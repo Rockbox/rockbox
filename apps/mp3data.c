@@ -42,6 +42,12 @@
 
 // #define DEBUG_VERBOSE
 
+#ifdef DEBUG_VERBOSE
+#define VDEBUGF DEBUGF
+#else
+#define VDEBUGF(...) do { } while(0)
+#endif
+
 #define SYNC_MASK (0x7ffL << 21)
 #define VERSION_MASK (3L << 19)
 #define LAYER_MASK (3L << 17)
@@ -184,13 +190,11 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     info->mode_extension = (header & MODE_EXT_MASK) >> 4;
     info->emphasis = header & EMPHASIS_MASK;
 
-#ifdef DEBUG_VERBOSE
-    DEBUGF( "Header: %08lx, Ver %d, lay %d, bitr %d, freq %ld, "
+    VDEBUGF( "Header: %08lx, Ver %d, lay %d, bitr %d, freq %ld, "
             "chmode %d, mode_ext %d, emph %d, bytes: %d time: %d/%d\n",
             header, info->version, info->layer+1, info->bitrate,
             info->frequency, info->channel_mode, info->mode_extension,
             info->emphasis, info->frame_size, info->ft_num, info->ft_den);
-#endif
     return true;
 }
 
@@ -230,10 +234,8 @@ static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
 
     *offset = pos - 4;
 
-#if defined(DEBUG)
     if(*offset)
-        DEBUGF("Warning: skipping %ld bytes of garbage\n", *offset);
-#endif
+        VDEBUGF("Warning: skipping %ld bytes of garbage\n", *offset);
 
     return header;
 }
@@ -373,9 +375,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
     /* OK, we have found a frame. Let's see if it has a Xing header */
     if (info->frame_size-4 >= (int)sizeof(frame))
     {
-#if defined(DEBUG)
         DEBUGF("Error: Invalid id3 header, frame_size: %d\n", info->frame_size);
-#endif
         return -8;
     }
     
@@ -476,7 +476,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
 
     if (!memcmp(vbrheader, "VBRI", 4))
     {
-        DEBUGF("VBRI header\n");
+        VDEBUGF("VBRI header\n");
 
         /* We want to skip the VBRI frame when playing the stream */
         bytecount += info->frame_size;
@@ -492,16 +492,16 @@ int get_mp3file_info(int fd, struct mp3info *info)
         if(!mp3headerinfo(info, header))
             return -7;
 
-        DEBUGF("%04x: %04x %04x ", 0, (short)(header >> 16),
+        VDEBUGF("%04x: %04x %04x ", 0, (short)(header >> 16),
                (short)(header & 0xffff));
         for(i = 4;i < (int)sizeof(frame)-4;i+=2) {
             if(i % 16 == 0) {
-                DEBUGF("\n%04x: ", i-4);
+                VDEBUGF("\n%04x: ", i-4);
             }
-            DEBUGF("%04x ", (frame[i-4] << 8) | frame[i-4+1]);
+            VDEBUGF("%04x ", (frame[i-4] << 8) | frame[i-4+1]);
         }
 
-        DEBUGF("\n");
+        VDEBUGF("\n");
         
         /* Yes, it is a FhG VBR file */
         info->is_vbr = true;
@@ -524,12 +524,12 @@ int get_mp3file_info(int fd, struct mp3info *info)
 
         /* We don't parse the TOC, since we don't yet know how to (FIXME) */
         num_offsets = bytes2int(0, 0, vbrheader[18], vbrheader[19]);
-        DEBUGF("Frame size (%dkpbs): %d bytes (0x%x)\n",
+        VDEBUGF("Frame size (%dkpbs): %d bytes (0x%x)\n",
                info->bitrate, info->frame_size, info->frame_size);
-        DEBUGF("Frame count: %lx\n", info->frame_count);
-        DEBUGF("Byte count: %lx\n", info->byte_count);
-        DEBUGF("Offsets: %d\n", num_offsets);
-        DEBUGF("Frames/entry: %ld\n",
+        VDEBUGF("Frame count: %lx\n", info->frame_count);
+        VDEBUGF("Byte count: %lx\n", info->byte_count);
+        VDEBUGF("Offsets: %d\n", num_offsets);
+        VDEBUGF("Frames/entry: %ld\n",
                 bytes2int(0, 0, vbrheader[24], vbrheader[25]));
 
         offset = 0;
@@ -538,7 +538,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
         {
            j = bytes2int(0, 0, vbrheader[26+i*2], vbrheader[27+i*2]);
            offset += j;
-           DEBUGF("%03d: %lx (%x)\n", i, offset - bytecount, j);
+           VDEBUGF("%03d: %lx (%x)\n", i, offset - bytecount, j);
         }
     }
 
@@ -603,7 +603,7 @@ int count_mp3_frames(int fd, int startpos, int filesize,
             }
         }
     }
-    DEBUGF("Total number of frames: %d\n", num_frames);
+    VDEBUGF("Total number of frames: %d\n", num_frames);
 
     if(is_vbr)
         return num_frames;
@@ -693,7 +693,7 @@ int create_xing_header(int fd, long startpos, long filesize,
                 toc[i] = filepos * 256 / filesize;
             }
             
-            DEBUGF("Pos %d: %ld  relpos: %ld  filepos: %lx tocentry: %x\n",
+            VDEBUGF("Pos %d: %ld  relpos: %ld  filepos: %lx tocentry: %x\n",
                    i, pos, pos-last_pos, filepos, toc[i]);
             
             last_pos = pos;
