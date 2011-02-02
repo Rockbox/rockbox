@@ -596,7 +596,8 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             break;
         
         case MP4_ilst:
-            if (handler == MP4_mdir)
+            /* We need at least a size of 8 to read the next atom. */
+            if (handler == MP4_mdir && size>8)
             {
                 rc = read_mp4_tags(fd, id3, size);
                 size = 0;
