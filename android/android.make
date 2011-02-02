@@ -9,7 +9,7 @@
 
 .SECONDEXPANSION: # $$(JAVA_OBJ) is not populated until after this
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
-.PHONY: apk classes clean dex dirs libs
+.PHONY: apk classes clean dex dirs libs jar
 
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB)
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS)
@@ -48,6 +48,7 @@ LIBS		:= $(BINLIB_DIR)/$(BINARY) $(BINLIB_DIR)/libmisc.so
 TEMP_APK	:= $(BUILDDIR)/bin/_rockbox.apk
 TEMP_APK2	:= $(BUILDDIR)/bin/__rockbox.apk
 DEX		:= $(BUILDDIR)/bin/classes.dex
+JAR		:= $(BUILDDIR)/bin/classes.jar
 AP_		:= $(BUILDDIR)/bin/resources.ap_
 APK		:= $(BUILDDIR)/rockbox.apk
 
@@ -78,12 +79,22 @@ $(BUILDDIR)/bin/$(PACKAGE_PATH)/%.class: $(ANDROID_DIR)/src/$(PACKAGE_PATH)/%.ja
 		$(JAVAC_OPTS) \
 		-sourcepath $(ANDROID_DIR)/src $<
 
-$(DEX): $(R_OBJ) $(JAVA_OBJ)
-	$(call PRINTS,DX $(subst $(BUILDDIR)/,,$@))$(DX) --dex --output=$@ $(BUILDDIR)/bin
+$(JAR): $(JAVA_SRC) $(R_JAVA)
+	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$?))javac -d $(BUILDDIR)/bin \
+		$(JAVAC_OPTS) \
+		-sourcepath $(ANDROID_DIR)/src:$(ANDROID_DIR)/gen $?
+	$(call PRINTS,JAR $(subst $(BUILDDIR)/,,$@))jar cf $(JAR) -C $(BUILDDIR)/bin org
 
-classes: $(R_OBJ) $(JAVA_OBJ)
+jar: $(JAR)
+
+$(DEX): $(JAR)
+	@echo "Checking for deleted class files" && $(foreach obj,$(JAVA_OBJ) $(R_OBJ), \
+		(test -f $(obj) || (echo "$(obj) is missing. Run 'make classes' to fix." && false)) && ) true
+	$(call PRINTS,DX $(subst $(BUILDDIR)/,,$@))$(DX) --dex --output=$@ $<
 
 dex: $(DEX)
+
+classes: $(R_OBJ) $(JAVA_OBJ)
 
 $(BINLIB_DIR)/$(BINARY): $(BUILDDIR)/$(BINARY)
 	$(call PRINTS,CP $(BINARY))cp $^ $@
