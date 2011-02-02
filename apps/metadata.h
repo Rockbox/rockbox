@@ -240,6 +240,10 @@ struct mp3entry {
     /* Added for ATRAC3 */
     unsigned int channels;       /* Number of channels in the stream */
     unsigned int extradata_size; /* Size (in bytes) of the codec's extradata from the container */
+
+    /* Added for AAC HE SBR */
+    bool needs_upsampling_correction; /* flag used by aac codec */
+
     /* these following two fields are used for local buffering */
     char id3v2buf[ID3V2_BUF_SIZE];
     char id3v1buf[4][92];

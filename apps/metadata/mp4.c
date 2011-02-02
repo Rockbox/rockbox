@@ -639,7 +639,10 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             {
                 uint32_t entries;
                 unsigned int i;
-                
+
+                /* Reset to false. */
+                id3->needs_upsampling_correction = true;
+
                 lseek(fd, 4, SEEK_CUR);
                 read_uint32be(fd, &entries);
                 id3->samples = 0;
@@ -651,7 +654,21 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
 
                     read_uint32be(fd, &n);
                     read_uint32be(fd, &l);
-                    id3->samples += n * l;
+
+                    /* Some SBR files use upsampling. In this case the number 
+                     * of output samples is doubled to a maximum of 2048 
+                     * samples per frame. This means that files which already 
+                     * report a frame size of 2048 in their header will not 
+                     * need any further special handling. */
+                    if (SBR_upsampling_used && l<=1024)
+                    {
+                        id3->samples += n * l * 2;
+                        id3->needs_upsampling_correction = true;
+                    }
+                    else
+                    {
+                        id3->samples += n * l;
+                    }
                 }
                 
                 size = 0;
@@ -759,12 +776,6 @@ bool get_mp4_metadata(int fd, struct mp3entry* id3)
         {
             logf("Not an ALAC or AAC file");
             return false;
-        }
-        
-        /* SBR upsampling will output double amount of samples per frame. */
-        if (SBR_upsampling_used)
-        {
-            id3->samples *= 2;
         }
 
         id3->length = ((int64_t) id3->samples * 1000) / id3->frequency;

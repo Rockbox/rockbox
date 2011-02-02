@@ -145,8 +145,8 @@ next_track:
     }
 
 #ifdef SBR_DEC
-    /* The file uses SBR. */
-    if (decoder->forceUpSampling) {
+    /* Check for need of special handling for seek/resume and elapsed time. */
+    if (ci->id3->needs_upsampling_correction) {
         sbr_fac = 2;
     } else {
         sbr_fac = 1;
