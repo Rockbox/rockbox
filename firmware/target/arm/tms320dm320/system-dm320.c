@@ -308,7 +308,7 @@ void system_init(void)
     map_section(0, 0, 0x1000, CACHE_NONE);
     
     /* Enable caching for RAM */
-    map_section(CONFIG_SDRAM_START, CONFIG_SDRAM_START, MEM, CACHE_ALL);
+    map_section(CONFIG_SDRAM_START, CONFIG_SDRAM_START, MEMORYSIZE, CACHE_ALL);
     /* enable buffered writing for the framebuffer */
     map_section((int)FRAME, (int)FRAME, LCD_TTB_AREA, BUFFERED);
 #ifdef CREATIVE_ZVx
