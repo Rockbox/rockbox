@@ -59,6 +59,7 @@ enum codec_status codec_main(void)
     NeAACDecHandle decoder;
     int err;
     uint32_t s = 0;
+    uint32_t sbr_fac = 1;
     unsigned char c = 0;
     void *ret;
 
@@ -143,13 +144,26 @@ next_track:
         decoder->fb_intermed[1] = &gb_fb_intermed[1][0];
     }
 
+#ifdef SBR_DEC
+    /* The file uses SBR. */
+    if (decoder->forceUpSampling) {
+        sbr_fac = 2;
+    } else {
+        sbr_fac = 1;
+    }
+#endif
+
     ci->id3->frequency = s;
 
     i = 0;
     
     if (file_offset > 0) {
+        /* Resume the desired (byte) position. Important: When resuming SBR
+         * upsampling files the resulting sound_samples_done must be expanded 
+         * by a factor of 2. This is done via using sbr_fac. */
         if (alac_seek_raw(&demux_res, &input_stream, file_offset,
                           &sound_samples_done, (int*) &i)) {
+            sound_samples_done *= sbr_fac;
             elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
             ci->set_elapsed(elapsed_time);
         } else {
@@ -174,9 +188,14 @@ next_track:
 
         /* Deal with any pending seek requests */
         if (ci->seek_time) {
+            /* Seek to the desired time position. Important: When seeking in SBR
+             * upsampling files the seek_time must be divided by 2 when calling 
+             * alac_seek and the resulting sound_samples_done must be expanded 
+             * by a factor 2. This is done via using sbr_fac. */
             if (alac_seek(&demux_res, &input_stream,
-                          ((ci->seek_time-1)/10)*(ci->id3->frequency/100),
+                          ((ci->seek_time-1)/10/sbr_fac)*(ci->id3->frequency/100),
                           &sound_samples_done, (int*) &i)) {
+                sound_samples_done *= sbr_fac;
                 elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
                 ci->set_elapsed(elapsed_time);
             
@@ -234,6 +253,10 @@ next_track:
         /* Output the audio */
         ci->yield();
         
+        /* Ensure correct sample_duration is used. For SBR upsampling files
+         * sample_duration is only half the size of real output frame size. */
+        sample_duration *= sbr_fac;
+        
         framelength = (frame_info.samples >> 1) - lead_trim;
         
         if (i == demux_res.num_sample_byte_sizes - 1 && framelength > 0)
@@ -266,7 +289,7 @@ next_track:
         {
             /* frame_info.samples can be 0 for the first frame */
             lead_trim -= (i > 0 || frame_info.samples)
-                ? (frame_info.samples >> 1) : sample_duration;
+                ? (frame_info.samples >> 1) : (uint32_t)framelength;
 
             if (lead_trim < 0 || ci->id3->lead_trim == 0)
             {
@@ -275,7 +298,7 @@ next_track:
         }
 
         /* Update the elapsed-time indicator */
-        sound_samples_done += sample_duration;
+        sound_samples_done += framelength;
         elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
         ci->set_elapsed(elapsed_time);
         i++;
