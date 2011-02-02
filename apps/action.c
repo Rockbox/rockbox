@@ -192,6 +192,9 @@ static int get_action_worker(int context, int timeout,
     {
         if (button&BUTTON_REL)
         {
+            /* remember the button for the below button eating on context
+             * change */
+            last_button = button;
             wait_for_release = false;
         }
         return ACTION_NONE;
