@@ -1134,7 +1134,7 @@ int flush;
     RESTORE();
     if (state->wsize || (state->mode < CHECK && out != strm->avail_out))
         if (updatewindow(strm, out)) {
-            state->mode = MEMORYSIZE;
+            state->mode = MEM;
             return Z_MEM_ERROR;
         }
     in -= strm->avail_in;
@@ -1190,7 +1190,7 @@ uInt dictLength;
 
     /* copy dictionary to window */
     if (updatewindow(strm, strm->avail_out)) {
-        state->mode = MEMORYSIZE;
+        state->mode = MEM;
         return Z_MEM_ERROR;
     }
     if (dictLength > state->wsize) {
