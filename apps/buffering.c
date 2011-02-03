@@ -25,8 +25,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
-#define assert(a)
-
 #include "buffering.h"
 
 #include "storage.h"
@@ -613,16 +611,6 @@ static inline bool buffer_is_low(void)
     return data_counters.useful < (conf_watermark / 2);
 }
 
-static uintptr_t beyond_handle(struct memory_handle *h)
-{
-    /*
-     * the last handle on the chain must leave at least one byte
-     * between itself and the first handle, to avoid overflowing the
-     * ring by advancing buf_widx up to buf_ridx
-     */
-    return h->next != 0 ? ringbuf_offset(h->next) : ringbuf_sub(buf_ridx, 1);
-}
-
 /* Buffer data for the given handle.
    Return whether or not the buffering should continue explicitly.  */
 static bool buffer_handle(int handle_id)
@@ -681,10 +669,10 @@ static bool buffer_handle(int handle_id)
                              buffer_len - h->widx);
 
         ssize_t overlap;
-        uintptr_t next_handle = beyond_handle(h);
+        uintptr_t next_handle = ringbuf_offset(h->next);
 
         /* stop copying if it would overwrite the reading position */
-        if (h->widx == next_handle || ringbuf_add_cross(h->widx, copy_n, buf_ridx) >= 0)
+        if (ringbuf_add_cross(h->widx, copy_n, buf_ridx) >= 0)
             return false;
 
         /* FIXME: This would overwrite the next handle
@@ -801,7 +789,8 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     LOGFQUEUE("buffering >| Q_RESET_HANDLE %d", handle_id);
     queue_send(&buffering_queue, Q_RESET_HANDLE, handle_id);
 
-    if (ringbuf_sub(beyond_handle(h), h->data) < h->filesize - newpos)
+    uintptr_t next = ringbuf_offset(h->next);
+    if (ringbuf_sub(next, h->data) < h->filesize - newpos)
     {
         /* There isn't enough space to rebuffer all of the track from its new
            offset, so we ask the user to free some */
