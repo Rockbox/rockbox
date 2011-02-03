@@ -46,6 +46,8 @@ enum codec_status codec_main(void)
     ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
 
 next_track:
+    /* Proper reset of the decoder context. */
+    memset(&wmadec, 0, sizeof(wmadec));
 
     /* Wait for the metadata to be read */
     while (!*ci->taginfo_ready && !ci->stop_codec)
