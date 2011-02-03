@@ -642,8 +642,8 @@ enum {
 #endif /* IRIVER_H100_PAD||IRIVER_H300_PAD */
 
 
-#define METRONOME_MSG_START     "start: press select"
-#define METRONOME_MSG_STOP      "start: hold select"
+#define METRONOME_MSG_START     "start: hold select"
+#define METRONOME_MSG_STOP      "stop : cancel"
 
 #ifdef MET_SYNC
 static const struct button_mapping iriver_syncaction[] =
