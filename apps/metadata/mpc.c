@@ -125,6 +125,8 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
            
             bufused = set_replaygain_sv7(id3, false, header[3], bufused);
             bufused = set_replaygain_sv7(id3, true , header[4], bufused);
+            
+            id3->codectype = AFMT_MPC_SV7;
         } else {
             return false; /* only SV7 is allowed within a "MP+" signature */
         }
@@ -191,6 +193,8 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
                     bufused += set_replaygain_sv8(id3, true , gain, peak, bufused);
                 }
             }
+            
+            id3->codectype = AFMT_MPC_SV8;
         } else {
             /* No sv8 stream header found */
             return false;

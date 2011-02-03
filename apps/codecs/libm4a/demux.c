@@ -257,7 +257,8 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
               stream_skip(qtmovie->stream, entry_remaining);
 
         } else if (qtmovie->res->format==MAKEFOURCC('m','p','4','a')) {
-          if (qtmovie->stream->ci->id3->codectype!=AFMT_MP4_AAC) {
+          if (qtmovie->stream->ci->id3->codectype!=AFMT_MP4_AAC &&
+              qtmovie->stream->ci->id3->codectype!=AFMT_MP4_AAC_HE) {
                return false;
           }
 

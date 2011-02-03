@@ -102,16 +102,45 @@ static bool codec_load_next_track(void);
 
 /** misc external functions */
 
+/* Used to check whether a new codec must be loaded. See array audio_formats[]
+ * in metadata.c */
 int get_codec_base_type(int type)
 {
+    int base_type = type;
     switch (type) {
         case AFMT_MPA_L1:
         case AFMT_MPA_L2:
         case AFMT_MPA_L3:
-            return AFMT_MPA_L3;
+            base_type = AFMT_MPA_L3;
+            break;
+        case AFMT_MPC_SV7:
+        case AFMT_MPC_SV8:
+            base_type = AFMT_MPC_SV7;
+            break;
+        case AFMT_MP4_AAC:
+        case AFMT_MP4_AAC_HE:
+            base_type = AFMT_MP4_AAC;
+            break;
+        case AFMT_SAP:
+        case AFMT_CMC:
+        case AFMT_CM3:
+        case AFMT_CMR:
+        case AFMT_CMS:
+        case AFMT_DMC:
+        case AFMT_DLT:
+        case AFMT_MPT:
+        case AFMT_MPD:
+        case AFMT_RMT:
+        case AFMT_TMC:
+        case AFMT_TM8:
+        case AFMT_TM2:
+            base_type = AFMT_SAP;
+            break;
+        default:
+            break;
     }
 
-    return type;
+    return base_type;
 }
 
 const char *get_codec_filename(int cod_spec)

@@ -300,8 +300,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
         /* Skip 13 bits from above, plus 3 bits, then read 11 bits */
         else if ((length >= 4) && (((bits >> 5) & 0x7ff) == 0x2b7))
         {
-            /* extensionAudioObjectType */
-            DEBUGF("MP4: extensionAudioType\n");
+            /* We found an extensionAudioObjectType */
             type = bits & 0x1f;         /* Object type - 5 bits*/
             bits = get_long_be(&buf[4]);
             
@@ -680,7 +679,6 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             {
                 uint32_t frequency;
 
-                id3->codectype = (type == MP4_mp4a) ? AFMT_MP4_AAC : AFMT_MP4_ALAC;
                 lseek(fd, 22, SEEK_CUR);
                 read_uint32be(fd, &frequency);
                 size -= 26;
@@ -700,11 +698,13 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                     read_mp4_atom(fd, &subsize, &subtype, size);
                     size -= 10;
                     
+                    id3->codectype = AFMT_MP4_AAC;
                     if (subtype == MP4_esds)
                     {
                         sbr_used = read_mp4_esds(fd, id3, &size);
                         if (sbr_used)
                         {
+                            id3->codectype = AFMT_MP4_AAC_HE;
                             if (SBR_upsampling_used)
                                 DEBUGF("MP4: AAC-HE, SBR upsampling\n");
                             else
@@ -712,6 +712,11 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                         }
                     }
                 }
+                else
+                {
+                    id3->codectype = AFMT_MP4_ALAC;
+                }
+
             }
             break;
 
