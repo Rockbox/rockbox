@@ -47,12 +47,10 @@ enum
     AFMT_OGG_VORBIS,   /* Ogg Vorbis */
     AFMT_FLAC,         /* FLAC */
     AFMT_MPC_SV7,      /* Musepack SV7 */
-    AFMT_MPC_SV8,      /* Musepack SV8 */
     AFMT_A52,          /* A/52 (aka AC3) audio */
     AFMT_WAVPACK,      /* WavPack */
     AFMT_MP4_ALAC,     /* Apple Lossless Audio Codec */
     AFMT_MP4_AAC,      /* Advanced Audio Coding (AAC) in M4A container */
-    AFMT_MP4_AAC_HE,   /* Advanced Audio Coding (AAC-HE) in M4A container */
     AFMT_SHN,          /* Shorten */
     AFMT_SID,          /* SID File Format */
     AFMT_ADX,          /* ADX File Format */
@@ -87,6 +85,8 @@ enum
     AFMT_WAVE64,       /* Wave64 */
     AFMT_TTA,          /* True Audio */
     AFMT_WMAVOICE,     /* WMA Voice in ASF */
+    AFMT_MPC_SV8,      /* Musepack SV8 */
+    AFMT_MP4_AAC_HE,   /* Advanced Audio Coding (AAC-HE) in M4A container */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

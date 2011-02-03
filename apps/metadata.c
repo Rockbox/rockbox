@@ -89,9 +89,6 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Musepack SV7 */
     [AFMT_MPC_SV7] =
         AFMT_ENTRY("MPCv7", "mpc",  NULL,       get_musepack_metadata,"mpc\0"),
-    /* Musepack SV8 */
-    [AFMT_MPC_SV8] =
-        AFMT_ENTRY("MPCv8", "mpc",  NULL,       get_musepack_metadata,"mpc\0"),
     /* A/52 (aka AC3) audio */                  
     [AFMT_A52] =
         AFMT_ENTRY("AC3",   "a52",  NULL,       get_a52_metadata,   "a52\0ac3\0"),
@@ -104,9 +101,6 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Advanced Audio Coding in M4A container */
     [AFMT_MP4_AAC] =
         AFMT_ENTRY("AAC",   "aac",  NULL,       get_mp4_metadata,   "mp4\0"),
-    /* Advanced Audio Coding High Efficiency in M4A container */
-    [AFMT_MP4_AAC_HE] =
-        AFMT_ENTRY("AAC-HE","aac",  NULL,       get_mp4_metadata,   "mp4\0"),
     /* Shorten */
     [AFMT_SHN] =
         AFMT_ENTRY("SHN","shorten", NULL,       get_shn_metadata,   "shn\0"),
@@ -209,6 +203,12 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* WMA Voice in ASF */
     [AFMT_WMAVOICE] =
         AFMT_ENTRY("WMAVoice","wmavoice",NULL,  NULL,               "wma\0wmv\0"),
+    /* Musepack SV8 */
+    [AFMT_MPC_SV8] =
+        AFMT_ENTRY("MPCv8", "mpc",  NULL,       get_musepack_metadata,"mpc\0"),
+    /* Advanced Audio Coding High Efficiency in M4A container */
+    [AFMT_MP4_AAC_HE] =
+        AFMT_ENTRY("AAC-HE","aac",  NULL,       get_mp4_metadata,   "mp4\0"),
 #endif
 };
 
