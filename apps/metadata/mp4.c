@@ -675,48 +675,54 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             break;
 
         case MP4_mp4a:
+            {
+                uint32_t subsize;
+                uint32_t subtype;
+
+                /* Move to the next expected mp4 atom. */
+                lseek(fd, 28, SEEK_CUR);
+                read_mp4_atom(fd, &subsize, &subtype, size);
+                size -= 36;
+
+                if (subtype == MP4_esds)
+                {
+                    /* Read esds metadata and return if AAC-HE/SBR is used. */
+                    if (read_mp4_esds(fd, id3, &size))
+                        id3->codectype = AFMT_MP4_AAC_HE;
+                    else
+                        id3->codectype = AFMT_MP4_AAC;
+                }
+            }
+            break;
+
         case MP4_alac:
             {
                 uint32_t frequency;
+                uint32_t subsize;
+                uint32_t subtype;
 
-                lseek(fd, 22, SEEK_CUR);
-                read_uint32be(fd, &frequency);
-                size -= 26;
-                id3->frequency = frequency;
-                
-                if (type == MP4_mp4a)
+                /* Move to the next expected mp4 atom. */
+                lseek(fd, 28, SEEK_CUR);
+                read_mp4_atom(fd, &subsize, &subtype, size);
+                size -= 36;
+#if 0
+                /* We might need to parse for the alac metadata atom. */
+                while (!((subsize==28) && (subtype==MP4_alac)) && (size>0))
                 {
-                    uint32_t subsize;
-                    uint32_t subtype;
-                    bool sbr_used;
-
-                    /* Get frequency from the decoder info tag, if possible. */
-                    lseek(fd, 2, SEEK_CUR);
-                    /* The esds atom is a part of the mp4a atom, so ignore 
-                     * the returned size (it's already accounted for).
-                     */
+                    lseek(fd, -7, SEEK_CUR);
                     read_mp4_atom(fd, &subsize, &subtype, size);
-                    size -= 10;
-                    
-                    id3->codectype = AFMT_MP4_AAC;
-                    if (subtype == MP4_esds)
-                    {
-                        sbr_used = read_mp4_esds(fd, id3, &size);
-                        if (sbr_used)
-                        {
-                            id3->codectype = AFMT_MP4_AAC_HE;
-                            if (SBR_upsampling_used)
-                                DEBUGF("MP4: AAC-HE, SBR upsampling\n");
-                            else
-                                DEBUGF("MP4: AAC-HE, SBR\n");
-                        }
-                    }
+                    size -= 1;
+                    errno = 0; /* will most likely be set while parsing */
                 }
-                else
+#endif
+                if (subtype == MP4_alac)
                 {
+                    lseek(fd, 24, SEEK_CUR);
+                    read_uint32be(fd, &frequency);
+                    size -= 28;
+                    id3->frequency = frequency;
                     id3->codectype = AFMT_MP4_ALAC;
                 }
-
             }
             break;
 
