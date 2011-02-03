@@ -32,20 +32,26 @@
 /* Video thread data passed around to its various functions */
 struct video_thread_data
 {
+    /* Stream data */
     mpeg2dec_t *mpeg2dec;   /* Our video decoder */
-    const  mpeg2_info_t *info; /* Info about video stream */
-    int    state;           /* Thread state */
-    int    status;          /* Media status */
-    struct queue_event ev;  /* Our event queue to receive commands */
-    uint32_t eta_stream;    /* Current time of stream */
-    uint32_t eta_video;     /* Time that frame has been scheduled for */
-    int32_t eta_early;      /* How early has the frame been decoded? */
-    int32_t eta_late;       /* How late has the frame been decoded? */
-    int frame_drop_level;   /* Drop severity */
-    int skip_level;         /* Skip severity */
-    long last_render;       /* Last time a frame was drawn */
-    uint32_t curr_time;     /* Current due time of frame */
-    uint32_t period;        /* Frame period in clock ticks */
+    const mpeg2_info_t *info; /* Info about video stream */
+    int      state;         /* Thread state */
+    int      status;        /* Media status */
+    struct   queue_event ev;/* Our event queue to receive commands */
+    /* Operational info */
+    uint32_t stream_time;   /* Current time from beginning of stream */
+    uint32_t goal_time;     /* Scheduled time of current frame */
+    int32_t  remain_time;   /* T-minus value to frame_time (-:early, +:late) */
+    int      skip_ref_pics; /* Severe skipping - wait for I-frame */
+    int      skip_level;    /* Number of frames still to skip */
+    int      num_picture;   /* Number of picture headers read */
+    int      num_intra;     /* Number of I-picture headers read */
+    int      group_est;     /* Estmated number remaining as of last I */
+    long     last_render;   /* Last time a frame was drawn */
+    /* Sync info */
+    uint32_t frame_time;    /* Current due time of frame (unadjusted) */
+    uint32_t frame_period;  /* Frame period in clock ticks */
+    int      num_ref_pics;  /* Number of I and P frames since sync/skip */
     int      syncf_perfect; /* Last sync fit result */
 };
 
@@ -61,6 +67,10 @@ static uint32_t video_stack[VIDEO_STACKSIZE / sizeof(uint32_t)] IBSS_ATTR;
 static struct event_queue video_str_queue SHAREDBSS_ATTR;
 static struct queue_sender_list video_str_queue_send SHAREDBSS_ATTR;
 struct stream video_str IBSS_ATTR;
+
+#define DEFAULT_GOP_SIZE    INT_MAX /* no I/P skips until it learns */
+#define DROP_THRESHOLD      (100*TS_SECOND/1000)
+#define MAX_EARLINESS       (120*TS_SECOND/1000)
 
 #if defined(DEBUG) || defined(SIMULATOR)
 static unsigned char pic_coding_type_char(unsigned type)
@@ -217,12 +227,12 @@ static bool check_needs_sync(struct video_thread_data *td, uint32_t time)
     }
 
     time = clip_time(&video_str, time);
-    end_time = td->curr_time + td->period;
+    end_time = td->frame_time + td->frame_period;
 
-    DEBUGF("  sft:%u t:%u sfte:%u\n", (unsigned)td->curr_time,
+    DEBUGF("  sft:%u t:%u sfte:%u\n", (unsigned)td->frame_time,
            (unsigned)time, (unsigned)end_time);
 
-    if (time < td->curr_time)
+    if (time < td->frame_time)
         return true;
 
     if (time >= end_time)
@@ -236,12 +246,12 @@ static int sync_decoder(struct video_thread_data *td,
                         struct str_sync_data *sd)
 {
     int retval = STREAM_ERROR;
-    int ipic = 0, ppic = 0;
     uint32_t time = clip_time(&video_str, sd->time);
 
     td->syncf_perfect = 0;
-    td->curr_time = 0;
-    td->period = 0;
+    td->frame_time = 0;
+    td->frame_period = 0;
+    td->num_ref_pics = 0;
 
     /* Sometimes theres no sequence headers nearby and libmpeg2 may have reset
      * fully at some point */
@@ -281,7 +291,6 @@ static int sync_decoder(struct video_thread_data *td,
             case STREAM_OK:
                 if (video_str.pkt_flags & PKT_HAS_TS)
                     mpeg2_tag_picture(td->mpeg2dec, video_str.pts, 0);
-
                 mpeg2_buffer(td->mpeg2dec, video_str.curr_packet,
                               video_str.curr_packet_end);
                 td->info = mpeg2_info(td->mpeg2dec);
@@ -310,11 +319,13 @@ static int sync_decoder(struct video_thread_data *td,
             case PIC_FLAG_CODING_TYPE_I:
                 /* I-frame; start decoding */
                 mpeg2_skip(td->mpeg2dec, 0);
-                ipic = 1;
+                td->num_ref_pics++;
                 break;
+
             case PIC_FLAG_CODING_TYPE_P:
                 /* P-frames don't count without I-frames */
-                ppic = ipic;
+                if (td->num_ref_pics > 0)
+                    td->num_ref_pics++;
                 break;
             }
 
@@ -348,26 +359,26 @@ static int sync_decoder(struct video_thread_data *td,
 
             if (td->info->display_picture->flags & PIC_FLAG_TAGS)
             {
-                td->curr_time = td->info->display_picture->tag;
-                DEBUGF("  frame tagged:%u (%c%s)\n", (unsigned)td->curr_time,
+                td->frame_time = td->info->display_picture->tag;
+                DEBUGF("  frame tagged:%u (%c%s)\n", (unsigned)td->frame_time,
                        pic_coding_type_char(type),
                        (td->info->display_picture->flags & PIC_FLAG_SKIP) ?
                             " skipped" : "");
             }
             else
             {
-                td->curr_time += td->period;
-                DEBUGF("  add period:%u (%c%s)\n", (unsigned)td->curr_time,
+                td->frame_time += td->frame_period;
+                DEBUGF("  add frame_period:%u (%c%s)\n", (unsigned)td->frame_time,
                        pic_coding_type_char(type),
                        (td->info->display_picture->flags & PIC_FLAG_SKIP) ?
                             " skipped" : "");
             }
 
-            td->period = TC_TO_TS(td->info->sequence->frame_period);
-            end_time = td->curr_time + td->period;
+            td->frame_period = TC_TO_TS(td->info->sequence->frame_period);
+            end_time = td->frame_time + td->frame_period;
 
             DEBUGF("  ft:%u t:%u fe:%u (%c%s)",
-                   (unsigned)td->curr_time,
+                   (unsigned)td->frame_time,
                    (unsigned)time,
                    (unsigned)end_time,
                    pic_coding_type_char(type),
@@ -383,12 +394,22 @@ static int sync_decoder(struct video_thread_data *td,
             else if (!(td->info->display_picture->flags & PIC_FLAG_SKIP))
             {
                 /* One perfect point if dependent frames were decoded */
-                td->syncf_perfect = ipic;
+                switch (type)
+                {
+                case PIC_FLAG_CODING_TYPE_B:
+                    if (td->num_ref_pics > 1)
+                    {
+                case PIC_FLAG_CODING_TYPE_P:
+                        if (td->num_ref_pics > 0)
+                        {
+                case PIC_FLAG_CODING_TYPE_I:
+                            td->syncf_perfect = 1;
+                            break;
+                        }
+                    }
+                }
 
-                if (type == PIC_FLAG_CODING_TYPE_B)
-                   td->syncf_perfect &= ppic;
-
-                if ((td->curr_time <= time && time < end_time) ||
+                if ((td->frame_time <= time && time < end_time) ||
                     end_time >= video_str.end_pts)
                 {
                     /* One perfect point for matching time goal */
@@ -464,18 +485,25 @@ static void video_thread_msg(struct video_thread_data *td)
 
             switch (td->state)
             {
-            case TSTATE_RENDER_WAIT:
-                /* Settings may have changed to nonlimited - just draw
-                 * what was previously being waited for */
-                if (!settings.limitfps)
-                    td->state = TSTATE_RENDER;
-            case TSTATE_DECODE:
-            case TSTATE_RENDER:
-                break;
-
             case TSTATE_INIT:
                 /* Begin decoding state */
                 td->state = TSTATE_DECODE;
+                /* */
+            case TSTATE_DECODE:
+                if (td->syncf_perfect <= 0)
+                    break;
+                /* There should be a frame already, just draw it */
+                td->goal_time = td->frame_time;
+                td->state = TSTATE_RENDER_WAIT;
+                /* */
+            case TSTATE_RENDER_WAIT:
+                /* Settings may have changed to nonlimited - just draw
+                 * what was previously being waited for */
+                td->stream_time = TICKS_TO_TS(stream_get_time());
+                if (!settings.limitfps)
+                    td->state = TSTATE_RENDER;
+                /* */
+            case TSTATE_RENDER:
                 break;
 
             case TSTATE_EOS:
@@ -538,12 +566,14 @@ static void video_thread_msg(struct video_thread_data *td)
             td->status = STREAM_STOPPED;
 
             /* Reset operational info but not sync info */
-            td->eta_stream = UINT32_MAX;
-            td->eta_video = 0;
-            td->eta_early = 0;
-            td->eta_late = 0;
-            td->frame_drop_level = 0;
+            td->stream_time = UINT32_MAX;
+            td->goal_time = 0;
+            td->remain_time = 0;
+            td->skip_ref_pics = 0;
             td->skip_level = 0;
+            td->num_picture = 0;
+            td->num_intra = 0;
+            td->group_est = DEFAULT_GOP_SIZE;
             td->last_render = *rb->current_tick - HZ;
             video_num_drawn = 0;
             video_num_skipped = 0;
@@ -639,13 +669,10 @@ static void video_thread(void)
 {
     struct video_thread_data td;
 
+    memset(&td, 0, sizeof (td));
+    td.mpeg2dec = mpeg2_init();
     td.status = STREAM_STOPPED;
     td.state = TSTATE_EOS;
-    td.mpeg2dec = mpeg2_init();
-    td.info = NULL;
-    td.syncf_perfect = 0;
-    td.curr_time = 0;
-    td.period = 0;
 
     if (td.mpeg2dec == NULL)
     {
@@ -687,10 +714,7 @@ static void video_thread(void)
             case TSTATE_RENDER:      goto picture_draw;
             case TSTATE_RENDER_WAIT: goto picture_wait;
             /* Anything else is interpreted as an exit */
-            default:
-                vo_cleanup();
-                mpeg2_close(td.mpeg2dec);
-                return;
+            default:                 goto video_exit;
             }
         }
 
@@ -733,50 +757,71 @@ static void video_thread(void)
 
         case STATE_PICTURE:
         {
-            int skip = 0; /* Assume no skip */
+            /* This is not in presentation order - do our best anyway */
+            int skip = td.skip_ref_pics;
 
-            if (td.frame_drop_level >= 1 || td.skip_level > 0)
+            /* Frame type: I/P/B/D */
+            switch (td.info->current_picture->flags & PIC_MASK_CODING_TYPE)
             {
-                /* A frame will be dropped in the decoder */
+            case PIC_FLAG_CODING_TYPE_I:
+                if (++td.num_intra >= 2)
+                    td.group_est = td.num_picture / (td.num_intra - 1);
 
-                /* Frame type: I/P/B/D */
-                int type = td.info->current_picture->flags
-                            & PIC_MASK_CODING_TYPE;
-
-                switch (type)
+                /* Things are extremely late and all frames will be
+                   dropped until the next key frame */
+                if (td.skip_level > 0 && td.skip_level >= td.group_est)
                 {
-                case PIC_FLAG_CODING_TYPE_I:
-                case PIC_FLAG_CODING_TYPE_D:
-                    /* Level 5: Things are extremely late and all frames will
-                       be dropped until the next key frame */
-                    if (td.frame_drop_level >= 1)
-                        td.frame_drop_level = 0; /* Key frame - reset drop level */
-                    if (td.skip_level >= 5)
+                    td.skip_level--;           /* skip frame  */
+                    skip = td.skip_ref_pics = 1; /* wait for I-frame */
+                    td.num_ref_pics = 0;
+                }
+                else if (skip != 0)
+                {
+                    skip = td.skip_ref_pics = 0; /* now, decode */
+                    td.num_ref_pics = 1;
+                }
+                break;
+
+            case PIC_FLAG_CODING_TYPE_P:
+                if (skip == 0)
+                {
+                    td.num_ref_pics++;
+
+                    /* If skip_level at least the estimated number of frames
+                       left in I-I span, skip until next I-frame */
+                    if (td.group_est > 0 && td.skip_level >= td.group_est)
                     {
-                        td.frame_drop_level = 1;
-                        td.skip_level = 0; /* reset */
+                        skip = td.skip_ref_pics = 1; /* wait for I-frame */
+                        td.num_ref_pics = 0;
                     }
-                    break;
-                case PIC_FLAG_CODING_TYPE_P:
-                    /* Level 4: Things are very late and all frames will be
-                       dropped until the next key frame */
-                    if (td.skip_level >= 4)
-                    {
-                        td.frame_drop_level = 1;
-                        td.skip_level = 0; /* reset */
-                    }
-                    break;
-                case PIC_FLAG_CODING_TYPE_B:
-                    /* We want to drop something, so this B frame won't even
-                       be decoded. Drawing can happen on the next frame if so
-                       desired. Bring the level down as skips are done. */
-                    skip = 1;
-                    if (td.skip_level > 0)
-                        td.skip_level--;
                 }
 
-                skip |= td.frame_drop_level;
+                if (skip != 0)
+                    td.skip_level--; 
+                break;
+
+            case PIC_FLAG_CODING_TYPE_B:
+                /* We want to drop something, so this B-frame won't even be
+                   decoded. Drawing can happen on the next frame if so desired
+                   so long as the B-frames were not dependent upon those from
+                   a previous open GOP where the needed reference frames were
+                   skipped */
+                if (td.skip_level > 0 || td.num_ref_pics < 2)
+                {
+                    skip = 1;
+                    td.skip_level--;
+                }
+                break;
+
+            default:
+                skip = 1;
+                break;
             }
+
+            if (td.num_intra > 0)
+                td.num_picture++;
+
+            td.group_est--;
 
             mpeg2_skip(td.mpeg2dec, skip);
             break;  
@@ -788,47 +833,73 @@ static void video_thread(void)
         {
             int32_t offset;  /* Tick adjustment to keep sync */
 
-            /* draw current picture */
             if (td.info->display_fbuf == NULL)
                 break; /* No picture */
 
-            td.syncf_perfect = 1; /* yes, a frame exists */
-
             /* Get presentation times in audio samples - quite accurate
                enough - add previous frame duration if not stamped */
-            td.curr_time = (td.info->display_picture->flags & PIC_FLAG_TAGS) ?
-                td.info->display_picture->tag : (td.curr_time + td.period);
+            if (td.info->display_picture->flags & PIC_FLAG_TAGS)
+                td.frame_time = td.info->display_picture->tag;
+            else
+                td.frame_time += td.frame_period;
 
-            td.period = TC_TO_TS(td.info->sequence->frame_period);
+            td.frame_period = TC_TO_TS(td.info->sequence->frame_period);
 
-            /* No limiting => no dropping - draw this frame */
             if (!settings.limitfps)
             {
+                /* No limiting => no dropping or waiting - draw this frame */
+                td.remain_time = 0;
+                td.skip_level = 0;
+                td.syncf_perfect = 1; /* have frame */
                 goto picture_draw;
             }
 
-            td.eta_video = td.curr_time;
-            td.eta_stream = TICKS_TO_TS(stream_get_time());
+            td.goal_time = td.frame_time;
+            td.stream_time = TICKS_TO_TS(stream_get_time());
 
             /* How early/late are we? > 0 = late, < 0  early */
-            offset = td.eta_stream - td.eta_video;
+            offset = td.stream_time - td.goal_time;
+
+            if (offset >= 0)
+            {
+                /* Late or on-time */
+                if (td.remain_time < 0)
+                    td.remain_time = 0;              /* now, late */
+
+                offset = AVERAGE(td.remain_time, offset, 4);
+                td.remain_time = offset;
+            }
+            else
+            {
+                /* Early */
+                if (td.remain_time >= 0)
+                    td.remain_time = 0;              /* now, early */
+                else if (offset > td.remain_time)
+                    td.remain_time = MAX(offset, -MAX_EARLINESS); /* less early */
+                else if (td.remain_time != 0)
+                    td.remain_time = AVERAGE(td.remain_time, 0, 8); /* earlier/same */
+                /* else there's been no frame drop */
+
+                offset = -td.remain_time;
+            }
+
+            /* Skip anything not decoded */
+            if (td.info->display_picture->flags & PIC_FLAG_SKIP)
+                goto picture_skip;
+
+            td.syncf_perfect = 1; /* have frame (assume so from now on) */
+
+            /* Keep goal_time >= 0 */
+            if ((uint32_t)offset > td.goal_time)
+                offset = td.goal_time;
+
+            td.goal_time -= offset;
 
             if (!settings.skipframes)
             {
-                /* Make no effort to determine whether this frame should be
-                   drawn or not since no action can be taken to correct the
-                   situation. We'll just wait if we're early and correct for
+                /* No skipping - just wait if we're early and correct for
                    lateness as much as possible. */
-                if (offset < 0)
-                    offset = 0;
-
-                td.eta_late = AVERAGE(td.eta_late, offset, 4);
-                offset = td.eta_late;
-
-                if ((uint32_t)offset > td.eta_video)
-                    offset = td.eta_video;
-
-                td.eta_video -= offset;
+                td.skip_level = 0;
                 goto picture_wait;
             }
 
@@ -838,112 +909,52 @@ static void video_thread(void)
              *
              * Frame Type  Who      Notes/Rationale
              * B           decoder  arbitrarily drop - no decode or draw
-             * Any         renderer arbitrarily drop - will be I/D/P
-             * P           decoder  must wait for I/D-frame - choppy
-             * I/D         decoder  must wait for I/D-frame - choppy
+             * Any         renderer arbitrarily drop - I/P unless B decoded
+             * P           decoder  must wait for I-frame
+             * I           decoder  must wait for I-frame
              *
              * If a frame can be drawn and it has been at least 1/2 second,
              * the image will be updated no matter how late it is just to
              * avoid looking stuck.
              */
-
-            /* If we're late, set the eta to play the frame early so
-               we may catch up. If early, especially because of a drop,
-               mitigate a "snap" by moving back gradually. */
-            if (offset >= 0) /* late or on time */
-            {
-                td.eta_early = 0; /* Not early now :( */
-
-                td.eta_late = AVERAGE(td.eta_late, offset, 4);
-                offset = td.eta_late;
-
-                if ((uint32_t)offset > td.eta_video)
-                    offset = td.eta_video;
-
-                td.eta_video -= offset;
-            }
-            else
-            {
-                td.eta_late = 0; /* Not late now :) */
-
-                if (offset > td.eta_early)
-                {
-                    /* Just dropped a frame and we're now early or we're
-                       coming back from being early */
-                    td.eta_early = offset;
-                    if ((uint32_t)-offset > td.eta_video)
-                        offset = -td.eta_video;
-
-                    td.eta_video += offset;
-                }
-                else
-                {
-                    /* Just early with an offset, do exponential drift back */
-                    if (td.eta_early != 0)
-                    {
-                        td.eta_early = AVERAGE(td.eta_early, 0, 8);
-                        td.eta_video = ((uint32_t)-td.eta_early > td.eta_video) ?
-                            0 : (td.eta_video + td.eta_early);
-                    }
-
-                    offset = td.eta_early;
-                }
-            }
-
-            if (td.info->display_picture->flags & PIC_FLAG_SKIP)
-            {
-                /* This frame was set to skip so skip it after having updated
-                   timing information */
-                td.eta_early = INT32_MIN;
-                video_num_skipped++;
-                goto picture_skip;
-            }
-
-            if (td.skip_level == 3 &&
+            if (td.skip_level > 0 &&
                 TIME_BEFORE(*rb->current_tick, td.last_render + HZ/2))
             {
-                /* Render drop was set previously but nothing was dropped in the
-                   decoder or it's been to long since drawing the last frame. */
-                td.skip_level = 0;
-                td.eta_early = INT32_MIN;
-                video_num_skipped++;
+                /* Frame skip was set previously but either there wasn't anything
+                   dropped yet or not dropped enough. So we quit at least rendering 
+                   the actual frame to avoid further increase of a/v-drift. */
+                td.skip_level--;
                 goto picture_skip;
             }
 
             /* At this point a frame _will_ be drawn  - a skip may happen on
                the next however */
+
+            /* Calculate number of frames to drop/skip - allow brief periods
+               of lateness before producing skips */
             td.skip_level = 0;
-
-            if (offset > TS_SECOND*110/1000)
+            if (td.remain_time > 0 && (uint32_t)offset > DROP_THRESHOLD)
             {
-                /* Decide which skip level is needed in order to catch up */
-
-                /* TODO: Calculate this rather than if...else - this is rather
-                   exponential though */
-                if (offset > TS_SECOND*367/1000)
-                    td.skip_level = 5; /* Decoder skip: I/D */
-                if (offset > TS_SECOND*233/1000)
-                    td.skip_level = 4; /* Decoder skip: P */
-                else if (offset > TS_SECOND*167/1000)
-                    td.skip_level = 3; /* Render skip */
-                else if (offset > TS_SECOND*133/1000)
-                    td.skip_level = 2; /* Decoder skip: B */
-                else
-                    td.skip_level = 1; /* Decoder skip: B */
+                td.skip_level = (offset - DROP_THRESHOLD + td.frame_period)
+                                    / td.frame_period;
             }
 
         picture_wait:
             td.state = TSTATE_RENDER_WAIT;
 
             /* Wait until time catches up */
-            while (td.eta_video > td.eta_stream)
+            while (1)
             {
+                int32_t twait = td.goal_time - td.stream_time;
                 /* Watch for messages while waiting for the frame time */
-                int32_t eta_remaining = td.eta_video - td.eta_stream;
-                if (eta_remaining > TS_SECOND/HZ)
+
+                if (twait <= 0)
+                    break;
+
+                if (twait > TS_SECOND/HZ)
                 {
                     /* Several ticks to wait - do some sleeping */
-                    int timeout = (eta_remaining - HZ) / (TS_SECOND/HZ);
+                    int timeout = (twait - HZ) / (TS_SECOND/HZ);
                     str_get_msg_w_tmo(&video_str, &td.ev, MAX(timeout, 1));
                     if (td.ev.id != SYS_TIMEOUT)
                         goto message_process;
@@ -956,7 +967,7 @@ static void video_thread(void)
                         goto message_wait;
                 }
 
-                td.eta_stream = TICKS_TO_TS(stream_get_time());
+                td.stream_time = TICKS_TO_TS(stream_get_time());
             }
        
         picture_draw:
@@ -965,8 +976,17 @@ static void video_thread(void)
 
             vo_draw_frame(td.info->display_fbuf->buf);
             video_num_drawn++;
+            break;
 
         picture_skip:
+            if (td.remain_time <= DROP_THRESHOLD)
+            {
+                td.skip_level = 0;
+                if (td.remain_time <= 0)
+                    td.remain_time = INT32_MIN;
+            }
+
+            video_num_skipped++;
             break;
             }
 
@@ -976,6 +996,10 @@ static void video_thread(void)
 
         rb->yield();
     } /* end while */
+
+video_exit:
+    vo_cleanup();
+    mpeg2_close(td.mpeg2dec);
 }
 
 /* Initializes the video thread */
