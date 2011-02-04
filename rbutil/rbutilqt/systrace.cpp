@@ -99,8 +99,7 @@ void SysTrace::debug(QtMsgType type, const char* msg)
     if(lastmessage != msg) {
         lastmessage = msg;
         flush();
-        debugbuffer.append(msg);
-        debugbuffer.append("\n");
+        debugbuffer.append(QString::fromLocal8Bit(msg) + "\n");
 #if !defined(NODEBUG)
         fprintf(stderr, "%s\n", msg);
 #endif
