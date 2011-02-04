@@ -143,16 +143,16 @@ QStringList SystemInfo::platforms(enum SystemInfo::PlatformType type, QString va
     return result;
 }
 
-QStringList SystemInfo::languages()
+QMap<QString, QString> SystemInfo::languages(void)
 {
     ensureSystemInfoExists();
 
-    QStringList result;
+    QMap<QString, QString> result;
     systemInfos->beginGroup("languages");
     QStringList a = systemInfos->childKeys();
     for(int i = 0; i < a.size(); i++)
     {
-        result.append(systemInfos->value(a.at(i), "null").toString());
+        result.insert(a.at(i), systemInfos->value(a.at(i), "null").toString());
     }
     systemInfos->endGroup();
     return result;

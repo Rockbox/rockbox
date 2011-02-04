@@ -71,24 +71,28 @@ void CreateVoiceWindow::accept()
 void CreateVoiceWindow::updateSettings(void)
 {
     // fill in language combobox
-    QStringList languages = SystemInfo::languages();
-    languages.sort();
-    ui.comboLanguage->addItems(languages);
+    QMap<QString, QString> languages = SystemInfo::languages();
+
+    for(int i = 0; i < languages.keys().size(); i++) {
+        QString key = languages.keys().at(i);
+        ui.comboLanguage->addItem(languages.value(key), key);
+    }
     // set saved lang
-    int sel = ui.comboLanguage->findText(RbSettings::value(RbSettings::VoiceLanguage).toString());
+    int sel = ui.comboLanguage->findText(
+            RbSettings::value(RbSettings::VoiceLanguage).toString());
     // if no saved language is found try to figure the language from the UI lang
     if(sel == -1) {
         QString f = RbSettings::value(RbSettings::Language).toString();
         // if no language is set default to english. Make sure not to check an empty string.
         if(f.isEmpty()) f = "english";
-        sel = ui.comboLanguage->findText(f, Qt::MatchStartsWith);
+        sel = ui.comboLanguage->findData(f);
         qDebug() << "sel =" << sel;
         // still nothing found?
         if(sel == -1)
             sel = ui.comboLanguage->findText("english", Qt::MatchStartsWith);
     }
     ui.comboLanguage->setCurrentIndex(sel);
-    
+
     QString ttsName = RbSettings::value(RbSettings::Tts).toString();
     TTSBase* tts = TTSBase::getTTS(this,ttsName);
     if(tts->configOk())

@@ -131,9 +131,10 @@ void Config::accept()
     if(RbSettings::value(RbSettings::Language).toString() != language
             && !language.isEmpty()) {
         QMessageBox::information(this, tr("Language changed"),
-            tr("You need to restart the application for the changed language to take effect."));
-        RbSettings::setValue(RbSettings::Language, language);
+            tr("You need to restart the application for the changed language "
+               "to take effect."));
     }
+    RbSettings::setValue(RbSettings::Language, language);
 
     // mountpoint
     QString mp = ui.mountPoint->text();

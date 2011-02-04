@@ -38,11 +38,10 @@ TTSBase::Capabilities TTSSapi::capabilities()
 void TTSSapi::generateSettings()
 {
     // language
-    QStringList languages = SystemInfo::languages();
-    languages.sort();
+    QMap<QString, QString> languages = SystemInfo::languages();
     EncTtsSetting* setting =new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,
         tr("Language:"),RbSettings::subValue("sapi",RbSettings::TtsLanguage),
-        languages);
+        languages.values());
     connect(setting,SIGNAL(dataChanged()),this,SLOT(updateVoiceList()));
     insertSetting(eLANGUAGE,setting);
     // voice
