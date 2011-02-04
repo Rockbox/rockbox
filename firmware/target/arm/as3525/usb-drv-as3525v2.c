@@ -96,7 +96,7 @@ static enum ep0state ep0_state;
 void usb_attach(void)
 {
     logf("usb-drv: attach");
-    usb_enable(true);
+    /* Nothing to do */
 }
 
 static inline void usb_delay(void)
@@ -654,9 +654,7 @@ void INT_USB(void)
 
     if(sts & GINTMSK_disconnect)
     {
-        panicf("usb-drv: disconnect");
         cancel_all_transfers(true);
-        usb_enable(false);
     }
 
     GINTSTS = sts;
