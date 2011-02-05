@@ -42,6 +42,11 @@
 #include "sbr_hfadj.h"
 
 
+/* globals */
+static qmf_t X_left [MAX_NTSRHFG][64] MEM_ALIGN_ATTR;// = {{0}};
+static qmf_t X_right[MAX_NTSRHFG][64] MEM_ALIGN_ATTR;// = {{0}}; /* must set this to 0 */
+
+
 /* static function declarations */
 static uint8_t sbr_save_prev_data(sbr_info *sbr, uint8_t ch);
 static void sbr_save_matrix(sbr_info *sbr, uint8_t ch);
@@ -227,7 +232,7 @@ static void sbr_save_matrix(sbr_info *sbr, uint8_t ch)
 }
 
 #ifdef SBR_LOW_POWER
-    ALIGN real_t deg[64];
+    real_t deg[64] MEM_ALIGN_ATTR;
 #endif
 
 static void sbr_process_channel(sbr_info *sbr, real_t *channel_buf, qmf_t X[MAX_NTSR][64],
@@ -370,7 +375,6 @@ static void sbr_process_channel(sbr_info *sbr, real_t *channel_buf, qmf_t X[MAX_
     }
 }
 
-ALIGN qmf_t X[MAX_NTSR][64];
 uint8_t sbrDecodeCoupleFrame(sbr_info *sbr, real_t *left_chan, real_t *right_chan,
                              const uint8_t just_seeked, const uint8_t downSampledSBR)
 {
@@ -401,22 +405,22 @@ uint8_t sbrDecodeCoupleFrame(sbr_info *sbr, real_t *left_chan, real_t *right_cha
         sbr->just_seeked = 0;
     }
 
-    sbr_process_channel(sbr, left_chan, X, 0, dont_process, downSampledSBR);
+    sbr_process_channel(sbr, left_chan, X_left, 0, dont_process, downSampledSBR);
     /* subband synthesis */
     if (downSampledSBR)
     {
-        sbr_qmf_synthesis_32(sbr, sbr->qmfs[0], X, left_chan);
+        sbr_qmf_synthesis_32(sbr, sbr->qmfs[0], X_left, left_chan);
     } else {
-        sbr_qmf_synthesis_64(sbr, sbr->qmfs[0], X, left_chan);
+        sbr_qmf_synthesis_64(sbr, sbr->qmfs[0], X_left, left_chan);
     }
 
-    sbr_process_channel(sbr, right_chan, X, 1, dont_process, downSampledSBR);
+    sbr_process_channel(sbr, right_chan, X_right, 1, dont_process, downSampledSBR);
     /* subband synthesis */
     if (downSampledSBR)
     {
-        sbr_qmf_synthesis_32(sbr, sbr->qmfs[1], X, right_chan);
+        sbr_qmf_synthesis_32(sbr, sbr->qmfs[1], X_right, right_chan);
     } else {
-        sbr_qmf_synthesis_64(sbr, sbr->qmfs[1], X, right_chan);
+        sbr_qmf_synthesis_64(sbr, sbr->qmfs[1], X_right, right_chan);
     }
 
     if (sbr->bs_header_flag)
@@ -453,8 +457,6 @@ uint8_t sbrDecodeCoupleFrame(sbr_info *sbr, real_t *left_chan, real_t *right_cha
     return 0;
 }
 
-ALIGN qmf_t X[MAX_NTSR][64];
-
 uint8_t sbrDecodeSingleFrame(sbr_info *sbr, real_t *channel,
                              const uint8_t just_seeked, const uint8_t downSampledSBR)
 {
@@ -485,13 +487,13 @@ uint8_t sbrDecodeSingleFrame(sbr_info *sbr, real_t *channel,
         sbr->just_seeked = 0;
     }
 
-    sbr_process_channel(sbr, channel, X, 0, dont_process, downSampledSBR);
+    sbr_process_channel(sbr, channel, X_left, 0, dont_process, downSampledSBR);
     /* subband synthesis */
     if (downSampledSBR)
     {
-        sbr_qmf_synthesis_32(sbr, sbr->qmfs[0], X, channel);
+        sbr_qmf_synthesis_32(sbr, sbr->qmfs[0], X_left, channel);
     } else {
-        sbr_qmf_synthesis_64(sbr, sbr->qmfs[0], X, channel);
+        sbr_qmf_synthesis_64(sbr, sbr->qmfs[0], X_left, channel);
     }
 
     if (sbr->bs_header_flag)
@@ -521,8 +523,6 @@ uint8_t sbrDecodeSingleFrame(sbr_info *sbr, real_t *channel,
     return 0;
 }
 
-qmf_t X_left [MAX_NTSRHFG][64] MEM_ALIGN_ATTR;// = {{0}};
-qmf_t X_right[MAX_NTSRHFG][64] MEM_ALIGN_ATTR;// = {{0}}; /* must set this to 0 */
 
 #if (defined(PS_DEC) || defined(DRM_PS))
 uint8_t sbrDecodeSingleFramePS(sbr_info *sbr, real_t *left_channel, real_t *right_channel,

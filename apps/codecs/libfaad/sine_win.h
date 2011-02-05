@@ -37,7 +37,7 @@ extern "C" {
 #pragma warning(disable:4244)
 #endif
 
-ALIGN static const real_t sine_long_1024[] ICONST_ATTR =
+static const real_t sine_long_1024[] ICONST_ATTR MEM_ALIGN_ATTR =
 {
     FRAC_CONST(0.00076699031874270449),
     FRAC_CONST(0.002300969151425805),
@@ -1066,7 +1066,7 @@ ALIGN static const real_t sine_long_1024[] ICONST_ATTR =
 };
 
 #ifdef ALLOW_SMALL_FRAMELENGTH
-ALIGN static const real_t sine_long_960[] =
+static const real_t sine_long_960[] MEM_ALIGN_ATTR =
 {
     FRAC_CONST(0.00081812299560725323),
     FRAC_CONST(0.0024543667964602917),
@@ -2031,7 +2031,7 @@ ALIGN static const real_t sine_long_960[] =
 };
 #endif
 
-ALIGN static const real_t sine_short_128[] ICONST_ATTR =
+static const real_t sine_short_128[] ICONST_ATTR MEM_ALIGN_ATTR =
 {
     FRAC_CONST(0.0061358846491544753),
     FRAC_CONST(0.01840672990580482),
@@ -2164,7 +2164,7 @@ ALIGN static const real_t sine_short_128[] ICONST_ATTR =
 };
 
 #ifdef ALLOW_SMALL_FRAMELENGTH
-ALIGN static const real_t sine_short_120[] =
+static const real_t sine_short_120[] MEM_ALIGN_ATTR =
 {
     FRAC_CONST(0.0065449379673518581),
     FRAC_CONST(0.019633692460628301),
@@ -2290,7 +2290,7 @@ ALIGN static const real_t sine_short_120[] =
 #endif
 
 #ifdef LD_DEC
-ALIGN static const real_t sine_mid_512[] =
+static const real_t sine_mid_512[] MEM_ALIGN_ATTR =
 {
     FRAC_CONST(0.0015339801862847655),
     FRAC_CONST(0.0046019261204485705),
@@ -2807,7 +2807,7 @@ ALIGN static const real_t sine_mid_512[] =
 };
 
 #ifdef ALLOW_SMALL_FRAMELENGTH
-ALIGN static const real_t sine_mid_480[] =
+static const real_t sine_mid_480[] MEM_ALIGN_ATTR =
 {
     FRAC_CONST(0.0016362454436240478),
     FRAC_CONST(0.00490871880799799),
@@ -3292,7 +3292,7 @@ ALIGN static const real_t sine_mid_480[] =
 };
 #endif
 
-ALIGN static const real_t ld_mid_512[] =
+static const real_t ld_mid_512[] MEM_ALIGN_ATTR =
 {
     FRAC_CONST(0),
     FRAC_CONST(0),
@@ -3809,7 +3809,7 @@ ALIGN static const real_t ld_mid_512[] =
 };
 
 #ifdef ALLOW_SMALL_FRAMELENGTH
-ALIGN static const real_t ld_mid_480[] =
+static const real_t ld_mid_480[] MEM_ALIGN_ATTR =
 {
     FRAC_CONST(0),
     FRAC_CONST(0),

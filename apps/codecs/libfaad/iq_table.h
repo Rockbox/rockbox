@@ -45,7 +45,7 @@ extern "C" {
 #pragma warning(disable:4244)
 #endif
 
-ALIGN static const real_t iq_table[IQ_TABLE_SIZE] =
+static const real_t iq_table[IQ_TABLE_SIZE] MEM_ALIGN_ATTR =
 {
     0,
     1,
@@ -8249,7 +8249,7 @@ ALIGN static const real_t iq_table[IQ_TABLE_SIZE] =
 #define IQ_TABLE_SIZE  1026
 #endif
 
-ALIGN static const real_t iq_table[IQ_TABLE_SIZE] =
+static const real_t iq_table[IQ_TABLE_SIZE] MEM_ALIGN_ATTR =
 {
     REAL_CONST(0.0),
     REAL_CONST(1.0/8.0),

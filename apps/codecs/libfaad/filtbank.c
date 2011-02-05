@@ -196,7 +196,7 @@ static INLINE void mdct(fb_info *fb, real_t *in_data, real_t *out_data, uint16_t
 }
 #endif
 
-ALIGN real_t transf_buf[2*1024] IBSS_ATTR;
+real_t transf_buf[2*1024] IBSS_ATTR MEM_ALIGN_ATTR;
 
 void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
                   uint8_t window_shape_prev, real_t *freq_in,
@@ -403,7 +403,7 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
 
 
 #ifdef LTP_DEC
-ALIGN real_t windowed_buf[2*1024] = {0};
+real_t windowed_buf[2*1024] MEM_ALIGN_ATTR = {0};
 /* only works for LTP -> no overlapping, no short blocks */
 void filter_bank_ltp(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
                      uint8_t window_shape_prev, real_t *in_data, real_t *out_mdct,

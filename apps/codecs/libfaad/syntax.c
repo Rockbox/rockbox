@@ -558,7 +558,7 @@ void raw_data_block(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
 
 /* Table 4.4.4 and */
 /* Table 4.4.9 */
-ALIGN int16_t spec_data[1024] = {0};
+int16_t spec_data[1024] MEM_ALIGN_ATTR = {0};
 element sce;
 static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
                                           uint8_t channel, uint8_t *tag)
@@ -603,8 +603,8 @@ static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
 }
 
 /* Table 4.4.5 */
-ALIGN int16_t spec_data1[1024] IBSS_ATTR;
-ALIGN int16_t spec_data2[1024] IBSS_ATTR;
+int16_t spec_data1[1024] IBSS_ATTR MEM_ALIGN_ATTR;
+int16_t spec_data2[1024] IBSS_ATTR MEM_ALIGN_ATTR;
 element cpe;
 static uint8_t channel_pair_element(NeAACDecHandle hDecoder, bitfile *ld,
                                     uint8_t channels, uint8_t *tag)
@@ -1170,8 +1170,8 @@ static void gain_control_data(bitfile *ld, ic_stream *ics)
 #endif
 
 #ifdef SCALABLE_DEC
-ALIGN int16_t spec_data1[1024];
-ALIGN int16_t spec_data2[1024];
+int16_t spec_data1[1024] MEM_ALIGN_ATTR;
+int16_t spec_data2[1024] MEM_ALIGN_ATTR;
 /* Table 4.4.13 ASME */
 void aac_scalable_main_element(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
                                bitfile *ld, program_config *pce, drc_info *drc)

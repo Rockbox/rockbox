@@ -62,7 +62,7 @@ void hf_adjustment(sbr_info *sbr, qmf_t Xsbr[MAX_NTSRHFG][64]
 #endif
                    ,uint8_t ch)
 {
-    ALIGN sbr_hfadj_info adj;
+    sbr_hfadj_info adj MEM_ALIGN_ATTR;
 
     memset(&adj,0,sizeof(adj));
     if (sbr->bs_frame_class[ch] == FIXFIX)
@@ -416,10 +416,10 @@ static void calculate_gain(sbr_info *sbr, sbr_hfadj_info *adj, uint8_t ch)
     uint8_t current_t_noise_band = 0;
     uint8_t S_mapped;
 
-    ALIGN real_t Q_M_lim[MAX_M];
-    ALIGN real_t G_lim[MAX_M];
-    ALIGN real_t G_boost;
-    ALIGN real_t S_M[MAX_M];
+    real_t Q_M_lim[MAX_M] MEM_ALIGN_ATTR;
+    real_t G_lim[MAX_M]   MEM_ALIGN_ATTR;
+    real_t G_boost        MEM_ALIGN_ATTR;
+    real_t S_M[MAX_M]     MEM_ALIGN_ATTR;
 
     for (l = 0; l < sbr->L_E[ch]; l++)
     {
@@ -879,10 +879,10 @@ static void calculate_gain(sbr_info *sbr, sbr_hfadj_info *adj, uint8_t ch)
     uint8_t current_t_noise_band = 0;
     uint8_t S_mapped;
 
-    ALIGN real_t Q_M_lim[MAX_M];
-    ALIGN real_t G_lim[MAX_M];
-    ALIGN real_t G_boost;
-    ALIGN real_t S_M[MAX_M];
+    real_t Q_M_lim[MAX_M] MEM_ALIGN_ATTR;
+    real_t G_lim[MAX_M]   MEM_ALIGN_ATTR;
+    real_t G_boost        MEM_ALIGN_ATTR;
+    real_t S_M[MAX_M]     MEM_ALIGN_ATTR;
 
     for (l = 0; l < sbr->L_E[ch]; l++)
     {
@@ -1126,10 +1126,10 @@ static void calculate_gain(sbr_info *sbr, sbr_hfadj_info *adj, uint8_t ch)
     uint8_t current_t_noise_band = 0;
     uint8_t S_mapped;
 
-    ALIGN real_t Q_M_lim[MAX_M];
-    ALIGN real_t G_lim[MAX_M];
-    ALIGN real_t G_boost;
-    ALIGN real_t S_M[MAX_M];
+    real_t Q_M_lim[MAX_M] MEM_ALIGN_ATTR;
+    real_t G_lim[MAX_M]   MEM_ALIGN_ATTR;
+    real_t G_boost        MEM_ALIGN_ATTR;
+    real_t S_M[MAX_M]     MEM_ALIGN_ATTR;
 
     for (l = 0; l < sbr->L_E[ch]; l++)
     {
