@@ -215,7 +215,7 @@ static inline unsigned char decode_byte(void)
     return tmp;
 }
 
-static inline int short range_decode_short(void)
+static inline unsigned short range_decode_short(void)
 {   int tmp = range_decode_culshift(16);
     range_decode_update( 1,tmp);
     return tmp;
