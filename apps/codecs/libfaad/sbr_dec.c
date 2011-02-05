@@ -521,8 +521,8 @@ uint8_t sbrDecodeSingleFrame(sbr_info *sbr, real_t *channel,
     return 0;
 }
 
-ALIGN qmf_t X_left[MAX_NTSRHFG][64];// = {{0}};
-ALIGN qmf_t X_right[MAX_NTSRHFG][64];// = {{0}}; /* must set this to 0 */
+qmf_t X_left [MAX_NTSRHFG][64] MEM_ALIGN_ATTR;// = {{0}};
+qmf_t X_right[MAX_NTSRHFG][64] MEM_ALIGN_ATTR;// = {{0}}; /* must set this to 0 */
 
 #if (defined(PS_DEC) || defined(DRM_PS))
 uint8_t sbrDecodeSingleFramePS(sbr_info *sbr, real_t *left_channel, real_t *right_channel,

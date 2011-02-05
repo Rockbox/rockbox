@@ -78,12 +78,12 @@ void qmfa_end(qmfa_info *qmfa)
 void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
                          qmf_t X[MAX_NTSRHFG][64], uint8_t offset, uint8_t kx)
 {
-    ALIGN real_t u[64];
+    real_t u[64] MEM_ALIGN_ATTR;
 #ifndef SBR_LOW_POWER
-    ALIGN real_t real[32];
-    ALIGN real_t imag[32];
+    real_t real[32] MEM_ALIGN_ATTR;
+    real_t imag[32] MEM_ALIGN_ATTR;
 #else
-    ALIGN real_t y[32];
+    real_t y[32] MEM_ALIGN_ATTR;
 #endif
     qmf_t *pX;
     uint32_t in = 0;
@@ -227,8 +227,8 @@ void qmfs_end(qmfs_info *qmfs)
 void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][64],
                           real_t *output)
 {
-    ALIGN real_t x[16];
-    ALIGN real_t y[16];
+    real_t x[16] MEM_ALIGN_ATTR;
+    real_t y[16] MEM_ALIGN_ATTR;
     int16_t n, k, out = 0;
     uint8_t l;
 
@@ -291,8 +291,8 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
 void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][64],
                           real_t *output)
 {
-    ALIGN real_t x[64];
-    ALIGN real_t y[64];
+    real_t x[64] MEM_ALIGN_ATTR;
+    real_t y[64] MEM_ALIGN_ATTR;
     int16_t n, k, out = 0;
     uint8_t l;
 
@@ -401,8 +401,8 @@ static const complex_t qmf32_pre_twiddle[] =
 void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][64],
                           real_t *output)
 {
-    ALIGN real_t x1[32];
-    ALIGN real_t x2[32];
+    real_t x1[32] MEM_ALIGN_ATTR;
+    real_t x2[32] MEM_ALIGN_ATTR;
     int32_t n, k, idx0, idx1, out = 0;
     uint32_t l;
 
@@ -464,10 +464,10 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
 void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][64],
                           real_t *output)
 {
-    ALIGN real_t real1[32]; 
-    ALIGN real_t imag1[32];
-    ALIGN real_t real2[32]; 
-    ALIGN real_t imag2[32];
+    real_t real1[32] MEM_ALIGN_ATTR; 
+    real_t imag1[32] MEM_ALIGN_ATTR;
+    real_t real2[32] MEM_ALIGN_ATTR; 
+    real_t imag2[32] MEM_ALIGN_ATTR;
     qmf_t *pX;
     real_t *p_buf_1, *p_buf_3;
     int32_t n, k, idx0, idx1, out = 0;
@@ -517,36 +517,36 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
             asm volatile (
                "ldmia %[qtab]!, { r0-r3 } \n\t"
                "ldr r4, [%[pbuf]]         \n\t"
+               "ldr r7, [%[pbuf], #192*4] \n\t"
                "smull r5, r6, r4, r0      \n\t"
-               "ldr r4, [%[pbuf], #192*4] \n\t"
-               "smlal r5, r6, r4, r1      \n\t"
                "ldr r4, [%[pbuf], #256*4] \n\t"
+               "smlal r5, r6, r7, r1      \n\t"
+               "ldr r7, [%[pbuf], #448*4] \n\t"
                "smlal r5, r6, r4, r2      \n\t"
-               "ldr r4, [%[pbuf], #448*4] \n\t"
-               "smlal r5, r6, r4, r3      \n\t"
+               "ldr r4, [%[pbuf], #512*4] \n\t"
+               "smlal r5, r6, r7, r3      \n\t"
 
                "ldmia %[qtab]!, { r0-r3 } \n\t"
-               "ldr r4, [%[pbuf], #512*4] \n\t"
+               "ldr r7, [%[pbuf], #704*4] \n\t"
                "smlal r5, r6, r4, r0      \n\t"
-               "ldr r4, [%[pbuf], #704*4] \n\t"
-               "smlal r5, r6, r4, r1      \n\t"
                "ldr r4, [%[pbuf], #768*4] \n\t"
+               "smlal r5, r6, r7, r1      \n\t"
+               "ldr r7, [%[pbuf], #960*4] \n\t"
                "smlal r5, r6, r4, r2      \n\t"
-               "ldr r4, [%[pbuf], #960*4] \n\t"
-               "smlal r5, r6, r4, r3      \n\t"
+               "mov r2, #1024*4           \n\t"
 
                "ldmia %[qtab]!, { r0-r1 } \n\t"
-               "mov r2, #1024*4           \n\t"
                "ldr r4, [%[pbuf], r2]     \n\t"
-               "smlal r5, r6, r4, r0      \n\t"
+               "smlal r5, r6, r7, r3      \n\t"
                "mov r2, #1216*4           \n\t"
-               "ldr r4, [%[pbuf], r2]     \n\t"
-               "smlal r5, r6, r4, r1      \n\t"
+               "ldr r7, [%[pbuf], r2]     \n\t"
+               "smlal r5, r6, r4, r0      \n\t"
+               "smlal r5, r6, r7, r1      \n\t"
 
                "str r6, [%[pout]]         \n"
                : [qtab] "+r" (qtab)
                : [pbuf] "r" (pbuf), [pout] "r" (pout)
-               : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory");
+               : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "memory");
         }
 #elif defined CPU_COLDFIRE
         const real_t *qtab = qmf_c;

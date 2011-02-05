@@ -1453,7 +1453,7 @@ void DCT2_32_unscaled(real_t *y, real_t *x)
 #else /* #ifdef SBR_LOW_POWER */
 
 /* table for pre-processing within dct4_kernel() */
-static const real_t dct4_pre_tab[] ICONST_ATTR = {
+static const real_t dct4_pre_tab[] ICONST_ATTR MEM_ALIGN_ATTR = {
     COEF_CONST(0.999924719333649), COEF_CONST(-1.01219630241394), COEF_CONST(-0.987653195858002),
     COEF_CONST(0.998118102550507), COEF_CONST(-1.05943882465363), COEF_CONST(-0.936797380447388),
     COEF_CONST(0.993906974792480), COEF_CONST(-1.10412919521332), COEF_CONST(-0.883684754371643),
@@ -1489,7 +1489,7 @@ static const real_t dct4_pre_tab[] ICONST_ATTR = {
 };
 
 /* table for post-processing within dct4_kernel() */
-static const real_t dct4_post_tab[] ICONST_ATTR = {
+static const real_t dct4_post_tab[] ICONST_ATTR MEM_ALIGN_ATTR = {
     COEF_CONST(1                ), COEF_CONST(-1               ), COEF_CONST(-1                ),
     COEF_CONST(0.998795449733734), COEF_CONST(-1.04786312580109), COEF_CONST(-0.949727773666382),
     COEF_CONST(0.995184719562531), COEF_CONST(-1.09320187568665), COEF_CONST(-0.897167563438416),
@@ -1525,7 +1525,7 @@ static const real_t dct4_post_tab[] ICONST_ATTR = {
 };
 
 // Table adapted from codeclib to fit into IRAM
-const uint32_t dct4_revtab[32] ICONST_ATTR = {
+const uint32_t dct4_revtab[32] ICONST_ATTR MEM_ALIGN_ATTR = {
   0, 24, 12, 22, 6, 30, 11, 19, 3, 27, 15, 21, 5, 29, 9, 17,
   1, 25, 13, 23, 7, 31, 10, 18, 2, 26, 14, 20, 4, 28, 8, 16};
 
