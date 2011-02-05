@@ -43,8 +43,8 @@
 
 
 /* globals */
-static qmf_t X_left [MAX_NTSRHFG][64] MEM_ALIGN_ATTR;// = {{0}};
-static qmf_t X_right[MAX_NTSRHFG][64] MEM_ALIGN_ATTR;// = {{0}}; /* must set this to 0 */
+static qmf_t X_left [MAX_NTSRHFG][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
+static qmf_t X_right[MAX_NTSRHFG][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
 
 
 /* static function declarations */
