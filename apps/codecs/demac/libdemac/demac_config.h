@@ -89,6 +89,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #define APE_OUTPUT_DEPTH (ape_ctx->bps)
 
+#define MEM_ALIGN_ATTR __attribute__((aligned(16)))
+        /* adjust to target architecture for best performance */
+
 #define ICODE_ATTR_DEMAC
 #define ICONST_ATTR_DEMAC
 #define IBSS_ATTR_DEMAC
