@@ -39,21 +39,21 @@ struct SPI_info {
     volatile unsigned short *setreg;
     volatile unsigned short *clrreg;
     int bit;
-    bool idle_low;
-    char divider;
+    unsigned short spi_mode;
+    bool clk_invert;
 };
 
-static struct SPI_info spi_targets[] =
+static const struct SPI_info spi_targets[] =
 {
 #ifndef CREATIVE_ZVx
     [SPI_target_TSC2100]   = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, 
-        GIO_TS_ENABLE, true, 0x07},
+        GIO_TS_ENABLE, 0x260D, true},
     /* RTC seems to have timing problems if the CLK idles low */
     [SPI_target_RX5X348AB] = { &IO_GIO_BITSET0, &IO_GIO_BITCLR0, 
-        GIO_RTC_ENABLE, false, 0x3F},
-    /* This appears to work properly idleing low, idling high is very glitchy */
+        GIO_RTC_ENABLE, 0x263F, true},
+    /* This appears to work properly idling low, idling high is very glitchy */
     [SPI_target_BACKLIGHT] = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, 
-        GIO_BL_ENABLE, true, 0x07},
+        GIO_BL_ENABLE, 0x2656, false},
 #else
     [SPI_target_LTV250QV] =  { &IO_GIO_BITCLR2, &IO_GIO_BITSET2, 
         GIO_LCD_ENABLE, true, 0x07},
@@ -61,7 +61,6 @@ static struct SPI_info spi_targets[] =
 };
 
 #define IO_SERIAL0_XMIT         (0x100)
-#define IO_SERIAL0_MODE_SCLK    (1 << 10)
 
 static void spi_disable_all_targets(void)
 {
@@ -77,40 +76,54 @@ int spi_block_transfer(enum SPI_target target,
                              uint8_t *rx_bytes, unsigned int rx_size)
 {
     mutex_lock(&spi_mtx);
+
+    /* Enable the clock */
+    bitset16(&IO_CLK_MOD2, CLK_MOD2_SIF0);
     
-    IO_SERIAL0_MODE &= ~(1<<10);
-    IO_SERIAL0_MODE |= (spi_targets[target].idle_low << 10);
-    
-    IO_SERIAL0_MODE &= ~(0xFF);
-    IO_SERIAL0_MODE |= spi_targets[target].divider;
-    
-    /* Activate the slave select pin */
-    if(tx_size) {
-        IO_SERIAL0_TX_ENABLE = 0x0001;
-        *spi_targets[target].setreg = spi_targets[target].bit;
+    if(spi_targets[target].clk_invert)
+    {
+        bitset16(&IO_CLK_INV, (1 << 12));
     }
+    else
+    {
+        bitclr16(&IO_CLK_INV, (1 << 12));
+    }
+
+    IO_SERIAL0_MODE =   spi_targets[target].spi_mode;
+
+    /* Activate the slave select pin */
+    IO_SERIAL0_TX_ENABLE = 0x0001;
+    *spi_targets[target].setreg = spi_targets[target].bit;
+
+    while (IO_SERIAL0_RX_DATA & IO_SERIAL0_XMIT) {};
 
     while (tx_size--)
     {
         /* Send one byte */
-        IO_SERIAL0_TX_DATA = *tx_bytes++;
+        IO_SERIAL0_TX_DATA = (short)*tx_bytes++;
         /* Wait until transfer finished */
-        while (IO_SERIAL0_RX_DATA & IO_SERIAL0_XMIT);
+        while (IO_SERIAL0_RX_DATA & IO_SERIAL0_XMIT) {};
     }
 
     while (rx_size--)
     {
+        unsigned short data;
+        
         /* Make the clock tick */
         IO_SERIAL0_TX_DATA = 0;
 
         /* Wait until transfer finished */
-        unsigned short data;
-        while ((data = IO_SERIAL0_RX_DATA) & IO_SERIAL0_XMIT);
+        while ((data = IO_SERIAL0_RX_DATA) & IO_SERIAL0_XMIT) {};
         
-        *rx_bytes++ = data & 0xff;
+        *rx_bytes++ = (unsigned char) data;
     }
 
     *spi_targets[target].clrreg = spi_targets[target].bit;
+    
+    IO_SERIAL0_TX_ENABLE = 0x0000;
+
+    /* Disable the clock */
+    bitclr16(&IO_CLK_MOD2, CLK_MOD2_SIF0);
     
     mutex_unlock(&spi_mtx);
     return 0;
@@ -120,25 +133,21 @@ void spi_init(void)
 {
     mutex_init(&spi_mtx);
 
-    IO_SERIAL0_MODE = 0x2200 | 0x3F;
-    /* Enable TX */
-    IO_SERIAL0_TX_ENABLE = 0x0001;
-#ifndef CREATIVE_ZVx
-    /* Setup SPI Chip Select Pins:
-     *  12 - RTC
-     *  18 - Touchscreen
-     *  29 - Backlight
-     */
-    /*  12: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(12, false, false, false, false, false, 0x00);
+    /* Enable the clock */
+    bitset16(&IO_CLK_MOD2, CLK_MOD2_SIF0);
     
-    /*  18: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(18, false, false, false, false, false, 0x00);
+    /* Disable transmitter */
+    IO_SERIAL0_TX_ENABLE = 0x0000;
     
-    /*  29: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(29, false, false, false, false, false, 0x00);
-#endif
+    IO_SERIAL0_MODE = 0x0230;
+    
+    /* Make sure the SPI clock is inverted */
+    bitclr16(&IO_CLK_INV, ( 1 << 12 ));
+
     /* make sure only one is ever enabled at a time */
     spi_disable_all_targets();
-
+    
+    /* Disable the clock */
+    bitclr16(&IO_CLK_MOD2, CLK_MOD2_SIF0);
 }
+
