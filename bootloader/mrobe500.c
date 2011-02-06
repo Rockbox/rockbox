@@ -64,8 +64,8 @@ void main(void)
     set_irq_level(IRQ_ENABLED);
     set_fiq_status(FIQ_ENABLED);
 
-    backlight_init();
     lcd_init();
+    backlight_init();
     font_init();
     button_init();
     usb_init();
