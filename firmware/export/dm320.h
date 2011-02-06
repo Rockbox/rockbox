@@ -438,6 +438,10 @@ extern unsigned long _ttbstart;
 #define IO_BUSC_EBITR             DM320_REG(0x0904)
 #define IO_BUSC_REVR              DM320_REG(0x0906)
 
+/* Known Silicon Revisions */
+#define REVR_ES10                 0x0010
+#define REVR_ES11                 0x0011
+
 /* SDRAM Controller */
 #define IO_SDRAM_SDBUFD0L         DM320_REG(0x0980)
 #define IO_SDRAM_SDBUFD0H         DM320_REG(0x0982)
