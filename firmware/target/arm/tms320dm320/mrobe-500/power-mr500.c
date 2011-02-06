@@ -33,19 +33,9 @@
 
 void power_init(void)
 {
-    /* Initialize IDE power pin */
-    /* set GIO17 (ATA power) on and output */
-    /*  17: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(17, false, false, false, false, false, 0x00);
     ide_power_enable(true); /* Power up the drive */
     
-    /* Charger detect */
-    /*  25: input, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(25, true, false, false, false, false, 0x00);
-    
     /* Power down pin */
-    /*  26: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(26, false, false, false, false, false, 0x00);
     IO_GIO_BITCLR1  =   1<<10; /* Make sure it is not active */
 }
 
@@ -68,9 +58,13 @@ bool charging_state(void)
 void ide_power_enable(bool on)
 {
     if (on)
+    {
         IO_GIO_BITCLR1  =   (1<<1);
+    }
     else
+    {
         IO_GIO_BITSET1  =   (1<<1);
+    }
 }
 
 bool ide_powered(void)
