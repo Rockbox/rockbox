@@ -1003,6 +1003,7 @@ target/arm/ata-as-arm.S
 target/arm/lcd-as-memframe.S
 #endif
 target/arm/mmu-arm.S
+target/arm/tms320dm320/mrobe-500/crt0-board.S
 target/arm/tms320dm320/mrobe-500/adc-mr500.c
 target/arm/tms320dm320/mrobe-500/ata-mr500.c
 target/arm/tms320dm320/mrobe-500/backlight-mr500.c
