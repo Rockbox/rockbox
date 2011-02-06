@@ -33,15 +33,7 @@ void adc_init(void)
      *  touchscreen does not work, audio has not been tested, but it is
      *  expected that is will also not work when low.
      */
-     
-    /* Setup touchscreen (tsc2100) pins:
-     *  14 - input, touchscreen irq
-     *  15 - output, touchscreen nPWD? */
-    /*  14: input , non-inverted,    irq, falling edge, no-chat, normal */
-    dm320_set_io(14, true, false, true, false, false, 0x00);
-    
-    /*  15: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(15, false, false, false, false, false, 0x00);
+
     IO_GIO_BITSET0  =   (1<<15); /* Turn on TSC2100 */
 
     /* Initialize the touchscreen and the battery readout */
@@ -64,6 +56,6 @@ void GIO14(void)
     tsc2100_read_data();
     
     /* Stop the scan, firmware will initiate another scan with a mode set */
-    tsc2100_set_mode(true, 0x00);  
+    tsc2100_set_mode(true, 0x00);
 }
 
