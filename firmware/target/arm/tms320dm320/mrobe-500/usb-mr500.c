@@ -29,28 +29,6 @@
 
 void usb_init_device(void) {
     logf("mxx: SOC Init");
-
-    /* The following EMIF timing values are from the OF:
-     *      IO_EMIF_CS4CTRL1 = 0x66AB;
-     *      IO_EMIF_CS4CTRL2 = 0x4220;
-     *
-     * More agressive numbers may be possible, but it depends on the clocking
-     *  setup. 
-     *
-     * When USB_TRANS_BLOCK is not defined the USB driver does not work unless
-     *  the values from the OF are used.
-     */
-    
-    IO_EMIF_CS4CTRL1 = 0x66AB;
-    IO_EMIF_CS4CTRL2 = 0x4220; 
-
-    /* Setup the m66591 reset signal */
-    /*  2: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(2, false, false, false, false, false, 0x00);
-
-    /* Setup the m66591 interrupt signal */
-    /*  3: input , non-inverted,    irq, falling edge, no-chat, normal */
-    dm320_set_io(3, true, false, true, false, false, 0x00);
     
     udelay(100);
     
