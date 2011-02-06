@@ -380,10 +380,6 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
         dst     += (stride*pix_width);
         height--;
     } while(height>0);
-    
-    /* Disable image buffer clock */
-    bitclr16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
-    bitclr16(&COP_CP_CLKC, 0x0001);
 }
 #else
 static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
@@ -461,10 +457,6 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
         dst     -= (stride*pix_width);
         width--;
     } while(width>0);
-    
-    /* Disable image buffer clock */
-    bitclr16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
-    bitclr16(&COP_CP_CLKC, 0x0001);
 }
 #endif
 #endif
