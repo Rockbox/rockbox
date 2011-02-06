@@ -152,6 +152,10 @@ uint32_t isolate_first_bit(uint32_t val)
     { return val & -val; }
 
 /* Functions to set and clear register or variable bits atomically */
+void bitmod16(volatile uint16_t *addr, uint16_t bits, uint16_t mask);
+void bitset16(volatile uint16_t *addr, uint16_t mask);
+void bitclr16(volatile uint16_t *addr, uint16_t mask);
+
 void bitmod32(volatile uint32_t *addr, uint32_t bits, uint32_t mask);
 void bitset32(volatile uint32_t *addr, uint32_t mask);
 void bitclr32(volatile uint32_t *addr, uint32_t mask);

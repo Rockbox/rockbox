@@ -985,6 +985,7 @@ target/arm/imx31/gigabeat-s/timer-gigabeat-s.c
 #endif /* GIGABEAT_S */
 
 #if CONFIG_CPU == DM320
+target/arm/bits-armv4.S
 target/arm/tms320dm320/debug-dm320.c
 target/arm/tms320dm320/dsp-dm320.c
 target/arm/tms320dm320/i2c-dm320.c
@@ -998,14 +999,18 @@ target/arm/tms320dm320/uart-dm320.c
 #ifdef MROBE_500
 #ifndef SIMULATOR
 target/arm/ata-as-arm.S
+#if !defined(LCD_USE_DMA)
 target/arm/lcd-as-memframe.S
+#endif
 target/arm/mmu-arm.S
+target/arm/tms320dm320/mrobe-500/crt0-board.S
 target/arm/tms320dm320/mrobe-500/adc-mr500.c
 target/arm/tms320dm320/mrobe-500/ata-mr500.c
 target/arm/tms320dm320/mrobe-500/backlight-mr500.c
 target/arm/tms320dm320/mrobe-500/button-mr500.c
 target/arm/tms320dm320/mrobe-500/dm320codec-mr500.c
 target/arm/tms320dm320/mrobe-500/lcd-mr500.c
+target/arm/tms320dm320/mrobe-500/lcd-as-mr500.S
 #if defined(HAVE_REMOTE_LCD)
 target/arm/tms320dm320/mrobe-500/lcd-remote-mr500.c
 #endif
