@@ -59,12 +59,8 @@ bool ata_is_coldstart(void)
 void ata_device_init(void)
 {
     /* ATA reset */
-    /*  10: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(10, false, false, false, false, false, 0x00);
     ATA_RESET_DISABLE; /* Set the pin to disable an active low reset */
     
-    /* ATA INT (currently unused) */
-    /*  11: input ,     inverted,    irq,     any edge, no-chat, normal */
-    dm320_set_io(11, true, true, true, true, false, 0x00);
+    /* ATA INT pin 11 (currently unused) */
 }
 
