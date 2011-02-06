@@ -91,10 +91,6 @@ void tsc2100_keyclick(void);
 #define VOLUME_MAX  0
 #define VOLUME_MIN  -630
 
-/* ts audio control 1*/
-#define TSAC1_PAGE          2
-#define TSAC1_ADDRESS       0x00
-
 /* ts audio control 2 */
 #define TSAC2_PAGE          2
 #define TSAC2_ADDRESS       0x04
@@ -111,13 +107,13 @@ void tsc2100_keyclick(void);
 #define TSAC2_DASTC         (1<<1)
 #define TSAC2_ADGAF         (1<<0) /* r only */
 
-/* ts codec power control */
-#define TSCPC_PAGE          2
-#define TSCPC_ADDRESS       0x05
-
-/* ts audio control 3 */
-#define TSAC3_PAGE          2
-#define TSAC3_ADDRESS       0x06
+#define CONTROL_PAGE2       2
+#define TSAC1_ADDRESS       0x00    /* ts audio control 1*/
+#define TSCSC_ADDRESS       0x03    /* Codec Sidetone Control */
+#define TSCPC_ADDRESS       0x05    /* ts codec power control */
+#define TSAC3_ADDRESS       0x06    /* ts audio control 3 */
+#define TSPP1_ADDRESS       0x1b    /* PLL Programability */
+#define TSPP2_ADDRESS       0x1c    /* PLL Programability */
 
 /* ts audio control 4 */
 #define TSAC4_PAGE          2

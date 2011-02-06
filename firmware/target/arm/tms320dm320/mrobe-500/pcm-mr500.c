@@ -29,14 +29,19 @@
 #include "dsp/ipc.h"
 #include "mmu-arm.h"
 
-/* These are global to save some latency when pcm_play_dma_get_peak_buffer is 
+/* This is global to save some latency when pcm_play_dma_get_peak_buffer is 
  *  called.
  */
 static void *start;
-static size_t size;
 
 void pcm_postinit(void)
 {
+    /* Configure clock divider */
+    tsc2100_writereg(CONTROL_PAGE2, TSPP1_ADDRESS, 0x1120);
+    tsc2100_writereg(CONTROL_PAGE2, TSAC3_ADDRESS, 0x0800);
+    tsc2100_writereg(CONTROL_PAGE2, TSCPC_ADDRESS, 0x3B00);
+    tsc2100_writereg(CONTROL_PAGE2, TSAC1_ADDRESS, 0x0300);
+    tsc2100_writereg(CONTROL_PAGE2, TSCSC_ADDRESS, 0xC580);
     audiohw_postinit();
 }
 
@@ -50,7 +55,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     int cnt = DSP_(_sdem_level);
 
-    unsigned long addr = (unsigned long) start +cnt;
+    unsigned long addr = (unsigned long) start + cnt;
     
     *count = (cnt & 0xFFFFF) >> 1;
     return (void *)((addr + 2) & ~3);
@@ -58,16 +63,23 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 
 void pcm_play_dma_init(void)
 {
-    IO_INTC_IRQ0 = 1 << 11;
-    IO_INTC_EINT0 |= 1 << 11;
+    IO_INTC_IRQ0 = INTR_IRQ0_IMGBUF;
+    bitset16(&IO_INTC_EINT0, INTR_EINT0_IMGBUF);
     
     /* Set this as a FIQ */
-    IO_INTC_FISEL0 |= 1 << 11;
+    bitset16(&IO_INTC_FISEL0, INTR_EINT0_IMGBUF);
     
+    /* Enable the HPIB clock */
+    bitset16(&IO_CLK_MOD0, (CLK_MOD0_HPIB | CLK_MOD0_DSP));
+
+    IO_SDRAM_SDDMASEL = 0x24;
+
     IO_DSPC_HPIB_CONTROL = 1 << 10 | 1 << 9 | 1 << 8 | 1 << 7 | 1 << 3 | 1 << 0;
     
     dsp_reset();
     dsp_load(dsp_image);
+
+    DSP_(_dma0_stopped)=1;
     dsp_wake();
 }
 
@@ -133,8 +145,9 @@ void DSPHINT(void) __attribute__ ((section(".icode")));
 void DSPHINT(void)
 {
     unsigned int i;
+    size_t size;
 
-    IO_INTC_FIQ0 = 1 << 11;
+    IO_INTC_FIQ0 = INTR_IRQ0_IMGBUF;
     
     switch (dsp_message.msg) 
     {

@@ -117,7 +117,7 @@ void audiohw_close(void)
 void audiohw_set_frequency(int fsel)
 {
     int reg_val;
-    reg_val = tsc2100_readreg(TSAC1_PAGE, TSAC1_ADDRESS);
+    reg_val = tsc2100_readreg(CONTROL_PAGE2, TSAC1_ADDRESS);
     
     reg_val &= ~(0x07<<3);
     
@@ -137,5 +137,5 @@ void audiohw_set_frequency(int fsel)
         break;
     }
 
-    tsc2100_writereg(TSAC1_PAGE, TSAC1_ADDRESS, reg_val);
+    tsc2100_writereg(CONTROL_PAGE2, TSAC1_ADDRESS, reg_val);
 }
