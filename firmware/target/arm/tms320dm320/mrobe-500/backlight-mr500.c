@@ -31,13 +31,26 @@
 
 short read_brightness = 0x0;
 
+static const char commands [][2] = 
+{   {0xA0, 0x00},
+    {0xA1, 0x00},
+    {0xA2, 0x00},
+    {0xA3, 0x00},
+    {0xA4, 0x00},
+    {0xA5, 0x00},
+    {0xA6, 0x00},
+    {0xA7, 0x00},
+    {0xA8, 0x00},
+    {0xB9, 0x40},
+};
+
 static void _backlight_write_brightness(int brightness)
 {
     uint8_t bl_command[] = {0xA4, 0x00, brightness, 0xA4};
     
-    uint8_t bl_read[] = {0xA8, 0x00};
-    
-    spi_block_transfer(SPI_target_BACKLIGHT, bl_read, 2, (char*)&read_brightness, 2);
+    spi_block_transfer(SPI_target_BACKLIGHT, commands[8], 2, (char *)&read_brightness, 2);
+
+//    bl_command[3] = (char) read_brightness;
     
     spi_block_transfer(SPI_target_BACKLIGHT, bl_command, 4, 0, 0);
 }
@@ -71,6 +84,25 @@ void __backlight_dim(bool dim_now)
 
 bool _backlight_init(void)
 {
+    short read_value;
+
+    IO_GIO_BITCLR2 = (1 << 5); /* output low (backlight/lcd on) */
+
+    spi_block_transfer(SPI_target_BACKLIGHT, commands[6], 2, 0, 0);
+
+    spi_block_transfer(SPI_target_BACKLIGHT, commands[8], 2, (char*)&read_value, 2);
+
+    if( (read_value & 0xFF) < 0xD0 )
+    {
+        spi_block_transfer(SPI_target_BACKLIGHT, commands[3], 2, 0, 0);
+        spi_block_transfer(SPI_target_BACKLIGHT, commands[4], 2, 0, 0);
+        spi_block_transfer(SPI_target_BACKLIGHT, commands[9], 2, 0, 0);
+        spi_block_transfer(SPI_target_BACKLIGHT, commands[0], 2, 0, 0);
+    }
+
+    spi_block_transfer(SPI_target_BACKLIGHT, commands[2], 2, 0, 0);
+
     _backlight_set_brightness(backlight_brightness);
     return true;
 }
+
