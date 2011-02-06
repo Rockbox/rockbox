@@ -1,6 +1,6 @@
 #include "config.h"
 
-ENTRY(start)
+ENTRY(_start)
 
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
@@ -16,7 +16,7 @@ STARTUP(target/arm/tms320dm320/crt0.o)
 
 #define LCD_FUDGE       LCD_NATIVE_WIDTH%32
 
-#define LCD_BUFFER_SIZE  ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
+#define LCD_BUFFER_SIZE ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
 
 /* must be 16Kb (0x4000) aligned */
 #define TTB_SIZE        0x4000
@@ -30,112 +30,144 @@ STARTUP(target/arm/tms320dm320/crt0.o)
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 
 #define DRAMORIG        0x00900000
-#define IRAMORIG        0x00000000
-#define IRAMSIZE        0x4000
+
+#define FLASHORIG       0x00100000
+#define FLASHSIZE       0x00800000
+
+#define ITCMORIG        0x00000000
+#define ITCMSIZE        0x4000
+
+#define DTCMORIG        0x00020000
+#define DTCMSIZE        0x4000
+
+PRO_STACK_SIZE =  0x2000;
+IRQ_STACK_SIZE =  0x600;
+FIQ_STACK_SIZE =  0x400;
 
 /* End of the audio buffer, where the codec buffer starts */
-#define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_TTB_AREA)
+#define ENDAUDIOADDR  \
+    (DRAMORIG + DRAMSIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_TTB_AREA)
 
 MEMORY
 {
     DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
-    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+    ITCM : ORIGIN = ITCMORIG, LENGTH = ITCMSIZE
+    DTCM : ORIGIN = DTCMORIG, LENGTH = DTCMSIZE
 }
 
 SECTIONS
 {
+    /* Set up variables needed for memory initialization */
+    _sdram_start    = DRAMORIG;
+    _sdram_sizem    = ((_endsdram - _sdram_start) / 0x100000);
+
+    _flash_start    = FLASHORIG;
+    _flash_sizem    = (FLASHSIZE / 0x100000);
+
+    /* crt0.S initialization */
+    .init :
+    {
+        . = ALIGN(0x4);
+        loadaddress = .;
+        *(.init)
+    } > DRAM
+
+    .vectors ITCMORIG :
+    {
+        . = ALIGN(0x4);
+        _vectorsstart = .;
+        *(.vectors);
+        _vectorsend = .;
+    } > ITCM AT> DRAM
+
+    _vectorscopy = LOADADDR(.vectors);
+
     .text :
     {
-        loadaddress = .;
-        _loadaddress = .;
-        *(.init.text)
-        *(.text*)
-        *(.glue_7)
-        *(.glue_7t)
         . = ALIGN(0x4);
+        *(.text*)
+    } > DRAM
+
+    /* Thumb interworking sections - for some reason LD dies even if these
+     * sections are empty.
+     */
+    .glue :
+    {
+       . = ALIGN(0x4);
+       *(.glue_7)  /* ARM calling Thumb */
+       *(.glue_7t) /* Thumb calling ARM */
     } > DRAM
 
     .rodata :
     {
-        *(.rodata)  /* problems without this, dunno why */
-        *(.rodata*)
         . = ALIGN(0x4);
+        *(.rodata*)
     } > DRAM
 
     .data : 
     {
-        *(.data*)
         . = ALIGN(0x4);
+        *(.data*)
     } > DRAM
 
-    /DISCARD/ :
+ 	.bss (NOLOAD) :
     {
-        *(.eh_frame)
-    }
-
-    .vectors IRAMORIG :
-    {
-        _vectorsstart = .;
-        *(.vectors);
-        _vectorsend = .;
-    } > IRAM AT> DRAM
-
-    _vectorscopy = LOADADDR(.vectors);
+        . = ALIGN(0x4);
+       	_bss_start = .;
+        *(.bss*)
+        *(COMMON)
+       	_bss_end = .;
+    } > DRAM
 
     .iram :
     {
+        . = ALIGN(0x4);
         _iramstart = .;
         *(.icode)
-        *(.irodata*)
+        *(.irodata)
         *(.idata)
-        . = ALIGN(0x4);
         _iramend = .;
-    } > IRAM AT> DRAM
+    } > ITCM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
-    
-    .ibss (NOLOAD) :
+
+    .ibss DTCMORIG + _iramend (NOLOAD) :
     {
-        _iedata = .;
+        . = ALIGN(0x4);
+        _ibss_start = .;
         *(.ibss)
-        . = ALIGN(0x4);
-        _iend = .;
-    } > IRAM
+        _ibss_end = .;
+    } > DTCM
 
-    .stack (NOLOAD) :
+    /* Program stack space */
+    .pro_stack (NOLOAD): 
     {
-       *(.stack)
-       stackbegin = .;
-       . += 0x2000;
-       stackend = .;
-    } > IRAM
-
-    .irqstack (NOLOAD) :
-    {
-       *(.stack)
-       . += 0x400;
-       irq_stack = .;
-    } > IRAM
-    
-    .fiqstack (NOLOAD) :
-    {
-       *(.stack)
-       . += 0x400;
-       fiq_stack = .;
-    } > IRAM
-    
-    /* This overwrites the iram (in ram), so make sure that the iram is copied 
-     *  out in crt0.s before the bss section and the rest are used.
-     */
-    .bss (NOLOAD) :
-    {
-    	. = ADDR(.data) + SIZEOF(.data);
-       	_edata = .;
-        *(.bss*)
-        *(COMMON)
         . = ALIGN(0x4);
-       	_end = .;
-    } > DRAM
+        *(.stack)
+        stackbegin = .;        /* Variable for thread.c */
+        _pro_stack_end = .;       
+        . += PRO_STACK_SIZE;
+        _pro_stack_start = .;
+        stackend = .;          /* Variable for tread.c */
+    } > DTCM
+
+    /* IRQ stack space */
+    .irq_stack (NOLOAD):
+    {
+        . = ALIGN(0x4);
+        _irq_stack_end = .;
+        . += IRQ_STACK_SIZE;
+        _irq_stack_start = .;
+    } > DTCM
+
+    /* FIQ stack space */
+    .fiq_stack (NOLOAD):
+    {
+        . = ALIGN(0x4);
+        _fiq_stack_end = .;
+        . += FIQ_STACK_SIZE;
+        _fiq_stack_start = .;
+    } > DTCM
 
     .audiobuf (NOLOAD) :
     {
@@ -160,6 +192,8 @@ SECTIONS
         . += PLUGIN_BUFFER_SIZE;
     } > DRAM
     
+    _endsdram = .;
+
     .ttbtable (NOLOAD) :
     {
         . = ALIGN (0x4000);
