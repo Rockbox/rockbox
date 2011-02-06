@@ -38,15 +38,6 @@ static volatile int uart1_receive_count, uart1_receive_read, uart1_receive_write
 
 void uart_init(void)
 {
-    /* Setup UART 1 pins:
-     *  27 - input, uart1 rx
-     *  28 - output, uart1 tx */
-    /*  27: input , non-inverted, no-irq, falling edge, no-chat, UART RX */
-    dm320_set_io(27, true, false, false, false, false, 0x01);
-    
-    /*  28: output, non-inverted, no-irq, falling edge, no-chat, UART TX */
-    dm320_set_io(28, false, false, false, false, false, 0x01);
-    
     /* Enable UART clock */
     IO_CLK_MOD2 |= CLK_MOD2_UART1;
     
