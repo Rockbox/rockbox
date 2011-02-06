@@ -51,11 +51,7 @@ struct ipc_message {
             unsigned short sdem_addrl;
             unsigned short sdem_addrh;
         } init PACKED;
-#define MSG_DEBUGF 2
-        struct {
-            short buffer[80];
-        } debugf PACKED;
-#define MSG_REFILL 3
+#define MSG_REFILL 2
         struct {
             unsigned short topbottom; /* byte offset to unlocked half-buffer */
 
@@ -66,6 +62,10 @@ struct ipc_message {
             unsigned short _DSP_ADDRL;
             unsigned short _DMA_SIZE;
         } refill PACKED;
+#define MSG_DEBUGF 3
+        struct {
+            short buffer[80];
+        } debugf PACKED;
     } payload PACKED;
 } PACKED;
 #endif

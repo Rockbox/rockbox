@@ -87,8 +87,7 @@ def main():
 """ % out_filepath)
 
     # Section data and directory.
-    h_directory = ["""
-static const struct dsp_section dsp_image[] = {"""]
+    h_directory = ["static const struct dsp_section dsp_image[] = {\n"]
     
     ti_coff = descend(object_file, "ti_coff")
     for section in descendAll(ti_coff, "section"):
@@ -122,6 +121,7 @@ static const struct dsp_section dsp_image[] = {"""]
             break
         
         if data or regular or text:
+            out_count = 0
             sys.stderr.write("%s: placing 0x%04x words at 0x%04x from offset "
                 "0x%08x\n" % (
                 name, raw_data_size >> 1, physical_addr, raw_data_ptr))
@@ -133,14 +133,16 @@ static const struct dsp_section dsp_image[] = {"""]
             out_file.seek(raw_data_ptr)
             data = array.array('H')
             data.fromfile(out_file, raw_data_size >> 1)
-            h_file.write("\t")
+            h_file.write("    ")
             for word in data:
+                out_count = out_count+1
                 h_file.write("0x%04x, " % word)
-            h_file.write("""
-};
-""")
+                if out_count % 8 == 0:
+                    h_file.write("\n    ")
+                    out_count=0
+            h_file.write("\n};\n\n")
             
-            h_directory.append("\t{_section%s, 0x%04x, 0x%04x}," % (
+            h_directory.append("    {_section%s, 0x%04x, 0x%04x}," % (
                 sanitized_name, physical_addr, raw_data_size >> 1))
                 
             continue
@@ -149,15 +151,15 @@ static const struct dsp_section dsp_image[] = {"""]
             sys.stderr.write("%s: bss section, 0x%04x words at 0x%04x\n" % (
                 name, raw_data_size >> 1, physical_addr))
             
-            h_directory.append("\t{NULL /* %s */, 0x%04x, 0x%04x}," % (
+            h_directory.append("    {NULL /* %s */, 0x%04x, 0x%04x}," % (
                 name, physical_addr, raw_data_size >> 1))
             continue
         
         sys.stderr.write("%s: error, unprocessed section\n" % name)
     
-    h_file.write("\n")
+    h_file.write("/* Program Mapping */\n")
 
-    h_directory.append("\t{NULL, 0, 0}")
+    h_directory.append("    {NULL, 0, 0}")
     h_directory.append("};")
     
     h_file.write("\n".join(h_directory))
@@ -165,9 +167,7 @@ static const struct dsp_section dsp_image[] = {"""]
     
     # Symbols.
     symbol_table = descend(ti_coff, "symbol_table")
-    h_file.write("""
-/* Symbol table, usable with the DSP_() macro (see dsp-target.h). */
-""")
+    h_file.write("\n/* Symbol table, usable with the DSP_() macro (see dsp-target.h). */\n")
     for symbol in descendAll(symbol_table, "symbol"):
         name = getTagText(symbol, "name")
         kind = getTagText(symbol, "kind")
@@ -181,7 +181,7 @@ static const struct dsp_section dsp_image[] = {"""]
         
         h_file.write("#define %s 0x%04x\n" % (name, value))
     
-    h_file.write("\n#endif\n")
+    h_file.write("\n#endif\n\n")
     h_file.close()
     out_file.close()
     

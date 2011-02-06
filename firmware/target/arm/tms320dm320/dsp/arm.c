@@ -20,13 +20,13 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
 #include "arm.h"
 #include "registers.h"
 #include "ipc.h"
 #include "dma.h"
 
 volatile struct ipc_message status;
+volatile short int0_count;
 
 #if defined(HAVE_DEBUG)
 static int acked;
@@ -34,6 +34,7 @@ static int acked;
 
 interrupt void handle_int0(void) {
     IFR = 1;
+    int0_count++;
     
 #if defined(HAVE_DEBUG)
     acked = 1;

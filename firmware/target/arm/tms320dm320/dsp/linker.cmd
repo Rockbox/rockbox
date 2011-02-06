@@ -1,13 +1,8 @@
 -c
 -x 
--stack 0x1000 
--heap  0x100 
-
-/* The rtx500.lib should be included if you want proper initialization, 
- *  currently the program is setup so that it is not necessary to save space.
- *  reset vector should jump to _c_int00 if initialization is needed.
- *
- * -l rts500.lib*/
+-stack 0x200 
+-heap  0x200 
+-l rts500.lib
  
 MEMORY
 {
@@ -37,3 +32,4 @@ SECTIONS
     /* DMA buffers for ABU mode must start on a 2*size boundary. */
     .dma    > SARAM PAGE 0
 }
+

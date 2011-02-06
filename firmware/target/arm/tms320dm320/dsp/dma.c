@@ -46,22 +46,21 @@ volatile unsigned short sdem_dsp_size;
  *  (SARAM to McBSP) and the level on the ARM buffer (sdem_level). 
  * sdem_level is used in the main firmware to keep track of the current 
  *  playback status.  dsp_level is only used in this function. */
-static unsigned short   dsp_level;
+volatile unsigned short dsp_level;
 volatile unsigned short sdem_level;
 
 /* This is used to keep track of the last SDRAM to SARAM transfer */
-static unsigned short   last_size;
+volatile unsigned short   last_size;
 
 /* This tells us which half of the DSP buffer (data) is free */
-static unsigned short   dma0_unlocked;
+volatile unsigned short   dma0_unlocked;
 
 /* This is used by the ARM to flag playback status and start/stop the DMA 
  *  transfers. */
 volatile unsigned short dma0_stopped;
 
 /* This is used to effectively flag whether the ARM has new data ready or not */
-short waiting;
-
+volatile short waiting;
 
 /* rebuffer sets up the next SDRAM to SARAM transfer and tells the ARM when DMA
  *  needs a new buffer.
@@ -196,16 +195,8 @@ interrupt void handle_dmac(void) {
 }
 
 void dma_init(void) {
-    /* Initialize some of the global variables to known values avoiding the 
-     *  .cinit section. */
-    dsp_level       =   0;
-    sdem_level      =   0;
-
-    last_size       =   0;
-    dma0_unlocked   =   0;
-    dma0_stopped    =   1;
-    
-    waiting         =   0;
+    /* Make sure that DMPREC is clear */
+    DMPREC          =   0;
 
     /* Configure SARAM to McBSP DMA */
 
@@ -216,8 +207,7 @@ void dma_init(void) {
      * ABU mode, From data space with postincrement, to data space with no 
      *  change
      */
-    DMMCR0 =    1 << 14 | 1 << 13 | 
-                1 << 12 | 1 << 8 | 1 << 6 | 1; 
+    DMMCR0 =    1 << 14 | 1 << 13 | 1 << 12 | 1 << 8 | 1 << 6 | 1; 
              
     /* Set the source (incrementing) location */
     DMSRC0 = (unsigned short)&data;
@@ -228,6 +218,6 @@ void dma_init(void) {
     /* Set the size of the buffer */
     DMCTR0 = sizeof(data);
 
-    /* Setup DMA0 interrupts and start the transfer */
+    /* Set the interrupt mux */
     DMPREC = 2 << 6;
 }
