@@ -24,6 +24,7 @@
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
+/* This is the absolute address on the bus */
 #define CONFIG_SDRAM_START 0x00900000
 
 #define OLYMPUS_MROBE_500 1
@@ -200,8 +201,8 @@
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
 /* define current usage levels */
-#define CURRENT_NORMAL     100 /* Measured */
-#define CURRENT_BACKLIGHT  100 /* Over 200 mA total measured when on */
+#define CURRENT_NORMAL     85 /* Measured */
+#define CURRENT_BACKLIGHT  200 /* Over 200 mA total measured when on */
 #define CURRENT_RECORD     0  /* no recording */
 
 /* Hardware controlled charging with monitoring */
