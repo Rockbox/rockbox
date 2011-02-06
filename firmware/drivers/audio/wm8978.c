@@ -283,7 +283,7 @@ void audiohw_postinit(void)
 
     /* 9. Set remaining registers */
     wmc_write(WMC_AUDIO_INTERFACE, WMC_WL_16 | WMC_FMT_I2S);
-    wmc_write(WMC_DAC_CONTROL, WMC_DACOSR_128 | WMC_AMUTE);
+    wmc_write(WMC_DAC_CONTROL, WMC_DACOSR_128);
 
     /* No ADC, no HP filter, no popping */
     wmc_clear(WMC_ADC_CONTROL, WMC_HPFEN);
