@@ -27,6 +27,7 @@
 #include "cpu.h"
 #include "string.h"
 #include "kernel.h"
+#include "system.h"
 #include "string-extra.h" /* memset16() */
 #include "mmu-arm.h"
 #include "system-target.h"
@@ -73,8 +74,8 @@ void lcd_sleep()
         memset16(FRAME, 0xFFFF, LCD_WIDTH*LCD_HEIGHT);
         sleep(HZ/5);
         /* Disabling these saves another ~15mA */
-        IO_OSD_OSDWINMD0    &= ~(0x01);
-        IO_VID_ENC_VMOD     &= ~(0x01);
+        bitclr16(&IO_OSD_OSDWINMD0, 0x01);
+        bitclr16(&IO_VID_ENC_VMOD, 0x01);
         
         /* Disabling the LCD saves ~50mA */
         IO_GIO_BITCLR2=1<<4; /* pin 36 */
@@ -87,8 +88,8 @@ void lcd_awake(void)
     if (!lcd_on)
     {
         lcd_on=true;
-        IO_OSD_OSDWINMD0    |= 0x01;
-        IO_VID_ENC_VMOD     |= 0x01;
+        bitset16(&IO_OSD_OSDWINMD0, 0x01);
+        bitset16(&IO_VID_ENC_VMOD, 0x01);
     
         sleep(2);
         IO_GIO_BITSET2      = 1<<4;
@@ -97,8 +98,7 @@ void lcd_awake(void)
         
         /* Wait long enough for a frame to be written */
         sleep(HZ/10);
-        
-        
+
         send_event(LCD_EVENT_ACTIVATION, NULL);
     }
 }
@@ -107,8 +107,6 @@ void lcd_awake(void)
 void lcd_enable_composite(bool enable)
 {
     /* Pin 39 appears to be related to the composite output */
-    /*  39: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(39, false, false, false, false, false, 0x00);
 
     short vidtemp = (IO_VID_ENC_VMOD & 0x7E8);
     
@@ -140,56 +138,33 @@ void lcd_init_device(void)
 {
     unsigned int addr;
     
-    /* LCD related pins:
-     *  32 - LED above LCD
-     *  34 - R2 for 18 bit output
-     *  35 - Resolution (MO?)
-     *  36 - LCD power (INI?)
-     *  37 - Backlight and LCD power
-     *  38 - B2 for 18 bit output
-     */
-     
-    /* Setup main LCD pins */
-    /*  32: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(32, false, false, false, false, false, 0x00);
-    IO_GIO_BITCLR2 = 1; /* Turn the LED off */
-    
-    /*  34: output, non-inverted, no-irq, falling edge, no-chat, R2 */
-    dm320_set_io(34, false, false, false, false, false, 0x02);
-    
-    /*  35: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(35, false, false, false, false, false, 0x00);
+    IO_GIO_BITCLR2      = 0x10; /* LCD off */
+
 #if LCD_NATIVE_HEIGHT > 320
     IO_GIO_BITSET2      = 1<<3; /* Set LCD resolution to VGA */
 #else
     IO_GIO_BITCLR2      = 1<<3; /* Set LCD resolution to QVGA */
 #endif
-    
-    /*  36: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(36, false, false, false, false, false, 0x00);
-    IO_GIO_BITSET2      = 0x10; /* LCD on */
-    
-    /*  37: output, non-inverted, no-irq, falling edge, no-chat, normal */
-    dm320_set_io(37, false, false, false, false, false, 0x00);
-    IO_GIO_BITCLR2 = (1 << 5); /* output low (backlight/lcd on) */
-    
-    /*  38: output, non-inverted, no-irq, falling edge, no-chat, B2 */
-    dm320_set_io(38, false, false, false, false, false, 0x02);
 
     /* Enable clocks for display */
-    IO_CLK_MOD1 |= (CLK_MOD1_VENC | CLK_MOD1_OSD);
+    bitset16(&IO_CLK_MOD1, (CLK_MOD1_VENC | CLK_MOD1_OSD));
 
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
+
+    IO_VID_ENC_VDCTL = 0x0;
+    IO_VID_ENC_SYNCTL = 0x0;
+    IO_VID_ENC_LCDOUT = 0x0;
+
+    IO_VID_ENC_VMOD = 0x4;
+
+    IO_VID_ENC_DCLKCTL  = 0x0800;   
+    IO_VID_ENC_DCLKPTN0 = 0x0001;
 
     IO_OSD_OSDWINMD0    &= ~(0x0001);
     IO_OSD_VIDWINMD     &= ~(0x0001);
 
     /* Setup the LCD controller */
-    IO_VID_ENC_VMOD     = 0x2014;
-    IO_VID_ENC_VDCTL    = 0x2000;
-    IO_VID_ENC_VDPRO    = 0x0000;
-    IO_VID_ENC_SYNCTL   = 0x100E;
     IO_VID_ENC_HSPLS    = 1; /* HSYNC pulse width */
     IO_VID_ENC_VSPLS    = 1; /* VSYNC pulse width */
     
@@ -200,6 +175,11 @@ void lcd_init_device(void)
     IO_VID_ENC_VINT     = LCD_NATIVE_HEIGHT+8;
     IO_VID_ENC_VSTART   = 2;
     IO_VID_ENC_VVALID   = LCD_NATIVE_HEIGHT;
+
+    IO_VID_ENC_VMOD     = 0x2015;
+    IO_VID_ENC_VDCTL    = 0x2000;
+    IO_VID_ENC_VDPRO    = 0x0000;
+    IO_VID_ENC_SYNCTL   = 0x100E;
     
     IO_VID_ENC_HSDLY    = 0x0000;
     IO_VID_ENC_VSDLY    = 0x0000;
@@ -229,7 +209,7 @@ void lcd_init_device(void)
     /* Setup the OSD windows */
     
     /* Used for 565 RGB */
-    IO_OSD_OSDWINMD0    = 0x30C0;
+    IO_OSD_OSDWINMD0    = 0x30C1;
 
     IO_OSD_OSDWIN0OFST  = LCD_NATIVE_WIDTH *2 / 32;
     
@@ -286,7 +266,8 @@ void lcd_init_device(void)
 
     IO_OSD_OSDWINMD0    |= 0x01;
     
-    lcd_enable_composite(false);
+    IO_GIO_BITSET2      = 0x10; /* LCD on */
+//    lcd_enable_composite(false);
 }
 
 #if defined(HAVE_LCD_MODES)
@@ -344,8 +325,8 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
     dst     -=  CONFIG_SDRAM_START;
     
     /* Enable Clocks */
-    IO_CLK_MOD1     |= 1<<8;
-    COP_CP_CLKC     |= 0x0001;
+    bitset16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
+    bitset16(&COP_CP_CLKC, 0x0001);
 
     /* ... */
     COP_BUF_MUX1    = 0x0005;
@@ -399,6 +380,10 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
         dst     += (stride*pix_width);
         height--;
     } while(height>0);
+    
+    /* Disable image buffer clock */
+    bitclr16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
+    bitclr16(&COP_CP_CLKC, 0x0001);
 }
 #else
 static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
@@ -412,15 +397,17 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
                 * pix_width;
     
     /* Flush the area that is being copied from. */
-    clean_dcache_range(src, (stride*pix_width*width));
+    clean_dcache();
+    
+//    clean_dcache_range(src, (stride*pix_width*width));
     
     /* Addresses are relative to start of SDRAM */
     src     -=  CONFIG_SDRAM_START;
     dst     -=  CONFIG_SDRAM_START;
     
     /* Enable Clocks */
-    IO_CLK_MOD1     |= 1<<8;
-    COP_CP_CLKC     |= 0x0001;
+    bitset16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
+    bitset16(&COP_CP_CLKC, 0x0001);
 
     /* ... */
     COP_BUF_MUX1    = 0x0005;
@@ -474,6 +461,10 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
         dst     -= (stride*pix_width);
         width--;
     } while(width>0);
+    
+    /* Disable image buffer clock */
+    bitclr16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
+    bitclr16(&COP_CP_CLKC, 0x0001);
 }
 #endif
 #endif
@@ -604,42 +595,46 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
     }
 #endif
 #else
+    if(width <= 0 || height <= 0)
+        return;
+
     char *dst=(char *)FRAME
         + (LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)
         - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y;
     
     src=src+src_x+src_y*width;
 
-    while(height--)
+    do
     {
-        register char *c_src=src;
-        register char *c_dst=dst;
-        register int c_width=width;
+        register char *c_dst = dst;
+        register unsigned int c_width = width;
 
-        while (c_width--)
+        do
         {
-            *c_dst = *c_src++;
+            *c_dst = *src++;
             c_dst -= (LCD_NATIVE_WIDTH+LCD_FUDGE);
-        } 
+        } while (--c_width);
 
         dst++;
-        src+=width;
-    }
+    } while(--height);
 #endif
 }
 
 void lcd_pal256_update_pal(fb_data *palette)
 {
-    unsigned char i;
-    for(i=0; i< 255; i++) 
+    unsigned int index = 255;
+    
+    do
     {
         int y, cb, cr;
-        unsigned char r=RGB_UNPACK_RED_LCD(palette[i])<<3;
-        unsigned char g=RGB_UNPACK_GREEN_LCD(palette[i])<<2;
-        unsigned char b=RGB_UNPACK_BLUE_LCD(palette[i])<<3;
+        fb_data index_value = palette[index];
+        unsigned char r = RGB_UNPACK_RED_LCD    (index_value)<<3;
+        unsigned char g = RGB_UNPACK_GREEN_LCD  (index_value)<<2;
+        unsigned char b = RGB_UNPACK_BLUE_LCD   (index_value)<<3;
         
-        y = ((77 * r + 150 * g + 29 * b) >> 8);        cb = ((-43 * r - 85 * g + 128 * b) >> 8) + 128;
-        cr = ((128 * r - 107 * g - 21 * b) >> 8) + 128;
+        y  = (( 77 * r + 150 * g + 29  * b) >> 8);
+        cb = ((-43 * r - 85  * g + 128 * b) >> 8) + 128;
+        cr = ((128 * r - 107 * g - 21  * b) >> 8) + 128;
         
         while(IO_OSD_MISCCTL&0x08)
         {};
@@ -648,8 +643,8 @@ void lcd_pal256_update_pal(fb_data *palette)
         IO_OSD_CLUTRAMYCB= ((unsigned char)y << 8) | (unsigned char)cb;
         
         /* Write in the index and cr */
-        IO_OSD_CLUTRAMCR=((unsigned char)cr << 8) | i;
-    }
+        IO_OSD_CLUTRAMCR=((unsigned char)cr << 8) | (unsigned char)index;
+    } while (index--); /* Write 256 values in */
 }
 #endif
                                            
@@ -719,16 +714,14 @@ void lcd_blit_yuv(unsigned char * const src[3],
             c_dst -= (LCD_NATIVE_WIDTH+LCD_FUDGE);
             
             c_width -= 2;
-        }
-        while (c_width > 0);
+        } while (c_width);
         
         yuv_src[0] += y_remain; /* Skip down two luma lines-width */
         yuv_src[1] += cbcr_remain; /* Skip down one chroma line-width/2 */
         yuv_src[2] += cbcr_remain;
 
         dst+=2;
-    }
-    while (--height > 0);
+    } while (--height);
 }
 
 void lcd_set_contrast(int val) {
