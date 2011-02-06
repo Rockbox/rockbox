@@ -1090,10 +1090,10 @@ static const char* tsc2100_debug_getname(int selected_item, void * data,
             break;
     }
     if (reserved)
-        snprintf(buffer, buffer_len, "%02x: RESERVED", selected_item);
+        snprintf(buffer, buffer_len, "%02x: RSVD", selected_item);
     else
-        snprintf(buffer, buffer_len, "%02x: %s", selected_item,
-                    itob(tsc2100_readreg(*page, selected_item)&0xffff,16));
+        snprintf(buffer, buffer_len, "%02x: %04x", selected_item,
+                    tsc2100_readreg(*page, selected_item)&0xffff);
     return buffer;
 }
 static int tsc2100debug_action_callback(int action, struct gui_synclist *lists)
