@@ -81,8 +81,10 @@ void tsc2100_set_mode(bool poweron, unsigned char scan_mode)
 {
     short tsadc=(scan_mode<<TSADC_ADSCM_SHIFT)| /* mode */
                  (0x3<<TSADC_RESOL_SHIFT)| /* 12 bit resolution */
+                 (0x2<<TSADC_ADAVG_SHIFT)| /* 8 or 9 sample average */
                  (0x2<<TSADC_ADCR_SHIFT )| /* 2 MHz internal clock */
-                 (0x2<<TSADC_PVSTC_SHIFT);
+                 (0x3<<TSADC_PVSTC_SHIFT)| /* 1 ms stabalization */
+                 (TSADC_AVGFS);            /* Median filter ( 9 sample ) */
                  
     if(!poweron)
     {
