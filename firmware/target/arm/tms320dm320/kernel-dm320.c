@@ -27,10 +27,7 @@
 
 void tick_start(unsigned int interval_in_ms)
 {
-/*    TODO: set up TIMER1 clock settings
-    IO_CLK_MOD2 &= ~CLK_MOD2_TMR1; //disable TIMER1 clock
-    IO_CLK_SEL0 |= (1 << 2); //set TIMER1 clock to PLLIN*/
-    IO_CLK_MOD2 |= CLK_MOD2_TMR1; //enable TIMER1 clock!!!!!!!!!
+    IO_CLK_MOD2 |= CLK_MOD2_TMR1; /* enable TIMER1 clock */
     IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_STOP;
     
     /*  Setup the Prescalar (Divide by 10)
@@ -56,3 +53,4 @@ void TIMER1(void)
     /* Run through the list of tick tasks */
     call_tick_tasks();
 }
+
