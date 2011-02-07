@@ -383,7 +383,7 @@ bool button_hold(void)
 #if CONFIG_CPU==S5L8701
     return ((PDAT14 & (1 << 6)) == 0);
 #elif CONFIG_CPU==S5L8702
-    return ((PDATE & (1 << 3)) == 0);
+    return ((PDATE & (1 << 4)) == 0);
 #endif
 }
 
