@@ -110,15 +110,6 @@ SECTIONS
         *(.data*)
     } > DRAM
 
- 	.bss (NOLOAD) :
-    {
-        . = ALIGN(0x4);
-       	_bss_start = .;
-        *(.bss*)
-        *(COMMON)
-       	_bss_end = .;
-    } > DRAM
-
     .iram :
     {
         . = ALIGN(0x4);
@@ -131,13 +122,22 @@ SECTIONS
 
     _iramcopy = LOADADDR(.iram);
 
-    .ibss DTCMORIG + _iramend (NOLOAD) :
+ 	.bss (NOLOAD) :
+    {
+        . = ALIGN(0x4);
+       	_bss_start = .;
+        *(.bss*)
+        *(COMMON)
+       	_bss_end = .;
+    } > DRAM
+
+    .ibss (NOLOAD) :
     {
         . = ALIGN(0x4);
         _ibss_start = .;
         *(.ibss)
         _ibss_end = .;
-    } > DTCM
+    } > ITCM
 
     /* Program stack space */
     .pro_stack (NOLOAD): 
@@ -149,7 +149,7 @@ SECTIONS
         . += PRO_STACK_SIZE;
         _pro_stack_start = .;
         stackend = .;          /* Variable for tread.c */
-    } > DTCM
+    } > ITCM
 
     /* IRQ stack space */
     .irq_stack (NOLOAD):
@@ -158,7 +158,7 @@ SECTIONS
         _irq_stack_end = .;
         . += IRQ_STACK_SIZE;
         _irq_stack_start = .;
-    } > DTCM
+    } > ITCM
 
     /* FIQ stack space */
     .fiq_stack (NOLOAD):
@@ -167,7 +167,7 @@ SECTIONS
         _fiq_stack_end = .;
         . += FIQ_STACK_SIZE;
         _fiq_stack_start = .;
-    } > DTCM
+    } > ITCM
 
     .audiobuf (NOLOAD) :
     {
