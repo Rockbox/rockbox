@@ -23,7 +23,10 @@
 # *WARNING*
 #
 # If you want to add a new string, add it to the end of this file!
-# If you want to remove a string, just blank it, don't actually remove it!
+# Removing strings will break the numbering of strings in binary lang files and
+# voice files so instead of removing a unused <phrase>, change the desc field
+# to deprecated and either blank the strings or change them to
+# deprecated (whout quotes) and do *not* change the targets.
 #
 # If you re-order things or remove entries, you must bump the binary language
 # file version number in both the 'genlang' tool and the language loader code.
@@ -5956,20 +5959,6 @@
   <voice>
     *: none
     recording: "Split Filesize"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REC_SIZE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>

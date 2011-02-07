@@ -7634,20 +7634,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REC_SIZE
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_GAIN
   desc: Generic string for gain used in EQ menu and recording screen
   user: core

@@ -7698,20 +7698,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REC_SIZE
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REMOTE_LCD_OFF
   desc: Remote lcd off splash in recording screen
   user: core

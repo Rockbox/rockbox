@@ -5861,20 +5861,6 @@
  </voice>
 </phrase>
 <phrase>
- id: LANG_REC_SIZE
-  desc: deprecated
-  user: core
- <source>
-    *: none
- </source>
- <dest>
-    *: none
- </dest>
- <voice>
-    *: none
- </voice>
-</phrase>
-<phrase>
  id: LANG_RECORD_PRERECORD_TIME
  desc: in recording settings_menu
  user: core

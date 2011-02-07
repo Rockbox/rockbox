@@ -7613,20 +7613,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REC_SIZE
-  desc: deprecated
-  user:
-  <source>
-    *: none
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_STOP_RECORDING
   desc: in record timesplit options
   user: core
