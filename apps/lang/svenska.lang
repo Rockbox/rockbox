@@ -12564,6 +12564,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Signalstyrka:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Signalstyrka"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_FILESIZE
   desc: in record timesplit options and in track information viewer 
   user: core
@@ -12575,5 +12592,33 @@
   </dest>
   <voice>
     *: "Filstorlek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Enable automatic resume"
+  </source>
+  <dest>
+    *: "Återuppta uppspelning automatiskt"
+  </dest>
+  <voice>
+    *: "Återuppta uppspelning automatiskt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Yes (requires initialized database)"
+  </source>
+  <dest>
+    *: "Ja (kräver initierad databas)"
+  </dest>
+  <voice>
+    *: "Ja (kräver initierad databas)"
   </voice>
 </phrase>
