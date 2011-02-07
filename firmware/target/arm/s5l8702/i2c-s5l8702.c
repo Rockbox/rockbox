@@ -41,33 +41,40 @@
 
 static struct mutex i2c_mtx[2];
 
-void i2c_init(void)
+static void i2c_on(int bus)
+{
+    /* enable I2C clock */
+    PWRCON(1) &= ~(1 << 4);
+
+    IICCON(bus) = (1 << 7) | /* ACK_GEN */
+                  (0 << 6) | /* CLKSEL = PCLK/16 */
+                  (1 << 5) | /* INT_EN */
+                  (1 << 4) | /* IRQ clear */
+                  (7 << 0);  /* CK_REG */
+
+    /* serial output on */
+    IICSTAT(bus) = (1 << 4);
+}
+
+static void i2c_off(int bus)
+{
+    /* serial output off */
+    IICSTAT(bus) = 0;
+
+    /* disable I2C clock */
+    PWRCON(1) |= (1 << 4);
+}
+
+void i2c_init()
 {
     mutex_init(&i2c_mtx[0]);
     mutex_init(&i2c_mtx[1]);
-
-    /* initial config */
-    IICADD(0) = 0;
-    IICADD(1) = 0;
-    IICCON(0) = (1 << 7) | /* ACK_GEN */
-             (0 << 6) | /* CLKSEL = PCLK/16 */
-             (1 << 5) | /* INT_EN */
-             (1 << 4) | /* IRQ clear */
-             (3 << 0);  /* CK_REG */
-    IICCON(1) = (1 << 7) | /* ACK_GEN */
-             (0 << 6) | /* CLKSEL = PCLK/16 */
-             (1 << 5) | /* INT_EN */
-             (1 << 4) | /* IRQ clear */
-             (3 << 0);  /* CK_REG */
-
-    /* serial output on */
-    IICSTAT(0) = (1 << 4);
-    IICSTAT(1) = (1 << 4);
 }
 
 int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned char *data)
 {
     mutex_lock(&i2c_mtx[bus]);
+	i2c_on(bus);
     long timeout = current_tick + HZ / 50;
 
     /* START */
@@ -116,6 +123,7 @@ int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned
             return 5;
         }
     
+	i2c_off(bus);
     mutex_unlock(&i2c_mtx[bus]);
     return 0;
 }
@@ -123,6 +131,7 @@ int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned
 int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *data)
 {
     mutex_lock(&i2c_mtx[bus]);
+	i2c_on(bus);
     long timeout = current_tick + HZ / 50;
 
     if (address >= 0) {
@@ -180,6 +189,7 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
             return 5;
         }
     
+	i2c_off(bus);
     mutex_unlock(&i2c_mtx[bus]);
     return 0;
 }
