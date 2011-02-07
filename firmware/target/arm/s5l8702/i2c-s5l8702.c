@@ -74,7 +74,7 @@ void i2c_init()
 int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned char *data)
 {
     mutex_lock(&i2c_mtx[bus]);
-	i2c_on(bus);
+    i2c_on(bus);
     long timeout = current_tick + HZ / 50;
 
     /* START */
@@ -123,7 +123,7 @@ int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned
             return 5;
         }
     
-	i2c_off(bus);
+    i2c_off(bus);
     mutex_unlock(&i2c_mtx[bus]);
     return 0;
 }
@@ -131,7 +131,7 @@ int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned
 int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *data)
 {
     mutex_lock(&i2c_mtx[bus]);
-	i2c_on(bus);
+    i2c_on(bus);
     long timeout = current_tick + HZ / 50;
 
     if (address >= 0) {
@@ -189,7 +189,7 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
             return 5;
         }
     
-	i2c_off(bus);
+    i2c_off(bus);
     mutex_unlock(&i2c_mtx[bus]);
     return 0;
 }
