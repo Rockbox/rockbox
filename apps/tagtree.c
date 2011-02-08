@@ -722,10 +722,15 @@ static void tagtree_track_finish_event(void *data)
     }
     tagcache_idx--;
     
-    /* Don't process unplayed tracks. */
-    if (id3->elapsed == 0)
+    /* Don't process unplayed tracks, or tracks interrupted within the
+       first 15 seconds. */
+    if (id3->elapsed == 0
+#if CONFIG_CODEC == SWCODEC /* HWCODEC doesn't have automatic_skip */
+        || (id3->elapsed < 15 * 1000 && !automatic_skip)
+#endif
+        )
     {
-        logf("not logging unplayed track");
+        logf("not logging unplayed or skipped track");
         return;
     }
     

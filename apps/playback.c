@@ -2013,6 +2013,15 @@ static void audio_thread(void)
                 LOGFQUEUE("audio < Q_AUDIO_FF_REWIND");
                 if (!playing)
                     break;
+
+                if ((long)ev.data == 0)
+                {
+                    /* About to restart the track - send track finish
+                       events if not already done. */
+                    if (thistrack_id3 == audio_current_track())
+                        send_event(PLAYBACK_EVENT_TRACK_FINISH, thistrack_id3);
+                }
+
                 if (automatic_skip)
                 {
                     /* An automatic track skip is in progress. Finalize it,
