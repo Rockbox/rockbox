@@ -427,6 +427,7 @@ void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig)
     adjust_mp3entry(dest, dest, orig);
 }
 
+#ifndef __PCTOOL__
 #ifdef HAVE_TAGCACHE
 #if CONFIG_CODEC == SWCODEC
 
@@ -472,3 +473,4 @@ bool autoresumable(struct mp3entry *id3)
 
 #endif  /* SWCODEC */
 #endif  /* HAVE_TAGCACHE */
+#endif  /* __PCTOOL__ */
