@@ -2771,7 +2771,7 @@ fi
     ;;
 
    143|samsungyps3)
-    target_id=60
+    target_id=72
     modelname="samsungyps3"
     target="-DSAMSUNG_YPS3"
     memory=16 # always
