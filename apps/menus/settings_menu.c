@@ -34,6 +34,7 @@
 #include "tagtree.h"
 #include "usb.h"
 #include "splash.h"
+#include "yesno.h"
 #include "talk.h"
 #include "powermgmt.h"
 #if CONFIG_CODEC == SWCODEC
@@ -426,7 +427,26 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 
 #ifdef HAVE_TAGCACHE
 #if CONFIG_CODEC == SWCODEC 
-MENUITEM_SETTING(autoresume_enable, &global_settings.autoresume_enable, NULL);
+static int autoresume_callback(int action, const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+
+    if (action == ACTION_EXIT_MENUITEM  /* on exit */
+        && global_settings.autoresume_enable
+        && !tagcache_is_usable())
+    {
+        static const char *lines[] = {ID2P(LANG_TAGCACHE_BUSY),
+                                      ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
+        static const struct text_message message = {lines, 2};
+        
+        if (gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
+            tagcache_rebuild_with_splash();
+    }
+    return action;
+}
+
+MENUITEM_SETTING(autoresume_enable, &global_settings.autoresume_enable,
+                 autoresume_callback);
 #endif
 #endif
 

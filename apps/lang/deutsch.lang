@@ -12610,29 +12610,29 @@
 </phrase>
 <phrase>
   id: LANG_AUTORESUME_ENABLE_YES
-  desc: resume settings menu
+  desc: deprecated
   user: core
   <source>
-    *: "Yes (requires initialized database)"
+    *: ""
   </source>
   <dest>
-    *: "Ja (erfordert initialisierte Datenbank)"
+    *: ""
   </dest>
   <voice>
-    *: "Ja (erfordert initialisierte Datenbank)"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_AUTORESUME_ENABLE
-  desc: resume settings menu
+  desc: deprecated
   user: core
   <source>
-    *: "Enable automatic resume"
+    *: ""
   </source>
   <dest>
-    *: "Automatisches Fortsetzen aktivieren"
+    *: ""
   </dest>
   <voice>
-    *: "Automatisches Fortsetzen aktivieren"
+    *: ""
   </voice>
 </phrase>

@@ -12591,29 +12591,29 @@
 </phrase>
 <phrase>
   id: LANG_AUTORESUME_ENABLE_YES
-  desc: resume settings menu
+  desc: deprecated
   user: core
   <source>
-    *: "Yes (requires initialized database)"
+    *: ""
   </source>
   <dest>
-    *: "Da (zahtijeva pokrenutu bazu podataka)"
+    *: ""
   </dest>
   <voice>
-    *: "Da (zahtijeva pokrenutu bazu podataka)"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_AUTORESUME_ENABLE
-  desc: resume settings menu
+  desc: deprecated
   user: core
   <source>
-    *: "Enable automatic resume"
+    *: ""
   </source>
   <dest>
-    *: "Omogući automatsko nastavljanje"
+    *: ""
   </dest>
   <voice>
-    *: "Omogući automatsko nastavljanje"
+    *: ""
   </voice>
 </phrase>

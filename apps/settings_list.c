@@ -1258,9 +1258,9 @@ const struct settings_list settings[] = {
 
 #ifdef HAVE_TAGCACHE
 #if CONFIG_CODEC == SWCODEC 
-    BOOL_SETTING(0, autoresume_enable, LANG_AUTORESUME_ENABLE, false,
+    BOOL_SETTING(0, autoresume_enable, LANG_AUTORESUME, false,
                  "autoresume enable", off_on,
-                 LANG_AUTORESUME_ENABLE_YES, LANG_SET_BOOL_NO, NULL),
+                 LANG_SET_BOOL_YES, LANG_SET_BOOL_NO, NULL),
 #endif                  
 
     OFFON_SETTING(0, runtimedb, LANG_RUNTIMEDB_ACTIVE, false,

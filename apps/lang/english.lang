@@ -12676,29 +12676,43 @@
 </phrase>
 <phrase>
   id: LANG_AUTORESUME_ENABLE
-  desc: resume settings menu
+  desc: deprecated
   user: core
   <source>
-    *: "Enable automatic resume"
+    *: ""
   </source>
   <dest>
-    *: "Enable automatic resume"
+    *: ""
   </dest>
   <voice>
-    *: "Enable automatic resume"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_AUTORESUME_ENABLE_YES
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME
   desc: resume settings menu
   user: core
   <source>
-    *: "Yes (requires initialized database)"
+    *: "Automatic resume"
   </source>
   <dest>
-    *: "Yes (requires initialized database)"
+    *: "Automatic resume"
   </dest>
   <voice>
-    *: "Yes (requires initialized database)"
+    *: "Automatic resume"
   </voice>
 </phrase>

@@ -12572,16 +12572,16 @@
 </phrase>
 <phrase>
   id: LANG_AUTORESUME_ENABLE_YES
-  desc: resume settings menu
+  desc: deprecated
   user: core
   <source>
-    *: "Yes (requires initialized database)"
+    *: ""
   </source>
   <dest>
-    *: "Áno (požaduje inicializovanú databázu)"
+    *: ""
   </dest>
   <voice>
-    *: "Áno (požaduje inicializovanú databázu)"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12603,15 +12603,15 @@
 </phrase>
 <phrase>
   id: LANG_AUTORESUME_ENABLE
-  desc: resume settings menu
+  desc: deprecated
   user: core
   <source>
-    *: "Enable automatic resume"
+    *: ""
   </source>
   <dest>
-    *: "Aktivovať Automatické Obnovenie Prehrávania"
+    *: ""
   </dest>
   <voice>
-    *: "Aktivovať Automatické Obnovenie Prehrávania"
+    *: ""
   </voice>
 </phrase>
