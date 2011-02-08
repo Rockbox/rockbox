@@ -1,0 +1,102 @@
+# cabbie 2.0
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+# (C) 2010, Thomas Martitz ported to 800x480 touchscreens
+# derived from "cabbie" (C) Yohann Misquitta
+
+# TODO:
+#  * images for battery, hold button
+%wd
+%X(wpsbackdrop-800x480x16.bmp)
+
+#%xl(A,lock-240x320x16.bmp,11,0,2)
+#%xl(B,battery-240x320x16.bmp,46,0,10)
+
+%Cl(0,0,225,225,c,c)
+
+%?C<%Vd(c)%?Tl(2.0)<%Vd(t)|%Vd(d)>|%Vd(a)%?Tl(2.0)<%Vd(t)|%Vd(b)>>
+
+# track & next track info - no AA
+%Vl(a,0,79,-,225,-)
+# tap on current title info for playlist (ie. where albumart would normally be)
+%T(0,0,225,225,playlist)
+%Vl(b,0,79,-,225,-)
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+
+%s%ac%Sx(Next Track:)
+%s%ac%?Ia<%Ia|%?D(2)<%D(2)|%(root%)>> - %?It<%It|%Fn>
+
+#
+# album art viewport
+#
+%Vl(c,58,76,225,225,-)
+# tap on the cover art for playlist
+%T(0,0,225,225,playlist)
+%Cd
+
+# track & next track info - AA
+%Vl(d,309,83,-,211,-)
+%s%al%?it<%it|%fn>
+%s%al%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
+
+%s%al%Sx(Next Track:)
+%s%al%?Ia<%Ia|%?D(2)<%D(2)|%(root%)>> - %?It<%It|%Fn>
+
+# playtime
+%V(30,360,740,36,-)
+%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+
+# progressbar and bottom icons
+%V(0,323,-,33,-)
+%pb(25,0,750,-,pb-800x480x16.bmp)
+%T(25,0,750,50,progressbar)
+
+#%?mh<%xd(Aa)|%xd(Ab)>
+#%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+# volume
+%xl(C,volume-800x480x16.bmp,340,78,10)
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+%T(340,78,88,60,volume)
+
+# shuffle
+%V(468,415,92,43,-)
+%xl(D,shuffle-800x480x16.bmp,0,0)
+%?ps<%xd(D)>
+%T(0,0,92,43,shuffle)
+
+# repeat
+%V(590,404,50,66,-)
+%xl(E,repeat-800x480x16.bmp,0,0,4)
+%xd(E, %mm, -1)
+%T(0,0,50,66,repmode)
+
+# playmode
+%V(700,402,70,70,-)
+%xl(F,playmode-800x480x16.bmp,0,0,5)
+%xd(F, %mp)
+%T(0,0,70,70,play)
+%T(0,0,70,70,&stop)
+
+#
+# popup osd menu
+#
+%Vl(t,309,83,-,211,-)
+%xl(G,popup-800x480x16.bmp,15,20)
+%xd(G)
+%T(10,10,160,140,browse)
+%T(170,10,144,119,quickscreen)
+%T(288,10,123,146,contextmenu)
+
+#
+# ff/rewind button
+#
+%V(166,395,160,75,-)
+%xl(H,rew-800x480x16.bmp,0,5)
+%xl(I,ff-800x480x16.bmp,80,5)
+%xd(H)%xd(I)
+%T(0,0,70,75,&rwd)
+%T(0,0,70,75,prev)
+%T(80,0,70,75,&ffwd)
+%T(80,0,70,75,next)

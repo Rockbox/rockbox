@@ -275,6 +275,7 @@ RSBS:
 Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
 
 # Preferred font (including .fnt extension - leave blank for player):
+Font.800x480x16: 35-Adobe-Helvetica.fnt
 Font.480x800x16: 35-Adobe-Helvetica.fnt
 Font.320x480x16: 27-Adobe-Helvetica.fnt
 Font.320x240x16: 15-Adobe-Helvetica.fnt
@@ -306,6 +307,7 @@ line selector text color: 000000
 filetype colours:
 
 #backdrop - remember this is the source file name in your SVN folder, not dest name!
+backdrop.800x480x16: backdrops/cabbiev2.800x480x16.bmp
 backdrop.480x800x16: backdrops/cabbiev2.480x800x16.bmp
 backdrop.320x480x16: backdrops/cabbiev2.320x480x16.bmp
 backdrop.320x240x16: backdrops/cabbiev2.320x240x16.bmp
@@ -322,6 +324,7 @@ backdrop.240x320x16: backdrops/cabbiev2.240x320x16.bmp
 backdrop.240x400x16: backdrops/cabbiev2.240x400x16.bmp
 
 #selection bar settings for color targets
+selector type.800x480x16: bar (gradient)
 selector type.480x800x16: bar (gradient)
 selector type.320x480x16: bar (gradient)
 selector type.320x240x16: bar (gradient)
@@ -338,6 +341,7 @@ selector type.160x128x2: bar (inverse)
 selector type.138x110x2: bar (inverse)
 
 #icons
+iconset.800x480x16: icons/tango_small.bmp
 iconset.480x800x16: icons/tango_small.bmp 
 iconset.320x480x16: icons/tango_small.bmp 
 iconset.320x240x16: icons/tango_small.bmp 
@@ -354,6 +358,7 @@ iconset.240x320x16: icons/tango_small.bmp
 iconset.240x400x16: icons/tango_small.bmp 
 
 #viewer icons
+viewers iconset.800x480x16: icons/tango_small_viewers.bmp
 viewers iconset.480x800x16: icons/tango_small_viewers.bmp
 viewers iconset.320x480x16: icons/tango_small_viewers.bmp
 viewers iconset.320x240x16: icons/tango_small_viewers.bmp
