@@ -64,10 +64,10 @@ void dsp_reset(void)
 {
     DSP_(0x7fff) = 0xdead;
     
-    IO_DSPC_HPIB_CONTROL &= ~(1 << 8);
+    bitclr16(&IO_DSPC_HPIB_CONTROL, 1 << 8);
     /* HPIB bus cycles will lock up the ARM in here. Don't touch DSP RAM. */
     nop; nop;
-    IO_DSPC_HPIB_CONTROL |= 1 << 8;
+    bitset16(&IO_DSPC_HPIB_CONTROL, 1 << 8);
     
     /* TODO: Timeout. */
     while (DSP_(0x7fff) != 0);
@@ -81,9 +81,9 @@ void dsp_wake(void)
     
     /* The first time you INT0 the DSP, the ROM loader will branch to your RST
        handler. Subsequent times, your INT0 handler will get executed. */
-    IO_DSPC_HPIB_CONTROL &= ~(1 << 7);
+    bitclr16(&IO_DSPC_HPIB_CONTROL, 1 << 7);
     nop; nop;
-    IO_DSPC_HPIB_CONTROL |= 1 << 7;
+    bitset16(&IO_DSPC_HPIB_CONTROL, 1 << 7);
     
     restore_irq(old_level);
 }

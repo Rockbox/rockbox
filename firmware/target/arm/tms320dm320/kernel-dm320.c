@@ -27,7 +27,7 @@
 
 void tick_start(unsigned int interval_in_ms)
 {
-    IO_CLK_MOD2 |= CLK_MOD2_TMR1; /* enable TIMER1 clock */
+    bitset16(&IO_CLK_MOD2, CLK_MOD2_TMR1); /* enable TIMER1 clock */
     IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_STOP;
     
     /*  Setup the Prescalar (Divide by 10)
@@ -42,7 +42,7 @@ void tick_start(unsigned int interval_in_ms)
     IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_FREE_RUN;
     
     /* Enable the interrupt */
-    IO_INTC_EINT0 |= INTR_EINT0_TMR1;
+    bitset16(&IO_INTC_EINT0, INTR_EINT0_TMR1);
 }
 
 void TIMER1(void) __attribute__ ((section(".icode")));

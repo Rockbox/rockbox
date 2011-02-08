@@ -39,7 +39,7 @@ static volatile int uart1_receive_count, uart1_receive_read, uart1_receive_write
 void uart_init(void)
 {
     /* Enable UART clock */
-    IO_CLK_MOD2 |= CLK_MOD2_UART1;
+    bitset16(&IO_CLK_MOD2, CLK_MOD2_UART1);
     
     // 8-N-1
     IO_UART1_MSR = 0xC400;
@@ -58,7 +58,7 @@ void uart_init(void)
     uart1_send_write=0;
 
     /* Enable the interrupt */
-    IO_INTC_EINT0 |= INTR_EINT0_UART1;
+    bitset16(&IO_INTC_EINT0, INTR_EINT0_UART1);
 }
 
 /* This function is not interrupt driven */
@@ -85,7 +85,7 @@ void uart1_puts(const char *str, int size)
     memcpy(uart1_send_buffer_ring, str, size);
     
     /* Disable interrupt while modifying the pointers */
-    IO_INTC_EINT0 &= ~INTR_EINT0_UART1;
+    bitclr16(&IO_INTC_EINT0, INTR_EINT0_UART1);
     
     uart1_send_count=size;
     uart1_send_read=0;
@@ -98,25 +98,27 @@ void uart1_puts(const char *str, int size)
     }
     
     /* Enable interrupt */
-    IO_INTC_EINT0 |= INTR_EINT0_UART1;
+    bitset16(&IO_INTC_EINT0, INTR_EINT0_UART1);
 }
 
 void uart1_clear_queue(void)
 {
     /* Disable interrupt while modifying the pointers */
-    IO_INTC_EINT0 &= ~INTR_EINT0_UART1;
+    bitclr16(&IO_INTC_EINT0, INTR_EINT0_UART1);
+
     uart1_receive_write=0;
     uart1_receive_count=0;
     uart1_receive_read=0;
+
     /* Enable interrupt */
-    IO_INTC_EINT0 |= INTR_EINT0_UART1;
+    bitset16(&IO_INTC_EINT0, INTR_EINT0_UART1);
 }
 
 /* This function returns the number of bytes left in the queue after a read is done (negative if fail)*/
 int uart1_gets_queue(char *str, int size)
 {
     /* Disable the interrupt while modifying the pointers */
-    IO_INTC_EINT0 &= ~INTR_EINT0_UART1;
+    bitclr16(&IO_INTC_EINT0, INTR_EINT0_UART1);
     int retval;
     
     if(uart1_receive_count<size)
@@ -146,7 +148,7 @@ int uart1_gets_queue(char *str, int size)
     }
 
     /* Enable the interrupt */
-    IO_INTC_EINT0 |= INTR_EINT0_UART1;
+    bitset16(&IO_INTC_EINT0, INTR_EINT0_UART1);
 
     return retval;
 }
@@ -176,3 +178,4 @@ void UART1(void)
         uart1_send_count--;
     }
 }
+

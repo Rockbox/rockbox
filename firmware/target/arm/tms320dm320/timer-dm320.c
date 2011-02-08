@@ -45,7 +45,7 @@ bool timer_set(long cycles, bool start)
 
     oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     
-    IO_CLK_MOD2 |= CLK_MOD2_TMR0; //enable TIMER0 clock!!!!!!!!!
+    bitset16(&IO_CLK_MOD2, CLK_MOD2_TMR0); /* enable TIMER0 clock */
 
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
 
@@ -74,13 +74,16 @@ bool timer_set(long cycles, bool start)
 
 static void stop_timer(void)
 {
-    IO_INTC_EINT0 &= ~INTR_EINT0_TMR0; //disable TIMER0 interrupt
+    /* disable TIMER0 interrupt */
+    bitclr16(&IO_INTC_EINT0, INTR_EINT0_TMR0);
 
-    IO_INTC_IRQ0 = INTR_IRQ0_TMR0; //clear TIMER0 interrupt
+    /* clear TIMER0 interrupt */
+    IO_INTC_IRQ0 = INTR_IRQ0_TMR0;
     
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
     
-    IO_CLK_MOD2 &= ~CLK_MOD2_TMR0; //disable TIMER0 clock
+    /* disable TIMER0 clock */
+    bitclr16(&IO_CLK_MOD2, CLK_MOD2_TMR0);
 }
 
 bool timer_start(void)
@@ -89,12 +92,14 @@ bool timer_start(void)
     
     stop_timer();
     
-    IO_CLK_MOD2 |= CLK_MOD2_TMR0; //enable TIMER0 clock!!!!!!!!!
+    /* enable TIMER0 clock */
+    bitset16(&IO_CLK_MOD2, CLK_MOD2_TMR0);
 
     /* Turn Timer0 to Free Run mode */
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_FREE_RUN;
 
-    IO_INTC_EINT0 |= INTR_EINT0_TMR0; //enable TIMER0 interrupt
+    /* enable TIMER0 interrupt */
+    bitset16(&IO_INTC_EINT0, INTR_EINT0_TMR0);
 
     restore_interrupt(oldstatus);
 
