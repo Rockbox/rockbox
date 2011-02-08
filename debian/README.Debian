@@ -1,0 +1,11 @@
+rockbox 3.7.x for Maemo
+--------------------------
+
+Rockbox for maemo technial preview release.
+
+Known issues:
+- Application exit is only possible with CTRL+BACKSPACE
+
+- Last.FM scrobbler log file is not working
+  Possible cause: We don't call clean_shutdown() / system_flush()
+  so the scrobbler log file never gets written to disk

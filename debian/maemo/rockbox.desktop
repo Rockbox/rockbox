@@ -1,0 +1,9 @@
+[Desktop Entry]
+ Encoding=UTF-8
+ Version=3.7.1
+ Type=Application
+ Name=Rockbox
+ Exec=/opt/rockbox/bin/rockbox
+ Icon=rockbox
+ X-HildonDesk-ShowInToolbar=true
+ X-Osso-Type=application/x-executable

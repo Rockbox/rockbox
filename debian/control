@@ -1,0 +1,80 @@
+Source: rockbox
+Section: user/multimedia
+Priority: extra
+Maintainer: Thomas Jarosch <tomj@simonv.com>
+Build-Depends: debhelper (>= 5), pkg-config, maemo-version-dev,
+  libosso-dev, libglib2.0-dev, libhal-dev, osso-af-settings,
+  libsdl1.2-dev, libxml2-dev,
+  libgstreamer0.10-dev | maemo-version-dev (<= 5),
+  libgstreamer-plugins-base0.10-dev | maemo-version-dev (<= 5),
+  libgstreamer-plugins-base0.10-dev | maemo-version-dev (<= 5),
+  libplayback-1-dev | maemo-version-dev (<= 5)
+# Note: This is the -debian- standards version, not rockbox
+Standards-Version: 3.7.2
+XB-Maemo-Icon-26:
+ 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
+ rkJggg==
+XSBC-Bugtracker: https://bugs.maemo.org/enter_bug.cgi?product=rockbox
+
+Package: rockbox
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Rockbox open source high quality audio player
+
+Package: rockbox-doc
+Architecture: all
+Description: Documentation for rockbox
+
+Package: rockbox-dbg
+Section: devel
+Architecture: any
+Depends: rockbox (= ${Source-Version})
+Description: Debug symbols for rockbox

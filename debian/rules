@@ -1,0 +1,67 @@
+#!/usr/bin/make -f
+
+CONFIGURE_OPTIONS := --platform=M --lcdwidth=800 --lcdheight=480 --target=application --ram=8 --rbdir=/.rockbox --type=N
+DESKTOP_DIR := `pkg-config --variable=desktopentrydir osso-af-settings`
+
+export DH_VERBOSE=1
+
+builddir:
+	test -d builddir || mkdir -p builddir
+
+builddir/Makefile: builddir
+	cd builddir && test -f Makefile || ../tools/configure $(CONFIGURE_OPTIONS)
+
+build: build-stamp
+
+build-stamp: builddir/Makefile
+	dh_testdir
+	cd builddir && $(MAKE)
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	rm -rf builddir
+	dh_clean
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	cd builddir && $(MAKE) PREFIX=$(CURDIR)/debian/rockbox/opt/rockbox fullinstall
+
+	# Install icon and .desktop file
+	mkdir -p $(CURDIR)/debian/rockbox/usr/share/icons/hicolor/64x64/apps
+	cp -f debian/maemo/rockbox.png $(CURDIR)/debian/rockbox/usr/share/icons/hicolor/64x64/apps
+	mkdir -p $(CURDIR)/debian/rockbox$(DESKTOP_DIR)
+	cp -f debian/maemo/rockbox.desktop $(CURDIR)/debian/rockbox$(DESKTOP_DIR)
+
+	# Ignore built in sounds
+	mkdir -p $(CURDIR)/debian/rockbox/usr/share/sounds
+	touch    $(CURDIR)/debian/rockbox/usr/share/sounds/database.ignore
+
+# Build architecture-independent files here.
+binary-indep:
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installexamples
+	dh_installman
+	dh_link
+	dh_strip --dbg-package=rockbox-dbg
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure

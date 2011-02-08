@@ -1,0 +1,48 @@
+rockbox (2011-01-26maemo0) unstable; urgency=low
+
+  * Bluetooth headset support
+  * Ignore preinstalled sounds in /usr/share/sounds
+
+ -- Thomas Jarosch <tomj@simonv.com>  Wed, 26 Jan 2011 22:50:00 -0500
+
+rockbox (2011-01-12maemo0) unstable; urgency=low
+
+  * Always show prev/next track button
+  * Bind enter key to rockbock's center button (all platforms)
+  * Bind more keys on n8xx (maemo4)
+  * Update to latest rockbox SVN code
+
+ -- Thomas Jarosch <tomj@simonv.com>  Tue, 12 Jan 2011 19:42:00 -0500
+
+rockbox (2011-01-04maemo0) unstable; urgency=low
+
+  * Update to latest rockbox SVN code (regenerates the database)
+  * Test automatic garage build
+  * Fix x86 build targets
+
+ -- Thomas Jarosch <tomj@simonv.com>  Tue, 04 Jan 2011 00:20:00 -0500
+
+
+rockbox (2011-01-02maemo0) unstable; urgency=low
+
+  * New version number to indicate this build is work in progress
+
+ -- Thomas Jarosch <tomj@simonv.com>  Sun, 02 Jan 2011 00:05:00 -0500
+
+
+rockbox (3.7.2maemo2) unstable; urgency=low
+
+  * Fix duplicate database entries
+  * Initial rockbox plugin support:
+    - Small tools in the context menu
+    - mikmod (.mod, .s3m, .xm etc) support
+    - Credits screen
+
+ -- Thomas Jarosch <tomj@simonv.com>  Sat, 01 Jan 2011 19:01:00 -0500
+
+
+rockbox (3.7.2maemo1) unstable; urgency=low
+
+  * Initial release for Nokia N900
+
+ -- Thomas Jarosch <tomj@simonv.com>  Thu, 30 Dec 2010 16:18:05 -0500
