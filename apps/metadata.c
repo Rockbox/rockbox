@@ -25,6 +25,7 @@
 
 #include "debug.h"
 #include "logf.h"
+#include "settings.h"
 #include "cuesheet.h"
 #include "metadata.h"
 
@@ -425,3 +426,49 @@ void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig)
     memcpy(dest, orig, sizeof(struct mp3entry));
     adjust_mp3entry(dest, dest, orig);
 }
+
+#ifdef HAVE_TAGCACHE
+#if CONFIG_CODEC == SWCODEC
+
+enum { AUTORESUMABLE_UNKNOWN = 0, AUTORESUMABLE_TRUE, AUTORESUMABLE_FALSE };
+
+bool autoresumable(struct mp3entry *id3)
+{
+    unsigned char search[MAX_PATHNAME+1];
+    char *saveptr, *substr;
+    bool is_resumable; 
+    
+    if (id3->autoresumable)             /* result cached? */
+        return id3->autoresumable == AUTORESUMABLE_TRUE;
+
+    is_resumable = true;
+
+    strcpy(search, global_settings.autoresume_strpat);
+    
+    for (substr = strtok_r(search, ",", &saveptr);
+         substr;
+         substr = strtok_r(NULL, ",", &saveptr))
+    {
+        if (id3->path && strcasestr(id3->path, substr))
+            goto out;
+        if (id3->genre_string && strcasestr(id3->genre_string, substr))
+            goto out;
+    }
+    
+    is_resumable = false;
+
+  out:
+    /* cache result */
+    id3->autoresumable =
+        is_resumable ? AUTORESUMABLE_TRUE : AUTORESUMABLE_FALSE;
+
+    logf("autoresumable: %s with genre %s is%s resumable",
+         id3->path,
+         id3->genre_string ? id3->genre_string : "(NULL)",
+         is_resumable ? "" : " not");
+    
+    return is_resumable;
+}
+
+#endif  /* SWCODEC */
+#endif  /* HAVE_TAGCACHE */

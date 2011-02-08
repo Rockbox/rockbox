@@ -12716,3 +12716,31 @@
     *: "Automatic resume"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Resume on automatic track change"
+  </dest>
+  <voice>
+    *: "Resume on automatic track change"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "Custom path/genre substrings (comma-separated)"
+  </source>
+  <dest>
+    *: "Custom path/genre substrings (comma-separated)"
+  </dest>
+  <voice>
+    *: "Custom path/genre substrings (comma-separated)"
+  </voice>
+</phrase>

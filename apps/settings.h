@@ -125,6 +125,10 @@ enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
 /* scrollbar visibility/position */
 enum { SCROLLBAR_OFF = 0, SCROLLBAR_LEFT, SCROLLBAR_RIGHT };
 
+/* autoresume settings */
+enum { AUTORESUME_NEXTTRACK_NEVER = 0, AUTORESUME_NEXTTRACK_ALWAYS,
+       AUTORESUME_NEXTTRACK_CUSTOM};
+
 /* Alarm settings */
 #ifdef HAVE_RTC_ALARM
 enum {  ALARM_START_WPS = 0,
@@ -577,6 +581,9 @@ struct user_settings
 #endif
     bool tagcache_autoupdate; /* automatically keep tagcache in sync? */
     bool autoresume_enable;   /* enable auto-resume feature? */
+    int autoresume_automatic; /* resume next track? 0=never, 1=always,
+                                 2=custom */
+    unsigned char autoresume_strpat[MAX_PATHNAME+1]; /* comma-separated list */
     bool runtimedb;           /* runtime database active? */
 #endif /* HAVE_TAGCACHE */
 

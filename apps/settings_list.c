@@ -1261,6 +1261,15 @@ const struct settings_list settings[] = {
     BOOL_SETTING(0, autoresume_enable, LANG_AUTORESUME, false,
                  "autoresume enable", off_on,
                  LANG_SET_BOOL_YES, LANG_SET_BOOL_NO, NULL),
+    CHOICE_SETTING(0, autoresume_automatic, LANG_AUTORESUME_AUTOMATIC,
+                   AUTORESUME_NEXTTRACK_NEVER,
+                   "autoresume next track", "never,all,custom",
+                   NULL, 3,
+                   ID2P(LANG_SET_BOOL_NO),
+                   ID2P(LANG_ALWAYS),
+                   ID2P(LANG_AUTORESUME_CUSTOM)),
+    TEXT_SETTING(0, autoresume_strpat, "autoresume next track patterns",
+                 "podcast", NULL, NULL),
 #endif                  
 
     OFFON_SETTING(0, runtimedb, LANG_RUNTIMEDB_ACTIVE, false,

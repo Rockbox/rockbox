@@ -255,6 +255,8 @@ struct mp3entry {
     int index;             /* playlist index */
 
 #ifdef HAVE_TAGCACHE
+    unsigned char autoresumable; /* caches result of autoresumable() */
+    
     /* runtime database fields */
     long tagcache_idx;     /* 0=invalid, otherwise idx+1 */
     int rating;
@@ -287,8 +289,13 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname);
 bool mp3info(struct mp3entry *entry, const char *filename);
 void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig);
 void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig);
+
 #if CONFIG_CODEC == SWCODEC
 void strip_tags(int handle_id);
+#endif
+
+#ifdef HAVE_TAGCACHE
+bool autoresumable(struct mp3entry *id3);
 #endif
 
 #endif

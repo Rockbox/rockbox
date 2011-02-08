@@ -28,6 +28,7 @@
 #include "action.h"
 #include "settings.h"
 #include "menu.h"
+#include "keyboard.h"
 #include "sound_menu.h"
 #include "exported_menus.h"
 #include "tree.h"
@@ -368,6 +369,64 @@ MAKE_MENU(bookmark_settings_menu, ID2P(LANG_BOOKMARK_SETTINGS), 0,
 /***********************************/
 
 /***********************************/
+/*    AUTORESUME MENU              */
+#ifdef HAVE_TAGCACHE
+#if CONFIG_CODEC == SWCODEC 
+
+static int autoresume_callback(int action, const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+
+    if (action == ACTION_EXIT_MENUITEM  /* on exit */
+        && global_settings.autoresume_enable
+        && !tagcache_is_usable())
+    {
+        static const char *lines[] = {ID2P(LANG_TAGCACHE_BUSY),
+                                      ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
+        static const struct text_message message = {lines, 2};
+        
+        if (gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
+            tagcache_rebuild_with_splash();
+    }
+    return action;
+}
+
+static int autoresume_nexttrack_callback(int action,
+                                         const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    static int oldval = 0;
+    switch (action)
+    {
+        case ACTION_ENTER_MENUITEM:
+            oldval = global_settings.autoresume_automatic;
+            break;
+        case ACTION_EXIT_MENUITEM:
+            if (global_settings.autoresume_automatic == AUTORESUME_NEXTTRACK_CUSTOM
+                && kbd_input ((char*) &global_settings.autoresume_strpat,
+                              MAX_PATHNAME+1) < 0)
+            {
+                global_settings.autoresume_automatic = oldval;
+            }
+    }
+    return action;
+}
+
+MENUITEM_SETTING(autoresume_enable, &global_settings.autoresume_enable,
+                 autoresume_callback);
+MENUITEM_SETTING(autoresume_automatic, &global_settings.autoresume_automatic,
+                 autoresume_nexttrack_callback);
+
+MAKE_MENU(autoresume_menu, ID2P(LANG_AUTORESUME),
+          0, Icon_NOICON,
+          &autoresume_enable, &autoresume_automatic);
+
+#endif /* CONFIG_CODEC == SWCODEC */
+#endif /* HAVE_TAGCACHE */
+/*    AUTORESUME MENU              */
+/***********************************/
+
+/***********************************/
 /*    VOICE MENU                   */
 static int talk_callback(int action,const struct menu_item_ex *this_item);
 MENUITEM_SETTING(talk_menu_item, &global_settings.talk_menu, NULL);
@@ -425,31 +484,6 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 /***********************************/
 /*    SETTINGS MENU                */
 
-#ifdef HAVE_TAGCACHE
-#if CONFIG_CODEC == SWCODEC 
-static int autoresume_callback(int action, const struct menu_item_ex *this_item)
-{
-    (void)this_item;
-
-    if (action == ACTION_EXIT_MENUITEM  /* on exit */
-        && global_settings.autoresume_enable
-        && !tagcache_is_usable())
-    {
-        static const char *lines[] = {ID2P(LANG_TAGCACHE_BUSY),
-                                      ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
-        static const struct text_message message = {lines, 2};
-        
-        if (gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
-            tagcache_rebuild_with_splash();
-    }
-    return action;
-}
-
-MENUITEM_SETTING(autoresume_enable, &global_settings.autoresume_enable,
-                 autoresume_callback);
-#endif
-#endif
-
 static struct browse_folder_info langs = { LANG_DIR, SHOW_LNG };
 
 MENUITEM_FUNCTION(browse_langs, MENU_FUNC_USEPARAM, ID2P(LANG_LANGUAGE),
@@ -465,7 +499,7 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           &bookmark_settings_menu,
 #ifdef HAVE_TAGCACHE
 #if CONFIG_CODEC == SWCODEC 
-          &autoresume_enable,
+          &autoresume_menu,
 #endif          
 #endif
           &browse_langs, &voice_settings_menu,
