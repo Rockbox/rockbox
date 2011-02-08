@@ -5,7 +5,7 @@
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 34
-#define MODEL_NAME   "Philips GoGear SA200"
+#define MODEL_NAME   "Philips GoGear SA9200"
 
 #define HW_SAMPR_CAPS       (SAMPR_CAP_44)
 
