@@ -51,7 +51,7 @@ prefixtools () {
 }
 
 app_get_platform() {
-    echo "Select your platform: (S)DL, (A)ndroid (default: Android)"
+    echo "Select your platform: (S)DL, (A)ndroid, (M)aemo (default: Android)"
     if [ -z "$ARG_PLATFORM" ]; then
         choice=`input`
     else
@@ -60,6 +60,7 @@ app_get_platform() {
 
     case $choice in
         s|S*)     app_platform="sdl" ;;
+        m|M*)     app_platform="maemo" ;;
         *|a|A*)   app_platform="android" ;;
     esac
 
@@ -128,6 +129,31 @@ app_get_platform() {
         libdir="/data/data/org.rockbox/app_rockbox"
         output="librockbox.so"
         bootoutput="librockbox.so"
+    elif [ "$app_platform" = "maemo" ]; then
+        if [ -z "$ARG_PREFIX" ]; then
+            # Rockbox is in /opt as there is enough free space for it on the N900.
+            sharedir="/opt/rockbox/share/rockbox"
+            bindir="/opt/rockbox/bin"
+            libdir="/opt/rockbox/lib"
+        else
+            if [ -d "$ARG_PREFIX" ]; then
+                if [ -z `echo $ARG_PREFIX | grep "^/"` ]; then
+                    ARG_PREFIX=`realpath $ARG_PREFIX`
+                    if [ "0" != "$?" ]; then
+                        echo "ERROR: Could not get prefix path (is realpath installed?)."
+                        exit
+                    fi
+                fi
+                sharedir="$ARG_PREFIX/share/rockbox"
+                bindir="$ARG_PREFIX/bin"
+                libdir="$ARG_PREFIX/lib"
+            else
+                echo "ERROR: PREFIX does not exist"
+                exit
+            fi
+        fi
+        output="rockbox"
+        bootoutput="rockbox"
     fi
 }
 
@@ -189,6 +215,9 @@ findsdl(){
 appcc () {
     if [ "$1" = "sdl" ]; then
         simcc "sdl-app"
+    elif [ "$1" = "maemo" ]; then
+        app_type="sdl-app"
+        maemocc
     elif [ "$1" = "android" ]; then
         app_type=$1
         androidcc
@@ -475,6 +504,68 @@ mipselcc () {
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
  gccchoice="4.1.2"
+}
+
+maemocc () {
+ # Scratchbox sets up "gcc" based on the active target
+ prefixtools ""
+
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+ GCCOPTS="$GCCOPTS -fno-builtin -g -I\$(SIMDIR)"
+ GCCOPTIMIZE=''
+ LDOPTS="-lm -ldl $LDOPTS"
+ GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
+ SHARED_FLAG="-shared"
+ endian="little"
+
+ is_n900=0
+ # Determine maemo version
+ if pkg-config --atleast-version=5 maemo-version; then
+    extradefines="$extradefines -DMAEMO5"
+    echo "Found N900 maemo version"
+    is_n900=1
+ elif pkg-config --atleast-version=4 maemo-version; then
+    extradefines="$extradefines -DMAEMO4"
+    echo "Found N8xx maemo version"
+ else
+    echo "Unable to determine maemo version. Is the maemo-version-dev package installed?"
+    exit 1
+ fi
+
+ # SDL
+ GCCOPTS="$GCCOPTS `pkg-config --cflags sdl`"
+ LDOPTS="$LDOPTS `pkg-config --libs sdl`"
+
+ # glib and libosso support
+ GCCOPTS="$GCCOPTS `pkg-config --cflags libosso glib-2.0 gthread-2.0`"
+ LDOPTS="$LDOPTS `pkg-config --libs libosso glib-2.0 gthread-2.0`"
+
+ # libhal support: Battery monitoring
+ GCCOPTS="$GCCOPTS `pkg-config --cflags hal`"
+ LDOPTS="$LDOPTS `pkg-config --libs hal`"
+
+ GCCOPTS="$GCCOPTS -O2 -fno-strict-aliasing"
+ if [ $is_n900 -eq 1 ]; then
+    # gstreamer support: Audio output.
+    GCCOPTS="$GCCOPTS `pkg-config --cflags gstreamer-base-0.10 gstreamer-plugins-base-0.10 gstreamer-app-0.10`"
+    LDOPTS="$LDOPTS `pkg-config --libs gstreamer-base-0.10 gstreamer-plugins-base-0.10 gstreamer-app-0.10`"
+
+    # N900 specific: libplayback support
+    GCCOPTS="$GCCOPTS `pkg-config --cflags libplayback-1`"
+    LDOPTS="$LDOPTS `pkg-config --libs libplayback-1`"
+
+    # N900 specific: Enable ARMv7 NEON support
+    if sb-conf current |grep ARMEL; then
+        GCCOPTS="$GCCOPTS -mcpu=cortex-a8 -mtune=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
+        extradefines="$extradefines -DMAEMO_ARM_BUILD"
+    fi
+ else
+    # N8xx specific: Enable armv5te instructions
+    if sb-conf current |grep ARMEL; then
+        GCCOPTS="$GCCOPTS -mcpu=arm1136jf-s -mfloat-abi=softfp -mfpu=vfp"
+        extradefines="$extradefines -DMAEMO_ARM_BUILD"
+    fi
+ fi
 }
 
 androidcc () {
@@ -3239,9 +3330,14 @@ EOF
 
 if test -n "$t_cpu"; then
   TARGET_INC="-I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer/$t_model"
-  if [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
-    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/"
-    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/"
+
+  if [ "$t_cpu" = "hosted" ] && [ "$t_manufacturer" = "maemo" ]; then
+    # Maemo needs the SDL port, too
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/app"
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
+  elif [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted"
   fi
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"
@@ -3282,6 +3378,8 @@ if [ "$app_platform" = "sdl" ]; then
   cmdline="$cmdline--platform=S "
 elif [ "$app_platform" = "android" ]; then
   cmdline="$cmdline--platform=A "
+elif [ "$app_platform" = "maemo" ]; then
+  cmdline="$cmdline--platform=M "
 fi
 if [ "$modelname" = "application" ]; then
   cmdline="$cmdline--lcdwidth=$ARG_LCDWIDTH --lcdheight=$ARG_LCDHEIGHT "

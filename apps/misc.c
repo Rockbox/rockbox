@@ -526,7 +526,7 @@ static void unplug_change(bool inserted)
 
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter)
 {
-#if CONFIG_PLATFORM & PLATFORM_ANDROID
+#if CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO)
     static bool resume = false;
 #endif
 
@@ -619,7 +619,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             iap_handlepkt();
             return SYS_IAP_HANDLEPKT;
 #endif
-#if CONFIG_PLATFORM & PLATFORM_ANDROID
+#if CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO)
         /* stop playback if we receive a call */
         case SYS_CALL_INCOMING:
             resume = audio_status() == AUDIO_STATUS_PLAY;

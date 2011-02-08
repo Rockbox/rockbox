@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by Thomas Martitz
+ * Copyright (C) 2010 by Thomas Jarosch
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,23 +18,19 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __MAEMO_THREAD_H__
+#define __MAEMO_THREAD_H__
 
+#include <glib.h>
+#include <libosso.h>
 
-#ifndef __BUTTON_SDL_H__
-#define __BUTTON_SDL_H__
+extern osso_context_t *maemo_osso_ctx;
+extern GMainLoop *maemo_main_loop;
 
-#include <stdbool.h>
-#include "config.h"
+extern volatile int maemo_display_on;
+extern volatile int maemo_has_input_focus;
 
-extern int sdl_app_has_input_focus;
+int maemo_thread_func(void *unused);
+void pcm_shutdown_gstreamer(void);
 
-bool button_hold(void);
-#undef button_init_device
-void button_init_device(void);
-#ifdef HAVE_BUTTON_DATA
-int button_read_device(int *data);
-#else
-int button_read_device(void);
 #endif
-
-#endif /* __BUTTON_SDL_H__ */

@@ -83,6 +83,9 @@
 #define PLATFORM_HOSTED  (1<<1)
 #define PLATFORM_ANDROID (1<<2)
 #define PLATFORM_SDL     (1<<3)
+#define PLATFORM_MAEMO4  (1<<4)
+#define PLATFORM_MAEMO5  (1<<5)
+#define PLATFORM_MAEMO   (PLATFORM_MAEMO4|PLATFORM_MAEMO5)
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -500,7 +503,12 @@ Lyre prototype 1 */
 #endif
 
 /* define for all cpus from ARM family */
-#if (CONFIG_CPU == IMX31L)
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5) && defined(MAEMO_ARM_BUILD)
+#define CPU_ARM
+#define ARM_ARCH 7 /* ARMv7 */
+
+#elif (CONFIG_CPU == IMX31L) \
+  || ((CONFIG_PLATFORM & PLATFORM_MAEMO4) && defined(MAEMO_ARM_BUILD))
 #define CPU_ARM
 #define ARM_ARCH 6 /* ARMv6 */
 

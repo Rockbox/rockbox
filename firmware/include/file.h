@@ -46,7 +46,7 @@ extern int app_open(const char *name, int o, ...);
 extern int app_creat(const char *name, mode_t mode);
 extern int app_remove(const char* pathname);
 extern int app_rename(const char* path, const char* newname);
-#   if (CONFIG_PLATFORM & PLATFORM_SDL)
+#   if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO))
 #   define filesize(x) sim_filesize(x)
 #   define fsync(x) sim_fsync(x)
 #   define ftruncate(x,y) sim_ftruncate(x,y)

@@ -12,5 +12,7 @@ backlight-sim.c
 io.c
 sim_tasks.c
 /* this is still needed for application since it has some stubs */
+#if !(CONFIG_PLATFORM & PLATFORM_MAEMO)
 powermgmt-sim.c
+#endif
 stubs.c

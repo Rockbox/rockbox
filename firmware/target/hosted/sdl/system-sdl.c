@@ -40,6 +40,13 @@
 #include "panic.h"
 #include "debug.h"
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+#include <glib.h>
+#include <glib-object.h>
+#include "maemo-thread.h"
+
+#endif
+
 SDL_Surface    *gui_surface;
 
 bool            background = true;          /* use backgrounds by default */
@@ -82,9 +89,13 @@ static int sdl_event_thread(void * param)
 {
     SDL_InitSubSystem(SDL_INIT_VIDEO);
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+    SDL_sem *wait_for_maemo_startup;
+#endif
     SDL_Surface *picture_surface = NULL;
     int width, height;
     int depth;
+    Uint32 flags;
 
     /* Try and load the background image. If it fails go without */
     if (background) {
@@ -121,9 +132,20 @@ static int sdl_event_thread(void * param)
     if (depth < 8)
         depth = 16;
 
-    if ((gui_surface = SDL_SetVideoMode(width * display_zoom, height * display_zoom, depth, SDL_HWSURFACE|SDL_DOUBLEBUF)) == NULL) {
+    flags = SDL_HWSURFACE|SDL_DOUBLEBUF;
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+    /* Fullscreen mode for maemo app */
+    flags |= SDL_FULLSCREEN;
+#endif
+
+    if ((gui_surface = SDL_SetVideoMode(width * display_zoom, height * display_zoom, depth, flags)) == NULL) {
         panicf("%s", SDL_GetError());
     }
+
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+    /* Hide mouse cursor on real touchscreen device */
+    SDL_ShowCursor(SDL_DISABLE);
+#endif
 
     SDL_WM_SetCaption(UI_TITLE, NULL);
 
@@ -133,9 +155,29 @@ static int sdl_event_thread(void * param)
     /* let system_init proceed */
     SDL_SemPost((SDL_sem *)param);
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+    /* Start maemo thread: Listen to display on/off events and battery monitoring */
+    wait_for_maemo_startup = SDL_CreateSemaphore(0); /* 0-count so it blocks */
+    SDL_Thread *maemo_thread = SDL_CreateThread(maemo_thread_func, wait_for_maemo_startup);
+#endif
+
     /*
      * finally enter the button loop */
     gui_message_loop();
+
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+    /* Ensure maemo thread is up and running */
+    SDL_SemWait(wait_for_maemo_startup);
+    SDL_DestroySemaphore(wait_for_maemo_startup);
+
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
+    pcm_shutdown_gstreamer();
+#endif
+
+    g_main_loop_quit (maemo_main_loop);
+    g_main_loop_unref(maemo_main_loop);
+    SDL_WaitThread(maemo_thread, NULL);
+#endif
 
     if(picture_surface)
         SDL_FreeSurface(picture_surface);
@@ -160,6 +202,12 @@ void sim_do_exit(void)
 void system_init(void)
 {
     SDL_sem *s;
+
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+    /* Make glib thread safe */
+    g_thread_init(NULL);
+    g_type_init();
+#endif
 
     if (SDL_Init(SDL_INIT_TIMER))
         panicf("%s", SDL_GetError());

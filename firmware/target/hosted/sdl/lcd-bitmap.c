@@ -22,8 +22,12 @@
 #include "debug.h"
 #include "sim-ui-defines.h"
 #include "system.h"
+#include "button-sdl.h"
 #include "lcd-sdl.h"
 #include "screendump.h"
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+#include "maemo-thread.h"
+#endif
 
 SDL_Surface* lcd_surface;
 
@@ -123,6 +127,16 @@ void lcd_update(void)
 
 void lcd_update_rect(int x_start, int y_start, int width, int height)
 {
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+    /* Don't update display if not shown */
+    if (!maemo_display_on)
+        return;
+
+    /* Don't update if we don't have the input focus */
+    if (!sdl_app_has_input_focus)
+        return;
+#endif
+
     sdl_update_rect(lcd_surface, x_start, y_start, width, height,
                     LCD_WIDTH, LCD_HEIGHT, get_lcd_pixel);
     sdl_gui_update(lcd_surface, x_start, y_start, width,

@@ -47,6 +47,11 @@ target/hosted/sdl/app/button-application.c
 #endif
 #endif
 
+/* Maemo specific files */
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+target/hosted/maemo/maemo-thread.c
+#endif
+
 /* Standard library */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(__MINGW32__) || defined(__CYGWIN__)
 libc/errno.c
@@ -339,8 +344,12 @@ drivers/audio/cs42l55.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
 #if CONFIG_CODEC == SWCODEC
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
+target/hosted/maemo/pcm-gstreamer.c
+#else
 target/hosted/sdl/pcm-sdl.c
-#endif
+#endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
+#endif /* CONFIG_CODEC == SWCODEC */
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER) */
 
 /* USB Stack */

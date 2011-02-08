@@ -34,11 +34,15 @@ extern void pcm_set_mixer_volume(int);
 void audiohw_set_volume(int volume)
 {
 #if CONFIG_CODEC == SWCODEC
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
+    pcm_set_mixer_volume(volume);
+#else
     pcm_set_mixer_volume(
         SDL_MIX_MAXVOLUME * ((volume - VOLUME_MIN) / 10) / (VOLUME_RANGE / 10));
+#endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
 #else
     (void)volume;
-#endif
+#endif /* CONFIG_CODEC == SWCODEC */
 }
 
 const struct sound_settings_info audiohw_settings[] = {
