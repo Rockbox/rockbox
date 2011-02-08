@@ -336,6 +336,11 @@ void system_init(void)
 
     uart_init();
     spi_init();
+
+    /* Initialization is done so shut the front LED off so that the battery
+     * can charge.
+     */
+    IO_GIO_BITCLR2 = 0x0001;
     
 #ifdef CREATIVE_ZVx
     dma_init();
