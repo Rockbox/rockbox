@@ -1572,6 +1572,11 @@ void buffering_init(void)
 /* Initialise the buffering subsystem */
 bool buffering_reset(char *buf, size_t buflen)
 {
+    /* Wraps of storage-aligned data must also be storage aligned,
+       thus buf and buflen must be a aligned to an integer multiple of
+       the storage alignment */
+    STORAGE_ALIGN_BUFFER(buf, buflen);
+
     if (!buf || !buflen)
         return false;
 

@@ -388,11 +388,14 @@ static inline void cpucache_flush(void)
     #define STORAGE_PAD(x) ((x) + CACHEALIGN_SIZE - 1)
     /* Number of bytes in the last cacheline assuming buffer of size x is aligned */
     #define STORAGE_OVERLAP(x) ((x) & (CACHEALIGN_SIZE - 1))
+    #define STORAGE_ALIGN_BUFFER(start, size) \
+        ALIGN_BUFFER((start), (size), CACHEALIGN_SIZE)
 #else
     #define STORAGE_ALIGN_ATTR
     #define STORAGE_ALIGN_DOWN(x) (x)
     #define STORAGE_PAD(x) (x)
     #define STORAGE_OVERLAP(x) 0
+    #define STORAGE_ALIGN_BUFFER(start, size)
 #endif
 
 /* Double-cast to avoid 'dereferencing type-punned pointer will
