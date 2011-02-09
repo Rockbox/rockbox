@@ -28,8 +28,7 @@
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
 
-//TODO: Figure out exact value
-#define TIMER_FREQ  216000000
+#define TIMER_FREQ  54000000
 
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
 
@@ -42,8 +41,21 @@
 #define TTB_SIZE                  0x4000
 #define TTB_BASE_ADDR             (DRAM_ORIG + DRAM_SIZE - TTB_SIZE)
 
-/////SYSCON/////
-#define CLKCON0C     (*((uint32_t volatile*)(0x3C50000C)))
+/////SYSTEM CONTROLLER/////
+#define CLKCON0      (*((volatile uint32_t*)(0x3C500000)))
+#define CLKCON1      (*((volatile uint32_t*)(0x3C500004)))
+#define CLKCON2      (*((volatile uint32_t*)(0x3C500008)))
+#define CLKCON3      (*((volatile uint32_t*)(0x3C50000C)))
+#define CLKCON4      (*((volatile uint32_t*)(0x3C500010)))
+#define CLKCON5      (*((volatile uint32_t*)(0x3C500014)))
+#define PLL0PMS      (*((volatile uint32_t*)(0x3C500020)))
+#define PLL1PMS      (*((volatile uint32_t*)(0x3C500024)))
+#define PLL2PMS      (*((volatile uint32_t*)(0x3C500028)))
+#define PLL0LCNT     (*((volatile uint32_t*)(0x3C500030)))
+#define PLL1LCNT     (*((volatile uint32_t*)(0x3C500034)))
+#define PLL2LCNT     (*((volatile uint32_t*)(0x3C500038)))
+#define PLLLOCK      (*((volatile uint32_t*)(0x3C500040)))
+#define PLLMODE      (*((volatile uint32_t*)(0x3C500044)))
 #define PWRCON(i)    (*((uint32_t volatile*)(0x3C500000 \
                                            + ((i) == 4 ? 0x6C : \
                                              ((i) == 3 ? 0x68 : \

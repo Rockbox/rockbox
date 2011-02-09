@@ -24,11 +24,10 @@
 #include "system-arm.h"
 #include "mmu-arm.h"
 
-//TODO: Figure out exact values
 #define CPUFREQ_SLEEP      32768
 #define CPUFREQ_MAX     216000000
-#define CPUFREQ_DEFAULT 216000000
-#define CPUFREQ_NORMAL  216000000
+#define CPUFREQ_DEFAULT 108000000
+#define CPUFREQ_NORMAL  108000000
 
 #define STORAGE_WANTS_ALIGN
 

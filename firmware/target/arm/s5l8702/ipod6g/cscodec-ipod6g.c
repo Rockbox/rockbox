@@ -59,6 +59,6 @@ void cscodec_reset(bool state)
 
 void cscodec_clock(bool state)
 {
-    if (state) CLKCON0C &= ~0xffff;
-    else CLKCON0C |= 0x8000;
+    if (state) CLKCON3 &= ~0xffff;
+    else CLKCON3 |= 0x8000;
 }

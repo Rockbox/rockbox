@@ -253,13 +253,16 @@ void set_cpu_frequency(long frequency)
     if (cpu_frequency == frequency)
         return;
 
+    //TODO: Need to understand this better
     if (frequency == CPUFREQ_MAX)
     {
-        //TODO: Figure out and implement
+        CLKCON0 = 0x3011;
+        CLKCON1 = 0x4001;
     }
     else
     {
-        //TODO: Figure out and implement
+        CLKCON1 = 0x404101;
+        CLKCON0 = 0x3000;
     }
 
     cpu_frequency = frequency;

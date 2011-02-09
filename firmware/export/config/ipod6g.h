@@ -168,10 +168,9 @@
 #define HAVE_USB_CHARGING_ENABLE
 
 /* The size of the flash ROM */
-#define FLASH_SIZE 0x400000
+#define FLASH_SIZE 0x1000000
 
 /* Define this to the CPU frequency */
-//TODO: Figure out exact value
 #define CPU_FREQ        216000000
 
 /* define this if the hardware can be powered off while charging */
@@ -195,7 +194,7 @@
 #define MAX_PHYS_SECTOR_SIZE 4096
 
 /* Define this if you have adjustable CPU frequency */
-//TODO: #define HAVE_ADJUSTABLE_CPU_FREQ
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

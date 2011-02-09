@@ -79,6 +79,7 @@ int pmu_read_battery_voltage(void)
 /* milliamps */
 int pmu_read_battery_current(void)
 {
+//TODO: Figure out how to read the battery current
 //    return pmu_read_adc(2);
     return 0;
 }
