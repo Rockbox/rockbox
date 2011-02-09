@@ -53,7 +53,6 @@
 #define strlen rb->strlen
 #define strlcpy rb->strlcpy
 #define strrchr rb->strrchr
-#define filesize rb->filesize
 
 #endif
 
