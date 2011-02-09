@@ -254,7 +254,7 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
     size_t shift;
     size_t new_widx;
     size_t len;
-    int overlap;
+    ssize_t overlap;
 
     if (num_handles >= BUF_MAX_HANDLES)
         return NULL;
@@ -296,7 +296,7 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
 
     /* How much space are we short in the actual ring buffer? */
     overlap = ringbuf_add_cross(buf_widx, shift + len, buf_ridx);
-    if (overlap >= 0 && (alloc_all || (unsigned)overlap > data_size)) {
+    if (overlap >= 0 && (alloc_all || (size_t)overlap >= data_size)) {
         /* Not enough space for required allocations */
         mutex_unlock(&llist_mod_mutex);
         mutex_unlock(&llist_mutex);
