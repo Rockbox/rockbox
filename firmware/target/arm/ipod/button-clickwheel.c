@@ -87,6 +87,11 @@ int int_btn = BUTTON_NONE;
 static struct wakeup button_init_wakeup;
 #endif
 
+#if CONFIG_CPU==S5L8702
+static long holdswitch_last_read;
+static bool holdswitch_last_value;
+#endif
+
 #ifdef CPU_PP
 static void opto_i2c_init(void)
 {
@@ -372,7 +377,8 @@ void button_init_device(void)
 #if CONFIG_CPU==S5L8701
     INTMSK |= (1<<26);
 #elif CONFIG_CPU==S5L8702
-    //TODO: Implement
+    holdswitch_last_read = USEC_TIMER;
+    holdswitch_last_value = (pmu_read(0x87) & 2) == 0;
 #endif
     s5l_clickwheel_init();
     wakeup_wait(&button_init_wakeup, HZ / 10);
@@ -383,7 +389,12 @@ bool button_hold(void)
 #if CONFIG_CPU==S5L8701
     return ((PDAT14 & (1 << 6)) == 0);
 #elif CONFIG_CPU==S5L8702
-    return ((PDATE & (1 << 4)) == 0);
+    if (USEC_TIMER - holdswitch_last_read > 100000)
+    {
+        holdswitch_last_read = USEC_TIMER;
+        holdswitch_last_value = (pmu_read(0x87) & 2) == 0;
+    }
+    return holdswitch_last_value;
 #endif
 }
 
