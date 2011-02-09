@@ -142,6 +142,7 @@ static struct cuesheet *curr_cue = NULL;
 #define MAX_MULTIPLE_AA SKINNABLE_SCREENS_COUNT
 
 #ifdef HAVE_ALBUMART
+
 static struct albumart_slot {
     struct dim dim;     /* holds width, height of the albumart */
     int used;           /* counter, increments if something uses it */
@@ -227,7 +228,6 @@ static void audio_initiate_track_change(long direction);
 static bool audio_have_tracks(void);
 static void audio_reset_buffer(void);
 static void audio_stop_playback(void);
-
 
 /**************************************/
 
@@ -647,6 +647,7 @@ bool audio_peek_track(struct mp3entry** id3, int offset)
 }
 
 #ifdef HAVE_ALBUMART
+
 int playback_current_aa_hid(int slot)
 {
     if (slot < 0)
@@ -656,13 +657,13 @@ int playback_current_aa_hid(int slot)
 
     cur_idx = track_ridx + offset;
     cur_idx &= MAX_TRACK_MASK;
-
     return tracks[cur_idx].aa_hid[slot];
 }
 
 int playback_claim_aa_slot(struct dim *dim)
 {
     int i;
+
     /* first try to find a slot already having the size to reuse it
      * since we don't want albumart of the same size buffered multiple times */
     FOREACH_ALBUMART(i)
@@ -693,6 +694,7 @@ void playback_release_aa_slot(int slot)
 {
     /* invalidate the albumart_slot */
     struct albumart_slot *aa_slot = &albumart_slots[slot];
+
     if (aa_slot->used > 0)
         aa_slot->used--;
 }
@@ -1315,19 +1317,37 @@ static void audio_finish_load_track(void)
     {
         int i;
         char aa_path[MAX_PATH];
+
         FOREACH_ALBUMART(i)
         {
             /* albumart_slots may change during a yield of bufopen,
              * but that's no problem */
             if (tracks[track_widx].aa_hid[i] >= 0 || !albumart_slots[i].used)
                 continue;
-            /* find_albumart will error out if the wps doesn't have AA */
-            if (find_albumart(track_id3, aa_path, sizeof(aa_path),
-                               &(albumart_slots[i].dim)))
-            {
-                int aa_hid = bufopen(aa_path, 0, TYPE_BITMAP,
-                                                &(albumart_slots[i].dim));
 
+            /* we can only decode jpeg for embedded AA */
+            bool embedded_albumart = 
+                track_id3->embed_albumart && track_id3->albumart.type == AA_TYPE_JPG;
+            /* find_albumart will error out if the wps doesn't have AA */
+            if (embedded_albumart || find_albumart(track_id3, aa_path,
+                                     sizeof(aa_path), &(albumart_slots[i].dim)))
+            {
+                int aa_hid;
+                struct bufopen_bitmap_data user_data = {
+                    .dim = &(albumart_slots[i].dim),
+                    .embedded_albumart = NULL,
+                };
+                if (embedded_albumart)
+                {
+                    user_data.embedded_albumart = &(track_id3->albumart);
+                    aa_hid = bufopen(track_id3->path, 0,
+                                            TYPE_BITMAP, &user_data);
+                }
+                else
+                {
+                    aa_hid = bufopen(aa_path, 0, TYPE_BITMAP,
+                                                &user_data);
+                }
                 if(aa_hid == ERR_BUFFER_FULL)
                 {
                     filling = STATE_FULL;
@@ -1342,7 +1362,6 @@ static void audio_finish_load_track(void)
                 tracks[track_widx].aa_hid[i] = aa_hid;
             }
         }
-        
     }
 #endif
 

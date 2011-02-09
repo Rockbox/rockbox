@@ -190,6 +190,22 @@ enum {
     ID3_VER_2_4
 };
 
+#ifdef HAVE_ALBUMART
+enum mp3_aa_type {
+    AA_TYPE_UNSYNC = -1,
+    AA_TYPE_UNKNOWN,
+    AA_TYPE_BMP,
+    AA_TYPE_PNG,
+    AA_TYPE_JPG,
+};
+
+struct mp3_albumart {
+    enum mp3_aa_type type;
+    int size;
+    off_t pos;
+};
+#endif
+
 struct mp3entry {
     char path[MAX_PATH];
     char* title;
@@ -275,6 +291,11 @@ struct mp3entry {
     long album_gain;
     long track_peak;    /* 7.24 signed fixed point. 0 for no peak. */
     long album_peak;
+#endif
+
+#ifdef HAVE_ALBUMART
+    bool embed_albumart;
+    struct mp3_albumart albumart;
 #endif
 
     /* Cuesheet support */

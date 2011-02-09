@@ -29,6 +29,7 @@
 #ifdef HAVE_ALBUMART
 
 #include "bmp.h"
+#include "metadata.h"
 /*
  * Returns the handle id of the buffered albumart for the given slot id
  **/
@@ -50,6 +51,12 @@ int playback_claim_aa_slot(struct dim *dim);
  * 
  * Save to call from other threads */
 void playback_release_aa_slot(int slot);
+
+struct bufopen_bitmap_data {
+    struct dim *dim;
+    struct mp3_albumart *embedded_albumart;
+};
+
 #endif
 
 /* Functions */

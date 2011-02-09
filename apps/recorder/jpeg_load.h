@@ -44,4 +44,27 @@ int read_jpeg_fd(int fd,
                  int format,
                  const struct custom_format *cformat);
 
+/**
+ * read embedded jpeg files as above. Needs an offset and length into
+ * the file
+ **/
+int clip_jpeg_file(const char* filename,
+                   int offset,
+                   unsigned long jpeg_size,
+                   struct bitmap *bm,
+                   int maxsize,
+                   int format,
+                   const struct custom_format *cformat);
+
+/**
+ * read embedded jpeg files as above. Needs an open file descripter, and
+ * assumes the caller has lseek()'d to the start of the jpeg blob
+ **/
+int clip_jpeg_fd(int fd,
+                 unsigned long jpeg_size,
+                 struct bitmap *bm,
+                 int maxsize,
+                 int format,
+                 const struct custom_format *cformat);
+
 #endif /* _JPEG_JPEG_DECODER_H */

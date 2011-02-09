@@ -52,6 +52,7 @@
 #include "albumart.h"
 #include "jpeg_load.h"
 #include "bmp.h"
+#include "playback.h"
 #endif
 
 #define GUARD_BUFSIZE   (32*1024)
@@ -908,10 +909,12 @@ static bool fill_buffer(void)
 /* Given a file descriptor to a bitmap file, write the bitmap data to the
    buffer, with a struct bitmap and the actual data immediately following.
    Return value is the total size (struct + data). */
-static int load_image(int fd, const char *path, struct dim *dim)
+static int load_image(int fd, const char *path, struct bufopen_bitmap_data *data)
 {
     int rc;
     struct bitmap *bmp = (struct bitmap *)&buffer[buf_widx];
+    struct dim *dim = data->dim;
+    struct mp3_albumart *aa = data->embedded_albumart;
 
     /* get the desired image size */
     bmp->width = dim->width, bmp->height = dim->height;
@@ -928,8 +931,13 @@ static int load_image(int fd, const char *path, struct dim *dim)
                                - sizeof(struct bitmap);
 
 #ifdef HAVE_JPEG
-    int pathlen = strlen(path);
-    if (strcmp(path + pathlen - 4, ".bmp"))
+    if (aa != NULL)
+    {
+        lseek(fd, aa->pos, SEEK_SET);
+        rc = clip_jpeg_fd(fd, aa->size, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
+                         FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+    }
+    else if (strcmp(path + strlen(path) - 4, ".bmp"))
         rc = read_jpeg_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
                          FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
     else
@@ -1010,7 +1018,18 @@ int bufopen(const char *file, size_t offset, enum data_type type,
     if (fd < 0)
         return ERR_FILE_ERROR;
 
-    size_t size = filesize(fd);
+    size_t size = 0;
+#ifdef HAVE_ALBUMART
+    if (type == TYPE_BITMAP)
+    {   /* if albumart is embedded, the complete file is not buffered,
+         * but only the jpeg part; filesize() would be wrong */
+        struct bufopen_bitmap_data *aa = (struct bufopen_bitmap_data*)user_data;
+        if (aa->embedded_albumart)
+            size = aa->embedded_albumart->size;
+    }
+#endif
+    if (size == 0)
+        size = filesize(fd);
     bool can_wrap = type==TYPE_PACKET_AUDIO || type==TYPE_CODEC;
 
     size_t adjusted_offset = offset;
@@ -1058,7 +1077,7 @@ int bufopen(const char *file, size_t offset, enum data_type type,
         /* Bitmap file: we load the data instead of the file */
         int rc;
         mutex_lock(&llist_mod_mutex); /* Lock because load_bitmap yields */
-        rc = load_image(fd, file, (struct dim*)user_data);
+        rc = load_image(fd, file, (struct bufopen_bitmap_data*)user_data);
         mutex_unlock(&llist_mod_mutex);
         if (rc <= 0)
         {

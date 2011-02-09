@@ -290,6 +290,63 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
     }
 }
 
+#ifdef HAVE_ALBUMART
+/* parse embed albumart */
+static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
+{
+    entry->embed_albumart = false;
+
+    /* we currently don't support unsynchronizing albumart */
+    if (entry->albumart.type == AA_TYPE_UNSYNC)
+        return bufferpos;
+
+    entry->albumart.type = AA_TYPE_UNKNOWN;
+
+    char *start = tag;
+    /* skip text encoding */
+    tag += 1;
+
+    if (memcmp(tag, "image/", 6) == 0)
+    {
+        /* ID3 v2.3+ */
+        tag += 6;
+        if (strcmp(tag, "jpeg") == 0)
+        {
+            entry->albumart.type = AA_TYPE_JPG;
+            tag += 5;
+        }
+        else if (strcmp(tag, "png") == 0)
+        {
+            entry->albumart.type = AA_TYPE_PNG;
+            tag += 4;
+        }
+    }
+    else
+    {
+        /* ID3 v2.2 */
+        if (memcmp(tag, "JPG", 3) == 0)
+            entry->albumart.type = AA_TYPE_JPG;
+        else if (memcmp(tag, "PNG", 3) == 0)
+            entry->albumart.type = AA_TYPE_PNG;
+        tag += 3;
+    }
+
+    if (entry->albumart.type != AA_TYPE_UNKNOWN)
+    {
+        /* skip picture type */
+        tag += 1;
+        /* skip description */
+        tag = strchr(tag, '\0') + 1;
+        /* fixup offset&size for image data */
+        entry->albumart.pos  += tag - start;
+        entry->albumart.size -= tag - start;
+        entry->embed_albumart = true;
+    }
+    /* return bufferpos as we didn't store anything in id3v2buf */
+    return bufferpos;
+}
+#endif
+
 /* parse user defined text, looking for album artist and replaygain 
  * information.
  */
@@ -439,6 +496,10 @@ static const struct tag_resolver taglist[] = {
     { "COM",  3, offsetof(struct mp3entry, comment), NULL, false }, 
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
+#ifdef HAVE_ALBUMART
+    { "APIC", 4, 0, &parsealbumart, true },
+    { "PIC",  3, 0, &parsealbumart, true },
+#endif
     { "TXXX", 4, 0, &parseuser, false },
 #if CONFIG_CODEC == SWCODEC
     { "RVA2", 4, 0, &parserva2, true },
@@ -960,6 +1021,21 @@ void setid3v2title(int fd, struct mp3entry *entry)
                  */
                 if (ptag && !*ptag)
                     *ptag = tag;
+
+                /* albumart */
+                if ((!entry->embed_albumart) &&
+                    ((tr->tag_length == 4 && !memcmp( header, "APIC", 4)) ||
+                     (tr->tag_length == 3 && !memcmp( header, "PIC" , 3))))
+                {
+                    if (unsynch || (global_unsynch && version <= ID3_VER_2_3))
+                        entry->albumart.type = AA_TYPE_UNSYNC;
+                    else
+                    {
+                        entry->albumart.pos = lseek(fd, 0, SEEK_CUR) - framelen;
+                        entry->albumart.size = totframelen;
+                        entry->albumart.type = AA_TYPE_UNKNOWN;
+                    }
+                }
 
                 if( tr->ppFunc )
                     bufferpos = tr->ppFunc(entry, tag, bufferpos);

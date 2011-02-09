@@ -75,12 +75,12 @@ struct jpeg
 {
 #ifdef JPEG_FROM_MEM
     unsigned char *data;
-    unsigned long len;
 #else
     int fd;
     int buf_left;
     int buf_index;
 #endif
+    unsigned long len;
     unsigned long int bitbuf;
     int bitbuf_bits;
     int marker_ind;
@@ -888,8 +888,12 @@ INLINE void jpeg_putc(struct jpeg* p_jpeg)
 #else
 INLINE void fill_buf(struct jpeg* p_jpeg)
 {
-        p_jpeg->buf_left = read(p_jpeg->fd, p_jpeg->buf, JPEG_READ_BUF_SIZE);
+        p_jpeg->buf_left = read(p_jpeg->fd, p_jpeg->buf,
+                                (p_jpeg->len >= JPEG_READ_BUF_SIZE)?
+                                     JPEG_READ_BUF_SIZE : p_jpeg->len);
         p_jpeg->buf_index = 0;
+        if (p_jpeg->buf_left > 0)
+            p_jpeg->len -= p_jpeg->buf_left;
 }
 
 static unsigned char *jpeg_getc(struct jpeg* p_jpeg)
@@ -1960,7 +1964,9 @@ block_end:
  *
  *****************************************************************************/
 #ifndef JPEG_FROM_MEM
-int read_jpeg_file(const char* filename,
+int clip_jpeg_file(const char* filename,
+                   int offset,
+                   unsigned long jpeg_size,
                    struct bitmap *bm,
                    int maxsize,
                    int format,
@@ -1975,10 +1981,19 @@ int read_jpeg_file(const char* filename,
         DEBUGF("read_jpeg_file: can't open '%s', rc: %d\n", filename, fd);
         return fd * 10 - 1;
     }
-
-    ret = read_jpeg_fd(fd, bm, maxsize, format, cformat);
+    lseek(fd, offset, SEEK_SET);
+    ret = clip_jpeg_fd(fd, jpeg_size, bm, maxsize, format, cformat);
     close(fd);
     return ret;
+}
+
+int read_jpeg_file(const char* filename,
+                   struct bitmap *bm,
+                   int maxsize,
+                   int format,
+                   const struct custom_format *cformat)
+{
+    return clip_jpeg_file(filename, 0, 0, bm, maxsize, format, cformat);
 }
 #endif
 
@@ -2014,10 +2029,11 @@ int get_jpeg_dim_mem(unsigned char *data, unsigned long len,
     return 0;
 }
 
-int decode_jpeg_mem(unsigned char *data, unsigned long len,
+int decode_jpeg_mem(unsigned char *data,
 #else
-int read_jpeg_fd(int fd,
+int clip_jpeg_fd(int fd,
 #endif
+                 unsigned long len,
                  struct bitmap *bm,
                  int maxsize,
                  int format,
@@ -2039,11 +2055,13 @@ int read_jpeg_fd(int fd,
         return -1;
 #endif
     memset(p_jpeg, 0, sizeof(struct jpeg));
+    p_jpeg->len = len;
 #ifdef JPEG_FROM_MEM
     p_jpeg->data = data;
-    p_jpeg->len = len;
 #else
     p_jpeg->fd = fd;
+    if (p_jpeg->len == 0)
+        p_jpeg->len = filesize(p_jpeg->fd);
 #endif
     status = process_markers(p_jpeg);
 #ifndef JPEG_FROM_MEM
@@ -2210,6 +2228,15 @@ int read_jpeg_fd(int fd,
         return bm_size;
     }
     return 0;
+}
+
+int read_jpeg_fd(int fd,
+                 struct bitmap *bm,
+                 int maxsize,
+                 int format,
+                 const struct custom_format *cformat)
+{
+    return clip_jpeg_fd(fd, 0, bm, maxsize, format, cformat);
 }
 
 /**************** end JPEG code ********************/
