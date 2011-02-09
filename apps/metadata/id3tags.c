@@ -1022,6 +1022,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
                 if (ptag && !*ptag)
                     *ptag = tag;
 
+#ifdef HAVE_ALBUMART
                 /* albumart */
                 if ((!entry->embed_albumart) &&
                     ((tr->tag_length == 4 && !memcmp( header, "APIC", 4)) ||
@@ -1036,7 +1037,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
                         entry->albumart.type = AA_TYPE_UNKNOWN;
                     }
                 }
-
+#endif
                 if( tr->ppFunc )
                     bufferpos = tr->ppFunc(entry, tag, bufferpos);
 
