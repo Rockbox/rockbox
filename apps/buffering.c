@@ -1012,7 +1012,11 @@ int bufopen(const char *file, size_t offset, enum data_type type,
 
         return h->id;
     }
-
+#ifdef APPLICATION
+    /* loading code from memory is not supported in application builds */
+    else if (type == TYPE_CODEC)
+        return ERR_UNSUPPORTED_TYPE;
+#endif
     /* Other cases: there is a little more work. */
     int fd = open(file, O_RDONLY);
     if (fd < 0)

@@ -1066,7 +1066,7 @@ static bool audio_release_tracks(void)
 
 static bool audio_loadcodec(bool start_play)
 {
-    int prev_track;
+    int prev_track, hid;
     char codec_path[MAX_PATH]; /* Full path to codec */
     const struct mp3entry *id3, *prev_id3;
 
@@ -1121,11 +1121,18 @@ static bool audio_loadcodec(bool start_play)
 
     codec_get_full_path(codec_path, codec_fn);
 
-    tracks[track_widx].codec_hid = bufopen(codec_path, 0, TYPE_CODEC, NULL);
-    if (tracks[track_widx].codec_hid < 0)
+    hid = tracks[track_widx].codec_hid = bufopen(codec_path, 0, TYPE_CODEC, NULL);
+
+    /* not an error if codec load it supported, will load it from disk
+     * application builds don't support it
+     */
+    if (hid < 0 && hid != ERR_UNSUPPORTED_TYPE)
         return false;
 
-    logf("Loaded codec");
+    if (hid > 0)
+        logf("Loaded codec");
+    else
+        logf("Buffering codec unsupported, load later from disk");
 
     return true;
 }

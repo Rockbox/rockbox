@@ -134,6 +134,16 @@ void * _lc_open(const _lc_open_char *filename, unsigned char *buf, size_t buf_si
 
 void *lc_open_from_mem(void *addr, size_t blob_size)
 {
+#ifndef SIMULATOR
+    (void)addr;
+    (void)blob_size;
+    /* we don't support loading code from memory on application builds,
+     * it doesn't make sense (since it means writing the blob to disk again and
+     * then falling back to load from disk) and requires the ability to write
+     * to an executable directory */
+    return NULL;
+#else
+    /* support it in the sim for the sake of simulating */
     int fd, i;
     char temp_filename[MAX_PATH];
 
@@ -143,17 +153,8 @@ void *lc_open_from_mem(void *addr, size_t blob_size)
        to find an unused filename */
     for (i = 0; i < 10; i++)
     {
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
-        /* we need that path fixed, since _get_user_file_path()
-         * gives us the folder on the sdcard where we cannot load libraries
-         * from (no exec permissions)
-         */
-        snprintf(temp_filename, sizeof(temp_filename),
-                 "/data/data/org.rockbox/app_rockbox/libtemp_binary_%d.so", i);
-#else
         snprintf(temp_filename, sizeof(temp_filename),
                  ROCKBOX_DIR "/libtemp_binary_%d.dll", i);
-#endif
         fd = open(temp_filename, O_WRONLY|O_CREAT|O_TRUNC, 0700);
         if (fd >= 0)
             break;  /* Created a file ok */
@@ -175,6 +176,7 @@ void *lc_open_from_mem(void *addr, size_t blob_size)
 
     close(fd);
     return lc_open(temp_filename, NULL, 0);
+#endif
 }
 
 

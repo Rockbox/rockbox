@@ -44,6 +44,7 @@ enum data_type {
 #define ERR_INVALID_VALUE       -3
 #define ERR_FILE_ERROR          -4
 #define ERR_HANDLE_NOT_DONE     -5
+#define ERR_UNSUPPORTED_TYPE    -6
 
 
 /* Initialise the buffering subsystem */
