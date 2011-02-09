@@ -389,12 +389,15 @@ theme}. For this feature to work, there are a few requirements.
 
 \subsection{Limitations}
 
-Rockbox does not support album art embedded in your files' tags, and will
-instead look for a picture located on disk. In addition to this, the
-pictures must be in either BMP or JPEG format. Rockbox does not support
+Rockbox supports embedded album art only for formats that use ID3v2 tags, such
+as MP3. It additionally supports loading images located on the \disk{}.
+The image files must be in either BMP or JPEG format, while embedded album art
+is currently limited to JPEG. Rockbox does not support
 RLE-compressed BMP files, nor does it support progressive and multi-scan
-JPEG files. JPEG files must consist of a single scan with interleaved components, 
+JPEG files. Embedded JPEG images must not be unsynchronized.
+JPEG files must consist of a single scan with interleaved components, 
 as progessive and multi-scan images require much more memory to decode.
+Pictureflow does not currently support embedded album art.
 
 \subsection{Where to put album art}
 
@@ -407,6 +410,7 @@ is as follows (a list in braces means that those file extensions are tried in
 that order):
 
 \begin{enumerate}
+\item  embedded (JPEG images in ID3v2 tags only)
 \item  \fname{./filename.\{jpeg,jpg,bmp\}}
 \item  \fname{./albumtitle.\{jpeg,jpg,bmp\}}
 \item  \fname{./cover.\{jpeg,jpg,bmp\}}
