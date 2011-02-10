@@ -12735,12 +12735,12 @@
   desc: enable customization of resume on automatic track change
   user: core
   <source>
-    *: "Custom path/genre substrings (comma-separated)"
+    *: "In custom directories only"
   </source>
   <dest>
-    *: "Custom path/genre substrings (comma-separated)"
+    *: "In custom directories only"
   </dest>
   <voice>
-    *: "Custom path/genre substrings (comma-separated)"
+    *: "In custom directories only"
   </voice>
 </phrase>
