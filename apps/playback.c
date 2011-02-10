@@ -295,10 +295,23 @@ static struct mp3entry *bufgetid3(int handle_id)
     struct mp3entry *id3;
     ssize_t ret = bufgetdata(handle_id, 0, (void *)&id3);
 
-    if (ret < 0 || ret != sizeof(struct mp3entry))
+    if (ret != sizeof(struct mp3entry))
         return NULL;
 
     return id3;
+}
+
+static bool bufreadid3(int handle_id, struct mp3entry *id3out)
+{
+    struct mp3entry *id3 = bufgetid3(handle_id);
+
+    if (id3)
+    {
+        copy_mp3entry(id3out, id3);
+        return true;
+    }
+
+    return false;
 }
 
 static bool clear_track_info(struct track_info *track)
@@ -562,8 +575,7 @@ struct mp3entry* audio_current_track(void)
     if (tracks[cur_idx].id3_hid >= 0)
     {
         /* The current track's info has been buffered but not read yet, so get it */
-        if (bufread(tracks[cur_idx].id3_hid, sizeof(struct mp3entry), write_id3)
-             == sizeof(struct mp3entry))
+        if (bufreadid3(tracks[cur_idx].id3_hid, write_id3))
             return write_id3;
     }
 
@@ -611,8 +623,7 @@ struct mp3entry* audio_next_track(void)
 
     if (tracks[next_idx].id3_hid >= 0)
     {
-        if (bufread(tracks[next_idx].id3_hid, sizeof(struct mp3entry), othertrack_id3)
-             == sizeof(struct mp3entry))
+        if (bufreadid3(tracks[next_idx].id3_hid, othertrack_id3))
             return othertrack_id3;
         else
             return NULL;
@@ -639,15 +650,8 @@ bool audio_peek_track(struct mp3entry* id3, int offset)
     next_idx = (track_ridx + new_offset) & MAX_TRACK_MASK;
 
     if (tracks[next_idx].id3_hid >= 0)
-    {
-        struct mp3entry *id3src;
-        if (bufgetdata(tracks[next_idx].id3_hid, 0, (void**)&id3src) 
-                    == sizeof(struct mp3entry))
-        {
-            copy_mp3entry(id3, id3src);
-            return true;
-        }
-    }
+        return bufreadid3(tracks[next_idx].id3_hid, id3);
+
     return false;
 }
 
@@ -1003,7 +1007,7 @@ static void audio_update_trackinfo(void)
 
     /* Load the curent track's metadata into curtrack_id3 */
     if (CUR_TI->id3_hid >= 0)
-        copy_mp3entry(thistrack_id3, bufgetid3(CUR_TI->id3_hid));
+        bufreadid3(CUR_TI->id3_hid, thistrack_id3);
 
     /* Reset current position */
     thistrack_id3->elapsed = 0;
@@ -1238,10 +1242,8 @@ static bool audio_load_track(size_t offset, bool start_play)
         {
             /* TODO: Superfluos buffering call? */
             buf_request_buffer_handle(tracks[track_widx].id3_hid);
-            struct mp3entry *id3 = bufgetid3(tracks[track_widx].id3_hid);
-            if (id3)
+            if (bufreadid3(tracks[track_widx].id3_hid, thistrack_id3))
             {    
-                copy_mp3entry(thistrack_id3, id3);
                 thistrack_id3->offset = offset;
                 logf("audio_load_track: set offset for %s to %lX\n",
                      thistrack_id3->title,
