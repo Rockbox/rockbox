@@ -394,6 +394,9 @@ bool button_hold(void)
         holdswitch_last_read = USEC_TIMER;
         holdswitch_last_value = (pmu_read(0x87) & 2) == 0;
     }
+    if (holdswitch_last_value)
+        PCON(14) = (PCON(14) & ~0xffffff00) | 0x11111100;
+    else PCON(14) = (PCON(14) & ~0xffffff00) | 0x22222200;
     return holdswitch_last_value;
 #endif
 }
