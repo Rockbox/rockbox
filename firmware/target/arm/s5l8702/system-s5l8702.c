@@ -25,6 +25,8 @@
 #include "system-target.h"
 #include "pmu-target.h"
 
+extern long sleepin, slept;
+
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
@@ -188,6 +190,8 @@ void irq_handler(void)
     asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
 
+    if (sleepin) slept += USEC_TIMER - sleepin;
+    sleepin = 0;
     void* dummy = VIC0ADDRESS;
     dummy = VIC1ADDRESS;
     uint32_t irqs0 = VIC0IRQSTATUS;
@@ -256,13 +260,13 @@ void set_cpu_frequency(long frequency)
     //TODO: Need to understand this better
     if (frequency == CPUFREQ_MAX)
     {
-        CLKCON0 = 0x3011;
-        CLKCON1 = 0x4001;
+        CLKCON1 = 0x404101;
+        CLKCON0 = 0x3000;
     }
     else
     {
-        CLKCON1 = 0x404101;
-        CLKCON0 = 0x3000;
+        CLKCON0 = 0x3011;
+        CLKCON1 = 0x4001;
     }
 
     cpu_frequency = frequency;
