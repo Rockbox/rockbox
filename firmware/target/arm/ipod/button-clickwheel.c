@@ -387,7 +387,11 @@ void button_init_device(void)
 bool button_hold(void)
 {
 #if CONFIG_CPU==S5L8701
-    return ((PDAT14 & (1 << 6)) == 0);
+    bool value = (PDAT14 & (1 << 6)) == 0;
+    if (value)
+        PCONF = (PCONF & ~0xffff0000) | 0x11110000;
+    else PCONF = (PCONF & ~0xffff0000) | 0x22220000;
+    return value;
 #elif CONFIG_CPU==S5L8702
     if (USEC_TIMER - holdswitch_last_read > 100000)
     {
