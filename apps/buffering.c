@@ -666,30 +666,24 @@ static bool buffer_handle(int handle_id)
     while (h->filerem > 0 && !stop)
     {
         /* max amount to copy */
-        size_t copy_n = MIN( MIN(h->filerem, BUFFERING_DEFAULT_FILECHUNK),
+        ssize_t copy_n = MIN( MIN(h->filerem, BUFFERING_DEFAULT_FILECHUNK),
                              buffer_len - h->widx);
+        uintptr_t offset = h->next ? ringbuf_offset(h->next) : buf_ridx;
+        ssize_t overlap = ringbuf_add_cross(h->widx, copy_n, offset);
 
-        ssize_t overlap;
-        uintptr_t next_handle = ringbuf_offset(h->next);
+        if (!h->next)
+            overlap++; /* sub one more below to avoid buffer overflow */
 
-        /* stop copying if it would overwrite the reading position */
-        if (ringbuf_add_cross(h->widx, copy_n, buf_ridx) >= 0)
-            return false;
-
-        /* FIXME: This would overwrite the next handle
-         * If this is true, then there's a handle even though we have still
-         * data to buffer. This should NEVER EVER happen! (but it does :( ) */
-        if (h->next && (overlap
-                = ringbuf_add_cross(h->widx, copy_n, next_handle)) > 0)
+        if (overlap > 0)
         {
-            /* stop buffering data for now and post-pone buffering the rest */
+            /* read only up to available space and stop if it would overwrite
+               the reading position or the next handle */
             stop = true;
-            DEBUGF( "%s(): Preventing handle corruption: h1.id:%d h2.id:%d"
-                    " copy_n:%lu overlap:%ld h1.filerem:%lu\n", __func__,
-                    h->id, h->next->id, (unsigned long)copy_n, (long)overlap,
-                    (unsigned long)h->filerem);
             copy_n -= overlap;
         }
+
+        if (copy_n <= 0)
+            return false; /* no space for read */
 
         /* rc is the actual amount read */
         int rc = read(h->fd, &buffer[h->widx], copy_n);
@@ -830,12 +824,14 @@ static void shrink_handle(struct memory_handle *h)
     if (!h)
         return;
 
-    if (h->next && h->filerem == 0 &&
-            (h->type == TYPE_ID3 || h->type == TYPE_CUESHEET ||
-             h->type == TYPE_BITMAP || h->type == TYPE_CODEC ||
-             h->type == TYPE_ATOMIC_AUDIO))
+    if (h->type == TYPE_ID3 || h->type == TYPE_CUESHEET ||
+        h->type == TYPE_BITMAP || h->type == TYPE_CODEC ||
+        h->type == TYPE_ATOMIC_AUDIO)
     {
         /* metadata handle: we can move all of it */
+        if (!h->next || h->filerem != 0)
+            return; /* Last handle or not finished loading */
+
         uintptr_t handle_distance =
             ringbuf_sub(ringbuf_offset(h->next), h->data);
         delta = handle_distance - h->available;
