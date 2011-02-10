@@ -2230,6 +2230,7 @@ int clip_jpeg_fd(int fd,
     return 0;
 }
 
+#ifndef JPEG_FROM_MEM
 int read_jpeg_fd(int fd,
                  struct bitmap *bm,
                  int maxsize,
@@ -2238,5 +2239,6 @@ int read_jpeg_fd(int fd,
 {
     return clip_jpeg_fd(fd, 0, bm, maxsize, format, cformat);
 }
+#endif
 
 /**************** end JPEG code ********************/
