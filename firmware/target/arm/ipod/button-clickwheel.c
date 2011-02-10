@@ -389,7 +389,7 @@ bool button_hold(void)
 #if CONFIG_CPU==S5L8701
     bool value = (PDAT14 & (1 << 6)) == 0;
     if (value)
-        PCON15 = (PCON15 & ~0xffff0000) | 0x11110000;
+        PCON15 = PCON15 & ~0xffff0000;
     else PCON15 = (PCON15 & ~0xffff0000) | 0x22220000;
     return value;
 #elif CONFIG_CPU==S5L8702
@@ -399,7 +399,7 @@ bool button_hold(void)
         holdswitch_last_value = (pmu_read(0x87) & 2) == 0;
     }
     if (holdswitch_last_value)
-        PCON(14) = (PCON(14) & ~0xffffff00) | 0x11111100;
+        PCON(14) = PCON(14) & ~0xffffff00;
     else PCON(14) = (PCON(14) & ~0xffffff00) | 0x22222200;
     return holdswitch_last_value;
 #endif
