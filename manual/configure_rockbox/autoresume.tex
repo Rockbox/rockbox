@@ -1,0 +1,55 @@
+% $Id$ %
+\section{\label{ref:Autoresumeconfigactual}Automatic resume}
+
+The automatic resume feature stores and recalls resume positions for
+all tracks without user intervention.  These resume points are stored
+in the database, and thus automatic resume only works when the
+database has been initialized.
+
+When automatic resume is enabled, manually selected tracks resume
+playback at their last playback position.  It does not matter in which
+way you start the track; tracks are resumed whether they are navigated
+to through the database browser or file browser, from a playlist or
+bookmark, or by skipping through tracks in a playlist.
+
+Optionally, you can also enable automatic resume for automatic track
+transitions.  In this case, the next track will be resumed as well
+instead of starting playback at its beginning.  This is most useful
+for podcasts, and can be enabled on a per-directory basis.
+
+A track's resume position is updated whenever playback of that track
+stops, including when explicitly stopping the track, powering off the
+\dap{}, or starting playback of another track.
+
+If you intend to start a track from its beginning but notice that it
+was resumed, you can press the \ButtonLeft{} button to skip back to
+its beginning.  When pressing \ButtonLeft{} again in the first few
+seconds of a track to go to the previous track, the previously (on
+first button press) saved resume position is retained.  Therefore, you
+can also use the \ButtonLeft{} and \ButtonRight{} buttons to skip
+across tracks in a playlist without losing their resume position.
+
+\begin{description}
+\item[Automatic resume.] This option enables or disables automatic
+  resume globally.  When Rockbox detects that the database (which is
+  needed for this feature) has not been initialized yet, it asks
+  whether it should be initialized right away.
+
+\item[Resume on automatic track change.] Controls whether the next
+  track in an automatic track transition should be resumed at its last
+  playback position as well.
+  \begin{description}
+  \item[No.] Automatic resume works only for manual track selection.
+  \item[Yes.] Always attempt to resume -- for both manual and
+    automatic track changes.
+  \item[In custom directories only.] Configure directories in which to
+    enable resume on automatic track change.  Selecting this option
+    starts the text editor, in which you can enter the (absolute,
+    case-insensitive) directory names separated by colons (``:'').
+
+    A typical value is ``/podcast'', which matches all files in
+    directories \fname{/PODCAST}, \fname{/Podcast} or \fname{/podcast}
+    and their subdirectories, but not in directories \fname{/podcasts}
+    (mind the trailing ``s'') or \fname{/audio/podcast}.
+  \end{description}
+\end{description}
