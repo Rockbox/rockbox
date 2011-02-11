@@ -26,7 +26,7 @@ bindir=
 libdir=
 sharedir=
 
-app_platform=
+app_modelname=
 app_lcd_width=
 app_lcd_height=
 #
@@ -50,21 +50,43 @@ prefixtools () {
  OC=${prefix}objcopy
 }
 
-app_get_platform() {
-    echo "Select your platform: (S)DL, (A)ndroid, (M)aemo (default: Android)"
-    if [ -z "$ARG_PLATFORM" ]; then
-        choice=`input`
+app_set_paths () {
+    # setup files and paths depending on the platform
+    if [ -z "$ARG_PREFIX" ]; then
+        sharedir="/usr/local/share/rockbox"
+        bindir="/usr/local/bin"
+        libdir="/usr/local/lib"
     else
-        choice="$ARG_PLATFORM"
+        if [ -d "$ARG_PREFIX" ]; then
+            if [ -z `echo $ARG_PREFIX | grep "^/"` ]; then
+                ARG_PREFIX=`realpath $ARG_PREFIX`
+                if [ "0" != "$?" ]; then
+                    echo "ERROR: Could not get prefix path (is realpath installed?)."
+                    exit
+                fi
+            fi
+            sharedir="$ARG_PREFIX/share/rockbox"
+            bindir="$ARG_PREFIX/bin"
+            libdir="$ARG_PREFIX/lib"
+        else
+            echo "ERROR: PREFIX does not exist"
+            exit
+        fi
+    fi
+}
+
+# Set the application LCD size according to the following priorities:
+# 1) If --lcdwidth and --lcdheight are set, use them
+# 2) If a size is passed to the app_set_lcd_size() function, use that
+# 3) Otherwise ask the user
+app_set_lcd_size () {
+    if [ -z "$ARG_LCDWIDTH" ]; then
+        ARG_LCDWIDTH=$1
+    fi
+    if [ -z "$ARG_LCDHEIGHT" ]; then
+        ARG_LCDHEIGHT=$2
     fi
 
-    case $choice in
-        s|S*)     app_platform="sdl" ;;
-        m|M*)     app_platform="maemo" ;;
-        *|a|A*)   app_platform="android" ;;
-    esac
-
-    echo "Selected $app_platform platform"
     echo "Enter the LCD width (default: 320)"
     if [ -z "$ARG_LCDWIDTH" ]; then
         app_lcd_width=`input`
@@ -85,76 +107,6 @@ app_get_platform() {
 
     app_lcd_width="#define LCD_WIDTH $app_lcd_width"
     app_lcd_height="#define LCD_HEIGHT $app_lcd_height"
-    # setup files and paths depending on the platform
-    if [ "$app_platform" = "sdl" ]; then
-        if [ -z "$ARG_PREFIX" ]; then
-            sharedir="/usr/local/share/rockbox"
-            bindir="/usr/local/bin"
-            libdir="/usr/local/lib"
-        else
-            if [ -d "$ARG_PREFIX" ]; then
-                if [ -z `echo $ARG_PREFIX | grep "^/"` ]; then
-                    ARG_PREFIX=`realpath $ARG_PREFIX`
-                    if [ "0" != "$?" ]; then
-                        echo "ERROR: Could not get prefix path (is realpath installed?)."
-                        exit
-                    fi
-                fi
-                sharedir="$ARG_PREFIX/share/rockbox"
-                bindir="$ARG_PREFIX/bin"
-                libdir="$ARG_PREFIX/lib"
-            else
-                echo "ERROR: PREFIX does not exist"
-                exit
-            fi
-        fi
-        output="rockbox"
-        bootoutput="rockbox"
-    elif [ "$app_platform" = "android" ]; then
-        if [ -n "$PREFIX" ]; then
-            echo "WARNING: PREFIX not supported on Android. You can however use --rbdir"
-        fi
-        if [ -z "$ANDROID_SDK_PATH" ]; then
-            echo "ERROR: You need the Android SDK installed and have the ANDROID_SDK_PATH"
-            echo "environment variable point to the root directory of the Android SDK."
-            exit
-        fi
-        if [ -z "$ANDROID_NDK_PATH" ]; then
-            echo "ERROR: You need the Android NDK installed (r5 or higher) and have the ANDROID_NDK_PATH"
-            echo "environment variable point to the root directory of the Android NDK."
-            exit
-        fi
-        sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
-        bindir="/data/data/org.rockbox/lib"
-        libdir="/data/data/org.rockbox/app_rockbox"
-        output="librockbox.so"
-        bootoutput="librockbox.so"
-    elif [ "$app_platform" = "maemo" ]; then
-        if [ -z "$ARG_PREFIX" ]; then
-            # Rockbox is in /opt as there is enough free space for it on the N900.
-            sharedir="/opt/rockbox/share/rockbox"
-            bindir="/opt/rockbox/bin"
-            libdir="/opt/rockbox/lib"
-        else
-            if [ -d "$ARG_PREFIX" ]; then
-                if [ -z `echo $ARG_PREFIX | grep "^/"` ]; then
-                    ARG_PREFIX=`realpath $ARG_PREFIX`
-                    if [ "0" != "$?" ]; then
-                        echo "ERROR: Could not get prefix path (is realpath installed?)."
-                        exit
-                    fi
-                fi
-                sharedir="$ARG_PREFIX/share/rockbox"
-                bindir="$ARG_PREFIX/bin"
-                libdir="$ARG_PREFIX/lib"
-            else
-                echo "ERROR: PREFIX does not exist"
-                exit
-            fi
-        fi
-        output="rockbox"
-        bootoutput="rockbox"
-    fi
 }
 
 findarmgcc() {
@@ -210,18 +162,6 @@ findsdl(){
       fi
     fi
   done
-}
-
-appcc () {
-    if [ "$1" = "sdl" ]; then
-        simcc "sdl-app"
-    elif [ "$1" = "maemo" ]; then
-        app_type="sdl-app"
-        maemocc
-    elif [ "$1" = "android" ]; then
-        app_type=$1
-        androidcc
-    fi
 }
 
 simcc () {
@@ -521,10 +461,18 @@ maemocc () {
  is_n900=0
  # Determine maemo version
  if pkg-config --atleast-version=5 maemo-version; then
+    if [ "$1" == "4" ]; then
+        echo "ERROR: Maemo 4 SDK required."
+        exit 1
+    fi
     extradefines="$extradefines -DMAEMO5"
     echo "Found N900 maemo version"
     is_n900=1
  elif pkg-config --atleast-version=4 maemo-version; then
+    if [ "$1" == "5" ]; then
+        echo "ERROR: Maemo 5 SDK required."
+        exit 1
+    fi
     extradefines="$extradefines -DMAEMO4"
     echo "Found N8xx maemo version"
  else
@@ -569,6 +517,16 @@ maemocc () {
 }
 
 androidcc () {
+    if [ -z "$ANDROID_SDK_PATH" ]; then
+        echo "ERROR: You need the Android SDK installed and have the ANDROID_SDK_PATH"
+        echo "environment variable point to the root directory of the Android SDK."
+        exit
+    fi
+    if [ -z "$ANDROID_NDK_PATH" ]; then
+        echo "ERROR: You need the Android NDK installed (r5 or higher) and have the ANDROID_NDK_PATH"
+        echo "environment variable point to the root directory of the Android NDK."
+        exit
+    fi
     buildhost=`uname | tr [:upper:] [:lower:]`
     gccchoice="4.4.3"
     gcctarget="arm-linux-androideabi-"
@@ -1062,7 +1020,6 @@ for arg in "$@"; do
 		--language=*) ARG_LANG=`echo "$arg" | cut -d = -f 2`;;
 		--lcdwidth=*) ARG_LCDWIDTH=`echo "$arg" | cut -d = -f 2`;;
 		--lcdheight=*) ARG_LCDHEIGHT=`echo "$arg" | cut -d = -f 2`;;
-		--platform=*) ARG_PLATFORM=`echo "$arg" | cut -d = -f 2`;;
 		--ram=*)      ARG_RAM=`echo "$arg" | cut -d = -f 2`;;
 		--rbdir=*)    ARG_RBDIR=`echo "$arg" | cut -d = -f 2`;;
 		--target=*)   ARG_TARGET=`echo "$arg" | cut -d = -f 2`;;
@@ -1184,9 +1141,11 @@ cat <<EOF
  142) YH-925              ==Packard Bell==       
  143) YP-S3               160) Vibe 500          ==Lyre project==
                                                  130) Lyre proto 1
- ==MPIO==                 == Application ==      131) Mini2440
- 170) HD200               200) Application
- 171) HD300
+==Application==           ==MPIO==               131) Mini2440
+ 200) SDL                 170) HD200
+ 201) Android             171) HD300
+ 202) Nokia N8xx
+ 203) Nokia N900
 
 EOF
 
@@ -2862,28 +2821,116 @@ fi
     t_model="hd300"
     ;;
 
-   200|app*)
-    target_id=100
+   200|sdlapp)
+    target_id=73
     modelname="application"
+    app_modelname="sdlapp"
     target="-DAPPLICATION"
-
     need_full_path="yes"
-    app_get_platform
-
+    app_set_paths
+    app_set_lcd_size
     memory=8
     uname=`uname`
-
-    appcc "$app_platform"
+    simcc "sdl-app"
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
     appextra="recorder:gui:radio"
     plugins=""
     swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
-    t_manufacturer="$app_platform"
+    t_manufacturer="sdl"
+    t_model="app"
+    ;;
+
+   201|android)
+    target_id=74
+    modelname="application"
+    app_modelname="android"
+    target="-DAPPLICATION"
+    app_type="android"
+    need_full_path="yes"
+    app_set_lcd_size
+    sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
+    bindir="/data/data/org.rockbox/lib"
+    libdir="/data/data/org.rockbox/app_rockbox"
+    memory=8
+    uname=`uname`
+    androidcc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="librockbox.so"
+    bootoutput="librockbox.so"
+    appextra="recorder:gui:radio"
+    plugins=""
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="android"
+    t_model="app"
+    ;;
+
+   202|nokian8xx)
+    target_id=75
+    modelname="application"
+    app_modelname="nokian8xx"
+    app_type="sdl-app"
+    target="-DAPPLICATION"
+    need_full_path="yes"
+    app_set_lcd_size 800 480
+    sharedir="/opt/rockbox/share/rockbox"
+    bindir="/opt/rockbox/bin"
+    libdir="/opt/rockbox/lib"
+    memory=8
+    uname=`uname`
+    maemocc 4
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui:radio"
+    plugins=""
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="maemo"
+    t_model="app"
+    ;;
+
+   203|nokian900)
+    target_id=76
+    modelname="application"
+    app_modelname="nokian900"
+    app_type="sdl-app"
+    target="-DAPPLICATION"
+    need_full_path="yes"
+    app_set_lcd_size 800 480
+    sharedir="/opt/rockbox/share/rockbox"
+    bindir="/opt/rockbox/bin"
+    libdir="/opt/rockbox/lib"
+    memory=8
+    uname=`uname`
+    maemocc 5
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui:radio"
+    plugins=""
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="maemo"
     t_model="app"
     ;;
 
@@ -3374,21 +3421,16 @@ fi
 if [ "$ARG_ARM_EABI" = "1" ]; then
   cmdline="$cmdline--eabi "
 fi
-if [ "$app_platform" = "sdl" ]; then
-  cmdline="$cmdline--platform=S "
-elif [ "$app_platform" = "android" ]; then
-  cmdline="$cmdline--platform=A "
-elif [ "$app_platform" = "maemo" ]; then
-  cmdline="$cmdline--platform=M "
-fi
-if [ "$modelname" = "application" ]; then
-  cmdline="$cmdline--lcdwidth=$ARG_LCDWIDTH --lcdheight=$ARG_LCDHEIGHT "
-fi
 if [ -n "$ARG_PREFIX" ]; then
   cmdline="$cmdline--prefix=\$(PREFIX) "
 fi
+if [ "$modelname" = "application" ]; then
+  cmdline="$cmdline--target=$app_modelname --lcdwidth=$ARG_LCDWIDTH --lcdheight=$ARG_LCDHEIGHT "
+else
+  cmdline="$cmdline--target=\$(MODELNAME) "
+fi
 
-cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
+cmdline="$cmdline--ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
 
 ### end of cmdline
 

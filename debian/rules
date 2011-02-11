@@ -1,6 +1,13 @@
 #!/usr/bin/make -f
 
-CONFIGURE_OPTIONS := --platform=M --lcdwidth=800 --lcdheight=480 --target=application --ram=8 --rbdir=/.rockbox --type=N
+# We deduce the target based on the available version of the Maemo SDK
+ifeq (1,$(shell pkg-config --atleast-version=5 maemo-version && echo 1))
+TARGET=nokian900
+else
+TARGET=nokian8xx
+endif
+
+CONFIGURE_OPTIONS := --target=$(TARGET) --lcdwidth=800 --lcdheight=480 --ram=8 --rbdir=/.rockbox --type=N
 DESKTOP_DIR := `pkg-config --variable=desktopentrydir osso-af-settings`
 
 export DH_VERBOSE=1
