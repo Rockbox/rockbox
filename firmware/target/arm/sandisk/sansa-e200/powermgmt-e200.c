@@ -43,6 +43,6 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    /* Sansa Li Ion 750mAH FIXME */
-    3300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160
+    /* Sansa Li Ion 750mAH */
+    3700, 3900, 3950, 3985, 4030, 4095, 4150, 4173, 4185, 4195, 4200
 };
