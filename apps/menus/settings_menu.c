@@ -403,7 +403,7 @@ static int autoresume_nexttrack_callback(int action,
             break;
         case ACTION_EXIT_MENUITEM:
             if (global_settings.autoresume_automatic == AUTORESUME_NEXTTRACK_CUSTOM
-                && kbd_input ((char*) &global_settings.autoresume_strpat,
+                && kbd_input ((char*) &global_settings.autoresume_paths,
                               MAX_PATHNAME+1) < 0)
             {
                 global_settings.autoresume_automatic = oldval;

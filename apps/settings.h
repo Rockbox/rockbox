@@ -583,7 +583,7 @@ struct user_settings
     bool autoresume_enable;   /* enable auto-resume feature? */
     int autoresume_automatic; /* resume next track? 0=never, 1=always,
                                  2=custom */
-    unsigned char autoresume_strpat[MAX_PATHNAME+1]; /* comma-separated list */
+    unsigned char autoresume_paths[MAX_PATHNAME+1]; /* colon-separated list */
     bool runtimedb;           /* runtime database active? */
 #endif /* HAVE_TAGCACHE */
 

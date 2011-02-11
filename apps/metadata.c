@@ -435,39 +435,55 @@ enum { AUTORESUMABLE_UNKNOWN = 0, AUTORESUMABLE_TRUE, AUTORESUMABLE_FALSE };
 
 bool autoresumable(struct mp3entry *id3)
 {
-    unsigned char search[MAX_PATHNAME+1];
-    char *saveptr, *substr;
-    bool is_resumable; 
-    
+    char *endp, *path;
+    size_t len;
+    bool is_resumable;
+
     if (id3->autoresumable)             /* result cached? */
         return id3->autoresumable == AUTORESUMABLE_TRUE;
 
-    is_resumable = true;
-
-    strcpy(search, global_settings.autoresume_strpat);
-    
-    for (substr = strtok_r(search, ",", &saveptr);
-         substr;
-         substr = strtok_r(NULL, ",", &saveptr))
-    {
-        if (id3->path && strcasestr(id3->path, substr))
-            goto out;
-        if (id3->genre_string && strcasestr(id3->genre_string, substr))
-            goto out;
-    }
-    
     is_resumable = false;
 
-  out:
+    if (id3->path)
+    {
+        for (path = global_settings.autoresume_paths;
+             *path;                     /* search terms left? */
+             path++)
+        {
+            if (*path == ':')           /* Skip empty search patterns */
+                continue;
+
+            /* FIXME: As soon as strcspn or strchrnul are made available in
+               the core, the following can be made more efficient. */
+            endp = strchr(path, ':');
+            if (endp)
+                len = endp - path;
+            else
+                len = strlen(path);
+
+            /* Note: At this point, len is always > 0 */
+
+            if (strncasecmp(id3->path, path, len) == 0)
+            {
+                /* Full directory-name matches only.  Trailing '/' in
+                   search path OK. */
+                if (id3->path[len] == '/' || id3->path[len - 1] == '/')
+                {
+                    is_resumable = true;
+                    break;
+                }
+            }
+            path += len - 1;
+        }
+    }
+
     /* cache result */
     id3->autoresumable =
         is_resumable ? AUTORESUMABLE_TRUE : AUTORESUMABLE_FALSE;
 
-    logf("autoresumable: %s with genre %s is%s resumable",
-         id3->path,
-         id3->genre_string ? id3->genre_string : "(NULL)",
-         is_resumable ? "" : " not");
-    
+    logf("autoresumable: %s is%s resumable",
+         id3->path, is_resumable ? "" : " not");
+
     return is_resumable;
 }
 

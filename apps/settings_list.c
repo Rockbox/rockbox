@@ -1268,8 +1268,8 @@ const struct settings_list settings[] = {
                    ID2P(LANG_SET_BOOL_NO),
                    ID2P(LANG_ALWAYS),
                    ID2P(LANG_AUTORESUME_CUSTOM)),
-    TEXT_SETTING(0, autoresume_strpat, "autoresume next track patterns",
-                 "podcast", NULL, NULL),
+    TEXT_SETTING(0, autoresume_paths, "autoresume next track paths",
+                 "/podcast:/podcasts", NULL, NULL),
 #endif                  
 
     OFFON_SETTING(0, runtimedb, LANG_RUNTIMEDB_ACTIVE, false,
