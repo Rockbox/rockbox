@@ -419,7 +419,7 @@ static int sleep_timer(void)
 {
     int minutes = (get_sleep_timer() + 59) / 60; /* round up */
     return (int)set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
-                   &sleep_timer_set, -5, 300, 0, sleep_timer_formatter);
+                   &sleep_timer_set, 5, 0, 300, sleep_timer_formatter);
 }
 
 
