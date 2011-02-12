@@ -21,7 +21,6 @@ use_bootchart="#undef DO_BOOTCHART"
 scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
 
 rbdir="/.rockbox"
-need_full_path=
 bindir=
 libdir=
 sharedir=
@@ -2826,7 +2825,6 @@ fi
     modelname="application"
     app_modelname="sdlapp"
     target="-DAPPLICATION"
-    need_full_path="yes"
     app_set_paths
     app_set_lcd_size
     memory=8
@@ -2853,7 +2851,6 @@ fi
     app_modelname="android"
     target="-DAPPLICATION"
     app_type="android"
-    need_full_path="yes"
     app_set_lcd_size
     sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
     bindir="/data/data/org.rockbox/lib"
@@ -2882,7 +2879,6 @@ fi
     app_modelname="nokian8xx"
     app_type="sdl-app"
     target="-DAPPLICATION"
-    need_full_path="yes"
     app_set_lcd_size 800 480
     sharedir="/opt/rockbox/share/rockbox"
     bindir="/opt/rockbox/bin"
@@ -2911,7 +2907,6 @@ fi
     app_modelname="nokian900"
     app_type="sdl-app"
     target="-DAPPLICATION"
-    need_full_path="yes"
     app_set_lcd_size 800 480
     sharedir="/opt/rockbox/share/rockbox"
     bindir="/opt/rockbox/bin"
