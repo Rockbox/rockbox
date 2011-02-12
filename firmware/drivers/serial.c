@@ -252,12 +252,10 @@ void serial_setup (void)
 {
     int tmp;
 
-#if (MODEL_NUMBER == 3) || (MODEL_NUMBER == 8)
-
+#if defined(IPOD_COLOR) || defined(IPOD_4G)
     /* Route the Tx/Rx pins.  4G Ipod??? */
     outl(0x70000018, inl(0x70000018) & ~0xc00);
-#elif (MODEL_NUMBER == 4) || (MODEL_NUMBER == 5)
-
+#elif defined(IPOD_NANO) || defined(IPOD_VIDEO)
     /* Route the Tx/Rx pins.  5G Ipod */
     (*(volatile unsigned long *)(0x7000008C)) &= ~0x0C;
     GPO32_ENABLE &= ~0x0C;
