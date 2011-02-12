@@ -450,6 +450,9 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
         return false;
     }
 
+    mutex_lock(&llist_mutex);
+    mutex_lock(&llist_mod_mutex);
+
     oldpos = ringbuf_offset(src);
     newpos = ringbuf_add(oldpos, final_delta);
     overlap = ringbuf_add_cross(newpos, size_to_move, buffer_len);
@@ -475,6 +478,8 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
             correction = (correction + 3) & ~3;
             if (final_delta < correction + sizeof(struct memory_handle)) {
                 /* Delta cannot end up less than the size of the struct */
+                mutex_unlock(&llist_mod_mutex);
+                mutex_unlock(&llist_mutex);
                 return false;
             }
             newpos -= correction;
@@ -496,6 +501,8 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
         if (m && m->next == src) {
             m->next = dest;
         } else {
+            mutex_unlock(&llist_mod_mutex);
+            mutex_unlock(&llist_mutex);
             return false;
         }
     }
@@ -556,6 +563,8 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
     /* Update the caller with the new location of h and the distance moved */
     *h = dest;
     *delta = final_delta;
+    mutex_unlock(&llist_mod_mutex);
+    mutex_unlock(&llist_mutex);
     return true;
 }
 
