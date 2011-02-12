@@ -434,11 +434,7 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
 {
     struct memory_handle *dest;
     const struct memory_handle *src;
-    int32_t *here;
-    int32_t *there;
-    int32_t *end;
-    int32_t *begin;
-    size_t final_delta = *delta, size_to_move, n;
+    size_t final_delta = *delta, size_to_move;
     uintptr_t oldpos, newpos;
     intptr_t overlap, overlap_old;
 
@@ -454,17 +450,14 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
         return false;
     }
 
-    mutex_lock(&llist_mutex);
-    mutex_lock(&llist_mod_mutex);
-
     oldpos = ringbuf_offset(src);
     newpos = ringbuf_add(oldpos, final_delta);
-    overlap = ringbuf_add_cross(newpos, size_to_move, buffer_len - 1);
-    overlap_old = ringbuf_add_cross(oldpos, size_to_move, buffer_len -1);
+    overlap = ringbuf_add_cross(newpos, size_to_move, buffer_len);
+    overlap_old = ringbuf_add_cross(oldpos, size_to_move, buffer_len);
 
     if (overlap > 0) {
         /* Some part of the struct + data would wrap, maybe ok */
-        size_t correction = 0;
+        ssize_t correction = 0;
         /* If the overlap lands inside the memory_handle */
         if (!can_wrap) {
             /* Otherwise the overlap falls in the data area and must all be
@@ -473,7 +466,8 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
             correction = overlap;
         } else if ((uintptr_t)overlap > data_size) {
             /* Correct the position and real delta to prevent the struct from
-             * wrapping, this guarantees an aligned delta, I think */
+             * wrapping, this guarantees an aligned delta if the struct size is
+             * aligned and the buffer is aligned */
             correction = overlap - data_size;
         }
         if (correction) {
@@ -481,8 +475,6 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
             correction = (correction + 3) & ~3;
             if (final_delta < correction + sizeof(struct memory_handle)) {
                 /* Delta cannot end up less than the size of the struct */
-                mutex_unlock(&llist_mod_mutex);
-                mutex_unlock(&llist_mutex);
                 return false;
             }
             newpos -= correction;
@@ -504,12 +496,9 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
         if (m && m->next == src) {
             m->next = dest;
         } else {
-            mutex_unlock(&llist_mod_mutex);
-            mutex_unlock(&llist_mutex);
             return false;
         }
     }
-
 
     /* Update the cache to prevent it from keeping the old location of h */
     if (src == cached_handle)
@@ -519,39 +508,54 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
     if (src == cur_handle)
         cur_handle = dest;
 
-
-    /* Copying routine takes into account that the handles have a
-     * distance between each other which is a multiple of four.  Faster 2 word
-     * copy may be ok but do this for safety and because wrapped copies should
-     * be fairly uncommon */
-
-    here = (int32_t *)((ringbuf_add(oldpos, size_to_move - 1) & ~3)+ (intptr_t)buffer);
-    there =(int32_t *)((ringbuf_add(newpos, size_to_move - 1) & ~3)+ (intptr_t)buffer);
-    end = (int32_t *)(( intptr_t)buffer + buffer_len - 4);
-    begin =(int32_t *)buffer;
-
-    n = (size_to_move & ~3)/4;
-
-    if ( overlap_old > 0 || overlap > 0 ) {
-    /* Old or moved handle wraps */
-        while (n--) {
-            if (here < begin)
-                here =  end;
-            if (there < begin)
-                there = end;
-           *there-- = *here--;
-        }
-    } else {
-    /* both handles do not wrap */
-        memmove(dest,src,size_to_move);
+    /* x = handle(s) following this one...
+     * ...if last handle, unmoveable if metadata, only shrinkable if audio.
+     * In other words, no legal move can be made that would have the src head
+     * and dest tail of the data overlap itself. These facts reduce the
+     * problem to four essential permutations.
+     *
+     * movement: always "clockwise" >>>>
+     *
+     * (src nowrap, dest nowrap)
+     * |0123  x |
+     * |  0123x | etc...
+     * move: "0123"
+     *
+     * (src nowrap, dest wrap)
+     * |  x0123 |
+     * |23x   01|
+     * move: "23", "01"
+     *
+     * (src wrap, dest nowrap)
+     * |23   x01|
+     * | 0123x  |
+     * move: "23", "01"
+     *
+     * (src wrap, dest wrap)
+     * |23 x  01|
+     * |123x   0|
+     * move: "23", "1", "0"
+     */
+    if (overlap_old > 0) {
+        /* Move over already wrapped data by the final delta */
+        memmove(&buffer[final_delta], buffer, overlap_old);
+        if (overlap <= 0)
+            size_to_move -= overlap_old;
     }
 
+    if (overlap > 0) {
+        /* Move data that now wraps to the beginning */
+        size_to_move -= overlap;
+        memmove(buffer, SKIPBYTES(src, size_to_move),
+                overlap_old > 0 ? final_delta : (size_t)overlap);
+    }
+
+    /* Move leading fragment containing handle struct */
+    memmove(dest, src, size_to_move);
 
     /* Update the caller with the new location of h and the distance moved */
     *h = dest;
     *delta = final_delta;
-    mutex_unlock(&llist_mod_mutex);
-    mutex_unlock(&llist_mutex);
     return true;
 }
 
