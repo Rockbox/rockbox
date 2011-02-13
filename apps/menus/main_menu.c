@@ -303,7 +303,7 @@ static int info_speak_item(int selected_item, void * data)
             {
                 talk_id(LANG_BATTERY_TIME, false);
                 talk_value(battery_level(), UNIT_PERCENT, true);
-                talk_value(battery_time() *60, UNIT_TIME, true);
+                talk_value(battery_time() *60, UNIT_TIME_EXACT, true);
             }
             else talk_id(VOICE_BLANK, false);
             break;
