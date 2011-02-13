@@ -641,11 +641,6 @@ void talk_init(void)
     strlcpy((char *)last_lang, (char *)global_settings.lang_file,
         MAX_FILENAME);
 
-#if CONFIG_CODEC == SWCODEC
-    audio_get_buffer(false, NULL);  /* Must tell audio to reinitialize */
-#endif
-    reset_state(); /* use this for most of our inits */
-
     filehandle = open_voicefile();
     if (filehandle < 0) {
         has_voicefile = false;
@@ -654,6 +649,11 @@ void talk_init(void)
     }
 
     voicefile_size = filesize(filehandle);
+    
+#if CONFIG_CODEC == SWCODEC
+    audio_get_buffer(false, NULL);  /* Must tell audio to reinitialize */
+#endif
+    reset_state(); /* use this for most of our inits */
 
     /* test if we can open and if it fits in the audiobuffer */
     size_t audiobufsz = audiobufend - audiobuf;
