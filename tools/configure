@@ -480,8 +480,13 @@ maemocc () {
  fi
 
  # SDL
- GCCOPTS="$GCCOPTS `pkg-config --cflags sdl`"
- LDOPTS="$LDOPTS `pkg-config --libs sdl`"
+ if [ $is_n900 -eq 1 ]; then
+    GCCOPTS="$GCCOPTS `pkg-config --cflags sdl`"
+    LDOPTS="$LDOPTS `pkg-config --libs sdl`"
+ else
+    GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+    LDOPTS="$LDOPTS `sdl-config --libs`"
+ fi
 
  # glib and libosso support
  GCCOPTS="$GCCOPTS `pkg-config --cflags libosso glib-2.0 gthread-2.0`"
