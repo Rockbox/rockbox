@@ -250,7 +250,7 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
     /* gives each handle a unique id */
     static int cur_handle_id = 0;
     size_t shift;
-    size_t new_widx;
+    size_t widx, new_widx;
     size_t len;
     ssize_t overlap;
 
@@ -260,7 +260,7 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
     mutex_lock(&llist_mutex);
     mutex_lock(&llist_mod_mutex);
 
-    new_widx = buf_widx;
+    widx = buf_widx;
 
     if (cur_handle && cur_handle->filerem > 0) {
         /* the current handle hasn't finished buffering. We can only add
@@ -274,12 +274,12 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
             return NULL;
         } else {
             /* Allocate the remainder of the space for the current handle */
-            new_widx = ringbuf_add(cur_handle->widx, cur_handle->filerem);
+            widx = ringbuf_add(cur_handle->widx, cur_handle->filerem);
         }
     }
 
     /* align to 4 bytes up */
-    new_widx = ringbuf_add(new_widx, 3) & ~3;
+    new_widx = ringbuf_add(widx, 3) & ~3;
 
     len = data_size + sizeof(struct memory_handle);
 
@@ -291,11 +291,11 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
         new_widx = 0;
     }
 
-    /* How far we shifted buf_widx to align things, must be < buffer_len */
-    shift = ringbuf_sub(new_widx, buf_widx);
+    /* How far we shifted the new_widx to align things, must be < buffer_len */
+    shift = ringbuf_sub(new_widx, widx);
 
     /* How much space are we short in the actual ring buffer? */
-    overlap = ringbuf_add_cross(buf_widx, shift + len, buf_ridx);
+    overlap = ringbuf_add_cross(widx, shift + len, buf_ridx);
     if (overlap >= 0 && (alloc_all || (size_t)overlap >= data_size)) {
         /* Not enough space for required allocations */
         mutex_unlock(&llist_mod_mutex);
