@@ -12636,3 +12636,45 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Automatisches Fortsetzen"
+  </dest>
+  <voice>
+    *: "Automatisches Fortsetzen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Bei automatischem Titelwechsel"
+  </dest>
+  <voice>
+    *: "Bei automatischem Titelwechsel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Nur in bestimmten Verzeichnissen"
+  </dest>
+  <voice>
+    *: "Nur in bestimmten Verzeichnissen"
+  </voice>
+</phrase>
