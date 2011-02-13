@@ -168,10 +168,10 @@
     *: "Scanning disk..."
   </source>
   <dest>
-    *: "Procházím disk..."
+    *: "Aktualizuji..."
   </dest>
   <voice>
-    *: "Procházím disk"
+    *: "Aktualizuji"
   </voice>
 </phrase>
 <phrase>
@@ -8219,10 +8219,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Mezipaměť složek je zaplňená!"
+    *: "Mezipaměť složek je zaplněná!"
   </dest>
   <voice>
-    *: "Mezipaměť složek je zaplňená!"
+    *: "Mezipaměť složek je zaplněná!"
   </voice>
 </phrase>
 <phrase>
@@ -8267,7 +8267,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Baterie: Nabíjení"
+    charging: "Baterie se nabíjí"
   </voice>
 </phrase>
 <phrase>
@@ -8280,11 +8280,11 @@
   </source>
   <dest>
     *: none
-    archosrecorder: "Baterie: uplně vybitá"
+    archosrecorder: "Baterie: úplně vybitá"
   </dest>
   <voice>
     *: none
-    archosrecorder: "Baterie je uplně vybitá"
+    archosrecorder: "Baterie je úplně vybitá"
   </voice>
 </phrase>
 <phrase>
@@ -8301,7 +8301,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Baterie: Přerušované nabíjení"
+    charging: "Baterie, Přerušované nabíjení"
   </voice>
 </phrase>
 <phrase>
@@ -8326,10 +8326,10 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "Prázdná baterie! DOBIJTE!"
+    *: "Prázdná baterie! NABIJTE JÍ!"
   </dest>
   <voice>
-    *: "Prázdná baterie! DOBIJTE!"
+    *: "Prázdná baterie! NABIJTE JÍ!"
   </voice>
 </phrase>
 <phrase>
@@ -10632,11 +10632,11 @@
   </source>
   <dest> 
     *: none
-    serial_port: "Bitrate seriového portu"
+    serial_port: "Bitrate sériového portu"
   </dest>
   <voice> 
     *: none
-    serial_port: "Bitrejt seriového portu"
+    serial_port: "Bitrejt sériového portu"
   </voice>
 </phrase>
 <phrase>
@@ -11879,7 +11879,7 @@
     *: ""
   </dest>
   <voice>
-    *: "vzhled statusbáru"
+    *: "vzhled stavové lišty"
   </voice>
 </phrase>
 <phrase>
@@ -12617,5 +12617,47 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Automatické pokračování"
+  </dest>
+  <voice>
+    *: "Automatycké pokračování"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Pokračování při automatické změně stopy"
+  </dest>
+  <voice>
+    *: "Pokračování při automatycké změně stopy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Pouze ve vlastních složkách"
+  </dest>
+  <voice>
+    *: "Pouze ve vlastních složkách"
   </voice>
 </phrase>
