@@ -805,7 +805,7 @@ static int runtime_speak_data(int selected_item, void* data)
     talk_ids(false,
              (selected_item < 2) ? LANG_RUNNING_TIME : LANG_TOP_TIME,
              TALK_ID((selected_item < 2) ? global_status.runtime
-                     : global_status.topruntime, UNIT_TIME));
+                     : global_status.topruntime, UNIT_TIME_EXACT));
     return 0;
 }
 
