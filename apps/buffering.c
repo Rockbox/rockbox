@@ -243,10 +243,7 @@ buf_ridx == buf_widx means the buffer is empty.
    alloc_all tells us if we must immediately be able to allocate data_size
    returns a valid memory handle if all conditions for allocation are met.
            NULL if there memory_handle itself cannot be allocated or if the
-           data_size cannot be allocated and alloc_all is set.  This function's
-           only potential side effect is to allocate space for the cur_handle
-           if it returns NULL.
-   */
+           data_size cannot be allocated and alloc_all is set. */
 static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
                                         bool alloc_all)
 {
@@ -263,6 +260,8 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
     mutex_lock(&llist_mutex);
     mutex_lock(&llist_mod_mutex);
 
+    new_widx = buf_widx;
+
     if (cur_handle && cur_handle->filerem > 0) {
         /* the current handle hasn't finished buffering. We can only add
            a new one if there is already enough free space to finish
@@ -275,12 +274,12 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
             return NULL;
         } else {
             /* Allocate the remainder of the space for the current handle */
-            buf_widx = ringbuf_add(cur_handle->widx, cur_handle->filerem);
+            new_widx = ringbuf_add(cur_handle->widx, cur_handle->filerem);
         }
     }
 
     /* align to 4 bytes up */
-    new_widx = ringbuf_add(buf_widx, 3) & ~3;
+    new_widx = ringbuf_add(new_widx, 3) & ~3;
 
     len = data_size + sizeof(struct memory_handle);
 
