@@ -18,8 +18,8 @@ compiling the java files will fail.
 
 1. Create a separate build folder. Do not build in this source directory.
 
-2. Run "../tools/configure". Choose target 200, then chose 'A' for Android
-   and input your screen resolution.
+2. Run "../tools/configure". Choose the "Android" target and input your
+   screen resolution.
 
 3. Run "make"
 
