@@ -12588,3 +12588,45 @@
     *: "Tamaño de archivo"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Continuación automática"
+  </dest>
+  <voice>
+    *: "Continuación automática"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Continuar al cambiar automáticamente de pista"
+  </dest>
+  <voice>
+    *: "Continuar al cambiar automáticamente de pista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "En directorios personalizados solamente"
+  </dest>
+  <voice>
+    *: "En directorios personalizados solamente"
+  </voice>
+</phrase>

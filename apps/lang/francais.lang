@@ -12643,3 +12643,45 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Reprise automatique"
+  </dest>
+  <voice>
+    *: "Reprise automatique"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Reprise sur changement automatique de piste"
+  </dest>
+  <voice>
+    *: "Reprise sur changement automatique de piste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Dans répertoire personnalisé seulement"
+  </dest>
+  <voice>
+    *: "Dans répertoire personnalisé seulement"
+  </voice>
+</phrase>
