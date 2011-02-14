@@ -12595,11 +12595,11 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTORESUME_ENABLE
+  id: LANG_AUTORESUME
   desc: resume settings menu
   user: core
   <source>
-    *: "Enable automatic resume"
+    *: "Automatic resume"
   </source>
   <dest>
     *: "Återuppta uppspelning automatiskt"
@@ -12609,16 +12609,30 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTORESUME_ENABLE_YES
-  desc: resume settings menu
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
   user: core
   <source>
-    *: "Yes (requires initialized database)"
+    *: "Resume on automatic track change"
   </source>
   <dest>
-    *: "Ja (kräver initierad databas)"
+    *: "Återuppta vid automatiskt byte"
   </dest>
   <voice>
-    *: "Ja (kräver initierad databas)"
+    *: "Återuppta vid automatiskt byte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Bara i angivna kataloger"
+  </dest>
+  <voice>
+    *: "Bara i angivna kataloger"
   </voice>
 </phrase>
