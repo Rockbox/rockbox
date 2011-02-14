@@ -483,10 +483,10 @@
     *: "<Don't Resume>"
   </source>
   <dest>
-    *: "<Nepokračovat>"
+    *: "<Neobnovovat>"
   </dest>
   <voice>
-    *: "nepokračovat"
+    *: "neobnovovat"
   </voice>
 </phrase>
 <phrase>
@@ -539,10 +539,10 @@
     *: "Resume"
   </source>
   <dest>
-    *: "Pokračovat"
+    *: "Pokračovat v přahrávání"
   </dest>
   <voice>
-    *: "Pokračovat"
+    *: "Pokračovat v přahrávání"
   </voice>
 </phrase>
 <phrase>
@@ -1377,10 +1377,10 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Náhodný výběr"
+    *: "Náhodně"
   </dest>
   <voice>
-    *: "Náhodný výběr"
+    *: "Náhodně"
   </voice>
 </phrase>
 <phrase>
@@ -1979,11 +1979,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pauza a pokračování"
+    headphone_detection: "Pauza a obnovení"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pauza a pokračování"
+    headphone_detection: "Pauza a obnovení"
   </voice>
 </phrase>
 <phrase>
@@ -2013,11 +2013,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Zrušit pokračování přehrávání při zapnutí pokud jsou sluchátka odpojena"
+    headphone_detection: "Zrušit obnovení přehrávání při zapnutí pokud jsou sluchátka odpojena"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Zrušit pokračování přehrávání při zapnutí pokud jsou sluchátka odpojena"
+    headphone_detection: "Zrušit obnovení přehrávání při zapnutí pokud jsou sluchátka odpojena"
   </voice>
 </phrase>
 <phrase>
@@ -6701,10 +6701,10 @@
     *: "Top Time"
   </source>
   <dest>
-    *: "Nejdelší doba běhu"
+    *: "Celková doba běhu"
   </dest>
   <voice>
-    *: "Nejdelší doba běhu"
+    *: "Celková doba běhu"
   </voice>
 </phrase>
 <phrase>
@@ -12627,10 +12627,10 @@
     *: "Automatic resume"
   </source>
   <dest>
-    *: "Automatické pokračování"
+    *: "Automatické obnovování"
   </dest>
   <voice>
-    *: "Automatycké pokračování"
+    *: "Automatycké obnovování"
   </voice>
 </phrase>
 <phrase>
@@ -12641,10 +12641,10 @@
     *: "Resume on automatic track change"
   </source>
   <dest>
-    *: "Pokračování při automatické změně stopy"
+    *: "Obnovení při změně stopy"
   </dest>
   <voice>
-    *: "Pokračování při automatycké změně stopy"
+    *: "Obnovení při změně stopy"
   </voice>
 </phrase>
 <phrase>
