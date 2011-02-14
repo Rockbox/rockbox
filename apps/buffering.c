@@ -145,7 +145,8 @@ static struct mutex llist_mutex SHAREDBSS_ATTR;
    This is global so that move_handle and rm_handle can invalidate it. */
 static struct memory_handle *cached_handle = NULL;
 
-static struct data_counters {
+static struct data_counters
+{
     size_t remaining;   /* Amount of data needing to be buffered */
     size_t wasted;      /* Amount of space available for freeing */
     size_t buffered;    /* Amount of data currently in the buffer */
@@ -154,7 +155,8 @@ static struct data_counters {
 
 
 /* Messages available to communicate with the buffering thread */
-enum {
+enum
+{
     Q_BUFFER_HANDLE = 1, /* Request buffering of a handle, this should not be
                             used in a low buffer situation. */
     Q_REBUFFER_HANDLE,   /* Request reset and rebuffering of a handle at a new
@@ -286,8 +288,8 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
     /* First, will the handle wrap? */
     /* If the handle would wrap, move to the beginning of the buffer,
      * or if the data must not but would wrap, move it to the beginning */
-    if( (new_widx + sizeof(struct memory_handle) > buffer_len) ||
-                   (!can_wrap && (new_widx + len > buffer_len)) ) {
+    if (new_widx + sizeof(struct memory_handle) > buffer_len ||
+                   (!can_wrap && new_widx + len > buffer_len)) {
         new_widx = 0;
     }
 
@@ -622,8 +624,7 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
         return true;
     }
 
-    if (h->fd < 0)  /* file closed, reopen */
-    {
+    if (h->fd < 0) { /* file closed, reopen */
         if (*h->path)
             h->fd = open(h->path, O_RDONLY);
 
@@ -641,10 +642,9 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
 
     trigger_cpu_boost();
 
-    if (h->type == TYPE_ID3)
-    {
-        if (!get_metadata((struct mp3entry *)(buffer + h->data), h->fd, h->path))
-        {
+    if (h->type == TYPE_ID3) {
+        if (!get_metadata((struct mp3entry *)(buffer + h->data),
+                          h->fd, h->path)) {
             /* metadata parsing failed: clear the buffer. */
             memset(buffer + h->data, 0, sizeof(struct mp3entry));
         }
@@ -665,8 +665,7 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
         uintptr_t offset = h->next ? ringbuf_offset(h->next) : buf_ridx;
         ssize_t overlap = ringbuf_add_cross(h->widx, copy_n, offset) + 1;
 
-        if (overlap > 0)
-        {
+        if (overlap > 0) {
             /* read only up to available space and stop if it would overwrite
                or be on top of the reading position or the next handle */
             stop = true;
@@ -679,8 +678,7 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
         /* rc is the actual amount read */
         int rc = read(h->fd, &buffer[h->widx], copy_n);
 
-        if (rc < 0)
-        {
+        if (rc < 0) {
             /* Some kind of filesystem error, maybe recoverable if not codec */
             if (h->type == TYPE_CODEC) {
                 logf("Partial codec");
@@ -703,23 +701,17 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
         /* If this is a large file, see if we need to break or give the codec
          * more time */
         if (h->type == TYPE_PACKET_AUDIO &&
-            pcmbuf_is_lowdata() && !buffer_is_low())
-        {
+            pcmbuf_is_lowdata() && !buffer_is_low()) {
             sleep(1);
-        }
-        else
-        {
+        } else {
             yield();
         }
 
-        if (to_buffer == 0)
-        {
+        if (to_buffer == 0) {
             /* Normal buffering - check queue */
             if(!queue_empty(&buffering_queue))
                 break;
-        }
-        else
-        {
+        } else {
             if (to_buffer <= (size_t)rc)
                 break; /* Done */
             to_buffer -= rc;
@@ -801,9 +793,7 @@ static void shrink_handle(struct memory_handle *h)
             struct bitmap *bmp = (struct bitmap *)&buffer[h->data];
             bmp->data = &buffer[h->data + sizeof(struct bitmap)];
         }
-    }
-    else
-    {
+    } else {
         /* only move the handle struct */
         delta = ringbuf_sub(h->ridx, h->data);
         if (!move_handle(&h, &delta, 0, true))
@@ -837,9 +827,7 @@ static bool fill_buffer(void)
 
     if (m) {
         return true;
-    }
-    else
-    {
+    } else {
         /* only spin the disk down if the filling wasn't interrupted by an
            event arriving in the queue. */
         storage_sleep();
@@ -851,7 +839,8 @@ static bool fill_buffer(void)
 /* Given a file descriptor to a bitmap file, write the bitmap data to the
    buffer, with a struct bitmap and the actual data immediately following.
    Return value is the total size (struct + data). */
-static int load_image(int fd, const char *path, struct bufopen_bitmap_data *data)
+static int load_image(int fd, const char *path,
+                      struct bufopen_bitmap_data *data)
 {
     int rc;
     struct bitmap *bmp = (struct bitmap *)&buffer[buf_widx];
@@ -873,8 +862,7 @@ static int load_image(int fd, const char *path, struct bufopen_bitmap_data *data
                                - sizeof(struct bitmap);
 
 #ifdef HAVE_JPEG
-    if (aa != NULL)
-    {
+    if (aa != NULL) {
         lseek(fd, aa->pos, SEEK_SET);
         rc = clip_jpeg_fd(fd, aa->size, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
                          FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
@@ -930,14 +918,14 @@ int bufopen(const char *file, size_t offset, enum data_type type,
 
     /* No buffer refs until after the mutex_lock call! */
 
-    if (type == TYPE_ID3)
-    {
+    if (type == TYPE_ID3) {
         /* ID3 case: allocate space, init the handle and return. */
         mutex_lock(&llist_mutex);
 
-        struct memory_handle *h = add_handle(sizeof(struct mp3entry), false, true);
-        if (h)
-        {
+        struct memory_handle *h =
+            add_handle(sizeof(struct mp3entry), false, true);
+
+        if (h) {
             handle_id = h->id;
             h->fd = -1;
             h->filesize = sizeof(struct mp3entry);
@@ -973,8 +961,8 @@ int bufopen(const char *file, size_t offset, enum data_type type,
 
     size_t size = 0;
 #ifdef HAVE_ALBUMART
-    if (type == TYPE_BITMAP)
-    {   /* if albumart is embedded, the complete file is not buffered,
+    if (type == TYPE_BITMAP) {
+        /* if albumart is embedded, the complete file is not buffered,
          * but only the jpeg part; filesize() would be wrong */
         struct bufopen_bitmap_data *aa = (struct bufopen_bitmap_data*)user_data;
         if (aa->embedded_albumart)
@@ -995,8 +983,7 @@ int bufopen(const char *file, size_t offset, enum data_type type,
     mutex_lock(&llist_mutex);
 
     struct memory_handle *h = add_handle(padded_size, can_wrap, false);
-    if (!h)
-    {
+    if (!h) {
         DEBUGF("%s(): failed to add handle\n", __func__);
         mutex_unlock(&llist_mutex);
         close(fd);
@@ -1011,8 +998,7 @@ int bufopen(const char *file, size_t offset, enum data_type type,
     /* Don't bother to storage align bitmaps because they are not
      * loaded directly into the buffer.
      */
-    if (type != TYPE_BITMAP)
-    {
+    if (type != TYPE_BITMAP) {
         /* Align to desired storage alignment */
         size_t alignment_pad = STORAGE_OVERLAP(adjusted_offset -
                                                (size_t)(&buffer[buf_widx]));
@@ -1028,18 +1014,14 @@ int bufopen(const char *file, size_t offset, enum data_type type,
     h->type = type;
 
 #ifdef HAVE_ALBUMART
-    if (type == TYPE_BITMAP)
-    {
+    if (type == TYPE_BITMAP) {
         /* Bitmap file: we load the data instead of the file */
         int rc;
         rc = load_image(fd, file, (struct bufopen_bitmap_data*)user_data);
-        if (rc <= 0)
-        {
+        if (rc <= 0) {
             rm_handle(h);
             handle_id = ERR_FILE_ERROR;
-        }
-        else
-        {
+        } else {
             h->filesize = rc;
             h->available = rc;
             h->widx = buf_widx + rc; /* safe because the data doesn't wrap */
@@ -1060,19 +1042,15 @@ int bufopen(const char *file, size_t offset, enum data_type type,
 
     mutex_unlock(&llist_mutex);
 
-    if (type == TYPE_CUESHEET)
-    {
+    if (type == TYPE_CUESHEET) {
         /* Immediately start buffering those */
         LOGFQUEUE("buffering >| Q_BUFFER_HANDLE %d", handle_id);
         queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
-    }
-    else
-    {
+    } else {
         /* Other types will get buffered in the course of normal operations */
         close(fd);
 
-        if (handle_id >= 0)
-        {
+        if (handle_id >= 0) {
             /* Inform the buffering thread that we added a handle */
             LOGFQUEUE("buffering > Q_HANDLE_ADDED %d", handle_id);
             queue_post(&buffering_queue, Q_HANDLE_ADDED, handle_id);
@@ -1098,8 +1076,7 @@ int bufalloc(const void *src, size_t size, enum data_type type)
 
     struct memory_handle *h = add_handle(size, false, true);
 
-    if (h)
-    {
+    if (h) {
         handle_id = h->id;
 
         if (src) {
@@ -1117,7 +1094,7 @@ int bufalloc(const void *src, size_t size, enum data_type type)
         h->filesize = size;
         h->offset = 0;
         h->ridx = buf_widx;
-        h->widx = buf_widx + size; /* this is safe because the data doesn't wrap */
+        h->widx = buf_widx + size; /* safe because the data doesn't wrap */
         h->data = buf_widx;
         h->available = size;
         h->type = type;
@@ -1145,20 +1122,21 @@ bool bufclose(int handle_id)
 static void rebuffer_handle(int handle_id, size_t newpos)
 {
     struct memory_handle *h = find_handle(handle_id);
-    if (!h)
-    {
+
+    if (!h) {
         queue_reply(&buffering_queue, ERR_HANDLE_NOT_FOUND);
         return;
     }
 
     /* When seeking foward off of the buffer, if it is a short seek attempt to
        avoid rebuffering the whole track, just read enough to satisfy */
-    if (newpos > h->offset && newpos - h->offset < BUFFERING_DEFAULT_FILECHUNK)
-    {
+    if (newpos > h->offset &&
+        newpos - h->offset < BUFFERING_DEFAULT_FILECHUNK) {
+
         size_t amount = newpos - h->offset;
         h->ridx = ringbuf_add(h->data, amount);
-        if (buffer_handle(handle_id, amount + 1))
-        {
+
+        if (buffer_handle(handle_id, amount + 1)) {
             queue_reply(&buffering_queue, 0);
             buffer_handle(handle_id, 0); /* Ok, try the rest */
             return;
@@ -1175,8 +1153,9 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     /* Strip alignment padding then redo */
     size_t new_index = ringbuf_add(ringbuf_offset(h), sizeof (*h));
 
-    /* Align to desired storage alignment if space permits - handle could have
-       been shrunken too close to the following one after a previous rebuffer. */
+    /* Align to desired storage alignment if space permits - handle could
+       have been shrunken too close to the following one after a previous
+       rebuffer. */
     size_t alignment_pad =
         STORAGE_OVERLAP(h->offset - (size_t)(&buffer[new_index]));
 
@@ -1200,8 +1179,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     if (h->fd >= 0)
         lseek(h->fd, h->offset, SEEK_SET);
 
-    if (h->next && ringbuf_sub(next, h->data) <= h->filesize - newpos)
-    {
+    if (h->next && ringbuf_sub(next, h->data) <= h->filesize - newpos) {
         /* There isn't enough space to rebuffer all of the track from its new
            offset, so we ask the user to free some */
         DEBUGF("%s(): space is needed\n", __func__);
@@ -1290,8 +1268,7 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
 
     size_t avail = handle_size_available(h);
 
-    if (avail == 0 && h->filerem == 0)
-    {
+    if (avail == 0 && h->filerem == 0) {
         /* File is finished reading */
         *size = 0;
         return h;
@@ -1303,8 +1280,7 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
         realsize = avail + h->filerem;
 
     if (guardbuf_limit && h->type == TYPE_PACKET_AUDIO
-            && realsize > GUARD_BUFSIZE)
-    {
+            && realsize > GUARD_BUFSIZE) {
         logf("data request > guardbuf");
         /* If more than the size of the guardbuf is requested and this is a
          * bufgetdata, limit to guard_bufsize over the end of the buffer */
@@ -1312,8 +1288,7 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
         /* this ensures *size <= buffer_len - h->ridx + GUARD_BUFSIZE */
     }
 
-    if (h->filerem > 0 && avail < realsize)
-    {
+    if (h->filerem > 0 && avail < realsize) {
         /* Data isn't ready. Request buffering */
         buf_request_buffer_handle(handle_id);
         /* Wait for the data to be ready */
@@ -1356,15 +1331,12 @@ ssize_t bufread(int handle_id, size_t size, void *dest)
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
 
-    if (h->ridx + adjusted_size > buffer_len)
-    {
+    if (h->ridx + adjusted_size > buffer_len) {
         /* the data wraps around the end of the buffer */
         size_t read = buffer_len - h->ridx;
         memcpy(dest, &buffer[h->ridx], read);
         memcpy(dest+read, buffer, adjusted_size - read);
-    }
-    else
-    {
+    } else {
         memcpy(dest, &buffer[h->ridx], adjusted_size);
     }
 
@@ -1389,12 +1361,12 @@ ssize_t bufgetdata(int handle_id, size_t size, void **data)
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
 
-    if (h->ridx + adjusted_size > buffer_len)
-    {
+    if (h->ridx + adjusted_size > buffer_len) {
         /* the data wraps around the end of the buffer :
            use the guard buffer to provide the requested amount of data. */
         size_t copy_n = h->ridx + adjusted_size - buffer_len;
-        /* prep_bufdata ensures adjusted_size <= buffer_len - h->ridx + GUARD_BUFSIZE,
+        /* prep_bufdata ensures
+           adjusted_size <= buffer_len - h->ridx + GUARD_BUFSIZE,
            so copy_n <= GUARD_BUFSIZE */
         memcpy(guard_buffer, (const unsigned char *)buffer, copy_n);
     }
@@ -1425,8 +1397,7 @@ ssize_t bufgettail(int handle_id, size_t size, void **data)
 
     tidx = ringbuf_sub(h->widx, size);
 
-    if (tidx + size > buffer_len)
-    {
+    if (tidx + size > buffer_len) {
         size_t copy_n = tidx + size - buffer_len;
         memcpy(guard_buffer, (const unsigned char *)buffer, copy_n);
     }
@@ -1614,13 +1585,11 @@ void buffering_thread(void)
          * for simplicity until its done right */
 #if MEMORYSIZE > 8
         /* If the disk is spinning, take advantage by filling the buffer */
-        else if (storage_disk_is_active() && queue_empty(&buffering_queue))
-        {
+        else if (storage_disk_is_active() && queue_empty(&buffering_queue)) {
             if (num_handles > 0 && data_counters.useful <= high_watermark)
                 send_event(BUFFER_EVENT_BUFFER_LOW, 0);
 
-            if (data_counters.remaining > 0 && BUF_USED <= high_watermark)
-            {
+            if (data_counters.remaining > 0 && BUF_USED <= high_watermark) {
                 /* This is a new fill, shrink the buffer up first */
                 if (!filling)
                     shrink_buffer();
@@ -1637,9 +1606,7 @@ void buffering_thread(void)
                     filling = fill_buffer();
                 else if (data_counters.remaining == 0)
                     filling = false;
-            }
-            else if (ev.id == SYS_TIMEOUT)
-            {
+            } else if (ev.id == SYS_TIMEOUT) {
                 if (data_counters.remaining > 0 &&
                     data_counters.useful <= conf_watermark) {
                     shrink_buffer();
