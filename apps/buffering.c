@@ -266,9 +266,9 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
         /* the current handle hasn't finished buffering. We can only add
            a new one if there is already enough free space to finish
            the buffering. */
-        size_t req = cur_handle->filerem + sizeof(struct memory_handle);
+        size_t req = cur_handle->filerem;
         if (ringbuf_add_cross(cur_handle->widx, req, buf_ridx) >= 0) {
-            /* Not enough space */
+            /* Not enough space to finish allocation */
             mutex_unlock(&llist_mod_mutex);
             mutex_unlock(&llist_mutex);
             return NULL;
@@ -278,8 +278,8 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
         }
     }
 
-    /* align to 4 bytes up */
-    new_widx = ringbuf_add(widx, 3) & ~3;
+    /* align to 4 bytes up always leaving a gap */
+    new_widx = ringbuf_add(widx, 4) & ~3;
 
     len = data_size + sizeof(struct memory_handle);
 
@@ -681,15 +681,12 @@ static bool buffer_handle(int handle_id)
         ssize_t copy_n = MIN( MIN(h->filerem, BUFFERING_DEFAULT_FILECHUNK),
                              buffer_len - h->widx);
         uintptr_t offset = h->next ? ringbuf_offset(h->next) : buf_ridx;
-        ssize_t overlap = ringbuf_add_cross(h->widx, copy_n, offset);
-
-        if (!h->next)
-            overlap++; /* sub one more below to avoid buffer overflow */
+        ssize_t overlap = ringbuf_add_cross(h->widx, copy_n, offset) + 1;
 
         if (overlap > 0)
         {
             /* read only up to available space and stop if it would overwrite
-               the reading position or the next handle */
+               or be on top of the reading position or the next handle */
             stop = true;
             copy_n -= overlap;
         }
@@ -751,7 +748,7 @@ static bool buffer_handle(int handle_id)
    Use this after having set the new offset to use. */
 static void reset_handle(int handle_id)
 {
-    size_t alignment_pad;
+    size_t new_index;
 
     logf("reset_handle(%d)", handle_id);
 
@@ -759,12 +756,27 @@ static void reset_handle(int handle_id)
     if (!h)
         return;
 
-    /* Align to desired storage alignment */
-    alignment_pad = STORAGE_OVERLAP(h->offset - (size_t)(&buffer[h->start]));
-    h->ridx = h->widx = h->data = ringbuf_add(h->start, alignment_pad);
+    new_index = h->start;
+
+#ifdef STORAGE_WANTS_ALIGN
+    /* Align to desired storage alignment if space permits - handle could have
+       been shrunken too close to the following one after a previous rebuffer. */
+    size_t alignment_pad = STORAGE_OVERLAP(h->offset - (size_t)(&buffer[new_index]));
+    size_t offset = h->next ? ringbuf_offset(h->next) : buf_ridx;
+
+    if (ringbuf_add_cross(new_index, alignment_pad, offset) >= 0) {
+        /* Forego storage alignment this time */
+        alignment_pad = 0;
+    }
+
+    new_index = ringbuf_add(new_index, alignment_pad);
+#endif
+
+    h->ridx = h->widx = h->data = new_index;
 
     if (h == cur_handle)
-        buf_widx = h->widx;
+        buf_widx = new_index;
+
     h->available = 0;
     h->filerem = h->filesize - h->offset;
 
