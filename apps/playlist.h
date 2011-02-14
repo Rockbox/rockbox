@@ -105,7 +105,7 @@ struct playlist_info
     int num_cached;      /* number of cached entries                */
     bool pending_control_sync; /* control file needs to be synced   */
 
-    struct mutex control_mutex; /* mutex for control file access    */
+    struct mutex *control_mutex; /* mutex for control file access    */
     int last_shuffled_start; /* number of tracks when insert last
                                     shuffled command start */
 };

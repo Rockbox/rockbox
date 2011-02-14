@@ -182,7 +182,7 @@ static struct sd_card_status sd_status[NUM_DRIVES] =
 static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
-static struct event_queue sd_queue;
+static struct event_queue sd_queue SHAREDBSS_ATTR;
 
 #ifdef HAVE_HOTSWAP
 static int sd_first_drive = 0;

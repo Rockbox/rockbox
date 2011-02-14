@@ -42,7 +42,7 @@
 #include "lcd-remote.h"
 #endif
 
-struct event_queue button_queue;
+struct event_queue button_queue SHAREDBSS_ATTR;
 
 static long lastbtn;   /* Last valid button status */
 static long last_read; /* Last button status, for debouncing/filtering */

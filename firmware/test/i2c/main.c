@@ -288,7 +288,7 @@ bool filling; /* We are filling the buffer with data from disk */
 
 
 
-struct event_queue mpeg_queue;
+struct event_queue mpeg_queue SHAREDBSS_ATTR;
 
 
 

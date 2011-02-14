@@ -266,7 +266,7 @@ static struct batt_info
 #define BUF_ELEMENTS    (sizeof(bat)/sizeof(struct batt_info))
 
 static unsigned int thread_id;
-static struct event_queue thread_q;
+static struct event_queue thread_q SHAREDBSS_ATTR;
 static bool in_usb_mode;
 static unsigned int buf_idx;
 

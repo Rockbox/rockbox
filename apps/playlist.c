@@ -192,10 +192,13 @@ static int rotate_index(const struct playlist_info* playlist, int index);
 #ifdef HAVE_DIRCACHE
 #define PLAYLIST_LOAD_POINTERS 1
 
-static struct event_queue playlist_queue;
+static struct event_queue playlist_queue SHAREDBSS_ATTR;
 static long playlist_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char playlist_thread_name[] = "playlist cachectrl";
 #endif
+
+static struct mutex current_playlist_mutex SHAREDBSS_ATTR;
+static struct mutex created_playlist_mutex SHAREDBSS_ATTR;
 
 /* Check if the filename suggests M3U or M3U8 format. */
 static bool is_m3u8(const char* filename)
@@ -1232,9 +1235,9 @@ static void playlist_flush_callback(void *param)
     {
         if (playlist->num_cached > 0)
         {
-            mutex_lock(&playlist->control_mutex);
+            mutex_lock(playlist->control_mutex);
             flush_cached_control(playlist);
-            mutex_unlock(&playlist->control_mutex);
+            mutex_unlock(playlist->control_mutex);
         }
         sync_control(playlist, true);
     }
@@ -1362,7 +1365,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     }
     else if (max < 0)
     {
-        mutex_lock(&playlist->control_mutex);
+        mutex_lock(playlist->control_mutex);
 
         if (control_file)
         {
@@ -1396,7 +1399,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
             }
         }
 
-        mutex_unlock(&playlist->control_mutex);
+        mutex_unlock(playlist->control_mutex);
 
         if (max < 0)
         {
@@ -1829,7 +1832,7 @@ static int update_control(struct playlist_info* playlist,
     struct playlist_control_cache* cache;
     bool flush = false;
 
-    mutex_lock(&playlist->control_mutex);
+    mutex_lock(playlist->control_mutex);
 
     cache = &(playlist->control_cache[playlist->num_cached++]);
 
@@ -1861,7 +1864,7 @@ static int update_control(struct playlist_info* playlist,
     if (flush || playlist->num_cached == PLAYLIST_MAX_CACHE)
         result = flush_cached_control(playlist);
 
-    mutex_unlock(&playlist->control_mutex);
+    mutex_unlock(playlist->control_mutex);
         
     return result;
 }
@@ -1881,10 +1884,10 @@ static void sync_control(struct playlist_info* playlist, bool force)
     {
         if (playlist->pending_control_sync)
         {
-            mutex_lock(&playlist->control_mutex);
+            mutex_lock(playlist->control_mutex);
             fsync(playlist->control_fd);
             playlist->pending_control_sync = false;
-            mutex_unlock(&playlist->control_mutex);
+            mutex_unlock(playlist->control_mutex);
         }
     }
 }
@@ -1908,6 +1911,9 @@ void playlist_init(void)
 {
     struct playlist_info* playlist = &current_playlist;
 
+    mutex_init(&current_playlist_mutex);
+    mutex_init(&created_playlist_mutex);
+
     playlist->current = true;
     strlcpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
             sizeof(playlist->control_filename));
@@ -1919,7 +1925,8 @@ void playlist_init(void)
     playlist->buffer_size =
         AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir;
     playlist->buffer = buffer_alloc(playlist->buffer_size);
-    mutex_init(&playlist->control_mutex);
+    playlist->control_mutex = &current_playlist_mutex;
+
     empty_playlist(playlist, true);
 
 #ifdef HAVE_DIRCACHE
@@ -1943,14 +1950,14 @@ void playlist_shutdown(void)
 
     if (playlist->control_fd >= 0)
     {
-        mutex_lock(&playlist->control_mutex);
+        mutex_lock(playlist->control_mutex);
 
         if (playlist->num_cached > 0)
             flush_cached_control(playlist);
 
         close(playlist->control_fd);
 
-        mutex_unlock(&playlist->control_mutex);
+        mutex_unlock(playlist->control_mutex);
     }
 }
 
@@ -2705,7 +2712,7 @@ int playlist_create_ex(struct playlist_info* playlist,
 
         playlist->buffer_size = 0;
         playlist->buffer = NULL;
-        mutex_init(&playlist->control_mutex);
+        playlist->control_mutex = &created_playlist_mutex;
     }
 
     new_playlist(playlist, dir, file);
@@ -3441,7 +3448,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     {
         result = -1;
 
-        mutex_lock(&playlist->control_mutex);
+        mutex_lock(playlist->control_mutex);
 
         /* Replace the current playlist with the new one and update indices */
         close(playlist->fd);
@@ -3471,7 +3478,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
             }
        }
 
-       mutex_unlock(&playlist->control_mutex);
+       mutex_unlock(playlist->control_mutex);
 
     }
 

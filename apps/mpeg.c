@@ -150,7 +150,7 @@ static char mpeg_stack[DEFAULT_STACK_SIZE];
 static struct mp3entry taginfo;
 
 #else /* !SIMULATOR */
-static struct event_queue mpeg_queue;
+static struct event_queue mpeg_queue SHAREDBSS_ATTR;
 static long mpeg_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 
 static int audiobuflen;

@@ -82,7 +82,7 @@ static const char usb_thread_name[] = "usb";
 static unsigned int usb_thread_entry = 0;
 static bool usb_monitor_enabled = false;
 #endif /* USB_FULL_INIT */
-static struct event_queue usb_queue;
+static struct event_queue usb_queue SHAREDBSS_ATTR;
 static bool exclusive_storage_access = false;
 #ifdef USB_ENABLE_HID
 static bool usb_hid = true;

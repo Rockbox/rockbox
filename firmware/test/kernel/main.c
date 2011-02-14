@@ -31,7 +31,7 @@ unsigned int s2[256];
 void t1(void);
 void t2(void);
 
-struct event_queue main_q;
+struct event_queue main_q SHAREDBSS_ATTR;
 
 int tick_add_task(void (*f)(void));
 

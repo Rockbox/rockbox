@@ -74,7 +74,7 @@ static unsigned long reserve_used = 0;
 static unsigned int  cache_build_ticks = 0;
 static unsigned long appflags = 0;
 
-static struct event_queue dircache_queue;
+static struct event_queue dircache_queue SHAREDBSS_ATTR;
 static long dircache_stack[(DEFAULT_STACK_SIZE + 0x400)/sizeof(long)];
 static const char dircache_thread_name[] = "dircache";
 

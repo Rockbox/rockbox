@@ -54,7 +54,7 @@
 /* arbitrary delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<20;_x++);} while (0)
 
-static struct mutex i2c_mtx;
+static struct mutex i2c_mtx SHAREDBSS_ATTR;
 
 void i2c_begin(void)
 {

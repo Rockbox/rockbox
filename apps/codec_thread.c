@@ -81,15 +81,15 @@ extern bool automatic_skip; /* Who initiated in-progress skip? (C/A-) */
  */
 static bool codec_requested_stop = false;
 
-extern struct event_queue audio_queue;
-extern struct event_queue codec_queue;
+extern struct event_queue audio_queue SHAREDBSS_ATTR;
+extern struct event_queue codec_queue SHAREDBSS_ATTR;
 
 extern struct codec_api ci; /* from codecs.c */
 
 /* Codec thread */
 unsigned int codec_thread_id;   /* For modifying thread priority later.
                                    Used by playback.c and pcmbuf.c */
-static struct queue_sender_list codec_queue_sender_list;
+static struct queue_sender_list codec_queue_sender_list SHAREDBSS_ATTR;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
 static const char codec_thread_name[] = "codec";

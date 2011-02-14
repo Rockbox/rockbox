@@ -90,7 +90,7 @@ static long last_disk_activity = -1;
 
 /* private variables */
 
-static struct mutex mmc_mutex;
+static struct mutex mmc_mutex SHAREDBSS_ATTR;
 
 #ifdef HAVE_HOTSWAP
 static long mmc_stack[((DEFAULT_STACK_SIZE*2) + 0x800)/sizeof(long)];
@@ -98,7 +98,7 @@ static long mmc_stack[((DEFAULT_STACK_SIZE*2) + 0x800)/sizeof(long)];
 static long mmc_stack[(DEFAULT_STACK_SIZE*2)/sizeof(long)];
 #endif
 static const char mmc_thread_name[] = "mmc";
-static struct event_queue mmc_queue;
+static struct event_queue mmc_queue SHAREDBSS_ATTR;
 static bool initialized = false;
 static bool new_mmc_circuit;
 

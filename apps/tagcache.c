@@ -96,7 +96,7 @@
 
 #ifndef __PCTOOL__
 /* Tag Cache thread. */
-static struct event_queue tagcache_queue;
+static struct event_queue tagcache_queue SHAREDBSS_ATTR;
 static long tagcache_stack[(DEFAULT_STACK_SIZE + 0x4000)/sizeof(long)];
 static const char tagcache_thread_name[] = "tagcache";
 #endif
@@ -159,7 +159,7 @@ struct tagcache_command_entry {
 static struct tagcache_command_entry command_queue[TAGCACHE_COMMAND_QUEUE_LENGTH];
 static volatile int command_queue_widx = 0;
 static volatile int command_queue_ridx = 0;
-static struct mutex command_queue_mutex;
+static struct mutex command_queue_mutex SHAREDBSS_ATTR;
 #endif
 
 /* Tag database structures. */

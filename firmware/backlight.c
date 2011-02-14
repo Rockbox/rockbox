@@ -95,7 +95,7 @@ enum {
 static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
-static struct event_queue backlight_queue;
+static struct event_queue backlight_queue SHAREDBSS_ATTR;
 #ifdef BACKLIGHT_DRIVER_CLOSE
 static unsigned int backlight_thread_id = 0;
 #endif

@@ -31,7 +31,7 @@
 #define EV_EXIT 9999
 #define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
 static unsigned int thread_id;
-static struct event_queue thread_q;
+static struct event_queue thread_q SHAREDBSS_ATTR;
 /* use long for aligning */
 unsigned long thread_stack[THREAD_STACK_SIZE/sizeof(long)];
 #endif
