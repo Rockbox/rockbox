@@ -168,13 +168,21 @@ int app_remove(const char *name)
 
 int app_rename(const char *old, const char *new)
 {
-    char realpath[MAX_PATH];
-    const char *fname = old;
+    char realpath_old[MAX_PATH], realpath_new[MAX_PATH];
+
+    const char *final_old = old;
     if (!strncmp(ROCKBOX_DIR, old, ROCKBOX_DIR_LEN))
     {
-        fname = _get_user_file_path(old, NEED_WRITE, realpath, sizeof(realpath));
+        final_old = _get_user_file_path(old, NEED_WRITE, realpath_old, sizeof(realpath_old));
     }
-    return rename(fname, new);
+
+    const char *final_new = new;
+    if (!strncmp(ROCKBOX_DIR, new, ROCKBOX_DIR_LEN))
+    {
+        final_new = _get_user_file_path(new, NEED_WRITE, realpath_new, sizeof(realpath_new));
+    }
+
+    return rename(final_old, final_new);
 }
 
 DIR *app_opendir(const char *name)
