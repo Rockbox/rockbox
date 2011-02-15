@@ -24,6 +24,7 @@
 #include <time.h>
 #include "kernel.h"
 #include "powermgmt.h"
+#include <SDL_events.h>
 
 #define BATT_MINMVOLT   2500      /* minimum millivolts of battery */
 #define BATT_MAXMVOLT   4500      /* maximum millivolts of battery */
@@ -155,6 +156,11 @@ void reset_poweroff_timer(void)
 
 void shutdown_hw(void)
 {
+    /* Shut down SDL event loop */
+    SDL_Event event;
+    memset(&event, 0, sizeof(SDL_Event));
+    event.type = SDL_USEREVENT;
+    SDL_PushEvent(&event);
 }
 
 void cancel_shutdown(void)
