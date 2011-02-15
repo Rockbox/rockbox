@@ -83,12 +83,15 @@ static void get_scrobbler_filename(char *path, size_t size)
 #endif
 
 /* Get location of USB mass storage area */
-#if APPLICATION && (CONFIG_PLATFORM & PLATFORM_MAEMO)
+#ifdef APPLICATION
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
     used = snprintf(path, size, "/home/user/MyDocs/%s", base_filename);
-#elif APPLICATION && (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#elif (CONFIG_PLATFORM & PLATFORM_ANDROID)
     used = snprintf(path, size, "/sdcard/%s", base_filename);
-#elif APPLICATION && (CONFIG_PLATFORM & PLATFORM_SDL)
+#else /* SDL/unknown RaaA build */
     used = snprintf(path, size, "%s/%s", ROCKBOX_DIR, base_filename);
+#endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
+
 #else
     used = snprintf(path, size, "/%s", base_filename);
 #endif
