@@ -883,7 +883,8 @@ menu:
                         boost_settings, 2, NULL);
         goto menu;
     }
-    rb->cpu_boost(boost ? true: false);
+    if(boost)
+        rb->cpu_boost(true);
 #endif
 
     if (result == QUIT)

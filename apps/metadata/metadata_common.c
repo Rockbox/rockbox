@@ -337,10 +337,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
         p = NULL;
     }
     
-    /* Do not overwrite already available metadata. Especially when reading
-     * tags with e.g. multiple genres / artists. This way only the first 
-     * of multiple entries is used, all following are dropped. */
-    if (p!=NULL && *p==NULL)
+    if (p)
     {
         len = strlen(value);
         len = MIN(len, buf_remaining - 1);

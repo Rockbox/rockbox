@@ -1015,7 +1015,7 @@ int talk_number(long n, bool enqueue)
 
 /* Say time duration/interval. Input is time in seconds,
    say hours,minutes,seconds. */
-static int talk_time_unit(long secs, bool enqueue)
+static int talk_time_unit(long secs, bool exact, bool enqueue)
 {
     int hours, mins;
     if (!enqueue)
@@ -1026,9 +1026,11 @@ static int talk_time_unit(long secs, bool enqueue)
     }
     if((mins = secs/60)) {
         secs %= 60;
-        talk_value(mins, UNIT_MIN, true);
+        if(exact || !hours)
+            talk_value(mins, UNIT_MIN, true);
+        else talk_number(mins, true); /* don't say "minutes" */
     }
-    if((secs) || (!hours && !mins))
+    if((exact && secs) || (!hours && !mins))
         talk_value(secs, UNIT_SEC, true);
     else if(!hours && secs)
         talk_number(secs, true);
@@ -1108,8 +1110,8 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
 #endif
 
     /* special case for time duration */
-    if (unit == UNIT_TIME)
-        return talk_time_unit(n, enqueue);
+    if (unit == UNIT_TIME || unit == UNIT_TIME_EXACT)
+        return talk_time_unit(n, unit == UNIT_TIME_EXACT, enqueue);
 
     if (unit < 0 || unit >= UNIT_LAST)
         unit_id = -1;

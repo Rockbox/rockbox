@@ -73,6 +73,9 @@
 #define MP4_udta FOURCC('u', 'd', 't', 'a')
 #define MP4_extra FOURCC('-', '-', '-', '-')
 
+/* Used to correct id3->samples, if SBR upsampling was detected in esds atom. */
+static bool SBR_upsampling_used = false;
+
 /* Read the tag data from an MP4 file, storing up to buffer_size bytes in
  * buffer.
  */
@@ -117,17 +120,11 @@ static unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
 
     if (bytes_read)
     {
-        /* Do not overwrite already available metadata. Especially when reading
-         * tags with e.g. multiple genres / artists. This way only the first 
-         * of multiple entries is used, all following are dropped. */
-        if (*dest == NULL)
-        {
-            (*buffer)[bytes_read] = 0;
-            *dest = *buffer;
-            length = strlen(*buffer) + 1;
-            *buffer_left -= length;
-            *buffer += length;
-        }
+        (*buffer)[bytes_read] = 0;
+        *dest = *buffer;
+        length = strlen(*buffer) + 1;
+        *buffer_left -= length;
+        *buffer += length;
     }
     else
     {
@@ -346,6 +343,11 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
              * decoding (parts of) the file.
              */
             id3->frequency *= 2;
+            
+            /* Set this to true to be able to calculate the correct runtime 
+             * and bitrate. */
+            SBR_upsampling_used = true;
+
             sbr = true;
         }
     }
@@ -638,7 +640,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                 unsigned int i;
 
                 /* Reset to false. */
-                id3->needs_upsampling_correction = false;
+                id3->needs_upsampling_correction = true;
 
                 lseek(fd, 4, SEEK_CUR);
                 read_uint32be(fd, &entries);
@@ -652,12 +654,12 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                     read_uint32be(fd, &n);
                     read_uint32be(fd, &l);
 
-                    /* Some AAC file use HE profile. In this case the number 
+                    /* Some SBR files use upsampling. In this case the number 
                      * of output samples is doubled to a maximum of 2048 
                      * samples per frame. This means that files which already 
                      * report a frame size of 2048 in their header will not 
                      * need any further special handling. */
-                    if (id3->codectype==AFMT_MP4_AAC_HE && l<=1024)
+                    if (SBR_upsampling_used && l<=1024)
                     {
                         id3->samples += n * l * 2;
                         id3->needs_upsampling_correction = true;
@@ -772,6 +774,7 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
 
 bool get_mp4_metadata(int fd, struct mp3entry* id3)
 {
+    SBR_upsampling_used = false;
     id3->codectype = AFMT_UNKNOWN;
     id3->filesize = 0;
     errno = 0;
