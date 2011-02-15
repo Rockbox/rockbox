@@ -45,12 +45,6 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 
 #define SCROBBLER_VERSION "1.1"
 
-#if CONFIG_RTC
-#define SCROBBLER_FILE "/.scrobbler.log"
-#else
-#define SCROBBLER_FILE "/.scrobbler-timeless.log"
-#endif
-
 /* increment this on any code change that effects output */
 #define SCROBBLER_REVISION " $Revision$"
 
@@ -78,16 +72,47 @@ unsigned long audio_prev_elapsed(void)
 }
 #endif
 
+static void get_scrobbler_filename(char *path, size_t size)
+{
+    int used;
+
+#if CONFIG_RTC
+    const char *base_filename = ".scrobbler.log";
+#else
+    const char *base_filename = ".scrobbler-timeless.log";
+#endif
+
+/* Get location of USB mass storage area */
+#if APPLICATION && (CONFIG_PLATFORM & PLATFORM_MAEMO)
+    used = snprintf(path, size, "/home/user/MyDocs/%s", base_filename);
+#elif APPLICATION && (CONFIG_PLATFORM & PLATFORM_ANDROID)
+    used = snprintf(path, size, "/sdcard/%s", base_filename);
+#elif APPLICATION && (CONFIG_PLATFORM & PLATFORM_SDL)
+    used = snprintf(path, size, "%s/%s", ROCKBOX_DIR, base_filename);
+#else
+    used = snprintf(path, size, "/%s", base_filename);
+#endif
+
+    if (used >= (int)size)
+    {
+        logf("SCROBBLER: not enough buffer space for log file");
+        memset(path, 0, size);
+    }
+}
+
 static void write_cache(void)
 {
     int i;
     int fd;
 
+    char scrobbler_file[MAX_PATH];
+    get_scrobbler_filename(scrobbler_file, MAX_PATH);
+
     /* If the file doesn't exist, create it.
     Check at each write since file may be deleted at any time */
-    if(!file_exists(SCROBBLER_FILE))
+    if(!file_exists(scrobbler_file))
     {
-        fd = open(SCROBBLER_FILE, O_RDWR | O_CREAT, 0666);
+        fd = open(scrobbler_file, O_RDWR | O_CREAT, 0666);
         if(fd >= 0)
         {
             fdprintf(fd, "#AUDIOSCROBBLER/" SCROBBLER_VERSION "\n"
@@ -107,7 +132,7 @@ static void write_cache(void)
     }
 
     /* write the cache entries */
-    fd = open(SCROBBLER_FILE, O_WRONLY | O_APPEND);
+    fd = open(scrobbler_file, O_WRONLY | O_APPEND);
     if(fd >= 0)
     {
         logf("SCROBBLER: writing %d entries", cache_pos); 
