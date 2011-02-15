@@ -781,13 +781,15 @@ bool get_mp4_metadata(int fd, struct mp3entry* id3)
         }
 
         id3->length = ((int64_t) id3->samples * 1000) / id3->frequency;
-    
+
+        id3->vbr = true; /* ALAC is native VBR, AAC very unlikely is CBR. */
+
         if (id3->length <= 0)
         {
             logf("mp4 length invalid!");
             return false;
         }
-        
+
         id3->bitrate = ((int64_t) id3->filesize * 8) / id3->length;
         DEBUGF("MP4 bitrate %d, frequency %ld Hz, length %ld ms\n",
             id3->bitrate, id3->frequency, id3->length);
