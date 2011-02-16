@@ -430,7 +430,7 @@ static long find_entry_ram(const char *filename,
 }
 #endif
 
-static long find_entry_disk(const char *filename, bool localfd)
+static long find_entry_disk(const char *filename_raw, bool localfd)
 {
     struct tagcache_header tch;
     static long last_pos = -1;
@@ -442,6 +442,13 @@ static long find_entry_disk(const char *filename, bool localfd)
     char buf[TAG_MAXLEN+32];
     int i;
     int pos = -1;
+
+    char *filename = (char *)filename_raw;
+#ifdef APPLICATION
+    char pathbuf[MAX_PATH];
+    if (realpath(filename, pathbuf) == pathbuf)
+        filename = pathbuf;
+#endif
 
     if (!tc_stat.ready)
         return -2;
