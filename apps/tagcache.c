@@ -443,7 +443,7 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
     int i;
     int pos = -1;
 
-    char *filename = (char *)filename_raw;
+    const char *filename = filename_raw;
 #ifdef APPLICATION
     char pathbuf[MAX_PATH];
     if (realpath(filename, pathbuf) == pathbuf)
