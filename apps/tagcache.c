@@ -445,7 +445,7 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
 
     const char *filename = filename_raw;
 #ifdef APPLICATION
-    char pathbuf[MAX_PATH];
+    char pathbuf[PATH_MAX]; /* Note: Don't use MAX_PATH here, it's too small */
     if (realpath(filename, pathbuf) == pathbuf)
         filename = pathbuf;
 #endif
