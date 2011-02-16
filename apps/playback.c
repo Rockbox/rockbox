@@ -1264,6 +1264,60 @@ static bool audio_load_track(size_t offset, bool start_play)
     return true;
 }
 
+#ifdef HAVE_ALBUMART
+/* Load any album art for the file */
+static void audio_load_albumart(struct mp3entry *track_id3)
+{
+    int i;
+
+    FOREACH_ALBUMART(i)
+    {
+        struct bufopen_bitmap_data user_data;
+        int hid = ERR_HANDLE_NOT_FOUND;
+
+        /* albumart_slots may change during a yield of bufopen,
+         * but that's no problem */
+        if (tracks[track_widx].aa_hid[i] >= 0 || !albumart_slots[i].used)
+            continue;
+
+        memset(&user_data, 0, sizeof(user_data));
+        user_data.dim = &(albumart_slots[i].dim);
+
+        /* we can only decode jpeg for embedded AA */
+        if (track_id3->embed_albumart && track_id3->albumart.type == AA_TYPE_JPG)
+        {
+            user_data.embedded_albumart = &(track_id3->albumart);
+            hid = bufopen(track_id3->path, 0, TYPE_BITMAP, &user_data);
+        }
+
+        if (hid < 0 && hid != ERR_BUFFER_FULL)
+        {
+            /* no embedded AA or it couldn't be loaded, try other sources */
+            char path[MAX_PATH];
+
+            if (find_albumart(track_id3, path, sizeof(path),
+                &(albumart_slots[i].dim)))
+            {
+                user_data.embedded_albumart = NULL;
+                hid = bufopen(path, 0, TYPE_BITMAP, &user_data);
+            }
+        }
+
+        if (hid == ERR_BUFFER_FULL)
+        {
+            filling = STATE_FULL;
+            logf("buffer is full for now (get album art)");
+        }
+        else if (hid < 0)
+        {
+            logf("Album art loading failed");
+        }
+
+        tracks[track_widx].aa_hid[i] = hid;
+    }
+}
+#endif
+
 /* Second part of the track loading: We now have the metadata available, so we
    can load the codec, the album art and finally the audio data.
    This is called on the audio thread after the buffering thread calls the
@@ -1327,56 +1381,9 @@ static void audio_finish_load_track(void)
             }
         }
     }
+
 #ifdef HAVE_ALBUMART
-    {
-        int i;
-        char aa_path[MAX_PATH];
-
-        FOREACH_ALBUMART(i)
-        {
-            /* albumart_slots may change during a yield of bufopen,
-             * but that's no problem */
-            if (tracks[track_widx].aa_hid[i] >= 0 || !albumart_slots[i].used)
-                continue;
-
-            /* we can only decode jpeg for embedded AA */
-            bool embedded_albumart = 
-                track_id3->embed_albumart && track_id3->albumart.type == AA_TYPE_JPG;
-            /* find_albumart will error out if the wps doesn't have AA */
-            if (embedded_albumart || find_albumart(track_id3, aa_path,
-                                     sizeof(aa_path), &(albumart_slots[i].dim)))
-            {
-                int aa_hid;
-                struct bufopen_bitmap_data user_data = {
-                    .dim = &(albumart_slots[i].dim),
-                    .embedded_albumart = NULL,
-                };
-                if (embedded_albumart)
-                {
-                    user_data.embedded_albumart = &(track_id3->albumart);
-                    aa_hid = bufopen(track_id3->path, 0,
-                                            TYPE_BITMAP, &user_data);
-                }
-                else
-                {
-                    aa_hid = bufopen(aa_path, 0, TYPE_BITMAP,
-                                                &user_data);
-                }
-                if(aa_hid == ERR_BUFFER_FULL)
-                {
-                    filling = STATE_FULL;
-                    logf("buffer is full for now (get album art)");
-                    return;  /* No space for track's album art, not an error */
-                }
-                else if (aa_hid < 0)
-                {
-                    /* another error, ignore AlbumArt */
-                    logf("Album art loading failed");
-                }
-                tracks[track_widx].aa_hid[i] = aa_hid;
-            }
-        }
-    }
+    audio_load_albumart(track_id3);
 #endif
 
     /* Load the codec. */
