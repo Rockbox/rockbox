@@ -363,7 +363,8 @@ int get_mp3file_info(int fd, struct mp3info *info)
     if(header == 0)
         return -1;
 
-    memset(info, 0, sizeof(struct mp3info));
+    memset(info,  0, sizeof(struct mp3info));
+    memset(frame, 0, sizeof(frame));
 #if CONFIG_CODEC==SWCODEC
     /* These two are needed for proper LAME gapless MP3 playback */
     info->enc_delay = -1;
@@ -460,12 +461,12 @@ int get_mp3file_info(int fd, struct mp3info *info)
         }
 #if CONFIG_CODEC==SWCODEC
         i += 21;
-        info->enc_delay = (vbrheader[i] << 4) | (vbrheader[i + 1] >> 4);
-        info->enc_padding = ((vbrheader[i + 1] & 0x0f) << 8) | vbrheader[i + 2];
+        info->enc_delay   = ((int)vbrheader[i  ] << 4) | (vbrheader[i+1] >> 4);
+        info->enc_padding = ((int)vbrheader[i+1] << 8) |  vbrheader[i+2];
         /* TODO: This sanity checking is rather silly, seeing as how the LAME
            header contains a CRC field that can be used to verify integrity. */
-        if (!(info->enc_delay >= 0 && info->enc_delay <= 2880 && 
-            info->enc_padding >= 0 && info->enc_padding <= 2*1152))
+        if (!(info->enc_delay   >= 0 && info->enc_delay   <= 2880 &&
+              info->enc_padding >= 0 && info->enc_padding <= 2*1152))
         {
            /* Invalid data */
            info->enc_delay = -1;

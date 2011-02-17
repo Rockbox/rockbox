@@ -544,8 +544,8 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
 static bool read_mp4_container(int fd, struct mp3entry* id3, 
                                uint32_t size_left)
 {
-    uint32_t size;
-    uint32_t type;
+    uint32_t size    = 0;
+    uint32_t type    = 0;
     uint32_t handler = 0;
     bool rc = true;
     bool done = false;
