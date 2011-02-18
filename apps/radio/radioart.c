@@ -23,13 +23,13 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "system.h"
 #include "settings.h"
 #include "radio.h"
 #include "buffering.h"
 #include "file.h"
 #include "kernel.h"
 #include "string-extra.h"
-#include "misc.h"
 #include "filefuncs.h"
 
 #define MAX_RADIOART_IMAGES 10
