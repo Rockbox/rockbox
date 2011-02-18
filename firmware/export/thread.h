@@ -84,15 +84,19 @@
  * We need more stack when we run under a host
  * maybe more expensive C lib functions?
  *
- * simulator doesn't simulate stack usage anyway but well ... */
-#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SIMULATOR))
-#define DEFAULT_STACK_SIZE 0x400 /* Bytes */
-#else
+ * simulator (possibly) doesn't simulate stack usage anyway but well ... */
+#ifdef HAVE_SIGALTSTACK_THREADS
+#include <signal.h>
+/* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
+#define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x3000) /* Bytes */
+#elif (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(HAVE_WIN32_FIBER_THREADS)
 #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
+#else /* native threads, sdl threads */
+#define DEFAULT_STACK_SIZE 0x400 /* Bytes */
 #endif
 
 
-#if (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_ANDROID))
+#if defined(ASSEMBLER_THREADS)
 /* Need to keep structures inside the header file because debug_menu
  * needs them. */
 #ifdef CPU_COLDFIRE
@@ -112,7 +116,7 @@ struct regs
     uint32_t pr;    /*    32 - Procedure register */
     uint32_t start; /*    36 - Thread start address, or NULL when started */
 };
-#elif defined(CPU_ARM) || (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#elif defined(CPU_ARM)
 struct regs
 {
     uint32_t r[8];  /*  0-28 - Registers r4-r11 */
@@ -147,6 +151,16 @@ struct regs
 };
 #endif /* CONFIG_CPU */
 #elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#ifndef HAVE_SDL_THREADS
+struct regs
+{
+    void (*start)(void); /* thread's entry point, or NULL when started */
+    void* uc;            /* host thread handle */
+    uintptr_t sp;        /* Stack pointer, unused */
+    size_t stack_size;   /* stack size, not always used */
+    uintptr_t stack;     /* pointer to start of the stack buffer */
+};
+#else /* SDL threads */
 struct regs
 {
     void *t;             /* OS thread */
@@ -154,6 +168,7 @@ struct regs
     void *s;             /* Semaphore for blocking and wakeup */
     void (*start)(void); /* Start function */
 };
+#endif
 #endif /* PLATFORM_NATIVE */
 
 /* NOTE: The use of the word "queue" may also refer to a linked list of

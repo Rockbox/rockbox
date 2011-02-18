@@ -184,7 +184,9 @@ static int sdl_event_thread(void * param)
 
     /* Order here is relevent to prevent deadlocks and use of destroyed
        sync primitives by kernel threads */
-    sim_thread_shutdown();
+#ifdef HAVE_SDL_THREADS
+    sim_thread_shutdown(); /* not needed for native threads */
+#endif
     sim_kernel_shutdown();
 
     return 0;
@@ -199,9 +201,13 @@ void sim_do_exit(void)
     exit(EXIT_SUCCESS);
 }
 
+uintptr_t *stackbegin;
+uintptr_t *stackend;
 void system_init(void)
 {
     SDL_sem *s;
+    /* fake stack, OS manages size (and growth) */
+    stackbegin = stackend = (uintptr_t*)&s;
 
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO)
     /* Make glib thread safe */
@@ -219,21 +225,24 @@ void system_init(void)
     /* wait for sdl_event_thread to run so that it can initialize the surfaces
      * and video subsystem needed for SDL events */
     SDL_SemWait(s);
-
     /* cleanup */
     SDL_DestroySemaphore(s);
 }
 
-void system_exception_wait(void)
-{
-    sim_thread_exception_wait();
-}
 
 void system_reboot(void)
 {
+#ifdef HAVE_SDL_THREADS
     sim_thread_exception_wait();
+#else
+    sim_do_exit();
+#endif
 }
 
+void system_exception_wait(void)
+{
+    system_reboot();
+}
 
 void sys_handle_argv(int argc, char *argv[])
 {

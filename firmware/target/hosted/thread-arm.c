@@ -22,7 +22,6 @@
  *
  ****************************************************************************/
 
-#include <jni.h>
 #include <system.h>
 /*---------------------------------------------------------------------------
  * Start the thread running and terminate it if it returns
@@ -84,14 +83,15 @@ static inline void load_context(const void* addr)
  * this core sleep suspends the OS thread rockbox runs under, which greatly
  * reduces cpu usage (~100% to <10%)
  *
- * it returns when the RockboxTimer notified us, i.e. at each tick
- * (after it called the tick tasks)
+ * it returns when when the tick timer is called, other interrupt-like
+ * events occur
  *
- * wait_for_interrupt is implemented in kernel-android.c
+ * wait_for_interrupt is implemented in kernel-<platform>.c
  **/
 
 static inline void core_sleep(void)
 {
+    enable_irq();
     wait_for_interrupt();
 }
 

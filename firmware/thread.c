@@ -174,10 +174,13 @@ void switch_thread(void)
         __attribute__((noinline));
 
 /****************************************************************************
- * Processor-specific section - include necessary core support
+ * Processor/OS-specific section - include necessary core support
  */
-#if defined(ANDROID)
-#include "thread-android-arm.c"
+
+#if defined(HAVE_WIN32_FIBER_THREADS)
+#include "thread-win32.c"
+#elif defined(HAVE_SIGALTSTACK_THREADS)
+#include "thread-unix.c"
 #elif defined(CPU_ARM)
 #include "thread-arm.c"
 #if defined (CPU_PP)
@@ -2308,6 +2311,9 @@ void init_threads(void)
         thread_exit();
 #endif /* NUM_CORES */
     }
+#ifdef INIT_MAIN_THREAD
+    init_main_thread(&thread->context);
+#endif
 }
 
 /* Shared stack scan helper for thread_stack_usage and idle_stack_usage */

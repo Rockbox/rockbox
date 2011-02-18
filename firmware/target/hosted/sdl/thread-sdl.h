@@ -22,11 +22,13 @@
 #ifndef __THREADSDL_H__
 #define __THREADSDL_H__
 
+#ifdef HAVE_SDL_THREADS
 /* extra thread functions that only apply when running on hosting platforms */
 void sim_thread_lock(void *me);
 void * sim_thread_unlock(void);
 void sim_thread_exception_wait(void);
 void sim_thread_shutdown(void); /* Shut down all kernel threads gracefully */
+#endif
 
 #endif /* #ifndef __THREADSDL_H__ */
 

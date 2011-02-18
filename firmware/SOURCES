@@ -37,7 +37,11 @@ target/hosted/sdl/lcd-remote-bitmap.c
 #endif
 target/hosted/sdl/lcd-sdl.c
 target/hosted/sdl/system-sdl.c
+#ifdef HAVE_SDL_THREADS
 target/hosted/sdl/thread-sdl.c
+#else
+thread.c
+#endif
 target/hosted/sdl/timer-sdl.c
 #ifdef HAVE_TOUCHSCREEN
 target/hosted/sdl/key_to_touch-sdl.c
