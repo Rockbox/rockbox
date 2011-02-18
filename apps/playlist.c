@@ -1666,12 +1666,13 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
         i++;
 
     /* Now work back killing white space */
-    while((src[i-1] == ' ') ||
-          (src[i-1] == '\t'))
+    while((i > 0) &&
+          ((src[i-1] == ' ') ||
+          (src[i-1] == '\t')))
         i--;
 
     src[i]=0;
-      
+
     /* replace backslashes with forward slashes */
     for ( j=0; j<i; j++ )
         if ( src[j] == '\\' )
