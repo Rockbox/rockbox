@@ -1659,10 +1659,11 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
     int j;
     char *temp_ptr;
 
-    /* Zero-terminate the file name */
+    /* Look for the end of the string */
     while((i < max) &&
           (src[i] != '\n') &&
-          (src[i] != '\r'))
+          (src[i] != '\r') &&
+          (src[i] != '\0'))
         i++;
 
     /* Now work back killing white space */
@@ -1671,6 +1672,7 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
           (src[i-1] == '\t')))
         i--;
 
+    /* Zero-terminate the file name */
     src[i]=0;
 
     /* replace backslashes with forward slashes */
