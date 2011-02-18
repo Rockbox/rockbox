@@ -2385,7 +2385,7 @@ void thread_get_name(char *buffer, int size,
         const char *fmt = "%s";
         if (name == NULL IF_COP(|| name == THREAD_DESTRUCT) || *name == '\0')
         {
-            name = (const char *)(unsigned int)thread->id;
+            name = (const char *)(uintptr_t)thread->id;
             fmt = "%04lX";
         }
         snprintf(buffer, size, fmt, name);

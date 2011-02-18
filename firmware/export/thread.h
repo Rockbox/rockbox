@@ -150,7 +150,7 @@ struct regs
     uint32_t start; /*   44 - Thread start address, or NULL when started */
 };
 #endif /* CONFIG_CPU */
-#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED) || defined(__PCTOOL__)
 #ifndef HAVE_SDL_THREADS
 struct regs
 {

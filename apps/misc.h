@@ -24,7 +24,6 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include "config.h"
-#include "system.h"
 #include "screen_access.h"
 
 extern const unsigned char * const byte_units[];

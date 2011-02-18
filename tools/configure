@@ -170,7 +170,9 @@ check_sigaltstack() {
 #include <signal.h>
 int main(int argc, char **argv)
 {
+#ifndef NULL
   #define NULL (void*)0
+#endif
   sigaltstack(NULL, NULL);
   return 0;
 }
