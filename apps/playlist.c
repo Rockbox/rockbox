@@ -1660,9 +1660,9 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
     char *temp_ptr;
 
     /* Zero-terminate the file name */
-    while((src[i] != '\n') &&
-          (src[i] != '\r') &&
-          (i < max))
+    while((i < max) &&
+          (src[i] != '\n') &&
+          (src[i] != '\r'))
         i++;
 
     /* Now work back killing white space */
