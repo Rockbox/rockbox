@@ -95,7 +95,7 @@ public class RockboxActivity extends Activity
     private void setServiceActivity(boolean set)
     {
         if (rbservice != null)
-            rbservice.set_activity(this);
+            rbservice.set_activity(set ? this : null);
     }
 
     private void attachFramebuffer()
