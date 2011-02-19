@@ -80,6 +80,7 @@ public class RockboxService extends Service
     public void onCreate()
     {
         instance = this;
+        mMediaButtonReceiver = new MediaButtonReceiver(this);
     }
     
     public static RockboxService get_instance()
@@ -145,6 +146,9 @@ public class RockboxService extends Service
                 e.printStackTrace();
             }
         }
+        /* (Re-)attach the media button receiver, in case it has been lost */
+        mMediaButtonReceiver.register();
+
         if (resultReceiver != null)
             resultReceiver.send(RESULT_SERVICE_RUNNING, null);
     }
@@ -175,8 +179,6 @@ public class RockboxService extends Service
         fb = new RockboxFramebuffer(this);
         if (resultReceiver != null)
             resultReceiver.send(RESULT_FB_INITIALIZED, null);
-        mMediaButtonReceiver = new MediaButtonReceiver(this);
-        mMediaButtonReceiver.register();
         Thread rb = new Thread(new Runnable()
         {
             public void run()
@@ -325,6 +327,7 @@ public class RockboxService extends Service
     {
         super.onDestroy();
         mMediaButtonReceiver.unregister();
+        mMediaButtonReceiver = null;
         /* Make sure our notification is gone. */
         stopForeground();
     }
