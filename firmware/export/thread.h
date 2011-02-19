@@ -125,22 +125,6 @@ struct regs
     uint32_t start; /*    40 - Thread start address, or NULL when started */
 };
 
-#ifdef CPU_PP
-#ifdef HAVE_CORELOCK_OBJECT
-/* No reliable atomic instruction available - use Peterson's algorithm */
-struct corelock
-{
-    volatile unsigned char myl[NUM_CORES];
-    volatile unsigned char turn;
-} __attribute__((packed));
-
-/* Too big to inline everywhere */
-void corelock_init(struct corelock *cl);
-void corelock_lock(struct corelock *cl);
-int corelock_try_lock(struct corelock *cl);
-void corelock_unlock(struct corelock *cl);
-#endif /* HAVE_CORELOCK_OBJECT */
-#endif /* CPU_PP */
 #elif defined(CPU_MIPS)
 struct regs
 {
@@ -170,6 +154,23 @@ struct regs
 };
 #endif
 #endif /* PLATFORM_NATIVE */
+
+#ifdef CPU_PP
+#ifdef HAVE_CORELOCK_OBJECT
+/* No reliable atomic instruction available - use Peterson's algorithm */
+struct corelock
+{
+    volatile unsigned char myl[NUM_CORES];
+    volatile unsigned char turn;
+} __attribute__((packed));
+
+/* Too big to inline everywhere */
+void corelock_init(struct corelock *cl);
+void corelock_lock(struct corelock *cl);
+int corelock_try_lock(struct corelock *cl);
+void corelock_unlock(struct corelock *cl);
+#endif /* HAVE_CORELOCK_OBJECT */
+#endif /* CPU_PP */
 
 /* NOTE: The use of the word "queue" may also refer to a linked list of
    threads being maintained that are normally dealt with in FIFO order
@@ -266,7 +267,7 @@ struct thread_entry
                                   object where thread is blocked - used
                                   for implicit unblock and explicit wake
                                   states: STATE_BLOCKED/STATE_BLOCKED_W_TMO  */
-#if NUM_CORES > 1
+#ifdef HAVE_CORELOCK_OBJECT
     struct corelock *obj_cl;   /* Object corelock where thead is blocked -
                                   states: STATE_BLOCKED/STATE_BLOCKED_W_TMO */
     struct corelock waiter_cl; /* Corelock for thread_wait */
@@ -323,7 +324,7 @@ struct thread_entry
 /* Specify current thread in a function taking an ID. */
 #define THREAD_ID_CURRENT ((unsigned int)-1)
 
-#if NUM_CORES > 1
+#ifdef HAVE_CORELOCK_OBJECT
 /* Operations to be performed just before stopping a thread and starting
    a new one if specified before calling switch_thread */
 enum
@@ -356,7 +357,7 @@ struct core_entry
                                          threads */
 #endif
     long next_tmo_check;           /* soonest time to check tmo threads */
-#if NUM_CORES > 1
+#ifdef HAVE_CORELOCK_OBJECT
     struct thread_blk_ops blk_ops; /* operations to perform when
                                       blocking a thread */
     struct corelock rtr_cl;        /* Lock for rtr list */

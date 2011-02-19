@@ -967,7 +967,7 @@ void check_tmo_threads(void)
              * life again. */
             if (state == STATE_BLOCKED_W_TMO)
             {
-#if NUM_CORES > 1
+#ifdef HAVE_CORELOCK_OBJECT
                 /* Lock the waiting thread's kernel object */
                 struct corelock *ocl = curr->obj_cl;
 
@@ -1782,7 +1782,7 @@ void thread_exit(void)
  */
 void remove_thread(unsigned int thread_id)
 {
-#if NUM_CORES > 1
+#ifdef HAVE_CORELOCK_OBJECT
     /* core is not constant here because of core switching */
     unsigned int core = CURRENT_CORE;
     unsigned int old_core = NUM_CORES;
