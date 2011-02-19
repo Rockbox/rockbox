@@ -483,10 +483,10 @@
     *: "<Don't Resume>"
   </source>
   <dest>
-    *: "<Neobnovovat>"
+    *: "<Nepokračovat>"
   </dest>
   <voice>
-    *: "neobnovovat"
+    *: "Nepokračovat"
   </voice>
 </phrase>
 <phrase>
@@ -1979,11 +1979,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pauza a obnovení"
+    headphone_detection: "Pauza a pokračování v přehrávání"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pauza a obnovení"
+    headphone_detection: "Pauza a pokračování v přehrávání"
   </voice>
 </phrase>
 <phrase>
@@ -1996,11 +1996,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Délka přetočení"
+    headphone_detection: "Délka přetočení zpět"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Délka přetočení"
+    headphone_detection: "Délka přetočení zpět"
   </voice>
 </phrase>
 <phrase>
@@ -2013,11 +2013,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Zrušit obnovení přehrávání při zapnutí pokud jsou sluchátka odpojena"
+    headphone_detection: "Zrušit pokračování v přehrávání po zapnutí pokud jsou sluchátka odpojena"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Zrušit obnovení přehrávání při zapnutí pokud jsou sluchátka odpojena"
+    headphone_detection: "Zrušit pokračování v přehrávání po zapnutí pokud jsou sluchátka odpojena"
   </voice>
 </phrase>
 <phrase>
@@ -10410,10 +10410,10 @@
     *: "Say File Type"
   </source>
   <dest>
-    *: "Vyslovit typ souboru"
+    *: "Vyslovovat typ souboru"
   </dest>
   <voice>
-    *: "Vyslovit typ souboru"
+    *: "Vyslovovat typ souboru"
   </voice>
 </phrase>
 <phrase>
@@ -12540,10 +12540,10 @@
     *: "Start File Browser Here"
   </source>
   <dest>
-    *: "Začít prohlížení souborů zde"
+    *: "Otevírat prohlížení souborů zde"
   </dest>
   <voice>
-    *: "Začít prohlížení souborů zde"
+    *: "Otevírat prohlížení souborů zde"
   </voice>
 </phrase>
 <phrase>
@@ -12554,10 +12554,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Začít prohlížení souborů na rootu"
+    *: "Nastavit prohlížení souborů na root"
   </dest>
   <voice>
-    *: "Začít prohlížení souborů na růtu"
+    *: "Nastavit prohlížení souborů na růt"
   </voice>
 </phrase>
 <phrase>
@@ -12627,10 +12627,10 @@
     *: "Automatic resume"
   </source>
   <dest>
-    *: "Automatické obnovování"
+    *: "Pokračování přehr. u všech skladeb"
   </dest>
   <voice>
-    *: "Automatycké obnovování"
+    *: "Pokračování přehrávání u všech skladeb"
   </voice>
 </phrase>
 <phrase>
@@ -12641,10 +12641,10 @@
     *: "Resume on automatic track change"
   </source>
   <dest>
-    *: "Obnovení při změně stopy"
+    *: "Při automatické změně skladby"
   </dest>
   <voice>
-    *: "Obnovení při změně stopy"
+    *: "Při automatické změně skladby"
   </voice>
 </phrase>
 <phrase>
