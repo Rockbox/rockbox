@@ -25,7 +25,7 @@ public class RunForegroundManager
     private IRunForeground api;
     private Service mCurrentService;
 
-    public RunForegroundManager(Service service) throws Exception
+    public RunForegroundManager(Service service)
     {
         mCurrentService = service;
         mNM = (NotificationManager)

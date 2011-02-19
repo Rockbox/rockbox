@@ -69,18 +69,21 @@ public class RockboxService extends Service
     @SuppressWarnings("unused")
     private int battery_level;
     private ResultReceiver resultReceiver;
+    final private Object lock = new Object();
 
     public static final int RESULT_INVOKING_MAIN = 0;
     public static final int RESULT_LIB_LOAD_PROGRESS = 1;
     public static final int RESULT_FB_INITIALIZED = 2;
     public static final int RESULT_SERVICE_RUNNING = 3;
     public static final int RESULT_ERROR_OCCURED = 4;
+    public static final int RESULT_LIB_LOADED = 5;
 
     @Override
     public void onCreate()
     {
         instance = this;
         mMediaButtonReceiver = new MediaButtonReceiver(this);
+        fg_runner = new RunForegroundManager(this);
     }
     
     public static RockboxService get_instance()
@@ -108,9 +111,38 @@ public class RockboxService extends Service
 
         if (intent != null && intent.hasExtra("callback"))
             resultReceiver = (ResultReceiver) intent.getParcelableExtra("callback");
+
+        /* Display a notification about us starting.  
+         * We put an icon in the status bar. */
+        if (fg_runner == null)
+        {   /* needs to be initialized before main() runs */
+            try {
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         if (!rockbox_running)
-            startservice();
-        
+        {
+            synchronized(lock)
+            {
+                startservice();
+                while(true) {
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
+                    break;
+                }
+                fb = new RockboxFramebuffer(this);
+                if (resultReceiver != null)
+                    resultReceiver.send(RESULT_FB_INITIALIZED, null);
+            }
+        }
+        if (resultReceiver != null)
+            resultReceiver.send(RESULT_LIB_LOADED, null);
+
         if (intent != null && intent.getAction() != null)
         {
             Log.d("RockboxService", intent.getAction());
@@ -136,16 +168,6 @@ public class RockboxService extends Service
             }
         }
 
-        /* Display a notification about us starting.  
-         * We put an icon in the status bar. */
-        if (fg_runner == null)
-        {
-            try {
-                fg_runner = new RunForegroundManager(this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         /* (Re-)attach the media button receiver, in case it has been lost */
         mMediaButtonReceiver.register();
 
@@ -176,9 +198,6 @@ public class RockboxService extends Service
     private void startservice() 
     {
         final int BUFFER = 8*1024;
-        fb = new RockboxFramebuffer(this);
-        if (resultReceiver != null)
-            resultReceiver.send(RESULT_FB_INITIALIZED, null);
         Thread rb = new Thread(new Runnable()
         {
             public void run()
@@ -249,8 +268,11 @@ public class RockboxService extends Service
     		            }
     		        }
                 }
-
-                System.loadLibrary("rockbox");
+                
+                synchronized (lock) {
+                    System.loadLibrary("rockbox");
+                    lock.notify();
+                }
 
 		        rockbox_running = true;
 		        if (resultReceiver != null)

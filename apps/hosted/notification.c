@@ -83,6 +83,11 @@ void notification_init(void)
                     "fg_runner", "Lorg/rockbox/Helper/RunForegroundManager;");
     NotificationManager_instance = e->GetObjectField(env_ptr,
                                                 RockboxService_instance, nNM);
+    if (NotificationManager_instance == NULL)
+    {
+        DEBUGF("Failed to get RunForegroundManager instance. Performance will be bad");
+        return;
+    }
 
     jclass class = e->GetObjectClass(env_ptr, NotificationManager_instance);
     updateNotification = e->GetMethodID(env_ptr, class, "updateNotification",
