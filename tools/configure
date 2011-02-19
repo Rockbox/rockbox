@@ -521,6 +521,7 @@ maemocc () {
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
  SHARED_FLAG="-shared"
  endian="little"
+ thread_support="HAVE_SIGALTSTACK_THREADS"
 
  is_n900=0
  # Determine maemo version
