@@ -21,10 +21,12 @@
 
 
 #include <jni.h>
+#include <string.h>
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
 #include "lcd.h"
+#include "button.h"
 
 extern JNIEnv *env_ptr;
 extern jclass  RockboxService_class;
@@ -32,57 +34,48 @@ extern jobject RockboxService_instance;
 
 static jclass RockboxFramebuffer_class;
 static jobject RockboxFramebuffer_instance;
-static jmethodID postInvalidate1;
-static jmethodID postInvalidate2;
+static jmethodID java_lcd_update;
+static jmethodID java_lcd_update_rect;
 
-static bool display_on;
 static int dpi;
 static int scroll_threshold;
-static struct wakeup lcd_wakeup;
-static struct mutex lcd_mtx;
+static bool display_on;
 
 void lcd_init_device(void)
 {
     JNIEnv e = *env_ptr;
-    wakeup_init(&lcd_wakeup);
-    mutex_init(&lcd_mtx);
-    RockboxFramebuffer_class = e->FindClass(env_ptr,
-                                            "org/rockbox/RockboxFramebuffer");
-    /* instantiate a RockboxFramebuffer instance
-     * 
-     * Pass lcd width and height and our framebuffer so the java layer
-     * can create a Bitmap which directly maps to it
-     **/
+    /* get existing instance from the Service */
+    jmethodID get_fb     = e->GetMethodID(env_ptr, RockboxService_class, "get_fb",
+                                          "()Lorg/rockbox/RockboxFramebuffer;");
+    RockboxFramebuffer_instance = e->CallObjectMethod(env_ptr,
+                                                     RockboxService_instance,
+                                                     get_fb);
+    RockboxFramebuffer_class = (*env_ptr)->GetObjectClass(env_ptr,
+                                                          RockboxFramebuffer_instance);
 
-    /* map the framebuffer to a ByteBuffer, this way lcd updates will
-     * be directly feched from the framebuffer */
+    /* Get init function and set up what's left from the constructor */
+    jmethodID java_lcd_init = (*env_ptr)->GetMethodID(env_ptr,
+                                                   RockboxFramebuffer_class,
+                                                   "java_lcd_init",
+                                                   "(IILjava/nio/ByteBuffer;)V");
+
     jobject buf          = e->NewDirectByteBuffer(env_ptr,
                                                   lcd_framebuffer,
                                                   (jlong)sizeof(lcd_framebuffer));
 
-    jmethodID constructor = e->GetMethodID(env_ptr,
-                                         RockboxFramebuffer_class,
-                                         "<init>",
-                                         "(Landroid/content/Context;" /* Service */
-                                         "II"             /* lcd width/height */
-                                         "Ljava/nio/ByteBuffer;)V"); /* ByteBuffer */
-
-    RockboxFramebuffer_instance = e->NewObject(env_ptr,
-                                               RockboxFramebuffer_class,
-                                               constructor,
-                                               RockboxService_instance,
+    e->CallVoidMethod(env_ptr, RockboxFramebuffer_instance, java_lcd_init,
                                                (jint)LCD_WIDTH,
                                                (jint)LCD_HEIGHT,
                                                buf);
 
     /* cache update functions */
-    postInvalidate1      = (*env_ptr)->GetMethodID(env_ptr,
+    java_lcd_update  = (*env_ptr)->GetMethodID(env_ptr,
                                                    RockboxFramebuffer_class,
-                                                   "postInvalidate",
+                                                   "java_lcd_update",
                                                    "()V");
-    postInvalidate2 = (*env_ptr)->GetMethodID(env_ptr,
+    java_lcd_update_rect = (*env_ptr)->GetMethodID(env_ptr,
                                                    RockboxFramebuffer_class,
-                                                   "postInvalidate",
+                                                   "java_lcd_update_rect",
                                                    "(IIII)V");
 
     jmethodID get_dpi    = e->GetMethodID(env_ptr,
@@ -98,49 +91,54 @@ void lcd_init_device(void)
                                         get_dpi);
     scroll_threshold = e->CallIntMethod(env_ptr, RockboxFramebuffer_instance,
                                         get_scroll_threshold);
-    display_on = true;
+    /* must not draw until surface is created */
+    display_on = false;
 }
 
-/* the update mechanism is asynchronous since
- * onDraw() must be called from the UI thread
- * 
- * The Rockbox thread calling lcd_update() has to wait
- * for the update to complete, so that it's synchronous,
- * and we need to notify it (we could wait in the java layer, but
- * that'd block the other Rockbox threads too)
- * 
- * That should give more smoonth animations
- */
 void lcd_update(void)
 {
-    /* tell the system we're ready for drawing */
     if (display_on)
-    {
-        mutex_lock(&lcd_mtx);
-        (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance, postInvalidate1);
-        wakeup_wait(&lcd_wakeup, TIMEOUT_BLOCK);
-        mutex_unlock(&lcd_mtx);
-    }
+        (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
+                                   java_lcd_update);
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
     if (display_on)
-    {
-        mutex_lock(&lcd_mtx);
-        (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance, postInvalidate2,
-                                  (jint)x, (jint)y, (jint)x+width, (jint)y+height);
-        wakeup_wait(&lcd_wakeup, TIMEOUT_BLOCK);
-        mutex_unlock(&lcd_mtx);
-    }
+        (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
+                                   java_lcd_update_rect, x, y, width, height);
 }
 
+/*
+ * this is called when the surface is created, which called is everytime
+ * the activity is brought in front and the RockboxFramebuffer gains focus
+ *
+ * Note this is considered interrupt context
+ */
 JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxFramebuffer_post_1update_1done(JNIEnv *e, jobject this)
+Java_org_rockbox_RockboxFramebuffer_surfaceCreated(JNIEnv *e, jobject this,
+                                                     jobject surfaceholder)
 {
-    (void)e;
-    (void)this;
-    wakeup_signal(&lcd_wakeup);
+    (void)e; (void)this; (void)surfaceholder;
+
+    display_on = true;
+    send_event(LCD_EVENT_ACTIVATION, NULL);
+    /* Force an update, since the newly created surface is initially black
+     * waiting for the next normal update results in a longish black screen */
+    queue_post(&button_queue, BUTTON_FORCE_REDRAW, 0);
+}
+
+/*
+ * the surface is destroyed everytime the RockboxFramebuffer loses focus and
+ * goes invisible
+ */
+JNIEXPORT void JNICALL
+Java_org_rockbox_RockboxFramebuffer_surfaceDestroyed(JNIEnv *e, jobject this,
+                                                    jobject surfaceholder)
+{
+    (void)e; (void)this; (void)surfaceholder;
+
+    display_on = false;
 }
 
 bool lcd_active(void)
@@ -158,26 +156,6 @@ int touchscreen_get_scroll_threshold(void)
     return scroll_threshold;
 }
 
-/*
- * (un)block lcd updates.
- *
- * Notice: This is called from the activity thread, so take it
- * as interrupt context and take care what the event callback does
- * (it shouldn't block in particular
- *
- * the 1s are needed due to strange naming conventions...
- **/
-JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxFramebuffer_set_1lcd_1active(JNIEnv *e,
-                                                     jobject this,
-                                                     jint active)
-{
-    (void)e;
-    (void)this;
-    display_on = active != 0;
-    if (active)
-        send_event(LCD_EVENT_ACTIVATION, NULL);
-}
 /* below is a plain copy from lcd-sdl.c */
 
 /**

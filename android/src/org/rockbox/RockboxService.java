@@ -31,6 +31,7 @@ import java.util.TimerTask;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.rockbox.Helper.MediaButtonReceiver;
 import org.rockbox.Helper.RunForegroundManager;
 
 import android.app.Activity;
@@ -59,20 +60,21 @@ public class RockboxService extends Service
     
     /* locals needed for the c code and rockbox state */
     private RockboxFramebuffer fb = null;
-    private boolean mRockboxRunning = false;
-    private volatile boolean rbLibLoaded;
+    private volatile boolean rockbox_running;
     private Activity current_activity = null;
     private IntentFilter itf;
     private BroadcastReceiver batt_monitor;
     private RunForegroundManager fg_runner;
+    private MediaButtonReceiver mMediaButtonReceiver;
     @SuppressWarnings("unused")
     private int battery_level;
     private ResultReceiver resultReceiver;
 
-    public static final int RESULT_LIB_LOADED = 0;
+    public static final int RESULT_INVOKING_MAIN = 0;
     public static final int RESULT_LIB_LOAD_PROGRESS = 1;
     public static final int RESULT_FB_INITIALIZED = 2;
-    public static final int RESULT_ERROR_OCCURED = 3;
+    public static final int RESULT_SERVICE_RUNNING = 3;
+    public static final int RESULT_ERROR_OCCURED = 4;
 
     @Override
     public void onCreate()
@@ -88,14 +90,6 @@ public class RockboxService extends Service
     public RockboxFramebuffer get_fb()
     {
     	return fb;
-    }
-    /* framebuffer is initialised by the native code(!) so this is needed */
-    public void set_fb(RockboxFramebuffer newfb)
-    {
-    	fb = newfb;
-        mRockboxRunning = true;
-        if (resultReceiver != null)
-            resultReceiver.send(RESULT_FB_INITIALIZED, null);
     }
     
     public Activity get_activity()
@@ -113,7 +107,7 @@ public class RockboxService extends Service
 
         if (intent != null && intent.hasExtra("callback"))
             resultReceiver = (ResultReceiver) intent.getParcelableExtra("callback");
-        if (!rbLibLoaded)
+        if (!rockbox_running)
             startservice();
         
         if (intent != null && intent.getAction() != null)
@@ -151,6 +145,8 @@ public class RockboxService extends Service
                 e.printStackTrace();
             }
         }
+        if (resultReceiver != null)
+            resultReceiver.send(RESULT_SERVICE_RUNNING, null);
     }
 
     private void LOG(CharSequence text)
@@ -176,6 +172,11 @@ public class RockboxService extends Service
     private void startservice() 
     {
         final int BUFFER = 8*1024;
+        fb = new RockboxFramebuffer(this);
+        if (resultReceiver != null)
+            resultReceiver.send(RESULT_FB_INITIALIZED, null);
+        mMediaButtonReceiver = new MediaButtonReceiver(this);
+        mMediaButtonReceiver.register();
         Thread rb = new Thread(new Runnable()
         {
             public void run()
@@ -247,10 +248,11 @@ public class RockboxService extends Service
     		        }
                 }
 
-		        System.loadLibrary("rockbox");
-		        rbLibLoaded = true;
+                System.loadLibrary("rockbox");
+
+		        rockbox_running = true;
 		        if (resultReceiver != null)
-		            resultReceiver.send(RESULT_LIB_LOADED, null);
+		            resultReceiver.send(RESULT_INVOKING_MAIN, null);
 
                 main();
 		        throw new IllegalStateException("native main() returned!");
@@ -259,15 +261,8 @@ public class RockboxService extends Service
         rb.setDaemon(false);
         rb.start();
     }
+
     private native void main();
-    
-    /* returns true once rockbox is up and running.
-     * This is considered done once the framebuffer is initialised
-     */
-    public boolean isRockboxRunning()
-    {
-    	return mRockboxRunning;
-    }
 
     @Override
     public IBinder onBind(Intent intent) 
@@ -329,7 +324,7 @@ public class RockboxService extends Service
     public void onDestroy() 
     {
         super.onDestroy();
-        fb.destroy();
+        mMediaButtonReceiver.unregister();
         /* Make sure our notification is gone. */
         stopForeground();
     }

@@ -66,10 +66,9 @@ public class RockboxActivity extends Activity
             protected void onReceiveResult(final int resultCode, final Bundle resultData)
             {
                 switch (resultCode) {
-                    case RockboxService.RESULT_LIB_LOADED:
-                        rbservice = RockboxService.get_instance();
+                    case RockboxService.RESULT_INVOKING_MAIN:
                         if (loadingdialog != null)
-                            loadingdialog.setIndeterminate(true);
+                            loadingdialog.dismiss();
                         break;
                     case RockboxService.RESULT_LIB_LOAD_PROGRESS:
                         if (loadingdialog == null)
@@ -79,10 +78,10 @@ public class RockboxActivity extends Activity
                         loadingdialog.setMax(resultData.getInt("max", 100));
                         loadingdialog.setProgress(resultData.getInt("value", 0));
                         break;
-                    case RockboxService.RESULT_FB_INITIALIZED:
+                    case RockboxService.RESULT_SERVICE_RUNNING:
+                        rbservice = RockboxService.get_instance();
+                        setServiceActivity(true);
                         attachFramebuffer();
-                        if (loadingdialog != null)
-                            loadingdialog.dismiss();
                         break;
                     case RockboxService.RESULT_ERROR_OCCURED:
                         Toast.makeText(RockboxActivity.this, resultData.getString("error"), Toast.LENGTH_LONG);
@@ -93,17 +92,17 @@ public class RockboxActivity extends Activity
         startService(intent);
     }
 
-    private boolean isRockboxRunning()
+    private void setServiceActivity(boolean set)
     {
-        if (rbservice == null)
-            rbservice = RockboxService.get_instance();
-        return (rbservice!= null && rbservice.isRockboxRunning() == true);    	
+        if (rbservice != null)
+            rbservice.set_activity(this);
     }
 
     private void attachFramebuffer()
     {
-        View rbFramebuffer = rbservice.get_fb();
+        View rbFramebuffer = null;
         try {
+            rbFramebuffer = rbservice.get_fb();
             setContentView(rbFramebuffer);
         } catch (IllegalStateException e) {
             /* we are already using the View,
@@ -111,17 +110,17 @@ public class RockboxActivity extends Activity
             ViewGroup g = (ViewGroup) rbFramebuffer.getParent();
             g.removeView(rbFramebuffer);
             setContentView(rbFramebuffer);
-        } finally {
-            rbFramebuffer.requestFocus();
-            rbservice.set_activity(this);
+        } catch (NullPointerException e) {
+            return;
         }
+        rbFramebuffer.requestFocus();
     }
 
     public void onResume()
     {
         super.onResume();
-        if (isRockboxRunning())
-            attachFramebuffer();
+        setVisible(true);
+        attachFramebuffer();
     }
     
     /* this is also called when the backlight goes off,
@@ -131,27 +130,23 @@ public class RockboxActivity extends Activity
     protected void onPause() 
     {
         super.onPause();
-        if (rbservice != null)
-        {
-        	rbservice.set_activity(null);
-        	rbservice.get_fb().dispatchWindowVisibilityChanged(View.INVISIBLE);
-        }
+        /* this will cause the framebuffer's Surface to be destroyed, enabling
+         * us to disable drawing */
+        setVisible(false);
     }
     
     @Override
     protected void onStop() 
     {
         super.onStop();
-        if (rbservice != null)
-        	rbservice.set_activity(null);
+        setServiceActivity(false);
     }
     
     @Override
     protected void onDestroy() 
     {
         super.onDestroy();
-        if (rbservice != null)
-        	rbservice.set_activity(null);
+        setServiceActivity(false);
     }
 
     private void LOG(CharSequence text)

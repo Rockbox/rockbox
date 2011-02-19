@@ -58,6 +58,8 @@ void android_ignore_back_button(bool yes);
 #define BUTTON_BOTTOMMIDDLE 0x00080000
 #define BUTTON_BOTTOMRIGHT  0x00100000
 
+#define BUTTON_FORCE_REDRAW 0x00200000
+
 /* No remote */
 #define BUTTON_REMOTE 0
                 
