@@ -25,6 +25,7 @@
 #include "appevents.h"
 #include "metadata.h"
 #include "misc.h"
+#include "debug.h"
 
 extern JNIEnv *env_ptr;
 extern jclass RockboxService_class;
