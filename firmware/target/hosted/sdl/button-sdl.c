@@ -68,6 +68,9 @@ struct event_queue button_queue;
 static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
 
 int sdl_app_has_input_focus = 1;
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+static int n900_updown_key_pressed = 0;
+#endif
 
 #ifdef HAS_BUTTON_HOLD
 bool hold_button_state = false;
@@ -230,8 +233,19 @@ static bool event_handler(SDL_Event *event)
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
         /* N900 with shared up/down cursor mapping. Seen on the German,
            Finnish, Italian, French and Russian version. Probably more. */
-        if (event->key.keysym.mod & KMOD_MODE)
+        if (event->key.keysym.mod & KMOD_MODE || n900_updown_key_pressed)
         {
+            /* Prevent stuck up/down keys: If you release the ALT key before the cursor key,
+               rockbox will see a KEYUP event for left/right instead of up/down and
+               the previously pressed up/down key would stay active. */
+            if (ev_key == SDLK_LEFT || ev_key == SDLK_RIGHT)
+            {
+                if (event->type == SDL_KEYDOWN)
+                    n900_updown_key_pressed = 1;
+                else
+                    n900_updown_key_pressed = 0;
+            }
+
             if (ev_key == SDLK_LEFT)
                 ev_key = SDLK_UP;
             else if (ev_key == SDLK_RIGHT)
