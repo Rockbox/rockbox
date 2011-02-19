@@ -373,6 +373,7 @@ EOF
  if [ -z "$ARG_THREAD_SUPPORT" ] || [ "$ARG_THREAD_SUPPORT" = "0" ]; then
    if [ "$sigaltstack" = "0" ]; then
      thread_support="HAVE_SIGALTSTACK_THREADS"
+     LDOPTS="$LDOPTS -lpthread" # pthread needed
      echo "Selected sigaltstack threads"
    elif [ "$fibers" = "0" ]; then
      thread_support="HAVE_WIN32_FIBER_THREADS"
