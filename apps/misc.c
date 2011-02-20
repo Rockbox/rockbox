@@ -894,16 +894,20 @@ char* skip_whitespace(char* const str)
  */
 void format_time(char* buf, int buf_size, long t)
 {
-    if ( t < 3600000 ) 
+    int const time = ABS(t / 1000);
+    int const hours = time / 3600;
+    int const minutes = time / 60 - hours * 60;
+    int const seconds = time % 60;
+    const char * const sign = &"-"[t < 0 ? 0 : 1];
+
+    if ( hours == 0 ) 
     {
-        snprintf(buf, buf_size, "%d:%02d",
-                 (int) (t / 60000), (int) (t % 60000 / 1000));
+        snprintf(buf, buf_size, "%s%d:%02d", sign, minutes, seconds);
     }
     else
     {
-        snprintf(buf, buf_size, "%d:%02d:%02d",
-                 (int) (t / 3600000), (int) (t % 3600000 / 60000),
-                 (int) (t % 60000 / 1000));
+        snprintf(buf, buf_size, "%s%d:%02d:%02d", sign, hours, minutes,
+                 seconds);
     }
 }
 
