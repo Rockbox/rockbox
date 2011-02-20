@@ -84,19 +84,15 @@
  * We need more stack when we run under a host
  * maybe more expensive C lib functions?
  *
- * simulator (possibly) doesn't simulate stack usage anyway but well ... */
-#ifdef HAVE_SIGALTSTACK_THREADS
-#include <signal.h>
-/* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
-#define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x3000) /* Bytes */
-#elif (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(HAVE_WIN32_FIBER_THREADS)
-#define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
-#else /* native threads, sdl threads */
+ * simulator doesn't simulate stack usage anyway but well ... */
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SIMULATOR))
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
+#else
+#define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
 #endif
 
 
-#if defined(ASSEMBLER_THREADS)
+#if (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_ANDROID))
 /* Need to keep structures inside the header file because debug_menu
  * needs them. */
 #ifdef CPU_COLDFIRE
@@ -116,7 +112,7 @@ struct regs
     uint32_t pr;    /*    32 - Procedure register */
     uint32_t start; /*    36 - Thread start address, or NULL when started */
 };
-#elif defined(CPU_ARM)
+#elif defined(CPU_ARM) || (CONFIG_PLATFORM & PLATFORM_ANDROID)
 struct regs
 {
     uint32_t r[8];  /*  0-28 - Registers r4-r11 */
@@ -124,36 +120,6 @@ struct regs
     uint32_t lr;    /*    36 - r14 (lr) */
     uint32_t start; /*    40 - Thread start address, or NULL when started */
 };
-
-#elif defined(CPU_MIPS)
-struct regs
-{
-    uint32_t r[9];  /* 0-32 - Registers s0-s7, fp */
-    uint32_t sp;    /*   36 - Stack pointer */
-    uint32_t ra;    /*   40 - Return address */
-    uint32_t start; /*   44 - Thread start address, or NULL when started */
-};
-#endif /* CONFIG_CPU */
-#elif (CONFIG_PLATFORM & PLATFORM_HOSTED) || defined(__PCTOOL__)
-#ifndef HAVE_SDL_THREADS
-struct regs
-{
-    void (*start)(void); /* thread's entry point, or NULL when started */
-    void* uc;            /* host thread handle */
-    uintptr_t sp;        /* Stack pointer, unused */
-    size_t stack_size;   /* stack size, not always used */
-    uintptr_t stack;     /* pointer to start of the stack buffer */
-};
-#else /* SDL threads */
-struct regs
-{
-    void *t;             /* OS thread */
-    void *told;          /* Last thread in slot (explained in thead-sdl.c) */
-    void *s;             /* Semaphore for blocking and wakeup */
-    void (*start)(void); /* Start function */
-};
-#endif
-#endif /* PLATFORM_NATIVE */
 
 #ifdef CPU_PP
 #ifdef HAVE_CORELOCK_OBJECT
@@ -171,6 +137,24 @@ int corelock_try_lock(struct corelock *cl);
 void corelock_unlock(struct corelock *cl);
 #endif /* HAVE_CORELOCK_OBJECT */
 #endif /* CPU_PP */
+#elif defined(CPU_MIPS)
+struct regs
+{
+    uint32_t r[9];  /* 0-32 - Registers s0-s7, fp */
+    uint32_t sp;    /*   36 - Stack pointer */
+    uint32_t ra;    /*   40 - Return address */
+    uint32_t start; /*   44 - Thread start address, or NULL when started */
+};
+#endif /* CONFIG_CPU */
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
+struct regs
+{
+    void *t;             /* OS thread */
+    void *told;          /* Last thread in slot (explained in thead-sdl.c) */
+    void *s;             /* Semaphore for blocking and wakeup */
+    void (*start)(void); /* Start function */
+};
+#endif /* PLATFORM_NATIVE */
 
 /* NOTE: The use of the word "queue" may also refer to a linked list of
    threads being maintained that are normally dealt with in FIFO order
@@ -267,7 +251,7 @@ struct thread_entry
                                   object where thread is blocked - used
                                   for implicit unblock and explicit wake
                                   states: STATE_BLOCKED/STATE_BLOCKED_W_TMO  */
-#ifdef HAVE_CORELOCK_OBJECT
+#if NUM_CORES > 1
     struct corelock *obj_cl;   /* Object corelock where thead is blocked -
                                   states: STATE_BLOCKED/STATE_BLOCKED_W_TMO */
     struct corelock waiter_cl; /* Corelock for thread_wait */
@@ -324,7 +308,7 @@ struct thread_entry
 /* Specify current thread in a function taking an ID. */
 #define THREAD_ID_CURRENT ((unsigned int)-1)
 
-#ifdef HAVE_CORELOCK_OBJECT
+#if NUM_CORES > 1
 /* Operations to be performed just before stopping a thread and starting
    a new one if specified before calling switch_thread */
 enum
@@ -357,7 +341,7 @@ struct core_entry
                                          threads */
 #endif
     long next_tmo_check;           /* soonest time to check tmo threads */
-#ifdef HAVE_CORELOCK_OBJECT
+#if NUM_CORES > 1
     struct thread_blk_ops blk_ops; /* operations to perform when
                                       blocking a thread */
     struct corelock rtr_cl;        /* Lock for rtr list */

@@ -174,13 +174,10 @@ void switch_thread(void)
         __attribute__((noinline));
 
 /****************************************************************************
- * Processor/OS-specific section - include necessary core support
+ * Processor-specific section - include necessary core support
  */
-
-#if defined(HAVE_WIN32_FIBER_THREADS)
-#include "thread-win32.c"
-#elif defined(HAVE_SIGALTSTACK_THREADS)
-#include "thread-unix.c"
+#if defined(ANDROID)
+#include "thread-android-arm.c"
 #elif defined(CPU_ARM)
 #include "thread-arm.c"
 #if defined (CPU_PP)
@@ -967,7 +964,7 @@ void check_tmo_threads(void)
              * life again. */
             if (state == STATE_BLOCKED_W_TMO)
             {
-#ifdef HAVE_CORELOCK_OBJECT
+#if NUM_CORES > 1
                 /* Lock the waiting thread's kernel object */
                 struct corelock *ocl = curr->obj_cl;
 
@@ -1782,7 +1779,7 @@ void thread_exit(void)
  */
 void remove_thread(unsigned int thread_id)
 {
-#ifdef HAVE_CORELOCK_OBJECT
+#if NUM_CORES > 1
     /* core is not constant here because of core switching */
     unsigned int core = CURRENT_CORE;
     unsigned int old_core = NUM_CORES;
@@ -2311,9 +2308,6 @@ void init_threads(void)
         thread_exit();
 #endif /* NUM_CORES */
     }
-#ifdef INIT_MAIN_THREAD
-    init_main_thread(&thread->context);
-#endif
 }
 
 /* Shared stack scan helper for thread_stack_usage and idle_stack_usage */
@@ -2385,7 +2379,7 @@ void thread_get_name(char *buffer, int size,
         const char *fmt = "%s";
         if (name == NULL IF_COP(|| name == THREAD_DESTRUCT) || *name == '\0')
         {
-            name = (const char *)(uintptr_t)thread->id;
+            name = (const char *)(unsigned int)thread->id;
             fmt = "%04lX";
         }
         snprintf(buffer, size, fmt, name);

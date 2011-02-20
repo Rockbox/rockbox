@@ -46,9 +46,6 @@ void sys_poweroff(void);
 void sys_handle_argv(int argc, char *argv[]);
 void gui_message_loop(void);
 void sim_do_exit(void);
-#ifndef HAVE_SDL_THREADS
-void wait_for_interrupt(void);
-#endif
 
 extern bool background;  /* True if the background image is enabled */
 extern bool showremote;

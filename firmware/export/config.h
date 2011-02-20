@@ -717,9 +717,7 @@ Lyre prototype 1 */
 #define HAVE_WAKEUP_EXT_CB
 
 
-#if defined(ASSEMBLER_THREADS) \
-    || defined(HAVE_WIN32_FIBER_THREADS) \
-    || defined(HAVE_SIGALTSTACK_THREADS)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #define HAVE_PRIORITY_SCHEDULING
 #endif
 

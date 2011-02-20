@@ -26,7 +26,6 @@
 #include "string-extra.h"
 #include "config.h"
 #include "misc.h"
-#include "system.h"
 #include "lcd.h"
 #include "file.h"
 #include "filefuncs.h"

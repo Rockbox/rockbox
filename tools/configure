@@ -25,7 +25,6 @@ bindir=
 libdir=
 sharedir=
 
-thread_support="ASSEMBLER_THREADS"
 app_modelname=
 app_lcd_width=
 app_lcd_height=
@@ -164,41 +163,6 @@ findsdl(){
   done
 }
 
-# check for availability of sigaltstack to support our thread engine
-check_sigaltstack() {
-   cat >$tmpdir/check_threads.c <<EOF
-#include <signal.h>
-int main(int argc, char **argv)
-{
-#ifndef NULL
-  #define NULL (void*)0
-#endif
-  sigaltstack(NULL, NULL);
-  return 0;
-}
-EOF
-   $CC -o $tmpdir/check_threads $tmpdir/check_threads.c 1> /dev/null
-   result=$?
-   rm -rf $tmpdir/check_threads*
-   echo $result
-}
-
-# check for availability of Fiber on Win32 to support our thread engine
-check_fiber() {
-   cat >$tmpdir/check_threads.c <<EOF
-#include <windows.h>
-int main(int argc, char **argv)
-{
-  ConvertThreadToFiber(NULL);
-  return 0;
-}
-EOF
-   $CC -o $tmpdir/check_threads $tmpdir/check_threads.c 2>/dev/null
-   result=$?
-   rm -rf $tmpdir/check_threads*
-   echo $result
-}
-
 simcc () {
 
  # default tool setup for native building
@@ -211,8 +175,6 @@ simcc () {
  GCCOPTS="$GCCOPTS -fno-builtin -g"
  GCCOPTIMIZE=''
  LDOPTS='-lm' # button-sdl.c uses sqrt()
- sigaltstack=""
- fibers=""
 
  # default output binary name, don't override app_get_platform()
  if [ "$app_type" != "sdl-app" ]; then
@@ -231,7 +193,6 @@ simcc () {
    CYGWIN*)
    echo "Cygwin host detected"
 
-   fibers=`check_fiber`
    LDOPTS="$LDOPTS -mconsole"
    output="$output.exe"
    winbuild="yes"
@@ -240,33 +201,29 @@ simcc () {
    MINGW*)
    echo "MinGW host detected"
 
-   fibers=`check_fiber`
    LDOPTS="$LDOPTS -mconsole"
    output="$output.exe"
    winbuild="yes"
    ;;
 
    Linux)
-   sigaltstack=`check_sigaltstack`
    echo "Linux host detected"
    LDOPTS="$LDOPTS -ldl"
    ;;
 
    FreeBSD)
-   sigaltstack=`check_sigaltstack`
    echo "FreeBSD host detected"
    LDOPTS="$LDOPTS -ldl"
    ;;
 
    Darwin)
-   sigaltstack=`check_sigaltstack`
    echo "Darwin host detected"
    LDOPTS="$LDOPTS -ldl"
+
    SHARED_FLAG="-dynamiclib -Wl\,-single_module"
    ;;
 
    SunOS)
-   sigaltstack=`check_sigaltstack`
    echo "*Solaris host detected"
 
    GCCOPTS="$GCCOPTS -fPIC"
@@ -362,33 +319,10 @@ EOF
    # add cross-compiler option(s)
    prefixtools i586-mingw32msvc-
    LDOPTS="$LDOPTS -mconsole"
-   fibers=`check_fiber`
    output="rockboxui.exe"
    endian="little" # windows is little endian
    echo "Enabling MMX support"
    GCCOPTS="$GCCOPTS -mmmx"
- fi
-
- thread_support=
- if [ -z "$ARG_THREAD_SUPPORT" ] || [ "$ARG_THREAD_SUPPORT" = "0" ]; then
-   if [ "$sigaltstack" = "0" ]; then
-     thread_support="HAVE_SIGALTSTACK_THREADS"
-     LDOPTS="$LDOPTS -lpthread" # pthread needed
-     echo "Selected sigaltstack threads"
-   elif [ "$fibers" = "0" ]; then
-     thread_support="HAVE_WIN32_FIBER_THREADS"
-     echo "Selected Win32 Fiber threads"
-   fi
- fi
-
- if [ -n `echo $app_type | grep "sdl"` ] && [ -z "$thread_support" ] \
-    && [ "$ARG_THREAD_SUPPORT" != "0" ]; then
-   thread_support="HAVE_SDL_THREADS"
-   if [ "$ARG_THREAD_SUPPORT" = "1" ]; then
-     echo "Selected SDL threads"
-   else
-     echo "WARNING: Falling back to SDL threads"
-   fi
  fi
 }
 
@@ -522,7 +456,6 @@ maemocc () {
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
  SHARED_FLAG="-shared"
  endian="little"
- thread_support="HAVE_SIGALTSTACK_THREADS"
 
  is_n900=0
  # Determine maemo version
@@ -1061,11 +994,6 @@ help() {
     --thumb           Build with -mthumb (for ARM builds)
     --no-thumb        The opposite of --thumb (don't use thumb even for targets
                       where this is the default
-    --sdl-threads     Force use of SDL threads. They have inferior performance,
-                      but are better debuggable with GDB
-    --no-sdl-threads  Disallow use of SDL threads. This prevents the default
-                      behavior of falling back to them if no native thread
-                      support was found.
     --prefix          Target installation directory
     --help            Shows this message (must not be used with other options)
 
@@ -1087,7 +1015,6 @@ ARG_VOICE=
 ARG_ARM_EABI=
 ARG_ARM_THUMB=
 ARG_PREFIX="$PREFIX"
-ARG_THREAD_SUPPORT=
 err=
 for arg in "$@"; do
 	case "$arg" in
@@ -1108,9 +1035,6 @@ for arg in "$@"; do
 		--no-eabi)    ARG_ARM_EABI=0;;
 		--thumb)      ARG_ARM_THUMB=1;;
 		--no-thumb)   ARG_ARM_THUMB=0;;
-        --sdl-threads)ARG_THREAD_SUPPORT=1;;
-        --no-sdl-threads)
-                      ARG_THREAD_SUPPORT=0;;
         --prefix=*)   ARG_PREFIX=`echo "$arg" | cut -d = -f 2`;;
 		--help)       help;;
 		*)            err=1; echo "[ERROR] Option '$arg' unsupported";;
@@ -3402,7 +3326,6 @@ sed > autoconf.h \
  -e "s<^#undef DO_BOOTCHART<$use_bootchart<g" \
  -e "s<@config_rtc@<$config_rtc<g" \
  -e "s<@have_rtc_alarm@<$have_rtc_alarm<g" \
- -e "s<@thread_support@<$thread_support<g" \
  -e "s<@RBDIR@<${rbdir}<g" \
  -e "s<@sharepath@<${sharedir}<g" \
  -e "s<@binpath@<${bindir}<g" \
@@ -3438,9 +3361,6 @@ sed > autoconf.h \
 /* optional defines for RTC mod for h1x0 */
 @config_rtc@
 @have_rtc_alarm@
-
-/* the threading backend we use */
-#define @thread_support@
 
 /* lcd dimensions for application builds from configure */
 @lcd_width@

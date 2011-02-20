@@ -28,7 +28,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
-#include "system.h"
+#include "misc.h"
 #include "button-sdl.h"
 #include "backlight.h"
 #include "sim_tasks.h"

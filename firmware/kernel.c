@@ -68,9 +68,7 @@ void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
 static struct
 {
     struct event_queue *queues[MAX_NUM_QUEUES+1];
-#ifdef HAVE_CORELOCK_OBJECT
-    struct corelock cl;
-#endif
+    IF_COP( struct corelock cl; )
 } all_queues SHAREDBSS_ATTR;
 
 /****************************************************************************

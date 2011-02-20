@@ -46,12 +46,9 @@
 #endif
 
 #include <fcntl.h>
-#ifdef HAVE_SDL_THREADS
+#include <SDL.h>
+#include <SDL_thread.h>
 #include "thread-sdl.h"
-#else
-#define sim_thread_unlock() NULL
-#define sim_thread_lock(a)
-#endif
 #include "thread.h"
 #include "kernel.h"
 #include "debug.h"
