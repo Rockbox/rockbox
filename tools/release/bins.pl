@@ -50,14 +50,18 @@ sub runone {
 
     my $o="build-$dir/rockbox.zip";
     my $map="build-$dir/rockbox-maps.zip";
+    my $elf="build-$dir/rockbox-elfs.zip";
     if (-f $o) {
         my $newo="output/rockbox-$dir-$version.zip";
         my $newmap="output/rockbox-$dir-$version-maps.zip";
+        my $newelf="output/rockbox-$dir-$version-elfs.zip";
         system("mkdir -p output");
         system("mv $o $newo");
         print "moved $o to $newo\n" if($verbose);
         system("mv $map $newmap");
         print "moved $map to $newmap\n" if($verbose);
+        system("mv $elf $newelf");
+        print "moved $elf to $newelf\n" if($verbose);
     }
 
     print "remove all contents in build-$dir\n" if($verbose);
@@ -117,6 +121,9 @@ sub buildit {
 
     print "Run 'make mapzip'\n" if($verbose);
     `make mapzip`;
+
+    print "Run 'make elfzip'\n" if($verbose);
+    `make elfzip`;
 }
 
 sub buildfonts {
