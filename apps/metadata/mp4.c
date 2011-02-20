@@ -117,11 +117,17 @@ static unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
 
     if (bytes_read)
     {
-        (*buffer)[bytes_read] = 0;
-        *dest = *buffer;
-        length = strlen(*buffer) + 1;
-        *buffer_left -= length;
-        *buffer += length;
+        /* Do not overwrite already available metadata. Especially when reading
+         * tags with e.g. multiple genres / artists. This way only the first 
+         * of multiple entries is used, all following are dropped. */
+        if (*dest == NULL)
+        {
+            (*buffer)[bytes_read] = 0;
+            *dest = *buffer;
+            length = strlen(*buffer) + 1;
+            *buffer_left -= length;
+            *buffer += length;
+        }
     }
     else
     {

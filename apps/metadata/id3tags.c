@@ -358,8 +358,7 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
 
     if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
         /* At least part of the value was read, so we can safely try to
-         * parse it
-         */
+         * parse it */
         value = tag + desc_len + 1;
         value_len = bufferpos - (tag - entry->id3v2buf);
         
@@ -368,8 +367,7 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
             entry->albumartist = tag;
 #if CONFIG_CODEC == SWCODEC
         } else {
-            value_len = parse_replaygain(tag, value, entry, tag,
-                value_len);
+            value_len = parse_replaygain(tag, value, entry, tag, value_len);
 #endif
         }
     }
@@ -1040,6 +1038,12 @@ void setid3v2title(int fd, struct mp3entry *entry)
 #endif
                 if( tr->ppFunc )
                     bufferpos = tr->ppFunc(entry, tag, bufferpos);
+                    
+                /* Trim. Take into account that multiple string contents will
+                 * only be displayed up to their first null termination. All
+                 * content after this null termination is obsolete and can be
+                 * overwritten. */
+                bufferpos -= (bytesread - strlen(tag));
 
                 /* Seek to the next frame */
                 if(framelen < totframelen)
