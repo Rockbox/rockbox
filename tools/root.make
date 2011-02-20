@@ -259,6 +259,9 @@ zip:
 mapzip:
 	$(SILENT)find . -name "*.map" | xargs zip rockbox-maps.zip
 
+elfzip: 
+	$(SILENT)find . -name "*.elf" | xargs zip rockbox-elfs.zip
+
 fullzip:
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 -o rockbox-full.zip $(TARGET) $(BINARY)
 
