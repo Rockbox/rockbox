@@ -894,7 +894,7 @@ char* skip_whitespace(char* const str)
  */
 void format_time(char* buf, int buf_size, long t)
 {
-    int const time = ABS(t / 1000);
+    int const time = abs(t / 1000);
     int const hours = time / 3600;
     int const minutes = time / 60 - hours * 60;
     int const seconds = time % 60;
