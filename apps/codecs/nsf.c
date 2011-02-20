@@ -4344,9 +4344,9 @@ next_track:
     
 
     /* wait for track info to load */
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
-
+    if (codec_wait_taginfo() != 0)
+        goto request_next_track;
+        
     codec_set_replaygain(ci->id3);
         
     /* Read the entire file */
@@ -4448,7 +4448,8 @@ init_nsf:
     }
     
     print_timers(last_path,track);
-    
+
+request_next_track:
     if (ci->request_next_track()) {
     if (ci->global_settings->repeat_mode==REPEAT_ONE) {
         /* in repeat one mode just advance to the next track */

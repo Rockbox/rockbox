@@ -40,15 +40,18 @@ enum codec_status codec_main(void)
     int datasize, res, frame_counter, total_frames, seek_frame_offset;
     uint8_t *bit_buffer;
     int elapsed = 0;
-    size_t resume_offset = ci->id3->offset;
+    size_t resume_offset;
 
 next_track:
     if (codec_init()) {
         DEBUGF("codec init failed\n");
         return CODEC_ERROR;
     }
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+
+    if (codec_wait_taginfo() != 0)
+        goto done;
+
+    resume_offset = ci->id3->offset;
 
     codec_set_replaygain(ci->id3);
     ci->memset(&q,0,sizeof(ATRAC3Context));

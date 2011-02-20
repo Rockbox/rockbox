@@ -64,7 +64,7 @@ enum codec_status codec_main(void)
     mpc_streaminfo info;
     mpc_frame_info frame;
     mpc_demux *demux = NULL;
-    int retval = CODEC_OK;
+    int retval;
     
     frame.buffer = sample_buffer;
     
@@ -78,15 +78,17 @@ enum codec_status codec_main(void)
     reader.tell     = tell_impl;
     reader.get_size = get_size_impl;
 
-next_track:    
+next_track:
+    retval = CODEC_OK;
+
     if (codec_init()) 
     {
         retval = CODEC_ERROR;
         goto exit;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
 
     /* Initialize demux/decoder. */
     demux = mpc_demux_init(&reader);

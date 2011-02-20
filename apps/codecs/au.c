@@ -108,7 +108,7 @@ static int convert_au_format(unsigned int encoding, struct pcm_format *fmt)
 /* this is the codec entry point */
 enum codec_status codec_main(void)
 {
-    int status = CODEC_OK;
+    int status;
     struct pcm_format format;
     uint32_t bytesdone, decodedsamples;
     size_t n;
@@ -124,14 +124,16 @@ enum codec_status codec_main(void)
     ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
   
 next_track:
+    status = CODEC_OK;
+
     if (codec_init()) {
         DEBUGF("codec_init() error\n");
         status = CODEC_ERROR;
         goto exit;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
 
     codec_set_replaygain(ci->id3);
     
@@ -304,7 +306,6 @@ next_track:
             endofstream = 1;
         ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
     }
-    status = CODEC_OK;
 
 done:
     if (ci->request_next_track())

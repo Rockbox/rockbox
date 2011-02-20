@@ -371,7 +371,7 @@ static void *process_header(spx_ogg_packet *op,
 enum codec_status codec_main(void)
 {
     SpeexBits bits;
-    int error = 0;
+    int error;
     int eof = 0;
     spx_ogg_sync_state oy;
     spx_ogg_page og;
@@ -395,16 +395,18 @@ enum codec_status codec_main(void)
 
     /* Ogg handling still uses mallocs, so reset the malloc buffer per track */
 next_track:
+    error = CODEC_OK;
 
     if (codec_init()) {
         error = CODEC_ERROR;
         goto exit;
     }
     stereo = speex_stereo_state_init();
-    strtoffset = ci->id3->offset;
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-       ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
+
+    strtoffset = ci->id3->offset;
 
     spx_ogg_sync_init(&oy);
     spx_ogg_alloc_buffer(&oy,2*CHUNKSIZE);
@@ -568,8 +570,6 @@ done:
 
         goto next_track;
     }
-
-    error = CODEC_OK;
 
 exit:
     speex_bits_destroy(&bits);

@@ -49,6 +49,19 @@ void codec_set_replaygain(struct mp3entry* id3)
     ci->configure(DSP_SET_ALBUM_PEAK, id3->album_peak);
 }
 
+/* Note: codec really needs its own private metdata copy for the current
+   track being processed in order to be stable. */
+int codec_wait_taginfo(void)
+{
+    while (!*ci->taginfo_ready && !ci->stop_codec && !ci->new_track)
+        ci->sleep(0);
+    if (ci->stop_codec)
+        return -1;
+    if (ci->new_track)
+        return 1;
+    return 0;
+}
+
 /* Various "helper functions" common to all the xxx2wav decoder plugins  */
 
 

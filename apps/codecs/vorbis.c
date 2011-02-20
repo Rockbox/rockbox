@@ -136,10 +136,12 @@ enum codec_status codec_main(void)
 #endif
 
 next_track:
+    error = CODEC_OK;
+
     ogg_malloc_init();
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
 
     /* Create a decoder instance */
     callbacks.read_func = read_handler;
@@ -233,8 +235,7 @@ next_track:
             ci->set_elapsed(ov_time_tell(&vf));
         }
     }
-    error = CODEC_OK;
-    
+
 done:
 #if 0 /* defined(SIMULATOR) */
     {

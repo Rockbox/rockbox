@@ -46,15 +46,16 @@ enum codec_status codec_main(void)
     /* Generic codec initialisation */
     ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
 
-    next_track:
+next_track:
+    retval = CODEC_OK;
 
     if (codec_init()) {
         retval = CODEC_ERROR;
         goto exit;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
         
     /* Create a decoder instance */
     wpc = WavpackOpenFileInput (read_callback, error);
@@ -121,7 +122,6 @@ enum codec_status codec_main(void)
         ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
         ci->yield ();
     }
-    retval = CODEC_OK;
 
 done:
     if (ci->request_next_track())

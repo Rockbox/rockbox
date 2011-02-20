@@ -132,20 +132,24 @@ enum codec_status codec_main(void)
     uint8_t *filebuf;
     int retval, consumed, packet_offset;
     int playback_on = -1;
-    size_t resume_offset = ci->id3->offset;
+    size_t resume_offset;
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
 
 next_track:
+    retval = CODEC_OK;
+
     if (codec_init()) {
         retval = CODEC_ERROR;
         goto exit;
     }
 
-    while (!ci->taginfo_ready)
-        ci->yield();
+    if (codec_wait_taginfo() != 0)
+        goto request_next_track;
+
+    resume_offset = ci->id3->offset;
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
@@ -201,8 +205,7 @@ next_track:
         ci->advance_buffer(pkt.length);
     }
 
-    retval = CODEC_OK;
-
+request_next_track:
     if (ci->request_next_track())
         goto next_track;
 

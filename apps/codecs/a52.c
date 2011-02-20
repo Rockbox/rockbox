@@ -128,13 +128,15 @@ enum codec_status codec_main(void)
     ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
 
 next_track:
+    retval = CODEC_OK;
+
     if (codec_init()) {
         retval = CODEC_ERROR;
         goto exit;
     }
 
-    while (!ci->taginfo_ready)
-        ci->yield();
+    if (codec_wait_taginfo() != 0)
+        goto request_next_track;
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
@@ -176,8 +178,8 @@ next_track:
         a52_decode_data(filebuf, filebuf + n);
         ci->advance_buffer(n);
     }
-    retval = CODEC_OK;
 
+request_next_track:
     if (ci->request_next_track())
         goto next_track;
 

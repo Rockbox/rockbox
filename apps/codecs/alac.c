@@ -48,6 +48,7 @@ enum codec_status codec_main(void)
   ci->configure(DSP_SET_SAMPLE_DEPTH, ALAC_OUTPUT_DEPTH-1);
 
   next_track:
+    retval = CODEC_OK;
 
   /* Clean and initialize decoder structures */
    memset(&demux_res , 0, sizeof(demux_res));
@@ -57,8 +58,8 @@ enum codec_status codec_main(void)
     goto exit;
   }
 
-  while (!*ci->taginfo_ready && !ci->stop_codec)
-    ci->sleep(1);
+  if (codec_wait_taginfo() != 0)
+    goto done;
   
   ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
   codec_set_replaygain(ci->id3);
@@ -145,7 +146,6 @@ enum codec_status codec_main(void)
 
     i++;
   }
-  retval = CODEC_OK;
 
 done:
   LOGF("ALAC: Decoded %lu samples\n",(unsigned long)samplesdone);

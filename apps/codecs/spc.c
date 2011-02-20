@@ -553,8 +553,8 @@ enum codec_status codec_main(void)
         ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
 
         /* wait for track info to load */
-        while (!*ci->taginfo_ready && !ci->stop_codec)
-            ci->yield();
+        if (codec_wait_taginfo() != 0)
+            continue;
 
         codec_set_replaygain(ci->id3);
 

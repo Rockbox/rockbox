@@ -56,7 +56,7 @@ enum codec_status codec_main(void)
     uint32_t s = 0; /* sample rate */
     unsigned char c = 0; /* channels */
     int playback_on = -1;
-    size_t resume_offset = ci->id3->offset;
+    size_t resume_offset;
 
     /* Generic codec initialisation */
     ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
@@ -70,8 +70,10 @@ next_track:
         return CODEC_ERROR;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
+
+    resume_offset = ci->id3->offset;
 
     ci->memset(&rmctx,0,sizeof(RMContext));
     ci->memset(&pkt,0,sizeof(RMPacket));
@@ -223,8 +225,6 @@ seek_start:
         
         ci->advance_buffer(pkt.length);              
     }
-
-    err = CODEC_OK;
 
 done:
     if (ci->request_next_track())

@@ -78,8 +78,8 @@ next_track:
     ch1_1=ch1_2=ch2_1=ch2_2=0;
 
     /* wait for track info to load */
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto request_next_track;
 
     codec_set_replaygain(ci->id3);
         
@@ -385,6 +385,7 @@ next_track:
            1000LL/avgbytespersec);
     }
 
+request_next_track:
     if (ci->request_next_track())
         goto next_track;
 

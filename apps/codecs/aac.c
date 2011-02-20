@@ -78,8 +78,8 @@ next_track:
         goto exit;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
   
     file_offset = ci->id3->offset;
 
@@ -303,8 +303,6 @@ next_track:
         ci->set_elapsed(elapsed_time);
         i++;
     }
-
-    err = CODEC_OK;
 
 done:
     LOGF("AAC: Decoded %lu samples\n", (unsigned long)sound_samples_done);

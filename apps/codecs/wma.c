@@ -46,19 +46,22 @@ enum codec_status codec_main(void)
     ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
 
 next_track:
+    retval = CODEC_OK;
+
     /* Proper reset of the decoder context. */
     memset(&wmadec, 0, sizeof(wmadec));
 
     /* Wait for the metadata to be read */
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
-
-    retval = CODEC_OK;
+    if (codec_wait_taginfo() != 0)
+        goto done;
 
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
     resume_offset = ci->id3->offset;
+
 restart_track:
+    retval = CODEC_OK;
+
     if (codec_init()) {
         LOGF("WMA: Error initialising codec\n");
         retval = CODEC_ERROR;
@@ -176,7 +179,6 @@ new_packet:
 
         ci->advance_buffer(packetlength);
     }
-    retval = CODEC_OK;
 
 done:
     /*LOGF("WMA: Decoded %ld samples\n",elapsedtime*wfx.rate/1000);*/

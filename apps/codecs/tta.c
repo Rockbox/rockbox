@@ -37,7 +37,7 @@ static int32_t samples[PCM_BUFFER_LENGTH * 2] IBSS_ATTR;
 enum codec_status codec_main(void)
 {
     tta_info info;
-    int status = CODEC_OK;
+    int status;
     unsigned int decodedsamples;
     int endofstream;
     int new_pos = 0;
@@ -47,6 +47,8 @@ enum codec_status codec_main(void)
     ci->configure(DSP_SET_SAMPLE_DEPTH, TTA_OUTPUT_DEPTH - 1);
   
 next_track:
+    status = CODEC_OK;
+
     if (codec_init())
     {
         DEBUGF("codec_init() error\n");
@@ -54,8 +56,8 @@ next_track:
         goto exit;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
 
     if (set_tta_info(&info) < 0 || player_init(&info) < 0)
     {
@@ -117,7 +119,7 @@ next_track:
             endofstream = 1;
         ci->set_elapsed((uint64_t)info.LENGTH * 1000 * decodedsamples / info.DATALENGTH);
     }
-    status = CODEC_OK;
+
 done:
     player_stop();
     if (ci->request_next_track())

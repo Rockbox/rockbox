@@ -48,16 +48,18 @@ enum codec_status codec_main(void)
     
 
 next_track:
+    retval = CODEC_OK;
 
     /* Wait for the metadata to be read */
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
-
-    retval = CODEC_OK;
+    if (codec_wait_taginfo() != 0)
+        goto done;
 
     /* Remember the resume position */
     resume_offset = ci->id3->offset;
- restart_track:   
+
+restart_track:
+    retval = CODEC_OK;
+
     if (codec_init()) {
         LOGF("(WMA PRO) Error: Error initialising codec\n");
         retval = CODEC_ERROR;
@@ -149,7 +151,6 @@ next_track:
         /* Advance to the next logical packet */
         ci->advance_buffer(packetlength);
     }
-    retval = CODEC_OK;
 
 done:
     if (ci->request_next_track())

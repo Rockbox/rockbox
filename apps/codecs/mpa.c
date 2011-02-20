@@ -325,15 +325,14 @@ enum codec_status codec_main(void)
         return CODEC_ERROR;
     
 next_track:
-
     status = CODEC_OK;
 
     /* Reinitializing seems to be necessary to avoid playback quircks when seeking. */
     init_mad();
 
     file_end = 0;
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto request_next_track;
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     current_frequency = ci->id3->frequency;
@@ -505,6 +504,7 @@ next_track:
                           framelength - stop_skip);
     }
 
+request_next_track:
     if (ci->request_next_track())
         goto next_track;
 

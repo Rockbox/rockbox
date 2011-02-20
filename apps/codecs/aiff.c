@@ -63,7 +63,7 @@ static const struct pcm_codec *get_codec(uint32_t formattag)
 
 enum codec_status codec_main(void)
 {
-    int status = CODEC_OK;
+    int status;
     struct pcm_format format;
     uint32_t bytesdone, decodedsamples;
     uint32_t num_sample_frames = 0;
@@ -82,13 +82,15 @@ enum codec_status codec_main(void)
     ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
   
 next_track:
+    status = CODEC_OK;
+
     if (codec_init()) {
         status = CODEC_ERROR;
         goto exit;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
 
     codec_set_replaygain(ci->id3);
     

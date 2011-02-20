@@ -51,15 +51,18 @@ enum codec_status codec_main(void)
     uint32_t packet_count;
     int scrambling_unit_size, num_units, elapsed = 0;
     int playback_on = -1;
-    size_t resume_offset = ci->id3->offset;
+    size_t resume_offset;
 
 next_track:
     if (codec_init()) {
         DEBUGF("codec init failed\n");
         return CODEC_ERROR;
     }
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+
+    if (codec_wait_taginfo() != 0)
+        goto done;
+
+    resume_offset = ci->id3->offset;
 
     codec_set_replaygain(ci->id3);
     ci->memset(&rmctx,0,sizeof(RMContext));

@@ -149,22 +149,21 @@ enum codec_status codec_main(void)
     /* Generic codec initialisation */
     ci->configure(DSP_SET_SAMPLE_DEPTH, APE_OUTPUT_DEPTH-1);
 
-    next_track:
-
+next_track:
     retval = CODEC_OK;
 
-    /* Remember the resume position - when the codec is opened, the
-       playback engine will reset it. */
-    resume_offset = ci->id3->offset;
-        
     if (codec_init()) {
         LOGF("APE: Error initialising codec\n");
         retval = CODEC_ERROR;
         goto exit;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
+
+    /* Remember the resume position - when the codec is opened, the
+       playback engine will reset it. */
+    resume_offset = ci->id3->offset;
 
     inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 
@@ -318,8 +317,6 @@ frame_start:
 
         currentframe++;
     }
-
-    retval = CODEC_OK;
 
 done:
     LOGF("APE: Decoded %lu samples\n",(unsigned long)samplesdone);

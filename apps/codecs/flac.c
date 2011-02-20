@@ -433,19 +433,20 @@ enum codec_status codec_main(void)
     /* Generic codec initialisation */
     ci->configure(DSP_SET_SAMPLE_DEPTH, FLAC_OUTPUT_DEPTH-1);
 
-    next_track:
+next_track:
+    retval = CODEC_OK;
         
-    /* Need to save offset for later use (cleared indirectly by flac_init) */
-    samplesdone=ci->id3->offset;
-
     if (codec_init()) {
         LOGF("FLAC: Error initialising codec\n");
         retval = CODEC_ERROR;
         goto exit;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
+    if (codec_wait_taginfo() != 0)
+        goto done;
+
+    /* Need to save offset for later use (cleared indirectly by flac_init) */
+    samplesdone = ci->id3->offset;
     
     if (!flac_init(&fc,ci->id3->first_frame_offset)) {
         LOGF("FLAC: Error initialising codec\n");
