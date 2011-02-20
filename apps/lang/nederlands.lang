@@ -12577,3 +12577,90 @@
     *: "Bestandsgrootte"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Automatisch hervatten"
+  </dest>
+  <voice>
+    *: "Automatisch hervatten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Hervat bij automatische nummerwissel"
+  </dest>
+  <voice>
+    *: "Hervat bij automatische nummerwissel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Signaalsterkte:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Signaalsterkte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Alleen in bepaalde mappen"
+  </dest>
+  <voice>
+    *: "Alleen in bepaalde mappen"
+  </voice>
+</phrase>
