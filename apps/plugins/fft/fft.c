@@ -1226,10 +1226,9 @@ static void fft_thread_entry(void)
             continue;
         }
 
-#if NUM_CORES > 1
         /* write back output for other processor and invalidate for next frame read */
         rb->cpucache_invalidate();
-#endif
+
         int new_tail = output_tail ^ 1;
 
         /* if full, block waiting until reader has freed a slot */
@@ -1290,9 +1289,7 @@ static void fft_close_fft(void)
     /* Handle our FFT thread. */
     fft_thread_run = false;
     rb->thread_wait(fft_thread);
-#if NUM_CORES > 1
     rb->cpucache_invalidate();
-#endif
 }
 #else /* NUM_CORES == 1 */
 /* everything serialize on single-core and FFT gets to use IRAM main stack if
