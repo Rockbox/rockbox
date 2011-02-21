@@ -266,6 +266,9 @@ static int parseyearnum( struct mp3entry* entry, char* tag, int bufferpos )
 /* parse numeric genre from string, version 2.2 and 2.3 */
 static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
 {
+    /* Use bufferpos to hold current position in entry->id3v2buf. */
+    bufferpos = tag - entry->id3v2buf;
+
     if(entry->id3version >= ID3_VER_2_4) {
         /* In version 2.4 and up, there are no parentheses, and the genre frame
            is a list of strings, either numbers or text. */
@@ -273,19 +276,19 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
         /* Is it a number? */
         if(isdigit(tag[0])) {
             entry->genre_string = id3_get_num_genre(atoi( tag ));
-            return tag - entry->id3v2buf;
+            return bufferpos;
         } else {
             entry->genre_string = tag;
-            return bufferpos;
+            return bufferpos + strlen(tag) + 1;
         }
     } else {
         if( tag[0] == '(' && tag[1] != '(' ) {
             entry->genre_string = id3_get_num_genre(atoi( tag + 1 ));
-            return tag - entry->id3v2buf;
+            return bufferpos;
         }
         else {
             entry->genre_string = tag;
-            return bufferpos;
+            return bufferpos + strlen(tag) + 1;
         }
     }
 }
@@ -360,7 +363,7 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
         /* At least part of the value was read, so we can safely try to
          * parse it */
         value = tag + desc_len + 1;
-        value_len = bufferpos - (tag - entry->id3v2buf);
+        value_len = strlen(value) + 1;
         
         if (!strcasecmp(tag, "ALBUM ARTIST")) {
             strlcpy(tag, value, value_len);
@@ -368,6 +371,8 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
 #if CONFIG_CODEC == SWCODEC
         } else {
             value_len = parse_replaygain(tag, value, entry, tag, value_len);
+#else
+            value_len = 0;
 #endif
         }
     }
@@ -1038,12 +1043,6 @@ void setid3v2title(int fd, struct mp3entry *entry)
 #endif
                 if( tr->ppFunc )
                     bufferpos = tr->ppFunc(entry, tag, bufferpos);
-                    
-                /* Trim. Take into account that multiple string contents will
-                 * only be displayed up to their first null termination. All
-                 * content after this null termination is obsolete and can be
-                 * overwritten. */
-                bufferpos -= (bytesread - strlen(tag));
 
                 /* Seek to the next frame */
                 if(framelen < totframelen)
