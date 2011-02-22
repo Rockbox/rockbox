@@ -344,6 +344,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     {
         len = strlen(value);
         len = MIN(len, buf_remaining - 1);
+        len = MIN(len, ID3V2_MAX_ITEM_SIZE); /* Limit max. item size. */
 
         if (len > 0)
         {

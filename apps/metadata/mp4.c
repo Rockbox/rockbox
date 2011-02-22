@@ -122,9 +122,12 @@ static unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
          * of multiple entries is used, all following are dropped. */
         if (*dest == NULL)
         {
-            (*buffer)[bytes_read] = 0;
-            *dest = *buffer;
+            (*buffer)[bytes_read] = 0; /* zero-terminate for correct strlen().*/
             length = strlen(*buffer) + 1;
+            length = MIN(length, ID3V2_MAX_ITEM_SIZE); /* Limit item size. */
+
+            *dest = *buffer;
+            (*buffer)[length-1] = 0; /* zero-terminate buffer. */
             *buffer_left -= length;
             *buffer += length;
         }
@@ -518,7 +521,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                     char* any = NULL;
                     unsigned int length = read_mp4_tag_string(fd, size,
                         &buffer, &buffer_left, &any);
-                    
+
                     if (length > 0)
                     {
                         /* Re-use the read buffer as the dest buffer... */
