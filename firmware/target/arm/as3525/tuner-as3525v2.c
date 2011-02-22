@@ -33,6 +33,6 @@ int tuner_detect_type(void)
     if (rda5802_detect()) {
         return RDA5802;
     }
-    return 0;
+    return RDA5802;
 }
 
