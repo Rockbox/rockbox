@@ -357,27 +357,32 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
 {
     char* value = NULL;
     int desc_len = strlen(tag);
-    int value_len = 0;
+    int length = 0;
 
     if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
         /* At least part of the value was read, so we can safely try to
          * parse it */
         value = tag + desc_len + 1;
-        value_len = strlen(value) + 1;
         
         if (!strcasecmp(tag, "ALBUM ARTIST")) {
-            strlcpy(tag, value, value_len);
+            length = strlen(value) + 1;
+            strlcpy(tag, value, length);
             entry->albumartist = tag;
 #if CONFIG_CODEC == SWCODEC
         } else {
-            value_len = parse_replaygain(tag, value, entry, tag, value_len);
-#else
-            value_len = 0;
+            /* Calculate residual buffer size in bytes which can be used by 
+             * parse_replaygain() to save the string representation of 
+             * replaygain data.*/
+            length = sizeof(entry->id3v2buf) - (tag - entry->id3v2buf);
+
+            /* Call parse_replaygain(), returns length in bytes used by the
+             * string representation of replaygain data. */
+            length = parse_replaygain(tag, value, entry, tag, length);
 #endif
         }
     }
 
-    return tag - entry->id3v2buf + value_len;
+    return tag - entry->id3v2buf + length;
 }
 
 #if CONFIG_CODEC == SWCODEC
