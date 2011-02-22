@@ -17,6 +17,7 @@
 # Galician language file, translated by:
 # - Jesús Rodríguez Marcial
 # - José M. Fandiño
+# - Ismael Castiñeira Álvarez
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
