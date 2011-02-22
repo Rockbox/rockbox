@@ -69,7 +69,7 @@ app_set_paths () {
             bindir="$ARG_PREFIX/bin"
             libdir="$ARG_PREFIX/lib"
         else
-            echo "ERROR: PREFIX does not exist"
+            echo "ERROR: PREFIX directory $ARG_PREFIX does not exist"
             exit
         fi
     fi
