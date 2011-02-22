@@ -23,8 +23,6 @@
 #ifndef MPEGPLAYER_H
 #define MPEGPLAYER_H
 
-#include "mpeg2.h"
-
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 #define trigger_cpu_boost rb->trigger_cpu_boost
 #define cancel_cpu_boost  rb->cancel_cpu_boost
@@ -74,7 +72,7 @@
 
 #include "lib/mylcd.h"
 
-#include "mpeg2.h"
+#include "libmpeg2/mpeg2.h"
 #include "video_out.h"
 #include "mpeg_stream.h"
 #include "mpeg_misc.h"

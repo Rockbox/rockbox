@@ -103,7 +103,6 @@
 #include "mpegplayer.h"
 #include "lib/helper.h"
 #include "mpeg_settings.h"
-#include "mpeg2.h"
 #include "video_out.h"
 #include "stream_thread.h"
 #include "stream_mgr.h"
