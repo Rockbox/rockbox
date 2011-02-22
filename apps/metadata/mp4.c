@@ -515,7 +515,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 }   
                 else
                 {
-                    char* any;
+                    char* any = NULL;
                     unsigned int length = read_mp4_tag_string(fd, size,
                         &buffer, &buffer_left, &any);
                     
