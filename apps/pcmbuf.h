@@ -32,6 +32,7 @@ size_t pcmbuf_init(unsigned char *bufend);
 void pcmbuf_play_start(void);
 void pcmbuf_play_stop(void);
 void pcmbuf_pause(bool pause);
+void pcmbuf_monitor_track_change(bool monitor);
 void pcmbuf_start_track_change(bool manual_skip);
 
 /* Crossfade */

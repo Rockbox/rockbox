@@ -75,17 +75,16 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 35
+#define CODEC_API_VERSION 36
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 35
+#define CODEC_MIN_API_VERSION 36
 
 /* codec return codes */
 enum codec_status {
     CODEC_OK = 0,
-    CODEC_USB_CONNECTED,
     CODEC_ERROR = -1,
 };
 
@@ -106,13 +105,13 @@ struct codec_api {
     
     /* Codec should periodically check if stop_codec is set to true.
        In case it is, codec must return immediately */
-    bool stop_codec;
+    volatile bool stop_codec;
     /* Codec should periodically check if new_track is non zero.
        When it is, the codec should request a new track. */
-    int new_track;
+    volatile int new_track;
     /* If seek_time != 0, codec should seek to that song position (in ms)
        if codec supports seeking. */
-    long seek_time;
+    volatile long seek_time;
 
     /* The dsp instance to be used for audio output */
     struct dsp_config *dsp;
@@ -145,8 +144,6 @@ struct codec_api {
        track is available and changed. If return value is false,
        codec should exit immediately with PLUGIN_OK status. */
     bool (*request_next_track)(void);
-    /* Free the buffer area of the current codec after its loaded */
-    void (*discard_codec)(void);
     
     void (*set_offset)(size_t value);
     /* Configure different codec buffer parameters. */
@@ -210,8 +207,6 @@ struct codec_api {
 #endif
  
 #ifdef HAVE_RECORDING
-    volatile bool   stop_encoder;
-    volatile int    enc_codec_loaded; /* <0=error, 0=pending, >0=ok */
     void            (*enc_get_inputs)(struct enc_inputs *inputs);
     void            (*enc_set_parameters)(struct enc_parameters *params);
     struct enc_chunk_hdr * (*enc_get_chunk)(void);
@@ -283,8 +278,10 @@ extern unsigned char plugin_end_addr[];
 void codec_get_full_path(char *path, const char *codec_root_fn);
 
 /* defined by the codec loader (codec.c) */
-int codec_load_buf(unsigned int hid, struct codec_api *api);
-int codec_load_file(const char* codec, struct codec_api *api);
+void * codec_load_buf(int hid, struct codec_api *api);
+void * codec_load_file(const char* codec, struct codec_api *api);
+int codec_begin(void *handle);
+void codec_close(void *handle);
 
 /* defined by the codec */
 enum codec_status codec_start(void);

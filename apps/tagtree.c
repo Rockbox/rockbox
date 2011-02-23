@@ -52,6 +52,7 @@
 #include "appevents.h"
 #include "storage.h"
 #include "dir.h"
+#include "playback.h"
 
 #define str_or_empty(x) (x ? x : "(NULL)")
 
@@ -169,10 +170,6 @@ static int current_offset;
 static int current_entry_count;
 
 static struct tree_context *tc;
-
-#if CONFIG_CODEC == SWCODEC 
-extern bool automatic_skip; /* Who initiated in-progress skip? (C/A-) */
-#endif
 
 static int get_token_str(char *buf, int size)
 {
@@ -726,7 +723,7 @@ static void tagtree_track_finish_event(void *data)
        first 15 seconds. */
     if (id3->elapsed == 0
 #if CONFIG_CODEC == SWCODEC /* HWCODEC doesn't have automatic_skip */
-        || (id3->elapsed < 15 * 1000 && !automatic_skip)
+        || (id3->elapsed < 15 * 1000 && !audio_automatic_skip())
 #endif
         )
     {
@@ -766,7 +763,7 @@ static void tagtree_track_finish_event(void *data)
     if (global_settings.autoresume_enable)
     {
         unsigned long offset
-            = automatic_skip ? 0 : id3->offset;
+            = audio_automatic_skip() ? 0 : id3->offset;
 
         tagcache_update_numeric(tagcache_idx, tag_lastoffset, offset);
 

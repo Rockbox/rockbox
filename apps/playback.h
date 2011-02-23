@@ -81,9 +81,9 @@ size_t audio_get_filebuflen(void);
 void audio_pcmbuf_position_callback(unsigned int time) ICODE_ATTR;
 void audio_post_track_change(bool pcmbuf);
 int get_audio_hid(void);
-int *get_codec_hid(void);
 void audio_set_prev_elapsed(unsigned long setting);
 bool audio_buffer_state_trashed(void);
+bool audio_automatic_skip(void);
 
 /* Define one constant that includes recording related functionality */
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
@@ -101,6 +101,7 @@ enum {
     Q_AUDIO_CHECK_NEW_TRACK,
     Q_AUDIO_FLUSH,
     Q_AUDIO_TRACK_CHANGED,
+    Q_AUDIO_SEEK_COMPLETE,
     Q_AUDIO_DIR_SKIP,
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
@@ -112,11 +113,13 @@ enum {
     Q_CODEC_LOAD_DISK,
 
 #ifdef AUDIO_HAVE_RECORDING
+    Q_AUDIO_LOAD_ENCODER,
     Q_ENCODER_LOAD_DISK,
     Q_ENCODER_RECORD,
 #endif
 
     Q_CODEC_DO_CALLBACK,
+    Q_CODEC_ACK,
 };
 
 #endif

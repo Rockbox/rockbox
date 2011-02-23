@@ -31,6 +31,7 @@
 #include "usb.h"
 #include "buffer.h"
 #include "general.h"
+#include "codec_thread.h"
 #include "audio.h"
 #include "sound.h"
 #include "metadata.h"
@@ -40,8 +41,6 @@
 #endif
 
 /***************************************************************************/
-
-extern unsigned int codec_thread_id;
 
 /** General recording state **/
 static bool is_recording;              /* We are recording                 */
@@ -900,8 +899,8 @@ static void pcmrec_flush(unsigned flush_num)
                  num >= flood_watermark ? "num" : "time");
             prio_pcmrec = thread_set_priority(THREAD_ID_CURRENT,
                                 thread_get_priority(THREAD_ID_CURRENT) - 4);
-            prio_codec  = thread_set_priority(codec_thread_id,
-                                thread_get_priority(codec_thread_id) - 4);
+            prio_codec = codec_thread_set_priority(
+                                codec_thread_get_priority() - 4);
         }
 #endif
 
@@ -952,7 +951,7 @@ static void pcmrec_flush(unsigned flush_num)
         /* return to original priorities */
         logf("pcmrec: unboost priority");
         thread_set_priority(THREAD_ID_CURRENT, prio_pcmrec);
-        thread_set_priority(codec_thread_id, prio_codec);
+        codec_thread_set_priority(prio_codec);
     }
 
     last_flush_tick = current_tick; /* save tick when we left */

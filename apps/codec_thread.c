@@ -19,10 +19,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include "config.h"
+#include "system.h"
 #include "playback.h"
 #include "codec_thread.h"
-#include "system.h"
 #include "kernel.h"
 #include "codecs.h"
 #include "buffering.h"
@@ -67,36 +67,38 @@
  */
 
 /* Main state control */
-volatile bool audio_codec_loaded SHAREDBSS_ATTR = false; /* Codec loaded? (C/A-) */
+
+/* Type of codec loaded? (C/A) */
+static int current_codectype SHAREDBSS_ATTR = AFMT_UNKNOWN;
 
 extern struct mp3entry *thistrack_id3,  /* the currently playing track */
                        *othertrack_id3; /* prev track during track-change-transition, or end of playlist,
                                          * next track otherwise */
 
 /* Track change controls */
-extern bool automatic_skip; /* Who initiated in-progress skip? (C/A-) */
-
-/* Set to true if the codec thread should send an audio stop request
- * (typically because the end of the playlist has been reached).
- */
-static bool codec_requested_stop = false;
-
 extern struct event_queue audio_queue SHAREDBSS_ATTR;
-extern struct event_queue codec_queue SHAREDBSS_ATTR;
+
 
 extern struct codec_api ci; /* from codecs.c */
 
 /* Codec thread */
-unsigned int codec_thread_id;   /* For modifying thread priority later.
-                                   Used by playback.c and pcmbuf.c */
+static unsigned int codec_thread_id; /* For modifying thread priority later */
+static struct event_queue codec_queue SHAREDBSS_ATTR;
 static struct queue_sender_list codec_queue_sender_list SHAREDBSS_ATTR;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
-IBSS_ATTR;
+                IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
 
-/* function prototypes */
-static bool codec_load_next_track(void);
+/* static routines */
+static void codec_queue_ack(intptr_t ackme)
+{
+    queue_reply(&codec_queue, ackme);
+}
 
+static intptr_t codec_queue_send(long id, intptr_t data)
+{
+    return queue_send(&codec_queue, id, data);
+}
 
 /**************************************/
 
@@ -183,7 +185,7 @@ void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
 
     /* Codec thread will signal just before entering callback */
     LOGFQUEUE("codec >| Q_CODEC_DO_CALLBACK");
-    queue_send(&codec_queue, Q_CODEC_DO_CALLBACK, (intptr_t)fn);
+    codec_queue_send(Q_CODEC_DO_CALLBACK, (intptr_t)fn);
 }
 
 
@@ -289,7 +291,7 @@ static size_t codec_filebuf_callback(void *ptr, size_t size)
 {
     ssize_t copy_n;
 
-    if (ci.stop_codec || !(audio_status() & AUDIO_STATUS_PLAY))
+    if (ci.stop_codec)
         return 0;
 
     copy_n = bufread(get_audio_hid(), size, ptr);
@@ -311,24 +313,16 @@ static void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     ssize_t ret;
     void *ptr;
 
-    if (!(audio_status() & AUDIO_STATUS_PLAY))
-    {
-        *realsize = 0;
-        return NULL;
-    }
-
     ret = bufgetdata(get_audio_hid(), reqsize, &ptr);
     if (ret >= 0)
         copy_n = MIN((size_t)ret, reqsize);
+    else
+        copy_n = 0;
 
     if (copy_n == 0)
-    {
-        *realsize = 0;
-        return NULL;
-    }
+        ptr = NULL;
 
     *realsize = copy_n;
-
     return ptr;
 } /* codec_request_buffer_callback */
 
@@ -360,61 +354,71 @@ static bool codec_seek_buffer_callback(size_t newpos)
 
 static void codec_seek_complete_callback(void)
 {
+    struct queue_event ev;
+
     logf("seek_complete");
-    /* If seeking-while-playing, pcm_is_paused() is true.
-     * If seeking-while-paused, audio_status PAUSE is true.
-     * A seamless seek skips this section. */
-    bool audio_paused = audio_status() & AUDIO_STATUS_PAUSE;
-    if (pcm_is_paused() || audio_paused)
-    {
-        /* Clear the buffer */
-        pcmbuf_play_stop();
-        dsp_configure(ci.dsp, DSP_FLUSH, 0);
 
-        /* If seeking-while-playing, resume pcm playback */
-        if (!audio_paused)
-            pcmbuf_pause(false);
-    }
-    ci.seek_time = 0;
-}
+    /* Clear DSP */
+    dsp_configure(ci.dsp, DSP_FLUSH, 0);
 
-static void codec_discard_codec_callback(void)
-{
-    int *codec_hid = get_codec_hid();
-    if (*codec_hid >= 0)
-    {
-        bufclose(*codec_hid);
-        *codec_hid = -1;
-    }
+    /* Post notification to audio thread */
+    LOGFQUEUE("audio > Q_AUDIO_SEEK_COMPLETE");
+    queue_post(&audio_queue, Q_AUDIO_SEEK_COMPLETE, 0);
+
+    /* Wait for ACK */
+    queue_wait(&codec_queue, &ev);
+
+    /* ACK back in context */
+    codec_queue_ack(Q_AUDIO_SEEK_COMPLETE);
 }
 
 static bool codec_request_next_track_callback(void)
 {
-    int prev_codectype;
+    struct queue_event ev;
 
-    if (ci.stop_codec || !(audio_status() & AUDIO_STATUS_PLAY))
-        return false;
+    logf("Request new track");
 
-    prev_codectype = get_codec_base_type(thistrack_id3->codectype);
-    if (!codec_load_next_track())
-        return false;
+    audio_set_prev_elapsed(thistrack_id3->elapsed);
 
-    /* Seek to the beginning of the new track because if the struct
-       mp3entry was buffered, "elapsed" might not be zero (if the track has
-       been played already but not unbuffered) */
-    codec_seek_buffer_callback(thistrack_id3->first_frame_offset);
-    /* Check if the next codec is the same file. */
-    if (prev_codectype == get_codec_base_type(thistrack_id3->codectype))
+#ifdef AB_REPEAT_ENABLE
+    ab_end_of_track_report();
+#endif
+
+    if (ci.stop_codec)
     {
-        logf("New track loaded");
-        codec_discard_codec_callback();
-        return true;
-    }
-    else
-    {
-        logf("New codec:%d/%d", thistrack_id3->codectype, prev_codectype);
+        /* Handle ACK in outer loop */
+        LOGFQUEUE("codec: already stopping");
         return false;
     }
+
+    trigger_cpu_boost();
+
+    /* Post request to audio thread */
+    LOGFQUEUE("codec > audio Q_AUDIO_CHECK_NEW_TRACK");
+    queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
+
+    /* Wait for ACK */
+    queue_wait(&codec_queue, &ev);
+
+    if (ev.data == Q_CODEC_REQUEST_COMPLETE)
+    {
+        /* Seek to the beginning of the new track because if the struct
+           mp3entry was buffered, "elapsed" might not be zero (if the track has
+           been played already but not unbuffered) */
+        codec_seek_buffer_callback(thistrack_id3->first_frame_offset);
+    }
+
+    /* ACK back in context */
+    codec_queue_ack(Q_AUDIO_CHECK_NEW_TRACK);
+
+    if (ev.data != Q_CODEC_REQUEST_COMPLETE || ci.stop_codec)
+    {
+        LOGFQUEUE("codec <= request failed (%d)", ev.data);
+        return false;
+    }
+
+    LOGFQUEUE("codec <= Q_CODEC_REQEST_COMPLETE");
+    return true;
 }
 
 static void codec_configure_callback(int setting, intptr_t value)
@@ -438,7 +442,6 @@ void codec_init_codec_api(void)
     ci.seek_buffer         = codec_seek_buffer_callback;
     ci.seek_complete       = codec_seek_complete_callback;
     ci.request_next_track  = codec_request_next_track_callback;
-    ci.discard_codec       = codec_discard_codec_callback;
     ci.set_offset          = codec_set_offset_callback;
     ci.configure           = codec_configure_callback;
 }
@@ -446,61 +449,18 @@ void codec_init_codec_api(void)
 
 /* track change */
 
-static bool codec_load_next_track(void)
-{
-    intptr_t result = Q_CODEC_REQUEST_FAILED;
-
-    audio_set_prev_elapsed(thistrack_id3->elapsed);
-
-#ifdef AB_REPEAT_ENABLE
-    ab_end_of_track_report();
-#endif
-
-    logf("Request new track");
-
-    if (ci.new_track == 0)
-    {
-        ci.new_track++;
-        automatic_skip = true;
-    }
-
-    if (!ci.stop_codec)
-    {
-        trigger_cpu_boost();
-        LOGFQUEUE("codec >| audio Q_AUDIO_CHECK_NEW_TRACK");
-        result = queue_send(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
-    }
-
-    switch (result)
-    {
-        case Q_CODEC_REQUEST_COMPLETE:
-            LOGFQUEUE("codec |< Q_CODEC_REQUEST_COMPLETE");
-            pcmbuf_start_track_change(automatic_skip);
-            return true;
-
-        case Q_CODEC_REQUEST_FAILED:
-            LOGFQUEUE("codec |< Q_CODEC_REQUEST_FAILED");
-            ci.new_track = 0;
-            ci.stop_codec = true;
-            codec_requested_stop = true;
-            return false;
-
-        default:
-            LOGFQUEUE("codec |< default");
-            ci.stop_codec = true;
-            codec_requested_stop = true;
-            return false;
-    }
-}
-
 /** CODEC THREAD */
 static void codec_thread(void)
 {
     struct queue_event ev;
-    int status;
 
-    while (1) {
-        status = 0;
+
+    while (1)   
+    {
+        int status = CODEC_OK;
+        void *handle = NULL;
+        int hid;
+        const char *codec_fn;
         
 #ifdef HAVE_CROSSFADE
         if (!pcmbuf_is_crossfade_active())
@@ -508,171 +468,89 @@ static void codec_thread(void)
         {
             cancel_cpu_boost();
         }
-            
-        queue_wait(&codec_queue, &ev);
-        codec_requested_stop = false;
 
-        switch (ev.id) {
+        queue_wait(&codec_queue, &ev);
+
+        switch (ev.id)
+        {
             case Q_CODEC_LOAD_DISK:
                 LOGFQUEUE("codec < Q_CODEC_LOAD_DISK");
-                queue_reply(&codec_queue, 1);
-                audio_codec_loaded = true;
-                ci.stop_codec = false;
-                status = codec_load_file((const char *)ev.data, &ci);
-                LOGFQUEUE("codec_load_file %s %d\n", (const char *)ev.data, status);
+                codec_fn = get_codec_filename(ev.data);
+                if (!codec_fn)
+                    break;
+#ifdef AUDIO_HAVE_RECORDING
+                if (ev.data & CODEC_TYPE_ENCODER)
+                {
+                    ev.id = Q_ENCODER_LOAD_DISK;
+                    handle = codec_load_file(codec_fn, &ci);
+                    if (handle)
+                        codec_queue_ack(Q_ENCODER_LOAD_DISK);
+                }
+                else
+#endif
+                {
+                    codec_queue_ack(Q_CODEC_LOAD_DISK);
+                    handle = codec_load_file(codec_fn, &ci);
+                }
                 break;
 
             case Q_CODEC_LOAD:
                 LOGFQUEUE("codec < Q_CODEC_LOAD");
-                if (*get_codec_hid() < 0) {
-                    logf("Codec slot is empty!");
-                    /* Wait for the pcm buffer to go empty */
-                    while (pcm_is_playing())
-                        yield();
-                    /* This must be set to prevent an infinite loop */
-                    ci.stop_codec = true;
-                    LOGFQUEUE("codec > codec Q_AUDIO_PLAY");
-                    queue_post(&codec_queue, Q_AUDIO_PLAY, 0);
-                    break;
-                }
-
-                audio_codec_loaded = true;
-                ci.stop_codec = false;
-                status = codec_load_buf(*get_codec_hid(), &ci);
-                LOGFQUEUE("codec_load_buf %d\n", status);
+                codec_queue_ack(Q_CODEC_LOAD);
+                hid = (int)ev.data;
+                handle = codec_load_buf(hid, &ci);
+                bufclose(hid);
                 break;
 
             case Q_CODEC_DO_CALLBACK:
                 LOGFQUEUE("codec < Q_CODEC_DO_CALLBACK");
-                queue_reply(&codec_queue, 1);
+                codec_queue_ack(Q_CODEC_DO_CALLBACK);
                 if ((void*)ev.data != NULL)
                 {
-                    cpucache_invalidate();
+                    cpucache_commit_discard();
                     ((void (*)(void))ev.data)();
-                    cpucache_flush();
+                    cpucache_commit();
                 }
                 break;
 
+            default:
+                LOGFQUEUE("codec < default : %ld", ev.id);
+        }
+
+        if (handle)
+        {
+            /* Codec loaded - call the entrypoint */
+            yield();
+            logf("codec running");
+            status = codec_begin(handle);
+            logf("codec stopped");
+            codec_close(handle);
+            current_codectype = AFMT_UNKNOWN;
+
+            if (ci.stop_codec)
+                status = CODEC_OK;
+        }
+
+        switch (ev.id)
+        {
 #ifdef AUDIO_HAVE_RECORDING
             case Q_ENCODER_LOAD_DISK:
-                LOGFQUEUE("codec < Q_ENCODER_LOAD_DISK");
-                audio_codec_loaded = false; /* Not audio codec! */
-                logf("loading encoder");
-                ci.stop_encoder = false;
-                status = codec_load_file((const char *)ev.data, &ci);
-                logf("encoder stopped");
-                break;
-#endif /* AUDIO_HAVE_RECORDING */
-
-            default:
-                LOGFQUEUE("codec < default");
-        }
-
-        if (audio_codec_loaded)
-        {
-            if (ci.stop_codec)
-            {
-                status = CODEC_OK;
-                if (!(audio_status() & AUDIO_STATUS_PLAY))
-                    pcmbuf_play_stop();
-
-            }
-            audio_codec_loaded = false;
-        }
-
-        switch (ev.id) {
+#endif
             case Q_CODEC_LOAD_DISK:
             case Q_CODEC_LOAD:
-                LOGFQUEUE("codec < Q_CODEC_LOAD");
-                if (audio_status() & AUDIO_STATUS_PLAY)
-                {
-                    if (ci.new_track || status != CODEC_OK)
-                    {
-                        if (!ci.new_track)
-                        {
-                            logf("Codec failure, %d %d", ci.new_track, status);
-                            splash(HZ*2, "Codec failure");
-                        }
-
-                        if (!codec_load_next_track())
-                        {
-                            LOGFQUEUE("codec > audio Q_AUDIO_STOP");
-                            /* End of playlist */
-                            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        logf("Codec finished");
-                        if (ci.stop_codec)
-                        {
-                            /* Wait for the audio to stop playing before
-                             * triggering the WPS exit */
-                            while(pcm_is_playing())
-                            {
-                                /* There has been one too many struct pointer swaps by now
-                                 * so even though it says othertrack_id3, its the correct one! */
-                                othertrack_id3->elapsed =
-                                    othertrack_id3->length - pcmbuf_get_latency();
-                                sleep(1);
-                            }
-
-                            if (codec_requested_stop)
-                            {
-                                LOGFQUEUE("codec > audio Q_AUDIO_STOP");
-                                queue_post(&audio_queue, Q_AUDIO_STOP, 0);
-                            }
-                            break;
-                        }
-                    }
-
-                    if (*get_codec_hid() >= 0)
-                    {
-                        LOGFQUEUE("codec > codec Q_CODEC_LOAD");
-                        queue_post(&codec_queue, Q_CODEC_LOAD, 0);
-                    }
-                    else
-                    {
-                        const char *codec_fn =
-                            get_codec_filename(thistrack_id3->codectype);
-                        if (codec_fn)
-                        {
-                            LOGFQUEUE("codec > codec Q_CODEC_LOAD_DISK");
-                            queue_post(&codec_queue, Q_CODEC_LOAD_DISK,
-                                       (intptr_t)codec_fn);
-                        }
-                    }
-                }
+                /* Notify about the status */
+                if (!handle)
+                    status = CODEC_ERROR;
+                LOGFQUEUE("codec > audio notify status: %d", status);
+                queue_post(&audio_queue, ev.id, status);
                 break;
-
-#ifdef AUDIO_HAVE_RECORDING
-            case Q_ENCODER_LOAD_DISK:
-                LOGFQUEUE("codec < Q_ENCODER_LOAD_DISK");
-
-                if (status == CODEC_OK)
-                    break;
-
-                logf("Encoder failure");
-                splash(HZ*2, "Encoder failure");
-
-                if (ci.enc_codec_loaded < 0)
-                    break;
-
-                logf("Encoder failed to load");
-                ci.enc_codec_loaded = -1;
-                break;
-#endif /* AUDIO_HAVE_RECORDING */
-
-            default:
-                LOGFQUEUE("codec < default");
-
-        } /* end switch */
+        }
     }
 }
 
 void make_codec_thread(void)
 {
+    queue_init(&codec_queue, false);
     codec_thread_id = create_thread(
             codec_thread, codec_stack, sizeof(codec_stack),
             CREATE_THREAD_FROZEN,
@@ -680,4 +558,80 @@ void make_codec_thread(void)
             IF_COP(, CPU));
     queue_enable_queue_send(&codec_queue, &codec_queue_sender_list,
                             codec_thread_id);
+}
+
+void codec_thread_resume(void)
+{
+    thread_thaw(codec_thread_id);
+}
+
+bool is_codec_thread(void)
+{
+    return thread_get_current() == codec_thread_id;
+}
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+int codec_thread_get_priority(void)
+{
+    return thread_get_priority(codec_thread_id);
+}
+
+int codec_thread_set_priority(int priority)
+{
+    return thread_set_priority(codec_thread_id, priority);
+}
+#endif /* HAVE_PRIORITY_SCHEDULING */
+
+/* functions for audio thread use */
+intptr_t codec_ack_msg(intptr_t data, bool stop_codec)
+{
+    intptr_t resp;
+    LOGFQUEUE("codec >| Q_CODEC_ACK: %d", data);
+    if (stop_codec)
+        ci.stop_codec = true;
+    resp = codec_queue_send(Q_CODEC_ACK, data);
+    if (stop_codec)
+        codec_stop();
+    LOGFQUEUE("  ack: %ld", resp);
+    return resp;
+}
+
+bool codec_load(int hid, int cod_spec)
+{
+    bool retval = false;
+
+    ci.stop_codec = false;
+    current_codectype = cod_spec;
+
+    if (hid >= 0)
+    {
+        LOGFQUEUE("audio >| codec Q_CODEC_LOAD: %d", hid);
+        retval = codec_queue_send(Q_CODEC_LOAD, hid) != Q_NULL;
+    }
+    else
+    {
+        LOGFQUEUE("audio >| codec Q_CODEC_LOAD_DISK: %d", cod_spec);
+        retval = codec_queue_send(Q_CODEC_LOAD_DISK, cod_spec) != Q_NULL;
+    }
+
+    if (!retval)
+    {
+        ci.stop_codec = true;
+        current_codectype = AFMT_UNKNOWN;
+    }
+
+    return retval;
+}
+
+void codec_stop(void)
+{
+    ci.stop_codec = true;
+    /* Wait until it's in the main loop */
+    while (codec_ack_msg(0, false) != Q_NULL);
+    current_codectype = AFMT_UNKNOWN;
+}
+
+int codec_loaded(void)
+{
+    return current_codectype;
 }

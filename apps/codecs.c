@@ -97,7 +97,6 @@ struct codec_api ci = {
     NULL, /* seek_buffer */
     NULL, /* seek_complete */
     NULL, /* request_next_track */
-    NULL, /* discard_codec */
     NULL, /* set_offset */
     NULL, /* configure */
     
@@ -149,8 +148,6 @@ struct codec_api ci = {
 #endif
 
 #ifdef HAVE_RECORDING
-    false,  /* stop_encoder */
-    0,      /* enc_codec_loaded */
     enc_get_inputs,
     enc_set_parameters,
     enc_get_chunk,
@@ -178,11 +175,10 @@ void codec_get_full_path(char *path, const char *codec_root_fn)
              CODECS_DIR, codec_root_fn);
 }
 
-static int codec_load_ram(void *handle, struct codec_api *api)
+static void * codec_load_ram(void *handle, struct codec_api *api)
 {
     struct codec_header *c_hdr = lc_get_header(handle);
     struct lc_header    *hdr   = c_hdr ? &c_hdr->lc_hdr : NULL;
-    int status;
 
     if (hdr == NULL
         || (hdr->magic != CODEC_MAGIC
@@ -199,14 +195,14 @@ static int codec_load_ram(void *handle, struct codec_api *api)
     {
         logf("codec header error");
         lc_close(handle);
-        return CODEC_ERROR;
+        return NULL;
     }
 
     if (hdr->api_version > CODEC_API_VERSION
         || hdr->api_version < CODEC_MIN_API_VERSION) {
         logf("codec api version error");
         lc_close(handle);
-        return CODEC_ERROR;
+        return NULL;
     }
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -216,34 +212,31 @@ static int codec_load_ram(void *handle, struct codec_api *api)
 #endif
 
     *(c_hdr->api) = api;
-    status = c_hdr->entry_point();
 
-    lc_close(handle);
-
-    return status;
+    return handle;
 }
 
-int codec_load_buf(unsigned int hid, struct codec_api *api)
+void * codec_load_buf(int hid, struct codec_api *api)
 {
     int rc;
     void *handle;
     rc = bufread(hid, CODEC_SIZE, codecbuf);
     if (rc < 0) {
-        logf("error loading codec");
-        return CODEC_ERROR;
-    }
-    handle = lc_open_from_mem(codecbuf, rc);
-    if (handle == NULL)
-    {
-        logf("error loading codec");
-        return CODEC_ERROR;
+        logf("Codec: cannot read buf handle");
+        return NULL;
     }
 
-    api->discard_codec();
+    handle = lc_open_from_mem(codecbuf, rc);
+
+    if (handle == NULL) {
+        logf("error loading codec");
+        return NULL;
+    }
+
     return codec_load_ram(handle, api);
 }
 
-int codec_load_file(const char *plugin, struct codec_api *api)
+void * codec_load_file(const char *plugin, struct codec_api *api)
 {
     char path[MAX_PATH];
     void *handle;
@@ -253,10 +246,30 @@ int codec_load_file(const char *plugin, struct codec_api *api)
     handle = lc_open(path, codecbuf, CODEC_SIZE);
 
     if (handle == NULL) {
-        logf("Codec load error");
-        splashf(HZ*2, "Couldn't load codec: %s", path);
-        return CODEC_ERROR;
+        logf("Codec: cannot read file");
+        return NULL;
     }
 
     return codec_load_ram(handle, api);
+}
+
+int codec_begin(void *handle)
+{
+    int status = CODEC_ERROR;
+    struct codec_header *c_hdr;
+
+    c_hdr = lc_get_header(handle);
+
+    if (c_hdr != NULL) {
+        logf("Codec: calling entry_point");
+        status = c_hdr->entry_point();
+    }
+
+    return status;
+}
+
+void codec_close(void *handle)
+{
+    if (handle)
+        lc_close(handle);
 }

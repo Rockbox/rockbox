@@ -26,6 +26,7 @@
 #include "pcmbuf.h"
 #include "pcm.h"
 #include "playback.h"
+#include "codec_thread.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
@@ -86,8 +87,7 @@ static size_t pcmbuffer_pos IDATA_ATTR;
 static size_t pcmbuffer_fillpos IDATA_ATTR;
 
 /* Gapless playback */
-static bool end_of_track IDATA_ATTR;
-bool track_transition IDATA_ATTR;
+static bool track_transition IDATA_ATTR;
 
 #ifdef HAVE_CROSSFADE
 /* Crossfade buffer */
@@ -130,8 +130,6 @@ static bool flush_pcmbuf = false;
 #ifdef HAVE_PRIORITY_SCHEDULING
 static int codec_thread_priority = PRIORITY_PLAYBACK;
 #endif
-
-extern unsigned int codec_thread_id;
 
 /* Helpful macros for use in conditionals this assumes some of the above
  * static variable names */
@@ -223,9 +221,8 @@ static void commit_chunk(bool flush_next_time)
     /* Fill in the values in the new buffer chunk */
     pcmbuf_current->addr = &pcmbuffer[pcmbuffer_pos];
     pcmbuf_current->size = size;
-    pcmbuf_current->end_of_track = end_of_track;
+    pcmbuf_current->end_of_track = false;
     pcmbuf_current->link = NULL;
-    end_of_track = false;   /* This is single use only */
     
     if (read_chunk != NULL)
     {
@@ -297,7 +294,7 @@ static void boost_codec_thread(int pcm_fill_state)
      * will starve if the codec thread's priority is boosted. */
     if (new_prio != codec_thread_priority)
     {
-        thread_set_priority(codec_thread_id, new_prio);
+        codec_thread_set_priority(new_prio);
         voice_thread_set_priority(new_prio);
         codec_thread_priority = new_prio;
     }
@@ -327,7 +324,7 @@ static bool prepare_insert(size_t length)
         /* Only codec thread initiates boost - voice boosts the cpu when playing
            a clip */
 #ifndef SIMULATOR
-        if (thread_get_current() == codec_thread_id)
+        if (is_codec_thread())
 #endif /* SIMULATOR */
         {
             /* boost cpu if necessary */
@@ -487,6 +484,27 @@ size_t pcmbuf_init(unsigned char *bufend)
 
 
 /** Track change */
+void pcmbuf_monitor_track_change(bool monitor)
+{
+    pcm_play_lock();
+
+    if (last_chunksize != 0)
+    {
+        /* If monitoring, wait until this track runs out. Place in
+           currently playing chunk. If not, cancel notification. */
+        track_transition = monitor;
+        read_end_chunk->end_of_track = monitor;
+    }
+    else
+    {
+        /* Post now if PCM stopped and last buffer was sent. */
+        track_transition = false;
+        if (monitor)
+            audio_post_track_change(false);
+    }
+
+    pcm_play_unlock();
+}
 
 void pcmbuf_start_track_change(bool auto_skip)
 {
@@ -523,6 +541,11 @@ void pcmbuf_start_track_change(bool auto_skip)
             { logf("  crossfade track change"); }
         else
             { logf("  manual track change"); }
+
+        pcm_play_lock();
+
+        /* Cancel any pending automatic gapless transition */
+        pcmbuf_monitor_track_change(false);
         
         /* Notify the wps that the track change starts now */
         audio_post_track_change(false);
@@ -535,26 +558,32 @@ void pcmbuf_start_track_change(bool auto_skip)
             !pcm_is_playing())
         {
             pcmbuf_play_stop();
+            pcm_play_unlock();
             return;
         }
-
-        trigger_cpu_boost();
 
         /* Not enough data, or not crossfading, flush the old data instead */
         if (LOW_DATA(2) || !crossfade || low_latency_mode)
         {
             commit_chunk(true);
-            return;
         }
-
 #ifdef HAVE_CROSSFADE
-        /* Don't enable mix mode when skipping tracks manually. */
-        crossfade_mixmode = auto_skip && global_settings.crossfade_fade_out_mixmode;
-        
-        crossfade_auto_skip = auto_skip;
+        else
+        {
+            /* Don't enable mix mode when skipping tracks manually. */
+            crossfade_mixmode = auto_skip &&
+                global_settings.crossfade_fade_out_mixmode;
 
-        crossfade_track_change_started = crossfade;
+            crossfade_auto_skip = auto_skip;
+
+            crossfade_track_change_started = crossfade;
+        }
 #endif
+        pcm_play_unlock();
+
+        /* Keep trigger outside the play lock or HW FIFO underruns can happen
+           since frequency scaling is *not* always fast */
+        trigger_cpu_boost();
     }
     else    /* automatic and not crossfading, so do gapless track change */
     {
@@ -563,8 +592,7 @@ void pcmbuf_start_track_change(bool auto_skip)
          * current track will be updated properly, and mark the current chunk
          * as the last one in the track. */
         logf("  gapless track change");
-        track_transition = true;
-        end_of_track = true;
+        pcmbuf_monitor_track_change(true);
     }
 }
 
@@ -674,7 +702,6 @@ void pcmbuf_play_stop(void)
     crossfade_track_change_started = false;
     crossfade_active = false;
 #endif
-    end_of_track = false;
     track_transition = false;
     flush_pcmbuf = false;
     DISPLAY_DESC("play_stop");

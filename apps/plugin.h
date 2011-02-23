@@ -145,12 +145,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 198
+#define PLUGIN_API_VERSION 199
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 198
+#define PLUGIN_MIN_API_VERSION 199
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -798,7 +798,9 @@ struct plugin_api {
 #if CONFIG_CODEC == SWCODEC
     void (*codec_thread_do_callback)(void (*fn)(void),
                                      unsigned int *audio_thread_id);
-    int (*codec_load_file)(const char* codec, struct codec_api *api);
+    void * (*codec_load_file)(const char* codec, struct codec_api *api);
+    int (*codec_begin)(void *handle);
+    void (*codec_close)(void *handle);
     const char *(*get_codec_filename)(int cod_spec);
     void ** (*find_array_ptr)(void **arr, void *ptr);
     int (*remove_array_ptr)(void **arr, void *ptr);

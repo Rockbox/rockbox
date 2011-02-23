@@ -516,13 +516,6 @@ static bool request_next_track(void)
 }
 
 
-/* Free the buffer area of the current codec after its loaded */
-static void discard_codec(void)
-{
-    /* ??? */
-}
-
-
 static void set_offset(size_t value)
 {
     /* ??? */
@@ -576,7 +569,6 @@ static void init_ci(void)
     ci.seek_buffer = seek_buffer;
     ci.seek_complete = seek_complete;
     ci.request_next_track = request_next_track;
-    ci.discard_codec = discard_codec;
     ci.set_offset = set_offset;
     ci.configure = configure;
     ci.dsp = (struct dsp_config *)rb->dsp_configure(NULL, DSP_MYDSP,
@@ -636,12 +628,19 @@ static void init_ci(void)
 static void codec_thread(void)
 {
     const char* codecname;
-    int res;
+    void *handle;
+    int res = CODEC_ERROR;
 
     codecname = rb->get_codec_filename(track.id3.codectype);
 
     /* Load the codec and start decoding. */
-    res = rb->codec_load_file(codecname,&ci);
+    handle = rb->codec_load_file(codecname,&ci);
+
+    if (handle != NULL)
+    {
+        res = rb->codec_begin(handle);
+        rb->codec_close(handle);
+    }
 
     /* Signal to the main thread that we are done */
     endtick = *rb->current_tick - rebuffertick;

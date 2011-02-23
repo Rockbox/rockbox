@@ -2588,16 +2588,10 @@ enum codec_status codec_main(void)
 {
     /* Generic codec initialisation */
     if (!enc_init())
-    {
-        ci->enc_codec_loaded = -1;
         return CODEC_ERROR;
-    }
-
-    /* main application waits for this flag during encoder loading */
-    ci->enc_codec_loaded = 1;
 
     /* main encoding loop */
-    while (!ci->stop_encoder)
+    while (!ci->stop_codec)
     {
         char *buffer;
 
@@ -2605,7 +2599,7 @@ enum codec_status codec_main(void)
         {
             struct enc_chunk_hdr *chunk;
 
-            if (ci->stop_encoder)
+            if (ci->stop_codec)
                 break;
 
             chunk           = ci->enc_get_chunk();
@@ -2629,9 +2623,6 @@ enum codec_status codec_main(void)
 
     /* reset parameters to initial state */
     ci->enc_set_parameters(NULL);
-
-    /* main application waits for this flag during encoder removing */
-    ci->enc_codec_loaded = 0;
 
     return CODEC_OK;
 } /* codec_start */

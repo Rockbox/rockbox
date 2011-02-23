@@ -393,16 +393,10 @@ enum codec_status codec_main(void)
 {
     /* initialize params and config */
     if (!init_encoder())
-    {
-        ci->enc_codec_loaded = -1;
         return CODEC_ERROR;
-    }
-
-    /* main application waits for this flag during encoder loading */
-    ci->enc_codec_loaded = 1;
 
     /* main encoding loop */
-    while(!ci->stop_encoder)
+    while(!ci->stop_codec)
     {
         uint8_t *src;
 
@@ -413,7 +407,7 @@ enum codec_status codec_main(void)
             uint8_t *dst;
             uint8_t *src_end;
 
-            if(ci->stop_encoder)
+            if(ci->stop_codec)
                 break;
 
             abort_chunk = true;
@@ -442,7 +436,7 @@ enum codec_status codec_main(void)
                     chunk->num_pcm += PCM_SAMP_PER_CHUNK/4;
                     ci->yield();
                     /* could've been stopped in some way */
-                    abort_chunk = ci->stop_encoder ||
+                    abort_chunk = ci->stop_codec ||
                                   (chunk->flags & CHUNKF_ABORT);
                 }
 
@@ -467,8 +461,5 @@ enum codec_status codec_main(void)
     /* reset parameters to initial state */
     ci->enc_set_parameters(NULL);
  
-    /* main application waits for this flag during encoder removing */
-    ci->enc_codec_loaded = 0;
-
     return CODEC_OK;
 } /* codec_start */
