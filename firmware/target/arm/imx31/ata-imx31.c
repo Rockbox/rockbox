@@ -371,7 +371,7 @@ void ata_enable(bool on)
 
 bool ata_is_coldstart(void)
 {
-    return true;
+    return false;
 }
 
 #ifdef HAVE_ATA_DMA
