@@ -22,9 +22,8 @@
 package org.rockbox.Helper;
 
 import java.lang.reflect.Method;
-
+import org.rockbox.RockboxFramebuffer;
 import org.rockbox.RockboxService;
-
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -73,7 +72,12 @@ public class MediaButtonReceiver
 
     /* helper class for the manifest */
     public static class MediaReceiver extends BroadcastReceiver
-    {        
+    {
+        private void startService(Context c, Intent baseIntent)
+        {
+            baseIntent.setClass(c, RockboxService.class);
+            c.startService(baseIntent);
+        }
         @Override
         public void onReceive(Context context, Intent intent)
         {
@@ -81,8 +85,11 @@ public class MediaButtonReceiver
             {
                 KeyEvent key = (KeyEvent)intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
                 if (key.getAction() == KeyEvent.ACTION_UP)
-                {   /* pass the pressed key to Rockbox */
-                    if (RockboxService.get_instance().get_fb().dispatchKeyEvent(key))
+                {   /* pass the pressed key to Rockbox, starting it if needed */
+                    RockboxService s = RockboxService.get_instance();
+                    if (s == null || !s.isRockboxRunning())
+                        startService(context, intent);
+                    else if (RockboxFramebuffer.buttonHandler(key.getKeyCode(), false))
                         abortBroadcast();
                 }
             }

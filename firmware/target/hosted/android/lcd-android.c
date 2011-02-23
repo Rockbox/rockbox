@@ -29,68 +29,63 @@
 #include "button.h"
 
 extern JNIEnv *env_ptr;
-extern jclass  RockboxService_class;
 extern jobject RockboxService_instance;
 
-static jclass RockboxFramebuffer_class;
 static jobject RockboxFramebuffer_instance;
 static jmethodID java_lcd_update;
 static jmethodID java_lcd_update_rect;
+static jmethodID java_lcd_init;
+static jobject native_buffer;
 
 static int dpi;
 static int scroll_threshold;
 static bool display_on;
 
-void lcd_init_device(void)
+/* this might actually be called before lcd_init_device() or even main(), so
+ * be sure to only access static storage initalized at library loading,
+ * and not more */
+void connect_with_java(JNIEnv* env, jobject fb_instance)
 {
-    JNIEnv e = *env_ptr;
-    /* get existing instance from the Service */
-    jmethodID get_fb     = e->GetMethodID(env_ptr, RockboxService_class, "get_fb",
-                                          "()Lorg/rockbox/RockboxFramebuffer;");
-    RockboxFramebuffer_instance = e->CallObjectMethod(env_ptr,
-                                                     RockboxService_instance,
-                                                     get_fb);
-    RockboxFramebuffer_class = (*env_ptr)->GetObjectClass(env_ptr,
-                                                          RockboxFramebuffer_instance);
+    JNIEnv e = *env;
+    static bool have_class;
+    RockboxFramebuffer_instance = fb_instance;
+    if (!have_class)
+    {
+        jclass fb_class = e->GetObjectClass(env, fb_instance);
+        /* cache update functions */
+        java_lcd_update      = e->GetMethodID(env, fb_class,
+                                             "java_lcd_update",
+                                             "()V");
+        java_lcd_update_rect = e->GetMethodID(env, fb_class,
+                                             "java_lcd_update_rect",
+                                             "(IIII)V");
+        jmethodID get_dpi    = e->GetMethodID(env, fb_class,
+                                             "getDpi", "()I");
+        jmethodID thresh     = e->GetMethodID(env, fb_class,
+                                             "getScrollThreshold", "()I");
+        /* these don't change with new instances so call them now */
+        dpi                  = e->CallIntMethod(env, fb_instance, get_dpi);
+        scroll_threshold     = e->CallIntMethod(env, fb_instance, thresh);
 
-    /* Get init function and set up what's left from the constructor */
-    jmethodID java_lcd_init = (*env_ptr)->GetMethodID(env_ptr,
-                                                   RockboxFramebuffer_class,
-                                                   "java_lcd_init",
-                                                   "(IILjava/nio/ByteBuffer;)V");
-
-    jobject buf          = e->NewDirectByteBuffer(env_ptr,
+        java_lcd_init        = e->GetMethodID(env, fb_class,
+                                             "java_lcd_init",
+                                             "(IILjava/nio/ByteBuffer;)V");
+                                               
+        native_buffer        = e->NewDirectByteBuffer(env,
                                                   lcd_framebuffer,
                                                   (jlong)sizeof(lcd_framebuffer));
+        have_class           = true;
+    }
+    /* we need to setup parts for the java object every time */
+    (*env)->CallVoidMethod(env, fb_instance, java_lcd_init,
+                          (jint)LCD_WIDTH, (jint)LCD_HEIGHT, native_buffer);
+}
 
-    e->CallVoidMethod(env_ptr, RockboxFramebuffer_instance, java_lcd_init,
-                                               (jint)LCD_WIDTH,
-                                               (jint)LCD_HEIGHT,
-                                               buf);
-
-    /* cache update functions */
-    java_lcd_update  = (*env_ptr)->GetMethodID(env_ptr,
-                                                   RockboxFramebuffer_class,
-                                                   "java_lcd_update",
-                                                   "()V");
-    java_lcd_update_rect = (*env_ptr)->GetMethodID(env_ptr,
-                                                   RockboxFramebuffer_class,
-                                                   "java_lcd_update_rect",
-                                                   "(IIII)V");
-
-    jmethodID get_dpi    = e->GetMethodID(env_ptr,
-                                          RockboxFramebuffer_class,
-                                          "getDpi", "()I");
-
-    jmethodID get_scroll_threshold
-                         = e->GetMethodID(env_ptr,
-                                          RockboxFramebuffer_class,
-                                          "getScrollThreshold", "()I");
-
-    dpi              = e->CallIntMethod(env_ptr, RockboxFramebuffer_instance,
-                                        get_dpi);
-    scroll_threshold = e->CallIntMethod(env_ptr, RockboxFramebuffer_instance,
-                                        get_scroll_threshold);
+/*
+ * Do nothing here and connect with the java object later (if it isn't already)
+ */
+void lcd_init_device(void)
+{
     /* must not draw until surface is created */
     display_on = false;
 }
@@ -116,12 +111,14 @@ void lcd_update_rect(int x, int y, int width, int height)
  * Note this is considered interrupt context
  */
 JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxFramebuffer_surfaceCreated(JNIEnv *e, jobject this,
+Java_org_rockbox_RockboxFramebuffer_surfaceCreated(JNIEnv *env, jobject this,
                                                      jobject surfaceholder)
 {
-    (void)e; (void)this; (void)surfaceholder;
-
+    (void)surfaceholder;
+    /* possibly a new instance - reconnect */
+    connect_with_java(env, this);
     display_on = true;
+
     send_event(LCD_EVENT_ACTIVATION, NULL);
     /* Force an update, since the newly created surface is initially black
      * waiting for the next normal update results in a longish black screen */

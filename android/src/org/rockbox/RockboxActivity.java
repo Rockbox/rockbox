@@ -29,16 +29,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 public class RockboxActivity extends Activity 
 {
-    private RockboxService rbservice;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) 
@@ -79,9 +75,7 @@ public class RockboxActivity extends Activity
                         loadingdialog.setProgress(resultData.getInt("value", 0));
                         break;
                     case RockboxService.RESULT_SERVICE_RUNNING:
-                        rbservice = RockboxService.get_instance();
                         setServiceActivity(true);
-                        attachFramebuffer();
                         break;
                     case RockboxService.RESULT_ERROR_OCCURED:
                         Toast.makeText(RockboxActivity.this, resultData.getString("error"), Toast.LENGTH_LONG);
@@ -89,38 +83,21 @@ public class RockboxActivity extends Activity
                 }
             }
         });
+        setContentView(new RockboxFramebuffer(this));
         startService(intent);
     }
 
     private void setServiceActivity(boolean set)
     {
-        if (rbservice != null)
-            rbservice.set_activity(set ? this : null);
-    }
-
-    private void attachFramebuffer()
-    {
-        View rbFramebuffer = null;
-        try {
-            rbFramebuffer = rbservice.get_fb();
-            setContentView(rbFramebuffer);
-        } catch (IllegalStateException e) {
-            /* we are already using the View,
-             * need to remove it and re-attach it */
-            ViewGroup g = (ViewGroup) rbFramebuffer.getParent();
-            g.removeView(rbFramebuffer);
-            setContentView(rbFramebuffer);
-        } catch (NullPointerException e) {
-            return;
-        }
-        rbFramebuffer.requestFocus();
+        RockboxService s = RockboxService.get_instance();
+        if (s != null)
+            s.set_activity(set ? this : null);
     }
 
     public void onResume()
     {
         super.onResume();
         setVisible(true);
-        attachFramebuffer();
     }
     
     /* this is also called when the backlight goes off,

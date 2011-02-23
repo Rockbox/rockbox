@@ -410,7 +410,6 @@ static void init(void)
 #endif /* CONFIG_CODEC == SWCODEC */
 
     audio_init();
-    button_clear_queue(); /* Empty the keyboard buffer */
     
     settings_apply_skins();
 }

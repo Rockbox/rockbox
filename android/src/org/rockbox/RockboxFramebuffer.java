@@ -148,7 +148,7 @@ public class RockboxFramebuffer extends SurfaceView
     }
 
     private native void touchHandler(boolean down, int x, int y);
-    private native static boolean buttonHandler(int keycode, boolean state);
+    public native static boolean buttonHandler(int keycode, boolean state);
 
     public native void surfaceCreated(SurfaceHolder holder);
     public native void surfaceDestroyed(SurfaceHolder holder);
