@@ -1,0 +1,17 @@
+/* For all targets with a bitmap display */
+#ifdef HAVE_LCD_BITMAP
+
+#ifdef HAVE_TAGCACHE
+pictureflow
+#endif
+
+#endif /* HAVE_LCD_BITMAP */
+
+/* For all the swcodec targets */
+#if CONFIG_CODEC == SWCODEC
+
+#if MEMORYSIZE > 2 /* we need a lot of RAM for instruments */
+mikmod
+#endif
+
+#endif /* CONFIG_CODEC == SWCODEC */

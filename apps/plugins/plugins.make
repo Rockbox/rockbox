@@ -8,7 +8,18 @@
 #
 
 # single-file plugins:
+is_app_build =
+ifdef APP_TYPE
+ifneq ($(APP_TYPE),sdl-sim)
+  is_app_build = yes
+endif
+endif
+
+ifdef is_app_build
+PLUGINS_SRC = $(call preprocess, $(APPSDIR)/plugins/SOURCES.app_build)
+else
 PLUGINS_SRC = $(call preprocess, $(APPSDIR)/plugins/SOURCES)
+endif
 OTHER_SRC += $(PLUGINS_SRC)
 ROCKS1 := $(PLUGINS_SRC:.c=.rock)
 ROCKS1 := $(subst $(ROOTDIR),$(BUILDDIR),$(ROCKS1))
@@ -36,7 +47,11 @@ endif
 OTHER_SRC += $(ROOTDIR)/apps/plugins/plugin_crt0.c
 PLUGIN_CRT0 := $(BUILDDIR)/apps/plugins/plugin_crt0.o
 # multifile plugins (subdirs):
+ifdef is_app_build
+PLUGINSUBDIRS := $(call preprocess, $(APPSDIR)/plugins/SUBDIRS.app_build)
+else
 PLUGINSUBDIRS := $(call preprocess, $(APPSDIR)/plugins/SUBDIRS)
+endif
 
 # include <dir>.make from each subdir (yay!)
 $(foreach dir,$(PLUGINSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))

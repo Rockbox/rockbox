@@ -79,6 +79,11 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
+/* Work around debug macro expansion of strncmp in scratchbox */
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+#define _HAVE_STRING_ARCH_strncmp
+#endif
+
 #if (CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO))
 #define HAVE_MULTIMEDIA_KEYS
 #endif

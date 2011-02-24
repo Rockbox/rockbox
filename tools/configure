@@ -2918,7 +2918,7 @@ fi
     output="rockbox"
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -2974,7 +2974,7 @@ fi
     output="rockbox"
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3002,7 +3002,7 @@ fi
     output="rockbox"
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"

@@ -1,0 +1,41 @@
+/* plugins common to all models */
+credits.c
+properties.c
+random_folder_advance_config.c
+search.c
+sort.c
+theme_remove.c
+vbrfix.c
+
+#ifdef HAVE_TEST_PLUGINS /* enable in advanced build options */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+test_boost.c
+#endif
+#if CONFIG_CODEC == SWCODEC
+test_codec.c
+#endif
+#ifdef HAVE_JPEG
+test_core_jpeg.c
+#endif
+test_disk.c
+#ifdef HAVE_LCD_BITMAP
+#if LCD_DEPTH < 4 && !defined(SIMULATOR)
+test_scanrate.c
+#endif
+#ifndef HAVE_LCD_COLOR
+test_grey.c
+test_greylib_bitmap_scale.c
+#endif
+#endif
+test_mem.c
+#ifdef HAVE_LCD_BITMAP
+test_mem_jpeg.c
+#endif
+#ifdef HAVE_LCD_COLOR
+test_resize.c
+#endif
+#if CONFIG_CODEC == SWCODEC
+test_sampr.c
+#endif
+test_viewports.c
+#endif /* HAVE_TEST_PLUGINS */
