@@ -379,40 +379,33 @@ void strip_tags(int handle_id)
 #endif /* CONFIG_CODEC == SWCODEC */
 #endif /* ! __PCTOOL__ */
 
+#define MOVE_ENTRY(x) if (x) x += offset;
+
 void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig)
 {
     long offset;
     if (orig > dest)
-        offset = - ((size_t)orig - (size_t)dest);
+        offset = -((size_t)orig - (size_t)dest);
     else
-        offset = (size_t)dest - (size_t)orig;
+        offset =  ((size_t)dest - (size_t)orig);
 
-    if (entry->title)
-        entry->title += offset;
-    if (entry->artist)
-        entry->artist += offset;
-    if (entry->album)
-        entry->album += offset;
-    if (entry->genre_string > (char*)orig
-         && entry->genre_string < (char*)orig + sizeof(struct mp3entry))
+    MOVE_ENTRY(entry->title)
+    MOVE_ENTRY(entry->artist)
+    MOVE_ENTRY(entry->album)
+
+    if (entry->genre_string > (char*)orig && 
+        entry->genre_string < (char*)orig + sizeof(struct mp3entry))
         /* Don't adjust that if it points to an entry of the "genres" array */
         entry->genre_string += offset;
-    if (entry->track_string)
-        entry->track_string += offset;
-    if (entry->disc_string)
-        entry->disc_string += offset;
-    if (entry->year_string)
-        entry->year_string += offset;
-    if (entry->composer)
-        entry->composer += offset;
-    if (entry->comment)
-        entry->comment += offset;
-    if (entry->albumartist)
-        entry->albumartist += offset;
-    if (entry->grouping)
-        entry->grouping += offset;
-    if (entry->mb_track_id)
-        entry->mb_track_id += offset;
+
+    MOVE_ENTRY(entry->track_string)
+    MOVE_ENTRY(entry->disc_string)
+    MOVE_ENTRY(entry->year_string)
+    MOVE_ENTRY(entry->composer)
+    MOVE_ENTRY(entry->comment)
+    MOVE_ENTRY(entry->albumartist)
+    MOVE_ENTRY(entry->grouping)
+    MOVE_ENTRY(entry->mb_track_id)
 }
 
 void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig)
