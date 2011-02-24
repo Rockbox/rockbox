@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "plugin.h"
 #include "file.h"
 
