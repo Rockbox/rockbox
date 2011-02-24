@@ -53,6 +53,7 @@
 #include "backdrop.h"
 #include "viewport.h"
 #include "language.h"
+#include "replaygain.h"
 
 #if CONFIG_CODEC == SWCODEC
 #include "dsp.h"
@@ -728,10 +729,12 @@ static const char* id3_get_info(int selected_item, void* data,
                 break;
 #if CONFIG_CODEC == SWCODEC
             case LANG_ID3_TRACK_GAIN:
-                val=id3->track_gain_string;
+                replaygain_itoa(buffer, buffer_len, id3->track_gain);
+                val=(id3->track_gain) ? buffer : NULL; /* only show gains!=0 */
                 break;
             case LANG_ID3_ALBUM_GAIN:
-                val=id3->album_gain_string;
+                replaygain_itoa(buffer, buffer_len, id3->album_gain);
+                val=(id3->album_gain) ? buffer : NULL; /* only show gains!=0 */
                 break;
 #endif
             case LANG_ID3_PATH:

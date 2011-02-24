@@ -35,6 +35,7 @@
 #include "sound.h"
 #include "debug.h"
 #include "cuesheet.h"
+#include "replaygain.h"
 #ifdef HAVE_LCD_CHARCELLS
 #include "hwcompat.h"
 #endif
@@ -1305,8 +1306,8 @@ const char *get_token_value(struct gui_wps *gwps,
             {
                 int type;
                 if (LIKELY(id3))
-                    type = get_replaygain_mode(id3->track_gain_string != NULL,
-                                        id3->album_gain_string != NULL);
+                    type = get_replaygain_mode(id3->track_gain != 0,
+                                               id3->album_gain != 0);
                 else
                     type = -1;
 
@@ -1331,11 +1332,11 @@ const char *get_token_value(struct gui_wps *gwps,
                 /* due to above, coming here with !id3 shouldn't be possible */
                 case 2:
                 case 4:
-                    strlcpy(buf, id3->track_gain_string, buf_size);
+                    replaygain_itoa(buf, buf_size, id3->track_gain);
                     break;
                 case 3:
                 case 5:
-                    strlcpy(buf, id3->album_gain_string, buf_size);
+                    replaygain_itoa(buf, buf_size, id3->album_gain);
                     break;
             }
             return buf;

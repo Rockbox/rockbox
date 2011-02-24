@@ -283,13 +283,10 @@ struct mp3entry {
 #endif
     
     /* replaygain support */
-    
 #if CONFIG_CODEC == SWCODEC
-    char* track_gain_string;
-    char* album_gain_string;
-    long track_gain;    /* 7.24 signed fixed point. 0 for no gain. */
+    long track_gain;    /* s19.12 signed fixed point. 0 for no gain. */
     long album_gain;
-    long track_peak;    /* 7.24 signed fixed point. 0 for no peak. */
+    long track_peak;    /* s19.12 signed fixed point. 0 for no peak. */
     long album_peak;
 #endif
 

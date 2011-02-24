@@ -46,8 +46,7 @@ static int set_replaygain_sv7(struct mp3entry* id3,
     /* We use a peak value of 0 to indicate a given gain type isn't used. */
     if (peak != 0) {
         /* Save the ReplayGain data to id3-structure for further processing. */
-        used += parse_replaygain_int(album, gain * 512 / 100, peak << 9,
-            id3, id3->toc + used, sizeof(id3->toc) - used);
+        parse_replaygain_int(album, gain * 512 / 100, peak << 9, id3);
     }
     
     return used;
@@ -73,8 +72,7 @@ static int set_replaygain_sv8(struct mp3entry* id3,
     /* We use a peak value of 0 to indicate a given gain type isn't used. */
     if (peak != 0) {
         /* Save the ReplayGain data to id3-structure for further processing. */
-        used += parse_replaygain_int(album, gain * 512 / 100, peak,
-            id3, id3->toc + used, sizeof(id3->toc) - used);
+        parse_replaygain_int(album, gain * 512 / 100, peak, id3);
     }
     
     return used;

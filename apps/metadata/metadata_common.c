@@ -333,7 +333,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     }
     else
     {
-        len = parse_replaygain(name, value, id3, buf, buf_remaining);
+        parse_replaygain(name, value, id3);
         p = NULL;
     }
     

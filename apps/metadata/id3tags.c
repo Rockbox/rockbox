@@ -370,14 +370,8 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
             entry->albumartist = tag;
 #if CONFIG_CODEC == SWCODEC
         } else {
-            /* Calculate residual buffer size in bytes which can be used by 
-             * parse_replaygain() to save the string representation of 
-             * replaygain data.*/
-            length = sizeof(entry->id3v2buf) - (tag - entry->id3v2buf);
-
-            /* Call parse_replaygain(), returns length in bytes used by the
-             * string representation of replaygain data. */
-            length = parse_replaygain(tag, value, entry, tag, length);
+            /* Call parse_replaygain(). */
+            parse_replaygain(tag, value, entry);
 #endif
         }
     }
@@ -387,12 +381,11 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
 
 #if CONFIG_CODEC == SWCODEC
 /* parse RVA2 binary data and convert to replaygain information. */
-static int parserva2( struct mp3entry* entry, char* tag, int bufferpos )
+static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
 {
     int desc_len = strlen(tag);
     int start_pos = tag - entry->id3v2buf;
     int end_pos = start_pos + desc_len + 5;
-    int value_len = 0;
     unsigned char* value = tag + desc_len + 1;
 
     /* Only parse RVA2 replaygain tags if tag version == 2.4 and channel
@@ -447,11 +440,10 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos )
             }
         }
             
-        value_len = parse_replaygain_int(album, gain, peak * 2, entry,
-            tag, sizeof(entry->id3v2buf) - start_pos);
+        parse_replaygain_int(album, gain, peak * 2, entry);
     }
 
-    return start_pos + value_len;
+    return start_pos;
 }
 #endif
 

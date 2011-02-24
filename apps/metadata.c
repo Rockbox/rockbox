@@ -411,12 +411,6 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig)
         entry->albumartist += offset;
     if (entry->grouping)
         entry->grouping += offset;
-#if CONFIG_CODEC == SWCODEC
-    if (entry->track_gain_string)
-        entry->track_gain_string += offset;
-    if (entry->album_gain_string)
-        entry->album_gain_string += offset;
-#endif
     if (entry->mb_track_id)
         entry->mb_track_id += offset;
 }
