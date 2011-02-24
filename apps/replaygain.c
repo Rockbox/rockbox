@@ -197,6 +197,7 @@ void parse_replaygain(const char* key, const char* value,
  * gain    Gain value in dB, multiplied by 512. 0 for no gain.
  * peak    Peak volume in Q7.24 format, where 1.0 is full scale. 0 for no 
  *         peak volume.
+ * entry   mp3entry struct to update.
  */
 void parse_replaygain_int(bool album, long gain, long peak,
                           struct mp3entry* entry)
