@@ -1,3 +1,16 @@
+rockbox (2011-02-25maemo0) unstable; urgency=low
+
+  * Embedded album art support
+  * Fixed bookmark handling
+  * Prevent stuck up/down buttons on N900 with shared cursor keys
+  * Fixed Last.FM scrobbler log file
+  * New threading code uses less CPU
+  * Fix rare hang on shutdown
+  * Small fixes to the metadata parser
+  * Update to rockbox SVN code
+
+ -- Thomas Jarosch <tomj@simonv.com>  Wed, 25 Feb 2011 18:10:00 -0500
+
 rockbox (2011-01-26maemo0) unstable; urgency=low
 
   * Bluetooth headset support
