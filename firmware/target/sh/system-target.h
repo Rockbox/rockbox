@@ -84,7 +84,7 @@ static inline uint16_t swap16_hw(uint16_t value)
   */
 {
     uint16_t result;
-    asm volatile ("swap.b\t%1,%0" : "=r"(result) : "r"(value));
+    asm ("swap.b\t%1,%0" : "=r"(result) : "r"(value));
     return result;
 }
 
@@ -95,7 +95,7 @@ static inline uint32_t swaw32_hw(uint32_t value)
   */
 {
     uint32_t result;
-    asm volatile ("swap.w\t%1,%0" : "=r"(result) : "r"(value));
+    asm ("swap.w\t%1,%0" : "=r"(result) : "r"(value));
     return result;
 }
 
@@ -107,9 +107,9 @@ static inline uint32_t swap32_hw(uint32_t value)
     result[ 7.. 0] = value[31..24];
   */
 {
-    asm volatile ("swap.b\t%0,%0\n"
-                  "swap.w\t%0,%0\n"
-                  "swap.b\t%0,%0\n" : "+r"(value));
+    asm ("swap.b\t%0,%0\n"
+         "swap.w\t%0,%0\n"
+         "swap.b\t%0,%0\n" : "+r"(value));
     return value;
 }
 
@@ -119,10 +119,10 @@ static inline uint32_t swap_odd_even32_hw(uint32_t value)
       result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
       result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
     */
-    asm volatile ("swap.b\t%0,%0\n"
-                  "swap.w\t%0,%0\n"
-                  "swap.b\t%0,%0\n"
-                  "swap.w\t%0,%0\n" : "+r"(value));
+    asm ("swap.b\t%0,%0\n"
+         "swap.w\t%0,%0\n"
+         "swap.b\t%0,%0\n"
+         "swap.w\t%0,%0\n" : "+r"(value));
     return value;
 }
 

@@ -97,7 +97,7 @@ static inline uint16_t swap16_hw(uint16_t value)
     */
 {
     uint32_t retval;
-    asm volatile ("revsh %0, %1"                /* xxAB */
+    asm ("revsh %0, %1"                         /* xxAB */
         : "=r"(retval) : "r"((uint32_t)value)); /* xxBA */
     return retval;
 }
@@ -111,7 +111,7 @@ static inline uint32_t swap32_hw(uint32_t value)
     */
 {
     uint32_t retval;
-    asm volatile ("rev %0, %1"        /* ABCD */
+    asm ("rev %0, %1"                 /* ABCD */
         : "=r"(retval) : "r"(value)); /* DCBA */
     return retval;
 }
@@ -123,7 +123,7 @@ static inline uint32_t swap_odd_even32_hw(uint32_t value)
       result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
     */
     uint32_t retval;
-    asm volatile ("rev16 %0, %1"      /* ABCD */
+    asm ("rev16 %0, %1"               /* ABCD */
         : "=r"(retval) : "r"(value)); /* BADC */
     return retval;
 }
@@ -209,24 +209,23 @@ static inline uint32_t swap32_hw(uint32_t value)
 {
 #ifdef __thumb__
     uint32_t mask = 0x00FF00FF;
-    asm volatile (
-        "and %1, %0              \n\t" /* mask = .B.D */
-        "eor %0, %1              \n\t" /* val  = A.C. */
-        "lsl %1, #8              \n\t" /* mask = B.D. */
-        "lsr %0, #8              \n\t" /* val  = .A.C */
-        "orr %0, %1              \n\t" /* val  = BADC */
-        "mov %1, #16             \n\t" /* mask = 16   */
-        "ror %0, %1              \n\t" /* val  = DCBA */
+    asm (                            /* val  = ABCD */
+        "and %1, %0              \n" /* mask = .B.D */
+        "eor %0, %1              \n" /* val  = A.C. */
+        "lsl %1, #8              \n" /* mask = B.D. */
+        "lsr %0, #8              \n" /* val  = .A.C */
+        "orr %0, %1              \n" /* val  = BADC */
+        "mov %1, #16             \n" /* mask = 16   */
+        "ror %0, %1              \n" /* val  = DCBA */
         : "+l"(value), "+l"(mask));
 #else
     uint32_t tmp;
-    asm volatile (
-        "eor %1, %0, %0, ror #16 \n\t"
-        "bic %1, %1, #0xff0000   \n\t"
-        "mov %0, %0, ror #8      \n\t"
-        "eor %0, %0, %1, lsr #8  \n\t"
-        : "+r" (value), "=r" (tmp)
-    );
+    asm (
+        "eor %1, %0, %0, ror #16 \n"
+        "bic %1, %1, #0xff0000   \n"
+        "mov %0, %0, ror #8      \n"
+        "eor %0, %0, %1, lsr #8  \n"
+        : "+r" (value), "=r" (tmp));
 #endif
     return value;
 }
@@ -239,22 +238,21 @@ static inline uint32_t swap_odd_even32_hw(uint32_t value)
     */
 #ifdef __thumb__
     uint32_t mask = 0x00FF00FF;
-    asm volatile (
-        "and %1, %0             \n\t" /* mask = .B.D */
-        "eor %0, %1             \n\t" /* val  = A.C. */
-        "lsl %1, #8             \n\t" /* mask = B.D. */
-        "lsr %0, #8             \n\t" /* val  = .A.C */
-        "orr %0, %1             \n\t" /* val  = BADC */
+    asm (                            /* val  = ABCD */
+        "and %1, %0             \n"  /* mask = .B.D */
+        "eor %0, %1             \n"  /* val  = A.C. */
+        "lsl %1, #8             \n"  /* mask = B.D. */
+        "lsr %0, #8             \n"  /* val  = .A.C */
+        "orr %0, %1             \n"  /* val  = BADC */
         : "+l"(value), "+l"(mask));
 #else
     uint32_t tmp;
-    asm volatile (                    /* ABCD      */
-        "bic %1, %0, #0x00ff00  \n\t" /* AB.D      */
-        "bic %0, %0, #0xff0000  \n\t" /* A.CD      */
-        "mov %0, %0, lsr #8     \n\t" /* .A.C      */
-        "orr %0, %0, %1, lsl #8 \n\t" /* B.D.|.A.C */
-        : "+r" (value), "=r" (tmp)    /* BADC      */
-    );
+    asm (                            /* ABCD      */
+        "bic %1, %0, #0x00ff00  \n"  /* AB.D      */
+        "bic %0, %0, #0xff0000  \n"  /* A.CD      */
+        "mov %0, %0, lsr #8     \n"  /* .A.C      */
+        "orr %0, %0, %1, lsl #8 \n"  /* B.D.|.A.C */
+        : "+r" (value), "=r" (tmp)); /* BADC      */
 #endif
     return value;
 }
@@ -303,13 +301,15 @@ static inline uint32_t swaw32_hw(uint32_t value)
       result[15.. 0] = value[31..16];
     */
 #ifdef __thumb__
-    asm volatile ("ror %0, %1" :
-                  "+l"(value) : "l"(16));
+    asm (
+        "ror %0, %1"
+        : "+l"(value) : "l"(16));
     return value;
 #else
     uint32_t retval;
-    asm volatile ("mov %0, %1, ror #16" :
-                  "=r"(retval) : "r"(value));
+    asm (
+        "mov %0, %1, ror #16"
+        : "=r"(retval) : "r"(value));
     return retval;
 #endif
 
