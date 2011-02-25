@@ -47,7 +47,7 @@
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
 %?ps<%xd(D)>
 %?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
-%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+%?Tp<%?mp<%xd(F, 1)|%xd(F, 3)|%xd(F, 2)|%xd(F, 4)|%xd(F, 5)||||>|%xd(F, %mp)>
 
 %T(206,0,24,24,play)
 %T(206,0,24,24,&stop)
