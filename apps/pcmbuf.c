@@ -696,6 +696,7 @@ void pcmbuf_play_stop(void)
         write_end_chunk = read_end_chunk;
         read_chunk = read_end_chunk = NULL;
     }
+    last_chunksize = 0;
     pcmbuffer_pos = 0;
     pcmbuffer_fillpos = 0;
 #ifdef HAVE_CROSSFADE
