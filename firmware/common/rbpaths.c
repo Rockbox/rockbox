@@ -25,6 +25,7 @@
 #include <stdarg.h>
 #include "rbpaths.h"
 #include "file.h" /* MAX_PATH */
+#include "logf.h"
 #include "gcc_extensions.h"
 #include "string-extra.h"
 #include "filefuncs.h"
@@ -70,9 +71,19 @@ void paths_init(void)
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
     mkdir("/sdcard/rockbox");
 #else
-    char home_path[MAX_PATH];
-    snprintf(home_path, sizeof(home_path), "%s/.config/rockbox.org", getenv("HOME"));
-    mkdir(home_path);
+    char config_dir[MAX_PATH];
+
+    const char *home = getenv("HOME");
+    if (!home)
+    {
+      logf("HOME environment var not set. Can't write config");
+      return;
+    }
+
+    snprintf(config_dir, sizeof(config_dir), "%s/.config", home);
+    mkdir(config_dir);
+    snprintf(config_dir, sizeof(config_dir), "%s/.config/rockbox.org", home);
+    mkdir(config_dir);
 #endif
 }
 
