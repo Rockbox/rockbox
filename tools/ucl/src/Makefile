@@ -56,5 +56,5 @@ clean:
 
 $(OUT):
 	@echo MKDIR $(OUT)
-	$(SILENT)mkdir $(OUT)
+	$(SILENT)mkdir -p $(OUT)
 
