@@ -309,12 +309,12 @@ public class RockboxService extends Service
         registerReceiver(batt_monitor, itf);
     }
     
-    public void startForeground()
+    void startForeground()
     {
         fg_runner.startForeground();
     }
     
-    public void stopForeground()
+    void stopForeground()
     {
         fg_runner.stopForeground();
     }

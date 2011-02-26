@@ -79,22 +79,25 @@ public class RockboxPCM extends AudioTrack
     }
 
     @SuppressWarnings("unused")
-    private void play_pause(boolean pause) {
+    private void play_pause(boolean pause) 
+    {
+        RockboxService service = RockboxService.get_instance();
         if (pause)
         {
             Intent widgetUpdate = new Intent("org.rockbox.UpdateState");
             widgetUpdate.putExtra("state", "pause");
-            RockboxService.get_instance().sendBroadcast(widgetUpdate);
+            service.sendBroadcast(widgetUpdate);
+            service.stopForeground();
             pause();
         }
         else
         {
             Intent widgetUpdate = new Intent("org.rockbox.UpdateState");
             widgetUpdate.putExtra("state", "play");
-            RockboxService.get_instance().sendBroadcast(widgetUpdate);
+            service.sendBroadcast(widgetUpdate);
+            service.startForeground();
             if (getPlayState() == AudioTrack.PLAYSTATE_STOPPED)
             {
-                RockboxService.get_instance().startForeground();
                 if (getState() == AudioTrack.STATE_INITIALIZED)
                 {
                     if (h == null)
@@ -121,10 +124,10 @@ public class RockboxPCM extends AudioTrack
         } catch (IllegalStateException e) {
             throw new IllegalStateException(e);
         }
-        RockboxService.get_instance().stopForeground();
         Intent widgetUpdate = new Intent("org.rockbox.UpdateState");
         widgetUpdate.putExtra("state", "stop");
         RockboxService.get_instance().sendBroadcast(widgetUpdate);
+        RockboxService.get_instance().stopForeground();
     }
 
     @SuppressWarnings("unused")
