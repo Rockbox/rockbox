@@ -681,10 +681,11 @@ $year+=1900;
 sub runone {
     my ($target, $fonts)=@_;
 
-    # in the app the the layout is different (no .rockbox, but bin/lib/share)
     $app = ($modelname eq "application");
-    unless ($app) {
-        #rbdir starts with '/', strip it
+
+    # Strip the leading / from $rbdir unless we are installing an application
+    # build - the layout is different (no .rockbox, but bin/lib/share)
+    unless ($app && $install) {
         $rbdir = substr($rbdir, 1);
     }
 
