@@ -12615,3 +12615,45 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Automatické Obnovenie Prehrávania"
+  </dest>
+  <voice>
+    *: "Automatické obnovenie prehrávania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Obnoviť Pri Automatickej Zmene Stopy"
+  </dest>
+  <voice>
+    *: "Obnoviť Pri Automatickej Zmene Stopy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Len v Zvolených Priečinkoch"
+  </dest>
+  <voice>
+    *: "Len v Zvolených Priečinkoch"
+  </voice>
+</phrase>
