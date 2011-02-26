@@ -14,6 +14,7 @@
 <!-- Widget -->
 <string name="appwidget_label_4x1">Rockbox (line)</string>
 <string name="appwidget_label_2x2">Rockbox (square)</string>
+<string name="appwidget_label_3x3">Rockbox (big square)</string>
 <string name="appwidget_infoDisplay">Touch to launch app</string>
 
 <!-- Widget configuration -->

@@ -54,6 +54,17 @@
                  android:resource="@xml/appwidget_provider_2x2" />
     </receiver>
 
+    <receiver android:name=".widgets.RockboxWidgetProvider3x3"
+              android:label="@string/appwidget_label_3x3">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+        <action android:name="org.rockbox.TrackUpdateInfo" />
+        <action android:name="org.rockbox.TrackFinish" />
+        <action android:name="org.rockbox.UpdateState" />
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider"
+                 android:resource="@xml/appwidget_provider_3x3" />
+    </receiver>
     <!-- Widget configuration -->
     <activity android:name=".widgets.RockboxWidgetConfigure">
       <intent-filter>
