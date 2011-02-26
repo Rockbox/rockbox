@@ -12623,3 +12623,45 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Авто-возобновление"
+  </dest>
+  <voice>
+    *: "Автоматическое возобновление"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Возобновление при автоматической смене трэка"
+  </dest>
+  <voice>
+    *: "Возобновление при автоматической смене трэка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Только в заданных папках"
+  </dest>
+  <voice>
+    *: "Только в заданных папках"
+  </voice>
+</phrase>
