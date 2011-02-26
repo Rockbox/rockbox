@@ -29,7 +29,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 
@@ -81,7 +80,7 @@ public class RockboxWidgetConfigure extends Activity
             saveWidgetPref(context, mAppWidgetId, state);
 
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            RockboxWidgetProvider.updateAppWidget(context, appWidgetManager, mAppWidgetId, null);
+            RockboxWidgetProvider.getInstance().updateAppWidget(context, appWidgetManager, mAppWidgetId, null);
 
             Intent result = new Intent();
             result.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);

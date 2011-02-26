@@ -105,8 +105,8 @@ public class RockboxService extends Service
 
     private void do_start(Intent intent)
     {
-        LOG("Start Service");
-        if (intent != null && intent.hasExtra("callback"))
+        LOG("Start RockboxService (Intent: " + intent.getAction() + ")");
+        if (intent.hasExtra("callback"))
             resultReceiver = (ResultReceiver) intent.getParcelableExtra("callback");
 
         if (!rockbox_running)
@@ -114,32 +114,18 @@ public class RockboxService extends Service
         if (resultReceiver != null)
             resultReceiver.send(RESULT_LIB_LOADED, null);
 
-            
-        if (intent != null && intent.getAction() != null)
-        {
-            if (!rockbox_running)
-            {   /* give it a bit of time so we can register button presses 
-                 * sleeping longer doesn't work here, apparently Android 
-                 * surpresses long sleeps during intent handling */
-                try {
-                    Thread.sleep(50);
-                }
-                catch (InterruptedException e) { }
-            }
+        if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON))
+        {            
+            /* give it a bit of time so we can register button presses 
+             * sleeping longer doesn't work here, apparently Android 
+             * surpresses long sleeps during intent handling */
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) { }
 
-            if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON))
-            {
-                KeyEvent kev = (KeyEvent)intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                RockboxFramebuffer.buttonHandler(kev.getKeyCode(), kev.getAction() == KeyEvent.ACTION_DOWN);
-            }
-            else if (intent.getAction().equals("org.rockbox.PlayPause"))
-                RockboxFramebuffer.buttonHandler(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, false);
-            else if (intent.getAction().equals("org.rockbox.Prev"))
-                RockboxFramebuffer.buttonHandler(KeyEvent.KEYCODE_MEDIA_PREVIOUS, false);
-            else if (intent.getAction().equals("org.rockbox.Next"))
-                RockboxFramebuffer.buttonHandler(KeyEvent.KEYCODE_MEDIA_NEXT, false);
-            else if (intent.getAction().equals("org.rockbox.Stop"))
-                RockboxFramebuffer.buttonHandler(KeyEvent.KEYCODE_MEDIA_STOP, false);
+            KeyEvent kev = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            RockboxFramebuffer.buttonHandler(kev.getKeyCode(), 
+                                kev.getAction() == KeyEvent.ACTION_DOWN);
         }
 
         /* (Re-)attach the media button receiver, in case it has been lost */

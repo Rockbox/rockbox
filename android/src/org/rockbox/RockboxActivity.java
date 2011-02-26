@@ -45,6 +45,7 @@ public class RockboxActivity extends Activity
                              WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         Intent intent = new Intent(this, RockboxService.class);
+        intent.setAction(Intent.ACTION_MAIN);
         intent.putExtra("callback", new ResultReceiver(new Handler(getMainLooper())) {
             private ProgressDialog loadingdialog;
 

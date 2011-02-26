@@ -24,7 +24,6 @@ package org.rockbox.widgets;
 import org.rockbox.R;
 import org.rockbox.RockboxActivity;
 import org.rockbox.RockboxService;
-
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -32,17 +31,19 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.util.Log;
-import android.view.View;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.RemoteViews;
-
-import java.util.ArrayList;
 
 public class RockboxWidgetProvider extends AppWidgetProvider
 {
+    static RockboxWidgetProvider mInstance;
+    public RockboxWidgetProvider()
+    {
+        super();
+        mInstance = this;
+    }
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
     {
@@ -53,6 +54,12 @@ public class RockboxWidgetProvider extends AppWidgetProvider
             updateAppWidget(context, appWidgetManager, appWidgetId, null);
 
         }
+    }
+    
+    public static RockboxWidgetProvider getInstance()
+    {   
+        /* no new instance here, instanced by android */
+        return mInstance;
     }
 
     @Override
@@ -74,9 +81,9 @@ public class RockboxWidgetProvider extends AppWidgetProvider
     public void onReceive(Context context, Intent intent)
     {
         String action = intent.getAction();
-        if (intent.getAction().equals("org.rockbox.TrackUpdateInfo") ||
-            intent.getAction().equals("org.rockbox.TrackFinish") ||
-            intent.getAction().equals("org.rockbox.UpdateState"))
+        if (action.equals("org.rockbox.TrackUpdateInfo") ||
+            action.equals("org.rockbox.TrackFinish") ||
+            action.equals("org.rockbox.UpdateState"))
         {
             AppWidgetManager gm = AppWidgetManager.getInstance(context);
             int[] appWidgetIds = gm.getAppWidgetIds(new ComponentName(context, this.getClass()));
@@ -92,7 +99,7 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         }
     }
 
-     public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Intent args)
+     public void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Intent args)
      {
         AppWidgetProviderInfo provider = appWidgetManager.getAppWidgetInfo(appWidgetId);
         RemoteViews views = null;
@@ -104,38 +111,42 @@ public class RockboxWidgetProvider extends AppWidgetProvider
 
         RockboxWidgetConfigure.WidgetPref state = RockboxWidgetConfigure.loadWidgetPref(context, appWidgetId);
 
+        /* enable/disable PREV */
         if (state.enablePrev)
         {
-            intent = new Intent("org.rockbox.Prev", Uri.EMPTY, context, RockboxService.class);
-            pendingIntent = PendingIntent.getService(context, 0, intent, 0);
-            views.setOnClickPendingIntent(R.id.prev, pendingIntent);
+            views.setOnClickPendingIntent(R.id.prev, 
+                    RockboxMediaIntent.newPendingIntent(context, 
+                                           KeyEvent.KEYCODE_MEDIA_PREVIOUS));
         }
         else
             views.setViewVisibility(R.id.prev, View.GONE);
 
+        /* enable/disable PLAY/PAUSE */
         if (state.enablePlayPause)
         {
-            intent = new Intent("org.rockbox.PlayPause", Uri.EMPTY, context, RockboxService.class);
-            pendingIntent = PendingIntent.getService(context, 0, intent, 0);
-            views.setOnClickPendingIntent(R.id.playPause, pendingIntent);
+            views.setOnClickPendingIntent(R.id.playPause, 
+                    RockboxMediaIntent.newPendingIntent(context, 
+                                           KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
         }
         else
             views.setViewVisibility(R.id.playPause, View.GONE);
 
+        /* enable/disable NEXT */
         if (state.enableNext)
         {
-            intent = new Intent("org.rockbox.Next", Uri.EMPTY, context, RockboxService.class);
-            pendingIntent = PendingIntent.getService(context, 0, intent, 0);
-            views.setOnClickPendingIntent(R.id.next, pendingIntent);
+            views.setOnClickPendingIntent(R.id.next, 
+                    RockboxMediaIntent.newPendingIntent(context, 
+                                           KeyEvent.KEYCODE_MEDIA_NEXT));
         }
         else
             views.setViewVisibility(R.id.next, View.GONE);
 
+        /* enable/disable STOP */
         if (state.enableStop)
         {
-            intent = new Intent("org.rockbox.Stop", Uri.EMPTY, context, RockboxService.class);
-            pendingIntent = PendingIntent.getService(context, 0, intent, 0);
-            views.setOnClickPendingIntent(R.id.stop, pendingIntent);
+            views.setOnClickPendingIntent(R.id.stop, 
+                    RockboxMediaIntent.newPendingIntent(context, 
+                                           KeyEvent.KEYCODE_MEDIA_STOP));
         }
         else
             views.setViewVisibility(R.id.stop, View.GONE);
@@ -166,6 +177,26 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         }
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
-     }
+    }
+     
+    private static class RockboxMediaIntent extends Intent
+    {
+        private RockboxMediaIntent(Context c, int keycode)
+        {
+            super(ACTION_MEDIA_BUTTON, Uri.EMPTY, c, RockboxService.class);
+            putExtra(EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP,
+                    keycode));
+        }
+        
+        public static PendingIntent newPendingIntent(Context c, int keycode)
+        {
+            /* Use keycode as request to code to prevent successive 
+             * PendingIntents  from overwritting one another. 
+             * This seems hackish but at least it works.
+             * see: http://code.google.com/p/android/issues/detail?id=863
+             */
+            return PendingIntent.getService(c, keycode, new RockboxMediaIntent(c, keycode), 0);
+        }
+    }
 }
 
