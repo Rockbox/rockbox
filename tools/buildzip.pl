@@ -15,7 +15,7 @@ use File::Find; # For find()
 use File::Path qw(mkpath rmtree); # For rmtree()
 use Cwd;
 use Cwd 'abs_path';
-use Getopt::Long qw(:config pass_through);	# pass_through so not confused by -DTYPE_STUFF
+use Getopt::Long qw(:config pass_through);    # pass_through so not confused by -DTYPE_STUFF
 
 my $ROOT="..";
 
@@ -204,16 +204,16 @@ sub make_install {
 }
 
 # Get options
-GetOptions ( 'r|root=s'		=> \$ROOT,
-	     'z|ziptool:s'	=> \$ziptool,
-	     'm|modelname=s' => \$modelname,  # The model name as used in ARCHOS in the root makefile
-	     'i|id=s'		=> \$target_id,  # The target id name as used in TARGET_ID in the root makefile
-	     'o|output:s'	=> \$output,
-	     'f|fonts=s'	=> \$incfonts,   # 0 - no fonts, 1 - fonts only 2 - fonts and package
-	     'v|verbose'	=> \$verbose,
-	     'install=s'		=> \$install, # install destination
-	     'rbdir:s'          => \$rbdir, # If we want to put in a different directory
-	     'l|link'           => \$mklinks, # If we want to create links instead of copying files
+GetOptions ( 'r|root=s'      => \$ROOT,
+             'z|ziptool:s'   => \$ziptool,
+             'm|modelname=s' => \$modelname,  # The model name as used in ARCHOS in the root makefile
+             'i|id=s'        => \$target_id,  # The target id name as used in TARGET_ID in the root makefile
+             'o|output:s'    => \$output,
+             'f|fonts=s'     => \$incfonts,   # 0 - no fonts, 1 - fonts only 2 - fonts and package
+             'v|verbose'     => \$verbose,
+             'install=s'     => \$install, # install destination
+             'rbdir:s'       => \$rbdir, # If we want to put in a different directory
+             'l|link'        => \$mklinks, # If we want to create links instead of copying files
     );
 
 # GetOptions() doesn't remove the params from @ARGV if their value was ""
@@ -625,12 +625,12 @@ STOP
 
     # Now do the WPS dance
     if(-d "$ROOT/wps") {
-	my $wps_build_cmd="perl $ROOT/wps/wpsbuild.pl ";
-	$wps_build_cmd=$wps_build_cmd."-v " if $verbose;
-	$wps_build_cmd=$wps_build_cmd." --tempdir=$temp_dir --rbdir=$rbdir -r $ROOT -m $modelname $ROOT/wps/WPSLIST $target";
-	print "wpsbuild: $wps_build_cmd\n" if $verbose;
+        my $wps_build_cmd="perl $ROOT/wps/wpsbuild.pl ";
+        $wps_build_cmd=$wps_build_cmd."-v " if $verbose;
+        $wps_build_cmd=$wps_build_cmd." --tempdir=$temp_dir --rbdir=$rbdir -r $ROOT -m $modelname $ROOT/wps/WPSLIST $target";
+        print "wpsbuild: $wps_build_cmd\n" if $verbose;
         system("$wps_build_cmd");
-	print "wps_build_cmd: done\n" if $verbose;
+        print "wps_build_cmd: done\n" if $verbose;
     }
     else {
         print STDERR "No wps module present, can't do the WPS magic!\n";
@@ -640,21 +640,21 @@ STOP
     mkdir "$temp_dir/wps/classic_statusbar", 0777;
     glob_copy("$ROOT/wps/classic_statusbar/*.bmp", "$temp_dir/wps/classic_statusbar");
     if ($swcodec) {
-		if ($depth == 16) {
-			copy("$ROOT/wps/classic_statusbar.sbs", "$temp_dir/wps");
-		} elsif ($depth > 1) {
-			copy("$ROOT/wps/classic_statusbar.grey.sbs", "$temp_dir/wps/classic_statusbar.sbs");
-		} else {
-			copy("$ROOT/wps/classic_statusbar.mono.sbs", "$temp_dir/wps/classic_statusbar.sbs");
-		}
+        if ($depth == 16) {
+            copy("$ROOT/wps/classic_statusbar.sbs", "$temp_dir/wps");
+        } elsif ($depth > 1) {
+            copy("$ROOT/wps/classic_statusbar.grey.sbs", "$temp_dir/wps/classic_statusbar.sbs");
+        } else {
+            copy("$ROOT/wps/classic_statusbar.mono.sbs", "$temp_dir/wps/classic_statusbar.sbs");
+        }
     } else {
         copy("$ROOT/wps/classic_statusbar.112x64x1.sbs", "$temp_dir/wps/classic_statusbar.sbs");
     }
     if ($remote_depth != $depth) {
-		copy("$ROOT/wps/classic_statusbar.mono.sbs", "$temp_dir/wps/classic_statusbar.rsbs");
-	} else {
-		copy("$temp_dir/wps/classic_statusbar.sbs", "$temp_dir/wps/classic_statusbar.rsbs");
-	}
+        copy("$ROOT/wps/classic_statusbar.mono.sbs", "$temp_dir/wps/classic_statusbar.rsbs");
+    } else {
+        copy("$temp_dir/wps/classic_statusbar.sbs", "$temp_dir/wps/classic_statusbar.rsbs");
+    }
     copy("$temp_dir/wps/rockbox_none.sbs", "$temp_dir/wps/rockbox_none.rsbs");
 
     # and the info file
