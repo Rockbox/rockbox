@@ -53,7 +53,7 @@
     *: "On"
   </source>
   <dest>
-    *: "Iesl"
+    *: "Ieslēgts"
   </dest>
   <voice>
     *: "Ieslēgts"
@@ -67,7 +67,7 @@
     *: "Off"
   </source>
   <dest>
-    *: "Izsl"
+    *: "Izslēgts"
   </dest>
   <voice>
     *: "Izslēgts"
@@ -109,10 +109,10 @@
     *: "Normal"
   </source>
   <dest>
-    *: "Parasts"
+    *: "Normāls"
   </dest>
   <voice>
-    *: "Parasts"
+    *: "Normāls"
   </voice>
 </phrase>
 <phrase>
@@ -123,7 +123,7 @@
     *: "Gain"
   </source>
   <dest>
-    *: "Pastipr"
+    *: "Pastiprinājums"
   </dest>
   <voice>
     *: "Pastiprinājums"
@@ -776,11 +776,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono Labais + Kreisais"
+    recording_swcodec: "Kreisais + Labais"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono Labais plus Kreisais"
+    recording_swcodec: "Mono Kreisais plus Labais"
   </voice>
 </phrase>
 <phrase>
@@ -1402,10 +1402,10 @@
     *: "All"
   </source>
   <dest>
-    *: "Visu"
+    *: "Visus"
   </dest>
   <voice>
-    *: "Visu"
+    *: "Visus"
   </voice>
 </phrase>
 <phrase>
@@ -1564,11 +1564,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Ieslēgt Pārklāšanos"
+    crossfade: "Izmantot Pārklāšanos"
   </dest>
   <voice>
     *: none
-    crossfade: "Ieslēgt Pārklāšanos"
+    crossfade: "Izmantot Pārklāšanos"
   </voice>
 </phrase>
 <phrase>
@@ -1615,11 +1615,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Fade-In Delay"
+    crossfade: "Ievada Aizture"
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-In Delay"
+    crossfade: "Ievada Aizture"
   </voice>
 </phrase>
 <phrase>
@@ -1700,11 +1700,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Sajaukt"
+    crossfade: "Sajaukšanās"
   </dest>
   <voice>
     *: none
-    crossfade: "Sajaukt"
+    crossfade: "Sajaukšanās"
   </voice>
 </phrase>
 <phrase>
@@ -3070,11 +3070,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Ekrāna Rullēšanas SOlis"
+    lcd_bitmap: "Ekrāna Rullēšanas Solis"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Ekrāna Rullēšanas SOlis"
+    lcd_bitmap: "Ekrāna Rullēšanas Solis"
   </voice>
 </phrase>
 <phrase>
@@ -3220,11 +3220,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Batt Attēlošana"
+    lcd_bitmap: "Batterijas Attēlošana"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Batt Attēlošana"
+    lcd_bitmap: "Batterijas Attēlošana"
   </voice>
 </phrase>
 <phrase>
@@ -3237,11 +3237,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Grafiskas"
+    lcd_bitmap: "Grafiski"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Grafiskas"
+    lcd_bitmap: "Grafiski"
   </voice>
 </phrase>
 <phrase>
@@ -3254,11 +3254,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Numeriskas"
+    lcd_bitmap: "Numeriski"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Numeriskas"
+    lcd_bitmap: "Numeriski"
   </voice>
 </phrase>
 <phrase>
@@ -3932,7 +3932,7 @@
   </source>
   <dest>
     *: none
-    rtc: "24 stundu Pulkstenis"
+    rtc: "24 Stundu Pulkstenis"
   </dest>
   <voice>
     *: none
@@ -4336,7 +4336,7 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Autom.Izsl."
+    *: "Automātiskā Izslēgšanās"
   </dest>
   <voice>
     *: "Automātiskā Izslēgšanās"
@@ -4408,11 +4408,11 @@
   </source>
   <dest>
     *: none
-    charging: "Mašīnas Lādētajs"
+    charging: "Automašīnas Režīms"
   </dest>
   <voice>
     *: none
-    charging: "Mašīnas Lādētāja Režīms"
+    charging: "Automašīnas Režīms"
   </voice>
 </phrase>
 <phrase>
@@ -4442,11 +4442,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Modinātāja Logs"
+    alarm: "Modinātāja Darbība"
   </dest>
   <voice>
     *: none
-    alarm: "Modinātāja Logs"
+    alarm: "Modinātāja Darbība"
   </voice>
 </phrase>
 <phrase>
@@ -4625,7 +4625,7 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Iel.Pēdējo.Grāmatzīmi"
+    *: "Ielādēt Pēdējo Grāmatzīmi"
   </dest>
   <voice>
     *: "Ielādēt Pēdējo Grāmatzīmi"
@@ -4681,10 +4681,10 @@
     *: "New Language"
   </source>
   <dest>
-    *: "Jauna Valoda"
+    *: "Valoda Nomainīta"
   </dest>
   <voice>
-    *: "Jauna Valoda"
+    *: "Valoda Nomainīta"
   </voice>
 </phrase>
 <phrase>
@@ -5938,11 +5938,11 @@
   </source>
   <dest>
     *: none
-    recording: "Iztukšot Ieraksta Mapi"
+    recording: "Pārstatīt Ieraksta Mapi"
   </dest>
   <voice>
     *: none
-    recording: "Iztukšot Ieraksta Mapi"
+    recording: "Pārstatīt Ieraksta Mapi"
   </voice>
 </phrase>
 <phrase>
@@ -6509,10 +6509,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Brīdināt Dzēšot Dinamisku Sarakstu"
+    *: "Brīdināt Dzēšot Dinamisku Izlasi"
   </dest>
   <voice>
-    *: "Brīdināt Dzēšot Dinamisku Sarakstu"
+    *: "Brīdināt Dzēšot Dinamisku Izlasi"
   </voice>
 </phrase>
 <phrase>
@@ -6569,8 +6569,8 @@
     archosplayer: "Buf:"
   </source>
   <dest>
-    *: "Buffer:"
-    archosplayer: "Buferis:"
+    *: "Buferis:"
+    archosplayer: "Buf:"
   </dest>
   <voice>
     *: "Bufera Izmērs"
@@ -9691,7 +9691,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Rediģēt: %s %s"
+    swcodec: "Izmainit: %s %s"
   </dest>
   <voice>
     *: none
@@ -9708,7 +9708,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Robeža"
+    swcodec: "Robeza"
   </dest>
   <voice>
     *: none
@@ -9725,7 +9725,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Pastiprinājums"
+    swcodec: "Pastiprinajums"
   </dest>
   <voice>
     *: none
@@ -10731,10 +10731,10 @@
     *: "Very slow"
   </source>
   <dest>
-    *: "Ļoti Lēni"
+    *: "Ļoti Lēns"
   </dest>
   <voice>
-    *: "Ļoti Lēni"
+    *: "Ļoti Lēns"
   </voice>
 </phrase>
 <phrase>
@@ -10745,10 +10745,10 @@
     *: "Slow"
   </source>
   <dest>
-    *: "Lēni"
+    *: "Lēns"
   </dest>
   <voice>
-    *: "Lēni"
+    *: "Lēns"
   </voice>
 </phrase>
 <phrase>
@@ -10759,10 +10759,10 @@
     *: "Very fast"
   </source>
   <dest>
-    *: "Ļoti Ātri"
+    *: "Ļoti Ātrs"
   </dest>
   <voice>
-    *: "Ļoti Ātri"
+    *: "Ļoti Ātrs"
   </voice>
 </phrase>
 <phrase>
@@ -10773,10 +10773,10 @@
     *: "Fast"
   </source>
   <dest>
-    *: "Ātri"
+    *: "Ātrs"
   </dest>
   <voice>
-    *: "Ātri"
+    *: "Ātrs"
   </voice>
 </phrase>
 <phrase>
@@ -10831,11 +10831,11 @@
   </source>
   <dest>
     *: none
-    recording: "Pastipr L"
+    recording: "Pastipr K"
   </dest>
   <voice>
     *: none
-    recording: "Pastipr L"
+    recording: "Pastipr K"
   </voice>
 </phrase>
 <phrase>
@@ -11013,10 +11013,10 @@
     *: "Left"
   </source>
   <dest>
-    *: "Kreisais"
+    *: "Pa Kreisi"
   </dest>
   <voice>
-    *: "Kreisais"
+    *: "Pa Kreisi"
   </voice>
 </phrase>
 <phrase>
@@ -11027,10 +11027,10 @@
     *: "Right"
   </source>
   <dest>
-    *: "Labais"
+    *: "Pa Labi"
   </dest>
   <voice>
-    *: "Labais"
+    *: "Pa Labi"
   </voice>
 </phrase>
 <phrase>
@@ -11427,7 +11427,7 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB Klaviatūras Rež."
+    usb_hid: "USB Klaviatūras Režīms"
   </dest>
   <voice>
     *: none
@@ -12539,10 +12539,10 @@
     *: "Start File Browser Here"
   </source>
   <dest>
-    *: "Palaist Failu Pārlūku Seit"
+    *: "Palaist Šeit Failu Pārlūku"
   </dest>
   <voice>
-    *: "Palaist Failu Pārlūku Seit"
+    *: "Palaist Šeit Failu Pārlūku"
   </voice>
 </phrase>
 <phrase>
@@ -12553,10 +12553,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Palaist Failu Pārlūku /"
+    *: "Pārstatīt Failu Pārlūku uz /"
   </dest>
   <voice>
-    *: "Palaist Failu Pārlūku pamatmapē"
+    *: "Pārstatīt Failu Pārlūku pamatmapē"
   </voice>
 </phrase>
 <phrase>
