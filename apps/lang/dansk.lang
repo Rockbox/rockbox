@@ -9230,11 +9230,11 @@
   </source>
   <dest>
     *: none
-    recording: "Tøm optagelsesmappe"
+    recording: "Nulstil optagelsesmappe"
   </dest>
   <voice>
     *: none
-    recording: "Tøm optagelsesmappe"
+    recording: "Nulstil optagelsesmappe"
   </voice>
 </phrase>
 <phrase>
