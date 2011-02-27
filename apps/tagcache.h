@@ -26,7 +26,7 @@
 #include "metadata.h"
 
 /**
- Note: When adding new tags, make sure to update index_entry_ec in 
+ Note: When adding new tags, make sure to update index_entry_ec and tags_str in 
  tagcache.c and bump up the header version too.
  */
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
