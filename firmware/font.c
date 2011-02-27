@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include "inttypes.h"
 #include "lcd.h"
+#include "system.h"
 #include "font.h"
 #include "file.h"
 #include "debug.h"
@@ -76,11 +77,11 @@ extern struct font sysfont;
 /* structure filled in by font_load */
 static struct font font_ui;
 /* static buffer allocation structures */
-static unsigned char main_buf[MAX_FONT_SIZE];
+static unsigned char main_buf[MAX_FONT_SIZE] CACHEALIGN_ATTR;
 #ifdef HAVE_REMOTE_LCD
 #define REMOTE_FONT_SIZE 10000
 static struct font remote_font_ui;
-static unsigned char remote_buf[REMOTE_FONT_SIZE];
+static unsigned char remote_buf[REMOTE_FONT_SIZE] CACHEALIGN_ATTR;
 #endif
 
 /* system font table, in order of FONT_xxx definition */

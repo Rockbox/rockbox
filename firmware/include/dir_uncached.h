@@ -57,9 +57,9 @@ struct dirent_uncached {
 #ifndef DIR_DEFINED
 typedef struct {
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+    struct fat_dir fatdir CACHEALIGN_ATTR;
     bool busy;
     long startcluster;
-    struct fat_dir fatdir;
     struct dirent_uncached theent;
 #ifdef HAVE_MULTIVOLUME
     int volumecounter; /* running counter for faked volume entries */
@@ -69,7 +69,7 @@ typedef struct {
     void *dir; /* actually a DIR* dir */
     char *name;
 #endif
-} DIR_UNCACHED;
+} DIR_UNCACHED CACHEALIGN_ATTR;
 #endif
 
 

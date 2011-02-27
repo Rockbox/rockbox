@@ -39,7 +39,7 @@
 */
 
 struct filedesc {
-    unsigned char cache[SECTOR_SIZE];
+    unsigned char cache[SECTOR_SIZE] CACHEALIGN_ATTR;
     int cacheoffset; /* invariant: 0 <= cacheoffset <= SECTOR_SIZE */
     long fileoffset;
     long size;
@@ -49,9 +49,9 @@ struct filedesc {
     bool write;
     bool dirty;
     bool trunc;
-};
+} CACHEALIGN_ATTR;
 
-static struct filedesc openfiles[MAX_OPEN_FILES];
+static struct filedesc openfiles[MAX_OPEN_FILES] CACHEALIGN_ATTR;
 
 static int flush_cache(int fd);
 

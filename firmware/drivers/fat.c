@@ -211,7 +211,7 @@ struct fat_cache_entry
 #endif
 };
 
-static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
+static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE] CACHEALIGN_ATTR;
 static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 static struct mutex cache_mutex SHAREDBSS_ATTR;
 
