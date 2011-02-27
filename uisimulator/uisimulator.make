@@ -18,7 +18,7 @@ SIMOBJ = $(call c2obj,$(SIMSRC))
 OTHER_SRC += $(SIMSRC)
 
 SIMLIB = $(BUILDDIR)/uisimulator/libuisimulator.a
-ifeq ($(MODELNAME), application)
+ifeq (yes,$(APPLICATION))
 UIBMP=
 else
 UIBMP=$(BUILDDIR)/UI256.bmp

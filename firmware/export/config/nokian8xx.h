@@ -1,18 +1,11 @@
 /*
- * This config file is for Rockbox as an application!
+ * This config file is for Rockbox as an application on the Nokia N8xx
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* We don't run on hardware directly */
-#ifdef ANDROID
-#define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_ANDROID)
-#elif MAEMO5
-#define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_MAEMO5)
-#elif MAEMO4
 #define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_MAEMO4)
-#else
-#define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_SDL)
-#endif
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 100
 
@@ -43,23 +36,11 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-/* LCD dimensions
- *
- * overriden by configure for application builds */
-#ifndef LCD_WIDTH
-#define LCD_WIDTH  320
-#endif
-
-#ifndef LCD_HEIGHT
+/* LCD dimensions */
+#define LCD_WIDTH  800
 #define LCD_HEIGHT 480
-#endif
-
 #define LCD_DEPTH  16
 #define LCD_PIXELFORMAT 565
-
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
-#define HAVE_LCD_ENABLE
-#endif
 
 /* define this to indicate your device's keypad */
 #define HAVE_TOUCHSCREEN
@@ -80,28 +61,15 @@
 #define CONFIG_CODEC SWCODEC
 
 /* Work around debug macro expansion of strncmp in scratchbox */
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
 #define _HAVE_STRING_ARCH_strncmp
-#endif
 
-#if (CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO))
 #define HAVE_MULTIMEDIA_KEYS
-#endif
-
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
-#define CONFIG_KEYPAD ANDROID_PAD
-#elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO))
 #define HAVE_SCROLLWHEEL
 #define CONFIG_KEYPAD SDL_PAD
-#else
-#error unknown platform
-#endif
 
-#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO))
 /* Use SDL audio/pcm in a SDL app build */
 #define HAVE_SDL
 #define HAVE_SDL_AUDIO
-#endif
 
 #define HAVE_SW_TONE_CONTROLS 
 

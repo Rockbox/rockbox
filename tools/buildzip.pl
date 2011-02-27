@@ -214,6 +214,7 @@ GetOptions ( 'r|root=s'      => \$ROOT,
              'install=s'     => \$install, # install destination
              'rbdir:s'       => \$rbdir, # If we want to put in a different directory
              'l|link'        => \$mklinks, # If we want to create links instead of copying files
+             'a|app:s'       => \$app, # Is this an Application build?
     );
 
 # GetOptions() doesn't remove the params from @ARGV if their value was ""
@@ -680,8 +681,6 @@ $year+=1900;
 # made once for all targets
 sub runone {
     my ($target, $fonts)=@_;
-
-    $app = ($modelname eq "application");
 
     # Strip the leading / from $rbdir unless we are installing an application
     # build - the layout is different (no .rockbox, but bin/lib/share)

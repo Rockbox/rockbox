@@ -26,7 +26,6 @@ libdir=
 sharedir=
 
 thread_support="ASSEMBLER_THREADS"
-app_modelname=
 app_lcd_width=
 app_lcd_height=
 #
@@ -610,7 +609,6 @@ androidcc () {
     GLOBAL_LDOPTS="$GLOBAL_LDOPTS -nostdlib -lc -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack \
 		--sysroot=$ANDROID_NDK_PATH/platforms/android-4/arch-arm"
     LDOPTS="$LDOPTS -shared -nostdlib -ldl -llog"
-    extradefines="$extradefines -DANDROID"
     endian="little"
     SHARED_FLAG="-shared"
 }
@@ -2902,10 +2900,10 @@ fi
     ;;
 
    200|sdlapp)
+    application="yes"
     target_id=73
-    modelname="application"
-    app_modelname="sdlapp"
-    target="-DAPPLICATION"
+    modelname="sdlapp"
+    target="-DSDLAPP"
     app_set_paths
     app_set_lcd_size
     memory=8
@@ -2927,10 +2925,10 @@ fi
     ;;
 
    201|android)
+    application="yes"
     target_id=74
-    modelname="application"
-    app_modelname="android"
-    target="-DAPPLICATION"
+    modelname="android"
+    target="-DANDROID"
     app_type="android"
     app_set_lcd_size
     sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
@@ -2945,7 +2943,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="librockbox.so"
     bootoutput="librockbox.so"
-    appextra="recorder:gui:radio"
+    appextra="recorder:gui:radio:hosted"
     plugins="yes"
     swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
@@ -2955,12 +2953,11 @@ fi
     ;;
 
    202|nokian8xx)
+    application="yes"
     target_id=75
-    modelname="application"
-    app_modelname="nokian8xx"
+    modelname="nokian8xx"
     app_type="sdl-app"
-    target="-DAPPLICATION"
-    app_set_lcd_size 800 480
+    target="-DNOKIAN8XX"
     sharedir="/opt/rockbox/share/rockbox"
     bindir="/opt/rockbox/bin"
     libdir="/opt/rockbox/lib"
@@ -2983,12 +2980,11 @@ fi
     ;;
 
    203|nokian900)
+    application="yes"
     target_id=76
-    modelname="application"
-    app_modelname="nokian900"
+    modelname="nokian900"
     app_type="sdl-app"
-    target="-DAPPLICATION"
-    app_set_lcd_size 800 480
+    target="-DNOKIAN900"
     sharedir="/opt/rockbox/share/rockbox"
     bindir="/opt/rockbox/bin"
     libdir="/opt/rockbox/lib"
@@ -3234,6 +3230,11 @@ fi
 
 if [ -z "$debug" ]; then
   GCCOPTS="$GCCOPTS $GCCOPTIMIZE"
+fi
+
+if [ "yes" = "$application" ]; then
+  echo Building Rockbox as an Application
+  extradefines="$extradefines -DAPPLICATION"
 fi
 
 echo "Using source code root directory: $rootdir"
@@ -3504,13 +3505,11 @@ fi
 if [ -n "$ARG_PREFIX" ]; then
   cmdline="$cmdline--prefix=\$(PREFIX) "
 fi
-if [ "$modelname" = "application" ]; then
-  cmdline="$cmdline--target=$app_modelname --lcdwidth=$ARG_LCDWIDTH --lcdheight=$ARG_LCDHEIGHT "
-else
-  cmdline="$cmdline--target=\$(MODELNAME) "
+if [ -n "$ARG_LCDWIDTH" ]; then
+  cmdline="$cmdline--lcdwidth=$ARG_LCDWIDTH --lcdheight=$ARG_LCDHEIGHT "
 fi
 
-cmdline="$cmdline--ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
+cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
 
 ### end of cmdline
 
@@ -3561,6 +3560,7 @@ sed > Makefile \
  -e "s<@TOOLSDIR@<${toolsdir}<g" \
  -e "s<@APPS@<${apps}<g" \
  -e "s<@APP_TYPE@<${app_type}<g" \
+ -e "s<@APPLICATION@<${application}<g" \
  -e "s<@GCCVER@<${gccver}<g" \
  -e "s<@GCCNUM@<${gccnum}<g" \
  -e "s<@UNAME@<${uname}<g" \
@@ -3630,6 +3630,7 @@ export RANLIB=@RANLIB@
 export PREFIX=@PREFIX@
 export PROFILE_OPTS=@PROFILE_OPTS@
 export APP_TYPE=@APP_TYPE@
+export APPLICATION=@APPLICATION@
 export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
 export GCCOPTS=@GCCOPTS@
 export TARGET_INC=@TARGET_INC@
