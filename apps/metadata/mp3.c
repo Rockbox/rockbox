@@ -100,10 +100,9 @@ static int getsonglength(int fd, struct mp3entry *entry)
         }
     }
 
-    entry->bitrate = info.bitrate;
+    entry->bitrate   = info.bitrate;
     entry->frequency = info.frequency;
-    entry->version = info.version;
-    entry->layer = info.layer;
+    entry->layer     = info.layer;
     switch(entry->layer) {
 #if CONFIG_CODEC==SWCODEC
         case 0:
@@ -148,8 +147,6 @@ static int getsonglength(int fd, struct mp3entry *entry)
 #endif
 
     memcpy(entry->toc, info.toc, sizeof(info.toc));
-
-    entry->vbr_header_pos = info.vbr_header_pos;
 
     /* Update the seek point for the first playable frame */
     entry->first_frame_offset = bytecount;

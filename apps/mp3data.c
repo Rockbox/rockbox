@@ -142,8 +142,10 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     if (info->layer == 3)
         return false;
 
+/* Rockbox: not used
     info->protection = (header & PROTECTION_MASK) ? true : false;
-    
+*/
+
     /* Bitrate */
     bitindex = (header & BITRATE_MASK) >> 12;
     info->bitrate = bitrate_table[info->version][info->layer][bitindex];
@@ -187,14 +189,15 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     info->ft_num = 1000 * info->ft_den * info->frame_samples / info->frequency;
 
     info->channel_mode = (header & CHANNELMODE_MASK) >> 6;
+/* Rockbox: not used
     info->mode_extension = (header & MODE_EXT_MASK) >> 4;
     info->emphasis = header & EMPHASIS_MASK;
-
+*/
     VDEBUGF( "Header: %08lx, Ver %d, lay %d, bitr %d, freq %ld, "
-            "chmode %d, mode_ext %d, emph %d, bytes: %d time: %d/%d\n",
+            "chmode %d, bytes: %d time: %d/%d\n",
             header, info->version, info->layer+1, info->bitrate,
-            info->frequency, info->channel_mode, info->mode_extension,
-            info->emphasis, info->frame_size, info->ft_num, info->ft_den);
+            info->frequency, info->channel_mode,
+            info->frame_size, info->ft_num, info->ft_den);
     return true;
 }
 
@@ -405,8 +408,9 @@ int get_mp3file_info(int fd, struct mp3info *info)
         /* DEBUGF("Xing/Info header\n"); */
 
         /* Remember where in the file the Xing header is */
+/* Rockbox: not used
         info->vbr_header_pos = lseek(fd, 0, SEEK_CUR) - info->frame_size;
-        
+*/
         /* We want to skip the Xing frame when playing the stream */
         bytecount += info->frame_size;
         
@@ -420,7 +424,10 @@ int get_mp3file_info(int fd, struct mp3info *info)
             return -5;
 
         /* Is it a VBR file? */
-        info->is_vbr = info->is_xing_vbr = !memcmp(vbrheader, "Xing", 4);
+        info->is_vbr = !memcmp(vbrheader, "Xing", 4);
+/* Rockbox: not used
+        info->is_xing_vbr = info->is_vbr;
+*/
 
         if (vbrheader[7] & VBR_FRAMES_FLAG) /* Is the frame count there? */
         {
@@ -506,7 +513,9 @@ int get_mp3file_info(int fd, struct mp3info *info)
         
         /* Yes, it is a FhG VBR file */
         info->is_vbr = true;
+/* Rockbox: not used
         info->is_vbri_vbr = true;
+*/
         info->has_toc = false; /* We don't parse the TOC (yet) */
 
         info->byte_count = bytes2int(vbrheader[10], vbrheader[11],

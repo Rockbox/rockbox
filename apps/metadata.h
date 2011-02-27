@@ -221,7 +221,6 @@ struct mp3entry {
     char* grouping;
     int discnum;    
     int tracknum;
-    int version;
     int layer;
     int year;
     unsigned char id3version;
@@ -233,7 +232,6 @@ struct mp3entry {
     unsigned long first_frame_offset; /* Byte offset to first real MP3 frame.
                                          Used for skipping leading garbage to
                                          avoid gaps between tracks. */
-    unsigned long vbr_header_pos;
     unsigned long filesize; /* without headers; in bytes */
     unsigned long length;   /* song length in ms */
     unsigned long elapsed;  /* ms played */
@@ -241,7 +239,7 @@ struct mp3entry {
     int lead_trim;          /* Number of samples to skip at the beginning */
     int tail_trim;          /* Number of samples to remove from the end */
 
-    /* Added for Vorbis */
+    /* Added for Vorbis, used by mp4 parser as well. */
     unsigned long samples;  /* number of samples in track */
 
     /* MP3 stream specific info */
