@@ -39,7 +39,7 @@ void audiohw_set_volume(int volume)
 #else
     pcm_set_mixer_volume(
         SDL_MIX_MAXVOLUME * ((volume - VOLUME_MIN) / 10) / (VOLUME_RANGE / 10));
-#endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
+#endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO5) */
 #else
     (void)volume;
 #endif /* CONFIG_CODEC == SWCODEC */
