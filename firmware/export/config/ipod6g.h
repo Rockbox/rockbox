@@ -185,13 +185,20 @@
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION
 
+//#define HAVE_ATA_BBT
+//#define ATA_BBT_PAGES 3072
+
+#define SECTOR_SIZE 4096
+
+#define STORAGE_NEEDS_ALIGN
+
 /* define this if the device has larger sectors when accessed via USB */
 /* (only relevant in disk.c, fat.c now always supports large virtual sectors) */
-#define MAX_LOG_SECTOR_SIZE 4096
+//#define MAX_LOG_SECTOR_SIZE 4096
 
 /* define this if the hard drive uses large physical sectors (ATA-7 feature) */
 /* and doesn't handle them in the drive firmware */
-#define MAX_PHYS_SECTOR_SIZE 4096
+//#define MAX_PHYS_SECTOR_SIZE 4096
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

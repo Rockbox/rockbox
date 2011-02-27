@@ -209,7 +209,7 @@ target/arm/ata-nand-telechips.c
 #if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_SAMSUNG)
 target/arm/s5l8700/ata-nand-s5l8700.c
 #endif
-#if (CONFIG_STORAGE & STORAGE_ATA)
+#if (CONFIG_STORAGE & STORAGE_ATA) && !defined(IPOD_6G)
 drivers/ata.c
 #endif
 #if (CONFIG_STORAGE & STORAGE_SD)
@@ -1551,6 +1551,7 @@ target/arm/s5l8700/ipodnano2g/adc-nano2g.c
 #ifdef IPOD_6G
 #ifndef SIMULATOR
 target/arm/ipod/button-clickwheel.c
+target/arm/s5l8702/ipod6g/storage_ata-ipod6g.c
 target/arm/s5l8702/ipod6g/cscodec-ipod6g.c
 target/arm/s5l8702/ipod6g/backlight-ipod6g.c
 target/arm/s5l8702/ipod6g/powermgmt-ipod6g.c
@@ -1559,7 +1560,6 @@ target/arm/s5l8702/kernel-s5l8702.c
 target/arm/s5l8702/system-s5l8702.c
 target/arm/s5l8702/ipod6g/lcd-ipod6g.c
 target/arm/s5l8702/ipod6g/lcd-asm-ipod6g.S
-target/arm/s5l8702/ipod6g/ata-ipod6g.c
 #if 0 //TODO
 target/arm/s5l8702/postmortemstub.S
 #endif

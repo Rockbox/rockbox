@@ -95,7 +95,7 @@ SECTIONS
        *(.stack)
        stackbegin = .;
        _stackbegin = .;
-       . += 0x4000;
+       . += 0x2000;
        stackend = .;
        _stackend = .;
        _irqstackbegin = .;
