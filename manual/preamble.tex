@@ -20,8 +20,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[a4paper,11pt]{scrreprt}
-\usepackage[utf8]{inputenc}
+\usepackage[utf8]{inputenx}
 \usepackage[T1]{fontenc}
+% load ix-utf8enc.dfu to get additional characters from the inputenx package.
+\makeatletter\input{ix-utf8enc.dfu}\makeatother
 % This manual used to use Palatino as font. This caused issues with small caps
 % (textsc), so do not use that font as default one anymore.
 
