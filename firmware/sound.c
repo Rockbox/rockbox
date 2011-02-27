@@ -26,17 +26,6 @@
 #include "logf.h"
 #include "system.h"
 #include "i2c.h"
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif /* CONFIG_CPU == PNX101 */
-#if CONFIG_CODEC == SWCODEC
-#include "pcm.h"
-#else /* !CONFIG_CODEC == HWCODEC */
-#include "mas35xx.h"
-#include "dac3550a.h"
-#endif
-#endif /* !SIMULATOR */
 
 /* TODO
  * find a nice way to handle 1.5db steps -> see wm8751 ifdef in sound_set_bass/treble
