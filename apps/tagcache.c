@@ -130,7 +130,7 @@ static long tempbuf_pos;
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
     "filename", "composer", "comment", "albumartist", "grouping", "year", 
     "discnumber", "tracknumber", "bitrate", "length", "playcount", "rating", 
-    "playtime", "lastplayed", "commitid", "mtime" };
+    "playtime", "lastplayed", "commitid", "mtime", "lastoffset" };
 
 /* Status information of the tagcache. */
 static struct tagcache_stat tc_stat;
