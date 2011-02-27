@@ -37,7 +37,7 @@ static jobject NotificationManager_instance;
 static jstring title, artist, album, albumart;
 
 /* completely arbitrary dimensions. neded for find_albumart() */
-const struct dim dim = { .width = 200, .height = 200 };
+static const struct dim dim = { .width = 200, .height = 200 };
 #define NZV(a) (a && a[0])
 
 /*
