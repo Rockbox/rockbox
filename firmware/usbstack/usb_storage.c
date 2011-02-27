@@ -27,6 +27,7 @@
 #include "logf.h"
 #include "storage.h"
 #include "disk.h"
+#include "fat.h"
 /* Needed to get at the audio buffer */
 #include "audio.h"
 #include "usb_storage.h"
@@ -358,8 +359,10 @@ static bool check_disk_present(IF_MD_NONVOID(int volume))
 #ifdef USB_USE_RAMDISK
     return true;
 #else
-    unsigned char sector[SECTOR_SIZE];
-    return storage_read_sectors(IF_MD2(volume,)0,1,sector) == 0;
+    unsigned char* sector = fat_get_sector_buffer();
+    bool success = storage_read_sectors(IF_MD2(volume,)0,1,sector) == 0;
+    fat_release_sector_buffer();
+    return success;
 #endif
 }
 

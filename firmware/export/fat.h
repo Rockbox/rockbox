@@ -134,5 +134,7 @@ extern int fat_opendir(IF_MV2(int volume,)
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
 extern unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume)); /* public for debug info screen */
 extern bool fat_ismounted(int volume);
+extern void* fat_get_sector_buffer(void);
+extern void fat_release_sector_buffer(void);
 
 #endif
