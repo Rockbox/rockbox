@@ -1,3 +1,11 @@
+rockbox (2011-02-27maemo0) unstable; urgency=low
+
+  * Fix/enable assembler optimizations on public build
+  * Change play/pause button so that it shows
+    the click action and not the current state
+
+ -- Thomas Jarosch <tomj@simonv.com>  Wed, 27 Feb 2011 19:00:00 -0500
+
 rockbox (2011-02-25maemo0) unstable; urgency=low
 
   * Embedded album art support
