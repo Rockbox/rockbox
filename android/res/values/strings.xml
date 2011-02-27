@@ -19,6 +19,7 @@
 
 <!-- Widget configuration -->
 <string name="appwidget_configure_instructions">Please chose elements to display in widget.</string>
+<string name="appwidget_configure_albumart">Cover Art</string>
 <string name="appwidget_configure_prev">Prev Button</string>
 <string name="appwidget_configure_stop">Stop Button</string>
 <string name="appwidget_configure_playpause">Play/Pause Button</string>

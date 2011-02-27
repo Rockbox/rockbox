@@ -24,6 +24,7 @@
 #include "notification.h"
 #include "appevents.h"
 #include "metadata.h"
+#include "albumart.h"
 #include "misc.h"
 #include "debug.h"
 
@@ -33,8 +34,10 @@ extern jobject RockboxService_instance;
 
 static jmethodID updateNotification, finishNotification;
 static jobject NotificationManager_instance;
-static jstring title, artist, album;
+static jstring title, artist, album, albumart;
 
+/* completely arbitrary dimensions. neded for find_albumart() */
+const struct dim dim = { .width = 200, .height = 200 };
 #define NZV(a) (a && a[0])
 
 /*
@@ -49,6 +52,7 @@ static void track_changed_callback(void *param)
         e->DeleteLocalRef(env_ptr, title);
         e->DeleteLocalRef(env_ptr, artist);
         e->DeleteLocalRef(env_ptr, album);
+        e->DeleteLocalRef(env_ptr, albumart);
 
         char buf[200];
         const char * ptitle = id3->title;
@@ -62,8 +66,12 @@ static void track_changed_callback(void *param)
         artist = e->NewStringUTF(env_ptr, id3->artist ?: "");
         album = e->NewStringUTF(env_ptr, id3->album ?: "");
 
+        albumart = NULL;
+        if (find_albumart(id3, buf, sizeof(buf), &dim))
+            albumart = e->NewStringUTF(env_ptr, buf);
+
         e->CallVoidMethod(env_ptr, NotificationManager_instance,
-                      updateNotification, title, artist, album);
+                      updateNotification, title, artist, album, albumart);
     }
 }
 
@@ -93,6 +101,7 @@ void notification_init(void)
     jclass class = e->GetObjectClass(env_ptr, NotificationManager_instance);
     updateNotification = e->GetMethodID(env_ptr, class, "updateNotification",
                                          "(Ljava/lang/String;"
+                                         "Ljava/lang/String;"
                                          "Ljava/lang/String;"
                                          "Ljava/lang/String;)V");
     finishNotification = e->GetMethodID(env_ptr, class, "finishNotification",

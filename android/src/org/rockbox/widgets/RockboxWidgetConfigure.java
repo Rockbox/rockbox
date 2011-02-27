@@ -50,6 +50,7 @@ public class RockboxWidgetConfigure extends Activity
         setResult(RESULT_CANCELED);
         setContentView(R.layout.appwidget_configure);
 
+        ((CheckBox)findViewById(R.id.enable_aa)).setChecked(true);
         ((CheckBox)findViewById(R.id.enable_prev)).setChecked(false);
         ((CheckBox)findViewById(R.id.enable_stop)).setChecked(true);
         ((CheckBox)findViewById(R.id.enable_playpause)).setChecked(true);
@@ -73,6 +74,7 @@ public class RockboxWidgetConfigure extends Activity
             final Context context = RockboxWidgetConfigure.this;
 
             WidgetPref state = new WidgetPref();
+            state.enableAA   = ((CheckBox)findViewById(R.id.enable_aa)).isChecked();
             state.enablePrev = ((CheckBox)findViewById(R.id.enable_prev)).isChecked();
             state.enableStop = ((CheckBox)findViewById(R.id.enable_stop)).isChecked();
             state.enablePlayPause = ((CheckBox)findViewById(R.id.enable_playpause)).isChecked();
@@ -91,6 +93,7 @@ public class RockboxWidgetConfigure extends Activity
 
     static public class WidgetPref
     {
+        public boolean enableAA = true;
         public boolean enablePrev = true;
         public boolean enableStop = true;
         public boolean enablePlayPause = true;
@@ -100,6 +103,7 @@ public class RockboxWidgetConfigure extends Activity
     static void saveWidgetPref(Context context, int appWidgetId, WidgetPref state)
     {
         SharedPreferences.Editor prefs = context.getSharedPreferences("org.rockbox.RockboxWidgetConfigure", 0).edit();
+        prefs.putBoolean("albumart"+appWidgetId, state.enableAA);
         prefs.putBoolean("prev"+appWidgetId, state.enablePrev);
         prefs.putBoolean("stop"+appWidgetId, state.enableStop);
         prefs.putBoolean("playpause"+appWidgetId, state.enablePlayPause);
@@ -111,6 +115,7 @@ public class RockboxWidgetConfigure extends Activity
     {
         SharedPreferences prefs = context.getSharedPreferences("org.rockbox.RockboxWidgetConfigure", 0);
         WidgetPref state = new WidgetPref();
+        state.enableAA   = prefs.getBoolean("albumart"+appWidgetId, true);
         state.enablePrev = prefs.getBoolean("prev"+appWidgetId, true);
         state.enableStop = prefs.getBoolean("stop"+appWidgetId, true);
         state.enablePlayPause = prefs.getBoolean("playpause"+appWidgetId, true);

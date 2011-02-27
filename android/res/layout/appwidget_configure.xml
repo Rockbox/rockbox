@@ -15,6 +15,10 @@
             android:layout_height="wrap_content"
             android:text="@string/appwidget_configure_instructions"/>
 
+  <CheckBox android:id="@+id/enable_aa"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/appwidget_configure_albumart"/>
   <CheckBox android:id="@+id/enable_prev"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

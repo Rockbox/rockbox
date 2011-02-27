@@ -11,7 +11,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -83,7 +82,7 @@ public class RunForegroundManager
         api.stopForeground();
     }
 
-    public void updateNotification(String title, String artist, String album)
+    public void updateNotification(String title, String artist, String album, String albumart)
     {
         RemoteViews views = mNotification.contentView;
         views.setTextViewText(R.id.title, title);
@@ -98,6 +97,7 @@ public class RunForegroundManager
         widgetUpdate.putExtra("title", title);
         widgetUpdate.putExtra("artist", artist);
         widgetUpdate.putExtra("album", album);
+        widgetUpdate.putExtra("albumart", albumart);
         mCurrentService.sendBroadcast(widgetUpdate);
     }
 

@@ -21,6 +21,7 @@
 
 package org.rockbox.widgets;
 
+import java.io.File;
 import org.rockbox.R;
 import org.rockbox.RockboxActivity;
 import org.rockbox.RockboxService;
@@ -108,6 +109,7 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         Intent intent = new Intent(context, RockboxActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.infoDisplay, pendingIntent);
+        views.setOnClickPendingIntent(R.id.logo, pendingIntent);
 
         RockboxWidgetConfigure.WidgetPref state = RockboxWidgetConfigure.loadWidgetPref(context, appWidgetId);
 
@@ -151,6 +153,9 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         else
             views.setViewVisibility(R.id.stop, View.GONE);
 
+        if (!state.enableAA)
+            views.setViewVisibility(R.id.logo, View.GONE);
+
         if (args != null)
         {
             if (args.getAction().equals("org.rockbox.TrackUpdateInfo"))
@@ -159,12 +164,18 @@ public class RockboxWidgetProvider extends AppWidgetProvider
                 CharSequence artist = args.getCharSequenceExtra("artist");
                 CharSequence album = args.getCharSequenceExtra("album");
                 views.setTextViewText(R.id.infoDisplay, title+"\n"+artist+"\n"+album);
+                CharSequence albumart = args.getCharSequenceExtra("albumart");
+                if (albumart != null)
+                    views.setImageViewUri(R.id.logo, Uri.fromFile(new File(albumart.toString())));
+                else
+                    views.setImageViewResource(R.id.logo, R.drawable.rockbox);
             }
             else if (args.getAction().equals("org.rockbox.TrackFinish"))
             {
                 // FIXME: looks like this event is always fired earlier than
                 // the actual track change (a few seconds)
                 views.setTextViewText(R.id.infoDisplay, context.getString(R.string.appwidget_infoDisplay));
+                views.setImageViewResource(R.id.logo, R.drawable.rockbox);
             }
             else if (args.getAction().equals("org.rockbox.UpdateState"))
             {

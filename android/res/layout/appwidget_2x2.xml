@@ -8,10 +8,12 @@
               android:background="@drawable/appwidget_background">
               <!-- style="@style/appwidget_background"-->
 
-  <ImageView android:id="@+id/logo"
+  <ImageButton android:id="@+id/logo"
+             android:layout_marginTop="5dp"
              android:layout_width="fill_parent"
-             android:layout_height="40dp"
-             android:scaleType="centerInside"
+             android:layout_height="80dp"
+             android:scaleType="centerInside"             
+             android:background="@drawable/appwidget_infodisplay_background"
              android:src="@drawable/rockbox" />
   <Button android:id="@+id/infoDisplay"
           style="@style/appwidget_infodisplay"
