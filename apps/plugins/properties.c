@@ -289,6 +289,9 @@ enum plugin_status plugin_start(const void* parameter)
     char file[MAX_PATH];
     if(!parameter) return PLUGIN_ERROR;
     rb->strcpy(file, (const char *) parameter);
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+#endif
 
     /* determine if it's a file or a directory */
     bool found = false;
