@@ -496,10 +496,13 @@ static int flush_cache(int fd)
 static int readwrite(int fd, void* buf, long count, bool write)
 {
     long sectors;
-    long i;
     long nread=0;
     struct filedesc* file;
-    int rc, rc2;
+    int rc;
+#ifdef STORAGE_NEEDS_ALIGN
+    long i;
+    int rc2;
+#endif
 
     if (fd < 0 || fd > MAX_OPEN_FILES-1) {
         errno = EINVAL;
