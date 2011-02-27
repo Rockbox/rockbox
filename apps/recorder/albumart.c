@@ -275,7 +275,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
  * Stores the found filename in the buf parameter.
  * Returns true if a bitmap was found, false otherwise */
 bool find_albumart(const struct mp3entry *id3, char *buf, int buflen,
-                    struct dim *dim)
+                    const struct dim *dim)
 {
     if (!id3 || !buf)
         return false;
