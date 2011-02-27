@@ -573,15 +573,21 @@ maemocc () {
     LDOPTS="$LDOPTS `pkg-config --libs libplayback-1`"
 
     # N900 specific: Enable ARMv7 NEON support
-    if sb-conf current |grep ARMEL; then
+    if sb-conf show -A |grep -q -i arm; then
+        echo "Detected ARM target"
         GCCOPTS="$GCCOPTS -mcpu=cortex-a8 -mtune=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
         extradefines="$extradefines -DMAEMO_ARM_BUILD"
+    else
+        echo "Detected x86 target"
     fi
  else
     # N8xx specific: Enable armv5te instructions
-    if sb-conf current |grep ARMEL; then
+    if sb-conf show -A |grep -q -i arm; then
+        echo "Detected ARM target"
         GCCOPTS="$GCCOPTS -mcpu=arm1136jf-s -mfloat-abi=softfp -mfpu=vfp"
         extradefines="$extradefines -DMAEMO_ARM_BUILD"
+    else
+        echo "Detected x86 target"
     fi
  fi
 }
