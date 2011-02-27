@@ -185,7 +185,7 @@
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION
 
-//#define HAVE_ATA_BBT
+//#define ATA_HAVE_BBT
 //#define ATA_BBT_PAGES 3072
 
 #define SECTOR_SIZE 4096
