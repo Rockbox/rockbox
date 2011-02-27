@@ -54,7 +54,7 @@
 #define LOGF_ENABLE
 #include "logf.h"
 
-#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO))
+#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 #define PREFIX(_x_) sim_ ## _x_
 #else
 #define PREFIX(_x_) _x_

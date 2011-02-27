@@ -43,7 +43,7 @@
 #define opendir opendir_android
 #define mkdir   mkdir_android
 #define rmdir   rmdir_android
-#elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO))
+#elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 #define open    sim_open
 #define remove  sim_remove
 #define rename  sim_rename

@@ -33,7 +33,7 @@ struct dirinfo {
 #include <stdbool.h>
 #include "file.h"
 
-#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO))
+#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 #   define dirent_uncached sim_dirent
 #   define DIR_UNCACHED SIM_DIR
 #   define opendir_uncached sim_opendir

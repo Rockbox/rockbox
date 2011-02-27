@@ -133,7 +133,7 @@ static int sdl_event_thread(void * param)
         depth = 16;
 
     flags = SDL_HWSURFACE|SDL_DOUBLEBUF;
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+#if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
     /* Fullscreen mode for maemo app */
     flags |= SDL_FULLSCREEN;
 #endif
@@ -142,7 +142,7 @@ static int sdl_event_thread(void * param)
         panicf("%s", SDL_GetError());
     }
 
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO|PLATFORM_PANDORA)
     /* Hide mouse cursor on real touchscreen device */
     SDL_ShowCursor(SDL_DISABLE);
 #endif

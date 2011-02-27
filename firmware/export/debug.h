@@ -34,7 +34,7 @@ extern void ldebugf(const char* file, int line, const char *fmt, ...)
 
 /*  */
 #if defined(SIMULATOR) && !defined(__PCTOOL__) \
-    || ((CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO)) && defined(DEBUG))
+    || ((CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO|PLATFORM_PANDORA)) && defined(DEBUG))
 #define DEBUGF  debugf
 #define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
 #else

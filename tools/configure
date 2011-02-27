@@ -592,6 +592,48 @@ maemocc () {
  fi
 }
 
+pandoracc () {
+ # Note: The new "Ivanovic" pandora toolchain is not able to compile rockbox.
+ #       You have to use the sebt3 toolchain:
+ #       http://www.gp32x.com/board/index.php?/topic/58490-yactfeau/
+
+ PNDSDK="/usr/local/angstrom/arm"
+ if [ ! -x $PNDSDK/bin/arm-angstrom-linux-gnueabi-gcc ]; then
+     echo "Pandora SDK gcc not found in $PNDSDK/bin/arm-angstrom-linux-gnueabi-gcc"
+     exit
+ fi
+
+ PATH=$PNDSDK/bin:$PATH:$PNDSDK/arm-angstrom-linux-gnueabi/usr/bin
+ PKG_CONFIG_PATH=$PNDSDK/arm-angstrom-linux-gnueabi/usr/lib/pkgconfig
+ LDOPTS="-L$PNDSDK/arm-angstrom-linux-gnueabi/usr/lib -Wl,-rpath,$PNDSDK/arm-angstrom-linux-gnueabi/usr/lib $LDOPTS"
+ PKG_CONFIG="pkg-config"
+
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+ GCCOPTS="$GCCOPTS -fno-builtin -g -I\$(SIMDIR)"
+ GCCOPTIMIZE=''
+ LDOPTS="-lm -ldl $LDOPTS"
+ GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
+ SHARED_FLAG="-shared"
+ endian="little"
+ thread_support="HAVE_SIGALTSTACK_THREADS"
+
+ # Include path
+ GCCOPTS="-I$PNDSDK/arm-angstrom-linux-gnueabi/usr/include"
+
+ # Set up compiler
+ gccchoice="4.3.3"
+ prefixtools "$PNDSDK/bin/arm-angstrom-linux-gnueabi-"
+
+ # Detect SDL
+ GCCOPTS="$GCCOPTS `$PKG_CONFIG --cflags sdl`"
+ LDOPTS="$LDOPTS `$PKG_CONFIG --libs sdl`"
+
+ # Compiler options
+ GCCOPTS="$GCCOPTS -O2 -fno-strict-aliasing"
+ GCCOPTS="$GCCOPTS -march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
+ GCCOPTS="$GCCOPTS -ffast-math -fsingle-precision-constant"
+}
+
 androidcc () {
     if [ -z "$ANDROID_SDK_PATH" ]; then
         echo "ERROR: You need the Android SDK installed and have the ANDROID_SDK_PATH"
@@ -1230,6 +1272,7 @@ cat <<EOF
  201) Android             171) HD300
  202) Nokia N8xx
  203) Nokia N900
+ 204) Pandora
 
 EOF
 
@@ -3012,6 +3055,33 @@ fi
     t_model="app"
     ;;
 
+   204|pandora)
+    application="yes"
+    target_id=77
+    modelname="pandora"
+    app_type="sdl-app"
+    target="-DPANDORA"
+    sharedir="rockbox/share"
+    bindir="rockbox/bin"
+    libdir="rockbox/lib"
+    memory=8
+    uname=`uname`
+    pandoracc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="pandora"
+    t_model="app"
+    ;;
+
    *)
     echo "Please select a supported target platform!"
     exit 7
@@ -3469,10 +3539,15 @@ if test -n "$t_cpu"; then
     # Maemo needs the SDL port, too
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/app"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
+  elif [ "$t_cpu" = "hosted" ] && [ "$t_manufacturer" = "pandora" ]; then
+    # Pandora needs the SDL port, too
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/app"
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
   elif [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted"
   fi
+
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"
   GCCOPTS="$GCCOPTS"

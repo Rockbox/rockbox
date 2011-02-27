@@ -217,7 +217,7 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_FONTNAME "15-Adobe-Helvetica"
 #elif LCD_HEIGHT <= 400
   #define DEFAULT_FONTNAME "16-Adobe-Helvetica"
-#elif LCD_HEIGHT <= 480 && !(CONFIG_PLATFORM & PLATFORM_MAEMO)
+#elif LCD_HEIGHT <= 480 && !(CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
   #define DEFAULT_FONTNAME "27-Adobe-Helvetica"
 #else
   #define DEFAULT_FONTNAME "35-Adobe-Helvetica"
