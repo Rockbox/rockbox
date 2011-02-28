@@ -206,10 +206,6 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         s5l_lcd_write_cmd(R_MEMORY_WRITE);
     }
-    for (y = y0; y <= y1; y++)
-        for (x = x0; x <= x1; x++)
-            s5l_lcd_write_data(lcd_framebuffer[y][x]);
-    return;
 
     /* Copy display bitmap to hardware */
     p = &lcd_framebuffer[y0][x0];
