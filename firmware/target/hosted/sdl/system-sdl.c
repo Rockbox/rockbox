@@ -143,7 +143,7 @@ static int sdl_event_thread(void * param)
         panicf("%s", SDL_GetError());
     }
 
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO|PLATFORM_PANDORA)
+#if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
     /* Hide mouse cursor on real touchscreen device */
     SDL_ShowCursor(SDL_DISABLE);
 #endif
