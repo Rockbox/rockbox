@@ -324,7 +324,8 @@ static int miscscrn(void * param)
     switch (result)
     {
         case GO_TO_PLAYLIST_VIEWER:
-            return GO_TO_PLAYLIST_VIEWER;
+        case GO_TO_WPS:
+            return result;
         default:
             return GO_TO_ROOT;
     }
