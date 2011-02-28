@@ -76,7 +76,7 @@
 #include "skin_engine/skin_engine.h"
 #include "statusbar-skinned.h"
 #include "bootchart.h"
-#if defined(APPLICATION) && (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #include "notification.h"
 #endif
 
