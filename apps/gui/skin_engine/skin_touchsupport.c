@@ -89,7 +89,10 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                                 *retregion = r;
                         }
                         if (pressed)
+                        {
                             r->armed = true;
+                            r->last_press = current_tick;
+                        }
                         break;
                     default:
                         if (edge_offset)

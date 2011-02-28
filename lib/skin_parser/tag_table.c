@@ -203,10 +203,17 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_TRANSLATEDSTRING,      "Sx" , "S", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_LANG_IS_RTL,           "Sr" , "", SKIN_REFRESH_STATIC },
     
-    { SKIN_TOKEN_LASTTOUCH,             "Tl" , "|D", SKIN_REFRESH_DYNAMIC },
-    { SKIN_TOKEN_CURRENT_SCREEN,        "cs", "", SKIN_REFRESH_DYNAMIC },
-    { SKIN_TOKEN_TOUCHREGION,           "T"  , "IIIIS|S", 0|NOBREAK },
+    /* HACK Alert (jdgordon): The next two tags have hacks so we could
+     * add a S param at the front without breaking old skins.
+     * [SD]D <- handled by the callback, allows SD or S or D params
+     * [SI]III[SI]|S -< SIIIIS|S or IIIIS|S 
+     *  keep in sync with parse_touchregion() and parse_lasttouch() */
+    { SKIN_TOKEN_LASTTOUCH,             "Tl" , "|[SD]D", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_TOUCHREGION,           "T"  , "[SI]III[SI]|S", 0|NOBREAK },
+    
     { SKIN_TOKEN_HAVE_TOUCH,            "Tp", "", FEATURE_TAG },
+    
+    { SKIN_TOKEN_CURRENT_SCREEN,        "cs", "", SKIN_REFRESH_DYNAMIC },
     
     { SKIN_TOKEN_HAVE_RECORDING,        "Rp"   , "", FEATURE_TAG },
     { SKIN_TOKEN_IS_RECORDING,          "Rr"   , "", SKIN_REFRESH_DYNAMIC },

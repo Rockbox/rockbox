@@ -1413,8 +1413,12 @@ const char *get_token_value(struct gui_wps *gwps,
             {
 #ifdef HAVE_TOUCHSCREEN
             unsigned int last_touch = touchscreen_last_touch();
+            struct touchregion_lastpress *data = token->value.data;
+            if (data->region)
+                last_touch = data->region->last_press;
+
             if (last_touch != 0xffff &&
-                TIME_BEFORE(current_tick, token->value.i + last_touch))
+                TIME_BEFORE(current_tick, data->timeout + last_touch))
                 return "t";
 #endif
             }

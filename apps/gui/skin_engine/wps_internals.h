@@ -182,6 +182,7 @@ struct viewport_colour {
 };
 #ifdef HAVE_TOUCHSCREEN
 struct touchregion {
+    char* label;            /* label to identify this region */
     struct skin_viewport* wvp;/* The viewport this region is in */
     short int x;             /* x-pos */
     short int y;             /* y-pos */
@@ -201,6 +202,12 @@ struct touchregion {
         void* data;
         int   value;
     };
+    long last_press;        /* last tick this was pressed */
+};
+
+struct touchregion_lastpress {
+    struct touchregion *region;
+    long timeout;
 };
 #endif
 
