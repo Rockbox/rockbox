@@ -62,6 +62,9 @@ int last_sent_battery_level = 100;
 int battery_percent = -1;
 void send_battery_level_event(void);
 
+static bool sleeptimer_active = false;
+static long sleeptimer_endtick;
+
 #if CONFIG_CHARGING
 /* State of the charger input as seen by the power thread */
 enum charger_input_state_type charger_input_state;
@@ -811,9 +814,6 @@ void send_battery_level_event(void)
         level++;
     }
 }
-
-static bool sleeptimer_active = false;
-static long sleeptimer_endtick;
 
 void set_sleep_timer(int seconds)
 {
