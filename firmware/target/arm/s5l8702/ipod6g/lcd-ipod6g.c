@@ -259,12 +259,16 @@ void lcd_blit_yuv(unsigned char * const src[3],
         s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
     } else {
         s5l_lcd_write_cmd(R_COLUMN_ADDR_SET);
-        s5l_lcd_write_data(x0);            /* Start column */
-        s5l_lcd_write_data(x1);            /* End column */
+        s5l_lcd_write_data(x0 >> 8);
+        s5l_lcd_write_data(x0 & 0xff);
+        s5l_lcd_write_data(x1 >> 8);
+        s5l_lcd_write_data(x1 & 0xff);
 
         s5l_lcd_write_cmd(R_ROW_ADDR_SET);
-        s5l_lcd_write_data(y0);            /* Start row */
-        s5l_lcd_write_data(y1);            /* End row */
+        s5l_lcd_write_data(y0 >> 8);
+        s5l_lcd_write_data(y0 & 0xff);
+        s5l_lcd_write_data(y1 >> 8);
+        s5l_lcd_write_data(y1 & 0xff);
 
         s5l_lcd_write_cmd(R_MEMORY_WRITE);
     }
