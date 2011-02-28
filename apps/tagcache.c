@@ -3390,8 +3390,8 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
     char tag_data[TAG_MAXLEN+32];
     int idx_id;
     long masterfd = (long)parameters;
-    const int import_tags[] = { tag_playcount, tag_rating, tag_playtime, tag_lastplayed,
-        tag_commitid };
+    const int import_tags[] = { tag_playcount, tag_rating, tag_playtime,
+                                tag_lastplayed, tag_commitid, tag_lastoffset };
     int i;
     (void)line_n;
     
