@@ -1467,7 +1467,7 @@ static void audio_finish_load_track(void)
        must wait until after PLAYBACK_EVENT_TRACK_BUFFER, which may
        generate a resume position.  */
 #ifdef HAVE_TAGCACHE
-    if (! global_settings.autoresume_enable)
+    if (!global_settings.autoresume_enable || offset)
 #endif
         tracks[track_widx].taginfo_ready = true;
 
@@ -1482,7 +1482,7 @@ static void audio_finish_load_track(void)
 #ifdef HAVE_TAGCACHE
     /* In case the autoresume feature has been enabled, finally all
        required data is available for the codec. */
-    if (global_settings.autoresume_enable)
+    if (global_settings.autoresume_enable && !offset)
         tracks[track_widx].taginfo_ready = true;
 #endif
 
