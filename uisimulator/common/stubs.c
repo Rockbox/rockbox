@@ -385,17 +385,6 @@ void mpeg_set_pitch(int pitch)
     (void)pitch;
 }
 
-static int sleeptime;
-void set_sleep_timer(int seconds)
-{
-    sleeptime = seconds;
-}
-
-int get_sleep_timer(void)
-{
-    return sleeptime;
-}
-
 #ifdef HAVE_LCD_CHARCELLS
 void lcd_clearrect (int x, int y, int nx, int ny)
 {

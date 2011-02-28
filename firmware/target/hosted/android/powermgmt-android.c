@@ -73,14 +73,3 @@ unsigned battery_voltage(void)
 {
     return 0;
 }
-
-static int sleeptime;
-void set_sleep_timer(int seconds)
-{
-    sleeptime = seconds;
-}
-
-int get_sleep_timer(void)
-{
-    return sleeptime;
-}
