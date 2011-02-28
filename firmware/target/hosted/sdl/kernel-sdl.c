@@ -36,11 +36,8 @@ long start_tick;
 
 #ifndef HAVE_SDL_THREADS
 /* for the wait_for_interrupt function */
-static bool do_exit;
 static SDL_cond *wfi_cond;
 static SDL_mutex *wfi_mutex;
-#else
-#define do_exit false
 #endif
 /* Condition to signal that "interrupts" may proceed */
 static SDL_cond *sim_thread_cond;
@@ -74,7 +71,7 @@ int set_irq_level(int level)
         /* Not in a handler and "interrupts" are going from disabled to
          * enabled; signal any pending handlers still waiting */
         if (handlers_pending > 0)
-            SDL_CondSignal(sim_thread_cond);
+            SDL_CondBroadcast(sim_thread_cond);
     }
 
     interrupt_level = level; /* save new level */
@@ -147,10 +144,14 @@ void sim_kernel_shutdown(void)
 {
     SDL_RemoveTimer(tick_timer_id);
 #ifndef HAVE_SDL_THREADS
-    do_exit = true;
-    SDL_CondSignal(wfi_cond);
+    SDL_DestroyCond(wfi_cond);
+    SDL_UnlockMutex(wfi_mutex);
+    SDL_DestroyMutex(wfi_mutex);
 #endif
-    disable_irq(); 
+    enable_irq();
+    while(handlers_pending > 0)
+        SDL_Delay(10);
+
     SDL_DestroyMutex(sim_irq_mtx);
     SDL_DestroyCond(sim_thread_cond); 
 }
@@ -164,7 +165,7 @@ Uint32 tick_timer(Uint32 interval, void *param)
     
     new_tick = (SDL_GetTicks() - start_tick) / (1000/HZ);
         
-    while(new_tick != current_tick && !do_exit)
+    while(new_tick != current_tick)
     {
         sim_enter_irq_handler();
 
@@ -175,7 +176,7 @@ Uint32 tick_timer(Uint32 interval, void *param)
         sim_exit_irq_handler();
     }
     
-    return do_exit ? 0 : interval;
+    return interval;
 }
 
 void tick_start(unsigned int interval_in_ms)
@@ -203,23 +204,10 @@ void tick_start(unsigned int interval_in_ms)
 }
 
 #ifndef HAVE_SDL_THREADS
-static void check_exit(void)
-{
-    if (UNLIKELY(do_exit))
-    {
-        SDL_DestroyCond(wfi_cond);
-        SDL_UnlockMutex(wfi_mutex);
-        SDL_DestroyMutex(wfi_mutex);
-        sim_do_exit();
-    }
-}
-
 void wait_for_interrupt(void)
 {
     /* the exit may come at any time, during the CondWait or before,
      * so check it twice */
-    check_exit();
     SDL_CondWait(wfi_cond, wfi_mutex);
-    check_exit();
 }
 #endif

@@ -23,7 +23,6 @@
 #include <libhal.h>
 #include <libosso.h>
 #include <SDL_thread.h>
-#include <SDL_events.h>
 
 #include "config.h"
 #include "system.h"
@@ -210,15 +209,6 @@ void set_poweroff_timeout(int timeout)
 
 void reset_poweroff_timer(void)
 {
-}
-
-void shutdown_hw(void)
-{
-    /* Shut down SDL event loop */
-    SDL_Event event;
-    memset(&event, 0, sizeof(SDL_Event));
-    event.type = SDL_USEREVENT;
-    SDL_PushEvent(&event);
 }
 
 void cancel_shutdown(void)

@@ -275,8 +275,8 @@ static bool event_handler(SDL_Event *event)
         break;
     }
     case SDL_QUIT:
-        /* Post SYS_POWEROFF event. Will post SDL_USEREVENT in shutdown_hw() if successful. */
-        queue_broadcast(SYS_POWEROFF, 0);
+        /* Will post SDL_USEREVENT in shutdown_hw() if successful. */
+        sys_poweroff();
         break;
     case SDL_USEREVENT:
         return true;
@@ -324,8 +324,8 @@ static void button_event(int key, bool pressed)
 
 #if (CONFIG_PLATFORM & PLATFORM_PANDORA)
     case SDLK_LCTRL:
-        /* Post SYS_POWEROFF event. Will post SDL_USEREVENT in shutdown_hw() if successful. */
-        queue_broadcast(SYS_POWEROFF, 0);
+        /* Will post SDL_USEREVENT in shutdown_hw() if successful. */
+        sys_poweroff();
         break;
 #endif
 #ifdef HAS_BUTTON_HOLD

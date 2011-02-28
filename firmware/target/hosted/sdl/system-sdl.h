@@ -22,6 +22,8 @@
 #define _SYSTEM_SDL_H_
 
 #include <stdbool.h>
+#include "config.h"
+#include "gcc_extensions.h"
 
 #define HIGHEST_IRQ_LEVEL 1
 
@@ -45,7 +47,7 @@ void sim_kernel_shutdown(void);
 void sys_poweroff(void);
 void sys_handle_argv(int argc, char *argv[]);
 void gui_message_loop(void);
-void sim_do_exit(void);
+void sim_do_exit(void) NORETURN_ATTR;
 #ifndef HAVE_SDL_THREADS
 void wait_for_interrupt(void);
 #endif
