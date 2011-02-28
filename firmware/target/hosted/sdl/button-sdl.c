@@ -322,6 +322,12 @@ static void button_event(int key, bool pressed)
         }
         return;
 
+#if (CONFIG_PLATFORM & PLATFORM_PANDORA)
+    case SDLK_LCTRL:
+        /* Post SYS_POWEROFF event. Will post SDL_USEREVENT in shutdown_hw() if successful. */
+        queue_broadcast(SYS_POWEROFF, 0);
+        break;
+#endif
 #ifdef HAS_BUTTON_HOLD
     case SDLK_h:
         if(pressed)
