@@ -25,9 +25,10 @@ try() {
 
 buildimage() {
     /sbin/mkdosfs -F 32 -s $1 $IMAGE > /dev/null
-    mount -o loop $IMAGE $MOUNT
+    #mount -o loop $IMAGE $MOUNT
+    mount $MOUNT
     echo "Filling it with /etc files"
-    find /etc -type f -maxdepth 1 -exec cp {} $MOUNT \;
+    find /etc -maxdepth 1 -type f -readable -exec cp {} $MOUNT \;
     for i in `seq 1 120`;
     do
         echo apa > "$MOUNT/very $i long test filename so we can make sure they.work"

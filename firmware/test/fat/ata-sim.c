@@ -9,7 +9,7 @@ static FILE* file;
 
 void panicf( const char *fmt, ... );
 
-int ata_read_sectors(unsigned long start, int count, void* buf)
+int storage_read_sectors(unsigned long start, int count, void* buf)
 {
     if ( count > 1 )
         DEBUGF("[Reading %d blocks: 0x%lx to 0x%lx]\n",
@@ -22,14 +22,14 @@ int ata_read_sectors(unsigned long start, int count, void* buf)
         return -1;
     }
     if(!fread(buf,BLOCK_SIZE,count,file)) {
-        DEBUGF("ata_write_sectors(0x%x, 0x%x, 0x%x)\n", start, count, buf );
+        DEBUGF("ata_write_sectors(0x%lx, 0x%x, %p)\n", start, count, buf );
         perror("fread");
         panicf("Disk error\n");
     }
     return 0;
 }
 
-int ata_write_sectors(unsigned long start, int count, void* buf)
+int storage_write_sectors(unsigned long start, int count, void* buf)
 {
     if ( count > 1 )
         DEBUGF("[Writing %d blocks: 0x%lx to 0x%lx]\n",
@@ -45,7 +45,7 @@ int ata_write_sectors(unsigned long start, int count, void* buf)
         return -1;
     }
     if(!fwrite(buf,BLOCK_SIZE,count,file)) {
-        DEBUGF("ata_write_sectors(0x%x, 0x%x, 0x%x)\n", start, count, buf );
+        DEBUGF("ata_write_sectors(0x%lx, 0x%x, %p)\n", start, count, buf );
         perror("fwrite");
         panicf("Disk error\n");
     }

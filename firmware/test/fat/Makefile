@@ -8,57 +8,46 @@ export TARGET_INC=-I$(FIRMWARE)/target/arm/ipod/video -I$(FIRMWARE)/target/arm/i
 DRIVERS = ../../drivers
 EXPORT = ../../export
 
-INCLUDE = -I$(EXPORT)
+INCLUDE = -I$(EXPORT) -I$(FIRMWARE)/include 
 
-RINCLUDE =  -I$(FIRMWARE)/include 
-DEFINES =  -DTEST_FAT -DDEBUG -DCRT_DISPLAY -DDISK_WRITE -DHAVE_FAT16SUPPORT
+DEFINES =  -DTEST_FAT -DDEBUG -DCRT_DISPLAY -DDISK_WRITE -DHAVE_FAT16SUPPORT -D__PCTOOL__
 
-CFLAGS = -g -Wall $(DEFINES) -I. $(INCLUDE) $(RINCLUDE) $(BUILDDATE) 
-SIMFLAGS = -g -Wall $(DEFINES) -I. $(INCLUDE)
+CFLAGS = -g -Wall -std=gnu99 -Wno-pointer-sign $(DEFINES) -I. $(INCLUDE) $(BUILDDATE) -I$(FIRMWARE)/libc/include
+SIMFLAGS = -g -Wall -std=gnu99 -Wno-pointer-sign $(DEFINES) -I. $(INCLUDE)
 
 TARGET = fat
 
+all: $(TARGET)
 
-$(TARGET): fat.o ata-sim.o main.o disk.o debug.o dir.o file.o ctype.o
+$(TARGET): fat.o ata-sim.o main.o disk.o dir.o file.o ctype.o unicode.o strlcpy.o
 	gcc -g -o fat $+ -lfl
 
 fat.o: $(DRIVERS)/fat.c $(EXPORT)/fat.h $(EXPORT)/ata.h
-	$(CC) $(CFLAGS) -DSIMULATOR -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
-ctype.o: $(FIRMWARE)/common/ctype.c
+ctype.o: $(FIRMWARE)/libc/ctype.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 disk.o: $(FIRMWARE)/common/disk.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-dir.o: $(FIRMWARE)/common/dir.c
+dir.o: $(FIRMWARE)/common/dir_uncached.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 file.o: $(FIRMWARE)/common/file.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-debug.o: $(FIRMWARE)/debug.c
-	$(CC) $(SIMFLAGS) -DSIMULATOR -c $< -o $@
+unicode.o: $(FIRMWARE)/common/unicode.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+strlcpy.o: $(FIRMWARE)/common/strlcpy.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 ata-sim.o: ata-sim.c $(EXPORT)/ata.h
-	$(CC) $(SIMFLAGS) -DSIMULATOR -c $< -o $@
+	$(CC) $(SIMFLAGS) -c $< -o $@
 
-dir.h: $(FIRMWARE)/include/dir.h
-	ln -s $(FIRMWARE)/include/dir.h .
-
-file.h: $(FIRMWARE)/include/file.h
-	ln -s $(FIRMWARE)/include/file.h .
-
-main.o: main.c $(EXPORT)/ata.h dir.h file.h
+main.o: main.c $(EXPORT)/ata.h
 	$(CC) $(SIMFLAGS) -c $< -o $@
 
 clean:
 	rm -f *.o $(TARGET)
-	rm -f *~
-	rm -f cmd.tab.h lex.yy.c cmd.tab.c
-	rm -f core
-	rm -f dir.h file.h
-
-tar:
-	rm -f $(TARGET).tar
-	tar cvf $(TARGET).tar -C .. fat

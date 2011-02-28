@@ -16,6 +16,13 @@ To mount the image, your linux kernel must include the loopback device:
 
 Now copy some test data to the disk, umount it and start testing.
 
+The test script mounts the disk image in order to initialize it will a number
+of dummy files. Since users are no longer allowed to mount loopback devices,
+you can either run the test script as root (not recommended) or add a line to
+your fstab file:
+
+/path/to/disk.img /mnt/dummy vfat loop,users,noauto 0 0
+
 
 Test code
 ---------
