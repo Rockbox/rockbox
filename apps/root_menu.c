@@ -461,7 +461,7 @@ MAKE_MENU(root_menu_, ID2P(LANG_ROCKBOX_TITLE),
 #endif
             &playlists, &rocks_browser,  &system_menu_
 
-#ifdef HAVE_LCD_CHARCELLS
+#if CONFIG_KEYPAD == PLAYER_PAD
             ,&do_shutdown_item
 #endif
         );
