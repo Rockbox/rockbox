@@ -56,13 +56,12 @@ static void track_changed_callback(void *param)
 
         char buf[200];
         const char * ptitle = id3->title;
-        if (!ptitle)
+        if (!ptitle && *id3->path)
         {   /* pass the filename as title if id3 info isn't available */
-            ptitle =
-                strip_extension(buf, sizeof(buf), strrchr(id3->path,'/') + 1);
+            ptitle = strip_extension(buf, sizeof(buf), strrchr(id3->path,'/') + 1);
         }
 
-        title = e->NewStringUTF(env_ptr, ptitle);
+        title = e->NewStringUTF(env_ptr, ptitle ?: "");
         artist = e->NewStringUTF(env_ptr, id3->artist ?: "");
         album = e->NewStringUTF(env_ptr, id3->album ?: "");
 
