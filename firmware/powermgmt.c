@@ -788,11 +788,13 @@ void cancel_shutdown(void)
 {
     logf("cancel_shutdown()");
 
+#ifndef BOOTLOADER
 #if defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)
     /* TODO: Move some things to target/ tree */
     if (shutdown_timeout)
         pcf50606_reset_timeout();
 #endif
+#endif /* BOOTLOADER */
 
     shutdown_timeout = 0;
 }
