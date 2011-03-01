@@ -937,7 +937,8 @@ static const struct touchaction touchactions[] = {
     {"mute", ACTION_TOUCH_MUTE },
     
     /* generic settings changers */
-    {"setting_inc", ACTION_SETTINGS_INC}, {"setting_dec", ACTION_SETTINGS_DEC}, 
+    {"setting_inc", ACTION_SETTINGS_INC}, {"setting_dec", ACTION_SETTINGS_DEC},
+    {"setting_set", ACTION_SETTINGS_SET}, 
 
     /* WPS specific actions */
     {"browse", ACTION_WPS_BROWSE },
@@ -952,6 +953,7 @@ static const struct touchaction touchactions[] = {
     {"presets", ACTION_FM_PRESET}, 
 #endif
 };
+bool cfg_string_to_int(int setting_id, int* out, const char* str);
 
 static int parse_touchregion(struct skin_element *element,
                              struct wps_token *token,
@@ -966,26 +968,9 @@ static int parse_touchregion(struct skin_element *element,
     const char vol_string[] = "volume";
     char temp[20];
 
-    /* format: %T(x,y,width,height,action)
+    /* format: %T([label,], x,y,width,height,action[, ...])
      * if action starts with & the area must be held to happen
-     * action is one of:
-     * play  -  play/pause playback
-     * stop  -  stop playback, exit the wps
-     * prev  -  prev track
-     * next  -  next track
-     * ffwd  -  seek forward
-     * rwd   -  seek backwards
-     * menu  -  go back to the main menu
-     * browse - go back to the file/db browser
-     * shuffle - toggle shuffle mode
-     * repmode - cycle the repeat mode
-     * quickscreen - go into the quickscreen
-     * contextmenu - open the context menu
-     * playlist - go into the playlist
-     * pitch - go into the pitchscreen
-     * volup - increase volume by one step
-     * voldown - decrease volume by one step
-    */
+     */
 
     
     region = (struct touchregion*)skin_buffer_alloc(sizeof(struct touchregion));
@@ -1018,7 +1003,7 @@ static int parse_touchregion(struct skin_element *element,
     region->wvp = curr_vp;
     region->armed = false;
     region->reverse_bar = false;
-    region->data = NULL;
+    region->value = 0;
     region->last_press = 0xffff;
     action = element->params[p++].data.text;
 
@@ -1055,7 +1040,8 @@ static int parse_touchregion(struct skin_element *element,
             {
                 region->action = touchactions[i].action;
                 if (region->action == ACTION_SETTINGS_INC ||
-                    region->action == ACTION_SETTINGS_DEC)
+                    region->action == ACTION_SETTINGS_DEC ||
+                    region->action == ACTION_SETTINGS_SET)
                 {
                     if (element->params_count < p+1)
                     {
@@ -1072,7 +1058,50 @@ static int parse_touchregion(struct skin_element *element,
                                 break;
                         if (j==nb_settings)
                             return WPS_ERROR_INVALID_PARAM;
-                        region->data = (void*)&settings[j];
+                        region->setting_data.setting = (void*)&settings[j];
+                        if (region->action == ACTION_SETTINGS_SET)
+                        {
+                            char* text;
+                            int temp;
+                            struct touchsetting *setting = 
+                                &region->setting_data;
+                            if (element->params_count < p+2)
+                                return WPS_ERROR_INVALID_PARAM;
+                            text = element->params[p+1].data.text;
+                            switch (settings[j].flags&F_T_MASK)
+                            {
+                            case F_T_CUSTOM:
+                                setting->value.text = text;
+                                break;                              
+                            case F_T_INT:
+                            case F_T_UINT:
+                                if (settings[j].cfg_vals == NULL)
+                                {
+                                    setting->value.number = atoi(text);
+                                }
+                                else if (cfg_string_to_int(j, &temp, text))
+                                {
+                                    if (settings[j].flags&F_TABLE_SETTING)
+                                        setting->value.number = 
+                                            settings[j].table_setting->values[temp];
+                                    else
+                                        setting->value.number = temp;
+                                }
+                                else
+                                    return WPS_ERROR_INVALID_PARAM;
+                                break;
+                            case F_T_BOOL:
+                                if (cfg_string_to_int(j, &temp, text))
+                                {
+                                    setting->value.number = temp;
+                                }
+                                else
+                                    return WPS_ERROR_INVALID_PARAM;
+                                break;
+                            default:
+                                return WPS_ERROR_INVALID_PARAM;
+                            }
+                        }
                     }
                 }
                 break;

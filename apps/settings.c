@@ -231,7 +231,7 @@ void settings_load(int which)
     }
 }
 
-static bool cfg_string_to_int(int setting_id, int* out, const char* str)
+bool cfg_string_to_int(int setting_id, int* out, const char* str)
 {
     const char* start = settings[setting_id].cfg_vals;
     char* end = NULL;

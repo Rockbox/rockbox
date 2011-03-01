@@ -196,6 +196,7 @@ enum {
     ACTION_SETTINGS_DECREPEAT,
     ACTION_SETTINGS_DECBIGSTEP,
     ACTION_SETTINGS_RESET,
+    ACTION_SETTINGS_SET, /* Used by touchscreen targets */
     
     /* bookmark screen */
     ACTION_BMS_DELETE,

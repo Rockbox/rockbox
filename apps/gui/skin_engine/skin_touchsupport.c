@@ -27,6 +27,7 @@
 #include "misc.h"
 #include "option_select.h"
 #include "sound.h"
+#include "settings_list.h"
 
 
 /** Disarms all touchregions. */
@@ -129,8 +130,45 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_DEC:
             {
-                const struct settings_list *setting = temp->data;
-                option_select_next_val(setting, returncode == ACTION_SETTINGS_DEC, true);
+                const struct settings_list *setting = 
+                                            temp->setting_data.setting;
+                option_select_next_val(setting, 
+                                       returncode == ACTION_SETTINGS_DEC,
+                                       true);
+                returncode = ACTION_REDRAW;
+            }
+            break;
+            case ACTION_SETTINGS_SET:
+            {
+                struct touchsetting *data = &temp->setting_data;
+                const struct settings_list *s = data->setting;
+                void (*f)(int) = NULL;
+                switch (s->flags&F_T_MASK)
+                {
+                    case F_T_CUSTOM:
+                        s->custom_setting
+                            ->load_from_cfg(s->setting, data->value.text);
+                        break;                          
+                    case F_T_INT:
+                    case F_T_UINT:
+                        *(int*)s->setting = data->value.number;
+                        if (s->flags&F_CHOICE_SETTING)
+                            f = s->choice_setting->option_callback;
+                        else if (s->flags&F_TABLE_SETTING)
+                            f = s->table_setting->option_callback;
+                        else
+                            f = s->int_setting->option_callback;
+
+                        if (f)
+                            f(data->value.number);
+                        break;
+                    case F_T_BOOL:
+                        *(bool*)s->setting = data->value.number ? true : false;
+                        if (s->bool_setting->option_callback)
+                            s->bool_setting
+                                ->option_callback(data->value.number ? true : false);
+                        break;
+                }
                 returncode = ACTION_REDRAW;
             }
             break;
