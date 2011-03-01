@@ -295,26 +295,6 @@ int sb_touch_to_button(int context)
         case ACTION_WPS_VOLDOWN:
             return ACTION_LIST_VOLDOWN;
 #endif
-        case ACTION_SETTINGS_INC:
-        case ACTION_SETTINGS_DEC:
-        {
-            const struct settings_list *setting = region->data;
-            option_select_next_val(setting, button == ACTION_SETTINGS_DEC, true);
-        }
-        return ACTION_REDRAW;
-        case ACTION_TOUCH_MUTE:
-        {
-            const int min_vol = sound_min(SOUND_VOLUME);
-            if (global_settings.volume == min_vol)
-                global_settings.volume = region->value;
-            else
-            {
-                region->value = global_settings.volume;
-                global_settings.volume = min_vol;
-            }
-            setvol();
-        }
-        return ACTION_REDRAW;
         /* TODO */
     }
     return button;

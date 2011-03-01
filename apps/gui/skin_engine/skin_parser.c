@@ -999,7 +999,7 @@ static int parse_touchregion(struct skin_element *element,
     {
         region->label = element->params[0].data.text;
         p = 1;
-        /* "[SI]III[SI]|S" is the param list. There MUST be 4 numbers
+        /* "[SI]III[SI]|SS" is the param list. There MUST be 4 numbers
          * followed by at least one string. Verify that here */
         if (element->params_count < 6 ||
             element->params[4].type != INTEGER)
