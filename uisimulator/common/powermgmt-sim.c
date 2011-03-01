@@ -152,7 +152,3 @@ void lineout_set(bool enable)
 void reset_poweroff_timer(void)
 {
 }
-
-void cancel_shutdown(void)
-{
-}

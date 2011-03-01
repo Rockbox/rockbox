@@ -76,8 +76,9 @@ enum charge_state_type charge_state = DISCHARGING;
 #endif
 #endif /* CONFIG_CHARGING */
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 static int shutdown_timeout = 0;
+
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 /*
  * Average battery voltage and charger voltage, filtered via a digital
  * exponential filter (aka. exponential moving average, scaled):
@@ -755,6 +756,7 @@ void shutdown_hw(void)
     sleep(HZ/4);
     power_off();
 }
+#endif /* PLATFORM_NATIVE */
 
 void sys_poweroff(void)
 {
@@ -794,7 +796,6 @@ void cancel_shutdown(void)
 
     shutdown_timeout = 0;
 }
-#endif /* PLATFORM_NATIVE */
 
 /* Send system battery level update events on reaching certain significant
    levels. This must be called after battery_percent has been updated. */

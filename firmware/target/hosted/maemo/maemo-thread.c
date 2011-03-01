@@ -210,7 +210,3 @@ void set_poweroff_timeout(int timeout)
 void reset_poweroff_timer(void)
 {
 }
-
-void cancel_shutdown(void)
-{
-}

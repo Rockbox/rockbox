@@ -71,12 +71,6 @@ bool debug_audio = false;
 bool debug_wps = false;
 int wps_verbose_level = 3;
 
-void sys_poweroff(void)
-{
-    /* Post SYS_POWEROFF event. Will post SDL_USEREVENT in shutdown_hw() if successful. */
-    queue_broadcast(SYS_POWEROFF, 0);
-}
-
 /*
  * This thread will read the buttons in an interrupt like fashion, and
  * also initializes SDL_INIT_VIDEO and the surfaces
