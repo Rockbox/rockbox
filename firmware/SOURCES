@@ -401,7 +401,6 @@ drivers/audio/tsc2100.c
 #if defined(CPU_SH)
 
 #ifndef SIMULATOR
-drivers/i2c.c
 target/sh/adc-sh.c
 target/sh/bitswap.S
 target/sh/crt0.S
@@ -412,6 +411,7 @@ target/sh/memset-sh.S
 target/sh/strlen-sh.S
 target/sh/system-sh.c
 target/sh/archos/descramble.S
+target/sh/archos/i2c-archos.c
 target/sh/debug-sh.c
 #endif /* SIMULATOR */
 
