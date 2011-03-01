@@ -923,6 +923,7 @@ static int parse_lasttouch(struct skin_element *element,
 struct touchaction {const char* s; int action;};
 static const struct touchaction touchactions[] = {
     /* generic actions, convert to screen actions on use */
+    {"none", ACTION_TOUCHSCREEN},
     {"prev", ACTION_STD_PREV },         {"next", ACTION_STD_NEXT },
     {"rwd", ACTION_STD_PREVREPEAT },    {"ffwd", ACTION_STD_NEXTREPEAT },
     {"hotkey", ACTION_STD_HOTKEY},      {"select", ACTION_STD_OK },
