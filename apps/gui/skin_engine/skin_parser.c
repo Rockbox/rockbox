@@ -1067,6 +1067,7 @@ static int parse_touchregion(struct skin_element *element,
                                 &region->setting_data;
                             if (element->params_count < p+2)
                                 return WPS_ERROR_INVALID_PARAM;
+#ifndef __PCTOOL__
                             text = element->params[p+1].data.text;
                             switch (settings[j].flags&F_T_MASK)
                             {
@@ -1101,6 +1102,7 @@ static int parse_touchregion(struct skin_element *element,
                             default:
                                 return WPS_ERROR_INVALID_PARAM;
                             }
+#endif /* __PCTOOL__ */
                         }
                     }
                 }
