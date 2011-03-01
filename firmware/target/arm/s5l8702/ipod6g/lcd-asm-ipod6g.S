@@ -19,57 +19,15 @@
  *
  ****************************************************************************/
 
-#define FORCE_FIFO_WAIT
-/**************************************************************************** 
- * #define FORCE_FIFO_WAIT
- *
- * This is not needed in YUV blitting when the LCD IF is fast enough. In this
- * case YUV-to-RGB conversion per pixel needs longer than the transfer of a 
- * pixel via the LCD IF. For iPod nano 2G this is true if the LCD IF is 
- * configured to use LCD_PHTIME = 0x00 (see lcd-nano2g.c).
- ****************************************************************************/
 
 #include "config.h"
 
     .section .icode, "ax", %progbits
     
-/****************************************************************************
- * void lcd_write_line(const fb_data *addr, 
- *                     int pixelcount, 
- *                     const unsigned int lcd_base_addr);
- * 
- * Writes pixelcount pixels from src-pointer (lcd_framebuffer) to LCD dataport.
- */
-    .align  2
-    .global lcd_write_line
-    .type   lcd_write_line, %function
-                                      /* r0 = addr, must be aligned */
-                                      /* r1 = pixel count, must be even */
-lcd_write_line:                       /* r2 = LCD_BASE */
-    stmfd   sp!, {r4-r6, lr}          /* save non-scratch registers */
-    add     r12, r2, #0x40            /* LCD_WDATA = LCD data port */
-
-.loop:
-    ldmia r0!, {r3, r5}               /* read 2 pixel (=8 byte) */
-
-    /* wait for FIFO half full */
-.fifo_wait:
-    ldr     lr, [r2, #0x1C]           /* while (LCD_STATUS & 0x08); */
-    tst     lr, #0x8
-    bgt     .fifo_wait
-    
-    mov     r4, r3, asr #16           /* r3 = 1st pixel, r4 = 2nd pixel */
-    mov     r6, r5, asr #16           /* r5 = 3rd pixel, r6 = 4th pixel */
-    stmia   r12, {r3-r6}              /* write pixels (lowest 16 bit used) */
-
-    subs    r1, r1, #4
-    bgt     .loop
-
-    ldmpc   regs=r4-r6
 
 /****************************************************************************
  * extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
- *                                    const unsigned LCD_BASE,
+ *                                    uint16_t* out,
  *                                    int width,
  *                                    int stride);
  *
@@ -93,7 +51,7 @@ lcd_write_line:                       /* r2 = LCD_BASE */
     .type       lcd_write_yuv420_lines, %function
 lcd_write_yuv420_lines:
                                       /* r0 = src = yuv_src */
-                                      /* r1 = dst = LCD_BASE */
+                                      /* r1 = dst = out */
                                       /* r2 = width */
                                       /* r3 = stride */                
     stmfd       sp!, { r4-r10, lr }   /* save non-scratch */
@@ -103,14 +61,14 @@ lcd_write_yuv420_lines:
     add         r3, r9, r3            /* r3 = &ysrc[stride] */
     add         r4, r2, r2, asr #1    /* chroma buffer lenght = width/2 *3 */
     mov         r4, r4, asl #2        /*   use words for str/ldm possibility */
-    add         r4, r4, #19           /*   plus room for 4 additional words, */
+    add         r4, r4, #15           /*   plus room for 3 additional words, */
     bic         r4, r4, #3            /*   rounded up to multiples of 4 byte */
     sub         sp, sp, r4            /*   and allocate on stack */
-    stmia       sp, {r1-r4}           /* LCD_BASE, width, &ysrc[stride], stack_alloc */
+    stmia       sp, {r2-r4}           /* width, &ysrc[stride], stack_alloc */
 
     mov         r7, r2                /* r7 = loop count */
-    add         r8, sp, #16           /* chroma buffer */
-    add         lr, r1, #0x40         /* LCD data port = LCD_BASE + 0x40 */
+    add         r8, sp, #12           /* chroma buffer */
+    mov         lr, r1                /* RGB565 data destination buffer */
 
     /* 1st loop start */
 10:                                   /* loop start */
@@ -195,23 +153,16 @@ lcd_write_yuv420_lines:
     /* calculate pixel_2 and pack with pixel_1 before writing */
     orr         r5, r5, r3, lsl #5    /* pixel_2 = r<<11 | g<<5 | b */
     orr         r5, r5, r6, lsl #11   /* r5 = pixel_2 */
-#ifdef FORCE_FIFO_WAIT
-    /* wait for FIFO half full */
-.fifo_wait1:
-    ldr         r3, [lr, #-0x24]      /* while (LCD_STATUS & 0x08); */
-    tst         r3, #0x8
-    bgt         .fifo_wait1
-#endif
-    stmia       lr, {r4,r5}           /* write pixel_1 and pixel_2 */
+    orr         r4, r4, r5, lsl #16
+    str         r4, [lr], #4          /* write pixel_1 and pixel_2 */
 
     subs        r7, r7, #2            /* check for loop end */
     bgt         10b                   /* back to beginning  */
     /* 1st loop end */
 
     /* Reload several registers for pointer rewinding for next loop */
-    add         r8, sp, #16           /* chroma buffer */
-    ldmia       sp, { r1, r7, r9}     /* r1  = LCD_BASE */
-                                      /* r7  = loop count */
+    add         r8, sp, #12           /* chroma buffer */
+    ldmia       sp, {r7, r9}          /* r7  = loop count */
                                       /* r9 = &ysrc[stride] */   
 
     /* 2nd loop start */
@@ -275,20 +226,14 @@ lcd_write_yuv420_lines:
     /* calculate pixel_2 and pack with pixel_1 before writing */
     orr         r5, r5, r3, lsl #5    /* pixel_2 = r<<11 | g<<5 | b */
     orr         r5, r5, r6, lsl #11   /* r5 = pixel_2 */
-#ifdef FORCE_FIFO_WAIT
-    /* wait for FIFO half full */
-.fifo_wait2:
-    ldr         r3, [lr, #-0x24]      /* while (LCD_STATUS & 0x08); */
-    tst         r3, #0x8
-    bgt         .fifo_wait2
-#endif
-    stmia       lr, {r4,r5}           /* write pixel_1 and pixel_2 */
+    orr         r4, r4, r5, lsl #16
+    str         r4, [lr], #4          /* write pixel_1 and pixel_2 */
 
     subs        r7, r7, #2            /* check for loop end */
     bgt         20b                   /* back to beginning  */
     /* 2nd loop end */
 
-    ldr         r3, [sp, #12]
+    ldr         r3, [sp, #8]
     add         sp, sp, r3            /* deallocate buffer */
     ldmpc       regs=r4-r10           /* restore registers */
 
