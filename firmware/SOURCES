@@ -197,9 +197,6 @@ drivers/touchscreen.c
 
 /* Storage */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#if (CONFIG_STORAGE & STORAGE_MMC)
-drivers/ata_mmc.c
-#endif
 #if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_IFP7XX)
 drivers/ata_flash.c
 #endif
@@ -636,6 +633,7 @@ target/sh/archos/ondio/button-ondio.c
 target/sh/archos/ondio/power-ondio.c
 target/sh/archos/ondio/powermgmt-ondio.c
 target/sh/archos/ondio/usb-ondio.c
+target/sh/archos/ondio/ata_mmc.c
 target/sh/archos/mascodec-archos.c
 target/sh/archos/audio-archos.c
 #if (CONFIG_TUNER & TEA5767)
