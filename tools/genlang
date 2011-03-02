@@ -123,6 +123,11 @@ if(!$target && !$update && !$sortfile) {
 }
 my @target_parts = split ':', $target;
 
+my $binpath = "";
+if ($binary =~ m|(.*)/[^/]+|) {
+    $binpath = $1;
+}
+
 my $verbose=$v;
 
 my %id; # string to num hash
@@ -146,12 +151,6 @@ sub trim {
     $string =~ s/^\s+//;
     $string =~ s/\s+$//;
     return $string;
-}
-
-sub match {
-    my ($string, $pattern)=@_;
-
-    return ($string =~ /^$pattern\z/);
 }
 
 sub blank {
@@ -212,15 +211,44 @@ sub voice {
     parsetarget("voice", \$voice, @_);
 }
 
+sub file_is_newer {
+    my ($file1, $file2) = @_;
+
+    my @s1 = stat $file1;
+    my @s2 = stat $file2;
+
+    return 1 if ($s1[9] > $s2[9]);
+    return 0;
+}
+
 my %idmap;
 my %english;
 if($english) {
+    readenglish();
+}
+
+sub readenglish {
     # For the cases where the english file needs to be scanned/read, we do
     # it before we read the translated file. For -b it isn't necessary, but for
     # -u it is convenient.
 
     my @idnum = ((0));       # start with a true number
     my @vidnum = ((0x8000)); # first voice id
+
+
+    if (!$update and file_is_newer("$binpath/english.list", $english)) {
+        open(ENG, "<$binpath/english.list") || 
+            die "Error: can't open $binpath/english.list";
+        while (<ENG>) {
+            my ($user, $id, $value) = split ':', $_;
+            $idmap[$user]{$id} = $value;
+            $english{$id} = 1;
+        }
+        close ENG;
+
+        return;
+    }
+
     open(ENG, "<$english") || die "Error: can't open $english";
     my @phrase;
     my $id;
@@ -233,12 +261,12 @@ if($english) {
     while(<ENG>) {
 
         # get rid of DOS newlines
-        $_ =~ s/\r//g;
+        $_ =~ tr/\r//d;
 
         if($_ =~ /^ *\<phrase\>/) {
             # this is the start of a phrase
         }
-        elsif($_ =~ /^ *\<\/phrase\>/) {
+        elsif($_ =~ /\<\/phrase\>/) {
 
             # if id is something, when we count and store this phrase
             if($id) {
@@ -409,7 +437,7 @@ while(<LANG>) {
     $line++;
 
     # get rid of DOS newlines
-    $_ =~ s/\r//g;
+    $_ =~ tr/\r//d;
 
     if($_ =~ /^( *\#|[ \t\n\r]*\z)/) {
         # comment or empty line - output it if it's part of the header
@@ -640,7 +668,7 @@ MOO
     for $i (0 .. $idcount[$users{"core"}]-1) {
         my $name=$idnum[$users{"core"}][$i]; # get the ID name
         
-        $name =~ s/\"//g; # cut off the quotes
+        $name =~ tr/\"//d; # cut off the quotes
         
         printf HFILE_CORE ("    %s, /* %d */\n", $name, $i);
     }
@@ -658,7 +686,7 @@ MOO
     for $i (0x8001 .. ($voiceid[$users{"core"}]-1)) {
         my $name=$idnum[$users{"core"}][$i]; # get the ID name
         
-        $name =~ s/\"//g; # cut off the quotes
+        $name =~ tr/\"//d; # cut off the quotes
         
         printf HFILE_CORE ("    %s, /* 0x%x */\n", $name, $i);
     }
@@ -802,3 +830,13 @@ if($verbose) {
     }
 }
 
+if (!-r "$binpath/english.list") {
+    open(ENGLIST, ">$binpath/english.list") || 
+        die "Failed creating $binpath/english.list";
+    for my $user (keys %users) {
+        for my $id (keys %{$idmap[$user]}) {
+            print ENGLIST "$user:$id:$idmap[$user]{$id}\n";
+        }
+    }
+    close ENGLIST;
+}
