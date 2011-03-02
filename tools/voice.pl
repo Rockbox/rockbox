@@ -128,106 +128,12 @@ sub correct_string {
     our $verbose;
     my ($string, $language, $tts_object) = @_;
     my $orig = $string;
-    switch($language) {
-        # General for all engines and languages
-        $string =~ s/USB/U S B/g;
-        $string =~ s/ID3/I D 3/g;
+    my $corrections = $tts_object->{"corrections"};
 
-        case "english" {
-            switch($$tts_object{"name"}) {
-                case ["sapi","festival"] {
-                    $string =~ s/plugin(s?)/plug-in$1/ig; next
-                }
-                case "festival" {
-                    $string =~ s/\ba\b/ay/ig;
-                    $string =~ s/$/./;
-                }
-            }
-        }
-        case "deutsch" {
-            # for all german engines (e.g. for english words)
-            $string =~ s/alkaline/alkalein/ig;
-            $string =~ s/byte(s?)/beit$1/ig;
-            $string =~ s/clip(s?)/klipp$1/ig;
-            $string =~ s/\bcover/kawwer/ig;
-            $string =~ s/cuesheet/kjuschiet/ig;
-            $string =~ s/dither/didder/ig;
-            $string =~ s/equalizer/iquileiser/ig;
-            $string =~ s/\bflash\b/fläsh/ig;
-            $string =~ s/\bfirmware(s?)\b/firmwer$1/ig;
-            $string =~ s/\bI D 3 tag\b/I D 3 täg/ig; # can't just use "tag" here
-            $string =~ s/\bloudness\b/laudness/ig;
-            $string =~ s/\bunicode\b/unikod/ig;
-            switch($$tts_object{"name"}) {
-                 case "sapi" {   # just for SAPI
-                    switch($$tts_object{"vendor"}) {
-                        case "AT&T Labs" {
-                            $string =~ s/alphabet/alfabet/ig;
-                            $string =~ s/ampere/amper/ig;
-                            $string =~ s/\bdezibel\b/de-zibell/ig;
-                            $string =~ s/diddering/didde-ring/ig;
-                            $string =~ s/energie\b/ener-gie/ig;
-                            $string =~ s/\Blauf\b/-lauf/ig;
-                            $string =~ s/\bnumerisch\b/numehrisch/ig;
-                        }
-                    }
-                }
-            }
-        }
-        case "svenska" {
-            # for all swedish engines (e.g. for english words)
-            $string =~ s/kilobyte/kilobajt/ig;
-            $string =~ s/megabyte/megabajt/ig;
-            $string =~ s/gigabyte/gigabajt/ig;
-            $string =~ s/\bloudness\b/laudness/ig;
-
-            switch($$tts_object{"name"}) {
-                 case "espeak" {   # just for eSpeak
-                     $string =~ s/ampere/ampär/ig;
-                     $string =~ s/bokmärken/bok-märken/ig;
-                     $string =~ s/generella/schenerella/ig;
-                     $string =~ s/dithering/diddering/ig;
-                     $string =~ s/\bunicode\b/jynikod/ig;
-                     $string =~ s/uttoning/utoning/ig;
-                     $string =~ s/procent/pro-cent/ig;
-                     $string =~ s/spellistor/spelistor/ig;
-                     $string =~ s/cuesheet/qjyschiit/ig;
-                 }
-            }
-        }
-        case "italiano" {
-            # for all italian engines (e.g. for english words)
-            $string =~ s/Replaygain/Ripleyghein/ig;
-            $string =~ s/Crossfade/Crossfeid/ig;
-            $string =~ s/beep/Bip/ig;
-            $string =~ s/cuesheet/chiushit/ig;
-            $string =~ s/fade/feid/ig;
-            $string =~ s/Crossfeed/crossfid/ig;
-            $string =~ s/Cache/chash/ig;
-            $string =~ s/\bfirmware(s?)\b/firmuer$1/ig;
-            $string =~ s/\bFile(s?)\b/fail$1/ig;
-            $string =~ s/\bloudness\b/laudness/ig;
-            $string =~ s/\bunicode\b/unikod/ig;
-            $string =~ s/Playlist/pleylist/ig;
-            $string =~ s/WavPack/wave pak/ig;
-            $string =~ s/BITRATE/bit reit/ig;
-            $string =~ s/Codepage/cod page/ig;
-            $string =~ s/PCM Wave/pcm Ue'iv/ig;
-            switch($$tts_object{"name"}) {
-                 case "sapi" {   # just for SAPI
-                    switch($$tts_object{"vendor"}) {
-                        case "Loquendo" {
-                            $string =~ s/Inizializza/inizializa/ig;
-                        }
-                        case "ScanSoft, Inc" {
-                            $string =~ s/V/v/ig;
-                            $string =~ s/X/x/ig;
-                            $string =~ s/stop/stohp/ig;
-                        }
-                    }
-                }
-            }
-        }
+    foreach (@$corrections) {
+        my $r = "s" . $_->{separator} . $_->{search} . $_->{separator}
+                . $_->{replace} . $_->{separator} . $_->{modifier};
+        eval ('$string =~' . "$r;");
     }
     if ($orig ne $string) {
         printf("%s -> %s\n", $orig, $string) if $verbose;
@@ -331,6 +237,7 @@ sub generateclips {
     my ($language, $target, $encoder, $encoder_opts, $tts_engine, $tts_engine_opts) = @_;
     my $english = dirname($0) . '/../apps/lang/english.lang';
     my $langfile = dirname($0) . '/../apps/lang/' . $language . '.lang';
+    my $correctionsfile = dirname($0) . '/voice-corrections.txt';
     my $id = '';
     my $voice = '';
     my $cmd = "genlang -o -t=$target -e=$english $langfile 2>/dev/null";
@@ -340,6 +247,37 @@ sub generateclips {
     local $| = 1; # make progress indicator work reliably
 
     my $tts_object = init_tts($tts_engine, $tts_engine_opts, $language);
+    # add string corrections to tts_object.
+    my @corrects = ();
+    open(VOICEREGEXP, "<$correctionsfile") or die "Can't open corrections file!\n";
+    while(<VOICEREGEXP>) {
+        # get first character of line
+        my $line = $_;
+        my $separator = substr($_, 0, 1);
+        if($separator =~ m/\s+/) {
+            next;
+        }
+        chomp($line);
+        $line =~ s/^.//g; # remove separator at beginning
+        my ($lang, $engine, $vendor, $search, $replace, $modifier) = split(/$separator/, $line);
+
+        # does language match?
+        if($language !~ m/$lang/) {
+            next;
+        }
+        if($$tts_object{"name"} !~ m/$engine/) {
+            next;
+        }
+        my $v = $$tts_object{"vendor"} || ""; # vendor might be empty in $tts_object
+        if($v !~ m/$vendor/) {
+            next;
+        }
+        push @corrects, {separator => $separator, search => $search, replace => $replace, modifier => $modifier};
+
+    }
+    close(VOICEREGEXP);
+    $tts_object->{corrections} = [@corrects];
+
     print("Generating voice clips");
     print("\n") if $verbose;
     for (`$cmd`) {

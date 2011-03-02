@@ -1,0 +1,92 @@
+              __________               __   ___.
+    Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+    Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+    Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+    Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+                      \/            \/     \/    \/            \/
+  $Id$
+ 
+ 
+  Voice string corrections for voice.pl to support TTS engines.
+  The list items are separated by the separator that is defined by the first
+  character on the line. If the first character is a whitespace the line will
+  get treated as comment.
+
+  Format:
+  /language/engine/vendor/string/replacement/
+
+  Where / is the separator, and all strings are Perl regexes.
+  Empty lines and lines starting with a whitespace are ignored, for all other
+  lines the first character will become the separator.
+
+  General for all engines and languages
+
+/.*/.*/.*/USB/U S B/g
+/.*/.*/.*/ID3/I D 3/g
+  English
+/english/(sapi|festival)/.*/plugin(s?)/plug-in$1/ig
+/english/festival/.*//\ba\b/ay/ig
+/english/festival/.*//$/./
+
+  German (deutsch)
+
+/deutsch/.*/.*/alkaline/alkalein/ig
+/deutsch/.*/.*/byte(s?)/beit$1/ig
+/deutsch/.*/.*/clip(s?)/klipp$1/ig
+/deutsch/.*/.*/\bcover/kawwer/ig
+/deutsch/.*/.*/cuesheet/kjuschiet/ig
+/deutsch/.*/.*/dither/didder/ig
+/deutsch/.*/.*/equalizer/iquileiser/ig
+/deutsch/.*/.*/\bflash\b/fläsh/ig
+/deutsch/.*/.*/\bfirmware(s?)\b/firmwer$1/ig
+/deutsch/.*/.*/\bI D 3 tag\b/I D 3 täg/ig
+/deutsch/.*/.*/\bloudness\b/laudness/ig
+/deutsch/.*/.*/\bunicode\b/unikod/ig
+/deutsch/sapi/AT&T Labs/alphabet/alfabet/ig;
+/deutsch/sapi/AT&T Labs/ampere/amper/ig;
+/deutsch/sapi/AT&T Labs/\bdezibel\b/de-zibell/ig;
+/deutsch/sapi/AT&T Labs/diddering/didde-ring/ig;
+/deutsch/sapi/AT&T Labs/energie\b/ener-gie/ig;
+/deutsch/sapi/AT&T Labs/\Blauf\b/-lauf/ig;
+/deutsch/sapi/AT&T Labs/\bnumerisch\b/numehrisch/ig;
+
+  Swedish (svenska)
+  for all swedish engines (e.g. for english words)
+
+/svenska/.*/.*/kilobyte/kilobajt/ig
+/svenska/.*/.*/megabyte/megabajt/ig
+/svenska/.*/.*/gigabyte/gigabajt/ig
+/svenska/.*/.*/\bloudness\b/laudness/ig
+/svenska/espeak/.*/ampere/ampär/ig
+/svenska/espeak/.*/bokmärken/bok-märken/ig
+/svenska/espeak/.*/generella/schenerella/ig
+/svenska/espeak/.*/dithering/diddering/ig
+/svenska/espeak/.*/\bunicode\b/jynikod/ig
+/svenska/espeak/.*/uttoning/utoning/ig
+/svenska/espeak/.*/procent/pro-cent/ig
+/svenska/espeak/.*/spellistor/spelistor/ig
+/svenska/espeak/.*/cuesheet/qjyschiit/ig
+
+  Italian (italiano)
+  for all italian engines (e.g. for english words)
+
+/italiano/.*/.*/Replaygain/Ripleyghein/ig
+/italiano/.*/.*/Crossfade/Crossfeid/ig
+/italiano/.*/.*/beep/Bip/ig
+/italiano/.*/.*/cuesheet/chiushit/ig
+/italiano/.*/.*/fade/feid/ig
+/italiano/.*/.*/Crossfeed/crossfid/ig
+/italiano/.*/.*/Cache/chash/ig
+/italiano/.*/.*/\bfirmware(s?)\b/firmuer$1/ig
+/italiano/.*/.*/\bFile(s?)\b/fail$1/ig
+/italiano/.*/.*/\bloudness\b/laudness/ig
+/italiano/.*/.*/\bunicode\b/unikod/ig
+/italiano/.*/.*/Playlist/pleylist/ig
+/italiano/.*/.*/WavPack/wave pak/ig
+/italiano/.*/.*/BITRATE/bit reit/ig
+/italiano/.*/.*/Codepage/cod page/ig
+/italiano/.*/.*/PCM Wave/pcm Ue'iv/ig
+/italiano/sapi/Loquendo/Inizializza/inizializa/ig
+/italiano/sapi/ScanSoft, Inc/V/v/ig
+/italiano/sapi/ScanSoft, Inc/X/x/ig
+/italiano/sapi/ScanSoft, Inc/stop/stohp/ig
