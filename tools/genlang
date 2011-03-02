@@ -236,7 +236,7 @@ sub readenglish {
     my @vidnum = ((0x8000)); # first voice id
 
 
-    if (!$update and file_is_newer("$binpath/english.list", $english)) {
+    if ($binary and file_is_newer("$binpath/english.list", $english)) {
         open(ENG, "<$binpath/english.list") || 
             die "Error: can't open $binpath/english.list";
         while (<ENG>) {
@@ -830,7 +830,7 @@ if($verbose) {
     }
 }
 
-if (!-r "$binpath/english.list") {
+if ($binary and !-r "$binpath/english.list") {
     open(ENGLIST, ">$binpath/english.list") || 
         die "Failed creating $binpath/english.list";
     for my $user (keys %users) {
