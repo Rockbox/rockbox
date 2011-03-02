@@ -350,6 +350,7 @@ static void init(void)
     font_init();
     show_logo();
     button_init();
+    powermgmt_init();
     backlight_init();
 #if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
     sim_tasks_init();

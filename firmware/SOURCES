@@ -5,6 +5,9 @@ buffer.c
 general.c
 load_code.c
 powermgmt.c
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+target/hosted/powermgmt.c
+#endif
 system.c
 usb.c
 #ifdef ROCKBOX_HAS_LOGF

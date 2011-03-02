@@ -75,6 +75,9 @@ extern unsigned int power_thread_inputs;
 #include "powermgmt-target.h"
 #endif
 
+/* Start up power management thread */
+void powermgmt_init(void) INIT_ATTR;
+
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 
 /* Generic current values that are intentionally meaningless - config header
@@ -126,9 +129,6 @@ extern const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
 #if CONFIG_CHARGING
 extern const unsigned short percent_to_volt_charge[11];
 #endif
-
-/* Start up power management thread */
-void powermgmt_init(void) INIT_ATTR;
 
 #endif /* PLATFORM_NATIVE */
 

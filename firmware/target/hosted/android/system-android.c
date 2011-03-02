@@ -35,7 +35,6 @@ uintptr_t *stackbegin;
 uintptr_t *stackend;
 
 extern int main(void);
-extern void powermgmt_init_target(void);
 extern void telephony_init_device(void);
 
 void system_exception_wait(void) { }
@@ -44,10 +43,7 @@ void power_off(void) { }
 
 void system_init(void)
 {
-    /* no better place yet, most of powermgmt.c is #ifdef'd out for non-native
-     * builds */
-    powermgmt_init_target();
-    /* also no better place yet */
+    /* no better place yet */
     telephony_init_device();
 }
 
