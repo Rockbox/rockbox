@@ -90,7 +90,6 @@ bool charger_enabled(void);
 #if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
 static inline void powermgmt_init_target(void) {}
 #endif
-void powermgmt_init_target(void);
 void charging_algorithm_step(void);
 
 #ifdef CHARGING_DEBUG_FILE
