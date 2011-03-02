@@ -28,7 +28,7 @@
 #ifndef SIMULATOR
 
 #include "as3514.h"
-#include "kernel.h"       /* for struct wakeup */
+#include "kernel.h"       /* for struct semaphore */
 #include "clock-target.h" /* for AS3525_I2C_PRESCALER */
 #include "system-arm.h"
 

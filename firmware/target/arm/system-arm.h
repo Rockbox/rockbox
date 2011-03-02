@@ -62,6 +62,21 @@ void __div0(void);
 #define enable_fiq() \
     enable_interrupt(FIQ_STATUS)
 
+#define irq_enabled() \
+    interrupt_enabled(IRQ_STATUS)
+#define fiq_enabled() \
+    interrupt_enabled(FIQ_STATUS)
+#define ints_enabled() \
+    interrupt_enabled(IRQ_FIQ_STATUS)
+
+#define irq_enabled_checkval(val) \
+    (((val) & IRQ_STATUS) == 0)
+#define fiq_enabled_checkval(val) \
+    (((val) & FIQ_STATUS) == 0)
+#define ints_enabled_checkval(val) \
+    (((val) & IRQ_FIQ_STATUS) == 0)
+
+
 /* Core-level interrupt masking */
 
 static inline int set_interrupt_status(int status, int mask)
@@ -85,6 +100,13 @@ static inline void restore_interrupt(int cpsr)
     /* Set cpsr_c from value returned by disable_interrupt_save
      * or set_interrupt_status */
     asm volatile ("msr cpsr_c, %0" : : "r"(cpsr));
+}
+
+static inline bool interrupt_enabled(int status)
+{
+    unsigned long cpsr;
+    asm ("mrs %0, cpsr" : "=r"(cpsr));
+    return (cpsr & status) == 0;
 }
 
 /* ARM_ARCH version section for architecture*/

@@ -741,8 +741,6 @@ Lyre prototype 1 */
 #endif /* PLATFORM_NATIVE */
 
 
-#define HAVE_SEMAPHORE_OBJECTS
-
 #ifdef HAVE_USBSTACK
 #if CONFIG_USBOTG == USBOTG_ARC
 #define USB_STATUS_BY_EVENT
@@ -769,7 +767,7 @@ Lyre prototype 1 */
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) \
     || defined(CPU_S5L870X) || (CONFIG_CPU == S3C2440) \
     || defined(APPLICATION)
-#define HAVE_WAKEUP_OBJECTS
+#define HAVE_SEMAPHORE_OBJECTS
 #endif
 
 /*include support for crossfading - requires significant PCM buffer space*/

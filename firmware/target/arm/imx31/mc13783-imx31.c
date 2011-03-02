@@ -32,11 +32,11 @@ extern struct spi_node mc13783_spi;
 /* PMIC event service data */
 static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
 static const char *mc13783_thread_name = "pmic";
-static struct wakeup mc13783_svc_wake;
+static struct semaphore mc13783_svc_wake;
 
 /* Synchronous thread communication objects */
 static struct mutex mc13783_spi_mutex;
-static struct wakeup mc13783_spi_wake;
+static struct semaphore mc13783_spi_complete;
 
 /* Tracking for which interrupts are enabled */
 static uint32_t pmic_int_enabled[2] =
@@ -69,13 +69,13 @@ static void mc13783_xfer_complete_cb(struct spi_transfer_desc *xfer)
     if (xfer->count != 0)
         return;
 
-    wakeup_signal(&mc13783_spi_wake);
+    semaphore_release(&mc13783_spi_complete);
 }
 
 static inline bool wait_for_transfer_complete(void)
 {
-    return wakeup_wait(&mc13783_spi_wake, HZ*2) == OBJ_WAIT_SUCCEEDED &&
-           mc13783_transfer.count == 0;
+    return semaphore_wait(&mc13783_spi_complete, HZ*2)
+            == OBJ_WAIT_SUCCEEDED && mc13783_transfer.count == 0;
 }
 
 static void mc13783_interrupt_thread(void)
@@ -89,7 +89,7 @@ static void mc13783_interrupt_thread(void)
     {
         const struct mc13783_event *event, *event_last;
 
-        wakeup_wait(&mc13783_svc_wake, TIMEOUT_BLOCK);
+        semaphore_wait(&mc13783_svc_wake, TIMEOUT_BLOCK);
 
         if (mc13783_thread_id == 0)
             break;
@@ -140,16 +140,16 @@ void mc13783_event(void)
     /* Mask the interrupt (unmasked when PMIC thread services it). */
     bitclr32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
     MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
-    wakeup_signal(&mc13783_svc_wake);
+    semaphore_release(&mc13783_svc_wake);
 }
 
 void INIT_ATTR mc13783_init(void)
 {
     /* Serial interface must have been initialized first! */
-    wakeup_init(&mc13783_svc_wake);
+    semaphore_init(&mc13783_svc_wake, 1, 0);
     mutex_init(&mc13783_spi_mutex);
 
-    wakeup_init(&mc13783_spi_wake);
+    semaphore_init(&mc13783_spi_complete, 1, 0);
 
     /* Enable the PMIC SPI module */
     spi_enable_module(&mc13783_spi);
@@ -175,7 +175,7 @@ void mc13783_close(void)
         return;
 
     mc13783_thread_id = 0;
-    wakeup_signal(&mc13783_svc_wake);
+    semaphore_release(&mc13783_svc_wake);
     thread_wait(thread_id);
     spi_disable_module(&mc13783_spi);
 }

@@ -107,7 +107,7 @@ struct ascodec_request {
     unsigned char status;
     unsigned char cnt;
     unsigned char data[ASCODEC_REQ_MAXLEN];
-    struct wakeup wkup;
+    struct semaphore complete;
     ascodec_cb_fn *callback;
     struct ascodec_request *next;
 };
@@ -121,7 +121,7 @@ static unsigned char *req_data_ptr = NULL;
 static struct ascodec_request *req_head = NULL;
 static struct ascodec_request *req_tail = NULL;
 
-static struct wakeup adc_wkup;
+static struct semaphore adc_done_sem;
 static struct ascodec_request as_audio_req;
 
 #ifdef DEBUG
@@ -168,7 +168,7 @@ static void ascodec_finish_req(struct ascodec_request *req)
     if (req->callback) {
         req->callback(req->data, req_data_ptr - req->data);
     }
-    wakeup_signal(&req->wkup);
+    semaphore_release(&req->complete);
 
     req_head = req->next;
     req->next = NULL;
@@ -263,7 +263,7 @@ void ascodec_init(void)
     int prescaler;
 
     mutex_init(&as_mtx);
-    wakeup_init(&adc_wkup);
+    semaphore_init(&adc_done_sem, 1, 0);
 
     /* enable clock */
     bitset32(&CGU_PERI, CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE);
@@ -312,7 +312,7 @@ void ascodec_init(void)
 static void ascodec_req_init(struct ascodec_request *req, int type,
                       unsigned int index, unsigned int cnt)
 {
-    wakeup_init(&req->wkup);
+    semaphore_init(&req->complete, 1, 0);
     req->next = NULL;
     req->callback = NULL;
     req->type = type;
@@ -337,19 +337,10 @@ static void ascodec_submit(struct ascodec_request *req)
     restore_irq(oldlevel);
 }
 
-static int irq_disabled(void)
-{
-    unsigned long cpsr;
-
-    asm volatile ("mrs %0, cpsr" : "=r"(cpsr));
-
-    return (cpsr & IRQ_STATUS) == IRQ_DISABLED;
-}
-
 static void ascodec_wait(struct ascodec_request *req)
 {
-    if (!irq_disabled()) {
-        wakeup_wait(&req->wkup, TIMEOUT_BLOCK);
+    if (irq_enabled()) {
+        semaphore_wait(&req->complete, TIMEOUT_BLOCK);
         return;
     }
 
@@ -477,7 +468,7 @@ static void ascodec_read_cb(unsigned const char *data, unsigned int len)
     }
     if (data[2] & IRQ_ADC) { /* adc finished */
         IFDEBUG(int_adc++);
-        wakeup_signal(&adc_wkup);
+        semaphore_release(&adc_done_sem);
     }
     VIC_INT_ENABLE = INTERRUPT_AUDIO;
 }
@@ -492,7 +483,7 @@ void INT_AUDIO(void)
 
 void ascodec_wait_adc_finished(void)
 {
-    wakeup_wait(&adc_wkup, TIMEOUT_BLOCK);
+    semaphore_wait(&adc_done_sem, TIMEOUT_BLOCK);
 }
 
 #ifdef CONFIG_CHARGING

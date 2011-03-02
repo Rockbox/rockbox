@@ -35,7 +35,7 @@ static const unsigned char reg_array[4] =
 };
 
 static uint32_t channels[2][4];
-static struct wakeup adc_wake;
+static struct semaphore adc_done_signal;
 static struct mutex adc_mtx;
 static long last_adc_read[2]; /* One for each input group */
 
@@ -67,7 +67,7 @@ unsigned short adc_read(int channel)
         mc13783_write(MC13783_ADC1, adc1);
 
         /* Wait for done signal */
-        wakeup_wait(&adc_wake, TIMEOUT_BLOCK);
+        semaphore_wait(&adc_done_signal, TIMEOUT_BLOCK);
 
         /* Read all 8 channels that are converted - two channels in each
          * word. */
@@ -113,12 +113,12 @@ bool adc_enable_channel(int channel, bool enable)
 /* Called by mc13783 interrupt thread when conversion is complete */
 void adc_done(void)
 {
-    wakeup_signal(&adc_wake);
+    semaphore_release(&adc_done_signal);
 }
 
 void adc_init(void) 
 {
-    wakeup_init(&adc_wake);
+    semaphore_init(&adc_done_signal, 1, 0);
     mutex_init(&adc_mtx);
 
     /* Init so first reads get data */

@@ -349,7 +349,7 @@ struct queue_head {
 static struct queue_head qh_array[USB_NUM_ENDPOINTS*2]
     USB_QHARRAY_ATTR;
 
-static struct wakeup transfer_completion_signal[USB_NUM_ENDPOINTS*2]
+static struct semaphore transfer_completion_signal[USB_NUM_ENDPOINTS*2]
     SHAREDBSS_ATTR;
 
 static const unsigned int pipe2mask[] = {
@@ -424,7 +424,7 @@ void usb_drv_startup(void)
     /* Initialize all the signal objects once */
     int i;
     for(i=0;i<USB_NUM_ENDPOINTS*2;i++) {
-        wakeup_init(&transfer_completion_signal[i]);
+        semaphore_init(&transfer_completion_signal[i], 1, 0);
     }
 }
 
@@ -778,7 +778,7 @@ static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait)
 
     if (wait) {
         /* wait for transfer to finish */
-        wakeup_wait(&transfer_completion_signal[pipe], TIMEOUT_BLOCK);
+        semaphore_wait(&transfer_completion_signal[pipe], TIMEOUT_BLOCK);
         if(qh->status!=0) {
             /* No need to cancel wait here since it was done and the signal
              * came. */
@@ -797,7 +797,7 @@ pt_error:
         qh->wait = 0;
         /* Make sure to remove any signal if interrupt fired before we zeroed
          * qh->wait. Could happen during a bus reset for example. */
-        wakeup_wait(&transfer_completion_signal[pipe], TIMEOUT_NOBLOCK);
+        semaphore_wait(&transfer_completion_signal[pipe], TIMEOUT_NOBLOCK);
     }
 
     return rc;
@@ -814,7 +814,7 @@ void usb_drv_cancel_all_transfers(void)
         if(qh_array[i].wait) {
             qh_array[i].wait=0;
             qh_array[i].status=DTD_STATUS_HALTED;
-            wakeup_signal(&transfer_completion_signal[i]);
+            semaphore_release(&transfer_completion_signal[i]);
         }
     }
 }
@@ -906,7 +906,7 @@ static void control_received(void)
         if(qh_array[i].wait) {
             qh_array[i].wait=0;
             qh_array[i].status=DTD_STATUS_HALTED;
-            wakeup_signal(&transfer_completion_signal[i]);
+            semaphore_release(&transfer_completion_signal[i]);
         }
     }
 
@@ -945,7 +945,7 @@ static void transfer_completed(void)
                 }
                 if(qh->wait) {
                     qh->wait=0;
-                    wakeup_signal(&transfer_completion_signal[pipe]);
+                    semaphore_release(&transfer_completion_signal[pipe]);
                 }
                 
                 usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT,

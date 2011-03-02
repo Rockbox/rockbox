@@ -40,6 +40,7 @@
 static struct usb_endpoint endpoints[USB_NUM_EPS][2];
 static int got_set_configuration = 0;
 static int usb_enum_timeout = -1;
+static bool initialized = false;
 
 /*
  * dma/setup descriptors and buffers should avoid sharing
@@ -180,19 +181,19 @@ static void reset_endpoints(int init)
             if (endpoints[i][0].state & EP_STATE_BUSY) {
                 if (endpoints[i][0].state & EP_STATE_ASYNC) {
                     endpoints[i][0].rc = -1;
-                    wakeup_signal(&endpoints[i][0].complete);
+                    semaphore_release(&endpoints[i][0].complete);
                 } else {
                     usb_core_transfer_complete(i, USB_DIR_IN, -1, 0);
                 }
             }
             endpoints[i][0].state = 0;
-            wakeup_init(&endpoints[i][0].complete);
+            semaphore_wait(&endpoints[i][0].complete, TIMEOUT_NOBLOCK);
 
             if (i != 2) { /* Skip the OUT EP0 alias */
                 if (endpoints[i][1].state & EP_STATE_BUSY)
                     usb_core_transfer_complete(i, USB_DIR_OUT, -1, 0);
                 endpoints[i][1].state = 0;
-                wakeup_init(&endpoints[i][1].complete);
+                semaphore_wait(&endpoints[i][1].complete, TIMEOUT_NOBLOCK);
                 USB_OEP_SUP_PTR(i)    = 0;
             }
         }
@@ -224,6 +225,18 @@ static void reset_endpoints(int init)
 void usb_drv_init(void)
 {
     logf("usb_drv_init() !!!!\n");
+
+    if (!initialized)
+    {
+        int i;
+        for (i = 0; i < USB_NUM_EPS; i++)
+        {
+            semaphore_init(&endpoints[i][0].complete, 1, 0);
+            semaphore_init(&endpoints[i][1].complete, 1, 0);
+        }
+
+        initialized = true;
+    }
 
     usb_enable_pll();
 
@@ -322,6 +335,7 @@ void usb_drv_exit(void)
     ascodec_write(AS3515_USB_UTIL, ascodec_read(AS3515_USB_UTIL) & ~(1<<4));
     usb_disable_pll();
     cpu_boost(0);
+    initialized = false;
     logf("usb_drv_exit() !!!!\n");
 }
 
@@ -529,7 +543,7 @@ int usb_drv_send(int ep, void *ptr, int len)
     }
 
     ep_send(ep, ptr, len);
-    if (wakeup_wait(&endpoints[ep][0].complete, HZ) == OBJ_WAIT_TIMEDOUT)
+    if (semaphore_wait(&endpoints[ep][0].complete, HZ) == OBJ_WAIT_TIMEDOUT)
         logf("send timed out!\n");
 
     return endpoints[ep][0].rc;
@@ -570,7 +584,7 @@ static void handle_in_ep(int ep)
             endpoints[ep][0].state &= ~EP_STATE_ASYNC;
             usb_core_transfer_complete(ep, USB_DIR_IN, 0, endpoints[ep][0].len);
         } else {
-            wakeup_signal(&endpoints[ep][0].complete);
+            semaphore_release(&endpoints[ep][0].complete);
         }
         ep_sts &= ~USB_EP_STAT_TDC;
     }

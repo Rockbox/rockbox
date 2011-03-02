@@ -48,7 +48,7 @@ static struct i2c_module_descriptor
     volatile unsigned short * const base; /* Module base address */
     void (* const handler)(void);         /* Module interrupt handler */
     struct mutex m;                       /* Node mutual-exclusion */
-    struct wakeup w;                      /* I2C done signal */
+    struct semaphore complete;            /* I2C completion signal */
     unsigned char *addr_data;             /* Additional addressing data */
     int addr_count;                       /* Addressing byte count */
     unsigned char *data;                  /* TX/RX buffer (actual data) */
@@ -164,7 +164,7 @@ i2c_stop:
     base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
 i2c_done:
     /* Signal thread we're done */
-    wakeup_signal(&desc->w);
+    semaphore_release(&desc->complete);
 }
 
 #if (I2C_MODULE_MASK & USE_I2C1_MODULE)
@@ -221,7 +221,7 @@ static int i2c_transfer(struct i2c_node * const node,
     base[I2DR] = desc->addr;
 
     /* Wait for transfer to complete */
-    if (wakeup_wait(&desc->w, HZ) == OBJ_WAIT_SUCCEEDED)
+    if (semaphore_wait(&desc->complete, HZ) == OBJ_WAIT_SUCCEEDED)
     {
         count -= desc->data_count;
     }
@@ -294,7 +294,7 @@ void i2c_init(void)
         struct i2c_module_descriptor *const desc = &i2c_descs[i];
         ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
         mutex_init(&desc->m);
-        wakeup_init(&desc->w);
+        semaphore_init(&desc->complete, 1, 0);
         desc->base[I2CR] = 0;
         ccm_module_clock_gating(desc->cg, CGM_OFF);
     }

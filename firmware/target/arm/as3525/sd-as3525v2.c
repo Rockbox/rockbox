@@ -342,8 +342,8 @@ static struct event_queue sd_queue;
 bool sd_enabled = false;
 #endif
 
-static struct wakeup transfer_completion_signal;
-static struct wakeup command_completion_signal;
+static struct semaphore transfer_completion_signal;
+static struct semaphore command_completion_signal;
 static volatile bool retry;
 static volatile int cmd_error;
 
@@ -365,12 +365,12 @@ void INT_NAND(void)
         retry = true;
 
     if( status & (MCI_INT_DTO|MCI_DATA_ERROR))
-        wakeup_signal(&transfer_completion_signal);
+        semaphore_release(&transfer_completion_signal);
 
     cmd_error = status & MCI_CMD_ERROR;
 
     if(status & MCI_INT_CD)
-        wakeup_signal(&command_completion_signal);
+        semaphore_release(&command_completion_signal);
 
     MCI_CTRL |= INT_ENABLE;
 }
@@ -442,7 +442,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
             _buttonlight_off();
     }
 #endif
-    wakeup_wait(&command_completion_signal, TIMEOUT_BLOCK);
+    semaphore_wait(&command_completion_signal, TIMEOUT_BLOCK);
 
     /*  Handle command responses & errors */
     if(flags & MCI_RESP)
@@ -769,8 +769,8 @@ int sd_init(void)
                | (AS3525_SDSLOT_DIV << 2)
                | 1;             /* clock source = PLLA */
 
-    wakeup_init(&transfer_completion_signal);
-    wakeup_init(&command_completion_signal);
+    semaphore_init(&transfer_completion_signal, 1, 0);
+    semaphore_init(&command_completion_signal, 1, 0);
 
 #if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
     if (amsv2_variant == 1)
@@ -932,7 +932,7 @@ sd_transfer_retry_with_reinit:
             goto sd_transfer_error;
         }
 
-        wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+        semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
         last_disk_activity = current_tick;
 

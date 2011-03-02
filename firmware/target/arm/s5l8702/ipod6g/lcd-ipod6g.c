@@ -50,7 +50,7 @@
 
 int lcd_type; /* also needed in debug-s5l8702.c */
 static struct dma_lli lcd_lli[(LCD_WIDTH * LCD_HEIGHT - 1) / 0xfff] CACHEALIGN_ATTR;
-static struct wakeup lcd_wakeup;
+static struct semaphore lcd_wakeup;
 static struct mutex lcd_mutex;
 static uint16_t lcd_dblbuf[LCD_HEIGHT][LCD_WIDTH];
 
@@ -149,7 +149,7 @@ void lcd_sleep(void)
 void lcd_init_device(void)
 {
     /* Detect lcd type */
-    wakeup_init(&lcd_wakeup);
+    semaphore_init(&lcd_wakeup, 1, 0);
     mutex_init(&lcd_mutex);
     lcd_type = (PDAT6 & 0x30) >> 4;
 }
@@ -180,7 +180,7 @@ static void displaylcd_setup(int x, int y, int width, int height) ICODE_ATTR;
 static void displaylcd_setup(int x, int y, int width, int height)
 {
     mutex_lock(&lcd_mutex);
-    while (DMAC0C4CONFIG & 1) wakeup_wait(&lcd_wakeup, HZ / 10);
+    while (DMAC0C4CONFIG & 1) semaphore_wait(&lcd_wakeup, HZ / 10);
 
     int xe = (x + width) - 1;           /* max horiz */
     int ye = (y + height) - 1;          /* max vert */
@@ -237,7 +237,7 @@ void INT_DMAC0C4(void) ICODE_ATTR;
 void INT_DMAC0C4(void)
 {
     DMAC0INTTCCLR = 0x10;
-    wakeup_signal(&lcd_wakeup);
+    semaphore_release(&lcd_wakeup);
 }
 
 /* Update a fraction of the display. */

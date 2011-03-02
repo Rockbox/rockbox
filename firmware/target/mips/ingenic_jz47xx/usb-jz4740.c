@@ -69,7 +69,7 @@ struct usb_endpoint
     unsigned short fifo_size;
 
     bool wait;
-    struct wakeup wakeup;
+    struct semaphore complete;
 };
 
 static unsigned char ep0_rx_buf[64];
@@ -171,7 +171,7 @@ static inline void ep_transfer_completed(struct usb_endpoint* ep)
     ep->buf    = NULL;
     ep->busy   = false;
     if(ep->wait)
-        wakeup_signal(&ep->wakeup);
+        semaphore_release(&ep->complete);
 }
 
 static void EP0_send(void)
@@ -598,7 +598,7 @@ void usb_init_device(void)
     system_enable_irq(IRQ_UDC);
 
     for(i=0; i<TOTAL_EP(); i++)
-        wakeup_init(&endpoints[i].wakeup);
+        semaphore_init(&endpoints[i].complete, 1, 0);
 }
 
 #ifdef USB_GPIO_IRQ
@@ -715,7 +715,7 @@ static void usb_drv_send_internal(struct usb_endpoint* ep, void* ptr, int length
 
     if(blocking)
     {
-        wakeup_wait(&ep->wakeup, TIMEOUT_BLOCK);
+        semaphore_wait(&ep->complete, TIMEOUT_BLOCK);
         ep->wait = false;
     }
 }

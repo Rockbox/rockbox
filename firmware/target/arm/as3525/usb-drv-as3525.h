@@ -310,7 +310,7 @@ struct usb_endpoint
     unsigned int len;
     volatile unsigned int state;
     int rc;
-    struct wakeup complete;
+    struct semaphore complete;
     struct usb_dev_dma_desc *uc_desc;
 };
 

@@ -244,7 +244,7 @@ static inline void samples_release_wrbuf(void)
 
 static inline struct sample_queue_chunk * samples_get_wrbuf(void)
 {
-    ci->semaphore_wait(&sample_queue.emu_sem_tail);
+    ci->semaphore_wait(&sample_queue.emu_sem_tail, TIMEOUT_BLOCK);
     return &sample_queue.wav_chunk[sample_queue.tail & WAV_CHUNK_MASK];
 }
 
@@ -259,7 +259,7 @@ static inline void samples_release_rdbuf(void)
 
 static inline int32_t * samples_get_rdbuf(void)
 {
-    ci->semaphore_wait(&sample_queue.emu_sem_head);
+    ci->semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_BLOCK);
 
     if (ci->stop_codec || ci->new_track)
     {
@@ -275,7 +275,7 @@ static intptr_t emu_thread_send_msg(long id, intptr_t data)
 {
     struct sample_queue_chunk *chunk;
     /* Grab an audio output buffer */
-    ci->semaphore_wait(&sample_queue.emu_sem_head);
+    ci->semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_BLOCK);
     chunk = &sample_queue.wav_chunk[sample_queue.head & WAV_CHUNK_MASK];
     /* Place a message in it instead of audio */
     chunk->id = id;
@@ -285,7 +285,7 @@ static intptr_t emu_thread_send_msg(long id, intptr_t data)
 
     if (id != SPC_EMU_QUIT) {
         /* Wait for a response */
-        ci->semaphore_wait(&sample_queue.emu_evt_reply);
+        ci->semaphore_wait(&sample_queue.emu_evt_reply, TIMEOUT_BLOCK);
     }
 
     return sample_queue.retval;    
@@ -308,11 +308,10 @@ static bool emu_thread_process_msg(struct sample_queue_chunk *chunk)
         sample_queue.retval = SPC_load_spc(&spc_emu, ld->buf, ld->size);
 
         /* Empty the audio queue */
-        /* This is a dirty hack a timeout based wait would make unnescessary but
-           still safe because the other thread is known to be waiting for a reply
-           and is not using the objects. */
-        ci->semaphore_init(&sample_queue.emu_sem_tail, 2, 2);
-        ci->semaphore_init(&sample_queue.emu_sem_head, 2, 0);
+        ci->semaphore_release(&sample_queue.emu_sem_tail);
+        ci->semaphore_release(&sample_queue.emu_sem_tail);
+        ci->semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_NOBLOCK);
+        ci->semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_NOBLOCK);
         sample_queue.head = sample_queue.tail = 0;
     }
 

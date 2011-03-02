@@ -61,7 +61,7 @@ static const uint8_t out_ep_list[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
 struct usb_endpoint
 {
     unsigned int len; /* length of the data buffer */
-    struct wakeup complete; /* wait object */
+    struct semaphore complete; /* wait object */
     int8_t status; /* completion status (0 for success) */
     bool active; /* true is endpoint has been requested (true for EP0) */
     bool wait; /* true if usb thread is blocked on completion */
@@ -281,7 +281,7 @@ static void reset_endpoints(void)
         if(endpoints[ep][DIR_IN].wait)
         {
             endpoints[ep][DIR_IN].wait = false;
-            wakeup_signal(&endpoints[ep][DIR_IN].complete);
+            semaphore_release(&endpoints[ep][DIR_IN].complete);
         }
         if(DIEPCTL(ep) & DEPCTL_epena)
             DIEPCTL(ep) = DEPCTL_snak;
@@ -297,7 +297,7 @@ static void reset_endpoints(void)
         if(endpoints[ep][DIR_OUT].wait)
         {
             endpoints[ep][DIR_OUT].wait = false;
-            wakeup_signal(&endpoints[ep][DIR_OUT].complete);
+            semaphore_release(&endpoints[ep][DIR_OUT].complete);
         }
         if(DOEPCTL(ep) & DEPCTL_epena)
             DOEPCTL(ep) =  DEPCTL_snak;
@@ -329,7 +329,7 @@ static void cancel_all_transfers(bool cancel_ep0)
         if(endpoints[ep][DIR_IN].wait)
         {
             endpoints[ep][DIR_IN].wait = false;
-            wakeup_signal(&endpoints[ep][DIR_IN].complete);
+            semaphore_release(&endpoints[ep][DIR_IN].complete);
         }
         DIEPCTL(ep) = (DIEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_snak;
     }
@@ -340,7 +340,7 @@ static void cancel_all_transfers(bool cancel_ep0)
         if(endpoints[ep][DIR_OUT].wait)
         {
             endpoints[ep][DIR_OUT].wait = false;
-            wakeup_signal(&endpoints[ep][DIR_OUT].complete);
+            semaphore_release(&endpoints[ep][DIR_OUT].complete);
         }
         DOEPCTL(ep) = (DOEPCTL(ep) & ~DEPCTL_usbactep) | DEPCTL_snak;
     }
@@ -457,9 +457,9 @@ void usb_drv_init(void)
     /* Core init */
     core_init();
     FOR_EACH_IN_EP_AND_EP0(i, ep)
-        wakeup_init(&endpoints[ep][DIR_IN].complete);
+        semaphore_init(&endpoints[ep][DIR_IN].complete, 1, 0);
     FOR_EACH_OUT_EP_AND_EP0(i, ep)
-        wakeup_init(&endpoints[ep][DIR_OUT].complete);
+        semaphore_init(&endpoints[ep][DIR_OUT].complete, 1, 0);
     /* Enable global interrupts */
     enable_global_interrupts();
 }
@@ -498,7 +498,7 @@ static void handle_ep_in_int(int ep)
             if(endpoint->wait)
             {
                 endpoint->wait = false;
-                wakeup_signal(&endpoint->complete);
+                semaphore_release(&endpoint->complete);
             }
         }
     }
@@ -515,7 +515,7 @@ static void handle_ep_in_int(int ep)
             if(endpoint->wait)
             {
                 endpoint->wait = false;
-                wakeup_signal(&endpoint->complete);
+                semaphore_release(&endpoint->complete);
             }
         }
     }
@@ -549,7 +549,7 @@ static void handle_ep_out_int(int ep)
             if(endpoint->wait)
             {
                 endpoint->wait = false;
-                wakeup_signal(&endpoint->complete);
+                semaphore_release(&endpoint->complete);
             }
         }
     }
@@ -798,7 +798,7 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
 
     if(blocking)
     {
-        wakeup_wait(&endpoint->complete, TIMEOUT_BLOCK);
+        semaphore_wait(&endpoint->complete, TIMEOUT_BLOCK);
         return endpoint->status;
     }
 

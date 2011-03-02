@@ -29,7 +29,7 @@
 #include "adc.h"
 #include "button.h"
 
-static struct wakeup headphone_wakeup;
+static struct semaphore headphone_wakeup;
 static unsigned int headphone_thread_id;
 static int headphone_stack[200/sizeof(int)]; /* Not much stack needed */
 static const char * const headphone_thread_name = "headphone";
@@ -115,7 +115,7 @@ static void headphone_thread(void)
 
     while (1)
     {
-        int rc = wakeup_wait(&headphone_wakeup, headphone_wait_timeout);
+        int rc = semaphore_wait(&headphone_wakeup, headphone_wait_timeout);
         unsigned int data = adc_read(ADC_HPREMOTE);
 
         if (rc == OBJ_WAIT_TIMEDOUT)
@@ -175,7 +175,7 @@ static void headphone_thread(void)
 void headphone_detect_event(void)
 {
     /* Trigger the thread immediately. */
-    wakeup_signal(&headphone_wakeup);
+    semaphore_release(&headphone_wakeup);
 }
 
 /* Tell if anything is in the jack. */
@@ -187,7 +187,7 @@ bool headphones_inserted(void)
 void INIT_ATTR headphone_init(void)
 {
     /* A thread is required to monitor the remote ADC and jack state. */
-    wakeup_init(&headphone_wakeup);
+    semaphore_init(&headphone_wakeup, 1, 0);
     headphone_thread_id = create_thread(headphone_thread, 
                                         headphone_stack,
                                         sizeof(headphone_stack),

@@ -119,7 +119,7 @@ static long             sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
 static const char               sd_thread_name[] = "sd";
 static struct mutex             sd_mtx SHAREDBSS_ATTR;
 static struct event_queue       sd_queue;
-static struct wakeup            transfer_completion_signal;
+static struct semaphore         transfer_completion_signal;
 static volatile unsigned int    transfer_error[NUM_VOLUMES];
 /* align on cache line size */
 static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE] 
@@ -223,7 +223,7 @@ void SDI (void)
 
     dbgprintf ("SDI %x\n", transfer_error[curr_card]);
     
-    wakeup_signal(&transfer_completion_signal);
+    semaphore_release(&transfer_completion_signal);
 
     /* Ack the interrupt */
     SRCPND = SDI_MASK;
@@ -242,7 +242,7 @@ void dma_callback (void)
     SDIDSTA |= S3C2410_SDIDSTA_CLEAR_BITS;  /* needed to clear int  */
     
     dbgprintf ("dma_cb\n");
-    wakeup_signal(&transfer_completion_signal);
+    semaphore_release(&transfer_completion_signal);
 }
 #endif
 
@@ -783,7 +783,7 @@ static int sd_transfer_sectors(int card_no, unsigned long start,
                                 (9<<4) /* 2^9 = 512 */ ;
 #endif
 
-        wakeup_wait(&transfer_completion_signal, 100 /*TIMEOUT_BLOCK*/);
+        semaphore_wait(&transfer_completion_signal, 100 /*TIMEOUT_BLOCK*/);
         
         /* wait for DMA to finish */
         while (DSTAT0 & DSTAT_STAT_BUSY)
@@ -928,7 +928,7 @@ int sd_init(void)
     sd_enabled = true;
     sd_enable(false);
 #endif
-    wakeup_init(&transfer_completion_signal);
+    semaphore_init(&transfer_completion_signal, 1, 0);
     /* init mutex */
     mutex_init(&sd_mtx);
     queue_init(&sd_queue, true);

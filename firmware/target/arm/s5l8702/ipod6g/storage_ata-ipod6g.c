@@ -53,7 +53,7 @@ bool ata_lba48;
 bool ata_dma;
 uint64_t ata_total_sectors;
 struct mutex ata_mutex;
-static struct wakeup ata_wakeup;
+static struct semaphore ata_wakeup;
 static uint32_t ata_dma_flags;
 static long ata_last_activity_value = -1;
 static long ata_sleep_timeout = 20 * HZ;
@@ -61,8 +61,8 @@ static uint32_t ata_stack[(DEFAULT_STACK_SIZE + 0x400) / 4];
 static bool ata_powered;
 static const int ata_retries = ATA_RETRIES;
 static const bool ata_error_srst = true;
-static struct wakeup mmc_wakeup;
-static struct wakeup mmc_comp_wakeup;
+static struct semaphore mmc_wakeup;
+static struct semaphore mmc_comp_wakeup;
 static int spinup_time = 0;
 static int dma_mode = 0;
 
@@ -319,7 +319,7 @@ void mmc_discard_irq(void)
 {
     SDCI_IRQ = SDCI_IRQ_DAT_DONE_INT | SDCI_IRQ_MASK_MASK_IOCARD_IRQ_INT
              | SDCI_IRQ_MASK_MASK_READ_WAIT_INT;
-    wakeup_wait(&mmc_wakeup, 0);
+    semaphore_wait(&mmc_wakeup, 0);
 }
 
 int ceata_read_multiple_register(uint32_t addr, void* dest, uint32_t size)
@@ -338,7 +338,8 @@ int ceata_read_multiple_register(uint32_t addr, void* dest, uint32_t size)
                            | MMC_CMD_CEATA_RW_MULTIPLE_REG_ADDRESS(addr & 0xfc)
                            | MMC_CMD_CEATA_RW_MULTIPLE_REG_COUNT(size & 0xfc),
                              NULL, CEATA_COMMAND_TIMEOUT), 2, 1);
-    if (wakeup_wait(&mmc_wakeup, CEATA_COMMAND_TIMEOUT * HZ / 1000000) == OBJ_WAIT_TIMEDOUT) RET_ERR(2);
+    if (semaphore_wait(&mmc_wakeup, CEATA_COMMAND_TIMEOUT * HZ / 1000000)
+        == OBJ_WAIT_TIMEDOUT) RET_ERR(2);
     PASS_RC(mmc_dsta_check_data_success(), 2, 3);
     return 0;
 }
@@ -362,7 +363,8 @@ int ceata_write_multiple_register(uint32_t addr, void* dest, uint32_t size)
     SDCI_DCTRL = SDCI_DCTRL_TRCONT_TX;
     for (i = 0; i < size / 4; i++) SDCI_DATA = ((uint32_t*)dest)[i];
     long startusec = USEC_TIMER;
-    if (wakeup_wait(&mmc_wakeup, CEATA_COMMAND_TIMEOUT * HZ / 1000000) == OBJ_WAIT_TIMEDOUT) RET_ERR(2);
+    if (semaphore_wait(&mmc_wakeup, CEATA_COMMAND_TIMEOUT * HZ / 1000000)
+        == OBJ_WAIT_TIMEDOUT) RET_ERR(2);
     while ((SDCI_STATE & SDCI_STATE_DAT_STATE_MASK) != SDCI_STATE_DAT_STATE_IDLE)
     {
         if (TIMEOUT_EXPIRED(startusec, CEATA_COMMAND_TIMEOUT)) RET_ERR(3);
@@ -479,13 +481,13 @@ int ceata_rw_multiple_block(bool write, void* buf, uint32_t count, long timeout)
                              direction | MMC_CMD_CEATA_RW_MULTIPLE_BLOCK_COUNT(count),
                              NULL, CEATA_COMMAND_TIMEOUT), 4, 0);
     if (write) SDCI_DCTRL = SDCI_DCTRL_TRCONT_TX;
-    if (wakeup_wait(&mmc_wakeup, timeout) == OBJ_WAIT_TIMEDOUT)
+    if (semaphore_wait(&mmc_wakeup, timeout) == OBJ_WAIT_TIMEDOUT)
     {
         PASS_RC(ceata_cancel_command(), 4, 1);
         RET_ERR(2);
     }
     PASS_RC(mmc_dsta_check_data_success(), 4, 3);
-    if (wakeup_wait(&mmc_comp_wakeup, timeout) == OBJ_WAIT_TIMEDOUT)
+    if (semaphore_wait(&mmc_comp_wakeup, timeout) == OBJ_WAIT_TIMEDOUT)
     {
         PASS_RC(ceata_cancel_command(), 4, 4);
         RET_ERR(4);
@@ -750,11 +752,12 @@ int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bool writ
             ATA_XFR_NUM = SECTOR_SIZE * cnt - 1;
             ATA_CFG |= ata_dma_flags;
             ATA_CFG &= ~(BIT(7) | BIT(8));
-            wakeup_wait(&ata_wakeup, 0);
+            semaphore_wait(&ata_wakeup, 0);
             ATA_IRQ = BITRANGE(0, 4);
             ATA_IRQ_MASK = BIT(0);
             ATA_COMMAND = BIT(0);
-            if (wakeup_wait(&ata_wakeup, 500000 * HZ / 1000000) == OBJ_WAIT_TIMEDOUT)
+            if (semaphore_wait(&ata_wakeup, 500000 * HZ / 1000000)
+                == OBJ_WAIT_TIMEDOUT)
             {
                 ATA_COMMAND = BIT(1);
                 ATA_CFG &= ~(BITRANGE(2, 3) | BIT(12));
@@ -1068,9 +1071,9 @@ void ata_bbt_reload(void)
 int ata_init(void)
 {
     mutex_init(&ata_mutex);
-    wakeup_init(&ata_wakeup);
-    wakeup_init(&mmc_wakeup);
-    wakeup_init(&mmc_comp_wakeup);
+    semaphore_init(&ata_wakeup, 1, 0);
+    semaphore_init(&mmc_wakeup, 1, 0);
+    semaphore_init(&mmc_comp_wakeup, 1, 0);
     ceata = PDAT(11) & BIT(1);
     if (ceata)
     {
@@ -1129,14 +1132,14 @@ void INT_ATA(void)
 {
     uint32_t ata_irq = ATA_IRQ;
     ATA_IRQ = ata_irq;
-    if (ata_irq & ATA_IRQ_MASK) wakeup_signal(&ata_wakeup);
+    if (ata_irq & ATA_IRQ_MASK) semaphore_release(&ata_wakeup);
     ATA_IRQ_MASK = 0;
 }
 
 void INT_MMC(void)
 {
     uint32_t irq = SDCI_IRQ;
-    if (irq & SDCI_IRQ_DAT_DONE_INT) wakeup_signal(&mmc_wakeup);
-    if (irq & SDCI_IRQ_IOCARD_IRQ_INT) wakeup_signal(&mmc_comp_wakeup);
+    if (irq & SDCI_IRQ_DAT_DONE_INT) semaphore_release(&mmc_wakeup);
+    if (irq & SDCI_IRQ_IOCARD_IRQ_INT) semaphore_release(&mmc_comp_wakeup);
     SDCI_IRQ = irq;
 }

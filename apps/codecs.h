@@ -75,12 +75,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 38
+#define CODEC_API_VERSION 39
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 38
+#define CODEC_MIN_API_VERSION 39
 
 /* codec return codes */
 enum codec_status {
@@ -166,7 +166,7 @@ struct codec_api {
     void (*thread_thaw)(unsigned int thread_id);
     void (*thread_wait)(unsigned int thread_id);
     void (*semaphore_init)(struct semaphore *s, int max, int start);
-    void (*semaphore_wait)(struct semaphore *s);
+    int  (*semaphore_wait)(struct semaphore *s, int timeout);
     void (*semaphore_release)(struct semaphore *s);
 #endif /* NUM_CORES */
 

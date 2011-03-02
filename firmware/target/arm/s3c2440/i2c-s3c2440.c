@@ -21,7 +21,7 @@
 #include "system.h"
 #include "i2c-s3c2440.h"
 
-static struct wakeup i2c_wake; /* Transfer completion signal */
+static struct semaphore i2c_complete; /* Transfer completion signal */
 static struct mutex i2c_mtx;   /* Mutual exclusion */
 static unsigned char *buf_ptr; /* Next byte to transfer */
 static int buf_count;          /* Number of bytes remaining to transfer */
@@ -64,7 +64,7 @@ void i2c_write(int addr, const unsigned char *buf, int count)
     /* Generate START */
     IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_START | I2C_RXTX_ENB;
 
-    if (wakeup_wait(&i2c_wake, HZ) != OBJ_WAIT_SUCCEEDED)
+    if (semaphore_wait(&i2c_complete, HZ) != OBJ_WAIT_SUCCEEDED)
     {
         /* Something went wrong - stop transmission */
         int oldlevel = disable_irq_save();
@@ -84,7 +84,7 @@ void i2c_write(int addr, const unsigned char *buf, int count)
 void i2c_init(void)
 {
     /* Init kernel objects */
-    wakeup_init(&i2c_wake);
+    semaphore_init(&i2c_complete, 1, 0);
     mutex_init(&i2c_mtx);
 
     /* Clear pending source */
@@ -134,7 +134,7 @@ void IIC(void)
         i2c_stop();
 
         /* Signal thread */
-        wakeup_signal(&i2c_wake);
+        semaphore_release(&i2c_complete);
         break;
     }
 

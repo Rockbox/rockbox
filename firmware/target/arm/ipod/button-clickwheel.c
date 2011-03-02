@@ -84,7 +84,7 @@ int int_btn = BUTTON_NONE;
 #endif
 
 #if CONFIG_CPU==S5L8701 || CONFIG_CPU==S5L8702
-static struct wakeup button_init_wakeup;
+static struct semaphore button_init_wakeup;
 #endif
 
 #if CONFIG_CPU==S5L8702
@@ -273,7 +273,7 @@ static inline int ipod_4g_button_read(void)
                 btn |= BUTTON_PLAY;
             if (status & 0x00100000)
                 btn |= BUTTON_MENU;
-            wakeup_signal(&button_init_wakeup);
+            semaphore_release(&button_init_wakeup);
         }
 #endif
 
@@ -373,7 +373,7 @@ void s5l_clickwheel_init(void)
 
 void button_init_device(void)
 {
-    wakeup_init(&button_init_wakeup);
+    semaphore_init(&button_init_wakeup, 1, 0);
 #if CONFIG_CPU==S5L8701
     INTMSK |= (1<<26);
 #elif CONFIG_CPU==S5L8702
@@ -381,7 +381,7 @@ void button_init_device(void)
     holdswitch_last_value = (pmu_read(0x87) & 2) == 0;
 #endif
     s5l_clickwheel_init();
-    wakeup_wait(&button_init_wakeup, HZ / 10);
+    semaphore_wait(&button_init_wakeup, HZ / 10);
 }
 
 bool button_hold(void)

@@ -117,7 +117,7 @@ static struct nand_param internal_param;
 static struct mutex nand_mtx;
 #ifdef USE_DMA
 static struct mutex nand_dma_mtx;
-static struct wakeup nand_wkup;
+static struct semaphore nand_dma_complete;
 #endif
 static unsigned char temp_page[4096]; /* Max page size */
 
@@ -170,7 +170,7 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
         yield();
 #else
     REG_DMAC_DCMD(DMA_NAND_CHANNEL) |= DMAC_DCMD_TIE;  /* Enable DMA interrupt */
-    wakeup_wait(&nand_wkup, TIMEOUT_BLOCK);
+    semaphore_wait(&nand_dma_complete, TIMEOUT_BLOCK);
 #endif
 
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
@@ -202,7 +202,7 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
         yield();
 #else
     REG_DMAC_DCMD(DMA_NAND_CHANNEL) |= DMAC_DCMD_TIE;  /* Enable DMA interrupt */
-    wakeup_wait(&nand_wkup, TIMEOUT_BLOCK);
+    semaphore_wait(&nand_dma_complete, TIMEOUT_BLOCK);
 #endif
 
     //REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
@@ -226,7 +226,7 @@ void DMA_CALLBACK(DMA_NAND_CHANNEL)(void)
     if (REG_DMAC_DCCSR(DMA_NAND_CHANNEL) & DMAC_DCCSR_TT)
         REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_TT;
     
-    wakeup_signal(&nand_wkup);
+    semaphore_release(&nand_dma_complete);
 }
 #endif /* USE_DMA */
 
@@ -603,7 +603,7 @@ int nand_init(void)
         mutex_init(&nand_mtx);
 #ifdef USE_DMA
         mutex_init(&nand_dma_mtx);
-        wakeup_init(&nand_wkup);
+        semaphore_init(&nand_dma_complete, 1, 0);
         system_enable_irq(DMA_IRQ(DMA_NAND_CHANNEL));
 #endif
         

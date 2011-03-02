@@ -47,7 +47,7 @@ static long               sd_stack[(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
 static struct event_queue sd_queue;
 static struct mutex       sd_mtx;
-static struct wakeup      sd_wakeup;
+static struct semaphore   sd_wakeup;
 static void               sd_thread(void) NORETURN_ATTR;
 
 static int                use_4bit;
@@ -831,7 +831,7 @@ static int jz_sd_exec_cmd(struct sd_request *request)
 
     /* Wait for command completion */
     //__intc_unmask_irq(IRQ_MSC);
-    //wakeup_wait(&sd_wakeup, 100);
+    //semaphore_wait(&sd_wakeup, 100);
     while (timeout-- && !(REG_MSC_STAT & MSC_STAT_END_CMD_RES));
 
 
@@ -881,7 +881,7 @@ static int jz_sd_exec_cmd(struct sd_request *request)
 #endif
         }
         //__intc_unmask_irq(IRQ_MSC);
-        //wakeup_wait(&sd_wakeup, 100);
+        //semaphore_wait(&sd_wakeup, 100);
         /* Wait for Data Done */
         while (!(REG_MSC_IREG & MSC_IREG_DATA_TRAN_DONE));
         REG_MSC_IREG = MSC_IREG_DATA_TRAN_DONE;    /* clear status */
@@ -891,7 +891,7 @@ static int jz_sd_exec_cmd(struct sd_request *request)
     if (events & SD_EVENT_PROG_DONE)
     {
         //__intc_unmask_irq(IRQ_MSC);
-        //wakeup_wait(&sd_wakeup, 100);
+        //semaphore_wait(&sd_wakeup, 100);
         while (!(REG_MSC_IREG & MSC_IREG_PRG_DONE));
         REG_MSC_IREG = MSC_IREG_PRG_DONE;    /* clear status */
     }
@@ -945,7 +945,7 @@ static void jz_sd_rx_handler(unsigned int arg)
 /* MSC interrupt handler */
 void MSC(void)
 {
-    //wakeup_signal(&sd_wakeup);
+    //semaphore_release(&sd_wakeup);
     logf("MSC interrupt");
 }
 
@@ -1228,7 +1228,7 @@ int sd_init(void)
     static bool inited = false;
     if(!inited)
     {
-        wakeup_init(&sd_wakeup);
+        semaphore_init(&sd_wakeup, 1, 0);
         mutex_init(&sd_mtx);
         queue_init(&sd_queue, true);
         create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,

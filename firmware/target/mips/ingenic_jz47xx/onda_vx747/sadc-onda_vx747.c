@@ -74,7 +74,7 @@ static int datacount = 0;
 static volatile int cur_touch = 0;
 static volatile bool pen_down = false;
 static struct mutex battery_mtx;
-static struct wakeup battery_wkup;
+static struct semaphore battery_done;
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -113,7 +113,7 @@ unsigned int battery_adc_voltage(void)
 
     REG_SADC_ENA |= SADC_ENA_PBATEN;
 
-    wakeup_wait(&battery_wkup, HZ/4);
+    semaphore_wait(&battery_done, HZ/4);
     bat_val = REG_SADC_BATDAT;
 
     logf("%d %d", bat_val, (bat_val * BATTERY_SCALE_FACTOR) / 4096);
@@ -268,7 +268,7 @@ void SADC(void)
     if(state & SADC_CTRL_PBATRDYM)
     {
         /* Battery AD IRQ */
-        wakeup_signal(&battery_wkup);
+        semaphore_release(&battery_done);
     }
 }
 
@@ -290,7 +290,7 @@ void adc_init(void)
     REG_SADC_ENA = SADC_ENA_TSEN;
 
     mutex_init(&battery_mtx);
-    wakeup_init(&battery_wkup);
+    semaphore_init(&battery_done, 1, 0);
 }
 
 void adc_close(void)

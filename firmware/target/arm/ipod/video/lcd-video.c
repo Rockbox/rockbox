@@ -107,7 +107,7 @@ struct
 #ifdef HAVE_LCD_SLEEP
     bool display_on;
     bool waking;
-    struct wakeup initwakeup;
+    struct semaphore initwakeup;
 #endif
 } lcd_state IBSS_ATTR;
 
@@ -188,7 +188,7 @@ static inline unsigned bcm_read32(unsigned address)
 static void continue_lcd_awake(void)
 {
     lcd_state.waking = false;
-    wakeup_signal(&(lcd_state.initwakeup));
+    semaphore_release(&(lcd_state.initwakeup));
 }
 #endif
 
@@ -357,7 +357,7 @@ void lcd_init_device(void)
         /* lcd_write_data needs an even number of 16 bit values */
         flash_vmcs_length = ((flash_vmcs_length + 3) >> 1) & ~1;
     }
-    wakeup_init(&(lcd_state.initwakeup));
+    semaphore_init(&(lcd_state.initwakeup), 1, 0);
     lcd_state.waking = false;
 
     if (GPO32_VAL & 0x4000)
@@ -620,7 +620,7 @@ void lcd_awake(void)
          */
         lcd_state.waking = true;
         tick_add_task(&lcd_tick);
-        wakeup_wait(&(lcd_state.initwakeup), TIMEOUT_BLOCK);
+        semaphore_wait(&(lcd_state.initwakeup), TIMEOUT_BLOCK);
 
         send_event(LCD_EVENT_ACTIVATION, NULL);
     }

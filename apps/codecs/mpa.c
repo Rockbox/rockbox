@@ -211,7 +211,7 @@ static void mad_synth_thread(void)
 {
     while(1) {
         ci->semaphore_release(&synth_done_sem);
-        ci->semaphore_wait(&synth_pending_sem);
+        ci->semaphore_wait(&synth_pending_sem, TIMEOUT_BLOCK);
         
         if(die)
             break;
@@ -224,7 +224,7 @@ static void mad_synth_thread(void)
  * synthesized */
 static inline void mad_synth_thread_wait_pcm(void)
 {
-    ci->semaphore_wait(&synth_done_sem);
+    ci->semaphore_wait(&synth_done_sem, TIMEOUT_BLOCK);
 }
 
 /* increment the done semaphore - used after a wait for idle to preserve the

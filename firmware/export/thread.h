@@ -284,7 +284,9 @@ struct thread_entry
                                   and priority disinheritance */
     /* Only enabled when using queue_send for now */
 #endif
-#if defined(HAVE_EXTENDED_MESSAGING_AND_NAME) || NUM_CORES > 1
+#if defined(HAVE_SEMAPHORE_OBJECTS) || \
+    defined(HAVE_EXTENDED_MESSAGING_AND_NAME) || \
+    NUM_CORES > 1
     volatile intptr_t retval;  /* Return value from a blocked operation/
                                   misc. use */
 #endif

@@ -42,11 +42,11 @@
 
 
 static struct mutex adc_mtx;
-static struct wakeup adc_wakeup;
+static struct semaphore adc_wakeup;
 
 void INT_ADC(void)
 {
-    wakeup_signal(&adc_wakeup);
+    semaphore_release(&adc_wakeup);
 }
 
 unsigned short adc_read(int channel)
@@ -61,7 +61,7 @@ unsigned short adc_read(int channel)
              (1 << 0);          /* enable start */
     
     /* wait for conversion */
-    wakeup_wait(&adc_wakeup, TIMEOUT_BLOCK);
+    semaphore_wait(&adc_wakeup, TIMEOUT_BLOCK);
     
     /* get the converted data */
     data = ADCDAT0 & 0x3FF;
@@ -77,7 +77,7 @@ unsigned short adc_read(int channel)
 void adc_init(void)
 {
     mutex_init(&adc_mtx);
-    wakeup_init(&adc_wakeup);
+    semaphore_init(&adc_wakeup, 1, 0);
 
     /* enable clock to ADC */
     PWRCON &= ~(1 << 10);

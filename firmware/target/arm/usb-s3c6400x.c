@@ -44,7 +44,7 @@ struct ep_type
     bool done;
     int rc;
     int size;
-    struct wakeup complete;
+    struct semaphore complete;
 } ;
 
 static struct ep_type endpoints[USB_NUM_ENDPOINTS];
@@ -64,7 +64,7 @@ static void reset_endpoints(int reinit)
         endpoints[i].busy = false;
         endpoints[i].rc = -1;
         endpoints[i].done = true;
-        wakeup_signal(&endpoints[i].complete);
+        semaphore_release(&endpoints[i].complete);
     }
     DIEPCTL0 = 0x8800;  /* EP0 IN ACTIVE NEXT=1 */
     DOEPCTL0 = 0x8000;  /* EP0 OUT ACTIVE */
@@ -201,7 +201,7 @@ void INT_USB_FUNC(void)
                         endpoints[i].rc = 0;
                         endpoints[i].done = true;
                         usb_core_transfer_complete(i, USB_DIR_IN, 0, bytes);
-                        wakeup_signal(&endpoints[i].complete);
+                        semaphore_release(&endpoints[i].complete);
                     }
                 }
                 if (epints & 4)  /* AHB error */
@@ -213,7 +213,7 @@ void INT_USB_FUNC(void)
                         endpoints[i].busy = false;
                         endpoints[i].rc = 1;
                         endpoints[i].done = true;
-                        wakeup_signal(&endpoints[i].complete);
+                        semaphore_release(&endpoints[i].complete);
                     }
                 }
                 DIEPINT(i) = epints;
@@ -233,7 +233,7 @@ void INT_USB_FUNC(void)
                         endpoints[i].rc = 0;
                         endpoints[i].done = true;
                         usb_core_transfer_complete(i, USB_DIR_OUT, 0, bytes);
-                        wakeup_signal(&endpoints[i].complete);
+                        semaphore_release(&endpoints[i].complete);
                     }
                 }
                 if (epints & 4)  /* AHB error */
@@ -325,7 +325,7 @@ int usb_drv_send(int endpoint, void *ptr, int length)
     endpoints[endpoint].done = false;
     ep_send(endpoint, ptr, length);
     while (!endpoints[endpoint].done && endpoints[endpoint].busy)
-        wakeup_wait(&endpoints[endpoint].complete, TIMEOUT_BLOCK);
+        semaphore_wait(&endpoints[endpoint].complete, TIMEOUT_BLOCK);
     return endpoints[endpoint].rc;
 }
 
@@ -412,7 +412,7 @@ void usb_init_device(void)
 {
     unsigned int i;
     for (i = 0; i < sizeof(endpoints)/sizeof(struct ep_type); i++)
-        wakeup_init(&endpoints[i].complete);
+        semaphore_init(&endpoints[i].complete, 1, 0);
 
     /* Power up the core clocks to allow writing
        to some registers needed to power it down */

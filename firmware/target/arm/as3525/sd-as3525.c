@@ -136,7 +136,7 @@ static bool hs_card = false;
 #define EXT_SD_BITS (1<<2)
 #endif
 
-static struct wakeup transfer_completion_signal;
+static struct semaphore transfer_completion_signal;
 static volatile unsigned int transfer_error[NUM_VOLUMES];
 #define PL180_MAX_TRANSFER_ERRORS 10
 
@@ -191,7 +191,7 @@ void INT_NAND(void)
 
     transfer_error[INTERNAL_AS3525] = status & MCI_DATA_ERROR;
 
-    wakeup_signal(&transfer_completion_signal);
+    semaphore_release(&transfer_completion_signal);
     MCI_CLEAR(INTERNAL_AS3525) = status;
 }
 
@@ -202,7 +202,7 @@ void INT_MCI0(void)
 
     transfer_error[SD_SLOT_AS3525] = status & MCI_DATA_ERROR;
 
-    wakeup_signal(&transfer_completion_signal);
+    semaphore_release(&transfer_completion_signal);
     MCI_CLEAR(SD_SLOT_AS3525) = status;
 }
 #endif
@@ -568,7 +568,7 @@ int sd_init(void)
     bitset32(&CCU_IO, 1<<2);
 #endif
 
-    wakeup_init(&transfer_completion_signal);
+    semaphore_init(&transfer_completion_signal, 1, 0);
 
     init_pl180_controller(INTERNAL_AS3525);
     ret = sd_init_card(INTERNAL_AS3525);
@@ -678,7 +678,7 @@ static int sd_select_bank(signed char bank)
                                 (9<<4) /* 2^9 = 512 */ ;
 
         /* Wakeup signal from NAND/MCIO isr on MCI_DATA_ERROR | MCI_DATA_END */
-        wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+        semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
         /*  Wait for FIFO to empty, card may still be in PRG state  */
         while(MCI_STATUS(INTERNAL_AS3525) & MCI_TX_ACTIVE );
@@ -837,7 +837,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                 (9<<4) /* 2^9 = 512 */ ;
 
         /* Wakeup signal from NAND/MCIO isr on MCI_DATA_ERROR | MCI_DATA_END */
-        wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+        semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
         /*  Wait for FIFO to empty, card may still be in PRG state for writes */
         while(MCI_STATUS(drive) & MCI_TX_ACTIVE);

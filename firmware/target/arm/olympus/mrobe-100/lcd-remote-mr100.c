@@ -67,7 +67,7 @@ unsigned char rc_buf[5];
 /* Remote thread functions                            */
 /*   These functions are private to the remote thread */
 /* ================================================== */
-static struct wakeup rc_thread_wakeup;
+static struct semaphore rc_thread_wakeup;
 static unsigned int remote_thread_id;
 static int remote_stack[256/sizeof(int)];
 static const char * const remote_thread_name = "remote";
@@ -368,7 +368,7 @@ static void remote_thread(void)
 
     while (1)
     {
-        wakeup_wait(&rc_thread_wakeup, rc_thread_wait_timeout);
+        semaphore_wait(&rc_thread_wakeup, rc_thread_wait_timeout);
 
         /* Error handling (most likely due to remote not present) */
         if (rc_status & RC_ERROR_MASK)
@@ -500,7 +500,7 @@ void lcd_remote_off(void)
 {
     /* should only be used to power off at shutdown */
     rc_status |= RC_POWER_OFF;
-    wakeup_signal(&rc_thread_wakeup);
+    semaphore_release(&rc_thread_wakeup);
 
     /* wait until the things are powered off */
     while (rc_status & RC_DEV_INIT)
@@ -515,7 +515,7 @@ void lcd_remote_on(void)
     {
         rc_status &= ~RC_FORCE_DETECT;
         rc_status &= ~RC_POWER_OFF;
-        wakeup_signal(&rc_thread_wakeup);
+        semaphore_release(&rc_thread_wakeup);
     }
 }
 
@@ -536,7 +536,7 @@ void lcd_remote_init_device(void)
     GPIO_SET_BITWISE(GPIOL_OUTPUT_EN, 0x80);
 
     /* a thread is required to poll & update the remote */
-    wakeup_init(&rc_thread_wakeup);
+    semaphore_init(&rc_thread_wakeup, 1, 0);
     remote_thread_id = create_thread(remote_thread, remote_stack,
                             sizeof(remote_stack), 0, remote_thread_name
                             IF_PRIO(, PRIORITY_SYSTEM)

@@ -37,14 +37,14 @@
 #define CF_START        0x40000000
 #define SSFDC_START     0x48000000
 
-static struct wakeup transfer_completion_signal;
+static struct semaphore transfer_completion_signal;
 
 static bool dma_in_progress = false;
 
 void MTC0(void)
 {
     IO_INTC_IRQ1 = INTR_IRQ1_MTC0;
-    wakeup_signal(&transfer_completion_signal);
+    semaphore_release(&transfer_completion_signal);
     dma_in_progress = false;
 }
 
@@ -59,7 +59,7 @@ void dma_start(const void* addr, size_t size)
 void dma_ata_read(unsigned char* buf, int shortcount)
 {
     if(dma_in_progress)
-        wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+        semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
     while((unsigned long)buf & 0x1F)
     {
@@ -83,7 +83,7 @@ void dma_ata_read(unsigned char* buf, int shortcount)
     IO_EMIF_DMACTL = 3; /* Select MTC->AHB and start transfer */
 
     dma_in_progress = true;
-    wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+    semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
     if(shortcount % 2)
     {
@@ -97,7 +97,7 @@ void dma_ata_read(unsigned char* buf, int shortcount)
 void dma_ata_write(unsigned char* buf, int wordcount)
 {
     if(dma_in_progress)
-        wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+        semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
     while((unsigned long)buf & 0x1F)
     {
@@ -121,12 +121,12 @@ void dma_ata_write(unsigned char* buf, int wordcount)
     IO_EMIF_DMACTL = 1; /* Select AHB->MTC and start transfer */
 
     dma_in_progress = true;
-    wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+    semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 }
 
 void dma_init(void)
 {
     IO_INTC_EINT1 |= INTR_EINT1_MTC0;     /* enable MTC interrupt */
-    wakeup_init(&transfer_completion_signal);
+    semaphore_init(&transfer_completion_signal, 1, 0);
     dma_in_progress = false;
 }
