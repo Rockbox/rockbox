@@ -148,6 +148,16 @@ sub trim {
     return $string;
 }
 
+sub match {
+    my ($string, $pattern)=@_;
+
+    return ($string =~ /^$pattern\z/);
+}
+
+sub blank {
+    # nothing to do
+}
+
 my %head;
 sub header {
     my ($full, $n, $v)=@_;
@@ -171,14 +181,13 @@ sub parsetarget {
     my $string;
     my @all= split(" *, *", $n);
     my $test;
-    my $regexp;
     for $test (@all) {
         $test =~ s/\*/.*/g;
         $test =~ s/\?/./g;
-        $regexp = qr/^$test\z/;
+
 #        print "TEST ($debug) $target for $test\n";
         for my $part (@target_parts) {
-            if($part =~ $regexp) {
+            if($part =~ /^$test\z/) {
                 $string = $v;
 #                print "MATCH: $test => $v\n";
                 $$strref = $string;
@@ -224,7 +233,7 @@ if($english) {
     while(<ENG>) {
 
         # get rid of DOS newlines
-        $_ =~ tr/\r//d;
+        $_ =~ s/\r//g;
 
         if($_ =~ /^ *\<phrase\>/) {
             # this is the start of a phrase
@@ -341,7 +350,7 @@ sub compare {
                 $l = "### The 'desc' field differs from the english!\n### the previously used desc is commented below:\n### desc: $ldesc\n  desc: $edesc\n";
             }
             push @show, $l;
-    }
+        }
         elsif($l =~ / *\<source\>/i) {
             $mode=1;
             push @show, $l;
@@ -400,7 +409,7 @@ while(<LANG>) {
     $line++;
 
     # get rid of DOS newlines
-    $_ =~ tr/\r//d;
+    $_ =~ s/\r//g;
 
     if($_ =~ /^( *\#|[ \t\n\r]*\z)/) {
         # comment or empty line - output it if it's part of the header
