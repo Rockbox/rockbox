@@ -87,7 +87,7 @@ bool charger_enabled(void);
 #define BATT_AVE_SAMPLES 32
 
 /* No init to do */
-static inline void powermgmt_init_target(void) {}
+void powermgmt_init_target(void);
 void charging_algorithm_step(void);
 
 #ifdef CHARGING_DEBUG_FILE
