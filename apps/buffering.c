@@ -560,6 +560,17 @@ fill_buffer     : Call buffer_handle for all handles that have data to buffer
 
 These functions are used by the buffering thread to manage buffer space.
 */
+static size_t handle_size_available(const struct memory_handle *h)
+{
+    /* Obtain proper distances from data start */
+    size_t rd = ringbuf_sub(h->ridx, h->data);
+    size_t wr = ringbuf_sub(h->widx, h->data);
+
+    if (LIKELY(wr > rd))
+        return wr - rd;
+
+    return 0; /* ridx is ahead of or equal to widx at this time */
+}
 
 static void update_data_counters(struct data_counters *dc)
 {
@@ -582,6 +593,8 @@ static void update_data_counters(struct data_counters *dc)
     m = first_handle;
     while (m) {
         buffered += m->available;
+        /* wasted could come out larger than the buffer size if ridx's are
+           overlapping data ahead of their handles' buffered data */
         wasted += ringbuf_sub(m->ridx, m->data);
         remaining += m->filerem;
 
@@ -589,7 +602,7 @@ static void update_data_counters(struct data_counters *dc)
             is_useful = true;
 
         if (is_useful)
-            useful += ringbuf_sub(m->widx, m->ridx);
+            useful += handle_size_available(m);
 
         m = m->next;
     }
@@ -795,7 +808,11 @@ static void shrink_handle(struct memory_handle *h)
         }
     } else {
         /* only move the handle struct */
-        delta = ringbuf_sub(h->ridx, h->data);
+        size_t rd = ringbuf_sub(h->ridx, h->data);
+        size_t wr = ringbuf_sub(h->widx, h->data);
+
+        /* ridx could be ahead of widx on a mini rebuffer */
+        delta = MIN(rd, wr);
         if (!move_handle(&h, &delta, 0, true))
             return;
 
@@ -1245,18 +1262,6 @@ int bufadvance(int handle_id, off_t offset)
  * actual amount of data available for reading.  This function explicitly
  * does not check the validity of the input handle.  It does do range checks
  * on size and returns a valid (and explicit) amount of data for reading */
-static size_t handle_size_available(const struct memory_handle *h)
-{
-    /* Obtain proper distances from data start */
-    size_t rd = ringbuf_sub(h->ridx, h->data);
-    size_t wr = ringbuf_sub(h->widx, h->data);
-
-    if (LIKELY(wr > rd))
-        return wr - rd;
-
-    return 0; /* ridx is ahead of or equal to widx at this time */
-}
-
 static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
                                           bool guardbuf_limit)
 {
