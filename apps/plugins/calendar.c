@@ -319,8 +319,8 @@
 #endif
 #endif
 
-#define MEMO_FILE PLUGIN_APPS_DIR "/.memo"
-#define TEMP_FILE PLUGIN_APPS_DIR "/~temp"
+#define MEMO_FILE PLUGIN_APPS_DATA_DIR "/.memo"
+#define TEMP_FILE PLUGIN_APPS_DATA_DIR "/~temp"
 
 #define X_OFFSET ((LCD_WIDTH%7)/2)
 #if LCD_HEIGHT <= 80

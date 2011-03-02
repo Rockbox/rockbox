@@ -29,8 +29,8 @@
 
 
 /* save files */
-#define SCORE_FILE PLUGIN_GAMES_DIR "/blackjack.score"
-#define SAVE_FILE  PLUGIN_GAMES_DIR "/blackjack.save"
+#define SCORE_FILE PLUGIN_GAMES_DATA_DIR "/blackjack.score"
+#define SAVE_FILE  PLUGIN_GAMES_DATA_DIR "/blackjack.save"
 #define NUM_SCORES 5
 
 /* final game return status */

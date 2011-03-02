@@ -254,7 +254,7 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #define BOARD_HEIGHT (LCD_HEIGHT/4)
 
 #define CONFIG_FILE_NAME "snake.cfg"
-#define SCORE_FILE PLUGIN_GAMES_DIR "/snake.score"
+#define SCORE_FILE PLUGIN_GAMES_DATA_DIR "/snake.score"
 #define NUM_SCORES 5
 
 static int board[BOARD_WIDTH][BOARD_HEIGHT],snakelength;

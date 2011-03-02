@@ -467,7 +467,7 @@ void calc_scales(void)
 }
 
 void load_settings(void) {
-    int fp = rb->open(PLUGIN_DEMOS_DIR "/.vu_meter", O_RDONLY);
+    int fp = rb->open(PLUGIN_DEMOS_DATA_DIR "/.vu_meter", O_RDONLY);
     if(fp>=0) {
             rb->read(fp, &vumeter_settings, sizeof(struct saved_settings));
             rb->close(fp);
@@ -479,7 +479,7 @@ void load_settings(void) {
 }
 
 void save_settings(void) {
-    int fp = rb->creat(PLUGIN_DEMOS_DIR "/.vu_meter", 0666);
+    int fp = rb->creat(PLUGIN_DEMOS_DATA_DIR "/.vu_meter", 0666);
     if(fp >= 0) {
         rb->write (fp, &vumeter_settings, sizeof(struct saved_settings));
         rb->close(fp);

@@ -54,8 +54,8 @@
  * font name              MAX_PATH
  */
 
-#define VIEWER_GLOBAL_SETTINGS_FILE      VIEWERS_DIR "/viewer.dat"
-#define TV_GLOBAL_SETTINGS_FILE          VIEWERS_DIR "/tv_global.dat"
+#define VIEWER_GLOBAL_SETTINGS_FILE      VIEWERS_DATA_DIR "/viewer.dat"
+#define TV_GLOBAL_SETTINGS_FILE          VIEWERS_DATA_DIR "/tv_global.dat"
 
 #define TV_GLOBAL_SETTINGS_HEADER        "\x54\x56\x47\x53" /* "TVGS" */
 #define TV_GLOBAL_SETTINGS_VERSION       0x38
@@ -108,11 +108,11 @@
  * ...
  * [last file]
  */
-#define VIEWER_SETTINGS_FILE      VIEWERS_DIR "/viewer_file.dat"
-#define TV_SETTINGS_FILE          VIEWERS_DIR "/tv_file.dat"
+#define VIEWER_SETTINGS_FILE      VIEWERS_DATA_DIR "/viewer_file.dat"
+#define TV_SETTINGS_FILE          VIEWERS_DATA_DIR "/tv_file.dat"
 
 /* temporary file */
-#define TV_SETTINGS_TMP_FILE      VIEWERS_DIR "/tv_file.tmp"
+#define TV_SETTINGS_TMP_FILE      VIEWERS_DATA_DIR "/tv_file.tmp"
 
 #define TV_SETTINGS_HEADER        "\x54\x56\x53" /* "TVS" */
 #define TV_SETTINGS_VERSION       0x39

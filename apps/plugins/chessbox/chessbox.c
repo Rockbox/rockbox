@@ -59,7 +59,7 @@ extern const fb_data chessbox_pieces[];
 #define YOFS ((LCD_HEIGHT-8*TILE_HEIGHT)/2)
 
 /* save files */
-#define SAVE_FILE  PLUGIN_GAMES_DIR "/chessbox.save"
+#define SAVE_FILE  PLUGIN_GAMES_DATA_DIR "/chessbox.save"
 
 /* commands enum */
 #define COMMAND_NOP        0

@@ -632,7 +632,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define TARGET_BOTTOM 3
 #define TARGET_UFO 4
 
-#define HISCOREFILE PLUGIN_GAMES_DIR "/invadrox.high"
+#define HISCOREFILE PLUGIN_GAMES_DATA_DIR "/invadrox.high"
 
 
 /* The time (in ms) for one iteration through the game loop - decrease this

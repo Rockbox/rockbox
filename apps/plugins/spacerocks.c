@@ -400,7 +400,7 @@
 #define SET_BG(x)
 #endif
 
-#define SCORE_FILE PLUGIN_GAMES_DIR "/spacerocks.score"
+#define SCORE_FILE PLUGIN_GAMES_DATA_DIR "/spacerocks.score"
 #define NUM_SCORES 5
 
 static struct highscore highscores[NUM_SCORES];

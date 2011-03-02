@@ -450,8 +450,8 @@ CONFIG_KEYPAD == SANSA_M200_PAD
  */
 
 #define CONFIG_FILE_NAME "brickmania.cfg"
-#define SAVE_FILE  PLUGIN_GAMES_DIR "/brickmania.save"
-#define SCORE_FILE PLUGIN_GAMES_DIR "/brickmania.score"
+#define SAVE_FILE  PLUGIN_GAMES_DATA_DIR "/brickmania.save"
+#define SCORE_FILE PLUGIN_GAMES_DATA_DIR "/brickmania.score"
 #define NUM_SCORES 5
 
 

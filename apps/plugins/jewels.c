@@ -461,8 +461,8 @@ struct puzzle_level puzzle_levels[NUM_PUZZLE_LEVELS] = {
               {4, 7, PUZZLE_TILE_LEFT|PUZZLE_TILE_UP} } },
 };
 
-#define SAVE_FILE  PLUGIN_GAMES_DIR "/jewels.save"
-#define SCORE_FILE PLUGIN_GAMES_DIR "/jewels.score"
+#define SAVE_FILE  PLUGIN_GAMES_DATA_DIR "/jewels.save"
+#define SCORE_FILE PLUGIN_GAMES_DATA_DIR "/jewels.score"
 struct highscore highscores[NUM_SCORES];
 
 static bool resume_file = false;

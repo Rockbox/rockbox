@@ -413,7 +413,7 @@ static struct highscore highscores[NUM_SCORES];
 #define SOUTH_WEST  4096
 
 #define LEVELS_FILE PLUGIN_GAMES_DIR "/snake2.levels"
-#define SCORE_FILE  PLUGIN_GAMES_DIR "/snake2.score"
+#define SCORE_FILE  PLUGIN_GAMES_DATA_DIR "/snake2.score"
 
 int load_all_levels(void)
 {

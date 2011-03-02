@@ -23,12 +23,15 @@
 
 static void get_cfg_filename(char* buf, int buf_len, const char* filename)
 {
+#ifdef APPLICATION
+    rb->snprintf(buf, buf_len, PLUGIN_DATA_DIR "/%s", filename);
+#else
     char *s;
     rb->strcpy(buf, rb->plugin_get_current_filename());
     s = rb->strrchr(buf, '/');
     if (!s) /* should never happen */
     {
-        rb->snprintf(buf, buf_len, PLUGIN_DIR "/%s", filename);
+        rb->snprintf(buf, buf_len, PLUGIN_DATA_DIR "/%s", filename);
     }
     else
     {
@@ -36,6 +39,7 @@ static void get_cfg_filename(char* buf, int buf_len, const char* filename)
         *s = '\0';
         rb->strcat(s, filename);
     }
+#endif
 }
 
 int configfile_save(const char *filename, struct configdata *cfg,

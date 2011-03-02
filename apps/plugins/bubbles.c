@@ -30,9 +30,9 @@
 #include "lib/highscore.h"
 
 /* files */
-#define SCORE_FILE PLUGIN_GAMES_DIR "/bubbles.score"
-#define SAVE_FILE  PLUGIN_GAMES_DIR "/bubbles.save"
-#define DATA_FILE  PLUGIN_GAMES_DIR "/bubbles.data"
+#define SCORE_FILE PLUGIN_GAMES_DATA_DIR "/bubbles.score"
+#define SAVE_FILE  PLUGIN_GAMES_DATA_DIR "/bubbles.save"
+#define DATA_FILE  PLUGIN_GAMES_DATA_DIR "/bubbles.data"
 
 /* final game return status */
 enum {

@@ -44,8 +44,8 @@ struct tidy_type {
 int tidy_type_count;
 bool tidy_loaded_and_changed = false;
 
-#define DEFAULT_FILES PLUGIN_APPS_DIR "/disktidy.config"
-#define CUSTOM_FILES  PLUGIN_APPS_DIR "/disktidy_custom.config"
+#define DEFAULT_FILES PLUGIN_APPS_DATA_DIR "/disktidy.config"
+#define CUSTOM_FILES  PLUGIN_APPS_DATA_DIR "/disktidy_custom.config"
 
 void add_item(const char* name, int index)
 {

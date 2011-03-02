@@ -192,7 +192,7 @@
 #define CLIX_BUTTON_CLICK   BUTTON_CENTER
 #endif
 
-#define SCORE_FILE PLUGIN_GAMES_DIR "/clix.score"
+#define SCORE_FILE PLUGIN_GAMES_DATA_DIR "/clix.score"
 #define NUM_SCORES 5
 struct highscore highscores[NUM_SCORES];
 

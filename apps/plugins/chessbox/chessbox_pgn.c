@@ -22,8 +22,8 @@
 #include "plugin.h"
 #include "chessbox_pgn.h"
 
-#define PGN_FILE  PLUGIN_GAMES_DIR  "/chessbox.pgn"
-#define LOG_FILE  PLUGIN_GAMES_DIR  "/chessbox.log"
+#define PGN_FILE  PLUGIN_GAMES_DATA_DIR  "/chessbox.pgn"
+#define LOG_FILE  PLUGIN_GAMES_DATA_DIR  "/chessbox.log"
 int loghandler;
 
 short kn_offs[8][2] = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};

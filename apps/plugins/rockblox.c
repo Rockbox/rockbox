@@ -800,8 +800,8 @@ bool resume = false;
 bool resume_file = false;
 
 /* Rockbox File System only supports full filenames inc dir */
-#define SCORE_FILE  PLUGIN_GAMES_DIR "/rockblox.score"
-#define RESUME_FILE PLUGIN_GAMES_DIR "/rockblox.resume"
+#define SCORE_FILE  PLUGIN_GAMES_DATA_DIR "/rockblox.score"
+#define RESUME_FILE PLUGIN_GAMES_DATA_DIR "/rockblox.resume"
 #define NUM_SCORES  5
 
 /* Default High Scores... */

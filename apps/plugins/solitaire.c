@@ -1293,11 +1293,15 @@ int bouncing_cards( void )
  */
 void get_save_filename( char *buf )
 {
+#ifdef APPLICATION
+    rb->snprintf(buf, sizeof(buf), PLUGIN_DATA_DIR "/sol.save");
+#else
     char *s;
     rb->strcpy( buf, rb->plugin_get_current_filename() );
     s = rb->strrchr( buf, '/' ) + 1;
     *s = '\0';
     rb->strcat( s, "sol.save" );
+#endif
 }
 
 int open_save_file( int flags )

@@ -76,6 +76,19 @@ extern void paths_init(void);
 #define PLUGIN_DEMOS_DIR    PLUGIN_DIR "/demos"
 #define VIEWERS_DIR         PLUGIN_DIR "/viewers"
 
+#ifdef APPLICATION
+#define PLUGIN_DATA_DIR          "/.rockbox/rocks.data"
+#define PLUGIN_GAMES_DATA_DIR    PLUGIN_DATA_DIR
+#define PLUGIN_APPS_DATA_DIR     PLUGIN_DATA_DIR
+#define PLUGIN_DEMOS_DATA_DIR    PLUGIN_DATA_DIR
+#define VIEWERS_DATA_DIR         PLUGIN_DATA_DIR
+#else
+#define PLUGIN_DATA_DIR          PLUGIN_DIR
+#define PLUGIN_GAMES_DATA_DIR    PLUGIN_DIR "/games"
+#define PLUGIN_APPS_DATA_DIR     PLUGIN_DIR "/apps"
+#define PLUGIN_DEMOS_DATA_DIR    PLUGIN_DIR "/demos"
+#define VIEWERS_DATA_DIR         PLUGIN_DIR "/viewers"
+#endif
 
 #define WPS_DIR             ROCKBOX_DIR "/wps"
 #define SBS_DIR             WPS_DIR

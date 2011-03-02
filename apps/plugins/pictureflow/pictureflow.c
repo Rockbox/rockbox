@@ -228,7 +228,7 @@ typedef fb_data pix_t;
 #define MAX_SLIDES_COUNT 10
 
 #define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
-#define CACHE_PREFIX PLUGIN_DEMOS_DIR "/pictureflow"
+#define CACHE_PREFIX PLUGIN_DEMOS_DATA_DIR "/pictureflow"
 
 #define EV_EXIT 9999
 #define EV_WAKEUP 1337

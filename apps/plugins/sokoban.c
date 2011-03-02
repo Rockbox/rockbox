@@ -29,8 +29,13 @@
 #define SOKOBAN_TITLE        "Sokoban"
 
 #define SOKOBAN_LEVELS_FILE  PLUGIN_GAMES_DIR "/sokoban.levels"
-#define SOKOBAN_SAVE_FILE    PLUGIN_GAMES_DIR "/sokoban.save"
+#define SOKOBAN_SAVE_FILE    PLUGIN_GAMES_DATA_DIR "/sokoban.save"
+
+#ifdef APPLICATION
+#define SOKOBAN_SAVE_FOLDER  PLUGIN_GAMES_DATA_DIR
+#else
 #define SOKOBAN_SAVE_FOLDER  "/games"
+#endif
 
 #include "pluginbitmaps/sokoban_tiles.h"
 #define SOKOBAN_TILESIZE BMPWIDTH_sokoban_tiles
