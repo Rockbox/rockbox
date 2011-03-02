@@ -94,6 +94,6 @@
 #define CONFIG_LCD LCD_COWOND2
 
 /* Define this if a programmable hotkey is mapped */
-//#define HAVE_HOTKEY
+#define HAVE_HOTKEY
 
 #define BOOTDIR "/.rockbox"
