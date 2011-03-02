@@ -808,11 +808,7 @@ static void shrink_handle(struct memory_handle *h)
         }
     } else {
         /* only move the handle struct */
-        size_t rd = ringbuf_sub(h->ridx, h->data);
-        size_t wr = ringbuf_sub(h->widx, h->data);
-
-        /* ridx could be ahead of widx on a mini rebuffer */
-        delta = MIN(rd, wr);
+        delta = ringbuf_sub(h->ridx, h->data);
         if (!move_handle(&h, &delta, 0, true))
             return;
 
@@ -1154,11 +1150,19 @@ static void rebuffer_handle(int handle_id, size_t newpos)
         h->ridx = ringbuf_add(h->data, amount);
 
         if (buffer_handle(handle_id, amount + 1)) {
-            queue_reply(&buffering_queue, 0);
-            buffer_handle(handle_id, 0); /* Ok, try the rest */
-            return;
+            size_t rd = ringbuf_sub(h->ridx, h->data); 
+            size_t wr = ringbuf_sub(h->widx, h->data);
+            if (wr >= rd) {
+                /* It really did succeed */
+                queue_reply(&buffering_queue, 0);
+                buffer_handle(handle_id, 0); /* Ok, try the rest */
+                return;
+            }
         }
-        /* Data collision - must reset */
+        /* Data collision or other file error - must reset */
+
+        if (newpos > h->filesize)
+            newpos = h->filesize; /* file truncation happened above */
     }
 
     /* Reset the handle to its new position */
