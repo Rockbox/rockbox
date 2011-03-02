@@ -33,7 +33,7 @@ extern JNIEnv   *env_ptr;
 static jclass    RockboxYesno_class = NULL;
 static jobject   RockboxYesno_instance = NULL;
 static jmethodID yesno_func;
-static struct wakeup    yesno_wakeup;
+static struct semaphore    yesno_done;
 static bool      ret;
 
 JNIEXPORT void JNICALL
@@ -42,7 +42,7 @@ Java_org_rockbox_RockboxYesno_put_1result(JNIEnv *env, jobject this, jboolean re
     (void)env;
     (void)this;
     ret = (bool)result;
-    wakeup_signal(&yesno_wakeup);
+    semaphore_release(&yesno_done);
 }
 
 static void yesno_init(void)
@@ -51,7 +51,7 @@ static void yesno_init(void)
     static jmethodID yesno_is_usable;
     if (RockboxYesno_class == NULL)
     {
-        wakeup_init(&yesno_wakeup);
+        semaphore_init(&yesno_done, 1, 0);
         /* get the class and its constructor */
         RockboxYesno_class = e->FindClass(env_ptr,
                                             "org/rockbox/RockboxYesno");
@@ -109,7 +109,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     e->CallVoidMethod(env_ptr, RockboxYesno_instance, yesno_func,
                       message, yes, no);
     
-    wakeup_wait(&yesno_wakeup, TIMEOUT_BLOCK);
+    semaphore_wait(&yesno_done, TIMEOUT_BLOCK);
 
     e->DeleteLocalRef(env_ptr, message);
     e->DeleteLocalRef(env_ptr, yes);

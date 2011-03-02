@@ -31,7 +31,7 @@ extern JNIEnv          *env_ptr;
 static jclass           RockboxKeyboardInput_class;
 static jobject          RockboxKeyboardInput_instance;
 static jmethodID        kbd_inputfunc;
-static struct wakeup    kbd_wakeup;
+static struct semaphore kbd_wakeup;
 static bool             accepted;
 static jstring          new_string;
 
@@ -48,7 +48,7 @@ Java_org_rockbox_RockboxKeyboardInput_put_1result(JNIEnv *env, jobject this,
         new_string = _new_string;
         (*env)->NewGlobalRef(env, new_string); /* prevet GC'ing */
     }
-    wakeup_signal(&kbd_wakeup);
+    semaphore_release(&kbd_wakeup);
 }
 
 static void kdb_init(void)
@@ -57,7 +57,7 @@ static void kdb_init(void)
     static jmethodID kbd_is_usable;
     if (RockboxKeyboardInput_class == NULL)
     {
-        wakeup_init(&kbd_wakeup);
+        semaphore_init(&kbd_wakeup, 1, 0);
         /* get the class and its constructor */
         RockboxKeyboardInput_class = e->FindClass(env_ptr,
                                             "org/rockbox/RockboxKeyboardInput");
@@ -94,7 +94,7 @@ int kbd_input(char* text, int buflen)
     e->CallVoidMethod(env_ptr, RockboxKeyboardInput_instance,kbd_inputfunc,
                       str, ok_text, cancel_text);
 
-    wakeup_wait(&kbd_wakeup, TIMEOUT_BLOCK);
+    semaphore_wait(&kbd_wakeup, TIMEOUT_BLOCK);
 
     if (accepted)
     {
