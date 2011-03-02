@@ -121,6 +121,8 @@ if(!$target && !$update && !$sortfile) {
     print STDERR "Please specify a target (with -t)!\n";
     exit;
 }
+my @target_parts = split ':', $target;
+
 my $verbose=$v;
 
 my %id; # string to num hash
@@ -148,9 +150,6 @@ sub trim {
 
 sub match {
     my ($string, $pattern)=@_;
-
-    $pattern =~ s/\*/.*/g;
-    $pattern =~ s/\?/./g;
 
     return ($string =~ /^$pattern\z/);
 }
@@ -183,9 +182,12 @@ sub parsetarget {
     my @all= split(" *, *", $n);
     my $test;
     for $test (@all) {
+        $test =~ s/\*/.*/g;
+        $test =~ s/\?/./g;
+
 #        print "TEST ($debug) $target for $test\n";
-        for my $part (split(":", $target)) {
-            if(match($part, $test)) {
+        for my $part (@target_parts) {
+            if($part =~ /^$test\z/) {
                 $string = $v;
 #                print "MATCH: $test => $v\n";
                 $$strref = $string;
