@@ -110,6 +110,7 @@ enum codec_status codec_main(void)
     OggVorbis_File vf;
     ogg_int32_t **pcm;
 
+    bool initialized = false; /* First init done? */
     int error;
     long n;
     int current_section;
@@ -185,6 +186,7 @@ next_track:
          vf.end = ci->id3->filesize;
          vf.ready_state = OPENED;
          vf.links = 1;
+         initialized = true;
     } else {
          DEBUGF("Vorbis: ov_open failed: %d\n", error);
          error = CODEC_ERROR;
@@ -248,6 +250,8 @@ done:
     ogg_malloc_destroy();
 
     if (ci->request_next_track()) {
+        if (!initialized)
+            goto next_track;
         /* Clean things up for the next track */
         vf.dataoffsets = NULL;
         vf.offsets = NULL;

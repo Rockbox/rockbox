@@ -393,6 +393,9 @@ enum codec_status codec_main(void)
     void *st = NULL;
     int j = 0;
 
+    memset(&bits, 0, sizeof(bits));
+    memset(&oy, 0, sizeof(oy));
+
     /* Ogg handling still uses mallocs, so reset the malloc buffer per track */
 next_track:
     error = CODEC_OK;
@@ -401,15 +404,15 @@ next_track:
         error = CODEC_ERROR;
         goto exit;
     }
+
     stereo = speex_stereo_state_init();
+    spx_ogg_sync_init(&oy);
+    spx_ogg_alloc_buffer(&oy,2*CHUNKSIZE);
 
     if (codec_wait_taginfo() != 0)
         goto done;
 
     strtoffset = ci->id3->offset;
-
-    spx_ogg_sync_init(&oy);
-    spx_ogg_alloc_buffer(&oy,2*CHUNKSIZE);
 
     samplerate = ci->id3->frequency; 
     codec_set_replaygain(ci->id3);
@@ -558,7 +561,8 @@ done:
 
         /* Clean things up for the next track */
 
-        speex_decoder_destroy(st);
+        if (st)
+            speex_decoder_destroy(st);
 
         if (stream_init == 1)
             spx_ogg_stream_reset(&os);
