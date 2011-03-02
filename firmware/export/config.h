@@ -766,7 +766,7 @@ Lyre prototype 1 */
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) \
     || defined(CPU_S5L870X) || (CONFIG_CPU == S3C2440) \
-    || defined(APPLICATION)
+    || defined(APPLICATION) || (CONFIG_CPU == PP5002)
 #define HAVE_SEMAPHORE_OBJECTS
 #endif
 
