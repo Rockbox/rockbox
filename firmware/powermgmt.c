@@ -33,7 +33,6 @@
 #include "usb.h"
 #include "powermgmt.h"
 #include "backlight.h"
-#include "bookmark.h"
 #include "lcd.h"
 #include "rtc.h"
 #if CONFIG_TUNER
@@ -47,6 +46,9 @@
 #include "lcd-remote.h"
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <time.h>
+#endif
+#ifndef BOOTLOADER
+#include "bookmark.h"
 #endif
 
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5)) && !defined (SIMULATOR)
@@ -850,7 +852,9 @@ void handle_sleep_timer(void)
 #endif
         ) {
             DEBUGF("Sleep timer timeout. Stopping...\n");
+#ifndef BOOTLOADER
             bookmark_autobookmark(false);
+#endif
             audio_stop();
             set_sleep_timer(0);
             backlight_off(); /* Nighty, nighty... */
