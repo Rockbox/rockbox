@@ -31,7 +31,11 @@
 bool button_hold(void);
 */
 void button_init_device(void);
+#ifdef HAVE_BUTTON_DATA
 int button_read_device(int *data);
+#else
+int button_read_device(void);
+#endif
 
 /* Main unit's buttons */
 #define BUTTON_UP           0x00000001
