@@ -80,6 +80,45 @@ typedef struct
 
 typedef struct
 {
+    Elf32_Word  sh_name; /* Section name (string tbl index) */
+    Elf32_Word  sh_type; /* Section type */
+    Elf32_Word  sh_flags; /* Section flags */
+    Elf32_Addr  sh_addr; /* Section virtual addr at execution */
+    Elf32_Off   sh_offset; /* Section file offset */
+    Elf32_Word  sh_size; /* Section size in bytes */
+    Elf32_Word  sh_link; /* Link to another section */
+    Elf32_Word  sh_info; /* Additional section information */
+    Elf32_Word  sh_addralign; /* Section alignment */
+    Elf32_Word  sh_entsize; /* Entry size if section holds table */
+}Elf32_Shdr;
+
+#define SHT_NULL            0 /* Section header table entry unused */
+#define SHT_PROGBITS        1 /* Program data */
+#define SHT_SYMTAB          2 /* Symbol table */
+#define SHT_STRTAB          3 /* String table */
+#define SHT_RELA            4 /* Relocation entries with addends */
+#define SHT_HASH            5 /* Symbol hash table */
+#define SHT_DYNAMIC         6 /* Dynamic linking information */
+#define SHT_NOTE            7 /* Notes */
+#define SHT_NOBITS          8 /* Program space with no data (bss) */
+#define SHT_REL             9 /* Relocation entries, no addends */
+#define SHT_SHLIB           10 /* Reserved */
+#define SHT_DYNSYM          11 /* Dynamic linker symbol table */
+#define SHT_INIT_ARRAY      14 /* Array of constructors */
+#define SHT_FINI_ARRAY      15 /* Array of destructors */
+#define SHT_PREINIT_ARRAY   16 /* Array of pre-constructors */
+#define SHT_GROUP           17 /* Section group */
+#define SHT_SYMTAB_SHNDX    18 /* Extended section indeces */
+#define	SHT_NUM             19 /* Number of defined types.  */
+
+#define SHF_WRITE       (1 << 0) /* Writable */
+#define SHF_ALLOC       (1 << 1) /* Occupies memory during execution */
+#define SHF_EXECINSTR   (1 << 2) /* Executable */
+#define SHF_MERGE       (1 << 4) /* Might be merged */
+#define SHF_STRINGS     (1 << 5) /* Contains nul-terminated strings */
+
+typedef struct
+{
     Elf32_Word  p_type; /* Segment type */
     Elf32_Off   p_offset; /* Segment file offset */
     Elf32_Addr  p_vaddr; /* Segment virtual address */

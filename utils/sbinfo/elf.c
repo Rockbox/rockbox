@@ -57,13 +57,16 @@ void elf_add_fill_section(struct elf_params_t *params,
 void elf_output(struct elf_params_t *params, elf_write_fn_t write, void *user)
 {
     Elf32_Ehdr ehdr;
-    uint32_t phoff = sizeof(Elf32_Ehdr);
-    uint32_t phentsize = sizeof(Elf32_Phdr);
     uint32_t phnum = 0;
-    uint32_t shstrndx = SHN_UNDEF;
     struct elf_section_t *sec = params->first_section;
     uint32_t offset = 0;
     Elf32_Phdr phdr;
+    Elf32_Shdr shdr;
+    memset(&ehdr, 0, EI_NIDENT);
+
+    uint32_t bss_strtbl = 0;
+    uint32_t text_strtbl = bss_strtbl + strlen(".bss") + 1;
+    uint32_t strtbl_size = text_strtbl + strlen(".text") + 1;
 
     while(sec)
     {
@@ -77,7 +80,8 @@ void elf_output(struct elf_params_t *params, elf_write_fn_t write, void *user)
         sec = sec->next;
     }
 
-    memset(&ehdr, 0, EI_NIDENT);
+    uint32_t strtbl_offset = offset;
+
     ehdr.e_ident[EI_MAG0] = ELFMAG0;
     ehdr.e_ident[EI_MAG1] = ELFMAG1;
     ehdr.e_ident[EI_MAG2] = ELFMAG2;
@@ -91,25 +95,28 @@ void elf_output(struct elf_params_t *params, elf_write_fn_t write, void *user)
     ehdr.e_machine = EM_ARM;
     ehdr.e_version = EV_CURRENT;
     ehdr.e_entry = params->start_addr;
-    ehdr.e_phoff = phoff;
-    ehdr.e_shoff = 0;
     ehdr.e_flags = 0;
     if(params->has_start_addr)
         ehdr.e_flags |= EF_ARM_HASENTRY;
     ehdr.e_ehsize = sizeof ehdr;
-    ehdr.e_phentsize = phentsize;
+    ehdr.e_phentsize = sizeof phdr;
     ehdr.e_phnum = phnum;
-    ehdr.e_shentsize = 0;
-    ehdr.e_shnum = 0;
-    ehdr.e_shstrndx = shstrndx;
+    ehdr.e_shentsize = sizeof shdr;
+    ehdr.e_shnum = phnum + 1;
+    ehdr.e_shstrndx = ehdr.e_shnum - 1;
+    ehdr.e_phoff = ehdr.e_ehsize;
+    ehdr.e_shoff = ehdr.e_ehsize + ehdr.e_phnum * ehdr.e_phentsize;
 
     write(user, 0, &ehdr, sizeof ehdr);
 
+    uint32_t data_offset = ehdr.e_ehsize + ehdr.e_phnum * ehdr.e_phentsize +
+        ehdr.e_shnum * ehdr.e_shentsize;
+
     sec = params->first_section;
-    offset = phoff;
+    offset = ehdr.e_phoff;
     while(sec)
     {
-        sec->offset += phoff + phnum * phentsize;
+        sec->offset += data_offset;
         
         phdr.p_type = PT_LOAD;
         if(sec->type == EST_LOAD)
@@ -133,12 +140,55 @@ void elf_output(struct elf_params_t *params, elf_write_fn_t write, void *user)
     }
 
     sec = params->first_section;
+    offset = ehdr.e_shoff;
+    while(sec)
+    {
+        shdr.sh_name = text_strtbl;
+        if(sec->type == EST_LOAD)
+            shdr.sh_type = SHT_PROGBITS;
+        else
+            shdr.sh_type = SHT_NOBITS;
+        shdr.sh_flags = SHF_ALLOC | SHF_EXECINSTR;
+        shdr.sh_addr = sec->addr;
+        shdr.sh_offset = sec->offset;
+        shdr.sh_size = sec->size;
+        shdr.sh_link = SHN_UNDEF;
+        shdr.sh_info = 0;
+        shdr.sh_addralign = 1;
+        shdr.sh_entsize = 0;
+
+        write(user, offset, &shdr, sizeof shdr);
+
+        offset += sizeof(Elf32_Shdr);
+        sec = sec->next;
+    }
+
+    {
+        shdr.sh_name = bss_strtbl;
+            shdr.sh_type = SHT_STRTAB;
+        shdr.sh_flags = 0;
+        shdr.sh_addr = 0;
+        shdr.sh_offset = strtbl_offset + data_offset;
+        shdr.sh_size = strtbl_size;
+        shdr.sh_link = SHN_UNDEF;
+        shdr.sh_info = 0;
+        shdr.sh_addralign = 1;
+        shdr.sh_entsize = 0;
+
+        write(user, offset, &shdr, sizeof shdr);
+
+        offset += sizeof(Elf32_Shdr);
+    }
+
+    sec = params->first_section;
     while(sec)
     {
         if(sec->type == EST_LOAD)
             write(user, sec->offset, sec->section, sec->size);
         sec = sec->next;
     }
+
+    write(user, strtbl_offset + data_offset, ".bss\0.text\0", strtbl_size);
 }
 
 bool elf_is_empty(struct elf_params_t *params)

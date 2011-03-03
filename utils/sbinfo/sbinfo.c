@@ -63,8 +63,8 @@ char BLUE[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 
 /* byte swapping */
 #define get32le(a) ((uint32_t) \
-    ( buf[a+3] << 24 | buf[a+2] << 16 | buf[a+1] << 8 | buf[a] ))
-#define get16le(a) ((uint16_t)( buf[a+1] << 8 | buf[a] ))
+    ( g_buf[a+3] << 24 | g_buf[a+2] << 16 | g_buf[a+1] << 8 | g_buf[a] ))
+#define get16le(a) ((uint16_t)( g_buf[a+1] << 8 | g_buf[a] ))
 
 /* all blocks are sized as a multiple of 0x1ff */
 #define PAD_TO_BOUNDARY(x) (((x) + 0x1ff) & ~0x1ff)
@@ -74,8 +74,8 @@ char BLUE[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 
 /* globals */
 
-size_t sz;	/* file size */
-uint8_t *buf; /* file content */
+size_t g_sz;	/* file size */
+uint8_t *g_buf; /* file content */
 #define PREFIX_SIZE     128
 char out_prefix[PREFIX_SIZE];
 const char *key_file;
@@ -129,25 +129,23 @@ void *xmalloc(size_t s) /* malloc helper, used in elf.c */
 static char getchr(int offset)
 {
     char c;
-    c = buf[offset];
+    c = g_buf[offset];
     return isprint(c) ? c : '_';
 }
 
 static void getstrle(char string[], int offset)
 {
     int i;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++)
         string[i] = getchr(offset + 3 - i);
-    }
     string[4] = 0;
 }
 
 static void getstrbe(char string[], int offset)
 {
     int i;
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++)
         string[i] = getchr(offset + i);
-    }
     string[4] = 0;
 }
 
@@ -155,9 +153,8 @@ static void printhex(int offset, int len)
 {
     int i;
     
-    for (i = 0; i < len; i++) {
-        printf("%02X ", buf[offset + i]);
-    }
+    for (i = 0; i < len; i++)
+        printf("%02X ", g_buf[offset + i]);
     printf("\n");
 }
 
@@ -222,7 +219,7 @@ static key_array_t read_keys(int num_keys)
         bugp("key file stat() failed");
     size = st.st_size;
     char *buf = xmalloc(size);
-    if(read(fd,buf,sz)!=(ssize_t)size)
+    if(read(fd, buf, size) != (ssize_t)size)
         bugp("reading key file");
     close(fd);
 
@@ -417,13 +414,13 @@ static void extract(unsigned long filesize)
     printf("Basic info:\n");
     color(GREEN);
     printf("\tHeader SHA-1: ");
-    byte *hdr_sha1 = &buf[0];
+    byte *hdr_sha1 = &g_buf[0];
     color(YELLOW);
     print_sha1(hdr_sha1);
     /* Check SHA1 sum */
     byte computed_sha1[20];
     sha_1_init(&sha_1_params);
-    sha_1_update(&sha_1_params, &buf[0x14], 0x4C);
+    sha_1_update(&sha_1_params, &g_buf[0x14], 0x4C);
     sha_1_finish(&sha_1_params);
     sha_1_output(&sha_1_params, computed_sha1);
     color(RED);
@@ -480,7 +477,7 @@ static void extract(unsigned long filesize)
     if(num_enc > 0)
     {
         keys = read_keys(num_enc);
-        color(BLUE),
+        color(BLUE);
         printf("Encryption data\n");
         for(int i = 0; i < num_enc; i++)
         {
@@ -492,14 +489,14 @@ static void extract(unsigned long filesize)
             printf("\t\tCBC-MAC of headers: ");
             /* copy the cbc mac */
             byte hdr_cbc_mac[16];
-            memcpy(hdr_cbc_mac, &buf[0x60 + 16 * num_chunks + 32 * i], 16);
+            memcpy(hdr_cbc_mac, &g_buf[0x60 + 16 * num_chunks + 32 * i], 16);
             color(YELLOW);
             print_key(hdr_cbc_mac);
             /* check it */
             byte computed_cbc_mac[16];
             byte zero[16];
             memset(zero, 0, 16);
-            cbc_mac(buf, NULL, 6 + num_chunks, keys[i], zero, &computed_cbc_mac, 1);
+            cbc_mac(g_buf, NULL, 6 + num_chunks, keys[i], zero, &computed_cbc_mac, 1);
             color(RED);
             if(memcmp(hdr_cbc_mac, computed_cbc_mac, 16) == 0)
                 printf(" Ok\n");
@@ -509,7 +506,7 @@ static void extract(unsigned long filesize)
             
             printf("\t\tEncrypted key     : ");
             byte (*encrypted_key)[16];
-            encrypted_key = (key_array_t)&buf[0x60 + 16 * num_chunks + 32 * i + 16];
+            encrypted_key = (key_array_t)&g_buf[0x60 + 16 * num_chunks + 32 * i + 16];
             color(YELLOW);
             print_key(*encrypted_key);
             printf("\n");
@@ -517,7 +514,7 @@ static void extract(unsigned long filesize)
             /* decrypt */
             byte decrypted_key[16];
             byte iv[16];
-            memcpy(iv, buf, 16); /* uses the first 16-bytes of SHA-1 sig as IV */
+            memcpy(iv, g_buf, 16); /* uses the first 16-bytes of SHA-1 sig as IV */
             cbc_mac(*encrypted_key, decrypted_key, 1, keys[i], iv, NULL, 0);
             printf("\t\tDecrypted key     : ");
             color(YELLOW);
@@ -571,9 +568,9 @@ static void extract(unsigned long filesize)
         /* save it */
         byte *sec = xmalloc(size);
         if(encrypted)
-            cbc_mac(buf + pos, sec, size / 16, real_key, buf, NULL, 0);
+            cbc_mac(g_buf + pos, sec, size / 16, real_key, g_buf, NULL, 0);
         else
-            memcpy(sec, buf + pos, size);
+            memcpy(sec, g_buf + pos, size);
         
         extract_section(data_sec, name, sec, size, "\t\t\t");
         free(sec);
@@ -590,16 +587,16 @@ static void extract(unsigned long filesize)
     printf("\t\t");
     printhex(filesize - 16, 16);
     /* decrypt it */
-    byte *encrypted_block = &buf[filesize - 32];
+    byte *encrypted_block = &g_buf[filesize - 32];
     byte decrypted_block[32];
-    cbc_mac(encrypted_block, decrypted_block, 2, real_key, buf, NULL, 0);
+    cbc_mac(encrypted_block, decrypted_block, 2, real_key, g_buf, NULL, 0);
     color(GREEN);
     printf("\tDecrypted SHA-1:\n\t\t");
     color(YELLOW);
     print_sha1(decrypted_block);
     /* check it */
     sha_1_init(&sha_1_params);
-    sha_1_update(&sha_1_params, buf, filesize - 32);
+    sha_1_update(&sha_1_params, g_buf, filesize - 32);
     sha_1_finish(&sha_1_params);
     sha_1_output(&sha_1_params, computed_sha1);
     color(RED);
@@ -621,17 +618,17 @@ int main(int argc, const char **argv)
     else
         strcpy(out_prefix, "");
 
-    if( (fd = open(argv[1],O_RDONLY)) == -1 )
+    if( (fd = open(argv[1], O_RDONLY)) == -1 )
         bugp("opening firmware failed");
 
     key_file = argv[2];
 
-    if(fstat(fd,&st) == -1)
+    if(fstat(fd, &st) == -1)
         bugp("firmware stat() failed");
-    sz = st.st_size;
+    g_sz = st.st_size;
 
-    buf=xmalloc(sz);
-    if(read(fd,buf,sz)!=(ssize_t)sz) /* load the whole file into memory */
+    g_buf = xmalloc(g_sz);
+    if(read(fd, g_buf, g_sz) != (ssize_t)g_sz) /* load the whole file into memory */
         bugp("reading firmware");
 
     close(fd);
@@ -641,6 +638,6 @@ int main(int argc, const char **argv)
 
     color(OFF);
 
-    free(buf);
+    free(g_buf);
     return 0;
 }
