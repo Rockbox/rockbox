@@ -48,7 +48,7 @@ const struct sound_settings_info audiohw_settings[] = {
 #endif
 };
 
-static unsigned short wm8975_regs[] =
+static unsigned short wm8975_regs[WM8975_NUM_REGISTERS] =
 {
     [LINVOL]   = LINVOL_LZCEN | 23, /* 0dB */
     [RINVOL]   = RINVOL_RIVU | RINVOL_RZCEN | 23, /* 0dB */
@@ -68,8 +68,10 @@ static unsigned short wm8975_regs[] =
 
 static void wm8975_write(int reg, unsigned val)
 {
-    wm8975_regs[reg] = val;
-    wmcodec_write(reg, val);
+    if (WM8975_NUM_REGISTERS > reg) {
+        wm8975_regs[reg] = val;
+        wmcodec_write(reg, val);
+    }
 }
 
 static void wm8975_write_and(int reg, unsigned bits)
@@ -141,17 +143,13 @@ static void audiohw_mute(bool mute)
 #ifdef IPOD_NANO2G
 void audiohw_preinit(void)
 {
-    wmcodec_write(RESET, RESET_RESET);
+    wm8975_write(RESET, RESET_RESET);
 
-    wmcodec_write(AINTFCE, AINTFCE_MS | AINTFCE_LRP_I2S_RLO
-                         | AINTFCE_IWL_16BIT | AINTFCE_FORMAT_I2S);
+    wm8975_write(AINTFCE, AINTFCE_MS | AINTFCE_LRP_I2S_RLO
+                        | AINTFCE_IWL_16BIT | AINTFCE_FORMAT_I2S);
 
-#ifndef IPOD_NANO2G
-    wmcodec_write(SAMPCTRL, WM8975_44100HZ);
-#endif
-
-    wmcodec_write(LOUTMIX1, LOUTMIX1_LD2LO | LOUTMIX1_LI2LOVOL(5));
-    wmcodec_write(ROUTMIX2, ROUTMIX2_RD2RO | ROUTMIX2_RI2ROVOL(5));
+    wm8975_write(LOUTMIX1, LOUTMIX1_LD2LO | LOUTMIX1_LI2LOVOL(5));
+    wm8975_write(ROUTMIX2, ROUTMIX2_RD2RO | ROUTMIX2_RI2ROVOL(5));
 
     wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1]);
     wm8975_write(PWRMGMT2, wm8975_regs[PWRMGMT2]);
@@ -164,11 +162,11 @@ void audiohw_postinit(void)
     wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1]);
     audiohw_mute(false);
 }
-#else
+#else /* !IPOD_NANO2G */
 void audiohw_preinit(void)
 {
     /* POWER UP SEQUENCE */
-    wmcodec_write(RESET, RESET_RESET);
+    wm8975_write(RESET, RESET_RESET);
 
     /* 2. Enable Vmid and VREF, quick startup. */
     wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1]);
@@ -179,30 +177,26 @@ void audiohw_preinit(void)
     /* 4. Enable DACs, line and headphone output buffers as required. */
     wm8975_write(PWRMGMT2, wm8975_regs[PWRMGMT2]);
     
-    wmcodec_write(AINTFCE, AINTFCE_MS | AINTFCE_LRP_I2S_RLO
-                         | AINTFCE_IWL_16BIT | AINTFCE_FORMAT_I2S);
+    wm8975_write(AINTFCE, AINTFCE_MS | AINTFCE_LRP_I2S_RLO
+                        | AINTFCE_IWL_16BIT | AINTFCE_FORMAT_I2S);
 
     wm8975_write(DAPCTRL, wm8975_regs[DAPCTRL] );
 
-/* Still need to find out why this is neccessary */
-#ifdef IPOD_NANO2G
-    wmcodec_write(SAMPCTRL, 0);
-#else
-    wmcodec_write(SAMPCTRL, WM8975_44100HZ);
-#endif
+    /* Set sample rate. */
+    wm8975_write(SAMPCTRL, WM8975_44100HZ);
 
     /* set the volume to -6dB */
-    wmcodec_write(LOUT1VOL, LOUT1VOL_LO1ZC | IPOD_PCM_LEVEL);
-    wmcodec_write(ROUT1VOL, ROUT1VOL_RO1VU | ROUT1VOL_RO1ZC | IPOD_PCM_LEVEL);
+    wm8975_write(LOUT1VOL, LOUT1VOL_LO1ZC | IPOD_PCM_LEVEL);
+    wm8975_write(ROUT1VOL, ROUT1VOL_RO1VU | ROUT1VOL_RO1ZC | IPOD_PCM_LEVEL);
 
-    wmcodec_write(LOUTMIX1, LOUTMIX1_LD2LO| LOUTMIX1_LI2LOVOL(5));
-    wmcodec_write(LOUTMIX2, LOUTMIX2_RI2LOVOL(5));
+    wm8975_write(LOUTMIX1, LOUTMIX1_LD2LO| LOUTMIX1_LI2LOVOL(5));
+    wm8975_write(LOUTMIX2, LOUTMIX2_RI2LOVOL(5));
     
-    wmcodec_write(ROUTMIX1, ROUTMIX1_LI2ROVOL(5));
-    wmcodec_write(ROUTMIX2, ROUTMIX2_RD2RO| ROUTMIX2_RI2ROVOL(5));
+    wm8975_write(ROUTMIX1, ROUTMIX1_LI2ROVOL(5));
+    wm8975_write(ROUTMIX2, ROUTMIX2_RD2RO| ROUTMIX2_RI2ROVOL(5));
     
-    wmcodec_write(MOUTMIX1, 0);
-    wmcodec_write(MOUTMIX2, 0);
+    wm8975_write(MOUTMIX1, 0);
+    wm8975_write(MOUTMIX2, 0);
 }
 
 void audiohw_postinit(void)
@@ -220,15 +214,15 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
     /* 0101111 == mute (0x2f) */
 
     /* OUT1 */
-    wmcodec_write(LOUT1VOL, LOUT1VOL_LO1ZC | vol_l);
-    wmcodec_write(ROUT1VOL, ROUT1VOL_RO1VU | ROUT1VOL_RO1ZC | vol_r);
+    wm8975_write(LOUT1VOL, LOUT1VOL_LO1ZC | vol_l);
+    wm8975_write(ROUT1VOL, ROUT1VOL_RO1VU | ROUT1VOL_RO1ZC | vol_r);
 }
 
 void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     /* OUT2 */
-    wmcodec_write(LOUT2VOL, LOUT2VOL_LO2ZC | vol_l);
-    wmcodec_write(ROUT2VOL, ROUT2VOL_RO2VU | ROUT2VOL_RO2ZC | vol_r);
+    wm8975_write(LOUT2VOL, LOUT2VOL_LO2ZC | vol_l);
+    wm8975_write(ROUT2VOL, ROUT2VOL_RO2VU | ROUT2VOL_RO2ZC | vol_r);
 }
 
 void audiohw_enable_lineout(bool enable)
@@ -251,7 +245,7 @@ void audiohw_set_bass(int value)
 
     if ((value >= -6) && (value <= 9)) {
         /* We use linear bass control with 200 Hz cutoff */
-        wmcodec_write(BASSCTRL, regvalues[value + 6] | BASSCTRL_BC);
+        wm8975_write(BASSCTRL, regvalues[value + 6] | BASSCTRL_BC);
     }
 }
 
@@ -263,7 +257,7 @@ void audiohw_set_treble(int value)
 
     if ((value >= -6) && (value <= 9)) {
         /* We use linear treble control with 4 kHz cutoff */
-        wmcodec_write(TREBCTRL, regvalues[value + 6] | TREBCTRL_TC);
+        wm8975_write(TREBCTRL, regvalues[value + 6] | TREBCTRL_TC);
     }
 }
 
@@ -273,10 +267,10 @@ void audiohw_close(void)
     audiohw_mute(true);
 
     /* 2. Disable all output buffers. */
-    wmcodec_write(PWRMGMT2, 0x0);
+    wm8975_write(PWRMGMT2, 0x0);
 
     /* 3. Switch off the power supplies. */
-    wmcodec_write(PWRMGMT1, 0x0);
+    wm8975_write(PWRMGMT1, 0x0);
 }
 
 /* Note: Disable output before calling this function */
@@ -296,24 +290,24 @@ void audiohw_enable_recording(bool source_mic)
      * the DACs disabled. Also the outputs shouldn't be disabled
      * when recording from line in (dock connector) - needs testing. */
     wm8975_regs[PWRMGMT2] &= ~(PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1
-                               | PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2);
+                             | PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2);
     wm8975_write(PWRMGMT2, wm8975_regs[PWRMGMT2]);
 
     wm8975_write_or(LINVOL, LINVOL_LINMUTE);
     wm8975_write_or(RINVOL, RINVOL_RINMUTE);
 
-    wmcodec_write(ADDCTRL3, ADDCTRL3_VROI);
+    wm8975_write(ADDCTRL3, ADDCTRL3_VROI);
 
     if (source_mic) {
-        wmcodec_write(ADDCTRL1, ADDCTRL1_VSEL_LOWBIAS | ADDCTRL1_DATSEL_RADC
-                              | ADDCTRL1_TOEN);
-        wmcodec_write(ADCLPATH, 0);
-        wmcodec_write(ADCRPATH, ADCRPATH_RINSEL_RIN2 | ADCRPATH_RMICBOOST_20dB);
+        wm8975_write(ADDCTRL1, ADDCTRL1_VSEL_LOWBIAS | ADDCTRL1_DATSEL_RADC
+                             | ADDCTRL1_TOEN);
+        wm8975_write(ADCLPATH, 0);
+        wm8975_write(ADCRPATH, ADCRPATH_RINSEL_RIN2 | ADCRPATH_RMICBOOST_20dB);
     } else {
-        wmcodec_write(ADDCTRL1, ADDCTRL1_VSEL_LOWBIAS | ADDCTRL1_DATSEL_NORMAL
-                              | ADDCTRL1_TOEN);
-        wmcodec_write(ADCLPATH, ADCLPATH_LINSEL_LIN1 | ADCLPATH_LMICBOOST_OFF);
-        wmcodec_write(ADCRPATH, ADCRPATH_RINSEL_RIN1 | ADCRPATH_RMICBOOST_OFF);
+        wm8975_write(ADDCTRL1, ADDCTRL1_VSEL_LOWBIAS | ADDCTRL1_DATSEL_NORMAL
+                             | ADDCTRL1_TOEN);
+        wm8975_write(ADCLPATH, ADCLPATH_LINSEL_LIN1 | ADCLPATH_LMICBOOST_OFF);
+        wm8975_write(ADCRPATH, ADCRPATH_RINSEL_RIN1 | ADCRPATH_RMICBOOST_OFF);
     }
     wm8975_write_and(LINVOL, ~LINVOL_LINMUTE);
     wm8975_write_and(RINVOL, ~RINVOL_RINMUTE);
@@ -325,7 +319,7 @@ void audiohw_disable_recording(void)
     wm8975_write_or(LINVOL, LINVOL_LINMUTE);
     wm8975_write_or(RINVOL, RINVOL_RINMUTE);
 
-    wmcodec_write(ADDCTRL3, 0);
+    wm8975_write(ADDCTRL3, 0);
 
     wm8975_regs[PWRMGMT2] |= PWRMGMT2_DACL | PWRMGMT2_DACR
                            | PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1
@@ -361,12 +355,12 @@ void audiohw_set_monitor(bool enable)
     if (enable) {
         /* set volume to 0 dB */
         wm8975_regs[LOUTMIX1] &= ~LOUTMIX1_LI2LOVOL_MASK;
-        wm8975_regs[LOUTMIX1] |= LOUTMIX1_LI2LOVOL(2);
+        wm8975_regs[LOUTMIX1] |=  LOUTMIX1_LI2LOVOL(2);
         wm8975_regs[ROUTMIX2] &= ~ROUTMIX2_RI2ROVOL_MASK;
-        wm8975_regs[ROUTMIX2] |= ROUTMIX2_RI2ROVOL(2);
+        wm8975_regs[ROUTMIX2] |=  ROUTMIX2_RI2ROVOL(2);
         /* set mux to line input */
-        wm8975_write_and(LOUTMIX1, ~7);
-        wm8975_write_and(ROUTMIX1, ~7);
+        wm8975_write_and(LOUTMIX1, ~LOUTMIX1_LMIXSEL_MASK);
+        wm8975_write_and(ROUTMIX1, ~ROUTMIX1_RMIXSEL_MASK);
         /* enable bypass */
         wm8975_write_or(LOUTMIX1, LOUTMIX1_LI2LO);
         wm8975_write_or(ROUTMIX2, ROUTMIX2_RI2RO);
