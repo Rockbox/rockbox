@@ -33,6 +33,7 @@
 #include "usb.h"
 #include "powermgmt.h"
 #include "backlight.h"
+#include "bookmark.h"
 #include "lcd.h"
 #include "rtc.h"
 #if CONFIG_TUNER
@@ -843,14 +844,14 @@ void handle_sleep_timer(void)
 
     /* Handle sleeptimer */
     if (TIME_AFTER(current_tick, sleeptimer_endtick)) {
-        audio_stop();
-
         if (usb_inserted()
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
             || charger_input_state != NO_CHARGER
 #endif
         ) {
             DEBUGF("Sleep timer timeout. Stopping...\n");
+            bookmark_autobookmark(false);
+            audio_stop();
             set_sleep_timer(0);
             backlight_off(); /* Nighty, nighty... */
         }
