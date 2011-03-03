@@ -116,7 +116,10 @@ INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher 
 
 DEPENDPATH = $$INCLUDEPATH
 
-LIBS += -L$$OUT_PWD -L$$MYBUILDDIR -lrbspeex -lmkamsboot -lmktccboot -lmkmpioboot -lucl -lz
+LIBS += -L$$OUT_PWD -L$$MYBUILDDIR -lrbspeex -lmkamsboot -lmktccboot -lmkmpioboot -lucl
+!win32 {
+    LIBS += -lz
+}
 
 # Add a (possibly found) libspeex now, don't do this before -lrbspeex!
 !static:!isEmpty(LIBSPEEX) {
