@@ -4351,6 +4351,7 @@ static bool check_dir(const char *dirname, int add_files)
 
         processed_dir_count++;
         if (info.attribute & ATTR_DIRECTORY)
+#ifndef SIMULATOR
         {   /* don't follow symlinks to dirs, but try to add it as a search root
              * this makes able to avoid looping in recursive symlinks */
             if (info.attribute & ATTR_LINK)
@@ -4358,6 +4359,9 @@ static bool check_dir(const char *dirname, int add_files)
             else
                 check_dir(curpath, add_files);
         }
+#else
+            check_dir(curpath, add_files);
+#endif
         else if (add_files)
         {
             tc_stat.curentry = curpath;
