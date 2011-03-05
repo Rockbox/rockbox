@@ -998,6 +998,7 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
     if (y + height > current_vp->height)
         height = current_vp->height - y;
 
+    
     if (drmode & DRMODE_INVERSEVID)
     {
         dmask = 0xffffffff;
@@ -1008,7 +1009,37 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
         dmask = ~dmask;
     }
 
-    dst_row = dst = LCDADDR(current_vp->x + x, current_vp->y + y);
+    /* adjust for viewport */
+    x += current_vp->x;
+    y += current_vp->y;
+
+#if defined(HAVE_VIEWPORT_CLIP)
+    /********************* Viewport on screen clipping ********************/
+    /* nothing to draw? */
+    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT) 
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+    
+    /* clip image in viewport in screen */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+#endif
+
+    dst_row = dst = LCDADDR(x, y);
     
 
     int col, row = height;
@@ -1035,8 +1066,8 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
     do
     {
         col = width;
-        dst = dst_row;
-        dst_row++;
+        dst = dst_row++;
+
 #ifdef ALPHA_BITMAP_READ_WORDS
 #define UPDATE_SRC_ALPHA    do { \
             if (--pixels) \
