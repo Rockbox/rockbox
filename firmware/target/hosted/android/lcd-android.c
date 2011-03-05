@@ -86,8 +86,6 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
  */
 void lcd_init_device(void)
 {
-    /* must not draw until surface is created */
-    display_on = false;
 }
 
 void lcd_update(void)
