@@ -901,6 +901,258 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
     lcd_mono_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
+/* draw alpha bitmap for anti-alias font */
+#define ALPHA_COLOR_FONT_DEPTH 2
+#define ALPHA_COLOR_LOOKUP_SHIFT (1 << ALPHA_COLOR_FONT_DEPTH)
+#define ALPHA_COLOR_LOOKUP_SIZE ((1 << ALPHA_COLOR_LOOKUP_SHIFT) - 1)
+#define ALPHA_COLOR_PIXEL_PER_BYTE (8 >> ALPHA_COLOR_FONT_DEPTH)
+#define ALPHA_COLOR_PIXEL_PER_WORD (32 >> ALPHA_COLOR_FONT_DEPTH)
+#ifdef CPU_ARM
+#define BLEND_INIT do {} while (0)
+#define BLEND_START(acc, color, alpha) \
+    asm volatile("mul %0, %1, %2" : "=&r" (acc) : "r" (color), "r" (alpha))
+#define BLEND_CONT(acc, color, alpha) \
+    asm volatile("mla %0, %1, %2, %0" : "+&r" (acc) : "r" (color), "r" (alpha))
+#define BLEND_OUT(acc) do {} while (0)
+#elif defined(CPU_COLDFIRE)
+#define ALPHA_BITMAP_READ_WORDS
+#define BLEND_INIT coldfire_set_macsr(EMAC_UNSIGNED)
+#define BLEND_START(acc, color, alpha) \
+    asm volatile("mac.l %0, %1, %%acc0" :: "%d" (color), "d" (alpha))
+#define BLEND_CONT BLEND_START
+#define BLEND_OUT(acc) asm volatile("movclr.l %%acc0, %0" : "=d" (acc))
+#else
+#define BLEND_INIT do {} while (0)
+#define BLEND_START(acc, color, alpha) ((acc) = (color) * (alpha))
+#define BLEND_CONT(acc, color, alpha) ((acc) += (color) * (alpha))
+#define BLEND_OUT(acc) do {} while (0)
+#endif
+
+/* Blend the given two colors */
+static inline unsigned blend_two_colors(unsigned c1, unsigned c2, unsigned a)
+{
+    a += a >> (ALPHA_COLOR_LOOKUP_SHIFT - 1);
+#if (LCD_PIXELFORMAT == RGB565SWAPPED)
+    c1 = swap16(c1);
+    c2 = swap16(c2);
+#endif
+    unsigned c1l = (c1 | (c1 << 16)) & 0x07e0f81f;
+    unsigned c2l = (c2 | (c2 << 16)) & 0x07e0f81f;
+    unsigned p;
+    BLEND_START(p, c1l, a);
+    BLEND_CONT(p, c2l, ALPHA_COLOR_LOOKUP_SIZE + 1 - a);
+    BLEND_OUT(p);
+    p = (p >> ALPHA_COLOR_LOOKUP_SHIFT) & 0x07e0f81f;
+    p |= (p >> 16);
+#if (LCD_PIXELFORMAT == RGB565SWAPPED)
+    return swap16(p);
+#else
+    return p;
+#endif
+}
+
+/* Blend the given color with the value from the alpha_color_lookup table */
+static inline unsigned blend_color(unsigned c, unsigned a)
+{
+    return blend_two_colors(c, current_vp->fg_pattern, a);
+}
+
+void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
+                                      int src_y, int stride, int x, int y,
+                                      int width, int height)
+{
+    fb_data *dst, *backdrop;
+    unsigned dmask = 0x00000000;
+    int drmode = current_vp->drawmode;
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) ||
+         (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
+        return;
+    /* initialize blending */
+    BLEND_INIT;
+
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > current_vp->width)
+        width = current_vp->width - x;
+    if (y + height > current_vp->height)
+        height = current_vp->height - y;
+
+    if (drmode & DRMODE_INVERSEVID)
+    {
+        dmask = 0xffffffff;
+        drmode &= DRMODE_SOLID; /* mask out inversevid */
+    }
+    if (drmode == DRMODE_BG)
+    {
+        dmask = ~dmask;
+    }
+
+    dst = LCDADDR(current_vp->x + x, current_vp->y + y);
+
+    int col, row = height;
+    unsigned data, pixels;
+    unsigned skip_end = (stride - width);
+    unsigned skip_start = src_y * stride + src_x;
+
+#ifdef ALPHA_BITMAP_READ_WORDS
+    uint32_t *src_w = (uint32_t *)((uintptr_t)src & ~3);
+    skip_start += ALPHA_COLOR_PIXEL_PER_BYTE * ((uintptr_t)src & 3);
+    src_w += skip_start / ALPHA_COLOR_PIXEL_PER_WORD;
+    data = letoh32(*src_w++) ^ dmask;
+    pixels = skip_start % ALPHA_COLOR_PIXEL_PER_WORD;
+#else
+    src += skip_start / ALPHA_COLOR_PIXEL_PER_BYTE;
+    data = *src ^ dmask;
+    pixels = skip_start % ALPHA_COLOR_PIXEL_PER_BYTE;
+#endif
+    data >>= pixels * ALPHA_COLOR_LOOKUP_SHIFT;
+#ifdef ALPHA_BITMAP_READ_WORDS
+    pixels = 8 - pixels;
+#endif
+
+    do
+    {
+        col = width;
+#ifdef ALPHA_BITMAP_READ_WORDS
+#define UPDATE_SRC_ALPHA    do { \
+            if (--pixels) \
+                data >>= ALPHA_COLOR_LOOKUP_SHIFT; \
+            else \
+            { \
+                data = letoh32(*src_w++) ^ dmask; \
+                pixels = ALPHA_COLOR_PIXEL_PER_WORD; \
+            } \
+        } while (0)
+#elif ALPHA_COLOR_PIXEL_PER_BYTE == 2
+#define UPDATE_SRC_ALPHA    do { \
+            if (pixels ^= 1) \
+                data >>= ALPHA_COLOR_LOOKUP_SHIFT; \
+            else \
+                data = *(++src) ^ dmask; \
+        } while (0)
+#else
+#define UPDATE_SRC_ALPHA    do { \
+            if (pixels = (++pixels % ALPHA_COLOR_PIXEL_PER_BYTE)) \
+                data >>= ALPHA_COLOR_LOOKUP_SHIFT; \
+            else \
+                data = *(++src) ^ dmask; \
+        } while (0)
+#endif
+        /* we don't want to have this in our inner
+         * loop and the codesize increase is minimal */
+        switch (drmode)
+        {
+            case DRMODE_COMPLEMENT:
+                do
+                {
+                    *dst=blend_two_colors(*dst, ~(*dst),
+                                data & ALPHA_COLOR_LOOKUP_SIZE );
+                    dst++;
+                    UPDATE_SRC_ALPHA;
+                }
+                while (--col);
+                break;
+            case DRMODE_BG:
+                if(lcd_backdrop)
+                {
+                    backdrop = (fb_data *)((long)dst+lcd_backdrop_offset);
+                    do
+                    {
+                        *dst=blend_two_colors(*dst, *(backdrop++),
+                                    data & ALPHA_COLOR_LOOKUP_SIZE );
+                        dst++;
+                        UPDATE_SRC_ALPHA;
+                    }
+                    while (--col);
+                }
+                else
+                {
+                    do
+                    {
+                        *dst=blend_two_colors(*dst, current_vp->bg_pattern,
+                                    data & ALPHA_COLOR_LOOKUP_SIZE );
+                        dst++;
+                        UPDATE_SRC_ALPHA;
+                    }
+                    while (--col);
+                }
+                break;
+            case DRMODE_FG:
+                do
+                {
+                    *dst=blend_color(*dst, data & ALPHA_COLOR_LOOKUP_SIZE );
+                    dst++;
+                    UPDATE_SRC_ALPHA;
+                }
+                while (--col);
+                break;
+            case DRMODE_SOLID:
+                if(lcd_backdrop)
+                {
+                    backdrop = (fb_data *)((long)dst+lcd_backdrop_offset);
+                    do
+                    {
+                        *(dst++)=blend_color(*(backdrop++),
+                                        data & ALPHA_COLOR_LOOKUP_SIZE );
+                        UPDATE_SRC_ALPHA;
+                    }
+                    while (--col);
+                }
+                else
+                {
+                    do
+                    {
+                        *(dst++)=blend_color(current_vp->bg_pattern,
+                                        data & ALPHA_COLOR_LOOKUP_SIZE );
+                        UPDATE_SRC_ALPHA;
+                    }
+                    while (--col);
+                }
+                break;
+        }
+#ifdef ALPHA_BITMAP_READ_WORDS
+        if (skip_end < pixels)
+        {
+            pixels -= skip_end;
+            data >>= skip_end * ALPHA_COLOR_LOOKUP_SHIFT;
+        } else {
+            pixels = skip_end - pixels;
+            src_w += pixels / ALPHA_COLOR_PIXEL_PER_WORD;
+            pixels %= ALPHA_COLOR_PIXEL_PER_WORD;
+            data = letoh32(*src_w++) ^ dmask;
+            data >>= pixels * ALPHA_COLOR_LOOKUP_SHIFT;
+            pixels = 8 - pixels;
+        }
+#else
+        if (skip_end)
+        {
+            pixels += skip_end;
+            if (pixels >= ALPHA_COLOR_PIXEL_PER_BYTE)
+            {
+                src += pixels / ALPHA_COLOR_PIXEL_PER_BYTE;
+                pixels %= ALPHA_COLOR_PIXEL_PER_BYTE;
+                data = *src ^ dmask;
+                data >>= pixels * ALPHA_COLOR_LOOKUP_SHIFT;
+            } else
+                data >>= skip_end * ALPHA_COLOR_LOOKUP_SHIFT;
+        }
+#endif
+        dst += LCD_WIDTH - width;
+    } while (--row);
+}
+
 /* Draw a partial native bitmap */
 void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                                 int stride, int x, int y, int width,

@@ -46,6 +46,7 @@ struct font {
     int     ascent;     /* ascent (baseline) height */
     int     firstchar;  /* first character in bitmap */
     int     size;       /* font size in glyphs ('holes' included) */
+    int     depth;      /* depth of the font, 0=1bit 1=4bit */
     bitmap_t*   bits;       /* 16-bit right-padded bitmap data */
     int*    offset;     /* offsets into bitmap data */
     unsigned char* width;   /* character widths or NULL if fixed */
@@ -1220,6 +1221,7 @@ int gen_c_source(struct font* pf, char *path)
         "   size: %d\n"
         "   ascent: %d\n"
         "   descent: %d\n"
+        "   depth: %d\n"
         "   first char: %d (0x%02x)\n"
         "   last char: %d (0x%02x)\n"
         "   default char: %d (0x%02x)\n"
@@ -1245,7 +1247,7 @@ int gen_c_source(struct font* pf, char *path)
             pf->facename? pf->facename: "",
             pf->maxwidth, pf->height,
             pf->size,
-            pf->ascent, pf->descent,
+            pf->ascent, pf->descent, pf->depth,
             pf->firstchar, pf->firstchar,
             pf->firstchar+pf->size-1, pf->firstchar+pf->size-1,
             pf->defaultchar, pf->defaultchar,
@@ -1392,6 +1394,7 @@ int gen_c_source(struct font* pf, char *path)
             "  %d,  /* ascent */\n"
             "  %d,  /* firstchar */\n"
             "  %d,  /* size */\n"
+            "  %d,  /* depth */\n"
             "  _font_bits, /* bits */\n"
             "  %s  /* offset */\n"
             "  %s\n"
@@ -1411,7 +1414,7 @@ int gen_c_source(struct font* pf, char *path)
             pf->maxwidth, pf->height,
             pf->ascent,
             pf->firstchar,
-            pf->size,
+            pf->size, 0,
             obuf,
             buf,
             pf->defaultchar,
@@ -1436,7 +1439,8 @@ int gen_h_header(struct font* pf, char *path)
         "#define SYSFONT_WIDTH          %d\n"
         "#define SYSFONT_HEIGHT         %d\n"
         "#define SYSFONT_SIZE           %d\n"
-        "#define SYSFONT_ASCENT         %d\n";
+        "#define SYSFONT_ASCENT         %d\n"
+        "#define SYSFONT_DEPTH          %d\n";
     char *hdr2 =
         "#define SYSFONT_DESCENT        %d\n"
         "#define SYSFONT_FIRST_CHAR     %d\n"
@@ -1463,7 +1467,8 @@ int gen_h_header(struct font* pf, char *path)
             pf->maxwidth,
             pf->height,
             pf->size,
-            pf->ascent);
+            pf->ascent,
+            pf->depth);
 
     fprintf(ofp, hdr2, 
             pf->descent,
@@ -1546,7 +1551,7 @@ int gen_fnt_file(struct font* pf, char *path)
     writeshort(ofp, pf->maxwidth);
     writeshort(ofp, pf->height);
     writeshort(ofp, pf->ascent);
-    writeshort(ofp, 0);
+    writeshort(ofp, 0); /* depth = 0 for bdffonts */
     writeint(ofp, pf->firstchar);
     writeint(ofp, pf->defaultchar);
     writeint(ofp, pf->size);

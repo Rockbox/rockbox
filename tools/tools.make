@@ -33,6 +33,11 @@ $(TOOLSDIR)/uclpack: $(TOOLSDIR)/ucl/uclpack.c $(wildcard $(TOOLSDIR)/ucl/src/*.
 	$(call PRINTS,CC $(@F))$(HOSTCC) $(TOOLSCFLAGS) -I$(TOOLSDIR)/ucl \
 		-I$(TOOLSDIR)/ucl/include -o $@ $^
 
+$(TOOLSDIR)/convttf: $(TOOLSDIR)/convttf.c
+	$(call PRINTS,CC $(@F))
+	$(SILENT)$(HOSTCC) $(TOOLSFLAGS) -lm -O2 -Wall -g $+ -o $@ \
+		`freetype-config --libs` `freetype-config --cflags`
+
 # implicit rule for simple tools
 $(TOOLSDIR)/%: $(TOOLSDIR)/%.c
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$@))

@@ -13,10 +13,10 @@ LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf \
     generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat lngdump \
-    telechips gigabeats creative hmac-sha1 rbspeexenc mkzenboot mk500boot
+    telechips gigabeats creative hmac-sha1 rbspeexenc mkzenboot mk500boot convttf
 
 all: scramble descramble sh2d rdf2binary mkboot mkzenboot convbdf codepages \
-	uclpack rbspeexenc voicefont mk500boot
+	uclpack rbspeexenc voicefont mk500boot convttf
 
 scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o \
 	iaudio_bl_flash.o creative.o hmac-sha1.o
@@ -96,6 +96,11 @@ voicefont: voicefont.c
 
 usb_benchmark: usb_benchmark.c
 	$(SILENT)$(CC) $(CFLAGS) -lusb $+ -o $@
+
+convttf: convttf.c
+	$(call PRINTS,CC $(@F))
+	$(SILENT)$(CC) $(CFLAGS) -lm -std=c99 -O2 -Wall -g $+ -o $@ \
+		`freetype-config --libs` `freetype-config --cflags`
 
 clean:
 	@echo "Cleaning tools"

@@ -89,7 +89,7 @@ static struct font* sysfonts[MAXFONTS] = { &sysfont, &font_ui, NULL};
 
 
 /* Font cache structures */
-static void cache_create(struct font* pf, int maxwidth, int height);
+static void cache_create(struct font* pf);
 static void glyph_cache_load(struct font* pf);
 /* End Font cache structures */
 
@@ -132,6 +132,13 @@ static int32_t readlong(struct font *pf)
     return l;
 }
 
+static int glyph_bytes( struct font *pf, int width )
+{
+    return pf->depth ?
+        (pf->height * width + 1) / 2:
+        width * ((pf->height + 7) / 8);
+}
+
 void font_reset(struct font *pf)
 {
     unsigned char* buffer = NULL;
@@ -168,7 +175,7 @@ static struct font* font_load_header(struct font *pf)
     pf->maxwidth = readshort(pf);
     pf->height = readshort(pf);
     pf->ascent = readshort(pf);
-    pf->buffer_position += 2; /* Skip padding */
+    pf->depth = readshort(pf);
     pf->firstchar = readlong(pf);
     pf->defaultchar = readlong(pf);
     pf->size = readlong(pf);
@@ -308,7 +315,7 @@ static struct font* font_load_cached(struct font* pf)
     pf->buffer_position = oldfileptr;
 
     /* Create the cache */
-    cache_create(pf, pf->maxwidth, pf->height);
+    cache_create(pf);
 
     return pf;
 }
@@ -436,7 +443,8 @@ int font_load(struct font* pf, const char *path)
     {
         /* currently, font loading replaces earlier font allocation*/
         buffer = (unsigned char *)(((intptr_t)main_buf + 3) & ~3);
-        buffer_size = MAX_FONT_SIZE;
+        /* make sure above doesn't exceed */
+        buffer_size = MAX_FONT_SIZE-3; 
     }
     else
     {
@@ -516,24 +524,23 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
     }
     else
     {
-        bitmap_offset = ((pf->height + 7) / 8) * p->width * char_code;
+        bitmap_offset = char_code * glyph_bytes(pf, p->width);
     }
 
     int32_t file_offset = FONT_HEADER_SIZE + bitmap_offset;
     lseek(pf->fd, file_offset, SEEK_SET);
-
-    int src_bytes = p->width * ((pf->height + 7) / 8);
+    int src_bytes = glyph_bytes(pf, p->width);
     read(pf->fd, p->bitmap, src_bytes);
 }
 
 /*
  * Converts cbuf into a font cache
  */
-static void cache_create(struct font* pf, int maxwidth, int height)
+static void cache_create(struct font* pf)
 {
     /* maximum size of rotated bitmap */
-    int bitmap_size = maxwidth * ((height + 7) / 8);
-    
+    int bitmap_size = glyph_bytes( pf, pf->maxwidth);
+  
     /* Initialise cache */
     font_cache_create(&pf->cache, pf->buffer_start, pf->buffer_size, bitmap_size);
 }
@@ -578,7 +585,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
                 bits += ((uint32_t*)(pf->offset))[char_code];
         }
         else
-            bits += ((pf->height + 7) / 8) * pf->maxwidth * char_code;
+            bits += char_code * glyph_bytes(pf, pf->maxwidth);
     }
 
     return bits;
@@ -655,7 +662,7 @@ int font_glyphs_to_bufsize(const char *path, int glyphs)
     
     bufsize = LRU_SLOT_OVERHEAD + sizeof(struct font_cache_entry) + 
         sizeof( unsigned short);
-    bufsize += f.maxwidth * ((f.height + 7) / 8);
+    bufsize += glyph_bytes(&f, f.maxwidth);
     bufsize *= glyphs;
     if ( bufsize < FONT_HEADER_SIZE )
         bufsize = FONT_HEADER_SIZE;

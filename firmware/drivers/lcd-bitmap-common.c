@@ -203,9 +203,15 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         }
 
         bits = font_get_bits(pf, *ucs);
-        LCDFN(mono_bitmap_part)(bits, ofs, 0, width, x + base_ofs, y,
-                width - ofs, pf->height);
 
+#if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
+        if (pf->depth)
+            lcd_alpha_bitmap_part(bits, ofs, 0, width, x + base_ofs, y,
+                                  width - ofs, pf->height);
+        else
+#endif
+            LCDFN(mono_bitmap_part)(bits, ofs, 0, width, x + base_ofs,
+                                    y, width - ofs, pf->height);
         if (is_diac)
         {
             current_vp->drawmode = drawmode;

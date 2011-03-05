@@ -68,7 +68,7 @@ enum {
  * USHORT maxwidth               2   font max width in pixels
  * USHORT height                 2   font height in pixels
  * USHORT ascent                 2   font ascent (baseline) in pixels
- * USHORT pad                    2   unused, pad to 32-bit boundary
+ * USHORT depth                  2   depth of the font, 0=1bit and 1=4bit
  * ULONG firstchar               4   first character code in font
  * ULONG defaultchar             4   default character code in font
  * ULONG size                    4   # characters in font
@@ -92,6 +92,7 @@ struct font {
     int          ascent;          /* ascent (baseline) height*/
     int          firstchar;       /* first character in bitmap*/
     int          size;            /* font size in glyphs*/
+    int          depth;           /* depth of the font, 0=1bit and 1=4bit */
     const unsigned char *bits;    /* 8-bit column bitmap data*/
     const void *offset;           /* offsets into bitmap data,
                                      uint16_t if bits_size < 0xFFDB else uint32_t*/

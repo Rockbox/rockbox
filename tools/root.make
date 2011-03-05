@@ -21,7 +21,7 @@ ASMFLAGS = -D__ASSEMBLER__      # work around gcc 3.4.x bug with -std=gnu99, onl
 TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/codepages $(TOOLSDIR)/scramble $(TOOLSDIR)/bmp2rb \
 	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mkboot $(TOOLSDIR)/iaudio_bl_flash.c \
-	$(TOOLSDIR)/iaudio_bl_flash.h
+	$(TOOLSDIR)/iaudio_bl_flash.h $(TOOLSDIR)/convttf
 
 
 ifeq (,$(PREFIX))
