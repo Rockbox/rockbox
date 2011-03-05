@@ -197,7 +197,7 @@ static enum
 static inline void charging_set_thread_priority(bool charging)
 {
 #ifdef HAVE_PRIORITY_SCHEDULING
-    thread_set_priority(THREAD_ID_CURRENT,
+    thread_set_priority(thread_self(),
                         charging ? PRIORITY_REALTIME : PRIORITY_SYSTEM);
 #endif
     (void)charging;

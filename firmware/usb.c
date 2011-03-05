@@ -220,7 +220,7 @@ static inline void usb_slave_mode(bool on)
     {
         trigger_cpu_boost();
 #ifdef HAVE_PRIORITY_SCHEDULING
-        thread_set_priority(THREAD_ID_CURRENT, PRIORITY_REALTIME);
+        thread_set_priority(thread_self(), PRIORITY_REALTIME);
 #endif
         disk_unmount_all();
         usb_attach();
@@ -229,7 +229,7 @@ static inline void usb_slave_mode(bool on)
     {
         usb_enable(false);
 #ifdef HAVE_PRIORITY_SCHEDULING
-        thread_set_priority(THREAD_ID_CURRENT, PRIORITY_SYSTEM);
+        thread_set_priority(thread_self(), PRIORITY_SYSTEM);
 #endif
         /* Entered exclusive mode */
         rc = disk_mount_all();

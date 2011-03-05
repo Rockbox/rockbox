@@ -468,7 +468,7 @@ static void audio_thread(void)
     struct audio_thread_data td;
 #ifdef HAVE_PRIORITY_SCHEDULING
     /* Up the priority since the core DSP over-yields internally */
-    int old_priority = rb->thread_set_priority(THREAD_ID_CURRENT,
+    int old_priority = rb->thread_set_priority(rb->thread_self(),
                                                PRIORITY_PLAYBACK-4);
 #endif
 
@@ -514,7 +514,7 @@ static void audio_thread(void)
             default:
             {
 #ifdef HAVE_PRIORITY_SCHEDULING
-                rb->thread_set_priority(THREAD_ID_CURRENT, old_priority);
+                rb->thread_set_priority(rb->thread_self(), old_priority);
 #endif
                 return;
                 }

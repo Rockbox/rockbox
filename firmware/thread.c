@@ -1517,9 +1517,27 @@ static struct thread_entry * find_empty_thread_slot(void)
  */
 struct thread_entry * thread_id_entry(unsigned int thread_id)
 {
-    return (thread_id == THREAD_ID_CURRENT) ?
-        cores[CURRENT_CORE].running :
-        &threads[thread_id & THREAD_ID_SLOT_MASK];
+    return &threads[thread_id & THREAD_ID_SLOT_MASK];
+}
+
+/*---------------------------------------------------------------------------
+ * Return the thread id of the calling thread
+ * --------------------------------------------------------------------------
+ */
+unsigned int thread_self(void)
+{
+    return cores[CURRENT_CORE].running->id;
+}
+
+/*---------------------------------------------------------------------------
+ * Return the thread entry of the calling thread.
+ *
+ * INTERNAL: Intended for use by kernel and not for programs.
+ *---------------------------------------------------------------------------
+ */
+struct thread_entry* thread_self_entry(void)
+{
+    return cores[CURRENT_CORE].running;
 }
 
 /*---------------------------------------------------------------------------
@@ -1675,8 +1693,7 @@ void thread_wait(unsigned int thread_id)
     corelock_lock(&thread->waiter_cl);
 
     /* Be sure it hasn't been killed yet */
-    if (thread_id == THREAD_ID_CURRENT ||
-        (thread->id == thread_id && thread->state != STATE_KILLED))
+    if (thread->id == thread_id && thread->state != STATE_KILLED)
     {
         IF_COP( current->obj_cl = &thread->waiter_cl; )
         current->bqp = &thread->queue;
@@ -1973,8 +1990,7 @@ int thread_set_priority(unsigned int thread_id, int priority)
     LOCK_THREAD(thread);
 
     /* Make sure it's not killed */
-    if (thread_id == THREAD_ID_CURRENT ||
-        (thread->id == thread_id && thread->state != STATE_KILLED))
+    if (thread->id == thread_id && thread->state != STATE_KILLED)
     {
         int old_priority = thread->priority;
 
@@ -2099,8 +2115,7 @@ int thread_get_priority(unsigned int thread_id)
     /* Simply check without locking slot. It may or may not be valid by the
      * time the function returns anyway. If all tests pass, it is the
      * correct value for when it was valid. */
-    if (thread_id != THREAD_ID_CURRENT &&
-        (thread->id != thread_id || thread->state == STATE_KILLED))
+    if (thread->id != thread_id || thread->state == STATE_KILLED)
         base_priority = -1;
 
     return base_priority;
@@ -2141,15 +2156,6 @@ void thread_thaw(unsigned int thread_id)
 
     UNLOCK_THREAD(thread);
     restore_irq(oldlevel);
-}
-
-/*---------------------------------------------------------------------------
- * Return the ID of the currently executing thread.
- *---------------------------------------------------------------------------
- */
-unsigned int thread_get_current(void)
-{
-    return cores[CURRENT_CORE].running->id;
 }
 
 #if NUM_CORES > 1

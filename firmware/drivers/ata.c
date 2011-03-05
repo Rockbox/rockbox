@@ -99,8 +99,7 @@ static void ata_lock_init(struct ata_lock *l)
 
 static void ata_lock_lock(struct ata_lock *l)
 {
-    struct thread_entry * const current =
-        thread_id_entry(THREAD_ID_CURRENT);
+    struct thread_entry * const current = thread_self_entry();
 
     if (current == l->thread)
     {

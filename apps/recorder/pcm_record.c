@@ -897,8 +897,8 @@ static void pcmrec_flush(unsigned flush_num)
                priority until finished */
             logf("pcmrec: boost (%s)",
                  num >= flood_watermark ? "num" : "time");
-            prio_pcmrec = thread_set_priority(THREAD_ID_CURRENT,
-                                thread_get_priority(THREAD_ID_CURRENT) - 4);
+            prio_pcmrec = thread_set_priority(thread_self(),
+                                thread_get_priority(thread_self()) - 4);
             prio_codec = codec_thread_set_priority(
                                 codec_thread_get_priority() - 4);
         }
@@ -950,7 +950,7 @@ static void pcmrec_flush(unsigned flush_num)
     {
         /* return to original priorities */
         logf("pcmrec: unboost priority");
-        thread_set_priority(THREAD_ID_CURRENT, prio_pcmrec);
+        thread_set_priority(thread_self(), prio_pcmrec);
         codec_thread_set_priority(prio_codec);
     }
 

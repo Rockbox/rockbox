@@ -253,9 +253,7 @@ void * sim_thread_unlock(void)
 
 struct thread_entry * thread_id_entry(unsigned int thread_id)
 {
-    return (thread_id == THREAD_ID_CURRENT) ? 
-        cores[CURRENT_CORE].running :
-        &threads[thread_id & THREAD_ID_SLOT_MASK];
+    return &threads[thread_id & THREAD_ID_SLOT_MASK];
 }
 
 static void add_to_list_l(struct thread_entry **list,
@@ -299,9 +297,14 @@ static void remove_from_list_l(struct thread_entry **list,
     thread->l.next->l.prev = thread->l.prev;
 }
 
-unsigned int thread_get_current(void)
+unsigned int thread_self(void)
 {
     return cores[CURRENT_CORE].running->id;
+}
+
+struct thread_entry* thread_self_entry(void)
+{
+    return cores[CURRENT_CORE].running;
 }
 
 void switch_thread(void)
@@ -562,7 +565,7 @@ void remove_thread(unsigned int thread_id)
     SDL_Thread *t;
     SDL_sem *s;
 
-    if (thread_id != THREAD_ID_CURRENT && thread->id != thread_id)
+    if (thread->id != thread_id)
         return;
 
     int oldlevel = disable_irq_save();
@@ -629,11 +632,11 @@ void remove_thread(unsigned int thread_id)
 
 void thread_exit(void)
 {
-    remove_thread(THREAD_ID_CURRENT);
+    unsigned int id = thread_self();
+    remove_thread(id);
     /* This should never and must never be reached - if it is, the
      * state is corrupted */
-    THREAD_PANICF("thread_exit->K:*R (ID: %d)",
-                  thread_id_entry(THREAD_ID_CURRENT)->id);
+    THREAD_PANICF("thread_exit->K:*R (ID: %d)", id);
     while (1);
 }
 
@@ -642,8 +645,7 @@ void thread_wait(unsigned int thread_id)
     struct thread_entry *current = cores[CURRENT_CORE].running;
     struct thread_entry *thread = thread_id_entry(thread_id);
 
-    if (thread_id == THREAD_ID_CURRENT ||
-        (thread->id == thread_id && thread->state != STATE_KILLED))
+    if (thread->id == thread_id && thread->state != STATE_KILLED)
     {
         current->bqp = &thread->queue;
         block_thread(current);

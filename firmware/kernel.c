@@ -509,7 +509,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 
 #ifdef HAVE_PRIORITY_SCHEDULING
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
-                  QUEUE_GET_THREAD(q) == thread_id_entry(THREAD_ID_CURRENT),
+                  QUEUE_GET_THREAD(q) == thread_self_entry(),
                   "queue_wait->wrong thread\n");
 #endif
 
@@ -527,7 +527,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
         if (rd != q->write) /* A waking message could disappear */
             break;
 
-        current = thread_id_entry(THREAD_ID_CURRENT);
+        current = thread_self_entry();
 
         IF_COP( current->obj_cl = &q->cl; )
         current->bqp = &q->queue;
@@ -559,7 +559,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
-                  QUEUE_GET_THREAD(q) == thread_id_entry(THREAD_ID_CURRENT),
+                  QUEUE_GET_THREAD(q) == thread_self_entry(),
                   "queue_wait_w_tmo->wrong thread\n");
 #endif
 
@@ -573,7 +573,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     wr = q->write;
     if (rd == wr && ticks > 0)
     {
-        struct thread_entry *current = thread_id_entry(THREAD_ID_CURRENT);
+        struct thread_entry *current = thread_self_entry();
 
         IF_COP( current->obj_cl = &q->cl; )
         current->bqp = &q->queue;
@@ -658,7 +658,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     {
         struct queue_sender_list *send = q->send;
         struct thread_entry **spp = &send->senders[wr];
-        struct thread_entry *current = thread_id_entry(THREAD_ID_CURRENT);
+        struct thread_entry *current = thread_self_entry();
 
         if(UNLIKELY(*spp))
         {
@@ -893,7 +893,7 @@ void mutex_init(struct mutex *m)
 /* Gain ownership of a mutex object or block until it becomes free */
 void mutex_lock(struct mutex *m)
 {
-    struct thread_entry *current = thread_id_entry(THREAD_ID_CURRENT);
+    struct thread_entry *current = thread_self_entry();
 
     if(current == mutex_get_thread(m))
     {
@@ -932,10 +932,10 @@ void mutex_lock(struct mutex *m)
 void mutex_unlock(struct mutex *m)
 {
     /* unlocker not being the owner is an unlocking violation */
-    KERNEL_ASSERT(mutex_get_thread(m) == thread_id_entry(THREAD_ID_CURRENT),
+    KERNEL_ASSERT(mutex_get_thread(m) == thread_self_entry(),
                   "mutex_unlock->wrong thread (%s != %s)\n",
                   mutex_get_thread(m)->name,
-                  thread_id_entry(THREAD_ID_CURRENT)->name);
+                  thread_self_entry()->name);
 
     if(m->recursion > 0)
     {
@@ -1019,7 +1019,7 @@ int semaphore_wait(struct semaphore *s, int timeout)
     else
     {
         /* too many waits - block until count is upped... */
-        struct thread_entry * current = thread_id_entry(THREAD_ID_CURRENT);
+        struct thread_entry * current = thread_self_entry();
         IF_COP( current->obj_cl = &s->cl; )
         current->bqp = &s->queue;
         /* return value will be OBJ_WAIT_SUCCEEDED after wait if wake was

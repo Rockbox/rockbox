@@ -779,6 +779,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    thread_self,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

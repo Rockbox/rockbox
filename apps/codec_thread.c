@@ -567,7 +567,7 @@ void codec_thread_resume(void)
 
 bool is_codec_thread(void)
 {
-    return thread_get_current() == codec_thread_id;
+    return thread_self() == codec_thread_id;
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
