@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PXML xmlns="http://openpandora.org/namespaces/PXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="PXML_schema.xsd">
+
+  <application id="rockbox.thomasjfox.001" appdata="rockbox">
+    <exec command="run_rockbox.sh"/>
+
+    <title lang="en_US">Rockbox</title>
+    <!-- if you want to provide a manual, uncomment the following line and set correct values! -->
+    <!-- <info name=" manual" type="html" src="manual.html"/> -->
+
+    <author name="Thomas Jarosch" website="http://www.rockbox.org"/>
+
+    <version major="3" minor="8" release="x" build="1"/>
+    <osversion major="1" minor="0" release="0" build="0"/>
+
+    <description lang="en_US">rockbox digital music player</description>
+
+    <icon src="rockbox.png"/>
+
+    <previewpics>
+    <pic src="rockbox_preview.jpg"/>
+    </previewpics>
+
+    <categories>
+      <category name="Audio">
+        <subcategory name="Player"/>
+      </category>
+    </categories>
+
+  </application>
+
+</PXML>
