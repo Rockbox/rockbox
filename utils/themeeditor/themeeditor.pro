@@ -40,7 +40,7 @@ cross {
     # retrieve ar binary for w32 cross compile. This might be specific to
     # Fedora mingw32 packages of Qt. Using member() here is needed because at
     # least the F13 packages add ar options to the variable.
-    CROSSOPTIONS += AR=$$member(QMAKE_LIB)
+    CROSSOPTIONS += AR=$$member(QMAKE_LIB) TARGETPLATFORM=\"MinGW\"
     
     # make sure we use the correct subsystem to prevent a console window coming up.
     LIBS += -Wl,-subsystem,windows
