@@ -21,11 +21,13 @@
 
 #include <jni.h>
 #include <stdio.h>
+#include <sys/mman.h>
 #include "notification.h"
 #include "appevents.h"
 #include "metadata.h"
 #include "albumart.h"
 #include "misc.h"
+#include "thread.h"
 #include "debug.h"
 
 extern JNIEnv *env_ptr;
@@ -66,8 +68,36 @@ static void track_changed_callback(void *param)
         album = e->NewStringUTF(env_ptr, id3->album ?: "");
 
         albumart = NULL;
-        if (find_albumart(id3, buf, sizeof(buf), &dim))
+        if (id3->embed_albumart && id3->albumart.type == AA_TYPE_JPG)
+        {   /* extract albumart to a temporary file using mmap() */
+            snprintf(buf, sizeof(buf), "/sdcard/rockbox/.temp_albumart_%d.jpg",
+                     thread_self());
+            int dst_fd = creat(buf, 0666);
+            if (dst_fd >= 0)
+            {
+                int src_fd = open(id3->path, O_RDONLY);
+                off_t o_pos = id3->albumart.pos;
+                off_t pa_pos = o_pos & ~(sysconf(_SC_PAGE_SIZE) - 1);
+                if (src_fd >= 0)
+                {   /* align to page boundary */
+                    int pos_diff = o_pos - pa_pos;
+                    unsigned char* p = mmap(NULL, id3->albumart.size + pos_diff,
+                                        PROT_READ, MAP_SHARED, src_fd, pa_pos);
+                    if (p != MAP_FAILED)
+                    {
+                        write(dst_fd, p + pos_diff, id3->albumart.size);
+                        munmap(p, id3->albumart.size + pos_diff);
+                        albumart = e->NewStringUTF(env_ptr, buf);
+                    }
+                    close(src_fd);
+                }
+                close(dst_fd);
+            }
+        }
+        else if (find_albumart(id3, buf, sizeof(buf), &dim))
+        {
             albumart = e->NewStringUTF(env_ptr, buf);
+        }
 
         e->CallVoidMethod(env_ptr, NotificationManager_instance,
                       updateNotification, title, artist, album, albumart);
@@ -82,6 +112,12 @@ static void track_finished_callback(void *param)
     JNIEnv e = *env_ptr;
     e->CallVoidMethod(env_ptr, NotificationManager_instance,
                       finishNotification);
+
+    /* delete temporary albumart file */
+    char buf[MAX_PATH];
+    snprintf(buf, sizeof(buf), "/sdcard/rockbox/.temp_albumart_%d.jpg",
+                     thread_self());
+    unlink(buf);
 }
 
 void notification_init(void)
