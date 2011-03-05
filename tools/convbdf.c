@@ -1387,7 +1387,7 @@ int gen_c_source(struct font* pf, char *path)
     else
         sprintf(buf, "0,  /* fixed width */");
 
-    fprintf(ofp,    "/* Exported structure definition. */\n"
+    fprintf(ofp, "/* Exported structure definition. */\n"
             "const struct font sysfont = {\n"
             "  %d,  /* maxwidth */\n"
             "  %d,  /* height */\n"
@@ -1399,16 +1399,16 @@ int gen_c_source(struct font* pf, char *path)
             "  %s  /* offset */\n"
             "  %s\n"
             "  %d,  /* defaultchar */\n"
-            "  %d,   /* bits_size */\n"
-            "  -1,   /* font fd */\n"
-            "  0,   /* buffer start */\n"
-            "  0,   /* ^ position */\n"
-            "  0,   /* ^ end */\n"
-            "  0,   /* ^ size  */\n"
+            "  %d,  /* bits_size */\n"
+            "  -1,  /* font fd */\n"
+            "  0,  /* buffer start */\n"
+            "  0,  /* ^ position */\n"
+            "  0,  /* ^ end */\n"
+            "  0,  /* ^ size  */\n"
             "  {{0,0,0,0,0},0,0,0},   /* cache  */\n"
-            "  0,   /*   */\n"
-            "  0,   /*   */\n"
-            "  0,   /*   */\n"
+            "  0,  /*   */\n"
+            "  0,  /*   */\n"
+            "  0,  /*   */\n"
             "};\n"
             "#endif /* HAVE_LCD_BITMAP */\n",
             pf->maxwidth, pf->height,
