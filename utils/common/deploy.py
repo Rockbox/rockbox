@@ -45,6 +45,7 @@ import getopt
 import time
 import hashlib
 import tempfile
+import string
 
 # modules that are not part of python itself.
 try:
@@ -68,27 +69,6 @@ except ImportError:
     print "Warning: multiprocessing module not found. Assuming 1 core."
 
 # == Global stuff ==
-# Windows nees some special treatment. Differentiate between program name
-# and executable filename.
-program = ""
-project = ""
-environment = os.environ
-progexe = ""
-make = "make"
-programfiles = []
-nsisscript = ""
-
-svnserver = ""
-# Paths and files to retrieve from svn when creating a tarball.
-# This is a mixed list, holding both paths and filenames.
-svnpaths = [ ]
-# set this to true to run upx on the resulting binary, false to skip this step.
-# only used on w32.
-useupx = False
-
-# OS X: files to copy into the bundle. Workaround for out-of-tree builds.
-bundlecopy = { }
-
 # DLL files to ignore when searching for required DLL files.
 systemdlls = ['advapi32.dll',
         'comdlg32.dll',
@@ -121,10 +101,13 @@ def usage(myself):
         print "       -n, --makensis=<file> path to makensis for building Windows setup program."
     if sys.platform != "darwin":
         print "       -d, --dynamic         link dynamically instead of static"
+    if sys.platform != "win32":
+        print "       -x, --cross=          prefix to cross compile for win32"
     print "       -k, --keep-temp       keep temporary folder on build failure"
     print "       -h, --help            this help"
     print "  If neither a project file nor tag is specified trunk will get downloaded"
     print "  from svn."
+
 
 def getsources(svnsrv, filelist, dest):
     '''Get the files listed in filelist from svnsrv and put it at dest.'''
@@ -171,10 +154,10 @@ def findversion(versionfile):
     return m.group(1)
 
 
-def findqt():
+def findqt(cross=""):
     '''Search for Qt4 installation. Return path to qmake.'''
     print "Searching for Qt"
-    bins = ["qmake", "qmake-qt4"]
+    bins = [cross + "qmake", cross + "qmake-qt4"]
     for binary in bins:
         try:
             q = which.which(binary)
@@ -212,14 +195,19 @@ def checkqt(qmakebin):
     return result
 
 
-def qmake(qmake="qmake", projfile=project, wd=".", static=True):
+def qmake(qmake, projfile, platform=sys.platform, wd=".", static=True, cross=""):
     print "Running qmake in %s..." % wd
     command = [qmake, "-config", "release", "-config", "noccache"]
     if static == True:
-        command.append("-config")
-        command.append("static")
+        command.extend(["-config", "-static"])
+    # special spec required?
+    if len(qmakespec[platform]) > 0:
+        command.extend(["-spec", qmakespec[platform]])
+    # cross compiling prefix set?
+    if len(cross) > 0:
+        command.extend(["-config", "cross"])
     command.append(projfile)
-    output = subprocess.Popen(command, stdout=subprocess.PIPE, cwd=wd, env=environment)
+    output = subprocess.Popen(command, stdout=subprocess.PIPE, cwd=wd)
     output.communicate()
     if not output.returncode == 0:
         print "qmake returned an error!"
@@ -227,10 +215,11 @@ def qmake(qmake="qmake", projfile=project, wd=".", static=True):
     return 0
 
 
-def build(wd="."):
+def build(wd=".", platform=sys.platform, cross=""):
     # make
     print "Building ..."
-    command = [make]
+    # use the current platforms make here, cross compiling uses the native make.
+    command = [make[sys.platform]]
     if cpus > 1:
         command.append("-j")
         command.append(str(cpus))
@@ -246,10 +235,11 @@ def build(wd="."):
                 print "Build failed!"
                 return -1
             break
-    if sys.platform != "darwin":
+    if platform != "darwin":
         # strip. OS X handles this via macdeployqt.
         print "Stripping binary."
-        output = subprocess.Popen(["strip", progexe], stdout=subprocess.PIPE, cwd=wd)
+        output = subprocess.Popen([cross + "strip", progexe[platform]], \
+                                  stdout=subprocess.PIPE, cwd=wd)
         output.communicate()
         if not output.returncode == 0:
             print "Stripping failed!"
@@ -257,10 +247,11 @@ def build(wd="."):
     return 0
 
 
-def upxfile(wd="."):
+def upxfile(wd=".", platform=sys.platform):
     # run upx on binary
     print "UPX'ing binary ..."
-    output = subprocess.Popen(["upx", progexe], stdout=subprocess.PIPE, cwd=wd)
+    output = subprocess.Popen(["upx", progexe[platform]], \
+                              stdout=subprocess.PIPE, cwd=wd)
     output.communicate()
     if not output.returncode == 0:
         print "UPX'ing failed!"
@@ -279,11 +270,14 @@ def runnsis(versionstring, nsis, script, srcfolder):
 
     # FIXME: instead of copying binaries around copy the NSI file and inject
     # the correct paths.
-    b = srcfolder + "/" + os.path.dirname(script) + "/" + os.path.dirname(progexe)
+    # Only win32 supported as target platform so hard coded.
+    b = srcfolder + "/" + os.path.dirname(script) + "/" \
+        + os.path.dirname(progexe["win32"])
     if not os.path.exists(b):
         os.mkdir(b)
-    shutil.copy(srcfolder + "/" + progexe, b)
-    output = subprocess.Popen([nsis, srcfolder + "/" + script], stdout=subprocess.PIPE)
+    shutil.copy(srcfolder + "/" + progexe["win32"], b)
+    output = subprocess.Popen([nsis, srcfolder + "/" + script], \
+                              stdout=subprocess.PIPE)
     output.communicate()
     if not output.returncode == 0:
         print "NSIS failed!"
@@ -297,7 +291,8 @@ def runnsis(versionstring, nsis, script, srcfolder):
     if nsissetup == "":
         print "Could not retrieve output file name!"
         return -1
-    shutil.copy(srcfolder + "/" + os.path.dirname(script) + "/" + nsissetup, setupfile)
+    shutil.copy(srcfolder + "/" + os.path.dirname(script) + "/" + nsissetup, \
+                setupfile)
     return 0
 
 
@@ -309,20 +304,24 @@ def nsisfileinject(nsis, outscript, filelist):
     output = open(outscript, "w")
     for line in open(nsis, "r"):
         output.write(line)
-	# inject files after the progexe binary. Match the basename only to avoid path mismatches.
-	if re.match(r'^\s*File\s*.*' + os.path.basename(progexe), line, re.IGNORECASE):
+        # inject files after the progexe binary.
+        # Match the basename only to avoid path mismatches.
+        if re.match(r'^\s*File\s*.*' + os.path.basename(progexe["win32"]), \
+                    line, re.IGNORECASE):
             for f in filelist:
-                injection = "    File /oname=$INSTDIR\\" + os.path.basename(f) + " " + os.path.normcase(f) + "\n"
+                injection = "    File /oname=$INSTDIR\\" + os.path.basename(f) \
+                             + " " + os.path.normcase(f) + "\n"
                 output.write(injection)
             output.write("    ; end of injected files\n")
     output.close()
 
 
-def finddlls(program, extrapaths = []):
+def finddlls(program, extrapaths=[], cross=""):
     '''Check program for required DLLs. Find all required DLLs except ignored
        ones and return a list of DLL filenames (including path).'''
     # ask objdump about dependencies.
-    output = subprocess.Popen(["objdump", "-x", program], stdout=subprocess.PIPE)
+    output = subprocess.Popen([cross + "objdump", "-x", program], \
+                              stdout=subprocess.PIPE)
     cmdout = output.communicate()
 
     # create list of used DLLs. Store as lower case as W32 is case-insensitive.
@@ -342,20 +341,20 @@ def finddlls(program, extrapaths = []):
         for path in extrapaths:
             if os.path.exists(path + "/" + file):
                 dllpath = re.sub(r"\\", r"/", path + "/" + file)
-		print file + ": found at " + dllpath
+                print file + ": found at " + dllpath
                 dllpaths.append(dllpath)
                 break
         if dllpath == "":
             try:
                 dllpath = re.sub(r"\\", r"/", which.which(file))
-		print file + ": found at " + dllpath
-		dllpaths.append(dllpath)
+                print file + ": found at " + dllpath
+                dllpaths.append(dllpath)
             except:
                 print file + ": NOT FOUND."
     return dllpaths
 
 
-def zipball(versionstring, buildfolder):
+def zipball(versionstring, buildfolder, platform=sys.platform):
     '''package created binary'''
     print "Creating binary zipball."
     archivebase = program + "-" + versionstring
@@ -364,6 +363,7 @@ def zipball(versionstring, buildfolder):
     # create output folder
     os.mkdir(outfolder)
     # move program files to output folder
+    programfiles.append(progexe[platform])
     for f in programfiles:
         if re.match(r'^(/|[a-zA-Z]:)', f) != None:
             shutil.copy(f, outfolder)
@@ -373,12 +373,12 @@ def zipball(versionstring, buildfolder):
     zf = zipfile.ZipFile(archivename, mode='w', compression=zipfile.ZIP_DEFLATED)
     for root, dirs, files in os.walk(outfolder):
         for name in files:
-            physname = os.path.join(root, name)
-            filename = re.sub("^" + buildfolder, "", physname)
+            physname = os.path.normpath(os.path.join(root, name))
+            filename = string.replace(physname, os.path.normpath(buildfolder), "")
             zf.write(physname, filename)
         for name in dirs:
-            physname = os.path.join(root, name)
-            filename = re.sub("^" + buildfolder, "", physname)
+            physname = os.path.normpath(os.path.join(root, name))
+            filename = string.replace(physname, os.path.normpath(buildfolder), "")
             zf.write(physname, filename)
     zf.close()
     # remove output folder
@@ -406,10 +406,10 @@ def tarball(versionstring, buildfolder):
     return archivename
 
 
-def macdeploy(versionstring, buildfolder):
+def macdeploy(versionstring, buildfolder, platform=sys.platform):
     '''package created binary to dmg'''
     dmgfile = program + "-" + versionstring + ".dmg"
-    appbundle = buildfolder + "/" + progexe
+    appbundle = buildfolder + "/" + progexe[platform]
 
     # workaround to Qt issues when building out-of-tree. Copy files into bundle.
     sourcebase = buildfolder + re.sub('[^/]+.pro$', '', project) + "/"
@@ -418,7 +418,8 @@ def macdeploy(versionstring, buildfolder):
         shutil.copy(sourcebase + src, appbundle + "/" + bundlecopy[src])
     # end of Qt workaround
 
-    output = subprocess.Popen(["macdeployqt", progexe, "-dmg"], stdout=subprocess.PIPE, cwd=buildfolder)
+    output = subprocess.Popen(["macdeployqt", progexe[platform], "-dmg"], \
+                              stdout=subprocess.PIPE, cwd=buildfolder)
     output.communicate()
     if not output.returncode == 0:
         print "macdeployqt failed!"
@@ -426,6 +427,7 @@ def macdeploy(versionstring, buildfolder):
     # copy dmg to output folder
     shutil.copy(buildfolder + "/" + program + ".dmg", dmgfile)
     return dmgfile
+
 
 def filehashes(filename):
     '''Calculate md5 and sha1 hashes for a given file.'''
@@ -468,8 +470,9 @@ def deploy():
     startup = time.time()
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:n:sbdkh",
-            ["qmake=", "project=", "tag=", "add=", "makensis=", "source-only", "binary-only", "dynamic", "keep-temp", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "q:p:t:a:n:sbdkx:h",
+            ["qmake=", "project=", "tag=", "add=", "makensis=", "source-only",
+             "binary-only", "dynamic", "keep-temp", "cross=", "help"])
     except getopt.GetoptError, err:
         print str(err)
         usage(sys.argv[0])
@@ -484,6 +487,8 @@ def deploy():
     source = True
     keeptemp = False
     makensis = ""
+    cross = ""
+    platform = sys.platform
     if sys.platform != "darwin":
         static = True
     else:
@@ -509,6 +514,9 @@ def deploy():
             static = False
         if o in ("-k", "--keep-temp"):
             keeptemp = True
+        if o in ("-x", "--cross") and sys.platform != "win32":
+            cross = a
+            platform = "win32"
         if o in ("-h", "--help"):
             usage(sys.argv[0])
             sys.exit(0)
@@ -517,9 +525,10 @@ def deploy():
         print "Building build neither source nor binary means nothing to do. Exiting."
         sys.exit(1)
 
+    print "Building " + progexe[platform] + " for " + platform
     # search for qmake
     if qt == "":
-        qm = findqt()
+        qm = findqt(cross)
     else:
         qm = checkqt(qt)
     if qm == "":
@@ -581,28 +590,30 @@ def deploy():
     print len(header) * "="
 
     # build it.
-    if not qmake(qm, proj, sourcefolder, static) == 0:
+    if not qmake(qm, proj, platform, sourcefolder, static, cross) == 0:
         tempclean(workfolder, cleanup and not keeptemp)
         sys.exit(1)
-    if not build(sourcefolder) == 0:
+    if not build(sourcefolder, platform, cross) == 0:
         tempclean(workfolder, cleanup and not keeptemp)
         sys.exit(1)
     buildtime = time.time() - buildstart
-    if sys.platform == "win32":
+    if platform == "win32":
         if useupx == True:
-            if not upxfile(sourcefolder) == 0:
+            if not upxfile(sourcefolder, platform) == 0:
                 tempclean(workfolder, cleanup and not keeptemp)
                 sys.exit(1)
-        dllfiles = finddlls(sourcefolder + "/" + progexe, [os.path.dirname(qm)])
+        dllfiles = finddlls(sourcefolder + "/" + progexe[platform], \
+                            [os.path.dirname(qm)], cross)
         if dllfiles.count > 0:
             programfiles.extend(dllfiles)
-        archive = zipball(ver, sourcefolder)
+        archive = zipball(ver, sourcefolder, platform)
         # only when running native right now.
         if nsisscript != "" and makensis != "":
-            nsisfileinject(sourcefolder + "/" + nsisscript, sourcefolder + "/" + nsisscript + ".tmp", dllfiles)
+            nsisfileinject(sourcefolder + "/" + nsisscript, sourcefolder \
+                           + "/" + nsisscript + ".tmp", dllfiles)
             runnsis(ver, makensis, nsisscript + ".tmp", sourcefolder)
-    elif sys.platform == "darwin":
-        archive = macdeploy(ver, sourcefolder)
+    elif platform == "darwin":
+        archive = macdeploy(ver, sourcefolder, platform)
     else:
         if os.uname()[4].endswith("64"):
             ver += "-64bit"
@@ -627,5 +638,5 @@ def deploy():
 
 
 if __name__ == "__main__":
-    deploy()
-
+    print "You cannot run this module directly!"
+    print "Set required environment and call deploy()."
