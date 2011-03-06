@@ -335,7 +335,7 @@ def finddlls(program, extrapaths=[], cross=""):
     dllpaths = []
     for file in dlls:
         if file in systemdlls:
-            print file + ": System DLL"
+            print "System DLL:  " + file
             continue
         dllpath = ""
         for path in extrapaths:
@@ -350,11 +350,11 @@ def finddlls(program, extrapaths=[], cross=""):
                 print file + ": found at " + dllpath
                 dllpaths.append(dllpath)
             except:
-                print file + ": NOT FOUND."
+                print "MISSING DLL: " + file
     return dllpaths
 
 
-def zipball(versionstring, buildfolder, platform=sys.platform):
+def zipball(programfiles, versionstring, buildfolder, platform=sys.platform):
     '''package created binary'''
     print "Creating binary zipball."
     archivebase = program + "-" + versionstring
@@ -363,7 +363,6 @@ def zipball(versionstring, buildfolder, platform=sys.platform):
     # create output folder
     os.mkdir(outfolder)
     # move program files to output folder
-    programfiles.append(progexe[platform])
     for f in programfiles:
         if re.match(r'^(/|[a-zA-Z]:)', f) != None:
             shutil.copy(f, outfolder)
@@ -386,7 +385,7 @@ def zipball(versionstring, buildfolder, platform=sys.platform):
     return archivename
 
 
-def tarball(versionstring, buildfolder):
+def tarball(programfiles, versionstring, buildfolder):
     '''package created binary'''
     print "Creating binary tarball."
     archivebase = program + "-" + versionstring
@@ -597,6 +596,8 @@ def deploy():
         tempclean(workfolder, cleanup and not keeptemp)
         sys.exit(1)
     buildtime = time.time() - buildstart
+    progfiles = programfiles
+    progfiles.append(progexe[platform])
     if platform == "win32":
         if useupx == True:
             if not upxfile(sourcefolder, platform) == 0:
@@ -605,8 +606,8 @@ def deploy():
         dllfiles = finddlls(sourcefolder + "/" + progexe[platform], \
                             [os.path.dirname(qm)], cross)
         if dllfiles.count > 0:
-            programfiles.extend(dllfiles)
-        archive = zipball(ver, sourcefolder, platform)
+            progfiles.extend(dllfiles)
+        archive = zipball(progfiles, ver, sourcefolder, platform)
         # only when running native right now.
         if nsisscript != "" and makensis != "":
             nsisfileinject(sourcefolder + "/" + nsisscript, sourcefolder \
@@ -617,7 +618,7 @@ def deploy():
     else:
         if os.uname()[4].endswith("64"):
             ver += "-64bit"
-        archive = tarball(ver, sourcefolder)
+        archive = tarball(progfiles, ver, sourcefolder)
 
     # remove temporary files
     tempclean(workfolder, cleanup)
