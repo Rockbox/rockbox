@@ -116,7 +116,6 @@ static volatile bool paused SHAREDBSS_ATTR = false; /* Is audio paused? (A/C-) *
 
 /* Ring buffer where compressed audio and codecs are loaded */
 static unsigned char *filebuf = NULL;       /* Start of buffer (A/C-) */
-static unsigned char *malloc_buf = NULL;    /* Start of malloc buffer (A/C-) */
 static size_t filebuflen = 0;               /* Size of buffer (A/C-) */
 /* FIXME: make buf_ridx (C/A-) */
 
@@ -2014,26 +2013,21 @@ static void audio_reset_buffer(void)
        as it will likely be affected and need sliding over */
 
     /* Initially set up file buffer as all space available */
-    malloc_buf = audiobuf + talk_get_bufsize();
+    filebuf = audiobuf + talk_get_bufsize();
+    filebuflen = audiobufend - filebuf;
 
-    /* Align the malloc buf to line size.
-     * Especially important to cf targets that do line reads/writes.
-     * Also for targets which need aligned DMA storage buffers */
-    malloc_buf = (unsigned char *)(((uintptr_t)malloc_buf + (CACHEALIGN_SIZE - 1)) & ~(CACHEALIGN_SIZE - 1));
-    filebuf    = malloc_buf; /* filebuf line align implied */
-    filebuflen = (audiobufend - filebuf) & ~(CACHEALIGN_SIZE - 1);
+    ALIGN_BUFFER(filebuf, filebuflen, sizeof (intptr_t));
 
     /* Subtract whatever the pcm buffer says it used plus the guard buffer */
-    const size_t pcmbuf_size = pcmbuf_init(filebuf + filebuflen) +GUARD_BUFSIZE;
+    size_t pcmbuf_size = pcmbuf_init(filebuf + filebuflen) + GUARD_BUFSIZE;
+
+    /* Make sure filebuflen is a pointer sized multiple after adjustment */
+    pcmbuf_size = ALIGN_UP(pcmbuf_size, sizeof (intptr_t));
+
     if(pcmbuf_size > filebuflen)
         panicf("%s(): EOM (%zu > %zu)", __func__, pcmbuf_size, filebuflen);
 
     filebuflen -= pcmbuf_size;
-
-    /* Make sure filebuflen is a longword multiple after adjustment - filebuf
-       will already be line aligned */
-    filebuflen &= ~3;
-
     buffering_reset(filebuf, filebuflen);
 
     /* Clear any references to the file buffer */
@@ -2046,7 +2040,6 @@ static void audio_reset_buffer(void)
     {
         size_t pcmbufsize;
         const unsigned char *pcmbuf = pcmbuf_get_meminfo(&pcmbufsize);
-        logf("mabuf:  %08X", (unsigned)malloc_buf);
         logf("fbuf:   %08X", (unsigned)filebuf);
         logf("fbufe:  %08X", (unsigned)(filebuf + filebuflen));
         logf("gbuf:   %08X", (unsigned)(filebuf + filebuflen));

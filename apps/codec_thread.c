@@ -193,10 +193,15 @@ void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
 
 static void* codec_get_buffer(size_t *size)
 {
-    if (codec_size >= CODEC_SIZE)
+    ssize_t s = CODEC_SIZE - codec_size;
+    void *buf = &codecbuf[codec_size];
+    ALIGN_BUFFER(buf, s, CACHEALIGN_SIZE);
+
+    if (s <= 0)
         return NULL;
-    *size = CODEC_SIZE - codec_size;
-    return &codecbuf[codec_size];
+
+    *size = s;
+    return buf;
 }
 
 static void codec_pcmbuf_insert_callback(
