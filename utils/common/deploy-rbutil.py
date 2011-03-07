@@ -50,19 +50,19 @@ deploy.bundlecopy = {
 deploy.progexe = {
     "win32"    : "release/RockboxUtility.exe",
     "darwin"   : "RockboxUtility.app",
-    "linux"    : "RockboxUtility"
+    "linux2"   : "RockboxUtility"
 }
 # OS X 10.6 defaults to gcc 4.2. Building universal binaries that are
 # compatible with 10.4 requires using gcc-4.0.
 deploy.qmakespec = {
     "win32"    : "",
     "darwin"   : "macx-g++40",
-    "linux"    : ""
+    "linux2"   : ""
 }
 deploy.make = {
     "win32"    : "mingw32-make",
     "darwin"   : "make",
-    "linux"    : "make"
+    "linux2"   : "make"
 }
 
 # all files of the program. Will get put into an archive after building
