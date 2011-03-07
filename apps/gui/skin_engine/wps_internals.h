@@ -368,7 +368,9 @@ enum skin_find_what {
 	SKIN_FIND_VP = 0,
 	SKIN_FIND_UIVP,
 	SKIN_FIND_IMAGE,
-	SKIN_FIND_TOUCHREGION
+#ifdef HAVE_TOUCHSCREEN
+	SKIN_FIND_TOUCHREGION,
+#endif
 };
 void *skin_find_item(const char *label, enum skin_find_what what,
 					 struct wps_data *data);

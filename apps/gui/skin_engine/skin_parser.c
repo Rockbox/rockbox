@@ -117,6 +117,68 @@ static void add_to_ll_chain(struct skin_token_list **list, struct skin_token_lis
 
 #endif
 
+
+void *skin_find_item(const char *label, enum skin_find_what what,
+					 struct wps_data *data)
+{
+    const char *itemlabel = NULL;
+    union {
+        struct skin_token_list *linkedlist;
+        struct skin_element *vplist;
+    } list;
+    bool isvplist = false;
+    void *ret = NULL;
+    switch (what)
+    {
+        case SKIN_FIND_UIVP:
+        case SKIN_FIND_VP:
+            list.vplist = data->tree;
+            isvplist = true;
+        break;
+        case SKIN_FIND_IMAGE:
+            list.linkedlist = data->images;
+        break;
+#ifdef HAVE_TOUCHSCREEN
+        case SKIN_FIND_TOUCHREGION:
+            list.linkedlist = data->touchregions;
+        break;
+#endif
+    }
+        
+    while (list.linkedlist)
+    {
+        bool skip = false;
+        switch (what)
+        {
+            case SKIN_FIND_UIVP:
+            case SKIN_FIND_VP:
+                ret = list.vplist->data;
+                itemlabel = ((struct skin_viewport *)ret)->label;
+                skip = !(((struct skin_viewport *)ret)->is_infovp == 
+                    (what==SKIN_FIND_UIVP));
+                break;
+            case SKIN_FIND_IMAGE:
+                ret = list.linkedlist->token->value.data;
+                itemlabel = ((struct gui_img *)ret)->label;
+                break;
+#ifdef HAVE_TOUCHSCREEN
+            case SKIN_FIND_TOUCHREGION:
+                ret = list.linkedlist->token->value.data;
+                itemlabel = ((struct touchregion *)ret)->label;
+                break;
+#endif
+        }
+        if (!skip && itemlabel && !strcmp(itemlabel, label))
+            return ret;
+        
+        if (isvplist)
+            list.vplist = list.vplist->next;
+        else
+            list.linkedlist = list.linkedlist->next;
+    }
+    return NULL;
+}
+
 #ifdef HAVE_LCD_BITMAP
 
 /* create and init a new wpsll item.
