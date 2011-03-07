@@ -156,7 +156,7 @@ static char *get_token_desc(struct wps_token *token, char *buf,
         {
             char subimage = '\0';
             char label = token->value.i&0xFF;
-            struct gui_img *img = find_image(label, data);
+            struct gui_img *img = skin_find_item(label, SKIN_FIND_IMAGE, data);
             if (img && img->num_subimages > 1)
             {
                 int item = token->value.i>>8;

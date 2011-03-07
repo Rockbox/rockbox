@@ -87,7 +87,7 @@ int sb_postproccess(enum screen_type screen, struct wps_data *data)
         /* hide the sb's default viewport because it has nasty effect with stuff
         * not part of the statusbar,
         * hence .sbs's without any other vps are unsupported*/
-        struct skin_viewport *vp = find_viewport(VP_DEFAULT_LABEL, false, data);
+        struct skin_viewport *vp = skin_find_item(VP_DEFAULT_LABEL, SKIN_FIND_VP, data);
         struct skin_element *next_vp = data->tree->next;
         
         if (vp)
@@ -115,6 +115,7 @@ void sb_set_info_vp(enum screen_type screen, char *label)
 struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 {
     struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
+    struct skin_viewport *vp = NULL;
     if (oldinfovp_label[screen] &&
         strcmp(oldinfovp_label[screen], infovp_label[screen]))
     {
@@ -122,8 +123,9 @@ struct viewport *sb_skin_get_info_vp(enum screen_type screen)
         oldinfovp_label[screen] = infovp_label[screen];
         viewportmanager_theme_enable(screen, false, NULL);
         viewportmanager_theme_undo(screen, true);
-    }        
-    return &find_viewport(infovp_label[screen], true, data)->vp;
+    }
+    vp = skin_find_item(infovp_label[screen], SKIN_FIND_UIVP, data);
+    return &vp->vp;
 }
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)

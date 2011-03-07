@@ -115,36 +115,7 @@ static void add_to_ll_chain(struct skin_token_list **list, struct skin_token_lis
     }
 }
 
-/* traverse the image linked-list for an image */
-struct gui_img* find_image(const char *label, struct wps_data *data)
-{
-    struct skin_token_list *list = data->images;
-    while (list)
-    {
-        struct gui_img *img = (struct gui_img *)list->token->value.data;
-        if (!strcmp(img->label,label))
-            return img;
-        list = list->next;
-    }
-    return NULL;
-}
-
 #endif
-
-/* traverse the viewport linked list for a viewport */
-struct skin_viewport* find_viewport(const char *label, bool uivp, struct wps_data *data)
-{
-    struct skin_element *list = data->tree;
-    while (list)
-    {
-        struct skin_viewport *vp = (struct skin_viewport *)list->data;
-        if (vp->label && (vp->is_infovp == uivp) &&
-            !strcmp(vp->label, label))
-            return vp;
-        list = list->next;
-    }
-    return NULL;
-}
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -240,7 +211,7 @@ static int parse_image_display(struct skin_element *element,
         label[1] = '\0';
     }
     /* sanity check */
-    img = find_image(label, wps_data);
+    img = skin_find_item(label, SKIN_FIND_IMAGE, wps_data);
     if (!img || !id)
     {
         return WPS_ERROR_INVALID_PARAM;
@@ -298,7 +269,7 @@ static int parse_image_load(struct skin_element *element,
     y = element->params[3].data.number;
 
     /* check the image number and load state */
-    if(find_image(id, wps_data))
+    if(skin_find_item(id, SKIN_FIND_IMAGE, wps_data))
     {
         /* Invalid image ID */
         return WPS_ERROR_INVALID_PARAM;
@@ -680,7 +651,8 @@ static int parse_progressbar_tag(struct skin_element* element,
             {
                 curr_param++;
                 param++;
-                pb->slider = find_image(param->data.text, wps_data);
+                pb->slider = skin_find_item(param->data.text, 
+											SKIN_FIND_IMAGE, wps_data);
             }
             else /* option needs the next param */
                 return -1;
@@ -703,7 +675,8 @@ static int parse_progressbar_tag(struct skin_element* element,
             {
                 curr_param++;
                 param++;
-                pb->backdrop = find_image(param->data.text, wps_data);
+                pb->backdrop = skin_find_item(param->data.text, 
+											  SKIN_FIND_IMAGE, wps_data);
                 
             }
             else /* option needs the next param */
@@ -725,7 +698,7 @@ static int parse_progressbar_tag(struct skin_element* element,
 
     if (image_filename)
     {
-        pb->image = find_image(image_filename, wps_data);
+        pb->image = skin_find_item(image_filename, SKIN_FIND_IMAGE, wps_data);
         if (!pb->image) /* load later */
         {           
             struct gui_img* img = (struct gui_img*)skin_buffer_alloc(sizeof(struct gui_img));
@@ -878,21 +851,6 @@ static int parse_albumart_load(struct skin_element* element,
 #endif /* HAVE_ALBUMART */
 
 #ifdef HAVE_TOUCHSCREEN
-struct touchregion* find_touchregion(const char *label, 
-                                       struct wps_data *data)
-{
-    struct skin_token_list *list = data->touchregions;
-    while (list)
-    {
-        struct touchregion *tr = 
-            (struct touchregion *)list->token->value.data;
-        if (tr->label && !strcmp(tr->label, label))
-            return tr;
-        list = list->next;
-    }
-    return NULL;
-}
-
 static int parse_lasttouch(struct skin_element *element,
                            struct wps_token *token,
                            struct wps_data *wps_data)
@@ -909,8 +867,8 @@ static int parse_lasttouch(struct skin_element *element,
     for (i=0; i<element->params_count; i++)
     {
         if (element->params[i].type == STRING)
-            data->region = find_touchregion(
-                                element->params[i].data.text, wps_data);
+            data->region = skin_find_item(element->params[i].data.text,
+										  SKIN_FIND_TOUCHREGION, wps_data);
         else if (element->params[i].type == INTEGER)
             data->timeout = element->params[i].data.number;
     }

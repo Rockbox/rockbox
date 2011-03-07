@@ -163,7 +163,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         {
             struct image_display *id = token->value.data;
             const char* label = id->label;
-            struct gui_img *img = find_image(label, data);
+            struct gui_img *img = skin_find_item(label,SKIN_FIND_IMAGE, data);
             if (img && img->loaded)
             {
                 if (id->token == NULL)
@@ -281,7 +281,8 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
             if (token->type == SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY)
             {
                 struct image_display *id = token->value.data;
-                struct gui_img *img = find_image(id->label, data);
+                struct gui_img *img = skin_find_item(id->label, 
+                                                     SKIN_FIND_IMAGE, data);
                 clear_image_pos(gwps, img);
             }
             else if (token->type == SKIN_TOKEN_PEAKMETER)

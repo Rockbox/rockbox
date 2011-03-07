@@ -628,8 +628,8 @@ static void gwps_enter_wps(void)
 #if LCD_DEPTH > 1
         if (display->depth > 1)
         {
-            struct skin_viewport *svp = find_viewport(VP_DEFAULT_LABEL, 
-                                                      false, gwps->data);
+            struct skin_viewport *svp = skin_find_item(VP_DEFAULT_LABEL, 
+                                                       SKIN_FIND_VP, gwps->data);
             if (svp)
             {
                 struct viewport *vp = &svp->vp;

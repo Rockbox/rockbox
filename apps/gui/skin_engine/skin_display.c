@@ -100,8 +100,9 @@ void skin_statusbar_changed(struct gui_wps *skin)
     struct wps_data *data = skin->data;
     const struct screen *display = skin->display;
     const int   screen = display->screen_type;
+    struct skin_viewport *svp = skin_find_item(VP_DEFAULT_LABEL, SKIN_FIND_VP, data);
 
-    struct viewport *vp = &find_viewport(VP_DEFAULT_LABEL, false, data)->vp;
+    struct viewport *vp = &svp->vp;
     viewport_set_defaults(vp, screen);
 
     if (data->wps_sb_tag)
