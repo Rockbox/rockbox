@@ -125,7 +125,7 @@ void *skin_find_item(const char *label, enum skin_find_what what,
     union {
         struct skin_token_list *linkedlist;
         struct skin_element *vplist;
-    } list;
+    } list = {NULL};
     bool isvplist = false;
     void *ret = NULL;
     switch (what)
@@ -135,9 +135,11 @@ void *skin_find_item(const char *label, enum skin_find_what what,
             list.vplist = data->tree;
             isvplist = true;
         break;
+#ifdef HAVE_LCD_BITMAP
         case SKIN_FIND_IMAGE:
             list.linkedlist = data->images;
         break;
+#endif
 #ifdef HAVE_TOUCHSCREEN
         case SKIN_FIND_TOUCHREGION:
             list.linkedlist = data->touchregions;
@@ -157,10 +159,12 @@ void *skin_find_item(const char *label, enum skin_find_what what,
                 skip = !(((struct skin_viewport *)ret)->is_infovp == 
                     (what==SKIN_FIND_UIVP));
                 break;
+#ifdef HAVE_LCD_BITMAP
             case SKIN_FIND_IMAGE:
                 ret = list.linkedlist->token->value.data;
                 itemlabel = ((struct gui_img *)ret)->label;
                 break;
+#endif
 #ifdef HAVE_TOUCHSCREEN
             case SKIN_FIND_TOUCHREGION:
                 ret = list.linkedlist->token->value.data;

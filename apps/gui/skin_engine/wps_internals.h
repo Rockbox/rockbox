@@ -367,7 +367,9 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 enum skin_find_what {
 	SKIN_FIND_VP = 0,
 	SKIN_FIND_UIVP,
+#ifdef HAVE_LCD_BITMAP
 	SKIN_FIND_IMAGE,
+#endif
 #ifdef HAVE_TOUCHSCREEN
 	SKIN_FIND_TOUCHREGION,
 #endif
