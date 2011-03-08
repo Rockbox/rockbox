@@ -200,13 +200,3 @@ bool battery_level_safe(void)
 {
     return battery_level() >= 5;
 }
-
-/** Rockbox stubs */
-void set_poweroff_timeout(int timeout)
-{
-    (void)timeout;
-}
-
-void reset_poweroff_timer(void)
-{
-}

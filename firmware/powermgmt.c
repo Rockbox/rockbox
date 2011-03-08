@@ -81,9 +81,9 @@ enum charge_state_type charge_state = DISCHARGING;
 
 static int shutdown_timeout = 0;
 
-static void handle_auto_poweroff(void);
+void handle_auto_poweroff(void);
 static int poweroff_timeout = 0;
-static long last_event_tick;
+static long last_event_tick = 0;
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 /*
@@ -132,11 +132,6 @@ void battery_read_info(int *voltage, int *level)
 
     if (level)
         *level = voltage_to_battery_level(millivolts);
-}
-
-void reset_poweroff_timer(void)
-{
-    last_event_tick = current_tick;
 }
 
 #if BATTERY_TYPES_COUNT > 1
@@ -202,11 +197,6 @@ bool battery_level_safe(void)
 #else
     return battery_millivolts > battery_level_dangerous[battery_type];
 #endif
-}
-
-void set_poweroff_timeout(int timeout)
-{
-    poweroff_timeout = timeout;
 }
 
 /* look into the percent_to_volt_* table and get a realistic battery level */
@@ -712,6 +702,16 @@ void shutdown_hw(void)
 }
 #endif /* PLATFORM_NATIVE */
 
+void set_poweroff_timeout(int timeout)
+{
+    poweroff_timeout = timeout;
+}
+
+void reset_poweroff_timer(void)
+{
+    last_event_tick = current_tick;
+}
+
 void sys_poweroff(void)
 {
 #ifndef BOOTLOADER
@@ -790,7 +790,7 @@ int get_sleep_timer(void)
         return 0;
 }
 
-void handle_sleep_timer(void)
+static void handle_sleep_timer(void)
 {
     if (!sleeptimer_active)
       return;
@@ -817,7 +817,6 @@ void handle_sleep_timer(void)
     }
 }
 
-
 /*
  * We shut off in the following cases:
  * 1) The unit is idle, not playing music
@@ -830,7 +829,7 @@ void handle_sleep_timer(void)
  * 3) We are recording, or recording with pause
  * 4) The radio is playing
  */
-static void handle_auto_poweroff(void)
+void handle_auto_poweroff(void)
 {
     long timeout = poweroff_timeout*60*HZ;
     int audio_stat = audio_status();
@@ -846,7 +845,7 @@ static void handle_auto_poweroff(void)
     }
 #endif
 
-#ifndef APPLICATION
+#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
     if (!shutdown_timeout && query_force_shutdown()) {
         backlight_on();
         sys_poweroff();
@@ -863,7 +862,7 @@ static void handle_auto_poweroff(void)
           !sleeptimer_active))) {
 
         if (TIME_AFTER(tick, last_event_tick + timeout)
-#ifndef APPLICATION
+#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
             && TIME_AFTER(tick, storage_last_disk_activity() + timeout)
 #endif
         ) {

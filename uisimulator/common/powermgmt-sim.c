@@ -118,11 +118,6 @@ bool battery_level_safe(void)
     return battery_level() >= 10;
 }
 
-void set_poweroff_timeout(int timeout)
-{
-    (void)timeout;
-}
-
 void set_battery_capacity(int capacity)
 {
   (void)capacity;
@@ -148,7 +143,3 @@ void lineout_set(bool enable)
     (void)enable;
 }
 #endif
-
-void reset_poweroff_timer(void)
-{
-}

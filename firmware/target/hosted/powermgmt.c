@@ -44,7 +44,7 @@ static void power_thread(void)
         /* Sleep two seconds */
         sleep(HZ*2);
 
-        handle_sleep_timer();
+        handle_auto_poweroff();
     }
 } /* power_thread */
 

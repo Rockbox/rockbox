@@ -58,10 +58,6 @@ int battery_time(void)
     return 0;
 }
 
-/* could be useful to stop the service after some time of inactivity */
-void reset_poweroff_timer(void) {}
-void set_poweroff_timeout(int timeout) { (void)timeout; };
-
 /* should always be safe on android targets, the host shuts us down before */
 bool battery_level_safe(void)
 {
