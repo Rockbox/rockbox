@@ -234,10 +234,6 @@ void storage_spindown(int s)
     storage_spinning = false;
 }
 
-void rtc_init(void)
-{
-}
-
 int rtc_read(int address)
 {
     return address ^ 0x55;
@@ -247,20 +243,6 @@ int rtc_write(int address, int value)
 {
     (void)address;
     (void)value;
-    return 0;
-}
-
-int rtc_read_datetime(struct tm *tm)
-{
-    time_t now = time(NULL);
-    *tm = *localtime(&now);
-
-    return 0;
-}
-
-int rtc_write_datetime(const struct tm *tm)
-{
-    (void)tm;
     return 0;
 }
 

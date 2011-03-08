@@ -49,6 +49,9 @@
 /* define this if you have RTC RAM available for settings */
 //#define HAVE_RTC_RAM
 
+/* define this if you have a real-time clock */
+#define CONFIG_RTC APPLICATION
+
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x100000
 
