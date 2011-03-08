@@ -7,7 +7,6 @@
 Version:   r%{svn_revision}
 %else
 # Normal rockbox release
-%define    major_version 3.8
 Version:   3.8
 %endif
 
@@ -22,7 +21,7 @@ Buildroot: %{_tmppath}/%{name}-%{version}-root
 Requires:  SDL
 BuildRequires: SDL-devel
 # Note: rpm doesn't support 7z. You need to repack as .tar.bz2
-# Source:    http://download.rockbox.org/release/%{major_version}/%{name}-%{version}.7z
+# Source:    http://download.rockbox.org/release/%{version}/%{name}-%{version}.7z
 Source:    %{name}-%{version}.tar.bz2
 Prefix:    /opt/rockbox
 
