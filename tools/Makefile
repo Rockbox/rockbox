@@ -49,7 +49,7 @@ mkboot:	mkboot.c
 
 mk500boot: mk500boot.c mr500.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
-	
+
 mkzenboot.o: mkzenboot.c
 	$(SILENT)$(CC) $(CFLAGS) -DSTANDALONE -c -o $@ $+
 
