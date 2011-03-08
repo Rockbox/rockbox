@@ -289,7 +289,8 @@ RBScene* ParseTreeModel::render(ProjectModel* project,
     /* Setting themebase if it can't be derived from the project */
     if(settings.value("themebase", "") == "" && file && QFile::exists(*file))
     {
-        QDir base(*file);
+        QFileInfo wpsfile(*file);
+        QDir base(wpsfile.canonicalPath());
         base.cdUp();
         settings.insert("themebase", base.canonicalPath());
     }
