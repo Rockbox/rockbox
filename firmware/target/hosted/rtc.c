@@ -36,5 +36,5 @@ int rtc_read_datetime(struct tm *tm)
 int rtc_write_datetime(const struct tm *tm)
 {
     (void)tm;
-    return 0;
+    return -1;
 }

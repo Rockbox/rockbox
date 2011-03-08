@@ -99,7 +99,7 @@ int set_time(const struct tm *tm)
     }
 #else /* No RTC */
     (void)tm;
-    return 0;
+    return -1;
 #endif /* RTC */
 }
 
