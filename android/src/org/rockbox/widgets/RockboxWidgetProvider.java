@@ -117,8 +117,8 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         if (state.enablePrev)
         {
             views.setOnClickPendingIntent(R.id.prev, 
-                    RockboxMediaIntent.newPendingIntent(context, 
-                                           KeyEvent.KEYCODE_MEDIA_PREVIOUS));
+                                          newPendingIntent(context,
+                                            KeyEvent.KEYCODE_MEDIA_PREVIOUS));
         }
         else
             views.setViewVisibility(R.id.prev, View.GONE);
@@ -127,8 +127,8 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         if (state.enablePlayPause)
         {
             views.setOnClickPendingIntent(R.id.playPause, 
-                    RockboxMediaIntent.newPendingIntent(context, 
-                                           KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
+                                          newPendingIntent(context,
+                                            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
         }
         else
             views.setViewVisibility(R.id.playPause, View.GONE);
@@ -137,8 +137,8 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         if (state.enableNext)
         {
             views.setOnClickPendingIntent(R.id.next, 
-                    RockboxMediaIntent.newPendingIntent(context, 
-                                           KeyEvent.KEYCODE_MEDIA_NEXT));
+                                          newPendingIntent(context,
+                                            KeyEvent.KEYCODE_MEDIA_NEXT));
         }
         else
             views.setViewVisibility(R.id.next, View.GONE);
@@ -147,8 +147,8 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         if (state.enableStop)
         {
             views.setOnClickPendingIntent(R.id.stop, 
-                    RockboxMediaIntent.newPendingIntent(context, 
-                                           KeyEvent.KEYCODE_MEDIA_STOP));
+                                          newPendingIntent(context,
+                                            KeyEvent.KEYCODE_MEDIA_STOP));
         }
         else
             views.setViewVisibility(R.id.stop, View.GONE);
@@ -190,24 +190,18 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
      
-    private static class RockboxMediaIntent extends Intent
+    public static PendingIntent newPendingIntent(Context context, int keycode)
     {
-        private RockboxMediaIntent(Context c, int keycode)
-        {
-            super(ACTION_MEDIA_BUTTON, Uri.EMPTY, c, RockboxService.class);
-            putExtra(EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP,
-                    keycode));
-        }
-        
-        public static PendingIntent newPendingIntent(Context c, int keycode)
-        {
-            /* Use keycode as request to code to prevent successive 
-             * PendingIntents  from overwritting one another. 
-             * This seems hackish but at least it works.
-             * see: http://code.google.com/p/android/issues/detail?id=863
-             */
-            return PendingIntent.getService(c, keycode, new RockboxMediaIntent(c, keycode), 0);
-        }
+        /* Use keycode as request to code to prevent successive
+         * PendingIntents  from overwritting one another.
+         * This seems hackish but at least it works.
+         * see: http://code.google.com/p/android/issues/detail?id=863
+         */
+        Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON, Uri.EMPTY,
+                                   context, RockboxService.class);
+        intent.putExtra(Intent.EXTRA_KEY_EVENT,
+                        new KeyEvent(KeyEvent.ACTION_UP, keycode));
+        return PendingIntent.getService(context, keycode, intent, 0);
     }
 }
 

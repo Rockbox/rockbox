@@ -19,7 +19,12 @@
 			</intent-filter>
 		</activity>		
 
-		<service android:name=".RockboxService"/>
+		<service android:name=".RockboxService">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<action android:name="android.intent.action.MEDIA_BUTTON" />
+			</intent-filter>
+    </service>
 
 		<receiver android:name=".Helper.MediaButtonReceiver$MediaReceiver"
 			android:enabled="true"
