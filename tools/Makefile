@@ -16,7 +16,7 @@ CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf \
     telechips gigabeats creative hmac-sha1 rbspeexenc mkzenboot mk500boot convttf
 
 all: scramble descramble sh2d rdf2binary mkboot mkzenboot convbdf codepages \
-	uclpack rbspeexenc voicefont mk500boot convttf
+	uclpack rbspeexenc voicefont mk500boot
 
 scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o \
 	iaudio_bl_flash.o creative.o hmac-sha1.o
