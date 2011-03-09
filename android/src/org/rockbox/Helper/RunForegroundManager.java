@@ -23,6 +23,7 @@ public class RunForegroundManager
     private NotificationManager mNM;
     private IRunForeground api;
     private Service mCurrentService;
+    private Intent mWidgetUpdate;
 
     public RunForegroundManager(Service service)
     {
@@ -48,10 +49,12 @@ public class RunForegroundManager
             api = new oldForegroundApi();
         }
     }
+
     private void LOG(CharSequence text)
     {
         Log.d("Rockbox", (String)text);
     }
+
     private void LOG(CharSequence text, Throwable tr)
     {
         Log.d("Rockbox", (String)text, tr);
@@ -80,6 +83,7 @@ public class RunForegroundManager
          */
         mNM.cancel(R.string.notification);
         api.stopForeground();
+        mWidgetUpdate = null;
     }
 
     public void updateNotification(String title, String artist, String album, String albumart)
@@ -93,12 +97,18 @@ public class RunForegroundManager
             mNotification.tickerText = title+" - "+artist;
         mNM.notify(R.string.notification, mNotification);
 
-        Intent widgetUpdate = new Intent("org.rockbox.TrackUpdateInfo");
-        widgetUpdate.putExtra("title", title);
-        widgetUpdate.putExtra("artist", artist);
-        widgetUpdate.putExtra("album", album);
-        widgetUpdate.putExtra("albumart", albumart);
-        mCurrentService.sendBroadcast(widgetUpdate);
+        mWidgetUpdate = new Intent("org.rockbox.TrackUpdateInfo");
+        mWidgetUpdate.putExtra("title", title);
+        mWidgetUpdate.putExtra("artist", artist);
+        mWidgetUpdate.putExtra("album", album);
+        mWidgetUpdate.putExtra("albumart", albumart);
+        mCurrentService.sendBroadcast(mWidgetUpdate);
+    }
+
+    public void resendUpdateNotification()
+    {
+        if (mWidgetUpdate != null)
+            mCurrentService.sendBroadcast(mWidgetUpdate);
     }
 
     public void finishNotification()

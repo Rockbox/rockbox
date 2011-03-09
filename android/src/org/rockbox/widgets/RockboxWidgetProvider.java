@@ -45,6 +45,7 @@ public class RockboxWidgetProvider extends AppWidgetProvider
         super();
         mInstance = this;
     }
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
     {

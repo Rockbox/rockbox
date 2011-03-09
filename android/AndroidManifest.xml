@@ -23,6 +23,7 @@
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<action android:name="android.intent.action.MEDIA_BUTTON" />
+				<action android:name="org.rockbox.ResendTrackUpdateInfo" />
 			</intent-filter>
     </service>
 

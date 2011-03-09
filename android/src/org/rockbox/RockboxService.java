@@ -106,6 +106,14 @@ public class RockboxService extends Service
     private void do_start(Intent intent)
     {
         LOG("Start RockboxService (Intent: " + intent.getAction() + ")");
+
+        if (intent.getAction().equals("org.rockbox.ResendTrackUpdateInfo"))
+        {
+            if (rockbox_running)
+                fg_runner.resendUpdateNotification();
+            return;
+        }
+
         if (intent.hasExtra("callback"))
             resultReceiver = (ResultReceiver) intent.getParcelableExtra("callback");
 

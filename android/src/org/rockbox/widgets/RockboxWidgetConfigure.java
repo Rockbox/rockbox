@@ -22,16 +22,17 @@
 package org.rockbox.widgets;
 
 import org.rockbox.R;
+import org.rockbox.RockboxService;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
-
 
 public class RockboxWidgetConfigure extends Activity
 {
@@ -83,6 +84,11 @@ public class RockboxWidgetConfigure extends Activity
 
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             RockboxWidgetProvider.getInstance().updateAppWidget(context, appWidgetManager, mAppWidgetId, null);
+
+            /* Ask for track information so that new widgets display properly
+            * if rockbox was already playing */
+            context.startService(new Intent("org.rockbox.ResendTrackUpdateInfo",
+                                     Uri.EMPTY, context, RockboxService.class));
 
             Intent result = new Intent();
             result.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
