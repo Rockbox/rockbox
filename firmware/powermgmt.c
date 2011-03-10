@@ -47,9 +47,6 @@
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <time.h>
 #endif
-#ifndef BOOTLOADER
-#include "bookmark.h"
-#endif
 
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5)) && !defined (SIMULATOR)
 #include "lcd-remote-target.h"
@@ -803,10 +800,7 @@ static void handle_sleep_timer(void)
 #endif
         ) {
             DEBUGF("Sleep timer timeout. Stopping...\n");
-#ifndef BOOTLOADER
-            bookmark_autobookmark(false);
-#endif
-            audio_stop();
+            audio_pause();
             set_sleep_timer(0);
             backlight_off(); /* Nighty, nighty... */
         }
