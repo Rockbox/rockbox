@@ -76,6 +76,9 @@
 #define HAVE_MULTIMEDIA_KEYS
 #define CONFIG_KEYPAD ANDROID_PAD
 
+/* define this if the target has volume keys which can be used in the lists */
+#define HAVE_VOLUME_IN_LIST
+
 #define HAVE_SW_TONE_CONTROLS 
 
 /* Define current usage levels. */

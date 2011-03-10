@@ -39,6 +39,10 @@ int key_to_button(int keyboard_key)
             return BUTTON_MENU;
         case KEYCODE_DPAD_CENTER:
             return BUTTON_DPAD_CENTER;
+        case KEYCODE_VOLUME_UP:
+            return BUTTON_VOL_UP;
+        case KEYCODE_VOLUME_DOWN:
+            return BUTTON_VOL_DOWN;
         default:
             return BUTTON_NONE;
     }

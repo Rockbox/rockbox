@@ -40,6 +40,8 @@ void android_ignore_back_button(bool yes);
 #define BUTTON_DPAD_UP     0x00000010
 #define BUTTON_DPAD_DOWN   0x00000020
 #define BUTTON_DPAD_CENTER 0x00000040
+#define BUTTON_VOL_UP      0x00000080
+#define BUTTON_VOL_DOWN    0x00000100
 
 /* Compatibility hacks for flipping. Needs a somewhat better fix. */
 #define BUTTON_LEFT  BUTTON_DPAD_LEFT
