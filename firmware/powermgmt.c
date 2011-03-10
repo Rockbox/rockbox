@@ -789,6 +789,7 @@ int get_sleep_timer(void)
 
 static void handle_sleep_timer(void)
 {
+#ifndef BOOTLOADER
     if (!sleeptimer_active)
       return;
 
@@ -809,6 +810,7 @@ static void handle_sleep_timer(void)
             sys_poweroff();
         }
     }
+#endif /* BOOTLOADER */
 }
 
 /*
