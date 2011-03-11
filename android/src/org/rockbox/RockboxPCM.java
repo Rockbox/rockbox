@@ -23,6 +23,7 @@ package org.rockbox;
 
 import java.util.Arrays;
 
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -38,6 +39,7 @@ public class RockboxPCM extends AudioTrack
     private PCMListener l;
     private HandlerThread ht;
     private Handler h = null;
+    private static final int streamtype = AudioManager.STREAM_MUSIC;
     private static final int samplerate = 44100;
     /* should be CHANNEL_OUT_STEREO in 2.0 and above */
     private static final int channels = 
@@ -48,6 +50,11 @@ public class RockboxPCM extends AudioTrack
     private static final int buf_len  = 
             Math.max(24<<10, getMinBufferSize(samplerate, channels, encoding));
 
+    private AudioManager audiomanager;
+    private int maxstreamvolume;
+    private float minpcmvolume;
+    private float pcmrange;
+
     private void LOG(CharSequence text)
     {
         Log.d("Rockbox", (String) text);
@@ -55,7 +62,7 @@ public class RockboxPCM extends AudioTrack
 
     public RockboxPCM()
     {
-        super(AudioManager.STREAM_MUSIC, samplerate,  channels, encoding,
+        super(streamtype, samplerate,  channels, encoding,
                 buf_len, AudioTrack.MODE_STREAM);
         ht = new HandlerThread("audio thread", 
                 Process.THREAD_PRIORITY_URGENT_AUDIO);
@@ -63,6 +70,15 @@ public class RockboxPCM extends AudioTrack
         raw_data = new byte[buf_len]; /* in shorts */
         Arrays.fill(raw_data, (byte) 0);
         l = new PCMListener(buf_len);
+
+        /* find cleaner way to get context? */
+        final RockboxService rb = RockboxService.get_instance();
+        audiomanager =
+            (AudioManager) rb.getSystemService(Context.AUDIO_SERVICE);
+        maxstreamvolume = audiomanager.getStreamMaxVolume(streamtype);
+
+        minpcmvolume = getMinVolume();
+        pcmrange = getMaxVolume() - minpcmvolume;
     }    
 
     private int bytes2frames(int bytes) 
@@ -130,19 +146,26 @@ public class RockboxPCM extends AudioTrack
 
     private void set_volume(int volume)
     {
-        /* volume comes from 0..-990 from Rockbox */
-        /* TODO:
-         * volume is in dB, but this code acts as if it were in %,  convert? */
-        float fvolume;
-        /* special case min and max volume to not suffer from 
-         * floating point accuracy */
-        if (volume == 0)
-            fvolume = 1.0f;
-        else if (volume == -990)
-            fvolume = 0.0f;
-        else
-            fvolume = (volume + 990)/990.0f;
-        setStereoVolume(fvolume, fvolume);
+        /* Rockbox 'volume' is 0..-990 deci-dB attenuation.
+           Android streams have rather low resolution volume control,
+           typically 8 or 15 steps.
+           Therefore we use the pcm volume to add finer steps between
+           every android stream volume step.
+           It's not "real" dB, but it gives us 100 volume steps.
+        */
+
+        float fraction = 1 - (volume / -990.0f);
+        int streamvolume = (int)Math.ceil(maxstreamvolume * fraction);
+        if (streamvolume > 0) {
+            float streamfraction = (float)streamvolume / maxstreamvolume;
+            float pcmvolume =
+                (fraction / streamfraction) * pcmrange + minpcmvolume;
+            setStereoVolume(pcmvolume, pcmvolume);
+        }
+
+        int oldstreamvolume = audiomanager.getStreamVolume(streamtype);
+        if (streamvolume != oldstreamvolume)
+            audiomanager.setStreamVolume(streamtype, streamvolume, 0);
     }
 
     public native void pcmSamplesToByteArray(byte[] dest);
