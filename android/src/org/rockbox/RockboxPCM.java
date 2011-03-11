@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
@@ -78,7 +77,6 @@ public class RockboxPCM extends AudioTrack
         return (frames*4);
     }
 
-    @SuppressWarnings("unused")
     private void play_pause(boolean pause) 
     {
         RockboxService service = RockboxService.get_instance();
@@ -130,7 +128,6 @@ public class RockboxPCM extends AudioTrack
         RockboxService.get_instance().stopForeground();
     }
 
-    @SuppressWarnings("unused")
     private void set_volume(int volume)
     {
         /* volume comes from 0..-990 from Rockbox */

@@ -24,7 +24,6 @@ package org.rockbox;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Enumeration;
@@ -68,7 +67,6 @@ public class RockboxService extends Service
     private BroadcastReceiver batt_monitor;
     private RunForegroundManager fg_runner;
     private MediaButtonReceiver mMediaButtonReceiver;
-    @SuppressWarnings("unused")
     private int battery_level;
     private ResultReceiver resultReceiver;
 
@@ -302,11 +300,6 @@ public class RockboxService extends Service
     }
 
     
-    @SuppressWarnings("unused")
-    /*
-     * Sets up the battery monitor which receives the battery level
-     * about each 30 seconds
-     */
     private void initBatteryMonitor()
     {
         itf = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);

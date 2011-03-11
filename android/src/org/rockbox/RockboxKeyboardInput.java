@@ -72,7 +72,6 @@ public class RockboxKeyboardInput
 
     private native void put_result(boolean accepted, String new_string);
 
-    @SuppressWarnings("unused")
     public boolean is_usable()
     {
         return RockboxService.get_instance().get_activity() != null;

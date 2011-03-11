@@ -27,7 +27,6 @@ import android.content.DialogInterface;
 
 public class RockboxYesno
 {
-    @SuppressWarnings("unused")
     private void yesno_display(final String text, final String yes, final String no)
     {
         final Activity c = RockboxService.get_instance().get_activity();
@@ -59,7 +58,6 @@ public class RockboxYesno
         });
     }
 
-    @SuppressWarnings("unused")
     private boolean is_usable()
     {
         return RockboxService.get_instance().get_activity() != null;

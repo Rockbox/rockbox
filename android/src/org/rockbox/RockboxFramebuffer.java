@@ -62,7 +62,6 @@ public class RockboxFramebuffer extends SurfaceView
 
     /* second stage init; called from Rockbox with information about the 
      * display framebuffer */
-    @SuppressWarnings("unused")
     private void java_lcd_init(int lcd_width, int lcd_height, ByteBuffer native_fb)
     {
         btm = Bitmap.createBitmap(lcd_width, lcd_height, Bitmap.Config.RGB_565);
@@ -70,7 +69,6 @@ public class RockboxFramebuffer extends SurfaceView
         setEnabled(true);
     }
 
-    @SuppressWarnings("unused")
     private void java_lcd_update()
     {
         SurfaceHolder holder = getHolder();                            
@@ -83,7 +81,6 @@ public class RockboxFramebuffer extends SurfaceView
         holder.unlockCanvasAndPost(c);
     }
     
-    @SuppressWarnings("unused")
     private void java_lcd_update_rect(int x, int y, int width, int height)
     {
         SurfaceHolder holder = getHolder();         
@@ -99,7 +96,6 @@ public class RockboxFramebuffer extends SurfaceView
         holder.unlockCanvasAndPost(c);
     }
 
-    @SuppressWarnings("unused")
     private void LOG(CharSequence text)
     {
         Log.d("Rockbox", (String) text);
@@ -135,13 +131,12 @@ public class RockboxFramebuffer extends SurfaceView
         return buttonHandler(keyCode, false);
     }
  
-    @SuppressWarnings("unused")
     private int getDpi()
     {
         return metrics.densityDpi;
     }
     
-    @SuppressWarnings("unused")
+
     private int getScrollThreshold()
     {
         return view_config.getScaledTouchSlop();

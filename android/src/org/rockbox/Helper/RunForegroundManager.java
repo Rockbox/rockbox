@@ -1,6 +1,5 @@
 package org.rockbox.Helper;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.rockbox.R;
