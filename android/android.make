@@ -22,12 +22,12 @@ BINLIB_DIR=$(BUILDDIR)/libs/armeabi
 java2class = $(addsuffix .class,$(basename $(subst $(ANDROID_DIR),$(BUILDDIR),$(1))))
 
 # API version
-ANDROID_PLATFORM_VERSION=8
+ANDROID_PLATFORM_VERSION=11
 ANDROID_PLATFORM=$(ANDROID_SDK_PATH)/platforms/android-$(ANDROID_PLATFORM_VERSION)
 
 # android tools
-AAPT=$(ANDROID_PLATFORM)/tools/aapt
-DX=$(ANDROID_PLATFORM)/tools/dx
+AAPT=$(ANDROID_SDK_PATH)/platform-tools/aapt
+DX=$(ANDROID_SDK_PATH)/platform-tools/dx
 APKBUILDER=$(ANDROID_SDK_PATH)/tools/apkbuilder
 ZIPALIGN=$(ANDROID_SDK_PATH)/tools/zipalign
 KEYSTORE=$(HOME)/.android/debug.keystore
