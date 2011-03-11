@@ -36,10 +36,18 @@ uintptr_t *stackend;
 
 extern int main(void);
 extern void telephony_init_device(void);
+extern void lcd_deinit(void);
+extern void pcm_deinit(void);
 
 void system_exception_wait(void) { }
 void system_reboot(void) { }
-void power_off(void) { }
+
+void power_off(void)
+{
+    lcd_deinit();
+    pcm_deinit();
+    (*env_ptr)->DeleteGlobalRef(env_ptr, RockboxService_class);
+}
 
 void system_init(void)
 {
@@ -51,18 +59,19 @@ void system_init(void)
 JNIEXPORT void JNICALL
 Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
 {
+    jclass class = (*env)->GetObjectClass(env, this);
+
     /* hack!!! we can't have a valid stack pointer otherwise.
      * but we don't really need it anyway, thread.c only needs it
      * for overflow detection which doesn't apply for the main thread
      * (it's managed by the OS) */
 
-    (void)env;
-    (void)this;
     volatile uintptr_t stack = 0;
     stackbegin = stackend = (uintptr_t*) &stack;
     env_ptr = env;
-    RockboxService_instance = this;
-    RockboxService_class = (*env)->GetObjectClass(env, this);
+
+    RockboxService_instance = (*env)->NewGlobalRef(env, this);
+    RockboxService_class = (*env)->NewGlobalRef(env, class);
 
     main();
 }
