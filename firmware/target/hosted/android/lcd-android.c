@@ -28,7 +28,6 @@
 #include "lcd.h"
 #include "button.h"
 
-extern JNIEnv *env_ptr;
 extern jobject RockboxService_instance;
 
 static jobject RockboxFramebuffer_instance;
@@ -94,6 +93,8 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
 
 void lcd_deinit(void)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     (*env_ptr)->DeleteGlobalRef(env_ptr, RockboxFramebuffer_instance);
     (*env_ptr)->DeleteGlobalRef(env_ptr, native_buffer);
 }
@@ -107,6 +108,8 @@ void lcd_init_device(void)
 
 void lcd_update(void)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     if (display_on)
         (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
                                    java_lcd_update);
@@ -114,6 +117,8 @@ void lcd_update(void)
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     if (display_on)
         (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
                                    java_lcd_update_rect, x, y, width, height);

@@ -25,8 +25,6 @@
 #include "debug.h"
 #include "pcm.h"
 
-extern JNIEnv *env_ptr;
-
 /* infos about our pcm chunks */
 static size_t  pcm_data_size;
 static char   *pcm_data_start;
@@ -117,6 +115,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
 void pcm_play_dma_stop(void)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     (*env_ptr)->CallVoidMethod(env_ptr,
                                RockboxPCM_instance,
                                stop_method);
@@ -124,6 +124,8 @@ void pcm_play_dma_stop(void)
 
 void pcm_play_dma_pause(bool pause)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     (*env_ptr)->CallVoidMethod(env_ptr,
                                RockboxPCM_instance,
                                play_pause_method,
@@ -152,6 +154,7 @@ void pcm_play_dma_init(void)
      * Luckily we only reference the PCM object from here, so it's safe (and
      * clean) to allocate it here
      **/
+    JNIEnv *env_ptr = getJavaEnvironment();
     JNIEnv e = *env_ptr;
     /* get the class and its constructor */
     jclass RockboxPCM_class = e->FindClass(env_ptr, "org/rockbox/RockboxPCM");
@@ -169,6 +172,8 @@ void pcm_play_dma_init(void)
 
 void pcm_deinit(void)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     (*env_ptr)->DeleteGlobalRef(env_ptr, RockboxPCM_instance);
 }
 
@@ -178,5 +183,7 @@ void pcm_postinit(void)
 
 void pcm_set_mixer_volume(int volume)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     (*env_ptr)->CallVoidMethod(env_ptr, RockboxPCM_instance, set_volume_method, volume);
 }

@@ -29,8 +29,8 @@
 #include "misc.h"
 #include "thread.h"
 #include "debug.h"
+#include "system.h"
 
-extern JNIEnv *env_ptr;
 extern jclass RockboxService_class;
 extern jobject RockboxService_instance;
 
@@ -47,6 +47,7 @@ static const struct dim dim = { .width = 200, .height = 200 };
 static void track_changed_callback(void *param)
 {
     struct mp3entry* id3 = (struct mp3entry*)param;
+    JNIEnv *env_ptr = getJavaEnvironment();
     JNIEnv e = *env_ptr;
     if (id3)
     {
@@ -109,6 +110,7 @@ static void track_changed_callback(void *param)
 static void track_finished_callback(void *param)
 {
     (void)param;
+    JNIEnv *env_ptr = getJavaEnvironment();
     JNIEnv e = *env_ptr;
     e->CallVoidMethod(env_ptr, NotificationManager_instance,
                       finishNotification);
@@ -122,6 +124,7 @@ static void track_finished_callback(void *param)
 
 void notification_init(void)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
     JNIEnv e = *env_ptr;
     jfieldID nNM = e->GetFieldID(env_ptr, RockboxService_class,
                     "fg_runner", "Lorg/rockbox/Helper/RunForegroundManager;");

@@ -23,8 +23,8 @@
 #include <jni.h>
 #include <stdbool.h>
 #include "config.h"
+#include "system.h"
 
-extern JNIEnv *env_ptr;
 extern jclass  RockboxService_class;
 extern jobject RockboxService_instance;
 
@@ -32,6 +32,8 @@ static jfieldID _battery_level;
 
 void powermgmt_init_target(void)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     jmethodID initBatteryMonitor = (*env_ptr)->GetMethodID(env_ptr,
                                                            RockboxService_class,
                                                            "initBatteryMonitor",
@@ -50,6 +52,8 @@ void powermgmt_init_target(void)
 
 int battery_level(void)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     return (*env_ptr)->GetIntField(env_ptr, RockboxService_instance, _battery_level);
 }
 

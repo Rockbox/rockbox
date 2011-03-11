@@ -27,7 +27,7 @@
 
 
 /* global fields for use with various JNI calls */
-JNIEnv *env_ptr;
+JavaVM *vm_ptr;
 jobject RockboxService_instance;
 jclass  RockboxService_class;
 
@@ -44,8 +44,11 @@ void system_reboot(void) { }
 
 void power_off(void)
 {
+    JNIEnv *env_ptr = getJavaEnvironment();
+
     lcd_deinit();
     pcm_deinit();
+
     (*env_ptr)->DeleteGlobalRef(env_ptr, RockboxService_class);
 }
 
@@ -68,8 +71,8 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
 
     volatile uintptr_t stack = 0;
     stackbegin = stackend = (uintptr_t*) &stack;
-    env_ptr = env;
 
+    (*env)->GetJavaVM(env, &vm_ptr);
     RockboxService_instance = (*env)->NewGlobalRef(env, this);
     RockboxService_class = (*env)->NewGlobalRef(env, class);
 
