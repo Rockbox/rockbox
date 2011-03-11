@@ -94,8 +94,8 @@ gui/statusbar.c
 gui/statusbar-skinned.c
 #endif
 #if (CONFIG_PLATFORM&PLATFORM_ANDROID)
-hosted/yesno.c
-hosted/notification.c
+hosted/android/yesno.c
+hosted/android/notification.c
 #else
 gui/yesno.c
 #endif
@@ -126,7 +126,7 @@ player/keyboard.c
 recorder/bmp.c
 recorder/icons.c
 #if (CONFIG_PLATFORM&PLATFORM_ANDROID)
-hosted/keyboard.c
+hosted/android/keyboard.c
 #else
 recorder/keyboard.c
 #endif
