@@ -46,7 +46,6 @@ static bool display_on;
 void connect_with_java(JNIEnv* env, jobject fb_instance)
 {
     JNIEnv e = *env;
-
     /* Update RockboxFramebuffer_instance */
     if (!e->IsSameObject(env, RockboxFramebuffer_instance, fb_instance)) {
         if (RockboxFramebuffer_instance != NULL)
@@ -55,7 +54,7 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
         RockboxFramebuffer_instance = e->NewGlobalRef(env, fb_instance);
     }
 
-    static bool have_class = false;
+    static bool have_class;
     if (!have_class)
     {
         jclass fb_class = e->GetObjectClass(env, fb_instance);
@@ -77,13 +76,10 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
         java_lcd_init        = e->GetMethodID(env, fb_class,
                                              "java_lcd_init",
                                              "(IILjava/nio/ByteBuffer;)V");
-
-        jobject buffer       = e->NewDirectByteBuffer(env,
+                                               
+        native_buffer        = e->NewDirectByteBuffer(env,
                                                   lcd_framebuffer,
                                                   (jlong)sizeof(lcd_framebuffer));
-
-        native_buffer        = e->NewGlobalRef(env, buffer);
-
         have_class           = true;
     }
     /* we need to setup parts for the java object every time */
@@ -96,7 +92,6 @@ void lcd_deinit(void)
     JNIEnv *env_ptr = getJavaEnvironment();
 
     (*env_ptr)->DeleteGlobalRef(env_ptr, RockboxFramebuffer_instance);
-    (*env_ptr)->DeleteGlobalRef(env_ptr, native_buffer);
 }
 
 /*

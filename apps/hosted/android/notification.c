@@ -128,14 +128,13 @@ void notification_init(void)
     JNIEnv e = *env_ptr;
     jfieldID nNM = e->GetFieldID(env_ptr, RockboxService_class,
                     "fg_runner", "Lorg/rockbox/Helper/RunForegroundManager;");
-    jobject nMN_instance = e->GetObjectField(env_ptr,
-                                             RockboxService_instance, nNM);
-    if (nMN_instance == NULL)
+    NotificationManager_instance = e->GetObjectField(env_ptr,
+                                                RockboxService_instance, nNM);
+    if (NotificationManager_instance == NULL)
     {
         DEBUGF("Failed to get RunForegroundManager instance. Performance will be bad");
         return;
     }
-    NotificationManager_instance = e->NewGlobalRef(env_ptr, nMN_instance);
 
     jclass class = e->GetObjectClass(env_ptr, NotificationManager_instance);
     updateNotification = e->GetMethodID(env_ptr, class, "updateNotification",

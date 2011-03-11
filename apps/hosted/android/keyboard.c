@@ -61,17 +61,14 @@ static void kdb_init(void)
     {
         semaphore_init(&kbd_wakeup, 1, 0);
         /* get the class and its constructor */
-        jclass kbInput_class = e->FindClass(env_ptr,
+        RockboxKeyboardInput_class = e->FindClass(env_ptr,
                                             "org/rockbox/RockboxKeyboardInput");
-        RockboxKeyboardInput_class = e->NewGlobalRef(env_ptr, kbInput_class);
         jmethodID constructor = e->GetMethodID(env_ptr,
                                                RockboxKeyboardInput_class,
                                                "<init>", "()V");
-        jobject kbInput_instance = e->NewObject(env_ptr,
-                                                RockboxKeyboardInput_class,
-                                                constructor);
-        RockboxKeyboardInput_instance = e->NewGlobalRef(env_ptr,
-                                                        kbInput_instance);
+        RockboxKeyboardInput_instance = e->NewObject(env_ptr,
+                                                     RockboxKeyboardInput_class,
+                                                     constructor);
         kbd_inputfunc = e->GetMethodID(env_ptr, RockboxKeyboardInput_class,
                                        "kbd_input",
                                        "(Ljava/lang/String;"

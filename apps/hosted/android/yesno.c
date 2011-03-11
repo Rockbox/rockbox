@@ -52,21 +52,20 @@ static void yesno_init(JNIEnv *env_ptr)
     {
         semaphore_init(&yesno_done, 1, 0);
         /* get the class and its constructor */
-        jclass yesno_class = e->FindClass(env_ptr,
-                                          "org/rockbox/RockboxYesno");
+        jclass RockboxYesno_class = e->FindClass(env_ptr,
+                                                 "org/rockbox/RockboxYesno");
         jmethodID constructor = e->GetMethodID(env_ptr,
-                                               yesno_class,
+                                               RockboxYesno_class,
                                                "<init>", "()V");
-        jobject yesno_instance = e->NewObject(env_ptr,
-                                              yesno_class,
-                                              constructor);
-        RockboxYesno_instance = e->NewGlobalRef(env_ptr, yesno_instance);
-        yesno_func = e->GetMethodID(env_ptr, yesno_class,
+        RockboxYesno_instance = e->NewObject(env_ptr,
+                                                     RockboxYesno_class,
+                                                     constructor);
+        yesno_func = e->GetMethodID(env_ptr, RockboxYesno_class,
                                        "yesno_display",
                                        "(Ljava/lang/String;"
                                        "Ljava/lang/String;"
                                        "Ljava/lang/String;)V");
-        yesno_is_usable = e->GetMethodID(env_ptr, yesno_class,
+        yesno_is_usable = e->GetMethodID(env_ptr, RockboxYesno_class,
                                        "is_usable", "()Z");
     }
     /* need to get it every time incase the activity died/restarted */
