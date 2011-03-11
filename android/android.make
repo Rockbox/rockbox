@@ -129,5 +129,7 @@ dirs: $(DIRS)
 apk: $(APK)
 
 install: apk
-	$(ADB) install -r $(APK)
+	$(SILENT)$(ADB) install -r $(APK)
 
+launch:
+	$(SILENT)echo 'am start -a android.intent.action.MAIN -n org.rockbox/.RockboxActivity; exit' | $(ADB) shell >/dev/null
