@@ -11,6 +11,9 @@
 <string name="error_extraction">Error occured during extraction!</string>
 <string name="rockbox_extracting">Rockbox is loading. Please wait...</string>
 
+<!-- Rockbox initial configuration values -->
+<string name="rockbox_language_file">english.lng</string>
+
 <!-- Widget -->
 <string name="appwidget_label_4x1">Rockbox (line)</string>
 <string name="appwidget_label_2x2">Rockbox (square)</string>
