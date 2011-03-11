@@ -147,7 +147,8 @@ clean::
 		*.wav *.mp3 *.voice $(CLEANOBJS) \
 		$(LINKRAM) $(LINKROM) rockbox.elf rockbox.map rockbox.bin \
 		make.dep rombox.elf rombox.map rombox.bin rombox.ucl romstart.txt \
-		$(BINARY) $(FLASHFILE) uisimulator bootloader flash $(BOOTLINK)
+		$(BINARY) $(FLASHFILE) uisimulator bootloader flash $(BOOTLINK) \
+		rockbox.apk
 
 #### linking the binaries: ####
 
