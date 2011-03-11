@@ -46,15 +46,8 @@ static bool display_on;
 void connect_with_java(JNIEnv* env, jobject fb_instance)
 {
     JNIEnv e = *env;
-    /* Update RockboxFramebuffer_instance */
-    if (!e->IsSameObject(env, RockboxFramebuffer_instance, fb_instance)) {
-        if (RockboxFramebuffer_instance != NULL)
-            e->DeleteGlobalRef(env, RockboxFramebuffer_instance);
-
-        RockboxFramebuffer_instance = e->NewGlobalRef(env, fb_instance);
-    }
-
     static bool have_class;
+
     if (!have_class)
     {
         jclass fb_class = e->GetObjectClass(env, fb_instance);
@@ -123,6 +116,8 @@ Java_org_rockbox_RockboxFramebuffer_surfaceCreated(JNIEnv *env, jobject this,
                                                      jobject surfaceholder)
 {
     (void)surfaceholder;
+    /* Update RockboxFramebuffer_instance */
+    RockboxFramebuffer_instance = (*env)->NewGlobalRef(env, this);
     /* possibly a new instance - reconnect */
     connect_with_java(env, this);
     display_on = true;
