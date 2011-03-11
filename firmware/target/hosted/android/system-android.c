@@ -36,15 +36,10 @@ uintptr_t *stackend;
 
 extern int main(void);
 extern void telephony_init_device(void);
-extern void lcd_deinit(void);
 
 void system_exception_wait(void) { }
 void system_reboot(void) { }
-
-void power_off(void)
-{
-    lcd_deinit();
-}
+void power_off(void) { }
 
 void system_init(void)
 {

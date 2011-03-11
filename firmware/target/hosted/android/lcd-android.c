@@ -87,13 +87,6 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
                           (jint)LCD_WIDTH, (jint)LCD_HEIGHT, native_buffer);
 }
 
-void lcd_deinit(void)
-{
-    JNIEnv *env_ptr = getJavaEnvironment();
-
-    (*env_ptr)->DeleteGlobalRef(env_ptr, RockboxFramebuffer_instance);
-}
-
 /*
  * Do nothing here and connect with the java object later (if it isn't already)
  */
@@ -148,9 +141,12 @@ JNIEXPORT void JNICALL
 Java_org_rockbox_RockboxFramebuffer_surfaceDestroyed(JNIEnv *e, jobject this,
                                                     jobject surfaceholder)
 {
-    (void)e; (void)this; (void)surfaceholder;
+    (void)this; (void)surfaceholder;
 
     display_on = false;
+
+    (*e)->DeleteGlobalRef(e, RockboxFramebuffer_instance);
+    RockboxFramebuffer_instance = NULL;
 }
 
 bool lcd_active(void)
