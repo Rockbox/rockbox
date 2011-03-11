@@ -24,7 +24,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
-#include <semaphore.h>
+#include <pthread.h>
 #include "config.h"
 #include "system.h"
 #include "button.h"
@@ -32,12 +32,13 @@
 #include "panic.h"
 
 
-static sem_t wfi_sem;
+static pthread_cond_t wfi_cond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t wfi_mtx = PTHREAD_MUTEX_INITIALIZER;
 /*
  * call tick tasks and wake the scheduler up */
-void timer_signal(int sig)
+void timer_signal(union sigval arg)
 {
-    (void)sig;
+    (void)arg;
     call_tick_tasks();
     interrupt();
 }
@@ -48,18 +49,14 @@ void timer_signal(int sig)
  * other mechanisms could use them as well */
 void wait_for_interrupt(void)
 {
-    sem_wait(&wfi_sem);
+    pthread_cond_wait(&wfi_cond, &wfi_mtx);
 }
 
+/*
+ * Wakeup the kernel, if sleeping (shall not be called from a signal handler) */
 void interrupt(void)
 {
-    int s;
-    /* unless idling, we usually have more interrupt() than wait_for_interrupt()
-     * don't post unecessarily because wait_for_interrupt() would need to
-     * decrement for each wasted sem_post(), instead of sleeping directly */
-    sem_getvalue(&wfi_sem, &s);
-    if (s <= 0)
-        sem_post(&wfi_sem);
+    pthread_cond_signal(&wfi_cond);
 }
 
 /*
@@ -67,30 +64,26 @@ void interrupt(void)
 void tick_start(unsigned int interval_in_ms)
 {
     int ret = 0;
-    sigset_t proc_set;
     timer_t timerid;
     struct itimerspec ts;
-    sigevent_t sigev = {
-        .sigev_notify = SIGEV_SIGNAL,
-        .sigev_signo  = SIGUSR2,
-    };
+    sigevent_t sigev;
+
+    /* initializing in the declaration causes some weird warnings */
+    memset(&sigev, 0, sizeof(sigevent_t));
+    sigev.sigev_notify = SIGEV_THREAD,
+    sigev.sigev_notify_function = timer_signal,
 
     ts.it_value.tv_sec = ts.it_interval.tv_sec = 0;
     ts.it_value.tv_nsec = ts.it_interval.tv_nsec = interval_in_ms*1000*1000;
-
-    /* add the signal handler */
-    signal(SIGUSR2, timer_signal);
 
     /* add the timer */
     ret |= timer_create(CLOCK_REALTIME, &sigev, &timerid);
     ret |= timer_settime(timerid, 0, &ts, NULL);
 
-    /* unblock SIGUSR2 so the handler can run */
-    ret |= sigprocmask(0, NULL, &proc_set);
-    ret |= sigdelset(&proc_set, SIGUSR2);
-    ret |= sigprocmask(SIG_SETMASK, &proc_set, NULL);
-
-    ret |= sem_init(&wfi_sem, 0, 0);
+    /* Grab the mutex already now and leave it to this thread. We don't
+     * care about race conditions when signaling the condition (because
+     * they are not critical), but a mutex is necessary due to the API */
+    pthread_mutex_lock(&wfi_mtx);
 
     if (ret != 0)
         panicf("%s(): %s\n", __func__, strerror(errno));
