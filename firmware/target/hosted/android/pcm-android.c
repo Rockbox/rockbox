@@ -33,7 +33,6 @@ static char   *pcm_data_start;
 static jmethodID play_pause_method;
 static jmethodID stop_method;
 static jmethodID set_volume_method;
-static jclass    RockboxPCM_class;
 static jobject   RockboxPCM_instance;
 
 
@@ -158,7 +157,7 @@ void pcm_play_dma_init(void)
     JNIEnv *env_ptr = getJavaEnvironment();
     JNIEnv e = *env_ptr;
     /* get the class and its constructor */
-    RockboxPCM_class = e->FindClass(env_ptr, "org/rockbox/RockboxPCM");
+    jclass RockboxPCM_class = e->FindClass(env_ptr, "org/rockbox/RockboxPCM");
     jmethodID constructor = e->GetMethodID(env_ptr, RockboxPCM_class, "<init>", "()V");
     /* instance = new RockboxPCM() */
     RockboxPCM_instance = e->NewObject(env_ptr, RockboxPCM_class, constructor);
