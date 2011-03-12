@@ -34,7 +34,6 @@ static jobject RockboxFramebuffer_instance;
 static jmethodID java_lcd_update;
 static jmethodID java_lcd_update_rect;
 static jmethodID java_lcd_init;
-static jobject native_buffer;
 
 static int dpi;
 static int scroll_threshold;
@@ -69,15 +68,17 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
         java_lcd_init        = e->GetMethodID(env, fb_class,
                                              "java_lcd_init",
                                              "(IILjava/nio/ByteBuffer;)V");
-                                               
-        native_buffer        = e->NewDirectByteBuffer(env,
-                                                  lcd_framebuffer,
-                                                  (jlong)sizeof(lcd_framebuffer));
+
         have_class           = true;
     }
+
+    /* Create native_buffer */
+    jobject buffer = (*env)->NewDirectByteBuffer(env, lcd_framebuffer,
+                                               (jlong) sizeof(lcd_framebuffer));
+
     /* we need to setup parts for the java object every time */
     (*env)->CallVoidMethod(env, fb_instance, java_lcd_init,
-                          (jint)LCD_WIDTH, (jint)LCD_HEIGHT, native_buffer);
+                          (jint)LCD_WIDTH, (jint)LCD_HEIGHT, buffer);
 }
 
 /*
@@ -116,8 +117,10 @@ Java_org_rockbox_RockboxFramebuffer_surfaceCreated(JNIEnv *env, jobject this,
                                                      jobject surfaceholder)
 {
     (void)surfaceholder;
+
     /* Update RockboxFramebuffer_instance */
     RockboxFramebuffer_instance = (*env)->NewGlobalRef(env, this);
+
     /* possibly a new instance - reconnect */
     connect_with_java(env, this);
     display_on = true;
