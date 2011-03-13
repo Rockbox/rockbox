@@ -448,12 +448,16 @@ static void get_vbri_info(struct mp3info *info, unsigned char *buf)
 /* Seek to next mpeg header and extract relevant information. */
 static int get_next_header_info(int fd, long *bytecount, struct mp3info *info)
 {
-    unsigned long header = find_next_frame(fd, bytecount, 0x20000, 0);
+    long tmp;
+    unsigned long header = find_next_frame(fd, &tmp, 0x20000, 0);
     if(header == 0)
         return -1;
 
     if(!mp3headerinfo(info, header))
         return -2;
+
+    /* Next header is tmp bytes away. */
+    *bytecount += tmp;
         
     return 0;
 }
@@ -461,7 +465,7 @@ static int get_next_header_info(int fd, long *bytecount, struct mp3info *info)
 int get_mp3file_info(int fd, struct mp3info *info)
 {
     unsigned char frame[1800], *vbrheader;
-    long bytecount;
+    long bytecount = 0;
     int result;
 
     /* Initialize info and frame */
