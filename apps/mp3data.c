@@ -349,32 +349,135 @@ unsigned long mem_find_next_frame(int startpos, long *offset, long max_offset,
 }
 #endif
 
-int get_mp3file_info(int fd, struct mp3info *info)
+/* Extract information from a 'Xing' or 'Info' header. */
+static void get_xing_info(struct mp3info *info, unsigned char *buf)
 {
-    unsigned char frame[1800];
-    unsigned char *vbrheader;
-    unsigned long header;
-    long bytecount;
-    int num_offsets;
-    int i;
-    long offset;
-    int j;
-    long tmp;
+    int i = 8;
 
-    header = find_next_frame(fd, &bytecount, 0x20000, 0);
-    /* Quit if we haven't found a valid header within 128K */
+    /* Is it a VBR file? */
+    info->is_vbr = !memcmp(buf, "Xing", 4);
+
+    if (buf[7] & VBR_FRAMES_FLAG) /* Is the frame count there? */
+    {
+        info->frame_count = bytes2int(buf[i], buf[i+1], buf[i+2], buf[i+3]);
+        if (info->frame_count <= ULONG_MAX / info->ft_num)
+            info->file_time = info->frame_count * info->ft_num / info->ft_den;
+        else
+            info->file_time = info->frame_count / info->ft_den * info->ft_num;
+        i += 4;
+    }
+
+    if (buf[7] & VBR_BYTES_FLAG) /* Is byte count there? */
+    {
+        info->byte_count = bytes2int(buf[i], buf[i+1], buf[i+2], buf[i+3]);
+        i += 4;
+    }
+
+    if (info->file_time && info->byte_count)
+    {
+        if (info->byte_count <= (ULONG_MAX/8))
+            info->bitrate = info->byte_count * 8 / info->file_time;
+        else
+            info->bitrate = info->byte_count / (info->file_time >> 3);
+    }
+
+    if (buf[7] & VBR_TOC_FLAG) /* Is table-of-contents there? */
+    {
+        info->has_toc = true;
+        memcpy( info->toc, buf+i, 100 );
+        i += 100;
+    }
+    if (buf[7] & VBR_QUALITY_FLAG)
+    {
+        /* We don't care about this, but need to skip it */
+        i += 4;
+    }
+#if CONFIG_CODEC==SWCODEC
+    i += 21;
+    info->enc_delay   = ((int)buf[i  ] << 4) | (buf[i+1] >> 4);
+    info->enc_padding = ((int)buf[i+1] << 8) |  buf[i+2];
+    /* TODO: This sanity checking is rather silly, seeing as how the LAME
+       header contains a CRC field that can be used to verify integrity. */
+    if (!(info->enc_delay   >= 0 && info->enc_delay   <= 2880 &&
+          info->enc_padding >= 0 && info->enc_padding <= 2*1152))
+    {
+       /* Invalid data */
+       info->enc_delay   = -1;
+       info->enc_padding = -1;
+    }
+#endif
+}
+
+/* Extract information from a 'VBRI' header. */
+static void get_vbri_info(struct mp3info *info, unsigned char *buf)
+{
+    int i, num_offsets, offset = 0;
+
+    info->is_vbr  = true;  /* Yes, it is a FhG VBR file */
+    info->has_toc = false; /* We don't parse the TOC (yet) */
+
+    info->byte_count  = bytes2int(buf[10], buf[11], buf[12], buf[13]);
+    info->frame_count = bytes2int(buf[14], buf[15], buf[16], buf[17]);
+    if (info->frame_count <= ULONG_MAX / info->ft_num)
+        info->file_time = info->frame_count * info->ft_num / info->ft_den;
+    else
+        info->file_time = info->frame_count / info->ft_den * info->ft_num;
+
+    if (info->byte_count <= (ULONG_MAX/8))
+        info->bitrate = info->byte_count * 8 / info->file_time;
+    else
+        info->bitrate = info->byte_count / (info->file_time >> 3);
+
+    /* We don't parse the TOC, since we don't yet know how to (FIXME) */
+    num_offsets = bytes2int(0, 0, buf[18], buf[19]);
+    VDEBUGF("Frame size (%dkpbs): %d bytes (0x%x)\n",
+           info->bitrate, info->frame_size, info->frame_size);
+    VDEBUGF("Frame count: %lx\n", info->frame_count);
+    VDEBUGF("Byte count: %lx\n", info->byte_count);
+    VDEBUGF("Offsets: %d\n", num_offsets);
+    VDEBUGF("Frames/entry: %ld\n",
+            bytes2int(0, 0, buf[24], buf[25]));
+
+    for(i = 0; i < num_offsets; i++)
+    {
+       offset += bytes2int(0, 0, buf[26+i*2], buf[27+i*2]);;
+       VDEBUGF("%03d: %lx\n", i, offset - bytecount,);
+    }
+}
+
+/* Seek to next mpeg header and extract relevant information. */
+static int get_next_header_info(int fd, long *bytecount, struct mp3info *info)
+{
+    unsigned long header = find_next_frame(fd, bytecount, 0x20000, 0);
     if(header == 0)
         return -1;
 
-    memset(info,  0, sizeof(struct mp3info));
-    memset(frame, 0, sizeof(frame));
-#if CONFIG_CODEC==SWCODEC
-    /* These two are needed for proper LAME gapless MP3 playback */
-    info->enc_delay = -1;
-    info->enc_padding = -1;
-#endif
     if(!mp3headerinfo(info, header))
         return -2;
+        
+    return 0;
+}
+
+int get_mp3file_info(int fd, struct mp3info *info)
+{
+    unsigned char frame[1800], *vbrheader;
+    long bytecount;
+    int result;
+
+    /* Initialize info and frame */
+    memset(info,  0, sizeof(struct mp3info));
+    memset(frame, 0, sizeof(frame));
+    
+#if CONFIG_CODEC==SWCODEC
+    /* These two are needed for proper LAME gapless MP3 playback */
+    info->enc_delay   = -1;
+    info->enc_padding = -1;
+#endif
+
+    /* Get the very first MPEG frame. */
+    result = get_next_header_info(fd, &bytecount, info);
+    if(result)
+        return result;
 
     /* OK, we have found a frame. Let's see if it has a Xing header */
     if (info->frame_size-4 >= (int)sizeof(frame))
@@ -386,170 +489,50 @@ int get_mp3file_info(int fd, struct mp3info *info)
     if(read(fd, frame, info->frame_size-4) < 0)
         return -3;
 
-    /* calculate position of VBR header */
-    if ( info->version == MPEG_VERSION1 ) {
+    /* Calculate position of a possible VBR header */
+    if (info->version == MPEG_VERSION1) {
         if (info->channel_mode == 3) /* mono */
             vbrheader = frame + 17;
         else
             vbrheader = frame + 32;
-    }
-    else {
+    } else {
         if (info->channel_mode == 3) /* mono */
             vbrheader = frame + 9;
         else
             vbrheader = frame + 17;
     }
 
-    if (!memcmp(vbrheader, "Xing", 4)
-        || !memcmp(vbrheader, "Info", 4))
+    if (!memcmp(vbrheader, "Xing", 4) || !memcmp(vbrheader, "Info", 4))
     {
-        int i = 8; /* Where to start parsing info */
+        VDEBUGF("-- XING header --\n");
 
-        /* DEBUGF("Xing/Info header\n"); */
-
-        /* Remember where in the file the Xing header is */
-/* Rockbox: not used
-        info->vbr_header_pos = lseek(fd, 0, SEEK_CUR) - info->frame_size;
-*/
         /* We want to skip the Xing frame when playing the stream */
         bytecount += info->frame_size;
         
-        /* Now get the next frame to find out the real info about
-           the mp3 stream */
-        header = find_next_frame(fd, &tmp, 0x20000, 0);
-        if(header == 0)
-            return -4;
-
-        if(!mp3headerinfo(info, header))
-            return -5;
-
-        /* Is it a VBR file? */
-        info->is_vbr = !memcmp(vbrheader, "Xing", 4);
-/* Rockbox: not used
-        info->is_xing_vbr = info->is_vbr;
-*/
-
-        if (vbrheader[7] & VBR_FRAMES_FLAG) /* Is the frame count there? */
-        {
-            info->frame_count = bytes2int(vbrheader[i], vbrheader[i+1],
-                                          vbrheader[i+2], vbrheader[i+3]);
-            if (info->frame_count <= ULONG_MAX / info->ft_num)
-                info->file_time = info->frame_count * info->ft_num / info->ft_den;
-            else
-                info->file_time = info->frame_count / info->ft_den * info->ft_num;
-            i += 4;
-        }
-
-        if (vbrheader[7] & VBR_BYTES_FLAG) /* Is byte count there? */
-        {
-            info->byte_count = bytes2int(vbrheader[i], vbrheader[i+1],
-                                         vbrheader[i+2], vbrheader[i+3]);
-            i += 4;
-        }
-
-        if (info->file_time && info->byte_count)
-        {
-            if (info->byte_count <= (ULONG_MAX/8))
-                info->bitrate = info->byte_count * 8 / info->file_time;
-            else
-                info->bitrate = info->byte_count / (info->file_time >> 3);
-        }
-
-        if (vbrheader[7] & VBR_TOC_FLAG) /* Is table-of-contents there? */
-        {
-            info->has_toc = true;
-            memcpy( info->toc, vbrheader+i, 100 );
-            i += 100;
-        }
-        if (vbrheader[7] & VBR_QUALITY_FLAG)
-        {
-            /* We don't care about this, but need to skip it */
-            i += 4;
-        }
-#if CONFIG_CODEC==SWCODEC
-        i += 21;
-        info->enc_delay   = ((int)vbrheader[i  ] << 4) | (vbrheader[i+1] >> 4);
-        info->enc_padding = ((int)vbrheader[i+1] << 8) |  vbrheader[i+2];
-        /* TODO: This sanity checking is rather silly, seeing as how the LAME
-           header contains a CRC field that can be used to verify integrity. */
-        if (!(info->enc_delay   >= 0 && info->enc_delay   <= 2880 &&
-              info->enc_padding >= 0 && info->enc_padding <= 2*1152))
-        {
-           /* Invalid data */
-           info->enc_delay = -1;
-           info->enc_padding = -1;
-        }
-#endif
+        /* Now get the next frame to read the real info about the mp3 stream */
+        result = get_next_header_info(fd, &bytecount, info);
+        if(result)
+            return result;
+            
+        get_xing_info(info, vbrheader);
     }
-
-    if (!memcmp(vbrheader, "VBRI", 4))
+    else if (!memcmp(vbrheader, "VBRI", 4))
     {
-        VDEBUGF("VBRI header\n");
+        VDEBUGF("-- VBRI header --\n");
 
         /* We want to skip the VBRI frame when playing the stream */
         bytecount += info->frame_size;
         
-        /* Now get the next frame to find out the real info about
-           the mp3 stream */
-        header = find_next_frame(fd, &tmp, 0x20000, 0);
-        if(header == 0)
-            return -6;
-
-        bytecount += tmp;
-        
-        if(!mp3headerinfo(info, header))
-            return -7;
-
-        VDEBUGF("%04x: %04x %04x ", 0, (short)(header >> 16),
-               (short)(header & 0xffff));
-        for(i = 4;i < (int)sizeof(frame)-4;i+=2) {
-            if(i % 16 == 0) {
-                VDEBUGF("\n%04x: ", i-4);
-            }
-            VDEBUGF("%04x ", (frame[i-4] << 8) | frame[i-4+1]);
-        }
-
-        VDEBUGF("\n");
-        
-        /* Yes, it is a FhG VBR file */
-        info->is_vbr = true;
-/* Rockbox: not used
-        info->is_vbri_vbr = true;
-*/
-        info->has_toc = false; /* We don't parse the TOC (yet) */
-
-        info->byte_count = bytes2int(vbrheader[10], vbrheader[11],
-                                     vbrheader[12], vbrheader[13]);
-        info->frame_count = bytes2int(vbrheader[14], vbrheader[15],
-                                      vbrheader[16], vbrheader[17]);
-        if (info->frame_count <= ULONG_MAX / info->ft_num)
-            info->file_time = info->frame_count * info->ft_num / info->ft_den;
-        else
-            info->file_time = info->frame_count / info->ft_den * info->ft_num;
-
-        if (info->byte_count <= (ULONG_MAX/8))
-            info->bitrate = info->byte_count * 8 / info->file_time;
-        else
-            info->bitrate = info->byte_count / (info->file_time >> 3);
-
-        /* We don't parse the TOC, since we don't yet know how to (FIXME) */
-        num_offsets = bytes2int(0, 0, vbrheader[18], vbrheader[19]);
-        VDEBUGF("Frame size (%dkpbs): %d bytes (0x%x)\n",
-               info->bitrate, info->frame_size, info->frame_size);
-        VDEBUGF("Frame count: %lx\n", info->frame_count);
-        VDEBUGF("Byte count: %lx\n", info->byte_count);
-        VDEBUGF("Offsets: %d\n", num_offsets);
-        VDEBUGF("Frames/entry: %ld\n",
-                bytes2int(0, 0, vbrheader[24], vbrheader[25]));
-
-        offset = 0;
-
-        for(i = 0;i < num_offsets;i++)
-        {
-           j = bytes2int(0, 0, vbrheader[26+i*2], vbrheader[27+i*2]);
-           offset += j;
-           VDEBUGF("%03d: %lx (%x)\n", i, offset - bytecount, j);
-        }
+        /* Now get the next frame to read the real info about the mp3 stream */
+        result = get_next_header_info(fd, &bytecount, info);
+        if(result)
+            return result;
+            
+        get_vbri_info(info, vbrheader);
+    }
+    else
+    {
+        VDEBUGF("-- No VBR header --\n");
     }
 
     return bytecount;
