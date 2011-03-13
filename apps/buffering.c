@@ -950,8 +950,8 @@ int bufopen(const char *file, size_t offset, enum data_type type,
             h->type = type;
             strlcpy(h->path, file, MAX_PATH);
 
-            buf_widx += sizeof(struct mp3entry);  /* safe because the handle
-                                                     can't wrap */
+            buf_widx = ringbuf_add(buf_widx, sizeof(struct mp3entry));
+
             h->filerem = sizeof(struct mp3entry);
 
             /* Inform the buffering thread that we added a handle */
@@ -1037,8 +1037,8 @@ int bufopen(const char *file, size_t offset, enum data_type type,
         } else {
             h->filesize = rc;
             h->available = rc;
-            h->widx = buf_widx + rc; /* safe because the data doesn't wrap */
-            buf_widx += rc;  /* safe too */
+            buf_widx = ringbuf_add(buf_widx, rc);
+            h->widx = buf_widx;
         }
     }
     else
@@ -1107,12 +1107,11 @@ int bufalloc(const void *src, size_t size, enum data_type type)
         h->filesize = size;
         h->offset = 0;
         h->ridx = buf_widx;
-        h->widx = buf_widx + size; /* safe because the data doesn't wrap */
         h->data = buf_widx;
+        buf_widx = ringbuf_add(buf_widx, size);
+        h->widx = buf_widx;
         h->available = size;
         h->type = type;
-
-        buf_widx += size;  /* safe too */
     }
 
     mutex_unlock(&llist_mutex);
