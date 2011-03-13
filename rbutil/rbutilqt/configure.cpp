@@ -396,11 +396,13 @@ void Config::updateTtsState(int index)
     {
         ui.configTTSstatus->setText(tr("Configuration OK"));
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.png")));
+        ui.testTTS->setEnabled(true);
     }
     else
     {
         ui.configTTSstatus->setText(tr("Configuration INVALID"));
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.png")));
+        ui.testTTS->setEnabled(false);
     }
     
     delete tts; /* Config objects are never deleted (in fact, they are leaked..), so we can't rely on QObject,
@@ -718,8 +720,9 @@ void Config::configTts()
     EncTtsCfgGui gui(this,tts,TTSBase::getTTSName(ui.comboTts->itemData(index).toString()));
     gui.exec();
     updateTtsState(ui.comboTts->currentIndex());
-    delete tts; /* Config objects are never deleted (in fact, they are leaked..), so we can't rely on QObject,
-                   since that would delete the TTSBase instance on application exit*/
+    delete tts; /* Config objects are never deleted (in fact, they are
+                   leaked..), so we can't rely on QObject, since that would
+                   delete the TTSBase instance on application exit */
 }
 
 void Config::testTts()
@@ -733,26 +736,28 @@ void Config::testTts()
                 tr("TTS configuration invalid. \n Please configure TTS engine."));
         return;
     }
-    
+    ui.testTTS->setEnabled(false);
     if(!tts->start(&errstr))
     {
         QMessageBox::warning(this,tr("Could not start TTS engine."),
                 tr("Could not start TTS engine.\n") + errstr
                 + tr("\nPlease configure TTS engine."));
+        ui.testTTS->setEnabled(true);
         return;
     }
-    
+
     QTemporaryFile file(this);
     file.open();
     QString filename = file.fileName();
     file.close();
-    
+
     if(tts->voice(tr("Rockbox Utility Voice Test"),filename,&errstr) == FatalError)
     {
         tts->stop();
         QMessageBox::warning(this,tr("Could not voice test string."),
                 tr("Could not voice test string.\n") + errstr
                 + tr("\nPlease configure TTS engine."));
+        ui.testTTS->setEnabled(false);
         return;
     }
     tts->stop();
@@ -766,9 +771,10 @@ void Config::testTts()
 #else
     QSound::play(filename);
 #endif
-    
-    delete tts; /* Config objects are never deleted (in fact, they are leaked..), so we can't rely on QObject,
-                   since that would delete the TTSBase instance on application exit*/
+    ui.testTTS->setEnabled(true);
+    delete tts; /* Config objects are never deleted (in fact, they are
+                   leaked..), so we can't rely on QObject, since that would
+                   delete the TTSBase instance on application exit */
 }
 
 void Config::configEnc()
