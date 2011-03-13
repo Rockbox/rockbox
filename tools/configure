@@ -625,8 +625,8 @@ pandoracc () {
  prefixtools "$PNDSDK/bin/arm-angstrom-linux-gnueabi-"
 
  # Detect SDL
- GCCOPTS="$GCCOPTS `$PKG_CONFIG --cflags sdl`"
- LDOPTS="$LDOPTS `$PKG_CONFIG --libs sdl`"
+ GCCOPTS="$GCCOPTS `$PNDSDK/bin/sdl-config --cflags`"
+ LDOPTS="$LDOPTS `$PNDSDK/bin/sdl-config --libs`"
 
  # Compiler options
  GCCOPTS="$GCCOPTS -O2 -fno-strict-aliasing"
