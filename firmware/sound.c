@@ -245,7 +245,7 @@ static void set_prescaled_volume(void)
    || defined(HAVE_CS42L55)
     audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) \
-    || defined(HAVE_WM8750) || (defined(HAVE_WM8751) && !defined(MROBE_100)) \
+    || (defined(HAVE_WM8751) && defined(TOSHIBA_GIGABEAT_F)) \
     || defined(HAVE_WM8985) || defined(HAVE_CS42L55)
     audiohw_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
 #endif
