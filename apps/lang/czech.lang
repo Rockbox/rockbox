@@ -10422,15 +10422,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Oříznutí basů"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Oříznutí basů"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Oříznutí basů"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Oříznutí basů"
   </voice>
 </phrase>
 <phrase>
@@ -10439,15 +10439,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Oříznutí výšek"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Oříznutí výšek"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Oříznutí výšek"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Oříznutí výšek"
   </voice>
 </phrase>
 <phrase>
@@ -12383,15 +12383,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats: "3-D vylepšení"
+    gigabeats,mpiohd200,mpiohd300: "3-D vylepšení"
   </dest>
   <voice>
     *: none
-    gigabeats: "TŘIDÉ vylepšení"
+    gigabeats,mpiohd200,mpiohd300: "TŘIDÉ vylepšení"
   </voice>
 </phrase>
 <phrase>

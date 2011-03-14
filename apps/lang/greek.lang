@@ -10388,15 +10388,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Αποκοπή μπάσων"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Αποκοπή μπάσων"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Αποκοπή μπάσων"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Αποκοπή μπάσων"
   </voice>
 </phrase>
 <phrase>
@@ -10405,15 +10405,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Αποκοπή πρίμων"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Αποκοπή πρίμων"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Αποκοπή πρίμων"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Αποκοπή πρίμων"
   </voice>
 </phrase>
 <phrase>

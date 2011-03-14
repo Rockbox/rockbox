@@ -10476,15 +10476,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Bosų nukirpimas"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bosų nukirpimas"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Bosų nukirpimas"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bosų nukirpimas"
   </voice>
 </phrase>
 <phrase>
@@ -10493,15 +10493,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Aukštų daž. Nukirpimas"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Aukštų daž. Nukirpimas"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Aukštų daž. Nukirpimas"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Aukštų daž. Nukirpimas"
   </voice>
 </phrase>
 <phrase>

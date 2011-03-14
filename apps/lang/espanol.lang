@@ -8558,15 +8558,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Frecuencia de corte de bajos"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Frecuencia de corte de bajos"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Frecuencia de corte de bajos"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Frecuencia de corte de bajos"
   </voice>
 </phrase>
 <phrase>
@@ -10211,15 +10211,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Frec. de corte de agudos"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Frec. de corte de agudos"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Frecuencia de corte de agudos"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Frecuencia de corte de agudos"
   </voice>
 </phrase>
 <phrase>
@@ -12258,15 +12258,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats: "Realce 3D"
+    gigabeats,mpiohd200,mpiohd300: "Realce 3D"
   </dest>
   <voice>
     *: none
-    gigabeats: "Realce 3 D"
+    gigabeats,mpiohd200,mpiohd300: "Realce 3 D"
   </voice>
 </phrase>
 <phrase>

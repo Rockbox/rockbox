@@ -9238,15 +9238,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "중저음 컷오프 주파수"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "중저음 컷오프 주파수"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "중저음 컷오프 주파수"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "중저음 컷오프 주파수"
   </voice>
 </phrase>
 <phrase>
@@ -10667,15 +10667,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "고음역 컷오프 주파수"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "고음역 컷오프 주파수"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "고음역 컷오프 주파수"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "고음역 컷오프 주파수"
   </voice>
 </phrase>
 <phrase>

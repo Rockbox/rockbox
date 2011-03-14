@@ -12381,15 +12381,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats: "3-D poboljšanje"
+    gigabeats,mpiohd200,mpiohd300: "3-D poboljšanje"
   </dest>
   <voice>
     *: none
-    gigabeats: "3-D poboljšanje"
+    gigabeats,mpiohd200,mpiohd300: "3-D poboljšanje"
   </voice>
 </phrase>
 <phrase>

@@ -6233,15 +6233,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Bass araw ng katapusan"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass araw ng katapusan"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Bass araw ng katapusan"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass araw ng katapusan"
   </voice>
 </phrase>
 <phrase>
@@ -9837,15 +9837,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Pagtatluhin araw ng katapusan"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Pagtatluhin araw ng katapusan"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Pagtatluhin araw ng katapusan"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Pagtatluhin araw ng katapusan"
   </voice>
 </phrase>
 <phrase>
@@ -12116,15 +12116,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
   </dest>
   <voice>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
   </voice>
 </phrase>
 <phrase>

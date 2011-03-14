@@ -9165,15 +9165,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Bass-knekkfrekvens"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass-knekkfrekvens"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Bass-knekkfrekvens"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass-knekkfrekvens"
   </voice>
 </phrase>
 <phrase>
@@ -10253,15 +10253,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Diskantknekkfrekvens"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Diskantknekkfrekvens"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Diskantknekkfrekvens"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Diskantknekkfrekvens"
   </voice>
 </phrase>
 <phrase>

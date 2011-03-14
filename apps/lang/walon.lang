@@ -10422,15 +10422,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Frécwince di côpaedje des basses"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Frécwince di côpaedje des basses"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Frécwince di côpaedje des basses"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Frécwince di côpaedje des basses"
   </voice>
 </phrase>
 <phrase>
@@ -10439,15 +10439,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Frécwince di côpaedje des hôts sons"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Frécwince di côpaedje des hôts sons"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Frécwince di côpaedje des hôts sons"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Frécwince di côpaedje des hôts sons"
   </voice>
 </phrase>
 <phrase>

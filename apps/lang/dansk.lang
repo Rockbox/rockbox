@@ -10224,15 +10224,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Basgrænse"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Basgrænse"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Basgrænse"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Basgrænse"
   </voice>
 </phrase>
 <phrase>
@@ -10430,15 +10430,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Diskantgrænse"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Diskantgrænse"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Diskantgrænse"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Diskantgrænse"
   </voice>
 </phrase>
 <phrase>
@@ -12348,15 +12348,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats: "3D forbedring"
+    gigabeats,mpiohd200,mpiohd300: "3D forbedring"
   </dest>
   <voice>
     *: none
-    gigabeats: "3D forbedring"
+    gigabeats,mpiohd200,mpiohd300: "3D forbedring"
   </voice>
 </phrase>
 <phrase>

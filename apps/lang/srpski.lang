@@ -10402,15 +10402,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Гранична фрекв. за ниске"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Гранична фрекв. за ниске"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Гранична фреквенција за ниске"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Гранична фреквенција за ниске"
   </voice>
 </phrase>
 <phrase>
@@ -10419,15 +10419,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Гранична фрекв. за високе"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Гранична фрекв. за високе"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Гранична фреквенција за високе"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Гранична фреквенција за високе"
   </voice>
 </phrase>
 <phrase>
@@ -12309,15 +12309,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats: "3-D побољшање"
+    gigabeats,mpiohd200,mpiohd300: "3-D побољшање"
   </dest>
   <voice>
     *: none
-    gigabeats: "3-D побољшање"
+    gigabeats,mpiohd200,mpiohd300: "3-D побољшање"
   </voice>
 </phrase>
 <phrase>

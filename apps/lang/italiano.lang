@@ -10422,15 +10422,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Taglio Bassi"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Taglio Bassi"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Taglio Bassi"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Taglio Bassi"
   </voice>
 </phrase>
 <phrase>
@@ -10439,15 +10439,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g: "Taglio Alti"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Taglio Alti"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g: "Taglio Alti"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Taglio Alti"
   </voice>
 </phrase>
 <phrase>
@@ -12383,15 +12383,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats: "Efatizzazione 3-D"
+    gigabeats,mpiohd200,mpiohd300: "Efatizzazione 3-D"
   </dest>
   <voice>
     *: none
-    gigabeats: "Enfatizzazione 3-D"
+    gigabeats,mpiohd200,mpiohd300: "Enfatizzazione 3-D"
   </voice>
 </phrase>
 <phrase>
