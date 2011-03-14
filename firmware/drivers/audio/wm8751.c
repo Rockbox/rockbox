@@ -202,10 +202,11 @@ int sound_val2phys(int setting, int value)
         result = value * 5;
         break;
 #endif
+#ifdef AUDIOHW_HAVE_DEPTH_3D
     case SOUND_DEPTH_3D:
         result = (100 * value + 8) / 15;
         break;
-
+#endif
     default:
         result = value;
     }
