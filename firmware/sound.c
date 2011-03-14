@@ -669,6 +669,7 @@ void sound_set(int setting, int value)
   && !defined(HAVE_WM8758) && !defined(HAVE_TSC2100) \
   && !defined (HAVE_WM8711) && !defined (HAVE_WM8721) \
   && !defined (HAVE_WM8731) && !defined (HAVE_WM8978) \
+  && !defined (HAVE_WM8750) && !defined (HAVE_WM8751) \
   && !defined(HAVE_AK4537)) || (CONFIG_PLATFORM & PLATFORM_HOSTED)
 int sound_val2phys(int setting, int value)
 {
@@ -748,7 +749,7 @@ int sound_val2phys(int setting, int value)
     }
 
     return result;
-#elif defined(HAVE_WM8978)
+#elif defined(HAVE_WM8978) || defined(HAVE_WM8750) || defined(HAVE_WM8751)
     int result;
 
     switch (setting)

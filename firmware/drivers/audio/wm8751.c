@@ -33,19 +33,16 @@
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
-#ifdef USE_ADAPTIVE_BASS
-    [SOUND_BASS]          = {"",   0,  1,   0,  15,   0},
-#else
     [SOUND_BASS]          = {"dB", 1, 15, -60,  90,   0},
-#endif
     [SOUND_TREBLE]        = {"dB", 1, 15, -60,  90,   0},
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
 #ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1, 50,-970, 300,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1, 50,-970, 300,   0},
-    [SOUND_MIC_GAIN]      = {"dB", 1, 50,-970, 300,   0},
+    /* -97.0dB to 30.0dB in 0.5dB increments */
+    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-194,  60,   0},
+    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-194,  60,   0},
+    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-194,  60,  60},
 #endif
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     [SOUND_BASS_CUTOFF]   = {"Hz", 0, 70, 130, 200, 200},
@@ -54,11 +51,9 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_TREBLE_CUTOFF] = {"kHz",0,  4,   4,   8,   4},
 #endif
 #ifdef AUDIOHW_HAVE_DEPTH_3D
-    [SOUND_DEPTH_3D]      = {"",   0,  1,   -1,  15,   -1},
+    [SOUND_DEPTH_3D]      = {"%",   0,  1,  0,  15,   0},
 #endif
 };
-
-static int prescaler = 0;
 
 static uint16_t wmcodec_regs[WM_NUM_REGS] =
 {
@@ -106,6 +101,10 @@ static uint16_t wmcodec_regs[WM_NUM_REGS] =
     [ROUT2]               = 0x079,
     [MONOOUT]             = 0x079
 };
+
+/* global prescaler vars */
+static int prescalertone = 0;
+static int prescaler3d = 0;
 
 static void wmcodec_set_reg(unsigned int reg, unsigned int val)
 {
@@ -160,16 +159,6 @@ static int tone_tenthdb2hw(int value)
     return value;
 }
 
-#ifdef USE_ADAPTIVE_BASS
-static int adaptivebass2hw(int value)
-{
-    /* 0 to 15 step 1 - step -1  0 = off is a 15 in the register */
-    value = 15 - value;
-
-    return value;
-}
-#endif
-
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
 void audiohw_set_bass_cutoff(int val)
 {
@@ -200,14 +189,38 @@ static int recvol2hw(int value)
 }
 #endif
 
+int sound_val2phys(int setting, int value)
+{
+    int result;
+
+    switch (setting)
+    {
+#ifdef HAVE_RECORDING
+    case SOUND_LEFT_GAIN:
+    case SOUND_RIGHT_GAIN:
+    case SOUND_MIC_GAIN:
+        result = value * 5;
+        break;
+#endif
+    case SOUND_DEPTH_3D:
+        result = (100 * value + 8) / 15;
+        break;
+
+    default:
+        result = value;
+    }
+
+    return result;
+}
+
 static void audiohw_mute(bool mute)
 {
     /* Mute:   Set DACMU = 1 to soft-mute the audio DACs. */
     /* Unmute: Set DACMU = 0 to soft-un-mute the audio DACs. */
     if (mute)
-        wmcodec_set_bits(DACCTRL,DACCTRL_DACMU);
+        wmcodec_set_bits(DACCTRL, DACCTRL_DACMU);
     else
-        wmcodec_clear_bits(DACCTRL,DACCTRL_DACMU);
+        wmcodec_clear_bits(DACCTRL, DACCTRL_DACMU);
 }
 
 /* Reset and power up the WM8751 */
@@ -243,7 +256,7 @@ void audiohw_preinit(void)
     wmcodec_set_bits(PWRMGMT1, PWRMGMT1_VREF | PWRMGMT1_VMIDSEL_5K);
 
 #ifdef CODEC_SLAVE
-    wmcodec_set_bits(AINTFCE,AINTFCE_WL_16|AINTFCE_FORMAT_I2S);
+    wmcodec_set_bits(AINTFCE,AINTFCE_WL_16 | AINTFCE_FORMAT_I2S);
 #else
     /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
     /* IWL=00(16 bit) FORMAT=10(I2S format) */
@@ -261,25 +274,21 @@ void audiohw_postinit(void)
     /* From app notes: allow Vref to stabilize to reduce clicks */
     sleep(HZ);
 
-
 #ifdef AUDIOHW_HAVE_DEPTH_3D
     wmcodec_set_bits(ENHANCE_3D, ENHANCE_3D_MODE3D_PLAYBACK);
-#endif
-
-#ifdef USE_ADAPTIVE_BASS
-    wmcodec_set_bits(BASSCTRL, BASSCTRL_BB);
 #endif
 
      /* 3. Enable DACs as required. */
     wmcodec_set_bits(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR);
 
      /* 4. Enable line and / or headphone output buffers as required. */
-#if defined(MROBE_100) || defined(MPIO_HD200)
-     /* power-up output stage */
-    wmcodec_set_bits(PWRMGMT2, PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
-#else
+#if defined(GIGABEATFX)
+    /* headphones + line-out */
     wmcodec_set_bits(PWRMGMT2, PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1 | 
                      PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2);
+#else
+    /* headphones */
+    wmcodec_set_bits(PWRMGMT2, PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
 #endif
 
     /* Full -0dB on the DACS */
@@ -359,12 +368,8 @@ void audiohw_set_lineout_vol(int vol_l, int vol_r)
 void audiohw_set_bass(int value)
 {
     wmcodec_set_masked(BASSCTRL,
-
-#ifdef USE_ADAPTIVE_BASS
-        BASSCTRL_BASS(adaptivebass2hw(value)),BASSCTRL_BASS_MASK);
-#else
-        BASSCTRL_BASS(tone_tenthdb2hw(value)),BASSCTRL_BASS_MASK);
-#endif
+                       BASSCTRL_BASS(tone_tenthdb2hw(value)),
+                       BASSCTRL_BASS_MASK);
 }
 
 void audiohw_set_treble(int value)
@@ -373,12 +378,21 @@ void audiohw_set_treble(int value)
                        TREBCTRL_TREB_MASK);
 }
 
+static void sync_prescaler(void)
+{
+    int prescaler;
+    prescaler = prescalertone + prescaler3d;
+
+    /* attenuate in 0.5dB steps (0dB - -127dB) */
+    wmcodec_set_reg(LEFTGAIN, 0xff - (prescaler & LEFTGAIN_LDACVOL));
+    wmcodec_set_reg(RIGHTGAIN, RIGHTGAIN_RDVU |
+                    (0xff - (prescaler & RIGHTGAIN_RDACVOL)));
+}
+
 void audiohw_set_prescaler(int value)
 {
-    prescaler = 3 * value / 15;
-    wmcodec_set_reg(LEFTGAIN, 0xff - (prescaler & LEFTGAIN_LDACVOL));
-    wmcodec_set_reg(RIGHTGAIN, RIGHTGAIN_RDVU | 
-                    (0xff - (prescaler & RIGHTGAIN_RDACVOL)));
+    prescalertone = 3 * value / 15; /* value in tdB */
+    sync_prescaler();
 }
 
 /* Nice shutdown of WM8751 codec */
@@ -424,11 +438,9 @@ void audiohw_set_frequency(int fsel)
 /* Set the depth of the 3D effect */
 void audiohw_set_depth_3d(int val)
 {
-    if (val >= 0)
+    if (val > 0)
     {
-        if ( !(wmcodec_regs[ENHANCE_3D] & ENHANCE_3D_3DEN) )
-            wmcodec_set_bits(ENHANCE_3D, ENHANCE_3D_3DEN);
-
+        wmcodec_set_bits(ENHANCE_3D, ENHANCE_3D_3DEN);
         wmcodec_set_masked(ENHANCE_3D, ENHANCE_3D_DEPTH(val),
                            ENHANCE_3D_DEPTH_MASK);
     }
@@ -436,10 +448,18 @@ void audiohw_set_depth_3d(int val)
     {
         wmcodec_clear_bits(ENHANCE_3D, ENHANCE_3D_3DEN);
     }
+
+    /* -4 dB @ full setting
+     * this gives approximately constant volume on setting change
+     * and prevents clipping (at least on my HD300)
+     */
+    prescaler3d = 8*val / 15;
+    sync_prescaler();
 }
 #endif
 
 #ifdef HAVE_RECORDING
+#if 0
 static void audiohw_set_ngat(int ngath, int type, bool enable)
 {
     /* This function controls Noise gate function
@@ -474,6 +494,7 @@ static void audiohw_set_alc(unsigned char level,  /* signal level at ADC */
         wmcodec_set_masked(ALC1, ALC1_ALCSEL_DISABLED, ALC1_ALCSEL_MASK);
     }
 }
+#endif
 
 void audiohw_set_recsrc(int source, bool recording)
 {
@@ -529,8 +550,10 @@ void audiohw_set_recsrc(int source, bool recording)
             wmcodec_set_masked(ADCR, ADCR_RINSEL_RINPUT1, ADCR_RINSEL_MASK);
 
            /* turn off ALC and NGAT as OF do */
+           /*
            audiohw_set_alc(0x00, false, 0x00, 0x00, 0x00, false);
            audiohw_set_ngat(0x00, 0x00, false);
+           */
 
             /* setup output digital data
              * default is LADC -> LDATA, RADC -> RDATA
@@ -596,9 +619,9 @@ void audiohw_set_recsrc(int source, bool recording)
 
         /* setup ALC and NGAT as OF do */
         /* level, zc, hold, decay, attack, enable */
-        audiohw_set_alc(0x0b, true, 0x00, 0x03, 0x02, true);
+        /*  audiohw_set_alc(0x0b, true, 0x00, 0x03, 0x02, true); */
         /* ngath, type, enable */
-        audiohw_set_ngat(0x08, 0x02, true);
+        /* audiohw_set_ngat(0x08, 0x02, true); */
 
         /* setup output digital data
          * default is LADC -> LDATA, RADC -> RDATA
@@ -634,9 +657,9 @@ void audiohw_set_recsrc(int source, bool recording)
 
         /* setup ALC and NGAT as OF do */
         /* level, zc, hold, decay, attack, enable */
-        audiohw_set_alc(0x0f, false, 0x00, 0x05, 0x02, true);
+        /* audiohw_set_alc(0x0f, false, 0x00, 0x05, 0x02, true); */
         /* ngath, type, enable */
-        audiohw_set_ngat(0x1f, 0x00, true);
+        /* audiohw_set_ngat(0x1f, 0x00, true); */
 
         /* setup output digital data
          * default is LADC -> LDATA, RADC -> RDATA
