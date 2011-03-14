@@ -179,3 +179,28 @@ void pcm_set_mixer_volume(int volume)
 
     (*env_ptr)->CallVoidMethod(env_ptr, RockboxPCM_instance, set_volume_method, volume);
 }
+
+/* Due to limitations of default_event_handler(), parameters gets swallowed when
+ * being posted with queue_broadcast(), so workaround this by caching the last
+ * value.
+ */
+static int lastPostedVolume = -1;
+int hosted_get_volume(void)
+{
+    return lastPostedVolume;
+}
+
+JNIEXPORT void JNICALL
+Java_org_rockbox_RockboxPCM_postVolumeChangedEvent(JNIEnv *env,
+                                                   jobject this,
+                                                   jint volume)
+{
+    (void) env;
+    (void) this;
+
+    if (volume != lastPostedVolume)
+    {
+        lastPostedVolume = volume;
+        queue_broadcast(SYS_VOLUME_CHANGED, 0);
+    }
+}

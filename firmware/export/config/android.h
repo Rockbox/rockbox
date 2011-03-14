@@ -79,6 +79,9 @@
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
 
+/* define this if the host platform can change volume outside of rockbox */
+#define PLATFORM_HAS_VOLUME_CHANGE
+
 #define HAVE_SW_TONE_CONTROLS 
 
 /* Define current usage levels. */

@@ -636,6 +636,15 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             resume = false;
             return SYS_CALL_HUNG_UP;
 #endif
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(PLATFORM_HAS_VOLUME_CHANGE)
+        case SYS_VOLUME_CHANGED:
+        {
+            int volume = hosted_get_volume();
+            if (global_settings.volume != volume)
+                global_settings.volume = volume;
+            return 0;
+        }
+#endif
 #ifdef HAVE_MULTIMEDIA_KEYS
         /* multimedia keys on keyboards, headsets */
         case BUTTON_MULTIMEDIA_PLAYPAUSE:

@@ -1834,7 +1834,9 @@ static void audio_play_start(size_t offset)
     ci.seek_time = 0;
     wps_offset = 0;
 
+#ifndef PLAFORM_HAS_VOLUME_CHANGE
     sound_set_volume(global_settings.volume);
+#endif
     track_widx = track_ridx = 0;
     buf_set_base_handle(-1);
 
