@@ -39,16 +39,16 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
 #ifdef HAVE_RECORDING
-    /* -97.0dB to 30.0dB in 0.5dB increments */
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-194,  60,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-194,  60,   0},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-194,  60,  60},
+    /* -17.25dB to 30.0dB in 0.75dB increments 64 steps*/
+    [SOUND_LEFT_GAIN]     = {"dB", 2,  75, -1725, 3000, 0},
+    [SOUND_RIGHT_GAIN]    = {"dB", 2,  75, -1725, 3000, 0},
+    [SOUND_MIC_GAIN]      = {"dB", 2,  75, -1725, 3000, 3000},
 #endif
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     [SOUND_BASS_CUTOFF]   = {"Hz", 0, 70, 130, 200, 200},
 #endif
 #ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
-    [SOUND_TREBLE_CUTOFF] = {"kHz",0,  4,   4,   8,   4},
+    [SOUND_TREBLE_CUTOFF] = {"kHz", 0,  4,   4,   8,   4},
 #endif
 #ifdef AUDIOHW_HAVE_DEPTH_3D
     [SOUND_DEPTH_3D]      = {"%",   0,  1,  0,  15,   0},
@@ -180,12 +180,11 @@ void audiohw_set_treble_cutoff(int val)
 }
 #endif
 
-#if defined(HAVE_WM8750) && defined(HAVE_RECORDING)
+#ifdef HAVE_RECORDING
 static int recvol2hw(int value)
 {
-   /* -970...300 to input register value */
-
-   return ((2*value)/10 + 0xc3);
+    /* -1725 to 3000 => 0 ... 23 ... 63 */
+    return ((4 * value) / 300) + 23;
 }
 #endif
 
@@ -195,13 +194,6 @@ int sound_val2phys(int setting, int value)
 
     switch (setting)
     {
-#ifdef HAVE_RECORDING
-    case SOUND_LEFT_GAIN:
-    case SOUND_RIGHT_GAIN:
-    case SOUND_MIC_GAIN:
-        result = value * 5;
-        break;
-#endif
 #ifdef AUDIOHW_HAVE_DEPTH_3D
     case SOUND_DEPTH_3D:
         result = (100 * value + 8) / 15;
@@ -542,10 +534,6 @@ void audiohw_set_recsrc(int source, bool recording)
             wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR | 
                              PWRMGMT1_ADCL | PWRMGMT1_ADCR);
 
-            /* Set input volume to PGA 0dB*/
-            wmcodec_set_reg(LINVOL, LINVOL_LIVU | LINVOL_LINVOL(0x17));
-            wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RINVOL(0x17));
-
             /* Setup input source for PGA as INPUT1 */
             wmcodec_set_masked(ADCL, ADCL_LINSEL_LINPUT1, ADCL_LINSEL_MASK);
             wmcodec_set_masked(ADCR, ADCR_RINSEL_RINPUT1, ADCR_RINSEL_MASK);
@@ -608,10 +596,6 @@ void audiohw_set_recsrc(int source, bool recording)
         wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR |
                          PWRMGMT1_ADCL | PWRMGMT1_ADCR);
 
-        /* Set input volume to PGA 0dB*/
-        wmcodec_set_reg(LINVOL, LINVOL_LIVU | LINVOL_LINVOL(0x17));
-        wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RINVOL(0x17));
-
         /* Setup input source for PGA as INPUT2 
          * MICBOOST disabled
          */
@@ -649,10 +633,6 @@ void audiohw_set_recsrc(int source, bool recording)
         wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR |
                          PWRMGMT1_ADCL | PWRMGMT1_ADCR);
 
-        /* Set input volume to PGA 0dB*/
-        wmcodec_set_reg(LINVOL, LINVOL_LIVU | LINVOL_LINVOL(0x17));
-        wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RINVOL(0x17));
-
         /* Setup input source for PGA as INPUT3 
          * MICBOOST disabled
          */
@@ -685,14 +665,14 @@ void audiohw_set_recsrc(int source, bool recording)
 /* Setup PGA gain */
 void audiohw_set_recvol(int vol_l, int vol_r, int type)
 {
-    wmcodec_set_reg(LADCVOL, LADCVOL_LADCVOL(recvol2hw(vol_l)));
+    wmcodec_set_reg(LINVOL, LINVOL_LIZC | LINVOL_LINVOL(recvol2hw(vol_l)));
 
     if (type == AUDIO_GAIN_MIC)
-        wmcodec_set_reg(RADCVOL, RADCVOL_RAVU | 
-                        RADCVOL_RADCVOL(recvol2hw(vol_l)));
+        wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RIZC |
+                                RINVOL_RINVOL(recvol2hw(vol_l)));
     else
-        wmcodec_set_reg(RADCVOL, RADCVOL_RAVU | 
-                        RADCVOL_RADCVOL(recvol2hw(vol_r)));
+        wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RIZC |
+                                RINVOL_RINVOL(recvol2hw(vol_r)));
 }
 #endif /* HAVE_RECORDING */
 #endif /* HAVE_WM8750 */
