@@ -635,7 +635,10 @@ void audiohw_set_recsrc(int source, bool recording)
         wmcodec_clear_bits(RIGHTMIX2, RIGHTMIX2_RI2RO);
         wmcodec_set_bits(RIGHTMIX2, RIGHTMIX2_RD2RO);
 
+#if !defined(MPIO_HD300)
+        /* HD300 uses the same socket for headphones and line-in */
         audiohw_mute(false);
+#endif
         break;
 #endif
 #if (INPUT_SRC_CAPS & SRC_CAP_MIC)
