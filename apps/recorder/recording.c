@@ -308,12 +308,30 @@ static void set_gain(void)
 #ifdef HAVE_MIC_REC
     if(global_settings.rec_source == AUDIO_SRC_MIC)
     {
+        if (global_settings.rec_mic_gain > sound_max(SOUND_MIC_GAIN))
+            global_settings.rec_mic_gain = sound_max(SOUND_MIC_GAIN);
+        
+        if (global_settings.rec_mic_gain < sound_min(SOUND_MIC_GAIN))
+            global_settings.rec_mic_gain = sound_min(SOUND_MIC_GAIN);
+
         audio_set_recording_gain(global_settings.rec_mic_gain,
                                  0, AUDIO_GAIN_MIC);
     }
     else
 #endif /* MIC */
     {
+        if (global_settings.rec_left_gain > sound_max(SOUND_LEFT_GAIN))
+            global_settings.rec_left_gain = sound_max(SOUND_LEFT_GAIN);
+
+        if (global_settings.rec_left_gain < sound_min(SOUND_LEFT_GAIN))
+            global_settings.rec_left_gain = sound_min(SOUND_LEFT_GAIN);
+
+        if (global_settings.rec_right_gain > sound_max(SOUND_RIGHT_GAIN))
+            global_settings.rec_right_gain = sound_max(SOUND_RIGHT_GAIN);
+
+        if (global_settings.rec_right_gain < sound_min(SOUND_RIGHT_GAIN))
+            global_settings.rec_right_gain = sound_min(SOUND_RIGHT_GAIN);
+      
         /* AUDIO_SRC_LINEIN, AUDIO_SRC_FMRADIO, AUDIO_SRC_SPDIF */
         audio_set_recording_gain(global_settings.rec_left_gain,
                                  global_settings.rec_right_gain,
@@ -572,6 +590,8 @@ static const char* const fmtstr[] =
     "%c%d.%02d %s "       /* 2 decimals */
 };
 
+static const char factor[] = {1, 10, 100};
+
 static char *fmt_gain(int snd, int val, char *str, int len)
 {
     int i, d, numdec;
@@ -589,8 +609,8 @@ static char *fmt_gain(int snd, int val, char *str, int len)
 
     if(numdec)
     {
-        i = val / (10*numdec);
-        d = val % (10*numdec);
+        i = val / factor[numdec];
+        d = val % factor[numdec];
         snprintf(str, len, fmtstr[numdec], sign, i, d, unit);
     }
     else
@@ -1402,37 +1422,34 @@ bool recording_screen(bool no_source)
                 switch (listid_to_enum[gui_synclist_get_sel_pos(&lists)])
                 {
                     case ITEM_VOLUME:
-                        global_settings.volume++;
+                        global_settings.volume += sound_steps(SOUND_VOLUME);
                         setvol();
                         break;
                     case ITEM_GAIN:
 #ifdef HAVE_MIC_REC
                         if(global_settings.rec_source == AUDIO_SRC_MIC)
                         {
-                            if(global_settings.rec_mic_gain <
-                               sound_max(SOUND_MIC_GAIN))
-                                global_settings.rec_mic_gain++;
+                            global_settings.rec_mic_gain +=
+                                sound_steps(SOUND_MIC_GAIN);
                         }
                         else
 #endif /* MIC */
                         {
-                            if(global_settings.rec_left_gain <
-                               sound_max(SOUND_LEFT_GAIN))
-                                global_settings.rec_left_gain++;
-                            if(global_settings.rec_right_gain <
-                               sound_max(SOUND_RIGHT_GAIN))
-                                global_settings.rec_right_gain++;
+                            global_settings.rec_left_gain +=
+                                sound_steps(SOUND_LEFT_GAIN);
+                            global_settings.rec_right_gain +=
+                                sound_steps(SOUND_RIGHT_GAIN);
                         }
                         break;
                     case ITEM_GAIN_L:
-                        if(global_settings.rec_left_gain <
-                           sound_max(SOUND_LEFT_GAIN))
-                            global_settings.rec_left_gain++;
+                        global_settings.rec_left_gain +=
+                            sound_steps(SOUND_LEFT_GAIN);
+
                         break;
                     case ITEM_GAIN_R:
-                        if(global_settings.rec_right_gain <
-                           sound_max(SOUND_RIGHT_GAIN))
-                            global_settings.rec_right_gain++;
+                        global_settings.rec_right_gain +=
+                            sound_steps(SOUND_RIGHT_GAIN);
+
                         break;
 #ifdef HAVE_AGC
                     case ITEM_AGC_MODE:
@@ -1475,37 +1492,37 @@ bool recording_screen(bool no_source)
                 switch (listid_to_enum[gui_synclist_get_sel_pos(&lists)])
                 {
                     case ITEM_VOLUME:
-                        global_settings.volume--;
+                        global_settings.volume -= sound_steps(SOUND_VOLUME);
+
+                        /* check range and update */
                         setvol();
                         break;
                     case ITEM_GAIN:
 #ifdef HAVE_MIC_REC
                         if(global_settings.rec_source == AUDIO_SRC_MIC)
                         {
-                            if(global_settings.rec_mic_gain >
-                               sound_min(SOUND_MIC_GAIN))
-                                global_settings.rec_mic_gain--;
+                            global_settings.rec_mic_gain -= 
+                                sound_steps(SOUND_MIC_GAIN);
                         }
                         else
 #endif /* MIC */
                         {
-                            if(global_settings.rec_left_gain >
-                               sound_min(SOUND_LEFT_GAIN))
-                                global_settings.rec_left_gain--;
-                            if(global_settings.rec_right_gain >
-                               sound_min(SOUND_RIGHT_GAIN))
-                                global_settings.rec_right_gain--;
+                            global_settings.rec_left_gain -=
+                                sound_steps(SOUND_LEFT_GAIN);
+
+                            global_settings.rec_right_gain -=
+                                sound_steps(SOUND_RIGHT_GAIN);
                         }
                         break;
                     case ITEM_GAIN_L:
-                        if(global_settings.rec_left_gain >
-                           sound_min(SOUND_LEFT_GAIN))
-                            global_settings.rec_left_gain--;
+                        global_settings.rec_left_gain -=
+                            sound_steps(SOUND_LEFT_GAIN);
+
                         break;
                     case ITEM_GAIN_R:
-                        if(global_settings.rec_right_gain >
-                           sound_min(SOUND_RIGHT_GAIN))
-                            global_settings.rec_right_gain--;
+                        global_settings.rec_right_gain -=
+                            sound_steps(SOUND_RIGHT_GAIN);
+
                         break;
 #ifdef HAVE_AGC
                     case ITEM_AGC_MODE:
