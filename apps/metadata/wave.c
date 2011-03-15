@@ -30,6 +30,11 @@
 #include "rbunicode.h"
 #include "logf.h"
 
+#ifdef DEBUGF
+#undef DEBUGF
+#define DEBUGF(...)
+#endif
+
 /* Wave(RIFF)/Wave64 format */
 
 
