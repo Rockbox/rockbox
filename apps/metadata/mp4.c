@@ -33,6 +33,11 @@
 #include "debug.h"
 #include "replaygain.h"
 
+#ifdef DEBUGF
+#undef DEBUGF
+#define DEBUGF(...)
+#endif
+
 #define MP4_3gp6 FOURCC('3', 'g', 'p', '6')
 #define MP4_aART FOURCC('a', 'A', 'R', 'T')
 #define MP4_alac FOURCC('a', 'l', 'a', 'c')
@@ -45,6 +50,7 @@
 #define MP4_cwrt FOURCC(0xa9, 'w', 'r', 't')
 #define MP4_ccmt FOURCC(0xa9, 'c', 'm', 't')
 #define MP4_cday FOURCC(0xa9, 'd', 'a', 'y')
+#define MP4_covr FOURCC('c', 'o', 'v', 'r')
 #define MP4_disk FOURCC('d', 'i', 's', 'k')
 #define MP4_esds FOURCC('e', 's', 'd', 's')
 #define MP4_ftyp FOURCC('f', 't', 'y', 'p')
@@ -460,6 +466,32 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 id3->tracknum = betoh16(n[1]);
             }
             break;
+
+#ifdef HAVE_ALBUMART
+        case MP4_covr:
+            {
+                int pos = lseek(fd, 0, SEEK_CUR) + 16;
+                
+                read_mp4_tag(fd, size, buffer, 8);
+                id3->albumart.type = AA_TYPE_UNKNOWN;
+                if (memcmp(buffer, "\xff\xd8\xff\xe0", 4) == 0)
+                {
+                    id3->albumart.type = AA_TYPE_JPG;
+                }
+                else if (memcmp(buffer, "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a", 8) == 0)
+                {
+                    id3->albumart.type = AA_TYPE_PNG;
+                }
+                
+                if (id3->albumart.type != AA_TYPE_UNKNOWN)
+                {
+                    id3->albumart.pos  = pos;
+                    id3->albumart.size = size - 16;
+                    id3->embed_albumart = true;
+                }
+            }
+            break;
+#endif
 
         case MP4_extra:
             {
