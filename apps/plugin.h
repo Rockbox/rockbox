@@ -819,7 +819,7 @@ struct plugin_api {
             unsigned long rec_time, unsigned long header_template,
             void (*progressfunc)(int), bool generate_toc);
     unsigned long (*find_next_frame)(int fd, long *offset,
-            long max_offset, unsigned long last_header);
+            long max_offset, unsigned long reference_header);
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned short (*peak_meter_scale_value)(unsigned short val,

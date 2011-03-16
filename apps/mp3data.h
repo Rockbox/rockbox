@@ -57,17 +57,29 @@ struct mp3info {
 
 #define MAX_XING_HEADER_SIZE 576
 
-unsigned long find_next_frame(int fd, long *offset, long max_offset,
-                              unsigned long last_header);
-unsigned long mem_find_next_frame(int startpos, long *offset, long max_offset,
-                                  unsigned long last_header);
-int get_mp3file_info(int fd, struct mp3info *info);
-int count_mp3_frames(int fd, int startpos, int filesize,
+unsigned long find_next_frame(int fd, 
+                              long *offset, 
+                              long max_offset,
+                              unsigned long reference_header);
+unsigned long mem_find_next_frame(int startpos, 
+                                  long *offset, 
+                                  long max_offset, 
+                                  unsigned long reference_header);
+int get_mp3file_info(int fd, 
+                     struct mp3info *info);
+int count_mp3_frames(int fd, 
+                     int startpos, 
+                     int filesize,
                      void (*progressfunc)(int));
-int create_xing_header(int fd, long startpos, long filesize,
-                       unsigned char *buf, unsigned long num_frames,
-                       unsigned long rec_time, unsigned long header_template,
-                       void (*progressfunc)(int), bool generate_toc);
+int create_xing_header(int fd, 
+                       long startpos, 
+                       long filesize,
+                       unsigned char *buf, 
+                       unsigned long num_frames,
+                       unsigned long rec_time, 
+                       unsigned long header_template,
+                       void (*progressfunc)(int), 
+                       bool generate_toc);
 
 extern unsigned long bytes2int(unsigned long b0,
                                unsigned long b1,

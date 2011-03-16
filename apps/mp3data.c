@@ -39,6 +39,7 @@
 #include "mp3data.h"
 #include "file.h"
 #include "buffer.h"
+#include "metadata/metadata_common.h"
 
 // #define DEBUG_VERBOSE
 
@@ -201,39 +202,74 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     return true;
 }
 
+static bool headers_have_same_type(unsigned long header1, 
+                                   unsigned long header2)
+{
+    /* Compare MPEG version, layer and sampling frequency. If header1 is zero
+     * it is assumed the headers are of same type. */
+    unsigned int mask = 0xfffe0c00;
+    header1 &= mask;
+    header2 &= mask;
+    return header1 ? (header1 == header2) : true;
+}
+
 static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
-                                       unsigned long last_header,
-                                       int(*getfunc)(int fd, unsigned char *c))
+                                       unsigned long reference_header,
+                                       int(*getfunc)(int fd, unsigned char *c),
+                                       bool single_header)
 {
     unsigned long header=0;
     unsigned char tmp;
-    int i;
+    long pos      = 0;
 
-    long pos = 0;
-
-    /* We remember the last header we found, to use as a template to see if
-       the header we find has the same frequency, layer etc */
-    last_header &= 0xffff0c00;
-    
-    /* Fill up header with first 24 bits */
-    for(i = 0; i < 3; i++) {
-        header <<= 8;
-        if(!getfunc(fd, &tmp))
-            return 0;
-        header |= tmp;
-        pos++;
-    }
-
+    /* We will search until we find two consecutive MPEG frame headers with 
+     * the same MPEG version, layer and sampling frequency. The first header
+     * of this pair is assumed to be the first valid MPEG frame header of the
+     * whole stream. */
     do {
+        /* Read 1 new byte. */
         header <<= 8;
-        if(!getfunc(fd, &tmp))
+        if (!getfunc(fd, &tmp))
             return 0;
         header |= tmp;
         pos++;
-        if(max_offset > 0 && pos > max_offset)
+        
+        /* Abort if max_offset is reached. Stop parsing. */
+        if (max_offset > 0 && pos > max_offset)
             return 0;
-    } while(!is_mp3frameheader(header) ||
-            (last_header?((header & 0xffff0c00) != last_header):false));
+        
+        if (is_mp3frameheader(header)) {
+            if (single_header) {
+                /* We search for one _single_ valid header that has the same
+                 * type as the reference_header (if reference_header != 0). 
+                 * In this case we are finished. */
+                if (headers_have_same_type(reference_header, header))
+                    break;
+            } else {
+                /* The current header is valid. Now gather the frame size,
+                 * seek to this byte position and check if there is another
+                 * valid MPEG frame header of the same type. */
+                struct mp3info info;
+                
+                /* Gather frame size from given header and seek to next
+                 * frame header. */
+                mp3headerinfo(&info, header);
+                lseek(fd, info.frame_size-4, SEEK_CUR);
+                
+                /* Read possible next frame header and seek back to last frame
+                 * headers byte position. */
+                reference_header = 0;
+                read_uint32be(fd, (uint32_t*)&reference_header);
+                lseek(fd, -info.frame_size, SEEK_CUR);
+                
+                /* If the current header is of the same type as the previous 
+                 * header we are finished. */
+                if (headers_have_same_type(header, reference_header))
+                    break;
+            }
+        }
+  
+    } while (true);
 
     *offset = pos - 4;
 
@@ -248,9 +284,13 @@ static int fileread(int fd, unsigned char *c)
     return read(fd, c, 1);
 }
 
-unsigned long find_next_frame(int fd, long *offset, long max_offset, unsigned long last_header)
+unsigned long find_next_frame(int fd, 
+                              long *offset, 
+                              long max_offset,
+                              unsigned long reference_header)
 {
-    return __find_next_frame(fd, offset, max_offset, last_header, fileread);
+    return __find_next_frame(fd, offset, max_offset, reference_header, 
+                             fileread, true);
 }
 
 #ifndef __PCTOOL__
@@ -312,10 +352,9 @@ static void buf_init(void)
     fnf_read_index = 0;
 }
 
-static unsigned long buf_find_next_frame(int fd, long *offset, long max_offset,
-                                         unsigned long last_header)
+static unsigned long buf_find_next_frame(int fd, long *offset, long max_offset)
 {
-    return __find_next_frame(fd, offset, max_offset, last_header, buf_getbyte);
+    return __find_next_frame(fd, offset, max_offset, 0, buf_getbyte, true);
 }
 
 static int audiobuflen;
@@ -337,15 +376,18 @@ static int mem_getbyte(int dummy, unsigned char *c)
         return 1;
 }
 
-unsigned long mem_find_next_frame(int startpos, long *offset, long max_offset,
-                                  unsigned long last_header)
+unsigned long mem_find_next_frame(int startpos, 
+                                  long *offset, 
+                                  long max_offset,
+                                  unsigned long reference_header)
 {
     audiobuflen = audiobufend - audiobuf;
     mem_pos = startpos;
     mem_cnt = 0;
     mem_maxlen = max_offset;
 
-    return __find_next_frame(0, offset, max_offset, last_header, mem_getbyte);
+    return __find_next_frame(0, offset, max_offset, reference_header, 
+                             mem_getbyte, true);
 }
 #endif
 
@@ -446,17 +488,20 @@ static void get_vbri_info(struct mp3info *info, unsigned char *buf)
 }
 
 /* Seek to next mpeg header and extract relevant information. */
-static int get_next_header_info(int fd, long *bytecount, struct mp3info *info)
+static int get_next_header_info(int fd, long *bytecount, struct mp3info *info,
+                                bool single_header)
 {
     long tmp;
-    unsigned long header = find_next_frame(fd, &tmp, 0x20000, 0);
+    unsigned long header = 0;
+    
+    header = __find_next_frame(fd, &tmp, 0x20000, 0, fileread, single_header);
     if(header == 0)
         return -1;
 
     if(!mp3headerinfo(info, header))
         return -2;
 
-    /* Next header is tmp bytes away. */
+    /* Next frame header is tmp bytes away. */
     *bytecount += tmp;
         
     return 0;
@@ -478,8 +523,8 @@ int get_mp3file_info(int fd, struct mp3info *info)
     info->enc_padding = -1;
 #endif
 
-    /* Get the very first MPEG frame. */
-    result = get_next_header_info(fd, &bytecount, info);
+    /* Get the very first single MPEG frame. */
+    result = get_next_header_info(fd, &bytecount, info, true);
     if(result)
         return result;
 
@@ -514,7 +559,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
         bytecount += info->frame_size;
         
         /* Now get the next frame to read the real info about the mp3 stream */
-        result = get_next_header_info(fd, &bytecount, info);
+        result = get_next_header_info(fd, &bytecount, info, false);
         if(result)
             return result;
             
@@ -528,7 +573,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
         bytecount += info->frame_size;
         
         /* Now get the next frame to read the real info about the mp3 stream */
-        result = get_next_header_info(fd, &bytecount, info);
+        result = get_next_header_info(fd, &bytecount, info, false);
         if(result)
             return result;
             
@@ -537,6 +582,13 @@ int get_mp3file_info(int fd, struct mp3info *info)
     else
     {
         VDEBUGF("-- No VBR header --\n");
+        
+        /* There was no VBR header found. So, we seek back to beginning and
+         * search for the first MPEG frame header of the mp3 stream. */
+        lseek(fd, -info->frame_size, SEEK_CUR);
+        result = get_next_header_info(fd, &bytecount, info, false);
+        if(result)
+            return result;
     }
 
     return bytecount;
@@ -574,7 +626,7 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     num_frames = 0;
     cnt = 0;
     
-    while((header = buf_find_next_frame(fd, &bytes, -1, header_template))) {
+    while((header = buf_find_next_frame(fd, &bytes, header_template))) {
         mp3headerinfo(&info, header);
 
         if(!header_template)
@@ -649,7 +701,7 @@ int create_xing_header(int fd, long startpos, long filesize,
             /* Advance from the last seek point to this one */
             for(j = 0;j < pos - last_pos;j++)
             {
-                header = buf_find_next_frame(fd, &bytes, -1, header_template);
+                header = buf_find_next_frame(fd, &bytes, header_template);
                 filepos += bytes;
                 mp3headerinfo(&info, header);
                 buf_seek(fd, info.frame_size-4);
