@@ -166,8 +166,11 @@ public class RockboxWidgetProvider extends AppWidgetProvider
                 CharSequence album = args.getCharSequenceExtra("album");
                 views.setTextViewText(R.id.infoDisplay, title+"\n"+artist+"\n"+album);
                 CharSequence albumart = args.getCharSequenceExtra("albumart");
+                /* Uri.fromFile() is buggy in <2.2
+                 * http://stackoverflow.com/questions/3004713/get-content-uri-from-file-path-in-android */
                 if (albumart != null)
-                    views.setImageViewUri(R.id.logo, Uri.fromFile(new File(albumart.toString())));
+                    views.setImageViewUri(R.id.logo, Uri.parse(
+                                    new File(albumart.toString()).toString()));
                 else
                     views.setImageViewResource(R.id.logo, R.drawable.rockbox);
             }
