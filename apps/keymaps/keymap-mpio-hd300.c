@@ -184,29 +184,27 @@ static const struct button_mapping button_context_recscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_recscreen */
 
-#if 0
 static const struct button_mapping button_context_keyboard[]  = {
-    { ACTION_KBD_LEFT,           BUTTON_VOL_DOWN,               BUTTON_NONE },
-    { ACTION_KBD_LEFT,           BUTTON_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_KBD_RIGHT,          BUTTON_VOL_UP,                 BUTTON_NONE },
-    { ACTION_KBD_RIGHT,          BUTTON_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_KBD_LEFT,           BUTTON_REW     ,               BUTTON_NONE },
+    { ACTION_KBD_LEFT,           BUTTON_REW|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_KBD_RIGHT,          BUTTON_FF,                     BUTTON_NONE },
+    { ACTION_KBD_RIGHT,          BUTTON_FF|BUTTON_REPEAT,       BUTTON_NONE },
 /*  { ACTION_KBD_CURSOR_LEFT,    BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_KBD_CURSOR_RIGHT,   BUTTON_,                       BUTTON_ }, */
-    { ACTION_KBD_SELECT,         BUTTON_FUNC,                   BUTTON_NONE },
+    { ACTION_KBD_SELECT,         BUTTON_ENTER,                  BUTTON_NONE },
     { ACTION_KBD_PAGE_FLIP,      BUTTON_PLAY|BUTTON_REPEAT,     BUTTON_PLAY },
     { ACTION_KBD_DONE,           BUTTON_PLAY|BUTTON_REL,        BUTTON_PLAY },
-    { ACTION_KBD_ABORT,          BUTTON_REC|BUTTON_REL,         BUTTON_REC },
-/*  { ACTION_KBD_BACKSPACE,      BUTTON_,                       BUTTON_ }, */
-    { ACTION_KBD_UP,             BUTTON_REW,                    BUTTON_NONE },
-    { ACTION_KBD_UP,             BUTTON_REW|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_KBD_DOWN,           BUTTON_FF,                     BUTTON_NONE },
-    { ACTION_KBD_DOWN,           BUTTON_FF|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_KBD_MORSE_INPUT,    BUTTON_REC|BUTTON_REPEAT,      BUTTON_REC },
-    { ACTION_KBD_MORSE_SELECT,   BUTTON_FUNC|BUTTON_REL,        BUTTON_NONE },
+    { ACTION_KBD_ABORT,          BUTTON_MENU|BUTTON_REL,        BUTTON_MENU },
+    { ACTION_KBD_BACKSPACE,      BUTTON_REC,                    BUTTON_NONE },
+    { ACTION_KBD_UP,             BUTTON_UP,                     BUTTON_NONE },
+    { ACTION_KBD_UP,             BUTTON_UP|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_DOWN,           BUTTON_DOWN,                   BUTTON_NONE },
+    { ACTION_KBD_DOWN,           BUTTON_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_KBD_MORSE_INPUT,    BUTTON_MENU|BUTTON_REPEAT,     BUTTON_MENU },
+    { ACTION_KBD_MORSE_SELECT,   BUTTON_ENTER|BUTTON_REL,       BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
-#endif
 
 const struct button_mapping* get_context_mapping(int context)
 {
@@ -240,9 +238,9 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
 
-//        case CONTEXT_KEYBOARD:
-//        case CONTEXT_MORSE_INPUT:
-//            return button_context_keyboard;
+        case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
+            return button_context_keyboard;
 
         case CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS_EQ:
