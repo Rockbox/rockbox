@@ -27,6 +27,7 @@
 #include "settings.h"
 #include "radio.h"
 #include "buffering.h"
+#include "playback.h" /* bufopen_user_data */
 #include "file.h"
 #include "kernel.h"
 #include "string-extra.h"
@@ -63,6 +64,7 @@ static int load_radioart_image(struct radioart *ra, const char* preset_name,
                                struct dim *dim)
 {
     char path[MAX_PATH];
+    struct bufopen_bitmap_data user_data;
 #ifndef HAVE_NOISY_IDLE_MODE
     cpu_idle_mode(false);
 #endif
@@ -80,7 +82,9 @@ static int load_radioart_image(struct radioart *ra, const char* preset_name,
     ra->dim.height = dim->height;
     ra->dim.width = dim->width;
     ra->last_tick = current_tick;
-    ra->handle = bufopen(path, 0, TYPE_BITMAP, &ra->dim);
+    user_data.embedded_albumart = NULL;
+    user_data.dim = &ra->dim;
+    ra->handle = bufopen(path, 0, TYPE_BITMAP, &user_data);
     if (ra->handle == ERR_BUFFER_FULL)
     {
         int i = find_oldest_image();
