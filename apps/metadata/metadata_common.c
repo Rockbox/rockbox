@@ -213,7 +213,6 @@ unsigned long get_itunes_int32(char* value, int count)
     return r;
 }
 
-#if CONFIG_CODEC == SWCODEC
 /* Skip an ID3v2 tag if it can be found. We assume the tag is located at the
  * start of the file, which should be true in all cases where we need to skip it.
  * Returns true if successfully skipped or not skipped, and false if
@@ -360,4 +359,3 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     
     return len;
 }
-#endif

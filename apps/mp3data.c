@@ -213,6 +213,19 @@ static bool headers_have_same_type(unsigned long header1,
     return header1 ? (header1 == header2) : true;
 }
 
+/* Helper function to read 4-byte in big endian format. */
+static void read_uint32be_mp3data(int fd, unsigned long *data, long *pos)
+{
+#ifdef ROCKBOX_BIG_ENDIAN
+    (void)read(fd, (char*)data, 4);
+#else
+    char tmp[4];
+    (void)read(fd, tmp, 4);
+    *data = (tmp[0]<<24) | (tmp[1]<<16) | (tmp[2]<<8) | tmp[3];
+#endif
+    *pos += 4;
+}
+
 static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
                                        unsigned long reference_header,
                                        int(*getfunc)(int fd, unsigned char *c),
@@ -259,7 +272,8 @@ static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
                 /* Read possible next frame header and seek back to last frame
                  * headers byte position. */
                 reference_header = 0;
-                read_uint32be(fd, (uint32_t*)&reference_header);
+                read_uint32be_mp3data(fd, &reference_header, &pos);
+                //
                 lseek(fd, -info.frame_size, SEEK_CUR);
                 
                 /* If the current header is of the same type as the previous 
