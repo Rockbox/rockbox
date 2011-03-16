@@ -49,19 +49,19 @@
 #define VDEBUGF(...) do { } while(0)
 #endif
 
-#define SYNC_MASK (0x7ffL << 21)
-#define VERSION_MASK (3L << 19)
-#define LAYER_MASK (3L << 17)
-#define PROTECTION_MASK (1L << 16)
-#define BITRATE_MASK (0xfL << 12)
-#define SAMPLERATE_MASK (3L << 10)
-#define PADDING_MASK (1L << 9)
-#define PRIVATE_MASK (1L << 8)
-#define CHANNELMODE_MASK (3L << 6)
-#define MODE_EXT_MASK (3L << 4)
-#define COPYRIGHT_MASK (1L << 3)
-#define ORIGINAL_MASK (1L << 2)
-#define EMPHASIS_MASK 3L
+#define SYNC_MASK           (0x7ffL << 21)
+#define VERSION_MASK        (3L << 19)
+#define LAYER_MASK          (3L << 17)
+#define PROTECTION_MASK     (1L << 16)
+#define BITRATE_MASK        (0xfL << 12)
+#define SAMPLERATE_MASK     (3L << 10)
+#define PADDING_MASK        (1L << 9)
+#define PRIVATE_MASK        (1L << 8)
+#define CHANNELMODE_MASK    (3L << 6)
+#define MODE_EXT_MASK       (3L << 4)
+#define COPYRIGHT_MASK      (1L << 3)
+#define ORIGINAL_MASK       (1L << 2)
+#define EMPHASIS_MASK       (3L)
 
 /* MPEG Version table, sorted by version index */
 static const signed char version_table[4] = {
@@ -206,8 +206,8 @@ static bool headers_have_same_type(unsigned long header1,
                                    unsigned long header2)
 {
     /* Compare MPEG version, layer and sampling frequency. If header1 is zero
-     * it is assumed the headers are of same type. */
-    unsigned int mask = 0xfffe0c00;
+     * it is assumed both frame headers are of same type. */
+    unsigned int mask = SYNC_MASK | VERSION_MASK | LAYER_MASK | SAMPLERATE_MASK;
     header1 &= mask;
     header2 &= mask;
     return header1 ? (header1 == header2) : true;
