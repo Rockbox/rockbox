@@ -1444,7 +1444,6 @@ ssize_t bufcuttail(int handle_id, size_t size)
 SECONDARY EXPORTED FUNCTIONS
 ============================
 
-buf_get_offset
 buf_handle_offset
 buf_request_buffer_handle
 buf_set_base_handle
@@ -1456,16 +1455,6 @@ These functions are exported, to allow interaction with the buffer.
 They take care of the content of the structs, and rely on the linked list
 management functions for all the actual handle management work.
 */
-
-/* Get a handle offset from a pointer */
-ssize_t buf_get_offset(int handle_id, void *ptr)
-{
-    const struct memory_handle *h = find_handle(handle_id);
-    if (!h)
-        return ERR_HANDLE_NOT_FOUND;
-
-    return (size_t)ptr - (size_t)&buffer[h->ridx];
-}
 
 ssize_t buf_handle_offset(int handle_id)
 {

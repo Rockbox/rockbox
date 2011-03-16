@@ -93,7 +93,6 @@ struct codec_api ci = {
     NULL, /* read_filebuf */
     NULL, /* request_buffer */
     NULL, /* advance_buffer */
-    NULL, /* advance_buffer_loc */
     NULL, /* seek_buffer */
     NULL, /* seek_complete */
     NULL, /* request_next_track */

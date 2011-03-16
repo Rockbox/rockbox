@@ -145,12 +145,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 201
+#define PLUGIN_API_VERSION 202
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 200
+#define PLUGIN_MIN_API_VERSION 202
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -479,6 +479,7 @@ struct plugin_api {
                                   const char *name
                                   IF_PRIO(, int priority)
                                   IF_COP(, unsigned int core));
+    unsigned int (*thread_self)(void);
     void (*thread_exit)(void);
     void (*thread_wait)(unsigned int thread_id);
 #if CONFIG_CODEC == SWCODEC
@@ -871,7 +872,6 @@ struct plugin_api {
     ssize_t (*bufgettail)(int handle_id, size_t size, void **data);
     ssize_t (*bufcuttail)(int handle_id, size_t size);
 
-    ssize_t (*buf_get_offset)(int handle_id, void *ptr);
     ssize_t (*buf_handle_offset)(int handle_id);
     void (*buf_request_buffer_handle)(int handle_id);
     void (*buf_set_base_handle)(int handle_id);
@@ -909,7 +909,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    unsigned int (*thread_self)(void);
 };
 
 /* plugin header */

@@ -407,6 +407,7 @@ static const struct plugin_api rockbox_api = {
     default_event_handler,
     default_event_handler_ex,
     create_thread,
+    thread_self,
     thread_exit,
     thread_wait,
 #if (CONFIG_CODEC == SWCODEC)
@@ -745,7 +746,6 @@ static const struct plugin_api rockbox_api = {
     bufgettail,
     bufcuttail,
 
-    buf_get_offset,
     buf_handle_offset,
     buf_request_buffer_handle,
     buf_set_base_handle,
@@ -779,7 +779,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    thread_self,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

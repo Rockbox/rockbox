@@ -337,12 +337,6 @@ static void codec_advance_buffer_callback(size_t amount)
     codec_set_offset_callback(ci.curpos);
 }
 
-static void codec_advance_buffer_loc_callback(void *ptr)
-{
-    size_t amount = buf_get_offset(get_audio_hid(), ptr);
-    codec_advance_buffer_callback(amount);
-}
-
 static bool codec_seek_buffer_callback(size_t newpos)
 {
     logf("codec_seek_buffer_callback");
@@ -443,7 +437,6 @@ void codec_init_codec_api(void)
     ci.read_filebuf        = codec_filebuf_callback;
     ci.request_buffer      = codec_request_buffer_callback;
     ci.advance_buffer      = codec_advance_buffer_callback;
-    ci.advance_buffer_loc  = codec_advance_buffer_loc_callback;
     ci.seek_buffer         = codec_seek_buffer_callback;
     ci.seek_complete       = codec_seek_complete_callback;
     ci.request_next_track  = codec_request_next_track_callback;

@@ -424,23 +424,21 @@ next_track:
 
                 /* Fill the buffer */
                 if (stream.next_frame)
-                    ci->advance_buffer_loc((void *)stream.next_frame);
+                    ci->advance_buffer(stream.next_frame - stream.buffer);
                 else
                     ci->advance_buffer(size);
-                stream.error = 0;
+                stream.error = 0; /* Must get new inputbuffer next time */
                 file_end++;
                 continue;
             } else if (MAD_RECOVERABLE(stream.error)) {
+                /* Probably syncing after a seek */
                 continue;
             } else {
                 /* Some other unrecoverable error */
                 status = CODEC_ERROR;
                 break;
             }
-            break;
         }
-
-        file_end = 0;
 
         /* Do the pcmbuf insert here. Note, this is the PREVIOUS frame's pcm
            data (not the one just decoded above). When we exit the decoding
@@ -479,9 +477,11 @@ next_track:
         }
 
         if (stream.next_frame)
-            ci->advance_buffer_loc((void *)stream.next_frame);
+            ci->advance_buffer(stream.next_frame - stream.buffer);
         else
             ci->advance_buffer(size);
+        stream.error = 0; /* Must get new inputbuffer next time */
+        file_end = 0;
 
         framelength = synth.pcm.length - samples_to_skip;
         if (framelength < 0) {

@@ -91,14 +91,12 @@ ssize_t bufcuttail(int handle_id, size_t size);
  * SECONDARY FUNCTIONS
  * ===================
  *
- * buf_get_offset: Get a handle offset from a pointer
  * buf_handle_offset: Get the offset of the first buffered byte from the file
  * buf_request_buffer_handle: Request buffering of a handle
  * buf_set_base_handle: Tell the buffering thread which handle is currently read
  * buf_used: Total amount of buffer space used (including allocated space)
  ****************************************************************************/
 
-ssize_t buf_get_offset(int handle_id, void *ptr);
 ssize_t buf_handle_offset(int handle_id);
 void buf_request_buffer_handle(int handle_id);
 void buf_set_base_handle(int handle_id);

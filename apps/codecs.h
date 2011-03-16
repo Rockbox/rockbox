@@ -75,12 +75,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 39
+#define CODEC_API_VERSION 40
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 39
+#define CODEC_MIN_API_VERSION 40
 
 /* codec return codes */
 enum codec_status {
@@ -134,8 +134,6 @@ struct codec_api {
     void* (*request_buffer)(size_t *realsize, size_t reqsize);
     /* Advance file buffer position by <amount> amount of bytes. */
     void (*advance_buffer)(size_t amount);
-    /* Advance file buffer to a pointer location inside file buffer. */
-    void (*advance_buffer_loc)(void *ptr);
     /* Seek file buffer to position <newpos> beginning of file. */
     bool (*seek_buffer)(size_t newpos);
     /* Codec should call this function when it has done the seeking. */
