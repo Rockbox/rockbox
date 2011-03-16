@@ -75,6 +75,7 @@ public class RockboxService extends Service
     public static final int RESULT_SERVICE_RUNNING = 3;
     public static final int RESULT_ERROR_OCCURED = 4;
     public static final int RESULT_LIB_LOADED = 5;
+    public static final int RESULT_ROCKBOX_EXIT = 6;
 
     @Override
     public void onCreate()
@@ -270,7 +271,12 @@ public class RockboxService extends Service
 		            resultReceiver.send(RESULT_INVOKING_MAIN, null);
 
                 main();
-		        throw new IllegalStateException("native main() returned!");
+
+                if (resultReceiver != null)
+                    resultReceiver.send(RESULT_ROCKBOX_EXIT, null);
+
+                LOG("Stop service: main() returned");
+                stopSelf(); /* serivce is of no use anymore */
             }
         }, "Rockbox thread");
         rb.setDaemon(false);
@@ -353,5 +359,11 @@ public class RockboxService extends Service
         stopForeground();
         instance = null;
         rockbox_running = false;
+        System.runFinalization();
+        /* exit() seems unclean but is needed in order to get the .so file garbage 
+         * collected, otherwise Android caches this Service and librockbox.so
+         * The library must be reloaded to zero the bss and reset data
+         * segment */
+        System.exit(0);
     }
 }

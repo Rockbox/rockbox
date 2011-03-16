@@ -81,6 +81,9 @@ public class RockboxActivity extends Activity
                     case RockboxService.RESULT_ERROR_OCCURED:
                         Toast.makeText(RockboxActivity.this, resultData.getString("error"), Toast.LENGTH_LONG);
                         break;
+                    case RockboxService.RESULT_ROCKBOX_EXIT:
+                        finish();
+                        break;
                 }
             }
         });

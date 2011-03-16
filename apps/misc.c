@@ -257,12 +257,6 @@ static void system_restore(void)
 
 static bool clean_shutdown(void (*callback)(void *), void *parameter)
 {
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
-    (void)callback;
-    (void)parameter;
-    bookmark_autobookmark(false);
-    call_storage_idle_notifys(true);
-#else
     long msg_id = -1;
     int i;
 
@@ -373,7 +367,6 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 
         shutdown_hw();
     }
-#endif
     return false;
 }
 

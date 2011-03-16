@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 
+#include <setjmp.h>
 #include <jni.h>
 #include "config.h"
 #include "system.h"
@@ -37,10 +38,17 @@ uintptr_t *stackend;
 
 extern int main(void);
 extern void telephony_init_device(void);
+extern void pcm_shutdown(void);
 
 void system_exception_wait(void) { }
 void system_reboot(void) { }
-void power_off(void) { }
+
+/* this is used to return from the entry point of the native library. */
+static jmp_buf poweroff_buf;
+void shutdown_hw(void)
+{
+    longjmp(poweroff_buf, 1);
+}
 
 void system_init(void)
 {
@@ -75,10 +83,18 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
 
     volatile uintptr_t stack = 0;
     stackbegin = stackend = (uintptr_t*) &stack;
-    env_ptr = env;
+    /* setup a jmp_buf to come back later in case of exit */
+    if (setjmp(poweroff_buf) == 0)
+    {
+        env_ptr = env;
 
-    RockboxService_instance = this;
-    RockboxService_class = (*env)->GetObjectClass(env, this);
+        RockboxService_instance = this;
+        RockboxService_class = (*env)->GetObjectClass(env, this);
 
-    main();
+        main();
+    }
+
+    pcm_shutdown();
+    /* simply return here. this will allow the VM to clean up objects and do
+     * garbage collection */
 }
