@@ -27,7 +27,8 @@
 
 
 /* global fields for use with various JNI calls */
-JavaVM *vm_ptr;
+static JavaVM *vm_ptr;
+JNIEnv *env_ptr;
 jobject RockboxService_instance;
 jclass  RockboxService_class;
 
@@ -47,6 +48,22 @@ void system_init(void)
     telephony_init_device();
 }
 
+JNIEXPORT jint JNICALL
+JNI_OnLoad(JavaVM *vm, void* reserved)
+{
+    (void)reserved;
+    vm_ptr = vm;
+
+    return JNI_VERSION_1_2;
+}
+
+JNIEnv* getJavaEnvironment(void)
+{
+    JNIEnv* env;
+    (*vm_ptr)->GetEnv(vm_ptr, (void**) &env, JNI_VERSION_1_2);
+    return env;
+}
+
 /* this is the entry point of the android app initially called by jni */
 JNIEXPORT void JNICALL
 Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
@@ -58,8 +75,8 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
 
     volatile uintptr_t stack = 0;
     stackbegin = stackend = (uintptr_t*) &stack;
+    env_ptr = env;
 
-    (*env)->GetJavaVM(env, &vm_ptr);
     RockboxService_instance = this;
     RockboxService_class = (*env)->GetObjectClass(env, this);
 

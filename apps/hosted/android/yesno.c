@@ -28,8 +28,8 @@
 #include "settings.h"
 #include "lang.h"
 #include "kernel.h"
-#include "system.h"
 
+extern JNIEnv   *env_ptr;
 static jobject   RockboxYesno_instance = NULL;
 static jmethodID yesno_func;
 static struct semaphore    yesno_done;
@@ -44,7 +44,7 @@ Java_org_rockbox_RockboxYesno_put_1result(JNIEnv *env, jobject this, jboolean re
     semaphore_release(&yesno_done);
 }
 
-static void yesno_init(JNIEnv *env_ptr)
+static void yesno_init(void)
 {
     JNIEnv e = *env_ptr;
     static jmethodID yesno_is_usable;
@@ -74,7 +74,7 @@ static void yesno_init(JNIEnv *env_ptr)
         sleep(HZ/10);
 }
 
-static jstring build_message(JNIEnv *env_ptr, const struct text_message *message)
+jstring build_message(const struct text_message *message)
 {
     char msg[1024] = "";
     JNIEnv e = *env_ptr;
@@ -98,12 +98,10 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
 {
     (void)yes_message;
     (void)no_message;
-    JNIEnv *env_ptr = getJavaEnvironment();
-
-    yesno_init(env_ptr);
-
+    yesno_init();
+    
     JNIEnv e = *env_ptr;
-    jstring message = build_message(env_ptr, main_message);
+    jstring message = build_message(main_message);
     jstring yes = (*env_ptr)->NewStringUTF(env_ptr, str(LANG_SET_BOOL_YES));
     jstring no  = (*env_ptr)->NewStringUTF(env_ptr, str(LANG_SET_BOOL_NO));
 

@@ -29,6 +29,7 @@
 #include "system.h"
 #include "touchscreen.h"
 
+extern JNIEnv *env_ptr;
 static int last_y, last_x;
 static int last_btns;
 

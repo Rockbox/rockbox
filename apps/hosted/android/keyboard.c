@@ -26,8 +26,8 @@
 #include "string-extra.h"
 #include "kernel.h"
 #include "lang.h"
-#include "system.h"
 
+extern JNIEnv          *env_ptr;
 static jclass           RockboxKeyboardInput_class;
 static jobject          RockboxKeyboardInput_instance;
 static jmethodID        kbd_inputfunc;
@@ -53,9 +53,7 @@ Java_org_rockbox_RockboxKeyboardInput_put_1result(JNIEnv *env, jobject this,
 
 static void kdb_init(void)
 {
-    JNIEnv *env_ptr = getJavaEnvironment();
     JNIEnv e = *env_ptr;
-
     static jmethodID kbd_is_usable;
     if (RockboxKeyboardInput_class == NULL)
     {
@@ -86,7 +84,6 @@ static void kdb_init(void)
 
 int kbd_input(char* text, int buflen)
 {
-    JNIEnv *env_ptr     = getJavaEnvironment();
     JNIEnv e            = *env_ptr;
     jstring str         = e->NewStringUTF(env_ptr, text);
     jstring ok_text     = e->NewStringUTF(env_ptr, str(LANG_KBD_OK));

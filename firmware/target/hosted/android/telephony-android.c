@@ -22,16 +22,14 @@
 
 #include <jni.h>
 #include "kernel.h"
-#include "system.h"
 
+extern JNIEnv *env_ptr;
 extern jobject RockboxService_instance;
 
 
 void telephony_init_device(void)
 {
-    JNIEnv *env_ptr = getJavaEnvironment();
     JNIEnv e = *env_ptr;
-
     jclass class = e->FindClass(env_ptr, "org/rockbox/RockboxTelephony");
     jmethodID constructor = e->GetMethodID(env_ptr, class, "<init>", "(Landroid/content/Context;)V");
 

@@ -21,8 +21,6 @@
 #ifndef __SYSTEM_TARGET_H__
 #define __SYSTEM_TARGET_H__
 
-#include <jni.h>
-
 #define disable_irq()
 #define enable_irq()
 #define disable_irq_save() 0
@@ -32,19 +30,15 @@ void power_off(void);
 void wait_for_interrupt(void);
 void interrupt(void);
 
-/* A JNI environment is specific to its thread, so use the correct way to
- * obtain it: share a pointer to the JavaVM structure and ask that the JNI
- * environment attached to the current thread. */
-static inline JNIEnv* getJavaEnvironment(void)
-{
-    extern JavaVM *vm_ptr;
-    JNIEnv *env = NULL;
-
-    if (vm_ptr)
-        (*vm_ptr)->GetEnv(vm_ptr, (void**) &env, JNI_VERSION_1_2);
-
-    return env;
-}
+ /* don't pull in jni.h for every user of this file, it should be only needed
+  * within the target tree (if at all)
+  * define this before #including system.h or system-target.h */
+#ifdef _SYSTEM_WITH_JNI
+#include <jni.h>
+/*
+ * discover the JNIEnv for this the calling thread in case it's not known */
+extern JNIEnv* getJavaEnvironment(void);
+#endif /* _SYSTEM_WITH_JNI */
 
 #endif /* __SYSTEM_TARGET_H__ */
 
