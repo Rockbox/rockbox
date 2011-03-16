@@ -485,13 +485,6 @@ static void advance_buffer(size_t amount)
 }
 
 
-/* Advance file buffer to a pointer location inside file buffer. */
-static void advance_buffer_loc(void *ptr)
-{
-    ci.curpos = ptr - (audiobuf - offset);
-}
-
-
 /* Seek file buffer to position <newpos> beginning of file. */
 static bool seek_buffer(size_t newpos)
 {
@@ -565,7 +558,6 @@ static void init_ci(void)
     ci.read_filebuf = read_filebuf;
     ci.request_buffer = request_buffer;
     ci.advance_buffer = advance_buffer;
-    ci.advance_buffer_loc = advance_buffer_loc;
     ci.seek_buffer = seek_buffer;
     ci.seek_complete = seek_complete;
     ci.request_next_track = request_next_track;
