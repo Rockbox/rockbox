@@ -198,8 +198,8 @@ gui/usb_screen.c
 metadata.c
 metadata/id3tags.c
 metadata/mp3.c
-#if CONFIG_CODEC == SWCODEC
 metadata/metadata_common.c
+#if CONFIG_CODEC == SWCODEC
 metadata/aiff.c
 metadata/ape.c
 metadata/asf.c

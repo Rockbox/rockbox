@@ -31,35 +31,6 @@
 #include "replaygain.h"
 #include "misc.h"
 
-/* Skip an ID3v2 tag if it can be found. We assume the tag is located at the
- * start of the file, which should be true in all cases where we need to skip it.
- * Returns true if successfully skipped or not skipped, and false if
- * something went wrong while skipping.
- */
-bool skip_id3v2(int fd, struct mp3entry *id3)
-{
-    char buf[4];
-
-    read(fd, buf, 4);
-    if (memcmp(buf, "ID3", 3) == 0)
-    {
-        /* We have found an ID3v2 tag at the start of the file - find its
-           length and then skip it. */
-        if ((id3->first_frame_offset = getid3v2len(fd)) == 0)
-            return false;
-
-        if ((lseek(fd, id3->first_frame_offset, SEEK_SET) < 0)) 
-            return false;
-        
-        return true;
-    } else {
-        lseek(fd, 0, SEEK_SET);
-        id3->first_frame_offset = 0;
-        return true;
-    }
-}
-
-
 /* Read a string from the file. Read up to size bytes, or, if eos != -1, 
  * until the eos character is found (eos is not stored in buf, unless it is
  * nil). Writes up to buf_size chars to buf, always terminating with a nil.
@@ -241,7 +212,36 @@ unsigned long get_itunes_int32(char* value, int count)
     
     return r;
 }
- 
+
+#if CONFIG_CODEC == SWCODEC
+/* Skip an ID3v2 tag if it can be found. We assume the tag is located at the
+ * start of the file, which should be true in all cases where we need to skip it.
+ * Returns true if successfully skipped or not skipped, and false if
+ * something went wrong while skipping.
+ */
+bool skip_id3v2(int fd, struct mp3entry *id3)
+{
+    char buf[4];
+
+    read(fd, buf, 4);
+    if (memcmp(buf, "ID3", 3) == 0)
+    {
+        /* We have found an ID3v2 tag at the start of the file - find its
+           length and then skip it. */
+        if ((id3->first_frame_offset = getid3v2len(fd)) == 0)
+            return false;
+
+        if ((lseek(fd, id3->first_frame_offset, SEEK_SET) < 0)) 
+            return false;
+        
+        return true;
+    } else {
+        lseek(fd, 0, SEEK_SET);
+        id3->first_frame_offset = 0;
+        return true;
+    }
+}
+
 /* Parse the tag (the name-value pair) and fill id3 and buffer accordingly.
  * String values to keep are written to buf. Returns number of bytes written
  * to buf (including end nil).
@@ -360,4 +360,4 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     
     return len;
 }
-
+#endif
