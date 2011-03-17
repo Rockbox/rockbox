@@ -39,7 +39,7 @@
 #include "mp3data.h"
 #include "file.h"
 #include "buffer.h"
-#include "metadata/metadata_common.h"
+#include "system.h"
 
 // #define DEBUG_VERBOSE
 
@@ -214,16 +214,14 @@ static bool headers_have_same_type(unsigned long header1,
 }
 
 /* Helper function to read 4-byte in big endian format. */
-static void read_uint32be_mp3data(int fd, unsigned long *data, long *pos)
+static void read_uint32be_mp3data(int fd, unsigned long *data)
 {
 #ifdef ROCKBOX_BIG_ENDIAN
     (void)read(fd, (char*)data, 4);
 #else
-    char tmp[4];
-    (void)read(fd, tmp, 4);
-    *data = (tmp[0]<<24) | (tmp[1]<<16) | (tmp[2]<<8) | tmp[3];
+    (void)read(fd, (char*)data, 4);
+    *data = betoh32(*data);
 #endif
-    *pos += 4;
 }
 
 static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
@@ -272,7 +270,7 @@ static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
                 /* Read possible next frame header and seek back to last frame
                  * headers byte position. */
                 reference_header = 0;
-                read_uint32be_mp3data(fd, &reference_header, &pos);
+                read_uint32be_mp3data(fd, &reference_header);
                 //
                 lseek(fd, -info.frame_size, SEEK_CUR);
                 
