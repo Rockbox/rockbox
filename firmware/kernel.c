@@ -537,7 +537,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
         corelock_unlock(&q->cl);
         switch_thread();
 
-        oldlevel = disable_irq_save();
+        disable_irq();
         corelock_lock(&q->cl);
     } 
 
@@ -583,7 +583,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
         switch_thread();
 
-        oldlevel = disable_irq_save();
+        disable_irq();
         corelock_lock(&q->cl);
 
         rd = q->read;
