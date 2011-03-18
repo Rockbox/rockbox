@@ -11,6 +11,17 @@ Build-Depends: debhelper (>= 5), pkg-config, maemo-version-dev,
   libplayback-1-dev | maemo-version-dev (<= 5)
 # Note: This is the -debian- standards version, not rockbox
 Standards-Version: 3.7.2
+
+Package: rockbox
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Rockbox open source high quality audio player
+XB-Maemo-Display-Name: Rockbox audio player
+XB-Maemo-Upgrade-Description: Implemented RTC support
+ (timestamps in last.FM scrobbler log). Working sleep timer.
+ Working idle poweroff. Support for antialised fonts (not in use yet).
+ Update to latest rockbox SVN code
+XSBC-Bugtracker: http://www.rockbox.org/tracker/
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c
  6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0
@@ -62,16 +73,6 @@ XB-Maemo-Icon-26:
  W/c2/WbdtpJdQGWLMviA4EOTcoaNHey+0+MSGVrfXJc9hMBqbNZV7x9t3L9x
  R9khoAyoFzF5RVf01oo7evXmZrxuEwKaYq/b/B/B2k8FFRXfJAAAAABJRU5E
  rkJggg==
-XSBC-Bugtracker: http://www.rockbox.org/tracker/
-
-Package: rockbox
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Rockbox open source high quality audio player
-XB-Maemo-Upgrade-Description: Implemented RTC support
- (timestamps in last.FM scrobbler log). Working sleep timer.
- Working idle poweroff. Support for antialised fonts (not in use yet).
- Update to latest rockbox SVN code
 
 Package: rockbox-doc
 Architecture: all
