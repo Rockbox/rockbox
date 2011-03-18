@@ -63,6 +63,9 @@
 #define ORIGINAL_MASK       (1L << 2)
 #define EMPHASIS_MASK       (3L)
 
+/* Maximum number of bytes needed by Xing/Info/VBRI parser. */
+#define VBR_HEADER_MAX_SIZE (180)
+
 /* MPEG Version table, sorted by version index */
 static const signed char version_table[4] = {
     MPEG_VERSION2_5, -1, MPEG_VERSION2, MPEG_VERSION1
@@ -465,7 +468,10 @@ static void get_xing_info(struct mp3info *info, unsigned char *buf)
 /* Extract information from a 'VBRI' header. */
 static void get_vbri_info(struct mp3info *info, unsigned char *buf)
 {
+    /* We don't parse the TOC, since we don't yet know how to (FIXME) */
+    /* 
     int i, num_offsets, offset = 0;
+    */
 
     info->is_vbr  = true;  /* Yes, it is a FhG VBR file */
     info->has_toc = false; /* We don't parse the TOC (yet) */
@@ -482,21 +488,23 @@ static void get_vbri_info(struct mp3info *info, unsigned char *buf)
     else
         info->bitrate = info->byte_count / (info->file_time >> 3);
 
-    /* We don't parse the TOC, since we don't yet know how to (FIXME) */
-    num_offsets = bytes2int(0, 0, buf[18], buf[19]);
     VDEBUGF("Frame size (%dkpbs): %d bytes (0x%x)\n",
            info->bitrate, info->frame_size, info->frame_size);
     VDEBUGF("Frame count: %lx\n", info->frame_count);
     VDEBUGF("Byte count: %lx\n", info->byte_count);
+
+    /* We don't parse the TOC, since we don't yet know how to (FIXME) */
+    /*
+    num_offsets = bytes2int(0, 0, buf[18], buf[19]);
     VDEBUGF("Offsets: %d\n", num_offsets);
-    VDEBUGF("Frames/entry: %ld\n",
-            bytes2int(0, 0, buf[24], buf[25]));
+    VDEBUGF("Frames/entry: %ld\n", bytes2int(0, 0, buf[24], buf[25]));
 
     for(i = 0; i < num_offsets; i++)
     {
        offset += bytes2int(0, 0, buf[26+i*2], buf[27+i*2]);;
        VDEBUGF("%03d: %lx\n", i, offset - bytecount,);
     }
+    */
 }
 
 /* Seek to next mpeg header and extract relevant information. */
@@ -521,9 +529,9 @@ static int get_next_header_info(int fd, long *bytecount, struct mp3info *info,
 
 int get_mp3file_info(int fd, struct mp3info *info)
 {
-    unsigned char frame[1800], *vbrheader;
+    unsigned char frame[VBR_HEADER_MAX_SIZE], *vbrheader;
     long bytecount = 0;
-    int result;
+    int result, buf_size;
 
     /* Initialize info and frame */
     memset(info,  0, sizeof(struct mp3info));
@@ -539,16 +547,13 @@ int get_mp3file_info(int fd, struct mp3info *info)
     result = get_next_header_info(fd, &bytecount, info, true);
     if(result)
         return result;
-
-    /* OK, we have found a frame. Let's see if it has a Xing header */
-    if (info->frame_size-4 >= (int)sizeof(frame))
-    {
-        DEBUGF("Error: Invalid id3 header, frame_size: %d\n", info->frame_size);
-        return -8;
-    }
     
-    if(read(fd, frame, info->frame_size-4) < 0)
+    /* Read the amount of frame data to the buffer that is required for the 
+     * vbr tag parsing. Skip the rest. */
+    buf_size = MIN(info->frame_size-4, (int)sizeof(frame));
+    if(read(fd, frame, buf_size) < 0)
         return -3;
+    lseek(fd, info->frame_size - 4 - buf_size, SEEK_CUR);
 
     /* Calculate position of a possible VBR header */
     if (info->version == MPEG_VERSION1) {
