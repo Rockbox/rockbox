@@ -68,6 +68,10 @@ Package: rockbox
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Rockbox open source high quality audio player
+XB-Maemo-Upgrade-Description: Implemented RTC support
+ (timestamps in last.FM scrobbler log). Working sleep timer.
+ Working idle poweroff. Support for antialised fonts (not in use yet).
+ Update to latest rockbox SVN code
 
 Package: rockbox-doc
 Architecture: all

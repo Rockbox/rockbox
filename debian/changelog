@@ -1,10 +1,20 @@
+rockbox (2011-03-18maemo0) unstable; urgency=low
+
+  * Implemented RTC support (timestamps in last.FM scrobbler log)
+  * Working sleep timer
+  * Working idle poweroff
+  * Support for antialised fonts (not in use yet)
+  * Update to latest rockbox SVN code
+
+ -- Thomas Jarosch <tomj@simonv.com>  Fri, 18 Mar 2011 22:00:00 +0100
+
 rockbox (2011-02-27maemo0) unstable; urgency=low
 
   * Fix/enable assembler optimizations on public build
   * Change play/pause button so that it shows
     the click action and not the current state
 
- -- Thomas Jarosch <tomj@simonv.com>  Wed, 27 Feb 2011 19:00:00 -0500
+ -- Thomas Jarosch <tomj@simonv.com>  Sun, 27 Feb 2011 19:00:00 +0100
 
 rockbox (2011-02-25maemo0) unstable; urgency=low
 
@@ -17,14 +27,14 @@ rockbox (2011-02-25maemo0) unstable; urgency=low
   * Small fixes to the metadata parser
   * Update to rockbox SVN code
 
- -- Thomas Jarosch <tomj@simonv.com>  Wed, 25 Feb 2011 18:10:00 -0500
+ -- Thomas Jarosch <tomj@simonv.com>  Fri, 25 Feb 2011 18:10:00 +0100
 
 rockbox (2011-01-26maemo0) unstable; urgency=low
 
   * Bluetooth headset support
   * Ignore preinstalled sounds in /usr/share/sounds
 
- -- Thomas Jarosch <tomj@simonv.com>  Wed, 26 Jan 2011 22:50:00 -0500
+ -- Thomas Jarosch <tomj@simonv.com>  Wed, 26 Jan 2011 22:50:00 +0100
 
 rockbox (2011-01-12maemo0) unstable; urgency=low
 
@@ -33,7 +43,7 @@ rockbox (2011-01-12maemo0) unstable; urgency=low
   * Bind more keys on n8xx (maemo4)
   * Update to latest rockbox SVN code
 
- -- Thomas Jarosch <tomj@simonv.com>  Tue, 12 Jan 2011 19:42:00 -0500
+ -- Thomas Jarosch <tomj@simonv.com>  Wed, 12 Jan 2011 19:42:00 +0100
 
 rockbox (2011-01-04maemo0) unstable; urgency=low
 
@@ -41,14 +51,14 @@ rockbox (2011-01-04maemo0) unstable; urgency=low
   * Test automatic garage build
   * Fix x86 build targets
 
- -- Thomas Jarosch <tomj@simonv.com>  Tue, 04 Jan 2011 00:20:00 -0500
+ -- Thomas Jarosch <tomj@simonv.com>  Tue, 04 Jan 2011 00:20:00 +0100
 
 
 rockbox (2011-01-02maemo0) unstable; urgency=low
 
   * New version number to indicate this build is work in progress
 
- -- Thomas Jarosch <tomj@simonv.com>  Sun, 02 Jan 2011 00:05:00 -0500
+ -- Thomas Jarosch <tomj@simonv.com>  Sun, 02 Jan 2011 00:05:00 +0100
 
 
 rockbox (3.7.2maemo2) unstable; urgency=low
@@ -59,11 +69,11 @@ rockbox (3.7.2maemo2) unstable; urgency=low
     - mikmod (.mod, .s3m, .xm etc) support
     - Credits screen
 
- -- Thomas Jarosch <tomj@simonv.com>  Sat, 01 Jan 2011 19:01:00 -0500
+ -- Thomas Jarosch <tomj@simonv.com>  Sat, 01 Jan 2011 19:01:00 +0100
 
 
 rockbox (3.7.2maemo1) unstable; urgency=low
 
   * Initial release for Nokia N900
 
- -- Thomas Jarosch <tomj@simonv.com>  Thu, 30 Dec 2010 16:18:05 -0500
+ -- Thomas Jarosch <tomj@simonv.com>  Thu, 30 Dec 2010 16:18:05 +0100
