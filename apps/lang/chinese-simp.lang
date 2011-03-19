@@ -12472,10 +12472,10 @@
     *: "Automatic resume"
   </source>
   <dest>
-    *: "自动恢复"
+    *: "自动断点续播"
   </dest>
   <voice>
-    *: "自动回复"
+    *: "音频自动断点续播"
   </voice>
 </phrase>
 <phrase>
@@ -12548,10 +12548,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "文件浏览从根目录开始"
+    *: "重置文件浏览起始目录"
   </dest>
   <voice>
-    *: "文件浏览从根目录开始"
+    *: "重置文件浏览起始目录"
   </voice>
 </phrase>
 <phrase>
@@ -12638,10 +12638,10 @@
     *: "Start File Browser Here"
   </source>
   <dest>
-    *: "从这里开始文件浏览"
+    *: "设置为文件浏览起始目录"
   </dest>
   <voice>
-    *: "从这里开始文件浏览"
+    *: "设置本文件夹为文件浏览起始目录"
   </voice>
 </phrase>
 <phrase>
