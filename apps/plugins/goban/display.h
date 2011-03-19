@@ -38,10 +38,10 @@ extern unsigned short cursor_pos;
 extern bool draw_variations;
 
 /* Used to set the zoom level, loaded in from the config file */
-unsigned int saved_circle_size;
+extern unsigned int saved_circle_size;
 
 /* the size of one intersection on the board, in pixels */
-unsigned int intersection_size;
+extern unsigned int intersection_size;
 
 /* Clear the marks from the board */
 void clear_marks_display (void);

@@ -15,7 +15,7 @@
 
 
 struct cpu cpu IBSS_ATTR;
-
+bool plugbuf;
 
 #define ZFLAG(n) ( (n) ? 0 : FZ )
 
