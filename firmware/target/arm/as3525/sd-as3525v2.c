@@ -559,7 +559,12 @@ static int sd_init_card(const int drive)
         /* CMD6 */
         if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
             return -9;
-        mci_delay();
+            
+        /* This delay is a bit of a hack, but seems to fix card detection
+           problems with some SD cards (particularly 16 GB and bigger cards).
+           Preferably we should handle this properly instead of using a delay,
+           see also FS#11870. */
+        udelay(100000);
 
         /*  We need to go back to STBY state now so we can read csd */
         /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
@@ -572,6 +577,7 @@ static int sd_init_card(const int drive)
                  MCI_RESP|MCI_LONG_RESP, card_info[drive].csd))
         return -11;
 
+    /* Another delay hack, see FS#11798 */
     mci_delay();
 
     sd_parse_csd(&card_info[drive]);
