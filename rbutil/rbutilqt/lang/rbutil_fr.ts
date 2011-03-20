@@ -3455,8 +3455,8 @@ Cible détectée: %1, cible sélectionnée: %2.&lt;/li&gt;</translation>
     </message>
     <message utf8="true">
         <location filename="../aboutbox.ui" line="57"/>
-        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2010 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
-        <translation>Installeur et utilitaire d&apos;entretien du firmware libre pour lecteurs audio Rockbox.&lt;br/&gt;© 2005 - 2010 L&apos;équipe Rockbox.&lt;br/&gt;Publié sous Licence Publique Générale GNU GPL v2.&lt;br/&gt;Icônes utilisées grâce au &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2011 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
+        <translation>Installeur et utilitaire d&apos;entretien du firmware libre pour lecteurs audio Rockbox.&lt;br/&gt;© 2005 - 2011 L&apos;équipe Rockbox.&lt;br/&gt;Publié sous Licence Publique Générale GNU GPL v2.&lt;br/&gt;Icônes utilisées grâce au &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="77"/>
