@@ -186,13 +186,13 @@ typedef struct
     real_t det;
 } acorr_coef;
 
-/* Within auto_correlation(...) a pre-shift of >>2 is needed to avoid overflow 
- * when multiply-adding the FRACT-variables -- FRACT part is 31 bits. After the
- * calculation has been finished the result 'ac->det' needs to be 
- * post-shifted by <<(4*2). This pre-/post-shifting is needed for FIXED_POINT
- * only. */
+/* Within auto_correlation(...) a pre-shift of >>ACDET_EXP is needed to avoid 
+ * overflow when multiply-adding the FRACT-variables -- FRACT part is 31 bits. 
+ * After the calculation has been finished the result 'ac->det' needs to be 
+ * post-shifted by <<(4*ACDET_EXP). This pre-/post-shifting is needed for 
+ * FIXED_POINT only. */
 #ifdef FIXED_POINT
-#define ACDET_EXP      2
+#define ACDET_EXP      3
 #define ACDET_PRE(A)  (A)>>ACDET_EXP
 #define ACDET_POST(A) (A)<<(4*ACDET_EXP)
 #else
