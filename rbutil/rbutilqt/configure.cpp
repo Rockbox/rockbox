@@ -631,19 +631,21 @@ void Config::autodetect()
 
         if(!detector.errdev().isEmpty()) {
             QString text;
-            if(detector.errdev() == "sansae200")
-                text = tr("Sansa e200 in MTP mode found!\n"
-                        "You need to change your player to MSC mode for installation. ");
-            if(detector.errdev() == "h10")
-                text = tr("H10 20GB in MTP mode found!\n"
-                        "You need to change your player to UMS mode for installation. ");
             if(SystemInfo::platformValue(detector.errdev(),
-                                         SystemInfo::CurBootloaderMethod) == "ipod")
+                                         SystemInfo::CurBootloaderMethod) == "ipod") {
                 text = tr("%1 \"MacPod\" found!\n"
                         "Rockbox needs a FAT formatted Ipod (so-called \"WinPod\") "
                         "to run. ").arg(SystemInfo::platformValue(
                                 detector.errdev(), SystemInfo::CurName).toString());
-            text += tr("Unless you changed this installation will fail!");
+            }
+            // treat all other errors as MTP device for now.
+            else {
+                text = tr("%1 in MTP mode found!\n"
+                        "You need to change your player to MSC mode for installation. ")
+                        .arg(SystemInfo::platformValue(detector.errdev(),
+                                    SystemInfo::CurName).toString());
+            }
+            text += tr("Until you change this installation will fail!");
 
             QMessageBox::critical(this, tr("Fatal error"), text, QMessageBox::Ok);
             return;
