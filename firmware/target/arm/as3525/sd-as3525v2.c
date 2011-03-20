@@ -1005,10 +1005,7 @@ sd_transfer_error_no_dma:
         /* .initialized might have been >= 0 but now stale if the ata sd thread
          * isn't handling an insert because of USB */
         if (--retry_all >= 0)
-        {
-            ret = 0;
             goto sd_transfer_retry_with_reinit;
-        }
     }
 }
 
