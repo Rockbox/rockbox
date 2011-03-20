@@ -930,7 +930,8 @@ bool ParseTreeNode::execTag(const RBRenderInfo& info, RBViewport* viewport)
             int width = element->params[2].data.number;
             int height = element->params[3].data.number;
             QString action(element->params[4].data.text);
-            RBTouchArea* temp = new RBTouchArea(width, height, action, info);
+            RBTouchArea* temp = new RBTouchArea(width, height, action, info,
+                                                viewport);
             temp->setPos(x, y);
             return true;
         }

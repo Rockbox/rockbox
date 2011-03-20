@@ -31,7 +31,7 @@ class RBTouchArea : public QGraphicsItem
 {
 public:
     RBTouchArea(int width, int height, QString action,
-                const RBRenderInfo& info);
+                const RBRenderInfo& info, QGraphicsItem* parent = 0);
     virtual ~RBTouchArea();
 
     QRectF boundingRect() const;

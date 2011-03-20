@@ -28,8 +28,8 @@
 #include <QGraphicsSceneMouseEvent>
 
 RBTouchArea::RBTouchArea(int width, int height, QString action,
-                         const RBRenderInfo& info)
-                             : QGraphicsItem(info.screen()),
+                         const RBRenderInfo& info, QGraphicsItem* parent)
+                             : QGraphicsItem(parent),
                              size(QRectF(0, 0, width, height)), action(action),
                              device(info.device())
 {
