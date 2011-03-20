@@ -845,6 +845,12 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
         goto sd_transfer_error_no_dma;
     }
 
+    if((start+count) > card_info[drive].numblocks)
+    {
+        ret = -19;
+        goto sd_transfer_error_no_dma;
+    }
+
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
         start += AMS_OF_SIZE;
@@ -859,12 +865,6 @@ sd_transfer_retry_with_reinit:
         ret = sd_init_card(drive);
         if (!(card_info[drive].initialized))
             goto sd_transfer_error_no_dma;
-    }
-
-    if((start+count) > card_info[drive].numblocks)
-    {
-        ret = -19;
-        goto sd_transfer_error_no_dma;
     }
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
