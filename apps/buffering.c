@@ -691,7 +691,7 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
         /* rc is the actual amount read */
         int rc = read(h->fd, &buffer[h->widx], copy_n);
 
-        if (rc < 0) {
+        if (rc <= 0) {
             /* Some kind of filesystem error, maybe recoverable if not codec */
             if (h->type == TYPE_CODEC) {
                 logf("Partial codec");
