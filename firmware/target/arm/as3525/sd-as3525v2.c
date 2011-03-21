@@ -564,7 +564,7 @@ static int sd_init_card(const int drive)
            problems with some SD cards (particularly 16 GB and bigger cards).
            Preferably we should handle this properly instead of using a delay,
            see also FS#11870. */
-        udelay(100000);
+        sleep(HZ/10);
 
         /*  We need to go back to STBY state now so we can read csd */
         /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
