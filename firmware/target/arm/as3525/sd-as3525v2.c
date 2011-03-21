@@ -425,7 +425,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b12     | CMD_SENT_AUTO_STOP_BIT  unused  */
       /*b13 */  | ((cmd != SD_STOP_TRANSMISSION)     ? CMD_WAIT_PRV_DAT_BIT:  0)
       /*b14     | CMD_ABRT_CMD_BIT        unused  */
-      /*b15     | CMD_SEND_INIT_BIT       unused  */
+      /*b15 */  | ((cmd == SD_GO_IDLE_STATE)         ? CMD_SEND_INIT_BIT:     0)
    /*b20:16 */  |                                      card_no
       /*b21     | CMD_SEND_CLK_ONLY       unused  */
       /*b22     | CMD_READ_CEATA          unused  */
