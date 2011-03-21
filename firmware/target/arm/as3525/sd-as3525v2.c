@@ -423,7 +423,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b10 */  | ((cmd == SD_WRITE_MULTIPLE_BLOCK)  ? CMD_RW_BIT:            0)
       /*b11     | CMD_TRANSMODE_BIT       unused  */
       /*b12     | CMD_SENT_AUTO_STOP_BIT  unused  */
-      /*b13 */  | (TRANSFER_CMD                      ? CMD_WAIT_PRV_DAT_BIT:  0)
+      /*b13 */  | ((cmd != SD_STOP_TRANSMISSION)     ? CMD_WAIT_PRV_DAT_BIT:  0)
       /*b14     | CMD_ABRT_CMD_BIT        unused  */
       /*b15     | CMD_SEND_INIT_BIT       unused  */
    /*b20:16 */  |                                      card_no
