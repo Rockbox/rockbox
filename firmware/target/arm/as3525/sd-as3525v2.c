@@ -550,14 +550,14 @@ static int sd_init_card(const int drive)
     {
         /* Attempt to switch cards to HS timings, non HS cards just ignore this */
         /*  CMD7 w/rca: Select card to put it in TRAN state */
-        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
+        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
             return -7;
 
         if(sd_wait_for_tran_state(drive))
             return -8;
 
         /* CMD6 */
-        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
+        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_RESP, &response))
             return -9;
             
         /* This delay is a bit of a hack, but seems to fix card detection
@@ -589,7 +589,7 @@ static int sd_init_card(const int drive)
     MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
-    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
+    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
         return -12;
 
 #ifndef BOOTLOADER
@@ -597,11 +597,10 @@ static int sd_init_card(const int drive)
     if(sd_wait_for_tran_state(drive) < 0)
         return -13;
     /* ACMD6  */
-    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ACMD|MCI_NO_RESP, NULL))
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ACMD|MCI_RESP, &response))
         return -15;
-    mci_delay();
     /* ACMD42  */
-    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ACMD|MCI_NO_RESP, NULL))
+    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ACMD|MCI_RESP, &response))
         return -17;
 
     /* Now that card is widebus make controller aware */
