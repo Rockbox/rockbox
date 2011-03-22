@@ -657,6 +657,32 @@ static void gwps_enter_wps(void)
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }
 
+void wps_do_playpause(bool updatewps)
+{
+    struct wps_state *state = skin_get_global_state();
+    if ( state->paused )
+    {
+        state->paused = false;
+        if ( global_settings.fade_on_stop )
+            fade(true, updatewps);
+        else
+            audio_resume();
+    }
+    else
+    {
+        state->paused = true;
+        if ( global_settings.fade_on_stop )
+            fade(false, updatewps);
+        else
+            audio_pause();
+        settings_save();
+#if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
+        call_storage_idle_notifys(true);   /* make sure resume info is saved */
+#endif
+    }
+}
+    
+
 /* The WPS can be left in two ways:
  *      a)  call a function, which draws over the wps. In this case, the wps
  *          will be still active (i.e. the below function didn't return)
@@ -783,26 +809,7 @@ long gui_wps_show(void)
             case ACTION_WPS_PLAY:
                 if (global_settings.party_mode)
                     break;
-                if ( state->paused )
-                {
-                    state->paused = false;
-                    if ( global_settings.fade_on_stop )
-                        fade(true, true);
-                    else
-                        audio_resume();
-                }
-                else
-                {
-                    state->paused = true;
-                    if ( global_settings.fade_on_stop )
-                        fade(false, true);
-                    else
-                        audio_pause();
-                    settings_save();
-#if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
-                    call_storage_idle_notifys(true);   /* make sure resume info is saved */
-#endif
-                }
+                wps_do_playpause(true);
                 break;
 
             case ACTION_WPS_VOLUP:

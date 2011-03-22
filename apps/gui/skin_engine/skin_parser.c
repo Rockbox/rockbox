@@ -965,6 +965,7 @@ static const struct touchaction touchactions[] = {
     {"setting_set", ACTION_SETTINGS_SET}, 
 
     /* WPS specific actions */
+    {"wps_prev", ACTION_WPS_SKIPPREV }, {"wps_next", ACTION_WPS_SKIPNEXT },
     {"browse", ACTION_WPS_BROWSE },
     {"play", ACTION_WPS_PLAY },         {"stop", ACTION_WPS_STOP },
     {"shuffle", ACTION_TOUCH_SHUFFLE }, {"repmode", ACTION_TOUCH_REPMODE },

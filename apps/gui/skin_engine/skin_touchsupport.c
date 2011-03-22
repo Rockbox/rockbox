@@ -28,7 +28,10 @@
 #include "option_select.h"
 #include "sound.h"
 #include "settings_list.h"
-
+#include "wps.h"
+#include "lang.h"
+#include "splash.h"
+#include "playlist.h"
 
 /** Disarms all touchregions. */
 void skin_disarm_touchregions(struct wps_data *data)
@@ -125,8 +128,56 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
     
     if (returncode != ACTION_NONE)
     {
+        if (global_settings.party_mode)
+        {
+            switch (returncode)
+            {
+                case ACTION_WPS_PLAY:
+                case ACTION_WPS_SKIPPREV:
+                case ACTION_WPS_SKIPNEXT:
+                case ACTION_WPS_STOP:
+                    returncode = ACTION_NONE;
+                    break;
+                default:
+                    break;
+            }
+        }
         switch (returncode)
         {
+            case ACTION_WPS_PLAY:
+                if (!audio_status())
+                {
+                    if ( global_status.resume_index != -1 )
+                    {
+                        if (playlist_resume() != -1)
+                        {
+                            playlist_start(global_status.resume_index,
+                                global_status.resume_offset);
+                        }
+                    }
+                    else
+                    {
+                        splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
+                    }
+                }
+                else
+                {
+                    wps_do_playpause(false);
+                }
+                returncode = ACTION_REDRAW;
+                break;
+            case ACTION_WPS_SKIPPREV:
+                audio_prev();
+                returncode = ACTION_REDRAW;
+                break;
+            case ACTION_WPS_SKIPNEXT:
+                audio_next();
+                returncode = ACTION_REDRAW;
+                break;
+            case ACTION_WPS_STOP:
+                audio_stop();
+                returncode = ACTION_REDRAW;
+                break;
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_DEC:
             {
