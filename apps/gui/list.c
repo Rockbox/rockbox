@@ -569,8 +569,8 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
     {
         if (global_settings.list_accel_start_delay)
         {
-            int start_delay = global_settings.list_accel_start_delay * (HZ/2);
-            int accel_wait = global_settings.list_accel_wait * HZ/2;
+            int start_delay = global_settings.list_accel_start_delay * HZ;
+            int accel_wait = global_settings.list_accel_wait * HZ;
 
             if (get_action_statuscode(NULL)&ACTION_REPEAT)
             {
