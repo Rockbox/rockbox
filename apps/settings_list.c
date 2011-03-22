@@ -368,7 +368,7 @@ static const char* scanaccel_formatter(char *buffer, size_t buffer_size,
     if (val == 0)
         return str(LANG_OFF);
     else
-        snprintf(buffer, buffer_size, "2x/%ds", val);
+        snprintf(buffer, buffer_size, "Speed up every %ds", val);
     return buffer;
 }
 #endif
@@ -1694,7 +1694,7 @@ const struct settings_list settings[] = {
 #endif
 #ifndef HAVE_WHEEL_ACCELERATION
     INT_SETTING(0, list_accel_start_delay, LANG_LISTACCEL_START_DELAY,
-                2, "list_accel_start_delay", UNIT_MS, 0, 10, 1,
+                2, "list_accel_start_delay", UNIT_SEC, 0, 10, 1,
                 formatter_unit_0_is_off, getlang_unit_0_is_off, NULL),
     INT_SETTING(0, list_accel_wait, LANG_LISTACCEL_ACCEL_SPEED,
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 

@@ -181,6 +181,20 @@
       When set to \setting{Yes} scrolling vertically on pages that surpass the
       screen size will page up/down instead of simply changing lines. This can be
       useful on slow displays.
+    \nopt{scrollwheel}{
+      \item[List Acceleration Start Delay.]
+        This setting enables the acceleration of scroll speed in lists when 
+        holding \ButtonScrollUp{} or \ButtonScrollDown{}. When set to 
+        \setting{Off} the acceleration is disabled. When any other value is set 
+        the acceleration will start to accelerate after holding
+        \ButtonScrollUp{} or \ButtonScrollDown{} for the chosen time (in 
+        seconds).
+      \item[List Acceleration Speed.]
+        This setting controls how fast the scroll speed accelerates. The scroll 
+        speed will increase every N seconds. For example, selecting 
+        \setting{Speed up every 3s} will increase the scroll speed every 3 
+        seconds while \ButtonScrollUp{} or \ButtonScrollDown{} is held.
+    }
     \end{description}
 %
   \opt{lcd_bitmap}{
