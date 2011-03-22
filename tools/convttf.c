@@ -89,12 +89,12 @@ static int eid = DEFAULT_ENCODING_ID;
 static FT_UShort nocmap;
 
 int pct                     = 0; /* display ttc table if it is not zero. */
-unsigned long   max_char    = 65535;
+FT_Long         max_char    = 65535;
 int             pixel_size  = 15;
-unsigned long   start_char  = 0;
-unsigned long   limit_char; 
-unsigned long   firstchar   = 0;
-unsigned long   lastchar;
+FT_Long         start_char  = 0;
+FT_Long         limit_char;
+FT_Long         firstchar   = 0;
+FT_Long         lastchar;
 FT_Long         ttc_index   = -1;
 int             flg_all_ttc = 0;
 short           antialias   = 1; /* smooth fonts with gray levels  */
@@ -104,6 +104,7 @@ float           between_chr = 0.0f;
 float           between_row = 0.0f;
 int             hv_resolution = 60;
 int             dump_glyphs = 0;
+int             digits_equally_wide = 1; /* Try to make digits equally wide */
 int             trimming    = 0;
 int             trim_dp     = 0; /* trim descent percent */
 int             trim_da     = 0; /* trim descnet actual  */
@@ -204,6 +205,7 @@ void usage(void)
         "    -tt    Display the True Type Collection tables available in the font\n"
         "    -t N   Index of true type collection. It must be start from 0.(default N=0).\n"
         "    -ta    Convert all fonts in ttc (ignores outfile option)\n"
+        "    -w     Don't try to make digits (0-9) equally wide\n"
     };
     fprintf(stderr, "%s", help);
     exit( 1 );
@@ -503,22 +505,54 @@ void print_raw_glyph( FT_Face face)
     printf("----End-----\n");
 }
 
-int glyph_width( FT_Face face) 
+int glyph_width( FT_Face face, FT_Long code, FT_Long digit_width )
 {
-    int pitch, h_adv, width;
-    unsigned spacing = (unsigned)(between_chr * (1<<6));/* convert to fixed point */
+    int width;
 
-    pitch = ABS(face->glyph->bitmap.pitch);
-    h_adv = face->glyph->metrics.horiAdvance >> 6;
-    width = (face->glyph->metrics.width + spacing) >> 6;
+    if (code >= '0' && code <= '9' && digit_width)
+    {
+        width = digit_width;
+    }
+    else
+    {
+        int pitch, h_adv;
+        unsigned spacing = (unsigned)(between_chr * (1<<6));/* convert to fixed point */
 
-    if(pitch == 0)    pitch = h_adv;
-    if(width < pitch) width = pitch;
-    if(width == 0)    return 0;
+        pitch = ABS(face->glyph->bitmap.pitch);
+        h_adv = face->glyph->metrics.horiAdvance >> 6;
+        width = (face->glyph->metrics.width + spacing) >> 6;
+
+        if(pitch == 0)    pitch = h_adv;
+        if(width < pitch) width = pitch;
+    }
 
     return width;
 }
 
+FT_Long check_digit_width( FT_Face face )
+{
+    FT_Long code;
+    FT_Long last_advance = -1;
+
+    for (code='0'; code <= '9'; ++code)
+    {
+        FT_Glyph_Metrics* metrics;
+
+        FT_Load_Char(face, code, FT_LOAD_RENDER | FT_LOAD_NO_BITMAP);
+        metrics = &face->glyph->metrics;
+
+        if ((last_advance != -1 && last_advance != metrics->horiAdvance) ||
+            metrics->horiBearingX < 0)
+        {
+            last_advance = 0;
+            break;
+        }
+
+        last_advance = metrics->horiAdvance;
+    }
+
+    return last_advance >> 6;
+}
 
 void trim_glyph( FT_GlyphSlot glyph, int *empty_first_col, 
                 int *empty_last_col, int *width )
@@ -574,6 +608,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     FT_Long     charindex;
     FT_Long     index = 0;
     FT_Long     code;
+    FT_Long     digit_width = 0;
 
     int depth = 2;
     unsigned char bit_shift = 1 << depth;
@@ -626,6 +661,9 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     firstchar = limit_char;
     lastchar  = start_char;
 
+    if (digits_equally_wide)
+        digit_width = check_digit_width(face);
+
     /* calculate memory usage */
     for(code = start_char; code <= limit_char ; code++ )
     {
@@ -634,8 +672,8 @@ void convttf(char* path, char* destfile, FT_Long face_index)
         error = FT_Load_Glyph( face, charindex, 
                                (FT_LOAD_RENDER | FT_LOAD_NO_BITMAP) );
         if ( error ) continue;
-        
-        w = glyph_width( face );
+
+        w = glyph_width( face, code, digit_width );
         if (w == 0) continue;
         empty_first_col = empty_last_col = 0;
         if(trimming)
@@ -715,7 +753,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
         FT_GlyphSlot slot = face->glyph;
         FT_Bitmap* source = &slot->bitmap;
         //print_raw_glyph( face );
-        w = glyph_width( face );
+        w = glyph_width( face, code, digit_width );
         if (w == 0) continue;
         empty_first_col = empty_last_col = 0;
 
@@ -1178,6 +1216,11 @@ void getopts(int *pac, char ***pav)
                     if (ac > 0)
                         ttc_index = atoi(av[0]);
                 }
+                break;
+            case 'w':     /* Don't try to make digits equally wide */
+                digits_equally_wide = 0;
+                while (*p && *p != ' ')
+                    p++;
                 break;
 
             default:
