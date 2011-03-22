@@ -32,6 +32,7 @@
 #include "lang.h"
 #include "splash.h"
 #include "playlist.h"
+#include "dsp.h"
 
 /** Disarms all touchregions. */
 void skin_disarm_touchregions(struct wps_data *data)
@@ -234,6 +235,29 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                     global_settings.volume = min_vol;
                 }
                 setvol();
+                returncode = ACTION_REDRAW;
+            }
+            break;
+            case ACTION_TOUCH_SHUFFLE: /* toggle shuffle mode */
+            {
+                global_settings.playlist_shuffle = 
+                                            !global_settings.playlist_shuffle;
+#if CONFIG_CODEC == SWCODEC
+                dsp_set_replaygain();
+#endif
+                if (global_settings.playlist_shuffle)
+                    playlist_randomise(NULL, current_tick, true);
+                else
+                    playlist_sort(NULL, true);
+                returncode = ACTION_REDRAW;
+            }
+            break;
+            case ACTION_TOUCH_REPMODE: /* cycle the repeat mode setting */
+            {
+                const struct settings_list *rep_setting = 
+                                find_setting(&global_settings.repeat_mode, NULL);
+                option_select_next_val(rep_setting, false, true);
+                audio_flush_and_reload_tracks();
                 returncode = ACTION_REDRAW;
             }
             break;
