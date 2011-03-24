@@ -68,11 +68,14 @@ static int dma_mode = 0;
 
 
 #ifdef ATA_HAVE_BBT
-char ata_bbtbuf[ATA_BBT_PAGES * 64];
+char ata_bbt_buf[ATA_BBT_PAGES * 64];
 uint16_t (*ata_bbt)[0x20];
 uint64_t ata_virtual_sectors;
 uint32_t ata_last_offset;
 uint64_t ata_last_phys;
+
+int ata_rw_sectors_internal(uint64_t sector, uint32_t count,
+                            void* buffer, bool write);
 
 int ata_bbt_read_sectors(uint32_t sector, uint32_t count, void* buffer)
 {
@@ -83,7 +86,7 @@ int ata_bbt_read_sectors(uint32_t sector, uint32_t count, void* buffer)
     ata_last_offset = 0;
     if (IS_ERR(rc))
         panicf("ATA: Error %08X while reading BBT (sector %d, count %d)\n",
-                rc, sector, count);
+               (unsigned int)rc, (unsigned int)sector, (unsigned int)count);
     return rc;
 }
 #endif
@@ -836,7 +839,7 @@ int ata_bbt_translate(uint64_t sector, uint32_t count, uint64_t* phys, uint32_t*
             {
                 uint32_t l3idx = sector & 0x1f;
                 uint32_t l3data = ata_bbt[l2data & 0x7fff][l3idx];
-                for (*physcount = 1; *physcount < count && l3idx + *physcount < 0x20; *physcount++)
+                for (*physcount = 1; *physcount < count && l3idx + *physcount < 0x20; (*physcount)++)
                     if (ata_bbt[l2data & 0x7fff][l3idx + *physcount] != l3data)
                         break;
                 offset = l3data + base;
@@ -1023,7 +1026,6 @@ long ata_last_disk_activity(void)
 void ata_bbt_disable(void)
 {
     mutex_lock(&ata_mutex);
-    if (ata_bbt) free(ata_bbt);
     ata_bbt = NULL;
     ata_virtual_sectors = ata_total_sectors;
     mutex_unlock(&ata_mutex);
@@ -1044,7 +1046,8 @@ void ata_bbt_reload(void)
             ata_virtual_sectors = (((uint64_t)buf[0x1fd]) << 32) | buf[0x1fc];
             uint32_t count = buf[0x1ff];
             if (count > ATA_BBT_PAGES / 64)
-                panicf("ATA: BBT too big! (space: %d, size: %d)", ATA_BBT_PAGES, count * 64);
+                panicf("ATA: BBT too big! (space: %d, size: %d)",
+                       ATA_BBT_PAGES, (unsigned int)(count * 64));
             uint32_t i;
             uint32_t cnt;
             ata_bbt = (typeof(ata_bbt))ata_bbt_buf;
