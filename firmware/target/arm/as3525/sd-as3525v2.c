@@ -831,7 +831,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     int retry_all = 0;
     int const retry_data_max = 100; /* Generous, methinks */
     int retry_data;
-    int real_numblocks;
+    unsigned int real_numblocks;
 
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
