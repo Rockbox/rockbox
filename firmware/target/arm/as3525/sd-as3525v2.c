@@ -394,7 +394,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
         unsigned long *response)
 {
     int card_no;
-    
+
     if ((flags & MCI_ACMD) && /* send SD_APP_CMD first */
         !send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, response))
         return false;
@@ -559,7 +559,7 @@ static int sd_init_card(const int drive)
         /* CMD6 */
         if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_RESP, &response))
             return -9;
-            
+
         /* This delay is a bit of a hack, but seems to fix card detection
            problems with some SD cards (particularly 16 GB and bigger cards).
            Preferably we should handle this properly instead of using a delay,
@@ -831,6 +831,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     int retry_all = 0;
     int const retry_data_max = 100; /* Generous, methinks */
     int retry_data;
+    int real_numblocks;
 
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
@@ -841,12 +842,6 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     if(count < 0) /* XXX: why is it signed ? */
     {
         ret = -18;
-        goto sd_transfer_error_no_dma;
-    }
-
-    if((start+count) > card_info[drive].numblocks)
-    {
-        ret = -19;
         goto sd_transfer_error_no_dma;
     }
 
@@ -864,6 +859,18 @@ sd_transfer_retry_with_reinit:
         ret = sd_init_card(drive);
         if (!(card_info[drive].initialized))
             goto sd_transfer_error_no_dma;
+    }
+
+    /* Check the real block size after the card has been initialized */
+    real_numblocks = card_info[drive].numblocks;
+    /* 'start' represents the real (physical) starting sector
+     *  so we must compare it to the real (physical) number of sectors */
+    if (drive == INTERNAL_AS3525)
+        real_numblocks += AMS_OF_SIZE;
+    if ((start+count) > real_numblocks)
+    {
+        ret = -19;
+        goto sd_transfer_error_no_dma;
     }
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
