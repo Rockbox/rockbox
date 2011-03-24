@@ -53,7 +53,7 @@ static bool wait_for_release = false;
 static bool short_press = false;
 #endif
 
-#define REPEAT_WINDOW_TICKS HZ/10
+#define REPEAT_WINDOW_TICKS HZ/4
 static int last_action_tick = 0;
 
 /* software keylock stuff */
