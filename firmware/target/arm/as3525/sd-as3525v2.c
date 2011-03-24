@@ -826,6 +826,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
     int retry_all = 0;
     int const retry_data_max = 100; /* Generous, methinks */
     int retry_data;
+    unsigned int real_numblocks;
 
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
@@ -855,7 +856,13 @@ sd_transfer_retry_with_reinit:
             goto sd_transfer_error_no_dma;
     }
 
-    if((start+count) > card_info[drive].numblocks)
+    /* Check the real block size after the card has been initialized */
+    real_numblocks = card_info[drive].numblocks;
+    /* 'start' represents the real (physical) starting sector
+     *  so we must compare it to the real (physical) number of sectors */
+    if (drive == INTERNAL_AS3525)
+        real_numblocks += AMS_OF_SIZE;
+    if ((start+count) > real_numblocks)
     {
         ret = -19;
         goto sd_transfer_error_no_dma;
