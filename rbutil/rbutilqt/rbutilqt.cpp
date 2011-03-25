@@ -32,13 +32,13 @@
 #include "uninstallwindow.h"
 #include "utils.h"
 #include "rockboxinfo.h"
-#include "rbzip.h"
 #include "sysinfo.h"
 #include "system.h"
 #include "systrace.h"
 #include "rbsettings.h"
 #include "serverinfo.h"
 #include "systeminfo.h"
+#include "ziputil.h"
 
 #include "progressloggerinterface.h"
 
@@ -578,6 +578,7 @@ bool RbUtilQt::installAuto()
            tr("Rockbox installation detected. Do you want to backup first?"),
            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
+            bool result;
             logger->addItem(tr("Starting backup..."),LOGINFO);
             QString backupName = RbSettings::value(RbSettings::Mountpoint).toString()
                 + "/.backup/rockbox-backup-" + rbinfo.version() + ".zip";
@@ -590,11 +591,19 @@ bool RbUtilQt::installAuto()
                 a.mkpath(backupFile.path());
             }
 
+            logger->addItem(tr("Beginning Backup..."),LOGINFO);
+            QCoreApplication::processEvents();
+
             //! create backup
-            RbZip backup;
-            connect(&backup,SIGNAL(zipProgress(int,int)),logger, SLOT(setProgress(int,int)));
-            if(backup.createZip(backupName,
-                RbSettings::value(RbSettings::Mountpoint).toString() + "/.rockbox") == Zip::Ok)
+            ZipUtil zip(this);
+            connect(&zip, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+            connect(&zip, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+            zip.open(backupName, QuaZip::mdCreate);
+            QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
+            QString folder = mp + "/.rockbox";
+            result = zip.appendDirToArchive(folder, mp);
+            zip.close();
+            if(result)
             {
                 logger->addItem(tr("Backup successful"),LOGOK);
             }
@@ -1262,13 +1271,13 @@ void RbUtilQt::checkUpdate(void)
 #elif defined(Q_OS_MACX)
     url += "macosx/";
 #endif
-    
+
     update = new HttpGet(this);
     connect(update, SIGNAL(done(bool)), this, SLOT(downloadUpdateDone(bool)));
     connect(qApp, SIGNAL(lastWindowClosed()), update, SLOT(abort()));
     if(RbSettings::value(RbSettings::CacheOffline).toBool())
         update->setCache(true);
-   
+
     ui.statusbar->showMessage(tr("Checking for update ..."));
     update->getFile(QUrl(url));
 }
@@ -1289,7 +1298,7 @@ void RbUtilQt::downloadUpdateDone(bool error)
             rbutilList << searchString.cap(1);
             pos += searchString.matchedLength();
         }
-        qDebug() << "[Checkupdate] " << rbutilList;
+        qDebug() << "[RbUtilQt] Checking for update";
 
         QString newVersion = "";
         QString foundVersion = "";

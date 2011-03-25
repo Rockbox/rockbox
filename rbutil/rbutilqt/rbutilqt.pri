@@ -22,8 +22,6 @@ SOURCES += \
  installwindow.cpp \
  base/httpget.cpp \
  configure.cpp \
- zip/zip.cpp \
- zip/unzip.cpp \
  base/zipinstaller.cpp \
  progressloggergui.cpp \
  installtalkwindow.cpp \
@@ -53,8 +51,6 @@ SOURCES += \
  base/rbsettings.cpp \
  base/serverinfo.cpp \
  base/systeminfo.cpp \
- base/rbunzip.cpp \
- base/rbzip.cpp \
  base/system.cpp \
  sysinfo.cpp \
  systrace.cpp \
@@ -71,6 +67,13 @@ SOURCES += \
  base/rockboxinfo.cpp \
  ../../tools/mkboot.c \
  ../../tools/iriver.c \
+ quazip/quazip.cpp \
+ quazip/quazipfile.cpp \
+ quazip/quazipnewinfo.cpp \
+ quazip/unzip.c \
+ quazip/zip.c \
+ quazip/ioapi.c \
+ base/ziputil.cpp \
 
 
 HEADERS += \
@@ -78,11 +81,6 @@ HEADERS += \
  installwindow.h \
  base/httpget.h \
  configure.h \
- zip/zip.h \
- zip/unzip.h \
- zip/zipentry_p.h \
- zip/unzip_p.h \
- zip/zip_p.h \
  version.h \
  base/zipinstaller.h \
  installtalkwindow.h \
@@ -120,8 +118,6 @@ HEADERS += \
  base/rbsettings.h \
  base/serverinfo.h \
  base/systeminfo.h \
- base/rbunzip.h \
- base/rbzip.h \
  sysinfo.h \
  base/system.h \
  systrace.h \
@@ -138,6 +134,16 @@ HEADERS += \
  base/rockboxinfo.h \
  ../../tools/mkboot.h \
  ../../tools/iriver.h \
+ quazip/crypt.h \
+ quazip/ioapi.h \
+ quazip/quazipfile.h \
+ quazip/quazipfileinfo.h \
+ quazip/quazip.h \
+ quazip/quazipnewinfo.h \
+ quazip/unzip.h \
+ quazip/zip.h \
+ base/ziputil.h \
+
 
 FORMS += \
  rbutilqtfrm.ui \

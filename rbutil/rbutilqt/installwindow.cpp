@@ -19,13 +19,13 @@
 
 #include "installwindow.h"
 #include "ui_installwindowfrm.h"
-#include "rbzip.h"
 #include "system.h"
 #include "rbsettings.h"
 #include "serverinfo.h"
 #include "systeminfo.h"
 #include "utils.h"
 #include "rockboxinfo.h"
+#include "ziputil.h"
 
 InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
 {
@@ -55,8 +55,8 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
         ui.Backupgroup->hide();
     }
     backupCheckboxChanged(Qt::Unchecked);
-    
-    
+
+
     if(ServerInfo::value(ServerInfo::DailyRevision).toString().isEmpty()) {
         ui.radioArchived->setEnabled(false);
         qDebug() << "[Install] no information about archived version available!";
@@ -89,7 +89,7 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
         font.setBold(true);
         ui.radioCurrent->setFont(font);
     }
-    
+
 }
 
 
@@ -186,6 +186,7 @@ void InstallWindow::accept()
     if(ui.backup->isChecked())
     {
         logger->addItem(tr("Beginning Backup..."),LOGINFO);
+        QCoreApplication::processEvents();
 
         //! create dir, if it doesnt exist
         QFileInfo backupFile(m_backupName);
@@ -196,16 +197,20 @@ void InstallWindow::accept()
         }
 
         //! create backup
-        RbZip backup;
-        connect(&backup,SIGNAL(zipProgress(int,int)),logger,SLOT(setProgress(int,int)));
-        if(backup.createZip(m_backupName,
-            RbSettings::value(RbSettings::Mountpoint).toString() + "/.rockbox") == Zip::Ok)
-        {
-            logger->addItem(tr("Backup successful"),LOGOK);
+        bool result = true;
+        ZipUtil zip(this);
+        connect(&zip, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+        connect(&zip, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+        zip.open(m_backupName, QuaZip::mdCreate);
+        QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
+        QString folder = mp + "/.rockbox";
+        result = zip.appendDirToArchive(folder, mp);
+        zip.close();
+        if(result) {
+            logger->addItem(tr("Backup finished."), LOGINFO);
         }
-        else
-        {
-            logger->addItem(tr("Backup failed!"),LOGERROR);
+        else {
+            logger->addItem(tr("Backup failed!"), LOGERROR);
             logger->setFinished();
             return;
         }

@@ -19,8 +19,8 @@
 
 #include <QtCore>
 #include "zipinstaller.h"
-#include "rbunzip.h"
 #include "utils.h"
+#include "ziputil.h"
 
 ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 {
@@ -132,39 +132,28 @@ void ZipInstaller::downloadDone(bool error)
         emit logItem(tr("Extracting file."), LOGINFO);
         QCoreApplication::processEvents();
 
-        UnZip::ErrorCode ec;
-        RbUnZip uz;
-        connect(&uz, SIGNAL(unzipProgress(int, int)), this, SIGNAL(logProgress(int, int)));
-        connect(this, SIGNAL(internalAborted()), &uz, SLOT(abortUnzip()));
-        ec = uz.openArchive(m_file);
-        if(ec != UnZip::Ok) {
-            emit logItem(tr("Opening archive failed: %1.")
-                .arg(uz.formatError(ec)),LOGERROR);
-            emit logProgress(1, 1);
-            emit done(true);
-            return;
-        }
-
+        ZipUtil zip(this);
+        connect(&zip, SIGNAL(logProgress(int, int)), this, SIGNAL(logProgress(int, int)));
+        connect(&zip, SIGNAL(logItem(QString, int)), this, SIGNAL(logItem(QString, int)));
+        zip.open(m_file, QuaZip::mdUnzip);
         // check for free space. Make sure after installation will still be
         // some room for operating (also includes calculation mistakes due to
         // cluster sizes on the player).
-        if(Utils::filesystemFree(m_mountpoint) < (uz.totalSize() + 1000000)) {
+        if(Utils::filesystemFree(m_mountpoint)
+                < (zip.totalUncompressedSize() + 1000000)) {
             emit logItem(tr("Not enough disk space! Aborting."), LOGERROR);
             emit logProgress(1, 1);
             emit done(true);
             return;
         }
-        ec = uz.extractArchive(m_mountpoint);
-        // TODO: better handling of aborted unzip operation.
-        if(ec != UnZip::Ok) {
-            emit logItem(tr("Extracting failed: %1.")
-                .arg(uz.formatError(ec)),LOGERROR);
+        zipContents = zip.files();
+        if(!zip.extractArchive(m_mountpoint)) {
+            emit logItem(tr("Extraction failed!"), LOGERROR);
             emit logProgress(1, 1);
             emit done(true);
             return;
         }
-        // prepare file list for log
-        zipContents = uz.fileList();
+        zip.close();
     }
     else {
         // only copy the downloaded file to the output location / name
@@ -185,7 +174,7 @@ void ZipInstaller::downloadDone(bool error)
         }
 
         // add file to log
-        zipContents.append( m_target);
+        zipContents.append(m_target);
     }
 
     emit logItem(tr("Creating installation log"),LOGINFO);
