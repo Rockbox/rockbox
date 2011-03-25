@@ -496,9 +496,9 @@ static void display_helpfile(void)
         "", "V = IR",
         "", "I = V/R",
         "", "and",
-        "", "R = I/V", "", "",
-        "Where", "V", "=", "voltage", "I", "=", "current", "(in", "amps)", 
-        "and", "R", "=", "resistance", "(measured", "in", "Ohms)", "", "",
+        "", "R = V/I", "", "",
+        "Where", "V", "=", "voltage, ", "I", "=", "current", "(in", "amps)", 
+        "and", "R", "=", "resistance", "(measured", "in", "Ohms).", "", "",
          /* 28 */
         /* -- */
         "The", "primary", "characteristics", "of", "a", "resistor", "are",
