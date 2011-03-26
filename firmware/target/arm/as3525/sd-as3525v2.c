@@ -546,6 +546,9 @@ static int sd_init_card(const int drive)
 #endif
     /*  End of Card Identification Mode   ************************************/
 
+    /*  Card back to full speed  */
+    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
+
     if (sd_v2)
     {
         /* Attempt to switch cards to HS timings, non HS cards just ignore this */
@@ -584,9 +587,6 @@ static int sd_init_card(const int drive)
 
     if(drive == INTERNAL_AS3525) /* The OF is stored in the first blocks */
         card_info[INTERNAL_AS3525].numblocks -= AMS_OF_SIZE;
-
-    /*  Card back to full speed  */
-    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
