@@ -275,7 +275,7 @@ void audiohw_postinit(void)
     wmcodec_set_bits(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR);
 
      /* 4. Enable line and / or headphone output buffers as required. */
-#if defined(GIGABEATFX)
+#if defined(GIGABEAT_F)
     /* headphones + line-out */
     wmcodec_set_bits(PWRMGMT2, PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1 | 
                      PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2);
