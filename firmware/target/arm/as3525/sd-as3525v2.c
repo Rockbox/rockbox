@@ -823,6 +823,7 @@ int sd_init(void)
 static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                 int count, void* buf, bool write)
 {
+    unsigned long response;
     int ret = 0;
 #ifndef HAVE_MULTIDRIVE
     const int drive = 0;
@@ -938,8 +939,7 @@ sd_transfer_retry_with_reinit:
             dma_enable_channel(0, MCI_FIFO, dma_buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
-        unsigned long dummy; /* if we don't ask for a response, writing fails */
-        if(!send_cmd(drive, cmd, arg, MCI_RESP, &dummy))
+        if(!send_cmd(drive, cmd, arg, MCI_RESP, &response))
         {
             ret = -21;
             goto sd_transfer_error;
@@ -955,7 +955,7 @@ sd_transfer_retry_with_reinit:
             while(MCI_STATUS & DATA_BUSY) ;
         }
 
-        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_RESP, NULL))
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP, &response))
         {
             ret = -22;
             goto sd_transfer_error;
