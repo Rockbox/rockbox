@@ -1071,12 +1071,12 @@ tCardInfo *card_get_info_target(int card_no)
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MD_NONVOID(int drive))
 {
-    return (drive==1);
+    return (drive == SD_SLOT_AS3525);
 }
 
 bool sd_present(IF_MD_NONVOID(int drive))
 {
-    return (drive == 0) ? true : card_detect_target();
+    return (drive == INTERNAL_AS3525) ? true : card_detect_target();
 }
 
 static int sd1_oneshot_callback(struct timeout *tmo)
