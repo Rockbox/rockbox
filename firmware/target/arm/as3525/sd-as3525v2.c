@@ -588,18 +588,19 @@ static int sd_init_card(const int drive)
     if(drive == INTERNAL_AS3525) /* The OF is stored in the first blocks */
         card_info[INTERNAL_AS3525].numblocks -= AMS_OF_SIZE;
 
+#ifndef BOOTLOADER
+    /*  Switch to to 4 bit widebus mode  */
+
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
         return -12;
-
-#ifndef BOOTLOADER
-    /*  Switch to to 4 bit widebus mode  */
     if(sd_wait_for_tran_state(drive) < 0)
         return -13;
-    /* ACMD6  */
+
+    /* ACMD6: set bus width to 4-bit */
     if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ACMD|MCI_RESP, &response))
         return -15;
-    /* ACMD42  */
+    /* ACMD42: disconnect the pull-up resistor on CD/DAT3 */
     if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ACMD|MCI_RESP, &response))
         return -17;
 
