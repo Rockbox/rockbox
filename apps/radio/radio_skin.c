@@ -118,7 +118,7 @@ int fms_do_button_loop(bool update_screen)
             return ACTION_FM_PLAY;
         case ACTION_STD_MENU:
             return ACTION_FM_MENU;
-        case WPS_TOUCHREGION_SCROLLBAR:
+        case ACTION_TOUCH_SCROLLBAR:
             /* TODO */
             break;
     }   
