@@ -229,6 +229,30 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             break;
         
 #endif /* HAVE_LCD_BITMAP */
+#ifdef HAVE_SKIN_VARIABLES
+        case SKIN_TOKEN_VAR_SET:
+            if (do_refresh)
+            {
+                struct skin_var_changer *data = token->value.data;
+                if (data->direct)
+                    data->var->value = data->newval;
+                else
+                {
+                    data->var->value += data->newval;
+                    if (data->max)
+                    {
+                        if (data->var->value > data->max)
+                            data->var->value = 1;
+                        else if (data->var->value < 1)
+                            data->var->value = data->max;
+                    }
+                }
+                if (data->var->value < 1)
+                    data->var->value = 1;
+                data->var->last_changed = current_tick;
+            }
+            break;
+#endif
         default:
             return false;
     }

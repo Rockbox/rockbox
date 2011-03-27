@@ -949,6 +949,8 @@ Lyre prototype 1 */
 #ifdef HAVE_TOUCHSCREEN
 /* Timeout objects required for kinetic list scrolling */
 #define INCLUDE_TIMEOUT_API
+/* Enable skin variable system, may not be the best place for this #define. */
+#define HAVE_SKIN_VARIABLES
 #endif /* HAVE_TOUCHSCREEN */
 
 #if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)

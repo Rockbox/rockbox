@@ -199,12 +199,12 @@ struct touchregion {
                                 on repeat or release. */
     union {                  /* Extra data, action dependant */
         struct touchsetting {
-			const struct settings_list *setting; /* setting being controlled */
-			union {			/* Value to set the setting to for ACTION_SETTING_SET */
-				int number;
-				char* text;
-			} value;
-		} setting_data;
+            const struct settings_list *setting; /* setting being controlled */
+            union {         /* Value to set the setting to for ACTION_SETTING_SET */
+                int number;
+                char* text;
+            } value;
+        } setting_data;
         int   value;
     };
     long last_press;        /* last tick this was pressed */
@@ -272,6 +272,24 @@ struct logical_if {
     int num_options;
 };
 
+#ifdef HAVE_SKIN_VARIABLES
+struct skin_var {
+    const char *label;
+    int value;
+    long last_changed;
+};
+struct skin_var_lastchange {
+    struct skin_var *var;
+    long timeout;
+};
+struct skin_var_changer {
+    struct skin_var *var;
+    int newval;
+    bool direct; /* true to make val=newval, false for val += newval */
+    int max;
+};
+#endif
+
 /* wps_data
    this struct holds all necessary data which describes the
    viewable content of a wps */
@@ -294,6 +312,10 @@ struct wps_data
 #ifdef HAVE_ALBUMART
     struct skin_albumart *albumart;
     int    playback_aa_slot;
+#endif
+
+#ifdef HAVE_SKIN_VARIABLES
+    struct skin_token_list *skinvars;
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -364,17 +386,20 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 #endif
 
 enum skin_find_what {
-	SKIN_FIND_VP = 0,
-	SKIN_FIND_UIVP,
+    SKIN_FIND_VP = 0,
+    SKIN_FIND_UIVP,
 #ifdef HAVE_LCD_BITMAP
-	SKIN_FIND_IMAGE,
+    SKIN_FIND_IMAGE,
 #endif
 #ifdef HAVE_TOUCHSCREEN
-	SKIN_FIND_TOUCHREGION,
+    SKIN_FIND_TOUCHREGION,
+#endif
+#ifdef HAVE_SKIN_VARIABLES
+    SKIN_VARIABLE,
 #endif
 };
 void *skin_find_item(const char *label, enum skin_find_what what,
-					 struct wps_data *data);
+                     struct wps_data *data);
 #ifdef SIMULATOR
 #define DEBUG_SKIN_ENGINE
 extern bool debug_wps;

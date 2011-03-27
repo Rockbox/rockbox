@@ -119,7 +119,7 @@ static void add_to_ll_chain(struct skin_token_list **list, struct skin_token_lis
 
 
 void *skin_find_item(const char *label, enum skin_find_what what,
-					 struct wps_data *data)
+                     struct wps_data *data)
 {
     const char *itemlabel = NULL;
     union {
@@ -143,6 +143,11 @@ void *skin_find_item(const char *label, enum skin_find_what what,
 #ifdef HAVE_TOUCHSCREEN
         case SKIN_FIND_TOUCHREGION:
             list.linkedlist = data->touchregions;
+        break;
+#endif
+#ifdef HAVE_SKIN_VARIABLES
+        case SKIN_VARIABLE:
+            list.linkedlist = data->skinvars;
         break;
 #endif
     }
@@ -171,6 +176,13 @@ void *skin_find_item(const char *label, enum skin_find_what what,
                 itemlabel = ((struct touchregion *)ret)->label;
                 break;
 #endif
+#ifdef HAVE_SKIN_VARIABLES
+            case SKIN_VARIABLE:
+                ret = list.linkedlist->token->value.data;
+                itemlabel = ((struct skin_var *)ret)->label;
+                break;
+#endif
+                
         }
         if (!skip && itemlabel && !strcmp(itemlabel, label))
             return ret;
@@ -718,7 +730,7 @@ static int parse_progressbar_tag(struct skin_element* element,
                 curr_param++;
                 param++;
                 pb->slider = skin_find_item(param->data.text, 
-											SKIN_FIND_IMAGE, wps_data);
+                                            SKIN_FIND_IMAGE, wps_data);
             }
             else /* option needs the next param */
                 return -1;
@@ -742,7 +754,7 @@ static int parse_progressbar_tag(struct skin_element* element,
                 curr_param++;
                 param++;
                 pb->backdrop = skin_find_item(param->data.text, 
-											  SKIN_FIND_IMAGE, wps_data);
+                                              SKIN_FIND_IMAGE, wps_data);
                 
             }
             else /* option needs the next param */
@@ -915,7 +927,86 @@ static int parse_albumart_load(struct skin_element* element,
 }
 
 #endif /* HAVE_ALBUMART */
-
+#ifdef HAVE_SKIN_VARIABLES
+static struct skin_var* find_or_add_var(const char* label,
+                                        struct wps_data *data)
+{
+    struct skin_var* ret = skin_find_item(label, SKIN_VARIABLE, data);
+    if (!ret)
+    {
+        ret = (struct skin_var*)skin_buffer_alloc(sizeof(struct skin_var));
+        if (!ret)
+            return NULL;
+        ret->label = label;
+        ret->value = 1;
+        ret->last_changed = 0xffff;
+        struct skin_token_list *item = new_skin_token_list_item(NULL, ret);
+        if (!item)
+            return NULL;
+        add_to_ll_chain(&data->skinvars, item);
+    }
+    return ret;
+}
+static int parse_skinvar(  struct skin_element *element,
+                           struct wps_token *token,
+                           struct wps_data *wps_data)
+{
+    const char* label = element->params[0].data.text;
+    struct skin_var* var = find_or_add_var(label, wps_data);
+    if (!var)
+        return WPS_ERROR_INVALID_PARAM;
+    switch (token->type)
+    {
+        case SKIN_TOKEN_VAR_GETVAL:
+            token->value.data = var;
+            break;
+        case SKIN_TOKEN_VAR_SET:
+        {
+            struct skin_var_changer *data = 
+                                (struct skin_var_changer*)skin_buffer_alloc(
+                                            sizeof(struct skin_var_changer));
+            if (!data)
+                return WPS_ERROR_INVALID_PARAM;
+            data->var = var;
+            data->newval = element->params[2].data.number;
+            data->max = 0;
+            if (!strcmp(element->params[1].data.text, "set"))
+                data->direct = true;
+            else if (!strcmp(element->params[1].data.text, "inc"))
+            {
+                data->direct = false;
+            }
+            else if (!strcmp(element->params[1].data.text, "dec"))
+            {
+                data->direct = false;
+                data->newval *= -1;
+            }
+            if (element->params_count > 3)
+                data->max = element->params[3].data.number;
+            token->value.data = data;
+        }
+        break;
+        case SKIN_TOKEN_VAR_TIMEOUT:
+        {
+            struct skin_var_lastchange *data = 
+                                (struct skin_var_lastchange*)skin_buffer_alloc(
+                                            sizeof(struct skin_var_lastchange));
+            if (!data)
+                return WPS_ERROR_INVALID_PARAM;
+            data->var = var;
+            data->timeout = 10;
+            if (element->params_count > 1)
+                data->timeout = element->params[1].data.number;
+            data->timeout *= TIMEOUT_UNIT;
+            token->value.data = data;
+        }
+        break;
+        default: /* kill the warning */
+            break;
+    }
+    return 0;
+}
+#endif /* HAVE_SKIN_VARIABLES */
 #ifdef HAVE_TOUCHSCREEN
 static int parse_lasttouch(struct skin_element *element,
                            struct wps_token *token,
@@ -934,7 +1025,7 @@ static int parse_lasttouch(struct skin_element *element,
     {
         if (element->params[i].type == STRING)
             data->region = skin_find_item(element->params[i].data.text,
-										  SKIN_FIND_TOUCHREGION, wps_data);
+                                          SKIN_FIND_TOUCHREGION, wps_data);
         else if (element->params[i].type == INTEGER)
             data->timeout = element->params[i].data.number;
     }
@@ -1216,6 +1307,9 @@ static void skin_data_reset(struct wps_data *wps_data)
 #endif
 #ifdef HAVE_TOUCHSCREEN
     wps_data->touchregions = NULL;
+#endif
+#ifdef HAVE_SKIN_VARIABLES
+	wps_data->skinvars = NULL;
 #endif
 #ifdef HAVE_ALBUMART
     wps_data->albumart = NULL;
@@ -1630,6 +1724,13 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     break;
                 case SKIN_TOKEN_ALBUMART_LOAD:
                     function = parse_albumart_load;
+                    break;
+#endif
+#ifdef HAVE_SKIN_VARIABLES
+                case SKIN_TOKEN_VAR_SET:
+                case SKIN_TOKEN_VAR_GETVAL:
+                case SKIN_TOKEN_VAR_TIMEOUT:
+                    function = parse_skinvar;
                     break;
 #endif
                 default:

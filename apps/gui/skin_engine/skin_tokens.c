@@ -1772,6 +1772,28 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_LANG_IS_RTL:
             return lang_is_rtl() ? "r" : NULL;
 
+#ifdef HAVE_SKIN_VARIABLES
+        case SKIN_TOKEN_VAR_GETVAL:
+        {
+            struct skin_var* var = token->value.data;
+            if (intval)
+                *intval = var->value;
+            snprintf(buf, buf_size, "%d", var->value);
+            return buf;
+        }
+        break;
+        case SKIN_TOKEN_VAR_TIMEOUT:
+            {
+            struct skin_var_lastchange *data = token->value.data;
+            unsigned int last_change = data->var->last_changed;
+
+            if (last_change != 0xffff &&
+                TIME_BEFORE(current_tick, data->timeout + last_change))
+                return "t";
+            }
+            return NULL;
+#endif
+
         default:
             return NULL;
     }
