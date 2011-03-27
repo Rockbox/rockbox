@@ -62,6 +62,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
     bool released = (type == BUTTON_REL);
     bool pressed = (type == BUTTON_TOUCHSCREEN);
     struct skin_token_list *regions = data->touchregions;
+    bool needs_repeat;
 
     while (regions)
     {
@@ -72,6 +73,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
             regions = regions->next;
             continue;
         }
+        needs_repeat = r->press_length != PRESS;
         /* check if it's inside this viewport */
         if (viewport_point_within_vp(&(r->wvp->vp), x, y))
         {   /* reposition the touch inside the viewport since touchregions
@@ -87,10 +89,25 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                 vy -= r->y;
                 
 
-                switch(r->type)
+                switch(r->action)
                 {
-                    case WPS_TOUCHREGION_ACTION:
-                        if (r->armed && ((repeated && r->repeat) || (released && !r->repeat)))
+                    case ACTION_TOUCH_SCROLLBAR:
+                    case ACTION_TOUCH_VOLUME:
+                        if (edge_offset)
+                        {
+                            if(r->width > r->height)
+                                *edge_offset = vx*100/r->width;
+                            else
+                                *edge_offset = vy*100/r->height;
+                            if (r->reverse_bar)
+                                *edge_offset = 100 - *edge_offset;
+                        }
+                        temp = r;
+                        returncode = r->action;
+                        break;
+                    default:
+                        if (r->armed && ((repeated && needs_repeat) || 
+                            (released && !needs_repeat)))
                         {
                             last_action = r->action;
                             returncode = r->action;
@@ -101,19 +118,6 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                             r->armed = true;
                             r->last_press = current_tick;
                         }
-                        break;
-                    default:
-                        if (edge_offset)
-                        {
-                            if(r->width > r->height)
-                                *edge_offset = vx*100/r->width;
-                            else
-                                *edge_offset = vy*100/r->height;
-                            if (r->reverse_bar)
-                                *edge_offset = 100 - *edge_offset;
-                        }
-                        returncode = r->type;
-                        temp = r;
                         break;
                 }
             }
@@ -126,6 +130,8 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
         skin_disarm_touchregions(data);
     if (retregion && temp)
         *retregion = temp;
+    if (temp && temp->press_length == LONG_PRESS)
+        temp->armed = false;
     
     if (returncode != ACTION_NONE)
     {

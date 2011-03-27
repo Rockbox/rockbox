@@ -1030,6 +1030,7 @@ static int parse_touchregion(struct skin_element *element,
     region->reverse_bar = false;
     region->value = 0;
     region->last_press = 0xffff;
+    region->press_length = PRESS;
     action = element->params[p++].data.text;
 
     strcpy(temp, action);
@@ -1042,20 +1043,23 @@ static int parse_touchregion(struct skin_element *element,
     }
 
     if(!strcmp(pb_string, action))
-        region->type = WPS_TOUCHREGION_SCROLLBAR;
+        region->action = ACTION_TOUCH_SCROLLBAR;
     else if(!strcmp(vol_string, action))
-        region->type = WPS_TOUCHREGION_VOLUME;
+        region->action = ACTION_TOUCH_VOLUME;
     else
     {
-        region->type = WPS_TOUCHREGION_ACTION;
-
         if (*action == '&')
         {
             action++;
-            region->repeat = true;
+            region->press_length = LONG_PRESS;
+        }
+        else if(*action == '*')
+        {
+            action++;
+            region->press_length = REPEAT;
         }
         else
-            region->repeat = false;
+            region->press_length = PRESS;
 
         imax = ARRAYLEN(touchactions);
         for (i = 0; i < imax; i++)

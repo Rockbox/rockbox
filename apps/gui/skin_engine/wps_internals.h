@@ -188,13 +188,12 @@ struct touchregion {
     short int y;             /* y-pos */
     short int width;         /* width */
     short int height;        /* height */
-    enum {
-        WPS_TOUCHREGION_ACTION,
-        WPS_TOUCHREGION_SCROLLBAR,
-        WPS_TOUCHREGION_VOLUME
-    } type;                  /* type of touch region */
     bool reverse_bar;        /* if true 0% is the left or top */
-    bool repeat;             /* requires the area be held for the action */
+    enum {
+        PRESS,               /* quick press only */
+        LONG_PRESS,          /* Long press without repeat */
+        REPEAT,              /* long press allowing repeats */
+    } press_length;          
     int action;              /* action this button will return */
     bool armed;              /* A region is armed on press. Only armed regions are triggered
                                 on repeat or release. */

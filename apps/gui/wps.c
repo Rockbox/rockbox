@@ -217,7 +217,7 @@ static int skintouch_to_wps(struct wps_data *data)
         case ACTION_STD_HOTKEY:
             return ACTION_WPS_HOTKEY;
 #endif
-        case WPS_TOUCHREGION_SCROLLBAR:
+        case ACTION_TOUCH_SCROLLBAR:
             skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->length*offset/100;
             if (!skin_get_global_state()->paused)
 #if (CONFIG_CODEC == SWCODEC)
@@ -231,7 +231,7 @@ static int skintouch_to_wps(struct wps_data *data)
                 audio_resume();
 #endif
             return ACTION_TOUCHSCREEN;
-        case WPS_TOUCHREGION_VOLUME:
+        case ACTION_TOUCH_VOLUME:
         {
             const int min_vol = sound_min(SOUND_VOLUME);
             const int max_vol = sound_max(SOUND_VOLUME);
