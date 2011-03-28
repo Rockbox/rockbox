@@ -580,7 +580,7 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
 static inline bool scale_v_linear(struct rowset *rset,
                                   struct scaler_context *ctx)
 {
-    uint32_t mul, iy, iye;
+    uint32_t iy, iye;
     int32_t oy;
 #if defined(CPU_SH) || defined (TEST_SH_MATH)
     const uint32_t v_i_val = ctx->src->height - 1,
@@ -604,7 +604,6 @@ static inline bool scale_v_linear(struct rowset *rset,
              *rowinc_px, *rowval_px, *rowtmp_px;
 
     SDEBUGF("scale_v_linear\n");
-    mul = 0;
     iy = 0;
     iye = v_o_val;
     /* get first scaled row in rowtmp */
