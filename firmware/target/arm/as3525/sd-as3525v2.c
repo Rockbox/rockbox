@@ -399,9 +399,9 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
         !send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, response))
         return false;
 
-#if defined(HAVE_MULTIDRIVE)
-    if(sd_present(SD_SLOT_AS3525))
-        GPIOB_PIN(5) = (1-drive) << 5;
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+    if (amsv2_variant == 1)
+        GPIOB_PIN(5) = (drive == INTERNAL_AS3525) ? 1 << 5 : 0;
 #endif
 
     MCI_ARGUMENT = arg;
