@@ -617,7 +617,7 @@ static int sd_init_card(const int drive)
     /*  Set low power mode  */
 #if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
     if (amsv2_variant == 1)
-        MCI_CLKENA |= 1<<16;
+        MCI_CLKENA |= 1<<(1 + 16);
     else
 #endif
         MCI_CLKENA |= 1<<(drive + 16);
