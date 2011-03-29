@@ -1,4 +1,3 @@
-test_disk.c
 /* plugins common to all models */
 chessclock.c
 credits.c
