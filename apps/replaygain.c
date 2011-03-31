@@ -124,7 +124,7 @@ long convert_gain(long gain)
     gain = MAX(gain,-48 * FP_ONE);
     gain = MIN(gain, 17 * FP_ONE);
 
-    return fp_factor(gain, FP_BITS) << (24 - FP_BITS);
+    return (gain) ? fp_factor(gain, FP_BITS) << (24 - FP_BITS) : 0;
 }
 
 /* Get the sample scale factor in Q19.12 format from a gain value. Returns 0
