@@ -35,6 +35,8 @@
 
 #define FP_BITS         (12)
 #define FP_ONE          (1 << FP_BITS)
+#define FP_MIN          (-48 * FP_ONE)
+#define FP_MAX          ( 17 * FP_ONE)
 
 void replaygain_itoa(char* buffer, int length, long int_gain)
 {
@@ -121,10 +123,10 @@ long convert_gain(long gain)
     /* Don't allow unreasonably low or high gain changes.
      * Our math code can't handle it properly anyway. :)
      */
-    gain = MAX(gain,-48 * FP_ONE);
-    gain = MIN(gain, 17 * FP_ONE);
+    gain = MAX(gain, FP_MIN);
+    gain = MIN(gain, FP_MAX);
 
-    return (gain) ? fp_factor(gain, FP_BITS) << (24 - FP_BITS) : 0;
+    return fp_factor(gain, FP_BITS) << (24 - FP_BITS);
 }
 
 /* Get the sample scale factor in Q19.12 format from a gain value. Returns 0

@@ -1475,12 +1475,12 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
 
     case DSP_SET_TRACK_GAIN:
         if (dsp == &AUDIO_DSP)
-            dsp_set_gain_var(&track_gain, convert_gain(value));
+            dsp_set_gain_var(&track_gain, value ? convert_gain(value) : 0);
         break;
 
     case DSP_SET_ALBUM_GAIN:
         if (dsp == &AUDIO_DSP)
-            dsp_set_gain_var(&album_gain, convert_gain(value));
+            dsp_set_gain_var(&album_gain, value ? convert_gain(value) : 0);
         break;
 
     case DSP_SET_TRACK_PEAK:
