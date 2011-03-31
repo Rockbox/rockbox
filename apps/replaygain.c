@@ -121,8 +121,7 @@ static long fp_atof(const char* s, int precision)
 long convert_gain(long gain)
 {
     /* Don't allow unreasonably low or high gain changes.
-     * Our math code can't handle it properly anyway. :)
-     */
+     * Our math code can't handle it properly anyway. :) */
     gain = MAX(gain, FP_MIN);
     gain = MIN(gain, FP_MAX);
 
