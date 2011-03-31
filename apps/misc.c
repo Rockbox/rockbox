@@ -58,6 +58,8 @@
 #include "yesno.h"
 #include "viewport.h"
 
+#include "debug.h"
+
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
@@ -632,9 +634,16 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(PLATFORM_HAS_VOLUME_CHANGE)
         case SYS_VOLUME_CHANGED:
         {
+            static bool firstvolume = true;
             int volume = hosted_get_volume();
-            if (global_settings.volume != volume)
+            DEBUGF("SYS_VOLUME_CHANGED: %d\n", volume);
+            if (global_settings.volume != volume) {
                 global_settings.volume = volume;
+                if (firstvolume) {
+                    setvol();
+                    firstvolume = false;
+                }
+            }
             return 0;
         }
 #endif

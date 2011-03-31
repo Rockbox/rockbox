@@ -85,9 +85,19 @@ public class RockboxPCM extends AudioTrack
         pcmrange = getMaxVolume() - minpcmvolume;
 
         setupVolumeHandler();
+        postVolume(audiomanager.getStreamVolume(streamtype));
     }    
 
     private native void postVolumeChangedEvent(int volume);
+
+    private void postVolume(int volume)
+    {
+        int rbvolume = ((maxstreamvolume - volume) * -99) /
+            maxstreamvolume;
+        LOG("java:postVolumeChangedEvent, avol "+volume+" rbvol "+rbvolume);
+        postVolumeChangedEvent(rbvolume);
+    }
+    
     private void setupVolumeHandler()
     {
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver()
@@ -105,9 +115,7 @@ public class RockboxPCM extends AudioTrack
                     volume != setstreamvolume &&
                     rbservice.isRockboxRunning())
                 {
-                    int rbvolume = ((maxstreamvolume - volume) * -99) /
-                        maxstreamvolume;
-                    postVolumeChangedEvent(rbvolume);
+                    postVolume(volume);
                 }
             }
         };
@@ -190,6 +198,7 @@ public class RockboxPCM extends AudioTrack
 
     private void set_volume(int volume)
     {
+        LOG("java:set_volume("+volume+")");
         /* Rockbox 'volume' is 0..-990 deci-dB attenuation.
            Android streams have rather low resolution volume control,
            typically 8 or 15 steps.
@@ -209,6 +218,7 @@ public class RockboxPCM extends AudioTrack
 
         int oldstreamvolume = audiomanager.getStreamVolume(streamtype);
         if (streamvolume != oldstreamvolume) {
+            LOG("java:setStreamVolume("+streamvolume+")");
             setstreamvolume = streamvolume;
             audiomanager.setStreamVolume(streamtype, streamvolume, 0);
         }
