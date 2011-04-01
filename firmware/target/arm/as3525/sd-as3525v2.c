@@ -46,10 +46,6 @@
 #include "disk.h"
 #endif
 
-#if defined(SANSA_FUZEV2)
-#include "backlight-target.h"
-#endif
-
 #include "lcd.h"
 #include <stdarg.h>
 #include "sysfont.h"
@@ -432,16 +428,6 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b23     | CMD_CCS_EXPECTED        unused  */
       /*b31 */  |                                      CMD_DONE_BIT;
 
-#if defined(SANSA_FUZEV2)
-    if (amsv2_variant == 0)
-    {
-        extern int buttonlight_is_on;
-        if(buttonlight_is_on)
-            _buttonlight_on();
-        else
-            _buttonlight_off();
-    }
-#endif
     semaphore_wait(&command_completion_signal, TIMEOUT_BLOCK);
 
     /*  Handle command responses & errors */
