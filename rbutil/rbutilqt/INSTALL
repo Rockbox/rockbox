@@ -20,12 +20,13 @@ for Rockbox.
 
 Requirements:
 =============
-- Qt 4.5.0 or greater
+- gcc
+- Qt 4.5.0 or later
 - at least the following folders from Rockbox svn:
   o apps/codecs/libspeex
   o rbutil/
   o tools/
-- libusb (Linux, Mac)
+- libusb (Linux only)
 
 Building:
 =========
@@ -41,19 +42,21 @@ Build Options:
   add "-config dbg" to build with debug symbols.
 - silent
   add "-config silent" to the qmake call. This is an undocumented feature of
-  Qt itself. Note that this doesn't seem to work on Windows and Mac OS X.
+  Qt itself. Note that this doesn't seem to work on Windows and Mac OS X until
+  recent versions of Qt.
 
 Installation / Deployment:
 ==========================
 Rockbox Utility is build as all-in-one binary. This means for distribution
 you need:
 - RockboxUtility (main binary)
-- rbutil_*.qm (translation files, optional)
+- rbutil_*.qm (translation files, only for non-static builds)
 You don't need any other files like configuration files, especially
 rbutil.ini which will get included into the binary.
 
-The script deploy-release.py automates building deployment binaries. For a
-complete list of paths to get from svn to build please check its source.
+The script utils/common/deploy-rbutil.py automates building deployment
+binaries. For a complete list of paths to get from svn to build please check
+its source.
 
 
 The website for Rockbox Utility is
