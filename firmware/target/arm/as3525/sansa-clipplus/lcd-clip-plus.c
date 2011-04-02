@@ -35,12 +35,17 @@ int lcd_hw_init(void)
     SSP_CR1 = (1<<3) | (1<<1);  /* SSP Operation enabled */
     SSP_IMSC = 0;       /* No interrupts */
 
-    GPIOA_DIR |= (1<<5);
-    GPIOB_DIR |= (1<<2) | (1<<7);
+    /* configure GPIO B2 (display D/C#) as output */
+    GPIOB_DIR |= (1<<2);
+
+    /* configure GPIO B3 (display type detect) as input */
     GPIOB_DIR &= ~(1<<3);
-    GPIOB_PIN(7) = 0;
+
+    /* set GPIO A5 (display RESET# ?) */
+    GPIOA_DIR |= (1<<5);
     GPIOA_PIN(5) = (1<<5);
 
+    /* detect display type on GPIO B3 */    
     return GPIOB_PIN(3) ? 1 : 0;
 }
 
@@ -49,15 +54,17 @@ void lcd_write_command(int byte)
     while(SSP_SR & (1<<4))  /* BSY flag */
         ;
 
+    /* LCD command mode */
     GPIOB_PIN(2) = 0;
+    
     SSP_DATA = byte;
-
     while(SSP_SR & (1<<4))  /* BSY flag */
         ;
 }
 
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
+    /* LCD data mode */
     GPIOB_PIN(2) = (1<<2);
 
     while (count--)
