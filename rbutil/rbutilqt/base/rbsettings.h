@@ -48,6 +48,7 @@ class RbSettings : public QObject
             TtsOptions,
             TtsPath,
             TtsVoice,
+            TtsPitch,
             EncoderPath,
             EncoderOptions,
             WavtrimThreshold,

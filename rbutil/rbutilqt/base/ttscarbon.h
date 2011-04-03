@@ -33,7 +33,8 @@ class TTSCarbon : public TTSBase
     enum ConfigValuesCarbon
     {
         ConfigVoice,
-        ConfigSpeed
+        ConfigSpeed,
+        ConfigPitch
     };
     public:
         TTSCarbon(QObject *parent = NULL);

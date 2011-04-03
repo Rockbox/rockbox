@@ -89,6 +89,12 @@ bool TTSCarbon::start(QString *errStr)
                                     RbSettings::TtsSpeed).toInt());
     if(rate != 0)
         SetSpeechRate(m_channel, rate);
+
+    Fixed pitch = (Fixed)(0x10000 * RbSettings::subValue("carbon",
+                                    RbSettings::TtsPitch).toInt());
+    if(pitch != 0)
+        SetSpeechPitch(m_channel, pitch);
+
     return (error == 0) ? true : false;
 }
 
@@ -139,6 +145,14 @@ void TTSCarbon::generateSettings(void)
                                 tr("Speed (words/min):"), speed, 80, 500,
                                 EncTtsSetting::eNOBTN);
     insertSetting(ConfigSpeed, setting);
+
+    // pitch
+    int pitch = RbSettings::subValue("carbon", RbSettings::TtsPitch).toInt();
+    setting = new EncTtsSetting(this, EncTtsSetting::eINT,
+                                tr("Pitch (0 for default):"), pitch, 0, 65,
+                                EncTtsSetting::eNOBTN);
+    insertSetting(ConfigPitch, setting);
+
 }
 
 
@@ -149,6 +163,8 @@ void TTSCarbon::saveSettings(void)
                             getSetting(ConfigVoice)->current().toString());
     RbSettings::setSubValue("carbon", RbSettings::TtsSpeed,
                             getSetting(ConfigSpeed)->current().toInt());
+    RbSettings::setSubValue("carbon", RbSettings::TtsPitch,
+                            getSetting(ConfigPitch)->current().toInt());
     RbSettings::sync();
 }
 

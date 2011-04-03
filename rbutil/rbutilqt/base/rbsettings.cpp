@@ -46,6 +46,7 @@ const static struct {
     { RbSettings::VoiceLanguage,        "voicelanguage",        "" },
     { RbSettings::TtsLanguage,          ":tts:/language",       "" },
     { RbSettings::TtsOptions,           ":tts:/options",        "" },
+    { RbSettings::TtsPitch,             ":tts:/pitch",          "0" },
     { RbSettings::TtsPath,              ":tts:/path",           "" },
     { RbSettings::TtsVoice,             ":tts:/voice",          "" },
     { RbSettings::EncoderPath,          ":encoder:/encoderpath",        "" },
