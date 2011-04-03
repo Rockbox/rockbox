@@ -46,10 +46,6 @@
 #include "disk.h"
 #endif
 
-#if defined(SANSA_FUZEV2)
-#include "backlight-target.h"
-#endif
-
 #include "lcd.h"
 #include <stdarg.h>
 #include "sysfont.h"
@@ -399,9 +395,9 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
         !send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, response))
         return false;
 
-#if defined(HAVE_MULTIDRIVE)
-    if(sd_present(SD_SLOT_AS3525))
-        GPIOB_PIN(5) = (1-drive) << 5;
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+    if (amsv2_variant == 1)
+        GPIOB_PIN(5) = (drive == INTERNAL_AS3525) ? 1 << 5 : 0;
 #endif
 
     MCI_ARGUMENT = arg;
@@ -423,25 +419,15 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
       /*b10 */  | ((cmd == SD_WRITE_MULTIPLE_BLOCK)  ? CMD_RW_BIT:            0)
       /*b11     | CMD_TRANSMODE_BIT       unused  */
       /*b12     | CMD_SENT_AUTO_STOP_BIT  unused  */
-      /*b13 */  | (TRANSFER_CMD                      ? CMD_WAIT_PRV_DAT_BIT:  0)
+      /*b13 */  | ((cmd != SD_STOP_TRANSMISSION)     ? CMD_WAIT_PRV_DAT_BIT:  0)
       /*b14     | CMD_ABRT_CMD_BIT        unused  */
-      /*b15     | CMD_SEND_INIT_BIT       unused  */
+      /*b15 */  | ((cmd == SD_GO_IDLE_STATE)         ? CMD_SEND_INIT_BIT:     0)
    /*b20:16 */  |                                      card_no
       /*b21     | CMD_SEND_CLK_ONLY       unused  */
       /*b22     | CMD_READ_CEATA          unused  */
       /*b23     | CMD_CCS_EXPECTED        unused  */
       /*b31 */  |                                      CMD_DONE_BIT;
 
-#if defined(SANSA_FUZEV2)
-    if (amsv2_variant == 0)
-    {
-        extern int buttonlight_is_on;
-        if(buttonlight_is_on)
-            _buttonlight_on();
-        else
-            _buttonlight_off();
-    }
-#endif
     wakeup_wait(&command_completion_signal, TIMEOUT_BLOCK);
 
     /*  Handle command responses & errors */
@@ -546,56 +532,33 @@ static int sd_init_card(const int drive)
 #endif
     /*  End of Card Identification Mode   ************************************/
 
-    if (sd_v2)
-    {
-        /* Attempt to switch cards to HS timings, non HS cards just ignore this */
-        /*  CMD7 w/rca: Select card to put it in TRAN state */
-        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
-            return -7;
-
-        if(sd_wait_for_tran_state(drive))
-            return -8;
-
-        /* CMD6 */
-        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
-            return -9;
-        mci_delay();
-
-        /*  We need to go back to STBY state now so we can read csd */
-        /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
-        if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-            return -10;
-    }
+    /*  Card back to full speed  */
+    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
 
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
                  MCI_RESP|MCI_LONG_RESP, card_info[drive].csd))
         return -11;
 
-    mci_delay();
-
     sd_parse_csd(&card_info[drive]);
 
     if(drive == INTERNAL_AS3525) /* The OF is stored in the first blocks */
         card_info[INTERNAL_AS3525].numblocks -= AMS_OF_SIZE;
 
-    /*  Card back to full speed  */
-    MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
-
-    /*  CMD7 w/rca: Select card to put it in TRAN state */
-    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
-        return -12;
-
 #ifndef BOOTLOADER
     /*  Switch to to 4 bit widebus mode  */
+
+    /*  CMD7 w/rca: Select card to put it in TRAN state */
+    if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
+        return -12;
     if(sd_wait_for_tran_state(drive) < 0)
         return -13;
-    /* ACMD6  */
-    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ACMD|MCI_NO_RESP, NULL))
+
+    /* ACMD6: set bus width to 4-bit */
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_ACMD|MCI_RESP, &response))
         return -15;
-    mci_delay();
-    /* ACMD42  */
-    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ACMD|MCI_NO_RESP, NULL))
+    /* ACMD42: disconnect the pull-up resistor on CD/DAT3 */
+    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_ACMD|MCI_RESP, &response))
         return -17;
 
     /* Now that card is widebus make controller aware */
@@ -611,7 +574,7 @@ static int sd_init_card(const int drive)
     /*  Set low power mode  */
 #if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
     if (amsv2_variant == 1)
-        MCI_CLKENA |= 1<<16;
+        MCI_CLKENA |= 1<<(1 + 16);
     else
 #endif
         MCI_CLKENA |= 1<<(drive + 16);
@@ -817,6 +780,7 @@ int sd_init(void)
 static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
                                 int count, void* buf, bool write)
 {
+    unsigned long response;
     int ret = 0;
 #ifndef HAVE_MULTIDRIVE
     const int drive = 0;
@@ -932,8 +896,7 @@ sd_transfer_retry_with_reinit:
             dma_enable_channel(0, MCI_FIFO, dma_buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
-        unsigned long dummy; /* if we don't ask for a response, writing fails */
-        if(!send_cmd(drive, cmd, arg, MCI_RESP, &dummy))
+        if(!send_cmd(drive, cmd, arg, MCI_RESP, &response))
         {
             ret = -21;
             goto sd_transfer_error;
@@ -949,7 +912,7 @@ sd_transfer_retry_with_reinit:
             while(MCI_STATUS & DATA_BUSY) ;
         }
 
-        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_NO_RESP, NULL))
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP, &response))
         {
             ret = -22;
             goto sd_transfer_error;
@@ -1006,10 +969,7 @@ sd_transfer_error_no_dma:
         /* .initialized might have been >= 0 but now stale if the ata sd thread
          * isn't handling an insert because of USB */
         if (--retry_all >= 0)
-        {
-            ret = 0;
             goto sd_transfer_retry_with_reinit;
-        }
     }
 }
 
@@ -1068,12 +1028,12 @@ tCardInfo *card_get_info_target(int card_no)
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MD_NONVOID(int drive))
 {
-    return (drive==1);
+    return (drive == SD_SLOT_AS3525);
 }
 
 bool sd_present(IF_MD_NONVOID(int drive))
 {
-    return (drive == 0) ? true : card_detect_target();
+    return (drive == INTERNAL_AS3525) ? true : card_detect_target();
 }
 
 static int sd1_oneshot_callback(struct timeout *tmo)
