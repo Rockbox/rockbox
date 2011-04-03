@@ -98,6 +98,9 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     connect(ui.treeDevices, SIGNAL(itemSelectionChanged()), this, SLOT(updateEncState()));
     connect(ui.testTTS,SIGNAL(clicked()),this,SLOT(testTts()));
     connect(ui.showDisabled, SIGNAL(toggled(bool)), this, SLOT(showDisabled(bool)));
+    // delete this dialog after it finished automatically.
+    connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
+
     setUserSettings();
     setDevices();
 }
