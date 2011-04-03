@@ -36,7 +36,7 @@ TTSCarbon::TTSCarbon(QObject* parent) : TTSBase(parent)
 
 TTSBase::Capabilities TTSCarbon::capabilities()
 {
-    return None;
+    return TTSBase::CanSpeak;
 }
 
 bool TTSCarbon::configOk()
@@ -75,7 +75,7 @@ bool TTSCarbon::start(QString *errStr)
     if(voiceIndex == numVoices) {
         // voice not found. Add user notification here and proceed with
         // system default voice.
-        qDebug() << "selected voice not found, using system default!";
+        qDebug() << "[TTSCarbon] Selected voice not found, using system default!";
         GetVoiceDescription(&vspec, &vdesc, sizeof(vdesc));
         if(vdesc.script != -1)
             m_voiceScript = (CFStringBuiltInEncodings)vdesc.script;
@@ -160,18 +160,21 @@ TTSStatus TTSCarbon::voice(QString text, QString wavfile, QString* errStr)
     TTSStatus status = NoError;
     OSErr error;
 
-    QString aifffile = wavfile + ".aiff";
-    // FIXME: find out why we need to do this.
-    // Create a local copy of the temporary file filename.
-    // Not doing so causes weird issues (path contains trailing spaces)
-    unsigned int len = aifffile.size() + 1;
-    char* tmpfile = (char*)malloc(len * sizeof(char));
-    strncpy(tmpfile, aifffile.toLocal8Bit().constData(), len);
-    CFStringRef tmpfileref = CFStringCreateWithCString(kCFAllocatorDefault,
-                                tmpfile, kCFStringEncodingUTF8);
-    CFURLRef urlref = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
-                                tmpfileref, kCFURLPOSIXPathStyle, false);
-    SetSpeechInfo(m_channel, soOutputToFileWithCFURL, urlref);
+    char* tmpfile;
+    if(!wavfile.isEmpty()) {
+        QString aifffile = wavfile + ".aiff";
+        // FIXME: find out why we need to do this.
+        // Create a local copy of the temporary file filename.
+        // Not doing so causes weird issues (path contains trailing spaces)
+        unsigned int len = aifffile.size() + 1;
+        tmpfile = (char*)malloc(len * sizeof(char));
+        strncpy(tmpfile, aifffile.toLocal8Bit().constData(), len);
+        CFStringRef tmpfileref = CFStringCreateWithCString(kCFAllocatorDefault,
+                                                           tmpfile, kCFStringEncodingUTF8);
+        CFURLRef urlref = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
+                                                        tmpfileref, kCFURLPOSIXPathStyle, false);
+        SetSpeechInfo(m_channel, soOutputToFileWithCFURL, urlref);
+    }
 
     // speak it.
     // Convert the string to the encoding requested by the voice. Do this
@@ -206,15 +209,17 @@ TTSStatus TTSCarbon::voice(QString text, QString wavfile, QString* errStr)
     free(textbuf);
     CFRelease(cfstring);
 
-    // convert the temporary aiff file to wav
-    if(status == NoError
-        && convertAiffToWav(tmpfile, wavfile.toLocal8Bit().constData()) != 0) {
-        *errStr = tr("Could not convert intermediate file");
-        status = FatalError;
+    if(!wavfile.isEmpty()) {
+        // convert the temporary aiff file to wav
+        if(status == NoError
+            && convertAiffToWav(tmpfile, wavfile.toLocal8Bit().constData()) != 0) {
+            *errStr = tr("Could not convert intermediate file");
+            status = FatalError;
+        }
+        // remove temporary aiff file
+        unlink(tmpfile);
+        free(tmpfile);
     }
-    // remove temporary aiff file
-    unlink(tmpfile);
-    free(tmpfile);
 
     return status;
 }

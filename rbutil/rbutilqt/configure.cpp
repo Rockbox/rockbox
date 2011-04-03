@@ -731,14 +731,16 @@ void Config::testTts()
 {
     QString errstr;
     int index = ui.comboTts->currentIndex();
-    TTSBase* tts = TTSBase::getTTS(this,ui.comboTts->itemData(index).toString());
+    TTSBase* tts;
+
+    ui.testTTS->setEnabled(false);
+    tts = TTSBase::getTTS(this,ui.comboTts->itemData(index).toString());
     if(!tts->configOk())
     {
         QMessageBox::warning(this,tr("TTS configuration invalid"),
                 tr("TTS configuration invalid. \n Please configure TTS engine."));
         return;
     }
-    ui.testTTS->setEnabled(false);
     if(!tts->start(&errstr))
     {
         QMessageBox::warning(this,tr("Could not start TTS engine."),
@@ -748,10 +750,13 @@ void Config::testTts()
         return;
     }
 
-    QTemporaryFile file(this);
-    file.open();
-    QString filename = file.fileName();
-    file.close();
+    QString filename;
+    if(!(tts->capabilities() & TTSBase::CanSpeak)) {
+        QTemporaryFile file(this);
+        file.open();
+        filename = file.fileName();
+        file.close();
+    }
 
     if(tts->voice(tr("Rockbox Utility Voice Test"),filename,&errstr) == FatalError)
     {
@@ -763,16 +768,18 @@ void Config::testTts()
         return;
     }
     tts->stop();
+    if(!(tts->capabilities() & TTSBase::CanSpeak)) {
 #if defined(Q_OS_LINUX)
-    QString exe = Utils::findExecutable("aplay");
-    if(exe == "") exe = Utils::findExecutable("play");
-    if(exe != "")
-    {
-        QProcess::execute(exe+" "+filename);
-    }
+        QString exe = Utils::findExecutable("aplay");
+        if(exe == "") exe = Utils::findExecutable("play");
+        if(exe != "")
+        {
+            QProcess::execute(exe+" "+filename);
+        }
 #else
-    QSound::play(filename);
+        QSound::play(filename);
 #endif
+    }
     ui.testTTS->setEnabled(true);
     delete tts; /* Config objects are never deleted (in fact, they are
                    leaked..), so we can't rely on QObject, since that would

@@ -36,7 +36,7 @@ class TTSBase : public EncTtsSettingInterface
 {
     Q_OBJECT
     public:
-        enum Capability { None = 0, RunInParallel = 1 };
+        enum Capability { None = 0, RunInParallel = 1, CanSpeak = 2 };
         Q_DECLARE_FLAGS(Capabilities, Capability)
 
         TTSBase(QObject *parent);
