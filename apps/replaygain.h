@@ -30,6 +30,5 @@ void parse_replaygain(const char* key, const char* value,
 void parse_replaygain_int(bool album, long gain, long peak,
                           struct mp3entry* entry);
 void replaygain_itoa(char* buffer, int length, long int_gain);
-long convert_gain(long gain);
 
 #endif

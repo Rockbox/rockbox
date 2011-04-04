@@ -729,12 +729,12 @@ static const char* id3_get_info(int selected_item, void* data,
                 break;
 #if CONFIG_CODEC == SWCODEC
             case LANG_ID3_TRACK_GAIN:
-                replaygain_itoa(buffer, buffer_len, id3->track_gain);
-                val=(id3->track_gain) ? buffer : NULL; /* only show gains!=0 */
+                replaygain_itoa(buffer, buffer_len, id3->track_level);
+                val=(id3->track_level) ? buffer : NULL; /* only show level!=0 */
                 break;
             case LANG_ID3_ALBUM_GAIN:
-                replaygain_itoa(buffer, buffer_len, id3->album_gain);
-                val=(id3->album_gain) ? buffer : NULL; /* only show gains!=0 */
+                replaygain_itoa(buffer, buffer_len, id3->album_level);
+                val=(id3->album_level) ? buffer : NULL; /* only show level!=0 */
                 break;
 #endif
             case LANG_ID3_PATH:

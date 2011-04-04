@@ -1332,11 +1332,11 @@ const char *get_token_value(struct gui_wps *gwps,
                 /* due to above, coming here with !id3 shouldn't be possible */
                 case 2:
                 case 4:
-                    replaygain_itoa(buf, buf_size, id3->track_gain);
+                    replaygain_itoa(buf, buf_size, id3->track_level);
                     break;
                 case 3:
                 case 5:
-                    replaygain_itoa(buf, buf_size, id3->album_gain);
+                    replaygain_itoa(buf, buf_size, id3->album_level);
                     break;
             }
             return buf;

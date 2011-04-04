@@ -118,7 +118,7 @@ static long fp_atof(const char* s, int precision)
         + (((int64_t) frac_part * int_one) / frac_max_int));
 }
 
-long convert_gain(long gain)
+static long convert_gain(long gain)
 {
     /* Don't allow unreasonably low or high gain changes.
      * Our math code can't handle it properly anyway. :) */
@@ -171,13 +171,15 @@ void parse_replaygain(const char* key, const char* value,
          (strcasecmp(key, "rg_radio") == 0)) && 
         !entry->track_gain)
     {
-        entry->track_gain = get_replaygain(value);
+        entry->track_level = get_replaygain(value);
+        entry->track_gain  = convert_gain(entry->track_level);
     }
     else if (((strcasecmp(key, "replaygain_album_gain") == 0) || 
               (strcasecmp(key, "rg_audiophile") == 0)) && 
              !entry->album_gain)
     {
-        entry->album_gain = get_replaygain(value);
+        entry->album_level = get_replaygain(value);
+        entry->album_gain  = convert_gain(entry->album_level);
     }
     else if (((strcasecmp(key, "replaygain_track_peak") == 0) || 
               (strcasecmp(key, "rg_peak") == 0)) && 
@@ -207,12 +209,14 @@ void parse_replaygain_int(bool album, long gain, long peak,
 
     if (album)
     {
-        entry->album_gain = gain;
-        entry->album_peak = peak;
+        entry->album_level = gain;
+        entry->album_gain  = convert_gain(gain);
+        entry->album_peak  = peak;
     }
     else
     {
-        entry->track_gain = gain;
-        entry->track_peak = peak;
+        entry->track_level = gain;
+        entry->track_gain  = convert_gain(gain);
+        entry->track_peak  = peak;
     }
 }
