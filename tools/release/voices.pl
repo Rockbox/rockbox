@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-$version="3.8";
+$version="3.8.1";
 
 require "tools/builds.pm";
 
