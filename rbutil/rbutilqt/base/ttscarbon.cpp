@@ -176,7 +176,7 @@ TTSStatus TTSCarbon::voice(QString text, QString wavfile, QString* errStr)
     TTSStatus status = NoError;
     OSErr error;
 
-    char* tmpfile;
+    char* tmpfile = NULL;
     if(!wavfile.isEmpty()) {
         QString aifffile = wavfile + ".aiff";
         // FIXME: find out why we need to do this.
