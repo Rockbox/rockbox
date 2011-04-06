@@ -40,7 +40,6 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
     unsigned long numChannels = 0;
     unsigned long numSampleFrames = 0;
     unsigned long numbytes = 0;
-    int read_bytes;
     bool is_aifc = false;
 
     if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, &buf[0], 12) < 12) ||
@@ -50,7 +49,7 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
         return false;
     }
 
-    while((read_bytes = read(fd, &buf[0], 8)) == 8)
+    while (read(fd, &buf[0], 8) == 8)
     {
         size_t size = get_long_be(&buf[4]); /* chunkSize */
 

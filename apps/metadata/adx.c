@@ -34,12 +34,12 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char * buf = (unsigned char *)id3->path;
-    int chanstart, channels, read_bytes;
+    int chanstart, channels;
     int looping = 0, start_adr = 0, end_adr = 0;
     
     /* try to get the basic header */
     if ((lseek(fd, 0, SEEK_SET) < 0)
-        || ((read_bytes = read(fd, buf, 0x38)) < 0x38))
+        || (read(fd, buf, 0x38) < 0x38))
     {
         DEBUGF("lseek or read failed\n");
         return false;
@@ -106,7 +106,7 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
         
     /* try to get the channel header */
     if ((lseek(fd, chanstart-6, SEEK_SET) < 0)
-        || ((read_bytes = read(fd, buf, 6)) < 6))
+        || (read(fd, buf, 6) < 6))
     {
         return false;
     }

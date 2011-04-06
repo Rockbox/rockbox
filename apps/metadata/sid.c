@@ -36,12 +36,11 @@ bool get_sid_metadata(int fd, struct mp3entry* id3)
 {    
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;    
-    int read_bytes;
     char *p;
     
 
     if ((lseek(fd, 0, SEEK_SET) < 0) 
-         || ((read_bytes = read(fd, buf, 0x80)) < 0x80))
+         || (read(fd, buf, 0x80) < 0x80))
     {
         return false;
     }
@@ -70,7 +69,7 @@ bool get_sid_metadata(int fd, struct mp3entry* id3)
     /* Copy Album (assumed max 0x1f-0x05 letters + 1 zero byte) */
     id3->album = p;
     buf[0x56+0x1f] = 0;
-    p = iso_decode(&buf[0x5b], p, 0, strlen(&buf[0x5b])+1);
+    iso_decode(&buf[0x5b], p, 0, strlen(&buf[0x5b])+1);
 
     id3->bitrate = 706;
     id3->frequency = 44100;

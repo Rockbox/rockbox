@@ -35,7 +35,6 @@ bool get_spc_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char * buf = (unsigned char *)id3->path;
-    int read_bytes;
     char * p;
     
     unsigned long length;
@@ -45,7 +44,7 @@ bool get_spc_metadata(int fd, struct mp3entry* id3)
     
     /* try to get the ID666 tag */
     if ((lseek(fd, 0x2e, SEEK_SET) < 0)
-        || ((read_bytes = read(fd, buf, 0xD2)) < 0xD2))
+        || (read(fd, buf, 0xD2) < 0xD2))
     {
         DEBUGF("lseek or read failed\n");
         return false;
@@ -115,7 +114,7 @@ bool get_spc_metadata(int fd, struct mp3entry* id3)
     
     id3->artist = p;
     buf[31] = 0;
-    p = iso_decode(buf, p, 0, 32);
+    iso_decode(buf, p, 0, 32);
     
     if (length==0) {
         length=3*60*1000; /* 3 minutes */

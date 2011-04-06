@@ -14,12 +14,10 @@ bool get_nsf_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;
-    int read_bytes;
     char *p;
       
-
     if ((lseek(fd, 0, SEEK_SET) < 0) 
-         || ((read_bytes = read(fd, buf, 110)) < 110))
+         || (read(fd, buf, 110) < 110))
     {
         return false;
     }
@@ -55,7 +53,6 @@ bool get_nsf_metadata(int fd, struct mp3entry* id3)
     /* Copyright (per codec) */
     memcpy(p, &buf[78], 32);
     id3->album = p;
-    p += strlen(p)+1;
         
     return true;
 }
