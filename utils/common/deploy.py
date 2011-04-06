@@ -563,6 +563,22 @@ def deploy():
             tempclean(workfolder, cleanup and not keeptemp)
             sys.exit(1)
 
+        # replace version strings. Only done when building from trunk
+        if tag == "":
+            print "Updating version information in sources"
+            for f in regreplace:
+                infile = open(sourcefolder + "/" + f, "r")
+                incontents = infile.readlines()
+                infile.close()
+
+                outfile = open(sourcefolder + "/" + f, "w")
+                for line in incontents:
+                    # replacements made on the replacement string:
+                    # %REVISION% is replaced with the revision number
+                    replacement = re.sub("%REVISION%", str(trunk), regreplace[f][1])
+                    outfile.write(re.sub(regreplace[f][0], replacement, line))
+                outfile.close()
+
         if source == True:
             tf = tarfile.open(archivename, mode='w:bz2')
             tf.add(sourcefolder, os.path.basename(re.subn('/$', '', sourcefolder)[0]))

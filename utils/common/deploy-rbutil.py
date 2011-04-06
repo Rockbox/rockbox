@@ -52,6 +52,9 @@ deploy.progexe = {
     "darwin"   : "RockboxUtility.app",
     "linux2"   : "RockboxUtility"
 }
+deploy.regreplace = {
+        "rbutil/rbutilqt/version.h" : ["SVN \$.*\$", "SVN $Revision: %REVISION% $"]
+}
 # OS X 10.6 defaults to gcc 4.2. Building universal binaries that are
 # compatible with 10.4 requires using gcc-4.0.
 deploy.qmakespec = {
@@ -72,4 +75,3 @@ deploy.programfiles = [ ]
 deploy.nsisscript = ""
 
 deploy.deploy()
-
