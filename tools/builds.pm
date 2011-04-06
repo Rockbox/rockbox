@@ -1,8 +1,8 @@
-$publicrelease="3.8";
-$manualrelease="3.8";
-$voicerelease="3.8";
-$releasedate="February 27, 2011";
-$releasenotes="/wiki/ReleaseNotes38";
+$publicrelease="3.8.1";
+$manualrelease="3.8.1";
+$voicerelease="3.8.1";
+$releasedate="April 06, 2011";
+$releasenotes="/wiki/ReleaseNotes381";
 
 %builds = (
     'archosav300' => {
