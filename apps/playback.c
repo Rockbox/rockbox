@@ -2207,6 +2207,8 @@ static void audio_thread(void)
             case Q_AUDIO_TRACK_CHANGED:
                 /* PCM track change done */
                 LOGFQUEUE("audio < Q_AUDIO_TRACK_CHANGED");
+                /* Set new playlist position for resuming. */
+                thistrack_id3->index = playlist_get_index();
                 if (filling != STATE_ENDING)
                     audio_finalise_track_change();
                 else if (playing)

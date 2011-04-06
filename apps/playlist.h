@@ -131,6 +131,7 @@ const char *playlist_peek(int steps, char* buf, size_t buf_size);
 int playlist_next(int steps);
 bool playlist_next_dir(int direction);
 int playlist_get_resume_info(int *resume_index);
+int playlist_get_index(void);
 int playlist_update_resume_info(const struct mp3entry* id3);
 int playlist_get_display_index(void);
 int playlist_amount(void);

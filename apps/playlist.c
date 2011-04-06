@@ -2612,24 +2612,28 @@ int playlist_get_resume_info(int *resume_index)
     return 0;
 }
 
+/* Get current playlist index. */
+int playlist_get_index(void)
+{
+    return current_playlist.index;
+}
+
 /* Update resume info for current playing song.  Returns -1 on error. */
 int playlist_update_resume_info(const struct mp3entry* id3)
 {
-    struct playlist_info* playlist = &current_playlist;
-
     if (id3)
     {
-        if (global_status.resume_index != playlist->index ||
+        if (global_status.resume_index  != id3->index ||
             global_status.resume_offset != id3->offset)
         {
-            global_status.resume_index = playlist->index;
+            global_status.resume_index  = id3->index;
             global_status.resume_offset = id3->offset;
             status_save();
         }
     }
     else
     {
-        global_status.resume_index = -1;
+        global_status.resume_index  = -1;
         global_status.resume_offset = -1;
         status_save();
     }
