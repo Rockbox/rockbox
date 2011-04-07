@@ -819,6 +819,9 @@ static int add_track_to_playlist(struct playlist_info* playlist,
 
     playlist->amount++;
     playlist->num_inserted_tracks++;
+    
+    /* Update index for resume. */
+    playback_set_playlist_index(playlist->index);
 
     return insert_position;
 }
@@ -919,6 +922,9 @@ static int remove_track_from_playlist(struct playlist_info* playlist,
 
         sync_control(playlist, false);
     }
+    
+    /* Update index for resume. */
+    playback_set_playlist_index(playlist->index);
 
     return 0;
 }
@@ -978,6 +984,9 @@ static int randomise_playlist(struct playlist_info* playlist,
         update_control(playlist, PLAYLIST_COMMAND_SHUFFLE, seed,
             playlist->first_index, NULL, NULL, NULL);
     }
+    
+    /* Update index for resume. */
+    playback_set_playlist_index(playlist->index);
 
     return 0;
 }
@@ -1018,6 +1027,9 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
         update_control(playlist, PLAYLIST_COMMAND_UNSHUFFLE,
             playlist->first_index, -1, NULL, NULL, NULL);
     }
+    
+    /* Update index for resume. */
+    playback_set_playlist_index(playlist->index);
 
     return 0;
 }
@@ -1191,6 +1203,9 @@ static void find_and_set_playlist_index(struct playlist_info* playlist,
             break;
         }
     }
+    
+    /* Update index for resume. */
+    playback_set_playlist_index(playlist->index);
 }
 
 /*
@@ -3173,6 +3188,9 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
 #ifdef HAVE_DIRCACHE
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
+
+    /* Update index for resume. */
+    playback_set_playlist_index(playlist->index);
 
     return result;
 }

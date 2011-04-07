@@ -233,6 +233,14 @@ static void audio_stop_playback(void);
 
 /**************************************/
 
+/** Playlist callback */
+
+/* This callback is required to update the resume index in case of changing
+ * a playlist and pausing/resuming before the next track change. */
+void playback_set_playlist_index(int index)
+{
+    thistrack_id3->index = index;
+}
 
 /** Pcmbuf callbacks */
 
