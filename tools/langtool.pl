@@ -209,15 +209,9 @@ foreach my $file (@ARGV) {
             if ($id ne "" and grep(/^$id$/, @ids)) {
                 # Set desc
                 $line =~ s/\s*desc:.*/  desc: deprecated/;
-                # Set user
-                $line =~ s/\s*user:.*/  user:/;
-                # Print an empty target line after opening tag (target isn't set)
-                if ($location =~ /source|dest|voice/ and $target eq "") {
-                    $line .= "    *: none\n";
-                }
-                # Do not print target: string lines
-                elsif ($location =~ /source|dest|voice/ and $target ne "") {
-                    $line = "";
+                # Leave user field alone
+                if ($location =~ /source|dest|voice/) {
+                    $line =~ s/".*"/""/;
                 }
             }
         }
