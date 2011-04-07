@@ -266,6 +266,9 @@ struct mp3entry {
 
     /* resume related */
     unsigned long offset;  /* bytes played */
+#if CONFIG_CODEC != SWCODEC
+    int index;             /* playlist index */
+#endif
 
 #ifdef HAVE_TAGCACHE
     unsigned char autoresumable; /* caches result of autoresumable() */
