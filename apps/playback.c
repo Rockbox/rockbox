@@ -233,15 +233,6 @@ static void audio_stop_playback(void);
 
 /**************************************/
 
-/** Playlist callback */
-
-/* This callback is required to update the resume index in case of changing
- * a playlist and pausing/resuming before the next track change. */
-void playback_set_playlist_index(int index)
-{
-    thistrack_id3->index = index;
-}
-
 /** Pcmbuf callbacks */
 
 /* Between the codec and PCM track change, we need to keep updating the
@@ -2216,7 +2207,7 @@ static void audio_thread(void)
                 /* PCM track change done */
                 LOGFQUEUE("audio < Q_AUDIO_TRACK_CHANGED");
                 /* Set new playlist position for resuming. */
-                thistrack_id3->index = playlist_get_index();
+                playlist_update_resume_index();
                 if (filling != STATE_ENDING)
                     audio_finalise_track_change();
                 else if (playing)

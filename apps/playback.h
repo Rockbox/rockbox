@@ -67,7 +67,6 @@ long audio_filebufused(void);
 void audio_pre_ff_rewind(void);
 void audio_skip(int direction);
 void audio_hard_stop(void); /* Stops audio from serving playback */
-void playback_set_playlist_index(int index);
 #ifdef HAVE_CROSSFADE
 void audio_set_crossfade(int enable);
 #endif

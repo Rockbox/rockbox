@@ -90,6 +90,7 @@ struct playlist_info
     int  buffer_end_pos; /* last position where buffer was written  */
     int  index;          /* index of current playing track          */
     int  first_index;    /* index of first song in playlist         */
+    int  resume_index;   /* index of playing track to resume        */
     int  amount;         /* number of tracks in the index           */
     int  last_insert_pos; /* last position we inserted a track      */
     int  seed;           /* shuffle seed                            */
@@ -175,5 +176,6 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
                                    int (*callback)(char*, void*),
                                    void* context);
 int playlist_remove_all_tracks(struct playlist_info *playlist);
+void playlist_update_resume_index(void);
 
 #endif /* __PLAYLIST_H__ */

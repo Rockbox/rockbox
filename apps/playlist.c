@@ -821,7 +821,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
     playlist->num_inserted_tracks++;
     
     /* Update index for resume. */
-    playback_set_playlist_index(playlist->index);
+    playlist_update_resume_index();
 
     return insert_position;
 }
@@ -924,7 +924,7 @@ static int remove_track_from_playlist(struct playlist_info* playlist,
     }
     
     /* Update index for resume. */
-    playback_set_playlist_index(playlist->index);
+    playlist_update_resume_index();
 
     return 0;
 }
@@ -986,7 +986,7 @@ static int randomise_playlist(struct playlist_info* playlist,
     }
     
     /* Update index for resume. */
-    playback_set_playlist_index(playlist->index);
+    playlist_update_resume_index();
 
     return 0;
 }
@@ -1029,7 +1029,7 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
     }
     
     /* Update index for resume. */
-    playback_set_playlist_index(playlist->index);
+    playlist_update_resume_index();
 
     return 0;
 }
@@ -1205,7 +1205,7 @@ static void find_and_set_playlist_index(struct playlist_info* playlist,
     }
     
     /* Update index for resume. */
-    playback_set_playlist_index(playlist->index);
+    playlist_update_resume_index();
 }
 
 /*
@@ -2633,15 +2633,24 @@ int playlist_get_index(void)
     return current_playlist.index;
 }
 
+/* Update resume index within playlist_info structure. */
+void playlist_update_resume_index(void)
+{
+    struct playlist_info* playlist = &current_playlist;
+    playlist->resume_index = playlist->index;
+}
+
 /* Update resume info for current playing song.  Returns -1 on error. */
 int playlist_update_resume_info(const struct mp3entry* id3)
 {
+    struct playlist_info* playlist = &current_playlist;
+    
     if (id3)
     {
-        if (global_status.resume_index  != id3->index ||
+        if (global_status.resume_index  != playlist->resume_index ||
             global_status.resume_offset != id3->offset)
         {
-            global_status.resume_index  = id3->index;
+            global_status.resume_index  = playlist->resume_index;
             global_status.resume_offset = id3->offset;
             status_save();
         }
@@ -3190,7 +3199,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
 #endif
 
     /* Update index for resume. */
-    playback_set_playlist_index(playlist->index);
+    playlist_update_resume_index();
 
     return result;
 }

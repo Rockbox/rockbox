@@ -2751,7 +2751,6 @@ void audio_next(void)
             continue;
         }
         index = playlist_next(steps);
-        taginfo.index = index;
         current_track_counter++;
         is_playing = true;
         playing = true;
@@ -2780,7 +2779,6 @@ void audio_prev(void)
             continue;
         }
         index = playlist_next(steps);
-        taginfo.index = index;
         current_track_counter++;
         is_playing = true;
         playing = true;
