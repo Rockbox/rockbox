@@ -608,6 +608,34 @@ static enum themable_icons playlist_callback_icons(int selected_item,
         return Icon_NOICON;
 }
 
+static int playlist_callback_voice(int selected_item, void * data)
+{
+    struct playlist_viewer * local_viewer = (struct playlist_viewer *)data;
+    
+    int track_num = get_track_num(local_viewer, selected_item);
+    struct playlist_entry *track =
+       playlist_buffer_get_track(&(local_viewer->buffer), track_num);
+    
+    bool enqueue = false;
+
+    if (global_settings.talk_file_clip || global_settings.talk_file == 2)
+    {
+        if (global_settings.playlist_viewer_indices)
+        {
+            talk_number(track->display_index, false);
+            enqueue = true;
+        }
+        talk_file_or_spell(NULL, track->name, NULL, enqueue);
+    }
+    else if (global_settings.talk_file == 1) /* as numbers */
+    {
+        talk_id(VOICE_FILE, false);
+        talk_number(track->display_index, true);
+    }
+
+    return 0;
+}
+
 /* Main viewer function.  Filename identifies playlist to be viewed.  If NULL,
    view current playlist. */
 enum playlist_viewer_result playlist_viewer_ex(const char* filename)
@@ -621,6 +649,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
 
     gui_synclist_init(&playlist_lists, playlist_callback_name,
                       &viewer, false, 1, NULL);
+    gui_synclist_set_voice_callback(&playlist_lists, playlist_callback_voice);
     gui_synclist_set_icon_callback(&playlist_lists,
                   global_settings.playlist_viewer_icons?
                   &playlist_callback_icons:NULL);
@@ -628,6 +657,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
     gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST), Icon_Playlist);
     gui_synclist_select_item(&playlist_lists, viewer.selected_track);
     gui_synclist_draw(&playlist_lists);
+    gui_synclist_speak_item(&playlist_lists);
     while (!exit)
     {
         int track;
