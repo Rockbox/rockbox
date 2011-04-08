@@ -36,12 +36,12 @@ static inline bool _backlight_init(void)
 
 static inline void _buttonlight_on(void)
 {
-    GPIOA_PIN(5) |= 1<<5;
+    GPIOA_PIN(5) = 1<<5;
 }
 
 static inline void _buttonlight_off(void)
 {
-    GPIOA_PIN(5) &= ~(1<<5);
+    GPIOA_PIN(5) = 0;
 }
 
 
