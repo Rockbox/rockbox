@@ -624,7 +624,9 @@ static int create_and_play_dir(int direction, bool play_last)
             else
                 index = 0;
 
-#if (CONFIG_CODEC != SWCODEC)
+#if (CONFIG_CODEC == SWCODEC)
+            current_playlist.started = true;
+#else
             playlist_start(index, 0);
 #endif
         }
@@ -2558,7 +2560,10 @@ int playlist_next(int steps)
             playlist->first_index = 0;
             sort_playlist(playlist, false, false);
             randomise_playlist(playlist, current_tick, false, true);
-#if CONFIG_CODEC != SWCODEC
+
+#if CONFIG_CODEC == SWCODEC
+            playlist->started = true;
+#else
             playlist_start(0, 0);
 #endif
             playlist->index = 0;
