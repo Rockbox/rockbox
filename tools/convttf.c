@@ -22,10 +22,11 @@
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 
-#include <stdbool.h>
 #include <stdio.h>
 #ifdef WIN32
-#include <windows.h>
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
 #else
 #include <stdlib.h>
 #include <unistd.h>
@@ -220,7 +221,11 @@ char *basename(char *path)
     /* remove prepended path and extension*/
     b = path;
     for (p=path; *p; ++p) {
+#ifdef WIN32
+        if (*p == '/' || *p == '\\')
+#else
         if (*p == '/')
+#endif
             b = p + 1;
     }
     strcpy(base, b);
@@ -301,8 +306,8 @@ otf_get_english_string(FT_Face face, int nameID, int dash_to_space,
     int j, encid;
     FT_UInt i, nrec;
     FT_SfntName sfntName;
-    unsigned char *s;
-    unsigned short slen;
+    unsigned char *s = NULL;
+    unsigned short slen = 0;
 
     nrec = FT_Get_Sfnt_Name_Count(face);
 
@@ -404,7 +409,7 @@ int get_ttc_table(char *path, struct ttc_table *ttcname )
 {
 
 
-    FT_Error    error;
+    FT_Error    err;
     FT_Library  library;
     FT_Face     face;
     FT_Long     i;
@@ -414,19 +419,19 @@ int get_ttc_table(char *path, struct ttc_table *ttcname )
     ttcname->ttc_count = 0;
 
     /* Initialize engine */
-    if ( ( error = FT_Init_FreeType( &library ) ) != 0 ) 
+    if ( ( err = FT_Init_FreeType( &library ) ) != 0 ) 
     {
         panic( "Error while initializing engine" );
-        return error;
+        return err;
     }
 
 
     /* Load face */
-    error = FT_New_Face( library, path, (FT_Long) 0, &face );
-    if ( error )
+    err = FT_New_Face( library, path, (FT_Long) 0, &face );
+    if ( err )
     {
         arg_panic( "Could not find/open font", path );
-        return error;
+        return err;
     }
 
     ttcname->ttc_count = face->num_faces;
@@ -434,8 +439,8 @@ int get_ttc_table(char *path, struct ttc_table *ttcname )
 
     for(i = 0; i < ttcname->ttc_count; i++)
     {
-        error = FT_New_Face( library, path, i, &face );
-        if ( error == FT_Err_Cannot_Open_Stream )
+        err = FT_New_Face( library, path, i, &face );
+        if ( err == FT_Err_Cannot_Open_Stream )
             arg_panic( "Could not find/open font", path );
         otf_get_english_string(face, BDFOTF_POSTSCRIPT_STRING, 0, xlfd,
                                   sizeof(xlfd));
@@ -599,49 +604,62 @@ void trim_glyph( FT_GlyphSlot glyph, int *empty_first_col,
 
 void convttf(char* path, char* destfile, FT_Long face_index)
 {
-    FT_Error    error;
+    FT_Error    err;
     FT_Library  library;
     FT_Face     face;
     int         w,h;
     int         row,col;
     int         empty_first_col, empty_last_col;
     FT_Long     charindex;
-    FT_Long     index = 0;
+    FT_Long     idx = 0;
     FT_Long     code;
     FT_Long     digit_width = 0;
+    float extra_space;
+    FT_Long char_count;
+    char use_long_offset;
+    int done = 0;
+    char char_name[1024];
+    int converted_char_count = 0;
+    int failed_char_count = 0;
 
     int depth = 2;
-    unsigned char bit_shift = 1 << depth;
+    unsigned char bit_shift = 1u << depth;
     unsigned char pixel_per_byte = CHAR_BIT / bit_shift;
+    struct font_struct export_font;
+    char pad[] = {0,0,0,0};
+    int skip,i;
+    FILE *file;
 
     /* Initialize engine */
-    if ( ( error = FT_Init_FreeType( &library ) ) != 0 )
+    if ( ( err = FT_Init_FreeType( &library ) ) != 0 )
         panic( "Error while initializing engine" );
 
     /* Load face */
-    error = FT_New_Face( library, path, (FT_Long) face_index, &face );
-    if ( error == FT_Err_Cannot_Open_Stream )
+    err = FT_New_Face( library, path, (FT_Long) face_index, &face );
+    if ( err == FT_Err_Cannot_Open_Stream )
         arg_panic( "Could not find/open font\n", path );
-    else if ( error )
+    else if ( err )
         arg_panic( "Error while opening font\n", path );
 
 
     setcharmap( face );
     /* Set font header data */
-    struct font_struct export_font;
+
     export_font.header.header[0] = 'R';
     export_font.header.header[1] = 'B';
     export_font.header.header[2] = '1';
     export_font.header.header[3] = '2';
-    //export_font.header.height = 0;
-    //export_font.header.ascent = 0;
+#if 0
+    export_font.header.height = 0;
+    export_font.header.ascent = 0;
+#endif
 
-    float extra_space = (float)(between_row-trim_aa-trim_da);
+    extra_space = (float)(between_row-trim_aa-trim_da);
     FT_Set_Char_Size( face, 0, pixel_size << 6, hv_resolution, hv_resolution );
-    export_font.header.ascent = 
+    export_font.header.ascent =
             ((face->size->metrics.ascender*(100-trim_ap)/100) >> 6) - trim_aa;
-            
-    export_font.header.height = 
+
+    export_font.header.height =
         (((face->size->metrics.ascender*(100-trim_ap)/100) -
         (face->size->metrics.descender*(100-trim_dp)/100)) >> 6) + extra_space;
 
@@ -652,7 +670,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     if ( limit_char == 0 ) limit_char = max_char;
     if ( limit_char > max_char ) limit_char = max_char;
 
-    FT_Long char_count = 0;
+    char_count = 0;
 
 
 
@@ -669,9 +687,9 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     {
         charindex = getcharindex( face, code);
         if ( !(charindex) ) continue;
-        error = FT_Load_Glyph( face, charindex, 
+        err = FT_Load_Glyph( face, charindex, 
                                (FT_LOAD_RENDER | FT_LOAD_NO_BITMAP) );
-        if ( error ) continue;
+        if ( err ) continue;
 
         w = glyph_width( face, code, digit_width );
         if (w == 0) continue;
@@ -684,7 +702,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
 
 
         char_count++;
-        index += (w*export_font.header.height + pixel_per_byte - 1)/pixel_per_byte;
+        idx += (w*export_font.header.height + pixel_per_byte - 1)/pixel_per_byte;
 
         if (code >= lastchar)
             lastchar = code;
@@ -695,12 +713,12 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     export_font.header.defaultchar = firstchar;
     export_font.header.firstchar = firstchar;
     export_font.header.size = lastchar - firstchar + 1;
-    export_font.header.nbits = index;
+    export_font.header.nbits = idx;
     export_font.header.noffset = export_font.header.size;
     export_font.header.nwidth  = export_font.header.size;
     
     /* check if we need to use long offsets */
-    char use_long_offset = (export_font.header.nbits >= 0xFFDB );
+    use_long_offset = (export_font.header.nbits >= 0xFFDB );
 
     /* allocate memory */
     export_font.offset = NULL;
@@ -720,14 +738,26 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     /* for now we use the full height for each character */
     h = export_font.header.height;
 
-    index = 0;
-    int done = 0;
-    char char_name[1024];
-    int converted_char_count = 0;
-    int failed_char_count = 0;
+    idx = 0;
 
     for( code = firstchar; code <= lastchar; code++ )
     {
+        FT_GlyphSlot slot;
+        FT_Bitmap* source;
+        unsigned char* src;
+        unsigned char* tmpbuf;
+        int start_y;
+
+        int glyph_height;
+        int stride;
+        unsigned char* buf;
+        unsigned char* endbuf;
+
+        /* insert empty pixels on the left */
+        int col_off;
+        int numbits;
+        unsigned int field;
+
         /* Get gylph index from the char and render it */
         charindex = getcharindex( face, code);
         if ( !charindex ) 
@@ -740,9 +770,9 @@ void convttf(char* path, char* destfile, FT_Long face_index)
             continue;
         }
         
-        error = FT_Load_Glyph( face, charindex , 
+        err = FT_Load_Glyph( face, charindex , 
                                (FT_LOAD_RENDER | FT_LOAD_NO_BITMAP) );
-        if ( error ) {
+        if ( err ) {
             continue;
         }
         if FT_HAS_GLYPH_NAMES( face )
@@ -750,9 +780,11 @@ void convttf(char* path, char* destfile, FT_Long face_index)
         else
             char_name[0] = '\0';
 
-        FT_GlyphSlot slot = face->glyph;
-        FT_Bitmap* source = &slot->bitmap;
-        //print_raw_glyph( face );
+        slot = face->glyph;
+        source = &slot->bitmap;
+#if 0
+        print_raw_glyph( face );
+#endif
         w = glyph_width( face, code, digit_width );
         if (w == 0) continue;
         empty_first_col = empty_last_col = 0;
@@ -761,26 +793,26 @@ void convttf(char* path, char* destfile, FT_Long face_index)
             trim_glyph( face->glyph, &empty_first_col, &empty_last_col, &w );
         
         if ( use_long_offset )
-            export_font.offset_long[code - firstchar] = index;
+            export_font.offset_long[code - firstchar] = idx;
         else
-            export_font.offset[code - firstchar] = index;
+            export_font.offset[code - firstchar] = idx;
 
         export_font.width[code - firstchar] = w;
 
         /* copy the glyph bitmap to a full sized glyph bitmap */
-        unsigned char* src = source->buffer;
-        unsigned char* tmpbuf = malloc(sizeof(unsigned char) * w * h);
+        src = source->buffer;
+        tmpbuf = malloc(sizeof(unsigned char) * w * h);
         memset(tmpbuf, 0xff, w*h);
-        int start_y =  export_font.header.ascent - slot->bitmap_top;
+        start_y =  export_font.header.ascent - slot->bitmap_top;
 
-        int glyph_height = source->rows;
-        int stride = source->pitch;
-        unsigned char* buf = tmpbuf;
-        unsigned char* endbuf = tmpbuf + w*h;
+        glyph_height = source->rows;
+        stride = source->pitch;
+        buf = tmpbuf;
+        endbuf = tmpbuf + w*h;
 
-        int error = 0;
+        err = 0;
         /* insert empty pixels on the left */
-        int col_off = w - stride;
+        col_off = w - stride;
         if (col_off > 1) col_off /= 2;
         if (col_off < 0) col_off = 0;
 
@@ -796,16 +828,14 @@ void convttf(char* path, char* destfile, FT_Long face_index)
                 if (dst < endbuf && dst >= tmpbuf)
                     *dst = 0xff - *tsrc;
                 else {
-                    error = 1;
+                    err = 1;
                     printf("Error! row: %3d col: %3d\n", row, col);
                 }
             }
         }
-        if(error) print_raw_glyph(face);
+        if(err) print_raw_glyph(face);
 
         buf = tmpbuf;
-        int numbits;
-        unsigned int field;
         field = 0;
         numbits = pixel_per_byte;
 
@@ -813,13 +843,13 @@ void convttf(char* path, char* destfile, FT_Long face_index)
         {
             for(col=0; col < w; col++)
             {
-                unsigned int src = *buf++;
-                unsigned int cur_col = (src + 8) / 17;
+                unsigned int src2 = *buf++;
+                unsigned int cur_col = (src2 + 8) / 17;
                 field |= (cur_col << (bit_shift*(pixel_per_byte-numbits)));
 
                 if (--numbits == 0)
                 {
-                    export_font.chars_data[index++] = (unsigned char)field;
+                    export_font.chars_data[idx++] = (unsigned char)field;
                     numbits = pixel_per_byte;
                     field = 0;
                 }
@@ -829,15 +859,19 @@ void convttf(char* path, char* destfile, FT_Long face_index)
         /* Pad last byte */
         if (numbits != pixel_per_byte)
         {
-            export_font.chars_data[index++] = (unsigned char)field;
+            export_font.chars_data[idx++] = (unsigned char)field;
         }
 
         if( dump_glyphs )
         {
             /* debug: dump char */
-            printf("\n---Converted Glyph Dump---\n");
             unsigned char bit_max = (1 << bit_shift) - 1;
+            printf("\n---Converted Glyph Dump---\n");
+
             if ( code > 32 && code < 255 ) {
+                unsigned char current_data;
+                unsigned char font_bits;
+
                 row = h;
                 if(use_long_offset)
                     buf =  &(export_font.chars_data[export_font.offset_long[
@@ -845,8 +879,6 @@ void convttf(char* path, char* destfile, FT_Long face_index)
                 else
                     buf =  &(export_font.chars_data[export_font.offset[
                              code - firstchar]]);
-                unsigned char current_data;
-                unsigned char font_bits;
                 numbits = pixel_per_byte;
                 current_data = *buf;
                 do
@@ -889,7 +921,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
                char_name,converted_char_count,done); fflush(stdout);
     }
 
-    FILE *file = fopen(destfile, "w");
+    file = fopen(destfile, "w");
     printf("Writing %s\n", destfile);
 
     /* font info */
@@ -909,8 +941,8 @@ void convttf(char* path, char* destfile, FT_Long face_index)
                export_font.header.nbits, file);
     free(export_font.chars_data);
 
-    int skip,i;
-    char pad[] = {0,0,0,0};
+
+
     if ( use_long_offset ) 
     {
         skip = ((export_font.header.nbits + 3) & ~3) - 
