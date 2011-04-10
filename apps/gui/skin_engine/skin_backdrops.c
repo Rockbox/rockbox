@@ -113,10 +113,7 @@ bool skin_backdrops_preload(void)
             if (screen == SCREEN_MAIN && global_settings.backdrop_file[0] &&
                 global_settings.backdrop_file[0] != '-' && filename[0] == '-')
             {
-                char* temp = filename+2; /* slightly hacky to get a buffer */
-                size_t size = sizeof(backdrops[i].name) - 2;
-                snprintf(temp, size, BACKDROP_DIR "/%s.bmp", global_settings.backdrop_file);
-                filename = temp;
+                filename = global_settings.backdrop_file;
             }
             if (*filename && *filename != '-')
             {
@@ -156,7 +153,6 @@ void skin_backdrop_unload(int backdrop_id)
 void skin_backdrop_load_setting(void)
 {
     int i;
-    char filename[MAX_PATH];
     for(i=0;i<SKINNABLE_SCREENS_COUNT*NB_SCREENS;i++)
     {
         if (backdrops[i].name[0] == '-' && backdrops[i].screen == SCREEN_MAIN)
@@ -166,11 +162,11 @@ void skin_backdrop_load_setting(void)
             {
                 if (!backdrops[i].buffer)
                     backdrops[i].buffer = (char*)skin_buffer_alloc(LCD_BACKDROP_BYTES);
-                snprintf(filename, sizeof filename, BACKDROP_DIR "/%s.bmp",
-                         global_settings.backdrop_file);
+
                 bool loaded = backdrops[i].buffer && 
-                              screens[SCREEN_MAIN].backdrop_load(filename,
-                                                            backdrops[i].buffer);
+                              screens[SCREEN_MAIN].backdrop_load(
+                                                   global_settings.backdrop_file,
+                                                   backdrops[i].buffer);
                 backdrops[i].name[2] = loaded ? '.' : '\0';
                 return;
             }

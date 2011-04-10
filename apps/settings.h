@@ -588,7 +588,7 @@ struct user_settings
 #endif /* HAVE_TAGCACHE */
 
 #if LCD_DEPTH > 1
-    unsigned char backdrop_file[MAX_FILENAME+1];  /* backdrop bitmap file */
+    unsigned char backdrop_file[MAX_PATHNAME+1];  /* backdrop bitmap file */
 #endif
 
 #ifdef HAVE_LCD_COLOR

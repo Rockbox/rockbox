@@ -1587,7 +1587,7 @@ const struct settings_list settings[] = {
     TEXT_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng"),
 #if LCD_DEPTH > 1
     TEXT_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
-                     DEFAULT_BACKDROP, BACKDROP_DIR "/", ".bmp"),
+                     DEFAULT_BACKDROP, NULL, NULL),
 #endif
 #ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(0,kbd_file,"kbd","-",ROCKBOX_DIR "/",".kbd"),
