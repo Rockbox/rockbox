@@ -921,7 +921,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
                char_name,converted_char_count,done); fflush(stdout);
     }
 
-    file = fopen(destfile, "w");
+    file = fopen(destfile, "wb");
     printf("Writing %s\n", destfile);
 
     /* font info */
