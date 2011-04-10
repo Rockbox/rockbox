@@ -7224,36 +7224,36 @@
 </phrase>
 <phrase>
   id: LANG_BACKDROP_LOADED
-  desc: text for splash to indicate a new backdrop has been loaded successfully
+  desc: deprecated
   user: core
   <source>
     *: none
-    lcd_non-mono: "Backdrop Loaded"
+    lcd_non-mono: ""
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Achtergrond geladen"
+    lcd_non-mono: ""
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Achtergrond geladen"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BACKDROP_FAILED
-  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  desc: deprecated
   user: core
   <source>
     *: none
-    lcd_non-mono: "Backdrop Failed"
+    lcd_non-mono: ""
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Achtergrond laden mislukt"
+    lcd_non-mono: ""
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Achtergrond laden mislukt"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>

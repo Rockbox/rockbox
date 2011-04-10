@@ -6955,13 +6955,13 @@
 </phrase>
 <phrase>
   id: LANG_BACKDROP_LOADED
-  desc: text for splash to indicate a new backdrop has been loaded successfully
+  desc: deprecated
   user: core
   <source>
-    *: "Backdrop Loaded"
+    *: ""
   </source>
   <dest>
-    *: "Fono Ŝarĝita"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -6969,13 +6969,13 @@
 </phrase>
 <phrase>
   id: LANG_BACKDROP_FAILED
-  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  desc: deprecated
   user: core
   <source>
-    *: "Backdrop Failed"
+    *: ""
   </source>
   <dest>
-    *: "Fono Ŝarĝo Malsukcesis"
+    *: ""
   </dest>
   <voice>
     *: ""
