@@ -430,7 +430,7 @@
     *: "Playlisty"
   </dest>
   <voice>
-    *: "Plejlisty, neozvučené"
+    *: "Plejlisty"
   </voice>
 </phrase>
 <phrase>
@@ -444,7 +444,7 @@
     *: "Pluginy"
   </dest>
   <voice>
-    *: "Plaginy, neozvučitelné"
+    *: "Plaginy, neozvučené"
   </voice>
 </phrase>
 <phrase>
@@ -539,10 +539,10 @@
     *: "Resume"
   </source>
   <dest>
-    *: "Pokračovat v přahrávání"
+    *: "Pokračovat v přehrávání"
   </dest>
   <voice>
-    *: "Pokračovat v přahrávání"
+    *: "Pokračovat v přehrávání"
   </voice>
 </phrase>
 <phrase>
@@ -1419,10 +1419,10 @@
     *: "One"
   </source>
   <dest>
-    *: "Jednou"
+    *: "Skladba"
   </dest>
   <voice>
-    *: "Jednou"
+    *: "Skladba"
   </voice>
 </phrase>
 <phrase>
@@ -12132,11 +12132,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Zkratková klávesa"
+    hotkey: "Zkratkové klávesy"
   </dest>
   <voice>
     *: none
-    hotkey: "Zkratková klávesa"
+    hotkey: "Zkratkové klávesy"
   </voice>
 </phrase>
 <phrase>
