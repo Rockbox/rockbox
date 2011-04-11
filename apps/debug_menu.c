@@ -1540,6 +1540,11 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                     "Nsac: %d clk", card->nsac);
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "R2W: *%d", card->r2w_factor);
+#if (CONFIG_STORAGE & STORAGE_SD)
+            int csd_structure = card_extract_bits(card->csd, 127, 2);
+            if (csd_structure == 0) /* CSD version 1.0 */
+#endif
+            {
             simplelist_addline(SIMPLELIST_ADD_LINE,
                     "IRmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 61, 3)],
@@ -1548,6 +1553,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                     "IWmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 55, 3)],
                     i_vmax[card_extract_bits(card->csd, 52, 3)]);
+            }
         }
         else if (card->initialized == 0)
         {
