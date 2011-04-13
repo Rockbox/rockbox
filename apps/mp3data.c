@@ -41,7 +41,7 @@
 #include "buffer.h"
 #include "system.h"
 
-// #define DEBUG_VERBOSE
+//#define DEBUG_VERBOSE
 
 #ifdef DEBUG_VERBOSE
 #define VDEBUGF DEBUGF
@@ -452,7 +452,7 @@ static void get_xing_info(struct mp3info *info, unsigned char *buf)
 #if CONFIG_CODEC==SWCODEC
     i += 21;
     info->enc_delay   = ((int)buf[i  ] << 4) | (buf[i+1] >> 4);
-    info->enc_padding = ((int)buf[i+1] << 8) |  buf[i+2];
+    info->enc_padding = ((int)(buf[i+1]&0xF) << 8) |  buf[i+2];
     /* TODO: This sanity checking is rather silly, seeing as how the LAME
        header contains a CRC field that can be used to verify integrity. */
     if (!(info->enc_delay   >= 0 && info->enc_delay   <= 2880 &&
