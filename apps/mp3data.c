@@ -462,7 +462,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
 #if CONFIG_CODEC==SWCODEC
         i += 21;
         info->enc_delay   = ((int)vbrheader[i  ] << 4) | (vbrheader[i+1] >> 4);
-        info->enc_padding = ((int)vbrheader[i+1] << 8) |  vbrheader[i+2];
+        info->enc_padding = ((int)(vbrheader[i+1]&0xF) << 8) |  vbrheader[i+2];
         /* TODO: This sanity checking is rather silly, seeing as how the LAME
            header contains a CRC field that can be used to verify integrity. */
         if (!(info->enc_delay   >= 0 && info->enc_delay   <= 2880 &&
