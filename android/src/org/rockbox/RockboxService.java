@@ -52,14 +52,14 @@ import android.view.KeyEvent;
  * All access should be done through RockboxService.get_instance() for safety.
  */
 
-public class RockboxService extends Service 
+public class RockboxService extends Service
 {
     /* this Service is really a singleton class - well almost.
      * To do it properly this line should be instance = new RockboxService()
      * but apparently that doesnt work with the way android Services are created.
      */
     private static RockboxService instance = null;
-    
+
     /* locals needed for the c code and rockbox state */
     private static volatile boolean rockbox_running;
     private Activity current_activity = null;
@@ -84,25 +84,25 @@ public class RockboxService extends Service
         mMediaButtonReceiver = new MediaButtonReceiver(this);
         fg_runner = new RunForegroundManager(this);
     }
-    
+
     public static RockboxService get_instance()
     {
         /* don't call the construtor here, the instances are managed by
          * android, so we can't just create a new one */
-    	return instance;
+        return instance;
     }
-    
+
     public boolean isRockboxRunning()
     {
         return rockbox_running;
     }
     public Activity get_activity()
     {
-    	return current_activity;
+        return current_activity;
     }
     public void set_activity(Activity a)
     {
-    	current_activity = a;
+        current_activity = a;
     }
 
     private void do_start(Intent intent)
@@ -125,7 +125,7 @@ public class RockboxService extends Service
             resultReceiver.send(RESULT_LIB_LOADED, null);
 
         if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON))
-        {            
+        {
             /* give it a bit of time so we can register button presses 
              * sleeping longer doesn't work here, apparently Android 
              * surpresses long sleeps during intent handling */
@@ -142,7 +142,7 @@ public class RockboxService extends Service
         mMediaButtonReceiver.register();
         if (resultReceiver != null)
             resultReceiver.send(RESULT_SERVICE_RUNNING, null);
-        
+
         rockbox_running = true;
     }
 
@@ -150,7 +150,7 @@ public class RockboxService extends Service
     {
         Log.d("Rockbox", (String) text);
     }
-    
+
     private void LOG(CharSequence text, Throwable tr)
     {
         Log.d("Rockbox", (String) text, tr);
@@ -168,7 +168,7 @@ public class RockboxService extends Service
 
     private void startservice()
     {
-        final Object lock = new Object();        
+        final Object lock = new Object();
         Thread rb = new Thread(new Runnable()
         {
             public void run()
@@ -183,35 +183,35 @@ public class RockboxService extends Service
                     lock.notify();
                 }
 
-		        /* the following block unzips libmisc.so, which contains the files 
-		         * we ship, such as themes. It's needed to put it into a .so file
-		         * because there's no other way to ship files and have access
-		         * to them from native code
-		         */
+                /* the following block unzips libmisc.so, which contains the files 
+                 * we ship, such as themes. It's needed to put it into a .so file
+                 * because there's no other way to ship files and have access
+                 * to them from native code
+                 */
                 File libMisc = new File("/data/data/org.rockbox/lib/libmisc.so");
                 /* use arbitrary file to determine whether extracting is needed */
                 File arbitraryFile = new File(rockboxDir, "viewers.config");
                 if (!arbitraryFile.exists() || (libMisc.lastModified() > arbitraryFile.lastModified()))
                 {
-    		        try
-    		        {
-    	                Bundle progressData = new Bundle();
-    	                byte data[] = new byte[BUFFER];
-    	                ZipFile zipfile = new ZipFile(libMisc);
-    	                Enumeration<? extends ZipEntry> e = zipfile.entries();
-    	                progressData.putInt("max", zipfile.size());
+                    try
+                    {
+                        Bundle progressData = new Bundle();
+                        byte data[] = new byte[BUFFER];
+                        ZipFile zipfile = new ZipFile(libMisc);
+                        Enumeration<? extends ZipEntry> e = zipfile.entries();
+                        progressData.putInt("max", zipfile.size());
 
-    	                while(e.hasMoreElements())
-    	                {
-    	                   ZipEntry entry = (ZipEntry) e.nextElement();
-    	                   File file;
-    	                   /* strip off /.rockbox when extracting */
-    	                   String fileName = entry.getName();
-    	                   int slashIndex = fileName.indexOf('/', 1);
-    	                   file = new File(rockboxDirPath + fileName.substring(slashIndex));
+                        while(e.hasMoreElements())
+                        {
+                           ZipEntry entry = (ZipEntry) e.nextElement();
+                           File file;
+                           /* strip off /.rockbox when extracting */
+                           String fileName = entry.getName();
+                           int slashIndex = fileName.indexOf('/', 1);
+                           file = new File(rockboxDirPath + fileName.substring(slashIndex));
 
-    	                   if (!entry.isDirectory())
-    	                   {
+                           if (!entry.isDirectory())
+                           {
                                /* Create the parent folders if necessary */
                                File folder = new File(file.getParent());
                                if (!folder.exists())
@@ -229,22 +229,22 @@ public class RockboxService extends Service
                                dest.flush();
                                dest.close();
                                is.close();
-    	                   }
+                           }
 
                            if (resultReceiver != null) {
                                progressData.putInt("value", progressData.getInt("value", 0) + 1);
                                resultReceiver.send(RESULT_LIB_LOAD_PROGRESS, progressData);
                            }
                         }
-    		        } catch(Exception e) {
-    		            LOG("Exception when unzipping", e);
-    		            e.printStackTrace();
-    		            if (resultReceiver != null) {
-    		                Bundle bundle = new Bundle();
+                    } catch(Exception e) {
+                        LOG("Exception when unzipping", e);
+                        e.printStackTrace();
+                        if (resultReceiver != null) {
+                            Bundle bundle = new Bundle();
                             bundle.putString("error", getString(R.string.error_extraction));
-    		                resultReceiver.send(RESULT_ERROR_OCCURED, bundle);
-    		            }
-    		        }
+                            resultReceiver.send(RESULT_ERROR_OCCURED, bundle);
+                        }
+                    }
                 }
 
                 /* Generate default config if none exists yet */
@@ -267,8 +267,8 @@ public class RockboxService extends Service
                 }
 
                 /* Start native code */
-		        if (resultReceiver != null)
-		            resultReceiver.send(RESULT_INVOKING_MAIN, null);
+                if (resultReceiver != null)
+                    resultReceiver.send(RESULT_INVOKING_MAIN, null);
 
                 main();
 
@@ -281,10 +281,10 @@ public class RockboxService extends Service
         }, "Rockbox thread");
         rb.setDaemon(false);
         /* wait at least until the library is loaded */
-        synchronized (lock) 
+        synchronized (lock)
         {
             rb.start();
-            while(true) 
+            while(true)
             {
                 try {
                     lock.wait();
@@ -292,34 +292,34 @@ public class RockboxService extends Service
                     continue;
                 }
                 break;
-            }   
+            }
         }
     }
 
     private native void main();
 
     @Override
-    public IBinder onBind(Intent intent) 
+    public IBinder onBind(Intent intent)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
-    
+
     private void initBatteryMonitor()
     {
         itf = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        batt_monitor = new BroadcastReceiver() 
-        {            
+        batt_monitor = new BroadcastReceiver()
+        {
             @Override
-            public void onReceive(Context context, Intent intent) 
+            public void onReceive(Context context, Intent intent)
             {
                 /* we get literally spammed with battery statuses 
                  * if we don't delay the re-attaching
                  */
-                TimerTask tk = new TimerTask() 
+                TimerTask tk = new TimerTask()
                 {
-                    public void run() 
+                    public void run()
                     {
                         registerReceiver(batt_monitor, itf);
                     }
@@ -332,25 +332,25 @@ public class RockboxService extends Service
                     battery_level = (rawlevel * 100) / scale;
                 else
                     battery_level = -1;
-                /* query every 30s should be sufficient */ 
+                /* query every 30s should be sufficient */
                 t.schedule(tk, 30000);
             }
         };
         registerReceiver(batt_monitor, itf);
     }
-    
+
     void startForeground()
     {
         fg_runner.startForeground();
     }
-    
+
     void stopForeground()
     {
         fg_runner.stopForeground();
     }
 
     @Override
-    public void onDestroy() 
+    public void onDestroy()
     {
         super.onDestroy();
         mMediaButtonReceiver.unregister();
