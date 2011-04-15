@@ -102,7 +102,7 @@ void elf_output(struct elf_params_t *params, elf_write_fn_t write, void *user)
     ehdr.e_phentsize = sizeof phdr;
     ehdr.e_phnum = phnum;
     ehdr.e_shentsize = sizeof shdr;
-    ehdr.e_shnum = phnum + 1;
+    ehdr.e_shnum = phnum + 2; /* one for section 0 and one for string table */
     ehdr.e_shstrndx = ehdr.e_shnum - 1;
     ehdr.e_phoff = ehdr.e_ehsize;
     ehdr.e_shoff = ehdr.e_ehsize + ehdr.e_phnum * ehdr.e_phentsize;
@@ -141,6 +141,24 @@ void elf_output(struct elf_params_t *params, elf_write_fn_t write, void *user)
 
     sec = params->first_section;
     offset = ehdr.e_shoff;
+
+    {
+        shdr.sh_name = 0;
+        shdr.sh_type = SHT_NULL;
+        shdr.sh_flags = 0;
+        shdr.sh_addr = 0;
+        shdr.sh_offset = 0;
+        shdr.sh_size = 0;
+        shdr.sh_link = SHN_UNDEF;
+        shdr.sh_info = 0;
+        shdr.sh_addralign = 0;
+        shdr.sh_entsize = 0;
+
+        write(user, offset, &shdr, sizeof shdr);
+
+        offset += sizeof(Elf32_Shdr);
+    }
+    
     while(sec)
     {
         shdr.sh_name = text_strtbl;
@@ -165,7 +183,7 @@ void elf_output(struct elf_params_t *params, elf_write_fn_t write, void *user)
 
     {
         shdr.sh_name = bss_strtbl;
-            shdr.sh_type = SHT_STRTAB;
+        shdr.sh_type = SHT_STRTAB;
         shdr.sh_flags = 0;
         shdr.sh_addr = 0;
         shdr.sh_offset = strtbl_offset + data_offset;
