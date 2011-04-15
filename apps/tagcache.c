@@ -3039,7 +3039,6 @@ static bool commit(void)
     }
     
     close(tmpfd);
-    remove(TAGCACHE_FILE_TEMP);
     
     tc_stat.commit_step = 0;
     
@@ -3050,6 +3049,8 @@ static bool commit(void)
         return false;
     }
     
+    remove(TAGCACHE_FILE_TEMP);
+
     tcmh.tch.entry_count += tch.entry_count;
     tcmh.tch.datasize = sizeof(struct master_header) 
         + sizeof(struct index_entry) * tcmh.tch.entry_count
@@ -4479,7 +4480,6 @@ void tagcache_build(const char *path)
 #endif
     if (commit())
     {
-        remove(TAGCACHE_FILE_TEMP);
         logf("tagcache built!");
     }
 #ifdef __PCTOOL__
