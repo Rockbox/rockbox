@@ -41,6 +41,7 @@
 
 #include "crypto.h"
 #include "elf.h"
+#include "sb.h"
 
 #if 1 /* ANSI colors */
 
@@ -79,48 +80,6 @@ uint8_t *g_buf; /* file content */
 #define PREFIX_SIZE     128
 char out_prefix[PREFIX_SIZE];
 const char *key_file;
-
-#define SB_INST_NOP     0x0
-#define SB_INST_TAG     0x1
-#define SB_INST_LOAD    0x2
-#define SB_INST_FILL    0x3
-#define SB_INST_JUMP    0x4
-#define SB_INST_CALL    0x5
-#define SB_INST_MODE    0x6
-
-#define ROM_SECTION_BOOTABLE    (1 << 0)
-#define ROM_SECTION_CLEARTEXT   (1 << 1)
-
-struct sb_instruction_header_t
-{
-    uint8_t checksum;
-    uint8_t opcode;
-    uint16_t zero_except_for_tag;
-} __attribute__((packed));
-
-struct sb_instruction_load_t
-{
-    struct sb_instruction_header_t hdr;
-    uint32_t addr;
-    uint32_t len;
-    uint32_t crc;
-} __attribute__((packed));
-
-struct sb_instruction_fill_t
-{
-    struct sb_instruction_header_t hdr;
-    uint32_t addr;
-    uint32_t len;
-    uint32_t pattern;
-} __attribute__((packed));
-
-struct sb_instruction_call_t
-{
-    struct sb_instruction_header_t hdr;
-    uint32_t addr;
-    uint32_t zero;
-    uint32_t arg;
-} __attribute__((packed));
 
 void *xmalloc(size_t s) /* malloc helper, used in elf.c */
 {
