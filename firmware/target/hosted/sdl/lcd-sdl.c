@@ -141,7 +141,15 @@ void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
 
 int lcd_get_dpi(void)
 {
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
+    return 267;
+#elif (CONFIG_PLATFORM & PLATFORM_MAEMO4)
+    return 225;
+#elif (CONFIG_PLATFORM & PLATFORM_PANDORA)
+    return 217;
+#else
     /* TODO: find a way to query it from the OS, SDL doesn't support it
      * directly; for now assume the more or less standard 96 */
     return 96;
+#endif
 }
