@@ -88,6 +88,9 @@ const char *key_file;
 #define SB_INST_CALL    0x5
 #define SB_INST_MODE    0x6
 
+#define ROM_SECTION_BOOTABLE    (1 << 0)
+#define ROM_SECTION_CLEARTEXT   (1 << 1)
+
 struct sb_instruction_header_t
 {
     uint8_t checksum;
@@ -265,11 +268,12 @@ static void elf_write(void *user, uint32_t addr, const void *buf, size_t count)
     fwrite(buf, count, 1, f);
 }
 
-static void extract_elf_section(struct elf_params_t *elf, int count, const char *prefix)
+static void extract_elf_section(struct elf_params_t *elf, int count, const char *prefix,
+    const char *indent)
 {
     char *filename = xmalloc(strlen(prefix) + 32);
     sprintf(filename, "%s.%d.elf", prefix, count);
-    printf("write %s\n", filename);
+    printf("%swrite %s\n", indent, filename);
     
     FILE *fd = fopen(filename, "wb");
     free(filename);
@@ -385,7 +389,7 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
 
             /* elf construction */
             elf_set_start_addr(&elf, call->addr);
-            extract_elf_section(&elf, elf_count++, filename);
+            extract_elf_section(&elf, elf_count++, filename, indent);
             elf_release(&elf);
             elf_init(&elf);
 
@@ -402,7 +406,7 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
     }
 
     if(!elf_is_empty(&elf))
-        extract_elf_section(&elf, elf_count++, filename);
+        extract_elf_section(&elf, elf_count++, filename, indent);
     elf_release(&elf);
 }
 
@@ -413,7 +417,7 @@ static void extract(unsigned long filesize)
     color(BLUE);
     printf("Basic info:\n");
     color(GREEN);
-    printf("\tHeader SHA-1: ");
+    printf("  Header SHA-1: ");
     byte *hdr_sha1 = &g_buf[0];
     color(YELLOW);
     print_sha1(hdr_sha1);
@@ -429,27 +433,39 @@ static void extract(unsigned long filesize)
     else
         printf(" Failed\n");
     color(GREEN);
-    printf("\tFlags: ");
+    printf("  Flags: ");
+    color(YELLOW);
     printhex(0x18, 4);
-    printf("\tTotal file size : %ld\n", filesize);
+    color(GREEN);
+    printf("  Total file size : ");
+    color(YELLOW);
+    printf("%ld\n", filesize);
     
     /* Sizes and offsets */
     color(BLUE);
     printf("Sizes and offsets:\n");
     color(GREEN);
     int num_enc = get16le(0x28);
-    printf("\t# of encryption keys = %d\n", num_enc);
+    printf("  # of encryption keys = ");
+    color(YELLOW);
+    printf("%d\n", num_enc);
+    color(GREEN);
     int num_chunks = get16le(0x2E);
-    printf("\t# of chunk headers = %d\n", num_chunks);
+    printf("  # of chunk headers = ");
+     color(YELLOW);
+    printf("%d\n", num_chunks);
 
     /* Versions */
     color(BLUE);
     printf("Versions\n");
     color(GREEN);
 
-    printf("\tRandom 1: ");
+    printf("  Random 1: ");
+    color(YELLOW);
     printhex(0x32, 6);
-    printf("\tRandom 2: ");
+    color(GREEN);
+    printf("  Random 2: ");
+    color(YELLOW);
     printhex(0x5A, 6);
     
     uint64_t micros_l = get32le(0x38);
@@ -459,7 +475,9 @@ static void extract(unsigned long filesize)
     seconds += 946684800; /* 2000/1/1 0:00:00 */
     struct tm *time = gmtime(&seconds);
     color(GREEN);
-    printf("\tCreation date/time = %s", asctime(time));
+    printf("  Creation date/time = ");
+    color(YELLOW);
+    printf("%s", asctime(time));
 
     int p_maj = get32le(0x40);
     int p_min = get32le(0x44);
@@ -468,8 +486,13 @@ static void extract(unsigned long filesize)
     int c_min = get32le(0x50);
     int c_sub = get32le(0x54);
     color(GREEN);
-    printf("\tProduct version   = %X.%X.%X\n", p_maj, p_min, p_sub);
-    printf("\tComponent version = %X.%X.%X\n", c_maj, c_min, c_sub);
+    printf("  Product version   = ");
+    color(YELLOW);
+    printf("%X.%X.%X\n", p_maj, p_min, p_sub);
+    color(GREEN);
+    printf("  Component version = ");
+    color(YELLOW);
+    printf("%X.%X.%X\n", c_maj, c_min, c_sub);
 
     /* encryption cbc-mac */
     key_array_t keys = NULL; /* array of 16-bytes keys */
@@ -482,11 +505,11 @@ static void extract(unsigned long filesize)
         for(int i = 0; i < num_enc; i++)
         {
             color(RED);
-            printf("\tKey %d: ", i);
+            printf("  Key %d: ", i);
             print_key(keys[i]);
             printf("\n");
             color(GREEN);
-            printf("\t\tCBC-MAC of headers: ");
+            printf("    CBC-MAC of headers: ");
             /* copy the cbc mac */
             byte hdr_cbc_mac[16];
             memcpy(hdr_cbc_mac, &g_buf[0x60 + 16 * num_chunks + 32 * i], 16);
@@ -504,7 +527,7 @@ static void extract(unsigned long filesize)
                 printf(" Failed\n");
             color(GREEN);
             
-            printf("\t\tEncrypted key     : ");
+            printf("    Encrypted key     : ");
             byte (*encrypted_key)[16];
             encrypted_key = (key_array_t)&g_buf[0x60 + 16 * num_chunks + 32 * i + 16];
             color(YELLOW);
@@ -516,7 +539,7 @@ static void extract(unsigned long filesize)
             byte iv[16];
             memcpy(iv, g_buf, 16); /* uses the first 16-bytes of SHA-1 sig as IV */
             cbc_mac(*encrypted_key, decrypted_key, 1, keys[i], iv, NULL, 0);
-            printf("\t\tDecrypted key     : ");
+            printf("    Decrypted key     : ");
             color(YELLOW);
             print_key(decrypted_key);
             /* cross-check or copy */
@@ -548,14 +571,25 @@ static void extract(unsigned long filesize)
         int pos = 16 * get32le(ofs + 4);
         int size = 16 * get32le(ofs + 8);
         int flags = get32le(ofs + 12);
-        int data_sec = (flags == 2);
-        int encrypted = !data_sec && (num_enc > 0);
+        int data_sec = !(flags & ROM_SECTION_BOOTABLE);
+        int encrypted = !(flags & ROM_SECTION_CLEARTEXT);
     
         color(GREEN);
-        printf("\tChunk '%s'\n", name);
-        printf("\t\tpos   = %8x - %8x\n", pos, pos+size);
-        printf("\t\tlen   = %8x\n", size);
-        printf("\t\tflags = %8x", flags);
+        printf("  Chunk ");
+        color(YELLOW);
+        printf("'%s'\n", name);
+        color(GREEN);
+        printf("    pos   = ");
+        color(YELLOW);
+        printf("%8x - %8x\n", pos, pos+size);
+        color(GREEN);
+        printf("    len   = ");
+        color(YELLOW);
+        printf("%8x\n", size);
+        color(GREEN);
+        printf("    flags = ");
+        color(YELLOW);
+        printf("%8x", flags);
         color(RED);
         if(data_sec)
             printf("  Data Section");
@@ -572,7 +606,7 @@ static void extract(unsigned long filesize)
         else
             memcpy(sec, g_buf + pos, size);
         
-        extract_section(data_sec, name, sec, size, "\t\t\t");
+        extract_section(data_sec, name, sec, size, "      ");
         free(sec);
     }
     
@@ -580,18 +614,18 @@ static void extract(unsigned long filesize)
     color(BLUE);
     printf("Final signature:\n");
     color(GREEN);
-    printf("\tEncrypted signature:\n");
+    printf("  Encrypted signature:\n");
     color(YELLOW);
-    printf("\t\t");
+    printf("    ");
     printhex(filesize - 32, 16);
-    printf("\t\t");
+    printf("    ");
     printhex(filesize - 16, 16);
     /* decrypt it */
     byte *encrypted_block = &g_buf[filesize - 32];
     byte decrypted_block[32];
     cbc_mac(encrypted_block, decrypted_block, 2, real_key, g_buf, NULL, 0);
     color(GREEN);
-    printf("\tDecrypted SHA-1:\n\t\t");
+    printf("  Decrypted SHA-1:\n    ");
     color(YELLOW);
     print_sha1(decrypted_block);
     /* check it */
