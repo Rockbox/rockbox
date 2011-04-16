@@ -1108,14 +1108,14 @@ int alac_decode_frame(alac_file *alac,
 {
     int channels;
     int outputsamples;
-    int input_buffer_start;
+    unsigned char *input_buffer_start;
 
     /* setup the stream */
     alac->input_buffer = inbuffer;
     alac->input_buffer_bitaccumulator = 0;
     
     /* save to gather byte consumption */
-    input_buffer_start = (int)alac->input_buffer;
+    input_buffer_start = alac->input_buffer;
 
     channels = readbits(alac, 3);
 
@@ -1133,7 +1133,7 @@ int alac_decode_frame(alac_file *alac,
     }
     
     /* calculate consumed bytes */
-    alac->bytes_consumed = (int)alac->input_buffer - input_buffer_start;
+    alac->bytes_consumed = (int)(alac->input_buffer - input_buffer_start);
     alac->bytes_consumed += (alac->input_buffer_bitaccumulator>5) ? 2 : 1;
 
     return outputsamples;
