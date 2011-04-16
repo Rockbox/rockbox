@@ -831,15 +831,17 @@ void handle_auto_poweroff(void)
     int audio_stat = audio_status();
     long tick = current_tick;
 
-#if CONFIG_CHARGING
     /*
      * Inhibit shutdown as long as the charger is plugged in.  If it is
      * unplugged, wait for a timeout period and then shut down.
      */
-    if (charger_input_state == CHARGER || audio_stat == AUDIO_STATUS_PLAY) {
+    if (audio_stat == AUDIO_STATUS_PLAY
+#if CONFIG_CHARGING
+        || charger_input_state == CHARGER
+#endif
+    ) {
         last_event_tick = current_tick;
     }
-#endif
 
 #if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
     if (!shutdown_timeout && query_force_shutdown()) {
