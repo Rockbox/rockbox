@@ -47,8 +47,6 @@ enum codec_status codec_main(void)
     stream_t input_stream;
     uint32_t sound_samples_done;
     uint32_t elapsed_time;
-    uint32_t sample_duration;
-    uint32_t sample_byte_size;
     int file_offset;
     int framelength;
     int lead_trim = 0;
@@ -207,22 +205,14 @@ next_track:
             ci->seek_complete();
         }
 
-        /* Lookup the length (in samples and bytes) of block i */
-        if (!get_sample_info(&demux_res, i, &sample_duration, 
-                             &sample_byte_size)) {
-            LOGF("AAC: get_sample_info error\n");
-            err = CODEC_ERROR;
-            goto done;
-        }
-
         /* There can be gaps between chunks, so skip ahead if needed. It
          * doesn't seem to happen much, but it probably means that a 
          * "proper" file can have chunks out of order. Why one would want
          * that an good question (but files with gaps do exist, so who 
          * knows?), so we don't support that - for now, at least.
-         */        
+         */    
         file_offset = get_sample_offset(&demux_res, i);
-        
+
         if (file_offset > ci->curpos)
         {
             ci->advance_buffer(file_offset - ci->curpos);
@@ -235,7 +225,7 @@ next_track:
         }
         
         /* Request the required number of bytes from the input buffer */
-        buffer=ci->request_buffer(&n,sample_byte_size);
+        buffer=ci->request_buffer(&n, demux_res.sample_byte_size[i]);
 
         /* Decode one block - returned samples will be host-endian */
         ret = NeAACDecDecode(decoder, &frame_info, buffer, n);
@@ -248,34 +238,17 @@ next_track:
         }
 
         /* Advance codec buffer (no need to call set_offset because of this) */
-        ci->advance_buffer(n);
+        ci->advance_buffer(frame_info.bytesconsumed);
 
         /* Output the audio */
         ci->yield();
         
-        /* Ensure correct sample_duration is used. For SBR upsampling files
-         * sample_duration is only half the size of real output frame size. */
-        sample_duration *= sbr_fac;
-        
+        /* Gather number of samples for the decoded frame. */
         framelength = (frame_info.samples >> 1) - lead_trim;
         
         if (i == demux_res.num_sample_byte_sizes - 1 && framelength > 0)
         {
-            /* Currently limited to at most one frame of tail_trim.
-             * Seems to be enough.
-             */
-            if (ci->id3->tail_trim == 0 
-                && sample_duration < (frame_info.samples >> 1))
-            {
-                /* Subtract lead_trim just in case we decode a file with
-                 * only one audio frame with actual data.
-                 */
-                framelength = sample_duration - lead_trim;
-            }
-            else
-            {
-                framelength -= ci->id3->tail_trim;
-            }
+            framelength -= ci->id3->tail_trim;
         }
 
         if (framelength > 0)
