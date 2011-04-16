@@ -23,6 +23,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define BLOCK_SIZE      16
+
 struct sb_version_t
 {
     uint16_t major;
@@ -56,6 +58,23 @@ struct sb_header_t
     uint8_t rand_pad1[6]; /* Random padding */
 } __attribute__((packed));
 
+struct sb_section_header_t
+{
+    uint32_t identifier;
+    uint32_t offset; /* In blocks */
+    uint32_t size; /* In blocks */
+    uint32_t flags;
+} __attribute__((packed));
+
+struct sb_key_dictionary_entry_t
+{
+    uint8_t hdr_cbc_mac[16]; /* CBC-MAC of the header */
+    uint8_t key[16]; /* Actual AES Key (encrypted by the global key) */
+} __attribute__((packed));
+
+#define ROM_SECTION_BOOTABLE    (1 << 0)
+#define ROM_SECTION_CLEARTEXT   (1 << 1)
+
 #define SB_INST_NOP     0x0
 #define SB_INST_TAG     0x1
 #define SB_INST_LOAD    0x2
@@ -63,9 +82,6 @@ struct sb_header_t
 #define SB_INST_JUMP    0x4
 #define SB_INST_CALL    0x5
 #define SB_INST_MODE    0x6
-
-#define ROM_SECTION_BOOTABLE    (1 << 0)
-#define ROM_SECTION_CLEARTEXT   (1 << 1)
 
 struct sb_instruction_header_t
 {
