@@ -147,6 +147,8 @@ extern int _wrmdir(const wchar_t*);
 
 
 #ifdef HAVE_DIRCACHE
+struct dircache_entry;
+const struct dircache_entry *dircache_get_entry_ptr(const char *filename);
 void dircache_add_file(const char *name, long startcluster);
 void dircache_remove(const char *name);
 void dircache_rename(const char *oldname, const char *newname);
@@ -391,7 +393,7 @@ int sim_open(const char *name, int o, ...)
         mode_t mode = va_arg(ap, unsigned int);
         ret = OPEN(get_sim_pathname(name), opts, mode);
 #ifdef HAVE_DIRCACHE
-        if (ret >= 0)
+        if (ret >= 0 && !dircache_get_entry_ptr(name))
             dircache_add_file(name, 0);
 #endif
         va_end(ap);
@@ -418,7 +420,7 @@ int sim_creat(const char *name, mode_t mode)
     int ret = OPEN(get_sim_pathname(name),
                    O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, mode);
 #ifdef HAVE_DIRCACHE
-    if (ret >= 0)
+    if (ret >= 0 && !dircache_get_entry_ptr(name))
         dircache_add_file(name, 0);
 #endif
     return ret;
