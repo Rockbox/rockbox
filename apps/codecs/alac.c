@@ -35,8 +35,6 @@ enum codec_status codec_main(void)
   stream_t input_stream;
   uint32_t samplesdone;
   uint32_t elapsedtime;
-  uint32_t sample_duration;
-  uint32_t sample_byte_size;
   int samplesdecoded;
   unsigned int i;
   unsigned char* buffer;
@@ -112,18 +110,9 @@ enum codec_status codec_main(void)
       ci->seek_complete();
     }
 
-    /* Lookup the length (in samples and bytes) of block i */
-    if (!get_sample_info(&demux_res, i, &sample_duration, 
-                         &sample_byte_size)) {
-      LOGF("ALAC: Error in get_sample_info\n");
-      retval = CODEC_ERROR;
-      goto done;
-    }
-
     /* Request the required number of bytes from the input buffer */
-
-    buffer=ci->request_buffer(&n,sample_byte_size);
-    if (n!=sample_byte_size) {
+    buffer=ci->request_buffer(&n, demux_res.sample_byte_size[i]);
+    if (n!=demux_res.sample_byte_size[i]) {
         retval = CODEC_ERROR;
         goto done;
     }
@@ -132,15 +121,15 @@ enum codec_status codec_main(void)
     ci->yield();
     samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, ci->yield);
 
-    /* Advance codec buffer n bytes */
-    ci->advance_buffer(n);
+    /* Advance codec buffer by amount of consumed bytes */
+    ci->advance_buffer(alac.bytes_consumed);
 
     /* Output the audio */
     ci->yield();
     ci->pcmbuf_insert(outputbuffer[0], outputbuffer[1], samplesdecoded);
 
     /* Update the elapsed-time indicator */
-    samplesdone+=sample_duration;
+    samplesdone+=samplesdecoded;
     elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
     ci->set_elapsed(elapsedtime);
 

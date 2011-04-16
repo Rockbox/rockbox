@@ -20,6 +20,7 @@ typedef struct
     int samplesize;
     int numchannels;
     int bytespersample;
+    int bytes_consumed;
 
     /* stuff from setinfo */
     uint32_t setinfo_max_samples_per_frame; /* 0x1000 = 4096 */    /* max samples per frame? */
