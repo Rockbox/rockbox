@@ -24,7 +24,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
-#include <stdbool.h>
 
 #include "skin_buffer.h"
 #include "skin_parser.h"
