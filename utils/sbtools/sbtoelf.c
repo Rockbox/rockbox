@@ -183,7 +183,7 @@ static void extract_elf_section(struct elf_params_t *elf, int count, const char 
     
     if(fd == NULL)
         return ;
-    elf_output(elf, elf_write, fd);
+    elf_write_file(elf, elf_write, fd);
     fclose(fd);
 }
 

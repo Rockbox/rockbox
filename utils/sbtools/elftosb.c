@@ -31,6 +31,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <stdarg.h>
 
 #include "crypto.h"
 #include "elf.h"
@@ -38,6 +39,12 @@
 
 #define bug(...) do { fprintf(stderr,"ERROR: "__VA_ARGS__); exit(1); } while(0)
 #define bugp(a) do { perror("ERROR: "a); exit(1); } while(0)
+
+bool g_debug = false;
+
+/**
+ * Misc
+ */
 
 void *xmalloc(size_t s) /* malloc helper, used in elf.c */
 {
@@ -66,6 +73,10 @@ static int convxdigit(char digit, byte *val)
     else
         return 1;
 }
+
+/**
+ * Key file parsing
+ */
 
 typedef byte (*key_array_t)[16];
 
@@ -117,11 +128,18 @@ static key_array_t read_keys(const char *key_file, int *num_keys)
     return keys;
 }
 
+/**
+ * Command file parsing
+ */
+
 struct cmd_source_t
 {
     char *identifier;
     char *filename;
     struct cmd_source_t *next;
+    /* for later use */
+    bool elf_loaded;
+    struct elf_params_t elf;
 };
 
 enum cmd_inst_type_t
@@ -142,6 +160,7 @@ struct cmd_section_t
 {
     uint32_t identifier;
     struct cmd_inst_t *inst_list;
+    struct cmd_section_t *next;
 };
 
 struct cmd_file_t
@@ -171,7 +190,7 @@ struct lexem_t
     uint32_t num;
 };
 
-void __parse_string(char **ptr, char *end, void *user, void (*emit_fn)(void *user, char c))
+static void __parse_string(char **ptr, char *end, void *user, void (*emit_fn)(void *user, char c))
 {
     while(*ptr != end)
     {
@@ -196,19 +215,19 @@ void __parse_string(char **ptr, char *end, void *user, void (*emit_fn)(void *use
     (*ptr)++;
 }
 
-void __parse_string_emit(void *user, char c)
+static void __parse_string_emit(void *user, char c)
 {
     char **pstr = (char **)user;
     *(*pstr)++ = c;
 }
 
-void __parse_string_count(void *user, char c)
+static void __parse_string_count(void *user, char c)
 {
     (void) c;
     (*(int *)user)++;
 }
 
-void parse_string(char **ptr, char *end, struct lexem_t *lexem)
+static void parse_string(char **ptr, char *end, struct lexem_t *lexem)
 {
     /* skip " */
     (*ptr)++;
@@ -224,7 +243,7 @@ void parse_string(char **ptr, char *end, struct lexem_t *lexem)
     __parse_string(ptr, end, (void *)&pstr, __parse_string_emit);
 }
 
-void parse_number(char **ptr, char *end, struct lexem_t *lexem)
+static void parse_number(char **ptr, char *end, struct lexem_t *lexem)
 {
     int base = 10;
     if(**ptr == '0' && (*ptr) + 1 != end && (*ptr)[1] == 'x')
@@ -247,7 +266,7 @@ void parse_number(char **ptr, char *end, struct lexem_t *lexem)
     }
 }
 
-void parse_identifier(char **ptr, char *end, struct lexem_t *lexem)
+static void parse_identifier(char **ptr, char *end, struct lexem_t *lexem)
 {
     /* remember position */
     char *old = *ptr;
@@ -260,7 +279,7 @@ void parse_identifier(char **ptr, char *end, struct lexem_t *lexem)
     memcpy(lexem->str, old, len);
 }
 
-void next_lexem(char **ptr, char *end, struct lexem_t *lexem)
+static void next_lexem(char **ptr, char *end, struct lexem_t *lexem)
 {
     #define ret_simple(t, advance) ({(*ptr) += advance; lexem->type = t; return;})
     while(true)
@@ -294,7 +313,7 @@ void next_lexem(char **ptr, char *end, struct lexem_t *lexem)
     #undef ret_simple
 }
 
-void log_lexem(struct lexem_t *lexem)
+static void log_lexem(struct lexem_t *lexem)
 {
     switch(lexem->type)
     {
@@ -312,19 +331,19 @@ void log_lexem(struct lexem_t *lexem)
     }
 }
 
-char *find_source_by_id(struct cmd_file_t *cmd_file, const char *id)
+static struct cmd_source_t *find_source_by_id(struct cmd_file_t *cmd_file, const char *id)
 {
     struct cmd_source_t *src = cmd_file->source_list;
     while(src)
     {
         if(strcmp(src->identifier, id) == 0)
-            return src->filename;
+            return src;
         src = src->next;
     }
     return NULL;
 }
 
-struct cmd_file_t *read_command_file(const char *file)
+static struct cmd_file_t *read_command_file(const char *file)
 {
     int size;
     struct stat st;
@@ -380,6 +399,7 @@ struct cmd_file_t *read_command_file(const char *file)
     }
 
     /* sections */
+    struct cmd_section_t *end_sec = NULL;
     while(true)
     {
         struct cmd_section_t *sec = xmalloc(sizeof(struct cmd_section_t));
@@ -442,11 +462,183 @@ struct cmd_file_t *read_command_file(const char *file)
                 end_list = inst;
             }
         }
+
+        if(end_sec == NULL)
+        {
+            cmd_file->section_list = sec;
+            end_sec = sec;
+        }
+        else
+        {
+            end_sec->next = sec;
+            end_sec = sec;
+        }
     }
     #undef next
 
     return cmd_file;
 }
+
+/**
+ * command file to sb conversion
+ */
+
+struct sb_inst_t
+{
+    uint8_t inst; /* SB_INST_* */
+    uint32_t size;
+    // <union>
+    void *data;
+    uint32_t pattern;
+    uint32_t addr;
+    // </union>
+};
+
+struct sb_section_t
+{
+    uint32_t identifier;
+    int nr_insts;
+    struct sb_inst_t *insts;
+};
+
+struct sb_file_t
+{
+    int nr_sections;
+    struct sb_section_t *sections;
+};
+
+static bool elf_read(void *user, uint32_t addr, void *buf, size_t count)
+{
+    if(lseek(*(int *)user, addr, SEEK_SET) == (off_t)-1)
+        return false;
+    return read(*(int *)user, buf, count) == (ssize_t)count;
+}
+
+static void elf_printf(void *user, bool error, const char *fmt, ...)
+{
+    if(!g_debug && !error)
+        return;
+    (void) user;
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+}
+
+static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
+{
+    struct cmd_source_t *src = find_source_by_id(cmd_file, id);
+    if(src == NULL)
+        bug("undefined reference to source '%s'\n", id);
+    /* avoid reloading */
+    if(src->elf_loaded)
+        return;
+    int fd = open(src->filename, O_RDONLY);
+    if(fd < 0)
+        bug("cannot open '%s' (id '%s')\n", src->filename, id);
+    elf_init(&src->elf);
+    src->elf_loaded = elf_read_file(&src->elf, elf_read, elf_printf, &fd);
+    close(fd);
+    if(!src->elf_loaded)
+        bug("error loading elf file '%s' (id '%s')\n", src->filename, id);
+}
+
+static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
+{
+    struct sb_file_t *sb = xmalloc(sizeof(struct sb_file_t));
+    memset(sb, 0, sizeof(struct sb_file_t));
+    /* count sections */
+    struct cmd_section_t *csec = cmd_file->section_list;
+    while(csec)
+    {
+        sb->nr_sections++;
+        csec = csec->next;
+    }
+
+    sb->sections = xmalloc(sb->nr_sections * sizeof(struct sb_section_t));
+    memset(sb->sections, 0, sb->nr_sections * sizeof(struct sb_section_t));
+    /* flatten sections */
+    csec = cmd_file->section_list;
+    for(int i = 0; i < sb->nr_sections; i++, csec = csec->next)
+    {
+        struct sb_section_t *sec = &sb->sections[i];
+        sec->identifier = csec->identifier;
+        /* count instructions */
+        struct cmd_inst_t *cinst = csec->inst_list;
+        while(cinst)
+        {
+            load_elf_by_id(cmd_file, cinst->identifier);
+            struct elf_params_t *elf = &find_source_by_id(cmd_file, cinst->identifier)->elf;
+
+            if(cinst->type == CMD_LOAD)
+                sec->nr_insts += elf_get_nr_sections(elf);
+            else if(cinst->type == CMD_JUMP || cinst->type == CMD_LOAD)
+            {
+                if(!elf_get_start_addr(elf, NULL))
+                    bug("cannot jump/call '%s' because it has no starting point !", cinst->identifier);
+                sec->nr_insts++;
+            }
+            
+            cinst = cinst->next;
+        }
+
+        sec->insts = xmalloc(sec->nr_insts * sizeof(struct sb_inst_t));
+        memset(sec->insts, 0, sec->nr_insts * sizeof(struct sb_inst_t));
+        /* flatten */
+        int idx = 0;
+        cinst = csec->inst_list;
+        while(cinst)
+        {
+            struct elf_params_t *elf = &find_source_by_id(cmd_file, cinst->identifier)->elf;
+
+            if(cinst->type == CMD_LOAD)
+            {
+                struct elf_section_t *esec = elf->first_section;
+                while(esec)
+                {
+                    if(esec->type == EST_LOAD)
+                    {
+                        sec->insts[idx].inst = SB_INST_LOAD;
+                        sec->insts[idx].addr = esec->addr;
+                        sec->insts[idx].size = esec->size;
+                        sec->insts[idx++].data = esec->section;
+                        if(g_debug)
+                            printf("LOAD | addr=0x%08x | len=0x%08x | crc=0x%08x\n",
+                                esec->addr, esec->size, 0);
+                    }
+                    else if(esec->type == EST_FILL)
+                    {
+                        sec->insts[idx].inst = SB_INST_FILL;
+                        sec->insts[idx].addr = esec->addr;
+                        sec->insts[idx].size = esec->size;
+                        sec->insts[idx++].pattern = esec->pattern;
+                        if(g_debug)
+                            printf("FILL | addr=0x%08x | len=0x%08x | pattern=0x%08x\n",
+                                esec->addr, esec->size, esec->pattern);
+                    }
+                    esec = esec->next;
+                }
+            }
+            else if(cinst->type == CMD_JUMP || cinst->type == CMD_LOAD)
+            {
+                sec->insts[idx].inst = (cinst->type == CMD_JUMP) ? SB_INST_JUMP : SB_INST_CALL;
+                sec->insts[idx++].addr = elf->start_addr;
+                if(g_debug)
+                    printf("%s | addr=0x%08x | arg=0x%08x\n",
+                        (cinst->type == CMD_JUMP) ? "JUMP" : "CALL",
+                        elf->start_addr, 0);
+            }
+            
+            cinst = cinst->next;
+        }
+    }
+
+    return sb;
+}
+
+/**
+ * Sb file production
+ */
 
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
 
@@ -467,6 +659,7 @@ int main(int argc, const char **argv)
     int nr_keys;
     key_array_t key_array = read_keys(argv[2], &nr_keys);
     struct cmd_file_t *cmd_file = read_command_file(argv[1]);
+    struct sb_file_t *sb_file = apply_cmd_file(cmd_file);
     
     return 0;
 }
