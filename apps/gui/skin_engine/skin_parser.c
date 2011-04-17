@@ -1069,7 +1069,6 @@ static const struct touchaction touchactions[] = {
     {"presets", ACTION_FM_PRESET}, 
 #endif
 };
-bool cfg_string_to_int(int setting_id, int* out, const char* str);
 
 static int parse_touchregion(struct skin_element *element,
                              struct wps_token *token,
