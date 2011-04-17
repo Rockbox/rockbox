@@ -70,7 +70,12 @@ static uint32_t crc_table[256] = {
 
 uint32_t crc(byte *data, int size)
 {
-    uint32_t c = 0xffffffff;
+    return crc_continue(0xffffffff, data, size);
+}
+
+uint32_t crc_continue(uint32_t previous_crc, byte *data, int size)
+{
+    uint32_t c = previous_crc;
     /* normal CRC */
     for(int i = 0; i < size; i++)
         c = crc_table[data[i] ^ (c >> 24)] ^ (c << 8);

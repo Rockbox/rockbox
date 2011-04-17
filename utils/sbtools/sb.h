@@ -99,6 +99,14 @@ struct sb_instruction_header_t
     uint16_t flags;
 } __attribute__((packed));
 
+struct sb_instruction_common_t
+{
+    struct sb_instruction_header_t hdr;
+    uint32_t addr;
+    uint32_t len;
+    uint32_t data;
+} __attribute__((packed));
+
 struct sb_instruction_load_t
 {
     struct sb_instruction_header_t hdr;

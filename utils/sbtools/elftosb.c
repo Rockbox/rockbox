@@ -42,9 +42,22 @@
 
 bool g_debug = false;
 
+#define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
+
 /**
  * Misc
  */
+
+void generate_random_data(void *buf, size_t sz)
+{
+    static int rand_fd = -1;
+    if(rand_fd == -1)
+        rand_fd = open("/dev/urandom", O_RDONLY);
+    if(rand_fd == -1)
+        bugp("failed to open /dev/urandom");
+    if(read(rand_fd, buf, sz) != (ssize_t)sz)
+        bugp("failed to read /dev/urandom");
+}
 
 void *xmalloc(size_t s) /* malloc helper, used in elf.c */
 {
@@ -316,6 +329,7 @@ static void next_lexem(char **ptr, char *end, struct lexem_t *lexem)
     #undef ret_simple
 }
 
+#if 0
 static void log_lexem(struct lexem_t *lexem)
 {
     switch(lexem->type)
@@ -333,6 +347,7 @@ static void log_lexem(struct lexem_t *lexem)
         default: printf("<unk>");
     }
 }
+#endif
 
 static struct cmd_source_t *find_source_by_id(struct cmd_file_t *cmd_file, const char *id)
 {
@@ -495,6 +510,9 @@ struct sb_inst_t
     uint32_t pattern;
     uint32_t addr;
     // </union>
+    /* for production use */
+    uint32_t padding_size;
+    uint8_t *padding;
 };
 
 struct sb_section_t
@@ -504,6 +522,7 @@ struct sb_section_t
     struct sb_inst_t *insts;
     /* for production use */
     uint32_t file_offset; /* in blocks */
+    uint32_t sec_size; /* in blocks */
 };
 
 struct sb_file_t
@@ -637,6 +656,24 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
  * Sb file production
  */
 
+static void fill_gaps(struct sb_file_t *sb)
+{
+    for(int i = 0; i < sb->nr_sections; i++)
+    {
+        struct sb_section_t *sec = &sb->sections[i];
+        for(int j = 0; j < sec->nr_insts; j++)
+        {
+            struct sb_inst_t *inst = &sec->insts[j];
+            if(inst->inst != SB_INST_LOAD)
+                continue;
+            inst->padding_size = ROUND_UP(inst->size, BLOCK_SIZE) - inst->size;
+            /* emulate elftosb2 behaviour: generate 15 bytes (that's a safe maximum) */
+            inst->padding = xmalloc(15);
+            generate_random_data(inst->padding, 15);
+        }
+    }
+}
+
 static void compute_sb_offsets(struct sb_file_t *sb)
 {
     sb->image_size = 0;
@@ -663,6 +700,7 @@ static void compute_sb_offsets(struct sb_file_t *sb)
                     printf("%s | addr=0x%08x | arg=0x%08x\n",
                         inst->inst == SB_INST_CALL ? "CALL" : "JUMP", inst->addr, 0);
                 sb->image_size += sizeof(struct sb_instruction_call_t) / BLOCK_SIZE;
+                sec->sec_size += sizeof(struct sb_instruction_call_t) / BLOCK_SIZE;
             }
             else if(inst->inst == SB_INST_FILL)
             {
@@ -670,6 +708,7 @@ static void compute_sb_offsets(struct sb_file_t *sb)
                     printf("FILL | addr=0x%08x | len=0x%08x | pattern=0x%08x\n",
                         inst->addr, inst->size, inst->pattern);
                 sb->image_size += sizeof(struct sb_instruction_fill_t) / BLOCK_SIZE;
+                sec->sec_size += sizeof(struct sb_instruction_fill_t) / BLOCK_SIZE;
             }
             else if(inst->inst == SB_INST_LOAD)
             {
@@ -677,8 +716,10 @@ static void compute_sb_offsets(struct sb_file_t *sb)
                     printf("LOAD | addr=0x%08x | len=0x%08x\n", inst->addr, inst->size);
                 /* load header */
                 sb->image_size += sizeof(struct sb_instruction_load_t) / BLOCK_SIZE;
+                sec->sec_size += sizeof(struct sb_instruction_load_t) / BLOCK_SIZE;
                 /* data + alignment */
-                sb->image_size += (inst->size + BLOCK_SIZE - 1) / BLOCK_SIZE;
+                sb->image_size += (inst->size + inst->padding_size) / BLOCK_SIZE;
+                sec->sec_size += (inst->size + inst->padding_size) / BLOCK_SIZE;
             }
         }
     }
@@ -686,8 +727,27 @@ static void compute_sb_offsets(struct sb_file_t *sb)
     sb->image_size += 2;
 }
 
+static uint64_t generate_timestamp()
+{
+    struct tm tm_base = {0, 0, 0, 1, 0, 100, 0, 0, 1, 0, NULL}; /* 2000/1/1 0:00:00 */
+    time_t t = time(NULL) - mktime(&tm_base);
+    return (uint64_t)t * 1000000L;
+}
+
+void generate_version(struct sb_version_t *ver)
+{
+    ver->major = 0x999;
+    ver->pad0 = 0;
+    ver->minor = 0x999;
+    ver->pad1 = 0;
+    ver->revision = 0x999;
+    ver->pad2 = 0;
+}
+
 static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
 {
+    struct sha_1_params_t sha_1_params;
+    
     sb_hdr->signature[0] = 'S';
     sb_hdr->signature[1] = 'T';
     sb_hdr->signature[2] = 'M';
@@ -696,6 +756,83 @@ static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
     sb_hdr->minor_ver = IMAGE_MINOR_VERSION;
     sb_hdr->flags = 0;
     sb_hdr->image_size = sb->image_size;
+    sb_hdr->header_size = sizeof(struct sb_header_t) / BLOCK_SIZE;
+    sb_hdr->first_boot_sec_id = sb->sections[0].identifier;
+    sb_hdr->nr_keys = g_nr_keys;
+    sb_hdr->nr_sections = sb->nr_sections;
+    sb_hdr->sec_hdr_size = sizeof(struct sb_section_header_t) / BLOCK_SIZE;
+    sb_hdr->key_dict_off = sb_hdr->header_size +
+        sb_hdr->sec_hdr_size * sb_hdr->nr_sections;
+    sb_hdr->first_boot_tag_off = sb_hdr->key_dict_off +
+        sizeof(struct sb_key_dictionary_entry_t) * sb_hdr->nr_keys / BLOCK_SIZE;
+    generate_random_data(sb_hdr->rand_pad0, sizeof(sb_hdr->rand_pad0));
+    generate_random_data(sb_hdr->rand_pad1, sizeof(sb_hdr->rand_pad1));
+    sb_hdr->timestamp = generate_timestamp();
+    generate_version(&sb_hdr->product_ver);
+    generate_version(&sb_hdr->component_ver);
+    sb_hdr->drive_tag = 0;
+
+    sha_1_init(&sha_1_params);
+    sha_1_update(&sha_1_params, &sb_hdr->signature[0],
+        sizeof(struct sb_header_t) - sizeof(sb_hdr->sha1_header));
+    sha_1_finish(&sha_1_params);
+    sha_1_output(&sha_1_params, sb_hdr->sha1_header);
+}
+
+static void produce_sb_section_header(struct sb_section_t *sec,
+    struct sb_section_header_t *sec_hdr)
+{
+    sec_hdr->identifier = sec->identifier;
+    sec_hdr->offset = sec->file_offset;
+    sec_hdr->size = sec->sec_size;
+    sec_hdr->flags = SECTION_BOOTABLE;
+}
+
+static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
+{
+    uint8_t sum = 90;
+    byte *ptr = (byte *)hdr;
+    for(int i = 1; i < 16; i++)
+        sum += ptr[i];
+    return sum;
+}
+
+static void produce_section_tag_cmd(struct sb_section_t *sec,
+    struct sb_instruction_tag_t *tag, bool is_last)
+{
+    tag->hdr.opcode = SB_INST_TAG;
+    tag->hdr.flags = is_last ? SB_INST_LAST_TAG : 0;
+    tag->identifier = sec->identifier;
+    tag->len = sec->sec_size;
+    tag->flags = SECTION_BOOTABLE;
+    tag->hdr.checksum = instruction_checksum(&tag->hdr);
+}
+
+void produce_sb_instruction(struct sb_inst_t *inst,
+    struct sb_instruction_common_t *cmd)
+{
+    cmd->hdr.flags = 0;
+    cmd->hdr.opcode = inst->inst;
+    cmd->addr = inst->addr;
+    cmd->len = inst->size;
+    switch(inst->inst)
+    {
+        case SB_INST_CALL:
+        case SB_INST_JUMP:
+            cmd->len = 0;
+            cmd->data = 0;
+            break;
+        case SB_INST_FILL:
+            cmd->data = inst->pattern;
+            break;
+        case SB_INST_LOAD:
+            cmd->data = crc_continue(crc(inst->data, inst->size),
+                inst->padding, inst->padding_size);
+            break;
+        default:
+            break;
+    }
+    cmd->hdr.checksum = instruction_checksum(&cmd->hdr);
 }
 
 static void produce_sb_file(struct sb_file_t *sb, const char *filename)
@@ -705,23 +842,66 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     if(fd < 0)
         bugp("cannot open output file");
 
+    byte real_key[16];
+
+    fill_gaps(sb);
     compute_sb_offsets(sb);
 
+    generate_random_data(real_key, sizeof(real_key));
+
+    /* global SHA-1 */
+    struct sha_1_params_t file_sha1;
+    sha_1_init(&file_sha1);
+    /* produce and write header */
     struct sb_header_t sb_hdr;
     produce_sb_header(sb, &sb_hdr);
+    sha_1_update(&file_sha1, (byte *)&sb_hdr, sizeof(sb_hdr));
+    write(fd, &sb_hdr, sizeof(sb_hdr));
+    
+    /* produce and write section headers */
+    for(int i = 0; i < sb_hdr.nr_sections; i++)
+    {
+        struct sb_section_header_t sb_sec_hdr;
+        produce_sb_section_header(&sb->sections[i], &sb_sec_hdr);
+        sha_1_update(&file_sha1, (byte *)&sb_sec_hdr, sizeof(sb_sec_hdr));
+        write(fd, &sb_sec_hdr, sizeof(sb_sec_hdr));
+    }
+    /* produce key dictionary */
+    /* produce sections data */
+    for(int i = 0; i< sb_hdr.nr_sections; i++)
+    {
+        /* produce tag command */
+        struct sb_instruction_tag_t tag_cmd;
+        produce_section_tag_cmd(&sb->sections[i], &tag_cmd, (i + 1) == sb_hdr.nr_sections);
+        sha_1_update(&file_sha1, (byte *)&tag_cmd, sizeof(tag_cmd));
+        write(fd, &tag_cmd, sizeof(tag_cmd));
+        /* produce other commands */
+        for(int j = 0; j < sb->sections[i].nr_insts; j++)
+        {
+            struct sb_inst_t *inst = &sb->sections[i].insts[j];
+            /* command */
+            struct sb_instruction_common_t cmd;
+            produce_sb_instruction(inst, &cmd);
+            sha_1_update(&file_sha1, (byte *)&cmd, sizeof(cmd));
+            write(fd, &cmd, sizeof(cmd));
+            /* data */
+            if(inst->inst == SB_INST_LOAD)
+            {
+                sha_1_update(&file_sha1, inst->data, inst->size);
+                write(fd, inst->data, inst->size);
+                sha_1_update(&file_sha1, inst->padding, inst->padding_size);
+                write(fd, inst->padding, inst->padding_size);
+            }
+        }
+    }
+    /* write file SHA-1 */
+    byte final_sig[32];
+    sha_1_finish(&file_sha1);
+    sha_1_output(&file_sha1, final_sig);
+    generate_random_data(final_sig + 20, 12);
+    write(fd, final_sig, 32);
     
     close(fd);
-}
-
-#define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
-
-static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
-{
-    uint8_t sum = 90;
-    byte *ptr = (byte *)hdr;
-    for(int i = 1; i < 16; i++)
-        sum += ptr[i];
-    return sum;
 }
 
 int main(int argc, const char **argv)

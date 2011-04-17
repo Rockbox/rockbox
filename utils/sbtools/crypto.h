@@ -41,6 +41,7 @@ void cbc_mac(
 
 /* crc.c */
 uint32_t crc(byte *data, int size);
+uint32_t crc_continue(uint32_t previous_crc, byte *data, int size);
 
 /* sha1.c */
 struct sha_1_params_t

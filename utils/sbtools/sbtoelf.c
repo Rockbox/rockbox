@@ -421,6 +421,14 @@ static void extract(unsigned long filesize)
     printf("  Drive tag = ");
     color(YELLOW);
     printf("%x\n", sb_header->drive_tag);
+    color(GREEN);
+    printf("  First boot tag offset = ");
+    color(YELLOW);
+    printf("%x\n", sb_header->first_boot_tag_off);
+    color(GREEN);
+    printf("  First boot section ID = ");
+    color(YELLOW);
+    printf("0x%08x\n", sb_header->first_boot_sec_id);
 
     /* encryption cbc-mac */
     key_array_t keys = NULL; /* array of 16-bytes keys */
@@ -504,7 +512,7 @@ static void extract(unsigned long filesize)
             int pos = sec_hdr->offset * BLOCK_SIZE;
             int size = sec_hdr->size * BLOCK_SIZE;
             int data_sec = !(sec_hdr->flags & SECTION_BOOTABLE);
-            int encrypted = !(sec_hdr->flags & SECTION_CLEARTEXT);
+            int encrypted = !(sec_hdr->flags & SECTION_CLEARTEXT) && sb_header->nr_keys > 0;
         
             color(GREEN);
             printf("  Section ");
@@ -547,9 +555,7 @@ static void extract(unsigned long filesize)
         /* advanced raw mode */
         color(BLUE);
         printf("Commands\n");
-        uint32_t offset = sizeof(struct sb_header_t)
-            + sizeof(struct sb_section_header_t) * sb_header->nr_sections
-            + sizeof(struct sb_key_dictionary_entry_t) * sb_header->nr_keys;
+        uint32_t offset = sb_header->first_boot_tag_off * BLOCK_SIZE;
         byte iv[16];
         memcpy(iv, g_buf, 16);
         const char *indent = "    ";
@@ -597,7 +603,7 @@ static void extract(unsigned long filesize)
                 int pos = offset;
                 int size = tag->len * BLOCK_SIZE;
                 int data_sec = !(tag->flags & SECTION_BOOTABLE);
-                int encrypted = !(tag->flags & SECTION_CLEARTEXT);
+                int encrypted = !(tag->flags & SECTION_CLEARTEXT) && sb_header->nr_keys > 0;
             
                 color(GREEN);
                 printf("%sSection ", indent);
@@ -653,19 +659,24 @@ static void extract(unsigned long filesize)
     /* final signature */
     color(BLUE);
     printf("Final signature:\n");
-    color(GREEN);
-    printf("  Encrypted signature:\n");
-    color(YELLOW);
-    byte *encrypted_block = &g_buf[filesize - 32];
-    printf("    ");
-    print_hex(encrypted_block, 16, true);
-    printf("    ");
-    print_hex(encrypted_block + 16, 16, true);
-    /* decrypt it */
     byte decrypted_block[32];
-    cbc_mac(encrypted_block, decrypted_block, 2, real_key, g_buf, NULL, 0);
+    if(sb_header->nr_keys > 0)
+    {
+        color(GREEN);
+        printf("  Encrypted SHA-1:\n");
+        color(YELLOW);
+        byte *encrypted_block = &g_buf[filesize - 32];
+        printf("    ");
+        print_hex(encrypted_block, 16, true);
+        printf("    ");
+        print_hex(encrypted_block + 16, 16, true);
+        /* decrypt it */
+        cbc_mac(encrypted_block, decrypted_block, 2, real_key, g_buf, NULL, 0);
+    }
+    else
+        memcpy(decrypted_block, &g_buf[filesize - 32], 32);
     color(GREEN);
-    printf("  Decrypted SHA-1:\n    ");
+    printf("  File SHA-1:\n    ");
     color(YELLOW);
     print_hex(decrypted_block, 20, false);
     /* check it */
