@@ -595,7 +595,7 @@ static void extract(unsigned long filesize)
                 char name[5];
                 fill_section_name(name, tag->identifier);
                 int pos = offset;
-                int size = (tag->len - 1) * BLOCK_SIZE; /* command include itself */
+                int size = tag->len * BLOCK_SIZE;
                 int data_sec = !(tag->flags & SECTION_BOOTABLE);
                 int encrypted = !(tag->flags & SECTION_CLEARTEXT);
             
