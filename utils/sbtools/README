@@ -1,0 +1,32 @@
+This file document the format of the command file used by the elftosb tool.
+By no way our tools tries to be compatible with Freescale's elftosb2.
+However, our format is more subset of the general one.
+
+The parse supports a limited form of comments: comments starting with // and ending at the end of the line.
+
+A file first contains the list of sources:
+
+sources
+{
+    hw_init = "sdram_init.elf";
+    rockbox = "rockbox.elf";
+}
+
+It can then contain an arbitrary number of section. A section is identified by a number.
+Within a section, three commands are supported: "load", "jump" and "call":
+
+section(0x626f6f74) // hex for 'boot'
+{
+    load hw_init;
+    call hw_init;
+    load rockbox;
+    jump rockbox;
+}
+
+Finally, both elftosb and sbtoelf tools use key files. A key file is a list of keys.
+Each key consist is 128-bit long and is written in hexadecimal:
+
+00000000000000000000000000000000
+
+The parser does not handle blank line and only allows a final newline at the end of the file.
+A file is allowed to contain zero (0) keys.
