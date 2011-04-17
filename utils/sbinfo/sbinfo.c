@@ -386,7 +386,8 @@ static void extract(unsigned long filesize)
     
     uint64_t micros = sb_header->timestamp;
     time_t seconds = (micros / (uint64_t)1000000L);
-    seconds += 946684800; /* 2000/1/1 0:00:00 */
+    struct tm tm_base = {0, 0, 0, 1, 0, 100, 0, 0, 1, 0, NULL}; /* 2000/1/1 0:00:00 */
+    seconds += mktime(&tm_base);
     struct tm *time = gmtime(&seconds);
     color(GREEN);
     printf("  Creation date/time = ");
