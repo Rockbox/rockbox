@@ -80,6 +80,9 @@ static int convxdigit(char digit, byte *val)
 
 typedef byte (*key_array_t)[16];
 
+int g_nr_keys;
+key_array_t g_key_array;
+
 static key_array_t read_keys(const char *key_file, int *num_keys)
 {
     int size;
@@ -499,12 +502,16 @@ struct sb_section_t
     uint32_t identifier;
     int nr_insts;
     struct sb_inst_t *insts;
+    /* for production use */
+    uint32_t file_offset; /* in blocks */
 };
 
 struct sb_file_t
 {
     int nr_sections;
     struct sb_section_t *sections;
+    /* for production use */
+    uint32_t image_size; /* in blocks */
 };
 
 static bool elf_read(void *user, uint32_t addr, void *buf, size_t count)
@@ -572,7 +579,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
 
             if(cinst->type == CMD_LOAD)
                 sec->nr_insts += elf_get_nr_sections(elf);
-            else if(cinst->type == CMD_JUMP || cinst->type == CMD_LOAD)
+            else if(cinst->type == CMD_JUMP || cinst->type == CMD_CALL)
             {
                 if(!elf_get_start_addr(elf, NULL))
                     bug("cannot jump/call '%s' because it has no starting point !", cinst->identifier);
@@ -602,9 +609,6 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
                         sec->insts[idx].addr = esec->addr;
                         sec->insts[idx].size = esec->size;
                         sec->insts[idx++].data = esec->section;
-                        if(g_debug)
-                            printf("LOAD | addr=0x%08x | len=0x%08x | crc=0x%08x\n",
-                                esec->addr, esec->size, 0);
                     }
                     else if(esec->type == EST_FILL)
                     {
@@ -612,21 +616,14 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
                         sec->insts[idx].addr = esec->addr;
                         sec->insts[idx].size = esec->size;
                         sec->insts[idx++].pattern = esec->pattern;
-                        if(g_debug)
-                            printf("FILL | addr=0x%08x | len=0x%08x | pattern=0x%08x\n",
-                                esec->addr, esec->size, esec->pattern);
                     }
                     esec = esec->next;
                 }
             }
-            else if(cinst->type == CMD_JUMP || cinst->type == CMD_LOAD)
+            else if(cinst->type == CMD_JUMP || cinst->type == CMD_CALL)
             {
                 sec->insts[idx].inst = (cinst->type == CMD_JUMP) ? SB_INST_JUMP : SB_INST_CALL;
                 sec->insts[idx++].addr = elf->start_addr;
-                if(g_debug)
-                    printf("%s | addr=0x%08x | arg=0x%08x\n",
-                        (cinst->type == CMD_JUMP) ? "JUMP" : "CALL",
-                        elf->start_addr, 0);
             }
             
             cinst = cinst->next;
@@ -639,6 +636,82 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
 /**
  * Sb file production
  */
+
+static void compute_sb_offsets(struct sb_file_t *sb)
+{
+    sb->image_size = 0;
+    /* sb header */
+    sb->image_size += sizeof(struct sb_header_t) / BLOCK_SIZE;
+    /* sections headers */
+    sb->image_size += sb->nr_sections * sizeof(struct sb_section_header_t) / BLOCK_SIZE;
+    /* key dictionary */
+    sb->image_size += g_nr_keys * sizeof(struct sb_key_dictionary_entry_t) / BLOCK_SIZE;
+    /* sections */
+    for(int i = 0; i < sb->nr_sections; i++)
+    {
+        /* each section has a preliminary TAG command */
+        sb->image_size += sizeof(struct sb_instruction_tag_t) / BLOCK_SIZE;
+        
+        struct sb_section_t *sec = &sb->sections[i];
+        sec->file_offset = sb->image_size;
+        for(int j = 0; j < sec->nr_insts; j++)
+        {
+            struct sb_inst_t *inst = &sec->insts[j];
+            if(inst->inst == SB_INST_CALL || inst->inst == SB_INST_JUMP)
+            {
+                if(g_debug)
+                    printf("%s | addr=0x%08x | arg=0x%08x\n",
+                        inst->inst == SB_INST_CALL ? "CALL" : "JUMP", inst->addr, 0);
+                sb->image_size += sizeof(struct sb_instruction_call_t) / BLOCK_SIZE;
+            }
+            else if(inst->inst == SB_INST_FILL)
+            {
+                if(g_debug)
+                    printf("FILL | addr=0x%08x | len=0x%08x | pattern=0x%08x\n",
+                        inst->addr, inst->size, inst->pattern);
+                sb->image_size += sizeof(struct sb_instruction_fill_t) / BLOCK_SIZE;
+            }
+            else if(inst->inst == SB_INST_LOAD)
+            {
+                if(g_debug)
+                    printf("LOAD | addr=0x%08x | len=0x%08x\n", inst->addr, inst->size);
+                /* load header */
+                sb->image_size += sizeof(struct sb_instruction_load_t) / BLOCK_SIZE;
+                /* data + alignment */
+                sb->image_size += (inst->size + BLOCK_SIZE - 1) / BLOCK_SIZE;
+            }
+        }
+    }
+    /* final signature */
+    sb->image_size += 2;
+}
+
+static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
+{
+    sb_hdr->signature[0] = 'S';
+    sb_hdr->signature[1] = 'T';
+    sb_hdr->signature[2] = 'M';
+    sb_hdr->signature[3] = 'P';
+    sb_hdr->major_ver = IMAGE_MAJOR_VERSION;
+    sb_hdr->minor_ver = IMAGE_MINOR_VERSION;
+    sb_hdr->flags = 0;
+    sb_hdr->image_size = sb->image_size;
+}
+
+static void produce_sb_file(struct sb_file_t *sb, const char *filename)
+{
+    int fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT,
+        S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    if(fd < 0)
+        bugp("cannot open output file");
+
+    compute_sb_offsets(sb);
+
+    struct sb_header_t sb_hdr;
+    produce_sb_header(sb, &sb_hdr);
+    
+    close(fd);
+}
 
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
 
@@ -654,12 +727,19 @@ static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
 int main(int argc, const char **argv)
 {
     if(argc != 4)
-        bug("Usage: %s <cmd file> <key file> <out file>\n",*argv);
+    {
+        printf("Usage: %s <cmd file> <key file> <out file>\n",*argv);
+        printf("To enable debug mode, set environement variable SB_DEBUG to YES\n");
+        return 1;
+    }
 
-    int nr_keys;
-    key_array_t key_array = read_keys(argv[2], &nr_keys);
+    if(getenv("SB_DEBUG") != NULL && strcmp(getenv("SB_DEBUG"), "YES") == 0)
+        g_debug = true;
+
+    g_key_array = read_keys(argv[2], &g_nr_keys);
     struct cmd_file_t *cmd_file = read_command_file(argv[1]);
     struct sb_file_t *sb_file = apply_cmd_file(cmd_file);
+    produce_sb_file(sb_file, argv[3]);
     
     return 0;
 }
