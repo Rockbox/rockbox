@@ -325,7 +325,8 @@ static void extract(unsigned long filesize)
         bugp("File size mismatch");
     if(sb_header->header_size * BLOCK_SIZE != sizeof(struct sb_header_t))
         bugp("Bad header size");
-    if(sb_header->major_ver != 1 || sb_header->minor_ver != 1)
+    if(sb_header->major_ver != IMAGE_MAJOR_VERSION ||
+            sb_header->minor_ver != IMAGE_MINOR_VERSION)
         bugp("Bad file format version");
     if(sb_header->sec_hdr_size * BLOCK_SIZE != sizeof(struct sb_section_header_t))
         bugp("Bad section header size");
@@ -489,8 +490,8 @@ static void extract(unsigned long filesize)
         name[4] = 0;
         int pos = sec_hdr->offset * BLOCK_SIZE;
         int size = sec_hdr->size * BLOCK_SIZE;
-        int data_sec = !(sec_hdr->flags & ROM_SECTION_BOOTABLE);
-        int encrypted = !(sec_hdr->flags & ROM_SECTION_CLEARTEXT);
+        int data_sec = !(sec_hdr->flags & SECTION_BOOTABLE);
+        int encrypted = !(sec_hdr->flags & SECTION_CLEARTEXT);
     
         color(GREEN);
         printf("  Chunk ");

@@ -72,8 +72,11 @@ struct sb_key_dictionary_entry_t
     uint8_t key[16]; /* Actual AES Key (encrypted by the global key) */
 } __attribute__((packed));
 
-#define ROM_SECTION_BOOTABLE    (1 << 0)
-#define ROM_SECTION_CLEARTEXT   (1 << 1)
+#define IMAGE_MAJOR_VERSION     1
+#define IMAGE_MINOR_VERSION     1
+
+#define SECTION_BOOTABLE        (1 << 0)
+#define SECTION_CLEARTEXT       (1 << 1)
 
 #define SB_INST_NOP     0x0
 #define SB_INST_TAG     0x1
