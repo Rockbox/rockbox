@@ -1,9 +1,10 @@
-TGT = sbinfo
+all: elftosb sbtoelf
 
-all: $(TGT)
+sbtoelf: sbtoelf.c crc.c crypto.h aes128.c sha1.c elf.c sb.h
+	gcc -g -std=c99 -o $@ -W -Wall $^
 
-$(TGT): sbinfo.c crc.c crypto.h aes128.c sha1.c elf.c
-	$(CC) -g -std=c99 -o $(TGT) -W -Wall sbinfo.c aes128.c crc.c sha1.c elf.c
+elftosb: elftosb.c crc.c crypto.h aes128.c sha1.c elf.c sb.h
+	gcc -g -std=c99 -o $@ -W -Wall $^
 
 clean:
-	rm -fr $(TGT)
+	rm -fr elftosb sbtoelf

@@ -19,9 +19,7 @@
  *
  ****************************************************************************/
 
-#define _ISOC99_SOURCE /* snprintf() */
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <stdint.h>
 
 #define BLOCK_SIZE      16
 

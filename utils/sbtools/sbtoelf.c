@@ -78,9 +78,9 @@ const char *key_file;
 
 void *xmalloc(size_t s) /* malloc helper, used in elf.c */
 {
-	void * r = malloc(s);
-	if(!r) bugp("malloc");
-	return r;
+    void * r = malloc(s);
+    if(!r) bugp("malloc");
+    return r;
 }
 
 static void print_hex(byte *data, int len, bool newline)
@@ -91,7 +91,7 @@ static void print_hex(byte *data, int len, bool newline)
         printf("\n");
 }
 
-int convxdigit(char digit, byte *val)
+static int convxdigit(char digit, byte *val)
 {
     if(digit >= '0' && digit <= '9')
     {
@@ -495,7 +495,7 @@ static void extract(unsigned long filesize)
         int encrypted = !(sec_hdr->flags & SECTION_CLEARTEXT);
     
         color(GREEN);
-        printf("  Chunk ");
+        printf("  Section ");
         color(YELLOW);
         printf("'%s'\n", name);
         color(GREEN);
