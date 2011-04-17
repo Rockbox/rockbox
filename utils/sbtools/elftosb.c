@@ -843,6 +843,10 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
         bugp("cannot open output file");
 
     byte real_key[16];
+    byte (*cbc_macs)[16] = xmalloc(16 * g_nr_keys);
+    /* init CBC-MACs */
+    for(int i = 0; i < g_nr_keys; i++)
+        memset(cbc_macs[i], 0, 16);
 
     fill_gaps(sb);
     compute_sb_offsets(sb);
@@ -857,6 +861,10 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     produce_sb_header(sb, &sb_hdr);
     sha_1_update(&file_sha1, (byte *)&sb_hdr, sizeof(sb_hdr));
     write(fd, &sb_hdr, sizeof(sb_hdr));
+    /* update CBC-MACs */
+    for(int i = 0; i < g_nr_keys; i++)
+        cbc_mac((byte *)&sb_hdr, NULL, sizeof(sb_hdr) / BLOCK_SIZE, g_key_array[i],
+            cbc_macs[i], &cbc_macs[i], 1);
     
     /* produce and write section headers */
     for(int i = 0; i < sb_hdr.nr_sections; i++)
@@ -865,32 +873,60 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
         produce_sb_section_header(&sb->sections[i], &sb_sec_hdr);
         sha_1_update(&file_sha1, (byte *)&sb_sec_hdr, sizeof(sb_sec_hdr));
         write(fd, &sb_sec_hdr, sizeof(sb_sec_hdr));
+        /* update CBC-MACs */
+        for(int j = 0; j < g_nr_keys; j++)
+            cbc_mac((byte *)&sb_sec_hdr, NULL, sizeof(sb_sec_hdr) / BLOCK_SIZE,
+                g_key_array[j], cbc_macs[j], &cbc_macs[j], 1);
     }
     /* produce key dictionary */
+    for(int i = 0; i < g_nr_keys; i++)
+    {
+        struct sb_key_dictionary_entry_t entry;
+        memcpy(entry.hdr_cbc_mac, cbc_macs[i], 16);
+        cbc_mac(real_key, entry.key, sizeof(real_key) / BLOCK_SIZE, g_key_array[i],
+            (byte *)&sb_hdr, NULL, 1);
+        
+        write(fd, &entry, sizeof(entry));
+        sha_1_update(&file_sha1, (byte *)&entry, sizeof(entry));
+    }
     /* produce sections data */
     for(int i = 0; i< sb_hdr.nr_sections; i++)
     {
         /* produce tag command */
         struct sb_instruction_tag_t tag_cmd;
         produce_section_tag_cmd(&sb->sections[i], &tag_cmd, (i + 1) == sb_hdr.nr_sections);
+        if(g_nr_keys > 0)
+            cbc_mac((byte *)&tag_cmd, (byte *)&tag_cmd, sizeof(tag_cmd) / BLOCK_SIZE,
+                real_key, (byte *)&sb_hdr, NULL, 1);
         sha_1_update(&file_sha1, (byte *)&tag_cmd, sizeof(tag_cmd));
         write(fd, &tag_cmd, sizeof(tag_cmd));
         /* produce other commands */
+        byte cur_cbc_mac[16];
+        memcpy(cur_cbc_mac, (byte *)&sb_hdr, 16);
         for(int j = 0; j < sb->sections[i].nr_insts; j++)
         {
             struct sb_inst_t *inst = &sb->sections[i].insts[j];
             /* command */
             struct sb_instruction_common_t cmd;
             produce_sb_instruction(inst, &cmd);
+            if(g_nr_keys > 0)
+                cbc_mac((byte *)&cmd, (byte *)&cmd, sizeof(cmd) / BLOCK_SIZE,
+                    real_key, cur_cbc_mac, &cur_cbc_mac, 1);
             sha_1_update(&file_sha1, (byte *)&cmd, sizeof(cmd));
             write(fd, &cmd, sizeof(cmd));
             /* data */
             if(inst->inst == SB_INST_LOAD)
             {
-                sha_1_update(&file_sha1, inst->data, inst->size);
-                write(fd, inst->data, inst->size);
-                sha_1_update(&file_sha1, inst->padding, inst->padding_size);
-                write(fd, inst->padding, inst->padding_size);
+                uint32_t sz = inst->size + inst->padding_size;
+                byte *data = xmalloc(sz);
+                memcpy(data, inst->data, inst->size);
+                memcpy(data + inst->size, inst->padding, inst->padding_size);
+                if(g_nr_keys > 0)
+                    cbc_mac(data, data, sz / BLOCK_SIZE,
+                        real_key, cur_cbc_mac, &cur_cbc_mac, 1);
+                sha_1_update(&file_sha1, data, sz);
+                write(fd, data, sz);
+                free(data);
             }
         }
     }
@@ -899,6 +935,8 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     sha_1_finish(&file_sha1);
     sha_1_output(&file_sha1, final_sig);
     generate_random_data(final_sig + 20, 12);
+    if(g_nr_keys > 0)
+        cbc_mac(final_sig, final_sig, 2, real_key, (byte *)&sb_hdr, NULL, 1);
     write(fd, final_sig, 32);
     
     close(fd);
