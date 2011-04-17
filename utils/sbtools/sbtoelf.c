@@ -313,6 +313,18 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
     elf_release(&elf);
 }
 
+void fill_section_name(char name[5], uint32_t identifier)
+{
+    name[0] = (identifier >> 24) & 0xff;
+    name[1] = (identifier >> 16) & 0xff;
+    name[2] = (identifier >> 8) & 0xff;
+    name[3] = identifier & 0xff;
+    for(int i = 0; i < 4; i++)
+        if(!isprint(name[i]))
+            name[i] = '_';
+    name[4] = 0;
+}
+
 static void extract(unsigned long filesize)
 {
     struct sha_1_params_t sha_1_params;
@@ -404,6 +416,11 @@ static void extract(unsigned long filesize)
     color(YELLOW);
     printf("%X.%X.%X\n", sb_header->component_ver.major,
          sb_header->component_ver.minor,  sb_header->component_ver.revision);
+        
+    color(GREEN);
+    printf("  Drive tag = ");
+    color(YELLOW);
+    printf("%x\n", sb_header->drive_tag);
 
     /* encryption cbc-mac */
     key_array_t keys = NULL; /* array of 16-bytes keys */
@@ -472,62 +489,165 @@ static void extract(unsigned long filesize)
     }
 
     /* sections */
-    color(BLUE);
-    printf("Sections\n");
-
-    for(int i = 0; i < sb_header->nr_sections; i++)
+    char *raw_cmd_env = getenv("SB_RAW_CMD");
+    if(raw_cmd_env == NULL || strcmp(raw_cmd_env, "YES") != 0)
     {
-        uint32_t ofs = sb_header->header_size * BLOCK_SIZE + i * sizeof(struct sb_section_header_t);
-        struct sb_section_header_t *sec_hdr = (struct sb_section_header_t *)&g_buf[ofs];
-    
-        char name[5];
-        name[0] = (sec_hdr->identifier >> 24) & 0xff;
-        name[1] = (sec_hdr->identifier >> 16) & 0xff;
-        name[2] = (sec_hdr->identifier >> 8) & 0xff;
-        name[3] = sec_hdr->identifier & 0xff;
-        for(int i = 0; i < 4; i++)
-            if(!isprint(name[i]))
-                name[i] = '_';
-        name[4] = 0;
-        int pos = sec_hdr->offset * BLOCK_SIZE;
-        int size = sec_hdr->size * BLOCK_SIZE;
-        int data_sec = !(sec_hdr->flags & SECTION_BOOTABLE);
-        int encrypted = !(sec_hdr->flags & SECTION_CLEARTEXT);
-    
-        color(GREEN);
-        printf("  Section ");
-        color(YELLOW);
-        printf("'%s'\n", name);
-        color(GREEN);
-        printf("    pos   = ");
-        color(YELLOW);
-        printf("%8x - %8x\n", pos, pos+size);
-        color(GREEN);
-        printf("    len   = ");
-        color(YELLOW);
-        printf("%8x\n", size);
-        color(GREEN);
-        printf("    flags = ");
-        color(YELLOW);
-        printf("%8x", sec_hdr->flags);
-        color(RED);
-        if(data_sec)
-            printf("  Data Section");
-        else
-            printf("  Boot Section");
-        if(encrypted)
-            printf(" (Encrypted)");
-        printf("\n");
+        color(BLUE);
+        printf("Sections\n");
+        for(int i = 0; i < sb_header->nr_sections; i++)
+        {
+            uint32_t ofs = sb_header->header_size * BLOCK_SIZE + i * sizeof(struct sb_section_header_t);
+            struct sb_section_header_t *sec_hdr = (struct sb_section_header_t *)&g_buf[ofs];
         
-        /* save it */
-        byte *sec = xmalloc(size);
-        if(encrypted)
-            cbc_mac(g_buf + pos, sec, size / BLOCK_SIZE, real_key, g_buf, NULL, 0);
-        else
-            memcpy(sec, g_buf + pos, size);
+            char name[5];
+            fill_section_name(name, sec_hdr->identifier);
+            int pos = sec_hdr->offset * BLOCK_SIZE;
+            int size = sec_hdr->size * BLOCK_SIZE;
+            int data_sec = !(sec_hdr->flags & SECTION_BOOTABLE);
+            int encrypted = !(sec_hdr->flags & SECTION_CLEARTEXT);
         
-        extract_section(data_sec, name, sec, size, "      ");
-        free(sec);
+            color(GREEN);
+            printf("  Section ");
+            color(YELLOW);
+            printf("'%s'\n", name);
+            color(GREEN);
+            printf("    pos   = ");
+            color(YELLOW);
+            printf("%8x - %8x\n", pos, pos+size);
+            color(GREEN);
+            printf("    len   = ");
+            color(YELLOW);
+            printf("%8x\n", size);
+            color(GREEN);
+            printf("    flags = ");
+            color(YELLOW);
+            printf("%8x", sec_hdr->flags);
+            color(RED);
+            if(data_sec)
+                printf("  Data Section");
+            else
+                printf("  Boot Section");
+            if(encrypted)
+                printf(" (Encrypted)");
+            printf("\n");
+            
+            /* save it */
+            byte *sec = xmalloc(size);
+            if(encrypted)
+                cbc_mac(g_buf + pos, sec, size / BLOCK_SIZE, real_key, g_buf, NULL, 0);
+            else
+                memcpy(sec, g_buf + pos, size);
+            
+            extract_section(data_sec, name, sec, size, "      ");
+            free(sec);
+        }
+    }
+    else
+    {
+        /* advanced raw mode */
+        color(BLUE);
+        printf("Commands\n");
+        uint32_t offset = sizeof(struct sb_header_t)
+            + sizeof(struct sb_section_header_t) * sb_header->nr_sections
+            + sizeof(struct sb_key_dictionary_entry_t) * sb_header->nr_keys;
+        byte iv[16];
+        memcpy(iv, g_buf, 16);
+        const char *indent = "    ";
+        while(true)
+        {
+            byte cmd[16];
+            if(sb_header->nr_keys > 0)
+                cbc_mac(g_buf + offset, cmd, 1, real_key, iv, &iv, 0);
+            else
+                memcpy(cmd, g_buf + offset, BLOCK_SIZE);
+            struct sb_instruction_header_t *hdr = (struct sb_instruction_header_t *)cmd;
+            printf("%s", indent);
+            uint8_t checksum = instruction_checksum(hdr);
+            if(checksum != hdr->checksum)
+            {
+                color(GREY);
+                printf("[Bad checksum]");
+            }
+            
+            if(hdr->opcode == SB_INST_NOP)
+            {
+                color(RED);
+                printf("NOOP\n");
+                offset += BLOCK_SIZE;
+            }
+            else if(hdr->opcode == SB_INST_TAG)
+            {
+                struct sb_instruction_tag_t *tag = (struct sb_instruction_tag_t *)hdr;
+                color(RED);
+                printf("BTAG");
+                color(OFF);printf(" | ");
+                color(BLUE);
+                printf("sec=0x%08x", tag->identifier);
+                color(OFF);printf(" | ");
+                color(GREEN);
+                printf("cnt=0x%08x", tag->len);
+                color(OFF);printf(" | ");
+                color(YELLOW);
+                printf("flg=0x%08x\n", tag->flags);
+                color(OFF);
+                offset += sizeof(struct sb_instruction_tag_t);
+
+                char name[5];
+                fill_section_name(name, tag->identifier);
+                int pos = offset;
+                int size = (tag->len - 1) * BLOCK_SIZE; /* command include itself */
+                int data_sec = !(tag->flags & SECTION_BOOTABLE);
+                int encrypted = !(tag->flags & SECTION_CLEARTEXT);
+            
+                color(GREEN);
+                printf("%sSection ", indent);
+                color(YELLOW);
+                printf("'%s'\n", name);
+                color(GREEN);
+                printf("%s  pos   = ", indent);
+                color(YELLOW);
+                printf("%8x - %8x\n", pos, pos+size);
+                color(GREEN);
+                printf("%s  len   = ", indent);
+                color(YELLOW);
+                printf("%8x\n", size);
+                color(GREEN);
+                printf("%s  flags = ", indent);
+                color(YELLOW);
+                printf("%8x", tag->flags);
+                color(RED);
+                if(data_sec)
+                    printf("  Data Section");
+                else
+                    printf("  Boot Section");
+                if(encrypted)
+                    printf(" (Encrypted)");
+                printf("\n");
+
+                /* save it */
+                byte *sec = xmalloc(size);
+                if(encrypted)
+                    cbc_mac(g_buf + pos, sec, size / BLOCK_SIZE, real_key, g_buf, NULL, 0);
+                else
+                    memcpy(sec, g_buf + pos, size);
+                
+                extract_section(data_sec, name, sec, size, "      ");
+                free(sec);
+
+                /* last one ? */
+                if(tag->hdr.flags & SB_INST_LAST_TAG)
+                    break;
+                offset += size;
+                /* restart with IV */
+                memcpy(iv, g_buf, 16);
+            }
+            else
+            {
+                color(RED);
+                printf("Unknown instruction %d at address 0x%08lx\n", hdr->opcode, (long)offset);
+                break;
+            }
+        }
     }
     
     /* final signature */
@@ -565,7 +685,11 @@ int main(int argc, const char **argv)
     int fd;
     struct stat st;
     if(argc != 3 && argc != 4)
-        bug("Usage: %s <firmware> <key file> [<out prefix>]\n",*argv);
+    {
+        printf("Usage: %s <firmware> <key file> [<out prefix>]\n",*argv);
+        printf("To use raw command mode, set environment variable SB_RAW_CMD to YES\n");
+        return 1;
+    }
 
     if(argc == 4)
         snprintf(out_prefix, PREFIX_SIZE, "%s", argv[3]);

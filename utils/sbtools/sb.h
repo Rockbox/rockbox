@@ -52,7 +52,7 @@ struct sb_header_t
     uint64_t timestamp; /* In microseconds since 2000/1/1 00:00:00 */
     struct sb_version_t product_ver;
     struct sb_version_t component_ver;
-    uint16_t drive_tag; /* Unknown meaning */
+    uint16_t drive_tag; /* first tag to boot ? */
     uint8_t rand_pad1[6]; /* Random padding */
 } __attribute__((packed));
 
@@ -84,11 +84,19 @@ struct sb_key_dictionary_entry_t
 #define SB_INST_CALL    0x5
 #define SB_INST_MODE    0x6
 
+/* flags */
+#define SB_INST_LAST_TAG    1 /* for TAG */
+#define SB_INST_LOAD_DCD    1 /* for LOAD */
+#define SB_INST_FILL_BYTE   0 /* for FILL */
+#define SB_INST_FILL_HWORD  1 /* for FILL */
+#define SB_INST_FILL_WORD   2 /* for FILL */
+#define SB_INST_HAB_EXEC    1 /* for JUMP/CALL */
+
 struct sb_instruction_header_t
 {
     uint8_t checksum;
     uint8_t opcode;
-    uint16_t zero_except_for_tag;
+    uint16_t flags;
 } __attribute__((packed));
 
 struct sb_instruction_load_t
@@ -113,4 +121,12 @@ struct sb_instruction_call_t
     uint32_t addr;
     uint32_t zero;
     uint32_t arg;
+} __attribute__((packed));
+
+struct sb_instruction_tag_t
+{
+    struct sb_instruction_header_t hdr;
+    uint32_t identifier; /* section identifier */
+    uint32_t len; /* length of the section */
+    uint32_t flags; /* section flags */
 } __attribute__((packed));
