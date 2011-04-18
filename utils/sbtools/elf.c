@@ -198,7 +198,6 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write, void *use
     uint32_t text_strtbl = bss_strtbl + strlen(".bss") + 1;
     uint32_t shstrtab_strtbl = text_strtbl + strlen(".text") + 1;
     uint32_t strtbl_size = shstrtab_strtbl + strlen(".shstrtab") + 1;
-    
 
     while(sec)
     {
@@ -368,14 +367,15 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
         error_printf("invalid elf file: must target an arm machine\n");
     if(ehdr.e_ehsize != sizeof(ehdr))
         error_printf("invalid elf file: size header mismatch\n");
-    if(ehdr.e_phentsize != sizeof(Elf32_Phdr))
+    if(ehdr.e_phnum > 0 && ehdr.e_phentsize != sizeof(Elf32_Phdr))
         error_printf("invalid elf file: program header size mismatch\n");
-    if(ehdr.e_shentsize != sizeof(Elf32_Shdr))
+    if(ehdr.e_shnum > 0 && ehdr.e_shentsize != sizeof(Elf32_Shdr))
         error_printf("invalid elf file: section header size mismatch\n");
     if(ehdr.e_flags & EF_ARM_HASENTRY)
         elf_set_start_addr(params, ehdr.e_entry);
 
     char *strtab = NULL;
+    if(ehdr.e_shstrndx != SHN_UNDEF)
     {
         Elf32_Shdr shstrtab;
         if(read(user, ehdr.e_shoff + ehdr.e_shstrndx * ehdr.e_shentsize,
@@ -406,15 +406,20 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
                 error_printf("error read self section data");
             elf_add_load_section(params, shdr.sh_addr, shdr.sh_size, data);
 
-            printf(user, false, "create load segment for %s\n", &strtab[shdr.sh_name]);
+            if(strtab)
+                printf(user, false, "create load segment for %s\n", &strtab[shdr.sh_name]);
         }
         else if(shdr.sh_type == SHT_NOBITS && shdr.sh_flags & SHF_ALLOC)
         {
             elf_add_fill_section(params, shdr.sh_addr, shdr.sh_size, 0);
-            printf(user, false, "create fill segment for %s\n", &strtab[shdr.sh_name]);
+            if(strtab)
+                printf(user, false, "create fill segment for %s\n", &strtab[shdr.sh_name]);
         }
         else
-            printf(user, false, "filter out %s\n", &strtab[shdr.sh_name], shdr.sh_type);
+        {
+            if(strtab)
+                printf(user, false, "filter out %s\n", &strtab[shdr.sh_name], shdr.sh_type);
+        }
         
     }
     return true;
