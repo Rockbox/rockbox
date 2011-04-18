@@ -753,7 +753,7 @@ int sd_init(void)
 
 #ifndef SANSA_CLIPV2
     /* Configure XPD for SD-MCI interface */
-    bitset32(&CCU_IO, 1<<2);
+    bitmod32(&CCU_IO, 1<<2, 3<<2);
 #endif
 
     VIC_INT_ENABLE = INTERRUPT_NAND;

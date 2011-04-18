@@ -226,7 +226,7 @@ int button_read_device(void)
     while(delay--) nop;
 
     bool ccu_io_bit12 = CCU_IO & (1<<12);
-    CCU_IO &= ~(1<<12);
+    bitclr32(&CCU_IO, 1<<12);
 
     /* B1 is shared with FM i2c */
     bool gpiob_pin0_dir = GPIOB_DIR & (1<<1);
@@ -256,7 +256,7 @@ int button_read_device(void)
         GPIOB_DIR |= 1<<1;
 
     if(ccu_io_bit12)
-        CCU_IO |= 1<<12;
+        bitset32(&CCU_IO, 1<<12);
 
 #ifdef HAS_BUTTON_HOLD
 #ifndef BOOTLOADER

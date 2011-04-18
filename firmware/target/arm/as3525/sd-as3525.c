@@ -564,8 +564,7 @@ int sd_init(void)
     bitset32(&CGU_PERI, CGU_NAF_CLOCK_ENABLE);
 #ifdef HAVE_MULTIDRIVE
     bitset32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
-    bitclr32(&CCU_IO, 1<<3);    /* bits 3:2 = 01, xpd is SD interface */
-    bitset32(&CCU_IO, 1<<2);
+    bitmod32(&CCU_IO, 1<<2, 3<<2);  /* bits 3:2 = 01, xpd is SD interface */
 #endif
 
     semaphore_init(&transfer_completion_signal, 1, 0);
@@ -970,7 +969,7 @@ void sd_enable(bool on)
 #if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
         /* buttonlight AMSes need a bit of special handling for the buttonlight
          * here due to the dual mapping of GPIOD and XPD */
-        bitset32(&CCU_IO, 1<<2);    /* XPD is SD-MCI interface (b3:2 = 01) */
+        bitmod32(&CCU_IO, 1<<2, 3<<2);  /* XPD is SD-MCI interface (b3:2 = 01) */
         if (buttonlight_is_on)
             GPIOD_DIR &= ~(1<<7);
         else
@@ -996,7 +995,7 @@ void sd_enable(bool on)
 #endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
 
 #if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
-        bitclr32(&CCU_IO, 1<<2);    /* XPD is general purpose IO (b3:2 = 00) */
+        bitmod32(&CCU_IO, 0<<2, 3<<2);  /* XPD is general purpose IO (b3:2 = 00) */
         if (buttonlight_is_on)
             _buttonlight_on();
 #endif
