@@ -354,8 +354,6 @@ static bool read_chunk_stts(qtmovie_t *qtmovie, size_t chunk_len)
 
 static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
 {
-    unsigned int i;
-    uint32_t numentries;
     size_t size_remaining = chunk_len - 8;
 
     /* version */
@@ -377,35 +375,11 @@ static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
     }
     size_remaining -= 4;
 
-    numentries = stream_read_uint32(qtmovie->stream);
+    qtmovie->res->num_sample_byte_sizes = stream_read_uint32(qtmovie->stream);
     size_remaining -= 4;
-
-    qtmovie->res->num_sample_byte_sizes = numentries;
-    qtmovie->res->sample_byte_size = malloc(numentries * sizeof(*qtmovie->res->sample_byte_size));
-
-    if (!qtmovie->res->sample_byte_size)
-    {
-        DEBUGF("stsz too large\n");
-        return false;
-    }
-
-    for (i = 0; i < numentries; i++)
-    {
-        uint32_t v = stream_read_uint32(qtmovie->stream);
-        
-        if (v > 0x0000ffff)
-        {
-            DEBUGF("stsz[%d] > 65 kB (%ld)\n", i, (long)v);
-            return false;
-        }
-        
-        qtmovie->res->sample_byte_size[i] = v;
-        size_remaining -= 4;
-    }
 
     if (size_remaining)
     {
-        DEBUGF("ehm, size remianing?\n");
         stream_skip(qtmovie->stream, size_remaining);
     }
     
@@ -426,8 +400,7 @@ static bool read_chunk_stsc(qtmovie_t *qtmovie, size_t chunk_len)
     size_remaining -= 4;
 
     qtmovie->res->num_sample_to_chunks = numentries;
-    qtmovie->res->sample_to_chunk = malloc(numentries *
-        sizeof(*qtmovie->res->sample_to_chunk));
+    qtmovie->res->sample_to_chunk = malloc(numentries * sizeof(sample_to_chunk_t));
 
     if (!qtmovie->res->sample_to_chunk)
     {
@@ -456,8 +429,14 @@ static bool read_chunk_stsc(qtmovie_t *qtmovie, size_t chunk_len)
 
 static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
 {
-    unsigned int i;
+    uint32_t i, k;
     uint32_t numentries;
+    int32_t idx = 0;
+    int32_t frame;
+    int32_t offset;
+    int32_t old_first;
+    int32_t new_first;
+    int32_t old_frame;
     size_t size_remaining = chunk_len - 8;
 
     /* version + flags */
@@ -466,20 +445,57 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
 
     numentries = stream_read_uint32(qtmovie->stream);
     size_remaining -= 4;
+  
+    qtmovie->res->num_lookup_table = numentries;
+    qtmovie->res->lookup_table = malloc(numentries * sizeof(*qtmovie->res->lookup_table));
 
-    qtmovie->res->num_chunk_offsets = numentries;
-    qtmovie->res->chunk_offset = malloc(numentries * 
-        sizeof(*qtmovie->res->chunk_offset));
-
-    if (!qtmovie->res->chunk_offset)
+    if (!qtmovie->res->lookup_table)
     {
-        DEBUGF("stco too large\n");
+        DEBUGF("stco too large to allocate lookup_table[]\n");
         return false;
     }
 
-    for (i = 0; i < numentries; i++)
+    /* read first offset */
+    offset = stream_read_uint32(qtmovie->stream);
+    size_remaining -= 4;
+    
+    /* Build up lookup table. The lookup table contains the sample index and
+     * byte position in the file for each chunk. This table is used to seek
+     * and resume (see m4a_seek() and m4a_seek_raw() in libm4a/m4a.c) and 
+     * to skip empty chunks (see m4a_check_sample_offset() in codecs/aac.c and
+     * libm4a/m4a.c).
+     * The seek/resume precision is lower than using sample_byte_size[] and 
+     * depends on numentries. Typically the resolution is ~1/10 of all frames
+     * which equals about 1/4-1/2 seconds. The loss of seek precision is 
+     * accepted to be able to avoid allocation of the large sample_byte_size[] 
+     * table. This reduces the memory consumption by a factor of 2 or even 
+     * more. */
+    i = 1;
+    frame = 0;
+    old_frame = qtmovie->res->sample_to_chunk[0].num_samples;
+    old_first = qtmovie->res->sample_to_chunk[0].first_chunk;
+    for (k = 1; k < numentries; ++k)
     {
-        qtmovie->res->chunk_offset[i] = stream_read_uint32(qtmovie->stream);
+        for (; i < qtmovie->res->num_sample_to_chunks; ++i)
+        {
+            old_frame = qtmovie->res->sample_to_chunk[i-1].num_samples;
+            old_first = qtmovie->res->sample_to_chunk[i-1].first_chunk;
+            new_first = qtmovie->res->sample_to_chunk[i  ].first_chunk;
+            
+            if (qtmovie->res->sample_to_chunk[i].first_chunk > k)
+                break;
+            
+            frame += (new_first - old_first) * old_frame;
+        }
+        frame += (k - old_first) * old_frame;
+        
+        qtmovie->res->lookup_table[idx].sample = frame;
+        qtmovie->res->lookup_table[idx].offset = offset;
+        idx++;
+        
+        frame -= (k - old_first) * old_frame;
+        
+        offset = stream_read_uint32(qtmovie->stream);
         size_remaining -= 4;
     }
 

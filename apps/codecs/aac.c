@@ -27,6 +27,11 @@
 
 CODEC_HEADER
 
+/* The maximum buffer size handled by faad. 12 bytes are required by libfaad
+ * as headroom (see libfaad/bits.c). FAAD_BYTE_BUFFER_SIZE bytes are buffered 
+ * for each frame. */
+#define FAAD_BYTE_BUFFER_SIZE (2048-12)
+
 /* Global buffers to be used in the mdct synthesis. This way the arrays can
  * be moved to IRAM for some targets */
 #define GB_BUF_SIZE 1024
@@ -159,7 +164,7 @@ next_track:
         /* Resume the desired (byte) position. Important: When resuming SBR
          * upsampling files the resulting sound_samples_done must be expanded 
          * by a factor of 2. This is done via using sbr_fac. */
-        if (alac_seek_raw(&demux_res, &input_stream, file_offset,
+        if (m4a_seek_raw(&demux_res, &input_stream, file_offset,
                           &sound_samples_done, (int*) &i)) {
             sound_samples_done *= sbr_fac;
             elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
@@ -188,9 +193,9 @@ next_track:
         if (ci->seek_time) {
             /* Seek to the desired time position. Important: When seeking in SBR
              * upsampling files the seek_time must be divided by 2 when calling 
-             * alac_seek and the resulting sound_samples_done must be expanded 
+             * m4a_seek and the resulting sound_samples_done must be expanded 
              * by a factor 2. This is done via using sbr_fac. */
-            if (alac_seek(&demux_res, &input_stream,
+            if (m4a_seek(&demux_res, &input_stream,
                           ((ci->seek_time-1)/10/sbr_fac)*(ci->id3->frequency/100),
                           &sound_samples_done, (int*) &i)) {
                 sound_samples_done *= sbr_fac;
@@ -211,7 +216,7 @@ next_track:
          * that an good question (but files with gaps do exist, so who 
          * knows?), so we don't support that - for now, at least.
          */    
-        file_offset = get_sample_offset(&demux_res, i);
+        file_offset = m4a_check_sample_offset(&demux_res, i);
 
         if (file_offset > ci->curpos)
         {
@@ -225,7 +230,7 @@ next_track:
         }
         
         /* Request the required number of bytes from the input buffer */
-        buffer=ci->request_buffer(&n, demux_res.sample_byte_size[i]);
+        buffer=ci->request_buffer(&n, FAAD_BYTE_BUFFER_SIZE);
 
         /* Decode one block - returned samples will be host-endian */
         ret = NeAACDecDecode(decoder, &frame_info, buffer, n);

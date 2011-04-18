@@ -59,6 +59,12 @@ typedef struct
 
 typedef struct
 {
+    uint32_t sample;
+    uint32_t offset;
+} sample_offset_t;
+
+typedef struct
+{
     uint16_t num_channels;
     uint16_t sound_sample_size;
     uint32_t sound_sample_rate;
@@ -68,13 +74,12 @@ typedef struct
     sample_to_chunk_t *sample_to_chunk;
     uint32_t num_sample_to_chunks;
     
-    uint32_t *chunk_offset;
-    uint32_t num_chunk_offsets;
+    sample_offset_t *lookup_table;
+    uint32_t num_lookup_table;
     
     time_to_sample_t *time_to_sample;
     uint32_t num_time_to_samples;
 
-    uint16_t *sample_byte_size;
     uint32_t num_sample_byte_sizes;
 
     uint32_t codecdata_len;
@@ -127,10 +132,11 @@ void stream_create(stream_t *stream,struct codec_api* ci);
 int get_sample_info(demux_res_t *demux_res, uint32_t sample,
     uint32_t *sample_duration, uint32_t *sample_byte_size);
 unsigned int get_sample_offset(demux_res_t *demux_res, uint32_t sample);
-unsigned int alac_seek (demux_res_t* demux_res, stream_t* stream,
+unsigned int m4a_seek (demux_res_t* demux_res, stream_t* stream,
     uint32_t sound_sample_loc, uint32_t* sound_samples_done, 
     int* current_sample);
-unsigned int alac_seek_raw (demux_res_t* demux_res, stream_t* stream,
+unsigned int m4a_seek_raw (demux_res_t* demux_res, stream_t* stream,
     uint32_t file_loc, uint32_t* sound_samples_done, int* current_sample);
+int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame);
 
 #endif /* STREAM_H */

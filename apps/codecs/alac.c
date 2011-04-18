@@ -25,6 +25,10 @@
 
 CODEC_HEADER
 
+/* The maximum buffer size handled. This amount of bytes is buffered for each 
+ * frame. */
+#define ALAC_BYTE_BUFFER_SIZE 32768
+
 static int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE] IBSS_ATTR;
 
 /* this is the codec entry point */
@@ -83,7 +87,7 @@ enum codec_status codec_main(void)
   /* Set i for first frame, seek to desired sample position for resuming. */
   i=0;
   if (samplesdone > 0) {
-    if (alac_seek(&demux_res, &input_stream, samplesdone,
+    if (m4a_seek(&demux_res, &input_stream, samplesdone,
                   &samplesdone, (int*) &i)) {
         elapsedtime = (samplesdone * 10) / (ci->id3->frequency / 100);
         ci->set_elapsed(elapsedtime);
@@ -101,7 +105,7 @@ enum codec_status codec_main(void)
 
     /* Deal with any pending seek requests */
     if (ci->seek_time) {
-      if (alac_seek(&demux_res, &input_stream,
+      if (m4a_seek(&demux_res, &input_stream,
                     ((ci->seek_time-1)/10) * (ci->id3->frequency/100),
                     &samplesdone, (int *)&i)) {
         elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
@@ -111,11 +115,7 @@ enum codec_status codec_main(void)
     }
 
     /* Request the required number of bytes from the input buffer */
-    buffer=ci->request_buffer(&n, demux_res.sample_byte_size[i]);
-    if (n!=demux_res.sample_byte_size[i]) {
-        retval = CODEC_ERROR;
-        goto done;
-    }
+    buffer=ci->request_buffer(&n, ALAC_BYTE_BUFFER_SIZE);
 
     /* Decode one block - returned samples will be host-endian */
     ci->yield();
