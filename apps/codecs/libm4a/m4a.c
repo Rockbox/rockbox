@@ -124,10 +124,14 @@ void stream_create(stream_t *stream,struct codec_api* ci)
 
 /* Check if there is a dedicated byte position contained for the given frame.
  * Return this byte position in case of success or return -1. This allows to
- * skip empty samples. */
-int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame)
+ * skip empty samples. 
+ * During standard playback the search result (index i) will always increase. 
+ * Therefor we save this index and let the caller set this value again as start
+ * index when calling m4a_check_sample_offset() for the next frame. This 
+ * reduces the overall loop count significantly. */
+int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame, uint32_t *start)
 {
-    uint32_t i = 0;
+    uint32_t i = *start;
     for (i=0; i<demux_res->num_lookup_table; ++i)
     {
         if (demux_res->lookup_table[i].sample > frame ||
@@ -136,6 +140,7 @@ int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame)
         if (demux_res->lookup_table[i].sample == frame)
             break;
     }
+    *start = i;
     return demux_res->lookup_table[i].offset;
 }
 

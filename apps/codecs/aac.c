@@ -61,6 +61,7 @@ enum codec_status codec_main(void)
     NeAACDecFrameInfo frame_info;
     NeAACDecHandle decoder;
     int err;
+    uint32_t seek_idx = 0;
     uint32_t s = 0;
     uint32_t sbr_fac = 1;
     unsigned char c = 0;
@@ -201,7 +202,8 @@ next_track:
                 sound_samples_done *= sbr_fac;
                 elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
                 ci->set_elapsed(elapsed_time);
-            
+                seek_idx = 0;
+
                 if (i == 0) 
                 {
                     lead_trim = ci->id3->lead_trim;
@@ -215,8 +217,8 @@ next_track:
          * "proper" file can have chunks out of order. Why one would want
          * that an good question (but files with gaps do exist, so who 
          * knows?), so we don't support that - for now, at least.
-         */    
-        file_offset = m4a_check_sample_offset(&demux_res, i);
+         */
+        file_offset = m4a_check_sample_offset(&demux_res, i, &seek_idx);
 
         if (file_offset > ci->curpos)
         {
