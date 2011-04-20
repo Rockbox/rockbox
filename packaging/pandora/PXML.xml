@@ -1,21 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PXML xmlns="http://openpandora.org/namespaces/PXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="PXML_schema.xsd">
 
+  <!-- Note: Don't change the unique ID -->
+  <package id="rockbox.thomasjfox.003">
+    <author name="Thomas Jarosch" website="http://www.rockbox.org"/>
+
+    <!-- Note: Another version tag below -->
+    <version major="3" minor="8" release="x" build="3"/>
+
+    <titles>
+      <title lang="en_US">Rockbox</title>
+    </titles>
+
+    <descriptions>
+      <description lang="en_US">rockbox digital music player</description>
+    </descriptions>
+
+    <icon src="rockbox.png"/>
+  </package>
+
+  <!-- Note: Don't change the unique ID -->
   <application id="rockbox.thomasjfox.003" appdata="rockbox">
     <exec command="run_rockbox.sh"/>
 
-    <title lang="en_US">Rockbox</title>
+    <titles>
+      <title lang="en_US">Rockbox</title>
+    </titles>
+
     <!-- if you want to provide a manual, uncomment the following line and set correct values! -->
     <!-- <info name=" manual" type="html" src="manual.html"/> -->
 
-    <author name="Thomas Jarosch" website="http://www.rockbox.org"/>
+    <author name="The rockbox team" website="http://www.rockbox.org"/>
 
     <version major="3" minor="8" release="x" build="3"/>
+
     <osversion major="1" minor="0" release="0" build="0"/>
 
-    <description lang="en_US">rockbox digital music player</description>
+    <descriptions>
+      <description lang="en_US">rockbox digital music player</description>
+    </descriptions>
 
     <icon src="rockbox.png"/>
+
+    <licenses>
+      <license name="GPLv2+" url="http://www.gnu.org/licenses/gpl-2.0.html" sourcecodeurl="http://rockbox.org"/>
+      <license name="other"/>
+    </licenses>
 
     <previewpics>
     <pic src="rockbox_preview.jpg"/>
