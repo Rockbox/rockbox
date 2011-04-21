@@ -218,6 +218,628 @@ static void iap_set_remote_volume(void)
     iap_send_pkt(data, sizeof(data));
 }
 
+static void iap_handlepkt_mode0(void)
+{
+    unsigned int cmd = serbuf[2];
+    switch (cmd) {
+    
+        case 0x24:
+        {
+            /* ipod video send this */
+            unsigned char data[] = {0x00, 0x25, 0x00, 0x00, 0x00,
+                                    0x00, 0x00, 0x00, 0x00, 0x01};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        case 0x18:
+        {
+            /* ciphered authentication command */
+            /* Isn't used since we don't send the 0x00 0x17 command */
+            break;
+        }
+
+        case 0x15:
+        {
+            unsigned char data0[] = {0x00, 0x16, 0x00};
+            iap_send_pkt(data0, sizeof(data0));
+            unsigned char data1[] = {0x00, 0x27, 0x00};
+            iap_send_pkt(data1, sizeof(data1));
+            /* authentication ack, mandatory to enable some hardware */
+            unsigned char data2[] = {0x00, 0x19, 0x00};
+            iap_send_pkt(data2, sizeof(data2));
+            if (radio_present == 1)
+            {
+                /* get tuner capacities */
+                unsigned char data3[] = {0x07, 0x01};
+                iap_send_pkt(data3, sizeof(data3));
+            }
+            iap_set_remote_volume();
+            break;
+        }
+
+        case 0x13:
+        {
+            unsigned char data[] = {0x00, 0x02, 0x00, 0x13};
+            iap_send_pkt(data, sizeof(data));
+
+            if (serbuf[6] == 0x35)
+            /* FM transmitter sends this: */
+            /* FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??)*/
+            {
+                unsigned char data2[] = {0x00, 0x27, 0x00};
+                iap_send_pkt(data2, sizeof(data2));
+                unsigned char data3[] = {0x05, 0x02};
+                iap_send_pkt(data3, sizeof(data3));
+            }
+
+            else
+            {
+                /* ipod fm remote sends this: */ 
+                /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 */
+                if (serbuf[6] |= 0x80)
+                    radio_present = 1;
+                unsigned char data4[] = {0x00, 0x14};
+                iap_send_pkt(data4, sizeof(data4));
+            }
+            break;
+        }
+
+        /* Init */
+        case 0x0F:
+        {
+            unsigned char data[] = {0x00, 0x10, 0x00, 0x01, 0x05};
+            data[2] = serbuf[3];
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* get model info */
+        case 0x0D:
+        {
+            /* ipod is supposed to work only with 5G and nano 2G */
+            /*{0x00, 0x0E, 0x00, 0x0B, 0x00, 0x05, 0x50, 0x41, 0x31, 0x34, 
+                    0x37, 0x4C, 0x4C, 0x00};    PA147LL (IPOD 5G 60 GO) */
+            unsigned char data[] = {0x00, 0x0E, 0x00, 0x0B, 0x00, 0x10,
+                                'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* Ipod FM remote sends this: FF 55 02 00 09 F5  */
+        case 0x09:
+        {
+            /* ipod5G firmware version */
+            unsigned char data[] = {0x00, 0x0A, 0x01, 0x02, 0x01 };
+            iap_send_pkt(data, sizeof(data));
+            break;
+        } 
+
+        /* FM transmitter sends this: */
+        /* FF 55 02 00 05 F9 (mode switch: AiR mode) */
+        case 0x05:
+        {
+            unsigned char data[] = {0x00, 0x02, 0x06,
+                                    0x05, 0x00, 0x00, 0x0B, 0xB8, 0x28};
+            iap_send_pkt(data, sizeof(data));
+            unsigned char data2[] = {0x00, 0x02, 0x00, 0x05};
+            iap_send_pkt(data2, sizeof(data2));
+            break;
+        }
+
+        case 0x01:
+        {
+            /* FM transmitter sends this: */
+            /* FF 55 06 00 01 05 00 02 01 F1 (mode switch) */
+            if(serbuf[3] == 0x05)
+            {
+                sleep(HZ/3);
+                unsigned char data[] = {0x05, 0x02};
+                iap_send_pkt(data, sizeof(data));
+            }
+            /* FM remote sends this: */
+            /* FF 55 03 00 01 02 FA (1st thing sent) */
+            else if(serbuf[3] == 0x02)
+            {
+                /* useful only for apple firmware */
+            }
+            break;
+        }
+
+        /* default response is with cmd ok packet */
+        default:
+        {
+            unsigned char data[] = {0x00, 0x02, 0x00, 0x00};
+            data[3] = cmd; /* respond with cmd */
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+    }
+}
+
+static void iap_handlepkt_mode2(void)
+{
+    if(serbuf[2] != 0) return;
+    iap_remotebtn = BUTTON_NONE;
+    iap_remotetick = false;
+    
+    if(serbuf[0] >= 3 && serbuf[3] != 0)
+    {
+        if(serbuf[3] & 1)
+            iap_remotebtn |= BUTTON_RC_PLAY;
+        if(serbuf[3] & 2)
+            iap_remotebtn |= BUTTON_RC_VOL_UP;
+        if(serbuf[3] & 4)
+            iap_remotebtn |= BUTTON_RC_VOL_DOWN;
+        if(serbuf[3] & 8)
+            iap_remotebtn |= BUTTON_RC_RIGHT;
+        if(serbuf[3] & 16)
+            iap_remotebtn |= BUTTON_RC_LEFT;
+    }
+    else if(serbuf[0] >= 4 && serbuf[4] != 0)
+    {
+        if(serbuf[4] & 1) /* play */
+        {
+            if (audio_status() != AUDIO_STATUS_PLAY)
+            {
+                iap_remotebtn |= BUTTON_RC_PLAY;
+                iap_repeatbtn = 2;
+                iap_remotetick = false;
+                iap_changedctr = 1;
+            }
+        }
+        if(serbuf[4] & 2) /* pause */
+        {
+            if (audio_status() == AUDIO_STATUS_PLAY)
+            {
+                iap_remotebtn |= BUTTON_RC_PLAY;
+                iap_repeatbtn = 2;
+                iap_remotetick = false;
+                iap_changedctr = 1;
+            }
+        }
+        if((serbuf[4] & 128) && !iap_btnshuffle) /* shuffle */
+        {
+            iap_btnshuffle = true;
+            if(!global_settings.playlist_shuffle)
+            {
+                global_settings.playlist_shuffle = 1;
+                settings_save();
+                if (audio_status() & AUDIO_STATUS_PLAY)
+                    playlist_randomise(NULL, current_tick, true);
+            }
+            else if(global_settings.playlist_shuffle)
+            {
+                global_settings.playlist_shuffle = 0;
+                settings_save();
+                if (audio_status() & AUDIO_STATUS_PLAY)
+                    playlist_sort(NULL, true);
+            }
+        }
+        else
+            iap_btnshuffle = false;
+    }
+    else if(serbuf[0] >= 5 && serbuf[5] != 0)
+    {
+        if((serbuf[5] & 1) && !iap_btnrepeat) /* repeat */
+        {
+            int oldmode = global_settings.repeat_mode;
+            iap_btnrepeat = true;
+        
+            if (oldmode == REPEAT_ONE)
+                    global_settings.repeat_mode = REPEAT_OFF;
+            else if (oldmode == REPEAT_ALL)
+                    global_settings.repeat_mode = REPEAT_ONE;
+            else if (oldmode == REPEAT_OFF)
+                    global_settings.repeat_mode = REPEAT_ALL;
+
+            settings_save();
+            if (audio_status() & AUDIO_STATUS_PLAY)
+            audio_flush_and_reload_tracks();
+        }
+        else
+            iap_btnrepeat = false;
+
+        if(serbuf[5] & 16) /* ffwd */
+        {
+            iap_remotebtn |= BUTTON_RC_RIGHT;
+        }
+        if(serbuf[5] & 32) /* frwd */
+        {
+            iap_remotebtn |= BUTTON_RC_LEFT;
+        }
+    }
+}
+
+static void iap_handlepkt_mode3(void)
+{
+    unsigned int cmd = serbuf[2];
+    switch (cmd)
+    {
+        /* some kind of status packet? */
+        case 0x01:
+        {
+            unsigned char data[] = {0x03, 0x02, 0x00, 0x00, 0x00, 0x00};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        case 0x08:
+        {
+            /* ACK */
+            unsigned char data[] = {0x03, 0x00, 0x00, 0x08};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        
+        case 0x0C:
+        {
+            /* request ipod volume */
+            if (serbuf[3] == 0x04)
+            {
+                iap_set_remote_volume();
+            }
+            break;
+        }
+        /* get volume from accessory */
+        case 0x0E:
+        {
+            if (serbuf[3] == 0x04)
+                global_settings.volume = (-58)+((int)serbuf[5]+1)/4;
+                sound_set_volume(global_settings.volume);   /* indent BUG? */
+            break;
+        }
+    }
+}
+
+static void iap_handlepkt_mode4(void)
+{
+    unsigned int cmd = (serbuf[2] << 8) | serbuf[3];
+    switch (cmd)
+    {
+        /* Get data updated??? flag */
+        case 0x0009:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x0A, 0x00};
+            data[3] = iap_updateflag ? 0 : 1;
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Set data updated??? flag */
+        case 0x000B:
+        {
+            iap_updateflag = serbuf[4] ? 0 : 1;
+            /* respond with cmd ok packet */
+            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x0B};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Get iPod size? */
+        case 0x0012:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x13, 0x01, 0x0B};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Get count of given types */
+        case 0x0018:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00};
+            unsigned long num = 0;
+            switch(serbuf[4]) /* type number */
+            {
+                case 0x01: /* total number of playlists */
+                    num = 1;
+                    break;
+                case 0x05: /* total number of songs */
+                    num = 1;
+            }
+            data[3] = num >> 24;
+            data[4] = num >> 16;
+            data[5] = num >> 8;
+            data[6] = num;
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Get time and status */
+        case 0x001C:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x1D, 0x00, 0x00, 0x00, 
+                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+            struct mp3entry *id3 = audio_current_track();
+            unsigned long time_total = id3->length;
+            unsigned long time_elapsed = id3->elapsed;
+            int status = audio_status();
+            data[3] = time_total >> 24;
+            data[4] = time_total >> 16;
+            data[5] = time_total >> 8;
+            data[6] = time_total;
+            data[7] = time_elapsed >> 24;
+            data[8] = time_elapsed >> 16;
+            data[9] = time_elapsed >> 8;
+            data[10] = time_elapsed;
+            if (status == AUDIO_STATUS_PLAY)
+                data[11] = 0x01; /* play */
+            else if (status & AUDIO_STATUS_PAUSE)
+                data[11] = 0x02; /* pause */ 
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Get current pos in playlist */
+        case 0x001E:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x1F, 0x00, 0x00, 0x00, 0x00};
+            long playlist_pos = playlist_next(0);
+            playlist_pos -= playlist_get_first_index(NULL);
+            if(playlist_pos < 0)
+                playlist_pos += playlist_amount();
+            data[3] = playlist_pos >> 24;
+            data[4] = playlist_pos >> 16;
+            data[5] = playlist_pos >> 8;
+            data[6] = playlist_pos;
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Get title of a song number */
+        case 0x0020:
+        /* Get artist of a song number */
+        case 0x0022:
+        /* Get album of a song number */
+        case 0x0024:
+        {
+            unsigned char data[70] = {0x04, 0x00, 0xFF};
+            struct mp3entry id3;
+            int fd;
+            size_t len;
+            long tracknum = (signed long)serbuf[4] << 24 |
+                            (signed long)serbuf[5] << 16 |
+                            (signed long)serbuf[6] << 8 | serbuf[7];
+            data[2] = serbuf[3] + 1;
+            memcpy(&id3, audio_current_track(), sizeof(id3));
+            tracknum += playlist_get_first_index(NULL);
+            if(tracknum >= playlist_amount())
+                tracknum -= playlist_amount();
+
+            /* If the tracknumber is not the current one,
+               read id3 from disk */
+            if(playlist_next(0) != tracknum)
+            {
+                struct playlist_track_info info;
+                playlist_get_track_info(NULL, tracknum, &info);
+                fd = open(info.filename, O_RDONLY);
+                memset(&id3, 0, sizeof(struct mp3entry));
+                get_metadata(&id3, fd, info.filename);
+                close(fd);
+            }
+
+            /* Return the requested track data */
+            switch(serbuf[3])
+            {
+                case 0x20:
+                    len = strlcpy((char *)&data[3], id3.title, 64);
+                        iap_send_pkt(data, 4+len);
+                    break;
+                case 0x22:
+                    len = strlcpy((char *)&data[3], id3.artist, 64);
+                        iap_send_pkt(data, 4+len);
+                    break;
+                case 0x24:
+                    len = strlcpy((char *)&data[3], id3.album, 64);
+                        iap_send_pkt(data, 4+len);
+                    break;
+            }
+            break;
+        }
+        /* Set polling mode */
+        case 0x0026:
+        {
+            iap_pollspeed = serbuf[4] ? 1 : 0;
+            /*responsed with cmd ok packet */
+            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x26};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* AiR playback control */
+        case 0x0029:
+        {
+            /* respond with cmd ok packet */
+            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x29};
+            iap_send_pkt(data, sizeof(data));
+            switch(serbuf[4])
+            {
+                case 0x01: /* play/pause */
+                    iap_remotebtn = BUTTON_RC_PLAY;
+                    iap_repeatbtn = 2;
+                    iap_remotetick = false;
+                    iap_changedctr = 1;
+                    break;
+                case 0x02: /* stop */
+                    iap_remotebtn = BUTTON_RC_PLAY|BUTTON_REPEAT;
+                    iap_repeatbtn = 2;
+                    iap_remotetick = false;
+                    iap_changedctr = 1;
+                    break;
+                case 0x03: /* skip++ */
+                    iap_remotebtn = BUTTON_RC_RIGHT;
+                    iap_repeatbtn = 2;
+                    iap_remotetick = false;
+                    break;
+                case 0x04: /* skip-- */
+                    iap_remotebtn = BUTTON_RC_LEFT;
+                    iap_repeatbtn = 2;
+                    iap_remotetick = false;
+                    break;
+                case 0x05: /* ffwd */
+                    iap_remotebtn = BUTTON_RC_RIGHT;
+                    iap_remotetick = false;
+                    if(iap_pollspeed) iap_pollspeed = 5;
+                    break;
+                case 0x06: /* frwd */
+                    iap_remotebtn = BUTTON_RC_LEFT;
+                    iap_remotetick = false;
+                    if(iap_pollspeed) iap_pollspeed = 5;
+                    break;
+                case 0x07: /* end ffwd/frwd */
+                    iap_remotebtn = BUTTON_NONE;
+                    iap_remotetick = false;
+                    if(iap_pollspeed) iap_pollspeed = 1;
+                    break;
+            }
+            break;
+        }
+        /* Get shuffle mode */
+        case 0x002C:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x2D, 0x00};
+            data[3] = global_settings.playlist_shuffle ? 1 : 0;
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Set shuffle mode */
+        case 0x002E:
+        {
+            if(serbuf[4] && !global_settings.playlist_shuffle)
+            {
+                global_settings.playlist_shuffle = 1;
+                settings_save();
+                if (audio_status() & AUDIO_STATUS_PLAY)
+                    playlist_randomise(NULL, current_tick, true);
+            }
+            else if(!serbuf[4] && global_settings.playlist_shuffle)
+            {
+                global_settings.playlist_shuffle = 0;
+                settings_save();
+                if (audio_status() & AUDIO_STATUS_PLAY)
+                    playlist_sort(NULL, true);
+            }
+
+            
+            /* respond with cmd ok packet */
+            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x2E};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Get repeat mode */
+        case 0x002F:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x30, 0x00};
+            if(global_settings.repeat_mode == REPEAT_OFF)
+                data[3] = 0;
+            else if(global_settings.repeat_mode == REPEAT_ONE)
+                data[3] = 1;
+            else
+                data[3] = 2;
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Set repeat mode */
+        case 0x0031:
+        {
+            int oldmode = global_settings.repeat_mode;
+            if (serbuf[4] == 0)
+                global_settings.repeat_mode = REPEAT_OFF;
+            else if (serbuf[4] == 1)
+                global_settings.repeat_mode = REPEAT_ONE;
+            else if (serbuf[4] == 2)
+                global_settings.repeat_mode = REPEAT_ALL;
+
+            if (oldmode != global_settings.repeat_mode)
+            {
+                settings_save();
+                if (audio_status() & AUDIO_STATUS_PLAY)
+                    audio_flush_and_reload_tracks();
+            }
+
+            /* respond with cmd ok packet */
+            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x31};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }        
+        /* Get Screen Size */
+        case 0x0033:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x34,
+                                    LCD_WIDTH >> 8, LCD_WIDTH & 0xff,
+                                    LCD_HEIGHT >> 8, LCD_HEIGHT & 0xff,
+                                    0x01};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* Get number songs in current playlist */
+        case 0x0035:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x36, 0x00, 0x00, 0x00, 0x00};
+            unsigned long playlist_amt = playlist_amount();
+            data[3] = playlist_amt >> 24;
+            data[4] = playlist_amt >> 16;
+            data[5] = playlist_amt >> 8;
+            data[6] = playlist_amt;
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }                
+        /* Jump to track number in current playlist */
+        case 0x0037:
+        {
+            int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
+            long tracknum = (signed long)serbuf[4] << 24 |
+                            (signed long)serbuf[5] << 16 |
+                            (signed long)serbuf[6] << 8 | serbuf[7];
+            audio_pause();
+            audio_skip(tracknum - playlist_next(0));
+            if (!paused)
+                audio_resume();
+            
+            /* respond with cmd ok packet */
+            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x00};
+            data[4] = serbuf[2];
+            data[5] = serbuf[3];
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        default:
+        {
+            /* default response is with cmd ok packet */
+            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x00};
+            data[4] = serbuf[2];
+            data[5] = serbuf[3];
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+    }
+}
+
+static void iap_handlepkt_mode7(void)
+{
+    unsigned int cmd = serbuf[2];
+    switch (cmd)
+    {
+        /* tuner capabilities */
+        case 0x02:
+        {
+            /* do nothing */
+            
+            unsigned char data[] = {0x00, 0x27, 0x00};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        /* actual tuner frequency */
+        case 0x0A:
+        /* fall through */
+        /* tuner frequency from scan */
+        case 0x13:
+        {
+            rmt_tuner_freq(serbuf);
+            break;
+        }
+        /* RDS station name 0x21 1E 00 + ASCII text*/
+        case 0x21:
+        {
+            rmt_tuner_rds_data(serbuf);
+            break;
+        }
+    }
+}
+
 void iap_handlepkt(void)
 {
 
@@ -232,622 +854,15 @@ void iap_handlepkt(void)
         return;
     }
 
-    /* Handle Mode 0 */
-    if (serbuf[1] == 0x00)
-    {
-        switch (serbuf[2])
-        {
-            case 0x24:
-            {
-                /* ipod video send this */
-                unsigned char data[] = {0x00, 0x25, 0x00, 0x00, 0x00,
-                                                0x00, 0x00, 0x00, 0x00,0x01};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-
-            case 0x18:
-            {
-                /* ciphered authentication command */
-                /* Isn't used since we don't send the 0x00 0x17 command */
-                break;
-            }
-
-            case 0x15:
-            {
-                unsigned char data0[] = {0x00, 0x16, 0x00};
-                iap_send_pkt(data0, sizeof(data0));
-                unsigned char data1[] = {0x00, 0x27, 0x00};
-                iap_send_pkt(data1, sizeof(data1));
-                /* authentication ack, mandatory to enable some hardware */
-                unsigned char data2[] = {0x00, 0x19, 0x00};
-                iap_send_pkt(data2, sizeof(data2));
-                if (radio_present == 1)
-                {
-                    /* get tuner capacities */
-                    unsigned char data3[] = {0x07, 0x01};
-                    iap_send_pkt(data3, sizeof(data3));
-                }
-                iap_set_remote_volume();
-                break;
-            }
-
-            case 0x13:
-            {
-                unsigned char data[] = {0x00, 0x02, 0x00, 0x13};
-                iap_send_pkt(data, sizeof(data));
-
-                if (serbuf[6] == 0x35)
-                /* FM transmitter sends this: */
-                /* FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??)*/
-                {
-                    unsigned char data2[] = {0x00, 0x27, 0x00};
-                    iap_send_pkt(data2, sizeof(data2));
-                    unsigned char data3[] = {0x05, 0x02};
-                    iap_send_pkt(data3, sizeof(data3));
-                }
-
-                else
-                {
-                    /* ipod fm remote sends this: */ 
-                    /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 */
-                    if (serbuf[6] |= 0x80)
-                        radio_present = 1;
-                    unsigned char data4[] = {0x00, 0x14};
-                    iap_send_pkt(data4, sizeof(data4));
-                }
-                break;
-            }
-
-            /* Init */
-            case 0x0F:
-            {
-                unsigned char data[] = {0x00, 0x10, 0x00, 0x01, 0x05};
-                data[2] = serbuf[3];
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-
-            /* get model info */
-            case 0x0D:
-            {
-                /* ipod is supposed to work only with 5G and nano 2G */
-                /*{0x00, 0x0E, 0x00, 0x0B, 0x00, 0x05, 0x50, 0x41, 0x31, 0x34, 
-                        0x37, 0x4C, 0x4C, 0x00};    PA147LL (IPOD 5G 60 GO) */
-                unsigned char data[] = {0x00, 0x0E, 0x00, 0x0B, 0x00, 0x10,
-                                    'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-
-            /* Ipod FM remote sends this: FF 55 02 00 09 F5  */
-            case 0x09:
-            {
-                /* ipod5G firmware version */
-                unsigned char data[] = {0x00, 0x0A, 0x01, 0x02, 0x01 };
-                iap_send_pkt(data, sizeof(data));
-                break;
-            } 
-
-            /* FM transmitter sends this: */
-            /* FF 55 02 00 05 F9 (mode switch: AiR mode) */
-            case 0x05:
-            {
-                unsigned char data[] = {0x00, 0x02, 0x06,
-                                        0x05, 0x00, 0x00, 0x0B, 0xB8, 0x28};
-                iap_send_pkt(data, sizeof(data));
-                unsigned char data2[] = {0x00, 0x02, 0x00, 0x05};
-                iap_send_pkt(data2, sizeof(data2));
-                break;
-            }
-
-            case 0x01:
-            {
-                /* FM transmitter sends this: */
-                /* FF 55 06 00 01 05 00 02 01 F1 (mode switch) */
-                if(serbuf[3] == 0x05)
-                {
-                    sleep(HZ/3);
-                    unsigned char data[] = {0x05, 0x02};
-                    iap_send_pkt(data, sizeof(data));
-                }
-                /* FM remote sends this: */
-                /* FF 55 03 00 01 02 FA (1st thing sent) */
-                else if(serbuf[3] == 0x02)
-                {
-                    /* useful only for apple firmware */
-                }
-                break;
-            }
-
-            /* default response is with cmd ok packet */
-            default:
-            {
-                unsigned char data[] = {0x00, 0x02, 0x00, 0x00};
-                data[3] = serbuf[2]; /* respond with cmd */
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-        }
+    unsigned char mode = serbuf[1];
+    switch (mode) {
+    case 0: iap_handlepkt_mode0(); break;
+    case 2: iap_handlepkt_mode2(); break;
+    case 3: iap_handlepkt_mode3(); break;
+    case 4: iap_handlepkt_mode4(); break;
+    case 7: iap_handlepkt_mode7(); break;
     }
-    /* Handle Mode 2 */
-    else if (serbuf[1] == 0x02)
-    {
-        if(serbuf[2] != 0) return;
-        iap_remotebtn = BUTTON_NONE;
-        iap_remotetick = false;
-        
-        if(serbuf[0] >= 3 && serbuf[3] != 0)
-        {
-            if(serbuf[3] & 1)
-                iap_remotebtn |= BUTTON_RC_PLAY;
-            if(serbuf[3] & 2)
-                iap_remotebtn |= BUTTON_RC_VOL_UP;
-            if(serbuf[3] & 4)
-                iap_remotebtn |= BUTTON_RC_VOL_DOWN;
-            if(serbuf[3] & 8)
-                iap_remotebtn |= BUTTON_RC_RIGHT;
-            if(serbuf[3] & 16)
-                iap_remotebtn |= BUTTON_RC_LEFT;
-        }
-        else if(serbuf[0] >= 4 && serbuf[4] != 0)
-        {
-            if(serbuf[4] & 1) /* play */
-            {
-                if (audio_status() != AUDIO_STATUS_PLAY)
-                {
-                    iap_remotebtn |= BUTTON_RC_PLAY;
-                    iap_repeatbtn = 2;
-                    iap_remotetick = false;
-                    iap_changedctr = 1;
-                }
-            }
-            if(serbuf[4] & 2) /* pause */
-            {
-                if (audio_status() == AUDIO_STATUS_PLAY)
-                {
-                    iap_remotebtn |= BUTTON_RC_PLAY;
-                    iap_repeatbtn = 2;
-                    iap_remotetick = false;
-                    iap_changedctr = 1;
-                }
-            }
-            if((serbuf[4] & 128) && !iap_btnshuffle) /* shuffle */
-            {
-                iap_btnshuffle = true;
-                if(!global_settings.playlist_shuffle)
-                {
-                    global_settings.playlist_shuffle = 1;
-                    settings_save();
-                    if (audio_status() & AUDIO_STATUS_PLAY)
-                        playlist_randomise(NULL, current_tick, true);
-                }
-                else if(global_settings.playlist_shuffle)
-                {
-                    global_settings.playlist_shuffle = 0;
-                    settings_save();
-                    if (audio_status() & AUDIO_STATUS_PLAY)
-                        playlist_sort(NULL, true);
-                }
-            }
-            else
-                iap_btnshuffle = false;
-        }
-        else if(serbuf[0] >= 5 && serbuf[5] != 0)
-        {
-            if((serbuf[5] & 1) && !iap_btnrepeat) /* repeat */
-            {
-                int oldmode = global_settings.repeat_mode;
-                iap_btnrepeat = true;
-            
-                if (oldmode == REPEAT_ONE)
-                        global_settings.repeat_mode = REPEAT_OFF;
-                else if (oldmode == REPEAT_ALL)
-                        global_settings.repeat_mode = REPEAT_ONE;
-                else if (oldmode == REPEAT_OFF)
-                        global_settings.repeat_mode = REPEAT_ALL;
 
-                settings_save();
-                if (audio_status() & AUDIO_STATUS_PLAY)
-                audio_flush_and_reload_tracks();
-            }
-            else
-                iap_btnrepeat = false;
-
-            if(serbuf[5] & 16) /* ffwd */
-            {
-                iap_remotebtn |= BUTTON_RC_RIGHT;
-            }
-            if(serbuf[5] & 32) /* frwd */
-            {
-                iap_remotebtn |= BUTTON_RC_LEFT;
-            }
-        }
-    }
-    /* Handle Mode 3 */
-    else if (serbuf[1] == 0x03)
-    {
-        switch(serbuf[2])
-        {
-            /* some kind of status packet? */
-            case 0x01:
-            {
-                unsigned char data[] = {0x03, 0x02, 0x00, 0x00, 0x00, 0x00};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-
-            case 0x08:
-            {
-                /* ACK */
-                unsigned char data[] = {0x03, 0x00, 0x00, 0x08};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            
-            case 0x0C:
-            {
-                /* request ipod volume */
-                if (serbuf[3] == 0x04)
-                {
-                    iap_set_remote_volume();
-                }
-                break;
-            }
-            /* get volume from accessory */
-            case 0x0E:
-                if (serbuf[3] == 0x04)
-                    global_settings.volume = (-58)+((int)serbuf[5]+1)/4;
-                    sound_set_volume(global_settings.volume);
-                break;
-        }
-    }
-    /* Handle Mode 4 */
-    else if (serbuf[1] == 0x04)
-    {
-        switch (((unsigned long)serbuf[2] << 8) | serbuf[3])
-        {
-            /* Get data updated??? flag */
-            case 0x0009:
-            {
-                unsigned char data[] = {0x04, 0x00, 0x0A, 0x00};
-                data[3] = iap_updateflag ? 0 : 1;
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Set data updated??? flag */
-            case 0x000B:
-            {
-                iap_updateflag = serbuf[4] ? 0 : 1;
-                /* respond with cmd ok packet */
-                unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x0B};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Get iPod size? */
-            case 0x0012:
-            {
-                unsigned char data[] = {0x04, 0x00, 0x13, 0x01, 0x0B};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Get count of given types */
-            case 0x0018:
-            {
-                unsigned char data[] = {0x04, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00};
-                unsigned long num = 0;
-                switch(serbuf[4]) /* type number */
-                {
-                    case 0x01: /* total number of playlists */
-                        num = 1;
-                        break;
-                    case 0x05: /* total number of songs */
-                        num = 1;
-                }
-                data[3] = num >> 24;
-                data[4] = num >> 16;
-                data[5] = num >> 8;
-                data[6] = num;
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Get time and status */
-            case 0x001C:
-            {
-                unsigned char data[] = {0x04, 0x00, 0x1D, 0x00, 0x00, 0x00, 
-                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-                struct mp3entry *id3 = audio_current_track();
-                unsigned long time_total = id3->length;
-                unsigned long time_elapsed = id3->elapsed;
-                int status = audio_status();
-                data[3] = time_total >> 24;
-                data[4] = time_total >> 16;
-                data[5] = time_total >> 8;
-                data[6] = time_total;
-                data[7] = time_elapsed >> 24;
-                data[8] = time_elapsed >> 16;
-                data[9] = time_elapsed >> 8;
-                data[10] = time_elapsed;
-                if (status == AUDIO_STATUS_PLAY)
-                    data[11] = 0x01; /* play */
-                else if (status & AUDIO_STATUS_PAUSE)
-                    data[11] = 0x02; /* pause */ 
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Get current pos in playlist */
-            case 0x001E:
-            {
-                unsigned char data[] = {0x04, 0x00, 0x1F, 0x00, 0x00, 0x00, 0x00};
-                long playlist_pos = playlist_next(0);
-                playlist_pos -= playlist_get_first_index(NULL);
-                if(playlist_pos < 0)
-                    playlist_pos += playlist_amount();
-                data[3] = playlist_pos >> 24;
-                data[4] = playlist_pos >> 16;
-                data[5] = playlist_pos >> 8;
-                data[6] = playlist_pos;
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Get title of a song number */
-            case 0x0020:
-            /* Get artist of a song number */
-            case 0x0022:
-            /* Get album of a song number */
-            case 0x0024:
-            {
-                unsigned char data[70] = {0x04, 0x00, 0xFF};
-                struct mp3entry id3;
-                int fd;
-                size_t len;
-                long tracknum = (signed long)serbuf[4] << 24 |
-                                (signed long)serbuf[5] << 16 |
-                                (signed long)serbuf[6] << 8 | serbuf[7];
-                data[2] = serbuf[3] + 1;
-                memcpy(&id3, audio_current_track(), sizeof(id3));
-                tracknum += playlist_get_first_index(NULL);
-                if(tracknum >= playlist_amount())
-                    tracknum -= playlist_amount();
-
-                /* If the tracknumber is not the current one,
-                   read id3 from disk */
-                if(playlist_next(0) != tracknum)
-                {
-                    struct playlist_track_info info;
-                    playlist_get_track_info(NULL, tracknum, &info);
-                    fd = open(info.filename, O_RDONLY);
-                    memset(&id3, 0, sizeof(struct mp3entry));
-                    get_metadata(&id3, fd, info.filename);
-                    close(fd);
-                }
-
-                /* Return the requested track data */
-                switch(serbuf[3])
-                {
-                    case 0x20:
-                        len = strlcpy((char *)&data[3], id3.title, 64);
-                            iap_send_pkt(data, 4+len);
-                        break;
-                    case 0x22:
-                        len = strlcpy((char *)&data[3], id3.artist, 64);
-                            iap_send_pkt(data, 4+len);
-                        break;
-                    case 0x24:
-                        len = strlcpy((char *)&data[3], id3.album, 64);
-                            iap_send_pkt(data, 4+len);
-                        break;
-                }
-                break;
-            }
-            /* Set polling mode */
-            case 0x0026:
-            {
-                iap_pollspeed = serbuf[4] ? 1 : 0;
-                /*responsed with cmd ok packet */
-                unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x26};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* AiR playback control */
-            case 0x0029:
-            {
-                /* respond with cmd ok packet */
-                unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x29};
-                iap_send_pkt(data, sizeof(data));
-                switch(serbuf[4])
-                {
-                    case 0x01: /* play/pause */
-                        iap_remotebtn = BUTTON_RC_PLAY;
-                        iap_repeatbtn = 2;
-                        iap_remotetick = false;
-                        iap_changedctr = 1;
-                        break;
-                    case 0x02: /* stop */
-                        iap_remotebtn = BUTTON_RC_PLAY|BUTTON_REPEAT;
-                        iap_repeatbtn = 2;
-                        iap_remotetick = false;
-                        iap_changedctr = 1;
-                        break;
-                    case 0x03: /* skip++ */
-                        iap_remotebtn = BUTTON_RC_RIGHT;
-                        iap_repeatbtn = 2;
-                        iap_remotetick = false;
-                        break;
-                    case 0x04: /* skip-- */
-                        iap_remotebtn = BUTTON_RC_LEFT;
-                        iap_repeatbtn = 2;
-                        iap_remotetick = false;
-                        break;
-                    case 0x05: /* ffwd */
-                        iap_remotebtn = BUTTON_RC_RIGHT;
-                        iap_remotetick = false;
-                        if(iap_pollspeed) iap_pollspeed = 5;
-                        break;
-                    case 0x06: /* frwd */
-                        iap_remotebtn = BUTTON_RC_LEFT;
-                        iap_remotetick = false;
-                        if(iap_pollspeed) iap_pollspeed = 5;
-                        break;
-                    case 0x07: /* end ffwd/frwd */
-                        iap_remotebtn = BUTTON_NONE;
-                        iap_remotetick = false;
-                        if(iap_pollspeed) iap_pollspeed = 1;
-                        break;
-                }
-                break;
-            }
-            /* Get shuffle mode */
-            case 0x002C:
-            {
-                unsigned char data[] = {0x04, 0x00, 0x2D, 0x00};
-                data[3] = global_settings.playlist_shuffle ? 1 : 0;
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Set shuffle mode */
-            case 0x002E:
-            {
-                if(serbuf[4] && !global_settings.playlist_shuffle)
-                {
-                    global_settings.playlist_shuffle = 1;
-                    settings_save();
-                    if (audio_status() & AUDIO_STATUS_PLAY)
-                        playlist_randomise(NULL, current_tick, true);
-                }
-                else if(!serbuf[4] && global_settings.playlist_shuffle)
-                {
-                    global_settings.playlist_shuffle = 0;
-                    settings_save();
-                    if (audio_status() & AUDIO_STATUS_PLAY)
-                        playlist_sort(NULL, true);
-                }
-
-                
-                /* respond with cmd ok packet */
-                unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x2E};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Get repeat mode */
-            case 0x002F:
-            {
-                unsigned char data[] = {0x04, 0x00, 0x30, 0x00};
-                if(global_settings.repeat_mode == REPEAT_OFF)
-                    data[3] = 0;
-                else if(global_settings.repeat_mode == REPEAT_ONE)
-                    data[3] = 1;
-                else
-                    data[3] = 2;
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Set repeat mode */
-            case 0x0031:
-            {
-                int oldmode = global_settings.repeat_mode;
-                if (serbuf[4] == 0)
-                    global_settings.repeat_mode = REPEAT_OFF;
-                else if (serbuf[4] == 1)
-                    global_settings.repeat_mode = REPEAT_ONE;
-                else if (serbuf[4] == 2)
-                    global_settings.repeat_mode = REPEAT_ALL;
-
-                if (oldmode != global_settings.repeat_mode)
-                {
-                    settings_save();
-                    if (audio_status() & AUDIO_STATUS_PLAY)
-                        audio_flush_and_reload_tracks();
-                }
-
-                /* respond with cmd ok packet */
-                unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x31};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }        
-            /* Get Screen Size */
-            case 0x0033:
-            {
-                unsigned char data[] = {0x04, 0x00, 0x34,
-                                        LCD_WIDTH >> 8, LCD_WIDTH & 0xff,
-                                        LCD_HEIGHT >> 8, LCD_HEIGHT & 0xff,
-                                        0x01};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* Get number songs in current playlist */
-            case 0x0035:
-            {
-                unsigned char data[] = {0x04, 0x00, 0x36, 0x00, 0x00, 0x00, 0x00};
-                unsigned long playlist_amt = playlist_amount();
-                data[3] = playlist_amt >> 24;
-                data[4] = playlist_amt >> 16;
-                data[5] = playlist_amt >> 8;
-                data[6] = playlist_amt;
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }                
-            /* Jump to track number in current playlist */
-            case 0x0037:
-            {
-                int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
-                long tracknum = (signed long)serbuf[4] << 24 |
-                                (signed long)serbuf[5] << 16 |
-                                (signed long)serbuf[6] << 8 | serbuf[7];
-                audio_pause();
-                audio_skip(tracknum - playlist_next(0));
-                if (!paused)
-                    audio_resume();
-                
-                /* respond with cmd ok packet */
-                unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x00};
-                data[4] = serbuf[2];
-                data[5] = serbuf[3];
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            default:
-            {
-                /* default response is with cmd ok packet */
-                unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x00};
-                data[4] = serbuf[2];
-                data[5] = serbuf[3];
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-        }
-    }
-    /* Handle Mode 7 */
-    else if (serbuf[1] == 0x07)
-    {
-        switch(serbuf[2])
-        {
-            /* tuner capabilities */
-            case 0x02:
-            {
-                /* do nothing */
-                
-                unsigned char data[] = {0x00, 0x27, 0x00};
-                iap_send_pkt(data, sizeof(data));
-                break;
-            }
-            /* actual tuner frequency */
-            case 0x0A:
-            /* fall through */
-            /* tuner frequency from scan */
-            case 0x13:
-            {
-                rmt_tuner_freq(serbuf);
-                break;
-            }
-            /* RDS station name 0x21 1E 00 + ASCII text*/
-            case 0x21:
-            {
-                rmt_tuner_rds_data(serbuf);
-                break;
-            }
-        }
-    }
     serbuf[0] = 0;
 }
 
