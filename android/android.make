@@ -109,7 +109,7 @@ $(TEMP_APK): $(AP_) $(LIBS) $(DEX) | $(DIRS)
 	-u -z $(AP_) -f $(DEX) -nf $(BUILDDIR)/libs
 
 $(KEYSTORE):
-	$(SILENT)mkdir $(HOME)/.android
+	$(SILENT)mkdir -p $(HOME)/.android
 	$(call PRINTS,KEYTOOL debug.keystore)keytool -genkey \
 		-alias androiddebugkey -keystore $@ \
 		-storepass android -keypass android -validity 365 \
