@@ -218,6 +218,13 @@ static void iap_set_remote_volume(void)
     iap_send_pkt(data, sizeof(data));
 }
 
+static void cmd_ok_mode0(unsigned char cmd)
+{
+    unsigned char data[] = {0x00, 0x02, 0x00, 0x13};
+    data[3] = cmd;  /* respond with cmd */
+    iap_send_pkt(data, sizeof(data));
+}
+
 static void iap_handlepkt_mode0(void)
 {
     unsigned int cmd = serbuf[2];
@@ -260,8 +267,7 @@ static void iap_handlepkt_mode0(void)
 
         case 0x13:
         {
-            unsigned char data[] = {0x00, 0x02, 0x00, 0x13};
-            iap_send_pkt(data, sizeof(data));
+            cmd_ok_mode0(cmd);
 
             if (serbuf[6] == 0x35)
             /* FM transmitter sends this: */
@@ -322,8 +328,7 @@ static void iap_handlepkt_mode0(void)
             unsigned char data[] = {0x00, 0x02, 0x06,
                                     0x05, 0x00, 0x00, 0x0B, 0xB8, 0x28};
             iap_send_pkt(data, sizeof(data));
-            unsigned char data2[] = {0x00, 0x02, 0x00, 0x05};
-            iap_send_pkt(data2, sizeof(data2));
+            cmd_ok_mode0(cmd);
             break;
         }
 
@@ -349,9 +354,7 @@ static void iap_handlepkt_mode0(void)
         /* default response is with cmd ok packet */
         default:
         {
-            unsigned char data[] = {0x00, 0x02, 0x00, 0x00};
-            data[3] = cmd; /* respond with cmd */
-            iap_send_pkt(data, sizeof(data));
+            cmd_ok_mode0(cmd);
             break;
         }
     }
@@ -492,6 +495,14 @@ static void iap_handlepkt_mode3(void)
     }
 }
 
+static void cmd_ok_mode4(unsigned int cmd)
+{
+    unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x00};
+    data[4] = (cmd >> 8) & 0xFF;
+    data[5] = (cmd >> 0) & 0xFF;
+    iap_send_pkt(data, sizeof(data));
+}
+
 static void iap_handlepkt_mode4(void)
 {
     unsigned int cmd = (serbuf[2] << 8) | serbuf[3];
@@ -510,8 +521,7 @@ static void iap_handlepkt_mode4(void)
         {
             iap_updateflag = serbuf[4] ? 0 : 1;
             /* respond with cmd ok packet */
-            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x0B};
-            iap_send_pkt(data, sizeof(data));
+            cmd_ok_mode4(cmd);
             break;
         }
         /* Get iPod size? */
@@ -634,9 +644,8 @@ static void iap_handlepkt_mode4(void)
         case 0x0026:
         {
             iap_pollspeed = serbuf[4] ? 1 : 0;
-            /*responsed with cmd ok packet */
-            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x26};
-            iap_send_pkt(data, sizeof(data));
+            /*respond with cmd ok packet */
+            cmd_ok_mode4(cmd);
             break;
         }
         /* AiR playback control */
@@ -715,8 +724,7 @@ static void iap_handlepkt_mode4(void)
 
             
             /* respond with cmd ok packet */
-            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x2E};
-            iap_send_pkt(data, sizeof(data));
+            cmd_ok_mode4(cmd);
             break;
         }
         /* Get repeat mode */
@@ -751,8 +759,7 @@ static void iap_handlepkt_mode4(void)
             }
 
             /* respond with cmd ok packet */
-            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x31};
-            iap_send_pkt(data, sizeof(data));
+            cmd_ok_mode4(cmd);
             break;
         }        
         /* Get Screen Size */
@@ -790,19 +797,13 @@ static void iap_handlepkt_mode4(void)
                 audio_resume();
             
             /* respond with cmd ok packet */
-            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x00};
-            data[4] = serbuf[2];
-            data[5] = serbuf[3];
-            iap_send_pkt(data, sizeof(data));
+            cmd_ok_mode4(cmd);
             break;
         }
         default:
         {
             /* default response is with cmd ok packet */
-            unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x00};
-            data[4] = serbuf[2];
-            data[5] = serbuf[3];
-            iap_send_pkt(data, sizeof(data));
+            cmd_ok_mode4(cmd);
             break;
         }
     }
