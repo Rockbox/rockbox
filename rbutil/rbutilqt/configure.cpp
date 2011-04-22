@@ -619,9 +619,15 @@ void Config::autodetect()
             for(int j=0;j < itmList.at(i)->childCount();j++)
             {
                 QString data = itmList.at(i)->child(j)->data(0, Qt::UserRole).toString();
+                // unset bold flag
+                QFont f = itmList.at(i)->child(j)->font(0);
+                f.setBold(false);
+                itmList.at(i)->child(j)->setFont(0, f);
 
                 if(devicename == data) // item found
                 {
+                    f.setBold(true);
+                    itmList.at(i)->child(j)->setFont(0, f);
                     itmList.at(i)->child(j)->setSelected(true); //select the item
                     itmList.at(i)->setExpanded(true); //expand the platform item
                     //ui.treeDevices->indexOfTopLevelItem(itmList.at(i)->child(j));
