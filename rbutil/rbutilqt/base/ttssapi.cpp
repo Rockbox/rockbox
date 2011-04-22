@@ -52,8 +52,11 @@ void TTSSapi::generateSettings()
     connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceList()));
     insertSetting(eVOICE,setting);
     //speed
-    insertSetting(eSPEED,new EncTtsSetting(this,EncTtsSetting::eINT,
-        tr("Speed:"),RbSettings::subValue("sapi",RbSettings::TtsSpeed),-10,10));
+    int speed = RbSettings::subValue("sapi", RbSettings::TtsSpeed).toInt();
+    if(speed > 10 || speed < -10)
+        speed = 0;
+    insertSetting(eSPEED, new EncTtsSetting(this, EncTtsSetting::eINT,
+                tr("Speed:"), speed, -10, 10));
     // options
     insertSetting(eOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,
         tr("Options:"),RbSettings::subValue("sapi",RbSettings::TtsOptions)));
