@@ -94,6 +94,7 @@ private:
     EncBase* m_enc;
 
     bool m_ttsWarnings;
+    bool m_userAborted;
 };
 
 

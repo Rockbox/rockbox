@@ -24,7 +24,7 @@
 
 TalkGenerator::TalkGenerator(QObject* parent): QObject(parent), encFutureWatcher(this), ttsFutureWatcher(this)
 {
-
+    m_userAborted = false;
 }
 
 //! \brief Creates Talkfiles.
@@ -126,32 +126,52 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
     }
 
     /* If the engine can't be parallelized, we use only 1 thread */
-    int maxThreadCount = QThreadPool::globalInstance()->maxThreadCount();
-    if ((m_tts->capabilities() & TTSBase::RunInParallel) == 0)
-        QThreadPool::globalInstance()->setMaxThreadCount(1);
-    qDebug() << "[TalkGenerator] Maximum number of threads used:"
-             << QThreadPool::globalInstance()->maxThreadCount();
+    // NOTE: setting the number of maximum threads to use to 1 doesn't seem to
+    // work as expected -- it causes sporadically output files missing (see
+    // FS#11994). As a stop-gap solution use a separate implementation in that
+    // case for running the TTS.
+    if((m_tts->capabilities() & TTSBase::RunInParallel) != 0)
+    {
+        int maxThreadCount = QThreadPool::globalInstance()->maxThreadCount();
+        qDebug() << "[TalkGenerator] Maximum number of threads used:"
+            << QThreadPool::globalInstance()->maxThreadCount();
 
-    connect(&ttsFutureWatcher, SIGNAL(progressValueChanged(int)), 
-            this, SLOT(ttsProgress(int)));
-    ttsFutureWatcher.setFuture(QtConcurrent::map(*list, &TalkGenerator::ttsEntryPoint));
+        connect(&ttsFutureWatcher, SIGNAL(progressValueChanged(int)),
+                this, SLOT(ttsProgress(int)));
+        ttsFutureWatcher.setFuture(QtConcurrent::map(*list, &TalkGenerator::ttsEntryPoint));
 
-    /* We use this loop as an equivalent to ttsFutureWatcher.waitForFinished() 
-     * since the latter blocks all events */
-    while(ttsFutureWatcher.isRunning())
-        QCoreApplication::processEvents();
+        /* We use this loop as an equivalent to ttsFutureWatcher.waitForFinished() 
+         * since the latter blocks all events */
+        while(ttsFutureWatcher.isRunning())
+            QCoreApplication::processEvents();
 
-    /* Restore global settings, if we changed them */
-    if ((m_tts->capabilities() & TTSBase::RunInParallel) == 0)
-        QThreadPool::globalInstance()->setMaxThreadCount(maxThreadCount);
+        /* Restore global settings, if we changed them */
+        if ((m_tts->capabilities() & TTSBase::RunInParallel) == 0)
+            QThreadPool::globalInstance()->setMaxThreadCount(maxThreadCount);
 
-    if(ttsFutureWatcher.isCanceled())
-        return eERROR;
-    else if(m_ttsWarnings)
-        return eWARNING;
-    else
-        return eOK;
-} 
+        if(ttsFutureWatcher.isCanceled())
+            return eERROR;
+        else if(m_ttsWarnings)
+            return eWARNING;
+        else
+            return eOK;
+    }
+    else {
+        qDebug() << "[TalkGenerator] Using single thread TTS workaround";
+        int items = list->size();
+        for(int i = 0; i < items; i++) {
+            if(m_userAborted) {
+                emit logItem(tr("Voicing aborted"), LOGERROR);
+                return eERROR;
+            }
+            TalkEntry entry = list->at(i);
+            TalkGenerator::ttsEntryPoint(entry);
+            (*list)[i] = entry;
+            emit logProgress(i, items);
+        }
+        return m_ttsWarnings ? eWARNING : eOK;
+    }
+}
 
 void TalkGenerator::ttsEntryPoint(TalkEntry& entry)
 {
@@ -279,5 +299,6 @@ void TalkGenerator::abort()
         encFutureWatcher.cancel();
         emit logItem(tr("Encoding aborted"), LOGERROR);
     }
+    m_userAborted = true;
 }
 
