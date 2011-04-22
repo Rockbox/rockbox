@@ -754,8 +754,9 @@ void Config::testTts()
     }
 
     QString filename;
+    QTemporaryFile file(this);
+    // keep filename empty if the TTS can do speaking for itself.
     if(!(tts->capabilities() & TTSBase::CanSpeak)) {
-        QTemporaryFile file(this);
         file.open();
         filename = file.fileName();
         file.close();
@@ -771,7 +772,7 @@ void Config::testTts()
         return;
     }
     tts->stop();
-    if(!(tts->capabilities() & TTSBase::CanSpeak)) {
+    if(!filename.isEmpty()) {
 #if defined(Q_OS_LINUX)
         QString exe = Utils::findExecutable("aplay");
         if(exe == "") exe = Utils::findExecutable("play");
