@@ -119,7 +119,7 @@ default_interrupt(INT_IRQ62);
 default_interrupt(INT_IRQ63);
 
 
-int current_irq;
+static int current_irq;
 
 
 void INT_TIMER(void) ICODE_ATTR;

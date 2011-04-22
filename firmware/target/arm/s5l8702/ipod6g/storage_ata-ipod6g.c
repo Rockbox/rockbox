@@ -47,12 +47,12 @@
 
 /** static, private data **/ 
 static uint8_t ceata_taskfile[16] __attribute__((aligned(16)));
-uint16_t ata_identify_data[0x100] __attribute__((aligned(16)));
-bool ceata;
-bool ata_lba48;
-bool ata_dma;
-uint64_t ata_total_sectors;
-struct mutex ata_mutex;
+static uint16_t ata_identify_data[0x100] __attribute__((aligned(16)));
+static bool ceata;
+static bool ata_lba48;
+static bool ata_dma;
+static uint64_t ata_total_sectors;
+static struct mutex ata_mutex;
 static struct semaphore ata_wakeup;
 static uint32_t ata_dma_flags;
 static long ata_last_activity_value = -1;
@@ -151,7 +151,7 @@ static int ata_wait_for_end_of_transfer(long timeout)
     RET_ERR(2);
 }    
 
-int mmc_dsta_check_command_success(bool disable_crc)
+static int mmc_dsta_check_command_success(bool disable_crc)
 {
     int rc = 0;
     uint32_t dsta = SDCI_DSTA;
@@ -165,7 +165,7 @@ int mmc_dsta_check_command_success(bool disable_crc)
     return 0;
 }
 
-bool mmc_send_command(uint32_t cmd, uint32_t arg, uint32_t* result, int timeout)
+static bool mmc_send_command(uint32_t cmd, uint32_t arg, uint32_t* result, int timeout)
 {
     long starttime = USEC_TIMER;
     while ((SDCI_STATE & SDCI_STATE_CMD_STATE_MASK) != SDCI_STATE_CMD_STATE_CMD_IDLE)
@@ -214,7 +214,7 @@ bool mmc_send_command(uint32_t cmd, uint32_t arg, uint32_t* result, int timeout)
     return 0;
 }
 
-int mmc_get_card_status(uint32_t* result)
+static int mmc_get_card_status(uint32_t* result)
 {
     return mmc_send_command(SDCI_CMD_CMD_NUM(MMC_CMD_SEND_STATUS)
                           | SDCI_CMD_CMD_TYPE_AC | SDCI_CMD_RES_TYPE_R1
@@ -222,7 +222,7 @@ int mmc_get_card_status(uint32_t* result)
                             MMC_CMD_SEND_STATUS_RCA(CEATA_MMC_RCA), result, CEATA_COMMAND_TIMEOUT);
 }
 
-int mmc_init(void)
+static int mmc_init(void)
 {
     sleep(HZ / 10);
     PASS_RC(mmc_send_command(SDCI_CMD_CMD_NUM(MMC_CMD_GO_IDLE_STATE)
@@ -262,7 +262,7 @@ int mmc_init(void)
     return 0;
 }
 
-int mmc_fastio_write(uint32_t addr, uint32_t data)
+static int mmc_fastio_write(uint32_t addr, uint32_t data)
 {
     return mmc_send_command(SDCI_CMD_CMD_NUM(MMC_CMD_FAST_IO)
                           | SDCI_CMD_CMD_TYPE_AC | SDCI_CMD_RES_TYPE_R4
@@ -272,7 +272,7 @@ int mmc_fastio_write(uint32_t addr, uint32_t data)
                             NULL, CEATA_COMMAND_TIMEOUT);
 }
 
-int mmc_fastio_read(uint32_t addr, uint32_t* data)
+static int mmc_fastio_read(uint32_t addr, uint32_t* data)
 {
     return mmc_send_command(SDCI_CMD_CMD_NUM(MMC_CMD_FAST_IO)
                           | SDCI_CMD_CMD_TYPE_AC | SDCI_CMD_RES_TYPE_R4
@@ -281,7 +281,7 @@ int mmc_fastio_read(uint32_t addr, uint32_t* data)
                           | MMC_CMD_FAST_IO_ADDRESS(addr), data, CEATA_COMMAND_TIMEOUT);
 }
 
-int ceata_soft_reset(void)
+static int ceata_soft_reset(void)
 {
     PASS_RC(mmc_fastio_write(6, 4), 2, 0);
     sleep(HZ / 100);
@@ -299,7 +299,7 @@ int ceata_soft_reset(void)
     return 0;
 }
 
-int mmc_dsta_check_data_success(void)
+static int mmc_dsta_check_data_success(void)
 {
     int rc = 0;
     uint32_t dsta = SDCI_DSTA;
@@ -318,14 +318,14 @@ int mmc_dsta_check_data_success(void)
     return 0;
 }
 
-void mmc_discard_irq(void)
+static void mmc_discard_irq(void)
 {
     SDCI_IRQ = SDCI_IRQ_DAT_DONE_INT | SDCI_IRQ_MASK_MASK_IOCARD_IRQ_INT
              | SDCI_IRQ_MASK_MASK_READ_WAIT_INT;
     semaphore_wait(&mmc_wakeup, 0);
 }
 
-int ceata_read_multiple_register(uint32_t addr, void* dest, uint32_t size)
+static int ceata_read_multiple_register(uint32_t addr, void* dest, uint32_t size)
 {
     if (size > 0x10) RET_ERR(0);
     mmc_discard_irq();
@@ -347,7 +347,7 @@ int ceata_read_multiple_register(uint32_t addr, void* dest, uint32_t size)
     return 0;
 }
 
-int ceata_write_multiple_register(uint32_t addr, void* dest, uint32_t size)
+static int ceata_write_multiple_register(uint32_t addr, void* dest, uint32_t size)
 {
     uint32_t i;
     if (size > 0x10) RET_ERR(0);
@@ -377,7 +377,7 @@ int ceata_write_multiple_register(uint32_t addr, void* dest, uint32_t size)
     return 0;
 }
 
-int ceata_init(int buswidth)
+static int ceata_init(int buswidth)
 {
     uint32_t result;
     PASS_RC(mmc_send_command(SDCI_CMD_CMD_NUM(MMC_CMD_SWITCH) | SDCI_CMD_RES_BUSY
@@ -414,7 +414,7 @@ int ceata_init(int buswidth)
     return 0;
 }
 
-int ceata_check_error(void)
+static int ceata_check_error(void)
 {
     uint32_t status, error;
     PASS_RC(mmc_fastio_read(0xf, &status), 2, 0);
@@ -426,7 +426,7 @@ int ceata_check_error(void)
     return 0;
 }
 
-int ceata_wait_idle(void)
+static int ceata_wait_idle(void)
 {
     long startusec = USEC_TIMER;
     while (true)
@@ -439,7 +439,7 @@ int ceata_wait_idle(void)
     }
 }
 
-int ceata_cancel_command(void)
+static int ceata_cancel_command(void)
 {
     *((uint32_t volatile*)0x3cf00200) = 0x9000e;
     udelay(1);
@@ -455,7 +455,7 @@ int ceata_cancel_command(void)
     return 0;
 }
 
-int ceata_rw_multiple_block(bool write, void* buf, uint32_t count, long timeout)
+static int ceata_rw_multiple_block(bool write, void* buf, uint32_t count, long timeout)
 {
     mmc_discard_irq();
     uint32_t responsetype;
@@ -499,7 +499,7 @@ int ceata_rw_multiple_block(bool write, void* buf, uint32_t count, long timeout)
     return 0;
 }
 
-int ata_identify(uint16_t* buf)
+static int ata_identify(uint16_t* buf)
 {
     int i;
     if (ceata)
@@ -525,7 +525,7 @@ int ata_identify(uint16_t* buf)
     return 0;
 }
 
-void ata_set_active(void)
+static void ata_set_active(void)
 {
     ata_last_activity_value = current_tick;
 }
@@ -535,7 +535,7 @@ bool ata_disk_is_active(void)
     return ata_powered;
 }
 
-int ata_set_feature(uint32_t feature, uint32_t param)
+static int ata_set_feature(uint32_t feature, uint32_t param)
 {
     PASS_RC(ata_wait_for_rdy(500000), 1, 0);
     ata_write_cbr(&ATA_PIO_DVR, 0);
@@ -546,7 +546,7 @@ int ata_set_feature(uint32_t feature, uint32_t param)
     return 0;
 }
 
-int ata_power_up(void)
+static int ata_power_up(void)
 {
     ata_set_active();
     if (ata_powered) return 0;
@@ -664,7 +664,7 @@ int ata_power_up(void)
     return 0;
 }
 
-void ata_power_down(void)
+static void ata_power_down(void)
 {
     if (!ata_powered) return;
     ata_powered = false;
@@ -691,7 +691,7 @@ void ata_power_down(void)
     ide_power_enable(false);
 }
 
-int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bool write)
+static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bool write)
 {
     if (ceata)
     {
@@ -790,7 +790,7 @@ int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bool writ
     return 0;
 }
 
-int ata_rw_chunk(uint64_t sector, uint32_t cnt, void* buffer, bool write)
+static int ata_rw_chunk(uint64_t sector, uint32_t cnt, void* buffer, bool write)
 {
     led(true);
     int rc = ata_rw_chunk_internal(sector, cnt, buffer, write);
@@ -851,7 +851,7 @@ int ata_bbt_translate(uint64_t sector, uint32_t count, uint64_t* phys, uint32_t*
 }
 #endif
 
-int ata_rw_sectors(uint64_t sector, uint32_t count, void* buffer, bool write)
+static int ata_rw_sectors(uint64_t sector, uint32_t count, void* buffer, bool write)
 {
     if (((uint32_t)buffer) & 0xf)
         panicf("ATA: Misaligned data buffer at %08X (sector %lu, count %lu)",
@@ -1108,13 +1108,15 @@ int ata_init(void)
     return 0;
 }
 
-int ata_num_drives(int first_drive)
+#ifdef CONFIG_STORAGE_MULTI
+static int ata_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
     
     return 1;
 }
+#endif
 
 unsigned short* ata_get_identify(void)
 {

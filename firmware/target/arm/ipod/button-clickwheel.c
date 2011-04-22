@@ -352,7 +352,7 @@ void INT_WHEEL(void)
     int_btn = ipod_4g_button_read();
 }
 
-void s5l_clickwheel_init(void)
+static void s5l_clickwheel_init(void)
 {
 #if CONFIG_CPU==S5L8701
     PWRCONEXT &= ~1;

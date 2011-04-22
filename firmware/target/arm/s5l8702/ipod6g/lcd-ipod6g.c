@@ -140,10 +140,12 @@ void lcd_shutdown(void)
     mutex_unlock(&lcd_mutex);
 }
 
+#ifdef HAVE_LCD_SLEEP
 void lcd_sleep(void)
 {
     lcd_shutdown();
 }
+#endif
 
 /* LCD init */
 void lcd_init_device(void)
