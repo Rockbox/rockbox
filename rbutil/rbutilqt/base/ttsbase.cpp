@@ -37,17 +37,17 @@ TTSBase::TTSBase(QObject* parent): EncTtsSettingInterface(parent)
 // static functions
 void TTSBase::initTTSList()
 {
-    ttsList["espeak"] = "Espeak TTS Engine";
-    ttsList["flite"] = "Flite TTS Engine";
-    ttsList["swift"] = "Swift TTS Engine";
+    ttsList["espeak"] = tr("Espeak TTS Engine");
+    ttsList["flite"] = tr("Flite TTS Engine");
+    ttsList["swift"] = tr("Swift TTS Engine");
 #if defined(Q_OS_WIN)
-    ttsList["sapi"] = "Sapi TTS Engine";
+    ttsList["sapi"] = tr("SAPI TTS Engine");
 #endif
 #if defined(Q_OS_LINUX)
-    ttsList["festival"] = "Festival TTS Engine";
+    ttsList["festival"] = tr("Festival TTS Engine");
 #endif
 #if defined(Q_OS_MACX)
-    ttsList["carbon"] = "OS X System Engine";
+    ttsList["carbon"] = tr("OS X System Engine");
 #endif
 }
 
