@@ -46,7 +46,7 @@ void power_off(void)
 void power_init(void)
 {
     pmu_write(0x1e, 0xf);         /* Vcore = 1.000V */
-    pmu_ldo_set_voltage(2, 0x11); /* LCD   = 2.600V */
+    pmu_ldo_set_voltage(2, 0x13); /* LCD   = 2.800V */
 }
 
 #if CONFIG_CHARGING
