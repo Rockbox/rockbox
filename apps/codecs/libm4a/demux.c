@@ -429,14 +429,14 @@ static bool read_chunk_stsc(qtmovie_t *qtmovie, size_t chunk_len)
 
 static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
 {
-    uint32_t i, k;
+    uint32_t i, k, old_i;
     uint32_t numentries;
-    int32_t idx = 0;
-    int32_t frame;
-    int32_t offset;
-    int32_t old_first;
-    int32_t new_first;
-    int32_t old_frame;
+    uint32_t idx = 0;
+    uint32_t frame;
+    uint32_t offset;
+    uint32_t old_first;
+    uint32_t new_first;
+    uint32_t old_frame;
     size_t size_remaining = chunk_len - 8;
 
     /* version + flags */
@@ -471,18 +471,25 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
      * table. This reduces the memory consumption by a factor of 2 or even 
      * more. */
     i = 1;
+    old_i = 1;
     frame = 0;
-    old_frame = qtmovie->res->sample_to_chunk[0].num_samples;
     old_first = qtmovie->res->sample_to_chunk[0].first_chunk;
+    old_frame = qtmovie->res->sample_to_chunk[0].num_samples;
+    new_first = qtmovie->res->sample_to_chunk[1].first_chunk;
     for (k = 1; k < numentries; ++k)
     {
         for (; i < qtmovie->res->num_sample_to_chunks; ++i)
         {
-            old_frame = qtmovie->res->sample_to_chunk[i-1].num_samples;
-            old_first = qtmovie->res->sample_to_chunk[i-1].first_chunk;
-            new_first = qtmovie->res->sample_to_chunk[i  ].first_chunk;
+            if (i > old_i)
+            {
+                /* Only access sample_to_chunk[] if new data is required. */
+                old_first = qtmovie->res->sample_to_chunk[i-1].first_chunk;
+                old_frame = qtmovie->res->sample_to_chunk[i-1].num_samples;
+                new_first = qtmovie->res->sample_to_chunk[i  ].first_chunk;
+                old_i = i;
+            }
             
-            if (qtmovie->res->sample_to_chunk[i].first_chunk > k)
+            if (new_first > k)
                 break;
             
             frame += (new_first - old_first) * old_frame;
