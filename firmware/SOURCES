@@ -584,6 +584,7 @@ drivers/i2c.c
 target/sh/archos/ata-archos.c
 target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
+target/sh/archos/uart-archos.c
 target/sh/archos/player/button-player.c
 target/sh/archos/player/hwcompat-player.c
 target/sh/archos/player/lcd-as-player.S
@@ -601,6 +602,7 @@ target/sh/archos/audio-archos.c
 target/sh/archos/ata-archos.c
 target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
+target/sh/archos/uart-archos.c
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S   
 target/sh/archos/recorder/button-recorder.c
@@ -876,6 +878,7 @@ target/coldfire/iriver/udacodec-iriver.c
 #ifndef SIMULATOR
 drivers/sw_i2c.c
 target/coldfire/ata-as-coldfire.S
+target/coldfire/uart-coldfire.c
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
 target/coldfire/iriver/lcd-remote-as-iriver.S
@@ -976,6 +979,7 @@ target/arm/imx31/mmu-imx31.c
 target/arm/imx31/rolo_restart_firmware.S
 target/arm/imx31/sdma-imx31.c
 target/arm/imx31/spi-imx31.c
+target/arm/imx31/uart-imx31.c
 target/arm/imx31/gigabeat-s/adc-gigabeat-s.c
 target/arm/imx31/gigabeat-s/backlight-gigabeat-s.c
 target/arm/imx31/gigabeat-s/button-gigabeat-s.c
