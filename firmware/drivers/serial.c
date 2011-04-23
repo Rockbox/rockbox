@@ -32,6 +32,17 @@
 
 #if defined(IPOD_ACCESSORY_PROTOCOL)
 static int autobaud = 0;
+
+static void set_bitrate(unsigned int rate)
+{
+    unsigned int divisor;
+    
+    divisor = 24000000L / rate / 16;
+    SER0_LCR = 0x80; /* Divisor latch enable */
+    SER0_DLL = (divisor >> 0) & 0xFF;
+    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+}
+
 void serial_setup (void)
 {
     int tmp;
@@ -71,16 +82,13 @@ void serial_bitrate(int rate)
     if(rate == 0)
     {
         autobaud = 2;
-        SER0_LCR = 0x80; /* Divisor latch enable */
-        SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
-        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-        return;
+        set_bitrate(115200);
     }
-
-    autobaud = 0;
-    SER0_LCR = 0x80; /* Divisor latch enable */
-    SER0_DLL = 24000000L / rate / 16;
-    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+    else
+    {
+        autobaud = 0;
+        set_bitrate(rate);
+    }
 }
 
 int tx_rdy(void)
@@ -128,15 +136,11 @@ void SERIAL0(void)
                     case 0x55:
                         break;
                     case 0xFC:
-                        SER0_LCR = 0x80; /* Divisor latch enable */
-                        SER0_DLL = 0x4E; /* 24000000/78/16 = 19230 baud */
-                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        set_bitrate(19200);
                         temp = 0xFF;
                         break;
                     case 0xE0:
-                        SER0_LCR = 0x80; /* Divisor latch enable */
-                        SER0_DLL = 0x9C; /* 24000000/156/16 = 9615 baud */
-                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        set_bitrate(9600);
                         temp = 0xFF;
                         break;
                     default:
@@ -144,14 +148,10 @@ void SERIAL0(void)
                         if (badbaud >= 6) /* Switch baud detection mode */
                         {
                             autobaud = 2;
-                            SER0_LCR = 0x80; /* Divisor latch enable */
-                            SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
-                            SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                            set_bitrate(115200);
                             badbaud = 0;
                         } else {
-                            SER0_LCR = 0x80; /* Divisor latch enable */
-                            SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
-                            SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                            set_bitrate(57600);
                         }
                         continue;
                 }
@@ -162,21 +162,15 @@ void SERIAL0(void)
                     case 0x55:
                         break;
                     case 0xFE:
-                        SER0_LCR = 0x80; /* Divisor latch enable */
-                        SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
-                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        set_bitrate(57600);
                         temp = 0xFF;
                         break;
                     case 0xFC:
-                            SER0_LCR = 0x80; /* Divisor latch enable */
-                        SER0_DLL = 0x27; /* 24000000/39/16 = 38461 baud */
-                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        set_bitrate(38400);
                         temp = 0xFF;
                         break;
                     case 0xE0:
-                        SER0_LCR = 0x80; /* Divisor latch enable */
-                        SER0_DLL = 0x4E; /* 24000000/78/16 = 19230 baud */
-                        SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                        set_bitrate(19200);
                         temp = 0xFF;
                         break;
                     default:
@@ -184,14 +178,10 @@ void SERIAL0(void)
                         if (badbaud >= 6) /* Switch baud detection */
                         {
                             autobaud = 1;
-                            SER0_LCR = 0x80; /* Divisor latch enable */
-                            SER0_DLL = 0x1A; /* 24000000/26/16 = 57692 baud */
-                            SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                            set_bitrate(57600);
                             badbaud = 0;
                         } else {
-                            SER0_LCR = 0x80; /* Divisor latch enable */
-                            SER0_DLL = 0x0D; /* 24000000/13/16 = 115384 baud */
-                            SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+                            set_bitrate(115200);
                         }
                         continue;
                 }
