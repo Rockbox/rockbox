@@ -53,7 +53,6 @@
 #include "ssr_fb.h"
 #endif
 
-
 /* static function declarations */
 static uint8_t quant_to_spec(NeAACDecHandle hDecoder,
                              ic_stream *ics, int16_t *quant_data,
@@ -283,6 +282,11 @@ static const uint16_t *const swb_offset_128_window[] ICONST_ATTR =
 };
 
 #define bit_set(A, B) ((A) & (1<<(B)))
+
+/* static variables */
+/* used by reconstruct_single_channel() and reconstruct_channel_pair() */
+static real_t spec_coef1[FRAME_LEN] IBSS_ATTR MEM_ALIGN_ATTR;
+static real_t spec_coef2[FRAME_LEN] IBSS_ATTR MEM_ALIGN_ATTR;
 
 /* 4.5.2.3.4 */
 /*
@@ -648,196 +652,20 @@ static uint8_t quant_to_spec(NeAACDecHandle hDecoder,
 static uint8_t allocate_single_channel(NeAACDecHandle hDecoder, uint8_t channel,
                                        uint8_t output_channels)
 {
-    uint8_t mul = 1;
-
-#ifdef MAIN_DEC
-    /* MAIN object type prediction */
-    if (hDecoder->object_type == MAIN)
-    {
-        /* allocate the state only when needed */
-        if (hDecoder->pred_stat[channel] == NULL)
-        {
-            hDecoder->pred_stat[channel] = (pred_state*)faad_malloc(hDecoder->frameLength * sizeof(pred_state));
-            reset_all_predictors(hDecoder->pred_stat[channel], hDecoder->frameLength);
-        }
-    }
-#endif
-
-#ifdef LTP_DEC
-    if (is_ltp_ot(hDecoder->object_type))
-    {
-        /* allocate the state only when needed */
-        if (hDecoder->lt_pred_stat[channel] == NULL)
-        {
-            hDecoder->lt_pred_stat[channel] = (int16_t*)faad_malloc(hDecoder->frameLength*4 * sizeof(int16_t));
-            memset(hDecoder->lt_pred_stat[channel], 0, hDecoder->frameLength*4 * sizeof(int16_t));
-        }
-    }
-#endif
-
-    if (hDecoder->time_out[channel] == NULL)
-    {
-        mul = 1;
-#ifdef SBR_DEC
-        hDecoder->sbr_alloced[hDecoder->fr_ch_ele] = 0;
-        if ((hDecoder->sbr_present_flag == 1) || (hDecoder->forceUpSampling == 1))
-        {
-            /* SBR requires 2 times as much output data */
-            mul = 2;
-            hDecoder->sbr_alloced[hDecoder->fr_ch_ele] = 1;
-        }
-#endif
-        hDecoder->time_out[channel] = (real_t*)faad_malloc(mul*hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->time_out[channel], 0, mul*hDecoder->frameLength*sizeof(real_t));
-    }
-#if (defined(PS_DEC) || defined(DRM_PS))
-    if (output_channels == 2)
-    {
-        if (hDecoder->time_out[channel+1] == NULL)
-        {
-            hDecoder->time_out[channel+1] = (real_t*)faad_malloc(mul*hDecoder->frameLength*sizeof(real_t));
-            memset(hDecoder->time_out[channel+1], 0, mul*hDecoder->frameLength*sizeof(real_t));
-        }
-    }
-#else
-    (void)output_channels;  /*silence warning when PS disabled*/
-#endif
-
-    if (hDecoder->fb_intermed[channel] == NULL)
-    {
-        hDecoder->fb_intermed[channel] = (real_t*)faad_malloc(hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->fb_intermed[channel], 0, hDecoder->frameLength*sizeof(real_t));
-    }
-
-#ifdef SSR_DEC
-    if (hDecoder->object_type == SSR)
-    {
-        if (hDecoder->ssr_overlap[channel] == NULL)
-        {
-            hDecoder->ssr_overlap[channel] = (real_t*)faad_malloc(2*hDecoder->frameLength*sizeof(real_t));
-            memset(hDecoder->ssr_overlap[channel], 0, 2*hDecoder->frameLength*sizeof(real_t));
-        }
-        if (hDecoder->prev_fmd[channel] == NULL)
-        {
-            uint16_t k;
-            hDecoder->prev_fmd[channel] = (real_t*)faad_malloc(2*hDecoder->frameLength*sizeof(real_t));
-            for (k = 0; k < 2*hDecoder->frameLength; k++)
-                hDecoder->prev_fmd[channel][k] = REAL_CONST(-1);
-        }
-    }
-#endif
-
+    (void)output_channels;
+    (void)hDecoder;
+    (void)channel;
     return 0;
 }
 
 static uint8_t allocate_channel_pair(NeAACDecHandle hDecoder,
                                      uint8_t channel, uint8_t paired_channel)
 {
-    uint8_t mul = 1;
-
-#ifdef MAIN_DEC
-    /* MAIN object type prediction */
-    if (hDecoder->object_type == MAIN)
-    {
-        /* allocate the state only when needed */
-        if (hDecoder->pred_stat[channel] == NULL)
-        {
-            hDecoder->pred_stat[channel] = (pred_state*)faad_malloc(hDecoder->frameLength * sizeof(pred_state));
-            reset_all_predictors(hDecoder->pred_stat[channel], hDecoder->frameLength);
-        }
-        if (hDecoder->pred_stat[paired_channel] == NULL)
-        {
-            hDecoder->pred_stat[paired_channel] = (pred_state*)faad_malloc(hDecoder->frameLength * sizeof(pred_state));
-            reset_all_predictors(hDecoder->pred_stat[paired_channel], hDecoder->frameLength);
-        }
-    }
-#endif
-
-#ifdef LTP_DEC
-    if (is_ltp_ot(hDecoder->object_type))
-    {
-        /* allocate the state only when needed */
-        if (hDecoder->lt_pred_stat[channel] == NULL)
-        {
-            hDecoder->lt_pred_stat[channel] = (int16_t*)faad_malloc(hDecoder->frameLength*4 * sizeof(int16_t));
-            memset(hDecoder->lt_pred_stat[channel], 0, hDecoder->frameLength*4 * sizeof(int16_t));
-        }
-        if (hDecoder->lt_pred_stat[paired_channel] == NULL)
-        {
-            hDecoder->lt_pred_stat[paired_channel] = (int16_t*)faad_malloc(hDecoder->frameLength*4 * sizeof(int16_t));
-            memset(hDecoder->lt_pred_stat[paired_channel], 0, hDecoder->frameLength*4 * sizeof(int16_t));
-        }
-    }
-#endif
-
-    if (hDecoder->time_out[channel] == NULL)
-    {
-        mul = 1;
-#ifdef SBR_DEC
-        hDecoder->sbr_alloced[hDecoder->fr_ch_ele] = 0;
-        if ((hDecoder->sbr_present_flag == 1) || (hDecoder->forceUpSampling == 1))
-        {
-            /* SBR requires 2 times as much output data */
-            mul = 2;
-            hDecoder->sbr_alloced[hDecoder->fr_ch_ele] = 1;
-        }
-#endif
-        hDecoder->time_out[channel] = (real_t*)faad_malloc(mul*hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->time_out[channel], 0, mul*hDecoder->frameLength*sizeof(real_t));
-    }
-    if (hDecoder->time_out[paired_channel] == NULL)
-    {
-        hDecoder->time_out[paired_channel] = (real_t*)faad_malloc(mul*hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->time_out[paired_channel], 0, mul*hDecoder->frameLength*sizeof(real_t));
-    }
-
-    if (hDecoder->fb_intermed[channel] == NULL)
-    {
-        hDecoder->fb_intermed[channel] = (real_t*)faad_malloc(hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->fb_intermed[channel], 0, hDecoder->frameLength*sizeof(real_t));
-    }
-    if (hDecoder->fb_intermed[paired_channel] == NULL)
-    {
-        hDecoder->fb_intermed[paired_channel] = (real_t*)faad_malloc(hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->fb_intermed[paired_channel], 0, hDecoder->frameLength*sizeof(real_t));
-    }
-
-#ifdef SSR_DEC
-    if (hDecoder->object_type == SSR)
-    {
-        if (hDecoder->ssr_overlap[cpe->channel] == NULL)
-        {
-            hDecoder->ssr_overlap[cpe->channel] = (real_t*)faad_malloc(2*hDecoder->frameLength*sizeof(real_t));
-            memset(hDecoder->ssr_overlap[cpe->channel], 0, 2*hDecoder->frameLength*sizeof(real_t));
-        }
-        if (hDecoder->ssr_overlap[cpe->paired_channel] == NULL)
-        {
-            hDecoder->ssr_overlap[cpe->paired_channel] = (real_t*)faad_malloc(2*hDecoder->frameLength*sizeof(real_t));
-            memset(hDecoder->ssr_overlap[cpe->paired_channel], 0, 2*hDecoder->frameLength*sizeof(real_t));
-        }
-        if (hDecoder->prev_fmd[cpe->channel] == NULL)
-        {
-            uint16_t k;
-            hDecoder->prev_fmd[cpe->channel] = (real_t*)faad_malloc(2*hDecoder->frameLength*sizeof(real_t));
-            for (k = 0; k < 2*hDecoder->frameLength; k++)
-                hDecoder->prev_fmd[cpe->channel][k] = REAL_CONST(-1);
-        }
-        if (hDecoder->prev_fmd[cpe->paired_channel] == NULL)
-        {
-            uint16_t k;
-            hDecoder->prev_fmd[cpe->paired_channel] = (real_t*)faad_malloc(2*hDecoder->frameLength*sizeof(real_t));
-            for (k = 0; k < 2*hDecoder->frameLength; k++)
-                hDecoder->prev_fmd[cpe->paired_channel][k] = REAL_CONST(-1);
-        }
-    }
-#endif
-
+    (void)paired_channel;
+    (void)hDecoder;
+    (void)channel;
     return 0;
 }
-
-/* used by reconstruct_single_channel() and reconstruct_channel_pair() */
-static real_t spec_coef1[1024] IBSS_ATTR MEM_ALIGN_ATTR;
-static real_t spec_coef2[1024] IBSS_ATTR MEM_ALIGN_ATTR;
 
 uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
                                    element *sce, int16_t *spec_data)
@@ -978,7 +806,8 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
         if (hDecoder->sbr[ele] == NULL)
         {
             hDecoder->sbr[ele] = sbrDecodeInit(hDecoder->frameLength,
-                hDecoder->element_id[ele], 2*get_sample_rate(hDecoder->sf_index),
+                hDecoder->element_id[ele], ele,
+                2*get_sample_rate(hDecoder->sf_index),
                 hDecoder->downSampledSBR
 #ifdef DRM
                 , 0
@@ -1227,7 +1056,8 @@ uint8_t reconstruct_channel_pair(NeAACDecHandle hDecoder, ic_stream *ics1, ic_st
         if (hDecoder->sbr[ele] == NULL)
         {
             hDecoder->sbr[ele] = sbrDecodeInit(hDecoder->frameLength,
-                hDecoder->element_id[ele], 2*get_sample_rate(hDecoder->sf_index),
+                hDecoder->element_id[ele], ele, 
+                2*get_sample_rate(hDecoder->sf_index),
                 hDecoder->downSampledSBR
 #ifdef DRM
                 , 0

@@ -558,7 +558,7 @@ void raw_data_block(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
 
 /* Table 4.4.4 and */
 /* Table 4.4.9 */
-int16_t spec_data[1024] MEM_ALIGN_ATTR = {0};
+int16_t spec_data[FRAME_LEN] MEM_ALIGN_ATTR = {0};
 element sce;
 static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
                                           uint8_t channel, uint8_t *tag)
@@ -603,8 +603,9 @@ static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
 }
 
 /* Table 4.4.5 */
-int16_t spec_data1[1024] IBSS_ATTR MEM_ALIGN_ATTR;
-int16_t spec_data2[1024] IBSS_ATTR MEM_ALIGN_ATTR;
+
+int16_t spec_data1[FRAME_LEN] IBSS_ATTR MEM_ALIGN_ATTR;
+int16_t spec_data2[FRAME_LEN] IBSS_ATTR MEM_ALIGN_ATTR;
 element cpe;
 static uint8_t channel_pair_element(NeAACDecHandle hDecoder, bitfile *ld,
                                     uint8_t channels, uint8_t *tag)
@@ -884,7 +885,7 @@ static uint8_t coupling_channel_element(NeAACDecHandle hDecoder, bitfile *ld)
 
     element el_empty = {0};
     ic_stream ics_empty = {0};
-    static int16_t sh_data[1024];
+    static int16_t sh_data[FRAME_LEN];
 
     c = faad_getbits(ld, LEN_TAG
         DEBUGVAR(1,900,"coupling_channel_element(): element_instance_tag"));
@@ -1028,7 +1029,8 @@ static uint8_t fill_element(NeAACDecHandle hDecoder, bitfile *ld, drc_info *drc
             if (!hDecoder->sbr[sbr_ele])
             {
                 hDecoder->sbr[sbr_ele] = sbrDecodeInit(hDecoder->frameLength,
-                    hDecoder->element_id[sbr_ele], 2*get_sample_rate(hDecoder->sf_index),
+                    hDecoder->element_id[sbr_ele], sbr_ele, 
+                    2*get_sample_rate(hDecoder->sf_index),
                     hDecoder->downSampledSBR
 #ifdef DRM
                     , 0
@@ -1170,8 +1172,8 @@ static void gain_control_data(bitfile *ld, ic_stream *ics)
 #endif
 
 #ifdef SCALABLE_DEC
-int16_t spec_data1[1024] MEM_ALIGN_ATTR;
-int16_t spec_data2[1024] MEM_ALIGN_ATTR;
+int16_t spec_data1[FRAME_LEN] MEM_ALIGN_ATTR;
+int16_t spec_data2[FRAME_LEN] MEM_ALIGN_ATTR;
 /* Table 4.4.13 ASME */
 void aac_scalable_main_element(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
                                bitfile *ld, program_config *pce, drc_info *drc)

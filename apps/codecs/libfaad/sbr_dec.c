@@ -41,34 +41,63 @@
 #include "sbr_hfgen.h"
 #include "sbr_hfadj.h"
 
-
-/* globals */
+/* type definitons */
+typedef struct {
 #if (defined(PS_DEC) || defined(DRM_PS))
-/* In case of PS_DEC or DRM_PS we need larger buffer data when calling
- * ps_decode() or drm_ps_decode(). */
-static qmf_t X_left [MAX_NTSRPS][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
-static qmf_t X_right[MAX_NTSRPS][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
+    /* In case of PS_DEC or DRM_PS we need larger buffer data when calling
+     * ps_decode() or drm_ps_decode(). */
+    qmf_t X_L[MAX_NTSRPS][64];
+    qmf_t X_R[MAX_NTSRPS][64];
 #else
-/* No PS functions called. Keep using MAX_NTSR as array size. */
-static qmf_t X_left [MAX_NTSR][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
-static qmf_t X_right[MAX_NTSR][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
+    /* No PS functions called. Keep using MAX_NTSR as array size. */
+    qmf_t X_L[MAX_NTSR][64];
+    qmf_t X_R[MAX_NTSR][64];
 #endif
+} XLR_t;
 
+/* static variables */
+static XLR_t *p_XLR = NULL;
+#if defined(FAAD_STATIC_ALLOC) || defined(FAAD_HAVE_XLR_IN_IRAM)
+static XLR_t s_XLR IBSS_ATTR MEM_ALIGN_ATTR;
+#endif
+#if defined(FAAD_STATIC_ALLOC)
+static sbr_info s_sbr[MAX_SYNTAX_ELEMENTS];
+#endif
+#ifdef SBR_LOW_POWER
+static real_t deg[64] MEM_ALIGN_ATTR;
+#endif
 
 /* static function declarations */
 static uint8_t sbr_save_prev_data(sbr_info *sbr, uint8_t ch);
 static void sbr_save_matrix(sbr_info *sbr, uint8_t ch);
 
 
-sbr_info *sbrDecodeInit(uint16_t framelength, uint8_t id_aac,
+sbr_info *sbrDecodeInit(uint16_t framelength, uint8_t id_aac, uint8_t id_ele,
                         uint32_t sample_rate, uint8_t downSampledSBR
 #ifdef DRM
                         , uint8_t IsDRM
 #endif
                         )
 {
-    sbr_info *sbr = faad_malloc(sizeof(sbr_info));
+    (void)downSampledSBR;
+
+    /* Allocate sbr_info. */
+#if defined(FAAD_STATIC_ALLOC)
+    sbr_info *sbr = &s_sbr[id_ele];
+#else
+    (void)id_ele;
+    sbr_info *sbr =(sbr_info*)faad_malloc(sizeof(sbr_info));
+#endif
     memset(sbr, 0, sizeof(sbr_info));
+    
+    /* Allocate XLR temporary variable. Use static allocation if either 
+     * FAAD_STATIC_ALLOC is set or XLR fits to IRAM. */
+#if defined(FAAD_STATIC_ALLOC) || defined(FAAD_HAVE_XLR_IN_IRAM)
+    p_XLR  = &s_XLR;
+#else
+    p_XLR  =(XLR_t*)faad_malloc(sizeof(XLR_t));
+#endif
+    memset(p_XLR, 0, sizeof(XLR_t));
 
     /* save id of the parent element */
     sbr->id_aac = id_aac;
@@ -115,78 +144,13 @@ sbr_info *sbrDecodeInit(uint16_t framelength, uint8_t id_aac,
     sbr->GQ_ringbuf_index[0] = 0;
     sbr->GQ_ringbuf_index[1] = 0;
 
-    if (id_aac == ID_CPE)
-    {
-        /* stereo */
-        uint8_t j;
-        sbr->qmfa[0] = qmfa_init(32);
-        sbr->qmfa[1] = qmfa_init(32);
-        sbr->qmfs[0] = qmfs_init((downSampledSBR)?32:64);
-        sbr->qmfs[1] = qmfs_init((downSampledSBR)?32:64);
+    memset(sbr->qmfa, 0, 2*sizeof(qmfa_info));
+    memset(sbr->qmfs, 0, 2*sizeof(qmfs_info));
 
-        for (j = 0; j < 5; j++)
-        {
-            sbr->G_temp_prev[0][j] = faad_malloc(64*sizeof(real_t));
-            sbr->G_temp_prev[1][j] = faad_malloc(64*sizeof(real_t));
-            sbr->Q_temp_prev[0][j] = faad_malloc(64*sizeof(real_t));
-            sbr->Q_temp_prev[1][j] = faad_malloc(64*sizeof(real_t));
-        }
-
-        memset(sbr->Xsbr[0], 0, (sbr->numTimeSlotsRate+sbr->tHFGen)*64 * sizeof(qmf_t));
-        memset(sbr->Xsbr[1], 0, (sbr->numTimeSlotsRate+sbr->tHFGen)*64 * sizeof(qmf_t));
-    } else {
-        /* mono */
-        uint8_t j;
-        sbr->qmfa[0] = qmfa_init(32);
-        sbr->qmfs[0] = qmfs_init((downSampledSBR)?32:64);
-        sbr->qmfs[1] = NULL;
-
-        for (j = 0; j < 5; j++)
-        {
-            sbr->G_temp_prev[0][j] = faad_malloc(64*sizeof(real_t));
-            sbr->Q_temp_prev[0][j] = faad_malloc(64*sizeof(real_t));
-        }
-
-        memset(sbr->Xsbr[0], 0, (sbr->numTimeSlotsRate+sbr->tHFGen)*64 * sizeof(qmf_t));
-    }
+    memset(sbr->Xsbr[0], 0, (sbr->numTimeSlotsRate+sbr->tHFGen)*64 * sizeof(qmf_t));
+    memset(sbr->Xsbr[1], 0, (sbr->numTimeSlotsRate+sbr->tHFGen)*64 * sizeof(qmf_t));
 
     return sbr;
-}
-
-void sbrDecodeEnd(sbr_info *sbr)
-{
-    uint8_t j;
-
-    if (sbr)
-    {
-        qmfa_end(sbr->qmfa[0]);
-        qmfs_end(sbr->qmfs[0]);
-        if (sbr->qmfs[1] != NULL)
-        {
-            qmfa_end(sbr->qmfa[1]);
-            qmfs_end(sbr->qmfs[1]);
-        }
-
-        for (j = 0; j < 5; j++)
-        {
-            if (sbr->G_temp_prev[0][j]) faad_free(sbr->G_temp_prev[0][j]);
-            if (sbr->Q_temp_prev[0][j]) faad_free(sbr->Q_temp_prev[0][j]);
-            if (sbr->G_temp_prev[1][j]) faad_free(sbr->G_temp_prev[1][j]);
-            if (sbr->Q_temp_prev[1][j]) faad_free(sbr->Q_temp_prev[1][j]);
-        }
-
-#ifdef PS_DEC
-        if (sbr->ps != NULL) 
-            ps_free(sbr->ps);
-#endif
-
-#ifdef DRM_PS
-        if (sbr->drm_ps != NULL)
-            drm_ps_free(sbr->drm_ps);
-#endif
-
-        faad_free(sbr);
-    }
 }
 
 static uint8_t sbr_save_prev_data(sbr_info *sbr, uint8_t ch)
@@ -239,10 +203,6 @@ static void sbr_save_matrix(sbr_info *sbr, uint8_t ch)
     }
 }
 
-#ifdef SBR_LOW_POWER
-    real_t deg[64] MEM_ALIGN_ATTR;
-#endif
-
 static void sbr_process_channel(sbr_info *sbr, real_t *channel_buf, qmf_t X[MAX_NTSR][64],
                                 uint8_t ch, uint8_t dont_process,
                                 const uint8_t downSampledSBR)
@@ -276,9 +236,9 @@ static void sbr_process_channel(sbr_info *sbr, real_t *channel_buf, qmf_t X[MAX_
 
     /* subband analysis */
     if (dont_process)
-        sbr_qmf_analysis_32(sbr, sbr->qmfa[ch], channel_buf, sbr->Xsbr[ch], sbr->tHFGen, 32);
+        sbr_qmf_analysis_32(sbr, &sbr->qmfa[ch], channel_buf, sbr->Xsbr[ch], sbr->tHFGen, 32);
     else
-        sbr_qmf_analysis_32(sbr, sbr->qmfa[ch], channel_buf, sbr->Xsbr[ch], sbr->tHFGen, sbr->kx);
+        sbr_qmf_analysis_32(sbr, &sbr->qmfa[ch], channel_buf, sbr->Xsbr[ch], sbr->tHFGen, sbr->kx);
 
     if (!dont_process)
     {
@@ -413,22 +373,22 @@ uint8_t sbrDecodeCoupleFrame(sbr_info *sbr, real_t *left_chan, real_t *right_cha
         sbr->just_seeked = 0;
     }
 
-    sbr_process_channel(sbr, left_chan, X_left, 0, dont_process, downSampledSBR);
+    sbr_process_channel(sbr, left_chan, p_XLR->X_L, 0, dont_process, downSampledSBR);
     /* subband synthesis */
     if (downSampledSBR)
     {
-        sbr_qmf_synthesis_32(sbr, sbr->qmfs[0], X_left, left_chan);
+        sbr_qmf_synthesis_32(sbr, &sbr->qmfs[0], p_XLR->X_L, left_chan);
     } else {
-        sbr_qmf_synthesis_64(sbr, sbr->qmfs[0], X_left, left_chan);
+        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[0], p_XLR->X_L, left_chan);
     }
 
-    sbr_process_channel(sbr, right_chan, X_right, 1, dont_process, downSampledSBR);
+    sbr_process_channel(sbr, right_chan, p_XLR->X_R, 1, dont_process, downSampledSBR);
     /* subband synthesis */
     if (downSampledSBR)
     {
-        sbr_qmf_synthesis_32(sbr, sbr->qmfs[1], X_right, right_chan);
+        sbr_qmf_synthesis_32(sbr, &sbr->qmfs[1], p_XLR->X_R, right_chan);
     } else {
-        sbr_qmf_synthesis_64(sbr, sbr->qmfs[1], X_right, right_chan);
+        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[1], p_XLR->X_R, right_chan);
     }
 
     if (sbr->bs_header_flag)
@@ -495,13 +455,13 @@ uint8_t sbrDecodeSingleFrame(sbr_info *sbr, real_t *channel,
         sbr->just_seeked = 0;
     }
 
-    sbr_process_channel(sbr, channel, X_left, 0, dont_process, downSampledSBR);
+    sbr_process_channel(sbr, channel, p_XLR->X_L, 0, dont_process, downSampledSBR);
     /* subband synthesis */
     if (downSampledSBR)
     {
-        sbr_qmf_synthesis_32(sbr, sbr->qmfs[0], X_left, channel);
+        sbr_qmf_synthesis_32(sbr, &sbr->qmfs[0], p_XLR->X_L, channel);
     } else {
-        sbr_qmf_synthesis_64(sbr, sbr->qmfs[0], X_left, channel);
+        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[0], p_XLR->X_L, channel);
     }
 
     if (sbr->bs_header_flag)
@@ -540,8 +500,8 @@ uint8_t sbrDecodeSingleFramePS(sbr_info *sbr, real_t *left_channel, real_t *righ
     uint8_t dont_process = 0;
     uint8_t ret = 0;
 
-    memset(X_left,0,sizeof(X_left));
-    memset(X_right,0,sizeof(X_right));
+    memset(p_XLR->X_L, 0, sizeof(*p_XLR->X_L));
+    memset(p_XLR->X_R, 0, sizeof(*p_XLR->X_R));
     if (sbr == NULL)
         return 20;
 
@@ -566,20 +526,15 @@ uint8_t sbrDecodeSingleFramePS(sbr_info *sbr, real_t *left_channel, real_t *righ
         sbr->just_seeked = 0;
     }
 
-    if (sbr->qmfs[1] == NULL)
-    {
-        sbr->qmfs[1] = qmfs_init((downSampledSBR)?32:64);
-    }
-
-    sbr_process_channel(sbr, left_channel, X_left, 0, dont_process, downSampledSBR);
+    sbr_process_channel(sbr, left_channel, p_XLR->X_L, 0, dont_process, downSampledSBR);
 
     /* copy some extra data for PS */
     for (l = 32; l < 38; l++)
     {
         for (k = 0; k < 5; k++)
         {
-            QMF_RE(X_left[l][k]) = QMF_RE(sbr->Xsbr[0][sbr->tHFAdj+l][k]);
-            QMF_IM(X_left[l][k]) = QMF_IM(sbr->Xsbr[0][sbr->tHFAdj+l][k]);
+            QMF_RE(p_XLR->X_L[l][k]) = QMF_RE(sbr->Xsbr[0][sbr->tHFAdj+l][k]);
+            QMF_IM(p_XLR->X_L[l][k]) = QMF_IM(sbr->Xsbr[0][sbr->tHFAdj+l][k]);
         }
     }
 
@@ -587,11 +542,11 @@ uint8_t sbrDecodeSingleFramePS(sbr_info *sbr, real_t *left_channel, real_t *righ
 #ifdef DRM_PS
     if (sbr->Is_DRM_SBR)
     {
-        drm_ps_decode(sbr->drm_ps, (sbr->ret > 0), sbr->sample_rate, X_left, X_right);
+        drm_ps_decode(sbr->drm_ps, (sbr->ret > 0), sbr->sample_rate, p_XLR->X_L, p_XLR->X_R);
     } else {
 #endif
 #ifdef PS_DEC
-        ps_decode(sbr->ps, X_left, X_right);
+        ps_decode(sbr->ps, p_XLR->X_L, p_XLR->X_R);
 #endif
 #ifdef DRM_PS
     }
@@ -600,11 +555,11 @@ uint8_t sbrDecodeSingleFramePS(sbr_info *sbr, real_t *left_channel, real_t *righ
     /* subband synthesis */
     if (downSampledSBR)
     {
-        sbr_qmf_synthesis_32(sbr, sbr->qmfs[0], X_left, left_channel);
-        sbr_qmf_synthesis_32(sbr, sbr->qmfs[1], X_right, right_channel);
+        sbr_qmf_synthesis_32(sbr, &sbr->qmfs[0], p_XLR->X_L, left_channel);
+        sbr_qmf_synthesis_32(sbr, &sbr->qmfs[1], p_XLR->X_R, right_channel);
     } else {
-        sbr_qmf_synthesis_64(sbr, sbr->qmfs[0], X_left, left_channel);
-        sbr_qmf_synthesis_64(sbr, sbr->qmfs[1], X_right, right_channel);
+        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[0], p_XLR->X_L, left_channel);
+        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[1], p_XLR->X_R, right_channel);
     }
 
     if (sbr->bs_header_flag)

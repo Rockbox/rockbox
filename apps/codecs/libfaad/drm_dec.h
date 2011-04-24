@@ -86,7 +86,6 @@ typedef struct
 uint16_t drm_ps_data(drm_ps_info *ps, bitfile *ld);
 
 drm_ps_info *drm_ps_init(void);
-void drm_ps_free(drm_ps_info *ps);
 
 uint8_t drm_ps_decode(drm_ps_info *ps, uint8_t guess, uint32_t samplerate, 
                       qmf_t X_left[MAX_NTSRPS][64], 

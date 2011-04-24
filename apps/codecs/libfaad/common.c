@@ -169,25 +169,6 @@ int8_t can_decode_ot(const uint8_t object_type)
     return -1;
 }
 
-void *faad_malloc(size_t size)
-{
-#if 0 // defined(_WIN32) && !defined(_WIN32_WCE)
-    return _aligned_malloc(size, 16);
-#else   // #ifdef 0
-    return malloc(size);
-#endif  // #ifdef 0
-}
-
-/* common free function */
-void faad_free(void *b)
-{
-#if 0 // defined(_WIN32) && !defined(_WIN32_WCE)
-    _aligned_free(b);
-#else
-    free(b);
-}
-#endif
-
 static const  uint8_t    Parity [256] = {  // parity
     0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0,1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,
     1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,1,0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0,

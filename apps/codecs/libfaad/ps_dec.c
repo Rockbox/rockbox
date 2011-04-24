@@ -152,19 +152,26 @@ typedef struct
     uint8_t resolution20[3];
     uint8_t resolution34[5];
 
-    qmf_t *work;
-    qmf_t **buffer;
-    qmf_t **temp;
+    qmf_t work[32+12];
+    qmf_t buffer[5][32];
+    qmf_t temp[32][12];
 } hyb_info;
+
+
+/* static variables */
+#ifdef FAAD_STATIC_ALLOC
+static hyb_info s_hyb_info;
+static ps_info s_ps_info;
+#endif
 
 /* static function declarations */
 static void ps_data_decode(ps_info *ps);
 static hyb_info *hybrid_init(void);
 static void channel_filter2(hyb_info *hyb, uint8_t frame_len, const real_t *filter,
-                            qmf_t *buffer, qmf_t **X_hybrid);
+                            qmf_t *buffer, qmf_t X_hybrid[32][12]);
 static INLINE void DCT3_4_unscaled(real_t *y, real_t *x);
 static void channel_filter8(hyb_info *hyb, uint8_t frame_len, const real_t *filter,
-                            qmf_t *buffer, qmf_t **X_hybrid);
+                            qmf_t *buffer, qmf_t X_hybrid[32][12]);
 static void hybrid_analysis(hyb_info *hyb, qmf_t X[32][64], qmf_t X_hybrid[32][32],
                             uint8_t use34);
 static void hybrid_synthesis(hyb_info *hyb, qmf_t X[32][64], qmf_t X_hybrid[32][32],
@@ -197,9 +204,11 @@ static void ps_mix_phase(ps_info *ps,
 
 static hyb_info *hybrid_init()
 {
-    uint8_t i;
-
+#ifdef FAAD_STATIC_ALLOC
+    hyb_info *hyb = &s_hyb_info;
+#else
     hyb_info *hyb = (hyb_info*)faad_malloc(sizeof(hyb_info));
+#endif
 
     hyb->resolution34[0] = 12;
     hyb->resolution34[1] = 8;
@@ -213,52 +222,16 @@ static hyb_info *hybrid_init()
 
     hyb->frame_len = 32;
 
-    hyb->work = (qmf_t*)faad_malloc((hyb->frame_len+12) * sizeof(qmf_t));
-    memset(hyb->work, 0, (hyb->frame_len+12) * sizeof(qmf_t));
-
-    hyb->buffer = (qmf_t**)faad_malloc(5 * sizeof(qmf_t*));
-    for (i = 0; i < 5; i++)
-    {
-        hyb->buffer[i] = (qmf_t*)faad_malloc(hyb->frame_len * sizeof(qmf_t));
-        memset(hyb->buffer[i], 0, hyb->frame_len * sizeof(qmf_t));
-    }
-
-    hyb->temp = (qmf_t**)faad_malloc(hyb->frame_len * sizeof(qmf_t*));
-    for (i = 0; i < hyb->frame_len; i++)
-    {
-        hyb->temp[i] = (qmf_t*)faad_malloc(12 /*max*/ * sizeof(qmf_t));
-    }
+    memset(hyb->work  , 0, sizeof(hyb->work));
+    memset(hyb->buffer, 0, sizeof(hyb->buffer));
+    memset(hyb->temp  , 0, sizeof(hyb->temp));
 
     return hyb;
 }
 
-static void hybrid_free(hyb_info *hyb)
-{
-    uint8_t i;
-
-    if (hyb->work)
-        faad_free(hyb->work);
-
-    for (i = 0; i < 5; i++)
-    {
-        if (hyb->buffer[i])
-            faad_free(hyb->buffer[i]);
-    }
-    if (hyb->buffer)
-        faad_free(hyb->buffer);
-
-    for (i = 0; i < hyb->frame_len; i++)
-    {
-        if (hyb->temp[i])
-            faad_free(hyb->temp[i]);
-    }
-    if (hyb->temp)
-        faad_free(hyb->temp);
-}
-
 /* real filter, size 2 */
 static void channel_filter2(hyb_info *hyb, uint8_t frame_len, const real_t *filter,
-                            qmf_t *buffer, qmf_t **X_hybrid)
+                            qmf_t *buffer, qmf_t X_hybrid[32][12])
 {
     uint8_t i;
 
@@ -292,7 +265,7 @@ static void channel_filter2(hyb_info *hyb, uint8_t frame_len, const real_t *filt
 
 /* complex filter, size 4 */
 static void channel_filter4(hyb_info *hyb, uint8_t frame_len, const real_t *filter,
-                            qmf_t *buffer, qmf_t **X_hybrid)
+                            qmf_t *buffer, qmf_t X_hybrid[32][12])
 {
     uint8_t i;
     real_t input_re1[2], input_re2[2], input_im1[2], input_im2[2];
@@ -367,7 +340,7 @@ static INLINE void DCT3_4_unscaled(real_t *y, real_t *x)
 
 /* complex filter, size 8 */
 static void channel_filter8(hyb_info *hyb, uint8_t frame_len, const real_t *filter,
-                            qmf_t *buffer, qmf_t **X_hybrid)
+                            qmf_t *buffer, qmf_t X_hybrid[32][12])
 {
     uint8_t i, n;
     real_t input_re1[4], input_re2[4], input_im1[4], input_im2[4];
@@ -460,7 +433,7 @@ static INLINE void DCT3_6_unscaled(real_t *y, real_t *x)
 
 /* complex filter, size 12 */
 static void channel_filter12(hyb_info *hyb, uint8_t frame_len, const real_t *filter,
-                             qmf_t *buffer, qmf_t **X_hybrid)
+                             qmf_t *buffer, qmf_t X_hybrid[32][12])
 {
     uint8_t i, n;
     real_t input_re1[6], input_re2[6], input_im1[6], input_im2[6];
@@ -1848,20 +1821,16 @@ static void ps_mix_phase(ps_info *ps,
     }
 }
 
-void ps_free(ps_info *ps)
-{
-    /* free hybrid filterbank structures */
-    hybrid_free(ps->hyb);
-
-    faad_free(ps);
-}
-
 ps_info *ps_init(uint8_t sr_index)
 {
     uint8_t i;
     uint8_t short_delay_band;
 
+#ifdef FAAD_STATIC_ALLOC
+    ps_info *ps = &s_ps_info;
+#else
     ps_info *ps = (ps_info*)faad_malloc(sizeof(ps_info));
+#endif
     memset(ps, 0, sizeof(ps_info));
 
     (void)sr_index;

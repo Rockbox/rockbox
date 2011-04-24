@@ -231,7 +231,7 @@ static const real_t Q_div_tab_right[31][13] = {
 
 /* calculates 1/(1+Q) */
 /* [0..1] */
-real_t calc_Q_div(sbr_info *sbr, uint8_t ch, uint8_t m, uint8_t l)
+static real_t calc_Q_div(sbr_info *sbr, uint8_t ch, uint8_t m, uint8_t l)
 {
     if (sbr->bs_coupling)
     {
@@ -350,7 +350,7 @@ static const real_t Q_div2_tab_right[31][13] = {
 
 /* calculates Q/(1+Q) */
 /* [0..1] */
-real_t calc_Q_div2(sbr_info *sbr, uint8_t ch, uint8_t m, uint8_t l)
+static real_t calc_Q_div2(sbr_info *sbr, uint8_t ch, uint8_t m, uint8_t l)
 {
     if (sbr->bs_coupling)
     {

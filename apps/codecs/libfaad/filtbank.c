@@ -43,8 +43,14 @@
 #include "sine_win.h"
 
 
-/*Windowing functions borrowed from libwmai*/
+/* static variables */
+static real_t transf_buf[2*FRAME_LEN] IBSS_ATTR MEM_ALIGN_ATTR;
+#ifdef LTP_DEC
+static real_t windowed_buf[2*FRAME_LEN] MEM_ALIGN_ATTR = {0};
+#endif
 
+
+/*Windowing functions borrowed from libwmai*/
 #ifdef CPU_ARM
 static inline 
 void vector_fmul_add_add(real_t *dst, const real_t *src0, const real_t *src1, const real_t *src2, int len)
@@ -195,8 +201,6 @@ static INLINE void mdct(fb_info *fb, real_t *in_data, real_t *out_data, uint16_t
     faad_mdct(mdct, in_data, out_data);
 }
 #endif
-
-real_t transf_buf[2*1024] IBSS_ATTR MEM_ALIGN_ATTR;
 
 void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
                   uint8_t window_shape_prev, real_t *freq_in,
@@ -403,7 +407,6 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
 
 
 #ifdef LTP_DEC
-real_t windowed_buf[2*1024] MEM_ALIGN_ATTR = {0};
 /* only works for LTP -> no overlapping, no short blocks */
 void filter_bank_ltp(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
                      uint8_t window_shape_prev, real_t *in_data, real_t *out_mdct,

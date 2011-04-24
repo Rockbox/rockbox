@@ -50,30 +50,6 @@
     #define FAAD_ANALYSIS_SCALE3(X) ((X)/32.0f)
 #endif
 
-qmfa_info *qmfa_init(uint8_t channels)
-{
-    qmfa_info *qmfa = (qmfa_info*)faad_malloc(sizeof(qmfa_info));
-
-    /* x is implemented as double ringbuffer */
-    qmfa->x = (real_t*)faad_malloc(2 * channels * 10 * sizeof(real_t));
-    memset(qmfa->x, 0, 2 * channels * 10 * sizeof(real_t));
-
-    /* ringbuffer index */
-    qmfa->x_index = 0;
-
-    qmfa->channels = channels;
-
-    return qmfa;
-}
-
-void qmfa_end(qmfa_info *qmfa)
-{
-    if (qmfa)
-    {
-        if (qmfa->x) faad_free(qmfa->x);
-        faad_free(qmfa);
-    }
-}
 
 void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
                          qmf_t X[MAX_NTSR][64], uint8_t offset, uint8_t kx)
@@ -195,30 +171,6 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
             QMF_RE(pX[idx1]) = QMF_IM(pX[idx1]) = 0;
         }
 #endif /* #ifdef SBR_LOW_POWER */
-    }
-}
-
-qmfs_info *qmfs_init(uint8_t channels)
-{
-    qmfs_info *qmfs = (qmfs_info*)faad_malloc(sizeof(qmfs_info));
-
-    /* v is a double ringbuffer */
-    qmfs->v = (real_t*)faad_malloc(2 * channels * 20 * sizeof(real_t));
-    memset(qmfs->v, 0, 2 * channels * 20 * sizeof(real_t));
-
-    qmfs->v_index = 0;
-
-    qmfs->channels = channels;
-
-    return qmfs;
-}
-
-void qmfs_end(qmfs_info *qmfs)
-{
-    if (qmfs)
-    {
-        if (qmfs->v) faad_free(qmfs->v);
-        faad_free(qmfs);
     }
 }
 

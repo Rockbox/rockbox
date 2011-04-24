@@ -36,7 +36,6 @@ extern "C" {
 
 
 drc_info *drc_init(real_t cut, real_t boost);
-void drc_end(drc_info *drc);
 void drc_decode(drc_info *drc, real_t *spec);
 
 

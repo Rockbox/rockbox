@@ -41,7 +41,7 @@
 #define DECAY_CUTOFF         3
 #define DECAY_SLOPE          0.05f
 
-/* type definitaions */
+/* type definitions */
 typedef const int8_t (*drm_ps_huff_tab)[2];
 
 
@@ -445,6 +445,8 @@ static const complex_t Phi_Fract_Qmf[] = {
     { FRAC_CONST(-0.7396311164), FRAC_CONST(0.6730124950) }
 };
 
+/* static variables */
+static drm_ps_info s_drm_ps_info;
 
 /* static function declarations */
 static void drm_ps_sa_element(drm_ps_info *ps, bitfile *ld);
@@ -915,16 +917,10 @@ static void drm_add_pan(drm_ps_info *ps, uint8_t rateselect,
 
 drm_ps_info *drm_ps_init(void)
 {
-    drm_ps_info *ps = (drm_ps_info*)faad_malloc(sizeof(drm_ps_info));
-
+    drm_ps_info *ps = &s_drm_ps_info;
     memset(ps, 0, sizeof(drm_ps_info));     
 
     return ps;
-}
-
-void drm_ps_free(drm_ps_info *ps)
-{
-    faad_free(ps);
 }
 
 /* main DRM PS decoding function */

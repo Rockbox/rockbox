@@ -73,8 +73,10 @@ static uint32_t bitmask[] = {
 
 void faad_initbits(bitfile *ld, const void *buffer, const uint32_t buffer_size);
 void faad_endbits(bitfile *ld);
+/* not used
 void faad_initbits_rev(bitfile *ld, void *buffer,
                        uint32_t bits_in_buffer);
+*/
 uint8_t faad_byte_align(bitfile *ld);
 uint32_t faad_get_processed_bits(bitfile *ld);
 void faad_rewindbits(bitfile *ld);

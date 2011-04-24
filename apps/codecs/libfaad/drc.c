@@ -33,9 +33,12 @@
 #include "syntax.h"
 #include "drc.h"
 
+/* static variables */
+static drc_info s_drc_info;
+
 drc_info *drc_init(real_t cut, real_t boost)
 {
-    drc_info *drc = (drc_info*)faad_malloc(sizeof(drc_info));
+    drc_info *drc = &s_drc_info;
     memset(drc, 0, sizeof(drc_info));
 
     drc->ctrl1 = cut;
@@ -47,11 +50,6 @@ drc_info *drc_init(real_t cut, real_t boost)
     drc->dyn_rng_ctl[0] = 0;
 
     return drc;
-}
-
-void drc_end(drc_info *drc)
-{
-    if (drc) faad_free(drc);
 }
 
 #ifdef FIXED_POINT

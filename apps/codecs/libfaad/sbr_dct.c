@@ -1525,7 +1525,7 @@ static const real_t dct4_post_tab[] ICONST_ATTR MEM_ALIGN_ATTR = {
 };
 
 // Table adapted from codeclib to fit into IRAM
-const uint32_t dct4_revtab[32] ICONST_ATTR MEM_ALIGN_ATTR = {
+static const uint32_t dct4_revtab[32] ICONST_ATTR MEM_ALIGN_ATTR = {
   0, 24, 12, 22, 6, 30, 11, 19, 3, 27, 15, 21, 5, 29, 9, 17,
   1, 25, 13, 23, 7, 31, 10, 18, 2, 26, 14, 20, 4, 28, 8, 16};
 

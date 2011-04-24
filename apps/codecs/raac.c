@@ -28,13 +28,6 @@
 
 CODEC_HEADER
 
-/* Global buffers to be used in the mdct synthesis. This way the arrays can
- * be moved to IRAM for some targets */
-#define GB_BUF_SIZE 1024
-static ALIGN real_t gb_time_buffer[2][GB_BUF_SIZE] IBSS_ATTR_FAAD_LARGE_IRAM;
-static ALIGN real_t gb_fb_intermed[2][GB_BUF_SIZE] IBSS_ATTR_FAAD_LARGE_IRAM;
-
-
 static void init_rm(RMContext *rmctx)
 {
     memcpy(rmctx, (void*)(( (intptr_t)ci->id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
@@ -49,7 +42,6 @@ enum codec_status codec_main(void)
     NeAACDecHandle decoder;
     size_t n;
     void *ret;
-    int needed_bufsize;
     unsigned int i;
     unsigned char* buffer;
     int err, consumed, pkt_offset, skipped = 0;
@@ -101,34 +93,6 @@ next_track:
         DEBUGF("FAAD: DecInit: %d, %d\n", err, decoder->object_type);
         err = CODEC_ERROR;
         goto done;
-    }
-    
-    /* Set pointer to be able to use IRAM an to avoid alloc in decoder. Must
-     * be called after NeAACDecOpen(). */
-    /* A buffer of framelength or 2*frameLenght size must be allocated for
-     * time_out. If frameLength is too big or SBR/forceUpSampling is active, 
-     * we do not use the IRAM buffer and keep faad's internal allocation (see 
-     * specrec.c). */
-    needed_bufsize = decoder->frameLength;
-#ifdef SBR_DEC
-    if ((decoder->sbr_present_flag == 1) || (decoder->forceUpSampling == 1))
-    {
-        needed_bufsize *= 2;
-    }
-#endif
-    if (needed_bufsize <= GB_BUF_SIZE)
-    {
-        decoder->time_out[0]    = &gb_time_buffer[0][0];
-        decoder->time_out[1]    = &gb_time_buffer[1][0];
-    }
-    /* A buffer of with frameLength elements must be allocated for fb_intermed. 
-     * If frameLength is too big, we do not use the IRAM buffer and keep faad's 
-     * internal allocation (see specrec.c). */
-    needed_bufsize = decoder->frameLength;
-    if (needed_bufsize <= GB_BUF_SIZE)
-    {
-        decoder->fb_intermed[0] = &gb_fb_intermed[0][0];
-        decoder->fb_intermed[1] = &gb_fb_intermed[1][0];
     }
     
     /* check for a mid-track resume and force a seek time accordingly */

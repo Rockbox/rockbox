@@ -72,8 +72,6 @@ extern "C" {
 
 char* NEAACDECAPI NeAACDecGetErrorMessage(uint8_t errcode);
 
-uint32_t NEAACDECAPI NeAACDecGetCapabilities(void);
-
 NeAACDecHandle NEAACDECAPI NeAACDecOpen(void);
 
 NeAACDecConfigurationPtr NEAACDECAPI NeAACDecGetCurrentConfiguration(NeAACDecHandle hDecoder);
@@ -97,19 +95,12 @@ int8_t NEAACDECAPI NeAACDecInit2(NeAACDecHandle hDecoder, uint8_t *pBuffer,
 int8_t NEAACDECAPI NeAACDecInitDRM(NeAACDecHandle *hDecoder, uint32_t samplerate,
                                    uint8_t channels);
 
-void NEAACDECAPI NeAACDecClose(NeAACDecHandle hDecoder);
-
 void NEAACDECAPI NeAACDecPostSeekReset(NeAACDecHandle hDecoder, int32_t frame);
 
 void* NEAACDECAPI NeAACDecDecode(NeAACDecHandle hDecoder,
                                  NeAACDecFrameInfo *hInfo,
                                  uint8_t *buffer,
                                  uint32_t buffer_size);
-
-void* NEAACDECAPI NeAACDecDecode2(NeAACDecHandle hDecoder,
-                                  NeAACDecFrameInfo *hInfo,
-                                  uint8_t *buffer, uint32_t buffer_size,
-                                  void **sample_buffer, uint32_t sample_buffer_size);
 
 #ifdef _WIN32
   #pragma pack(pop)

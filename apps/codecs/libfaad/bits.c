@@ -36,7 +36,7 @@
  * Samples were observed to need up to 1500 bytes (400 kbps nero aac).
  */
 #define BUFFER_SIZE 2048
-uint8_t static_buffer[BUFFER_SIZE] IBSS_ATTR;
+static uint8_t static_buffer[BUFFER_SIZE] IBSS_ATTR;
 
 /* initialize buffer, call once before first getbits or showbits */
 void faad_initbits(bitfile *ld, const void *_buffer, const uint32_t buffer_size)
@@ -111,6 +111,7 @@ uint8_t faad_byte_align(bitfile *ld)
 }
 
 /* rewind to beginning */
+/* not used
 void faad_rewindbits(bitfile *ld)
 {
     uint32_t tmp;
@@ -131,7 +132,9 @@ void faad_rewindbits(bitfile *ld)
     ld->bytes_used = 0;
     ld->no_more_reading = 0;
 }
+*/
 
+#ifdef ERROR_RESILIENCE
 uint8_t *faad_getbitbuffer(bitfile *ld, uint32_t bits
                        DEBUGDEC)
 {
@@ -139,7 +142,7 @@ uint8_t *faad_getbitbuffer(bitfile *ld, uint32_t bits
     uint8_t temp;
     uint16_t bytes = (uint16_t)bits / 8;
     uint8_t remainder = (uint8_t)bits % 8;
-
+    
     uint8_t *buffer = (uint8_t*)faad_malloc((bytes+1)*sizeof(uint8_t));
 
     for (i = 0; i < bytes; i++)
@@ -156,6 +159,7 @@ uint8_t *faad_getbitbuffer(bitfile *ld, uint32_t bits
 
     return buffer;
 }
+#endif
 
 #ifdef DRM
 /* return the original data buffer */
@@ -172,6 +176,7 @@ uint32_t faad_origbitbuffer_size(bitfile *ld)
 #endif
 
 /* reversed bit reading routines, used for RVLC and HCR */
+/* not used
 void faad_initbits_rev(bitfile *ld, void *buffer,
                        uint32_t bits_in_buffer)
 {
@@ -200,3 +205,4 @@ void faad_initbits_rev(bitfile *ld, void *buffer,
     ld->no_more_reading = 0;
     ld->error = 0;
 }
+*/

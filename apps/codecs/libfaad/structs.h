@@ -37,12 +37,13 @@ extern "C" {
 #include "sbr_dec.h"
 #endif
 
-#define MAX_CHANNELS        64
-#define MAX_SYNTAX_ELEMENTS 48
+#define MAX_CHANNELS         2 /* Was 64, but we need to limit RAM usage */
+#define MAX_SYNTAX_ELEMENTS  1 /* Was 48, but we need to limit RAM usage */
 #define MAX_WINDOW_GROUPS    8
 #define MAX_SFB             51
 #define MAX_LTP_SFB         40
 #define MAX_LTP_SFB_S        8
+#define FRAME_LEN         1024
 
 /* used to save the prediction state */
 typedef struct {
@@ -406,9 +407,6 @@ typedef struct
        determines the number of channels where output data is allocated for
     */
     uint8_t alloced_channels;
-
-    /* output data buffer */
-    void *sample_buffer;
 
     uint8_t window_shape_prev[MAX_CHANNELS];
 #ifdef LTP_DEC
