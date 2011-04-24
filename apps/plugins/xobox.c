@@ -956,6 +956,7 @@ static inline void move_board (void)
             player.level++;
         init_board ();
         refresh_board ();
+        rb->button_clear_queue();
         rb->splash (HZ * 2, "Ready?");
     }
 }
