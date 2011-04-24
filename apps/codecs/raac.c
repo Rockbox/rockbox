@@ -188,6 +188,7 @@ seek_start:
             }           
             ci->seek_buffer(pkt_offset + rmctx.data_offset + DATA_HEADER_SIZE);
             buffer = ci->request_buffer(&n,rmctx.audio_framesize + 1000);
+            NeAACDecPostSeekReset(decoder, i);
             ci->seek_complete();            
         }
 

@@ -173,6 +173,7 @@ next_track:
         } else {
             sound_samples_done = 0;
         }
+        NeAACDecPostSeekReset(decoder, i);
     } else {
         sound_samples_done = 0;
     }
@@ -209,6 +210,7 @@ next_track:
                     lead_trim = ci->id3->lead_trim;
                 }
             }
+            NeAACDecPostSeekReset(decoder, i);
             ci->seek_complete();
         }
 
