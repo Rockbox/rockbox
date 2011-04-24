@@ -505,6 +505,9 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
         offset = stream_read_uint32(qtmovie->stream);
         size_remaining -= 4;
     }
+    /* zero-terminate the lookup table */
+    qtmovie->res->lookup_table[idx].sample = 0;
+    qtmovie->res->lookup_table[idx].offset = 0;
 
     if (size_remaining)
     {
