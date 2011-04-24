@@ -25,6 +25,13 @@
 #include "screen_access.h"
 #include "settings.h"
 
+#if defined (HAVE_SCROLLWHEEL)      || \
+    (CONFIG_KEYPAD == PLAYER_PAD)
+/* Define this if your target makes sense to have 
+   smaller values at the top of the list increasing down the list */
+#define ASCENDING_INT_SETTINGS
+#endif
+
 bool option_screen(const struct settings_list *setting,
                    struct viewport parent[NB_SCREENS],
                    bool use_temp_var, unsigned char* option_title);

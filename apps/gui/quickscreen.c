@@ -275,7 +275,13 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
     }
     if (qs->items[item] == NULL)
         return false;
-
+#ifdef ASCENDING_INT_SETTINGS
+    if (((qs->items[item]->flags & F_INT_SETTING) == F_INT_SETTING) &&
+        ( button == ACTION_QS_DOWN || button == ACTION_QS_TOP))
+    {
+        invert = !invert;
+    }
+#endif
     option_select_next_val(qs->items[item], invert, true);
     talk_qs_option(qs->items[item], false);
     return true;
