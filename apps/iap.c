@@ -220,7 +220,7 @@ static void iap_set_remote_volume(void)
 
 static void cmd_ok_mode0(unsigned char cmd)
 {
-    unsigned char data[] = {0x00, 0x02, 0x00, 0x13};
+    unsigned char data[] = {0x00, 0x02, 0x00, 0x00};
     data[3] = cmd;  /* respond with cmd */
     iap_send_pkt(data, sizeof(data));
 }
@@ -229,109 +229,7 @@ static void iap_handlepkt_mode0(void)
 {
     unsigned int cmd = serbuf[2];
     switch (cmd) {
-    
-        case 0x24:
-        {
-            /* ipod video send this */
-            unsigned char data[] = {0x00, 0x25, 0x00, 0x00, 0x00,
-                                    0x00, 0x00, 0x00, 0x00, 0x01};
-            iap_send_pkt(data, sizeof(data));
-            break;
-        }
-
-        case 0x18:
-        {
-            /* ciphered authentication command */
-            /* Isn't used since we don't send the 0x00 0x17 command */
-            break;
-        }
-
-        case 0x15:
-        {
-            unsigned char data0[] = {0x00, 0x16, 0x00};
-            iap_send_pkt(data0, sizeof(data0));
-            unsigned char data1[] = {0x00, 0x27, 0x00};
-            iap_send_pkt(data1, sizeof(data1));
-            /* authentication ack, mandatory to enable some hardware */
-            unsigned char data2[] = {0x00, 0x19, 0x00};
-            iap_send_pkt(data2, sizeof(data2));
-            if (radio_present == 1)
-            {
-                /* get tuner capacities */
-                unsigned char data3[] = {0x07, 0x01};
-                iap_send_pkt(data3, sizeof(data3));
-            }
-            iap_set_remote_volume();
-            break;
-        }
-
-        case 0x13:
-        {
-            cmd_ok_mode0(cmd);
-
-            if (serbuf[6] == 0x35)
-            /* FM transmitter sends this: */
-            /* FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??)*/
-            {
-                unsigned char data2[] = {0x00, 0x27, 0x00};
-                iap_send_pkt(data2, sizeof(data2));
-                unsigned char data3[] = {0x05, 0x02};
-                iap_send_pkt(data3, sizeof(data3));
-            }
-
-            else
-            {
-                /* ipod fm remote sends this: */ 
-                /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 */
-                if (serbuf[6] |= 0x80)
-                    radio_present = 1;
-                unsigned char data4[] = {0x00, 0x14};
-                iap_send_pkt(data4, sizeof(data4));
-            }
-            break;
-        }
-
-        /* Init */
-        case 0x0F:
-        {
-            unsigned char data[] = {0x00, 0x10, 0x00, 0x01, 0x05};
-            data[2] = serbuf[3];
-            iap_send_pkt(data, sizeof(data));
-            break;
-        }
-
-        /* get model info */
-        case 0x0D:
-        {
-            /* ipod is supposed to work only with 5G and nano 2G */
-            /*{0x00, 0x0E, 0x00, 0x0B, 0x00, 0x05, 0x50, 0x41, 0x31, 0x34, 
-                    0x37, 0x4C, 0x4C, 0x00};    PA147LL (IPOD 5G 60 GO) */
-            unsigned char data[] = {0x00, 0x0E, 0x00, 0x0B, 0x00, 0x10,
-                                'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
-            iap_send_pkt(data, sizeof(data));
-            break;
-        }
-
-        /* Ipod FM remote sends this: FF 55 02 00 09 F5  */
-        case 0x09:
-        {
-            /* ipod5G firmware version */
-            unsigned char data[] = {0x00, 0x0A, 0x01, 0x02, 0x01 };
-            iap_send_pkt(data, sizeof(data));
-            break;
-        } 
-
-        /* FM transmitter sends this: */
-        /* FF 55 02 00 05 F9 (mode switch: AiR mode) */
-        case 0x05:
-        {
-            unsigned char data[] = {0x00, 0x02, 0x06,
-                                    0x05, 0x00, 0x00, 0x0B, 0xB8, 0x28};
-            iap_send_pkt(data, sizeof(data));
-            cmd_ok_mode0(cmd);
-            break;
-        }
-
+        /* Identify */
         case 0x01:
         {
             /* FM transmitter sends this: */
@@ -339,6 +237,7 @@ static void iap_handlepkt_mode0(void)
             if(serbuf[3] == 0x05)
             {
                 sleep(HZ/3);
+                /* RF Transmitter: Begin transmission */
                 unsigned char data[] = {0x05, 0x02};
                 iap_send_pkt(data, sizeof(data));
             }
@@ -350,7 +249,119 @@ static void iap_handlepkt_mode0(void)
             }
             break;
         }
+    
+        /* EnterRemoteUIMode, FM transmitter sends FF 55 02 00 05 F9 */
+        case 0x05:
+        {
+            /* ACK Pending (3000 ms) */
+            unsigned char data[] = {0x00, 0x02, 0x06,
+                                    0x05, 0x00, 0x00, 0x0B, 0xB8};
+            iap_send_pkt(data, sizeof(data));
+            cmd_ok_mode0(cmd);
+            break;
+        }
 
+        /* RequestiPodSoftwareVersion, Ipod FM remote sends FF 55 02 00 09 F5 */
+        case 0x09:
+        {
+            /* ReturniPodSoftwareVersion, ipod5G firmware version */
+            unsigned char data[] = {0x00, 0x0A, 0x01, 0x02, 0x01};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        } 
+
+        /* RequestiPodModelNum */
+        case 0x0D:
+        {
+            /* ipod is supposed to work only with 5G and nano 2G */
+            /*{0x00, 0x0E, 0x00, 0x0B, 0x00, 0x05, 0x50, 0x41, 0x31, 0x34, 
+                    0x37, 0x4C, 0x4C, 0x00};    PA147LL (IPOD 5G 60 GO) */
+            /* ReturniPodModelNum */
+            unsigned char data[] = {0x00, 0x0E, 0x00, 0x0B, 0x00, 0x10,
+                                'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* RequestLingoProtocolVersion */
+        case 0x0F:
+        {
+            /* ReturnLingoProtocolVersion */
+            unsigned char data[] = {0x00, 0x10, 0x00, 0x01, 0x05};
+            data[2] = serbuf[3];
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* IdentifyDeviceLingoes */
+        case 0x13:
+        {
+            cmd_ok_mode0(cmd);
+
+            if (serbuf[6] == 0x35)
+            /* FM transmitter sends this: */
+            /* FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??)*/
+            {
+                /* GetAccessoryInfo */
+                unsigned char data2[] = {0x00, 0x27, 0x00};
+                iap_send_pkt(data2, sizeof(data2));
+                /* RF Transmitter: Begin transmission */
+                unsigned char data3[] = {0x05, 0x02};
+                iap_send_pkt(data3, sizeof(data3));
+            }
+
+            else
+            {
+                /* ipod fm remote sends this: */ 
+                /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 */
+                if (serbuf[6] |= 0x80)
+                    radio_present = 1;
+                /* GetDevAuthenticationInfo */    
+                unsigned char data4[] = {0x00, 0x14};
+                iap_send_pkt(data4, sizeof(data4));
+            }
+            break;
+        }
+
+        /* RetDevAuthenticationInfo */
+        case 0x15:
+        {
+            /* AckDevAuthenticationInfo */
+            unsigned char data0[] = {0x00, 0x16, 0x00};
+            iap_send_pkt(data0, sizeof(data0));
+            /* GetAccessoryInfo */
+            unsigned char data1[] = {0x00, 0x27, 0x00};
+            iap_send_pkt(data1, sizeof(data1));
+            /* AckDevAuthenticationStatus, mandatory to enable some hardware */
+            unsigned char data2[] = {0x00, 0x19, 0x00};
+            iap_send_pkt(data2, sizeof(data2));
+            if (radio_present == 1)
+            {
+                /* GetTunerCaps */
+                unsigned char data3[] = {0x07, 0x01};
+                iap_send_pkt(data3, sizeof(data3));
+            }
+            iap_set_remote_volume();
+            break;
+        }
+
+        /* RetDevAuthenticationSignature */
+        case 0x18:
+        {
+            /* Isn't used since we don't send the 0x00 0x17 command */
+            break;
+        }
+
+        /* GetIpodOptions */
+        case 0x24:
+        {
+            /* RetIpodOptions (ipod video send this) */
+            unsigned char data[] = {0x00, 0x25, 0x00, 0x00, 0x00,
+                                    0x00, 0x00, 0x00, 0x00, 0x01};
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        
         /* default response is with cmd ok packet */
         default:
         {
