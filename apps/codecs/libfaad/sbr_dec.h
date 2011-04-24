@@ -39,8 +39,7 @@ extern "C" {
 #include "drm_dec.h"
 #endif
 
-/* MAX_NTSRHFG: maximum of number_time_slots * rate + HFGen. 16*2+8 */
-#define MAX_NTSRHFG 40
+#define MAX_NTSRHFG 40 /* maximum of number_time_slots * rate + HFGen. 16*2+8 */
 #define MAX_NTSR    32 /* max number_time_slots * rate, ok for DRM and not DRM mode */
 
 /* MAX_M: maximum value for M */

@@ -43,8 +43,16 @@
 
 
 /* globals */
-static qmf_t X_left [MAX_NTSRHFG][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
-static qmf_t X_right[MAX_NTSRHFG][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
+#if (defined(PS_DEC) || defined(DRM_PS))
+/* In case of PS_DEC or DRM_PS we need larger buffer data when calling
+ * ps_decode() or drm_ps_decode(). */
+static qmf_t X_left [MAX_NTSRPS][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
+static qmf_t X_right[MAX_NTSRPS][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
+#else
+/* No PS functions called. Keep using MAX_NTSR as array size. */
+static qmf_t X_left [MAX_NTSR][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
+static qmf_t X_right[MAX_NTSR][64] IBSS_ATTR_FAAD_XLARGE_IRAM MEM_ALIGN_ATTR;
+#endif
 
 
 /* static function declarations */

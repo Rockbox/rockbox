@@ -76,7 +76,7 @@ void qmfa_end(qmfa_info *qmfa)
 }
 
 void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
-                         qmf_t X[MAX_NTSRHFG][64], uint8_t offset, uint8_t kx)
+                         qmf_t X[MAX_NTSR][64], uint8_t offset, uint8_t kx)
 {
     real_t u[64] MEM_ALIGN_ATTR;
 #ifndef SBR_LOW_POWER
@@ -224,7 +224,7 @@ void qmfs_end(qmfs_info *qmfs)
 
 #ifdef SBR_LOW_POWER
 
-void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][64],
+void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
                           real_t *output)
 {
     real_t x[16] MEM_ALIGN_ATTR;
@@ -288,7 +288,7 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
     }
 }
 
-void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][64],
+void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
                           real_t *output)
 {
     real_t x[64] MEM_ALIGN_ATTR;
@@ -398,7 +398,7 @@ static const complex_t qmf32_pre_twiddle[] =
         (MUL_F(QMF_IM(X[l][k]), RE(qmf32_pre_twiddle[k])) + \
          MUL_F(QMF_RE(X[l][k]), IM(qmf32_pre_twiddle[k])))
 
-void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][64],
+void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
                           real_t *output)
 {
     real_t x1[32] MEM_ALIGN_ATTR;
@@ -461,7 +461,7 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][6
     }
 }
 
-void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSRHFG][64],
+void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
                           real_t *output)
 {
     real_t real1[32] MEM_ALIGN_ATTR; 

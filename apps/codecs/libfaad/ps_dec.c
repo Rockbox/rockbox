@@ -181,10 +181,16 @@ static void map20indexto34(int8_t *index, uint8_t bins);
 static void map34indexto20(int8_t *index, uint8_t bins);
 #endif
 static void ps_data_decode(ps_info *ps);
-static void ps_decorrelate(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38][64],
-                           qmf_t X_hybrid_left[32][32], qmf_t X_hybrid_right[32][32]);
-static void ps_mix_phase(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38][64],
-                         qmf_t X_hybrid_left[32][32], qmf_t X_hybrid_right[32][32]);
+static void ps_decorrelate(ps_info *ps, 
+                           qmf_t X_left[MAX_NTSRPS][64], 
+                           qmf_t X_right[MAX_NTSRPS][64],
+                           qmf_t X_hybrid_left[32][32], 
+                           qmf_t X_hybrid_right[32][32]);
+static void ps_mix_phase(ps_info *ps, 
+                         qmf_t X_left[MAX_NTSRPS][64], 
+                         qmf_t X_right[MAX_NTSRPS][64],
+                         qmf_t X_hybrid_left[32][32], 
+                         qmf_t X_hybrid_right[32][32]);
 
 /*  */
 
@@ -1027,8 +1033,11 @@ static void ps_data_decode(ps_info *ps)
 }
 
 /* decorrelate the mono signal using an allpass filter */
-static void ps_decorrelate(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38][64],
-                           qmf_t X_hybrid_left[32][32], qmf_t X_hybrid_right[32][32])
+static void ps_decorrelate(ps_info *ps, 
+                           qmf_t X_left[MAX_NTSRPS][64], 
+                           qmf_t X_right[MAX_NTSRPS][64],
+                           qmf_t X_hybrid_left[32][32], 
+                           qmf_t X_hybrid_right[32][32])
 {
     uint8_t gr, n, m, bk;
     uint8_t temp_delay = 0;
@@ -1423,8 +1432,11 @@ static const real_t ipdopd_sin_tab[] = {
     FRAC_CONST(-0.000000000000000)
 };
 
-static void ps_mix_phase(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38][64],
-                         qmf_t X_hybrid_left[32][32], qmf_t X_hybrid_right[32][32])
+static void ps_mix_phase(ps_info *ps, 
+                         qmf_t X_left[MAX_NTSRPS][64], 
+                         qmf_t X_right[MAX_NTSRPS][64],
+                         qmf_t X_hybrid_left[32][32], 
+                         qmf_t X_hybrid_right[32][32])
 {
     uint8_t n;
     uint8_t gr;
@@ -1939,13 +1951,15 @@ ps_info *ps_init(uint8_t sr_index)
 }
 
 /* main Parametric Stereo decoding function */
-uint8_t ps_decode(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38][64])
+uint8_t ps_decode(ps_info *ps, 
+                  qmf_t X_left[MAX_NTSRPS][64], 
+                  qmf_t X_right[MAX_NTSRPS][64])
 {
     static qmf_t X_hybrid_left[32][32];
     static qmf_t X_hybrid_right[32][32];
 
-    memset(&X_hybrid_left,0,sizeof(X_hybrid_left));
-    memset(&X_hybrid_right,0,sizeof(X_hybrid_right));
+    memset(&X_hybrid_left , 0, sizeof(X_hybrid_left));
+    memset(&X_hybrid_right, 0, sizeof(X_hybrid_right));
 
     /* delta decoding of the bitstream data */
     ps_data_decode(ps);

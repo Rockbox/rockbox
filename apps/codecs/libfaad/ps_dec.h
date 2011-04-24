@@ -39,6 +39,8 @@ extern "C" {
 #define MAX_PS_ENVELOPES 5
 #define NO_ALLPASS_LINKS 3
 
+#define MAX_NTSRPS  38 /* max number_time_slots * rate + 6 (delay) */
+
 typedef struct
 {
     /* bitstream parameters */
@@ -138,7 +140,9 @@ uint16_t ps_data(ps_info *ps, bitfile *ld, uint8_t *header);
 ps_info *ps_init(uint8_t sr_index);
 void ps_free(ps_info *ps);
 
-uint8_t ps_decode(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38][64]);
+uint8_t ps_decode(ps_info *ps, 
+                  qmf_t X_left[MAX_NTSRPS][64], 
+                  qmf_t X_right[MAX_NTSRPS][64]);
 
 
 #ifdef __cplusplus
