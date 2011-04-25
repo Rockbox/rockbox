@@ -262,6 +262,14 @@ static void iap_handlepkt_mode0(void)
             break;
         }
 
+        /* ExitRemoteUIMode */
+        case 0x06:
+        {
+            audio_stop();
+            cmd_ok_mode0(cmd);
+            break;
+        }
+
         /* RequestiPodSoftwareVersion, Ipod FM remote sends FF 55 02 00 09 F5 */
         case 0x09:
         {
