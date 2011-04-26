@@ -77,8 +77,9 @@ static int16_t s_lt_pred_stat[MAX_CHANNELS][4*FRAME_LEN] MEM_ALIGN_ATTR;
 /* static function declarations */
 static void* aac_frame_decode(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
                               uint8_t *buffer, uint32_t buffer_size);
+/* not used by rockbox
 static void create_channel_config(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo);
-
+*/
 
 char* NEAACDECAPI NeAACDecGetErrorMessage(uint8_t errcode)
 {
@@ -305,6 +306,12 @@ int32_t NEAACDECAPI NeAACDecInit(NeAACDecHandle hDecoder, uint8_t *buffer,
     }
 #endif
 
+    /* A maximum of MAX_CHANNELS channels is supported. */
+    if (*channels > MAX_CHANNELS)
+    {
+        return -1;
+    }
+
 #ifdef SBR_DEC
     /* implicit signalling */
     if (*samplerate <= 24000 && !(hDecoder->config.dontUpSampleImplicitSBR))
@@ -399,6 +406,13 @@ int8_t NEAACDECAPI NeAACDecInit2(NeAACDecHandle hDecoder, uint8_t *pBuffer,
         *channels = 2;
     }
 #endif
+
+    /* A maximum of MAX_CHANNELS channels is supported. */
+    if (*channels > MAX_CHANNELS)
+    {
+        return -1;
+    }
+
     hDecoder->sf_index = mp4ASC.samplingFrequencyIndex;
     hDecoder->object_type = mp4ASC.objectTypeIndex;
 #ifdef ERROR_RESILIENCE
@@ -520,6 +534,8 @@ void NEAACDECAPI NeAACDecPostSeekReset(NeAACDecHandle hDecoder, int32_t frame)
     }
 }
 
+/* not used by rockbox */
+#if 0
 static void create_channel_config(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo)
 {
     hInfo->num_front_channels = 0;
@@ -724,6 +740,7 @@ static void create_channel_config(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hI
         }
     }
 }
+#endif
 
 void* NEAACDECAPI NeAACDecDecode(NeAACDecHandle hDecoder,
                                  NeAACDecFrameInfo *hInfo,
@@ -882,7 +899,9 @@ static void* aac_frame_decode(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
 #endif
 
     /* Make a channel configuration based on either a PCE or a channelConfiguration */
+    /* not used by rockbox
     create_channel_config(hDecoder, hInfo);
+    */
 
     /* number of samples in this frame */
     hInfo->samples = frame_len*output_channels;
