@@ -110,7 +110,6 @@ static mpc_status check_streaminfo(mpc_streaminfo * si)
 mpc_status
 streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r)
 {
-    mpc_uint16_t Estimatedpeak_title = 0;
     mpc_uint32_t frames, last_frame_samples;
 
     si->bitrate            = 0;
@@ -124,7 +123,7 @@ streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r)
 */
     mpc_bits_read(r, 2); // Link ?
     si->sample_freq        = samplefreqs[mpc_bits_read(r, 2)];
-    Estimatedpeak_title    = (mpc_uint16_t) mpc_bits_read(r, 16);   // read the ReplayGain data
+    mpc_bits_read(r, 16); // Estimatedpeak_title
     si->gain_title         = (mpc_uint16_t) mpc_bits_read(r, 16);
     si->peak_title         = (mpc_uint16_t) mpc_bits_read(r, 16);
     si->gain_album         = (mpc_uint16_t) mpc_bits_read(r, 16);

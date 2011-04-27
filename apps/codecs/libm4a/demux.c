@@ -55,7 +55,6 @@ typedef struct
 static void read_chunk_ftyp(qtmovie_t *qtmovie, size_t chunk_len)
 {
     fourcc_t type;
-    uint32_t minor_ver;
     size_t size_remaining = chunk_len - 8;
 
     type = stream_read_uint32(qtmovie->stream);
@@ -71,7 +70,7 @@ static void read_chunk_ftyp(qtmovie_t *qtmovie, size_t chunk_len)
         DEBUGF("not M4A file\n");
         return;
     }
-    minor_ver = stream_read_uint32(qtmovie->stream);
+    /* minor_ver = */ stream_read_uint32(qtmovie->stream);
     size_remaining-=4;
 
     /* compatible brands */
@@ -104,9 +103,6 @@ static bool read_chunk_esds(qtmovie_t *qtmovie, size_t chunk_len)
 {
     uint8_t tag;
     uint32_t temp;
-    int audioType;
-    int32_t maxBitrate;
-    int32_t avgBitrate;
 
     (void)chunk_len;
     /* version and flags */
@@ -138,12 +134,10 @@ static bool read_chunk_esds(qtmovie_t *qtmovie, size_t chunk_len)
     temp = mp4ff_read_mp4_descr_length(qtmovie->stream);
     if (temp < 13) return false;
 
-    audioType = stream_read_uint8(qtmovie->stream);
-    temp=stream_read_int32(qtmovie->stream);//0x15000414 ????
-    maxBitrate = stream_read_int32(qtmovie->stream);
-    avgBitrate = stream_read_int32(qtmovie->stream);
-    DEBUGF("audioType=%d, maxBitrate=%ld, avgBitrate=%ld\n",audioType,
-           (long)maxBitrate,(long)avgBitrate);
+    /* audioType = */  stream_read_uint8(qtmovie->stream);
+    /* temp = */       stream_read_int32(qtmovie->stream);//0x15000414 ????
+    /* maxBitrate = */ stream_read_int32(qtmovie->stream);
+    /* avgBitrate = */ stream_read_int32(qtmovie->stream);
 
     /* get and verify DecSpecificInfoTag */
     if (stream_read_uint8(qtmovie->stream) != 0x05)
