@@ -2179,11 +2179,13 @@ static void audio_on_codec_complete(int status)
 
     codec_skip_pending = false;
 
+#ifdef AB_REPEAT_ENABLE
     if (status >= 0)
     {
         /* Normal automatic skip */
         ab_end_of_track_report();
     }
+#endif
 
     int trackstat = LOAD_TRACK_OK;
 
