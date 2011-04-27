@@ -43,6 +43,10 @@
 #include "tuner.h"
 #include "ipod_remote_tuner.h"
 
+#define MAX_NAME_LENGTH 20
+#include "filetree.h"
+#include "dir.h"
+
 static volatile int iap_pollspeed = 0;
 static volatile bool iap_remotetick = true;
 static bool iap_setupflag = false, iap_updateflag = false;
@@ -57,6 +61,8 @@ static int serbuf_i = 0;
 
 static unsigned char response[TX_BUFLEN];
 static int responselen;
+
+static char cur_dbrecord[5] = {0};
 
 static void iap_task(void)
 {
@@ -527,6 +533,33 @@ static void cmd_ok_mode4(unsigned int cmd)
     iap_send_pkt(data, sizeof(data));
 }
 
+static void get_playlist_name(unsigned char *dest,
+                              unsigned long item_offset,
+                              size_t max_length)
+{
+    if (item_offset == 0) return;
+    DIR* dp;
+    struct dirent* playlist_file = NULL;
+
+    dp = opendir(global_settings.playlist_catalog_dir);
+
+    char *extension;
+    unsigned long nbr = 0;
+    while ((nbr < item_offset) && ((playlist_file = readdir(dp)) != NULL))
+    {
+        /*Increment only if there is a playlist extension*/
+        if ((extension=strrchr(playlist_file->d_name, '.')) != NULL){
+            if ((strcmp(extension, ".m3u") == 0 || 
+                strcmp(extension, ".m3u8") == 0))
+                nbr++;
+        }
+    }
+    if (playlist_file != NULL) {
+        strlcpy(dest, playlist_file->d_name, max_length);
+    }
+    closedir(dp);
+}
+
 static void iap_handlepkt_mode4(void)
 {
     unsigned int cmd = (serbuf[2] << 8) | serbuf[3];
@@ -559,25 +592,74 @@ static void iap_handlepkt_mode4(void)
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
+        /* SelectDBRecord */
+        case 0x0017:
+        {
+            memcpy(cur_dbrecord, serbuf + 4, 5);
+            cmd_ok_mode4(cmd);
+            break;
+        }
+
         /* GetNumberCategorizedDBRecords */
         case 0x0018:
         {
             /* ReturnNumberCategorizedDBRecords */
             unsigned char data[] = {0x04, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00};
             unsigned long num = 0;
+            
+            DIR* dp;
+            unsigned long nbr_total_playlists = 0;
+            struct dirent* playlist_file = NULL;
+            char *extension;
+
             switch(serbuf[4]) /* type number */
             {
                 case 0x01: /* total number of playlists */
-                    num = 1;
+                    dp = opendir(global_settings.playlist_catalog_dir);
+                    while ((playlist_file = readdir(dp)) != NULL)
+                    {
+                    /*Increment only if there is a playlist extension*/
+                        if ((extension=strrchr(playlist_file->d_name, '.'))
+                        != NULL) {
+                            if ((strcmp(extension, ".m3u") == 0 || 
+                                strcmp(extension, ".m3u8") == 0))
+                                nbr_total_playlists++;
+                        }
+                    }
+                    closedir(dp);
+                    /*Add 1 for the main playlist*/
+                    num = nbr_total_playlists + 1;
                     break;
                 case 0x05: /* total number of songs */
                     num = 1;
+                    break;
             }
             data[3] = num >> 24;
             data[4] = num >> 16;
             data[5] = num >> 8;
             data[6] = num;
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+        
+        /* RetrieveCategorizedDatabaseRecords */
+        case 0x001A:
+        {
+            /* ReturnCategorizedDatabaseRecord */
+            unsigned char data[7 + MAX_NAME_LENGTH] = 
+                            {0x04, 0x00, 0x1B, 0x00, 0x00, 0x00, 0x00,
+                             'R', 'O', 'C', 'K', 'B', 'O', 'X', '\0'};
+            
+            unsigned long item_offset = (serbuf[5] << 24) | (serbuf[6] << 16) |
+                                        (serbuf[7] << 8) | serbuf[8];
+
+            get_playlist_name(data + 7, item_offset, MAX_NAME_LENGTH);
+            /*Remove file extension*/
+            char *dot=NULL;
+            dot = (strrchr(data+7, '.'));
+            if (dot != NULL)
+                *dot = '\0';
             iap_send_pkt(data, sizeof(data));
             break;
         }
@@ -681,6 +763,37 @@ static void iap_handlepkt_mode4(void)
         {
             iap_pollspeed = serbuf[4] ? 1 : 0;
             /* respond with cmd ok packet */
+            cmd_ok_mode4(cmd);
+            break;
+        }
+        
+        /* PlayCurrentSelection */
+        case 0x0028:
+        {
+            switch (cur_dbrecord[0])
+            {
+                case 0x01:
+                {/*Playlist*/
+                    unsigned long item_offset = (cur_dbrecord[1] << 24)|
+                                                (cur_dbrecord[2] << 16)|
+                                                (cur_dbrecord[3] << 8) |
+                                                 cur_dbrecord[4];
+                    unsigned char selected_playlist
+                    [sizeof(global_settings.playlist_catalog_dir) + 1 + MAX_NAME_LENGTH] = {0};
+
+                    strcpy(selected_playlist,
+                            global_settings.playlist_catalog_dir);
+                    int len = strlen(selected_playlist);
+                    selected_playlist[len] = '/';
+                    get_playlist_name (selected_playlist + len + 1,
+                                       item_offset,
+                                       MAX_NAME_LENGTH);
+                    ft_play_playlist(selected_playlist,
+                                     global_settings.playlist_catalog_dir,
+                                     strrchr(selected_playlist, '/') + 1);
+                    break;
+                }
+            }
             cmd_ok_mode4(cmd);
             break;
         }
