@@ -70,7 +70,6 @@ struct bufopen_bitmap_data {
 #endif
 
 /* Functions */
-void voice_wait(void);
 bool audio_is_thread_ready(void);
 int audio_track_count(void);
 long audio_filebufused(void);

@@ -83,6 +83,9 @@
 #include "bookmark.h"
 #include "wps.h"
 #include "playback.h"
+#if CONFIG_CODEC == SWCODEC
+#include "voice_thread.h"
+#endif
 
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF) \

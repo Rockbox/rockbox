@@ -27,6 +27,7 @@ void mp3_play_stop(void);
 void mp3_play_pause(bool play);
 bool mp3_is_playing(void);
 
+void voice_wait(void);
 void voice_stop(void);
 void voice_thread_init(void);
 void voice_thread_resume(void);

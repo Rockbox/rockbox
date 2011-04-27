@@ -86,7 +86,6 @@
 #define SYS_VOLUME_CHANGED        MAKE_SYS_EVENT(SYS_EVENT_CLS_MISC, 5)
 
 #define IS_SYSEVENT(ev)           ((ev & SYS_EVENT) == SYS_EVENT)
-#define EVENT_RESERVED            (~0)
 
 #ifndef TIMEOUT_BLOCK
 #define TIMEOUT_BLOCK   -1
