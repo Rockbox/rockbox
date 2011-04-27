@@ -4319,7 +4319,7 @@ static int dontresettrack = 0;
 enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
-        /* we only render 16 bits, 44.1KHz, Stereo */
+        /* we only render 16 bits, 44.1KHz, Mono */
         ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
         ci->configure(DSP_SET_FREQUENCY, 44100);
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
@@ -4338,6 +4338,7 @@ enum codec_status codec_run(void)
     size_t n;
     int endofstream; /* end of stream flag */
     int usingplaylist = 0;
+    intptr_t param;
     
     DEBUGF("NSF: next_track\n");
     if (codec_init()) {
@@ -4406,27 +4407,21 @@ init_nsf:
     reset_profile_timers();
     
     while (!endofstream) {
-        intptr_t param;
         enum codec_command_action action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
-            if (param > 0) {
-                track=param/1000;
-                if (usingplaylist) {
-                    if (track>=nPlaylistSize) break;
-                } else {
-                    if (track>=nTrackCount) break;
-                }
-                dontresettrack=1;
-                ci->seek_complete();
-                goto init_nsf;
+            track=param/1000;
+            if (usingplaylist) {
+                if (track>=nPlaylistSize) break;
+            } else {
+                if (track>=nTrackCount) break;
             }
-            else {
-                ci->seek_complete();
-            }
+            dontresettrack=1;
+            ci->seek_complete();
+            goto init_nsf;
         }
 
         ENTER_TIMER(total);
