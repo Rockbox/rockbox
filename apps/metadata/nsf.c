@@ -9,6 +9,7 @@
 #include "metadata_common.h"
 #include "metadata_parsers.h"
 #include "rbunicode.h"
+#include "string-extra.h"
 
 struct NESM_HEADER
 {
