@@ -106,9 +106,19 @@ static int convert_au_format(unsigned int encoding, struct pcm_format *fmt)
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    int status;
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
     struct pcm_format format;
     uint32_t bytesdone, decodedsamples;
     size_t n;
@@ -119,21 +129,12 @@ enum codec_status codec_main(void)
     off_t firstblockposn;     /* position of the first block in file */
     const struct pcm_codec *codec;
     int offset = 0;
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
-  
-next_track:
-    status = CODEC_OK;
-
+    intptr_t param;
+ 
     if (codec_init()) {
         DEBUGF("codec_init() error\n");
-        status = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
-
-    if (codec_wait_taginfo() != 0)
-        goto done;
 
     codec_set_replaygain(ci->id3);
     
@@ -145,6 +146,7 @@ next_track:
     format.is_little_endian = false;
 
     /* set format */
+    ci->seek_buffer(0);
     buf = ci->request_buffer(&n, 24);
     if (n < 24 || (memcmp(buf, ".snd", 4) != 0))
     {
@@ -170,8 +172,7 @@ next_track:
         if (offset < 24)
         {
             DEBUGF("CODEC_ERROR: sun audio offset size is small: %d\n", offset);
-            status = CODEC_ERROR;
-            goto done;
+            return CODEC_ERROR;
         }
         /* data size */
         format.numbytes = get_be32(buf + 8);
@@ -182,8 +183,7 @@ next_track:
         if (format.formattag == AU_FORMAT_UNSUPPORT)
         {
             DEBUGF("CODEC_ERROR: sun audio unsupport format: %d\n", get_be32(buf + 12));
-            status = CODEC_ERROR;
-            goto done;
+            return CODEC_ERROR;
         }
         /* skip sample rate */
         format.channels = get_be32(buf + 20);
@@ -202,20 +202,17 @@ next_track:
     if (!codec)
     {
         DEBUGF("CODEC_ERROR: unsupport sun audio format: %x\n", (int)format.formattag);
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     if (!codec->set_format(&format))
     {
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     if (format.numbytes == 0) {
         DEBUGF("CODEC_ERROR: data size is 0\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* check chunksize */
@@ -225,8 +222,7 @@ next_track:
     if (format.chunksize == 0)
     {
         DEBUGF("CODEC_ERROR: chunksize is 0\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
@@ -236,8 +232,7 @@ next_track:
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* make sure we're at the correct offset */
@@ -253,7 +248,6 @@ next_track:
             bytesdone      = newpos->pos;
             decodedsamples = newpos->samples;
         }
-        ci->seek_complete();
     } else {
         /* already where we need to be */
         bytesdone = 0;
@@ -263,22 +257,29 @@ next_track:
     endofstream = 0;
 
     while (!endofstream) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
-            break;
-        }
+        enum codec_command_action action = ci->get_command(&param);
 
-        if (ci->seek_time) {
+        if (action == CODEC_ACTION_HALT)
+            break;
+
+        if (action == CODEC_ACTION_SEEK_TIME) {
             /* 3rd args(read_buffer) is unnecessary in the format which Sun Audio supports.  */
-            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, PCM_SEEK_TIME, NULL);
+            struct pcm_pos *newpos = codec->get_seek_pos(param, PCM_SEEK_TIME, NULL);
 
             if (newpos->pos > format.numbytes)
+            {
+                ci->set_elapsed(ci->id3->length);
+                ci->seek_complete();
                 break;
+            }
+
             if (ci->seek_buffer(firstblockposn + newpos->pos))
             {
                 bytesdone      = newpos->pos;
                 decodedsamples = newpos->samples;
             }
+
+            ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
             ci->seek_complete();
         }
 
@@ -290,11 +291,10 @@ next_track:
             endofstream = 1;
         }
 
-        status = codec->decode(aubuf, n, samples, &bufcount);
-        if (status == CODEC_ERROR)
+        if (codec->decode(aubuf, n, samples, &bufcount) == CODEC_ERROR)
         {
             DEBUGF("codec error\n");
-            goto done;
+            return CODEC_ERROR;
         }
 
         ci->pcmbuf_insert(samples, NULL, bufcount);
@@ -308,9 +308,5 @@ next_track:
     }
 
 done:
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    return status;
+    return CODEC_OK;
 }

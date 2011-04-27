@@ -40,6 +40,9 @@ bool get_nsf_metadata(int fd, struct mp3entry* id3)
 
     p = id3->id3v2buf;
 
+    /* Length */
+    id3->length = buf[6]*1000;
+
     /* Title */
     memcpy(p, &buf[14], 32);
     id3->title = p;

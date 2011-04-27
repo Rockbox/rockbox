@@ -266,9 +266,7 @@ struct mp3entry {
 
     /* resume related */
     unsigned long offset;  /* bytes played */
-#if CONFIG_CODEC != SWCODEC
     int index;             /* playlist index */
-#endif
 
 #ifdef HAVE_TAGCACHE
     unsigned char autoresumable; /* caches result of autoresumable() */
@@ -309,9 +307,14 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname);
 bool mp3info(struct mp3entry *entry, const char *filename);
 void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig);
 void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig);
+void wipe_mp3entry(struct mp3entry *id3);
 
 #if CONFIG_CODEC == SWCODEC
+void fill_metadata_from_path(struct mp3entry *id3, const char *trackname);
+int get_audio_base_codec_type(int type);
 void strip_tags(int handle_id);
+enum data_type get_audio_base_data_type(int afmt);
+bool format_buffers_with_offset(int afmt);
 #endif
 
 #ifdef HAVE_TAGCACHE

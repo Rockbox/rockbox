@@ -58,7 +58,7 @@
 #define GUARD_BUFSIZE   (32*1024)
 
 /* Define LOGF_ENABLE to enable logf output in this file */
-/*#define LOGF_ENABLE*/
+/* #define LOGF_ENABLE */
 #include "logf.h"
 
 /* macros to enable logf for queues
@@ -82,8 +82,6 @@
 #define LOGFQUEUE_SYS_TIMEOUT(...)
 #endif
 
-/* default point to start buffer refill */
-#define BUFFERING_DEFAULT_WATERMARK      (1024*128)
 /* amount of data to read in one read() call */
 #define BUFFERING_DEFAULT_FILECHUNK      (1024*32)
 
@@ -94,6 +92,8 @@
 struct memory_handle {
     int id;                    /* A unique ID for the handle */
     enum data_type type;       /* Type of data buffered with this handle */
+    int8_t pinned;             /* Count of references */
+    int8_t signaled;           /* Stop any attempt at waiting to get the data */
     char path[MAX_PATH];       /* Path if data originated in a file */
     int fd;                    /* File descriptor to path (-1 if closed) */
     size_t data;               /* Start index of the handle's data buffer */
@@ -125,9 +125,7 @@ static volatile size_t buf_ridx;  /* current reading position */
 
 /* Configuration */
 static size_t conf_watermark = 0; /* Level to trigger filebuf fill */
-#if MEMORYSIZE > 8
 static size_t high_watermark = 0; /* High watermark for rebuffer */
-#endif
 
 /* current memory handle in the linked list. NULL when the list is empty. */
 static struct memory_handle *cur_handle;
@@ -162,7 +160,6 @@ enum
     Q_REBUFFER_HANDLE,   /* Request reset and rebuffering of a handle at a new
                             file starting position. */
     Q_CLOSE_HANDLE,      /* Request closing a handle */
-    Q_BASE_HANDLE,       /* Set the reference handle for buf_useful_data */
 
     /* Configuration: */
     Q_START_FILL,        /* Request that the buffering thread initiate a buffer
@@ -221,6 +218,9 @@ static inline ssize_t ringbuf_add_cross(uintptr_t p1, size_t v, uintptr_t p2)
 
 /* Bytes available in the buffer */
 #define BUF_USED ringbuf_sub(buf_widx, buf_ridx)
+
+/* Real buffer watermark */
+#define BUF_WATERMARK MIN(conf_watermark, high_watermark)
 
 /*
 LINKED LIST MANAGEMENT
@@ -313,6 +313,12 @@ static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
     /* Prevent buffering thread from looking at it */
     new_handle->filerem = 0;
 
+    /* Handle can be moved by default */
+    new_handle->pinned = 0;
+
+    /* Handle data can be waited for by default */
+    new_handle->signaled = 0;
+
     /* only advance the buffer write index of the size of the struct */
     buf_widx = ringbuf_add(buf_widx, sizeof(struct memory_handle));
 
@@ -364,6 +370,9 @@ static bool rm_handle(const struct memory_handle *h)
                 buf_widx = cur_handle->widx;
             }
         } else {
+            /* If we don't find ourselves, this is a seriously incoherent
+               state with a corrupted list and severe action is needed! */
+            panicf("rm_handle fail: %d", h->id);
             return false;
         }
     }
@@ -385,8 +394,7 @@ static struct memory_handle *find_handle(int handle_id)
 
     /* simple caching because most of the time the requested handle
     will either be the same as the last, or the one after the last */
-    if (cached_handle)
-    {
+    if (cached_handle) {
         if (cached_handle->id == handle_id) {
             return cached_handle;
         } else if (cached_handle->next &&
@@ -618,19 +626,21 @@ static void update_data_counters(struct data_counters *dc)
 static inline bool buffer_is_low(void)
 {
     update_data_counters(NULL);
-    return data_counters.useful < (conf_watermark / 2);
+    return data_counters.useful < BUF_WATERMARK / 2;
 }
 
 /* Q_BUFFER_HANDLE event and buffer data for the given handle.
    Return whether or not the buffering should continue explicitly.  */
 static bool buffer_handle(int handle_id, size_t to_buffer)
 {
-    logf("buffer_handle(%d)", handle_id);
+    logf("buffer_handle(%d, %lu)", handle_id, (unsigned long)to_buffer);
     struct memory_handle *h = find_handle(handle_id);
     bool stop = false;
 
     if (!h)
         return true;
+
+    logf("  type: %d", (int)h->type);
 
     if (h->filerem == 0) {
         /* nothing left to buffer */
@@ -659,13 +669,13 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
         if (!get_metadata((struct mp3entry *)(buffer + h->data),
                           h->fd, h->path)) {
             /* metadata parsing failed: clear the buffer. */
-            memset(buffer + h->data, 0, sizeof(struct mp3entry));
+            wipe_mp3entry((struct mp3entry *)(buffer + h->data));
         }
         close(h->fd);
         h->fd = -1;
         h->filerem = 0;
         h->available = sizeof(struct mp3entry);
-        h->widx += sizeof(struct mp3entry);
+        h->widx = ringbuf_add(h->widx, sizeof(struct mp3entry));
         send_event(BUFFER_EVENT_FINISHED, &handle_id);
         return true;
     }
@@ -698,7 +708,7 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
                 break;
             }
 
-            DEBUGF("File ended %ld bytes early\n", (long)h->filerem);
+            logf("File ended %ld bytes early\n", (long)h->filerem);
             h->filesize -= h->filerem;
             h->filerem = 0;
             break;
@@ -770,22 +780,31 @@ static bool close_handle(int handle_id)
    part of its data buffer or by moving all the data. */
 static void shrink_handle(struct memory_handle *h)
 {
-    size_t delta;
-
     if (!h)
         return;
 
-    if (h->type == TYPE_ID3 || h->type == TYPE_CUESHEET ||
-        h->type == TYPE_BITMAP || h->type == TYPE_CODEC ||
-        h->type == TYPE_ATOMIC_AUDIO)
-    {
+    if (h->type == TYPE_PACKET_AUDIO) {
+        /* only move the handle struct */
+        /* data is pinned by default - if we start moving packet audio,
+           the semantics will determine whether or not data is movable
+           but the handle will remain movable in either case */
+        size_t delta = ringbuf_sub(h->ridx, h->data);
+
+        /* The value of delta might change for alignment reasons */
+        if (!move_handle(&h, &delta, 0, true))
+            return;
+
+        h->data = ringbuf_add(h->data, delta);
+        h->available -= delta;
+        h->offset += delta;
+    } else {
         /* metadata handle: we can move all of it */
-        if (!h->next || h->filerem != 0)
-            return; /* Last handle or not finished loading */
+        if (h->pinned || !h->next || h->filerem != 0)
+            return; /* Pinned, last handle or not finished loading */
 
         uintptr_t handle_distance =
             ringbuf_sub(ringbuf_offset(h->next), h->data);
-        delta = handle_distance - h->available;
+        size_t delta = handle_distance - h->available;
 
         /* The value of delta might change for alignment reasons */
         if (!move_handle(&h, &delta, h->available, h->type==TYPE_CODEC))
@@ -806,15 +825,6 @@ static void shrink_handle(struct memory_handle *h)
             struct bitmap *bmp = (struct bitmap *)&buffer[h->data];
             bmp->data = &buffer[h->data + sizeof(struct bitmap)];
         }
-    } else {
-        /* only move the handle struct */
-        delta = ringbuf_sub(h->ridx, h->data);
-        if (!move_handle(&h, &delta, 0, true))
-            return;
-
-        h->data = ringbuf_add(h->data, delta);
-        h->available -= delta;
-        h->offset += delta;
     }
 }
 
@@ -962,6 +972,8 @@ int bufopen(const char *file, size_t offset, enum data_type type,
         mutex_unlock(&llist_mutex);
         return handle_id;
     }
+    else if (type == TYPE_UNKNOWN)
+        return ERR_UNSUPPORTED_TYPE;
 #ifdef APPLICATION
     /* loading code from memory is not supported in application builds */
     else if (type == TYPE_CODEC)
@@ -1083,7 +1095,12 @@ int bufopen(const char *file, size_t offset, enum data_type type,
 */
 int bufalloc(const void *src, size_t size, enum data_type type)
 {
-    int handle_id = ERR_BUFFER_FULL;
+    int handle_id;
+
+    if (type == TYPE_UNKNOWN)
+        return ERR_UNSUPPORTED_TYPE;
+
+    handle_id = ERR_BUFFER_FULL;
 
     mutex_lock(&llist_mutex);
 
@@ -1124,7 +1141,14 @@ int bufalloc(const void *src, size_t size, enum data_type type)
 bool bufclose(int handle_id)
 {
     logf("bufclose(%d)", handle_id);
-
+#if 0
+    /* Don't interrupt the buffering thread if the handle is already
+       stale */
+    if (!find_handle(handle_id)) {
+        logf("  handle already closed");
+        return true;
+    }
+#endif
     LOGFQUEUE("buffering >| Q_CLOSE_HANDLE %d", handle_id);
     return queue_send(&buffering_queue, Q_CLOSE_HANDLE, handle_id);
 }
@@ -1236,9 +1260,10 @@ static int seek_handle(struct memory_handle *h, size_t newpos)
 
 /* Set reading index in handle (relatively to the start of the file).
    Access before the available data will trigger a rebuffer.
-   Return 0 for success and < 0 for failure:
-     -1 if the handle wasn't found
-     -2 if the new requested position was beyond the end of the file
+   Return 0 for success and for failure:
+     ERR_HANDLE_NOT_FOUND if the handle wasn't found
+     ERR_INVALID_VALUE if the new requested position was beyond the end of
+     the file
 */
 int bufseek(int handle_id, size_t newpos)
 {
@@ -1250,7 +1275,11 @@ int bufseek(int handle_id, size_t newpos)
 }
 
 /* Advance the reading index in a handle (relatively to its current position).
-   Return 0 for success and < 0 for failure */
+   Return 0 for success and for failure:
+     ERR_HANDLE_NOT_FOUND if the handle wasn't found
+     ERR_INVALID_VALUE if the new requested position was beyond the end of
+     the file
+ */
 int bufadvance(int handle_id, off_t offset)
 {
     struct memory_handle *h = find_handle(handle_id);
@@ -1259,6 +1288,18 @@ int bufadvance(int handle_id, off_t offset)
 
     size_t newpos = h->offset + ringbuf_sub(h->ridx, h->data) + offset;
     return seek_handle(h, newpos);
+}
+
+/* Get the read position from the start of the file
+   Returns the offset from byte 0 of the file and for failure:
+     ERR_HANDLE_NOT_FOUND if the handle wasn't found
+ */
+off_t bufftell(int handle_id)
+{
+    const struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return ERR_HANDLE_NOT_FOUND;
+    return h->offset + ringbuf_sub(h->ridx, h->data);
 }
 
 /* Used by bufread and bufgetdata to prepare the buffer and retrieve the
@@ -1306,7 +1347,7 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
             /* it is not safe for a non-buffering thread to sleep while
              * holding a handle */
             h = find_handle(handle_id);
-            if (!h)
+            if (!h || h->signaled != 0)
                 return NULL;
             avail = handle_size_available(h);
         }
@@ -1447,9 +1488,14 @@ SECONDARY EXPORTED FUNCTIONS
 buf_handle_offset
 buf_request_buffer_handle
 buf_set_base_handle
+buf_handle_data_type
+buf_is_handle
+buf_pin_handle
+buf_signal_handle
+buf_length
 buf_used
-register_buffering_callback
-unregister_buffering_callback
+buf_set_watermark
+buf_get_watermark
 
 These functions are exported, to allow interaction with the buffer.
 They take care of the content of the structs, and rely on the linked list
@@ -1472,8 +1518,61 @@ void buf_request_buffer_handle(int handle_id)
 
 void buf_set_base_handle(int handle_id)
 {
-    LOGFQUEUE("buffering > Q_BASE_HANDLE %d", handle_id);
-    queue_post(&buffering_queue, Q_BASE_HANDLE, handle_id);
+    mutex_lock(&llist_mutex);
+    base_handle_id = handle_id;
+    mutex_unlock(&llist_mutex);
+}
+
+enum data_type buf_handle_data_type(int handle_id)
+{
+    const struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return TYPE_UNKNOWN;
+    return h->type;
+}
+
+ssize_t buf_handle_remaining(int handle_id)
+{
+    const struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return ERR_HANDLE_NOT_FOUND;
+    return h->filerem;
+}
+
+bool buf_is_handle(int handle_id)
+{
+    return find_handle(handle_id) != NULL;
+}
+
+bool buf_pin_handle(int handle_id, bool pin)
+{
+    struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return false;
+
+    if (pin) {
+        h->pinned++;
+    } else if (h->pinned > 0) {
+        h->pinned--;
+    }
+
+    return true; 
+}
+
+bool buf_signal_handle(int handle_id, bool signal)
+{
+    struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return false;
+
+    h->signaled = signal ? 1 : 0;
+    return true; 
+}
+
+/* Return the size of the ringbuffer */
+size_t buf_length(void)
+{
+    return buffer_len;
 }
 
 /* Return the amount of buffer space used */
@@ -1487,6 +1586,21 @@ void buf_set_watermark(size_t bytes)
     conf_watermark = bytes;
 }
 
+size_t buf_get_watermark(void)
+{
+    return BUF_WATERMARK;
+}
+
+#ifdef HAVE_IO_PRIORITY
+void buf_back_off_storage(bool back_off)
+{
+    int priority = back_off ?
+        IO_PRIORITY_BACKGROUND : IO_PRIORITY_IMMEDIATE;
+    thread_set_io_priority(buffering_thread_id, priority);
+}
+#endif
+
+/** -- buffer thread helpers -- **/
 static void shrink_buffer_inner(struct memory_handle *h)
 {
     if (h == NULL)
@@ -1503,7 +1617,7 @@ static void shrink_buffer(void)
     shrink_buffer_inner(first_handle);
 }
 
-void buffering_thread(void)
+static void NORETURN_ATTR buffering_thread(void)
 {
     bool filling = false;
     struct queue_event ev;
@@ -1511,19 +1625,21 @@ void buffering_thread(void)
 
     while (true)
     {
-        if (!filling) {
+        if (num_handles > 0) {
+            if (!filling) {
+                cancel_cpu_boost();
+            }
+            queue_wait_w_tmo(&buffering_queue, &ev, filling ? 1 : HZ/2);
+        } else {
+            filling = false;
             cancel_cpu_boost();
+            queue_wait(&buffering_queue, &ev);
         }
-
-        queue_wait_w_tmo(&buffering_queue, &ev, filling ? 5 : HZ/2);
 
         switch (ev.id)
         {
             case Q_START_FILL:
                 LOGFQUEUE("buffering < Q_START_FILL %d", (int)ev.data);
-                /* Call buffer callbacks here because this is one of two ways
-                 * to begin a full buffer fill */
-                send_event(BUFFER_EVENT_BUFFER_LOW, 0);
                 shrink_buffer();
                 queue_reply(&buffering_queue, 1);
                 filling |= buffer_handle((int)ev.data, 0);
@@ -1553,36 +1669,21 @@ void buffering_thread(void)
                 filling = true;
                 break;
 
-            case Q_BASE_HANDLE:
-                LOGFQUEUE("buffering < Q_BASE_HANDLE %d", (int)ev.data);
-                base_handle_id = (int)ev.data;
-                break;
-
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-            case SYS_USB_CONNECTED:
-                LOGFQUEUE("buffering < SYS_USB_CONNECTED");
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                usb_wait_for_disconnect(&buffering_queue);
-                break;
-#endif
-
             case SYS_TIMEOUT:
                 LOGFQUEUE_SYS_TIMEOUT("buffering < SYS_TIMEOUT");
                 break;
         }
 
+        if (num_handles == 0 || !queue_empty(&buffering_queue))
+            continue;
+
         update_data_counters(NULL);
-
-        /* If the buffer is low, call the callbacks to get new data */
-        if (num_handles > 0 && data_counters.useful <= conf_watermark)
-            send_event(BUFFER_EVENT_BUFFER_LOW, 0);
-
 #if 0
         /* TODO: This needs to be fixed to use the idle callback, disable it
          * for simplicity until its done right */
 #if MEMORYSIZE > 8
         /* If the disk is spinning, take advantage by filling the buffer */
-        else if (storage_disk_is_active() && queue_empty(&buffering_queue)) {
+        else if (storage_disk_is_active()) {
             if (num_handles > 0 && data_counters.useful <= high_watermark)
                 send_event(BUFFER_EVENT_BUFFER_LOW, 0);
 
@@ -1597,15 +1698,23 @@ void buffering_thread(void)
 #endif
 #endif
 
-        if (queue_empty(&buffering_queue)) {
-            if (filling) {
-                if (data_counters.remaining > 0 && BUF_USED < buffer_len)
-                    filling = fill_buffer();
-                else if (data_counters.remaining == 0)
-                    filling = false;
-            } else if (ev.id == SYS_TIMEOUT) {
-                if (data_counters.remaining > 0 &&
-                    data_counters.useful <= conf_watermark) {
+        if (filling) {
+            if (data_counters.remaining > 0 && BUF_USED < buffer_len) {
+                filling = fill_buffer();
+            }
+            else if (data_counters.remaining == 0) {
+                filling = false;
+            }
+        } else if (ev.id == SYS_TIMEOUT) {
+            if (data_counters.useful < BUF_WATERMARK) {
+                /* The buffer is low and we're idle, just watching the levels
+                   - call the callbacks to get new data */
+                send_event(BUFFER_EVENT_BUFFER_LOW, NULL);
+
+                /* Continue anything else we haven't finished - it might
+                   get booted off or stop early because the receiver hasn't
+                   had a chance to clear anything yet */
+                if (data_counters.remaining > 0) {
                     shrink_buffer();
                     filling = fill_buffer();
                 }
@@ -1618,9 +1727,14 @@ void buffering_init(void)
 {
     mutex_init(&llist_mutex);
 
-    conf_watermark = BUFFERING_DEFAULT_WATERMARK;
-
-    queue_init(&buffering_queue, true);
+    /* Thread should absolutely not respond to USB because if it waits first,
+       then it cannot properly service the handles and leaks will happen -
+       this is a worker thread and shouldn't need to care about any system
+       notifications.
+                                      ***
+       Whoever is using buffering should be responsible enough to clear all
+       the handles at the right time. */
+    queue_init(&buffering_queue, false);
     buffering_thread_id = create_thread( buffering_thread, buffering_stack,
             sizeof(buffering_stack), CREATE_THREAD_FROZEN,
             buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING)
@@ -1636,6 +1750,9 @@ bool buffering_reset(char *buf, size_t buflen)
     /* Wraps of storage-aligned data must also be storage aligned,
        thus buf and buflen must be a aligned to an integer multiple of
        the storage alignment */
+
+    buflen -= GUARD_BUFSIZE;
+
     STORAGE_ALIGN_BUFFER(buf, buflen);
 
     if (!buf || !buflen)
@@ -1654,10 +1771,13 @@ bool buffering_reset(char *buf, size_t buflen)
     num_handles = 0;
     base_handle_id = -1;
 
-    /* Set the high watermark as 75% full...or 25% empty :) */
-#if MEMORYSIZE > 8
+    /* Set the high watermark as 75% full...or 25% empty :)
+       This is the greatest fullness that will trigger low-buffer events
+       no matter what the setting because high-bitrate files can have
+       ludicrous margins that even exceed the buffer size - most common
+       with a huge anti-skip buffer but even without that setting,
+       staying constantly active in buffering is pointless */
     high_watermark = 3*buflen / 4;
-#endif
 
     thread_thaw(buffering_thread_id);
 
@@ -1673,5 +1793,5 @@ void buffering_get_debugdata(struct buffering_debug *dbgdata)
     dbgdata->wasted_space = dc.wasted;
     dbgdata->buffered_data = dc.buffered;
     dbgdata->useful_data = dc.useful;
-    dbgdata->watermark = conf_watermark;
+    dbgdata->watermark = BUF_WATERMARK;
 }

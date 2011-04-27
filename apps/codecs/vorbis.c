@@ -104,14 +104,25 @@ static bool vorbis_set_codec_parameters(OggVorbis_File *vf)
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        if (codec_init())
+            return CODEC_ERROR;
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 24);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     ov_callbacks callbacks;
     OggVorbis_File vf;
     ogg_int32_t **pcm;
 
-    bool initialized = false; /* First init done? */
-    int error;
+    int error = CODEC_ERROR;
     long n;
     int current_section;
     int previous_section;
@@ -120,35 +131,23 @@ enum codec_status codec_main(void)
     ogg_int64_t vf_dataoffsets;
     ogg_uint32_t vf_serialnos;
     ogg_int64_t vf_pcmlengths[2];
-
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 24);
-
-    if (codec_init()) {
-        error = CODEC_ERROR;
-        goto exit;
-    }
+    intptr_t param;
 
 #if defined(CPU_ARM) || defined(CPU_COLDFIRE) || defined(CPU_MIPS)
     if (setjmp(rb_jump_buf) != 0) {
-        /* malloc failed; skip to next track */
-        error = CODEC_ERROR;
+        /* malloc failed; finish with this track */
         goto done;
     }
 #endif
-
-next_track:
-    error = CODEC_OK;
-
     ogg_malloc_init();
-
-    if (codec_wait_taginfo() != 0)
-        goto done;
 
     /* Create a decoder instance */
     callbacks.read_func = read_handler;
     callbacks.seek_func = initial_seek_handler;
     callbacks.tell_func = tell_handler;
     callbacks.close_func = close_handler;
+
+    ci->seek_buffer(0);
 
     /* Open a non-seekable stream */
     error = ov_open_callbacks(ci, &vf, NULL, 0, callbacks);
@@ -186,15 +185,13 @@ next_track:
          vf.end = ci->id3->filesize;
          vf.ready_state = OPENED;
          vf.links = 1;
-         initialized = true;
     } else {
          DEBUGF("Vorbis: ov_open failed: %d\n", error);
-         error = CODEC_ERROR;
          goto done;
     }
 
     if (ci->id3->offset) {
-        ci->advance_buffer(ci->id3->offset);
+        ci->seek_buffer(ci->id3->offset);
         ov_raw_seek(&vf, ci->id3->offset);
         ci->set_elapsed(ov_time_tell(&vf));
         ci->set_offset(ov_raw_tell(&vf));
@@ -203,14 +200,17 @@ next_track:
     previous_section = -1;
     eof = 0;
     while (!eof) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track)
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
 
-        if (ci->seek_time) {
-            if (ov_time_seek(&vf, ci->seek_time - 1)) {
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            if (ov_time_seek(&vf, param)) {
                 //ci->logf("ov_time_seek failed");
             }
+
+            ci->set_elapsed(ov_time_tell(&vf));
             ci->seek_complete();
         }
 
@@ -220,7 +220,6 @@ next_track:
         /* Change DSP and buffer settings for this bitstream */
         if (current_section != previous_section) {
             if (!vorbis_set_codec_parameters(&vf)) {
-                error = CODEC_ERROR;
                 goto done;
             } else {
                 previous_section = current_section;
@@ -238,6 +237,7 @@ next_track:
         }
     }
 
+    error = CODEC_OK;
 done:
 #if 0 /* defined(SIMULATOR) */
     {
@@ -249,18 +249,12 @@ done:
 #endif
     ogg_malloc_destroy();
 
-    if (ci->request_next_track()) {
-        if (!initialized)
-            goto next_track;
-        /* Clean things up for the next track */
-        vf.dataoffsets = NULL;
-        vf.offsets = NULL;
-        vf.serialnos = NULL;
-        vf.pcmlengths = NULL;
-        ov_clear(&vf);
-        goto next_track;
-    }
-        
-exit:
+    /* Clean things up for the next track */
+    vf.dataoffsets = NULL;
+    vf.offsets = NULL;
+    vf.serialnos = NULL;
+    vf.pcmlengths = NULL;
+    ov_clear(&vf);
+
     return error;
 }

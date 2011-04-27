@@ -33,7 +33,7 @@
 
 #if CONFIG_CODEC == SWCODEC
 
-/* For trailing tag stripping */
+/* For trailing tag stripping and base audio data types */
 #include "buffering.h"
 
 #include "metadata/metadata_common.h"
@@ -239,6 +239,94 @@ const int afmt_rec_format[AFMT_NUM_CODECS] =
 };
 #endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
 
+#if CONFIG_CODEC == SWCODEC
+/* Get the canonical AFMT type */
+int get_audio_base_codec_type(int type)
+{
+    int base_type = type;
+    switch (type) {
+        case AFMT_MPA_L1:
+        case AFMT_MPA_L2:
+        case AFMT_MPA_L3:
+            base_type = AFMT_MPA_L3;
+            break;
+        case AFMT_MPC_SV7:
+        case AFMT_MPC_SV8:
+            base_type = AFMT_MPC_SV7;
+            break;
+        case AFMT_MP4_AAC:
+        case AFMT_MP4_AAC_HE:
+            base_type = AFMT_MP4_AAC;
+            break;
+        case AFMT_SAP:
+        case AFMT_CMC:
+        case AFMT_CM3:
+        case AFMT_CMR:
+        case AFMT_CMS:
+        case AFMT_DMC:
+        case AFMT_DLT:
+        case AFMT_MPT:
+        case AFMT_MPD:
+        case AFMT_RMT:
+        case AFMT_TMC:
+        case AFMT_TM8:
+        case AFMT_TM2:
+            base_type = AFMT_SAP;
+            break;
+        default:
+            break;
+    }
+
+    return base_type;
+}
+
+/* Get the basic audio type */
+enum data_type get_audio_base_data_type(int afmt)
+{
+    if ((unsigned)afmt >= AFMT_NUM_CODECS)
+        return TYPE_UNKNOWN;
+
+    switch (get_audio_base_codec_type(afmt))
+    {
+    case AFMT_NSF:
+    case AFMT_SPC:
+    case AFMT_SID:
+    case AFMT_MOD:
+    case AFMT_SAP:
+        /* Type must be allocated and loaded in its entirety onto
+           the buffer */
+        return TYPE_ATOMIC_AUDIO;
+
+    default:
+        /* Assume type may be loaded and discarded incrementally */
+        return TYPE_PACKET_AUDIO;
+
+    case AFMT_UNKNOWN:
+        /* Have no idea at all */
+        return TYPE_UNKNOWN;
+    }
+}
+
+/* Is the format allowed to buffer starting at some offset other than 0
+   or first frame only for resume purposes? */
+bool format_buffers_with_offset(int afmt)
+{
+    switch (afmt)
+    {
+    case AFMT_MPA_L1:
+    case AFMT_MPA_L2:
+    case AFMT_MPA_L3:
+    case AFMT_WAVPACK:
+        /* Format may be loaded at the first needed frame */
+        return true;
+    default:
+        /* Format must be loaded from the beginning of the file
+           (does not imply 'atomic', while 'atomic' implies 'no offset') */
+        return false;
+    }
+}
+#endif /* CONFIG_CODEC == SWCODEC */
+
 
 /* Simple file type probing by looking at the filename extension. */
 unsigned int probe_file_format(const char *filename)
@@ -313,7 +401,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     }
     
     /* Clear the mp3entry to avoid having bogus pointers appear */
-    memset(id3, 0, sizeof(struct mp3entry));
+    wipe_mp3entry(id3);
 
     /* Take our best guess at the codec type based on file extension */
     id3->codectype = probe_file_format(trackname);
@@ -413,6 +501,44 @@ void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig)
     memcpy(dest, orig, sizeof(struct mp3entry));
     adjust_mp3entry(dest, dest, orig);
 }
+
+/* A shortcut to simplify the common task of clearing the struct */
+void wipe_mp3entry(struct mp3entry *id3)
+{
+    memset(id3, 0, sizeof (struct mp3entry));
+}
+
+#if CONFIG_CODEC == SWCODEC
+/* Glean what is possible from the filename alone - does not parse metadata */
+void fill_metadata_from_path(struct mp3entry *id3, const char *trackname)
+{
+    char *p;
+
+    /* Clear the mp3entry to avoid having bogus pointers appear */
+    wipe_mp3entry(id3);
+
+    /* Find the filename portion of the path */
+    p = strrchr(trackname, '/');
+    strlcpy(id3->id3v2buf, p ? ++p : id3->path, ID3V2_BUF_SIZE);
+
+    /* Get the format from the extension and trim it off */
+    p = strrchr(id3->id3v2buf, '.');
+    if (p)
+    {
+        /* Might be wrong for container formats - should we bother? */
+        id3->codectype = probe_file_format(p);
+
+        if (id3->codectype != AFMT_UNKNOWN)
+            *p = '\0';
+    }
+
+    /* Set the filename as the title */
+    id3->title = id3->id3v2buf;
+
+    /* Copy the path info */
+    strlcpy(id3->path, trackname, sizeof (id3->path));
+}
+#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifndef __PCTOOL__
 #ifdef HAVE_TAGCACHE

@@ -35,8 +35,21 @@ static void init_rm(RMContext *rmctx)
 
 static RMContext rmctx;
 static RMPacket pkt;
+
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     static NeAACDecFrameInfo frame_info;
     NeAACDecHandle decoder;
@@ -49,26 +62,21 @@ enum codec_status codec_main(void)
     unsigned char c = 0; /* channels */
     int playback_on = -1;
     size_t resume_offset;
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
-
-next_track:
-    err = CODEC_OK;
+    intptr_t param;
+    enum codec_command_action action = CODEC_ACTION_NULL;
 
     if (codec_init()) {
         DEBUGF("FAAD: Codec init error\n");
         return CODEC_ERROR;
     }
 
-    if (codec_wait_taginfo() != 0)
-        goto done;
-
     resume_offset = ci->id3->offset;
 
     ci->memset(&rmctx,0,sizeof(RMContext));
     ci->memset(&pkt,0,sizeof(RMPacket));
+
+    ci->seek_buffer(0);
+
     init_rm(&rmctx);    
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
@@ -78,9 +86,9 @@ next_track:
     
     if (!decoder) {
         DEBUGF("FAAD: Decode open error\n");
-        err = CODEC_ERROR;
-        goto done;
-    }   
+        return CODEC_ERROR;
+    }
+
     NeAACDecConfigurationPtr conf = NeAACDecGetCurrentConfiguration(decoder);
     conf->outputFormat = FAAD_FMT_16BIT; /* irrelevant, we don't convert */
     NeAACDecSetConfiguration(decoder, conf);    
@@ -91,8 +99,7 @@ next_track:
    
     if (err) {
         DEBUGF("FAAD: DecInit: %d, %d\n", err, decoder->object_type);
-        err = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
     
     /* check for a mid-track resume and force a seek time accordingly */
@@ -100,36 +107,38 @@ next_track:
         resume_offset -= rmctx.data_offset + DATA_HEADER_SIZE;
         /* put number of subpackets to skip in resume_offset */
         resume_offset /= (rmctx.block_align + PACKET_HEADER_SIZE);
-        ci->seek_time =  (int)resume_offset * ((rmctx.block_align * 8 * 1000)/rmctx.bit_rate);                
+        param = (int)resume_offset * ((rmctx.block_align * 8 * 1000)/rmctx.bit_rate);
+        action = CODEC_ACTION_SEEK_TIME;
     }
-    
-    ci->id3->frequency = s;    
+
+    ci->id3->frequency = s; /* FIXME: Won't get it to the UI */    
     ci->set_elapsed(0);
     ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
 
     /* The main decoding loop */
-seek_start:
     while (1) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
-            break;
-        }
+        if (action == CODEC_ACTION_NULL)
+            action = ci->get_command(&param);
 
-        if (ci->seek_time) {            
-            
+        if (action == CODEC_ACTION_HALT)
+            break;
+
+        if (action == CODEC_ACTION_SEEK_TIME) {
             /* Do not allow seeking beyond the file's length */
-            if ((unsigned) ci->seek_time > ci->id3->length) {
+            if ((unsigned) param > ci->id3->length) {
+                ci->set_elapsed(ci->id3->length);
                 ci->seek_complete();
-                goto done;
+                break;
             }       
 
             ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE);            
 
             /* Seek to the start of the track */
-            if (ci->seek_time == 1) {
+            if (param == 0) {
                 ci->set_elapsed(0);
                 ci->seek_complete();
-                goto seek_start;           
+                action = CODEC_ACTION_NULL;
+                continue;          
             }
             
             skipped = 0;                                                                                       
@@ -141,20 +150,29 @@ seek_start:
                     if(playback_on == -1) {
                     /* Error only if packet-parsing failed and playback hadn't started */
                         DEBUGF("rm_get_packet failed\n");
+                        ci->seek_complete();
                         return CODEC_ERROR;
                     }
-                    else
-                        goto done;
+                    else {
+                        ci->seek_complete();
+                        return CODEC_OK;
+                    }
                 }
                 skipped += pkt.length;
-                if(pkt.timestamp > (unsigned)ci->seek_time) break;                
+
+                if(pkt.timestamp > (unsigned)param)
+                    break;
+                
                 ci->advance_buffer(pkt.length);
             }           
             ci->seek_buffer(pkt_offset + rmctx.data_offset + DATA_HEADER_SIZE);
             buffer = ci->request_buffer(&n,rmctx.audio_framesize + 1000);
             NeAACDecPostSeekReset(decoder, decoder->frame);
+            ci->set_elapsed(pkt.timestamp);
             ci->seek_complete();            
         }
+
+        action = CODEC_ACTION_NULL;
 
         /* Request the required number of bytes from the input buffer */ 
         buffer=ci->request_buffer(&n,rmctx.audio_framesize + 1000);        
@@ -167,20 +185,20 @@ seek_start:
                 return CODEC_ERROR;
             }
             else
-                goto done;
+                break;
         }
         
         playback_on = 1;
         if (pkt.timestamp >= ci->id3->length)
-            goto done;
+            break;
+
         /* Decode one block - returned samples will be host-endian */                           
         for(i = 0; i < rmctx.sub_packet_cnt; i++) {
             ret = NeAACDecDecode(decoder, &frame_info, buffer, rmctx.sub_packet_lengths[i]);
             buffer += rmctx.sub_packet_lengths[i];                      
             if (frame_info.error > 0) {
                 DEBUGF("FAAD: decode error '%s'\n", NeAACDecGetErrorMessage(frame_info.error));
-                err = CODEC_ERROR;
-                goto exit;
+                return CODEC_ERROR;
             }
             ci->pcmbuf_insert(decoder->time_out[0],
                               decoder->time_out[1],
@@ -191,11 +209,5 @@ seek_start:
         ci->advance_buffer(pkt.length);              
     }
 
-done:
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    return err;
+    return CODEC_OK;
 }
- 

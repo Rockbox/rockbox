@@ -31,39 +31,39 @@ static int32_t temp_buffer [BUFFER_SIZE] IBSS_ATTR;
 static int32_t read_callback (void *buffer, int32_t bytes)
 {
     int32_t retval = ci->read_filebuf (buffer, bytes);
-    ci->id3->offset = ci->curpos;
+    ci->set_offset(ci->curpos);
     return retval;
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     WavpackContext *wpc;
     char error [80];
     int bps, nchans, sr_100;
-    int retval;
+    intptr_t param;
 
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    if (codec_init())
+        return CODEC_ERROR;
 
-next_track:
-    retval = CODEC_OK;
+    ci->seek_buffer (ci->id3->offset);
 
-    if (codec_init()) {
-        retval = CODEC_ERROR;
-        goto exit;
-    }
-
-    if (codec_wait_taginfo() != 0)
-        goto done;
-        
     /* Create a decoder instance */
     wpc = WavpackOpenFileInput (read_callback, error);
 
-    if (!wpc) {
-        retval = CODEC_ERROR;
-        goto done;
-    }
+    if (!wpc)
+        return CODEC_ERROR;
 
     ci->configure(DSP_SWITCH_FREQUENCY, WavpackGetSampleRate (wpc));
     codec_set_replaygain(ci->id3);
@@ -77,56 +77,48 @@ next_track:
     /* The main decoder loop */
 
     while (1) {
-        int32_t nsamples;  
+        int32_t nsamples;
+        enum codec_command_action action = ci->get_command(&param);
 
-        if (ci->seek_time && ci->taginfo_ready && ci->id3->length) {
-            ci->seek_time--;
+        if (action == CODEC_ACTION_HALT)
+            break;
+
+        if (action == CODEC_ACTION_SEEK_TIME) {
             int curpos_ms = WavpackGetSampleIndex (wpc) / sr_100 * 10;
             int n, d, skip;
 
-            if (ci->seek_time > curpos_ms) {
-                n = ci->seek_time - curpos_ms;
+            if (param > curpos_ms) {
+                n = param - curpos_ms;
                 d = ci->id3->length - curpos_ms;
                 skip = (int)((int64_t)(ci->filesize - ci->curpos) * n / d);
                 ci->seek_buffer (ci->curpos + skip);
             }
-            else {
-                n = curpos_ms - ci->seek_time;
+            else if (curpos_ms != 0) {
+                n = curpos_ms - param;
                 d = curpos_ms;
                 skip = (int)((int64_t) ci->curpos * n / d);
                 ci->seek_buffer (ci->curpos - skip);
             }
 
             wpc = WavpackOpenFileInput (read_callback, error);
-            ci->seek_complete();
-
             if (!wpc)
+            {
+                ci->seek_complete();
                 break;
+            }
 
             ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
-            ci->yield ();
+            ci->seek_complete();
         }
 
         nsamples = WavpackUnpackSamples (wpc, temp_buffer, BUFFER_SIZE / nchans);  
 
-        if (!nsamples || ci->stop_codec || ci->new_track)
-            break;
-
-        ci->yield ();
-
-        if (ci->stop_codec || ci->new_track)
+        if (!nsamples)
             break;
 
         ci->pcmbuf_insert (temp_buffer, NULL, nsamples);
-
         ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
-        ci->yield ();
     }
 
-done:
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    return retval;
+    return CODEC_OK;
 }

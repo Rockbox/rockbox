@@ -389,77 +389,79 @@ static bool init_encoder(void)
     return true;
 } /* init_encoder */
 
-enum codec_status codec_main(void)
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    /* initialize params and config */
-    if (!init_encoder())
-        return CODEC_ERROR;
-
-    /* main encoding loop */
-    while(!ci->stop_codec)
-    {
-        uint8_t *src;
-
-        while ((src = ci->enc_get_pcm_data(PCM_CHUNK_SIZE)) != NULL)
-        {
-            struct enc_chunk_hdr *chunk;
-            bool     abort_chunk;
-            uint8_t *dst;
-            uint8_t *src_end;
-
-            if(ci->stop_codec)
-                break;
-
-            abort_chunk = true;
-
-            chunk = ci->enc_get_chunk();
-
-            /* reset counts and pointer */
-            chunk->enc_size = 0;
-            chunk->num_pcm  = 0;
-            chunk->enc_data = NULL;
-
-            dst = ENC_CHUNK_SKIP_HDR(dst, chunk);
-
-            WavpackStartBlock(wpc, dst, dst + data_size);
-
-            chunk_to_int32((uint32_t*)src);
-            src      = input_buffer;
-            src_end  = src + input_size;
-
-            /* encode chunk in four steps yielding between each */
-            do
-            {
-                if (WavpackPackSamples(wpc, (int32_t *)src,
-                                       PCM_SAMP_PER_CHUNK/4))
-                {
-                    chunk->num_pcm += PCM_SAMP_PER_CHUNK/4;
-                    ci->yield();
-                    /* could've been stopped in some way */
-                    abort_chunk = ci->stop_codec ||
-                                  (chunk->flags & CHUNKF_ABORT);
-                }
-
-                src += input_step;
-            }
-            while (!abort_chunk && src < src_end);
-
-            if (!abort_chunk)
-            {
-                chunk->enc_data = dst;
-                if (chunk->num_pcm < PCM_SAMP_PER_CHUNK)
-                    ci->enc_unget_pcm_data(PCM_CHUNK_SIZE - chunk->num_pcm*4);
-            /* finish the chunk and store chunk size info */
-                chunk->enc_size = WavpackFinishBlock(wpc);
-                ci->enc_finish_chunk();
-            }
-        }
-
-        ci->yield();
+    if (reason == CODEC_LOAD) {
+        /* initialize params and config */
+        if (!init_encoder())
+            return CODEC_ERROR;
+    }
+    else if (reason == CODEC_UNLOAD) {
+        /* reset parameters to initial state */
+        ci->enc_set_parameters(NULL);
     }
 
-    /* reset parameters to initial state */
-    ci->enc_set_parameters(NULL);
- 
     return CODEC_OK;
-} /* codec_start */
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
+    /* main encoding loop */
+    while(ci->get_command(NULL) != CODEC_ACTION_HALT)
+    {
+        uint8_t *src = (uint8_t *)ci->enc_get_pcm_data(PCM_CHUNK_SIZE);
+        struct enc_chunk_hdr *chunk;
+        bool abort_chunk;
+        uint8_t *dst;
+        uint8_t *src_end;
+
+        if(src == NULL)
+            continue;
+
+        chunk = ci->enc_get_chunk();
+
+        /* reset counts and pointer */
+        chunk->enc_size = 0;
+        chunk->num_pcm  = 0;
+        chunk->enc_data = NULL;
+
+        dst = ENC_CHUNK_SKIP_HDR(dst, chunk);
+
+        WavpackStartBlock(wpc, dst, dst + data_size);
+
+        chunk_to_int32((uint32_t*)src);
+        src      = input_buffer;
+        src_end  = src + input_size;
+
+        /* encode chunk in four steps yielding between each */
+        do
+        {
+            abort_chunk = true;
+            if (WavpackPackSamples(wpc, (int32_t *)src,
+                                   PCM_SAMP_PER_CHUNK/4))
+            {
+                chunk->num_pcm += PCM_SAMP_PER_CHUNK/4;
+                ci->yield();
+                /* could've been stopped in some way */
+                abort_chunk = chunk->flags & CHUNKF_ABORT;
+            }
+
+            src += input_step;
+        }
+        while (!abort_chunk && src < src_end);
+
+        if (!abort_chunk)
+        {
+            chunk->enc_data = dst;
+            if (chunk->num_pcm < PCM_SAMP_PER_CHUNK)
+                ci->enc_unget_pcm_data(PCM_CHUNK_SIZE - chunk->num_pcm*4);
+            /* finish the chunk and store chunk size info */
+            chunk->enc_size = WavpackFinishBlock(wpc);
+            ci->enc_finish_chunk();
+        }
+    }
+
+    return CODEC_OK;
+}

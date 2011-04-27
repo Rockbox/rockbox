@@ -44,9 +44,19 @@ static uint8_t *read_buffer(size_t *realsize)
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    int status;
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
     uint32_t decodedsamples;
     size_t n;
     int bufcount;
@@ -54,26 +64,18 @@ enum codec_status codec_main(void)
     uint8_t *voxbuf;
     off_t firstblockposn = 0;     /* position of the first block in file */
     const struct pcm_codec *codec;
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
-  
-next_track:
-    status = CODEC_OK;
+    intptr_t param;
 
     if (codec_init()) {
         DEBUGF("codec_init() error\n");
-        status = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
-
-    if (codec_wait_taginfo() != 0)
-        goto done;
 
     codec_set_replaygain(ci->id3);
 
     /* Need to save offset for later use (cleared indirectly by advance_buffer) */
     bytesdone = ci->id3->offset;
+    ci->seek_buffer(0);
 
     ci->memset(&format, 0, sizeof(struct pcm_format));
 
@@ -96,20 +98,16 @@ next_track:
     if (!codec)
     {
         DEBUGF("CODEC_ERROR: dialogic oki adpcm codec does not load.\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
-    if (!codec->set_format(&format))
-    {
-        status = CODEC_ERROR;
-        goto done;
+    if (!codec->set_format(&format)) {
+        return CODEC_ERROR;
     }
 
     if (format.numbytes == 0) {
         DEBUGF("CODEC_ERROR: data size is 0\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* check chunksize */
@@ -118,8 +116,7 @@ next_track:
     if (format.chunksize == 0)
     {
         DEBUGF("CODEC_ERROR: chunksize is 0\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
@@ -131,14 +128,14 @@ next_track:
         struct pcm_pos *newpos = codec->get_seek_pos(bytesdone - firstblockposn,
                                                      PCM_SEEK_POS, &read_buffer);
 
-        if (newpos->pos > format.numbytes)
-            goto done;
+        if (newpos->pos > format.numbytes) {
+            return CODEC_OK;
+        }
         if (ci->seek_buffer(firstblockposn + newpos->pos))
         {
             bytesdone      = newpos->pos;
             decodedsamples = newpos->samples;
         }
-        ci->seek_complete();
     } else {
         /* already where we need to be */
         bytesdone = 0;
@@ -148,22 +145,29 @@ next_track:
     endofstream = 0;
 
     while (!endofstream) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
-            break;
-        }
+        enum codec_command_action action = ci->get_command(&param);
 
-        if (ci->seek_time) {
-            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, PCM_SEEK_TIME,
+        if (action == CODEC_ACTION_HALT)
+            break;
+
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            struct pcm_pos *newpos = codec->get_seek_pos(param, PCM_SEEK_TIME,
                                                          &read_buffer);
 
             if (newpos->pos > format.numbytes)
+            {
+                ci->set_elapsed(ci->id3->length);
+                ci->seek_complete();
                 break;
+            }
+
             if (ci->seek_buffer(firstblockposn + newpos->pos))
             {
                 bytesdone      = newpos->pos;
                 decodedsamples = newpos->samples;
             }
+
+            ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
             ci->seek_complete();
         }
 
@@ -175,11 +179,10 @@ next_track:
             endofstream = 1;
         }
 
-        status = codec->decode(voxbuf, n, samples, &bufcount);
-        if (status == CODEC_ERROR)
+        if (codec->decode(voxbuf, n, samples, &bufcount) == CODEC_ERROR)
         {
             DEBUGF("codec error\n");
-            goto done;
+            return CODEC_ERROR;
         }
 
         ci->pcmbuf_insert(samples, NULL, bufcount);
@@ -192,10 +195,5 @@ next_track:
         ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
     }
 
-done:
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    return status;
+    return CODEC_OK;
 }

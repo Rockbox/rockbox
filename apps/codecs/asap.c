@@ -29,23 +29,20 @@ CODEC_HEADER
 static byte samples[CHUNK_SIZE] IBSS_ATTR;   /* The sample buffer */
 static ASAP_State asap;         /* asap codec state */
 
-/* this is the codec entry point */
-enum codec_status codec_main(void)
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     int n_bytes;
     int song;
     int duration;
     char* module;
     int bytesPerSample =2;
+    intptr_t param;
     
-next_track:
     if (codec_init()) {
         DEBUGF("codec init failed\n");
         return CODEC_ERROR;
     }
-
-    if (codec_wait_taginfo() != 0)
-        goto request_next_track;
 
     codec_set_replaygain(ci->id3);
         
@@ -97,19 +94,20 @@ next_track:
     
     /* The main decoder loop */    
     while (1) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track)
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
 
-        if (ci->seek_time) {
-            /* New time is ready in ci->seek_time */
-                      
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            /* New time is ready in param */
+
             /* seek to pos */
-            ASAP_Seek(&asap,ci->seek_time);
-            /* update elapsed */
-            ci->set_elapsed(ci->seek_time);
+            ASAP_Seek(&asap,param);
             /* update bytes_done */
-            bytes_done = ci->seek_time*44.1*2;    
+            bytes_done = param*44.1*2;    
+            /* update elapsed */
+            ci->set_elapsed((bytes_done / 2) / 44.1);
             /* seek ready */    
             ci->seek_complete();            
         }
@@ -129,10 +127,6 @@ next_track:
         if(n_bytes != sizeof(samples))
             break;
     }
-
-request_next_track:
-    if (ci->request_next_track())
-        goto next_track;
  
     return CODEC_OK;    
 }

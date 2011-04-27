@@ -32,116 +32,114 @@ CODEC_HEADER
 static int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE] IBSS_ATTR;
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-  size_t n;
-  demux_res_t demux_res;
-  stream_t input_stream;
-  uint32_t samplesdone;
-  uint32_t elapsedtime;
-  int samplesdecoded;
-  unsigned int i;
-  unsigned char* buffer;
-  alac_file alac;
-  int retval;
-
-  /* Generic codec initialisation */
-  ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-  ci->configure(DSP_SET_SAMPLE_DEPTH, ALAC_OUTPUT_DEPTH-1);
-
-  next_track:
-    retval = CODEC_OK;
-
-  /* Clean and initialize decoder structures */
-   memset(&demux_res , 0, sizeof(demux_res));
-  if (codec_init()) {
-    LOGF("ALAC: Error initialising codec\n");
-    retval = CODEC_ERROR;
-    goto exit;
-  }
-
-  if (codec_wait_taginfo() != 0)
-    goto done;
-  
-  ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
-  codec_set_replaygain(ci->id3);
-
-  stream_create(&input_stream,ci);
-
-  /* Read from ci->id3->offset before calling qtmovie_read. */
-  samplesdone = (uint32_t)(((uint64_t)(ci->id3->offset) * ci->id3->frequency) /  
-                (ci->id3->bitrate*128));
-  
-  /* if qtmovie_read returns successfully, the stream is up to
-   * the movie data, which can be used directly by the decoder */
-  if (!qtmovie_read(&input_stream, &demux_res)) {
-    LOGF("ALAC: Error initialising file\n");
-    retval = CODEC_ERROR;
-    goto done;
-  }
-
-  /* initialise the sound converter */
-  create_alac(demux_res.sound_sample_size, demux_res.num_channels,&alac);
-  alac_set_info(&alac, demux_res.codecdata);
-  
-  /* Set i for first frame, seek to desired sample position for resuming. */
-  i=0;
-  if (samplesdone > 0) {
-    if (m4a_seek(&demux_res, &input_stream, samplesdone,
-                  &samplesdone, (int*) &i)) {
-        elapsedtime = (samplesdone * 10) / (ci->id3->frequency / 100);
-        ci->set_elapsed(elapsedtime);
-    } else {
-        samplesdone = 0;
-    }
-  }
-
-  /* The main decoding loop */
-  while (i < demux_res.num_sample_byte_sizes) {
-    ci->yield();
-    if (ci->stop_codec || ci->new_track) {
-      break;
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        ci->configure(DSP_SET_SAMPLE_DEPTH, ALAC_OUTPUT_DEPTH-1);
     }
 
-    /* Deal with any pending seek requests */
-    if (ci->seek_time) {
-      if (m4a_seek(&demux_res, &input_stream,
-                    ((ci->seek_time-1)/10) * (ci->id3->frequency/100),
-                    &samplesdone, (int *)&i)) {
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
+    size_t n;
+    demux_res_t demux_res;
+    stream_t input_stream;
+    uint32_t samplesdone;
+    uint32_t elapsedtime = 0;
+    int samplesdecoded;
+    unsigned int i;
+    unsigned char* buffer;
+    alac_file alac;
+    intptr_t param;
+
+    /* Clean and initialize decoder structures */
+    memset(&demux_res , 0, sizeof(demux_res));
+    if (codec_init()) {
+        LOGF("ALAC: Error initialising codec\n");
+        return CODEC_ERROR;
+    }
+
+    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    codec_set_replaygain(ci->id3);
+
+    ci->seek_buffer(0);
+
+    stream_create(&input_stream,ci);
+
+    /* Read from ci->id3->offset before calling qtmovie_read. */
+    samplesdone = (uint32_t)(((uint64_t)(ci->id3->offset) * ci->id3->frequency) /  
+                  (ci->id3->bitrate*128));
+  
+    /* if qtmovie_read returns successfully, the stream is up to
+     * the movie data, which can be used directly by the decoder */
+    if (!qtmovie_read(&input_stream, &demux_res)) {
+        LOGF("ALAC: Error initialising file\n");
+        return CODEC_ERROR;
+    }
+
+    /* initialise the sound converter */
+    create_alac(demux_res.sound_sample_size, demux_res.num_channels,&alac);
+    alac_set_info(&alac, demux_res.codecdata);
+  
+    /* Set i for first frame, seek to desired sample position for resuming. */
+    i=0;
+    if (samplesdone > 0) {
+        if (m4a_seek(&demux_res, &input_stream, samplesdone,
+                      &samplesdone, (int*) &i)) {
+            elapsedtime = (samplesdone * 10) / (ci->id3->frequency / 100);
+            ci->set_elapsed(elapsedtime);
+        } else {
+            samplesdone = 0;
+        }
+    }
+
+    /* The main decoding loop */
+    while (i < demux_res.num_sample_byte_sizes) {
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
+            break;
+
+        /* Request the required number of bytes from the input buffer */
+        buffer=ci->request_buffer(&n, ALAC_BYTE_BUFFER_SIZE);
+
+        /* Deal with any pending seek requests */
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            if (m4a_seek(&demux_res, &input_stream,
+                         (param/10) * (ci->id3->frequency/100),
+                         &samplesdone, (int *)&i)) {
+                elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
+            }
+            ci->set_elapsed(elapsedtime);
+            ci->seek_complete();
+        }
+
+        /* Request the required number of bytes from the input buffer */
+        buffer=ci->request_buffer(&n, ALAC_BYTE_BUFFER_SIZE);
+
+        /* Decode one block - returned samples will be host-endian */
+        samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, ci->yield);
+        ci->yield();
+
+        /* Advance codec buffer by amount of consumed bytes */
+        ci->advance_buffer(alac.bytes_consumed);
+
+        /* Output the audio */
+        ci->pcmbuf_insert(outputbuffer[0], outputbuffer[1], samplesdecoded);
+
+        /* Update the elapsed-time indicator */
+        samplesdone+=samplesdecoded;
         elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
         ci->set_elapsed(elapsedtime);
-      }
-      ci->seek_complete();
+
+        i++;
     }
 
-    /* Request the required number of bytes from the input buffer */
-    buffer=ci->request_buffer(&n, ALAC_BYTE_BUFFER_SIZE);
-
-    /* Decode one block - returned samples will be host-endian */
-    ci->yield();
-    samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, ci->yield);
-
-    /* Advance codec buffer by amount of consumed bytes */
-    ci->advance_buffer(alac.bytes_consumed);
-
-    /* Output the audio */
-    ci->yield();
-    ci->pcmbuf_insert(outputbuffer[0], outputbuffer[1], samplesdecoded);
-
-    /* Update the elapsed-time indicator */
-    samplesdone+=samplesdecoded;
-    elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
-    ci->set_elapsed(elapsedtime);
-
-    i++;
-  }
-
-done:
-  LOGF("ALAC: Decoded %lu samples\n",(unsigned long)samplesdone);
-
-  if (ci->request_next_track())
-   goto next_track;
-
-exit:
-  return retval;
+    LOGF("ALAC: Decoded %lu samples\n",(unsigned long)samplesdone);
+    return CODEC_OK;
 }

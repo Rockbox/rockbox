@@ -52,10 +52,20 @@ static void init_codec_ctx(AVCodecContext *avctx, asf_waveformatex_t *wfx)
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 31);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     uint32_t elapsedtime;
-    int retval;
     asf_waveformatex_t wfx;     /* Holds the stream properties */
     size_t resume_offset;
     int res;                    /* Return values from asf_read_packet() and decode_packet() */
@@ -64,27 +74,14 @@ enum codec_status codec_main(void)
     int packetlength = 0;       /* Logical packet size (minus the header size) */          
     int outlen = 0;             /* Number of bytes written to the output buffer */
     int pktcnt = 0;             /* Count of the packets played */
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 31);
-    
-
-next_track:
-    retval = CODEC_OK;
-
-    /* Wait for the metadata to be read */
-    if (codec_wait_taginfo() != 0)
-        goto done;
+    intptr_t param;
 
     /* Remember the resume position */
     resume_offset = ci->id3->offset;
 restart_track:
-    retval = CODEC_OK;
-
     if (codec_init()) {
         LOGF("(WMA Voice) Error: Error initialising codec\n");
-        retval = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* Copy the format metadata we've stored in the id3 TOC field.  This
@@ -97,14 +94,15 @@ restart_track:
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_INTERLEAVED);
     codec_set_replaygain(ci->id3);
+
+    ci->seek_buffer(0);
     
     /* Initialise the AVCodecContext */
     init_codec_ctx(&avctx, &wfx);
 
     if (wmavoice_decode_init(&avctx) < 0) {
         LOGF("(WMA Voice) Error: Unsupported or corrupt file\n");
-        retval = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* Now advance the file position to the first frame */
@@ -117,21 +115,24 @@ restart_track:
 
     while (pktcnt < wfx.numpackets)
     {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
-            goto done;
-        }
-        
-        /* Deal with any pending seek requests */
-        if (ci->seek_time){
+        enum codec_command_action action = ci->get_command(&param);
 
-            if (ci->seek_time == 1) {
+        if (action == CODEC_ACTION_HALT)
+            break;
+
+        /* Deal with any pending seek requests */
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            ci->set_elapsed(param);
+
+            if (param == 0) {
+                ci->set_elapsed(0);
                 ci->seek_complete();
                 goto restart_track; /* Pretend you never saw this... */
             }
 
-            elapsedtime = asf_seek(ci->seek_time, &wfx);
+            elapsedtime = asf_seek(param, &wfx);
             if (elapsedtime < 1){
+                ci->set_elapsed(0);
                 ci->seek_complete();
                 goto next_track;
             }
@@ -145,7 +146,7 @@ new_packet:
 
         if (res < 0) {
             LOGF("(WMA Voice) read_packet error %d\n",res);
-            goto done;
+            return CODEC_ERROR;
         } else {
             avpkt.data = audiobuf;
             avpkt.size = audiobufsize;
@@ -165,8 +166,9 @@ new_packet:
                         ci->advance_buffer(packetlength);
                         goto new_packet;    
                     }
-                    else
-                        goto done;
+                    else {
+                        return CODEC_ERROR;
+                    }
                 }
                 avpkt.data += res;
                 avpkt.size -= res;
@@ -186,10 +188,6 @@ new_packet:
         ci->advance_buffer(packetlength);
     }
 
-done:
-    if (ci->request_next_track())
-        goto next_track;
-    
-    return retval;
+    return CODEC_OK;
 }
 

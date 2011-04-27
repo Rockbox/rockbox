@@ -86,6 +86,7 @@
 #define SYS_VOLUME_CHANGED        MAKE_SYS_EVENT(SYS_EVENT_CLS_MISC, 5)
 
 #define IS_SYSEVENT(ev)           ((ev & SYS_EVENT) == SYS_EVENT)
+#define EVENT_RESERVED            (~0)
 
 #ifndef TIMEOUT_BLOCK
 #define TIMEOUT_BLOCK   -1
@@ -249,6 +250,15 @@ extern bool queue_in_queue_send(struct event_queue *q);
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 extern bool queue_empty(const struct event_queue* q);
 extern bool queue_peek(struct event_queue *q, struct queue_event *ev);
+
+#define QPEEK_FILTER_COUNT_MASK (0xffu) /* 0x00=1 filter, 0xff=256 filters */
+#define QPEEK_FILTER_HEAD_ONLY  (1u << 8) /* Ignored if no filters */
+#define QPEEK_REMOVE_EVENTS     (1u << 9) /* Remove or discard events */
+extern bool queue_peek_ex(struct event_queue *q,
+                          struct queue_event *ev,
+                          unsigned int flags,
+                          const long (*filters)[2]);
+
 extern void queue_clear(struct event_queue* q);
 extern void queue_remove_from_head(struct event_queue *q, long id);
 extern int queue_count(const struct event_queue *q);

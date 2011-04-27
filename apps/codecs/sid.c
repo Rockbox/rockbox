@@ -1203,34 +1203,47 @@ unsigned short LoadSIDFromMemory(void *pSidData, unsigned short *load_addr,
     return *load_addr;
 }
 
+static int nSamplesRendered = 0;
+static int nSamplesPerCall = 882;  /* This is PAL SID single speed (44100/50Hz) */
+static int nSamplesToRender = 0;
 
-enum codec_status codec_main(void)
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Make use of 44.1khz */
+        ci->configure(DSP_SWITCH_FREQUENCY, 44100);
+        /* Sample depth is 28 bit host endian */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+        /* Mono output */
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     unsigned int filesize;
-
     unsigned short load_addr, init_addr, play_addr;
     unsigned char subSongsMax, subSong, song_speed;
+    intptr_t param;
 
-    int nSamplesRendered = 0;
-    int nSamplesPerCall = 882;  /* This is PAL SID single speed (44100/50Hz) */
-    int nSamplesToRender = 0;
-
-next_track:
     if (codec_init()) {
         return CODEC_ERROR;
     }
 
-    if (codec_wait_taginfo() != 0)
-        goto request_next_track;
-
     codec_set_replaygain(ci->id3);
     
     /* Load SID file the read_filebuf callback will return the full requested
-     * size if at all possible, so there is no need to loop */    
+     * size if at all possible, so there is no need to loop */
+    ci->seek_buffer(0);
     filesize = ci->read_filebuf(sidfile, sizeof(sidfile));
 
-    if (filesize == 0)
+    if (filesize == 0) {
         return CODEC_ERROR;
+    }
     
     c64Init(44100);
     LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr,
@@ -1239,37 +1252,30 @@ next_track:
     cpuJSR(init_addr, subSong);     /* Start the song initialize */
     
 
-    /* Make use of 44.1khz */
-    ci->configure(DSP_SWITCH_FREQUENCY, 44100);
-    /* Sample depth is 28 bit host endian */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
-    /* Mono output */
-    ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
-
-    
     /* Set the elapsed time to the current subsong (in seconds) */
     ci->set_elapsed(subSong*1000);
 
     /* The main decoder loop */    
     while (1) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track)
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
 
-        if (ci->seek_time) {
-            /* New time is ready in ci->seek_time */
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            /* New time is ready in param */
 
             /* Start playing from scratch */
             c64Init(44100);
-            LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr, &subSongsMax, &subSong, &song_speed, filesize);
-            sidPoke(24, 15);                /* Turn on full volume */            
-            subSong = ci->seek_time / 1000; /* Now use the current seek time in seconds as subsong */
-            cpuJSR(init_addr, subSong);     /* Start the song initialize */
-            nSamplesToRender = 0;           /* Start the rendering from scratch */
-            
-            ci->seek_complete();
+            LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr,
+                              &subSongsMax, &subSong, &song_speed, filesize);
+            sidPoke(24, 15);            /* Turn on full volume */            
+            subSong = param / 1000;     /* Now use the current seek time in seconds as subsong */
+            cpuJSR(init_addr, subSong); /* Start the song initialize */
+            nSamplesToRender = 0;       /* Start the rendering from scratch */
 
             /* Set the elapsed time to the current subsong (in seconds) */
+            ci->seek_complete();
             ci->set_elapsed(subSong*1000);
         }
         
@@ -1305,10 +1311,6 @@ next_track:
         
         ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE);
     }
-
-request_next_track:
-    if (ci->request_next_track())
-        goto next_track;
 
     return CODEC_OK;
 }

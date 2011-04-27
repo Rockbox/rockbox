@@ -33,13 +33,21 @@ void pcmbuf_play_start(void);
 void pcmbuf_play_stop(void);
 void pcmbuf_pause(bool pause);
 void pcmbuf_monitor_track_change(bool monitor);
-void pcmbuf_start_track_change(bool manual_skip);
+bool pcmbuf_start_track_change(bool manual_skip);
 
 /* Crossfade */
 #ifdef HAVE_CROSSFADE
 bool pcmbuf_is_crossfade_active(void);
 void pcmbuf_request_crossfade_enable(bool on_off);
 bool pcmbuf_is_same_size(void);
+#else
+/* Dummy functions with sensible returns */
+static inline bool pcmbuf_is_crossfade_active(void)
+    { return false; }
+static inline void pcmbuf_request_crossfade_enable(bool on_off)
+    { return; (void)on_off; }
+static inline bool pcmbuf_is_same_size(void)
+    { return true; }
 #endif
 
 /* Voice */

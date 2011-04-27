@@ -27,39 +27,45 @@ struct codec_api *ci DATA_ATTR;
 extern unsigned char plugin_bss_start[];
 extern unsigned char plugin_end_addr[];
 
-extern enum codec_status codec_main(void);
+extern enum codec_status codec_main(enum codec_entry_call_reason reason);
 
 /* stub, the entry point is called via its reference in __header to
  * avoid warning with certain compilers */
 int _start(void) {return 0;}
 
-enum codec_status codec_start(void)
+enum codec_status codec_start(enum codec_entry_call_reason reason)
 {
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#ifdef USE_IRAM
-    extern char iramcopy[], iramstart[], iramend[], iedata[], iend[];
-    size_t iram_size = iramend - iramstart;
-    size_t ibss_size = iend - iedata;
-    if (iram_size > 0 || ibss_size > 0)
+    if (reason == CODEC_LOAD)
     {
-        ci->memcpy(iramstart, iramcopy, iram_size);
-        ci->memset(iedata, 0, ibss_size);
-        /* make the icache (if it exists) up to date with the new code */
-        ci->cpucache_invalidate();
-        /* barrier to prevent reordering iram copy and BSS clearing,
-         * because the BSS segment alias the IRAM copy.
-         */
-        asm volatile ("" ::: "memory");
-    }
+#ifdef USE_IRAM
+        extern char iramcopy[], iramstart[], iramend[], iedata[], iend[];
+        size_t iram_size = iramend - iramstart;
+        size_t ibss_size = iend - iedata;
+        if (iram_size > 0 || ibss_size > 0)
+        {
+            ci->memcpy(iramstart, iramcopy, iram_size);
+            ci->memset(iedata, 0, ibss_size);
+            /* make the icache (if it exists) up to date with the new code */
+            ci->cpucache_invalidate();
+            /* barrier to prevent reordering iram copy and BSS clearing,
+             * because the BSS segment alias the IRAM copy.
+             */
+            asm volatile ("" ::: "memory");
+        }
 #endif /* PLUGIN_USE_IRAM */
-    ci->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
-    /* Some parts of bss may be used via a no-cache alias (at least
-     * portalplayer has this). If we don't clear the cache, those aliases
-     * may read garbage */
-    ci->cpucache_invalidate();
-#endif
+        ci->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
+        /* Some parts of bss may be used via a no-cache alias (at least
+         * portalplayer has this). If we don't clear the cache, those aliases
+         * may read garbage */
+        ci->cpucache_invalidate();
+    }
+#endif /* CONFIG_PLATFORM */
 
-    return codec_main();
+    /* Note: If for any reason codec_main would not be called with CODEC_LOAD
+     * because the above code failed then it must not be ever be called with
+     * any other value and some strategy to avoid doing so must be conceived */
+    return codec_main(reason);
 }
 
 #if defined(CPU_ARM) && (CONFIG_PLATFORM & PLATFORM_NATIVE)

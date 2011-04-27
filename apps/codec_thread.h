@@ -25,7 +25,6 @@
 #include <stdbool.h>
 
 /* codec identity */
-int get_codec_base_type(int type);
 const char *get_codec_filename(int cod_spec);
 
 /* codec thread */
@@ -44,10 +43,14 @@ int codec_thread_set_priority(int priority);
 #endif
 
 /* codec commands - on audio thread only! */
-intptr_t codec_ack_msg(intptr_t data, bool stop_codec);
 bool codec_load(int hid, int cod_spec);
+void codec_go(void);
+bool codec_pause(void);
+void codec_seek(long time);
 void codec_stop(void);
+void codec_unload(void);
 int codec_loaded(void);
+
 /* */
 
 #endif /* _CODEC_THREAD_H */

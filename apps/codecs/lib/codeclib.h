@@ -156,8 +156,7 @@ static inline unsigned int bs_generic(unsigned int v, int mode)
 /* Various codec helper functions */
 
 int codec_init(void);
-void codec_set_replaygain(struct mp3entry* id3);
-int codec_wait_taginfo(void); /* 0 = success */
+void codec_set_replaygain(const struct mp3entry *id3);
 
 #ifdef RB_PROFILE
 void __cyg_profile_func_enter(void *this_fn, void *call_site)

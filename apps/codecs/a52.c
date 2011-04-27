@@ -116,27 +116,31 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    }
+    else if (reason == CODEC_UNLOAD) {
+        if (state)
+            a52_free(state);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     size_t n;
     unsigned char *filebuf;
     int sample_loc;
-    int retval;
+    intptr_t param;
 
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
-
-next_track:
-    retval = CODEC_OK;
-
-    if (codec_init()) {
-        retval = CODEC_ERROR;
-        goto exit;
-    }
-
-    if (codec_wait_taginfo() != 0)
-        goto request_next_track;
+    if (codec_init())
+        return CODEC_ERROR;
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
@@ -153,15 +157,18 @@ next_track:
         }
     }
     else {
+        ci->seek_buffer(ci->id3->first_frame_offset);
         samplesdone = 0;
     }
 
     while (1) {
-        if (ci->stop_codec || ci->new_track)
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
 
-        if (ci->seek_time) {
-            sample_loc = (ci->seek_time - 1)/1000 * ci->id3->frequency;
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            sample_loc = param/1000 * ci->id3->frequency;
 
             if (ci->seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*ci->id3->bytesperframe)) {
                 samplesdone = sample_loc;
@@ -179,11 +186,5 @@ next_track:
         ci->advance_buffer(n);
     }
 
-request_next_track:
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    a52_free(state);
-    return retval;
+    return CODEC_OK;
 }

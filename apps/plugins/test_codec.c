@@ -127,7 +127,6 @@ struct test_track_info {
 };
 
 static struct test_track_info track;
-static bool taginfo_ready = true;
 
 static bool use_dsp;
 
@@ -433,6 +432,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
 static void set_elapsed(unsigned long value)
 {
     elapsed = value;
+    ci.id3->elapsed = value;
 }
 
 
@@ -482,6 +482,7 @@ static void* request_buffer(size_t *realsize, size_t reqsize)
 static void advance_buffer(size_t amount)
 {
     ci.curpos += amount;
+    ci.id3->offset = ci.curpos;
 }
 
 
@@ -499,20 +500,17 @@ static void seek_complete(void)
     /* Do nothing */
 }
 
-/* Request file change from file buffer. Returns true is next
-   track is available and changed. If return value is false,
-   codec should exit immediately with PLUGIN_OK status. */
-static bool request_next_track(void)
+/* Codec calls this to know what it should do next. */
+static enum codec_command_action get_command(intptr_t *param)
 {
-    /* We are only decoding a single track */
-    return false;
+    rb->yield();
+    return CODEC_ACTION_NULL; /* just continue processing */
+    (void)param;
 }
-
 
 static void set_offset(size_t value)
 {
-    /* ??? */
-    (void)value;
+    ci.id3->offset = value;
 }
 
 
@@ -546,6 +544,9 @@ static void init_ci(void)
 {
     /* --- Our "fake" implementations of the codec API functions. --- */
 
+    ci.dsp = (struct dsp_config *)rb->dsp_configure(NULL, DSP_MYDSP,
+                                                    CODEC_IDX_AUDIO);
+
     ci.codec_get_buffer = codec_get_buffer;
 
     if (wavinfo.fd >= 0 || checksum) {
@@ -560,11 +561,9 @@ static void init_ci(void)
     ci.advance_buffer = advance_buffer;
     ci.seek_buffer = seek_buffer;
     ci.seek_complete = seek_complete;
-    ci.request_next_track = request_next_track;
     ci.set_offset = set_offset;
     ci.configure = configure;
-    ci.dsp = (struct dsp_config *)rb->dsp_configure(NULL, DSP_MYDSP,
-                                                    CODEC_IDX_AUDIO);
+    ci.get_command = get_command;
 
     /* --- "Core" functions --- */
 
@@ -620,19 +619,21 @@ static void init_ci(void)
 static void codec_thread(void)
 {
     const char* codecname;
-    void *handle;
-    int res = CODEC_ERROR;
+    int res;
 
     codecname = rb->get_codec_filename(track.id3.codectype);
 
-    /* Load the codec and start decoding. */
-    handle = rb->codec_load_file(codecname,&ci);
+    /* Load the codec */
+    res = rb->codec_load_file(codecname, &ci);
 
-    if (handle != NULL)
+    if (res >= 0)
     {
-        res = rb->codec_begin(handle);
-        rb->codec_close(handle);
+        /* Decode the file */
+        res = rb->codec_run_proc();
     }
+
+    /* Clean up */
+    rb->codec_close();
 
     /* Signal to the main thread that we are done */
     endtick = *rb->current_tick - rebuffertick;
@@ -705,11 +706,7 @@ static enum plugin_status test_track(const char* filename)
     /* Prepare the codec struct for playing the whole file */
     ci.filesize = track.filesize;
     ci.id3 = &track.id3;
-    ci.taginfo_ready = &taginfo_ready;
     ci.curpos = 0;
-    ci.stop_codec = false;
-    ci.new_track = 0;
-    ci.seek_time = 0;
 
     if (use_dsp)
         rb->dsp_configure(ci.dsp, DSP_RESET, 0);

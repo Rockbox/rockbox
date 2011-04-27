@@ -4307,46 +4307,44 @@ static void set_codec_track(int t, int d) {
         nSilenceTrackMS=5000;
         SetFadeTime(track,track+fade, fNSFPlaybackSpeed,def);
     }
-    ci->id3->elapsed=d*1000; /* d is track no to display */
+    ci->set_elapsed(d*1000); /* d is track no to display */
 }
 
+/** Operational info **/
+static int track = 0;
+static char last_path[MAX_PATH];
+static int dontresettrack = 0;
+
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* we only render 16 bits, 44.1KHz, Stereo */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+        ci->configure(DSP_SET_FREQUENCY, 44100);
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+
+        RebuildOutputTables();
+    }
+
+    return CODEC_OK;
+}
+    
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     int written;
     uint8_t *buf;
     size_t n;
     int endofstream; /* end of stream flag */
-    int track;
-    int dontresettrack;
-    char last_path[MAX_PATH];
-    int usingplaylist;
-
-    /* we only render 16 bits */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
-
-    ci->configure(DSP_SET_FREQUENCY, 44100);
-    ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+    int usingplaylist = 0;
     
-    RebuildOutputTables();
-
-    dontresettrack=0;
-    last_path[0]='\0';
-    track=0;
-    
-next_track:
-    usingplaylist=0;
     DEBUGF("NSF: next_track\n");
     if (codec_init()) {
         return CODEC_ERROR;
     }
     DEBUGF("NSF: after init\n");
     
-
-    /* wait for track info to load */
-    if (codec_wait_taginfo() != 0)
-        goto request_next_track;
-        
     codec_set_replaygain(ci->id3);
         
     /* Read the entire file */
@@ -4408,22 +4406,27 @@ init_nsf:
     reset_profile_timers();
     
     while (!endofstream) {
+        intptr_t param;
+        enum codec_command_action action = ci->get_command(&param);
 
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
+        if (action == CODEC_ACTION_HALT)
             break;
-        }
 
-        if (ci->seek_time >0) {
-            track=ci->seek_time/1000;
-            if (usingplaylist) {
-                if (track>=nPlaylistSize) break;
-            } else {
-                if (track>=nTrackCount) break;
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            if (param > 0) {
+                track=param/1000;
+                if (usingplaylist) {
+                    if (track>=nPlaylistSize) break;
+                } else {
+                    if (track>=nTrackCount) break;
+                }
+                dontresettrack=1;
+                ci->seek_complete();
+                goto init_nsf;
             }
-            ci->seek_complete();
-            dontresettrack=1;
-            goto init_nsf;
+            else {
+                ci->seek_complete();
+            }
         }
 
         ENTER_TIMER(total);
@@ -4449,21 +4452,16 @@ init_nsf:
     
     print_timers(last_path,track);
 
-request_next_track:
-    if (ci->request_next_track()) {
     if (ci->global_settings->repeat_mode==REPEAT_ONE) {
         /* in repeat one mode just advance to the next track */
         track++;
         if (track>=nTrackCount) track=0;
         dontresettrack=1;
         /* at this point we can't tell if another file has been selected */
-        goto next_track;
     } else {
         /* otherwise do a proper load of the next file */
         dontresettrack=0;
         last_path[0]='\0';
-    }
-    goto next_track; /* when we fall through here we'll reload the file */
     }
     
     return CODEC_OK;

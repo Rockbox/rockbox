@@ -27,11 +27,22 @@ CODEC_HEADER
 
 int32_t *dec[2]; /* pointers to the output buffers in WMAProDecodeCtx in wmaprodec.c */
 
+
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, WMAPRO_DSP_SAMPLE_DEPTH);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     uint32_t elapsedtime;
-    int retval;
     asf_waveformatex_t wfx;     /* Holds the stream properties */
     size_t resume_offset;
     int res;                    /* Return values from asf_read_packet() and decode_packet() */
@@ -42,28 +53,15 @@ enum codec_status codec_main(void)
     int pktcnt = 0;             /* Count of the packets played */
     uint8_t *data;              /* Pointer to decoder input buffer */
     int size;                   /* Size of the input frame to the decoder */
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, WMAPRO_DSP_SAMPLE_DEPTH);
-    
-
-next_track:
-    retval = CODEC_OK;
-
-    /* Wait for the metadata to be read */
-    if (codec_wait_taginfo() != 0)
-        goto done;
+    intptr_t param;
 
     /* Remember the resume position */
     resume_offset = ci->id3->offset;
 
 restart_track:
-    retval = CODEC_OK;
-
     if (codec_init()) {
         LOGF("(WMA PRO) Error: Error initialising codec\n");
-        retval = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* Copy the format metadata we've stored in the id3 TOC field.  This
@@ -77,8 +75,7 @@ restart_track:
     
     if (decode_init(&wfx) < 0) {
         LOGF("(WMA PRO) Error: Unsupported or corrupt file\n");
-        retval = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* Now advance the file position to the first frame */
@@ -91,23 +88,24 @@ restart_track:
 
     while (pktcnt < wfx.numpackets)
     {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
-            goto done;
-        }
-        
-        /* Deal with any pending seek requests */
-        if (ci->seek_time){
+        enum codec_command_action action = ci->get_command(&param);
 
-            if (ci->seek_time == 1) {
+        if (action == CODEC_ACTION_HALT)
+            break;
+
+        /* Deal with any pending seek requests */
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            if (param == 0) {
+                ci->set_elapsed(0);
                 ci->seek_complete();
                 goto restart_track; /* Pretend you never saw this... */
             }
 
-            elapsedtime = asf_seek(ci->seek_time, &wfx);
+            elapsedtime = asf_seek(param, &wfx);
             if (elapsedtime < 1){
+                ci->set_elapsed(0);
                 ci->seek_complete();
-                goto next_track;
+                break;
             }
 
             ci->set_elapsed(elapsedtime);
@@ -117,8 +115,8 @@ restart_track:
         res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
 
         if (res < 0) {
-           LOGF("(WMA PRO) Warning: asf_read_packet returned %d", res);
-           goto done;
+            LOGF("(WMA PRO) Warning: asf_read_packet returned %d", res);
+            return CODEC_ERROR;
         } else {
             data = audiobuf;
             size = audiobufsize;
@@ -132,7 +130,7 @@ restart_track:
                 res = decode_packet(&wfx, dec, &outlen, data, size);
                 if(res < 0) {
                     LOGF("(WMA PRO) Error: decode_packet returned %d", res);
-                    goto done;
+                    return CODEC_ERROR;
                 }
                 data += res;
                 size -= res;
@@ -152,10 +150,6 @@ restart_track:
         ci->advance_buffer(packetlength);
     }
 
-done:
-    if (ci->request_next_track())
-        goto next_track;
-    
-    return retval;
+    return CODEC_OK;
 }
 

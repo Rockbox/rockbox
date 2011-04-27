@@ -159,9 +159,13 @@ static int cuesheet_callback(int action,const struct menu_item_ex *this_item)
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
+#if CONFIG_CODEC == SWCODEC
+            audio_set_cuesheet(global_settings.cuesheet);
+#else
             if (global_settings.cuesheet)
                 splash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
             break;
+#endif
     }
     return action;
 }

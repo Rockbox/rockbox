@@ -359,40 +359,42 @@ static bool init_encoder(void)
     return true;
 } /* init_encoder */
 
-/* main codec entry point */
-enum codec_status codec_main(void)
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    if (!init_encoder())
-        return CODEC_ERROR;
-
-    /* main encoding loop */
-    while(!ci->stop_codec)
-    {
-        uint32_t *src;
-
-        while ((src = (uint32_t *)ci->enc_get_pcm_data(PCM_CHUNK_SIZE)) != NULL)
-        {
-            struct enc_chunk_hdr *chunk;
-
-            if (ci->stop_codec)
-                break;
-
-            chunk           = ci->enc_get_chunk();
-            chunk->enc_size = enc_size;
-            chunk->num_pcm  = PCM_SAMP_PER_CHUNK;
-            chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
-
-            chunk_to_aiff_format(src, (uint32_t *)chunk->enc_data);
-
-            ci->enc_finish_chunk();
-            ci->yield();
-        }
-
-        ci->yield();
+    if (reason == CODEC_LOAD) {
+        if (!init_encoder())
+            return CODEC_ERROR;
+    }
+    else if (reason == CODEC_UNLOAD) {
+        /* reset parameters to initial state */
+        ci->enc_set_parameters(NULL);
     }
 
-    /* reset parameters to initial state */
-    ci->enc_set_parameters(NULL);
- 
     return CODEC_OK;
-} /* codec_start */
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
+    /* main encoding loop */
+    while (ci->get_command(NULL) != CODEC_ACTION_HALT)
+    {
+        uint32_t *src = (uint32_t *)ci->enc_get_pcm_data(PCM_CHUNK_SIZE);
+        struct enc_chunk_hdr *chunk;
+
+        if (src == NULL)
+            continue;
+
+        chunk           = ci->enc_get_chunk();
+        chunk->enc_size = enc_size;
+        chunk->num_pcm  = PCM_SAMP_PER_CHUNK;
+        chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
+
+        chunk_to_aiff_format(src, (uint32_t *)chunk->enc_data);
+
+        ci->enc_finish_chunk();
+    }
+
+    return CODEC_OK;
+}

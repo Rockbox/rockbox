@@ -61,9 +61,20 @@ static const struct pcm_codec *get_codec(uint32_t formattag)
     return NULL;
 }
 
-enum codec_status codec_main(void)
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    int status;
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
     struct pcm_format format;
     uint32_t bytesdone, decodedsamples;
     uint32_t num_sample_frames = 0;
@@ -77,20 +88,11 @@ enum codec_status codec_main(void)
     bool is_aifc = false;
     const struct pcm_codec *codec;
     uint32_t size;
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
-  
-next_track:
-    status = CODEC_OK;
+    intptr_t param;
 
     if (codec_init()) {
-        status = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
-
-    if (codec_wait_taginfo() != 0)
-        goto done;
 
     codec_set_replaygain(ci->id3);
     
@@ -98,17 +100,16 @@ next_track:
     bytesdone = ci->id3->offset;
 
     /* assume the AIFF header is less than 1024 bytes */
+    ci->seek_buffer(0);
     buf = ci->request_buffer(&n, 1024);
     if (n < 54) {
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     if (memcmp(buf, "FORM", 4) != 0)
     {
         DEBUGF("CODEC_ERROR: does not aiff format %4.4s\n", (char*)&buf[0]);
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
     if (memcmp(&buf[8], "AIFF", 4) == 0)
         is_aifc = false;
@@ -117,8 +118,7 @@ next_track:
     else
     {
         DEBUGF("CODEC_ERROR: does not aiff format %4.4s\n", (char*)&buf[8]);
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     buf += 12;
@@ -141,8 +141,7 @@ next_track:
             {
                 DEBUGF("CODEC_ERROR: 'COMM' chunk size=%lu < %d\n",
                        (unsigned long)size, (is_aifc)?22:18);
-                status = CODEC_ERROR;
-                goto done;
+                return CODEC_ERROR;
             }
             /* num_channels */
             format.channels = ((buf[8]<<8)|buf[9]);
@@ -154,8 +153,7 @@ next_track:
             /* sample_rate (don't use last 4 bytes, only integer fs) */
             if (buf[16] != 0x40) {
                 DEBUGF("CODEC_ERROR: weird sampling rate (no @)\n");
-                status = CODEC_ERROR;
-                goto done;
+                return CODEC_ERROR;
             }
             format.samplespersec = ((buf[18]<<24)|(buf[19]<<16)|(buf[20]<<8)|buf[21])+1;
             format.samplespersec >>= (16 + 14 - buf[17]);
@@ -181,8 +179,7 @@ next_track:
         } else if (memcmp(buf, "SSND", 4)==0) {
             if (format.bitspersample == 0) {
                 DEBUGF("CODEC_ERROR: unsupported chunk order\n");
-                status = CODEC_ERROR;
-                goto done;
+                return CODEC_ERROR;
             }
             /* offset2snd */
             offset2snd = (buf[8]<<24)|(buf[9]<<16)|(buf[10]<<8)|buf[11];
@@ -205,21 +202,18 @@ next_track:
         buf += size;
         if (n < size) {
             DEBUGF("CODEC_ERROR: AIFF header size > 1024\n");
-            status = CODEC_ERROR;
-            goto done;
+            return CODEC_ERROR;
         }
         n -= size;
     } /* while 'SSND' */
 
     if (format.channels == 0) {
         DEBUGF("CODEC_ERROR: 'COMM' chunk not found or 0-channels file\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
     if (format.numbytes == 0) {
         DEBUGF("CODEC_ERROR: 'SSND' chunk not found or has zero length\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     codec = get_codec(format.formattag);
@@ -227,14 +221,12 @@ next_track:
     {
         DEBUGF("CODEC_ERROR: AIFC does not support compressionType: 0x%x\n", 
             (unsigned int)format.formattag);
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     if (!codec->set_format(&format))
     {
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
@@ -245,21 +237,18 @@ next_track:
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels unsupported\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     if (format.samplesperblock == 0)
     {
         DEBUGF("CODEC_ERROR: samplesperblock is 0\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
     if (format.blockalign == 0)
     {
         DEBUGF("CODEC_ERROR: blockalign is 0\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* check chunksize */
@@ -269,8 +258,7 @@ next_track:
     if (format.chunksize == 0)
     {
         DEBUGF("CODEC_ERROR: chunksize is 0\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     firstblockposn = 1024 - n;
@@ -283,13 +271,13 @@ next_track:
                                                      PCM_SEEK_POS, NULL);
 
         if (newpos->pos > format.numbytes)
-            goto done;
+            return CODEC_OK;
+
         if (ci->seek_buffer(firstblockposn + newpos->pos))
         {
             bytesdone      = newpos->pos;
             decodedsamples = newpos->samples;
         }
-        ci->seek_complete();
     } else {
         /* already where we need to be */
         bytesdone = 0;
@@ -299,21 +287,29 @@ next_track:
     endofstream = 0;
 
     while (!endofstream) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track)
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
 
-        if (ci->seek_time) {
+        if (action == CODEC_ACTION_SEEK_TIME) {
             /* 3rd args(read_buffer) is unnecessary in the format which AIFF supports. */
-            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, PCM_SEEK_TIME, NULL);
+            struct pcm_pos *newpos = codec->get_seek_pos(param, PCM_SEEK_TIME, NULL);
 
             if (newpos->pos > format.numbytes)
+            {
+                ci->set_elapsed(ci->id3->length);
+                ci->seek_complete();
                 break;
+            }
+
             if (ci->seek_buffer(firstblockposn + newpos->pos))
             {
                 bytesdone      = newpos->pos;
                 decodedsamples = newpos->samples;
             }
+
+            ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
             ci->seek_complete();
         }
         aifbuf = (uint8_t *)ci->request_buffer(&n, format.chunksize);
@@ -326,11 +322,10 @@ next_track:
             endofstream = 1;
         }
 
-        status = codec->decode(aifbuf, n, samples, &bufcount);
-        if (status == CODEC_ERROR)
+        if (codec->decode(aifbuf, n, samples, &bufcount) == CODEC_ERROR)
         {
             DEBUGF("codec error\n");
-            goto done;
+            return CODEC_ERROR;
         }
 
         ci->pcmbuf_insert(samples, NULL, bufcount);
@@ -343,13 +338,6 @@ next_track:
 
         ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
     }
-    status = CODEC_OK;
 
-done:
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    return status;
+    return CODEC_OK;
 }
-

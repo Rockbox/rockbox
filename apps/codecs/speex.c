@@ -367,11 +367,12 @@ static void *process_header(spx_ogg_packet *op,
     return st;
 }
 
-/* this is the codec entry point */
-enum codec_status codec_main(void)
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
+    int error = CODEC_ERROR;
+
     SpeexBits bits;
-    int error;
     int eof = 0;
     spx_ogg_sync_state oy;
     spx_ogg_page og;
@@ -383,7 +384,7 @@ enum codec_status codec_main(void)
     int eos = 0;
     SpeexStereoState *stereo;
     int channels = -1;
-    int rate = 0, samplerate = 0;
+    int samplerate = 0;
     int extra_headers = 0;
     int stream_init = 0;
     int page_nb_packets, frame_size, packet_count = 0;
@@ -392,25 +393,21 @@ enum codec_status codec_main(void)
     unsigned long strtoffset = 0;
     void *st = NULL;
     int j = 0;
+    intptr_t param;
 
     memset(&bits, 0, sizeof(bits));
     memset(&oy, 0, sizeof(oy));
 
     /* Ogg handling still uses mallocs, so reset the malloc buffer per track */
-next_track:
-    error = CODEC_OK;
-
     if (codec_init()) {
-        error = CODEC_ERROR;
         goto exit;
     }
+
+    ci->seek_buffer(0);
 
     stereo = speex_stereo_state_init();
     spx_ogg_sync_init(&oy);
     spx_ogg_alloc_buffer(&oy,2*CHUNKSIZE);
-
-    if (codec_wait_taginfo() != 0)
-        goto done;
 
     strtoffset = ci->id3->offset;
 
@@ -419,30 +416,32 @@ next_track:
 
     eof = 0;
     while (!eof) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track)
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
 
         /*seek (seeks to the page before the position) */
-        if (ci->seek_time) {
+        if (action == CODEC_ACTION_SEEK_TIME) {
             if(samplerate!=0&&packet_count>1){
                 LOGF("Speex seek page:%lld,%lld,%ld,%lld,%d\n",
-                     ((spx_int64_t)ci->seek_time/1000) *
+                     ((spx_int64_t)param/1000) *
                      (spx_int64_t)samplerate,
-                     page_granule, ci->seek_time,
+                     page_granule, param,
                      (page_granule/samplerate)*1000, samplerate);
 
-                speex_seek_page_granule(((spx_int64_t)ci->seek_time/1000) *
+                speex_seek_page_granule(((spx_int64_t)param/1000) *
                                         (spx_int64_t)samplerate,
                                         page_granule, &oy, headerssize);
-                ci->seek_complete();
             }
+
+            ci->set_elapsed(param);
+            ci->seek_complete();
         }
 
 next_page:
         /*Get the ogg buffer for writing*/
         if(get_more_data(&oy)<1){/*read error*/
-            error=CODEC_ERROR;
             goto done;
         }
 
@@ -477,8 +476,7 @@ next_page:
                         nframes=1;
 
                     if (!st){
-                        error=CODEC_ERROR;
-                        goto exit;
+                        goto done;
                     }
 
                     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
@@ -557,31 +555,18 @@ next_page:
     }
 
 done:
-    if (ci->request_next_track()) {
+    /* Clean things up for the next track */
+    speex_bits_destroy(&bits);
 
-        /* Clean things up for the next track */
-
+    if (st)
         if (st)
             speex_decoder_destroy(st);
-
-        if (stream_init == 1)
-            spx_ogg_stream_reset(&os);
-
-        spx_ogg_sync_reset(&oy);
-
-        cur_granule = stream_init = rate = samplerate = headerssize 
-            = packet_count = eos = 0;
-
-        goto next_track;
-    }
-
-exit:
-    speex_bits_destroy(&bits);
 
     if (stream_init)
        spx_ogg_stream_destroy(&os);
 
     spx_ogg_sync_destroy(&oy);
 
+exit:
     return error;
 }

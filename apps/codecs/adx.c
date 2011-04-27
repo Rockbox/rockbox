@@ -45,7 +45,19 @@ static const long cutoff = 500;
 static int16_t samples[WAV_CHUNK_SIZE] IBSS_ATTR;
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        /* we only render 16 bits */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     int channels;
     int sampleswritten, i;
@@ -62,12 +74,8 @@ enum codec_status codec_main(void)
     off_t chanstart, bufoff;
     /*long coef1=0x7298L,coef2=-0x3350L;*/
     long coef1, coef2;
+    intptr_t param;
 
-    /* Generic codec initialisation */
-    /* we only render 16 bits */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
-  
-next_track:
     DEBUGF("ADX: next_track\n");
     if (codec_init()) {
         return CODEC_ERROR;
@@ -76,10 +84,6 @@ next_track:
     
     /* init history */
     ch1_1=ch1_2=ch2_1=ch2_2=0;
-
-    /* wait for track info to load */
-    if (codec_wait_taginfo() != 0)
-        goto request_next_track;
 
     codec_set_replaygain(ci->id3);
         
@@ -226,10 +230,10 @@ next_track:
     /* The main decoder loop */
         
     while (!endofstream) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
-        }
         
         /* do we need to loop? */
         if (bufoff > end_adr-18*channels && looping) {
@@ -254,17 +258,17 @@ next_track:
         }
 
         /* do we need to seek? */
-        if (ci->seek_time) {
+        if (action == CODEC_ACTION_SEEK_TIME) {
             uint32_t newpos;
             
-            DEBUGF("ADX: seek to %ldms\n",ci->seek_time);
+            DEBUGF("ADX: seek to %ldms\n", (long)param);
 
             endofstream = 0;
             loop_count = 0;
             fade_count = -1; /* disable fade */
             fade_frames = 1;
 
-            newpos = (((uint64_t)avgbytespersec*(ci->seek_time - 1))
+            newpos = (((uint64_t)avgbytespersec*param)
                       / (1000LL*18*channels))*(18*channels);
             bufoff = chanstart + newpos;
             while (bufoff > end_adr-18*channels) {
@@ -384,10 +388,6 @@ next_track:
            ((end_adr-start_adr)*loop_count + bufoff-chanstart)*
            1000LL/avgbytespersec);
     }
-
-request_next_track:
-    if (ci->request_next_track())
-        goto next_track;
 
     return CODEC_OK;
 }

@@ -2584,45 +2584,46 @@ static bool enc_init(void)
     return true;
 } /* enc_init */
 
-enum codec_status codec_main(void)
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    /* Generic codec initialisation */
-    if (!enc_init())
-        return CODEC_ERROR;
-
-    /* main encoding loop */
-    while (!ci->stop_codec)
-    {
-        char *buffer;
-
-        while ((buffer = ci->enc_get_pcm_data(pcm_chunk_size)) != NULL)
-        {
-            struct enc_chunk_hdr *chunk;
-
-            if (ci->stop_codec)
-                break;
-
-            chunk           = ci->enc_get_chunk();
-            chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
-
-            encode_frame(buffer, chunk);
-
-            if (chunk->num_pcm < samp_per_frame)
-            {
-                ci->enc_unget_pcm_data(pcm_chunk_size - chunk->num_pcm*4);
-                chunk->num_pcm = samp_per_frame;
-            }
-
-            ci->enc_finish_chunk();
-
-            ci->yield();
-        }
-
-        ci->yield();
+    if (reason == CODEC_LOAD) {
+        if (!enc_init())
+            return CODEC_ERROR;
+    }
+    else if (reason == CODEC_UNLOAD) {
+        /* reset parameters to initial state */
+        ci->enc_set_parameters(NULL);
     }
 
-    /* reset parameters to initial state */
-    ci->enc_set_parameters(NULL);
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
+    /* main encoding loop */
+    while(ci->get_command(NULL) != CODEC_ACTION_HALT)
+    {
+        char *buffer = buffer = ci->enc_get_pcm_data(pcm_chunk_size);
+        struct enc_chunk_hdr *chunk;
+
+        if(buffer == NULL)
+            continue;
+
+        chunk           = ci->enc_get_chunk();
+        chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
+
+        encode_frame(buffer, chunk);
+
+        if (chunk->num_pcm < samp_per_frame)
+        {
+            ci->enc_unget_pcm_data(pcm_chunk_size - chunk->num_pcm*4);
+            chunk->num_pcm = samp_per_frame;
+        }
+
+        ci->enc_finish_chunk();
+    }
 
     return CODEC_OK;
-} /* codec_start */
+}

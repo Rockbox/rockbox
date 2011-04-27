@@ -268,8 +268,8 @@ static bool mad_synth_thread_create(void)
 
 static void mad_synth_thread_quit(void)
 {
-    /*mop up COP thread*/
-    die=1;
+    /* mop up COP thread */
+    die = 1;
     ci->semaphore_release(&synth_pending_sem);
     ci->thread_wait(mad_synth_thread_id);
     ci->cpucache_invalidate();
@@ -299,9 +299,30 @@ static inline void mad_synth_thread_unwait_pcm(void)
 #endif /* MPA_SYNTH_ON_COP */
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    int status;
+    if (reason == CODEC_LOAD) {
+        /* Create a decoder instance */
+        if (codec_init())
+            return CODEC_ERROR;
+
+        ci->configure(DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
+
+        /* does nothing on 1 processor systems except return true */
+        if(!mad_synth_thread_create())
+            return CODEC_ERROR;
+    }
+    else if (reason == CODEC_UNLOAD) {
+        /* mop up COP thread - MT only */
+        mad_synth_thread_quit();
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
     size_t size;
     int file_end;
     int samples_to_skip; /* samples to skip in total for this file (at start) */
@@ -312,27 +333,12 @@ enum codec_status codec_main(void)
     unsigned long current_frequency = 0;
     int framelength;
     int padding = MAD_BUFFER_GUARD; /* to help mad decode the last frame */
-
-    if (codec_init())
-        return CODEC_ERROR;
-
-    /* Create a decoder instance */
-
-    ci->configure(DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
-
-    /*does nothing on 1 processor systems except return true*/
-    if(!mad_synth_thread_create())
-        return CODEC_ERROR;
-    
-next_track:
-    status = CODEC_OK;
+    intptr_t param;
 
     /* Reinitializing seems to be necessary to avoid playback quircks when seeking. */
     init_mad();
 
     file_end = 0;
-    if (codec_wait_taginfo() != 0)
-        goto request_next_track;
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     current_frequency = ci->id3->frequency;
@@ -379,29 +385,35 @@ next_track:
 
     /* This is the decoding loop. */
     while (1) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track)
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
 
-        if (ci->seek_time) {
+        if (action == CODEC_ACTION_SEEK_TIME) {
             int newpos;
 
             /*make sure the synth thread is idle before seeking - MT only*/
             mad_synth_thread_wait_pcm();
             mad_synth_thread_unwait_pcm();
 
-            samplesdone = ((int64_t)(ci->seek_time-1))*current_frequency/1000;
+            samplesdone = ((int64_t)param)*current_frequency/1000;
 
-            if (ci->seek_time-1 == 0) {
+            if (param == 0) {
                 newpos = ci->id3->first_frame_offset;
                 samples_to_skip = start_skip;
             } else {
-                newpos = get_file_pos(ci->seek_time-1);
+                newpos = get_file_pos(param);
                 samples_to_skip = 0;
             }
 
             if (!ci->seek_buffer(newpos))
+            {
+                ci->seek_complete();
                 break;
+            }
+
+            ci->set_elapsed((samplesdone * 1000) / current_frequency);
             ci->seek_complete();
             init_mad();
             framelength = 0;
@@ -435,8 +447,7 @@ next_track:
                 continue;
             } else {
                 /* Some other unrecoverable error */
-                status = CODEC_ERROR;
-                break;
+               return CODEC_ERROR;
             }
         }
 
@@ -504,12 +515,5 @@ next_track:
                           framelength - stop_skip);
     }
 
-request_next_track:
-    if (ci->request_next_track())
-        goto next_track;
-
-    /*mop up COP thread - MT only*/
-    mad_synth_thread_quit();
-
-    return status;
+    return CODEC_OK;
 }

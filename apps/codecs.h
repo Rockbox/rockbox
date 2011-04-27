@@ -75,17 +75,30 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 41
+#define CODEC_API_VERSION 42
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 41
+#define CODEC_MIN_API_VERSION 42
+
+/* reasons for calling codec main entrypoint */
+enum codec_entry_call_reason {
+    CODEC_LOAD = 0,
+    CODEC_UNLOAD
+};
 
 /* codec return codes */
 enum codec_status {
     CODEC_OK = 0,
     CODEC_ERROR = -1,
+};
+
+/* codec command action codes */
+enum codec_command_action {
+    CODEC_ACTION_HALT = -1,
+    CODEC_ACTION_NULL = 0,
+    CODEC_ACTION_SEEK_TIME = 1,
 };
 
 /* NOTE: To support backwards compatibility, only add new functions at
@@ -95,24 +108,12 @@ enum codec_status {
          version
  */
 struct codec_api {
-
     off_t  filesize;          /* Total file length */
     off_t  curpos;            /* Current buffer position */
     
-    /* For gapless mp3 */
     struct mp3entry *id3;     /* TAG metadata pointer */
-    bool *taginfo_ready;      /* Is metadata read */
+    int    audio_hid;         /* Current audio handle */
     
-    /* Codec should periodically check if stop_codec is set to true.
-       In case it is, codec must return immediately */
-    volatile bool stop_codec;
-    /* Codec should periodically check if new_track is non zero.
-       When it is, the codec should request a new track. */
-    volatile int new_track;
-    /* If seek_time != 0, codec should seek to that song position (in ms)
-       if codec supports seeking. */
-    volatile long seek_time;
-
     /* The dsp instance to be used for audio output */
     struct dsp_config *dsp;
     
@@ -138,14 +139,12 @@ struct codec_api {
     bool (*seek_buffer)(size_t newpos);
     /* Codec should call this function when it has done the seeking. */
     void (*seek_complete)(void);
-    /* Request file change from file buffer. Returns true is next
-       track is available and changed. If return value is false,
-       codec should exit immediately with PLUGIN_OK status. */
-    bool (*request_next_track)(void);
-    
+    /* Update the current position */
     void (*set_offset)(size_t value);
     /* Configure different codec buffer parameters. */
     void (*configure)(int setting, intptr_t value);
+    /* Obtain command action on what to do next */
+    enum codec_command_action (*get_command)(intptr_t *param);
 
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -231,7 +230,8 @@ struct codec_api {
 /* codec header */
 struct codec_header {
     struct lc_header lc_hdr; /* must be first */
-    enum codec_status(*entry_point)(void);
+    enum codec_status(*entry_point)(enum codec_entry_call_reason reason);
+    enum codec_status(*run_proc)(void);
     struct codec_api **api;
 };
 
@@ -248,13 +248,15 @@ extern unsigned char plugin_end_addr[];
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, codec_start, &ci };
+        plugin_start_addr, plugin_end_addr }, codec_start, \
+        codec_run, &ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, codec_start, &ci };
+        plugin_start_addr, plugin_end_addr }, codec_start, \
+        codec_run, &ci };
 
 #else /* def SIMULATOR */
 /* decoders */
@@ -262,12 +264,12 @@ extern unsigned char plugin_end_addr[];
         const struct codec_header __header \
         __attribute__((visibility("default"))) = { \
         { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
-        codec_start, &ci };
+        codec_start, codec_run, &ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header = { \
         { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
-        codec_start, &ci };
+        codec_start, codec_run, &ci };
 #endif /* SIMULATOR */
 #endif /* CODEC */
 
@@ -276,13 +278,14 @@ extern unsigned char plugin_end_addr[];
 void codec_get_full_path(char *path, const char *codec_root_fn);
 
 /* defined by the codec loader (codec.c) */
-void * codec_load_buf(int hid, struct codec_api *api);
-void * codec_load_file(const char* codec, struct codec_api *api);
-int codec_begin(void *handle);
-void codec_close(void *handle);
+int codec_load_buf(int hid, struct codec_api *api);
+int codec_load_file(const char* codec, struct codec_api *api);
+int codec_run_proc(void);
+int codec_halt(void);
+int codec_close(void);
 
 /* defined by the codec */
-enum codec_status codec_start(void);
-enum codec_status codec_main(void);
+enum codec_status codec_start(enum codec_entry_call_reason reason);
+enum codec_status codec_run(void);
 
-#endif
+#endif /* _CODECS_H_ */

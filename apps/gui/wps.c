@@ -219,10 +219,10 @@ static int skintouch_to_wps(struct wps_data *data)
 #endif
         case ACTION_TOUCH_SCROLLBAR:
             skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->length*offset/100;
-            if (!skin_get_global_state()->paused)
 #if (CONFIG_CODEC == SWCODEC)
-                audio_pre_ff_rewind();
+            audio_pre_ff_rewind();
 #else
+            if (!skin_get_global_state()->paused)
                 audio_pause();
 #endif
             audio_ff_rewind(skin_get_global_state()->id3->elapsed);
@@ -300,10 +300,10 @@ bool ffwd_rew(int button)
                     if ( (audio_status() & AUDIO_STATUS_PLAY) &&
                           skin_get_global_state()->id3 && skin_get_global_state()->id3->length )
                     {
-                        if (!skin_get_global_state()->paused)
 #if (CONFIG_CODEC == SWCODEC)
-                            audio_pre_ff_rewind();
+                        audio_pre_ff_rewind();
 #else
+                        if (!skin_get_global_state()->paused)
                             audio_pause();
 #endif
 #if CONFIG_KEYPAD == PLAYER_PAD
@@ -472,10 +472,10 @@ static void prev_track(unsigned long skip_thresh)
             return;
         }
 
-        if (!state->paused)
 #if (CONFIG_CODEC == SWCODEC)
-            audio_pre_ff_rewind();
+        audio_pre_ff_rewind();
 #else
+        if (!state->paused)
             audio_pause();
 #endif
 
@@ -554,16 +554,20 @@ static void play_hop(int direction)
     {
         elapsed += step * direction;
     }
-    if((audio_status() & AUDIO_STATUS_PLAY) && !state->paused)
+    if(audio_status() & AUDIO_STATUS_PLAY)
     {
 #if (CONFIG_CODEC == SWCODEC)
         audio_pre_ff_rewind();
 #else
-        audio_pause();
+        if (!state->paused)
+            audio_pause();
 #endif
     }
+
+#if (CONFIG_CODEC == SWCODEC)
+    audio_ff_rewind(elapsed);
+#else
     audio_ff_rewind(state->id3->elapsed = elapsed);
-#if (CONFIG_CODEC != SWCODEC)
     if (!state->paused)
         audio_resume();
 #endif
@@ -849,10 +853,10 @@ long gui_wps_show(void)
                 {
                     if (state->id3->cuesheet)
                     {
-                        if (!state->paused)
 #if (CONFIG_CODEC == SWCODEC)
-                            audio_pre_ff_rewind();
+                        audio_pre_ff_rewind();
 #else
+                        if (!state->paused)
                             audio_pause();
 #endif
                         audio_ff_rewind(0);
@@ -1146,6 +1150,17 @@ static void nextid3available_callback(void* param)
     skin_request_full_update(WPS);
 }
 
+#ifdef AUDIO_FAST_SKIP_PREVIEW
+/* this is called on the audio_skip caller thread */
+static void track_skip_callback(void *param)
+{
+    struct wps_state *state = skin_get_global_state();
+    state->id3 = audio_current_track();
+    state->nid3 = audio_next_track();
+    skin_request_full_update(WPS);
+    (void)param;
+}
+#endif /* AUDIO_FAST_SKIP_PREVIEW */
 
 static void wps_state_init(void)
 {
@@ -1167,6 +1182,9 @@ static void wps_state_init(void)
     /* add the WPS track event callbacks */
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, track_changed_callback);
     add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false, nextid3available_callback);
+#ifdef AUDIO_FAST_SKIP_PREVIEW
+    add_event(PLAYBACK_EVENT_TRACK_SKIP, false, track_skip_callback);
+#endif
 }
 
 

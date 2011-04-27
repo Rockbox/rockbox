@@ -418,40 +418,40 @@ static bool flac_seek_offset(FLACContext* fc, uint32_t offset) {
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, FLAC_OUTPUT_DEPTH-1);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     int8_t *buf;
     FLACContext fc;
-    uint32_t samplesdone = 0;
+    uint32_t samplesdone;
     uint32_t elapsedtime;
     size_t bytesleft;
     int consumed;
     int res;
     int frame;
-    int retval;
+    intptr_t param;
 
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, FLAC_OUTPUT_DEPTH-1);
-
-next_track:
-    retval = CODEC_OK;
-        
     if (codec_init()) {
         LOGF("FLAC: Error initialising codec\n");
-        retval = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
-
-    if (codec_wait_taginfo() != 0)
-        goto done;
 
     /* Need to save offset for later use (cleared indirectly by flac_init) */
     samplesdone = ci->id3->offset;
     
     if (!flac_init(&fc,ci->id3->first_frame_offset)) {
         LOGF("FLAC: Error initialising codec\n");
-        retval = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
@@ -459,35 +459,34 @@ next_track:
                   STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);
 
-    if (samplesdone) {
-        flac_seek_offset(&fc, samplesdone);
-        samplesdone=0;
-    }
+    flac_seek_offset(&fc, samplesdone);
+    samplesdone=0;
 
     /* The main decoding loop */
     frame=0;
     buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     while (bytesleft) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
-        }
 
         /* Deal with any pending seek requests */
-        if (ci->seek_time) {
-            if (flac_seek(&fc,(uint32_t)(((uint64_t)(ci->seek_time-1)
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            if (flac_seek(&fc,(uint32_t)(((uint64_t)param
                 *ci->id3->frequency)/1000))) {
                 /* Refill the input buffer */
                 buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
             }
+
+            ci->set_elapsed(param);
             ci->seek_complete();
         }
 
         if((res=flac_decode_frame(&fc,decoded0,decoded1,buf,
                              bytesleft,ci->yield)) < 0) {
              LOGF("FLAC: Frame %d, error %d\n",frame,res);
-             retval = CODEC_ERROR;
-             goto done;
+             return CODEC_ERROR;
         }
         consumed=fc.gb.index/8;
         frame++;
@@ -507,14 +506,7 @@ next_track:
 
         buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     }
-    retval = CODEC_OK;
 
-done:
     LOGF("FLAC: Decoded %lu samples\n",(unsigned long)samplesdone);
-
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    return retval;
+    return CODEC_OK;
 }

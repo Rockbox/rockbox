@@ -127,13 +127,23 @@ static void ape_resume(struct ape_ctx_t* ape_ctx, size_t resume_offset,
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, APE_OUTPUT_DEPTH-1);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     struct ape_ctx_t ape_ctx;
     uint32_t samplesdone;
     uint32_t elapsedtime;
     size_t bytesleft;
-    int retval;
 
     uint32_t currentframe;
     uint32_t newfilepos;
@@ -145,33 +155,24 @@ enum codec_status codec_main(void)
     int res;
     int firstbyte;
     size_t resume_offset;
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, APE_OUTPUT_DEPTH-1);
-
-next_track:
-    retval = CODEC_OK;
+    intptr_t param;
 
     if (codec_init()) {
         LOGF("APE: Error initialising codec\n");
-        retval = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
-
-    if (codec_wait_taginfo() != 0)
-        goto done;
 
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
     resume_offset = ci->id3->offset;
 
+    ci->seek_buffer(0);
     inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 
     /* Read the file headers to populate the ape_ctx struct */
     if (ape_parseheaderbuf(inbuffer,&ape_ctx) < 0) {
         LOGF("APE: Error reading header\n");
-        retval = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
 
     /* Initialise the seektable for this file */
@@ -243,16 +244,16 @@ frame_start:
         /* Decode the frame a chunk at a time */
         while (nblocks > 0)
         {
-            ci->yield();
-            if (ci->stop_codec || ci->new_track) {
+            enum codec_command_action action = ci->get_command(&param);
+
+            if (action == CODEC_ACTION_HALT)
                 goto done;
-            }
 
             /* Deal with any pending seek requests */
-            if (ci->seek_time) 
+            if (action == CODEC_ACTION_SEEK_TIME) 
             {
                 if (ape_calc_seekpos(&ape_ctx,
-                    ((ci->seek_time-1)/10) * (ci->id3->frequency/100),
+                    (param/10) * (ci->id3->frequency/100),
                     &currentframe,
                     &newfilepos,
                     &samplestoskip))
@@ -266,9 +267,12 @@ frame_start:
                     ci->seek_buffer(newfilepos);
                     inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 
+                    elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
+                    ci->set_elapsed(elapsedtime);
                     ci->seek_complete();
                     goto frame_start;  /* Sorry... */
                 }
+
                 ci->seek_complete();
             }
 
@@ -281,8 +285,7 @@ frame_start:
             {
                 /* Frame decoding error, abort */
                 LOGF("APE: Frame %lu, error %d\n",(unsigned long)currentframe,res);
-                retval = CODEC_ERROR;
-                goto done;
+                return CODEC_ERROR;
             }
 
             ci->yield();
@@ -320,10 +323,5 @@ frame_start:
 
 done:
     LOGF("APE: Decoded %lu samples\n",(unsigned long)samplesdone);
-
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    return retval;
+    return CODEC_OK;
 }

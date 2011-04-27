@@ -37,7 +37,19 @@ static int32_t offset1[MAX_OFFSET_SIZE] IBSS_ATTR;
 static int8_t ibuf[MAX_BUFFER_SIZE] IBSS_ATTR;
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        ci->configure(DSP_SET_SAMPLE_DEPTH, SHN_OUTPUT_DEPTH-1);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     ShortenContext sc;
     uint32_t samplesdone;
@@ -45,20 +57,13 @@ enum codec_status codec_main(void)
     int8_t *buf;
     int consumed, res, nsamples;
     size_t bytesleft;
+    intptr_t param;
 
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, SHN_OUTPUT_DEPTH-1);
-    
-next_track:
     /* Codec initialization */
     if (codec_init()) {
         LOGF("Shorten: codec_init error\n");
         return CODEC_ERROR;
     }
-
-    if (codec_wait_taginfo() != 0)
-        goto request_next_track;
 
     codec_set_replaygain(ci->id3);
 
@@ -103,14 +108,15 @@ seek_start:
     samplesdone = 0;
     buf = ci->request_buffer(&bytesleft, MAX_BUFFER_SIZE);
     while (bytesleft) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
-        }
 
         /* Seek to start of track */
-        if (ci->seek_time == 1) {
-            if (ci->seek_buffer(sc.header_bits/8 + ci->id3->first_frame_offset)) {
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            if (param == 0 &&
+                ci->seek_buffer(sc.header_bits/8 + ci->id3->first_frame_offset)) {
                 sc.bitindex = sc.header_bits - 8*(sc.header_bits/8);
                 ci->set_elapsed(0);
                 ci->seek_complete();
@@ -128,7 +134,7 @@ seek_start:
         if (res == FN_ERROR) {
             LOGF("Shorten: shorten_decode_frames error (%lu)\n",
                 (unsigned long)samplesdone);
-            break;
+            return CODEC_ERROR;
         } else {
             /* Insert decoded samples in pcmbuf */
             if (nsamples) {
@@ -152,10 +158,6 @@ seek_start:
         buf = ci->request_buffer(&bytesleft, MAX_BUFFER_SIZE);
         sc.bitindex = sc.gb.index - 8*consumed;
     }
-
-request_next_track:
-    if (ci->request_next_track())
-        goto next_track;
 
     return CODEC_OK;
 }

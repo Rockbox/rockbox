@@ -260,14 +260,6 @@ static inline void samples_release_rdbuf(void)
 static inline int32_t * samples_get_rdbuf(void)
 {
     ci->semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_BLOCK);
-
-    if (ci->stop_codec || ci->new_track)
-    {
-        /* Told to stop. Buffer must be released. */
-        samples_release_rdbuf();
-        return NULL;
-    }
-
     return sample_queue.wav_chunk[sample_queue.head & WAV_CHUNK_MASK].audio;
 }
 
@@ -390,11 +382,10 @@ static inline void spc_emu_quit(void)
     }
 }
 
-static inline bool spc_play_get_samples(int32_t **samples)
+static inline int32_t * spc_play_get_samples(void)
 {
     /* obtain filled samples buffer */
-    *samples = samples_get_rdbuf();
-    return *samples != NULL;
+    return samples_get_rdbuf();
 }
 
 static inline void spc_play_send_samples(int32_t *samples)
@@ -433,15 +424,14 @@ static inline void spc_play_send_samples(int32_t *samples)
 #define spc_emu_quit()
 #define samples_release_rdbuf()
 
-static inline bool spc_play_get_samples(int32_t **samples)
+static inline int32_t * spc_play_get_samples(void)
 {
     ENTER_TIMER(render);
     /* fill samples buffer */
     if ( SPC_play(&spc_emu,WAV_CHUNK_SIZE*2,wav_chunk) )
         assert( false );
     EXIT_TIMER(render);
-    *samples = wav_chunk;
-    return true;
+    return wav_chunk;
 }
 #endif /* SPC_DUAL_CORE */
 
@@ -454,6 +444,7 @@ static int play_track( void )
     unsigned long fadeendsample = (ID666.length+ID666.fade)*(long long) SAMPLE_RATE/1000;
     int fadedec = 0;
     int fadevol = 0x7fffffffl;
+    intptr_t param;
     
     if (fadeendsample>fadestartsample)
         fadedec=0x7fffffffl/(fadeendsample-fadestartsample)+1;
@@ -462,25 +453,26 @@ static int play_track( void )
 
     while ( 1 )
     {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
-            break;
-        }
+        enum codec_command_action action = ci->get_command(&param);
 
-        if (ci->seek_time) {
+        if (action == CODEC_ACTION_HALT)
+            break;
+
+        if (action == CODEC_ACTION_SEEK_TIME) {
             int curtime = sampleswritten*1000LL/SAMPLE_RATE;
-            DEBUGF("seek to %ld\ncurrently at %d\n",ci->seek_time,curtime);
-            if (ci->seek_time < curtime) {
+            DEBUGF("seek to %ld\ncurrently at %d\n", (long)param, curtime);
+            if (param < curtime) {
                 DEBUGF("seek backwards = reset\n");
+                ci->set_elapsed(0);
                 ci->seek_complete();
                 return 1;
             }
+
+            ci->set_elapsed(curtime);
             ci->seek_complete();
         }
 
-        int32_t *samples;
-        if (!spc_play_get_samples(&samples))
-            break;
+        int32_t *samples = spc_play_get_samples();
 
         sampleswritten += WAV_CHUNK_SIZE;
 
@@ -532,67 +524,61 @@ static int play_track( void )
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    enum codec_status stat = CODEC_ERROR;
-
-    if (!spc_emu_start())
-        goto codec_quit;
-
-    do
-    {
-        DEBUGF("SPC: next_track\n");
-        if (codec_init()) {
-            goto codec_quit;
-        }
-        DEBUGF("SPC: after init\n");
+    if (reason == CODEC_LOAD) {
+        if (!spc_emu_start())
+            return CODEC_ERROR;
 
         ci->configure(DSP_SET_SAMPLE_DEPTH, 24);
         ci->configure(DSP_SET_FREQUENCY, SAMPLE_RATE);
         ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-
-        /* wait for track info to load */
-        if (codec_wait_taginfo() != 0)
-            continue;
-
-        codec_set_replaygain(ci->id3);
-
-        /* Read the entire file */
-        DEBUGF("SPC: request initial buffer\n");
-        ci->seek_buffer(0);
-        size_t buffersize;
-        uint8_t* buffer = ci->request_buffer(&buffersize, ci->filesize);
-        if (!buffer) {
-            goto codec_quit;
-        }
-
-        DEBUGF("SPC: read size = 0x%lx\n",(unsigned long)buffersize);
-        do
-        {
-            if (load_spc_buffer(buffer, buffersize)) {
-                DEBUGF("SPC load failure\n");
-                goto codec_quit;
-            }
-
-            LoadID666(buffer+0x2e);
-
-            if (ci->global_settings->repeat_mode!=REPEAT_ONE && ID666.length==0) {
-                ID666.length=3*60*1000; /* 3 minutes */
-                ID666.fade=5*1000; /* 5 seconds */
-            }
-
-            reset_profile_timers();
-        }
-        while ( play_track() );
-
-        print_timers(ci->id3->path);
     }
-    while ( ci->request_next_track() );
+    else if (reason == CODEC_UNLOAD) {
+        spc_emu_quit();
+    }
 
-    stat = CODEC_OK;
+    return CODEC_OK;
+}
 
-codec_quit:
-    spc_emu_quit();
-    
-    return stat;
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
+    DEBUGF("SPC: next_track\n");
+    if (codec_init())
+        return CODEC_ERROR;
+    DEBUGF("SPC: after init\n");
+
+    codec_set_replaygain(ci->id3);
+
+    /* Read the entire file */
+    DEBUGF("SPC: request initial buffer\n");
+    ci->seek_buffer(0);
+    size_t buffersize;
+    uint8_t* buffer = ci->request_buffer(&buffersize, ci->filesize);
+    if (!buffer)
+        return CODEC_ERROR;
+
+    DEBUGF("SPC: read size = 0x%lx\n",(unsigned long)buffersize);
+    do
+    {
+        if (load_spc_buffer(buffer, buffersize)) {
+            DEBUGF("SPC load failure\n");
+            return CODEC_ERROR;
+        }
+
+        LoadID666(buffer+0x2e);
+
+        if (ci->global_settings->repeat_mode!=REPEAT_ONE && ID666.length==0) {
+            ID666.length=3*60*1000; /* 3 minutes */
+            ID666.fade=5*1000; /* 5 seconds */
+        }
+
+        reset_profile_timers();
+    }
+    while ( play_track() );
+
+    print_timers(ci->id3->path);
+
+    return CODEC_OK;
 }

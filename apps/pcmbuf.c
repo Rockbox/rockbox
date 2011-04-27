@@ -86,6 +86,8 @@ static size_t pcmbuffer_pos IDATA_ATTR;
 /* Amount pcmbuffer_pos will be increased.*/
 static size_t pcmbuffer_fillpos IDATA_ATTR;
 
+static struct chunkdesc *first_desc;
+
 /* Gapless playback */
 static bool track_transition IDATA_ATTR;
 
@@ -144,6 +146,11 @@ static void write_to_crossfade(size_t length);
 static void pcmbuf_finish_crossfade_enable(void);
 #endif
 
+/* Callbacks into playback.c */
+extern void audio_pcmbuf_position_callback(unsigned int time);
+extern void audio_pcmbuf_track_change(bool pcmbuf);
+extern bool audio_pcmbuf_may_play(void);
+
 
 /**************************************/
 
@@ -153,9 +160,8 @@ static void pcmbuf_finish_crossfade_enable(void);
 #ifndef SIMULATOR
 #undef DESC_DEBUG
 #endif
+
 #ifdef DESC_DEBUG
-static struct chunkdesc *first_desc;
-static bool show_desc_in_use = false;
 #define DISPLAY_DESC(caller) while(!show_desc(caller))
 #define DESC_IDX(desc)       (desc ? desc - first_desc : -1)
 #define SHOW_DESC(desc)      if(DESC_IDX(desc)==-1) DEBUGF("--"); \
@@ -231,6 +237,7 @@ static void commit_chunk(bool flush_next_time)
             /* Flush! Discard all data after the currently playing chunk,
                and make the current chunk play next */
             logf("commit_chunk: flush");
+            pcm_play_lock();
             write_end_chunk->link = read_chunk->link;
             read_chunk->link = pcmbuf_current;
             while (write_end_chunk->link)
@@ -238,6 +245,9 @@ static void commit_chunk(bool flush_next_time)
                 write_end_chunk = write_end_chunk->link;
                 pcmbuf_unplayed_bytes -= write_end_chunk->size;
             }
+
+            read_chunk->end_of_track = track_transition;
+            pcm_play_unlock();
         }
         /* If there is already a read buffer setup, add to it */
         else
@@ -248,7 +258,7 @@ static void commit_chunk(bool flush_next_time)
         /* Otherwise create the buffer */
         read_chunk = pcmbuf_current;
     }
-    
+
     /* If flush_next_time is true, then the current chunk will be thrown out
      * and the next chunk to be committed will be the next to be played.
      * This is used to empty the PCM buffer for a track change. */
@@ -354,7 +364,7 @@ static bool prepare_insert(size_t length)
 #endif
         {
             logf("pcm starting");
-            if (!(audio_status() & AUDIO_STATUS_PAUSE))
+            if (audio_pcmbuf_may_play())
                 pcmbuf_play_start();
         }
     }
@@ -373,8 +383,12 @@ void *pcmbuf_request_buffer(int *count)
     /* crossfade has begun, put the new track samples in fadebuf */
     if (crossfade_active)
     {
-        *count = MIN(*count, CROSSFADE_BUFSIZE/4);
-        return fadebuf;
+        int cnt = MIN(*count, CROSSFADE_BUFSIZE/4);
+        if (prepare_insert(cnt << 2))
+        {
+            *count = cnt;
+            return fadebuf;
+        }
     }
     else
 #endif
@@ -421,9 +435,7 @@ void pcmbuf_write_complete(int count)
 
 static inline void init_pcmbuffers(void)
 {
-#ifdef DESC_DEBUG
     first_desc = write_chunk;
-#endif
     struct chunkdesc *next = write_chunk;
     next++;
     write_end_chunk = write_chunk;
@@ -494,19 +506,27 @@ void pcmbuf_monitor_track_change(bool monitor)
            currently playing chunk. If not, cancel notification. */
         track_transition = monitor;
         read_end_chunk->end_of_track = monitor;
+        if (!monitor)
+        {
+            /* Clear all notifications */
+            struct chunkdesc *desc = first_desc;
+            struct chunkdesc *end = desc + pcmbuf_descs();
+            while (desc < end)
+                desc++->end_of_track = false;
+        }
     }
     else
     {
         /* Post now if PCM stopped and last buffer was sent. */
         track_transition = false;
         if (monitor)
-            audio_post_track_change(false);
+            audio_pcmbuf_track_change(false);
     }
 
     pcm_play_unlock();
 }
 
-void pcmbuf_start_track_change(bool auto_skip)
+bool pcmbuf_start_track_change(bool auto_skip)
 {
     bool crossfade = false;
 #ifdef HAVE_CROSSFADE
@@ -546,9 +566,6 @@ void pcmbuf_start_track_change(bool auto_skip)
 
         /* Cancel any pending automatic gapless transition */
         pcmbuf_monitor_track_change(false);
-        
-        /* Notify the wps that the track change starts now */
-        audio_post_track_change(false);
 
         /* Can't do two crossfades at once and, no fade if pcm is off now */
         if (
@@ -559,7 +576,8 @@ void pcmbuf_start_track_change(bool auto_skip)
         {
             pcmbuf_play_stop();
             pcm_play_unlock();
-            return;
+            /* Notify playback that the track change starts now */
+            return true;
         }
 
         /* Not enough data, or not crossfading, flush the old data instead */
@@ -584,6 +602,9 @@ void pcmbuf_start_track_change(bool auto_skip)
         /* Keep trigger outside the play lock or HW FIFO underruns can happen
            since frequency scaling is *not* always fast */
         trigger_cpu_boost();
+
+        /* Notify playback that the track change starts now */
+        return true;
     }
     else    /* automatic and not crossfading, so do gapless track change */
     {
@@ -593,6 +614,7 @@ void pcmbuf_start_track_change(bool auto_skip)
          * as the last one in the track. */
         logf("  gapless track change");
         pcmbuf_monitor_track_change(true);
+        return false;
     }
 }
 
@@ -623,7 +645,7 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
         if (pcmbuf_current->end_of_track)
         {
             track_transition = false;
-            audio_post_track_change(true);
+            audio_pcmbuf_track_change(true);
         }
 
         /* Put the finished chunk back into circulation */
@@ -955,9 +977,6 @@ static void write_to_crossfade(size_t length)
                 return;
         }
 
-        /* Commit samples to the buffer */
-        while (!prepare_insert(length))
-            sleep(1);
         while (length > 0)
         {
             COMMIT_IF_NEEDED;

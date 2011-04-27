@@ -29,53 +29,52 @@ CODEC_HEADER
 static WMADecodeContext wmadec;
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     uint32_t elapsedtime;
-    int retval;
     asf_waveformatex_t wfx;
     size_t resume_offset;
     int i;
-    int wmares, res;
+    int wmares;
+    int res = 0;
     uint8_t* audiobuf;
     int audiobufsize;
     int packetlength = 0;
     int errcount = 0;
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
-
-next_track:
-    retval = CODEC_OK;
+    intptr_t param;
 
     /* Proper reset of the decoder context. */
     memset(&wmadec, 0, sizeof(wmadec));
-
-    /* Wait for the metadata to be read */
-    if (codec_wait_taginfo() != 0)
-        goto done;
 
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
     resume_offset = ci->id3->offset;
 
 restart_track:
-    retval = CODEC_OK;
-
     if (codec_init()) {
         LOGF("WMA: Error initialising codec\n");
-        retval = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
 
     /* Copy the format metadata we've stored in the id3 TOC field.  This
        saves us from parsing it again here. */
     memcpy(&wfx, ci->id3->toc, sizeof(wfx));
 
+    ci->seek_buffer(ci->id3->first_frame_offset);
     if (wma_decode_init(&wmadec,&wfx) < 0) {
         LOGF("WMA: Unsupported or corrupt file\n");
-        retval = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
 
     if (resume_offset > ci->id3->first_frame_offset)
@@ -101,34 +100,35 @@ restart_track:
     codec_set_replaygain(ci->id3);
 
     /* The main decoding loop */
-
-    res = 1;
     while (res >= 0)
     {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
-            goto done;
-        }
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
+            break;
 
         /* Deal with any pending seek requests */
-        if (ci->seek_time){
+        if (action == CODEC_ACTION_SEEK_TIME) {
 
-            if (ci->seek_time == 1) {
+            if (param == 0) {
+                ci->set_elapsed(0);
                 ci->seek_complete();
                 goto restart_track; /* Pretend you never saw this... */
             }
 
-            elapsedtime = asf_seek(ci->seek_time, &wfx);
+            elapsedtime = asf_seek(param, &wfx);
             if (elapsedtime < 1){
+                ci->set_elapsed(0);
                 ci->seek_complete();
-                goto next_track;
+                break;
             }
             /*DEBUGF("Seek returned %d\n", (int)elapsedtime);*/
-            ci->set_elapsed(elapsedtime);
 
             /*flush the wma decoder state*/
             wmadec.last_superframe_len = 0;
             wmadec.last_bitoffset = 0;
+
+            ci->set_elapsed(elapsedtime);
             ci->seek_complete();
         }
         errcount = 0;
@@ -140,10 +140,15 @@ new_packet:
              * times. If we succeed, the error counter will be reset.
              */
 
+            if (res == ASF_ERROR_EOF) {
+                /* File ended - not an error */
+                break;
+            }
+
             errcount++;
             DEBUGF("read_packet error %d, errcount %d\n",wmares, errcount);
             if (errcount > 5) {
-                goto done;
+                return CODEC_ERROR;
             } else {
                 ci->advance_buffer(packetlength);
                 goto new_packet;
@@ -163,7 +168,7 @@ new_packet:
                     errcount++;
                     DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
                     if (errcount > 5) {
-                        goto done;
+                        return CODEC_ERROR;
                     } else {
                         ci->advance_buffer(packetlength);
                         goto new_packet;
@@ -173,18 +178,12 @@ new_packet:
                     elapsedtime += (wmares*10)/(wfx.rate/100);
                     ci->set_elapsed(elapsedtime);
                 }
-                ci->yield();
             }
         }
 
         ci->advance_buffer(packetlength);
     }
 
-done:
     /*LOGF("WMA: Decoded %ld samples\n",elapsedtime*wfx.rate/1000);*/
-
-    if (ci->request_next_track())
-        goto next_track;
-exit:
-    return retval;
+    return CODEC_OK;
 }

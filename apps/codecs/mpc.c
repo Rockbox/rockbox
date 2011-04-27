@@ -52,8 +52,20 @@ static mpc_int32_t get_size_impl(mpc_reader *reader)
     return ci->filesize;
 }
 
-/* This is the codec entry point. */
-enum codec_status codec_main(void)
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* musepack's sample representation is 18.14
+         * DSP_SET_SAMPLE_DEPTH = 14 (FRACT) + 16 (NATIVE) - 1 (SIGN) = 29 */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     mpc_int64_t samplesdone;
     uint32_t frequency;     /* 0.1 kHz accuracy */
@@ -64,39 +76,27 @@ enum codec_status codec_main(void)
     mpc_streaminfo info;
     mpc_frame_info frame;
     mpc_demux *demux = NULL;
-    int retval;
+    intptr_t param;
     
     frame.buffer = sample_buffer;
-    
-    /* musepack's sample representation is 18.14
-     * DSP_SET_SAMPLE_DEPTH = 14 (FRACT) + 16 (NATIVE) - 1 (SIGN) = 29 */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
-    
+
     /* Create a decoder instance */
     reader.read     = read_impl;
     reader.seek     = seek_impl;
     reader.tell     = tell_impl;
     reader.get_size = get_size_impl;
 
-next_track:
-    retval = CODEC_OK;
-
     if (codec_init()) 
-    {
-        retval = CODEC_ERROR;
-        goto exit;
-    }
+        return CODEC_ERROR;
 
-    if (codec_wait_taginfo() != 0)
-        goto done;
+    /* Prep position */
+    ci->seek_buffer(0);
 
     /* Initialize demux/decoder. */
     demux = mpc_demux_init(&reader);
     if (NULL == demux)
-    {
-        retval = CODEC_ERROR;
-        goto done;
-    }
+        return CODEC_ERROR;
+
     /* Read file's streaminfo data. */
     mpc_demux_get_info(demux, &info);
     
@@ -117,11 +117,8 @@ next_track:
         ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     else if (info.channels == 1)
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
-    else 
-    {
-       retval = CODEC_ERROR;
-       goto done;
-    }
+    else
+        return CODEC_ERROR;
     
     codec_set_replaygain(ci->id3);
 
@@ -142,21 +139,24 @@ next_track:
     /* This is the decoding loop. */
     do 
     {
+        enum codec_command_action action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
+            return CODEC_OK;
+
         /* Complete seek handler. */
-        if (ci->seek_time) 
+        if (action == CODEC_ACTION_SEEK_TIME) 
         {
-            mpc_int64_t new_offset = ((ci->seek_time - 1)/10)*frequency;
+            mpc_int64_t new_offset = (param/10)*frequency;
             if (mpc_demux_seek_sample(demux, new_offset) == MPC_STATUS_OK) 
             {
                 samplesdone = new_offset;
-                ci->set_elapsed(ci->seek_time);
             }
+
+            elapsed_time = (samplesdone*10)/frequency;
+            ci->set_elapsed(elapsed_time);
             ci->seek_complete();
         }
-        
-        /* Stop or skip occured, exit decoding loop. */
-        if (ci->stop_codec || ci->new_track)
-            break;
 
         /* Decode one frame. */
         status = mpc_demux_decode(demux, &frame);
@@ -164,8 +164,7 @@ next_track:
         if (frame.bits == -1)
         {
             /* Decoding error, exit decoding loop. */
-            retval = (status == MPC_STATUS_OK) ? CODEC_OK : CODEC_ERROR;
-            goto done;
+            return (status == MPC_STATUS_OK) ? CODEC_OK : CODEC_ERROR;
         } 
         else 
         {
@@ -181,11 +180,4 @@ next_track:
             ci->set_offset( (samplesdone * byterate)/(frequency*100) );
         }
     } while (true);
-
-done:
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    return retval;
 }

@@ -124,35 +124,43 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
     }
 }
 
-
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    }
+    else if (reason == CODEC_UNLOAD) {
+        if (state)
+            a52_free(state);        
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
 {
     size_t n;
     uint8_t *filebuf;
-    int retval, consumed, packet_offset;
+    int consumed, packet_offset;
     int playback_on = -1;
     size_t resume_offset;
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
-
-next_track:
-    retval = CODEC_OK;
+    intptr_t param;
+    enum codec_command_action action = CODEC_ACTION_NULL;
 
     if (codec_init()) {
-        retval = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
-
-    if (codec_wait_taginfo() != 0)
-        goto request_next_track;
 
     resume_offset = ci->id3->offset;
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
+
+    ci->seek_buffer(ci->id3->first_frame_offset);
 
     /* Intializations */
     state = a52_init(0);
@@ -165,25 +173,33 @@ next_track:
         resume_offset -= rmctx.data_offset + DATA_HEADER_SIZE;
         /* put number of subpackets to skip in resume_offset */
         resume_offset /= (rmctx.block_align + PACKET_HEADER_SIZE);
-        ci->seek_time =  (int)resume_offset * ((rmctx.block_align * 8 * 1000)/rmctx.bit_rate);                
+        param = (int)resume_offset * ((rmctx.block_align * 8 * 1000)/rmctx.bit_rate);
+        action = CODEC_ACTION_SEEK_TIME;
     }
-    
-    /* Seek to the first packet */
-    ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE );
+    else {
+        /* Seek to the first packet */
+        ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE );
+    }
 
     /* The main decoding loop */
     while((unsigned)rmctx.audio_pkt_cnt < rmctx.nb_packets) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track)
+        if (action == CODEC_ACTION_NULL)
+            action = ci->get_command(&param);
+
+        if (action == CODEC_ACTION_HALT)
             break;
 
-        if (ci->seek_time) {
-            packet_offset = ci->seek_time / ((rmctx.block_align*8*1000)/rmctx.bit_rate);
-            ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + packet_offset*(rmctx.block_align + PACKET_HEADER_SIZE));
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            packet_offset = param / ((rmctx.block_align*8*1000)/rmctx.bit_rate);
+            ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE +
+                            packet_offset*(rmctx.block_align + PACKET_HEADER_SIZE));
             rmctx.audio_pkt_cnt = packet_offset;
-            samplesdone = (rmctx.sample_rate/1000 * ci->seek_time);
+            samplesdone = (rmctx.sample_rate/1000 * param);
+            ci->set_elapsed(samplesdone/(frequency/1000));
             ci->seek_complete();
         }
+
+        action = CODEC_ACTION_NULL;
 
         filebuf = ci->request_buffer(&n, rmctx.block_align + PACKET_HEADER_SIZE);
         consumed = rm_get_packet(&filebuf, &rmctx, &pkt);
@@ -195,8 +211,7 @@ next_track:
                 return CODEC_ERROR;
             }
             else {
-                retval = CODEC_OK;
-                goto exit;
+                break;
             }
         }
 
@@ -205,11 +220,5 @@ next_track:
         ci->advance_buffer(pkt.length);
     }
 
-request_next_track:
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    a52_free(state);
-    return retval;
+    return CODEC_OK;
 }

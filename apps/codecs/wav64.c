@@ -159,9 +159,19 @@ static uint8_t *read_buffer(size_t *realsize)
 }
 
 /* this is the codec entry point */
-enum codec_status codec_main(void)
+enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    int status;
+    if (reason == CODEC_LOAD) {
+        /* Generic codec initialisation */
+        ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
+    }
+
+    return CODEC_OK;
+}
+
+/* this is called for each file to process */
+enum codec_status codec_run(void)
+{
     uint32_t decodedsamples;
     size_t n;
     int bufcount;
@@ -171,21 +181,12 @@ enum codec_status codec_main(void)
     off_t firstblockposn;     /* position of the first block in file */
     const struct pcm_codec *codec;
     uint64_t size;
-
-    /* Generic codec initialisation */
-    ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
-  
-next_track:
-    status = CODEC_OK;
+    intptr_t param;
 
     if (codec_init()) {
         DEBUGF("codec_init() error\n");
-        status = CODEC_ERROR;
-        goto exit;
+        return CODEC_ERROR;
     }
-
-    if (codec_wait_taginfo() != 0)
-        goto done;
 
     codec_set_replaygain(ci->id3);
     
@@ -193,17 +194,16 @@ next_track:
     bytesdone = ci->id3->offset;
 
     /* get RIFF chunk header */
+    ci->seek_buffer(0);
     buf = ci->request_buffer(&n, 40);
     if (n < 40) {
         DEBUGF("request_buffer error\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
     if ((memcmp(buf   , WAVE64_GUID_RIFF, 16) != 0) ||
         (memcmp(buf+24, WAVE64_GUID_WAVE, 16) != 0))
     {
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* advance to first WAVE chunk */
@@ -224,8 +224,7 @@ next_track:
         if (n < 8) {
             DEBUGF("data chunk request_buffer error\n");
             /* no more chunks, 'data' chunk must not have been found */
-            status = CODEC_ERROR;
-            goto done;
+            return CODEC_ERROR;
         }
 
         /* chunkSize */
@@ -233,8 +232,7 @@ next_track:
         if (memcmp(buf, WAVE64_GUID_FMT, 16) == 0) {
             if (size < 16) {
                 DEBUGF("CODEC_ERROR: 'fmt ' chunk size=%d < 16\n", (int)size);
-                status = CODEC_ERROR;
-                goto done;
+                return CODEC_ERROR;
             }
             /* wFormatTag */
             format.formattag=buf[24]|(buf[25]<<8);
@@ -263,8 +261,7 @@ next_track:
                         if (format.size < 22) {
                             DEBUGF("CODEC_ERROR: WAVE_FORMAT_EXTENSIBLE is "
                                    "missing extension\n");
-                            status = CODEC_ERROR;
-                            goto done;
+                            return CODEC_ERROR;
                         }
                         /* wValidBitsPerSample */
                         format.bitspersample = buf[42]|(buf[43]<<8);
@@ -279,10 +276,7 @@ next_track:
             if (format.formattag == WAVE_FORMAT_ADPCM)
             {
                 if (!set_msadpcm_coeffs(buf))
-                {
-                    status = CODEC_ERROR;
-                    goto done;
-                }
+                    return CODEC_ERROR;
             }
 
             /* get codec */
@@ -291,8 +285,7 @@ next_track:
             {
                 DEBUGF("CODEC_ERROR: unsupported wave format 0x%x\n", 
                     (unsigned int) format.formattag);
-                status = CODEC_ERROR;
-                goto done;
+                return CODEC_ERROR;
             }
 
             /* riff 8bit linear pcm is unsigned */
@@ -301,10 +294,7 @@ next_track:
 
             /* check format, and calculate chunk size */
             if (!codec->set_format(&format))
-            {
-                status = CODEC_ERROR;
-                goto done;
-            }
+                return CODEC_ERROR;
         } else if (memcmp(buf, WAVE64_GUID_DATA, 16) == 0) {
             format.numbytes = size;
             /* advance to start of data */
@@ -330,31 +320,26 @@ next_track:
     if (!codec)
     {
         DEBUGF("CODEC_ERROR: 'fmt ' chunk not found\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* common format check */
     if (format.channels == 0) {
         DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-channels file\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
     if (format.samplesperblock == 0) {
         DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-wSamplesPerBlock file\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
     if (format.blockalign == 0)
     {
         DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-blockalign file\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
     if (format.numbytes == 0) {
         DEBUGF("CODEC_ERROR: 'data' chunk not found or has zero-length\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* check chunksize */
@@ -364,8 +349,7 @@ next_track:
     if (format.chunksize == 0)
     {
         DEBUGF("CODEC_ERROR: chunksize is 0\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
@@ -375,8 +359,7 @@ next_track:
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels\n");
-        status = CODEC_ERROR;
-        goto done;
+        return CODEC_ERROR;
     }
 
     /* make sure we're at the correct offset */
@@ -385,14 +368,14 @@ next_track:
         struct pcm_pos *newpos = codec->get_seek_pos(bytesdone - firstblockposn,
                                                      PCM_SEEK_POS, &read_buffer);
 
-        if (newpos->pos > format.numbytes)
-            goto done;
+        if (newpos->pos > format.numbytes) {
+            return CODEC_OK;
+        }
         if (ci->seek_buffer(firstblockposn + newpos->pos))
         {
             bytesdone      = newpos->pos;
             decodedsamples = newpos->samples;
         }
-        ci->seek_complete();
     } else {
         /* already where we need to be */
         bytesdone = 0;
@@ -402,22 +385,29 @@ next_track:
     endofstream = 0;
 
     while (!endofstream) {
-        ci->yield();
-        if (ci->stop_codec || ci->new_track) {
-            break;
-        }
+        enum codec_command_action action = ci->get_command(&param);
 
-        if (ci->seek_time) {
-            struct pcm_pos *newpos = codec->get_seek_pos(ci->seek_time, PCM_SEEK_TIME,
+        if (action == CODEC_ACTION_HALT)
+            break;
+
+        if (action == CODEC_ACTION_SEEK_TIME) {
+            struct pcm_pos *newpos = codec->get_seek_pos(param, PCM_SEEK_TIME,
                                                          &read_buffer);
 
             if (newpos->pos > format.numbytes)
+            {
+                ci->set_elapsed(ci->id3->length);
+                ci->seek_complete();
                 break;
+            }
+
             if (ci->seek_buffer(firstblockposn + newpos->pos))
             {
                 bytesdone      = newpos->pos;
                 decodedsamples = newpos->samples;
             }
+
+            ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
             ci->seek_complete();
         }
 
@@ -429,11 +419,10 @@ next_track:
             endofstream = 1;
         }
 
-        status = codec->decode(wavbuf, n, samples, &bufcount);
-        if (status == CODEC_ERROR)
+        if (codec->decode(wavbuf, n, samples, &bufcount) == CODEC_ERROR)
         {
             DEBUGF("codec error\n");
-            goto done;
+            return CODEC_ERROR;
         }
 
         ci->pcmbuf_insert(samples, NULL, bufcount);
@@ -445,12 +434,6 @@ next_track:
             endofstream = 1;
         ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
     }
-    status = CODEC_OK;
 
-done:
-    if (ci->request_next_track())
-        goto next_track;
-
-exit:
-    return status;
+    return CODEC_OK;
 }

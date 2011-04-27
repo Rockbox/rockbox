@@ -516,8 +516,10 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
     oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
-    /* auto-reply */
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    /* Auto-reply (even if ev is NULL to avoid stalling a waiting thread) */
     queue_do_auto_reply(q->send);
+#endif
 
     while(1)
     {
@@ -541,12 +543,18 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
         corelock_lock(&q->cl);
     } 
 
-    q->read = rd + 1;
-    rd &= QUEUE_LENGTH_MASK;
-    *ev = q->events[rd];
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    if(ev)
+#endif
+    {
+        q->read = rd + 1;
+        rd &= QUEUE_LENGTH_MASK;
+        *ev = q->events[rd];
 
-    /* Get data for a waiting thread if one */
-    queue_do_fetch_sender(q->send, rd);
+        /* Get data for a waiting thread if one */
+        queue_do_fetch_sender(q->send, rd);
+    }
+    /* else just waiting on non-empty */
 
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
@@ -566,8 +574,10 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
-    /* Auto-reply */
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    /* Auto-reply (even if ev is NULL to avoid stalling a waiting thread) */
     queue_do_auto_reply(q->send);
+#endif
 
     rd = q->read;
     wr = q->write;
@@ -590,20 +600,26 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
         wr = q->write;
     }
 
-    /* no worry about a removed message here - status is checked inside
-       locks - perhaps verify if timeout or false alarm */
-    if (rd != wr)
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    if(ev)
+#endif
     {
-        q->read = rd + 1;
-        rd &= QUEUE_LENGTH_MASK;
-        *ev = q->events[rd];
-        /* Get data for a waiting thread if one */
-        queue_do_fetch_sender(q->send, rd);
+        /* no worry about a removed message here - status is checked inside
+           locks - perhaps verify if timeout or false alarm */
+        if (rd != wr)
+        {
+            q->read = rd + 1;
+            rd &= QUEUE_LENGTH_MASK;
+            *ev = q->events[rd];
+            /* Get data for a waiting thread if one */
+            queue_do_fetch_sender(q->send, rd);
+        }
+        else
+        {
+            ev->id = SYS_TIMEOUT;
+        }
     }
-    else
-    {
-        ev->id = SYS_TIMEOUT;
-    }
+    /* else just waiting on non-empty */
 
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
@@ -740,6 +756,120 @@ void queue_reply(struct event_queue *q, intptr_t retval)
 }
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+/* Scan the even queue from head to tail, returning any event from the
+   filter list that was found, optionally removing the event. If an
+   event is returned, synchronous events are handled in the same manner as
+   with queue_wait(_w_tmo); if discarded, then as queue_clear.
+   If filters are NULL, any event matches. If filters exist, the default
+   is to search the full queue depth.
+   Earlier filters take precedence.
+
+   Return true if an event was found, false otherwise. */
+bool queue_peek_ex(struct event_queue *q, struct queue_event *ev,
+                   unsigned int flags, const long (*filters)[2])
+{
+    bool have_msg;
+    unsigned int rd, wr;
+    int oldlevel;
+
+    if(LIKELY(q->read == q->write))
+        return false; /* Empty: do nothing further */
+
+    have_msg = false;
+
+    oldlevel = disable_irq_save();
+    corelock_lock(&q->cl);
+
+    /* Starting at the head, find first match  */
+    for(rd = q->read, wr = q->write; rd != wr; rd++)
+    {
+        struct queue_event *e = &q->events[rd & QUEUE_LENGTH_MASK];
+
+        if(filters)
+        {
+            /* Have filters - find the first thing that passes */
+            const long (* f)[2] = filters;
+            const long (* const f_last)[2] =
+                &filters[flags & QPEEK_FILTER_COUNT_MASK];
+            long id = e->id;
+
+            do
+            {
+                if(UNLIKELY(id >= (*f)[0] && id <= (*f)[1]))
+                    goto passed_filter;
+            }
+            while(++f <= f_last);
+
+            if(LIKELY(!(flags & QPEEK_FILTER_HEAD_ONLY)))
+                continue;   /* No match; test next event */
+            else
+                break;      /* Only check the head */
+        }
+        /* else - anything passes */
+
+    passed_filter:
+
+        /* Found a matching event */
+        have_msg = true;
+
+        if(ev)
+            *ev = *e;       /* Caller wants the event */
+
+        if(flags & QPEEK_REMOVE_EVENTS)
+        {
+            /* Do event removal */
+            unsigned int r = q->read;
+            q->read = r + 1; /* Advance head */
+
+            if(ev)
+            {
+                /* Auto-reply */
+                queue_do_auto_reply(q->send);
+                /* Get the thread waiting for reply, if any */
+                queue_do_fetch_sender(q->send, rd & QUEUE_LENGTH_MASK);
+            }
+            else
+            {
+                /* Release any thread waiting on this message */
+                queue_do_unblock_sender(q->send, rd & QUEUE_LENGTH_MASK);
+            }
+
+            /* Slide messages forward into the gap if not at the head */
+            while(rd != r)
+            {
+                unsigned int dst = rd & QUEUE_LENGTH_MASK;
+                unsigned int src = --rd & QUEUE_LENGTH_MASK;
+
+                q->events[dst] = q->events[src];
+                /* Keep sender wait list in sync */
+                if(q->send)
+                    q->send->senders[dst] = q->send->senders[src];
+            }
+        }
+
+        break;
+    }
+
+    corelock_unlock(&q->cl);
+    restore_irq(oldlevel);
+
+    return have_msg;
+}
+
+bool queue_peek(struct event_queue *q, struct queue_event *ev)
+{
+    return queue_peek_ex(q, ev, 0, NULL);
+}
+
+void queue_remove_from_head(struct event_queue *q, long id)
+{
+    const long f[2] = { id, id };
+    while (queue_peek_ex(q, NULL,
+            QPEEK_FILTER_HEAD_ONLY | QPEEK_REMOVE_EVENTS, &f));
+}
+#else /* !HAVE_EXTENDED_MESSAGING_AND_NAME */
+/* The more powerful routines aren't required */
 bool queue_peek(struct event_queue *q, struct queue_event *ev)
 {
     unsigned int rd;
@@ -765,32 +895,6 @@ bool queue_peek(struct event_queue *q, struct queue_event *ev)
     return have_msg;
 }
 
-/* Poll queue to see if a message exists - careful in using the result if
- * queue_remove_from_head is called when messages are posted - possibly use
- * queue_wait_w_tmo(&q, 0) in that case or else a removed message that
- * unsignals the queue may cause an unwanted block */
-bool queue_empty(const struct event_queue* q)
-{
-    return ( q->read == q->write );
-}
-
-void queue_clear(struct event_queue* q)
-{
-    int oldlevel;
-
-    oldlevel = disable_irq_save();
-    corelock_lock(&q->cl);
-
-    /* Release all threads waiting in the queue for a reply -
-       dequeued sent message will be handled by owning thread */
-    queue_release_all_senders(q);
-
-    q->read = q->write;
-
-    corelock_unlock(&q->cl);
-    restore_irq(oldlevel);
-}
-
 void queue_remove_from_head(struct event_queue *q, long id)
 {
     int oldlevel;
@@ -812,6 +916,33 @@ void queue_remove_from_head(struct event_queue *q, long id)
 
         q->read++;
     }
+
+    corelock_unlock(&q->cl);
+    restore_irq(oldlevel);
+}
+#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
+
+/* Poll queue to see if a message exists - careful in using the result if
+ * queue_remove_from_head is called when messages are posted - possibly use
+ * queue_wait_w_tmo(&q, 0) in that case or else a removed message that
+ * unsignals the queue may cause an unwanted block */
+bool queue_empty(const struct event_queue* q)
+{
+    return ( q->read == q->write );
+}
+
+void queue_clear(struct event_queue* q)
+{
+    int oldlevel;
+
+    oldlevel = disable_irq_save();
+    corelock_lock(&q->cl);
+
+    /* Release all threads waiting in the queue for a reply -
+       dequeued sent message will be handled by owning thread */
+    queue_release_all_senders(q);
+
+    q->read = q->write;
 
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
