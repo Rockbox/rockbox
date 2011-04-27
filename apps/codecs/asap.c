@@ -29,6 +29,14 @@ CODEC_HEADER
 static byte samples[CHUNK_SIZE] IBSS_ATTR;   /* The sample buffer */
 static ASAP_State asap;         /* asap codec state */
 
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    /* Nothing to do */
+    return CODEC_OK;
+    (void)reason;
+}
+
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {

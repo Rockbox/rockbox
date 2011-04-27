@@ -41,6 +41,14 @@ static void init_rm(RMContext *rmctx)
     memcpy(ci->id3->id3v2buf, (char*)rmctx->codec_extradata, rmctx->extradata_size*sizeof(char));
 }
 
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    /* Nothing to do */
+    return CODEC_OK;
+    (void)reason;
+}
+
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {

@@ -367,6 +367,14 @@ static void *process_header(spx_ogg_packet *op,
     return st;
 }
 
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    /* Nothing to do */
+    return CODEC_OK;
+    (void)reason;
+}
+
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {

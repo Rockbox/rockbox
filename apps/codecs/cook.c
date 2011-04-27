@@ -38,6 +38,14 @@ static void init_rm(RMContext *rmctx)
     memcpy(rmctx, (void*)(( (intptr_t)ci->id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
 }
 
+/* this is the codec entry point */
+enum codec_status codec_main(enum codec_entry_call_reason reason)
+{
+    /* Nothing to do */
+    return CODEC_OK;
+    (void)reason;
+}
+
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {

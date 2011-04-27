@@ -33,16 +33,6 @@ unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
 unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
 unsigned char* filebuf;    // The rest of the MP3 buffer
 
-/* this is the default codec entry point for when nothing needs to be done
-   on load or unload */
-enum codec_status __attribute__((weak))
-codec_main(enum codec_entry_call_reason reason)
-{
-    /* Nothing to do */
-    return CODEC_OK;
-    (void)reason;
-}
-
 int codec_init(void)
 {
     mem_ptr = 0;
