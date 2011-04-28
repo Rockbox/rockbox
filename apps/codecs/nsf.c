@@ -4294,12 +4294,18 @@ jammed:
 
 /****************** rockbox interface ******************/
 
+/** Operational info **/
+static int track = 0;
+static char last_path[MAX_PATH];
+static int dontresettrack = 0;
+static bool repeat_one = false;
+
 static void set_codec_track(int t, int d) {
     int track,fade,def=0;
     SetTrack(t);
 
     /* for REPEAT_ONE we disable track limits */
-    if (ci->global_settings->repeat_mode!=REPEAT_ONE) {
+    if (!repeat_one) {
         if (!bIsExtended || nTrackTime[t]==-1) {track=60*2*1000; def=1;}
         else track=nTrackTime[t];
         if (!bIsExtended || nTrackFade[t]==-1) fade=5*1000;
@@ -4309,11 +4315,6 @@ static void set_codec_track(int t, int d) {
     }
     ci->set_elapsed(d*1000); /* d is track no to display */
 }
-
-/** Operational info **/
-static int track = 0;
-static char last_path[MAX_PATH];
-static int dontresettrack = 0;
 
 /* this is the codec entry point */
 enum codec_status codec_main(enum codec_entry_call_reason reason)
@@ -4356,6 +4357,8 @@ enum codec_status codec_run(void)
         DEBUGF("NSF: file load failed\n");
         return CODEC_ERROR;
     }
+
+    repeat_one = ci->global_settings->repeat_mode == REPEAT_ONE;
     
 init_nsf:    
     if(!NSFCore_Initialize()) {
@@ -4368,21 +4371,11 @@ init_nsf:
     if(!LoadNSF(nDataBufferSize)) {
         DEBUGF("NSF: LoadNSF failed\n"); return CODEC_ERROR;}
 
-    ci->id3->title=szGameTitle;
-    ci->id3->artist=szArtist;
-    ci->id3->album=szCopyright;
-    if (usingplaylist) {
-        ci->id3->length=nPlaylistSize*1000;
-    } else {
-        ci->id3->length=nTrackCount*1000;
-    }
-
     if (!dontresettrack||strcmp(ci->id3->path,last_path)) {
         /* if this is the first time we're seeing this file, or if we haven't
            been asked to preserve the track number, default to the proper
            initial track */
-        if (bIsExtended &&
-            ci->global_settings->repeat_mode!=REPEAT_ONE && nPlaylistSize>0) {
+        if (bIsExtended && !repeat_one && nPlaylistSize>0) {
             /* decide to use the playlist */
             usingplaylist=1;
             track=0;
@@ -4447,7 +4440,7 @@ init_nsf:
     
     print_timers(last_path,track);
 
-    if (ci->global_settings->repeat_mode==REPEAT_ONE) {
+    if (repeat_one) {
         /* in repeat one mode just advance to the next track */
         track++;
         if (track>=nTrackCount) track=0;
