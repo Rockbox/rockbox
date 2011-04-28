@@ -123,8 +123,6 @@ enum codec_status codec_run(void)
     }
 #endif
 
-    ci->id3->frequency = s;
-
     i = 0;
     
     if (file_offset > 0) {

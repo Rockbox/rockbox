@@ -110,8 +110,6 @@ enum codec_status codec_run(void)
         param = (int)resume_offset * ((rmctx.block_align * 8 * 1000)/rmctx.bit_rate);
         action = CODEC_ACTION_SEEK_TIME;
     }
-
-    ci->id3->frequency = s; /* FIXME: Won't get it to the UI */    
     ci->set_elapsed(0);
     ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
 
