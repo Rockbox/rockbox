@@ -814,51 +814,62 @@ Veuillez vous référer à http://www.rockbox.org/wiki/SansaE200Install
 <context>
     <name>Config</name>
     <message>
-        <location filename="../configure.cpp" line="133"/>
+        <location filename="../configure.cpp" line="136"/>
         <source>Language changed</source>
         <translation>Changement de langue</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="134"/>
+        <location filename="../configure.cpp" line="137"/>
         <source>You need to restart the application for the changed language to take effect.</source>
         <translation>Vous devez redémarrer l&apos;application pour que le changement de langue prenne effet.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="288"/>
+        <location filename="../configure.cpp" line="292"/>
         <source>Showing disabled targets</source>
         <translation>Afficher les cibles d&apos;installation désactivées</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="289"/>
+        <location filename="../configure.cpp" line="293"/>
         <source>You just enabled showing targets that are marked disabled. Disabled targets are not recommended to end users. Please use this option only if you know what you are doing.</source>
         <translation>Vous venez d&apos;activer l&apos;affichage des cibles d&apos;installations indiquées comme inactives. Cette option n&apos;est pas recommandée pour l&apos;utilisateur final. Vous êtes encouragé à utiliser celle-ci uniquement si vous savez ce que vous faites.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="469"/>
+        <location filename="../configure.cpp" line="475"/>
         <source>Proxy Detection</source>
         <translation>Détection du proxy</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="470"/>
+        <location filename="../configure.cpp" line="476"/>
         <source>The System Proxy settings are invalid!
 Rockbox Utility can&apos;t work with this proxy settings. Make sure the system proxy is set correctly. Note that &quot;proxy auto-config (PAC)&quot; scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
         <translation>Les paramètres système Proxy sont non valides !
 L&apos;Utilitaire Rockbox ne peut pas fonctionner avec ces réglages proxy. Vérifier que le proxy soit correctement paramétré. Notez que les scripts &quot;proxy auto-config (PAC)&quot; ne sont pas supportés. Si votre système en utilise vous devez effectuer un paramétrage manuel.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="571"/>
+        <location filename="../configure.cpp" line="577"/>
         <source>Set Cache Path</source>
         <translation>Sélectionner le chemin vers le cache</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="639"/>
+        <location filename="../configure.cpp" line="645"/>
         <source>%1 &quot;MacPod&quot; found!
 Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
         <translation>%1 &quot;MacPod&quot; détecté !
 Rockbox ne peut fonctionner que sur un Ipod utilisant le système de fichier FAT (aussi appelé un &quot;WinPod&quot;).</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="650"/>
+        <location filename="../configure.cpp" line="652"/>
+        <source>%1 in MTP mode found!
+You need to change your player to MSC mode for installation. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="657"/>
+        <source>Until you change this installation will fail!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="664"/>
         <source>Detected an unsupported player:
 %1
 Sorry, Rockbox doesn&apos;t run on your player.</source>
@@ -867,186 +878,167 @@ Sorry, Rockbox doesn&apos;t run on your player.</source>
 Désolé, Rockbox ne fonctionne pas sur votre lecteur audio.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="655"/>
+        <location filename="../configure.cpp" line="669"/>
         <source>Fatal: player incompatible</source>
         <translation>Erreur fatale: le lecteur audio est incompatible</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="666"/>
-        <location filename="../configure.cpp" line="675"/>
+        <location filename="../configure.cpp" line="680"/>
+        <location filename="../configure.cpp" line="689"/>
         <source>Autodetection</source>
         <translation>Autodétection</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="667"/>
+        <location filename="../configure.cpp" line="681"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>Impossible de détecter un point de montage.
 Veuillez sélectionner manuellement le point de montage.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="676"/>
+        <location filename="../configure.cpp" line="690"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>Impossible de détecter le périphérique.
 Veuillez sélectionner manuellement le type de périphérique et le point de montage.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="687"/>
+        <location filename="../configure.cpp" line="701"/>
         <source>Really delete cache?</source>
         <translation>Supprimer le cache ?</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="688"/>
+        <location filename="../configure.cpp" line="702"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>Voulez-vous supprimer le cache ? Vérifier bien que ce paramètre est correct car il supprimera &lt;b&gt;tous&lt;/b&gt; les fichiers de ce répertoire !</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="696"/>
+        <location filename="../configure.cpp" line="710"/>
         <source>Path wrong!</source>
         <translation>Chemin incorrect !</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="697"/>
+        <location filename="../configure.cpp" line="711"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>Le chemin du cache est invalide. Annulation.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="731"/>
+        <location filename="../configure.cpp" line="749"/>
         <source>TTS configuration invalid</source>
         <translation>La configuration du moteur TTS est incorrecte</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="732"/>
+        <location filename="../configure.cpp" line="750"/>
         <source>TTS configuration invalid. 
  Please configure TTS engine.</source>
         <translation>La configuration du moteur TTS est incorrecte.
 Veuillez configurer le moteur TTS.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="738"/>
+        <location filename="../configure.cpp" line="755"/>
         <source>Could not start TTS engine.</source>
         <translation>Impossible lancer le moteur TTS.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="739"/>
+        <location filename="../configure.cpp" line="756"/>
         <source>Could not start TTS engine.
 </source>
         <translation>Impossible lancer le moteur TTS.
 </translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="740"/>
-        <location filename="../configure.cpp" line="754"/>
+        <location filename="../configure.cpp" line="757"/>
+        <location filename="../configure.cpp" line="776"/>
         <source>
 Please configure TTS engine.</source>
         <translation>
 Veuillez configurer le moteur TTS.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="749"/>
+        <location filename="../configure.cpp" line="771"/>
         <source>Rockbox Utility Voice Test</source>
         <translation>Test de la synthèse vocale de l&apos;utilitaire Rockbox</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="752"/>
+        <location filename="../configure.cpp" line="774"/>
         <source>Could not voice test string.</source>
         <translation>Impossible de synthétiser la phrase de test.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="753"/>
+        <location filename="../configure.cpp" line="775"/>
         <source>Could not voice test string.
 </source>
         <translation>Impossible de synthétiser la phrase de test.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="546"/>
+        <location filename="../configure.cpp" line="552"/>
         <source>Select your device</source>
         <translation>Sélectionnez votre périphérique</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="632"/>
-        <source>Sansa e200 in MTP mode found!
-You need to change your player to MSC mode for installation. </source>
-        <translation>Sansa e200 en mode MTP trouvé !
-Vous devez mettre votre lecteur audio en mode MSC pour l&apos;installation. </translation>
-    </message>
-    <message>
-        <location filename="../configure.cpp" line="635"/>
-        <source>H10 20GB in MTP mode found!
-You need to change your player to UMS mode for installation. </source>
-        <translation>H10 20 Go en mode MTP trouvé !
-Vous devez mettre votre lecteur audio en mode UMS pour l&apos;installation. </translation>
-    </message>
-    <message>
-        <location filename="../configure.cpp" line="643"/>
-        <source>Unless you changed this installation will fail!</source>
-        <translation>Si vous n&apos;avez pas changé ceci, l&apos;installation échouera !</translation>
-    </message>
-    <message>
-        <location filename="../configure.cpp" line="645"/>
+        <location filename="../configure.cpp" line="659"/>
         <source>Fatal error</source>
         <translation>Erreur fatale</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="279"/>
+        <location filename="../configure.cpp" line="283"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>La taille actuelle du cache est %L1 ko.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="396"/>
-        <location filename="../configure.cpp" line="424"/>
+        <location filename="../configure.cpp" line="400"/>
+        <location filename="../configure.cpp" line="430"/>
         <source>Configuration OK</source>
         <translation>La configuration est correcte</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="401"/>
-        <location filename="../configure.cpp" line="429"/>
+        <location filename="../configure.cpp" line="406"/>
+        <location filename="../configure.cpp" line="435"/>
         <source>Configuration INVALID</source>
         <translation>La configuration est incorrecte</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="109"/>
+        <location filename="../configure.cpp" line="112"/>
         <source>The following errors occurred:</source>
         <translation>Les erreurs suivantes sont survenues:</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="141"/>
+        <location filename="../configure.cpp" line="145"/>
         <source>No mountpoint given</source>
         <translation>Aucun point de montage spécifié</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="145"/>
+        <location filename="../configure.cpp" line="149"/>
         <source>Mountpoint does not exist</source>
         <translation>Le point de montage n&apos;existe pas</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="149"/>
+        <location filename="../configure.cpp" line="153"/>
         <source>Mountpoint is not a directory.</source>
         <translation>Le point de montage n&apos;est pas un dossier.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="153"/>
+        <location filename="../configure.cpp" line="157"/>
         <source>Mountpoint is not writeable</source>
         <translation>Le point de montage n&apos;est pas accessible en écriture</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="167"/>
+        <location filename="../configure.cpp" line="171"/>
         <source>No player selected</source>
         <translation>Aucun lecteur audio sélectionné</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="174"/>
+        <location filename="../configure.cpp" line="178"/>
         <source>Cache path not writeable. Leave path empty to default to systems temporary path.</source>
         <translation>Le chemin vers le cache n&apos;est pas accessible en écriture. Vous pouvez laisser le chemin vide pour utiliser le dossier temporaire par défaut de votre système.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="193"/>
+        <location filename="../configure.cpp" line="197"/>
         <source>You need to fix the above errors before you can continue.</source>
         <translation>Vous devez corriger les erreurs suivantes avant de pouvoir continuer.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="196"/>
+        <location filename="../configure.cpp" line="200"/>
         <source>Configuration error</source>
         <translation>Erreur de configuration</translation>
     </message>
@@ -1098,11 +1090,6 @@ Vous devez mettre votre lecteur audio en mode UMS pour l&apos;installation. </tr
         <location filename="../configurefrm.ui" line="133"/>
         <source>&amp;No Proxy</source>
         <translation>P&amp;as de proxy</translation>
-    </message>
-    <message>
-        <location filename="../configurefrm.ui" line="143"/>
-        <source>Use &amp;System values</source>
-        <translation>Utiliser les valeurs du s&amp;ystème</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="150"/>
@@ -1238,6 +1225,11 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
         <translation>Afficher les cibles d&apos;installation désactivées</translation>
     </message>
     <message>
+        <location filename="../configurefrm.ui" line="143"/>
+        <source>Use S&amp;ystem values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../configurefrm.ui" line="411"/>
         <location filename="../configurefrm.ui" line="455"/>
         <source>Configuration invalid!</source>
@@ -1262,7 +1254,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
 <context>
     <name>Configure</name>
     <message>
-        <location filename="../configure.cpp" line="529"/>
+        <location filename="../configure.cpp" line="535"/>
         <source>English</source>
         <comment>This is the localized language name, i.e. your language.</comment>
         <translation>Français</translation>
@@ -1325,15 +1317,15 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
 <context>
     <name>CreateVoiceWindow</name>
     <message>
-        <location filename="../createvoicewindow.cpp" line="95"/>
-        <location filename="../createvoicewindow.cpp" line="98"/>
+        <location filename="../createvoicewindow.cpp" line="99"/>
+        <location filename="../createvoicewindow.cpp" line="102"/>
         <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Moteur TTS sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../createvoicewindow.cpp" line="106"/>
-        <location filename="../createvoicewindow.cpp" line="109"/>
+        <location filename="../createvoicewindow.cpp" line="110"/>
         <location filename="../createvoicewindow.cpp" line="113"/>
+        <location filename="../createvoicewindow.cpp" line="117"/>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Encodeur sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -1550,47 +1542,47 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
         <translation>Début de la sauvegarde...</translation>
     </message>
     <message>
-        <location filename="../installwindow.cpp" line="204"/>
-        <source>Backup successful</source>
-        <translation>Sauvegarde effectuée avec succès</translation>
+        <location filename="../installwindow.cpp" line="210"/>
+        <source>Backup finished.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../installwindow.cpp" line="208"/>
+        <location filename="../installwindow.cpp" line="213"/>
         <source>Backup failed!</source>
         <translation>La sauvegarde a échoué !</translation>
     </message>
     <message>
-        <location filename="../installwindow.cpp" line="239"/>
+        <location filename="../installwindow.cpp" line="244"/>
         <source>Select Backup Filename</source>
         <translation>Sélectionnez un fichier de sauvegarde</translation>
     </message>
     <message>
-        <location filename="../installwindow.cpp" line="272"/>
+        <location filename="../installwindow.cpp" line="277"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
         <translation>C&apos;est la version la plus récente possible. Elle est mise à jour à chaque fois qu&apos;un changement est fait. La version actuelle est r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="../installwindow.cpp" line="278"/>
+        <location filename="../installwindow.cpp" line="283"/>
         <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;C&apos;est la version recommandée.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../installwindow.cpp" line="289"/>
+        <location filename="../installwindow.cpp" line="294"/>
         <source>This is the last released version of Rockbox.</source>
         <translation>C&apos;est la dernière version publique officielle de Rockbox.</translation>
     </message>
     <message>
-        <location filename="../installwindow.cpp" line="292"/>
+        <location filename="../installwindow.cpp" line="297"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Remarque:&lt;/b&gt;La dernière version publique officielle est %1. &lt;b&gt;C&apos;est la version recommandée.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../installwindow.cpp" line="304"/>
+        <location filename="../installwindow.cpp" line="309"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
         <translation>Celles-ci sont compilées chaque jour à partir du code source courant. Il y a généralement plus de fonctionnalités que dans la dernière version publique officielle mais le stabilité n&apos;est pas garantie. Les fonctionnalités peuvent changer régulièrement.</translation>
     </message>
     <message>
-        <location filename="../installwindow.cpp" line="308"/>
+        <location filename="../installwindow.cpp" line="313"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Remarque :&lt;/b&gt; la version archivée est r%1 (%2).</translation>
     </message>
@@ -1741,6 +1733,24 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../base/system.cpp" line="376"/>
+        <source>(unknown vendor name) </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/system.cpp" line="394"/>
+        <source>(unknown product name)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuaZipFile</name>
+    <message>
+        <location filename="../quazip/quazipfile.cpp" line="141"/>
+        <source>ZIP/UNZIP API error %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQt</name>
@@ -1799,163 +1809,168 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../rbutilqt.cpp" line="420"/>
         <location filename="../rbutilqt.cpp" line="476"/>
-        <location filename="../rbutilqt.cpp" line="644"/>
-        <location filename="../rbutilqt.cpp" line="811"/>
-        <location filename="../rbutilqt.cpp" line="898"/>
-        <location filename="../rbutilqt.cpp" line="942"/>
+        <location filename="../rbutilqt.cpp" line="653"/>
+        <location filename="../rbutilqt.cpp" line="819"/>
+        <location filename="../rbutilqt.cpp" line="906"/>
+        <location filename="../rbutilqt.cpp" line="950"/>
         <source>Confirm Installation</source>
         <translation>Confirmation de l&apos;installation</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="499"/>
-        <location filename="../rbutilqt.cpp" line="1134"/>
+        <location filename="../rbutilqt.cpp" line="1141"/>
         <source>Mount point is wrong!</source>
         <translation>Le point de montage est erroné !</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="645"/>
+        <location filename="../rbutilqt.cpp" line="594"/>
+        <source>Beginning Backup...</source>
+        <translation type="unfinished">Début de la sauvegarde...</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="654"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>Etes-vous sûr de vouloir installer le bootloader ?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="805"/>
-        <location filename="../rbutilqt.cpp" line="883"/>
+        <location filename="../rbutilqt.cpp" line="813"/>
+        <location filename="../rbutilqt.cpp" line="891"/>
         <source>No Rockbox installation found</source>
         <translation>Aucune installation de Rockbox n&apos;a été trouvé</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="806"/>
+        <location filename="../rbutilqt.cpp" line="814"/>
         <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing fonts.</source>
         <translation>Impossible de déterminer la version de Rockbox installée. Veuillez installer Rockbox avant d&apos;installer les polices.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="812"/>
+        <location filename="../rbutilqt.cpp" line="820"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Etes-vous sûr de vouloir installer le pack de polices de caractères ?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="884"/>
+        <location filename="../rbutilqt.cpp" line="892"/>
         <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
         <translation>Impossible de déterminer la version de Rockbox installée. Veuillez installer Rockbox avant d&apos;installer les fichiers de voix.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="899"/>
+        <location filename="../rbutilqt.cpp" line="907"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Etes-vous sûr de vouloir installer le fichier de voix ?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="943"/>
+        <location filename="../rbutilqt.cpp" line="951"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Etes-vous sûr de vouloir installer les fichiers additionnels pour les jeux ?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1021"/>
+        <location filename="../rbutilqt.cpp" line="1029"/>
         <source>Confirm Uninstallation</source>
         <translation>Confirmation de la désinstallation</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1022"/>
+        <location filename="../rbutilqt.cpp" line="1030"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Etes-vous sûr de vouloir désinstaller le bootloader ?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1036"/>
+        <location filename="../rbutilqt.cpp" line="1044"/>
         <source>No uninstall method for this target known.</source>
         <translation>Aucune méthode de désinstallation n&apos;est connue pour cette plateforme.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1042"/>
+        <location filename="../rbutilqt.cpp" line="1050"/>
         <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
         <translation>L&apos;utilitaire Rockbox ne peut pas désinstaller le bootloader. Essayez de faire une mise à jour normale du firmware pour supprimer le bootloader.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1072"/>
+        <location filename="../rbutilqt.cpp" line="1079"/>
         <source>Confirm download</source>
         <translation>Confirmation du téléchargement</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1073"/>
+        <location filename="../rbutilqt.cpp" line="1080"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Etes-vous sûr de vouloir télécharger le manuel ? Il sera sauvegardé dans le dossier racine de votre lecteur audio.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1120"/>
+        <location filename="../rbutilqt.cpp" line="1127"/>
         <source>Confirm installation</source>
         <translation>Confirmation de l&apos;installation</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1121"/>
+        <location filename="../rbutilqt.cpp" line="1128"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Etes-vous sûr de vouloir installer l&apos;utilitaire Rockbox sur votre lecteur audio ? Après l&apos;installation vous pourrez le lancer depuis le disque dur de votre lecteur audio.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1130"/>
+        <location filename="../rbutilqt.cpp" line="1137"/>
         <source>Installing Rockbox Utility</source>
         <translation>Installation de l&apos;utilitaire Rockbox</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1148"/>
+        <location filename="../rbutilqt.cpp" line="1155"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Erreur pendant l&apos;installation de l&apos;utilitaire Rockbox</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1152"/>
+        <location filename="../rbutilqt.cpp" line="1159"/>
         <source>Installing user configuration</source>
         <translation>Installation de la configuration utilisateur</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1156"/>
+        <location filename="../rbutilqt.cpp" line="1163"/>
         <source>Error installing user configuration</source>
         <translation>Erreur pendant l&apos;installation de la configuration utilisateur</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1160"/>
+        <location filename="../rbutilqt.cpp" line="1167"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Installation de l&apos;utilitaire Rockbox terminée avec succès.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1274"/>
+        <location filename="../rbutilqt.cpp" line="1281"/>
         <source>Checking for update ...</source>
         <translation>Vérification des mises à jour...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1334"/>
+        <location filename="../rbutilqt.cpp" line="1346"/>
         <source>RockboxUtility Update available</source>
         <translation>Une mise à jour de l&apos;utilitaire Rockbox est disponible</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1335"/>
+        <location filename="../rbutilqt.cpp" line="1347"/>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
         <translation>&lt;b&gt;Une nouvelle version de l&apos;utilitaire de Rockbox est disponible.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Vous pouvez la télécharger ici: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1337"/>
+        <location filename="../rbutilqt.cpp" line="1350"/>
         <source>New version of Rockbox Utility available.</source>
         <translation>Une nouvelle version de l&apos;utilitaire Rockbox est disponible.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1340"/>
+        <location filename="../rbutilqt.cpp" line="1353"/>
         <source>Rockbox Utility is up to date.</source>
         <translation>L&apos;utilitaire Rockbox est à jour.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="337"/>
-        <location filename="../rbutilqt.cpp" line="1250"/>
+        <location filename="../rbutilqt.cpp" line="1257"/>
         <source>Configuration error</source>
         <translation>Erreur de configuration</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="937"/>
+        <location filename="../rbutilqt.cpp" line="945"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="938"/>
+        <location filename="../rbutilqt.cpp" line="946"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Votre périphérique n&apos;a pas de le plugin Doom. Annulation.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="1251"/>
+        <location filename="../rbutilqt.cpp" line="1258"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Votre configuration est invalide. Veuillez vérifier dans la fenêtre de configuration que les valeurs sélectionnées soient correctes.</translation>
     </message>
@@ -1998,22 +2013,22 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
         <translation>Une installation de Rockox a été détectée. Souhaitez-vous la sauvegarder avant de continuer ?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="603"/>
+        <location filename="../rbutilqt.cpp" line="612"/>
         <source>Backup failed!</source>
         <translation>Sauvegarde échouée !</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="869"/>
+        <location filename="../rbutilqt.cpp" line="877"/>
         <source>Warning</source>
         <translation>Avertissement</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="870"/>
+        <location filename="../rbutilqt.cpp" line="878"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>L&apos;application est encore en train de télécharger les informations sur les dernières versions. Veuillez réessayer dans un instant.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="581"/>
+        <location filename="../rbutilqt.cpp" line="582"/>
         <source>Starting backup...</source>
         <translation>Début de la sauvegarde...</translation>
     </message>
@@ -2028,7 +2043,7 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
         <translation>Votre configuration est invalide. Ceci est probablement dû à un changement du chemin du périphérique. La fenêtre de configuration va s&apos;ouvrir pour vous permettre de corriger le problème.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="599"/>
+        <location filename="../rbutilqt.cpp" line="608"/>
         <source>Backup successful</source>
         <translation>Sauvegarde effectuée avec succès</translation>
     </message>
@@ -2044,64 +2059,64 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
         <translation>Êtes vous sûr de vouloir poursuivre ?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="664"/>
+        <location filename="../rbutilqt.cpp" line="673"/>
         <source>No install method known.</source>
         <translation>Aucune méthode d&apos;installation n&apos;est connue.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="684"/>
+        <location filename="../rbutilqt.cpp" line="693"/>
         <source>Bootloader detected</source>
         <translation>Le bootloader a été détecté</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="685"/>
+        <location filename="../rbutilqt.cpp" line="694"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
         <translation>Le bootloader est déjà installé. Voulez-vous le réinstaller ?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="708"/>
+        <location filename="../rbutilqt.cpp" line="717"/>
         <source>Create Bootloader backup</source>
         <translation>Sauvegarde du bootloader</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="709"/>
+        <location filename="../rbutilqt.cpp" line="718"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>Vous pouvez créer une sauvegarde du bootloader original. Appuyez sur &quot;Oui&quot; pour sélectionner un dossier de sortie sur votre ordinateur où le fichier sera enregistré. Le fichier sera placé dans le sous-dossier &quot;%1&quot;.
 Appuyez sur &quot;Non&quot; pour ignorez cette étape.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="716"/>
+        <location filename="../rbutilqt.cpp" line="725"/>
         <source>Browse backup folder</source>
         <translation>Parcourir le dossier de sauvegarde</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="728"/>
+        <location filename="../rbutilqt.cpp" line="737"/>
         <source>Prerequisites</source>
         <translation>Prérequis</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="741"/>
+        <location filename="../rbutilqt.cpp" line="750"/>
         <source>Select firmware file</source>
         <translation>Sélectionnez le fichier firmware</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="743"/>
+        <location filename="../rbutilqt.cpp" line="752"/>
         <source>Error opening firmware file</source>
         <translation>Impossible d&apos;ouvrir le fichier firmware</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="761"/>
+        <location filename="../rbutilqt.cpp" line="770"/>
         <source>Backup error</source>
         <translation>Erreur de la sauvegarde</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="762"/>
+        <location filename="../rbutilqt.cpp" line="771"/>
         <source>Could not create backup file. Continue?</source>
         <translation>Impossible de créer une sauvegarde. Voulez-vous poursuivre ?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="792"/>
+        <location filename="../rbutilqt.cpp" line="801"/>
         <source>Manual steps required</source>
         <translation>Des étapes manuelles sont nécessaires</translation>
     </message>
@@ -2124,12 +2139,12 @@ This will install Rockbox %1. To install the most recent development build avail
 Ceci installera Rockbox %1. Pour installer la version en cours de développement la plus récente, appuyez sur &quot;Annuler&quot; et utilisez l&apos;onglet &quot;Installation&quot;.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="690"/>
+        <location filename="../rbutilqt.cpp" line="699"/>
         <source>Bootloader installation skipped</source>
         <translation>Installation du bootloader ignorée</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="734"/>
+        <location filename="../rbutilqt.cpp" line="743"/>
         <source>Bootloader installation aborted</source>
         <translation>Installation du bootloader annulée</translation>
     </message>
@@ -2674,51 +2689,89 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
 <context>
     <name>System</name>
     <message>
-        <location filename="../base/system.cpp" line="119"/>
+        <location filename="../base/system.cpp" line="121"/>
         <source>Guest</source>
         <translation>Invité</translation>
     </message>
     <message>
-        <location filename="../base/system.cpp" line="122"/>
+        <location filename="../base/system.cpp" line="124"/>
         <source>Admin</source>
         <translation>Administrateur</translation>
     </message>
     <message>
-        <location filename="../base/system.cpp" line="125"/>
+        <location filename="../base/system.cpp" line="127"/>
         <source>User</source>
         <translation>Utilisateur</translation>
     </message>
     <message>
-        <location filename="../base/system.cpp" line="128"/>
+        <location filename="../base/system.cpp" line="130"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../base/system.cpp" line="257"/>
-        <location filename="../base/system.cpp" line="302"/>
+        <location filename="../base/system.cpp" line="269"/>
+        <location filename="../base/system.cpp" line="314"/>
         <source>(no description available)</source>
         <translation>(aucune description disponible)</translation>
     </message>
 </context>
 <context>
+    <name>TTSBase</name>
+    <message>
+        <location filename="../base/ttsbase.cpp" line="40"/>
+        <source>Espeak TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/ttsbase.cpp" line="41"/>
+        <source>Flite TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/ttsbase.cpp" line="42"/>
+        <source>Swift TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/ttsbase.cpp" line="44"/>
+        <source>SAPI TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/ttsbase.cpp" line="47"/>
+        <source>Festival TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/ttsbase.cpp" line="50"/>
+        <source>OS X System Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TTSCarbon</name>
     <message>
-        <location filename="../base/ttscarbon.cpp" line="133"/>
+        <location filename="../base/ttscarbon.cpp" line="139"/>
         <source>Voice:</source>
         <translation>Voix:</translation>
     </message>
     <message>
-        <location filename="../base/ttscarbon.cpp" line="139"/>
+        <location filename="../base/ttscarbon.cpp" line="145"/>
         <source>Speed (words/min):</source>
         <translation>Vitesse (mots/min):</translation>
     </message>
     <message>
-        <location filename="../base/ttscarbon.cpp" line="203"/>
+        <location filename="../base/ttscarbon.cpp" line="152"/>
+        <source>Pitch (0 for default):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/ttscarbon.cpp" line="222"/>
         <source>Could not voice string</source>
         <translation>Impossible de synthétiser la phrase</translation>
     </message>
     <message>
-        <location filename="../base/ttscarbon.cpp" line="212"/>
+        <location filename="../base/ttscarbon.cpp" line="232"/>
         <source>Could not convert intermediate file</source>
         <translation>Impossible de convertir le fichier intermédiaire</translation>
     </message>
@@ -2772,32 +2825,32 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
 <context>
     <name>TTSSapi</name>
     <message>
-        <location filename="../base/ttssapi.cpp" line="104"/>
+        <location filename="../base/ttssapi.cpp" line="106"/>
         <source>Could not copy the Sapi-script</source>
         <translation>Impossible de copier le script Sapi</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="125"/>
+        <location filename="../base/ttssapi.cpp" line="127"/>
         <source>Could not start the Sapi-script</source>
         <translation>Impossible de démarrer le script Sapi</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="44"/>
+        <location filename="../base/ttssapi.cpp" line="43"/>
         <source>Language:</source>
         <translation>Langue:</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="50"/>
+        <location filename="../base/ttssapi.cpp" line="49"/>
         <source>Voice:</source>
         <translation>Voix:</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="57"/>
+        <location filename="../base/ttssapi.cpp" line="59"/>
         <source>Speed:</source>
         <translation>Vitesse:</translation>
     </message>
     <message>
-        <location filename="../base/ttssapi.cpp" line="60"/>
+        <location filename="../base/ttssapi.cpp" line="62"/>
         <source>Options:</source>
         <translation>Options:</translation>
     </message>
@@ -2883,23 +2936,24 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
         <translation>Encodage des fichiers...</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="273"/>
+        <location filename="../base/talkgenerator.cpp" line="164"/>
+        <location filename="../base/talkgenerator.cpp" line="295"/>
         <source>Voicing aborted</source>
         <translation>Synthèse vocale annulée</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="180"/>
-        <location filename="../base/talkgenerator.cpp" line="185"/>
+        <location filename="../base/talkgenerator.cpp" line="202"/>
+        <location filename="../base/talkgenerator.cpp" line="207"/>
         <source>Voicing of %1 failed: %2</source>
         <translation>La synthèse vocale de %1 a échoué: %2</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="278"/>
+        <location filename="../base/talkgenerator.cpp" line="300"/>
         <source>Encoding aborted</source>
         <translation>Encodage interrompu</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="262"/>
+        <location filename="../base/talkgenerator.cpp" line="284"/>
         <source>Encoding of %1 failed</source>
         <translation>L&apos;encodage de %1 a échoué</translation>
     </message>
@@ -3046,94 +3100,6 @@ Code de réponse HHTP: %1</translation>
     </message>
 </context>
 <context>
-    <name>UnZip</name>
-    <message>
-        <location filename="../zip/unzip.cpp" line="250"/>
-        <source>ZIP operation completed successfully.</source>
-        <translation>Opération ZIP terminée avec succès.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="251"/>
-        <source>Failed to initialize or load zlib library.</source>
-        <translation>Impossible d&apos;initialiser ou de charger la librairie zlib.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="252"/>
-        <source>zlib library error.</source>
-        <translation>Erreur de la librairie zlib.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="253"/>
-        <source>Unable to create or open file.</source>
-        <translation>Impossible de créer ou d&apos;ouvrir le fichier.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="254"/>
-        <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation>Archive partiellement corrompue. Certains fichiers pourraient être extraits.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="255"/>
-        <source>Corrupted archive.</source>
-        <translation>Archive corrompue.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="256"/>
-        <source>Wrong password.</source>
-        <translation>Mot de passe incorrect.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="257"/>
-        <source>No archive has been created yet.</source>
-        <translation>Aucune archive n&apos;a encore été crée.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="258"/>
-        <source>File or directory does not exist.</source>
-        <translation>Le fichier ou le répertoire n&apos;existe pas.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="259"/>
-        <source>File read error.</source>
-        <translation>Erreur de lecture du fichier.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="260"/>
-        <source>File write error.</source>
-        <translation>Erreur d&apos;écriture du fichier.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="261"/>
-        <source>File seek error.</source>
-        <translation>Erreur de parcours du fichier.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="262"/>
-        <source>Unable to create a directory.</source>
-        <translation>Impossible de créer un dossier.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="263"/>
-        <source>Invalid device.</source>
-        <translation>Périphérique invalide.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="264"/>
-        <source>Invalid or incompatible zip archive.</source>
-        <translation>Archive zip invalide ou incompatible.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="265"/>
-        <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation>Les en-têtes ne correspondent pas. L&apos;archive est peut-être corrompue.</translation>
-    </message>
-    <message>
-        <location filename="../zip/unzip.cpp" line="269"/>
-        <source>Unknown error.</source>
-        <translation>Erreur inconnue.</translation>
-    </message>
-</context>
-<context>
     <name>UninstallFrm</name>
     <message>
         <location filename="../uninstallfrm.ui" line="16"/>
@@ -3240,72 +3206,72 @@ Cible détectée: %1, cible sélectionnée: %2.&lt;/li&gt;</translation>
         <translation>Démarrage de la génération du fichier de voix</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="83"/>
+        <location filename="../base/voicefile.cpp" line="86"/>
         <source>Downloading voice info...</source>
         <translation>Téléchargement des informations d&apos;annonces...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="96"/>
+        <location filename="../base/voicefile.cpp" line="99"/>
         <source>Download error: received HTTP error %1.</source>
         <translation>Erreur de téléchargement: Erreur HTTP %1.</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="102"/>
+        <location filename="../base/voicefile.cpp" line="105"/>
         <source>Cached file used.</source>
         <translation>Fichier en cache utilisé.</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="105"/>
+        <location filename="../base/voicefile.cpp" line="108"/>
         <source>Download error: %1</source>
         <translation>Erreur de téléchargement: %1</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="110"/>
+        <location filename="../base/voicefile.cpp" line="113"/>
         <source>Download finished.</source>
         <translation>Téléchargement terminé.</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="118"/>
+        <location filename="../base/voicefile.cpp" line="121"/>
         <source>failed to open downloaded file</source>
         <translation>Impossible d&apos;ouvrir le fichier téléchargé</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="126"/>
+        <location filename="../base/voicefile.cpp" line="129"/>
         <source>Reading strings...</source>
         <translation>Lecture des phrases...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="193"/>
+        <location filename="../base/voicefile.cpp" line="196"/>
         <source>Creating voicefiles...</source>
         <translation>Création des fichiers de voix...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="238"/>
+        <location filename="../base/voicefile.cpp" line="241"/>
         <source>Cleaning up...</source>
         <translation>Nettoyage...</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="249"/>
+        <location filename="../base/voicefile.cpp" line="252"/>
         <source>Finished</source>
         <translation>Terminé</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="170"/>
+        <location filename="../base/voicefile.cpp" line="173"/>
         <source>The downloaded file was empty!</source>
         <translation>Le fichier téléchargé est vide !</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="198"/>
+        <location filename="../base/voicefile.cpp" line="201"/>
         <source>Error opening downloaded file</source>
         <translation>Erreur lors de l&apos;ouverture du fichier téléchargé</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="209"/>
+        <location filename="../base/voicefile.cpp" line="212"/>
         <source>Error opening output file</source>
         <translation>Erreur lors de l&apos;ouverture du fichier de sortie</translation>
     </message>
     <message>
-        <location filename="../base/voicefile.cpp" line="229"/>
+        <location filename="../base/voicefile.cpp" line="232"/>
         <source>successfully created.</source>
         <translation>Créé avec succès.</translation>
     </message>
@@ -3313,59 +3279,6 @@ Cible détectée: %1, cible sélectionnée: %2.&lt;/li&gt;</translation>
         <location filename="../base/voicefile.cpp" line="54"/>
         <source>could not find rockbox-info.txt</source>
         <translation>Impossible de trouver rockbox-info.txt</translation>
-    </message>
-</context>
-<context>
-    <name>Zip</name>
-    <message>
-        <location filename="../zip/zip.cpp" line="481"/>
-        <source>ZIP operation completed successfully.</source>
-        <translation>Opération ZIP terminée avec succès.</translation>
-    </message>
-    <message>
-        <location filename="../zip/zip.cpp" line="482"/>
-        <source>Failed to initialize or load zlib library.</source>
-        <translation>Impossible d&apos;initialiser ou de charger la librairie zlib.</translation>
-    </message>
-    <message>
-        <location filename="../zip/zip.cpp" line="483"/>
-        <source>zlib library error.</source>
-        <translation>Erreur de la librairie zlib.</translation>
-    </message>
-    <message>
-        <location filename="../zip/zip.cpp" line="484"/>
-        <source>Unable to create or open file.</source>
-        <translation>Impossible de créer ou d&apos;ouvrir le fichier.</translation>
-    </message>
-    <message>
-        <location filename="../zip/zip.cpp" line="485"/>
-        <source>No archive has been created yet.</source>
-        <translation>Aucune archive n&apos;a encore été crée.</translation>
-    </message>
-    <message>
-        <location filename="../zip/zip.cpp" line="486"/>
-        <source>File or directory does not exist.</source>
-        <translation>Le fichier ou le répertoire n&apos;existe pas.</translation>
-    </message>
-    <message>
-        <location filename="../zip/zip.cpp" line="487"/>
-        <source>File read error.</source>
-        <translation>Erreur de lecture du fichier.</translation>
-    </message>
-    <message>
-        <location filename="../zip/zip.cpp" line="488"/>
-        <source>File write error.</source>
-        <translation>Erreur d&apos;écriture du fichier.</translation>
-    </message>
-    <message>
-        <location filename="../zip/zip.cpp" line="489"/>
-        <source>File seek error.</source>
-        <translation>Erreur de parcours du fichier.</translation>
-    </message>
-    <message>
-        <location filename="../zip/zip.cpp" line="493"/>
-        <source>Unknown error.</source>
-        <translation>Erreur inconnue.</translation>
     </message>
 </context>
 <context>
@@ -3411,34 +3324,47 @@ Cible détectée: %1, cible sélectionnée: %2.&lt;/li&gt;</translation>
         <translation>Extraction du fichier.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="141"/>
-        <source>Opening archive failed: %1.</source>
-        <translation>L&apos;ouverture de l&apos;archive a échoué : %1.</translation>
+        <location filename="../base/zipinstaller.cpp" line="151"/>
+        <source>Extraction failed!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="160"/>
-        <source>Extracting failed: %1.</source>
-        <translation>L&apos;extraction a échoué: %1.</translation>
-    </message>
-    <message>
-        <location filename="../base/zipinstaller.cpp" line="171"/>
         <source>Installing file.</source>
         <translation>Installation du fichier.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="182"/>
+        <location filename="../base/zipinstaller.cpp" line="171"/>
         <source>Installing file failed.</source>
         <translation>L&apos;installation du fichier a échoué.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="191"/>
+        <location filename="../base/zipinstaller.cpp" line="180"/>
         <source>Creating installation log</source>
         <translation>Création du journal d&apos;installation</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="152"/>
+        <location filename="../base/zipinstaller.cpp" line="144"/>
         <source>Not enough disk space! Aborting.</source>
         <translation>Espace disque insuffisant ! Abandon.</translation>
+    </message>
+</context>
+<context>
+    <name>ZipUtil</name>
+    <message>
+        <location filename="../base/ziputil.cpp" line="97"/>
+        <source>Creating output path failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/ziputil.cpp" line="104"/>
+        <source>Creating output file failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../base/ziputil.cpp" line="113"/>
+        <source>Error during Zip operation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

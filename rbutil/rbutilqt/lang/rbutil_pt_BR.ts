@@ -712,22 +712,6 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
         <translation>Selecione seu dispositivo</translation>
     </message>
     <message>
-        <source>Sansa e200 in MTP mode found!
-You need to change your player to MSC mode for installation. </source>
-        <translation>Encontrado Sansa e200 em modo MTP!
-Você precisa modificar seu reprodutor para o modo MSC para a instalação.</translation>
-    </message>
-    <message>
-        <source>H10 20GB in MTP mode found!
-You need to change your player to UMS mode for installation. </source>
-        <translation>Encontrado H10 20GB em modo MTP!
-Você precisa modificar seu reprodutor para o modo UMS para a instalação.</translation>
-    </message>
-    <message>
-        <source>Unless you changed this installation will fail!</source>
-        <translation>A menos que você modifique esta instalação falhará!</translation>
-    </message>
-    <message>
         <source>Fatal error</source>
         <translation>Erro fatal</translation>
     </message>
@@ -840,6 +824,15 @@ O Rockbox precisa de um Ipod formatado como FAT (chamado de &quot;WinPod&quot;) 
 Rockbox Utility can&apos;t work with this proxy settings. Make sure the system proxy is set correctly. Note that &quot;proxy auto-config (PAC)&quot; scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
         <translation>As configurações de Proxy do Sistema são inválidas!
 O Utilitário Rockbox não funciona com estas configurações de proxy. Certifique-se que o proxy do sistema esteja configurado corretamente. Note que scripts &quot;proxy auto-config (PAC)&quot; não são suportados pelo Utilitário Rockbox. Se seu sistema usa um desses scripts você precisa configurar o proxy manualmente.</translation>
+    </message>
+    <message>
+        <source>%1 in MTP mode found!
+You need to change your player to MSC mode for installation. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Until you change this installation will fail!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1124,8 +1117,8 @@ O Utilitário Rockbox não funciona com estas configurações de proxy. Certifiq
         <translation>Atualizar</translation>
     </message>
     <message>
-        <source>Select excutable</source>
-        <translation>Selecionar executável</translation>
+        <source>Select executable</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1241,10 +1234,6 @@ O Utilitário Rockbox não funciona com estas configurações de proxy. Certifiq
         <translation>Iniciando Cópia de Segurança...</translation>
     </message>
     <message>
-        <source>Backup successful</source>
-        <translation>Cópia de segurança efetuado com sucesso</translation>
-    </message>
-    <message>
         <source>Backup failed!</source>
         <translation>Cópia de segurança falhou!</translation>
     </message>
@@ -1275,6 +1264,10 @@ O Utilitário Rockbox não funciona com estas configurações de proxy. Certifiq
     <message>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Nota:&lt;/b&gt; a versão arquivada é r%1 (%2).</translation>
+    </message>
+    <message>
+        <source>Backup finished.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1395,6 +1388,21 @@ O Utilitário Rockbox não funciona com estas configurações de proxy. Certifiq
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
         <translation>LTR</translation>
+    </message>
+    <message>
+        <source>(unknown vendor name) </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(unknown product name)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuaZipFile</name>
+    <message>
+        <source>ZIP/UNZIP API error %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1703,6 +1711,10 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
         <source>Rockbox Utility is up to date.</source>
         <translation>O Utilitário Rockbox está atualizado.</translation>
     </message>
+    <message>
+        <source>Beginning Backup...</source>
+        <translation type="unfinished">Iniciando Cópia de Segurança...</translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQtFrm</name>
@@ -1793,10 +1805,6 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
     <message>
         <source>Install themes</source>
         <translation>Instalar temas</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.</source>
-        <translation>&lt;b&gt;Instalar Temas&lt;/b&gt;&lt;br/&gt;O visual do Rockbox pode ser personalizado através de temas. Você pode escolher e instalar diversos temas distribuidos oficialmente.</translation>
     </message>
     <message>
         <source>Install game files</source>
@@ -2032,6 +2040,10 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <source>System &amp;Trace</source>
         <translation>&amp;Trace do Sistema</translation>
     </message>
+    <message>
+        <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos;s look can be customized by themes. You can choose and install several officially distributed themes.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ServerInfo</name>
@@ -2156,6 +2168,33 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     </message>
 </context>
 <context>
+    <name>TTSBase</name>
+    <message>
+        <source>Espeak TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flite TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swift TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SAPI TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Festival TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OS X System Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TTSCarbon</name>
     <message>
         <source>Voice:</source>
@@ -2172,6 +2211,10 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     <message>
         <source>Could not convert intermediate file</source>
         <translation>Não foi possível converter o arquivo intermediário</translation>
+    </message>
+    <message>
+        <source>Pitch (0 for default):</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2437,77 +2480,6 @@ código de resposta HTTP: %1</translation>
     </message>
 </context>
 <context>
-    <name>UnZip</name>
-    <message>
-        <source>ZIP operation completed successfully.</source>
-        <translation>Operação ZIP completada com sucesso.</translation>
-    </message>
-    <message>
-        <source>Failed to initialize or load zlib library.</source>
-        <translation>Falha ao inicializar ou carregar a biblioteca zlib.</translation>
-    </message>
-    <message>
-        <source>zlib library error.</source>
-        <translation>Erro na biblioteca zlib.</translation>
-    </message>
-    <message>
-        <source>Unable to create or open file.</source>
-        <translation>Incapaz de criar ou abrir o arquivo.</translation>
-    </message>
-    <message>
-        <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation>Arquivo zip parcialmente corrompido. Alguns arquivos poderão ser extraidos.</translation>
-    </message>
-    <message>
-        <source>Corrupted archive.</source>
-        <translation>Arquivo corrompido.</translation>
-    </message>
-    <message>
-        <source>Wrong password.</source>
-        <translation>Senha incorreta.</translation>
-    </message>
-    <message>
-        <source>No archive has been created yet.</source>
-        <translation>Nenhuma arquivo foi criando ainda.</translation>
-    </message>
-    <message>
-        <source>File or directory does not exist.</source>
-        <translation>Arquivo ou diretório não existe.</translation>
-    </message>
-    <message>
-        <source>File read error.</source>
-        <translation>Erro na leitura do arquivo.</translation>
-    </message>
-    <message>
-        <source>File write error.</source>
-        <translation>Erro na escrita do arquivo.</translation>
-    </message>
-    <message>
-        <source>File seek error.</source>
-        <translation>Erro na navegação do arquivo.</translation>
-    </message>
-    <message>
-        <source>Unable to create a directory.</source>
-        <translation>Incapaz de criar um diretório.</translation>
-    </message>
-    <message>
-        <source>Invalid device.</source>
-        <translation>Dispositivo inválido.</translation>
-    </message>
-    <message>
-        <source>Invalid or incompatible zip archive.</source>
-        <translation>Arquivo zip inválido ou incompatível.</translation>
-    </message>
-    <message>
-        <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation>Cabeçalhos inconsistentes. O arquivo pode estar corrompido.</translation>
-    </message>
-    <message>
-        <source>Unknown error.</source>
-        <translation>Erro desconhecido.</translation>
-    </message>
-</context>
-<context>
     <name>UninstallFrm</name>
     <message>
         <source>Uninstall Rockbox</source>
@@ -2656,49 +2628,6 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
     </message>
 </context>
 <context>
-    <name>Zip</name>
-    <message>
-        <source>ZIP operation completed successfully.</source>
-        <translation>Operação ZIP completada com sucesso.</translation>
-    </message>
-    <message>
-        <source>Failed to initialize or load zlib library.</source>
-        <translation>Falhou ao inicializar ou carregar a biblioteca zlib.</translation>
-    </message>
-    <message>
-        <source>zlib library error.</source>
-        <translation>Erro na biblioteca zlib.</translation>
-    </message>
-    <message>
-        <source>Unable to create or open file.</source>
-        <translation>Incapaz de criar ou abrir o arquivo.</translation>
-    </message>
-    <message>
-        <source>No archive has been created yet.</source>
-        <translation>Nenhum arquivo foi criando ainda.</translation>
-    </message>
-    <message>
-        <source>File or directory does not exist.</source>
-        <translation>Arquivo ou diretório não existe.</translation>
-    </message>
-    <message>
-        <source>File read error.</source>
-        <translation>Erro na leitura do arquivo.</translation>
-    </message>
-    <message>
-        <source>File write error.</source>
-        <translation>Erro na escrita do arquivo.</translation>
-    </message>
-    <message>
-        <source>File seek error.</source>
-        <translation>Erro na navegação do arquivo.</translation>
-    </message>
-    <message>
-        <source>Unknown error.</source>
-        <translation>Erro desconhecido.</translation>
-    </message>
-</context>
-<context>
     <name>ZipInstaller</name>
     <message>
         <source>done.</source>
@@ -2733,16 +2662,8 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
         <translation>Extraindo arquivo.</translation>
     </message>
     <message>
-        <source>Opening archive failed: %1.</source>
-        <translation>Falhou ao abrir arquivo: %1.</translation>
-    </message>
-    <message>
         <source>Not enough disk space! Aborting.</source>
         <translation>Sem espaço em disco suficiente! Abortando.</translation>
-    </message>
-    <message>
-        <source>Extracting failed: %1.</source>
-        <translation>Falhou extraindo: %1.</translation>
     </message>
     <message>
         <source>Installing file.</source>
@@ -2755,6 +2676,25 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
     <message>
         <source>Creating installation log</source>
         <translation>Criando registro da instalação</translation>
+    </message>
+    <message>
+        <source>Extraction failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ZipUtil</name>
+    <message>
+        <source>Creating output path failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Creating output file failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error during Zip operation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -696,22 +696,6 @@ Select your device and Mountpoint manually.</source>
         <translation>Укажите ваше устройство</translation>
     </message>
     <message>
-        <source>Sansa e200 in MTP mode found!
-You need to change your player to MSC mode for installation. </source>
-        <translation>Найден плеер Sansa e200 в режиме MTP!
-Вам необходимо переключить плеер в режим MSC, чтобы продолжить установку. </translation>
-    </message>
-    <message>
-        <source>H10 20GB in MTP mode found!
-You need to change your player to UMS mode for installation. </source>
-        <translation>Найден плеер H10 на 20 ГБ в режиме MTP!
-Вам необходимо переключить плеер в режим UMS, чтобы продолжить установку.</translation>
-    </message>
-    <message>
-        <source>Unless you changed this installation will fail!</source>
-        <translation>Установка не удастся если вы этого не сделали!</translation>
-    </message>
-    <message>
         <source>Fatal error</source>
         <translation>Фатальная ошибка</translation>
     </message>
@@ -842,6 +826,15 @@ Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </sour
 Rockbox Utility can&apos;t work with this proxy settings. Make sure the system proxy is set correctly. Note that &quot;proxy auto-config (PAC)&quot; scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
         <translation>Системные настройки прокси негодны!
 Мастер Rockbox не может работать с этими настройками. Проверьте правильность системных настроек прокси. Учтите, что мастер Rockbox не поддерживает сценарии &quot;proxy auto config&quot; (PAC). Если таковые используются на Вашей системе, вам необходимо использовать ручные настройки.</translation>
+    </message>
+    <message>
+        <source>%1 in MTP mode found!
+You need to change your player to MSC mode for installation. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Until you change this installation will fail!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1122,8 +1115,8 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
         <translation>Обновить</translation>
     </message>
     <message>
-        <source>Select excutable</source>
-        <translation>Выбрать исполняемый файл</translation>
+        <source>Select executable</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1239,10 +1232,6 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
         <translation>Начинаю резервную копию...</translation>
     </message>
     <message>
-        <source>Backup successful</source>
-        <translation>Резеврная копия успешно создана</translation>
-    </message>
-    <message>
         <source>Backup failed!</source>
         <translation>Не удалось создать резервную копию!</translation>
     </message>
@@ -1273,6 +1262,10 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
     <message>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Примечание :&lt;/b&gt; текущая версия в архиве: r%1 (%2).</translation>
+    </message>
+    <message>
+        <source>Backup finished.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1393,6 +1386,21 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
         <translation>LTR</translation>
+    </message>
+    <message>
+        <source>(unknown vendor name) </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(unknown product name)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuaZipFile</name>
+    <message>
+        <source>ZIP/UNZIP API error %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1701,6 +1709,10 @@ Network error: %1. Please check your network and proxy settings.</source>
         <source>Rockbox Utility is up to date.</source>
         <translation>Мастер Rockbox не требует обновления.</translation>
     </message>
+    <message>
+        <source>Beginning Backup...</source>
+        <translation type="unfinished">Начинаю резервную копию...</translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQtFrm</name>
@@ -1925,10 +1937,6 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation>&lt;b&gt;Пакет шрифтов&lt;/b&gt;&lt;br/&gt;Содержит несколько часто используемых шрифтов. Установка рекомендуется.</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.</source>
-        <translation>&lt;b&gt;Установить темы&lt;/b&gt;&lt;br/&gt;Внешний вид Rockbox может быть настроен с помощью тем. Вы можете выбрать и установить несколько тем среди официально раздаваемых.</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Install Game Files&lt;/b&gt;&lt;br/&gt;Doom needs a base wad file to run.</source>
         <translation>&lt;b&gt;Установить игровые файлы&lt;/b&gt;&lt;br/&gt;Чтобы играть в Doom, необходимо установить базовый wad-файл.</translation>
     </message>
@@ -2028,6 +2036,10 @@ Network error: %1. Please check your network and proxy settings.</source>
         <source>&lt;b&gt;Create Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so
  if you installed the voice file Rockbox will speak.</source>
         <translation>&lt;b&gt;Создать голосовой файл&lt;/b&gt;&lt;br/&gt;Он нужен, чтобы Rockbox произносил пользовательский интерфейс. Произношение включено по умолчанию, поэтому если Вы установили голосовой файл, Rockbox станет разговаривать.</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos;s look can be customized by themes. You can choose and install several officially distributed themes.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2153,6 +2165,33 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
 </context>
 <context>
+    <name>TTSBase</name>
+    <message>
+        <source>Espeak TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flite TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swift TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SAPI TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Festival TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OS X System Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TTSCarbon</name>
     <message>
         <source>Voice:</source>
@@ -2169,6 +2208,10 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <source>Could not convert intermediate file</source>
         <translation>Не могу преобразовать промежуточный файл</translation>
+    </message>
+    <message>
+        <source>Pitch (0 for default):</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2435,77 +2478,6 @@ HTTP response code: %1</source>
     </message>
 </context>
 <context>
-    <name>UnZip</name>
-    <message>
-        <source>ZIP operation completed successfully.</source>
-        <translation>Операция ZIP успешно завершена.</translation>
-    </message>
-    <message>
-        <source>Failed to initialize or load zlib library.</source>
-        <translation>Сбой загрузки или инициализации библиотеки zlib.</translation>
-    </message>
-    <message>
-        <source>zlib library error.</source>
-        <translation>Ошибка библиотеки zlib.</translation>
-    </message>
-    <message>
-        <source>Unable to create or open file.</source>
-        <translation>Не могу создать или открыть файл.</translation>
-    </message>
-    <message>
-        <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation>Архив частично повреждён. Некоторые файлы могут быть извлечены.</translation>
-    </message>
-    <message>
-        <source>Corrupted archive.</source>
-        <translation>Архив повреждён.</translation>
-    </message>
-    <message>
-        <source>Wrong password.</source>
-        <translation>Неверный пароль.</translation>
-    </message>
-    <message>
-        <source>No archive has been created yet.</source>
-        <translation>Никакого архива пока не было создано.</translation>
-    </message>
-    <message>
-        <source>File or directory does not exist.</source>
-        <translation>Файл или папка не существует.</translation>
-    </message>
-    <message>
-        <source>File read error.</source>
-        <translation>Ошибка чтения файла.</translation>
-    </message>
-    <message>
-        <source>File write error.</source>
-        <translation>Сбой записи файла.</translation>
-    </message>
-    <message>
-        <source>File seek error.</source>
-        <translation>Сбой пробега файла.</translation>
-    </message>
-    <message>
-        <source>Unable to create a directory.</source>
-        <translation>Не могу создать папку.</translation>
-    </message>
-    <message>
-        <source>Invalid device.</source>
-        <translation>Негодное устройство.</translation>
-    </message>
-    <message>
-        <source>Invalid or incompatible zip archive.</source>
-        <translation>Неверный или несовместимый ZIP-архив.</translation>
-    </message>
-    <message>
-        <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation>Заголовки не соответствуют. Возможно, архив повреждён.</translation>
-    </message>
-    <message>
-        <source>Unknown error.</source>
-        <translation>Неизвестная ошибка.</translation>
-    </message>
-</context>
-<context>
     <name>UninstallFrm</name>
     <message>
         <source>Uninstall Rockbox</source>
@@ -2654,49 +2626,6 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     </message>
 </context>
 <context>
-    <name>Zip</name>
-    <message>
-        <source>ZIP operation completed successfully.</source>
-        <translation>Операция ZIP успешно завершена.</translation>
-    </message>
-    <message>
-        <source>Failed to initialize or load zlib library.</source>
-        <translation>Сбой загрузки или инициализации библиотеки zlib.</translation>
-    </message>
-    <message>
-        <source>zlib library error.</source>
-        <translation>Ошибка библиотеки zlib.</translation>
-    </message>
-    <message>
-        <source>Unable to create or open file.</source>
-        <translation>Не могу создать или открыть файл.</translation>
-    </message>
-    <message>
-        <source>No archive has been created yet.</source>
-        <translation>Никакого архива пока не было создано.</translation>
-    </message>
-    <message>
-        <source>File or directory does not exist.</source>
-        <translation>Файл или папка не существует.</translation>
-    </message>
-    <message>
-        <source>File read error.</source>
-        <translation>Сбой чтения файла.</translation>
-    </message>
-    <message>
-        <source>File write error.</source>
-        <translation>Сбой записи файла.</translation>
-    </message>
-    <message>
-        <source>File seek error.</source>
-        <translation>Сбой пробега файла.</translation>
-    </message>
-    <message>
-        <source>Unknown error.</source>
-        <translation>Неизвестная ошибка.</translation>
-    </message>
-</context>
-<context>
     <name>ZipInstaller</name>
     <message>
         <source>done.</source>
@@ -2731,14 +2660,6 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
         <translation>Извлечение файла.</translation>
     </message>
     <message>
-        <source>Opening archive failed: %1.</source>
-        <translation>Сбой открытия архива: %1.</translation>
-    </message>
-    <message>
-        <source>Extracting failed: %1.</source>
-        <translation>Сбой извлечения: %1.</translation>
-    </message>
-    <message>
         <source>Installing file.</source>
         <translation>Установка файла.</translation>
     </message>
@@ -2753,6 +2674,25 @@ Installed target: %1, selected target: %2.&lt;/li&gt;</source>
     <message>
         <source>Not enough disk space! Aborting.</source>
         <translation>Не достаточно дискового пространства! Отмена.</translation>
+    </message>
+    <message>
+        <source>Extraction failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ZipUtil</name>
+    <message>
+        <source>Creating output path failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Creating output file failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error during Zip operation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
