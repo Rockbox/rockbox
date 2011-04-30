@@ -287,7 +287,7 @@ void RbUtilQt::about()
     while(!r.atEnd()) {
         QString line = r.readLine();
         // filter out header.
-        line.remove(QRegExp("^[^A-Z]+.*"));
+        line.remove(QRegExp("^ +.*"));
         line.remove(QRegExp("^People.*"));
         about.browserCredits->append(line);
     }
