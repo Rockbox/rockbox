@@ -312,7 +312,12 @@ static void iap_handlepkt_mode0(void)
         {
             cmd_ok_mode0(cmd);
 
-            if (serbuf[6] == 0x35)
+            uint32_t lingoes = (serbuf[3] << 24) |
+                               (serbuf[4] << 16) |
+                               (serbuf[5] << 8) |
+                               (serbuf[6] << 0);
+
+            if (lingoes == 0x35)
             /* FM transmitter sends this: */
             /* FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??)*/
             {
@@ -323,12 +328,11 @@ static void iap_handlepkt_mode0(void)
                 unsigned char data3[] = {0x05, 0x02};
                 iap_send_pkt(data3, sizeof(data3));
             }
-
             else
             {
                 /* ipod fm remote sends this: */ 
                 /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 */
-                if (serbuf[6] |= 0x80)
+                if (lingoes & (1 << 7)) /* bit 7 = RF tuner lingo */
                     radio_present = 1;
                 /* GetDevAuthenticationInfo */    
                 unsigned char data4[] = {0x00, 0x14};
