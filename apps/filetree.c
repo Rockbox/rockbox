@@ -285,7 +285,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
     c->dirsindir = 0;
     c->dirfull = false;
 
-    for ( i=0; i < global_settings.max_files_in_dir; i++ ) {
+    for ( i=0; i < c->dircache_count; i++ ) {
         int len;
         struct dirent *entry = readdir(dir);
         struct dirinfo info;

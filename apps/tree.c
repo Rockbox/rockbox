@@ -95,7 +95,6 @@ static char lastdir[MAX_PATH];
 #ifdef HAVE_TAGCACHE
 static int lasttable, lastextra, lastfirstpos;
 #endif
-static int max_files = 0;
 
 static bool reload_dir = false;
 
@@ -391,7 +390,7 @@ static int update_dir(void)
 #ifdef HAVE_TAGCACHE
         !id3db && 
 #endif
-        (tc.dirfull || tc.filesindir == global_settings.max_files_in_dir) )
+        (tc.dirfull || tc.filesindir == tc.dircache_count) )
         {
             splash(HZ, ID2P(LANG_SHOWDIR_BUFFER_FULL));
         }
@@ -1005,20 +1004,18 @@ int rockbox_browse(struct browse_context *browse)
 
 void tree_mem_init(void)
 {
-    /* We copy the settings value in case it is changed by the user. We can't
-       use it until the next reboot. */
-    max_files = global_settings.max_files_in_dir;
-
     /* initialize tree context struct */
     memset(&tc, 0, sizeof(tc));
     tc.dirfilter = &global_settings.dirfilter;
     tc.sort_dir = global_settings.sort_dir;
 
-    tc.name_buffer_size = AVERAGE_FILENAME_LENGTH * max_files;
+    tc.name_buffer_size = AVERAGE_FILENAME_LENGTH *
+        global_settings.max_files_in_dir;
     tc.name_buffer = buffer_alloc(tc.name_buffer_size);
 
-    tc.dircache_size = max_files * sizeof(struct entry);
-    tc.dircache = buffer_alloc(tc.dircache_size);
+    tc.dircache_count = global_settings.max_files_in_dir;
+    tc.dircache = buffer_alloc(global_settings.max_files_in_dir *
+        sizeof(struct entry));
     tree_get_filetypes(&filetypes, &filetypes_count);
 }
 

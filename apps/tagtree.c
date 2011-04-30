@@ -1288,7 +1288,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         dptr++;
         current_entry_count++;
 
-        if (current_entry_count >= global_settings.max_files_in_dir)
+        if (current_entry_count >= c->dircache_count)
         {
             logf("chunk mode #3: %d", current_entry_count);
             c->dirfull = true;

@@ -84,7 +84,7 @@ struct tree_context {
      * contains all files and dirs in the current
      * dir (with filters applied) */
     void* dircache;
-    int dircache_size;
+    int dircache_count; /* Number of entries in dircache */
     char* name_buffer;
     int name_buffer_size;
     int dentry_size;
