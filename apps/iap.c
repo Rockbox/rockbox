@@ -63,6 +63,19 @@ static int responselen;
 
 static char cur_dbrecord[5] = {0};
 
+static void put_u32(unsigned char *buf, uint32_t data)
+{
+    buf[0] = (data >> 24) & 0xFF;
+    buf[1] = (data >> 16) & 0xFF;
+    buf[2] = (data >>  8) & 0xFF;
+    buf[3] = (data >>  0) & 0xFF;
+}
+
+static uint32_t get_u32(const unsigned char *buf)
+{
+    return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+}
+
 static void iap_task(void)
 {
     static int count = 0;
@@ -210,10 +223,7 @@ void iap_periodic(void)
         iap_updateflag = true;
     }
 
-    data[4] = time_elapsed >> 24;
-    data[5] = time_elapsed >> 16;
-    data[6] = time_elapsed >> 8;
-    data[7] = time_elapsed;
+    put_u32(&data[4], time_elapsed);
     iap_send_pkt(data, sizeof(data));
 }
 
@@ -312,10 +322,7 @@ static void iap_handlepkt_mode0(void)
         {
             cmd_ok_mode0(cmd);
 
-            uint32_t lingoes = (serbuf[3] << 24) |
-                               (serbuf[4] << 16) |
-                               (serbuf[5] << 8) |
-                               (serbuf[6] << 0);
+            uint32_t lingoes = get_u32(&serbuf[3]);
 
             if (lingoes == 0x35)
             /* FM transmitter sends this: */
@@ -638,10 +645,7 @@ static void iap_handlepkt_mode4(void)
                     num = 1;
                     break;
             }
-            data[3] = num >> 24;
-            data[4] = num >> 16;
-            data[5] = num >> 8;
-            data[6] = num;
+            put_u32(&data[3], num);
             iap_send_pkt(data, sizeof(data));
             break;
         }
@@ -654,8 +658,7 @@ static void iap_handlepkt_mode4(void)
                             {0x04, 0x00, 0x1B, 0x00, 0x00, 0x00, 0x00,
                              'R', 'O', 'C', 'K', 'B', 'O', 'X', '\0'};
             
-            unsigned long item_offset = (serbuf[5] << 24) | (serbuf[6] << 16) |
-                                        (serbuf[7] << 8) | serbuf[8];
+            unsigned long item_offset = get_u32(&serbuf[5]);
 
             get_playlist_name(data + 7, item_offset, MAX_PATH);
             /*Remove file extension*/
@@ -677,14 +680,8 @@ static void iap_handlepkt_mode4(void)
             unsigned long time_total = id3->length;
             unsigned long time_elapsed = id3->elapsed;
             int status = audio_status();
-            data[3] = time_total >> 24;
-            data[4] = time_total >> 16;
-            data[5] = time_total >> 8;
-            data[6] = time_total;
-            data[7] = time_elapsed >> 24;
-            data[8] = time_elapsed >> 16;
-            data[9] = time_elapsed >> 8;
-            data[10] = time_elapsed;
+            put_u32(&data[3], time_total);
+            put_u32(&data[7], time_elapsed);
             if (status == AUDIO_STATUS_PLAY)
                 data[11] = 0x01; /* play */
             else if (status & AUDIO_STATUS_PAUSE)
@@ -702,10 +699,7 @@ static void iap_handlepkt_mode4(void)
             playlist_pos -= playlist_get_first_index(NULL);
             if(playlist_pos < 0)
                 playlist_pos += playlist_amount();
-            data[3] = playlist_pos >> 24;
-            data[4] = playlist_pos >> 16;
-            data[5] = playlist_pos >> 8;
-            data[6] = playlist_pos;
+            put_u32(&data[3], playlist_pos);
             iap_send_pkt(data, sizeof(data));
             break;
         }
@@ -721,9 +715,8 @@ static void iap_handlepkt_mode4(void)
             struct mp3entry id3;
             int fd;
             size_t len;
-            long tracknum = (signed long)serbuf[4] << 24 |
-                            (signed long)serbuf[5] << 16 |
-                            (signed long)serbuf[6] << 8 | serbuf[7];
+            long tracknum = get_u32(&serbuf[4]);
+            
             data[2] = cmd + 1;
             memcpy(&id3, audio_current_track(), sizeof(id3));
             tracknum += playlist_get_first_index(NULL);
@@ -777,10 +770,8 @@ static void iap_handlepkt_mode4(void)
             {
                 case 0x01:
                 {/*Playlist*/
-                    unsigned long item_offset = (cur_dbrecord[1] << 24)|
-                                                (cur_dbrecord[2] << 16)|
-                                                (cur_dbrecord[3] << 8) |
-                                                 cur_dbrecord[4];
+                    unsigned long item_offset = get_u32(&cur_dbrecord[1]);
+                    
                     unsigned char selected_playlist
                     [sizeof(global_settings.playlist_catalog_dir)
                     + 1
@@ -940,10 +931,7 @@ static void iap_handlepkt_mode4(void)
             /* ReturnNumPlayingTracks */
             unsigned char data[] = {0x04, 0x00, 0x36, 0x00, 0x00, 0x00, 0x00};
             unsigned long playlist_amt = playlist_amount();
-            data[3] = playlist_amt >> 24;
-            data[4] = playlist_amt >> 16;
-            data[5] = playlist_amt >> 8;
-            data[6] = playlist_amt;
+            put_u32(&data[3], playlist_amt);
             iap_send_pkt(data, sizeof(data));
             break;
         }
@@ -952,9 +940,8 @@ static void iap_handlepkt_mode4(void)
         case 0x0037:
         {
             int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
-            long tracknum = (signed long)serbuf[4] << 24 |
-                            (signed long)serbuf[5] << 16 |
-                            (signed long)serbuf[6] << 8 | serbuf[7];
+            long tracknum = get_u32(&serbuf[4]);
+            
             audio_pause();
             audio_skip(tracknum - playlist_next(0));
             if (!paused)
