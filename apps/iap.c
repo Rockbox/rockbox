@@ -43,7 +43,6 @@
 #include "tuner.h"
 #include "ipod_remote_tuner.h"
 
-#define MAX_NAME_LENGTH 20
 #include "filetree.h"
 #include "dir.h"
 
@@ -647,20 +646,20 @@ static void iap_handlepkt_mode4(void)
         case 0x001A:
         {
             /* ReturnCategorizedDatabaseRecord */
-            unsigned char data[7 + MAX_NAME_LENGTH] = 
+            unsigned char data[7 + MAX_PATH] = 
                             {0x04, 0x00, 0x1B, 0x00, 0x00, 0x00, 0x00,
                              'R', 'O', 'C', 'K', 'B', 'O', 'X', '\0'};
             
             unsigned long item_offset = (serbuf[5] << 24) | (serbuf[6] << 16) |
                                         (serbuf[7] << 8) | serbuf[8];
 
-            get_playlist_name(data + 7, item_offset, MAX_NAME_LENGTH);
+            get_playlist_name(data + 7, item_offset, MAX_PATH);
             /*Remove file extension*/
             char *dot=NULL;
             dot = (strrchr(data+7, '.'));
             if (dot != NULL)
                 *dot = '\0';
-            iap_send_pkt(data, sizeof(data));
+            iap_send_pkt(data, 7 + strlen(data+7) + 1);
             break;
         }
         
@@ -779,7 +778,9 @@ static void iap_handlepkt_mode4(void)
                                                 (cur_dbrecord[3] << 8) |
                                                  cur_dbrecord[4];
                     unsigned char selected_playlist
-                    [sizeof(global_settings.playlist_catalog_dir) + 1 + MAX_NAME_LENGTH] = {0};
+                    [sizeof(global_settings.playlist_catalog_dir)
+                    + 1
+                    + MAX_PATH] = {0};
 
                     strcpy(selected_playlist,
                             global_settings.playlist_catalog_dir);
@@ -787,7 +788,7 @@ static void iap_handlepkt_mode4(void)
                     selected_playlist[len] = '/';
                     get_playlist_name (selected_playlist + len + 1,
                                        item_offset,
-                                       MAX_NAME_LENGTH);
+                                       MAX_PATH);
                     ft_play_playlist(selected_playlist,
                                      global_settings.playlist_catalog_dir,
                                      strrchr(selected_playlist, '/') + 1);
