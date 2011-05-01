@@ -93,7 +93,12 @@ static void cleanup(void)
 
 enum plugin_status plugin_start(const void* parameter)
 {
+#if defined(FRACTAL_ZOOM_OUT_PRE) || \
+    defined(FRACTAL_ZOOM_IN_PRE) || \
+    defined(FRACTAL_PRECISION_DEC_PRE) || \
+    defined(FRACTAL_PRECISION_INC)
     long lastbutton = BUTTON_NONE;
+#endif
     int redraw = REDRAW_FULL;
     struct fractal_ops *ops = &mandelbrot_ops;
 
@@ -246,9 +251,13 @@ enum plugin_status plugin_start(const void* parameter)
             exit_on_usb(button);
             break;
         }
-
+#if defined(FRACTAL_ZOOM_OUT_PRE) || \
+    defined(FRACTAL_ZOOM_IN_PRE) || \
+    defined(FRACTAL_PRECISION_DEC_PRE) || \
+    defined(FRACTAL_PRECISION_INC)
         if (button != BUTTON_NONE)
             lastbutton = button;
+#endif
     }
     return PLUGIN_OK;
 }

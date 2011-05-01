@@ -945,7 +945,11 @@ static int star_run_game(int current_level)
     int move_x = 0;
     int move_y = 0;
     int key;
+#if defined(STAR_LEVEL_DOWN_PRE) || \
+    defined(STAR_LEVEL_UP_PRE) || \
+    defined(STAR_TOGGLE_CONTROL_PRE) 
     int lastkey = BUTTON_NONE;
+#endif
 
     if (!star_load_level(current_level))
         return 0;
@@ -1033,8 +1037,12 @@ static int star_run_game(int current_level)
                     }
                     break;
             }
+#if defined(STAR_LEVEL_DOWN_PRE) || \
+    defined(STAR_LEVEL_UP_PRE) || \
+    defined(STAR_TOGGLE_CONTROL_PRE) 
             if (key != BUTTON_NONE)
                 lastkey = key;
+#endif
         }
 
         if (control == STAR_CONTROL_BALL)

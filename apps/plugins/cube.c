@@ -649,7 +649,11 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     int button;
+#if defined(CUBE_MODE_PRE) || \
+    defined(CUBE_PAUSE_PRE) || \
+    defined(CUBE_HIGHSPEED_PRE)
     int lastbutton = BUTTON_NONE;
+#endif
     int curr = 0;
     bool highspeed = false;
     bool paused = false;
@@ -855,8 +859,12 @@ enum plugin_status plugin_start(const void* parameter)
                 exit_on_usb(button);
                 break;
         }
+#if defined(CUBE_MODE_PRE) || \
+    defined(CUBE_PAUSE_PRE) || \
+    defined(CUBE_HIGHSPEED_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
+#endif
     }
 
     return PLUGIN_OK;

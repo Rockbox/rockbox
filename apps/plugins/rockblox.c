@@ -1332,7 +1332,9 @@ static int rockblox_menu(void)
 static int rockblox_loop (void)
 {
     int button;
+#if defined(ROCKBLOX_OFF_PRE) || defined(ROCKBLOX_DROP_PRE)
     int lastbutton = BUTTON_NONE;
+#endif
     long next_down_tick = *rb->current_tick + level_speed(rockblox_status.level);
 
     if (rockblox_menu()) {
@@ -1450,8 +1452,10 @@ static int rockblox_loop (void)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
+#if defined(ROCKBLOX_OFF_PRE) || defined(ROCKBLOX_DROP_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
+#endif
 
 #ifdef HAVE_SCROLLWHEEL
         /* check if we should enable the scroll wheel, if events

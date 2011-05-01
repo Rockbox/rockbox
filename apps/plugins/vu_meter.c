@@ -781,7 +781,9 @@ void digital_meter(void) {
 
 enum plugin_status plugin_start(const void* parameter) {
     int button;
+#if defined(VUMETER_HELP_PRE) || defined(VUMETER_MENU_PRE)
     int lastbutton = BUTTON_NONE;
+#endif
 
     (void) parameter;
 
@@ -859,7 +861,9 @@ enum plugin_status plugin_start(const void* parameter) {
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
+#if defined(VUMETER_HELP_PRE) || defined(VUMETER_MENU_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
+#endif
     }
 }

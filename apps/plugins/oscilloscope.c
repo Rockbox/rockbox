@@ -786,7 +786,9 @@ void cleanup(void)
 enum plugin_status plugin_start(const void* parameter)
 {
     int button, vol;
+#if defined(OSCILLOSCOPE_DRAWMODE_PRE) || defined(OSCILLOSCOPE_ORIENTATION_PRE) 
     int lastbutton = BUTTON_NONE;
+#endif
     bool exit = false;
     bool paused = false;
     bool tell_speed;
@@ -917,9 +919,11 @@ enum plugin_status plugin_start(const void* parameter)
                 exit_on_usb(button);
                 break;
         }
+#if defined(OSCILLOSCOPE_DRAWMODE_PRE) || defined(OSCILLOSCOPE_ORIENTATION_PRE) 
         if (button != BUTTON_NONE)
             lastbutton = button;
-            
+#endif
+
         if (tell_speed)
         {
             rb->snprintf(message, sizeof(message), "%s%d", 

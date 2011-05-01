@@ -618,7 +618,9 @@ static void puzzle_init(void)
 static int puzzle_loop(void)
 {
     int button;
+#if defined(PUZZLE_SHUFFLE_PICTURE_PRE)
     int lastbutton = BUTTON_NONE;
+#endif
     bool load_success;
 
     puzzle_init();
@@ -689,8 +691,10 @@ static int puzzle_loop(void)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
+#if defined(PUZZLE_SHUFFLE_PICTURE_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
+#endif
     }
 }
 

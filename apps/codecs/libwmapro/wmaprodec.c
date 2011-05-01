@@ -1382,20 +1382,16 @@ static int decode_frame(WMAProDecodeCtx *s)
     /** no idea what these are for, might be the number of samples
         that need to be skipped at the beginning or end of a stream */
     if (get_bits1(gb)) {
-        int skip;
-
         /** usually true for the first frame */
         if (get_bits1(gb)) {
-            skip = get_bits(gb, av_log2(s->samples_per_frame * 2));
-            DEBUGF("start skip: %i\n", skip);
+            get_bits(gb, av_log2(s->samples_per_frame * 2));
+            DEBUGF("start skip\n");
         }
-
         /** sometimes true for the last frame */
         if (get_bits1(gb)) {
-            skip = get_bits(gb, av_log2(s->samples_per_frame * 2));
-            DEBUGF("end skip: %i\n", skip);
+            get_bits(gb, av_log2(s->samples_per_frame * 2));
+            DEBUGF("end skip\n");
         }
-
     }
 
     DEBUGF("BITSTREAM: frame header length was %i\n",

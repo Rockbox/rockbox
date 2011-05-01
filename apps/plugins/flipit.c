@@ -615,7 +615,10 @@ static bool flipit_loop(void)
 {
     int i;
     int button;
+#if defined(FLIPIT_SOLVE_PRE) || defined(FLIPIT_STEP_PRE) || \
+    defined(FLIPIT_TOGGLE_PRE) || defined(FLIPIT_UP_PRE)
     int lastbutton = BUTTON_NONE;
+#endif
 
     flipit_init();
     while(true) {
@@ -729,8 +732,11 @@ static bool flipit_loop(void)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
+#if defined(FLIPIT_SOLVE_PRE) || defined(FLIPIT_STEP_PRE) || \
+    defined(FLIPIT_TOGGLE_PRE) || defined(FLIPIT_UP_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
+#endif
     }
 }
 
