@@ -178,9 +178,11 @@ for examples see get_bits, show_bits, skip_bits, get_vlc
 #ifdef ALT_BITSTREAM_READER
 #   define MIN_CACHE_BITS 25
 
+
+/* ROCKBOX: work around "set but not used" warning */
 #   define OPEN_READER(name, gb)\
         unsigned int name##_index= (gb)->index;\
-        int name##_cache= 0;\
+        int name##_cache __attribute__((unused)) = 0;\
 
 #   define CLOSE_READER(name, gb)\
         (gb)->index= name##_index;\
