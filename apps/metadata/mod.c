@@ -50,38 +50,38 @@ bool get_mod_metadata(int fd, struct mp3entry* id3)
         return false;
 
     /* Mod type checking based on MikMod */
-	/* Protracker and variants */
-	if ((!memcmp(id, "M.K.", 4)) || (!memcmp(id, "M!K!", 4))) {
+    /* Protracker and variants */
+    if ((!memcmp(id, "M.K.", 4)) || (!memcmp(id, "M!K!", 4))) {
         is_mod_file = true;
-	}
-	
-	/* Star Tracker */
-	if (((!memcmp(id, "FLT", 3)) || (!memcmp(id, "EXO", 3))) &&
-		(isdigit(id[3]))) {
-		char numchn = id[3] - '0';
-		if (numchn == 4 || numchn == 8)
+    }
+    
+    /* Star Tracker */
+    if (((!memcmp(id, "FLT", 3)) || (!memcmp(id, "EXO", 3))) &&
+        (isdigit(id[3]))) {
+        char numchn = id[3] - '0';
+        if (numchn == 4 || numchn == 8)
             is_mod_file = true;
-	}
+    }
 
-	/* Oktalyzer (Amiga) */
-	if (!memcmp(id, "OKTA", 4)) {
+    /* Oktalyzer (Amiga) */
+    if (!memcmp(id, "OKTA", 4)) {
         is_mod_file = true;
-	}
+    }
 
-	/* Oktalyser (Atari) */
-	if (!memcmp(id, "CD81", 4)) {
+    /* Oktalyser (Atari) */
+    if (!memcmp(id, "CD81", 4)) {
         is_mod_file = true;
-	}
+    }
 
-	/* Fasttracker */
-	if ((!memcmp(id + 1, "CHN", 3)) && (isdigit(id[0]))) {
+    /* Fasttracker */
+    if ((!memcmp(id + 1, "CHN", 3)) && (isdigit(id[0]))) {
         is_mod_file = true;
-	}
-	/* Fasttracker or Taketracker */
-	if (((!memcmp(id + 2, "CH", 2)) || (!memcmp(id + 2, "CN", 2)))
-		&& (isdigit(id[0])) && (isdigit(id[1]))) {
+    }
+    /* Fasttracker or Taketracker */
+    if (((!memcmp(id + 2, "CH", 2)) || (!memcmp(id + 2, "CN", 2)))
+        && (isdigit(id[0])) && (isdigit(id[1]))) {
         is_mod_file = true;
-	}
+    }
 
     /* Don't try to play if we can't find a known mod type
      * (there are mod files which have nothing to do with music) */
