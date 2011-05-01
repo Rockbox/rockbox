@@ -360,7 +360,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
     if(ehdr.e_ident[EI_DATA] != ELFDATA2LSB)
         error_printf("invalid elf data encoding: must be 32-bit lsb\n");
     if(ehdr.e_ident[EI_VERSION] != EV_CURRENT)
-        error_printf("invalid elf version");
+        error_printf("invalid elf version\n");
     if(ehdr.e_type != ET_EXEC)
         error_printf("invalid elf file: must be an executable file\n");
     if(ehdr.e_machine != EM_ARM)
@@ -371,8 +371,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
         error_printf("invalid elf file: program header size mismatch\n");
     if(ehdr.e_shnum > 0 && ehdr.e_shentsize != sizeof(Elf32_Shdr))
         error_printf("invalid elf file: section header size mismatch\n");
-    if(ehdr.e_flags & EF_ARM_HASENTRY)
-        elf_set_start_addr(params, ehdr.e_entry);
+    elf_set_start_addr(params, ehdr.e_entry);
 
     char *strtab = NULL;
     if(ehdr.e_shstrndx != SHN_UNDEF)
@@ -403,7 +402,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
         {
             void *data = xmalloc(shdr.sh_size);
             if(!read(user, shdr.sh_offset, data, shdr.sh_size))
-                error_printf("error read self section data");
+                error_printf("error read self section data\n");
             elf_add_load_section(params, shdr.sh_addr, shdr.sh_size, data);
 
             if(strtab)

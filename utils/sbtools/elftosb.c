@@ -601,7 +601,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
             else if(cinst->type == CMD_JUMP || cinst->type == CMD_CALL)
             {
                 if(!elf_get_start_addr(elf, NULL))
-                    bug("cannot jump/call '%s' because it has no starting point !", cinst->identifier);
+                    bug("cannot jump/call '%s' because it has no starting point !\n", cinst->identifier);
                 sec->nr_insts++;
             }
             
