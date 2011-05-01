@@ -386,19 +386,22 @@ enum codec_status codec_run(void)
     spx_ogg_page og;
     spx_ogg_packet op;
     spx_ogg_stream_state os;
-    spx_int64_t page_granule = 0, cur_granule = 0;
+    spx_int64_t page_granule = 0;
+    spx_int64_t cur_granule = 0;
     int enh_enabled = 1;
     int nframes = 2;
     int eos = 0;
     SpeexStereoState *stereo;
     int channels = -1;
-    int samplerate = 0;
+    int samplerate = ci->id3->frequency;
     int extra_headers = 0;
     int stream_init = 0;
-    int page_nb_packets, frame_size, packet_count = 0;
+    int page_nb_packets;
+    int frame_size;
+    int packet_count = 0;
     int lookahead;
-    int headerssize = -1;
-    unsigned long strtoffset = 0;
+    int headerssize = 0;
+    unsigned long strtoffset = ci->id3->offset;
     void *st = NULL;
     int j = 0;
     intptr_t param;
@@ -417,9 +420,6 @@ enum codec_status codec_run(void)
     spx_ogg_sync_init(&oy);
     spx_ogg_alloc_buffer(&oy,2*CHUNKSIZE);
 
-    strtoffset = ci->id3->offset;
-
-    samplerate = ci->id3->frequency; 
     codec_set_replaygain(ci->id3);
 
     eof = 0;
@@ -562,13 +562,13 @@ next_page:
         }
     }
 
+    error = CODEC_OK;
 done:
     /* Clean things up for the next track */
     speex_bits_destroy(&bits);
 
     if (st)
-        if (st)
-            speex_decoder_destroy(st);
+        speex_decoder_destroy(st);
 
     if (stream_init)
        spx_ogg_stream_destroy(&os);
