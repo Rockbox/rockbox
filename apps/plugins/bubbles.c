@@ -1953,7 +1953,7 @@ static int bubbles_remove(struct game_context* bb) {
 ******************************************************************************/
 static void bubbles_anchored(struct game_context* bb, int row, int col) {
     int i, adj;
-    int myrow, mycol, mytype;
+    int myrow, mycol;
     int count = 0;
 
     struct coord {
@@ -1971,7 +1971,6 @@ static void bubbles_anchored(struct game_context* bb, int row, int col) {
     for(i=0; i<count; i++) {
         myrow = search[i].row;
         mycol = search[i].col;
-        mytype = bb->playboard[myrow][mycol].type;
         adj = myrow%2;
 
         if(mycol-1 >= 0) {

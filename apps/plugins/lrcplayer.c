@@ -1193,7 +1193,6 @@ static void parse_id3v2(int fd)
     int bytesread = 0;
     unsigned char global_flags;
     int flags;
-    int skip;
     bool global_unsynch = false;
     bool global_ff_found = false;
     bool unsynch = false;
@@ -1235,7 +1234,6 @@ static void parse_id3v2(int fd)
 
     /* Skip the extended header if it is present */
     if(global_flags & 0x40) {
-        skip = 0;
 
         if(version == ID3_VER_2_3) {
             if(10 != rb->read(fd, header, 10))

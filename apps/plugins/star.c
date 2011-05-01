@@ -947,10 +947,6 @@ static int star_run_game(int current_level)
     int key;
     int lastkey = BUTTON_NONE;
 
-    int label_offset_y;
-
-    label_offset_y = LCD_HEIGHT - char_height;
-
     if (!star_load_level(current_level))
         return 0;
 

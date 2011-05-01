@@ -153,10 +153,11 @@ void cleanup(void)
 int main(void)
 {
     plasma_frequency = 1;
-    int action, delay, x, y;
+    int action, x, y;
     unsigned char p1,p2,p3,p4,t1,t2,t3,t4, z,z0;
     long last_tick = *rb->current_tick;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    int delay;
     int cumulated_lag = 0;
 #endif
 #ifdef HAVE_LCD_COLOR
@@ -243,8 +244,8 @@ int main(void)
         grey_ub_gray_bitmap(greybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 
-        delay = last_tick - *rb->current_tick + HZ/33;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        delay = last_tick - *rb->current_tick + HZ/33;
         if (!boosted && delay < 0)
         {
             cumulated_lag -= delay;     /* proportional increase */

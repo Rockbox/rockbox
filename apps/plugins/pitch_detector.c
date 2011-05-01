@@ -982,7 +982,9 @@ static void record_data(void)
 static void record_and_get_pitch(void)
 {
     int quit=0, button;
+#ifndef SIMULATOR
     bool redraw = true;
+#endif
     /* For tracking the latency */
     /*
     long timer;
@@ -1016,7 +1018,9 @@ static void record_and_get_pitch(void)
                     quit = main_menu();
                     if(!quit)
                     {
+#ifndef SIMULATOR
                         redraw = true;
+#endif
                         record_data();
                     }
                     break;

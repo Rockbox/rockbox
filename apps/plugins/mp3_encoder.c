@@ -871,8 +871,10 @@ int Read32BitsLowHigh(int fd)
 int wave_open(void)
 {
   unsigned short  wFormatTag;
+  /* rockbox: comment 'set but unused" variable
   unsigned long   dAvgBytesPerSec;
   unsigned short  wBlockAlign;
+  */
   unsigned short  bits_per_samp;
   long            header_size;
 
@@ -889,8 +891,8 @@ int wave_open(void)
   
   cfg.channels    = Read16BitsLowHigh(wavfile);
   cfg.samplerate  = Read32BitsLowHigh(wavfile);
-  dAvgBytesPerSec = Read32BitsLowHigh(wavfile);
-  wBlockAlign     = Read16BitsLowHigh(wavfile);
+  /*dAvgBytesPerSec*/ Read32BitsLowHigh(wavfile);
+  /*wBlockAlign    */ Read16BitsLowHigh(wavfile);
   bits_per_samp   = Read16BitsLowHigh(wavfile);
   
   if(wFormatTag != 0x0001)         return -5; /* linear PCM required */

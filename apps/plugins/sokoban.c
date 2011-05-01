@@ -1528,15 +1528,11 @@ static bool sokoban_loop(void)
 {
     bool moved;
     int i = 0, button = 0, lastbutton = 0;
-    short r = 0, c = 0;
     int w, h;
     char *loc;
 
     while (true) {
         moved = false;
-
-        r = current_info.player.row;
-        c = current_info.player.col;
 
         button = rb->button_get(true);
 

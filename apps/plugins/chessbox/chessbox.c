@@ -321,7 +321,6 @@ void cb_saveposition ( void ) {
 /* ---- Restore saved position ---- */
 void cb_restoreposition ( void ) {
     int fd;
-    int c;
     short sq;
     unsigned short m;
     
@@ -357,7 +356,7 @@ void cb_restoreposition ( void ) {
             else
                 --color[sq];
         }
-        GameCnt = -1; c = '?';
+        GameCnt = -1;
         while (rb->read(fd, &(GameList[++GameCnt].gmove),
                         sizeof(GameList[GameCnt].gmove)) > 0) {
             rb->read(fd, &(GameList[GameCnt].score),

@@ -223,7 +223,7 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
     struct real_object_t obj;
     int res;
     int skipped;
-    off_t curpos;
+    off_t curpos __attribute__((unused));
     uint8_t len; /* Holds a string_length, which is then passed to read_string() */
 
 #ifdef SIMULATOR

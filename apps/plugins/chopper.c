@@ -392,7 +392,6 @@ static void chopTerrainNodeDeleteAndShift(struct CTerrain *ter,int nodeIndex)
 int chopUpdateTerrainRecycling(struct CTerrain *ter)
 {
     int i=1;
-    int ret = 0;
     int iNewNodePos,g,v;
     while(i < ter->iNodesCount)
     {
@@ -412,8 +411,6 @@ int chopUpdateTerrainRecycling(struct CTerrain *ter)
                 v*=5;
 
             chopAddTerrainNode(ter,iNewNodePos,g - iR(-v,v));
-            ret=1;
-
         }
 
         i++;
@@ -426,7 +423,7 @@ int chopUpdateTerrainRecycling(struct CTerrain *ter)
 int chopTerrainHeightAtPoint(struct CTerrain *ter, int pX)
 {
 
-    int iNodeIndexOne=0,iNodeIndexTwo=0, h, terY1, terY2, terX1, terX2, a, b;
+    int iNodeIndexOne=0,iNodeIndexTwo=0, h, terY1, terY2, terX2, a, b;
     float c,d;
 
     int i=0;
@@ -444,7 +441,7 @@ int chopTerrainHeightAtPoint(struct CTerrain *ter, int pX)
     terY1 = ter->mNodes[iNodeIndexOne].y;
     terY2 = ter->mNodes[iNodeIndexTwo].y;
 
-    terX1 = 0;
+    /* terX1 = 0; */
     terX2 = ter->mNodes[iNodeIndexTwo].x - ter->mNodes[iNodeIndexOne].x;
 
     pX-= ter->mNodes[iNodeIndexOne].x;

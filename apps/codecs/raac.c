@@ -54,7 +54,6 @@ enum codec_status codec_run(void)
     static NeAACDecFrameInfo frame_info;
     NeAACDecHandle decoder;
     size_t n;
-    void *ret;
     unsigned int i;
     unsigned char* buffer;
     int err, consumed, pkt_offset, skipped = 0;
@@ -192,7 +191,7 @@ enum codec_status codec_run(void)
 
         /* Decode one block - returned samples will be host-endian */                           
         for(i = 0; i < rmctx.sub_packet_cnt; i++) {
-            ret = NeAACDecDecode(decoder, &frame_info, buffer, rmctx.sub_packet_lengths[i]);
+            NeAACDecDecode(decoder, &frame_info, buffer, rmctx.sub_packet_lengths[i]);
             buffer += rmctx.sub_packet_lengths[i];                      
             if (frame_info.error > 0) {
                 DEBUGF("FAAD: decode error '%s'\n", NeAACDecGetErrorMessage(frame_info.error));

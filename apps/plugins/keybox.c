@@ -465,7 +465,6 @@ static int parse_buffer(void)
 
 static void write_output(int fd)
 {
-    size_t bytes_written;
     int i;
     size_t len, size;
     char *p = &buffer[HEADER_LEN]; /* reserve space for salt + hash */
@@ -498,7 +497,7 @@ static void write_output(int fd)
     encrypt_buffer(&buffer[8], size, &key.words[0]);
     rb->memcpy(&buffer[0], &salt, sizeof(salt));
 
-    bytes_written = rb->write(fd, &buffer, size);
+    rb->write(fd, &buffer, size);
 }
 
 static int enter_pw(char *pw_buf, size_t buflen, bool new_pw)

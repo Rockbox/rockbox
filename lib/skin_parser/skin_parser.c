@@ -474,7 +474,6 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     int num_args = 1;
     int i;
     int star = 0; /* Flag for the all-or-none option */
-    int req_args; /* To mark when we enter optional arguments */
 
     int optional = 0;
     tag_recursion_level++;
@@ -597,7 +596,6 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         if(*tag_args == '|')
         {
             optional = 1;
-            req_args = i;
             tag_args++;
         }
 
@@ -775,7 +773,6 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         if(*tag_args == '|')
         {
             optional = 1;
-            req_args = i + 1;
             tag_args++;
         }
     }

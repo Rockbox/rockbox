@@ -1,5 +1,7 @@
 #include "zxconfig.h"
 
+//#define ZX_WRITE_OUT_TEXT
+
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
@@ -274,8 +276,9 @@ int zx_kbd_input(char* text/*, int buflen*/)
     bool done = false;
     int i, j, k, w, l;
     int text_w = 0;
-    int len_utf8/*, c = 0*/;
-    int editpos;
+#ifdef ZX_WRITE_OUT_TEXT
+    int editpos, len_utf8;
+#endif
 /*    int statusbar_size = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;*/
     unsigned short ch/*, tmp, hlead = 0, hvowel = 0, htail = 0*/;
     /*bool hangul = false;*/
@@ -298,7 +301,7 @@ int zx_kbd_input(char* text/*, int buflen*/)
     }
 
     char outline[256];
-    int button, lastbutton = 0;
+    int button;
     FOR_NB_SCREENS(l)
     {
             /* Copy default keyboard to buffer */
@@ -419,13 +422,15 @@ int zx_kbd_input(char* text/*, int buflen*/)
         param[l].keyboard_margin -= param[l].keyboard_margin/2;
 
     }
+#ifdef ZX_WRITE_OUT_TEXT
     editpos = rb->utf8length(text);
-
-
+#endif
 
     while(!done)
     {
+#ifdef ZX_WRITE_OUT_TEXT
         len_utf8 = rb->utf8length(text);
+#endif
         FOR_NB_SCREENS(l)
             rb->screens[l]->clear_display();
 
@@ -456,8 +461,8 @@ int zx_kbd_input(char* text/*, int buflen*/)
                                   param[l].main_y - param[l].keyboard_margin);
 
         /* write out the text */
-#if 0
-			rb->screens[l]->setfont(param[l].curfont);
+#ifdef ZX_WRITE_OUT_TEXT
+            rb->screens[l]->setfont(param[l].curfont);
 
             i=j=0;
             param[l].curpos = MIN(editpos, param[l].max_chars_text
@@ -493,7 +498,7 @@ int zx_kbd_input(char* text/*, int buflen*/)
                 rb->screens[l]->hline(param[l].curpos*text_w, (param[l].curpos+1)*text_w,
                                        param[l].main_y+param[l].font_h-1);
 #endif
-		}
+        }
         cur_blink = !cur_blink;
 
         
@@ -626,7 +631,6 @@ int zx_kbd_input(char* text/*, int buflen*/)
         }
         if (button != BUTTON_NONE)
         {
-            lastbutton = button;
             cur_blink = true;
         }
     }

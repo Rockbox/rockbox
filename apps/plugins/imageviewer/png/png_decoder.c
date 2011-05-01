@@ -1675,7 +1675,6 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
 
     /* for unknown chunk order */
     bool unknown = false;
-    uint8_t critical_pos = 1; /*1 = after IHDR, 2 = after PLTE, 3 = after IDAT*/
 
     if (decoder->file_size == 0 || in == NULL)
     {
@@ -1739,7 +1738,6 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
             /* copy compressed data */
             memcpy(idat+idat_size, data, chunkLength * sizeof(uint8_t));
             idat_size += chunkLength;
-            critical_pos = 3;
         }
         /*IEND chunk*/
         else if (LodePNG_chunk_type_equals(chunk, PNG_CHUNK_IEND))
@@ -1765,7 +1763,6 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
                 decoder->infoPng.color.palette[(i<<2) | 2] = data[pos++]; /*B*/
                 decoder->infoPng.color.palette[(i<<2) | 3] = 255; /*alpha*/
             }
-            critical_pos = 2;
         }
         /*palette transparency chunk (tRNS)*/
         else if (LodePNG_chunk_type_equals(chunk, PNG_CHUNK_tRNS))
