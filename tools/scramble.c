@@ -335,6 +335,8 @@ int main (int argc, char** argv)
             modelnum = 70;
         else if (!strcmp(&argv[1][5], "ip6g")) /* iPod Classic/6G */
             modelnum = 71;
+        else if (!strcmp(&argv[1][5], "fuz+")) /* Sansa Fuze+ */
+            modelnum = 72;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

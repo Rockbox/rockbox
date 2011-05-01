@@ -481,6 +481,15 @@ target/arm/pnx0101/system-pnx0101.c
 target/arm/pnx0101/timer-pnx0101.c
 #endif
 
+#if CONFIG_CPU == IMX233
+target/arm/imx233/clkctrl-imx233.c
+target/arm/imx233/system-imx233.c
+target/arm/imx233/timrot-imx233.c
+target/arm/imx233/kernel-imx233.c
+target/arm/imx233/kernel-imx233.c
+target/arm/imx233/sd-imx233.c
+#endif /* IMX233 */
+
 #if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2
 target/arm/bits-armv4.S
 target/arm/as3525/system-as3525.c
@@ -551,6 +560,8 @@ target/arm/imx31/crt0.S
 target/arm/s5l8700/crt0.S
 #elif CONFIG_CPU==S5L8702
 target/arm/s5l8702/crt0.S
+#elif CONFIG_CPU==IMX233
+target/arm/imx233/crt0.S
 #elif defined(CPU_ARM)
 target/arm/crt0.S
 #endif /* defined(CPU_*) */
@@ -1421,6 +1432,15 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
 #endif /* SANSA_FUZEV2 */
+
+#ifdef SANSA_FUZEPLUS
+#ifndef SIMULATOR
+target/arm/imx233/sansa-fuzeplus/backlight-fuzeplus.c
+target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
+target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c
+target/arm/imx233/lcdif-imx233.c
+#endif /* SIMULATOR */
+#endif
 
 #ifdef IAUDIO_7
 #ifndef SIMULATOR

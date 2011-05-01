@@ -74,6 +74,7 @@
 #define AS3525       3525
 #define AT91SAM9260  9260
 #define AS3525v2    35252
+#define IMX233        233
 
 /* platforms
  * bit fields to allow PLATFORM_HOSTED to be OR'ed e.g. with a
@@ -136,6 +137,7 @@
 #define ANDROID_PAD        45
 #define SDL_PAD            46
 #define MPIO_HD300_PAD     47
+#define SANSA_FUZEPLUS_PAD 48
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -219,6 +221,7 @@
 #define LCD_HDD6330   38 /* as used by the Philips HDD6330 */
 #define LCD_VIBE500   39 /* as used by the Packard Bell Vibe 500 */
 #define LCD_IPOD6G    40 /* as used by the iPod Nano 2nd Generation */
+#define LCD_FUZEPLUS  41
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -256,6 +259,7 @@ Lyre prototype 1 */
 #define I2C_JZ47XX  14 /* Ingenic Jz47XX style */
 #define I2C_AS3525  15
 #define I2C_S5L8702 16 /* Same as S5L8700, but with two channels */
+#define I2C_IMX233  17
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -287,14 +291,15 @@ Lyre prototype 1 */
 #define RTC_JZ47XX   16 /* Ingenic Jz47XX */
 #define RTC_NANO2G   17 /* This seems to be a PCF5063x */
 #define RTC_D2       18 /* Either PCF50606 or PCF50635 */
-#define RTC_S35380A  19 
+#define RTC_S35380A  19
+#define RTC_IMX233   20
 
 /* USB On-the-go */
 #define USBOTG_M66591   6591 /* M:Robe 500 */
 #define USBOTG_ISP1362  1362 /* iriver H300 */
 #define USBOTG_ISP1583  1583 /* Creative Zen Vision:M */
 #define USBOTG_M5636    5636 /* iAudio X5 */
-#define USBOTG_ARC      5020 /* PortalPlayer 502x */
+#define USBOTG_ARC      5020 /* PortalPlayer 502x and IMX233 */
 #define USBOTG_JZ4740   4740 /* Ingenic Jz4740/Jz4732 */
 #define USBOTG_AS3525   3525 /* AMS AS3525 */
 #define USBOTG_AS3525v2 3535 /* AMS AS3525v2 FIXME : same as S3C6400X */
@@ -419,6 +424,8 @@ Lyre prototype 1 */
 #include "config/sansafuze.h"
 #elif defined(SANSA_FUZEV2)
 #include "config/sansafuzev2.h"
+#elif defined(SANSA_FUZEPLUS)
+#include "config/sansafuzeplus.h"
 #elif defined(SANSA_C200V2)
 #include "config/sansac200v2.h"
 #elif defined(SANSA_VIEW)
@@ -526,7 +533,8 @@ Lyre prototype 1 */
 
 #elif defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320) \
   || (CONFIG_CPU == AT91SAM9260) || (CONFIG_CPU == AS3525v2) \
-  || (CONFIG_CPU == S5L8702) || (CONFIG_PLATFORM & PLATFORM_ANDROID)
+  || (CONFIG_CPU == S5L8702) || (CONFIG_PLATFORM & PLATFORM_ANDROID) \
+  || (CONFIG_CPU == IMX233)
 #define CPU_ARM
 #define ARM_ARCH 5 /* ARMv5 */
 
@@ -824,6 +832,7 @@ Lyre prototype 1 */
     (CONFIG_CPU == AS3525v2 && !defined(PLUGIN) && !defined(CODEC) && !defined(BOOTLOADER)) || /* AS3525v2: core only */ \
     (CONFIG_CPU == PNX0101) || \
     (CONFIG_CPU == TCC7801) || \
+    (CONFIG_CPU == IMX233) || \
     defined(CPU_S5L870X)) || /* Samsung S5L8700: core, plugins, codecs */ \
     (CONFIG_CPU == JZ4732 && !defined(PLUGIN) && !defined(CODEC)) /* Jz4740: core only */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))

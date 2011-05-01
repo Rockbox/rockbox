@@ -1261,14 +1261,14 @@ cat <<EOF
  122) VX747+              111) M6SP              61) Sansa View
  123) VX777               112) M3                62) Sansa Clip+
                                                  63) Sansa Fuze v2
- ==Samsung==              ==Tatung==
- 140) YH-820              150) Elio TPJ-1022     ==Logik==
- 141) YH-920                                     80) DAX 1GB MP3/DAB
- 142) YH-925              ==Packard Bell==       
- 143) YP-S3               160) Vibe 500          ==Lyre project==
-                                                 130) Lyre proto 1
-==Application==           ==MPIO==               131) Mini2440
- 200) SDL                 170) HD200
+ ==Samsung==              ==Tatung==             64) Sansa Fuze+
+ 140) YH-820              150) Elio TPJ-1022     
+ 141) YH-920                                     ==Logik==
+ 142) YH-925              ==Packard Bell==       80) DAX 1GB MP3/DAB
+ 143) YP-S3               160) Vibe 500
+                                                 ==Lyre project==
+==Application==           ==MPIO==               130) Lyre proto 1
+ 200) SDL                 170) HD200             131) Mini2440
  201) Android             171) HD300
  202) Nokia N8xx
  203) Nokia N900
@@ -2487,6 +2487,27 @@ fi
     t_cpu="arm"
     t_manufacturer="as3525"
     t_model="sansa-fuzev2"
+    arm926ejscc
+    ;;
+
+    64|sansafuzeplus)
+    target_id=80
+    modelname="sansafuzeplus"
+    target="-DSANSA_FUZEPLUS"
+    memory=128
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=fuz+"
+    output="rockbox.sansa"
+    boottool="true"
+    bootoutput=""
+    appextra="gui"
+    plugins="no"
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="sansa-fuzeplus"
     arm926ejscc
     ;;
 
