@@ -43,7 +43,7 @@ void replaygain_itoa(char* buffer, int length, long int_gain)
     /* int_gain uses Q19.12 format. */
     int one  = abs(int_gain) >> FP_BITS;
     int cent = ((abs(int_gain) & 0x0fff) * 100 + (FP_ONE/2)) >> FP_BITS;
-    snprintf(buffer, length, "%d.%02d dB", (int_gain<0) ? -one : one, cent);
+    snprintf(buffer, length, "%s%d.%02d dB", (int_gain<0) ? "-":"", one, cent);
 }
 
 static long fp_atof(const char* s, int precision)
