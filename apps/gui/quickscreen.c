@@ -171,7 +171,6 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     int i;
     char buf[MAX_PATH];
     unsigned const char *title, *value;
-    void *setting;
     int temp;
     display->set_viewport(parent);
     display->clear_viewport();
@@ -184,7 +183,6 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
         display->set_viewport(vp);
 
         title = P2STR(ID2P(qs->items[i]->lang_id));
-        setting = qs->items[i]->setting;
         temp = option_value_as_int(qs->items[i]);
         value = option_get_valuestring(qs->items[i],
                                        buf, MAX_PATH, temp);

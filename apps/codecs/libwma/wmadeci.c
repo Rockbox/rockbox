@@ -598,7 +598,7 @@ static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed32 x)
 static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len)
 {
     fixed32 wdel, a, b, temp2;
-    int i, m;
+    int i;
 
     wdel = fixdiv32(itofix32(1),     itofix32(frame_len));
     for (i=0; i<frame_len; ++i)
@@ -620,7 +620,6 @@ static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len)
     /*double check this later*/
     for(i=(1 << LSP_POW_BITS) - 1;i>=0;i--)
     {
-        m = (1 << LSP_POW_BITS) + i;
         a = pow_a_table[ix++]<<4;
         ((fixed32*)s->lsp_pow_m_table1)[i] = 2 * a - b;
         ((fixed32*)s->lsp_pow_m_table2)[i] = b - a;

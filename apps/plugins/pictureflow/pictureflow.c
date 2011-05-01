@@ -1257,14 +1257,13 @@ int create_empty_slide(bool force)
 {
     if ( force || ! rb->file_exists( EMPTY_SLIDE ) )  {
         struct bitmap input_bmp;
-        int ret;
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
 #if LCD_DEPTH > 1
         input_bmp.format = FORMAT_NATIVE;
 #endif
         input_bmp.data = (char*)buf;
-        ret = scaled_read_bmp_file(EMPTY_SLIDE_BMP, &input_bmp,
+        scaled_read_bmp_file(EMPTY_SLIDE_BMP, &input_bmp,
                                 buf_size,
                                 FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
                                 &format_transposed);

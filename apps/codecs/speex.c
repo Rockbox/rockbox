@@ -396,7 +396,9 @@ enum codec_status codec_run(void)
     int samplerate = ci->id3->frequency;
     int extra_headers = 0;
     int stream_init = 0;
+    /* rockbox: comment 'set but unused' variables
     int page_nb_packets;
+    */
     int frame_size;
     int packet_count = 0;
     int lookahead;
@@ -465,7 +467,7 @@ next_page:
             spx_ogg_stream_pagein(&os, &og);
 
             page_granule = spx_ogg_page_granulepos(&og);
-            page_nb_packets = spx_ogg_page_packets(&og);
+            /* page_nb_packets = spx_ogg_page_packets(&og); */
 
             cur_granule = page_granule;
 

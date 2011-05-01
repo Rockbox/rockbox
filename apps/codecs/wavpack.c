@@ -51,7 +51,10 @@ enum codec_status codec_run(void)
 {
     WavpackContext *wpc;
     char error [80];
-    int bps, nchans, sr_100;
+    /* rockbox: comment 'set but unused' variables
+    int bps;
+    */
+    int nchans, sr_100;
     intptr_t param;
 
     if (codec_init())
@@ -67,7 +70,7 @@ enum codec_status codec_run(void)
 
     ci->configure(DSP_SWITCH_FREQUENCY, WavpackGetSampleRate (wpc));
     codec_set_replaygain(ci->id3);
-    bps = WavpackGetBytesPerSample (wpc);
+    /* bps = WavpackGetBytesPerSample (wpc); */
     nchans = WavpackGetReducedChannels (wpc);
     ci->configure(DSP_SET_STEREO_MODE, nchans == 2 ? STEREO_INTERLEAVED : STEREO_MONO);
     sr_100 = ci->id3->frequency / 100;

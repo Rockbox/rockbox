@@ -44,7 +44,6 @@ enum codec_status codec_run(void)
 {
     uint32_t elapsedtime;
     asf_waveformatex_t wfx;     /* Holds the stream properties */
-    size_t resume_offset;
     int res;                    /* Return values from asf_read_packet() and decode_packet() */
     uint8_t* audiobuf;          /* Pointer to the payload of one wma pro packet */
     int audiobufsize;           /* Payload size */
@@ -54,9 +53,6 @@ enum codec_status codec_run(void)
     uint8_t *data;              /* Pointer to decoder input buffer */
     int size;                   /* Size of the input frame to the decoder */
     intptr_t param;
-
-    /* Remember the resume position */
-    resume_offset = ci->id3->offset;
 
 restart_track:
     if (codec_init()) {
@@ -82,12 +78,11 @@ restart_track:
     ci->seek_buffer(ci->id3->first_frame_offset);
     
     elapsedtime = 0;
-    resume_offset = 0;
     
     /* The main decoding loop */
 
     while (pktcnt < wfx.numpackets)
-    {
+    { 
         enum codec_command_action action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)

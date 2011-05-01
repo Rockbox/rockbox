@@ -59,16 +59,18 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
     uint8_t* datap;
     uint32_t length;
     uint32_t padding_length;
+    /* rockbox: comment 'set but unused' variables
     uint32_t send_time;
     uint16_t duration;
+    uint32_t media_object_number;
+    uint32_t media_object_offset;
+    */
     uint16_t payload_count;
     int payload_length_type;
     uint32_t payload_hdrlen;
     int payload_datalen;
     int multiple;
     uint32_t replicated_length;
-    uint32_t media_object_number;
-    uint32_t media_object_offset;
     uint32_t bytesread = 0;
     uint8_t* buf;
     size_t bufsize;
@@ -133,9 +135,9 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
     datap += GETLEN2b((packet_flags >> 1) & 0x03);
     padding_length = GETVALUE2b((packet_flags >> 3) & 0x03, datap);
     datap += GETLEN2b((packet_flags >> 3) & 0x03);
-    send_time = get_long_le(datap);
+    /* send_time = get_long_le(datap); */
     datap += 4;
-    duration = get_short_le(datap);
+    /* duration = get_short_le(datap); */
     datap += 2;
     /*DEBUGF("and duration %d ms\n", duration);*/
 
@@ -225,9 +227,9 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
         }
 
         bytesread += payload_hdrlen;
-        media_object_number = GETVALUE2b((packet_property >> 4) & 0x03, datap);
+        /* media_object_number = GETVALUE2b((packet_property >> 4) & 0x03, datap); */
         datap += GETLEN2b((packet_property >> 4) & 0x03);
-        media_object_offset = GETVALUE2b((packet_property >> 2) & 0x03, datap);
+        /* media_object_offset = GETVALUE2b((packet_property >> 2) & 0x03, datap); */
         datap += GETLEN2b((packet_property >> 2) & 0x03);
         replicated_length = GETVALUE2b(packet_property & 0x03, datap);
         datap += GETLEN2b(packet_property & 0x03);
@@ -299,8 +301,10 @@ int asf_get_timestamp(int *duration)
     int datalen;
     uint8_t data[18];
     uint8_t* datap;
+    /* rockbox: comment 'set but unused' variables
     uint32_t length;
     uint32_t padding_length;
+    */
     uint32_t send_time;
     static int packet_count = 0;
 
@@ -359,13 +363,13 @@ int asf_get_timestamp(int *duration)
     bytesread += datalen;
 
     datap = data;
-    length = GETVALUE2b((packet_flags >> 5) & 0x03, datap);
+    /* length = GETVALUE2b((packet_flags >> 5) & 0x03, datap); */
     datap += GETLEN2b((packet_flags >> 5) & 0x03);
 
     /* sequence value is not used */
     GETVALUE2b((packet_flags >> 1) & 0x03, datap);
     datap += GETLEN2b((packet_flags >> 1) & 0x03);
-    padding_length = GETVALUE2b((packet_flags >> 3) & 0x03, datap);
+    /* padding_length = GETVALUE2b((packet_flags >> 3) & 0x03, datap); */
     datap += GETLEN2b((packet_flags >> 3) & 0x03);
     send_time = get_long_le(datap);
     datap += 4;

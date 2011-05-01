@@ -77,7 +77,9 @@ enum codec_status codec_run(void)
 {
     struct pcm_format format;
     uint32_t bytesdone, decodedsamples;
+    /* rockbox: comment 'set but unused' variables
     uint32_t num_sample_frames = 0;
+    */
     size_t n;
     int bufcount;
     int endofstream;
@@ -146,8 +148,11 @@ enum codec_status codec_run(void)
             /* num_channels */
             format.channels = ((buf[8]<<8)|buf[9]);
             /* num_sample_frames */
+            /*
             num_sample_frames = ((buf[10]<<24)|(buf[11]<<16)|(buf[12]<<8)
                                 |buf[13]);
+            */
+            
             /* sample_size */
             format.bitspersample = ((buf[14]<<8)|buf[15]);
             /* sample_rate (don't use last 4 bytes, only integer fs) */
