@@ -194,11 +194,6 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write, void *use
     Elf32_Shdr shdr;
     memset(&ehdr, 0, EI_NIDENT);
 
-    uint32_t bss_strtbl = 1;
-    uint32_t text_strtbl = bss_strtbl + strlen(".bss") + 1;
-    uint32_t shstrtab_strtbl = text_strtbl + strlen(".text") + 1;
-    uint32_t strtbl_size = shstrtab_strtbl + strlen(".shstrtab") + 1;
-
     while(sec)
     {
         if(sec->type == EST_LOAD)
@@ -239,6 +234,17 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write, void *use
     ehdr.e_shoff = ehdr.e_ehsize + ehdr.e_phnum * ehdr.e_phentsize;
 
     write(user, 0, &ehdr, sizeof ehdr);
+
+    /* allocate enough size to hold any combinaison of .text/.bss in the string table:
+     * - one empty name ("\0")
+     * - at most N names of the form ".textXX\0" or ".bssXX\0"
+     * - one name ".shstrtab\0" */
+    char *strtbl_content = malloc(1 + strlen(".shstrtab") + 1 +
+        phnum * (strlen(".textXX") + 1));
+    
+    strtbl_content[0] = '\0';
+    strcpy(&strtbl_content[1], ".shstrtab");
+    uint32_t strtbl_index = 1 + strlen(".shstrtab") + 1;
 
     uint32_t data_offset = ehdr.e_ehsize + ehdr.e_phnum * ehdr.e_phentsize +
         ehdr.e_shnum * ehdr.e_shentsize;
@@ -289,14 +295,22 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write, void *use
 
         offset += sizeof(Elf32_Shdr);
     }
-    
+
+    uint32_t text_idx = 0;
+    uint32_t bss_idx = 0;
     while(sec)
     {
-        shdr.sh_name = text_strtbl;
+        shdr.sh_name = strtbl_index;
         if(sec->type == EST_LOAD)
+        {
+            strtbl_index += 1 + sprintf(&strtbl_content[strtbl_index], ".text%d", text_idx++);
             shdr.sh_type = SHT_PROGBITS;
+        }
         else
+        {
+            strtbl_index += 1 + sprintf(&strtbl_content[strtbl_index], ".bss%d", bss_idx++);
             shdr.sh_type = SHT_NOBITS;
+        }
         shdr.sh_flags = SHF_ALLOC | SHF_EXECINSTR;
         shdr.sh_addr = sec->addr;
         shdr.sh_offset = sec->offset;
@@ -313,12 +327,12 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write, void *use
     }
 
     {
-        shdr.sh_name = shstrtab_strtbl;
+        shdr.sh_name = 1;
         shdr.sh_type = SHT_STRTAB;
         shdr.sh_flags = 0;
         shdr.sh_addr = 0;
         shdr.sh_offset = strtbl_offset + data_offset;
-        shdr.sh_size = strtbl_size;
+        shdr.sh_size = strtbl_index;
         shdr.sh_link = SHN_UNDEF;
         shdr.sh_info = 0;
         shdr.sh_addralign = 1;
@@ -337,7 +351,8 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write, void *use
         sec = sec->next;
     }
 
-    write(user, strtbl_offset + data_offset, "\0.bss\0.text\0.shstrtab\0", strtbl_size);
+    write(user, strtbl_offset + data_offset, strtbl_content, strtbl_index);
+    free(strtbl_content);
 }
 
 bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
