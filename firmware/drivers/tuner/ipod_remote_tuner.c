@@ -52,13 +52,16 @@ static void rmt_tuner_signal_power(unsigned char value)
     tuner_signal_power = (int)(value);
 }
 
-void rmt_tuner_freq(const unsigned char *serbuf)
+void rmt_tuner_freq(unsigned int len, const unsigned char *buf)
 {
-    unsigned int khz = (serbuf[3] << 24) | (serbuf[4] << 16) |
-                       (serbuf[5] << 8) | serbuf[6];
+    /* length currently unused */
+    (void)len;
+
+    unsigned int khz = (buf[2] << 24) | (buf[3] << 16) |
+                       (buf[4] << 8) | buf[5];
     tuner_frequency = khz *1000 ;
     radio_tuned = true;
-    rmt_tuner_signal_power(serbuf[7]);
+    rmt_tuner_signal_power(buf[6]);
 }
 
 static void rmt_tuner_set_freq(int curr_freq)
@@ -270,15 +273,15 @@ static bool reply_timeout(void)
     return (timeout >= TIMEOUT_VALUE);
 }
 
-void rmt_tuner_rds_data(const unsigned char *serbuf)
+void rmt_tuner_rds_data(unsigned int len, const unsigned char *buf)
 {
-    if (serbuf[3] == 0x1E)
+    if (buf[2] == 0x1E)
     {
-        strlcpy(rds_radioname,serbuf+5,8);
+        strlcpy(rds_radioname,buf+4,8);
     }
-    else if(serbuf[3] == 0x04)
+    else if(buf[2] == 0x04)
     {
-        strlcpy(rds_radioinfo,serbuf+5,(serbuf[0]-4));
+        strlcpy(rds_radioinfo,buf+4,len-4);
     }
     rds_event = true;
 }

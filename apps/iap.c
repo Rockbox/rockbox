@@ -241,16 +241,18 @@ static void cmd_ok_mode0(unsigned char cmd)
     iap_send_pkt(data, sizeof(data));
 }
 
-static void iap_handlepkt_mode0(void)
+static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
 {
-    unsigned int cmd = serbuf[2];
+    (void)len;    /* len currently unused */
+    
+    unsigned int cmd = buf[1];
     switch (cmd) {
         /* Identify */
         case 0x01:
         {
             /* FM transmitter sends this: */
             /* FF 55 06 00 01 05 00 02 01 F1 (mode switch) */
-            if(serbuf[3] == 0x05)
+            if(buf[2] == 0x05)
             {
                 sleep(HZ/3);
                 /* RF Transmitter: Begin transmission */
@@ -259,7 +261,7 @@ static void iap_handlepkt_mode0(void)
             }
             /* FM remote sends this: */
             /* FF 55 03 00 01 02 FA (1st thing sent) */
-            else if(serbuf[3] == 0x02)
+            else if (buf[2] == 0x02)
             {
                 /* useful only for apple firmware */
             }
@@ -312,7 +314,7 @@ static void iap_handlepkt_mode0(void)
         {
             /* ReturnLingoProtocolVersion */
             unsigned char data[] = {0x00, 0x10, 0x00, 0x01, 0x05};
-            data[2] = serbuf[3];
+            data[2] = buf[2];
             iap_send_pkt(data, sizeof(data));
             break;
         }
@@ -322,7 +324,7 @@ static void iap_handlepkt_mode0(void)
         {
             cmd_ok_mode0(cmd);
 
-            uint32_t lingoes = get_u32(&serbuf[3]);
+            uint32_t lingoes = get_u32(&buf[2]);
 
             if (lingoes == 0x35)
             /* FM transmitter sends this: */
@@ -396,28 +398,28 @@ static void iap_handlepkt_mode0(void)
     }
 }
 
-static void iap_handlepkt_mode2(void)
+static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
 {
-    if(serbuf[2] != 0) return;
+    if(buf[1] != 0) return;
     iap_remotebtn = BUTTON_NONE;
     iap_remotetick = false;
     
-    if(serbuf[0] >= 3 && serbuf[3] != 0)
+    if(len >= 3 && buf[2] != 0)
     {
-        if(serbuf[3] & 1)
+        if(buf[2] & 1)
             iap_remotebtn |= BUTTON_RC_PLAY;
-        if(serbuf[3] & 2)
+        if(buf[2] & 2)
             iap_remotebtn |= BUTTON_RC_VOL_UP;
-        if(serbuf[3] & 4)
+        if(buf[2] & 4)
             iap_remotebtn |= BUTTON_RC_VOL_DOWN;
-        if(serbuf[3] & 8)
+        if(buf[2] & 8)
             iap_remotebtn |= BUTTON_RC_RIGHT;
-        if(serbuf[3] & 16)
+        if(buf[2] & 16)
             iap_remotebtn |= BUTTON_RC_LEFT;
     }
-    else if(serbuf[0] >= 4 && serbuf[4] != 0)
+    else if(len >= 4 && buf[3] != 0)
     {
-        if(serbuf[4] & 1) /* play */
+        if(buf[3] & 1) /* play */
         {
             if (audio_status() != AUDIO_STATUS_PLAY)
             {
@@ -427,7 +429,7 @@ static void iap_handlepkt_mode2(void)
                 iap_changedctr = 1;
             }
         }
-        if(serbuf[4] & 2) /* pause */
+        if(buf[3] & 2) /* pause */
         {
             if (audio_status() == AUDIO_STATUS_PLAY)
             {
@@ -437,7 +439,7 @@ static void iap_handlepkt_mode2(void)
                 iap_changedctr = 1;
             }
         }
-        if((serbuf[4] & 128) && !iap_btnshuffle) /* shuffle */
+        if((buf[3] & 128) && !iap_btnshuffle) /* shuffle */
         {
             iap_btnshuffle = true;
             if(!global_settings.playlist_shuffle)
@@ -458,9 +460,9 @@ static void iap_handlepkt_mode2(void)
         else
             iap_btnshuffle = false;
     }
-    else if(serbuf[0] >= 5 && serbuf[5] != 0)
+    else if(len >= 5 && buf[4] != 0)
     {
-        if((serbuf[5] & 1) && !iap_btnrepeat) /* repeat */
+        if((buf[4] & 1) && !iap_btnrepeat) /* repeat */
         {
             int oldmode = global_settings.repeat_mode;
             iap_btnrepeat = true;
@@ -479,20 +481,22 @@ static void iap_handlepkt_mode2(void)
         else
             iap_btnrepeat = false;
 
-        if(serbuf[5] & 16) /* ffwd */
+        if(buf[4] & 16) /* ffwd */
         {
             iap_remotebtn |= BUTTON_RC_RIGHT;
         }
-        if(serbuf[5] & 32) /* frwd */
+        if(buf[4] & 32) /* frwd */
         {
             iap_remotebtn |= BUTTON_RC_LEFT;
         }
     }
 }
 
-static void iap_handlepkt_mode3(void)
+static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
 {
-    unsigned int cmd = serbuf[2];
+    (void)len;    /* len currently unused */
+
+    unsigned int cmd = buf[1];
     switch (cmd)
     {
         /* GetCurrentEQProfileIndex */
@@ -517,7 +521,7 @@ static void iap_handlepkt_mode3(void)
         case 0x0C:
         {
             /* request ipod volume */
-            if (serbuf[3] == 0x04)
+            if (buf[2] == 0x04)
             {
                 iap_set_remote_volume();
             }
@@ -527,8 +531,8 @@ static void iap_handlepkt_mode3(void)
         /* SetiPodStateInfo */
         case 0x0E:
         {
-            if (serbuf[3] == 0x04)
-                global_settings.volume = (-58)+((int)serbuf[5]+1)/4;
+            if (buf[2] == 0x04)
+                global_settings.volume = (-58)+((int)buf[4]+1)/4;
                 sound_set_volume(global_settings.volume);   /* indent BUG? */
             break;
         }
@@ -570,9 +574,11 @@ static void get_playlist_name(unsigned char *dest,
     closedir(dp);
 }
 
-static void iap_handlepkt_mode4(void)
+static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
 {
-    unsigned int cmd = (serbuf[2] << 8) | serbuf[3];
+    (void)len;    /* len currently unused */
+
+    unsigned int cmd = (buf[1] << 8) | buf[2];
     switch (cmd)
     {
         /* GetAudioBookSpeed */
@@ -588,7 +594,7 @@ static void iap_handlepkt_mode4(void)
         /* SetAudioBookSpeed */
         case 0x000B:
         {
-            iap_updateflag = serbuf[4] ? 0 : 1;
+            iap_updateflag = buf[3] ? 0 : 1;
             /* respond with cmd ok packet */
             cmd_ok_mode4(cmd);
             break;
@@ -606,7 +612,7 @@ static void iap_handlepkt_mode4(void)
         /* SelectDBRecord */
         case 0x0017:
         {
-            memcpy(cur_dbrecord, serbuf + 4, 5);
+            memcpy(cur_dbrecord, buf + 3, 5);
             cmd_ok_mode4(cmd);
             break;
         }
@@ -623,7 +629,7 @@ static void iap_handlepkt_mode4(void)
             struct dirent* playlist_file = NULL;
             char *extension;
 
-            switch(serbuf[4]) /* type number */
+            switch(buf[3]) /* type number */
             {
                 case 0x01: /* total number of playlists */
                     dp = opendir(global_settings.playlist_catalog_dir);
@@ -658,7 +664,7 @@ static void iap_handlepkt_mode4(void)
                             {0x04, 0x00, 0x1B, 0x00, 0x00, 0x00, 0x00,
                              'R', 'O', 'C', 'K', 'B', 'O', 'X', '\0'};
             
-            unsigned long item_offset = get_u32(&serbuf[5]);
+            unsigned long item_offset = get_u32(&buf[4]);
 
             get_playlist_name(data + 7, item_offset, MAX_PATH);
             /*Remove file extension*/
@@ -715,7 +721,7 @@ static void iap_handlepkt_mode4(void)
             struct mp3entry id3;
             int fd;
             size_t len;
-            long tracknum = get_u32(&serbuf[4]);
+            long tracknum = get_u32(&buf[3]);
             
             data[2] = cmd + 1;
             memcpy(&id3, audio_current_track(), sizeof(id3));
@@ -757,7 +763,7 @@ static void iap_handlepkt_mode4(void)
         /* SetPlayStatusChangeNotification */
         case 0x0026:
         {
-            iap_pollspeed = serbuf[4] ? 1 : 0;
+            iap_pollspeed = buf[3] ? 1 : 0;
             /* respond with cmd ok packet */
             cmd_ok_mode4(cmd);
             break;
@@ -797,7 +803,7 @@ static void iap_handlepkt_mode4(void)
         /* PlayControl */
         case 0x0029:
         {
-            switch(serbuf[4])
+            switch(buf[3])
             {
                 case 0x01: /* play/pause */
                     iap_remotebtn = BUTTON_RC_PLAY;
@@ -855,14 +861,14 @@ static void iap_handlepkt_mode4(void)
         /* SetShuffle */
         case 0x002E:
         {
-            if(serbuf[4] && !global_settings.playlist_shuffle)
+            if(buf[3] && !global_settings.playlist_shuffle)
             {
                 global_settings.playlist_shuffle = 1;
                 settings_save();
                 if (audio_status() & AUDIO_STATUS_PLAY)
                     playlist_randomise(NULL, current_tick, true);
             }
-            else if(!serbuf[4] && global_settings.playlist_shuffle)
+            else if(!buf[3] && global_settings.playlist_shuffle)
             {
                 global_settings.playlist_shuffle = 0;
                 settings_save();
@@ -894,11 +900,11 @@ static void iap_handlepkt_mode4(void)
         case 0x0031:
         {
             int oldmode = global_settings.repeat_mode;
-            if (serbuf[4] == 0)
+            if (buf[3] == 0)
                 global_settings.repeat_mode = REPEAT_OFF;
-            else if (serbuf[4] == 1)
+            else if (buf[3] == 1)
                 global_settings.repeat_mode = REPEAT_ONE;
-            else if (serbuf[4] == 2)
+            else if (buf[3] == 2)
                 global_settings.repeat_mode = REPEAT_ALL;
 
             if (oldmode != global_settings.repeat_mode)
@@ -940,7 +946,7 @@ static void iap_handlepkt_mode4(void)
         case 0x0037:
         {
             int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
-            long tracknum = get_u32(&serbuf[4]);
+            long tracknum = get_u32(&buf[3]);
             
             audio_pause();
             audio_skip(tracknum - playlist_next(0));
@@ -961,9 +967,9 @@ static void iap_handlepkt_mode4(void)
     }
 }
 
-static void iap_handlepkt_mode7(void)
+static void iap_handlepkt_mode7(unsigned int len, const unsigned char *buf)
 {
-    unsigned int cmd = serbuf[2];
+    unsigned int cmd = buf[1];
     switch (cmd)
     {
         /* RetTunerCaps */
@@ -983,14 +989,14 @@ static void iap_handlepkt_mode7(void)
         /* TunerSeekDone */
         case 0x13:
         {
-            rmt_tuner_freq(serbuf);
+            rmt_tuner_freq(len, buf);
             break;
         }
         
         /* RdsReadyNotify, RDS station name 0x21 1E 00 + ASCII text*/
         case 0x21:
         {
-            rmt_tuner_rds_data(serbuf);
+            rmt_tuner_rds_data(len, buf);
             break;
         }
     }
@@ -998,7 +1004,6 @@ static void iap_handlepkt_mode7(void)
 
 void iap_handlepkt(void)
 {
-
     if(!iap_setupflag) return;
     if(serbuf[0] == 0) return;
 
@@ -1010,13 +1015,17 @@ void iap_handlepkt(void)
         return;
     }
 
-    unsigned char mode = serbuf[1];
+    /* get length and payload from serbuf */
+    unsigned int len = serbuf[0];
+    unsigned char *payload = &serbuf[1];
+    
+    unsigned char mode = payload[0];
     switch (mode) {
-    case 0: iap_handlepkt_mode0(); break;
-    case 2: iap_handlepkt_mode2(); break;
-    case 3: iap_handlepkt_mode3(); break;
-    case 4: iap_handlepkt_mode4(); break;
-    case 7: iap_handlepkt_mode7(); break;
+    case 0: iap_handlepkt_mode0(len, payload); break;
+    case 2: iap_handlepkt_mode2(len, payload); break;
+    case 3: iap_handlepkt_mode3(len, payload); break;
+    case 4: iap_handlepkt_mode4(len, payload); break;
+    case 7: iap_handlepkt_mode7(len, payload); break;
     }
 
     serbuf[0] = 0;
