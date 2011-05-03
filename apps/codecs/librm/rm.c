@@ -503,7 +503,9 @@ void rm_get_packet_fd(int fd,RMContext *rmctx, RMPacket *pkt)
 int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
 {   
     int consumed = 0;
+    /* rockbox: comment 'set but unused' variables
     uint8_t unknown;
+    */
     uint16_t x, place;
     uint16_t sps = rmctx->sub_packet_size;
     uint16_t h = rmctx->sub_packet_h;
@@ -528,11 +530,11 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
                "    length  = %d\n"
                "    stream  = %d\n"
                "    timestamp= %d\n\n",pkt->version,pkt->length,pkt->stream_number,pkt->timestamp);*/
-        unknown      = rm_get_uint8(*src+10);
+        /* unknown =*/ rm_get_uint8(*src+10);
         pkt->flags   = rm_get_uint8(*src+11);
 
         if(pkt->version == 1)
-            unknown = rm_get_uint8(*src+10);
+            /* unknown = */ rm_get_uint8(*src+10);
 
         if (pkt->flags & 2) /* keyframe */
             y = rmctx->sub_packet_cnt = 0;

@@ -1396,7 +1396,9 @@ static bool get_next(struct tagcache_search *tcs)
 {
     static char buf[TAG_MAXLEN+32];
     struct tagfile_entry entry;
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     long flag = 0;
+#endif
 
     if (!tcs->valid || !tc_stat.ready)
         return false;
@@ -1433,7 +1435,9 @@ static bool get_next(struct tagcache_search *tcs)
         }
         
         seeklist = &tcs->seeklist[tcs->list_position];
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
         flag = seeklist->flag;
+#endif
         tcs->position = seeklist->seek;
         tcs->idx_id = seeklist->idx_id;
         tcs->list_position++;

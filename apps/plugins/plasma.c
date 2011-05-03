@@ -155,8 +155,8 @@ int main(void)
     plasma_frequency = 1;
     int action, x, y;
     unsigned char p1,p2,p3,p4,t1,t2,t3,t4, z,z0;
-    long last_tick = *rb->current_tick;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    long last_tick = *rb->current_tick;
     int delay;
     int cumulated_lag = 0;
 #endif
@@ -257,10 +257,10 @@ int main(void)
             if (--cumulated_lag <= 0)   /* slow decrease */
                 rb->cpu_boost(boosted = false);
         }
+        last_tick = *rb->current_tick;
 #endif
         action = pluginlib_getaction(0, plugin_contexts,
                         ARRAYLEN(plugin_contexts));
-        last_tick = *rb->current_tick;
 
         switch(action)
         {

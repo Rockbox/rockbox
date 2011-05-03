@@ -124,7 +124,6 @@ static void initmem(void *mem, int size)
 
 static byte *loadfile(int fd, int *len)
 {
-    int c;
     byte *d;
 
     *len=lseek(fd,0,SEEK_END);
@@ -136,7 +135,7 @@ static byte *loadfile(int fd, int *len)
     }
     lseek(fd,0,SEEK_SET);
     
-    c = read(fd, d, *len);
+    read(fd, d, *len);
 
     return d;
 }
