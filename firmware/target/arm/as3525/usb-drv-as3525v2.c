@@ -101,12 +101,14 @@ void usb_attach(void)
 
 static inline void usb_delay(void)
 {
-    int i = 0;
-    while(i < 0x300)
-    {
-        asm volatile("nop");
-        i++;
-    }
+    register int i = 0;
+    asm volatile(
+        "1: nop             \n"
+        "   add %0, %0, #1  \n"
+        "   cmp %0, #0x300  \n"
+        "   bne 1b          \n"
+        : "+r"(i)
+    );
 }
 
 static void as3525v2_connect(void)
