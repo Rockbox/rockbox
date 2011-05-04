@@ -267,8 +267,9 @@ static int compare(const void* p1, const void* p2)
 /* load and sort directory into dircache. returns NULL on failure. */
 int ft_load(struct tree_context* c, const char* tempdir)
 {
-    int i;
+    int files_in_dir = 0;
     int name_buffer_used = 0;
+    struct dirent *entry;
     bool (*callback_show_item)(char *, int, struct tree_context *) = NULL;
     DIR *dir;
 
@@ -285,12 +286,11 @@ int ft_load(struct tree_context* c, const char* tempdir)
     c->dirsindir = 0;
     c->dirfull = false;
 
-    for ( i=0; i < c->dircache_count; i++ ) {
+    while ((entry = readdir(dir))) {
         int len;
-        struct dirent *entry = readdir(dir);
         struct dirinfo info;
         struct entry* dptr =
-            (struct entry*)(c->dircache + i * sizeof(struct entry));
+            (struct entry*)(c->dircache + files_in_dir * sizeof(struct entry));
         if (!entry)
             break;
 
@@ -301,13 +301,11 @@ int ft_load(struct tree_context* c, const char* tempdir)
         if ((info.attribute & ATTR_DIRECTORY) &&
             (((len == 1) && (!strncmp((char *)entry->d_name, ".", 1))) ||
              ((len == 2) && (!strncmp((char *)entry->d_name, "..", 2))))) {
-            i--;
             continue;
         }
 
         /* Skip FAT volume ID */
         if (info.attribute & ATTR_VOLUME_ID) {
-            i--;
             continue;
         }
 
@@ -315,7 +313,6 @@ int ft_load(struct tree_context* c, const char* tempdir)
         if (*c->dirfilter != SHOW_ALL &&
             ((entry->d_name[0]=='.') ||
             (info.attribute & ATTR_HIDDEN))) {
-            i--;
             continue;
         }
 
@@ -359,15 +356,18 @@ int ft_load(struct tree_context* c, const char* tempdir)
                                               (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LUA) ||
             (callback_show_item && !callback_show_item(entry->d_name, dptr->attr, c)))
         {
-            i--;
             continue;
         }
 
-        if (len > c->name_buffer_size - name_buffer_used - 1) {
+        if ((len > c->name_buffer_size - name_buffer_used - 1) ||
+            (files_in_dir >= c->dircache_count)) {
             /* Tell the world that we ran out of buffer space */
             c->dirfull = true;
             break;
         }
+
+        ++files_in_dir;
+
         dptr->name = &c->name_buffer[name_buffer_used];
         dptr->time_write =
             (long)info.wrtdate<<16 |
@@ -378,12 +378,12 @@ int ft_load(struct tree_context* c, const char* tempdir)
         if (dptr->attr & ATTR_DIRECTORY) /* count the remaining dirs */
             c->dirsindir++;
     }
-    c->filesindir = i;
-    c->dirlength = i;
+    c->filesindir = files_in_dir;
+    c->dirlength = files_in_dir;
     closedir(dir);
 
     compare_sort_dir = c->sort_dir;
-    qsort(c->dircache,i,sizeof(struct entry),compare);
+    qsort(c->dircache, files_in_dir, sizeof(struct entry), compare);
 
     /* If thumbnail talking is enabled, make an extra run to mark files with
        associated thumbnails, so we don't do unsuccessful spinups later. */

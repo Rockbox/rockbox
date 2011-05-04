@@ -390,7 +390,7 @@ static int update_dir(void)
 #ifdef HAVE_TAGCACHE
         !id3db && 
 #endif
-        (tc.dirfull || tc.filesindir == tc.dircache_count) )
+        tc.dirfull )
         {
             splash(HZ, ID2P(LANG_SHOWDIR_BUFFER_FULL));
         }
