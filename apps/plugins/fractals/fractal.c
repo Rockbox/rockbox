@@ -96,7 +96,7 @@ enum plugin_status plugin_start(const void* parameter)
 #if defined(FRACTAL_ZOOM_OUT_PRE) || \
     defined(FRACTAL_ZOOM_IN_PRE) || \
     defined(FRACTAL_PRECISION_DEC_PRE) || \
-    defined(FRACTAL_PRECISION_INC)
+    defined(FRACTAL_PRECISION_INC_PRE)
     long lastbutton = BUTTON_NONE;
 #endif
     int redraw = REDRAW_FULL;
@@ -254,7 +254,7 @@ enum plugin_status plugin_start(const void* parameter)
 #if defined(FRACTAL_ZOOM_OUT_PRE) || \
     defined(FRACTAL_ZOOM_IN_PRE) || \
     defined(FRACTAL_PRECISION_DEC_PRE) || \
-    defined(FRACTAL_PRECISION_INC)
+    defined(FRACTAL_PRECISION_INC_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
 #endif
