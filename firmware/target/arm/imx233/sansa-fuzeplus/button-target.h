@@ -29,7 +29,6 @@ int button_read_device(void);
 
 /* Main unit's buttons */
 #define BUTTON_POWER        0x00000001
-
 #define BUTTON_VOL_UP       0x00000002
 #define BUTTON_VOL_DOWN     0x00000004
 

@@ -30,30 +30,6 @@
 #include "lcd.h"
 #include "backlight-target.h"
 
-#define HW_POWER_BASE           0x80044000
-
-#define HW_POWER_RESET          (*(volatile uint32_t *)(HW_POWER_BASE + 0x100))
-#define HW_POWER_RESET__UNLOCK  0x3E770000
-#define HW_POWER_RESET__PWD     0x1
-
-#define HW_ICOLL_BASE           0x80000000
-
-#define HW_ICOLL_VECTOR         (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x0))
-
-#define HW_ICOLL_LEVELACK       (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x10))
-#define HW_ICOLL_LEVELACK__LEVEL0   0x1
-
-#define HW_ICOLL_CTRL           (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x20))
-#define HW_ICOLL_CTRL__IRQ_FINAL_ENABLE (1 << 16)
-#define HW_ICOLL_CTRL__ARM_RSE_MODE     (1 << 18)
-
-#define HW_ICOLL_VBASE          (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x40))
-#define HW_ICOLL_INTERRUPT(i)   (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x120 + (i) * 0x10))
-#define HW_ICOLL_INTERRUPT__PRIORITY_BM 0x3
-#define HW_ICOLL_INTERRUPT__ENABLE      0x4
-#define HW_ICOLL_INTERRUPT__SOFTIRQ     0x8
-#define HW_ICOLL_INTERRUPT__ENFIQ       0x10
-
 #define default_interrupt(name) \
     extern __attribute__((weak, alias("UIRQ"))) void name(void)
 
