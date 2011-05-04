@@ -23,7 +23,11 @@
 // contain a build timestamp because it needs to be the same in different
 // files
 // VERSION is the plain version number, used for http User-Agent string.
-#define VERSION "1.2.9"
+// BUILD is an additional build string to handle package updates (i.e. rebuilds
+// because of issues like dependency problems or library updates). Usually
+// empty.
+#define BUILDID ""
+#define VERSION "1.2.9" BUILDID
 #define PUREVERSION "SVN $Revision$"
 
 #define FULLVERSION VERSION" ("PUREVERSION"), built "__DATE__" "__TIME__
