@@ -59,13 +59,13 @@ Java_org_rockbox_RockboxPCM_pcmSamplesToByteArray(JNIEnv *env,
 {
     (void)this;
     size_t len;
-	size_t array_size = (*env)->GetArrayLength(env, arr);
+    size_t array_size = (*env)->GetArrayLength(env, arr);
     if (array_size > pcm_data_size)
         len = pcm_data_size;
     else
         len = array_size;
 
-	(*env)->SetByteArrayRegion(env, arr, 0, len, pcm_data_start);
+    (*env)->SetByteArrayRegion(env, arr, 0, len, pcm_data_start);
 
     if (array_size > pcm_data_size)
     {   /* didn't have enough data for the array ? */
