@@ -53,8 +53,9 @@ deploy.progexe = {
     "linux2"   : "RockboxUtility"
 }
 deploy.regreplace = {
-        "rbutil/rbutilqt/version.h"  : ["SVN \$.*\$", "SVN r%REVISION%"],
-        "rbutil/rbutilqt/Info.plist" : ["SVN \$.*\$", "SVN r%REVISION%"]
+    "rbutil/rbutilqt/version.h"  : [["SVN \$.*\$", "SVN r%REVISION%"],
+                                    ["(^#define BUILDID).*", "\\1 \"-%BUILDID%\""]],
+    "rbutil/rbutilqt/Info.plist" : [["SVN \$.*\$", "SVN r%REVISION%"]],
 }
 # OS X 10.6 defaults to gcc 4.2. Building universal binaries that are
 # compatible with 10.4 requires using gcc-4.0.
