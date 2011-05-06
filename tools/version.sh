@@ -43,16 +43,15 @@ gitversion() {
 	version=`git log --pretty=format:'%b' --grep='git-svn-id: svn' -1 | tail -n 1 | perl -ne 'm/@(\d*)/; print "r" . $1;'`
 	mod=""
 	# Is this a git-svn commit?
-	if ! git log  HEAD^.. --pretty=format:"%b" | grep -q "git-svn-id: svn" ; then
-	    mod="M"
+	if ! git log -1 --pretty=format:"%b" | grep -q "git-svn-id: svn" ; then
+	    version="$version+$head"
+	fi
 	# Are there uncommitted changes?
-	else
-	    export GIT_WORK_TREE="$1"
-	    if git diff --name-only HEAD | read dummy; then
-		mod="M"
-	    elif git diff --name-only --cached HEAD | read dummy; then
-		mod="M"
-	    fi
+	export GIT_WORK_TREE="$1"
+	if git diff --name-only HEAD | read dummy; then
+	    mod="M"
+	elif git diff --name-only --cached HEAD | read dummy; then
+	    mod="M"
 	fi
 
 	echo "${version}${mod}"
