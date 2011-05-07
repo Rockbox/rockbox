@@ -204,6 +204,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                 break;
             case ACTION_NONE:
             case SYS_CHARGER_DISCONNECTED:
+            case SYS_BATTERY_UPDATE:
                 /* ignore some SYS events that can happen */
                 continue;
             default:
