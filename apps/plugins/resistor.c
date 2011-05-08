@@ -205,7 +205,7 @@ static enum color get_band_rtoc(int in_val)
 
 static char *get_tolerance_str(enum color color)
 {
-    static char tolerance_str [14];	
+    static char tolerance_str [14];
     rb->snprintf(tolerance_str, sizeof(tolerance_str), "%d%% tolerance",
                  band_data[color].tolerance);
     return tolerance_str;

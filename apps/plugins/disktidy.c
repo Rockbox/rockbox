@@ -554,9 +554,9 @@ static bool save_config(const char *file_name)
     {
         for (i=0; i<tidy_type_count; i++)
         {
-	    rb->fdprintf(fd, "%s%s: %s\n", tidy_types[i].filestring,
-	                 tidy_types[i].directory ? "/" : "",
-	                 tidy_types[i].remove ? "yes" : "no");
+        rb->fdprintf(fd, "%s%s: %s\n", tidy_types[i].filestring,
+                     tidy_types[i].directory ? "/" : "",
+                     tidy_types[i].remove ? "yes" : "no");
         }
         rb->close(fd);
     }
