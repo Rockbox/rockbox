@@ -22,5 +22,5 @@
 
 #ifndef __STRLCASESTR_H__
 #define __STRLCASESTR_H__
-char	*strcasestr(const char *, const char *);
+char *strcasestr(const char *, const char *);
 #endif

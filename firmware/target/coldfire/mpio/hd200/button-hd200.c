@@ -93,7 +93,7 @@ int button_read_device(void)
 
         if (data < 2300) /* valid button */
         {
-	    if (data < 900) /* middle */
+            if (data < 900) /* middle */
             {
                 if (data < 500)
                 {
@@ -123,7 +123,7 @@ int button_read_device(void)
                     else /* 1900 - 2300 */
                         btn = BUTTON_FUNC;
                 }
-	    }	    
+            }
         }
     }
 
@@ -134,7 +134,7 @@ int button_read_device(void)
 
         if (data < 2050) /* valid button */
         {
-	    if (data < 950) /* middle */
+        if (data < 950) /* middle */
             {
                 if (data < 650)
                 {

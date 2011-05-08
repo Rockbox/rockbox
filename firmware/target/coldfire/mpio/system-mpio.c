@@ -97,8 +97,8 @@ void cf_set_cpu_frequency(long frequency)
         timers_adjust_prescale(CPUFREQ_NORMAL_MULT, true);
         DCR = (0x8000 | NORMAL_REFRESH_TIMER);       /* Refresh timer */
         cpu_frequency = CPUFREQ_NORMAL;
-	IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
-	IDECONFIG2 = (1<<18)|(1<<16);
+        IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
+        IDECONFIG2 = (1<<18)|(1<<16);
 
         and_l(~(0x07<<16), &ADCONFIG);
         or_l((0x03)<<16, &ADCONFIG); /* adclk = busclk/8 */
@@ -115,8 +115,8 @@ void cf_set_cpu_frequency(long frequency)
         CSCR3 = 0x00000180; /* LCD: 0 wait states */
         DCR = (0x8000 | DEFAULT_REFRESH_TIMER);       /* Refresh timer */
         cpu_frequency = CPUFREQ_DEFAULT;
-	IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
-	IDECONFIG2 = (1<<18)|(1<<16);
+        IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
+        IDECONFIG2 = (1<<18)|(1<<16);
 
         and_l(~(0x07<<16), &ADCONFIG);
         or_l((0x01)<<16, &ADCONFIG); /* adclk = busclk/2 */

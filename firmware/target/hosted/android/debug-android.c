@@ -35,7 +35,7 @@ void debugf(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-	__android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG, fmt, ap);
+    __android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG, fmt, ap);
     va_end(ap);
 }
 

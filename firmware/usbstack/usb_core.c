@@ -828,8 +828,8 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 #ifdef HAVE_USB_CHARGING_ENABLE
     timeout_cancel(&usb_no_host_timeout);
     if(usb_no_host) {
-	usb_no_host = false;
-	usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+        usb_no_host = false;
+        usb_charging_maxcurrent_change(usb_charging_maxcurrent());
     }
 #endif
     if(usb_state == DEFAULT) {
@@ -918,9 +918,9 @@ int usb_charging_maxcurrent()
     if (!initialized || usb_charging_mode == USB_CHARGING_DISABLE)
         return 100;
     if (usb_state == CONFIGURED)
-	return usb_charging_current_requested;
+        return usb_charging_current_requested;
     if (usb_charging_mode == USB_CHARGING_FORCE && usb_no_host)
-	return 500;
+        return 500;
     return 100;
 }
 #endif
