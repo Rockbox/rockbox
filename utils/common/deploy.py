@@ -132,8 +132,8 @@ def getsources(svnsrv, filelist, dest):
     return 0
 
 
-def gettrunkrev(svnsrv):
-    '''Get the revision of trunk for svnsrv'''
+def getfolderrev(svnsrv):
+    '''Get the most recent revision for svnsrv'''
     client = pysvn.Client()
     entries = client.info2(svnsrv, recurse=False)
     return entries[0][1].rev.number
@@ -543,20 +543,20 @@ def deploy():
         # make sure the path doesn't contain backslashes to prevent issues
         # later when running on windows.
         workfolder = re.sub(r'\\', '/', w)
+        revision = getfolderrev(svnbase)
         if buildid == None:
             versionextra = ""
         else:
             versionextra = "-" + buildid
-        if not tag == "":
+        if tag != "":
             sourcefolder = workfolder + "/" + tag + "/"
             archivename = tag + versionextra + "-src.tar.bz2"
             # get numeric version part from tag
             ver = "v" + re.sub('^[^\d]+', '', tag)
         else:
-            trunk = gettrunkrev(svnbase)
-            sourcefolder = workfolder + "/" + program + "-r" + str(trunk) + versionextra + "/"
-            archivename = program + "-r" + str(trunk) + versionextra + "-src.tar.bz2"
-            ver = "r" + str(trunk)
+            sourcefolder = workfolder + "/" + program + "-r" + str(revision) + versionextra + "/"
+            archivename = program + "-r" + str(revision) + versionextra + "-src.tar.bz2"
+            ver = "r" + str(revision)
         os.mkdir(sourcefolder)
     else:
         workfolder = "."
@@ -583,11 +583,11 @@ def deploy():
                 for r in regreplace[f]:
                     # replacements made on the replacement string:
                     # %REVISION% is replaced with the revision number
-                    replacement = re.sub("%REVISION%", str(trunk), r[1])
+                    replacement = re.sub("%REVISION%", str(revision), r[1])
                     # %BUILD% is replace with buildid as passed on the command line
                     if buildid != None:
                         replacement = re.sub("%BUILDID%", str(buildid), replacement)
-                    newline = re.sub(r[0], replacement, newline)
+                        newline = re.sub(r[0], replacement, newline)
                 outfile.write(newline)
             outfile.close()
 
