@@ -610,7 +610,10 @@ enum plugin_status plugin_start(const void *parameter) {
 #ifdef HAVE_TOUCHSCREEN
     int button_x, button_y;
 #endif
+#if defined(REVERSI_BUTTON_MENU_LONGPRESS) || \
+    defined(REVERSI_BUTTON_MAKE_MOVE_SHORTPRESS)
     int lastbutton = BUTTON_NONE;
+#endif
     int row, col;
     int w_cnt, b_cnt;
     
@@ -787,10 +790,12 @@ enum plugin_status plugin_start(const void *parameter) {
             /* Quit if USB has been connected */
             return PLUGIN_USB_CONNECTED;
         }
-
+#if defined(REVERSI_BUTTON_MENU_LONGPRESS) || \
+    defined(REVERSI_BUTTON_MAKE_MOVE_SHORTPRESS)
         if (button != BUTTON_NONE) {
             lastbutton = button;
         }
+#endif
     }
 
     return PLUGIN_OK;

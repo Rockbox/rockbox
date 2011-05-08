@@ -1527,7 +1527,10 @@ static int sokoban_menu(void)
 static bool sokoban_loop(void)
 {
     bool moved;
-    int i = 0, button = 0, lastbutton = 0;
+    int i = 0, button = 0;
+#if defined(SOKOBAN_UNDO_PRE)
+    int lastbutton = 0;
+#endif
     int w, h;
     char *loc;
 
@@ -1629,8 +1632,9 @@ static bool sokoban_loop(void)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
-
+#if defined(SOKOBAN_UNDO_PRE)
         lastbutton = button;
+#endif
 
         if (moved) {
             rb->lcd_clear_display();

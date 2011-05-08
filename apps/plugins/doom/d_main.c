@@ -179,7 +179,6 @@ void D_Display (void)
 {
    static boolean isborderstate        IDATA_ATTR= false;
    static boolean borderwillneedredraw IDATA_ATTR= false;
-   static  boolean  inhelpscreensstate IDATA_ATTR= false;
    static  gamestate_t  oldgamestate IDATA_ATTR= -1;
    boolean wipe;
    boolean viewactive = false, isborder = false;
@@ -254,7 +253,6 @@ void D_Display (void)
       HU_Drawer();
    }
 
-   inhelpscreensstate = inhelpscreens;
    isborderstate      = isborder;
    oldgamestate = wipegamestate = gamestate;
 

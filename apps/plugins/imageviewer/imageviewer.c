@@ -345,7 +345,9 @@ static int show_menu(void) /* return 1 to quit */
 static int ask_and_get_audio_buffer(const char *filename)
 {
     int button;
+#if defined(IMGVIEW_ZOOM_PRE)
     int lastbutton = BUTTON_NONE;
+#endif
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
@@ -414,9 +416,10 @@ static int ask_and_get_audio_buffer(const char *filename)
                         == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
         }
-
+#if defined(IMGVIEW_ZOOM_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
+#endif
     }
 }
 #endif /* USE_PLUG_BUF */
@@ -548,7 +551,9 @@ static void pan_view_down(struct image_info *info)
 static int scroll_bmp(struct image_info *info)
 {
     int button;
+#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE)
     int lastbutton = BUTTON_NONE;
+#endif
 
     while (true)
     {
@@ -669,9 +674,10 @@ static int scroll_bmp(struct image_info *info)
             break;
 
         } /* switch */
-
+#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
+#endif
     } /* while (true) */
 }
 

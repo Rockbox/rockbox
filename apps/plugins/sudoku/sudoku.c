@@ -1029,7 +1029,9 @@ enum plugin_status plugin_start(const void* parameter)
 {
     bool exit;
     int button;
+#if defined(SUDOKU_BUTTON_TOGGLE_PRE) || defined(SUDOKU_BUTTON_MENU_PRE)
     int lastbutton = BUTTON_NONE;
+#endif
     int res;
     int rc = PLUGIN_OK;
     long ticks;
@@ -1289,8 +1291,10 @@ enum plugin_status plugin_start(const void* parameter)
                 }
                 break;
         }
+#if defined(SUDOKU_BUTTON_TOGGLE_PRE) || defined(SUDOKU_BUTTON_MENU_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
+#endif
 
         display_board(&state);
     }

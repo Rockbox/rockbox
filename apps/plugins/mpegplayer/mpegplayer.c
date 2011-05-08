@@ -607,7 +607,7 @@ static void draw_oriented_mono_bitmap_part(const unsigned char *src,
 {
     const unsigned char *src_end;
     fb_data *dst, *dst_end;
-    unsigned fg_pattern, bg_pattern;
+    unsigned fg_pattern;
 
     if (x + width > SCREEN_WIDTH)
         width = SCREEN_WIDTH - x; /* Clip right */
@@ -623,8 +623,8 @@ static void draw_oriented_mono_bitmap_part(const unsigned char *src,
     if (height <= 0)
         return; /* nothing left to do */
 
-    fg_pattern = rb->lcd_get_foreground();
-    bg_pattern = rb->lcd_get_background();
+    fg_pattern =     rb->lcd_get_foreground();
+    /*bg_pattern =*/ rb->lcd_get_background();
 
     src += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
@@ -719,7 +719,7 @@ static void draw_oriented_alpha_bitmap_part(const unsigned char *src,
                                             int width, int height)
 {
     fb_data *dst, *dst_start;
-    unsigned fg_pattern, bg_pattern;
+    unsigned fg_pattern;
 
     if (x + width > SCREEN_WIDTH)
         width = SCREEN_WIDTH - x; /* Clip right */
@@ -738,8 +738,8 @@ static void draw_oriented_alpha_bitmap_part(const unsigned char *src,
     /* initialize blending */
     BLEND_INIT;
 
-    fg_pattern = rb->lcd_get_foreground();
-    bg_pattern = rb->lcd_get_background();
+    fg_pattern =    rb->lcd_get_foreground();
+    /*bg_pattern=*/ rb->lcd_get_background();
 
     dst_start = rb->lcd_framebuffer + (LCD_WIDTH - y - 1) + x*LCD_WIDTH;
     int col, row = height;

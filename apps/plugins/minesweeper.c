@@ -692,7 +692,9 @@ enum minesweeper_status minesweeper( void )
 {
     int i, j;
     int button;
+#if defined(HAVE_TOUCHSCREEN) || defined(MINESWP_TOGGLE_PRE)
     int lastbutton = BUTTON_NONE;
+#endif
 
     /* the cursor coordinates */
     int x=0, y=0;
@@ -898,8 +900,10 @@ enum minesweeper_status minesweeper( void )
                     return MINESWEEPER_USB;
                 break;
         }
+#if defined(HAVE_TOUCHSCREEN) || defined(MINESWP_TOGGLE_PRE)
         if( button != BUTTON_NONE )
             lastbutton = button;
+#endif
     }
 
 }

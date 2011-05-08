@@ -781,7 +781,7 @@ void* dircache_steal_buffer(long *size)
 void dircache_init(void)
 {
     int i;
-    int thread_id;
+    int thread_id __attribute__((unused));
     
     dircache_initialized = false;
     dircache_initializing = false;

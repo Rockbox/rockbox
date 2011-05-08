@@ -522,7 +522,6 @@ menu_t  SaveDef =
 void M_ReadSaveStrings(void)
 {
    int             handle;
-   int             count;
    int             i;
    char    name[256];
 
@@ -540,7 +539,7 @@ void M_ReadSaveStrings(void)
          LoadMenu[i].status = 0;
          continue;
       }
-      count = read (handle, &savegamestrings[i], SAVESTRINGSIZE);
+      read (handle, &savegamestrings[i], SAVESTRINGSIZE);
       close (handle);
       LoadMenu[i].status = 1;
    }
@@ -1027,8 +1026,7 @@ void M_Options(int choice)
 //
 void M_ChangeMessages(int choice)
 {
-   // warning: unused parameter `int choice'
-   choice = 0;
+   (void)choice;
    showMessages = 1 - showMessages;
 
    if (!showMessages)
@@ -1059,7 +1057,7 @@ void M_EndGameResponse(int ch)
 
 void M_EndGame(int choice)
 {
-   choice = 0;
+   (void)choice;
    if (!usergame)
    {
       S_StartSound(NULL,sfx_oof);
@@ -1083,19 +1081,19 @@ void M_EndGame(int choice)
 //
 void M_ReadThis(int choice)
 {
-   choice = 0;
+   (void)choice;
    M_SetupNextMenu(&ReadDef1);
 }
 
 void M_ReadThis2(int choice)
 {
-   choice = 0;
+   (void)choice;
    M_SetupNextMenu(&ReadDef2);
 }
 
 void M_FinishReadThis(int choice)
 {
-   choice = 0;
+   (void)choice;
    M_SetupNextMenu(&MainDef);
 }
 

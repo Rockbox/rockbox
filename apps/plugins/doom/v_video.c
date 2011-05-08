@@ -525,12 +525,9 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
       int   DXI = (320<<16)          / SCREENWIDTH;
       int   DY  = (SCREENHEIGHT<<16) / 200;
       register int DYI = (200<<16)   / SCREENHEIGHT;
-      int   DY2, DYI2;
 
       stretchx = ( x * DX ) >> 16;
       stretchy = ( y * DY ) >> 16;
-      DY2  = DY / 2;
-      DYI2 = DYI* 2;
 
       if (!scrn)
          V_MarkRect ( stretchx, stretchy, (SHORT( patch->width ) * DX ) >> 16,

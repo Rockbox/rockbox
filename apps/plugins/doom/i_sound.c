@@ -534,26 +534,27 @@ static int musicdies=-1;
 void I_PlaySong(int handle, int looping)
 {
    // UNUSED.
-   handle = looping = 0;
+   (void)handle;
+   (void)looping;
    musicdies = gametic + TICRATE*30;
 }
 
 void I_PauseSong (int handle)
 {
    // UNUSED.
-   handle = 0;
+   (void)handle;
 }
 
 void I_ResumeSong (int handle)
 {
    // UNUSED.
-   handle = 0;
+   (void)handle;
 }
 
 void I_StopSong(int handle)
 {
    // UNUSED.
-   handle = 0;
+   (void)handle;
 
    looping = 0;
    musicdies = 0;
@@ -562,13 +563,13 @@ void I_StopSong(int handle)
 void I_UnRegisterSong(int handle)
 {
    // UNUSED.
-   handle = 0;
+   (void)handle;
 }
 
 int I_RegisterSong(const void *data)
 {
    // UNUSED.
-   data = NULL;
+   (void)data;
 
    return 1;
 }
@@ -577,7 +578,7 @@ int I_RegisterSong(const void *data)
 int I_QrySongPlaying(int handle)
 {
    // UNUSED.
-   handle = 0;
+   (void)handle;
    return looping || musicdies > gametic;
 }
 
