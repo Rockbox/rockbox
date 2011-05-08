@@ -255,7 +255,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         }
 #endif
         flags |= DONT_CLEAR_EXCESS;
-	}
+    }
     
     if (!pb->nobar)
     {

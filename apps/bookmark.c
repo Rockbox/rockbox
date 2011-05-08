@@ -951,17 +951,17 @@ static const char* skip_token(const char* s)
     return s;
 }
 
-static const char* int_token(const char* s, int* dest) 	 
-{ 	 
+static const char* int_token(const char* s, int* dest)
+{
     *dest = atoi(s);
-    return skip_token(s); 	 
-} 	 
+    return skip_token(s);
+}
 
-static const char* long_token(const char* s, long* dest) 	 
-{ 	 
+static const char* long_token(const char* s, long* dest)
+{
     *dest = atoi(s);    /* Should be atol, but we don't have it. */
-    return skip_token(s); 	 
-} 	 
+    return skip_token(s);
+}
 
 /* ----------------------------------------------------------------------- */
 /* This function takes a bookmark and parses it.  This function also       */

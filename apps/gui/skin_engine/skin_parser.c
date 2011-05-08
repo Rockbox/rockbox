@@ -1308,7 +1308,7 @@ static void skin_data_reset(struct wps_data *wps_data)
     wps_data->touchregions = NULL;
 #endif
 #ifdef HAVE_SKIN_VARIABLES
-	wps_data->skinvars = NULL;
+    wps_data->skinvars = NULL;
 #endif
 #ifdef HAVE_ALBUMART
     wps_data->albumart = NULL;

@@ -74,10 +74,10 @@ static int load_radioart_image(struct radioart *ra, const char* preset_name,
     if (!file_exists(path))
     {
 #ifndef HAVE_NOISY_IDLE_MODE
-		cpu_idle_mode(true);
+        cpu_idle_mode(true);
 #endif
         return -1;
-	}
+    }
     strlcpy(ra->name, preset_name, MAX_FMPRESET_LEN+1);
     ra->dim.height = dim->height;
     ra->dim.width = dim->width;
