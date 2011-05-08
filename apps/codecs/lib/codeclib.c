@@ -27,11 +27,11 @@
 #include "codeclib.h"
 #include "metadata.h"
 
-size_t mem_ptr;
-size_t bufsize;
-unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
-unsigned char* mallocbuf;  // 512K from the start of MP3 buffer
-unsigned char* filebuf;    // The rest of the MP3 buffer
+/* The following variables are used by codec_malloc() to make use of free RAM
+ * within the statically allocated codec buffer. */
+static size_t mem_ptr;
+static size_t bufsize;
+static unsigned char* mallocbuf;
 
 int codec_init(void)
 {
