@@ -235,9 +235,6 @@ struct codec_header {
     struct codec_api **api;
 };
 
-extern unsigned char codecbuf[];
-extern size_t codec_size;
-
 #ifdef CODEC
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 /* plugin_* is correct, codecs use the plugin linker script */
@@ -276,6 +273,9 @@ extern unsigned char plugin_end_addr[];
 /* create full codec path from root filenames in audio_formats[]
    assumes buffer size is MAX_PATH */
 void codec_get_full_path(char *path, const char *codec_root_fn);
+
+/* Returns pointer to and size of free codec RAM */
+void *codeclib_get_buffer(size_t *size);
 
 /* defined by the codec loader (codec.c) */
 int codec_load_buf(int hid, struct codec_api *api);

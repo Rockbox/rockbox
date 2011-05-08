@@ -208,19 +208,6 @@ void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
 
 /** --- codec API callbacks --- **/
 
-static void * codec_get_buffer(size_t *size)
-{
-    ssize_t s = CODEC_SIZE - codec_size;
-    void *buf = &codecbuf[codec_size];
-    ALIGN_BUFFER(buf, s, CACHEALIGN_SIZE);
-
-    if (s <= 0)
-        return NULL;
-
-    *size = s;
-    return buf;
-}
-
 static void codec_pcmbuf_insert_callback(
         const void *ch1, const void *ch2, int count)
 {
@@ -420,7 +407,7 @@ void codec_init_codec_api(void)
 {
     ci.dsp                 = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
                                                                 CODEC_IDX_AUDIO);
-    ci.codec_get_buffer    = codec_get_buffer;
+    ci.codec_get_buffer    = codeclib_get_buffer;
     ci.pcmbuf_insert       = codec_pcmbuf_insert_callback;
     ci.set_elapsed         = audio_codec_update_elapsed;
     ci.read_filebuf        = codec_filebuf_callback;

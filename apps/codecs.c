@@ -61,12 +61,14 @@
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-#if CONFIG_CODEC == SWCODEC
-unsigned char codecbuf[CODEC_SIZE];
-#endif
+/* For PLATFORM_HOSTED this buffer must be define here. */
+static unsigned char codecbuf[CODEC_SIZE];
+#else
+/* For PLATFORM_NATIVE this buffer is defined in *.lds files. */
+extern unsigned char codecbuf[];
 #endif
 
-size_t codec_size;
+static size_t codec_size;
 
 extern void* plugin_get_audio_buffer(size_t *buffer_size);
 
@@ -169,6 +171,19 @@ void codec_get_full_path(char *path, const char *codec_root_fn)
 {
     snprintf(path, MAX_PATH-1, "%s/%s." CODEC_EXTENSION,
              CODECS_DIR, codec_root_fn);
+}
+
+/* Returns pointer to and size of free codec RAM. Aligns to CACHEALIGN_SIZE. */
+void *codeclib_get_buffer(size_t *size)
+{
+    void *buf = &codecbuf[codec_size];
+    *size = CODEC_SIZE - codec_size;
+    ALIGN_BUFFER(buf, *size, CACHEALIGN_SIZE);
+
+    if (*size <= 0)
+        return NULL;
+
+    return buf;
 }
 
 /** codec loading and call interface **/
