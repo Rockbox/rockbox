@@ -32,7 +32,7 @@
 #include "is.h"
 
 #ifdef FIXED_POINT
-static real_t pow05_table[] = {
+static real_t pow05_table[] ICONST_ATTR = {
     COEF_CONST(1.68179283050743), /* 0.5^(-3/4) */
     COEF_CONST(1.41421356237310), /* 0.5^(-2/4) */
     COEF_CONST(1.18920711500272), /* 0.5^(-1/4) */
@@ -47,7 +47,7 @@ void is_decode(ic_stream *ics, ic_stream *icsr, real_t *l_spec, real_t *r_spec,
                uint16_t frame_len)
 {
     uint8_t g, sfb, b;
-    uint16_t i;
+    uint16_t i, k;
 #ifndef FIXED_POINT
     real_t scale;
 #else
@@ -84,19 +84,21 @@ void is_decode(ic_stream *ics, ic_stream *icsr, real_t *l_spec, real_t *r_spec,
 
                     /* Scale from left to right channel,
                        do not touch left channel */
-                    for (i = icsr->swb_offset[sfb]; i < icsr->swb_offset[sfb+1]; i++)
+                    k = (group*nshort) + icsr->swb_offset[sfb];
+                    for (i = icsr->swb_offset[sfb]; i < icsr->swb_offset[sfb+1]; i++, k++)
                     {
 #ifndef FIXED_POINT
-                        r_spec[(group*nshort)+i] = MUL_R(l_spec[(group*nshort)+i], scale);
+                        r_spec[k] = MUL_R(l_spec[k], scale);
 #else
                         if (exp < 0)
-                            r_spec[(group*nshort)+i] = l_spec[(group*nshort)+i] << -exp;
+                            r_spec[k] = l_spec[k] << -exp;
                         else
-                            r_spec[(group*nshort)+i] = l_spec[(group*nshort)+i] >> exp;
-                        r_spec[(group*nshort)+i] = MUL_C(r_spec[(group*nshort)+i], pow05_table[frac + 3]);
+                            r_spec[k] = l_spec[k] >> exp;
+
+                        r_spec[k] = MUL_C(r_spec[k], pow05_table[frac + 3]);
 #endif
                         if (is_intensity(icsr, g, sfb) != invert_intensity(ics, g, sfb))
-                            r_spec[(group*nshort)+i] = -r_spec[(group*nshort)+i];
+                            r_spec[k] = -r_spec[k];
                     }
                 }
             }
