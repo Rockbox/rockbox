@@ -172,4 +172,32 @@
     Sound Interface Device & \fname{.sid} & \\
     SPC700 & \fname{.spc} & \\
   \end{rbtabular}
+  
+  \section{\label{ref:SupportedMetadata}Supported metadata tags}
+    Rockbox supports different metadata formats. In general those tag formats
+    are ID3 (v1 and v2), APE (v1 and v2), Vorbis, MP4 and ASF. Few codecs use
+    codec specific tags, several codecs do not use any tags yet. The following
+    table gives an overview about what tag types rockbox supports for which
+    audio file extension.
+    
+    \note{There is always only \emph{one} tag type supported for each file
+    extension.}
+    
+    \begin{rbtabular}{\textwidth}{lX}%
+    {\textbf{Extension} & \textbf{Tag type}}{}{}
+      \fname{.mp1}, \fname{.mpa}, \fname{.mp2}, \fname{.mp3},
+         \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.tta}        & ID3 \\
+      \fname{.mpc}, \fname{.ape}, \fname{.mac}, \fname{.wv}           & APE \\
+      \fname{.ogg}, \fname{.oga}, \fname{.spx}, \fname{.flac}         & Vorbis \\
+      \fname{.m4a}, \fname{.m4b}, \fname{.mp4}                        & MP4 \\
+      \fname{.wma}, \fname{.wmv}, \fname{.asf}                        & ASF \\
+      \fname{.mmf}, \fname{.mod}, \fname{.nsf}, \fname{.nsfe},
+         \fname{.sap}, \fname{.sid}, \fname{.spc}                     & Codec specific \\
+      \fname{.a52}, \fname{.ac3}, \fname{.adx}, \fname{.oma},
+         \fname{.aa3}, \fname{.aif}, \fname{.aiff}, \fname{.au}       & None \\
+      \fname{.snd}, \fname{.shn}, \fname{.vox}, \fname{.w64},
+         \fname{.wav}, \fname{.cmc}, \fname{.cm3}, \fname{.cmr}       & None \\
+      \fname{.cms}, \fname{.dmc}, \fname{.dlt}, \fname{.mpt},
+         \fname{.mpd}                                                 & None \\
+    \end{rbtabular}
 }
