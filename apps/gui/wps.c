@@ -119,6 +119,23 @@ char* wps_default_skin(enum screen_type screen)
     return skin_buf[screen];
 }
 
+void pause_action(bool may_fade, bool updatewps)
+{
+    int32_t newpos;
+    if (may_fade && global_settings.fade_on_stop)
+        fade(false, updatewps);
+    else
+        audio_pause();
+}
+
+void unpause_action(bool may_fade, bool updatewps)
+{
+    if (may_fade && global_settings.fade_on_stop)
+        fade(true, updatewps);
+    else
+        audio_resume();
+}        
+
 void fade(bool fade_in, bool updatewps)
 {
     int fp_global_vol = global_settings.volume << 8;
@@ -667,18 +684,12 @@ void wps_do_playpause(bool updatewps)
     if ( state->paused )
     {
         state->paused = false;
-        if ( global_settings.fade_on_stop )
-            fade(true, updatewps);
-        else
-            audio_resume();
+        unpause_action(true, updatewps);
     }
     else
     {
         state->paused = true;
-        if ( global_settings.fade_on_stop )
-            fade(false, updatewps);
-        else
-            audio_pause();
+        pause_action(true, updatewps);
         settings_save();
 #if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
         call_storage_idle_notifys(true);   /* make sure resume info is saved */

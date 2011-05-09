@@ -30,6 +30,10 @@ void wps_data_load(enum screen_type, const char *, bool);
 
 void gui_sync_wps_init(void) INIT_ATTR;
 
+/* fade (if enabled) and pause the audio, optionally rewind a little */
+void pause_action(bool may_fade, bool updatewps);
+void unpause_action(bool may_fade, bool updatewps);
+
 /* fades the volume, e.g. on pause or stop */
 void fade(bool fade_in, bool updatewps);
 
