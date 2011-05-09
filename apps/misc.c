@@ -510,6 +510,9 @@ static void unplug_change(bool inserted)
 
                 if (global_settings.unplug_rw)
                 {
+#if (CONFIG_CODEC == SWCODEC)
+                    audio_pre_ff_rewind();
+#endif
                     if (audio_current_track()->elapsed >
                             (unsigned long)(global_settings.unplug_rw*1000))
                         audio_ff_rewind(audio_current_track()->elapsed -
