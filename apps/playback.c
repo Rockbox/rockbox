@@ -132,7 +132,7 @@ static struct audio_scratch_memory
 } * audio_scratch_memory = NULL;
 
 /* These are used to store the current, next and optionally the peek-ahead
- * mp3entry's - this guarentees that the pointer returned by audio_current/
+ * mp3entry's - this guarantees that the pointer returned by audio_current/
  * next_track will be valid for the full duration of the currently playing
  * track */
 enum audio_id3_types
@@ -153,7 +153,7 @@ enum audio_id3_types
 static struct mp3entry static_id3_entries[ID3_TYPE_NUM_STATIC]; /* (A,O) */
 
 /* Peeking functions can yield and mess us up */
-static struct mutex id3_mutex SHAREDBSS_ATTR; /* (A,0)*/
+static struct mutex id3_mutex SHAREDBSS_ATTR; /* (A,O)*/
 
 
 /** For Scrobbler support **/
@@ -199,7 +199,7 @@ struct track_info
 {
     /* In per-track allocated order: */
     int id3_hid;                /* Metadata handle ID */
-    int cuesheet_hid;           /* Parsed cueesheet handle ID */
+    int cuesheet_hid;           /* Parsed cuesheet handle ID */
 #ifdef HAVE_ALBUMART
     int aa_hid[MAX_MULTIPLE_AA];/* Album art handle IDs */
 #endif
@@ -315,7 +315,7 @@ static struct
 } track_change = { 0, 0 };
 
 /** Codec status **/
-/* Did the codec notify us it finished while we were paused or while still 
+/* Did the codec notify us it finished while we were paused or while still
    in an automatic transition?
 
    If paused, it is necessary to defer a codec-initiated skip until resuming
@@ -780,7 +780,7 @@ static void audio_reset_buffer(void)
 
 #if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
     /* Make sure everything adds up - yes, some info is a bit redundant but
-       aids viewing and the sumation of certain variables should add up to
+       aids viewing and the summation of certain variables should add up to
        the location of others. */
     {
         size_t pcmbufsize;
@@ -839,7 +839,7 @@ static void audio_update_filebuf_watermark(int seconds)
 #endif
 
     /* Watermark is a function of the bitrate of the last track in the buffer */
-    struct mp3entry *id3 = NULL;   
+    struct mp3entry *id3 = NULL;
     struct track_info *info = track_list_last(0);
 
     if (info)
@@ -854,7 +854,7 @@ static void audio_update_filebuf_watermark(int seconds)
         else
         {
             /* Bitrate has no meaning to buffering margin for atomic audio -
-               rebuffer when it's the only track left unless it's the only 
+               rebuffer when it's the only track left unless it's the only
                track that fits, in which case we should avoid constant buffer
                low events */
             if (track_list_count() > 1)
@@ -1475,7 +1475,7 @@ static bool audio_load_albumart(struct track_info *info,
 #ifdef HAVE_CODEC_BUFFERING
 /* Load a codec for the file onto the buffer - assumes we're working from the
    currently loading track - not called for the current track */
-static bool audio_buffer_codec(struct track_info *track_info,                             
+static bool audio_buffer_codec(struct track_info *track_info,
                                struct mp3entry *track_id3)
 {
     /* This will not be the current track -> it cannot be the first and the
@@ -1899,7 +1899,7 @@ static void audio_on_buffering(int event)
 
     if (track_list_empty())
         return;
-    
+
     switch (event)
     {
     case BUFFER_EVENT_BUFFER_LOW:
@@ -2243,7 +2243,7 @@ static void audio_on_codec_complete(int status)
 
             if (trackstat == LOAD_TRACK_ERR_NO_MORE)
             {
-                /* Failed to find anything afterall - do playlist switchover
+                /* Failed to find anything after all - do playlist switchover
                    instead */
                 skip_pending = TRACK_SKIP_AUTO_NEW_PLAYLIST;
                 end_of_playlist = playlist_next(1) < 0;
@@ -2683,7 +2683,7 @@ static void audio_on_ff_rewind(long time)
                 !audio_init_codec(cur_info, ci_id3))
             {
                 /* We should have still been able to get it - skip it and move
-                   onto the next one - like it or not this track is borken */
+                   onto the next one - like it or not this track is broken */
                 break;
             }
 
@@ -2753,7 +2753,7 @@ static void audio_on_audio_flush(void)
         id3_write_locked(UNBUFFERED_ID3, NULL);
         audio_update_and_announce_next_track(NULL);
 
-        /* Ignore return since it's about the next track, not this one */        
+        /* Ignore return since it's about the next track, not this one */
         audio_fill_file_buffer();
 
         if (skip_pending == TRACK_SKIP_NONE)
@@ -2961,7 +2961,7 @@ static void audio_thread(void)
         case Q_AUDIO_HANDLE_FINISHED:
             /* some other type is buffered */
             LOGFQUEUE("audio < Q_AUDIO_HANDLE_FINISHED");
-            audio_on_handle_finished(ev.data); 
+            audio_on_handle_finished(ev.data);
             break;
 
         /** Miscellaneous messages **/
@@ -3429,10 +3429,10 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
         /* Ok to use everything from audiobuf to audiobufend - voice is loaded,
            the talk buffer is not needed because voice isn't being used, or
            could be AUDIOBUF_STATE_TRASHED already. If state is
-           AUDIOBUF_STATE_VOICED_ONLY, no problem as long as memory isn't written
-           without the caller knowing what's going on. Changing certain settings
-           may move it to a worse condition but the memory in use by something
-           else will remain undisturbed.
+           AUDIOBUF_STATE_VOICED_ONLY, no problem as long as memory isn't
+           written without the caller knowing what's going on. Changing certain
+           settings may move it to a worse condition but the memory in use by
+           something else will remain undisturbed.
          */
         if (buffer_state != AUDIOBUF_STATE_TRASHED)
         {
@@ -3597,7 +3597,7 @@ void audio_remove_encoder(void)
 }
 #endif /* HAVE_RECORDING */
 
-/* Is an automatic skip in progress? If called outside transistion callbacks,
+/* Is an automatic skip in progress? If called outside transition callbacks,
    indicates the last skip type at the time it was processed and isn't very
    meaningful. */
 bool audio_automatic_skip(void)
@@ -3612,7 +3612,7 @@ int audio_get_file_pos(void)
     return 0;
 }
 
-/* Return the elasped time of the track previous to the current */
+/* Return the elapsed time of the track previous to the current */
 unsigned long audio_prev_elapsed(void)
 {
     return prev_track_elapsed;
@@ -3715,7 +3715,7 @@ void audio_init(void)
     pcm_init();
 
     codec_init_codec_api();
-    
+
     make_codec_thread();
 
     /* This thread does buffer, so match its priority */
@@ -3732,7 +3732,7 @@ void audio_init(void)
     voice_thread_init();
 #endif
 
-    /* audio_reset_buffer must to know the size of voice buffer so init
+    /* audio_reset_buffer must know the size of voice buffer so init
        talk first */
     talk_init();
 

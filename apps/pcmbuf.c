@@ -206,7 +206,7 @@ static void commit_chunk(bool flush_next_time)
 {
     if (!pcmbuffer_fillpos)
         return;
-    
+
     /* Never use the last buffer descriptor */
     while (write_chunk == write_end_chunk) {
         /* If this happens, something is being stupid */
@@ -217,9 +217,9 @@ static void commit_chunk(bool flush_next_time)
         /* Let approximately one chunk of data playback */
         sleep(HZ * PCMBUF_TARGET_CHUNK / BYTERATE);
     }
-    
+
     /* commit the chunk */
-    
+
     register size_t size = pcmbuffer_fillpos;
     /* Grab the next description to write, and change the write pointer */
     register struct chunkdesc *pcmbuf_current = write_chunk;
@@ -229,7 +229,7 @@ static void commit_chunk(bool flush_next_time)
     pcmbuf_current->size = size;
     pcmbuf_current->end_of_track = false;
     pcmbuf_current->link = NULL;
-    
+
     if (read_chunk != NULL)
     {
         if (flush_pcmbuf)
@@ -263,7 +263,7 @@ static void commit_chunk(bool flush_next_time)
      * and the next chunk to be committed will be the next to be played.
      * This is used to empty the PCM buffer for a track change. */
     flush_pcmbuf = flush_next_time;
-    
+
     /* This is now the last buffer to read */
     read_end_chunk = pcmbuf_current;
 
@@ -423,7 +423,7 @@ void pcmbuf_write_complete(int count)
     if (crossfade_active)
         write_to_crossfade(length);
     else
-#endif    
+#endif
     {
         pcmbuffer_fillpos += length;
         COMMIT_IF_NEEDED;
@@ -553,7 +553,7 @@ bool pcmbuf_start_track_change(bool auto_skip)
         }
     }
 #endif
-    
+
     if (!auto_skip || crossfade)
     /* manual skip or crossfade */
     {
@@ -640,7 +640,7 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
         /* if during a track transition, update the elapsed time in ms */
         if (track_transition)
             audio_pcmbuf_position_callback(last_chunksize * 1000 / BYTERATE);
-        
+
         /* if last chunk in the track, stop updates and notify audio thread */
         if (pcmbuf_current->end_of_track)
         {
@@ -662,7 +662,7 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
             crossfade_chunk = read_chunk;
 #endif
     }
-    
+
     {
         /* Commit last samples at end of playlist */
         if (pcmbuffer_fillpos && !read_chunk)
@@ -904,7 +904,7 @@ static void crossfade_start(void)
             crossfade_mix_fade(factor, block_rem, NULL,
                 &fade_out_sample, &fade_out_chunk);
         }
-        
+
         /* zero out the rest of the buffer */
         crossfade_mix_fade(0, crossfade_rem, NULL,
             &fade_out_sample, &fade_out_chunk);
@@ -997,7 +997,7 @@ static void pcmbuf_finish_crossfade_enable(void)
 {
     /* Copy the pending setting over now */
     crossfade_enabled = crossfade_enable_request;
-    
+
     pcmbuf_watermark = (crossfade_enabled && pcmbuf_size) ?
         /* If crossfading, try to keep the buffer full other than 1 second */
         (pcmbuf_size - BYTERATE) :
@@ -1021,11 +1021,11 @@ bool pcmbuf_is_same_size(void)
     /* if pcmbuffer is NULL, then not set up yet even once so always */
     bool same_size = pcmbuffer ?
         (get_next_required_pcmbuf_size() == pcmbuf_size) : true;
-    
+
     /* no buffer change needed, so finish crossfade setup now */
     if (same_size)
         pcmbuf_finish_crossfade_enable();
-    
+
     return same_size;
 }
 #endif /* HAVE_CROSSFADE */
@@ -1232,7 +1232,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
         if (!bufstart || !pcm_is_playing())
             return;
 
-        /* Give 5ms clearance. */    
+        /* Give 5ms clearance. */
         bufstart += BYTERATE / 200;
 
 #ifdef HAVE_PCM_DMA_ADDRESS
