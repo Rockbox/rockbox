@@ -407,7 +407,7 @@ void codec_init_codec_api(void)
 {
     ci.dsp                 = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
                                                                 CODEC_IDX_AUDIO);
-    ci.codec_get_buffer    = codeclib_get_buffer;
+    ci.codec_get_buffer    = codec_get_buffer_callback;
     ci.pcmbuf_insert       = codec_pcmbuf_insert_callback;
     ci.set_elapsed         = audio_codec_update_elapsed;
     ci.read_filebuf        = codec_filebuf_callback;

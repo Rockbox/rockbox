@@ -174,7 +174,7 @@ void codec_get_full_path(char *path, const char *codec_root_fn)
 }
 
 /* Returns pointer to and size of free codec RAM. Aligns to CACHEALIGN_SIZE. */
-void *codeclib_get_buffer(size_t *size)
+void *codec_get_buffer_callback(size_t *size)
 {
     void *buf = &codecbuf[codec_size];
     *size = CODEC_SIZE - codec_size;

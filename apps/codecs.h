@@ -275,7 +275,7 @@ extern unsigned char plugin_end_addr[];
 void codec_get_full_path(char *path, const char *codec_root_fn);
 
 /* Returns pointer to and size of free codec RAM */
-void *codeclib_get_buffer(size_t *size);
+void *codec_get_buffer_callback(size_t *size);
 
 /* defined by the codec loader (codec.c) */
 int codec_load_buf(int hid, struct codec_api *api);
