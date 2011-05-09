@@ -95,7 +95,6 @@ ssize_t bufcuttail(int handle_id, size_t size);
  * buf_is_handle: is the handle valid?
  * buf_pin_handle: Disallow/allow handle movement. Handle may still be removed.
  * buf_handle_offset: Get the offset of the first buffered byte from the file
- * buf_request_buffer_handle: Request buffering of a handle
  * buf_set_base_handle: Tell the buffering thread which handle is currently read
  * buf_length: Total size of ringbuffer
  * buf_used: Total amount of buffer space used (including allocated space)
@@ -106,7 +105,6 @@ enum data_type buf_handle_data_type(int handle_id);
 ssize_t buf_handle_remaining(int handle_id);
 bool buf_is_handle(int handle_id);
 ssize_t buf_handle_offset(int handle_id);
-void buf_request_buffer_handle(int handle_id);
 void buf_set_base_handle(int handle_id);
 size_t buf_length(void);
 size_t buf_used(void);

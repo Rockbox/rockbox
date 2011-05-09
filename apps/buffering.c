@@ -1339,7 +1339,8 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
 
     if (h->filerem > 0 && avail < realsize) {
         /* Data isn't ready. Request buffering */
-        buf_request_buffer_handle(handle_id);
+        LOGFQUEUE("buffering >| Q_START_FILL %d",handle_id);
+        queue_send(&buffering_queue, Q_START_FILL, handle_id);
         /* Wait for the data to be ready */
         do
         {
@@ -1486,7 +1487,6 @@ SECONDARY EXPORTED FUNCTIONS
 ============================
 
 buf_handle_offset
-buf_request_buffer_handle
 buf_set_base_handle
 buf_handle_data_type
 buf_is_handle
@@ -1508,12 +1508,6 @@ ssize_t buf_handle_offset(int handle_id)
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
     return h->offset;
-}
-
-void buf_request_buffer_handle(int handle_id)
-{
-    LOGFQUEUE("buffering >| Q_START_FILL %d",handle_id);
-    queue_send(&buffering_queue, Q_START_FILL, handle_id);
 }
 
 void buf_set_base_handle(int handle_id)
@@ -1642,7 +1636,15 @@ static void NORETURN_ATTR buffering_thread(void)
                 LOGFQUEUE("buffering < Q_START_FILL %d", (int)ev.data);
                 shrink_buffer();
                 queue_reply(&buffering_queue, 1);
-                filling |= buffer_handle((int)ev.data, 0);
+                if (buffer_handle((int)ev.data, 0)) {
+                    filling = true;
+                }
+                else if (num_handles > 0 && conf_watermark > 0) {
+                    update_data_counters(NULL);
+                    if (data_counters.useful >= BUF_WATERMARK) {
+                        send_event(BUFFER_EVENT_BUFFER_LOW, NULL);
+                    }
+                }
                 break;
 
             case Q_BUFFER_HANDLE:
@@ -1699,12 +1701,7 @@ static void NORETURN_ATTR buffering_thread(void)
 #endif
 
         if (filling) {
-            if (data_counters.remaining > 0 && BUF_USED < buffer_len) {
-                filling = fill_buffer();
-            }
-            else if (data_counters.remaining == 0) {
-                filling = false;
-            }
+            filling = data_counters.remaining > 0 ? fill_buffer() : false;
         } else if (ev.id == SYS_TIMEOUT) {
             if (data_counters.useful < BUF_WATERMARK) {
                 /* The buffer is low and we're idle, just watching the levels

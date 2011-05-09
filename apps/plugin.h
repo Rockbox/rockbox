@@ -145,12 +145,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 204
+#define PLUGIN_API_VERSION 205
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 204
+#define PLUGIN_MIN_API_VERSION 205
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -873,7 +873,6 @@ struct plugin_api {
     ssize_t (*bufcuttail)(int handle_id, size_t size);
 
     ssize_t (*buf_handle_offset)(int handle_id);
-    void (*buf_request_buffer_handle)(int handle_id);
     void (*buf_set_base_handle)(int handle_id);
     size_t (*buf_used)(void);
 #endif

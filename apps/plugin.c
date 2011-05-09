@@ -747,7 +747,6 @@ static const struct plugin_api rockbox_api = {
     bufcuttail,
 
     buf_handle_offset,
-    buf_request_buffer_handle,
     buf_set_base_handle,
     buf_used,
 #endif
