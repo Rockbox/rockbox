@@ -177,11 +177,13 @@ void codec_get_full_path(char *path, const char *codec_root_fn)
 void *codec_get_buffer_callback(size_t *size)
 {
     void *buf = &codecbuf[codec_size];
-    *size = CODEC_SIZE - codec_size;
-    ALIGN_BUFFER(buf, *size, CACHEALIGN_SIZE);
+    ssize_t s = CODEC_SIZE - codec_size;
 
-    if (*size <= 0)
+    if (s <= 0)
         return NULL;
+
+    *size = s;
+    ALIGN_BUFFER(buf, *size, CACHEALIGN_SIZE);
 
     return buf;
 }
