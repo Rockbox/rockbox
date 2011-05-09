@@ -121,7 +121,6 @@ char* wps_default_skin(enum screen_type screen)
 
 void pause_action(bool may_fade, bool updatewps)
 {
-    int32_t newpos;
     if (may_fade && global_settings.fade_on_stop)
         fade(false, updatewps);
     else
