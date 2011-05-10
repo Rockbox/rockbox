@@ -461,16 +461,18 @@ static int add_format(const char *buf)
         
         while (1)
         {
+            struct tagcache_search_clause *newclause;
+            
             if (clause_count >= TAGCACHE_MAX_CLAUSES)
             {
                 logf("too many clauses");
                 break;
             }
             
-            formats[format_count]->clause[clause_count] = 
-                buffer_alloc(sizeof(struct tagcache_search_clause));
+            newclause = buffer_alloc(sizeof(struct tagcache_search_clause));
             
-            if (!read_clause(formats[format_count]->clause[clause_count]))
+            formats[format_count]->clause[clause_count] = newclause;
+            if (!read_clause(newclause))
                 break;
             
             clause_count++;
@@ -486,6 +488,7 @@ static int add_format(const char *buf)
 
 static int get_condition(struct search_instruction *inst)
 {
+    struct tagcache_search_clause *new_clause;
     int clause_count;
     char buf[128];
         
@@ -530,10 +533,15 @@ static int get_condition(struct search_instruction *inst)
         return false;
     }
     
-    inst->clause[inst->tagorder_count][clause_count] = 
-        buffer_alloc(sizeof(struct tagcache_search_clause));
+    new_clause = buffer_alloc(sizeof(struct tagcache_search_clause));
+    inst->clause[inst->tagorder_count][clause_count] = new_clause;
     
-    if (!read_clause(inst->clause[inst->tagorder_count][clause_count]))
+    if (*strp == '|')
+    {
+        strp++;
+        new_clause->type = clause_logical_or;
+    }
+    else if (!read_clause(new_clause))
         return -1;
     
     inst->clause_count[inst->tagorder_count]++;
@@ -1502,6 +1510,10 @@ int tagtree_enter(struct tree_context* c)
                     for (j = 0; j < csi->clause_count[i]; j++)
                     {
                         char* searchstring;
+
+                        if (csi->clause[i][j]->type == clause_logical_or)
+                            continue;
+
                         source = csi->clause[i][j]->source;
                         
                         if (source == source_constant)

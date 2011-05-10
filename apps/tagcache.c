@@ -984,74 +984,86 @@ static bool check_against_clause(long numeric, const char *str,
 
 static bool check_clauses(struct tagcache_search *tcs,
                           struct index_entry *idx,
-                          struct tagcache_search_clause **clause, int count)
+                          struct tagcache_search_clause **clauses, int count)
 {
     int i;
     
-#ifdef HAVE_TC_RAMCACHE
-    if (tcs->ramsearch)
+    /* Go through all conditional clauses. */
+    for (i = 0; i < count; i++)
     {
-        /* Go through all conditional clauses. */
-        for (i = 0; i < count; i++)
+        int seek;
+        char buf[256];
+        char *str;
+        struct tagcache_search_clause *clause = clauses[i];
+        
+        if (clause->type == clause_logical_or)
+            break; /* all conditions before logical-or satisfied --
+                      stop processing clauses */
+
+#ifdef HAVE_TC_RAMCACHE
+        str = NULL;
+
+        if (tcs->ramsearch)
         {
             struct tagfile_entry *tfe;
-            int seek;
-            char buf[256];
-            char *str = NULL;
             
-            seek = check_virtual_tags(clause[i]->tag, tcs->idx_id, idx);
+            seek = check_virtual_tags(clause->tag, tcs->idx_id, idx);
             
-            if (!TAGCACHE_IS_NUMERIC(clause[i]->tag))
+            if (!TAGCACHE_IS_NUMERIC(clause->tag))
             {
-                if (clause[i]->tag == tag_filename)
+                if (clause->tag == tag_filename)
                 {
                     retrieve(tcs, idx, tag_filename, buf, sizeof buf);
                     str = buf;
                 }
                 else
                 {
-                    tfe = (struct tagfile_entry *)&hdr->tags[clause[i]->tag][seek];
+                    tfe = (struct tagfile_entry *)&hdr->tags[clause->tag][seek];
                     str = tfe->tag_data;
                 }
             }
-        
-            if (!check_against_clause(seek, str, clause[i]))
-                return false;
         }
-    }
-    else
+        else
 #endif
-    {
-        /* Check for conditions. */
-        for (i = 0; i < count; i++)
         {
             struct tagfile_entry tfe;
-            int seek;
-            char str[256];
+            str = buf;
             
-            seek = check_virtual_tags(clause[i]->tag, tcs->idx_id, idx);
+            seek = check_virtual_tags(clause->tag, tcs->idx_id, idx);
                 
-            memset(str, 0, sizeof str);
-            if (!TAGCACHE_IS_NUMERIC(clause[i]->tag))
+            memset(buf, 0, sizeof buf);
+            if (!TAGCACHE_IS_NUMERIC(clause->tag))
             {
-                int fd = tcs->idxfd[clause[i]->tag];
+                int fd = tcs->idxfd[clause->tag];
                 lseek(fd, seek, SEEK_SET);
                 ecread_tagfile_entry(fd, &tfe);
-                if (tfe.tag_length >= (int)sizeof(str))
+                if (tfe.tag_length >= (int)sizeof(buf))
                 {
                     logf("Too long tag read!");
-                    break ;
+                    return false;
                 }
 
                 read(fd, str, tfe.tag_length);
                 
                 /* Check if entry has been deleted. */
                 if (str[0] == '\0')
+                    return false;
+            }
+        }
+
+        if (!check_against_clause(seek, str, clause))
+        {
+            /* Clause failed -- try finding a logical-or clause */
+            while (++i < count)
+            {
+                if (clauses[i]->type == clause_logical_or)
                     break;
             }
             
-            if (!check_against_clause(seek, str, clause[i]))
-                return false;
+            if (i < count)        /* Found logical-or? */
+                continue;         /* Check clauses after logical-or */
+
+            return false;
         }
     }
     
@@ -1369,21 +1381,24 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
         return false;
     }
 
-    /* Check if there is already a similar filter in present (filters are
-     * much faster than clauses). 
-     */
-    for (i = 0; i < tcs->filter_count; i++)
+    if (clause->type != clause_logical_or)
     {
-        if (tcs->filter_tag[i] == clause->tag)
-            return true;
-    }
-    
-    if (!TAGCACHE_IS_NUMERIC(clause->tag) && tcs->idxfd[clause->tag] < 0)
-    {
-        char buf[MAX_PATH];
-
-        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, clause->tag);        
-        tcs->idxfd[clause->tag] = open(buf, O_RDONLY);
+        /* Check if there is already a similar filter in present (filters are
+         * much faster than clauses). 
+         */
+        for (i = 0; i < tcs->filter_count; i++)
+        {
+            if (tcs->filter_tag[i] == clause->tag)
+                return true;
+        }
+        
+        if (!TAGCACHE_IS_NUMERIC(clause->tag) && tcs->idxfd[clause->tag] < 0)
+        {
+            char buf[MAX_PATH];
+            
+            snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, clause->tag);        
+            tcs->idxfd[clause->tag] = open(buf, O_RDONLY);
+        }
     }
     
     tcs->clause[tcs->clause_count] = clause;
