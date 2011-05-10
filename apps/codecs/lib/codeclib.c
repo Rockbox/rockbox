@@ -29,9 +29,9 @@
 
 /* The following variables are used by codec_malloc() to make use of free RAM
  * within the statically allocated codec buffer. */
-static size_t mem_ptr;
-static size_t bufsize;
-static unsigned char* mallocbuf;
+static size_t mem_ptr = 0;
+static size_t bufsize = 0;
+static unsigned char* mallocbuf = NULL;
 
 int codec_init(void)
 {
