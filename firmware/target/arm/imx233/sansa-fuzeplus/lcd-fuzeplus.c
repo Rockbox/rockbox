@@ -268,7 +268,63 @@ static void lcd_init_seq_7783(void)
 
 static void lcd_init_seq_9325(void)
 {
-    
+    lcd_write_reg(0xe5, 0x78f0);
+    lcd_write_reg(0xe3, 0x3008);
+    lcd_write_reg(0xe7, 0x12);
+    lcd_write_reg(0xef, 0x1231);
+    lcd_write_reg(0, 1);
+    lcd_write_reg(1, 0x100);
+    lcd_write_reg(2, 0x700);
+    lcd_write_reg(3, 0x1030);
+    lcd_write_reg(4, 0);
+    lcd_write_reg(8, 0x207);
+    lcd_write_reg(9, 0);
+    lcd_write_reg(0xa, 0);
+    lcd_write_reg(0xc, 0);
+    lcd_write_reg(0xd, 0);
+    lcd_write_reg(0xf, 0);
+    lcd_write_reg(0x10, 0);
+    lcd_write_reg(0x11, 7);
+    lcd_write_reg(0x12, 0);
+    lcd_write_reg(0x13, 0);
+    mdelay(20);
+    lcd_write_reg(0x10, 0x1290);
+    lcd_write_reg(0x11, 7);
+    mdelay(50);
+    lcd_write_reg(0x12, 0x19);
+    mdelay(50);
+    lcd_write_reg(0x13, 0x1700);
+    lcd_write_reg(0x29, 0x14);
+    mdelay(50);
+    lcd_write_reg(0x20, 0);
+    lcd_write_reg(0x21, 0);
+    lcd_write_reg(0x30, 0x504);
+    lcd_write_reg(0x31, 7);
+    lcd_write_reg(0x32, 6);
+    lcd_write_reg(0x35, 0x106);
+    lcd_write_reg(0x36, 0x202);
+    lcd_write_reg(0x37, 0x504);
+    lcd_write_reg(0x38, 0x500);
+    lcd_write_reg(0x39, 0x706);
+    lcd_write_reg(0x3c, 0x204);
+    lcd_write_reg(0x3d, 0x202);
+    lcd_write_reg(0x50, 0);
+    lcd_write_reg(0x51, 0xef);
+    lcd_write_reg(0x52, 0);
+    lcd_write_reg(0x53, 0x13f);
+    lcd_write_reg(0x60, 0xa700);
+    lcd_write_reg(0x61, 1);
+    lcd_write_reg(0x6a, 1);
+    lcd_write_reg(0x2b, 0xd);
+    mdelay(50);
+    lcd_write_reg(0x90, 0x11);
+    lcd_write_reg(0x92, 0x600);
+    lcd_write_reg(0x93, 3);
+    lcd_write_reg(0x95, 0x110);
+    lcd_write_reg(0x97, 0);
+    lcd_write_reg(0x98, 0);
+    lcd_write_reg(7, 0x173);
+    lcd_write_reg(0x22, 0);
 }
 
 void lcd_init_device(void)
@@ -333,7 +389,39 @@ static void lcd_enable_7783(bool enable)
 
 static void lcd_enable_9325(bool enable)
 {
-    (void) enable;
+    if(!enable)
+    {
+        lcd_write_reg(7, 0x131);
+        mdelay(10);
+        lcd_write_reg(7, 0x130);
+        mdelay(10);
+        lcd_write_reg(7, 0);
+        lcd_write_reg(0x10, 0x80);
+        lcd_write_reg(0x11, 0);
+        lcd_write_reg(0x12, 0);
+        lcd_write_reg(0x13, 0);
+        mdelay(200);
+        lcd_write_reg(0x10, 0x82);
+    }
+    else
+    {
+        lcd_write_reg(0x10, 0x80);
+        lcd_write_reg(0x11, 0);
+        lcd_write_reg(0x12, 0);
+        lcd_write_reg(0x13, 0);
+        lcd_write_reg(7, 1);
+        mdelay(200);
+        lcd_write_reg(0x10, 0x1290);
+        lcd_write_reg(0x11, 7);
+        mdelay(50);
+        lcd_write_reg(0x12, 0x19);
+        mdelay(50);
+        lcd_write_reg(0x13, 0x1700);
+        lcd_write_reg(0x29, 0x10);
+        mdelay(50);
+        lcd_write_reg(7, 0x133);
+        lcd_write_reg(0x22, 0);
+    }
 }
 
 void lcd_enable(bool enable)
