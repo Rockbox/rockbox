@@ -346,6 +346,11 @@ int32_t NEAACDECAPI NeAACDecInit(NeAACDecHandle hDecoder, uint8_t *buffer,
             hDecoder->time_out[i] = s_time_buf_2048[i];
 #else
             hDecoder->time_out[i] = (real_t*)faad_malloc(2*FRAME_LEN*sizeof(real_t));
+            if (hDecoder->time_out[i] == NULL)
+            {
+                /* could not allocate memory */
+                return -1;
+            }
 #endif
             memset(hDecoder->time_out[i], 0, 2*FRAME_LEN);
             hDecoder->sbr_alloced[hDecoder->fr_ch_ele] = 1;
@@ -469,6 +474,11 @@ int8_t NEAACDECAPI NeAACDecInit2(NeAACDecHandle hDecoder, uint8_t *pBuffer,
             hDecoder->time_out[i] = s_time_buf_2048[i];
 #else
             hDecoder->time_out[i] = (real_t*)faad_malloc(2*FRAME_LEN*sizeof(real_t));
+            if (hDecoder->time_out[i] == NULL)
+            {
+                /* could not allocate memory */
+                return -1;
+            }
 #endif
             memset(hDecoder->time_out[i], 0, 2*FRAME_LEN);
             hDecoder->sbr_alloced[hDecoder->fr_ch_ele] = 1;

@@ -56,6 +56,7 @@ char *err_msg[] = {
     "Unexpected fill element with SBR data",
     "Not all elements were provided with SBR data",
     "LTP decoding not available",
-    "Output data buffer too small"
+    "Output data buffer too small",
+    "Could not allocate enough memory"
 };
 

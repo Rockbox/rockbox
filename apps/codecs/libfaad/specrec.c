@@ -808,11 +808,14 @@ uint8_t reconstruct_single_channel(NeAACDecHandle hDecoder, ic_stream *ics,
             hDecoder->sbr[ele] = sbrDecodeInit(hDecoder->frameLength,
                 hDecoder->element_id[ele], ele,
                 2*get_sample_rate(hDecoder->sf_index),
-                hDecoder->downSampledSBR
-#ifdef DRM
-                , 0
+                hDecoder->downSampledSBR, 0);
+#ifndef FAAD_STATIC_ALLOC
+            if (hDecoder->sbr[ele] == NULL)
+            {
+                /* could not allocate memory */
+                return 28;
+            }
 #endif
-                );
         }
 
         if (sce->ics1.window_sequence == EIGHT_SHORT_SEQUENCE)
@@ -1058,11 +1061,14 @@ uint8_t reconstruct_channel_pair(NeAACDecHandle hDecoder, ic_stream *ics1, ic_st
             hDecoder->sbr[ele] = sbrDecodeInit(hDecoder->frameLength,
                 hDecoder->element_id[ele], ele, 
                 2*get_sample_rate(hDecoder->sf_index),
-                hDecoder->downSampledSBR
-#ifdef DRM
-                , 0
+                hDecoder->downSampledSBR, 0);
+#ifndef FAAD_STATIC_ALLOC
+            if (hDecoder->sbr[ele] == NULL)
+            {
+                /* could not allocate memory */
+                return 28;
+            }
 #endif
-                );
         }
 
         if (cpe->ics1.window_sequence == EIGHT_SHORT_SEQUENCE)

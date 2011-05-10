@@ -1031,11 +1031,14 @@ static uint8_t fill_element(NeAACDecHandle hDecoder, bitfile *ld, drc_info *drc
                 hDecoder->sbr[sbr_ele] = sbrDecodeInit(hDecoder->frameLength,
                     hDecoder->element_id[sbr_ele], sbr_ele, 
                     2*get_sample_rate(hDecoder->sf_index),
-                    hDecoder->downSampledSBR
-#ifdef DRM
-                    , 0
+                    hDecoder->downSampledSBR, 0);
+#ifndef FAAD_STATIC_ALLOC
+                if (hDecoder->sbr[sbr_ele] == NULL)
+                {
+                    /* could not allocate memory */
+                    return 28;
+                }
 #endif
-                    );
             }
 
             hDecoder->sbr_present_flag = 1;
@@ -1249,10 +1252,24 @@ void aac_scalable_main_element(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo
         {
             hDecoder->sbr[0] = sbrDecodeInit(hDecoder->frameLength, hDecoder->element_id[0],
                 2*get_sample_rate(hDecoder->sf_index), 0 /* ds SBR */, 1);
+#ifndef FAAD_STATIC_ALLOC
+            if (hDecoder->sbr[0] == NULL)
+            {
+                /* could not allocate memory */
+                hInfo->error = 28;
+                return;
+            }
+#endif
         }
 
         /* Reverse bit reading of SBR data in DRM audio frame */
         revbuffer = (uint8_t*)faad_malloc(buffer_size*sizeof(uint8_t));
+        if (revbuffer == NULL)
+        {
+            /* could not allocate memory */
+            hInfo->error = 28;
+            return;
+        }
         prevbufstart = revbuffer;
         pbufend = &buffer[buffer_size - 1];
         for (i = 0; i < buffer_size; i++)

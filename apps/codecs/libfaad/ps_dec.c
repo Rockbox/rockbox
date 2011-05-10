@@ -159,10 +159,8 @@ typedef struct
 
 
 /* static variables */
-#ifdef FAAD_STATIC_ALLOC
 static hyb_info s_hyb_info;
 static ps_info s_ps_info;
-#endif
 
 /* static function declarations */
 static void ps_data_decode(ps_info *ps);
@@ -204,11 +202,7 @@ static void ps_mix_phase(ps_info *ps,
 
 static hyb_info *hybrid_init()
 {
-#ifdef FAAD_STATIC_ALLOC
     hyb_info *hyb = &s_hyb_info;
-#else
-    hyb_info *hyb = (hyb_info*)faad_malloc(sizeof(hyb_info));
-#endif
 
     hyb->resolution34[0] = 12;
     hyb->resolution34[1] = 8;
@@ -1826,11 +1820,7 @@ ps_info *ps_init(uint8_t sr_index)
     uint8_t i;
     uint8_t short_delay_band;
 
-#ifdef FAAD_STATIC_ALLOC
     ps_info *ps = &s_ps_info;
-#else
-    ps_info *ps = (ps_info*)faad_malloc(sizeof(ps_info));
-#endif
     memset(ps, 0, sizeof(ps_info));
 
     (void)sr_index;
