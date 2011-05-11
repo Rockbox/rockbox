@@ -176,7 +176,7 @@ typedef struct
     uint8_t tHFAdj;
 
 #ifdef PS_DEC
-    ps_info *ps;
+    ps_info ps;
 #endif
 #if (defined(PS_DEC) || defined(DRM_PS))
     uint8_t ps_used;

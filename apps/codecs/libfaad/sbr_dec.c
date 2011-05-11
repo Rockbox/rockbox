@@ -95,6 +95,9 @@ sbr_info *sbrDecodeInit(uint16_t framelength, uint8_t id_aac, uint8_t id_ele,
 #endif
     memset(sbr, 0, sizeof(sbr_info));
     
+    /* initialize PS variables */
+    ps_init(&sbr->ps);
+    
     /* Allocate XLR temporary variable. Use static allocation if either 
      * FAAD_STATIC_ALLOC is set or XLR fits to IRAM. */
 #if defined(FAAD_STATIC_ALLOC) || defined(FAAD_HAVE_XLR_IN_IRAM)
@@ -556,7 +559,7 @@ uint8_t sbrDecodeSingleFramePS(sbr_info *sbr, real_t *left_channel, real_t *righ
     } else {
 #endif
 #ifdef PS_DEC
-        ps_decode(sbr->ps, p_XLR->X_L, p_XLR->X_R);
+        ps_decode(&sbr->ps, p_XLR->X_L, p_XLR->X_R);
 #endif
 #ifdef DRM_PS
     }

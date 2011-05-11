@@ -826,11 +826,7 @@ static uint16_t sbr_extension(bitfile *ld, sbr_info *sbr,
     {
 #ifdef PS_DEC
     case EXTENSION_ID_PS:
-        if (!sbr->ps)
-        {
-            sbr->ps = ps_init(get_sr_index(sbr->sample_rate));
-        }
-        ret = ps_data(sbr->ps, ld, &header);
+        ret = ps_data(&sbr->ps, ld, &header);
 
         /* enable PS if and only if: a header has been decoded */
         if (sbr->ps_used == 0 && header == 1)

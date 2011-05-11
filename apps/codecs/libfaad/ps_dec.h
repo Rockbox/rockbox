@@ -43,6 +43,17 @@ extern "C" {
 
 typedef struct
 {
+    uint8_t frame_len;
+    uint8_t resolution20[3];
+    uint8_t resolution34[5];
+
+    qmf_t work[32+12];
+    qmf_t buffer[5][32];
+    qmf_t temp[32][12];
+} hyb_info;
+
+typedef struct
+{
     /* bitstream parameters */
     uint8_t enable_iid;
     uint8_t enable_icc;
@@ -89,7 +100,7 @@ typedef struct
     uint8_t header_read;
 
     /* hybrid filterbank parameters */
-    void *hyb;
+    hyb_info hyb;
     uint8_t use34hybrid_bands;
 
     /**/
@@ -137,7 +148,7 @@ typedef struct
 uint16_t ps_data(ps_info *ps, bitfile *ld, uint8_t *header);
 
 /* ps_dec.c */
-ps_info *ps_init(uint8_t sr_index);
+void ps_init(ps_info *ps);
 
 uint8_t ps_decode(ps_info *ps, 
                   qmf_t X_left[MAX_NTSRPS][64], 
