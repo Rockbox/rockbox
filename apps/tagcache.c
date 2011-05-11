@@ -2311,7 +2311,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
              * If tag_filename matches, no further checking necessary.
              * 
              * For string hashes: tag_artist, tag_album, tag_title
-             * - Two of these must match
+             * - All three of these must match
              */
             for (j = 0; j < count; j++)
             {
@@ -2335,7 +2335,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
                     tmpdb_match(tag_album);
                     tmpdb_match(tag_title);
                     
-                    if (match_count < 2)
+                    if (match_count < 3)
                     {
                         /* Still no match found, give up. */
                         continue;
