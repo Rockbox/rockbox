@@ -35,6 +35,8 @@
 #include "disk.h"
 #include "panic.h"
 #include "power.h"
+#include "pinctrl-imx233.h"
+#include "system-target.h"
 
 int show_logo(void);
 
@@ -57,6 +59,10 @@ void main(void)
     backlight_init();
 
     button_init_device();
+
+    button_debug_screen();
+    
+    power_off();
 
     ret = storage_init();
     if(ret < 0)

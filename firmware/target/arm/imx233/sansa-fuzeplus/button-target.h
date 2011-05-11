@@ -26,6 +26,7 @@
 
 void button_init_device(void);
 int button_read_device(void);
+void button_debug_screen(void);
 
 /* Main unit's buttons */
 #define BUTTON_POWER        0x00000001
