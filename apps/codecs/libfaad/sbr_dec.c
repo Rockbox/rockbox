@@ -95,8 +95,10 @@ sbr_info *sbrDecodeInit(uint16_t framelength, uint8_t id_aac, uint8_t id_ele,
 #endif
     memset(sbr, 0, sizeof(sbr_info));
     
+#ifdef PS_DEC
     /* initialize PS variables */
     ps_init(&sbr->ps);
+#endif
     
     /* Allocate XLR temporary variable. Use static allocation if either 
      * FAAD_STATIC_ALLOC is set or XLR fits to IRAM. */
