@@ -56,29 +56,32 @@ extern struct codec_api* ci;
 #define IBSS_ATTR_FAAD_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_FAAD_LARGE_IRAM
 #define ICONST_ATTR_FAAD_LARGE_IRAM ICONST_ATTR
+#define IBSS_ATTR_FAAD_XLR
 
 #elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
 /* Enough IRAM to move additional data and code to it. */
 #define IBSS_ATTR_FAAD_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_FAAD_LARGE_IRAM  ICODE_ATTR
 #define ICONST_ATTR_FAAD_LARGE_IRAM ICONST_ATTR
+#define IBSS_ATTR_FAAD_XLR
 
 #elif defined(CPU_S5L870X)
 /* Very large IRAM. Move even more data to it. */
 #define IBSS_ATTR_FAAD_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_FAAD_LARGE_IRAM  ICODE_ATTR
 #define ICONST_ATTR_FAAD_LARGE_IRAM ICONST_ATTR
-#define FAAD_HAVE_XLR_IN_IRAM
+#define IBSS_ATTR_FAAD_XLR          IBSS_ATTR
 
 #else
 /* Not enough IRAM available. */
 #define IBSS_ATTR_FAAD_LARGE_IRAM
 #define ICODE_ATTR_FAAD_LARGE_IRAM
 #define ICONST_ATTR_FAAD_LARGE_IRAM
+#define IBSS_ATTR_FAAD_XLR
 #endif
 
 /* Used to allocate several SBR + PS arrays and variables statically. */
-#define FAAD_STATIC_ALLOC
+//#define FAAD_STATIC_ALLOC
 
 #define INLINE __inline
 #if 0 //defined(_WIN32) && !defined(_WIN32_WCE)
