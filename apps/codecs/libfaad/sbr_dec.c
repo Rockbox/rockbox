@@ -57,7 +57,7 @@ typedef struct {
 
 /* static variables */
 static XLR_t *p_XLR = NULL;
-#if defined(FAAD_STATIC_ALLOC) || defined(IBSS_ATTR_FAAD_XLR)
+#if defined(FAAD_STATIC_ALLOC) || defined(HAVE_FAAD_XLR_IN_IRAM)
 static XLR_t s_XLR IBSS_ATTR_FAAD_XLR MEM_ALIGN_ATTR;
 #endif
 #if defined(FAAD_STATIC_ALLOC)
@@ -102,7 +102,7 @@ sbr_info *sbrDecodeInit(uint16_t framelength, uint8_t id_aac, uint8_t id_ele,
     
     /* Allocate XLR temporary variable. Use static allocation if either 
      * FAAD_STATIC_ALLOC is set or XLR fits to IRAM. */
-#if defined(FAAD_STATIC_ALLOC) || defined(IBSS_ATTR_FAAD_XLR)
+#if defined(FAAD_STATIC_ALLOC) || defined(HAVE_FAAD_XLR_IN_IRAM)
     p_XLR  = &s_XLR;
 #else
     p_XLR  = (XLR_t*)faad_malloc(sizeof(XLR_t));

@@ -71,6 +71,7 @@ extern struct codec_api* ci;
 #define ICODE_ATTR_FAAD_LARGE_IRAM  ICODE_ATTR
 #define ICONST_ATTR_FAAD_LARGE_IRAM ICONST_ATTR
 #define IBSS_ATTR_FAAD_XLR          IBSS_ATTR
+#define HAVE_FAAD_XLR_IN_IRAM
 
 #else
 /* Not enough IRAM available. */
