@@ -78,7 +78,7 @@ extern struct codec_api* ci;
 #endif
 
 /* Used to allocate several SBR + PS arrays and variables statically. */
-//#define FAAD_STATIC_ALLOC
+#define FAAD_STATIC_ALLOC
 
 #define INLINE __inline
 #if 0 //defined(_WIN32) && !defined(_WIN32_WCE)
@@ -110,10 +110,8 @@ extern struct codec_api* ci;
 
 /* Allow decoding of MAIN profile AAC */
 #define MAIN_DEC
-#if MEMORYSIZE > 2
 /* Allow decoding of SSR profile AAC */
 #define SSR_DEC
-#endif
 /* Allow decoding of LTP profile AAC */
 #define LTP_DEC
 /* Allow decoding of LD profile AAC */
@@ -149,9 +147,9 @@ extern struct codec_api* ci;
   #undef ERROR_RESILIENCE
 #endif
 
-#if MEMORYSIZE > 2
+#if CODEC_SIZE >= 0x80000
 #define SBR_DEC
-//#define SBR_LOW_POWER
+//#define SBR_LOW_POWER /* Does not work yet in rockbox. */
 #define PS_DEC
 #endif
 
