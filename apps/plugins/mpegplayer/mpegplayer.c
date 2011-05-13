@@ -1723,6 +1723,15 @@ static int osd_pause(void)
     osd_backlight_on_video_mode(false);
     /* Leave brightness alone and restore it when OSD is hidden */
 
+    if (stream_can_seek() && rb->global_settings->pause_rewind) {
+        stream_seek(-rb->global_settings->pause_rewind*TS_SECOND,
+                    SEEK_CUR);
+        osd_schedule_refresh(OSD_REFRESH_VIDEO);
+        /* Update time display now */
+        osd_update_time();
+        osd_refresh(OSD_REFRESH_TIME);
+    }
+
     return status;
 }
 
@@ -1922,15 +1931,6 @@ static void osd_handle_phone_plug(bool inserted)
             osd_pause();
 
             osd_set_hp_pause_flag(true);
-
-            if (stream_can_seek() && rb->global_settings->unplug_rw) {
-                stream_seek(-rb->global_settings->unplug_rw*TS_SECOND,
-                            SEEK_CUR);
-                osd_schedule_refresh(OSD_REFRESH_VIDEO);
-                /* Update time display now */
-                osd_update_time();
-                osd_refresh(OSD_REFRESH_TIME);
-            }
         }
     }
 }
