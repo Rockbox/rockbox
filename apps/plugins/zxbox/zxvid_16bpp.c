@@ -54,8 +54,10 @@ void update_screen(void)
     int y=0;
    
 #if LCD_HEIGHT >= ZX_HEIGHT && LCD_WIDTH >= ZX_WIDTH
+    /* 'set but not used'
     byte *scrptr;
     scrptr = (byte *) SPNM(image);
+    */
     frameb = rb->lcd_framebuffer;
     for ( y = 0 ; y < HEIGHT*WIDTH; y++ ){
         frameb[y] = _16bpp_colors[(unsigned)sp_image[y]];
