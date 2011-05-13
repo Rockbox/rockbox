@@ -1138,12 +1138,12 @@ static int parse_touchregion(struct skin_element *element,
         region->action = ACTION_TOUCH_VOLUME;
     else
     {
-        if (*action == '&')
+        if (*action == '*')
         {
             action++;
             region->press_length = LONG_PRESS;
         }
-        else if(*action == '*')
+        else if(*action == '&')
         {
             action++;
             region->press_length = REPEAT;
