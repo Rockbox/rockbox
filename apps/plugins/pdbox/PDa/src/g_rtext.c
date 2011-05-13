@@ -162,7 +162,9 @@ extern int sys_oldtclversion;
 static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
     int *indexp)
 {
+#ifndef ROCKBOX
     float dispx, dispy;
+#endif
     char tempbuf[UPBUFSIZE], *tp = tempbuf, *bp = x->x_buf;
     int outchars, inchars = x->x_bufsize, nlines = 0, ncolumns = 0,
     	pixwide, pixhigh;
@@ -221,8 +223,10 @@ static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
     if (outchars > 1950) outchars = 1950;
     if (!reportedindex)
     	*indexp = outchars;
+#ifndef ROCKBOX
     dispx = text_xpix(x->x_text, x->x_glist);
     dispy = text_ypix(x->x_text, x->x_glist);
+#endif
     if (nlines < 1) nlines = 1;
     if (!widthspec)
     {
