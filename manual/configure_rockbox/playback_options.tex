@@ -238,9 +238,7 @@ you to configure settings related to audio playback.
       %
     \item[Pause and Resume.] Pauses when the headphones are removed, and 
       resumes playback when they are reconnected.
-  \end{description}
-  \item[Duration to Rewind.] Number of seconds (between 0 and 15) to rewind 
-    playback when the headphones are removed.
+    \end{description}
     %
   \item[Disable Auto-Resume If Phones Not Present.] This option will disable 
     the automatic resumption of playback at startup if the headphones are not 
@@ -252,7 +250,7 @@ you to configure settings related to audio playback.
 
 \section{Last.fm Log}\index{Last.fm Log}\index{Audioscrobbler|see{Last.fm Log}}
   Enables logging of your played tracks for submittal to 
-  \url{http://www.last.fm}. This service was formely known as 
+  \url{http://www.last.fm}. This service was formerly known as 
   \emph{Audioscrobbler}. When you enable this option, you'll have to reboot to
   start the logging. The log-file is called 
   \opt{rtc}{\fname{.scrobbler.log},}%
@@ -287,12 +285,18 @@ you to configure settings related to audio playback.
 
 \opt{swcodec}{
   \section{Rewind Before Resume}\index{Rewind Before Resume}
-    When resuming a track or a bookmark, a short rewind can be done before the
+    When restarting a track or a bookmark, a short rewind can be done before the
     playback is started. This can be useful when listening to speech material,
     to help remember what was being said just before playback was stopped.
     The size of the rewind can be set to various values between 0 (off) and
     60 seconds.
-    \note{The rewind is not done when resuming a paused track.}
+    \note{This option does not apply to resuming a paused track.  Use
+      the next option for rewinding on pause.}
     \note{The actual rewind distance may differ a little from the requested
       value, depending on the file in question.}
 }%\opt{swcodec}
+
+\section{Rewind on Pause}\index{Rewind on Pause}
+  This option rewinds the current track by a small amount whenever it is
+  paused (not stopped).  The amount to rewind can be set between 0 and
+  15 seconds.
