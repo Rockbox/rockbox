@@ -290,13 +290,17 @@ static const char *canvas_undo_name;
 void canvas_setundo(t_canvas *x, t_undofn undofn, void *buf,
     const char *name)
 {
+#ifndef ROCKBOX
     int hadone = 0;
+#endif
     	/* blow away the old undo information.  In one special case the
 	old undo info is re-used; if so we shouldn't free it here. */
     if (canvas_undo_fn && canvas_undo_buf && (buf != canvas_undo_buf))
     {
     	(*canvas_undo_fn)(canvas_undo_canvas, canvas_undo_buf, UNDO_FREE);
+#ifndef ROCKBOX
 	hadone = 1;
+#endif
     }
     canvas_undo_canvas = x;
     canvas_undo_fn = undofn;
@@ -809,9 +813,9 @@ static t_gobj *canvas_findhitbox(t_canvas *x, int xpos, int ypos,
     /* right-clicking on a canvas object pops up a menu. */
 static void canvas_rightclick(t_canvas *x, int xpos, int ypos, t_gobj *y)
 {
-    int canprop, canopen;
-    canprop = (!y || (y && class_getpropertiesfn(pd_class(&y->g_pd))));
-    canopen = (y && zgetfn(&y->g_pd, gensym("menu-open")));
+    /* int canprop, canopen; unused */
+    /* canprop = */ (!y || (y && class_getpropertiesfn(pd_class(&y->g_pd))));
+    /* canopen = */ (y && zgetfn(&y->g_pd, gensym("menu-open")));
 #ifdef ROCKBOX
     (void) x;
     (void) xpos;
@@ -1267,26 +1271,46 @@ void canvas_doconnect(t_canvas *x, int xpos, int ypos, int which, int doit)
     	    (noutlet1 = obj_noutlets(ob1))
     	    && (ninlet2 = obj_ninlets(ob2)))
     	{
-    	    int width1 = x12 - x11, closest1, hotspot1;
-    	    int width2 = x22 - x21, closest2, hotspot2;
+#ifndef ROCKBOX
+    	    int hotspot1;
+    	    int hotspot2;
     	    int lx1, lx2, ly1, ly2;
     	    t_outconnect *oc;
-
+#else
+            int width1 = x12 - x11, closest1;
+            int width2 = x22 - x21, closest2;
+#endif
     	    if (noutlet1 > 1)
     	    {
     		closest1 = ((xwas-x11) * (noutlet1-1) + width1/2)/width1;
+#ifndef ROCKBOX
     		hotspot1 = x11 +
     	    	    (width1 - IOWIDTH) * closest1 / (noutlet1-1);
+#endif
     	    }
-    	    else closest1 = 0, hotspot1 = x11;
+    	    else 
+    	    {
+        	    closest1 = 0;
+#ifndef ROCKBOX
+        	    hotspot1 = x11;
+#endif
+    	    }
 
     	    if (ninlet2 > 1)
     	    {
     		closest2 = ((xpos-x21) * (ninlet2-1) + width2/2)/width2;
+#ifndef ROCKBOX
     		hotspot2 = x21 +
     	    	    (width2 - IOWIDTH) * closest2 / (ninlet2-1);
+#endif
     	    }
-    	    else closest2 = 0, hotspot2 = x21;
+    	    else 
+    	    {
+        	    closest2 = 0;
+#ifndef ROCKBOX
+        	    hotspot2 = x21;
+#endif
+            }
 
     	    if (closest1 >= noutlet1)
     	    	closest1 = noutlet1 - 1;
@@ -1308,6 +1332,7 @@ void canvas_doconnect(t_canvas *x, int xpos, int ypos, int which, int doit)
 	    }
     	    if (doit)
     	    {
+#ifndef ROCKBOX
     	    	oc = obj_connect(ob1, closest1, ob2, closest2);
     	    	lx1 = x11 + (noutlet1 > 1 ?
    	    		((x12-x11-IOWIDTH) * closest1)/(noutlet1-1) : 0)
@@ -1317,7 +1342,6 @@ void canvas_doconnect(t_canvas *x, int xpos, int ypos, int which, int doit)
    	    		((x22-x21-IOWIDTH) * closest2)/(ninlet2-1) : 0)
    	    		    + IOMIDDLE;
     	    	ly2 = y21;
-#ifndef ROCKBOX
     	    	sys_vgui(".x%x.c create line %d %d %d %d -width %d -tags l%x\n",
 		    glist_getcanvas(x),
 		    	lx1, ly1, lx2, ly2,
@@ -1456,7 +1480,10 @@ static void canvas_displaceselection(t_canvas *x, int dx, int dy)
 void canvas_key(t_canvas *x, t_symbol *s, int ac, t_atom *av)
 {
     static t_symbol *keynumsym, *keyupsym, *keynamesym;
-    int keynum, fflag;
+#ifndef ROCKBOX
+    int fflag;
+#endif
+    int keynum;
     t_symbol *gotkeysym;
     	
     int down, shift;
@@ -1488,7 +1515,9 @@ void canvas_key(t_canvas *x, t_symbol *s, int ac, t_atom *av)
 	gotkeysym = gensym(buf);
     }
     else gotkeysym = gensym("?");
+#ifndef ROCKBOX
     fflag = (av[0].a_type == A_FLOAT ? av[0].a_w.w_float : 0);
+#endif
     keynum = (av[1].a_type == A_FLOAT ? av[1].a_w.w_float : 0);
     if (keynum == '\\' || keynum == '{' || keynum == '}')
     {
