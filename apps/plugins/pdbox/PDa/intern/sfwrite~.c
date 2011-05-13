@@ -136,8 +136,10 @@ static t_int *sfwrite_perform(t_int *w)
      int i,num,n;
      short* tout = out;
      int ret;
+#ifndef ROCKBOX
      int timebefore,timeafter;
-     /* double late; unused */
+     double late;
+#endif
 
      for (i=0;i < c;i++) {
 	  in[i] = (t_sample *)(w[2+i]);     
@@ -155,13 +157,17 @@ static t_int *sfwrite_perform(t_int *w)
 	       }
 	  }
 	  
+#ifndef ROCKBOX
 	  timebefore = sys_getrealtime();
+#endif
 	  if ((ret =write(x->x_file,out,sizeof(short)*num*c)) < (signed int)sizeof(short)*num*c) {
 	       post("sfwrite: short write %d",ret);
 
 	       }
+#ifndef ROCKBOX
 	  timeafter = sys_getrealtime();
-	  /* late = timeafter - timebefore; unused */
+	  late = timeafter - timebefore;
+#endif
 
 #if 0
 	  /* OK, we let only 10 ms block here */

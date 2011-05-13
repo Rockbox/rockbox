@@ -110,9 +110,12 @@ void hlshelf_check(t_hlshelf *x)
 void hlshelf_bang(t_hlshelf *x)
 {
      t_atom at[6];
-     /* float c0; unused */
+#ifndef ROCKBOX
+     float c0;
+     float g1, g2;
+#endif
      float c1, c2, d0, d1, d2;	/* output coefs */
-     float a1, a2, b1, b2, g1, g2;	/* temp coefs */
+     float a1, a2, b1, b2;	/* temp coefs */
      double xf;
 
      hlshelf_check(x);
@@ -123,7 +126,9 @@ void hlshelf_bang(t_hlshelf *x)
      {
 	  a1 = 1.0f;
 	  b1 = -1.0f;
+#ifndef ROCKBOX
 	  g1 = 0.0f;
+#endif
      }
      else
      {
@@ -134,7 +139,9 @@ void hlshelf_bang(t_hlshelf *x)
 	  
 	  a1 = (r - 1) / (r + 1);		
 	  b1 = (kr - 1) / (kr + 1);
+#ifndef ROCKBOX
 	  g1 = (kr + 1) / (r + 1);
+#endif
      }
      
      /* high shelf */
@@ -143,7 +150,9 @@ void hlshelf_bang(t_hlshelf *x)
      {
 	  a2 = -1.0f;
 	  b2 = 1.0f;
+#ifndef ROCKBOX
 	  g2 = 0.0f;
+#endif
      }
      else
      {
@@ -154,11 +163,15 @@ void hlshelf_bang(t_hlshelf *x)
 	  
 	  a2 = (1 - r) / (1 + r);
 	  b2 = (1 - kr) / (1 + kr);
+#ifndef ROCKBOX
 	  g2 = (1 + kr) / (1 + r);
+#endif
      }
      
      /* form product */
-     /* c0 = g1 * g2 * (float)(exp((double)(x->s_gain1) * 0.05f * 2.302585093f)); unused */
+#ifndef ROCKBOX
+     c0 = g1 * g2 * (float)(exp((double)(x->s_gain1) * 0.05f * 2.302585093f));
+#endif
      c1 = a1 + a2;
      c2 = a1 * a2;
      d0 =  1.0f;
@@ -167,7 +180,10 @@ void hlshelf_bang(t_hlshelf *x)
 
      if (!hlshelf_check_stability(-c1/d0,-c2/d0,d0/d0,d1/d0,d2/d0)) {
        post("hlshelf: filter unstable -> resetting");
-       /* c0=1.; unused */ c1=0.;c2=0.;
+#ifndef ROCKBOX
+       c0=1.; 
+#endif
+       c1=0.;c2=0.;
        d0=1.;d1=0.;d2=0.;
      }
 

@@ -813,14 +813,15 @@ static t_gobj *canvas_findhitbox(t_canvas *x, int xpos, int ypos,
     /* right-clicking on a canvas object pops up a menu. */
 static void canvas_rightclick(t_canvas *x, int xpos, int ypos, t_gobj *y)
 {
-    /* int canprop, canopen; unused */
-    /* canprop = */ (!y || (y && class_getpropertiesfn(pd_class(&y->g_pd))));
-    /* canopen = */ (y && zgetfn(&y->g_pd, gensym("menu-open")));
 #ifdef ROCKBOX
     (void) x;
     (void) xpos;
     (void) ypos;
+    (void) y;
 #else /* ROCKBOX */
+    int canprop, canopen;
+    canprop = (!y || (y && class_getpropertiesfn(pd_class(&y->g_pd))));
+    canopen = (y && zgetfn(&y->g_pd, gensym("menu-open")));
     sys_vgui("pdtk_canvas_popup .x%x %d %d %d %d\n",
     	x, xpos, ypos, canprop, canopen);
 #endif /* ROCKBOX */
