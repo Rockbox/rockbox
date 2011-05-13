@@ -647,7 +647,7 @@ static void *pack_new(t_symbol *s, int argc, t_atom *argv)
     (void) s;
 #endif
     t_pack *x = (t_pack *)pd_new(pack_class);
-    t_atom defarg[2], *ap, *vec, *vp;
+    t_atom defarg[2], *ap, /* *vec, */ *vp;
     t_gpointer *gp;
     int nptr = 0;
     int i;
@@ -660,7 +660,7 @@ static void *pack_new(t_symbol *s, int argc, t_atom *argv)
     }
 
     x->x_n = argc;
-    vec = x->x_vec = (t_atom *)getbytes(argc * sizeof(*x->x_vec));
+    /* vec = */ x->x_vec = (t_atom *)getbytes(argc * sizeof(*x->x_vec));
     x->x_outvec = (t_atom *)getbytes(argc * sizeof(*x->x_outvec));
 
     for (i = argc, ap = argv; i--; ap++)

@@ -135,7 +135,7 @@ void gcanvas_drawme(t_gcanvas *x, t_glist *glist, int firsttime)
                     x->x_obj.te_ypix + x->x_height*i/x->x_ygrid,
                     x->x_width, 0);                    
      }
-     
+#ifndef ROCKBOX
      {
        /* outlets */
 	  int n = 3;
@@ -143,7 +143,6 @@ void gcanvas_drawme(t_gcanvas *x, t_glist *glist, int firsttime)
 	  nplus = (n == 1 ? 1 : n-1);
 	  for (i = 0; i < n; i++)
 	  {
-#ifndef ROCKBOX
 	       int onset = x->x_obj.te_xpix + (x->x_width - IOWIDTH) * i / nplus;
 	       if (firsttime)
 		    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xo%d\n",
@@ -156,14 +155,12 @@ void gcanvas_drawme(t_gcanvas *x, t_glist *glist, int firsttime)
 			     glist_getcanvas(glist), x, i,
 			     onset, x->x_obj.te_ypix + x->x_height - 1,
 			     onset + IOWIDTH, x->x_obj.te_ypix + x->x_height);
-#endif /* ROCKBOX */
 	  }
 	  /* inlets */
 	  n = 0; 
 	  nplus = (n == 1 ? 1 : n-1);
 	  for (i = 0; i < n; i++)
 	  {
-#ifndef ROCKBOX
 	       int onset = x->x_obj.te_xpix + (x->x_width - IOWIDTH) * i / nplus;
 	       if (firsttime)
 		    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xi%d\n",
@@ -176,10 +173,9 @@ void gcanvas_drawme(t_gcanvas *x, t_glist *glist, int firsttime)
 			     glist_getcanvas(glist), x, i,
 			     onset, x->x_obj.te_ypix,
 			     onset + IOWIDTH, x->x_obj.te_ypix + 1);
-#endif /* ROCKBOX */
 	  }
      }
-
+#endif /* ROCKBOX */
 }
 
 

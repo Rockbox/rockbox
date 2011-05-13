@@ -866,7 +866,7 @@ void ugen_done_graph(t_dspcontext *dc)
     t_dspcontext *parent_context = dc->dc_parentcontext;
     float parent_srate;
     int parent_vecsize;
-    int period, frequency, phase, vecsize;
+    int period, frequency, /* phase, */ vecsize;
     float srate;
     int chainblockbegin;    /* DSP chain onset before block prolog code */
     int chainblockend;	    /* and after block epilog code */
@@ -931,7 +931,7 @@ void ugen_done_graph(t_dspcontext *dc)
     	frequency = (parent_vecsize * realoverlap * upsample)/
 	    (vecsize * downsample);
 	/* } IOhannes*/
-    	phase = blk->x_phase;
+    	/* phase = blk->x_phase; */
     	srate = parent_srate * realoverlap * upsample / downsample;
 	    /* IOhannes */
     	if (period < 1) period = 1;
@@ -951,7 +951,7 @@ void ugen_done_graph(t_dspcontext *dc)
     	vecsize = parent_vecsize;
 	downsample = upsample = 1;/* IOhannes */
     	period = frequency = 1;
-    	phase = 0;
+    	/* phase = 0; */
 	if (!parent_context) reblock = 1;
     	switched = 0;
     }

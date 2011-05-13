@@ -1398,7 +1398,10 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     {    	
     	char outline[20];
     	int lastpixel = -1, ndrawn = 0;
-    	float xsum, yval = 0, wval = 0, xpix;
+    	float xsum, yval = 0, xpix;
+#ifndef ROCKBOX
+        float wval = 0;
+#endif
     	int ixpix = 0, i;
 
     	    /* draw the trace */
@@ -1422,7 +1425,9 @@ static void plot_vis(t_gobj *z, t_glist *glist,
 		if (yonset >= 0)
     		    yval = *(float *)((elem + elemsize * i) + yonset);
 		else yval = 0;
+#ifndef ROCKBOX
     		wval = *(float *)((elem + elemsize * i) + wonset);
+#endif
     		xpix = glist_xtopixels(glist, basex + usexloc);
     		ixpix = xpix + 0.5;
     		if (xonset >= 0 || ixpix != lastpixel)
@@ -1447,7 +1452,9 @@ static void plot_vis(t_gobj *z, t_glist *glist,
 		if (yonset >= 0)
     		    yval = *(float *)((elem + elemsize * i) + yonset);
     		else yval = 0;
+#ifndef ROCKBOX
 		wval = *(float *)((elem + elemsize * i) + wonset);
+#endif
     		xpix = glist_xtopixels(glist, basex + usexloc);
     		ixpix = xpix + 0.5;
     		if (xonset >= 0 || ixpix != lastpixel)

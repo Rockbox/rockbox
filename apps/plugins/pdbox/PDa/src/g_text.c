@@ -814,10 +814,10 @@ static void gatom_param(t_gatom *x, t_symbol *sel, int argc, t_atom *argv)
     /* ---------------- gatom-specific widget functions --------------- */
 static void gatom_getwherelabel(t_gatom *x, t_glist *glist, int *xp, int *yp)
 {
-    int x1, y1, x2, y2, width, height;
+    int x1, y1, x2, y2 /*, width, height */;
     text_getrect(&x->a_text.te_g, glist, &x1, &y1, &x2, &y2);
-    width = x2 - x1;
-    height = y2 - y1;
+    /* width = x2 - x1; */
+    /* height = y2 - y1; */
     if (x->a_wherelabel == ATOM_LABELLEFT)
     {
     	*xp = x1 - 3 -
@@ -1265,9 +1265,9 @@ static t_widgetbehavior gatom_widgetbehavior =
 void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     char *tag, int x1, int y1, int x2, int y2)
 {
-    int n = obj_noutlets(ob), nplus = (n == 1 ? 1 : n-1), i;
 #ifdef ROCKBOX
     (void) glist;
+    (void) ob;
     (void) firsttime;
     (void) tag;
     (void) x1;
@@ -1275,11 +1275,12 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     (void) x2;
     (void) y2;
 #else /* ROCKBOX */
+    int n = obj_noutlets(ob), i;
     int width = x2 - x1;
-#endif /* ROCKBOX */
+    int nplus = (n == 1 ? 1 : n-1);
+
     for (i = 0; i < n; i++)
     {
-#ifndef ROCKBOX
     	int onset = x1 + (width - IOWIDTH) * i / nplus;
     	if (firsttime)
     	    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %so%d\n",
@@ -1292,13 +1293,12 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     	    	glist_getcanvas(glist), tag, i,
     	    	onset, y2 - 1,
     	    	onset + IOWIDTH, y2);
-#endif /* ROCKBOX */
     }
+
     n = obj_ninlets(ob);
     nplus = (n == 1 ? 1 : n-1);
     for (i = 0; i < n; i++)
     {
-#ifndef ROCKBOX
     	int onset = x1 + (width - IOWIDTH) * i / nplus;
     	if (firsttime)
     	    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %si%d\n",
@@ -1311,15 +1311,15 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     	    	glist_getcanvas(glist), tag, i,
     	    	onset, y1,
     	    	onset + IOWIDTH, y1 + EXTRAPIX);
-#endif /* ROCKBOX */
     }
+#endif /* ROCKBOX */
 }
 
 void text_drawborder(t_text *x, t_glist *glist,
     char *tag, int width2, int height2, int firsttime)
 {
     t_object *ob;
-    int x1, y1, x2, y2, width, height;
+    int x1, y1, x2, y2 /* , width, height */;
 
 #ifdef ROCKBOX
     (void) width2;
@@ -1327,8 +1327,8 @@ void text_drawborder(t_text *x, t_glist *glist,
 #endif
 
     text_getrect(&x->te_g, glist, &x1, &y1, &x2, &y2);
-    width = x2 - x1;
-    height = y2 - y1;
+    /* width = x2 - x1; */
+    /* height = y2 - y1; */
     if (x->te_type == T_OBJECT)
     {
 #ifndef ROCKBOX

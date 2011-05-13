@@ -655,9 +655,9 @@ int obj_sigoutletindex(t_object *x, int m)
 
 int obj_issignaloutlet(t_object *x, int m)
 {
-    int n;
+    /* int n; */
     t_outlet *o2;
-    for (o2 = x->ob_outlet, n = 0; o2 && m--; o2 = o2->o_next);
+    for (o2 = x->ob_outlet /* , n = 0 */; o2 && m--; o2 = o2->o_next);
     return (o2 && (o2->o_sym == &s_signal));
 }
 

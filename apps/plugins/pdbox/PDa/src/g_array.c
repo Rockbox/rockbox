@@ -245,13 +245,13 @@ void glist_arraydialog(t_glist *parent, t_symbol *name, t_floatarg size,
     t_floatarg saveit, t_floatarg otherflag)
 {
     t_glist *gl;
-    t_garray *a;
+    /* t_garray *a; unused */
     if (size < 1)
     	size = 1;
     if (otherflag == 0 || (!(gl = glist_findgraph(parent))))
     	gl = glist_addglist(parent, &s_, 0, 1,
 	    (size > 1 ? size-1 : size), -1, 0, 0, 0, 0);
-    a = graph_array(gl, sharptodollar(name), &s_float, size, saveit);
+    /* a = */ graph_array(gl, sharptodollar(name), &s_float, size, saveit);
 }
 
     /* this is called from the properties dialog window for an existing array */
@@ -706,17 +706,22 @@ static void garray_vis(t_gobj *z, t_glist *glist, int vis)
     	else if (!template_find_field(template, gensym("x"), &xonset, &type,
 	    &arraytype) || type != DT_FLOAT)
     	{
-    	    float firsty, xcum = x->x_firstx;
+    	    float xcum = x->x_firstx;
     	    int lastpixel = -1, ndrawn = 0;
-    	    float yval = 0, xpix;
+    	    float xpix;
+#ifndef ROCKBOX
+    	    float firsty, yval = 0;
+#endif
     	    int ixpix = 0;
 #ifndef ROCKBOX
     	    sys_vgui(".x%x.c create line \\\n", glist_getcanvas(glist));
 #endif
     	    for (i = 0; i < x->x_n; i++)
     	    {
+#ifndef ROCKBOX
     	    	yval = fixtof(*(t_sample *)(x->x_vec +
 		    template->t_n * i * sizeof (t_word) + yonset));
+#endif
     	    	xpix = glist_xtopixels(glist, xcum);
     	    	ixpix = xpix + 0.5;
     	    	if (ixpix != lastpixel)
@@ -737,9 +742,7 @@ static void garray_vis(t_gobj *z, t_glist *glist, int vis)
     	    else if (ndrawn == 1) sys_vgui("%d %f \\\n", ixpix,
     	    	    	glist_ytopixels(glist, yval));
     	    sys_vgui("-tags .x%x.a%x\n", glist_getcanvas(glist), x);
-#endif
     	    firsty = fixtof(*(t_sample *)(x->x_vec + yonset));
-#ifndef ROCKBOX
     	    sys_vgui(".x%x.c create text %f %f -text {%s} -anchor e\
     	    	 -font -*-courier-bold--normal--%d-* -tags .x%x.a%x\n",
     	    	glist_getcanvas(glist),

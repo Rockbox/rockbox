@@ -381,7 +381,7 @@ t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
 #ifdef ROCKBOX
     (void) dummy;
     (void) sel;
-    int font = 10;
+    int font __attribute__((unused)) = 10;
 #else /* ROCKBOX */
     int font = (owner ? owner->gl_font : sys_defaultfont);
 #endif /* ROCKBOX */

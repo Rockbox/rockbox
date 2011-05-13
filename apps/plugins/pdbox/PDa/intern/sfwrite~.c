@@ -137,7 +137,7 @@ static t_int *sfwrite_perform(t_int *w)
      short* tout = out;
      int ret;
      int timebefore,timeafter;
-     double late;
+     /* double late; unused */
 
      for (i=0;i < c;i++) {
 	  in[i] = (t_sample *)(w[2+i]);     
@@ -161,7 +161,7 @@ static t_int *sfwrite_perform(t_int *w)
 
 	       }
 	  timeafter = sys_getrealtime();
-	  late = timeafter - timebefore;
+	  /* late = timeafter - timebefore; unused */
 
 #if 0
 	  /* OK, we let only 10 ms block here */

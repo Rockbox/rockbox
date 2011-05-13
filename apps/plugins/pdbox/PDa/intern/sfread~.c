@@ -114,7 +114,7 @@ static t_int *sfread_perform(t_int *w)
 {
      t_sfread* x = (t_sfread*)(w[1]);
      short* buf = x->x_mapaddr;
-     t_time tmp;
+     /* t_time tmp; unused */
      int c = x->x_channels;
      t_time pos = x->x_pos;
      t_sample speed = x->x_speed;
@@ -137,7 +137,7 @@ static t_int *sfread_perform(t_int *w)
 	  }
 	  pos = x->x_skip;
      }
-     tmp = n*speed;
+     /* tmp = n*speed; unused */
 
      if (pos + n*speed <= 0) {  // playing backwards end
 	  if (!x->x_loop) {

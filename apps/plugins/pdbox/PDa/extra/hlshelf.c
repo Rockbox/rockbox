@@ -110,7 +110,8 @@ void hlshelf_check(t_hlshelf *x)
 void hlshelf_bang(t_hlshelf *x)
 {
      t_atom at[6];
-     float c0, c1, c2, d0, d1, d2;	/* output coefs */
+     /* float c0; unused */
+     float c1, c2, d0, d1, d2;	/* output coefs */
      float a1, a2, b1, b2, g1, g2;	/* temp coefs */
      double xf;
 
@@ -157,7 +158,7 @@ void hlshelf_bang(t_hlshelf *x)
      }
      
      /* form product */
-     c0 = g1 * g2 * (float)(exp((double)(x->s_gain1) * 0.05f * 2.302585093f));  ;
+     /* c0 = g1 * g2 * (float)(exp((double)(x->s_gain1) * 0.05f * 2.302585093f)); unused */
      c1 = a1 + a2;
      c2 = a1 * a2;
      d0 =  1.0f;
@@ -166,7 +167,7 @@ void hlshelf_bang(t_hlshelf *x)
 
      if (!hlshelf_check_stability(-c1/d0,-c2/d0,d0/d0,d1/d0,d2/d0)) {
        post("hlshelf: filter unstable -> resetting");
-       c0=1.;c1=0.;c2=0.;
+       /* c0=1.; unused */ c1=0.;c2=0.;
        d0=1.;d1=0.;d2=0.;
      }
 

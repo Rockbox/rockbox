@@ -736,10 +736,12 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     	    zero, this is disabled. */
     	if (x->gl_xtick.k_lperb)
     	{
+#ifndef ROCKBOX
 	    float upix, lpix;
 	    if (y2 < y1)
 		upix = y1, lpix = y2;
 	    else upix = y2, lpix = y1;
+#endif
     	    for (i = 0, f = x->gl_xtick.k_point;
     		f < 0.99 * x->gl_x2 + 0.01*x->gl_x1; i++,
     		    f += x->gl_xtick.k_inc)

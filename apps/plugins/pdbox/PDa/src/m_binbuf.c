@@ -96,13 +96,13 @@ void binbuf_text(t_binbuf *x, char *text, size_t size)
 	{
 	    	/* it's an atom other than a comma or semi */
 	    char c;
-	    int floatstate = 0, slash = 0, lastslash = 0,
+	    int floatstate = 0, slash = 0, /* lastslash = 0, */
 	    	firstslash = (*textp == '\\');
 	    bufp = buf;
 	    do
 	    {
 		c = *bufp = *textp++;
-		lastslash = slash;
+		/* lastslash = slash; */
 		slash = (c == '\\');
 
 		if (floatstate >= 0)
