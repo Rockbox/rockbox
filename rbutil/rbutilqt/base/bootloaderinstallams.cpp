@@ -31,7 +31,9 @@ BootloaderInstallAms::BootloaderInstallAms(QObject *parent)
 QString BootloaderInstallAms::ofHint()
 {
     return tr("Bootloader installation requires you to provide "
-              "a firmware file of the original firmware (bin file). "
+              "a copy of the original Sandisk firmware (bin file). "
+              "This firmware file will be patched and then installed to your "
+              "player along with the rockbox bootloader. "
               "You need to download this file yourself due to legal "
               "reasons. Please browse the "
               "<a href='http://forums.sandisk.com/sansa/'>Sansa Forums'</a> "
