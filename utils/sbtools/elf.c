@@ -359,6 +359,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
     elf_printf_fn_t printf, void *user)
 {
     #define error_printf(...) ({printf(user, true, __VA_ARGS__); return false;})
+    
     /* read header */
     Elf32_Ehdr ehdr;
     if(!read(user, 0, &ehdr, sizeof(ehdr)))
