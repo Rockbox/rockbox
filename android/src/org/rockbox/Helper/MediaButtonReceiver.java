@@ -21,7 +21,6 @@
 
 package org.rockbox.Helper;
 
-import java.lang.reflect.Method;
 import org.rockbox.RockboxFramebuffer;
 import org.rockbox.RockboxService;
 import android.content.BroadcastReceiver;
@@ -30,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.util.Log;
 import android.view.KeyEvent;
 
 public class MediaButtonReceiver
@@ -55,7 +55,9 @@ public class MediaButtonReceiver
     {
         try {
             api = new NewApi(c);
-        } catch (Exception e) {
+        } catch (Throwable t) {
+            /* Throwable includes Exception and the expected
+             * NoClassDefFoundError */
             api = new OldApi(c);
         }
     }
@@ -102,44 +104,52 @@ public class MediaButtonReceiver
         void unregister();
     }
 
-    private static class NewApi implements IMultiMediaReceiver
+    private static class NewApi 
+                    implements IMultiMediaReceiver, AudioManager.OnAudioFocusChangeListener
     {
-        private Method register_method;
-        private Method unregister_method;
         private AudioManager audio_manager;
         private ComponentName receiver_name;
-        /* the constructor gets the methods through reflection so that
-         * this compiles on pre-2.2 devices */
-        NewApi(Context c) throws SecurityException, NoSuchMethodException
+        private boolean running = false;
+        
+        NewApi(Context c)
         {
-            register_method = AudioManager.class.getMethod(
-                                    "registerMediaButtonEventReceiver",
-                                    new Class[] { ComponentName.class } );
-            unregister_method = AudioManager.class.getMethod(
-                                    "unregisterMediaButtonEventReceiver",
-                                    new Class[] { ComponentName.class } );
-
             audio_manager = (AudioManager)c.getSystemService(Context.AUDIO_SERVICE);
             receiver_name = new ComponentName(c, MediaReceiver.class);
         }
+        
         public void register()
         {
             try {
-                register_method.invoke(audio_manager, receiver_name);
+                audio_manager.registerMediaButtonEventReceiver(receiver_name);
+                audio_manager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                running = true;
             } catch (Exception e) {
                 // Nothing
                 e.printStackTrace();
-            }            
+            }
         }
 
         public void unregister()
         {
             try
             {
-                unregister_method.invoke(audio_manager, receiver_name);
+                audio_manager.unregisterMediaButtonEventReceiver(receiver_name);
+                audio_manager.abandonAudioFocus(this);
+                running = false;
             } catch (Exception e) {
                 // Nothing
                 e.printStackTrace();
+            }
+        }
+
+        public void onAudioFocusChange(int focusChange)
+        {
+            Log.d("Rockbox", "Audio focus" + ((focusChange>0)?"gained":"lost")+
+                                         ": "+ focusChange);
+            if (running)
+            {   /* Play nice and stop for the the other app */
+                if (focusChange == AudioManager.AUDIOFOCUS_LOSS)
+                    RockboxFramebuffer.buttonHandler(KeyEvent.KEYCODE_MEDIA_STOP, false);
             }
         }
         

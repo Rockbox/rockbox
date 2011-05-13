@@ -353,7 +353,10 @@ public class RockboxService extends Service
     public void onDestroy()
     {
         super.onDestroy();
-        mMediaButtonReceiver.unregister();
+        /* Don't unregister so we can receive them (and startup the service)
+         * after idle poweroff. Hopefully it's ok if mMediaButtonReceiver is
+         * garbage collected.
+         *  mMediaButtonReceiver.unregister(); */
         mMediaButtonReceiver = null;
         /* Make sure our notification is gone. */
         stopForeground();
