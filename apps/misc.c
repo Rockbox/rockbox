@@ -504,19 +504,6 @@ static void unplug_change(bool inserted)
             {
                 headphone_caused_pause = true;
                 pause_action(false, false);
-
-                if (global_settings.unplug_rw)
-                {
-#if (CONFIG_CODEC == SWCODEC)
-                    audio_pre_ff_rewind();
-#endif
-                    if (audio_current_track()->elapsed >
-                            (unsigned long)(global_settings.unplug_rw*1000))
-                        audio_ff_rewind(audio_current_track()->elapsed -
-                                (global_settings.unplug_rw*1000));
-                    else
-                        audio_ff_rewind(0);
-                }
             }
         }
     }

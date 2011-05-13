@@ -2069,19 +2069,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12742,5 +12739,19 @@
   </dest>
   <voice>
     *: "In custom directories only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Rewind on Pause"
+  </dest>
+  <voice>
+    *: "Rewind on Pause"
   </voice>
 </phrase>

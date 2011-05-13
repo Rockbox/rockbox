@@ -173,10 +173,9 @@ MENUITEM_SETTING(cuesheet, &global_settings.cuesheet, cuesheet_callback);
 
 #ifdef HAVE_HEADPHONE_DETECTION
 MENUITEM_SETTING(unplug_mode, &global_settings.unplug_mode, NULL);
-MENUITEM_SETTING(unplug_rw, &global_settings.unplug_rw, NULL);
 MENUITEM_SETTING(unplug_autoresume, &global_settings.unplug_autoresume, NULL);
 MAKE_MENU(unplug_menu, ID2P(LANG_HEADPHONE_UNPLUG), 0, Icon_NOICON,
-          &unplug_mode, &unplug_rw, &unplug_autoresume);
+          &unplug_mode, &unplug_autoresume);
 #endif
 
 MENUITEM_SETTING(skip_length, &global_settings.skip_length, NULL);
@@ -184,6 +183,7 @@ MENUITEM_SETTING(prevent_skip, &global_settings.prevent_skip, NULL);
 #if CONFIG_CODEC == SWCODEC
 MENUITEM_SETTING(resume_rewind, &global_settings.resume_rewind, NULL);
 #endif
+MENUITEM_SETTING(pause_rewind, &global_settings.pause_rewind, NULL);
 
 MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
           Icon_Playback_menu,
@@ -214,6 +214,7 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #if CONFIG_CODEC == SWCODEC
           &resume_rewind,
 #endif
+          &pause_rewind,
          );
          
 static int playback_callback(int action,const struct menu_item_ex *this_item)

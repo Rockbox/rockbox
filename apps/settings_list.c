@@ -1537,13 +1537,13 @@ const struct settings_list settings[] = {
                    "pause on headphone unplug", "off,pause,pause and resume",
                    NULL, 3, ID2P(LANG_OFF), ID2P(LANG_PAUSE),
                    ID2P(LANG_HEADPHONE_UNPLUG_RESUME)),
-    INT_SETTING(0, unplug_rw, LANG_HEADPHONE_UNPLUG_RW, 0,
-                "rewind duration on pause", UNIT_SEC, 0, 15, 1, NULL, NULL,
-                NULL),
     OFFON_SETTING(0, unplug_autoresume,
                   LANG_HEADPHONE_UNPLUG_DISABLE_AUTORESUME, false,
                   "disable autoresume if phones not present",NULL),
 #endif
+    INT_SETTING(0, pause_rewind, LANG_PAUSE_REWIND, 0,
+                "rewind duration on pause", UNIT_SEC, 0, 15, 1, NULL, NULL,
+                NULL),
 #if CONFIG_TUNER
     CHOICE_SETTING(0, fm_region, LANG_FM_REGION, 0,
                    "fm_region", "eu,us,jp,kr,it,wo", set_radio_region, 6,

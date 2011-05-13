@@ -483,9 +483,9 @@ struct user_settings
     int touchpad_sensitivity;
 #endif
 
+    int  pause_rewind; /* time in s to rewind when pausing */
 #ifdef HAVE_HEADPHONE_DETECTION
     int  unplug_mode; /* pause on headphone unplug */
-    int  unplug_rw; /* time in s to rewind when pausing */
     bool unplug_autoresume; /* disable auto-resume if no phones */
 #endif
 

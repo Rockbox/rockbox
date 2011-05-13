@@ -125,6 +125,17 @@ void pause_action(bool may_fade, bool updatewps)
         fade(false, updatewps);
     else
         audio_pause();
+
+    if (global_settings.pause_rewind) {
+        long newpos;
+
+#if (CONFIG_CODEC == SWCODEC)
+        audio_pre_ff_rewind();
+#endif
+        newpos = audio_current_track()->elapsed
+            - global_settings.pause_rewind * 1000;
+        audio_ff_rewind(newpos > 0 ? newpos : 0);
+    }
 }
 
 void unpause_action(bool may_fade, bool updatewps)
