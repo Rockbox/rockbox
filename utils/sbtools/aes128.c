@@ -155,7 +155,7 @@ void EncryptAES(byte *msg, byte *key, byte *c) {
   expand_key(key,keys);
   
   // First Round
-  memcpy(c, msg, 16);
+  memmove(c, msg, 16);
   xor_round_key(c,keys,0);
 
   // Middle rounds

@@ -307,7 +307,7 @@ static void parse_identifier(char **ptr, char *end, struct lexem_t *lexem)
 static void next_lexem(char **ptr, char *end, struct lexem_t *lexem)
 {
     #define ret_simple(t, advance) ({(*ptr) += advance; lexem->type = t; return;})
-    while(true)
+    while(*ptr != end)
     {
         /* skip whitespace */
         if(**ptr == ' ' || **ptr == '\t' || **ptr == '\n' || **ptr == '\r')

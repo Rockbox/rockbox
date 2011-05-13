@@ -103,7 +103,7 @@ void sha_1_block(struct sha_1_params_t *params, uint32_t cur_hash[5], byte *data
 
     #define w params->w
 
-    memcpy(w, data, 64);
+    memmove(w, data, 64);
     for(int i = 0; i < 16; i++)
         byte_swap32(&w[i]);
         
