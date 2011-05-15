@@ -135,6 +135,7 @@ static uint32_t crc32;
 
 static volatile unsigned int elapsed;
 static volatile bool codec_playing;
+static volatile enum codec_command_action codec_action;
 static volatile long endtick;
 static volatile long rebuffertick;
 struct wavinfo_t wavinfo;
@@ -504,7 +505,7 @@ static void seek_complete(void)
 static enum codec_command_action get_command(intptr_t *param)
 {
     rb->yield();
-    return CODEC_ACTION_NULL; /* just continue processing */
+    return codec_action;
     (void)param;
 }
 
@@ -718,13 +719,19 @@ static enum plugin_status test_track(const char* filename)
     starttick = *rb->current_tick;
 
     codec_playing = true;
+    codec_action = CODEC_ACTION_NULL;
 
     rb->codec_thread_do_callback(codec_thread, NULL);
 
     /* Wait for codec thread to die */
     while (codec_playing)
     {
-        rb->sleep(HZ);
+        if (rb->button_get_w_tmo(HZ) == TESTCODEC_EXITBUTTON)
+        {
+            codec_action = CODEC_ACTION_HALT;
+            break;
+        }
+
         rb->snprintf(str,sizeof(str),"%d of %d",elapsed,(int)track.id3.length);
         log_text(str,false);
     }
@@ -734,8 +741,12 @@ static enum plugin_status test_track(const char* filename)
     rb->codec_thread_do_callback(NULL, NULL);
     rb->backlight_on();
     log_text(str,true);
-    
-    if (checksum)
+
+    if (codec_action == CODEC_ACTION_HALT)
+    {
+        /* User aborted test */
+    }    
+    else if (checksum)
     {
         rb->snprintf(str, sizeof(str), "CRC32 - %08x", (unsigned)crc32);
         log_text(str,true);
@@ -940,6 +951,10 @@ menu:
                 if (!(info.attribute & ATTR_DIRECTORY)) {
                     rb->snprintf(filename,sizeof(filename),"%s%s",dirpath,entry->d_name);
                     test_track(filename);
+
+                    if (codec_action == CODEC_ACTION_HALT)
+                        break;
+
                     log_text("", true);
                 }
 
@@ -958,7 +973,9 @@ menu:
             close_wav();
             log_text("Wrote /test.wav",true);
         }
-        while (rb->button_get(true) != TESTCODEC_EXITBUTTON);
+
+        while (codec_action != CODEC_ACTION_HALT &&
+               rb->button_get(true) != TESTCODEC_EXITBUTTON);
     }
 
     #ifdef HAVE_ADJUSTABLE_CPU_FREQ
