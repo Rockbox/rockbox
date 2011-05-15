@@ -179,7 +179,7 @@ typedef struct {
     int samples;
     int iir_acc_left;
     int iir_acc_right;
-    ASAP_ModuleInfo module_info;
+    ASAP_ModuleInfo *module_info;
     int tmc_per_frame;
     int tmc_per_frame_counter;
     int current_song;
@@ -189,7 +189,7 @@ typedef struct {
     int silence_cycles_counter;
     byte poly9_lookup[511];
     byte poly17_lookup[16385];
-    byte memory[65536];
+    byte *memory;
 } ASAP_State;
 
 /* Parses the string in the "mm:ss.xxx" format

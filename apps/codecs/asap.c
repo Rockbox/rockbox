@@ -27,7 +27,7 @@ CODEC_HEADER
 #define CHUNK_SIZE (1024*2)
 
 static byte samples[CHUNK_SIZE] IBSS_ATTR;   /* The sample buffer */
-static ASAP_State asap;         /* asap codec state */
+static ASAP_State asap IBSS_ATTR;         /* asap codec state */
 
 /* this is the codec entry point */
 enum codec_status codec_main(enum codec_entry_call_reason reason)
@@ -76,7 +76,7 @@ enum codec_status codec_run(void)
     /* Sample depth is 16 bit little endian */
     ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
     /* Stereo or Mono output ? */
-    if(asap.module_info.channels ==1)
+    if(asap.module_info->channels ==1)
     {
         ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
         bytesPerSample = 2;
@@ -89,8 +89,8 @@ enum codec_status codec_run(void)
     /* reset eleapsed */
     ci->set_elapsed(0);
 
-    song = asap.module_info.default_song;
-    duration = asap.module_info.durations[song];
+    song = asap.module_info->default_song;
+    duration = asap.module_info->durations[song];
     if (duration < 0)
         duration = 180 * 1000;
     

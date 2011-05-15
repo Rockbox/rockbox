@@ -109,7 +109,7 @@ void trace_cpu(const ASAP_State *ast, int pc, int a, int x, int y, int s, int nz
 #define PutByte(addr, data)     do { if (((addr) & 0xf900) == 0xd000) ASAP_PutByte(ast, addr, data); else dPutByte(addr, data); } while (FALSE)
 #define RMW_GetByte(dest, addr) do { if (((addr) >> 8) == 0xd2) { dest = ASAP_GetByte(ast, addr); ast _ cycle--; ASAP_PutByte(ast, addr, dest); ast _ cycle++; } else dest = dGetByte(addr); } while (FALSE)
 
-#define ASAP_MAIN_CLOCK(ast)    ((ast) _ module_info.ntsc ? 1789772 : 1773447)
+#define ASAP_MAIN_CLOCK(ast)    ((ast) _ module_info->ntsc ? 1789772 : 1773447)
 #define CYCLE_TO_SAMPLE(cycle)  TO_INT(((cycle) * ASAP_SAMPLE_RATE + ast _ sample_offset) / ASAP_MAIN_CLOCK(ast))
 
 #endif /* _ASAP_INTERNAL_H_ */

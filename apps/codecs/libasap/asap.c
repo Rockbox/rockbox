@@ -23,6 +23,9 @@
 
 #include "asap_internal.h"
 
+static byte s_memory[65536];
+static ASAP_ModuleInfo s_module_info;
+
 #ifdef ASAP_ONLY_INFO
 
 #define GET_PLAYER(name)  NULL
@@ -35,7 +38,7 @@ FUNC(int, ASAP_GetByte, (P(ASAP_State PTR, ast), P(int, addr)))
 {
     switch (addr & 0xff1f) {
     case 0xd014:
-        return ast _ module_info.ntsc ? 0xf : 1;
+        return ast _ module_info->ntsc ? 0xf : 1;
     case 0xd20a:
     case 0xd21a:
         return PokeySound_GetRandom(ast, addr, ast _ cycle);
@@ -91,7 +94,7 @@ FUNC(void, ASAP_PutByte, (P(ASAP_State PTR, ast), P(int, addr), P(int, data)))
         else
             ast _ cycle = ast _ next_scanline_cycle + 106;
     }
-    else if ((addr & 0xff00) == ast _ module_info.covox_addr) {
+    else if ((addr & 0xff00) == ast _ module_info->covox_addr) {
         V(PokeyState PTR, pst);
         addr &= 3;
         if (addr == 0 || addr == 3)
@@ -1379,8 +1382,11 @@ FUNC(abool, ASAP_Load, (
     P(ASAP_State PTR, ast), P(STRING, filename),
     P(CONST BYTEARRAY, module), P(int, module_len)))
 {
+    /* Set up ast */
+    ast _ memory = s_memory;
+    ast _ module_info = &s_module_info;
     ast _ silence_cycles = 0;
-    return parse_file(ast, ADDRESSOF ast _ module_info, filename, module, module_len);
+    return parse_file(ast, ast _ module_info, filename, module, module_len);
 }
 
 FUNC(void, ASAP_DetectSilence, (P(ASAP_State PTR, ast), P(int, seconds)))
@@ -1416,7 +1422,7 @@ FUNC(void, ASAP_PlaySong, (P(ASAP_State PTR, ast), P(int, song), P(int, duration
     ast _ current_duration = duration;
     ast _ blocks_played = 0;
     ast _ silence_cycles_counter = ast _ silence_cycles;
-    ast _ extra_pokey_mask = ast _ module_info.channels > 1 ? 0x10 : 0;
+    ast _ extra_pokey_mask = ast _ module_info->channels > 1 ? 0x10 : 0;
     ast _ consol = 8;
     ast _ covox[0] = CAST(byte) 0x80;
     ast _ covox[1] = CAST(byte) 0x80;
@@ -1433,9 +1439,9 @@ FUNC(void, ASAP_PlaySong, (P(ASAP_State PTR, ast), P(int, song), P(int, duration
     ast _ timer2_cycle = NEVER;
     ast _ timer4_cycle = NEVER;
     ast _ irqst = 0xff;
-    switch (ast _ module_info.type) {
+    switch (ast _ module_info->type) {
     case ASAP_TYPE_SAP_B:
-        call_6502_init(ast, ast _ module_info.init, song, 0, 0);
+        call_6502_init(ast, ast _ module_info->init, song, 0, 0);
         break;
     case ASAP_TYPE_SAP_C:
 #ifndef ASAP_ONLY_SAP
@@ -1444,8 +1450,8 @@ FUNC(void, ASAP_PlaySong, (P(ASAP_State PTR, ast), P(int, song), P(int, duration
     case ASAP_TYPE_CMR:
     case ASAP_TYPE_CMS:
 #endif
-        call_6502_init(ast, ast _ module_info.player + 3, 0x70, ast _ module_info.music, ast _ module_info.music >> 8);
-        call_6502_init(ast, ast _ module_info.player + 3, 0x00, song, 0);
+        call_6502_init(ast, ast _ module_info->player + 3, 0x70, ast _ module_info->music, ast _ module_info->music >> 8);
+        call_6502_init(ast, ast _ module_info->player + 3, 0x00, song, 0);
         break;
     case ASAP_TYPE_SAP_D:
     case ASAP_TYPE_SAP_S:
@@ -1453,23 +1459,23 @@ FUNC(void, ASAP_PlaySong, (P(ASAP_State PTR, ast), P(int, song), P(int, duration
         ast _ cpu_x = 0x00;
         ast _ cpu_y = 0x00;
         ast _ cpu_s = 0xff;
-        ast _ cpu_pc = ast _ module_info.init;
+        ast _ cpu_pc = ast _ module_info->init;
         break;
 #ifndef ASAP_ONLY_SAP
     case ASAP_TYPE_DLT:
-        call_6502_init(ast, ast _ module_info.player + 0x100, 0x00, 0x00, ast _ module_info.song_pos[song]);
+        call_6502_init(ast, ast _ module_info->player + 0x100, 0x00, 0x00, ast _ module_info->song_pos[song]);
         break;
     case ASAP_TYPE_MPT:
-        call_6502_init(ast, ast _ module_info.player, 0x00, ast _ module_info.music >> 8, ast _ module_info.music);
-        call_6502_init(ast, ast _ module_info.player, 0x02, ast _ module_info.song_pos[song], 0);
+        call_6502_init(ast, ast _ module_info->player, 0x00, ast _ module_info->music >> 8, ast _ module_info->music);
+        call_6502_init(ast, ast _ module_info->player, 0x02, ast _ module_info->song_pos[song], 0);
         break;
     case ASAP_TYPE_RMT:
-        call_6502_init(ast, ast _ module_info.player, ast _ module_info.song_pos[song], ast _ module_info.music, ast _ module_info.music >> 8);
+        call_6502_init(ast, ast _ module_info->player, ast _ module_info->song_pos[song], ast _ module_info->music, ast _ module_info->music >> 8);
         break;
     case ASAP_TYPE_TMC:
     case ASAP_TYPE_TM2:
-        call_6502_init(ast, ast _ module_info.player, 0x70, ast _ module_info.music >> 8, ast _ module_info.music);
-        call_6502_init(ast, ast _ module_info.player, 0x00, song, 0);
+        call_6502_init(ast, ast _ module_info->player, 0x70, ast _ module_info->music >> 8, ast _ module_info->music);
+        call_6502_init(ast, ast _ module_info->player, 0x00, song, 0);
         ast _ tmc_per_frame_counter = 1;
         break;
 #endif
@@ -1485,11 +1491,11 @@ FUNC(void, ASAP_MutePokeyChannels, (P(ASAP_State PTR, ast), P(int, mask)))
 
 FUNC(abool, call_6502_player, (P(ASAP_State PTR, ast)))
 {
-    V(int, player) = ast _ module_info.player;
+    V(int, player) = ast _ module_info->player;
     PokeySound_StartFrame(ast);
-    switch (ast _ module_info.type) {
+    switch (ast _ module_info->type) {
     case ASAP_TYPE_SAP_B:
-        call_6502(ast, player, ast _ module_info.fastplay);
+        call_6502(ast, player, ast _ module_info->fastplay);
         break;
     case ASAP_TYPE_SAP_C:
 #ifndef ASAP_ONLY_SAP
@@ -1498,7 +1504,7 @@ FUNC(abool, call_6502_player, (P(ASAP_State PTR, ast)))
     case ASAP_TYPE_CMR:
     case ASAP_TYPE_CMS:
 #endif
-        call_6502(ast, player + 6, ast _ module_info.fastplay);
+        call_6502(ast, player + 6, ast _ module_info->fastplay);
         break;
     case ASAP_TYPE_SAP_D:
         if (player >= 0) {
@@ -1525,10 +1531,10 @@ FUNC(abool, call_6502_player, (P(ASAP_State PTR, ast)))
             dPutByte(RETURN_FROM_PLAYER_ADDR + 5, 0x40); /* RTI */
             ast _ cpu_pc = player;
         }
-        Cpu_RunScanlines(ast, ast _ module_info.fastplay);
+        Cpu_RunScanlines(ast, ast _ module_info->fastplay);
         break;
     case ASAP_TYPE_SAP_S:
-        Cpu_RunScanlines(ast, ast _ module_info.fastplay);
+        Cpu_RunScanlines(ast, ast _ module_info->fastplay);
         {
             V(int, i) = dGetByte(0x45) - 1;
             dPutByte(0x45, i);
@@ -1538,28 +1544,28 @@ FUNC(abool, call_6502_player, (P(ASAP_State PTR, ast)))
         break;
 #ifndef ASAP_ONLY_SAP
     case ASAP_TYPE_DLT:
-        call_6502(ast, player + 0x103, ast _ module_info.fastplay);
+        call_6502(ast, player + 0x103, ast _ module_info->fastplay);
         break;
     case ASAP_TYPE_MPT:
     case ASAP_TYPE_RMT:
     case ASAP_TYPE_TM2:
-        call_6502(ast, player + 3, ast _ module_info.fastplay);
+        call_6502(ast, player + 3, ast _ module_info->fastplay);
         break;
     case ASAP_TYPE_TMC:
         if (--ast _ tmc_per_frame_counter <= 0) {
             ast _ tmc_per_frame_counter = ast _ tmc_per_frame;
-            call_6502(ast, player + 3, ast _ module_info.fastplay);
+            call_6502(ast, player + 3, ast _ module_info->fastplay);
         }
         else
-            call_6502(ast, player + 6, ast _ module_info.fastplay);
+            call_6502(ast, player + 6, ast _ module_info->fastplay);
         break;
 #endif
     }
-    PokeySound_EndFrame(ast, ast _ module_info.fastplay * 114);
+    PokeySound_EndFrame(ast, ast _ module_info->fastplay * 114);
     if (ast _ silence_cycles > 0) {
         if (PokeySound_IsSilent(ADDRESSOF ast _ base_pokey)
          && PokeySound_IsSilent(ADDRESSOF ast _ extra_pokey)) {
-            ast _ silence_cycles_counter -= ast _ module_info.fastplay * 114;
+            ast _ silence_cycles_counter -= ast _ module_info->fastplay * 114;
             if (ast _ silence_cycles_counter <= 0)
                 return FALSE;
         }
@@ -1606,7 +1612,7 @@ FUNC(void, ASAP_GetWavHeader, (
     P(CONST ASAP_State PTR, ast), P(BYTEARRAY, buffer), P(ASAP_SampleFormat, format)))
 {
     V(int, use_16bit) = format != ASAP_FORMAT_U8 ? 1 : 0;
-    V(int, block_size) = ast _ module_info.channels << use_16bit;
+    V(int, block_size) = ast _ module_info->channels << use_16bit;
     V(int, bytes_per_second) = ASAP_SAMPLE_RATE * block_size;
     V(int, total_blocks) = milliseconds_to_blocks(ast _ current_duration);
     V(int, n_bytes) = (total_blocks - ast _ blocks_played) * block_size;
@@ -1629,7 +1635,7 @@ FUNC(void, ASAP_GetWavHeader, (
     buffer[19] = 0;
     buffer[20] = 1;
     buffer[21] = 0;
-    buffer[22] = CAST(byte) ast _ module_info.channels;
+    buffer[22] = CAST(byte) ast _ module_info->channels;
     buffer[23] = 0;
     serialize_int(buffer, 24, ASAP_SAMPLE_RATE);
     serialize_int(buffer, 28, bytes_per_second);
@@ -1656,7 +1662,7 @@ PRIVATE FUNC(int, ASAP_GenerateAt, (P(ASAP_State PTR, ast), P(VOIDPTR, buffer), 
 #ifdef ACTIONSCRIPT
     block_shift = 0;
 #else
-    block_shift = (ast _ module_info.channels - 1) + (format != ASAP_FORMAT_U8 ? 1 : 0);
+    block_shift = (ast _ module_info->channels - 1) + (format != ASAP_FORMAT_U8 ? 1 : 0);
 #endif
     buffer_blocks = buffer_len >> block_shift;
     if (ast _ current_duration > 0) {
