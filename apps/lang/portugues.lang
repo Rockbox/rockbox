@@ -10224,19 +10224,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Duração para Retroceder"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Duração para Retroceder"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12655,5 +12652,19 @@
   </dest>
   <voice>
     *: "Apenas nas pastas especificadas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Retroceder ao Pausar"
+  </dest>
+  <voice>
+    *: "Retroceder ao Pausar"
   </voice>
 </phrase>
