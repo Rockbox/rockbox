@@ -306,7 +306,11 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
         size_t len;
         if (m3u8name == NULL)
         {
-            snprintf(playlist, MAX_PATH, "%s/", playlist_dir);
+            /*If sel is a folder, we prefill the text field with its name*/
+            const char *name = strrchr(sel, '/');
+            snprintf(playlist, MAX_PATH, "%s/%s",
+                     playlist_dir,
+                     (name!=NULL && (sel_attr & ATTR_DIRECTORY))?name+1:"");
             if (kbd_input(playlist, MAX_PATH))
                 return false;
         }
