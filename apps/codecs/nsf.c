@@ -29,20 +29,35 @@
 
 CODEC_HEADER
 
-/* arm doesn't benefit from IRAM? */
-#ifdef CPU_ARM
-#undef ICODE_ATTR
-#define ICODE_ATTR
-#undef IDATA_ATTR
-#define IDATA_ATTR
+#if   (CONFIG_CPU == MCF5250)
+#define ICODE_INSTEAD_OF_INLINE
+/* Enough IRAM to move additional data and code to it. */
+#define IBSS_ATTR_NSF_LARGE_IRAM    IBSS_ATTR
+#define ICONST_ATTR_NSF_LARGE_IRAM  ICONST_ATTR
+
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#define ICODE_INSTEAD_OF_INLINE
+/* Enough IRAM to move additional data and code to it. */
+#define IBSS_ATTR_NSF_LARGE_IRAM    IBSS_ATTR
+#define ICONST_ATTR_NSF_LARGE_IRAM  ICONST_ATTR
+
+#elif defined(CPU_S5L870X)
+#define ICODE_INSTEAD_OF_INLINE
+/* Very large IRAM. Move even more data to it. */
+#define IBSS_ATTR_NSF_LARGE_IRAM    IBSS_ATTR
+#define ICONST_ATTR_NSF_LARGE_IRAM  ICONST_ATTR
+
 #else
 #define ICODE_INSTEAD_OF_INLINE
+/* Not enough IRAM available. */
+#define IBSS_ATTR_NSF_LARGE_IRAM
+#define ICONST_ATTR_NSF_LARGE_IRAM
 #endif
 
 /* Maximum number of bytes to process in one iteration */
 #define WAV_CHUNK_SIZE (1024*2)
 
-static int16_t samples[WAV_CHUNK_SIZE] IBSS_ATTR;
+static int16_t samples[WAV_CHUNK_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
 
 #define ZEROMEMORY(addr,size) memset(addr,0,size)
 
@@ -172,7 +187,7 @@ union QUAD
 
 /****************** tables */
 static const int32_t ModulationTable[8] ICONST_ATTR = {0,1,2,4,0,-4,-2,-1};
-const uint16_t  DMC_FREQ_TABLE[2][0x10] = {
+const uint16_t  DMC_FREQ_TABLE[2][0x10] ICONST_ATTR_NSF_LARGE_IRAM = {
     /* NTSC */
     {0x1AC,0x17C,0x154,0x140,0x11E,0x0FE,0x0E2,0x0D6,0x0BE,0x0A0,0x08E,0x080,
     0x06A,0x054,0x048,0x036},
@@ -181,15 +196,15 @@ const uint16_t  DMC_FREQ_TABLE[2][0x10] = {
     0x062,0x04E,0x042,0x032}
 };
 
-const uint8_t DUTY_CYCLE_TABLE[4] = {2,4,8,12};
+const uint8_t DUTY_CYCLE_TABLE[4] ICONST_ATTR_NSF_LARGE_IRAM = {2,4,8,12};
 
-const uint8_t LENGTH_COUNTER_TABLE[0x20] = {
+const uint8_t LENGTH_COUNTER_TABLE[0x20] ICONST_ATTR_NSF_LARGE_IRAM = {
     0x0A,0xFE,0x14,0x02,0x28,0x04,0x50,0x06,0xA0,0x08,0x3C,0x0A,0x0E,0x0C,0x1A,
     0x0E,0x0C,0x10,0x18,0x12,0x30,0x14,0x60,0x16,0xC0,0x18,0x48,0x1A,0x10,0x1C,
     0x20,0x1E
 };
 
-const uint16_t NOISE_FREQ_TABLE[0x10] = {
+const uint16_t NOISE_FREQ_TABLE[0x10] ICONST_ATTR_NSF_LARGE_IRAM = {
     0x004,0x008,0x010,0x020,0x040,0x060,0x080,0x0A0,0x0CA,0x0FE,0x17C,0x1FC,
     0x2FA,0x3F8,0x7F2,0xFE4
 };
@@ -589,7 +604,7 @@ struct FDSWave
     int32_t     nPopCount;
     
 };
-int16_t     FDS_nOutputTable_L[4][0x21][0x40];
+int16_t     FDS_nOutputTable_L[4][0x21][0x40] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 
 struct FME07Wave
 {
@@ -610,7 +625,7 @@ struct FME07Wave
     int32_t     nMixL;
 };
 
-int16_t     FME07_nOutputTable_L[0x10] IDATA_ATTR;
+int16_t     FME07_nOutputTable_L[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
 
 struct N106Wave
 {
@@ -650,7 +665,7 @@ struct N106Wave
     int32_t     nMixL[8];
 };
 
-int16_t     N106_nOutputTable_L[0x10][0x10];
+int16_t     N106_nOutputTable_L[0x10][0x10] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 
 struct VRC6PulseWave
 {
@@ -675,7 +690,7 @@ struct VRC6PulseWave
     
 };
 
-int16_t     VRC6Pulse_nOutputTable_L[0x10] IDATA_ATTR;
+int16_t     VRC6Pulse_nOutputTable_L[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
 
 struct VRC6SawWave
 {
@@ -697,7 +712,7 @@ struct VRC6SawWave
     
 };
 
-int16_t     VRC6Saw_nOutputTable_L[0x20] IDATA_ATTR;
+int16_t     VRC6Saw_nOutputTable_L[0x20] IDATA_ATTR MEM_ALIGN_ATTR;
 
 struct Wave_Squares
 {
@@ -735,7 +750,7 @@ struct Wave_Squares
     int32_t         nMixL;
 };
 
-int16_t     Squares_nOutputTable_L[0x10][0x10] IDATA_ATTR;
+int16_t     Squares_nOutputTable_L[0x10][0x10] IDATA_ATTR MEM_ALIGN_ATTR;
 
 struct Wave_TND
 {
@@ -1161,16 +1176,16 @@ inline void Wave_TND_ClockMinor()
  *  Memory
  */
 /* RAM:      0x0000 - 0x07FF */
-uint8_t     pRAM[0x800] IDATA_ATTR;
+uint8_t     pRAM[0x800] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 /* SRAM:     0x6000 - 0x7FFF (non-FDS only) */
-uint8_t     pSRAM[0x2000];
+uint8_t     pSRAM[0x2000] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 /* ExRAM:    0x5C00 - 0x5FF5 (MMC5 only)
  * Also holds NSF player code (at 0x5000 - 0x500F) */
-uint8_t     pExRAM[0x1000];
+uint8_t     pExRAM[0x1000] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 /* Full ROM buffer */
 uint8_t*    pROM_Full IDATA_ATTR;
 
-uint16_t    main_nOutputTable_L[0x8000];
+uint16_t    main_nOutputTable_L[0x8000] MEM_ALIGN_ATTR;
 
 uint8_t*    pROM[10] IDATA_ATTR;/* ROM banks (point to areas in pROM_Full) */
                                 /* 0x8000 - 0xFFFF */
@@ -1188,8 +1203,8 @@ int32_t         nROMMaxSize;    /* size of allocated pROM_Full buffer */
  
 typedef uint8_t ( *ReadProc)(uint16_t);
 typedef void ( *WriteProc)(uint16_t,uint8_t);
-ReadProc    ReadMemory[0x10] IDATA_ATTR;
-WriteProc   WriteMemory[0x10] IDATA_ATTR;
+ReadProc    ReadMemory[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
+WriteProc   WriteMemory[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
 
 /*
  *  6502 Registers / Mode
@@ -3541,7 +3556,7 @@ int32_t GetSamples(uint8_t* buffer,int32_t buffersize)
 /*  Lookup Tables */
 
 /* the number of CPU cycles used for each instruction */
-static const uint8_t CPU_Cycles[0x100] = {
+static const uint8_t CPU_Cycles[0x100] ICONST_ATTR_NSF_LARGE_IRAM = {
 7,6,0,8,3,3,5,5,3,2,2,2,4,4,6,6,
 2,5,0,8,4,4,6,6,2,4,2,7,4,4,7,7,
 6,6,0,8,3,3,5,5,4,2,2,2,4,4,6,6,
@@ -3560,7 +3575,7 @@ static const uint8_t CPU_Cycles[0x100] = {
 2,5,0,8,4,4,6,6,2,4,2,7,4,4,7,7     };
 
 /* the status of the NZ flags for the given value */
-static const uint8_t NZTable[0x100] = {
+static const uint8_t NZTable[0x100] ICONST_ATTR_NSF_LARGE_IRAM = {
 Z_FLAG,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
