@@ -89,20 +89,41 @@
     #define SPC_NOECHO 1
 #endif
 
-#ifdef CPU_ARM
+#if   (CONFIG_CPU == MCF5250)
+#define IBSS_ATTR_SPC               IBSS_ATTR
+#define ICODE_ATTR_SPC              ICODE_ATTR
+#define ICONST_ATTR_SPC             ICONST_ATTR
+/* Not enough IRAM available to move further data to it. */
+#define IBSS_ATTR_SPC_LARGE_IRAM
 
-#if CONFIG_CPU != PP5002
-    #undef  ICODE_ATTR
-    #define ICODE_ATTR
+#elif (CONFIG_CPU == PP5020)
+/* spc is slower on PP5020 when moving data to IRAM. */
+#define IBSS_ATTR_SPC
+#define ICODE_ATTR_SPC
+#define ICONST_ATTR_SPC
+/* Not enough IRAM available to move further data to it. */
+#define IBSS_ATTR_SPC_LARGE_IRAM
 
-    #undef  IDATA_ATTR
-    #define IDATA_ATTR
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#define IBSS_ATTR_SPC               IBSS_ATTR
+#define ICODE_ATTR_SPC              ICODE_ATTR
+#define ICONST_ATTR_SPC             ICONST_ATTR
+/* Not enough IRAM available to move further data to it. */
+#define IBSS_ATTR_SPC_LARGE_IRAM
 
-    #undef  ICONST_ATTR
-    #define ICONST_ATTR
+#elif defined(CPU_S5L870X)
+#define IBSS_ATTR_SPC               IBSS_ATTR
+#define ICODE_ATTR_SPC              ICODE_ATTR
+#define ICONST_ATTR_SPC             ICONST_ATTR
+/* Very large IRAM. Move even more data to it. */
+#define IBSS_ATTR_SPC_LARGE_IRAM    IBSS_ATTR
 
-    #undef  IBSS_ATTR
-    #define IBSS_ATTR
+#else
+#define IBSS_ATTR_SPC               IBSS_ATTR
+#define ICODE_ATTR_SPC              ICODE_ATTR
+#define ICONST_ATTR_SPC             ICONST_ATTR
+/* Not enough IRAM available to move further data to it. */
+#define IBSS_ATTR_SPC_LARGE_IRAM
 #endif
 
 #if SPC_DUAL_CORE
@@ -110,7 +131,6 @@
     #define SHAREDBSS_ATTR __attribute__ ((section(".ibss")))
     #undef SHAREDDATA_ATTR
     #define SHAREDDATA_ATTR __attribute__((section(".idata")))
-#endif
 #endif
 
 /* Samples per channel per iteration */
@@ -192,7 +212,7 @@ struct cpu_ram_t
 #define RAM ram.ram
 extern struct cpu_ram_t ram;
 
-long CPU_run( THIS, long start_time ) ICODE_ATTR;
+long CPU_run( THIS, long start_time ) ICODE_ATTR_SPC;
 void CPU_Init( THIS );
 
 /* The DSP portion (awe!) */
@@ -375,7 +395,7 @@ struct Spc_Dsp
 #endif
 };
 
-void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf ) ICODE_ATTR;
+void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf ) ICODE_ATTR_SPC;
 void DSP_reset( struct Spc_Dsp* this );
 
 static inline void DSP_run( struct Spc_Dsp* this, long count, int32_t* out )
@@ -412,7 +432,7 @@ struct Timer
     int counter;
 };
 
-void Timer_run_( struct Timer* t, long time ) ICODE_ATTR;
+void Timer_run_( struct Timer* t, long time ) ICODE_ATTR_SPC;
 
 static inline void Timer_run( struct Timer* t, long time )
 {
@@ -461,7 +481,7 @@ void SPC_Init( THIS );
 int SPC_load_spc( THIS, const void* data, long size );
 
 /**************** DSP interaction ****************/
-void DSP_write( struct Spc_Dsp* this, int i, int data ) ICODE_ATTR;
+void DSP_write( struct Spc_Dsp* this, int i, int data ) ICODE_ATTR_SPC;
 
 static inline int DSP_read( struct Spc_Dsp* this, int i )
 {
@@ -469,7 +489,7 @@ static inline int DSP_read( struct Spc_Dsp* this, int i )
     return this->r.reg [i];
 }
 
-void SPC_run_dsp_( THIS, long time ) ICODE_ATTR;
+void SPC_run_dsp_( THIS, long time ) ICODE_ATTR_SPC;
 
 static inline void SPC_run_dsp( THIS, long time )
 {
@@ -477,10 +497,10 @@ static inline void SPC_run_dsp( THIS, long time )
         SPC_run_dsp_( this, time );
 }
 
-int SPC_read( THIS, unsigned addr, long const time ) ICODE_ATTR;
-void SPC_write( THIS, unsigned addr, int data, long const time ) ICODE_ATTR;
+int SPC_read( THIS, unsigned addr, long const time ) ICODE_ATTR_SPC;
+void SPC_write( THIS, unsigned addr, int data, long const time ) ICODE_ATTR_SPC;
 
 /**************** Sample generation ****************/
-int SPC_play( THIS, long count, int32_t* out ) ICODE_ATTR;
+int SPC_play( THIS, long count, int32_t* out ) ICODE_ATTR_SPC;
 
 #endif /* _SPC_CODEC_H_ */

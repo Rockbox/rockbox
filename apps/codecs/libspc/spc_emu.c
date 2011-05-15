@@ -28,7 +28,7 @@
 /* DSP Based on Brad Martin's OpenSPC DSP emulator */
 /* tag reading from sexyspc by John Brawn (John_Brawn@yahoo.com) and others */
 
-struct cpu_ram_t ram CACHEALIGN_ATTR;
+struct cpu_ram_t ram IBSS_ATTR_SPC_LARGE_IRAM CACHEALIGN_ATTR;
 
 /**************** Timers ****************/
 

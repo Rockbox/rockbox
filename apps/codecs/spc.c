@@ -190,7 +190,7 @@ static int LoadID666(unsigned char *buf) {
 
 /**************** Codec ****************/
 enum {SAMPLE_RATE = 32000};
-static struct Spc_Emu spc_emu IDATA_ATTR CACHEALIGN_ATTR;
+static struct Spc_Emu spc_emu IBSS_ATTR_SPC CACHEALIGN_ATTR;
 
 #if SPC_DUAL_CORE
 /** Implementations for pipelined dual-core operation **/

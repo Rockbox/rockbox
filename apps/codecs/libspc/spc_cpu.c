@@ -65,7 +65,7 @@ static unsigned char const cycle_table [0x100] = {
 #define MEM_BIT() CPU_mem_bit( this, pc, spc_time_ )
     
 static unsigned CPU_mem_bit( THIS, uint8_t const* pc, long const spc_time_ )
-    ICODE_ATTR;
+    ICODE_ATTR_SPC;
     
 static unsigned CPU_mem_bit( THIS, uint8_t const* pc, long const spc_time_ )
 {

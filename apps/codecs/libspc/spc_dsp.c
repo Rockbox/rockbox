@@ -28,8 +28,7 @@
 #include "spc_profiler.h"
 
 #if defined(CPU_COLDFIRE) || defined (CPU_ARM)
-int32_t fir_buf[FIR_BUF_CNT]
-    __attribute__ ((aligned (FIR_BUF_ALIGN*1))) IBSS_ATTR;
+int32_t fir_buf[FIR_BUF_CNT] IBSS_ATTR_SPC MEM_ALIGN_ATTR;
 #endif
 #if SPC_BRRCACHE
 /* a little extra for samples that go past end */
@@ -80,7 +79,7 @@ void DSP_write( struct Spc_Dsp* this, int i, int data )
 #if SPC_BRRCACHE
 static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,
                         struct voice_t* voice,
-                        struct raw_voice_t const* const raw_voice ) ICODE_ATTR;
+                        struct raw_voice_t const* const raw_voice ) ICODE_ATTR_SPC;
 static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,
                         struct voice_t* voice,
                         struct raw_voice_t const* const raw_voice )
@@ -248,7 +247,7 @@ wave_in_cache:;
 static void key_on(struct Spc_Dsp* const this, struct voice_t* const voice,
                    struct src_dir const* const sd,
                    struct raw_voice_t const* const raw_voice,
-                   const int key_on_delay, const int vbit) ICODE_ATTR;
+                   const int key_on_delay, const int vbit) ICODE_ATTR_SPC;
 static void key_on(struct Spc_Dsp* const this, struct voice_t* const voice,
                    struct src_dir const* const sd,
                    struct raw_voice_t const* const raw_voice,
@@ -385,7 +384,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
     
     /* each rate divides exactly into 0x7800 without remainder */
     int const env_rate_init = 0x7800;
-    static unsigned short const env_rates [0x20] ICONST_ATTR =
+    static unsigned short const env_rates [0x20] ICONST_ATTR_SPC =
     {
         0x0000, 0x000F, 0x0014, 0x0018, 0x001E, 0x0028, 0x0030, 0x003C,
         0x0050, 0x0060, 0x0078, 0x00A0, 0x00C0, 0x00F0, 0x0140, 0x0180,
@@ -767,7 +766,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         #if !SPC_NOINTERP
             /* Interleved gauss table (to improve cache coherency). */
             /* gauss [i * 2 + j] = normal_gauss [(1 - j) * 256 + i] */
-            static short const gauss [512] =
+            static short const gauss [512] ICONST_ATTR_SPC =
             {
 370,1305, 366,1305, 362,1304, 358,1304, 354,1304, 351,1304, 347,1304, 343,1303,
 339,1303, 336,1303, 332,1302, 328,1302, 325,1301, 321,1300, 318,1300, 314,1299,
