@@ -347,7 +347,7 @@ static inline bool usb_power_button(void)
 #ifdef USB_FIREWIRE_HANDLING
 static inline bool usb_reboot_button(void)
 {
-    return (button_status() & ~USBPOWER_BTN_IGNORE) != USBPOWER_BUTTON;
+    return (button_status() & ~USBPOWER_BTN_IGNORE);
 }
 #endif
 #else /* !HAVE_USB_POWER */
