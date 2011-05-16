@@ -60,12 +60,15 @@
     #define QMFWIN_TYPE int32_t
 #endif
 
-static VLC          spectral_coeff_tab[7];
+static VLC          spectral_coeff_tab[7]     IBSS_ATTR_LARGE_IRAM;
 static QMFWIN_TYPE  qmf_window[48]            IBSS_ATTR MEM_ALIGN_ATTR; 
 static int32_t      atrac3_spectrum [2][1024] IBSS_ATTR MEM_ALIGN_ATTR;
 static int32_t      atrac3_IMDCT_buf[2][ 512] IBSS_ATTR MEM_ALIGN_ATTR;
 static int32_t      atrac3_prevFrame[2][1024] IBSS_ATTR MEM_ALIGN_ATTR;
-static channel_unit channel_units[2] IBSS_ATTR_LARGE_IRAM;
+static channel_unit channel_units[2]          IBSS_ATTR_LARGE_IRAM;
+static VLC_TYPE     atrac3_vlc_table[4096][2] IBSS_ATTR_LARGE_IRAM;
+static int          vlcs_initialized = 0;
+
 
 
 /**
@@ -1153,13 +1156,11 @@ int atrac3_decode_frame(unsigned long block_align, ATRAC3Context *q,
  * Atrac3 initialization
  *
  * @param rmctx     pointer to the RMContext
- */
+ */ 
 int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3)
 {
     int i;
     uint8_t *edata_ptr = (uint8_t*)&id3->id3v2buf;
-    static VLC_TYPE atrac3_vlc_table[4096][2];
-    static int vlcs_initialized = 0;
 
 #if defined(CPU_COLDFIRE)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);

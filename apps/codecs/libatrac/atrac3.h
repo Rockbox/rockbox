@@ -23,14 +23,17 @@
 #include "../librm/rm.h"
 #include "codeclib.h"
 
-#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250)
-/* PP5022/24 and MCF5250 have larger IRAM */
-#define IBSS_ATTR_LARGE_IRAM  IBSS_ATTR
-#define ICODE_ATTR_LARGE_IRAM ICODE_ATTR
+#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || \
+    (CONFIG_CPU == MCF5250) || defined(CPU_S5L870X)
+/* PP5022/24, MCF5250 and S5L870x have larger IRAM */
+#define IBSS_ATTR_LARGE_IRAM    IBSS_ATTR
+#define ICODE_ATTR_LARGE_IRAM   ICODE_ATTR
+#define ICONST_ATTR_LARGE_IRAM  ICONST_ATTR
 #else
 /* other CPUs IRAM is not large enough */
 #define IBSS_ATTR_LARGE_IRAM
 #define ICODE_ATTR_LARGE_IRAM
+#define ICONST_ATTR_LARGE_IRAM
 #endif
 
 /* These structures are needed to store the parsed gain control data. */
