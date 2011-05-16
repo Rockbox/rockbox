@@ -510,7 +510,11 @@ mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data,
 #endif /* CPU_ARM || CPU_COLDFIRE */
 
 static void 
-mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V, const MPC_SAMPLE_FORMAT *Y)
+mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V, 
+                          const MPC_SAMPLE_FORMAT *Y) ICODE_ATTR_MPC_LARGE_IRAM;
+static void 
+mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V, 
+                          const MPC_SAMPLE_FORMAT *Y)
 {
     mpc_uint32_t n;
     

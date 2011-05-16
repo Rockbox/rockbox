@@ -123,7 +123,8 @@ void mpc_decoder_requantisierung   (mpc_decoder *d)
 void mpc_decoder_read_bitstream_sv7(mpc_decoder * d, mpc_bits_reader * r) 
                                     ICODE_ATTR_MPC_LARGE_IRAM;
 void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r,
-                                    mpc_bool_t is_key_frame);
+                                    mpc_bool_t is_key_frame)
+                                    ICODE_ATTR_MPC_SV8_BS_DEC;
 
 //------------------------------------------------------------------------------
 // macros

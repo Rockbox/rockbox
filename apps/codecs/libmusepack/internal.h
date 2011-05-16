@@ -58,7 +58,7 @@ typedef struct mpc_block_t {
 } mpc_block;
 
 #define MAX_FRAME_SIZE 4352
-#define DEMUX_BUFFER_SIZE (65536 - MAX_FRAME_SIZE) // need some space as sand box
+#define DEMUX_BUFFER_SIZE (32768 - MAX_FRAME_SIZE) // need some space as sand box
 
 struct mpc_demux_t {
     mpc_reader * r;

@@ -51,7 +51,7 @@
 #define MAX_BUFFER_SIZE (DEMUX_BUFFER_SIZE + MAX_FRAME_SIZE)
 
 // globals
-static mpc_uint8_t g_buffer[MAX_BUFFER_SIZE];
+static mpc_uint8_t g_buffer[MAX_BUFFER_SIZE] IBSS_ATTR_MPC_BITBUFFER;
 static mpc_seek_t g_seek_table[MAX_SEEK_TABLE_SIZE];
 static mpc_demux g_mpc_demux IBSS_ATTR;
 
