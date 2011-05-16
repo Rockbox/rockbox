@@ -1988,19 +1988,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Délka přetočení zpět"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Délka přetočení zpět"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5241,11 +5238,11 @@
   </source>
   <dest>
     *: none
-    radio: "Vymazat uložené stanice?"
+    radio: "Zrušit aktuální seznam stanic?"
   </dest>
   <voice>
     *: none
-    radio: "Vymazat uložené stanice?"
+    radio: "Zrušit aktuální seznam stanic?"
   </voice>
 </phrase>
 <phrase>
@@ -5343,11 +5340,11 @@
   </source>
   <dest>
     *: none
-    radio: "Vymazat seznam stanic"
+    radio: "Zrušit seznam stanic"
   </dest>
   <voice>
     *: none
-    radio: "Vymazat seznam stanic"
+    radio: "Zrušit seznam stanic"
   </voice>
 </phrase>
 <phrase>
@@ -7892,7 +7889,7 @@
     *: "Mód:"
   </dest>
   <voice>
-    *: ""
+    *: "Mód"
   </voice>
 </phrase>
 <phrase>
@@ -12659,5 +12656,19 @@
   </dest>
   <voice>
     *: "Pouze ve vlastních složkách"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Přetočit zpět při pauze"
+  </dest>
+  <voice>
+    *: "Přetočit zpět při pauze"
   </voice>
 </phrase>
