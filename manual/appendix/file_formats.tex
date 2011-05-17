@@ -104,101 +104,214 @@
 \end{rbtabular}
 
 \opt{swcodec}{
+  \chapter{Audio and metadata formats}
   \section{\label{ref:Supportedaudioformats}Supported audio formats}
   \subsection{Lossy Codecs}
   \begin{rbtabular}{\textwidth}{l>{\raggedright}p{6em}X}%
   {\textbf{Format} & \textbf{Extension} & \textbf{Notes}}{}{}
-    ATSC A/52 & \fname{.a52}, \fname{.ac3} & Supports downmixing for playback of 5.1 streams in stereo\tabularnewline
-    ADX & \fname{.adx} & \tabularnewline
-    Advanced Audio Coding & \fname{.m4a}, \fname{.m4b}, \fname{.mp4} & \tabularnewline
-    MPEG audio & \fname{.mp1}, \fname{.mpa}, \fname{.mp2}, \fname{.mp3} & \tabularnewline
-    Musepack & \fname{.mpc} & Supports SV7 and SV8 in mono/stereo \tabularnewline
-    OGG/Vorbis & \fname{.ogg}, \fname{.oga} & Playback of some old ``floor 0'' files may fail\tabularnewline
-    Sony Audio & \fname{.oma}, \fname{.aa3} & \tabularnewline
-    RealAudio & \fname{.rm}, \fname{.ra}, \fname{.rmvb} & \tabularnewline
-    Speex & \fname{.spx} & \tabularnewline
-    Dialogic telephony type & \fname{.vox} & \tabularnewline
-    Windows Media Audio Standard & \fname{.wma}, \fname{.wmv}, \fname{.asf} & \tabularnewline
-    Windows Media Audio Professional & \fname{.wma}, \fname{.wmv}, \fname{.asf} & \tabularnewline
+    ATSC A/52 (AC3)
+        & \fname{.a52}, \fname{.ac3}, \fname{.rm}, \fname{.ra}, \fname{.rmvb}
+        & Supports downmixing for playback of 5.1 streams in stereo\\
+    ADX
+        & \fname{.adx} 
+        & \\
+    Advanced Audio Coding
+        & \fname{.m4a}, \fname{.m4b}, \fname{.mp4}, \fname{.rm}, \fname{.ra}, \fname{.rmvb}
+        \nopt{clipv1,c200v2}{
+            & Supports AAC-LC, -HEv1, and -HEv2 profiles\\}
+        \opt{clipv1,c200v2}{ % low memory targets (CODEC_SIZE <= 512 KB)
+            & Supports AAC-LC profile\\}
+    MPEG audio
+        & \fname{.mpa}, \fname{.mp1}, \fname{.mp2}, \fname{.mp3} 
+        & MPEG 1/2/2.5 Layer 1/2/3\\
+    Musepack
+        & \fname{.mpc} 
+        & Supports SV7 and SV8 in mono/stereo \\
+    OGG/Vorbis
+        & \fname{.ogg}, \fname{.oga} 
+        & Playback of some old ``floor 0'' files may fail on low memory targets.
+          Files with album art larger than available RAM will be skipped. 
+          Chained Ogg files are not supported.\\
+    Sony Audio
+        & \fname{.oma}, \fname{.aa3}, \fname{.rm}, \fname{.ra}, \fname{.rmvb}
+        & Supports ATRAC3\\
+    RealAudio
+        & \fname{.rm}, \fname{.ra}, \fname{.rmvb}
+        & Supports RealAudio G2 (Cook)\\
+    Speex
+        & \fname{.spx} 
+        & \\
+    Dialogic telephony type
+        & \fname{.vox} 
+        & \\
+    Windows Media Audio Standard
+        & \fname{.wma}, \fname{.wmv}, \fname{.asf} 
+        & \\
+    Windows Media Audio Professional
+        & \fname{.wma}, \fname{.wmv}, \fname{.asf} 
+        & \\
   \end{rbtabular}
+  
+  \note{AAC-HE profiles might not play in realtime on all devices due to CPU 
+  performance requirements.}
 
   \subsection{Lossless Codecs}
   \begin{rbtabular}{\textwidth}{lp{6em}X}%
   {\textbf{Format} & \textbf{Extension} & \textbf{Notes}}{}{}
-    Audio Interchange File Format & \fname{.aif}, \fname{.aiff} & AIFF supports following formats:\\
-                                  &                     & Linear PCM 8/16/24/32 bit\\
-                                  &                     & IEEE float 32/64 bit\\
-                                  &                     & ITU-T G.711 a-law/$\mu$-law\\
-                                  &                     & QuickTime IMA ADPCM\\
-    \opt{gigabeatf,iriverh100,iriverh300,iaudiox5,iaudiom5,iaudiom3,ipodnano2g,clipv1}{
-      Monkey's Audio & \fname{.ape}, \fname{.mac} & -c1000 to -c3000
-      files decode fast enough to be useful.}
-    \opt{gigabeats}{
-      Monkey's Audio & \fname{.ape}, \fname{.mac} & }
-    \nopt{ipodnano2g}{
-      \opt{ipod,iriverh10,iriverh10_5gb,mrobe100,sansa,vibe500}{
-        Monkey's Audio & \fname{.ape}, \fname{.mac} & Only -c1000 files decode fast
-        enough to be useful.}
-    }
-    \\
-    Sun Audio & \fname{.au}, \fname{.snd} & Sun Audio supports following formats: \\
-              &                   & Linear PCM 8/16/24/32 bit \\
-              &                   & IEEE float 32/64 bit\\
-              &                   & ITU-T G.711 a-law/$\mu$-law\\
-    Free Lossless Audio & \fname{.flac} & \\
-    Apple Lossless & \fname{.m4a}, \fname{.mp4} & \\
-    Shorten & \fname{.shn} & Seeking not supported.\\
-    True Audio & \fname{.tta} & \\
-    Wave64 & \fname{.w64} & Wave/Wave64 supports following formats: \\
-    Waveform audio format & \fname{.wav} & Linear PCM 8/16/24/32 bit\\
-                          &              & IEEE float 32/64 bit\\
-                          &              & ITU-T G.711 a-law/$\mu$-law\\
-                          &              & Microsoft ADPCM\\
-                          &              & Intel DVI ADPCM(IMA ADPCM) 2/3/4/5 bit\\
-                          &              & Dialogic OKI ADPCM\\
-                          &              & YAMAHA ADPCM\\
-                          &              & Adobe SWF ADPCM\\
-    Wavpack & \fname{.wv} & \\
+    Audio Interchange File Format
+        & \fname{.aif}, \fname{.aiff} 
+        & Linear PCM 8/16/24/32 bit, IEEE float 32/64 bit, ITU-T G.711 a-law/$\mu$-law,
+          QuickTime IMA ADPCM\\
+    Monkey's Audio
+        & \fname{.ape}, \fname{.mac} 
+        \opt{gigabeatf,iriverh100,iriverh300,iaudiox5,iaudiom5,iaudiom3,ipodnano2g,clipv1}{
+            & -c1000 to -c3000 files decode fast enough to be useful.\\}
+        \opt{gigabeats}{
+            & \\}
+        \nopt{ipodnano2g}{\opt{ipod,iriverh10,iriverh10_5gb,mrobe100,sansa,vibe500}{
+            & Only -c1000 files decode fast enough to be useful.\\}}
+    Sun Audio
+        & \fname{.au}, \fname{.snd} 
+        & Linear PCM 8/16/24/32 bit, IEEE float 32/64 bit, ITU-T G.711 a-law/$\mu$-law\\
+    Free Lossless Audio
+        & \fname{.flac} 
+        & \\
+    Apple Lossless
+        & \fname{.m4a}, \fname{.mp4} 
+        & \\
+    Shorten
+        & \fname{.shn} 
+        & Seeking not supported.\\
+    True Audio
+        & \fname{.tta} 
+        & \\
+    Wave64
+        & \fname{.w64} 
+        & Supports same formats as Waveform audio format.\\
+    Waveform audio format
+        & \fname{.wav} 
+        & Linear PCM 8/16/24/32 bit, IEEE float 32/64 bit, ITU-T G.711 a-law/$\mu$-law,
+          Microsoft ADPCM, Intel DVI ADPCM (IMA ADPCM) 2/3/4/5 bit, Dialogic OKI ADPCM,
+          YAMAHA ADPCM, Adobe SWF ADPCM\\
+    Wavpack
+        & \fname{.wv} 
+        & \\
   \end{rbtabular}
 
   \subsection{Other Codecs}
   \begin{rbtabular}{\textwidth}{l>{\raggedright}p{6em}X}%
   {\textbf{Format} & \textbf{Extension} & \textbf{Notes}}{}{}
-    Atari Sound Format & \fname{.cmc}, \fname{.cm3}, \fname{.cmr}, \fname{.cms},
-        \fname{.dmc}, \fname{.dlt}, \fname{.mpt}, \fname{.mpd} & \tabularnewline
-    Synthetic music Mobile Application Format & \fname{.mmf} & Supports PCM/ADPCM only \tabularnewline
-    MOD & \fname{.mod} & \tabularnewline
-    NES Sound Format & \fname{.nsf}, \fname{.nsfe} & \tabularnewline
-    Atari SAP & \fname{.sap} & \tabularnewline
-    Sound Interface Device & \fname{.sid} & \tabularnewline
-    SPC700 & \fname{.spc} & \tabularnewline
+    Atari Sound Format
+        & \fname{.cmc}, \fname{.cm3}, \fname{.cmr}, \fname{.cms}, \fname{.dmc}, 
+          \fname{.dlt}, \fname{.mpt}, \fname{.mpd} 
+        & \\
+    Synthetic music Mobile Application Format
+        & \fname{.mmf} 
+        & PCM/ADPCM only \\
+    MOD
+        & \fname{.mod} 
+        & \\
+    NES Sound Format
+        & \fname{.nsf}, \fname{.nsfe} 
+        & Progress bar and seek use tracks instead of seconds.\\
+    Atari SAP
+        & \fname{.sap} 
+        & \\
+    Sound Interface Device
+        & \fname{.sid} 
+        & \\
+    SPC700
+        & \fname{.spc} 
+        & \\
   \end{rbtabular}
   
   \section{\label{ref:SupportedMetadata}Supported metadata tags}
     Rockbox supports different metadata formats. In general those tag formats
-    are ID3 (v1 and v2), APE (v1 and v2), Vorbis, MP4 and ASF. Few codecs use
-    codec specific tags, several codecs do not use any tags yet. The following
-    table gives an overview about what tag types rockbox supports for which
-    audio file extension.
+    are ID3 (v1.0, v1.1, v2.2, v2.3 and v2.4), APE (v1 and v2), Vorbis, MP4 and 
+    ASF. Few codecs use codec specific tags, several codecs do not use any tags 
+    yet. The following table gives an overview about what tag types rockbox 
+    supports for which audio file extension.
     
     \note{There is always only \emph{one} tag type supported for each file
     extension.}
     
     \begin{rbtabular}{\textwidth}{lX}%
-    {\textbf{Extension} & \textbf{Tag type}}{}{}
-      \fname{.mp1}, \fname{.mpa}, \fname{.mp2}, \fname{.mp3},
-         \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.tta}        & ID3 \\
-      \fname{.mpc}, \fname{.ape}, \fname{.mac}, \fname{.wv}           & APE \\
-      \fname{.ogg}, \fname{.oga}, \fname{.spx}, \fname{.flac}         & Vorbis \\
-      \fname{.m4a}, \fname{.m4b}, \fname{.mp4}                        & MP4 \\
-      \fname{.wma}, \fname{.wmv}, \fname{.asf}                        & ASF \\
-      \fname{.mmf}, \fname{.mod}, \fname{.nsf}, \fname{.nsfe},
-         \fname{.sap}, \fname{.sid}, \fname{.spc}                     & Codec specific \\
-      \fname{.a52}, \fname{.ac3}, \fname{.adx}, \fname{.oma},
-         \fname{.aa3}, \fname{.aif}, \fname{.aiff}, \fname{.au}       & None \\
-      \fname{.snd}, \fname{.shn}, \fname{.vox}, \fname{.w64},
-         \fname{.wav}, \fname{.cmc}, \fname{.cm3}, \fname{.cmr}       & None \\
-      \fname{.cms}, \fname{.dmc}, \fname{.dlt}, \fname{.mpt},
-         \fname{.mpd}                                                 & None \\
+    {\textbf{Tag type} & \textbf{File extension}}{}{}
+      ID3               & \fname{.mp1}, \fname{.mpa}, \fname{.mp2}, \fname{.mp3},
+                          \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.tta} \\
+      APE               & \fname{.mpc}, \fname{.ape}, \fname{.mac}, \fname{.wv} \\
+      Vorbis            & \fname{.ogg}, \fname{.oga}, \fname{.spx}, \fname{.flac} \\
+      MP4               & \fname{.m4a}, \fname{.m4b}, \fname{.mp4} \\
+      ASF               & \fname{.wma}, \fname{.wmv}, \fname{.asf} \\
+      Codec specific    & \fname{.mmf}, \fname{.mod}, \fname{.nsf}, \fname{.nsfe},
+                          \fname{.sap}, \fname{.sid}, \fname{.spc} \\
+      None              & \fname{.a52}, \fname{.ac3}, \fname{.adx}, \fname{.oma},
+                          \fname{.aa3}, \fname{.aif}, \fname{.aiff}, \fname{.au},
+                          \fname{.snd}, \fname{.shn}, \fname{.vox}, \fname{.w64},
+                          \fname{.wav}, \fname{.cmc}, \fname{.cm3}, \fname{.cmr},
+                          \fname{.cms}, \fname{.dmc}, \fname{.dlt}, \fname{.mpt},
+                          \fname{.mpd} \\
     \end{rbtabular}
+    
+    \subsection{Featureset for generic metadata tags}
+    \begin{rbtabular}{\textwidth}{lccccX}%
+    {\textbf{Feature} & \textbf{ID3} & \textbf{APE} & \textbf{Vorbis} & 
+     \textbf{MP4} & \textbf{ASF}}{}{}
+     Embedded albumart \fname{.bmp}     &   &   &   &   &   \\
+     Embedded albumart \fname{.jpg}     & x &   &   & x &   \\
+     Embedded albumart \fname{.png}     &   &   &   &   &   \\
+     Replaygain information             & x & x & x & x & x \\
+     Title (string)                     & x & x & x & x & x \\
+     Artist (string)                    & x & x & x & x & x \\
+     Album (string)                     & x & x & x & x & x \\
+     Genre (string)                     & x & x & x & x & x \\
+     Disc (string or number)            & x & x & x & x &   \\
+     Track (string or number)           & x & x & x & x & x \\
+     Year (string or number)            & x & x & x & x & x \\
+     Composer (string)                  &   & x & x & x & x \\
+     Comment (string)                   & x & x & x & x & x \\
+     Albumartist (string)               & x & x & x & x & x \\
+     Grouping (string)                  &   & x & x & x &   \\
+    \end{rbtabular}
+    
+    \subsection{Featureset for codec specific metadata}
+    \begin{rbtabular}{\textwidth}{lX}%
+    {\textbf{Feature} & \textbf{Codec specific metadata (file extension)}}{}{}
+     Embedded \fname{.bmp}  & None \\
+     Embedded \fname{.jpg}  & None \\
+     Embedded \fname{.png}  & None \\
+     Replaygain             & \fname{.mpc}\\
+     Title                  & \fname{.tta}, \fname{.spc}, \fname{.mmf}, \fname{.sid}, 
+                              \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.nsf}, 
+                              \fname{.nsfe}, \fname{.mod}, \fname{.sap} \\
+     Artist                 & \fname{.tta}, \fname{.spc}, \fname{.mmf}, \fname{.sid}, 
+                              \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.nsf}, 
+                              \fname{.nsfe}, \fname{.sap} \\
+     Album                  & \fname{.spc}, \fname{.sid}, \fname{.nsf}, \fname{.nsfe} \\
+     Genre                  & \fname{.tta}, \fname{.spc}, \fname{.sap} \\
+     Disc                   & \fname{.tta} \\
+     Track                  & \fname{.tta} \\
+     Year                   & \fname{.spc}, \fname{.sid}, \fname{.sap} \\
+     Composer               & \fname{.mmf} \\
+     Comment                & \fname{.spc}, \fname{.rm}, \fname{.ra}, \fname{.rmvb} \\
+     Albumartist            & None \\
+     Grouping               & None \\
+    \end{rbtabular}
+    
+    \subsection{Limitations of metadata handling}
+    \begin{enumerate}
+        \item Multiple tags (e.g. for Genre) are not supported. The first tag 
+              item of a set of multiple tags is used.
+        \item Only one tag type is supported for each audio format.
+    \nopt{clipv1,c200v2}{
+        \item Overall there are 900 bytes available to load metadata strings.
+        \item The maximum size of each metadata item (e.g. Artists) is limited 
+              to 240 bytes.
+    }
+    \opt{clipv1,c200v2}{
+        \item Overall there are 300 bytes available to load metadata strings.
+        \item The maximum size of each metadata item (e.g. Artists) is limited 
+              to 90 bytes.
+    }
+    \end{enumerate}
 }
