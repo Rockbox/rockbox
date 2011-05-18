@@ -44,16 +44,18 @@ void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c)
     sin = fp_sincos(cutoff/2, &cos);
     if (low) {
         const int32_t sin_div_g = fp_div(sin, g, 25);
+        const int32_t sin_g = FRACMUL(sin, g);
         cos >>= 3;
-        b0 = FRACMUL(sin, g) + cos;   /* 0.25 .. 4.10 */
-        b1 = FRACMUL(sin, g) - cos;   /* -1 .. 3.98 */
+        b0 = sin_g + cos;             /* 0.25 .. 4.10 */
+        b1 = sin_g - cos;             /* -1 .. 3.98 */
         a0 = sin_div_g + cos;         /* 0.25 .. 4.10 */
         a1 = sin_div_g - cos;         /* -1 .. 3.98 */
     } else {
         const int32_t cos_div_g = fp_div(cos, g, 25);
+        const int32_t cos_g = FRACMUL(cos, g);
         sin >>= 3;
-        b0 = sin + FRACMUL(cos, g);   /* 0.25 .. 4.10 */
-        b1 = sin - FRACMUL(cos, g);   /* -3.98 .. 1 */
+        b0 = sin + cos_g;             /* 0.25 .. 4.10 */
+        b1 = sin - cos_g;             /* -3.98 .. 1 */
         a0 = sin + cos_div_g;         /* 0.25 .. 4.10 */
         a1 = sin - cos_div_g;         /* -3.98 .. 1 */
     }
@@ -130,11 +132,12 @@ void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     int32_t a0, a1, a2; /* these are all s3.28 format */
     int32_t b0, b1, b2;
     const long alphadivA = fp_div(alpha, A, 27);
+    const long alphaA = FRACMUL(alpha, A);
 
     /* possible numerical ranges are in comments by each coef */
-    b0 = one + FRACMUL(alpha, A);     /* [1 .. 5] */
+    b0 = one + alphaA;                /* [1 .. 5] */
     b1 = a1 = -2*(cs >> 3);           /* [-2 .. 2] */
-    b2 = one - FRACMUL(alpha, A);     /* [-3 .. 1] */
+    b2 = one - alphaA;                /* [-3 .. 1] */
     a0 = one + alphadivA;             /* [1 .. 5] */
     a2 = one - alphadivA;             /* [-3 .. 1] */
 
@@ -160,22 +163,24 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     const long alpha = fp_sincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
     const long ap1 = (A >> 4) + one;
     const long am1 = (A >> 4) - one;
+    const long ap1_cs = FRACMUL(ap1, cs);
+    const long am1_cs = FRACMUL(am1, cs);
     const long twosqrtalpha = 2*FRACMUL(sqrtA, alpha);
     int32_t a0, a1, a2; /* these are all s6.25 format */
     int32_t b0, b1, b2;
     
     /* [0.1 .. 40] */
-    b0 = FRACMUL_SHL(A, ap1 - FRACMUL(am1, cs) + twosqrtalpha, 2);
+    b0 = FRACMUL_SHL(A, ap1 - am1_cs + twosqrtalpha, 2);
     /* [-16 .. 63.4] */
-    b1 = FRACMUL_SHL(A, am1 - FRACMUL(ap1, cs), 3);
+    b1 = FRACMUL_SHL(A, am1 - ap1_cs, 3);
     /* [0 .. 31.7] */
-    b2 = FRACMUL_SHL(A, ap1 - FRACMUL(am1, cs) - twosqrtalpha, 2);
+    b2 = FRACMUL_SHL(A, ap1 - am1_cs - twosqrtalpha, 2);
     /* [0.5 .. 10] */
-    a0 = ap1 + FRACMUL(am1, cs) + twosqrtalpha;
+    a0 = ap1 + am1_cs + twosqrtalpha;
     /* [-16 .. 4] */
-    a1 = -2*((am1 + FRACMUL(ap1, cs)));
+    a1 = -2*(am1 + ap1_cs);
     /* [0 .. 8] */
-    a2 = ap1 + FRACMUL(am1, cs) - twosqrtalpha;
+    a2 = ap1 + am1_cs - twosqrtalpha;
 
     /* [0.1 .. 1.99] */
     const long rcp_a0 = fp_div(1, a0, 55);    /* s1.30 */
@@ -199,22 +204,24 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     const long alpha = fp_sincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
     const long ap1 = (A >> 4) + one;
     const long am1 = (A >> 4) - one;
+    const long ap1_cs = FRACMUL(ap1, cs);
+    const long am1_cs = FRACMUL(am1, cs);
     const long twosqrtalpha = 2*FRACMUL(sqrtA, alpha);
     int32_t a0, a1, a2; /* these are all s6.25 format */
     int32_t b0, b1, b2;
 
     /* [0.1 .. 40] */
-    b0 = FRACMUL_SHL(A, ap1 + FRACMUL(am1, cs) + twosqrtalpha, 2);
+    b0 = FRACMUL_SHL(A, ap1 + am1_cs + twosqrtalpha, 2);
     /* [-63.5 .. 16] */
-    b1 = -FRACMUL_SHL(A, am1 + FRACMUL(ap1, cs), 3);
+    b1 = -FRACMUL_SHL(A, am1 + ap1_cs, 3);
     /* [0 .. 32] */
-    b2 = FRACMUL_SHL(A, ap1 + FRACMUL(am1, cs) - twosqrtalpha, 2);
+    b2 = FRACMUL_SHL(A, ap1 + am1_cs - twosqrtalpha, 2);
     /* [0.5 .. 10] */
-    a0 = ap1 - FRACMUL(am1, cs) + twosqrtalpha;
+    a0 = ap1 - am1_cs + twosqrtalpha;
     /* [-4 .. 16] */
-    a1 = 2*((am1 - FRACMUL(ap1, cs)));
+    a1 = 2*(am1 - ap1_cs);
     /* [0 .. 8] */
-    a2 = ap1 - FRACMUL(am1, cs) - twosqrtalpha;
+    a2 = ap1 - am1_cs - twosqrtalpha;
 
     /* [0.1 .. 1.99] */
     const long rcp_a0 = fp_div(1, a0, 55);    /* s1.30 */
