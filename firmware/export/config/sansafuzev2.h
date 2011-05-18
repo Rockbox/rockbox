@@ -130,7 +130,7 @@
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      1
-#define MAX_BRIGHTNESS_SETTING     25
+#define MAX_BRIGHTNESS_SETTING     20
 #define DEFAULT_BRIGHTNESS_SETTING  6
 
 /* define this if you have a light associated with the buttons */
