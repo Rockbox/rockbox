@@ -7,7 +7,7 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 #
-# Copyright © 2010 Rafaël Carré <rafael.carre@gmail>
+# Copyright © 2010-2011 Rafaël Carré <rafael.carre@gmail>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,65 +16,27 @@
 #
 # This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 # KIND, either express or implied.
-#
 
-import sys
-import os
-import subprocess
-import tempfile
+from sys        import argv, stderr, stdout
+from subprocess import Popen, PIPE
+from os         import execv
 
-
-def run_gcc(args):
-    os.execv(args[0], args) # run real gcc
-
-def get_output(args):
-    output = False
-    for i in args:
-        if output == True:
-            return i
-        elif i == '-o':
-            output = True
-
-
-def try_thumb(args, output):
-    thumb_args = args + ['-mthumb']
-    thumb_args[thumb_args.index('-o') + 1] = output
-    thumb_gcc = subprocess.Popen(thumb_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    (stdout, stderr) = thumb_gcc.communicate()
-
-    if thumb_gcc.returncode != 0: # building failed
-        return False
-
-    # building with thumb succeeded, show our output
-    #sys.stderr.write(bytes.decode(stderr))
-    #sys.stdout.write(bytes.decode(stdout))
-    sys.stderr.write(stderr)
-    sys.stdout.write(stdout)
-    return True
-
-##### main
-
-
-args=sys.argv[1:]   # remove script path
+args = argv[1:] # remove script path
 
 for opt in ['-E', '-MM', '-v', '--version']:
     if opt in args:
-        run_gcc(args)
+        execv(args[0], args) # not actually compiling
 
-output = get_output(args)
-split = output.rsplit('.o', 1)
+if '-o' in args and args.index('-o') < len(args) - 1:
+    if len(args[args.index('-o') + 1].rsplit('.o', 1)) == 1:
+        execv(args[0], args) # output doesn't end in .o
 
-if len(split) == 1: # output doesn't end in .o
-    run_gcc(args)
+args.append('-mthumb-interwork') # thumb-interwork is required
+gcc = Popen(args + ['-mthumb'], stdout=PIPE, stderr=PIPE)
+(out, err) = gcc.communicate()
 
-dirname = os.path.dirname(output)
-thumb_output = tempfile.mktemp(suffix='.o', prefix=split[0], dir=dirname)
+if gcc.returncode != 0: # thumb failed, try outputting arm
+    execv(args[0], args)
 
-args.append('-mthumb-interwork')
-
-if try_thumb(args, thumb_output):
-    os.rename(thumb_output, output)
-    sys.exit(0)
-else:
-    #sys.stderr.write('skipped ' + os.path.basename(output) + '\n')
-    run_gcc(args)
+stdout.write(out)
+stderr.write(err)
