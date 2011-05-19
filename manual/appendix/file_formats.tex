@@ -213,17 +213,52 @@
         & \\
     NES Sound Format
         & \fname{.nsf}, \fname{.nsfe} 
-        & Progress bar and seek use tracks instead of seconds.\\
+        & Progress bar and seek use subtracks instead of seconds.\\
     Atari SAP
         & \fname{.sap} 
         & \\
     Sound Interface Device
         & \fname{.sid} 
-        & \\
+        & Progress bar and seek use subtracks instead of seconds.\\
     SPC700
         & \fname{.spc} 
         & \\
   \end{rbtabular}
+  
+  \subsection{Codec featureset}
+  \begin{rbtabular}{.90\textwidth}{lXXX}%
+  {\textbf{Format} & \textbf{Seek} & \textbf{Resume} & \textbf{Gapless}}{}{}
+    ATSC A/52 (AC3)                             & x & x &   \\
+    ADX                                         & x &   &   \\
+    MPEG audio                                  & x & x & x \\
+    Musepack                                    & x & x & x \\
+    OGG/Vorbis                                  & x & x & x \\
+    Sony Audio                                  & x & x &   \\
+    RealAudio                                   & x & x &   \\
+    Dialogic telephony type                     & x & x &   \\
+    Windows Media Audio Standard                & x & x &   \\
+    Windows Media Audio Professional            & x & x &   \\
+    Audio Interchange File Format               & x & x & x \\
+    Monkey's Audio                              & x & x & x \\
+    Sun Audio                                   & x & x & x \\
+    Free Lossless Audio                         & x & x & x \\
+    Apple Lossless                              & x & x & x \\
+    Shorten                                     &   &   & x \\
+    True Audio                                  & x & x & x \\
+    Wave64                                      & x & x & x \\
+    Waveform audio format                       & x & x & x \\
+    Wavpack                                     & x & x & x \\
+    Atari Sound Format                          & x &   &   \\
+    Synthetic music Mobile Application Format   & x & x &   \\
+    MOD                                         & x &   &   \\
+    NES Sound Format                            & x &   &   \\
+    Atari SAP                                   & x &   &   \\
+    Sound Interface Device                      & x &   &   \\
+    SPC700                                      & x &   &   \\
+  \end{rbtabular}
+  
+  \note{The seek implementations of NES Sound Format and Sound Interface Device 
+  use subtracks instead of seconds, whereas each subtrack equals a second.}
   
   \section{\label{ref:SupportedMetadata}Supported metadata tags}
     Rockbox supports different metadata formats. In general those tag formats
@@ -254,7 +289,7 @@
     \end{rbtabular}
     
     \subsection{Featureset for generic metadata tags}
-    \begin{rbtabular}{\textwidth}{lccccX}%
+    \begin{rbtabular}{0.80\textwidth}{lXXXXX}%
     {\textbf{Feature} & \textbf{ID3} & \textbf{APE} & \textbf{Vorbis} & 
      \textbf{MP4} & \textbf{ASF}}{}{}
      Embedded albumart \fname{.bmp}     &   &   &   &   &   \\
