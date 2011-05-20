@@ -400,31 +400,31 @@ int decode_init(asf_waveformatex_t *wfx)
 
     INIT_VLC_STATIC(&sf_vlc, SCALEVLCBITS, HUFF_SCALE_SIZE,
                     scale_huffbits, 1, 1,
-                    scale_huffcodes, 2, 2, 616);
+                    scale_huffcodes, 2, 2, 616, IBSS_ATTR_WMAPRO_VLC_TABLES);
 
     INIT_VLC_STATIC(&sf_rl_vlc, VLCBITS, HUFF_SCALE_RL_SIZE,
                     scale_rl_huffbits, 1, 1,
-                    scale_rl_huffcodes, 4, 4, 1406);
+                    scale_rl_huffcodes, 4, 4, 1406, IBSS_ATTR_WMAPRO_VLC_TABLES);
 
     INIT_VLC_STATIC(&coef_vlc[0], VLCBITS, HUFF_COEF0_SIZE,
                     coef0_huffbits, 1, 1,
-                    coef0_huffcodes, 4, 4, 2108);
+                    coef0_huffcodes, 4, 4, 2108, IBSS_ATTR_WMAPRO_VLC_TABLES);
 
     INIT_VLC_STATIC(&coef_vlc[1], VLCBITS, HUFF_COEF1_SIZE,
                     coef1_huffbits, 1, 1,
-                    coef1_huffcodes, 4, 4, 3912);
+                    coef1_huffcodes, 4, 4, 3912, IBSS_ATTR_WMAPRO_VLC_TABLES);
 
     INIT_VLC_STATIC(&vec4_vlc, VLCBITS, HUFF_VEC4_SIZE,
                     vec4_huffbits, 1, 1,
-                    vec4_huffcodes, 2, 2, 604);
+                    vec4_huffcodes, 2, 2, 604, IBSS_ATTR_WMAPRO_VLC_TABLES);
 
     INIT_VLC_STATIC(&vec2_vlc, VLCBITS, HUFF_VEC2_SIZE,
                     vec2_huffbits, 1, 1,
-                    vec2_huffcodes, 2, 2, 562);
+                    vec2_huffcodes, 2, 2, 562, IBSS_ATTR_WMAPRO_VLC_TABLES);
 
     INIT_VLC_STATIC(&vec1_vlc, VLCBITS, HUFF_VEC1_SIZE,
                     vec1_huffbits, 1, 1,
-                    vec1_huffcodes, 2, 2, 562);
+                    vec1_huffcodes, 2, 2, 562, IBSS_ATTR_WMAPRO_VLC_TABLES);
 
     /** calculate number of scale factor bands and their offsets
         for every possible block size */
