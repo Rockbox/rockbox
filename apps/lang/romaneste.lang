@@ -7179,15 +7179,15 @@
 </phrase>
 <phrase>
   id: LANG_BACKDROP_FAILED
-  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  desc: deprecated
   user: core
   <source>
     *: none
-    lcd_non-mono: "Backdrop Failed"
+    lcd_non-mono: ""
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Eroare fundal"
+    lcd_non-mono: ""
   </dest>
   <voice>
     *: none
@@ -7562,19 +7562,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Durata rebobinării"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Durata rebobinării"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11150,7 +11147,6 @@
   </voice>
 </phrase>
 <phrase>
-<phrase>
   id: LANG_FM_OTHER
   desc: Catch-all FM region. Select if none of the others work
   user: core
@@ -12742,5 +12738,19 @@
   <voice>
     *: none
     recording_histogram: "Intervalul histogramei"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Rebobinare la pauză"
+  </dest>
+  <voice>
+    *: "Rebobinare la pauză"
   </voice>
 </phrase>
