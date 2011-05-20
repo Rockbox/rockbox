@@ -33,19 +33,25 @@ static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len);
 
 /*declarations of statically allocated variables used to remove malloc calls*/
 
-fixed32 coefsarray[MAX_CHANNELS][BLOCK_MAX_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
+static fixed32 coefsarray[MAX_CHANNELS][BLOCK_MAX_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
 /*decode and window into IRAM on targets with at least 80KB of codec IRAM*/
-fixed32 frame_out_buf[MAX_CHANNELS][BLOCK_MAX_SIZE * 2] IBSS_ATTR_WMA_LARGE_IRAM MEM_ALIGN_ATTR;
+static fixed32 frame_out_buf[MAX_CHANNELS][BLOCK_MAX_SIZE * 2] IBSS_ATTR_WMA_LARGE_IRAM MEM_ALIGN_ATTR;
 
 /*MDCT reconstruction windows*/
-fixed32 stat0[2048] MEM_ALIGN_ATTR, stat1[1024] MEM_ALIGN_ATTR, 
-    stat2[512] MEM_ALIGN_ATTR, stat3[256] MEM_ALIGN_ATTR, stat4[128] MEM_ALIGN_ATTR;    
+static fixed32 stat0[2048] IBSS_ATTR_WMA_XL_IRAM MEM_ALIGN_ATTR;
+static fixed32 stat1[1024] IBSS_ATTR_WMA_XL_IRAM MEM_ALIGN_ATTR;
+static fixed32 stat2[ 512] IBSS_ATTR_WMA_XL_IRAM MEM_ALIGN_ATTR;
+static fixed32 stat3[ 256] IBSS_ATTR_WMA_XL_IRAM MEM_ALIGN_ATTR;
+static fixed32 stat4[ 128] IBSS_ATTR_WMA_XL_IRAM MEM_ALIGN_ATTR;
 
 /*VLC lookup tables*/
-uint16_t *runtabarray[2], *levtabarray[2];                                        
+static uint16_t *runtabarray[2];
+static uint16_t *levtabarray[2];         
 
-uint16_t runtab_big[1336] MEM_ALIGN_ATTR, runtab_small[1072] MEM_ALIGN_ATTR,
-    levtab_big[1336] MEM_ALIGN_ATTR, levtab_small[1072] MEM_ALIGN_ATTR;
+static uint16_t runtab_big[1336]   MEM_ALIGN_ATTR;
+static uint16_t runtab_small[1072] MEM_ALIGN_ATTR;
+static uint16_t levtab_big[1336]   MEM_ALIGN_ATTR;
+static uint16_t levtab_small[1072] MEM_ALIGN_ATTR;
 
 #define VLCBUF1SIZE 4598
 #define VLCBUF2SIZE 3574
@@ -54,11 +60,11 @@ uint16_t runtab_big[1336] MEM_ALIGN_ATTR, runtab_small[1072] MEM_ALIGN_ATTR,
 
 /*putting these in IRAM actually makes PP slower*/
 
-VLC_TYPE vlcbuf1[VLCBUF1SIZE][2] MEM_ALIGN_ATTR;
-VLC_TYPE vlcbuf2[VLCBUF2SIZE][2] MEM_ALIGN_ATTR;
+static VLC_TYPE vlcbuf1[VLCBUF1SIZE][2] IBSS_ATTR_WMA_XL_IRAM MEM_ALIGN_ATTR;
+static VLC_TYPE vlcbuf2[VLCBUF2SIZE][2] MEM_ALIGN_ATTR;
 /* This buffer gets reused for lsp tables */
-VLC_TYPE vlcbuf3[VLCBUF3SIZE][2] MEM_ALIGN_ATTR;
-VLC_TYPE vlcbuf4[VLCBUF4SIZE][2] MEM_ALIGN_ATTR;
+static VLC_TYPE vlcbuf3[VLCBUF3SIZE][2] MEM_ALIGN_ATTR;
+static VLC_TYPE vlcbuf4[VLCBUF4SIZE][2] MEM_ALIGN_ATTR;
 
 
 
