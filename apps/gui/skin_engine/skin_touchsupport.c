@@ -56,7 +56,6 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
     short x,y;
     short vx, vy;
     int type = action_get_touchscreen_press(&x, &y);
-    static int last_action = ACTION_NONE;
     struct touchregion *r, *temp = NULL;
     bool repeated = (type == BUTTON_REPEAT);
     bool released = (type == BUTTON_REL);
@@ -109,7 +108,6 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                         if (r->armed && ((repeated && needs_repeat) || 
                             (released && !needs_repeat)))
                         {
-                            last_action = r->action;
                             returncode = r->action;
                             temp = r;
                         }
@@ -270,7 +268,6 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
         }
         return returncode;
     }
-        
-    last_action = ACTION_TOUCHSCREEN;
+
     return ACTION_TOUCHSCREEN;
 }

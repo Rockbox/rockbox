@@ -2235,10 +2235,9 @@ static int brickmania_game_loop(void)
             if( move_button & BUTTON_TOUCHSCREEN)
             {
                 int data;
-                short touch_x, touch_y;
+                short touch_x;
                 rb->button_status_wdata(&data);
                 touch_x = FIXED3(data >> 16);
-                touch_y = FIXED3(data & 0xffff);
 
                 if(flip_sides)
                 {

@@ -629,6 +629,14 @@ CONFIG_KEYPAD == MROBE500_PAD
 
 #define NOT_A_COL -1
 
+#if defined(SOL_LEFT_PRE)      || defined(SOL_RIGHT_PRE)     || \
+    defined(SOL_DOWN_PRE)      || defined(SOL_UP_PRE)        || \
+    defined(SOL_CUR2STACK_PRE) || defined(SOL_MOVE_PRE)      || \
+    defined(SOL_REM2CUR_PRE)   || defined(SOL_REM2STACK_PRE) || \
+    defined(SOL_DRAW_PRE)
+#   define NEED_LASTBUTTON_VAR
+#endif
+
 typedef struct
 {
     signed char suit;
@@ -1418,7 +1426,10 @@ int solitaire( int skipmenu )
 {
 
     int i,j;
-    int button, lastbutton = 0;
+    int button;
+#ifdef NEED_LASTBUTTON_VAR
+    int lastbutton = 0;
+#endif
     int c,h,prevcard;
     int biggest_col_length;
 
@@ -1906,8 +1917,9 @@ int solitaire( int skipmenu )
                 break;
         }
 
-        if( button != BUTTON_NONE )
+#ifdef NEED_LASTBUTTON_VAR
             lastbutton = button;
+#endif
 
         /* fix incoherences concerning cur_col and cur_card */
         c = find_card_col( cur_card );
