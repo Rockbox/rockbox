@@ -102,32 +102,83 @@ static void dump_short_table(short* table, int size, int delimiter) {
 #endif
 
 /*************** init functions ***************/
-#define VLCBUFSIZE 1500
-VLC_TYPE vlcbuf[21][VLCBUFSIZE][2];
+/* Codebook sizes (11586 * 4 bytes in total) */
+/* Used for envelope_quant_index[]. */
+static VLC_TYPE vlcbuf00[ 520][2] IBSS_ATTR_COOK_LARGE_IRAM;
+static VLC_TYPE vlcbuf01[ 640][2] IBSS_ATTR_COOK_LARGE_IRAM;
+static VLC_TYPE vlcbuf02[ 544][2] IBSS_ATTR_COOK_LARGE_IRAM;
+static VLC_TYPE vlcbuf03[ 528][2] IBSS_ATTR_COOK_VLCBUF;
+static VLC_TYPE vlcbuf04[ 544][2] IBSS_ATTR_COOK_VLCBUF;
+static VLC_TYPE vlcbuf05[ 544][2] IBSS_ATTR_COOK_VLCBUF;
+static VLC_TYPE vlcbuf06[ 640][2] IBSS_ATTR_COOK_VLCBUF;
+static VLC_TYPE vlcbuf07[ 576][2] IBSS_ATTR_COOK_VLCBUF;
+static VLC_TYPE vlcbuf08[ 528][2] IBSS_ATTR_COOK_VLCBUF;
+static VLC_TYPE vlcbuf09[ 544][2] IBSS_ATTR_COOK_VLCBUF;
+static VLC_TYPE vlcbuf10[ 544][2] IBSS_ATTR_COOK_VLCBUF;
+static VLC_TYPE vlcbuf11[ 640][2] IBSS_ATTR_COOK_VLCBUF;
+static VLC_TYPE vlcbuf12[ 544][2] IBSS_ATTR_COOK_LARGE_IRAM;
+/* Used for sqvh[]. */
+static VLC_TYPE vlcbuf13[ 622][2] IBSS_ATTR_COOK_LARGE_IRAM;
+static VLC_TYPE vlcbuf14[ 308][2] IBSS_ATTR_COOK_LARGE_IRAM; 
+static VLC_TYPE vlcbuf15[ 280][2] IBSS_ATTR_COOK_LARGE_IRAM;
+static VLC_TYPE vlcbuf16[1456][2] IBSS_ATTR_COOK_LARGE_IRAM;
+static VLC_TYPE vlcbuf17[ 694][2] IBSS_ATTR_COOK_LARGE_IRAM;
+static VLC_TYPE vlcbuf18[ 698][2] IBSS_ATTR_COOK_LARGE_IRAM;
+static VLC_TYPE vlcbuf19[ 104][2] IBSS_ATTR_COOK_LARGE_IRAM;
+/* Used for ccpl. */
+static VLC_TYPE vlcbuf20[  88][2] IBSS_ATTR_COOK_VLCBUF;
+
+/* Code book sizes (11586 entries in total) */
+static int env_size[13] = {520,640,544, 528,544,544,640,576,528,544,544,640,544};
+static int sqvh_size[7] = {622,308,280,1456,694,698,104};
+static int ccpl_size    = 88;
+
 
 static int init_cook_vlc_tables(COOKContext *q) {
-    int i, result;
+    int i, result = 0;
+    
+    /* Set pointers for codebooks. */
+    q->envelope_quant_index[ 0].table = vlcbuf00;
+    q->envelope_quant_index[ 1].table = vlcbuf01;
+    q->envelope_quant_index[ 2].table = vlcbuf02;
+    q->envelope_quant_index[ 3].table = vlcbuf03;
+    q->envelope_quant_index[ 4].table = vlcbuf04;
+    q->envelope_quant_index[ 5].table = vlcbuf05;
+    q->envelope_quant_index[ 6].table = vlcbuf06;
+    q->envelope_quant_index[ 7].table = vlcbuf07;
+    q->envelope_quant_index[ 8].table = vlcbuf08;
+    q->envelope_quant_index[ 9].table = vlcbuf09;
+    q->envelope_quant_index[10].table = vlcbuf10;
+    q->envelope_quant_index[11].table = vlcbuf11;
+    q->envelope_quant_index[12].table = vlcbuf12;
+    q->sqvh[0].table = vlcbuf13; 
+    q->sqvh[1].table = vlcbuf14;
+    q->sqvh[2].table = vlcbuf15; 
+    q->sqvh[3].table = vlcbuf16;
+    q->sqvh[4].table = vlcbuf17; 
+    q->sqvh[5].table = vlcbuf18;
+    q->sqvh[6].table = vlcbuf19;
+    q->ccpl.table = vlcbuf20;
 
-    result = 0;
+    /* Init envelope VLC (13 books) */
     for (i=0 ; i<13 ; i++) {
-        q->envelope_quant_index[i].table = vlcbuf[i];
-        q->envelope_quant_index[i].table_allocated = VLCBUFSIZE;
+        q->envelope_quant_index[i].table_allocated = env_size[i];
         result |= init_vlc (&q->envelope_quant_index[i], 9, 24,
             envelope_quant_index_huffbits[i], 1, 1,
             envelope_quant_index_huffcodes[i], 2, 2, INIT_VLC_USE_NEW_STATIC);
     }
-    DEBUGF("sqvh VLC init\n");
+
+    /* Init subband VLC (7 books) */
     for (i=0 ; i<7 ; i++) {
-        q->sqvh[i].table = vlcbuf[i+13];
-        q->sqvh[i].table_allocated = VLCBUFSIZE;
+        q->sqvh[i].table_allocated = sqvh_size[i];
         result |= init_vlc (&q->sqvh[i], vhvlcsize_tab[i], vhsize_tab[i],
             cvh_huffbits[i], 1, 1,
             cvh_huffcodes[i], 2, 2, INIT_VLC_USE_NEW_STATIC);
     }
 
+    /* Init Joint-Stereo VLC (1 book) */
     if (q->nb_channels==2 && q->joint_stereo==1){
-        q->ccpl.table = vlcbuf[20];
-        q->ccpl.table_allocated = VLCBUFSIZE;
+        q->ccpl.table_allocated = ccpl_size;
         result |= init_vlc (&q->ccpl, 6, (1<<q->js_vlc_bits)-1,
             ccpl_huffbits[q->js_vlc_bits-2], 1, 1,
             ccpl_huffcodes[q->js_vlc_bits-2], 2, 2, INIT_VLC_USE_NEW_STATIC);
@@ -414,7 +465,9 @@ static int unpack_SQVH(COOKContext *q, int category, int* subband_coef_index,
  * @param mlt_buffer        pointer to mlt coefficients
  */
 
-
+static void decode_vectors(COOKContext* q, int* category,
+                           int *quant_index_table, REAL_T* mlt_buffer)
+                           ICODE_ATTR_COOK_DECODE;
 static void decode_vectors(COOKContext* q, int* category,
                            int *quant_index_table, REAL_T* mlt_buffer){
     /* A zero in this table means that the subband coefficient is
@@ -438,9 +491,9 @@ static void decode_vectors(COOKContext* q, int* category,
             memset(subband_coef_index, 0, sizeof(subband_coef_index));
             memset(subband_coef_sign, 0, sizeof(subband_coef_sign));
         }
-        q->scalar_dequant(q, index, quant_index_table[band],
-                          subband_coef_index, subband_coef_sign,
-                          &mlt_buffer[band * SUBBAND_SIZE]);
+        scalar_dequant_math(q, index, quant_index_table[band],
+                            subband_coef_index, subband_coef_sign,
+                            &mlt_buffer[band * SUBBAND_SIZE]);
     }
 
     if(q->total_subbands*SUBBAND_SIZE >= q->samples_per_channel){
@@ -456,6 +509,7 @@ static void decode_vectors(COOKContext* q, int* category,
  * @param mlt_buffer        pointer to mlt coefficients
  */
 
+static void mono_decode(COOKContext *q, REAL_T* mlt_buffer) ICODE_ATTR_COOK_DECODE;
 static void mono_decode(COOKContext *q, REAL_T* mlt_buffer) {
 
     int category_index[128];
@@ -818,10 +872,12 @@ int cook_decode_init(RMContext *rmctx, COOKContext *q)
 
 
     /* Initialize COOK signal arithmetic handling */
+    /*
     if (1) {
         q->scalar_dequant  = scalar_dequant_math;
         q->interpolate     = interpolate_math;
     }
+    */
 
     /* Try to catch some obviously faulty streams, othervise it might be exploitable */
     if (q->total_subbands > 53) {

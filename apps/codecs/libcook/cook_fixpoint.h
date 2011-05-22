@@ -120,6 +120,11 @@ static inline int av_clip(int a, int amin, int amax)
  * @param subband_coef_sign     use random noise instead of predetermined value
  * @param mlt_ptr               pointer to the mlt coefficients
  */
+
+static void scalar_dequant_math(COOKContext *q, int index,
+                                int quant_index, int* subband_coef_index,
+                                int* subband_coef_sign, REAL_T *mlt_p)
+                                ICODE_ATTR_COOK_DECODE;
 static void scalar_dequant_math(COOKContext *q, int index,
                                 int quant_index, int* subband_coef_index,
                                 int* subband_coef_sign, REAL_T *mlt_p)

@@ -27,6 +27,34 @@
 #include "../librm/rm.h"
 #include "cookdata_fixpoint.h"
 
+#include "codeclib.h"
+
+#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250)
+/* PP5022/24, MCF5250 have large IRAM */
+#define IBSS_ATTR_COOK_LARGE_IRAM    IBSS_ATTR
+#define ICODE_ATTR_COOK_LARGE_IRAM   ICODE_ATTR
+#define ICONST_ATTR_COOK_LARGE_IRAM  ICONST_ATTR
+#define IBSS_ATTR_COOK_VLCBUF
+#define ICODE_ATTR_COOK_DECODE
+
+#elif defined(CPU_S5L870X)
+/* S5L870X have even larger IRAM and it is faster to use ICODE_ATTR. */
+#define IBSS_ATTR_COOK_LARGE_IRAM    IBSS_ATTR
+#define ICODE_ATTR_COOK_LARGE_IRAM   ICODE_ATTR
+#define ICONST_ATTR_COOK_LARGE_IRAM  ICONST_ATTR
+#define IBSS_ATTR_COOK_VLCBUF        IBSS_ATTR
+#define ICODE_ATTR_COOK_DECODE       ICODE_ATTR
+
+#else
+/* other CPUs IRAM is not large enough */
+#define IBSS_ATTR_COOK_LARGE_IRAM
+#define ICODE_ATTR_COOK_LARGE_IRAM
+#define ICONST_ATTR_COOK_LARGE_IRAM
+#define IBSS_ATTR_COOK_VLCBUF
+#define ICODE_ATTR_COOK_DECODE
+
+#endif
+
 typedef struct {
     int *now;
     int *previous;
@@ -86,13 +114,14 @@ typedef struct cook {
 
     /* data buffers */
 
-    uint8_t             decoded_bytes_buffer[1024];
-    REAL_T mono_mdct_output[2048] __attribute__ ((aligned(16)));
-    REAL_T              mono_previous_buffer1[1024];
-    REAL_T              mono_previous_buffer2[1024];
-    REAL_T              decode_buffer_1[1024];
-    REAL_T              decode_buffer_2[1024];
-    REAL_T              decode_buffer_0[1060]; /* static allocation for joint decode */
+    uint8_t             decoded_bytes_buffer[1024]  MEM_ALIGN_ATTR;
+    REAL_T              mono_mdct_output[2048]      MEM_ALIGN_ATTR;
+    REAL_T              mono_previous_buffer1[1024] MEM_ALIGN_ATTR;
+    REAL_T              mono_previous_buffer2[1024] MEM_ALIGN_ATTR;
+    REAL_T              decode_buffer_1[1024]       MEM_ALIGN_ATTR;
+    REAL_T              decode_buffer_2[1024]       MEM_ALIGN_ATTR;
+    /* static allocation for joint decode */
+    REAL_T              decode_buffer_0[1060]       MEM_ALIGN_ATTR;
 } COOKContext;
 
 int cook_decode_init(RMContext *rmctx, COOKContext *q);
