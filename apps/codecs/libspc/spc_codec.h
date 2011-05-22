@@ -51,6 +51,7 @@
 /* Only some targets are fast enough for gaussian and realtime BRR decode */
 #if CONFIG_CPU == S3C2440 || CONFIG_CPU == IMX31L || \
     CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2 || \
+    defined(CPU_S5L870X) || \
     (CONFIG_PLATFORM & PLATFORM_HOSTED) || MEMORYSIZE <= 2
     /* Don't cache BRR waves */
     #define SPC_BRRCACHE 0 

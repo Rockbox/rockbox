@@ -766,7 +766,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         #if !SPC_NOINTERP
             /* Interleved gauss table (to improve cache coherency). */
             /* gauss [i * 2 + j] = normal_gauss [(1 - j) * 256 + i] */
-            static short const gauss [512] ICONST_ATTR_SPC =
+            static short const gauss [512] ICONST_ATTR_SPC MEM_ALIGN_ATTR =
             {
 370,1305, 366,1305, 362,1304, 358,1304, 354,1304, 351,1304, 347,1304, 343,1303,
 339,1303, 336,1303, 332,1302, 328,1302, 325,1301, 321,1300, 318,1300, 314,1299,
