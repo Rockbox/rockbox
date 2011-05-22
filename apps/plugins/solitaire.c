@@ -1918,6 +1918,7 @@ int solitaire( int skipmenu )
         }
 
 #ifdef NEED_LASTBUTTON_VAR
+        if( button != BUTTON_NONE )
             lastbutton = button;
 #endif
 
