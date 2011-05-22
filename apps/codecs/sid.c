@@ -66,15 +66,13 @@
 CODEC_HEADER
 
 #define CHUNK_SIZE (1024*2)
+#define SID_BUFFER_SIZE 0x10000
 
 /* This codec supports SID Files:
  * 
  */
 
 static int32_t samples[CHUNK_SIZE] IBSS_ATTR;   /* The sample buffer */
-
-/* Static buffer for the plain SID-File */
-static unsigned char sidfile[0x10000];
 
 void sidPoke(int reg, unsigned char val) ICODE_ATTR;
 
@@ -1225,6 +1223,7 @@ enum codec_status codec_run(void)
     unsigned int filesize;
     unsigned short load_addr, init_addr, play_addr;
     unsigned char subSongsMax, subSong, song_speed;
+    unsigned char *sidfile = NULL;
     intptr_t param;
 
     if (codec_init()) {
@@ -1236,7 +1235,7 @@ enum codec_status codec_run(void)
     /* Load SID file the read_filebuf callback will return the full requested
      * size if at all possible, so there is no need to loop */
     ci->seek_buffer(0);
-    filesize = ci->read_filebuf(sidfile, sizeof(sidfile));
+    sidfile = ci->request_buffer(&filesize, SID_BUFFER_SIZE);
 
     if (filesize == 0) {
         return CODEC_ERROR;
