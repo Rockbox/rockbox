@@ -15,7 +15,7 @@
 # KIND, either express or implied.
 #
 # 
-# Latvian language file, translated by Mārtiņš Šimis
+# Latvian language file, translated by Mārtiņš Šimis jeb msh
 
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -1985,11 +1985,10 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
     *: none
@@ -12658,5 +12657,19 @@
   </dest>
   <voice>
     *: "Tikai Norādītās Mapēs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Attīt Nopauzējot"
+  </dest>
+  <voice>
+    *: "Attīt Nopauzējot"
   </voice>
 </phrase>
