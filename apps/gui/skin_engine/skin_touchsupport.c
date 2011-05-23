@@ -103,6 +103,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                         }
                         temp = r;
                         returncode = r->action;
+                        r->last_press = current_tick;
                         break;
                     default:
                         if (r->armed && ((repeated && needs_repeat) || 
