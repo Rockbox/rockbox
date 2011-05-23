@@ -1220,7 +1220,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {
-    unsigned int filesize;
+    size_t filesize;
     unsigned short load_addr, init_addr, play_addr;
     unsigned char subSongsMax, subSong, song_speed;
     unsigned char *sidfile = NULL;
@@ -1243,7 +1243,7 @@ enum codec_status codec_run(void)
     
     c64Init(44100);
     LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr,
-            &subSongsMax, &subSong, &song_speed, filesize);
+            &subSongsMax, &subSong, &song_speed, (unsigned short)filesize);
     sidPoke(24, 15);                /* Turn on full volume */
     cpuJSR(init_addr, subSong);     /* Start the song initialize */
     
@@ -1264,7 +1264,7 @@ enum codec_status codec_run(void)
             /* Start playing from scratch */
             c64Init(44100);
             LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr,
-                              &subSongsMax, &subSong, &song_speed, filesize);
+                              &subSongsMax, &subSong, &song_speed, (unsigned short)filesize);
             sidPoke(24, 15);            /* Turn on full volume */            
             subSong = param / 1000;     /* Now use the current seek time in seconds as subsong */
             cpuJSR(init_addr, subSong); /* Start the song initialize */
