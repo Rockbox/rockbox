@@ -1026,7 +1026,8 @@ static int parse_lasttouch(struct skin_element *element,
         if (element->params[i].type == STRING)
             data->region = skin_find_item(element->params[i].data.text,
                                           SKIN_FIND_TOUCHREGION, wps_data);
-        else if (element->params[i].type == INTEGER)
+        else if (element->params[i].type == INTEGER ||
+                 element->params[i].type == DECIMAL)
             data->timeout = element->params[i].data.number;
     }
 
