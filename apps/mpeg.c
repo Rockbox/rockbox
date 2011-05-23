@@ -2739,7 +2739,6 @@ void audio_next(void)
     char name_buf[MAX_PATH+1];
     const char* file;
     int steps = 1;
-    int index;
 
     do {
         file = playlist_peek(steps, name_buf, sizeof(name_buf));
@@ -2750,7 +2749,7 @@ void audio_next(void)
                 break;
             continue;
         }
-        index = playlist_next(steps);
+        playlist_next(steps);
         current_track_counter++;
         is_playing = true;
         playing = true;
@@ -2768,7 +2767,6 @@ void audio_prev(void)
     char name_buf[MAX_PATH+1];
     const char* file;
     int steps = -1;
-    int index;
 
     do {
         file = playlist_peek(steps, name_buf, sizeof(name_buf));
@@ -2778,7 +2776,7 @@ void audio_prev(void)
             steps--;
             continue;
         }
-        index = playlist_next(steps);
+        playlist_next(steps);
         current_track_counter++;
         is_playing = true;
         playing = true;

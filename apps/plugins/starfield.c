@@ -395,7 +395,7 @@ int plugin_main(void)
 {
     int button, avg_peak, t_disp=0;
     int font_h, font_w;
-    bool pulse=true;
+    bool pulse __attribute__ ((unused)) = true; /* 'unused' resolves warnings */
     rb->lcd_getstringsize("A", &font_w, &font_h);
     starfield_init(&starfield);
     starfield_add_stars(&starfield, INIT_STARS);
