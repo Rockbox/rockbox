@@ -392,8 +392,8 @@ void radio_screen(void)
 #endif
 #if CONFIG_CODEC != SWCODEC
     int timeout = current_tick + HZ/10;
-    unsigned int last_seconds = 0;
 #if !defined(SIMULATOR)
+    unsigned int last_seconds = 0;
     unsigned int seconds = 0;
     struct audio_recording_options rec_options;
 #endif /* SIMULATOR */
@@ -547,8 +547,10 @@ void radio_screen(void)
                     rec_command(RECORDING_CMD_START);
                     update_type = SKIN_REFRESH_ALL;
                 }
-#endif /* SIMULATOR */
+#if CONFIG_CODEC != SWCODEC
                 last_seconds = 0;
+#endif
+#endif /* SIMULATOR */
                 break;
 #endif /* #ifdef FM_RECORD */
 
