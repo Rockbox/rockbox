@@ -50,4 +50,11 @@
 #define NORETURN_ATTR
 #endif
 
+
+#if defined(__GNUC__)
+#define FORCE_INLINE inline __attribute__((always_inline))
+#else
+#define FORCE_INLINE inline
+#endif
+
 #endif /* _GCC_EXTENSIONS_H_ */
