@@ -6,7 +6,7 @@
     <author name="Thomas Jarosch" website="http://www.rockbox.org"/>
 
     <!-- Note: Another version tag below -->
-    <version major="3" minor="8" release="x" build="3"/>
+    <version major="3" minor="8" release="x" build="4"/>
 
     <titles>
       <title lang="en_US">Rockbox</title>
@@ -23,6 +23,8 @@
   <application id="rockbox.thomasjfox.003" appdata="rockbox">
     <exec command="run_rockbox.sh"/>
 
+    <!-- Old title tag for pre hotfix6 OS version -->
+    <title lang="en_US">Rockbox</title>
     <titles>
       <title lang="en_US">Rockbox</title>
     </titles>
@@ -32,7 +34,7 @@
 
     <author name="The rockbox team" website="http://www.rockbox.org"/>
 
-    <version major="3" minor="8" release="x" build="3"/>
+    <version major="3" minor="8" release="x" build="4"/>
 
     <osversion major="1" minor="0" release="0" build="0"/>
 
