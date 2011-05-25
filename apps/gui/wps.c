@@ -1203,6 +1203,11 @@ static void wps_state_init(void)
     /* add the WPS track event callbacks */
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, track_changed_callback);
     add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false, nextid3available_callback);
+#if CONFIG_CODEC == SWCODEC
+    /* Use the same callback as ..._TRACK_CHANGE for when remaining handles have
+       finished */
+    add_event(PLAYBACK_EVENT_CUR_TRACK_READY, false, track_changed_callback);
+#endif
 #ifdef AUDIO_FAST_SKIP_PREVIEW
     add_event(PLAYBACK_EVENT_TRACK_SKIP, false, track_skip_callback);
 #endif

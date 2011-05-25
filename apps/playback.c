@@ -1716,6 +1716,17 @@ static int audio_finish_load_track(struct track_info *info)
     }
 #endif
 
+    /* All handles available to external routines are ready - audio and codec
+       information is private */
+
+    if (info == track_list_user_current(0))
+    {
+        /* Send only when the track handles could not all be opened ahead of
+           time for the user's current track - otherwise everything is ready
+           by the time PLAYBACK_EVENT_TRACK_CHANGE is sent */
+        send_event(PLAYBACK_EVENT_CUR_TRACK_READY, id3_get(PLAYING_ID3));
+    }
+
 #ifdef HAVE_CODEC_BUFFERING
     /* Try to buffer a codec for the track */
     if (info != cur_info && !audio_buffer_codec(info, track_id3))

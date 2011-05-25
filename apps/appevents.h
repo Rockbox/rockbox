@@ -31,11 +31,19 @@
 
 /** Playback events **/
 enum {
+    /* Playback is starting from a stopped state */
     PLAYBACK_EVENT_START_PLAYBACK = (EVENT_CLASS_PLAYBACK|1),
+    /* Audio has begun buffering for decoding track (or is already completed) */
     PLAYBACK_EVENT_TRACK_BUFFER,
+    /* Handles for current user track are ready (other than audio or codec) */
+    PLAYBACK_EVENT_CUR_TRACK_READY,
+    /* Current user track finished */
     PLAYBACK_EVENT_TRACK_FINISH,
+    /* A new current user track has begun */
     PLAYBACK_EVENT_TRACK_CHANGE,
+    /* A manual skip is about to be processed */
     PLAYBACK_EVENT_TRACK_SKIP,
+    /* Next track medadata was just loaded */
     PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE,
 };
 
