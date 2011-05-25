@@ -138,8 +138,15 @@ static int sdl_event_thread(void * param)
     }
 
 #if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
-    /* Hide mouse cursor on real touchscreen device */
-    SDL_ShowCursor(SDL_DISABLE);
+    /* SDL touch screen fix: Work around a SDL assumption that returns
+       relative mouse coordinates when you get to the screen edges
+       using the touchscreen and a disabled mouse cursor.
+     */
+    uint8_t hiddenCursorData = 0;
+    SDL_Cursor *hiddenCursor = SDL_CreateCursor(&hiddenCursorData, &hiddenCursorData, 8, 1, 0, 0);
+
+    SDL_ShowCursor(SDL_ENABLE);
+    SDL_SetCursor(hiddenCursor);
 #endif
 
     SDL_WM_SetCaption(UI_TITLE, NULL);
@@ -172,6 +179,10 @@ static int sdl_event_thread(void * param)
     g_main_loop_quit (maemo_main_loop);
     g_main_loop_unref(maemo_main_loop);
     SDL_WaitThread(maemo_thread, NULL);
+#endif
+
+#if (CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
+    SDL_FreeCursor(hiddenCursor);
 #endif
 
     if(picture_surface)
