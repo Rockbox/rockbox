@@ -77,6 +77,7 @@ Java_org_rockbox_RockboxFramebuffer_buttonHandler(JNIEnv*env, jclass class,
             button = dpad_to_button((int)keycode);
         if (button)
         {
+            reset_poweroff_timer();
             queue_post(&button_queue, button, 0);
             return true;
         }
