@@ -33,7 +33,7 @@
  *          where phase is a 32 bit unsigned integer with 0 representing 0
  *          and 0xFFFFFFFF representing 2*pi, and *cos is the address to
  *          a long signed integer.  Value returned is a long signed integer
- *          from LONG_MIN to LONG_MAX, representing -1 to 1 respectively.
+ *          from -0x80000000 to 0x7fffffff, representing -1 to 1 respectively.
  *          That is, value is a fixed point integer with 31 fractional bits.
  *
  *  Take square root of a fixed point number:

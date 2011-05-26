@@ -129,7 +129,7 @@ enum codec_status codec_run(void)
         
         fp_sincos((unsigned long)phasemultiple,&z);
 
-        a = (M_SQRT2*big28)-(z*big28/LONG_MAX);
+        a = (M_SQRT2*big28) - (z >> 3);
 
         /**
          * In the long passed to fsqrt there are only 4 nonfractional bits,
