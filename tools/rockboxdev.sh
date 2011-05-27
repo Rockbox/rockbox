@@ -276,7 +276,7 @@ do
     echo ""
     case $arch in
         [Ss])
-            build "binutils" "sh-elf" "2.16.1"
+            build "binutils" "sh-elf" "2.16.1" "" "--disable-werror"
             build "gcc" "sh-elf" "4.0.3" "gcc-4.0.3-rockbox-1.diff"
             ;;
 
@@ -290,18 +290,12 @@ do
             ;;
 
         [Mm])
-            binopts=""
-            case $system in
-                Darwin)
-                    binopts="--disable-werror"
-                    ;;
-            esac
-            build "binutils" "m68k-elf" "2.20.1" "" "$binopts"
+            build "binutils" "m68k-elf" "2.20.1" "" "--disable-werror"
             build "gcc" "m68k-elf" "4.5.2" "" "--with-arch=cf" "gmp mpfr mpc"
             ;;
 
         [Aa])
-            build "binutils" "arm-elf" "2.16.1"
+            build "binutils" "arm-elf" "2.16.1" "" "--disable-werror"
             build "gcc" "arm-elf" "4.0.3" "rockbox-multilibs-arm-elf-gcc-4.0.3_3.diff"
             ;;
 
@@ -310,11 +304,11 @@ do
             gccopts=""
             case $system in
                 Darwin)
-                    binopts="--disable-nls --disable-werror"
+                    binopts="--disable-nls"
                     gccopts="--disable-nls"
                     ;;
             esac
-            build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff" "$binopts"
+            build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff" "$binopts --disable-werror"
             build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts" "gmp mpfr"
             ;;
 
