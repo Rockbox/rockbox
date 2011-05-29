@@ -28,6 +28,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "touchscreen.h"
+#include "powermgmt.h"
 
 extern JNIEnv *env_ptr;
 static int last_y, last_x;
@@ -84,7 +85,7 @@ Java_org_rockbox_RockboxFramebuffer_buttonHandler(JNIEnv*env, jclass class,
     }
 
     if (!button)
-    {   
+    {
         button = key_to_button(keycode);
     }
 
@@ -103,7 +104,7 @@ Java_org_rockbox_RockboxFramebuffer_buttonHandler(JNIEnv*env, jclass class,
         last_btns &= (~button);
         return false;
     }
-        
+
     return true;
 }
 
