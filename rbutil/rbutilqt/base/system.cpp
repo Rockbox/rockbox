@@ -190,9 +190,14 @@ QString System::osVersionString(void)
 #else
     long cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
-    result = QString("CPU: %1, %2 processor(s)").arg(u.machine).arg(cores);
-    result += QString("<br/>System: %2<br/>Release: %3<br/>Version: %4")
-        .arg(u.sysname).arg(u.release).arg(u.version);
+    if(ret != -1) {
+        result = QString("CPU: %1, %2 processor(s)").arg(u.machine).arg(cores);
+        result += QString("<br/>System: %2<br/>Release: %3<br/>Version: %4")
+            .arg(u.sysname).arg(u.release).arg(u.version);
+    }
+    else {
+        result = QString("(Error when retrieving system information)");
+    }
 #if defined(Q_OS_MACX)
     SInt32 major;
     SInt32 minor;

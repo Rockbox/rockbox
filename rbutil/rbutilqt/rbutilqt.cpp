@@ -1065,8 +1065,7 @@ void RbUtilQt::uninstallBootloader(void)
     connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
     connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
 
-    int result;
-    result = bl->uninstall();
+    bl->uninstall();
 
     logger->setFinished();
 
