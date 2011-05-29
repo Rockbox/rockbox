@@ -33,7 +33,7 @@ ZIPALIGN=$(ANDROID_SDK_PATH)/tools/zipalign
 KEYSTORE=$(HOME)/.android/debug.keystore
 ADB=$(ANDROID_SDK_PATH)/platform-tools/adb
 
-MANIFEST	:= $(BUILDDIR)/AndroidManifest.xml
+MANIFEST	:= $(BUILDDIR)/bin/AndroidManifest.xml
 MANIFEST_SRC	:= $(ANDROID_DIR)/AndroidManifest.xml
 
 R_JAVA		:= $(BUILDDIR)/gen/$(PACKAGE_PATH)/R.java
@@ -66,7 +66,7 @@ CLEANOBJS += bin gen libs data
 JAVAC_OPTS += -implicit:none -classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin
 
 .PHONY:
-$(MANIFEST): $(MANIFEST_SRC)
+$(MANIFEST): $(MANIFEST_SRC) $(DIRS)
 	$(call PRINTS,MANIFEST $(@F))sed -e 's/versionName="1.0"/versionName="$(SVNVERSION)"/' $(MANIFEST_SRC) > $(MANIFEST)
 
 $(R_JAVA) $(AP_): $(MANIFEST) $(RES) | $(DIRS)
