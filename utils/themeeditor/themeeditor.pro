@@ -215,3 +215,7 @@ macx {
     QMAKE_INFO_PLIST = Info.plist
     RC_FILE = resources/windowicon.icns
 }
+
+# add any external lib build into build/ to clean target, as well as objects
+# created during that in the objects build folder.
+QMAKE_CLEAN += build/*.a $$OBJECTS_DIR/*.o
