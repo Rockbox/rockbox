@@ -500,6 +500,13 @@ arm1176jzscc () {
  endian="little"
 }
 
+arm7ejscc () {
+ findarmgcc
+ GCCOPTS="$CCOPTS -march=armv5te"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+}
+
 mipselcc () {
  prefixtools mipsel-elf-
  # mips is predefined, but we want it for paths. use __mips instead
@@ -1271,8 +1278,8 @@ cat <<EOF
  200) SDL                 170) HD200             131) Mini2440
  201) Android             171) HD300
  202) Nokia N8xx
- 203) Nokia N900
- 204) Pandora
+ 203) Nokia N900          ==ROCKCHIP==
+ 204) Pandora             180) rk27xx generic
 
 EOF
 
@@ -2967,6 +2974,29 @@ fi
     t_cpu="coldfire"
     t_manufacturer="mpio"
     t_model="hd300"
+    ;;
+
+   180|rk27generic)
+    target_id=78
+    modelname="rk27generic"
+    target="-DRK27_GENERIC"
+    memory=16 # always
+    arm7ejscc
+    tool="$rootdir/tools/scramble -add=rk27"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rk27"
+    bootoutput="bootloader.rk27"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="rk27generic"
     ;;
 
    200|sdlapp)

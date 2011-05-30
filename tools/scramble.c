@@ -126,7 +126,7 @@ void usage(void)
     printf("\t                   9200, 1630, 6330, ldax, m200, c100, clip, e2v2,\n"
            "\t                   m2v4, fuze, c2v2, clv2, y820, y920, y925, x747,\n"
            "\t                   747p, x777, nn2g, m244, cli+, fuz2, hd20, hd30,\n"
-           "\t                   ip6g)\n");
+           "\t                   ip6g, rk27)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -337,6 +337,8 @@ int main (int argc, char** argv)
             modelnum = 71;
         else if (!strcmp(&argv[1][5], "fuz+")) /* Sansa Fuze+ */
             modelnum = 72;
+        else if (!strcmp(&argv[1][5], "rk27")) /* rockchip 27xx generic */
+            modelnum = 73;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

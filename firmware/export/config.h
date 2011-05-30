@@ -75,6 +75,7 @@
 #define AT91SAM9260  9260
 #define AS3525v2    35252
 #define IMX233        233
+#define RK27XX       2700
 
 /* platforms
  * bit fields to allow PLATFORM_HOSTED to be OR'ed e.g. with a
@@ -222,6 +223,7 @@
 #define LCD_VIBE500   39 /* as used by the Packard Bell Vibe 500 */
 #define LCD_IPOD6G    40 /* as used by the iPod Nano 2nd Generation */
 #define LCD_FUZEPLUS  41
+#define LCD_SPFD5420A 42 /* rk27xx */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -260,6 +262,7 @@ Lyre prototype 1 */
 #define I2C_AS3525  15
 #define I2C_S5L8702 16 /* Same as S5L8700, but with two channels */
 #define I2C_IMX233  17
+#define I2C_RK27XX  18
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -271,6 +274,7 @@ Lyre prototype 1 */
 #define NAND_TCC     2
 #define NAND_SAMSUNG 3
 #define NAND_CC      4 /* ChinaChip */
+#define NAND_RK27XX  5
 
 /* CONFIG_RTC */
 #define RTC_M41ST84W 1 /* Archos Recorder */
@@ -448,6 +452,8 @@ Lyre prototype 1 */
 #include "config/mpiohd200.h"
 #elif defined(MPIO_HD300)
 #include "config/mpiohd300.h"
+#elif defined(RK27_GENERIC)
+#include "config/rk27generic.h"
 #elif defined(SDLAPP)
 #include "config/sdlapp.h"
 #elif defined(ANDROID)
@@ -533,8 +539,8 @@ Lyre prototype 1 */
 
 #elif defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320) \
   || (CONFIG_CPU == AT91SAM9260) || (CONFIG_CPU == AS3525v2) \
-  || (CONFIG_CPU == S5L8702) || (CONFIG_PLATFORM & PLATFORM_ANDROID) \
-  || (CONFIG_CPU == IMX233)
+  || (CONFIG_CPU == S5L8702) || (CONFIG_CPU == IMX233) \
+  || (CONFIG_CPU == RK27XX) ||(CONFIG_PLATFORM & PLATFORM_ANDROID)
 #define CPU_ARM
 #define ARM_ARCH 5 /* ARMv5 */
 
@@ -774,7 +780,8 @@ Lyre prototype 1 */
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) \
     || defined(CPU_S5L870X) || (CONFIG_CPU == S3C2440) \
-    || defined(APPLICATION) || (CONFIG_CPU == PP5002)
+    || defined(APPLICATION) || (CONFIG_CPU == PP5002) \
+    || (CONFIG_CPU == RK27XX)
 #define HAVE_SEMAPHORE_OBJECTS
 #endif
 

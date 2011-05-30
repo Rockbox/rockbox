@@ -210,6 +210,9 @@ target/arm/ata-nand-telechips.c
 #if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_SAMSUNG)
 target/arm/s5l8700/ata-nand-s5l8700.c
 #endif
+#if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_RK27XX)
+target/arm/rk27xx/ata-nand-rk27xx.c
+#endif
 #if (CONFIG_STORAGE & STORAGE_ATA) && !defined(IPOD_6G)
 drivers/ata.c
 #endif
@@ -473,6 +476,8 @@ target/arm/i2c-telechips.c
 target/arm/s5l8700/i2c-s5l8700.c
 #elif CONFIG_I2C == I2C_S5L8702
 target/arm/s5l8702/i2c-s5l8702.c
+#elif CONFIG_I2C == I2C_RK27XX
+target/arm/rk27xx/i2c-rk27xx.c
 #endif
 
 #if CONFIG_CPU == PNX0101
@@ -562,6 +567,8 @@ target/arm/s5l8700/crt0.S
 target/arm/s5l8702/crt0.S
 #elif CONFIG_CPU==IMX233
 target/arm/imx233/crt0.S
+#elif CONFIG_CPU==RK27XX
+target/arm/rk27xx/crt0.S
 #elif defined(CPU_ARM)
 target/arm/crt0.S
 #endif /* defined(CPU_*) */
@@ -1601,6 +1608,23 @@ target/arm/s5l8702/pcm-s5l8702.c
 target/arm/s5l8702/ipod6g/audio-ipod6g.c
 target/arm/s5l8702/ipod6g/adc-ipod6g.c
 #endif
+#endif
+#endif
+
+#ifndef SIMULATOR
+#if CONFIG_CPU == RK27XX
+target/arm/rk27xx/kernel-rk27xx.c
+target/arm/rk27xx/system-rk27xx.c
+target/arm/rk27xx/timer-rk27xx.c
+target/arm/rk27xx/backlight-rk27xx.c
+target/arm/rk27xx/lcd-rk27xx.c
+target/arm/rk27xx/adc-rk27xx.c
+target/arm/rk27xx/sd-rk27xx.c
+target/arm/rk27xx/ftl-rk27xx.c
+#endif
+
+#if defined(RK27_GENERIC)
+target/arm/rk27xx/rk27generic/button-rk27generic.c
 #endif
 #endif
 
