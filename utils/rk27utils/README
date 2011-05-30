@@ -1,0 +1,37 @@
+This is the collection of small utilities needed to hack Rockchip rk27xx
+series based DAPs. This tools were tested on linux only. 
+
+
+rk27load
+This directory contains tool which can send arbitrary image(s) to the device
+in rockchip recovery mode (VID:PID 0x071B:0x3201).
+
+The first image can not exceed 510 bytes (+2 bytes checksum) and entry
+point is 0x18020e00. Usually this code is used to configure SDRAM controller.
+One can use first stage image extracted from Rock27Boot.bin file (a bit
+more sofisticated) or the one provided in rk27load/stage1 directory.
+
+The second image is loaded at the begining of the dram (0x60000000)
+and executed. For some reason (which is still unclear) the size of 
+2nd stage image is limited to about 3-4 kB.
+
+You can find example of custom 2nd stage image in rk27load/stage2 directory.
+The purpose of this image is to configure bulk transfer and allow to
+load usercode without size restriction mentioned above (the max size
+is 8MB actually). The entry point of usercode is 0x60000000.
+
+You need libusb 1.0 + header files in order to compile this utility.
+You need working arm-eabi crosscompiler in order to compile stage1/stage2
+bootloader binaries (but You should have one already if You tinker whith this)
+
+
+rkboottool
+This directory contains tool which allows to extract (and decrypt) images
+stored in Rock27Boot.bin recovery file.
+
+
+rkusbtool
+This directory contains tool which sends custom scsi commands to the
+rockchip player.
+
+You need libusb-1.0 + header files in order to compile this utility.
