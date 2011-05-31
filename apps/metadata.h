@@ -107,7 +107,13 @@ enum
 };
 
 #if CONFIG_CODEC == SWCODEC
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#define CODEC_EXTENSION "so"
+#define CODEC_PREFIX "lib"
+#else
 #define CODEC_EXTENSION "codec"
+#define CODEC_PREFIX ""
+#endif
 
 #ifdef HAVE_RECORDING
 enum rec_format_indexes

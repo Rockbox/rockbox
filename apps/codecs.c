@@ -169,8 +169,8 @@ struct codec_api ci = {
 
 void codec_get_full_path(char *path, const char *codec_root_fn)
 {
-    snprintf(path, MAX_PATH-1, "%s/%s." CODEC_EXTENSION,
-             CODECS_DIR, codec_root_fn);
+    snprintf(path, MAX_PATH-1, CODECS_DIR "/" CODEC_PREFIX "%s."
+            CODEC_EXTENSION, codec_root_fn);
 }
 
 /* Returns pointer to and size of free codec RAM. Aligns to CACHEALIGN_SIZE. */

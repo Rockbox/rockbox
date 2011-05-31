@@ -150,7 +150,11 @@ sub make_install {
     unless (glob_mkdir("$libdir/codecs")) {
         return 0;
     }
-    glob_install("$src/codecs/*", "$libdir/codecs", "-m 0755");
+    # Android has codecs installed as native libraries so they are not needed
+    # in the zip.
+    if ($modelname !~ /android/) {
+        glob_install("$src/codecs/*", "$libdir/codecs", "-m 0755");
+    }
 
     # plugins
     unless (glob_mkdir("$libdir/rocks")) {
@@ -473,7 +477,11 @@ STOP
 
     glob_mkdir("$temp_dir/codecs");
 
-    find(find_copyfile(qr/.*\.codec/, abs_path("$temp_dir/codecs/")), 'apps/codecs');
+    # Android has codecs installed as native libraries so they are not needed
+    # in the zip.
+    if ($modelname !~ /android/) {
+        find(find_copyfile(qr/.*\.codec/, abs_path("$temp_dir/codecs/")), 'apps/codecs');
+    }
 
     # remove directory again if no codec was copied
     rmdir("$temp_dir/codecs");

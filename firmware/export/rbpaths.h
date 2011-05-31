@@ -60,7 +60,11 @@
 #else /* application */
 
 #define PLUGIN_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/rocks"
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#define CODECS_DIR          ROCKBOX_BINARY_PATH
+#else
 #define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/codecs"
+#endif
 
 #define REC_BASE_DIR        ROCKBOX_DIR  "/"
 #define PLAYLIST_CATALOG_DEFAULT_DIR ROCKBOX_DIR "/Playlists"

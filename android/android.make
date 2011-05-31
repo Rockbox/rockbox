@@ -46,6 +46,7 @@ JAVA_OBJ	:= $(call java2class,$(subst $(ANDROID)/src/$(PACKAGE_PATH),$(ANDROID)/
 
 
 LIBS		:= $(BINLIB_DIR)/$(BINARY) $(BINLIB_DIR)/libmisc.so
+LIBS 		+= $(addprefix $(BINLIB_DIR)/lib,$(patsubst %.codec,%.so,$(notdir $(CODECS))))
 TEMP_APK	:= $(BUILDDIR)/bin/_rockbox.apk
 TEMP_APK2	:= $(BUILDDIR)/bin/__rockbox.apk
 DEX		:= $(BUILDDIR)/bin/classes.dex
@@ -106,6 +107,9 @@ $(BINLIB_DIR)/$(BINARY): $(BUILDDIR)/$(BINARY)
 
 $(BINLIB_DIR)/libmisc.so: $(BUILDDIR)/rockbox.zip
 	$(call PRINTS,CP rockbox.zip)cp $^ $@
+
+$(BINLIB_DIR)/lib%.so: $(BUILDDIR)/apps/codecs/%.codec
+	$(call PRINTS,CP $(@F))cp $^ $@
 
 libs: $(LIBS)
 
