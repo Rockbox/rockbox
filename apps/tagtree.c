@@ -156,6 +156,12 @@ struct menu_root {
     struct menu_entry *items[TAGMENU_MAX_ITEMS];
 };
 
+struct match
+{
+    const char* str;
+    int symbol;
+};
+
 /* Statusbar text of the current view. */
 static char current_title[MAX_TAGS][128];
 
@@ -193,16 +199,48 @@ static int get_token_str(char *buf, int size)
     return 0;
 }
 
-#define MATCH(tag,str1,str2,settag) \
-    if (!strcasecmp(str1, str2)) { \
-        *tag = settag; \
-        return 1; \
-    }
-
 static int get_tag(int *tag)
 {
+    static const struct match get_tag_match[] =
+    {
+        {"album", tag_album},
+        {"artist", tag_artist},
+        {"bitrate", tag_bitrate},
+        {"composer", tag_composer},
+        {"comment", tag_comment},
+        {"albumartist", tag_albumartist},
+        {"ensemble", tag_albumartist},
+        {"grouping", tag_grouping},
+        {"genre", tag_genre},
+        {"length", tag_length},
+        {"Lm", tag_virt_length_min},
+        {"Ls", tag_virt_length_sec},
+        {"Pm", tag_virt_playtime_min},
+        {"Ps", tag_virt_playtime_sec},
+        {"title", tag_title},
+        {"filename", tag_filename},
+        {"tracknum", tag_tracknumber},
+        {"discnum", tag_discnumber},
+        {"year", tag_year},
+        {"playcount", tag_playcount},
+        {"rating", tag_rating},
+        {"lastplayed", tag_lastplayed},
+        {"lastoffset", tag_lastoffset},
+        {"commitid", tag_commitid},
+        {"entryage", tag_virt_entryage},
+        {"autoscore", tag_virt_autoscore},
+        {"%sort", var_sorttype},
+        {"%limit", var_limit},
+        {"%strip", var_strip},
+        {"%menu_start", var_menu_start},
+        {"%include", var_include},
+        {"%root_menu", var_rootmenu},
+        {"%format", var_format},
+        {"->", menu_next},
+        {"==>", menu_load}
+    };
     char buf[128];
-    int i;
+    unsigned int i;
     
     /* Find the start. */
     while ((*strp == ' ' || *strp == '>') && *strp != '\0')
@@ -210,8 +248,8 @@ static int get_tag(int *tag)
     
     if (*strp == '\0' || *strp == '?')
         return 0;
-    
-    for (i = 0; i < (int)sizeof(buf)-1; i++)
+
+    for (i = 0; i < sizeof(buf)-1; i++)
     {
         if (*strp == '\0' || *strp == ' ')
             break ;
@@ -219,63 +257,54 @@ static int get_tag(int *tag)
         strp++;
     }
     buf[i] = '\0';
-    
-    MATCH(tag, buf, "album", tag_album);
-    MATCH(tag, buf, "artist", tag_artist);
-    MATCH(tag, buf, "bitrate", tag_bitrate);
-    MATCH(tag, buf, "composer", tag_composer);
-    MATCH(tag, buf, "comment", tag_comment);
-    MATCH(tag, buf, "albumartist", tag_albumartist);
-    MATCH(tag, buf, "ensemble", tag_albumartist);
-    MATCH(tag, buf, "grouping", tag_grouping);
-    MATCH(tag, buf, "genre", tag_genre);
-    MATCH(tag, buf, "length", tag_length);
-    MATCH(tag, buf, "Lm", tag_virt_length_min);
-    MATCH(tag, buf, "Ls", tag_virt_length_sec);
-    MATCH(tag, buf, "Pm", tag_virt_playtime_min);
-    MATCH(tag, buf, "Ps", tag_virt_playtime_sec);
-    MATCH(tag, buf, "title", tag_title);
-    MATCH(tag, buf, "filename", tag_filename);
-    MATCH(tag, buf, "tracknum", tag_tracknumber);
-    MATCH(tag, buf, "discnum", tag_discnumber);
-    MATCH(tag, buf, "year", tag_year);
-    MATCH(tag, buf, "playcount", tag_playcount);
-    MATCH(tag, buf, "rating", tag_rating);
-    MATCH(tag, buf, "lastplayed", tag_lastplayed);
-    MATCH(tag, buf, "lastoffset", tag_lastoffset);
-    MATCH(tag, buf, "commitid", tag_commitid);
-    MATCH(tag, buf, "entryage", tag_virt_entryage);
-    MATCH(tag, buf, "autoscore", tag_virt_autoscore);
-    MATCH(tag, buf, "%sort", var_sorttype);
-    MATCH(tag, buf, "%limit", var_limit);
-    MATCH(tag, buf, "%strip", var_strip);
-    MATCH(tag, buf, "%menu_start", var_menu_start);
-    MATCH(tag, buf, "%include", var_include);
-    MATCH(tag, buf, "%root_menu", var_rootmenu);
-    MATCH(tag, buf, "%format", var_format);
-    MATCH(tag, buf, "->", menu_next);
-    MATCH(tag, buf, "==>", menu_load);
-    
+
+    for (i = 0; i < ARRAYLEN(get_tag_match); i++)
+    {
+        if (!strcasecmp(buf, get_tag_match[i].str))
+        {
+            *tag = get_tag_match[i].symbol;
+            return 1;
+        }
+    }
+
     logf("NO MATCH: %s\n", buf);
     if (buf[0] == '?')
         return 0;
-    
+
     return -1;
 }
 
 static int get_clause(int *condition)
 {
+    static const struct match get_clause_match[] =
+    {
+        {"=", clause_is},
+        {"==", clause_is},
+        {"!=", clause_is_not},
+        {">", clause_gt},
+        {">=", clause_gteq},
+        {"<", clause_lt},
+        {"<=", clause_lteq},
+        {"~", clause_contains},
+        {"!~", clause_not_contains},
+        {"^", clause_begins_with},
+        {"!^", clause_not_begins_with},
+        {"$", clause_ends_with},
+        {"!$", clause_not_ends_with},
+        {"@", clause_oneof}
+    };
+
     char buf[4];
-    int i;
-    
+    unsigned int i;
+
     /* Find the start. */
     while (*strp == ' ' && *strp != '\0')
         strp++;
-    
+
     if (*strp == '\0')
         return 0;
-    
-    for (i = 0; i < (int)sizeof(buf)-1; i++)
+
+    for (i = 0; i < sizeof(buf)-1; i++)
     {
         if (*strp == '\0' || *strp == ' ')
             break ;
@@ -283,22 +312,16 @@ static int get_clause(int *condition)
         strp++;
     }
     buf[i] = '\0';
-    
-    MATCH(condition, buf, "=", clause_is);
-    MATCH(condition, buf, "==", clause_is);
-    MATCH(condition, buf, "!=", clause_is_not);
-    MATCH(condition, buf, ">", clause_gt);
-    MATCH(condition, buf, ">=", clause_gteq);
-    MATCH(condition, buf, "<", clause_lt);
-    MATCH(condition, buf, "<=", clause_lteq);
-    MATCH(condition, buf, "~", clause_contains);
-    MATCH(condition, buf, "!~", clause_not_contains);
-    MATCH(condition, buf, "^", clause_begins_with);
-    MATCH(condition, buf, "!^", clause_not_begins_with);
-    MATCH(condition, buf, "$", clause_ends_with);
-    MATCH(condition, buf, "!$", clause_not_ends_with);
-    MATCH(condition, buf, "@", clause_oneof);
-    
+
+    for (i = 0; i < ARRAYLEN(get_clause_match); i++)
+    {
+        if (!strcasecmp(buf, get_clause_match[i].str))
+        {
+            *condition = get_clause_match[i].symbol;
+            return 1;
+        }
+    }
+
     return 0;
 }
 
