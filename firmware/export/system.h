@@ -137,6 +137,12 @@ int get_cpu_boost_counter(void);
 #undef htobe32
 #endif
 
+/* Android NDK contains swap16 and swap32, ignore them */
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#undef swap16
+#undef swap32
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(PLATFORM_HAS_VOLUME_CHANGE)
 int hosted_get_volume(void);
 #endif
