@@ -34,7 +34,7 @@ CODEC_HEADER
 
 /**************** ID666 parsing ****************/
 
-struct {
+static struct {
     unsigned char isBinary;
     char song[32];
     char game[32];
@@ -397,7 +397,7 @@ static inline void spc_play_send_samples(int32_t *samples)
 
 #else /* !SPC_DUAL_CORE */
 /** Implementations for single-core operation **/
-int32_t wav_chunk[WAV_CHUNK_SIZE*2] IBSS_ATTR;
+static int32_t wav_chunk[WAV_CHUNK_SIZE*2] IBSS_ATTR;
 
 /* load a new program into emu */
 static inline int load_spc_buffer(uint8_t *buf, size_t size)

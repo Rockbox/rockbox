@@ -58,7 +58,7 @@ static const char support_formats[9][2] = {
   { AU_FORMAT_ALAW,       8  }, /* 27: G.711 ALAW */
 };
 
-const struct pcm_entry au_codecs[] = {
+static const struct pcm_entry au_codecs[] = {
     { AU_FORMAT_MULAW,      get_itut_g711_mulaw_codec },
     { AU_FORMAT_PCM,        get_linear_pcm_codec      },
     { AU_FORMAT_IEEE_FLOAT, get_ieee_float_codec      },

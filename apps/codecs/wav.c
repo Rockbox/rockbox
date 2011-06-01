@@ -60,7 +60,7 @@ enum
     WAVE_FORMAT_EXTENSIBLE = 0xFFFE
 };
 
-const struct pcm_entry wave_codecs[] = {
+static const struct pcm_entry wave_codecs[] = {
     { WAVE_FORMAT_UNKNOWN,            0                            },
     { WAVE_FORMAT_PCM,                get_linear_pcm_codec         },
     { WAVE_FORMAT_ADPCM,              get_ms_adpcm_codec           },

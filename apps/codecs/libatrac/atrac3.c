@@ -474,8 +474,8 @@ static void inverseQuantizeSpectrum(int *mantissas, int32_t *pOut,
  * @return outSubbands  subband counter, fix for broken specification/files
  */
 
-int decodeSpectrum (GetBitContext *gb, int32_t *pOut) ICODE_ATTR_LARGE_IRAM;
-int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
+static int decodeSpectrum (GetBitContext *gb, int32_t *pOut) ICODE_ATTR_LARGE_IRAM;
+static int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
 {
     int   numSubbands, codingMode, cnt, first, last, subbWidth;
     int   subband_vlc_index[32], SF_idxs[32];

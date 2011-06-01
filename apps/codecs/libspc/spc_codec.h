@@ -433,14 +433,6 @@ struct Timer
     int counter;
 };
 
-void Timer_run_( struct Timer* t, long time ) ICODE_ATTR_SPC;
-
-static inline void Timer_run( struct Timer* t, long time )
-{
-    if ( time >= t->next_tick )
-        Timer_run_( t, time );
-}
-
 struct Spc_Emu
 {
     uint8_t cycle_table [0x100];
@@ -488,14 +480,6 @@ static inline int DSP_read( struct Spc_Dsp* this, int i )
 {
     assert( (unsigned) i < REGISTER_COUNT );
     return this->r.reg [i];
-}
-
-void SPC_run_dsp_( THIS, long time ) ICODE_ATTR_SPC;
-
-static inline void SPC_run_dsp( THIS, long time )
-{
-    if ( time >= this->next_dsp )
-        SPC_run_dsp_( this, time );
 }
 
 int SPC_read( THIS, unsigned addr, long const time ) ICODE_ATTR_SPC;

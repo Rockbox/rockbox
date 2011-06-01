@@ -139,7 +139,9 @@ MPC_API void mpc_decoder_exit(mpc_decoder *p_dec);
  * by this factor. Useful for applying replay gain.
  * @param scale_factor multiplicative scaling factor
  */
+/* rockbox: changed to static
 MPC_API void mpc_decoder_scale_output(mpc_decoder *p_dec, double scale_factor);
+*/
 
 MPC_API void mpc_decoder_decode_frame(mpc_decoder * d, mpc_bits_reader * r, mpc_frame_info * i);
 

@@ -90,7 +90,7 @@ static mpc_uint32_t find_shift(double fval)
 
 #define SET_SCF(N,X) d->SCF[N] = MAKE_MPC_SAMPLE_EX(X,d->SCF_shift[N] = (mpc_uint8_t) find_shift(X));
 
-void
+static void
 mpc_decoder_scale_output(mpc_decoder *d, double factor)
 {
     mpc_int32_t n; double f1, f2;

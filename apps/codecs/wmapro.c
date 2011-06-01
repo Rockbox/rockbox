@@ -25,7 +25,8 @@
 
 CODEC_HEADER
 
-int32_t *dec[2]; /* pointers to the output buffers in WMAProDecodeCtx in wmaprodec.c */
+static int32_t *dec[2]; /* pointers to the output buffers in WMAProDecodeCtx in
+                           wmaprodec.c */
 
 
 /* this is the codec entry point */

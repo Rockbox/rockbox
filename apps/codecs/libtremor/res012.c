@@ -289,11 +289,11 @@ static int res1_inverse(vorbis_block *vb,vorbis_look_residue *vl,
 }
 
 /* duplicate code here as speed is somewhat more important */
-int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
-                 ogg_int32_t **in,int *nonzero,int ch)
+static int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
+                        ogg_int32_t **in,int *nonzero,int ch)
     ICODE_ATTR_TREMOR_NOT_MDCT;
-int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
-                 ogg_int32_t **in,int *nonzero,int ch){
+static int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
+                        ogg_int32_t **in,int *nonzero,int ch){
   long i,k,l,s;
   vorbis_look_residue0 *look=(vorbis_look_residue0 *)vl;
   vorbis_info_residue0 *info=look->info;

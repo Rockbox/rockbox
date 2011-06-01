@@ -118,13 +118,15 @@ enum
 //------------------------------------------------------------------------------
 // forward declarations
 //------------------------------------------------------------------------------
-void mpc_decoder_requantisierung   (mpc_decoder *d) 
-                                    ICODE_ATTR_MPC_LARGE_IRAM;
-void mpc_decoder_read_bitstream_sv7(mpc_decoder * d, mpc_bits_reader * r) 
-                                    ICODE_ATTR_MPC_LARGE_IRAM;
-void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r,
-                                    mpc_bool_t is_key_frame)
-                                    ICODE_ATTR_MPC_SV8_BS_DEC;
+static void mpc_decoder_requantisierung   (mpc_decoder *d)
+                                           ICODE_ATTR_MPC_LARGE_IRAM;
+static void mpc_decoder_read_bitstream_sv7(mpc_decoder * d,
+                                           mpc_bits_reader * r)
+                                           ICODE_ATTR_MPC_LARGE_IRAM;
+static void mpc_decoder_read_bitstream_sv8(mpc_decoder * d,
+                                           mpc_bits_reader * r,
+                                           mpc_bool_t is_key_frame)
+                                           ICODE_ATTR_MPC_SV8_BS_DEC;
 
 //------------------------------------------------------------------------------
 // macros
@@ -348,7 +350,7 @@ void mpc_decoder_decode_frame(mpc_decoder * d,
     }
 }
 
-void
+static void
 mpc_decoder_requantisierung(mpc_decoder *d)
 {
     mpc_int32_t     Band;
@@ -431,7 +433,7 @@ mpc_decoder_requantisierung(mpc_decoder *d)
     }
 }
 
-void mpc_decoder_read_bitstream_sv7(mpc_decoder * d, mpc_bits_reader * r)
+static void mpc_decoder_read_bitstream_sv7(mpc_decoder * d, mpc_bits_reader * r)
 {
     mpc_int32_t n, idx, Max_used_Band = 0;
 
@@ -580,7 +582,7 @@ void mpc_decoder_read_bitstream_sv7(mpc_decoder * d, mpc_bits_reader * r)
     }
 }
 
-void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r, mpc_bool_t is_key_frame)
+static void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r, mpc_bool_t is_key_frame)
 {
     mpc_int32_t n, Max_used_Band;
     const mpc_can_data * Table, * Tables[2];

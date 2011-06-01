@@ -40,9 +40,9 @@
 
 #define SIGNEXTEND24(val) (((signed)val<<8)>>8)
 
-int16_t predictor_coef_table[32] IBSS_ATTR;
-int16_t predictor_coef_table_a[32] IBSS_ATTR;
-int16_t predictor_coef_table_b[32] IBSS_ATTR;
+static int16_t predictor_coef_table[32] IBSS_ATTR;
+static int16_t predictor_coef_table_a[32] IBSS_ATTR;
+static int16_t predictor_coef_table_b[32] IBSS_ATTR;
 
 
 /* Endian/aligment safe functions - only used in alac_set_info() */
@@ -578,16 +578,16 @@ static void predictor_decompress_fir_adapt(int32_t *error_buffer,
     }
 }
 
-void deinterlace_16(int32_t* buffer0,
-                    int32_t* buffer1,
-                    int numsamples,
-                    uint8_t interlacing_shift,
-                    uint8_t interlacing_leftweight) ICODE_ATTR_ALAC;
-void deinterlace_16(int32_t* buffer0,
-                    int32_t* buffer1,
-                    int numsamples,
-                    uint8_t interlacing_shift,
-                    uint8_t interlacing_leftweight)
+static void deinterlace_16(int32_t* buffer0,
+                           int32_t* buffer1,
+                           int numsamples,
+                           uint8_t interlacing_shift,
+                           uint8_t interlacing_leftweight) ICODE_ATTR_ALAC;
+static void deinterlace_16(int32_t* buffer0,
+                           int32_t* buffer1,
+                           int numsamples,
+                           uint8_t interlacing_shift,
+                           uint8_t interlacing_leftweight)
 {
     int i;
     if (numsamples <= 0) return;
@@ -619,20 +619,20 @@ void deinterlace_16(int32_t* buffer0,
     }
 }
 
-void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
-                    int uncompressed_bytes,
-                    int32_t *uncompressed_bytes_buffer0, 
-                    int32_t *uncompressed_bytes_buffer1,
-                    int numsamples,
-                    uint8_t interlacing_shift,
-                    uint8_t interlacing_leftweight) ICODE_ATTR_ALAC;
-void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
-                    int uncompressed_bytes,
-                    int32_t *uncompressed_bytes_buffer0, 
-                    int32_t *uncompressed_bytes_buffer1,
-                    int numsamples,
-                    uint8_t interlacing_shift,
-                    uint8_t interlacing_leftweight)
+static void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
+                           int uncompressed_bytes,
+                           int32_t *uncompressed_bytes_buffer0,
+                           int32_t *uncompressed_bytes_buffer1,
+                           int numsamples,
+                           uint8_t interlacing_shift,
+                           uint8_t interlacing_leftweight) ICODE_ATTR_ALAC;
+static void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
+                           int uncompressed_bytes,
+                           int32_t *uncompressed_bytes_buffer0,
+                           int32_t *uncompressed_bytes_buffer1,
+                           int numsamples,
+                           uint8_t interlacing_shift,
+                           uint8_t interlacing_leftweight)
 {
     int i;
     if (numsamples <= 0) return;

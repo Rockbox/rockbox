@@ -53,7 +53,7 @@ static decoder tta[MAX_NCH]     IBSS_ATTR; /* decoder state */
 /* Rockbox speciffic: cache is defined in get_samples() (non static value) */
 /* static int     cache[MAX_NCH];   // decoder cache */
 
-tta_info *ttainfo               IBSS_ATTR; /* currently playing file info */
+static tta_info *ttainfo        IBSS_ATTR; /* currently playing file info */
 
 static unsigned int fframes     IBSS_ATTR; /* number of frames in file */
 static unsigned int framelen    IBSS_ATTR; /* the frame length in samples */

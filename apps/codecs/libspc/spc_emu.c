@@ -32,7 +32,8 @@ struct cpu_ram_t ram IBSS_ATTR_SPC_LARGE_IRAM CACHEALIGN_ATTR;
 
 /**************** Timers ****************/
 
-void Timer_run_( struct Timer* t, long time )
+static void Timer_run_( struct Timer* t, long time ) ICODE_ATTR_SPC;
+static void Timer_run_( struct Timer* t, long time )
 {
     /* when disabled, next_tick should always be in the future */
     assert( t->enabled ); 
@@ -48,6 +49,12 @@ void Timer_run_( struct Timer* t, long time )
         t->counter = (t->counter + n) & 15;
     }
     t->count = elapsed;
+}
+
+static inline void Timer_run( struct Timer* t, long time )
+{
+    if ( time >= t->next_tick )
+        Timer_run_( t, time );
 }
 
 /**************** SPC emulator ****************/
@@ -179,7 +186,8 @@ int SPC_load_spc( THIS, const void* data, long size )
 }
 
 /**************** DSP interaction ****************/
-void SPC_run_dsp_( THIS, long time )
+static void SPC_run_dsp_( THIS, long time ) ICODE_ATTR_SPC;
+static void SPC_run_dsp_( THIS, long time )
 {
     /* divide by CLOCKS_PER_SAMPLE */
     int count = ((time - this->next_dsp) >> 5) + 1; 
@@ -187,6 +195,12 @@ void SPC_run_dsp_( THIS, long time )
     this->sample_buf = buf + count;
     this->next_dsp += count * CLOCKS_PER_SAMPLE;
     DSP_run( &this->dsp, count, buf );
+}
+
+static inline void SPC_run_dsp( THIS, long time )
+{
+    if ( time >= this->next_dsp )
+        SPC_run_dsp_( this, time );
 }
 
 int SPC_read( THIS, unsigned addr, long const time )
