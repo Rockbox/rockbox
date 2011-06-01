@@ -1730,37 +1730,7 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_CURRENT_SCREEN:
         {
-            int curr_screen = current_screen();
-
-#ifdef HAVE_RECORDING
-            /* override current_screen() for recording screen since it may
-             * be entered from the radio screen */
-            if (in_recording_screen())
-                curr_screen = GO_TO_RECSCREEN;
-#endif
-            
-            switch (curr_screen)
-            {
-                case GO_TO_WPS:
-                    curr_screen = 2;
-                    break;
-#ifdef HAVE_RECORDING
-                case GO_TO_RECSCREEN:
-                    curr_screen = 3;
-                    break;
-#endif
-#if CONFIG_TUNER
-                case GO_TO_FM:
-                    curr_screen = 4;
-                    break;
-#endif
-                case GO_TO_PLAYLIST_VIEWER:
-                    curr_screen = 5;
-                    break;
-                default: /* lists */
-                    curr_screen = 1;
-                    break;
-            }
+            int curr_screen = get_current_activity();
             if (intval)
             {
                 *intval = curr_screen;

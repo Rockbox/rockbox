@@ -345,7 +345,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
     gui_buttonbar_set(&buttonbar, "<<<", "", "");
 #endif
-
     menu_callback_type menu_callback = NULL;
 
     /* if hide_theme is true, assume parent has been fixed before passed into

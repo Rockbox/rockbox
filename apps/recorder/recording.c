@@ -1108,6 +1108,7 @@ bool recording_screen(bool no_source)
 
     struct audio_recording_options rec_options;
     rec_status = RCSTAT_IN_RECSCREEN;
+    push_current_activity(ACTIVITY_RECORDING);
 
 #if (CONFIG_STORAGE & STORAGE_ATA) && (CONFIG_LED == LED_REAL) \
    && !defined(SIMULATOR)
@@ -2089,7 +2090,7 @@ rec_abort:
 #endif
 
     settings_save();
-
+    pop_current_activity();
     return (rec_status & RCSTAT_BEEN_IN_USB_MODE) != 0;
 } /* recording_screen */
 

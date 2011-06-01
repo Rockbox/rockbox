@@ -403,6 +403,7 @@ void radio_screen(void)
 #endif
 
     /* change status to "in screen" */
+    push_current_activity(ACTIVITY_FM);
     in_screen = true;
 
     if(radio_preset_count() <= 0)
@@ -868,6 +869,7 @@ void radio_screen(void)
     cpu_idle_mode(false);
 #endif
     fms_fix_displays(FMS_EXIT);
+    pop_current_activity();
     in_screen = false;
 } /* radio_screen */
 

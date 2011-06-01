@@ -780,7 +780,7 @@ static __attribute__((noinline)) void skin_render_playlistviewer(struct playlist
     int cur_pos, start_item, max;
     int nb_lines = viewport_get_nb_lines(viewer->vp);
 #if CONFIG_TUNER
-    if (current_screen() == GO_TO_FM)
+    if (get_current_activity() == ACTIVITY_FM)
     {
         cur_pos = radio_current_preset();
         start_item = cur_pos + viewer->start_offset;

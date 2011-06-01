@@ -1021,3 +1021,20 @@ int clamp_value_wrap(int value, int max, int min)
 }
 #endif
 #endif
+#define MAX_ACTIVITY_DEPTH 12
+static enum current_activity 
+        current_activity[MAX_ACTIVITY_DEPTH] = {ACTIVITY_UNKNOWN};
+static int current_activity_top = 0;
+void push_current_activity(enum current_activity screen)
+{
+    current_activity[current_activity_top++] = screen;
+}
+void pop_current_activity(void)
+{
+    current_activity_top--;
+}
+enum current_activity get_current_activity(void)
+{
+    return current_activity[current_activity_top?current_activity_top-1:0];
+}
+

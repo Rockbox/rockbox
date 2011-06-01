@@ -151,6 +151,7 @@ static int browser(void* param)
 #endif
                     strcpy(folder, last_folder);
             }
+            push_current_activity(ACTIVITY_FILEBROWSER);
         break;
 #ifdef HAVE_TAGCACHE
         case GO_TO_DBBROWSER:
@@ -246,12 +247,14 @@ static int browser(void* param)
             filter = SHOW_ID3DB;
             tc->dirlevel = last_db_dirlevel;
             tc->selected_item = last_db_selection;
+            push_current_activity(ACTIVITY_DATABASEBROWSER);
         break;
 #endif
     }
 
     browse_context_init(&browse, filter, 0, NULL, NOICON, folder, NULL);
     ret_val = rockbox_browse(&browse);
+    pop_current_activity();
     switch ((intptr_t)param)
     {
         case GO_TO_FILEBROWSER:
@@ -285,6 +288,7 @@ static int wpsscrn(void* param)
 {
     int ret_val = GO_TO_PREVIOUS;
     (void)param;
+    push_current_activity(ACTIVITY_WPS);
     if (audio_status())
     {
         talk_shutup();
@@ -306,6 +310,7 @@ static int wpsscrn(void* param)
     {
         splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
     }
+    pop_current_activity();
     return ret_val;
 }
 #if CONFIG_TUNER
@@ -511,13 +516,27 @@ static inline int load_screen(int screen)
         if we dont we will always return to the wrong screen on boot */
     int old_previous = last_screen;
     int ret_val;
+    enum current_activity activity = ACTIVITY_UNKNOWN;
     if (screen <= GO_TO_ROOT)
         return screen;
     if (screen == old_previous)
         old_previous = GO_TO_ROOT;
     global_status.last_screen = (char)screen;
     status_save();
+
+    if (screen == GO_TO_BROWSEPLUGINS)
+        activity = ACTIVITY_PLUGINBROWSER;
+    else if (screen == GO_TO_MAINMENU)
+        activity = ACTIVITY_SETTINGS;
+
+    if (activity != ACTIVITY_UNKNOWN)
+        push_current_activity(activity);
+
     ret_val = items[screen].function(items[screen].param);
+
+    if (activity != ACTIVITY_UNKNOWN)
+        pop_current_activity();
+
     last_screen = screen;
     if (ret_val == GO_TO_PREVIOUS)
         last_screen = old_previous;
@@ -578,15 +597,12 @@ void previous_music_is_wps(void)
     previous_music = GO_TO_WPS;
 }
 
-int current_screen(void)
-{
-    return next_screen;
-}
-
 void root_menu(void)
 {
     int previous_browser = GO_TO_FILEBROWSER;
     int selected = 0;
+    
+    push_current_activity(ACTIVITY_MAINMENU);
 
     if (global_settings.start_in_screen == 0)
         next_screen = (int)global_status.last_screen;

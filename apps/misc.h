@@ -100,4 +100,24 @@ int clamp_value_wrap(int value, int max, int min);
 #endif
 #endif
 
+enum current_activity {
+    ACTIVITY_UNKNOWN = 0,
+    ACTIVITY_MAINMENU,
+    ACTIVITY_WPS,
+    ACTIVITY_RECORDING,
+    ACTIVITY_FM,
+    ACTIVITY_PLAYLISTVIEWER,
+    ACTIVITY_SETTINGS,
+    ACTIVITY_FILEBROWSER,
+    ACTIVITY_DATABASEBROWSER,
+    ACTIVITY_PLUGINBROWSER,
+    ACTIVITY_QUICKSCREEN,
+    ACTIVITY_PITCHSCREEN,
+    ACTIVITY_OPTIONSELECT
+};
+void push_current_activity(enum current_activity screen);
+void pop_current_activity(void);
+enum current_activity get_current_activity(void);
+
+
 #endif /* MISC_H */

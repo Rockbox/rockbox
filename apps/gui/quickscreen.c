@@ -317,6 +317,9 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
      *  - an action taken while pressing the enter button,
      *    then release the enter button*/
     bool can_quit = false;
+    
+    push_current_activity(ACTIVITY_QUICKSCREEN);
+    
     FOR_NB_SCREENS(i)
     {
         screens[i].set_viewport(NULL);
@@ -369,6 +372,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
         viewportmanager_theme_undo(i, true);
     }
 
+    pop_current_activity();
     return changed;
 }
 

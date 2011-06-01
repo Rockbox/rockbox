@@ -486,6 +486,7 @@ bool option_screen(const struct settings_list *setting,
         temp_var = oldvalue = *(bool*)setting->setting?1:0;
     }
     else return false; /* only int/bools can go here */
+    push_current_activity(ACTIVITY_OPTIONSELECT);
     gui_synclist_init(&lists, value_setting_get_name_cb,
                       (void*)setting, false, 1, parent);
     if (setting->lang_id == -1)
@@ -566,6 +567,7 @@ bool option_screen(const struct settings_list *setting,
         if (function == sound_get_fn(SOUND_VOLUME))
             global_status.last_volume_change = current_tick;
     }
+    pop_current_activity();
     return false;
 }
 
