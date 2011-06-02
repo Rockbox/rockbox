@@ -46,34 +46,36 @@
 
 #define MAX_IN_SAMPLES 640
 
-
-
+#ifndef SPEEX_DISABLE_ENCODER
 void *speex_encoder_init(const SpeexMode *mode)
 {
    return mode->enc_init(mode);
 }
+#endif
 
 void *speex_decoder_init(const SpeexMode *mode)
 {
    return mode->dec_init(mode);
 }
 
+#ifndef SPEEX_DISABLE_ENCODER
 void speex_encoder_destroy(void *state)
 {
    (*((SpeexMode**)state))->enc_destroy(state);
 }
+#endif
 
 void speex_decoder_destroy(void *state)
 {
    (*((SpeexMode**)state))->dec_destroy(state);
 }
 
-
-
+#ifndef SPEEX_DISABLE_ENCODER
 int speex_encode_native(void *state, spx_word16_t *in, SpeexBits *bits)
 {
    return (*((SpeexMode**)state))->enc(state, in, bits);
 }
+#endif
 
 int speex_decode_native(void *state, SpeexBits *bits, spx_word16_t *out)
 {
@@ -177,19 +179,17 @@ int speex_decode_int(void *state, SpeexBits *bits, spx_int16_t *out)
 }
 #endif
 
-
-
+#ifndef SPEEX_DISABLE_ENCODER
 int speex_encoder_ctl(void *state, int request, void *ptr)
 {
    return (*((SpeexMode**)state))->enc_ctl(state, request, ptr);
 }
+#endif
 
 int speex_decoder_ctl(void *state, int request, void *ptr)
 {
    return (*((SpeexMode**)state))->dec_ctl(state, request, ptr);
 }
-
-
 
 int nb_mode_query(const void *mode, int request, void *ptr)
 {

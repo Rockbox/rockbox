@@ -60,6 +60,8 @@ void speex_bits_init(SpeexBits *bits)
 }
 #endif
 
+#if 0
+/* Rockbox: unused */
 void speex_bits_init_buffer(SpeexBits *bits, void *buff, int buf_size)
 {
    bits->chars = (char*)buff;
@@ -69,6 +71,7 @@ void speex_bits_init_buffer(SpeexBits *bits, void *buff, int buf_size)
 
    speex_bits_reset(bits);
 }
+#endif
 
 void speex_bits_set_bit_buffer(SpeexBits *bits, void *buff, int buf_size)
 {
@@ -93,6 +96,7 @@ void speex_bits_destroy(SpeexBits *bits)
 }
 #endif
 
+#ifdef ROCKBOX_VOICE_ENCODER
 void speex_bits_reset(SpeexBits *bits)
 {
    /* We only need to clear the first byte now */
@@ -102,13 +106,17 @@ void speex_bits_reset(SpeexBits *bits)
    bits->bitPtr=0;
    bits->overflow=0;
 }
+#endif
 
+#if 0
+/* Rockbox: unused */
 void speex_bits_rewind(SpeexBits *bits)
 {
    bits->charPtr=0;
    bits->bitPtr=0;
    bits->overflow=0;
 }
+#endif
 
 #if !defined(SPEEX_VOICE_ENCODER) && !defined(ROCKBOX_VOICE_CODEC)
 void speex_bits_read_from(SpeexBits *bits, char *chars, int len)
@@ -277,6 +285,8 @@ void speex_bits_pack(SpeexBits *bits, int data, int nbBits)
 }
 #endif /* SPEEX_DISABLE_ENCODER */
 
+#if 0
+/* Rockbox: unused */
 int speex_bits_unpack_signed(SpeexBits *bits, int nbBits)
 {
    unsigned int d=speex_bits_unpack_unsigned(bits,nbBits);
@@ -287,6 +297,7 @@ int speex_bits_unpack_signed(SpeexBits *bits, int nbBits)
    }
    return d;
 }
+#endif
 
 unsigned int speex_bits_unpack_unsigned(SpeexBits *bits, int nbBits)
 {
@@ -310,6 +321,8 @@ unsigned int speex_bits_unpack_unsigned(SpeexBits *bits, int nbBits)
    return d;
 }
 
+#if 0
+/* Rockbox: unused */
 unsigned int speex_bits_peek_unsigned(SpeexBits *bits, int nbBits)
 {
    unsigned int d=0;
@@ -338,6 +351,7 @@ unsigned int speex_bits_peek_unsigned(SpeexBits *bits, int nbBits)
    }
    return d;
 }
+#endif
 
 int speex_bits_peek(SpeexBits *bits)
 {
@@ -366,10 +380,13 @@ int speex_bits_remaining(SpeexBits *bits)
       return bits->nbBits-((bits->charPtr<<LOG2_BITS_PER_CHAR)+bits->bitPtr);
 }
 
+#if 0
+/* Rockbox: unused */
 int speex_bits_nbytes(SpeexBits *bits)
 {
    return ((bits->nbBits+BITS_PER_CHAR-1)>>LOG2_BITS_PER_CHAR);
 }
+#endif
 
 #ifndef SPEEX_DISABLE_ENCODER
 void speex_bits_insert_terminator(SpeexBits *bits)

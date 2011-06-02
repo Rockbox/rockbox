@@ -62,7 +62,9 @@ typedef struct SpeexBits {
 void speex_bits_init(SpeexBits *bits);
 
 /** Initializes SpeexBits struct using a pre-allocated buffer*/
+/* Rockbox: unused
 void speex_bits_init_buffer(SpeexBits *bits, void *buff, int buf_size);
+*/
 
 /** Sets the bits in a SpeexBits struct to use data from an existing buffer (for decoding without copying data) */
 void speex_bits_set_bit_buffer(SpeexBits *bits, void *buff, int buf_size);
@@ -74,7 +76,9 @@ void speex_bits_destroy(SpeexBits *bits);
 void speex_bits_reset(SpeexBits *bits);
 
 /** Rewind the bit-stream to the beginning (ready for read) without erasing the content */
+/* Rockbox: unused
 void speex_bits_rewind(SpeexBits *bits);
+*/
 
 /** Initializes the bit-stream from the data in an area of memory */
 void speex_bits_read_from(SpeexBits *bits, char *bytes, int len);
@@ -112,7 +116,9 @@ void speex_bits_pack(SpeexBits *bits, int data, int nbBits);
  * @param nbBits Number of bits to interpret
  * @return A signed integer represented by the bits read
  */
+/* Rockbox: unused
 int speex_bits_unpack_signed(SpeexBits *bits, int nbBits);
+*/
 
 /** Interpret the next bits in the bit-stream as an unsigned integer
  *
@@ -127,7 +133,9 @@ unsigned int speex_bits_unpack_unsigned(SpeexBits *bits, int nbBits);
  * @param bits Bit-stream to operate on
  * @return Number of bytes in the stream
  */
+/* Rockbox: unused
 int speex_bits_nbytes(SpeexBits *bits);
+*/
 
 /** Same as speex_bits_unpack_unsigned, but without modifying the cursor position 
  * 
@@ -135,7 +143,9 @@ int speex_bits_nbytes(SpeexBits *bits);
  * @param nbBits Number of bits to look for
  * @return Value of the bits peeked, interpreted as unsigned
  */
+/* Rockbox: unused
 unsigned int speex_bits_peek_unsigned(SpeexBits *bits, int nbBits);
+*/
 
 /** Get the value of the next bit in the stream, without modifying the
  * "cursor" position 

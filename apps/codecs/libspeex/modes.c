@@ -464,13 +464,13 @@ const SpeexMode speex_nb_mode = {
    &nb_encoder_ctl,
    &nb_decoder_ctl,
 #else
+/*   NULL,
    NULL,
-   NULL,
-   NULL,
+   NULL, */
    &nb_decoder_init,
    &nb_decoder_destroy,
    &nb_decode,
-   NULL,
+/*   NULL, */
    &nb_decoder_ctl,
 #endif
 };

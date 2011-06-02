@@ -264,13 +264,13 @@ const SpeexMode speex_wb_mode = {
    &sb_encoder_ctl,
    &sb_decoder_ctl,
 #else
+/*   NULL,
    NULL,
-   NULL,
-   NULL,
+   NULL, */
    &sb_decoder_init,
    &sb_decoder_destroy,
    &sb_decode,
-   NULL,
+/*   NULL, */
    &sb_decoder_ctl,
 #endif
 };
@@ -348,13 +348,13 @@ const SpeexMode speex_uwb_mode = {
    &sb_encoder_ctl,
    &sb_decoder_ctl,
 #else
+/*   NULL,
    NULL,
-   NULL,
-   NULL,
+   NULL, */
    &sb_decoder_init,
    &sb_decoder_destroy,
    &sb_decode,
-   NULL,
+/*   NULL, */
    &sb_decoder_ctl,
 #endif
 };

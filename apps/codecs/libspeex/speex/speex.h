@@ -263,6 +263,7 @@ typedef struct SpeexMode {
     bitstream compatibility*/
    int bitstream_version;
 
+#ifndef SPEEX_DISABLE_ENCODER
    /** Pointer to encoder initialization function */
    encoder_init_func enc_init;
 
@@ -271,6 +272,7 @@ typedef struct SpeexMode {
 
    /** Pointer to frame encoding function */
    encode_func enc;
+#endif
 
    /** Pointer to decoder initialization function */
    decoder_init_func dec_init;
@@ -281,8 +283,10 @@ typedef struct SpeexMode {
    /** Pointer to frame decoding function */
    decode_func dec;
 
+#ifndef SPEEX_DISABLE_ENCODER
    /** ioctl-like requests for encoder */
    encoder_ctl_func enc_ctl;
+#endif
 
    /** ioctl-like requests for decoder */
    decoder_ctl_func dec_ctl;

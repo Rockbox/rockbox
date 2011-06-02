@@ -72,6 +72,8 @@ int speex_inband_handler(SpeexBits *bits, SpeexCallback *callback_list, void *st
    return 0;
 }
 
+#if 0
+/* Rockbox: unused */
 int speex_std_mode_request_handler(SpeexBits *bits, void *state, void *data)
 {
    (void)state;
@@ -98,6 +100,7 @@ int speex_std_high_mode_request_handler(SpeexBits *bits, void *state, void *data
    speex_encoder_ctl(data, SPEEX_SET_HIGH_MODE, &m);
    return 0;
 }
+#endif
 
 #ifndef DISABLE_VBR
 int speex_std_vbr_request_handler(SpeexBits *bits, void *state, void *data)
@@ -110,6 +113,8 @@ int speex_std_vbr_request_handler(SpeexBits *bits, void *state, void *data)
 }
 #endif /* #ifndef DISABLE_VBR */
 
+#if 0
+/* Rockbox: unused */
 int speex_std_enh_request_handler(SpeexBits *bits, void *state, void *data)
 {
    (void)state;
@@ -118,6 +123,7 @@ int speex_std_enh_request_handler(SpeexBits *bits, void *state, void *data)
    speex_decoder_ctl(data, SPEEX_SET_ENH, &enh);
    return 0;
 }
+#endif
 
 #ifndef DISABLE_VBR
 int speex_std_vbr_quality_request_handler(SpeexBits *bits, void *state, void *data)
@@ -130,6 +136,8 @@ int speex_std_vbr_quality_request_handler(SpeexBits *bits, void *state, void *da
 }
 #endif /* #ifndef DISABLE_VBR */
 
+#if 0
+/* Rockbox: unused */
 int speex_std_char_handler(SpeexBits *bits, void *state, void *data)
 {
    (void)state;
@@ -139,6 +147,7 @@ int speex_std_char_handler(SpeexBits *bits, void *state, void *data)
    /*printf("speex_std_char_handler ch=%x\n", ch);*/
    return 0;
 }
+#endif
 
 /* Default handler for user callbacks: skip it */
 int speex_default_user_handler(SpeexBits *bits, void *state, void *data)

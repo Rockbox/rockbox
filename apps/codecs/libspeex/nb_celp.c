@@ -1092,7 +1092,7 @@ static void nb_decode_lost(DecState *st, spx_word16_t *out, char *stack)
 #endif
 
 /* Just so we don't need to carry the complete wideband mode information */
-static const int wb_skip_table[8] = {0, 36, 112, 192, 352, 0, 0, 0};
+static const unsigned short wb_skip_table[8] = {0, 36, 112, 192, 352, 0, 0, 0};
    
 int nb_decode(void *state, SpeexBits *bits, void *vout)
 {
