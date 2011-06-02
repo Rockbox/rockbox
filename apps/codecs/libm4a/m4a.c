@@ -67,16 +67,6 @@ uint32_t stream_read_uint32(stream_t *stream)
     return v;
 }
 
-int16_t stream_read_int16(stream_t *stream)
-{
-    int16_t v;
-    stream_read(stream, 2, &v);
-#ifdef ROCKBOX_LITTLE_ENDIAN
-    _Swap16(v);
-#endif
-    return v;
-}
-
 uint16_t stream_read_uint16(stream_t *stream)
 {
     uint16_t v;
@@ -84,13 +74,6 @@ uint16_t stream_read_uint16(stream_t *stream)
 #ifdef ROCKBOX_LITTLE_ENDIAN
     _Swap16(v);
 #endif
-    return v;
-}
-
-int8_t stream_read_int8(stream_t *stream)
-{
-    int8_t v;
-    stream_read(stream, 1, &v);
     return v;
 }
 

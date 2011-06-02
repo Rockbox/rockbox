@@ -83,7 +83,6 @@ enum codec_status codec_run(void)
     }
 
     /* initialise the sound converter */
-    create_alac(demux_res.sound_sample_size, demux_res.num_channels,&alac);
     alac_set_info(&alac, demux_res.codecdata);
   
     /* Set i for first frame, seek to desired sample position for resuming. */

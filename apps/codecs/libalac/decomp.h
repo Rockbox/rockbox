@@ -17,9 +17,12 @@ typedef struct
     unsigned char *input_buffer;
     int input_buffer_bitaccumulator; /* used so we can do arbitary
                                         bit reads */
+
+    /* rockbox: not used
     int samplesize;
     int numchannels;
-    int bytespersample;
+    int bytespersample; */
+
     int bytes_consumed;
 
     /* stuff from setinfo */
@@ -37,8 +40,10 @@ typedef struct
     /* end setinfo stuff */
 } alac_file;
 
+/* rockbox: not used
 void create_alac(int samplesize, int numchannels, alac_file* alac)
-    ICODE_ATTR_ALAC;
+    ICODE_ATTR_ALAC; */
+
 int alac_decode_frame(alac_file *alac,
                       unsigned char *inbuffer,
                       int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE],

@@ -1139,9 +1139,10 @@ int alac_decode_frame(alac_file *alac,
     return outputsamples;
 }
 
+/* rockbox: not used
 void create_alac(int samplesize, int numchannels, alac_file* alac)
 {
     alac->samplesize = samplesize;
     alac->numchannels = numchannels;
     alac->bytespersample = (samplesize / 8) * numchannels;
-}
+} */

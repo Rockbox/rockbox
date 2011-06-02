@@ -203,20 +203,6 @@ static inline void vect_copy(ogg_int32_t *x, const ogg_int32_t *y, int n)
 #endif
 
 #endif
-/* not used anymore */
-/*
-#ifndef _V_CLIP_MATH
-#define _V_CLIP_MATH
-
-static inline ogg_int32_t CLIP_TO_15(ogg_int32_t x) {
-  int ret=x;
-  ret-= ((x<=32767)-1)&(x-32767);
-  ret-= ((x>=-32768)-1)&(x+32768);
-  return(ret);
-}
-
-#endif
-*/
 
 static inline ogg_int32_t VFLOAT_MULT(ogg_int32_t a,ogg_int32_t ap,
                                       ogg_int32_t b,ogg_int32_t bp,

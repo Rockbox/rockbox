@@ -24,7 +24,9 @@
 #include "libfaad/common.h"
 #include "libfaad/structs.h"
 #include "libfaad/decoder.h"
+/* rockbox: not used
 #include "libfaad/output.h"
+*/
 
 CODEC_HEADER
 

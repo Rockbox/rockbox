@@ -1,4 +1,3 @@
-crc.c
 predictor.c
 #ifdef CPU_ARM
 predictor-arm.S

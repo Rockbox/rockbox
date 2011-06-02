@@ -227,6 +227,7 @@ static int done_buffer_read(void) {
 
 /************************* decoder functions ****************************/
 
+/* rockbox: not used
 const char *get_error_str (int error) {
     switch (error) {
     case NO_ERROR:      return "No errors found";
@@ -237,7 +238,7 @@ const char *get_error_str (int error) {
     case MEMORY_ERROR:  return "Insufficient memory available";
     default:            return "Unknown error code";
     }
-}
+} */
 
 int set_tta_info (tta_info *info)
 {

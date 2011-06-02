@@ -119,12 +119,13 @@ static uint8_t ObjectTypesTable[32] = {
 };
 
 /* Table 1.6.1 */
+/* rockbox: not used
 int8_t NEAACDECAPI NeAACDecAudioSpecificConfig(uint8_t *pBuffer,
                                                uint32_t buffer_size,
                                                mp4AudioSpecificConfig *mp4ASC)
 {
     return AudioSpecificConfig2(pBuffer, buffer_size, mp4ASC, NULL);
-}
+}*/
 
 int8_t AudioSpecificConfig2(uint8_t *pBuffer,
                             uint32_t buffer_size,

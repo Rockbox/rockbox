@@ -37,8 +37,10 @@ static void tns_decode_coef(uint8_t order, uint8_t coef_res_bits, uint8_t coef_c
                             uint8_t *coef, real_t *a);
 static void tns_ar_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *lpc,
                           int8_t order);
+#ifdef LTP_DEC
 static void tns_ma_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *lpc,
                           int8_t order);
+#endif
 
 
 #ifdef _MSC_VER
@@ -129,6 +131,7 @@ void tns_decode_frame(ic_stream *ics, tns_info *tns, uint8_t sr_index,
     }
 }
 
+#ifdef LTP_DEC
 /* TNS encoding for one channel and frame */
 void tns_encode_frame(ic_stream *ics, tns_info *tns, uint8_t sr_index,
                       uint8_t object_type, real_t *spec, uint16_t frame_len)
@@ -182,6 +185,7 @@ void tns_encode_frame(ic_stream *ics, tns_info *tns, uint8_t sr_index,
         }
     }
 }
+#endif
 
 /* Decoder transmitted coefficients for one TNS filter */
 static void tns_decode_coef(uint8_t order, uint8_t coef_res_bits, uint8_t coef_compress,
@@ -268,6 +272,7 @@ static void tns_ar_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *l
     }
 }
 
+#ifdef LTP_DEC
 static void tns_ma_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *lpc,
                           int8_t order)
 {
@@ -304,3 +309,4 @@ static void tns_ma_filter(real_t *spectrum, uint16_t size, int8_t inc, real_t *l
         spectrum += inc;
     }
 }
+#endif

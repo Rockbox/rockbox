@@ -45,7 +45,7 @@
 #define MAX_CHARS_PER_FRAME (2000/BYTES_PER_CHAR)
 #endif
 
-#ifndef ROCKBOX_VOICE_CODEC
+#ifdef ROCKBOX_VOICE_ENCODER
 void speex_bits_init(SpeexBits *bits)
 {
    bits->chars = (char*)speex_alloc(MAX_CHARS_PER_FRAME);

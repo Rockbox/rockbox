@@ -216,26 +216,6 @@ static inline void vect_copy(ogg_int32_t *x, const ogg_int32_t *y, int n)
 #endif
 
 #endif
-/* not used anymore */
-/*
-#ifndef _V_CLIP_MATH
-#define _V_CLIP_MATH
-
-static inline ogg_int32_t CLIP_TO_15(ogg_int32_t x) {
-  int tmp;
-  asm volatile("subs    %1, %0, #32768\n\t"
-               "movpl   %0, #0x7f00\n\t"
-               "orrpl   %0, %0, #0xff\n"
-               "adds    %1, %0, #32768\n\t"
-               "movmi   %0, #0x8000"
-               : "+r"(x),"=r"(tmp)
-               :
-               : "cc");
-  return(x);
-}
-
-#endif
-*/
 
 #ifndef _V_LSP_MATH_ASM
 #define _V_LSP_MATH_ASM

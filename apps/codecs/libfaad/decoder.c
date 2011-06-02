@@ -88,6 +88,8 @@ char* NEAACDECAPI NeAACDecGetErrorMessage(uint8_t errcode)
     return err_msg[errcode];
 }
 
+/* rockbox: not used */
+#if 0
 uint32_t NEAACDECAPI NeAACDecGetCapabilities(void)
 {
     uint32_t cap = 0;
@@ -113,6 +115,7 @@ uint32_t NEAACDECAPI NeAACDecGetCapabilities(void)
 
     return cap;
 }
+#endif
 
 NeAACDecHandle NEAACDECAPI NeAACDecOpen(void)
 {

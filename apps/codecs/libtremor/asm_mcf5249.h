@@ -250,16 +250,4 @@ void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 #endif
 
 #endif
-/* not used anymore */
-/*
-#ifndef _V_CLIP_MATH
-#define _V_CLIP_MATH
-
-static inline ogg_int32_t CLIP_TO_15(register ogg_int32_t x) {
-  register ogg_int32_t hi=32767, lo=-32768;
-  return (x>=hi ? hi : (x<=lo ? lo : x));
-}
-
-#endif
-*/
 #endif

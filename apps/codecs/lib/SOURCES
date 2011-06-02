@@ -3,16 +3,11 @@ codeclib.c
 fixedpoint.c
 ffmpeg_bitstream.c
 
-/* OLD MDCT */
-/* (when all other codecs are remediated this can be remoed) */
-mdct2.c
 mdct_lookup.c
-
 fft-ffmpeg.c
 mdct.c
 
 #ifdef CPU_ARM
-mdct_arm.S
 ../../../firmware/target/arm/support-arm.S
 #endif
 
