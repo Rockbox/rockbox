@@ -4305,19 +4305,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "磁盤1"
-    sansae200*,sansac200*,sansafuze*: "Multimedia 卡:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "Multimedia 卡:"
     archosondio*: "MMC 卡:"
   </dest>
   <voice>
     *: none
     multivolume: "磁盤1"
-    sansae200*,sansac200*,sansafuze*: "Multimedia 卡"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "Multimedia 卡"
     archosondio*: "MMC 卡"
   </voice>
 </phrase>

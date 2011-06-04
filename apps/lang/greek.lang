@@ -6615,19 +6615,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
     archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "Έιτς Ντι 1"
-    sansae200*,sansac200*,sansafuze*: "μάικρο Ες Ντι"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "μάικρο Ες Ντι"
     archosondio*: "Εμ Εμ Σι"
   </voice>
 </phrase>

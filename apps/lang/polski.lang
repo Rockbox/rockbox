@@ -6656,19 +6656,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*: "microSD:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "microSD:"
     archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "ha de 1"
-    sansae200*,sansac200*,sansafuze*: "mikro es di"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mikro es di"
     archosondio*: "em em ce"
   </voice>
 </phrase>

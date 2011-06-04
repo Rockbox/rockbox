@@ -6649,19 +6649,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "DP1"
-    sansae200*,sansac200*,sansafuze*: "MSD:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
     archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "D P 1"
-    sansae200*,sansac200*,sansafuze*: "micro S D"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
     archosondio*: "M M C"
   </voice>
 </phrase>

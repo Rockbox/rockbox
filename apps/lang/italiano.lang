@@ -6647,19 +6647,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*: "mSD:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*: "MSD:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
     archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "HD 1"
-    sansae200*,sansac200*,sansafuze*: "Micro SD"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "Micro SD"
     archosondio*: "M M C"
   </voice>
 </phrase>
