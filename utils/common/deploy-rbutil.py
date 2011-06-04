@@ -28,6 +28,7 @@ deploy.svnpaths = \
              "apps/codecs/libspeex",
              "docs/COPYING",
              "docs/gpl-2.0.html",
+             "docs/logo/rockbox-clef.svg",
              "docs/CREDITS",
              "tools/iriver.c",
              "tools/Makefile",

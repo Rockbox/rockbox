@@ -34,7 +34,7 @@
         <file>icons/user-trash-full.png</file>
         <file>icons/view-refresh.png</file>
         <file>icons/wizard.xpm</file>
-        <file>icons/rockbox-clef.svg</file>
+        <file alias="icons/rockbox-clef.svg">../../docs/logo/rockbox-clef.svg</file>
     </qresource>
     <qresource prefix="/ini" >
         <file>rbutil.ini</file>
