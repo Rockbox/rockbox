@@ -152,7 +152,7 @@ int i2c_write(unsigned char slave, int address, int len,
    i2c_iomux(slave);
 
    /* clear all flags */
-   I2C_ISR = 0x00
+   I2C_ISR = 0x00;
    I2C_IER = 0x00;
 
    /* START */
