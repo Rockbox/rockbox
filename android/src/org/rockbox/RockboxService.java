@@ -64,10 +64,13 @@ public class RockboxService extends Service
     private static volatile boolean rockbox_running;
     private Activity current_activity = null;
     private IntentFilter itf;
+    private IntentFilter ifh;
     private BroadcastReceiver batt_monitor;
+    private BroadcastReceiver headphone_monitor;
     private RunForegroundManager fg_runner;
     private MediaButtonReceiver mMediaButtonReceiver;
     private int battery_level;
+    private int headphone_state;
     private ResultReceiver resultReceiver;
 
     public static final int RESULT_INVOKING_MAIN = 0;
@@ -338,6 +341,24 @@ public class RockboxService extends Service
         };
         registerReceiver(batt_monitor, itf);
     }
+
+
+    private void initHeadphoneMonitor()
+    {
+        ifh = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        headphone_monitor = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                int state = intent.getIntExtra("state", -1);
+                LOG("headphone state:" + state);
+                headphone_state = state;
+            }
+        };
+        registerReceiver(headphone_monitor, ifh);
+    }
+
 
     void startForeground()
     {

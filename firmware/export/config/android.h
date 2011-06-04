@@ -84,6 +84,8 @@
 
 #define HAVE_SW_TONE_CONTROLS 
 
+#define HAVE_HEADPHONE_DETECTION
+
 /* Define current usage levels. */
 #define CURRENT_NORMAL     88 /* 18 hours from a 1600 mAh battery */  
 #define CURRENT_BACKLIGHT  30 /* TBD */ 
