@@ -40,28 +40,28 @@ static struct mutex i2c_mtx;
 
 static bool i2c_write_byte(uint8_t data, bool start)
 {
-   long timeout = current_tick + HZ / 50;
+    long timeout = current_tick + 50;
 
-   /* START */
-   I2C_CONR |= (1<<3)  | (1<<2); /* master port enable, transmit bit */
-   I2C_MTXR = data;
+    /* START */
+    I2C_CONR |= (1<<3) | (1<<2); /* master port enable, transmit bit */
+    I2C_MTXR = data;
 
-   if (start)
-       I2C_LCMR = (1<<2) | (1<<0); /* resume op, start bit */
-   else
-       I2C_LCMR = (1<<2); /* resume op */
+    if (start)
+        I2C_LCMR = (1<<2) | (1<<0); /* resume op, start bit */
+    else
+        I2C_LCMR = (1<<2); /* resume op */
 
-   I2C_CONR &= ~(1<<4); /* ACK enable */
+    I2C_CONR &= ~(1<<4); /* ACK enable */
 
-   /* wait for ACK from slave */
-   while ( !(I2C_ISR & (1<<0)) || (I2C_LSR & (1<<0)) )
-       if (TIME_AFTER(current_tick, timeout))
-           return false;
+    /* wait for ACK from slave */
+    while ( (!(I2C_ISR & (1<<0))) || (I2C_LSR & (1<<1)) )
+        if (TIME_AFTER(current_tick, timeout))
+            return false;
 
-   /* clear status bit */
-   I2C_ISR &= ~(1<<0);
+    /* clear status bit */
+    I2C_ISR &= ~(1<<0);
 
-   return true;
+    return true;
 }
 
 static bool i2c_read_byte(unsigned char *data)
@@ -70,7 +70,7 @@ static bool i2c_read_byte(unsigned char *data)
 
    I2C_LCMR = (1<<2); /* resume op */
 
-   while (I2C_ISR & (1<<1))
+   while (!(I2C_ISR & (1<<1)))
        if (TIME_AFTER(current_tick, timeout))
            return false;
 
@@ -97,7 +97,7 @@ static bool i2c_stop(void)
 }
 
 /* route i2c bus to internal codec or external bus
- * internal codec has 0x27 i2c slave address so
+ * internal codec has 0x4e i2c slave address so
  * access to this address is routed to internal bus.
  * All other addresses are routed to external pads
  */
@@ -105,15 +105,15 @@ static void i2c_iomux(unsigned char slave)
 {
    unsigned long muxa = SCU_IOMUXA_CON & ~(0x1f<<14);
 
-   if (slave == (0x27<<1))
+   if ((slave & 0xfe) == (0x27<<1))
    {
        /* internal codec */
-       SCU_IOMUXA_CON = muxa | (1<<16) | (1<<14);
+       SCU_IOMUXA_CON = (muxa | (1<<16) | (1<<14));
    }
    else
    {
        /* external I2C bus */
-       SCU_IOMUXA_CON = muxa | (1<<18);
+       SCU_IOMUXA_CON = (muxa | (1<<18));
    }
 }
 
@@ -131,7 +131,13 @@ void i2c_init(void)
     * APBfreq = 50Mhz
     * SCLfreq = (APBfreq/5*(I2CCDVR[5:3] + 1) * 2^((I2CCDVR[2:0] + 1))
     */
-   I2C_OPR = (I2C_OPR & ~(0x3F)) | (6<<3) | 1<<0;
+
+   /* we are driving this slightly above specs
+    * (6<<3) | (1<<0)    416kHz
+    * (7<<3) | (1<<0)    357kHz
+    * (6<<3) | (2<<0)    208kHz
+    */
+   I2C_OPR = (I2C_OPR & ~(0x3F)) | (6<<3) | (1<<0);
 
    I2C_IER = 0x00;
 
@@ -144,6 +150,10 @@ int i2c_write(unsigned char slave, int address, int len,
    mutex_lock(&i2c_mtx);
 
    i2c_iomux(slave);
+
+   /* clear all flags */
+   I2C_ISR = 0x00
+   I2C_IER = 0x00;
 
    /* START */
    if (! i2c_write_byte(slave & ~1, true))
@@ -187,6 +197,10 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
    mutex_lock(&i2c_mtx);
 
    i2c_iomux(slave);
+
+   /* clear all flags */
+   I2C_ISR = 0x00;
+   I2C_IER = 0x00;
 
    if (address >= 0)
    {
