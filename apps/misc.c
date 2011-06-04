@@ -695,9 +695,11 @@ int show_logo( void )
     lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
                0, (unsigned char *)version);
-    lcd_bitmap(rockboxlogo, 0, 16, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+    lcd_bitmap(rockboxlogo, (LCD_WIDTH - BMPWIDTH_rockboxlogo) / 2, 16,
+            BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
 #else
-    lcd_bitmap(rockboxlogo, 0, 10, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+    lcd_bitmap(rockboxlogo, (LCD_WIDTH - BMPWIDTH_rockboxlogo) / 2, 10,
+            BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
