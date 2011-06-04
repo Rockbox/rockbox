@@ -28,6 +28,7 @@ sharedir=
 thread_support="ASSEMBLER_THREADS"
 app_lcd_width=
 app_lcd_height=
+app_lcd_orientation=
 #
 # Begin Function Definitions
 #
@@ -100,7 +101,12 @@ app_set_lcd_size () {
         app_lcd_height="$ARG_LCDHEIGHT"
     fi
     if [ -z "$app_lcd_height" ]; then app_lcd_height="480"; fi
-    echo "Selected $app_lcd_width x $app_lcd_height resolution"
+    if [ $app_lcd_width -gt $app_lcd_height ]; then
+        lcd_orientation="landscape"
+    else
+        lcd_orientation="portrait"
+    fi
+    echo "Selected $app_lcd_width x $app_lcd_height resolution ($lcd_orientation)"
     ARG_LCDWIDTH=$app_lcd_width
     ARG_LCDHEIGHT=$app_lcd_height
 
@@ -3715,6 +3721,7 @@ sed > Makefile \
  -e "s<@PREFIX@<$ARG_PREFIX<g" \
  -e "s<@CMDLINE@<$cmdline<g" \
  -e "s<@SDLCONFIG@<$sdl<g" \
+ -e "s<@LCDORIENTATION@<$lcd_orientation<g" \
 <<EOF
 ## Automatically generated. http://www.rockbox.org/
 
@@ -3784,6 +3791,7 @@ export ROCKBOX_SHARE_PATH=@sharepath@
 export ROCKBOX_BINARY_PATH=@binpath@
 export ROCKBOX_LIBRARY_PATH=@libpath@
 export SDLCONFIG=@SDLCONFIG@
+export LCDORIENTATION=@LCDORIENTATION@
 
 CONFIGURE_OPTIONS=@CMDLINE@
 
