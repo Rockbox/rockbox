@@ -177,7 +177,7 @@ static void button_tick(void)
         /* Use the autoresetting oneshot to debounce the detection signal */
         phones_present = !phones_present;
         timeout_register(&hp_detect_timeout, btn_detect_callback,
-                         HZ, phones_present);
+                         HZ/2, phones_present);
     }
 #endif
 

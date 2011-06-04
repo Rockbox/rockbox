@@ -67,11 +67,13 @@ public class RockboxService extends Service
     private IntentFilter ifh;
     private BroadcastReceiver batt_monitor;
     private BroadcastReceiver headphone_monitor;
+    private BroadcastReceiver noisy_monitor;
     private RunForegroundManager fg_runner;
     private MediaButtonReceiver mMediaButtonReceiver;
     private int battery_level;
     private int headphone_state;
     private ResultReceiver resultReceiver;
+    private RockboxService rbservice;
 
     public static final int RESULT_INVOKING_MAIN = 0;
     public static final int RESULT_LIB_LOAD_PROGRESS = 1;
@@ -357,6 +359,20 @@ public class RockboxService extends Service
             }
         };
         registerReceiver(headphone_monitor, ifh);
+        noisy_monitor = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                LOG("audio becoming noisy");
+                headphone_state = 0;
+            }
+        };
+        rbservice = RockboxService.get_instance();
+        /* We're relying on internal API's here,
+           this can break in the future! */
+        rbservice.registerReceiver(noisy_monitor,
+                new IntentFilter("android.media.AUDIO_BECOMING_NOISY"));
     }
 
 
