@@ -22,7 +22,6 @@
 package org.rockbox;
 
 import java.util.Arrays;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,10 +36,6 @@ import android.util.Log;
 
 public class RockboxPCM extends AudioTrack 
 {
-    private byte[] raw_data;
-    private PCMListener l;
-    private HandlerThread ht;
-    private Handler h = null;
     private static final int streamtype = AudioManager.STREAM_MUSIC;
     private static final int samplerate = 44100;
     /* should be CHANNEL_OUT_STEREO in 2.0 and above */
@@ -48,16 +43,20 @@ public class RockboxPCM extends AudioTrack
             AudioFormat.CHANNEL_CONFIGURATION_STEREO;
     private static final int encoding = 
             AudioFormat.ENCODING_PCM_16BIT;
-    /* 24k is plenty, but some devices may have a higher minimum */
+    /* 32k is plenty, but some devices may have a higher minimum */
     private static final int buf_len  = 
-            Math.max(24<<10, getMinBufferSize(samplerate, channels, encoding));
+        Math.max(32<<10, 4*getMinBufferSize(samplerate, channels, encoding));
 
     private AudioManager audiomanager;
+    private RockboxService rbservice;
+    private byte[] raw_data;
+
+    private int refillmark;
     private int maxstreamvolume;
     private int setstreamvolume = -1;
     private float minpcmvolume;
+    private float curpcmvolume = 0;
     private float pcmrange;
-    private RockboxService rbservice;
 
     private void LOG(CharSequence text)
     {
@@ -68,12 +67,11 @@ public class RockboxPCM extends AudioTrack
     {
         super(streamtype, samplerate,  channels, encoding,
                 buf_len, AudioTrack.MODE_STREAM);
-        ht = new HandlerThread("audio thread", 
+        HandlerThread ht = new HandlerThread("audio thread", 
                 Process.THREAD_PRIORITY_URGENT_AUDIO);
         ht.start();
         raw_data = new byte[buf_len]; /* in shorts */
         Arrays.fill(raw_data, (byte) 0);
-        l = new PCMListener(buf_len);
 
         /* find cleaner way to get context? */
         rbservice = RockboxService.get_instance();
@@ -86,6 +84,13 @@ public class RockboxPCM extends AudioTrack
 
         setupVolumeHandler();
         postVolume(audiomanager.getStreamVolume(streamtype));
+        refillmark = buf_len / 4; /* higher values don't work on many devices */
+
+        /* getLooper() returns null if thread isn't running */
+        while(!ht.isAlive()) Thread.yield();
+        setPlaybackPositionUpdateListener(
+                new PCMListener(buf_len / 2), new Handler(ht.getLooper()));
+        refillmark = bytes2frames(refillmark);
     }    
 
     private native void postVolumeChangedEvent(int volume);
@@ -133,18 +138,21 @@ public class RockboxPCM extends AudioTrack
             new IntentFilter("android.media.VOLUME_CHANGED_ACTION"));
     }
 
+    @SuppressWarnings("unused")
     private int bytes2frames(int bytes) 
     {
         /* 1 sample is 2 bytes, 2 samples are 1 frame */
         return (bytes/4);
     }
     
+    @SuppressWarnings("unused")
     private int frames2bytes(int frames) 
     {
         /* 1 frame is 2 samples, 1 sample is 2 bytes */
         return (frames*4);
     }
 
+    @SuppressWarnings("unused")
     private void play_pause(boolean pause) 
     {
         RockboxService service = RockboxService.get_instance();
@@ -164,38 +172,45 @@ public class RockboxPCM extends AudioTrack
             service.startForeground();
             if (getPlayState() == AudioTrack.PLAYSTATE_STOPPED)
             {
-                if (getState() == AudioTrack.STATE_INITIALIZED)
-                {
-                    if (h == null)
-                        h = new Handler(ht.getLooper());
-                    if (setNotificationMarkerPosition(bytes2frames(buf_len)/4)
-                            != AudioTrack.SUCCESS)
-                        LOG("setNotificationMarkerPosition Error");
-                    else
-                        setPlaybackPositionUpdateListener(l, h);
-                }
-                /* need to fill with silence before starting playback */
-                write(raw_data, frames2bytes(getPlaybackHeadPosition()), 
-                        raw_data.length);
+                setNotificationMarkerPosition(refillmark);
+                /* need to fill with silence before starting playback */ 
+                write(raw_data, 0, raw_data.length);
             }
             play();
         }
     }
     
     @Override
-    public void stop() throws IllegalStateException 
+    public synchronized void stop() throws IllegalStateException 
     {
+        /* flush pending data, but turn the volume off so it cannot be heard.
+         * This is so that we don't hear old data if music is resumed very
+         * quickly after (e.g. when seeking).
+         */
+        float old_vol = curpcmvolume; 
         try {
+            setStereoVolume(0, 0);
+            flush();
             super.stop();
         } catch (IllegalStateException e) {
             throw new IllegalStateException(e);
+        } finally {
+            setStereoVolume(old_vol, old_vol);
         }
+
         Intent widgetUpdate = new Intent("org.rockbox.UpdateState");
         widgetUpdate.putExtra("state", "stop");
         RockboxService.get_instance().sendBroadcast(widgetUpdate);
         RockboxService.get_instance().stopForeground();
     }
+    
+    public int setStereoVolume(float leftVolume, float rightVolume)
+    {
+        curpcmvolume = leftVolume;
+        return super.setStereoVolume(leftVolume, rightVolume);
+    }
 
+    @SuppressWarnings("unused")
     private void set_volume(int volume)
     {
         LOG("java:set_volume("+volume+")");
@@ -228,15 +243,10 @@ public class RockboxPCM extends AudioTrack
    
     private class PCMListener implements OnPlaybackPositionUpdateListener 
     {
-        private int max_len;
-        private int refill_mark;
         private byte[] buf;
-        public PCMListener(int len) 
+        public PCMListener(int refill_bufsize) 
         {
-            max_len = len;
-            /* refill to 100% when reached the 25% */
-            buf = new byte[max_len*3/4];
-            refill_mark = max_len - buf.length;
+            buf = new byte[refill_bufsize];
         }
 
         public void onMarkerReached(AudioTrack track) 
@@ -248,31 +258,16 @@ public class RockboxPCM extends AudioTrack
             result = track.write(buf, 0, buf.length);
             if (result >= 0)
             {
-                switch(track.getPlayState())
+                switch(getPlayState())
                 {
-                    case AudioTrack.PLAYSTATE_PLAYING:
-                    case AudioTrack.PLAYSTATE_PAUSED:
-                        /* refill at 25% no matter of how many 
-                         * bytes we've written */
-                        if (setNotificationMarkerPosition(
-                                bytes2frames(refill_mark)) 
-                                    != AudioTrack.SUCCESS)
-                        {
-                            LOG("Error in onMarkerReached: " +
-                            		"Could not set notification marker");
-                        }
-                        else /* recharge */
-                            setPlaybackPositionUpdateListener(this, h);
+                    case PLAYSTATE_PLAYING:
+                    case PLAYSTATE_PAUSED:
+                        setNotificationMarkerPosition(pcm.refillmark);
                         break;
-                    case AudioTrack.PLAYSTATE_STOPPED:
-                        LOG("State STOPPED");
+                    case PLAYSTATE_STOPPED:
+                        LOG("Stopped");
                         break;
                 }
-            }
-            else
-            {
-                LOG("Error in onMarkerReached (result="+result+")");
-                stop();
             }
         }
 
