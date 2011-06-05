@@ -19,14 +19,6 @@
 #endif
 #endif
 
-/* Workaround for gcc bug where all static functions are called with short 
-   calls */
-#if !defined(ICODE_ATTR_TREMOR_NOT_MDCT) && (CONFIG_CPU==S5L8701)
-#define STATICIRAM_NOT_MDCT STATICIRAM
-#else
-#define STATICIRAM_NOT_MDCT static
-#endif
-
 #ifndef ICODE_ATTR_TREMOR_NOT_MDCT
 #define ICODE_ATTR_TREMOR_NOT_MDCT ICODE_ATTR
 #endif
