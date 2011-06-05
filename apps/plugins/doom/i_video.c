@@ -158,7 +158,9 @@ void I_ShutdownGraphics(void)
 
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-//#define DOOMBUTTON_SCROLLWHEEL
+#define DOOMBUTTON_SCROLLWHEEL
+#define DOOMBUTTON_SCROLLWHEEL_CC     BUTTON_SCROLL_BACK
+#define DOOMBUTTON_SCROLLWHEEL_CW    BUTTON_SCROLL_FWD
 #define DOOMBUTTON_UP         BUTTON_MENU
 #define DOOMBUTTON_WEAPON     BUTTON_SELECT
 #define DOOMBUTTON_LEFT       BUTTON_LEFT
@@ -493,6 +495,26 @@ static inline void getkey()
    holdbutton=rb->button_hold();
 #endif
 
+#ifdef DOOMBUTTON_SCROLLWHEEL
+   /* use button_get(false) for clickwheel checks */
+   int button; /* move me */
+   button = rb->button_get(false);
+   switch(button){
+   case DOOMBUTTON_SCROLLWHEEL_CC | BUTTON_REPEAT:
+   case DOOMBUTTON_SCROLLWHEEL_CC:
+         event.type = ev_scroll;
+         event.data1=-1;
+         D_PostEvent(&event);
+         break;
+   case DOOMBUTTON_SCROLLWHEEL_CW | BUTTON_REPEAT:
+   case DOOMBUTTON_SCROLLWHEEL_CW:
+         event.type = ev_scroll;
+         //event.data1=KEY_LEFTARROW;
+         event.data1=1;
+         D_PostEvent(&event);
+         break;
+   }
+#endif   
    newbuttonstate = rb->button_status();
 #ifdef DOOMBUTTON_SCROLLWHEEL
    newbuttonstate |= read_scroll_wheel();

@@ -47,7 +47,8 @@ enum
    ev_keydown,
    ev_keyup,
    ev_mouse,
-   ev_joystick
+   ev_joystick,
+   ev_scroll
 };
 typedef unsigned evtype_t;
 

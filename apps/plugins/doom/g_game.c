@@ -229,6 +229,9 @@ static unsigned int   dclicktime2;
 static unsigned int   dclickstate2;
 static unsigned int   dclicks2;
 
+// scrollwheel values
+static int scrollmag;
+
 // joystick values are repeated
 static int   joyxmove;
 static int   joyymove;
@@ -316,6 +319,13 @@ void G_BuildTiccmd(ticcmd_t* cmd)
    }                                                             // phares
 
    // let movement keys cancel each other out
+
+   /* strafe with scrollwheel */
+   if (scrollmag > 0)
+         side += 5*sidemove[speed];
+   if (scrollmag < 0)
+         side -= 5*sidemove[speed];
+   scrollmag = 0;         
 
    if (strafe)
    {
@@ -756,6 +766,9 @@ boolean G_Responder (event_t* ev)
       joyxmove = ev->data2;
       joyymove = ev->data3;
       return true;    // eat events
+
+   case ev_scroll:
+      scrollmag = ev->data1;
 
    default:
       break;
