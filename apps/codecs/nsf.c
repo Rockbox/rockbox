@@ -69,7 +69,7 @@ static int16_t samples[WAV_CHUNK_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
 
 #ifdef NSF_PROFILE
 
-#define CREATE_TIMER(name) uint32_t nsf_timer_##name##_start,\
+#define CREATE_TIMER(name) static uint32_t nsf_timer_##name##_start,\
     nsf_timer_##name##_total
 #define ENTER_TIMER(name) nsf_timer_##name##_start=USEC_TIMER
 #define EXIT_TIMER(name) nsf_timer_##name##_total+=\
@@ -187,7 +187,7 @@ union QUAD
 
 /****************** tables */
 static const int32_t ModulationTable[8] ICONST_ATTR = {0,1,2,4,0,-4,-2,-1};
-const uint16_t  DMC_FREQ_TABLE[2][0x10] ICONST_ATTR_NSF_LARGE_IRAM = {
+static const uint16_t  DMC_FREQ_TABLE[2][0x10] ICONST_ATTR_NSF_LARGE_IRAM = {
     /* NTSC */
     {0x1AC,0x17C,0x154,0x140,0x11E,0x0FE,0x0E2,0x0D6,0x0BE,0x0A0,0x08E,0x080,
     0x06A,0x054,0x048,0x036},
@@ -196,15 +196,17 @@ const uint16_t  DMC_FREQ_TABLE[2][0x10] ICONST_ATTR_NSF_LARGE_IRAM = {
     0x062,0x04E,0x042,0x032}
 };
 
-const uint8_t DUTY_CYCLE_TABLE[4] ICONST_ATTR_NSF_LARGE_IRAM = {2,4,8,12};
+static const uint8_t DUTY_CYCLE_TABLE[4] ICONST_ATTR_NSF_LARGE_IRAM = {
+    2,4,8,12
+};
 
-const uint8_t LENGTH_COUNTER_TABLE[0x20] ICONST_ATTR_NSF_LARGE_IRAM = {
+static const uint8_t LENGTH_COUNTER_TABLE[0x20] ICONST_ATTR_NSF_LARGE_IRAM = {
     0x0A,0xFE,0x14,0x02,0x28,0x04,0x50,0x06,0xA0,0x08,0x3C,0x0A,0x0E,0x0C,0x1A,
     0x0E,0x0C,0x10,0x18,0x12,0x30,0x14,0x60,0x16,0xC0,0x18,0x48,0x1A,0x10,0x1C,
     0x20,0x1E
 };
 
-const uint16_t NOISE_FREQ_TABLE[0x10] ICONST_ATTR_NSF_LARGE_IRAM = {
+static const uint16_t NOISE_FREQ_TABLE[0x10] ICONST_ATTR_NSF_LARGE_IRAM = {
     0x004,0x008,0x010,0x020,0x040,0x060,0x080,0x0A0,0x0CA,0x0FE,0x17C,0x1FC,
     0x2FA,0x3F8,0x7F2,0xFE4
 };
@@ -245,62 +247,64 @@ struct NSFE_INFOCHUNK
     uint8_t         nStartingTrack;
 };
 
-int32_t     LoadFile(uint8_t *,size_t);
+static int32_t     LoadFile(uint8_t *,size_t);
 
-int32_t     LoadFile_NESM(uint8_t *,size_t);
-int32_t     LoadFile_NSFE(uint8_t *,size_t);
+static int32_t     LoadFile_NESM(uint8_t *,size_t);
+static int32_t     LoadFile_NSFE(uint8_t *,size_t);
 
 /* NSF file info */
 
 /* basic NSF info */
-int32_t     bIsExtended=0;      /* 0 = NSF, 1 = NSFE */
-uint8_t     nIsPal=0;           /* 0 = NTSC, 1 = PAL,
-                                 2,3 = mixed NTSC/PAL (interpretted as NTSC) */
-int32_t     nfileLoadAddress=0; /* The address to which the NSF code is
-                                   loaded */
-int32_t     nfileInitAddress=0; /* The address of the Init routine
-                                   (called at track change) */
-int32_t     nfilePlayAddress=0; /* The address of the Play routine
-                                   (called several times a second) */
-uint8_t     nChipExtensions=0;  /* Bitwise representation of the external chips
-                                   used by this NSF.  */
+static int32_t     bIsExtended=0;      /* 0 = NSF, 1 = NSFE */
+static uint8_t     nIsPal=0;           /* 0 = NTSC, 1 = PAL, 2,3 = mixed
+                                          NTSC/PAL (interpretted as NTSC) */
+static int32_t     nfileLoadAddress=0; /* The address to which the NSF code is
+                                          loaded */
+static int32_t     nfileInitAddress=0; /* The address of the Init routine
+                                          (called at track change) */
+static int32_t     nfilePlayAddress=0; /* The address of the Play routine
+                                          (called several times a second) */
+static uint8_t     nChipExtensions=0;  /* Bitwise representation of the
+                                          external chips used by this NSF.  */
     
 /* old NESM speed stuff (blarg) */
-int32_t     nNTSC_PlaySpeed=0;
-int32_t     nPAL_PlaySpeed=0;
+static int32_t     nNTSC_PlaySpeed=0;
+static int32_t     nPAL_PlaySpeed=0;
 
 /* track info */
 /* The number of tracks in the NSF (1 = 1 track, 5 = 5 tracks, etc) */
-int32_t     nTrackCount=0;
+static int32_t     nTrackCount=0;
 /* The initial track (ZERO BASED:  0 = 1st track, 4 = 5th track, etc) */
-int32_t     nInitialTrack=0;
+static int32_t     nInitialTrack=0;
 
 /* nsf data */
-uint8_t*    pDataBuffer=0;      /* the buffer containing NSF code. */
-int32_t     nDataBufferSize=0;  /* the size of the above buffer. */
+static uint8_t*    pDataBuffer=0;      /* the buffer containing NSF code. */
+static int32_t     nDataBufferSize=0;  /* the size of the above buffer. */
 
 /* playlist */
-uint8_t     nPlaylist[256];     /* Each entry is the zero based index of the
-                                   song to play */
-int32_t     nPlaylistSize=0;    /* the number of tracks in the playlist */
+static uint8_t     nPlaylist[256];     /* Each entry is the zero based index of
+                                          the song to play */
+static int32_t     nPlaylistSize=0;    /* number of tracks in the playlist */
 
 /* track time / fade */
-int32_t     nTrackTime[256];    /* track times -1 if no track times specified */
-int32_t     nTrackFade[256];    /* track fade times -1 if none are specified */
+static int32_t     nTrackTime[256];    /* track times -1 if no track times
+                                          specified */
+static int32_t     nTrackFade[256];    /* track fade times -1 if none are
+                                          specified */
 
 /* string info */
-uint8_t     szGameTitle[0x101];
-uint8_t     szArtist[0x101];
-uint8_t     szCopyright[0x101];
-uint8_t     szRipper[0x101];
+static uint8_t     szGameTitle[0x101];
+static uint8_t     szArtist[0x101];
+static uint8_t     szCopyright[0x101];
+static uint8_t     szRipper[0x101];
 
 /* bankswitching info */
-uint8_t     nBankswitch[8]={0}; /* The initial bankswitching registers needed
-                                 * for some NSFs.  If the NSF does not use
-                                 * bankswitching, these values will all be zero
-                                 */
+static uint8_t     nBankswitch[8]={0}; /* The initial bankswitching registers
+                                          needed for some NSFs. If the NSF does
+                                          not use bankswitching, these values
+                                          will all be zero */
 
-int32_t     LoadFile(uint8_t * inbuffer, size_t size)
+static int32_t     LoadFile(uint8_t * inbuffer, size_t size)
 {
     if(!inbuffer) return -1;
 
@@ -328,7 +332,7 @@ int32_t     LoadFile(uint8_t * inbuffer, size_t size)
     return ret;
 }
 
-int32_t LoadFile_NESM(uint8_t* inbuffer, size_t size)
+static int32_t LoadFile_NESM(uint8_t* inbuffer, size_t size)
 {
     uint8_t ignoreversion=1;
     uint8_t needdata=1;
@@ -379,7 +383,7 @@ int32_t LoadFile_NESM(uint8_t* inbuffer, size_t size)
     return 0;
 }
 
-int32_t LoadFile_NSFE(uint8_t* inbuffer, size_t size)
+static int32_t LoadFile_NSFE(uint8_t* inbuffer, size_t size)
 {
     /* the vars we'll be using */
     uint32_t nChunkType;
@@ -604,7 +608,7 @@ struct FDSWave
     int32_t     nPopCount;
     
 };
-int16_t     FDS_nOutputTable_L[4][0x21][0x40] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
+static int16_t     FDS_nOutputTable_L[4][0x21][0x40] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 
 struct FME07Wave
 {
@@ -625,7 +629,7 @@ struct FME07Wave
     int32_t     nMixL;
 };
 
-int16_t     FME07_nOutputTable_L[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
+static int16_t     FME07_nOutputTable_L[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
 
 struct N106Wave
 {
@@ -665,7 +669,7 @@ struct N106Wave
     int32_t     nMixL[8];
 };
 
-int16_t     N106_nOutputTable_L[0x10][0x10] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
+static int16_t     N106_nOutputTable_L[0x10][0x10] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 
 struct VRC6PulseWave
 {
@@ -690,7 +694,7 @@ struct VRC6PulseWave
     
 };
 
-int16_t     VRC6Pulse_nOutputTable_L[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
+static int16_t     VRC6Pulse_nOutputTable_L[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
 
 struct VRC6SawWave
 {
@@ -712,7 +716,7 @@ struct VRC6SawWave
     
 };
 
-int16_t     VRC6Saw_nOutputTable_L[0x20] IDATA_ATTR MEM_ALIGN_ATTR;
+static int16_t     VRC6Saw_nOutputTable_L[0x20] IDATA_ATTR MEM_ALIGN_ATTR;
 
 struct Wave_Squares
 {
@@ -750,7 +754,7 @@ struct Wave_Squares
     int32_t         nMixL;
 };
 
-int16_t     Squares_nOutputTable_L[0x10][0x10] IDATA_ATTR MEM_ALIGN_ATTR;
+static int16_t     Squares_nOutputTable_L[0x10][0x10] IDATA_ATTR MEM_ALIGN_ATTR;
 
 struct Wave_TND
 {
@@ -841,13 +845,13 @@ struct Wave_TND
 };
 
 /* channels */
-struct Wave_Squares mWave_Squares IDATA_ATTR; /* Square channels 1 and 2 */
-struct Wave_TND     mWave_TND IDATA_ATTR;     /* Triangle/Noise/DMC channels */
-struct VRC6PulseWave    mWave_VRC6Pulse[2] IDATA_ATTR;
-struct VRC6SawWave  mWave_VRC6Saw IDATA_ATTR;
-struct N106Wave     mWave_N106 IDATA_ATTR;
-struct FDSWave      mWave_FDS IDATA_ATTR;
-struct FME07Wave    mWave_FME07[3] IDATA_ATTR; /* FME-07's 3 pulse channels */
+static struct Wave_Squares mWave_Squares IDATA_ATTR; /* Square channels 1 and 2 */
+static struct Wave_TND     mWave_TND IDATA_ATTR;     /* Triangle/Noise/DMC channels */
+static struct VRC6PulseWave    mWave_VRC6Pulse[2] IDATA_ATTR;
+static struct VRC6SawWave  mWave_VRC6Saw IDATA_ATTR;
+static struct N106Wave     mWave_N106 IDATA_ATTR;
+static struct FDSWave      mWave_FDS IDATA_ATTR;
+static struct FME07Wave    mWave_FME07[3] IDATA_ATTR; /* FME-07's 3 pulse channels */
 
 
 /****************** MMC5 ******************/
@@ -857,11 +861,11 @@ struct FME07Wave    mWave_FME07[3] IDATA_ATTR; /* FME-07's 3 pulse channels */
 /****************** N106 (Disch loves this chip) ******************/
 
 #ifdef ICODE_INSTEAD_OF_INLINE
-void Wave_N106_DoTicks(const int32_t ticks) ICODE_ATTR;
-void Wave_N106_DoTicks(const int32_t ticks)
+static void Wave_N106_DoTicks(const int32_t ticks) ICODE_ATTR;
+static void Wave_N106_DoTicks(const int32_t ticks)
 #else
-inline void Wave_N106_DoTicks(const int32_t ticks);
-inline void Wave_N106_DoTicks(const int32_t ticks)
+static inline void Wave_N106_DoTicks(const int32_t ticks);
+static inline void Wave_N106_DoTicks(const int32_t ticks)
 #endif
 {
     register int32_t i;
@@ -927,11 +931,11 @@ inline void Wave_N106_DoTicks(const int32_t ticks)
 /****************** VRC6 ******************/
 
 #ifdef ICODE_INSTEAD_OF_INLINE
-void Wave_VRC6_DoTicks(const int32_t ticks) ICODE_ATTR;
-void Wave_VRC6_DoTicks(const int32_t ticks)
+static void Wave_VRC6_DoTicks(const int32_t ticks) ICODE_ATTR;
+static void Wave_VRC6_DoTicks(const int32_t ticks)
 #else
-inline void Wave_VRC6_DoTicks(const int32_t ticks);
-inline void Wave_VRC6_DoTicks(const int32_t ticks)
+static inline void Wave_VRC6_DoTicks(const int32_t ticks);
+static inline void Wave_VRC6_DoTicks(const int32_t ticks)
 #endif
 {
     register int32_t i;
@@ -989,11 +993,11 @@ inline void Wave_VRC6_DoTicks(const int32_t ticks)
 
 /* decay */
 #ifdef ICODE_INSTEAD_OF_INLINE
-void Wave_Squares_ClockMajor(void) ICODE_ATTR;
-void Wave_Squares_ClockMajor()
+static void Wave_Squares_ClockMajor(void) ICODE_ATTR;
+static void Wave_Squares_ClockMajor()
 #else
-inline void Wave_Squares_ClockMajor(void);
-inline void Wave_Squares_ClockMajor()
+static inline void Wave_Squares_ClockMajor(void);
+static inline void Wave_Squares_ClockMajor()
 #endif
 {
     if(mWave_Squares.nDecayCount[0])
@@ -1034,11 +1038,11 @@ inline void Wave_Squares_ClockMajor()
 
 
 #ifdef ICODE_INSTEAD_OF_INLINE
-void Wave_Squares_CheckSweepForcedSilence(const int32_t i) ICODE_ATTR;
-void Wave_Squares_CheckSweepForcedSilence(const int32_t i)
+static void Wave_Squares_CheckSweepForcedSilence(const int32_t i) ICODE_ATTR;
+static void Wave_Squares_CheckSweepForcedSilence(const int32_t i)
 #else
-inline void Wave_Squares_CheckSweepForcedSilence(const int32_t i);
-inline void Wave_Squares_CheckSweepForcedSilence(const int32_t i)
+static inline void Wave_Squares_CheckSweepForcedSilence(const int32_t i);
+static inline void Wave_Squares_CheckSweepForcedSilence(const int32_t i)
 #endif
 {
     if(mWave_Squares.nFreqTimer[i].W < 8) {
@@ -1054,11 +1058,11 @@ inline void Wave_Squares_CheckSweepForcedSilence(const int32_t i)
 
 /* sweep / length */
 #ifdef ICODE_INSTEAD_OF_INLINE
-void Wave_Squares_ClockMinor(void) ICODE_ATTR;
-void Wave_Squares_ClockMinor()
+static void Wave_Squares_ClockMinor(void) ICODE_ATTR;
+static void Wave_Squares_ClockMinor()
 #else
-inline void Wave_Squares_ClockMinor(void);
-inline void Wave_Squares_ClockMinor()
+static inline void Wave_Squares_ClockMinor(void);
+static inline void Wave_Squares_ClockMinor()
 #endif
 {
 /* unrolled a little loop
@@ -1114,11 +1118,11 @@ other_square:
 /* decay (noise), linear (tri) */
 
 #ifdef ICODE_INSTEAD_OF_INLINE
-void Wave_TND_ClockMajor(void) ICODE_ATTR;
-void Wave_TND_ClockMajor()
+static void Wave_TND_ClockMajor(void) ICODE_ATTR;
+static void Wave_TND_ClockMajor()
 #else
-inline void Wave_TND_ClockMajor(void);
-inline void Wave_TND_ClockMajor()
+static inline void Wave_TND_ClockMajor(void);
+static inline void Wave_TND_ClockMajor()
 #endif
 {
     /* noise's decay */
@@ -1152,11 +1156,11 @@ inline void Wave_TND_ClockMajor()
 /* length */
 
 #ifdef ICODE_INSTEAD_OF_INLINE
-void Wave_TND_ClockMinor(void) ICODE_ATTR;
-void Wave_TND_ClockMinor()
+static void Wave_TND_ClockMinor(void) ICODE_ATTR;
+static void Wave_TND_ClockMinor()
 #else
-inline void Wave_TND_ClockMinor(void);
-inline void Wave_TND_ClockMinor()
+static inline void Wave_TND_ClockMinor(void);
+static inline void Wave_TND_ClockMinor()
 #endif
 {
     if(mWave_TND.bNoiseLengthEnabled && mWave_TND.nNoiseLengthCount)
@@ -1176,26 +1180,26 @@ inline void Wave_TND_ClockMinor()
  *  Memory
  */
 /* RAM:      0x0000 - 0x07FF */
-uint8_t     pRAM[0x800] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
+static uint8_t     pRAM[0x800] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 /* SRAM:     0x6000 - 0x7FFF (non-FDS only) */
-uint8_t     pSRAM[0x2000] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
+static uint8_t     pSRAM[0x2000] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 /* ExRAM:    0x5C00 - 0x5FF5 (MMC5 only)
  * Also holds NSF player code (at 0x5000 - 0x500F) */
-uint8_t     pExRAM[0x1000] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
+static uint8_t     pExRAM[0x1000] IBSS_ATTR_NSF_LARGE_IRAM MEM_ALIGN_ATTR;
 /* Full ROM buffer */
-uint8_t*    pROM_Full IDATA_ATTR;
+static uint8_t*    pROM_Full IDATA_ATTR;
 
-uint16_t    main_nOutputTable_L[0x8000] MEM_ALIGN_ATTR;
+static uint16_t    main_nOutputTable_L[0x8000] MEM_ALIGN_ATTR;
 
-uint8_t*    pROM[10] IDATA_ATTR;/* ROM banks (point to areas in pROM_Full) */
-                                /* 0x8000 - 0xFFFF */
-                                /* also includes 0x6000 - 0x7FFF (FDS only) */
-uint8_t*        pStack;         /* the stack (points to areas in pRAM) */
-                                /* 0x0100 - 0x01FF */
+static uint8_t*    pROM[10] IDATA_ATTR;/* ROM banks (point to areas in pROM_Full) */
+                                       /* 0x8000 - 0xFFFF */
+                                       /* also includes 0x6000 - 0x7FFF (FDS only) */
+static uint8_t*        pStack;         /* the stack (points to areas in pRAM) */
+                                       /* 0x0100 - 0x01FF */
 
-int32_t         nROMSize;       /* size of this ROM file in bytes */
-int32_t         nROMBankCount;  /* max number of 4k banks */
-int32_t         nROMMaxSize;    /* size of allocated pROM_Full buffer */
+static int32_t         nROMSize;       /* size of this ROM file in bytes */
+static int32_t         nROMBankCount;  /* max number of 4k banks */
+static int32_t         nROMMaxSize;    /* size of allocated pROM_Full buffer */
 
 /*
  *  Memory Proc Pointers
@@ -1203,128 +1207,128 @@ int32_t         nROMMaxSize;    /* size of allocated pROM_Full buffer */
  
 typedef uint8_t ( *ReadProc)(uint16_t);
 typedef void ( *WriteProc)(uint16_t,uint8_t);
-ReadProc    ReadMemory[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
-WriteProc   WriteMemory[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
+static ReadProc    ReadMemory[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
+static WriteProc   WriteMemory[0x10] IDATA_ATTR MEM_ALIGN_ATTR;
 
 /*
  *  6502 Registers / Mode
  */
 
-uint8_t     regA IDATA_ATTR;        /* Accumulator */
-uint8_t     regX IDATA_ATTR;        /* X-Index */
-uint8_t     regY IDATA_ATTR;        /* Y-Index */
-uint8_t     regP IDATA_ATTR;        /* Processor Status */
-uint8_t     regSP IDATA_ATTR;       /* Stack Pointer */
-uint16_t    regPC IDATA_ATTR;       /* Program Counter */
+static uint8_t     regA IDATA_ATTR;        /* Accumulator */
+static uint8_t     regX IDATA_ATTR;        /* X-Index */
+static uint8_t     regY IDATA_ATTR;        /* Y-Index */
+static uint8_t     regP IDATA_ATTR;        /* Processor Status */
+static uint8_t     regSP IDATA_ATTR;       /* Stack Pointer */
+static uint16_t    regPC IDATA_ATTR;       /* Program Counter */
 
-uint8_t     bPALMode IDATA_ATTR;/* 1 if in PAL emulation mode, 0 if in NTSC */
-uint8_t     bCPUJammed IDATA_ATTR;  /* 0 = not jammed.  1 = really jammed.
-                                     * 2 = 'fake' jammed */
+static uint8_t     bPALMode IDATA_ATTR;/* 1 if in PAL emulation mode, 0 if in NTSC */
+static uint8_t     bCPUJammed IDATA_ATTR;  /* 0 = not jammed.  1 = really
+                                              jammed. 2 = 'fake' jammed */
                                   /* fake jam caused by the NSF code to signal
                                    * the end of the play/init routine */
 
 /* Multiplication Register, for MMC5 chip only (5205+5206) */
-uint8_t     nMultIn_Low;
-uint8_t     nMultIn_High;
+static uint8_t     nMultIn_Low;
+static uint8_t     nMultIn_High;
 
 /*
  *  NSF Preparation Information
  */
 
-uint8_t     nBankswitchInitValues[10];  /* banks to swap to on tune init */
-uint16_t    nPlayAddress;               /* Play routine address */
-uint16_t    nInitAddress;               /* Init routine address */
+static uint8_t     nBankswitchInitValues[10];  /* banks to swap to on tune init */
+static uint16_t    nPlayAddress;               /* Play routine address */
+static uint16_t    nInitAddress;               /* Init routine address */
 
-uint8_t     nExternalSound;             /* external sound chips */
-uint8_t     nCurTrack;
+static uint8_t     nExternalSound;             /* external sound chips */
+static uint8_t     nCurTrack;
 
-float       fNSFPlaybackSpeed;
+static float       fNSFPlaybackSpeed;
 
 /*
  *  pAPU
  */
 
-uint8_t     nFrameCounter;      /* Frame Sequence Counter */
-uint8_t     nFrameCounterMax;   /* Frame Sequence Counter Size
-                                   (3 or 4 depending on $4017.7) */
-uint8_t     bFrameIRQEnabled;   /* TRUE if frame IRQs are enabled */
-uint8_t     bFrameIRQPending;   /* TRUE if the frame sequencer is holding down
-                                   an IRQ */
+static uint8_t     nFrameCounter;      /* Frame Sequence Counter */
+static uint8_t     nFrameCounterMax;   /* Frame Sequence Counter Size
+                                          (3 or 4 depending on $4017.7) */
+static uint8_t     bFrameIRQEnabled;   /* TRUE if frame IRQs are enabled */
+static uint8_t     bFrameIRQPending;   /* TRUE if the frame sequencer is
+                                          holding down an IRQ */
 
-uint8_t         nFME07_Address;
+static uint8_t         nFME07_Address;
 
 /*
  *  Timing and Counters
  */
 /* fixed point -15.16 */
 
-int32_t     nTicksUntilNextFrame;
-int32_t     nTicksPerPlay;
-int32_t     nTicksUntilNextPlay;
-int32_t     nTicksPerSample;
-int32_t     nTicksUntilNextSample;
+static int32_t     nTicksUntilNextFrame;
+static int32_t     nTicksPerPlay;
+static int32_t     nTicksUntilNextPlay;
+static int32_t     nTicksPerSample;
+static int32_t     nTicksUntilNextSample;
 
-uint32_t    nCPUCycle IDATA_ATTR;
-uint32_t    nAPUCycle IDATA_ATTR;
+static uint32_t    nCPUCycle IDATA_ATTR;
+static uint32_t    nAPUCycle IDATA_ATTR;
 
    
-uint32_t    nTotalPlays; /* number of times the play subroutine has been called
-                            (for tracking output time) */
+static uint32_t    nTotalPlays; /* number of times the play subroutine has been
+                                   called (for tracking output time) */
 /*
  *  Silence Tracker
  */
-int32_t     nSilentSamples;
-int32_t     nSilentSampleMax;
-int32_t     nSilenceTrackMS;
-uint8_t     bNoSilenceIfTime;
-uint8_t     bTimeNotDefault;
+static int32_t     nSilentSamples;
+static int32_t     nSilentSampleMax;
+static int32_t     nSilenceTrackMS;
+static uint8_t     bNoSilenceIfTime;
+static uint8_t     bTimeNotDefault;
 
 /*
  *  Sound output options
  */
-const int32_t       nSampleRate=44100;
+static const int32_t       nSampleRate=44100;
 
 /*
  *  Volume/fading/filter tracking
  */
 
-uint32_t        nStartFade; /* play call to start fading out */
-uint32_t        nEndFade;   /* play call to stop fading out (song is over) */
-uint8_t         bFade;      /* are we fading? */
-float           fFadeVolume;
-float           fFadeChange;
+static uint32_t        nStartFade; /* play call to start fading out */
+static uint32_t        nEndFade;   /* play call to stop fading out (song is over) */
+static uint8_t         bFade;      /* are we fading? */
+static float           fFadeVolume;
+static float           fFadeChange;
 
 /*
  *  Designated Output Buffer
  */
-uint8_t*        pOutput IDATA_ATTR;
+static uint8_t*        pOutput IDATA_ATTR;
 
-const uint8_t   bDMCPopReducer=1;
-uint8_t         nDMCPop_Prev IDATA_ATTR = 0;
-uint8_t         bDMCPop_Skip IDATA_ATTR = 0;
-uint8_t         bDMCPop_SamePlay IDATA_ATTR = 0;
+static const uint8_t   bDMCPopReducer=1;
+static uint8_t         nDMCPop_Prev IDATA_ATTR = 0;
+static uint8_t         bDMCPop_Skip IDATA_ATTR = 0;
+static uint8_t         bDMCPop_SamePlay IDATA_ATTR = 0;
 
-const uint8_t   nForce4017Write=0;
-const uint8_t   bN106PopReducer=0;
-const uint8_t   bIgnore4011Writes=0;
+static const uint8_t   nForce4017Write=0;
+static const uint8_t   bN106PopReducer=0;
+static const uint8_t   bIgnore4011Writes=0;
     
-const uint8_t   bIgnoreBRK=0;
-const uint8_t   bIgnoreIllegalOps=0;
-const uint8_t   bNoWaitForReturn=0;
-const uint8_t   bPALPreference=0;
-const uint8_t   bCleanAXY=0;
-const uint8_t   bResetDuty=0;
+static const uint8_t   bIgnoreBRK=0;
+static const uint8_t   bIgnoreIllegalOps=0;
+static const uint8_t   bNoWaitForReturn=0;
+static const uint8_t   bPALPreference=0;
+static const uint8_t   bCleanAXY=0;
+static const uint8_t   bResetDuty=0;
 
 /*
  *  Sound Filter
  */
 
-int64_t     nFilterAccL IDATA_ATTR;
-int64_t     nHighPass IDATA_ATTR;
+static int64_t     nFilterAccL IDATA_ATTR;
+static int64_t     nHighPass IDATA_ATTR;
 
-int32_t     nHighPassBase IDATA_ATTR;
+static int32_t     nHighPassBase IDATA_ATTR;
 
-uint8_t     bHighPassEnabled IDATA_ATTR;
+static uint8_t     bHighPassEnabled IDATA_ATTR;
 
 /* end globals */
 
@@ -1344,40 +1348,43 @@ uint8_t     bHighPassEnabled IDATA_ATTR;
  *  prototypes
  */
  
-uint32_t Emulate6502(uint32_t runto) ICODE_ATTR;
-void EmulateAPU(uint8_t bBurnCPUCycles) ICODE_ATTR;
+static uint32_t Emulate6502(uint32_t runto) ICODE_ATTR;
+static void EmulateAPU(uint8_t bBurnCPUCycles) ICODE_ATTR;
 
-int     NSFCore_Initialize(void); /* 1 = initialized ok,
+static int     NSFCore_Initialize(void); /* 1 = initialized ok,
                            0 = couldn't initialize (memory allocation error) */
 
 /*
  *  Song Loading
  */
-int     LoadNSF(int32_t);   /* grab data from an existing file
-                               1 = loaded ok, 0 = error loading */
+static int     LoadNSF(int32_t);   /* grab data from an existing file
+                                      1 = loaded ok, 0 = error loading */
 
 /*
  *  Track Control
  */
-void    SetTrack(uint8_t track);  /* Change tracks */
+static void    SetTrack(uint8_t track);  /* Change tracks */
 
 /*
  *  Getting Samples
  */
 /* fill a buffer with samples */
-int32_t     GetSamples(uint8_t* buffer, int32_t buffersize);
+static int32_t     GetSamples(uint8_t* buffer, int32_t buffersize);
 
 /*
  *  Playback options
  */
 /* Set desired playback options (0 = bad options couldn't be set) */
-int     SetPlaybackOptions(int32_t samplerate);
+static int     SetPlaybackOptions(int32_t samplerate);
 /* Speed throttling (0 = uses NSF specified speed) */
-void    SetPlaybackSpeed(float playspersec);
+static void    SetPlaybackSpeed(float playspersec);
 
-float   GetPlaybackSpeed(void);
-float   GetMasterVolume(void);
+static float   GetPlaybackSpeed(void);
+/* rockbox: not used
+float   GetMasterVolume(void); */
 
+/* rockbox: not used */
+#if 0
 /*
  *  Seeking
  */
@@ -1391,72 +1398,75 @@ uint32_t    GetWrittenTime(float basedplayspersec);
 void    SetPlayCalls(float plays);
 /* sets the written time (approx. seeking) */
 void    SetWrittenTime(uint32_t ms,float basedplays);
+#endif
 
 /*
  *  Fading
  */
 
-void    StopFade(void);         /* stops all fading (plays indefinitely) */
-uint8_t SongCompleted(void);    /* song has faded out (samples have stopped
-                                   being generated) */
+/* rockbox: not used
+void    StopFade(void); */      /* stops all fading (plays indefinitely) */
+static uint8_t SongCompleted(void);    /* song has faded out (samples have
+                                          stopped being generated) */
 /* parameters are play calls */
-void    SetFade(int32_t fadestart,int32_t fadestop,uint8_t bNotDefault);
-void    SetFadeTime(uint32_t fadestart,uint32_t fadestop,float basedplays,
-            uint8_t bNotDefault); /* parameters are in milliseconds */
+static void    SetFade(int32_t fadestart,int32_t fadestop,uint8_t bNotDefault);
+static void    SetFadeTime(uint32_t fadestart,uint32_t fadestop,
+                           float basedplays, uint8_t bNotDefault);
+                          /* parameters are in milliseconds */
 
 /*
  *  Internal Functions
  */
-void    RebuildOutputTables(void);
-void    RecalculateFade(void);  /* called when fade status is changed. */
-void    RecalcFilter(void);
-void    RecalcSilenceTracker(void);
+static void    RebuildOutputTables(void);
+static void    RecalculateFade(void);  /* called when fade status is changed. */
+static void    RecalcFilter(void);
+static void    RecalcSilenceTracker(void);
 
-void    WriteMemory_VRC6(uint16_t a,uint8_t v) ICODE_ATTR;
-void    WriteMemory_MMC5(uint16_t a,uint8_t v) ICODE_ATTR;
-void    WriteMemory_N106(uint16_t a,uint8_t v) ICODE_ATTR;
-void    WriteMemory_FME07(uint16_t a,uint8_t v) ICODE_ATTR;
+static void    WriteMemory_VRC6(uint16_t a,uint8_t v) ICODE_ATTR;
+static void    WriteMemory_MMC5(uint16_t a,uint8_t v) ICODE_ATTR;
+static void    WriteMemory_N106(uint16_t a,uint8_t v) ICODE_ATTR;
+static void    WriteMemory_FME07(uint16_t a,uint8_t v) ICODE_ATTR;
 
 /*
  *  Memory Read/Write routines
  */
 
-uint8_t     ReadMemory_RAM(uint16_t a) ICODE_ATTR;
-uint8_t     ReadMemory_ExRAM(uint16_t a) ICODE_ATTR;
-uint8_t     ReadMemory_SRAM(uint16_t a) ICODE_ATTR;
-uint8_t     ReadMemory_pAPU(uint16_t a) ICODE_ATTR;
-uint8_t     ReadMemory_ROM(uint16_t a) ICODE_ATTR;
-uint8_t     ReadMemory_Default(uint16_t a) ICODE_ATTR;
+static uint8_t     ReadMemory_RAM(uint16_t a) ICODE_ATTR;
+static uint8_t     ReadMemory_ExRAM(uint16_t a) ICODE_ATTR;
+static uint8_t     ReadMemory_SRAM(uint16_t a) ICODE_ATTR;
+static uint8_t     ReadMemory_pAPU(uint16_t a) ICODE_ATTR;
+static uint8_t     ReadMemory_ROM(uint16_t a) ICODE_ATTR;
+static uint8_t     ReadMemory_Default(uint16_t a) ICODE_ATTR;
 
-uint8_t     ReadMemory_N106(uint16_t a) ICODE_ATTR;
+static uint8_t     ReadMemory_N106(uint16_t a) ICODE_ATTR;
 
-void        WriteMemory_RAM(uint16_t a,uint8_t v) ICODE_ATTR;
-void        WriteMemory_ExRAM(uint16_t a,uint8_t v) ICODE_ATTR;
-void        WriteMemory_SRAM(uint16_t a,uint8_t v) ICODE_ATTR;
-void        WriteMemory_pAPU(uint16_t a,uint8_t v) ICODE_ATTR;
-void        WriteMemory_FDSRAM(uint16_t a,uint8_t v) ICODE_ATTR;
-void        WriteMemory_Default(uint16_t a,uint8_t v) ICODE_ATTR;
+static void        WriteMemory_RAM(uint16_t a,uint8_t v) ICODE_ATTR;
+static void        WriteMemory_ExRAM(uint16_t a,uint8_t v) ICODE_ATTR;
+static void        WriteMemory_SRAM(uint16_t a,uint8_t v) ICODE_ATTR;
+static void        WriteMemory_pAPU(uint16_t a,uint8_t v) ICODE_ATTR;
+static void        WriteMemory_FDSRAM(uint16_t a,uint8_t v) ICODE_ATTR;
+static void        WriteMemory_Default(uint16_t a,uint8_t v) ICODE_ATTR;
 
-uint8_t         ReadMemory_RAM(uint16_t a)      { return pRAM[a & 0x07FF]; }
-uint8_t         ReadMemory_ExRAM(uint16_t a)    { return pExRAM[a & 0x0FFF]; }
-uint8_t         ReadMemory_SRAM(uint16_t a)     { return pSRAM[a & 0x1FFF]; }
-uint8_t         ReadMemory_ROM(uint16_t a)
+static uint8_t         ReadMemory_RAM(uint16_t a)      { return pRAM[a & 0x07FF]; }
+static uint8_t         ReadMemory_ExRAM(uint16_t a)    { return pExRAM[a & 0x0FFF]; }
+static uint8_t         ReadMemory_SRAM(uint16_t a)     { return pSRAM[a & 0x1FFF]; }
+static uint8_t         ReadMemory_ROM(uint16_t a)
     { return pROM[(a >> 12) - 6][a & 0x0FFF]; }
-uint8_t         ReadMemory_Default(uint16_t a)  { return (a >> 8); }
+static uint8_t         ReadMemory_Default(uint16_t a)  { return (a >> 8); }
 
-void        WriteMemory_RAM(uint16_t a,uint8_t v)
+static void        WriteMemory_RAM(uint16_t a,uint8_t v)
     { pRAM[a & 0x07FF] = v; }
-void        WriteMemory_ExRAM(uint16_t a,uint8_t v);
-void        WriteMemory_SRAM(uint16_t a,uint8_t v)
+static void        WriteMemory_ExRAM(uint16_t a,uint8_t v);
+static void        WriteMemory_SRAM(uint16_t a,uint8_t v)
     { pSRAM[a & 0x1FFF] = v; }
-void        WriteMemory_FDSRAM(uint16_t a,uint8_t v)
+static void        WriteMemory_FDSRAM(uint16_t a,uint8_t v)
     { pROM[(a >> 12) - 6][a & 0x0FFF] = v; }
-void        WriteMemory_Default(uint16_t a,uint8_t v)   { (void)a; (void)v; }
+static void        WriteMemory_Default(uint16_t a,uint8_t v)   { (void)a; (void)v; }
 
 
 /* Read Memory Procs */
 
-uint8_t  ReadMemory_pAPU(uint16_t a)
+static uint8_t  ReadMemory_pAPU(uint16_t a)
 {
     EmulateAPU(1);
 
@@ -1489,7 +1499,7 @@ uint8_t  ReadMemory_pAPU(uint16_t a)
     return 0x40;
 }
 
-uint8_t  ReadMemory_N106(uint16_t a)
+static uint8_t  ReadMemory_N106(uint16_t a)
 {
     if(a != 0x4800)
         return ReadMemory_pAPU(a);
@@ -1505,7 +1515,7 @@ uint8_t  ReadMemory_N106(uint16_t a)
 
 /* Write Memory Procs */
 
-void  WriteMemory_ExRAM(uint16_t a,uint8_t v)
+static void  WriteMemory_ExRAM(uint16_t a,uint8_t v)
 {
     if(a < 0x5FF6)              /* Invalid */
         return;
@@ -1526,7 +1536,7 @@ void  WriteMemory_ExRAM(uint16_t a,uint8_t v)
         mWave_TND.pDMCDMAPtr[a - 2] = pROM[a];
 }
 
-void  WriteMemory_pAPU(uint16_t a,uint8_t v)
+static void  WriteMemory_pAPU(uint16_t a,uint8_t v)
 {
     EmulateAPU(1);
     switch(a)
@@ -1875,7 +1885,7 @@ void  WriteMemory_pAPU(uint16_t a,uint8_t v)
     }
 }
 
-void  WriteMemory_VRC6(uint16_t a,uint8_t v)
+static void  WriteMemory_VRC6(uint16_t a,uint8_t v)
 {
     EmulateAPU(1);
 
@@ -1938,7 +1948,7 @@ void  WriteMemory_VRC6(uint16_t a,uint8_t v)
     }
 }
 
-void  WriteMemory_MMC5(uint16_t a,uint8_t v)
+static void  WriteMemory_MMC5(uint16_t a,uint8_t v)
 {
     if((a <= 0x5015) && !bPALMode)
     {
@@ -1968,7 +1978,7 @@ multiply:
         WriteMemory_ExRAM(a,v);
 }
 
-void  WriteMemory_N106(uint16_t a,uint8_t v)
+static void  WriteMemory_N106(uint16_t a,uint8_t v)
 {
     if(a < 0x4800)
     {
@@ -2040,7 +2050,7 @@ void  WriteMemory_N106(uint16_t a,uint8_t v)
     }
 }
 
-void WriteMemory_FME07(uint16_t a,uint8_t v)
+static void WriteMemory_FME07(uint16_t a,uint8_t v)
 {
     if((a < 0xD000) && (nExternalSound & EXTSOUND_FDS))
         WriteMemory_FDSRAM(a,v);
@@ -2073,8 +2083,8 @@ void WriteMemory_FME07(uint16_t a,uint8_t v)
  * Emulate APU
  */
 
-int32_t fulltick;
-void EmulateAPU(uint8_t bBurnCPUCycles)
+static int32_t fulltick;
+static void EmulateAPU(uint8_t bBurnCPUCycles)
 {
     int32_t tick;
     int64_t diff;
@@ -2592,7 +2602,7 @@ void EmulateAPU(uint8_t bBurnCPUCycles)
  *      Initializes Memory
  */
 
-int NSFCore_Initialize()
+static int NSFCore_Initialize()
 {
     int32_t i;
     /* clear globals */
@@ -2751,7 +2761,7 @@ int NSFCore_Initialize()
  *  LoadNSF
  */
 
-int LoadNSF(int32_t datasize)
+static int LoadNSF(int32_t datasize)
 {
     if(!pDataBuffer)                return 0;
 
@@ -2925,7 +2935,7 @@ int LoadNSF(int32_t datasize)
  *  SetTrack
  */
 
-void SetTrack(uint8_t track)
+static void SetTrack(uint8_t track)
 {
     int32_t i;
     
@@ -3054,7 +3064,7 @@ void SetTrack(uint8_t track)
  *  SetPlaybackOptions
  */
 
-int SetPlaybackOptions(int32_t samplerate)
+static int SetPlaybackOptions(int32_t samplerate)
 {
     if(samplerate < 2000)                   return 0;
     if(samplerate > 96000)                  return 0;
@@ -3073,7 +3083,7 @@ int SetPlaybackOptions(int32_t samplerate)
  *  SetPlaybackSpeed
  */
 
-void SetPlaybackSpeed(float playspersec)
+static void SetPlaybackSpeed(float playspersec)
 {
     if(playspersec < 1)
     {
@@ -3088,7 +3098,7 @@ void SetPlaybackSpeed(float playspersec)
 *   GetPlaybackSpeed
 */
 
-float GetPlaybackSpeed()
+static float GetPlaybackSpeed()
 {
     if(nTicksPerPlay <= 0)  return 0;
     return ((bPALMode ? PAL_FREQUENCY : NTSC_FREQUENCY) / (nTicksPerPlay>>16));
@@ -3098,7 +3108,7 @@ float GetPlaybackSpeed()
  *  RecalcFilter
  */
 
-void RecalcFilter()
+static void RecalcFilter()
 {
     if(!nSampleRate) return;
 
@@ -3111,7 +3121,7 @@ void RecalcFilter()
  *  RecalcSilenceTracker
  */
 
-void RecalcSilenceTracker()
+static void RecalcSilenceTracker()
 {
     if(nSilenceTrackMS <= 0 || !nSampleRate ||
        (bNoSilenceIfTime && bTimeNotDefault))
@@ -3124,7 +3134,7 @@ void RecalcSilenceTracker()
     nSilentSampleMax /= 2;
 }
 
-void RebuildOutputTables(void) {
+static void RebuildOutputTables(void) {
     int32_t i,j;
     float l[3];
     int32_t temp;
@@ -3223,6 +3233,8 @@ void RebuildOutputTables(void) {
     }
 }
 
+/* rockbox: not used */
+#if 0
 /*
  *  GetPlayCalls
  */
@@ -3257,12 +3269,13 @@ void StopFade()
     bFade = 0;
     fFadeVolume = 1;
 }
+#endif
 
 /*
  *  SongCompleted
  */
 
-uint8_t SongCompleted()
+static uint8_t SongCompleted()
 {
     if(!bFade)                      return 0;
     if(nTotalPlays >= nEndFade)     return 1;
@@ -3275,7 +3288,7 @@ uint8_t SongCompleted()
  *  SetFade
  */
 
-void SetFade(int32_t fadestart,int32_t fadestop,
+static void SetFade(int32_t fadestart,int32_t fadestop,
              uint8_t bNotDefault) /* play routine calls */
 {
     if(fadestart < 0)   fadestart = 0;
@@ -3294,7 +3307,7 @@ void SetFade(int32_t fadestart,int32_t fadestop,
  *  SetFadeTime
  */
 
-void SetFadeTime(uint32_t fadestart,uint32_t fadestop,float basedplays,
+static void SetFadeTime(uint32_t fadestart,uint32_t fadestop,float basedplays,
                  uint8_t bNotDefault) /* time in MS */
 {
     if(basedplays <= 0)
@@ -3310,7 +3323,7 @@ void SetFadeTime(uint32_t fadestart,uint32_t fadestop,float basedplays,
  *  RecalculateFade
  */
 
-void RecalculateFade()
+static void RecalculateFade()
 {
     if(!bFade)  return;
 
@@ -3342,7 +3355,7 @@ void RecalculateFade()
 
 }
 
-int32_t GetSamples(uint8_t* buffer,int32_t buffersize)
+static int32_t GetSamples(uint8_t* buffer,int32_t buffersize)
 {
     if(!buffer)                             return 0;
     if(buffersize < 16)                     return 0;
@@ -3805,12 +3818,10 @@ N_FLAG,N_FLAG,N_FLAG,N_FLAG,N_FLAG,N_FLAG,N_FLAG };
 
 /* The 6502 emulation function! */
 
-union TWIN front;
-union TWIN final;
-uint8_t val;
-uint8_t op;
+static uint8_t val;
+static uint8_t op;
 
-uint32_t Emulate6502(uint32_t runto)
+static uint32_t Emulate6502(uint32_t runto)
 {
     /* If the CPU is jammed... don't bother */
     if(bCPUJammed == 1)
