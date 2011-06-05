@@ -153,7 +153,6 @@ int vorbis_block_clear(vorbis_block *vb){
 static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
   int i;
   long b_size[2];
-  LOOKUP_TNC *iramposw;
   
   codec_setup_info *ci=(codec_setup_info *)vi->codec_setup;
   private_state *b=NULL;
@@ -183,17 +182,20 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
   b_size[1]=ci->blocksizes[1]/2;
   b->window[0]=_vorbis_window(0,b_size[0]);
   b->window[1]=_vorbis_window(0,b_size[1]);
-  
+
+#ifdef TREMOR_USE_IRAM
   /* allocate IRAM buffer for window tables too, if sufficient iram available */
   /* give preference to the larger window over the smaller window
      (on the assumption that both windows are equally likely used) */
+  LOOKUP_TNC *iramposw;
   for(i=1; i>=0; i--){
-    iramposw=(LOOKUP_TNC *)iram_malloc(b_size[i]*sizeof(LOOKUP_TNC));
+    iramposw=iram_malloc(b_size[i]*sizeof(LOOKUP_TNC));
     if(iramposw!=NULL) {
       memcpy(iramposw, b->window[i], b_size[i]*sizeof(LOOKUP_TNC));
       b->window[i]=iramposw;
     }
   }
+#endif
 
   /* finish the codebooks */
   if(!ci->fullbooks){
