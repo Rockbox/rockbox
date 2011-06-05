@@ -37,7 +37,7 @@
 #define _DEBUG_PRINTF(a, varargs...) lcd_putsf(0, line++, (a), ##varargs);
 
 extern int lcd_type;
-bool __dbg_hw_info(void)
+bool dbg_hw_info(void)
 {
     int line;
     int i;
