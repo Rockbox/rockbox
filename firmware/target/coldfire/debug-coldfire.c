@@ -29,6 +29,58 @@
 #include "adc.h"
 #include "debug-target.h"
 #include "lcd-remote.h"
+#ifdef IAUDIO_X5
+#include "ds2411.h"
+#endif
+
+/* Tool function to read the flash manufacturer and type, if available.
+   Only chips which could be reprogrammed in system will return values.
+   (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
+   /* In IRAM to avoid problems when running directly from Flash */
+static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
+                         unsigned addr1, unsigned addr2)
+                         ICODE_ATTR __attribute__((noinline));
+static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
+                         unsigned addr1, unsigned addr2)
+
+{
+    unsigned not_manu, not_id; /* read values before switching to ID mode */
+    unsigned manu, id; /* read values when in ID mode */
+
+    volatile unsigned short* flash = (unsigned short*)0; /* flash mapping */
+    int old_level; /* saved interrupt level */
+
+    not_manu = flash[0]; /* read the normal content */
+    not_id   = flash[1]; /* should be 'A' (0x41) and 'R' (0x52) from the "ARCH" marker */
+
+    /* disable interrupts, prevent any stray flash access */
+    old_level = disable_irq_save();
+
+    flash[addr1] = 0xAA; /* enter command mode */
+    flash[addr2] = 0x55;
+    flash[addr1] = 0x90; /* ID command */
+    /* Atmel wants 20ms pause here */
+    /* sleep(HZ/50); no sleeping possible while interrupts are disabled */
+    manu = flash[0]; /* read the IDs */
+    id   = flash[1];
+
+    flash[0] = 0xF0; /* reset flash (back to normal read mode) */
+    /* Atmel wants 20ms pause here */
+    /* sleep(HZ/50); no sleeping possible while interrupts are disabled */
+
+    restore_irq(old_level); /* enable interrupts again */
+
+    /* I assume success if the obtained values are different from
+        the normal flash content. This is not perfectly bulletproof, they
+        could theoretically be the same by chance, causing us to fail. */
+    if (not_manu != manu || not_id != id) /* a value has changed */
+    {
+        *p_manufacturer = manu; /* return the results */
+        *p_device = id;
+        return true; /* success */
+    }
+    return false; /* fail */
+}
 
 bool dbg_ports(void)
 {
@@ -103,5 +155,61 @@ bool dbg_ports(void)
             return false;
         }
     }
+    return false;
+}
+
+bool dbg_hw_info(void)
+{
+    unsigned manu, id; /* flash IDs */
+    int got_id; /* flag if we managed to get the flash IDs */
+    int oldmode;  /* saved memory guard mode */
+    int line = 0;
+
+    oldmode = system_memory_guard(MEMGUARD_NONE);  /* disable memory guard */
+
+    /* get flash ROM type */
+    got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
+    if (!got_id)
+        got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
+
+    system_memory_guard(oldmode);  /* re-enable memory guard */
+
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+
+    lcd_puts(0, line++, "[Hardware info]");
+
+    if (got_id)
+        lcd_putsf(0, line++, "Flash: M=%04x D=%04x", manu, id);
+    else
+        lcd_puts(0, line++, "Flash: M=???? D=????"); /* unknown, sorry */
+
+#ifdef IAUDIO_X5
+    {
+        struct ds2411_id id;
+
+        lcd_puts(0, ++line, "Serial Number:");
+
+        got_id = ds2411_read_id(&id);
+
+        if (got_id == DS2411_OK)
+        {
+            lcd_putsf(0, ++line, "  FC=%02x", (unsigned)id.family_code);
+            lcd_putsf(0, ++line, "  ID=%02X %02X %02X %02X %02X %02X",
+                (unsigned)id.uid[0], (unsigned)id.uid[1], (unsigned)id.uid[2],
+                (unsigned)id.uid[3], (unsigned)id.uid[4], (unsigned)id.uid[5]);
+            lcd_putsf(0, ++line, "  CRC=%02X", (unsigned)id.crc);
+        }
+        else
+        {
+            lcd_putsf(0, ++line, "READ ERR=%d", got_id);
+        }
+    }
+#endif
+
+    /* wait for exit */
+    while (button_get_w_tmo(HZ/10) != (DEBUG_CANCEL|BUTTON_REL));
+
+    lcd_setfont(FONT_UI);
     return false;
 }

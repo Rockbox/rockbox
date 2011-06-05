@@ -47,3 +47,4 @@
 #   define DEBUG_CANCEL  BUTTON_CANCEL
 #endif
 bool dbg_ports(void);
+bool dbg_hw_info(void);

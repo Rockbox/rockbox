@@ -28,7 +28,42 @@
 #include "powermgmt.h"
 #include "adc.h"
 #include "iap.h"
+#include "hwcompat.h"
 #include "debug-target.h"
+
+static int perfcheck(void)
+{
+    int result;
+
+    asm (
+        "mrs     r2, CPSR            \n"
+        "orr     r0, r2, #0xc0       \n" /* disable IRQ and FIQ */
+        "msr     CPSR_c, r0          \n"
+        "mov     %[res], #0          \n"
+        "ldr     r0, [%[timr]]       \n"
+        "add     r0, r0, %[tmo]      \n"
+    "1:                              \n"
+        "add     %[res], %[res], #1  \n"
+        "ldr     r1, [%[timr]]       \n"
+        "cmp     r1, r0              \n"
+        "bmi     1b                  \n"
+        "msr     CPSR_c, r2          \n" /* reset IRQ and FIQ state */
+        :
+        [res]"=&r"(result)
+        :
+        [timr]"r"(&USEC_TIMER),
+        [tmo]"r"(
+#if CONFIG_CPU == PP5002
+        16000
+#else /* PP5020/5022/5024 */
+        10226
+#endif
+        )
+        :
+        "r0", "r1", "r2"
+    );
+    return result;
+}
 
 bool dbg_ports(void)
 {
@@ -150,5 +185,48 @@ bool dbg_ports(void)
             return false;
         }
     }
+    return false;
+}
+
+bool dbg_hw_info(void)
+{
+    int line = 0;
+#if defined(CPU_PP502x)
+    char pp_version[] = { (PP_VER2 >> 24) & 0xff, (PP_VER2 >> 16) & 0xff,
+                          (PP_VER2 >> 8) & 0xff, (PP_VER2) & 0xff,
+                          (PP_VER1 >> 24) & 0xff, (PP_VER1 >> 16) & 0xff,
+                          (PP_VER1 >> 8) & 0xff, (PP_VER1) & 0xff, '\0' };
+#elif CONFIG_CPU == PP5002
+    char pp_version[] = { (PP_VER4 >> 8) & 0xff, PP_VER4 & 0xff,
+                          (PP_VER3 >> 8) & 0xff, PP_VER3 & 0xff,
+                          (PP_VER2 >> 8) & 0xff, PP_VER2 & 0xff,
+                          (PP_VER1 >> 8) & 0xff, PP_VER1 & 0xff, '\0' };
+#endif
+
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+
+    lcd_puts(0, line++, "[Hardware info]");
+
+#ifdef IPOD_ARCH
+    lcd_putsf(0, line++, "HW rev: 0x%08lx", IPOD_HW_REVISION);
+#endif
+
+#ifdef IPOD_COLOR
+    extern int lcd_type; /* Defined in lcd-colornano.c */
+
+    lcd_putsf(0, line++, "LCD type: %d", lcd_type);
+#endif
+
+    lcd_putsf(0, line++, "PP version: %s", pp_version);
+
+    lcd_putsf(0, line++, "Est. clock (kHz): %d", perfcheck());
+
+    lcd_update();
+
+    /* wait for exit */
+    while (button_get_w_tmo(HZ/10) != (DEBUG_CANCEL|BUTTON_REL));
+
+    lcd_setfont(FONT_UI);
     return false;
 }

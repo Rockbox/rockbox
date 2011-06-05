@@ -25,6 +25,6 @@
 #define DEBUG_CANCEL  BUTTON_MENU
 #endif
 
-bool __dbg_hw_info(void);
+bool dbg_hw_info(void);
 bool dbg_ports(void);
 

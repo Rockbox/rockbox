@@ -134,7 +134,7 @@ bool dbg_ports(void)
     return false;
 }
 
-bool __dbg_hw_info(void)
+bool dbg_hw_info(void)
 {
     int btn = 0;
 #ifdef HAVE_TOUCHSCREEN

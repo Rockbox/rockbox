@@ -23,12 +23,12 @@
 #include <stdbool.h>
 #include "debug-target.h"
 
-bool __dbg_ports(void)
+bool dbg_ports(void)
 {
     return false;
 }
 
-bool __dbg_hw_info(void)
+bool dbg_hw_info(void)
 {
     return false;
 }

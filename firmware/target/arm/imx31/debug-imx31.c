@@ -31,7 +31,7 @@
 #include "dvfs_dptc-imx31.h"
 #include <stdio.h>
 
-bool __dbg_hw_info(void)
+bool dbg_hw_info(void)
 {
     int line;
     unsigned int pllref;

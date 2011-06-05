@@ -41,7 +41,7 @@
 extern int lcd_type;
 extern uint32_t nand_type[4];
 
-bool __dbg_hw_info(void)
+bool dbg_hw_info(void)
 {
     int line;
     int i;
@@ -127,7 +127,7 @@ bool __dbg_hw_info(void)
         }
 
 #else
-        _DEBUG_PRINTF("__dbg_hw_info");
+        _DEBUG_PRINTF("dbg_hw_info");
 #endif
 
         lcd_update(); 

@@ -22,7 +22,7 @@
 #ifndef __DEBUG_TARGET_H_
 #define __DEBUG_TARGET_H_
 
-bool __dbg_hw_info(void);
+bool dbg_hw_info(void);
 bool dbg_ports(void);
 
 #endif /* __DEBUG_TARGET_H_ */

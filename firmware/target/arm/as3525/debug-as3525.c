@@ -248,7 +248,7 @@ static int calc_freq(int clk)
         }
 }
 
-bool __dbg_hw_info(void)
+bool dbg_hw_info(void)
 {
     int line;
 #if CONFIG_CPU == AS3525

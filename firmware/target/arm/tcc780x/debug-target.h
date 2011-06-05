@@ -19,6 +19,6 @@
  *
  ****************************************************************************/
 
-bool __dbg_hw_info(void);
+bool dbg_hw_info(void);
 bool dbg_ports(void);
 
