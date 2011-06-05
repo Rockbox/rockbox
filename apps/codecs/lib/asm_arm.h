@@ -52,6 +52,17 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   return(hi);
 }
 
+static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
+  int32_t lo,hi;
+  asm volatile("smull   %0, %1, %2, %3\n\t"
+               "movs    %0, %0, lsr #16\n\t"
+               "adc %1, %0, %1, lsl #16\n\t"
+               : "=&r"(lo),"=&r"(hi)
+               : "r"(x),"r"(y)
+               : "cc" );
+  return(hi);
+}
+
 #define XPROD32(a, b, t, v, x, y) \
 { \
   int32_t l; \

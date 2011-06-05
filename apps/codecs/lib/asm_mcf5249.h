@@ -61,6 +61,21 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   return r;
 }
 
+static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
+  int32_t r;
+
+  asm volatile ("mac.l %[x], %[y], %%acc0;"  /* multiply */
+                "mulu.l %[y], %[x];"         /* get lower half, avoid emac stall */
+                "movclr.l %%acc0, %[r];"     /* get higher half */
+                "lsr.l #1, %[r];"            /* hi >> 1, to compensate emac shift */
+                "move.w %[r], %[x];"         /* x = x & 0xffff0000 | r & 0xffff */
+                "swap %[x];"                 /* x = (unsigned)x << 16 | (unsigned)x >> 16 */
+                : [r] "=&d" (r), [x] "+d" (x)
+                : [y] "d" (y)
+                : "cc");
+  return x;
+}
+
 static inline
 void XPROD31(int32_t  a, int32_t  b,
              int32_t  t, int32_t  v,

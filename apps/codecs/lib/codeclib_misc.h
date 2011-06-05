@@ -65,6 +65,7 @@ static inline int32_t MULT32(int32_t x, int32_t y) {
   magic.whole = (int64_t)x * y;
   return magic.halves.hi;
 }
+
 static inline int32_t MULT31(int32_t x, int32_t y) {
   return MULT32(x,y)<<1;
 }
@@ -73,6 +74,12 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   union magic magic;
   magic.whole  = (int64_t)x * y;
   return ((uint32_t)(magic.halves.lo)>>15) | ((magic.halves.hi)<<17);
+}
+
+static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
+  union magic magic;
+  magic.whole  = (int64_t)x * y;
+  return ((uint32_t)(magic.halves.lo)>>16) | ((magic.halves.hi)<<16);
 }
 
 #else
