@@ -28,6 +28,7 @@
 #include "storage.h"
 #include "lcd.h"
 #include "scrollbar.h"
+#include "string.h"
 #include "button.h"
 #include "system.h"
 #include "font.h"
@@ -64,9 +65,10 @@ static int pm_cur_left;        /* current values (last peak_meter_peek) */
 static int pm_cur_right;
 static int pm_max_left;        /* maximum values between peak meter draws */
 static int pm_max_right;
-#if defined(HAVE_AGC) || defined(HAVE_RECORDING_HISTOGRAM)
+#if defined(HAVE_AGC) || defined(HAVE_HISTOGRAM)
 static int pm_peakhold_left;   /* max. peak values between peakhold calls */
 static int pm_peakhold_right;  /* used for AGC and histogram display */
+static long next_histogram_update;
 #endif
 
 /* Clip hold */
@@ -133,6 +135,38 @@ static unsigned int peeks_per_redraw[PEEKS_PER_DRAW_SIZE];
 #define TICKS_PER_DRAW_SIZE 20
 static unsigned int ticks_per_redraw[TICKS_PER_DRAW_SIZE];
 #endif
+
+#if defined(HAVE_HISTOGRAM)
+#define HIST_BUF_SIZE (LCD_WIDTH / 2)
+static int hist_l = 0;
+static int hist_r = 0;
+static unsigned char history_l[HIST_BUF_SIZE];
+static unsigned char history_r[HIST_BUF_SIZE];
+static const char hist_level_marks[6] = { 29, 26, 23, 17, 9, 2};
+static int history_pos = 0;
+#define HIST_W (LCD_WIDTH / 2)
+#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
+#define LCD_BAL_L LCD_RGBPACK(0, 0, 255)
+#define LCD_BAL_R LCD_RGBPACK(204, 0, 0)
+#define LCD_HIST_OVER LCD_RGBPACK(204, 0, 0)
+#define LCD_HIST_HI LCD_RGBPACK(255, 204, 0)
+#define LCD_HIST_OK LCD_RGBPACK(51, 153, 0)
+#else /* HAVE_LCD_COLOR */
+#define LCD_BATT_OK LCD_BLACK
+#define LCD_BATT_LO LCD_DARKGRAY
+#define LCD_DISK_OK LCD_BLACK
+#define LCD_DISK_LO LCD_DARKGRAY
+#define LCD_HIST_OVER LCD_BLACK
+#define LCD_HIST_OK LCD_DARKGRAY
+#define LCD_BAL LCD_DARKGRAY
+#endif /* HAVE_LCD_COLOR */
+#else /* LCD_DEPTH > 1 */
+#define LCD_HIST_OVER LCD_DEFAULT_FG
+#define LCD_HIST_OK LCD_DEFAULT_FG
+#define LCD_BAL LCD_DEFAULT_FG
+#endif /* LCD_DEPTH > 1 */
+#endif /* HAVE_HISTOGRAM */
 
 static void peak_meter_draw(struct screen *display, struct meter_scales *meter_scales,
                             int x, int y, int width, int height);
@@ -810,7 +844,7 @@ static int peak_meter_read_l(void)
 
     retval = pm_max_left;
 
-#if defined(HAVE_RECORDING_HISTOGRAM) || defined(HAVE_AGC)
+#if defined(HAVE_HISTOGRAM) || defined(HAVE_AGC)
     /* store max peak value for peak_meter_get_peakhold_x readout */
     pm_peakhold_left = MAX(pm_max_left, pm_peakhold_left);
 #endif
@@ -843,7 +877,7 @@ static int peak_meter_read_r(void)
 
     retval = pm_max_right;
 
-#if defined(HAVE_RECORDING_HISTOGRAM) || defined(HAVE_AGC)
+#if defined(HAVE_HISTOGRAM) || defined(HAVE_AGC)
     /* store max peak value for peak_meter_get_peakhold_x readout */
     pm_peakhold_right = MAX(pm_max_right, pm_peakhold_right);
 #endif
@@ -857,7 +891,7 @@ static int peak_meter_read_r(void)
     return retval;
 }
 
-#if defined(HAVE_AGC) || defined(HAVE_RECORDING_HISTOGRAM)
+#if defined(HAVE_AGC) || defined(HAVE_HISTOGRAM)
 /**
  * Reads out the current peak-hold values since the last call.
  * This is used by the histogram feature in the recording screen.
@@ -869,6 +903,14 @@ void peak_meter_get_peakhold(int *peak_left, int *peak_right)
         *peak_left  = pm_peakhold_left;
     if (peak_right)
         *peak_right = pm_peakhold_right;
+
+#ifdef HAVE_HISTOGRAM
+    if (*peak_left > hist_l)
+        hist_l = *peak_left;
+    if (*peak_right > hist_r)
+        hist_r = *peak_right;
+#endif
+
     pm_peakhold_left  = 0;
     pm_peakhold_right = 0;
 }
@@ -1447,4 +1489,75 @@ bool peak_meter_histogram(void)
 }
 #endif
 
+#ifdef HAVE_HISTOGRAM
+void histogram_init()
+{
+    /* get update interval, clear buffer, reset drawing position */
+    memset(history_l, 0, sizeof(unsigned char)*HIST_BUF_SIZE);
+    memset(history_r, 0, sizeof(unsigned char)*HIST_BUF_SIZE);
+    next_histogram_update = current_tick +
+                                      (global_settings.histogram_interval * HZ);
+}
+
+void histogram_draw(int x1, int x2, int y1, int y2, int width, int height)
+{
+    int i, j;
+    if (current_tick >= next_histogram_update)
+    {
+        /* fill history buffer */
+        history_l[history_pos] = hist_l * height / 32767;
+        history_r[history_pos] = hist_r * height / 32767;
+        history_pos = (history_pos + 1) % HIST_BUF_SIZE;
+        history_l[history_pos] = history_r[history_pos] = 0;
+        history_l[(history_pos + 1) % HIST_BUF_SIZE] = 0;
+        history_r[(history_pos + 1) % HIST_BUF_SIZE] = 0;
+        hist_l = 0;
+        hist_r = 0;
+        next_histogram_update = current_tick +
+                                      (global_settings.histogram_interval * HZ);
+    }
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_drawrect(x1, y1, width, height);
+    lcd_drawrect(x2, y2, width, height);
+    lcd_set_drawmode(DRMODE_FG);
+
+    j = history_pos;
+    for (i = width-2; i >= 0; i--)
+    {
+        j--;
+        if(j<0)
+            j = HIST_BUF_SIZE-1;
+        if (history_l[j])
+        {
+            if (history_l[j] == height)
+                lcd_set_foreground(LCD_HIST_OVER);
+#ifdef HAVE_LCD_COLOR
+            else if (history_l[j] > hist_level_marks[1])
+                lcd_set_foreground(LCD_HIST_HI);
+#endif
+            else
+                lcd_set_foreground(LCD_HIST_OK);
+            lcd_vline(x1 + i, y1 + height - 2, y1 + height - history_l[j]);
+        }
+        if (history_r[j])
+        {
+            if (history_r[j] == height)
+                lcd_set_foreground(LCD_HIST_OVER);
+#ifdef HAVE_LCD_COLOR
+            else if (history_r[j] > hist_level_marks[1])
+                lcd_set_foreground(LCD_HIST_HI);
+#endif
+            else
+                lcd_set_foreground(LCD_HIST_OK);
+            lcd_vline(x2 + i, y2 + height - 2, y2 + height - history_r[j]);
+        }
+    }
+    lcd_set_foreground(
+#ifdef HAVE_LCD_COLOR
+    global_settings.fg_color);
+#else
+    LCD_DEFAULT_FG);
+#endif
+}
+#endif /* HAVE_HISTOGRAM */
 

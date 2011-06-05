@@ -269,39 +269,9 @@ static short agc_baltime = 0;
 /* AGC maximum gain */
 static short agc_maxgain;
 #endif /* HAVE_AGC */
-#if defined(HAVE_AGC) || defined(HAVE_RECORDING_HISTOGRAM)
+#if defined(HAVE_AGC)
 static long hist_time = 0;
-#endif /* HAVE_AGC or HAVE_RECORDING_HISTOGRAM */
-/* Histogram data */
-/* TO DO: move some of this stuff inside the recording function? */
-#ifdef HAVE_RECORDING_HISTOGRAM
-static int hist_l = 0;
-static int hist_r = 0;
-#define HIST_BUF_SIZE (LCD_WIDTH)
-#define HIST_Y (hist_pos_y+hist_size_h-1)
-#define HIST_W (LCD_WIDTH / 2 - 4)
-#if LCD_DEPTH > 1
-#ifdef HAVE_LCD_COLOR
-#define LCD_BAL_L LCD_RGBPACK(0, 0, 255)
-#define LCD_BAL_R LCD_RGBPACK(204, 0, 0)
-#define LCD_HIST_OVER LCD_RGBPACK(204, 0, 0)
-#define LCD_HIST_HI LCD_RGBPACK(255, 204, 0)
-#define LCD_HIST_OK LCD_RGBPACK(51, 153, 0)
-#else /* HAVE_LCD_COLOR */
-#define LCD_BATT_OK LCD_BLACK
-#define LCD_BATT_LO LCD_DARKGRAY
-#define LCD_DISK_OK LCD_BLACK
-#define LCD_DISK_LO LCD_DARKGRAY
-#define LCD_HIST_OVER LCD_BLACK
-#define LCD_HIST_OK LCD_DARKGRAY
-#define LCD_BAL LCD_DARKGRAY
-#endif /* HAVE_LCD_COLOR */
-#else /* LCD_DEPTH > 1 */
-#define LCD_HIST_OVER LCD_DEFAULT_FG
-#define LCD_HIST_OK LCD_DEFAULT_FG
-#define LCD_BAL LCD_DEFAULT_FG
-#endif /* LCD_DEPTH > 1 */
-#endif /* HAVE_RECORDING_HISTOGRAM */
+#endif /* HAVE_AGC */
 
 static void set_gain(void)
 {
@@ -367,13 +337,6 @@ static bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
     for (i = 0; i < BAL_MEM_SIZE; i++)
         *balance += balance_mem[i];
     *balance = *balance / BAL_MEM_SIZE;
-
-#ifdef HAVE_RECORDING_HISTOGRAM
-    if (*peak_l > hist_l)
-        hist_l = *peak_l;
-    if (*peak_r > hist_r)
-        hist_r = *peak_r;
-#endif
 
     return true;
 }
@@ -1089,18 +1052,12 @@ bool recording_screen(bool no_source)
                                      /* tweak layout tiny screens / big fonts */                                    
     bool compact_view[NB_SCREENS] = { false };
     struct gui_synclist lists;      /* the list in the bottom vp */
-#if defined(HAVE_AGC) || defined(HAVE_RECORDING_HISTOGRAM)
+#if defined(HAVE_AGC)
     bool peak_valid = false;
 #endif
-#if defined(HAVE_RECORDING_HISTOGRAM)
-    int j;
+#if defined(HAVE_HISTOGRAM)
     unsigned short hist_pos_y = 0;
     unsigned short hist_size_h = 0;
-    int history_pos = 0;
-    short hist_time_interval = 1; /* 1, 2, 4, 8 */
-    unsigned char history_l[HIST_BUF_SIZE];
-    unsigned char history_r[HIST_BUF_SIZE];
-    const char hist_level_marks[6] = { 29, 26, 23, 17, 9, 2};
 #endif
 #ifdef HAVE_FMRADIO_REC
     int prev_rec_source = global_settings.rec_source; /* detect source change */
@@ -1186,10 +1143,9 @@ bool recording_screen(bool no_source)
                 /* top vp, 4 lines, force sys font if total screen < 6 lines
                 NOTE: one could limit the list to 1 line and get away with 5 lines */
                 top_height_req[i] = 4;
-#if defined(HAVE_RECORDING_HISTOGRAM)
-                if((global_settings.rec_histogram_interval) && (!i))
+#if defined(HAVE_HISTOGRAM)
+                if((global_settings.histogram_interval) && (!i))
                     top_height_req[i] += 1; /* use one line for histogram */
-                hist_time_interval = 1 << global_settings.rec_histogram_interval;
 #endif
                 v = &vp_top[i];
                 viewport_set_defaults(v, i);
@@ -1229,13 +1185,11 @@ bool recording_screen(bool no_source)
 
             send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
 
-#if defined(HAVE_RECORDING_HISTOGRAM)
-            history_pos = 0;
+#if defined(HAVE_HISTOGRAM)
             hist_pos_y = (compact_view[0] ? 3 : 4) * (font_get(vp_top[0].font)->height)
                                                                                     + 1;
             hist_size_h = font_get(vp_top[0].font)->height - 2;
-            memset(history_l, 0, sizeof(unsigned char)*HIST_BUF_SIZE);
-            memset(history_r, 0, sizeof(unsigned char)*HIST_BUF_SIZE);
+            histogram_init();
 #endif
 
             FOR_NB_SCREENS(i)
@@ -1887,75 +1841,21 @@ bool recording_screen(bool no_source)
                 }
             }
 
-#ifdef HAVE_RECORDING_HISTOGRAM
-        if(global_settings.rec_histogram_interval)
-        {
-            if (peak_valid && !(hist_time % hist_time_interval) && hist_l)
+#ifdef HAVE_HISTOGRAM
+            if(global_settings.histogram_interval)
             {
-                /* fill history buffer */
-                history_l[history_pos] = hist_l * hist_size_h / 32767;
-                history_r[history_pos] = hist_r * hist_size_h / 32767;
-                history_pos = (history_pos + 1) % HIST_BUF_SIZE;
-                history_l[history_pos] = history_r[history_pos] = 0;
-                history_l[(history_pos + 1) % HIST_BUF_SIZE] = 0;
-                history_r[(history_pos + 1) % HIST_BUF_SIZE] = 0;
-                hist_l = 0;
-                hist_r = 0;
+                histogram_draw(0,
+                               screens[0].getwidth()/2,
+                               hist_pos_y,
+                               hist_pos_y,
+                               screens[0].getwidth()/2,
+                               hist_size_h);
             }
-            lcd_set_drawmode(DRMODE_SOLID);
-            lcd_drawrect(0, hist_pos_y - 1,
-                            HIST_W + 2, hist_size_h + 1);
-            lcd_drawrect(HIST_W + 6, hist_pos_y - 1,
-                            HIST_W + 2, hist_size_h + 1);
-            lcd_set_drawmode(DRMODE_FG);
-
-            j = history_pos;
-            for (i = HIST_W-1; i >= 0; i--)
-            {
-                j--;
-                if(j<0)
-                    j = HIST_BUF_SIZE-1;
-                if (history_l[j])
-                {
-                    if (history_l[j] == hist_size_h)
-                        lcd_set_foreground(LCD_HIST_OVER);
-#ifdef HAVE_LCD_COLOR
-                    else if (history_l[j] > hist_level_marks[1])
-                        lcd_set_foreground(LCD_HIST_HI);
 #endif
-                    else
-                        lcd_set_foreground(LCD_HIST_OK);
-                    lcd_vline(1 + i, HIST_Y-1, HIST_Y - history_l[j]);
-                }
-                if (history_r[j])
-                {
-                    if (history_r[j] == hist_size_h)
-                        lcd_set_foreground(LCD_HIST_OVER);
-#ifdef HAVE_LCD_COLOR
-                    else if (history_r[j] > hist_level_marks[1])
-                        lcd_set_foreground(LCD_HIST_HI);
-#endif
-                    else
-                        lcd_set_foreground(LCD_HIST_OK);
-                    lcd_vline(HIST_W+7 + i, HIST_Y-1, HIST_Y - history_r[j]);
-                }
-            }
-            lcd_set_foreground(
-#ifdef HAVE_LCD_COLOR
-            global_settings.fg_color);
-#else
-            LCD_DEFAULT_FG);
-#endif
-            for (i = 0; i < 6; i++)
-                lcd_hline(HIST_W + 3, HIST_W + 4,
-                            HIST_Y - hist_level_marks[i]);
-        }
-#endif /* HAVE_RECORDING_HISTOGRAM */
 
 #ifdef HAVE_AGC
             hist_time++;
 #endif
-
             /* draw the trigger status */
             if (peak_meter_trigger_status() != TRIG_OFF)
             {

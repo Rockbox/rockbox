@@ -114,7 +114,7 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
-#define HAVE_RECORDING_HISTOGRAM
+#define HAVE_HISTOGRAM
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */

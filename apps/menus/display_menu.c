@@ -443,6 +443,30 @@ static int peak_meter_max(void) {
     settings_apply_pm_range();
     return retval;
 }
+
+#if defined(HAVE_HISTOGRAM)
+static bool history_interval(void)
+{
+    static const struct opt_items names[] = {
+        { "0s", TALK_ID(0, UNIT_SEC) },
+        { "1s", TALK_ID(1, UNIT_SEC) },
+        { "2s", TALK_ID(2, UNIT_SEC) },
+        { "4s", TALK_ID(4, UNIT_SEC) }
+    };
+
+    /* reconfigure histogram settings here */
+
+    return set_option(str(LANG_HISTOGRAM_INTERVAL),
+                          &global_settings.histogram_interval,
+                          INT, names, 4, NULL );
+}
+
+MENUITEM_FUNCTION(histogram, 0,
+                  ID2P(LANG_HISTOGRAM_INTERVAL),
+                  history_interval, NULL, NULL, Icon_Menu_setting);
+
+#endif
+
 MENUITEM_FUNCTION(peak_meter_scale_item, 0, ID2P(LANG_PM_SCALE),
                     peak_meter_scale, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(peak_meter_min_item, 0, ID2P(LANG_PM_MIN), 
@@ -454,6 +478,9 @@ MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, Icon_NOICON,
           &peak_meter_clip_hold,
 #ifdef HAVE_RECORDING
           &peak_meter_clipcounter,
+#endif
+#ifdef HAVE_HISTOGRAM
+          &histogram,
 #endif
           &peak_meter_scale_item, &peak_meter_min_item, &peak_meter_max_item);
 #endif /*  HAVE_LCD_BITMAP */

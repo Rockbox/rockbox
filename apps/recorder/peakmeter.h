@@ -56,6 +56,11 @@ extern int  calc_db (int isample);
 extern int  peak_meter_db2sample(int db);
 extern unsigned short peak_meter_scale_value(unsigned short val, int meterwidth);
 
+#ifdef HAVE_HISTOGRAM
+extern void histogram_init(void);
+extern void histogram_draw(int x1, int x2, int y1, int y2, int width, int height);
+#endif
+
 /* valid values for trigger_status */
 #define TRIG_OFF            0x00
 #define TRIG_READY          0x01
@@ -103,3 +108,4 @@ struct meter_scales{
 
 extern void peak_meter_screen(struct screen *display, int x, int y, int height);
 #endif /* __PEAKMETER_H__ */
+

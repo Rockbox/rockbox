@@ -392,26 +392,6 @@ MENUITEM_FUNCTION(agc_cliptime, 0, ID2P(LANG_RECORDING_AGC_CLIPTIME),
                     agc_cliptime_func, NULL, NULL, Icon_Menu_setting);
 #endif /* HAVE_AGC */
 
-#if defined(HAVE_RECORDING_HISTOGRAM)
-static bool history_interval(void)
-{
-    static const struct opt_items names[] = {
-        { "0s", TALK_ID(0, UNIT_SEC) },
-        { "1s", TALK_ID(1, UNIT_SEC) },
-        { "2s", TALK_ID(2, UNIT_SEC) },
-        { "4s", TALK_ID(4, UNIT_SEC) }
-    };
-    return set_option(str(LANG_RECORDING_HISTOGRAM_INTERVAL),
-                          &global_settings.rec_histogram_interval,
-                          INT, names, 4, NULL );
-}
-
-MENUITEM_FUNCTION(recording_histogram, 0,
-                  ID2P(LANG_RECORDING_HISTOGRAM_INTERVAL),
-                  history_interval, NULL, NULL, Icon_Menu_setting);
-
-#endif
-
 /** Rec trigger **/
 enum trigger_menu_option
 {
@@ -665,9 +645,6 @@ MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
             &rectrigger_item,
 #ifdef HAVE_AGC
             &agc_preset, &agc_cliptime,
-#endif
-#if defined(HAVE_RECORDING_HISTOGRAM)
-            &recording_histogram,
 #endif
 #ifdef HAVE_LCD_BITMAP
             &peak_meter_menu,

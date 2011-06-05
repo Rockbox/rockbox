@@ -123,7 +123,7 @@
 
 #define HAVE_AGC
 
-#define HAVE_RECORDING_HISTOGRAM
+#define HAVE_HISTOGRAM
 
 #define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1300 /* min. capacity selectable */

@@ -12372,20 +12372,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_HISTOGRAM_INTERVAL
+  id: LANG_HISTOGRAM_INTERVAL
   desc: in record settings menu
   user: core
   <source>
     *: none
-    recording_histogram: "Histogram interval"
+    histogram: "Histogram interval"
   </source>
   <dest>
     *: none
-    recording_histogram: "Intervalo del histograma"
+    histogram: "Intervalo del histograma"
   </dest>
   <voice>
     *: none
-    recording_histogram: "Intervalo del histograma"
+    histogram: "Intervalo del histograma"
   </voice>
 </phrase>
 <phrase>

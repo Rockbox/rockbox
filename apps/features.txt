@@ -129,8 +129,8 @@ recording_mic
 #endif
 #endif
 
-#if defined(HAVE_RECORDING_HISTOGRAM)
-recording_histogram
+#if defined(HAVE_HISTOGRAM)
+histogram
 #endif
 
 #if defined(HAVE_REMOTE_LCD)
