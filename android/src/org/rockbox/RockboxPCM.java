@@ -239,14 +239,14 @@ public class RockboxPCM extends AudioTrack
         }
     }
 
-    public native void pcmSamplesToByteArray(byte[] dest);
+    public native int nativeWrite(byte[] temp, int len);
    
     private class PCMListener implements OnPlaybackPositionUpdateListener 
     {
-        private byte[] buf;
-        public PCMListener(int refill_bufsize) 
+        byte[] pcm_data;
+        public PCMListener(int _refill_bufsize) 
         {
-            buf = new byte[refill_bufsize];
+            pcm_data = new byte[_refill_bufsize];
         }
 
         public void onMarkerReached(AudioTrack track) 
@@ -254,8 +254,7 @@ public class RockboxPCM extends AudioTrack
             /* push new data to the hardware */
             RockboxPCM pcm = (RockboxPCM)track;
             int result = -1;
-            pcm.pcmSamplesToByteArray(buf);
-            result = track.write(buf, 0, buf.length);
+            result = pcm.nativeWrite(pcm_data, pcm_data.length);
             if (result >= 0)
             {
                 switch(getPlayState())
@@ -269,6 +268,8 @@ public class RockboxPCM extends AudioTrack
                         break;
                 }
             }
+            else /* stop on error */ 
+                stop();
         }
 
         public void onPeriodicNotification(AudioTrack track) 

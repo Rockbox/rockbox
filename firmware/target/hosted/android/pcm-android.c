@@ -36,65 +36,49 @@ static char   *pcm_data_start;
 static jmethodID play_pause_method;
 static jmethodID stop_method;
 static jmethodID set_volume_method;
+static jmethodID write_method;
 static jclass    RockboxPCM_class;
 static jobject   RockboxPCM_instance;
 
 
 /*
- * transfer our raw data into a java array
+ * write pcm samples to the hardware. Calls AudioTrack.write directly (which
+ * is usually a blocking call)
  *
- * a bit of a monster functions, but it should cover all cases to overcome
- * the issue that the chunk size of the java layer and our pcm chunks are
- * differently sized
- *
- * afterall, it only copies the raw pcm data from pcm_data_start to
- * the passed byte[]-array
+ * temp_array is not strictly needed as a parameter as we could
+ * create it here, but that would result in frequent garbage collection
  *
  * it is called from the PositionMarker callback of AudioTrack
  **/
-JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxPCM_pcmSamplesToByteArray(JNIEnv *env,
-                                                  jobject this,
-                                                  jbyteArray arr)
+JNIEXPORT jint JNICALL
+Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
+                                        jbyteArray temp_array, jint max_size)
 {
-    (void)this;
-    size_t len;
-    size_t array_size = (*env)->GetArrayLength(env, arr);
-    if (array_size > pcm_data_size)
-        len = pcm_data_size;
-    else
-        len = array_size;
+    jint left = max_size;
 
-    (*env)->SetByteArrayRegion(env, arr, 0, len, pcm_data_start);
+    if (!pcm_data_size) /* get some initial data */
+        pcm_play_get_more_callback((void**) &pcm_data_start, &pcm_data_size);
 
-    if (array_size > pcm_data_size)
-    {   /* didn't have enough data for the array ? */
-        size_t remaining = array_size - pcm_data_size;
-        size_t offset = len;
-    retry:
-        pcm_play_get_more_callback((void**)&pcm_data_start, &pcm_data_size);
-        if (pcm_data_size == 0)
-        {
-            DEBUGF("out of data\n");
-            return;
-        }
-        if (remaining > pcm_data_size)
-        {   /* got too little data, get more ... */
-            (*env)->SetByteArrayRegion(env, arr, offset, pcm_data_size, pcm_data_start);
-            /* advance in the java array by the amount we copied */
-            offset += pcm_data_size;
-            /* we copied at least a bit */
-            remaining -= pcm_data_size;
-            pcm_data_size = 0;
-            /* let's get another buch of data and try again */
-            goto retry;
-        }
-        else
-            (*env)->SetByteArrayRegion(env, arr, offset, remaining, pcm_data_start);
-        len = remaining;
+    while(left > 0 && pcm_data_size)
+    {
+        jint ret;
+        jsize transfer_size = MIN((size_t)left, pcm_data_size);
+        /* decrement both by the amount we're going to write */
+        pcm_data_size -= transfer_size; left -= transfer_size;
+        (*env)->SetByteArrayRegion(env, temp_array, 0,
+                                        transfer_size, (jbyte*)pcm_data_start);
+
+        ret = (*env)->CallIntMethod(env, this, write_method,
+                                            temp_array, 0, transfer_size);
+        if (ret < 0)
+            return ret;
+
+        if (pcm_data_size == 0) /* need new data */
+            pcm_play_get_more_callback((void**)&pcm_data_start, &pcm_data_size);
+        else /* increment data pointer and feed more */
+            pcm_data_start += transfer_size;
     }
-    pcm_data_start += len;
-    pcm_data_size -= len;
+    return max_size - left;
 }
 
 void pcm_play_lock(void)
@@ -120,7 +104,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     /* NOTE: due to how pcm_play_get_more_callback() works, this is
-     * possibly called from pcmSamplesToByteArray(), i.e. another thread.
+     * possibly called from writeNative(), i.e. another thread.
      * => We need to discover the env_ptr */
     JNIEnv* env = getJavaEnvironment();
     (*env)->CallVoidMethod(env,
@@ -168,6 +152,7 @@ void pcm_play_dma_init(void)
     play_pause_method = e->GetMethodID(env_ptr, RockboxPCM_class, "play_pause", "(Z)V");
     set_volume_method = e->GetMethodID(env_ptr, RockboxPCM_class, "set_volume", "(I)V");
     stop_method       = e->GetMethodID(env_ptr, RockboxPCM_class, "stop", "()V");
+    write_method      = e->GetMethodID(env_ptr, RockboxPCM_class, "write", "([BII)I");
     /* get initial pcm data, if any */
     pcm_play_get_more_callback((void*)&pcm_data_start, &pcm_data_size);
 }
