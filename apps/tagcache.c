@@ -993,28 +993,25 @@ static bool check_clauses(struct tagcache_search *tcs,
     {
         int seek;
         char buf[256];
-        char *str;
+        char *str = buf;
         struct tagcache_search_clause *clause = clauses[i];
         
         if (clause->type == clause_logical_or)
             break; /* all conditions before logical-or satisfied --
                       stop processing clauses */
 
-#ifdef HAVE_TC_RAMCACHE
-        str = NULL;
+        seek = check_virtual_tags(clause->tag, tcs->idx_id, idx);
 
+#ifdef HAVE_TC_RAMCACHE
         if (tcs->ramsearch)
         {
             struct tagfile_entry *tfe;
-            
-            seek = check_virtual_tags(clause->tag, tcs->idx_id, idx);
             
             if (!TAGCACHE_IS_NUMERIC(clause->tag))
             {
                 if (clause->tag == tag_filename)
                 {
                     retrieve(tcs, idx, tag_filename, buf, sizeof buf);
-                    str = buf;
                 }
                 else
                 {
@@ -1027,11 +1024,7 @@ static bool check_clauses(struct tagcache_search *tcs,
 #endif
         {
             struct tagfile_entry tfe;
-            str = buf;
             
-            seek = check_virtual_tags(clause->tag, tcs->idx_id, idx);
-                
-            memset(buf, 0, sizeof buf);
             if (!TAGCACHE_IS_NUMERIC(clause->tag))
             {
                 int fd = tcs->idxfd[clause->tag];
@@ -1044,6 +1037,7 @@ static bool check_clauses(struct tagcache_search *tcs,
                 }
 
                 read(fd, str, tfe.tag_length);
+                str[tfe.tag_length] = '\0';
                 
                 /* Check if entry has been deleted. */
                 if (str[0] == '\0')
