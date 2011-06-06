@@ -79,7 +79,9 @@ typedef struct vorbis_dsp_state{
   void       *backend_state;
   
   ogg_int32_t *first_pcm;       /* PCM buffer (for normal RAM or IRAM)*/
+#ifdef TREMOR_USE_IRAM
   ogg_int32_t *iram_double_pcm; /* PCM 2nd buffer for IRAM */
+#endif
   bool reset_pcmb;
 } vorbis_dsp_state;
 

@@ -23,9 +23,13 @@
 #define ICODE_ATTR_TREMOR_NOT_MDCT ICODE_ATTR
 #endif
 
+/* Enable special handling of buffers in faster ram, not usefull when no
+   such different ram is available. There are 3 different memory configurations
+   * No special iram, uses double buffers to avoid copying data
+   * Small special iram, copies buffers to run hottest processing in iram
+   * Large iram, uses double buffers in iram */
 #ifdef USE_IRAM
 #define TREMOR_USE_IRAM
-#endif
 
 /* Define CPU of large IRAM (PP5022/5024, MCF5250)     */
 #if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || defined(CPU_S5L870X) || (CONFIG_CPU == MCF5250)
@@ -34,12 +38,13 @@
  * TOTAL         : 41984                               */
 #define IRAM_IBSS_SIZE 41984
 
-/* Define CPU of Normal IRAM (96KB) (and SIM also)     */
+/* Define CPU of Normal IRAM (96KB)                    */
 #else
 /* PCM_BUFFER    : 16384 Byte (2048*2*4)               *
  * WINDOW_LOOKUP : 4608 Byte (128*4 + 1024*4)          *
  * TOTAL         : 20992                               */
 #define IRAM_IBSS_SIZE 20992
+#endif
 #endif
 
 /* max 2 channels  */

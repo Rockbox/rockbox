@@ -60,6 +60,7 @@ void ogg_free(void* ptr)
     tlsf_free(ptr);
 }
 
+#ifdef TREMOR_USE_IRAM
 /* Allocate IRAM buffer */
 static unsigned char iram_buff[IRAM_IBSS_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
 static size_t iram_remain;
@@ -82,3 +83,4 @@ void *iram_malloc(size_t size){
 
     return x;
 }
+#endif
