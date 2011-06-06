@@ -1870,36 +1870,9 @@ static void __attribute__ ((noinline)) add_tagcache(char *path,
 
     logf("-> %s", path);
     
-    /* Generate track number if missing. */
-    if (id3.tracknum <= 0)
+    if (id3.tracknum <= 0)              /* Track number missing? */
     {
-        const char *p = strrchr(path, '.');
-        
-        if (p == NULL)
-            p = &path[strlen(path)-1];
-        
-        while (*p != '/')
-        {
-            if (isdigit(*p) && isdigit(*(p-1)))
-            {
-                tracknumfix[1] = *p--;
-                tracknumfix[0] = *p;
-                break;
-            }
-            p--;
-        }
-        
-        if (tracknumfix[0] != '\0')
-        {
-            id3.tracknum = atoi(tracknumfix);
-            /* Set a flag to indicate track number has been generated. */
-            entry.flag |= FLAG_TRKNUMGEN;
-        }
-        else
-        {
-            /* Unable to generate track number. */
-            id3.tracknum = -1;
-        }
+        id3.tracknum = -1;
     }
     
     /* Numeric tags */
