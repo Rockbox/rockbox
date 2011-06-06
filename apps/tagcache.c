@@ -770,10 +770,10 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
 
 #define COMMAND_QUEUE_IS_EMPTY (command_queue_ridx == command_queue_widx)
 
-static long read_numeric_tag(int tag, int idx_id, const struct index_entry *idx)
+static long find_tag(int tag, int idx_id, const struct index_entry *idx)
 {
 #ifndef __PCTOOL__
-    if (! COMMAND_QUEUE_IS_EMPTY)
+    if (! COMMAND_QUEUE_IS_EMPTY && TAGCACHE_IS_NUMERIC(tag))
     {
         /* Attempt to find tag data through store-to-load forwarding in
            command queue */
@@ -801,7 +801,7 @@ static long read_numeric_tag(int tag, int idx_id, const struct index_entry *idx)
 
         if (result >= 0)
         {
-            logf("read_numeric_tag: "
+            logf("find_tag: "
                  "Recovered tag %d value %lX from write queue",
                  tag, result);
             return result;
@@ -821,24 +821,24 @@ static long check_virtual_tags(int tag, int idx_id,
     switch (tag) 
     {
         case tag_virt_length_sec:
-            data = (read_numeric_tag(tag_length, idx_id, idx)/1000) % 60;
+            data = (find_tag(tag_length, idx_id, idx)/1000) % 60;
             break;
         
         case tag_virt_length_min:
-            data = (read_numeric_tag(tag_length, idx_id, idx)/1000) / 60;
+            data = (find_tag(tag_length, idx_id, idx)/1000) / 60;
             break;
         
         case tag_virt_playtime_sec:
-            data = (read_numeric_tag(tag_playtime, idx_id, idx)/1000) % 60;
+            data = (find_tag(tag_playtime, idx_id, idx)/1000) % 60;
             break;
         
         case tag_virt_playtime_min:
-            data = (read_numeric_tag(tag_playtime, idx_id, idx)/1000) / 60;
+            data = (find_tag(tag_playtime, idx_id, idx)/1000) / 60;
             break;
         
         case tag_virt_autoscore:
-            if (read_numeric_tag(tag_length, idx_id, idx) == 0 
-                || read_numeric_tag(tag_playcount, idx_id, idx) == 0)
+            if (find_tag(tag_length, idx_id, idx) == 0 
+                || find_tag(tag_playcount, idx_id, idx) == 0)
             {
                 data = 0;
             }
@@ -854,23 +854,23 @@ static long check_virtual_tags(int tag, int idx_id,
                      autoscore = 100 * (alpha / playcout + beta / length / playcount)
                    Both terms should be small enough to avoid any overflow
                 */
-                data = 100 * (read_numeric_tag(tag_playtime, idx_id, idx) 
-                              / read_numeric_tag(tag_length, idx_id, idx))
-                       + (100 * (read_numeric_tag(tag_playtime, idx_id, idx) 
-                                 % read_numeric_tag(tag_length, idx_id, idx)))
-                         / read_numeric_tag(tag_length, idx_id, idx);
-                data /=  read_numeric_tag(tag_playcount, idx_id, idx);
+                data = 100 * (find_tag(tag_playtime, idx_id, idx) 
+                              / find_tag(tag_length, idx_id, idx))
+                       + (100 * (find_tag(tag_playtime, idx_id, idx) 
+                                 % find_tag(tag_length, idx_id, idx)))
+                         / find_tag(tag_length, idx_id, idx);
+                data /=  find_tag(tag_playcount, idx_id, idx);
             }
             break;
         
         /* How many commits before the file has been added to the DB. */
         case tag_virt_entryage:
             data = current_tcmh.commitid 
-                   - read_numeric_tag(tag_commitid, idx_id, idx) - 1;
+                   - find_tag(tag_commitid, idx_id, idx) - 1;
             break;
         
         default:
-            data = read_numeric_tag(tag, idx_id, idx);
+            data = find_tag(tag, idx_id, idx);
     }
     
     return data;
