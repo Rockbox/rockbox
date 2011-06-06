@@ -188,7 +188,7 @@ struct tagcache_search {
     /* Exported variables. */
     bool ramsearch;      /* Is ram copy of the tagcache being used. */
     bool ramresult;      /* False if result is not static, and must be copied. */
-    int type;
+    int type;            /* The tag type to be searched. Only nonvirtual tags */
     char *result;        /* The result data for all tags. */
     int result_len;      /* Length of the result including \0 */
     int32_t result_seek; /* Current position in the tag data. */
