@@ -225,7 +225,8 @@ simcc () {
  fi
 
  # default share option, override below if needed
- SHARED_FLAG="-shared"
+ SHARED_LDFLAG="-shared"
+ SHARED_CFLAGS="-fPIC -fvisibility=hidden"
 
  if [ "$win32crosscompile" = "yes" ]; then
    LDOPTS="$LDOPTS -mconsole"
@@ -267,7 +268,7 @@ simcc () {
    sigaltstack=`check_sigaltstack`
    echo "Darwin host detected"
    LDOPTS="$LDOPTS -ldl"
-   SHARED_FLAG="-dynamiclib -Wl\,-single_module"
+   SHARED_LDFLAG="-dynamiclib -Wl\,-single_module"
    ;;
 
    SunOS)
@@ -305,20 +306,11 @@ simcc () {
  GCCOPTS="$GCCOPTS -I\$(SIMDIR)"
 
  if test "X$win32crosscompile" != "Xyes"; then
-   case `uname -m` in
-    x86_64|amd64)
-      # fPIC is needed to make shared objects link
-      # setting visibility to hidden is necessary to avoid strange crashes
-      # due to symbol clashing
-      GCCOPTS="$GCCOPTS -fPIC -fvisibility=hidden"
-      # x86_64 supports MMX by default
-    ;;
-
-    i686)
-      echo "Enabling MMX support"
-      GCCOPTS="$GCCOPTS -mmmx"
-    ;;
-   esac
+   if test "`uname -m`" = "i686"; then
+     echo "Enabling MMX support"
+     GCCOPTS="$GCCOPTS -mmmx"
+   fi
+   # x86_64 supports MMX by default
 
    id=$$
    cat >$tmpdir/conftest-$id.c <<EOF
@@ -532,7 +524,8 @@ maemocc () {
  GCCOPTIMIZE=''
  LDOPTS="-lm -ldl $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
- SHARED_FLAG="-shared"
+ SHARED_LDFLAG="-shared"
+ SHARED_CFLAGS=''
  endian="little"
  thread_support="HAVE_SIGALTSTACK_THREADS"
 
@@ -626,7 +619,8 @@ pandoracc () {
  GCCOPTIMIZE=''
  LDOPTS="-lm -ldl $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
- SHARED_FLAG="-shared"
+ SHARED_LDFLAG="-shared"
+ SHARED_CFLAGS=''
  endian="little"
  thread_support="HAVE_SIGALTSTACK_THREADS"
 
@@ -671,7 +665,8 @@ androidcc () {
 		--sysroot=$ANDROID_NDK_PATH/platforms/android-4/arch-arm"
     LDOPTS="$LDOPTS -shared -nostdlib -ldl -llog"
     endian="little"
-    SHARED_FLAG="-shared"
+    SHARED_LDFLAG="-shared"
+    SHARED_CFLAGS=''
 }
 
 whichadvanced () {
@@ -3686,7 +3681,8 @@ sed > Makefile \
  -e "s<@PLUGINS@<${plugins}<g" \
  -e "s<@CODECS@<${swcodec}<g" \
  -e "s<@PROFILE_OPTS@<${PROFILE_OPTS}<g" \
- -e "s<@SHARED_FLAG@<${SHARED_FLAG}<g" \
+ -e "s<@SHARED_LDFLAG@<${SHARED_LDFLAG}<g" \
+ -e "s<@SHARED_CFLAGS@<${SHARED_CFLAGS}<g" \
  -e "s<@GCCOPTS@<${GCCOPTS}<g" \
  -e "s<@TARGET_INC@<${TARGET_INC}<g" \
  -e "s<@LDOPTS@<${LDOPTS}<g" \
@@ -3774,7 +3770,8 @@ export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
 export GCCOPTS=@GCCOPTS@
 export TARGET_INC=@TARGET_INC@
 export LOADADDRESS=@LOADADDRESS@
-export SHARED_FLAG=@SHARED_FLAG@
+export SHARED_LDFLAG=@SHARED_LDFLAG@
+export SHARED_CFLAGS=@SHARED_CFLAGS@
 export LDOPTS=@LDOPTS@
 export GLOBAL_LDOPTS=@GLOBAL_LDOPTS@
 export GCCVER=@GCCVER@

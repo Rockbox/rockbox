@@ -98,7 +98,8 @@ $(BUILDDIR)/apps/plugins/%.o: $(ROOTDIR)/apps/plugins/%.c
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINFLAGS) -c $< -o $@
 
 ifdef APP_TYPE
- PLUGINLDFLAGS = $(SHARED_FLAG) # <-- from Makefile
+ PLUGINLDFLAGS = $(SHARED_LDFLAG) # <-- from Makefile
+ PLUGINFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
 else
  PLUGINLDFLAGS = -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-Map,$*.map
  OVERLAYLDFLAGS = -T$(OVERLAYREF_LDS) -Wl,--gc-sections -Wl,-Map,$*.refmap
