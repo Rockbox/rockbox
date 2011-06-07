@@ -274,9 +274,7 @@ int rda5802_set(int setting, int value)
 {
     switch (setting) {
     case RADIO_SLEEP:
-        if (value != 2) {
-            rda5802_sleep(value);
-        }
+        rda5802_sleep(value);
         break;
 
     case RADIO_FREQUENCY:
