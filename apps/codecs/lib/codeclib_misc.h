@@ -15,32 +15,15 @@
 
  ********************************************************************/
 
-//#include "config-tremor.h"
+#ifndef _CODECLIB_MISC_H_
+#define _CODECLIB_MISC_H_
 
-#ifndef _V_RANDOM_H_
-#define _V_RANDOM_H_
-//#include "ivorbiscodec.h"
-//#include "os_types.h"
-
+#include <stdint.h>
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
 
-
-/* Some prototypes that were not defined elsewhere */
-//void *_vorbis_block_alloc(vorbis_block *vb,long bytes);
-//void _vorbis_block_ripcord(vorbis_block *vb);
-//extern int _ilog(unsigned int v);
-
-#ifndef _V_WIDE_MATH
-#define _V_WIDE_MATH
-
-#ifndef ROCKBOX
-#include <inttypes.h>
-#endif /* ROCKBOX */
-
 #ifndef  _LOW_ACCURACY_
 /* 64 bit multiply */
-/* #include <sys/types.h> */
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
 union magic {
@@ -60,29 +43,43 @@ union magic {
 };
 #endif
 
+#ifndef INCL_OPTIMIZED_MULT32
+#define INCL_OPTIMIZED_MULT32
 static inline int32_t MULT32(int32_t x, int32_t y) {
   union magic magic;
   magic.whole = (int64_t)x * y;
   return magic.halves.hi;
 }
+#endif
 
+#ifndef INCL_OPTIMIZED_MULT31
+#define INCL_OPTIMIZED_MULT31
 static inline int32_t MULT31(int32_t x, int32_t y) {
   return MULT32(x,y)<<1;
 }
+#endif
 
+#ifndef INCL_OPTIMIZED_MULT31_SHIFT15
+#define INCL_OPTIMIZED_MULT31_SHIFT15
 static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   union magic magic;
   magic.whole  = (int64_t)x * y;
   return ((uint32_t)(magic.halves.lo)>>15) | ((magic.halves.hi)<<17);
 }
+#endif
 
+#ifndef INCL_OPTIMIZED_MULT31_SHIFT16
+#define INCL_OPTIMIZED_MULT31_SHIFT16
 static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
   union magic magic;
   magic.whole  = (int64_t)x * y;
   return ((uint32_t)(magic.halves.lo)>>16) | ((magic.halves.hi)<<16);
 }
+#endif
 
 #else
+/* Rockbox: unused */
+#if 0
 /* 32 bit multiply, more portable but less accurate */
 
 /*
@@ -110,6 +107,7 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   return (x >> 6) * y;  /* y preshifted >>9 */
 }
 #endif
+#endif
 
 /*
  * The XPROD functions are meant to optimize the cross products found all
@@ -121,13 +119,17 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
  * macros.
  */
 
+#ifndef INCL_OPTIMIZED_XPROD32
+#define INCL_OPTIMIZED_XPROD32
 /* replaced XPROD32 with a macro to avoid memory reference
    _x, _y are the results (must be l-values) */
 #define XPROD32(_a, _b, _t, _v, _x, _y)     \
   { (_x)=MULT32(_a,_t)+MULT32(_b,_v);       \
     (_y)=MULT32(_b,_t)-MULT32(_a,_v); }
+#endif
 
-
+/* Rockbox: Unused */
+/*
 #ifdef __i386__
 
 #define XPROD31(_a, _b, _t, _v, _x, _y)     \
@@ -138,7 +140,10 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
     *(_y)=MULT31(_b,_t)+MULT31(_a,_v); }
 
 #else
+*/
 
+#ifndef INCL_OPTIMIZED_XPROD31
+#define INCL_OPTIMIZED_XPROD31
 static inline void XPROD31(int32_t a, int32_t b,
                       int32_t t, int32_t v,
                       int32_t *x, int32_t *y)
@@ -146,7 +151,10 @@ static inline void XPROD31(int32_t a, int32_t b,
   *x = MULT31(a, t) + MULT31(b, v);
   *y = MULT31(b, t) - MULT31(a, v);
 }
+#endif
 
+#ifndef INCL_OPTIMIZED_XNPROD31
+#define INCL_OPTIMIZED_XNPROD31
 static inline void XNPROD31(int32_t a, int32_t b,
                        int32_t  t, int32_t  v,
                        int32_t *x, int32_t *y)
@@ -155,19 +163,25 @@ static inline void XNPROD31(int32_t a, int32_t b,
   *y = MULT31(b, t) + MULT31(a, v);
 }
 #endif
+/*#endif*/
 
+#ifndef INCL_OPTIMIZED_XPROD31_R
+#define INCL_OPTIMIZED_XPROD31_R
 #define XPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
   _x = MULT31(_a, _t) + MULT31(_b, _v);\
   _y = MULT31(_b, _t) - MULT31(_a, _v);\
 }
+#endif
 
+#ifndef INCL_OPTIMIZED_XNPROD31_R
+#define INCL_OPTIMIZED_XNPROD31_R
 #define XNPROD31_R(_a, _b, _t, _v, _x, _y)\
 {\
   _x = MULT31(_a, _t) - MULT31(_b, _v);\
   _y = MULT31(_b, _t) + MULT31(_a, _v);\
 }
-
+#endif
 
 #ifndef _V_VECT_OPS
 #define _V_VECT_OPS
@@ -213,7 +227,6 @@ void vect_mult_bw(int32_t *data, int32_t *window, int n)
 }
 #endif
 
-#endif
 /* not used anymore */
 /*
 #ifndef _V_CLIP_MATH

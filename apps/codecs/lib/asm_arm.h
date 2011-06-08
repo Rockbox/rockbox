@@ -16,9 +16,7 @@
  ********************************************************************/
 #ifdef CPU_ARM
 
-#if !defined(_V_WIDE_MATH) && !defined(_LOW_ACCURACY_)
-#define _V_WIDE_MATH
-
+#define INCL_OPTIMIZED_MULT32
 #if ARM_ARCH >= 6
 static inline int32_t MULT32(int32_t x, int32_t y) {
   int32_t hi;
@@ -37,10 +35,12 @@ static inline int32_t MULT32(int32_t x, int32_t y) {
 }
 #endif
 
+#define INCL_OPTIMIZED_MULT31
 static inline int32_t MULT31(int32_t x, int32_t y) {
   return MULT32(x,y)<<1;
 }
 
+#define INCL_OPTIMIZED_MULT31_SHIFT15
 static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   int32_t lo,hi;
   asm volatile("smull   %0, %1, %2, %3\n\t"
@@ -52,6 +52,7 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   return(hi);
 }
 
+#define INCL_OPTIMIZED_MULT31_SHIFT16
 static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
   int32_t lo,hi;
   asm volatile("smull   %0, %1, %2, %3\n\t"
@@ -63,6 +64,7 @@ static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
   return(hi);
 }
 
+#define INCL_OPTIMIZED_XPROD32
 #define XPROD32(a, b, t, v, x, y) \
 { \
   int32_t l; \
@@ -75,6 +77,8 @@ static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
       : "r" ((a)), "r" ((b)), "r" ((t)), "r" ((v)) ); \
 }
 
+#define INCL_OPTIMIZED_XPROD31_R
+#define INCL_OPTIMIZED_XNPROD31_R
 #if ARM_ARCH >= 6
 /* These may yield slightly different result from the macros below
    because only the high 32 bits of the multiplications are accumulated while
@@ -134,6 +138,7 @@ static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
 }
 #endif
 
+#define INCL_OPTIMIZED_XPROD31
 static inline void XPROD31(int32_t  a, int32_t  b,
                            int32_t  t, int32_t  v,
                            int32_t *x, int32_t *y)
@@ -144,6 +149,7 @@ static inline void XPROD31(int32_t  a, int32_t  b,
   *y = _y1;
 }
 
+#define INCL_OPTIMIZED_XNPROD31
 static inline void XNPROD31(int32_t  a, int32_t  b,
                             int32_t  t, int32_t  v,
                             int32_t *x, int32_t *y)
@@ -261,7 +267,6 @@ void vect_mult_bw(int32_t *data, int32_t *window, int n)
 
 #endif
 
-#endif
 /* not used anymore */
 /*
 #ifndef _V_CLIP_MATH
@@ -282,11 +287,6 @@ static inline int32_t CLIP_TO_15(int32_t x) {
 
 #endif
 */
-#ifndef _V_LSP_MATH_ASM
-#define _V_LSP_MATH_ASM
 
-
-
-#endif
 #endif
 

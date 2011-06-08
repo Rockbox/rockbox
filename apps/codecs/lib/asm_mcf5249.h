@@ -21,9 +21,7 @@
 
 #if defined(CPU_COLDFIRE)
 
-#ifndef _V_WIDE_MATH
-#define _V_WIDE_MATH
-
+#define INCL_OPTIMIZED_MULT32
 static inline int32_t MULT32(int32_t x, int32_t y) {
 
   asm volatile ("mac.l %[x], %[y], %%acc0;"    /* multiply & shift  */
@@ -35,6 +33,7 @@ static inline int32_t MULT32(int32_t x, int32_t y) {
   return x;
 }
 
+#define INCL_OPTIMIZED_MULT31
 static inline int32_t MULT31(int32_t x, int32_t y) {
   asm volatile ("mac.l %[x], %[y], %%acc0;" /* multiply */
                 "movclr.l %%acc0, %[x];"    /* move and clear */
@@ -44,6 +43,7 @@ static inline int32_t MULT31(int32_t x, int32_t y) {
   return x;
 }
 
+#define INCL_OPTIMIZED_MULT31_SHIFT15
 static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   int32_t r;
 
@@ -61,6 +61,7 @@ static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   return r;
 }
 
+#define INCL_OPTIMIZED_MULT31_SHIFT16
 static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
   int32_t r;
 
@@ -76,6 +77,7 @@ static inline int32_t MULT31_SHIFT16(int32_t x, int32_t y) {
   return x;
 }
 
+#define INCL_OPTIMIZED_XPROD31
 static inline
 void XPROD31(int32_t  a, int32_t  b,
              int32_t  t, int32_t  v,
@@ -95,6 +97,7 @@ void XPROD31(int32_t  a, int32_t  b,
                 : "cc", "memory");
 }
 
+#define INCL_OPTIMIZED_XNPROD31
 static inline
 void XNPROD31(int32_t  a, int32_t  b,
               int32_t  t, int32_t  v,
@@ -114,15 +117,11 @@ void XNPROD31(int32_t  a, int32_t  b,
                 : "cc", "memory");
 }
 
-#if 0    /* canonical Tremor definition */
-#define XPROD32(_a, _b, _t, _v, _x, _y)         \
-  { (_x)=MULT32(_a,_t)+MULT32(_b,_v);           \
-    (_y)=MULT32(_b,_t)-MULT32(_a,_v); }
-#endif
 
 /* this could lose the LSB by overflow, but i don't think it'll ever happen.
    if anyone think they can hear a bug caused by this, please try the above
    version. */
+#define INCL_OPTIMIZED_XPROD32
 #define XPROD32(_a, _b, _t, _v, _x, _y)     \
   asm volatile ("mac.l %[a], %[t], %%acc0;" \
                 "mac.l %[b], %[v], %%acc0;" \
@@ -137,6 +136,7 @@ void XNPROD31(int32_t  a, int32_t  b,
                   [t] "r" (_t), [v] "r" (_v) \
                 : "cc");
 
+#define INCL_OPTIMIZED_XPROD31_R
 #define XPROD31_R(_a, _b, _t, _v, _x, _y)   \
   asm volatile ("mac.l %[a], %[t], %%acc0;" \
                 "mac.l %[b], %[v], %%acc0;" \
@@ -149,6 +149,7 @@ void XNPROD31(int32_t  a, int32_t  b,
                   [t] "r" (_t), [v] "r" (_v) \
                 : "cc");
 
+#define INCL_OPTIMIZED_XNPROD31_R
 #define XNPROD31_R(_a, _b, _t, _v, _x, _y)  \
   asm volatile ("mac.l %[a], %[t], %%acc0;" \
                 "msac.l %[b], %[v], %%acc0;" \
@@ -336,7 +337,6 @@ void vect_mult_bw(int32_t *data, int32_t *window, int n)
 
 #endif
 
-#endif
 /* not used anymore */
 /*
 #ifndef _V_CLIP_MATH
