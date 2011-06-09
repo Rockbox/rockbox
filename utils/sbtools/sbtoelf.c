@@ -337,8 +337,8 @@ static void extract(unsigned long filesize)
         bugp("File size mismatch");
     if(sb_header->header_size * BLOCK_SIZE != sizeof(struct sb_header_t))
         bugp("Bad header size");
-    if(sb_header->major_ver != IMAGE_MAJOR_VERSION ||
-            sb_header->minor_ver != IMAGE_MINOR_VERSION)
+    if((sb_header->major_ver != IMAGE_MAJOR_VERSION ||
+            sb_header->minor_ver != IMAGE_MINOR_VERSION) && strcmp(getenv("SB_IGNORE_VER"), "YES"))
         bugp("Bad file format version");
     if(sb_header->sec_hdr_size * BLOCK_SIZE != sizeof(struct sb_section_header_t))
         bugp("Bad section header size");
