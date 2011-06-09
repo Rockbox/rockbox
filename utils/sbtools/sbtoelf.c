@@ -38,6 +38,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <strings.h>
 
 #include "crypto.h"
 #include "elf.h"
@@ -75,6 +76,12 @@ uint8_t *g_buf; /* file content */
 #define PREFIX_SIZE     128
 char out_prefix[PREFIX_SIZE];
 const char *key_file;
+
+char *s_getenv(const char *name)
+{
+    char *s = getenv(name);
+    return s ? s : "";
+}
 
 void *xmalloc(size_t s) /* malloc helper, used in elf.c */
 {
@@ -338,7 +345,7 @@ static void extract(unsigned long filesize)
     if(sb_header->header_size * BLOCK_SIZE != sizeof(struct sb_header_t))
         bugp("Bad header size");
     if((sb_header->major_ver != IMAGE_MAJOR_VERSION ||
-            sb_header->minor_ver != IMAGE_MINOR_VERSION) && strcmp(getenv("SB_IGNORE_VER"), "YES"))
+            sb_header->minor_ver != IMAGE_MINOR_VERSION) && strcasecmp(s_getenv("SB_IGNORE_VER"), "YES"))
         bugp("Bad file format version");
     if(sb_header->sec_hdr_size * BLOCK_SIZE != sizeof(struct sb_section_header_t))
         bugp("Bad section header size");
@@ -497,8 +504,7 @@ static void extract(unsigned long filesize)
     }
 
     /* sections */
-    char *raw_cmd_env = getenv("SB_RAW_CMD");
-    if(raw_cmd_env == NULL || strcmp(raw_cmd_env, "YES") != 0)
+    if(strcasecmp(s_getenv("SB_RAW_CMD"), "YES") != 0)
     {
         color(BLUE);
         printf("Sections\n");

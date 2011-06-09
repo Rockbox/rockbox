@@ -32,6 +32,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <stdarg.h>
+#include <strings.h>
 
 #include "crypto.h"
 #include "elf.h"
@@ -47,6 +48,12 @@ bool g_debug = false;
 /**
  * Misc
  */
+
+char *s_getenv(const char *name)
+{
+    char *s = getenv(name);
+    return s ? s : "";
+}
 
 void generate_random_data(void *buf, size_t sz)
 {
@@ -968,7 +975,7 @@ int main(int argc, const char **argv)
         return 1;
     }
 
-    if(getenv("SB_DEBUG") != NULL && strcmp(getenv("SB_DEBUG"), "YES") == 0)
+    if(strcasecmp(s_getenv("SB_DEBUG"), "YES") == 0)
         g_debug = true;
 
     g_key_array = read_keys(argv[2], &g_nr_keys);
