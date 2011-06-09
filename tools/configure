@@ -3113,7 +3113,7 @@ fi
     modelname="pandora"
     app_type="sdl-app"
     target="-DPANDORA"
-    sharedir="rockbox/share"
+    sharedir="rockbox/share/rockbox"
     bindir="rockbox/bin"
     libdir="rockbox/lib"
     memory=8
