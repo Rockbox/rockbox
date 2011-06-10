@@ -25,6 +25,7 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <errno.h>
 #include "config.h"
 
 #define HAVE_STATVFS (!defined(WIN32))
@@ -328,8 +329,11 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     char buffer[MAX_PATH]; /* sufficiently big */
     static struct sim_dirent secret;
     STAT_T s;
-    DIRENT_T *x11 = READDIR(dir->dir);
     struct tm tm;
+    DIRENT_T *x11;
+
+read_next:
+    x11 = READDIR(dir->dir);
 
     if(!x11)
         return (struct sim_dirent *)0;
@@ -339,8 +343,18 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     /* build file name */
     snprintf(buffer, sizeof(buffer), "%s/%s", 
         get_sim_pathname(dir->name), secret.d_name);
+
     if (STAT(buffer, &s)) /* get info */
+    {
+        /* File size larger than 2 GB? */
+        if (errno == EOVERFLOW)
+        {
+            DEBUGF("stat() overflow for %s. Skipping\n", buffer);
+            goto read_next;
+        }
+
         return NULL;
+    }
 
 #define ATTR_DIRECTORY 0x10
 
