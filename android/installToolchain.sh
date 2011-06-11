@@ -7,9 +7,34 @@
 set -e
 
 # http://developer.android.com/sdk/index.html
-SDK_URL="http://dl.google.com/android/android-sdk_r09-linux_x86.tgz"
+SDK_URL_LNX="http://dl.google.com/android/android-sdk_r11-linux_x86.tgz"
+SDK_URL_MAC="http://dl.google.com/android/android-sdk_r11-mac_x86.zip"
+SDK_URL_WIN="http://dl.google.com/android/android-sdk_r11-windows.zip"
 # http://developer.android.com/sdk/ndk/index.html
-NDK_URL="http://dl.google.com/android/ndk/android-ndk-r5b-linux-x86.tar.bz2"
+NDK_URL_LNX="http://dl.google.com/android/ndk/android-ndk-r5c-linux-x86.tar.bz2"
+NDK_URL_MAC="http://dl.google.com/android/ndk/android-ndk-r5c-darwin-x86.tar.bz2"
+NDK_URL_WIN="http://dl.google.com/android/ndk/android-ndk-r5c-windows.zip"
+
+OS=`uname`
+case $OS in
+    Linux)
+    SDK_URL=$SDK_URL_LNX
+    NDK_URL=$NDK_URL_LNX
+    ANDROID=tools/android
+    ;;
+    
+    Darwin)
+    SDK_URL=$SDK_URL_MAC
+    NDK_URL=$NDK_URL_MAC
+    ANDROID=tools/android
+    ;;
+
+    CYGWIN*)
+    SDK_URL=$SDK_URL_WIN
+    NDK_URL=$NDK_URL_WIN
+    ANDROID=tools/android.bat
+    ;;
+esac
 
 prefix="${INSTALL_PREFIX:-$HOME}"
 dldir="${DOWNLOAD_DIR:-/tmp}"
@@ -45,16 +70,17 @@ download_and_extract() {
 
 if [ -z "$SDK_PATH" ]; then
     download_and_extract $SDK_URL
-    SDK_PATH=$(realpath $prefix/android-sdk-*)
+    # OS X doesn't know about realname, use basename instead.
+    SDK_PATH=$prefix/$(basename $prefix/android-sdk-*)
 fi
 if [ -z "$NDK_PATH" ]; then
     download_and_extract $NDK_URL
-    NDK_PATH=$(realpath $prefix/android-ndk-*)
+    NDK_PATH=$prefix/$(basename $prefix/android-ndk-*)
 fi
 
 if [ -z "$(find $SDK_PATH/platforms -type d -name 'android-*')" ]; then
     echo " * Installing Android platforms..."
-    $SDK_PATH/tools/android update sdk --no-ui --filter platform,tool
+    $SDK_PATH/$ANDROID update sdk --no-ui --filter platform,tool
 fi
 
 cat <<EOF
