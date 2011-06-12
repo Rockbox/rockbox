@@ -276,7 +276,6 @@ void option_select_next_val(const struct settings_list *setting,
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {
         struct choice_setting *info = (struct choice_setting *)setting->choice_setting;
-        val = *value + 1;
         if (!previous)
         {
             val = *value + 1;

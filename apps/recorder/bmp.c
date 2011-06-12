@@ -206,7 +206,7 @@ static unsigned int read_part_line(struct bmp_args *ba)
     uint8_t *ibuf;
     struct uint8_rgb *buf = (struct uint8_rgb *)(ba->buf);
     const struct uint8_rgb *palette = ba->palette;
-    uint32_t component, data = data;
+    uint32_t component, data;
     int ret;
     int i, cols, len;
 
