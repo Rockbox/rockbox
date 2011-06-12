@@ -3198,13 +3198,13 @@ fi
   # this
 case $modelname in
   iriverifp7xx)
-     gdbstub="(G)DB stub, "
+     gdbstub=", (G)DB stub"
      ;;
   sansae200r|sansae200)
-     gdbstub="(I)nstaller, "
+     gdbstub=", (I)nstaller"
      ;;
   sansac200)
-     gdbstub="(E)raser, "
+     gdbstub=", (E)raser"
      ;;
   *)
      ;;
@@ -3212,7 +3212,7 @@ esac
 if [ "$ARG_TYPE" ]; then
   btype=$ARG_TYPE
 else
-  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, (C)heckWPS, (D)atabase tool, $gdbstub(M)anual: (Defaults to N)"
+  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, (C)heckWPS, (D)atabase tool$gdbstub: (Defaults to N)"
   btype=`input`;
 fi
 
@@ -3291,11 +3291,6 @@ fi
               ;;
       esac
       echo "GDB stub build selected"
-      ;;
-    [Mm])
-      toolset='';
-      apps="manual"
-      echo "Manual build selected"
       ;;
     [Cc])
       uname=`uname`
