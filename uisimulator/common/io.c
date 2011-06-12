@@ -346,12 +346,14 @@ read_next:
 
     if (STAT(buffer, &s)) /* get info */
     {
+#ifdef EOVERFLOW
         /* File size larger than 2 GB? */
         if (errno == EOVERFLOW)
         {
             DEBUGF("stat() overflow for %s. Skipping\n", buffer);
             goto read_next;
         }
+#endif
 
         return NULL;
     }
