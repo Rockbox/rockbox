@@ -12441,23 +12441,6 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_HISTOGRAM_INTERVAL
-  desc: in record settings menu
-  user: core
-  <source>
-    *: none
-    recording_histogram: "Histogram interval"
-  </source>
-  <dest>
-    *: none
-    recording_histogram: "Intervalo de histograma"
-  </dest>
-  <voice>
-    *: none
-    recording_histogram: "Intervalo de histograma"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_COPYING
   desc:
   user: core
@@ -12701,5 +12684,22 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
   <voice>
     *: none
     masf: "Tempo de caida de AV"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    histogram: "Intervalo de histograma"
+  </dest>
+  <voice>
+    *: none
+    histogram: "Intervalo de histograma"
   </voice>
 </phrase>
