@@ -307,6 +307,17 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
             // fixme: useless as pos is a multiple of 16 and call struct is 4-bytes wide ?
             pos = ROUND_UP(pos, 16);
         }
+        else if(hdr->opcode == SB_INST_MODE)
+        {
+            struct sb_instruction_mode_t *mode = (struct sb_instruction_mode_t *)hdr;
+            color(RED);
+            printf("MODE");
+            color(OFF);printf(" | ");
+            color(BLUE);
+            printf("mod=0x%08x\n", mode->mode);
+            color(OFF);
+            pos += sizeof(struct sb_instruction_mode_t);
+        }
         else
         {
             color(RED);
@@ -705,6 +716,7 @@ int main(int argc, const char **argv)
     {
         printf("Usage: %s <firmware> <key file> [<out prefix>]\n",*argv);
         printf("To use raw command mode, set environment variable SB_RAW_CMD to YES\n");
+        printf("To ignore the file version check, set environment variable SB_IGNORE_VER to YES\n");
         return 1;
     }
 
