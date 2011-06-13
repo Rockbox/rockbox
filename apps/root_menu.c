@@ -339,7 +339,12 @@ static int miscscrn(void * param)
 static int playlist_view(void * param)
 {
     (void)param;
-    switch (playlist_viewer())
+    int val;
+
+    push_current_activity(ACTIVITY_PLAYLISTVIEWER);
+    val = playlist_viewer();
+    pop_current_activity();
+    switch (val)
     {
         case PLAYLIST_VIEWER_MAINMENU:
         case PLAYLIST_VIEWER_USB:

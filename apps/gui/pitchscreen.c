@@ -746,6 +746,8 @@ int gui_syncpitchscreen_run(void)
     struct viewport pitch_viewports[NB_SCREENS][PITCH_ITEM_COUNT];
     int max_lines[NB_SCREENS];
 
+    push_current_activity(ACTIVITY_PITCHSCREEN);
+
 #if CONFIG_CODEC == SWCODEC
     int32_t new_speed = 0, new_stretch;
 
@@ -1060,5 +1062,6 @@ int gui_syncpitchscreen_run(void)
 #if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(false);
 #endif
+    pop_current_activity();
     return 0;
 }
