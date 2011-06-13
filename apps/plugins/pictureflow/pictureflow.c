@@ -1330,8 +1330,7 @@ bool create_pf_thread(void)
                            sizeof(thread_stack),
                             0,
                            "Picture load thread"
-                               IF_PRIO(, MAX(PRIORITY_USER_INTERFACE / 2,
-                                       PRIORITY_REALTIME + 1))
+                               IF_PRIO(, PRIORITY_BUFFERING)
                                IF_COP(, CPU)
                                       )
         ) == 0) {
@@ -1928,10 +1927,6 @@ void render_slide(struct slide_data *slide, const int alpha)
                 pixel -= PIXELSTEP_Y;
             }
         }
-        rb->yield(); /* allow audio to play when fast scrolling */
-        bmp = surface(slide->slide_index); /* resync surface due to yield */
-        src = (pix_t*)(sizeof(struct dim) + (char *)bmp);
-        ptr = &src[column * bmp->height];
         p = (bmp->height-DISPLAY_OFFS) * PFREAL_ONE;
         plim = MIN(sh * PFREAL_ONE, p + (LCD_HEIGHT/2) * dy);
         int plim2 = MIN(MIN(sh + REFLECT_HEIGHT, sh * 2) * PFREAL_ONE,
