@@ -9728,19 +9728,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Tiempo en rebobinar"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Tiempo en rebobinar"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12656,5 +12653,19 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Rebobinado al entrar en pausa"
+  </dest>
+  <voice>
+    *: "Rebobinado al entrar en pausa"
   </voice>
 </phrase>
