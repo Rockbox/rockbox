@@ -462,6 +462,12 @@ static int get_format_str(struct display_format *fmt)
 
 static int add_format(const char *buf)
 {
+    if (format_count >= TAGMENU_MAX_FMTS)
+    {
+        logf("too many formats");
+        return -1;
+    }
+
     strp = buf;
     
     if (formats[format_count] == NULL)
