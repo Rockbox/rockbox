@@ -140,10 +140,10 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "Nahrávám..."
+    *: "Otevírám..."
   </dest>
   <voice>
-    *: "Nahrávám"
+    *: "Otevírám"
   </voice>
 </phrase>
 <phrase>
@@ -154,7 +154,7 @@
     *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "Nahrávám... %d%% hotovo (%s)"
+    *: "Otevírám... %d%% hotovo (%s)"
   </dest>
   <voice>
     *: ""
