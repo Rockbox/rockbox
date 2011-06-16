@@ -8974,7 +8974,7 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
     *: "Modo:"
   </dest>
   <voice>
-    *: ""
+    *: "Modo:"
   </voice>
 </phrase>
 <phrase>
