@@ -37,6 +37,9 @@
 #include "power.h"
 #include "pinctrl-imx233.h"
 #include "system-target.h"
+#include "ssp-imx233.h"
+
+#include "usb.h"
 
 int show_logo(void);
 
@@ -60,10 +63,39 @@ void main(void)
 
     button_init_device();
 
-    button_debug_screen();
-    
-    power_off();
+    //button_debug_screen();
 
+    #if 0
+    usb_init();
+    usb_start_monitoring();
+    extern int usb_status;
+    usb_status = USB_INSERTED;
+    usb_status_event(USB_POWERED);
+
+    printf("USB: Connecting");
+
+    while(1)
+    {
+        int button = button_get_w_tmo(HZ/25);
+
+        if(button == SYS_USB_CONNECTED)
+            break; /* Hit */
+        if(button_read_device() & BUTTON_POWER)
+            power_off();
+        yield();
+    }
+
+    printf("USB: Connected");
+    while(1)
+    {
+        int button = button_get_w_tmo(HZ/25);
+
+        if(button_read_device() & BUTTON_POWER)
+            power_off();
+        yield();
+    }
+    #endif
+    
     ret = storage_init();
     if(ret < 0)
         error(EATA, ret, true);

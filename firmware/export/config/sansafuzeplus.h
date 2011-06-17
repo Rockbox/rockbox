@@ -116,7 +116,9 @@
 #define HAVE_FLASH_STORAGE
 
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
-#define CONFIG_STORAGE STORAGE_SD
+#define CONFIG_STORAGE (STORAGE_SD | STORAGE_MMC)
+
+#define NUM_DRIVES 2
 
 /* todo */
 #define BATTERY_CAPACITY_DEFAULT 550    /* default battery capacity */
@@ -169,9 +171,11 @@
 #define HAVE_USBSTACK
 //#define USB_HANDLED_BY_OF
 #define USE_ROCKBOX_USB
+#define HAVE_BOOTLOADER_USB_MODE
 #define USB_VENDOR_ID 0x0781
 #define USB_PRODUCT_ID 0x74e1
 #define HAVE_USB_HID_MOUSE
+//#define HAVE_BOOTLOADER_USB_MODE
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

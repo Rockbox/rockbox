@@ -18,45 +18,59 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
+#include "cpu.h"
+#include "string.h"
+#include "usb.h"
+#include "usb_drv.h"
+#include "usb_core.h"
+#include "usb-target.h"
 #include "system.h"
-#include "sd.h"
-#include "sdmmc.h"
+#include "system-target.h"
 
-int sd_init(void)
+int usb_status = USB_EXTRACTED;
+
+void usb_drv_usb_detect_event()
 {
-    return -1;
+    usb_status_event(USB_INSERTED);
 }
 
-int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
-                     void* buf)
+void usb_attach(void)
 {
-    IF_MD((void) drive);
-    (void) start;
-    (void) count;
-    (void) buf;
-    return -1;
+    usb_drv_attach();
 }
 
-int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
-                     const void* buf)
+void usb_drv_int_enable(bool enable)
 {
-    IF_MD((void) drive);
-    (void) start;
-    (void) count;
-    (void) buf;
-    return -1;
+    imx233_enable_interrupt(INT_SRC_USB_CTRL, enable);
 }
 
-tCardInfo *card_get_info_target(int card_no)
+void INT_USB_CTRL(void)
 {
-    (void)card_no;
-    return NULL;
+    printf("usb int");
+    usb_drv_int();
 }
 
-int sd_num_drives(int first_drive)
+void usb_init_device(void)
 {
-    (void) first_drive;
-    return 0;
+    usb_drv_startup();
 }
 
+int usb_detect(void)
+{
+    return usb_status;
+}
+
+bool usb_plugged(void)
+{
+    return true;
+}
+
+void usb_enable(bool on)
+{
+    if(on)
+        usb_core_init();
+    else
+        usb_core_exit();
+}

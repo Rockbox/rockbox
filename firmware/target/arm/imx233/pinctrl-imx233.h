@@ -106,4 +106,20 @@ static inline void imx233_set_pin_function(unsigned bank, unsigned pin, unsigned
     __REG_SET(HW_PINCTRL_MUXSEL(2 * bank + pin / 16)) = function << (2 * (pin % 16));
 }
 
+static inline void imx233_enable_pin_pullup(unsigned bank, unsigned pin, bool enable)
+{
+    if(enable)
+        __REG_SET(HW_PINCTRL_PULL(bank)) = 1 << pin;
+    else
+        __REG_CLR(HW_PINCTRL_PULL(bank)) = 1 << pin;
+}
+
+static inline void imx233_enable_pin_pullup_mask(unsigned bank, uint32_t pin_msk, bool enable)
+{
+    if(enable)
+        __REG_SET(HW_PINCTRL_PULL(bank)) = pin_msk;
+    else
+        __REG_CLR(HW_PINCTRL_PULL(bank)) = pin_msk;
+}
+
 #endif /* __PINCTRL_IMX233_H__ */

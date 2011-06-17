@@ -27,6 +27,8 @@
 #include "clkctrl-imx233.h"
 #include "pinctrl-imx233.h"
 #include "timrot-imx233.h"
+#include "dma-imx233.h"
+#include "ssp-imx233.h"
 #include "lcd.h"
 #include "backlight-target.h"
 
@@ -44,6 +46,10 @@ default_interrupt(INT_TIMER2);
 default_interrupt(INT_TIMER3);
 default_interrupt(INT_LCDIF_DMA);
 default_interrupt(INT_LCDIF_ERROR);
+default_interrupt(INT_SSP1_DMA);
+default_interrupt(INT_SSP1_ERROR);
+default_interrupt(INT_SSP2_DMA);
+default_interrupt(INT_SSP2_ERROR);
 
 typedef void (*isr_t)(void);
 
@@ -56,6 +62,10 @@ static isr_t isr_table[INT_SRC_NR_SOURCES] =
     [INT_SRC_TIMER(3)] = INT_TIMER3,
     [INT_SRC_LCDIF_DMA] = INT_LCDIF_DMA,
     [INT_SRC_LCDIF_ERROR] = INT_LCDIF_ERROR,
+    [INT_SRC_SSP1_DMA] = INT_SSP1_DMA,
+    [INT_SRC_SSP1_ERROR] = INT_SSP1_ERROR,
+    [INT_SRC_SSP2_DMA] = INT_SSP2_DMA,
+    [INT_SRC_SSP2_ERROR] = INT_SSP2_ERROR
 };
 
 static void UIRQ(void)
@@ -128,6 +138,8 @@ void system_init(void)
 
     imx233_pinctrl_init();
     imx233_timrot_init();
+    imx233_dma_init();
+    imx233_ssp_init();
 }
 
 void power_off(void)

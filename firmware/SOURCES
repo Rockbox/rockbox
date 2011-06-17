@@ -493,6 +493,10 @@ target/arm/imx233/timrot-imx233.c
 target/arm/imx233/kernel-imx233.c
 target/arm/imx233/kernel-imx233.c
 target/arm/imx233/sd-imx233.c
+target/arm/imx233/mmc-imx233.c
+target/arm/imx233/ssp-imx233.c
+target/arm/imx233/usb-imx233.c
+target/arm/imx233/dma-imx233.c
 #endif /* IMX233 */
 
 #if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2
