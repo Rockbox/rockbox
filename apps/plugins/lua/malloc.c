@@ -2823,16 +2823,10 @@ static struct mallinfo internal_mallinfo(mstate m) {
 
 static void internal_malloc_stats(mstate m) {
   if (!PREACTION(m)) {
-    size_t maxfp = 0;
-    size_t fp = 0;
-    size_t used = 0;
     check_malloc_state(m);
     if (is_initialized(m)) {
       msegmentptr s = &m->seg;
-      maxfp = m->max_footprint;
-      fp = m->footprint;
-      used = fp - (m->topsize + TOP_FOOT_SIZE);
-
+      size_t used = m->footprint - (m->topsize + TOP_FOOT_SIZE);
       while (s != 0) {
         mchunkptr q = align_as_chunk(s->base);
         while (segment_holds(s, q) &&
@@ -2843,11 +2837,12 @@ static void internal_malloc_stats(mstate m) {
         }
         s = s->next;
       }
+      DEBUGF("max system bytes = %10zu\n", m->max_footprint);
+      DEBUGF("system bytes     = %10zu\n", m->footprint);
+      DEBUGF("in use bytes     = %10zu\n", used);
+    } else {
+      DEBUGF("malloc not initialized\n");
     }
-
-    DEBUGF("max system bytes = %10lu\n", (unsigned long)(maxfp));
-    DEBUGF("system bytes     = %10lu\n", (unsigned long)(fp));
-    DEBUGF("in use bytes     = %10lu\n", (unsigned long)(used));
 
     POSTACTION(m);
   }

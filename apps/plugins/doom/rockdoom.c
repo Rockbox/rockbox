@@ -114,12 +114,11 @@ int printf(const char *fmt, ...)
 {
    static int p_xtpt;
    char p_buf[50];
-   bool ok;
    rb->yield();
    va_list ap;
 
    va_start(ap, fmt);
-   ok = vsnprintf(p_buf,sizeof(p_buf), fmt, ap);
+   vsnprintf(p_buf,sizeof(p_buf), fmt, ap);
    va_end(ap);
 
    rb->lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
