@@ -219,19 +219,19 @@ void pcm_postinit(void)
 static struct dma_lock dma_play_lock =
 {
     .locked = 0,
-    .state = (0 << 14)  /* bit 14 is DMA0 */
+    .state = (1 << 14)  /* bit 14 is DMA0 */
 };
 
 void pcm_play_lock(void)
 {
     if (++dma_play_lock.locked == 1)
-        or_l((1 << 14), &IMR);
+        coldfire_imr_mod(1 << 14, 1 << 14);
 }
 
 void pcm_play_unlock(void)
 {
     if (--dma_play_lock.locked == 0)
-        and_l(~dma_play_lock.state, &IMR);
+        coldfire_imr_mod(dma_play_lock.state, 1 << 14);
 }
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
@@ -248,7 +248,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_SINC |
            DMA_SSIZE(DMA_SIZE_LINE) | DMA_START;
 
-    dma_play_lock.state = (1 << 14);
+    dma_play_lock.state = (0 << 14);
 } /* pcm_play_dma_start */
 
 /* Stops the DMA transfer and interrupt */
@@ -260,7 +260,7 @@ void pcm_play_dma_stop(void)
 
     iis_play_reset_if_playback(true);
 
-    dma_play_lock.state = (0 << 14);
+    dma_play_lock.state = (1 << 14);
 } /* pcm_play_dma_stop */
 
 void pcm_play_dma_pause(bool pause)
@@ -271,14 +271,14 @@ void pcm_play_dma_pause(bool pause)
         and_l(~(DMA_EEXT | DMA_INT), &DCR0); /* per request and int OFF */
         DSR0 = 1;                            /* stop channel */
         iis_play_reset_if_playback(true);
-        dma_play_lock.state = (0 << 14);
+        dma_play_lock.state = (1 << 14);
     }
     else
     {
         /* restart playback on current buffer */
         iis_play_reset_if_playback(true);
         or_l(DMA_INT | DMA_EEXT | DMA_START, &DCR0); /* everything ON */
-        dma_play_lock.state = (1 << 14);
+        dma_play_lock.state = (0 << 14);
     }
 } /* pcm_play_dma_pause */
 
@@ -344,7 +344,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 static struct dma_lock dma_rec_lock =
 {
     .locked = 0,
-    .state = (0 << 15)  /* bit 15 is DMA1 */
+    .state = (1 << 15)  /* bit 15 is DMA1 */
 };
 
 /* For the locks, DMA interrupt must be disabled when manipulating the lock
@@ -353,13 +353,13 @@ static struct dma_lock dma_rec_lock =
 void pcm_rec_lock(void)
 {
     if (++dma_rec_lock.locked == 1)
-        or_l((1 << 15), &IMR);
+        coldfire_imr_mod(1 << 15, 1 << 15);
 }
 
 void pcm_rec_unlock(void)
 {
     if (--dma_rec_lock.locked == 0)
-        and_l(~dma_rec_lock.state, &IMR);
+        coldfire_imr_mod(dma_rec_lock.state, 1 << 15);
 }
 
 void pcm_rec_dma_start(void *addr, size_t size)
@@ -382,7 +382,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_DINC |
            DMA_DSIZE(DMA_SIZE_LINE) | DMA_START;
 
-    dma_rec_lock.state = (1 << 15);
+    dma_rec_lock.state = (0 << 15);
 } /* pcm_rec_dma_start */
 
 void pcm_rec_dma_stop(void)
@@ -395,7 +395,7 @@ void pcm_rec_dma_stop(void)
 
     iis_play_reset_if_playback(false);
 
-    dma_rec_lock.state = (0 << 15);
+    dma_rec_lock.state = (1 << 15);
 } /* pcm_rec_dma_stop */
 
 void pcm_rec_dma_init(void)

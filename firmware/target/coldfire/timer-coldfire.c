@@ -89,7 +89,7 @@ bool timer_set(long cycles, bool start)
 bool timer_start(void)
 {
     ICR2 = 0x90;       /* interrupt on level 4.0 */
-    and_l(~(1<<10), &IMR);
+    coldfire_imr_mod(0, 1 << 10);
     TMR1 |= 1;         /* start timer */
     return true;
 }
@@ -97,7 +97,7 @@ bool timer_start(void)
 void timer_stop(void)
 {
     TMR1 = 0;               /* disable timer 1 */
-    or_l((1<<10), &IMR);    /* disable interrupt */
+    coldfire_imr_mod(1 << 10, 1 << 10); /* disable interrupt */
 }
 
 void timers_adjust_prescale(int multiplier, bool enable_irq)

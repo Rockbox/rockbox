@@ -201,6 +201,11 @@ static inline uint32_t swap_odd_even32_hw(uint32_t value)
 #define DEFAULT_PLLCR_AUDIO_BITS 0x10400000
 void coldfire_set_pllcr_audio_bits(long bits);
 
+/* Safely modify the interrupt mask register as the core interrupt level is
+   required to be at least as high as the level interrupt being
+   masked/unmasked */
+void coldfire_imr_mod(unsigned long bits, unsigned long mask);
+
 /* Set DATAINCONTROL without disturbing FIFO reset state */
 void coldfire_set_dataincontrol(unsigned long value);
 

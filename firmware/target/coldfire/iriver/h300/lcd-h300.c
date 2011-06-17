@@ -266,7 +266,7 @@ void lcd_init_device(void)
     DSR3 = 1;
     DIVR3 = 57;        /* DMA3 is mapped into vector 57 in system.c */
     ICR9 = (6 << 2);   /* Enable DMA3 interrupt at level 6, priority 0 */
-    and_l(~(1<<17), &IMR);
+    coldfire_imr_mod(0, 1 << 17);
 
     mutex_init(&lcd_mtx);
     _display_on();

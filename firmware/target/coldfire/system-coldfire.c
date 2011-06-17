@@ -268,7 +268,7 @@ void system_init(void)
        will do. */
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
     
-    IMR = 0x3ffff;
+    coldfire_imr_mod(0x3ffff, 0x3ffff);
     INTPRI1 = 0;
     INTPRI2 = 0;
     INTPRI3 = 0;
@@ -363,6 +363,16 @@ int system_memory_guard(int newmode)
 void coldfire_set_pllcr_audio_bits(long bits)
 {
     PLLCR = (PLLCR & ~0x70400000) | (bits & 0x70400000);
+}
+
+/* Safely modify the interrupt mask register as the core interrupt level is
+   required to be at least as high as the level interrupt being
+   masked/unmasked */
+void coldfire_imr_mod(unsigned long bits, unsigned long mask)
+{
+    unsigned long oldlevel = set_irq_level(DISABLE_INTERRUPTS);
+    IMR = (IMR & ~mask) | (bits & mask);
+    restore_irq(oldlevel);
 }
 
 /* Set DATAINCONTROL without disturbing FIFO reset state */

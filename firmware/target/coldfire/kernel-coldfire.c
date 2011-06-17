@@ -51,7 +51,7 @@ void tick_start(unsigned int interval_in_ms)
     TER0 = 0xff; /* Clear all events */
 
     ICR1 = 0x8c; /* Interrupt on level 3.0 */
-    IMR &= ~0x200;
+    coldfire_imr_mod(0x000, 0x200);
 }
 
 void TIMER0(void) __attribute__ ((interrupt_handler));
