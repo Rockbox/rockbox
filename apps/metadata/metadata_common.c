@@ -29,7 +29,6 @@
 #include "metadata_common.h"
 #include "metadata_parsers.h"
 #include "replaygain.h"
-#include "misc.h"
 
 /* Read a string from the file. Read up to size bytes, or, if eos != -1, 
  * until the eos character is found (eos is not stored in buf, unless it is
@@ -202,7 +201,10 @@ uint32_t get_itunes_int32(char* value, int count)
     
     while (count-- > 0)
     {
-        value = skip_whitespace(value);
+        while (isspace(*value))
+        {
+            value++;
+        }
         
         while (*value && !isspace(*value))
         {
@@ -210,7 +212,10 @@ uint32_t get_itunes_int32(char* value, int count)
         }
     }
     
-    value = skip_whitespace(value);
+    while (isspace(*value))
+    {
+        value++;
+    }
     
     while (*value && ((c = strchr(hexdigits, toupper(*value))) != NULL))
     {
