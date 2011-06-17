@@ -1045,7 +1045,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Editační mód: %s"
+    swcodec: "Režim: %s"
   </dest>
   <voice>
     *: none
@@ -1686,11 +1686,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Mód zeslabení"
+    crossfade: "Režim zeslabení"
   </dest>
   <voice>
     *: none
-    crossfade: "Mód zeslabení"
+    crossfade: "Režim zeslabení"
   </voice>
 </phrase>
 <phrase>
@@ -2669,11 +2669,11 @@
   </source>
   <dest>
     *: none
-    lcd_invert,remote_lcd_invert: "Mód displeje"
+    lcd_invert,remote_lcd_invert: "Režim displeje"
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "Mód dyspleje"
+    lcd_invert,remote_lcd_invert: "Režim dyspleje"
   </voice>
 </phrase>
 <phrase>
@@ -7886,10 +7886,10 @@
     *: "Mode:"
   </source>
   <dest>
-    *: "Mód:"
+    *: "Režim:"
   </dest>
   <voice>
-    *: "Mód:"
+    *: "V režimu"
   </voice>
 </phrase>
 <phrase>
@@ -9689,7 +9689,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Editační mód: %s %s"
+    swcodec: "Režim: %s %s"
   </dest>
   <voice>
     *: none
@@ -9740,7 +9740,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mód:"
+    lcd_bitmap: "Režim:"
   </dest>
   <voice>
     *: none
@@ -11425,11 +11425,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Režim USB klávesnice"
+    usb_hid: "Mód USB klávesnice"
   </dest>
   <voice>
     *: none
-    usb_hid: "Režim ÚESBÉ klávesnice"
+    usb_hid: "Mód ÚESBÉ klávesnice"
   </voice>
 </phrase>
 <phrase>
