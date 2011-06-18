@@ -72,6 +72,7 @@ enum codec_status codec_run(void)
     unsigned char c = 0;
     void *ret;
     intptr_t param;
+    bool empty_first_frame = false;
 
     /* Clean and initialize decoder structures */
     memset(&demux_res , 0, sizeof(demux_res));
@@ -213,10 +214,24 @@ enum codec_status codec_run(void)
         /* Output the audio */
         ci->yield();
         
+        if (empty_first_frame)
+        {
+            /* Remove the first frame from lead_trim, under the assumption
+             * that it had the same size as this frame
+             */
+            empty_first_frame = false;
+            lead_trim -= (frame_info.samples >> 1);
+
+            if (lead_trim < 0)
+            {
+                lead_trim = 0;
+            }
+        }
+
         /* Gather number of samples for the decoded frame. */
         framelength = (frame_info.samples >> 1) - lead_trim;
         
-        if (i == demux_res.num_sample_byte_sizes - 1 && framelength > 0)
+        if (i == demux_res.num_sample_byte_sizes - 1)
         {
             framelength -= ci->id3->tail_trim;
         }
@@ -226,15 +241,21 @@ enum codec_status codec_run(void)
             ci->pcmbuf_insert(&decoder->time_out[0][lead_trim],
                               &decoder->time_out[1][lead_trim],
                               framelength);
-        } 
-        
+        }
+
         if (lead_trim > 0)
         {
-            /* frame_info.samples can be 0 for the first frame */
-            lead_trim -= (i > 0 || frame_info.samples)
-                ? (frame_info.samples >> 1) : (uint32_t)framelength;
+            /* frame_info.samples can be 0 for frame 0. We still want to
+             * remove it from lead_trim, so do that during frame 1.
+             */
+            if (0 == i && 0 == frame_info.samples)
+            {
+                empty_first_frame = true;
+            }
 
-            if (lead_trim < 0 || ci->id3->lead_trim == 0)
+            lead_trim -= (frame_info.samples >> 1);
+
+            if (lead_trim < 0)
             {
                 lead_trim = 0;
             }
