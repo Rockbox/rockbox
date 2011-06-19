@@ -64,17 +64,23 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     [AFMT_UNKNOWN] =
         AFMT_ENTRY("???", NULL,    NULL,        NULL, NULL  ),
 
-    /* MPEG Audio layer 1 */
-    [AFMT_MPA_L1] =
-        AFMT_ENTRY("MP1",   "mpa",  NULL,       get_mp3_metadata,   "mp1\0"),
     /* MPEG Audio layer 2 */
     [AFMT_MPA_L2] =
         AFMT_ENTRY("MP2",   "mpa",  NULL,       get_mp3_metadata,   "mpa\0mp2\0"),
-    /* MPEG Audio layer 3 */
+
+#if CONFIG_CODEC != SWCODEC
+    /* MPEG Audio layer 3 on HWCODEC: .talk clips, no encoder  */
+    [AFMT_MPA_L3] =
+        AFMT_ENTRY("MP3",   "mpa",  NULL,       get_mp3_metadata,   "mp3\0talk\0"),
+
+#else /* CONFIG_CODEC == SWCODEC */
+    /* MPEG Audio layer 3 on SWCODEC */
     [AFMT_MPA_L3] =
         AFMT_ENTRY("MP3",   "mpa",  "mp3_enc",  get_mp3_metadata,   "mp3\0"),
 
-#if CONFIG_CODEC == SWCODEC
+    /* MPEG Audio layer 1 */
+    [AFMT_MPA_L1] =
+        AFMT_ENTRY("MP1",   "mpa",  NULL,       get_mp3_metadata,   "mp1\0"),
     /* Audio Interchange File Format */
     [AFMT_AIFF] =
         AFMT_ENTRY("AIFF",  "aiff", "aiff_enc", get_aiff_metadata,  "aiff\0aif\0"),
