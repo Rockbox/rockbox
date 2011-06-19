@@ -206,7 +206,6 @@ static struct master_header current_tcmh;
 #ifdef HAVE_TC_RAMCACHE
 /* Header is created when loading database to ram. */
 struct ramcache_header {
-    struct master_header h;      /* Header from the master index */
     struct index_entry *indices; /* Master index file content */
     char *tags[TAG_COUNT];       /* Tag file content (not including filename tag) */
     int entry_count[TAG_COUNT];  /* Number of entries in the indices. */
@@ -214,6 +213,7 @@ struct ramcache_header {
 
 # ifdef HAVE_EEPROM_SETTINGS
 struct statefile_header {
+    struct master_header mh;      /* Header from the master index */
     struct ramcache_header *hdr;
     struct tagcache_stat tc_stat;
 };
@@ -409,7 +409,7 @@ static long find_entry_ram(const char *filename,
     else
         i = 0;
     
-    for (; i < hdr->h.tch.entry_count; i++)
+    for (; i < current_tcmh.tch.entry_count; i++)
     {
         if (hdr->indices[i].tag_seek[tag_filename] == (long)dc)
         {
@@ -1119,7 +1119,7 @@ static bool build_lookup_list(struct tagcache_search *tcs)
 # endif
         )
     {
-        for (i = tcs->seek_pos; i < hdr->h.tch.entry_count; i++)
+        for (i = tcs->seek_pos; i < current_tcmh.tch.entry_count; i++)
         {
             struct tagcache_seeklist_entry *seeklist;
             struct index_entry *idx = &hdr->indices[i];
@@ -1595,15 +1595,6 @@ static bool update_master_header(void)
     lseek(fd, 0, SEEK_SET);
     ecwrite(fd, &myhdr, 1, master_header_ec, tc_stat.econ);
     close(fd);
-    
-#ifdef HAVE_TC_RAMCACHE
-    if (hdr)
-    {
-        hdr->h.serial = current_tcmh.serial;
-        hdr->h.commitid = current_tcmh.commitid;
-        hdr->h.dirty = current_tcmh.dirty;
-    }
-#endif
     
     return true;
 }
@@ -3362,6 +3353,7 @@ static bool read_tag(char *dest, long size,
             
             src++;
         }
+        
         dest[pos] = '\0';
 
         if (!strcasecmp(tagstr, current_tag))
@@ -3813,7 +3805,7 @@ static bool allocate_tagcache(void)
         sizeof(struct ramcache_header) + TAG_COUNT*sizeof(void *);
     hdr = buffer_alloc(tc_stat.ramcache_allocated + 128);
     memset(hdr, 0, sizeof(struct ramcache_header));
-    memcpy(&hdr->h, &tcmh, sizeof(struct master_header));
+    memcpy(&current_tcmh, &tcmh, sizeof current_tcmh);
     hdr->indices = (struct index_entry *)(hdr + 1);
     logf("tagcache: %d bytes allocated.", tc_stat.ramcache_allocated);
 
@@ -3839,7 +3831,7 @@ static bool tagcache_dumpload(void)
     hdr = buffer_alloc(0);
     rc = read(fd, &shdr, sizeof(struct statefile_header));
     if (rc != sizeof(struct statefile_header)
-        /* || (long)hdr != (long)shdr.hdr */)
+        || shdr.mh.tch.magic != TAGCACHE_MAGIC)
     {
         logf("incorrect statefile");
         hdr = NULL;
@@ -3868,6 +3860,9 @@ static bool tagcache_dumpload(void)
     for (i = 0; i < TAG_COUNT; i++)
         hdr->tags[i] += offpos;
     
+    /* Load the tagcache master header (should match the actual DB file header). */
+    memcpy(&current_tcmh, &shdr.mh, sizeof current_tcmh);
+    
     return true;
 }
 
@@ -3888,8 +3883,9 @@ static bool tagcache_dumpsave(void)
     
     /* Create the header */
     shdr.hdr = hdr;
-    memcpy(&shdr.tc_stat, &tc_stat, sizeof(struct tagcache_stat));
-    write(fd, &shdr, sizeof(struct statefile_header));
+    memcpy(&shdr.mh, &current_tcmh, sizeof current_tcmh);
+    memcpy(&shdr.tc_stat, &tc_stat, sizeof tc_stat);
+    write(fd, &shdr, sizeof shdr);
     
     /* And dump the data too */
     write(fd, hdr, tc_stat.ramcache_allocated);
@@ -3902,6 +3898,7 @@ static bool tagcache_dumpsave(void)
 static bool load_tagcache(void)
 {
     struct tagcache_header *tch;
+    struct master_header tcmh;
     long bytesleft = tc_stat.ramcache_allocated;
     struct index_entry *idx;
     int rc, fd;
@@ -3924,18 +3921,21 @@ static bool load_tagcache(void)
         return false;
     }
     
-    if (ecread(fd, &hdr->h, 1, master_header_ec, tc_stat.econ)
+    if (ecread(fd, &tcmh, 1, master_header_ec, tc_stat.econ)
         != sizeof(struct master_header)
-        || hdr->h.tch.magic != TAGCACHE_MAGIC)
+        || tcmh.tch.magic != TAGCACHE_MAGIC)
     {
         logf("incorrect header");
         return false;
     }
 
+    /* Master header copy should already match, this can be redundant to do. */
+    memcpy(&current_tcmh, &tcmh, sizeof current_tcmh);
+    
     idx = hdr->indices;
 
     /* Load the master index table. */
-    for (i = 0; i < hdr->h.tch.entry_count; i++)
+    for (i = 0; i < tcmh.tch.entry_count; i++)
     {
         rc = ecread_index_entry(fd, idx);
         if (rc != sizeof(struct index_entry))
@@ -4476,7 +4476,7 @@ void tagcache_build(const char *path)
     if (hdr)
     {
         /* Import runtime statistics if we just initialized the db. */
-        if (hdr->h.serial == 0)
+        if (current_tcmh.serial == 0)
             queue_post(&tagcache_queue, Q_IMPORT_CHANGELOG, 0);
     }
 #endif
@@ -4664,7 +4664,7 @@ static int get_progress(void)
 #ifdef HAVE_TC_RAMCACHE
     {
         if (hdr && tc_stat.ramcache)
-            total_count = hdr->h.tch.entry_count;
+            total_count = current_tcmh.tch.entry_count;
     }
 #endif
 
