@@ -123,6 +123,10 @@ void check_battery(void)
     }
 }
 
+#if defined(IAUDIO_M5) || defined(IAUDIO_X5)
+int initial_gpio_read;
+#endif
+
 void main(void)
 {
     int i;
@@ -144,17 +148,13 @@ void main(void)
     if ((GPIO_READ & 0x80000000) == 0)
         rc_on_button = true;
 #elif defined(IAUDIO_M5) || defined(IAUDIO_X5)
-    int data;
-
     or_l(0x0e000000, &GPIO_FUNCTION); /* main Hold & Power, remote Play */
     and_l(~0x0e000000, &GPIO_ENABLE);
-    
-    data = GPIO_READ;
-    
-    if ((data & 0x04000000) == 0)
+
+    if ((initial_gpio_read & 0x04000000) == 0)
         on_button = true;
-        
-    if ((data & 0x02000000) == 0)
+
+    if ((initial_gpio_read & 0x02000000) == 0)
         rc_on_button = true;
 #endif
 

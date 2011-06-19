@@ -162,7 +162,7 @@ void BootloaderInstallHex::installStage2(void)
 
     // iriver decode already done in stage 1
     int result;
-    if((result = mkboot(descrambledName.toLocal8Bit().constData(),
+    if((result = mkboot_iriver(descrambledName.toLocal8Bit().constData(),
                     tempfileName.toLocal8Bit().constData(),
                     tempbinName.toLocal8Bit().constData(), origin)) < 0)
     {

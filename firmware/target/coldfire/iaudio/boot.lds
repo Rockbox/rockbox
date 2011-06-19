@@ -14,8 +14,12 @@ STARTUP(target/coldfire/crt0.o)
 #define IRAMSIZE 0x18000
 #endif
 #define DRAMORIG 0x31000000
+#ifdef HAVE_DUALBOOT
+#define FLASHORIG 0x00150000
+#else
 #define FLASHORIG 0x00010000
-#define FLASHSIZE 4M
+#endif
+#define FLASHSIZE 4M - FLASHORIG
 
 MEMORY
 {

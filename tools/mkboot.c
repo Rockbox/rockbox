@@ -26,42 +26,46 @@
 #ifndef RBUTIL
 static void usage(void)
 {
-    printf("usage: mkboot [-h300] <firmware file> <boot file> <output file>\n");
+    printf("usage: mkboot <target> <firmware file> <boot file> <output file>\n");
+    printf("available targets:\n"
+           "\t-h100     Iriver H1x0\n"
+           "\t-h300     Iriver H3x0\n"
+           "\t-iax5     iAudio X5\n"
+           "\t-iam5     iAudio M5\n");
 
     exit(1);
 }
 #endif
 
-static unsigned char image[0x400000 + 0x220 + 0x400000/0x200];
-
 #ifndef RBUTIL
 int main(int argc, char *argv[])
 {
-    char *infile, *bootfile, *outfile;
-    int origin = 0x1f0000;   /* H1x0 bootloader address */
-
-    if(argc < 3) {
-        usage();
-    }
-
-    if(!strcmp(argv[1], "-h300")) {
-        infile = argv[2];
-        bootfile = argv[3];
-        outfile = argv[4];
-
-        origin = 0x3f0000;   /* H3x0 bootloader address */
-    }
-    else
+    if(argc != 5)
     {
-        infile = argv[1];
-        bootfile = argv[2];
-        outfile = argv[3];
+        usage();
+        return 1;
     }
-    return mkboot(infile, bootfile, outfile, origin);
+
+    if ( ! strcmp(argv[1], "-h100"))
+        return mkboot_iriver(argv[2], argv[3], argv[4], 0x1f0000);
+    
+    if ( ! strcmp(argv[1], "-h300"))
+        return mkboot_iriver(argv[2], argv[3], argv[4], 0x3f0000);
+    
+    if ( ! strcmp(argv[1], "-iax5"))
+        return mkboot_iaudio(argv[2], argv[3], argv[4], 0);
+        
+    if ( ! strcmp(argv[1], "-iam5"))
+        return mkboot_iaudio(argv[2], argv[3], argv[4], 1);
+
+    usage();
+    return 1;
 }
 #endif
 
-int mkboot(const char* infile, const char* bootfile, const char* outfile, int origin)
+static unsigned char image[0x400000 + 0x220 + 0x400000/0x200];
+
+int mkboot_iriver(const char* infile, const char* bootfile, const char* outfile, int origin)
 {
     FILE *f;
     int i;
@@ -185,5 +189,131 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, int or
     
     fclose(f);
     
+    return 0;
+}
+
+/* iAudio firmware update file header size */
+#define HEADER_SIZE 0x1030
+/* Address of flash contents that get overwritten by a firmware update.
+ * Contents before this address contain the preloader and are not affected
+ * by a firmware update.
+ * -> Firmware update file contents starting at offset HEADER_SIZE end up
+ * in flash at address FLASH_START
+ */
+#define FLASH_START        0x00010000
+/* Start of unused space in original firmware (flash address, not file
+ * offset!) where we patch in the Rockbox loader */
+#define ROCKBOX_BOOTLOADER 0x00150000
+/* End of unused space in original firmware */
+#define BOOTLOADER_LIMIT   0x00170000 
+
+/* Patch the Rockbox bootloader into free space in the original firmware
+ * (starting at 0x150000). The preloader starts execution of the OF at
+ * 0x10000 which normally contains a jsr 0x10010. We also patch this to
+ * do a jsr 0x150000 to the Rockbox dual boot loader instead. If it then
+ * decides to start the OF instead of Rockbox, it simply does a jmp
+ * 0x10010 instead of loading Rockbox from disk.
+ */
+int mkboot_iaudio(const char* infile, const char* bootfile, const char* outfile, int model_nr)
+{
+    size_t flength, blength;
+    unsigned char *bbuf, *fbuf, *p;
+    const unsigned char fsig[] = {
+        0x4e, 0xb9, 0x00, 0x01, 0x00, 0x10 };               /* jsr 0x10010 */
+    unsigned char bsig[2][8] = {
+        /* dualboot signatures */
+        { 0x60, 0x06, 0x44, 0x42, 0x69, 0x61, 0x78, 0x35 }, /* X5 */
+        { 0x60, 0x06, 0x44, 0x42, 0x69, 0x61, 0x6d, 0x35 }, /* M5 */ };
+    FILE *ffile, *bfile, *ofile;
+    unsigned char sum = 0;
+    int i;
+
+    /* read input files */
+    if ((bfile = fopen(bootfile, "rb")) == NULL) {
+        perror("Cannot open Rockbox bootloader file.\n");
+        return 1;
+    }
+
+    fseek(bfile, 0, SEEK_END);
+    blength = ftell(bfile);
+    fseek(bfile, 0, SEEK_SET);
+
+    if (blength + ROCKBOX_BOOTLOADER >= BOOTLOADER_LIMIT) {
+        fprintf(stderr, "Rockbox bootloader is too big.\n");
+        return 1;
+    }
+ 
+    if ((ffile = fopen(infile, "rb")) == NULL) {
+        perror("Cannot open original firmware file.");
+        return 1;
+    }
+  
+    fseek(ffile, 0, SEEK_END);
+    flength = ftell(ffile);
+    fseek(ffile, 0, SEEK_SET);
+
+    bbuf = malloc(blength);
+    fbuf = malloc(flength);
+
+    if (!bbuf || !fbuf) {
+        fprintf(stderr, "Out of memory.\n");
+        return 1;
+    }
+
+    if (   fread(bbuf, 1, blength, bfile) < blength
+        || fread(fbuf, 1, flength, ffile) < flength) {
+        fprintf(stderr, "Read error.\n");
+        return 1;
+    }
+    fclose(bfile);
+    fclose(ffile);
+
+    /* verify format of input files */
+    if (blength < 0x10 || memcmp(bbuf, bsig[model_nr], sizeof(bsig[0]))) {
+        fprintf(stderr, "Rockbox bootloader format error (is it bootloader.bin?).\n");
+        return 1;
+    }
+    if (flength < HEADER_SIZE-FLASH_START+BOOTLOADER_LIMIT
+        || memcmp(fbuf+HEADER_SIZE, fsig, sizeof(fsig))) {
+        fprintf(stderr, "Original firmware format error.\n");
+        return 1;
+    }
+
+    /* verify firmware is not overrun */
+    for (i = ROCKBOX_BOOTLOADER; i < BOOTLOADER_LIMIT; i++) {
+        if (fbuf[HEADER_SIZE-FLASH_START+i] != 0xff) {
+            fprintf(stderr, "Original firmware has grown too much.\n");
+            return 1;
+        }
+    }
+
+    /* change jsr 0x10010 to jsr DUAL_BOOTLOADER */
+    p = fbuf + HEADER_SIZE + 2;
+    *p++ = (ROCKBOX_BOOTLOADER >> 24) & 0xff;
+    *p++ = (ROCKBOX_BOOTLOADER >> 16) & 0xff;
+    *p++ = (ROCKBOX_BOOTLOADER >>  8) & 0xff;
+    *p++ = (ROCKBOX_BOOTLOADER      ) & 0xff;
+
+    p = fbuf + HEADER_SIZE + ROCKBOX_BOOTLOADER - FLASH_START;
+    memcpy(p, bbuf, blength);
+
+    /* recalc checksum */
+    for (i = HEADER_SIZE; (size_t)i < flength; i++)
+        sum += fbuf[i];
+    fbuf[0x102b] = sum;
+
+    /* write output */
+    if ((ofile = fopen(outfile, "wb")) == NULL) {
+        perror("Cannot open output file");
+        return 1;
+    }
+    if (fwrite(fbuf, 1, flength, ofile) < flength) {
+        fprintf(stderr, "Write error.\n");
+        return 1;
+    }
+    fclose(ofile);
+    free(bbuf);
+    free(fbuf);
+
     return 0;
 }

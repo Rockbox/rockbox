@@ -26,7 +26,8 @@
 extern "C" {
 #endif
 
-int mkboot(const char* infile, const char* bootfile, const char* outfile, int origin);
+int mkboot_iriver(const char* infile, const char* bootfile, const char* outfile, int origin);
+int mkboot_iaudio(const char* infile, const char* bootfile, const char* outfile, int model_nr);
 
 #ifdef __cplusplus
 }

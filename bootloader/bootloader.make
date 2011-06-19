@@ -10,6 +10,7 @@
 INCLUDES += -I$(APPSDIR)
 SRC += $(call preprocess, $(APPSDIR)/SOURCES)
 
+CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
 BOOTLDS := $(FIRMDIR)/target/$(CPU)/$(MANUFACTURER)/boot.lds
 BOOTLINK := $(BUILDDIR)/boot.link
 
@@ -17,7 +18,7 @@ CLEANOBJS += $(BUILDDIR)/bootloader.*
 
 .SECONDEXPANSION:
 
-$(BOOTLINK): $(BOOTLDS)
+$(BOOTLINK): $(BOOTLDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
