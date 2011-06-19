@@ -17,6 +17,7 @@ buildmanual: rockbox-build.tex pdf
 buildhtml: rockbox-build.tex
 	@mkdir -p $(OBJDIR)/html
 	@$(HTLATEX) $(DOCUMENT) "$(HTOPTS1),$(SPLITHTML)" $(HTOPTS2) $(HTOPTS3)
+	@cp --parent `cat $(OBJDIR)/html/*.html | sed -e '/\.js/!d;s/.*\"\(.*\.js\)\".*/\1/g;/</d' | uniq` $(OBJDIR)/html
 	@cp --parent `cat $(OBJDIR)/html/*.html | sed -e '/[pj][np]g/!d;s/.*\"\(.*\.[pj][np]g\)\".*/\1/g;/</d'` $(OBJDIR)/html
 	@cp -r $(OBJDIR)/html $(OBJDIR)/../
 
