@@ -7,6 +7,7 @@ HTOPTS1 := rockbox-html,charset=utf-8,early_
 HTOPTS2 := " -utf8 -cmozhtf"
 HTOPTS3 := "-dhtml/ -cvalidate"
 VERSION=`$(TOOLSDIR)/version.sh $(ROOTDIR)`
+SPLITHTML ?= 2
 
 .PHONY: all cleaner buildmanual output
 
@@ -15,14 +16,10 @@ buildmanual: rockbox-build.tex pdf
 
 buildhtml: rockbox-build.tex
 	@mkdir -p $(OBJDIR)/html
-	@(if [ $(SPLITHTML) ]; then \
-	$(HTLATEX) $(DOCUMENT) "$(HTOPTS1),$(SPLITHTML)" $(HTOPTS2) $(HTOPTS3); \
-	else \
-	$(HTLATEX) $(DOCUMENT) "$(HTOPTS1),2" $(HTOPTS2) $(HTOPTS3); \
-	fi)
-
+	@$(HTLATEX) $(DOCUMENT) "$(HTOPTS1),$(SPLITHTML)" $(HTOPTS2) $(HTOPTS3)
 	@cp --parent `cat $(OBJDIR)/html/*.html | sed -e '/[pj][np]g/!d;s/.*\"\(.*\.[pj][np]g\)\".*/\1/g;/</d'` $(OBJDIR)/html
 	@cp -r $(OBJDIR)/html $(OBJDIR)/../
+
 buildtxt: buildhtml
 	@mkdir -p $(OBJDIR)/txt
 	@(cd $(OBJDIR)/txt; for i in $(OBJDIR)/html/*.html; do \
