@@ -30,12 +30,11 @@ typedef const unsigned char * ICON;
 typedef long ICON;
 #endif
 
-#define NOICON Icon_NOICON
-#define FORCE_INBUILT_ICON 0x80000000
 /* Don't #ifdef icon values, or we wont be able to use the same 
    bmp for every target. */
 enum themable_icons {
-    Icon_NOICON = -1, /* Dont put this in a .bmp */
+    NOICON = -1,
+    Icon_NOICON = NOICON, /* Dont put this in a .bmp */
     Icon_Audio,
     Icon_Folder,
     Icon_Playlist,

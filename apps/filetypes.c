@@ -159,7 +159,7 @@ void tree_get_filetypes(const struct filetype** types, int* count)
 #define ROCK_EXTENSION "rock"
 
 struct file_type {
-    int  icon; /* the icon which shall be used for it, NOICON if unknown */
+    enum themable_icons icon; /* the icon which shall be used for it, NOICON if unknown */
     unsigned char  attr; /* FILE_ATTR_MASK >> 8 */
     char* plugin; /* Which plugin to use, NULL if unknown, or builtin */
     char* extension; /* NULL for none */
