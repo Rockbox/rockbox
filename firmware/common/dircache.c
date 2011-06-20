@@ -599,8 +599,8 @@ int dircache_load(void)
     dotdot = dot - sizeof("..");
 
     /* d_names are in reverse order, so the last entry points to the first string */
-    intptr_t offset_d_names = maindata.d_names_start - d_names_start;
-    intptr_t offset_entries = maindata.root_entry - dircache_root;
+    ptrdiff_t offset_d_names = maindata.d_names_start - d_names_start,
+              offset_entries = maindata.root_entry - dircache_root;
 
     /* offset_entries is less likely to differ, so check if it's 0 in the loop
      * offset_d_names however is almost always non-zero, since dircache_save()
@@ -846,10 +846,11 @@ int dircache_build(int last_size)
         return 3;
     }
 
-    /* struct dircache_entrys are allocated from the beginning,
-     * their corresponding d_name from the end
+    /* We'll use the entire audiobuf to allocate the dircache
+     * struct dircache_entrys are allocated from the beginning
+     * and their corresponding d_name from the end
      * after generation the buffer will be compacted with DIRCACHE_RESERVE
-     * free bytes in between */
+     * free bytes inbetween */
     audiobuf = (char*)(((intptr_t)audiobuf & ~0x03) + 0x04);
     dircache_root = (struct dircache_entry*)audiobuf;
     d_names_start = d_names_end = audiobufend - 1;
@@ -858,35 +859,29 @@ int dircache_build(int last_size)
 
     /* Start a non-transparent rebuild. */
     int res = dircache_do_rebuild();
+    if (res < 0)
+        return res;
 
-    /** compact the dircache buffer **/
-    if (res >= 0)
-    {
-        char* dst = ((char*)&dircache_root[entry_count] + DIRCACHE_RESERVE);
-        ssize_t offset = d_names_start - dst;
-        if (offset > 0)
-        {
-            ssize_t size_to_move = dircache_size -
-                                    entry_count*sizeof(struct dircache_entry);
-            /* move d_names down, use memmove if overlap */
-            if (offset > size_to_move)
-                memcpy(dst, d_names_start, size_to_move);
-            else
-                memmove(dst, d_names_start, size_to_move);
-            
-            /* fix up pointers to the d_names */
-            for(unsigned i = 0; i < entry_count; i++)
-                dircache_root[i].d_name -= offset;
+    /* now compact the dircache buffer */
+    char* dst = ((char*)&dircache_root[entry_count] + DIRCACHE_RESERVE);
+    ptrdiff_t offset = d_names_start - dst, size_to_move;
+    if (offset <= 0) /* something went wrong */
+        return -1;
 
-            d_names_end -= offset;
-            /* equivalent to dircache_size + DIRCACHE_RESERVE */
-            allocated_size = (d_names_end - (char*)dircache_root);
-            reserve_used = 0;
-            audiobuf += allocated_size;
-        }
-        else /* something went wrong */
-            return -1;
-    }
+    /* memmove d_names down, there's a possibility of overlap */
+    size_to_move = dircache_size - entry_count*sizeof(struct dircache_entry);
+    memmove(dst, d_names_start, size_to_move);
+    
+    /* fix up pointers to the d_names */
+    for(unsigned i = 0; i < entry_count; i++)
+        dircache_root[i].d_name -= offset;
+
+    d_names_end -= offset;
+    /* equivalent to dircache_size + DIRCACHE_RESERVE */
+    allocated_size = (d_names_end - (char*)dircache_root);
+    reserve_used = 0;
+    audiobuf += allocated_size;
+
     return res;
 }
 
