@@ -1077,11 +1077,12 @@ struct dirinfo* _dircache_get_entry_dirinfo(int id)
  * (or, in case of truncation, the position of the nul byte */
 static size_t copy_path_helper(const struct dircache_entry *entry, char *buf, size_t size)
 {
+    int offset = 1;
     /* has parent? */
     if (entry->up)
-        copy_path_helper(entry->up, buf, size);
+        offset += copy_path_helper(entry->up, buf, size);
 
-    size_t len = strlcat(buf, entry->d_name, size);
+    size_t len = strlcpy(buf+offset, entry->d_name, size - offset) + offset;
     if (len < size)
     {
         buf[len++] = '/';
@@ -1101,7 +1102,7 @@ size_t dircache_copy_path(int index, char *buf, size_t size)
         return 0;
 
     buf[0] = '/';
-    size_t res = copy_path_helper(&dircache_root[index], buf, size);
+    size_t res = copy_path_helper(&dircache_root[index], buf, size - 1);
     /* fixup trailing '/' */
     buf[res] = '\0';
     return res;
