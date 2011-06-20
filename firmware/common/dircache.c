@@ -47,6 +47,7 @@
 #endif
 #include "rbpaths.h"
 
+
 /* Queue commands. */
 #define DIRCACHE_BUILD 1
 #define DIRCACHE_STOP  2
@@ -57,9 +58,30 @@
 #define MAX_OPEN_DIRS 8
 #endif
 static DIR_CACHED opendirs[MAX_OPEN_DIRS];
-
+/* Cache Layout:
+ *
+ * x - array of struct dircache_entry
+ * r - reserved buffer
+ * d - name buffer for the d_name entry of the struct dircache_entry
+ * |xxxxxx|rrrrrrrrr|dddddd|
+ *
+ * subsequent x are allocated from the front, d are allocated from the back,
+ * using the reserve buffer for entries added after initial scan
+ *
+ * after a while the cache may look like:
+ * |xxxxxxxx|rrrrr|dddddddd|
+ *
+ * after a reboot, the reserve buffer is restored in it's size, so that the
+ * total allocation size grows
+ * |xxxxxxxx|rrrrrrrrr|dddddddd|
+ */
 static struct dircache_entry *fd_bindings[MAX_OPEN_FILES];
+/* this points to the beginnging of the buffer and the first entry */
 static struct dircache_entry *dircache_root;
+/* these point to the start and end of the name buffer (d above) */
+static char                  *d_names_start, *d_names_end;
+/* put "." and ".." into the d_names buffer to enable easy pointer logic */
+static char                  *dot, *dotdot;
 #ifdef HAVE_MULTIVOLUME
 static struct dircache_entry *append_position;
 #endif
@@ -116,20 +138,12 @@ static struct dircache_entry* allocate_entry(void)
         return NULL;
     }
     
-    next_entry = (struct dircache_entry *)((char *)dircache_root+dircache_size);
-#ifdef ROCKBOX_STRICT_ALIGN
-    /* Make sure the entry is long aligned. */
-    if ((long)next_entry & 0x03)
-    {
-        dircache_size += 4 - ((long)next_entry & 0x03);
-        next_entry = (struct dircache_entry *)(((long)next_entry & ~0x03) + 0x04);
-    }
-#endif
+    next_entry = &dircache_root[entry_count++];
     next_entry->d_name = NULL;
     next_entry->up = NULL;
     next_entry->down = NULL;
     next_entry->next = NULL;
-    
+
     dircache_size += sizeof(struct dircache_entry);
 
     return next_entry;
@@ -230,8 +244,9 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
         if(!strcmp(".", sab.direntry->name) ||
                 !strcmp("..", sab.direntry->name))
             continue;
-        
-        ce->d_name = ((char *)dircache_root + dircache_size);
+
+        size_t size = strlen(sab.direntry->name) + 1;
+        ce->d_name = (d_names_start -= size);
         ce->startcluster = sab.direntry->firstcluster;
         ce->info.size = sab.direntry->filesize;
         ce->info.attribute = sab.direntry->attr;
@@ -239,9 +254,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
         ce->info.wrttime = sab.direntry->wrttime;
 
         strcpy(ce->d_name, sab.direntry->name); 
-        dircache_size += strlen(ce->d_name) + 1;
-
-        entry_count++;
+        dircache_size += size;
         
         if(ce->info.attribute & FAT_ATTR_DIRECTORY)
             dircache_gen_down(ce);
@@ -261,7 +274,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     }
     
     /* add "." and ".." */
-    ce->d_name = ".";
+    ce->d_name = dot;
     ce->info.attribute = FAT_ATTR_DIRECTORY;
     ce->startcluster = startcluster;
     ce->info.size = 0;
@@ -269,7 +282,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     
     ce = dircache_gen_next(ce);
     
-    ce->d_name = "..";
+    ce->d_name = dotdot;
     ce->info.attribute = FAT_ATTR_DIRECTORY;
     ce->startcluster = (first_ce->up ? first_ce->up->startcluster : 0);
     ce->info.size = 0;
@@ -300,7 +313,7 @@ static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce
 #ifdef HAVE_MULTIVOLUME
     if (volume > 0)
     {
-        ce->d_name = ((char *)dircache_root+dircache_size);
+        ce->d_name = (d_names_start -= sizeof(VOL_NAMES));
         size_t len = snprintf(ce->d_name, VOL_ENUM_POS + 3, VOL_NAMES, volume)+1;
         dircache_size += len;
         ce->info.attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
@@ -338,14 +351,13 @@ static int sab_process_dir(struct dircache_entry *ce)
         if(!strcmp(".", entry->d_name) ||
                 !strcmp("..", entry->d_name))
             continue;
-        
-        ce->d_name = ((char *)dircache_root + dircache_size);
+
+        size_t size = strlen(entry->d_name) + 1;
+        ce->d_name = (d_names_start -= size);
         ce->info = entry->info;
 
         strcpy(ce->d_name, entry->d_name);
-        dircache_size += strlen(entry->d_name) + 1;
-
-        entry_count++;
+        dircache_size += size;
         
         if(entry->info.attribute & ATTR_DIRECTORY)
         {
@@ -387,14 +399,14 @@ static int sab_process_dir(struct dircache_entry *ce)
     }
     
     /* add "." and ".." */
-    ce->d_name = ".";
+    ce->d_name = dot;
     ce->info.attribute = ATTR_DIRECTORY;
     ce->info.size = 0;
     ce->down = first_ce;
     
     ce = dircache_gen_next(ce);
     
-    ce->d_name = "..";
+    ce->d_name = dotdot;
     ce->info.attribute = ATTR_DIRECTORY;
     ce->info.size = 0;
     ce->down = first_ce->up;
@@ -498,7 +510,7 @@ static struct dircache_entry* dircache_get_entry(const char *path, bool go_down)
 int dircache_load(void)
 {
     struct dircache_maindata maindata;
-    int bytes_read;
+    ssize_t bytes_read;
     int fd;
         
     if (dircache_initialized)
@@ -520,27 +532,63 @@ int dircache_load(void)
         remove_dircache_file();
         return -3;
     }
-
-    dircache_root = buffer_alloc(0);
-    if ((long)maindata.root_entry != (long)dircache_root)
-    {
-        logf("Position missmatch");
-        close(fd);
-        remove_dircache_file();
-        return -4;
-    }
     
     dircache_root = buffer_alloc(maindata.size + DIRCACHE_RESERVE);
     entry_count = maindata.entry_count;
     appflags = maindata.appflags;
-    bytes_read = read(fd, dircache_root, MIN(DIRCACHE_LIMIT, maindata.size));
+
+    /* read the dircache file into memory,
+     * start with the struct dircache_entries */
+    ssize_t bytes_to_read = entry_count*sizeof(struct dircache_entry);
+    bytes_read = read(fd, dircache_root, bytes_to_read);
+    
+    if (bytes_read != bytes_to_read)
+    {
+        logf("Dircache read failed #1");
+        return -6;
+    }
+
+    /* continue with the d_names. Fix up pointers to them if needed */
+    d_names_start = ((char*)&dircache_root[entry_count] + DIRCACHE_RESERVE);
+    bytes_to_read = maindata.size - bytes_to_read;
+    bytes_read = read(fd, d_names_start, bytes_to_read);
     close(fd);
     remove_dircache_file();
-    
-    if (bytes_read != maindata.size)
+    if (bytes_read != bytes_to_read)
     {
-        logf("Dircache read failed");
-        return -6;
+        logf("Dircache read failed #2");
+        return -7;
+    }
+
+    d_names_end = &d_names_start[bytes_read];
+    dot = d_names_end - sizeof(".");
+    dotdot = dot - sizeof("..");
+
+    /* d_names are in reverse order, so the last entry points to the first string */
+    intptr_t offset_d_names = maindata.d_names_start - d_names_start;
+    intptr_t offset_entries = maindata.root_entry - dircache_root;
+
+    /* offset_entries is less likely to differ, so check if it's 0 in the loop
+     * offset_d_names however is almost always non-zero, since dircache_save()
+     * creates a file which causes the reserve buffer to be used. since
+     * we allocate a new, empty DIRCACHE_RESERVE here, the strings are
+     * farther behind */
+    if (offset_entries != 0 || offset_d_names != 0)
+    {
+        for(unsigned i = 0; i < entry_count; i++)
+        {
+            if (dircache_root[i].d_name)
+                dircache_root[i].d_name -= offset_d_names;
+
+            if (offset_entries == 0)
+                continue;
+            if (dircache_root[i].next)
+                dircache_root[i].next -= offset_entries;
+            if (dircache_root[i].up)
+                dircache_root[i].up -= offset_entries;
+            if (dircache_root[i].down)
+                dircache_root[i].down -= offset_entries;
+        }
     }
 
     /* Cache successfully loaded. */
@@ -575,6 +623,7 @@ int dircache_save(void)
     maindata.magic = DIRCACHE_MAGIC;
     maindata.size = dircache_size;
     maindata.root_entry = dircache_root;
+    maindata.d_names_start = d_names_start;
     maindata.entry_count = entry_count;
     maindata.appflags = appflags;
 
@@ -587,14 +636,26 @@ int dircache_save(void)
         return -2;
     }
 
-    /* Dump whole directory cache to disk */
-    bytes_written = write(fd, dircache_root, dircache_size);
-    close(fd);
-    if (bytes_written != dircache_size)
+    /* Dump whole directory cache to disk
+     * start by writing the dircache_entries */
+    size_t bytes_to_write = entry_count*sizeof(struct dircache_entry);
+    bytes_written = write(fd, dircache_root, bytes_to_write);
+    if (bytes_written != bytes_to_write)
     {
         logf("dircache: write failed #2");
         return -3;
     }
+
+    /* continue with the d_names */
+    bytes_to_write = d_names_end - d_names_start;
+    bytes_written = write(fd, d_names_start, bytes_to_write);
+    close(fd);
+    if (bytes_written != bytes_to_write)
+    {
+        logf("dircache: write failed #3");
+        return -4;
+    }
+
     
     return 0;
 }
@@ -605,6 +666,7 @@ int dircache_save(void)
  */
 static int dircache_do_rebuild(void)
 {
+    struct dircache_entry* root_entry;
     unsigned int start_tick;
     int i;
     
@@ -612,12 +674,13 @@ static int dircache_do_rebuild(void)
     start_tick = current_tick;
     dircache_initializing = true;
     appflags = 0;
+
+    /* reset dircache and alloc root entry */
     entry_count = 0;
-    
-    dircache_size = sizeof(struct dircache_entry);
+    root_entry = allocate_entry();
 
 #ifdef HAVE_MULTIVOLUME
-    append_position = dircache_root;
+    append_position = root_entry;
 
     for (i = NUM_VOLUMES; i >= 0; i--)
     {
@@ -628,7 +691,7 @@ static int dircache_do_rebuild(void)
 #ifdef HAVE_MULTIVOLUME
             if (dircache_scan_and_build(IF_MV2(i,) append_position) < 0)
 #else
-            if (dircache_scan_and_build(IF_MV2(0,) dircache_root) < 0)
+            if (dircache_scan_and_build(IF_MV2(0,) root_entry) < 0)
 #endif /* HAVE_MULTIVOLUME */
             {
                 logf("dircache_scan_and_build failed");
@@ -659,14 +722,6 @@ static int dircache_do_rebuild(void)
     {
         if (allocated_size - dircache_size < DIRCACHE_RESERVE)
             reserve_used = DIRCACHE_RESERVE - (allocated_size - dircache_size);
-    }
-    else
-    {
-        /* We have to long align the audiobuf to keep the buffer access fast. */
-        audiobuf += (long)((dircache_size & ~0x03) + 0x04);
-        audiobuf += DIRCACHE_RESERVE;
-        allocated_size = dircache_size + DIRCACHE_RESERVE;
-        reserve_used = 0;
     }
     
     return 1;
@@ -712,6 +767,14 @@ static void dircache_thread(void)
     }
 }
 
+static void generate_dot_d_names(void)
+{
+    dot = (d_names_start -= sizeof("."));
+    dotdot = (d_names_start -= sizeof(".."));
+    dircache_size += sizeof(".") + sizeof("..");
+    strcpy(dot, ".");
+    strcpy(dotdot, "..");
+}
 /**
  * Start scanning the disk to build the dircache.
  * Either transparent or non-transparent build method is used.
@@ -734,22 +797,63 @@ int dircache_build(int last_size)
         queue_post(&dircache_queue, DIRCACHE_BUILD, 0);
         return 2;
     }
-    
     if (last_size > DIRCACHE_RESERVE && last_size < DIRCACHE_LIMIT )
     {
         allocated_size = last_size + DIRCACHE_RESERVE;
         dircache_root = buffer_alloc(allocated_size);
+        d_names_start =
+        d_names_end = ((char*)dircache_root)+allocated_size-1;
+        dircache_size = 0;
         thread_enabled = true;
+        generate_dot_d_names();
 
         /* Start a transparent rebuild. */
         queue_post(&dircache_queue, DIRCACHE_BUILD, 0);
         return 3;
     }
 
-    dircache_root = (struct dircache_entry *)(((long)audiobuf & ~0x03) + 0x04);
+    /* struct dircache_entrys are allocated from the beginning,
+     * their corresponding d_name from the end
+     * after generation the buffer will be compacted with DIRCACHE_RESERVE
+     * free bytes in between */
+    audiobuf = (char*)(((intptr_t)audiobuf & ~0x03) + 0x04);
+    dircache_root = (struct dircache_entry*)audiobuf;
+    d_names_start = d_names_end = audiobufend - 1;
+    dircache_size = 0;
+    generate_dot_d_names();
 
     /* Start a non-transparent rebuild. */
-    return dircache_do_rebuild();
+    int res = dircache_do_rebuild();
+
+    /** compact the dircache buffer **/
+    if (res >= 0)
+    {
+        char* dst = ((char*)&dircache_root[entry_count] + DIRCACHE_RESERVE);
+        ssize_t offset = d_names_start - dst;
+        if (offset > 0)
+        {
+            ssize_t size_to_move = dircache_size -
+                                    entry_count*sizeof(struct dircache_entry);
+            /* move d_names down, use memmove if overlap */
+            if (offset > size_to_move)
+                memcpy(dst, d_names_start, size_to_move);
+            else
+                memmove(dst, d_names_start, size_to_move);
+            
+            /* fix up pointers to the d_names */
+            for(unsigned i = 0; i < entry_count; i++)
+                dircache_root[i].d_name -= offset;
+
+            d_names_end -= offset;
+            /* equivalent to dircache_size + DIRCACHE_RESERVE */
+            allocated_size = (d_names_end - (char*)dircache_root);
+            reserve_used = 0;
+            audiobuf += allocated_size;
+        }
+        else /* something went wrong */
+            return -1;
+    }
+    return res;
 }
 
 /**
@@ -1008,14 +1112,15 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
             return NULL;
         }
     }
-        
-    entry->d_name = ((char *)dircache_root+dircache_size);
+
+    size_t size = strlen(new) + 1;
+    entry->d_name = (d_names_start -= size);
     entry->startcluster = 0;
     memset(&entry->info, 0, sizeof(entry->info));
     entry->info.attribute = attribute;
 
     strcpy(entry->d_name, new);
-    dircache_size += strlen(entry->d_name) + 1;
+    dircache_size += size;
 
     if (attribute & ATTR_DIRECTORY)
     {
