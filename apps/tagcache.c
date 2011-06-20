@@ -1481,10 +1481,10 @@ static bool get_next(struct tagcache_search *tcs)
         if (tcs->type == tag_filename && (flag & FLAG_DIRCACHE)
             && is_dircache_intact())
         {
-            dircache_copy_path((struct dircache_entry *)tcs->position,
+            size_t len = dircache_copy_path((struct dircache_entry *)tcs->position,
                                buf, sizeof buf);
+            tcs->result_len = len + 1;
             tcs->result = buf;
-            tcs->result_len = strlen(buf) + 1;
             tcs->ramresult = false;
             
             return true;

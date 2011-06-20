@@ -932,16 +932,19 @@ static size_t copy_path_helper(const struct dircache_entry *entry, char *buf, si
 /**
  * Function to copy the full absolute path from dircache to the given buffer
  * using the given dircache_entry pointer.
+ *
+ * Returns the size of the resulting string, or 0 if an error occured
  */
-void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size)
+size_t dircache_copy_path(const struct dircache_entry *entry, char *buf, size_t size)
 {
-    if (size <= 0 || !buf)
-        return ;
+    if (!size || !buf)
+        return 0;
 
     buf[0] = '/';
     size_t res = copy_path_helper(entry, buf, size);
     /* fixup trailing '/' */
     buf[res] = '\0';
+    return res;
 }
 
 /* --- Directory cache live updating functions --- */

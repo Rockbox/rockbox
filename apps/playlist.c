@@ -1353,8 +1353,8 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     {
         if (playlist->filenames[index] != NULL)
         {
-            dircache_copy_path(playlist->filenames[index], tmp_buf, sizeof(tmp_buf)-1);
-            max = strlen(tmp_buf);
+            max = dircache_copy_path(playlist->filenames[index],
+                                     tmp_buf, sizeof(tmp_buf)-1);
         }
     }
 #else
