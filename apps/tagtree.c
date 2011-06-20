@@ -132,20 +132,18 @@ struct display_format {
 static struct display_format *formats[TAGMENU_MAX_FMTS];
 static int format_count;
 
-struct search_instruction {
-    char name[64];
-    int tagorder[MAX_TAGS];
-    int tagorder_count;
-    struct tagcache_search_clause *clause[MAX_TAGS][TAGCACHE_MAX_CLAUSES];
-    int format_id[MAX_TAGS];
-    int clause_count[MAX_TAGS];
-    int result_seek[MAX_TAGS];
-};
-
 struct menu_entry {
     char name[64];
     int type;
-    struct search_instruction *si;
+    struct search_instruction {
+        char name[64];
+        int tagorder[MAX_TAGS];
+        int tagorder_count;
+        struct tagcache_search_clause *clause[MAX_TAGS][TAGCACHE_MAX_CLAUSES];
+        int format_id[MAX_TAGS];
+        int clause_count[MAX_TAGS];
+        int result_seek[MAX_TAGS];
+    } si;
     int link;
 };
 
@@ -590,7 +588,7 @@ static bool parse_search(struct menu_entry *entry, const char *str)
 {
     int ret;
     int type;
-    struct search_instruction *inst = entry->si;
+    struct search_instruction *inst = &entry->si;
     char buf[MAX_PATH];
     int i;
     struct menu_root *new_menu;
@@ -975,10 +973,8 @@ static int parse_line(int n, const char *buf, void *parameters)
     {
         menu->items[menu->itemcount] = buffer_alloc(sizeof(struct menu_entry));
         memset(menu->items[menu->itemcount], 0, sizeof(struct menu_entry));
-        menu->items[menu->itemcount]->si = buffer_alloc(sizeof(struct search_instruction));
     }
-    
-    memset(menu->items[menu->itemcount]->si, 0, sizeof(struct search_instruction));
+
     if (!parse_search(menu->items[menu->itemcount], buf))
         return 0;
     
@@ -1528,7 +1524,7 @@ int tagtree_enter(struct tree_context* c)
             {
                 int i, j;
                 
-                csi = menu->items[seek]->si;
+                csi = &menu->items[seek]->si;
                 c->currextra = 0;
                 
                 strlcpy(current_title[c->currextra], dptr->name, 
