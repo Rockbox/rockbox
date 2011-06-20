@@ -2676,8 +2676,10 @@ void playlist_set_last_shuffled_start(void)
 /*
  * Create a new playlist  If playlist is not NULL then we're loading a
  * playlist off disk for viewing/editing.  The index_buffer is used to store
- * playlist indices (required for and only used if !current playlist).  The
- * temp_buffer (if not NULL) is used as a scratchpad when loading indices.
+ * playlist indices (required for and only used if playlist != NULL).  The
+ * temp_buffer is used as a scratchpad when loading indices.
+ *
+ * returns <0 on failure
  */
 int playlist_create_ex(struct playlist_info* playlist,
                        const char* dir, const char* file,
@@ -2688,6 +2690,8 @@ int playlist_create_ex(struct playlist_info* playlist,
         playlist = &current_playlist;
     else
     {
+        if (!index_buffer)
+            return -1;
         /* Initialize playlist structure */
         int r = rand() % 10;
         playlist->current = false;
@@ -2698,31 +2702,20 @@ int playlist_create_ex(struct playlist_info* playlist,
         playlist->fd = -1;
         playlist->control_fd = -1;
 
-        if (index_buffer)
-        {
-            int num_indices = index_buffer_size / sizeof(int);
+        int num_indices = index_buffer_size / sizeof(int);
 
 #ifdef HAVE_DIRCACHE
-            num_indices /= 2;
+        num_indices /= 2;
 #endif
-            if (num_indices > global_settings.max_files_in_playlist)
-                num_indices = global_settings.max_files_in_playlist;
+        if (num_indices > global_settings.max_files_in_playlist)
+            num_indices = global_settings.max_files_in_playlist;
 
-            playlist->max_playlist_size = num_indices;
-            playlist->indices = index_buffer;
+        playlist->max_playlist_size = num_indices;
+        playlist->indices = index_buffer;
 #ifdef HAVE_DIRCACHE
-            playlist->filenames = (const struct dircache_entry **)
-                &playlist->indices[num_indices];
+        playlist->filenames = (const struct dircache_entry **)
+            &playlist->indices[num_indices];
 #endif
-        }
-        else
-        {
-            playlist->max_playlist_size = current_playlist.max_playlist_size;
-            playlist->indices = current_playlist.indices;
-#ifdef HAVE_DIRCACHE
-            playlist->filenames = current_playlist.filenames;
-#endif
-        }
 
         playlist->buffer_size = 0;
         playlist->buffer = NULL;
