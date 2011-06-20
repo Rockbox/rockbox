@@ -907,41 +907,41 @@ const struct dircache_entry *dircache_get_entry_ptr(const char *filename)
     return dircache_get_entry(filename, false);
 }
 
+/*
+ * build a path from an entry upto the root using recursion
+ *
+ * it appends '/' after strlcat, therefore buf[0] needs to be prepared with '/'
+ * and it will leave a trailing '/'
+ *
+ * returns the position of that trailing '/' so it can be deleted afterwards
+ * (or, in case of truncation, the position of the nul byte */
+static size_t copy_path_helper(const struct dircache_entry *entry, char *buf, size_t size)
+{
+    /* has parent? */
+    if (entry->up)
+        copy_path_helper(entry->up, buf, size);
+
+    size_t len = strlcat(buf, entry->d_name, size);
+    if (len < size)
+    {
+        buf[len++] = '/';
+        buf[len]   = '\0';
+    }
+    return len-1;
+}
 /**
  * Function to copy the full absolute path from dircache to the given buffer
  * using the given dircache_entry pointer.
  */
 void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size)
 {
-    int path_size = 0;
-    int idx;
-    const struct dircache_entry *temp = entry;
-    
-    if (size <= 0)
+    if (size <= 0 || !buf)
         return ;
-        
-    /* first compute the necessary size */
-    while(temp != NULL)
-    {
-        path_size += strlen(temp->d_name) + sizeof('/');
-        temp = temp->up;
-    }
-    
-    /* now copy the path */
-    idx = path_size;
-    while(entry != NULL)
-    {
-        idx -= strlen(entry->d_name);
-        /* available size */
-        int rem = size - idx;
-        
-        if(rem >= 1)
-        {
-            buf[idx] = '/';
-            strlcpy(buf + idx + 1, entry->d_name, rem - 1);
-        }
-        entry = entry->up;
-    }
+
+    buf[0] = '/';
+    size_t res = copy_path_helper(entry, buf, size);
+    /* fixup trailing '/' */
+    buf[res] = '\0';
 }
 
 /* --- Directory cache live updating functions --- */
