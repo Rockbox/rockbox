@@ -3278,6 +3278,13 @@ static bool write_tag(int fd, const char *tagstr, const char *datastr)
         if (*datastr == '"' || *datastr == '\\')
             buf[i++] = '\\';
         
+        else if (*datastr == '\n')
+        {
+            buf[i++] = '\\';
+            buf[i] = 'n';
+            continue;
+        }
+        
         buf[i] = *(datastr++);
     }
     
@@ -3335,12 +3342,18 @@ static bool read_tag(char *dest, long size,
             
             if (*src == '\\')
             {
-                dest[pos] = *(src+1);
-                src += 2;
+                src++;
+                if (*src == 'n')
+                    dest[pos] = '\n';
+                else
+                    dest[pos] = *src;
+                
+                src++;
                 continue;
             }
             
-            dest[pos] = *src;
+            if (*src == '\0')
+                break;
             
             if (*src == '"')
             {
@@ -3348,10 +3361,7 @@ static bool read_tag(char *dest, long size,
                 break;
             }
             
-            if (*src == '\0')
-                break;
-            
-            src++;
+            dest[pos] = *(src++);
         }
         
         dest[pos] = '\0';
@@ -3377,10 +3387,10 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
     if (*buf == '#')
         return 0;
     
-    logf("%d/%s", line_n, buf);
+    /* logf("%d/%s", line_n, buf); */
     if (!read_tag(tag_data, sizeof tag_data, buf, "filename"))
     {
-        logf("filename missing");
+        logf("%d/filename missing", line_n);
         logf("-> %s", buf);
         return 0;
     }
@@ -3388,13 +3398,13 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
     idx_id = find_index(tag_data);
     if (idx_id < 0)
     {
-        logf("entry not found");
+        logf("%d/entry not found", line_n);
         return 0;
     }
     
     if (!get_index(masterfd, idx_id, &idx, false))
     {
-        logf("failed to retrieve index entry");
+        logf("%d/failed to retrieve index entry", line_n);
         return 0;
     }
     
@@ -3402,7 +3412,7 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
     if (idx.flag & FLAG_DIRTYNUM)
         return 0;
     
-    logf("import: %s", tag_data);
+    logf("%d/import: %s", line_n, tag_data);
     
     idx.flag |= FLAG_DIRTYNUM;
     for (i = 0; i < (long)(sizeof(import_tags)/sizeof(import_tags[0])); i++)

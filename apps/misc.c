@@ -184,15 +184,7 @@ int fast_readline(int fd, char *buf, int buf_size, void *parameters,
         if (rc >= 0)
             buf[pos+rc] = '\0';
 
-        if ( (p = strchr(buf, '\r')) != NULL)
-        {
-            *p = '\0';
-            next = ++p;
-        }
-        else
-            p = buf;
-
-        if ( (p = strchr(p, '\n')) != NULL)
+        if ( (p = strchr(buf, '\n')) != NULL)
         {
             *p = '\0';
             next = ++p;
