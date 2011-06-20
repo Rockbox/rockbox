@@ -1015,7 +1015,7 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
     entry->info.attribute = attribute;
 
     strcpy(entry->d_name, new);
-    dircache_size += strlen(entry->d_name);
+    dircache_size += strlen(entry->d_name) + 1;
 
     if (attribute & ATTR_DIRECTORY)
     {
