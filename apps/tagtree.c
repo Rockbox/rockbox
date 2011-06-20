@@ -175,6 +175,27 @@ static int current_entry_count;
 
 static struct tree_context *tc;
 
+/* a few memory alloc helper */
+static void* tagtree_alloc(size_t size)
+{
+    return buffer_alloc(size);
+}
+
+static void* tagtree_alloc0(size_t size)
+{
+    void* ret = tagtree_alloc(size);
+    memset(ret, 0, size);
+    return ret;
+}
+
+static char* tagtree_strdup(const char* buf)
+{
+    size_t len = strlen(buf) + 1;
+    char* dest = tagtree_alloc(len);
+    strcpy(dest, buf);
+    return dest;
+}
+
 static int get_token_str(char *buf, int size)
 {
     /* Find the start. */
@@ -346,13 +367,12 @@ static bool read_clause(struct tagcache_search_clause *clause)
     if (i<ARRAYLEN(id3_to_search_mapping)) /* runtime search operand found */
     {
         clause->source = source_runtime+i;
-        clause->str = buffer_alloc(SEARCHSTR_SIZE);
+        clause->str = tagtree_alloc(SEARCHSTR_SIZE);
     }    
     else 
     {
         clause->source = source_constant;
-        clause->str = buffer_alloc(strlen(buf)+1);
-        strcpy(clause->str, buf);
+        clause->str = tagtree_strdup(buf);
     }    
     
     if (TAGCACHE_IS_NUMERIC(clause->tag))
@@ -418,8 +438,7 @@ static int get_format_str(struct display_format *fmt)
     if (get_token_str(buf, sizeof buf) < 0)
         return -10;
     
-    fmt->formatstr = buffer_alloc(strlen(buf) + 1);
-    strcpy(fmt->formatstr, buf);
+    fmt->formatstr = tagtree_strdup(buf);
     
     while (fmt->tag_count < MAX_TAGS)
     {
@@ -469,12 +488,12 @@ static int add_format(const char *buf)
     strp = buf;
     
     if (formats[format_count] == NULL)
-        formats[format_count] = buffer_alloc(sizeof(struct display_format));
+        formats[format_count] = tagtree_alloc0(sizeof(struct display_format));
     
-    memset(formats[format_count], 0, sizeof(struct display_format));
     if (get_format_str(formats[format_count]) < 0)
     {
         logf("get_format_str() parser failed!");
+        memset(formats[format_count], 0, sizeof(struct display_format));
         return -4;
     }
     
@@ -496,7 +515,7 @@ static int add_format(const char *buf)
                 break;
             }
             
-            newclause = buffer_alloc(sizeof(struct tagcache_search_clause));
+            newclause = tagtree_alloc(sizeof(struct tagcache_search_clause));
             
             formats[format_count]->clause[clause_count] = newclause;
             if (!read_clause(newclause))
@@ -560,7 +579,7 @@ static int get_condition(struct search_instruction *inst)
         return false;
     }
     
-    new_clause = buffer_alloc(sizeof(struct tagcache_search_clause));
+    new_clause = tagtree_alloc(sizeof(struct tagcache_search_clause));
     inst->clause[inst->tagorder_count][clause_count] = new_clause;
     
     if (*strp == '|')
@@ -628,9 +647,8 @@ static bool parse_search(struct menu_entry *entry, const char *str)
         }
         
         /* Allocate a new menu unless link is found. */
-        menus[menu_count] = buffer_alloc(sizeof(struct menu_root));
+        menus[menu_count] = tagtree_alloc0(sizeof(struct menu_root));
         new_menu = menus[menu_count];
-        memset(new_menu, 0, sizeof(struct menu_root));
         strlcpy(new_menu->id, buf, MAX_MENU_ID_SIZE);
         entry->link = menu_count;
         ++menu_count;
@@ -922,10 +940,9 @@ static int parse_line(int n, const char *buf, void *parameters)
             
                 if (menu == NULL) 
                 {
-                    menus[menu_count] = buffer_alloc(sizeof(struct menu_root));
+                    menus[menu_count] = tagtree_alloc0(sizeof(struct menu_root));
                     menu = menus[menu_count];
                     ++menu_count;
-                    memset(menu, 0, sizeof(struct menu_root));
                     strlcpy(menu->id, data, MAX_MENU_ID_SIZE);
                 }
             
@@ -970,10 +987,7 @@ static int parse_line(int n, const char *buf, void *parameters)
     
     /* Allocate */
     if (menu->items[menu->itemcount] == NULL)
-    {
-        menu->items[menu->itemcount] = buffer_alloc(sizeof(struct menu_entry));
-        memset(menu->items[menu->itemcount], 0, sizeof(struct menu_entry));
-    }
+        menu->items[menu->itemcount] = tagtree_alloc0(sizeof(struct menu_entry));
 
     if (!parse_search(menu->items[menu->itemcount], buf))
         return 0;
@@ -1021,7 +1035,7 @@ void tagtree_init(void)
     if (rootmenu < 0)
         rootmenu = 0;
     
-    uniqbuf = buffer_alloc(UNIQBUF_SIZE);
+    uniqbuf = tagtree_alloc(UNIQBUF_SIZE);
 
     add_event(PLAYBACK_EVENT_TRACK_BUFFER, false, tagtree_buffer_event);
     add_event(PLAYBACK_EVENT_TRACK_FINISH, false, tagtree_track_finish_event);
