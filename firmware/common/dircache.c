@@ -503,6 +503,17 @@ static struct dircache_entry* dircache_get_entry(const char *path, bool go_down)
 }
 
 #ifdef HAVE_EEPROM_SETTINGS
+
+#define DIRCACHE_MAGIC  0x00d0c0a1
+struct dircache_maindata {
+    long magic;
+    long size;
+    long entry_count;
+    long appflags;
+    struct dircache_entry *root_entry;
+    char *d_names_start;
+};
+
 /**
  * Function to load the internal cache structure from disk to initialize
  * the dircache really fast and little disk access.
@@ -525,7 +536,7 @@ int dircache_load(void)
         
     bytes_read = read(fd, &maindata, sizeof(struct dircache_maindata));
     if (bytes_read != sizeof(struct dircache_maindata)
-        || maindata.size <= 0)
+        || maindata.magic != DIRCACHE_MAGIC || maindata.size <= 0)
     {
         logf("Dircache file header error");
         close(fd);

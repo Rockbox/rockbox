@@ -47,16 +47,6 @@ struct travel_data {
     int pathpos;
 };
 
-#define DIRCACHE_MAGIC  0x00d0c0a1
-struct dircache_maindata {
-    long magic;
-    long size;
-    long entry_count;
-    long appflags;
-    struct dircache_entry *root_entry;
-    char *d_names_start;
-};
-
 #define MAX_PENDING_BINDINGS 2
 struct fdbind_queue {
     char path[MAX_PATH];
