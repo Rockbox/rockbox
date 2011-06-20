@@ -575,7 +575,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
                     playlist->indices[ playlist->amount ] = i+count;
 #ifdef HAVE_DIRCACHE
                     if (playlist->filenames)
-                        playlist->filenames[ playlist->amount ] = NULL;
+                        playlist->filenames[ playlist->amount ] = -1;
 #endif
                     playlist->amount++;
                 }
@@ -816,7 +816,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
 
 #ifdef HAVE_DIRCACHE
     if (playlist->filenames)
-        playlist->filenames[insert_position] = NULL;
+        playlist->filenames[insert_position] = -1;
 #endif
 
     playlist->amount++;
@@ -958,9 +958,9 @@ static int randomise_playlist(struct playlist_info* playlist,
 #ifdef HAVE_DIRCACHE
         if (playlist->filenames)
         {
-            store = (long)playlist->filenames[candidate];
+            store = playlist->filenames[candidate];
             playlist->filenames[candidate] = playlist->filenames[count];
-            playlist->filenames[count] = (struct dircache_entry *)store;
+            playlist->filenames[count] = store;
         }
 #endif
     }
@@ -1298,7 +1298,7 @@ static void playlist_thread(void)
                      && queue_empty(&playlist_queue); index++)
                 {
                     /* Process only pointers that are not already loaded. */
-                    if (playlist->filenames[index])
+                    if (playlist->filenames[index] >= 0)
                         continue ;
                     
                     control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
@@ -1310,7 +1310,7 @@ static void playlist_thread(void)
                         break ;
 
                     /* Set the dircache entry pointer. */
-                    playlist->filenames[index] = dircache_get_entry_ptr(tmp);
+                    playlist->filenames[index] = dircache_get_entry_id(tmp);
 
                     /* And be on background so user doesn't notice any delays. */
                     yield();
@@ -1351,7 +1351,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
 #ifdef HAVE_DIRCACHE
     if (dircache_is_enabled() && playlist->filenames)
     {
-        if (playlist->filenames[index] != NULL)
+        if (playlist->filenames[index] >= 0)
         {
             max = dircache_copy_path(playlist->filenames[index],
                                      tmp_buf, sizeof(tmp_buf)-1);
@@ -2389,7 +2389,7 @@ int playlist_add(const char *filename)
 
     playlist->indices[playlist->amount] = playlist->buffer_end_pos;
 #ifdef HAVE_DIRCACHE
-    playlist->filenames[playlist->amount] = NULL;
+    playlist->filenames[playlist->amount] = -1;
 #endif
     playlist->amount++;
     
@@ -2713,8 +2713,7 @@ int playlist_create_ex(struct playlist_info* playlist,
         playlist->max_playlist_size = num_indices;
         playlist->indices = index_buffer;
 #ifdef HAVE_DIRCACHE
-        playlist->filenames = (const struct dircache_entry **)
-            &playlist->indices[num_indices];
+            playlist->filenames = (int*)&playlist->indices[num_indices];
 #endif
 
         playlist->buffer_size = 0;

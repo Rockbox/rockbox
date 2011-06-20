@@ -108,25 +108,26 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
 #ifdef HAVE_DIRCACHE
     if (dircache_is_enabled() && !file->write && use_cache)
     {
-        const struct dircache_entry *ce;
 # ifdef HAVE_MULTIVOLUME
         int volume = strip_volume(pathname, pathnamecopy);
 # endif
 
-        ce = dircache_get_entry_ptr(pathname);
-        if (!ce)
+        int ce = dircache_get_entry_id(pathname);
+        if (ce < 0)
         {
             errno = ENOENT;
             file->busy = false;
             return -7;
         }
 
+        long startcluster = _dircache_get_entry_startcluster(ce);
         fat_open(IF_MV2(volume,)
-                 ce->startcluster,
+                 startcluster,
                  &(file->fatfile),
                  NULL);
-        file->size = ce->info.size;
-        file->attr = ce->info.attribute;
+        struct dirinfo *info = _dircache_get_entry_dirinfo(ce);
+        file->size = info->size;
+        file->attr = info->attribute;
         file->cacheoffset = -1;
         file->fileoffset = 0;
 

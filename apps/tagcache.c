@@ -383,8 +383,9 @@ static bool do_timed_yield(void)
 #endif
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-static long find_entry_ram(const char *filename,
-                           const struct dircache_entry *dc)
+/* find the ramcache entry corresponding to the file indicated by
+ * filename and dc (it's corresponding dircache id). */
+static long find_entry_ram(const char *filename, int dc)
 {
     static long last_pos = 0;
     int i;
@@ -393,10 +394,10 @@ static long find_entry_ram(const char *filename,
     if (!tc_stat.ramcache)
         return -1;
 
-    if (dc == NULL)
-        dc = dircache_get_entry_ptr(filename);
+    if (dc < 0)
+        dc = dircache_get_entry_id(filename);
     
-    if (dc == NULL)
+    if (dc < 0)
     {
         logf("tagcache: file not found.");
         return -1;
@@ -411,7 +412,7 @@ static long find_entry_ram(const char *filename,
     
     for (; i < current_tcmh.tch.entry_count; i++)
     {
-        if (hdr->indices[i].tag_seek[tag_filename] == (long)dc)
+        if (hdr->indices[i].tag_seek[tag_filename] == dc)
         {
             last_pos = MAX(0, i - 3);
             return i;
@@ -539,7 +540,7 @@ static int find_index(const char *filename)
     
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     if (tc_stat.ramcache && is_dircache_intact())
-        idx_id = find_entry_ram(filename, NULL);
+        idx_id = find_entry_ram(filename, -1);
 #endif
     
     if (idx_id < 0)
@@ -723,8 +724,8 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
         if (tag == tag_filename && (idx->flag & FLAG_DIRCACHE)
             && is_dircache_intact())
         {
-            dircache_copy_path((struct dircache_entry *)seek,
-                               buf, size);
+            /* for tag_filename, seek is a dircache index */
+            dircache_copy_path(seek, buf, size);
             return true;
         }
         else
@@ -1481,8 +1482,7 @@ static bool get_next(struct tagcache_search *tcs)
         if (tcs->type == tag_filename && (flag & FLAG_DIRCACHE)
             && is_dircache_intact())
         {
-            size_t len = dircache_copy_path((struct dircache_entry *)tcs->position,
-                               buf, sizeof buf);
+            size_t len = dircache_copy_path(tcs->position, buf, sizeof buf);
             tcs->result_len = len + 1;
             tcs->result = buf;
             tcs->ramresult = false;
@@ -1599,29 +1599,6 @@ static bool update_master_header(void)
     return true;
 }
 
-#if 0
-
-void tagcache_modify(struct tagcache_search *tcs, int type, const char *text)
-{
-    struct tagentry *entry;
-    
-    if (tcs->type != tag_title)
-        return ;
-
-    /* We will need reserve buffer for this. */
-    if (tcs->ramcache)
-    {
-        struct tagfile_entry *ep;
-
-        ep = (struct tagfile_entry *)&hdr->tags[tcs->type][tcs->result_seek];
-        tcs->seek_list[tcs->seek_list_count];
-    }
-
-    entry = find_entry_ram();
-    
-}
-#endif
-
 void tagcache_search_finish(struct tagcache_search *tcs)
 {
     int i;
@@ -1677,7 +1654,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
         return false;
     
     /* Find the corresponding entry in tagcache. */
-    idx_id = find_entry_ram(filename, NULL);
+    idx_id = find_entry_ram(filename, -1);
     if (idx_id < 0)
         return false;
     
@@ -1761,7 +1738,7 @@ static int check_if_empty(char **tag)
 static void __attribute__ ((noinline)) add_tagcache(char *path,
                                                     unsigned long mtime
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-                                                    ,const struct dircache_entry *dc
+                                                    ,int dc
 #endif
                                                    )
 {
@@ -4017,7 +3994,7 @@ static bool load_tagcache(void)
             if (tag == tag_filename)
             {
 # ifdef HAVE_DIRCACHE
-                const struct dircache_entry *dc;
+                int dc;
 # endif
                 
                 // FIXME: This is wrong!
@@ -4064,8 +4041,8 @@ static bool load_tagcache(void)
 # ifdef HAVE_DIRCACHE
                 if (dircache_is_enabled())
                 {
-                    dc = dircache_get_entry_ptr(buf);
-                    if (dc == NULL)
+                    dc = dircache_get_entry_id(buf);
+                    if (dc < 0)
                     {
                         logf("Entry no longer valid.");
                         logf("-> %s", buf);
@@ -4075,7 +4052,7 @@ static bool load_tagcache(void)
                     }
 
                     idx->flag |= FLAG_DIRCACHE;
-                    idx->tag_seek[tag_filename] = (long)dc;
+                    idx->tag_seek[tag_filename] = dc;
                 }
                 else
 # endif

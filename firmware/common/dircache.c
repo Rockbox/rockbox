@@ -57,7 +57,23 @@
 #else
 #define MAX_OPEN_DIRS 8
 #endif
-static DIR_CACHED opendirs[MAX_OPEN_DIRS];
+
+#define MAX_PENDING_BINDINGS 2
+struct fdbind_queue {
+    char path[MAX_PATH];
+    int fd;
+};
+
+/* Exported structures. */
+struct dircache_entry {
+    struct dirinfo info;
+    struct dircache_entry *next;
+    struct dircache_entry *up;
+    struct dircache_entry *down;
+    long startcluster;
+    char *d_name;
+};
+
 /* Cache Layout:
  *
  * x - array of struct dircache_entry
@@ -75,7 +91,6 @@ static DIR_CACHED opendirs[MAX_OPEN_DIRS];
  * total allocation size grows
  * |xxxxxxxx|rrrrrrrrr|dddddddd|
  */
-static struct dircache_entry *fd_bindings[MAX_OPEN_FILES];
 /* this points to the beginnging of the buffer and the first entry */
 static struct dircache_entry *dircache_root;
 /* these point to the start and end of the name buffer (d above) */
@@ -85,6 +100,9 @@ static char                  *dot, *dotdot;
 #ifdef HAVE_MULTIVOLUME
 static struct dircache_entry *append_position;
 #endif
+
+static DIR_CACHED opendirs[MAX_OPEN_DIRS];
+static struct dircache_entry *fd_bindings[MAX_OPEN_FILES];
 
 static bool dircache_initialized = false;
 static bool dircache_initializing = false;
@@ -104,6 +122,11 @@ static struct fdbind_queue fdbind_cache[MAX_PENDING_BINDINGS];
 static int fdbind_idx = 0;
 
 /* --- Internal cache structure control functions --- */
+
+static inline struct dircache_entry* get_entry(int id)
+{
+    return &dircache_root[id];
+}
 
 #ifdef HAVE_EEPROM_SETTINGS
 /**
@@ -1012,14 +1035,36 @@ void dircache_disable(void)
 }
 
 /**
- * Usermode function to return dircache_entry pointer to the given path.
+ * Usermode function to return dircache_entry index to the given path.
  */
-const struct dircache_entry *dircache_get_entry_ptr(const char *filename)
+static int dircache_get_entry_id_ex(const char *filename, bool go_down)
 {
     if (!dircache_initialized || filename == NULL)
-        return NULL;
+        return -1;
     
-    return dircache_get_entry(filename, false);
+    struct dircache_entry* res = dircache_get_entry(filename, go_down);
+    return res ? res - dircache_root : -1;
+}
+
+int dircache_get_entry_id(const char* filename)
+{
+    return dircache_get_entry_id_ex(filename, false);
+}
+
+/**
+ * Internal: Get the startcluster for the index
+ */
+long _dircache_get_entry_startcluster(int id)
+{
+    return get_entry(id)->startcluster;
+}
+
+/**
+ * Internal: Get the struct dirinfo for the index
+ */
+struct dirinfo* _dircache_get_entry_dirinfo(int id)
+{
+    return &get_entry(id)->info;
 }
 
 /*
@@ -1050,13 +1095,13 @@ static size_t copy_path_helper(const struct dircache_entry *entry, char *buf, si
  *
  * Returns the size of the resulting string, or 0 if an error occured
  */
-size_t dircache_copy_path(const struct dircache_entry *entry, char *buf, size_t size)
+size_t dircache_copy_path(int index, char *buf, size_t size)
 {
-    if (!size || !buf)
+    if (!size || !buf || index < 0)
         return 0;
 
     buf[0] = '/';
-    size_t res = copy_path_helper(entry, buf, size);
+    size_t res = copy_path_helper(&dircache_root[index], buf, size);
     /* fixup trailing '/' */
     buf[res] = '\0';
     return res;
@@ -1373,17 +1418,17 @@ DIR_CACHED* opendir_cached(const char* name)
 
     if (!dircache_initialized || is_disable_msg_pending())
     {
-        pdir->internal_entry = NULL;
+        pdir->internal_entry = -1;
         pdir->regulardir = opendir_uncached(name);   
     }
     else
     {
         pdir->regulardir = NULL;
-        pdir->internal_entry = dircache_get_entry(name, true);
+        pdir->internal_entry = dircache_get_entry_id_ex(name, true);
         pdir->theent.info.attribute = -1; /* used to make readdir_cached aware of the first call */
     }
 
-    if (pdir->internal_entry == NULL && pdir->regulardir == NULL)
+    if (pdir->internal_entry == -1 && pdir->regulardir == NULL)
     {
         pdir->busy = false;
         return NULL;
@@ -1394,7 +1439,7 @@ DIR_CACHED* opendir_cached(const char* name)
 
 struct dirent_cached* readdir_cached(DIR_CACHED* dir)
 {
-    struct dircache_entry *ce = dir->internal_entry;
+    struct dircache_entry *ce = get_entry(dir->internal_entry);
     struct dirent_uncached *regentry;
     
     if (!dir->busy)
@@ -1430,7 +1475,7 @@ struct dirent_cached* readdir_cached(DIR_CACHED* dir)
        because that modifies the d_name pointer. */
     dir->theent.startcluster = ce->startcluster;
     dir->theent.info = ce->info;
-    dir->internal_entry = ce;
+    dir->internal_entry = ce - dircache_root;
 
     //logf("-> %s", ce->d_name);
     return &dir->theent;

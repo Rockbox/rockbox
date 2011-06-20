@@ -70,7 +70,7 @@ bool file_exists(const char *file)
 
 #ifdef HAVE_DIRCACHE
     if (dircache_is_enabled())
-        return (dircache_get_entry_ptr(file) != NULL);
+        return (dircache_get_entry_id(file) >= 0);
 #endif
 
     fd = open(file, O_RDONLY);
