@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+/* no malloc
 #include <malloc.h>
+*/
 #include "plugin.h"
 #include "lib/helper.h"
 
