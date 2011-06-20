@@ -121,36 +121,52 @@ static void audiohw_mute(bool mute)
     if (mute) {
         wmcodec_write(DACCTRL, DACCTRL_SOFTMUTE);
     } else {
-        wmcodec_write(DACCTRL, 0);
+        wmcodec_write(DACCTRL, DACCTRL_DACOSR128);
     }
 }
 
 void audiohw_preinit(void)
 {
-    wmcodec_write(RESET, RESET_RESET);
-
-    wmcodec_write(PWRMGMT1, PWRMGMT1_PLLEN | PWRMGMT1_BIASEN
-                          | PWRMGMT1_VMIDSEL_10K);
+    /* Set low bias mode */
+    wmcodec_write(BIASCTRL, BIASCTRL_BIASCUT);
+    /* Enable HPCOM, LINECOM */
+    wmcodec_write(OUTCTRL, OUTCTRL_HP_COM | OUTCTRL_LINE_COM
+                         | OUTCTRL_TSOPCTRL | OUTCTRL_TSDEN | OUTCTRL_VROI);
+    /* Mute all Outputs and set PGAs minimum gain */
+    wmcodec_write(LOUT1VOL, 0x140);
+    wmcodec_write(ROUT1VOL, 0x140);
+    wmcodec_write(LOUT2VOL, 0x140);
+    wmcodec_write(ROUT2VOL, 0x140);
+    wmcodec_write(OUT3MIX,  0x40);
+    wmcodec_write(OUT4MIX,  0x40);
+    /* Enable L/ROUT1 */
     wmcodec_write(PWRMGMT2, PWRMGMT2_ROUT1EN | PWRMGMT2_LOUT1EN);
-    wmcodec_write(PWRMGMT3, PWRMGMT3_LOUT2EN | PWRMGMT3_ROUT2EN
-                          | PWRMGMT3_RMIXEN | PWRMGMT3_LMIXEN
+    /* Enable VMID independent current bias */
+    wmcodec_write(OUT4TOADC, OUT4TOADC_POBCTRL);
+    /* Enable required DACs and mixers */
+    wmcodec_write(PWRMGMT3, PWRMGMT3_RMIXEN | PWRMGMT3_LMIXEN
                           | PWRMGMT3_DACENR | PWRMGMT3_DACENL);
-
+    /* Enable VMIDSEL, BIASEN, BUFIOEN */
+    wmcodec_write(PWRMGMT1, PWRMGMT1_PLLEN | PWRMGMT1_BIASEN
+                          | PWRMGMT1_BUFIOEN | PWRMGMT1_VMIDSEL_10K);
+    /* Setup digital interface, input amplifiers, PLL, ADCs and DACs */
     wmcodec_write(AINTFCE, AINTFCE_IWL_16BIT | AINTFCE_FORMAT_I2S);
-    wmcodec_write(OUTCTRL, OUTCTRL_VROI);
     wmcodec_write(CLKCTRL, CLKCTRL_MS); /* WM8758 is clock master */
 
     audiohw_set_frequency(HW_FREQ_44);
 
     wmcodec_write(LOUTMIX, LOUTMIX_DACL2LMIX);
     wmcodec_write(ROUTMIX, ROUTMIX_DACR2RMIX);
+    /* Disable VMID independent current bias */
+    wmcodec_write(OUT4TOADC, 0);
 }
 
 void audiohw_postinit(void)
 {
     wmcodec_write(PWRMGMT1, PWRMGMT1_PLLEN | PWRMGMT1_BIASEN
-                          | PWRMGMT1_VMIDSEL_100K);
+                          | PWRMGMT1_BUFIOEN | PWRMGMT1_VMIDSEL_500K);
                           /* lower the VMID power consumption */
+    wmcodec_write(BIASCTRL, 0);
     audiohw_mute(false);
 }
 
@@ -223,9 +239,19 @@ void audiohw_close(void)
 {
     audiohw_mute(true);
 
+    /* Disable Thermal shutdown */
+    wmcodec_write(OUTCTRL, OUTCTRL_HP_COM | OUTCTRL_VROI);
+    /* Enable VMIDTOG */
+    wmcodec_write(OUT4TOADC, OUT4TOADC_VMIDTOG);
+    /* Disable VMIDSEL and BUFIOEN */
+    wmcodec_write(PWRMGMT1, PWRMGMT1_PLLEN | PWRMGMT1_BIASEN
+                          | PWRMGMT1_VMIDSEL_OFF);
+    /* Wait for VMID to discharge */
+    sleep(3*HZ/10);
+    /* Power off registers */
+    wmcodec_write(PWRMGMT2, 0);
     wmcodec_write(PWRMGMT3, 0);
     wmcodec_write(PWRMGMT1, 0);
-    wmcodec_write(PWRMGMT2, PWRMGMT2_SLEEP);
 }
 
 /* Note: Disable output before calling this function */
