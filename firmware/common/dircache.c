@@ -851,7 +851,7 @@ int dircache_build(int last_size)
      * and their corresponding d_name from the end
      * after generation the buffer will be compacted with DIRCACHE_RESERVE
      * free bytes inbetween */
-    audiobuf = (char*)(((intptr_t)audiobuf & ~0x03) + 0x04);
+    audiobuf = ALIGN_UP(audiobuf, sizeof(struct dircache_entry*));
     dircache_root = (struct dircache_entry*)audiobuf;
     d_names_start = d_names_end = audiobufend - 1;
     dircache_size = 0;
