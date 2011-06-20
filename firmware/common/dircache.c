@@ -125,7 +125,6 @@ static struct dircache_entry* allocate_entry(void)
         next_entry = (struct dircache_entry *)(((long)next_entry & ~0x03) + 0x04);
     }
 #endif
-    next_entry->name_len = 0;
     next_entry->d_name = NULL;
     next_entry->up = NULL;
     next_entry->down = NULL;
@@ -232,16 +231,16 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
                 !strcmp("..", sab.direntry->name))
             continue;
         
-        ce->name_len = strlen(sab.direntry->name) + 1;
         ce->d_name = ((char *)dircache_root + dircache_size);
         ce->startcluster = sab.direntry->firstcluster;
         ce->info.size = sab.direntry->filesize;
         ce->info.attribute = sab.direntry->attr;
         ce->info.wrtdate = sab.direntry->wrtdate;
         ce->info.wrttime = sab.direntry->wrttime;
-        memcpy(ce->d_name, sab.direntry->name, ce->name_len);
-        
-        dircache_size += ce->name_len;
+
+        strcpy(ce->d_name, sab.direntry->name); 
+        dircache_size += strlen(ce->d_name) + 1;
+
         entry_count++;
         
         if(ce->info.attribute & FAT_ATTR_DIRECTORY)
@@ -263,7 +262,6 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     
     /* add "." and ".." */
     ce->d_name = ".";
-    ce->name_len = 2;
     ce->info.attribute = FAT_ATTR_DIRECTORY;
     ce->startcluster = startcluster;
     ce->info.size = 0;
@@ -272,7 +270,6 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     ce = dircache_gen_next(ce);
     
     ce->d_name = "..";
-    ce->name_len = 3;
     ce->info.attribute = FAT_ATTR_DIRECTORY;
     ce->startcluster = (first_ce->up ? first_ce->up->startcluster : 0);
     ce->info.size = 0;
@@ -283,7 +280,8 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     
     while(rc >= 0 && ce)
     {
-        if(ce->name_len != 0 && ce->down != NULL && strcmp(ce->d_name, ".") && strcmp(ce->d_name, ".."))
+        if(ce->d_name != NULL && ce->down != NULL && strcmp(ce->d_name, ".")
+                && strcmp(ce->d_name, ".."))
             rc = sab_process_dir(ce->startcluster, ce->down);
         
         ce = ce->next;
@@ -303,9 +301,8 @@ static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce
     if (volume > 0)
     {
         ce->d_name = ((char *)dircache_root+dircache_size);
-        snprintf(ce->d_name, VOL_ENUM_POS + 3, VOL_NAMES, volume);
-        ce->name_len = VOL_ENUM_POS + 3;
-        dircache_size += ce->name_len;
+        size_t len = snprintf(ce->d_name, VOL_ENUM_POS + 3, VOL_NAMES, volume)+1;
+        dircache_size += len;
         ce->info.attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
         ce->info.size = 0;
         append_position = dircache_gen_next(ce);
@@ -342,12 +339,12 @@ static int sab_process_dir(struct dircache_entry *ce)
                 !strcmp("..", entry->d_name))
             continue;
         
-        ce->name_len = strlen(entry->d_name) + 1;
         ce->d_name = ((char *)dircache_root + dircache_size);
         ce->info = entry->info;
-        memcpy(ce->d_name, entry->d_name, ce->name_len);
-        
-        dircache_size += ce->name_len;
+
+        strcpy(ce->d_name, entry->d_name);
+        dircache_size += strlen(entry->d_name) + 1;
+
         entry_count++;
         
         if(entry->info.attribute & ATTR_DIRECTORY)
@@ -391,7 +388,6 @@ static int sab_process_dir(struct dircache_entry *ce)
     
     /* add "." and ".." */
     ce->d_name = ".";
-    ce->name_len = 2;
     ce->info.attribute = ATTR_DIRECTORY;
     ce->info.size = 0;
     ce->down = first_ce;
@@ -399,7 +395,6 @@ static int sab_process_dir(struct dircache_entry *ce)
     ce = dircache_gen_next(ce);
     
     ce->d_name = "..";
-    ce->name_len = 3;
     ce->info.attribute = ATTR_DIRECTORY;
     ce->info.size = 0;
     ce->down = first_ce->up;
@@ -471,7 +466,7 @@ static struct dircache_entry* dircache_get_entry(const char *path, bool go_down)
         while(cache_entry != NULL)
         {
             /* skip unused entries */
-            if(cache_entry->name_len == 0)
+            if(cache_entry->d_name == NULL)
             {
                 cache_entry = cache_entry->next;
                 continue;
@@ -928,29 +923,25 @@ void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size)
     /* first compute the necessary size */
     while(temp != NULL)
     {
-        path_size += temp->name_len; /* '/' + d_name */
+        path_size += strlen(temp->d_name) + sizeof('/');
         temp = temp->up;
     }
     
     /* now copy the path */
-    /* doesn't matter with trailing 0 because it's added later */
     idx = path_size;
     while(entry != NULL)
     {
-        idx -= entry->name_len;
+        idx -= strlen(entry->d_name);
         /* available size */
         int rem = size - idx;
         
         if(rem >= 1)
         {
             buf[idx] = '/';
-            memcpy(buf + idx + 1, entry->d_name, MIN((size_t)(rem - 1), (size_t)(entry->name_len - 1)));
+            strlcpy(buf + idx + 1, entry->d_name, rem - 1);
         }
         entry = entry->up;
     }
-    
-    /* add trailing 0 */
-    buf[MIN(path_size, size-1)] = 0;
 }
 
 /* --- Directory cache live updating functions --- */
@@ -1005,22 +996,23 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
     while (entry->next != NULL)
         entry = entry->next;
 
-    if (entry->name_len > 0)
-        entry = dircache_gen_next(entry);
-
-    if (entry == NULL)
+    if (entry->d_name != NULL)
     {
-        dircache_initialized = false;
-        return NULL;
+        entry = dircache_gen_next(entry);
+        if (entry == NULL)
+        {
+            dircache_initialized = false;
+            return NULL;
+        }
     }
         
-    entry->name_len = MIN(254, strlen(new)) + 1;
     entry->d_name = ((char *)dircache_root+dircache_size);
     entry->startcluster = 0;
     memset(&entry->info, 0, sizeof(entry->info));
     entry->info.attribute = attribute;
-    memcpy(entry->d_name, new, entry->name_len);
-    dircache_size += entry->name_len;
+
+    strcpy(entry->d_name, new);
+    dircache_size += strlen(entry->d_name);
 
     if (attribute & ATTR_DIRECTORY)
     {
@@ -1132,7 +1124,7 @@ void dircache_rmdir(const char *path)
     }
 
     entry->down = NULL;
-    entry->name_len = 0;
+    entry->d_name = NULL;
 }
 
 /* Remove a file from cache */
@@ -1154,7 +1146,7 @@ void dircache_remove(const char *name)
         return ;
     }
     
-    entry->name_len = 0;
+    entry->d_name = NULL;
 }
 
 void dircache_rename(const char *oldpath, const char *newpath)
@@ -1178,7 +1170,7 @@ void dircache_rename(const char *oldpath, const char *newpath)
     }
 
     /* Delete the old entry. */
-    entry->name_len = 0;
+    entry->d_name = NULL;
 
     /** If we rename the same filename twice in a row, we need to
      * save the data, because the entry will be re-used. */
@@ -1308,7 +1300,7 @@ struct dirent_cached* readdir_cached(DIR_CACHED* dir)
     if(dir->theent.info.attribute != -1)
         ce = ce->next;
     /* skip unused entries */
-    while(ce != NULL && ce->name_len == 0)
+    while(ce != NULL && ce->d_name == NULL)
         ce = ce->next;
     
     if (ce == NULL)
@@ -1321,7 +1313,7 @@ struct dirent_cached* readdir_cached(DIR_CACHED* dir)
     dir->theent.info = ce->info;
     dir->internal_entry = ce;
 
-    //logf("-> %s", ce->name);
+    //logf("-> %s", ce->d_name);
     return &dir->theent;
 }
 

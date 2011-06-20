@@ -69,7 +69,6 @@ struct dircache_entry {
     struct dircache_entry *up;
     struct dircache_entry *down;
     long startcluster;
-    unsigned long name_len;
     char *d_name;
 };
 
