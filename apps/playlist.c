@@ -1244,7 +1244,12 @@ static void playlist_flush_callback(void *param)
         sync_control(playlist, true);
     }
 }
-         
+
+static bool is_dircache_pointers_intact(void)
+{
+    return dircache_get_appflag(DIRCACHE_APPFLAG_PLAYLIST) ? true : false;
+}
+
 static void playlist_thread(void)
 {
     struct queue_event ev;
@@ -1277,6 +1282,7 @@ static void playlist_thread(void)
             /* Start the background scanning after either the disk spindown
                timeout or 5s, whichever is less */
             case SYS_TIMEOUT:
+            {
                 playlist = &current_playlist;
                 if (playlist->control_fd >= 0)
                 {
@@ -1284,11 +1290,14 @@ static void playlist_thread(void)
                         register_storage_idle_func(playlist_flush_callback);
                 }
 
-                if (!dirty_pointers)
-                    break ;
-
                 if (!dircache_is_enabled() || !playlist->filenames
                      || playlist->amount <= 0)
+                {
+                    break ;
+                }
+                
+                /* Check if previously loaded pointers are intact. */
+                if (is_dircache_pointers_intact() && !dirty_pointers)
                     break ;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -1298,7 +1307,7 @@ static void playlist_thread(void)
                      && queue_empty(&playlist_queue); index++)
                 {
                     /* Process only pointers that are not already loaded. */
-                    if (playlist->filenames[index] >= 0)
+                    if (is_dircache_pointers_intact() && playlist->filenames[index] >= 0)
                         continue ;
                     
                     control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
@@ -1307,7 +1316,9 @@ static void playlist_thread(void)
                     /* Load the filename from playlist file. */
                     if (get_filename(playlist, index, seek, control_file, tmp,
                         sizeof(tmp)) < 0)
+                    {
                         break ;
+                    }
 
                     /* Set the dircache entry pointer. */
                     playlist->filenames[index] = dircache_get_entry_id(tmp);
@@ -1315,12 +1326,18 @@ static void playlist_thread(void)
                     /* And be on background so user doesn't notice any delays. */
                     yield();
                 }
-
+                
+                if (dircache_is_enabled())
+                    dircache_set_appflag(DIRCACHE_APPFLAG_PLAYLIST);
+                
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 cpu_boost(false);
 #endif
-                dirty_pointers = false;
+                if (index == playlist->amount)
+                    dirty_pointers = false;
+            
                 break ;
+            }
             
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
             case SYS_USB_CONNECTED:
@@ -1349,7 +1366,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
         buf_length = MAX_PATH+1;
 
 #ifdef HAVE_DIRCACHE
-    if (dircache_is_enabled() && playlist->filenames)
+    if (is_dircache_pointers_intact() && playlist->filenames)
     {
         if (playlist->filenames[index] >= 0)
         {

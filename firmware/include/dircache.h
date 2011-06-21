@@ -30,6 +30,7 @@
 #define DIRCACHE_LIMIT    (1024*1024*6)
 
 #define DIRCACHE_APPFLAG_TAGCACHE  0x0001
+#define DIRCACHE_APPFLAG_PLAYLIST  0x0002
 
 /* Internal structures. */
 struct travel_data {
