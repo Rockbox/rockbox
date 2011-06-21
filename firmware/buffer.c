@@ -61,7 +61,7 @@ void buffer_init(void)
 
 void *buffer_alloc(size_t size)
 {
-    void *retval = audiobuf;
+    void *retval;
 #ifdef BUFFER_ALLOC_DEBUG
     struct buffer_start_marker *start;
     struct buffer_end_marker *end;
@@ -69,6 +69,11 @@ void *buffer_alloc(size_t size)
 
     /* 32-bit aligned */
     size = (size + 3) & ~3;
+
+    /* Other code touches audiobuf. Make sure it stays aligned */
+    audiobuf = (void *)(((unsigned long)audiobuf + 3) & ~3);
+
+    retval = audiobuf;
 
 #ifdef BUFFER_ALLOC_DEBUG
     retval +=sizeof(struct buffer_start_marker);
