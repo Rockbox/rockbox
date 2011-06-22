@@ -232,6 +232,7 @@ simcc () {
    LDOPTS="$LDOPTS -mconsole"
    output="$output.exe"
    winbuild="yes"
+   SHARED_CFLAGS=''
  else
  case $uname in
    CYGWIN*)
@@ -241,6 +242,7 @@ simcc () {
    LDOPTS="$LDOPTS -mconsole"
    output="$output.exe"
    winbuild="yes"
+   SHARED_CFLAGS=''
    ;;
 
    MINGW*)
