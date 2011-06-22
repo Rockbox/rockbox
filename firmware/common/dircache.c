@@ -567,7 +567,10 @@ int dircache_load(void)
         return -3;
     }
     
-    dircache_root = buffer_alloc(maindata.size + DIRCACHE_RESERVE);
+    allocated_size = maindata.size + DIRCACHE_RESERVE;
+    dircache_root = buffer_alloc(allocated_size);
+    /* needs to be struct-size aligned so that the pointer arithmetic below works */
+    ALIGN_BUFFER(dircache_root, allocated_size, sizeof(struct dircache_entry));
     entry_count = maindata.entry_count;
     appflags = maindata.appflags;
 
@@ -583,8 +586,8 @@ int dircache_load(void)
     }
 
     /* continue with the d_names. Fix up pointers to them if needed */
-    d_names_start = ((char*)&dircache_root[entry_count] + DIRCACHE_RESERVE);
     bytes_to_read = maindata.size - bytes_to_read;
+    d_names_start = (char*)dircache_root + allocated_size - bytes_to_read;
     bytes_read = read(fd, d_names_start, bytes_to_read);
     close(fd);
     remove_dircache_file();
@@ -594,7 +597,7 @@ int dircache_load(void)
         return -7;
     }
 
-    d_names_end = &d_names_start[bytes_read];
+    d_names_end = d_names_start + bytes_read;
     dot = d_names_end - sizeof(".");
     dotdot = dot - sizeof("..");
 
@@ -627,7 +630,6 @@ int dircache_load(void)
 
     /* Cache successfully loaded. */
     dircache_size = maindata.size;
-    allocated_size = dircache_size + DIRCACHE_RESERVE;
     reserve_used = 0;
     logf("Done, %ld KiB used", dircache_size / 1024);
     dircache_initialized = true;
@@ -835,6 +837,7 @@ int dircache_build(int last_size)
     {
         allocated_size = last_size + DIRCACHE_RESERVE;
         dircache_root = buffer_alloc(allocated_size);
+        ALIGN_BUFFER(dircache_root, allocated_size, sizeof(struct dircache_entry));
         d_names_start =
         d_names_end = ((char*)dircache_root)+allocated_size-1;
         dircache_size = 0;
@@ -851,7 +854,7 @@ int dircache_build(int last_size)
      * and their corresponding d_name from the end
      * after generation the buffer will be compacted with DIRCACHE_RESERVE
      * free bytes inbetween */
-    audiobuf = ALIGN_UP(audiobuf, sizeof(struct dircache_entry*));
+    audiobuf = ALIGN_UP(audiobuf, sizeof(struct dircache_entry));
     dircache_root = (struct dircache_entry*)audiobuf;
     d_names_start = d_names_end = audiobufend - 1;
     dircache_size = 0;
