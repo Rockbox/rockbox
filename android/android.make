@@ -124,7 +124,11 @@ $(KEYSTORE):
 		-storepass android -keypass android -validity 365 \
 		-dname "CN=Android Debug,O=Android,C=US"
 
+ifdef NODEPS
+$(APK): $(TEMP_APK) $(KEYSTORE)
+else
 $(APK): $(TEMP_APK) $(BUILDDIR)/rockbox.zip $(KEYSTORE)
+endif
 	$(SILENT)rm -f $@
 	$(call PRINTS,SIGN $(subst $(BUILDDIR)/,,$@))jarsigner \
 		-keystore "$(KEYSTORE)" -storepass "android" -keypass "android" \
