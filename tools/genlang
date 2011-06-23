@@ -237,7 +237,7 @@ sub readenglish {
 
 
     if ($binary and file_is_newer("$binpath/english.list", $english)) {
-        open(ENG, "<$binpath/english.list") || 
+        open(ENG, "<$binpath/english.list") ||
             die "Error: can't open $binpath/english.list";
         while (<ENG>) {
             my ($user, $id, $value) = split ':', $_;
@@ -830,8 +830,8 @@ if($verbose) {
     }
 }
 
-if ($binary and !-r "$binpath/english.list") {
-    open(ENGLIST, ">$binpath/english.list") || 
+if ($binary and !file_is_newer("$binpath/english.list", $english)) {
+    open(ENGLIST, ">$binpath/english.list") ||
         die "Failed creating $binpath/english.list";
     for my $user (keys %users) {
         for my $id (keys %{$idmap[$user]}) {
