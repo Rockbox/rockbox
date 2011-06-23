@@ -852,14 +852,20 @@ bool tagtree_import(void)
 
 static bool parse_menu(const char *filename);
 
-static int parse_line(int n, const char *buf, void *parameters)
+static int parse_line(int n, char *buf, void *parameters)
 {
     char data[256];
     int variable;
     static bool read_menu;
     int i;
+    char *p;
     
     (void)parameters;
+    
+    /* Strip possible <CR> at end of line. */
+    p = strchr(buf, '\r');
+    if (p != NULL)
+        *p = '\0';
     
     logf("parse:%d/%s", n, buf);
     

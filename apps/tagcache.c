@@ -3350,7 +3350,7 @@ static bool read_tag(char *dest, long size,
     return false;
 }
 
-static int parse_changelog_line(int line_n, const char *buf, void *parameters)
+static int parse_changelog_line(int line_n, char *buf, void *parameters)
 {
     struct index_entry idx;
     char tag_data[TAG_MAXLEN+32];

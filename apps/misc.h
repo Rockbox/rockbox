@@ -57,7 +57,7 @@ bool warn_on_pl_erase(void);
  */
 int read_line(int fd, char* buffer, int buffer_size);
 int fast_readline(int fd, char *buf, int buf_size, void *parameters,
-                  int (*callback)(int n, const char *buf, void *parameters));
+                  int (*callback)(int n, char *buf, void *parameters));
 
 bool settings_parseline(char* line, char** name, char** value);
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter);
