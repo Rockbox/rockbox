@@ -25,7 +25,7 @@
 /.*/.*/.*/ID3/I D 3/g
   English
 /english/(sapi|festival)/.*/plugin(s?)/plug-in$1/ig
-/english/festival/.*//\ba\b/ay/ig
+/english/festival/.*/\ba\b/ay/ig
 /english/festival/.*//$/./
 
   German (deutsch)
