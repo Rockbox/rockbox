@@ -28,7 +28,8 @@
 #include "spc_profiler.h"
 
 #if defined(CPU_COLDFIRE) || defined (CPU_ARM)
-int32_t fir_buf[FIR_BUF_CNT] IBSS_ATTR_SPC MEM_ALIGN_ATTR;
+int32_t fir_buf[FIR_BUF_CNT] IBSS_ATTR_SPC
+    __attribute__((aligned(FIR_BUF_ALIGN*1)));
 #endif
 #if SPC_BRRCACHE
 /* a little extra for samples that go past end */
@@ -1276,6 +1277,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         /* Feedback into echo buffer */
         if ( !(this->r.g.flags & 0x20) )
         {
+            int sh = 1 << 9;
+
             asm volatile (
             /* scale echo voices; saturate if overflow */
             "mac.l      %[sh], %[e1]       , %%acc1 \r\n"
@@ -1298,11 +1301,10 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             "or.l       %[sh], %[e0]                \r\n"
             /* save final feedback into echo buffer    */
             "move.l     %[e0], (%[echo_ptr])        \r\n"
-            : [e0]"+d"(echo_0), [e1]"+d"(echo_1)
+            : [e0]"+d"(echo_0), [e1]"+d"(echo_1), [sh]"+d"(sh)
             : [out_0]"r"(out_0), [out_1]"r"(out_1),
               [ef]"r"((int)this->r.g.echo_feedback),
-              [echo_ptr]"a"((int32_t *)echo_ptr),
-              [sh]"d"(1 << 9)
+              [echo_ptr]"a"((int32_t *)echo_ptr)
             );
         }
 
