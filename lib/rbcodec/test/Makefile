@@ -6,12 +6,14 @@ ROOTDIR = $(shell readlink -e ../../..)
 BUILDDIR = $(shell pwd)/build
 APPSDIR = $(ROOTDIR)/apps
 TOOLSDIR = $(ROOTDIR)/tools
+RBCODEC_DIR = $(ROOTDIR)/lib/rbcodec
+RBCODEC_BLD = $(BUILDDIR)/lib/rbcodec
 DEPFILE = $(BUILDDIR)/make.dep
 APP_TYPE = sdl-sim
 
 INCLUDES = -I$(shell pwd)
 INCLUDES += -I$(APPSDIR) -I$(APPSDIR)/codecs -I$(APPSDIR)/codecs/lib \
-			-I$(APPSDIR)/gui -I$(APPSDIR)/metadata
+			-I$(APPSDIR)/gui
 INCLUDES += -I$(ROOTDIR)/firmware/export -I$(ROOTDIR)/firmware/include \
 			-I$(ROOTDIR)/firmware/target/hosted \
 			-I$(ROOTDIR)/firmware/target/hosted/sdl
@@ -30,16 +32,14 @@ WARBLE_LDFLAGS = -lm -ldl $(shell sdl-config --libs)
 
 include $(ROOTDIR)/tools/functions.make
 include $(APPSDIR)/codecs/codecs.make
+include ../rbcodec.make
 
-SRC = $(ROOTDIR)/apps/metadata.c $(ROOTDIR)/apps/replaygain.c \
-	  $(ROOTDIR)/firmware/buflib.c \
+SRC = $(ROOTDIR)/firmware/buflib.c \
 	  $(ROOTDIR)/firmware/core_alloc.c \
 	  $(ROOTDIR)/firmware/common/strlcpy.c \
 	  $(ROOTDIR)/firmware/common/unicode.c \
-	  $(ROOTDIR)/firmware/common/structec.c $(ROOTDIR)/apps/mp3data.c \
+	  $(ROOTDIR)/firmware/common/structec.c \
 	  $(ROOTDIR)/apps/fixedpoint.c $(ROOTDIR)/uisimulator/common/io.c
-SRC += $(APPSDIR)/compressor.c $(APPSDIR)/dsp.c $(APPSDIR)/eq.c $(APPSDIR)/tdspeed.c
-SRC += $(wildcard $(ROOTDIR)/apps/metadata/*.c)
 
 OBJ := $(SRC:.c=.o)
 OBJ := $(OBJ:.S=.o)
@@ -58,7 +58,7 @@ dep $(DEPFILE):
 
 -include $(DEPFILE)
 
-warble: $(WARBLE_OBJS) $(OBJ)
+warble: $(WARBLE_OBJS) $(OBJ) $(RBCODEC_LIB)
 	$(call PRINTS,LD $@)$(CC) $(LDFLAGS) $^ -o $@ $(WARBLE_LDFLAGS)
 
 $(BUILDDIR)/%.o: %.c

@@ -1113,7 +1113,6 @@ static void load_lrc_file(void)
 /*******************************
  * read lyrics from id3
  *******************************/
-/* taken from apps/metadata/mp3.c */
 static unsigned long unsync(unsigned long b0, unsigned long b1,
                             unsigned long b2, unsigned long b3)
 {

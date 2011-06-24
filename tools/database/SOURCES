@@ -1,11 +1,6 @@
 database.c
 ../../apps/fixedpoint.c
-../../apps/metadata.c
-#if CONFIG_CODEC == SWCODEC
-../../apps/replaygain.c
-#endif
 ../../apps/misc.c
-../../apps/mp3data.c
 ../../apps/tagcache.c
 ../../firmware/common/crc32.c
 ../../firmware/common/filefuncs.c
@@ -17,7 +12,9 @@ database.c
 ../../firmware/logf.c
 ../../uisimulator/common/io.c
 #if CONFIG_CODEC != SWCODEC
-../../apps/metadata/id3tags.c
-../../apps/metadata/mp3.c
+../../lib/rbcodec/metadata/id3tags.c
+../../lib/rbcodec/metadata/metadata.c
+../../lib/rbcodec/metadata/mp3.c
+../../lib/rbcodec/metadata/mp3data.c
 #endif
 /* Caution. metadata files do not add!! */
