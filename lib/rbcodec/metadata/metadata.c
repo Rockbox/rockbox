@@ -29,7 +29,7 @@
 #include "cuesheet.h"
 #include "metadata.h"
 
-#include "metadata/metadata_parsers.h"
+#include "metadata_parsers.h"
 
 #if CONFIG_CODEC == SWCODEC
 

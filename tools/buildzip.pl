@@ -444,7 +444,7 @@ sub buildzip {
     if($swcodec) {
         glob_mkdir("$temp_dir/eqs");
 
-        glob_copy("$ROOT/apps/eqs/*.cfg", "$temp_dir/eqs/"); # equalizer presets
+        glob_copy("$ROOT/lib/rbcodec/dsp/eqs/*.cfg", "$temp_dir/eqs/"); # equalizer presets
     }
 
     glob_mkdir("$temp_dir/wps");

@@ -95,7 +95,10 @@ else ifneq (,$(findstring database,$(APP_TYPE)))
 else ifneq (,$(findstring warble,$(APP_TYPE)))
   include $(ROOTDIR)/lib/rbcodec/test/warble.make
 else
+  RBCODEC_DIR = $(ROOTDIR)/lib/rbcodec
+  RBCODEC_BLD = $(BUILDDIR)/lib/rbcodec
   include $(APPSDIR)/apps.make
+  include $(RBCODEC_DIR)/rbcodec.make
   include $(APPSDIR)/lang/lang.make
 
   ifdef SOFTWARECODECS
@@ -205,17 +208,19 @@ $(LINKROM): $(ROMLDS)
 	$(call PRINTS,PP $(@F))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
-$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(UNWARMINDER) $$(LINKRAM)
+$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(RBCODEC_LIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(UNWARMINDER) $$(LINKRAM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
+		-L$(RBCODEC_BLD) -lrbcodec \
 		-L$(BUILDDIR)/lib -lskin_parser $(LIBARMSUPPORT_LINK) \
 		$(UNWARMINDER_LINK) -L$(BUILDDIR)/apps/codecs \
 		$(VOICESPEEXLIB:lib%.a=-l%) -lgcc $(BOOTBOXLDOPTS) \
 		$(GLOBAL_LDOPTS) -T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
 
-$(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(UNWARMINDER) $$(LINKROM)
+$(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(RBCODEC_LIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(UNWARMINDER) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
+		-L$(RBCODEC_BLD) -lrbcodec \
 		-L$(BUILDDIR)/lib -lskin_parser $(LIBARMSUPPORT_LINK) \
                 $(UNWARMINDER_LINK) -L$(BUILDDIR)/apps/codecs \
 		$(VOICESPEEXLIB:lib%.a=-l%) -lgcc $(GLOBAL_LDOPTS) \
