@@ -2239,6 +2239,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Erstelle Datenbank... %d gefunden (OFF zum Abbrechen)"
@@ -2247,6 +2248,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Erstelle Datenbank... %d gefunden (LEFT zum Abbrechen)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Erstelle Datenbank... %d gefunden (PREV zum Abbrechen)"
     gogearsa9200: "Erstelle Datenbank... %d gefunden (REW zum Abbrechen)"
+    archosplayer: "Erstelle DB %d gefu."
   </dest>
   <voice>
     *: "Erstelle Datenbank"
