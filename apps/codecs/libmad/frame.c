@@ -315,6 +315,7 @@ int mad_header_decode(struct mad_header *header, struct mad_stream *stream)
   }
 
   /* stream skip */
+  /* rockbox: not used
   if (stream->skiplen) {
     if (!stream->sync)
       ptr = stream->this_frame;
@@ -332,6 +333,7 @@ int mad_header_decode(struct mad_header *header, struct mad_stream *stream)
 
     stream->sync = 1;
   }
+  */
 
  sync:
   /* synchronize */

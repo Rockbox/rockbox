@@ -24,11 +24,8 @@
 
 #define FPM_DEFAULT
 
-#include "version.h"
 #include "fixed.h"
 #include "bit.h"
-#include "timer.h"
 #include "stream.h"
 #include "frame.h"
 #include "synth.h"
-#include "decoder.h"

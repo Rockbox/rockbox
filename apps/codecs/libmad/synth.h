@@ -41,23 +41,6 @@ struct mad_synth {
   struct mad_pcm pcm;                   /* PCM output */
 };
 
-/* single channel PCM selector */
-enum {
-  MAD_PCM_CHANNEL_SINGLE = 0
-};
-
-/* dual channel PCM selector */
-enum {
-  MAD_PCM_CHANNEL_DUAL_1 = 0,
-  MAD_PCM_CHANNEL_DUAL_2 = 1
-};
-
-/* stereo PCM selector */
-enum {
-  MAD_PCM_CHANNEL_STEREO_LEFT  = 0,
-  MAD_PCM_CHANNEL_STEREO_RIGHT = 1
-};
-
 void mad_synth_init(struct mad_synth *);
 
 # define mad_synth_finish(synth)  /* nothing */

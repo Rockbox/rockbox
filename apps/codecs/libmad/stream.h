@@ -61,7 +61,8 @@ enum mad_error {
 struct mad_stream {
   unsigned char const *buffer;          /* input bitstream buffer */
   unsigned char const *bufend;          /* end of buffer */
-  unsigned long skiplen;                /* bytes to skip before next frame */
+  /* rockbox: not used
+  unsigned long skiplen; */             /* bytes to skip before next frame */
 
   int sync;                             /* stream sync found */
   unsigned long freerate;               /* free bitrate (fixed) */
@@ -94,14 +95,16 @@ enum {
 };
 
 void mad_stream_init(struct mad_stream *);
-void mad_stream_finish(struct mad_stream *);
+/* rockbox: not used
+void mad_stream_finish(struct mad_stream *); */
 
 # define mad_stream_options(stream, opts)  \
     ((void) ((stream)->options = (opts)))
 
 void mad_stream_buffer(struct mad_stream *,
                        unsigned char const *, unsigned long);
-void mad_stream_skip(struct mad_stream *, unsigned long);
+/* rockbox: not used
+void mad_stream_skip(struct mad_stream *, unsigned long); */
 
 int mad_stream_sync(struct mad_stream *);
 

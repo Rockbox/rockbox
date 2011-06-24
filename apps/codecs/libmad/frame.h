@@ -114,7 +114,8 @@ void mad_header_init(struct mad_header *);
 int mad_header_decode(struct mad_header *, struct mad_stream *);
 
 void mad_frame_init(struct mad_frame *);
-void mad_frame_finish(struct mad_frame *);
+/* rockbox: not used
+void mad_frame_finish(struct mad_frame *);*/
 
 int mad_frame_decode(struct mad_frame *, struct mad_stream *);
 

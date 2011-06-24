@@ -507,9 +507,4 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
 #  define MAD_F_SCALEBITS  MAD_F_FRACBITS
 # endif
 
-/* C routines */
-
-mad_fixed_t mad_f_abs(mad_fixed_t);
-mad_fixed_t mad_f_div(mad_fixed_t, mad_fixed_t);
-
 # endif
