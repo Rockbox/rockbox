@@ -1,0 +1,54 @@
+metadata/metadata.c
+metadata/id3tags.c
+metadata/mp3.c
+metadata/mp3data.c
+#if CONFIG_CODEC == SWCODEC
+dsp/compressor.c
+dsp/dsp.c
+dsp/eq.c
+# if defined(CPU_COLDFIRE)
+dsp/dsp_cf.S
+dsp/eq_cf.S
+# elif defined(CPU_ARM)
+dsp/dsp_arm.S
+dsp/eq_arm.S
+#  if ARM_ARCH >= 6
+dsp/dsp_arm_v6.S
+#  endif
+# endif
+# ifdef HAVE_PITCHSCREEN
+dsp/tdspeed.c
+# endif
+metadata/replaygain.c
+metadata/metadata_common.c
+metadata/a52.c
+metadata/adx.c
+metadata/aiff.c
+metadata/ape.c
+metadata/asap.c
+metadata/asf.c
+metadata/au.c
+metadata/ay.c
+metadata/flac.c
+metadata/gbs.c
+metadata/hes.c
+metadata/kss.c
+metadata/mod.c
+metadata/monkeys.c
+metadata/mp4.c
+metadata/mpc.c
+metadata/nsf.c
+metadata/ogg.c
+metadata/oma.c
+metadata/rm.c
+metadata/sgc.c
+metadata/sid.c
+metadata/smaf.c
+metadata/spc.c
+metadata/tta.c
+metadata/vgm.c
+metadata/vorbis.c
+metadata/vox.c
+metadata/wave.c
+metadata/wavpack.c
+#endif

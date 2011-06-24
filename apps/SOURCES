@@ -26,7 +26,6 @@ menus/audiohw_eq_menu.c
 menus/eq_menu.c
 buffering.c
 voice_thread.c
-replaygain.c
 #else  /* !SWCODEC */
 mpeg.c
 #endif
@@ -42,7 +41,6 @@ menus/sound_menu.c
 menus/time_menu.c
 #endif
 misc.c
-mp3data.c
 onplay.c
 playlist.c
 playlist_catalog.c
@@ -168,28 +166,12 @@ pcmbuf.c
 codec_thread.c
 playback.c
 codecs.c
-dsp.c
-compressor.c
 #ifndef HAVE_HARDWARE_BEEP
 beep.c
-#endif
-#ifdef HAVE_PITCHSCREEN
-tdspeed.c
 #endif
 #ifdef HAVE_RECORDING
 enc_config.c
 recorder/pcm_record.c
-#endif
-eq.c	 	
-#if defined(CPU_COLDFIRE)
-dsp_cf.S
-eq_cf.S	 	
-#elif defined(CPU_ARM)
-dsp_arm.S
-#if ARM_ARCH >= 6
-dsp_arm_v6.S
-#endif
-eq_arm.S
 #endif
 #endif
 #ifdef USB_ENABLE_HID
@@ -197,42 +179,6 @@ usb_keymaps.c
 #endif
 #ifndef USB_NONE
 gui/usb_screen.c
-#endif
-metadata.c
-metadata/id3tags.c
-metadata/mp3.c
-#if CONFIG_CODEC == SWCODEC
-metadata/metadata_common.c
-metadata/aiff.c
-metadata/ape.c
-metadata/asf.c
-metadata/adx.c
-metadata/flac.c
-metadata/monkeys.c
-metadata/mp4.c
-metadata/mpc.c
-metadata/ogg.c
-metadata/sid.c
-metadata/mod.c
-metadata/spc.c
-metadata/vorbis.c
-metadata/wave.c
-metadata/wavpack.c
-metadata/a52.c
-metadata/asap.c
-metadata/rm.c
-metadata/nsf.c
-metadata/oma.c
-metadata/smaf.c
-metadata/au.c
-metadata/vox.c
-metadata/tta.c
-metadata/ay.c
-metadata/gbs.c
-metadata/hes.c
-metadata/sgc.c
-metadata/vgm.c
-metadata/kss.c
 #endif
 #ifdef HAVE_TAGCACHE
 tagcache.c

@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "gcc_extensions.h"
 
-/** FRACTIONAL MULTIPLICATION - TAKEN FROM apps/dsp.h
+/** FRACTIONAL MULTIPLICATION
  *  Multiply two fixed point numbers with 31 fractional bits:
  *      FRACMUL(x, y)
  *

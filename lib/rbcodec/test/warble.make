@@ -9,12 +9,15 @@
 
 
 
+RBCODEC_DIR = $(ROOTDIR)/lib/rbcodec
+RBCODEC_BLD = $(BUILDDIR)/lib/rbcodec
+
 FLAGS=-g -D__PCTOOL__ $(TARGET) -Wall
 
 SRC= $(call preprocess, $(ROOTDIR)/lib/rbcodec/test/SOURCES)
 
 INCLUDES += -I$(ROOTDIR)/apps -I$(ROOTDIR)/apps/codecs -I$(ROOTDIR)/apps/codecs/lib \
-			-I$(ROOTDIR)/apps/gui -I$(ROOTDIR)/apps/metadata
+			-I$(ROOTDIR)/apps/gui
 INCLUDES += -I$(ROOTDIR)/firmware/export -I$(ROOTDIR)/firmware/include \
 			-I$(ROOTDIR)/firmware/target/hosted \
 			-I$(ROOTDIR)/firmware/target/hosted/sdl
@@ -30,9 +33,10 @@ endif
 
 include $(ROOTDIR)/tools/functions.make
 include $(ROOTDIR)/apps/codecs/codecs.make
+include $(ROOTDIR)/lib/rbcodec/rbcodec.make
 
 $(BUILDDIR)/$(BINARY): $(CODECS)
 
-$(BUILDDIR)/$(BINARY): $$(OBJ)
+$(BUILDDIR)/$(BINARY): $$(OBJ) $(RBCODEC_LIB)
 	@echo LD $(BINARY)
 	$(SILENT)$(HOSTCC) $(SIMFLAGS) $(LIBS) -o $@ $+
