@@ -541,8 +541,9 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
         if (!y)
             rmctx->audiotimestamp = pkt->timestamp;
         
-        advance_buffer(src,12);
-        consumed += 12;
+        /* Skip packet header */
+        advance_buffer(src, PACKET_HEADER_SIZE);
+        consumed += PACKET_HEADER_SIZE;
         if (rmctx->codec_type == CODEC_COOK || rmctx->codec_type == CODEC_ATRAC) {
             for(x = 0 ; x < w/sps; x++)
             {

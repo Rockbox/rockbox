@@ -89,7 +89,7 @@ enum codec_status codec_run(void)
     fs = rmctx.audio_framesize;
     sps= rmctx.block_align;
     h = rmctx.sub_packet_h;
-    scrambling_unit_size = h*fs;
+    scrambling_unit_size = h * (fs + PACKET_HEADER_SIZE);
     
     res = atrac3_decode_init(&q, ci->id3);
     if(res < 0) {
