@@ -121,7 +121,16 @@ void Config::accept()
         proxy.setPort(ui.proxyPort->text().toInt());
     }
 
-    RbSettings::setValue(RbSettings::Proxy, proxy.toString());
+    // QUrl::toEncoded() doesn't encode a colon in the password correctly,
+    // which will result in errors during parsing the string.
+    // QUrl::toPercentEncoding() does work as expected, so build the string to
+    // store in the configuration file manually.
+    QString proxystring = "http://"
+        + QString(QUrl::toPercentEncoding(proxy.userName())) + ":"
+        + QString(QUrl::toPercentEncoding(proxy.password())) + "@"
+        + proxy.host() + ":"
+        + QString::number(proxy.port());
+    RbSettings::setValue(RbSettings::Proxy, proxystring);
     qDebug() << "[Config] setting proxy to:" << proxy;
     // proxy type
     QString proxyType;
@@ -218,7 +227,7 @@ void Config::abort()
 void Config::setUserSettings()
 {
     // set proxy
-    proxy = RbSettings::value(RbSettings::Proxy).toString();
+    proxy.setEncodedUrl(RbSettings::value(RbSettings::Proxy).toByteArray());
 
     if(proxy.port() > 0)
         ui.proxyPort->setText(QString("%1").arg(proxy.port()));

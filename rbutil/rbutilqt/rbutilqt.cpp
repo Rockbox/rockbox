@@ -1240,11 +1240,13 @@ void RbUtilQt::updateInfo()
 
 QUrl RbUtilQt::proxy()
 {
+    QUrl proxy;
     if(RbSettings::value(RbSettings::ProxyType) == "manual")
-        return QUrl(RbSettings::value(RbSettings::Proxy).toString());
+        proxy.setEncodedUrl(RbSettings::value(RbSettings::Proxy).toByteArray());
     else if(RbSettings::value(RbSettings::ProxyType) == "system")
-        return System::systemProxy();
-    return QUrl("");
+        proxy = System::systemProxy();
+    qDebug() << proxy.userName() << proxy.password() << proxy.host() << proxy.port();
+    return proxy;
 }
 
 
