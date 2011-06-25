@@ -2062,7 +2062,7 @@ Naciśnij &quot;Nie&quot; aby pominąć ten etap.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1050"/>
-        <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
+        <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

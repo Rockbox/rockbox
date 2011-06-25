@@ -1039,7 +1039,7 @@ void RbUtilQt::uninstallBootloader(void)
     // create installer
     BootloaderInstallBase *bl = BootloaderInstallBase::createBootloaderInstaller(this,
                                     SystemInfo::value(SystemInfo::CurBootloaderMethod).toString());
-  
+
     if(bl == NULL ) {
         logger->addItem(tr("No uninstall method for this target known."), LOGERROR);
         logger->setFinished();
@@ -1047,13 +1047,13 @@ void RbUtilQt::uninstallBootloader(void)
     }
     if( (bl->capabilities() & BootloaderInstallBase::Uninstall) == 0)
     {
-        logger->addItem(tr("Rockbox Utility can not uninstall the bootloader on this target."
+        logger->addItem(tr("Rockbox Utility can not uninstall the bootloader on this target. "
                             "Try a normal firmware update to remove the booloader."), LOGERROR);
         logger->setFinished();
         delete bl;
         return;
     }
-    
+
     QStringList blfile = SystemInfo::value(SystemInfo::CurBootloaderFile).toStringList();
     QStringList blfilepath;
     for(int a = 0; a < blfile.size(); a++) {

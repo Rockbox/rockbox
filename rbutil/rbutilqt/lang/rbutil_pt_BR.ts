@@ -1684,7 +1684,7 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
         <translation>Não é conhecido método de desistalação deste alvo.</translation>
     </message>
     <message>
-        <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
+        <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
         <translation>O Utilitário Rockbox não pode desinstalar o inicializador neste alvo. Tente uma atualização normal de firmware para remover o inicializador.</translation>
     </message>
     <message>

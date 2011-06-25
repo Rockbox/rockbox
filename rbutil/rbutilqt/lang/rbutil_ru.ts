@@ -1694,7 +1694,7 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation>Нет известного способа удаления с этого устройства.</translation>
     </message>
     <message>
-        <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
+        <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
         <translation>Мастер Rockbox не может удалить загрузчик с этого устройства. Попробуйте нормальное обновление прошивки, чтобы удалить загрузчик.</translation>
     </message>
     <message>

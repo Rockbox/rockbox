@@ -1843,7 +1843,7 @@ TTSエンジンの設定を行って下さい。</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1050"/>
-        <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
+        <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
         <translation>Rockbox Utility は、このプレイヤーに対して、ブートローダをアンインストールすることができません。通常のファームウェアのアップデート処理を行って、ブートローダを削除して下さい。</translation>
     </message>
     <message>

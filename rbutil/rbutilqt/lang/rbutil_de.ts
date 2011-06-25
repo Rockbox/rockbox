@@ -1841,7 +1841,7 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1050"/>
-        <source>Rockbox Utility can not uninstall the bootloader on this target.Try a normal firmware update to remove the booloader.</source>
+        <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
         <translation type="unfinished">Rockbox Utility kann den Bootloader auf diesem Gerät nicht entfernen. Bitte ein reguläres Firmware-Update versuchen um den Bootloader zu installieren.</translation>
     </message>
     <message>
