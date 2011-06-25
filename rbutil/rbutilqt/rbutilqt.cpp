@@ -1045,15 +1045,6 @@ void RbUtilQt::uninstallBootloader(void)
         logger->setFinished();
         return;
     }
-    if( (bl->capabilities() & BootloaderInstallBase::Uninstall) == 0)
-    {
-        logger->addItem(tr("Rockbox Utility can not uninstall the bootloader on this target. "
-                            "Try a normal firmware update to remove the booloader."), LOGERROR);
-        logger->setFinished();
-        delete bl;
-        return;
-    }
-
     QStringList blfile = SystemInfo::value(SystemInfo::CurBootloaderFile).toStringList();
     QStringList blfilepath;
     for(int a = 0; a < blfile.size(); a++) {
@@ -1061,6 +1052,18 @@ void RbUtilQt::uninstallBootloader(void)
                 + blfile.at(a));
     }
     bl->setBlFile(blfilepath);
+
+    BootloaderInstallBase::BootloaderType currentbl = bl->installed();
+    if((bl->capabilities() & BootloaderInstallBase::Uninstall) == 0
+            || currentbl == BootloaderInstallBase::BootloaderUnknown
+            || currentbl == BootloaderInstallBase::BootloaderOther)
+    {
+        logger->addItem(tr("Rockbox Utility can not uninstall the bootloader on this target. "
+                            "Try a normal firmware update to remove the booloader."), LOGERROR);
+        logger->setFinished();
+        delete bl;
+        return;
+    }
 
     connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
     connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));

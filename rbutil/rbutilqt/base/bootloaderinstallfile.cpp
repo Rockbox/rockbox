@@ -141,6 +141,6 @@ BootloaderInstallBase::BootloaderType BootloaderInstallFile::installed(void)
 BootloaderInstallBase::Capabilities BootloaderInstallFile::capabilities(void)
 {
     qDebug() << "[BootloaderInstallFile] getting capabilities";
-    return Install | IsFile | CanCheckInstalled | Backup;
+    return Install | Uninstall | IsFile | CanCheckInstalled | Backup;
 }
 
