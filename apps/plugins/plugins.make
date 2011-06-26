@@ -87,7 +87,7 @@ $(BUILDDIR)/credits.raw credits.raw: $(DOCSDIR)/CREDITS
 	$(call PRINTS,Create credits.raw)perl $(APPSDIR)/plugins/credits.pl < $< > $(BUILDDIR)/$(@F)
 
 # special dependencies
-$(BUILDDIR)/apps/plugins/wav2wv.rock: $(BUILDDIR)/apps/codecs/libwavpack.a $(PLUGIN_LIBS)
+$(BUILDDIR)/apps/plugins/wav2wv.rock: $(RBCODEC_BLD)/codecs/libwavpack.a $(PLUGIN_LIBS)
 
 # Do not use '-ffunction-sections' and '-fdata-sections' when compiling sdl-sim
 ifeq ($(findstring sdl-sim, $(APP_TYPE)), sdl-sim)

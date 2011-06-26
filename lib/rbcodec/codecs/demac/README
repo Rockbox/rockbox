@@ -1,0 +1,69 @@
+demac - a decoder for Monkey's Audio files.
+
+Introduction
+
+demac is an implementation in portable ANSI C of a decoder for the
+Monkey's Audio lossless compression format.  It has the following
+features:
+
+  * Open source (GNU GPL)
+  * Written in portable ANSI C
+  * Designed for use on low memory and embedded devices.  All internal
+    buffers are statically declared - the core library doesn't require 
+    malloc/free.  This has the disadvantage that the library isn't 
+    re-entrant.
+
+
+Compatibility
+
+
+libdemac is still in the early stages of development but has been
+relatively well tested with v3.99 files at all compression levels.
+
+v3.97 files have received less testing - 16-bit files seem to work,
+but 24-bit files are causing problems in the range decoder.
+
+Files earlier than v3.97 are not supported by libdemac, but support
+might be added in the future.
+
+
+Source Code
+
+The source code in this directory is structured as follows:
+
+demac/Makefile - Makefile for the standalone demac decoder
+demac/demac.c - Simple standalone test program to decoder an APE file to WAV
+demac/wavwrite.[ch] - Helper functions for demac.c
+demac/libdemac/Makefile - A Makefile for use in Rockbox
+demac/libdemac/*.[ch] - The main libdemac code
+
+
+Latest Version
+
+The latest version of demac and libdemac can always be found in the
+"lib/rbcodec/codecs/demac/" directory in the Rockbox source.  You can check
+this out from svn with the command:
+
+svn co svn://svn.rockbox.org/rockbox/trunk/lib/rbcodec/codecs/demac demac
+
+Or browse the source code online here:
+
+http://svn.rockbox.org/viewvc.cgi/trunk/lib/rbcodec/codecs/demac
+
+
+
+Acknowledgements
+
+Thanks to Matt. T. Ashland for writing Monkey's Audio.  His website
+can be found here: http://www.monkeysaudio.com
+
+
+Copyright and license
+
+
+libdemac is (C) 2007 Dave Chapman and is licensed under the GNU
+GPL. See the COPYING file in this directory.
+
+The exception is the majority of rangecoding.h, which is (C) 1997,
+1998, 1999, 2000 Michael Schindler and is also licensed under the GPL.
+See that source file for full details.

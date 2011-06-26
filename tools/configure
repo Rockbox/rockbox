@@ -3849,6 +3849,7 @@ export CPU=${t_cpu}
 export MANUFACTURER=${t_manufacturer}
 export OBJDIR=${pwd}
 export BUILDDIR=${pwd}
+export RBCODEC_BLD=${pwd}/lib/rbcodec
 export LANGUAGE=${language}
 export VOICELANGUAGE=${voicelanguage}
 export MEMORYSIZE=${memory}

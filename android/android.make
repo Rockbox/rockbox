@@ -124,7 +124,7 @@ $(BINLIB_DIR)/$(BINARY): $(BUILDDIR)/$(BINARY)
 $(BINLIB_DIR)/libmisc.so: $(BUILDDIR)/rockbox.zip
 	$(call PRINTS,CP rockbox.zip)cp $^ $@
 
-$(BINLIB_DIR)/lib%.so: $(BUILDDIR)/apps/codecs/%.codec
+$(BINLIB_DIR)/lib%.so: $(RBCODEC_BLD)/codecs/%.codec
 	$(call PRINTS,CP $(@F))cp $^ $@
 
 libs: $(DIRS) $(LIBS)
