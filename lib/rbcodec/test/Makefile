@@ -10,10 +10,10 @@ RBCODEC_DIR = $(ROOTDIR)/lib/rbcodec
 RBCODEC_BLD = $(BUILDDIR)/lib/rbcodec
 DEPFILE = $(BUILDDIR)/make.dep
 APP_TYPE = sdl-sim
+SOFTWARECODECS = yes
 
 INCLUDES = -I$(shell pwd)
-INCLUDES += -I$(APPSDIR) -I$(APPSDIR)/codecs -I$(APPSDIR)/codecs/lib \
-			-I$(APPSDIR)/gui
+INCLUDES += -I$(APPSDIR) -I$(APPSDIR)/gui
 INCLUDES += -I$(ROOTDIR)/firmware/export -I$(ROOTDIR)/firmware/include \
 			-I$(ROOTDIR)/firmware/target/hosted \
 			-I$(ROOTDIR)/firmware/target/hosted/sdl
@@ -31,7 +31,6 @@ WARBLE_CFLAGS = '-DCODECDIR="$(CODECDIR)"' $(shell sdl-config --cflags)
 WARBLE_LDFLAGS = -lm -ldl $(shell sdl-config --libs)
 
 include $(ROOTDIR)/tools/functions.make
-include $(APPSDIR)/codecs/codecs.make
 include ../rbcodec.make
 
 SRC = $(ROOTDIR)/firmware/buflib.c \

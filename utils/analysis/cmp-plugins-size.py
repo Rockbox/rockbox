@@ -149,8 +149,8 @@ newver = rb_version(sys.argv[2])
 
 oldplugindir = sys.argv[1] + '/apps/plugins'
 newplugindir = sys.argv[2] + '/apps/plugins'
-oldcodecsdir = sys.argv[1] + '/apps/codecs'
-newcodecsdir = sys.argv[2] + '/apps/codecs'
+oldcodecsdir = sys.argv[1] + '/lib/rbcodec/codecs'
+newcodecsdir = sys.argv[2] + '/lib/rbcodec/codecs'
 
 if os.path.lexists(oldplugindir) and os.path.lexists(newplugindir):
     compare(oldplugindir, newplugindir, oldver, newver)

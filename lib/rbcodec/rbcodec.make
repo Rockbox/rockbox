@@ -8,7 +8,8 @@
 RBCODEC_LIB = $(RBCODEC_BLD)/librbcodec.a
 RBCODEC_SRC := $(call preprocess, $(RBCODEC_DIR)/SOURCES)
 RBCODEC_OBJ := $(call c2obj, $(RBCODEC_SRC))
-INCLUDES += -I$(RBCODEC_DIR) -I$(RBCODEC_DIR)/dsp -I$(RBCODEC_DIR)/metadata
+INCLUDES += -I$(RBCODEC_DIR) -I$(RBCODEC_DIR)/codecs -I$(RBCODEC_DIR)/dsp \
+            -I$(RBCODEC_DIR)/metadata
 OTHER_SRC += $(RBCODEC_SRC)
 
 $(RBCODEC_BLD)/%.o: $(RBCODEC_DIR)/%.c
@@ -17,3 +18,7 @@ $(RBCODEC_BLD)/%.o: $(RBCODEC_DIR)/%.c
 
 $(RBCODEC_LIB): $(RBCODEC_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
+
+ifdef SOFTWARECODECS
+  include $(RBCODEC_DIR)/codecs/codecs.make
+endif
