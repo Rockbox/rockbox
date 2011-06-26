@@ -49,7 +49,6 @@ extern int curr_freq; /* from radio.c.. naughty but meh */
 extern int radio_mode;
 int snap_freq_to_grid(int freq);
 void remember_frequency(void);
-void talk_freq(int freq, bool enqueue);
 
 #define MAX_PRESETS 64
 static bool presets_loaded = false;
@@ -178,10 +177,9 @@ void preset_talk(int preset, bool fallback, bool enqueue)
         if(presets[preset].name[0])
             talk_spell(presets[preset].name, enqueue);
         else if(fallback)
-             talk_freq(presets[preset].frequency, enqueue);
+            talk_value_decimal(presets[preset].frequency, UNIT_INT, 6, enqueue);
     }
 }
-
 
 void radio_save_presets(void)
 {

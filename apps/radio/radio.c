@@ -364,18 +364,6 @@ static void end_search(void)
     search_dir = 0;
 }
 
-/* Speak a frequency. */
-void talk_freq(int freq, bool enqueue)
-{
-    freq /= 10000;
-    talk_number(freq / 100, enqueue);
-    talk_id(LANG_POINT, true);
-    talk_number(freq % 100 / 10, true);
-    if (freq % 10)
-        talk_number(freq % 10, true);
-}
-
-
 void radio_screen(void)
 {
     bool done = false;
@@ -798,7 +786,7 @@ void radio_screen(void)
             bool enqueue = false;
             if (radio_mode == RADIO_SCAN_MODE)
             {
-                talk_freq(curr_freq, enqueue);
+                talk_value_decimal(curr_freq, UNIT_INT, 6, enqueue);
                 enqueue = true;
             }
             if (radio_current_preset() >= 0)
