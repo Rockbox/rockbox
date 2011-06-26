@@ -9,15 +9,14 @@
 
 
 
-RBCODEC_DIR = $(ROOTDIR)/lib/rbcodec
+RBCODECLIB_DIR = $(ROOTDIR)/lib/rbcodec
 RBCODEC_BLD = $(BUILDDIR)/lib/rbcodec
 
 GCCOPTS += -D__PCTOOL__ $(TARGET) -DDEBUG -g -std=gnu99 `$(SDLCONFIG) --cflags` -DCODECDIR="\"$(CODECDIR)\""
 
 SRC= $(call preprocess, $(ROOTDIR)/lib/rbcodec/test/SOURCES)
 
-INCLUDES += -I$(ROOTDIR)/apps -I$(ROOTDIR)/apps/codecs -I$(ROOTDIR)/apps/codecs/lib \
-			-I$(ROOTDIR)/apps/gui
+INCLUDES += -I$(ROOTDIR)/apps -I$(ROOTDIR)/apps/gui
 INCLUDES += -I$(ROOTDIR)/firmware/export -I$(ROOTDIR)/firmware/include \
 			-I$(ROOTDIR)/firmware/target/hosted \
 			-I$(ROOTDIR)/firmware/target/hosted/sdl

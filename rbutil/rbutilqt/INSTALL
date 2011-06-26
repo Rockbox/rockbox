@@ -23,7 +23,7 @@ Requirements:
 - gcc
 - Qt 4.5.0 or later
 - at least the following folders from Rockbox svn:
-  o apps/codecs/libspeex
+  o lib/rbcodec/codecs/libspeex
   o rbutil/
   o tools/
 - libusb (Linux only)

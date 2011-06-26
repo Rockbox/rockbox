@@ -486,7 +486,7 @@ STOP
     # Android has codecs installed as native libraries so they are not needed
     # in the zip.
     if ($modelname !~ /android/) {
-        find(find_copyfile(qr/.*\.codec/, abs_path("$temp_dir/codecs/")), 'apps/codecs');
+        find(find_copyfile(qr/.*\.codec/, abs_path("$temp_dir/codecs/")), 'lib/rbcodec/codecs');
     }
 
     # remove directory again if no codec was copied

@@ -11,7 +11,7 @@ ifndef V
 SILENT = @
 endif
 
-SPEEXSRC = ../../apps/codecs/libspeex
+SPEEXSRC = ../../lib/rbcodec/codecs/libspeex
 
 INCLUDES = -I $(SPEEXSRC)
 SPEEXOPTS = -DHAVE_CONFIG_H -DROCKBOX_VOICE_ENCODER

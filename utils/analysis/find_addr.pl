@@ -100,12 +100,12 @@ if($lookaddr != 0)
     close MAKEFILE;
 
     # Generate a list of all codecs
-    open FINDCODECS, "find apps/codecs/ -name '*.elf' 2>&1 |" or die "Can't open pipe: $!";
+    open FINDCODECS, "find lib/rbcodec/codecs/ -name '*.elf' 2>&1 |" or die "Can't open pipe: $!";
     my @codecs;
     while(<FINDCODECS>)
     {
         chomp($_);
-        $_ =~ s/apps\/codecs\///;
+        $_ =~ s/lib\/rbcodec\/codecs\///;
         push(@codecs, $_);
     }
     close FINDCODECS;

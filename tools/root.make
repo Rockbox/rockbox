@@ -101,16 +101,11 @@ else ifneq (,$(findstring database,$(APP_TYPE)))
 else ifneq (,$(findstring warble,$(APP_TYPE)))
   include $(ROOTDIR)/lib/rbcodec/test/warble.make
   include $(ROOTDIR)/lib/tlsf/libtlsf.make
-  include $(APPSDIR)/codecs/codecs.make
   include $(ROOTDIR)/lib/rbcodec/rbcodec.make
 else
   include $(APPSDIR)/apps.make
   include $(ROOTDIR)/lib/rbcodec/rbcodec.make
   include $(APPSDIR)/lang/lang.make
-
-  ifdef SOFTWARECODECS
-    include $(APPSDIR)/codecs/codecs.make
-  endif
 
   ifdef ENABLEDPLUGINS
     include $(APPSDIR)/plugins/bitmaps/pluginbitmaps.make
@@ -206,7 +201,7 @@ $(LINKROM): $(ROMLDS)
 $(BUILDDIR)/rockbox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $$(LINKRAM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
-		-L$(BUILDDIR)/apps/codecs $(call a2lnk, $(VOICESPEEXLIB)) \
+		-L$(RBCODEC_BLD)/codecs $(call a2lnk, $(VOICESPEEXLIB)) \
 		-L$(BUILDDIR)/lib $(call a2lnk, $(CORE_LIBS)) \
 		-lgcc $(BOOTBOXLDOPTS) $(GLOBAL_LDOPTS) \
 		-T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
@@ -214,7 +209,7 @@ $(BUILDDIR)/rockbox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $$(LI
 $(BUILDDIR)/rombox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
-		-L$(BUILDDIR)/apps/codecs $(call a2lnk, $(VOICESPEEXLIB)) \
+		-L$(RBCODEC_BLD)/codecs $(call a2lnk, $(VOICESPEEXLIB)) \
 		-L$(BUILDDIR)/lib $(call a2lnk, $(CORE_LIBS)) \
 		-lgcc $(BOOTBOXLDOPTS) $(GLOBAL_LDOPTS) \
 		-T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-$codecs="apps/codecs";
+$codecs="lib/rbcodec/codecs";
 
 opendir(DIR, $codecs) || die "can't opendir $some_dir: $!";
 my @maps = sort grep { /\.map/ && -f "$codecs/$_" } readdir(DIR);
