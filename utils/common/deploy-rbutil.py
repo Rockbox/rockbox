@@ -26,7 +26,7 @@ deploy.svnpaths = \
              "tools/ucl",
              "tools/rbspeex",
              "utils/imxtools",
-             "apps/codecs/libspeex",
+             "lib/rbcodec/codecs/libspeex",
              "docs/COPYING",
              "docs/gpl-2.0.html",
              "docs/logo/rockbox-clef.svg",

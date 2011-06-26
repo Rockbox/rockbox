@@ -17,7 +17,7 @@ SIMFLAGS += $(INCLUDES) $(DEFINES) -DHAVE_CONFIG_H $(GCCOPTS)
 $(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(UNWARMINDER)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
-		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
+		-L$(RBCODEC_BLD)/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
 		-L$(BUILDDIR)/lib -lskin_parser \
 		$(LDOPTS) $(GLOBAL_LDOPTS) -Wl,-Map,$(BUILDDIR)/rockbox.map
 

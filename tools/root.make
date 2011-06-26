@@ -101,10 +101,6 @@ else
   include $(RBCODEC_DIR)/rbcodec.make
   include $(APPSDIR)/lang/lang.make
 
-  ifdef SOFTWARECODECS
-    include $(APPSDIR)/codecs/codecs.make
-  endif
-
   ifdef ENABLEDPLUGINS
     include $(APPSDIR)/plugins/bitmaps/pluginbitmaps.make
     include $(APPSDIR)/plugins/plugins.make
@@ -213,7 +209,7 @@ $(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(RBCODEC_LIB) $$(VOICESPEEXLIB) 
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(RBCODEC_BLD) -lrbcodec \
 		-L$(BUILDDIR)/lib -lskin_parser $(LIBARMSUPPORT_LINK) \
-		$(UNWARMINDER_LINK) -L$(BUILDDIR)/apps/codecs \
+		$(UNWARMINDER_LINK) -L$(RBCODEC_BLD)/codecs \
 		$(VOICESPEEXLIB:lib%.a=-l%) -lgcc $(BOOTBOXLDOPTS) \
 		$(GLOBAL_LDOPTS) -T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
 
