@@ -8400,6 +8400,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Bygger database... %d fundet (SLUK for at stoppe)"
@@ -8408,13 +8409,10 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Bygger database... %d fundet (VENSTRE for at stoppe)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Bygger database... %d fundet (FORRIGE for at stoppe)"
     gogearsa9200: "Bygger database... %d fundet (SPOL TILBAGE for at stoppe)"
+    archosplayer: "Bygger DB %d fundet"
   </dest>
   <voice>
     *: "filer fundet til databasen"
-    iriverh100,iriverh120,iriverh300: ""
-    ipod*: ""
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: ""
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9885,19 +9883,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Spol tilbage"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Spol tilbage"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12681,5 +12676,19 @@
   </dest>
   <voice>
     *: "Kun i brugerdefinerede mapper"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Spol tilbage ved pause"
+  </dest>
+  <voice>
+    *: "Spol tilbage ved pause"
   </voice>
 </phrase>
