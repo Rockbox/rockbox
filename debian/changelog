@@ -1,3 +1,9 @@
+rockbox (2011-06-28maemo1) unstable; urgency=low
+
+  * Update to rockbox 3.9 code base
+
+ -- Thomas Jarosch <tomj@simonv.com>  Tue, 28 Jun 2011 19:00:00 +0100
+
 rockbox (2011-04-16maemo1) unstable; urgency=low
 
   * Fix premature idle shutdown after last track finished playing
