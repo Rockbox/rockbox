@@ -1992,19 +1992,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Czas do cofnięcia"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Czas do cofnięcia"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2245,17 +2242,19 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
-    *: "Budowanie biblioteki... %d znalezionych (OFF żeby wrócić)"
-    iriverh100,iriverh120,iriverh300: "Budowanie biblioteki... %d znalezionych (STOP żeby wrócić)"
-    ipod*: "Budowanie biblioteki... %d znalezionych (PREV żeby wrócić)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Budowanie biblioteki... %d znalezionych (LEFT żeby wrócić)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Budowanie biblioteki... %d znalezionych (PREV żeby wrócić)"
-    gogearsa9200: "Budowanie biblioteki... %d znalezionych (REW żeby wrócić)"
+    *: "Budowanie biblioteki... %d znalezionych (OFF by wrócić)"
+    iriverh100,iriverh120,iriverh300: "Budowanie biblioteki... %d znalezionych (STOP by wrócić)"
+    ipod*: "Budowanie biblioteki... %d znalezionych (PREV by wrócić)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Budowanie biblioteki... %d znalezionych (LEFT by wrócić)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Budowanie biblioteki... %d znalezionych (PREV by wrócić)"
+    gogearsa9200: "Budowanie biblioteki... %d znalezionych (REW by wrócić)"
+    archosplayer: "Budowanie biblioteki %d znalezionych"
   </dest>
   <voice>
-    *: "Znaleziono wpisy do biblioteki"
+    *: "znaleziono wpisy do biblioteki"
   </voice>
 </phrase>
 <phrase>
@@ -12666,5 +12665,19 @@
   </dest>
   <voice>
     *: "Tylko w wybranych katalogach"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Cofaj po Wstrzymaniu"
+  </dest>
+  <voice>
+    *: "Cofaj po Wstrzymaniu"
   </voice>
 </phrase>
