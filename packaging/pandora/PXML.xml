@@ -6,7 +6,7 @@
     <author name="Thomas Jarosch" website="http://www.rockbox.org"/>
 
     <!-- Note: Another version tag below -->
-    <version major="3" minor="8" release="x" build="4"/>
+    <version major="3" minor="9" release="x" build="1"/>
 
     <titles>
       <title lang="en_US">Rockbox</title>
@@ -34,7 +34,7 @@
 
     <author name="The rockbox team" website="http://www.rockbox.org"/>
 
-    <version major="3" minor="8" release="x" build="4"/>
+    <version major="3" minor="9" release="x" build="1"/>
 
     <osversion major="1" minor="0" release="0" build="0"/>
 
