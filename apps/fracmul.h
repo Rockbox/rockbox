@@ -75,7 +75,7 @@ static inline int32_t FRACMUL(int32_t x, int32_t y)
  */
 static inline int32_t FRACMUL_SHL(int32_t x, int32_t y, int z)
 {
-    int32_t t, t2; \
+    int32_t t, t2;
     asm ("smull    %[t], %[t2], %[a], %[b]\n\t"
          "mov      %[t2], %[t2], asl %[c]\n\t"
          "orr      %[t], %[t2], %[t], lsr %[d]\n\t"
