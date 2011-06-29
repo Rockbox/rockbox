@@ -1089,6 +1089,12 @@ help() {
                       order. So --type=b stands for Bootloader build, while
                       --type=ab stands for "Backlight MOD" build.
 
+    --lcdwidth=X      Sets the width of the LCD. Used only for application
+                      targets.
+
+    --lcdheight=Y     Sets the height of the LCD. Used only for application
+                      targets.
+
     --language=LANG   Set the language used for voice generation (used only if
                       TYPE is AV).
 
