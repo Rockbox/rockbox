@@ -26,6 +26,7 @@
 #include "audio.h"
 #include "sound.h"
 #include "file.h"
+#include "pcm-internal.h"
 
 /* PCM interrupt routine lockout */
 static struct
@@ -275,6 +276,8 @@ void fiq_handler(void)
 
     /* Re-Activate the channel */
     DMASKTRIG2 = 0x2;
+
+    pcm_play_dma_started_callback();
 }
 
 size_t pcm_get_bytes_waiting(void)

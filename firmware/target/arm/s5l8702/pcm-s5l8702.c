@@ -27,6 +27,7 @@
 #include "panic.h"
 #include "audiohw.h"
 #include "pcm.h"
+#include "pcm-internal.h"
 #include "pcm_sampr.h"
 #include "mmu-arm.h"
 #include "pcm-target.h"
@@ -113,6 +114,8 @@ void INT_DMAC0C0(void)
         DMAC0C0CONFIG = 0x8a81;
     }
     else DMAC0C0NEXTLLI = pcm_lli;
+
+    pcm_play_dma_started_callback();
 }
 
 void pcm_play_dma_start(const void* addr, size_t size)

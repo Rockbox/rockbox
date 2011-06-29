@@ -551,7 +551,7 @@ static const struct plugin_api rockbox_api = {
     pcm_get_peak_buffer,
     pcm_play_lock,
     pcm_play_unlock,
-    pcmbuf_beep,
+    beep_play,
 #ifdef HAVE_RECORDING
     &rec_freq_sampr[0],
     pcm_init_recording,
@@ -778,6 +778,9 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+    mixer_channel_status,
+    mixer_channel_get_buffer,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

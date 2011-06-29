@@ -311,6 +311,7 @@ sound.c
 #ifndef BOOTLOADER
 pcm_sampr.c
 pcm.c
+pcm_mixer.c
 #ifdef HAVE_RECORDING
 enc_base.c
 #endif /* HAVE_RECORDING */

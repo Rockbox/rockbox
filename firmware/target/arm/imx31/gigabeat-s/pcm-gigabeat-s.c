@@ -26,6 +26,7 @@
 #include "ccm-imx31.h"
 #include "sdma-imx31.h"
 #include "mmu-imx31.h"
+#include "pcm-internal.h"
 
 #define DMA_PLAY_CH_NUM 2
 #define DMA_REC_CH_NUM 1
@@ -105,6 +106,8 @@ static void play_dma_callback(void)
     dma_play_bd.mode.command = TRANSFER_16BIT;
     dma_play_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
     sdma_channel_run(DMA_PLAY_CH_NUM);
+
+    pcm_play_dma_started_callback();
 }
 
 void pcm_play_lock(void)

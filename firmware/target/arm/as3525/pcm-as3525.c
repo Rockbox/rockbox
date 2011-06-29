@@ -29,6 +29,7 @@
 #include "as3514.h"
 #include "audiohw.h"
 #include "mmu-arm.h"
+#include "pcm-internal.h"
 
 #define MAX_TRANSFER (4*((1<<11)-1)) /* maximum data we can transfer via DMA
                                       * i.e. 32 bits at once (size of I2SO_DATA)
@@ -104,9 +105,13 @@ static void dma_callback(void)
 
         /* force writeback */
         clean_dcache_range(dma_start_addr, dma_start_size);
+        play_start_pcm();
+        pcm_play_dma_started_callback();
     }
-
-    play_start_pcm();
+    else
+    {
+        play_start_pcm();
+    }
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)

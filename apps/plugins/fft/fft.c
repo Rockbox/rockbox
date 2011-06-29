@@ -1137,6 +1137,10 @@ static void draw_spectrogram_horizontal(void)
 /********************* End of plotting functions (modes) *********************/
 
 /****************************** FFT functions ********************************/
+static bool is_playing(void)
+{
+    return rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) == CHANNEL_PLAYING;
+}
 
 /** functions use in single/multi configuration **/
 static inline bool fft_init_fft_lib(void)
@@ -1156,7 +1160,8 @@ static inline bool fft_init_fft_lib(void)
 static inline bool fft_get_fft(void)
 {
     int count;
-    int16_t *value = (int16_t *) rb->pcm_get_peak_buffer(&count);
+    int16_t *value =
+        (int16_t *) rb->mixer_channel_get_buffer(PCM_MIXER_CHAN_PLAYBACK, &count);
     /* This block can introduce discontinuities in our data. Meaning, the
      * FFT will not be done a continuous segment of the signal. Which can
      * be bad. Or not.
@@ -1214,7 +1219,7 @@ static void fft_thread_entry(void)
 
     while(fft_thread_run)
 	{
-        if (!rb->pcm_is_playing())
+        if (!is_playing())
         {
             rb->sleep(HZ/5);
             continue;
@@ -1296,7 +1301,7 @@ static void fft_close_fft(void)
  * target uses IRAM */
 static bool fft_have_fft(void)
 {
-    return rb->pcm_is_playing() && fft_get_fft();
+    return is_playing() && fft_get_fft();
 }
 
 static inline void fft_free_fft_output(void)
@@ -1366,7 +1371,7 @@ enum plugin_status plugin_start(const void* parameter)
 		{
             int timeout;
 
-            if(!rb->pcm_is_playing())
+            if(!is_playing())
             {
                 showing_warning = true;
                 mylcd_clear_display();

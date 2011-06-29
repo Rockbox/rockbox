@@ -121,9 +121,11 @@ char* wps_default_skin(enum screen_type screen)
 
 void pause_action(bool may_fade, bool updatewps)
 {
+#if CONFIG_CODEC != SWCODEC
     if (may_fade && global_settings.fade_on_stop)
         fade(false, updatewps);
     else
+#endif
         audio_pause();
 
     if (global_settings.pause_rewind) {
@@ -136,16 +138,22 @@ void pause_action(bool may_fade, bool updatewps)
             - global_settings.pause_rewind * 1000;
         audio_ff_rewind(newpos > 0 ? newpos : 0);
     }
+
+    (void)may_fade; (void)updatewps;
 }
 
 void unpause_action(bool may_fade, bool updatewps)
 {
+#if CONFIG_CODEC != SWCODEC
     if (may_fade && global_settings.fade_on_stop)
         fade(true, updatewps);
     else
+#endif
         audio_resume();
+    (void)may_fade; (void)updatewps;
 }        
 
+#if CONFIG_CODEC != SWCODEC
 void fade(bool fade_in, bool updatewps)
 {
     int fp_global_vol = global_settings.volume << 8;
@@ -204,6 +212,7 @@ void fade(bool fade_in, bool updatewps)
         sound_set_volume(global_settings.volume);
     }
 }
+#endif /* SWCODEC */ 
 
 static bool update_onvol_change(enum screen_type screen)
 {
@@ -569,7 +578,7 @@ static void play_hop(int direction)
     {
 #if CONFIG_CODEC == SWCODEC
         if(global_settings.beep)
-            pcmbuf_beep(1000, 150, 1500*global_settings.beep);
+            beep_play(1000, 150, 1500*global_settings.beep);
 #endif
         return;
     }
@@ -1127,9 +1136,12 @@ long gui_wps_show(void)
             status_set_record(false);
             status_set_audio(false);
 #endif
+#if CONFIG_CODEC != SWCODEC
             if (global_settings.fade_on_stop)
                 fade(false, true);
-
+#else
+            audio_pause();
+#endif
             if (bookmark)
                 bookmark_autobookmark(true);
             audio_stop();

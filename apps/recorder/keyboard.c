@@ -1231,7 +1231,7 @@ static void kbd_move_cursor(struct edit_state *state, int dir)
         state->editpos -= dir;
 #if CONFIG_CODEC == SWCODEC
         if (global_settings.talk_menu)
-            pcmbuf_beep(1000, 150, 1500);
+            beep_play(1000, 150, 1500);
 #endif
     }
 }

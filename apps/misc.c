@@ -297,12 +297,13 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             splashf(0, "%s %s", str(LANG_WARNING_BATTERY_EMPTY),
                                 str(LANG_SHUTTINGDOWN));
         }
-
+#if CONFIG_CODEC != SWCODEC
         if (global_settings.fade_on_stop
             && (audio_stat & AUDIO_STATUS_PLAY))
         {
             fade(false, false);
         }
+#endif
 
         if (batt_safe) /* do not save on critical battery */
         {
@@ -380,8 +381,10 @@ bool list_stop_handler(void)
     {
         if (!global_settings.party_mode)
         {
+#if CONFIG_CODEC != SWCODEC
             if (global_settings.fade_on_stop)
                 fade(false, false);
+#endif
             bookmark_autobookmark(true);
             audio_stop();
             ret = true;  /* bookmarking can make a refresh necessary */

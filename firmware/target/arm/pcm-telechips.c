@@ -27,6 +27,7 @@
 #include "sound.h"
 #include "i2s.h"
 #include "pcm.h"
+#include "pcm-internal.h"
 
 struct dma_data
 {
@@ -247,6 +248,8 @@ void fiq_handler(void)
      * r0-r3 and r12 is a working register.
      */
     asm volatile (
+        "stmfd   sp!, { r0-r4, lr }  \n" /* stack scratch regs and lr */
+        "mov     r4, #0              \n" /* Was the callback called? */
 #if defined(CPU_TCC780X)
         "mov     r8, #0xc000         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
         "ldr     r9, =0xf3001004     \n" /* CREQ */
@@ -279,33 +282,41 @@ void fiq_handler(void)
         "sub     r9, r9, #0x10       \n" /* 4 words written */
         "stmia   r11, { r8-r9 }      \n" /* save p and size */
 
+        "cmp     r4, #0              \n" /* Callback called? */
+        "beq     .exit               \n"
+        /* "mov     r4, #0              \n" If get_more could be called multiple times! */
+        "ldr     r2, =pcm_play_dma_started\n"
+        "ldr     r2, [r2]            \n"
+        "cmp     r2, #0              \n"
+        "blxne   r2                  \n"
+
     ".exit:                          \n"
+        "ldmfd   sp!, { r0-r4, lr }  \n"
         "subs    pc, lr, #4          \n" /* FIQ specific return sequence */
 
     ".more_data:                     \n"
-        "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
+        "mov     r4, #1              \n" /* Remember we got more data in this FIQ */
         "ldr     r2, =pcm_play_get_more_callback \n"
         "mov     r0, r11             \n" /* r0 = &p */
         "add     r1, r11, #4         \n" /* r1 = &size */
         "blx     r2                  \n" /* call pcm_play_get_more_callback */
         "ldmia   r11, { r8-r9 }      \n" /* load new p and size */
         "cmp     r9, #0x10           \n" /* did we actually get enough data? */
-        "ldmfd   sp!, { r0-r3, lr }  \n"
         "bpl     .fill_fifo          \n" /* not stop and enough? refill */
         "b       .exit               \n"
         ".ltorg                      \n"
     );
 }
 #else /* C version for reference */
-void fiq_handler(void) ICODE_ATTR __attribute__((naked));
+void fiq_handler(void) ICODE_ATTR;
 void fiq_handler(void)
 {
-    asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
-                    "sub   sp, sp, #8           \n"); /* Reserve stack */
+    register bool new_buffer = false;
 
     if (dma_play_data.size < 16)
     {
         /* p is empty, get some more data */
+        new_buffer = true;
         pcm_play_get_more_callback((void**)&dma_play_data.p,
                                    &dma_play_data.size);
     }
@@ -327,9 +338,8 @@ void fiq_handler(void)
     /* Clear FIQ status */
     CREQ = DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK;
 
-    asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
-                    "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
-                    "subs  pc, lr, #4           \n"); /* Return from FIQ */
+    if (new_buffer)
+        pcm_play_dma_started_callback();
 }
 #endif
 

@@ -65,6 +65,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "misc.h"
 #include "filefuncs.h"
 #if (CONFIG_CODEC == SWCODEC)
+#include "pcm_mixer.h"
 #include "dsp.h"
 #include "codecs.h"
 #include "playback.h"
@@ -145,7 +146,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 205
+#define PLUGIN_API_VERSION 206
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -635,9 +636,8 @@ struct plugin_api {
     const void* (*pcm_get_peak_buffer)(int *count);
     void (*pcm_play_lock)(void);
     void (*pcm_play_unlock)(void);
-    void (*pcmbuf_beep)(unsigned int frequency,
-                        size_t duration,
-                        int amplitude);
+    void (*beep_play)(unsigned int frequency, unsigned int duration,
+                      unsigned int amplitude);
 #ifdef HAVE_RECORDING
     const unsigned long *rec_freq_sampr;
     void (*pcm_init_recording)(void);
@@ -908,6 +908,8 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    enum channel_status (*mixer_channel_status)(enum pcm_mixer_channel channel);
+    void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel, int *count);
 };
 
 /* plugin header */

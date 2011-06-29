@@ -170,6 +170,9 @@ codec_thread.c
 playback.c
 codecs.c
 dsp.c
+#ifndef HAVE_HARDWARE_BEEP
+beep.c
+#endif
 #ifdef HAVE_PITCHSCREEN
 tdspeed.c
 #endif

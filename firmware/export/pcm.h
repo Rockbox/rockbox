@@ -49,7 +49,7 @@
 
 /** RAW PCM routines used with playback and recording **/
 
-/* Typedef for registered callback */
+/* Typedef for registered callbacks */
 typedef void (*pcm_play_callback_type)(unsigned char **start,
                                        size_t *size);
 typedef void (*pcm_rec_callback_type)(int status, void **start, size_t *size);
@@ -90,34 +90,7 @@ void pcm_play_pause(bool play);
 bool pcm_is_paused(void);
 bool pcm_is_playing(void);
 
-/** The following are for internal use between pcm.c and target-
-    specific portion **/
-
-/* Called by the bottom layer ISR when more data is needed. Returns non-
- * zero size if more data is to be played. Setting start to NULL
- * forces stop. */
-void pcm_play_get_more_callback(void **start, size_t *size);
-
-extern unsigned long pcm_curr_sampr;
-extern unsigned long pcm_sampr;
-extern int pcm_fsel;
-
-#ifdef HAVE_PCM_DMA_ADDRESS
-void * pcm_dma_addr(void *addr);
-#endif
-
-extern volatile bool pcm_playing;
-extern volatile bool pcm_paused;
-
-void pcm_play_dma_lock(void);
-void pcm_play_dma_unlock(void);
-void pcm_play_dma_init(void) INIT_ATTR;
-void pcm_play_dma_start(const void *addr, size_t size);
-void pcm_play_dma_stop(void);
-void pcm_play_dma_pause(bool pause);
-const void * pcm_play_dma_get_peak_buffer(int *count);
-
-void pcm_dma_apply_settings(void);
+void pcm_play_set_dma_started_callback(void (* callback)(void));
 
 #ifdef HAVE_RECORDING
 
@@ -147,19 +120,6 @@ bool pcm_is_recording(void);
 void pcm_rec_more_ready_callback(int status, void **start, size_t *size);
 
 void pcm_calculate_rec_peaks(int *left, int *right);
-
-/** The following are for internal use between pcm.c and target-
-    specific portion **/
-/* DMA transfer in is currently active */
-extern volatile bool pcm_recording;
-
-/* APIs implemented in the target-specific portion */
-void pcm_rec_dma_init(void);
-void pcm_rec_dma_close(void);
-void pcm_rec_dma_start(void *addr, size_t size);
-void pcm_rec_dma_record_more(void *start, size_t size);
-void pcm_rec_dma_stop(void);
-const void * pcm_rec_dma_get_peak_buffer(void);
 
 #endif /* HAVE_RECORDING */
 

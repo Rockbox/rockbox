@@ -39,6 +39,7 @@
 #include "abrepeat.h"
 #include "pcmbuf.h"
 #include "playback.h"
+#include "misc.h"
 
 #ifdef HAVE_TAGCACHE
 #include "tagcache.h"
@@ -2360,6 +2361,9 @@ static void audio_start_playback(size_t offset, unsigned int flags)
 #ifndef PLATFORM_HAS_VOLUME_CHANGE
         sound_set_volume(global_settings.volume);
 #endif
+        /* Be sure channel is audible */
+        pcmbuf_fade(false, true);
+
         /* Update our state */
         play_status = PLAY_PLAYING;
     }
@@ -2413,6 +2417,8 @@ static void audio_stop_playback(void)
     if (play_status == PLAY_STOPPED)
         return;
 
+    pcmbuf_fade(global_settings.fade_on_stop, false);
+
     /* Stop the codec and unload it */
     halt_decoding_track(true);
     pcmbuf_play_stop();
@@ -2452,12 +2458,20 @@ static void audio_on_pause(bool pause)
     if (play_status == PLAY_STOPPED || pause == (play_status == PLAY_PAUSED))
         return;
 
+    bool const do_fade = global_settings.fade_on_stop;
+
+    if (pause)
+        pcmbuf_fade(do_fade, false);
+
     if (!ff_rw_mode)
     {
         /* Not in ff/rw mode - may set the state (otherwise this could make
            old data play because seek hasn't completed and cleared it) */
         pcmbuf_pause(pause);
     }
+
+    if (!pause)
+        pcmbuf_fade(do_fade, true);
 
     play_status = pause ? PLAY_PAUSED : PLAY_PLAYING;
 
@@ -3170,7 +3184,7 @@ void audio_pcmbuf_track_change(bool pcmbuf)
 /* May pcmbuf start PCM playback when the buffer is full enough? */
 bool audio_pcmbuf_may_play(void)
 {
-    return play_status != PLAY_PAUSED && !ff_rw_mode;
+    return play_status == PLAY_PLAYING && !ff_rw_mode;
 }
 
 
@@ -3339,7 +3353,7 @@ void audio_skip(int offset)
         skip_offset = accum;
 
         if (global_settings.beep)
-            pcmbuf_beep(2000, 100, 2500*global_settings.beep);
+            beep_play(2000, 100, 2500*global_settings.beep);
 
         LOGFQUEUE("audio > audio Q_AUDIO_SKIP %d", offset);
 
@@ -3360,7 +3374,7 @@ void audio_skip(int offset)
     {
         /* No more tracks */
         if (global_settings.beep)
-            pcmbuf_beep(1000, 100, 1500*global_settings.beep);
+            beep_play(1000, 100, 1500*global_settings.beep);
     }
 
     id3_mutex_unlock();

@@ -54,6 +54,7 @@
 #endif
 
 #include "pcm.h"
+#include "pcm-internal.h"
 #include "pcm_sampr.h"
 
 /*#define LOGF_ENABLE*/
@@ -182,6 +183,8 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
 
         if (ret != 0)
             DEBUGF("push-buffer error result: %d\n", ret);
+
+        pcm_play_dma_started_callback();
     } else
     {
         DEBUGF("feed_data: No Data.\n");

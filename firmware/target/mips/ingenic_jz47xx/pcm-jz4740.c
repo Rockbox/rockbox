@@ -25,6 +25,7 @@
 #include "audio.h"
 #include "sound.h"
 #include "pcm.h"
+#include "pcm-internal.h"
 #include "jz4740.h"
 
 
@@ -109,6 +110,7 @@ static inline void play_dma_callback(void)
     {
         set_dma(start, size);
         REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
+        pcm_play_dma_started_callback();
     }
 }
 

@@ -27,6 +27,7 @@
 #include "panic.h"
 #include "audiohw.h"
 #include "pcm.h"
+#include "pcm-internal.h"
 #include "pcm_sampr.h"
 #include "dma-target.h"
 #include "mmu-arm.h"
@@ -100,6 +101,7 @@ void pcm_play_unlock(void)
 void INT_DMA(void) ICODE_ATTR;
 void INT_DMA(void)
 {
+    bool new_buffer = false;
     DMACOM0 = 7;
     while (!(DMACON0 & (1 << 18)))
     {
@@ -112,8 +114,12 @@ void INT_DMA(void)
         }
         else
         {
-            if (!nextsize) pcm_play_get_more_callback((void**)&nextbuf, &nextsize);
-            if (!nextsize) break;
+            if (!nextsize)
+            {
+                pcm_play_get_more_callback((void**)&nextbuf, &nextsize);
+                if (!nextsize) break;
+                new_buffer = true;
+            }
             queuedsize = MIN(sizeof(dblbuf), nextsize / 2);
             nextsize -= queuedsize;
             queuedbuf = nextbuf + nextsize;
@@ -124,7 +130,14 @@ void INT_DMA(void)
         clean_dcache();
         DMACOM0 = 4;
         DMACOM0 = 7;
+
+        if (new_buffer)
+        {
+            pcm_play_dma_started_callback();
+            new_buffer = false;
+        }
     }
+
 }
 
 void pcm_play_dma_start(const void* addr, size_t size)

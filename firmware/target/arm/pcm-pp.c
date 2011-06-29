@@ -26,6 +26,7 @@
 #include "sound.h"
 #include "pcm.h"
 #include "pcm_sampr.h"
+#include "pcm-internal.h"
 
 /** DMA **/
 
@@ -115,6 +116,7 @@ void pcm_dma_apply_settings(void)
 /* NOTE: direct stack use forbidden by GCC stack handling bug for FIQ */
 void ICODE_ATTR __attribute__((interrupt("FIQ"))) fiq_playback(void)
 {
+    bool new_buffer = false;
     register size_t size;
 
     DMA0_STATUS; /* Clear any pending interrupt */
@@ -136,8 +138,13 @@ void ICODE_ATTR __attribute__((interrupt("FIQ"))) fiq_playback(void)
             /* Set the new DMA values and activate channel */
             DMA0_RAM_ADDR = dma_play_data.addr;
             DMA0_CMD = DMA_PLAY_CONFIG | (size - 4) | DMA_CMD_START;
+
+            if (new_buffer)
+                pcm_play_dma_started_callback();
             return;
         }
+
+        new_buffer = true;
 
         /* Buffer empty.  Try to get more. */
         pcm_play_get_more_callback((void **)&dma_play_data.addr,
@@ -181,8 +188,9 @@ void fiq_playback(void)
      * r0-r3 and r12 is a working register.
      */
     asm volatile (
-        "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
+        "stmfd   sp!, { r0-r4, lr }  \n" /* stack scratch regs and lr */
 
+        "mov     r4, #0              \n" /* Was the callback called? */
 #if CONFIG_CPU == PP5002
         "ldr     r12, =0xcf001040    \n" /* Some magic from iPodLinux */
         "ldr     r12, [r12]          \n"
@@ -212,16 +220,13 @@ void fiq_playback(void)
         "tst     r1, #1              \n" /* two samples (one word) left? */
         "ldrne   r12, [r8], #4       \n" /* load two samples */
         "strne   r12, [r10, %[wr]]   \n" /* write sample 0-1 to IISFIFO_WR */
-
-        "cmp     r9, #0              \n" /* either FIFO is full or source buffer is empty */
-        "bgt     .exit               \n" /* if source buffer is not empty, FIFO must be full */
 #elif SAMPLE_SIZE == 32
     ".check_fifo:                    \n"
         "ldr     r0, [r10, %[cfg]]   \n" /* read IISFIFO_CFG to check FIFO status */
         "and     r0, r0, %[mask]     \n" /* r0 = IIS_TX_FREE_COUNT << 23 (PP5002) */
 
         "movs    r1, r0, lsr #24     \n" /* number of free pairs of FIFO slots */
-        "beq     .exit               \n" /* no complete pair? -> exit */
+        "beq     .fifo_fill_complete \n" /* no complete pair? -> exit */
         "cmp     r1, r9, lsr #2      \n" /* number of words from source */
         "movgt   r1, r9, lsr #2      \n" /* r1 = amount of allowed loops */
         "sub     r9, r9, r1, lsl #2  \n" /* r1 words will be written in following loop */
@@ -234,11 +239,23 @@ void fiq_playback(void)
         "subs    r1, r1, #1          \n" /* one more loop? */
         "bgt     .fifo_loop          \n" /* yes, continue */
 
+    ".fifo_fill_complete:            \n"
+#endif
+        "cmp     r4, #0              \n" /* If fill came after get_more... */
+        "beq     .still_old_buffer   \n"
+        "mov     r4, #0              \n"
+        "ldr     r2, =pcm_play_dma_started \n"
+        "ldrne   r2, [r2]            \n"
+        "cmp     r2, #0              \n"
+        "movne   lr, pc              \n"
+        "bxne    r2                  \n"
+
+    ".still_old_buffer:              \n"
         "cmp     r9, #0              \n" /* either FIFO is full or source buffer is empty */
         "bgt     .exit               \n" /* if source buffer is not empty, FIFO must be full */
-#endif
 
     ".more_data:                     \n"
+        "mov     r4, #1              \n" /* Remember we did this */
         "ldr     r2, =pcm_play_get_more_callback \n"
         "mov     r0, r11             \n" /* r0 = &p */
         "add     r1, r11, #4         \n" /* r1 = &size */
@@ -250,7 +267,7 @@ void fiq_playback(void)
 
     ".exit:                          \n" /* (r9=0 if stopping, look above) */
         "stmia   r11, { r8-r9 }      \n" /* save p and size */
-        "ldmfd   sp!, { r0-r3, lr }  \n"
+        "ldmfd   sp!, { r0-r4, lr }  \n"
         "subs    pc, lr, #4          \n" /* FIQ specific return sequence */
         ".ltorg                      \n"
         : /* These must only be integers! No regs */
@@ -264,6 +281,8 @@ void fiq_playback(void) __attribute__((interrupt ("FIQ"))) ICODE_ATTR;
 /* NOTE: direct stack use forbidden by GCC stack handling bug for FIQ */
 void fiq_playback(void)
 {
+    bool new_buffer = false;
+
 #if CONFIG_CPU == PP5002
     inl(0xcf001040);
 #endif
@@ -271,6 +290,10 @@ void fiq_playback(void)
     do {
         while (dma_play_data.size > 0) {
             if (IIS_TX_FREE_COUNT < 2) {
+                if (new_buffer) {
+                    new_buffer = false;
+                    pcm_play_dma_started_callback();
+                }
                 return;
             }
 #if SAMPLE_SIZE == 16
@@ -282,9 +305,15 @@ void fiq_playback(void)
             dma_play_data.size -= 4;
         }
 
+        if (new_buffer) {
+            new_buffer = false;
+            pcm_play_dma_started_callback();
+        }
+
         /* p is empty, get some more data */
         pcm_play_get_more_callback((void **)&dma_play_data.addr,
                                    &dma_play_data.size);
+        new_buffer = true;
     } while (dma_play_data.size);
 
     /* No more data  */

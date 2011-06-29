@@ -100,6 +100,9 @@ int clamp_value_wrap(int value, int max, int min);
 #endif
 #endif
 
+void beep_play(unsigned int frequency, unsigned int duration,
+               unsigned int amplitude);
+
 enum current_activity {
     ACTIVITY_UNKNOWN = 0,
     ACTIVITY_MAINMENU,

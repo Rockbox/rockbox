@@ -28,6 +28,8 @@
 #include "audio.h"
 #include "sound.h"
 #include "general.h"
+#include "pcm-internal.h"
+#include "pcm_mixer.h"
 
 /**
  * Aspects implemented in the target-specific portion:
@@ -78,8 +80,8 @@
  */
 
 /* the registered callback function to ask for more mp3 data */
-static volatile pcm_play_callback_type pcm_callback_for_more
-    SHAREDBSS_ATTR = NULL;
+static pcm_play_callback_type pcm_callback_for_more SHAREDBSS_ATTR = NULL;
+void (* pcm_play_dma_started)(void) SHAREDBSS_ATTR = NULL;
 /* PCM playback state */
 volatile bool pcm_playing SHAREDBSS_ATTR = false;
 /* PCM paused state. paused implies playing */
@@ -95,6 +97,7 @@ int pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
 static void pcm_play_stopped(void)
 {
     pcm_callback_for_more = NULL;
+    pcm_play_dma_started = NULL;
     pcm_paused = false;
     pcm_playing = false;
 }
@@ -404,6 +407,12 @@ void pcm_apply_settings(void)
     }
 }
 
+/* register callback to buffer more data */
+void pcm_play_set_dma_started_callback(void (* callback)(void))
+{
+    pcm_play_dma_started = callback;
+}
+
 #ifdef HAVE_RECORDING
 /** Low level pcm recording apis **/
 
@@ -474,6 +483,11 @@ bool pcm_is_recording(void)
 void pcm_init_recording(void)
 {
     logf("pcm_init_recording");
+
+#ifndef HAVE_PCM_FULL_DUPLEX
+    /* Stop the beasty before attempting recording */
+    mixer_reset();
+#endif
 
     /* Recording init is locked unlike general pcm init since this is not
      * just a one-time event at startup and it should and must be safe by

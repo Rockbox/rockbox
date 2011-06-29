@@ -64,9 +64,10 @@ unsigned char *pcmbuf_get_meminfo(size_t *length);
 #endif
 
 /* Misc */
+void pcmbuf_fade(bool fade, bool in);
+void pcmbuf_soft_mode(bool shhh);
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_set_low_latency(bool state);
 unsigned long pcmbuf_get_latency(void);
-void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude);
 
 #endif

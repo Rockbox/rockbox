@@ -99,14 +99,15 @@ void TIMER3(void)
     INTPND = TIMER3_MASK;
 }
 
-void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
+void beep_play(unsigned int frequency, unsigned int duration,
+               unsigned int amplitude)
 {
     #define TIMER3_TICK_SEC (TIMER_FREQ / TIMER234_PRESCALE)
 
     unsigned long tcnt, tcmp;
     int oldstatus;
 
-    if (amplitude <= 0)
+    if (frequency == 0 || duration == 0 || amplitude == 0)
     {
         beep_stop(); /* won't hear it anyway */
         return;

@@ -28,6 +28,7 @@
 #include "dsp-target.h"
 #include "dsp/ipc.h"
 #include "mmu-arm.h"
+#include "pcm-internal.h"
 
 /* This is global to save some latency when pcm_play_dma_get_peak_buffer is 
  *  called.
@@ -178,6 +179,8 @@ void DSPHINT(void)
             
             DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
                 (unsigned long)start, (unsigned long)sdem_addr);
+
+            pcm_play_dma_started_callback();
         }
         
         break;

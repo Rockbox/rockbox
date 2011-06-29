@@ -23,14 +23,18 @@
 #include <stdbool.h>
 #define _SYSTEM_WITH_JNI /* for getJavaEnvironment */
 #include <system.h>
+#include <pthread.h>
 #include "debug.h"
 #include "pcm.h"
+#include "pcm-internal.h"
 
 extern JNIEnv *env_ptr;
 
 /* infos about our pcm chunks */
 static size_t  pcm_data_size;
 static char   *pcm_data_start;
+static int     audio_locked = 0;
+static pthread_mutex_t audio_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* cache frequently called methods */
 static jmethodID play_pause_method;
@@ -39,6 +43,20 @@ static jmethodID set_volume_method;
 static jmethodID write_method;
 static jclass    RockboxPCM_class;
 static jobject   RockboxPCM_instance;
+
+
+/*
+ * mutex lock/unlock wrappers neatness' sake
+ */
+static inline void lock_audio(void)
+{
+    pthread_mutex_lock(&audio_lock_mutex);
+}
+
+static inline void unlock_audio(void)
+{
+    pthread_mutex_unlock(&audio_lock_mutex);
+}
 
 
 /*
@@ -54,10 +72,17 @@ JNIEXPORT jint JNICALL
 Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
                                         jbyteArray temp_array, jint max_size)
 {
+    bool new_buffer = false;
+
+    lock_audio();
+
     jint left = max_size;
 
     if (!pcm_data_size) /* get some initial data */
+    {
+        new_buffer = true;
         pcm_play_get_more_callback((void**) &pcm_data_start, &pcm_data_size);
+    }
 
     while(left > 0 && pcm_data_size)
     {
@@ -70,23 +95,49 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
 
         ret = (*env)->CallIntMethod(env, this, write_method,
                                             temp_array, 0, transfer_size);
+
+        if (new_buffer)
+        {
+            new_buffer = false;
+            pcm_play_dma_started_callback();
+
+            /* NOTE: might need to release the mutex and sleep here if the
+               buffer is shorter than the required buffer (like pcm-sdl.c) to
+               have the mixer clocked at a regular interval */
+        }
+
         if (ret < 0)
+        {
+            unlock_audio();
             return ret;
+        }
 
         if (pcm_data_size == 0) /* need new data */
+        {
+            new_buffer = true;
             pcm_play_get_more_callback((void**)&pcm_data_start, &pcm_data_size);
+        }
         else /* increment data pointer and feed more */
             pcm_data_start += transfer_size;
     }
+
+    if (new_buffer && pcm_data_size)
+        pcm_play_dma_started_callback();
+
+    unlock_audio();
     return max_size - left;
 }
 
 void pcm_play_lock(void)
 {
+    if (++audio_locked == 1)
+        lock_audio();
 }
 
 void pcm_play_unlock(void)
 {
+    if (--audio_locked == 0)
+        unlock_audio();
 }
 
 void pcm_dma_apply_settings(void)
@@ -153,8 +204,6 @@ void pcm_play_dma_init(void)
     set_volume_method = e->GetMethodID(env_ptr, RockboxPCM_class, "set_volume", "(I)V");
     stop_method       = e->GetMethodID(env_ptr, RockboxPCM_class, "stop", "()V");
     write_method      = e->GetMethodID(env_ptr, RockboxPCM_class, "write", "([BII)I");
-    /* get initial pcm data, if any */
-    pcm_play_get_more_callback((void*)&pcm_data_start, &pcm_data_size);
 }
 
 void pcm_postinit(void)
@@ -173,6 +222,7 @@ void pcm_shutdown(void)
     JNIEnv e = *env_ptr;
     jmethodID release = e->GetMethodID(env_ptr, RockboxPCM_class, "release", "()V");
     e->CallVoidMethod(env_ptr, RockboxPCM_instance, release);
+    pthread_mutex_destroy(&audio_lock_mutex);
 }
     
 /* Due to limitations of default_event_handler(), parameters gets swallowed when

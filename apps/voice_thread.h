@@ -29,8 +29,13 @@ bool mp3_is_playing(void);
 
 void voice_wait(void);
 void voice_stop(void);
+
 void voice_thread_init(void);
 void voice_thread_resume(void);
+#ifdef HAVE_PRIORITY_SCHEDULING
 void voice_thread_set_priority(int priority);
+#endif
+
+size_t voicebuf_init(unsigned char *bufend);
 
 #endif /* VOICE_THREAD_H */

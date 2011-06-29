@@ -1048,4 +1048,9 @@ Lyre prototype 1 */
 #define HAVE_IO_PRIORITY
 #endif
 
+#if defined(CPU_COLDIRE) || CONFIG_CPU == IMX31L
+/* Can record and play simultaneously */
+#define HAVE_PCM_FULL_DUPLEX
+#endif
+
 #endif /* __CONFIG_H__ */

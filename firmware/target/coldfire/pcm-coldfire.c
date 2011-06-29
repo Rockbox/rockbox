@@ -28,6 +28,7 @@
 #if defined(HAVE_SPDIF_REC) || defined(HAVE_SPDIF_OUT)
 #include "spdif.h"
 #endif
+#include "pcm-internal.h"
 
 #define IIS_PLAY_DEFPARM ( (freq_ent[FPARM_CLOCKSEL] << 12) | \
                            (IIS_PLAY & (7 << 8)) | \
@@ -318,6 +319,9 @@ void DMA0(void)
         SAR0 = (unsigned long)start;     /* Source address */
         BCR0 = size;                     /* Bytes to transfer */
         or_l(DMA_EEXT | DMA_INT, &DCR0); /* per request and int ON */
+
+        /* Call buffer callback */
+        pcm_play_dma_started_callback();
     }
     /* else inished playing */
 } /* DMA0 */

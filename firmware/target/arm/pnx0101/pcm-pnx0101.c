@@ -21,6 +21,7 @@
 #include "system.h"
 #include "audio.h"
 #include "string.h"
+#include "pcm-internal.h"
 
 #define DMA_BUF_SAMPLES 0x100
 
@@ -63,6 +64,8 @@ static inline void fill_dma_buf(int offset)
 
     if (pcm_playing && !pcm_paused)
     {
+        bool new_buffer =false;
+
         do
         {
             int count;
@@ -102,10 +105,20 @@ static inline void fill_dma_buf(int offset)
                 count--;
             }
             p = tmp_p;
+
+            if (new_buffer)
+            {
+                new_buffer = false;
+                pcm_play_dma_started_callback();
+            }
+
             if (l >= lend)
                 return;
 
             pcm_play_get_more_callback((void**)&p, &p_size);
+
+            if (p_size)
+                new_buffer = true;
         }
         while (p_size);
     }

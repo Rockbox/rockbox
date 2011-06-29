@@ -30,6 +30,7 @@
 #include "sound.h"
 #include "audiohw.h"
 #include "system.h"
+#include "panic.h"
 
 #ifdef HAVE_RECORDING
 #include "audiohw.h"
@@ -39,6 +40,7 @@
 #endif
 
 #include "pcm.h"
+#include "pcm-internal.h"
 #include "pcm_sampr.h"
 
 /*#define LOGF_ENABLE*/
@@ -71,15 +73,19 @@ static struct pcm_udata
 
 static SDL_AudioSpec obtained;
 static SDL_AudioCVT cvt;
+static int audio_locked = 0;
+static SDL_mutex *audio_lock;
 
 void pcm_play_lock(void)
 {
-    SDL_LockAudio();
+    if (++audio_locked == 1)
+        SDL_LockMutex(audio_lock);
 }
 
 void pcm_play_unlock(void)
 {
-    SDL_UnlockAudio();
+    if (--audio_locked == 0)
+        SDL_UnlockMutex(audio_lock);
 }
 
 static void pcm_dma_apply_settings_nolock(void)
@@ -227,7 +233,11 @@ static void write_to_soundcard(struct pcm_udata *udata)
 static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 {
     logf("sdl_audio_callback: len %d, pcm %d\n", len, pcm_data_size);
+
+    bool new_buffer = false;
     udata->stream = stream;
+
+    SDL_LockMutex(audio_lock);
 
     /* Write what we have in the PCM buffer */
     if (pcm_data_size > 0)
@@ -235,6 +245,7 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 
     /* Audio card wants more? Get some more then. */
     while (len > 0) {
+        new_buffer = true;
         pcm_play_get_more_callback((void **)&pcm_data, &pcm_data_size);
     start:
         if (pcm_data_size != 0) {
@@ -246,6 +257,28 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
             udata->num_in  *= pcm_sample_bytes;
             udata->num_out *= pcm_sample_bytes;
 
+
+            if (new_buffer)
+            {
+                new_buffer = false;
+                pcm_play_dma_started_callback();
+
+                if ((size_t)len > udata->num_out)
+                {
+                    int delay = pcm_data_size*250 / pcm_sampr - 1;
+                
+                    if (delay > 0)
+                    {
+                        SDL_UnlockMutex(audio_lock);
+                        SDL_Delay(delay);
+                        SDL_LockMutex(audio_lock);
+
+                        if (!pcm_is_playing())
+                            break;
+                    }
+                }
+            }
+
             pcm_data      += udata->num_in;
             pcm_data_size -= udata->num_in;
             udata->stream += udata->num_out;
@@ -255,6 +288,8 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
             break;
         }
     }
+
+    SDL_UnlockMutex(audio_lock);
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
@@ -317,6 +352,14 @@ void pcm_play_dma_init(void)
     if (SDL_InitSubSystem(SDL_INIT_AUDIO))
     {
         DEBUGF("Could not initialize SDL audio subsystem!\n");
+        return;
+    }
+
+    audio_lock = SDL_CreateMutex();
+
+    if (!audio_lock)
+    {
+        panicf("Could not create audio_lock\n");
         return;
     }
 
