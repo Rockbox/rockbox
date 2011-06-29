@@ -264,7 +264,9 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #endif
     {
         bool batt_safe = battery_level_safe();
+#if CONFIG_CODEC != SWCODEC || defined(HAVE_RECORDING)
         int audio_stat = audio_status();
+#endif
 
         FOR_NB_SCREENS(i)
         {

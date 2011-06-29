@@ -778,9 +778,10 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
+#if CONFIG_CODEC == SWCODEC
     mixer_channel_status,
     mixer_channel_get_buffer,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

@@ -908,8 +908,10 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+#if CONFIG_CODEC == SWCODEC
     enum channel_status (*mixer_channel_status)(enum pcm_mixer_channel channel);
     void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel, int *count);
+#endif
 };
 
 /* plugin header */
