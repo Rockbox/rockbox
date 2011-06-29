@@ -218,7 +218,7 @@ static void mixer_pcm_callback(unsigned char **start, size_t *size)
 
 /* Buffering callback - calls sub-callbacks and mixes the data for next
    buffer to be sent from mixer_pcm_callback() */
-static void ICODE_ATTR mixer_buffer_callback(void)
+static void MIXER_CALLBACK_ICODE mixer_buffer_callback(void)
 {
     downmix_index ^= 1; /* Next buffer */
 

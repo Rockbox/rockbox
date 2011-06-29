@@ -37,10 +37,16 @@
 #if defined(CPU_COLDFIRE) || defined(CPU_PP)
 /* For Coldfire, it's just faster
    For PortalPlayer, this also avoids more expensive cache coherency */
-#define DOWNMIX_BUF_IBSS    IBSS_ATTR
+#define DOWNMIX_BUF_IBSS        IBSS_ATTR
 #else
 /* Otherwise can't DMA from IRAM, IRAM is pointless or worse */
 #define DOWNMIX_BUF_IBSS
+#endif
+
+#if defined(CPU_COLDFIRE) || defined(CPU_PP)
+#define MIXER_CALLBACK_ICODE    ICODE_ATTR
+#else
+#define MIXER_CALLBACK_ICODE
 #endif
 
 

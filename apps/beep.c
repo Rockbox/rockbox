@@ -94,7 +94,7 @@ static FORCE_INLINE void beep_generate(int count)
 
 /* Callback to generate the beep frames - also don't want inlining of
    call below in beep_play */
-static void __attribute__((noinline)) ICODE_ATTR
+static void __attribute__((noinline))
 beep_get_more(unsigned char **start, size_t *size)
 {
     int count = beep_count;

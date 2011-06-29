@@ -76,18 +76,18 @@ struct chunkdesc
     ((bufsize) / PCMBUF_MINAVG_CHUNK)
 
 /* Size of the PCM buffer. */
-static size_t pcmbuf_size IDATA_ATTR = 0;
-static char *pcmbuf_bufend IDATA_ATTR;
-static char *pcmbuffer IDATA_ATTR;
+static size_t pcmbuf_size = 0;
+static char *pcmbuf_bufend;
+static char *pcmbuffer;
 /* Current PCM buffer write index. */
-static size_t pcmbuffer_pos IDATA_ATTR;
+static size_t pcmbuffer_pos;
 /* Amount pcmbuffer_pos will be increased.*/
-static size_t pcmbuffer_fillpos IDATA_ATTR;
+static size_t pcmbuffer_fillpos;
 
 static struct chunkdesc *first_desc;
 
 /* Gapless playback */
-static bool track_transition IDATA_ATTR;
+static bool track_transition;
 
 /* Fade effect */
 static unsigned int fade_vol = MIX_AMP_UNITY;
@@ -97,33 +97,33 @@ static bool soft_mode = false;
 
 #ifdef HAVE_CROSSFADE
 /* Crossfade buffer */
-static char *fadebuf IDATA_ATTR;
+static char *fadebuf;
 
 /* Crossfade related state */
 static bool crossfade_enabled;
 static bool crossfade_enable_request;
 static bool crossfade_mixmode;
 static bool crossfade_auto_skip;
-static bool crossfade_active IDATA_ATTR;
-static bool crossfade_track_change_started IDATA_ATTR;
+static bool crossfade_active;
+static bool crossfade_track_change_started;
 
 /* Track the current location for processing crossfade */
-static struct chunkdesc *crossfade_chunk IDATA_ATTR;
-static size_t crossfade_sample IDATA_ATTR;
+static struct chunkdesc *crossfade_chunk;
+static size_t crossfade_sample;
 
 /* Counters for fading in new data */
-static size_t crossfade_fade_in_total IDATA_ATTR;
-static size_t crossfade_fade_in_rem IDATA_ATTR;
+static size_t crossfade_fade_in_total;
+static size_t crossfade_fade_in_rem;
 #endif
 
-static struct chunkdesc *read_chunk IDATA_ATTR;
-static struct chunkdesc *read_end_chunk IDATA_ATTR;
-static struct chunkdesc *write_chunk IDATA_ATTR;
-static struct chunkdesc *write_end_chunk IDATA_ATTR;
-static size_t last_chunksize IDATA_ATTR;
+static struct chunkdesc *read_chunk;
+static struct chunkdesc *read_end_chunk;
+static struct chunkdesc *write_chunk;
+static struct chunkdesc *write_end_chunk;
+static size_t last_chunksize;
 
-static size_t pcmbuf_unplayed_bytes IDATA_ATTR;
-static size_t pcmbuf_watermark IDATA_ATTR;
+static size_t pcmbuf_unplayed_bytes;
+static size_t pcmbuf_watermark;
 
 static bool low_latency_mode = false;
 static bool flush_pcmbuf = false;
@@ -635,7 +635,6 @@ bool pcmbuf_start_track_change(bool auto_skip)
  * buffer is empty except for uncommitted samples.  Then they are committed
  * and sent to the PCM driver for playback.  The third part performs the
  * operations involved in sending a new chunk to the DMA. */
-static void pcmbuf_pcm_callback(unsigned char** start, size_t* size) ICODE_ATTR;
 static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
 {
     {
