@@ -34,7 +34,8 @@
 #define MIX_FRAME_SAMPLES 256
 #endif
 
-#if defined(CPU_COLDFIRE) || defined(CPU_PP)
+/* IAUDIO_M5 is very tight on IRAM */
+#if (defined(CPU_COLDFIRE) && !defined(IAUDIO_M5)) ||  defined(CPU_PP)
 /* For Coldfire, it's just faster
    For PortalPlayer, this also avoids more expensive cache coherency */
 #define DOWNMIX_BUF_IBSS        IBSS_ATTR
