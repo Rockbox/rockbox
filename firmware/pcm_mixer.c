@@ -71,6 +71,8 @@ static unsigned int idle_counter = 0;
     ({ start = (void *)(((uintptr_t)start + 3) & ~3); \
        size &= ~3; })
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+
 /* Include any implemented CPU-optimized mixdown routines */
 #if defined(CPU_ARM)
 #if ARM_ARCH >= 6
@@ -84,6 +86,7 @@ static unsigned int idle_counter = 0;
 #include "pcm-mixer-coldfire.c"
 #endif /* CPU_* */
 
+#endif /* CONFIG_PLATFORM */
 
 /** Generic mixing routines **/
 
