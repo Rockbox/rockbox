@@ -35,17 +35,20 @@
 bool get_mod_metadata(int fd, struct mp3entry* id3)
 {    
     /* Use the trackname part of the id3 structure as a temporary buffer */
-    unsigned char buf[MODULEHEADERSIZE];
+    unsigned char *buf = id3->id3v2buf;
     unsigned char id[4];
     bool is_mod_file = false;
-    char *p;
 
-    if ((lseek(fd, 0, SEEK_SET) < 0) 
-        || (read(fd, buf, sizeof(buf)) < MODULEHEADERSIZE))
-    {
+    /* Seek to file begin */
+    if (lseek(fd, 0, SEEK_SET) < 0)
         return false;
-    }
-
+    /* Use id3v2buf as buffer for the track name */
+    if (read(fd, buf, sizeof(id3->id3v2buf)) < (ssize_t)sizeof(id3->id3v2buf))
+        return false;
+    /* Seek to MOD ID position */
+    if (lseek(fd, MODULEHEADERSIZE, SEEK_SET) < 0)
+        return false;
+    /* Read MOD ID */
     if (read(fd, id, sizeof(id)) < (ssize_t)sizeof(id))
         return false;
 
@@ -88,14 +91,7 @@ bool get_mod_metadata(int fd, struct mp3entry* id3)
     if (!is_mod_file)
         return false;
 
-    p = id3->id3v2buf;
-    
-    /* Copy Title */
-    if (strlcpy(p, buf, sizeof(id3->id3v2buf)) >= sizeof(id3->id3v2buf))
-        return false;
-
-    id3->title = p;
-
+    id3->title = id3->id3v2buf; /* Point title to previous read ID3 buffer. */
     id3->bitrate = filesize(fd)/1024; /* size in kb */
     id3->frequency = 44100;
     id3->length = 120*1000;
