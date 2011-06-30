@@ -37,7 +37,7 @@ static inline int32_t FRACMUL(int32_t x, int32_t y)
  * bits after a shift left by the constant z. NOTE: Only works for shifts of
  * 1 to 8 on Coldfire!
  */
-static inline FORCE_INLINE int32_t FRACMUL_SHL(int32_t x, int32_t y, int z)
+static FORCE_INLINE int32_t FRACMUL_SHL(int32_t x, int32_t y, int z)
 {
     int32_t t, t2;
     asm ("mac.l    %[a], %[b], %%acc0\n\t"
@@ -73,7 +73,7 @@ static inline int32_t FRACMUL(int32_t x, int32_t y)
 /* Multiply two S.31 fractional integers, and return the 32 most significant
  * bits after a shift left by the constant z.
  */
-static inline int32_t FRACMUL_SHL(int32_t x, int32_t y, int z)
+static FORCE_INLINE int32_t FRACMUL_SHL(int32_t x, int32_t y, int z)
 {
     int32_t t, t2;
     asm ("smull    %[t], %[t2], %[a], %[b]\n\t"
@@ -81,7 +81,7 @@ static inline int32_t FRACMUL_SHL(int32_t x, int32_t y, int z)
          "orr      %[t], %[t2], %[t], lsr %[d]\n\t"
          : [t] "=&r" (t), [t2] "=&r" (t2)
          : [a] "r" (x), [b] "r" (y),
-           [c] "M" ((z) + 1), [d] "M" (31 - (z)));
+           [c] "Mr" ((z) + 1), [d] "Mr" (31 - (z)));
     return t;
 }
 
