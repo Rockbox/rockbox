@@ -27,15 +27,34 @@
 
 #define HW_CLKCTRL_BASE     0x80040000
 
+#define HW_CLKCTRL_PLLCTRL0 (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x0))
+#define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BP 20
+#define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BM (3 << 20)
+
+#define HW_CLKCTRL_PLLCTRL1 (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x10))
+
+#define HW_CLKCTRL_CPU      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x20))
+#define HW_CLKCTRL_CPU__DIV_CPU_BP  0
+#define HW_CLKCTRL_CPU__DIV_CPU_BM  0x3f
+#define HW_CLKCTRL_CPU__BUSY_REF_CPU    (1 << 28)
+
+#define HW_CLKCTRL_HBUS     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x30))
+#define HW_CLKCTRL_HBUS__DIV_BP     0
+#define HW_CLKCTRL_HBUS__DIV_BM     0x1f
+
 #define HW_CLKCTRL_XTAL     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x50))
 #define HW_CLKCTRL_XTAL__TIMROT_CLK32K_GATE (1 << 26)
 
 #define HW_CLKCTRL_PIX      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x60))
+#define HW_CLKCTRL_PIX__DIV_BM  0xfff
+
 #define HW_CLKCTRL_SSP      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x70))
+#define HW_CLKCTRL_SSP__DIV_BM  0x1ff
 
 #define HW_CLKCTRL_CLKSEQ   (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x110))
 #define HW_CLKCTRL_CLKSEQ__BYPASS_PIX   (1 << 1)
 #define HW_CLKCTRL_CLKSEQ__BYPASS_SSP   (1 << 5)
+#define HW_CLKCTRL_CLKSEQ__BYPASS_CPU   (1 << 7)
 
 #define HW_CLKCTRL_FRAC     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xf0))
 #define HW_CLKCTRL_FRAC_CPU (*(volatile uint8_t *)(HW_CLKCTRL_BASE + 0xf0))
@@ -52,9 +71,11 @@
 
 enum imx233_clock_t
 {
-    CLK_PIX,
-    CLK_SSP,
-    CLK_IO,
+    CLK_PIX, /* div, frac */
+    CLK_SSP, /* div, frac */
+    CLK_IO, /* div */
+    CLK_CPU, /* div, frac */
+    CLK_AHB /* div */
 };
 
 void imx233_enable_timrot_xtal_clk32k(bool enable);

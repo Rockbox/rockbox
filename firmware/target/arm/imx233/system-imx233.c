@@ -31,6 +31,7 @@
 #include "ssp-imx233.h"
 #include "lcd.h"
 #include "backlight-target.h"
+#include "button-target.h"
 
 #define default_interrupt(name) \
     extern __attribute__((weak, alias("UIRQ"))) void name(void)
@@ -104,7 +105,13 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
-    /* what is this supposed to do ? */
+    /* make sure lcd and backlight are on */
+    _backlight_on();
+    _backlight_set_brightness(100);
+    /* wait until button release (if a button is pressed) */
+    while(button_read_device());
+    /* then wait until next button press */
+    while(!button_read_device());
 }
 
 void imx233_enable_interrupt(int src, bool enable)
@@ -177,3 +184,23 @@ void udelay(unsigned us)
     while(!imx233_us_elapsed(ref, us));
 }
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+void set_cpu_frequency(long frequency)
+{
+    switch(frequency)
+    {
+        case IMX233_CPUFREQ_454_MHz:
+            /* clk_h@clk_p/3 */
+            imx233_set_clock_divisor(CLK_AHB, 3);
+            /* clk_p@ref_cpu/1*18/19 */
+            imx233_set_fractional_divisor(CLK_CPU, 19);
+            imx233_set_clock_divisor(CLK_CPU, 1);
+            /* ref_cpu@480 MHz
+             * clk_p@454.74 MHz
+             * clk_h@151.58 MHz */
+            break;
+        default:
+            break;
+    }
+}
+#endif

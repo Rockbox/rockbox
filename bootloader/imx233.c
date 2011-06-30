@@ -35,9 +35,7 @@
 #include "disk.h"
 #include "panic.h"
 #include "power.h"
-#include "pinctrl-imx233.h"
 #include "system-target.h"
-#include "ssp-imx233.h"
 
 #include "usb.h"
 
@@ -65,40 +63,18 @@ void main(void)
 
     //button_debug_screen();
 
-    #if 0
-    usb_init();
-    usb_start_monitoring();
-    extern int usb_status;
-    usb_status = USB_INSERTED;
-    usb_status_event(USB_POWERED);
-
-    printf("USB: Connecting");
-
-    while(1)
-    {
-        int button = button_get_w_tmo(HZ/25);
-
-        if(button == SYS_USB_CONNECTED)
-            break; /* Hit */
-        if(button_read_device() & BUTTON_POWER)
-            power_off();
-        yield();
-    }
-
-    printf("USB: Connected");
-    while(1)
-    {
-        int button = button_get_w_tmo(HZ/25);
-
-        if(button_read_device() & BUTTON_POWER)
-            power_off();
-        yield();
-    }
-    #endif
-    
     ret = storage_init();
     if(ret < 0)
         error(EATA, ret, true);
+
+    #ifdef HAVE_BOOTLOADER_USB_MODE
+    usb_init();
+    usb_core_enable_driver(USB_DRIVER_SERIAL, true);
+    usb_attach();
+    while(!(button_read_device() & BUTTON_POWER))
+        yield();
+    power_off();
+    #endif /* HAVE_BOOTLOADER_USB_MODE */
 
     while(!disk_init(IF_MV(0)))
         panicf("disk_init failed!");

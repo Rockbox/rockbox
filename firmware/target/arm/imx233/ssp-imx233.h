@@ -67,7 +67,7 @@
 #define HW_SSP_CMD0__BLOCK_SIZE_BM      (0xf << 16)
 #define HW_SSP_CMD0__BLOCK_SIZE_BP      16
 #define HW_SSP_CMD0__BLOCK_COUNT_BM     (0xff << 8)
-#define HW_SSP_CMD0__BLOCK_COUNT_BP     16
+#define HW_SSP_CMD0__BLOCK_COUNT_BP     8
 #define HW_SSP_CMD0__CMD_BM             0xff
 
 #define HW_SSP_CMD1(ssp)    (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x20))
@@ -147,12 +147,15 @@ void imx233_ssp_start(int ssp);
 void imx233_ssp_stop(int ssp);
 /* only softreset between start and stop or it might hang ! */
 void imx233_ssp_softreset(int ssp);
-void imx233_ssp_set_timings(int ssp, int divide, int rate);
-void imx233_ssp_set_timeout(int ssp, int timeout);
+void imx233_ssp_set_timings(int ssp, int divide, int rate, int timeout);
 void imx233_ssp_set_mode(int ssp, unsigned mode);
+void imx233_ssp_set_bus_width(int ssp, unsigned width);
+/* block_size uses the SSP format so it's actually the log_2 of the block_size */
+void imx233_ssp_set_block_size(int ssp, unsigned log_block_size);
 /* SD/MMC facilities */
-enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd, uint32_t cmd_arg,
-    enum imx233_ssp_resp_t resp, void *buffer, int xfer_size, bool read, uint32_t *resp_ptr);
+enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
+    uint32_t cmd_arg, enum imx233_ssp_resp_t resp, void *buffer, unsigned block_count,
+    bool wait4irq, bool read, uint32_t *resp_ptr);
 void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     unsigned drive_strength);
 /* SD/MMC requires that the card be provided the clock during an init sequence of

@@ -42,6 +42,8 @@ static int ssp_in_use = 0;
 static struct mutex ssp_mutex[2];
 static struct semaphore ssp_sema[2];
 static struct ssp_dma_command_t ssp_dma_cmd[2];
+static uint32_t ssp_bus_width[2];
+static unsigned ssp_log_block_size[2];
 
 void INT_SSP(int ssp)
 {
@@ -84,6 +86,7 @@ void imx233_ssp_init(void)
     semaphore_init(&ssp_sema[1], 1, 0);
     mutex_init(&ssp_mutex[0]);
     mutex_init(&ssp_mutex[1]);
+    ssp_bus_width[0] = ssp_bus_width[1] = HW_SSP_CTRL0__BUS_WIDTH__ONE_BIT;
 }
 
 void imx233_ssp_start(int ssp)
@@ -96,11 +99,12 @@ void imx233_ssp_start(int ssp)
     /* If first block to start, start SSP clock */
     if(ssp_in_use == 0)
     {
+        /** 2.3.1: the clk_ssp maximum frequency is 102.858 MHz */
         /* fracdiv = 18 => clk_io = pll = 480Mhz
-         * intdiv = 4 => clk_ssp = 120Mhz */
+         * intdiv = 5 => clk_ssp = 96Mhz */
         imx233_set_fractional_divisor(CLK_IO, 18);
         imx233_enable_clock(CLK_SSP, false);
-        imx233_set_clock_divisor(CLK_SSP, 4);
+        imx233_set_clock_divisor(CLK_SSP, 5);
         imx233_set_bypass_pll(CLK_SSP, false); /* use IO */
         imx233_enable_clock(CLK_SSP, true);
     }
@@ -127,18 +131,9 @@ void imx233_ssp_softreset(int ssp)
     imx233_reset_block(&HW_SSP_CTRL0(ssp));
 }
 
-void imx233_ssp_set_timings(int ssp, int divide, int rate)
+void imx233_ssp_set_timings(int ssp, int divide, int rate, int timeout)
 {
-    __REG_CLR(HW_SSP_TIMING(ssp)) =
-        HW_SSP_TIMING__CLOCK_DIVIDE_BM | HW_SSP_TIMING__CLOCK_RATE_BM;
-    __REG_SET(HW_SSP_TIMING(ssp)) =
-        divide << HW_SSP_TIMING__CLOCK_DIVIDE_BP | rate;
-}
-
-void imx233_ssp_set_timeout(int ssp, int timeout)
-{
-    __REG_CLR(HW_SSP_TIMING(ssp)) = HW_SSP_TIMING__CLOCK_TIMEOUT_BM;
-    __REG_SET(HW_SSP_TIMING(ssp)) =
+    HW_SSP_TIMING(ssp) = divide << HW_SSP_TIMING__CLOCK_DIVIDE_BP | rate |
         timeout << HW_SSP_TIMING__CLOCK_TIMEOUT_BP;
 }
 
@@ -238,22 +233,43 @@ void imx233_ssp_set_mode(int ssp, unsigned mode)
     }
 }
 
-enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd, uint32_t cmd_arg,
-    enum imx233_ssp_resp_t resp, void *buffer, int xfer_size, bool read, uint32_t *resp_ptr)
+void imx233_ssp_set_bus_width(int ssp, unsigned width)
+{
+    switch(width)
+    {
+        case 1: ssp_bus_width[ssp - 1] = HW_SSP_CTRL0__BUS_WIDTH__ONE_BIT; break;
+        case 4: ssp_bus_width[ssp - 1] = HW_SSP_CTRL0__BUS_WIDTH__FOUR_BIT; break;
+        case 8: ssp_bus_width[ssp - 1] = HW_SSP_CTRL0__BUS_WIDTH__EIGHT_BIT; break;
+    }
+}
+
+void imx233_ssp_set_block_size(int ssp, unsigned log_block_size)
+{
+    ssp_log_block_size[ssp - 1] = log_block_size;
+}
+
+enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
+    uint32_t cmd_arg, enum imx233_ssp_resp_t resp, void *buffer, unsigned block_count,
+    bool wait4irq, bool read, uint32_t *resp_ptr)
 {
     mutex_lock(&ssp_mutex[ssp - 1]);
     /* Enable all interrupts */
     imx233_enable_interrupt(INT_SRC_SSP_DMA(ssp), true);
     imx233_dma_enable_channel_interrupt(APB_SSP(ssp), true);
-    /* Assume only one block so ignore block_count and block_size */
-    ssp_dma_cmd[ssp - 1].cmd0 = cmd | HW_SSP_CMD0__APPEND_8CYC;
+
+    unsigned xfer_size = block_count * (1 << ssp_log_block_size[ssp - 1]);
+    
+    ssp_dma_cmd[ssp - 1].cmd0 = cmd | HW_SSP_CMD0__APPEND_8CYC |
+        ssp_log_block_size[ssp - 1] << HW_SSP_CMD0__BLOCK_SIZE_BP |
+        (block_count - 1) << HW_SSP_CMD0__BLOCK_COUNT_BP;
     ssp_dma_cmd[ssp - 1].cmd1 = cmd_arg;
     /* setup all flags and run */
     ssp_dma_cmd[ssp - 1].ctrl0 = xfer_size | HW_SSP_CTRL0__ENABLE |
-        HW_SSP_CTRL0__IGNORE_CRC | 
-        (resp != SSP_NO_RESP ? HW_SSP_CTRL0__GET_RESP | HW_SSP_CTRL0__WAIT_FOR_IRQ : 0) |
+        (buffer ?  0 : HW_SSP_CTRL0__IGNORE_CRC) |
+        (wait4irq ? HW_SSP_CTRL0__WAIT_FOR_IRQ : 0) |
+        (resp != SSP_NO_RESP ? HW_SSP_CTRL0__GET_RESP : 0) |
         (resp == SSP_LONG_RESP ? HW_SSP_CTRL0__LONG_RESP : 0) |
-        HW_SSP_CTRL0__BUS_WIDTH__ONE_BIT << HW_SSP_CTRL0__BUS_WIDTH_BP |
+        (ssp_bus_width[ssp - 1] << HW_SSP_CTRL0__BUS_WIDTH_BP) |
         (buffer ? HW_SSP_CTRL0__DATA_XFER : 0) |
         (read ? HW_SSP_CTRL0__READ : 0);
     /* setup the dma parameters */
@@ -263,10 +279,11 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd, uint32_
         (buffer == NULL ? HW_APB_CHx_CMD__COMMAND__NO_XFER :
          read ? HW_APB_CHx_CMD__COMMAND__WRITE : HW_APB_CHx_CMD__COMMAND__READ) |
         HW_APB_CHx_CMD__IRQONCMPLT | HW_APB_CHx_CMD__SEMAPHORE |
-        HW_APB_CHx_CMD__WAIT4ENDCMD | HW_APB_CHx_CMD__HALTONTERMINATE |
+        HW_APB_CHx_CMD__WAIT4ENDCMD |
         (3 << HW_APB_CHx_CMD__CMDWORDS_BP) |
         (xfer_size << HW_APB_CHx_CMD__XFER_COUNT_BP);
 
+    imx233_dma_reset_channel(APB_SSP(ssp));
     imx233_dma_start_command(APB_SSP(ssp), &ssp_dma_cmd[ssp - 1].dma);
 
     /* the SSP hardware already has a timeout but we never know; 1 sec is a maximum
@@ -283,7 +300,7 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd, uint32_
     else
         ret = SSP_ERROR;
 
-    if(ret == SSP_SUCCESS && resp_ptr != NULL)
+    if(resp_ptr != NULL)
     {
         if(resp != SSP_NO_RESP)
             *resp_ptr++ = HW_SSP_SDRESP0(ssp);

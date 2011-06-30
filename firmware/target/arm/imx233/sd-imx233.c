@@ -25,7 +25,7 @@
 
 int sd_init(void)
 {
-    return -1;
+    return 0;
 }
 
 int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,

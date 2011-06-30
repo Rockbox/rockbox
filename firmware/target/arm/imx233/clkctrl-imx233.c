@@ -60,14 +60,24 @@ void imx233_set_clock_divisor(enum imx233_clock_t clk, int div)
     switch(clk)
     {
         case CLK_PIX:
-            __REG_CLR(HW_CLKCTRL_PIX) = (1 << 12) - 1;
+            __REG_CLR(HW_CLKCTRL_PIX) = HW_CLKCTRL_PIX__DIV_BM;
             __REG_SET(HW_CLKCTRL_PIX) = div;
             while(HW_CLKCTRL_PIX & __CLK_BUSY);
             break;
         case CLK_SSP:
-            __REG_CLR(HW_CLKCTRL_SSP) = (1 << 9) - 1;
+            __REG_CLR(HW_CLKCTRL_SSP) = HW_CLKCTRL_SSP__DIV_BM;
             __REG_SET(HW_CLKCTRL_SSP) = div;
             while(HW_CLKCTRL_SSP & __CLK_BUSY);
+            break;
+        case CLK_CPU:
+            __REG_CLR(HW_CLKCTRL_CPU) = HW_CLKCTRL_CPU__DIV_CPU_BM;
+            __REG_SET(HW_CLKCTRL_CPU) = div;
+            while(HW_CLKCTRL_CPU & HW_CLKCTRL_CPU__BUSY_REF_CPU);
+            break;
+        case CLK_AHB:
+            __REG_CLR(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__DIV_BM;
+            __REG_SET(HW_CLKCTRL_HBUS) = div;
+            while(HW_CLKCTRL_HBUS & __CLK_BUSY);
             break;
         default: return;
     }
@@ -81,6 +91,7 @@ void imx233_set_fractional_divisor(enum imx233_clock_t clk, int fracdiv)
     {
         case CLK_PIX: REG = &HW_CLKCTRL_FRAC_PIX; break;
         case CLK_IO: REG = &HW_CLKCTRL_FRAC_IO; break;
+        case CLK_CPU: REG = &HW_CLKCTRL_FRAC_CPU; break;
         default: return;
     }
 
@@ -97,6 +108,7 @@ void imx233_set_bypass_pll(enum imx233_clock_t clk, bool bypass)
     {
         case CLK_PIX: msk = HW_CLKCTRL_CLKSEQ__BYPASS_PIX; break;
         case CLK_SSP: msk = HW_CLKCTRL_CLKSEQ__BYPASS_SSP; break;
+        case CLK_CPU: msk = HW_CLKCTRL_CLKSEQ__BYPASS_CPU; break;
         default: return;
     }
 

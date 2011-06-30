@@ -48,7 +48,6 @@ void usb_drv_int_enable(bool enable)
 
 void INT_USB_CTRL(void)
 {
-    printf("usb int");
     usb_drv_int();
 }
 
