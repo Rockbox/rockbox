@@ -178,12 +178,11 @@ struct s_modplayer {
     /* Information about the channels */
     struct s_modchannel modchannel[8];
 
-    /* The Amiga Period Table
-       (+1 because we use index 0 for period 0 = no new note) */
-    unsigned short periodtable[37*8+1];
+    /* The Amiga Period Table */
+    unsigned short *periodtable;
 
     /* The sinus table [-255,255] */
-    signed short sintable[0x40];
+    signed short *sintable;
 
     /* Is the glissando effect enabled? */
     bool glissandoenabled;
@@ -238,6 +237,58 @@ struct s_mixer {
 struct s_song modsong IDATA_ATTR;               /* The Song */
 struct s_modplayer modplayer IDATA_ATTR;        /* The Module Player */
 struct s_mixer mixer IDATA_ATTR;
+
+/* The Amiga Period Table (+1 because we use index 0 for period 0 = no new note) */
+static unsigned short s_periodtable[37*8+1] IDATA_ATTR = 
+    { 0,  907,  900,  893,  887,  881,  874,  868,
+    862,  856,  849,  843,  837,  831,  825,  819,
+    813,  808,  802,  796,  790,  785,  779,  773,
+    768,  762,  757,  751,  746,  740,  735,  730,
+    725,  719,  714,  709,  704,  699,  694,  689,
+    684,  679,  674,  669,  664,  660,  655,  650,
+    645,  641,  636,  632,  627,  623,  618,  614,
+    609,  605,  600,  596,  592,  588,  583,  579,
+    575,  571,  567,  563,  559,  555,  551,  547,
+    543,  539,  535,  531,  527,  523,  520,  516,
+    512,  509,  505,  501,  498,  494,  490,  487,
+    483,  480,  477,  473,  470,  466,  463,  460,
+    456,  453,  450,  446,  443,  440,  437,  434,
+    431,  428,  424,  421,  418,  415,  412,  409,
+    406,  404,  401,  398,  395,  392,  389,  386,
+    384,  381,  378,  375,  373,  370,  367,  365,
+    362,  359,  357,  354,  352,  349,  347,  344,
+    342,  339,  337,  334,  332,  330,  327,  325,
+    322,  320,  318,  316,  313,  311,  309,  307,
+    304,  302,  300,  298,  296,  294,  291,  289,
+    287,  285,  283,  281,  279,  277,  275,  273,
+    271,  269,  267,  265,  263,  261,  260,  258,
+    256,  254,  252,  250,  249,  247,  245,  243,
+    241,  240,  238,  236,  235,  233,  231,  230,
+    228,  226,  225,  223,  221,  220,  218,  217,
+    215,  214,  212,  210,  209,  207,  206,  204,
+    203,  202,  200,  199,  197,  196,  194,  193,
+    192,  190,  189,  187,  186,  185,  183,  182,
+    181,  179,  178,  177,  176,  174,  173,  172,
+    171,  169,  168,  167,  166,  165,  163,  162,
+    161,  160,  159,  158,  156,  155,  154,  153,
+    152,  151,  150,  149,  148,  147,  145,  144,
+    143,  142,  141,  140,  139,  138,  137,  136,
+    135,  134,  133,  132,  131,  130,  130,  129,
+    128,  127,  126,  125,  124,  123,  122,  121,
+    120,  120,  119,  118,  117,  116,  115,  115,
+    114,  113,  112,  111,  110,  110,  109,  108,
+    107};
+
+/* The sin table */
+static signed short s_sintable[0x40] IDATA_ATTR = 
+    {  0,   25,   49,   74,   97,  120,  141,  162,
+     180,  197,  212,  225,  235,  244,  250,  254,
+     255,  254,  250,  244,  235,  225,  212,  197,
+     180,  161,  141,  120,   97,   73,   49,   24,
+       0,  -25,  -50,  -74,  -98, -120, -142, -162,
+    -180, -197, -212, -225, -236, -244, -250, -254,
+    -255, -254, -250, -244, -235, -224, -211, -197,
+    -180, -161, -141, -119,  -97,  -73,  -49,  -24};
 
 const unsigned short mixingrate = 44100;
 
@@ -299,8 +350,13 @@ static inline void mixer_setamigaperiod(int channel, int amigaperiod)
 STATICIRAM void initmodplayer(void) ICODE_ATTR;
 void initmodplayer(void)
 {
-    unsigned int i,c;
+    unsigned int c;
+#if 0
+    /* As the calculation of periodtable and sintable uses float and double 
+     * rockbox uses two predefined tables. This reduces the codesize by
+     * several KB. */
 
+    unsigned int i;
     /* Calculate Amiga Period Values
      * Start with Period 907 (= C-1 with Finetune -8) and work upwards */
     double f = 907.0f;
@@ -347,7 +403,11 @@ void initmodplayer(void)
         a = a+b;
         b = b-dd*a;
     }
-
+#else
+    /* Point to the predefined tables */
+    modplayer.periodtable = s_periodtable;
+    modplayer.sintable    = s_sintable;
+#endif
     /* Set Default Player Values */
     modplayer.currentline = 0;
     modplayer.currenttick = 0;
