@@ -185,6 +185,7 @@ struct cmd_inst_t
 {
     enum cmd_inst_type_t type;
     char *identifier;
+    uint32_t argument;
     struct cmd_inst_t *next;
 };
 
@@ -485,6 +486,17 @@ static struct cmd_file_t *read_command_file(const char *file)
             if(find_source_by_id(cmd_file, inst->identifier) == NULL)
                 bug("invalid command file: undefined reference to source '%s'", inst->identifier);
             next();
+            if((inst->type == CMD_CALL || inst->type == CMD_JUMP) && lexem.type == LEX_LPAREN)
+            {
+                next();
+                if(lexem.type != LEX_NUMBER)
+                    bug("invalid command file: expected numeral expression after (");
+                inst->argument = lexem.num;
+                next();
+                if(lexem.type != LEX_RPAREN)
+                    bug("invalid command file: expected closing brace");
+                next();
+            }
             if(lexem.type != LEX_SEMICOLON)
                 bug("invalid command file: expected ';' after command");
 
@@ -529,6 +541,7 @@ struct sb_inst_t
     uint32_t pattern;
     uint32_t addr;
     // </union>
+    uint32_t argument; // for call and jump
     /* for production use */
     uint32_t padding_size;
     uint8_t *padding;
@@ -665,6 +678,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
             }
             else if(cinst->type == CMD_JUMP || cinst->type == CMD_CALL)
             {
+                sec->insts[idx].argument = cinst->argument;
                 sec->insts[idx].inst = (cinst->type == CMD_JUMP) ? SB_INST_JUMP : SB_INST_CALL;
                 sec->insts[idx++].addr = elf->start_addr;
             }
@@ -722,7 +736,7 @@ static void compute_sb_offsets(struct sb_file_t *sb)
             {
                 if(g_debug)
                     printf("%s | addr=0x%08x | arg=0x%08x\n",
-                        inst->inst == SB_INST_CALL ? "CALL" : "JUMP", inst->addr, 0);
+                        inst->inst == SB_INST_CALL ? "CALL" : "JUMP", inst->addr, inst->argument);
                 sb->image_size += sizeof(struct sb_instruction_call_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_call_t) / BLOCK_SIZE;
             }
@@ -844,7 +858,7 @@ void produce_sb_instruction(struct sb_inst_t *inst,
         case SB_INST_CALL:
         case SB_INST_JUMP:
             cmd->len = 0;
-            cmd->data = 0;
+            cmd->data = inst->argument;
             break;
         case SB_INST_FILL:
             cmd->data = inst->pattern;

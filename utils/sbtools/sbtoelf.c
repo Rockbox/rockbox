@@ -355,14 +355,15 @@ static void extract(unsigned long filesize)
         bugp("File size mismatch");
     if(sb_header->header_size * BLOCK_SIZE != sizeof(struct sb_header_t))
         bugp("Bad header size");
-    if((sb_header->major_ver != IMAGE_MAJOR_VERSION ||
-            sb_header->minor_ver != IMAGE_MINOR_VERSION) && strcasecmp(s_getenv("SB_IGNORE_VER"), "YES"))
-        bugp("Bad file format version");
     if(sb_header->sec_hdr_size * BLOCK_SIZE != sizeof(struct sb_section_header_t))
         bugp("Bad section header size");
-    
+
     color(BLUE);
     printf("Basic info:\n");
+    color(GREEN);
+    printf("  SB version: ");
+    color(YELLOW);
+    printf("%d.%d\n", sb_header->major_ver, sb_header->minor_ver);
     color(GREEN);
     printf("  Header SHA-1: ");
     byte *hdr_sha1 = sb_header->sha1_header;
@@ -716,7 +717,6 @@ int main(int argc, const char **argv)
     {
         printf("Usage: %s <firmware> <key file> [<out prefix>]\n",*argv);
         printf("To use raw command mode, set environment variable SB_RAW_CMD to YES\n");
-        printf("To ignore the file version check, set environment variable SB_IGNORE_VER to YES\n");
         return 1;
     }
 
