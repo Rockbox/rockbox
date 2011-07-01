@@ -828,11 +828,17 @@ int dircache_build(int last_size)
     /* Background build, dircache has been previously allocated */
     if (dircache_size > 0)
     {
+        d_names_start = d_names_end;
+        dircache_size = 0;
+        reserve_used = 0;
         thread_enabled = true;
         dircache_initializing = true;
+        generate_dot_d_names();
+        
         queue_post(&dircache_queue, DIRCACHE_BUILD, 0);
         return 2;
     }
+    
     if (last_size > DIRCACHE_RESERVE && last_size < DIRCACHE_LIMIT )
     {
         allocated_size = last_size + DIRCACHE_RESERVE;
