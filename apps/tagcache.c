@@ -206,15 +206,16 @@ static struct master_header current_tcmh;
 #ifdef HAVE_TC_RAMCACHE
 /* Header is created when loading database to ram. */
 struct ramcache_header {
-    struct index_entry *indices; /* Master index file content */
     char *tags[TAG_COUNT];       /* Tag file content (not including filename tag) */
     int entry_count[TAG_COUNT];  /* Number of entries in the indices. */
+    struct index_entry indices[0]; /* Master index file content */
 };
 
 # ifdef HAVE_EEPROM_SETTINGS
 struct statefile_header {
+    int32_t magic;                /* Statefile version number */
     struct master_header mh;      /* Header from the master index */
-    struct ramcache_header *hdr;
+    struct ramcache_header *hdr;  /* Old load address of hdr for relocation */
     struct tagcache_stat tc_stat;
 };
 # endif
@@ -3793,7 +3794,6 @@ static bool allocate_tagcache(void)
     hdr = buffer_alloc(tc_stat.ramcache_allocated + 128);
     memset(hdr, 0, sizeof(struct ramcache_header));
     memcpy(&current_tcmh, &tcmh, sizeof current_tcmh);
-    hdr->indices = (struct index_entry *)(hdr + 1);
     logf("tagcache: %d bytes allocated.", tc_stat.ramcache_allocated);
 
     return true;
@@ -3818,6 +3818,7 @@ static bool tagcache_dumpload(void)
     hdr = buffer_alloc(0);
     rc = read(fd, &shdr, sizeof(struct statefile_header));
     if (rc != sizeof(struct statefile_header)
+        || shdr.magic != TAGCACHE_STATEFILE_MAGIC
         || shdr.mh.tch.magic != TAGCACHE_MAGIC)
     {
         logf("incorrect statefile");
@@ -3843,7 +3844,6 @@ static bool tagcache_dumpload(void)
     memcpy(&tc_stat, &shdr.tc_stat, sizeof(struct tagcache_stat));
     
     /* Now fix the pointers */
-    hdr->indices = (struct index_entry *)((long)hdr->indices + offpos);
     for (i = 0; i < TAG_COUNT; i++)
         hdr->tags[i] += offpos;
     
@@ -3869,6 +3869,7 @@ static bool tagcache_dumpsave(void)
     }
     
     /* Create the header */
+    shdr.magic = TAGCACHE_STATEFILE_MAGIC;
     shdr.hdr = hdr;
     memcpy(&shdr.mh, &current_tcmh, sizeof current_tcmh);
     memcpy(&shdr.tc_stat, &tc_stat, sizeof tc_stat);
@@ -3924,6 +3925,8 @@ static bool load_tagcache(void)
     /* Load the master index table. */
     for (i = 0; i < tcmh.tch.entry_count; i++)
     {
+        /* DEBUG: After tagcache commit and dircache rebuild, hdr-sturcture
+         * may become corrupt. */
         rc = ecread_index_entry(fd, idx);
         if (rc != sizeof(struct index_entry))
         {
@@ -3997,8 +4000,6 @@ static bool load_tagcache(void)
                 int dc;
 # endif
                 
-                // FIXME: This is wrong!
-                // idx = &hdr->indices[hdr->entry_count[i]];
                 idx = &hdr->indices[fe->idx_id];
                 
                 if (fe->tag_length >= (long)sizeof(buf)-1)
