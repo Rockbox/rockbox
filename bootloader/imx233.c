@@ -39,8 +39,6 @@
 
 #include "usb.h"
 
-int show_logo(void);
-
 void main(void) NORETURN_ATTR;
 void main(void)
 {
@@ -55,7 +53,8 @@ void main(void)
     enable_irq();
 
     lcd_init();
-    show_logo();
+    lcd_clear_display();
+    lcd_update();
 
     backlight_init();
 

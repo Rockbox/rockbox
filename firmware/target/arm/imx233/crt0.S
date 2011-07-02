@@ -23,10 +23,8 @@
 
 .section .vectors,"ax",%progbits
 .code 32
-.global start
-start:
     /* most handlers are in DRAM which is too far away for a relative jump */
-    ldr     pc, =newstart
+    ldr     pc, =start
     ldr     pc, =undef_instr_handler
     ldr     pc, =software_int_handler
     ldr     pc, =prefetch_abort_handler
@@ -36,8 +34,39 @@ start:
     ldr     pc, =fiq_handler
 
 .text
-newstart:
+.global start
+start:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
+    /* Zero out IBSS */
+    ldr     r2, =_iedata
+    ldr     r3, =_iend
+    mov     r4, #0
+1:
+    cmp     r3, r2
+    strhi   r4, [r2], #4
+    bhi     1b
+
+    /* Copy the IRAM */
+    /* must be done before bss is zeroed */
+    ldr     r2, =_iramcopy
+    ldr     r3, =_iramstart
+    ldr     r4, =_iramend
+1:
+    cmp     r4, r3
+    ldrhi   r5, [r2], #4
+    strhi   r5, [r3], #4
+    bhi     1b
+
+    /* Initialise bss section to zero */
+    ldr     r2, =_edata
+    ldr     r3, =_end
+    mov     r4, #0
+1:
+    cmp     r3, r2
+    strhi   r4, [r2], #4
+    bhi     1b
+
+
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr     sp, =stackend
     ldr     r2, =stackbegin

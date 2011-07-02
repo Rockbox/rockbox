@@ -14,32 +14,6 @@ MEMORY
 
 SECTIONS
 {
-    .vectors 0 :
-    {
-        *(.vectors);
-        . = ALIGN(0x4);
-    } > IRAM
-
-    .itext :
-    {
-        *(.icode)
-        *(.init.text)
-        . = ALIGN(0x4);
-    } > IRAM
-
-    .idata :
-    {
-        *(.qharray)
-        *(.idata)
-        *(.irodata)
-        . = ALIGN(0x4);
-    } > IRAM
-
-    .ibss :
-    {
-        *(.ibss)
-    } > IRAM
-
     .text :
     {
         *(.text*)
@@ -52,13 +26,34 @@ SECTIONS
         _dataend = . ;
     } > DRAM
 
+    .iram :
+    {
+        _iramstart = .; // always 0
+        *(.vectors)
+        KEEP(*(.vectors));// otherwise there are no reference to it and the linker strip it
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        . = ALIGN(0x4);
+        _iramend = .;
+    } > IRAM AT> DRAM
+
+    _iramcopy = LOADADDR(.iram);
+
+    .ibss (NOLOAD) :
+    {
+        _iedata = .;
+        *(.qharray)
+        *(.ibss)
+        . = ALIGN(0x4);
+        _iend = .;
+    } > IRAM
+
     .stack (NOLOAD) :
     {
         *(.stack)
-        _stackbegin = .;
         stackbegin = .;
         . += 0x2000;
-        _stackend = .;
         stackend = .;
     } > DRAM
 
