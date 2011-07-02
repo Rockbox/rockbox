@@ -115,13 +115,13 @@ int main(int argc, char* argv[])
     fprintf(stderr, "[INFO] Packed OF size:            %8d bytes\n",
             of_packedsize);
     fprintf(stderr, "[INFO] Bootloader size:           %8d bytes\n",
-            (int)bootloader_size);
+            bootloader_size);
     fprintf(stderr, "[INFO] Packed bootloader size:    %8d bytes\n",
             rb_packedsize);
     fprintf(stderr, "[INFO] Dual-boot function size:   %8d bytes\n",
             ams_identity[sum.model].bootloader_size);
-    fprintf(stderr, "[INFO] UCL unpack function size:  %8u bytes\n",
-            (unsigned int)sizeof(nrv2e_d8));
+    fprintf(stderr, "[INFO] UCL unpack function size:  %8zu bytes\n",
+            sizeof(nrv2e_d8));
     fprintf(stderr, "[INFO] Original firmware version: %8u bytes\n",
             0x200);
 
