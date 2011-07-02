@@ -44,6 +44,7 @@
 
 #if CONFIG_CODEC == SWCODEC
 #include "pcm.h"
+#include "pcm_mixer.h"
 
 #ifdef HAVE_RECORDING
 #include "pcm_record.h"
@@ -620,7 +621,8 @@ void peak_meter_peek(void)
    /* read current values */
 #if CONFIG_CODEC == SWCODEC
     if (pm_playback)
-        pcm_calculate_peaks(&pm_cur_left, &pm_cur_right);
+        mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
+                                      &pm_cur_left, &pm_cur_right);
 #ifdef HAVE_RECORDING
     else
         pcm_calculate_rec_peaks(&pm_cur_left, &pm_cur_right);

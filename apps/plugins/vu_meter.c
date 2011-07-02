@@ -660,7 +660,8 @@ void analog_meter(void) {
     int right_peak = rb->mas_codec_readreg(0xD);
 #elif (CONFIG_CODEC == SWCODEC)
     int left_peak, right_peak;
-    rb->pcm_calculate_peaks(&left_peak, &right_peak);
+    rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
+                                      &left_peak, &right_peak);
 #endif
 
     if(vumeter_settings.analog_use_db_scale) {

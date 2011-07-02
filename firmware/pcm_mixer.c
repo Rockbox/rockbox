@@ -23,6 +23,7 @@
 #include "general.h"
 #include "kernel.h"
 #include "pcm.h"
+#include "pcm-internal.h"
 #include "pcm_mixer.h"
 #include "dsp.h"
 
@@ -58,6 +59,9 @@ static size_t next_size = 0;    /* Size of buffer to play next time */
 
 /* Descriptors for all available channels */
 static struct mixer_channel channels[PCM_MIXER_NUM_CHANNELS] IBSS_ATTR;
+
+/* History for channel peaks */
+static struct pcm_peaks channel_peaks[PCM_MIXER_NUM_CHANNELS];
 
 /* Packed pointer array of all playing (active) channels in "channels" array */
 static struct mixer_channel * active_channels[PCM_MIXER_NUM_CHANNELS+1] IBSS_ATTR;
@@ -343,10 +347,13 @@ static void mixer_start_pcm(void)
     if (pcm_is_playing())
         return;
 
-#if defined(HAVE_RECORDING) && !defined(HAVE_PCM_FULL_DUPLEX)
+#if defined(HAVE_RECORDING)
     if (pcm_is_recording())
         return;
 #endif
+
+    /* Requires a shared global sample rate for all channels */
+    pcm_set_frequency(NATIVE_FREQUENCY);
 
     /* Prepare initial frames and set up the double buffer */
     mixer_buffer_callback();
@@ -490,6 +497,25 @@ void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count)
 
     *count = 0;
     return NULL;
+}
+
+/* Calculate peak values for channel */
+void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
+                                   int *left, int *right)
+{
+    struct mixer_channel *chan = &channels[channel];
+    struct pcm_peaks *peaks = &channel_peaks[channel];
+    int count;
+    const void *addr = mixer_channel_get_buffer(channel, &count);
+
+    pcm_do_peak_calculation(peaks, chan->status == CHANNEL_PLAYING,
+                            addr, count);
+
+    if (left)
+        *left = peaks->val[0];
+
+    if (right)
+        *right = peaks->val[1];
 }
 
 /* Stop ALL channels and PCM and reset state */

@@ -146,7 +146,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 206
+#define PLUGIN_API_VERSION 207
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -911,6 +911,8 @@ struct plugin_api {
 #if CONFIG_CODEC == SWCODEC
     enum channel_status (*mixer_channel_status)(enum pcm_mixer_channel channel);
     void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel, int *count);
+    void (*mixer_channel_calculate_peaks)(enum pcm_mixer_channel channel,
+                                          int *left, int *right);
 #endif
 };
 

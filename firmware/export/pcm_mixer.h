@@ -103,6 +103,10 @@ size_t mixer_channel_get_bytes_waiting(enum pcm_mixer_channel channel);
 /* Return pointer to channel's playing audio data and the size remaining */
 void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count);
 
+/* Calculate peak values for channel */
+void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
+                                   int *left, int *right);
+
 /* Stop ALL channels and PCM and reset state */
 void mixer_reset(void);
 

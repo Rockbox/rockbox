@@ -826,7 +826,8 @@ enum plugin_status plugin_start(const void* parameter)
             left = rb->mas_codec_readreg(0xC);
             right = rb->mas_codec_readreg(0xD);
 #elif (CONFIG_CODEC == SWCODEC)
-            rb->pcm_calculate_peaks(&left, &right);
+            rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
+                                              &left, &right);
 #endif
             if (osc.orientation == OSC_HORIZ)
                 anim_horizontal(left, right);

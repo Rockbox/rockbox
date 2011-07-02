@@ -93,6 +93,9 @@ unsigned long pcm_sampr SHAREDBSS_ATTR = HW_SAMPR_DEFAULT;
 /* samplerate frequency selection index */
 int pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
 
+/* peak data for the global peak values - i.e. what the final output is */
+static struct pcm_peaks global_peaks;
+
 /* Called internally by functions to reset the state */
 static void pcm_play_stopped(void)
 {
@@ -107,7 +110,7 @@ static void pcm_play_stopped(void)
  *
  * Used for recording and playback.
  */
-static void pcm_peak_peeker(const int32_t *addr, int count, int peaks[2])
+static void pcm_peak_peeker(const int32_t *addr, int count, uint16_t peaks[2])
 {
     int peak_l = 0, peak_r = 0;
     const int32_t * const end = addr + count;
@@ -145,18 +148,13 @@ static void pcm_peak_peeker(const int32_t *addr, int count, int peaks[2])
     peaks[1] = peak_r;
 }
 
-void pcm_calculate_peaks(int *left, int *right)
+void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
+                             const void *addr, int count)
 {
-    static int peaks[2] = { 0, 0 };
-    static unsigned long last_peak_tick = 0;
-    static unsigned long frame_period   = 0;
-
     long tick = current_tick;
-    int count;
-    const void *addr;
 
-    /* Throttled peak ahead based on calling period */
-    long period = tick - last_peak_tick;
+    /* Peak no farther ahead than expected period to avoid overcalculation */
+    long period = tick - peaks->tick;
 
     /* Keep reasonable limits on period */
     if (period < 1)
@@ -164,33 +162,38 @@ void pcm_calculate_peaks(int *left, int *right)
     else if (period > HZ/5)
         period = HZ/5;
 
-    frame_period = (3*frame_period + period) >> 2;
+    peaks->period = (3*peaks->period + period) >> 2;
+    peaks->tick = tick;
 
-    last_peak_tick = tick;
-
-    addr = pcm_play_dma_get_peak_buffer(&count);
-
-    if (pcm_playing && !pcm_paused)
+    if (active)
     {
-        int framecount;
-
-        framecount = frame_period*pcm_curr_sampr / HZ;
+        int framecount = peaks->period*pcm_curr_sampr / HZ;
         count = MIN(framecount, count);
 
         if (count > 0)
-            pcm_peak_peeker((int32_t *)addr, count, peaks);
+            pcm_peak_peeker((int32_t *)addr, count, peaks->val);
         /* else keep previous peak values */
     }
     else
     {
-        peaks[0] = peaks[1] = 0;
+        /* peaks are zero */
+        peaks->val[0] = peaks->val[1] = 0;
     }
+}
+
+void pcm_calculate_peaks(int *left, int *right)
+{
+    int count;
+    const void *addr = pcm_play_dma_get_peak_buffer(&count);
+
+    pcm_do_peak_calculation(&global_peaks, pcm_playing && !pcm_paused,
+                            addr, count);
 
     if (left)
-        *left = peaks[0];
+        *left = global_peaks.val[0];
 
     if (right)
-        *right = peaks[1];
+        *right = global_peaks.val[1];
 }
 
 const void* pcm_get_peak_buffer(int * count)
@@ -437,7 +440,7 @@ static void pcm_recording_stopped(void)
  */
 void pcm_calculate_rec_peaks(int *left, int *right)
 {
-    static int peaks[2];
+    static uint16_t peaks[2];
 
     if (pcm_recording)
     {
@@ -484,10 +487,8 @@ void pcm_init_recording(void)
 {
     logf("pcm_init_recording");
 
-#ifndef HAVE_PCM_FULL_DUPLEX
     /* Stop the beasty before attempting recording */
     mixer_reset();
-#endif
 
     /* Recording init is locked unlike general pcm init since this is not
      * just a one-time event at startup and it should and must be safe by

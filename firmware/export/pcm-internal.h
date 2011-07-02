@@ -22,6 +22,16 @@
 #ifndef PCM_INTERNAL_H
 #define PCM_INTERNAL_H
 
+struct pcm_peaks
+{
+    long period;
+    long tick;
+    uint16_t val[2];
+};
+
+void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
+                             const void *addr, int count);
+
 /** The following are for internal use between pcm.c and target-
     specific portion **/
 

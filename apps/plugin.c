@@ -781,6 +781,7 @@ static const struct plugin_api rockbox_api = {
 #if CONFIG_CODEC == SWCODEC
     mixer_channel_status,
     mixer_channel_get_buffer,
+    mixer_channel_calculate_peaks,
 #endif
 };
 
