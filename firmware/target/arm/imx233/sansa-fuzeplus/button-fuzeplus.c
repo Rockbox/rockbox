@@ -27,6 +27,7 @@
 #include "lcd.h"
 #include "string.h"
 
+#ifndef BOOTLOADER
 static void i2c_scl_dir(bool out)
 {
     imx233_enable_gpio_output(0, 30, out);
@@ -250,6 +251,14 @@ void button_init_device(void)
         RMI_2D_GESTURE_FLICK_DIST_4MM << RMI_2D_GESTURE_FLICK_DIST_BP |
         RMI_2D_GESTURE_FLICK_TIME_700MS << RMI_2D_GESTURE_FLICK_TIME_BP);
 }
+
+#else
+
+void button_init_device(void)
+{
+}
+
+#endif
 
 int button_read_device(void)
 {

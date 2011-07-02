@@ -1447,8 +1447,10 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 
 #ifdef SANSA_FUZEPLUS
 #ifndef SIMULATOR
+#ifndef BOOTLOADER
 drivers/generic_i2c.c
 drivers/synaptics-rmi.c
+#endif
 target/arm/imx233/sansa-fuzeplus/backlight-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c

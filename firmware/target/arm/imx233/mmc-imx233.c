@@ -69,7 +69,7 @@ int mmc_init(void)
     imx233_ssp_set_bus_width(MMC_SSP, 1);
     imx233_ssp_set_block_size(MMC_SSP, 9);
     /* go to idle state */
-    int ret = imx233_ssp_sd_mmc_transfer(MMC_SSP, SD_GO_IDLE_STATE, 0, SSP_NO_RESP, NULL, 0, false, false, NULL);
+    int ret = imx233_ssp_sd_mmc_transfer(MMC_SSP, 0, 0, SSP_NO_RESP, NULL, 0, false, false, NULL);
     if(ret != 0)
         return -1;
     /* send op cond until the card respond with busy bit set; it must complete within 1sec */

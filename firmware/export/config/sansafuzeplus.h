@@ -116,9 +116,13 @@
 #define HAVE_FLASH_STORAGE
 
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
-#define CONFIG_STORAGE (STORAGE_SD | STORAGE_MMC)
-
-#define NUM_DRIVES 2
+#ifdef BOOTLOADER
+# define CONFIG_STORAGE STORAGE_MMC
+#else
+# define CONFIG_STORAGE (STORAGE_SD | STORAGE_MMC)
+# define NUM_DRIVES 2
+# define HAVE_HOTSWAP
+#endif
 
 /* todo */
 #define BATTERY_CAPACITY_DEFAULT 550    /* default battery capacity */
@@ -157,12 +161,6 @@
    only used when loading the old format rockbox.e200 file */
 #define FIRMWARE_OFFSET_FILE_CRC    0x0
 #define FIRMWARE_OFFSET_FILE_DATA   0x8
-
-#ifndef BOOTLOADER
-#define HAVE_MULTIDRIVE
-#define NUM_DRIVES 2
-#define HAVE_HOTSWAP
-#endif
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
