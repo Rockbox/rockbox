@@ -47,7 +47,7 @@ static void usb_mode(void)
 {
     if(usb_detect() != USB_INSERTED)
     {
-        const char msg[] = "Plug USB cable";
+        static const char msg[] = "Plug USB cable";
         reset_screen();
         lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * sizeof(msg))) / 2,
                     (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
@@ -57,7 +57,7 @@ static void usb_mode(void)
         while(usb_detect() != USB_INSERTED) ;
     }
 
-    const char msg[] = "Bootloader USB mode";
+    static const char msg[] = "Bootloader USB mode";
     reset_screen();
     lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * sizeof(msg))) / 2,
                 (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
