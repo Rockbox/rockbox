@@ -57,8 +57,6 @@ int line = 0;
 int remote_line = 0;
 #endif
 
-char printfbuf[256];
-
 void reset_screen(void)
 {
     lcd_clear_display();
@@ -71,6 +69,7 @@ void reset_screen(void)
 
 int printf(const char *format, ...)
 {
+    static char printfbuf[256];
     int len;
     unsigned char *ptr;
     va_list ap;
@@ -185,7 +184,7 @@ int load_firmware(unsigned char* buf, char* firmware, int buffer_size)
     if(rc < 4)
         return EREAD_MODEL_FAILED;
 
-    model[4] = 0;
+    model[4] = '\0';
 
     printf("Model name: %s", model);
     printf("Loading %s", firmware);
@@ -238,17 +237,6 @@ int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size)
 
     close(fd);
     return len;
-}
-
-/* These functions are present in the firmware library, but we reimplement
-   them here because the originals do a lot more than we want */
-int dbg_ports(void)
-{
-   return 0;
-}
-
-void mpeg_stop(void)
-{
 }
 
 #ifdef ROCKBOX_HAS_LOGF /* Logf display helper for the bootloader */
