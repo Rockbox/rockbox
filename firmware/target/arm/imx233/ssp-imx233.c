@@ -180,36 +180,11 @@ void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     imx233_set_pin_function(0, 24, PINCTRL_FUNCTION_ALT2);
     imx233_enable_pin_pullup(0, 20, enable_pullups);
     /* SSP_DATA{0-7}*/
-    imx233_set_pin_drive_strength(0, 0, drive_strength);
-    imx233_set_pin_function(0, 0, PINCTRL_FUNCTION_ALT2);
-    imx233_enable_pin_pullup(0, 0, enable_pullups);
-    
-    if(bus_width >= 4)
+    for(unsigned i = 0; i < bus_width; i++)
     {
-        imx233_set_pin_drive_strength(0, 1, drive_strength);
-        imx233_set_pin_drive_strength(0, 2, drive_strength);
-        imx233_set_pin_drive_strength(0, 3, drive_strength);
-        imx233_set_pin_function(0, 1, PINCTRL_FUNCTION_ALT2);
-        imx233_set_pin_function(0, 2, PINCTRL_FUNCTION_ALT2);
-        imx233_set_pin_function(0, 3, PINCTRL_FUNCTION_ALT2);
-        imx233_enable_pin_pullup(0, 1, enable_pullups);
-        imx233_enable_pin_pullup(0, 2, enable_pullups);
-        imx233_enable_pin_pullup(0, 3, enable_pullups);
-    }
-    if(bus_width >= 8)
-    {
-        imx233_set_pin_drive_strength(0, 4, drive_strength);
-        imx233_set_pin_drive_strength(0, 5, drive_strength);
-        imx233_set_pin_drive_strength(0, 6, drive_strength);
-        imx233_set_pin_drive_strength(0, 7, drive_strength);
-        imx233_set_pin_function(0, 4, PINCTRL_FUNCTION_ALT2);
-        imx233_set_pin_function(0, 5, PINCTRL_FUNCTION_ALT2);
-        imx233_set_pin_function(0, 6, PINCTRL_FUNCTION_ALT2);
-        imx233_set_pin_function(0, 7, PINCTRL_FUNCTION_ALT2);
-        imx233_enable_pin_pullup(0, 4, enable_pullups);
-        imx233_enable_pin_pullup(0, 5, enable_pullups);
-        imx233_enable_pin_pullup(0, 6, enable_pullups);
-        imx233_enable_pin_pullup(0, 7, enable_pullups);
+        imx233_set_pin_drive_strength(0, i, drive_strength);
+        imx233_set_pin_function(0, i, PINCTRL_FUNCTION_ALT2);
+        imx233_enable_pin_pullup(0, i, enable_pullups);
     }
 
     imx233_enable_gpio_output_mask(0, 0x11000ff, false);
