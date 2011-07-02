@@ -103,14 +103,8 @@ static void UIRQ(void)
            masked ? "" : "un", irq_no, irqname[irq_no], status);
 }
 
-struct vec_int_src
-{
-    int source;
-    void (*isr) (void);
-};
-
 /* Vectored interrupts (16 available) */
-struct vec_int_src vec_int_srcs[] =
+static const struct { int source; void (*isr) (void); } vec_int_srcs[] =
 {
     /* Highest priority at the top of the list */
     { INT_SRC_DMAC, INT_DMAC },
