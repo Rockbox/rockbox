@@ -98,9 +98,7 @@ uclcopy:
         cmp     r1, #0
         bne     boot_of
 #endif
-        /* Here are model specific tests for dual boot */
-        /* All models but c200v2 use left button */
-        /* TODO: Left button for c200v2 too (needs DBOP code) */
+        /* Here are model specific tests for dual boot (test left button) */
 
 #ifdef SANSA_CLIP
 .set row, (1<<5) /* enable output on C5 */

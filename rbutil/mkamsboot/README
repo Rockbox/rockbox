@@ -58,9 +58,8 @@ firmware and the new (rockbox) firmware.
   To boot into the Original Firmware, you need to press the Left key.
   ***Note : on the Clip+ you can alternatively press the Home key.
 
-  The player will boot into the Original Firmware as well if it is powered up by
+  The Fuzev2, Clipv2 and Clip+ will boot into the Original Firmware as well if it is powered up by
 inserting an usb cable.
-  ***Note : on the m200v4 powering up by usb will cause booting into the new firmware.
 
 Hacking
 -------
