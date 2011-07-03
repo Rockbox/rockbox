@@ -258,6 +258,7 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
         (3 << HW_APB_CHx_CMD__CMDWORDS_BP) |
         (xfer_size << HW_APB_CHx_CMD__XFER_COUNT_BP);
 
+    __REG_CLR(HW_SSP_CTRL1(ssp)) = HW_SSP_CTRL1__ALL_IRQ;
     imx233_dma_reset_channel(APB_SSP(ssp));
     imx233_dma_start_command(APB_SSP(ssp), &ssp_dma_cmd[ssp - 1].dma);
 
@@ -266,7 +267,10 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     enum imx233_ssp_error_t ret;
     
     if(semaphore_wait(&ssp_sema[ssp - 1], HZ) == OBJ_WAIT_TIMEDOUT)
+    {
+        imx233_dma_reset_channel(APB_SSP(ssp));
         ret = SSP_TIMEOUT;
+    }
     else if((HW_SSP_CTRL1(ssp) & HW_SSP_CTRL1__ALL_IRQ) == 0)
         ret =  SSP_SUCCESS;
     else if(HW_SSP_CTRL1(ssp) & (HW_SSP_CTRL1__RESP_TIMEOUT_IRQ |

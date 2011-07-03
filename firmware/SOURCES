@@ -488,6 +488,8 @@ target/arm/pnx0101/timer-pnx0101.c
 #endif
 
 #if CONFIG_CPU == IMX233
+target/arm/imx233/i2c-imx233.c
+target/arm/imx233/lcdif-imx233.c
 target/arm/imx233/clkctrl-imx233.c
 target/arm/imx233/system-imx233.c
 target/arm/imx233/timrot-imx233.c
@@ -1448,13 +1450,11 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #ifdef SANSA_FUZEPLUS
 #ifndef SIMULATOR
 #ifndef BOOTLOADER
-drivers/generic_i2c.c
 drivers/synaptics-rmi.c
 #endif
 target/arm/imx233/sansa-fuzeplus/backlight-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c
-target/arm/imx233/lcdif-imx233.c
 #endif /* SIMULATOR */
 #endif
 

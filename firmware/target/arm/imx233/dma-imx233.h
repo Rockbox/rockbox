@@ -73,6 +73,7 @@
 /* APHX channels */
 #define HW_APBX_AUDIO_ADC   0
 #define HW_APBX_AUDIO_DAC   1
+#define HW_APBX_I2C         3
 
 #define HW_APBX_BASE        0x80024000
 
@@ -123,6 +124,7 @@ struct apb_dma_command_t
 
 #define APB_SSP(ssp)        APBH_DMA_CHANNEL(HW_APBH_SSP(ssp))
 #define APB_AUDIO_ADC       APBX_DMA_CHANNEL(HW_APBX_AUDIO_ADC)
+#define APB_I2C             APBX_DMA_CHANNEL(HW_APBX_I2C)
 
 #define HW_APB_CHx_CMD__COMMAND_BM         0x3
 #define HW_APB_CHx_CMD__COMMAND__NO_XFER   0

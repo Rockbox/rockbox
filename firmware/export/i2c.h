@@ -27,6 +27,7 @@ extern void i2c_end(void);
 extern int i2c_write(int device, const unsigned char* buf, int count );
 extern int i2c_read(int device, unsigned char* buf, int count );
 extern int i2c_readmem(int device, int address, unsigned char* buf, int count );
+extern int i2c_writemem(int device, int address, const unsigned char* buf, int count );
 extern void i2c_outb(unsigned char byte);
 extern unsigned char i2c_inb(int ack);
 extern void i2c_start(void);

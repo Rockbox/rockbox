@@ -114,7 +114,7 @@ struct rmi_2d_gesture_data_t
  * the generic_i2c driver; the i2c_dev_addr is the i2c address of the device.
  * NOTE: the driver automatically handles the page select mechanism used for
  *       RMI over i2c and assumes a standard page select register at 0xff. */
-int rmi_init(int i2c_bus_index, int i2c_dev_addr);
+int rmi_init(int i2c_dev_addr);
 /* Read one or more registers.
  * WARNING: don't cross a page boundary ! */
 int rmi_read(int address, int byte_count, unsigned char *buffer);

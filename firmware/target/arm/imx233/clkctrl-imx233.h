@@ -42,6 +42,11 @@
 #define HW_CLKCTRL_HBUS__DIV_BP     0
 #define HW_CLKCTRL_HBUS__DIV_BM     0x1f
 
+#define HW_CLKCTRL_XBUS     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x40))
+#define HW_CLKCTRL_XBUS__DIV_BP     0
+#define HW_CLKCTRL_XBUS__DIV_BM     0x3ff
+#define HW_CLKCTRL_XBUS__BUSY       (1 << 31)
+
 #define HW_CLKCTRL_XTAL     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x50))
 #define HW_CLKCTRL_XTAL__TIMROT_CLK32K_GATE (1 << 26)
 

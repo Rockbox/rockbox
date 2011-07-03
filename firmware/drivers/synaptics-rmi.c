@@ -19,20 +19,18 @@
  *
  ****************************************************************************/
 #include "system.h"
-#include "generic_i2c.h"
 #include "synaptics-rmi.h"
+#include "i2c.h"
 
 static int rmi_cur_page;
 static int rmi_i2c_addr;
-static int rmi_i2c_bus;
 
 /* NOTE:
  * RMI over i2c supports some special aliases on page 0x2 but this driver don't
  * use them */
 
-int rmi_init(int i2c_bus_index, int i2c_dev_addr)
+int rmi_init(int i2c_dev_addr)
 {
-    rmi_i2c_bus = i2c_bus_index;
     rmi_i2c_addr = i2c_dev_addr;
     rmi_cur_page = 0x4;
     return 0;
@@ -44,7 +42,7 @@ static int rmi_select_page(unsigned char page)
     if(page != rmi_cur_page)
     {
         rmi_cur_page = page;
-        return i2c_write_data(rmi_i2c_bus, rmi_i2c_addr, RMI_PAGE_SELECT, &page, 1);
+        return i2c_writemem(rmi_i2c_addr, RMI_PAGE_SELECT, &page, 1);
     }
     else
         return 0;
@@ -52,9 +50,10 @@ static int rmi_select_page(unsigned char page)
 
 int rmi_read(int address, int byte_count, unsigned char *buffer)
 {
-    if(rmi_select_page(address >> 8) < 0)
-        return -1;
-    return i2c_read_data(rmi_i2c_bus, rmi_i2c_addr, address & 0xff, buffer, byte_count);
+    int ret;
+    if((ret = rmi_select_page(address >> 8)) < 0)
+        return ret;
+    return i2c_readmem(rmi_i2c_addr, address & 0xff, buffer, byte_count);
 }
 
 int rmi_read_single(int address)
@@ -66,9 +65,10 @@ int rmi_read_single(int address)
 
 int rmi_write(int address, int byte_count, const unsigned char *buffer)
 {
-    if(rmi_select_page(address >> 8) < 0)
-        return -1;
-    return i2c_write_data(rmi_i2c_bus, rmi_i2c_addr, address & 0xff, buffer, byte_count);
+    int ret;
+    if((ret = rmi_select_page(address >> 8)) < 0)
+        return ret;
+    return i2c_writemem(rmi_i2c_addr, address & 0xff, buffer, byte_count);
 }
 
 int rmi_write_single(int address, unsigned char byte)

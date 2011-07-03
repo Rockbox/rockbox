@@ -87,6 +87,8 @@
 #define INT_SRC_SSP1_DMA    14
 #define INT_SRC_SSP1_ERROR  15
 #define INT_SRC_SSP2_DMA    20
+#define INT_SRC_I2C_DMA     26
+#define INT_SRC_I2C_ERROR   27
 #define INT_SRC_TIMER(nr)   (28 + (nr))
 #define INT_SRC_LCDIF_DMA   45
 #define INT_SRC_LCDIF_ERROR 46

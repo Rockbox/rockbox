@@ -53,8 +53,7 @@
 
 static inline void imx233_pinctrl_init(void)
 {
-    __REG_CLR(HW_PINCTRL_CTRL) = __BLOCK_CLKGATE;
-    __REG_CLR(HW_PINCTRL_CTRL) = __BLOCK_SFTRST;
+    __REG_CLR(HW_PINCTRL_CTRL) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
 }
 
 static inline void imx233_set_pin_drive_strength(unsigned bank, unsigned pin, unsigned strength)

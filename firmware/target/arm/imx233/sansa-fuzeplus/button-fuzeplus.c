@@ -28,59 +28,6 @@
 #include "string.h"
 
 #ifndef BOOTLOADER
-static void i2c_scl_dir(bool out)
-{
-    imx233_enable_gpio_output(0, 30, out);
-}
-
-static void i2c_sda_dir(bool out)
-{
-    imx233_enable_gpio_output(0, 31, out);
-}
-
-static void i2c_scl_out(bool high)
-{
-    imx233_set_gpio_output(0, 30, high);
-}
-
-static void i2c_sda_out(bool high)
-{
-    imx233_set_gpio_output(0, 31, high);
-}
-
-static bool i2c_scl_in(void)
-{
-    return imx233_get_gpio_input_mask(0, 1 << 30);
-}
-
-static bool i2c_sda_in(void)
-{
-    return imx233_get_gpio_input_mask(0, 1 << 31);
-}
-
-static void i2c_delay(int d)
-{
-    udelay(d);
-}
-
-struct i2c_interface btn_i2c =
-{
-    .scl_dir = i2c_scl_dir,
-    .sda_dir = i2c_sda_dir,
-    .scl_out = i2c_scl_out,
-    .sda_out = i2c_sda_out,
-    .scl_in = i2c_scl_in,
-    .sda_in = i2c_sda_in,
-    .delay = i2c_delay,
-    .delay_hd_sta = 4,
-    .delay_hd_dat = 5,
-    .delay_su_dat = 1,
-    .delay_su_sto = 4,
-    .delay_su_sta = 5,
-    .delay_thigh = 4
-};
-
-int rmi_i2c_bus = -1;
 
 void button_debug_screen(void)
 {
@@ -221,9 +168,6 @@ void button_debug_screen(void)
 
 void button_init_device(void)
 {
-    rmi_i2c_bus = i2c_add_node(&btn_i2c);
-    rmi_init(rmi_i2c_bus, 0x40);
-
     /* Synaptics TouchPad information:
      * - product id: 1533
      * - nr function: 1 (0x10 = 2D touchpad)
@@ -244,7 +188,17 @@ void button_init_device(void)
      * - Resolution: 82
      *
      * ATTENTION line: B0P27 asserted low
+     *
+     * The B0P26 line seems to be related to the touchpad
      */
+     
+    /* for touchpad ? */
+    imx233_set_pin_function(0, 26, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(0, 26, false);
+    imx233_set_pin_drive_strength(0, 26, PINCTRL_DRIVE_8mA);
+    
+    rmi_init(0x40);
+
     rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 5);
     rmi_write_single(RMI_2D_GESTURE_SETTINGS,
         RMI_2D_GESTURE_PRESS_TIME_300MS |
