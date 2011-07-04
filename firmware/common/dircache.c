@@ -885,7 +885,9 @@ int dircache_build(int last_size)
     for(unsigned i = 0; i < entry_count; i++)
         dircache_root[i].d_name -= offset;
 
+    d_names_start -= offset;
     d_names_end -= offset;
+    
     /* equivalent to dircache_size + DIRCACHE_RESERVE */
     allocated_size = (d_names_end - (char*)dircache_root);
     reserve_used = 0;
