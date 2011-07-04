@@ -184,8 +184,7 @@ struct cmd_source_t
     struct cmd_source_t *next;
     /* for later use */
     enum cmd_source_type_t type;
-    bool bin_loaded;
-    bool elf_loaded;
+    bool loaded;
     struct elf_params_t elf;
     struct bin_param_t bin;
 };
@@ -683,7 +682,7 @@ static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
     if(src == NULL)
         bug("undefined reference to source '%s'\n", id);
     /* avoid reloading */
-    if(src->type == CMD_SRC_ELF && src->elf_loaded)
+    if(src->type == CMD_SRC_ELF && src->loaded)
         return;
     if(src->type != CMD_SRC_UNK)
         bug("source '%s' seen both as elf and binary file", id);
@@ -694,9 +693,9 @@ static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
     if(g_debug)
         printf("Loading ELF file '%s'...\n", src->filename);
     elf_init(&src->elf);
-    src->elf_loaded = elf_read_file(&src->elf, elf_read, elf_printf, &fd);
+    src->loaded = elf_read_file(&src->elf, elf_read, elf_printf, &fd);
     close(fd);
-    if(!src->elf_loaded)
+    if(!src->loaded)
         bug("error loading elf file '%s' (id '%s')\n", src->filename, id);
 }
 
@@ -705,10 +704,8 @@ static void load_bin_by_id(struct cmd_file_t *cmd_file, const char *id)
     struct cmd_source_t *src = find_source_by_id(cmd_file, id);
     if(src == NULL)
         bug("undefined reference to source '%s'\n", id);
-    if(src == NULL)
-        bug("undefined reference to source '%s'\n", id);
     /* avoid reloading */
-    if(src->type == CMD_SRC_BIN && src->bin_loaded)
+    if(src->type == CMD_SRC_BIN && src->loaded)
         return;
     if(src->type != CMD_SRC_UNK)
         bug("source '%s' seen both as elf and binary file", id);
@@ -723,7 +720,7 @@ static void load_bin_by_id(struct cmd_file_t *cmd_file, const char *id)
     src->bin.data = xmalloc(src->bin.size);
     read(fd, src->bin.data, src->bin.size);
     close(fd);
-    src->bin_loaded = true;
+    src->loaded = true;
 }
 
 static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
