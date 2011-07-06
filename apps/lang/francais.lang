@@ -2262,6 +2262,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Création base de données... %d trouvés (OFF = retour)"
@@ -2270,6 +2271,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Création base de données... %d trouvés (LEFT = retour)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Création base de données... %d trouvés (PREV = retour)"
     gogearsa9200: "Création base de données... %d trouvés (REW = retour)"
+    archosplayer: "Création BD %d trouvés"
   </dest>
   <voice>
     *: "entrées trouvées pour base de données"
