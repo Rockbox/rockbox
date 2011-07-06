@@ -1119,7 +1119,9 @@ void pcmbuf_fade(bool fade, bool in)
     if (fade)
     {
         /* Do this on thread for now */
+#ifdef HAVE_PRIORITY_SCHEDULING
         int old_prio = thread_set_priority(thread_self(), PRIORITY_REALTIME);
+#endif
 
         while (1)
         {
@@ -1140,7 +1142,9 @@ void pcmbuf_fade(bool fade, bool in)
             break;
         }
 
+#ifdef HAVE_PRIORITY_SCHEDULING
         thread_set_priority(thread_self(), old_prio);
+#endif
     }
 }
 
