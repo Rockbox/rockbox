@@ -837,6 +837,56 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
 
     return buffer;
 }
+
+#if CONFIG_CODEC == SWCODEC
+/* Play a standard sound */
+void system_sound_play(enum system_sound sound)
+{
+    static const struct beep_params
+    {
+        int *setting;
+        unsigned short frequency;
+        unsigned short duration;
+        unsigned short amplitude;
+    } beep_params[] =
+    {
+        [SOUND_KEYCLICK] =
+        { &global_settings.keyclick,
+          4000, KEYCLICK_DURATION, 2500 },
+        [SOUND_TRACK_SKIP] =
+        { &global_settings.beep,
+          2000, 100, 2500 },
+        [SOUND_TRACK_NO_MORE] =
+        { &global_settings.beep,
+          1000, 100, 1500 },
+    };
+
+    const struct beep_params *params = &beep_params[sound];
+
+    if (*params->setting)
+    {
+        beep_play(params->frequency, params->duration,
+                  params->amplitude * *params->setting);
+    }
+}
+
+/* Produce keyclick based upon button and global settings */
+void keyclick_click(int button)
+{
+    /* Settings filters */
+    if (global_settings.keyclick &&
+        (global_settings.keyclick_repeats || !(button & BUTTON_REPEAT)))
+    {
+        /* Button filters */
+        if (button != BUTTON_NONE && !(button & BUTTON_REL)
+            && !(button & (SYS_EVENT|BUTTON_MULTIMEDIA)) )
+        {
+            system_sound_play(SOUND_KEYCLICK);
+        }
+    }
+}
+#endif /* CONFIG_CODEC == SWCODEC */
+
 #endif /* !defined(__PCTOOL__) */
 
 /* Read (up to) a line of text from fd into buffer and return number of bytes
@@ -1036,52 +1086,3 @@ enum current_activity get_current_activity(void)
 {
     return current_activity[current_activity_top?current_activity_top-1:0];
 }
-
-#if CONFIG_CODEC == SWCODEC
-/* Play a standard sound */
-void system_sound_play(enum system_sound sound)
-{
-    static const struct beep_params
-    {
-        int *setting;
-        unsigned short frequency;
-        unsigned short duration;
-        unsigned short amplitude;
-    } beep_params[] =
-    {
-        [SOUND_KEYCLICK] =
-        { &global_settings.keyclick,
-          4000, KEYCLICK_DURATION, 2500 },
-        [SOUND_TRACK_SKIP] =
-        { &global_settings.beep,
-          2000, 100, 2500 },
-        [SOUND_TRACK_NO_MORE] =
-        { &global_settings.beep,
-          1000, 100, 1500 },
-    };
-
-    const struct beep_params *params = &beep_params[sound];
-
-    if (*params->setting)
-    {
-        beep_play(params->frequency, params->duration,
-                  params->amplitude * *params->setting);
-    }
-}
-
-/* Produce keyclick based upon button and global settings */
-void keyclick_click(int button)
-{
-    /* Settings filters */
-    if (global_settings.keyclick &&
-        (global_settings.keyclick_repeats || !(button & BUTTON_REPEAT)))
-    {
-        /* Button filters */
-        if (button != BUTTON_NONE && !(button & BUTTON_REL)
-            && !(button & (SYS_EVENT|BUTTON_MULTIMEDIA)) )
-        {
-            system_sound_play(SOUND_KEYCLICK);
-        }
-    }
-}
-#endif /* CONFIG_CODEC == SWCODEC */
