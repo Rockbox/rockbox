@@ -203,9 +203,7 @@ static int get_action_worker(int context, int timeout,
 
 #if CONFIG_CODEC == SWCODEC
     /* Produce keyclick */
-    if (global_settings.keyclick && !(button & BUTTON_REL))
-        if (!(button & BUTTON_REPEAT) || global_settings.keyclick_repeats)
-            beep_play(4000, KEYCLICK_DURATION, 2500*global_settings.keyclick);
+    keyclick_click(button);
 #endif
 
     if ((context != last_context) && ((last_button & BUTTON_REL) == 0)

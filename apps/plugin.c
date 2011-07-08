@@ -782,6 +782,13 @@ static const struct plugin_api rockbox_api = {
     mixer_channel_status,
     mixer_channel_get_buffer,
     mixer_channel_calculate_peaks,
+    mixer_channel_play_data,
+    mixer_channel_play_pause,
+    mixer_channel_stop,
+    mixer_channel_set_amplitude,
+    mixer_channel_get_bytes_waiting,
+    system_sound_play,
+    keyclick_click,
 #endif
 };
 

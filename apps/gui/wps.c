@@ -577,8 +577,7 @@ static void play_hop(int direction)
     else if (direction == 1 && step >= remaining)
     {
 #if CONFIG_CODEC == SWCODEC
-        if(global_settings.beep)
-            beep_play(1000, 150, 1500*global_settings.beep);
+        system_sound_play(SOUND_TRACK_NO_MORE);
 #endif
         return;
     }

@@ -386,6 +386,7 @@ enum video_action
     VIDEO_STOP = 0,
     VIDEO_PREV,
     VIDEO_NEXT,
+    VIDEO_ACTION_MANUAL = 0x8000, /* Flag that says user did it */
 };
 
 /* OSD status - same order as icon array */
@@ -2139,7 +2140,7 @@ static int button_loop(void)
                     /* Release within 3 seconds of start: skip to previous
                      * file */
                     osd_stop();
-                    next_action = VIDEO_PREV;
+                    next_action = VIDEO_PREV | VIDEO_ACTION_MANUAL;
                 }
             }
             else if ((button & ~BUTTON_REPEAT) == old_button) {
@@ -2169,7 +2170,7 @@ static int button_loop(void)
             if ((old_button | BUTTON_REL) == button) {
                 /* If button has been released: skip to next file */
                 osd_stop();
-                next_action = VIDEO_NEXT;
+                next_action = VIDEO_NEXT | VIDEO_ACTION_MANUAL;
             }
             else if ((button & ~BUTTON_REPEAT) == old_button) {
                 button = osd_seek_btn(old_button);
@@ -2251,11 +2252,10 @@ enum plugin_status plugin_start(const void* parameter)
 
         while (!quit)
         {
-            int result;
-
             init_settings(videofile);
 
-            result = stream_open(videofile);
+            int result = stream_open(videofile);
+            bool manual_skip = false;
 
             if (result >= STREAM_OK) {
                 /* start menu */
@@ -2267,6 +2267,8 @@ enum plugin_status plugin_start(const void* parameter)
                 if (result != MPEG_START_QUIT) {
                     /* Enter button loop and process UI */
                     next_action = button_loop();
+                    manual_skip = next_action & VIDEO_ACTION_MANUAL;
+                    next_action &= ~VIDEO_ACTION_MANUAL;                    
                 }
 
                 stream_close();
@@ -2341,6 +2343,13 @@ enum plugin_status plugin_start(const void* parameter)
                                                    sizeof(videofile));
                 /* quit after finished the last videofile */
                 quit = !get_videofile_says;
+
+                if (manual_skip)
+                {
+                    rb->system_sound_play(get_videofile_says ?
+                                          SOUND_TRACK_SKIP : SOUND_TRACK_NO_MORE);
+                }
+
                 break;
                 }
             case VIDEO_PREV:
@@ -2348,6 +2357,13 @@ enum plugin_status plugin_start(const void* parameter)
                 get_videofile_says = get_videofile(VIDEO_PREV, videofile,
                                                    sizeof(videofile));
                 /* if there is no previous file, play the same videofile */
+
+                if (manual_skip)
+                {
+                    rb->system_sound_play(get_videofile_says ?
+                                          SOUND_TRACK_SKIP : SOUND_TRACK_NO_MORE);
+                }
+
                 break;
                 }
             case VIDEO_STOP:

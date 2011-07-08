@@ -3352,8 +3352,7 @@ void audio_skip(int offset)
            processed one */
         skip_offset = accum;
 
-        if (global_settings.beep)
-            beep_play(2000, 100, 2500*global_settings.beep);
+        system_sound_play(SOUND_TRACK_SKIP);
 
         LOGFQUEUE("audio > audio Q_AUDIO_SKIP %d", offset);
 
@@ -3373,8 +3372,7 @@ void audio_skip(int offset)
     else
     {
         /* No more tracks */
-        if (global_settings.beep)
-            beep_play(1000, 100, 1500*global_settings.beep);
+        system_sound_play(SOUND_TRACK_NO_MORE);
     }
 
     id3_mutex_unlock();

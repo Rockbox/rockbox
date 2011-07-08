@@ -214,6 +214,10 @@ int mpeg_button_get(int timeout)
     mpeg_sysevent_clear();
     button = timeout == TIMEOUT_BLOCK ? rb->button_get(true) :
                 rb->button_get_w_tmo(timeout);
+
+    /* Produce keyclick */
+    rb->keyclick_click(button);
+
     return mpeg_sysevent_callback(button, NULL);
 }
 

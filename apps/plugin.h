@@ -146,7 +146,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 207
+#define PLUGIN_API_VERSION 208
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -913,6 +913,16 @@ struct plugin_api {
     void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel, int *count);
     void (*mixer_channel_calculate_peaks)(enum pcm_mixer_channel channel,
                                           int *left, int *right);
+    void (*mixer_channel_play_data)(enum pcm_mixer_channel channel,
+                                    pcm_play_callback_type get_more,
+                                    unsigned char *start, size_t size);
+    void (*mixer_channel_play_pause)(enum pcm_mixer_channel channel, bool play);
+    void (*mixer_channel_stop)(enum pcm_mixer_channel channel);
+    void (*mixer_channel_set_amplitude)(enum pcm_mixer_channel channel,
+                                        unsigned int amplitude);
+    size_t (*mixer_channel_get_bytes_waiting)(enum pcm_mixer_channel channel);
+    void (*system_sound_play)(enum system_sound sound);
+    void (*keyclick_click)(int button);
 #endif
 };
 
