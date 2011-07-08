@@ -457,7 +457,7 @@ static void NORETURN_ATTR voice_thread(void)
             if ((dest = (char *)voice_buf_get()) != NULL)
                 break;
 
-            yield();
+            sleep(0);
         }
 
         voice_buf_commit(dsp_process(td.dsp, dest, td.src, td.count)
