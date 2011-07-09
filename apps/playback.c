@@ -738,7 +738,7 @@ static void audio_reset_buffer(void)
 {
     /*
      * Layout audio buffer as follows:
-     * [[|TALK]|SCRATCH|BUFFERING|PCM|]
+     * [[|TALK]|SCRATCH|BUFFERING|PCM|[VOICE|]]
      */
 
     /* see audio_get_recording_buffer if this is modified */
@@ -754,6 +754,18 @@ static void audio_reset_buffer(void)
     size_t allocsize;
 
     ALIGN_BUFFER(filebuf, filebuflen, sizeof (intptr_t));
+
+    if (talk_voice_required())
+    {
+        /* Need a space for voice PCM output */
+        allocsize = voicebuf_init(filebuf + filebuflen);
+
+        allocsize = ALIGN_UP(allocsize, sizeof (intptr_t));
+        if (allocsize > filebuflen)
+            goto bufpanic;
+
+        filebuflen -= allocsize;
+    }
 
     /* Subtract whatever the pcm buffer says it used plus the guard buffer */
     allocsize = pcmbuf_init(filebuf + filebuflen);
@@ -3475,7 +3487,7 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
            swap space */
         logf("get buffer: audio");
         buf = audiobuf + talk_get_bufsize();
-        end = audiobufend - pcmbuf_init(audiobufend);
+        end = audiobufend - voicebuf_init(audiobufend);
         buffer_state = AUDIOBUF_STATE_VOICED_ONLY;
     }
 

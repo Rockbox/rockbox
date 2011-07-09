@@ -467,22 +467,20 @@ static size_t get_next_required_pcmbuf_size(void)
 }
 
 /* Initialize the pcmbuffer the structure looks like this:
- * ...|---------PCMBUF---------|FADEBUF|VOICEBUF|DESCS|... */
+ * ...|---------PCMBUF---------[|FADEBUF]|DESCS|... */
 size_t pcmbuf_init(unsigned char *bufend)
 {
-    unsigned char *voicebuf;
-
     pcmbuf_bufend = bufend;
     pcmbuf_size = get_next_required_pcmbuf_size();
     write_chunk = (struct chunkdesc *)pcmbuf_bufend -
         NUM_CHUNK_DESCS(pcmbuf_size);
-    voicebuf = (unsigned char *)write_chunk -
-                voicebuf_init((unsigned char *)write_chunk);
+
 #ifdef HAVE_CROSSFADE
-    fadebuf = voicebuf - CROSSFADE_BUFSIZE;
+    fadebuf = (unsigned char *)write_chunk -
+        (crossfade_enable_request ? CROSSFADE_BUFSIZE : 0);
     pcmbuffer = fadebuf - pcmbuf_size;
 #else
-    pcmbuffer = voicebuf - pcmbuf_size;
+    pcmbuffer = (unsigned char *)write_chunk - pcmbuf_size;
 #endif
 
     init_pcmbuffers();
