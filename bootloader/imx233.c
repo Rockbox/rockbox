@@ -36,6 +36,7 @@
 #include "panic.h"
 #include "power.h"
 #include "system-target.h"
+#include "fmradio_i2c.h"
 
 #include "usb.h"
 

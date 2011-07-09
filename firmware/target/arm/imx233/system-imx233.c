@@ -152,9 +152,7 @@ void system_init(void)
     imx233_timrot_init();
     imx233_dma_init();
     imx233_ssp_init();
-    #ifndef BOOTLOADER
     imx233_i2c_init();
-    #endif
 }
 
 void power_off(void)

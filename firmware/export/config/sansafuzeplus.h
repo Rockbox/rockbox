@@ -69,6 +69,8 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_IMX233
 
+#define CONFIG_TUNER SI4700
+
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
 

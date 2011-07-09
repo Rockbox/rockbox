@@ -479,6 +479,8 @@ target/arm/s5l8700/i2c-s5l8700.c
 target/arm/s5l8702/i2c-s5l8702.c
 #elif CONFIG_I2C == I2C_RK27XX
 target/arm/rk27xx/i2c-rk27xx.c
+#elif CONFIG_I2C == I2C_IMX233
+target/arm/imx233/i2c-imx233.c
 #endif
 
 #if CONFIG_CPU == PNX0101
@@ -488,7 +490,6 @@ target/arm/pnx0101/timer-pnx0101.c
 #endif
 
 #if CONFIG_CPU == IMX233
-target/arm/imx233/i2c-imx233.c
 target/arm/imx233/lcdif-imx233.c
 target/arm/imx233/clkctrl-imx233.c
 target/arm/imx233/system-imx233.c
@@ -1451,6 +1452,8 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #ifndef SIMULATOR
 #ifndef BOOTLOADER
 drivers/synaptics-rmi.c
+drivers/generic_i2c.c
+target/arm/imx233/sansa-fuzeplus/fmradio-i2c-fuzeplus.c
 #endif
 target/arm/imx233/sansa-fuzeplus/backlight-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
