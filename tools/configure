@@ -29,6 +29,7 @@ thread_support="ASSEMBLER_THREADS"
 app_lcd_width=
 app_lcd_height=
 app_lcd_orientation=
+cmdline="$@"
 #
 # Begin Function Definitions
 #
@@ -3630,22 +3631,19 @@ if test "$apps" = "apps"; then
 fi
 
 #### Fix the cmdline ###
-if [ "$ARG_CCACHE" = "1" ]; then
-  cmdline="--ccache "
-elif [ "$ARG_CCACHE" = "0" ]; then
-  cmdline="--no-ccache "
-fi
-if [ "$ARG_ARM_EABI" = "1" ]; then
-  cmdline="$cmdline--eabi "
-fi
 if [ -n "$ARG_PREFIX" ]; then
-  cmdline="$cmdline--prefix=\$(PREFIX) "
+  cmdline="$cmdline --prefix=\$(PREFIX)"
 fi
 if [ -n "$ARG_LCDWIDTH" ]; then
-  cmdline="$cmdline--lcdwidth=$ARG_LCDWIDTH --lcdheight=$ARG_LCDHEIGHT "
+  cmdline="$cmdline --lcdwidth=$ARG_LCDWIDTH --lcdheight=$ARG_LCDHEIGHT "
 fi
 
-cmdline="$cmdline--target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
+# remove parts from the cmdline we're going to set unconditionally
+cmdline=`echo $cmdline | sed -e s,--target=[a-zA-Z0-9]\*,,g \
+                            -e s,--ram=[0-9]\*,,g \
+                            -e s,--rbdir=[./a-zA-Z0-9]\*,,g \
+                            -e s,--type=[a-zA-Z]\*,,g`
+cmdline="$cmdline --target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
 
 ### end of cmdline
 
