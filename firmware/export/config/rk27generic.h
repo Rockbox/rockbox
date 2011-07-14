@@ -113,9 +113,12 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
+#define HAVE_BACKLIGHT_BRIGHTNESS
 
-/* Doesn't work so comment it out for now */
-/* #define HAVE_BACKLIGHT_BRIGHTNESS */
+/* Main LCD backlight brightness range and defaults */
+#define MIN_BRIGHTNESS_SETTING      0
+#define MAX_BRIGHTNESS_SETTING      31
+#define DEFAULT_BRIGHTNESS_SETTING  18
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
