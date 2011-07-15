@@ -23,7 +23,6 @@
 #define CONFIGURE_H
 
 #include "ui_configurefrm.h"
-#include "browsedirtree.h"
 #include <QtGui>
 
 class Config : public QDialog
@@ -51,19 +50,19 @@ class Config : public QDialog
         QString language;
         QString programPath;
         QUrl proxy;
+        QString mountpoint;
         void updateCacheInfo(QString);
-
-        BrowseDirtree *browser;
-        BrowseDirtree *cbrowser;
 
     private slots:
         void setNoProxy(bool);
         void setSystemProxy(bool);
         void updateLanguage(void);
-        void browseFolder(void);
+        void refreshMountpoint(void);
         void browseCache(void);
         void autodetect(void);
         void setMountpoint(QString);
+        void updateMountpoint(QString);
+        void updateMountpoint(int);
         void cacheClear(void);
         void configTts(void);
         void configEnc(void);

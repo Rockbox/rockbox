@@ -23,7 +23,6 @@
 #include "configure.h"
 #include "autodetection.h"
 #include "ui_configurefrm.h"
-#include "browsedirtree.h"
 #include "encoders.h"
 #include "ttsbase.h"
 #include "system.h"
@@ -88,7 +87,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(abort()));
     connect(ui.radioNoProxy, SIGNAL(toggled(bool)), this, SLOT(setNoProxy(bool)));
     connect(ui.radioSystemProxy, SIGNAL(toggled(bool)), this, SLOT(setSystemProxy(bool)));
-    connect(ui.browseMountPoint, SIGNAL(clicked()), this, SLOT(browseFolder()));
+    connect(ui.refreshMountPoint, SIGNAL(clicked()), this, SLOT(refreshMountpoint()));
     connect(ui.buttonAutodetect,SIGNAL(clicked()),this,SLOT(autodetect()));
     connect(ui.buttonCacheBrowse, SIGNAL(clicked()), this, SLOT(browseCache()));
     connect(ui.buttonCacheClear, SIGNAL(clicked()), this, SLOT(cacheClear()));
@@ -98,6 +97,8 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     connect(ui.treeDevices, SIGNAL(itemSelectionChanged()), this, SLOT(updateEncState()));
     connect(ui.testTTS,SIGNAL(clicked()),this,SLOT(testTts()));
     connect(ui.showDisabled, SIGNAL(toggled(bool)), this, SLOT(showDisabled(bool)));
+    connect(ui.mountPoint, SIGNAL(editTextChanged(QString)), this, SLOT(updateMountpoint(QString)));
+    connect(ui.mountPoint, SIGNAL(currentIndexChanged(int)), this, SLOT(updateMountpoint(int)));
     // delete this dialog after it finished automatically.
     connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
 
@@ -149,25 +150,25 @@ void Config::accept()
     RbSettings::setValue(RbSettings::Language, language);
 
     // mountpoint
-    QString mp = ui.mountPoint->text();
-    if(mp.isEmpty()) {
+    if(mountpoint.isEmpty()) {
         errormsg += "<li>" + tr("No mountpoint given") + "</li>";
         error = true;
     }
-    else if(!QFileInfo(mp).exists()) {
+    else if(!QFileInfo(mountpoint).exists()) {
         errormsg += "<li>" + tr("Mountpoint does not exist") + "</li>";
         error = true;
     }
-    else if(!QFileInfo(mp).isDir()) {
+    else if(!QFileInfo(mountpoint).isDir()) {
         errormsg += "<li>" + tr("Mountpoint is not a directory.") + "</li>";
         error = true;
     }
-    else if(!QFileInfo(mp).isWritable()) {
+    else if(!QFileInfo(mountpoint).isWritable()) {
         errormsg += "<li>" + tr("Mountpoint is not writeable") + "</li>";
         error = true;
     }
     else {
-        RbSettings::setValue(RbSettings::Mountpoint, QDir::fromNativeSeparators(mp));
+        RbSettings::setValue(RbSettings::Mountpoint,
+                QDir::fromNativeSeparators(mountpoint));
     }
 
     // platform
@@ -269,7 +270,9 @@ void Config::setUserSettings()
     connect(ui.listLanguages, SIGNAL(itemSelectionChanged()), this, SLOT(updateLanguage()));
 
     // devices tab
-    ui.mountPoint->setText(QDir::toNativeSeparators(RbSettings::value(RbSettings::Mountpoint).toString()));
+    refreshMountpoint();
+    mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    setMountpoint(mountpoint);
 
     // cache tab
     if(!QFileInfo(RbSettings::value(RbSettings::CachePath).toString()).isDir())
@@ -556,28 +559,6 @@ void Config::updateLanguage()
 }
 
 
-void Config::browseFolder()
-{
-    browser = new BrowseDirtree(this,tr("Select your device"));
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
-    browser->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-#elif defined(Q_OS_WIN32)
-    browser->setFilter(QDir::Drives);
-#endif
-#if defined(Q_OS_MACX)
-    browser->setRoot("/Volumes");
-#elif defined(Q_OS_LINUX)
-    browser->setDir("/media");
-#endif
-    if( ui.mountPoint->text() != "" )
-    {
-        browser->setDir(ui.mountPoint->text());
-    }
-    browser->show();
-    connect(browser, SIGNAL(itemChanged(QString)), this, SLOT(setMountpoint(QString)));
-}
-
-
 void Config::browseCache()
 {
     QString old = ui.cachePath->text();
@@ -593,9 +574,70 @@ void Config::browseCache()
 }
 
 
+void Config::refreshMountpoint()
+{
+    // avoid QComboBox to send signals during rebuild to avoid changing to an
+    // unwanted item.
+    ui.mountPoint->blockSignals(true);
+    ui.mountPoint->clear();
+    QStringList mps = Autodetection::mountpoints();
+    for(int i = 0; i < mps.size(); ++i) {
+        // add mountpoint as user data so we can change the displayed string
+        // later (to include volume label or similar)
+        // Skip unwritable mountpoints, they are not useable for us.
+        if(QFileInfo(mps.at(i)).isWritable()) {
+            QString title = QString("%1 (%2 GiB of %3 GiB free)")
+                .arg(QDir::toNativeSeparators(mps.at(i)))
+                .arg((double)Utils::filesystemFree(mps.at(i))/(1<<30), 0, 'f', 2)
+                .arg((double)Utils::filesystemTotal(mps.at(i))/(1<<30), 0, 'f', 2);
+            ui.mountPoint->addItem(title, mps.at(i));
+        }
+    }
+    if(!mountpoint.isEmpty()) {
+        setMountpoint(mountpoint);
+    }
+    ui.mountPoint->blockSignals(false);
+}
+
+
+void Config::updateMountpoint(QString m)
+{
+    if(!m.isEmpty()) {
+        mountpoint = m;
+        qDebug() << "[Config] Mountpoint set to" << mountpoint;
+    }
+}
+
+
+void Config::updateMountpoint(int idx)
+{
+    if(idx == -1) {
+        return;
+    }
+    QString mp = ui.mountPoint->itemData(idx).toString();
+    if(!mp.isEmpty()) {
+        mountpoint = mp;
+        qDebug() << "[Config] Mountpoint set to" << mountpoint;
+    }
+}
+
+
 void Config::setMountpoint(QString m)
 {
-    ui.mountPoint->setText(m);
+    if(m.isEmpty()) {
+        return;
+    }
+    int index = ui.mountPoint->findData(m);
+    if(index != -1) {
+        ui.mountPoint->setCurrentIndex(index);
+    }
+    else {
+        // keep a mountpoint that is not in the list for convenience (to allow
+        // easier development)
+        ui.mountPoint->addItem(m);
+        ui.mountPoint->setCurrentIndex(ui.mountPoint->findText(m));
+    }
+    qDebug() << "[Config] Mountpoint set to" << mountpoint;
 }
 
 
@@ -682,7 +724,7 @@ void Config::autodetect()
 
         if(detector.getMountPoint() != "" )
         {
-            ui.mountPoint->setText(QDir::toNativeSeparators(detector.getMountPoint()));
+            setMountpoint(detector.getMountPoint());
         }
         else
         {

@@ -13,8 +13,8 @@
   <property name="windowTitle">
    <string>Configuration</string>
   </property>
-  <layout class="QGridLayout">
-   <item row="0" column="0" colspan="3">
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
     <widget class="QLabel" name="labelTitle">
      <property name="text">
       <string>Configure Rockbox Utility</string>
@@ -34,7 +34,7 @@
       <attribute name="title">
        <string>&amp;Device</string>
       </attribute>
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="labelMountPoint">
          <property name="text">
@@ -46,25 +46,25 @@
         </widget>
        </item>
        <item row="1" column="0" colspan="3">
-        <layout class="QHBoxLayout">
-         <item>
-          <widget class="QLineEdit" name="mountPoint"/>
-         </item>
-         <item>
-          <widget class="QPushButton" name="browseMountPoint">
-           <property name="text">
-            <string>&amp;Browse</string>
-           </property>
-           <property name="icon">
-            <iconset resource="rbutilqt.qrc">
-             <normaloff>:/icons/system-search.png</normaloff>:/icons/system-search.png</iconset>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QComboBox" name="mountPoint">
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QPushButton" name="refreshMountPoint">
+         <property name="text">
+          <string>&amp;Refresh</string>
+         </property>
+         <property name="icon">
+          <iconset resource="rbutilqt.qrc">
+           <normaloff>:/icons/view-refresh.png</normaloff>:/icons/view-refresh.png</iconset>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="labelPlayer">
@@ -89,17 +89,26 @@
          </property>
         </spacer>
        </item>
-       <item row="2" column="2">
+       <item row="2" column="2" colspan="2">
         <widget class="QCheckBox" name="showDisabled">
          <property name="text">
           <string>Show disabled targets</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="3">
-        <widget class="QTreeWidget" name="treeDevices"/>
+       <item row="3" column="0" colspan="4">
+        <widget class="QTreeWidget" name="treeDevices">
+         <attribute name="headerVisible">
+          <bool>false</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
+        </widget>
        </item>
-       <item row="4" column="0" colspan="3">
+       <item row="4" column="0" colspan="4">
         <widget class="QPushButton" name="buttonAutodetect">
          <property name="text">
           <string>&amp;Autodetect</string>
