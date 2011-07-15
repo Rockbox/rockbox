@@ -586,10 +586,11 @@ void Config::refreshMountpoint()
         // later (to include volume label or similar)
         // Skip unwritable mountpoints, they are not useable for us.
         if(QFileInfo(mps.at(i)).isWritable()) {
-            QString title = QString("%1 (%2 GiB of %3 GiB free)")
+            QString title = QString("%1 %4 (%2 GiB of %3 GiB free)")
                 .arg(QDir::toNativeSeparators(mps.at(i)))
                 .arg((double)Utils::filesystemFree(mps.at(i))/(1<<30), 0, 'f', 2)
-                .arg((double)Utils::filesystemTotal(mps.at(i))/(1<<30), 0, 'f', 2);
+                .arg((double)Utils::filesystemTotal(mps.at(i))/(1<<30), 0, 'f', 2)
+                .arg(Utils::filesystemName(mps.at(i)));
             ui.mountPoint->addItem(title, mps.at(i));
         }
     }

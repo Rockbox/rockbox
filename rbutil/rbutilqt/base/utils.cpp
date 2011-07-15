@@ -110,6 +110,23 @@ QString Utils::resolvePathCase(QString path)
 }
 
 
+QString Utils::filesystemName(QString path)
+{
+    QString name;
+#if defined(Q_OS_WIN32)
+    wchar_t volname[MAX_PATH+1];
+    bool res = GetVolumeInformationW((LPTSTR)path.utf16(), volname, MAX_PATH+1,
+            NULL, NULL, NULL, NULL, NULL);
+    if(res) {
+        name = QString::fromWCharArray(volname);
+    }
+#endif
+
+    qDebug() << "[Utils] Volume name of" << path << "is" << name;
+    return name;
+}
+
+
 //! @brief figure the free disk space on a filesystem
 //! @param path path on the filesystem to check
 //! @return size in bytes
@@ -160,7 +177,7 @@ qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
         }
     }
 #endif
-    qDebug() << "[Utils] Filesystem free:" << path << size;
+    qDebug() << "[Utils] Filesystem:" << path << size;
     return size;
 }
 
