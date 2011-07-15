@@ -31,9 +31,16 @@
 class Utils : public QObject
 {
 public:
+    enum Size {
+        FilesystemTotal,
+        FilesystemFree
+    };
+
     static bool recursiveRmdir(const QString &dirName);
     static QString resolvePathCase(QString path);
     static qulonglong filesystemFree(QString path);
+    static qulonglong filesystemTotal(QString path);
+    static qulonglong filesystemSize(QString path, enum Size type);
     static QString findExecutable(QString name);
     static QString checkEnvironment(bool permission);
     static int compareVersionStrings(QString s1, QString s2);

@@ -63,9 +63,10 @@ QString Sysinfo::getInfo()
     info += "<b>" + tr("Filesystem") + "</b><br/>";
     QStringList drives = Autodetection::mountpoints();
     for(int i = 0; i < drives.size(); i++) {
-        info += tr("%1, %2 MiB available")
+        info += tr("%1, %2 GiB of %3 GiB available")
             .arg(QDir::toNativeSeparators(drives.at(i)))
-            .arg(Utils::filesystemFree(drives.at(i)) / (1024*1024));
+            .arg((double)Utils::filesystemFree(drives.at(i)) / (1<<30), 0, 'f', 2)
+            .arg((double)Utils::filesystemTotal(drives.at(i)) / (1<<30), 0, 'f', 2);
             if(i + 1 < drives.size())
                 info += "<br/>";
     }

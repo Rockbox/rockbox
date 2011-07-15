@@ -115,6 +115,18 @@ QString Utils::resolvePathCase(QString path)
 //! @return size in bytes
 qulonglong Utils::filesystemFree(QString path)
 {
+    return filesystemSize(path, FilesystemFree);
+}
+
+
+qulonglong Utils::filesystemTotal(QString path)
+{
+    return filesystemSize(path, FilesystemTotal);
+}
+
+
+qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
+{
     qlonglong size = 0;
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX) 
     // the usage of statfs() is deprecated by the LSB so use statvfs().
@@ -123,16 +135,30 @@ qulonglong Utils::filesystemFree(QString path)
 
     ret = statvfs(qPrintable(path), &fs);
 
-    if(ret == 0)
-        size = (qulonglong)fs.f_frsize * (qulonglong)fs.f_bavail;
+    if(ret == 0) {
+        if(type == FilesystemFree) {
+            size = (qulonglong)fs.f_frsize * (qulonglong)fs.f_bavail;
+        }
+        if(type == FilesystemTotal) {
+            size = (qulonglong)fs.f_frsize * (qulonglong)fs.f_blocks;
+        }
+    }
 #endif
 #if defined(Q_OS_WIN32)
     BOOL ret;
     ULARGE_INTEGER freeAvailBytes;
+    ULARGE_INTEGER totalNumberBytes;
 
-    ret = GetDiskFreeSpaceExW((LPCTSTR)path.utf16(), &freeAvailBytes, NULL, NULL);
-    if(ret)
-        size = freeAvailBytes.QuadPart;
+    ret = GetDiskFreeSpaceExW((LPCTSTR)path.utf16(), &freeAvailBytes,
+            &totalNumberBytes, NULL);
+    if(ret) {
+        if(type == FilesystemFree) {
+            size = freeAvailBytes.QuadPart;
+        }
+        if(type == FilesystemTotal) {
+            size = totalNumberBytes.QuadPart;
+        }
+    }
 #endif
     qDebug() << "[Utils] Filesystem free:" << path << size;
     return size;
