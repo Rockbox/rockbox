@@ -132,6 +132,7 @@ QT += network
 dbg {
     CONFIG += debug thread qt warn_on
     DEFINES -= QT_NO_DEBUG_OUTPUT
+    DEFINES += DBG
     message("debug")
 }
 !dbg {

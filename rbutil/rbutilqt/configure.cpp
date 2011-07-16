@@ -31,7 +31,7 @@
 #include "serverinfo.h"
 #include "systeminfo.h"
 #include "utils.h"
-#include <stdio.h>
+#include "comboboxviewdelegate.h"
 #if defined(Q_OS_WIN32)
 #if defined(UNICODE)
 #define _UNICODE
@@ -65,6 +65,13 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
         ui.listLanguages->addItem(i.key());
         i++;
     }
+
+    ComboBoxViewDelegate *delegate = new ComboBoxViewDelegate(this);
+    ui.mountPoint->setItemDelegate(delegate);
+#if !defined(DBG)
+    ui.mountPoint->setEditable(false);
+#endif
+
     ui.listLanguages->setSelectionMode(QAbstractItemView::SingleSelection);
     ui.proxyPass->setEchoMode(QLineEdit::Password);
     ui.treeDevices->setAlternatingRowColors(true);
@@ -586,12 +593,11 @@ void Config::refreshMountpoint()
         // later (to include volume label or similar)
         // Skip unwritable mountpoints, they are not useable for us.
         if(QFileInfo(mps.at(i)).isWritable()) {
-            QString title = QString("%1 %4 (%2 GiB of %3 GiB free)")
-                .arg(QDir::toNativeSeparators(mps.at(i)))
+            QString description = QString("%1 (%2 GiB of %3 GiB free)")
+                .arg(Utils::filesystemName(mps.at(i)))
                 .arg((double)Utils::filesystemFree(mps.at(i))/(1<<30), 0, 'f', 2)
-                .arg((double)Utils::filesystemTotal(mps.at(i))/(1<<30), 0, 'f', 2)
-                .arg(Utils::filesystemName(mps.at(i)));
-            ui.mountPoint->addItem(title, mps.at(i));
+                .arg((double)Utils::filesystemTotal(mps.at(i))/(1<<30), 0, 'f', 2);
+            ui.mountPoint->addItem(QDir::toNativeSeparators(mps.at(i)), description);
         }
     }
     if(!mountpoint.isEmpty()) {
@@ -604,7 +610,7 @@ void Config::refreshMountpoint()
 void Config::updateMountpoint(QString m)
 {
     if(!m.isEmpty()) {
-        mountpoint = m;
+        mountpoint = QDir::fromNativeSeparators(m);
         qDebug() << "[Config] Mountpoint set to" << mountpoint;
     }
 }
@@ -615,9 +621,9 @@ void Config::updateMountpoint(int idx)
     if(idx == -1) {
         return;
     }
-    QString mp = ui.mountPoint->itemData(idx).toString();
+    QString mp = ui.mountPoint->itemText(idx);
     if(!mp.isEmpty()) {
-        mountpoint = mp;
+        mountpoint = QDir::fromNativeSeparators(mp);
         qDebug() << "[Config] Mountpoint set to" << mountpoint;
     }
 }
@@ -628,14 +634,14 @@ void Config::setMountpoint(QString m)
     if(m.isEmpty()) {
         return;
     }
-    int index = ui.mountPoint->findData(m);
+    int index = ui.mountPoint->findText(QDir::toNativeSeparators(m));
     if(index != -1) {
         ui.mountPoint->setCurrentIndex(index);
     }
     else {
         // keep a mountpoint that is not in the list for convenience (to allow
         // easier development)
-        ui.mountPoint->addItem(m);
+        ui.mountPoint->addItem(QDir::toNativeSeparators(m));
         ui.mountPoint->setCurrentIndex(ui.mountPoint->findText(m));
     }
     qDebug() << "[Config] Mountpoint set to" << mountpoint;

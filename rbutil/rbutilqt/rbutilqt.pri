@@ -73,6 +73,7 @@ SOURCES += \
  quazip/zip.c \
  quazip/ioapi.c \
  base/ziputil.cpp \
+ comboboxviewdelegate.cpp \
 
 
 HEADERS += \
@@ -141,6 +142,7 @@ HEADERS += \
  quazip/unzip.h \
  quazip/zip.h \
  base/ziputil.h \
+ comboboxviewdelegate.h \
 
 
 FORMS += \
