@@ -31,7 +31,6 @@ SOURCES += \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  ../chinachippatcher/chinachip.c \
- browsedirtree.cpp \
  themesinstallwindow.cpp \
  base/uninstall.cpp \
  uninstallwindow.cpp \
@@ -98,7 +97,6 @@ HEADERS += \
  irivertools/h100sums.h \
  irivertools/h120sums.h \
  irivertools/h300sums.h \
- browsedirtree.h \
  themesinstallwindow.h \
  base/uninstall.h \
  uninstallwindow.h \
@@ -151,7 +149,6 @@ FORMS += \
  installwindowfrm.ui \
  progressloggerfrm.ui \
  configurefrm.ui \
- browsedirtreefrm.ui \
  installtalkfrm.ui \
  themesinstallfrm.ui \
  uninstallfrm.ui \

@@ -20,7 +20,6 @@
 #include "installtalkwindow.h"
 #include "ui_installtalkfrm.h"
 
-#include "browsedirtree.h"
 #include "configure.h"
 #include "rbsettings.h"
 #include "systeminfo.h"

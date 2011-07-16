@@ -20,7 +20,6 @@
  ****************************************************************************/
  
 #include "encttscfggui.h"
-#include "browsedirtree.h"
 
 EncTtsCfgGui::EncTtsCfgGui(QDialog* parent,EncTtsSettingInterface* interface,QString name) : QDialog(parent)
 {

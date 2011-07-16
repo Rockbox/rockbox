@@ -20,7 +20,6 @@
 #include "createvoicewindow.h"
 #include "ui_createvoicefrm.h"
 
-#include "browsedirtree.h"
 #include "configure.h"
 #include "rbsettings.h"
 #include "systeminfo.h"
