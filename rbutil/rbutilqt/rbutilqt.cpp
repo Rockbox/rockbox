@@ -370,19 +370,25 @@ void RbUtilQt::updateDevice()
     // displayed device info
     QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
     QString brand = SystemInfo::value(SystemInfo::CurBrand).toString();
-    QString name = SystemInfo::value(SystemInfo::CurName).toString() + 
+    QString name = SystemInfo::value(SystemInfo::CurName).toString() +
         " (" + ServerInfo::value(ServerInfo::CurStatus).toString() + ")";
+    QString mountdisplay = QDir::toNativeSeparators(mountpoint);
+    QString label = Utils::filesystemName(mountpoint);
+    if(!label.isEmpty())
+        mountdisplay += " (" + label + ")";
+
     if(name.isEmpty()) name = "&lt;none&gt;";
-    if(mountpoint.isEmpty()) mountpoint = "&lt;invalid&gt;";
+    if(mountpoint.isEmpty())
+        mountpoint = "&lt;invalid&gt;";
     ui.labelDevice->setText(tr("<b>%1 %2</b> at <b>%3</b>")
-            .arg(brand, name, QDir::toNativeSeparators(mountpoint)));
-            
+            .arg(brand, name, mountdisplay));
+
     // hide quickstart buttons if no release available        
     bool installable = !ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty();
     ui.buttonSmall->setEnabled(installable);
     ui.buttonComplete->setEnabled(installable);
     ui.actionSmall_Installation->setEnabled(installable);
-    ui.actionComplete_Installation->setEnabled(installable);        
+    ui.actionComplete_Installation->setEnabled(installable);
 }
 
 
