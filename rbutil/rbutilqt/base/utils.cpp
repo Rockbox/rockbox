@@ -32,14 +32,28 @@
 #include <cstdlib>
 #include <stdio.h>
 
-#if defined(Q_OS_WIN32)
-#include <windows.h>
-#include <tchar.h>
-#include <winioctl.h>
-#endif
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 #include <sys/statvfs.h>
 #endif
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#include <stdio.h>
+#endif
+#if defined(Q_OS_LINUX)
+#include <mntent.h>
+#endif
+#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#include <sys/param.h>
+#include <sys/ucred.h>
+#include <sys/mount.h>
+#endif
+#if defined(Q_OS_WIN32)
+#include <stdio.h>
+#include <tchar.h>
+#include <windows.h>
+#include <setupapi.h>
+#include <winioctl.h>
+#endif
+
 
 // recursive function to delete a dir with files
 bool Utils::recursiveRmdir( const QString &dirName )
@@ -326,4 +340,204 @@ int Utils::compareVersionStrings(QString s1, QString s2)
     // no differences found.
     return 0;
 }
+
+
+/** Resolve mountpoint to devicename / disk number
+ *  @param path mountpoint path / drive letter
+ *  @return devicename / disk number
+ */
+QString Utils::resolveDevicename(QString path)
+{
+    qDebug() << "[Utils] resolving device name" << path;
+#if defined(Q_OS_LINUX)
+    FILE *mn = setmntent("/etc/mtab", "r");
+    if(!mn)
+        return QString("");
+
+    struct mntent *ent;
+    while((ent = getmntent(mn))) {
+        // check for valid filesystem type.
+        // Linux can handle hfs (and hfsplus), so consider it a valid file
+        // system. Otherwise resolving the device name would fail, which in
+        // turn would make it impossible to warn about a MacPod.
+        if(QString(ent->mnt_dir) == path
+           && (QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)
+            || QString(ent->mnt_type).contains("hfs", Qt::CaseInsensitive))) {
+            endmntent(mn);
+            qDebug() << "[Utils] device name is" << ent->mnt_fsname;
+            return QString(ent->mnt_fsname);
+        }
+    }
+    endmntent(mn);
+
+#endif
+
+#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+    int num;
+    struct statfs *mntinf;
+
+    num = getmntinfo(&mntinf, MNT_WAIT);
+    while(num--) {
+        // check for valid filesystem type. OS X can handle hfs (hfs+ is
+        // treated as hfs), BSD should be the same.
+        if(QString(mntinf->f_mntonname) == path
+           && (QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)
+            || QString(mntinf->f_fstypename).contains("hfs", Qt::CaseInsensitive))) {
+            qDebug() << "[Utils] device name is" << mntinf->f_mntfromname;
+            return QString(mntinf->f_mntfromname);
+        }
+        mntinf++;
+    }
+#endif
+
+#if defined(Q_OS_WIN32)
+    DWORD written;
+    HANDLE h;
+    TCHAR uncpath[MAX_PATH];
+    UCHAR buffer[0x400];
+    PVOLUME_DISK_EXTENTS extents = (PVOLUME_DISK_EXTENTS)buffer;
+
+    _stprintf(uncpath, _TEXT("\\\\.\\%c:"), path.toAscii().at(0));
+    h = CreateFile(uncpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+            NULL, OPEN_EXISTING, 0, NULL);
+    if(h == INVALID_HANDLE_VALUE) {
+        //qDebug() << "error getting extents for" << uncpath;
+        return "";
+    }
+    // get the extents
+    if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
+                NULL, 0, extents, sizeof(buffer), &written, NULL)) {
+        if(extents->NumberOfDiskExtents > 1) {
+            qDebug() << "[Utils] resolving device name: volume spans multiple disks!";
+            return "";
+        }
+        qDebug() << "[Utils] device name is" << extents->Extents[0].DiskNumber;
+        return QString("%1").arg(extents->Extents[0].DiskNumber);
+    }
+#endif
+    return QString("");
+
+}
+
+
+/** resolve device name to mount point / drive letter
+ *  @param device device name / disk number
+ *  @return mount point / drive letter
+ */
+QString Utils::resolveMountPoint(QString device)
+{
+    qDebug() << "[Utils] resolving mountpoint:" << device;
+
+#if defined(Q_OS_LINUX)
+    FILE *mn = setmntent("/etc/mtab", "r");
+    if(!mn)
+        return QString("");
+
+    struct mntent *ent;
+    while((ent = getmntent(mn))) {
+        // Check for valid filesystem. Allow hfs too, as an Ipod might be a
+        // MacPod.
+        if(QString(ent->mnt_fsname) == device) {
+            QString result;
+            if(QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)
+                    || QString(ent->mnt_type).contains("hfs", Qt::CaseInsensitive)) {
+                qDebug() << "[Utils] resolved mountpoint is:" << ent->mnt_dir;
+                result = QString(ent->mnt_dir);
+            }
+            else {
+                qDebug() << "[Utils] mountpoint is wrong filesystem!";
+            }
+            endmntent(mn);
+            return result;
+        }
+    }
+    endmntent(mn);
+
+#endif
+
+#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+    int num;
+    struct statfs *mntinf;
+
+    num = getmntinfo(&mntinf, MNT_WAIT);
+    while(num--) {
+        // Check for valid filesystem. Allow hfs too, as an Ipod might be a
+        // MacPod.
+        if(QString(mntinf->f_mntfromname) == device) {
+            if(QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)
+                || QString(mntinf->f_fstypename).contains("hfs", Qt::CaseInsensitive)) {
+                qDebug() << "[Utils] resolved mountpoint is:" << mntinf->f_mntonname;
+                return QString(mntinf->f_mntonname);
+            }
+            else {
+                qDebug() << "[Utils] mountpoint is wrong filesystem!";
+                return QString();
+            }
+        }
+        mntinf++;
+    }
+#endif
+
+#if defined(Q_OS_WIN32)
+    QString result;
+    unsigned int driveno = device.replace(QRegExp("^.*([0-9]+)"), "\\1").toInt();
+
+    int letter;
+    for(letter = 'A'; letter <= 'Z'; letter++) {
+        if(resolveDevicename(QString(letter)).toUInt() == driveno) {
+            result = letter;
+            qDebug() << "[Utils] resolved mountpoint is:" << result;
+            break;
+        }
+    }
+    if(!result.isEmpty())
+        return result + ":/";
+#endif
+    qDebug() << "[Utils] resolving mountpoint failed!";
+    return QString("");
+}
+
+
+QStringList Utils::mountpoints()
+{
+    QStringList tempList;
+#if defined(Q_OS_WIN32)
+    QFileInfoList list = QDir::drives();
+    for(int i=0; i<list.size();i++)
+    {
+        tempList << list.at(i).absolutePath();
+        qDebug() << "[Utils] Mounted on" << list.at(i).absolutePath();
+    }
+
+#elif defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+    int num;
+    struct statfs *mntinf;
+
+    num = getmntinfo(&mntinf, MNT_WAIT);
+    while(num--) {
+        tempList << QString(mntinf->f_mntonname);
+        qDebug() << "[Utils] Mounted on" << mntinf->f_mntonname
+                 << "is" << mntinf->f_mntfromname << "type" << mntinf->f_fstypename;
+        mntinf++;
+    }
+#elif defined(Q_OS_LINUX)
+
+    FILE *mn = setmntent("/etc/mtab", "r");
+    if(!mn)
+        return QStringList("");
+
+    struct mntent *ent;
+    while((ent = getmntent(mn))) {
+        tempList << QString(ent->mnt_dir);
+        qDebug() << "[Utils] Mounted on" << ent->mnt_dir
+                 << "is" << ent->mnt_fsname << "type" << ent->mnt_type;
+    }
+    endmntent(mn);
+
+#else
+#error Unknown Platform
+#endif
+    return tempList;
+}
+
 

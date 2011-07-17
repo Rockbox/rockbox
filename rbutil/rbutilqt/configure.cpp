@@ -587,7 +587,7 @@ void Config::refreshMountpoint()
     // unwanted item.
     ui.mountPoint->blockSignals(true);
     ui.mountPoint->clear();
-    QStringList mps = Autodetection::mountpoints();
+    QStringList mps = Utils::mountpoints();
     for(int i = 0; i < mps.size(); ++i) {
         // add mountpoint as user data so we can change the displayed string
         // later (to include volume label or similar)

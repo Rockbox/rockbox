@@ -22,7 +22,7 @@
 #include "bootloaderinstallsansa.h"
 
 #include "../sansapatcher/sansapatcher.h"
-#include "autodetection.h"
+#include "utils.h"
 
 BootloaderInstallSansa::BootloaderInstallSansa(QObject *parent)
         : BootloaderInstallBase(parent)
@@ -242,7 +242,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallSansa::installed(void)
 bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
 {
     if(!m_blfile.isEmpty()) {
-        QString devicename = Autodetection::resolveDevicename(m_blfile);
+        QString devicename = Utils::resolveDevicename(m_blfile);
         if(devicename.isEmpty()) {
             emit logItem(tr("Error: could not retrieve device name"), LOGERROR);
             return false;

@@ -22,7 +22,7 @@
 #include "bootloaderinstallipod.h"
 
 #include "../ipodpatcher/ipodpatcher.h"
-#include "autodetection.h"
+#include "utils.h"
 
 
 BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
@@ -226,7 +226,7 @@ BootloaderInstallBase::Capabilities BootloaderInstallIpod::capabilities(void)
 bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
 {
     if(!m_blfile.isEmpty()) {
-        QString devicename = Autodetection::resolveDevicename(m_blfile);
+        QString devicename = Utils::resolveDevicename(m_blfile);
         if(devicename.isEmpty()) {
             emit logItem(tr("Error: could not retrieve device name"), LOGERROR);
             return false;

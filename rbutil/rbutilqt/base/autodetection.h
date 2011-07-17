@@ -38,8 +38,6 @@ public:
     QString getMountPoint() {return m_mountpoint;}
     QString errdev(void) { return m_errdev; }
     QString incompatdev(void) { return m_incompat; }
-    static QStringList mountpoints(void);
-    static QString resolveDevicename(QString path);
 
 private:
     QString resolveMountPoint(QString);

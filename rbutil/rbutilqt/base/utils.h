@@ -45,6 +45,9 @@ public:
     static QString checkEnvironment(bool permission);
     static int compareVersionStrings(QString s1, QString s2);
     static QString filesystemName(QString path);
+    static QStringList mountpoints(void);
+    static QString resolveDevicename(QString path);
+    static QString resolveMountPoint(QString device);
 };
 
 #endif
