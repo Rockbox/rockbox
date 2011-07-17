@@ -75,7 +75,12 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     QIcon windowIcon(":/icons/rockbox-clef.svg");
     this->setWindowIcon(windowIcon);
 #endif
-
+#if defined(Q_OS_MACX)
+    // don't translate menu entries that are handled specially on OS X
+    // (Configure, Quit). Qt handles them for us if they use english string.
+    ui.action_Configure->setText("Configure");
+    ui.actionE_xit->setText("Quit");
+#endif
 #if defined(Q_OS_WIN32)
     long ret;
     HKEY hk;
