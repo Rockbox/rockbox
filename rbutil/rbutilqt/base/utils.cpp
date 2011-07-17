@@ -53,7 +53,11 @@
 #include <setupapi.h>
 #include <winioctl.h>
 #endif
-
+#if defined(Q_OS_MACX)
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreServices/CoreServices.h>
+#include <IOKit/IOKitLib.h>
+#endif
 
 // recursive function to delete a dir with files
 bool Utils::recursiveRmdir( const QString &dirName )
@@ -134,6 +138,43 @@ QString Utils::filesystemName(QString path)
     if(res) {
         name = QString::fromWCharArray(volname);
     }
+#endif
+#if defined(Q_OS_MACX)
+    // BSD label does not include folder.
+    QString bsd = Utils::resolveDevicename(path).remove("/dev/");
+    if(bsd.isEmpty()) {
+        return name;
+    }
+    OSStatus result;
+    ItemCount index = 1;
+
+    do {
+        FSVolumeRefNum volrefnum;
+        HFSUniStr255 volname;
+
+        result = FSGetVolumeInfo(kFSInvalidVolumeRefNum, index, &volrefnum,
+                kFSVolInfoFSInfo, NULL, &volname, NULL);
+
+        if(result == noErr) {
+            GetVolParmsInfoBuffer volparms;
+            HParamBlockRec hpb;
+            hpb.ioParam.ioNamePtr = NULL;
+            hpb.ioParam.ioVRefNum = volrefnum;
+            hpb.ioParam.ioBuffer = (Ptr)&volparms;
+            hpb.ioParam.ioReqCount = sizeof(volparms);
+
+            if(PBHGetVolParmsSync(&hpb) == noErr) {
+                if(volparms.vMServerAdr == 0) {
+                    if(bsd == (char*)volparms.vMDeviceID) {
+                        name = QString::fromUtf16((const ushort*)volname.unicode,
+                                                  (int)volname.length);
+                        break;
+                    }
+                }
+            }
+        }
+        index++;
+    } while(result == noErr);
 #endif
 
     qDebug() << "[Utils] Volume name of" << path << "is" << name;
