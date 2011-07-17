@@ -116,7 +116,7 @@ QString Utils::filesystemName(QString path)
 #if defined(Q_OS_WIN32)
     wchar_t volname[MAX_PATH+1];
     bool res = GetVolumeInformationW((LPTSTR)path.utf16(), volname, MAX_PATH+1,
-            NULL, NULL, NULL, NULL, NULL);
+            NULL, NULL, NULL, NULL, 0);
     if(res) {
         name = QString::fromWCharArray(volname);
     }

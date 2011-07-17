@@ -278,7 +278,7 @@ void Config::setUserSettings()
 
     // devices tab
     refreshMountpoint();
-    mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    mountpoint = QDir::toNativeSeparators(RbSettings::value(RbSettings::Mountpoint).toString());
     setMountpoint(mountpoint);
 
     // cache tab
@@ -426,7 +426,7 @@ void Config::updateTtsState(int index)
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.png")));
         ui.testTTS->setEnabled(false);
     }
-    
+
     delete tts; /* Config objects are never deleted (in fact, they are leaked..), so we can't rely on QObject,
                    since that would delete the TTSBase instance on application exit*/
 }
