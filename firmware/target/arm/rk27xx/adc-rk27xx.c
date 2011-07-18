@@ -11,7 +11,7 @@
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
+ * as published by the Free Software Foundation; either version 1
  * of the License, or (at your option) any later version.
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
@@ -28,11 +28,17 @@
 
 unsigned int adc_scan(int channel)
 {
-    ADC_CTRL = (1<<4) | (1<<3) | (channel & (NUM_ADC_CHANNELS - 1));
+    ADC_CTRL = (1<<4)|(1<<3) | (channel & (NUM_ADC_CHANNELS - 1));
 
-    /* wait for conversion ready ~10us */    
-    while (ADC_STAT & 0x01);
-
+    /* Wait for conversion ready.
+     * The doc says one should pool ADC_STAT for end of conversion
+     * or setup interrupt. Neither of these two methods work as
+     * advertised.
+     *
+     * ~10us should be enough so we wait 20us to be on the safe side
+     */
+    udelay(20);
+ 
     /* 10bits result */
     return (ADC_DATA & 0x3ff);
 }
@@ -43,5 +49,5 @@ void adc_init(void)
     SCU_DIVCON1 = (SCU_DIVCON1 & ~(0xff<<10)) | (49<<10);
 
     /* enable clocks for ADC */
-    SCU_CLKCFG |= 3<<23;
+    SCU_CLKCFG &= ~(3<<23);
 }
