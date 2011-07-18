@@ -58,6 +58,7 @@ public class MediaButtonReceiver
             /* Throwable includes Exception and the expected
              * NoClassDefFoundError */
             api = new OldApi(c);
+            Logger.i("MediaButtonReceiver: Falling back to compatibility API");
         }
     }
 

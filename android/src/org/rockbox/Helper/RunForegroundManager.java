@@ -1,22 +1,23 @@
 package org.rockbox.Helper;
 
 import java.lang.reflect.Method;
-
 import org.rockbox.R;
 import org.rockbox.RockboxActivity;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 public class RunForegroundManager
 {
+    /* all below is heavily based on the examples found on
+     * http://developer.android.com/reference/android/app/Service.html#setForeground(boolean)
+     */
     private Notification mNotification;
     private NotificationManager mNM;
+    private IRunForeground api;
     private Service mCurrentService;
     private Intent mWidgetUpdate;
 
@@ -37,17 +38,43 @@ public class RunForegroundManager
         mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
         mNotification.contentIntent = PendingIntent.getActivity(service, 0, intent, 0);
 
-        initForegroundCompat();
+        try {
+            api = new NewForegroundApi(R.string.notification, mNotification);
+        } catch (Throwable t) {
+            /* Throwable includes Exception and the expected
+             * NoClassDefFoundError for Android 1.x */
+            try {
+                api = new OldForegroundApi();
+                Logger.i("RunForegroundManager: Falling back to compatibility API");
+            } catch (Exception e) {
+                Logger.e("Cannot run in foreground: No available API");
+            }
+        }
     }
 
     public void startForeground() 
     {
-        startForegroundCompat(R.string.notification, mNotification);
+        /* 
+         * Send the notification.
+         * We use a layout id because it is a unique number.  
+         * We use it later to cancel.
+         */
+        mNM.notify(R.string.notification, mNotification);
+        /*
+         * this call makes the service run as foreground, which
+         * provides enough cpu time to do music decoding in the 
+         * background
+         */
+        api.startForeground();
     }
 
     public void stopForeground() 
     {
-        stopForegroundCompat(R.string.notification);
+        /* Note to cancel BEFORE changing the
+         * foreground state, since we could be killed at that point.
+         */
+        mNM.cancel(R.string.notification);
+        api.stopForeground();
         mWidgetUpdate = null;
     }
 
@@ -78,78 +105,68 @@ public class RunForegroundManager
 
     public void finishNotification()
     {
-        Log.d("Rockbox", "TrackFinish");
+        Logger.d("TrackFinish");
         Intent widgetUpdate = new Intent("org.rockbox.TrackFinish");
         mCurrentService.sendBroadcast(widgetUpdate);
     }
 
-    /* Loosely based on http://developer.android.com/reference/android/app/Service.html#startForeground(int, android.app.Notification) */
-    private static final Class<?>[] mSetForegroundSignature = new Class[] {boolean.class};
-    private static final Class<?>[] mStartForegroundSignature = new Class[] {int.class, Notification.class};
-    private static final Class<?>[] mStopForegroundSignature = new Class[] {boolean.class};
+    private interface IRunForeground 
+    {
+        void startForeground();
+        void stopForeground();
+    }
 
-    private Method mSetForeground;
-    private Method mStartForeground;
-    private Method mStopForeground;
+    private class NewForegroundApi implements IRunForeground 
+    {
+        int id;
+        Notification mNotification;
+        NewForegroundApi(int _id, Notification _notification)
+        {
+            id = _id;
+            mNotification = _notification;
+        }
 
-    private void initForegroundCompat() {
-        Class<?> serviceClass = mCurrentService.getClass();
-        try {
-            mStartForeground = serviceClass.getMethod("startForeground", mStartForegroundSignature);
-            mStopForeground = serviceClass.getMethod("stopForeground", mStopForegroundSignature);
-        } catch (NoSuchMethodException e) {
-            // Running on an older platform.
-            mStartForeground = mStopForeground = null;
+        public void startForeground()
+        {
+            mCurrentService.startForeground(id, mNotification);
+        }
+
+        public void stopForeground()
+        {
+            mCurrentService.stopForeground(true);
+        }
+    }
+    
+    private class OldForegroundApi implements IRunForeground
+    {
+        /* 
+         * Get the new API through reflection because it's unavailable 
+         * in honeycomb
+         */
+        private Method mSetForeground;
+
+        public OldForegroundApi() throws SecurityException, NoSuchMethodException
+        {
+            mSetForeground = getClass().getMethod("setForeground",
+                    new Class[] { boolean.class });
+        }
+
+        public void startForeground()
+        {
             try {
-                mSetForeground = serviceClass.getMethod("setForeground", mSetForegroundSignature);
-            } catch (NoSuchMethodException e2) {
-                throw new IllegalStateException("OS doesn't have Service.startForeground nor Service.setForeground!", e2);
+                mSetForeground.invoke(mCurrentService, Boolean.TRUE);
+            } catch (Exception e) {
+                Logger.e("startForeground compat error: " + e.getMessage());
+                e.printStackTrace();
             }
         }
-    }
-
-    private void invokeMethod(Method method, Object[] args) {
-        try {
-            method.invoke(mCurrentService, args);
-        } catch (Exception e) {
-            // Should not happen.
-            Log.w("Rockbox", "Unable to invoke method", e);
-        }
-    }
-
-    /**
-     * This is a wrapper around the new startForeground method, using the older
-     * APIs if it is not available.
-     */
-    private void startForegroundCompat(int id, Notification notification) {
-        // If we have the new startForeground API, then use it.
-        if (mStartForeground != null) {
-            Object[] startForeGroundArgs = new Object[] {Integer.valueOf(id), notification};
-            invokeMethod(mStartForeground, startForeGroundArgs);
-        } else {
-            // Fall back on the old API.
-            Object[] setForegroundArgs = new Object[] {Boolean.TRUE};
-            invokeMethod(mSetForeground, setForegroundArgs);
-            mNM.notify(id, notification);
-        }
-    }
-
-    /**
-     * This is a wrapper around the new stopForeground method, using the older
-     * APIs if it is not available.
-     */
-    private void stopForegroundCompat(int id) {
-        // If we have the new stopForeground API, then use it.
-        if (mStopForeground != null) {
-            Object[] stopForegroundArgs = new Object[] {Boolean.TRUE};
-            invokeMethod(mStopForeground, stopForegroundArgs);
-        } else {
-            // Fall back on the old API.  Note to cancel BEFORE changing the
-            // foreground state, since we could be killed at that point.
-            mNM.cancel(id);
-
-            Object[] setForegroundArgs = new Object[] {Boolean.FALSE};
-            invokeMethod(mSetForeground, setForegroundArgs);
-        }
+        public void stopForeground()
+        {
+            try {
+                mSetForeground.invoke(mCurrentService, Boolean.FALSE);
+            } catch (Exception e) {
+                Logger.e("stopForeground compat error: " + e.getMessage());
+            }
+        }        
     }
 }

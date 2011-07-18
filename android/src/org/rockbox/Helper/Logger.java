@@ -36,6 +36,10 @@ public class Logger
     {
         Log.d(TAG, s);
     }
+    public static void d(String s, Throwable t)
+    {
+        Log.d(TAG, s, t);
+    }
 
     public static void e(String s)
     {
