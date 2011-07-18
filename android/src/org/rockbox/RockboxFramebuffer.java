@@ -28,7 +28,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -94,11 +93,6 @@ public class RockboxFramebuffer extends SurfaceView
             c.drawBitmap(btm, dirty, dirty, null);   
         }
         holder.unlockCanvasAndPost(c);
-    }
-
-    private void LOG(CharSequence text)
-    {
-        Log.d("Rockbox", (String) text);
     }
 
     public boolean onTouchEvent(MotionEvent me)

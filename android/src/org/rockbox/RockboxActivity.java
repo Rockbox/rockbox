@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -128,10 +127,5 @@ public class RockboxActivity extends Activity
     {
         super.onDestroy();
         setServiceActivity(false);
-    }
-
-    private void LOG(CharSequence text)
-    {
-        Log.d("Rockbox", (String) text);
     }
 }

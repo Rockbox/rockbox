@@ -29,7 +29,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.util.Log;
 import android.view.KeyEvent;
 
 public class MediaButtonReceiver
@@ -144,7 +143,7 @@ public class MediaButtonReceiver
 
         public void onAudioFocusChange(int focusChange)
         {
-            Log.d("Rockbox", "Audio focus" + ((focusChange>0)?"gained":"lost")+
+            Logger.d("Audio focus" + ((focusChange>0)?"gained":"lost")+
                                          ": "+ focusChange);
             if (running)
             {   /* Play nice and stop for the the other app */

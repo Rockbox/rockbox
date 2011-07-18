@@ -40,16 +40,6 @@ public class RunForegroundManager
         initForegroundCompat();
     }
 
-    private void LOG(CharSequence text)
-    {
-        Log.d("Rockbox", (String)text);
-    }
-
-    private void LOG(CharSequence text, Throwable tr)
-    {
-        Log.d("Rockbox", (String)text, tr);
-    }
-
     public void startForeground() 
     {
         startForegroundCompat(R.string.notification, mNotification);

@@ -22,6 +22,7 @@
 package org.rockbox;
 
 import java.util.Arrays;
+import org.rockbox.Helper.Logger;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +33,6 @@ import android.media.AudioTrack;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
-import android.util.Log;
 
 public class RockboxPCM extends AudioTrack 
 {
@@ -57,11 +57,6 @@ public class RockboxPCM extends AudioTrack
     private float minpcmvolume;
     private float curpcmvolume = 0;
     private float pcmrange;
-
-    private void LOG(CharSequence text)
-    {
-        Log.d("Rockbox", (String) text);
-    }
 
     public RockboxPCM()
     {
@@ -99,7 +94,7 @@ public class RockboxPCM extends AudioTrack
     {
         int rbvolume = ((maxstreamvolume - volume) * -99) /
             maxstreamvolume;
-        LOG("java:postVolumeChangedEvent, avol "+volume+" rbvol "+rbvolume);
+        Logger.d("java:postVolumeChangedEvent, avol "+volume+" rbvol "+rbvolume);
         postVolumeChangedEvent(rbvolume);
     }
     
@@ -138,7 +133,6 @@ public class RockboxPCM extends AudioTrack
             new IntentFilter("android.media.VOLUME_CHANGED_ACTION"));
     }
 
-    @SuppressWarnings("unused")
     private int bytes2frames(int bytes) 
     {
         /* 1 sample is 2 bytes, 2 samples are 1 frame */
@@ -213,7 +207,7 @@ public class RockboxPCM extends AudioTrack
     @SuppressWarnings("unused")
     private void set_volume(int volume)
     {
-        LOG("java:set_volume("+volume+")");
+        Logger.d("java:set_volume("+volume+")");
         /* Rockbox 'volume' is 0..-990 deci-dB attenuation.
            Android streams have rather low resolution volume control,
            typically 8 or 15 steps.
@@ -233,7 +227,7 @@ public class RockboxPCM extends AudioTrack
 
         int oldstreamvolume = audiomanager.getStreamVolume(streamtype);
         if (streamvolume != oldstreamvolume) {
-            LOG("java:setStreamVolume("+streamvolume+")");
+            Logger.d("java:setStreamVolume("+streamvolume+")");
             setstreamvolume = streamvolume;
             audiomanager.setStreamVolume(streamtype, streamvolume, 0);
         }
@@ -264,7 +258,7 @@ public class RockboxPCM extends AudioTrack
                         setNotificationMarkerPosition(pcm.refillmark);
                         break;
                     case PLAYSTATE_STOPPED:
-                        LOG("Stopped");
+                        Logger.d("Stopped");
                         break;
                 }
             }
