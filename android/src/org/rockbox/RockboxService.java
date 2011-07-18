@@ -167,8 +167,12 @@ public class RockboxService extends Service
 
     public int onStartCommand(Intent intent, int flags, int startId)
     {
+        /* if null, then the service was most likely restarted by android
+         * after getting killed for memory pressure earlier */
+        if (intent == null)
+            intent = new Intent("org.rockbox.ServiceRestarted");
         do_start(intent);
-        return 1; /* old API compatibility: 1 == START_STICKY */
+        return START_STICKY;
     }
 
     private void startservice()
