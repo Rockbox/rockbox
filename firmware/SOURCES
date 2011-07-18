@@ -105,7 +105,6 @@ libc/mktime.c
 
 /* Common */
 common/version.c
-common/bsearch.c
 common/config.c
 common/crc32.c
 #ifdef MI4_FORMAT

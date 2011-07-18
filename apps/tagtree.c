@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string-extra.h"
-#include "bsearch.h"
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
@@ -161,13 +160,6 @@ struct match
     int symbol;
 };
 
-static int compare_match(const void* _key, const void* _elem)
-{
-    const char* key = _key;
-    const struct match *elem = _elem;
-    return strcasecmp(key, elem->str);
-}
-
 /* Statusbar text of the current view. */
 static char current_title[MAX_TAGS][128];
 
@@ -229,42 +221,42 @@ static int get_token_str(char *buf, int size)
 static int get_tag(int *tag)
 {
     static const struct match get_tag_match[] =
-    {   /* sorted by ascii (case insensitive) for bsearch */
-        { "%format", var_format },
-        { "%include", var_include },
-        { "%limit", var_limit },
-        {"%menu_start",var_menu_start},
-        {"%root_menu",var_rootmenu},
-        { "%sort", var_sorttype },
-        { "%strip", var_strip },
-        {"->",menu_next},
-        { "==>", menu_load },
-        { "album", tag_album },
-        { "albumartist", tag_albumartist },
-        { "artist", tag_artist },
-        { "autoscore", tag_virt_autoscore },
-        { "bitrate", tag_bitrate },
-        { "comment", tag_comment },
-        { "commitid", tag_commitid },
-        { "composer", tag_composer },
-        { "discnum", tag_discnumber },
-        { "ensemble", tag_albumartist },
-        { "entryage", tag_virt_entryage },
-        { "filename", tag_filename },
-        { "genre", tag_genre },
-        { "grouping", tag_grouping },
-        { "lastoffset", tag_lastoffset },
-        { "lastplayed", tag_lastplayed },
-        { "length", tag_length },
-        { "Lm", tag_virt_length_min },
-        { "Ls", tag_virt_length_sec },
-        { "playcount", tag_playcount },
-        { "Pm", tag_virt_playtime_min },
-        { "Ps", tag_virt_playtime_sec },
-        { "rating", tag_rating },
-        { "title", tag_title },
-        { "tracknum", tag_tracknumber },
-        { "year", tag_year },
+    {
+        {"album", tag_album},
+        {"artist", tag_artist},
+        {"bitrate", tag_bitrate},
+        {"composer", tag_composer},
+        {"comment", tag_comment},
+        {"albumartist", tag_albumartist},
+        {"ensemble", tag_albumartist},
+        {"grouping", tag_grouping},
+        {"genre", tag_genre},
+        {"length", tag_length},
+        {"Lm", tag_virt_length_min},
+        {"Ls", tag_virt_length_sec},
+        {"Pm", tag_virt_playtime_min},
+        {"Ps", tag_virt_playtime_sec},
+        {"title", tag_title},
+        {"filename", tag_filename},
+        {"tracknum", tag_tracknumber},
+        {"discnum", tag_discnumber},
+        {"year", tag_year},
+        {"playcount", tag_playcount},
+        {"rating", tag_rating},
+        {"lastplayed", tag_lastplayed},
+        {"lastoffset", tag_lastoffset},
+        {"commitid", tag_commitid},
+        {"entryage", tag_virt_entryage},
+        {"autoscore", tag_virt_autoscore},
+        {"%sort", var_sorttype},
+        {"%limit", var_limit},
+        {"%strip", var_strip},
+        {"%menu_start", var_menu_start},
+        {"%include", var_include},
+        {"%root_menu", var_rootmenu},
+        {"%format", var_format},
+        {"->", menu_next},
+        {"==>", menu_load}
     };
     char buf[128];
     unsigned int i;
@@ -285,13 +277,15 @@ static int get_tag(int *tag)
     }
     buf[i] = '\0';
 
-    struct match *elem = bsearch(buf, get_tag_match, ARRAYLEN(get_tag_match),
-                                        sizeof(struct match), compare_match);
-    if (elem)
+    for (i = 0; i < ARRAYLEN(get_tag_match); i++)
     {
-        *tag = elem->symbol;
-        return 1;
+        if (!strcasecmp(buf, get_tag_match[i].str))
+        {
+            *tag = get_tag_match[i].symbol;
+            return 1;
+        }
     }
+
     logf("NO MATCH: %s\n", buf);
     if (buf[0] == '?')
         return 0;
@@ -302,21 +296,21 @@ static int get_tag(int *tag)
 static int get_clause(int *condition)
 {
     static const struct match get_clause_match[] =
-    {   /* sorted by ascii (case insensitive) for bsearch */
-        { "!$", clause_not_ends_with },
-        { "!=", clause_is_not },
-        { "!^", clause_not_begins_with },
-        { "!~", clause_not_contains },
-        { "$", clause_ends_with },
-        { "<", clause_lt },
-        { "<=", clause_lteq },
-        { "=", clause_is },
-        { "==", clause_is },
-        { ">", clause_gt },
-        { ">=", clause_gteq },
-        { "@", clause_oneof },
-        { "^", clause_begins_with },
-        { "~", clause_contains },
+    {
+        {"=", clause_is},
+        {"==", clause_is},
+        {"!=", clause_is_not},
+        {">", clause_gt},
+        {">=", clause_gteq},
+        {"<", clause_lt},
+        {"<=", clause_lteq},
+        {"~", clause_contains},
+        {"!~", clause_not_contains},
+        {"^", clause_begins_with},
+        {"!^", clause_not_begins_with},
+        {"$", clause_ends_with},
+        {"!$", clause_not_ends_with},
+        {"@", clause_oneof}
     };
 
     char buf[4];
@@ -338,13 +332,15 @@ static int get_clause(int *condition)
     }
     buf[i] = '\0';
 
-    struct match *elem = bsearch(buf, get_clause_match, ARRAYLEN(get_clause_match),
-                                        sizeof(struct match), compare_match);
-    if (elem)
+    for (i = 0; i < ARRAYLEN(get_clause_match); i++)
     {
-        *condition = elem->symbol;
-        return 1;
+        if (!strcasecmp(buf, get_clause_match[i].str))
+        {
+            *condition = get_clause_match[i].symbol;
+            return 1;
+        }
     }
+
     return 0;
 }
 
