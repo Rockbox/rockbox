@@ -19,16 +19,16 @@
  *
  ****************************************************************************/
 
-package org.rockbox;
+package org.rockbox.monitors;
 
 import android.content.Context;
 import android.os.Handler;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
-public class RockboxTelephony 
+public class TelephonyMonitor 
 {
-    public RockboxTelephony(Context c)
+    public TelephonyMonitor(Context c)
     {
         final Handler handler = new Handler(c.getMainLooper());        
         final TelephonyManager tm = (TelephonyManager)

@@ -27,20 +27,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Enumeration;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
 import org.rockbox.Helper.MediaButtonReceiver;
 import org.rockbox.Helper.RunForegroundManager;
-
 import android.app.Activity;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -63,17 +56,9 @@ public class RockboxService extends Service
     /* locals needed for the c code and rockbox state */
     private static volatile boolean rockbox_running;
     private Activity current_activity = null;
-    private IntentFilter itf;
-    private IntentFilter ifh;
-    private BroadcastReceiver batt_monitor;
-    private BroadcastReceiver headphone_monitor;
-    private BroadcastReceiver noisy_monitor;
     private RunForegroundManager fg_runner;
     private MediaButtonReceiver mMediaButtonReceiver;
-    private int battery_level;
-    private int headphone_state;
     private ResultReceiver resultReceiver;
-    private RockboxService rbservice;
 
     public static final int RESULT_INVOKING_MAIN = 0;
     public static final int RESULT_LIB_LOAD_PROGRESS = 1;
@@ -313,72 +298,6 @@ public class RockboxService extends Service
         // TODO Auto-generated method stub
         return null;
     }
-
-
-    private void initBatteryMonitor()
-    {
-        itf = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        batt_monitor = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                /* we get literally spammed with battery statuses 
-                 * if we don't delay the re-attaching
-                 */
-                TimerTask tk = new TimerTask()
-                {
-                    public void run()
-                    {
-                        registerReceiver(batt_monitor, itf);
-                    }
-                };
-                Timer t = new Timer();
-                context.unregisterReceiver(this);
-                int rawlevel = intent.getIntExtra("level", -1);
-                int scale = intent.getIntExtra("scale", -1);
-                if (rawlevel >= 0 && scale > 0)
-                    battery_level = (rawlevel * 100) / scale;
-                else
-                    battery_level = -1;
-                /* query every 30s should be sufficient */
-                t.schedule(tk, 30000);
-            }
-        };
-        registerReceiver(batt_monitor, itf);
-    }
-
-
-    private void initHeadphoneMonitor()
-    {
-        ifh = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
-        headphone_monitor = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                int state = intent.getIntExtra("state", -1);
-                LOG("headphone state:" + state);
-                headphone_state = state;
-            }
-        };
-        registerReceiver(headphone_monitor, ifh);
-        noisy_monitor = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                LOG("audio becoming noisy");
-                headphone_state = 0;
-            }
-        };
-        rbservice = RockboxService.get_instance();
-        /* We're relying on internal API's here,
-           this can break in the future! */
-        rbservice.registerReceiver(noisy_monitor,
-                new IntentFilter("android.media.AUDIO_BECOMING_NOISY"));
-    }
-
 
     void startForeground()
     {

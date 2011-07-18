@@ -30,15 +30,17 @@ extern jobject RockboxService_instance;
 void telephony_init_device(void)
 {
     JNIEnv e = *env_ptr;
-    jclass class = e->FindClass(env_ptr, "org/rockbox/RockboxTelephony");
-    jmethodID constructor = e->GetMethodID(env_ptr, class, "<init>", "(Landroid/content/Context;)V");
-
-    e->NewObject(env_ptr, class, constructor, RockboxService_instance);
+    jclass class = e->FindClass(env_ptr, "org/rockbox/monitors/TelephonyMonitor");
+    jmethodID constructor = e->GetMethodID(env_ptr, class,
+                                        "<init>",
+                                        "(Landroid/content/Context;)V");
+    e->NewObject(env_ptr, class,
+                    constructor,
+                    RockboxService_instance);
 }
 
-
 JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxTelephony_postCallIncoming(JNIEnv *env, jobject this)
+Java_org_rockbox_monitors_TelephonyMonitor_postCallIncoming(JNIEnv *env, jobject this)
 {
     (void)env;
     (void)this;
@@ -46,7 +48,7 @@ Java_org_rockbox_RockboxTelephony_postCallIncoming(JNIEnv *env, jobject this)
 }
 
 JNIEXPORT void JNICALL
-Java_org_rockbox_RockboxTelephony_postCallHungUp(JNIEnv *env, jobject this)
+Java_org_rockbox_monitors_TelephonyMonitor_postCallHungUp(JNIEnv *env, jobject this)
 {
     (void)env;
     (void)this;
