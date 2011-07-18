@@ -68,7 +68,7 @@ public class MediaButtonReceiver
     
     public void unregister()
     {
-        api.register();
+        api.unregister();
     }
 
     /* helper class for the manifest */
