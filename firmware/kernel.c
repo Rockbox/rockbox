@@ -1181,7 +1181,9 @@ int semaphore_wait(struct semaphore *s, int timeout)
  * in 'semaphore_init'. */
 void semaphore_release(struct semaphore *s)
 {
-    IF_PRIO( unsigned int result = THREAD_NONE; )
+#if defined(HAVE_PRIORITY_SCHEDULING) && defined(irq_enabled_checkval)
+    unsigned int result = THREAD_NONE;
+#endif
     int oldlevel;
 
     oldlevel = disable_irq_save();
@@ -1193,7 +1195,11 @@ void semaphore_release(struct semaphore *s)
         KERNEL_ASSERT(s->count == 0,
             "semaphore_release->threads queued but count=%d!\n", s->count);
         s->queue->retval = OBJ_WAIT_SUCCEEDED; /* indicate explicit wake */
-        IF_PRIO( result = ) wakeup_thread(&s->queue);
+#if defined(HAVE_PRIORITY_SCHEDULING) && defined(irq_enabled_checkval)
+        result = wakeup_thread(&s->queue);
+#else
+        wakeup_thread(&s->queue);
+#endif
     }
     else
     {
