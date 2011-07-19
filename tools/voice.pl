@@ -17,9 +17,9 @@
 
 use strict;
 use warnings;
+use feature 'switch';
 use File::Basename;
 use File::Copy;
-use Switch;
 use vars qw($V $C $t $l $e $E $s $S $i $v);
 use IPC::Open2;
 use IPC::Open3;
@@ -74,8 +74,8 @@ sub init_tts {
     our $verbose;
     my ($tts_engine, $tts_engine_opts, $language) = @_;
     my %ret = ("name" => $tts_engine);
-    switch($tts_engine) {
-        case "festival" {
+    given ($tts_engine) {
+        when ("festival") {
             print("> festival $tts_engine_opts --server\n") if $verbose;
             my $pid = open(FESTIVAL_SERVER, "| festival $tts_engine_opts --server > /dev/null 2>&1");
             my $dummy = *FESTIVAL_SERVER; #suppress warning
@@ -83,7 +83,7 @@ sub init_tts {
             $SIG{KILL} = sub { kill TERM => $pid; print("boo"); panic_cleanup(); };
             $ret{"pid"} = $pid;
         }
-        case "sapi" {
+        when ("sapi") {
             my $toolsdir = dirname($0);
             my $path = `cygpath $toolsdir -a -w`;
             chomp($path);                                    
@@ -111,12 +111,12 @@ sub init_tts {
 # Shutdown TTS engine if necessary.
 sub shutdown_tts {
     my ($tts_object) = @_;
-    switch($$tts_object{"name"}) {
-        case "festival" {
+    given ($$tts_object{"name"}) {
+        when ("festival") {
             # Send SIGTERM to festival server
             kill TERM => $$tts_object{"pid"};
         }
-        case "sapi" {
+        when ("sapi") {
             print({$$tts_object{"stdin"}} "QUIT\r\n");
             close($$tts_object{"stdin"});
         }
@@ -147,8 +147,8 @@ sub voicestring {
     my ($string, $output, $tts_engine_opts, $tts_object) = @_;
     my $cmd;
     printf("Generate \"%s\" with %s in file %s\n", $string, $$tts_object{"name"}, $output) if $verbose;
-    switch($$tts_object{"name"}) {
-        case "festival" {
+    given ($$tts_object{"name"}) {
+        when ("festival") {
             # festival_client lies to us, so we have to do awful soul-eating
             # work with IPC::open3()
             $cmd = "festival_client --server localhost --otype riff --ttw --output \"$output\"";
@@ -168,22 +168,22 @@ sub voicestring {
             close(CMD_OUT);
             close(CMD_ERR);
         }
-        case "flite" {
+        when ("flite") {
             $cmd = "flite $tts_engine_opts -t \"$string\" \"$output\"";
             print("> $cmd\n") if $verbose;
             `$cmd`;
         }
-        case "espeak" {
+        when ("espeak") {
             $cmd = "espeak $tts_engine_opts -w \"$output\"";
             print("> $cmd\n") if $verbose;
             open(ESPEAK, "| $cmd");
             print ESPEAK $string . "\n";
             close(ESPEAK);
         }
-        case "sapi" {
+        when ("sapi") {
             print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\r\n");
         }
-        case "swift" {
+        when ("swift") {
             $cmd = "swift $tts_engine_opts -o \"$output\" \"$string\"";
             print("> $cmd\n") if $verbose;
             system($cmd);
