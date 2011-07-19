@@ -7,6 +7,9 @@
 #define FLASH_BANK0 0x10000000
 #define FLASH_BANK1 0x11000000
 
+#define USB_NUM_ENDPOINTS 16
+#define USB_DEVBSS_ATTR
+
 /* Timers */
 #define APB0_TIMER             (ARM_BUS0_BASE + 0x00000000)
 #define TMR0LR                 (*(volatile unsigned long *)(APB0_TIMER + 0x00))
@@ -1006,7 +1009,7 @@
 #define DMACHEN_CH3          (0x101<<3)
 
 /* ARM7 cache controller */
-#define ARM_CACHE_CNTRL        0xEFFF0000
+#define ARM_CACHE_CTRL      0xEFFF0000
 #define DEVID               (*(volatile unsigned long *)(ARM_CACHE_CTRL + 0x00))
 #define CACHEOP             (*(volatile unsigned long *)(ARM_CACHE_CTRL + 0x04))
 #define CACHELKDN           (*(volatile unsigned long *)(ARM_CACHE_CTRL + 0x08))

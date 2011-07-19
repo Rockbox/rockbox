@@ -163,3 +163,19 @@ void udelay(unsigned usecs)
     );
 }
 
+void cpucache_commit_discard(void)
+{
+    /* invalidate cache way 0 */
+    CACHEOP = 0x02;
+
+    /* wait for invalidate process to complete */
+    while (CACHEOP & 0x01);
+
+    /* invalidate cache way 1 */
+    CACHEOP = 0x80000002;
+
+    /* wait for invalidate process to complete */
+    while (CACHEOP & 0x01);   
+}
+
+void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")));

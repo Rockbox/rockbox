@@ -38,6 +38,10 @@ static inline void core_sleep(void)
     SCU_CPUPD = 0xdeedbabe;
 }
 
+#define HAVE_CPUCACHE_COMMIT_DISCARD
+/* deprecated alias */
+#define HAVE_CPUCACHE_INVALIDATE
+
 #define CPUFREQ_NORMAL 200000000
 #define CPUFREQ_MAX    200000000
 
