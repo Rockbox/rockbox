@@ -784,7 +784,7 @@ const struct settings_list settings[] = {
 #define BATTERY_CAPACITY_MAX BATTERY_CAPACITY_DEFAULT
 #define BATTERY_CAPACITY_INC 0
 #endif
-#ifdef IPOD_VIDEO
+#if defined(IPOD_VIDEO) && !defined(SIMULATOR)
     /* its easier to leave this one un-macro()ed for the time being */
     { F_T_INT|F_DEF_ISFUNC|F_INT_SETTING, &global_settings.battery_capacity,
         LANG_BATTERY_CAPACITY, FUNCTYPE(battery_default_capacity),
