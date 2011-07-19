@@ -34,8 +34,6 @@ extern JNIEnv *env_ptr;
 extern jclass  RockboxService_class;
 extern jobject RockboxService_instance;
 
-static jobject HeadphoneMonitor_instance;
-static jfieldID headphone_state;
 static int last_y, last_x;
 static int last_btns;
 
@@ -120,13 +118,9 @@ void button_init_device(void)
     jmethodID constructor =     e->GetMethodID(env_ptr, class,
                                                 "<init>",
                                                 "(Landroid/content/Context;)V");
-    HeadphoneMonitor_instance = e->NewObject(env_ptr, class,
-                                            constructor,
-                                            RockboxService_instance);
-    /* cache the battery level field id */
-    headphone_state = (*env_ptr)->GetFieldID(env_ptr,
-                                            class,
-                                            "mHpState", "I");
+    e->NewObject(env_ptr, class,         
+                        constructor,
+                        RockboxService_instance);
 }
 
 int button_read_device(int *data)
@@ -145,13 +139,23 @@ int button_read_device(int *data)
     return btn;
 }
 
-
-/* Tell if anything is in the jack. */
+static int hp_state;
+JNIEXPORT void JNICALL
+Java_org_rockbox_monitors_HeadphoneMonitor_postCallHungUp(JNIEnv *env,
+                                                        jobject this,
+                                                        jint state)
+{
+    (void)env; (void)this;
+    hp_state = state;
+}
+/* Tell if anything is in the jack.
+ * 
+ * since this is called from the tick task, which isn't attached to
+ * the dalvik VM, it's not permitted to make JNI calls (therefore
+ * we need the above callback) */
 bool headphones_inserted(void)
 {
-    int state = (*env_ptr)->GetIntField(env_ptr, HeadphoneMonitor_instance,
-                                                            headphone_state);
     /* 0 is disconnected, 1 and 2 are connected */
-    return (state == 0) ? false : true;
+    return (hp_state == 0) ? false : true;
 }
 

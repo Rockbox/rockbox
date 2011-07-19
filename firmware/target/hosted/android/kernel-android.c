@@ -60,7 +60,13 @@ void interrupt(void)
 }
 
 /*
- * setup a hrtimer to send a signal to our process every tick */
+ * setup a hrtimer to send a signal to our process every tick
+ *
+ * WARNING: JNI calls are not permitted from tick tasks, as the
+ * underlying thread is not attached to the Java VM
+ *
+ * Can be possibly be attached if it really needs to be. but let's
+ * keep this leightweight */
 void tick_start(unsigned int interval_in_ms)
 {
     int ret = 0;

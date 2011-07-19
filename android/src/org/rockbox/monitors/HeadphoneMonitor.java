@@ -29,7 +29,6 @@ import android.content.IntentFilter;
 public class HeadphoneMonitor extends BroadcastReceiver
 {
     @SuppressWarnings("unused")
-    private int mHpState; /* read by native code */
 
     public HeadphoneMonitor(Context c)
     {
@@ -45,7 +44,7 @@ public class HeadphoneMonitor extends BroadcastReceiver
     public void onReceive(Context arg0, Intent intent)
     {
         int state = intent.getIntExtra("state", -1);
-        mHpState = state;   
+        postHpStateChanged(state);
     }
 
     /* audio becoming noise acts as headphones extracted */
@@ -54,7 +53,9 @@ public class HeadphoneMonitor extends BroadcastReceiver
         @Override
         public void onReceive(Context arg0, Intent arg1)
         {
-            mHpState = 0;   
+            postHpStateChanged(0);   
         }
     }
+    
+    private synchronized native void postHpStateChanged(int state);
 }
