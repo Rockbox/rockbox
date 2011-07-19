@@ -26,11 +26,24 @@
 #include "system.h"
 
 static int brightness = DEFAULT_BRIGHTNESS_SETTING;
-static const unsigned short log_brightness[] = {
-    0x2710, 0x27ac, 0x2849, 0x2983, 0x2abd, 0x2c93, 0x2e6a, 0x30dd,
-    0x3351, 0x3661, 0x3971, 0x3d1f, 0x40cc, 0x4516, 0x4960, 0x4e47,
-    0x532e, 0x58b1, 0x5e35, 0x6456, 0x6a76, 0x7134, 0x77f1, 0x7f4c,
-    0x86a6, 0x8e9d, 0x9695, 0x9f29, 0xa7bd, 0xb0ee, 0xba1f, 0xc350
+
+/* Based on http://www.poynton.com/PDFs/SMPTE93_Gamma.pdf
+ * CIE standarized function that relates physical luminance
+ * to perceived lightness
+ *
+ * L* = 116*(Y/Yn)^(1/3) - 16 (Y/Yn > 0 008856)
+ * where Yn is luminance of reference white
+ *
+ * Actual function is lightly tweaked to account for the fact
+ * that fill factor of the PWM below ~15% gives black.
+ * So the function used to calculate the values in the matrix was:
+ * f(x) = 42000 * ((100*x/31 + 16)/116)^3 + 8000
+ */
+static const unsigned short lin_brightness[] = {
+     8110,  8191,  8304,  8455,  8649,  8892,  9189,  9545,
+     9966, 10457, 11024, 11671, 12406, 13232, 14156, 15182,
+    16316, 17565, 18932, 20423, 22045, 23801, 25699, 27742,
+    29937, 32289, 34803, 37485, 40340, 43374, 46592, 50000
 };
 
 bool _backlight_init(void)
@@ -50,7 +63,7 @@ bool _backlight_init(void)
     /* set pwm frequency to 500Hz - my lcd panel can't cope more reliably */
     /* (apb_freq/pwm_freq)/pwm_div = (50 000 000/500)/2 */
     PWMT0_LRC = 50000; 
-    PWMT0_HRC = log_brightness[brightness];
+    PWMT0_HRC = lin_brightness[brightness];
 
     /* reset counter */
     PWMT0_CNTR = 0x00;
@@ -88,5 +101,5 @@ void _backlight_off(void)
 void _backlight_set_brightness(int val)
 {
     brightness = val & 0x1f;
-    PWMT0_HRC = log_brightness[brightness];
+    PWMT0_HRC = lin_brightness[brightness];
 }
