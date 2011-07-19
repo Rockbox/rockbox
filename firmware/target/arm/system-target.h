@@ -173,6 +173,7 @@ static inline void wake_core(int core)
 
 #if defined(IPOD_VIDEO) && !defined(BOOTLOADER)
 extern unsigned char probed_ramsize;
+int battery_default_capacity(void);
 #endif
 
 
