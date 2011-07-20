@@ -58,6 +58,9 @@
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
 
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
 /* Define this if the LCD can shut down */
 #define HAVE_LCD_SHUTDOWN
 

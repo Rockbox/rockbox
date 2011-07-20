@@ -66,24 +66,31 @@ static void lcd_cmd_data(unsigned cmd, unsigned data)
 
 /*** hardware configuration ***/
 
+#ifdef HAVE_LCD_CONTRAST
 void lcd_set_contrast(int val)
 {
   /* TODO: Implement lcd_set_contrast() */
   (void)val;
 }
+#endif
 
+#ifdef HAVE_LCD_INVERT
 void lcd_set_invert_display(bool yesno)
 {
-  /* TODO: Implement lcd_set_invert_display() */
-  (void)yesno;
+#ifdef IPOD_NANO    /* this has only been tested on the ipod nano */
+    lcd_cmd_data(0x07, 0x73 | (yesno ? 0 : (1<<2)));
+#endif
 }
+#endif
 
+#ifdef HAVE_LCD_FLIP
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
   /* TODO: Implement lcd_set_flip() */
   (void)yesno;
 }
+#endif
 
 /* LCD init */
 void lcd_init_device(void)
