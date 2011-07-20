@@ -392,8 +392,7 @@ bool quick_screen_quick(int button_enter)
     int oldrepeat = global_settings.repeat_mode;
 
     qs.items[QUICKSCREEN_TOP] =
-            get_setting(global_settings.qs_items[QUICKSCREEN_TOP],
-                        find_setting(&global_settings.party_mode, NULL));
+            get_setting(global_settings.qs_items[QUICKSCREEN_TOP], NULL);
     qs.items[QUICKSCREEN_LEFT] =
             get_setting(global_settings.qs_items[QUICKSCREEN_LEFT],
                         find_setting(&global_settings.playlist_shuffle, NULL));
@@ -401,8 +400,7 @@ bool quick_screen_quick(int button_enter)
             get_setting(global_settings.qs_items[QUICKSCREEN_RIGHT],
                         find_setting(&global_settings.repeat_mode, NULL));
     qs.items[QUICKSCREEN_BOTTOM] =
-            get_setting(global_settings.qs_items[QUICKSCREEN_BOTTOM],
-                        find_setting(&global_settings.dirfilter, NULL));
+            get_setting(global_settings.qs_items[QUICKSCREEN_BOTTOM], NULL);
 
     qs.callback = NULL;
     if (gui_syncquickscreen_run(&qs, button_enter))

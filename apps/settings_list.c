@@ -460,6 +460,8 @@ static bool qs_is_changed(void* setting, void* defaultval)
 }
 static void qs_set_default(void* setting, void* defaultval)
 {
+    if (defaultval == NULL)
+        *(int*)setting = -1;
     find_setting(defaultval, (int*)setting);
 }
 #endif
@@ -1728,7 +1730,7 @@ const struct settings_list settings[] = {
 #endif
 #ifdef HAVE_QUICKSCREEN
    CUSTOM_SETTING(0, qs_items[QUICKSCREEN_TOP], LANG_TOP_QS_ITEM,
-                  &global_settings.dirfilter, "qs top",
+                  NULL, "qs top",
                   qs_load_from_cfg, qs_write_to_cfg,
                   qs_is_changed, qs_set_default),
    CUSTOM_SETTING(0, qs_items[QUICKSCREEN_LEFT], LANG_LEFT_QS_ITEM,
@@ -1740,7 +1742,7 @@ const struct settings_list settings[] = {
                   qs_load_from_cfg, qs_write_to_cfg,
                   qs_is_changed, qs_set_default),
    CUSTOM_SETTING(0, qs_items[QUICKSCREEN_BOTTOM], LANG_BOTTOM_QS_ITEM,
-                  &global_settings.dirfilter, "qs bottom",
+                  NULL, "qs bottom",
                   qs_load_from_cfg, qs_write_to_cfg,
                   qs_is_changed, qs_set_default),
 #endif
