@@ -21,6 +21,12 @@
 #ifndef _PLAYLIST_CATALOG_H_
 #define _PLAYLIST_CATALOG_H_
 
+/* Gets the configured playlist catalog dir */
+const char* catalog_get_directory(void);
+
+/* Set the playlist catalog dir */
+void catalog_set_directory(const char* directory);
+
 /* 
  * View list of playlists in catalog.
  *  ret : true if no error

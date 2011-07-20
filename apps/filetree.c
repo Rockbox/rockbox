@@ -1,4 +1,4 @@
-/***************************************************************************
+ /***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -43,6 +43,7 @@
 #include "filetree.h"
 #include "misc.h"
 #include "strnatcmp.h"
+#include "playlist_viewer.h"
 #ifdef HAVE_LCD_BITMAP
 #include "keyboard.h"
 #endif
@@ -445,13 +446,8 @@ int ft_enter(struct tree_context* c)
 
         switch ( file->attr & FILE_ATTR_MASK ) {
             case FILE_ATTR_M3U:
-                play = ft_play_playlist(buf, c->currdir, file->name);
-                
-                if (play)
-                {
-                    start_index = 0;
-                }
-
+                if (!bookmark_autoload(buf))
+                    playlist_viewer_ex(buf);
                 break;
 
             case FILE_ATTR_AUDIO:

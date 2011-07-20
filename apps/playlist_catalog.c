@@ -43,6 +43,8 @@
 #include "debug.h"
 #include "playlist_catalog.h"
 #include "talk.h"
+#include "playlist_viewer.h"
+#include "bookmark.h"
 
 /* Use for recursive directory search */
 struct add_track_context {
@@ -59,9 +61,9 @@ static int  playlist_dir_length;
 static bool playlist_dir_exists = false;
 
 /* Retrieve playlist directory from config file and verify it exists */
+static bool initialized = false;
 static int initialize_catalog(void)
 {
-    static bool initialized = false;
 
     if (!initialized)
     {
@@ -110,6 +112,27 @@ static int initialize_catalog(void)
     return 0;
 }
 
+void catalog_set_directory(const char* directory)
+{
+    if (directory == NULL)
+    {
+        global_settings.playlist_catalog_dir[0] = '\0';
+    }
+    else
+    {
+        strcpy(global_settings.playlist_catalog_dir, directory);
+    }
+    initialized = false;
+    initialize_catalog();
+}
+
+const char* catalog_get_directory(void)
+{
+    if (initialize_catalog() == -1)
+        return "";
+    return playlist_dir;
+}
+
 /* Display all playlists in catalog.  Selected "playlist" is returned.
    If "view" mode is set then we're not adding anything into playlist. */
 static int display_playlists(char* playlist, bool view)
@@ -126,6 +149,8 @@ static int display_playlists(char* playlist, bool view)
     browse.buf = selected_playlist;
     browse.bufsize = sizeof(selected_playlist);
 
+restart:
+    browse.flags &= ~BROWSE_SELECTED;
     rockbox_browse(&browse);
 
     if (browse.flags & BROWSE_SELECTED)
@@ -135,9 +160,12 @@ static int display_playlists(char* playlist, bool view)
 
         if (view)
         {
-            char *filename = strrchr(selected_playlist, '/')+1;
-            /* In view mode, selecting a playlist starts playback */
-            ft_play_playlist(selected_playlist, playlist_dir, filename);
+            
+            if (!bookmark_autoload(selected_playlist))
+            {
+                if (playlist_viewer_ex(selected_playlist) == PLAYLIST_VIEWER_CANCEL)
+                    goto restart;
+            }
             result = 0;
         }
         else
@@ -311,8 +339,6 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
             snprintf(playlist, MAX_PATH, "%s/%s.m3u8",
                      playlist_dir,
                      (name!=NULL && (sel_attr & ATTR_DIRECTORY))?name+1:"");
-            if (kbd_input(playlist, MAX_PATH))
-                return false;
         }
         else
             strcpy(playlist, m3u8name);
@@ -323,6 +349,9 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
             strcat(playlist, "8");
         else if(len <= 5 || strcasecmp(&playlist[len-5], ".m3u8"))
             strcat(playlist, ".m3u8");
+        
+        if (kbd_input(playlist, MAX_PATH))
+            return false;
     }
     else
     {

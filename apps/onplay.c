@@ -315,7 +315,7 @@ MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
                   view_playlist, NULL,
                   treeplaylist_callback, Icon_Playlist);
 
-MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_PLAYLIST),
+MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
                  treeplaylist_callback, Icon_Playlist,
                  
                  /* view */
@@ -382,6 +382,12 @@ static int treeplaylist_callback(int action,
     return action;
 }
 
+void onplay_show_playlist_menu(char* track_name)
+{
+    selected_file = track_name;
+    selected_file_attr = FILE_ATTR_AUDIO;
+    do_menu(&tree_playlist_menu, NULL, NULL, false);
+}
 
 /* playlist catalog options */
 static bool cat_add_to_a_playlist(void)
@@ -395,23 +401,37 @@ static bool cat_add_to_a_new_playlist(void)
     return catalog_add_to_a_playlist(selected_file, selected_file_attr,
                                      true, NULL);
 }
+static int clipboard_callback(int action,const struct menu_item_ex *this_item);
+static bool set_catalogdir(void)
+{
+    catalog_set_directory(selected_file);
+    settings_save();
+    return false;
+}
+MENUITEM_FUNCTION(set_catalogdir_item, 0, ID2P(LANG_SET_AS_PLAYLISTCAT_DIR),
+                  set_catalogdir, NULL, clipboard_callback, Icon_Playlist);
 
 static int cat_playlist_callback(int action,
                                  const struct menu_item_ex *this_item);
-MENUITEM_FUNCTION(cat_view_lists, 0, ID2P(LANG_CATALOG_VIEW),
-                  catalog_view_playlists, 0,
-                  cat_playlist_callback, Icon_Playlist);
 MENUITEM_FUNCTION(cat_add_to_list, 0, ID2P(LANG_CATALOG_ADD_TO),
                   cat_add_to_a_playlist, 0, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(cat_add_to_new, 0, ID2P(LANG_CATALOG_ADD_TO_NEW),
                   cat_add_to_a_new_playlist, 0, NULL, Icon_Playlist);
 MAKE_ONPLAYMENU(cat_playlist_menu, ID2P(LANG_CATALOG),
                 cat_playlist_callback, Icon_Playlist,
-                &cat_view_lists, &cat_add_to_list, &cat_add_to_new);
+                &cat_add_to_list, &cat_add_to_new, &set_catalogdir_item);
+
+void onplay_show_playlist_cat_menu(char* track_name)
+{
+    selected_file = track_name;
+    selected_file_attr = FILE_ATTR_AUDIO;
+    do_menu(&cat_playlist_menu, NULL, NULL, false);
+}
 
 static int cat_playlist_callback(int action,
                                  const struct menu_item_ex *this_item)
 {
+    (void)this_item;
     if (!selected_file ||
         (((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO) &&
          ((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) &&
@@ -430,12 +450,7 @@ static int cat_playlist_callback(int action,
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
-            if (this_item == &cat_view_lists)
-            {
-                return action;
-            }
-            else if ((audio_status() & AUDIO_STATUS_PLAY) ||
-                     context != CONTEXT_WPS)
+            if ((audio_status() & AUDIO_STATUS_PLAY) || context != CONTEXT_WPS)
             {
                 return action;
             }
@@ -1100,7 +1115,8 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                 {
                     /* only for directories */
                     if (this_item == &delete_dir_item ||
-                        this_item == &set_startdir_item
+                        this_item == &set_startdir_item ||
+                        this_item == &set_catalogdir_item
 #ifdef HAVE_RECORDING
                      || this_item == &set_recdir_item
 #endif

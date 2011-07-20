@@ -21,6 +21,7 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 #include "config.h"
 #include "lang.h"
 #include "action.h"
@@ -35,20 +36,28 @@
 #include "playlist_viewer.h"
 #include "talk.h"
 #include "playlist_catalog.h"
+#include "splash.h"
 
 int save_playlist_screen(struct playlist_info* playlist)
 {
-    char temp[MAX_PATH+1];
+    char temp[MAX_PATH+1], *dot;
     int len;
-
+    
     playlist_get_name(playlist, temp, sizeof(temp)-1);
     len = strlen(temp);
 
-    if (len > 4 && !strcasecmp(&temp[len-4], ".m3u"))
+    dot = strrchr(temp, '.');
+    if (!dot)
+    {
+        /* folder of some type */
+        if (temp[1] != '\0')
+            strcpy(&temp[len-1], ".m3u8");
+        else
+            snprintf(temp, sizeof(temp), "%s%s",
+                    catalog_get_directory(), DEFAULT_DYNAMIC_PLAYLIST_NAME);
+    }
+    else if (len > 4 && !strcasecmp(dot, ".m3u"))
         strcat(temp, "8");
-    
-    if (len <= 5 || strcasecmp(&temp[len-5], ".m3u8"))
-        strcpy(temp, DEFAULT_DYNAMIC_PLAYLIST_NAME);
 
     if (!kbd_input(temp, sizeof(temp)))
     {
@@ -63,27 +72,45 @@ int save_playlist_screen(struct playlist_info* playlist)
 
 static int playlist_view_(void)
 {
-    return GO_TO_PLAYLIST_VIEWER;
+    playlist_viewer_ex(NULL);
+    return 0;
 }
 
 MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST), 
                   (int(*)(void))create_playlist, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(view_cur_playlist, MENU_FUNC_CHECK_RETVAL,
+MENUITEM_FUNCTION(view_cur_playlist, 0,
                   ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), 
                   (int(*)(void))playlist_view_, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(save_playlist, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), 
                          (int(*)(void*))save_playlist_screen, 
                         NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(catalog, 0, ID2P(LANG_CATALOG_VIEW), 
-                  (int(*)(void))catalog_view_playlists,
-                   NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(recursive_dir_insert, &global_settings.recursive_dir_insert, NULL);
 MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL);
+static int clear_catalog_directory(void)
+{
+    catalog_set_directory(NULL);
+    settings_save();
+    splash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
+    return false;
+}
+MENUITEM_FUNCTION(clear_catalog_directory_item, 0, ID2P(LANG_RESET_PLAYLISTCAT_DIR), 
+                  clear_catalog_directory, NULL, NULL, Icon_file_view_menu);
+
+/* Playlist viewer settings submenu */
+MENUITEM_SETTING(show_icons, &global_settings.playlist_viewer_icons, NULL);
+MENUITEM_SETTING(show_indices, &global_settings.playlist_viewer_indices, NULL);
+MENUITEM_SETTING(track_display, 
+                 &global_settings.playlist_viewer_track_display, NULL);
+MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS), 
+          NULL, Icon_Playlist,
+          &show_icons, &show_indices, &track_display);
+
 
 MAKE_MENU(playlist_settings, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
-          &recursive_dir_insert, &warn_on_erase);
+          &viewer_settings_menu, &recursive_dir_insert, &warn_on_erase);
 MAKE_MENU(playlist_options, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
-          &create_playlist_item, &view_cur_playlist, &save_playlist, &catalog);
+          &create_playlist_item, &view_cur_playlist,
+          &save_playlist, &clear_catalog_directory_item);
 

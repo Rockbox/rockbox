@@ -125,7 +125,6 @@ static void format_line(const struct playlist_entry* track, char* str,
 
 static bool update_playlist(bool force);
 static int  onplay_menu(int index);
-static bool viewer_menu(void);
 static int save_playlist_func(void);
 
 static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
@@ -437,6 +436,9 @@ static bool update_playlist(bool force)
     return true;
 }
 
+MENUITEM_FUNCTION(save_playlist_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
+                  save_playlist_func, 0, NULL, Icon_NOICON);
+
 /* Menu of playlist commands.  Invoked via ON+PLAY on main viewer screen.
    Returns -1 if USB attached, 0 if no playlist change, and 1 if playlist
    changed. */
@@ -446,9 +448,9 @@ static int onplay_menu(int index)
     struct playlist_entry * current_track =
         playlist_buffer_get_track(&viewer.buffer, index);
     MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL, 
+                        ID2P(LANG_PLAYLIST), ID2P(LANG_CATALOG),
                         ID2P(LANG_REMOVE), ID2P(LANG_MOVE),
-                        ID2P(LANG_CATALOG_ADD_TO), ID2P(LANG_CATALOG_ADD_TO_NEW),
-                        ID2P(LANG_PLAYLISTVIEWER_SETTINGS));
+                        ID2P(LANG_SAVE_DYNAMIC_PLAYLIST));
     bool current = (current_track->index == viewer.current_playing_track);
 
     result = do_menu(&menu_items, NULL, NULL, false);
@@ -465,6 +467,16 @@ static int onplay_menu(int index)
         switch (result)
         {
             case 0:
+                /* playlist */
+                onplay_show_playlist_menu(current_track->name);
+                ret = 0;
+                break;
+            case 1:
+                /* add to catalog */
+                onplay_show_playlist_cat_menu(current_track->name);
+                ret = 0;
+                break;
+            case 2:
                 /* delete track */
                 playlist_delete(viewer.playlist, current_track->index);
                 if (current)
@@ -490,41 +502,20 @@ static int onplay_menu(int index)
                 }
                 ret = 1;
                 break;
-            case 1:
+            case 3:
                 /* move track */
                 viewer.moving_track = index;
                 viewer.moving_playlist_index = current_track->index;
                 ret = 0;
                 break;
-            case 2: /* add to catalog */
-            case 3: /* add to a new one */
-                catalog_add_to_a_playlist(current_track->name,
-                                          FILE_ATTR_AUDIO,
-                                          result == 3, NULL);
+            case 4:
+                /* save playlist */
+                save_playlist_screen(viewer.playlist);
                 ret = 0;
-                break;
-            case 4: /* playlist viewer settings */
-                /* true on usb connect */
-                ret = viewer_menu() ? -1 : 0;
                 break;
         }
     }
     return ret;
-}
-
-/* Menu of viewer options.  Invoked via F1(r) or Menu(p). */
-MENUITEM_SETTING(show_icons, &global_settings.playlist_viewer_icons, NULL);
-MENUITEM_SETTING(show_indices, &global_settings.playlist_viewer_indices, NULL);
-MENUITEM_SETTING(track_display, 
-                 &global_settings.playlist_viewer_track_display, NULL);
-MENUITEM_FUNCTION(save_playlist_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
-                  save_playlist_func, 0, NULL, Icon_NOICON);
-MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS), 
-          NULL, Icon_Playlist,
-          &show_icons, &show_indices, &track_display, &save_playlist_item);
-static bool viewer_menu(void)
-{
-    return do_menu(&viewer_settings_menu, NULL, NULL, false) == MENU_ATTACHED_USB;
 }
 
 /* Save playlist to disk */
@@ -712,7 +703,10 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     gui_synclist_draw(&playlist_lists);
                 }
                 else
+                {
                     exit = true;
+                    ret = PLAYLIST_VIEWER_CANCEL;
+                }
                 break;
             }
             case ACTION_STD_OK:
@@ -739,20 +733,31 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                 else if (!viewer.playlist)
                 {
                     /* play new track */
-                    playlist_start(current_track->index, 0);
-                    update_playlist(false);
+                    if (!global_settings.party_mode)
+                    {
+                        playlist_start(current_track->index, 0);
+                        update_playlist(false);
+                    }
                 }
-                else
+                else if (!global_settings.party_mode)
                 {
+                    int start_index = current_track->index;
+                    if (!warn_on_pl_erase())
+                    {
+                        gui_synclist_draw(&playlist_lists);
+                        break;
+                    }
                     /* New playlist */
                     if (playlist_set_current(viewer.playlist) < 0)
                         goto exit;
-
-                    playlist_start(current_track->index, 0);
+                    if (global_settings.playlist_shuffle)
+                        start_index = playlist_shuffle(current_tick, start_index);
+                    playlist_start(start_index, 0);
 
                     /* Our playlist is now the current list */
                     if (!playlist_viewer_init(&viewer, NULL, true))
                         goto exit;
+                    exit = true;
                 }
                 gui_synclist_draw(&playlist_lists);
 

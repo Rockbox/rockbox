@@ -502,7 +502,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -6544,7 +6544,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalog"
@@ -12755,5 +12755,47 @@
   </dest>
   <voice>
     *: "Rewind on Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalog dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalog Directory"
+  </source>
+  <dest>
+    *: "Set As Playlist Catalog Directory"
+  </dest>
+  <voice>
+    *: "Set As Playlist Catalog Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalog Directory"
+  </source>
+  <dest>
+    *: "Reset Playlist Catalog Directory"
+  </dest>
+  <voice>
+    *: "Reset Playlist Catalog Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Current Playlist"
+  </dest>
+  <voice>
+    *: "Current Playlist"
   </voice>
 </phrase>

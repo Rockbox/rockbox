@@ -917,8 +917,15 @@ bool create_playlist(void)
 {
     char filename[MAX_PATH];
 
-    snprintf(filename, sizeof filename, "%s.m3u8",
-             tc.currdir[1] ? tc.currdir : "/root");
+    if (tc.currdir[1])
+        snprintf(filename, sizeof filename, "%s.m3u8", tc.currdir);
+    else
+        snprintf(filename, sizeof filename, "%s/all.m3u8",
+                catalog_get_directory());
+        
+    
+    if (kbd_input(filename, MAX_PATH))
+        return false;
     splashf(0, "%s %s", str(LANG_CREATING), filename);
 
     trigger_cpu_boost();

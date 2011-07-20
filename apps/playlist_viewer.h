@@ -29,6 +29,7 @@ bool search_playlist(void);
 
 enum playlist_viewer_result {
     PLAYLIST_VIEWER_OK,
+    PLAYLIST_VIEWER_CANCEL,
     PLAYLIST_VIEWER_USB,
     PLAYLIST_VIEWER_MAINMENU,
 };
