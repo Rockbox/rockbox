@@ -489,7 +489,7 @@ void radio_screen(void)
                     done = true;
                     if(presets_have_changed())
                     {
-                        if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
+                        if(yesno_pop(ID2P(LANG_SAVE_CHANGES)))
                         {
                             presets_save();
                         }
@@ -539,7 +539,7 @@ void radio_screen(void)
                 done = true;
                 if(presets_have_changed())
                 {
-                    if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
+                    if(yesno_pop(ID2P(LANG_SAVE_CHANGES)))
                     {
                         presets_save();
                     }
@@ -705,7 +705,7 @@ void radio_screen(void)
                     done = true;
                     if(presets_have_changed())
                     {
-                        if(yesno_pop(ID2P(LANG_FM_SAVE_CHANGES)))
+                        if(yesno_pop(ID2P(LANG_SAVE_CHANGES)))
                         {
                             radio_save_presets();
                         }

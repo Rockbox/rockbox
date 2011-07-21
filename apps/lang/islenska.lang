@@ -6194,19 +6194,19 @@
 </phrase>
 <phrase>
   id: LANG_FM_SAVE_CHANGES
-  desc: When you try to exit radio to confirm save
+  desc: deprecated
   user: core
   <source>
     *: none
-    radio: "Save Changes?"
+    radio: ""
   </source>
   <dest>
     *: none
-    radio: "Vista breytingar?"
+    radio: ""
   </dest>
   <voice>
     *: none
-    radio: "Save Changes?"
+    radio: ""
   </voice>
 </phrase>
 <phrase>

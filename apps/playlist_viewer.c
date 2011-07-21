@@ -48,6 +48,7 @@
 #include "list.h"
 #include "splash.h"
 #include "playlist_menu.h"
+#include "yesno.h"
 
 /* Maximum number of tracks we can have loaded at one time */
 #define MAX_PLAYLIST_ENTRIES 200
@@ -634,6 +635,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
     enum playlist_viewer_result ret = PLAYLIST_VIEWER_OK;
     bool exit = false;        /* exit viewer */
     int button;
+    bool dirty = false;
     struct gui_synclist playlist_lists;
     if (!playlist_viewer_init(&viewer, filename, false))
         goto exit;
@@ -729,6 +731,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     update_playlist(true);
                     viewer.moving_track = -1;
                     viewer.moving_playlist_index = -1;
+                    dirty = true;
                 }
                 else if (!viewer.playlist)
                 {
@@ -784,6 +787,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                         exit = true;
                     if (viewer.selected_track >= viewer.num_tracks)
                         viewer.selected_track = viewer.num_tracks-1;
+                    dirty = true;
                 }
                 gui_synclist_draw(&playlist_lists);
                 break;
@@ -803,7 +807,11 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
 
 exit:
     if (viewer.playlist)
+    {
+        if(dirty && yesno_pop(ID2P(LANG_SAVE_CHANGES)))
+            save_playlist_screen(viewer.playlist);
         playlist_close(viewer.playlist);
+    }
     return ret;
 }
 

@@ -103,6 +103,7 @@
 #include "splash.h"
 #include "rbunicode.h"
 #include "root_menu.h"
+#include "plugin.h" /* To borrow a temp buffer to rewrite a .m3u8 file */
 
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
@@ -3369,6 +3370,8 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     int result = 0;
     bool overwrite_current = false;
     int* index_buf = NULL;
+    char* old_buffer = NULL;
+    size_t old_buffer_size = 0;
 
     if (!playlist)
         playlist = &current_playlist;
@@ -3388,8 +3391,17 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
         {
             /* not enough buffer space to store updated indices */
-            splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
-            return -1;
+            /* Try to get a buffer */
+            old_buffer = playlist->buffer;
+            old_buffer_size = playlist->buffer_size;
+            playlist->buffer = plugin_get_buffer((size_t*)&playlist->buffer_size);
+            if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
+            {
+                playlist->buffer = old_buffer;
+                playlist->buffer_size = old_buffer_size;
+                splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
+                return -1;
+            }
         }
 
         /* in_ram buffer is unused for m3u files so we'll use for storing
@@ -3413,6 +3425,11 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     if (fd < 0)
     {
         splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
+        if (old_buffer != NULL)
+        {
+            playlist->buffer = old_buffer;
+            playlist->buffer_size = old_buffer_size;
+        }
         return -1;
     }
 
@@ -3513,6 +3530,11 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     }
 
     cpu_boost(false);
+    if (old_buffer != NULL)
+    {
+        playlist->buffer = old_buffer;
+        playlist->buffer_size = old_buffer_size;
+    }
 
     return result;
 }
