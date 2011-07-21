@@ -6511,7 +6511,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO_NEW
-  desc: in onplay playlist catalog submenu
+  desc: in onplay playlist catalogue submenu
   user: core
   <source>
     *: "Add to New Playlist"
@@ -6646,7 +6646,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalog submenu
+  desc: in onplay playlist catalogue submenu
   user: core
   <source>
     *: "Add to Playlist"

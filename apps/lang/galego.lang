@@ -9321,7 +9321,7 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
   desc: in onplay menu
   user: core
   <source>
-    *: "Playlist Catalog"
+    *: "Playlist Catalogue"
   </source>
   <dest>
     *: "Catálogo de listas de repr."
@@ -10043,7 +10043,7 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO_NEW
-  desc: in onplay playlist catalog submenu
+  desc: in onplay playlist catalogue submenu
   user: core
   <source>
     *: "Add to New Playlist"
@@ -10517,7 +10517,7 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalog submenu
+  desc: in onplay playlist catalogue submenu
   user: core
   <source>
     *: "Add to Playlist"
@@ -11312,10 +11312,10 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
 </phrase>
 <phrase>
   id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalog submenu
+  desc: in onplay playlist catalogue submenu
   user: core
   <source>
-    *: "View Catalog"
+    *: "View Catalogue"
   </source>
   <dest>
     *: "Amosar catálogo"
@@ -12352,7 +12352,7 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
 </phrase>
 <phrase>
   id: LANG_CATALOG_NO_DIRECTORY
-  desc: error message when playlist catalog directory doesn't exist
+  desc: error message when playlist catalogue directory doesn't exist
   user: core
   <source>
     *: "%s doesn't exist"
@@ -12383,7 +12383,7 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
 </phrase>
 <phrase>
   id: LANG_CATALOG_NO_PLAYLISTS
-  desc: error message when no playlists for playlist catalog
+  desc: error message when no playlists for playlist catalogue
   user: core
   <source>
     *: "No Playlists"

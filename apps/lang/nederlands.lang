@@ -7714,7 +7714,7 @@
   desc: in onplay menu
   user: core
   <source>
-    *: "Playlist Catalog"
+    *: "Playlist Catalogue"
   </source>
   <dest>
     *: "Speellijst cataloog"
@@ -7725,7 +7725,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO
-  desc: in onplay playlist catalog submenu
+  desc: in onplay playlist catalogue submenu
   user: core
   <source>
     *: "Add to Playlist"
@@ -7739,7 +7739,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_ADD_TO_NEW
-  desc: in onplay playlist catalog submenu
+  desc: in onplay playlist catalogue submenu
   user: core
   <source>
     *: "Add to New Playlist"
@@ -7753,10 +7753,10 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_VIEW
-  desc: in onplay playlist catalog submenu
+  desc: in onplay playlist catalogue submenu
   user: core
   <source>
-    *: "View Catalog"
+    *: "View Catalogue"
   </source>
   <dest>
     *: "Toon catalogus"
@@ -7767,7 +7767,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_NO_DIRECTORY
-  desc: error message when playlist catalog directory doesn't exist
+  desc: error message when playlist catalogue directory doesn't exist
   user: core
   <source>
     *: "%s doesn't exist"
@@ -7781,7 +7781,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG_NO_PLAYLISTS
-  desc: error message when no playlists for playlist catalog
+  desc: error message when no playlists for playlist catalogue
   user: core
   <source>
     *: "No Playlists"
