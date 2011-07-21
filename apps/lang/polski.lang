@@ -425,7 +425,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -6470,16 +6470,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
   </source>
   <dest>
-    *: "Katalog list"
+    *: "Katalog List odtwarzania"
   </dest>
   <voice>
-    *: "Katalog list odtwarzania"
+    *: "Katalog List odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -12679,5 +12679,61 @@
   </dest>
   <voice>
     *: "Cofaj po Wstrzymaniu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Obecna Lista odtwarzania"
+  </dest>
+  <voice>
+    *: "Obecna Lista odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalog dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalog Directory"
+  </source>
+  <dest>
+    *: "Ustaw Jako Ścieżkę Katalogu List odtwarzania"
+  </dest>
+  <voice>
+    *: "Ustaw Jako Ścieżkę Katalogu List odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Zachować Zmiany?"
+  </dest>
+  <voice>
+    *: "Zachować Zmiany?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalog Directory"
+  </source>
+  <dest>
+    *: "Usuń Ścieżkę Katalogu List odtwarzania"
+  </dest>
+  <voice>
+    *: "Usuń Ścieżkę Katalogu List odtwarzania"
   </voice>
 </phrase>
