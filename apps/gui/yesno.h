@@ -21,6 +21,7 @@
 
 #ifndef _GUI_YESNO_H_
 #define _GUI_YESNO_H_
+#include <stdbool.h>
 
 enum yesno_res
 {
@@ -47,4 +48,7 @@ extern enum yesno_res gui_syncyesno_run(
                            const struct text_message * main_message,
                            const struct text_message * yes_message,
                            const struct text_message * no_message);
+                           
+bool yesno_pop(const char* text);
+
 #endif /* _GUI_YESNO_H_ */

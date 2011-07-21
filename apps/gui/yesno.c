@@ -233,3 +233,17 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     }
     return(result);
 }
+
+
+/* Function to manipulate all yesno dialogues.
+   This function needs the output text as an argument. */
+bool yesno_pop(const char* text)
+{
+    int i;
+    const char *lines[]={text};
+    const struct text_message message={lines, 1};
+    bool ret = (gui_syncyesno_run(&message,NULL,NULL)== YESNO_YES);
+    FOR_NB_SCREENS(i)
+        screens[i].clear_viewport();
+    return ret;
+}

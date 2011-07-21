@@ -59,8 +59,6 @@ static char filepreset[MAX_PATH]; /* preset filename variable */
 
 static int num_presets = 0; /* The number of presets in the preset list */
 
-bool yesno_pop(const char* text); /* radio.c */
-
 int radio_current_preset(void)
 {
     return curr_preset;
