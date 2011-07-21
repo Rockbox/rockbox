@@ -332,17 +332,10 @@ static bool prepare_insert(size_t length)
     /* Maintain the buffer level above the watermark */
     if (playing)
     {
-        /* Only codec thread initiates boost - voice boosts the cpu when playing
-           a clip */
-#ifndef SIMULATOR
-        if (is_codec_thread())
-#endif /* SIMULATOR */
-        {
-            /* boost cpu if necessary */
-            if (pcmbuf_unplayed_bytes < pcmbuf_watermark)
-                trigger_cpu_boost();
-            boost_codec_thread(pcmbuf_unplayed_bytes*10/pcmbuf_size);
-        }
+        /* boost cpu if necessary */
+        if (pcmbuf_unplayed_bytes < pcmbuf_watermark)
+            trigger_cpu_boost();
+        boost_codec_thread(pcmbuf_unplayed_bytes*10/pcmbuf_size);
 
 #ifdef HAVE_CROSSFADE
         /* Disable crossfade if < .5s of audio */

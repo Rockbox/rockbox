@@ -36,7 +36,6 @@ void codec_thread_do_callback(void (*fn)(void),
 void codec_init_codec_api(void);
 void make_codec_thread(void);
 void codec_thread_resume(void);
-bool is_codec_thread(void);
 #ifdef HAVE_PRIORITY_SCHEDULING
 int codec_thread_get_priority(void);
 int codec_thread_set_priority(int priority);

@@ -636,12 +636,6 @@ void codec_thread_resume(void)
     thread_thaw(codec_thread_id);
 }
 
-/* Is the current thread the codec thread? */
-bool is_codec_thread(void)
-{
-    return thread_self() == codec_thread_id;
-}
-
 #ifdef HAVE_PRIORITY_SCHEDULING
 /* Obtain codec thread's current priority */
 int codec_thread_get_priority(void)
