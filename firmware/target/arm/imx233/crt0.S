@@ -36,6 +36,8 @@
 .text
 .global start
 start:
+    /* Save r0 */
+    mov     r6, r0
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
     /* Zero out IBSS */
     ldr     r2, =_iedata
@@ -101,6 +103,7 @@ start:
     mcr     p15, 0, r0, c1, c0, 0
 
     /* Jump to main */
+    mov     r0, r6
     bl      main
 1:
     b       1b
