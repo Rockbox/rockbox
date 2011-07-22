@@ -224,7 +224,15 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
             color(GREY);
             printf("[Bad checksum]");
         }
-        
+        if(hdr->flags != 0)
+        {
+            color(GREY);
+            printf("[");
+            color(BLUE);
+            printf("f=%x", hdr->flags);
+            color(GREY);
+            printf("] ");
+        }
         if(hdr->opcode == SB_INST_LOAD)
         {
             struct sb_instruction_load_t *load = (struct sb_instruction_load_t *)&buf[pos];
@@ -612,8 +620,16 @@ static void extract(unsigned long filesize)
                 printf("cnt=0x%08x", tag->len);
                 color(OFF);printf(" | ");
                 color(YELLOW);
-                printf("flg=0x%08x\n", tag->flags);
+                printf("flg=0x%08x", tag->flags);
                 color(OFF);
+                if(tag->hdr.flags & SB_INST_LAST_TAG)
+                {
+                    printf(" | ");
+                    color(RED);
+                    printf(" Last section");
+                    color(OFF);
+                }
+                printf("\n");
                 offset += sizeof(struct sb_instruction_tag_t);
 
                 char name[5];
