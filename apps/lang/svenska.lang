@@ -7891,7 +7891,7 @@
     *: "Läge:"
   </dest>
   <voice>
-    *: "Läge:"
+    *: "Läge"
   </voice>
 </phrase>
 <phrase>
@@ -12672,5 +12672,61 @@
   </dest>
   <voice>
     *: "Spola bakåt vid paus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Använd som spellistekatalog"
+  </dest>
+  <voice>
+    *: "Använd som spellistekatalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Återställ spellistekatalog"
+  </dest>
+  <voice>
+    *: "Återställ spellistekatalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Aktuell spellista"
+  </dest>
+  <voice>
+    *: "Aktuell spellista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Spara ändringar?"
+  </dest>
+  <voice>
+    *: "Spara ändringar?"
   </voice>
 </phrase>
