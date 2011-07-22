@@ -118,13 +118,9 @@
 #define HAVE_FLASH_STORAGE
 
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
-#ifdef BOOTLOADER
-# define CONFIG_STORAGE STORAGE_MMC
-#else
-# define CONFIG_STORAGE (STORAGE_SD | STORAGE_MMC)
-# define NUM_DRIVES 2
-# define HAVE_HOTSWAP
-#endif
+#define CONFIG_STORAGE (STORAGE_SD | STORAGE_MMC)
+#define NUM_DRIVES 2
+#define HAVE_HOTSWAP
 
 /* todo */
 #define BATTERY_CAPACITY_DEFAULT 550    /* default battery capacity */

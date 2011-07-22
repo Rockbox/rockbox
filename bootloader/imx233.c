@@ -40,8 +40,8 @@
 
 #include "usb.h"
 
-void main(void) NORETURN_ATTR;
-void main(void)
+void main(uint32_t arg) NORETURN_ATTR;
+void main(uint32_t arg)
 {
     unsigned char* loadbuffer;
     int buffer_size;
@@ -62,6 +62,8 @@ void main(void)
     button_init_device();
 
     //button_debug_screen();
+    printf("arg=%c%c%c%c", arg >> 24,
+        (arg >> 16) & 0xff, (arg >> 8) & 0xff, (arg & 0xff));
 
     ret = storage_init();
     if(ret < 0)
@@ -83,6 +85,9 @@ void main(void)
     {
         error(EDISK, ret, true);
     }
+
+    if(button_read_device() & BUTTON_VOL_UP)
+        printf("Booting from SD card required.");
 
     printf("Loading firmware");
 

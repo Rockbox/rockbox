@@ -25,7 +25,6 @@
 #include "storage.h"
 #include "ssp-imx233.h"
 #include "pinctrl-imx233.h"
-#include "button-target.h"
 
 /**
  * This code assumes a single eMMC internal flash
@@ -215,4 +214,10 @@ int mmc_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const v
     (void) count;
     (void) buf;
     return -1;
+}
+
+bool mmc_present(IF_MD(int drive))
+{
+    IF_MD((void) drive);
+    return true;
 }

@@ -27,6 +27,7 @@
 #include "cpu.h"
 #include "system.h"
 #include "system-target.h"
+#include "pinctrl-imx233.h"
 
 /* ssp can value 1 or 2 */
 #define __SSP_SELECT(ssp, ssp1, ssp2) ((ssp) == 1 ? (ssp1) : (ssp2))
@@ -122,6 +123,7 @@
 #define HW_SSP_STATUS__RESP_TIMEOUT         (1 << 14)
 #define HW_SSP_STATUS__RESP_ERR             (1 << 15)
 #define HW_SSP_STATUS__RESP_CRC_ERR         (1 << 16)
+#define HW_SSP_STATUS__CARD_DETECT          (1 << 28)
 #define HW_SSP_STATUS__ALL_ERRORS           0x1f800
 
 #define HW_SSP_DEBUG(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x100))
@@ -142,6 +144,8 @@ enum imx233_ssp_resp_t
     SSP_LONG_RESP
 };
 
+typedef void (*ssp_detect_cb_t)(int ssp);
+
 void imx233_ssp_init(void);
 void imx233_ssp_start(int ssp);
 void imx233_ssp_stop(int ssp);
@@ -156,8 +160,14 @@ void imx233_ssp_set_block_size(int ssp, unsigned log_block_size);
 enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     uint32_t cmd_arg, enum imx233_ssp_resp_t resp, void *buffer, unsigned block_count,
     bool wait4irq, bool read, uint32_t *resp_ptr);
+void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
+    unsigned drive_strength, bool use_alt);
 void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     unsigned drive_strength);
+/* after callback is fired, imx233_ssp_sdmmc_setup_detect needs to be called
+ * to enable detection again */
+void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn);
+bool imx233_ssp_sdmmc_detect(int ssp);
 /* SD/MMC requires that the card be provided the clock during an init sequence of
  * at least 1msec (or 74 clocks). Does NOT touch the clock so it has to be correct. */
 void imx233_ssp_sd_mmc_power_up_sequence(int ssp);
