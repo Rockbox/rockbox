@@ -141,9 +141,9 @@ int button_read_device(int *data)
 
 static int hp_state;
 JNIEXPORT void JNICALL
-Java_org_rockbox_monitors_HeadphoneMonitor_postCallHungUp(JNIEnv *env,
-                                                        jobject this,
-                                                        jint state)
+Java_org_rockbox_monitors_HeadphoneMonitor_postHpStateChanged(JNIEnv *env,
+                                                            jobject this,
+                                                            jint state)
 {
     (void)env; (void)this;
     hp_state = state;
