@@ -54,6 +54,9 @@ default_interrupt(INT_SSP2_DMA);
 default_interrupt(INT_SSP2_ERROR);
 default_interrupt(INT_I2C_DMA);
 default_interrupt(INT_I2C_ERROR);
+default_interrupt(INT_GPIO0);
+default_interrupt(INT_GPIO1);
+default_interrupt(INT_GPIO2);
 
 typedef void (*isr_t)(void);
 
@@ -72,6 +75,9 @@ static isr_t isr_table[INT_SRC_NR_SOURCES] =
     [INT_SRC_SSP2_ERROR] = INT_SSP2_ERROR,
     [INT_SRC_I2C_DMA] = INT_I2C_DMA,
     [INT_SRC_I2C_ERROR] = INT_I2C_ERROR,
+    [INT_SRC_GPIO0] = INT_GPIO0,
+    [INT_SRC_GPIO1] = INT_GPIO1,
+    [INT_SRC_GPIO2] = INT_GPIO2,
 };
 
 static void UIRQ(void)
