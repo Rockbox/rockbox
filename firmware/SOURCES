@@ -501,6 +501,7 @@ target/arm/imx233/mmc-imx233.c
 target/arm/imx233/ssp-imx233.c
 target/arm/imx233/usb-imx233.c
 target/arm/imx233/dma-imx233.c
+target/arm/imx233/pinctrl-imx233.c
 #endif /* IMX233 */
 
 #if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2
@@ -1453,11 +1454,9 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 
 #ifdef SANSA_FUZEPLUS
 #ifndef SIMULATOR
-#ifndef BOOTLOADER
 drivers/synaptics-rmi.c
 drivers/generic_i2c.c
 target/arm/imx233/sansa-fuzeplus/fmradio-i2c-fuzeplus.c
-#endif
 target/arm/imx233/sansa-fuzeplus/backlight-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c
