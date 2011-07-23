@@ -44,6 +44,10 @@
 /* MMU not present */
 #define CACHE_SIZE 4
 
+#elif CONFIG_CPU == IMX233
+#define USE_MMU
+#define CACHE_SIZE 16
+
 #else
 #error Cache settings unknown for this CPU !
 

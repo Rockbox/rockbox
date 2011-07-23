@@ -141,6 +141,25 @@ void imx233_softirq(int src, bool enable)
         __REG_CLR(HW_ICOLL_INTERRUPT(src)) = HW_ICOLL_INTERRUPT__SOFTIRQ;
 }
 
+static void set_page_tables(void)
+{
+    /* map every memory region to itself */
+    map_section(0, 0, 0x1000, CACHE_NONE);
+
+    /* map RAM and enable caching for it */
+    map_section(DRAM_ORIG, DRAM_ORIG, MEMORYSIZE, CACHE_ALL);
+    
+    /* enable buffered writing for the framebuffer */
+    map_section((int)FRAME, (int)FRAME, 1, BUFFERED);
+}
+
+void memory_init(void)
+{
+    ttb_init();
+    set_page_tables();
+    enable_mmu();
+}
+
 void system_init(void)
 {
     /* disable all interrupts */
@@ -158,14 +177,6 @@ void system_init(void)
     imx233_timrot_init();
     imx233_dma_init();
     imx233_ssp_init();
-    imx233_i2c_init();
-}
-
-void power_off(void)
-{
-    /* power down */
-    HW_POWER_RESET = HW_POWER_RESET__UNLOCK | HW_POWER_RESET__PWD;
-    while(1);
 }
 
 bool imx233_us_elapsed(uint32_t ref, unsigned us_delay)

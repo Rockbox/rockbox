@@ -8,8 +8,8 @@ STARTUP(target/arm/imx233/crt0.o)
 
 MEMORY
 {
-    IRAM : ORIGIN = IRAM_ORIG, LENGTH = IRAM_SIZE
-    DRAM : ORIGIN = DRAM_ORIG, LENGTH = DRAM_SIZE - TTB_SIZE
+    IRAM : ORIGIN = IRAM_ORIG, LENGTH = IRAM_SIZE - TTB_SIZE
+    DRAM : ORIGIN = DRAM_ORIG, LENGTH = DRAM_SIZE - FRAME_SIZE
 }
 
 SECTIONS
@@ -30,7 +30,7 @@ SECTIONS
     {
         _iramstart = .; // always 0
         *(.vectors)
-        KEEP(*(.vectors));// otherwise there are no reference to it and the linker strip it
+        KEEP(*(.vectors));// otherwise there are no references to it and the linker strip it
         *(.icode)
         *(.irodata)
         *(.idata)
