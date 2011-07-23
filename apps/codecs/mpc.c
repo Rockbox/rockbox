@@ -108,7 +108,7 @@ enum codec_status codec_run(void)
      * sample seek position from the file offset, the sampling frequency and
      * the bitrate. As the saved position is exactly calculated the reverse way 
      * there is no loss of information except rounding. */
-    samplesdone = 100 * ((mpc_uint64_t)(ci->id3->offset * frequency) / byterate);
+    samplesdone = 100 * (((mpc_uint64_t)ci->id3->offset * frequency) / byterate);
         
     /* Set up digital signal processing for correct number of channels */
     /* NOTE: current musepack format only allows for stereo files
