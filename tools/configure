@@ -2511,14 +2511,14 @@ fi
     target_id=80
     modelname="sansafuzeplus"
     target="-DSANSA_FUZEPLUS"
-    memory=128
+    memory=64
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     tool="$rootdir/tools/scramble -add=fuz+"
     output="rockbox.sansa"
     boottool="true"
     bootoutput=""
-    appextra="gui"
+    appextra="gui:recorder:radio"
     plugins="no"
     swcodec="yes"
     toolset=$scramblebitmaptools
