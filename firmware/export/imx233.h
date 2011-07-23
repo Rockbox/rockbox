@@ -26,11 +26,11 @@
 #define DRAM_ORIG           0x40000000
 #define DRAM_SIZE           (MEMORYSIZE * 0x100000)
 
-#define TTB_BASE_ADDR   (IRAM_ORIG + IRAM_SIZE - TTB_SIZE)
+#define TTB_BASE_ADDR   (DRAM_ORIG + DRAM_SIZE - TTB_SIZE)
 #define TTB_SIZE        0x4000
 #define TTB_BASE        ((unsigned long *)TTB_BASE_ADDR)
 #define FRAME_SIZE      (LCD_WIDTH * LCD_HEIGHT * LCD_DEPTH / 8)
-#define LCD_FRAME_ADDR  (DRAM_ORIG + DRAM_SIZE - FRAME_SIZE)
+#define LCD_FRAME_ADDR  (DRAM_ORIG + DRAM_SIZE - TTB_SIZE - FRAME_SIZE)
 #define FRAME           ((unsigned short *)LCD_FRAME_ADDR)
 
 /* USBOTG */

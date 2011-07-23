@@ -12,9 +12,9 @@ STARTUP(target/arm/imx233/crt0.o)
 #define DRAMORIG DRAM_ORIG
 #define IRAMORIG IRAM_ORIG
 
-#define IRAMSIZE (IRAM_SIZE - TTB_SIZE)
+#define IRAMSIZE IRAM_SIZE
 
-#define DRAMSIZE (DRAM_SIZE - PLUGINSIZE - CODECSIZE - FRAME_SIZE)
+#define DRAMSIZE (DRAM_SIZE - PLUGINSIZE - CODECSIZE - FRAME_SIZE - TTB_SIZE)
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
