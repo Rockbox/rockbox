@@ -138,11 +138,16 @@ struct apb_dma_command_t
 #define HW_APBH_CHx_CMD__NANDWAIT4READY    (1 << 5)
 #define HW_APB_CHx_CMD__SEMAPHORE          (1 << 6)
 #define HW_APB_CHx_CMD__WAIT4ENDCMD        (1 << 7)
-#define HW_APB_CHx_CMD__HALTONTERMINATE    (1 << 8)
-#define HW_APB_CHx_CMD__CMDWORDS_BM        0xf000
-#define HW_APB_CHx_CMD__CMDWORDS_BP        12
-#define HW_APB_CHx_CMD__XFER_COUNT_BM      0xffff0000
-#define HW_APB_CHx_CMD__XFER_COUNT_BP      16
+/* An errata advise not to use it */
+//#define HW_APB_CHx_CMD__HALTONTERMINATE    (1 << 8)
+#define HW_APB_CHx_CMD__CMDWORDS_BM         0xf000
+#define HW_APB_CHx_CMD__CMDWORDS_BP         12
+#define HW_APB_CHx_CMD__XFER_COUNT_BM       0xffff0000
+#define HW_APB_CHx_CMD__XFER_COUNT_BP       16
+/* For software use */
+#define HW_APB_CHx_CMD__UNUSED_BP           8
+#define HW_APB_CHx_CMD__UNUSED_BM           (0xf << 8)
+#define HW_APB_CHx_CMD__UNUSED_MAGIC        (0xa << 8)
 
 #define HW_APB_CHx_SEMA__PHORE_BM           0xff0000
 #define HW_APB_CHx_SEMA__PHORE_BP           16

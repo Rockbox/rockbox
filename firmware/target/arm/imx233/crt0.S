@@ -39,6 +39,13 @@ start:
     /* Save r0 */
     mov     r6, r0
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
+    /* Disable MMU, disable caching and buffering;
+     * use low exception range address (the core uses high range by default) */
+    mrc     p15, 0, r0, c1, c0, 0
+    ldr     r1, =0x3005
+    bic     r0, r1
+    mcr     p15, 0, r0, c1, c0, 0
+
     /* Zero out IBSS */
     ldr     r2, =_iedata
     ldr     r3, =_iend
@@ -59,6 +66,22 @@ start:
     strhi   r5, [r3], #4
     bhi     1b
 
+#ifdef HAVE_INIT_ATTR
+    /* copy init data to codec buffer */
+    /* must be done before bss is zeroed */
+    ldr    r2, =_initcopy
+    ldr    r3, =_initstart
+    ldr    r4, =_initend
+1:
+    cmp     r4, r3
+    ldrhi   r5, [r2], #4
+    strhi   r5, [r3], #4
+    bhi     1b
+
+    mov     r2, #0
+    mcr     p15, 0, r2, c7, c5, 0   @ Invalidate ICache
+#endif
+
     /* Initialise bss section to zero */
     ldr     r2, =_edata
     ldr     r3, =_end
@@ -67,7 +90,6 @@ start:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     1b
-
 
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr     sp, =stackend
@@ -92,15 +114,11 @@ start:
     msr     cpsr_c, #0xdb
     ldr     sp, =irq_stack
 
+    /* Enable MMU */
+    bl      memory_init
+
     /* Switch back to supervisor mode */
     msr     cpsr_c, #0xd3
-
-    /* Disable MMU, disable caching and buffering;
-     * use low exception range address (the core uses high range by default) */
-    mrc     p15, 0, r0, c1, c0, 0
-    ldr     r1, =0x3005
-    bic     r0, r1
-    mcr     p15, 0, r0, c1, c0, 0
 
     /* Jump to main */
     mov     r0, r6

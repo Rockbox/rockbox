@@ -28,7 +28,7 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
-#ifndef BOOTLOADER/* define this if you want album art for this target */
+#ifndef BOOTLOADER
 #define HAVE_ALBUMART
 
 /* define this to enable bitmap scaling */
@@ -36,9 +36,6 @@
 
 /* define this to enable JPEG decoding */
 #define HAVE_JPEG
-
-/* define this if you have a light associated with the buttons */
-#define HAVE_BUTTON_LIGHT
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
@@ -69,12 +66,18 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_IMX233
 
+/* define this if you have a real-time clock with alarm facilities */
+#define HAVE_RTC_ALARM
+
+#endif /* !BOOTLOADER */
+
+/* define this if you have an i.MX23 codec */
+#define HAVE_IMX233_CODEC
+
 #define CONFIG_TUNER SI4700
 
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
-
-#endif /* !BOOTLOADER */
 
 #define CONFIG_KEYPAD SANSA_FUZEPLUS_PAD
 
@@ -83,7 +86,6 @@
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
-
 
 /* LCD dimensions */
 #define LCD_WIDTH  240

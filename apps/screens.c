@@ -59,7 +59,7 @@
 #include "dsp.h"
 #endif
 
-#if (CONFIG_STORAGE & STORAGE_MMC)
+#if (CONFIG_STORAGE & STORAGE_MMC) && (defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM))
 int mmc_remove_request(void)
 {
     struct queue_event ev;

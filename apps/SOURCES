@@ -317,4 +317,6 @@ keymaps/keymap-mpio-hd300.c
 keymaps/keymap-android.c
 #elif CONFIG_KEYPAD == SDL_PAD
 keymaps/keymap-sdl.c
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+keymaps/keymap-fuzeplus.c
 #endif

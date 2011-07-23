@@ -218,7 +218,7 @@ static struct mutex tempbuf_mutex;
 static char fat_tempbuf[SECTOR_SIZE] CACHEALIGN_ATTR;
 static bool tempbuf_locked;
 
-#if defined(HAVE_HOTSWAP) && !(CONFIG_STORAGE & STORAGE_MMC) /* A better condition ?? */
+#if defined(HAVE_HOTSWAP)
 void fat_lock(void)
 {
     mutex_lock(&cache_mutex);

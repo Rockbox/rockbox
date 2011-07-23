@@ -29,6 +29,16 @@
 
 #define logf(...)
 
+/* Copies a rectangle from one framebuffer to another. Can be used in
+   single transfer mode with width = num pixels, and height = 1 which
+   allows a full-width rectangle to be copied more efficiently. */
+extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
+                                 int width, int height);
+
+#ifdef HAVE_LCD_ENABLE
+static bool lcd_on = false;
+#endif
+
 static enum lcd_kind_t
 {
     LCD_KIND_7783 = 0x7783,
@@ -375,7 +385,7 @@ void lcd_init_device(void)
     }
 }
 
-
+#ifdef HAVE_LCD_ENABLE
 static void lcd_enable_7783(bool enable)
 {
     if(!enable)
@@ -454,6 +464,10 @@ static void lcd_enable_9325(bool enable)
 
 void lcd_enable(bool enable)
 {
+    if(lcd_on == enable)
+        return;
+    lcd_on = enable;
+    
     if(enable)
         common_lcd_enable(true);
     switch(lcd_kind)
@@ -466,8 +480,19 @@ void lcd_enable(bool enable)
         common_lcd_enable(false);
 }
 
+bool lcd_active(void)
+{
+    return lcd_on;
+}
+#endif
+
 void lcd_update(void)
 {
+#ifdef HAVE_LCD_ENABLE
+    if(!lcd_on)
+        return;
+#endif
+    imx233_lcdif_wait_ready();
     lcd_write_reg(0x50, 0);
     lcd_write_reg(0x51, LCD_WIDTH - 1);
     lcd_write_reg(0x52, 0);
@@ -479,8 +504,9 @@ void lcd_update(void)
     imx233_lcdif_set_word_length(HW_LCDIF_CTRL__WORD_LENGTH_16_BIT);
     imx233_lcdif_set_byte_packing_format(0xf); /* two pixels per 32-bit word */
     imx233_lcdif_set_data_format(false, false, false); /* RGB565, don't care, don't care */
-    imx233_lcdif_dma_send(lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
-    imx233_lcdif_wait_ready();
+    lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
+                         LCD_WIDTH * LCD_HEIGHT, 1);
+    imx233_lcdif_dma_send(FRAME, LCD_WIDTH, LCD_HEIGHT);
 }
 
 void lcd_update_rect(int x, int y, int width, int height)

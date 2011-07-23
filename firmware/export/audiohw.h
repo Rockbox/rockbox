@@ -70,6 +70,8 @@
 #include "ak4537.h"
 #elif defined(HAVE_CS42L55)
 #include "cs42l55.h"
+#elif defined(HAVE_IMX233_CODEC)
+#include "imx233-codec.h"
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 /* #include <SDL_audio.h> gives errors in other code areas,

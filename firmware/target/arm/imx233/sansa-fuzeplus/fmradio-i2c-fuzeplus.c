@@ -85,22 +85,17 @@ struct i2c_interface fmradio_i2c =
     .delay_thigh = 4
 };
 
-void fmradio_i2c_init(void)
+void fmradio_i2c_enable(bool enable)
 {
+    if(fmradio_i2c_bus == -1)
+        fmradio_i2c_bus = i2c_add_node(&fmradio_i2c);
     imx233_set_pin_function(0, 29, PINCTRL_FUNCTION_GPIO);
     imx233_set_pin_function(1, 24, PINCTRL_FUNCTION_GPIO);
     imx233_set_pin_function(1, 22, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(1, 22, true);
-    imx233_enable_gpio_output(1, 24, true);
-    imx233_set_gpio_output(1, 22, true);
-    imx233_set_gpio_output(1, 24, true);
-    fmradio_i2c_bus = i2c_add_node(&fmradio_i2c);
-}
-
-void fmradio_i2c_enable(bool enable)
-{
-    imx233_enable_gpio_output(0, 29, enable);
-    imx233_set_gpio_output(0, 29, enable);
+    imx233_enable_gpio_output(1, 22, enable);
+    imx233_enable_gpio_output(1, 24, enable);
+    imx233_set_gpio_output(1, 22, enable);
+    imx233_set_gpio_output(1, 24, enable);
 }
 
 int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)

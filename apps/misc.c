@@ -528,7 +528,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
         case SYS_USB_CONNECTED:
             if (callback != NULL)
                 callback(parameter);
-#if (CONFIG_STORAGE & STORAGE_MMC)
+#if (CONFIG_STORAGE & STORAGE_MMC) && (defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM))
             if (!mmc_touched() ||
                 (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
 #endif

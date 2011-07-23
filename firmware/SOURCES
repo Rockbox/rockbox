@@ -269,6 +269,8 @@ drivers/rtc/rtc_s35390a.c
 drivers/rtc/rtc_s35380a.c
 #elif (CONFIG_RTC == RTC_D2)
 drivers/rtc/rtc_d2.c
+#elif (CONFIG_RTC == RTC_IMX233)
+drivers/rtc/rtc_imx233.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* PLATFORM_NATIVE */
 
@@ -490,6 +492,7 @@ target/arm/pnx0101/timer-pnx0101.c
 #endif
 
 #if CONFIG_CPU == IMX233
+target/arm/mmu-arm.S
 target/arm/imx233/lcdif-imx233.c
 target/arm/imx233/clkctrl-imx233.c
 target/arm/imx233/system-imx233.c
@@ -499,9 +502,15 @@ target/arm/imx233/kernel-imx233.c
 target/arm/imx233/sd-imx233.c
 target/arm/imx233/mmc-imx233.c
 target/arm/imx233/ssp-imx233.c
-target/arm/imx233/usb-imx233.c
 target/arm/imx233/dma-imx233.c
 target/arm/imx233/pinctrl-imx233.c
+target/arm/imx233/power-imx233.c
+target/arm/imx233/powermgmt-imx233.c
+target/arm/imx233/adc-imx233.c
+target/arm/imx233/debug-imx233.c
+#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
+target/arm/imx233/usb-imx233.c
+#endif
 #endif /* IMX233 */
 
 #if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2
@@ -1456,10 +1465,13 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #ifndef SIMULATOR
 drivers/synaptics-rmi.c
 drivers/generic_i2c.c
+target/arm/lcd-as-memframe.S
 target/arm/imx233/sansa-fuzeplus/fmradio-i2c-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/backlight-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c
+target/arm/imx233/sansa-fuzeplus/debug-fuzeplus.c
+target/arm/imx233/sansa-fuzeplus/power-fuzeplus.c
 #endif /* SIMULATOR */
 #endif
 

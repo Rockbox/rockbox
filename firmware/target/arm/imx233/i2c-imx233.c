@@ -53,7 +53,7 @@ void INT_I2C_DMA(void)
     semaphore_release(&i2c_sema);
 }
 
-void imx233_i2c_init(void)
+void i2c_init(void)
 {
     __REG_SET(HW_I2C_CTRL0) = __BLOCK_SFTRST | __BLOCK_CLKGATE;
     /* setup pins (must be done when shutdown) */

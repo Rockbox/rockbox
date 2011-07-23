@@ -325,7 +325,6 @@ void imx233_ssp_sd_mmc_power_up_sequence(int ssp)
 
 static int ssp_detect_oneshot_callback(int ssp)
 {
-    printf("ssp_detect_oneshot_callback(%d)", ssp);
     if(ssp_detect_cb[ssp - 1])
         ssp_detect_cb[ssp - 1](ssp);
 
