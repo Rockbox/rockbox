@@ -889,10 +889,10 @@ static bool view_battery(void)
                 if(probed_ramsize == 64)
                     x = (adc_read(ADC_4066_ISTAT) * 2400) / (1024 * 2);
                 else
+#endif
                     x = (adc_read(ADC_4066_ISTAT) * 2400) / (1024 * 3);
                 lcd_putsf(0, 8, "Ibat: %d mA", x);
                 lcd_putsf(0, 9, "Vbat * Ibat: %d mW", x * y / 1000);
-#endif
 #elif defined TOSHIBA_GIGABEAT_S
                 int line = 3;
                 unsigned int st;

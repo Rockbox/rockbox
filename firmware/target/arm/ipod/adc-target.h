@@ -24,7 +24,7 @@
 #define ADC_BATTERY 0
 #define ADC_ACCESSORY 1
 #define ADC_UNREG_POWER ADC_BATTERY
-#ifdef IPOD_VIDEO
+#if defined(IPOD_VIDEO) || defined(IPOD_NANO)
 #define ADC_4066_ISTAT 2
 #define NUM_ADC_CHANNELS 3
 #else

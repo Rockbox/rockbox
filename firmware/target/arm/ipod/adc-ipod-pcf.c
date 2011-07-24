@@ -87,7 +87,7 @@ void adc_init(void)
     adc_battery->timeout = 0;
     adcdata[ADC_ACCESSORY].channelnum = 4;
     adcdata[ADC_ACCESSORY].timeout = 0;
-#ifdef IPOD_VIDEO
+#if defined(IPOD_VIDEO) || defined(IPOD_NANO)
     adcdata[ADC_4066_ISTAT].channelnum = 7;
     adcdata[ADC_4066_ISTAT].timeout = 0;
 #endif

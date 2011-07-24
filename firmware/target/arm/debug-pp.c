@@ -124,7 +124,7 @@ bool dbg_ports(void)
 #ifdef ADC_ACCESSORY
         lcd_putsf(0, line++, "ACCESSORY: %d", adc_read(ADC_ACCESSORY));
 #endif
-#ifdef IPOD_VIDEO
+#if defined(IPOD_VIDEO) || defined(IPOD_NANO)
         lcd_putsf(0, line++, "4066_ISTAT: %d", adc_read(ADC_4066_ISTAT));
 #endif
 
