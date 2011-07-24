@@ -46,7 +46,6 @@ static struct mutex sd_mutex;
 static const char sd_thread_name[] = "sd";
 static struct event_queue sd_queue;
 static int sd_first_drive;
-static bool sd_initialized;
 static int last_disk_activity;
 
 static void sd_detect_callback(int ssp)
@@ -59,7 +58,6 @@ static void sd_detect_callback(int ssp)
         queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
     else
         queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
-    printf("sd_detect_callback(%d)", imx233_ssp_sdmmc_detect(SD_SSP));
     imx233_ssp_sdmmc_setup_detect(SD_SSP, true, sd_detect_callback);
 }
 
@@ -80,7 +78,6 @@ void sd_enable(bool on)
 
 static int sd_init_card(void)
 {
-    printf("sd_init_card");
     imx233_ssp_start(SD_SSP);
     imx233_ssp_softreset(SD_SSP);
     imx233_ssp_set_mode(SD_SSP, HW_SSP_CTRL1__SSP_MODE__SD_MMC);
@@ -120,7 +117,6 @@ static void sd_thread(void)
         case SYS_HOTSWAP_INSERTED:
         case SYS_HOTSWAP_EXTRACTED:
         {
-            int microsd_init = 1;
             fat_lock();          /* lock-out FAT activity first -
                                     prevent deadlocking via disk_mount that
                                     would cause a reverse-order attempt with
