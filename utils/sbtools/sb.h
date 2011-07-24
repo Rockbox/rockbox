@@ -23,6 +23,7 @@
 
 #define BLOCK_SIZE      16
 
+/* All fields are in big-endian BCD */
 struct sb_version_t
 {
     uint16_t major;

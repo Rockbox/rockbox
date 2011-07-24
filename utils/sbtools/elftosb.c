@@ -221,6 +221,8 @@ struct cmd_section_t
 
 struct cmd_file_t
 {
+    struct sb_version_t product_ver;
+    struct sb_version_t component_ver;
     struct cmd_source_t *source_list;
     struct cmd_section_t *section_list;
 };
@@ -449,6 +451,50 @@ static struct cmd_source_t *find_source_by_id(struct cmd_file_t *cmd_file, const
     return NULL;
 }
 
+static void generate_default_version(struct sb_version_t *ver)
+{
+    ver->major = 0x999;
+    ver->minor = 0x999;
+    ver->revision = 0x999;
+}
+
+static uint16_t parse_sb_subversion(char *str)
+{
+    int len = strlen(str);
+    uint16_t n = 0;
+    if(len == 0 || len > 4)
+        bug("invalid command file: invalid version string");
+    for(int i = 0; i < len; i++)
+    {
+        if(!isdigit(str[i]))
+            bug("invalid command file: invalid version string");
+        n = n << 4 | (str[i] - '0');
+    }
+    return n;
+}
+
+static void parse_sb_version(struct sb_version_t *ver, char *str)
+{
+    int len = strlen(str);
+    int cnt = 0;
+    int pos[2];
+
+    for(int i = 0; i < len; i++)
+    {
+        if(str[i] != '.')
+            continue;
+        if(cnt == 2)
+            bug("invalid command file: invalid version string");
+        pos[cnt++] = i + 1;
+        str[i] = 0;
+    }
+    if(cnt != 2)
+        bug("invalid command file: invalid version string");
+    ver->major = parse_sb_subversion(str);
+    ver->minor = parse_sb_subversion(str + pos[0]);
+    ver->revision = parse_sb_subversion(str + pos[1]);
+}
+
 static struct cmd_file_t *read_command_file(const char *file)
 {
     int size;
@@ -469,12 +515,52 @@ static struct cmd_file_t *read_command_file(const char *file)
     struct cmd_file_t *cmd_file = xmalloc(sizeof(struct cmd_file_t));
     memset(cmd_file, 0, sizeof(struct cmd_file_t));
 
+    generate_default_version(&cmd_file->product_ver);
+    generate_default_version(&cmd_file->component_ver);
+
     struct lexem_t lexem;
     char *p = buf;
     char *end = buf + size;
     #define next() next_lexem(&p, end, &lexem)
-    /* sources */
+    /* init lexer */
     next();
+    /* options ? */
+    if(lexem.type == LEX_IDENTIFIER && !strcmp(lexem.str, "options"))
+    {
+        next();
+        if(lexem.type != LEX_LBRACE)
+            bug("invalid command file: '{' expected after 'options'\n");
+
+        while(true)
+        {
+            next();
+            if(lexem.type == LEX_RBRACE)
+                break;
+            if(lexem.type != LEX_IDENTIFIER)
+                bug("invalid command file: identifier expected in options\n");
+            char *opt = lexem.str;
+            next();
+            if(lexem.type != LEX_EQUAL)
+                bug("invalid command file: '=' expected after identifier\n");
+            next();
+            if(!strcmp(opt, "productVersion") || !strcmp(opt, "componentVersion"))
+            {
+                if(lexem.type != LEX_STRING)
+                    bug("invalid command file: string expected after '='\n");
+                if(!strcmp(opt, "productVersion"))
+                    parse_sb_version(&cmd_file->product_ver, lexem.str);
+                else
+                    parse_sb_version(&cmd_file->component_ver, lexem.str);
+            }
+            else
+                bug("invalid command file: unknown option '%s'\n", opt);
+            next();
+            if(lexem.type != LEX_SEMICOLON)
+                bug("invalid command file: ';' expected after string\n");
+        }
+        next();
+    }
+    /* sources */
     if(lexem.type != LEX_IDENTIFIER || strcmp(lexem.str, "sources") != 0)
         bug("invalid command file: 'sources' expected\n");
     next();
@@ -686,6 +772,8 @@ struct sb_file_t
 {
     int nr_sections;
     struct sb_section_t *sections;
+    struct sb_version_t product_ver;
+    struct sb_version_t component_ver;
     /* for production use */
     uint32_t image_size; /* in blocks */
 };
@@ -759,6 +847,9 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
 {
     struct sb_file_t *sb = xmalloc(sizeof(struct sb_file_t));
     memset(sb, 0, sizeof(struct sb_file_t));
+
+    sb->product_ver = cmd_file->product_ver;
+    sb->component_ver = cmd_file->component_ver;
     
     if(g_debug)
         printf("Applying command file...\n");
@@ -972,14 +1063,16 @@ static uint64_t generate_timestamp()
     return (uint64_t)t * 1000000L;
 }
 
-void generate_version(struct sb_version_t *ver)
+static uint16_t swap16(uint16_t t)
 {
-    ver->major = 0x999;
-    ver->pad0 = 0;
-    ver->minor = 0x999;
-    ver->pad1 = 0;
-    ver->revision = 0x999;
-    ver->pad2 = 0;
+    return (t << 8) | (t >> 8);
+}
+
+static void fix_version(struct sb_version_t *ver)
+{
+    ver->major = swap16(ver->major);
+    ver->minor = swap16(ver->minor);
+    ver->revision = swap16(ver->revision);
 }
 
 static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
@@ -1006,8 +1099,10 @@ static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
     generate_random_data(sb_hdr->rand_pad0, sizeof(sb_hdr->rand_pad0));
     generate_random_data(sb_hdr->rand_pad1, sizeof(sb_hdr->rand_pad1));
     sb_hdr->timestamp = generate_timestamp();
-    generate_version(&sb_hdr->product_ver);
-    generate_version(&sb_hdr->component_ver);
+    sb_hdr->product_ver = sb->product_ver;
+    fix_version(&sb_hdr->product_ver);
+    sb_hdr->component_ver = sb->component_ver;
+    fix_version(&sb_hdr->component_ver);
     sb_hdr->drive_tag = 0;
 
     sha_1_init(&sha_1_params);
