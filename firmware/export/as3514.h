@@ -300,6 +300,10 @@ extern void audiohw_set_sampr_dividers(int fsel);
 
 /* AUDIOSET2 (15h) */
 #ifdef HAVE_AS3543
+#define AUDIOSET2_BIAS_on      (0x0 << 7)
+#define AUDIOSET2_BIAS_off      (0x1 << 7)
+#define AUDIOSET2_SUM_off      (0x1 << 6)
+#define AUDIOSET2_AGC_off       (0x1 << 5)
 #define AUDIOSET2_HPH_QUALITY_LOW_POWER (0x0 << 4)
 #define AUDIOSET2_HPH_QUALITY_HIGH      (0x1 << 4)
 #else

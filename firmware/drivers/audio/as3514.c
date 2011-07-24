@@ -151,7 +151,7 @@ void audiohw_preinit(void)
 #ifdef HAVE_AS3543
 
     as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_DAC_GAIN_on);
-    as3514_write(AS3514_AUDIOSET2, AUDIOSET2_HPH_QUALITY_LOW_POWER);
+    as3514_write(AS3514_AUDIOSET2, AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
     /* common ground on, delay playback unmuting when inserting headphones */
     as3514_write(AS3514_AUDIOSET3, AUDIOSET3_HPCM_on | AUDIOSET3_HP_LONGSTART);
 
