@@ -35,6 +35,13 @@
 #define APETAG_ITEM_HEADER_FORMAT   "ll"
 #define APETAG_ITEM_TYPE_MASK       3
 
+#ifdef HAVE_ALBUMART
+/* The AA header consists of the pseudo filename "Album Cover (Front).ext"
+ * whereas ".ext" is the file extension. For now ".jpg" and ".png" are
+ * supported by this APE metadata parser. Therefore the length is 22. */
+#define APETAG_AA_HEADER_LENGTH     22
+#endif
+
 struct apetag_header 
 {
     char id[8];
@@ -125,6 +132,43 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
             }
             else
             {
+#ifdef HAVE_ALBUMART
+                if (strcasecmp(name, "cover art (front)") == 0)
+                {
+                    /* Allow to read at least APETAG_AA_HEADER_LENGTH bytes. */
+                    r = read_string(fd, name, sizeof(name), 0, APETAG_AA_HEADER_LENGTH);
+                    if (r == -1)
+                    {
+                        return false;
+                    }
+
+                    /* Gather the album art format from the pseudo file name. */
+                    id3->albumart.type = AA_TYPE_UNKNOWN;
+                    if      (strcasecmp(name, "cover art (front).jpg") == 0)
+                    {
+                        id3->albumart.type = AA_TYPE_JPG;
+                    }
+                    else if (strcasecmp(name, "cover art (front).png") == 0)
+                    {
+                        id3->albumart.type = AA_TYPE_PNG;
+                    }
+
+                    /* Set the album art size and position. */
+                    if (id3->albumart.type != AA_TYPE_UNKNOWN)
+                    {
+                        id3->albumart.pos  = lseek(fd, 0, SEEK_CUR);
+                        id3->albumart.size = item.length - r;
+                        id3->embed_albumart = true;
+                    }
+                    
+                    /* Seek back to this APE items begin. */
+                    if (lseek(fd, -r, SEEK_CUR) < 0)
+                    {
+                        return false;
+                    }
+                }
+#endif
+                /* Seek to the next APE item. */
                 if (lseek(fd, item.length, SEEK_CUR) < 0)
                 {
                     return false;
