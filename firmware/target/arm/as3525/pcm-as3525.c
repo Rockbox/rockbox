@@ -337,10 +337,32 @@ static inline void mono2stereo(int16_t *end)
 }
 #endif /* CONFIG_CPU == AS3525 */
 
+#if CONFIG_CPU == AS3525v2
+/* scale microphone audio by 2 bits due to 14 bit ADC */
+static inline void scalevolume(int16_t *end, int size)
+{
+    if(audio_channels != 1) /* only for microphone */
+        return;
+
+    /* load pointer in a register and avoid updating it in each loop */
+    register int16_t *samples = end;
+
+    do {
+        *samples++ <<=2;  
+
+    } while(samples != end+size);
+
+}
+#endif /* CONFIG_CPU == AS3525v2 */
+
 static void rec_dma_callback(void)
 {
     if(rec_dma_transfer_size)
     {
+
+#if CONFIG_CPU == AS3525v2
+        scalevolume(AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr), rec_dma_transfer_size);
+#endif
         rec_dma_size -= rec_dma_transfer_size;
         rec_dma_start_addr += rec_dma_transfer_size;
 
