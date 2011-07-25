@@ -1986,19 +1986,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Durata per Riavvolgimento"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Durata per Riavvolgimento"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2239,6 +2236,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Costruzione database... %d trovato (OFF per uscire)"
@@ -2247,6 +2245,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Costruzione database... %d trovato (LEFT per uscire)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Costruzione database... %d trovato (PREV per uscire)"
     gogearsa9200: "Costruzione database... %d trovato (REW per uscire)"
+    archosplayer: "Costruzione database... %d trovato"
   </dest>
   <voice>
     *: "Elementi trovati per il database"
@@ -12659,5 +12658,75 @@
   </dest>
   <voice>
     *: "Solo In Cartelle Personalizzate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Riavvolgi in Pausa"
+  </dest>
+  <voice>
+    *: "Riavvolgi in Pausa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Imposta Come Cartella Catalogo Playlist"
+  </dest>
+  <voice>
+    *: "Imposta Come Cartella Catalogo Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Ripristina Cartella Catalogo Playlist"
+  </dest>
+  <voice>
+    *: "Ripristina Cartella Catalogo Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Playlist Corrente"
+  </dest>
+  <voice>
+    *: "Playlist Corrente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Salva Modifiche?"
+  </dest>
+  <voice>
+    *: "Salva Modifiche?"
   </voice>
 </phrase>
