@@ -212,7 +212,8 @@ int main (int argc, char **argv)
     {
         fclose(fp_in);
         fprintf(stderr, "error: can't read %s file header\n", in_filename);
-        fprintf(stderr, "read %d, expected %d\n", ret, sizeof(rkboot_info));
+        fprintf(stderr, "read %d, expected %lu\n",
+			ret, (unsigned long)sizeof(rkboot_info));
         return -2;
     }
 
