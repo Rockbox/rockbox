@@ -140,7 +140,8 @@ void ZipInstaller::downloadDone(bool error)
         // some room for operating (also includes calculation mistakes due to
         // cluster sizes on the player).
         if((qint64)Utils::filesystemFree(m_mountpoint)
-                < (zip.totalUncompressedSize() + 1000000)) {
+                < (zip.totalUncompressedSize(Utils::filesystemClusterSize(m_mountpoint))
+                        + 1000000)) {
             emit logItem(tr("Not enough disk space! Aborting."), LOGERROR);
             emit logProgress(1, 1);
             emit done(true);

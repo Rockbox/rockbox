@@ -205,7 +205,7 @@ bool ZipUtil::appendFileToArchive(QString& file, QString& basedir)
 
 
 //! @brief calculate total size of extracted files
-qint64 ZipUtil::totalUncompressedSize(void)
+qint64 ZipUtil::totalUncompressedSize(unsigned int clustersize)
 {
     qint64 uncompressed = 0;
 
@@ -214,10 +214,23 @@ qint64 ZipUtil::totalUncompressedSize(void)
         return -1;
     }
     int max = items.size();
-    for(int i = 0; i < max; ++i) {
-        uncompressed += items.at(i).uncompressedSize;
+    if(clustersize > 0) {
+        for(int i = 0; i < max; ++i) {
+            qint64 item = items.at(i).uncompressedSize;
+            uncompressed += (item + clustersize - (item % clustersize));
+        }
     }
-    qDebug() << "[ZipUtil] size of archive files uncompressed:" << uncompressed;
+    else {
+        for(int i = 0; i < max; ++i) {
+            uncompressed += items.at(i).uncompressedSize;
+        }
+    }
+    if(clustersize > 0) {
+        qDebug() << "[ZipUtil] calculation rounded to cluster size for each file:"
+                 << clustersize;
+    }
+    qDebug() << "[ZipUtil] size of archive files uncompressed:"
+             << uncompressed;
     return uncompressed;
 }
 

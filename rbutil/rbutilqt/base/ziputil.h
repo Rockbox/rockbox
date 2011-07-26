@@ -37,7 +37,7 @@ class ZipUtil : public QObject
         bool extractArchive(QString& dest);
         bool appendDirToArchive(QString& source, QString& basedir);
         bool appendFileToArchive(QString& file, QString& basedir);
-        qint64 totalUncompressedSize(void);
+        qint64 totalUncompressedSize(unsigned int clustersize = 0);
         QStringList files(void);
 
     signals:

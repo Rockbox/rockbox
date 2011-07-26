@@ -187,13 +187,25 @@ QString Utils::filesystemName(QString path)
 //! @return size in bytes
 qulonglong Utils::filesystemFree(QString path)
 {
-    return filesystemSize(path, FilesystemFree);
+    qulonglong size = filesystemSize(path, FilesystemFree);
+    qDebug() << "[Utils] free disk space for" << path << size;
+    return size;
 }
 
 
 qulonglong Utils::filesystemTotal(QString path)
 {
-    return filesystemSize(path, FilesystemTotal);
+    qulonglong size = filesystemSize(path, FilesystemTotal);
+    qDebug() << "[Utils] total disk space for" << path << size;
+    return size;
+}
+
+
+qulonglong Utils::filesystemClusterSize(QString path)
+{
+    qulonglong size = filesystemSize(path, FilesystemClusterSize);
+    qDebug() << "[Utils] cluster size for" << path << size;
+    return size;
 }
 
 
@@ -214,6 +226,9 @@ qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
         if(type == FilesystemTotal) {
             size = (qulonglong)fs.f_frsize * (qulonglong)fs.f_blocks;
         }
+        if(type == FilesystemClusterSize) {
+            size = (qulonglong)fs.f_frsize;
+        }
     }
 #endif
 #if defined(Q_OS_WIN32)
@@ -230,9 +245,19 @@ qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
         if(type == FilesystemTotal) {
             size = totalNumberBytes.QuadPart;
         }
+        if(type == FilesystemClusterSize) {
+            DWORD sectorsPerCluster;
+            DWORD bytesPerSector;
+            DWORD freeClusters;
+            DWORD totalClusters;
+            ret = GetDiskFreeSpaceW((LPCTSTR)path.utf16(), &sectorsPerCluster,
+                    &bytesPerSector, &freeClusters, &totalClusters);
+            if(ret) {
+                size = bytesPerSector * sectorsPerCluster;
+            }
+        }
     }
 #endif
-    qDebug() << "[Utils] Filesystem:" << path << size;
     return size;
 }
 
