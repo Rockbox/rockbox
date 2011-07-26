@@ -6510,16 +6510,16 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
   </source>
   <dest>
-    *: "Catalog liste de redare"
+    *: "Catalog liste redare"
   </dest>
   <voice>
-    *: "Catalog liste de redare"
+    *: "Catalog liste redare"
   </voice>
 </phrase>
 <phrase>
@@ -9646,7 +9646,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -12752,5 +12752,61 @@
   <voice>
     *: none
     histogram: "Interval histogramă "
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Listă redare curentă"
+  </dest>
+  <voice>
+    *: "Listă redare curentă"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Setare dosar pentru catalog liste redare"
+  </dest>
+  <voice>
+    *: "Setare dosar pentru catalog liste redare"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Salvare modificări?"
+  </dest>
+  <voice>
+    *: "Salvare modificări?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Resetare dosar pentru catalog liste redare"
+  </dest>
+  <voice>
+    *: "Resetare dosar pentru catalog liste redare"
   </voice>
 </phrase>
