@@ -485,11 +485,16 @@ change to customise your listening experience.
     \end{btnmap}
 
   \item[Pre-cut.]
-  If too much gain is added through the graphical EQ, your music may distort.
-  The \setting{Precut} setting allows you to adjust the overall gain of the EQ.
-
-  If your music distorts when using the EQ, trying changing this setting to a 
-  negative value.
+  If too much positive gain is added through the graphical EQ, your music may 
+  distort.  The \setting{Precut} setting allows you to apply a global negative
+  gain to decoded audio, cancelling out positive gain from the EQ.  This will
+  prevent distortion when boosting certain frequency ranges, at the expense of 
+  making audio quieter.
+  
+  Alternatively, precut can be used with a flat EQ curve to implement a volume
+  cap.  For example, on a player that allows overdriving the headphone output
+  to +6dB, maximum volume can be capped to +0dB by applying 6dB of precut. Note
+  that precut is not applied if EQ is disabled.  
 
 \item[Simple EQ.]
 This option provides an easier alternative for those who are daunted by all of
