@@ -2,6 +2,12 @@ metadata/metadata.c
 metadata/id3tags.c
 metadata/mp3.c
 metadata/mp3data.c
+#ifndef HAVE_ROCKBOX_FIXEDPOINT
+util/fixedpoint.c
+#endif
+#ifndef HAVE_STRLCPY
+util/strlcpy.c
+#endif
 #if CONFIG_CODEC == SWCODEC
 dsp/compressor.c
 dsp/dsp.c

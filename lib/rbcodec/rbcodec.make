@@ -5,6 +5,7 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 
+RBCODEC_CFLAGS += -I$(RBCODEC_DIR)/util
 RBCODEC_LIB = $(RBCODEC_BLD)/librbcodec.a
 RBCODEC_SRC := $(call preprocess, $(RBCODEC_DIR)/SOURCES, $(RBCODEC_CFLAGS) \
 	-imacros rbcodecconfig.h)

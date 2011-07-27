@@ -38,10 +38,9 @@ include ../rbcodec.make
 
 SRC = $(ROOTDIR)/firmware/buflib.c \
 	  $(ROOTDIR)/firmware/core_alloc.c \
-	  $(ROOTDIR)/firmware/common/strlcpy.c \
 	  $(ROOTDIR)/firmware/common/unicode.c \
 	  $(ROOTDIR)/firmware/common/structec.c \
-	  $(ROOTDIR)/apps/fixedpoint.c $(ROOTDIR)/uisimulator/common/io.c
+	  $(ROOTDIR)/uisimulator/common/io.c
 
 OBJ := $(SRC:.c=.o)
 OBJ := $(OBJ:.S=.o)

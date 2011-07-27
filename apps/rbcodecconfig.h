@@ -7,6 +7,9 @@
 #define RBCODEC_ENABLE_CHANNEL_MODES
 #endif
 
+#define HAVE_ROCKBOX_FIXEDPOINT
+#define HAVE_STRLCPY
+
 #ifndef __ASSEMBLER__
 
 /* NULL, offsetof, size_t */
