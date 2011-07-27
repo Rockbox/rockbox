@@ -421,7 +421,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -2232,12 +2232,13 @@
   desc: splash database building progress
   user: core
   <source>
-*: "Building database... %d found (OFF to return)"
+    *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Vytvářím databázi... %d nalezeno (OFF pro návrat)"
@@ -2246,7 +2247,8 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Vytvářím databázi... %d nalezeno (LEFT pro návrat)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Vytvářím databázi... %d nalezeno (PREV pro návrat)"
     gogearsa9200: "Vytvářím databázi.. %d nalezeno (REW pro návrat)"
-</dest>
+    archosplayer: "Vytvář. DB %d nalez."
+  </dest>
   <voice>
     *: "záznamů vytvořeno do databáze"
   </voice>
@@ -6461,7 +6463,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -12670,5 +12672,61 @@
   </dest>
   <voice>
     *: "Přetočit zpět při pauze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalog dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalog Directory"
+  </source>
+  <dest>
+    *: "Nastavit jako složku pro katalog playlistů"
+  </dest>
+  <voice>
+    *: "Nastavit jako složku pro katalog plejlistů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalog Directory"
+  </source>
+  <dest>
+    *: "Zrušit přiřazení složky pro katalog playlistů"
+  </dest>
+  <voice>
+    *: "Zrušit přiřazení složky pro katalog plejlistů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Aktuální playlist"
+  </dest>
+  <voice>
+    *: "Aktuální plejlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Uložit změny?"
+  </dest>
+  <voice>
+    *: "Uložit změny?"
   </voice>
 </phrase>
