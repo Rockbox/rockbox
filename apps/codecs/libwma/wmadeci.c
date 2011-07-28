@@ -621,7 +621,7 @@ static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len)
     int ix = 0;
 
     s->lsp_pow_m_table1 = &vlcbuf3[0];
-    s->lsp_pow_m_table2 = &vlcbuf3[VLCBUF3SIZE];
+    s->lsp_pow_m_table2 = &vlcbuf3[1<<LSP_POW_BITS];
 
     /*double check this later*/
     for(i=(1 << LSP_POW_BITS) - 1;i>=0;i--)
