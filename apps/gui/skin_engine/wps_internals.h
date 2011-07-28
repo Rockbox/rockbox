@@ -189,6 +189,7 @@ struct touchregion {
     short int width;         /* width */
     short int height;        /* height */
     bool reverse_bar;        /* if true 0% is the left or top */
+    bool allow_while_locked;
     enum {
         PRESS,               /* quick press only */
         LONG_PRESS,          /* Long press without repeat */
@@ -308,6 +309,7 @@ struct wps_data
 
 #ifdef HAVE_TOUCHSCREEN
     struct skin_token_list *touchregions;
+    bool touchscreen_locked;
 #endif
 #ifdef HAVE_ALBUMART
     struct skin_albumart *albumart;

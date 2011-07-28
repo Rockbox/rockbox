@@ -1378,6 +1378,10 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
 
         case SKIN_TOKEN_MAIN_HOLD:
+#ifdef HAVE_TOUCHSCREEN
+            if (data->touchscreen_locked)
+                return "t";
+#endif
 #ifdef HAS_BUTTON_HOLD
             if (button_hold())
 #else

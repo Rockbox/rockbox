@@ -72,6 +72,12 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
             regions = regions->next;
             continue;
         }
+        if (data->touchscreen_locked && 
+            (r->action != ACTION_TOUCH_SOFTLOCK && !r->allow_while_locked))
+        {
+            regions = regions->next;
+            continue;
+        }
         needs_repeat = r->press_length != PRESS;
         /* check if it's inside this viewport */
         if (viewport_point_within_vp(&(r->wvp->vp), x, y))
@@ -150,6 +156,10 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
         }
         switch (returncode)
         {
+            case ACTION_TOUCH_SOFTLOCK:
+                data->touchscreen_locked = !data->touchscreen_locked;
+                returncode = ACTION_NONE;
+                break;
             case ACTION_WPS_PLAY:
                 if (!audio_status())
                 {

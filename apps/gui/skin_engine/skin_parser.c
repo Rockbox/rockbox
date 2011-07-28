@@ -1039,7 +1039,7 @@ static int parse_lasttouch(struct skin_element *element,
 struct touchaction {const char* s; int action;};
 static const struct touchaction touchactions[] = {
     /* generic actions, convert to screen actions on use */
-    {"none", ACTION_TOUCHSCREEN},
+    {"none", ACTION_TOUCHSCREEN},       {"lock", ACTION_TOUCH_SOFTLOCK },
     {"prev", ACTION_STD_PREV },         {"next", ACTION_STD_NEXT },
     {"rwd", ACTION_STD_PREVREPEAT },    {"ffwd", ACTION_STD_NEXTREPEAT },
     {"hotkey", ACTION_STD_HOTKEY},      {"select", ACTION_STD_OK },
@@ -1122,17 +1122,23 @@ static int parse_touchregion(struct skin_element *element,
     region->value = 0;
     region->last_press = 0xffff;
     region->press_length = PRESS;
+    region->allow_while_locked = false;
     action = element->params[p++].data.text;
 
     strcpy(temp, action);
     action = temp;
     
-    if (*action == '!')
+    switch (*action)
     {
-        region->reverse_bar = true;
-        action++;
+        case '!':
+            region->reverse_bar = true;
+            action++;
+            break;
+        case '^':
+            action++;
+            region->allow_while_locked = true;
+            break;
     }
-
     if(!strcmp(pb_string, action))
         region->action = ACTION_TOUCH_SCROLLBAR;
     else if(!strcmp(vol_string, action))
