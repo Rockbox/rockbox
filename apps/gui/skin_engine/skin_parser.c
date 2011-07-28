@@ -1071,6 +1071,68 @@ static const struct touchaction touchactions[] = {
 #endif
 };
 
+static int touchregion_setup_setting(struct skin_element *element, int param_no,
+                                     struct touchregion *region)
+{
+    int p = param_no;
+    char *name = element->params[p++].data.text;
+    int j;
+    /* Find the setting */
+    for (j=0; j<nb_settings; j++)
+        if (settings[j].cfg_name &&
+            !strcmp(settings[j].cfg_name, name))
+            break;
+    if (j==nb_settings)
+        return WPS_ERROR_INVALID_PARAM;
+    region->setting_data.setting = (void*)&settings[j];
+    if (region->action == ACTION_SETTINGS_SET)
+    {
+        char* text;
+        int temp;
+        struct touchsetting *setting = 
+            &region->setting_data;
+        if (element->params_count < p+1)
+            return -1;
+#ifndef __PCTOOL__
+        text = element->params[p++].data.text;
+        switch (settings[j].flags&F_T_MASK)
+        {
+        case F_T_CUSTOM:
+            setting->value.text = text;
+            break;                              
+        case F_T_INT:
+        case F_T_UINT:
+            if (settings[j].cfg_vals == NULL)
+            {
+                setting->value.number = atoi(text);
+            }
+            else if (cfg_string_to_int(j, &temp, text))
+            {
+                if (settings[j].flags&F_TABLE_SETTING)
+                    setting->value.number = 
+                        settings[j].table_setting->values[temp];
+                else
+                    setting->value.number = temp;
+            }
+            else
+                return -1;
+            break;
+        case F_T_BOOL:
+            if (cfg_string_to_int(j, &temp, text))
+            {
+                setting->value.number = temp;
+            }
+            else
+                return -1;
+            break;
+        default:
+            return -1;
+        }
+#endif /* __PCTOOL__ */
+    }
+    return p-param_no;
+}
+
 static int parse_touchregion(struct skin_element *element,
                              struct wps_token *token,
                              struct wps_data *wps_data)
@@ -1082,7 +1144,6 @@ static int parse_touchregion(struct skin_element *element,
     const char *action;
     const char pb_string[] = "progressbar";
     const char vol_string[] = "volume";
-    char temp[20];
 
     /* format: %T([label,], x,y,width,height,action[, ...])
      * if action starts with & the area must be held to happen
@@ -1125,39 +1186,13 @@ static int parse_touchregion(struct skin_element *element,
     region->allow_while_locked = false;
     action = element->params[p++].data.text;
 
-    strcpy(temp, action);
-    action = temp;
-    
-    switch (*action)
-    {
-        case '!':
-            region->reverse_bar = true;
-            action++;
-            break;
-        case '^':
-            action++;
-            region->allow_while_locked = true;
-            break;
-    }
+    /* figure out the action */
     if(!strcmp(pb_string, action))
         region->action = ACTION_TOUCH_SCROLLBAR;
     else if(!strcmp(vol_string, action))
         region->action = ACTION_TOUCH_VOLUME;
     else
     {
-        if (*action == '*')
-        {
-            action++;
-            region->press_length = LONG_PRESS;
-        }
-        else if(*action == '&')
-        {
-            action++;
-            region->press_length = REPEAT;
-        }
-        else
-            region->press_length = PRESS;
-
         imax = ARRAYLEN(touchactions);
         for (i = 0; i < imax; i++)
         {
@@ -1169,74 +1204,31 @@ static int parse_touchregion(struct skin_element *element,
                     region->action == ACTION_SETTINGS_DEC ||
                     region->action == ACTION_SETTINGS_SET)
                 {
+                    int val;
                     if (element->params_count < p+1)
-                    {
                         return WPS_ERROR_INVALID_PARAM;
-                    }
-                    else
-                    {
-                        char *name = element->params[p].data.text;
-                        int j;
-                        /* Find the setting */
-                        for (j=0; j<nb_settings; j++)
-                            if (settings[j].cfg_name &&
-                                !strcmp(settings[j].cfg_name, name))
-                                break;
-                        if (j==nb_settings)
-                            return WPS_ERROR_INVALID_PARAM;
-                        region->setting_data.setting = (void*)&settings[j];
-                        if (region->action == ACTION_SETTINGS_SET)
-                        {
-                            char* text;
-                            int temp;
-                            struct touchsetting *setting = 
-                                &region->setting_data;
-                            if (element->params_count < p+2)
-                                return WPS_ERROR_INVALID_PARAM;
-#ifndef __PCTOOL__
-                            text = element->params[p+1].data.text;
-                            switch (settings[j].flags&F_T_MASK)
-                            {
-                            case F_T_CUSTOM:
-                                setting->value.text = text;
-                                break;                              
-                            case F_T_INT:
-                            case F_T_UINT:
-                                if (settings[j].cfg_vals == NULL)
-                                {
-                                    setting->value.number = atoi(text);
-                                }
-                                else if (cfg_string_to_int(j, &temp, text))
-                                {
-                                    if (settings[j].flags&F_TABLE_SETTING)
-                                        setting->value.number = 
-                                            settings[j].table_setting->values[temp];
-                                    else
-                                        setting->value.number = temp;
-                                }
-                                else
-                                    return WPS_ERROR_INVALID_PARAM;
-                                break;
-                            case F_T_BOOL:
-                                if (cfg_string_to_int(j, &temp, text))
-                                {
-                                    setting->value.number = temp;
-                                }
-                                else
-                                    return WPS_ERROR_INVALID_PARAM;
-                                break;
-                            default:
-                                return WPS_ERROR_INVALID_PARAM;
-                            }
-#endif /* __PCTOOL__ */
-                        }
-                    }
+                    val = touchregion_setup_setting(element, p, region);
+                    if (val < 0)
+                        return WPS_ERROR_INVALID_PARAM;
+                    p += val;
                 }
                 break;
             }
         }
         if (region->action == ACTION_NONE)
             return WPS_ERROR_INVALID_PARAM;
+    }
+    while (p < element->params_count)
+    {
+        char* param = element->params[p++].data.text;
+        if (!strcmp(param, "allow_while_locked"))
+            region->allow_while_locked = true;
+        else if (!strcmp(param, "reverse_bar"))
+            region->reverse_bar = true;
+        else if (!strcmp(param, "repeat_press"))
+            region->press_length = REPEAT;
+        else if (!strcmp(param, "long_press"))
+            region->press_length = LONG_PRESS;
     }
     struct skin_token_list *item = new_skin_token_list_item(NULL, region);
     if (!item)

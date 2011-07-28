@@ -81,7 +81,7 @@
 # playmode
 %?Tp<%?mp<%xd(F, 1)|%xd(F, 3)|%xd(F, 2)|%xd(F, 4)|%xd(F, 5)||||>|%xd(F, %mp)>
 %T(400,119,70,75,play)
-%T(400,119,70,75,&stop)
+%T(400,119,70,75,stop, repeat)
 
 #
 # popup osd menu
@@ -97,7 +97,7 @@
 #
 %V(0,720,150,75,-)
 %xd(H)%xd(I)
-%T(0,0,70,75,&rwd)
+%T(0,0,70,75,rwd, repeat)
 %T(0,0,70,75,prev)
-%T(70,0,70,75,&ffwd)
+%T(70,0,70,75,ffwd, repeat)
 %T(70,0,70,75,next)
