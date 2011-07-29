@@ -384,7 +384,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the info menu
+  desc: in the Rockbox Info screen
   user: core
   <source>
     *: "Version"
@@ -1335,25 +1335,29 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF за отказ"
+    mrobe500: "POWER за отказ"
     iriverh100,iriverh120,iriverh300: "STOP за отказ"
-    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU за отказ"
+    ipod*,sansac200*,mpiohd300: "MENU за отказ"
     iaudiox5,iaudiom5: "RECORD за отказ"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV за отказ"
     gigabeatfx: "POWER за отказ"
     mrobe100: "DISPLAY за отказ"
     gigabeats: "BACK за отказ"
+    gogearsa9200: "LEFT за отказ"
     vibe500: "CANCEL за отказ"
   </dest>
   <voice>
@@ -1998,7 +2002,7 @@
   </dest>
   <voice>
     *: none
-    radio: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -2100,11 +2104,11 @@
   user: core
   <source>
     *: none
-    swcodec: "Edit mode: %s"
+    swcodec: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
-    swcodec: "Rejim na redaktirane: %s"
+    swcodec: "Режим на редактиране: %s %s"
   </dest>
   <voice>
     *: none
@@ -2486,17 +2490,21 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Изграждане на базата данни...  намерени %d (OFF за връщане)"
     iriverh100,iriverh120,iriverh300: "Изграждане на базата данни...  намерени %d (STOP за връщане)"
     ipod*: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Изграждане на базата данни...  намерени %d (LEFT за връщане)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
+    gogearsa9200: "Изграждане на базата данни...  намерени %d (REW за връщане)"
+    archosplayer: "Изгр. на БД %d файла"
   </dest>
   <voice>
-    *: "entries found for database"
+    *: "намерени записа за базата данни"
   </voice>
 </phrase>
 <phrase>
@@ -2681,13 +2689,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
     *: "Разглеждане на темите"
   </dest>
   <voice>
-    *: ""
+    *: "Разглеждане на темите"
   </voice>
 </phrase>
 <phrase>
@@ -2879,15 +2887,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Cutoff"
   </source>
   <dest>
     *: none
-    swcodec: "Chestota na otriazvane"
+    swcodec: "Отрязване"
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "Честота на отрязване"
   </voice>
 </phrase>
 <phrase>
@@ -2924,15 +2932,15 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
-    remote: "Разглеждане на .rwps-файловете"
+    remote: "Отдалечен екран за възпроизвеждане"
   </dest>
   <voice>
     *: none
-    remote: ""
+    remote: "Отдалечен екран за възпроизвеждане"
   </voice>
 </phrase>
 <phrase>
@@ -4398,15 +4406,19 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Да"
+    cowond2*: "MENU или горе ляво = Да"
     iriverh100,iriverh120,iriverh300: "NAVI = Да"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Да"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Да"
+    mrobe500: "PLAY, POWER или горе дясно = Да"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Да"
   </dest>
@@ -4435,16 +4447,20 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Set"
+    gogearsa9200: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Запази"
+    mrobe500: "HEART = Запази"
     iriverh100,iriverh120,iriverh300: "NAVI = Запази"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Запази"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "SELECT = Запази"
+    gogearsa9200: "PLAY = Запази"
     vibe500: "OK = Запази"
     mpiohd300: "ENTER = Запази"
   </dest>
@@ -4517,15 +4533,15 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
-    swcodec: "Сила на бибиткането"
+    swcodec: "Пиукане при смяна на песен"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Пиукане при смяна на песен"
   </voice>
 </phrase>
 <phrase>
@@ -4831,6 +4847,8 @@
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
+    gigabeats: "BACK to abort"
+    gigabeatfx: "POWER to abort"
   </source>
   <dest>
     *: "OFF за отказ"
@@ -4838,13 +4856,11 @@
     ipod*: "PLAY/PAUSE за отказ"
     iaudiox5,iaudiom5: "Продължително PLAY за отказ"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV за отказ"
+    gigabeats: "BACK за отказ"
+    gigabeatfx: "POWER за отказ"
   </dest>
   <voice>
     *: ""
-    archosplayer,iriverh100,iriverh120,iriverh300: ""
-    ipod*: ""
-    iaudiox5,iaudiom5: ""
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -5854,13 +5870,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk mp3 клипче"
+    *: ".talk клип"
   </dest>
   <voice>
-    *: ""
+    *: ".talk клип"
   </voice>
 </phrase>
 <phrase>
@@ -5899,13 +5915,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
-    *: "Разглеждане на .wps-файловете"
+    *: "Екран за възпроизвеждане"
   </dest>
   <voice>
-    *: ""
+    *: "Екран за възпроизвеждане"
   </voice>
 </phrase>
 <phrase>
@@ -6313,7 +6329,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -7012,7 +7028,7 @@
     lcd_non-mono: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_non-mono: ""
   </voice>
 </phrase>
@@ -7401,19 +7417,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Продължителност на превъртането"
+    *: ""
   </dest>
   <voice>
     *: ""
-    headphone_detection: ""
   </voice>
 </phrase>
 <phrase>
@@ -7957,16 +7970,19 @@
   user: core
   <source>
     *: none
+    multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
+    multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
     archosondio*: "MMC:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    multivolume: "H D 1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
     archosondio*: "M M C"
   </voice>
@@ -9590,7 +9606,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -9599,7 +9615,7 @@
     *: "Плейлисти"
   </dest>
   <voice>
-    *: ""
+    *: "Плейлисти"
   </voice>
 </phrase>
 <phrase>
@@ -9876,7 +9892,7 @@
     lcd_non-mono: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_non-mono: ""
   </voice>
 </phrase>
@@ -10263,15 +10279,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Разглеждане на шрифтовете"
+    lcd_bitmap: "Шрифт"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Шрифт"
   </voice>
 </phrase>
 <phrase>
@@ -10839,5 +10855,1866 @@
   </dest>
   <voice>
     *: "Размер на файла"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Добави накрая разбъркано"
+  </dest>
+  <voice>
+    *: "Добави накрая разбъркано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_19200
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "19200"
+  </source>
+  <dest>
+    *: none
+    serial_port: "19200"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "19200"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "statusbar skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Забрани смяна на песен"
+  </dest>
+  <voice>
+    *: "Забрани смяна на песен"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Време за освобождаване"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Време за освобождаване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Текуща плейлиста"
+  </dest>
+  <voice>
+    *: "Текуща плейлиста"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Бутон за екрана за възпроизвеждане"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Бутон за екрана за възпроизвеждане"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Отдалечен радио екран"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Отдалечен радио екран"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Праг"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Праг"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_SPEAKER
+  desc: in Settings -> Sound Settings
+  user: core
+  <source>
+    *: none
+    speaker: "Enable Speaker"
+  </source>
+  <dest>
+    *: none
+    speaker: "Разреши говорителя"
+  </dest>
+  <voice>
+    *: none
+    speaker: "Разреши говорителя"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Лента %d Усилване"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Лента Усилване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Усилване"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Усилване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Основен скин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Основен скин"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFTRIGHT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: none
+    recording_swcodec: "Mono Left + Right"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Моно ляво+дясно"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Моно ляво и дясно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Line Out"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Line Out"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "Interpret numbers when sorting"
+  </source>
+  <dest>
+    *: "Използвай номера при сортиране"
+  </dest>
+  <voice>
+    *: "Използвай номера при сортиране"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "скин за радио екран"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Широк"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Широк"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Автоматично възобновяване"
+  </dest>
+  <voice>
+    *: "Автоматично възобновяване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Позиция на скролбар-а"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Позиция на скролбар-а"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Отдалечена статус лента"
+  </dest>
+  <voice>
+    *: none
+    remote: "Отдалечена статус лента"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Serial Bitrate"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Сериен битрейт"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Сериен битрейт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_9600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "9600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "9600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "9600"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    remote: ""
+  </source>
+  <dest>
+    *: none
+    remote: ""
+  </dest>
+  <voice>
+    *: none
+    remote: "скин за отдалечена статус лента"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Рязкост"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Рязкост"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Автоматично"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Автоматично"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Обновяване при спиране"
+  </dest>
+  <voice>
+    *: "Обновяване при спиране"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Left Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Задай за ляв обект"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Задай за ляв обект"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Възобновяване при автоматична смяна на песен"
+  </dest>
+  <voice>
+    *: "Възобновяване при автоматична смяна на песен"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_SETTING
+  desc: used in the settings context menu
+  user: core
+  <source>
+    *: "Reset Setting"
+  </source>
+  <dest>
+    *: "Нулиране на настройката"
+  </dest>
+  <voice>
+    *: "Нулиране на настройката"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Вмъкни накрая разбъркано"
+  </dest>
+  <voice>
+    *: "Вмъкни накрая разбъркано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Плавно"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Плавно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Абсолютна точка"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Абсолютна точка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Следваща:"
+  </dest>
+  <voice>
+    *: "Следваща:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Коефицент"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Коефицент"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Изтрий"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Изтрий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Режим USB клавиатура"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Режим USB клавиатура"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOTTOM_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Bottom Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Задай за долен обект"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Задай за долен обект"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Рязко"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Рязко"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Задай за горен обект"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Задай за горен обект"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Темпо"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Темпо"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Отдалечен основен скин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Отдалечен основен скин"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Браузър"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Браузър"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "USB Human Interface Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right'
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Дясно"
+  </dest>
+  <voice>
+    *: "Дясно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Задай като директория за каталога на плейлисти"
+  </dest>
+  <voice>
+    *: "Задай като директория за каталога на плейлисти"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc:
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Полутон"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Полутон"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "скин за отдалечен радио екран"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Отдалечен екран"
+  </dest>
+  <voice>
+    *: none
+    remote: "Отдалечен екран"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Стесняване"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Стесняване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Друг"
+  </dest>
+  <voice>
+    *: none
+    radio: "Друг"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Бутон за файловия браузър"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Бутон за файловия браузър"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Ограничение"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Ограничение"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Превъртане преди възобновяване"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Превъртане преди възобновяване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Запазване на промените?"
+  </dest>
+  <voice>
+    *: "Запазване на промените?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Не е въведено>"
+  </dest>
+  <voice>
+    *: "Не е въведено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Италия"
+  </dest>
+  <voice>
+    *: none
+    radio: "Италия"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Калибриране"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Калибриране"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Превъртане при пауза"
+  </dest>
+  <voice>
+    *: "Превъртане при пауза"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Right Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Задай за десен обект"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Задай за десен обект"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_38400
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "38400"
+  </source>
+  <dest>
+    *: none
+    serial_port: "38400"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "38400"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_57600
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "57600"
+  </source>
+  <dest>
+    *: none
+    serial_port: "57600"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "57600"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 към 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Въвеждане с Морзов код"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Въвеждане с Морзов код"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Допълнителни настройки на тоновете"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Допълнителни настройки на тоновете"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Нулиране на калибрирането"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Нулиране на калибрирането"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    gigabeats,mpiohd200,mpiohd300: "3-D усилване"
+  </dest>
+  <voice>
+    *: none
+    gigabeats,mpiohd200,mpiohd300: "3-D усилване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Отказ"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Отказ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Композитор"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_NUMBERS
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As whole numbers"
+  </source>
+  <dest>
+    *: "Като цели числа"
+  </dest>
+  <voice>
+    *: "Като цели числа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Отваряй файловия браузър в /"
+  </dest>
+  <voice>
+    *: "Отваряй файловия браузър в /"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 към 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Лента %d Честота"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Лента Честота"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Сила на сигнала:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Сила на сигнала:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Лента %d Ширина"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Лента Ширина"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Мишка"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Мишка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREDITS
+  desc: in the Main Menu -> System screen
+  user: core
+  <source>
+    *: "Credits"
+  </source>
+  <dest>
+    *: "Създатели"
+  </dest>
+  <voice>
+    *: "Създатели"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "3x3 мрежа"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "3 по 3 мрежа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ограничение"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ограничение"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Мултимедиа"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Мултимедиа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Потребителски"
+  </dest>
+  <voice>
+    *: "Потребителски"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ширина на скролбара"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ширина на скролбара"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Тъчскрийн режим"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Тъчскрийн режим"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Станция:"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: how much RAM the skins are using
+  user: core
+  <source>
+    *: "Skin RAM usage:"
+  </source>
+  <dest>
+    *: "Използвана RAM от скина:"
+  </dest>
+  <voice>
+    *: "Използвана RAM от скина"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Превърти до края"
+  </dest>
+  <voice>
+    *: "Превърти до края"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "Радио екран"
+  </dest>
+  <voice>
+    *: none
+    radio: "Радио екран"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Само при автоматична смяна на песен"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Само при автоматична смяна на песен"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Долу"
+  </dest>
+  <voice>
+    *: "Долу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Промяна на продължителността"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Промяна на продължителността"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 към 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Основен екран"
+  </dest>
+  <voice>
+    *: none
+    remote: "Основен екран"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "отвори picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_RESULTS
+  desc: title for the list of results displayed after searching in a playlist
+  user: core
+  <source>
+    *: "Search Results"
+  </source>
+  <dest>
+    *: "Резултати от търсенето"
+  </dest>
+  <voice>
+    *: "Резултати от търсенето"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Форсиране"
+  </dest>
+  <voice>
+    *: "Форсиране"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_INTERPRET_AS_DIGIT
+  desc: in Settings -> File view
+  user: core
+  <source>
+    *: "As digits"
+  </source>
+  <dest>
+    *: "Като цифри"
+  </dest>
+  <voice>
+    *: "Като цифри"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MONO_MODE
+  desc: in the recording settings
+  user: core
+  <source>
+    *: none
+    recording_swcodec: "Mono mode"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Моно режим"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Моно режим"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Compressor"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Компресор"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Компресор"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Нулирай директорията за каталога на плейлисти"
+  </dest>
+  <voice>
+    *: "Нулирай директорията за каталога на плейлисти"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats: "Настройки на тона"
+  </dest>
+  <voice>
+    *: none
+    gigabeats: "Настройки на тона"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Бутон"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Бутон"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    histogram: "Интервал на хистограмата"
+  </dest>
+  <voice>
+    *: none
+    histogram: "Интервал на хистограмата"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Ляв"
+  </dest>
+  <voice>
+    *: "Ляв"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Настройки на тъчскрийна"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Настройки на тъчскрийна"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Горе"
+  </dest>
+  <voice>
+    *: "Горе"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Скорост"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Скорост"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Следваща песен:"
+  </dest>
+  <voice>
+    *: "Следваща песен:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 към 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Само в потребителски директории"
+  </dest>
+  <voice>
+    *: "Само в потребителски директории"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Презентация"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Презентация"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_BITRATE_AUTO
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Auto"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Авто"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Автоматично"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "от"
+  </dest>
+  <voice>
+    *: "от"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Отваряй файловия браузър тук"
+  </dest>
+  <voice>
+    *: "Отваряй файловия браузър тук"
   </voice>
 </phrase>
