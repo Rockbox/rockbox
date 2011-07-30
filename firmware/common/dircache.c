@@ -336,9 +336,12 @@ static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce
 #ifdef HAVE_MULTIVOLUME
     if (volume > 0)
     {
-        ce->d_name = (d_names_start -= sizeof(VOL_NAMES));
-        size_t len = snprintf(ce->d_name, VOL_ENUM_POS + 3, VOL_NAMES, volume)+1;
-        dircache_size += len;
+        /* broken for 100+ volumes because the format string is too small
+         * and we use that for size calculation */
+        const size_t max_len = VOL_ENUM_POS + 3;
+        ce->d_name = (d_names_start -= max_len);
+        snprintf(ce->d_name, max_len, VOL_NAMES, volume);
+        dircache_size += max_len;
         ce->info.attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
         ce->info.size = 0;
         append_position = dircache_gen_next(ce);
@@ -844,8 +847,7 @@ int dircache_build(int last_size)
         allocated_size = last_size + DIRCACHE_RESERVE;
         dircache_root = buffer_alloc(allocated_size);
         ALIGN_BUFFER(dircache_root, allocated_size, sizeof(struct dircache_entry));
-        d_names_start =
-        d_names_end = ((char*)dircache_root)+allocated_size-1;
+        d_names_start = d_names_end = ((char*)dircache_root)+allocated_size-1;
         dircache_size = 0;
         thread_enabled = true;
         generate_dot_d_names();
@@ -873,12 +875,13 @@ int dircache_build(int last_size)
 
     /* now compact the dircache buffer */
     char* dst = ((char*)&dircache_root[entry_count] + DIRCACHE_RESERVE);
-    ptrdiff_t offset = d_names_start - dst, size_to_move;
+    ptrdiff_t offset = d_names_start - dst;
     if (offset <= 0) /* something went wrong */
         return -1;
 
-    /* memmove d_names down, there's a possibility of overlap */
-    size_to_move = dircache_size - entry_count*sizeof(struct dircache_entry);
+    /* memmove d_names down, there's a possibility of overlap
+     * equivaent to dircache_size - entry_count*sizeof(struct dircache_entry) */
+    ptrdiff_t size_to_move = d_names_end - d_names_start;
     memmove(dst, d_names_start, size_to_move);
     
     /* fix up pointers to the d_names */
@@ -887,6 +890,8 @@ int dircache_build(int last_size)
 
     d_names_start -= offset;
     d_names_end -= offset;
+    dot -= offset;
+    dotdot -= offset;
     
     /* equivalent to dircache_size + DIRCACHE_RESERVE */
     allocated_size = (d_names_end - (char*)dircache_root);
