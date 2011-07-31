@@ -1074,9 +1074,9 @@ static bool show_search_progress(bool init, int count)
 static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
                       char *buf, int buf_size)
 {
-    char fmtbuf[8];
+    char fmtbuf[20];
     bool read_format = false;
-    int fmtbuf_pos = 0;
+    unsigned fmtbuf_pos = 0;
     int parpos = 0;
     int buf_pos = 0;
     int i;
@@ -1097,47 +1097,67 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
         
         if (read_format)
         {
-            fmtbuf[fmtbuf_pos++] = fmt->formatstr[i];
-            if (fmtbuf_pos >= buf_size)
+            char formatchar = fmt->formatstr[i];
+
+            fmtbuf[fmtbuf_pos++] = formatchar;
+            if (fmtbuf_pos >= sizeof fmtbuf)
             {
                 logf("format parse error");
                 return -2;
             }
-            
-            if (fmt->formatstr[i] == 's')
+
+            if (formatchar == 's' || formatchar == 'd')
             {
+                unsigned space_left = buf_size - buf_pos;
+                char tmpbuf[space_left + 1];
+                char *result;
+
                 fmtbuf[fmtbuf_pos] = '\0';
                 read_format = false;
-                if (fmt->tags[parpos] == tcs->type)
+
+                switch (formatchar)
                 {
-                    snprintf(&buf[buf_pos], buf_size - buf_pos, fmtbuf, tcs->result);
-                }
-                else
-                {
-                    /* Need to fetch the tag data. */
-                    if (!tagcache_retrieve(tcs, tcs->idx_id, fmt->tags[parpos],
-                                           &buf[buf_pos], buf_size - buf_pos))
+                case 's':
+                    if (fmt->tags[parpos] == tcs->type)
                     {
-                        logf("retrieve failed");
-                        return -3;
+                        result = tcs->result;
                     }
+                    else
+                    {
+                        /* Need to fetch the tag data. */
+                        int tag = fmt->tags[parpos];
+
+                        if (!tagcache_retrieve(tcs, tcs->idx_id,
+                                               (tag == tag_virt_basename ?
+                                                tag_filename : tag),
+                                               tmpbuf, space_left))
+                        {
+                            logf("retrieve failed");
+                            return -3;
+                        }
+
+                        if (tag == tag_virt_basename
+                            && (result = strrchr(tmpbuf, '/')) != NULL)
+                        {
+                            result++;
+                        }
+                        else
+                            result = tmpbuf;
+                    }
+                    snprintf(&buf[buf_pos], space_left, fmtbuf, result);
+                    break;
+
+                case 'd':
+                    snprintf(&buf[buf_pos], space_left, fmtbuf,
+                             tagcache_get_numeric(tcs, fmt->tags[parpos]));
                 }
+
                 buf_pos += strlen(&buf[buf_pos]);
                 parpos++;
             }
-            else if (fmt->formatstr[i] == 'd')
-            {
-                fmtbuf[fmtbuf_pos] = '\0';
-                read_format = false;
-                snprintf(&buf[buf_pos], buf_size - buf_pos, fmtbuf,
-                         tagcache_get_numeric(tcs, fmt->tags[parpos]));
-                buf_pos += strlen(&buf[buf_pos]);
-                parpos++;
-            }
-            continue;
         }
-        
-        buf[buf_pos++] = fmt->formatstr[i];
+        else
+            buf[buf_pos++] = fmt->formatstr[i];
         
         if (buf_pos - 1 >= buf_size)
         {
