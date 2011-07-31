@@ -871,6 +871,10 @@ static long check_virtual_tags(int tag, int idx_id,
                    - find_tag(tag_commitid, idx_id, idx) - 1;
             break;
         
+        case tag_virt_basename:
+            tag = tag_filename; /* return filename; caller handles basename */
+            /* FALLTHRU */
+
         default:
             data = find_tag(tag, idx_id, idx);
     }
@@ -1011,7 +1015,8 @@ static bool check_clauses(struct tagcache_search *tcs,
             
             if (!TAGCACHE_IS_NUMERIC(clause->tag))
             {
-                if (clause->tag == tag_filename)
+                if (clause->tag == tag_filename
+                    || clause->tag == tag_virt_basename)
                 {
                     retrieve(tcs, idx, tag_filename, buf, sizeof buf);
                 }
@@ -1029,7 +1034,11 @@ static bool check_clauses(struct tagcache_search *tcs,
             
             if (!TAGCACHE_IS_NUMERIC(clause->tag))
             {
-                int fd = tcs->idxfd[clause->tag];
+                int tag = clause->tag;
+                if (tag == tag_virt_basename)
+                    tag = tag_filename;
+
+                int fd = tcs->idxfd[tag];
                 lseek(fd, seek, SEEK_SET);
                 ecread_tagfile_entry(fd, &tfe);
                 if (tfe.tag_length >= (int)sizeof(buf))
@@ -1045,6 +1054,13 @@ static bool check_clauses(struct tagcache_search *tcs,
                 if (str[0] == '\0')
                     return false;
             }
+        }
+
+        if (clause->tag == tag_virt_basename)
+        {
+            char *basename = strrchr(str, '/');
+            if (basename)
+                str = basename + 1;
         }
 
         if (!check_against_clause(seek, str, clause))

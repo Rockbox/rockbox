@@ -238,6 +238,7 @@ static int get_tag(int *tag)
         {"Ps", tag_virt_playtime_sec},
         {"title", tag_title},
         {"filename", tag_filename},
+        {"basename", tag_virt_basename},
         {"tracknum", tag_tracknumber},
         {"discnum", tag_discnumber},
         {"year", tag_year},

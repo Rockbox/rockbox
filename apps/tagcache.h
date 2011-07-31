@@ -36,7 +36,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     /* Real tags end here, count them. */
     TAG_COUNT,
     /* Virtual tags */
-    tag_virt_length_min, tag_virt_length_sec,
+    tag_virt_basename, tag_virt_length_min, tag_virt_length_sec,
     tag_virt_playtime_min, tag_virt_playtime_sec,
     tag_virt_entryage, tag_virt_autoscore };
 
@@ -106,7 +106,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     (1LU << tag_tracknumber) | (1LU << tag_length) | (1LU << tag_bitrate) | \
     (1LU << tag_playcount) | (1LU << tag_rating) | (1LU << tag_playtime) | \
     (1LU << tag_lastplayed) | (1LU << tag_commitid) | (1LU << tag_mtime) | \
-    (1LU << tag_lastoffset) | \
+    (1LU << tag_lastoffset) | (1LU << tag_virt_basename) | \
     (1LU << tag_virt_length_min) | (1LU << tag_virt_length_sec) | \
     (1LU << tag_virt_playtime_min) | (1LU << tag_virt_playtime_sec) | \
     (1LU << tag_virt_entryage) | (1LU << tag_virt_autoscore))
