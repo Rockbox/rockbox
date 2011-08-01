@@ -495,11 +495,6 @@ int read_bmp_fd(int fd,
 
 #ifdef HAVE_REMOTE_LCD
     bool remote = false;
-    /* Thanks to the mass of #ifdefs in this function, there are cases where
-     * remote is never read, so we need to suppress the resulting warnings
-     * (or rewrite the lot)*/
-    (void)remote;
-
     if (format & FORMAT_REMOTE) {
         remote = true;
 #if LCD_REMOTE_DEPTH == 1
@@ -863,5 +858,11 @@ int read_bmp_fd(int fd,
         }
 #endif
     }
+#ifdef HAVE_REMOTE_LCD
+    /* Thanks to the mass of #ifdefs in this function, there are cases where
+     * remote is never read, so we need to suppress the resulting warnings
+     * (or rewrite the lot)*/
+    (void)remote;
+#endif
     return totalsize; /* return the used buffer size. */
 }
