@@ -3796,8 +3796,4 @@ void audio_init(void)
 #endif
     codec_thread_resume();
     thread_thaw(audio_thread_id);
-
-    /* Load the old playlist, to ensure that behaviour with and without
-     * rebooting is consistent */
-    playlist_resume();
 }

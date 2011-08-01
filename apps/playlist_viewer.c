@@ -278,7 +278,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     size_t buffer_size;
     bool is_playing = audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE);
     bool have_list = filename || is_playing;
-    if (!have_list)
+    if (!have_list && (global_status.resume_index != -1))
     {
         /* Try to restore the list from control file */
         have_list = (playlist_resume() != -1);
