@@ -88,8 +88,6 @@ static struct gui_buttonbar tree_buttonbar;
 #endif
 static struct tree_context tc;
 
-bool boot_changed = false;
-
 char lastfile[MAX_PATH];
 static char lastdir[MAX_PATH];
 #ifdef HAVE_TAGCACHE
@@ -655,16 +653,7 @@ static int dirbrowse(void)
         bool restore = false;
         if (tc.dirlevel < 0)
             tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
-#ifdef BOOTFILE
-        if (boot_changed) {
-            static const char *lines[]={ID2P(LANG_BOOT_CHANGED), ID2P(LANG_REBOOT_NOW)};
-            static const struct text_message message={lines, 2};
-            if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
-                rolo_load("/" BOOTFILE);
-            restore = true;
-            boot_changed = false;
-        }
-#endif
+
         button = get_action(CONTEXT_TREE,
                             list_do_action_timeout(&tree_lists, HZ/2));
         oldbutton = button;
