@@ -258,7 +258,7 @@ int scrobbler_init(void)
     return 1;
 }
 
-void scrobbler_flush_cache(void)
+static void scrobbler_flush_cache(void)
 {
     if (scrobbler_initialised)
     {
