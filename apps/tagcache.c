@@ -503,7 +503,7 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
             return -3;
         }
         
-        if (!strcasecmp(filename, buf))
+        if (!strcmp(filename, buf))
         {
             last_pos = pos_history[pos_history_idx];
             found = true;
