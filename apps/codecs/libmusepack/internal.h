@@ -88,12 +88,12 @@ struct mpc_demux_t {
 /**
  * checks if a block key is valid
  * @param key the two caracters key to check
- * @return MPC_STATUS_INVALIDSV if the key is invalid, MPC_STATUS_OK else
+ * @return MPC_STATUS_FAIL if the key is invalid, MPC_STATUS_OK else
  */
 static mpc_inline mpc_status mpc_check_key(char * key)
 {
     if (key[0] < 65 || key[0] > 90 || key[1] < 65 || key[1] > 90)
-        return MPC_STATUS_INVALIDSV;
+        return MPC_STATUS_FAIL;
     return MPC_STATUS_OK;
 }
 
@@ -113,6 +113,9 @@ void  streaminfo_gain(mpc_streaminfo* si, const mpc_bits_reader * r_in);
 
 // mpc_decoder.c
 void mpc_decoder_reset_scf(mpc_decoder * d, int value);
+
+#define MPC_IS_FAILURE(X) ((int)(X) < (int)MPC_STATUS_OK)
+#define MPC_AUTO_FAIL(X) { mpc_status s = (X); if (MPC_IS_FAILURE(s)) return s; }
 
 #ifdef __cplusplus
 }

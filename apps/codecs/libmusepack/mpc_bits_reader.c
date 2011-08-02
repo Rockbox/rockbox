@@ -136,6 +136,8 @@ mpc_int32_t mpc_bits_golomb_dec(mpc_bits_reader * r, const mpc_uint_t k)
 mpc_uint32_t mpc_bits_log_dec(mpc_bits_reader * r, mpc_uint_t max)
 {
     mpc_uint32_t value = 0;
+	if (max == 0)
+		return 0;
     if (log2[max - 1] > 1)
         value = mpc_bits_read(r, log2[max - 1] - 1);
     if (value >= log2_lost[max - 1])

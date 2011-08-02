@@ -101,8 +101,8 @@ mpc_get_encoder_string(mpc_streaminfo* si)
 static mpc_status check_streaminfo(mpc_streaminfo * si)
 {
     if (si->max_band == 0 || si->max_band >= 32
-        || si->channels > 2)
-        return MPC_STATUS_FILE;
+        || si->channels > 2 || si->channels == 0 || si->sample_freq == 0)
+        return MPC_STATUS_FAIL;
     return MPC_STATUS_OK;
 }
 
@@ -160,6 +160,7 @@ streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r)
 */
 
     if (last_frame_samples == 0) last_frame_samples = MPC_FRAME_LENGTH;
+    else if (last_frame_samples > MPC_FRAME_LENGTH) return MPC_STATUS_FAIL;
     si->samples = (mpc_int64_t) frames * MPC_FRAME_LENGTH;
     if (si->is_true_gapless)
         si->samples -= (MPC_FRAME_LENGTH - last_frame_samples);
@@ -196,11 +197,11 @@ streaminfo_read_header_sv8(mpc_streaminfo* si, const mpc_bits_reader * r_in,
 
     CRC = (mpc_bits_read(&r, 16) << 16) | mpc_bits_read(&r, 16);
     if (CRC != mpc_crc32(r.buff + 1 - (r.count >> 3), (int)block_size - 4))
-        return MPC_STATUS_FILE;
+        return MPC_STATUS_FAIL;
 
     si->stream_version = mpc_bits_read(&r, 8);
     if (si->stream_version != 8)
-        return MPC_STATUS_INVALIDSV;
+        return MPC_STATUS_FAIL;
 
     mpc_bits_get_size(&r, &si->samples);
     mpc_bits_get_size(&r, &si->beg_silence);

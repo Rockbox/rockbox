@@ -610,7 +610,7 @@ static void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r,
         }
 
         if (d->ms) {
-            int cnt = 0, tot = 0;
+            mpc_uint_t cnt = 0, tot = 0;
             mpc_uint32_t tmp = 0;
             for( n = 0; n < Max_used_Band; n++)
                 if ( d->Res_L[n] != 0 || d->Res_R[n] != 0 )
@@ -687,10 +687,10 @@ static void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r,
     /***************************** Samples ****************************/
     for ( n = 0; n < Max_used_Band; n++ ) {
         mpc_int16_t *q = d->Q[n].L, Res = d->Res_L[n];
-        static const int thres[] = {0, 0, 3, 0, 0, 1, 3, 4, 8};
+        static const mpc_uint32_t thres[] = {0, 0, 3, 0, 0, 1, 3, 4, 8};
         do {
             mpc_uint32_t nbit;
-            mpc_int32_t k = 0, idx = 1, dc;
+            mpc_uint32_t k = 0, idx = 1, dc;
             if (Res != 0) {
                 if (Res == 2) {
                     Tables[0] = & mpc_can_Q [0][0];
@@ -706,7 +706,7 @@ static void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r,
                 } else if (Res == 1) {
                     Table = & mpc_can_Q1;
                     for( ; k < 36; ){
-                        int kmax = k + 18;
+                        mpc_uint32_t kmax = k + 18;
                         mpc_uint_t cnt = mpc_bits_can_dec(r, Table);
                         idx = 0;
                         if (cnt > 0 && cnt < 18)

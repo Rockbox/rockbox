@@ -88,13 +88,10 @@ typedef struct mpc_quantizer {
 
 /// Libmpcdec error codes
 typedef enum mpc_status {
+	// Success.
     MPC_STATUS_OK        =  0,
-    MPC_STATUS_FILE      = -1,
-    MPC_STATUS_SV7BETA   = -2,
-    MPC_STATUS_CBR       = -3,
-    MPC_STATUS_IS        = -4,
-    MPC_STATUS_BLOCKSIZE = -5,
-    MPC_STATUS_INVALIDSV = -6
+	// Generic failure (I/O error or invalid file).
+    MPC_STATUS_FAIL      = -1
 } mpc_status;
 
 #define MPC_FIXED_POINT
