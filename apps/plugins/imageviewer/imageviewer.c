@@ -136,7 +136,7 @@ static enum image_type image_type = IMAGE_UNKNOWN;
 static void get_pic_list(void)
 {
     struct tree_context *tree = rb->tree_get_context();
-    struct entry *dircache = tree->dircache;
+    struct entry *dircache = tree->cache.entries;
     int i;
     char *pname;
 

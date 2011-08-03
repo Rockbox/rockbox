@@ -104,6 +104,12 @@ static int ft_play_dirname(char* name);
 static void ft_play_filename(char *dir, char *file);
 static void say_filetype(int attr);
 
+static struct entry* get_entry_at(struct tree_context *t, int index)
+{
+    struct entry* entries = t->cache.entries;
+    return &entries[index];
+}
+
 static const char* tree_get_filename(int selected_item, void *data,
                                      char *buffer, size_t buffer_len)
 {
@@ -121,8 +127,7 @@ static const char* tree_get_filename(int selected_item, void *data,
     else 
 #endif
     {
-        struct entry* dc = local_tc->dircache;
-        struct entry* e = &dc[selected_item];
+        struct entry* e = get_entry_at(local_tc, selected_item);
         name = e->name;
         attr = e->attr;
     }
@@ -164,8 +169,7 @@ static int tree_get_filecolor(int selected_item, void * data)
     if (*tc.dirfilter == SHOW_ID3DB)
         return -1;
     struct tree_context * local_tc=(struct tree_context *)data;
-    struct entry* dc = local_tc->dircache;
-    struct entry* e = &dc[selected_item];
+    struct entry* e = get_entry_at(local_tc, selected_item);
     return filetype_get_color(e->name, e->attr);
 }
 #endif
@@ -180,9 +184,8 @@ static enum themable_icons tree_get_fileicon(int selected_item, void * data)
     }
     else
 #endif
-        {
-        struct entry* dc = local_tc->dircache;
-        struct entry* e = &dc[selected_item];
+    {
+        struct entry* e = get_entry_at(local_tc, selected_item);
         return filetype_get_icon(e->attr);
     }
 }
@@ -203,8 +206,7 @@ static int tree_voice_cb(int selected_item, void * data)
     else
 #endif
     {
-        struct entry* dc = local_tc->dircache;
-        struct entry* e = &dc[selected_item];
+        struct entry* e = get_entry_at(local_tc, selected_item);
         name = e->name;
         attr = e->attr;
     }
@@ -322,12 +324,12 @@ struct tree_context* tree_get_context(void)
 static int tree_get_file_position(char * filename)
 {
     int i;
+    struct entry* e;
 
     /* use lastfile to determine the selected item (default=0) */
     for (i=0; i < tc.filesindir; i++)
     {
-        struct entry* dc = tc.dircache;
-        struct entry* e = &dc[i];
+        e = get_entry_at(&tc, i);
         if (!strcasecmp(e->name, filename))
             return(i);
     }
@@ -529,8 +531,7 @@ char* get_current_file(char* buffer, size_t buffer_len)
         return NULL;
 #endif
 
-    struct entry* dc = tc.dircache;
-    struct entry* e = &dc[tc.selected_item];
+    struct entry* e = get_entry_at(&tc, tc.selected_item);
     if (getcwd(buffer, buffer_len))
     {
         if (tc.dirlength)
@@ -649,7 +650,7 @@ static int dirbrowse(void)
     
     gui_synclist_draw(&tree_lists);
     while(1) {
-        struct entry *dircache = tc.dircache;
+        struct entry *entries = tc.cache.entries;
         bool restore = false;
         if (tc.dirlevel < 0)
             tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
@@ -666,7 +667,7 @@ static int dirbrowse(void)
                     break;
 
                 if ((tc.browse->flags & BROWSE_SELECTONLY) &&
-                    !(dircache[tc.selected_item].attr & ATTR_DIRECTORY))
+                    !(entries[tc.selected_item].attr & ATTR_DIRECTORY))
                 {
                     tc.browse->flags |= BROWSE_SELECTED;
                     get_current_file(tc.browse->buf, tc.browse->bufsize);
@@ -791,15 +792,15 @@ static int dirbrowse(void)
                     else
 #endif
                     {
-                        attr = dircache[tc.selected_item].attr;
+                        attr = entries[tc.selected_item].attr;
 
                         if (currdir[1]) /* Not in / */
                             snprintf(buf, sizeof buf, "%s/%s",
                                      currdir,
-                                     dircache[tc.selected_item].name);
+                                     entries[tc.selected_item].name);
                         else /* In / */
                             snprintf(buf, sizeof buf, "/%s",
-                                     dircache[tc.selected_item].name);
+                                     entries[tc.selected_item].name);
                     }
                     onplay_result = onplay(buf, attr, curr_context, hotkey);
                 }
@@ -1001,17 +1002,17 @@ int rockbox_browse(struct browse_context *browse)
 void tree_mem_init(void)
 {
     /* initialize tree context struct */
+    struct tree_cache* cache = &tc.cache;
     memset(&tc, 0, sizeof(tc));
     tc.dirfilter = &global_settings.dirfilter;
     tc.sort_dir = global_settings.sort_dir;
 
-    tc.name_buffer_size = AVERAGE_FILENAME_LENGTH *
+    cache->name_buffer_size = AVERAGE_FILENAME_LENGTH *
         global_settings.max_files_in_dir;
-    tc.name_buffer = buffer_alloc(tc.name_buffer_size);
+    cache->name_buffer = buffer_alloc(cache->name_buffer_size);
 
-    tc.dircache_count = global_settings.max_files_in_dir;
-    tc.dircache = buffer_alloc(global_settings.max_files_in_dir *
-        sizeof(struct entry));
+    cache->max_entries = global_settings.max_files_in_dir;
+    cache->entries = buffer_alloc(cache->max_entries*(sizeof(cache->entries)));
     tree_get_filetypes(&filetypes, &filetypes_count);
 }
 

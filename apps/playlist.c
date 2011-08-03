@@ -1537,7 +1537,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
             break;
         }
         
-        files = (struct entry*) tc->dircache;
+        files = tc->cache.entries;
         num_files = tc->filesindir;
 
         for (i=0; i<num_files; i++)
@@ -1615,7 +1615,7 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
         return -2;
     }
     
-    files = (struct entry*) tc->dircache;
+    files = tc->cache.entries;
     num_files = tc->filesindir;
     
     for (i=0; i<num_files; i++)
@@ -3568,7 +3568,7 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
         return -1;
     }
 
-    files = (struct entry*) tc->dircache;
+    files = tc->cache.entries;
     num_files = tc->filesindir;
 
     /* we've overwritten the dircache so tree browser will need to be
@@ -3603,7 +3603,7 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
                     break;
                 }
                     
-                files = (struct entry*) tc->dircache;
+                files = tc->cache.entries;
                 num_files = tc->filesindir;
                 if (!num_files)
                 {

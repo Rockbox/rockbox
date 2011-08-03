@@ -1175,7 +1175,7 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
 static int retrieve_entries(struct tree_context *c, int offset, bool init)
 {
     struct tagcache_search tcs;
-    struct tagentry *dptr = (struct tagentry *)c->dircache;
+    struct tagentry *dptr = c->cache.entries;
     struct display_format *fmt;
     int i;
     int namebufused = 0;
@@ -1339,13 +1339,13 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
                 }
             }
             
-            dptr->name = &c->name_buffer[namebufused];
+            dptr->name = &c->cache.name_buffer[namebufused];
             if (fmt)
                 namebufused += strlen(buf)+1;
             else
                 namebufused += tcs.result_len;
             
-            if (namebufused >= c->name_buffer_size)
+            if (namebufused >= c->cache.name_buffer_size)
             {
                 logf("chunk mode #2: %d", current_entry_count);
                 c->dirfull = true;
@@ -1363,7 +1363,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         dptr++;
         current_entry_count++;
 
-        if (current_entry_count >= c->dircache_count)
+        if (current_entry_count >= c->cache.max_entries)
         {
             logf("chunk mode #3: %d", current_entry_count);
             c->dirfull = true;
@@ -1382,9 +1382,12 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     }
     
     if (sort)
-        qsort(c->dircache + special_entry_count * c->dentry_size,
+    {
+        int entry_size = sizeof(struct tagentry);
+        qsort(c->cache.entries + special_entry_count * entry_size,
               current_entry_count - special_entry_count,
-              c->dentry_size, compare);
+              entry_size, compare);
+    }
     
     if (!init)
     {
@@ -1416,7 +1419,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     
     if (strip)
     {
-        dptr = c->dircache;
+        dptr = c->cache.entries;
         for (i = 0; i < total_count; i++, dptr++)
         {
             int len = strlen(dptr->name);
@@ -1434,7 +1437,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
 static int load_root(struct tree_context *c)
 {
-    struct tagentry *dptr = (struct tagentry *)c->dircache;
+    struct tagentry *dptr = c->cache.entries;
     int i;
     
     tc = c;
@@ -1476,7 +1479,6 @@ int tagtree_load(struct tree_context* c)
     int count;
     int table = c->currtable;
     
-    c->dentry_size = sizeof(struct tagentry);
     c->dirsindir = 0;
 
     if (!table)
@@ -1870,7 +1872,7 @@ static int tagtree_play_folder(struct tree_context* c)
 
 struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
 {
-    struct tagentry *entry = (struct tagentry *)c->dircache;
+    struct tagentry *entry = (struct tagentry *)c->cache.entries;
     int realid = id - current_offset;
     
     /* Load the next chunk if necessary. */

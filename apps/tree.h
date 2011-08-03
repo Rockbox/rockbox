@@ -38,6 +38,15 @@ struct entry {
 #define BROWSE_SELECTED         0x0100  /* this bit is set if user selected item */
 
 struct tree_context;
+struct tree_cache {
+    /* A big buffer with plenty of entry structs,
+     * contains all files and dirs in the current
+     * dir (with filters applied) */
+    void*   entries;
+    char*   name_buffer;
+    int     max_entries;      /* Max entries in the cache */
+    int     name_buffer_size; /* in bytes */
+};
 
 struct browse_context {
     int dirfilter;
@@ -80,14 +89,7 @@ struct tree_context {
     int currtable; /* db use */
     int currextra; /* db use */
 #endif
-    /* A big buffer with plenty of entry structs,
-     * contains all files and dirs in the current
-     * dir (with filters applied) */
-    void* dircache;
-    int dircache_count; /* Number of entries in dircache */
-    char* name_buffer;
-    int name_buffer_size;
-    int dentry_size;
+    struct tree_cache cache;
     bool dirfull;
     int sort_dir; /* directory sort order */
     struct browse_context *browse;
