@@ -572,8 +572,19 @@ static const struct plugin_api rockbox_api = {
     dsp_process,
     dsp_input_count,
     dsp_output_count,
-#endif /* CONFIG_CODEC == SWCODEC */
 
+    mixer_channel_status,
+    mixer_channel_get_buffer,
+    mixer_channel_calculate_peaks,
+    mixer_channel_play_data,
+    mixer_channel_play_pause,
+    mixer_channel_stop,
+    mixer_channel_set_amplitude,
+    mixer_channel_get_bytes_waiting,
+
+    system_sound_play,
+    keyclick_click,
+#endif
     /* playback control */
     playlist_amount,
     playlist_resume,
@@ -778,18 +789,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-#if CONFIG_CODEC == SWCODEC
-    mixer_channel_status,
-    mixer_channel_get_buffer,
-    mixer_channel_calculate_peaks,
-    mixer_channel_play_data,
-    mixer_channel_play_pause,
-    mixer_channel_stop,
-    mixer_channel_set_amplitude,
-    mixer_channel_get_bytes_waiting,
-    system_sound_play,
-    keyclick_click,
-#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)
