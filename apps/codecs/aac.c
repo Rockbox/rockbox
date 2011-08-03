@@ -61,6 +61,7 @@ enum codec_status codec_run(void)
     int file_offset;
     int framelength;
     int lead_trim = 0;
+    unsigned int frame_samples;
     unsigned int i;
     unsigned char* buffer;
     NeAACDecFrameInfo frame_info;
@@ -214,13 +215,15 @@ enum codec_status codec_run(void)
         /* Output the audio */
         ci->yield();
         
+        frame_samples = frame_info.samples >> 1;
+
         if (empty_first_frame)
         {
             /* Remove the first frame from lead_trim, under the assumption
              * that it had the same size as this frame
              */
             empty_first_frame = false;
-            lead_trim -= (frame_info.samples >> 1);
+            lead_trim -= frame_samples;
 
             if (lead_trim < 0)
             {
@@ -229,11 +232,30 @@ enum codec_status codec_run(void)
         }
 
         /* Gather number of samples for the decoded frame. */
-        framelength = (frame_info.samples >> 1) - lead_trim;
+        framelength = frame_samples - lead_trim;
         
         if (i == demux_res.num_sample_byte_sizes - 1)
         {
-            framelength -= ci->id3->tail_trim;
+            // Size of the last frame
+            const uint32_t sample_duration = (demux_res.num_time_to_samples > 0) ?
+                demux_res.time_to_sample[demux_res.num_time_to_samples - 1].sample_duration :
+                frame_samples;
+
+            /* Currently limited to at most one frame of tail_trim.
+             * Seems to be enough.
+             */
+            if (ci->id3->tail_trim == 0 && sample_duration < frame_samples)
+            {
+                /* Subtract lead_trim just in case we decode a file with only
+                 * one audio frame with actual data (lead_trim is usually zero
+                 * here).
+                 */
+                framelength = sample_duration - lead_trim;
+            }
+            else
+            {
+                framelength -= ci->id3->tail_trim;
+            }
         }
 
         if (framelength > 0)
@@ -241,6 +263,10 @@ enum codec_status codec_run(void)
             ci->pcmbuf_insert(&decoder->time_out[0][lead_trim],
                               &decoder->time_out[1][lead_trim],
                               framelength);
+            sound_samples_done += framelength;
+            /* Update the elapsed-time indicator */
+            elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
+            ci->set_elapsed(elapsed_time);
         }
 
         if (lead_trim > 0)
@@ -253,7 +279,7 @@ enum codec_status codec_run(void)
                 empty_first_frame = true;
             }
 
-            lead_trim -= (frame_info.samples >> 1);
+            lead_trim -= frame_samples;
 
             if (lead_trim < 0)
             {
@@ -261,11 +287,7 @@ enum codec_status codec_run(void)
             }
         }
 
-        /* Update the elapsed-time indicator */
-        sound_samples_done += framelength;
-        elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
-        ci->set_elapsed(elapsed_time);
-        i++;
+        ++i;
     }
 
     LOGF("AAC: Decoded %lu samples\n", (unsigned long)sound_samples_done);
