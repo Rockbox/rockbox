@@ -1012,7 +1012,7 @@ void tree_mem_init(void)
     cache->name_buffer = buffer_alloc(cache->name_buffer_size);
 
     cache->max_entries = global_settings.max_files_in_dir;
-    cache->entries = buffer_alloc(cache->max_entries*(sizeof(cache->entries)));
+    cache->entries = buffer_alloc(cache->max_entries*(sizeof(struct entry)));
     tree_get_filetypes(&filetypes, &filetypes_count);
 }
 
