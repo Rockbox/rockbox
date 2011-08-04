@@ -111,7 +111,12 @@ void format(
             }
             while (uval > 0);
             break;
-
+        case 'p':
+        case 'P':
+            /* for pointers prepend 0x and act like 'X' */
+            push(userp, '0');
+            push(userp, 'x');
+            /* fall through */
         case 'x':
         case 'X':
             pad='0';
