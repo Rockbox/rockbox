@@ -3905,7 +3905,7 @@ static bool load_tagcache(void)
 {
     struct tagcache_header *tch;
     struct master_header tcmh;
-    long bytesleft = tc_stat.ramcache_allocated;
+    long bytesleft = tc_stat.ramcache_allocated - sizeof(struct ramcache_header);
     struct index_entry *idx;
     int rc, fd;
     char *p;
@@ -3943,6 +3943,14 @@ static bool load_tagcache(void)
     /* Load the master index table. */
     for (i = 0; i < tcmh.tch.entry_count; i++)
     {
+        bytesleft -= sizeof(struct index_entry);
+        if (bytesleft < 0)
+        {
+            logf("too big tagcache.");
+            close(fd);
+            return false;
+        }
+
         /* DEBUG: After tagcache commit and dircache rebuild, hdr-sturcture
          * may become corrupt. */
         rc = ecread_index_entry(fd, idx);
@@ -3953,15 +3961,6 @@ static bool load_tagcache(void)
             return false;
         }
     
-        bytesleft -= sizeof(struct index_entry);
-        if (bytesleft < 0 ||
-            ((long)idx - (long)ramcache_hdr->indices) >= tc_stat.ramcache_allocated)
-        {
-            logf("too big tagcache.");
-            close(fd);
-            return false;
-        }
-
         idx++;
     }
 
