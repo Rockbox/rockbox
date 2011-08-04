@@ -1096,10 +1096,10 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
             }
         }
         
+        char formatchar = fmt->formatstr[i];
+
         if (read_format)
         {
-            char formatchar = fmt->formatstr[i];
-
             fmtbuf[fmtbuf_pos++] = formatchar;
             if (fmtbuf_pos >= sizeof fmtbuf)
             {
@@ -1110,7 +1110,7 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
             if (formatchar == 's' || formatchar == 'd')
             {
                 unsigned space_left = buf_size - buf_pos;
-                char tmpbuf[space_left + 1];
+                char tmpbuf[MAX_PATH];
                 char *result;
 
                 fmtbuf[fmtbuf_pos] = '\0';
@@ -1131,7 +1131,7 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
                         if (!tagcache_retrieve(tcs, tcs->idx_id,
                                                (tag == tag_virt_basename ?
                                                 tag_filename : tag),
-                                               tmpbuf, space_left))
+                                               tmpbuf, sizeof tmpbuf))
                         {
                             logf("retrieve failed");
                             return -3;
@@ -1145,22 +1145,23 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
                         else
                             result = tmpbuf;
                     }
-                    snprintf(&buf[buf_pos], space_left, fmtbuf, result);
+                    buf_pos +=
+                        snprintf(&buf[buf_pos], space_left, fmtbuf, result);
                     break;
 
                 case 'd':
-                    snprintf(&buf[buf_pos], space_left, fmtbuf,
-                             tagcache_get_numeric(tcs, fmt->tags[parpos]));
+                    buf_pos +=
+                        snprintf(&buf[buf_pos], space_left, fmtbuf,
+                                 tagcache_get_numeric(tcs, fmt->tags[parpos]));
                 }
 
-                buf_pos += strlen(&buf[buf_pos]);
                 parpos++;
             }
         }
         else
-            buf[buf_pos++] = fmt->formatstr[i];
+            buf[buf_pos++] = formatchar;
         
-        if (buf_pos - 1 >= buf_size)
+        if (buf_pos >= buf_size - 1)    /* need at least one more byte for \0 */
         {
             logf("buffer overflow");
             return -4;
@@ -1328,35 +1329,41 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         
         if (!tcs.ramresult || fmt)
         {
-            char buf[MAX_PATH];
+            dptr->name = &c->cache.name_buffer[namebufused];
             
             if (fmt)
             {
-                if (format_str(&tcs, fmt, buf, sizeof buf) < 0)
+                int ret = format_str(&tcs, fmt, dptr->name,
+                                     c->cache.name_buffer_size - namebufused);
+                if (ret == -4)          /* buffer full */
+                {
+                    logf("chunk mode #2: %d", current_entry_count);
+                    c->dirfull = true;
+                    sort = false;
+                    break ;
+                }
+                else if (ret < 0)
                 {
                     logf("format_str() failed");
                     tagcache_search_finish(&tcs);
                     return 0;
                 }
+                else
+                    namebufused += strlen(dptr->name)+1;
             }
-            
-            dptr->name = &c->cache.name_buffer[namebufused];
-            if (fmt)
-                namebufused += strlen(buf)+1;
             else
-                namebufused += tcs.result_len;
-            
-            if (namebufused >= c->cache.name_buffer_size)
             {
-                logf("chunk mode #2: %d", current_entry_count);
-                c->dirfull = true;
-                sort = false;
-                break ;
+                namebufused += tcs.result_len;
+                if (namebufused < c->cache.name_buffer_size)
+                    strcpy(dptr->name, tcs.result);
+                else
+                {
+                    logf("chunk mode #2a: %d", current_entry_count);
+                    c->dirfull = true;
+                    sort = false;
+                    break ;
+                }
             }
-            if (fmt)
-                strcpy(dptr->name, buf);
-            else
-                strcpy(dptr->name, tcs.result);
         }
         else
             dptr->name = tcs.result;
