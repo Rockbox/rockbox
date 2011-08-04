@@ -392,7 +392,7 @@ static long find_entry_ram(const char *filename, int dc)
     int i;
     
     /* Check if tagcache is loaded into ram. */
-    if (!tc_stat.ramcache)
+    if (!tc_stat.ramcache || !is_dircache_intact())
         return -1;
 
     if (dc < 0)
@@ -540,8 +540,7 @@ static int find_index(const char *filename)
     long idx_id = -1;
     
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-    if (tc_stat.ramcache && is_dircache_intact())
-        idx_id = find_entry_ram(filename, -1);
+    idx_id = find_entry_ram(filename, -1);
 #endif
     
     if (idx_id < 0)
@@ -1799,10 +1798,7 @@ static void __attribute__ ((noinline)) add_tagcache(char *path,
     
     /* Check if the file is already cached. */
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-    if (tc_stat.ramcache && is_dircache_intact())
-    {
-        idx_id = find_entry_ram(path, dc);
-    }
+    idx_id = find_entry_ram(path, dc);
 #endif
 
     /* Be sure the entry doesn't exist. */
