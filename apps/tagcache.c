@@ -719,12 +719,25 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
         struct tagfile_entry *ep;
         
 # ifdef HAVE_DIRCACHE
-        if (tag == tag_filename && (idx->flag & FLAG_DIRCACHE)
-            && is_dircache_intact())
+        if (tag == tag_filename && (idx->flag & FLAG_DIRCACHE))
         {
-            dircache_copy_path((struct dircache_entry *)seek,
-                               buf, size);
-            return true;
+            /* for tag_filename, seek is a dircache index */
+            if (is_dircache_intact())
+            {
+                dircache_copy_path((struct dircache_entry *)seek,
+                                   buf, size);
+                return true;
+            }
+            else
+            {
+                /* The seek is useless now, there's nothing we can return. */
+                logf("retrieve: dircache gone, cannot read file name");
+                tagcache_unload_ramcache();
+                // XXX do this when there's a way to not trigger an
+                // update before reloading:
+                // tagcache_start_scan();
+                return false;
+            }
         }
         else
 # endif
@@ -1477,16 +1490,29 @@ static bool get_next(struct tagcache_search *tcs)
     {
         
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-        if (tcs->type == tag_filename && (flag & FLAG_DIRCACHE)
-            && is_dircache_intact())
+        if (tcs->type == tag_filename && (flag & FLAG_DIRCACHE))
         {
-            dircache_copy_path((struct dircache_entry *)tcs->position,
-                               buf, sizeof buf);
-            tcs->result = buf;
-            tcs->result_len = strlen(buf) + 1;
-            tcs->ramresult = false;
+            if (is_dircache_intact())
+            {
+		dircache_copy_path((struct dircache_entry *)tcs->position,
+				   buf, sizeof buf);
+		tcs->result = buf;
+		tcs->result_len = strlen(buf) + 1;
+		tcs->ramresult = false;
             
-            return true;
+                return true;
+            }
+            else
+            {
+                /* The seek is useless now, there's nothing we can return. */
+                logf("get_next: dircache gone, cannot read file name");
+                tagcache_unload_ramcache();
+                // XXX do this when there's a way to not trigger an
+                // update before reloading:
+                // tagcache_start_scan();
+                tcs->valid = false;
+                return false;
+            }
         }
         else
 #endif
