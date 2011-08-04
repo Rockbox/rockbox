@@ -1244,6 +1244,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             dptr->name = str(LANG_TAGNAVI_ALL_TRACKS);
             dptr++;
             current_entry_count++;
+            special_entry_count++;
         }
         if (offset <= 1)
         {
@@ -1252,11 +1253,11 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             dptr->extraseek = -1;
             dptr++;
             current_entry_count++;
+            special_entry_count++;
         }
-        special_entry_count+=2;
+
+        total_count += 2;
     }
-    
-    total_count += special_entry_count;
     
     while (tagcache_get_next(&tcs))
     {
@@ -1386,7 +1387,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     if (strip)
     {
         dptr = c->dircache;
-        for (i = 0; i < total_count; i++, dptr++)
+        for (i = special_entry_count; i < current_entry_count; i++, dptr++)
         {
             int len = strlen(dptr->name);
             
