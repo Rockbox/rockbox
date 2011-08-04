@@ -864,6 +864,7 @@ int plugin_load(const char* plugin, const void* parameter)
     lcd_remote_clear_display();
     lcd_remote_update();
 #endif
+    push_current_activity(ACTIVITY_PLUGIN);
 
     FOR_NB_SCREENS(i)
        viewportmanager_theme_enable(i, false, NULL);
@@ -877,6 +878,8 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     rc = p_hdr->entry_point(parameter);
+    
+    pop_current_activity();
 
     if (!pfn_tsr_exit)
     {   /* close handle if plugin is no tsr one */
