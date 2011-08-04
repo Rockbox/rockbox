@@ -1129,7 +1129,7 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
         
         buf[buf_pos++] = fmt->formatstr[i];
         
-        if (buf_pos - 1 >= buf_size)
+        if (buf_pos >= buf_size - 1)    /* need at least one more byte for \0 */
         {
             logf("buffer overflow");
             return -4;
