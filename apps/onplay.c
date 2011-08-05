@@ -1347,12 +1347,15 @@ int onplay(char* file, int attr, int from, bool hotkey)
 #else
     (void)hotkey;
 #endif
+
+    push_current_activity(ACTIVITY_CONTEXTMENU);
     if (context == CONTEXT_WPS)
         menu = &wps_onplay_menu;
     else
         menu = &tree_onplay_menu;
     menu_selection = do_menu(menu, NULL, NULL, false);
-    
+    pop_current_activity();
+
     switch (menu_selection)
     {
         case GO_TO_WPS:
