@@ -456,8 +456,9 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 lseek(fd, length, SEEK_CUR);
                             }
                         } else if (!strncmp("replaygain_", utf8buf, 11)) {
+                            char *value = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                            parse_replaygain(utf8buf, id3buf, id3);
+                            parse_replaygain(utf8buf, value, id3);
                         } else if (!strcmp("MusicBrainz/Track Id", utf8buf)) {
                             id3->mb_track_id = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
