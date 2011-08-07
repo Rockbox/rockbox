@@ -254,6 +254,8 @@ int time_screen(void* ignored)
     int i, nb_lines, font_h, ret;
     menu_was_pressed = false;
 
+    push_current_activity(ACTIVITY_TIMEDATESCREEN);
+
     FOR_NB_SCREENS(i)
     {
         viewport_set_defaults(&clock_vps[i], i);
@@ -283,6 +285,7 @@ int time_screen(void* ignored)
     }
 
     ret = do_menu(&time_menu, NULL, menu, false);
+    pop_current_activity();
     /* see comments above in the button callback */
     if (!menu_was_pressed && ret == GO_TO_PREVIOUS)
         return 0;

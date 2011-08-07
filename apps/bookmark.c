@@ -149,13 +149,17 @@ bool bookmark_load_menu(void)
 /* ----------------------------------------------------------------------- */
 bool bookmark_mrb_load()
 {
-    char* bookmark = select_bookmark(RECENT_BOOKMARK_FILE, false);
+    char* bookmark;
+    bool ret = false;
 
+    push_current_activity(ACTIVITY_BOOKMARKSLIST);
+    bookmark = select_bookmark(RECENT_BOOKMARK_FILE, false);
     if (bookmark != NULL)
     {
-        return play_bookmark(bookmark);
+        ret = play_bookmark(bookmark);
     }
 
+    pop_current_activity();
     return false;
 }
 

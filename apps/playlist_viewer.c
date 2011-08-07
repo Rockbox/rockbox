@@ -640,6 +640,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
     if (!playlist_viewer_init(&viewer, filename, false))
         goto exit;
 
+    push_current_activity(ACTIVITY_PLAYLISTVIEWER);
     gui_synclist_init(&playlist_lists, playlist_callback_name,
                       &viewer, false, 1, NULL);
     gui_synclist_set_voice_callback(&playlist_lists, playlist_callback_voice);
@@ -806,6 +807,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
     }
 
 exit:
+    pop_current_activity();
     if (viewer.playlist)
     {
         if(dirty && yesno_pop(ID2P(LANG_SAVE_CHANGES)))

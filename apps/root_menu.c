@@ -552,6 +552,8 @@ static inline int load_screen(int screen)
         activity = ACTIVITY_PLUGINBROWSER;
     else if (screen == GO_TO_MAINMENU)
         activity = ACTIVITY_SETTINGS;
+    else if (screen == GO_TO_SYSTEM_SCREEN)
+        activity =  ACTIVITY_SYSTEMSCREEN;
 
     if (activity != ACTIVITY_UNKNOWN)
         push_current_activity(activity);
@@ -569,6 +571,8 @@ static inline int load_screen(int screen)
 static int load_context_screen(int selection)
 {
     const struct menu_item_ex *context_menu = NULL;
+    int retval = GO_TO_PREVIOUS;
+    push_current_activity(ACTIVITY_CONTEXTMENU);
     if ((root_menu__[selection]->flags&MENU_TYPE_MASK) == MT_RETURN_VALUE)
     {
         int item = root_menu__[selection]->value;
@@ -581,9 +585,9 @@ static int load_context_screen(int selection)
     }
     
     if (context_menu)
-        return do_menu(context_menu, NULL, NULL, false);
-    else
-        return GO_TO_PREVIOUS;
+        retval = do_menu(context_menu, NULL, NULL, false);
+    pop_current_activity();
+    return retval;
 }
 
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
