@@ -160,7 +160,7 @@ bool bookmark_mrb_load()
     }
 
     pop_current_activity();
-    return false;
+    return ret;
 }
 
 /* ----------------------------------------------------------------------- */
