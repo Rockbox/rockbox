@@ -11,6 +11,9 @@
 #include "rbunicode.h"
 #include "string-extra.h"
 
+/* NOTE: This file was modified to work properly with the new nsf codec based
+    on Game_Music_Emu */
+
 struct NESM_HEADER
 {
     uint32_t        nHeader;
@@ -66,7 +69,7 @@ static bool parse_nsfe(int fd, struct mp3entry *id3)
 
      /* default values */
     info.nTrackCount = 1;
-    id3->length = 2*1000*60;
+    id3->length = 150 * 1000;
     
     /* begin reading chunks */
     while (!(chunks_found & CHUNK_NEND))
@@ -210,6 +213,10 @@ static bool parse_nsfe(int fd, struct mp3entry *id3)
     if (track_count | playlist_count)
         id3->length = MAX(track_count, playlist_count)*1000;
 
+    /* Single subtrack files will be treated differently
+        by gme's nsf codec */
+    if (id3->length <= 1000) id3->length = 150 * 1000;
+
     /*
      * if we exited the while loop without a 'return', we must have hit an NEND
      *  chunk if this is the case, the file was layed out as it was expected.
@@ -230,7 +237,7 @@ static bool parse_nesm(int fd, struct mp3entry *id3)
         return false;
 
     /* Length */
-    id3->length = hdr.nTrackCount*1000;
+    id3->length = (hdr.nTrackCount > 1 ? hdr.nTrackCount : 150) * 1000;
 
     /* Title */
     id3->title = p;
@@ -250,7 +257,6 @@ static bool parse_nesm(int fd, struct mp3entry *id3)
 bool get_nsf_metadata(int fd, struct mp3entry* id3)
 {
     uint32_t nsf_type;
-      
     if (lseek(fd, 0, SEEK_SET) < 0 ||
         read_uint32be(fd, &nsf_type) != (int)sizeof(nsf_type))
         return false;

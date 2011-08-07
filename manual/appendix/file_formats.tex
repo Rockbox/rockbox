@@ -209,6 +209,29 @@
     Synthetic music Mobile Application Format
         & \fname{.mmf} 
         & PCM/ADPCM only \\
+    Game Boy Sound Format
+        & \fname{.gbs}
+        & Progress bar and seek use subtracks instead of seconds.\\
+    AY Sound Chip Music
+        & \fname{.ay}
+        & Progress bar and seek use subtracks instead of seconds for
+          multitrack files.\\
+    Hudson Entertainment System Sound Format
+        & \fname{.hes}
+        & Progress bar and seek use subtracks instead of seconds.\\
+    MSX Konami Sound System
+        & \fname{.kss}
+        & Progress bar and seek use subtracks instead of seconds.\\
+    SMS/GG/CV Sound Format
+        & \fname{.sgc}
+        & Supports Sega Master System and Game Gear Sound Format. 
+          Progress bar and seek use subtracks instead of seconds.\\
+    Video Game Music Format
+        & \fname{.vgm}
+        & \\
+    Gzipped Video Game Music Format
+        & \fname{.vgz}
+        & \\
     MOD
         & \fname{.mod} 
         & \\
@@ -227,7 +250,7 @@
   \end{rbtabular}
   
   \subsection{Codec featureset}
-  \begin{rbtabular}{.90\textwidth}{lXXX}%
+  \begin{rbtabular}{.95\textwidth}{lXXX}%
   {\textbf{Format} & \textbf{Seek} & \textbf{Resume} & \textbf{Gapless}}{}{}
     ATSC A/52 (AC3)                             & x & x &   \\
     ADX                                         & x &   &   \\
@@ -252,6 +275,13 @@
     Wavpack                                     & x & x & x \\
     Atari Sound Format                          & x &   &   \\
     Synthetic music Mobile Application Format   & x & x &   \\
+    Game Boy Sound Format                       & x &   &   \\
+    AY Sound Chip Music                         & x &   &   \\
+    Hudson Entertainment System Sound Format    & x &   &   \\
+    MSX Konami Sound System                     & x &   &   \\
+    SMS/GG/CV Sound Format                      & x &   &   \\
+    Video Game Music Format                     & x & x &   \\
+    Gzipped Video Game Music Format             & x & x &   \\
     MOD                                         & x &   &   \\
     NES Sound Format                            & x &   &   \\
     Atari SAP                                   & x &   &   \\
@@ -259,8 +289,10 @@
     SPC700                                      & x &   &   \\
   \end{rbtabular}
   
-  \note{The seek implementations of NES Sound Format and Sound Interface Device 
-  use subtracks instead of seconds, whereas each subtrack equals a second.}
+  \note{The seek implementations of NES Sound Format, Sound Interface Device,
+  Game Boy Sound Format, AY Sound Chip Music, Hudson Entertainment System Sound,
+  Format, MSX Konami Sound System and SMS/GG/CV Sound Format use subtracks
+  instead of seconds, whereas each subtrack equals a second.}
   
   \section{\label{ref:SupportedMetadata}Supported metadata tags}
     Rockbox supports different metadata formats. In general those tag formats
@@ -281,13 +313,14 @@
       MP4               & \fname{.m4a}, \fname{.m4b}, \fname{.mp4} \\
       ASF               & \fname{.wma}, \fname{.wmv}, \fname{.asf} \\
       Codec specific    & \fname{.mmf}, \fname{.mod}, \fname{.nsf}, \fname{.nsfe},
-                          \fname{.sap}, \fname{.sid}, \fname{.spc} \\
+                          \fname{.sap}, \fname{.sid}, \fname{.spc}, \fname{.gbs},
+                          \fname{.ay}, \fname{.kss}, \fname{.sgc}, \fname{.vgm} \\
       None              & \fname{.a52}, \fname{.ac3}, \fname{.adx}, \fname{.oma},
                           \fname{.aa3}, \fname{.aif}, \fname{.aiff}, \fname{.au},
                           \fname{.snd}, \fname{.shn}, \fname{.vox}, \fname{.w64},
                           \fname{.wav}, \fname{.cmc}, \fname{.cm3}, \fname{.cmr},
                           \fname{.cms}, \fname{.dmc}, \fname{.dlt}, \fname{.mpt},
-                          \fname{.mpd} \\
+                          \fname{.mpd}, \fname{.hes}, \fname{.vgz} \\
     \end{rbtabular}
     
     \subsection{Featureset for generic metadata tags}
@@ -322,17 +355,21 @@
      Replaygain             & \fname{.mpc}\\
      Title                  & \fname{.tta}, \fname{.spc}, \fname{.mmf}, \fname{.sid}, 
                               \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.nsf}, 
-                              \fname{.nsfe}, \fname{.mod}, \fname{.sap} \\
+                              \fname{.nsfe}, \fname{.mod}, \fname{.sap}, \fname{.gbs},
+                              \fname{.ay}, \fname{.sgc}, \fname{.vgm} \\
      Artist                 & \fname{.tta}, \fname{.spc}, \fname{.mmf}, \fname{.sid}, 
                               \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.nsf}, 
-                              \fname{.nsfe}, \fname{.sap} \\
-     Album                  & \fname{.spc}, \fname{.sid}, \fname{.nsf}, \fname{.nsfe} \\
+                              \fname{.nsfe}, \fname{.sap}, \fname{.gbs}, \fname{.ay},
+                              \fname{.sgc}, \fname{.vgm} \\
+     Album                  & \fname{.spc}, \fname{.sid}, \fname{.nsf}, \fname{.nsfe},
+                              \fname{.gbs}, \fname{.ay}, \fname{.sgc}, \fname{.vgm} \\
      Genre                  & \fname{.tta}, \fname{.spc}, \fname{.sap} \\
      Disc                   & \fname{.tta} \\
      Track                  & \fname{.tta} \\
      Year                   & \fname{.spc}, \fname{.sid}, \fname{.sap} \\
      Composer               & \fname{.mmf} \\
-     Comment                & \fname{.spc}, \fname{.rm}, \fname{.ra}, \fname{.rmvb} \\
+     Comment                & \fname{.spc}, \fname{.rm}, \fname{.ra}, \fname{.rmvb},
+                              \fname{.vgm} \\
      Albumartist            & None \\
      Grouping               & None \\
     \end{rbtabular}

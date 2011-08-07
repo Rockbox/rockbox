@@ -62,6 +62,7 @@ uint64_t get_uint64_le(void* buf);
 unsigned long get_long_le(void* buf);
 unsigned short get_short_le(void* buf);
 unsigned long get_long_be(void* buf);
+unsigned short get_short_be(void* buf);
 long get_slong(void* buf);
 unsigned long get_itunes_int32(char* value, int count);
 long parse_tag(const char* name, char* value, struct mp3entry* id3,

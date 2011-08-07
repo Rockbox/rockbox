@@ -178,6 +178,14 @@ unsigned long get_long_be(void* buf)
     return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
 }
 
+/* Read an unaligned 16-bit little endian short from buffer. */
+unsigned short get_short_be(void* buf)
+{
+    unsigned char* p = (unsigned char*) buf;
+
+    return (p[0] << 8) | p[1];
+}
+
 /* Read an unaligned 32-bit little endian long from buffer. */
 long get_slong(void* buf)
 {

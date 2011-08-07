@@ -227,6 +227,12 @@ metadata/smaf.c
 metadata/au.c
 metadata/vox.c
 metadata/tta.c
+metadata/ay.c
+metadata/gbs.c
+metadata/hes.c
+metadata/sgc.c
+metadata/vgm.c
+metadata/kss.c
 #endif
 #ifdef HAVE_TAGCACHE
 tagcache.c

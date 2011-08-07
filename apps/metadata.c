@@ -216,6 +216,24 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Advanced Audio Coding High Efficiency in M4A container */
     [AFMT_MP4_AAC_HE] =
         AFMT_ENTRY("AAC-HE","aac",  NULL,       get_mp4_metadata,   "mp4\0"),
+    /* AY (ZX Spectrum, Amstrad CPC Sound Format) */
+    [AFMT_AY] = 
+        AFMT_ENTRY("AY",    "ay",  NULL, get_ay_metadata,           "ay\0"),
+    /* GBS (Game Boy Sound Format) */
+    [AFMT_GBS] =
+        AFMT_ENTRY("GBS",   "gbs",  NULL,       get_gbs_metadata,   "gbs\0"),
+    /* HES (Hudson Entertainment System Sound Format) */
+    [AFMT_HES] =
+        AFMT_ENTRY("HES",   "hes",  NULL,       get_hes_metadata,   "hes\0"),
+    /* SGC (Sega Master System, Game Gear, Coleco Vision Sound Format) */
+    [AFMT_SGC] =
+        AFMT_ENTRY("SGC", "sgc", NULL, get_sgc_metadata,     "sgc\0"),
+    /* VGM (Video Game Music Format) */
+    [AFMT_VGM] =
+        AFMT_ENTRY("VGM", "vgm", NULL, get_vgm_metadata,   "vgm\0vgz\0"),
+    /* KSS (MSX computer KSS Music File) */
+    [AFMT_KSS] =
+        AFMT_ENTRY("KSS", "kss", NULL, get_kss_metadata,   "kss\0"),
 #endif
 };
 
@@ -299,6 +317,12 @@ enum data_type get_audio_base_data_type(int afmt)
     case AFMT_SID:
     case AFMT_MOD:
     case AFMT_SAP:
+    case AFMT_AY:
+    case AFMT_GBS:
+    case AFMT_HES:
+    case AFMT_SGC:
+    case AFMT_VGM:
+    case AFMT_KSS:
         /* Type must be allocated and loaded in its entirety onto
            the buffer */
         return TYPE_ATOMIC_AUDIO;

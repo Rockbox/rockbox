@@ -87,6 +87,12 @@ enum
     AFMT_WMAVOICE,     /* WMA Voice in ASF */
     AFMT_MPC_SV8,      /* Musepack SV8 */
     AFMT_MP4_AAC_HE,   /* Advanced Audio Coding (AAC-HE) in M4A container */
+    AFMT_AY,             /* AY (ZX Spectrum, Amstrad CPC Sound Format) */
+    AFMT_GBS,          /* GBS (Game Boy Sound Format) */
+    AFMT_HES,          /* HES (Hudson Entertainment System Sound Format) */
+    AFMT_SGC,          /* SGC (Sega Master System, Game Gear, Coleco Vision Sound Format) */
+    AFMT_VGM,         /* VGM (Video Game Music Format) */
+    AFMT_KSS,          /* KSS (MSX computer KSS Music File) */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -
