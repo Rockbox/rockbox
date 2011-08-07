@@ -50,11 +50,9 @@ enum codec_status codec_run(void)
     size_t n;
     int track;
     intptr_t param;
-    uint32_t elapsed_time;
 
     /* reset values */
     track = 0;
-    elapsed_time = 0;
 
     DEBUGF("KSS: next_track\n");
     if (codec_init()) {
