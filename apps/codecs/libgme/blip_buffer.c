@@ -27,7 +27,7 @@ int const silent_buf_size = 1; // size used for Silent_Blip_Buffer
 
 void Blip_init( struct Blip_Buffer* this )
 {
-	this->factor_       = LONG_MAX;
+	this->factor_       = (blip_ulong)LONG_MAX;
 	this->offset_       = 0;
 	this->buffer_size_  = 0;
 	this->sample_rate_  = 0;

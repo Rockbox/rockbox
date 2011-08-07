@@ -37,8 +37,8 @@ void clear_track_vars( struct Hes_Emu* this )
 	this->out_time         = 0;
 	this->emu_time         = 0;
 	this->emu_track_ended_ = true;
-	this->track_ended     = true;
-	this->fade_start       = LONG_MAX / 2 + 1;
+	this->track_ended      = true;
+	this->fade_start       = (blargg_long)(LONG_MAX / 2 + 1);
 	this->fade_step        = 1;
 	this->silence_time     = 0;
 	this->silence_count    = 0;
@@ -202,7 +202,7 @@ int Cpu_done( struct Hes_Emu* this )
 		if ( this->irq.timer <= present && !(this->irq.disables & timer_mask) )
 		{
 			this->timer.fired = true;
-			this->irq.timer = future_hes_time;
+			this->irq.timer = (hes_time_t)future_hes_time;
 			irq_changed( this ); // overkill, but not worth writing custom code
 			#if defined (GME_FRAME_HOOK_DEFINED)
 			{
@@ -322,7 +322,7 @@ int Emu_cpu_read( struct Hes_Emu* this, hes_addr_t addr )
 	case 0x0000:
 		if ( this->irq.vdp > time )
 			return 0;
-		this->irq.vdp = future_hes_time;
+		this->irq.vdp = (hes_time_t)future_hes_time;
 		run_until( this, time );
 		irq_changed( this );
 		return 0x20;
@@ -398,19 +398,19 @@ void irq_changed( struct Hes_Emu* this )
 	
 	if ( this->irq.timer > present )
 	{
-		this->irq.timer = future_hes_time;
+		this->irq.timer = (hes_time_t)future_hes_time;
 		if ( this->timer.enabled && !this->timer.fired )
 			this->irq.timer = present + this->timer.count;
 	}
 	
 	if ( this->irq.vdp > present )
 	{
-		this->irq.vdp = future_hes_time;
+		this->irq.vdp = (hes_time_t)future_hes_time;
 		if ( this->vdp.control & 0x08 )
 			this->irq.vdp = this->vdp.next_vbl;
 	}
 	
-	hes_time_t time = future_hes_time;
+	hes_time_t time = (hes_time_t)future_hes_time;
 	if ( !(this->irq.disables & timer_mask) ) time = this->irq.timer;
 	if ( !(this->irq.disables &   vdp_mask) ) time = min( time, this->irq.vdp );
 	
@@ -422,7 +422,7 @@ void irq_changed( struct Hes_Emu* this )
 static void adjust_time( blargg_long* time, hes_time_t delta ) ICODE_ATTR;
 static void adjust_time( blargg_long* time, hes_time_t delta )
 {
-	if ( *time < future_hes_time )
+	if ( *time < (blargg_long)future_hes_time )
 	{
 		*time -= delta;
 		if ( *time < 0 )
@@ -452,8 +452,8 @@ blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ )
 
 	// End cpu frame
 	this->cpu.state_.base -= duration;
-	if ( this->cpu.irq_time < future_hes_time ) this->cpu.irq_time -= duration;
-	if ( this->cpu.end_time < future_hes_time ) this->cpu.end_time -= duration;
+	if ( this->cpu.irq_time < (hes_time_t)future_hes_time ) this->cpu.irq_time -= duration;
+	if ( this->cpu.end_time < (hes_time_t)future_hes_time ) this->cpu.end_time -= duration;
 	
 	adjust_time( &this->irq.timer, duration );
 	adjust_time( &this->irq.vdp,   duration );
@@ -585,8 +585,8 @@ blargg_err_t Hes_start_track( struct Hes_Emu* this, int track )
 	Cpu_set_mmr( this, page_count, 0xFF ); // unmapped beyond end of address space
 	
 	this->irq.disables  = timer_mask | vdp_mask;
-	this->irq.timer     = future_hes_time;
-	this->irq.vdp       = future_hes_time;
+	this->irq.timer     = (hes_time_t)future_hes_time;
+	this->irq.vdp       = (hes_time_t)future_hes_time;
 	
 	this->timer.enabled = false;
 	this->timer.raw_load= 0x80;

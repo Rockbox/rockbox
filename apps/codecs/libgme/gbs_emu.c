@@ -34,8 +34,8 @@ void clear_track_vars( struct Gbs_Emu* this )
 	this->out_time         = 0;
 	this->emu_time         = 0;
 	this->emu_track_ended_ = true;
-	this->track_ended     = true;
-	this->fade_start       = LONG_MAX / 2 + 1;
+	this->track_ended      = true;
+	this->fade_start       = (blargg_long)(LONG_MAX / 2 + 1);
 	this->fade_step        = 1;
 	this->silence_time     = 0;
 	this->silence_count    = 0;

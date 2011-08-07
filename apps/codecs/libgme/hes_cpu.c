@@ -58,8 +58,8 @@ void Cpu_reset( struct Hes_Cpu* this )
 	
 	this->state_.time = 0;
 	this->state_.base = 0;
-	this->irq_time   = future_hes_time;
-	this->end_time   = future_hes_time;
+	this->irq_time   = (hes_time_t)future_hes_time;
+	this->end_time   = (hes_time_t)future_hes_time;
 	
 	this->r.status = st_i;
 	this->r.sp     = 0;

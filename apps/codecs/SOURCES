@@ -18,7 +18,6 @@ mpc.c
 wma.c
 sid.c
 ape.c
-nsf.c
 asap.c
 aac.c
 spc.c
@@ -36,9 +35,12 @@ wmapro.c
 ay.c
 gbs.c
 hes.c
+#if MEMORYSIZE > 2
+nsf.c
 sgc.c
 vgm.c
 kss.c
+#endif
 
 #ifdef HAVE_RECORDING
 
