@@ -462,7 +462,7 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
 
         if (cnt == 1)
         {
-            /* last block to tranfer */
+            /* last block to transfer */
             SD_DATAT = DATA_XFER_START | DATA_XFER_READ |
                        DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
                        DATA_XFER_SINGLE;
@@ -519,7 +519,7 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
             }
             else if (cnt == 1)
             {
-                /* last block to tranfer */
+                /* last block to transfer */
                 SD_DATAT = DATA_XFER_START | DATA_XFER_READ |
                            DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
                            DATA_XFER_SINGLE;
@@ -616,7 +616,7 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
 
             if (cnt == 1)
             {
-                /* last block to tranfer */
+                /* last block to transfer */
                 SD_DATAT = DATA_XFER_START | DATA_XFER_WRITE |
                            DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
                            DATA_XFER_SINGLE;
