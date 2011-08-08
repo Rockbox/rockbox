@@ -457,18 +457,67 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
 
         ret = 0;
         retry = false;       /* reset retry flag */
-        mmu_buff_reset();    /* reset recive buff state */
+
+        mmu_buff_reset();
+
+        if (cnt == 1)
+        {
+            /* last block to tranfer */
+            SD_DATAT = DATA_XFER_START | DATA_XFER_READ |
+                       DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
+                       DATA_XFER_SINGLE;
+        }
+        else
+        {
+            /* more than one block to transfer */
+            SD_DATAT = DATA_XFER_START | DATA_XFER_READ |
+                       DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
+                       DATA_XFER_MULTI;
+        }
 
         /* issue read command to the card */
         if (!send_cmd(SD_READ_MULTIPLE_BLOCK, start, RES_R1, &response))
         {
-            ret = -4;
+            ret = -2;
             continue;
         }
 
         while (cnt > 0)
         {
-            if (cnt == 1)
+            /* wait for transfer completion */
+            semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
+
+            if (retry)
+            {
+                /* data transfer error */
+                ret = -3;
+                break;
+            }
+
+            /* exchange buffers */
+            mmu_switch_buff();
+
+            A2A_IDST0 = (unsigned long)dst;
+            A2A_CON0  = (3<<9) |    /* burst 16 */
+                        (1<<6) |    /* fixed src */
+                        (1<<3) |    /* DMA start */
+                        (2<<1) |    /* word transfer size */
+                        (1<<0);     /* software mode */
+
+            /* wait for DMA engine to finish transfer */
+            while (A2A_DMA_STS & 1);
+
+            dst += 512;
+            cnt--;
+
+            if (cnt == 0)
+            {
+                if (!send_cmd(SD_STOP_TRANSMISSION, 0, RES_R1b, &response))
+                    ret = -4;
+
+                break;
+            }
+            else if (cnt == 1)
             {
                 /* last block to tranfer */
                 SD_DATAT = DATA_XFER_START | DATA_XFER_READ |
@@ -483,47 +532,15 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
                            DATA_XFER_MULTI;
             }
 
-            /* wait for transfer completion */
-            semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
-
-            if (retry)
-            {
-                /* data transfer error */
-                ret = -5;
-                break;
-            }
-
-            /* exchange buffers */
-            mmu_switch_buff();
-
             last_disk_activity = current_tick;
 
-            /* transfer data from receive buffer to the dest
-             * for (i=0; i<(512/4); i++)
-             *    *dst++ = MMU_DATA;
-             *
-             * below is DMA version in software mode.
-             * SD module provides DMAreq signals and all this
-             * can be done in hardware in theory but I can't
-             * figure this out. OF doesn't use DMA at all.
-             */
-            A2A_IDST0 = (unsigned long)dst;
-            A2A_CON0  = (3<<9) | (1<<6) | (1<<3) | (2<<1) | (1<<0);
-
-            /* wait for DMA engine to finish transfer */
-            while (A2A_DMA_STS & 1);
-
-            dst += 512;
-            cnt--;
         } /* while (cnt > 0) */
-
-        if (!send_cmd(SD_STOP_TRANSMISSION, 0, RES_R1b, &response))
-            ret = -6;
 
         /* transfer successfull - leave retry loop */
         if (ret == 0)
             break;
-    }
+
+    } /* while (retry_cnt++ < 20) */
 
     sd_enable(false);
     mutex_unlock(&sd_mtx);
@@ -548,7 +565,7 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     unsigned int retry_cnt = 0;
     int cnt, ret = 0;
     unsigned char *src;
-    bool card_selected = false;
+    /* bool card_selected = false; */
 
     mutex_lock(&sd_mtx);
     sd_enable(true);
@@ -574,6 +591,18 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
         retry = false;       /* reset retry flag */
         mmu_buff_reset();    /* reset recive buff state */
 
+        /* transfer data from receive buffer to the dest
+         * for (i=0; i<(512/4); i++)
+         *    MMU_DATA = *src++;
+         *
+         * Below is DMA version in software mode.
+         */
+
+        A2A_ISRC0 = (unsigned long)src;
+        A2A_CON0  = (3<<9) | (1<<5) | (1<<3) | (2<<1) | (1<<0);
+
+        while (A2A_DMA_STS & 1);
+
         if (!send_cmd(SD_WRITE_MULTIPLE_BLOCK, start, RES_R1, &response))
         {
             ret = -3;
@@ -582,20 +611,6 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
 
         while (cnt > 0)
         {
-            /* transfer data from receive buffer to the dest
-             * for (i=0; i<(512/4); i++)
-             *    MMU_DATA = *src++;
-             *
-             * Below is DMA version in software mode.
-             */
-
-            A2A_ISRC0 = (unsigned long)src;
-            A2A_CON0  = (3<<9) | (1<<5) | (1<<3) | (2<<1) | (1<<0);
-
-            while (A2A_DMA_STS & 1);
-
-            src += 512;
-
             /* exchange buffers */
             mmu_switch_buff();
 
@@ -614,6 +629,18 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                            DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
                            DATA_XFER_MULTI;
 
+                /* transfer data from receive buffer to the dest
+                 * for (i=0; i<(512/4); i++)
+                 *    MMU_DATA = *src++;
+                 *
+                 * Below is DMA version in software mode.
+                 */
+                src += 512;
+
+                A2A_ISRC0 = (unsigned long)src;
+                A2A_CON0  = (3<<9) | (1<<5) | (1<<3) | (2<<1) | (1<<0);
+
+                while (A2A_DMA_STS & 1);
             }
 
             /* wait for transfer completion */
