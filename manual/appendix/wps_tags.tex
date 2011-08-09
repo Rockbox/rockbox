@@ -266,17 +266,41 @@ Example: \config{\%?mp<Stop|Play|Pause|Ffwd|Rew|Rec|Rec pause|FM|FM pause>}
 
 \section{Current Screen}
   \begin{tagmap}
-    \config{\%cs} & The current screen, 1-15, in the order:
-                Menus, WPS, Recording screen, FM Radio screen, Current Playlist screen,
-                Settings menus, File browser, Database, Plugins, Quickscreen,
-                Pitchscreen, Setting chooser, Playlist Catalog Viewer, Plugin,
-                Conext Menu, System Info screen, Time and Date Screen,
-                Bookmarks\\
+    \config{\%cs} & The current screen, 1-18, in the order shown below\\
   \end{tagmap}
-The tag can also be used as the switch in a conditional tag. For players without
-some capabilities (e.g. having no FM radio) some values will be never yielded.
 
-Example: \config{You are in the \%?cs<Main menu|WPS|Recording screen|FM Radio screen>}
+\begin{table}
+  \begin{rbtabular}{.75\textwidth}{lX}%
+  {\textbf{Number} & \textbf{Screen}}{}{}
+    1 & Menus \\
+    2 & WPS \\
+    3 & Recording screen \\
+    4 & FM Radio screen \\
+    5 & Current Playlist screen \\
+    6 & Settings menus \\
+    7 & File browser \\
+    8 & Database browser \\
+    9 & Plugin browser \\
+    10 & Quickscreen \\
+    11 & Pitchscreen \\
+    12 & Setting chooser \\
+    13 & Playlist Catalogue Viewer \\
+    14 & Plugin \\
+    15 & Context menu \\
+    16 & System Info screen \\ 
+    17 & Time and Date Screen \\
+    18 & Bookmark browser \\
+  \end{rbtabular}
+\end{table}
+
+The tag can also be used as the switch in a conditional tag. For players without
+certain capabilities (e.g. no FM radio) some values will never be returned.
+
+Examples:
+
+\config{You are in the \%?cs<Main menu|WPS|Recording screen|FM Radio screen>}
+
+\config{\%?if(\%cs, =, 2)<This is the WPS>}
 
 \section{List Title (\fname{.sbs} only)}
   \begin{tagmap}
