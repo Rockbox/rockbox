@@ -13,18 +13,21 @@
 # This will invoke aspell interactively.
 
 MANDIR=$(dirname $0)
+PERSONALDICT=$MANDIR/spelldict.pws
 if [ $# -gt 0 ]; then
     TEX_FILES="$1"
 else
-    TEX_FILES=$(find "$MANDIR" -name "*.tex" | sed -e "s/\S*preamble.tex//")
+    TEX_FILES=$(find "$MANDIR" -name "*.tex" | sed -e "s/\S*preamble.tex//;/platform\//d;")
 fi
 
 for file in $TEX_FILES; do
     aspell -t -l en_UK-ise --add-tex-command="opt pp" \
-    --add-tex-command="nopt pp" --add-tex-command="screenshot ppo" \
+    --add-tex-command="nopt pp" --add-tex-command="screenshot ppp" \
     --add-tex-command="reference p" --add-tex-command="fname p" \
     --add-tex-command="wikilink p" --add-tex-command="IfFileExists p" \
     --add-tex-command="newcommand pp" --add-tex-command="renewcommand pp" \
-    --add-tex-command="download p" \
+    --add-tex-command="download p"  --add-tex-command="begin ppp" \
+    --add-tex-command="config p" \
+    --personal=$PERSONALDICT \
     -c $file
 done
