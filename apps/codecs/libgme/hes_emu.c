@@ -49,7 +49,7 @@ void Hes_init( struct Hes_Emu* this )
 {
 	this->sample_rate_ = 0;
 	this->mute_mask_   = 0;
-	this->tempo_       = 1.0;
+	this->tempo_       = (int)(FP_ONE_TEMPO);
 
 	// defaults
 	this->max_initial_silence = 2;
@@ -544,15 +544,15 @@ void Sound_mute_voices( struct Hes_Emu* this, int mask )
 	}
 }
 
-void Sound_set_tempo( struct Hes_Emu* this, double t )
+void Sound_set_tempo( struct Hes_Emu* this, int t )
 {
 	require( this->sample_rate_ ); // sample rate must be set first
-	double const min = 0.02;
-	double const max = 4.00;
+	int const min = (int)(FP_ONE_TEMPO*0.02);
+	int const max = (int)(FP_ONE_TEMPO*4.00);
 	if ( t < min ) t = min;
 	if ( t > max ) t = max;
-	this->play_period = (hes_time_t) (period_60hz / t);
-	this->timer_base = (int) (1024 / t);
+	this->play_period = (hes_time_t) ((period_60hz*FP_ONE_TEMPO) / t);
+	this->timer_base = (int) ((1024*FP_ONE_TEMPO) / t);
 	recalc_timer_load( this );
 	this->tempo_ = t;
 }

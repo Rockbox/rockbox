@@ -76,7 +76,7 @@ void Vgm_init( struct Vgm_Emu* this )
 {
 	this->sample_rate = 0;
 	this->mute_mask_ = 0;
-	this->tempo = 1.0;
+	this->tempo = (int)(FP_ONE_TEMPO);
 	
 	// defaults
 	this->max_initial_silence = 2;
@@ -288,7 +288,7 @@ blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_
 	Ym2612_enable( &this->ym2612, false );
 	Ym2413_enable( &this->ym2413, false );
 	
-	Sound_set_tempo( this, 1 );
+	Sound_set_tempo( this, (int)(FP_ONE_TEMPO) );
 	
 	this->voice_count = sms_osc_count;
 	
@@ -733,27 +733,26 @@ void Sound_mute_voices( struct Vgm_Emu* this, int mask )
 	}
 }
 
-void Sound_set_tempo( struct Vgm_Emu* this, double t )
+void Sound_set_tempo( struct Vgm_Emu* this, int t )
 {
 	require( this->sample_rate ); // sample rate must be set first
-	double const min = 0.02;
-	double const max = 4.00;
+	int const min = (int)(FP_ONE_TEMPO*0.02);
+	int const max = (int)(FP_ONE_TEMPO*4.00);
 	if ( t < min ) t = min;
 	if ( t > max ) t = max;
 	this->tempo = t;
 	
 	if ( this->file_begin )
 	{
-		this->vgm_rate = (long) (44100 * t + 0.5);
-		this->blip_time_factor = (int) ((double)
-				(1 << blip_time_bits) / this->vgm_rate * Blip_clock_rate( &this->stereo_buf.bufs [0] ) + 0.5);
+		this->vgm_rate = (long) ((44100LL * t) / FP_ONE_TEMPO);
+		this->blip_time_factor = (int) (((1LL << blip_time_bits) * Blip_clock_rate( &this->stereo_buf.bufs [0] )) / this->vgm_rate);
 		//debug_printf( "blip_time_factor: %ld\n", blip_time_factor );
 		//debug_printf( "vgm_rate: %ld\n", vgm_rate );
 		// TODO: remove? calculates vgm_rate more accurately (above differs at most by one Hz only)
 		//blip_time_factor = (long) floor( double (1L << blip_time_bits) * psg_rate / 44100 / t + 0.5 );
 		//vgm_rate = (long) floor( double (1L << blip_time_bits) * psg_rate / blip_time_factor + 0.5 );
 		
-		this->fm_time_factor = 2 + (int) (this->fm_rate * (1 << fm_time_bits) / this->vgm_rate + 0.5);
+		this->fm_time_factor = 2 + (int) ((this->fm_rate * (1LL << fm_time_bits)) / this->vgm_rate);
 	}
 }
 

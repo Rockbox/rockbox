@@ -28,7 +28,7 @@ struct Nes_Apu {
 	struct Nes_Triangle        triangle;
 	struct Nes_Dmc             dmc;
 	
-	double tempo_;
+	int tempo_;
 	nes_time_t last_time; // has been run until this time in current frame
 	nes_time_t earliest_irq_;
 	nes_time_t next_irq;
@@ -74,7 +74,7 @@ void Apu_end_frame( struct Nes_Apu* this, nes_time_t ) ICODE_ATTR;
 void Apu_reset( struct Nes_Apu* this, bool pal_mode, int initial_dmc_dac );
 	
 // Adjust frame period
-void Apu_set_tempo( struct Nes_Apu* this, double );
+void Apu_set_tempo( struct Nes_Apu* this, int );
 	
 // Set overall volume (default is 1.0)
 void Apu_volume( struct Nes_Apu* this, double );

@@ -152,11 +152,11 @@ void Apu_reset( struct Gb_Apu* this, enum gb_mode_t mode, bool agb_wave )
 	}
 }
 
-void Apu_set_tempo( struct Gb_Apu* this, double t )
+void Apu_set_tempo( struct Gb_Apu* this, int t )
 {
 	this->frame_period = 4194304 / 512; // 512 Hz
-	if ( t != 1.0 )
-		this->frame_period = t ? (blip_time_t) (this->frame_period / t) : (blip_time_t) (0);
+	if ( t != (int)FP_ONE_TEMPO )
+		this->frame_period = t ? (blip_time_t) ((this->frame_period * FP_ONE_TEMPO) / t) : (blip_time_t) (0);
 }
 
 void Apu_init( struct Gb_Apu* this )
@@ -184,7 +184,7 @@ void Apu_init( struct Gb_Apu* this )
 	}
 	
 	this->reduce_clicks_ = false;
-	Apu_set_tempo( this, 1.0 );
+	Apu_set_tempo( this, (int)FP_ONE_TEMPO );
 	this->volume_ = 1.0;
 	Apu_reset( this, mode_cgb, false );
 }

@@ -97,7 +97,7 @@ struct Kss_Emu {
 	int max_initial_silence;
 	int voice_count;
 	int mute_mask_;
-	double tempo;
+	int tempo;
 	double gain;
 	
 	long sample_rate;
@@ -192,7 +192,7 @@ static inline long Track_get_length( struct Kss_Emu* this, int n )
 
 // Adjust song tempo, where 1.0 = normal, 0.5 = half speed, 2.0 = double speed.
 // Track length as returned by track_info() assumes a tempo of 1.0.
-void Sound_set_tempo( struct Kss_Emu* this, double t );
+void Sound_set_tempo( struct Kss_Emu* this, int t );
 
 // Mute/unmute voice i, where voice 0 is first voice
 void Sound_mute_voice( struct Kss_Emu* this, int index, bool mute );

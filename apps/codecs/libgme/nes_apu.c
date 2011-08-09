@@ -19,7 +19,7 @@ int const amp_range = 15;
 
 void Apu_init( struct Nes_Apu* this )
 {
-	this->tempo_ = 1.0;
+	this->tempo_ = (int)(FP_ONE_TEMPO);
 	this->dmc.apu = this;
 	this->dmc.prg_reader = NULL;
 	this->irq_notifier_ = NULL;
@@ -77,12 +77,12 @@ void Apu_output( struct Nes_Apu* this, struct Blip_Buffer* buffer )
 		Apu_osc_output( this, i, buffer );
 }
 
-void Apu_set_tempo( struct Nes_Apu* this, double t )
+void Apu_set_tempo( struct Nes_Apu* this, int t )
 {
 	this->tempo_ = t;
 	this->frame_period = (this->dmc.pal_mode ? 8314 : 7458);
-	if ( t != 1.0 )
-		this->frame_period = (int) (this->frame_period / t) & ~1; // must be even
+	if ( t != (int)FP_ONE_TEMPO )
+		this->frame_period = (int) ((this->frame_period * FP_ONE_TEMPO) / t) & ~1; // must be even
 }
 
 void Apu_reset( struct Nes_Apu* this, bool pal_mode, int initial_dmc_dac )

@@ -54,7 +54,7 @@ void Nsf_init( struct Nsf_Emu* this )
 {
 	this->sample_rate = 0;
 	this->mute_mask_   = 0;
-	this->tempo        = 1.0;
+	this->tempo        = (int)(FP_ONE_TEMPO);
 	this->gain         = 1.0;
 	
 	// defaults
@@ -474,16 +474,16 @@ void Sound_mute_voices( struct Nsf_Emu* this, int mask )
 	}
 }
 
-void Sound_set_tempo( struct Nsf_Emu* this, double t )
+void Sound_set_tempo( struct Nsf_Emu* this, int t )
 {
 	require( this->sample_rate ); // sample rate must be set first
-	double const min = 0.02;
-	double const max = 4.00;
+	int const min = (int)(FP_ONE_TEMPO*0.02);
+	int const max = (int)(FP_ONE_TEMPO*4.00);
 	if ( t < min ) t = min;
 	if ( t > max ) t = max;
 	this->tempo = t;
 	
-	set_play_period( this, (int) (play_period( &this->header ) / t) );
+	set_play_period( this, (int) ((play_period( &this->header ) * FP_ONE_TEMPO) / t) );
 
 	Apu_set_tempo( &this->apu, t );
 	

@@ -53,7 +53,7 @@ void Kss_init( struct Kss_Emu* this )
 {
 	this->sample_rate   = 0;
 	this->mute_mask_    = 0;
-	this->tempo       = 1.0;
+	this->tempo       = (int)(FP_ONE_TEMPO);
 	this->gain        = 1.0;
 	this->chip_flags = 0;
 	
@@ -509,18 +509,18 @@ void Sound_mute_voices( struct Kss_Emu* this, int mask )
 	}
 }
 
-void Sound_set_tempo( struct Kss_Emu* this, double t )
+void Sound_set_tempo( struct Kss_Emu* this, int t )
 {
 	require( this->sample_rate ); // sample rate must be set first
-	double const min = 0.02;
-	double const max = 4.00;
+	int const min = (int)(FP_ONE_TEMPO*0.02);
+	int const max = (int)(FP_ONE_TEMPO*4.00);
 	if ( t < min ) t = min;
 	if ( t > max ) t = max;
 	this->tempo = t;
 	
 	blip_time_t period =
 		(this->header.device_flags & 0x40 ? clock_rate / 50 : clock_rate / 60);
-	this->play_period = (blip_time_t) (period / t);
+	this->play_period = (blip_time_t) ((period * FP_ONE_TEMPO) / t);
 }
 
 void fill_buf( struct Kss_Emu* this );

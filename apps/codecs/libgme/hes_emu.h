@@ -69,7 +69,7 @@ struct Hes_Emu {
 	long sample_rate_;
 	unsigned buf_changed_count;
 	int voice_count_;
-	double tempo_;
+	int tempo_;
 	double gain_;
 	
 	// track-specific
@@ -168,7 +168,7 @@ static inline long Track_get_length( struct Hes_Emu* this, int n )
 // Sound customization
 // Adjust song tempo, where 1.0 = normal, 0.5 = half speed, 2.0 = double speed.
 // Track length as returned by track_info() assumes a tempo of 1.0.
-void Sound_set_tempo( struct Hes_Emu* this, double );
+void Sound_set_tempo( struct Hes_Emu* this, int );
 
 // Mute/unmute voice i, where voice 0 is first voice
 void Sound_mute_voice( struct Hes_Emu* this, int index, bool mute );

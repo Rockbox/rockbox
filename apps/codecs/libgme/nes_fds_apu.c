@@ -108,12 +108,12 @@ void Fds_write_( struct Nes_Fds_Apu* this, unsigned addr, int data )
 	}
 }
 
-void Fds_set_tempo( struct Nes_Fds_Apu* this, double t )
+void Fds_set_tempo( struct Nes_Fds_Apu* this, int t )
 {
 	this->lfo_tempo = lfo_base_tempo;
-	if ( t != 1.0 )
+	if ( t != (int)FP_ONE_TEMPO )
 	{
-		this->lfo_tempo = (int) ((double) lfo_base_tempo / t + 0.5);
+		this->lfo_tempo = (int) ((lfo_base_tempo * FP_ONE_TEMPO) / t);
 		if ( this->lfo_tempo <= 0 )
 			this->lfo_tempo = 1;
 	}

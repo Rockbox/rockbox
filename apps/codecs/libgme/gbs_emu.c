@@ -46,7 +46,7 @@ void Gbs_init( struct Gbs_Emu* this )
 {	
 	this->sample_rate_ = 0;
 	this->mute_mask_   = 0;
-	this->tempo_       = 1.0;
+	this->tempo_       = (int)(FP_ONE_TEMPO);
 	
 	// Unload
 	this->header.timer_mode = 0;
@@ -304,16 +304,16 @@ void Sound_mute_voices( struct Gbs_Emu* this, int mask )
 	}
 }
 
-void Sound_set_tempo( struct Gbs_Emu* this, double t )
+void Sound_set_tempo( struct Gbs_Emu* this, int t )
 {
 	require( this->sample_rate_ ); // sample rate must be set first
-	double const min = 0.02;
-	double const max = 4.00;
+	int const min = (int)(FP_ONE_TEMPO*0.02);
+	int const max = (int)(FP_ONE_TEMPO*4.00);
 	if ( t < min ) t = min;
 	if ( t > max ) t = max;
 	this->tempo_ = t;
 		
-	this->tempo = (int) (tempo_unit / t + 0.5 );
+	this->tempo = (int) ((tempo_unit * FP_ONE_TEMPO) / t);
 	Apu_set_tempo( &this->apu, t );
 	Update_timer( this );
 }

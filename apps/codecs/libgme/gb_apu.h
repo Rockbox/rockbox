@@ -77,7 +77,7 @@ void Apu_reduce_clicks( struct Gb_Apu* this, bool reduce );
 	
 // Sets frame sequencer rate, where 1.0 is normal. Meant for adjusting the
 // tempo in a music player.
-void Apu_set_tempo( struct Gb_Apu* this, double t );
+void Apu_set_tempo( struct Gb_Apu* this, int t );
 
 
 void write_osc( struct Gb_Apu* this, int reg, int old_data, int data ) ICODE_ATTR;

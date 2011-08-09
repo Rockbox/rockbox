@@ -48,7 +48,7 @@ struct Nes_Fds_Apu {
 // init
 void Fds_init( struct Nes_Fds_Apu* this );
 // setup
-void Fds_set_tempo( struct Nes_Fds_Apu* this, double t );
+void Fds_set_tempo( struct Nes_Fds_Apu* this, int t );
 	
 // emulation
 void Fds_reset( struct Nes_Fds_Apu* this );

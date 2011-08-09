@@ -54,7 +54,7 @@ void Ay_init( struct Ay_Emu *this )
 {
 	this->sample_rate  = 0;
 	this->mute_mask_   = 0;
-	this->tempo        = 1.0;
+	this->tempo        = (int)FP_ONE_TEMPO;
 	this->gain         = 1.0;
 	this->track_count  = 0;
 	
@@ -343,11 +343,11 @@ void Sound_mute_voices( struct Ay_Emu *this, int mask )
 	}
 }
 
-void Sound_set_tempo( struct Ay_Emu *this, double t )
+void Sound_set_tempo( struct Ay_Emu *this, int t )
 {
 	require( this->sample_rate ); // sample rate must be set first
-	double const min = 0.02;
-	double const max = 4.00;
+	int const min = (int)(FP_ONE_TEMPO*0.02);
+	int const max = (int)(FP_ONE_TEMPO*4.00);
 	if ( t < min ) t = min;
 	if ( t > max ) t = max;
 	this->tempo = t;
@@ -356,7 +356,7 @@ void Sound_set_tempo( struct Ay_Emu *this, double t )
 	if ( this->clock_rate_ != spectrum_clock )
 		p = this->clock_rate_ / 50;
 	
-	this->play_period = (blip_time_t) (p / t);
+	this->play_period = (blip_time_t) ((p * FP_ONE_TEMPO) / t);
 }
 
 void fill_buf( struct Ay_Emu *this ) ICODE_ATTR;;

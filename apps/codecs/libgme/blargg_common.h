@@ -20,6 +20,9 @@
 #include "codeclib.h"
 #endif
 
+// common defines
+#define FP_ONE_TEMPO (1LL <<16)
+
 #if 1 /* IRAM configuration is not yet active for all libGME codecs. */
     #undef  ICODE_ATTR
     #define ICODE_ATTR

@@ -46,7 +46,7 @@ void Sgc_init( struct Sgc_Emu* this )
 	
 	this->sample_rate = 0;
 	this->mute_mask_  = 0;
-	this->tempo       = 1.0;
+	this->tempo       = (int)FP_ONE_TEMPO;
 	this->gain        = 1.0;
 	this->voice_count = 0;
 	
@@ -294,16 +294,16 @@ void Sound_mute_voices( struct Sgc_Emu* this, int mask )
 	}
 }
 
-void Sound_set_tempo( struct Sgc_Emu* this, double t )
+void Sound_set_tempo( struct Sgc_Emu* this, int t )
 {
 	require( this->sample_rate ); // sample rate must be set first
-	double const min = 0.02;
-	double const max = 4.00;
+	int const min = (int)(FP_ONE_TEMPO*0.02);
+	int const max = (int)(FP_ONE_TEMPO*4.00);
 	if ( t < min ) t = min;
 	if ( t > max ) t = max;
 	this->tempo = t;
 
-	this->play_period = (int) (clock_rate( this ) / (this->header.rate ? 50 : 60) / t);
+	this->play_period = (int) ((clock_rate( this ) * FP_ONE_TEMPO) / (this->header.rate ? 50 : 60) / t);
 }
 
 void fill_buf( struct Sgc_Emu* this ) ICODE_ATTR;
