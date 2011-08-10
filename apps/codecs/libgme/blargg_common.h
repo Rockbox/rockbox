@@ -21,7 +21,8 @@
 #endif
 
 // common defines
-#define FP_ONE_TEMPO (1LL <<16)
+#define FP_ONE_TEMPO (1LL <<24)
+#define FP_ONE_GAIN  (1LL <<24)
 
 #if 1 /* IRAM configuration is not yet active for all libGME codecs. */
     #undef  ICODE_ATTR

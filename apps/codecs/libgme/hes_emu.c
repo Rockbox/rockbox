@@ -61,7 +61,7 @@ void Hes_init( struct Hes_Emu* this )
 
 	this->timer.raw_load = 0;
 	this->silence_lookahead = 6;
-	Sound_set_gain( this, 1.11 );
+	Sound_set_gain( this, (int)(FP_ONE_GAIN*1.11) );
 
 	Rom_init( &this->rom, 0x2000 );
 
@@ -131,8 +131,8 @@ blargg_err_t Hes_load( struct Hes_Emu* this, void* data, long size )
 	
 	this->voice_count_ = osc_count + adpcm_osc_count;
 	
-	Apu_volume( &this->apu, this->gain_ );
-	Adpcm_volume( &this->adpcm, this->gain_ );
+	Apu_volume( &this->apu, (double)(this->gain_)/FP_ONE_GAIN );
+	Adpcm_volume( &this->adpcm, (double)(this->gain_)/FP_ONE_GAIN );
 
     // Setup buffer	
 	this->clock_rate_ = 7159091;

@@ -55,7 +55,7 @@ void Gbs_init( struct Gbs_Emu* this )
 	this->ignore_silence     = false;
 	this->silence_lookahead = 6;
 	this->max_initial_silence = 21;
-	Sound_set_gain( this, 1.2 );
+	Sound_set_gain( this, (int)(FP_ONE_GAIN*1.2) );
 	
 	Rom_init( &this->rom, 0x4000 );
 	
@@ -112,7 +112,7 @@ blargg_err_t Gbs_load( struct Gbs_Emu* this, void* data, long size )
 	Rom_set_addr( &this->rom, load_addr );
 
 	this->voice_count_ = osc_count;
-	Apu_volume( &this->apu, this->gain_ );
+	Apu_volume( &this->apu, (double)(this->gain_)/FP_ONE_GAIN );
 
 	// Change clock rate & setup buffer
 	this->clock_rate_ = 4194304;

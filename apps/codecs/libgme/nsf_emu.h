@@ -90,7 +90,7 @@ struct Nsf_Emu {
 	int voice_count;
 	int mute_mask_;
 	int tempo;
-	double gain;
+	int gain;
 	
 	long sample_rate;
 	
@@ -200,7 +200,7 @@ void Sound_mute_voices( struct Nsf_Emu* this, int mask );
 
 // Change overall output amplitude, where 1.0 results in minimal clamping.
 // Must be called before set_sample_rate().
-static inline void Sound_set_gain( struct Nsf_Emu* this, double g )
+static inline void Sound_set_gain( struct Nsf_Emu* this, int g )
 {
 	assert( !this->sample_rate ); // you must set gain before setting sample rate
 	this->gain = g;

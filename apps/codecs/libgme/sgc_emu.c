@@ -47,7 +47,7 @@ void Sgc_init( struct Sgc_Emu* this )
 	this->sample_rate = 0;
 	this->mute_mask_  = 0;
 	this->tempo       = (int)FP_ONE_TEMPO;
-	this->gain        = 1.0;
+	this->gain        = (int)FP_ONE_GAIN;
 	this->voice_count = 0;
 	
 	// defaults
@@ -61,7 +61,7 @@ void Sgc_init( struct Sgc_Emu* this )
 	Rom_init( &this->rom, 0x4000 );
 	Z80_init( &this->cpu );
 
-	Sound_set_gain( this, 1.2 );
+	Sound_set_gain( this, (int)(FP_ONE_GAIN*1.2) );
 		
 	// Unload
 	clear_track_vars( this );
@@ -96,8 +96,8 @@ blargg_err_t Sgc_load_mem( struct Sgc_Emu* this, const void* data, long size )
 	this->track_count = this->header.song_count;
 	this->voice_count =  sega_mapping( this ) ? osc_count : sms_osc_count;
 	
-	Sms_apu_volume( &this->apu, this->gain );
-	Fm_apu_volume( &this->fm_apu, this->gain );
+	Sms_apu_volume( &this->apu, (double)(this->gain)/FP_ONE_GAIN );
+	Fm_apu_volume( &this->fm_apu, (double)(this->gain)/FP_ONE_GAIN );
 
 	// Setup buffer
 	this->clock_rate_ = clock_rate( this );

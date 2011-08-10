@@ -55,7 +55,7 @@ void Ay_init( struct Ay_Emu *this )
 	this->sample_rate  = 0;
 	this->mute_mask_   = 0;
 	this->tempo        = (int)FP_ONE_TEMPO;
-	this->gain         = 1.0;
+	this->gain         = (int)FP_ONE_GAIN;
 	this->track_count  = 0;
 	
 	// defaults
@@ -144,7 +144,7 @@ blargg_err_t Ay_load_mem( struct Ay_Emu *this, byte const in [], int size )
 		warning( "Unknown file version" ); */
 	
 	this->voice_count = ay_osc_count + 1; // +1 for beeper
-	Ay_apu_volume( &this->apu, this->gain );
+	Ay_apu_volume( &this->apu, ((double)this->gain)/FP_ONE_GAIN);
 	
 	// Setup buffer
 	change_clock_rate( this, spectrum_clock );

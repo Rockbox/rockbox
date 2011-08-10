@@ -54,7 +54,7 @@ void Kss_init( struct Kss_Emu* this )
 	this->sample_rate   = 0;
 	this->mute_mask_    = 0;
 	this->tempo       = (int)(FP_ONE_TEMPO);
-	this->gain        = 1.0;
+	this->gain        = (int)FP_ONE_GAIN;
 	this->chip_flags = 0;
 	
 	// defaults
@@ -98,24 +98,24 @@ static blargg_err_t check_kss_header( void const* header )
 
 void update_gain( struct Kss_Emu* this )
 {
-	double g = this->gain;
+	int g = this->gain;
 	if ( msx_music_enabled( this ) || msx_audio_enabled( this ) 
 	  || sms_fm_enabled( this ) )
 	{
-		g *= 0.75;
+		g = (g*3) / 4; //g *= 0.75;
 	}
 	else
 	{
 		if ( this->scc_accessed )
-			g *= 1.2;
+			g = (g*6) / 5; //g *= 1.2;
 	}
 	
-	if ( sms_psg_enabled( this ) ) Sms_apu_volume( &this->sms.psg, g );
-	if ( sms_fm_enabled( this )  ) Opl_volume( &this->sms.fm, g );
-	if ( msx_psg_enabled( this ) ) Ay_apu_volume( &this->msx.psg, g );
-	if ( msx_scc_enabled( this ) ) Scc_volume( &this->msx.scc, g );
-	if ( msx_music_enabled( this ) ) Opl_volume( &this->msx.music, g );
-	if ( msx_audio_enabled( this ) ) Opl_volume( &this->msx.audio, g );
+	if ( sms_psg_enabled( this ) ) Sms_apu_volume( &this->sms.psg, (double)(g)/FP_ONE_GAIN );
+	if ( sms_fm_enabled( this )  ) Opl_volume( &this->sms.fm, (double)(g)/FP_ONE_GAIN );
+	if ( msx_psg_enabled( this ) ) Ay_apu_volume( &this->msx.psg, (double)(g)/FP_ONE_GAIN );
+	if ( msx_scc_enabled( this ) ) Scc_volume( &this->msx.scc, (double)(g)/FP_ONE_GAIN );
+	if ( msx_music_enabled( this ) ) Opl_volume( &this->msx.music, (double)(g)/FP_ONE_GAIN );
+	if ( msx_audio_enabled( this ) ) Opl_volume( &this->msx.audio, (double)(g)/FP_ONE_GAIN );
 }
 
 blargg_err_t Kss_load_mem( struct Kss_Emu* this, const void* data, long size )

@@ -63,7 +63,7 @@ struct Gbs_Emu {
 	long sample_rate_;
 	unsigned buf_changed_count;
 	int voice_count_;
-	double gain_;
+	int gain_;
 	int tempo_;
 	
 	// track-specific
@@ -169,7 +169,7 @@ void Sound_mute_voices( struct Gbs_Emu* this, int mask );
 
 // Change overall output amplitude, where 1.0 results in minimal clamping.
 // Must be called before set_sample_rate().
-static inline void Sound_set_gain( struct Gbs_Emu* this, double g )
+static inline void Sound_set_gain( struct Gbs_Emu* this, int g )
 {
 	assert( !this->sample_rate_ ); // you must set gain before setting sample rate
 	this->gain_ = g;

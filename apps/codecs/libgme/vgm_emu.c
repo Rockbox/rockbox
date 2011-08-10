@@ -104,7 +104,7 @@ void Vgm_init( struct Vgm_Emu* this )
 
 	// Set sound gain, a value too high
 	// will cause saturation
-	Sound_set_gain(this, 1.0);
+	Sound_set_gain(this, (int)FP_ONE_GAIN);
 	
 	// Unload
 	this->voice_count = 0;
@@ -350,13 +350,13 @@ blargg_err_t setup_fm( struct Vgm_Emu* this )
 	if ( uses_fm( this ) )
 	{
 		this->voice_count = 8;
-		RETURN_ERR( Resampler_setup( &this->resampler, fm_rate / this->sample_rate, rolloff, fm_gain * this->gain ) );
+		RETURN_ERR( Resampler_setup( &this->resampler, fm_rate / this->sample_rate, rolloff, fm_gain * (double)(this->gain)/FP_ONE_GAIN ) );
 		RETURN_ERR( Resampler_reset( &this->resampler, Buffer_length( &this->stereo_buf ) * this->sample_rate / 1000 ) );
-		Sms_apu_volume( &this->psg, 0.195 * fm_gain * this->gain );
+		Sms_apu_volume( &this->psg, 0.195 * fm_gain * (double)(this->gain)/FP_ONE_GAIN );
 	}
 	else
 	{
-		Sms_apu_volume( &this->psg, this->gain );
+		Sms_apu_volume( &this->psg, (double)(this->gain)/FP_ONE_GAIN );
 	}
 	
 	return 0;
@@ -717,7 +717,7 @@ void Sound_mute_voices( struct Vgm_Emu* this, int mask )
 			Sms_apu_set_output( &this->psg, i, ( mask & 0x80 ) ? 0 : &this->stereo_buf.bufs [0], NULL, NULL );
 		if ( Ym2612_enabled( &this->ym2612 ) )
 		{
-			Synth_volume( &this->pcm, (mask & 0x40) ? 0.0 : 0.1115 / 256 * fm_gain * this->gain );
+			Synth_volume( &this->pcm, (mask & 0x40) ? 0.0 : 0.1115 / 256 * fm_gain * (double)(this->gain)/FP_ONE_GAIN );
 			Ym2612_mute_voices( &this->ym2612, mask );
 		}
 		
