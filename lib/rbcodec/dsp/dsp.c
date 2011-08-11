@@ -186,6 +186,9 @@ static long track_peak;
 static long album_peak;
 static long replaygain;
 static bool crossfeed_enabled;
+static int  replaygain_type;
+static bool replaygain_noclip;
+static int  replaygain_preamp;
 
 #define AUDIO_DSP (dsp_conf[CODEC_IDX_AUDIO])
 #define VOICE_DSP (dsp_conf[CODEC_IDX_VOICE])
@@ -1190,6 +1193,53 @@ int dsp_callback(int msg, intptr_t param)
 }
 #endif
 
+static void dsp_recalc_replaygain(void)
+{
+    long gain = 0;
+
+    new_gain = false;
+
+    if ((replaygain_type != RBCODEC_REPLAYGAIN_NONE) || replaygain_noclip)
+    {
+        bool track_mode = replaygain_type == RBCODEC_REPLAYGAIN_TRACK
+                          && track_gain != 0;
+        long peak = (track_mode || !album_peak) ? track_peak : album_peak;
+
+        if (replaygain_type != RBCODEC_REPLAYGAIN_NONE)
+        {
+            gain = (track_mode || !album_gain) ? track_gain : album_gain;
+
+            if (replaygain_preamp)
+            {
+                long preamp = get_replaygain_int(replaygain_preamp * 10);
+                gain = (long) (((int64_t) gain * preamp) >> 24);
+            }
+        }
+
+        if (gain == 0)
+        {
+            /* So that noclip can work even with no gain information. */
+            gain = DEFAULT_GAIN;
+        }
+
+        if (replaygain_noclip && (peak != 0)
+            && ((((int64_t) gain * peak) >> 24) >= DEFAULT_GAIN))
+        {
+            gain = (((int64_t) DEFAULT_GAIN << 24) / peak);
+        }
+
+        if (gain == DEFAULT_GAIN)
+        {
+            /* Nothing to do, disable processing. */
+            gain = 0;
+        }
+    }
+
+    /* Store in S7.24 format to simplify calculations. */
+    replaygain = gain;
+    set_gain(&AUDIO_DSP);
+}
+
 /* Process and convert src audio to dst based on the DSP configuration,
  * reading count number of audio samples. dst is assumed to be large
  * enough; use dsp_output_count() to get the required number. src is an
@@ -1211,7 +1261,7 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 #endif
 
     if (new_gain)
-        dsp_set_replaygain(); /* Gain has changed */
+        dsp_recalc_replaygain(); /* Gain has changed */
 
     /* Testing function pointers for NULL is preferred since the pointer
        will be preloaded to be used for the call if not. */
@@ -1481,68 +1531,12 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
     return 1;
 }
 
-int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
+void rbcodec_dsp_set_replaygain(int type, bool noclip, int preamp)
 {
-    int type;
-
-    bool track = ((global_settings.replaygain_type == REPLAYGAIN_TRACK)
-        || ((global_settings.replaygain_type == REPLAYGAIN_SHUFFLE)
-            && global_settings.playlist_shuffle));
-
-    type = (!track && have_album_gain) ? REPLAYGAIN_ALBUM 
-        : have_track_gain ? REPLAYGAIN_TRACK : -1;
-    
-    return type;
-}
-
-void dsp_set_replaygain(void)
-{
-    long gain = 0;
-
-    new_gain = false;
-
-    if ((global_settings.replaygain_type != REPLAYGAIN_OFF) ||
-            global_settings.replaygain_noclip)
-    {
-        bool track_mode = get_replaygain_mode(track_gain != 0,
-            album_gain != 0) == REPLAYGAIN_TRACK;
-        long peak = (track_mode || !album_peak) ? track_peak : album_peak;
-
-        if (global_settings.replaygain_type != REPLAYGAIN_OFF)
-        {
-            gain = (track_mode || !album_gain) ? track_gain : album_gain;
-
-            if (global_settings.replaygain_preamp)
-            {
-                long preamp = get_replaygain_int(
-                    global_settings.replaygain_preamp * 10);
-
-                gain = (long) (((int64_t) gain * preamp) >> 24);
-            }
-        }
-
-        if (gain == 0)
-        {
-            /* So that noclip can work even with no gain information. */
-            gain = DEFAULT_GAIN;
-        }
-
-        if (global_settings.replaygain_noclip && (peak != 0)
-            && ((((int64_t) gain * peak) >> 24) >= DEFAULT_GAIN))
-        {
-            gain = (((int64_t) DEFAULT_GAIN << 24) / peak);
-        }
-
-        if (gain == DEFAULT_GAIN)
-        {
-            /* Nothing to do, disable processing. */
-            gain = 0;
-        }
-    }
-
-    /* Store in S7.24 format to simplify calculations. */
-    replaygain = gain;
-    set_gain(&AUDIO_DSP);
+    replaygain_type = type;
+    replaygain_noclip = noclip;
+    replaygain_preamp = preamp;
+    dsp_recalc_replaygain();
 }
 
 /** SET COMPRESSOR

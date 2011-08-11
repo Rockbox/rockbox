@@ -35,6 +35,7 @@
 #include "scrobbler.h"
 #include "audio.h"
 #include "cuesheet.h"
+#include "misc.h"
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #endif

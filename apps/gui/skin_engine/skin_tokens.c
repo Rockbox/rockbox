@@ -729,6 +729,24 @@ static void format_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 
 #endif /* HAVE_LCD_CHARCELLS */
 
+#if CONFIG_CODEC == SWCODEC
+static int get_replaygain_mode(struct mp3entry *id3)
+{
+    if (UNLIKELY(!id3))
+        return -1;
+
+    bool have_track_gain = id3->track_gain != 0;
+    bool have_album_gain = id3->album_gain != 0;
+
+    bool track = global_settings.replaygain_type == REPLAYGAIN_TRACK
+                 || (global_settings.replaygain_type == REPLAYGAIN_SHUFFLE
+                     && global_settings.playlist_shuffle);
+
+    return (have_track_gain && (track || !have_album_gain)) ? REPLAYGAIN_TRACK
+           : have_album_gain ? REPLAYGAIN_ALBUM : -1;
+}
+#endif
+
 /* Don't inline this; it was broken out of get_token_value to reduce stack
  * usage.
  */
@@ -1424,12 +1442,7 @@ const char *get_token_value(struct gui_wps *gwps,
                 val = 1; /* off */
             else
             {
-                int type;
-                if (LIKELY(id3))
-                    type = get_replaygain_mode(id3->track_gain != 0,
-                                               id3->album_gain != 0);
-                else
-                    type = -1;
+                int type = get_replaygain_mode(id3);
 
                 if (type < 0)
                     val = 6;    /* no tag */

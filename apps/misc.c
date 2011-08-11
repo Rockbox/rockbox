@@ -59,6 +59,7 @@
 #include "yesno.h"
 #include "viewport.h"
 #include "list.h"
+#include "dsp.h"
 
 #include "debug.h"
 
@@ -799,6 +800,24 @@ void setvol(void)
     global_status.last_volume_change = current_tick;
     settings_save();
 }
+
+#if CONFIG_CODEC == SWCODEC
+void dsp_set_replaygain(void)
+{
+    int type;
+    if (global_settings.replaygain_type == REPLAYGAIN_OFF)
+        type = RBCODEC_REPLAYGAIN_NONE;
+    else if (global_settings.replaygain_type == REPLAYGAIN_ALBUM)
+        type = RBCODEC_REPLAYGAIN_ALBUM;
+    else if (global_settings.replaygain_type == REPLAYGAIN_TRACK)
+        type = RBCODEC_REPLAYGAIN_TRACK;
+    else /* REPLAYGAIN_SHUFFLE */
+        type = global_settings.playlist_shuffle ? REPLAYGAIN_TRACK
+                                                : REPLAYGAIN_ALBUM;
+    rbcodec_dsp_set_replaygain(type, global_settings.replaygain_noclip,
+                               global_settings.replaygain_preamp);
+}
+#endif
 
 char* strrsplt(char* str, int c)
 {

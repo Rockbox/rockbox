@@ -85,6 +85,8 @@ void check_bootfile(bool do_rolo);
 /* check range, set volume and save settings */
 void setvol(void);
 
+void dsp_set_replaygain(void);
+
 #ifdef HAVE_LCD_COLOR
 int hex_to_rgb(const char* hex, int* color);
 #endif

@@ -57,7 +57,6 @@ enum
     DSP_CROSSFEED
 };
 
-
 /****************************************************************************
  * NOTE: Any assembly routines that use these structures must be updated
  * if current data members are moved or changed.
@@ -95,6 +94,12 @@ struct dsp_data
                                         /* 28h */
 };
 
+enum {
+    RBCODEC_REPLAYGAIN_NONE,
+    RBCODEC_REPLAYGAIN_TRACK,
+    RBCODEC_REPLAYGAIN_ALBUM,
+};
+
 struct dsp_config;
 
 int dsp_process(struct dsp_config *dsp, char *dest,
@@ -103,8 +108,7 @@ int dsp_input_count(struct dsp_config *dsp, int count);
 int dsp_output_count(struct dsp_config *dsp, int count);
 intptr_t dsp_configure(struct dsp_config *dsp, int setting,
                        intptr_t value);
-int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
-void dsp_set_replaygain(void);
+void rbcodec_dsp_set_replaygain(int type, bool noclip, int preamp);
 void dsp_set_crossfeed(bool enable);
 void dsp_set_crossfeed_direct_gain(int gain);
 void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain,
