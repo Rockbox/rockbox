@@ -17,7 +17,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #include "blargg_source.h"
 
-inline void set_code_page( struct Gb_Cpu* this, int i, void* p )
+static inline void set_code_page( struct Gb_Cpu* this, int i, void* p )
 {
 	byte* p2 = STATIC_CAST(byte*,p) - GB_CPU_OFFSET( i * page_size );
 	this->cpu_state_.code_map [i] = p2;

@@ -57,7 +57,7 @@ void Resampler_resize( struct Resampler* this, int pairs )
 	}
 }
 
-void mix_mono( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsample_t* out_ )
+static void mix_mono( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsample_t* out_ )
 {
 	int const bass = BLIP_READER_BASS( stereo_buf->bufs [0] );
 	BLIP_READER_BEGIN( sn, stereo_buf->bufs [0] );
@@ -90,7 +90,7 @@ void mix_mono( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsample
 	BLIP_READER_END( sn, stereo_buf->bufs [0] );
 }
 
-void mix_stereo( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsample_t* out_ )
+static void mix_stereo( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsample_t* out_ )
 {
 	int const bass = BLIP_READER_BASS( stereo_buf->bufs [0] );
 	BLIP_READER_BEGIN( snc, stereo_buf->bufs [0] );
@@ -133,7 +133,7 @@ void mix_stereo( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsamp
 	BLIP_READER_END( snr, stereo_buf->bufs [2] );
 }
 
-void mix_stereo_no_center( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsample_t* out_ )
+static void mix_stereo_no_center( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsample_t* out_ )
 {
 	int const bass = BLIP_READER_BASS( stereo_buf->bufs [0] );
 	BLIP_READER_BEGIN( snl, stereo_buf->bufs [1] );
@@ -171,7 +171,7 @@ void mix_stereo_no_center( struct Resampler* this, struct Stereo_Buffer* stereo_
 	BLIP_READER_END( snr, stereo_buf->bufs [2] );
 }
 
-dsample_t const* resample_( struct Resampler* this, dsample_t** out_,
+static dsample_t const* resample_( struct Resampler* this, dsample_t** out_,
 		dsample_t const* out_end, dsample_t const in [], int in_size )
 {
 	in_size -= write_offset;
@@ -209,7 +209,7 @@ dsample_t const* resample_( struct Resampler* this, dsample_t** out_,
 	return in;
 }
 
-inline int resample_wrapper( struct Resampler* this, dsample_t out [], int* out_size,
+static inline int resample_wrapper( struct Resampler* this, dsample_t out [], int* out_size,
 		dsample_t const in [], int in_size )
 {
 	assert( Resampler_rate( this ) );
@@ -223,7 +223,7 @@ inline int resample_wrapper( struct Resampler* this, dsample_t out [], int* out_
 	return result;
 }
 
-int skip_input( struct Resampler* this, int count )
+static int skip_input( struct Resampler* this, int count )
 {
 	this->write_pos -= count;
 	if ( this->write_pos < 0 ) // occurs when downsampling
@@ -235,7 +235,7 @@ int skip_input( struct Resampler* this, int count )
 	return count;
 }
 
-void play_frame_( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsample_t* out )
+static void play_frame_( struct Resampler* this, struct Stereo_Buffer* stereo_buf, dsample_t* out )
 {
 	long pair_count = this->sample_buf_size >> 1;
 	blip_time_t blip_time = Blip_count_clocks( &stereo_buf->bufs [0], pair_count );

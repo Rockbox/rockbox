@@ -23,7 +23,7 @@ void Sms_apu_volume( struct Sms_Apu* this, int vol )
 	Synth_volume( &this->synth, vol );
 }
 
-inline int calc_output( struct Sms_Apu* this, int i )
+static inline int calc_output( struct Sms_Apu* this, int i )
 {
 	int flags = this->ggstereo >> i;
 	return (flags >> 3 & 2) | (flags & 1);

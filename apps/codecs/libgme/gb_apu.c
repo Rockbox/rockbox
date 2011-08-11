@@ -24,7 +24,7 @@ int const wave_ram   = 0xFF30;
 
 int const power_mask = 0x80;
 
-inline int calc_output( struct Gb_Apu* this, int osc )
+static inline int calc_output( struct Gb_Apu* this, int osc )
 {
 	int bits = this->regs [stereo_reg - io_addr] >> osc;
 	return (bits >> 3 & 2) | (bits & 1);
@@ -49,13 +49,13 @@ void Apu_set_output( struct Gb_Apu* this, int i, struct Blip_Buffer* center, str
 	o->output = o->outputs [calc_output( this, i )];
 }
 
-void synth_volume( struct Gb_Apu* this, int iv )
+static void synth_volume( struct Gb_Apu* this, int iv )
 {
 	int v = (this->volume_ * 6) / 10 / osc_count / 15 /*steps*/ / 8 /*master vol range*/ * iv;
 	Synth_volume( &this->synth, v );
 }
 
-void apply_volume( struct Gb_Apu* this )
+static void apply_volume( struct Gb_Apu* this )
 {
 	// TODO: Doesn't handle differing left and right volumes (panning).
 	// Not worth the complexity.
@@ -76,7 +76,7 @@ void Apu_volume( struct Gb_Apu* this, int v )
 	}
 }
 
-void reset_regs( struct Gb_Apu* this )
+static void reset_regs( struct Gb_Apu* this )
 {
 	int i;
 	for ( i = 0; i < 0x20; i++ )
@@ -90,7 +90,7 @@ void reset_regs( struct Gb_Apu* this )
 	apply_volume( this );
 }
 
-void reset_lengths( struct Gb_Apu* this )
+static void reset_lengths( struct Gb_Apu* this )
 {
 	this->square1.osc.length_ctr = 64;
 	this->square2.osc.length_ctr = 64;
@@ -189,7 +189,7 @@ void Apu_init( struct Gb_Apu* this )
 	Apu_reset( this, mode_cgb, false );
 }
 
-void run_until_( struct Gb_Apu* this, blip_time_t end_time )
+static void run_until_( struct Gb_Apu* this, blip_time_t end_time )
 {
 	if ( !this->frame_period )
 		this->frame_time += end_time - this->last_time;
@@ -238,7 +238,7 @@ void run_until_( struct Gb_Apu* this, blip_time_t end_time )
 	}
 }
 
-inline void run_until( struct Gb_Apu* this, blip_time_t time )
+static inline void run_until( struct Gb_Apu* this, blip_time_t time )
 {
 	require( time >= this->last_time ); // end_time must not be before previous time
 	if ( time > this->last_time )
@@ -261,7 +261,7 @@ void Apu_end_frame( struct Gb_Apu* this, blip_time_t end_time )
 	assert( this->last_time >= 0 );
 }
 
-void silence_osc( struct Gb_Apu* this, struct Gb_Osc* o )
+static void silence_osc( struct Gb_Apu* this, struct Gb_Osc* o )
 {
 	int delta = -o->last_amp;
 	if ( this->reduce_clicks_ )
@@ -278,7 +278,7 @@ void silence_osc( struct Gb_Apu* this, struct Gb_Osc* o )
 	}
 }
 
-void apply_stereo( struct Gb_Apu* this )
+static void apply_stereo( struct Gb_Apu* this )
 {
 	int i;
 	for ( i = osc_count; --i >= 0; )

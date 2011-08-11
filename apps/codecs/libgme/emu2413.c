@@ -1495,7 +1495,7 @@ OPLL_is_internal_muted(OPLL * opll)
   return opll->internal_mute; 
 }
 
-e_uint32
+static e_uint32
 check_mute_helper(OPLL * opll)
 {		
   for (int i = 0; i < 6; i++) {
@@ -1524,7 +1524,7 @@ check_mute_helper(OPLL * opll)
   return 1;    /* nothing is playing, then mute */
 }
 
-void
+static void
 check_mute(OPLL * opll)
 {
   OPLL_set_internal_mute (opll, check_mute_helper (opll));

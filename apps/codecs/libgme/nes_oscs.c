@@ -82,7 +82,7 @@ void Square_clock_sweep( struct Nes_Square* this, int negative_adjust )
 }
 
 // TODO: clean up
-inline nes_time_t Square_maintain_phase( struct Nes_Square* this, nes_time_t time, nes_time_t end_time,
+static inline nes_time_t Square_maintain_phase( struct Nes_Square* this, nes_time_t time, nes_time_t end_time,
 		nes_time_t timer_period )
 {
 	nes_time_t remain = end_time - time;
@@ -183,7 +183,7 @@ void Triangle_clock_linear_counter( struct Nes_Triangle* this )
 		osc->reg_written [3] = false;
 }
 
-inline int Triangle_calc_amp( struct Nes_Triangle* this )
+static inline int Triangle_calc_amp( struct Nes_Triangle* this )
 {
 	int amp = Triangle_phase_range - this->phase;
 	if ( amp < 0 )
@@ -192,7 +192,7 @@ inline int Triangle_calc_amp( struct Nes_Triangle* this )
 }
 
 // TODO: clean up
-inline nes_time_t Triangle_maintain_phase( struct Nes_Triangle* this, nes_time_t time, nes_time_t end_time,
+static inline nes_time_t Triangle_maintain_phase( struct Nes_Triangle* this, nes_time_t time, nes_time_t end_time,
 		nes_time_t timer_period )
 {
 	nes_time_t remain = end_time - time;

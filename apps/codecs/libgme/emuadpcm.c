@@ -54,7 +54,7 @@ const int DECODE_MIN = -32768;
 //                                                  //
 //**************************************************//
 
-int CLAP(int min, int x, int max)
+static int CLAP(int min, int x, int max)
 {
 	return (x < min) ? min : ((max < x) ? max : x);
 }

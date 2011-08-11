@@ -31,7 +31,7 @@ int const fade_shift = 8; // fade ends with gain at 1.0 / (1 << fade_shift)
 int const initial_play_delay = 7; // KikiKaikai needed this to work
 int const rom_addr  = 0x8000;
 
-void clear_track_vars( struct Nsf_Emu* this )
+static void clear_track_vars( struct Nsf_Emu* this )
 {
 	this->current_track    = -1;
 	this->out_time         = 0;
@@ -82,7 +82,7 @@ void Nsf_init( struct Nsf_Emu* this )
 
 // Setup
 
-blargg_err_t init_sound( struct Nsf_Emu* this )
+static blargg_err_t init_sound( struct Nsf_Emu* this )
 {
 	/* if ( header_.chip_flags & ~(fds_flag | namco_flag | vrc6_flag | fme7_flag) )
 		warning( "Uses unsupported audio expansion hardware" ); **/
@@ -168,7 +168,7 @@ blargg_err_t init_sound( struct Nsf_Emu* this )
 }
 
 // Header stuff
-bool valid_tag( struct header_t* this )
+static bool valid_tag( struct header_t* this )
 {
 	return 0 == memcmp( this->tag, "NESM\x1A", 5 );
 }
@@ -184,7 +184,7 @@ static double clock_rate( struct header_t* this )
 	return pal_only( this ) ? 1662607.125 : 1789772.727272727;
 }
 
-int play_period( struct header_t* this )
+static int play_period( struct header_t* this )
 {
 	// NTSC
 	int         clocks   = 29780;
@@ -370,7 +370,7 @@ void map_memory( struct Nsf_Emu* this )
 		Cpu_map_code( &this->cpu, rom_addr, fdsram_size, fdsram( this ), 0 );
 }
 
-void set_voice( struct Nsf_Emu* this, int i, struct Blip_Buffer* buf, struct Blip_Buffer* left, struct Blip_Buffer* right)
+static void set_voice( struct Nsf_Emu* this, int i, struct Blip_Buffer* buf, struct Blip_Buffer* left, struct Blip_Buffer* right)
 {
 #if defined(ROCKBOX)
 	(void) left;
@@ -500,7 +500,7 @@ inline void push_byte( struct Nsf_Emu* this, int b )
 
 // Jumps to routine, given pointer to address in file header. Pushes idle_addr
 // as return address, NOT old PC.
-void jsr_then_stop( struct Nsf_Emu* this, byte const addr [] )
+static void jsr_then_stop( struct Nsf_Emu* this, byte const addr [] )
 {
 	this->cpu.r.pc = get_addr( addr );
 	push_byte( this, (idle_addr - 1) >> 8 );
@@ -533,7 +533,8 @@ int cpu_read( struct Nsf_Emu* this, addr_t addr )
 	return addr >> 8;
 }
 
-int unmapped_read( struct Nsf_Emu* this, addr_t addr )
+#if 0 /* function currently unused */
+static int unmapped_read( struct Nsf_Emu* this, addr_t addr )
 {
 	(void) this;
 	
@@ -548,6 +549,7 @@ int unmapped_read( struct Nsf_Emu* this, addr_t addr )
 	// Unmapped read
 	return addr >> 8;
 }
+#endif
 
 void cpu_write( struct Nsf_Emu* this, addr_t addr, int data )
 {
@@ -643,7 +645,8 @@ void cpu_write( struct Nsf_Emu* this, addr_t addr, int data )
 	// Unmapped_write
 }
 
-void unmapped_write( struct Nsf_Emu* this, addr_t addr, int data )
+#if 0 /* function currently unused */
+static void unmapped_write( struct Nsf_Emu* this, addr_t addr, int data )
 {
 	(void) data;
 	
@@ -662,6 +665,7 @@ void unmapped_write( struct Nsf_Emu* this, addr_t addr, int data )
 	// FDS memory
 	if ( fds_enabled( this ) && (unsigned) (addr - 0x8000) < 0x6000 ) return;
 }
+#endif
 
 void fill_buf( struct Nsf_Emu* this );
 blargg_err_t Nsf_start_track( struct Nsf_Emu* this, int track )
@@ -807,7 +811,7 @@ void run_until( struct Nsf_Emu* this, nes_time_t end )
 		run_once( this, end );
 }
 
-void end_frame( struct Nsf_Emu* this, nes_time_t end )
+static void end_frame( struct Nsf_Emu* this, nes_time_t end )
 {
 	if ( Cpu_time( &this->cpu ) < end )
 		run_until( this, end );
@@ -833,7 +837,7 @@ void end_frame( struct Nsf_Emu* this, nes_time_t end )
 
 // Tell/Seek
 
-blargg_long msec_to_samples( long sample_rate, blargg_long msec )
+static blargg_long msec_to_samples( long sample_rate, blargg_long msec )
 {
 	blargg_long sec = msec / 1000;
 	msec -= sec * 1000;
@@ -932,7 +936,7 @@ static int int_log( blargg_long x, int step, int unit )
 	return ((unit - fraction) + (fraction >> 1)) >> shift;
 }
 
-void handle_fade( struct Nsf_Emu* this, long out_count, sample_t* out )
+static void handle_fade( struct Nsf_Emu* this, long out_count, sample_t* out )
 {
 	int i;
 	for ( i = 0; i < out_count; i += fade_block_size )

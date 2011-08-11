@@ -145,7 +145,7 @@ void Apu_run_until( struct Nes_Apu* this, nes_time_t end_time )
 	}
 }
 
-void run_until_( struct Nes_Apu* this, nes_time_t end_time )
+static void run_until_( struct Nes_Apu* this, nes_time_t end_time )
 {
 	require( end_time >= this->last_time );
 	

@@ -67,7 +67,7 @@ static byte const modes [8] =
 	MODE( 0,1, 0,0, 0,0 ),
 };
 
-void set_output( struct Ay_Apu* this, struct Blip_Buffer* b )
+static void set_output( struct Ay_Apu* this, struct Blip_Buffer* b )
 {
 	int i;
 	for ( i = 0; i < ay_osc_count; ++i )

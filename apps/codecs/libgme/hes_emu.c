@@ -31,7 +31,7 @@ int const fade_shift = 8; // fade ends with gain at 1.0 / (1 << fade_shift)
 
 const char gme_wrong_file_type [] ICONST_ATTR = "Wrong file type for this emulator";
 
-void clear_track_vars( struct Hes_Emu* this )
+static void clear_track_vars( struct Hes_Emu* this )
 {
 	this->current_track_   = -1;
 	this->out_time         = 0;
@@ -632,7 +632,7 @@ blargg_err_t Hes_start_track( struct Hes_Emu* this, int track )
 
 // Tell/Seek
 
-blargg_long msec_to_samples( blargg_long msec, long sample_rate )
+static blargg_long msec_to_samples( blargg_long msec, long sample_rate )
 {
 	blargg_long sec = msec / 1000;
 	msec -= sec * 1000;

@@ -1,4 +1,4 @@
-// Nes_Snd_Emu 0.1.8. http://www.slack.net/~ant/
+    // Nes_Snd_Emu 0.1.8. http://www.slack.net/~ant/
 
 #include "nes_vrc6_apu.h"
 
@@ -51,7 +51,7 @@ void Vrc6_output( struct Nes_Vrc6_Apu* this, struct Blip_Buffer* buf )
 
 void run_square( struct Nes_Vrc6_Apu* this, struct Vrc6_Osc* osc, blip_time_t end_time );
 void run_saw( struct Nes_Vrc6_Apu* this, blip_time_t end_time );
-void Vrc6_run_until( struct Nes_Vrc6_Apu* this, blip_time_t time )
+static void Vrc6_run_until( struct Nes_Vrc6_Apu* this, blip_time_t time )
 {
 	require( time >= this->last_time );
 	run_square( this, &this->oscs [0], time );

@@ -44,7 +44,7 @@ void Z80_init( struct Z80_Cpu* this )
 	this->szpc [0x100] |= Z40;
 }
 
-inline void set_page( struct Z80_Cpu* this, int i, void* write, void const* read )
+static inline void set_page( struct Z80_Cpu* this, int i, void* write, void const* read )
 {
 	int offset = Z80_CPU_OFFSET( i * page_size );
 	byte      * write2 = STATIC_CAST(byte      *,write) - offset;

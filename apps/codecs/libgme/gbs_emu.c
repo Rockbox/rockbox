@@ -28,7 +28,7 @@ int const silence_threshold = 0x10;
 long const fade_block_size = 512;
 int const fade_shift = 8; // fade ends with gain at 1.0 / (1 << fade_shift)
 
-void clear_track_vars( struct Gbs_Emu* this )
+static void clear_track_vars( struct Gbs_Emu* this )
 {
 	this->current_track_   = -1;
 	this->out_time         = 0;
@@ -169,7 +169,7 @@ void Jsr_then_stop( struct Gbs_Emu* this, byte const addr [] )
 	Write_mem( this, --this->cpu.r.sp, idle_addr      );
 }
 
-blargg_err_t Run_until( struct Gbs_Emu* this, int end )
+static blargg_err_t Run_until( struct Gbs_Emu* this, int end )
 {
 	this->end_time = end;
 	Cpu_set_time( &this->cpu, Cpu_time( &this->cpu ) - end );
@@ -208,7 +208,7 @@ blargg_err_t Run_until( struct Gbs_Emu* this, int end )
 	return 0;
 }
 
-blargg_err_t End_frame( struct Gbs_Emu* this, int end )
+static blargg_err_t End_frame( struct Gbs_Emu* this, int end )
 {
 	RETURN_ERR( Run_until( this, end ) );
 	
@@ -231,7 +231,7 @@ blargg_err_t Run_clocks( struct Gbs_Emu* this, blip_time_t duration )
 	return End_frame( this, duration );
 }
 
-blargg_err_t play_( struct Gbs_Emu* this, long count, sample_t* out )
+static blargg_err_t play_( struct Gbs_Emu* this, long count, sample_t* out )
 {
 	long remain = count;
 	while ( remain )
@@ -399,7 +399,7 @@ blargg_err_t Gbs_start_track( struct Gbs_Emu* this, int track )
 
 // Track
 
-blargg_long msec_to_samples( blargg_long msec, long sample_rate )
+static blargg_long msec_to_samples( blargg_long msec, long sample_rate )
 {
 	blargg_long sec = msec / 1000;
 	msec -= sec * 1000;
@@ -421,7 +421,7 @@ blargg_err_t Track_seek( struct Gbs_Emu* this, long msec )
 	return Track_skip( this, time - this->out_time );
 }
 
-blargg_err_t skip_( struct Gbs_Emu* this, long count )
+static blargg_err_t skip_( struct Gbs_Emu* this, long count )
 {
 	// for long skip, mute sound
 	const long threshold = 30000;
@@ -496,7 +496,7 @@ static int int_log( blargg_long x, int step, int unit )
 	return ((unit - fraction) + (fraction >> 1)) >> shift;
 }
 
-void handle_fade( struct Gbs_Emu* this, long out_count, sample_t* out )
+static void handle_fade( struct Gbs_Emu* this, long out_count, sample_t* out )
 {
 	int i;
 	for ( i = 0; i < out_count; i += fade_block_size )
@@ -520,7 +520,7 @@ void handle_fade( struct Gbs_Emu* this, long out_count, sample_t* out )
 
 // Silence detection
 
-void emu_play( struct Gbs_Emu* this, long count, sample_t* out )
+static void emu_play( struct Gbs_Emu* this, long count, sample_t* out )
 {
 	check( current_track_ >= 0 );
 	this->emu_time += count;

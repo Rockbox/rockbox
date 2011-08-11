@@ -25,7 +25,7 @@ int const fade_shift = 8; // fade ends with gain at 1.0 / (1 << fade_shift)
 
 const char gme_wrong_file_type [] = "Wrong file type for this emulator";
 
-void clear_track_vars( struct Sgc_Emu* this )
+static void clear_track_vars( struct Sgc_Emu* this )
 {
 	this->current_track    = -1;
 	this->out_time         = 0;
@@ -110,7 +110,7 @@ blargg_err_t Sgc_load_mem( struct Sgc_Emu* this, const void* data, long size )
 	return 0;
 }
 
-void Sound_set_voice( struct Sgc_Emu* this, int i, struct Blip_Buffer* c, struct Blip_Buffer* l, struct Blip_Buffer* r )
+static void Sound_set_voice( struct Sgc_Emu* this, int i, struct Blip_Buffer* c, struct Blip_Buffer* l, struct Blip_Buffer* r )
 {
 	if ( i < sms_osc_count )
 		Sms_apu_set_output( &this->apu, i, c, l, r );
@@ -118,7 +118,7 @@ void Sound_set_voice( struct Sgc_Emu* this, int i, struct Blip_Buffer* c, struct
 		Fm_apu_set_output( &this->fm_apu, c );
 }
 
-blargg_err_t run_clocks( struct Sgc_Emu* this, blip_time_t* duration, int msec )
+static blargg_err_t run_clocks( struct Sgc_Emu* this, blip_time_t* duration, int msec )
 {
 #if defined(ROCKBOX)
 	(void) msec;
@@ -207,7 +207,7 @@ void jsr( struct Sgc_Emu* this, byte addr [2] )
 	this->cpu.r.pc = get_le16( addr );
 }
 
-void set_bank( struct Sgc_Emu* this, int bank, void const* data )
+static void set_bank( struct Sgc_Emu* this, int bank, void const* data )
 {
 	//dprintf( "map bank %d to %p\n", bank, (byte*) data - rom.at_addr( 0 ) );
 	Z80_map_mem( &this->cpu, bank * this->rom.bank_size, this->rom.bank_size, this->unmapped_write, data );
@@ -408,7 +408,7 @@ blargg_err_t Sgc_start_track( struct Sgc_Emu* this, int track )
 
 // Tell/Seek
 
-blargg_long msec_to_samples( blargg_long msec, long sample_rate )
+static blargg_long msec_to_samples( blargg_long msec, long sample_rate )
 {
 	blargg_long sec = msec / 1000;
 	msec -= sec * 1000;
@@ -509,7 +509,7 @@ static int int_log( blargg_long x, int step, int unit )
 	return ((unit - fraction) + (fraction >> 1)) >> shift;
 }
 
-void handle_fade( struct Sgc_Emu* this, long out_count, sample_t* out )
+static void handle_fade( struct Sgc_Emu* this, long out_count, sample_t* out )
 {
 	int i;
 	for ( i = 0; i < out_count; i += fade_block_size )
@@ -533,7 +533,7 @@ void handle_fade( struct Sgc_Emu* this, long out_count, sample_t* out )
 
 // Silence detection
 
-void emu_play( struct Sgc_Emu* this, long count, sample_t* out )
+static void emu_play( struct Sgc_Emu* this, long count, sample_t* out )
 {
 	check( this->current_track_ >= 0 );
 	this->emu_time += count;

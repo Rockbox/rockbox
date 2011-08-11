@@ -10,7 +10,7 @@
 #include "metadata_parsers.h"
 #include "rbunicode.h"
 
-bool parse_kss_header(int fd, struct mp3entry* id3)
+static bool parse_kss_header(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;

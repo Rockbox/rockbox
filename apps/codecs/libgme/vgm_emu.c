@@ -53,7 +53,7 @@ enum {
 	ym2612_dac_pan_port = 0xB6
 };
 
-void clear_track_vars( struct Vgm_Emu* this )
+static void clear_track_vars( struct Vgm_Emu* this )
 {
 	this->out_time         = 0;
 	this->emu_time         = 0;
@@ -165,7 +165,7 @@ static long check_gd3_header( byte const* h, long remain )
 	return gd3_size;
 }
 
-byte const* gd3_data( struct Vgm_Emu* this, int* size )
+static byte const* gd3_data( struct Vgm_Emu* this, int* size )
 {
 	if ( size )
 		*size = 0;
@@ -205,7 +205,7 @@ static void get_vgm_length( struct header_t const* h, struct track_info_t* out )
 	}
 }
 
-blargg_err_t track_info( struct Vgm_Emu* this, struct track_info_t* out )
+static blargg_err_t track_info( struct Vgm_Emu* this, struct track_info_t* out )
 {
 	memset(out, 0, sizeof out);
 	get_vgm_length( header( this ), out );
@@ -225,7 +225,7 @@ static blargg_err_t check_vgm_header( struct header_t* h )
 	return 0;
 }
 
-void set_voice( struct Vgm_Emu* this, int i, struct Blip_Buffer* c, struct Blip_Buffer* l, struct Blip_Buffer* r )
+static void set_voice( struct Vgm_Emu* this, int i, struct Blip_Buffer* c, struct Blip_Buffer* l, struct Blip_Buffer* r )
 {
 	if ( i < sms_osc_count ) {
 		int j;
@@ -310,7 +310,7 @@ blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_
 }
 
 void update_fm_rates( struct Vgm_Emu* this, int* ym2413_rate, int* ym2612_rate );
-blargg_err_t init_fm( struct Vgm_Emu* this, double* rate )
+static blargg_err_t init_fm( struct Vgm_Emu* this, double* rate )
 {
 	int ym2612_rate = get_le32( header( this )->ym2612_rate );
 	int ym2413_rate = get_le32( header( this )->ym2413_rate );
@@ -365,7 +365,7 @@ blargg_err_t setup_fm( struct Vgm_Emu* this )
 // Emulation
 
 blip_time_t run( struct Vgm_Emu* this, vgm_time_t end_time );
-blargg_err_t run_clocks( struct Vgm_Emu* this, blip_time_t* time_io, int msec )
+static blargg_err_t run_clocks( struct Vgm_Emu* this, blip_time_t* time_io, int msec )
 {
 	*time_io = run( this, msec * this->vgm_rate / 1000 );
 	Sms_apu_end_frame( &this->psg, *time_io );
@@ -374,7 +374,7 @@ blargg_err_t run_clocks( struct Vgm_Emu* this, blip_time_t* time_io, int msec )
 
 
 
-blargg_err_t play_( struct Vgm_Emu* this, long count, sample_t* out )
+static blargg_err_t play_( struct Vgm_Emu* this, long count, sample_t* out )
 {
 	if ( !uses_fm( this ) ) {
 		long remain = count;
@@ -407,7 +407,7 @@ blargg_err_t play_( struct Vgm_Emu* this, long count, sample_t* out )
 
 // Vgm_Emu_impl
 
-inline int command_len( int command )
+static inline int command_len( int command )
 {
 	static byte const lens [0x10] ICONST_ATTR = {
 	// 0 1 2 3 4 5 6 7 8 9 A B C D E F
@@ -418,17 +418,17 @@ inline int command_len( int command )
 	return len;
 }
 	
-inline fm_time_t to_fm_time( struct Vgm_Emu* this, vgm_time_t t )
+static inline fm_time_t to_fm_time( struct Vgm_Emu* this, vgm_time_t t )
 {
 	return (t * this->fm_time_factor + this->fm_time_offset) >> fm_time_bits;
 }
 
-inline blip_time_t to_psg_time( struct Vgm_Emu* this, vgm_time_t t )
+static inline blip_time_t to_psg_time( struct Vgm_Emu* this, vgm_time_t t )
 {
 	return (t * this->blip_time_factor) >> blip_time_bits;
 }
 
-void write_pcm( struct Vgm_Emu* this, vgm_time_t vgm_time, int amp )
+static void write_pcm( struct Vgm_Emu* this, vgm_time_t vgm_time, int amp )
 {
 	if ( this->blip_buf )
 	{
@@ -820,7 +820,7 @@ blargg_err_t Vgm_start_track( struct Vgm_Emu* this )
 
 // Tell/Seek
 
-blargg_long msec_to_samples( blargg_long msec, long sample_rate )
+static blargg_long msec_to_samples( blargg_long msec, long sample_rate )
 {
 	blargg_long sec = msec / 1000;
 	msec -= sec * 1000;
@@ -916,7 +916,7 @@ static int int_log( blargg_long x, int step, int unit )
 	return ((unit - fraction) + (fraction >> 1)) >> shift;
 }
 
-void handle_fade( struct Vgm_Emu* this, long out_count, sample_t* out )
+static void handle_fade( struct Vgm_Emu* this, long out_count, sample_t* out )
 {
 	int i;
 	for ( i = 0; i < out_count; i += fade_block_size )
@@ -940,7 +940,7 @@ void handle_fade( struct Vgm_Emu* this, long out_count, sample_t* out )
 
 // Silence detection
 
-void emu_play( struct Vgm_Emu* this, long count, sample_t* out )
+static void emu_play( struct Vgm_Emu* this, long count, sample_t* out )
 {
 	this->emu_time += count;
 	if ( !this->emu_track_ended_ ) {

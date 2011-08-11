@@ -133,7 +133,7 @@ static void makeSinTable(void)
 		sintable[PG_WIDTH/2 + i] = 2*DB_MUTE + sintable[i];
 }
 
-void makeDphaseNoiseTable(int sampleRate, int clockRate)
+static void makeDphaseNoiseTable(int sampleRate, int clockRate)
 {
 	for (int i=0; i<1024; i++)
 		for (int j=0; j<8; j++)
@@ -141,7 +141,7 @@ void makeDphaseNoiseTable(int sampleRate, int clockRate)
 }
 
 // Table for Pitch Modulator 
-void makePmTable(void)
+static void makePmTable(void)
 {
 	int i;
 	for (i=0; i < PM_PG_WIDTH; i++)
@@ -159,7 +159,7 @@ void makePmTable(void)
 }
 
 // Table for Amp Modulator 
-void makeAmTable(void)
+static void makeAmTable(void)
 {
 	int i;
 	for (i=0; i<AM_PG_WIDTH; i++)
@@ -549,7 +549,7 @@ static inline void keyOff_TOM(struct Y8950* this){ slotOff(&this->ch[8].mod); }
 static inline void keyOff_CYM(struct Y8950* this){ slotOff(&this->ch[8].car); }
 
 // Change Rhythm Mode
-inline void setRythmMode(struct Y8950* this, int data)
+static inline void setRythmMode(struct Y8950* this, int data)
 {
 	bool newMode = (data & 32) != 0;
 	if (this->rythm_mode != newMode) {
@@ -822,7 +822,7 @@ static inline int calcSample(struct Y8950* this, int channelMask)
 	return (mix*this->maxVolume) >> (DB2LIN_AMP_BITS - 1);
 }
 
-bool checkMuteHelper(struct Y8950* this)
+static bool checkMuteHelper(struct Y8950* this)
 {
 	int i;
 	struct OPLChannel *ch = this->ch;	
@@ -844,7 +844,7 @@ bool checkMuteHelper(struct Y8950* this)
 	return ADPCM_muted(&this->adpcm);
 }
 
-void checkMute(struct Y8950* this)
+static void checkMute(struct Y8950* this)
 {
 	bool mute = checkMuteHelper(this);
 	//PRT_DEBUG("Y8950: muted " << mute);

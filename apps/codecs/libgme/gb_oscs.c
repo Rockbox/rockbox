@@ -135,7 +135,7 @@ int wave_access( struct Gb_Wave* this, int addr )
 
 // write_register
 
-int write_trig( struct Gb_Osc* this, int frame_phase, int max_len, int old_data )
+static int write_trig( struct Gb_Osc* this, int frame_phase, int max_len, int old_data )
 {
 	int data = this->regs [4];
 	
@@ -162,7 +162,7 @@ int write_trig( struct Gb_Osc* this, int frame_phase, int max_len, int old_data 
 	return data & trigger_mask;
 }
 
-inline void Noise_zombie_volume( struct Gb_Noise* this, int old, int data )
+static inline void Noise_zombie_volume( struct Gb_Noise* this, int old, int data )
 {
 	int v = this->volume;
 	if ( this->osc.mode == mode_agb || cgb_05 )
@@ -198,7 +198,7 @@ inline void Noise_zombie_volume( struct Gb_Noise* this, int old, int data )
 	this->volume = v & 0x0F;
 }
 
-inline void Square_zombie_volume( struct Gb_Square* this, int old, int data )
+static inline void Square_zombie_volume( struct Gb_Square* this, int old, int data )
 {
 	int v = this->volume;
 	if ( this->osc.mode == mode_agb || cgb_05 )

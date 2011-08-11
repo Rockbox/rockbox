@@ -108,7 +108,7 @@ static void copy_ay_fields( struct file_t const* file, struct mp3entry* id3, int
     if (tmp) id3->comment = tmp;
 }
 
-bool parse_ay_header(int fd, struct mp3entry *id3)
+static bool parse_ay_header(int fd, struct mp3entry *id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->id3v2buf;

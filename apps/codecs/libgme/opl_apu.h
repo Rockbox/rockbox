@@ -36,6 +36,7 @@ struct Opl_Apu {
 };
 
 blargg_err_t Opl_init( struct Opl_Apu* this, long clock, long rate, blip_time_t period, enum opl_type_t type );
+void Opl_shutdown( struct Opl_Apu* this );
 	
 void Opl_reset( struct Opl_Apu* this );
 static inline void Opl_volume( struct Opl_Apu* this, int v ) { Synth_volume( &this->synth, v / (4096 * 6) ); }

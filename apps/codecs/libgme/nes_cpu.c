@@ -17,7 +17,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #include "blargg_source.h"
 
-inline void set_code_page( struct Nes_Cpu* this, int i, void const* p )
+static inline void set_code_page( struct Nes_Cpu* this, int i, void const* p )
 {
 	byte const* p2 = STATIC_CAST(byte const*,p) - NES_CPU_OFFSET( i * page_size );
 	this->cpu_state->code_map [i] = p2;
