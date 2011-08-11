@@ -104,7 +104,7 @@ void Vgm_init( struct Vgm_Emu* this )
 
 	// Set sound gain, a value too high
 	// will cause saturation
-	Sound_set_gain(this, (int)FP_ONE_GAIN);
+	Sound_set_gain(this, (int)(FP_ONE_GAIN*0.7));
 	
 	// Unload
 	this->voice_count = 0;
