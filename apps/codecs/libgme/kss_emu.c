@@ -110,12 +110,12 @@ void update_gain( struct Kss_Emu* this )
 			g = (g*6) / 5; //g *= 1.2;
 	}
 	
-	if ( sms_psg_enabled( this ) ) Sms_apu_volume( &this->sms.psg, (double)(g)/FP_ONE_GAIN );
-	if ( sms_fm_enabled( this )  ) Opl_volume( &this->sms.fm, (double)(g)/FP_ONE_GAIN );
-	if ( msx_psg_enabled( this ) ) Ay_apu_volume( &this->msx.psg, (double)(g)/FP_ONE_GAIN );
-	if ( msx_scc_enabled( this ) ) Scc_volume( &this->msx.scc, (double)(g)/FP_ONE_GAIN );
-	if ( msx_music_enabled( this ) ) Opl_volume( &this->msx.music, (double)(g)/FP_ONE_GAIN );
-	if ( msx_audio_enabled( this ) ) Opl_volume( &this->msx.audio, (double)(g)/FP_ONE_GAIN );
+	if ( sms_psg_enabled( this ) ) Sms_apu_volume( &this->sms.psg, g );
+	if ( sms_fm_enabled( this )  ) Opl_volume( &this->sms.fm, g );
+	if ( msx_psg_enabled( this ) ) Ay_apu_volume( &this->msx.psg, g );
+	if ( msx_scc_enabled( this ) ) Scc_volume( &this->msx.scc, g );
+	if ( msx_music_enabled( this ) ) Opl_volume( &this->msx.music, g );
+	if ( msx_audio_enabled( this ) ) Opl_volume( &this->msx.audio, g );
 }
 
 blargg_err_t Kss_load_mem( struct Kss_Emu* this, const void* data, long size )

@@ -39,19 +39,18 @@ void Apu_init( struct Nes_Apu* this )
 	this->oscs [4] = &this->dmc.osc;
 	
 	Apu_output( this, NULL );
-	Apu_volume( this, 1.0 );
+	Apu_volume( this, (int)FP_ONE_VOLUME );
 	Apu_reset( this, false, 0 );
 }
 
-static double nonlinear_tnd_gain( void ) { return 0.75; }
-void Apu_enable_nonlinear( struct Nes_Apu* this, double v )
+void Apu_enable_nonlinear( struct Nes_Apu* this, int v )
 {
 	this->dmc.nonlinear = true;
-	Synth_volume( &this->square_synth, 1.3 * 0.25751258 / 0.742467605 * 0.25 / amp_range * v );
+	Synth_volume( &this->square_synth, (int)((1.3 * 0.25751258 / 0.742467605 * 0.25 * FP_ONE_VOLUME) / amp_range * v) );
 	
-	const double tnd = 0.48 / 202 * nonlinear_tnd_gain();
-	Synth_volume( &this->triangle.synth, 3.0 * tnd );
-	Synth_volume( &this->noise.synth, 2.0 * tnd );
+	const int tnd = (int)(0.48 / 202 * 0.75 * FP_ONE_VOLUME);
+	Synth_volume( &this->triangle.synth, 3 * tnd );
+	Synth_volume( &this->noise.synth, 2 * tnd );
 	Synth_volume( &this->dmc.synth, tnd );
 	
 	this->square1 .osc.last_amp = 0;
@@ -61,13 +60,13 @@ void Apu_enable_nonlinear( struct Nes_Apu* this, double v )
 	this->dmc     .osc.last_amp = 0;
 }
 
-void Apu_volume( struct Nes_Apu* this, double v )
+void Apu_volume( struct Nes_Apu* this, int v )
 {
 	this->dmc.nonlinear = false;
-	Synth_volume( &this->square_synth,  0.1128  / amp_range * v );
-	Synth_volume( &this->triangle.synth,0.12765 / amp_range * v );
-	Synth_volume( &this->noise.synth,   0.0741  / amp_range * v );
-	Synth_volume( &this->dmc.synth,     0.42545 / 127 * v );
+	Synth_volume( &this->square_synth,  (int)((long long)(0.1128 *FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) );
+	Synth_volume( &this->triangle.synth,(int)((long long)(0.12765*FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) );
+	Synth_volume( &this->noise.synth,   (int)((long long)(0.0741 *FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) );
+	Synth_volume( &this->dmc.synth,     (int)((long long)(0.42545*FP_ONE_VOLUME) * v / 127       / FP_ONE_VOLUME) );
 }
 
 void Apu_output( struct Nes_Apu* this, struct Blip_Buffer* buffer )

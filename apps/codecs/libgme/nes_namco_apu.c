@@ -20,7 +20,7 @@ void Namco_init( struct Nes_Namco_Apu* this )
 	Synth_init( &this->synth );
 	
 	Namco_output( this, NULL );
-	Namco_volume( this, 1.0 );
+	Namco_volume( this, (int)FP_ONE_VOLUME );
 	Namco_reset( this );
 }
 

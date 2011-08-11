@@ -170,7 +170,7 @@ struct Blip_Synth {
 void Synth_init( struct Blip_Synth* this );
 
 // Set overall volume of waveform
-void Synth_volume( struct Blip_Synth* this, double v ) ICODE_ATTR;
+void Synth_volume( struct Blip_Synth* this, int v ) ICODE_ATTR;
 
 // Get/set Blip_Buffer used for output
 const struct Blip_Buffer* Synth_output( struct Blip_Synth* this ) ICODE_ATTR;

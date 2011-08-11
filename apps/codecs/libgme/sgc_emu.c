@@ -96,8 +96,8 @@ blargg_err_t Sgc_load_mem( struct Sgc_Emu* this, const void* data, long size )
 	this->track_count = this->header.song_count;
 	this->voice_count =  sega_mapping( this ) ? osc_count : sms_osc_count;
 	
-	Sms_apu_volume( &this->apu, (double)(this->gain)/FP_ONE_GAIN );
-	Fm_apu_volume( &this->fm_apu, (double)(this->gain)/FP_ONE_GAIN );
+	Sms_apu_volume( &this->apu, this->gain );
+	Fm_apu_volume( &this->fm_apu, this->gain );
 
 	// Setup buffer
 	this->clock_rate_ = clock_rate( this );

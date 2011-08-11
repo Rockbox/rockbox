@@ -47,6 +47,6 @@ static inline void Vrc7_set_output( struct Nes_Vrc7_Apu* this, int i, struct Bli
 }
 
 // DB2LIN_AMP_BITS == 11, * 2
-static inline void Vrc7_volume( struct Nes_Vrc7_Apu* this, double v ) { Synth_volume( &this->synth, 1.0 / 3 / 4096 * v ); }
+static inline void Vrc7_volume( struct Nes_Vrc7_Apu* this, int v ) { Synth_volume( &this->synth, v / 3 / 4096 ); }
 
 #endif

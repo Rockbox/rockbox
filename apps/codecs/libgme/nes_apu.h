@@ -77,7 +77,7 @@ void Apu_reset( struct Nes_Apu* this, bool pal_mode, int initial_dmc_dac );
 void Apu_set_tempo( struct Nes_Apu* this, int );
 	
 // Set overall volume (default is 1.0)
-void Apu_volume( struct Nes_Apu* this, double );
+void Apu_volume( struct Nes_Apu* this, int );
 	
 // Run DMC until specified time, so that any DMC memory reads can be
 // accounted for (i.e. inserting cpu wait states).

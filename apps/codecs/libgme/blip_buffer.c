@@ -106,18 +106,9 @@ blargg_err_t Blip_set_sample_rate( struct Blip_Buffer* this, long new_rate, int 
 	return 0; // success
 }
 
-/* Not sure if this affects sound quality */
-#if defined(ROCKBOX)
-double floor(double x) {
-	if ( x > 0 ) return (int)x;
-	return (int)(x-0.9999999999999999);
-}
-#endif
-
 blip_resampled_time_t Blip_clock_rate_factor( struct Blip_Buffer* this, long rate )
 {
-	double ratio = (double) this->sample_rate_ / rate;
-	blip_long factor = (blip_long) floor( ratio * (1L << BLIP_BUFFER_ACCURACY) + 0.5 );
+	blip_long factor = (blip_long) ( this->sample_rate_ * (1LL << BLIP_BUFFER_ACCURACY) / rate);
 	assert( factor > 0 || !this->sample_rate_ ); // fails if clock/output ratio is too large
 	return (blip_resampled_time_t) factor;
 }
@@ -279,7 +270,7 @@ void Synth_init( struct Blip_Synth* this )
 }
 
 // Set overall volume of waveform
-void Synth_volume( struct Blip_Synth* this, double v )
+void Synth_volume( struct Blip_Synth* this, int v )
 {
-	this->delta_factor = (int) (v * (1L << blip_sample_bits) + 0.5);
+	this->delta_factor = (int) (v * (1LL << blip_sample_bits) / FP_ONE_VOLUME);
 }

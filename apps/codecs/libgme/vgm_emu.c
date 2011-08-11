@@ -21,7 +21,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 const char* const gme_wrong_file_type = "Wrong file type for this emulator";
 
-double const fm_gain = 3.0; // FM emulators are internally quieter to avoid 16-bit overflow
+int const fm_gain = 3; // FM emulators are internally quieter to avoid 16-bit overflow
 double const rolloff = 0.990;
 double const oversample_factor = 1.5;
 
@@ -352,11 +352,11 @@ blargg_err_t setup_fm( struct Vgm_Emu* this )
 		this->voice_count = 8;
 		RETURN_ERR( Resampler_setup( &this->resampler, fm_rate / this->sample_rate, rolloff, fm_gain * (double)(this->gain)/FP_ONE_GAIN ) );
 		RETURN_ERR( Resampler_reset( &this->resampler, Buffer_length( &this->stereo_buf ) * this->sample_rate / 1000 ) );
-		Sms_apu_volume( &this->psg, 0.195 * fm_gain * (double)(this->gain)/FP_ONE_GAIN );
+		Sms_apu_volume( &this->psg, ((this->gain/5)-(this->gain*5)/1000) * fm_gain );
 	}
 	else
 	{
-		Sms_apu_volume( &this->psg, (double)(this->gain)/FP_ONE_GAIN );
+		Sms_apu_volume( &this->psg, this->gain );
 	}
 	
 	return 0;
@@ -717,7 +717,7 @@ void Sound_mute_voices( struct Vgm_Emu* this, int mask )
 			Sms_apu_set_output( &this->psg, i, ( mask & 0x80 ) ? 0 : &this->stereo_buf.bufs [0], NULL, NULL );
 		if ( Ym2612_enabled( &this->ym2612 ) )
 		{
-			Synth_volume( &this->pcm, (mask & 0x40) ? 0.0 : 0.1115 / 256 * fm_gain * (double)(this->gain)/FP_ONE_GAIN );
+			Synth_volume( &this->pcm, (mask & 0x40) ? 0 : (int)((long long)(0.1115*FP_ONE_VOLUME) / 256 * fm_gain * this->gain / FP_ONE_VOLUME) );
 			Ym2612_mute_voices( &this->ym2612, mask );
 		}
 		

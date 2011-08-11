@@ -27,7 +27,7 @@ struct Gb_Apu {
 	struct Gb_Osc*     oscs [osc_count];
 	blip_time_t last_time;          // time sound emulator has been run to
 	blip_time_t frame_period;       // clocks between each frame sequencer step
-	double      volume_;
+	int      volume_;
 	bool        reduce_clicks_;
 	
 	struct Gb_Square square1;
@@ -69,7 +69,7 @@ void Apu_set_output( struct Gb_Apu* this, int chan, struct Blip_Buffer* center,
 		struct Blip_Buffer* left, struct Blip_Buffer* right );
 	
 // Sets overall volume, where 1.0 is normal
-void Apu_volume( struct Gb_Apu* this, double v );
+void Apu_volume( struct Gb_Apu* this, int v );
 	
 // If true, reduces clicking by disabling DAC biasing. Note that this reduces
 // emulation accuracy, since the clicks are authentic.

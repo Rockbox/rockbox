@@ -58,6 +58,6 @@ void Sms_apu_end_frame( struct Sms_Apu* this, blip_time_t t ) ICODE_ATTR;
 void Sms_apu_reset( struct Sms_Apu* this, unsigned noise_feedback, int noise_width );
 
 // Sets overall volume, where 1.0 is normal
-void Sms_apu_volume( struct Sms_Apu* this, double vol );
+void Sms_apu_volume( struct Sms_Apu* this, int vol );
 
 #endif

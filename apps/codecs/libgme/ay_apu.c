@@ -100,7 +100,7 @@ void Ay_apu_init( struct Ay_Apu* this )
 	}
 	
 	set_output( this, NULL );
-	Ay_apu_volume( this, 1.0 );
+	Ay_apu_volume( this, (int)FP_ONE_VOLUME );
 	Ay_apu_reset( this );
 }
 

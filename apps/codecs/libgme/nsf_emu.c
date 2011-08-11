@@ -150,19 +150,19 @@ blargg_err_t init_sound( struct Nsf_Emu* this )
 			this->voice_count += vrc7_osc_count;
 		}
 		
-		if ( vrc7_enabled( this )  ) Vrc7_volume( &this->vrc7,    (double)adjusted_gain/FP_ONE_GAIN );
-		if ( namco_enabled( this ) ) Namco_volume( &this->namco,  (double)adjusted_gain/FP_ONE_GAIN );
-		if ( vrc6_enabled( this )  ) Vrc6_volume( &this->vrc6,    (double)adjusted_gain/FP_ONE_GAIN );
-		if ( fme7_enabled( this )  ) Fme7_volume( &this->fme7,    (double)adjusted_gain/FP_ONE_GAIN );
-		if ( mmc5_enabled( this )  ) Apu_volume( &this->mmc5.apu, (double)adjusted_gain/FP_ONE_GAIN );
-		if ( fds_enabled( this )   ) Fds_volume( &this->fds,      (double)adjusted_gain/FP_ONE_GAIN );
+		if ( vrc7_enabled( this )  ) Vrc7_volume( &this->vrc7,    adjusted_gain );
+		if ( namco_enabled( this ) ) Namco_volume( &this->namco,  adjusted_gain );
+		if ( vrc6_enabled( this )  ) Vrc6_volume( &this->vrc6,    adjusted_gain );
+		if ( fme7_enabled( this )  ) Fme7_volume( &this->fme7,    adjusted_gain );
+		if ( mmc5_enabled( this )  ) Apu_volume( &this->mmc5.apu, adjusted_gain );
+		if ( fds_enabled( this )   ) Fds_volume( &this->fds,      adjusted_gain );
 	}
 	#endif
 	
 	if ( adjusted_gain > this->gain )
 		adjusted_gain = this->gain;
 	
-	Apu_volume( &this->apu, (double)adjusted_gain/FP_ONE_GAIN );
+	Apu_volume( &this->apu, adjusted_gain );
 	
 	return 0;
 }

@@ -13,7 +13,7 @@ blargg_err_t Opl_init( struct Opl_Apu* this, long clock, long rate, blip_time_t 
 	this->rate_ = rate;
 	this->period_ = period;
 	Opl_set_output( this, 0 );
-	Opl_volume( this, 1.0 );
+	Opl_volume( this, (int)FP_ONE_VOLUME );
 
 	switch (type)
 	{

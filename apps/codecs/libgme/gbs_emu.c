@@ -112,7 +112,7 @@ blargg_err_t Gbs_load( struct Gbs_Emu* this, void* data, long size )
 	Rom_set_addr( &this->rom, load_addr );
 
 	this->voice_count_ = osc_count;
-	Apu_volume( &this->apu, (double)(this->gain_)/FP_ONE_GAIN );
+	Apu_volume( &this->apu, this->gain_ );
 
 	// Change clock rate & setup buffer
 	this->clock_rate_ = 4194304;

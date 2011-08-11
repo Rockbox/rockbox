@@ -85,5 +85,5 @@ int Adpcm_read_data( struct Hes_Apu_Adpcm* this, blip_time_t t, int addr ) ICODE
 void Adpcm_end_frame( struct Hes_Apu_Adpcm* this,blip_time_t t ) ICODE_ATTR;
 
 // Sets overall volume, where 1.0 is normal
-static inline void Adpcm_volume( struct Hes_Apu_Adpcm* this, double v )	{ Synth_volume( &this->synth, 0.6 / adpcm_osc_count / adpcm_amp_range * v ); }
+static inline void Adpcm_volume( struct Hes_Apu_Adpcm* this, int v )	{ Synth_volume( &this->synth, (v*3)/5 / adpcm_osc_count / adpcm_amp_range ); }
 #endif

@@ -51,5 +51,5 @@ void Apu_osc_output( struct Hes_Apu* this, int index, struct Blip_Buffer* center
 void Apu_write_data( struct Hes_Apu* this, blip_time_t, int addr, int data ) ICODE_ATTR;
 void Apu_end_frame( struct Hes_Apu* this, blip_time_t ) ICODE_ATTR;
 
-static inline void Apu_volume( struct Hes_Apu* this, double v ) { Synth_volume( &this->synth, 1.8 / osc_count / amp_range * v ); }
+static inline void Apu_volume( struct Hes_Apu* this, int v ) { Synth_volume( &this->synth, (v*9)/5 / osc_count / amp_range ); }
 #endif

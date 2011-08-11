@@ -52,11 +52,11 @@ static inline void Vrc6_osc_output( struct Nes_Vrc6_Apu* this, int i, struct Bli
 	this->oscs [i].output = buf;
 }
 
-static inline void Vrc6_volume( struct Nes_Vrc6_Apu* this, double v )
+static inline void Vrc6_volume( struct Nes_Vrc6_Apu* this, int v )
 {
-	double const factor = 0.0967 * 2;
-	Synth_volume( &this->saw_synth, factor / 31 * v );
-	Synth_volume( &this->square_synth, factor * 0.5 / 15 * v );
+	long long const factor = (long long)(FP_ONE_VOLUME * 0.0967 * 2);
+	Synth_volume( &this->saw_synth,    (int)(v * factor / 31 / FP_ONE_VOLUME) );
+	Synth_volume( &this->square_synth, (int)(v * factor / 2 / 15 / FP_ONE_VOLUME) );
 }
 
 #endif

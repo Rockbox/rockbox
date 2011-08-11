@@ -131,8 +131,8 @@ blargg_err_t Hes_load( struct Hes_Emu* this, void* data, long size )
 	
 	this->voice_count_ = osc_count + adpcm_osc_count;
 	
-	Apu_volume( &this->apu, (double)(this->gain_)/FP_ONE_GAIN );
-	Adpcm_volume( &this->adpcm, (double)(this->gain_)/FP_ONE_GAIN );
+	Apu_volume( &this->apu, this->gain_ );
+	Adpcm_volume( &this->adpcm, this->gain_ );
 
     // Setup buffer	
 	this->clock_rate_ = 7159091;

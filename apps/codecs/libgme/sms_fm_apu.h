@@ -31,7 +31,7 @@ static inline void Fm_apu_set_output( struct Sms_Fm_Apu* this, struct Blip_Buffe
 	this->output_ = b;
 }
 
-static inline void Fm_apu_volume( struct Sms_Fm_Apu* this, double v ) { Synth_volume( &this->synth, 0.4 / 4096 * v ); }
+static inline void Fm_apu_volume( struct Sms_Fm_Apu* this, int v ) { Synth_volume( &this->synth, (v*2) / 5 / 4096 ); }
 	
 void Fm_apu_reset( struct Sms_Fm_Apu* this );
 	

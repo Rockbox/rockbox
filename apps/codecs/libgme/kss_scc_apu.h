@@ -33,7 +33,7 @@ void Scc_init( struct Scc_Apu* this );
 void Scc_reset( struct Scc_Apu* this );
 
 // Set overall volume, where 1.0 is normal
-void Scc_volume( struct Scc_Apu* this, double v );
+void Scc_volume( struct Scc_Apu* this, int v );
 	
 static inline void Scc_set_output( struct Scc_Apu* this, int index, struct Blip_Buffer* b )
 {

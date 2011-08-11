@@ -15,7 +15,7 @@ void Vrc7_init( struct Nes_Vrc7_Apu* this )
 	this->osc.last_amp = 0;
 	this->mask = 0;
 
-	Vrc7_volume( this, 1.0 );
+	Vrc7_volume( this, (int)FP_ONE_VOLUME );
 	Vrc7_reset( this );
 }
 

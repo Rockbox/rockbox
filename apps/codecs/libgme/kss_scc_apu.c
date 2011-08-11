@@ -28,9 +28,9 @@ static void set_output( struct Scc_Apu* this, struct Blip_Buffer* buf )
 		Scc_set_output( this, i, buf );
 }
 
-void Scc_volume( struct Scc_Apu* this, double v )
+void Scc_volume( struct Scc_Apu* this, int v )
 {
-	Synth_volume( &this->synth, 0.43 / scc_osc_count / scc_amp_range * v );
+	Synth_volume( &this->synth, (v/2 - (v*7)/100) / scc_osc_count / scc_amp_range );
 }
 
 void Scc_reset( struct Scc_Apu* this )
@@ -49,7 +49,7 @@ void Scc_init( struct Scc_Apu* this )
 	Synth_init( &this->synth);
 	
 	set_output( this, NULL );
-	Scc_volume( this, 1.0 );
+	Scc_volume( this, (int)FP_ONE_VOLUME );
 	Scc_reset( this );
 }
 

@@ -17,9 +17,9 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 int const noise_osc = 3;
 
-void Sms_apu_volume( struct Sms_Apu* this, double vol )
+void Sms_apu_volume( struct Sms_Apu* this, int vol )
 {
-	vol *= 0.85 / sms_osc_count / 64;
+	vol = (vol - (vol*3)/20) / sms_osc_count / 64;
 	Synth_volume( &this->synth, vol );
 }
 
@@ -116,7 +116,7 @@ void Sms_apu_init( struct Sms_Apu* this )
 	for ( i = sms_osc_count; --i >= 0; )
 		Sms_apu_set_output( this, i, NULL, NULL, NULL );
 	
-	Sms_apu_volume( this, 1.0 );
+	Sms_apu_volume( this, (int)FP_ONE_VOLUME );
 	Sms_apu_reset( this, 0, 0 );
 }
 

@@ -14,7 +14,7 @@ blargg_err_t Fm_apu_init( struct Sms_Fm_Apu* this, double clock_rate, double sam
 	CHECK_ALLOC( !Ym2413_set_rate( &this->apu, sample_rate, clock_rate ) );
 	
 	Fm_apu_set_output( this, 0 );
-	Fm_apu_volume( this, 1.0 );
+	Fm_apu_volume( this, (int)FP_ONE_VOLUME );
 	Fm_apu_reset( this );
 	return 0;
 }

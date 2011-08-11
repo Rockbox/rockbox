@@ -21,7 +21,7 @@ void Vrc6_init( struct Nes_Vrc6_Apu* this )
 	Synth_init( &this->square_synth );
 	
 	Vrc6_output( this, NULL );
-	Vrc6_volume( this, 1.0 );
+	Vrc6_volume( this, (int)FP_ONE_VOLUME );
 	Vrc6_reset( this );
 }
 

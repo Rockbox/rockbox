@@ -41,9 +41,9 @@ struct Nes_Fme7_Apu {
 void Fme7_init( struct Nes_Fme7_Apu* this );
 void Fme7_reset( struct Nes_Fme7_Apu* this );
 	
-static inline void Fme7_volume( struct Nes_Fme7_Apu* this, double v )
+static inline void Fme7_volume( struct Nes_Fme7_Apu* this, int v )
 {
-	Synth_volume( &this->synth, 0.38 / amp_range * v ); // to do: fine-tune
+	Synth_volume( &this->synth, (v/2 - (v*3)/25) / amp_range ); // to do: fine-tune
 }
 
 static inline void Fme7_osc_output( struct Nes_Fme7_Apu* this, int i, struct Blip_Buffer* buf )

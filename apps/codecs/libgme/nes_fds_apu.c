@@ -23,7 +23,7 @@ void Fds_init( struct Nes_Fds_Apu* this )
 		
 	this->lfo_tempo = lfo_base_tempo;
 	Fds_set_output( this, 0, NULL );
-	Fds_volume( this, 1.0 );
+	Fds_volume( this, (int)FP_ONE_VOLUME );
 	Fds_reset( this );
 }
 

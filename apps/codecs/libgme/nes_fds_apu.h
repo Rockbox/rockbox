@@ -53,9 +53,9 @@ void Fds_set_tempo( struct Nes_Fds_Apu* this, int t );
 // emulation
 void Fds_reset( struct Nes_Fds_Apu* this );
 
-static inline void Fds_volume( struct Nes_Fds_Apu* this, double v )
+static inline void Fds_volume( struct Nes_Fds_Apu* this, int v )
 {
-	Synth_volume( &this->synth, 0.14 / fds_master_vol_max / fds_vol_max / fds_wave_sample_max * v );
+	Synth_volume( &this->synth, (v*14) / 100 / fds_master_vol_max / fds_vol_max / fds_wave_sample_max );
 }
 
 static inline void Fds_set_output( struct Nes_Fds_Apu* this, int i, struct Blip_Buffer* b )

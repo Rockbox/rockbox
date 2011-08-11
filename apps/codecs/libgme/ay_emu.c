@@ -144,7 +144,7 @@ blargg_err_t Ay_load_mem( struct Ay_Emu *this, byte const in [], int size )
 		warning( "Unknown file version" ); */
 	
 	this->voice_count = ay_osc_count + 1; // +1 for beeper
-	Ay_apu_volume( &this->apu, ((double)this->gain)/FP_ONE_GAIN);
+	Ay_apu_volume( &this->apu, this->gain);
 	
 	// Setup buffer
 	change_clock_rate( this, spectrum_clock );
@@ -483,7 +483,7 @@ blargg_err_t Ay_start_track( struct Ay_Emu *this, int track )
 	Z80_map_mem( &this->cpu, 0, mem_size, this->mem.ram, this->mem.ram );
 	this->cpu.r = r;
 	
-	this->beeper_delta   = (int) (ay_amp_range * 0.8);
+	this->beeper_delta   = (int) ((ay_amp_range*4)/5);
 	this->last_beeper    = 0;
 	this->next_play      = this->play_period;
 	this->spectrum_mode  = false;

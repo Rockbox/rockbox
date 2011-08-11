@@ -51,7 +51,7 @@ void Apu_set_output( struct Gb_Apu* this, int i, struct Blip_Buffer* center, str
 
 void synth_volume( struct Gb_Apu* this, int iv )
 {
-	double v = this->volume_ * 0.60 / osc_count / 15 /*steps*/ / 8 /*master vol range*/ * iv;
+	int v = (this->volume_ * 6) / 10 / osc_count / 15 /*steps*/ / 8 /*master vol range*/ * iv;
 	Synth_volume( &this->synth, v );
 }
 
@@ -67,7 +67,7 @@ void apply_volume( struct Gb_Apu* this )
 	synth_volume( this, max( left, right ) + 1 );
 }
 
-void Apu_volume( struct Gb_Apu* this, double v )
+void Apu_volume( struct Gb_Apu* this, int v )
 {
 	if ( this->volume_ != v )
 	{
@@ -185,7 +185,7 @@ void Apu_init( struct Gb_Apu* this )
 	
 	this->reduce_clicks_ = false;
 	Apu_set_tempo( this, (int)FP_ONE_TEMPO );
-	this->volume_ = 1.0;
+	this->volume_ = (int)FP_ONE_VOLUME;
 	Apu_reset( this, mode_cgb, false );
 }
 

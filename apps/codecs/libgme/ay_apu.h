@@ -57,7 +57,7 @@ int Ay_apu_read( struct Ay_Apu* this );
 void Ay_apu_reset( struct Ay_Apu* this );
 		
 // Sets overall volume, where 1.0 is normal
-static inline void Ay_apu_volume( struct Ay_Apu* this, double v ) { Synth_volume( &this->synth_, 0.7/ay_osc_count/ay_amp_range * v ); }
+static inline void Ay_apu_volume( struct Ay_Apu* this, int v ) { Synth_volume( &this->synth_, (v*7)/10 /ay_osc_count/ay_amp_range ); }
 
 static inline void Ay_apu_set_output( struct Ay_Apu* this, int i, struct Blip_Buffer* out )
 {
