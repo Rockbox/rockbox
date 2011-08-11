@@ -179,9 +179,9 @@ static bool pal_only( struct header_t* this )
 	return (this->speed_flags & 3) == 1;
 }
 	
-static double clock_rate( struct header_t* this )
+static long clock_rate( struct header_t* this )
 {
-	return pal_only( this ) ? 1662607.125 : 1789772.727272727;
+	return pal_only( this ) ? (long)1662607.125 : (long)1789772.727272727;
 }
 
 static int play_period( struct header_t* this )
@@ -206,7 +206,7 @@ static int play_period( struct header_t* this )
 	
 	// Custom rate
 	if ( rate != value )
-		clocks = (int) (rate * clock_rate( this ) * (1.0/1000000.0));
+		clocks = (int) ((1LL * rate * clock_rate( this )) / 1000000);
 	
 	return clocks;
 }
@@ -285,7 +285,7 @@ blargg_err_t Nsf_post_load( struct Nsf_Emu* this )
 	this->track_count = this->header.track_count;
 	
 	// Change clock rate & setup buffer
-	this->clock_rate__ = (long) (clock_rate( &this->header ) + 0.5);
+	this->clock_rate__ = (long) clock_rate( &this->header );
 	Buffer_clock_rate( &this->stereo_buf, this->clock_rate__ );
 	this->buf_changed_count = Buffer_channels_changed_count( &this->stereo_buf );
 	return 0;

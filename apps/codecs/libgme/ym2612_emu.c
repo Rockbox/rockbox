@@ -682,15 +682,15 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 	impl_reset( impl );
 }
 
-const char* Ym2612_set_rate( struct Ym2612_Emu* this, double sample_rate, double clock_rate )
+const char* Ym2612_set_rate( struct Ym2612_Emu* this, int sample_rate, int clock_rate )
 {
 // Only set rates if necessary
 #if defined(ROCKBOX)
-	static double last_sample_rate = 0.0, last_clock_rate = 0.0;
+	static int last_sample_rate = 0, last_clock_rate = 0;
 	if (last_sample_rate == sample_rate && last_clock_rate == clock_rate) return 0;
 #endif
 	memset( &this->impl.YM2612, 0, sizeof this->impl.YM2612 );
-	impl_set_rate( &this->impl, sample_rate, clock_rate );
+	impl_set_rate( &this->impl, (double)sample_rate, (double)clock_rate );
 	
 	return 0;
 }

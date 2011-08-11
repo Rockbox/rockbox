@@ -43,7 +43,7 @@ struct Hes_Apu_Adpcm {
 
 	struct Blip_Buffer* output;
 	blip_time_t  last_time;
-	double       next_timer;
+	int          next_timer;
 	int          last_amp;
 };
 

@@ -8,9 +8,9 @@ void Fm_apu_create( struct Sms_Fm_Apu* this )
 	Ym2413_init( &this->apu );
 }
 
-blargg_err_t Fm_apu_init( struct Sms_Fm_Apu* this, double clock_rate, double sample_rate )
+blargg_err_t Fm_apu_init( struct Sms_Fm_Apu* this, int clock_rate, int sample_rate )
 {
-	this->period_ = (blip_time_t) (clock_rate / sample_rate + 0.5);
+	this->period_ = (blip_time_t) (clock_rate / sample_rate);
 	CHECK_ALLOC( !Ym2413_set_rate( &this->apu, sample_rate, clock_rate ) );
 	
 	Fm_apu_set_output( this, 0 );

@@ -199,7 +199,7 @@ static inline void Ym2612_init( struct Ym2612_Emu* this_ )
 	
 // Sets sample rate and chip clock rate, in Hz. Returns non-zero
 // if error. If clock_rate=0, uses sample_rate*144
-const char* Ym2612_set_rate( struct Ym2612_Emu* this_, double sample_rate, double clock_rate );
+const char* Ym2612_set_rate( struct Ym2612_Emu* this_, int sample_rate, int clock_rate );
 	
 // Resets to power-up state
 void Ym2612_reset( struct Ym2612_Emu* this_ );

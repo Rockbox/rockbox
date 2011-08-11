@@ -24,7 +24,7 @@ struct Sms_Fm_Apu {
 void Fm_apu_create( struct Sms_Fm_Apu* this );
 
 static inline bool Fm_apu_supported( void ) { return Ym2413_supported(); }
-blargg_err_t Fm_apu_init( struct Sms_Fm_Apu* this, double clock_rate, double sample_rate );
+blargg_err_t Fm_apu_init( struct Sms_Fm_Apu* this, int clock_rate, int sample_rate );
 	
 static inline void Fm_apu_set_output( struct Sms_Fm_Apu* this, struct Blip_Buffer* b )
 {

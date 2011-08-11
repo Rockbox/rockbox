@@ -31,7 +31,7 @@ struct Resampler {
 	int buffer_size;
 	
 	int write_pos;
-	double rate_;
+	int rate_;
 	
 	int pos;
 	int step;
@@ -55,7 +55,7 @@ static inline void Resampler_set_callback(struct Resampler* this, int (*func)( v
 	this->callback_data = user_data;
 }
 
-blargg_err_t Resampler_setup( struct Resampler* this, double oversample, double rolloff, double gain );
+blargg_err_t Resampler_setup( struct Resampler* this, int fm_rate, int fm_gain, int rate, int gain );
 
 static inline void Resampler_clear( struct Resampler* this )
 {

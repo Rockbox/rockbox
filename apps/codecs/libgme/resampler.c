@@ -24,15 +24,13 @@ unsigned const resampler_extra = 34;
 enum { shift = 14 };
 int const unit = 1 << shift;
 
-blargg_err_t Resampler_setup( struct Resampler* this, double oversample, double rolloff, double gain )
-{
-	(void) rolloff;
-	
-	this->gain_ = (int)((1 << gain_bits) * gain);
-	this->step = (int) ( oversample * unit + 0.5);
-	this->rate_ = 1.0 / unit * this->step;
-	return 0;
-}
+blargg_err_t Resampler_setup( struct Resampler* this, int fm_rate, int fm_gain, int rate, int gain )
+ {
+	this->gain_ = (int)( ((1LL << gain_bits) * fm_gain * gain) / FP_ONE_GAIN );
+	this->step  = (int)( ((1LL << shift) * fm_rate) / rate + 1);
+	this->rate_ = this->step;
+ 	return 0;
+ }
 
 blargg_err_t Resampler_reset( struct Resampler* this, int pairs )
 {
@@ -52,7 +50,7 @@ void Resampler_resize( struct Resampler* this, int pairs )
 	if ( this->sample_buf_size != new_sample_buf_size )
 	{
 		this->sample_buf_size = new_sample_buf_size;
-		this->oversamples_per_frame = (int) (pairs * this->rate_) * 2 + 2;
+		this->oversamples_per_frame = (int) ((pairs * this->rate_ * 2LL) / unit) + 2;
 		Resampler_clear( this );
 	}
 }

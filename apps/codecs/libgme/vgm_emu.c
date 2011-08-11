@@ -22,8 +22,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 const char* const gme_wrong_file_type = "Wrong file type for this emulator";
 
 int const fm_gain = 3; // FM emulators are internally quieter to avoid 16-bit overflow
-double const rolloff = 0.990;
-double const oversample_factor = 1.5;
 
 int const silence_max = 6; // seconds
 int const silence_threshold = 0x10;
@@ -310,7 +308,7 @@ blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_
 }
 
 void update_fm_rates( struct Vgm_Emu* this, int* ym2413_rate, int* ym2612_rate );
-static blargg_err_t init_fm( struct Vgm_Emu* this, double* rate )
+static blargg_err_t init_fm( struct Vgm_Emu* this, int* rate )
 {
 	int ym2612_rate = get_le32( header( this )->ym2612_rate );
 	int ym2413_rate = get_le32( header( this )->ym2413_rate );
@@ -320,14 +318,14 @@ static blargg_err_t init_fm( struct Vgm_Emu* this, double* rate )
 	if ( ym2612_rate )
 	{
 		if ( !*rate )
-			*rate = ym2612_rate / 144.0;
+			*rate = ym2612_rate / 144;
 		RETURN_ERR( Ym2612_set_rate( &this->ym2612, *rate, ym2612_rate ) );
 		Ym2612_enable( &this->ym2612, true );
 	}
 	else if ( ym2413_rate )
 	{
 		if ( !*rate )
-			*rate = ym2413_rate / 72.0;
+			*rate = ym2413_rate / 72;
 		int result = Ym2413_set_rate( &this->ym2413, *rate, ym2413_rate );
 		if ( result == 2 )
 			return "YM2413 FM sound not supported";
@@ -342,15 +340,15 @@ static blargg_err_t init_fm( struct Vgm_Emu* this, double* rate )
 
 blargg_err_t setup_fm( struct Vgm_Emu* this )
 {
-	double fm_rate = 0.0;
+	int fm_rate = 0;
 	if ( !this->disable_oversampling )
-		this->fm_rate = this->sample_rate * oversample_factor;
+		this->fm_rate = (this->sample_rate * 3) / 2; // oversample factor = 1.5
 	RETURN_ERR( init_fm( this, &fm_rate ) );
 	
 	if ( uses_fm( this ) )
 	{
 		this->voice_count = 8;
-		RETURN_ERR( Resampler_setup( &this->resampler, fm_rate / this->sample_rate, rolloff, fm_gain * (double)(this->gain)/FP_ONE_GAIN ) );
+		RETURN_ERR( Resampler_setup( &this->resampler, fm_rate, fm_gain, this->sample_rate, this->gain ) );
 		RETURN_ERR( Resampler_reset( &this->resampler, Buffer_length( &this->stereo_buf ) * this->sample_rate / 1000 ) );
 		Sms_apu_volume( &this->psg, ((this->gain/5)-(this->gain*5)/1000) * fm_gain );
 	}

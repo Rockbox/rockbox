@@ -46,7 +46,7 @@ void Apu_init( struct Nes_Apu* this )
 void Apu_enable_nonlinear( struct Nes_Apu* this, int v )
 {
 	this->dmc.nonlinear = true;
-	Synth_volume( &this->square_synth, (int)((1.3 * 0.25751258 / 0.742467605 * 0.25 * FP_ONE_VOLUME) / amp_range * v) );
+	Synth_volume( &this->square_synth, (int)((long long)(1.3 * 0.25751258 / 0.742467605 * 0.25 * FP_ONE_VOLUME) / amp_range * v) );
 	
 	const int tnd = (int)(0.48 / 202 * 0.75 * FP_ONE_VOLUME);
 	Synth_volume( &this->triangle.synth, 3 * tnd );

@@ -25,7 +25,7 @@ static inline bool Ym2413_supported( void ) { return true; }
 	
 // Sets output sample rate and chip clock rates, in Hz. Returns non-zero
 // if error.
-int Ym2413_set_rate( struct Ym2413_Emu* this, double sample_rate, double clock_rate );
+int Ym2413_set_rate( struct Ym2413_Emu* this, int sample_rate, int clock_rate );
 	
 // Resets to power-up state
 void Ym2413_reset( struct Ym2413_Emu* this );

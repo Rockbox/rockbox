@@ -112,7 +112,6 @@ struct Nsf_Emu {
 	long silence_count;    // number of samples of silence to play before using buf
 	long buf_remain;       // number of samples left in silence buffer
 
-	double clock_rate_;
 	long clock_rate__;
 	unsigned buf_changed_count;
 

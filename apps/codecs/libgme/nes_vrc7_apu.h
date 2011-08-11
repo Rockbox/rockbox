@@ -27,7 +27,7 @@ struct Nes_Vrc7_Apu {
 // See Nes_Apu.h for reference
 void Vrc7_init( struct Nes_Vrc7_Apu* this );
 void Vrc7_reset( struct Nes_Vrc7_Apu* this );
-void Vrc7_set_rate( struct Nes_Vrc7_Apu* this, double r );
+void Vrc7_set_rate( struct Nes_Vrc7_Apu* this, int r );
 void Vrc7_end_frame( struct Nes_Vrc7_Apu* this, blip_time_t ) ICODE_ATTR;
 
 void Vrc7_write_reg( struct Nes_Vrc7_Apu* this, int reg ) ICODE_ATTR;

@@ -63,7 +63,7 @@ struct track_info_t
 // aliasing on high notes. Currently YM2413 support requires that you supply a
 // YM2413 sound chip emulator. I can provide one I've modified to work with the library.
 struct Vgm_Emu {
-	double fm_rate;
+	int fm_rate;
 	long psg_rate;
 	long vgm_rate;
 	bool disable_oversampling;

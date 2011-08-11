@@ -7,7 +7,7 @@ void Ym2413_init( struct Ym2413_Emu* this )
 	this->last_time = disabled_time; this->out = 0; 
 }
 
-int Ym2413_set_rate( struct Ym2413_Emu* this, double sample_rate, double clock_rate )
+int Ym2413_set_rate( struct Ym2413_Emu* this, int sample_rate, int clock_rate )
 {	
 	OPLL_new ( &this->opll, clock_rate, sample_rate );
     OPLL_reset_patch( &this->opll, OPLL_2413_TONE );
