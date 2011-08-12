@@ -210,7 +210,7 @@ static e_uint32 dphaseARTable[16][16];
 static e_uint32 dphaseDRTable[16][16];
 
 /* KSL + TL Table */
-static e_uint32 tllTable[16][8][1 << TL_BITS][4];
+e_uint8 tllTable[16][8][1 << TL_BITS][4];
 static e_int32 rksTable[2][8][2];
 
 /* We may not have too much SRAM in rockbox */

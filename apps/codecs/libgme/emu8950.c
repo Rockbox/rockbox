@@ -36,7 +36,12 @@ static unsigned int dphaseARTable[16][16];
 /** Phase incr table for Decay and Release. */
 static unsigned int dphaseDRTable[16][16];
 /** KSL + TL Table. */
-static int tllTable[16][8][1<<TL_BITS][4];
+#if !defined(ROCKBOX)
+static unsigned char tllTable[16][8][1<<TL_BITS][4];
+#else
+/* Use the table calculated in emu2413 which is identical. */
+extern unsigned char tllTable[16][8][1<<TL_BITS][4];
+#endif
 static int rksTable[2][8][2];
 /** Since we wont change clock rate in rockbox we can
     skip this table */
@@ -193,6 +198,7 @@ static void makeDphaseTable(int sampleRate, int clockRate)
 }
 #endif
 
+#if !defined(ROCKBOX)
 static void makeTllTable(void)
 {
 	#define dB2(x) (int)((x)*2)
@@ -209,17 +215,17 @@ static void makeTllTable(void)
 			for (TL=0; TL<64; TL++)
 				for (KL=0; KL<4; KL++) {
 					if (KL==0) {
-						tllTable[fnum][block][TL][KL] = ALIGN(TL, TL_STEP, EG_STEP);
+						tllTable[fnum][block][TL][KL] = (ALIGN(TL, TL_STEP, EG_STEP) ) >> 1;
 					} else {
 						int tmp = kltable[fnum] - dB2(3.000) * (7 - block);
 						if (tmp <= 0)
-							tllTable[fnum][block][TL][KL] = ALIGN(TL, TL_STEP, EG_STEP);
+							tllTable[fnum][block][TL][KL] = (ALIGN(TL, TL_STEP, EG_STEP) ) >> 1;
 						else 
-							tllTable[fnum][block][TL][KL] = (int)((tmp>>(3-KL))/EG_STEP) + ALIGN(TL, TL_STEP, EG_STEP);
+							tllTable[fnum][block][TL][KL] = ((int)((tmp>>(3-KL))/EG_STEP) + ALIGN(TL, TL_STEP, EG_STEP) ) >> 1;
 					}
 				}
 }
-
+#endif
 
 // Rate Table for Attack 
 static void makeDphaseARTable(int sampleRate, int clockRate)
@@ -313,7 +319,7 @@ static inline void slotUpdatePG(struct Slot* slot)
 
 static inline void slotUpdateTLL(struct Slot* slot)
 {
-	slot->tll = tllTable[slot->fnum>>6][slot->block][slot->patch.TL][slot->patch.KL];
+	slot->tll = (int)(tllTable[slot->fnum>>6][slot->block][slot->patch.TL][slot->patch.KL]) << 1;
 }
 
 static inline void slotUpdateRKS(struct Slot* slot)
@@ -457,7 +463,9 @@ void OPL_init(struct Y8950* this, byte* ramBank, int sampleRam)
 	
 	makeAdjustTable();
 	makeDB2LinTable();
+#if !defined(ROCKBOX)
 	makeTllTable();
+#endif
 	makeRksTable();
 	makeSinTable();
 
