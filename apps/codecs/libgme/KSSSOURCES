@@ -4,7 +4,6 @@ kss_emu.c
 kss_scc_apu.c
 opl_apu.c
 sms_apu.c
-ymdeltat.c
 z80_cpu.c
 blip_buffer.c
 multi_buffer.c
