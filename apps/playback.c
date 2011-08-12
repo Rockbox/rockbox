@@ -972,7 +972,7 @@ static void audio_update_filebuf_watermark(int seconds)
 
     if (id3)
     {
-        if (get_audio_base_data_type(id3->codectype) == TYPE_PACKET_AUDIO)
+        if (!rbcodec_format_is_atomic(id3->codectype))
         {
             bytes = id3->bitrate * (1000/8) * seconds;
         }
@@ -1897,7 +1897,8 @@ static int audio_finish_load_track(struct track_info *info)
        calls it again, so we don't save it (and they shouldn't accumulate) */
     size_t offset = resume_rewind_adjusted_offset(track_id3);
 
-    enum data_type audiotype = get_audio_base_data_type(track_id3->codectype);
+    enum data_type audiotype = rbcodec_format_is_atomic(track_id3->codectype) ?
+                                      TYPE_ATOMIC_AUDIO : TYPE_PACKET_AUDIO;
 
     if (audiotype == TYPE_ATOMIC_AUDIO)
         logf("Loading atomic %d", track_id3->codectype);
@@ -2342,9 +2343,7 @@ static void audio_on_codec_complete(int status)
 
             struct mp3entry *track_id3 = bufgetid3(info->id3_hid);
 
-            if (track_id3 &&
-                get_audio_base_data_type(track_id3->codectype)
-                            == TYPE_PACKET_AUDIO)
+            if (track_id3 && !rbcodec_format_is_atomic(track_id3->codectype))
             {
                 /* Continue filling after this track */
                 audio_reset_and_rebuffer(TRACK_LIST_KEEP_CURRENT, 1);

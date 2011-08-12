@@ -307,10 +307,10 @@ int get_audio_base_codec_type(int type)
 }
 
 /* Get the basic audio type */
-enum data_type get_audio_base_data_type(int afmt)
+bool rbcodec_format_is_atomic(int afmt)
 {
     if ((unsigned)afmt >= AFMT_NUM_CODECS)
-        return TYPE_UNKNOWN;
+        return false;
 
     switch (get_audio_base_codec_type(afmt))
     {
@@ -327,15 +327,11 @@ enum data_type get_audio_base_data_type(int afmt)
     case AFMT_KSS:
         /* Type must be allocated and loaded in its entirety onto
            the buffer */
-        return TYPE_ATOMIC_AUDIO;
+        return true;
 
     default:
         /* Assume type may be loaded and discarded incrementally */
-        return TYPE_PACKET_AUDIO;
-
-    case AFMT_UNKNOWN:
-        /* Have no idea at all */
-        return TYPE_UNKNOWN;
+        return false;
     }
 }
 

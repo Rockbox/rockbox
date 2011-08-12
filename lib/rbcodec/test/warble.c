@@ -475,7 +475,7 @@ static size_t ci_read_filebuf(void *ptr, size_t size)
 static void *ci_request_buffer(size_t *realsize, size_t reqsize)
 {
     free(input_buffer);
-    if (get_audio_base_data_type(ci.id3->codectype) == TYPE_PACKET_AUDIO)
+    if (!rbcodec_format_is_atomic(ci.id3->codectype))
         reqsize = MIN(reqsize, 32 * 1024);
     input_buffer = malloc(reqsize);
     *realsize = read(input_fd, input_buffer, reqsize);
