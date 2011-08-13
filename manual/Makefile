@@ -58,4 +58,4 @@ manual-zip: manual-html
 clean:
 	@if [ "$(OBJDIR)" = "" ]; then echo Run make in you build directory!; false; fi
 	@rm -rf $(OBJDIR)/manual $(OBJDIR)/*.pdf
-	@rm -rf $(OBJJDIR)/html $(OBJDIR)/txt
+	@rm -rf $(OBJDIR)/html $(OBJDIR)/txt
