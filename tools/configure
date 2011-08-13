@@ -3609,16 +3609,6 @@ if test -n "$t_cpu"; then
   GCCOPTS="$GCCOPTS"
 fi
 
-if test "$simulator" = "yes"; then
-  # add simul make stuff on the #SIMUL# line
-  simmagic1="s<@SIMUL1@<\$(SILENT)\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(BUILDDIR)/sim<"
-  simmagic2="s<@SIMUL2@<\$(SILENT)\$(MAKE) -C \$(ROOTDIR)/uisimulator/common OBJDIR=\$(BUILDDIR)/comsim<"
-else
-  # delete the lines that match
-  simmagic1='/@SIMUL1@/D'
-  simmagic2='/@SIMUL2@/D'
-fi
-
 if test "$swcodec" = "yes"; then
   voicetoolset="rbspeexenc voicefont wavtrim"
 else
@@ -3647,154 +3637,81 @@ cmdline="$cmdline --target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) 
 
 ### end of cmdline
 
-sed > Makefile \
- -e "s<@ROOTDIR@<${rootdir}<g" \
- -e "s<@DEBUG@<${debug}<g" \
- -e "s<@MEMORY@<${memory}<g" \
- -e "s<@TARGET_ID@<${target_id}<g" \
- -e "s<@TARGET@<${target}<g" \
- -e "s<@CPU@<${t_cpu}<g" \
- -e "s<@MANUFACTURER@<${t_manufacturer}<g" \
- -e "s<@MODELNAME@<${modelname}<g" \
- -e "s<@LANGUAGE@<${language}<g" \
- -e "s:@VOICELANGUAGE@:${voicelanguage}:g" \
- -e "s<@PWD@<${pwd}<g" \
- -e "s<@HOSTCC@<${HOSTCC}<g" \
- -e "s<@HOSTAR@<${HOSTAR}<g" \
- -e "s<@CC@<${CC}<g" \
- -e "s<@LD@<${LD}<g" \
- -e "s<@AR@<${AR}<g" \
- -e "s<@AS@<${AS}<g" \
- -e "s<@OC@<${OC}<g" \
- -e "s<@WINDRES@<${WINDRES}<g" \
- -e "s<@DLLTOOL@<${DLLTOOL}<g" \
- -e "s<@DLLWRAP@<${DLLWRAP}<g" \
- -e "s<@RANLIB@<${RANLIB}<g" \
- -e "s<@TOOL@<${tool}<g" \
- -e "s<@BMP2RB_NATIVE@<${bmp2rb_native}<g" \
- -e "s<@BMP2RB_MONO@<${bmp2rb_mono}<g" \
- -e "s<@BMP2RB_REMOTENATIVE@<${bmp2rb_remotenative}<g" \
- -e "s<@BMP2RB_REMOTEMONO@<${bmp2rb_remotemono}<g" \
- -e "s<@OUTPUT@<${output}<g" \
- -e "s<@APPEXTRA@<${appextra}<g" \
- -e "s<@ARCHOSROM@<${archosrom}<g" \
- -e "s<@FLASHFILE@<${flash}<g" \
- -e "s<@PLUGINS@<${plugins}<g" \
- -e "s<@CODECS@<${swcodec}<g" \
- -e "s<@PROFILE_OPTS@<${PROFILE_OPTS}<g" \
- -e "s<@SHARED_LDFLAG@<${SHARED_LDFLAG}<g" \
- -e "s<@SHARED_CFLAGS@<${SHARED_CFLAGS}<g" \
- -e "s<@GCCOPTS@<${GCCOPTS}<g" \
- -e "s<@TARGET_INC@<${TARGET_INC}<g" \
- -e "s<@LDOPTS@<${LDOPTS}<g" \
- -e "s<@GLOBAL_LDOPTS@<${GLOBAL_LDOPTS}<g" \
- -e "s<@LOADADDRESS@<${loadaddress}<g" \
- -e "s<@EXTRADEF@<${extradefines}<g" \
- -e "s<@APPSDIR@<${appsdir}<g" \
- -e "s<@FIRMDIR@<${firmdir}<g" \
- -e "s<@TOOLSDIR@<${toolsdir}<g" \
- -e "s<@APPS@<${apps}<g" \
- -e "s<@APP_TYPE@<${app_type}<g" \
- -e "s<@APPLICATION@<${application}<g" \
- -e "s<@GCCVER@<${gccver}<g" \
- -e "s<@GCCNUM@<${gccnum}<g" \
- -e "s<@UNAME@<${uname}<g" \
- -e "s<@ENDIAN@<${defendian}<g" \
- -e "s<@TOOLSET@<${toolset}<g" \
- -e "${simmagic1}" \
- -e "${simmagic2}" \
- -e "s<@MANUALDEV@<${manualdev}<g" \
- -e "s<@ENCODER@<${ENC_CMD}<g" \
- -e "s<@ENC_OPTS@<${ENC_OPTS}<g" \
- -e "s<@TTS_ENGINE@<${TTS_ENGINE}<g" \
- -e "s<@TTS_OPTS@<${TTS_OPTS}<g" \
- -e "s<@VOICETOOLSET@<${voicetoolset}<g" \
- -e "s<@LANGS@<${buildlangs}<g" \
- -e "s<@USE_ELF@<${USE_ELF}<g" \
- -e "s<@RBDIR@<${rbdir}<g" \
- -e "s<@sharepath@<${sharedir}<g" \
- -e "s<@binpath@<${bindir}<g" \
- -e "s<@libpath@<${libdir}<g" \
- -e "s<@PREFIX@<$ARG_PREFIX<g" \
- -e "s<@CMDLINE@<$cmdline<g" \
- -e "s<@SDLCONFIG@<$sdl<g" \
- -e "s<@LCDORIENTATION@<$lcd_orientation<g" \
-<<EOF
+cat > Makefile <<EOF
 ## Automatically generated. http://www.rockbox.org/
 
-export ROOTDIR=@ROOTDIR@
-export FIRMDIR=@FIRMDIR@
-export APPSDIR=@APPSDIR@
-export TOOLSDIR=@TOOLSDIR@
-export DOCSDIR=\$(ROOTDIR)/docs
-export MANUALDIR=\${ROOTDIR}/manual
-export DEBUG=@DEBUG@
-export MODELNAME=@MODELNAME@
-export ARCHOSROM=@ARCHOSROM@
-export FLASHFILE=@FLASHFILE@
-export TARGET_ID=@TARGET_ID@
-export TARGET=@TARGET@
-export CPU=@CPU@
-export MANUFACTURER=@MANUFACTURER@
-export OBJDIR=@PWD@
-export BUILDDIR=@PWD@
-export LANGUAGE=@LANGUAGE@
-export VOICELANGUAGE=@VOICELANGUAGE@
-export MEMORYSIZE=@MEMORY@
+export ROOTDIR=${rootdir}
+export FIRMDIR=${firmdir}
+export APPSDIR=${appsdir}
+export TOOLSDIR=${toolsdir}
+export DOCSDIR=${rootdir}/docs
+export MANUALDIR=${rootdir}/manual
+export DEBUG=${debug}
+export MODELNAME=${modelname}
+export ARCHOSROM=${archosrom}
+export FLASHFILE=${flash}
+export TARGET_ID=${target_id}
+export TARGET=${target}
+export CPU=${t_cpu}
+export MANUFACTURER=${t_manufacturer}
+export OBJDIR=${pwd}
+export BUILDDIR=${pwd}
+export LANGUAGE=${language}
+export VOICELANGUAGE=${voicelanguage}
+export MEMORYSIZE=${memory}
 export BUILDDATE:=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
-export MKFIRMWARE=@TOOL@
-export BMP2RB_MONO=@BMP2RB_MONO@
-export BMP2RB_NATIVE=@BMP2RB_NATIVE@
-export BMP2RB_REMOTEMONO=@BMP2RB_REMOTEMONO@
-export BMP2RB_REMOTENATIVE=@BMP2RB_REMOTENATIVE@
-export BINARY=@OUTPUT@
-export APPEXTRA=@APPEXTRA@
-export ENABLEDPLUGINS=@PLUGINS@
-export SOFTWARECODECS=@CODECS@
-export EXTRA_DEFINES=@EXTRADEF@
-export HOSTCC=@HOSTCC@
-export HOSTAR=@HOSTAR@
-export CC=@CC@
-export LD=@LD@
-export AR=@AR@
-export AS=@AS@
-export OC=@OC@
-export WINDRES=@WINDRES@
-export DLLTOOL=@DLLTOOL@
-export DLLWRAP=@DLLWRAP@
-export RANLIB=@RANLIB@
-export PREFIX=@PREFIX@
-export PROFILE_OPTS=@PROFILE_OPTS@
-export APP_TYPE=@APP_TYPE@
-export APPLICATION=@APPLICATION@
+export MKFIRMWARE=${tool}
+export BMP2RB_MONO=${bmp2rb_mono}
+export BMP2RB_NATIVE=${bmp2fb_native}
+export BMP2RB_REMOTEMONO=${bmp2rb_remotemono}
+export BMP2RB_REMOTENATIVE=${bmp2rb_remotenative}
+export BINARY=${output}
+export APPEXTRA=${appextra}
+export ENABLEDPLUGINS=${plugins}
+export SOFTWARECODECS=${swcodec}
+export EXTRA_DEFINES=${extradefines}
+export HOSTCC=${HOSTCC}
+export HOSTAR=${HOSTAR}
+export CC=${CC}
+export LD=${LD}
+export AR=${AR}
+export AS=${AS}
+export OC=${OC}
+export WINDRES=${WINDRES}
+export DLLTOOL=${DLLTOOL}
+export DLLWRAP=${DLLWRAP}
+export RANLIB=${RANLIB}
+export PREFIX=${ARG_PREFIX}
+export PROFILE_OPTS=${PROFILE_OPTS}
+export APP_TYPE=${app_type}
+export APPLICATION=${application}
 export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
-export GCCOPTS=@GCCOPTS@
-export TARGET_INC=@TARGET_INC@
-export LOADADDRESS=@LOADADDRESS@
-export SHARED_LDFLAG=@SHARED_LDFLAG@
-export SHARED_CFLAGS=@SHARED_CFLAGS@
-export LDOPTS=@LDOPTS@
-export GLOBAL_LDOPTS=@GLOBAL_LDOPTS@
-export GCCVER=@GCCVER@
-export GCCNUM=@GCCNUM@
-export UNAME=@UNAME@
-export MANUALDEV=@MANUALDEV@
-export TTS_OPTS=@TTS_OPTS@
-export TTS_ENGINE=@TTS_ENGINE@
-export ENC_OPTS=@ENC_OPTS@
-export ENCODER=@ENCODER@
-export USE_ELF=@USE_ELF@
-export RBDIR=@RBDIR@
-export ROCKBOX_SHARE_PATH=@sharepath@
-export ROCKBOX_BINARY_PATH=@binpath@
-export ROCKBOX_LIBRARY_PATH=@libpath@
-export SDLCONFIG=@SDLCONFIG@
-export LCDORIENTATION=@LCDORIENTATION@
+export GCCOPTS=${GCCOPTS}
+export TARGET_INC=${TARGET_INC}
+export LOADADDRESS=${loadaddress}
+export SHARED_LDFLAG=${SHARED_LDFLAG}
+export SHARED_CFLAGS=${SHARED_CFLAGS}
+export LDOPTS=${LDOPTS}
+export GLOBAL_LDOPTS=${GLOBAL_LDOPTS}
+export GCCVER=${gccver}
+export GCCNUM=${gccnum}
+export UNAME=${uname}
+export MANUALDEV=${manualdev}
+export TTS_OPTS=${TTS_OPTS}
+export TTS_ENGINE=${TTS_ENGINE}
+export ENC_OPTS=${ENC_OPTS}
+export ENCODER=${ENC_CMD}
+export USE_ELF=${USE_ELF}
+export RBDIR=${rbdir}
+export ROCKBOX_SHARE_PATH=${sharedir}
+export ROCKBOX_BINARY_PATH=${bindir}
+export ROCKBOX_LIBRARY_PATH=${libdir}
+export SDLCONFIG=${sdl}
+export LCDORIENTATION=${lcd_orientation}
 
-CONFIGURE_OPTIONS=@CMDLINE@
+CONFIGURE_OPTIONS=${cmdline}
 
 include \$(TOOLSDIR)/root.make
-
 EOF
 
 echo "Created Makefile"
