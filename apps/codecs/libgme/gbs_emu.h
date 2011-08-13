@@ -126,7 +126,7 @@ blargg_err_t Gbs_start_track( struct Gbs_Emu* this, int );
 
 // Generate 'count' samples info 'buf'. Output is in stereo. Any emulation
 // errors set warning string, and major errors also end track.
-blargg_err_t Gbs_play( struct Gbs_Emu* this, long count, sample_t* buf ) ICODE_ATTR;
+blargg_err_t Gbs_play( struct Gbs_Emu* this, long count, sample_t* buf );
 
 // Track status/control
 // Number of milliseconds (1000 msec = 1 second) played since beginning of track
@@ -178,16 +178,16 @@ static inline void Sound_set_gain( struct Gbs_Emu* this, int g )
 
 // Emulation (You shouldn't touch these)
 
-blargg_err_t Run_clocks( struct Gbs_Emu* this, blip_time_t duration ) ICODE_ATTR;
-void Set_bank( struct Gbs_Emu* this, int ) ICODE_ATTR;
-void Update_timer( struct Gbs_Emu* this ) ICODE_ATTR;
+blargg_err_t Run_clocks( struct Gbs_Emu* this, blip_time_t duration );
+void Set_bank( struct Gbs_Emu* this, int );
+void Update_timer( struct Gbs_Emu* this );
 
 // Runs CPU until time becomes >= 0
-void Run_cpu( struct Gbs_Emu* this ) ICODE_ATTR;
+void Run_cpu( struct Gbs_Emu* this );
 
 // Reads/writes memory and I/O
-int  Read_mem( struct Gbs_Emu* this, addr_t addr ) ICODE_ATTR;
-void Write_mem( struct Gbs_Emu* this, addr_t addr, int data ) ICODE_ATTR;
+int  Read_mem( struct Gbs_Emu* this, addr_t addr );
+void Write_mem( struct Gbs_Emu* this, addr_t addr, int data );
 
 // Current time
 static inline blip_time_t Time( struct Gbs_Emu* this ) 
@@ -195,10 +195,10 @@ static inline blip_time_t Time( struct Gbs_Emu* this )
 	return Cpu_time( &this->cpu ) + this->end_time; 
 }
 
-void Jsr_then_stop( struct Gbs_Emu* this, byte const [] ) ICODE_ATTR;
-void Write_io_inline( struct Gbs_Emu* this, int offset, int data, int base ) ICODE_ATTR;
-void Write_io_( struct Gbs_Emu* this, int offset, int data ) ICODE_ATTR;
-int  Read_io(  struct Gbs_Emu* this, int offset ) ICODE_ATTR;
-void Write_io( struct Gbs_Emu* this, int offset, int data ) ICODE_ATTR;
+void Jsr_then_stop( struct Gbs_Emu* this, byte const [] );
+void Write_io_inline( struct Gbs_Emu* this, int offset, int data, int base );
+void Write_io_( struct Gbs_Emu* this, int offset, int data );
+int  Read_io(  struct Gbs_Emu* this, int offset );
+void Write_io( struct Gbs_Emu* this, int offset, int data );
 
 #endif

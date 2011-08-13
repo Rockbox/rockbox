@@ -155,7 +155,7 @@ blargg_err_t Vgm_start_track( struct Vgm_Emu* this );
 	
 // Generate 'count' samples info 'buf'. Output is in stereo. Any emulation
 // errors set warning string, and major errors also end track.
-blargg_err_t Vgm_play( struct Vgm_Emu* this, long count, sample_t* buf ) ICODE_ATTR;
+blargg_err_t Vgm_play( struct Vgm_Emu* this, long count, sample_t* buf );
 		
 // Track status/control
 

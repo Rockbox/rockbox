@@ -18,7 +18,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #include "blargg_source.h"
 
-const char gme_wrong_file_type [] ICONST_ATTR = "Wrong file type for this emulator";
+const char gme_wrong_file_type [] = "Wrong file type for this emulator";
 long const clock_divisor = 12;
 
 int const stereo = 2; // number of channels for stereo
@@ -859,7 +859,7 @@ blargg_err_t Track_seek( struct Nsf_Emu* this, long msec )
 	return Track_skip( this, time - this->out_time );
 }
 
-blargg_err_t skip_( struct Nsf_Emu* this, long count ) ICODE_ATTR;
+blargg_err_t skip_( struct Nsf_Emu* this, long count );
 blargg_err_t Track_skip( struct Nsf_Emu* this, long count )
 {
 	require( this->current_track >= 0 ); // start_track() must have been called already
@@ -890,7 +890,7 @@ blargg_err_t Track_skip( struct Nsf_Emu* this, long count )
 	return 0;
 }
 
-blargg_err_t play_( struct Nsf_Emu* this, long count, sample_t* out ) ICODE_ATTR;
+blargg_err_t play_( struct Nsf_Emu* this, long count, sample_t* out );
 blargg_err_t skip_( struct Nsf_Emu* this, long count )
 {
 	// for long skip, mute sound
@@ -960,7 +960,7 @@ static void handle_fade( struct Nsf_Emu* this, long out_count, sample_t* out )
 
 // Silence detection
 
-void emu_play( struct Nsf_Emu* this, long count, sample_t* out ) ICODE_ATTR;
+void emu_play( struct Nsf_Emu* this, long count, sample_t* out );
 void emu_play( struct Nsf_Emu* this, long count, sample_t* out )
 {
 	check( current_track_ >= 0 );

@@ -46,8 +46,8 @@ void Ay_apu_init( struct Ay_Apu* this );
 static inline void Ay_apu_write_addr( struct Ay_Apu* this, int data ) { this->addr_ = data & 0x0F; }
 	
 // Emulates to time t, then writes to current data register
-void run_until( struct Ay_Apu* this, blip_time_t final_end_time ) ICODE_ATTR;;
-void write_data_( struct Ay_Apu* this, int addr, int data ) ICODE_ATTR;
+void run_until( struct Ay_Apu* this, blip_time_t final_end_time );;
+void write_data_( struct Ay_Apu* this, int addr, int data );
 static inline void Ay_apu_write_data( struct Ay_Apu* this, blip_time_t t, int data )  { run_until( this, t ); write_data_( this, this->addr_, data ); }
 	
 // Reads from current data register

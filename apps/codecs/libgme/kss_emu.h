@@ -155,7 +155,7 @@ blargg_err_t Kss_start_track( struct Kss_Emu* this, int track );
 
 // Generate 'count' samples info 'buf'. Output is in stereo. Any emulation
 // errors set warning string, and major errors also end track.
-blargg_err_t Kss_play( struct Kss_Emu* this, long count, sample_t* buf ) ICODE_ATTR;
+blargg_err_t Kss_play( struct Kss_Emu* this, long count, sample_t* buf );
 
 // Track status/control
 
@@ -210,13 +210,13 @@ static inline void Sound_set_gain( struct Kss_Emu* this, int g )
 }
 
 // Emulation (You shouldn't touch these
-void cpu_write( struct Kss_Emu* this, kss_addr_t, int ) ICODE_ATTR;
-int  cpu_in( struct Kss_Emu* this, kss_time_t, kss_addr_t ) ICODE_ATTR;
-void cpu_out( struct Kss_Emu* this, kss_time_t, kss_addr_t, int ) ICODE_ATTR;
+void cpu_write( struct Kss_Emu* this, kss_addr_t, int );
+int  cpu_in( struct Kss_Emu* this, kss_time_t, kss_addr_t );
+void cpu_out( struct Kss_Emu* this, kss_time_t, kss_addr_t, int );
 
-void cpu_write_( struct Kss_Emu* this, kss_addr_t addr, int data ) ICODE_ATTR;
-bool run_cpu( struct Kss_Emu* this, kss_time_t end ) ICODE_ATTR;
-void jsr( struct Kss_Emu* this, byte const addr [] ) ICODE_ATTR;
+void cpu_write_( struct Kss_Emu* this, kss_addr_t addr, int data );
+bool run_cpu( struct Kss_Emu* this, kss_time_t end );
+void jsr( struct Kss_Emu* this, byte const addr [] );
 
 static inline int sms_psg_enabled( struct Kss_Emu* this )   { return this->chip_flags & sms_psg_flag;  }
 static inline int sms_fm_enabled( struct Kss_Emu* this )    { return this->chip_flags & sms_fm_flag;   }

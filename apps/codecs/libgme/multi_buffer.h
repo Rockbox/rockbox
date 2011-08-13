@@ -38,18 +38,18 @@ void Buffer_clock_rate( struct Stereo_Buffer* this, long );
 void Buffer_bass_freq( struct Stereo_Buffer* this, int );
 void Buffer_clear( struct Stereo_Buffer* this );
 struct channel_t Buffer_channel( struct Stereo_Buffer* this );
-void Buffer_end_frame( struct Stereo_Buffer* this, blip_time_t ) ICODE_ATTR;
+void Buffer_end_frame( struct Stereo_Buffer* this, blip_time_t );
 
-long Buffer_read_samples( struct Stereo_Buffer* this, blip_sample_t*, long ) ICODE_ATTR;
+long Buffer_read_samples( struct Stereo_Buffer* this, blip_sample_t*, long );
 
 // Count of changes to channel configuration. Incremented whenever
 // a change is made to any of the Blip_Buffers for any channel.
-unsigned Buffer_channels_changed_count( struct Stereo_Buffer* this ) ICODE_ATTR;
-void Buffer_channels_changed( struct Stereo_Buffer* this ) ICODE_ATTR;
+unsigned Buffer_channels_changed_count( struct Stereo_Buffer* this );
+void Buffer_channels_changed( struct Stereo_Buffer* this );
 
-void Buffer_mix_stereo_no_center( struct Stereo_Buffer* this, blip_sample_t*, blargg_long ) ICODE_ATTR;
-void Buffer_mix_stereo( struct Stereo_Buffer* this, blip_sample_t*, blargg_long ) ICODE_ATTR;
-void Buffer_mix_mono( struct Stereo_Buffer* this, blip_sample_t*, blargg_long ) ICODE_ATTR;
+void Buffer_mix_stereo_no_center( struct Stereo_Buffer* this, blip_sample_t*, blargg_long );
+void Buffer_mix_stereo( struct Stereo_Buffer* this, blip_sample_t*, blargg_long );
+void Buffer_mix_mono( struct Stereo_Buffer* this, blip_sample_t*, blargg_long );
 
 // Number of samples per output frame (1 = mono, 2 = stereo)
 static inline int Buffer_samples_per_frame( struct Stereo_Buffer* this )

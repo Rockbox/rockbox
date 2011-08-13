@@ -48,22 +48,22 @@ struct Nes_Apu {
 void Apu_init( struct Nes_Apu* this );
 
 // Set buffer to generate all sound into, or disable sound if NULL
-void Apu_output( struct Nes_Apu* this, struct Blip_Buffer* ) ICODE_ATTR;
+void Apu_output( struct Nes_Apu* this, struct Blip_Buffer* );
 	
 // All time values are the number of cpu clock cycles relative to the
 // beginning of the current time frame. Before resetting the cpu clock
 // count, call end_frame( last_cpu_time ).
 
 // Write to register (0x4000-0x4017, except 0x4014 and 0x4016)
-void Apu_write_register( struct Nes_Apu* this, nes_time_t, addr_t, int data ) ICODE_ATTR;
+void Apu_write_register( struct Nes_Apu* this, nes_time_t, addr_t, int data );
 	
 // Read from status register at 0x4015
-int Apu_read_status( struct Nes_Apu* this, nes_time_t ) ICODE_ATTR;
+int Apu_read_status( struct Nes_Apu* this, nes_time_t );
 	
 // Run all oscillators up to specified time, end current time frame, then
 // start a new time frame at time 0. Time frames have no effect on emulation
 // and each can be whatever length is convenient.
-void Apu_end_frame( struct Nes_Apu* this, nes_time_t ) ICODE_ATTR;
+void Apu_end_frame( struct Nes_Apu* this, nes_time_t );
 	
 // Additional optional features (can be ignored without any problem)
 
@@ -81,7 +81,7 @@ void Apu_volume( struct Nes_Apu* this, int );
 	
 // Run DMC until specified time, so that any DMC memory reads can be
 // accounted for (i.e. inserting cpu wait states).
-void Apu_run_until( struct Nes_Apu* this, nes_time_t ) ICODE_ATTR;
+void Apu_run_until( struct Nes_Apu* this, nes_time_t );
 
 // Set sound output of specific oscillator to buffer. If buffer is NULL,
 // the specified oscillator is muted and emulation accuracy is reduced.
@@ -129,6 +129,6 @@ static inline nes_time_t Dmc_next_read_time( struct Nes_Dmc* this )
 
 // Time when next DMC memory read will occur
 static inline nes_time_t Apu_next_dmc_read_time( struct Nes_Apu* this ) { return Dmc_next_read_time( &this->dmc ); }
-void Apu_irq_changed( struct Nes_Apu* this ) ICODE_ATTR;
+void Apu_irq_changed( struct Nes_Apu* this );
 
 #endif

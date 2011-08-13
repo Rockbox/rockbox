@@ -68,7 +68,7 @@ static inline void Fds_set_output( struct Nes_Fds_Apu* this, int i, struct Blip_
 	this->output_ = b;
 }
 
-void Fds_run_until( struct Nes_Fds_Apu* this, blip_time_t ) ICODE_ATTR;
+void Fds_run_until( struct Nes_Fds_Apu* this, blip_time_t );
 static inline void Fds_end_frame( struct Nes_Fds_Apu* this, blip_time_t end_time )
 {
 	if ( end_time > this->last_time )
@@ -77,7 +77,7 @@ static inline void Fds_end_frame( struct Nes_Fds_Apu* this, blip_time_t end_time
 	assert( this->last_time >= 0 );
 }
 
-void Fds_write_( struct Nes_Fds_Apu* this, unsigned addr, int data ) ICODE_ATTR;
+void Fds_write_( struct Nes_Fds_Apu* this, unsigned addr, int data );
 static inline void Fds_write( struct Nes_Fds_Apu* this, blip_time_t time, unsigned addr, int data )
 {
 	Fds_run_until( this, time );

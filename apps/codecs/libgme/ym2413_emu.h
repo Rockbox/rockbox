@@ -34,10 +34,10 @@ void Ym2413_reset( struct Ym2413_Emu* this );
 void Ym2413_mute_voices( struct Ym2413_Emu* this, int mask );
 	
 // Writes data to addr
-void Ym2413_write( struct Ym2413_Emu* this, int addr, int data ) ICODE_ATTR;
+void Ym2413_write( struct Ym2413_Emu* this, int addr, int data );
 	
 // Runs and writes pair_count*2 samples to output
-void Ym2413_run( struct Ym2413_Emu* this, int pair_count, short* out ) ICODE_ATTR;
+void Ym2413_run( struct Ym2413_Emu* this, int pair_count, short* out );
 
 static inline void Ym2413_enable( struct Ym2413_Emu* this, bool b ) { this->last_time = b ? 0 : disabled_time; }
 static inline bool Ym2413_enabled( struct Ym2413_Emu* this ) { return this->last_time != disabled_time; }

@@ -359,7 +359,7 @@ void Sound_set_tempo( struct Ay_Emu *this, int t )
 	this->play_period = (blip_time_t) ((p * FP_ONE_TEMPO) / t);
 }
 
-void fill_buf( struct Ay_Emu *this ) ICODE_ATTR;;
+void fill_buf( struct Ay_Emu *this );;
 blargg_err_t Ay_start_track( struct Ay_Emu *this, int track )
 {
 	clear_track_vars( this );
@@ -543,7 +543,7 @@ blargg_err_t Track_seek( struct Ay_Emu *this, long msec )
 	return Track_skip( this, time - this->out_time );
 }
 
-blargg_err_t play_( struct Ay_Emu *this, long count, sample_t* out ) ICODE_ATTR;
+blargg_err_t play_( struct Ay_Emu *this, long count, sample_t* out );
 static blargg_err_t skip_( struct Ay_Emu *this, long count )
 {
 	// for long skip, mute sound

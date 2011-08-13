@@ -49,16 +49,16 @@ struct Gb_Apu {
 void Apu_init( struct Gb_Apu* this );
 	
 // Emulates to time t, then writes data to addr
-void Apu_write_register( struct Gb_Apu* this, blip_time_t t, int addr, int data ) ICODE_ATTR;
+void Apu_write_register( struct Gb_Apu* this, blip_time_t t, int addr, int data );
 	
 // Emulates to time t, then subtracts t from the current time.
 // OK if previous write call had time slightly after t.
-void Apu_end_frame( struct Gb_Apu* this,blip_time_t t ) ICODE_ATTR;
+void Apu_end_frame( struct Gb_Apu* this,blip_time_t t );
 	
 // More features
 	
 // Emulates to time t, then reads from addr
-int Apu_read_register( struct Gb_Apu* this, blip_time_t t, int addr ) ICODE_ATTR;
+int Apu_read_register( struct Gb_Apu* this, blip_time_t t, int addr );
 
 // Resets hardware to state after power, BEFORE boot ROM runs. Mode selects
 // sound hardware. If agb_wave is true, enables AGB's extra wave features.
@@ -80,6 +80,6 @@ void Apu_reduce_clicks( struct Gb_Apu* this, bool reduce );
 void Apu_set_tempo( struct Gb_Apu* this, int t );
 
 
-void write_osc( struct Gb_Apu* this, int reg, int old_data, int data ) ICODE_ATTR;
+void write_osc( struct Gb_Apu* this, int reg, int old_data, int data );
 
 #endif

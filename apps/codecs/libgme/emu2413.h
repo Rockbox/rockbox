@@ -132,14 +132,14 @@ EMU2413_API void OPLL_set_internal_mute(OPLL *, e_uint32 mute);
 EMU2413_API e_uint32 OPLL_is_internal_muted(OPLL *);
 
 /* Port/Register access */
-EMU2413_API void OPLL_writeIO(OPLL *, e_uint32 reg, e_uint32 val); ICODE_ATTR
-EMU2413_API void OPLL_writeReg(OPLL *, e_uint32 reg, e_uint32 val); ICODE_ATTR
+EMU2413_API void OPLL_writeIO(OPLL *, e_uint32 reg, e_uint32 val);
+EMU2413_API void OPLL_writeReg(OPLL *, e_uint32 reg, e_uint32 val);
 EMU2413_API e_uint32 OPLL_read(OPLL *, e_uint32 port);
 
 /* Synthsize */
-EMU2413_API e_int16 OPLL_calc(OPLL *) ; ICODE_ATTR
-EMU2413_API void OPLL_calc_stereo(OPLL *, e_int32 out[2]) ; ICODE_ATTR
-EMU2413_API e_int16 *OPLL_update_buffer(OPLL *, e_uint32 length) ; ICODE_ATTR
+EMU2413_API e_int16 OPLL_calc(OPLL *) ;
+EMU2413_API void OPLL_calc_stereo(OPLL *, e_int32 out[2]) ;
+EMU2413_API e_int16 *OPLL_update_buffer(OPLL *, e_uint32 length) ;
 
 /* Misc */
 EMU2413_API void OPLL_setPatch(OPLL *, const e_uint8 *dump) ;

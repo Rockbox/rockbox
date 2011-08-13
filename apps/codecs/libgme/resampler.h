@@ -47,7 +47,7 @@ static inline void Resampler_init( struct Resampler* this )
 blargg_err_t Resampler_reset( struct Resampler* this, int max_pairs );
 void Resampler_resize( struct Resampler* this, int pairs_per_frame );
 	
-void Resampler_play( struct Resampler* this, long count, dsample_t* out, struct Stereo_Buffer* ) ICODE_ATTR;
+void Resampler_play( struct Resampler* this, long count, dsample_t* out, struct Stereo_Buffer* );
 
 static inline void Resampler_set_callback(struct Resampler* this, int (*func)( void*, blip_time_t, int, dsample_t* ), void* user_data )
 {

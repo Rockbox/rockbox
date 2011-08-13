@@ -55,7 +55,7 @@ static short stepsize[49] = {
  876, 963,1060,1166,1282,1411,1552
 };
 
-static int Adpcm_decode( struct Hes_Apu_Adpcm* this,int code ) ICODE_ATTR;
+static int Adpcm_decode( struct Hes_Apu_Adpcm* this,int code );
 static int Adpcm_decode( struct Hes_Apu_Adpcm* this,int code )
 {
 	struct State* state = &this->state;
@@ -87,7 +87,7 @@ static int Adpcm_decode( struct Hes_Apu_Adpcm* this,int code )
 			state->ad_sample = 2047;
 	}
 
-	static int const steps [8] ICONST_ATTR = {
+	static int const steps [8] = {
 		-1, -1, -1, -1, 2, 4, 6, 8
 	};
 	state->ad_ref_index += steps [c];
@@ -99,7 +99,7 @@ static int Adpcm_decode( struct Hes_Apu_Adpcm* this,int code )
 	return state->ad_sample;
 }
 
-static void Adpcm_run_until( struct Hes_Apu_Adpcm* this, blip_time_t end_time ) ICODE_ATTR;
+static void Adpcm_run_until( struct Hes_Apu_Adpcm* this, blip_time_t end_time );
 static void Adpcm_run_until( struct Hes_Apu_Adpcm* this, blip_time_t end_time )
 {
 	struct State* state = &this->state;

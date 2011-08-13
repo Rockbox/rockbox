@@ -63,7 +63,7 @@ static inline void Fme7_output( struct Nes_Fme7_Apu* this, struct Blip_Buffer* b
 static inline void Fme7_write_latch( struct Nes_Fme7_Apu* this, int data ) { this->latch = data; }
 
 // (addr & addr_mask) == data_addr
-void Fme7_run_until( struct Nes_Fme7_Apu* this, blip_time_t end_time ) ICODE_ATTR;
+void Fme7_run_until( struct Nes_Fme7_Apu* this, blip_time_t end_time );
 static inline void Fme7_write_data( struct Nes_Fme7_Apu* this, blip_time_t time, int data )
 {
 	if ( (unsigned) this->latch >= fme7_reg_count )

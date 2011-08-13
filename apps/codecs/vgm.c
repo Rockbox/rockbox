@@ -16,7 +16,7 @@ CODEC_HEADER
 #define MAINMEMBUF 0
 
 static int16_t samples[CHUNK_SIZE] IBSS_ATTR;
-static struct Vgm_Emu vgm_emu IDATA_ATTR CACHEALIGN_ATTR;
+static struct Vgm_Emu vgm_emu;
 
 static void *inflatebuf;              /* heap for gunzip */
 static char *songbuf;               /* destination for uncompressed song */

@@ -407,7 +407,7 @@ static blargg_err_t play_( struct Vgm_Emu* this, long count, sample_t* out )
 
 static inline int command_len( int command )
 {
-	static byte const lens [0x10] ICONST_ATTR = {
+	static byte const lens [0x10] = {
 	// 0 1 2 3 4 5 6 7 8 9 A B C D E F
 	   1,1,1,2,2,3,1,1,1,1,3,3,4,4,5,5
 	};

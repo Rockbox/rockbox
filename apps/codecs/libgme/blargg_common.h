@@ -25,20 +25,6 @@
 #define FP_ONE_GAIN   (1LL << 24)
 #define FP_ONE_VOLUME FP_ONE_GAIN
 
-#if 1 /* IRAM configuration is not yet active for all libGME codecs. */
-    #undef  ICODE_ATTR
-    #define ICODE_ATTR
-
-    #undef  IDATA_ATTR
-    #define IDATA_ATTR
-
-    #undef  ICONST_ATTR
-    #define ICONST_ATTR
-
-    #undef  IBSS_ATTR
-    #define IBSS_ATTR
-#endif
-
 // BLARGG_RESTRICT: equivalent to C99's restrict, where supported
 #if __GNUC__ >= 3 || _MSC_VER >= 1100
 	#define BLARGG_RESTRICT __restrict

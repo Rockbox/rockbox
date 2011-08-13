@@ -185,7 +185,7 @@ loop:
 	#endif
 	
 	// TODO: each reference lists slightly different timing values, ugh
-	static uint8_t const clock_table [256] ICONST_ATTR =
+	static uint8_t const clock_table [256] =
 	{// 0 1 2  3 4 5 6 7 8 9 A B C D E F
 		1,7,3, 4,6,4,6,7,3,2,2,2,7,5,7,6,// 0
 		4,7,7, 4,6,4,6,7,2,5,2,2,7,5,7,6,// 1

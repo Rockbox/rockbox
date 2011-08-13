@@ -29,7 +29,7 @@ int const silence_threshold = 0x10;
 long const fade_block_size = 512;
 int const fade_shift = 8; // fade ends with gain at 1.0 / (1 << fade_shift)
 
-const char gme_wrong_file_type [] ICONST_ATTR = "Wrong file type for this emulator";
+const char gme_wrong_file_type [] = "Wrong file type for this emulator";
 
 static void clear_track_vars( struct Hes_Emu* this )
 {
@@ -151,7 +151,7 @@ blargg_err_t Hes_load( struct Hes_Emu* this, void* data, long size )
 
 // Emulation
 
-void recalc_timer_load( struct Hes_Emu* this ) ICODE_ATTR;
+void recalc_timer_load( struct Hes_Emu* this );
 void recalc_timer_load( struct Hes_Emu* this )
 {
 	this->timer.load = this->timer.raw_load * this->timer_base + 1;
@@ -159,8 +159,8 @@ void recalc_timer_load( struct Hes_Emu* this )
 
 // Hardware
 
-void irq_changed( struct Hes_Emu* this ) ICODE_ATTR;
-void run_until( struct Hes_Emu* this, hes_time_t present ) ICODE_ATTR;
+void irq_changed( struct Hes_Emu* this );
+void run_until( struct Hes_Emu* this, hes_time_t present );
 void Cpu_write_vdp( struct Hes_Emu* this, int addr, int data )
 {
 	switch ( addr )
@@ -419,7 +419,7 @@ void irq_changed( struct Hes_Emu* this )
 					this->cpu.end_time, (this->cpu.irq_time = time) );
 }
 
-static void adjust_time( blargg_long* time, hes_time_t delta ) ICODE_ATTR;
+static void adjust_time( blargg_long* time, hes_time_t delta );
 static void adjust_time( blargg_long* time, hes_time_t delta )
 {
 	if ( *time < (blargg_long)future_hes_time )
@@ -430,7 +430,7 @@ static void adjust_time( blargg_long* time, hes_time_t delta )
 	}
 }
 
-blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ ) ICODE_ATTR;
+blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ );
 blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ )
 {
 	blip_time_t duration = *duration_; // cache
@@ -463,7 +463,7 @@ blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ )
 	return 0;
 }
 
-blargg_err_t play_( struct Hes_Emu* this, long count, sample_t* out ) ICODE_ATTR;
+blargg_err_t play_( struct Hes_Emu* this, long count, sample_t* out );
 blargg_err_t play_( struct Hes_Emu* this, long count, sample_t* out )
 {
 	long remain = count;
@@ -557,7 +557,7 @@ void Sound_set_tempo( struct Hes_Emu* this, int t )
 	this->tempo_ = t;
 }
 
-void fill_buf( struct Hes_Emu* this ) ICODE_ATTR;
+void fill_buf( struct Hes_Emu* this );
 blargg_err_t Hes_start_track( struct Hes_Emu* this, int track )
 {
 	clear_track_vars( this );
@@ -654,7 +654,7 @@ blargg_err_t Track_seek( struct Hes_Emu* this, long msec )
 	return Track_skip( this, time - this->out_time );
 }
 
-blargg_err_t skip_( struct Hes_Emu* this, long count ) ICODE_ATTR;
+blargg_err_t skip_( struct Hes_Emu* this, long count );
 blargg_err_t skip_( struct Hes_Emu* this, long count )
 {
 	// for long skip, mute sound
@@ -726,7 +726,7 @@ void Track_set_fade( struct Hes_Emu* this, long start_msec, long length_msec )
 }
 
 // unit / pow( 2.0, (double) x / step )
-static int int_log( blargg_long x, int step, int unit ) ICODE_ATTR;
+static int int_log( blargg_long x, int step, int unit );
 static int int_log( blargg_long x, int step, int unit )
 {
 	int shift = x / step;
@@ -734,7 +734,7 @@ static int int_log( blargg_long x, int step, int unit )
 	return ((unit - fraction) + (fraction >> 1)) >> shift;
 }
 
-void handle_fade( struct Hes_Emu* this, long out_count, sample_t* out ) ICODE_ATTR;
+void handle_fade( struct Hes_Emu* this, long out_count, sample_t* out );
 void handle_fade( struct Hes_Emu* this, long out_count, sample_t* out )
 {
 	int i;
@@ -759,7 +759,7 @@ void handle_fade( struct Hes_Emu* this, long out_count, sample_t* out )
 
 // Silence detection
 
-void emu_play( struct Hes_Emu* this, long count, sample_t* out ) ICODE_ATTR;
+void emu_play( struct Hes_Emu* this, long count, sample_t* out );
 void emu_play( struct Hes_Emu* this, long count, sample_t* out )
 {
 	check( current_track_ >= 0 );
@@ -775,7 +775,7 @@ void emu_play( struct Hes_Emu* this, long count, sample_t* out )
 }
 
 // number of consecutive silent samples at end
-static long count_silence( sample_t* begin, long size ) ICODE_ATTR;
+static long count_silence( sample_t* begin, long size );
 static long count_silence( sample_t* begin, long size )
 {
 	sample_t first = *begin;

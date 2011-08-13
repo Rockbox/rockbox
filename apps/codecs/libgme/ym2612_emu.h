@@ -208,13 +208,13 @@ void Ym2612_reset( struct Ym2612_Emu* this_ );
 void Ym2612_mute_voices( struct Ym2612_Emu* this_, int mask );
 	
 // Writes addr to register 0 then data to register 1
-void Ym2612_write0( struct Ym2612_Emu* this_, int addr, int data ) ICODE_ATTR;
+void Ym2612_write0( struct Ym2612_Emu* this_, int addr, int data );
 	
 // Writes addr to register 2 then data to register 3
-void Ym2612_write1( struct Ym2612_Emu* this_, int addr, int data ) ICODE_ATTR;
+void Ym2612_write1( struct Ym2612_Emu* this_, int addr, int data );
 	
 // Runs and adds pair_count*2 samples into current output buffer contents
-void Ym2612_run( struct Ym2612_Emu* this_, int pair_count, short* out ) ICODE_ATTR;
+void Ym2612_run( struct Ym2612_Emu* this_, int pair_count, short* out );
 
 static inline void Ym2612_enable( struct Ym2612_Emu* this_, bool b ) { this_->last_time = b ? 0 : ym2612_disabled_time; }
 static inline bool Ym2612_enabled( struct Ym2612_Emu* this_ ) { return this_->last_time != ym2612_disabled_time; }

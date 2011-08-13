@@ -18,10 +18,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 enum { center_waves = 1 }; // reduces asymmetry and clamping when starting notes
 
-static void Apu_balance_changed( struct Hes_Apu* this, struct Hes_Osc* osc ) ICODE_ATTR;
+static void Apu_balance_changed( struct Hes_Apu* this, struct Hes_Osc* osc );
 static void Apu_balance_changed( struct Hes_Apu* this, struct Hes_Osc* osc )
 {
-	static short const log_table [32] ICONST_ATTR = { // ~1.5 db per step
+	static short const log_table [32] = { // ~1.5 db per step
 		#define ENTRY( factor ) (short) (factor * amp_range / 31.0 + 0.5)
 		ENTRY( 0.000000 ),ENTRY( 0.005524 ),ENTRY( 0.006570 ),ENTRY( 0.007813 ),
 		ENTRY( 0.009291 ),ENTRY( 0.011049 ),ENTRY( 0.013139 ),ENTRY( 0.015625 ),

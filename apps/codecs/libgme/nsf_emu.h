@@ -209,13 +209,13 @@ static inline void Sound_set_gain( struct Nsf_Emu* this, int g )
 
 blargg_err_t run_clocks( struct Nsf_Emu* this, blip_time_t* duration, int );
 
-void map_memory( struct Nsf_Emu* this ) ICODE_ATTR;
-void write_bank( struct Nsf_Emu* this, int index, int data ) ICODE_ATTR;
-int cpu_read( struct Nsf_Emu* this, addr_t ) ICODE_ATTR;
-void cpu_write( struct Nsf_Emu* this, addr_t, int ) ICODE_ATTR;
-void push_byte( struct Nsf_Emu* this, int ) ICODE_ATTR;
-addr_t get_addr( byte const [] ) ICODE_ATTR;
-bool run_cpu_until( struct Nsf_Emu* this, nes_time_t end ) ICODE_ATTR;
+void map_memory( struct Nsf_Emu* this );
+void write_bank( struct Nsf_Emu* this, int index, int data );
+int cpu_read( struct Nsf_Emu* this, addr_t );
+void cpu_write( struct Nsf_Emu* this, addr_t, int );
+void push_byte( struct Nsf_Emu* this, int );
+addr_t get_addr( byte const [] );
+bool run_cpu_until( struct Nsf_Emu* this, nes_time_t end );
 
 // Sets clocks between calls to play routine to p + 1/2 clock
 static inline void set_play_period( struct Nsf_Emu* this, int p ) { this->play_period = p; }
@@ -224,26 +224,26 @@ static inline void set_play_period( struct Nsf_Emu* this, int p ) { this->play_p
 static inline nes_time_t play_time( struct Nsf_Emu* this ) { return this->next_play; }
 	
 // Emulates to at least time t. Might emulate a few clocks extra.
-void run_until( struct Nsf_Emu* this, nes_time_t t ) ICODE_ATTR;
+void run_until( struct Nsf_Emu* this, nes_time_t t );
 	
 // Runs cpu to at least time t and returns false, or returns true
 // if it encounters illegal instruction (halt).
-bool run_cpu_until( struct Nsf_Emu* this, nes_time_t t ) ICODE_ATTR;
+bool run_cpu_until( struct Nsf_Emu* this, nes_time_t t );
 	
 // cpu calls through to these to access memory (except instructions)
-int  read_mem(  struct Nsf_Emu* this, addr_t ) ICODE_ATTR;
-void write_mem( struct Nsf_Emu* this, addr_t, int ) ICODE_ATTR;
+int  read_mem(  struct Nsf_Emu* this, addr_t );
+void write_mem( struct Nsf_Emu* this, addr_t, int );
 	
 // Address of play routine
 static inline addr_t play_addr( struct Nsf_Emu* this ) { return get_addr( this->header.play_addr ); }
 	
 // Same as run_until, except emulation stops for any event (routine returned,
 // play routine called, illegal instruction).
-void run_once( struct Nsf_Emu* this, nes_time_t ) ICODE_ATTR;
+void run_once( struct Nsf_Emu* this, nes_time_t );
 	
 // Reads byte as cpu would when executing code. Only works for RAM/ROM,
 // NOT I/O like sound chips.
-int  read_code( struct Nsf_Emu* this, addr_t addr ) ICODE_ATTR;
+int  read_code( struct Nsf_Emu* this, addr_t addr );
 
 static inline byte* fdsram( struct Nsf_Emu* this )          { return &this->high_ram [fdsram_offset]; }
 static inline byte* sram( struct Nsf_Emu* this )            { return this->high_ram; }

@@ -139,7 +139,7 @@ static void run_until( struct Sms_Apu* this, blip_time_t end_time )
 		if ( out )
 		{
 			// volumes [i] ~= 64 * pow( 1.26, 15 - i ) / pow( 1.26, 15 )
-			static unsigned char const volumes [16] ICONST_ATTR = {
+			static unsigned char const volumes [16] = {
 				64, 50, 40, 32, 25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 2, 0
 			};
 			

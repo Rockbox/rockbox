@@ -191,9 +191,9 @@ static inline bool sega_mapping( struct Sgc_Emu* this )
 
 // Emulation (You shouldn't touch these)
 
-bool run_cpu( struct Sgc_Emu* this, cpu_time_t end_time ) ICODE_ATTR;
-void cpu_out( struct Sgc_Emu* this, cpu_time_t time, addr_t addr, int data ) ICODE_ATTR;
-void cpu_write( struct Sgc_Emu* this, addr_t addr, int data ) ICODE_ATTR;
-void jsr( struct Sgc_Emu* this, byte addr [2] ) ICODE_ATTR;
+bool run_cpu( struct Sgc_Emu* this, cpu_time_t end_time );
+void cpu_out( struct Sgc_Emu* this, cpu_time_t time, addr_t addr, int data );
+void cpu_write( struct Sgc_Emu* this, addr_t addr, int data );
+void jsr( struct Sgc_Emu* this, byte addr [2] );
 
 #endif

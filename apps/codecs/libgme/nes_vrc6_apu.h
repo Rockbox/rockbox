@@ -39,12 +39,12 @@ struct Nes_Vrc6_Apu {
 void Vrc6_init( struct Nes_Vrc6_Apu* this );
 void Vrc6_reset( struct Nes_Vrc6_Apu* this );
 void Vrc6_output( struct Nes_Vrc6_Apu* this, struct Blip_Buffer* );
-void Vrc6_end_frame( struct Nes_Vrc6_Apu* this, blip_time_t ) ICODE_ATTR;
+void Vrc6_end_frame( struct Nes_Vrc6_Apu* this, blip_time_t );
 	
 // Oscillator 0 write-only registers are at $9000-$9002
 // Oscillator 1 write-only registers are at $A000-$A002
 // Oscillator 2 write-only registers are at $B000-$B002
-void Vrc6_write_osc( struct Nes_Vrc6_Apu* this, blip_time_t, int osc, int reg, int data ) ICODE_ATTR;
+void Vrc6_write_osc( struct Nes_Vrc6_Apu* this, blip_time_t, int osc, int reg, int data );
 
 static inline void Vrc6_osc_output( struct Nes_Vrc6_Apu* this, int i, struct Blip_Buffer* buf )
 {

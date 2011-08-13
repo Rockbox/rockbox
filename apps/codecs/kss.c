@@ -10,7 +10,7 @@ CODEC_HEADER
 #define CHUNK_SIZE (1024*2)
 
 static int16_t samples[CHUNK_SIZE] IBSS_ATTR;
-static struct Kss_Emu kss_emu IDATA_ATTR CACHEALIGN_ATTR;
+static struct Kss_Emu kss_emu;
 
 /****************** rockbox interface ******************/
 

@@ -28,7 +28,7 @@ void Fm_apu_reset( struct Sms_Fm_Apu* this )
 	Ym2413_reset( &this->apu );
 }
 
-void fm_run_until( struct Sms_Fm_Apu* this, blip_time_t end_time ) ICODE_ATTR;
+void fm_run_until( struct Sms_Fm_Apu* this, blip_time_t end_time );
 void Fm_apu_write_data( struct Sms_Fm_Apu* this, blip_time_t time, int data )
 {
 	if ( time > this->next_time )

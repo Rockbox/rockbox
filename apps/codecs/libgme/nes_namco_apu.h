@@ -37,7 +37,7 @@ void Namco_init( struct Nes_Namco_Apu* this );
 void Namco_output( struct Nes_Namco_Apu* this, struct Blip_Buffer* );
 	
 void Namco_reset( struct Nes_Namco_Apu* this );
-void Namco_end_frame( struct Nes_Namco_Apu* this, blip_time_t ) ICODE_ATTR;
+void Namco_end_frame( struct Nes_Namco_Apu* this, blip_time_t );
 	
 static inline uint8_t* namco_access( struct Nes_Namco_Apu* this )
 {
@@ -61,7 +61,7 @@ static inline void Namco_osc_output( struct Nes_Namco_Apu* this, int i, struct B
 }
 
 // Read/write data register is at 0x4800
-void Namco_run_until( struct Nes_Namco_Apu* this, blip_time_t ) ICODE_ATTR;
+void Namco_run_until( struct Nes_Namco_Apu* this, blip_time_t );
 static inline void Namco_write_data( struct Nes_Namco_Apu* this, blip_time_t time, int data )
 {
 	Namco_run_until( this, time );

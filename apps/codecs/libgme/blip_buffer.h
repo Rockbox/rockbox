@@ -65,12 +65,12 @@ struct Blip_Buffer {
 };
 
 // not documented yet
-void Blip_set_modified( struct Blip_Buffer* this ) ICODE_ATTR;
-int Blip_clear_modified( struct Blip_Buffer* this ) ICODE_ATTR;
-void Blip_remove_silence( struct Blip_Buffer* this, long count ) ICODE_ATTR;
-blip_resampled_time_t Blip_resampled_duration( struct Blip_Buffer* this, int t ) ICODE_ATTR;
-blip_resampled_time_t Blip_resampled_time( struct Blip_Buffer* this, blip_time_t t ) ICODE_ATTR;
-blip_resampled_time_t Blip_clock_rate_factor( struct Blip_Buffer* this, long clock_rate ) ICODE_ATTR;
+void Blip_set_modified( struct Blip_Buffer* this );
+int Blip_clear_modified( struct Blip_Buffer* this );
+void Blip_remove_silence( struct Blip_Buffer* this, long count );
+blip_resampled_time_t Blip_resampled_duration( struct Blip_Buffer* this, int t );
+blip_resampled_time_t Blip_resampled_time( struct Blip_Buffer* this, blip_time_t t );
+blip_resampled_time_t Blip_clock_rate_factor( struct Blip_Buffer* this, long clock_rate );
 
 // Initializes Blip_Buffer structure
 void Blip_init( struct Blip_Buffer* this );
@@ -92,13 +92,13 @@ static inline void Blip_set_clock_rate( struct Blip_Buffer* this, long cps )
 // End current time frame of specified duration and make its samples available
 // (along with any still-unread samples) for reading with read_samples(). Begins
 // a new time frame at the end of the current frame.
-void Blip_end_frame( struct Blip_Buffer* this, blip_time_t time ) ICODE_ATTR;
+void Blip_end_frame( struct Blip_Buffer* this, blip_time_t time );
 
 // Read at most 'max_samples' out of buffer into 'dest', removing them from from
 // the buffer. Returns number of samples actually read and removed. If stereo is
 // true, increments 'dest' one extra time after writing each sample, to allow
 // easy interleving of two channels into a stereo output buffer.
-long Blip_read_samples( struct Blip_Buffer* this, blip_sample_t* dest, long max_samples, int stereo ) ICODE_ATTR;
+long Blip_read_samples( struct Blip_Buffer* this, blip_sample_t* dest, long max_samples, int stereo );
 
 // Additional optional features
 
@@ -141,20 +141,20 @@ static inline long Blip_samples_avail( struct Blip_Buffer* this )
 }
 
 // Remove 'count' samples from those waiting to be read
-void Blip_remove_samples( struct Blip_Buffer* this, long count ) ICODE_ATTR;
+void Blip_remove_samples( struct Blip_Buffer* this, long count );
 
 // Experimental features
 
 // Count number of clocks needed until 'count' samples will be available.
 // If buffer can't even hold 'count' samples, returns number of clocks until
 // buffer becomes full.
-blip_time_t Blip_count_clocks( struct Blip_Buffer* this, long count ) ICODE_ATTR;
+blip_time_t Blip_count_clocks( struct Blip_Buffer* this, long count );
 
 // Number of raw samples that can be mixed within frame of specified duration.
-long Blip_count_samples( struct Blip_Buffer* this, blip_time_t duration ) ICODE_ATTR;
+long Blip_count_samples( struct Blip_Buffer* this, blip_time_t duration );
 
 // Mix 'count' samples from 'buf' into buffer.
-void Blip_mix_samples( struct Blip_Buffer* this, blip_sample_t const* buf, long count ) ICODE_ATTR;
+void Blip_mix_samples( struct Blip_Buffer* this, blip_sample_t const* buf, long count );
 
 // Range specifies the greatest expected change in amplitude. Calculate it
 // by finding the difference between the maximum and minimum expected
@@ -170,10 +170,10 @@ struct Blip_Synth {
 void Synth_init( struct Blip_Synth* this );
 
 // Set overall volume of waveform
-void Synth_volume( struct Blip_Synth* this, int v ) ICODE_ATTR;
+void Synth_volume( struct Blip_Synth* this, int v );
 
 // Get/set Blip_Buffer used for output
-const struct Blip_Buffer* Synth_output( struct Blip_Synth* this ) ICODE_ATTR;
+const struct Blip_Buffer* Synth_output( struct Blip_Synth* this );
 
 // Low-level interface
 

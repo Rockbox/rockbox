@@ -54,7 +54,7 @@ void Cpu_reset( struct Gb_Cpu* this, void* unmapped );
 	
 // Maps code memory (memory accessed via the program counter). Start and size
 // must be multiple of page_size.
-void Cpu_map_code( struct Gb_Cpu* this, addr_t start, int size, void* code ) ICODE_ATTR;
+void Cpu_map_code( struct Gb_Cpu* this, addr_t start, int size, void* code );
 			
 // Current time.
 static inline int Cpu_time( struct Gb_Cpu* this ) { return this->cpu_state->time; }

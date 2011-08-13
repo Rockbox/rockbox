@@ -51,12 +51,12 @@ static inline void Opl_osc_output( struct Opl_Apu* this, int i, struct Blip_Buff
 }
 
 static inline void Opl_set_output( struct Opl_Apu* this, struct Blip_Buffer* buf ) { Opl_osc_output( this, 0, buf ); }
-void Opl_end_frame( struct Opl_Apu* this, blip_time_t ) ICODE_ATTR;
+void Opl_end_frame( struct Opl_Apu* this, blip_time_t );
 
 static inline void Opl_write_addr( struct Opl_Apu* this, int data ) { this->addr = data; }
-void Opl_write_data( struct Opl_Apu* this, blip_time_t, int data ) ICODE_ATTR;
+void Opl_write_data( struct Opl_Apu* this, blip_time_t, int data );
 
-int Opl_read( struct Opl_Apu* this, blip_time_t, int port ) ICODE_ATTR;
+int Opl_read( struct Opl_Apu* this, blip_time_t, int port );
 
 static inline bool Opl_supported( void ) { return true; }
 

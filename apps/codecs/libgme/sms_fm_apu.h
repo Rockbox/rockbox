@@ -36,8 +36,8 @@ static inline void Fm_apu_volume( struct Sms_Fm_Apu* this, int v ) { Synth_volum
 void Fm_apu_reset( struct Sms_Fm_Apu* this );
 	
 static inline void Fm_apu_write_addr( struct Sms_Fm_Apu* this, int data )                 { this->addr = data; }
-void Fm_apu_write_data( struct Sms_Fm_Apu* this, blip_time_t, int data ) ICODE_ATTR;
+void Fm_apu_write_data( struct Sms_Fm_Apu* this, blip_time_t, int data );
 	
-void Fm_apu_end_frame( struct Sms_Fm_Apu* this, blip_time_t t ) ICODE_ATTR;
+void Fm_apu_end_frame( struct Sms_Fm_Apu* this, blip_time_t t );
 
 #endif

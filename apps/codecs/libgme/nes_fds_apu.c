@@ -42,7 +42,7 @@ void Fds_reset( struct Nes_Fds_Apu* this )
 	this->mod_pos       = 0;
 	this->mod_write_pos = 0;
 	
-	static byte const initial_regs [0x0B] ICONST_ATTR = {
+	static byte const initial_regs [0x0B] = {
 		0x80,       // disable envelope
 		0, 0, 0xC0, // disable wave and lfo
 		0x80,       // disable sweep

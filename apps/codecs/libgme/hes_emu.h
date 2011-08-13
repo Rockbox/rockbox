@@ -136,7 +136,7 @@ blargg_err_t Hes_start_track( struct Hes_Emu* this, int );
 
 // Generate 'count' samples info 'buf'. Output is in stereo. Any emulation
 // errors set warning string, and major errors also end track.
-blargg_err_t Hes_play( struct Hes_Emu* this, long count, sample_t* buf ) ICODE_ATTR;
+blargg_err_t Hes_play( struct Hes_Emu* this, long count, sample_t* buf );
 
 // Track status/control
 // Number of milliseconds (1000 msec = 1 second) played since ning of track
@@ -188,13 +188,13 @@ static inline void Sound_set_gain( struct Hes_Emu* this, int g )
 
 // Emulation (You shouldn't touch these)
 
-int Cpu_read( struct Hes_Emu* this, hes_addr_t ) ICODE_ATTR;
-void Cpu_write( struct Hes_Emu* this, hes_addr_t, int ) ICODE_ATTR;
-void Cpu_write_vdp( struct Hes_Emu* this, int addr, int data ) ICODE_ATTR;
-int Cpu_done( struct Hes_Emu* this ) ICODE_ATTR;
+int Cpu_read( struct Hes_Emu* this, hes_addr_t );
+void Cpu_write( struct Hes_Emu* this, hes_addr_t, int );
+void Cpu_write_vdp( struct Hes_Emu* this, int addr, int data );
+int Cpu_done( struct Hes_Emu* this );
 
-int Emu_cpu_read( struct Hes_Emu* this, hes_addr_t ) ICODE_ATTR;
-void Emu_cpu_write( struct Hes_Emu* this, hes_addr_t, int data ) ICODE_ATTR;
+int Emu_cpu_read( struct Hes_Emu* this, hes_addr_t );
+void Emu_cpu_write( struct Hes_Emu* this, hes_addr_t, int data );
 
 static inline byte const* Emu_cpu_set_mmr( struct Hes_Emu* this, int page, int bank )
 {

@@ -4,7 +4,7 @@
 /* Precalculated emu8950 tables for use in Rockbox, 
    Calculated for 44Khz sampling rate */
 
-static const short ar_adjust_coeff[] ICONST_ATTR = {
+static const short ar_adjust_coeff[] = {
  	 255,  227,  210,  198,  189,  181,  175,  170,  165,  161,  157, 
 	 153,  150,  147,  144,  141,  139,  136,  134,  132,  130,  128, 
 	 126,  125,  123,  121,  120,  118,  117,  115,  114,  113,  112, 
@@ -54,7 +54,7 @@ static const short ar_adjust_coeff[] ICONST_ATTR = {
 	   0,    0,    0,    0,    0
 };
    
-static const short db2lin_coeff[] ICONST_ATTR = {
+static const short db2lin_coeff[] = {
 	2047, 2003, 1960, 1918, 1877, 1837, 1798, 1759, 1722, 1685, 1649, 
 	1614, 1579, 1546, 1513, 1480, 1449, 1418, 1387, 1358, 1329, 1300, 
 	1273, 1245, 1219, 1193, 1167, 1142, 1118, 1094, 1071, 1048, 1025, 
@@ -104,7 +104,7 @@ static const short db2lin_coeff[] ICONST_ATTR = {
   	   0,    0,    0,    0,    0,    0
 };
 
-static const short sin_coeff[] ICONST_ATTR = {
+static const short sin_coeff[] = {
 	 511,  235,  203,  185,  171,  161,  152,  145,  139,  134,  129, 
  	 124,  120,  117,  113,  110,  107,  104,  102,   99,   97,   95, 
 	  92,   90,   88,   87,   85,   83,   81,   80,   78,   77,   75, 
@@ -131,7 +131,7 @@ static const short sin_coeff[] ICONST_ATTR = {
 	   0,    0,    0, 
 };
 
-static const short pm0_coeff[] ICONST_ATTR = {
+static const short pm0_coeff[] = {
 	 256,  256,  256,  256,  256,  256,  256,  256,  256,  256,  256, 
  	 256,  256,  256,  256,  256,  256,  256,  256,  256,  256,  256, 
 	 256,  256,  256,  256,  256,  256,  256,  256,  256,  256,  256, 
@@ -158,7 +158,7 @@ static const short pm0_coeff[] ICONST_ATTR = {
 	 255,  255,  255, 
 };
 
-static const short pm1_coeff[] ICONST_ATTR = {
+static const short pm1_coeff[] = {
 	 256,  256,  256,  256,  256,  256,  256,  256,  256,  256,  256, 
  	 256,  256,  256,  256,  256,  256,  256,  256,  256,  256,  257, 
 	 257,  257,  257,  257,  257,  257,  257,  257,  257,  257,  257, 
@@ -185,7 +185,7 @@ static const short pm1_coeff[] ICONST_ATTR = {
 	 255,  255,  255, 
 };
 
-static const short am0_coeff[] ICONST_ATTR = {
+static const short am0_coeff[] = {
 	   2,    2,    2,    2,    2,    2,    3,    3,    3,    3,    3, 
 	   3,    3,    3,    3,    3,    3,    3,    3,    3,    3,    3, 
 	   4,    4,    4,    4,    4,    4,    4,    4,    4,    4,    4, 
@@ -212,7 +212,7 @@ static const short am0_coeff[] ICONST_ATTR = {
 	   2,    2,    2, 
 };
 
-static const short am1_coeff[] ICONST_ATTR = {
+static const short am1_coeff[] = {
 	  12,   13,   13,   13,   14,   14,   14,   14,   15,   15,   15, 
 	  16,   16,   16,   17,   17,   17,   17,   18,   18,   18,   19, 
 	  19,   19,   19,   20,   20,   20,   20,   21,   21,   21,   21, 

@@ -31,7 +31,7 @@ struct Hes_Osc
 	unsigned char control;
 };
 
-void Osc_run_until( struct Hes_Osc* this, struct Blip_Synth* synth, blip_time_t ) ICODE_ATTR;
+void Osc_run_until( struct Hes_Osc* this, struct Blip_Synth* synth, blip_time_t );
 
 struct Hes_Apu {
 	struct Hes_Osc oscs [osc_count];
@@ -47,9 +47,9 @@ void Apu_init( struct Hes_Apu* this );
 // Reset HES apu couns chip
 void Apu_reset( struct Hes_Apu* this );
 
-void Apu_osc_output( struct Hes_Apu* this, int index, struct Blip_Buffer* center, struct Blip_Buffer* left, struct Blip_Buffer* right ) ICODE_ATTR;
-void Apu_write_data( struct Hes_Apu* this, blip_time_t, int addr, int data ) ICODE_ATTR;
-void Apu_end_frame( struct Hes_Apu* this, blip_time_t ) ICODE_ATTR;
+void Apu_osc_output( struct Hes_Apu* this, int index, struct Blip_Buffer* center, struct Blip_Buffer* left, struct Blip_Buffer* right );
+void Apu_write_data( struct Hes_Apu* this, blip_time_t, int addr, int data );
+void Apu_end_frame( struct Hes_Apu* this, blip_time_t );
 
 static inline void Apu_volume( struct Hes_Apu* this, int v ) { Synth_volume( &this->synth, (v*9)/5 / osc_count / amp_range ); }
 #endif

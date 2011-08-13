@@ -42,10 +42,10 @@ static inline void Scc_set_output( struct Scc_Apu* this, int index, struct Blip_
 }
 
 // Emulates to time t, then writes data to reg
-void Scc_write( struct Scc_Apu* this, blip_time_t time, int addr, int data ) ICODE_ATTR;
+void Scc_write( struct Scc_Apu* this, blip_time_t time, int addr, int data );
 
 // Emulates to time t, then subtracts t from the current time.
 // OK if previous write call had time slightly after t.
-void Scc_end_frame( struct Scc_Apu* this, blip_time_t end_time ) ICODE_ATTR;
+void Scc_end_frame( struct Scc_Apu* this, blip_time_t end_time );
 
 #endif

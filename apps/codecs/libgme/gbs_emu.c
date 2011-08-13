@@ -17,7 +17,7 @@ License along with this module; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 
-const char gme_wrong_file_type [] ICONST_ATTR = "Wrong file type for this emulator";
+const char gme_wrong_file_type [] = "Wrong file type for this emulator";
 
 int const idle_addr = 0xF00D;
 int const tempo_unit = 16;
@@ -334,7 +334,7 @@ blargg_err_t Gbs_start_track( struct Gbs_Emu* this, int track )
 	Buffer_clear( &this->stereo_buf );
 	
 	// Reset APU to state expected by most rips
-	static byte const sound_data [] ICONST_ATTR = {
+	static byte const sound_data [] = {
 		0x80, 0xBF, 0x00, 0x00, 0xB8, // square 1 DAC disabled
 		0x00, 0x3F, 0x00, 0x00, 0xB8, // square 2 DAC disabled
 		0x7F, 0xFF, 0x9F, 0x00, 0xB8, // wave     DAC disabled

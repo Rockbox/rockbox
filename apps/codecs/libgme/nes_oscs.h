@@ -153,13 +153,13 @@ struct Nes_Dmc
 };
 
 void Dmc_start( struct Nes_Dmc* this );
-void Dmc_write_register( struct Nes_Dmc* this, int, int ) ICODE_ATTR;
-void Dmc_run( struct Nes_Dmc* this, nes_time_t, nes_time_t ) ICODE_ATTR;
-void Dmc_recalc_irq( struct Nes_Dmc* this ) ICODE_ATTR;
-void Dmc_fill_buffer( struct Nes_Dmc* this ) ICODE_ATTR;
-void Dmc_reload_sample( struct Nes_Dmc* this ) ICODE_ATTR;
-void Dmc_reset( struct Nes_Dmc* this ) ICODE_ATTR;
+void Dmc_write_register( struct Nes_Dmc* this, int, int );
+void Dmc_run( struct Nes_Dmc* this, nes_time_t, nes_time_t );
+void Dmc_recalc_irq( struct Nes_Dmc* this );
+void Dmc_fill_buffer( struct Nes_Dmc* this );
+void Dmc_reload_sample( struct Nes_Dmc* this );
+void Dmc_reset( struct Nes_Dmc* this );
 
-int Dmc_count_reads( struct Nes_Dmc* this, nes_time_t, nes_time_t* ) ICODE_ATTR;
+int Dmc_count_reads( struct Nes_Dmc* this, nes_time_t, nes_time_t* );
 
 #endif

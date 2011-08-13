@@ -6,7 +6,7 @@
 
 #include "emutypes.h"
 
-static const e_uint16 sin_coeff[] ICONST_ATTR = {
+static const e_uint16 sin_coeff[] = {
 	255,   203,   171,   152,   139,   129,   120, 
 	113,   107,   102,    97,    92,    88,    85, 
 	 81,    78,    75,    72,    70,    67,    65, 
@@ -28,7 +28,7 @@ static const e_uint16 sin_coeff[] ICONST_ATTR = {
 	  0,     0, 
 };
 
-static const e_int32 pm_coeff[] ICONST_ATTR = {
+static const e_int32 pm_coeff[] = {
 	256,   256,   256,   256,   256,   256,   256, 
 	256,   256,   256,   256,   256,   256,   256, 
 	256,   256,   256,   256,   256,   256,   256, 
@@ -68,7 +68,7 @@ static const e_int32 pm_coeff[] ICONST_ATTR = {
 	255,   255,   255,   255, 
 };
 
-static const e_int16 db2lin_coeff[]  ICONST_ATTR = {
+static const e_int16 db2lin_coeff[]  = {
 	255,   249,   244,   239,   233,   228,   224, 
 	219,   214,   209,   205,   201,   196,   192, 
 	188,   184,   180,   176,   172,   169,   165, 
@@ -145,7 +145,7 @@ static const e_int16 db2lin_coeff[]  ICONST_ATTR = {
 	  0, 
 };
 
-static const e_uint16 ar_adjust_coeff[] ICONST_ATTR = {
+static const e_uint16 ar_adjust_coeff[] = {
 	127,  108,   98,   90,   84,   80,   75, 
 	 72,   69,   66,   64,   61,   59,   57, 
 	 56,   54,   52,   51,   49,   48,   47, 

@@ -395,8 +395,8 @@ void write_osc( struct Gb_Apu* this, int reg, int old_data, int data )
 void Square_run( struct Gb_Square* this, blip_time_t time, blip_time_t end_time )
 {
 	// Calc duty and phase
-	static byte const duty_offsets [4] ICONST_ATTR = { 1, 1, 3, 7 };
-	static byte const duties       [4] ICONST_ATTR = { 1, 2, 4, 6 };
+	static byte const duty_offsets [4] = { 1, 1, 3, 7 };
+	static byte const duties       [4] = { 1, 2, 4, 6 };
 
 	struct Gb_Osc* osc = &this->osc;
 	int const duty_code = osc->regs [1] >> 6;
@@ -595,7 +595,7 @@ void Noise_run( struct Gb_Noise* this, blip_time_t time, blip_time_t end_time )
 	}
 	
 	// Run timer and calculate time of next LFSR clock
-	static byte const period1s [8] ICONST_ATTR = { 1, 2, 4, 6, 8, 10, 12, 14 };
+	static byte const period1s [8] = { 1, 2, 4, 6, 8, 10, 12, 14 };
 	int const period1 = period1s [osc->regs [3] & 7] * clk_mul;
 	
 	#ifdef GB_APU_FAST
@@ -680,7 +680,7 @@ void Wave_run( struct Gb_Wave* this, blip_time_t time, blip_time_t end_time )
 	int const volume_shift = shifts [volume_idx];
 	int const volume_mul = 1;
 #else
-	static byte const volumes [8] ICONST_ATTR = { 0, 4, 2, 1, 3, 3, 3, 3 };
+	static byte const volumes [8] = { 0, 4, 2, 1, 3, 3, 3, 3 };
 	int const volume_shift = 2 + 4;
 	int const volume_idx = this->osc.regs [2] >> 5 & (this->agb_mask | 3); // 2 bits on DMG/CGB, 3 on AGB
 	int const volume_mul = volumes [volume_idx];

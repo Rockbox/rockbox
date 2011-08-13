@@ -43,7 +43,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 const int output_bits = 14;
 
-static const unsigned char DT_DEF_TAB [4 * 32] ICONST_ATTR =
+static const unsigned char DT_DEF_TAB [4 * 32] =
 {
 // FD = 0
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -62,7 +62,7 @@ static const unsigned char DT_DEF_TAB [4 * 32] ICONST_ATTR =
   8 , 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 20, 22, 22, 22, 22
 };
 
-static const unsigned char FKEY_TAB [16] ICONST_ATTR =
+static const unsigned char FKEY_TAB [16] =
 { 
 	0, 0, 0, 0,
 	0, 0, 0, 1,
@@ -70,12 +70,12 @@ static const unsigned char FKEY_TAB [16] ICONST_ATTR =
 	3, 3, 3, 3
 };
 
-static const unsigned char LFO_AMS_TAB [4] ICONST_ATTR =
+static const unsigned char LFO_AMS_TAB [4] =
 {
 	31, 4, 1, 0
 };
 
-static const unsigned char LFO_FMS_TAB [8] ICONST_ATTR =
+static const unsigned char LFO_FMS_TAB [8] =
 {
 	LFO_FMS_BASE * 0, LFO_FMS_BASE * 1,
 	LFO_FMS_BASE * 2, LFO_FMS_BASE * 3,

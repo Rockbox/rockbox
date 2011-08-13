@@ -40,7 +40,7 @@ void Fme7_reset( struct Nes_Fme7_Apu* this )
 	memset( this->delays, 0, sizeof this->delays );
 }
 
-static unsigned char const amp_table [16] ICONST_ATTR =
+static unsigned char const amp_table [16] =
 {
 	#define ENTRY( n ) (unsigned char) (n * amp_range + 0.5)
 	ENTRY(0.0000), ENTRY(0.0078), ENTRY(0.0110), ENTRY(0.0156),

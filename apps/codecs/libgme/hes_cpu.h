@@ -65,9 +65,9 @@ void Cpu_reset( struct Hes_Cpu* this );
 
 // Set end_time and run CPU from current time. Returns true if any illegal
 // instructions were encountered.
-bool Cpu_run( struct Hes_Emu* this, hes_time_t end_time ) ICODE_ATTR;
+bool Cpu_run( struct Hes_Emu* this, hes_time_t end_time );
 
-void Cpu_set_mmr( struct Hes_Emu* this, int reg, int bank ) ICODE_ATTR;
+void Cpu_set_mmr( struct Hes_Emu* this, int reg, int bank );
 
 // Time of ning of next instruction to be executed
 static inline hes_time_t Cpu_time( struct Hes_Cpu* this )

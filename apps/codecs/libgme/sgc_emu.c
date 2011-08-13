@@ -306,7 +306,7 @@ void Sound_set_tempo( struct Sgc_Emu* this, int t )
 	this->play_period = (int) ((clock_rate( this ) * FP_ONE_TEMPO) / (this->header.rate ? 50 : 60) / t);
 }
 
-void fill_buf( struct Sgc_Emu* this ) ICODE_ATTR;
+void fill_buf( struct Sgc_Emu* this );
 blargg_err_t Sgc_start_track( struct Sgc_Emu* this, int track )
 {
 	clear_track_vars( this );
@@ -430,7 +430,7 @@ blargg_err_t Track_seek( struct Sgc_Emu* this, long msec )
 	return Track_skip( this, time - this->out_time );
 }
 
-blargg_err_t skip_( struct Sgc_Emu* this, long count ) ICODE_ATTR;
+blargg_err_t skip_( struct Sgc_Emu* this, long count );
 blargg_err_t Track_skip( struct Sgc_Emu* this, long count )
 {
 	require( this->current_track >= 0 ); // start_track() must have been called already
@@ -463,7 +463,7 @@ blargg_err_t Track_skip( struct Sgc_Emu* this, long count )
 	return 0;
 }
 
-blargg_err_t play_( struct Sgc_Emu* this, long count, sample_t* out ) ICODE_ATTR;
+blargg_err_t play_( struct Sgc_Emu* this, long count, sample_t* out );
 blargg_err_t skip_( struct Sgc_Emu* this, long count )
 {
 	// for long skip, mute sound

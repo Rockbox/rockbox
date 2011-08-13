@@ -75,14 +75,14 @@ static inline void Adpcm_set_output( struct Hes_Apu_Adpcm* this, int chan, struc
 }
 
 // Emulates to time t, then writes data to addr
-void Adpcm_write_data( struct Hes_Apu_Adpcm* this, blip_time_t t, int addr, int data ) ICODE_ATTR;
+void Adpcm_write_data( struct Hes_Apu_Adpcm* this, blip_time_t t, int addr, int data );
 	
 // Emulates to time t, then reads from addr
-int Adpcm_read_data( struct Hes_Apu_Adpcm* this, blip_time_t t, int addr ) ICODE_ATTR;
+int Adpcm_read_data( struct Hes_Apu_Adpcm* this, blip_time_t t, int addr );
 
 // Emulates to time t, then subtracts t from the current time.
 // OK if previous write call had time slightly after t.
-void Adpcm_end_frame( struct Hes_Apu_Adpcm* this,blip_time_t t ) ICODE_ATTR;
+void Adpcm_end_frame( struct Hes_Apu_Adpcm* this,blip_time_t t );
 
 // Sets overall volume, where 1.0 is normal
 static inline void Adpcm_volume( struct Hes_Apu_Adpcm* this, int v )	{ Synth_volume( &this->synth, (v*3)/5 / adpcm_osc_count / adpcm_amp_range ); }
