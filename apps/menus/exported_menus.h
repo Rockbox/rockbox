@@ -38,6 +38,7 @@ extern const struct menu_item_ex
         sound_settings,             /* sound_menu.c     */
         settings_menu_item,         /* settings_menu.c  */
         bookmark_settings_menu,
+        sleep_timer_call,           /* main_menu.c */
         playlist_settings,          /* playlist_menu.c  */
         equalizer_menu,             /* eq_menu.c        */
 #ifdef AUDIOHW_HAVE_EQ

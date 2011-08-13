@@ -80,10 +80,6 @@ static int timedate_set(void)
 MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_SET_TIME), 
                   timedate_set, NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
-
-/* in main_menu.c */
-extern const struct menu_item_ex sleep_timer_call;
-
 #ifdef HAVE_RTC_ALARM
 MENUITEM_FUNCTION(alarm_screen_call, 0, ID2P(LANG_ALARM_MOD_ALARM_MENU),
                   (menu_function)alarm_screen, NULL, NULL, Icon_NOICON);
