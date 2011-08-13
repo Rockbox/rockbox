@@ -3526,61 +3526,45 @@ if [ "$ARG_RBDIR" != "" ]; then
   echo "Using alternate rockbox dir: ${rbdir}"
 fi
 
-sed > autoconf.h \
- -e "s<@ENDIAN@<${defendian}<g" \
- -e "s<^#undef ROCKBOX_HAS_LOGF<$use_logf<g" \
- -e "s<^#undef DO_BOOTCHART<$use_bootchart<g" \
- -e "s<@config_rtc@<$config_rtc<g" \
- -e "s<@have_rtc_alarm@<$have_rtc_alarm<g" \
- -e "s<@thread_support@<$thread_support<g" \
- -e "s<@RBDIR@<${rbdir}<g" \
- -e "s<@sharepath@<${sharedir}<g" \
- -e "s<@binpath@<${bindir}<g" \
- -e "s<@libpath@<${libdir}<g" \
- -e "s<@have_backlight@<$have_backlight<g" \
- -e "s<@have_fmradio_in@<$have_fmradio_in<g" \
- -e "s<@have_ata_poweroff@<$have_ata_poweroff<g" \
- -e "s<@lcd_width@<$app_lcd_width<g" \
- -e "s<@lcd_height@<$app_lcd_height<g" \
-<<EOF
+cat > autoconf.h <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
 #define __BUILD_AUTOCONF_H
 
 /* Define endianess for the target or simulator platform */
-#define @ENDIAN@ 1
+#define ${defendian} 1
 
 /* Define this if you build rockbox to support the logf logging and display */
-#undef ROCKBOX_HAS_LOGF
+${use_logf}
 
 /* Define this to record a chart with timings for the stages of boot */
-#undef DO_BOOTCHART
+${use_bootchart}
 
 /* optional define for a backlight modded Ondio */
-@have_backlight@
+${have_backlight}
 
 /* optional define for FM radio mod for iAudio M5 */
-@have_fmradio_in@
+${have_fmradio_in}
 
 /* optional define for ATA poweroff on Player */
-@have_ata_poweroff@
+${have_ata_poweroff}
 
 /* optional defines for RTC mod for h1x0 */
-@config_rtc@
-@have_rtc_alarm@
+${config_rtc}
+${have_rtc_alarm}
 
 /* the threading backend we use */
-#define @thread_support@
+#define ${thread_support}
 
 /* lcd dimensions for application builds from configure */
-@lcd_width@
-@lcd_height@
+${app_lcd_width}
+${app_lcd_height}
 
 /* root of Rockbox */
-#define ROCKBOX_DIR "@RBDIR@"
-#define ROCKBOX_SHARE_PATH "@sharepath@"
-#define ROCKBOX_BINARY_PATH "@binpath@"
-#define ROCKBOX_LIBRARY_PATH "@libpath@"
+#define ROCKBOX_DIR "${rbdir}"
+#define ROCKBOX_SHARE_PATH "${sharedir}"
+#define ROCKBOX_BINARY_PATH "${bindir}"
+#define ROCKBOX_LIBRARY_PATH "${libdir}"
 
 #endif /* __BUILD_AUTOCONF_H */
 EOF
