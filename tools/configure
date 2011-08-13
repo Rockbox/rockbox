@@ -1235,9 +1235,8 @@ if [ -z "$rootdir" ]; then
 fi
 
 apps="apps"
-appsdir='\$(ROOTDIR)/apps'
-firmdir='\$(ROOTDIR)/firmware'
-toolsdir='\$(ROOTDIR)/tools'
+appsdir='$(ROOTDIR)/apps'
+toolsdir='$(ROOTDIR)/tools'
 
 
 ##################################################################
@@ -3225,14 +3224,14 @@ fi
 
   case $btype in
     [Ii])
-      appsdir='\$(ROOTDIR)/bootloader'
+      appsdir='$(ROOTDIR)/bootloader'
       apps="bootloader"
       extradefines="$extradefines -DBOOTLOADER -DE200R_INSTALLER -ffunction-sections -fdata-sections"
       bootloader="1"
       echo "e200R-installer build selected"
       ;;
     [Ee])
-      appsdir='\$(ROOTDIR)/bootloader'
+      appsdir='$(ROOTDIR)/bootloader'
       apps="bootloader"
       echo "C2(4)0 or C2(5)0"
       variant=`input`
@@ -3253,10 +3252,10 @@ fi
       if test $t_manufacturer = "archos"; then
           # Archos SH-based players do this somewhat differently for
           # some reason
-          appsdir='\$(ROOTDIR)/flash/bootbox'
+          appsdir='$(ROOTDIR)/flash/bootbox'
           apps="bootbox"
       else
-          appsdir='\$(ROOTDIR)/bootloader'
+          appsdir='$(ROOTDIR)/bootloader'
           apps="bootloader"
           flash=""
           if test -n "$boottool"; then
@@ -3288,7 +3287,7 @@ fi
       ;;
     [Gg])
       extradefines="$extradefines -DSTUB" # for target makefile symbol EXTRA_DEFINES
-      appsdir='\$(ROOTDIR)/gdb'
+      appsdir='$(ROOTDIR)/gdb'
       apps="stub"
       case $modelname in
           iriverifp7xx)
@@ -3306,7 +3305,7 @@ fi
       t_cpu='';
       GCCOPTS='';
       extradefines="$extradefines  -DDEBUG"
-      appsdir='\$(ROOTDIR)/tools/checkwps';
+      appsdir='$(ROOTDIR)/tools/checkwps';
       output='checkwps.'${modelname};
       archosrom='';
       echo "CheckWPS build selected"
@@ -3317,7 +3316,7 @@ fi
       toolset='';
       t_cpu='';
       GCCOPTS='';
-      appsdir='\$(ROOTDIR)/tools/database';
+      appsdir='$(ROOTDIR)/tools/database';
       archosrom='';
 
       case $uname in
@@ -3639,7 +3638,7 @@ cat > Makefile <<EOF
 ## Automatically generated. http://www.rockbox.org/
 
 export ROOTDIR=${rootdir}
-export FIRMDIR=${firmdir}
+export FIRMDIR=\$(ROOTDIR)/firmware
 export APPSDIR=${appsdir}
 export TOOLSDIR=${toolsdir}
 export DOCSDIR=${rootdir}/docs
