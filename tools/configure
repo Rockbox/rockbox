@@ -3659,7 +3659,7 @@ export MEMORYSIZE=${memory}
 export BUILDDATE:=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
 export MKFIRMWARE=${tool}
 export BMP2RB_MONO=${bmp2rb_mono}
-export BMP2RB_NATIVE=${bmp2fb_native}
+export BMP2RB_NATIVE=${bmp2rb_native}
 export BMP2RB_REMOTEMONO=${bmp2rb_remotemono}
 export BMP2RB_REMOTENATIVE=${bmp2rb_remotenative}
 export BINARY=${output}
