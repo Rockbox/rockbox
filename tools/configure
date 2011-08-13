@@ -988,12 +988,10 @@ voiceconfig () {
 
     if [ "$swcodec" = "yes" ]; then
         ENCODER="rbspeexenc"
-        ENC_CMD="rbspeexenc"
         ENC_OPTS="-q 4 -c 10"
     else
         if [ -n "`findtool lame`" ]; then
             ENCODER="lame"
-            ENC_CMD="lame"
             ENC_OPTS="--resample 12 -t -m m -h -V 9.999 -S -B 64 --vbr-new"
          else
             echo "You need LAME in the system path to build voice files for"
@@ -3700,7 +3698,7 @@ export MANUALDEV=${manualdev}
 export TTS_OPTS=${TTS_OPTS}
 export TTS_ENGINE=${TTS_ENGINE}
 export ENC_OPTS=${ENC_OPTS}
-export ENCODER=${ENC_CMD}
+export ENCODER=${ENCODER}
 export USE_ELF=${USE_ELF}
 export RBDIR=${rbdir}
 export ROCKBOX_SHARE_PATH=${sharedir}
