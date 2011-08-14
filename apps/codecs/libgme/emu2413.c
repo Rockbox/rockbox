@@ -93,8 +93,9 @@ static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 16] = {
 #define DP_BASE_BITS (DP_BITS - PG_BITS)
 
 /* Dynamic range (Accuracy of sin table) */
+#define DB_PREC 48
 #define DB_BITS 8
-#define DB_STEP (48.0/(1<<DB_BITS))
+#define DB_STEP ((double)DB_PREC/(1<<DB_BITS))
 #define DB_MUTE (1<<DB_BITS)
 
 /* Dynamic range of envelope */
@@ -116,8 +117,8 @@ static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 16] = {
 #define TL2EG(d) ((d)*(e_int32)(TL_STEP/EG_STEP))
 #define SL2EG(d) ((d)*(e_int32)(SL_STEP/EG_STEP))
 
-#define DB_POS(x) (e_uint32)((x)/DB_STEP)
-#define DB_NEG(x) (e_uint32)(DB_MUTE+DB_MUTE+(x)/DB_STEP)
+#define DB_POS(x) (x*DB_MUTE/DB_PREC)
+#define DB_NEG(x) (DB_MUTE+DB_MUTE+x*DB_MUTE/DB_PREC)
 
 /* Bits for liner value */
 #define DB2LIN_AMP_BITS 8
@@ -162,7 +163,7 @@ static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 16] = {
 #define EXPAND_BITS_X(x,s,d) (((x)<<((d)-(s)))|((1<<((d)-(s)))-1))
 
 /* Adjust envelope speed which depends on sampling rate. */
-#define RATE_ADJUST(x) (rate==49716?(e_uint32)x:(e_uint32)((double)(x)*clk/72/rate + 0.5))        /* added 0.5 to round the value*/
+#define RATE_ADJUST(x) (rate==49716?(e_uint32)x:(e_uint32)(((long long)(x)*clk/rate+36)/72))
 
 #define MOD(o,x) (&(o)->slot[(x)<<1])
 #define CAR(o,x) (&(o)->slot[((x)<<1)|1])
@@ -1167,7 +1168,7 @@ OPLL_set_quality (OPLL * opll, e_uint32 q)
 #endif
 
 /* Update AM, PM unit */
-static void
+INLINE static void
 update_ampm (OPLL * opll)
 {
   opll->pm_phase = (opll->pm_phase + pm_dphase) & (PM_DP_WIDTH - 1);
@@ -1191,7 +1192,7 @@ calc_phase (OPLL_SLOT * slot, e_int32 lfo)
 }
 
 /* Update Noise unit */
-static void
+INLINE static void
 update_noise (OPLL * opll)
 {
    if(opll->noise_seed&1) opll->noise_seed ^= 0x8003020;
@@ -1199,7 +1200,7 @@ update_noise (OPLL * opll)
 }
 
 /* EG */
-static void
+INLINE static void
 calc_envelope (OPLL_SLOT * slot, e_int32 lfo)
 {
 #define S2E(x) (SL2EG((e_int32)(x/SL_STEP))<<(EG_DP_BITS-EG_BITS))
@@ -1360,9 +1361,9 @@ calc_slot_snare (OPLL_SLOT * slot, e_uint32 noise)
     return 0;
   
   if(BIT(slot->pgout,7))
-    return DB2LIN_TABLE[(noise?DB_POS(0.0):DB_POS(15.0))+slot->egout];
+    return DB2LIN_TABLE[(noise?DB_POS(0):DB_POS(15))+slot->egout];
   else
-    return DB2LIN_TABLE[(noise?DB_NEG(0.0):DB_NEG(15.0))+slot->egout];
+    return DB2LIN_TABLE[(noise?DB_NEG(0):DB_NEG(15))+slot->egout];
 }
 
 /* 
@@ -1381,9 +1382,9 @@ calc_slot_cym (OPLL_SLOT * slot, e_uint32 pgout_hh)
       /* different from fmopl.c */
      (BIT(slot->pgout,PG_BITS-7)&!BIT(slot->pgout,PG_BITS-5))
     )
-    dbout = DB_NEG(3.0);
+    dbout = DB_NEG(3);
   else
-    dbout = DB_POS(3.0);
+    dbout = DB_POS(3);
 
   return DB2LIN_TABLE[dbout + slot->egout];
 }
@@ -1406,16 +1407,16 @@ calc_slot_hat (OPLL_SLOT *slot, e_int32 pgout_cym, e_uint32 noise)
     )
   {
     if(noise)
-      dbout = DB_NEG(12.0);
+      dbout = DB_NEG(12);
     else
-      dbout = DB_NEG(24.0);
+      dbout = DB_NEG(24);
   }
   else
   {
     if(noise)
-      dbout = DB_POS(12.0);
+      dbout = DB_POS(12);
     else
-      dbout = DB_POS(24.0);
+      dbout = DB_POS(24);
   }
 
   return DB2LIN_TABLE[dbout + slot->egout];
