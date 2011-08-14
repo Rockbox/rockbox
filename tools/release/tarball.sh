@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="3.9"
+version="3.9.1"
 
 srcdir=.
 tempdir=rockbox-temp
