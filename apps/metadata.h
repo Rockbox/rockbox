@@ -36,12 +36,11 @@ enum
     AFMT_UNKNOWN = 0,  /* Unknown file format */
 
     /* start formats */
-
+    AFMT_MPA_L1,       /* MPEG Audio layer 1 */
     AFMT_MPA_L2,       /* MPEG Audio layer 2 */
     AFMT_MPA_L3,       /* MPEG Audio layer 3 */
 
 #if CONFIG_CODEC == SWCODEC
-    AFMT_MPA_L1,       /* MPEG Audio layer 1 */
     AFMT_AIFF,         /* Audio Interchange File Format */
     AFMT_PCM_WAV,      /* Uncompressed PCM in a WAV file */
     AFMT_OGG_VORBIS,   /* Ogg Vorbis */

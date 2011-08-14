@@ -61,8 +61,8 @@ bool write_metadata_log = false;
 const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
 {
     /* Unknown file format */
-    [AFMT_UNKNOWN] =
-        AFMT_ENTRY("???", NULL,    NULL,        NULL, NULL  ),
+    [0 ... AFMT_NUM_CODECS-1] =
+        AFMT_ENTRY("???", NULL,    NULL,        NULL, ""  ),
 
     /* MPEG Audio layer 2 */
     [AFMT_MPA_L2] =
