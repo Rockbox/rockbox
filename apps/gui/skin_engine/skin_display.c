@@ -453,6 +453,9 @@ int evaluate_conditional(struct gui_wps *gwps, int offset,
 void write_line(struct screen *display, struct align_pos *format_align,
                 int line, bool scroll, unsigned style)
 {
+#ifndef HAVE_LCD_BITMAP
+    (void)style;
+#endif
     int left_width = 0, left_xpos;
     int center_width = 0, center_xpos;
     int right_width = 0,  right_xpos;
