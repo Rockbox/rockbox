@@ -62,7 +62,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
 {
     /* Unknown file format */
     [0 ... AFMT_NUM_CODECS-1] =
-        AFMT_ENTRY("???", NULL,    NULL,        NULL, ""  ),
+        AFMT_ENTRY("???", NULL,    NULL,        NULL, "\0"  ),
 
     /* MPEG Audio layer 2 */
     [AFMT_MPA_L2] =
