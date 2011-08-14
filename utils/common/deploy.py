@@ -29,7 +29,6 @@
 # If the required Qt installation isn't in PATH use --qmake option.
 # Tested on Linux and MinGW / W32
 #
-# requires python which package (http://code.google.com/p/which/)
 # requires pysvn package.
 # requires upx.exe in PATH on Windows.
 #
@@ -53,12 +52,6 @@ try:
 except ImportError:
     print "Fatal: This script requires the pysvn package to run."
     print "       See http://pysvn.tigris.org/."
-    sys.exit(-5)
-try:
-    import which
-except ImportError:
-    print "Fatal: This script requires the which package to run."
-    print "       See http://code.google.com/p/which/."
     sys.exit(-5)
 cpus = 1
 try:
@@ -107,6 +100,16 @@ def usage(myself):
     print "       -h, --help            this help"
     print "  If neither a project file nor tag is specified trunk will get downloaded"
     print "  from svn."
+
+
+def which(executable):
+    path = os.environ.get("PATH", "").split(os.pathsep)
+    for p in path:
+        fullpath = p + "/" + executable
+        if os.path.exists(fullpath):
+            return fullpath
+    print "which: could not find " + executable
+    return ""
 
 
 def getsources(svnsrv, filelist, dest):
@@ -160,7 +163,7 @@ def findqt(cross=""):
     bins = [cross + "qmake", cross + "qmake-qt4"]
     for binary in bins:
         try:
-            q = which.which(binary)
+            q = which(binary)
             if len(q) > 0:
                 result = checkqt(q)
                 if not result == "":
@@ -346,7 +349,7 @@ def finddlls(program, extrapaths=[], cross=""):
                 break
         if dllpath == "":
             try:
-                dllpath = re.sub(r"\\", r"/", which.which(file))
+                dllpath = re.sub(r"\\", r"/", which(file))
                 print file + ": found at " + dllpath
                 dllpaths.append(dllpath)
             except:
