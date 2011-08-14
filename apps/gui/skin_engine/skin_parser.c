@@ -482,6 +482,8 @@ static int parse_viewport_gradient_setup(struct skin_element *element,
     return 0; 
 }
 #endif
+
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 static int parse_viewporttextstyle(struct skin_element *element,
                                    struct wps_token *token,
                                    struct wps_data *wps_data)
@@ -524,8 +526,6 @@ static int parse_viewporttextstyle(struct skin_element *element,
     token->value.l = style;
     return 0;
 }
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 
 static int parse_viewportcolour(struct skin_element *element,
                                 struct wps_token *token,
@@ -1759,10 +1759,10 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_IMAGE_BACKDROP:
                     function = parse_image_special;
                     break;
-#endif
                 case SKIN_TOKEN_VIEWPORT_TEXTSTYLE:
                     function = parse_viewporttextstyle;
                     break;
+#endif
 #ifdef HAVE_LCD_COLOR
                 case SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP:
                     function = parse_viewport_gradient_setup;
