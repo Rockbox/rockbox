@@ -138,15 +138,13 @@ public class RockboxPCM extends AudioTrack
         /* 1 sample is 2 bytes, 2 samples are 1 frame */
         return (bytes/4);
     }
-    
-    @SuppressWarnings("unused")
+
     private int frames2bytes(int frames) 
     {
         /* 1 frame is 2 samples, 1 sample is 2 bytes */
         return (frames*4);
     }
 
-    @SuppressWarnings("unused")
     private void play_pause(boolean pause) 
     {
         RockboxService service = RockboxService.get_instance();
@@ -204,7 +202,6 @@ public class RockboxPCM extends AudioTrack
         return super.setStereoVolume(leftVolume, rightVolume);
     }
 
-    @SuppressWarnings("unused")
     private void set_volume(int volume)
     {
         Logger.d("java:set_volume("+volume+")");

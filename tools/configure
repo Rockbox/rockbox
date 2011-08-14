@@ -663,9 +663,9 @@ androidcc () {
     prefixtools $gcctarget
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
     GCCOPTS="$GCCOPTS -ffunction-sections -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
-		--sysroot=$ANDROID_NDK_PATH/platforms/android-4/arch-arm"
+		--sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
     GLOBAL_LDOPTS="$GLOBAL_LDOPTS -nostdlib -lc -Wl,--no-undefined -Wl,--gc-sections -Wl,-z,noexecstack \
-		--sysroot=$ANDROID_NDK_PATH/platforms/android-4/arch-arm"
+		--sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
     LDOPTS="$LDOPTS -shared -nostdlib -ldl -llog"
     endian="little"
     SHARED_LDFLAG="-shared"

@@ -28,8 +28,6 @@ import android.content.IntentFilter;
 
 public class HeadphoneMonitor extends BroadcastReceiver
 {
-    @SuppressWarnings("unused")
-
     public HeadphoneMonitor(Context c)
     {
         IntentFilter hpFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
