@@ -2650,7 +2650,6 @@ void audio_set_recording_gain(int left, int right, int type)
 void audio_init_recording(void)
 {
     /* a dummy */
-    (void)buffer_offset;
 }
 void audio_set_recording_options(struct audio_recording_options *options)
 {

@@ -292,7 +292,7 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
     union voicebuf voicebuf;
 
     size_t load_size, alloc_size;
-    int got_size;
+    ssize_t got_size;
 #ifndef TALK_PARTIAL_LOAD
     size_t file_size;
 #endif
@@ -328,7 +328,7 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
 #endif
 
     got_size = read(filehandle, voicebuf.buf, load_size);
-    if (got_size != load_size /* failure */)
+    if (got_size != (ssize_t)load_size /* failure */)
         goto load_err;
 
     alloc_size = load_size;
@@ -370,7 +370,7 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
 #endif
 
     got_size = read(filehandle, &p_voicefile->index[0], load_size);
-    if (got_size != load_size) /* read error */
+    if (got_size != (ssize_t)load_size) /* read error */
         goto load_err;
 
     alloc_size += load_size;
