@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "dir_uncached.h"
+#include <string.h> /* size_t */
 
 #ifdef HAVE_DIRCACHE
 
@@ -65,7 +66,7 @@ void dircache_init(void) INIT_ATTR;
 int dircache_load(void);
 int dircache_save(void);
 int dircache_build(int last_size);
-void* dircache_steal_buffer(long *size);
+void* dircache_steal_buffer(size_t *size);
 bool dircache_is_enabled(void);
 bool dircache_is_initializing(void);
 void dircache_set_appflag(long mask);

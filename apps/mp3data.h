@@ -26,6 +26,8 @@
 #define MPEG_VERSION2   1
 #define MPEG_VERSION2_5 2
 
+#include <string.h> /* size_t */
+
 struct mp3info {
     /* Standard MP3 frame header fields */
     int version;
@@ -63,23 +65,21 @@ unsigned long find_next_frame(int fd,
                               unsigned long reference_header);
 unsigned long mem_find_next_frame(int startpos, 
                                   long *offset, 
-                                  long max_offset, 
-                                  unsigned long reference_header);
+                                  long max_offset,
+                                  unsigned long reference_header,
+                                  unsigned char* buf, size_t buflen);
 int get_mp3file_info(int fd, 
                      struct mp3info *info);
-int count_mp3_frames(int fd, 
-                     int startpos, 
-                     int filesize,
-                     void (*progressfunc)(int));
-int create_xing_header(int fd, 
-                       long startpos, 
-                       long filesize,
-                       unsigned char *buf, 
-                       unsigned long num_frames,
-                       unsigned long rec_time, 
-                       unsigned long header_template,
-                       void (*progressfunc)(int), 
-                       bool generate_toc);
+
+int count_mp3_frames(int fd,  int startpos,  int filesize,
+                     void (*progressfunc)(int),
+                     unsigned char* buf, size_t buflen);
+
+int create_xing_header(int fd, long startpos, long filesize,
+                       unsigned char *buf, unsigned long num_frames,
+                       unsigned long rec_time, unsigned long header_template,
+                       void (*progressfunc)(int), bool generate_toc,
+                       unsigned char *tempbuf, size_t tempbuflen );
 
 extern unsigned long bytes2int(unsigned long b0,
                                unsigned long b1,

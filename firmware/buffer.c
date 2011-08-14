@@ -19,19 +19,33 @@
  *
  ****************************************************************************/
 #include <stdio.h>
+#include <stdint.h>
+#include "system.h"
 #include "buffer.h"
 #include "panic.h"
 #include "logf.h"
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-unsigned char audiobuffer[(MEMORYSIZE*1024-256)*1024];
-unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
 #else
-/* defined in linker script */
-extern unsigned char audiobuffer[];
 #endif
 
-unsigned char *audiobuf;
+/* defined in linker script */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(IPOD_VIDEO)
+extern unsigned char *audiobufend_lds[];
+unsigned char *audiobufend;
+#else /* !IPOD_VIDEO */
+extern unsigned char audiobufend[];
+#endif
+/* defined in linker script */
+extern unsigned char audiobuffer[];
+#else /* PLATFORM_HOSTED */
+unsigned char audiobuffer[(MEMORYSIZE*1024-256)*1024];
+unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
+extern unsigned char *audiobufend;
+#endif
+
+static unsigned char *audiobuf;
 
 #ifdef BUFFER_ALLOC_DEBUG
 static unsigned char *audiobuf_orig_start;
@@ -54,13 +68,68 @@ void buffer_init(void)
 {
     /* 32-bit aligned */
     audiobuf = (void *)(((unsigned long)audiobuffer + 3) & ~3);
+    
+#if defined(IPOD_VIDEO)
+    audiobufend=(unsigned char *)audiobufend_lds;
+    if(MEMORYSIZE==64 && probed_ramsize!=64)
+    {
+        audiobufend -= (32<<20);
+    }
+#endif
+
 #ifdef BUFFER_ALLOC_DEBUG
     audiobuf_orig_start = audiobuf;
 #endif /* BUFFER_ALLOC_DEBUG */
 }
 
+/* protect concurrent access */
+static volatile int lock;
+
+/*
+ * Give the entire buffer, return the size in size.
+ * The caller needs to make sure audiobuf is not otherwise used
+ *
+ * Note that this does not modify the buffer position (buffer_release_buffer()
+ * does), so call this if you want to aquire temporary memory
+ **/
+#define _ALIGN (sizeof(char*))
+void *buffer_get_buffer(size_t *size)
+{
+    if (lock)
+        panicf("concurrent audiobuf access");
+    lock = 1;
+    audiobuf = ALIGN_UP(audiobuf, sizeof(intptr_t));
+    *size = (audiobufend - audiobuf);
+    return audiobuf;
+}
+
+/*
+ * Release the buffer gotten with buffer_get_buffer
+ *
+ * size should have the amount of bytes (from the front) that caller keeps for
+ * its own, 0 if the entire buffer is to be released
+ *
+ * safe to be called with size=0 even if the buffer wasn't claimed before
+ **/
+void buffer_release_buffer(size_t size)
+{
+    audiobuf += size;
+    /* ensure alignment */
+    audiobuf = ALIGN_UP(audiobuf, sizeof(intptr_t));
+    lock = 0;
+}
+
+/*
+ * Query how much free space the buffer has */
+size_t buffer_available(void)
+{
+    return audiobufend - audiobuf;
+}
+
 void *buffer_alloc(size_t size)
 {
+    if (lock) /* it's not save to call this here */
+        panicf("buffer_alloc(): exclusive buffer owner");
     void *retval;
 #ifdef BUFFER_ALLOC_DEBUG
     struct buffer_start_marker *start;

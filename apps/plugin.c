@@ -979,14 +979,8 @@ void* plugin_get_buffer(size_t *buffer_size)
  */
 void* plugin_get_audio_buffer(size_t *buffer_size)
 {
-#if CONFIG_CODEC == SWCODEC
-    return audio_get_buffer(true, buffer_size);
-#else
     audio_stop();
-    talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
-    *buffer_size = audiobufend - audiobuf;
-    return audiobuf;
-#endif
+    return audio_get_buffer(true, buffer_size);
 }
 
 /* The plugin wants to stay resident after leaving its main function, e.g.

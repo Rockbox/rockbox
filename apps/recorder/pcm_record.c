@@ -1643,14 +1643,12 @@ void enc_set_parameters(struct enc_parameters *params)
     logf("fnq files:%ld", fnq_size / MAX_PATH);
 
 #if defined(DEBUG)
-    logf("ab :%08lX", (uintptr_t)audiobuf);
     logf("pcm:%08lX", (uintptr_t)pcm_buffer);
     logf("enc:%08lX", (uintptr_t)enc_buffer);
     logf("res:%08lX", (uintptr_t)params->reserve_buffer);
     logf("wip:%08lX", (uintptr_t)wrap_id_p);
     logf("fnq:%08lX", (uintptr_t)fn_queue);
     logf("end:%08lX", (uintptr_t)fn_queue + fnq_size);
-    logf("abe:%08lX", (uintptr_t)audiobufend);
 #endif
 
     /* init all chunk headers and reset indexes */

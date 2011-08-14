@@ -493,9 +493,6 @@ static int onplay_menu(int index)
                         if (current_track->display_index!=viewer.num_tracks ||
                             global_settings.repeat_mode == REPEAT_ALL)
                         {
-#if CONFIG_CODEC != SWCODEC
-                            talk_buffer_steal(); /* will use the mp3 buffer */
-#endif
                             audio_play(0);
                             viewer.current_playing_track = -1;
                         }

@@ -311,17 +311,18 @@ unsigned long find_next_frame(int fd,
 #ifndef __PCTOOL__
 static int fnf_read_index;
 static int fnf_buf_len;
+static unsigned char *fnf_buf;
 
 static int buf_getbyte(int fd, unsigned char *c)
 {
     if(fnf_read_index < fnf_buf_len)
     {
-        *c = audiobuf[fnf_read_index++];
+        *c = fnf_buf[fnf_read_index++];
         return 1;
     }
     else
     {
-        fnf_buf_len = read(fd, audiobuf, audiobufend - audiobuf);
+        fnf_buf_len = read(fd, fnf_buf, fnf_buf_len);
         if(fnf_buf_len < 0)
             return -1;
 
@@ -329,7 +330,7 @@ static int buf_getbyte(int fd, unsigned char *c)
 
         if(fnf_buf_len > 0)
         {
-            *c = audiobuf[fnf_read_index++];
+            *c = fnf_buf[fnf_read_index++];
             return 1;
         }
         else
@@ -345,7 +346,7 @@ static int buf_seek(int fd, int len)
     {
         len = fnf_read_index - fnf_buf_len;
         
-        fnf_buf_len = read(fd, audiobuf, audiobufend - audiobuf);
+        fnf_buf_len = read(fd, fnf_buf, fnf_buf_len);
         if(fnf_buf_len < 0)
             return -1;
 
@@ -361,9 +362,10 @@ static int buf_seek(int fd, int len)
         return 0;
 }
 
-static void buf_init(void)
+static void buf_init(unsigned char* buf, size_t buflen)
 {
-    fnf_buf_len = 0;
+    fnf_buf = buf;
+    fnf_buf_len = buflen;
     fnf_read_index = 0;
 }
 
@@ -372,8 +374,9 @@ static unsigned long buf_find_next_frame(int fd, long *offset, long max_offset)
     return __find_next_frame(fd, offset, max_offset, 0, buf_getbyte, true);
 }
 
-static int audiobuflen;
-static int mem_pos;
+static size_t mem_buflen;
+static unsigned char* mem_buf;
+static size_t mem_pos;
 static int mem_cnt;
 static int mem_maxlen;
 
@@ -381,8 +384,8 @@ static int mem_getbyte(int dummy, unsigned char *c)
 {
     dummy = dummy;
     
-    *c = audiobuf[mem_pos++];
-    if(mem_pos >= audiobuflen)
+    *c = mem_buf[mem_pos++];
+    if(mem_pos >= mem_buflen)
         mem_pos = 0;
 
     if(mem_cnt++ >= mem_maxlen)
@@ -394,9 +397,11 @@ static int mem_getbyte(int dummy, unsigned char *c)
 unsigned long mem_find_next_frame(int startpos, 
                                   long *offset, 
                                   long max_offset,
-                                  unsigned long reference_header)
+                                  unsigned long reference_header,
+                                  unsigned char* buf, size_t buflen)
 {
-    audiobuflen = audiobufend - audiobuf;
+    mem_buf = buf;
+    mem_buflen = buflen;
     mem_pos = startpos;
     mem_cnt = 0;
     mem_maxlen = max_offset;
@@ -620,8 +625,9 @@ static void long2bytes(unsigned char *buf, long val)
     buf[3] = val & 0xff;
 }
 
-int count_mp3_frames(int fd, int startpos, int filesize,
-                     void (*progressfunc)(int))
+int count_mp3_frames(int fd,  int startpos,  int filesize,
+                     void (*progressfunc)(int),
+                     unsigned char* buf, size_t buflen)
 {
     unsigned long header = 0;
     struct mp3info info;
@@ -637,7 +643,7 @@ int count_mp3_frames(int fd, int startpos, int filesize,
     if(lseek(fd, startpos, SEEK_SET) < 0)
         return -1;
 
-    buf_init();
+    buf_init(buf, buflen);
 
     /* Find out the total number of frames */
     num_frames = 0;
@@ -687,7 +693,8 @@ static const char cooltext[] = "Rockbox - rocks your box";
 int create_xing_header(int fd, long startpos, long filesize,
                        unsigned char *buf, unsigned long num_frames,
                        unsigned long rec_time, unsigned long header_template,
-                       void (*progressfunc)(int), bool generate_toc)
+                       void (*progressfunc)(int), bool generate_toc,
+                       unsigned char *tempbuf, size_t tempbuflen )
 {   
     struct mp3info info;
     unsigned char toc[100];
@@ -705,7 +712,7 @@ int create_xing_header(int fd, long startpos, long filesize,
     if(generate_toc)
     {
         lseek(fd, startpos, SEEK_SET);
-        buf_init();
+        buf_init(tempbuf, tempbuflen);
 
         /* Generate filepos table */
         last_pos = 0;

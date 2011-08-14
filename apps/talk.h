@@ -80,6 +80,7 @@ void talk_init(void);
 bool talk_voice_required(void); /* returns true if voice codec required */
 #endif
 int talk_get_bufsize(void); /* get the loaded voice file size */
+size_t talkbuf_init(char* bufstart);
 void talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
 bool is_voice_queued(void); /* Are there more voice clips to be spoken? */
 int talk_id(int32_t id, bool enqueue); /* play a voice ID from voicefont */

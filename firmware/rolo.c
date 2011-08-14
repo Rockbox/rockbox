@@ -99,6 +99,7 @@ void rolo_restart_cop(void)
 
 static void rolo_error(const char *text)
 {
+    buffer_release_buffer(0);
     lcd_clear_display();
     lcd_puts(0, 0, "ROLO error:");
     lcd_puts_scroll(0, 1, text);
@@ -213,6 +214,8 @@ int rolo_load(const char* filename)
     unsigned short checksum,file_checksum;
 #endif
     unsigned char* ramstart = (void*)&loadaddress;
+    unsigned char* filebuf;
+    size_t filebuf_size;
 
     lcd_clear_display();
     lcd_puts(0, 0, "ROLO...");
@@ -234,6 +237,10 @@ int rolo_load(const char* filename)
     }
 
     length = filesize(fd) - FIRMWARE_OFFSET_FILE_DATA;
+
+    /* get the system buffer. release only in case of error, otherwise
+     * we don't return anyway */
+    filebuf = buffer_get_buffer(&filebuf_size);
 
 #if CONFIG_CPU != SH7034
     /* Read and save checksum */
@@ -260,7 +267,14 @@ int rolo_load(const char* filename)
 
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
-    if (read(fd, audiobuf, length) != length) {
+    /* this shouldn't happen, but well */
+    if ((long)filebuf_size < length)
+    {
+        rolo_error("File too big");
+        return -1;
+    }
+
+    if (read(fd, filebuf, length) != length) {
         rolo_error("Error Reading File");
         return -1;
     }
@@ -268,12 +282,12 @@ int rolo_load(const char* filename)
 #ifdef MI4_FORMAT
     /* Check CRC32 to see if we have a valid file */
     chksum_crc32gentab();
-    checksum = chksum_crc32 (audiobuf, length);
+    checksum = chksum_crc32 (filebuf, length);
 #else
     checksum = MODEL_NUMBER;
 
     for(i = 0;i < length;i++) {
-        checksum += audiobuf[i];
+        checksum += filebuf[i];
     }
 #endif
 
@@ -329,12 +343,12 @@ int rolo_load(const char* filename)
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
     /* verify that file can be read and descrambled */
-    if ((audiobuf + (2*length)+4) >= audiobufend) {
+    if ((size_t)((2*length)+4) >= filebuf_size) {
         rolo_error("Not enough room to load file");
         return -1;
     }
 
-    if (read(fd, &audiobuf[length], length) != (int)length) {
+    if (read(fd, &filebuf[length], length) != (int)length) {
         rolo_error("Error Reading File");
         return -1;
     }
@@ -342,7 +356,7 @@ int rolo_load(const char* filename)
     lcd_puts(0, 1, "Descramble");
     lcd_update();
 
-    checksum = descramble(audiobuf + length, audiobuf, length);
+    checksum = descramble(filebuf + length, filebuf, length);
 
     /* Verify checksum against file header */
     if (checksum != file_checksum) {
@@ -374,7 +388,7 @@ int rolo_load(const char* filename)
     PAIOR = 0x0FA0;
 #endif
 #endif
-    rolo_restart(audiobuf, ramstart, length);
+    rolo_restart(filebuf, ramstart, length);
 
     return 0; /* this is never reached */
     (void)checksum; (void)file_checksum;

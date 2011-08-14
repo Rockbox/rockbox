@@ -49,7 +49,7 @@
  
              MASCODEC  | MASCODEC  | SWCODEC
              (playing) | (stopped) |
-    audiobuf-----------+-----------+------------
+    voicebuf-----------+-----------+------------
               audio    | voice     | thumbnail
                        |-----------|------------
                        | thumbnail | voice
@@ -57,7 +57,7 @@
                        |           | filebuf
                        |           |------------
                        |           | audio
-  audiobufend----------+-----------+------------
+  voicebufend----------+-----------+------------
 
   SWCODEC allocates dedicated buffers, MASCODEC reuses audiobuf. */
 
@@ -128,6 +128,7 @@ static uint8_t        clip_age[QUEUE_SIZE];
 #endif
 #endif
 
+static char* voicebuf; /* root pointer to our buffer */
 static unsigned char* p_thumbnail = NULL; /* buffer for thumbnails */
 /* Multiple thumbnails can be loaded back-to-back in this buffer. */
 static volatile int thumbnail_buf_used SHAREDBSS_ATTR; /* length of data in
@@ -281,12 +282,18 @@ static unsigned char* get_clip(long id, long* p_size)
 
 
 /* load the voice file into the mp3 buffer */
-static void load_voicefile(bool probe)
+static void load_voicefile(bool probe, char* buf, size_t bufsize)
 {
-    int load_size;
+    union voicebuf {
+        unsigned char*    buf;
+        struct voicefile* file;
+    };
+    union voicebuf voicebuf;
+
+    int load_size, alloc_size;
     int got_size;
 #ifndef TALK_PARTIAL_LOAD
-    int file_size;
+    size_t file_size;
 #endif
 #ifdef ROCKBOX_LITTLE_ENDIAN
     int i;
@@ -297,37 +304,43 @@ static void load_voicefile(bool probe)
     if (filehandle < 0) /* failed to open */
         goto load_err;
 
+    voicebuf.buf = buf;
+    if (!voicebuf.buf)
+        goto load_err;
+
 #ifndef TALK_PARTIAL_LOAD
     file_size = filesize(filehandle);
-    if (file_size > audiobufend - audiobuf) /* won't fit? */
+    if (file_size > bufsize) /* won't fit? */
         goto load_err;
 #endif
 
 #if defined(TALK_PROGRESSIVE_LOAD) || defined(TALK_PARTIAL_LOAD)
     /* load only the header for now */
-    load_size = offsetof(struct voicefile, index);
+    load_size = sizeof(struct voicefile);
 #else /* load the full file */
     load_size = file_size; 
 #endif
 
 #ifdef TALK_PARTIAL_LOAD
-    if (load_size > audiobufend - audiobuf) /* won't fit? */
+    if (load_size > bufsize) /* won't fit? */
         goto load_err;
 #endif
 
-    got_size = read(filehandle, audiobuf, load_size);
+    got_size = read(filehandle, voicebuf.buf, load_size);
     if (got_size != load_size /* failure */)
         goto load_err;
 
+    alloc_size = load_size;
+
 #ifdef ROCKBOX_LITTLE_ENDIAN
     logf("Byte swapping voice file");
-    structec_convert(audiobuf, "lllll", 1, true);
+    structec_convert(voicebuf.buf, "lllll", 1, true);
 #endif
 
-    if (((struct voicefile*)audiobuf)->table /* format check */
-           == offsetof(struct voicefile, index))
+    /* format check */
+    if (voicebuf.file->table == sizeof(struct voicefile))
     {
-        p_voicefile = (struct voicefile*)audiobuf;
+        p_voicefile = voicebuf.file;
 
         if (p_voicefile->version != VOICE_VERSION ||
             p_voicefile->target_id != TARGET_ID)
@@ -337,9 +350,9 @@ static void load_voicefile(bool probe)
         }
 #if CONFIG_CODEC != SWCODEC
         /* MASCODEC: now use audiobuf for voice then thumbnail */
-        p_thumbnail = audiobuf + file_size;
+        p_thumbnail = voicebuf.buf + file_size;
         p_thumbnail += (long)p_thumbnail % 2; /* 16-bit align */
-        size_for_thumbnail = audiobufend - p_thumbnail;
+        size_for_thumbnail = voicebuf.buf + bufsize - p_thumbnail;
 #endif
     }
     else
@@ -351,14 +364,15 @@ static void load_voicefile(bool probe)
                 * sizeof(struct clip_entry);
 
 #ifdef TALK_PARTIAL_LOAD
-    if (load_size > audiobufend - audiobuf) /* won't fit? */
+    if (load_size > bufsize) /* won't fit? */
         goto load_err;
 #endif
 
-    got_size = read(filehandle, 
-                    (unsigned char *) p_voicefile + offsetof(struct voicefile, index), load_size);
+    got_size = read(filehandle, &p_voicefile->index[0], load_size);
     if (got_size != load_size) /* read error */
         goto load_err;
+
+    alloc_size += load_size;
 #else
     close(filehandle);
     filehandle = -1;
@@ -379,6 +393,11 @@ static void load_voicefile(bool probe)
         p_silence = get_clip(VOICE_PAUSE, &silence_len);
     }
 
+#ifdef TALK_PARTIAL_LOAD
+    alloc_size += silence_len + QUEUE_SIZE;
+#endif
+    if ((size_t)alloc_size > bufsize)
+        goto load_err;
     return;
 
 load_err:
@@ -582,24 +601,31 @@ static void queue_clip(unsigned char* buf, long size, bool enqueue)
 }
 
 
-/* common code for talk_init() and talk_buffer_steal() */
-static void reset_state(void)
+static void alloc_thumbnail_buf(void)
 {
-    queue_write = queue_read = 0; /* reset the queue */
-    p_voicefile = NULL; /* indicate no voicefile (trashed) */
 #if CONFIG_CODEC == SWCODEC
     /* Allocate a dedicated thumbnail buffer - once */
     if (p_thumbnail == NULL)
     {
-        size_for_thumbnail = audiobufend - audiobuf;
+        size_for_thumbnail = buffer_available();
         if (size_for_thumbnail > MAX_THUMBNAIL_BUFSIZE)
             size_for_thumbnail = MAX_THUMBNAIL_BUFSIZE;
         p_thumbnail = buffer_alloc(size_for_thumbnail);
     }
 #else
-    /* Just use the audiobuf, without allocating anything */
-    p_thumbnail = audiobuf;
-    size_for_thumbnail = audiobufend - audiobuf;
+    /* use the audio buffer now, need to release before loading a voice */
+    p_thumbnail = voicebuf;
+#endif
+    thumbnail_buf_used = 0;
+}
+
+/* common code for talk_init() and talk_buffer_steal() */
+static void reset_state(void)
+{
+    queue_write = queue_read = 0; /* reset the queue */
+    p_voicefile = NULL; /* indicate no voicefile (trashed) */
+#if CONFIG_CODEC != SWCODEC
+    p_thumbnail = NULL; /* don't leak buffer_alloc() for swcodec */
 #endif
 
 #ifdef TALK_PARTIAL_LOAD
@@ -608,8 +634,8 @@ static void reset_state(void)
         buffered_id[i] = -1;
 #endif
 
-    thumbnail_buf_used = 0;
     p_silence = NULL; /* pause clip not accessible */
+    voicebuf = NULL;
 }
 
 
@@ -655,12 +681,11 @@ void talk_init(void)
 #endif
     reset_state(); /* use this for most of our inits */
 
-    /* test if we can open and if it fits in the audiobuffer */
-    size_t audiobufsz = audiobufend - audiobuf;
-
 #ifdef TALK_PARTIAL_LOAD
+    size_t bufsize;
+    char* buf = plugin_get_buffer(&bufsize);
     /* we won't load the full file, we only need the index */
-    load_voicefile(true);
+    load_voicefile(true, buf, bufsize);
     if (!p_voicefile)
         return;
 
@@ -681,6 +706,9 @@ void talk_init(void)
     p_voicefile = NULL; /* Don't pretend we can load talk clips just yet */
 #endif
 
+
+    /* test if we can open and if it fits in the audiobuffer */
+    size_t audiobufsz = buffer_available();
     if (voicefile_size <= audiobufsz) {
         has_voicefile = true;
     } else {
@@ -688,6 +716,7 @@ void talk_init(void)
         voicefile_size = 0;
     }
 
+    alloc_thumbnail_buf();
     close(filehandle); /* close again, this was just to detect presence */
     filehandle = -1;
 }
@@ -703,8 +732,22 @@ bool talk_voice_required(void)
 #endif
 
 /* return size of voice file */
-int talk_get_bufsize(void)
+int talk_get_buffer(void)
 {
+    return voicefile_size;
+}
+
+/* Sets the buffer for the voicefile and returns how many bytes of this
+ * buffer we will use for the voicefile */
+size_t talkbuf_init(char *bufstart)
+{
+    bool changed = voicebuf != bufstart;
+
+    if (bufstart)
+        voicebuf = bufstart;
+    if (changed) /* must reload voice file */
+        reset_state();
+
     return voicefile_size;
 }
 
@@ -741,7 +784,7 @@ int talk_id(int32_t id, bool enqueue)
 #endif
 
     if (p_voicefile == NULL && has_voicefile)
-        load_voicefile(false); /* reload needed */
+        load_voicefile(false, voicebuf, voicefile_size); /* reload needed */
 
     if (p_voicefile == NULL) /* still no voices? */
         return -1;
@@ -819,7 +862,7 @@ static int _talk_file(const char* filename,
 #endif
 
     if (p_thumbnail == NULL || size_for_thumbnail <= 0)
-        return -1;
+        alloc_thumbnail_buf();
 
 #if CONFIG_CODEC != SWCODEC
     if(mp3info(&info, filename)) /* use this to find real start */

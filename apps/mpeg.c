@@ -37,6 +37,7 @@
 #include "mp3data.h"
 #include "buffer.h"
 #include "mp3_playback.h"
+#include "talk.h"
 #include "sound.h"
 #include "bitswap.h"
 #include "appevents.h"
@@ -144,19 +145,19 @@ static unsigned int mpeg_errno;
 static bool playing = false;    /* We are playing an MP3 stream */
 static bool is_playing = false; /* We are (attempting to) playing MP3 files */
 static bool paused;             /* playback is paused */
+static char* mpeg_audiobuf;     /* the audio buffer */
+static long audiobuflen;        /* length of the audio buffer */
 
 #ifdef SIMULATOR
 static char mpeg_stack[DEFAULT_STACK_SIZE];
 static struct mp3entry taginfo;
-
 #else /* !SIMULATOR */
 static struct event_queue mpeg_queue SHAREDBSS_ATTR;
 static long mpeg_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 
-static int audiobuflen;
 static int audiobuf_write;
 static int audiobuf_swapwrite;
-static int audiobuf_read;
+static long audiobuf_read;
 
 static int mpeg_file;
 
@@ -490,6 +491,18 @@ unsigned long mpeg_get_last_header(void)
 #endif /* !SIMULATOR */
 }
 
+
+unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
+{
+    (void)talk_buf; /* always grab the voice buffer for now */
+
+    audio_hard_stop();
+    if (buffer_size) /* special case for talk_init() */
+        return buffer_get_buffer(buffer_size);
+    return NULL;
+}
+
+
 #ifndef SIMULATOR
 /* Send callback events to notify about removing old tracks. */
 static void generate_unbuffer_events(void)
@@ -708,7 +721,7 @@ void rec_tick(void)
                 
             xor_b(0x08, &PADRH);                 /* Set PR inactive */
 
-            audiobuf[audiobuf_write++] = data;
+            mpeg_audiobuf[audiobuf_write++] = data;
 
             if (audiobuf_write >= audiobuflen)
                 audiobuf_write = 0;
@@ -825,7 +838,7 @@ static void transfer_end(unsigned char** ppbuf, size_t* psize)
             }
 
             *psize = last_dma_chunk_size & 0xffff;
-            *ppbuf = audiobuf + audiobuf_read;
+            *ppbuf = mpeg_audiobuf + audiobuf_read;
             track = get_trackdata(0);
             if(track)
                 track->id3.offset += last_dma_chunk_size;
@@ -1128,7 +1141,7 @@ static void start_playback_if_ready(void)
             playing = true;
 
             last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
-            mp3_play_data(audiobuf + audiobuf_read, last_dma_chunk_size, transfer_end);
+            mp3_play_data(mpeg_audiobuf + audiobuf_read, last_dma_chunk_size, transfer_end);
             dma_underrun = false;
 
             if (!paused)
@@ -1173,7 +1186,7 @@ static bool swap_one_chunk(void)
         amount_to_swap = MIN(audiobuf_write - audiobuf_swapwrite,
                              amount_to_swap);
 
-    bitswap(audiobuf + audiobuf_swapwrite, amount_to_swap);
+    bitswap(mpeg_audiobuf + audiobuf_swapwrite, amount_to_swap);
 
     audiobuf_swapwrite += amount_to_swap;
     if(audiobuf_swapwrite >= audiobuflen)
@@ -1341,7 +1354,7 @@ static void mpeg_thread(void)
                     track_change();
                     audiobuf_read = get_trackdata(0)->mempos;
                     last_dma_chunk_size = MIN(0x2000, get_unplayed_space_current_song());
-                    mp3_play_data(audiobuf + audiobuf_read, last_dma_chunk_size, transfer_end);
+                    mp3_play_data(mpeg_audiobuf + audiobuf_read, last_dma_chunk_size, transfer_end);
                     dma_underrun = false;
                     last_dma_tick = current_tick;
 
@@ -1501,7 +1514,7 @@ static void mpeg_thread(void)
                         /* resume will start at new position */
                         last_dma_chunk_size = 
                             MIN(0x2000, get_unplayed_space_current_song());
-                        mp3_play_data(audiobuf + audiobuf_read, 
+                        mp3_play_data(mpeg_audiobuf + audiobuf_read, 
                             last_dma_chunk_size, transfer_end);
                         dma_underrun = false;
                     }
@@ -1632,7 +1645,7 @@ static void mpeg_thread(void)
                 {
                     DEBUGF("R\n");
                     t1 = current_tick;
-                    len = read(mpeg_file, audiobuf + audiobuf_write,
+                    len = read(mpeg_file, mpeg_audiobuf + audiobuf_write,
                                amount_to_read);
                     if(len > 0)
                     {
@@ -1659,7 +1672,7 @@ static void mpeg_thread(void)
                                 if(tagptr >= audiobuflen)
                                     tagptr -= audiobuflen;
 
-                                if(audiobuf[tagptr] != tag[i])
+                                if(mpeg_audiobuf[tagptr] != tag[i])
                                 {
                                     taglen = 0;
                                     break;
@@ -1773,19 +1786,20 @@ static void mpeg_thread(void)
                         startpos = prerecord_buffer[startpos].mempos;
 
                         DEBUGF("Start looking at address %x (%x)\n",
-                               audiobuf+startpos, startpos);
+                               mpeg_audiobuf+startpos, startpos);
 
                         saved_header = mpeg_get_last_header();
                         
                         mem_find_next_frame(startpos, &offset, 1800,
-                                            saved_header);
+                                            saved_header, mpeg_audiobuf,
+                                            audiobuflen);
 
                         audiobuf_read = startpos + offset;
                         if(audiobuf_read >= audiobuflen)
                             audiobuf_read -= audiobuflen;
 
                         DEBUGF("New audiobuf_read address: %x (%x)\n",
-                               audiobuf+audiobuf_read, audiobuf_read);
+                               mpeg_audiobuf+audiobuf_read, audiobuf_read);
 
                         level = disable_irq_save();
                         num_rec_bytes = get_unsaved_space();
@@ -1894,7 +1908,8 @@ static void mpeg_thread(void)
                             save_endpos += audiobuflen;
 
                         rc = mem_find_next_frame(save_endpos, &offset, 1800,
-                                                 saved_header);
+                                                 saved_header, mpeg_audiobuf,
+                                                 audiobuflen);
                         if (!rc) /* No header found, save whole buffer */
                             offset = 1800;
 
@@ -1936,7 +1951,7 @@ static void mpeg_thread(void)
 #elif MEMORYSIZE == 8
                     amount_to_save = MIN(0x100000, amount_to_save);
 #endif
-                    rc = write(mpeg_file, audiobuf + audiobuf_read,
+                    rc = write(mpeg_file, mpeg_audiobuf + audiobuf_read,
                                amount_to_save);
                     if (rc < 0)
                     {
@@ -2256,21 +2271,21 @@ static void prepend_header(void)
     if(audiobuf_read < 0)
     {
         /* Clear the bottom half */
-        memset(audiobuf, 0, audiobuf_read + MPEG_RESERVED_HEADER_SPACE);
+        memset(mpeg_audiobuf, 0, audiobuf_read + MPEG_RESERVED_HEADER_SPACE);
 
         /* And the top half */
         audiobuf_read += audiobuflen;
-        memset(audiobuf + audiobuf_read, 0, audiobuflen - audiobuf_read);
+        memset(mpeg_audiobuf + audiobuf_read, 0, audiobuflen - audiobuf_read);
     }
     else
     {
-        memset(audiobuf + audiobuf_read, 0, MPEG_RESERVED_HEADER_SPACE);
+        memset(mpeg_audiobuf + audiobuf_read, 0, MPEG_RESERVED_HEADER_SPACE);
     }
     /* Copy the empty ID3 header */
     startpos = audiobuf_read;
     for(i = 0; i < sizeof(empty_id3_header); i++)
     {
-        audiobuf[startpos++] = empty_id3_header[i];
+        mpeg_audiobuf[startpos++] = empty_id3_header[i];
         if(startpos == audiobuflen)
             startpos = 0;
     }
@@ -2297,7 +2312,8 @@ static void update_header(void)
         /* saved_header is saved right before stopping the MAS */
         framelen = create_xing_header(fd, 0, last_rec_bytes, xing_buffer,
                                       frames, last_rec_time * (1000/HZ),
-                                      saved_header, NULL, false);
+                                      saved_header, NULL, false,
+                                      mpeg_audiobuf, audiobuflen);
 
         lseek(fd, MPEG_RESERVED_HEADER_SPACE - framelen, SEEK_SET);
         write(fd, xing_buffer, framelen);
@@ -2645,8 +2661,22 @@ void audio_set_recording_options(struct audio_recording_options *options)
 #endif /* SIMULATOR */
 #endif /* CONFIG_CODEC == MAS3587F */
 
+static void audio_reset_buffer(void)
+{
+    size_t bufsize; /* dont break strict-aliasing */
+    talk_buffer_steal(); /* will use the mp3 buffer */
+
+    /* release buffer on behalf of any audio_get_buffer() caller,
+     * non-fatal if there was none */
+    buffer_release_buffer(0);
+    /* re-aquire */
+    mpeg_audiobuf = buffer_get_buffer(&bufsize);
+    audiobuflen = bufsize;
+}
+
 void audio_play(long offset)
 {
+    audio_reset_buffer();
 #ifdef SIMULATOR
     char name_buf[MAX_PATH+1];
     const char* trackname;
@@ -2676,7 +2706,6 @@ void audio_play(long offset)
     } while(1);
 #else /* !SIMULATOR */
     is_playing = true;
-
     queue_post(&mpeg_queue, MPEG_PLAY, offset);
 #endif /* !SIMULATOR */
 
@@ -2700,12 +2729,22 @@ void audio_stop(void)
     is_playing = false;
     playing = false;
 #endif /* SIMULATOR */
+    /* give voice our entire buffer */
+    talkbuf_init(mpeg_audiobuf);
 }
 
 /* dummy */
 void audio_stop_recording(void)
 {
     audio_stop(); 
+}
+
+void audio_hard_stop(void)
+{
+    audio_stop();
+    /* tell voice we obtain the buffer before freeing */
+    talk_buffer_steal();
+    buffer_release_buffer(0);
 }
 
 void audio_pause(void)
@@ -2864,8 +2903,12 @@ void audio_init(void)
     if (global_settings.cuesheet)
         curr_cuesheet = (struct cuesheet*)buffer_alloc(sizeof(struct cuesheet));
 
+    size_t bufsize; /* don't break strict-aliasing */
+    mpeg_audiobuf = buffer_get_buffer(&bufsize);
+    audiobuflen = bufsize;
+    /* give voice buffer until we start to play */
+    talkbuf_init(mpeg_audiobuf);
 #ifndef SIMULATOR
-    audiobuflen = audiobufend - audiobuf;
     queue_init(&mpeg_queue, true);
 #endif /* !SIMULATOR */
     create_thread(mpeg_thread, mpeg_stack,

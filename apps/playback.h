@@ -75,7 +75,6 @@ int audio_track_count(void);
 long audio_filebufused(void);
 void audio_pre_ff_rewind(void);
 void audio_skip(int direction);
-void audio_hard_stop(void); /* Stops audio from serving playback */
 
 void audio_set_cuesheet(int enable);
 #ifdef HAVE_CROSSFADE

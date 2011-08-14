@@ -744,16 +744,25 @@ static void audio_reset_buffer(void)
     /* see audio_get_recording_buffer if this is modified */
     logf("%s()", __func__);
 
+    /* release the buffer on behalf of any caller of audio_get_buffer() */
+    buffer_release_buffer(0);
+
     /* If the setup of anything allocated before the file buffer is
        changed, do check the adjustments after the buffer_alloc call
        as it will likely be affected and need sliding over */
 
     /* Initially set up file buffer as all space available */
-    unsigned char *filebuf = audiobuf + talk_get_bufsize();
-    size_t filebuflen = audiobufend - filebuf;
-    size_t allocsize;
+    size_t filebuflen, allocsize;
+    unsigned char *filebuf = buffer_get_buffer(&filebuflen);
 
-    ALIGN_BUFFER(filebuf, filebuflen, sizeof (intptr_t));
+    /* Subtract whatever voice needs */
+    allocsize = talkbuf_init(filebuf);
+    allocsize = ALIGN_UP(allocsize, sizeof (intptr_t));
+    if (allocsize > filebuflen)
+        goto bufpanic;
+
+    filebuf += allocsize;
+    filebuflen -= allocsize;
 
     if (talk_voice_required())
     {
@@ -3335,6 +3344,7 @@ void audio_hard_stop(void)
 #ifdef PLAYBACK_VOICE
     voice_stop();
 #endif
+    buffer_release_buffer(0);
 }
 
 /* Resume playback if paused */
@@ -3441,7 +3451,7 @@ void audio_flush_and_reload_tracks(void)
    voicing */
 unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
-    unsigned char *buf, *end;
+    unsigned char *buf;
 
     if (audio_is_initialized)
     {
@@ -3461,7 +3471,7 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
            || !talk_voice_required())
     {
         logf("get buffer: talk, audio");
-        /* Ok to use everything from audiobuf to audiobufend - voice is loaded,
+        /* Ok to use everything from audiobuf - voice is loaded,
            the talk buffer is not needed because voice isn't being used, or
            could be AUDIOBUF_STATE_TRASHED already. If state is
            AUDIOBUF_STATE_VOICED_ONLY, no problem as long as memory isn't
@@ -3474,9 +3484,7 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
             talk_buffer_steal();
             buffer_state = AUDIOBUF_STATE_TRASHED;
         }
-
-        buf = audiobuf;
-        end = audiobufend;
+        buf = buffer_get_buffer(buffer_size);
     }
     else
     {
@@ -3485,13 +3493,17 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
         /* Skip talk buffer and move pcm buffer to end to maximize available
            contiguous memory - no audio running means voice will not need the
            swap space */
+        size_t siz, talkbuf_size;
         logf("get buffer: audio");
-        buf = audiobuf + talk_get_bufsize();
-        end = audiobufend - voicebuf_init(audiobufend);
+        /* call buffer_get_buffer() to make use of the locking mechanism */
+        buf = buffer_get_buffer(&siz);
+        buf += talkbuf_size = talkbuf_init(buf);
+        siz -= talkbuf_size;
+        siz -= voicebuf_init(buf + siz);
+        *buffer_size = siz;
+
         buffer_state = AUDIOBUF_STATE_VOICED_ONLY;
     }
-
-    *buffer_size = end - buf;
 
     return buf;
 }
@@ -3500,14 +3512,11 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
 /* Stop audio, voice and obtain all available buffer space */
 unsigned char * audio_get_recording_buffer(size_t *buffer_size)
 {
-    audio_hard_stop();
     talk_buffer_steal();
+    audio_hard_stop();
 
-    unsigned char *end = audiobufend;
     buffer_state = AUDIOBUF_STATE_TRASHED;
-    *buffer_size = end - audiobuf;
-
-    return (unsigned char *)audiobuf;
+    return buffer_get_buffer(buffer_size);
 }
 #endif /* HAVE_RECORDING */
 

@@ -157,14 +157,15 @@ static bool vbr_fix(const char *selected_file)
     xingupdate(0);
 
     num_frames = rb->count_mp3_frames(fd, entry.first_frame_offset,
-                                      flen, xingupdate);
+                                      flen, xingupdate, audiobuf, audiobuflen);
 
     if(num_frames) {
         /* Note: We don't need to pass a template header because it will be
            taken from the mpeg stream */
         framelen = rb->create_xing_header(fd, entry.first_frame_offset,
                                           flen, xingbuf, num_frames, 0,
-                                          0, xingupdate, true);
+                                          0, xingupdate, true,
+                                          audiobuf, audiobuflen);
         
         /* Try to fit the Xing header first in the stream. Replace the existing
            VBR header if there is one, else see if there is room between the

@@ -828,12 +828,14 @@ struct plugin_api {
 #endif /* CONFIG_CODEC == SWCODEC */
     bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
     bool (*mp3info)(struct mp3entry *entry, const char *filename);
-    int (*count_mp3_frames)(int fd, int startpos, int filesize,
-                            void (*progressfunc)(int));
+    int (*count_mp3_frames)(int fd,  int startpos,  int filesize,
+                     void (*progressfunc)(int),
+                     unsigned char* buf, size_t buflen);
     int (*create_xing_header)(int fd, long startpos, long filesize,
             unsigned char *buf, unsigned long num_frames,
             unsigned long rec_time, unsigned long header_template,
-            void (*progressfunc)(int), bool generate_toc);
+            void (*progressfunc)(int), bool generate_toc,
+            unsigned char* tempbuf, size_t tempbuf_len);
     unsigned long (*find_next_frame)(int fd, long *offset,
             long max_offset, unsigned long reference_header);
 

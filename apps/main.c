@@ -337,11 +337,11 @@ static void init_tagcache(void)
 static void init(void)
 {
     system_init();
+    buffer_init();
     kernel_init();
 #ifdef APPLICATION
     paths_init();
 #endif
-    buffer_init();
     enable_irq();
     lcd_init();
 #ifdef HAVE_REMOTE_LCD
@@ -428,13 +428,7 @@ static void init(void)
 #endif
 
     system_init();
-#if defined(IPOD_VIDEO)
-    audiobufend=(unsigned char *)audiobufend_lds;
-    if(MEMORYSIZE==64 && probed_ramsize!=64)
-    {
-        audiobufend -= (32<<20);
-    }
-#endif
+    buffer_init();
     kernel_init();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -445,7 +439,6 @@ static void init(void)
     cpu_boost(true);
 #endif
     
-    buffer_init();
 
     settings_reset();
 

@@ -533,13 +533,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     {
         /* use mp3 buffer for maximum load speed */
         audio_stop();
-#if CONFIG_CODEC != SWCODEC
-        talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
-        buflen = (audiobufend - audiobuf);
-        buffer = (char *)audiobuf;
-#else
-        buffer = (char *)audio_get_buffer(false, &buflen);
-#endif
+        buffer = audio_get_buffer(false, &buflen);
     }
 
     store_index = true;
@@ -2018,13 +2012,7 @@ int playlist_resume(void)
     bool sorted = true;
 
     /* use mp3 buffer for maximum load speed */
-#if CONFIG_CODEC != SWCODEC
-    talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
-    buflen = (audiobufend - audiobuf);
-    buffer = (char *)audiobuf;
-#else
     buffer = (char *)audio_get_buffer(false, &buflen);
-#endif
 
     empty_playlist(playlist, true);
 
@@ -2448,10 +2436,6 @@ void playlist_start(int start_index, int offset)
     previous_music_is_wps();
 
     playlist->index = start_index;
-
-#if CONFIG_CODEC != SWCODEC
-    talk_buffer_steal(); /* will use the mp3 buffer */
-#endif
 
     playlist->started = true;
     sync_control(playlist, false);

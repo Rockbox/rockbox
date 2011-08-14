@@ -51,6 +51,8 @@
 void audio_init(void) INIT_ATTR;
 void audio_play(long offset);
 void audio_stop(void);
+/* Stops audio from serving playback and frees resources*/
+void audio_hard_stop(void);
 void audio_pause(void);
 void audio_resume(void);
 void audio_next(void);
@@ -68,11 +70,11 @@ void audio_error_clear(void);
 int audio_get_file_pos(void);
 void audio_beep(int duration);
 
-#if CONFIG_CODEC == SWCODEC
 /* Required call when audio buffer is required for some other purpose */
+/* implemented in apps but called from firmware(!) */
 unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size); 
-/* only implemented in playback.c, but called from firmware */
 
+#if CONFIG_CODEC == SWCODEC
 void audio_next_dir(void);
 void audio_prev_dir(void);
 

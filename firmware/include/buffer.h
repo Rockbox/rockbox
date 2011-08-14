@@ -22,21 +22,13 @@
 #define BUFFER_H
 
 #include "config.h"
-/* defined in linker script */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#if defined(IPOD_VIDEO)
-extern unsigned char *audiobufend_lds[];
-unsigned char *audiobufend;
-#else
-extern unsigned char audiobufend[];
-#endif
-#else
-extern unsigned char *audiobufend;
-#endif
-
-extern unsigned char *audiobuf;
 
 void buffer_init(void) INIT_ATTR;
+
+void* buffer_get_buffer(size_t *size);
+void buffer_release_buffer(size_t size);
+size_t buffer_available(void);
+
 void *buffer_alloc(size_t size);
 
 #ifdef BUFFER_ALLOC_DEBUG

@@ -107,7 +107,7 @@ static char curpath[TAG_MAXLEN+32];
 /* Used when removing duplicates. */
 static char *tempbuf;     /* Allocated when needed. */
 static long tempbufidx;   /* Current location in buffer. */
-static long tempbuf_size; /* Buffer size (TEMPBUF_SIZE). */
+static size_t tempbuf_size; /* Buffer size (TEMPBUF_SIZE). */
 static long tempbuf_left; /* Buffer space left. */
 static long tempbuf_pos;
 
@@ -3089,9 +3089,7 @@ static void allocate_tempbuf(void)
     tempbuf_size = 32*1024*1024;
     tempbuf = malloc(tempbuf_size);
 #else
-    tempbuf = (char *)(((long)audiobuf & ~0x03) + 0x04);
-    tempbuf_size = (long)audiobufend - (long)audiobuf - 4;
-    audiobuf += tempbuf_size;
+    buffer_get_buffer(&tempbuf_size);
 #endif
 }
 
@@ -3103,7 +3101,7 @@ static void free_tempbuf(void)
 #ifdef __PCTOOL__
     free(tempbuf);
 #else
-    audiobuf -= tempbuf_size;
+    buffer_release_buffer(0);
 #endif
     tempbuf = NULL;
     tempbuf_size = 0;
