@@ -3089,7 +3089,7 @@ static void allocate_tempbuf(void)
     tempbuf_size = 32*1024*1024;
     tempbuf = malloc(tempbuf_size);
 #else
-    buffer_get_buffer(&tempbuf_size);
+    tempbuf = buffer_get_buffer(&tempbuf_size);
 #endif
 }
 
