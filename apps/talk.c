@@ -41,6 +41,7 @@
 #include "logf.h"
 #include "bitswap.h"
 #include "structec.h"
+#include "plugin.h" /* plugin_get_buffer() */
 #include "debug.h"
 
 
@@ -290,7 +291,7 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
     };
     union voicebuf voicebuf;
 
-    int load_size, alloc_size;
+    size_t load_size, alloc_size;
     int got_size;
 #ifndef TALK_PARTIAL_LOAD
     size_t file_size;
@@ -396,7 +397,7 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
 #ifdef TALK_PARTIAL_LOAD
     alloc_size += silence_len + QUEUE_SIZE;
 #endif
-    if ((size_t)alloc_size > bufsize)
+    if (alloc_size > bufsize)
         goto load_err;
     return;
 

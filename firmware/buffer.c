@@ -31,7 +31,7 @@
 
 /* defined in linker script */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#if defined(IPOD_VIDEO)
+#if defined(IPOD_VIDEO) && !defined(BOOTLOADER)
 extern unsigned char *audiobufend_lds[];
 unsigned char *audiobufend;
 #else /* !IPOD_VIDEO */
@@ -68,8 +68,8 @@ void buffer_init(void)
 {
     /* 32-bit aligned */
     audiobuf = (void *)(((unsigned long)audiobuffer + 3) & ~3);
-    
-#if defined(IPOD_VIDEO)
+
+#if defined(IPOD_VIDEO) && !defined(BOOTLOADER) && !defined(SIMULATOR)
     audiobufend=(unsigned char *)audiobufend_lds;
     if(MEMORYSIZE==64 && probed_ramsize!=64)
     {
@@ -92,7 +92,6 @@ static volatile int lock;
  * Note that this does not modify the buffer position (buffer_release_buffer()
  * does), so call this if you want to aquire temporary memory
  **/
-#define _ALIGN (sizeof(char*))
 void *buffer_get_buffer(size_t *size)
 {
     if (lock)

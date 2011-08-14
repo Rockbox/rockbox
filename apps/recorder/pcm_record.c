@@ -392,12 +392,11 @@ void pcm_rec_init(void)
 /**
  * Initializes recording - call before calling any other recording function
  */
-void audio_init_recording(unsigned int buffer_offset)
+void audio_init_recording(void)
 {
     logf("audio_init_recording");
     queue_send(&pcmrec_queue, PCMREC_INIT, 0);
     logf("audio_init_recording done");
-    (void)buffer_offset;
 } /* audio_init_recording */
 
 /**

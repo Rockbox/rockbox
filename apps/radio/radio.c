@@ -397,7 +397,7 @@ void radio_screen(void)
 
 #if CONFIG_CODEC != SWCODEC
     rec_create_directory();
-    audio_init_recording(talk_get_bufsize());
+    audio_init_recording();
 
     sound_settings_apply();
     /* Yes, we use the D/A for monitoring */

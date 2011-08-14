@@ -2126,9 +2126,8 @@ void audio_init_playback(void)
 /****************************************************************************
  * Recording functions
  ***************************************************************************/
-void audio_init_recording(unsigned int buffer_offset)
+void audio_init_recording(void)
 {
-    buffer_offset = buffer_offset;
     init_recording_done = false;
     queue_post(&mpeg_queue, MPEG_INIT_RECORDING, 0);
 
@@ -2648,7 +2647,7 @@ void audio_set_recording_gain(int left, int right, int type)
     (void)right;
     (void)type;
 }
-void audio_init_recording(unsigned int buffer_offset)
+void audio_init_recording(void)
 {
     /* a dummy */
     (void)buffer_offset;

@@ -1112,7 +1112,7 @@ bool recording_screen(bool no_source)
 #if CONFIG_CODEC == SWCODEC
     audio_close_recording();
 #endif
-    audio_init_recording(0);
+    audio_init_recording();
     sound_set_volume(global_settings.volume);
 
 #if CONFIG_RTC == 0
@@ -1213,7 +1213,7 @@ bool recording_screen(bool no_source)
 
 #if CONFIG_CODEC == SWCODEC
             audio_close_recording();
-            audio_init_recording(0);
+            audio_init_recording();
 #endif
 
             rec_init_recording_options(&rec_options);

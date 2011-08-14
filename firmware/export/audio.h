@@ -193,7 +193,7 @@ struct audio_recording_options
 };
 
 /* audio recording functions */
-void audio_init_recording(unsigned int buffer_offset);
+void audio_init_recording(void);
 void audio_close_recording(void);
 void audio_record(const char *filename);
 void audio_stop_recording(void);
