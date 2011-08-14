@@ -143,10 +143,6 @@ int get_cpu_boost_counter(void);
 #undef swap32
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(PLATFORM_HAS_VOLUME_CHANGE)
-int hosted_get_volume(void);
-#endif
-
 /* Get the byte offset of a type's member */
 #define OFFSETOF(type, membername) ((off_t)&((type *)0)->membername)
 

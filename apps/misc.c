@@ -622,7 +622,9 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
         case SYS_VOLUME_CHANGED:
         {
             static bool firstvolume = true;
-            int volume = hosted_get_volume();
+            /* kludge: since this events go to the button_queue,
+             * event data is available in the last button data */
+            int volume = button_get_data();
             DEBUGF("SYS_VOLUME_CHANGED: %d\n", volume);
             if (global_settings.volume != volume) {
                 global_settings.volume = volume;
