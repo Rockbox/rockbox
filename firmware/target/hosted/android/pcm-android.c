@@ -155,8 +155,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     /* NOTE: due to how pcm_play_get_more_callback() works, this is
-     * possibly called from writeNative(), i.e. another thread.
-     * => We need to discover the env_ptr */
+     * possibly called from nativeWrite(), i.e. another (host) thread
+     * => need to discover the appropriate JNIEnv* */
     JNIEnv* env = getJavaEnvironment();
     (*env)->CallVoidMethod(env,
                            RockboxPCM_instance,
