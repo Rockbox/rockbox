@@ -77,7 +77,7 @@
 %xl(F,playmode-800x480x16.bmp,0,0,5)
 %?Tp<%?mp<%xd(F, 1)|%xd(F, 3)|%xd(F, 2)|%xd(F, 4)|%xd(F, 5)||||>|%xd(F, %mp)>
 %T(0,0,70,70,play)
-%T(0,0,70,70,stop, repeat)
+%T(0,0,70,70,stop, repeat_press)
 
 #
 # popup osd menu
@@ -96,7 +96,7 @@
 %xl(H,rew-800x480x16.bmp,0,5)
 %xl(I,ff-800x480x16.bmp,80,5)
 %xd(H)%xd(I)
-%T(0,0,70,75,rwd, repeat)
+%T(0,0,70,75,rwd, repeat_press)
 %T(0,0,70,75,prev)
-%T(80,0,70,75,ffwd, repeat)
+%T(80,0,70,75,ffwd, repeat_press)
 %T(80,0,70,75,next)

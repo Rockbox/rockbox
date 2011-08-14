@@ -50,7 +50,7 @@
 %?Tp<%?mp<%xd(F, 1)|%xd(F, 3)|%xd(F, 2)|%xd(F, 4)|%xd(F, 5)||||>|%xd(F, %mp)>
 
 %T(206,0,24,24,play)
-%T(206,0,24,24,stop, repeat)
+%T(206,0,24,24,stop, repeat_press)
 %T(182,0,18,92,repmode)
 %T(139,0,37,23,shuffle)
 %T(98,0,33,23,volume)
@@ -69,8 +69,8 @@
 %T(39,5,24,24,pitch)
 %T(58,0,24,24,contextmenu)
 %T(86,0,24,24,quickscreen)
-%T(115,0,24,23,rwd, repeat)
-%T(144,0,24,23,ffwd, repeat)
+%T(115,0,24,23,rwd, repeat_press)
+%T(144,0,24,23,ffwd, repeat_press)
 %T(115,0,24,23,prev)
 %T(144,0,24,23,next)
 
