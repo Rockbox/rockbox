@@ -566,8 +566,13 @@ void write_line(struct screen *display, struct align_pos *format_align,
                    (center_width > scroll_width) ||
                    (right_width > scroll_width)))
     {
+#ifdef HAVE_LCD_BITMAP
         display->puts_scroll_style(0, line,
                              (unsigned char *)format_align->left, style);
+#else
+        display->puts_scroll(0, line,
+                             (unsigned char *)format_align->left);
+#endif
     }
     else
     {
