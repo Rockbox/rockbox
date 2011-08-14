@@ -677,9 +677,7 @@ void talk_init(void)
 
     voicefile_size = filesize(filehandle);
     
-#if CONFIG_CODEC == SWCODEC
     audio_get_buffer(false, NULL);  /* Must tell audio to reinitialize */
-#endif
     reset_state(); /* use this for most of our inits */
 
 #ifdef TALK_PARTIAL_LOAD
@@ -744,10 +742,10 @@ size_t talkbuf_init(char *bufstart)
 {
     bool changed = voicebuf != bufstart;
 
-    if (bufstart)
-        voicebuf = bufstart;
     if (changed) /* must reload voice file */
         reset_state();
+    if (bufstart)
+        voicebuf = bufstart;
 
     return voicefile_size;
 }
