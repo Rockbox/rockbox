@@ -29,7 +29,6 @@
 #include "audiohw.h"
 #include "system.h"
 #include "settings.h"
-#include "debug.h"
 
 #include "playback.h"
 #include "kernel.h"

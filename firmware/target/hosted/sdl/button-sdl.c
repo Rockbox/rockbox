@@ -30,7 +30,6 @@
 #include "backlight.h"
 #include "system.h"
 #include "button-sdl.h"
-#include "backlight.h"
 #include "sim_tasks.h"
 #include "buttonmap.h"
 #include "debug.h"

@@ -34,7 +34,6 @@
 #include "lang.h"
 #include "dir.h"
 #include "lcd-remote.h"
-#include "system.h"
 #include "timefuncs.h"
 #include "screens.h"
 #include "usb_screen.h"

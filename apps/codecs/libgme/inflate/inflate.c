@@ -41,7 +41,6 @@
 #include "mallocer.h"
 #include "bbfuncs.h"
 #include "inflate.h"
-#include "mallocer.h"
 
 #define TRIM_FILE_ON_ERROR 1
 
