@@ -55,6 +55,7 @@ struct skin_draw_info {
     struct skin_viewport *skin_vp;
     int line_number;
     unsigned long refresh_type;
+    unsigned text_style;
     
     char* cur_align_start;
     struct align_pos align;
@@ -104,6 +105,19 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         {
             struct viewport_colour *col = token->value.data;
             col->vp->bg_pattern = col->colour;
+        }
+        break;
+        case SKIN_TOKEN_VIEWPORT_TEXTSTYLE:
+            info->text_style = token->value.l;
+            break;
+#endif
+#ifdef HAVE_LCD_COLOR
+        case SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP:
+        {
+            struct gradient_config *cfg = token->value.data;
+            vp->lss_pattern = cfg->start;
+            vp->lse_pattern = cfg->end;
+            vp->lst_pattern = cfg->text;
         }
         break;
 #endif
@@ -614,7 +628,8 @@ static void skin_render_viewport(struct skin_element* viewport, struct gui_wps *
         .line_scrolls = false,
         .refresh_type = refresh_type,
         .skin_vp = skin_viewport,
-        .offset = 0
+        .offset = 0,
+        .text_style = STYLE_DEFAULT
     };
     
     struct align_pos * align = &info.align;
@@ -636,7 +651,17 @@ static void skin_render_viewport(struct skin_element* viewport, struct gui_wps *
         info.no_line_break = false;
         info.line_scrolls = false;
         info.force_redraw = false;
-    
+#ifdef HAVE_LCD_COLOR
+        if (info.text_style&STYLE_GRADIENT)
+        {
+            int cur = CURLN_UNPACK(info.text_style);
+            int num = NUMLN_UNPACK(info.text_style);
+            if (cur+1 == num)
+                info.text_style = STYLE_DEFAULT;
+            else
+                info.text_style = STYLE_GRADIENT|CURLN_PACK(cur+1)|NUMLN_PACK(num);
+        }
+#endif    
         info.cur_align_start = info.buf;
         align->left = info.buf;
         align->center = NULL;
@@ -668,10 +693,10 @@ static void skin_render_viewport(struct skin_element* viewport, struct gui_wps *
                 /* if the line is a scrolling one we don't want to update
                    too often, so that it has the time to scroll */
                 if ((refresh_type & SKIN_REFRESH_SCROLL) || info.force_redraw)
-                    write_line(display, align, info.line_number, true);
+                    write_line(display, align, info.line_number, true, info.text_style);
             }
             else
-                write_line(display, align, info.line_number, false);
+                write_line(display, align, info.line_number, false, info.text_style);
         }
         if (!info.no_line_break)
             info.line_number++;
@@ -716,6 +741,11 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
         skin_viewport->vp.fg_pattern = skin_viewport->start_fgcolour;
         skin_viewport->vp.bg_pattern = skin_viewport->start_bgcolour;
+#endif
+#ifdef HAVE_LCD_COLOR
+        skin_viewport->vp.lss_pattern = skin_viewport->start_gradient.start;
+        skin_viewport->vp.lse_pattern = skin_viewport->start_gradient.end;
+        skin_viewport->vp.lst_pattern = skin_viewport->start_gradient.text;
 #endif
         
         /* dont redraw the viewport if its disabled */
@@ -772,7 +802,8 @@ static __attribute__((noinline)) void skin_render_playlistviewer(struct playlist
         .line_scrolls = false,
         .refresh_type = refresh_type,
         .skin_vp = skin_viewport,
-        .offset = viewer->start_offset
+        .offset = viewer->start_offset,
+        .text_style = STYLE_DEFAULT
     };
     
     struct align_pos * align = &info.align;
@@ -829,10 +860,10 @@ static __attribute__((noinline)) void skin_render_playlistviewer(struct playlist
                 /* if the line is a scrolling one we don't want to update
                    too often, so that it has the time to scroll */
                 if ((refresh_type & SKIN_REFRESH_SCROLL) || info.force_redraw)
-                    write_line(display, align, info.line_number, true);
+                    write_line(display, align, info.line_number, true, info.text_style);
             }
             else
-                write_line(display, align, info.line_number, false);
+                write_line(display, align, info.line_number, false, info.text_style);
         }
         info.line_number++;
         info.offset++;

@@ -453,6 +453,77 @@ static int parse_playlistview(struct skin_element *element,
     return 0;
 }
 #endif
+#ifdef HAVE_LCD_COLOR
+static int parse_viewport_gradient_setup(struct skin_element *element,
+                                   struct wps_token *token,
+                                   struct wps_data *wps_data)
+{
+    (void)wps_data;
+    struct gradient_config *cfg;
+    if (element->params_count < 2) /* only start and end are required */
+        return 1;
+    cfg = (struct gradient_config *)skin_buffer_alloc(sizeof(struct gradient_config)); 
+    if (!cfg)
+        return 1;
+    if (!parse_color(curr_screen, element->params[0].data.text, &cfg->start) ||
+        !parse_color(curr_screen, element->params[1].data.text, &cfg->end))
+        return 1;
+    if (element->params_count > 2)
+    {
+        if (!parse_color(curr_screen, element->params[2].data.text, &cfg->text))
+            return 1;
+    }
+    else
+    {
+        cfg->text = curr_vp->vp.fg_pattern;
+    }
+
+    token->value.data = cfg;
+    return 0; 
+}
+#endif
+static int parse_viewporttextstyle(struct skin_element *element,
+                                   struct wps_token *token,
+                                   struct wps_data *wps_data)
+{
+    (void)wps_data;
+    int style;
+    char *mode = element->params[0].data.text;
+    unsigned colour;
+    
+    if (!strcmp(mode, "invert"))
+    {
+        style = STYLE_INVERT;
+    }
+    else if (!strcmp(mode, "colour") || !strcmp(mode, "color"))
+    {
+        if (element->params_count < 2 ||
+            !parse_color(curr_screen, element->params[1].data.text, &colour))
+            return 1;
+        style = STYLE_COLORED|(STYLE_COLOR_MASK&colour); 
+    }
+#ifdef HAVE_LCD_COLOR
+    else if (!strcmp(mode, "gradient"))
+    {
+        int num_lines;
+        if (element->params_count < 2)
+            num_lines = 1;
+        else /* atoi() instead of using a number in the parser is because [si]
+              * will select the number for something which looks like a colour
+              * making the "colour" case (above) harder to parse */
+            num_lines = atoi(element->params[1].data.text);
+        style = STYLE_GRADIENT|NUMLN_PACK(num_lines)|CURLN_PACK(0);
+    }
+#endif
+    else if (!strcmp(mode, "clear"))
+    {
+        style = STYLE_DEFAULT;
+    }
+    else
+        return 1;
+    token->value.l = style;
+    return 0;
+}
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 
@@ -1514,6 +1585,11 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     skin_vp->start_fgcolour = skin_vp->vp.fg_pattern;
     skin_vp->start_bgcolour = skin_vp->vp.bg_pattern;
 #endif
+#ifdef HAVE_LCD_COLOR
+    skin_vp->start_gradient.start = skin_vp->vp.lss_pattern;
+    skin_vp->start_gradient.end = skin_vp->vp.lse_pattern;
+    skin_vp->start_gradient.text = skin_vp->vp.lst_pattern;
+#endif
     
 
     struct skin_tag_parameter *param = element->params;
@@ -1682,6 +1758,14 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     break;
                 case SKIN_TOKEN_IMAGE_BACKDROP:
                     function = parse_image_special;
+                    break;
+#endif
+                case SKIN_TOKEN_VIEWPORT_TEXTSTYLE:
+                    function = parse_viewporttextstyle;
+                    break;
+#ifdef HAVE_LCD_COLOR
+                case SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP:
+                    function = parse_viewport_gradient_setup;
                     break;
 #endif
                 case SKIN_TOKEN_TRANSLATEDSTRING:

@@ -192,6 +192,8 @@ static const struct tag_info legal_tags[] =
     
     { SKIN_TOKEN_VIEWPORT_FGCOLOUR,       "Vf" , "s", SKIN_REFRESH_STATIC|NOBREAK },
     { SKIN_TOKEN_VIEWPORT_BGCOLOUR,       "Vb" , "s", SKIN_REFRESH_STATIC|NOBREAK },
+    { SKIN_TOKEN_VIEWPORT_TEXTSTYLE,      "Vs" , "S|s", SKIN_REFRESH_STATIC },
+    { SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP, "Vg" , "SS|s", SKIN_REFRESH_STATIC|NOBREAK },
     
     { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "SIIiii", 0 },
     { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "sIIiii", 0 },

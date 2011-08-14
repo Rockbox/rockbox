@@ -161,6 +161,14 @@ enum wps_parse_error {
     PARSE_FAIL_COND_INVALID_PARAM,
     PARSE_FAIL_LIMITS_EXCEEDED,
 };
+#ifdef HAVE_LCD_COLOR
+struct gradient_config {
+    unsigned start;
+    unsigned end;
+    unsigned text;
+    int lines_count;
+};
+#endif
 
 #define VP_DRAW_HIDEABLE    0x1
 #define VP_DRAW_HIDDEN      0x2
@@ -173,8 +181,13 @@ struct skin_viewport {
     char hidden_flags;
     bool is_infovp;
     char* label;
+#if LCD_DEPTH > 1
     unsigned start_fgcolour;
     unsigned start_bgcolour;
+#ifdef HAVE_LCD_COLOR
+    struct gradient_config start_gradient;
+#endif
+#endif
 };
 struct viewport_colour {
     struct viewport *vp;

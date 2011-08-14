@@ -35,6 +35,7 @@ struct wps_token {
     union {
         char c;
         unsigned short i;
+        long l;
         void* data;
     } value;
 };

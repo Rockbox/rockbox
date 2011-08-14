@@ -48,10 +48,8 @@ int evaluate_conditional(struct gui_wps *gwps, int offset,
    line is the index of the line on the screen.
    scroll indicates whether the line is a scrolling one or not.
 */
-void write_line(struct screen *display,
-                       struct align_pos *format_align,
-                       int line,
-                       bool scroll);
+void write_line(struct screen *display, struct align_pos *format_align,
+                int line, bool scroll, unsigned style);
 void draw_peakmeters(struct gui_wps *gwps, int line_number,
                      struct viewport *viewport);
 #endif

@@ -450,15 +450,12 @@ int evaluate_conditional(struct gui_wps *gwps, int offset,
    line is the index of the line on the screen.
    scroll indicates whether the line is a scrolling one or not.
 */
-void write_line(struct screen *display,
-                       struct align_pos *format_align,
-                       int line,
-                       bool scroll)
+void write_line(struct screen *display, struct align_pos *format_align,
+                int line, bool scroll, unsigned style)
 {
     int left_width = 0, left_xpos;
     int center_width = 0, center_xpos;
     int right_width = 0,  right_xpos;
-    int ypos;
     int space_width;
     int string_height;
     int scroll_width;
@@ -565,22 +562,19 @@ void write_line(struct screen *display,
         right_width = 0;
     }
 
-    ypos = (line * string_height);
-
-
     if (scroll && ((left_width > scroll_width) ||
                    (center_width > scroll_width) ||
                    (right_width > scroll_width)))
     {
-        display->puts_scroll(0, line,
-                             (unsigned char *)format_align->left);
+        display->puts_scroll_style(0, line,
+                             (unsigned char *)format_align->left, style);
     }
     else
     {
 #ifdef HAVE_LCD_BITMAP
         /* clear the line first */
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        display->fillrect(left_xpos, ypos, display->getwidth(), string_height);
+        display->fillrect(left_xpos, line*string_height, display->getwidth(), string_height);
         display->set_drawmode(DRMODE_SOLID);
 #endif
 
@@ -591,18 +585,19 @@ void write_line(struct screen *display,
         /* print aligned strings */
         if (left_width != 0)
         {
-            display->putsxy(left_xpos, ypos,
-                            (unsigned char *)format_align->left);
+            display->puts_style_xyoffset(left_xpos/space_width, line,
+                            (unsigned char *)format_align->left, style, 0, 0);
+
         }
         if (center_width != 0)
         {
-            display->putsxy(center_xpos, ypos,
-                            (unsigned char *)format_align->center);
+            display->puts_style_xyoffset(center_xpos/space_width, line,
+                            (unsigned char *)format_align->center, style, 0, 0);
         }
         if (right_width != 0)
         {
-            display->putsxy(right_xpos, ypos,
-                            (unsigned char *)format_align->right);
+            display->puts_style_xyoffset(right_xpos/space_width, line,
+                            (unsigned char *)format_align->right, style, 0, 0);
         }
     }
 }
