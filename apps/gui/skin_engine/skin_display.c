@@ -581,7 +581,7 @@ void write_line(struct screen *display, struct align_pos *format_align,
         /* Nasty hack: we output an empty scrolling string,
         which will reset the scroller for that line */
         display->puts_scroll(0, line, (unsigned char *)"");
-
+#ifdef HAVE_LCD_BITMAP
         /* print aligned strings */
         if (left_width != 0)
         {
@@ -599,6 +599,23 @@ void write_line(struct screen *display, struct align_pos *format_align,
             display->puts_style_xyoffset(right_xpos/space_width, line,
                             (unsigned char *)format_align->right, style, 0, 0);
         }
+#else
+        if (left_width != 0)
+        {
+            display->putsxy(left_xpos, line,
+                    (unsigned char *)format_align->left);
+        }
+        if (center_width != 0)
+        {
+            display->putsxy(center_xpos, line,
+                    (unsigned char *)format_align->center);
+        }
+        if (right_width != 0)
+        {
+            display->putsxy(right_xpos, line,
+                    (unsigned char *)format_align->right);
+        }
+#endif
     }
 }
 
