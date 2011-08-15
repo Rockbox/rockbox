@@ -35,10 +35,16 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 // Ported again to c by gama.
 // Not sure if performance is better than the original c version.
 
-#if !defined(ROCKBOX)
-	#define YM2612_CALCUL_TABLES
-#else
+#if !defined(YM2612_CALCUL_TABLES)
 	#include "ymtables.h"
+#endif
+
+#ifdef YM2612_CALCUL_TABLES
+    #define FREQ_TAB_LOOKUP g->LFO_FREQ_TAB
+    #define ENV_TAB_LOOKUP g->LFO_ENV_TAB
+#else
+    #define FREQ_TAB_LOOKUP lfo_freq_coeff
+    #define ENV_TAB_LOOKUP lfo_env_coeff
 #endif
 
 const int output_bits = 14;
@@ -540,11 +546,10 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 		impl->g.SIN_TAB [(SIN_LENGHT / 2) + i] = impl->g.SIN_TAB [SIN_LENGHT - i] = TL_LENGHT + j;
 	}
 
+    #ifdef YM2612_CALCUL_TABLES
 	// Tableau LFO (LFO wav) :
-
 	for ( i = 0; i < LFO_LENGHT; i++ )
 	{
-	#ifdef YM2612_CALCUL_TABLES
 		double x = 1 + sin( 2.0 * PI * i * (1.0 / LFO_LENGHT) );    // Sinus
 		x *= 11.8 / ENV_STEP / 2;       // ajusted to MAX enveloppe modulation
 
@@ -554,11 +559,8 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 		x *= (1 << (LFO_HBITS - 1)) - 1;
 
 		impl->g.LFO_FREQ_TAB [i] = (int) x;
-	#else
-		impl->g.LFO_ENV_TAB [i] = lfo_env_coeff [i];
-		impl->g.LFO_FREQ_TAB [i] = lfo_freq_coeff [i];
-	#endif
 	}
+    #endif
 
 	// Tableau Enveloppe :
 	// impl->g.ENV_TAB [0] -> impl->g.ENV_TAB [ENV_LENGHT - 1]              = attack curve
@@ -901,7 +903,7 @@ int YM2612_LFOcnt = g->LFOcnt + YM2612_LFOinc;
  			((temp##x - ch->SLOT [S##x].env_max) >> 31);
 				
 #define GET_ENV \
-int const env_LFO = g->LFO_ENV_TAB [YM2612_LFOcnt >> LFO_LBITS & LFO_MASK]; \
+int const env_LFO = ENV_TAB_LOOKUP [YM2612_LFOcnt >> LFO_LBITS & LFO_MASK]; \
 short const* const ENV_TAB = g->ENV_TAB; \
 CALC_EN( 0 ) \
 CALC_EN( 1 ) \
@@ -923,7 +925,7 @@ int CH_S0_OUT_0 = ch->S0_OUT [0]; \
 CH_OUTd >>= MAX_OUT_BITS - output_bits + 2; \
 
 #define UPDATE_PHASE_CYCLE \
-unsigned freq_LFO = ((g->LFO_FREQ_TAB [YM2612_LFOcnt >> LFO_LBITS & LFO_MASK] * \
+unsigned freq_LFO = ((FREQ_TAB_LOOKUP [YM2612_LFOcnt >> LFO_LBITS & LFO_MASK] * \
 			ch->FMS) >> (LFO_HBITS - 1 + 1)) + (1 << (LFO_FMS_LBITS - 1)); \
 YM2612_LFOcnt += YM2612_LFOinc; \
 in0 += (ch->SLOT [S0].Finc * freq_LFO) >> (LFO_FMS_LBITS - 1); \

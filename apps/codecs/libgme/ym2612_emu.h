@@ -6,6 +6,10 @@
 
 #include "blargg_common.h"
 
+#if !defined(ROCKBOX)
+	#define YM2612_CALCUL_TABLES
+#endif
+
 enum { ym2612_out_chan_count = 2 }; // stereo
 enum { ym2612_channel_count = 6 };
 enum { ym2612_disabled_time = -1 };
@@ -164,9 +168,10 @@ struct tables_t
 	int LFO_INC_TAB [8];                        // LFO step table
 	
 	short ENV_TAB [2 * ENV_LENGHT + 8];         // ENV CURVE TABLE (attack & decay)
-	
+#ifdef YM2612_CALCUL_TABLES
 	short LFO_ENV_TAB [LFO_LENGHT];             // LFO AMS TABLE (adjusted for 11.8 dB)
 	short LFO_FREQ_TAB [LFO_LENGHT];            // LFO FMS TABLE
+#endif
 	int TL_TAB [TL_LENGHT * 2];                 // TOTAL LEVEL TABLE (positif and minus)
 	unsigned int DECAY_TO_ATTACK [ENV_LENGHT];  // Conversion from decay to attack phase
 	unsigned int FINC_TAB [2048];               // Frequency step table
