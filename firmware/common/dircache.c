@@ -864,8 +864,9 @@ int dircache_build(int last_size)
      * free bytes inbetween */
     size_t got_size;
     char* buf = buffer_get_buffer(&got_size);
-    ALIGN_BUFFER(buf, got_size, sizeof(struct dircache_entry));
-    d_names_start = d_names_end = (char*)dircache_root + got_size - 1;
+    dircache_root = (struct dircache_entry*)ALIGN_UP(buf,
+                                                sizeof(struct dircache_entry));
+    d_names_start = d_names_end = buf + got_size - 1;
     dircache_size = 0;
     generate_dot_d_names();
 
@@ -897,8 +898,8 @@ int dircache_build(int last_size)
     dot -= offset;
     dotdot -= offset;
     
-    /* equivalent to dircache_size + DIRCACHE_RESERVE */
-    allocated_size = (d_names_end - (char*)dircache_root);
+    /* equivalent to dircache_size + DIRCACHE_RESERVE + align */
+    allocated_size = (d_names_end - buf);
     reserve_used = 0;
 
     buffer_release_buffer(allocated_size);
