@@ -331,6 +331,7 @@ static inline void usb_slave_mode(bool on)
         if(rc)
             panicf("storage: %d",rc);
 
+        sleep(HZ/10);
         rc = disk_mount_all();
         if(rc <= 0) /* no partition */
             panicf("mount: %d",rc);
