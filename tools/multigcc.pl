@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-use feature "switch";
 use List::Util 'shuffle'; # standard from Perl 5.8 and later
 
 my $tempfile = "multigcc.out";
@@ -26,23 +25,22 @@ my $command = join " ", @params;
 
 # count number of cores
 my $cores;
-given ($^O) {
-    when ("darwin") {
-        chomp($cores = `sysctl -n hw.ncpu`);
-        $cores = 1 if ($?);
+# Don't use given/when here - it's not compatible with old perl versions
+if ($^O eq 'darwin') {
+    chomp($cores = `sysctl -n hw.ncpu`);
+    $cores = 1 if ($?);
+}
+elsif ($^O eq 'solaris') {
+    $cores = scalar grep /on-line/i, `psrinfo`;
+    $cores = 1 if ($?);
+}
+else {
+    if (open CPUINFO, "</proc/cpuinfo") {
+        $cores = scalar grep /^processor/i, <CPUINFO>;
+        close CPUINFO;
     }
-    when ("solaris") {
-        $cores = scalar grep /on-line/i, `psrinfo`;
-        $cores = 1 if ($?);
-    }
-    default {
-        if (open CPUINFO, "</proc/cpuinfo") {
-            $cores = scalar grep /^processor/i, <CPUINFO>;
-            close CPUINFO;
-        }
-        else {
-            $cores = 1;
-        }
+    else {
+        $cores = 1;
     }
 }
 
