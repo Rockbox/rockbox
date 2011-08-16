@@ -14,8 +14,7 @@
 # This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 # KIND, either express or implied.
 #
-# American English language file, translated by:
-# - Steven Panek, 2011
+# American English language file
 
 <phrase>
   id: LANG_SET_BOOL_YES
