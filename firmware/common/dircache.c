@@ -107,7 +107,7 @@ static struct dircache_entry *fd_bindings[MAX_OPEN_FILES];
 static bool dircache_initialized = false;
 static bool dircache_initializing = false;
 static bool thread_enabled = false;
-static unsigned long allocated_size = DIRCACHE_LIMIT;
+static unsigned long allocated_size = 0;
 static unsigned long dircache_size = 0;
 static unsigned long entry_count = 0;
 static unsigned long reserve_used = 0;
@@ -829,7 +829,7 @@ int dircache_build(int last_size)
 #endif
 
     /* Background build, dircache has been previously allocated */
-    if (dircache_size > 0)
+    if (allocated_size > 0)
     {
         d_names_start = d_names_end;
         dircache_size = 0;
