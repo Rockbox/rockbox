@@ -37,8 +37,8 @@ gbs.c
 hes.c
 nsf.c
 sgc.c
-#if MEMORYSIZE > 2
 vgm.c
+#if MEMORYSIZE > 2
 kss.c
 #endif
 

@@ -12,7 +12,6 @@
 #include "ym2612_emu.h"
 #include "sms_apu.h"
 
-typedef short sample_t;
 typedef int vgm_time_t;
 typedef int fm_time_t;
 
@@ -85,7 +84,7 @@ struct Vgm_Emu {
 	int dac_amp;
 	int dac_disabled; // -1 if disabled
 
-	struct Blip_Buffer* blip_buf;
+	struct Blip_Buffer blip_buf;
 
 	// general
 	long clock_rate_;
@@ -124,10 +123,7 @@ struct Vgm_Emu {
 	
 	struct Sms_Apu psg;
 	struct Blip_Synth pcm;
-	struct Stereo_Buffer stereo_buf;
-	
 	struct Resampler resampler;
-	
 	struct Stereo_Buffer buf;
 };
 
