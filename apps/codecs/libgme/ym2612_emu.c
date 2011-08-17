@@ -490,7 +490,7 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 {
 	assert( sample_rate );
 	assert( !clock_rate || clock_rate > sample_rate );
-	
+		
 	int i;
 
 	// 144 = 12 * (prescale * 2) = 12 * 6 * 2
@@ -505,6 +505,7 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 	// [0     -  4095] = +output  [4095  - ...] = +output overflow (fill with 0)
 	// [12288 - 16383] = -output  [16384 - ...] = -output overflow (fill with 0)
 
+#ifdef YM2612_USE_TL_TAB
 	for ( i = 0; i < TL_LENGHT; i++ )
 	{
 		if (i >= PG_CUT_OFF)    // YM2612 cut off sound after 78 dB (14 bits output ?)
@@ -522,6 +523,7 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 			impl->g.TL_TAB [TL_LENGHT + i] = -impl->g.TL_TAB [i];
 		}
 	}
+#endif
 	
 	// Tableau SIN :
 	// impl->g.SIN_TAB [x] [y] = sin(x) * y; 
@@ -908,8 +910,24 @@ short const* const ENV_TAB = g->ENV_TAB; \
 CALC_EN( 0 ) \
 CALC_EN( 1 ) \
 CALC_EN( 2 ) \
-CALC_EN( 3 ) \
-int const* const TL_TAB = g->TL_TAB;
+CALC_EN( 3 )
+
+#ifndef YM2612_USE_TL_TAB
+static inline int tl_level( int i )
+{
+	if (i >= (PG_CUT_OFF + TL_LENGHT)) {
+		return 0;
+	} else if (i >= TL_LENGHT) {
+		return -tl_coeff [i - TL_LENGHT];
+	} else if (i >= PG_CUT_OFF) {
+		return 0;
+	} else
+		return tl_coeff [i];
+}
+#define SINT( i, o ) (tl_level (g->SIN_TAB [(i)] + (o)))
+#else
+#define SINT( i, o ) (g->TL_TAB [g->SIN_TAB [(i)] + (o)])
+#endif
 
 #define DO_FEEDBACK               \
 int CH_S0_OUT_0 = ch->S0_OUT [0]; \
@@ -918,8 +936,6 @@ int CH_S0_OUT_0 = ch->S0_OUT [0]; \
 	CH_S0_OUT_1 = CH_S0_OUT_0; \
 	CH_S0_OUT_0 = SINT( (temp >> SIN_LBITS) & SIN_MASK, en0 ); \
 } \
-
-#define SINT( i, o ) (TL_TAB [g->SIN_TAB [(i)] + (o)])
 
 #define DO_LIMIT \
 CH_OUTd >>= MAX_OUT_BITS - output_bits + 2; \

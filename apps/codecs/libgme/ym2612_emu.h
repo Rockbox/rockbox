@@ -10,6 +10,10 @@
 	#define YM2612_CALCUL_TABLES
 #endif
 
+#if MEMORYSIZE > 2
+    #define YM2612_USE_TL_TAB
+#endif
+
 enum { ym2612_out_chan_count = 2 }; // stereo
 enum { ym2612_channel_count = 6 };
 enum { ym2612_disabled_time = -1 };
@@ -172,7 +176,9 @@ struct tables_t
 	short LFO_ENV_TAB [LFO_LENGHT];             // LFO AMS TABLE (adjusted for 11.8 dB)
 	short LFO_FREQ_TAB [LFO_LENGHT];            // LFO FMS TABLE
 #endif
-	int TL_TAB [TL_LENGHT * 2];                 // TOTAL LEVEL TABLE (positif and minus)
+#ifdef YM2612_USE_TL_TAB
+    int TL_TAB [TL_LENGHT * 2];                 // TOTAL LEVEL TABLE (positif and minus)
+#endif
 	unsigned int DECAY_TO_ATTACK [ENV_LENGHT];  // Conversion from decay to attack phase
 	unsigned int FINC_TAB [2048];               // Frequency step table
 };
