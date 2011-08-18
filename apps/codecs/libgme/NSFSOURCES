@@ -12,4 +12,3 @@ nsfe_info.c
 blip_buffer.c
 multi_buffer.c
 rom_data.c
-emu2413.c
