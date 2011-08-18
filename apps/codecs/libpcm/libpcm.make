@@ -16,10 +16,3 @@ OTHER_SRC += $(PCMSLIB_SRC)
 $(PCMSLIB): $(PCMSLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-PCMSFLAGS = $(filter-out -O%,$(CODECFLAGS))
-PCMSFLAGS += -O1
-
-$(CODECDIR)/libpcm/%.o: $(ROOTDIR)/apps/codecs/libpcm/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(PCMSFLAGS) -c $< -o $@

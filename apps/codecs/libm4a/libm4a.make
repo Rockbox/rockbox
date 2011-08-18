@@ -16,10 +16,3 @@ OTHER_SRC += $(M4ALIB_SRC)
 $(M4ALIB): $(M4ALIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-M4AFLAGS = $(filter-out -O%,$(CODECFLAGS))
-M4AFLAGS += -O3
-
-$(CODECDIR)/libm4a/%.o: $(ROOTDIR)/apps/codecs/libm4a/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(M4AFLAGS) -c $< -o $@

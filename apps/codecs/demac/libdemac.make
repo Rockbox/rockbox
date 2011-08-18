@@ -26,14 +26,6 @@ $(DEMACLIB): $(DEMACLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-DEMACFLAGS = $(filter-out -O%,$(CODECFLAGS))
-
-ifeq ($(CPU),coldfire)
-    DEMACFLAGS += -O2
-else
-    DEMACFLAGS += -O3
-endif
-
 $(CODECDIR)/ape_free_iram.h: $(CODECDIR)/ape-pre.map
 	$(call PRINTS,GEN $(@F))perl -an \
 		-e 'if(/^PLUGIN_IRAM/){$$istart=hex($$F[1]);$$ilen=hex($$F[2])}' \
@@ -41,7 +33,3 @@ $(CODECDIR)/ape_free_iram.h: $(CODECDIR)/ape-pre.map
 		-e '}{if($$ilen){print"#define FREE_IRAM ".($$ilen+$$istart-$$iend)."\n";}' \
 		$(CODECDIR)/ape-pre.map \
 		> $@
-
-$(CODECDIR)/demac/%.o: $(ROOTDIR)/apps/codecs/demac/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(DEMACFLAGS) -c $< -o $@

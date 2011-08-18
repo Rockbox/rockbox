@@ -55,6 +55,64 @@ include $(APPSDIR)/codecs/libgme/libkss.make
 CODECFLAGS = $(CFLAGS) -fstrict-aliasing -I$(APPSDIR)/codecs \
 	-I$(APPSDIR)/codecs/lib -DCODEC
 
+# set CODECFLAGS per codec lib, since gcc takes the last -Ox and the last
+# in a -ffoo -fno-foo pair, there is no need to filter them out
+$(A52LIB) : CODECFLAGS += -O1
+$(ALACLIB) : CODECFLAGS += -O1
+$(ASAPLIB) : CODECFLAGS += -O1
+$(ASFLIB) : CODECFLAGS += -O2
+$(ATRACLIB) : CODECFLAGS += -O1
+$(AYLIB) : CODECFLAGS += -fno-strict-aliasing -O2
+$(COOKLIB): CODECFLAGS += -O1
+$(DEMACLIB) : CODECFLAGS += -O3
+$(FAADLIB) : CODECFLAGS += -O2
+$(FFMPEGFLACLIB) : CODECFLAGS += -O2
+$(GBSLIB) : CODECFLAGS += -fno-strict-aliasing -O2
+$(HESLIB) : CODECFLAGS += -fno-strict-aliasing -O2
+$(KSSLIB) : CODECFLAGS += -fno-strict-aliasing -O2
+$(M4ALIB) : CODECFLAGS += -O3
+$(MUSEPACKLIB) : CODECFLAGS += -O1
+$(NSFLIB) : CODECFLAGS += -fno-strict-aliasing -O2
+$(PCMSLIB) : CODECFLAGS += -O1
+$(RMLIB) : CODECFLAGS += -O3
+$(SGCLIB) : CODECFLAGS += -fno-strict-aliasing -O2
+$(SPCLIB) : CODECFLAGS += -fno-strict-aliasing -O1
+$(TREMORLIB) : CODECFLAGS += -O2
+$(TTALIB) : CODECFLAGS += -O2
+$(VGMLIB) : CODECFLAGS += -fno-strict-aliasing -O2
+$(WAVPACKLIB) : CODECFLAGS += -O1
+$(WMALIB) : CODECFLAGS += -O2
+$(WMAPROLIB) : CODECFLAGS += -O1
+$(WMAVOICELIB) : CODECFLAGS += -O1
+
+# fine-tuning of CODECFLAGS per cpu arch
+ifeq ($(CPU),arm)
+  # redo per arm generation
+  $(ALACLIB) : CODECFLAGS += -O2
+  $(AYLIB) : CODECFLAGS += -fno-strict-aliasing -O3
+  $(GBSLIB) : CODECFLAGS += -fno-strict-aliasing -O3
+  $(HESLIB) : CODECFLAGS += -fno-strict-aliasing -O3
+  $(KSSLIB) : CODECFLAGS += -fno-strict-aliasing -O3
+  $(NSFLIB) : CODECFLAGS += -fno-strict-aliasing -O3
+  $(SGCLIB) : CODECFLAGS += -fno-strict-aliasing -O3
+  $(VGMLIB) : CODECFLAGS += -fno-strict-aliasing -O3
+  $(WAVPACKLIB) : CODECFLAGS += -O3
+else ifeq ($(CPU),coldfire)
+  $(A52LIB) : CODECFLAGS += -O2
+  $(ASFLIB) : CODECFLAGS += -O3
+  $(ATRACLIB) : CODECFLAGS += -O2
+  $(COOKLIB): CODECFLAGS += -O2
+  $(DEMACLIB) : CODECFLAGS += -O2
+  $(TREMORLIB) : CODECFLAGS += -O3
+  $(WMAPROLIB) : CODECFLAGS += -O3
+  $(WMAVOICELIB) : CODECFLAGS += -O2
+endif
+
+ifeq ($(MEMORYSIZE),2)
+  $(ASFLIB) : CODECFLAGS += -Os
+  $(WMALIB) : CODECFLAGS += -Os
+endif
+
 ifndef APP_TYPE
   CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
   CODEC_LDS := $(APPSDIR)/plugins/plugin.lds # codecs and plugins use same file

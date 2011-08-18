@@ -16,15 +16,3 @@ OTHER_SRC += $(ALACLIB_SRC)
 $(ALACLIB): $(ALACLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-ALACFLAGS = $(filter-out -O%,$(CODECFLAGS))
-
-ifeq ($(CPU),arm)
-    ALACFLAGS += -O2
-else
-    ALACFLAGS += -O1
-endif
-
-$(CODECDIR)/libalac/%.o: $(ROOTDIR)/apps/codecs/libalac/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(ALACFLAGS) -c $< -o $@

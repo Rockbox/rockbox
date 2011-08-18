@@ -16,16 +16,3 @@ OTHER_SRC += $(WMALIB_SRC)
 $(WMALIB): $(WMALIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-WMAFLAGS = -I$(APPSDIR)/codecs/libwma $(filter-out -O%,$(CODECFLAGS))
-
-ifeq ($(MEMORYSIZE),2)
-    WMAFLAGS += -Os
-else
-    WMAFLAGS += -O2
-endif
-
-$(CODECDIR)/libwma/%.o: $(ROOTDIR)/apps/codecs/libwma/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(WMAFLAGS) -c $< -o $@
-

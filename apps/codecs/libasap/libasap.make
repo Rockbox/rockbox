@@ -16,10 +16,3 @@ OTHER_SRC += $(ASAPLIB_SRC)
 $(ASAPLIB): $(ASAPLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-ASAPFLAGS = $(filter-out -O%,$(CODECFLAGS))
-ASAPFLAGS += -O1
-
-$(CODECDIR)/libasap/%.o: $(ROOTDIR)/apps/codecs/libasap/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(ASAPFLAGS) -c $< -o $@

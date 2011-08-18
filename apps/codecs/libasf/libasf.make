@@ -16,17 +16,3 @@ OTHER_SRC += $(ASFLIB_SRC)
 $(ASFLIB): $(ASFLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-ASFFLAGS = $(filter-out -O%,$(CODECFLAGS))
-
-ifeq ($(MEMORYSIZE),2)
-    ASFFLAGS += -Os
-else ifeq ($(CPU),coldfire)
-	ASFFLAGS += -O3
-else
-	ASFFLAGS += -O2
-endif
-
-$(CODECDIR)/libasf/%.o: $(ROOTDIR)/apps/codecs/libasf/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(ASFFLAGS) -c $< -o $@

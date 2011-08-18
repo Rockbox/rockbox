@@ -16,10 +16,3 @@ OTHER_SRC += $(SPCLIB_SRC)
 $(SPCLIB): $(SPCLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-SPCFLAGS = $(filter-out -O%,$(CODECFLAGS)) -fno-strict-aliasing
-SPCFLAGS += -O1
-
-$(CODECDIR)/libspc/%.o: $(ROOTDIR)/apps/codecs/libspc/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(SPCFLAGS) -c $< -o $@

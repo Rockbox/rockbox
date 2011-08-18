@@ -16,10 +16,3 @@ OTHER_SRC += $(RMLIB_SRC)
 $(RMLIB): $(RMLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-RMFLAGS = $(filter-out -O%,$(CODECFLAGS))
-RMFLAGS += -O3
-
-$(CODECDIR)/librm/%.o: $(ROOTDIR)/apps/codecs/librm/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(RMFLAGS) -c $< -o $@

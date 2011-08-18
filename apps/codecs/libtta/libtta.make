@@ -16,14 +16,3 @@ OTHER_SRC += $(TTALIB_SRC)
 $(TTALIB): $(TTALIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-TTAFLAGS = $(filter-out -O%,$(CODECFLAGS))
-TTAFLAGS += -O2
-
-$(CODECDIR)/libtta/%.o: $(ROOTDIR)/apps/codecs/libtta/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(TTAFLAGS) -c $< -o $@
-
-$(CODECDIR)/libtta/%.o: $(ROOTDIR)/apps/codecs/libtta/%.S
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(TTAFLAGS) $(ASMFLAGS) -c $< -o $@

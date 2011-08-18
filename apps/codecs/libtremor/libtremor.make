@@ -16,16 +16,3 @@ OTHER_SRC += $(TREMORLIB_SRC)
 $(TREMORLIB): $(TREMORLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
-
-TREMORFLAGS = -I$(APPSDIR)/codecs/libtremor $(filter-out -O%,$(CODECFLAGS)) 
-
-# Tremor is slightly faster on coldfire with -O3
-ifeq ($(CPU),coldfire)
-    TREMORFLAGS += -O3
-else
-    TREMORFLAGS += -O2
-endif
-
-$(CODECDIR)/libtremor/%.o: $(ROOTDIR)/apps/codecs/libtremor/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(TREMORFLAGS) -c $< -o $@
