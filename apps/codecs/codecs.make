@@ -43,13 +43,14 @@ include $(APPSDIR)/codecs/librm/librm.make
 include $(APPSDIR)/codecs/libatrac/libatrac.make
 include $(APPSDIR)/codecs/libpcm/libpcm.make
 include $(APPSDIR)/codecs/libtta/libtta.make
-include $(APPSDIR)/codecs/libgme/libay.make
-include $(APPSDIR)/codecs/libgme/libgbs.make
-include $(APPSDIR)/codecs/libgme/libhes.make
-include $(APPSDIR)/codecs/libgme/libnsf.make
-include $(APPSDIR)/codecs/libgme/libsgc.make
-include $(APPSDIR)/codecs/libgme/libvgm.make
-include $(APPSDIR)/codecs/libgme/libkss.make
+include $(APPSDIR)/codecs/libgme/ay/libay.make
+include $(APPSDIR)/codecs/libgme/gbs/libgbs.make
+include $(APPSDIR)/codecs/libgme/hes/libhes.make
+include $(APPSDIR)/codecs/libgme/nsf/libnsf.make
+include $(APPSDIR)/codecs/libgme/sgc/libsgc.make
+include $(APPSDIR)/codecs/libgme/vgm/libvgm.make
+include $(APPSDIR)/codecs/libgme/kss/libkss.make
+include $(APPSDIR)/codecs/libgme/emu2413/libemu2413.make
 
 # compile flags for codecs
 CODECFLAGS = $(CFLAGS) -fstrict-aliasing -I$(APPSDIR)/codecs \
@@ -103,10 +104,10 @@ $(CODECDIR)/tta.codec : $(CODECDIR)/libtta.a
 $(CODECDIR)/ay.codec : $(CODECDIR)/libay.a
 $(CODECDIR)/gbs.codec : $(CODECDIR)/libgbs.a
 $(CODECDIR)/hes.codec : $(CODECDIR)/libhes.a
-$(CODECDIR)/nsf.codec : $(CODECDIR)/libnsf.a
-$(CODECDIR)/sgc.codec : $(CODECDIR)/libsgc.a
-$(CODECDIR)/vgm.codec : $(CODECDIR)/libvgm.a
-$(CODECDIR)/kss.codec : $(CODECDIR)/libkss.a
+$(CODECDIR)/nsf.codec : $(CODECDIR)/libnsf.a $(CODECDIR)/libemu2413.a
+$(CODECDIR)/sgc.codec : $(CODECDIR)/libsgc.a $(CODECDIR)/libemu2413.a
+$(CODECDIR)/vgm.codec : $(CODECDIR)/libvgm.a $(CODECDIR)/libemu2413.a
+$(CODECDIR)/kss.codec : $(CODECDIR)/libkss.a $(CODECDIR)/libemu2413.a
 
 $(CODECS): $(CODECLIB) # this must be last in codec dependency list
 
