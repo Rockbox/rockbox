@@ -69,9 +69,14 @@ show the information for the next song to be played.
       \opt{lcd_color}{%
         \config{\%V(x,y,[width],\tabnlindent[height],[font])}\newline
         \config{\%Vf([fgcolour])}\newline
-        \config{\%Vb([bgcolour])}
+        \config{\%Vb([bgcolour])}\newline
+        \config{\%Vg(start,end \tabnlindent[,text])}
         & See section \ref{ref:Viewports}\\}
-        
+
+      \opt{lcd_non-mono}{%
+        \config{\%Vs(mode[,param])}
+        & See section \ref{ref:Viewports}\\}
+
       \config{\%Vl('identifier',\newline\dots)} & Preloads a viewport for later
       display. `identifier' is a single lowercase letter (a-z) and the `\dots'
       parameters use the same logic as the \%V tag explained above.\\

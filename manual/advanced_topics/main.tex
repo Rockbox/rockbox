@@ -263,6 +263,27 @@ area of the screen.
 \nopt{lcd_color}{\opt{lcd_non-mono}{\input{advanced_topics/viewports/grayscale-vp-syntax.tex}}}
 \opt{lcd_color}{\input{advanced_topics/viewports/colour-vp-syntax.tex}}
 
+\opt{lcd_non-mono}{
+\subsubsection{Viewport Line Text Styles}
+  \begin{tagmap}
+    \config{\%Vs(mode[,param])}
+    & Set the viewport text style to `mode' from this point forward\\
+  \end{tagmap}
+
+Mode can be the following:
+
+\begin{rbtabular}{.75\textwidth}{lX}{\textbf{Mode} & \textbf{Description}}{}{}
+  clear & Restore the default style\\
+  invert & Draw lines inverted\\
+  color & Draw the text coloured by the value given in `param'. Functionally
+    equivalent to using the \%Vf() tag\\
+  \opt{lcd_color}{%
+    gradient & Draw the next `param' lines using a gradient as
+    defined by \%Vg. By default the gradient is drawn over 1 line.
+    \%Vs(gradient,2) will use 2 lines to fully change from the start colour to
+    the end colour\\}
+\end{rbtabular}
+}
 
 \subsubsection{Conditional Viewports}
 

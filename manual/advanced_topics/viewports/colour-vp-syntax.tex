@@ -1,9 +1,14 @@
 \subsubsection{Viewport Declaration Syntax}
 
-\config{\%V(x,y,[width],[height],[font]) \%Vf([fgcolour]) \%Vb([bgcolour])}%
+\config{\%V(x,y,[width],[height],[font]) \%Vf([fgcolour]) \%Vb([bgcolour]) %
+    \%Vg(start, end [,text])}%
 
     \begin{itemize}
+      \item \%Vf and \%Vb set the foreground and background colours respectively.
       \item `fgcolour' and `bgcolour' are 6-digit RGB888 colours, e.g. FF00FF.
+      \item \%Vg defines a gradient fill that can then be used with the \%Vs tag.
+      `start' and `end' set the initial and final colours, and the optional `text'
+      sets the text colour. Colours are 6-digit RGB888, e.g. FF00FF.
       \item `font' is a number: 0 is the built-in system font, 1 is the
       current menu font, and 2-9 are additional skin loaded fonts (see 
       \reference{ref:multifont}).
@@ -12,15 +17,16 @@
     \end{itemize}
 
 \note{The correct number of commas with hyphens in
-      blank fields are still needed in any case.}
+      blank fields are still needed.}
 
 \begin{example}
-    %V(12,20,-,-,1) %Vf(000000) %Vb(FFFFFF)
+    %V(12,20,-,-,1) %Vf(000000) %Vb(FFFFFF) %Vg(FFC0CB, FF0000, FFFF00)
     %sThis viewport is displayed permanently. It starts 12px from the left and
     %s20px from the top of the screen, and fills the rest of the screen from
     %sthat point. The lines will scroll if this text does not fit in the viewport.
     %sThe user font is used, and the foreground and background are set to black
-    %sand white respectively.
+    %sand white respectively. The line gradient is set to pink to red with yellow
+    %text.
 \end{example}
 \begin{rbtabular}{.75\textwidth}{XX}{\textbf{Viewport definition} & \textbf{Default value}}{}{}
   width/height & remaining part of screen \\

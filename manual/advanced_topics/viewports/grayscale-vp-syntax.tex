@@ -3,6 +3,8 @@
 \config{\%V(x,y,[width],[height],[font]) \%Vf([fgshade]) \%Vb([bgshade])}%
 
     \begin{itemize}
+      \item \%Vf and \%Vb set the foreground and background shade of grey
+      respectively.
       \item `fgshade' and `bgshade' are numbers in the range 0 (= black) to 3
       (= white).
       \item `font' is a number: 0 is the built-in system font, 1 is the
@@ -13,7 +15,7 @@
     \end{itemize}
 
 \note{The correct number of commas with hyphens in
-      blank fields are still needed in any case.}
+      blank fields are still needed.}
 
 \begin{example}
     %V(12,20,-,-,1) %Vf(0) %Vb(3)
