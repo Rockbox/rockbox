@@ -6,32 +6,32 @@
 # it stopped
 set -e
 
-# http://developer.android.com/sdk/index.html
-SDK_URL_LNX="http://dl.google.com/android/android-sdk_r11-linux_x86.tgz"
-SDK_URL_MAC="http://dl.google.com/android/android-sdk_r11-mac_x86.zip"
-SDK_URL_WIN="http://dl.google.com/android/android-sdk_r11-windows.zip"
-# http://developer.android.com/sdk/ndk/index.html
-NDK_URL_LNX="http://dl.google.com/android/ndk/android-ndk-r5c-linux-x86.tar.bz2"
-NDK_URL_MAC="http://dl.google.com/android/ndk/android-ndk-r5c-darwin-x86.tar.bz2"
-NDK_URL_WIN="http://dl.google.com/android/ndk/android-ndk-r5c-windows.zip"
+SDK_DOWNLOAD_URL="http://developer.android.com/sdk/index.html"
+NDK_DOWNLOAD_URL="http://developer.android.com/sdk/ndk/index.html"
+
+find_url() {
+    base_url="$1"
+    os="$2"
+    wget -q -O - $base_url | grep dl.google.com | sed 's/.*"\(http:\/\/.*\)".*/\1/' | grep $os | grep -v .exe # Windows hack
+}
 
 OS=`uname`
 case $OS in
     Linux)
-    SDK_URL=$SDK_URL_LNX
-    NDK_URL=$NDK_URL_LNX
+    SDK_URL=$(find_url $SDK_DOWNLOAD_URL linux)
+    NDK_URL=$(find_url $NDK_DOWNLOAD_URL linux)
     ANDROID=tools/android
     ;;
     
     Darwin)
-    SDK_URL=$SDK_URL_MAC
-    NDK_URL=$NDK_URL_MAC
+    SDK_URL=$(find_url $SDK_DOWNLOAD_URL mac)
+    NDK_URL=$(find_url $NDK_DOWNLOAD_URL darwin)
     ANDROID=tools/android
     ;;
 
     CYGWIN*)
-    SDK_URL=$SDK_URL_WIN
-    NDK_URL=$NDK_URL_WIN
+    SDK_URL=$(find_url $SDK_DOWNLOAD_URL windows)
+    NDK_URL=$(find_url $NDK_DOWNLOAD_URL windows)
     ANDROID=tools/android.bat
     ;;
 esac
