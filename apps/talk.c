@@ -51,16 +51,17 @@
              MASCODEC  | MASCODEC  | SWCODEC
              (playing) | (stopped) |
     voicebuf-----------+-----------+------------
-              audio    | voice     | thumbnail
+              audio    | voice     | voice
                        |-----------|------------
-                       | thumbnail | voice
+                       | thumbnail | thumbnail 
                        |           |------------
                        |           | filebuf
                        |           |------------
                        |           | audio
   voicebufend----------+-----------+------------
 
-  SWCODEC allocates dedicated buffers, MASCODEC reuses audiobuf. */
+  SWCODEC allocates dedicated buffers (except voice and thumbnail are together
+  in the talkbuf), MASCODEC reuses audiobuf. */
 
 
 /***************** Constants *****************/
@@ -349,12 +350,12 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
             logf("Incompatible voice file");
             goto load_err;
         }
-#if CONFIG_CODEC != SWCODEC
-        /* MASCODEC: now use audiobuf for voice then thumbnail */
         p_thumbnail = voicebuf.buf + file_size;
         p_thumbnail += (long)p_thumbnail % 2; /* 16-bit align */
-        size_for_thumbnail = voicebuf.buf + bufsize - p_thumbnail;
-#endif
+        size_for_thumbnail =
+                MIN(voicebuf.buf + bufsize - p_thumbnail, MAX_THUMBNAIL_BUFSIZE);
+        if (size_for_thumbnail <= 0)
+            p_thumbnail = NULL;
     }
     else
         goto load_err;
@@ -604,19 +605,9 @@ static void queue_clip(unsigned char* buf, long size, bool enqueue)
 
 static void alloc_thumbnail_buf(void)
 {
-#if CONFIG_CODEC == SWCODEC
-    /* Allocate a dedicated thumbnail buffer - once */
-    if (p_thumbnail == NULL)
-    {
-        size_for_thumbnail = buffer_available();
-        if (size_for_thumbnail > MAX_THUMBNAIL_BUFSIZE)
-            size_for_thumbnail = MAX_THUMBNAIL_BUFSIZE;
-        p_thumbnail = buffer_alloc(size_for_thumbnail);
-    }
-#else
     /* use the audio buffer now, need to release before loading a voice */
     p_thumbnail = voicebuf;
-#endif
+    size_for_thumbnail = MAX_THUMBNAIL_BUFSIZE;
     thumbnail_buf_used = 0;
 }
 
@@ -625,9 +616,7 @@ static void reset_state(void)
 {
     queue_write = queue_read = 0; /* reset the queue */
     p_voicefile = NULL; /* indicate no voicefile (trashed) */
-#if CONFIG_CODEC != SWCODEC
-    p_thumbnail = NULL; /* don't leak buffer_alloc() for swcodec */
-#endif
+    p_thumbnail = NULL; /* no thumbnails either */
 
 #ifdef TALK_PARTIAL_LOAD
     int i;
@@ -733,7 +722,11 @@ bool talk_voice_required(void)
 /* return size of voice file */
 int talk_get_buffer(void)
 {
-    return voicefile_size;
+    int ret = voicefile_size;
+#if CONFIG_CODEC == SWCODEC
+    ret += MAX_THUMBNAIL_BUFSIZE;
+#endif
+    return ret;
 }
 
 /* Sets the buffer for the voicefile and returns how many bytes of this
@@ -747,7 +740,7 @@ size_t talkbuf_init(char *bufstart)
     if (bufstart)
         voicebuf = bufstart;
 
-    return voicefile_size;
+    return talk_get_buffer();
 }
 
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
