@@ -992,7 +992,9 @@ void settings_apply(bool read_disk)
     dsp_set_eq(global_settings.eq_enabled);
     dsp_set_eq_precut(global_settings.eq_precut);
     for(i = 0; i < 5; i++) {
-        dsp_set_eq_coefs(i);
+        dsp_set_eq_coefs(i, global_settings.eq_band_cutoff[i],
+                         global_settings.eq_band_q[i],
+                         global_settings.eq_band_gain[i]);
     }
 
     dsp_dither_enable(global_settings.dithering_enabled);
