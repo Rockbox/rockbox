@@ -1201,8 +1201,6 @@ int dsp_callback(int msg, intptr_t param)
 int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 {
     static int32_t *tmp[2]; /* tdspeed_doit() needs it static */
-    static long last_yield;
-    long tick;
     int written = 0;
 
 #if defined(CPU_COLDFIRE)
@@ -1214,10 +1212,6 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 
     if (new_gain)
         dsp_set_replaygain(); /* Gain has changed */
-
-    /* Perform at least one yield before starting */
-    last_yield = current_tick;
-    yield();
 
     /* Testing function pointers for NULL is preferred since the pointer
        will be preloaded to be used for the call if not. */
@@ -1272,14 +1266,6 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 
             written += chunk;
             dst += chunk * sizeof (int16_t) * 2;
-
-            /* yield at least once each tick */
-            tick = current_tick;
-            if (TIME_AFTER(tick, last_yield))
-            {
-                last_yield = tick;
-                yield();
-            }
         }
     }
 

@@ -46,10 +46,6 @@
 struct user_settings global_settings;
 volatile long current_tick = 0;
 
-void yield(void)
-{
-}
-
 int set_irq_level(int level)
 {
     return 0;
@@ -561,6 +557,10 @@ static unsigned ci_sleep(unsigned ticks)
     return 0;
 }
 
+static void ci_yield(void)
+{
+}
+
 static void ci_cpucache_flush(void)
 {
 }
@@ -590,7 +590,7 @@ static struct codec_api ci = {
     ci_should_loop,
 
     ci_sleep,
-    yield,
+    ci_yield,
 
 #if NUM_CORES > 1
     ci_create_thread,

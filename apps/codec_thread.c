@@ -248,6 +248,7 @@ static void codec_pcmbuf_insert_callback(
         if (inp_count > count)
             inp_count = count;
 
+        yield();
         out_count = dsp_process(ci.dsp, dest, src, inp_count);
 
         if (out_count <= 0)
