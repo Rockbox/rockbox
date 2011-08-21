@@ -339,34 +339,9 @@ struct user_settings
     /* EQ */
     bool eq_enabled;            /* Enable equalizer */
     unsigned int eq_precut;     /* dB */
-
-    /* Order is important here, must be cutoff, q, then gain for each band.
-       See dsp_set_eq_coefs in dsp.c for why. */
-
-    /* Band 0 settings */
-    int eq_band0_cutoff;        /* Hz */
-    int eq_band0_q;
-    int eq_band0_gain;          /* +/- dB */
-
-    /* Band 1 settings */
-    int eq_band1_cutoff;        /* Hz */
-    int eq_band1_q;
-    int eq_band1_gain;          /* +/- dB */
-
-    /* Band 2 settings */
-    int eq_band2_cutoff;        /* Hz */
-    int eq_band2_q;
-    int eq_band2_gain;          /* +/- dB */
-
-    /* Band 3 settings */
-    int eq_band3_cutoff;        /* Hz */
-    int eq_band3_q;
-    int eq_band3_gain;          /* +/- dB */
-
-    /* Band 4 settings */
-    int eq_band4_cutoff;        /* Hz */
-    int eq_band4_q;
-    int eq_band4_gain;          /* +/- dB */
+    int eq_band_cutoff[5];      /* Hz */
+    int eq_band_q[5];
+    int eq_band_gain[5];        /* +/- dB */
 
     /* Misc. swcodec */
     int  beep;              /* system beep volume when changing tracks etc. */

@@ -111,7 +111,8 @@ void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain,
                                     long cutoff);
 void dsp_set_eq(bool enable);
 void dsp_set_eq_precut(int precut);
-void dsp_set_eq_coefs(int band);
+void dsp_set_eq_coefs(int band, unsigned long cutoff, unsigned long q,
+                      long gain);
 void dsp_dither_enable(bool enable);
 void dsp_timestretch_enable(bool enable);
 bool dsp_timestretch_available(void);

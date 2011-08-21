@@ -951,19 +951,11 @@ void dsp_set_eq_precut(int precut)
  *
  * @param band the equalizer band to synchronize
  */
-void dsp_set_eq_coefs(int band)
+void dsp_set_eq_coefs(int band, unsigned long cutoff, unsigned long q,
+                      long gain)
 {
-    const int *setting;
-    long gain;
-    unsigned long cutoff, q;
-
-    /* Adjust setting pointer to the band we actually want to change */
-    setting = &global_settings.eq_band0_cutoff + (band * 3);
-
     /* Convert user settings to format required by coef generator functions */
-    cutoff = 0xffffffff / NATIVE_FREQUENCY * (*setting++);
-    q = *setting++;
-    gain = *setting++;
+    cutoff = 0xffffffff / NATIVE_FREQUENCY * cutoff;
 
     if (q == 0)
         q = 1;
