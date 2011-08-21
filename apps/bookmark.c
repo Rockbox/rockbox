@@ -178,11 +178,13 @@ bool bookmark_autobookmark(bool prompt_ok)
     audio_pause();    /* first pause playback */
     update = (global_settings.autoupdatebookmark && bookmark_exists());
     bookmark = create_bookmark();
+#if CONFIG_CODEC != SWCODEC
     /* Workaround for inability to speak when paused: all callers will
        just do audio_stop() when we return, so we can do it right
        away. This makes it possible to speak the "Create a Bookmark?"
        prompt and the "Bookmark Created" splash. */
     audio_stop();
+#endif
 
     if (update)
         return write_bookmark(true, bookmark);
