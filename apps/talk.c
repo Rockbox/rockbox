@@ -354,14 +354,6 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
             logf("Incompatible voice file");
             goto load_err;
         }
-        p_thumbnail = voicebuf.buf + file_size;
-        p_thumbnail += (long)p_thumbnail % 2; /* 16-bit align */
-        size_for_thumbnail = voicebuf.buf + bufsize - p_thumbnail;
-#if CONFIG_CODEC == SWCODEC
-        size_for_thumbnail = MIN(size_for_thumbnail, MAX_THUMBNAIL_BUFSIZE);
-#endif
-        if (size_for_thumbnail <= 0)
-            p_thumbnail = NULL;
     }
     else
         goto load_err;
@@ -403,10 +395,25 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
 
 #ifdef TALK_PARTIAL_LOAD
     alloc_size += silence_len + QUEUE_SIZE;
+#else
+    /* allocate for the entire file, TALK_PROGRESSIVE_LOAD doesn't
+     * load everything just yet */
+    alloc_size = file_size;
 #endif
+
     if (alloc_size > bufsize)
         goto load_err;
     return;
+
+    /* now move p_thumbnail behind the voice clip buffer */
+    p_thumbnail = voicebuf.buf + alloc_size;
+    p_thumbnail += (long)p_thumbnail % 2; /* 16-bit align */
+    size_for_thumbnail = voicebuf.buf + bufsize - p_thumbnail;
+#if CONFIG_CODEC == SWCODEC
+    size_for_thumbnail = MIN(size_for_thumbnail, MAX_THUMBNAIL_BUFSIZE);
+#endif
+    if (size_for_thumbnail <= 0)
+        p_thumbnail = NULL;
 
 load_err:
     p_voicefile = NULL;
