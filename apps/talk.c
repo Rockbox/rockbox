@@ -77,6 +77,10 @@ const char* const file_thumbnail_ext = ".talk";
 
 #define LOADED_MASK 0x80000000 /* MSB */
 
+/* swcodec: cap p_thumnail to MAX_THUMNAIL_BUFSIZE since audio keeps playing
+ * while voice
+ * hwcodec: just use whatever is left in the audiobuffer, music
+ * playback is impossible => no cap */
 #if CONFIG_CODEC == SWCODEC    
 #define MAX_THUMBNAIL_BUFSIZE 0x10000
 #endif
@@ -352,8 +356,10 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
         }
         p_thumbnail = voicebuf.buf + file_size;
         p_thumbnail += (long)p_thumbnail % 2; /* 16-bit align */
-        size_for_thumbnail =
-                MIN(voicebuf.buf + bufsize - p_thumbnail, MAX_THUMBNAIL_BUFSIZE);
+        size_for_thumbnail = voicebuf.buf + bufsize - p_thumbnail;
+#if CONFIG_CODEC == SWCODEC
+        size_for_thumbnail = MIN(size_for_thumbnail, MAX_THUMBNAIL_BUFSIZE);
+#endif
         if (size_for_thumbnail <= 0)
             p_thumbnail = NULL;
     }
@@ -607,7 +613,9 @@ static void alloc_thumbnail_buf(void)
 {
     /* use the audio buffer now, need to release before loading a voice */
     p_thumbnail = voicebuf;
+#if CONFIG_CODEC == SWCODEC
     size_for_thumbnail = MAX_THUMBNAIL_BUFSIZE;
+#endif
     thumbnail_buf_used = 0;
 }
 
