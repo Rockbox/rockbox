@@ -344,10 +344,6 @@ bool rbcodec_format_is_atomic(int afmt);
 bool format_buffers_with_offset(int afmt);
 #endif
 
-#ifdef HAVE_TAGCACHE
-bool autoresumable(struct mp3entry *id3);
-#endif
-
 #endif
 
 
