@@ -153,55 +153,31 @@ static void asf_utf16LEdecode(int fd,
                               int* utf8bytes
                              )
 {
-    unsigned long ucs;
-    int n;
+    int utf16buflen, decodelen = 0, leftover = 0;
     unsigned char utf16buf[256];
-    unsigned char* utf16 = utf16buf;
     unsigned char* newutf8;
 
-    n = read(fd, utf16buf, MIN(sizeof(utf16buf), utf16bytes));
-    utf16bytes -= n;
+    while (leftover + utf16bytes >= 2 && *utf8bytes >= 7) {
+        memmove(utf16buf, utf16buf + decodelen, leftover);
+        utf16buflen = read(fd, utf16buf + leftover,
+                           MIN(sizeof(utf16buf) - leftover, utf16bytes));
+        utf16bytes -= utf16buflen;
+        utf16buflen += leftover;
 
-    while (n > 0) {
+        decodelen = MIN(utf16buflen, (*utf8bytes - 1) / 3 * 2) - 2;
+        if (decodelen < 2) {
+            break;
+        }
+
         /* Check for a surrogate pair */
-        if (utf16[1] >= 0xD8 && utf16[1] < 0xE0) {
-            if (n < 4) {
-                /* Run out of utf16 bytes, read some more */
-                utf16buf[0] = utf16[0];
-                utf16buf[1] = utf16[1];
-
-                n = read(fd, utf16buf + 2, MIN(sizeof(utf16buf)-2, utf16bytes));
-                utf16 = utf16buf;
-                utf16bytes -= n;
-                n += 2;
-            }
-
-            if (n < 4) {
-                /* Truncated utf16 string, abort */
-                break;
-            }
-            ucs = 0x10000 + ((utf16[0] << 10) | ((utf16[1] - 0xD8) << 18)
-                             | utf16[2] | ((utf16[3] - 0xDC) << 8));
-            utf16 += 4;
-            n -= 4;
-        } else {
-            ucs = (utf16[0] | (utf16[1] << 8));
-            utf16 += 2;
-            n -= 2;
+        if (utf16buf[decodelen - 1] >= 0xD8 && utf16buf[decodelen - 1] < 0xDC) {
+            decodelen += 2;
         }
 
-        if (*utf8bytes > 6) {
-            newutf8 = utf8encode(ucs, *utf8);
-            *utf8bytes -= (newutf8 - *utf8);
-            *utf8 += (newutf8 - *utf8);
-        }
-
-        /* We have run out of utf16 bytes, read more if available */
-        if ((n == 0) && (utf16bytes > 0)) {
-            n = read(fd, utf16buf, MIN(sizeof(utf16buf), utf16bytes));
-            utf16 = utf16buf;
-            utf16bytes -= n;
-        }
+        newutf8 = decode_text(ENCODING_UTF_16LE, utf16buf, *utf8, decodelen);
+        *utf8bytes -= (newutf8 - *utf8);
+        *utf8 = newutf8;
+        leftover = utf16buflen - decodelen;
     }
 
     *utf8[0] = 0;

@@ -33,16 +33,13 @@ static const int basebits[4] = { 4, 8, 12, 16 };
 
 static const int frequency[5] = { 4000, 8000, 11025, 22050, 44100 };
 
-static const int support_codepages[5] = {
+static const encoding_t support_codepages[5] = {
 #ifdef HAVE_LCD_BITMAP
-    SJIS, ISO_8859_1, -1, GB_2312, BIG_5,
+    ENCODING_SJIS, ENCODING_ISO_8859_1, ENCODING_NONE, ENCODING_EUC_CN, ENCODING_BIG_5,
 #else
-    -1, ISO_8859_1, -1, -1, -1,
+    ENCODING_NONE, ENCODING_ISO_8859_1, ENCODING_NONE, ENCODING_NONE, ENCODING_NONE,
 #endif
 };
-
-/* extra codepage */
-#define UCS2  (NUM_CODEPAGES + 1)
 
 /* support id3 tag */
 #define TAG_TITLE    (('S'<<8)|'T')
@@ -67,17 +64,17 @@ static inline int convert_smaf_audio_frequency(unsigned int freq)
     return frequency[freq];
 }
 
-static int convert_smaf_codetype(unsigned int codetype)
+static encoding_t convert_smaf_codetype(unsigned int codetype)
 {
     if (codetype < 5)
         return support_codepages[codetype];
     else if (codetype == 0x20 || codetype == 0x24) /* In Rockbox, UCS2 and UTF-16 are same. */
-        return UCS2;
+        return ENCODING_UTF_16BE;
     else if (codetype == 0x23)
-        return UTF_8;
+        return ENCODING_UTF_8;
     else if (codetype == 0xff)
-        return ISO_8859_1;
-    return -1;
+        return ENCODING_ISO_8859_1;
+    return ENCODING_NONE;
 }
 
 static void set_length(struct mp3entry *id3, unsigned int ch, unsigned int basebit,
@@ -111,26 +108,22 @@ static void set_length(struct mp3entry *id3, unsigned int ch, unsigned int baseb
 /* contents parse functions */
 
 /* Note: 
- *  1) When the codepage is UTF-8 or UCS2, contents data do not start BOM.
+ *  1) When the codepage is UTF-8 or UTF-16, contents data do not start BOM.
  *  2) The byte order of contents data is big endian.
  */
 
 static void decode2utf8(const unsigned char *src, unsigned char **dst,
-                        int srcsize, int *dstsize, int codepage)
+                        int srcsize, int *dstsize, encoding_t codepage)
 {
     unsigned char tmpbuf[srcsize * 3 + 1];
     unsigned char *p;
     int utf8size;
 
-    if (codepage < NUM_CODEPAGES)
-        p = iso_decode(src, tmpbuf, codepage, srcsize);
-    else /* codepage == UCS2 */
-        p = utf16BEdecode(src, tmpbuf, srcsize);
-
-    *p = '\0';
+    p = decode_text(codepage, src, tmpbuf, srcsize);
+    *p++ = '\0';
 
     strlcpy(*dst, tmpbuf, *dstsize);
-    utf8size = (p - tmpbuf) + 1;
+    utf8size = p - tmpbuf;
     if (utf8size > *dstsize)
     {
         DEBUGF("metadata warning: data length: %d > contents store buffer size: %d\n",
@@ -141,8 +134,8 @@ static void decode2utf8(const unsigned char *src, unsigned char **dst,
     *dstsize -= utf8size;
 }
 
-static int read_audio_track_contets(int fd, int codepage, unsigned char **dst,
-                                    int *dstsize)
+static int read_audio_track_contets(int fd, encoding_t codepage,
+                                    unsigned char **dst, int *dstsize)
 {
     /* value length <= 256 bytes */
     unsigned char buf[256];
@@ -155,7 +148,7 @@ static int read_audio_track_contets(int fd, int codepage, unsigned char **dst,
     while (p - buf < 256 && *p != ',')
     {
         /* skip yen mark */
-        if (codepage != UCS2)
+        if (codepage != ENCODING_UTF_16BE)
         {
             if (*p == '\\')
                 p++;
@@ -165,13 +158,13 @@ static int read_audio_track_contets(int fd, int codepage, unsigned char **dst,
 
         if (*p > 0x7f)
         {
-            if (codepage == UTF_8)
+            if (codepage == ENCODING_UTF_8)
             {
-                while ((*p & MASK) != COMP)
+                while ((*p & 0xc0) != 0x80)
                     *q++ = *p++;
             }
 #ifdef HAVE_LCD_BITMAP
-            else if (codepage == SJIS)
+            else if (codepage == ENCODING_SJIS)
             {
                 if (*p <= 0xa0 || *p >= 0xe0)
                     *q++ = *p++;
@@ -180,7 +173,7 @@ static int read_audio_track_contets(int fd, int codepage, unsigned char **dst,
         }
 
         *q++ = *p++;
-        if (codepage == UCS2)
+        if (codepage == ENCODING_UTF_16BE)
             *q++ = *p++;
     }
     datasize =  p - buf + 1;
@@ -192,7 +185,7 @@ static int read_audio_track_contets(int fd, int codepage, unsigned char **dst,
     return datasize;
 }
 
-static void read_score_track_contets(int fd, int codepage, int datasize,
+static void read_score_track_contets(int fd, encoding_t codepage, int datasize,
                                      unsigned char **dst, int *dstsize)
 {
     unsigned char buf[datasize];
@@ -231,12 +224,12 @@ static bool parse_smaf_audio_track(int fd, struct mp3entry *id3, unsigned int da
     unsigned int chunksize = datasize;
     int valsize;
 
-    int codepage;
+    encoding_t codepage;
 
     /* parse contents info */
     read(fd, tmp, 5);
     codepage = convert_smaf_codetype(tmp[2]);
-    if (codepage < 0)
+    if (codepage == ENCODING_NONE)
     {
         DEBUGF("metadata error: smaf unsupport codetype: %d\n", tmp[2]);
         return false;
@@ -327,7 +320,7 @@ static bool parse_smaf_score_track(int fd, struct mp3entry *id3)
     unsigned int datasize;
     int valsize;
 
-    int codepage;
+    encoding_t codepage;
 
     /* parse Optional Data Chunk */
     read(fd, tmp, 21);
@@ -348,7 +341,7 @@ static bool parse_smaf_score_track(int fd, struct mp3entry *id3)
     }
 
     codepage = convert_smaf_codetype(tmp[16]);
-    if (codepage < 0)
+    if (codepage == ENCODING_NONE)
     {
         DEBUGF("metadata error: smaf unsupport codetype: %d\n", tmp[16]);
         return false;

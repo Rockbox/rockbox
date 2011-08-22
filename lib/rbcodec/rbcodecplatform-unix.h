@@ -65,4 +65,40 @@ static inline off_t filesize(int fd) {
                   } while (0)
 #endif
 
+/* Character encoding conversion */
+typedef enum {
+    ENCODING_NONE,
+    ENCODING_BIG_5,
+    ENCODING_DEFAULT,
+    ENCODING_EUC_CN,
+    ENCODING_ISO_8859_1,
+    ENCODING_SJIS,
+    ENCODING_UTF_16BE,
+    ENCODING_UTF_16LE,
+    ENCODING_UTF_8,
+} encoding_t;
+
+#include <iconv.h>
+static inline char *decode_text(encoding_t encoding, const char *in, char *out, size_t in_len)
+{
+    const char *encoding_name;
+    size_t inbytesleft = in_len, outbytesleft = 4 * in_len;
+
+    switch (encoding) {
+    case ENCODING_BIG_5:      encoding_name = "BIG5";       break;
+    case ENCODING_EUC_CN:     encoding_name = "EUC-CN";     break;
+    case ENCODING_ISO_8859_1: encoding_name = "ISO-8859-1"; break;
+    case ENCODING_SJIS:       encoding_name = "SJIS";       break;
+    case ENCODING_UTF_16BE:   encoding_name = "UTF-16BE";   break;
+    case ENCODING_UTF_16LE:   encoding_name = "UTF-16LE";   break;
+    default: /* fallthrough */
+    case ENCODING_UTF_8:      encoding_name = "UTF-8";      break;
+    }
+
+    iconv_t cd = iconv_open("UTF-8", encoding_name);
+    iconv(cd, (char**)&in, &inbytesleft, &out, &outbytesleft);
+    iconv_close(cd);
+    return out + 4 * in_len - outbytesleft;
+}
+
 #endif

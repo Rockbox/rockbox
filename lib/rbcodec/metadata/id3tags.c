@@ -551,7 +551,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
         case 0x00: /* Type 0x00 is ordinary ISO 8859-1 */
             str++;
             (*len)--;
-            utf8 = iso_decode(str, utf8, -1, *len);
+            utf8 = decode_text(ENCODING_DEFAULT, str, utf8, *len);
             *utf8 = 0;
             *len = (unsigned long)utf8 - (unsigned long)utf8buf;
             break;
@@ -583,20 +583,14 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
                     if(str[1] == 0)
                         le = true;
 
-                while ((i < *len) && (str[0] || str[1])) {
-                    if(le)
-                        utf8 = utf16LEdecode(str, utf8, 1);
-                    else
-                        utf8 = utf16BEdecode(str, utf8, 1);
-
-                    str+=2;
+                while ((i < *len) && (str[0] || str[1]))
                     i += 2;
-                }
-
+                utf8 = decode_text(le ? ENCODING_UTF_16LE : ENCODING_UTF_16BE,
+                                   str, utf8, i);
                 *utf8++ = 0; /* Terminate the string */
                 templen += (strlen(&utf8buf[templen]) + 1);
-                str += 2;
                 i+=2;
+                str += i;
             } while(i < *len);
             *len = templen - 1;
             break;
@@ -608,7 +602,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
             break;
 
         default: /* Plain old string */
-            utf8 = iso_decode(str, utf8, -1, *len);
+            utf8 = decode_text(ENCODING_DEFAULT, str, utf8, *len);
             *utf8 = 0;
             *len = (unsigned long)utf8 - (unsigned long)utf8buf;
             break;
@@ -655,7 +649,7 @@ bool setid3v1title(int fd, struct mp3entry *entry)
                     ptr[j] = 0;
                 /* convert string to utf8 */
                 utf8 = (unsigned char *)entry->id3v1buf[i];
-                utf8 = iso_decode(ptr, utf8, -1, 30);
+                utf8 = decode_text(ENCODING_DEFAULT, ptr, utf8, 30);
                 /* make sure string is terminated */
                 *utf8 = 0;
                 break;
@@ -666,7 +660,7 @@ bool setid3v1title(int fd, struct mp3entry *entry)
                     ptr[j] = 0;
                 /* convert string to utf8 */
                 utf8 = (unsigned char *)entry->id3v1buf[3];
-                utf8 = iso_decode(ptr, utf8, -1, 28);
+                utf8 = decode_text(ENCODING_DEFAULT, ptr, utf8, 28);
                 /* make sure string is terminated */
                 *utf8 = 0;
                 break;
