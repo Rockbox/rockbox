@@ -339,16 +339,6 @@ enum {
     SOUND_LAST_SETTING, /* Keep this last */
 };
 
-enum Channel {
-    SOUND_CHAN_STEREO,
-    SOUND_CHAN_MONO,
-    SOUND_CHAN_CUSTOM,
-    SOUND_CHAN_MONO_LEFT,
-    SOUND_CHAN_MONO_RIGHT,
-    SOUND_CHAN_KARAOKE,
-    SOUND_CHAN_NUM_MODES,
-};
-
 struct sound_settings_info {
     const char *unit;
     char numdecimals;

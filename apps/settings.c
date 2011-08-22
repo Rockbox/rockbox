@@ -80,6 +80,7 @@ struct user_settings global_settings;
 struct system_status global_status;
 
 #if CONFIG_CODEC == SWCODEC
+#include "rbcodec_helpers.h"
 #include "dsp.h"
 #include "playback.h"
 #ifdef HAVE_RECORDING
@@ -1001,7 +1002,11 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_PITCHSCREEN
     dsp_timestretch_enable(global_settings.timestretch_enabled);
 #endif
-    dsp_set_compressor();
+    dsp_set_compressor(global_settings.compressor_threshold,
+                       global_settings.compressor_makeup_gain,
+                       global_settings.compressor_ratio,
+                       global_settings.compressor_knee,
+                       global_settings.compressor_release_time);
 #endif
 
 #ifdef HAVE_SPDIF_POWER

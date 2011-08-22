@@ -37,7 +37,6 @@
 #include "dsp.h"
 #include "metadata.h"
 #include "settings.h"
-#include "sound.h"
 #include "tdspeed.h"
 #include "platform.h"
 
@@ -356,8 +355,7 @@ static void perform_config(void)
         } else if (!strncmp(name, "tempo=", 6)) {
             dsp_set_timestretch(atof(val) * PITCH_SPEED_100);
         } else if (!strncmp(name, "vol=", 4)) {
-            global_settings.volume = atoi(val);
-            dsp_callback(DSP_CALLBACK_SET_SW_VOLUME, 0);
+            dsp_set_volume(atoi(val));
         } else {
             fprintf(stderr, "error: unrecognized config \"%.*s\"\n",
                     (int)(eq - name), name);

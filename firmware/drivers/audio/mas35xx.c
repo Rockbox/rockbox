@@ -25,6 +25,7 @@
 #include "config.h"
 #include "system.h" /* MAX MIN macros */
 #include "audiohw.h"
+#include "mas35xx.h"
 
 const struct sound_settings_info audiohw_settings[] = {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)

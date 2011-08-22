@@ -24,8 +24,15 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include "rbcodecconfig.h"
 
 #define NATIVE_FREQUENCY       44100
+
+#ifdef HAVE_PITCHSCREEN
+/* Precision of the pitch and speed variables. 100 = 1%, 10000 = 100%. */
+#define PITCH_SPEED_PRECISION 100L
+#define PITCH_SPEED_100 (100L * PITCH_SPEED_PRECISION)  /* 100% speed */
+#endif /* HAVE_PITCHSCREEN */
 
 enum
 {
@@ -34,6 +41,18 @@ enum
     STEREO_MONO,
     STEREO_NUM_MODES,
 };
+
+#ifdef RBCODEC_ENABLE_CHANNEL_MODES
+enum Channel {
+    SOUND_CHAN_STEREO,
+    SOUND_CHAN_MONO,
+    SOUND_CHAN_CUSTOM,
+    SOUND_CHAN_MONO_LEFT,
+    SOUND_CHAN_MONO_RIGHT,
+    SOUND_CHAN_KARAOKE,
+    SOUND_CHAN_NUM_MODES,
+};
+#endif
 
 enum
 {
@@ -118,13 +137,25 @@ void dsp_set_eq_precut(int precut);
 void dsp_set_eq_coefs(int band, unsigned long cutoff, unsigned long q,
                       long gain);
 void dsp_dither_enable(bool enable);
+#ifdef HAVE_PITCHSCREEN
 void dsp_timestretch_enable(bool enable);
 bool dsp_timestretch_available(void);
 void sound_set_pitch(int32_t r);
 int32_t sound_get_pitch(void);
 void dsp_set_timestretch(int32_t percent);
 int32_t dsp_get_timestretch(void);
-int dsp_callback(int msg, intptr_t param);
-void dsp_set_compressor(void);
+#endif
+void dsp_set_compressor(int c_threshold, int c_gain, int c_ratio,
+                        int c_knee, int c_release);
+#ifdef HAVE_SW_VOLUME_CONTROL
+void dsp_set_volume(int vol);
+#endif
+#ifdef HAVE_SW_TONE_CONTROLS
+void set_tone_controls(int bass, int treble, int prescale);
+#endif
+#ifdef RBCODEC_ENABLE_CHANNEL_MODES
+void dsp_set_channel_config(int value);
+void dsp_set_stereo_width(int value);
+#endif
 
 #endif

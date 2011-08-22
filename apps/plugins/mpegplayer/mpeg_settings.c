@@ -1,6 +1,7 @@
 #include "plugin.h"
 #include "lib/helper.h"
 #include "lib/configfile.h"
+#include "dsp.h" /* SOUND_CHAN_STEREO */
 
 #include "mpegplayer.h"
 #include "mpeg_settings.h"

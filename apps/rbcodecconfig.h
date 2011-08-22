@@ -3,6 +3,10 @@
 
 #include "config.h"
 
+#ifndef HAVE_MAS35XX
+#define RBCODEC_ENABLE_CHANNEL_MODES
+#endif
+
 #ifndef __ASSEMBLER__
 
 /* NULL, offsetof, size_t */
