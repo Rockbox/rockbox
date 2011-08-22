@@ -55,12 +55,12 @@ bool get_sid_metadata(int fd, struct mp3entry* id3)
     /* Copy Title (assumed max 0x1f letters + 1 zero byte) */
     id3->title = p;
     buf[0x16+0x1f] = 0;
-    p = iso_decode(&buf[0x16], p, 0, strlen(&buf[0x16])+1);
+    p = decode_text(ENCODING_ISO_8859_1, &buf[0x16], p, 0x20);
 
     /* Copy Artist (assumed max 0x1f letters + 1 zero byte) */
     id3->artist = p;
     buf[0x36+0x1f] = 0;
-    p = iso_decode(&buf[0x36], p, 0, strlen(&buf[0x36])+1);
+    p = decode_text(ENCODING_ISO_8859_1, &buf[0x36], p, 0x20);
 
     /* Copy Year (assumed max 4 letters + 1 zero byte) */
     buf[0x56+0x4] = 0;
@@ -69,7 +69,7 @@ bool get_sid_metadata(int fd, struct mp3entry* id3)
     /* Copy Album (assumed max 0x1f-0x05 letters + 1 zero byte) */
     id3->album = p;
     buf[0x56+0x1f] = 0;
-    iso_decode(&buf[0x5b], p, 0, strlen(&buf[0x5b])+1);
+    decode_text(ENCODING_ISO_8859_1, &buf[0x5b], p, 0x20);
 
     id3->bitrate = 706;
     id3->frequency = 44100;

@@ -58,8 +58,8 @@ static byte const* get_gd3_str( byte const* in, byte const* end, char* field )
         len = len < (int) max_field ? len : (int) max_field;
 
         field [len] = 0;
-        /* Conver to utf8 */
-        utf16LEdecode( in, field, len );
+        /* Convert to utf8 */
+        decode_text(ENCODING_UTF_16LE, in, field, 2 * len);
         
         /* Copy string back to id3v2buf */
         strcpy( (char*) in, field );

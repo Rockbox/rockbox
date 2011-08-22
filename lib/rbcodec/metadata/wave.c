@@ -135,17 +135,6 @@ struct wave_fmt {
     uint64_t numbytes;
 };
 
-static unsigned char *convert_utf8(const unsigned char *src, unsigned char *dst,
-                                   int size, bool is_64)
-{
-    if (is_64)
-    {
-        /* Note: wave64: metadata codepage is UTF-16 only */
-        return utf16LEdecode(src, dst, size);
-    }
-    return iso_decode(src, dst, -1, size);
-}
-
 static void set_totalsamples(struct wave_fmt *fmt, struct mp3entry* id3)
 {
     switch (fmt->formattag)
@@ -248,6 +237,7 @@ static void parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool i
     unsigned char *endp;
     unsigned char *data_pos;
     unsigned char *tag_pos  = id3->id3v2buf;
+    encoding_t encoding = is_64 ? ENCODING_UTF_16LE : ENCODING_DEFAULT;
     int datasize;
     int infosize;
     int remain;
@@ -279,9 +269,8 @@ static void parse_list_chunk(int fd, struct mp3entry* id3, int chunksize, bool i
             if (memcmp(bp, info_chunks[i].tag, 4) == 0)
             {
                 *((char **)(((char*)id3) + info_chunks[i].offset)) = tag_pos;
-                tag_pos = convert_utf8(data_pos, tag_pos,
-                                       (datasize + 1 >= remain )? remain - 1 : datasize,
-                                       is_64);
+                tag_pos = decode_text(encoding, data_pos, tag_pos,
+                                      (datasize + 1 >= remain )? remain - 1 : datasize);
                 *tag_pos++ = 0;
                 break;
             }

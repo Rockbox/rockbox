@@ -54,17 +54,17 @@ bool get_spc_metadata(int fd, struct mp3entry* id3)
     
     id3->title = p;
     buf[31] = 0;
-    p = iso_decode(buf, p, 0, 32);
+    p = decode_text(ENCODING_ISO_8859_1, buf, p, 32);
     buf += 32;
 
     id3->album = p;
     buf[31] = 0;
-    p = iso_decode(buf, p, 0, 32);
+    p = decode_text(ENCODING_ISO_8859_1, buf, p, 32);
     buf += 48;
     
     id3->comment = p;
     buf[31] = 0;
-    p = iso_decode(buf, p, 0, 32);
+    p = decode_text(ENCODING_ISO_8859_1, buf, p, 32);
     buf += 32;
     
     /* Date check */
@@ -114,7 +114,7 @@ bool get_spc_metadata(int fd, struct mp3entry* id3)
     
     id3->artist = p;
     buf[31] = 0;
-    iso_decode(buf, p, 0, 32);
+    p = decode_text(ENCODING_ISO_8859_1, buf, p, 32);
     
     if (length==0) {
         length=3*60*1000; /* 3 minutes */
