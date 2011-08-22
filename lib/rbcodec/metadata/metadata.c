@@ -25,7 +25,6 @@
 
 #include "debug.h"
 #include "logf.h"
-#include "settings.h"
 #include "cuesheet.h"
 #include "metadata.h"
 
@@ -571,67 +570,3 @@ void fill_metadata_from_path(struct mp3entry *id3, const char *trackname)
     strlcpy(id3->path, trackname, sizeof (id3->path));
 }
 #endif /* CONFIG_CODEC == SWCODEC */
-
-#ifndef __PCTOOL__
-#ifdef HAVE_TAGCACHE
-#if CONFIG_CODEC == SWCODEC
-
-enum { AUTORESUMABLE_UNKNOWN = 0, AUTORESUMABLE_TRUE, AUTORESUMABLE_FALSE };
-
-bool autoresumable(struct mp3entry *id3)
-{
-    char *endp, *path;
-    size_t len;
-    bool is_resumable;
-
-    if (id3->autoresumable)             /* result cached? */
-        return id3->autoresumable == AUTORESUMABLE_TRUE;
-
-    is_resumable = false;
-
-    if (id3->path)
-    {
-        for (path = global_settings.autoresume_paths;
-             *path;                     /* search terms left? */
-             path++)
-        {
-            if (*path == ':')           /* Skip empty search patterns */
-                continue;
-
-            /* FIXME: As soon as strcspn or strchrnul are made available in
-               the core, the following can be made more efficient. */
-            endp = strchr(path, ':');
-            if (endp)
-                len = endp - path;
-            else
-                len = strlen(path);
-
-            /* Note: At this point, len is always > 0 */
-
-            if (strncasecmp(id3->path, path, len) == 0)
-            {
-                /* Full directory-name matches only.  Trailing '/' in
-                   search path OK. */
-                if (id3->path[len] == '/' || id3->path[len - 1] == '/')
-                {
-                    is_resumable = true;
-                    break;
-                }
-            }
-            path += len - 1;
-        }
-    }
-
-    /* cache result */
-    id3->autoresumable =
-        is_resumable ? AUTORESUMABLE_TRUE : AUTORESUMABLE_FALSE;
-
-    logf("autoresumable: %s is%s resumable",
-         id3->path, is_resumable ? "" : " not");
-
-    return is_resumable;
-}
-
-#endif  /* SWCODEC */
-#endif  /* HAVE_TAGCACHE */
-#endif  /* __PCTOOL__ */

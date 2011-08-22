@@ -1379,6 +1379,64 @@ static bool audio_init_codec(struct track_info *track_info,
     (void)track_info; /* When codec buffering isn't supported */
 }
 
+#ifdef HAVE_TAGCACHE
+/* Check settings for whether the file should be autoresumed */
+enum { AUTORESUMABLE_UNKNOWN = 0, AUTORESUMABLE_TRUE, AUTORESUMABLE_FALSE };
+static bool autoresumable(struct mp3entry *id3)
+{
+    char *endp, *path;
+    size_t len;
+    bool is_resumable;
+
+    if (id3->autoresumable)             /* result cached? */
+        return id3->autoresumable == AUTORESUMABLE_TRUE;
+
+    is_resumable = false;
+
+    if (id3->path)
+    {
+        for (path = global_settings.autoresume_paths;
+             *path;                     /* search terms left? */
+             path++)
+        {
+            if (*path == ':')           /* Skip empty search patterns */
+                continue;
+
+            /* FIXME: As soon as strcspn or strchrnul are made available in
+               the core, the following can be made more efficient. */
+            endp = strchr(path, ':');
+            if (endp)
+                len = endp - path;
+            else
+                len = strlen(path);
+
+            /* Note: At this point, len is always > 0 */
+
+            if (strncasecmp(id3->path, path, len) == 0)
+            {
+                /* Full directory-name matches only.  Trailing '/' in
+                   search path OK. */
+                if (id3->path[len] == '/' || id3->path[len - 1] == '/')
+                {
+                    is_resumable = true;
+                    break;
+                }
+            }
+            path += len - 1;
+        }
+    }
+
+    /* cache result */
+    id3->autoresumable =
+        is_resumable ? AUTORESUMABLE_TRUE : AUTORESUMABLE_FALSE;
+
+    logf("autoresumable: %s is%s resumable",
+         id3->path, is_resumable ? "" : " not");
+
+    return is_resumable;
+}
+#endif  /* HAVE_TAGCACHE */
+
 /* Start the codec for the current track scheduled to be decoded */
 static bool audio_start_codec(bool auto_skip)
 {
