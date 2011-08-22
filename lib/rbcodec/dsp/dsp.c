@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include <sound.h>
 #include "dsp.h"
 #include "eq.h"
 #include "compressor.h"
@@ -163,16 +162,16 @@ static struct eq_state eq_data;                     /* A */
 
 /* Software tone controls */
 #ifdef HAVE_SW_TONE_CONTROLS
-static int prescale;                                /* A/V */
-static int bass;                                    /* A/V */
-static int treble;                                  /* A/V */
+static bool tone_controls_enabled;                  /* A/V */
+#ifdef HAVE_SW_VOLUME_CONTROL
+static int volume;
+#endif
 #endif
 
 /* Settings applicable to audio codec only */
 #ifdef HAVE_PITCHSCREEN
 static int32_t  pitch_ratio = PITCH_SPEED_100;
 #endif
-static int  channels_mode;
        long dsp_sw_gain;
        long dsp_sw_cross;
 static bool dither_enabled;
@@ -886,12 +885,8 @@ static void set_gain(struct dsp_config *dsp)
     }
 
 #ifdef HAVE_SW_VOLUME_CONTROL
-    if (global_settings.volume < SW_VOLUME_MAX ||
-        global_settings.volume > SW_VOLUME_MIN)
-    {
-        int vol_gain = get_replaygain_int(global_settings.volume * 100);
-        dsp->data.gain = (long) (((int64_t) dsp->data.gain * vol_gain) >> 24);
-    }
+    int vol_gain = get_replaygain_int(volume * 100);
+    dsp->data.gain = (long) (((int64_t) dsp->data.gain * vol_gain) >> 24);
 #endif
 
     if (dsp->data.gain == DEFAULT_GAIN)
@@ -905,6 +900,14 @@ static void set_gain(struct dsp_config *dsp)
 
     dsp->apply_gain = dsp->data.gain != 0 ? dsp_apply_gain : NULL;
 }
+
+#ifdef HAVE_SW_VOLUME_CONTROL
+void dsp_set_volume(int vol)
+{
+    volume = vol;
+    set_gain(&AUDIO_DSP);
+}
+#endif
 
 /**
  * Update the amount to cut the audio before applying the equalizer.
@@ -989,7 +992,8 @@ void dsp_set_eq(bool enable)
     set_gain(&AUDIO_DSP);
 }
 
-static void dsp_set_stereo_width(int value)
+#ifdef RBCODEC_ENABLE_CHANNEL_MODES
+void dsp_set_stereo_width(int value)
 {
     long width, straight, cross;
 
@@ -1010,6 +1014,7 @@ static void dsp_set_stereo_width(int value)
     dsp_sw_gain  = straight << 8;
     dsp_sw_cross = cross << 8;
 }
+#endif
 
 /**
  * Implements the different channel configurations and stereo width.
@@ -1082,7 +1087,8 @@ static void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
 }
 #endif /* DSP_HAVE_ASM_SOUND_CHAN_KARAOKE */
 
-static void dsp_set_channel_config(int value)
+#ifdef RBCODEC_ENABLE_CHANNEL_MODES
+void dsp_set_channel_config(int value)
 {
     static const channels_process_fn_type channels_process_functions[] =
     {
@@ -1102,15 +1108,14 @@ static void dsp_set_channel_config(int value)
     }
 
     /* This doesn't apply to voice */
-    channels_mode = value;
     AUDIO_DSP.channels_process = channels_process_functions[value];
 }
+#endif
 
-#if CONFIG_CODEC == SWCODEC
-
-#ifdef HAVE_SW_TONE_CONTROLS
-static void set_tone_controls(void)
+#if defined(HAVE_SW_TONE_CONTROLS)
+void set_tone_controls(int bass, int treble, int prescale)
 {
+    tone_controls_enabled = bass || treble;
     filter_bishelf_coefs(0xffffffff/NATIVE_FREQUENCY*200,
                          0xffffffff/NATIVE_FREQUENCY*3500,
                          bass, treble, -prescale,
@@ -1118,46 +1123,6 @@ static void set_tone_controls(void)
     /* Sync the voice dsp coefficients */
     memcpy(&VOICE_DSP.tone_filter.coefs, AUDIO_DSP.tone_filter.coefs,
            sizeof (VOICE_DSP.tone_filter.coefs));
-}
-#endif
-
-/* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
- * code directly.
- */
-int dsp_callback(int msg, intptr_t param)
-{
-    switch (msg)
-    {
-#ifdef HAVE_SW_TONE_CONTROLS
-    case DSP_CALLBACK_SET_PRESCALE:
-        prescale = param;
-        set_tone_controls();
-        break;
-    /* prescaler is always set after calling any of these, so we wait with
-     * calculating coefs until the above case is hit.
-     */
-    case DSP_CALLBACK_SET_BASS:
-        bass = param;
-        break;
-    case DSP_CALLBACK_SET_TREBLE:
-        treble = param;
-        break;
-#ifdef HAVE_SW_VOLUME_CONTROL
-    case DSP_CALLBACK_SET_SW_VOLUME:
-        set_gain(&AUDIO_DSP);
-        break;
-#endif
-#endif
-    case DSP_CALLBACK_SET_CHANNEL_CONFIG:
-        dsp_set_channel_config(param);
-        break;
-    case DSP_CALLBACK_SET_STEREO_WIDTH:
-        dsp_set_stereo_width(param);
-        break;
-    default:
-        break;
-    }
-    return 0;
 }
 #endif
 
@@ -1269,7 +1234,7 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
                 dsp->eq_process(chunk, t2);
 
 #ifdef HAVE_SW_TONE_CONTROLS
-            if ((bass | treble) != 0)
+            if (tone_controls_enabled)
                 eq_filter(t2, &dsp->tone_filter, chunk,
                       dsp->data.num_channels, FILTER_BISHELF_SHIFT);
 #endif
@@ -1509,9 +1474,11 @@ void rbcodec_dsp_set_replaygain(int type, bool noclip, int preamp)
 
 /** SET COMPRESSOR
  *  Called by the menu system to configure the compressor process */
-void dsp_set_compressor(void)
+void dsp_set_compressor(int threshold, int c_gain, int c_ratio, int c_knee,
+                        int c_release)
 {
     /* enable/disable the compressor */
-    AUDIO_DSP.compressor_process = compressor_update() ?
-                                        compressor_process : NULL;
+    AUDIO_DSP.compressor_process =
+        compressor_update(threshold, c_gain, c_ratio, c_knee, c_release) ?
+            compressor_process : NULL;
 }

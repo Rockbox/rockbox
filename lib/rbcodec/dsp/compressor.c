@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
+#include "platform.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
 #include "settings.h"
@@ -38,23 +38,18 @@ static int32_t release_gain IBSS_ATTR;     /* S7.24 format */
 
 /** COMPRESSOR UPDATE
  *  Called via the menu system to configure the compressor process */
-bool compressor_update(void)
+bool compressor_update(int threshold, int gain, int ratio, int knee,
+                       int release)
 {
     static int curr_set[5];
-    int new_set[5] = {
-        global_settings.compressor_threshold,
-        global_settings.compressor_makeup_gain,
-        global_settings.compressor_ratio,
-        global_settings.compressor_knee,
-        global_settings.compressor_release_time};
+    int new_set[5] = {threshold, gain, ratio, knee, release};
     
     /* make menu values useful */
-    int  threshold  =  new_set[0];
-    bool auto_gain  = (new_set[1] == 1);
+    bool auto_gain  = (gain == 1);
     const int comp_ratios[] = {2, 4, 6, 10, 0};
-    int  ratio      =  comp_ratios[new_set[2]];
-    bool soft_knee  = (new_set[3] == 1);
-    int  release    =  new_set[4] * NATIVE_FREQUENCY / 1000;
+    ratio      =  comp_ratios[ratio];
+    bool soft_knee  = (knee == 1);
+    release    =  release * NATIVE_FREQUENCY / 1000;
 
     bool changed = false;
     bool active  = (threshold < 0);

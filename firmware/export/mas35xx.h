@@ -272,4 +272,16 @@ extern void audiohw_set_balance(int val);
 extern void audiohw_set_pitch(unsigned long val);
 #endif
 
+/* This platform has hardware support for channel modes. Since librbcodec's
+ * version isn't being used, we need our own copy of this enum. */
+enum Channel {
+    SOUND_CHAN_STEREO,
+    SOUND_CHAN_MONO,
+    SOUND_CHAN_CUSTOM,
+    SOUND_CHAN_MONO_LEFT,
+    SOUND_CHAN_MONO_RIGHT,
+    SOUND_CHAN_KARAOKE,
+    SOUND_CHAN_NUM_MODES,
+};
+
 #endif /* _MAS35XX_H */
