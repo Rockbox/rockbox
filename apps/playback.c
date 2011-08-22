@@ -1183,6 +1183,7 @@ static bool audio_get_track_metadata(int offset, struct mp3entry *id3)
     }
     else if (bufreadid3(info->id3_hid, id3))
     {
+        id3->cuesheet = NULL;
         return true;
     }
 
