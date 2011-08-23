@@ -119,14 +119,28 @@ char* wps_default_skin(enum screen_type screen)
     return skin_buf[screen];
 }
 
+static void update_non_static(void)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+        skin_update(WPS, i, SKIN_REFRESH_NON_STATIC);
+}
+
 void pause_action(bool may_fade, bool updatewps)
 {
-#if CONFIG_CODEC != SWCODEC
+#if CONFIG_CODEC == SWCODEC
+    /* Do audio first, then update, unless skin were to use its local
+       status in which case, reverse it */
+    audio_pause();
+
+    if (updatewps)
+        update_non_static();
+#else
     if (may_fade && global_settings.fade_on_stop)
         fade(false, updatewps);
     else
-#endif
         audio_pause();
+#endif
 
     if (global_settings.pause_rewind) {
         long newpos;
@@ -139,18 +153,26 @@ void pause_action(bool may_fade, bool updatewps)
         audio_ff_rewind(newpos > 0 ? newpos : 0);
     }
 
-    (void)may_fade; (void)updatewps;
+    (void)may_fade;
 }
 
 void unpause_action(bool may_fade, bool updatewps)
 {
-#if CONFIG_CODEC != SWCODEC
+#if CONFIG_CODEC == SWCODEC
+    /* Do audio first, then update, unless skin were to use its local
+       status in which case, reverse it */
+    audio_resume();
+
+    if (updatewps)
+        update_non_static();
+#else
     if (may_fade && global_settings.fade_on_stop)
         fade(true, updatewps);
     else
-#endif
         audio_resume();
-    (void)may_fade; (void)updatewps;
+#endif
+
+    (void)may_fade;
 }        
 
 #if CONFIG_CODEC != SWCODEC
@@ -159,7 +181,7 @@ void fade(bool fade_in, bool updatewps)
     int fp_global_vol = global_settings.volume << 8;
     int fp_min_vol = sound_min(SOUND_VOLUME) << 8;
     int fp_step = (fp_global_vol - fp_min_vol) / 10;
-    int i;
+
     skin_get_global_state()->is_fading = !fade_in;
     if (fade_in) {
         /* fade in */
@@ -171,10 +193,8 @@ void fade(bool fade_in, bool updatewps)
         sleep(HZ/10); /* let audio thread run */
         audio_resume();
         
-        if (updatewps) {
-            FOR_NB_SCREENS(i)
-                skin_update(WPS, i, SKIN_REFRESH_NON_STATIC);
-        }
+        if (updatewps)
+            update_non_static();
 
         while (fp_volume < fp_global_vol - fp_step) {
             fp_volume += fp_step;
@@ -187,10 +207,8 @@ void fade(bool fade_in, bool updatewps)
         /* fade out */
         int fp_volume = fp_global_vol;
 
-        if (updatewps) {
-            FOR_NB_SCREENS(i)
-                skin_update(WPS, i, SKIN_REFRESH_NON_STATIC);
-        }
+        if (updatewps)
+            update_non_static();
 
         while (fp_volume > fp_min_vol + fp_step) {
             fp_volume -= fp_step;
@@ -1140,6 +1158,7 @@ long gui_wps_show(void)
                 fade(false, true);
 #else
             audio_pause();
+            update_non_static();
 #endif
             if (bookmark)
                 bookmark_autobookmark(true);

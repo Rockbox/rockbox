@@ -65,6 +65,7 @@ unsigned char *pcmbuf_get_meminfo(size_t *length);
 
 /* Misc */
 void pcmbuf_fade(bool fade, bool in);
+bool pcmbuf_fading(void);
 void pcmbuf_soft_mode(bool shhh);
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_set_low_latency(bool state);

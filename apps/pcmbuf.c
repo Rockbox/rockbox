@@ -91,6 +91,13 @@ static bool track_transition;
 
 /* Fade effect */
 static unsigned int fade_vol = MIX_AMP_UNITY;
+static enum
+{
+    PCM_NOT_FADING = 0,
+    PCM_FADING_IN,
+    PCM_FADING_OUT,
+} fade_state = PCM_NOT_FADING;
+static bool fade_out_complete = false;
 
 /* Voice */
 static bool soft_mode = false;
@@ -628,8 +635,9 @@ bool pcmbuf_start_track_change(bool auto_skip)
  * operations involved in sending a new chunk to the DMA. */
 static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
 {
+    struct chunkdesc *pcmbuf_current = read_chunk;
+
     {
-        struct chunkdesc *pcmbuf_current = read_chunk;
         /* Take the finished chunk out of circulation */
         read_chunk = pcmbuf_current->link;
 
@@ -657,25 +665,28 @@ static void pcmbuf_pcm_callback(unsigned char** start, size_t* size)
 
     {
         /* Commit last samples at end of playlist */
-        if (pcmbuffer_fillpos && !read_chunk)
+        if (pcmbuffer_fillpos && !pcmbuf_current)
         {
             logf("pcmbuf_pcm_callback: commit last samples");
             commit_chunk(false);
         }
     }
 
+    /* Stop at this frame */
+    pcmbuf_current = fade_out_complete ? NULL : read_chunk;
+
     {
         /* Send the new chunk to the DMA */
-        if(read_chunk)
+        if(pcmbuf_current)
         {
-            last_chunksize = read_chunk->size;
+            last_chunksize = pcmbuf_current->size;
             pcmbuf_unplayed_bytes -= last_chunksize;
             *size = last_chunksize;
-            *start = read_chunk->addr;
+            *start = pcmbuf_current->addr;
         }
         else
         {
-            /* No more chunks */
+            /* No more chunks or pause indicated */
             logf("pcmbuf_pcm_callback: no more chunks");
             last_chunksize = 0;
             *size = 0;
@@ -694,8 +705,8 @@ void pcmbuf_play_start(void)
         logf("pcmbuf_play_start");
         last_chunksize = read_chunk->size;
         pcmbuf_unplayed_bytes -= last_chunksize;
-        mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK,
-                                pcmbuf_pcm_callback, NULL, 0);
+        mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, pcmbuf_pcm_callback,
+                                read_chunk->addr, last_chunksize);
     }
 }
 
@@ -1087,58 +1098,75 @@ static void pcmbuf_update_volume(void)
 /* Quiet-down the channel if 'shhh' is true or else play at normal level */
 void pcmbuf_soft_mode(bool shhh)
 {
+    /* "Hate this" alert (messing with IRQ in app code): Have to block
+       the tick or improper order could leave volume in soft mode if
+       fading reads the old value first but updates after us. */
+    int oldlevel = disable_irq_save();
     soft_mode = shhh;
     pcmbuf_update_volume();
+    restore_irq(oldlevel);
 }
 
-/* Fade channel in or out */
+/* Tick that does the fade for the playback channel */
+static void pcmbuf_fade_tick(void)
+{
+    /* ~1/3 second for full range fade */
+    const unsigned int fade_step = MIX_AMP_UNITY / (HZ / 3);
+
+    if (fade_state == PCM_FADING_IN)
+        fade_vol += MIN(fade_step, MIX_AMP_UNITY - fade_vol);
+    else if (fade_state == PCM_FADING_OUT)
+        fade_vol -= MIN(fade_step, fade_vol - MIX_AMP_MUTE);
+
+    pcmbuf_update_volume();
+
+    if (fade_vol == MIX_AMP_MUTE || fade_vol == MIX_AMP_UNITY)
+    {
+        /* Fade is complete */
+        tick_remove_task(pcmbuf_fade_tick);
+
+        if (fade_state == PCM_FADING_OUT)
+        {
+            /* Tell PCM to stop at its earliest convenience */
+            fade_out_complete = true;
+        }
+
+        fade_state = PCM_NOT_FADING;
+    }
+}
+
+/* Fade channel in or out in the background - must pause it first */
 void pcmbuf_fade(bool fade, bool in)
 {
+    pcm_play_lock();
+
+    if (fade_state != PCM_NOT_FADING)
+        tick_remove_task(pcmbuf_fade_tick);
+
+    fade_out_complete = false;
+
+    pcm_play_unlock();
+
     if (!fade)
     {
         /* Simply set the level */
+        fade_state = PCM_NOT_FADING;
         fade_vol = in ? MIX_AMP_UNITY : MIX_AMP_MUTE;
+        pcmbuf_update_volume();
     }
     else
     {
-        /* Start from the opposing end */
-        fade_vol = in ? MIX_AMP_MUTE : MIX_AMP_UNITY;
-    }
-
-    pcmbuf_update_volume();
-
-    if (fade)
-    {
-        /* Do this on thread for now */
-#ifdef HAVE_PRIORITY_SCHEDULING
-        int old_prio = thread_set_priority(thread_self(), PRIORITY_REALTIME);
-#endif
-
-        while (1)
-        {
-            /* Linear fade actually sounds better */
-            if (in)
-                fade_vol += MIN(MIX_AMP_UNITY/16, MIX_AMP_UNITY - fade_vol);
-            else
-                fade_vol -= MIN(MIX_AMP_UNITY/16, fade_vol - MIX_AMP_MUTE);
-
-            pcmbuf_update_volume();
-
-            if (fade_vol > MIX_AMP_MUTE && fade_vol < MIX_AMP_UNITY)
-            {
-                sleep(0);
-                continue;
-            }
-
-            break;
-        }
-
-#ifdef HAVE_PRIORITY_SCHEDULING
-        thread_set_priority(thread_self(), old_prio);
-#endif
+        /* Set direction and resume fade from current point */
+        fade_state = in ? PCM_FADING_IN : PCM_FADING_OUT;
+        tick_add_task(pcmbuf_fade_tick);
     }
 }
 
+/* Return 'true' if fade is in progress */
+bool pcmbuf_fading(void)
+{
+    return fade_state != PCM_NOT_FADING;
+}
 
 /** Misc */
 

@@ -1100,6 +1100,14 @@ static void audio_clear_paused_pcm(void)
         pcmbuf_play_stop();
 }
 
+/* Wait for any in-progress fade to complete */
+static void audio_wait_fade_complete(void)
+{
+    /* Just loop until it's done */
+    while (pcmbuf_fading())
+        sleep(0);
+}
+
 /* End the ff/rw mode */
 static void audio_ff_rewind_end(void)
 {
@@ -2439,7 +2447,12 @@ static void audio_stop_playback(void)
     if (play_status == PLAY_STOPPED)
         return;
 
-    pcmbuf_fade(global_settings.fade_on_stop, false);
+    bool do_fade = global_settings.fade_on_stop && filling != STATE_ENDED;
+
+    pcmbuf_fade(do_fade, false);
+
+    /* Wait for fade-out */
+    audio_wait_fade_complete();
 
     /* Stop the codec and unload it */
     halt_decoding_track(true);
@@ -2480,27 +2493,22 @@ static void audio_on_pause(bool pause)
     if (play_status == PLAY_STOPPED || pause == (play_status == PLAY_PAUSED))
         return;
 
-    bool const do_fade = global_settings.fade_on_stop;
-
-    if (pause)
-        pcmbuf_fade(do_fade, false);
-
-    if (!ff_rw_mode)
-    {
-        /* Not in ff/rw mode - may set the state (otherwise this could make
-           old data play because seek hasn't completed and cleared it) */
-        pcmbuf_pause(pause);
-    }
-
-    if (!pause)
-        pcmbuf_fade(do_fade, true);
-
     play_status = pause ? PLAY_PAUSED : PLAY_PLAYING;
 
     if (!pause && codec_skip_pending)
     {
         /* Actually do the skip that is due - resets the status flag */
         audio_on_codec_complete(codec_skip_status);
+    }
+
+    bool do_fade = global_settings.fade_on_stop;
+
+    pcmbuf_fade(do_fade, !pause);
+
+    if (!ff_rw_mode && !(do_fade && pause))
+    {
+        /* Not in ff/rw mode - can actually change the audio state now */
+        pcmbuf_pause(pause);
     }
 }
 
@@ -2643,6 +2651,8 @@ static void audio_on_pre_ff_rewind(void)
         return;
 
     ff_rw_mode = true;
+
+    audio_wait_fade_complete();
 
     if (play_status == PLAY_PAUSED)
         return;
