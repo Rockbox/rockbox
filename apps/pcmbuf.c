@@ -1135,9 +1135,10 @@ static void pcmbuf_fade_tick(void)
     }
 }
 
-/* Fade channel in or out in the background - must pause it first */
+/* Fade channel in or out in the background */
 void pcmbuf_fade(bool fade, bool in)
 {
+    /* Must pause any active fade */
     pcm_play_lock();
 
     if (fade_state != PCM_NOT_FADING)
