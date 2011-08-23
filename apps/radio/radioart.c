@@ -174,6 +174,12 @@ void radioart_init(bool entering_screen)
             radioart[i].name[0] = '\0';
         }
         add_event(PLAYBACK_EVENT_START_PLAYBACK, true, playback_restarting_handler);
+
+        /* grab control over buffering */
+        char* buf;
+        size_t bufsize;
+        buf = audio_get_buffer(false, &bufsize);
+        buffering_reset(buf, bufsize);
     }
     else
     {
