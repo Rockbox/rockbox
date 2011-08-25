@@ -1095,18 +1095,6 @@ static void pcmbuf_update_volume(void)
     mixer_channel_set_amplitude(PCM_MIXER_CHAN_PLAYBACK, vol);
 }
 
-/* Quiet-down the channel if 'shhh' is true or else play at normal level */
-void pcmbuf_soft_mode(bool shhh)
-{
-    /* "Hate this" alert (messing with IRQ in app code): Have to block
-       the tick or improper order could leave volume in soft mode if
-       fading reads the old value first but updates after us. */
-    int oldlevel = disable_irq_save();
-    soft_mode = shhh;
-    pcmbuf_update_volume();
-    restore_irq(oldlevel);
-}
-
 /* Tick that does the fade for the playback channel */
 static void pcmbuf_fade_tick(void)
 {
@@ -1168,6 +1156,22 @@ bool pcmbuf_fading(void)
 {
     return fade_state != PCM_NOT_FADING;
 }
+
+/* Quiet-down the channel if 'shhh' is true or else play at normal level */
+void pcmbuf_soft_mode(bool shhh)
+{
+    /* Have to block the tick or improper order could leave volume in soft
+       mode if fading reads the old value first but updates after us. */
+    int res = fade_state != PCM_NOT_FADING ?
+                tick_remove_task(pcmbuf_fade_tick) : -1;
+
+    soft_mode = shhh;
+    pcmbuf_update_volume();
+
+    if (res == 0)
+        tick_add_task(pcmbuf_fade_tick);
+}
+
 
 /** Misc */
 
