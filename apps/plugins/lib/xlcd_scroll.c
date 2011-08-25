@@ -367,8 +367,8 @@ void xlcd_scroll_down(int count)
 /* Scroll up */
 void xlcd_scroll_up(int count)
 {
-    int bitcount, oldmode;
-    int blockcount, blocklen;
+    int bitcount=0, oldmode;
+    int blockcount=0, blocklen;
 
     if ((unsigned) count >= LCD_HEIGHT)
     {
@@ -561,8 +561,8 @@ void xlcd_scroll_up(int count)
 /* Scroll up */
 void xlcd_scroll_down(int count)
 {
-    int bitcount, oldmode;
-    int blockcount, blocklen;
+    int bitcount=0, oldmode;
+    int blockcount=0, blocklen;
 
     if ((unsigned) count >= LCD_HEIGHT)
     {
