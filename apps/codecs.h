@@ -286,6 +286,7 @@ int codec_close(void);
 
 /* defined by the codec */
 enum codec_status codec_start(enum codec_entry_call_reason reason);
+enum codec_status codec_main(enum codec_entry_call_reason reason);
 enum codec_status codec_run(void);
 
 #endif /* _CODECS_H_ */
