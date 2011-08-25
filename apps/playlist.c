@@ -418,10 +418,13 @@ static int recreate_control(struct playlist_info* playlist)
         playlist->control_fd = open(playlist->control_filename,
             O_CREAT|O_RDWR|O_TRUNC, 0666);
         if (playlist->control_fd < 0)
+        {
+            close(temp_fd);
             return -1;
+        }
 
         playlist->filename[playlist->dirlen-1] = '\0';
-        
+
         /* cannot call update_control() because of mutex */
         result = fdprintf(playlist->control_fd, "P:%d:%s:%s\n",
             PLAYLIST_CONTROL_FILE_VERSION, dir, file);
