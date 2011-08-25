@@ -783,7 +783,6 @@ static void resistance_to_color(void)
     int menu_selection;
     int menu_selection_tol;
     int button_press;
-    int i;
     bool quit = false;
     char kbd_buffer [10];
     int kbd_input_int;
