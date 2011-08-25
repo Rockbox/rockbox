@@ -655,12 +655,10 @@ static int inflate_block(int *e)
     case 0:            /* Inflate stored */
     {
         unsigned int n=0;    /* number of bytes in block */
-        unsigned int b_stored=0;    /* bit buffer */
-        unsigned int k_stored=0;    /* number of bits in bit buffer */
 
         /* make local copies of globals */
-        b_stored = gunzip_bb;    /* initialize bit buffer */
-        k_stored = gunzip_bk;
+        unsigned int b_stored=gunzip_bb;    /* bit buffer */
+        unsigned int k_stored=gunzip_bk;    /* number of bits in bit buffer */
 
         /* go to byte boundary */
         n = k_stored & 7;
