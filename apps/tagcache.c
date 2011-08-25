@@ -3532,7 +3532,10 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
     if (tcs->masterfd < 0)
     {
         if ( (tcs->masterfd = open_master_fd(&myhdr, false)) < 0)
+        {
+            close(clfd);
             return false;
+        }
     }
     else
     {
