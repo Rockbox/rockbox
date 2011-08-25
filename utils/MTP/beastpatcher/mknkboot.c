@@ -254,7 +254,6 @@ int main(int argc, char* argv[])
     if (fdboot < 0)
     {
         perror(bootfile);
-        close(fdin);
         result = 3;
         goto quit;
     }
