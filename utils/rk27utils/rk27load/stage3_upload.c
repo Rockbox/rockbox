@@ -45,7 +45,7 @@ int upload_stage3_code(libusb_device_handle *hdev, char *fn_stage3)
     {
         fprintf(stderr, "\n[error]: I/O error\n");
         fclose(f);
-        free(f);
+        free(code);
         return -33;
     }
     fprintf(stderr, "done\n");
