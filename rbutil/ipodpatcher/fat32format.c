@@ -309,7 +309,7 @@ static void create_boot_sector(unsigned char* buf,
     pFAT32BootSect->sJmpBoot[0]=0xEB;
     pFAT32BootSect->sJmpBoot[1]=0x5A;
     pFAT32BootSect->sJmpBoot[2]=0x90;
-    strcpy( pFAT32BootSect->sOEMName, "MSWIN4.1" );
+    memcpy(pFAT32BootSect->sOEMName, "MSWIN4.1", 8 );
     pFAT32BootSect->wBytsPerSec = rb_htole16(BytesPerSect);
     pFAT32BootSect->bSecPerClus = SectorsPerCluster ;
     pFAT32BootSect->wRsvdSecCnt = rb_htole16(ReservedSectCount);
