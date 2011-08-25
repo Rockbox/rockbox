@@ -801,8 +801,8 @@ static void resistance_to_color(void)
     enum color units_used = 0;
     
     char out_str[20];
-    
-    for(i=0; i<=10; i++) { kbd_buffer[i] = 0; }
+
+    memset(kbd_buffer,0,sizeof(kbd_buffer));
     /* This cleans out the mysterious garbage that appears */
     rb->lcd_clear_display();
     rb->splash(HZ/2, "Resistance to Colour");
