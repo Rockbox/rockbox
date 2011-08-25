@@ -138,15 +138,15 @@ void xlcd_scroll_down(int count)
 /* Scroll left */
 void xlcd_scroll_left(int count)
 {
-    int bitcount, oldmode;
-    int blockcount, blocklen;
+    int bitcount=0, oldmode;
+    int blockcount=0, blocklen;
 
     if ((unsigned) count >= LCD_WIDTH)
     {
         rb->lcd_clear_display();
         return;
     }
-        
+
 #if LCD_DEPTH == 2
     blockcount = count >> 2;
     blocklen = LCD_FBWIDTH - blockcount;
@@ -196,15 +196,15 @@ void xlcd_scroll_left(int count)
 /* Scroll right */
 void xlcd_scroll_right(int count)
 {
-    int bitcount, oldmode;
-    int blockcount, blocklen;
+    int bitcount=0, oldmode;
+    int blockcount=0, blocklen;
 
     if ((unsigned) count >= LCD_WIDTH)
     {
         rb->lcd_clear_display();
         return;
     }
-        
+
 #if LCD_DEPTH == 2
     blockcount = count >> 2;
     blocklen = LCD_FBWIDTH - blockcount;
