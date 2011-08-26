@@ -32,7 +32,7 @@
 //
 
 static int  firsttime = 1;
-static unsigned char cheat_xlate_table[20];
+static unsigned char cheat_xlate_table[256];
 
 
 //
