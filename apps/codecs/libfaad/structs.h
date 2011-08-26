@@ -45,6 +45,8 @@ extern "C" {
 #define MAX_LTP_SFB_S        8
 #define FRAME_LEN         1024
 
+#define DRC_MAX_CHANNELS    64 /* Should be the same as MAX_CHANNELS, but the DRC code expects 64 */
+
 /* used to save the prediction state */
 typedef struct {
     int16_t r[2];
@@ -91,8 +93,8 @@ typedef struct
     uint8_t prog_ref_level;
     uint8_t dyn_rng_sgn[17];
     uint8_t dyn_rng_ctl[17];
-    uint8_t exclude_mask[MAX_CHANNELS];
-    uint8_t additional_excluded_chns[MAX_CHANNELS];
+    uint8_t exclude_mask[DRC_MAX_CHANNELS];
+    uint8_t additional_excluded_chns[DRC_MAX_CHANNELS/7];
 
     real_t ctrl1;
     real_t ctrl2;
