@@ -364,7 +364,7 @@ void cue_draw_markers(struct screen *screen, struct cuesheet *cue,
     int i,xi;
     for (i=1; i < cue->track_count; i++)
     {
-        xi = x + (w * cue->tracks[i].offset)/tracklen;
+        xi = x + (w * (long long)cue->tracks[i].offset)/tracklen;
         draw_veritcal_line_mark(screen, xi, y, h);
     }
 }
