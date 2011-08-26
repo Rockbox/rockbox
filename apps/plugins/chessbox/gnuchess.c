@@ -2378,7 +2378,7 @@ short f,t,flag;
     if (t > f) {
 	  rb->strcpy(mvstr2,"o-o");
     } else {
-	  rb->strcpy(mvstr2,"o-o-o");
+	  rb->memcpy(mvstr2,"o-o-o", 5);
 	}
   }
   
