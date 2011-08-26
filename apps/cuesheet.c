@@ -362,9 +362,12 @@ void cue_draw_markers(struct screen *screen, struct cuesheet *cue,
                       int x, int y, int w, int h)
 {
     int i,xi;
+    unsigned long tracklen_seconds = tracklen/1000; /* duration in seconds */
+    
     for (i=1; i < cue->track_count; i++)
     {
-        xi = x + (w * (long long)cue->tracks[i].offset)/tracklen;
+        /* Convert seconds prior to multiplication to avoid overflow. */
+        xi = x + (w * (cue->tracks[i].offset/1000)) / tracklen_seconds;
         draw_veritcal_line_mark(screen, xi, y, h);
     }
 }
