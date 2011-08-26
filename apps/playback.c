@@ -1724,7 +1724,7 @@ static int audio_finish_load_track(struct track_info *info)
     {
         /* This is an error condition. Track cannot be played without valid
            metadata; skip the track. */
-        logf("No metadata for: %s", track_id3->path);
+        logf("No metadata");
         trackstat = LOAD_TRACK_ERR_FINISH_FAILED;
         goto audio_finish_load_track_exit;
     }
