@@ -78,6 +78,15 @@
 #define BATT_CHG_I          CHG_I_200MA
 #define CHARGER_TOTAL_TIMER (4*3600*2)
 
+#elif defined(SANSA_CLIPZIP)
+
+/* Check if topped-off and monitor voltage while plugged. */
+#define BATT_FULL_VOLTAGE   4160
+#define BATT_VAUTO_RECHARGE 4100
+#define BATT_CHG_V          CHG_V_4_20V
+#define BATT_CHG_I          CHG_I_150MA
+#define CHARGER_TOTAL_TIMER (4*3600*2)  /* about 1.5 * capacity / current */
+
 #elif defined(SANSA_C200V2)
 
 /* Check if topped-off and monitor voltage while plugged. */

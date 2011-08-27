@@ -224,6 +224,7 @@
 #define LCD_IPOD6G    40 /* as used by the iPod Nano 2nd Generation */
 #define LCD_FUZEPLUS  41
 #define LCD_SPFD5420A 42 /* rk27xx */
+#define LCD_CLIPZIP   43 /* as used by the Sandisk Sansa Clip Zip */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -430,6 +431,8 @@ Lyre prototype 1 */
 #include "config/sansafuzev2.h"
 #elif defined(SANSA_FUZEPLUS)
 #include "config/sansafuzeplus.h"
+#elif defined(SANSA_CLIPZIP)
+#include "config/sansaclipzip.h"
 #elif defined(SANSA_C200V2)
 #include "config/sansac200v2.h"
 #elif defined(SANSA_VIEW)

@@ -1475,6 +1475,20 @@ target/arm/imx233/sansa-fuzeplus/power-fuzeplus.c
 #endif /* SIMULATOR */
 #endif
 
+#ifdef SANSA_CLIPZIP
+#ifndef SIMULATOR
+target/arm/as3525/sansa-clipzip/lcd-clipzip.c
+target/arm/as3525/sansa-clipzip/button-clipzip.c
+target/arm/as3525/sansa-clipzip/backlight-clipzip.c
+#ifndef BOOTLOADER
+target/arm/powermgmt-ascodec.c
+target/arm/as3525/sansa-clipzip/powermgmt-clipzip.c
+//target/arm/as3525/sansa-clipzip/lcd-as-clip-plus.S
+target/arm/as3525/tuner-as3525v2.c
+#endif /* !BOOTLOADER */
+#endif /* !SIMULATOR */
+#endif /* SANSA_CLIPZIP */
+
 #ifdef IAUDIO_7
 #ifndef SIMULATOR
 drivers/nand_id.c

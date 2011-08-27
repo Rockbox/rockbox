@@ -93,7 +93,7 @@ void main(void)
     int btn = button_read_device();
 
 #if !defined(SANSA_FUZE) && !defined(SANSA_CLIP) && !defined(SANSA_CLIPV2) \
-    && !defined(SANSA_CLIPPLUS)
+    && !defined(SANSA_CLIPPLUS) && !defined(SANSA_CLIPZIP)
     if (button_hold())
     {
         verbose = true;

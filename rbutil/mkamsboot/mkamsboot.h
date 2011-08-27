@@ -43,6 +43,7 @@ enum {
     MODEL_C200V2,
     MODEL_CLIPPLUS,
     MODEL_FUZEV2,
+    MODEL_CLIPZIP,
     /* new models go here */
 
     NUM_MODELS
