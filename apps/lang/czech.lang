@@ -595,10 +595,10 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Záložka selhala!"
+    *: "Vytvoření záložky selhalo!"
   </dest>
   <voice>
-    *: "Záložka selhala!"
+    *: "Vytvoření záložky selhalo!"
   </voice>
 </phrase>
 <phrase>
@@ -1011,11 +1011,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Uložit předvolbu EQ"
+    swcodec: "Uložit konfiguraci EQ"
   </dest>
   <voice>
     *: none
-    swcodec: "Uložit předvolbu ekvalizéru"
+    swcodec: "Uložit konfiguraci ekvalizéru"
   </voice>
 </phrase>
 <phrase>
@@ -2480,10 +2480,10 @@
     *: "LCD Settings"
   </source>
   <dest>
-    *: "Nastavení LCD"
+    *: "Možnosti LCD"
   </dest>
   <voice>
-    *: "Nastavení elcédé"
+    *: "Možnosti elcédé"
   </voice>
 </phrase>
 <phrase>
@@ -3441,10 +3441,10 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "Nastavení kódování textu"
+    *: "Kódování znaků"
   </dest>
   <voice>
-    *: "Nastavení kódování textu"
+    *: "Kódování znaků"
   </voice>
 </phrase>
 <phrase>
@@ -7647,10 +7647,10 @@
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "Přidat do záložek"
+    *: "Přidat do zástupců"
   </dest>
   <voice>
-    *: "Přidat do záložek"
+    *: "Přidat do zástupců"
   </voice>
 </phrase>
 <phrase>
@@ -7804,10 +7804,10 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "Chyba aktualizace nastavení playlistu"
+    *: "Chyba aktualizace konfigurace playlistu"
   </dest>
   <voice>
-    *: "Chyba aktualizace nastavení plejlistu"
+    *: "Chyba aktualizace konfigurace plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -7832,10 +7832,10 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Chyba přístupu k nastavení playlistu"
+    *: "Chyba přístupu ke konfiguraci playlistu"
   </dest>
   <voice>
-    *: "Chyba přístupu k nastavení plejlistu"
+    *: "Chyba přístupu ke konfiguraci plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -7860,10 +7860,10 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Neplatný soubor nastavení playlistu"
+    *: "Neplatný konfigurační soubor playlistu"
   </dest>
   <voice>
-    *: "Neplatný soubor nastavení plejlistu"
+    *: "Neplatný konfigurační soubor plejlistu"
   </voice>
 </phrase>
 <phrase>
@@ -12626,7 +12626,7 @@
     *: "Automatic resume"
   </source>
   <dest>
-    *: "Pokračování přehr. u všech skladeb"
+    *: "Pokračování přehrávání u všech skladeb"
   </dest>
   <voice>
     *: "Pokračování přehrávání u všech skladeb"
@@ -12676,10 +12676,10 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalog dir
+  desc: used in the onplay menu to set a playlist catalogue dir
   user: core
   <source>
-    *: "Set As Playlist Catalog Directory"
+    *: "Set As Playlist Catalogue Directory"
   </source>
   <dest>
     *: "Nastavit jako složku pro katalog playlistů"
@@ -12693,7 +12693,7 @@
   desc:
   user: core
   <source>
-    *: "Reset Playlist Catalog Directory"
+    *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
     *: "Zrušit přiřazení složky pro katalog playlistů"
