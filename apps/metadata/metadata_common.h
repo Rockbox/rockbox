@@ -59,11 +59,11 @@ int read_uint64be(int fd, uint64_t* buf);
 #endif
 
 uint64_t get_uint64_le(void* buf);
-unsigned long get_long_le(void* buf);
-unsigned short get_short_le(void* buf);
-unsigned long get_long_be(void* buf);
-unsigned short get_short_be(void* buf);
-long get_slong(void* buf);
-unsigned long get_itunes_int32(char* value, int count);
+uint32_t get_long_le(void* buf);
+uint16_t get_short_le(void* buf);
+uint32_t get_long_be(void* buf);
+uint16_t get_short_be(void* buf);
+int32_t get_slong(void* buf);
+uint32_t get_itunes_int32(char* value, int count);
 long parse_tag(const char* name, char* value, struct mp3entry* id3,
     char* buf, long buf_remaining, enum tagtype type);

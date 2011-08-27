@@ -155,7 +155,7 @@ uint64_t get_uint64_le(void* buf)
 }
 
 /* Read an unaligned 32-bit little endian long from buffer. */
-unsigned long get_long_le(void* buf)
+uint32_t get_long_le(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
 
@@ -163,7 +163,7 @@ unsigned long get_long_le(void* buf)
 }
 
 /* Read an unaligned 16-bit little endian short from buffer. */
-unsigned short get_short_le(void* buf)
+uint16_t get_short_le(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
 
@@ -171,7 +171,7 @@ unsigned short get_short_le(void* buf)
 }
 
 /* Read an unaligned 32-bit big endian long from buffer. */
-unsigned long get_long_be(void* buf)
+uint32_t get_long_be(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
 
@@ -179,7 +179,7 @@ unsigned long get_long_be(void* buf)
 }
 
 /* Read an unaligned 16-bit little endian short from buffer. */
-unsigned short get_short_be(void* buf)
+uint16_t get_short_be(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
 
@@ -187,14 +187,14 @@ unsigned short get_short_be(void* buf)
 }
 
 /* Read an unaligned 32-bit little endian long from buffer. */
-long get_slong(void* buf)
+int32_t get_slong(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
 
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
-unsigned long get_itunes_int32(char* value, int count)
+uint32_t get_itunes_int32(char* value, int count)
 {
     static const char hexdigits[] = "0123456789ABCDEF";
     const char* c;
