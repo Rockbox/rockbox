@@ -27,8 +27,6 @@ struct codec_api *ci DATA_ATTR;
 extern unsigned char plugin_bss_start[];
 extern unsigned char plugin_end_addr[];
 
-extern enum codec_status codec_main(enum codec_entry_call_reason reason);
-
 /* stub, the entry point is called via its reference in __header to
  * avoid warning with certain compilers */
 int _start(void) {return 0;}
