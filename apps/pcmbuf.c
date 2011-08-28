@@ -1283,7 +1283,9 @@ void pcmbuf_soft_mode(bool shhh)
 
 bool pcmbuf_is_lowdata(void)
 {
-    if (!audio_pcmbuf_may_play() || pcmbuf_is_crossfade_active())
+    enum channel_status status = mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK);
+
+    if (status != CHANNEL_PLAYING || pcmbuf_is_crossfade_active())
         return false;
 
 #if MEMORYSIZE > 2
