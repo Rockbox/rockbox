@@ -329,12 +329,12 @@ long oggpackB_look(oggpack_buffer *b,int bits){
   }
   return ((ret&0xffffffff)>>(m>>1))>>((m+1)>>1);
 }
-#endif
+
 long oggpack_look1(oggpack_buffer *b){
   if(b->endbyte>=b->storage)return(-1);
   return((b->ptr[0]>>b->endbit)&1);
 }
-#if 0
+
 long oggpackB_look1(oggpack_buffer *b){
   if(b->endbyte>=b->storage)return(-1);
   return((b->ptr[0]>>(7-b->endbit))&1);
@@ -361,7 +361,7 @@ void oggpack_adv(oggpack_buffer *b,int bits){
 void oggpackB_adv(oggpack_buffer *b,int bits){
   oggpack_adv(b,bits);
 }
-#endif
+
 void oggpack_adv1(oggpack_buffer *b){
   if(++(b->endbit)>7){
     b->endbit=0;
@@ -369,7 +369,7 @@ void oggpack_adv1(oggpack_buffer *b){
     b->endbyte++;
   }
 }
-#if 0
+
 void oggpackB_adv1(oggpack_buffer *b){
   oggpack_adv1(b);
 }
@@ -461,7 +461,7 @@ long oggpackB_read(oggpack_buffer *b,int bits){
   b->endbit=1;
   return -1L;
 }
-#endif
+
 long oggpack_read1(oggpack_buffer *b){
   long ret;
 
@@ -482,7 +482,7 @@ long oggpack_read1(oggpack_buffer *b){
   b->endbit=1;
   return -1L;
 }
-#if 0
+
 long oggpackB_read1(oggpack_buffer *b){
   long ret;
 

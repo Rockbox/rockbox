@@ -161,14 +161,15 @@ static inline long oggpack_look(oggpack_buffer *b,int bits){
   }
   return(m&ret);
 }
-
+/*
 extern long  oggpack_look1(oggpack_buffer *b);
+extern void  oggpack_adv(oggpack_buffer *b,int bits);
+*/
 
-/* extern void  oggpack_adv(oggpack_buffer *b,int bits); */
-static inline void oggpack_adv(oggpack_buffer *b,int bits){
+static inline void oggpack_adv(oggpack_buffer *b, unsigned int bits){
   bits+=b->endbit;
 
-  if(b->endbyte > b->storage-((bits+7)>>3)) goto overflow;
+  if(b->endbyte > b->storage-(int)((bits+7)>>3)) goto overflow;
 
   b->ptr+=bits/8;
   b->endbyte+=bits/8;
@@ -181,10 +182,12 @@ static inline void oggpack_adv(oggpack_buffer *b,int bits){
   b->endbit=1;
 }
 
+/*
 extern void  oggpack_adv1(oggpack_buffer *b);
+*/
 extern long  oggpack_read(oggpack_buffer *b,int bits);
+/*
 extern long  oggpack_read1(oggpack_buffer *b);
-/* 
 extern long  oggpack_bytes(oggpack_buffer *b);
 */
 static inline long oggpack_bytes(oggpack_buffer *b){
