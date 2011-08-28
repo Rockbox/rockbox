@@ -209,12 +209,7 @@ static inline ogg_uint32_t bitreverse(register ogg_uint32_t x)
   );
 #else /* !_ARM_ASSEM_ */
 
-#ifdef CPU_COLDFIRE
-  ret = x;
-  asm ("swap  %[r]" : [r] "+d" (ret));   /* swap halfwords */
-#else
   ret = (x>>16) | (x<<16);
-#endif
   tmp = ret & 0x00ff00ff;
   ret ^= tmp;
   ret = (ret >> 8) | (tmp << 8);         /* bytes swapped */
