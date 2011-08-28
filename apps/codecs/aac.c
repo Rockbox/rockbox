@@ -134,8 +134,6 @@ enum codec_status codec_run(void)
         if (m4a_seek_raw(&demux_res, &input_stream, file_offset,
                           &sound_samples_done, (int*) &i)) {
             sound_samples_done *= sbr_fac;
-            elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
-            ci->set_elapsed(elapsed_time);
         } else {
             sound_samples_done = 0;
         }
@@ -143,6 +141,9 @@ enum codec_status codec_run(void)
     } else {
         sound_samples_done = 0;
     }
+
+    elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
+    ci->set_elapsed(elapsed_time);
     
     if (i == 0) 
     {

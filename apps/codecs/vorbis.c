@@ -196,6 +196,9 @@ enum codec_status codec_run(void)
         ci->set_elapsed(ov_time_tell(&vf));
         ci->set_offset(ov_raw_tell(&vf));
     }
+    else {
+        ci->set_elapsed(0);
+    }
 
     previous_section = -1;
     eof = 0;

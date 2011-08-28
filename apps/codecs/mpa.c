@@ -144,6 +144,7 @@ static void set_elapsed(struct mp3entry* id3)
 {
     unsigned long offset = id3->offset > id3->first_frame_offset ?
         id3->offset - id3->first_frame_offset : 0;
+    unsigned long elapsed = id3->elapsed;
 
     if ( id3->vbr ) {
         if ( id3->has_toc ) {
@@ -172,27 +173,28 @@ static void set_elapsed(struct mp3entry* id3)
             /* set time for this percent (divide before multiply to prevent
                overflow on long files. loss of precision is negligible on
                short files) */
-            id3->elapsed = i * (id3->length / 100);
+            elapsed = i * (id3->length / 100);
 
             /* calculate remainder time */
             plen = (nextpos - relpos) * (id3->filesize / 256);
-            id3->elapsed += (((remainder * 100) / plen) *
-                             (id3->length / 10000));
+            elapsed += (((remainder * 100) / plen) * (id3->length / 10000));
         }
         else {
             /* no TOC exists. set a rough estimate using average bitrate */
             int tpk = id3->length /
                 ((id3->filesize - id3->first_frame_offset - id3->id3v1len) /
                 1024);
-            id3->elapsed = offset / 1024 * tpk;
+            elapsed = offset / 1024 * tpk;
         }
     }
     else
     {
         /* constant bitrate, use exact calculation */
         if (id3->bitrate != 0)
-            id3->elapsed = offset / (id3->bitrate / 8);
+            elapsed = offset / (id3->bitrate / 8);
     }
+
+    ci->set_elapsed(elapsed);
 }
 
 #ifdef MPA_SYNTH_ON_COP

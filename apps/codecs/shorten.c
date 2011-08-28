@@ -99,6 +99,8 @@ enum codec_status codec_run(void)
     sc.bitindex = sc.gb.index - 8*consumed;
 
 seek_start:
+    ci->set_elapsed(0);
+
     /* The main decoding loop */
     ci->memset(&decoded0, 0, sizeof(int32_t)*MAX_DECODE_SIZE);
     ci->memset(&decoded1, 0, sizeof(int32_t)*MAX_DECODE_SIZE);
@@ -118,7 +120,6 @@ seek_start:
             if (param == 0 &&
                 ci->seek_buffer(sc.header_bits/8 + ci->id3->first_frame_offset)) {
                 sc.bitindex = sc.header_bits - 8*(sc.header_bits/8);
-                ci->set_elapsed(0);
                 ci->seek_complete();
                 goto seek_start;
             }

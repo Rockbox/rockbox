@@ -84,7 +84,6 @@ restart_track:
             % wfx.packet_size;
         ci->seek_buffer(resume_offset - packet_offset);
         elapsedtime = asf_get_timestamp(&i);
-        ci->set_elapsed(elapsedtime);
     }
     else
     {
@@ -92,6 +91,8 @@ restart_track:
         ci->seek_buffer(ci->id3->first_frame_offset);
         elapsedtime = 0;
     }
+
+    ci->set_elapsed(elapsedtime);
 
     resume_offset = 0;
     ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);

@@ -90,6 +90,8 @@ enum codec_status codec_run(void)
             decodedsamples = new_pos;
     }
 
+    ci->set_elapsed((uint64_t)info.LENGTH * 1000 * decodedsamples / info.DATALENGTH);
+
     while (!endofstream)
     {
         enum codec_command_action action = ci->get_command(&param);

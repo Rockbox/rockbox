@@ -105,8 +105,10 @@ enum codec_status codec_run(void)
         param = (int)resume_offset * ((sps * 8 * 1000)/rmctx.bit_rate);
         action = CODEC_ACTION_SEEK_TIME;
     }
+    else {
+        ci->set_elapsed(0);
+    }
 
-    ci->set_elapsed(0);
     ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
 
     /* The main decoder loop */

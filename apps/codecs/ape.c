@@ -220,6 +220,9 @@ enum codec_status codec_run(void)
         firstbyte = 3;  /* Take account of the little-endian 32-bit byte ordering */
     }
 
+    elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
+    ci->set_elapsed(elapsedtime);
+
     /* Initialise the buffer */
     inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 

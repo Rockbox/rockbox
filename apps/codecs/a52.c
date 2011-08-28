@@ -158,7 +158,7 @@ enum codec_status codec_run(void)
     }
     else {
         ci->seek_buffer(ci->id3->first_frame_offset);
-        samplesdone = 0;
+        ci->set_elapsed(0);
     }
 
     while (1) {

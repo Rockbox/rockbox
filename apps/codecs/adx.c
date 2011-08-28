@@ -209,7 +209,7 @@ enum codec_status codec_run(void)
 
     /* get in position */
     ci->seek_buffer(bufoff);
-
+    ci->set_elapsed(0);
 
     /* setup pcm buffer format */
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
@@ -276,6 +276,11 @@ enum codec_status codec_run(void)
                 loop_count++;
             }
             ci->seek_buffer(bufoff);
+
+            ci->set_elapsed(
+               ((end_adr-start_adr)*loop_count + bufoff-chanstart)*
+               1000LL/avgbytespersec);
+
             ci->seek_complete();
         }
 

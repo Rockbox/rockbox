@@ -560,6 +560,8 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
 
     DEBUGF("SPC: read size = 0x%lx\n",(unsigned long)buffersize);
+    ci->set_elapsed(0);
+
     do
     {
         if (load_spc_buffer(buffer, buffersize)) {

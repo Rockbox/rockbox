@@ -75,7 +75,7 @@ enum codec_status codec_run(void)
     ci->configure(DSP_SET_STEREO_MODE, nchans == 2 ? STEREO_INTERLEAVED : STEREO_MONO);
     sr_100 = ci->id3->frequency / 100;
 
-    ci->set_elapsed (0);
+    ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
 
     /* The main decoder loop */
 

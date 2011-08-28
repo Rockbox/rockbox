@@ -178,6 +178,7 @@ enum codec_status codec_run(void)
     }
     else {
         /* Seek to the first packet */
+        ci->set_elapsed(0);
         ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE );
     }
 

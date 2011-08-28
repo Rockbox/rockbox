@@ -417,6 +417,7 @@ enum codec_status codec_run(void)
     }
 
     ci->seek_buffer(0);
+    ci->set_elapsed(0);
 
     stereo = speex_stereo_state_init();
     spx_ogg_sync_init(&oy);

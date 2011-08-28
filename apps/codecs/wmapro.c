@@ -79,6 +79,7 @@ restart_track:
     ci->seek_buffer(ci->id3->first_frame_offset);
     
     elapsedtime = 0;
+    ci->set_elapsed(0);
     
     /* The main decoding loop */
 

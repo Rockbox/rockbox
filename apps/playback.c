@@ -330,7 +330,7 @@ static struct
 static bool codec_skip_pending = false;
 static int  codec_skip_status;
 static bool codec_seeking = false;          /* Codec seeking ack expected? */
-
+static unsigned int position_key = 0;
 
 /* Event queues */
 static struct event_queue audio_queue SHAREDBSS_ATTR;
@@ -353,14 +353,13 @@ static void audio_stop_playback(void);
 static void buffer_event_buffer_low_callback(void *data);
 static void buffer_event_rebuffer_callback(void *data);
 static void buffer_event_finished_callback(void *data);
+void audio_pcmbuf_sync_position(void);
 
 
 /**************************************/
 
 /** --- audio_queue helpers --- **/
-
-/* codec thread needs access */
-void audio_queue_post(long id, intptr_t data)
+static void audio_queue_post(long id, intptr_t data)
 {
     queue_post(&audio_queue, id, data);
 }
@@ -805,14 +804,10 @@ static void audio_reset_buffer(void)
        aids viewing and the summation of certain variables should add up to
        the location of others. */
     {
-        size_t pcmbufsize;
-        const unsigned char *pcmbuf = pcmbuf_get_meminfo(&pcmbufsize);
         logf("fbuf:   %08X", (unsigned)filebuf);
         logf("fbufe:  %08X", (unsigned)(filebuf + filebuflen));
         logf("sbuf:   %08X", (unsigned)audio_scratch_memory);
         logf("sbufe:  %08X", (unsigned)(audio_scratch_memory + allocsize));
-        logf("pcmb:   %08X", (unsigned)pcmbuf);
-        logf("pcmbe:  %08X", (unsigned)(pcmbuf + pcmbufsize));
     }
 #endif
 
@@ -978,7 +973,8 @@ static void audio_handle_track_load_status(int trackstat)
 /* Announce the end of playing the current track */
 static void audio_playlist_track_finish(void)
 {
-    struct mp3entry *id3 = valid_mp3entry(id3_get(PLAYING_ID3));
+    struct mp3entry *ply_id3 = id3_get(PLAYING_ID3);
+    struct mp3entry *id3 = valid_mp3entry(ply_id3);
 
     playlist_update_resume_info(filling == STATE_ENDED ? NULL : id3);
 
@@ -1001,6 +997,8 @@ static void audio_playlist_track_change(void)
     if (id3)
         send_event(PLAYBACK_EVENT_TRACK_CHANGE, id3);
 
+    position_key = pcmbuf_get_position_key();
+
     playlist_update_resume_info(id3);
 }
 
@@ -1014,26 +1012,28 @@ static void audio_update_and_announce_next_track(const struct mp3entry *id3_next
 
 /* Bring the user current mp3entry up to date and set a new offset for the
    buffered metadata */
-static void playing_id3_sync(struct track_info *user_info, size_t offset)
+static void playing_id3_sync(struct track_info *user_info, off_t offset)
 {
     id3_mutex_lock();
 
     struct mp3entry *id3 = bufgetid3(user_info->id3_hid);
+    struct mp3entry *playing_id3 = id3_get(PLAYING_ID3);
 
-    if (offset == (size_t)-1)
+    pcm_play_lock();
+
+    unsigned long e = playing_id3->elapsed;
+    unsigned long o = playing_id3->offset;
+
+    id3_write(PLAYING_ID3, id3);
+
+    if (offset < 0)
     {
-        struct mp3entry *ply_id3 = id3_get(PLAYING_ID3);
-        size_t play_offset = ply_id3->offset;
-        long play_elapsed = ply_id3->elapsed;
-        id3_write(PLAYING_ID3, id3);
-        ply_id3->offset = play_offset;
-        ply_id3->elapsed = play_elapsed;
+        playing_id3->elapsed = e;
+        playing_id3->offset = o;
         offset = 0;
     }
-    else
-    {
-        id3_write(PLAYING_ID3, id3);
-    }
+
+    pcm_play_unlock();
 
     if (id3)
         id3->offset = offset;
@@ -1093,13 +1093,6 @@ static bool halt_decoding_track(bool stop)
     return retval;
 }
 
-/* Clear the PCM on a manual skip */
-static void audio_clear_paused_pcm(void)
-{
-    if (play_status == PLAY_PAUSED && !pcmbuf_is_crossfade_active())
-        pcmbuf_play_stop();
-}
-
 /* Wait for any in-progress fade to complete */
 static void audio_wait_fade_complete(void)
 {
@@ -1121,6 +1114,7 @@ static void audio_ff_rewind_end(void)
         {
             /* Clear the buffer */
             pcmbuf_play_stop();
+            audio_pcmbuf_sync_position();
         }
 
         if (play_status != PLAY_PAUSED)
@@ -2063,7 +2057,7 @@ static void audio_on_handle_finished(int hid)
 
 /* Called to make an outstanding track skip the current track and to send the
    transition events */
-static void audio_finalise_track_change(bool delayed)
+static void audio_finalise_track_change(void)
 {
     switch (skip_pending)
     {
@@ -2117,15 +2111,6 @@ static void audio_finalise_track_change(bool delayed)
 
     id3_write(PLAYING_ID3, track_id3);
 
-    if (delayed)
-    {
-        /* Delayed skip where codec is ahead of user's current track */
-        struct mp3entry *ci_id3 = id3_get(CODEC_ID3);
-        struct mp3entry *ply_id3 = id3_get(PLAYING_ID3);
-        ply_id3->elapsed = ci_id3->elapsed;
-        ply_id3->offset = ci_id3->offset;
-    }
-
     /* The skip is technically over */
     skip_pending = TRACK_SKIP_NONE;
 
@@ -2141,24 +2126,24 @@ static void audio_finalise_track_change(bool delayed)
 }
 
 /* Actually begin a transition and take care of the codec change - may complete
-   it now or ask pcmbuf for notification depending on the type and what pcmbuf
-   has to say */
-static void audio_begin_track_change(bool auto_skip, int trackstat)
+   it now or ask pcmbuf for notification depending on the type */
+static void audio_begin_track_change(enum pcm_track_change_type type,
+                                     int trackstat)
 {
     /* Even if the new track is bad, the old track must be finished off */
-    bool finalised = pcmbuf_start_track_change(auto_skip);
+    pcmbuf_start_track_change(type);
 
-    if (finalised)
+    bool auto_skip = type != TRACK_CHANGE_MANUAL;
+
+    if (!auto_skip)
     {
-        /* pcmbuf says that the transition happens now - complete it */
-        audio_finalise_track_change(false);
+        /* Manual track change happens now */
+        audio_finalise_track_change();
+        pcmbuf_sync_position_update();
 
         if (play_status == PLAY_STOPPED)
             return; /* Stopped us */
     }
-
-    if (!auto_skip)
-        audio_clear_paused_pcm();
 
     if (trackstat >= LOAD_TRACK_OK)
     {
@@ -2170,7 +2155,7 @@ static void audio_begin_track_change(bool auto_skip, int trackstat)
         /* Everything needed for the codec is ready - start it */
         if (audio_start_codec(auto_skip))
         {
-            if (finalised)
+            if (!auto_skip)
                 playing_id3_sync(info, -1);
             return;
         }
@@ -2186,7 +2171,7 @@ static void audio_monitor_end_of_playlist(void)
 {
     skip_pending = TRACK_SKIP_AUTO_END_PLAYLIST;
     filling = STATE_ENDING;
-    pcmbuf_monitor_track_change(true);
+    pcmbuf_start_track_change(TRACK_CHANGE_END_OF_DATA);
 }
 
 /* Codec has completed decoding the track
@@ -2220,14 +2205,6 @@ static void audio_on_codec_complete(int status)
     }
 
     codec_skip_pending = false;
-
-#ifdef AB_REPEAT_ENABLE
-    if (status >= 0)
-    {
-        /* Normal automatic skip */
-        ab_end_of_track_report();
-    }
-#endif
 
     int trackstat = LOAD_TRACK_OK;
 
@@ -2263,7 +2240,7 @@ static void audio_on_codec_complete(int status)
             {
                 /* Continue filling after this track */
                 audio_reset_and_rebuffer(TRACK_LIST_KEEP_CURRENT, 1);
-                audio_begin_track_change(true, trackstat);
+                audio_begin_track_change(TRACK_CHANGE_AUTO, trackstat);
                 return;
             }
             /* else rebuffer at this track; status applies to the track we
@@ -2299,7 +2276,7 @@ static void audio_on_codec_complete(int status)
         }
     }
 
-    audio_begin_track_change(true, trackstat);
+    audio_begin_track_change(TRACK_CHANGE_AUTO, trackstat);
 }
 
 /* Called when codec completes seek operation
@@ -2316,7 +2293,7 @@ static void audio_on_codec_seek_complete(void)
 static void audio_on_track_changed(void)
 {
     /* Finish whatever is pending so that the WPS is in sync */
-    audio_finalise_track_change(true);
+    audio_finalise_track_change();
 
     if (codec_skip_pending)
     {
@@ -2367,8 +2344,7 @@ static void audio_start_playback(size_t offset, unsigned int flags)
             track_list_clear(TRACK_LIST_CLEAR_ALL);
 
             /* Indicate manual track change */
-            pcmbuf_start_track_change(false);
-            audio_clear_paused_pcm();
+            pcmbuf_start_track_change(TRACK_CHANGE_MANUAL);
             wipe_track_metadata(true);
         }
 
@@ -2397,6 +2373,10 @@ static void audio_start_playback(size_t offset, unsigned int flags)
         /* Update our state */
         play_status = PLAY_PLAYING;
     }
+
+    /* Codec's position should be available as soon as it knows it */
+    position_key = pcmbuf_get_position_key();
+    pcmbuf_sync_position_update();
 
     /* Start fill from beginning of playlist */
     playlist_peek_offset = -1;
@@ -2592,7 +2572,7 @@ static void audio_on_skip(void)
         trackstat = audio_reset_and_rebuffer(TRACK_LIST_CLEAR_ALL, -1);
     }
 
-    audio_begin_track_change(false, trackstat);
+    audio_begin_track_change(TRACK_CHANGE_MANUAL, trackstat);
 }
 
 /* Skip to the next/previous directory
@@ -2638,7 +2618,7 @@ static void audio_on_dir_skip(int direction)
         return;
     }
 
-    audio_begin_track_change(false, trackstat);
+    audio_begin_track_change(TRACK_CHANGE_MANUAL, trackstat);
 }
 
 /* Enter seek mode in order to start a seek
@@ -2689,11 +2669,6 @@ static void audio_on_ff_rewind(long time)
         if (time == 0)
             send_event(PLAYBACK_EVENT_TRACK_FINISH, id3);
 
-        /* Prevent user codec time update - coerce to something that is
-           innocuous concerning lookaheads */
-        if (pending == TRACK_SKIP_NONE)
-            skip_pending = TRACK_SKIP_AUTO_END_PLAYLIST;
-
         id3->elapsed = time;
         queue_reply(&audio_queue, 1);
 
@@ -2702,6 +2677,9 @@ static void audio_on_ff_rewind(long time)
         /* Need this set in case ff/rw mode + error but _after_ the codec
            halt that will reset it */
         codec_seeking = true;
+
+        /* If in transition, key will have changed - sync to it */
+        position_key = pcmbuf_get_position_key();
 
         if (pending == TRACK_SKIP_AUTO)
         {
@@ -3124,75 +3102,66 @@ static void buffer_event_finished_callback(void *data)
 
 /** -- Codec callbacks -- **/
 
-/* Update elapsed times with latency-adjusted values */
-void audio_codec_update_elapsed(unsigned long value)
+/* Update elapsed time for next PCM insert */
+void audio_codec_update_elapsed(unsigned long elapsed)
 {
 #ifdef AB_REPEAT_ENABLE
-    ab_position_report(value);
+    ab_position_report(elapsed);
 #endif
-
-    unsigned long latency = pcmbuf_get_latency();
-
-    if (LIKELY(value >= latency))
-    {
-        unsigned long elapsed = value - latency;
-
-        if (elapsed > value || elapsed < value - 2)
-            value = elapsed;
-    }
-    else
-    {
-        value = 0;
-    }
-
-    /* Track codec: used later when updating the playing at the user
-       transition */
-    id3_get(CODEC_ID3)->elapsed = value;
-
-    /* If a skip is pending, the PCM buffer is updating the time on the
-       previous song */
-    if (LIKELY(skip_pending == TRACK_SKIP_NONE))
-        id3_get(PLAYING_ID3)->elapsed = value;
+    /* Save in codec's id3 where it is used at next pcm insert */
+    id3_get(CODEC_ID3)->elapsed = elapsed;
 }
 
-/* Update offsets with latency-adjusted values */
-void audio_codec_update_offset(size_t value)
+/* Update offset for next PCM insert */
+void audio_codec_update_offset(size_t offset)
 {
-    struct mp3entry *ci_id3 = id3_get(CODEC_ID3);
-    unsigned long latency = pcmbuf_get_latency() * ci_id3->bitrate / 8;
+    /* Save in codec's id3 where it is used at next pcm insert */
+    id3_get(CODEC_ID3)->offset = offset;
+}
 
-    if (LIKELY(value >= latency))
+/* Codec has finished running */
+void audio_codec_complete(int status)
+{
+#ifdef AB_REPEAT_ENABLE
+    if (status >= CODEC_OK)
     {
-        value -= latency;
+        /* Normal automatic skip */
+        ab_end_of_track_report();
     }
-    else
-    {
-        value = 0;
-    }
+#endif
 
-    /* Track codec: used later when updating the playing id3 at the user
-       transition */
-    ci_id3->offset = value;
+    LOGFQUEUE("codec > audio Q_AUDIO_CODEC_COMPLETE: %d", status);
+    audio_queue_post(Q_AUDIO_CODEC_COMPLETE, status);
+}
 
-    /* If a skip is pending, the PCM buffer is updating the time on the
-       previous song */
-    if (LIKELY(skip_pending == TRACK_SKIP_NONE))
-        id3_get(PLAYING_ID3)->offset = value;
+/* Codec has finished seeking */
+void audio_codec_seek_complete(void)
+{
+    LOGFQUEUE("codec > audio Q_AUDIO_CODEC_SEEK_COMPLETE");
+    audio_queue_post(Q_AUDIO_CODEC_SEEK_COMPLETE, 0);
 }
 
 
 /** --- Pcmbuf callbacks --- **/
 
-/* Between the codec and PCM track change, we need to keep updating the
- * "elapsed" value of the previous (to the codec, but current to the
- * user/PCM/WPS) track, so that the progressbar reaches the end. */
-void audio_pcmbuf_position_callback(unsigned int time)
+/* Update the elapsed and offset from the information cached during the
+   PCM buffer insert */
+void audio_pcmbuf_position_callback(unsigned long elapsed, off_t offset,
+                                    unsigned int key)
 {
-    struct mp3entry *id3 = id3_get(PLAYING_ID3);
+    if (key == position_key)
+    {
+        struct mp3entry *id3 = id3_get(PLAYING_ID3);
+        id3->elapsed = elapsed;
+        id3->offset = offset;
+    }
+}
 
-    time += id3->elapsed;
-
-    id3->elapsed = MIN(time, id3->length);
+/* Synchronize position info to the codec's */
+void audio_pcmbuf_sync_position(void)
+{
+    audio_pcmbuf_position_callback(ci.id3->elapsed, ci.id3->offset,
+                                   pcmbuf_get_position_key());
 }
 
 /* Post message from pcmbuf that the end of the previous track has just

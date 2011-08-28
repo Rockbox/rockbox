@@ -21,9 +21,11 @@
 #ifndef PCMBUF_H
 #define PCMBUF_H
 
+#include <sys/types.h>
+
 /* Commit PCM data */
 void *pcmbuf_request_buffer(int *count);
-void pcmbuf_write_complete(int count);
+void pcmbuf_write_complete(int count, unsigned long elapsed, off_t offset);
 
 /* Init */
 size_t pcmbuf_init(unsigned char *bufend);
@@ -33,20 +35,30 @@ void pcmbuf_play_start(void);
 void pcmbuf_play_stop(void);
 void pcmbuf_pause(bool pause);
 void pcmbuf_monitor_track_change(bool monitor);
-bool pcmbuf_start_track_change(bool manual_skip);
+void pcmbuf_sync_position_update(void);
+
+/* Track change origin type */
+enum pcm_track_change_type
+{
+    TRACK_CHANGE_NONE = 0,     /* No track change pending */
+    TRACK_CHANGE_MANUAL,       /* Manual change (from user) */
+    TRACK_CHANGE_AUTO,         /* Automatic change (from codec) */
+    TRACK_CHANGE_END_OF_DATA,  /* Expect no more data (from codec) */
+};
+void pcmbuf_start_track_change(enum pcm_track_change_type type);
 
 /* Crossfade */
 #ifdef HAVE_CROSSFADE
 bool pcmbuf_is_crossfade_active(void);
-void pcmbuf_request_crossfade_enable(bool on_off);
+void pcmbuf_request_crossfade_enable(int setting);
 bool pcmbuf_is_same_size(void);
 #else
 /* Dummy functions with sensible returns */
-static inline bool pcmbuf_is_crossfade_active(void)
+static FORCE_INLINE bool pcmbuf_is_crossfade_active(void)
     { return false; }
-static inline void pcmbuf_request_crossfade_enable(bool on_off)
+static FORCE_INLINE void pcmbuf_request_crossfade_enable(bool on_off)
     { return; (void)on_off; }
-static inline bool pcmbuf_is_same_size(void)
+static FORCE_INLINE bool pcmbuf_is_same_size(void)
     { return true; }
 #endif
 
@@ -59,9 +71,7 @@ size_t pcmbuf_free(void);
 size_t pcmbuf_get_bufsize(void);
 int pcmbuf_descs(void);
 int pcmbuf_used_descs(void);
-#ifdef ROCKBOX_HAS_LOGF
-unsigned char *pcmbuf_get_meminfo(size_t *length);
-#endif
+unsigned int pcmbuf_get_position_key(void);
 
 /* Misc */
 void pcmbuf_fade(bool fade, bool in);
@@ -69,6 +79,5 @@ bool pcmbuf_fading(void);
 void pcmbuf_soft_mode(bool shhh);
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_set_low_latency(bool state);
-unsigned long pcmbuf_get_latency(void);
 
 #endif

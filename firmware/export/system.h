@@ -378,12 +378,16 @@ static inline void cpucache_flush(void)
 #if   defined(CPU_ARM)
     /* Use ARMs cache alignment. */
     #define MEM_ALIGN_ATTR CACHEALIGN_ATTR
+    #define MEM_ALIGN_SIZE CACHEALIGN_SIZE
 #elif defined(CPU_COLDFIRE)
     /* Use fixed alignment of 16 bytes. Speed up only for 'movem' in DRAM. */
     #define MEM_ALIGN_ATTR __attribute__((aligned(16)))
+    #define MEM_ALIGN_SIZE 16
 #else
     /* Do nothing. */
     #define MEM_ALIGN_ATTR
+    /* Align pointer size */
+    #define MEM_ALIGN_SIZE sizeof(intptr_t)
 #endif
 
 #ifdef STORAGE_WANTS_ALIGN

@@ -1333,12 +1333,11 @@ enum codec_status codec_run(void)
             /* New time is ready in param */
             modplayer.patterntableposition = param/1000;
             modplayer.currentline = 0;
-            ci->set_elapsed(modplayer.patterntableposition*1000+500);
             ci->seek_complete();
         }
 
         if(old_patterntableposition != modplayer.patterntableposition) {
-          ci->set_elapsed(modplayer.patterntableposition*1000+500);
+          ci->set_elapsed(modplayer.patterntableposition*1000);
           old_patterntableposition=modplayer.patterntableposition;
         }
 

@@ -1299,8 +1299,8 @@ enum codec_status codec_run(void)
             nSamplesToRender = 0;       /* Start the rendering from scratch */
 
             /* Set the elapsed time to the current subsong (in seconds) */
-            ci->seek_complete();
             ci->set_elapsed(subSong*1000);
+            ci->seek_complete();
         }
         
         nSamplesRendered = 0;

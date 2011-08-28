@@ -97,6 +97,8 @@ enum codec_status codec_run(void)
         }
     }
 
+    ci->set_elapsed(elapsedtime);
+
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
         enum codec_command_action action = ci->get_command(&param);

@@ -253,6 +253,8 @@ enum codec_status codec_run(void)
         bytesdone = 0;
     }
 
+    ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
+
     /* The main decoder loop */
     endofstream = 0;
 

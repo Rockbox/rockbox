@@ -460,7 +460,9 @@ enum codec_status codec_run(void)
     codec_set_replaygain(ci->id3);
 
     flac_seek_offset(&fc, samplesdone);
-    samplesdone=0;
+    samplesdone=fc.samplenumber+fc.blocksize;
+    elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
+    ci->set_elapsed(elapsedtime);
 
     /* The main decoding loop */
     frame=0;

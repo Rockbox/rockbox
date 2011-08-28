@@ -123,6 +123,8 @@ enum codec_status codec_run(void)
     codec_set_replaygain(ci->id3);
 
     /* Resume to saved sample offset. */
+    elapsed_time = 0;
+
     if (samplesdone > 0) 
     {
         if (mpc_demux_seek_sample(demux, samplesdone) == MPC_STATUS_OK) 
@@ -135,6 +137,8 @@ enum codec_status codec_run(void)
             samplesdone = 0;
         }
     }
+
+    ci->set_elapsed(elapsed_time);
 
     /* This is the decoding loop. */
     do 

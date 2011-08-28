@@ -77,9 +77,10 @@ struct codec_load_info
 static int codec_type = AFMT_UNKNOWN; /* Codec type (C,A-) */
 
 /* Private interfaces to main playback control */
-extern void audio_codec_update_elapsed(unsigned long value);
-extern void audio_codec_update_offset(size_t value);
-extern void audio_queue_post(long id, intptr_t data);
+extern void audio_codec_update_elapsed(unsigned long elapsed);
+extern void audio_codec_update_offset(size_t offset);
+extern void audio_codec_complete(int status);
+extern void audio_codec_seek_complete(void);
 extern struct codec_api ci; /* from codecs.c */
 
 /* Codec thread */
@@ -251,7 +252,7 @@ static void codec_pcmbuf_insert_callback(
         if (out_count <= 0)
             return;
 
-        pcmbuf_write_complete(out_count);
+        pcmbuf_write_complete(out_count, ci.id3->elapsed, ci.id3->offset);
 
         count -= inp_count;
     }
@@ -334,9 +335,11 @@ static void codec_seek_complete_callback(void)
     /* Clear DSP */
     dsp_configure(ci.dsp, DSP_FLUSH, 0);
 
+    /* Sync position */
+    audio_codec_update_offset(ci.curpos);
+
     /* Post notification to audio thread */
-    LOGFQUEUE("audio > Q_AUDIO_CODEC_SEEK_COMPLETE");
-    audio_queue_post(Q_AUDIO_CODEC_SEEK_COMPLETE, 0);
+    audio_codec_seek_complete();
 
     /* Wait for urgent or go message */
     do
@@ -521,8 +524,7 @@ static void run_codec(void)
 
         /* Notify audio that we're done for better or worse - advise of the
            status */
-        LOGFQUEUE("codec > audio Q_AUDIO_CODEC_COMPLETE: %d", status);
-        audio_queue_post(Q_AUDIO_CODEC_COMPLETE, status);
+        audio_codec_complete(status);
     }
 }
 
