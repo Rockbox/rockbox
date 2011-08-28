@@ -26,7 +26,7 @@
 
 /* A complete description of Ogg framing exists in docs/framing.html */
 
-int ogg_page_version(const ogg_page *og){
+static int ogg_page_version(const ogg_page *og){
   return((int)(og->header[4]));
 }
 
@@ -62,7 +62,7 @@ ogg_uint32_t ogg_page_serialno(const ogg_page *og){
          (og->header[17]<<24));
 }
  
-long ogg_page_pageno(const ogg_page *og){
+static long ogg_page_pageno(const ogg_page *og){
   return(og->header[18] |
          (og->header[19]<<8) |
          (og->header[20]<<16) |
@@ -87,14 +87,14 @@ more page packet), the return will be:
   ogg_page_packets(page)   ==0, 
   ogg_page_continued(page) !=0
 */
-
+/*
 int ogg_page_packets(const ogg_page *og){
   int i,n=og->header[26],count=0;
   for(i=0;i<n;i++)
     if(og->header[27+i]<255)count++;
   return(count);
 }
-
+*/
 
 #if 0
 /* helper to initialize lookup for direct-table CRC (illustrative; we
@@ -208,7 +208,7 @@ int ogg_stream_init(ogg_stream_state *os,int serialno){
 } 
 
 /* async/delayed error detection for the ogg_stream_state */
-int ogg_stream_check(ogg_stream_state *os){
+static int ogg_stream_check(ogg_stream_state *os){
   if(!os || !os->body_data) return -1;
   return 0;
 }
@@ -224,7 +224,7 @@ int ogg_stream_clear(ogg_stream_state *os){
   }
   return(0);
 } 
-
+/*
 int ogg_stream_destroy(ogg_stream_state *os){
   if(os){
     ogg_stream_clear(os);
@@ -232,7 +232,7 @@ int ogg_stream_destroy(ogg_stream_state *os){
   }
   return(0);
 } 
-
+*/
 /* Helpers for ogg_stream_encode; this keeps the structure and
    what's happening fairly clear */
 
@@ -277,7 +277,7 @@ static int _os_lacing_expand(ogg_stream_state *os,int needed){
 /* Direct table CRC; note that this will be faster in the future if we
    perform the checksum simultaneously with other copies */
 
-void ogg_page_checksum_set(ogg_page *og){
+static void ogg_page_checksum_set(ogg_page *og){
   if(og){
     ogg_uint32_t crc_reg=0;
     int i;
@@ -588,6 +588,7 @@ int ogg_sync_clear(ogg_sync_state *oy){
   return(0);
 }
 
+/*
 int ogg_sync_destroy(ogg_sync_state *oy){
   if(oy){
     ogg_sync_clear(oy);
@@ -595,8 +596,8 @@ int ogg_sync_destroy(ogg_sync_state *oy){
   }
   return(0);
 }
-
-int ogg_sync_check(ogg_sync_state *oy){
+*/
+static int ogg_sync_check(ogg_sync_state *oy){
   if(oy->storage<0) return -1;
   return 0;
 }
@@ -748,6 +749,7 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
    Returns pointers into buffered data; invalidated by next call to
    _stream, _clear, _init, or _buffer */
 
+#if 0
 int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
 
   if(ogg_sync_check(oy))return 0;
@@ -777,7 +779,7 @@ int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
 
   }
 }
-
+#endif
 /* add the incoming page to the stream state; we decompose the page
    into packet segments here as well. */
 
@@ -1019,11 +1021,12 @@ int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op){
   return _packetout(os,op,0);
 }
 
+/*
 void ogg_packet_clear(ogg_packet *op) {
   _ogg_free(op->packet);
   memset(op, 0, sizeof(*op));
 }
-
+*/
 #ifdef _V_SELFTEST
 #include <stdio.h>
 
