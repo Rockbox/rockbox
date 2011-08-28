@@ -130,7 +130,6 @@ enum codec_status codec_run(void)
         if (mpc_demux_seek_sample(demux, samplesdone) == MPC_STATUS_OK) 
         {
             elapsed_time = (samplesdone*10)/frequency;
-            ci->set_elapsed(elapsed_time);
         } 
         else 
         {
