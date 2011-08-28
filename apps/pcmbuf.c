@@ -1017,7 +1017,7 @@ static void crossfade_start(void)
         }
 
         /* zero out the rest of the buffer */
-        crossfade_mix_fade(0, INT_MAX, NULL, &fade_out_index,
+        crossfade_mix_fade(0, pcmbuf_size, NULL, &fade_out_index,
                            0, MIXFADE_NULLIFY_POS);
 
         pcm_play_lock();
