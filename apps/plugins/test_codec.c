@@ -831,10 +831,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     enum
     {
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        BOOST = 0,
-#endif
-        SPEED_TEST = 1,
+        SPEED_TEST = 0,
         SPEED_TEST_DIR,
         WRITE_WAV,
         SPEED_TEST_WITH_DSP,
@@ -843,13 +840,13 @@ enum plugin_status plugin_start(const void* parameter)
         CHECKSUM,
         CHECKSUM_DIR,
         QUIT,
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        BOOST,
+#endif
     };
 
     MENUITEM_STRINGLIST(
         menu, "test_codec", NULL,
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        "Boosting",
-#endif
         "Speed test",
         "Speed test folder",
         "Write WAV",
@@ -859,6 +856,9 @@ enum plugin_status plugin_start(const void* parameter)
         "Checksum",
         "Checksum folder",
         "Quit",
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        "Boosting",
+#endif
     );
     
 
