@@ -20,8 +20,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-
-
 /* All swcodec targets have BUTTON_SELECT apart from the H10 and M3 */
 
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
@@ -52,7 +50,6 @@ static const struct opt_items boost_settings[2] = {
     { "No",    -1 },
     { "Yes",   -1 },
 };
-
 #endif
 
 /* Log functions copied from test_disk.c */
@@ -225,7 +222,6 @@ void close_wav(void)
 /* Returns buffer to malloc array. Only codeclib should need this. */
 static void* codec_get_buffer(size_t *size)
 {
-   DEBUGF("codec_get_buffer(%"PRIuPTR")\n",(uintptr_t)size);
    *size = CODEC_SIZE;
    return codec_mallocbuf;
 }
@@ -835,11 +831,11 @@ enum plugin_status plugin_start(const void* parameter)
 
     enum
     {
-        SPEED_TEST = 0,
-        SPEED_TEST_DIR,
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        BOOST,
+        BOOST = 0,
 #endif
+        SPEED_TEST = 1,
+        SPEED_TEST_DIR,
         WRITE_WAV,
         SPEED_TEST_WITH_DSP,
         SPEED_TEST_DIR_WITH_DSP,
@@ -851,11 +847,11 @@ enum plugin_status plugin_start(const void* parameter)
 
     MENUITEM_STRINGLIST(
         menu, "test_codec", NULL,
-        "Speed test",
-        "Speed test folder",
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         "Boosting",
 #endif
+        "Speed test",
+        "Speed test folder",
         "Write WAV",
         "Speed test with DSP",
         "Speed test folder with DSP",
@@ -874,8 +870,8 @@ menu:
 #endif 
 
     result = rb->do_menu(&menu, &selection, NULL, false);
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     if (result == BOOST)
     {
         rb->set_option("Boosting", &boost, INT,
@@ -894,17 +890,18 @@ menu:
 
     scandir = 0;
 
-    if ((checksum = (result == CHECKSUM || result == CHECKSUM_DIR)))
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        result -= 7;
-#else
+    /* Map test runs with checksum calcualtion to standard runs 
+     * SPEED_TEST and SPEED_TEST_DIR and set the 'checksum' flag. */
+    if ((checksum = (result == CHECKSUM || 
+                     result == CHECKSUM_DIR)))
         result -= 6;
-#endif
 
-    if ((use_dsp = ((result >= SPEED_TEST_WITH_DSP)
-                   && (result <= WRITE_WAV_WITH_DSP)))) {
+    /* Map test runs with DSP to standard runs SPEED_TEST, 
+     * SPEED_TEST_DIR and WRITE_WAV and set the 'use_dsp' flag. */
+    if ((use_dsp = (result >= SPEED_TEST_WITH_DSP &&
+                    result <= WRITE_WAV_WITH_DSP)))
         result -= 3;
-    }
+
     if (result == SPEED_TEST) {
         wavinfo.fd = -1;
         log_init(false);
