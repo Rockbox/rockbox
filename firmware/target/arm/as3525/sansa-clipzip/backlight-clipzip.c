@@ -26,8 +26,8 @@
 
 void _backlight_init()
 {
-    /* GPIO B2 controls backlight */
-    GPIOB_DIR |= (1 << 2);
+    /* GPIO B1 controls backlight */
+    GPIOB_DIR |= (1 << 1);
 }
 
 void _backlight_on(void)
