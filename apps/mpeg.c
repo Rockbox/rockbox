@@ -493,6 +493,7 @@ unsigned long mpeg_get_last_header(void)
 #endif /* !SIMULATOR */
 }
 
+static void stop_playing(void);
 static void do_stop(void)
 {
     is_playing = false;
