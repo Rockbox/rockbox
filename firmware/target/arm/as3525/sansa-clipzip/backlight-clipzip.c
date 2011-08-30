@@ -32,11 +32,19 @@ void _backlight_init()
 
 void _backlight_on(void)
 {
-    /* TODO */
+    GPIOB_PIN(1) = (1 << 1);
+    
+    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
+    sleep(1);
+    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
+    sleep(1);
+    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
 }
 
 void _backlight_off(void)
 {
-    /* TODO */
+    GPIOB_PIN(1) = 0;
+    
+    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
 }
 
