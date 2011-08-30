@@ -505,6 +505,12 @@ static enum codec_command_action get_command(intptr_t *param)
     (void)param;
 }
 
+/* Some codecs call this to determine whether they should loop. */
+static bool loop_track(void)
+{
+    return false;
+}
+
 static void set_offset(size_t value)
 {
     ci.id3->offset = value;
@@ -561,6 +567,7 @@ static void init_ci(void)
     ci.set_offset = set_offset;
     ci.configure = configure;
     ci.get_command = get_command;
+    ci.loop_track = loop_track;
 
     /* --- "Core" functions --- */
 
@@ -578,7 +585,6 @@ static void init_ci(void)
     ci.memmove = rb->memmove;
     ci.memcmp = rb->memcmp;
     ci.memchr = rb->memchr;
-    ci.strcasestr = rb->strcasestr;
 #if defined(DEBUG) || defined(SIMULATOR)
     ci.debugf = rb->debugf;
 #endif
@@ -587,7 +593,6 @@ static void init_ci(void)
 #endif
 
     ci.qsort = rb->qsort;
-    ci.global_settings = rb->global_settings;
 
 #ifdef RB_PROFILE
     ci.profile_thread = rb->profile_thread;

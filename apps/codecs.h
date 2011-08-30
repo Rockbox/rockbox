@@ -44,7 +44,6 @@
 #endif
 #include "dsp.h"
 #endif
-#include "settings.h"
 
 #include "gcc_extensions.h"
 #include "load_code.h"
@@ -75,12 +74,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 42
+#define CODEC_API_VERSION 43
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 42
+#define CODEC_MIN_API_VERSION 43
 
 /* reasons for calling codec main entrypoint */
 enum codec_entry_call_reason {
@@ -145,6 +144,8 @@ struct codec_api {
     void (*configure)(int setting, intptr_t value);
     /* Obtain command action on what to do next */
     enum codec_command_action (*get_command)(intptr_t *param);
+    /* Determine whether the track should be looped, if applicable. */
+    bool (*loop_track)(void);
 
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -180,7 +181,6 @@ struct codec_api {
     void* (*memmove)(void *out, const void *in, size_t n);
     int (*memcmp)(const void *s1, const void *s2, size_t n);
     void *(*memchr)(const void *s1, int c, size_t n);
-    char *(*strcasestr) (const char* phaystack, const char* pneedle);
 
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
@@ -192,9 +192,6 @@ struct codec_api {
     /* Tremor requires qsort */
     void (*qsort)(void *base, size_t nmemb, size_t size,
                   int(*compar)(const void *, const void *));
-
-    /* The ADX codec accesses global_settings to test for REPEAT_ONE mode */
-    struct user_settings* global_settings;
 
 #ifdef RB_PROFILE
     void (*profile_thread)(void);

@@ -239,7 +239,7 @@ enum codec_status codec_run(void)
         if (bufoff > end_adr-18*channels && looping) {
             DEBUGF("ADX: loop!\n");
             /* check for endless looping */
-            if (ci->global_settings->repeat_mode==REPEAT_ONE) {
+            if (ci->loop_track()) {
                 loop_count=0;
                 fade_count = -1; /* disable fade */
             } else {

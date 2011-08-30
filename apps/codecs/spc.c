@@ -477,7 +477,7 @@ static int play_track( void )
         sampleswritten += WAV_CHUNK_SIZE;
 
         /* is track timed? */
-        if (ci->global_settings->repeat_mode!=REPEAT_ONE && ci->id3->length) {
+        if (!ci->loop_track() && ci->id3->length) {
             unsigned long curtime = sampleswritten*1000LL/SAMPLE_RATE;
             unsigned long lasttimesample = (sampleswritten-WAV_CHUNK_SIZE);
 
@@ -513,10 +513,10 @@ static int play_track( void )
 
         spc_play_send_samples(samples);
 
-        if (ci->global_settings->repeat_mode!=REPEAT_ONE)
-            ci->set_elapsed(sampleswritten*1000LL/SAMPLE_RATE);
-        else
+        if (ci->loop_track())
             ci->set_elapsed(0);
+        else
+            ci->set_elapsed(sampleswritten*1000LL/SAMPLE_RATE);
     }
     
     EXIT_TIMER(total);
@@ -571,7 +571,7 @@ enum codec_status codec_run(void)
 
         LoadID666(buffer+0x2e);
 
-        if (ci->global_settings->repeat_mode!=REPEAT_ONE && ID666.length==0) {
+        if (!ci->loop_track() && ID666.length==0) {
             ID666.length=3*60*1000; /* 3 minutes */
             ID666.fade=5*1000; /* 5 seconds */
         }

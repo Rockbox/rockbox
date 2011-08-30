@@ -17,8 +17,8 @@ static struct Hes_Emu hes_emu;
 static void set_codec_track(int t) {
     Hes_start_track(&hes_emu, t); 
 
-    /* for REPEAT_ONE we disable track limits */
-    if (ci->global_settings->repeat_mode != REPEAT_ONE) {
+    /* for loop mode we disable track limits */
+    if (!ci->loop_track()) {
         Track_set_fade(&hes_emu, Track_get_length( &hes_emu, t ), 4000);
     }
     ci->set_elapsed(t*1000); /* t is track no to display */

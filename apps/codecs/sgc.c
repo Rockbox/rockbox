@@ -23,7 +23,7 @@ static void set_codec_track(int t) {
     Sgc_start_track(&sgc_emu, t); 
 
     /* for REPEAT_ONE we disable track limits */
-    if (ci->global_settings->repeat_mode != REPEAT_ONE) {
+    if (!ci->loop_track()) {
         Track_set_fade(&sgc_emu, Track_get_length( &sgc_emu, t ), 4000);
     }
     ci->set_elapsed(t*1000); /* t is track no to display */

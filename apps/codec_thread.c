@@ -30,6 +30,7 @@
 #include "buffering.h"
 #include "dsp.h"
 #include "metadata.h"
+#include "settings.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
@@ -405,6 +406,11 @@ static enum codec_command_action
     }
 }
 
+static bool codec_loop_track_callback(void)
+{
+    return global_settings.repeat_mode == REPEAT_ONE;
+}
+
 /* Initialize codec API */
 void codec_init_codec_api(void)
 {
@@ -421,6 +427,7 @@ void codec_init_codec_api(void)
     ci.set_offset          = audio_codec_update_offset;
     ci.configure           = codec_configure_callback;
     ci.get_command         = codec_get_command_callback;
+    ci.loop_track          = codec_loop_track_callback;
 }
 
 

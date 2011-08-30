@@ -20,7 +20,7 @@ static void set_codec_track(int t, int multitrack) {
     Nsf_start_track(&nsf_emu, t); 
 
     /* for REPEAT_ONE we disable track limits */
-    if (ci->global_settings->repeat_mode != REPEAT_ONE) {
+    if (!ci->loop_track()) {
         Track_set_fade(&nsf_emu, Track_length( &nsf_emu, t ) - 4000, 4000);
     }
     if (multitrack) ci->set_elapsed(t*1000); /* t is track no to display */
@@ -109,7 +109,7 @@ next_track:
             ci->seek_complete();
             
             /* Set fade again */
-            if (ci->global_settings->repeat_mode != REPEAT_ONE) {
+            if (!ci->loop_track()) {
                 Track_set_fade(&nsf_emu, Track_length( &nsf_emu, track ), 4000);
             }
         }

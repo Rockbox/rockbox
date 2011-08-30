@@ -17,8 +17,8 @@ static struct Gbs_Emu gbs_emu;
 static void set_codec_track(int t) {
     Gbs_start_track(&gbs_emu, t); 
 
-    /* for REPEAT_ONE we disable track limits */
-    if (ci->global_settings->repeat_mode != REPEAT_ONE) {
+    /* for loop mode we disable track limits */
+    if (!ci->loop_track()) {
         Track_set_fade(&gbs_emu, Track_get_length( &gbs_emu, t ), 4000);
     }
     ci->set_elapsed(t*1000); /* t is track no to display */

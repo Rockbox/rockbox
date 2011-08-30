@@ -17,8 +17,8 @@ static struct Ay_Emu ay_emu;
 static void set_codec_track(int t, int multitrack) {
     Ay_start_track(&ay_emu, t); 
 
-    /* for REPEAT_ONE we disable track limits */
-    if (ci->global_settings->repeat_mode != REPEAT_ONE) {
+    /* for loop mode we disable track limits */
+    if (!ci->loop_track()) {
         Track_set_fade(&ay_emu, Track_get_length( &ay_emu, t ) - 4000, 4000);
     }
     if (multitrack) ci->set_elapsed(t*1000); /* t is track no to display */
@@ -111,7 +111,7 @@ next_track:
             ci->seek_complete();
             
             /* Set fade again */
-            if (ci->global_settings->repeat_mode != REPEAT_ONE) {
+            if (!ci->loop_track()) {
                 Track_set_fade(&ay_emu, Track_get_length( &ay_emu, track ) - 4000, 4000);
             }
         }

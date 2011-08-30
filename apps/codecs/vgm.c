@@ -105,7 +105,7 @@ enum codec_status codec_run(void)
     Vgm_start_track(&vgm_emu); 
 
     /* for REPEAT_ONE we disable track limits */
-    if (ci->global_settings->repeat_mode != REPEAT_ONE) {
+    if (!ci->loop_track()) {
         Track_set_fade(&vgm_emu, ci->id3->length - 4000, 4000);
     }
     

@@ -50,6 +50,7 @@
 #include "sound.h"
 #include "splash.h"
 #include "general.h"
+#include "rbpaths.h"
 
 #define LOGF_ENABLE
 #include "logf.h"
@@ -97,6 +98,7 @@ struct codec_api ci = {
     NULL, /* set_offset */
     NULL, /* configure */
     NULL, /* get_command */
+    NULL, /* loop_track */
     
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -127,7 +129,6 @@ struct codec_api ci = {
     memmove,
     memcmp,
     memchr,
-    strcasestr,
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
 #endif
@@ -136,7 +137,6 @@ struct codec_api ci = {
 #endif
 
     (qsort_func)qsort,
-    &global_settings,
 
 #ifdef RB_PROFILE
     profile_thread,
