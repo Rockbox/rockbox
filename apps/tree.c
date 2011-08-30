@@ -1216,7 +1216,7 @@ void tree_flush(void)
             if (firmware_settings.initialized)
                 dircache_save();
 # endif
-            dircache_disable();
+            dircache_suspend();
         }
         else
         {

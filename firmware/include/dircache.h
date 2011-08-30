@@ -76,6 +76,8 @@ int dircache_get_cache_size(void);
 int dircache_get_reserve_used(void);
 int dircache_get_build_ticks(void);
 void dircache_disable(void);
+void dircache_suspend(void);
+bool dircache_resume(void);
 int dircache_get_entry_id(const char *filename);
 size_t dircache_copy_path(int index, char *buf, size_t size);
 

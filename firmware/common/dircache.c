@@ -41,6 +41,7 @@
 #include "core_alloc.h"
 #include "dir.h"
 #include "storage.h"
+#include "audio.h"
 #if CONFIG_RTC
 #include "time.h"
 #include "timefuncs.h"
@@ -845,7 +846,7 @@ static void dircache_thread(void)
             case DIRCACHE_BUILD:
                 thread_enabled = true;
                 if (dircache_do_rebuild() < 0)
-                    core_free(dircache_handle);
+                    dircache_handle = core_free(dircache_handle);
                 thread_enabled = false;
                 break ;
                 
@@ -887,8 +888,8 @@ int dircache_build(int last_size)
     remove_dircache_file();
 #endif
 
-    /* Background build, dircache has been previously allocated */
-    if (allocated_size > 0)
+    /* Background build, dircache has been previously allocated and */
+    if (allocated_size > MAX(last_size, 0))
     {
         d_names_start = d_names_end;
         dircache_size = 0;
@@ -900,6 +901,9 @@ int dircache_build(int last_size)
         queue_post(&dircache_queue, DIRCACHE_BUILD, 0);
         return 2;
     }
+
+    if (dircache_handle > 0)
+        dircache_handle = core_free(dircache_handle);
 
     if (last_size > DIRCACHE_RESERVE && last_size < DIRCACHE_LIMIT )
     {
@@ -922,12 +926,18 @@ int dircache_build(int last_size)
      * and their corresponding d_name from the end
      * after generation the buffer will be compacted with DIRCACHE_RESERVE
      * free bytes inbetween */
-    size_t got_size;
-    dircache_handle = core_alloc_maximum("dircache", &got_size, &ops);
+    size_t available = audio_buffer_available();
+    /* try to allocate at least 1MB, the more the better */
+    if (available < 1<<20) available = 1<<20;
+    if (available > DIRCACHE_LIMIT) available = DIRCACHE_LIMIT;
+
+    dircache_handle = core_alloc_ex("dircache", available, &ops);
+    if (dircache_handle <= 0)
+        return -1; /* that was not successful, should try rebooting */
     char* buf = core_get_data(dircache_handle);
     dircache_root = (struct dircache_entry*)ALIGN_UP(buf,
                                                 sizeof(struct dircache_entry*));
-    d_names_start = d_names_end = buf + got_size - 1;
+    d_names_start = d_names_end = buf + available - 1;
     dircache_size = 0;
     generate_dot_d_names();
 
@@ -967,27 +977,7 @@ int dircache_build(int last_size)
     return res;
 fail:
     dircache_disable();
-    core_free(dircache_handle);
     return res;
-}
-
-/**
- * Steal the allocated dircache buffer and disable dircache.
- */
-void* dircache_steal_buffer(size_t *size)
-{
-    dircache_disable();
-    if (dircache_size == 0)
-    {
-        *size = 0;
-        return NULL;
-    }
-
-    /* since we give up the buffer (without freeing), it must not move anymore */
-    dont_move = true;
-    *size = dircache_size + (DIRCACHE_RESERVE-reserve_used);
-    
-    return dircache_root;
 }
 
 /**
@@ -1085,10 +1075,10 @@ int dircache_get_build_ticks(void)
 }
 
 /**
- * Disables the dircache. Usually called on shutdown or when
- * accepting a usb connection.
- */
-void dircache_disable(void)
+ * Disables dircache without freeing the buffer (so it can be re-enabled
+ * afterwards with dircache_resume() or dircache_build()), usually
+ * called when accepting an usb connection */
+void dircache_suspend(void)
 {
     int i;
     bool cache_in_use;
@@ -1115,6 +1105,52 @@ void dircache_disable(void)
     
     logf("Cache released");
     entry_count = 0;
+}
+
+/**
+ * Re-enables the dircache if previous suspended by dircache_suspend
+ * or dircache_steal_buffer(), re-using the already allocated buffer
+ *
+ * Returns true if the background build is started, false otherwise
+ * (e.g. if no buffer was previously allocated)
+ */
+bool dircache_resume(void)
+{
+    bool ret = allocated_size > 0;
+    if (ret) /* only resume if already allocated */
+        ret = (dircache_build(0) > 0);
+
+    return (allocated_size > 0);
+}
+
+/**
+ * Disables the dircache entirely. Usually called on shutdown or when
+ * deactivated
+ */
+void dircache_disable(void)
+{
+    dircache_suspend();
+    dircache_handle = core_free(dircache_handle);
+    dircache_size = allocated_size = 0;
+}
+
+/**
+ * Steal the allocated dircache buffer and disable dircache.
+ */
+void* dircache_steal_buffer(size_t *size)
+{
+    dircache_suspend();
+    if (dircache_size == 0)
+    {
+        *size = 0;
+        return NULL;
+    }
+
+    /* since we give up the buffer (without freeing), it must not move anymore */
+    dont_move = true;
+    *size = dircache_size + (DIRCACHE_RESERVE-reserve_used);
+    
+    return dircache_root;
 }
 
 /**

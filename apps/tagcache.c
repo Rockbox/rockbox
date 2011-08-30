@@ -3099,7 +3099,7 @@ static bool commit(void)
 #ifdef HAVE_DIRCACHE
     /* Rebuild the dircache, if we stole the buffer. */
     if (dircache_buffer_stolen)
-        dircache_build(0);
+        dircache_resume();
 #endif
 
 #ifdef HAVE_TC_RAMCACHE
