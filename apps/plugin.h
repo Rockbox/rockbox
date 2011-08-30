@@ -91,6 +91,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "list.h"
 #include "tree.h"
 #include "color_picker.h"
+#include "buflib.h"
 #include "buffering.h"
 #include "tagcache.h"
 #include "viewport.h"
@@ -928,6 +929,23 @@ struct plugin_api {
        the API gets incompatible */
     struct entry* (*tree_get_entries)(struct tree_context* t);
     struct entry* (*tree_get_entry_at)(struct tree_context* t, int index);
+
+    /* the buflib memory management library */
+    void   (*buflib_init)(struct buflib_context* ctx, void* buf, size_t size);
+    size_t (*buflib_available)(struct buflib_context* ctx);
+    int    (*buflib_alloc)(struct buflib_context* ctx, size_t size);
+    int    (*buflib_alloc_ex)(struct buflib_context* ctx, size_t size,
+                              const char* name, struct buflib_callbacks *ops);
+    int    (*buflib_alloc_maximum)(struct buflib_context* ctx, const char* name,
+                                   size_t* size, struct buflib_callbacks *ops);
+    void   (*buflib_buffer_in)(struct buflib_context* ctx, int size);
+    void*  (*buflib_buffer_out)(struct buflib_context* ctx, size_t* size);
+    int    (*buflib_free)(struct buflib_context* ctx, int handle);
+    bool   (*buflib_shrink)(struct buflib_context* ctx, int handle,
+                            void* new_start, size_t new_size);
+    void*  (*buflib_get_data)(struct buflib_context* ctx, int handle);
+    const char* (*buflib_get_name)(struct buflib_context* ctx, int handle);
+    
 };
 
 /* plugin header */

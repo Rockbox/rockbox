@@ -791,6 +791,19 @@ static const struct plugin_api rockbox_api = {
        the API gets incompatible */
     tree_get_entries,
     tree_get_entry_at,
+    
+    /* the buflib memory management library */
+    buflib_init,
+    buflib_available,
+    buflib_alloc,
+    buflib_alloc_ex,
+    buflib_alloc_maximum,
+    buflib_buffer_in,
+    buflib_buffer_out,
+    buflib_free,
+    buflib_shrink,
+    buflib_get_data,
+    buflib_get_name,
 };
 
 int plugin_load(const char* plugin, const void* parameter)

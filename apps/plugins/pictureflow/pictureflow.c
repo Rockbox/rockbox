@@ -33,7 +33,6 @@
 #include "lib/grey.h"
 #include "lib/mylcd.h"
 #include "lib/feature_wrappers.h"
-#include "lib/buflib.h"
 
 
 
@@ -924,7 +923,7 @@ void create_track_index(const int slide_index)
     int string_index = 0, track_num;
     int disc_num;
     size_t out = 0;
-    track_names = (char *)buflib_buffer_out(&buf_ctx, &out);
+    track_names = rb->buflib_buffer_out(&buf_ctx, &out);
     borrowed += out;
     int avail = borrowed;
     tracks = (struct track_data*)(track_names + borrowed);
@@ -980,7 +979,7 @@ retry:
                 if (!free_slide_prio(0))
                     goto fail;
                 out = 0;
-                buflib_buffer_out(&buf_ctx, &out);
+                rb->buflib_buffer_out(&buf_ctx, &out);
                 avail += out;
                 borrowed += out;
 
@@ -1457,7 +1456,7 @@ static inline void lla_insert_before(int *head, int i, int p)
 static inline void free_slide(int i)
 {
     if (cache[i].hid != empty_slide_hid)
-        buflib_free(&buf_ctx, cache[i].hid);
+        rb->buflib_free(&buf_ctx, cache[i].hid);
     cache[i].index = -1;
     lla_pop_item(&cache_used, i);
     lla_insert_tail(&cache_free, i);
@@ -1521,7 +1520,7 @@ int read_pfraw(char* filename, int prio)
                 sizeof( pix_t ) * bmph.width * bmph.height;
 
     int hid;
-    while (!(hid = buflib_alloc(&buf_ctx, size)) && free_slide_prio(prio));
+    while (!(hid = rb->buflib_alloc(&buf_ctx, size)) && free_slide_prio(prio));
 
     if (!hid) {
         rb->close( fh );
@@ -1529,7 +1528,7 @@ int read_pfraw(char* filename, int prio)
     }
 
     rb->yield(); /* allow audio to play when fast scrolling */
-    struct dim *bm = buflib_get_data(&buf_ctx, hid);
+    struct dim *bm = rb->buflib_get_data(&buf_ctx, hid);
 
     bm->width = bmph.width;
     bm->height = bmph.height;
@@ -1694,7 +1693,7 @@ static inline struct dim *get_slide(const int hid)
 
     struct dim *bmp;
 
-    bmp = buflib_get_data(&buf_ctx, hid);
+    bmp = rb->buflib_get_data(&buf_ctx, hid);
 
     return bmp;
 }
@@ -2697,7 +2696,7 @@ int main(void)
         configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     }
 
-    buflib_init(&buf_ctx, (void *)buf, buf_size);
+    rb->buflib_init(&buf_ctx, (void *)buf, buf_size);
 
     if (!(empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)))
     {
@@ -2832,7 +2831,7 @@ int main(void)
         case PF_BACK:
             if ( pf_state == pf_show_tracks )
             {
-                buflib_buffer_in(&buf_ctx, borrowed);
+                rb->buflib_buffer_in(&buf_ctx, borrowed);
                 borrowed = 0;
                 track_index = -1;
                 pf_state = pf_cover_out;
