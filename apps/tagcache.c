@@ -3905,9 +3905,7 @@ static bool allocate_tagcache(void)
 static bool tagcache_dumpload(void)
 {
     struct statefile_header shdr;
-    int fd, rc;
-    long offpos;
-    int i, handle;
+    int fd, rc, handle;
     
     fd = open(TAGCACHE_STATEFILE, O_RDONLY);
     if (fd < 0)
@@ -3932,7 +3930,7 @@ static bool tagcache_dumpload(void)
     /* Lets allocate real memory and load it */
     handle = core_alloc_ex("tc ramcache", shdr.tc_stat.ramcache_allocated, &ops);
     ramcache_hdr = core_get_data(handle);
-    moev_lock++;
+    move_lock++;
     rc = read(fd, ramcache_hdr, shdr.tc_stat.ramcache_allocated);
     move_lock--;
     close(fd);

@@ -765,7 +765,7 @@ void buflib_print_block_at(struct buflib_context *ctx, int block_num,
         block_num -= 1;
     }
     snprintf(buf, bufsize, "%8p: val: %4ld (%s)",
-                            this, this->val,
+                            this, (long)this->val,
                             this->val > 0? this[3].name:"<unallocated>");
 }
 

@@ -128,6 +128,7 @@ static struct trackdata trackdata[MAX_TRACK_ENTRIES];
 static unsigned int current_track_counter = 0;
 
 #ifndef SIMULATOR
+static void stop_playing(void);
 /* Play time of the previous track */
 static unsigned long prev_track_elapsed;
 
@@ -493,7 +494,6 @@ unsigned long mpeg_get_last_header(void)
 #endif /* !SIMULATOR */
 }
 
-static void stop_playing(void);
 static void do_stop(void)
 {
     is_playing = false;
