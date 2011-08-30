@@ -79,6 +79,7 @@
 #include "peakmeter.h"
 #endif
 #include "logfdisp.h"
+#include "core_alloc.h"
 #if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #include "buffering.h"
@@ -415,6 +416,22 @@ static bool dbg_buffering_thread(void)
 }
 #endif /* CONFIG_CODEC */
 #endif /* HAVE_LCD_BITMAP */
+
+static const char* bf_getname(int selected_item, void *data,
+                                   char *buffer, size_t buffer_len)
+{
+    (void)data;
+    core_print_block_at(selected_item, buffer, buffer_len);
+    return buffer;
+}
+
+static bool dbg_buflib_allocs(void)
+{
+    struct simplelist_info info;
+    simplelist_info_init(&info, "mem allocs", core_get_num_blocks(), NULL);
+    info.get_name = bf_getname;
+    return simplelist_show_list(&info);
+}
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 static const char* dbg_partitions_getname(int selected_item, void *data,
@@ -2040,6 +2057,7 @@ static const struct the_menu_item menuitems[] = {
         { "pm histogram", peak_meter_histogram},
 #endif /* PM_DEBUG */
 #endif /* HAVE_LCD_BITMAP */
+        { "View buflib allocs", dbg_buflib_allocs },
 #ifndef SIMULATOR
 #if CONFIG_TUNER
         { "FM Radio", dbg_fm_radio },

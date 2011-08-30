@@ -30,7 +30,7 @@
 #include "settings.h"
 #include "replaygain.h"
 #include "tdspeed.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
 
@@ -325,10 +325,16 @@ void dsp_timestretch_enable(bool enabled)
     {
         if (enabled)
         {
+            int handle;
             /* Set up timestretch buffers */
             big_sample_buf_count = SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO;
             big_sample_buf = small_resample_buf;
-            big_resample_buf = (int32_t *) buffer_alloc(big_sample_buf_count * RESAMPLE_RATIO * sizeof(int32_t));
+            handle = core_alloc("resample buf",
+                    big_sample_buf_count * RESAMPLE_RATIO * sizeof(int32_t));
+            if (handle > 0)
+                big_resample_buf = core_get_data(handle);
+            else
+                big_sample_buf_count = 0;
         }
         else
         {

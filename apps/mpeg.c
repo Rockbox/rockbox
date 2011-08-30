@@ -35,7 +35,7 @@
 #include "thread.h"
 #include "errno.h"
 #include "mp3data.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "mp3_playback.h"
 #include "talk.h"
 #include "sound.h"
@@ -145,7 +145,8 @@ static unsigned int mpeg_errno;
 static bool playing = false;    /* We are playing an MP3 stream */
 static bool is_playing = false; /* We are (attempting to) playing MP3 files */
 static bool paused;             /* playback is paused */
-static char* mpeg_audiobuf;     /* the audio buffer */
+static int audiobuf_handle;     /* handle to the audio buffer */
+static char* mpeg_audiobuf;     /* poiunter to the audio buffer */
 static long audiobuflen;        /* length of the audio buffer */
 
 #ifdef SIMULATOR
@@ -491,15 +492,27 @@ unsigned long mpeg_get_last_header(void)
 #endif /* !SIMULATOR */
 }
 
-
+/* Buffer must not move. And not shrink for now */
+static struct buflib_callbacks ops = { NULL, NULL };
 unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
     (void)talk_buf; /* always grab the voice buffer for now */
 
-    audio_hard_stop();
     if (buffer_size) /* special case for talk_init() */
-        return buffer_get_buffer(buffer_size);
-    return NULL;
+    {
+        size_t bufsize;
+        audio_hard_stop();
+        /* audio_hard_stop() frees audiobuf, so re-aquire */
+        audiobuf_handle = core_alloc_maximum("audiobuf", &bufsize, &ops);
+        audiobuflen = bufsize;
+        *buffer_size = audiobuflen;
+    }
+    mpeg_audiobuf = core_get_data(audiobuf_handle);
+
+    if (!buffer_size) /* special case for talk_init() */
+        talkbuf_init(mpeg_audiobuf);
+
+    return mpeg_audiobuf;
 }
 
 
@@ -2659,17 +2672,26 @@ void audio_set_recording_options(struct audio_recording_options *options)
 #endif /* SIMULATOR */
 #endif /* CONFIG_CODEC == MAS3587F */
 
+size_t audio_buffer_available(void)
+{
+    if (audiobuf_handle > 0)
+        return audiobuflen;
+    return core_available();
+}
+
 static void audio_reset_buffer(void)
 {
-    size_t bufsize; /* dont break strict-aliasing */
     talk_buffer_steal(); /* will use the mp3 buffer */
 
-    /* release buffer on behalf of any audio_get_buffer() caller,
-     * non-fatal if there was none */
-    buffer_release_buffer(0);
-    /* re-aquire */
-    mpeg_audiobuf = buffer_get_buffer(&bufsize);
-    audiobuflen = bufsize;
+    /* alloc buffer if it's was never allocated or freed by audio_hard_stop() */
+    if (!audiobuf_handle)
+    {
+        size_t bufsize; /* dont break strict-aliasing */
+        audiobuf_handle = core_alloc_maximum("audiobuf", &bufsize, &ops);
+        mpeg_audiobuf = core_get_data(audiobuf_handle);
+        audiobuflen = bufsize;
+    }
+    talkbuf_init(mpeg_audiobuf);
 }
 
 void audio_play(long offset)
@@ -2742,7 +2764,11 @@ void audio_hard_stop(void)
     audio_stop();
     /* tell voice we obtain the buffer before freeing */
     talk_buffer_steal();
-    buffer_release_buffer(0);
+    if (audiobuf_handle > 0)
+    {
+        audiobuf_handle = core_free(audiobuf_handle);
+        mpeg_audiobuf = NULL;
+    }
 }
 
 void audio_pause(void)
@@ -2899,13 +2925,15 @@ void audio_init(void)
     mpeg_errno = 0;
     /* cuesheet support */
     if (global_settings.cuesheet)
-        curr_cuesheet = (struct cuesheet*)buffer_alloc(sizeof(struct cuesheet));
+    {
+        int handle = core_alloc("cuesheet", sizeof(struct cuesheet));
+        if (handle > 0)
+            curr_cuesheet = core_get_data(handle);
+    }
 
-    size_t bufsize; /* don't break strict-aliasing */
-    mpeg_audiobuf = buffer_get_buffer(&bufsize);
-    audiobuflen = bufsize;
-    /* give voice buffer until we start to play */
-    talkbuf_init(mpeg_audiobuf);
+    talk_init();
+    audio_reset_buffer();
+
 #ifndef SIMULATOR
     queue_init(&mpeg_queue, true);
 #endif /* !SIMULATOR */

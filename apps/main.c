@@ -53,7 +53,7 @@
 #include "language.h"
 #include "wps.h"
 #include "playlist.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "rolo.h"
 #include "screens.h"
 #include "usb_screen.h"
@@ -337,7 +337,7 @@ static void init_tagcache(void)
 static void init(void)
 {
     system_init();
-    buffer_init();
+    core_allocator_init();
     kernel_init();
 #ifdef APPLICATION
     paths_init();
@@ -400,9 +400,6 @@ static void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
-
-    /* audio_init must to know the size of voice buffer so init voice first */
-    talk_init();
 #endif /* CONFIG_CODEC != SWCODEC */
 
     scrobbler_init();
@@ -428,7 +425,7 @@ static void init(void)
 #endif
 
     system_init();
-    buffer_init();
+    core_allocator_init();
     kernel_init();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -684,9 +681,6 @@ static void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
-
-     /* audio_init must to know the size of voice buffer so init voice first */
-    talk_init();
 #endif /* CONFIG_CODEC != SWCODEC */
 
     CHART(">audio_init");

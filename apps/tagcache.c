@@ -74,7 +74,7 @@
 #include "usb.h"
 #include "metadata.h"
 #include "tagcache.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "crc32.h"
 #include "misc.h"
 #include "settings.h"
@@ -3082,6 +3082,7 @@ static bool commit(void)
     return true;
 }
 
+static int tempbuf_handle;
 static void allocate_tempbuf(void)
 {
     /* Yeah, malloc would be really nice now :) */
@@ -3089,7 +3090,8 @@ static void allocate_tempbuf(void)
     tempbuf_size = 32*1024*1024;
     tempbuf = malloc(tempbuf_size);
 #else
-    tempbuf = buffer_get_buffer(&tempbuf_size);
+    tempbuf_handle = core_alloc_maximum("tc tempbuf", &tempbuf_size, NULL);
+    tempbuf = core_get_data(tempbuf_handle);
 #endif
 }
 
@@ -3101,7 +3103,7 @@ static void free_tempbuf(void)
 #ifdef __PCTOOL__
     free(tempbuf);
 #else
-    buffer_release_buffer(0);
+    tempbuf_handle = core_free(tempbuf_handle);
 #endif
     tempbuf = NULL;
     tempbuf_size = 0;
@@ -3829,9 +3831,10 @@ static bool allocate_tagcache(void)
      * Now calculate the required cache size plus 
      * some extra space for alignment fixes. 
      */
-    tc_stat.ramcache_allocated = tcmh.tch.datasize + 128 + TAGCACHE_RESERVE +
+    tc_stat.ramcache_allocated = tcmh.tch.datasize + 256 + TAGCACHE_RESERVE +
         sizeof(struct ramcache_header) + TAG_COUNT*sizeof(void *);
-    ramcache_hdr = buffer_alloc(tc_stat.ramcache_allocated + 128);
+    int handle = core_alloc("tc ramcache", tc_stat.ramcache_allocated);
+    ramcache_hdr = core_get_data(handle);
     memset(ramcache_hdr, 0, sizeof(struct ramcache_header));
     memcpy(&current_tcmh, &tcmh, sizeof current_tcmh);
     logf("tagcache: %d bytes allocated.", tc_stat.ramcache_allocated);
@@ -3845,7 +3848,7 @@ static bool tagcache_dumpload(void)
     struct statefile_header shdr;
     int fd, rc;
     long offpos;
-    int i;
+    int i, handle;
     
     fd = open(TAGCACHE_STATEFILE, O_RDONLY);
     if (fd < 0)
@@ -3855,7 +3858,6 @@ static bool tagcache_dumpload(void)
     }
     
     /* Check the statefile memory placement */
-    ramcache_hdr = buffer_alloc(0);
     rc = read(fd, &shdr, sizeof(struct statefile_header));
     if (rc != sizeof(struct statefile_header)
         || shdr.magic != TAGCACHE_STATEFILE_MAGIC
@@ -3867,13 +3869,14 @@ static bool tagcache_dumpload(void)
         return false;
     }
     
-    offpos = (long)ramcache_hdr - (long)shdr.hdr;
     
     /* Lets allocate real memory and load it */
-    ramcache_hdr = buffer_alloc(shdr.tc_stat.ramcache_allocated);
+    handle = core_alloc("tc ramcache", shdr.tc_stat.ramcache_allocated);
+    ramcache_hdr = core_get_data(handle);
     rc = read(fd, ramcache_hdr, shdr.tc_stat.ramcache_allocated);
     close(fd);
     
+    offpos = (long)ramcache_hdr - (long)shdr.hdr;
     if (rc != shdr.tc_stat.ramcache_allocated)
     {
         logf("read failure!");

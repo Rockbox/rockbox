@@ -30,7 +30,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #include "metadata.h"
 #include "kernel.h"
 #include "audio.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "settings.h"
 #include "ata_idle_notify.h"
 #include "filefuncs.h"
@@ -52,7 +52,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 /* longest entry I've had is 323, add a safety margin */
 #define SCROBBLER_CACHE_LEN 512
 
-static char* scrobbler_cache;
+static int scrobbler_cache;
 
 static int cache_pos;
 static struct mp3entry scrobbler_entry;
@@ -139,11 +139,16 @@ static void write_cache(void)
     if(fd >= 0)
     {
         logf("SCROBBLER: writing %d entries", cache_pos); 
-
+        /* copy data to temporary storage in case data moves during I/O */
+        char temp_buf[SCROBBLER_CACHE_LEN];
         for ( i=0; i < cache_pos; i++ )
         {
             logf("SCROBBLER: write %d", i);
-            fdprintf(fd, "%s", scrobbler_cache+(SCROBBLER_CACHE_LEN*i));
+            char* scrobbler_buf = core_get_data(scrobbler_cache);
+            ssize_t len = strlcpy(temp_buf, scrobbler_buf+(SCROBBLER_CACHE_LEN*i),
+                                        sizeof(temp_buf));
+            if (write(fd, temp_buf, len) != len)
+                break;
         }
         close(fd);
     }
@@ -170,6 +175,7 @@ static void add_to_cache(unsigned long play_length)
 
     int ret;
     char rating = 'S'; /* Skipped */
+    char* scrobbler_buf = core_get_data(scrobbler_cache);
 
     logf("SCROBBLER: add_to_cache[%d]", cache_pos);
 
@@ -178,7 +184,7 @@ static void add_to_cache(unsigned long play_length)
 
     if (scrobbler_entry.tracknum > 0)
     {
-        ret = snprintf(scrobbler_cache+(SCROBBLER_CACHE_LEN*cache_pos),
+        ret = snprintf(scrobbler_buf+(SCROBBLER_CACHE_LEN*cache_pos),
                 SCROBBLER_CACHE_LEN,
                 "%s\t%s\t%s\t%d\t%d\t%c\t%ld\t%s\n",
                 scrobbler_entry.artist,
@@ -190,7 +196,7 @@ static void add_to_cache(unsigned long play_length)
                 (long)timestamp,
                 scrobbler_entry.mb_track_id?scrobbler_entry.mb_track_id:"");
     } else {
-        ret = snprintf(scrobbler_cache+(SCROBBLER_CACHE_LEN*cache_pos),
+        ret = snprintf(scrobbler_buf+(SCROBBLER_CACHE_LEN*cache_pos),
                 SCROBBLER_CACHE_LEN,
                 "%s\t%s\t%s\t\t%d\t%c\t%ld\t%s\n",
                 scrobbler_entry.artist,
@@ -248,7 +254,7 @@ int scrobbler_init(void)
     if(!global_settings.audioscrobbler)
         return -1;
 
-    scrobbler_cache = buffer_alloc(SCROBBLER_MAX_CACHE*SCROBBLER_CACHE_LEN);
+    scrobbler_cache = core_alloc("scrobbler", SCROBBLER_MAX_CACHE*SCROBBLER_CACHE_LEN);
 
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, scrobbler_change_event);
     cache_pos = 0;

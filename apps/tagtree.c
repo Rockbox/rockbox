@@ -44,7 +44,7 @@
 #include "playlist.h"
 #include "keyboard.h"
 #include "gui/list.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "yesno.h"
 #include "misc.h"
 #include "filetypes.h"
@@ -176,9 +176,14 @@ static int current_entry_count;
 static struct tree_context *tc;
 
 /* a few memory alloc helper */
+static int tagtree_handle;
+static size_t tagtree_bufsize, tagtree_buf_used;
 static void* tagtree_alloc(size_t size)
 {
-    return buffer_alloc(size);
+    char* buf = core_get_data(tagtree_handle) + tagtree_buf_used;
+    size = ALIGN_UP(size, sizeof(void*));
+    tagtree_buf_used += size;
+    return buf;
 }
 
 static void* tagtree_alloc0(size_t size)
@@ -1035,6 +1040,7 @@ void tagtree_init(void)
     menu_count = 0;
     menu = NULL;
     rootmenu = -1;
+    tagtree_handle = core_alloc_maximum("tagtree", &tagtree_bufsize, NULL);
     parse_menu(FILE_SEARCH_INSTRUCTIONS);
     
     /* If no root menu is set, assume it's the first single menu
@@ -1046,6 +1052,8 @@ void tagtree_init(void)
 
     add_event(PLAYBACK_EVENT_TRACK_BUFFER, false, tagtree_buffer_event);
     add_event(PLAYBACK_EVENT_TRACK_FINISH, false, tagtree_track_finish_event);
+
+    core_shrink(tagtree_handle, core_get_data(tagtree_handle), tagtree_buf_used);
 }
 
 static bool show_search_progress(bool init, int count)

@@ -182,7 +182,7 @@ static const char* info_getname(int selected_item, void *data,
 
         case INFO_BUFFER: /* buffer */
         {
-            long kib = buffer_available() / 1024; /* to KiB */
+            long kib = audio_buffer_available() / 1024; /* to KiB */
             output_dyn_value(s1, sizeof(s1), kib, kbyte_units, true);
             snprintf(buffer, buffer_len, "%s %s", str(LANG_BUFFER_STAT), s1);
         }
@@ -272,7 +272,7 @@ static int info_speak_item(int selected_item, void * data)
         case INFO_BUFFER: /* buffer */
         {
             talk_id(LANG_BUFFER_STAT, false);
-            long kib = buffer_available() / 1024; /* to KiB */
+            long kib = audio_buffer_available() / 1024; /* to KiB */
             output_dyn_value(NULL, 0, kib, kbyte_units, true);
             break;
         }

@@ -85,7 +85,11 @@ struct playlist_info
     int  max_playlist_size; /* Max number of files in playlist. Mirror of
                               global_settings.max_files_in_playlist */
     bool in_ram;         /* playlist stored in ram (dirplay)        */
-    char *buffer;        /* buffer for in-ram playlists             */
+
+    union {
+        char *buffer;    /* buffer for in-ram playlists             */
+        int  *seek_buf;  /* buffer for seeks in real playlists      */
+    };
     int  buffer_size;    /* size of buffer                          */
     int  buffer_end_pos; /* last position where buffer was written  */
     int  index;          /* index of current playing track          */

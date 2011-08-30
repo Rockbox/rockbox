@@ -26,7 +26,6 @@
 #include "panic.h"
 #include "nand_id.h"
 #include "storage.h"
-#include "buffer.h"
 
 #define SECTOR_SIZE 512
 
@@ -122,8 +121,9 @@ struct lpt_entry
 #ifdef BOOTLOADER
 static struct lpt_entry lpt_lookup[MAX_SEGMENTS];
 #else
-/* buffer_alloc'd in nand_init() when the correct size has been determined */
-static struct lpt_entry* lpt_lookup = NULL;
+/* core_alloc()'d in nand_init() when the correct size has been determined */
+#include "core_alloc.h"
+static int lpt_handle;
 #endif
 
 /* Write Caches */
@@ -607,6 +607,9 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
     int page_in_segment = sector / sectors_per_page;
     int sector_in_page  = sector % sectors_per_page;
 
+#ifndef BOOTLOADER
+    struct lpt_entry* lpt_lookup = core_get_data(lpt_handle);
+#endif
     int bank = lpt_lookup[log_segment].bank;
     int phys_segment = lpt_lookup[log_segment].phys_segment;
 
@@ -918,7 +921,8 @@ int nand_init(void)
 #ifndef BOOTLOADER
     /* Use chip info to allocate the correct size LPT buffer */
     lptbuf_size = sizeof(struct lpt_entry) * segments_per_bank * total_banks;
-    lpt_lookup = buffer_alloc(lptbuf_size);
+    lpt_handle = core_alloc("lpt lookup", lptbuf_size);
+    struct lpt_entry* lpt_lookup = core_get_data(lpt_handle);
 #else
     /* Use a static array in the bootloader */
     lptbuf_size = sizeof(lpt_lookup);
@@ -968,6 +972,9 @@ int nand_init(void)
 
                     if (log_segment < segments_per_bank * total_banks)
                     {
+#ifndef BOOTLOADER
+                        lpt_lookup = core_get_data(lpt_handle);
+#endif
                         if (lpt_lookup[log_segment].bank == -1 ||
                             lpt_lookup[log_segment].phys_segment == -1)
                         {

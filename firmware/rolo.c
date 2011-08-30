@@ -31,7 +31,7 @@
 #include "i2c.h"
 #include "adc.h"
 #include "string.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "storage.h"
 #include "rolo.h"
 
@@ -48,6 +48,7 @@
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
+static int rolo_handle;
 #ifdef CPU_PP
 /* Handle the COP properly - it needs to jump to a function outside SDRAM while
  * the new firmware is being loaded, and then jump to the start of SDRAM
@@ -99,7 +100,7 @@ void rolo_restart_cop(void)
 
 static void rolo_error(const char *text)
 {
-    buffer_release_buffer(0);
+    rolo_handle = core_free(rolo_handle);
     lcd_clear_display();
     lcd_puts(0, 0, "ROLO error:");
     lcd_puts_scroll(0, 1, text);
@@ -240,7 +241,8 @@ int rolo_load(const char* filename)
 
     /* get the system buffer. release only in case of error, otherwise
      * we don't return anyway */
-    filebuf = buffer_get_buffer(&filebuf_size);
+    rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
+    filebuf = core_get_data(rolo_handle);
 
 #if CONFIG_CPU != SH7034
     /* Read and save checksum */

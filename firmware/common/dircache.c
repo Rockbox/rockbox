@@ -38,7 +38,7 @@
 #include "kernel.h"
 #include "usb.h"
 #include "file.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "dir.h"
 #include "storage.h"
 #if CONFIG_RTC
@@ -57,6 +57,8 @@
 #else
 #define MAX_OPEN_DIRS 8
 #endif
+static DIR_CACHED opendirs[MAX_OPEN_DIRS];
+static char       opendir_dnames[MAX_OPEN_DIRS][MAX_PATH];
 
 #define MAX_PENDING_BINDINGS 2
 struct fdbind_queue {
@@ -571,7 +573,8 @@ int dircache_load(void)
     }
     
     allocated_size = maindata.size + DIRCACHE_RESERVE;
-    dircache_root = buffer_alloc(allocated_size);
+    int handle = core_alloc("dircache", allocated_size);
+    dircache_root = core_get_data(handle);
     /* needs to be struct-size aligned so that the pointer arithmetic below works */
     ALIGN_BUFFER(dircache_root, allocated_size, sizeof(struct dircache_entry));
     entry_count = maindata.entry_count;
@@ -814,6 +817,7 @@ static void generate_dot_d_names(void)
     strcpy(dot, ".");
     strcpy(dotdot, "..");
 }
+
 /**
  * Start scanning the disk to build the dircache.
  * Either transparent or non-transparent build method is used.
@@ -841,11 +845,13 @@ int dircache_build(int last_size)
         queue_post(&dircache_queue, DIRCACHE_BUILD, 0);
         return 2;
     }
-    
+
     if (last_size > DIRCACHE_RESERVE && last_size < DIRCACHE_LIMIT )
     {
+        int handle;
         allocated_size = last_size + DIRCACHE_RESERVE;
-        dircache_root = buffer_alloc(allocated_size);
+        handle = core_alloc("dircache", allocated_size);
+        dircache_root = core_get_data(handle);
         ALIGN_BUFFER(dircache_root, allocated_size, sizeof(struct dircache_entry));
         d_names_start = d_names_end = ((char*)dircache_root)+allocated_size-1;
         dircache_size = 0;
@@ -863,7 +869,8 @@ int dircache_build(int last_size)
      * after generation the buffer will be compacted with DIRCACHE_RESERVE
      * free bytes inbetween */
     size_t got_size;
-    char* buf = buffer_get_buffer(&got_size);
+    int handle = core_alloc_maximum("dircache", &got_size, NULL);
+    char* buf = core_get_data(handle);
     dircache_root = (struct dircache_entry*)ALIGN_UP(buf,
                                                 sizeof(struct dircache_entry));
     d_names_start = d_names_end = buf + got_size - 1;
@@ -902,11 +909,11 @@ int dircache_build(int last_size)
     allocated_size = (d_names_end - buf);
     reserve_used = 0;
 
-    buffer_release_buffer(allocated_size);
+    core_shrink(handle, dircache_root, allocated_size);
     return res;
 fail:
     dircache_disable();
-    buffer_release_buffer(0);
+    core_free(handle);
     return res;
 }
 
@@ -942,7 +949,7 @@ void dircache_init(void)
     memset(opendirs, 0, sizeof(opendirs));
     for (i = 0; i < MAX_OPEN_DIRS; i++)
     {
-        opendirs[i].theent.d_name = buffer_alloc(MAX_PATH);
+        opendirs[i].theent.d_name = opendir_dnames[i];
     }
     
     queue_init(&dircache_queue, true);

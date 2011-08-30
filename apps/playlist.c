@@ -84,7 +84,7 @@
 #include "status.h"
 #include "applimits.h"
 #include "screens.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "misc.h"
 #include "filefuncs.h"
 #include "button.h"
@@ -1929,6 +1929,7 @@ static int rotate_index(const struct playlist_info* playlist, int index)
  */
 void playlist_init(void)
 {
+    int handle;
     struct playlist_info* playlist = &current_playlist;
 
     mutex_init(&current_playlist_mutex);
@@ -1940,18 +1941,19 @@ void playlist_init(void)
     playlist->fd = -1;
     playlist->control_fd = -1;
     playlist->max_playlist_size = global_settings.max_files_in_playlist;
-    playlist->indices = buffer_alloc(
-        playlist->max_playlist_size * sizeof(int));
+    handle = core_alloc("playlist idx", playlist->max_playlist_size * sizeof(int));
+    playlist->indices = core_get_data(handle);
     playlist->buffer_size =
         AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir;
-    playlist->buffer = buffer_alloc(playlist->buffer_size);
+    handle = core_alloc("playlist buf", playlist->buffer_size);
+    playlist->buffer = core_get_data(handle);
     playlist->control_mutex = &current_playlist_mutex;
 
     empty_playlist(playlist, true);
 
 #ifdef HAVE_DIRCACHE
-    playlist->filenames = buffer_alloc(
-        playlist->max_playlist_size * sizeof(int));
+    handle = core_alloc("playlist dc", playlist->max_playlist_size * sizeof(int));
+    playlist->filenames = core_get_data(handle);
     memset(playlist->filenames, 0xff,
            playlist->max_playlist_size * sizeof(int));
     create_thread(playlist_thread, playlist_stack, sizeof(playlist_stack),
@@ -3356,7 +3358,6 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     char tmp_buf[MAX_PATH+1];
     int result = 0;
     bool overwrite_current = false;
-    int* index_buf = NULL;
     char* old_buffer = NULL;
     size_t old_buffer_size = 0;
 
@@ -3390,10 +3391,6 @@ int playlist_save(struct playlist_info* playlist, char *filename)
                 return -1;
             }
         }
-
-        /* in_ram buffer is unused for m3u files so we'll use for storing
-           updated indices */
-        index_buf = (int*)playlist->buffer;
 
         /* use temporary pathname */
         snprintf(path, sizeof(path), "%s_temp", playlist->filename);
@@ -3453,7 +3450,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
             }
 
             if (overwrite_current)
-                index_buf[count] = lseek(fd, 0, SEEK_CUR);
+                playlist->seek_buf[count] = lseek(fd, 0, SEEK_CUR);
 
             if (fdprintf(fd, "%s\n", tmp_buf) < 0)
             {
@@ -3498,7 +3495,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
                     {
                         if (!(playlist->indices[index] & PLAYLIST_QUEUE_MASK))
                         {
-                            playlist->indices[index] = index_buf[count];
+                            playlist->indices[index] = playlist->seek_buf[count];
                             count++;
                         }
                         index = (index+1)%playlist->amount;

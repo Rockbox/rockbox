@@ -36,7 +36,7 @@
 #include "dir.h"
 #include "file.h"
 #include "splash.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "icons.h"
 #include "logf.h"
 
@@ -183,12 +183,14 @@ static int filetype_count = 0;
 static unsigned char highest_attr = 0;
 static int viewer_count = 0;
 
+static int strdup_handle, strdup_bufsize, strdup_cur_idx;
 static char *filetypes_strdup(char* string)
 {
-    char *buffer = (char*)buffer_alloc(strlen(string)+1);
-    strcpy(buffer, string);
+    char *buffer = core_get_data(strdup_handle) + strdup_cur_idx;
+    strdup_cur_idx += strlcpy(buffer, string, strdup_bufsize-strdup_cur_idx)+1;
     return buffer;
 }
+
 static char *filetypes_store_plugin(char *plugin, int n)
 {
     int i;
@@ -219,7 +221,7 @@ static int find_extension(const char* extension)
 }
 
 static void read_builtin_types(void);
-static void read_config(const char* config_file);
+static void read_config(int fd);
 #ifdef HAVE_LCD_COLOR
 /* Colors file format is similar to icons:
  * ext:hex_color
@@ -312,16 +314,28 @@ void  filetype_init(void)
     filetypes[0].attr   = 0;
     filetypes[0].icon   = Icon_Folder;
 
+    /* estimate bufsize with the filesize, will not be larger */
     viewer_count = 0;
     filetype_count = 1;
+
+    int fd = open(VIEWERS_CONFIG, O_RDONLY);
+    if (fd < 0)
+        return;
+
+    strdup_bufsize = filesize(fd);
+    strdup_handle = core_alloc("filetypes", strdup_bufsize);
+    if (strdup_handle <= 0)
+        return;
     read_builtin_types();
-    read_config(VIEWERS_CONFIG);
+    read_config(fd);
 #ifdef HAVE_LCD_BITMAP
     read_viewer_theme_file();
 #endif
 #ifdef HAVE_LCD_COLOR
     read_color_theme_file();
 #endif
+    close(fd);
+    core_shrink(strdup_handle, core_get_data(strdup_handle), strdup_cur_idx);
 }
 
 /* remove all white spaces from string */
@@ -355,13 +369,10 @@ static void read_builtin_types(void)
     }
 }
 
-static void read_config(const char* config_file)
+static void read_config(int fd)
 {
     char line[64], *s, *e;
     char *extension, *plugin;
-    int fd = open(config_file, O_RDONLY);
-    if (fd < 0)
-        return;
     /* config file is in the format
        <extension>,<plugin>,<icon code>
        ignore line if either of the first two are missing */

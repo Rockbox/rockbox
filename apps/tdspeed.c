@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "sound.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "system.h"
 #include "tdspeed.h"
 #include "settings.h"
@@ -56,21 +56,32 @@ static int32_t *outbuf[2] = { NULL, NULL };
 
 void tdspeed_init(void)
 {
+    int handle;
+
     if (!global_settings.timestretch_enabled)
         return;
 
     /* Allocate buffers */
     if (overlap_buffer[0] == NULL)
-        overlap_buffer[0] = (int32_t *)buffer_alloc(FIXED_BUFSIZE * sizeof(int32_t));
-
+    {
+        handle = core_alloc("tdspeed ovl left", FIXED_BUFSIZE * sizeof(int32_t));
+        overlap_buffer[0] = core_get_data(handle);
+    }
     if (overlap_buffer[1] == NULL)
-        overlap_buffer[1] = (int32_t *)buffer_alloc(FIXED_BUFSIZE * sizeof(int32_t));
-
+    {
+        handle = core_alloc("tdspeed ovl right", FIXED_BUFSIZE * sizeof(int32_t));
+        overlap_buffer[1] = core_get_data(handle);
+    }
     if (outbuf[0] == NULL)
-        outbuf[0] = (int32_t *)buffer_alloc(TDSPEED_OUTBUFSIZE * sizeof(int32_t));
-
+    {
+        handle = core_alloc("tdspeed left", TDSPEED_OUTBUFSIZE * sizeof(int32_t));
+        outbuf[0] = core_get_data(handle);
+    }
     if (outbuf[1] == NULL)
-        outbuf[1] = (int32_t *)buffer_alloc(TDSPEED_OUTBUFSIZE * sizeof(int32_t));
+    {
+        handle = core_alloc("tdspeed right", TDSPEED_OUTBUFSIZE * sizeof(int32_t));
+        outbuf[1] = core_get_data(handle);
+    }
 }
 
 

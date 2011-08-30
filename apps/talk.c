@@ -27,7 +27,6 @@
 #include <stddef.h>
 #include "string-extra.h"
 #include "file.h"
-#include "buffer.h"
 #include "system.h"
 #include "kernel.h"
 #include "settings.h"
@@ -711,7 +710,7 @@ void talk_init(void)
 
 
     /* test if we can open and if it fits in the audiobuffer */
-    size_t audiobufsz = buffer_available();
+    size_t audiobufsz = audio_buffer_available();
     if (voicefile_size <= audiobufsz) {
         has_voicefile = true;
     } else {

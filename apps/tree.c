@@ -46,7 +46,7 @@
 #include "keyboard.h"
 #include "bookmark.h"
 #include "onplay.h"
-#include "buffer.h"
+#include "core_alloc.h"
 #include "power.h"
 #include "action.h"
 #include "talk.h"
@@ -1002,6 +1002,7 @@ int rockbox_browse(struct browse_context *browse)
 void tree_mem_init(void)
 {
     /* initialize tree context struct */
+    int handle;
     struct tree_cache* cache = &tc.cache;
     memset(&tc, 0, sizeof(tc));
     tc.dirfilter = &global_settings.dirfilter;
@@ -1009,10 +1010,12 @@ void tree_mem_init(void)
 
     cache->name_buffer_size = AVERAGE_FILENAME_LENGTH *
         global_settings.max_files_in_dir;
-    cache->name_buffer = buffer_alloc(cache->name_buffer_size);
+    handle = core_alloc("tree names", cache->name_buffer_size);
+    cache->name_buffer = core_get_data(handle);
 
     cache->max_entries = global_settings.max_files_in_dir;
-    cache->entries = buffer_alloc(cache->max_entries*(sizeof(struct entry)));
+    handle = core_alloc("tree entries", cache->max_entries*(sizeof(struct entry)));
+    cache->entries = core_get_data(handle);
     tree_get_filetypes(&filetypes, &filetypes_count);
 }
 

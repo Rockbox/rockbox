@@ -58,6 +58,7 @@ void audio_resume(void);
 void audio_next(void);
 void audio_prev(void);
 int audio_status(void);
+size_t audio_buffer_available(void);
 void audio_ff_rewind(long newpos);
 void audio_flush_and_reload_tracks(void);
 struct mp3entry* audio_current_track(void);
