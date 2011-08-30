@@ -190,6 +190,7 @@ enum {
 #include "system-sdl.h"
 #define NEED_GENERIC_BYTESWAPS
 #endif
+#include "bitswap.h"
 
 #ifdef NEED_GENERIC_BYTESWAPS
 static inline uint16_t swap16_hw(uint16_t value)
