@@ -185,7 +185,7 @@ bool mod_ext(const char ext[])
 void get_mod_list(void)
 {
     struct tree_context *tree = rb->tree_get_context();
-    struct entry *dircache = tree->cache.entries;
+    struct entry *dircache = rb->tree_get_entries(tree);
     int i;
     char *pname;
 

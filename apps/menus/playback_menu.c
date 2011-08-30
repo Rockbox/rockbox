@@ -142,7 +142,7 @@ static int audioscrobbler_callback(int action,const struct menu_item_ex *this_it
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
             if (!scrobbler_is_enabled() && global_settings.audioscrobbler)
-                splash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
+                scrobbler_init();
         
             if(scrobbler_is_enabled() && !global_settings.audioscrobbler)
                 scrobbler_shutdown();

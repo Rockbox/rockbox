@@ -789,6 +789,8 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    tree_get_entries,
+    tree_get_entry_at,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
@@ -865,6 +867,9 @@ int plugin_load(const char* plugin, const void* parameter)
     lcd_remote_update();
 #endif
     push_current_activity(ACTIVITY_PLUGIN);
+    /* some plugins assume the entry cache doesn't move and save pointers to it
+     * they should be fixed properly instead of this lock */
+    tree_lock_cache(tree_get_context());
 
     FOR_NB_SCREENS(i)
        viewportmanager_theme_enable(i, false, NULL);
@@ -879,6 +884,7 @@ int plugin_load(const char* plugin, const void* parameter)
 
     rc = p_hdr->entry_point(parameter);
     
+    tree_unlock_cache(tree_get_context());
     pop_current_activity();
 
     if (!pfn_tsr_exit)

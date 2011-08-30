@@ -192,10 +192,6 @@ handle_table_shrink(struct buflib_context *ctx)
 static bool
 move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
 {
-#if 1 /* moving temporarily disabled */
-    (void)ctx;(void)block;(void)shift;
-    return false;
-#else
     char* new_start;
     union buflib_data *new_block, *tmp = block[1].handle;
     struct buflib_callbacks *ops = block[2].ops;
@@ -218,7 +214,6 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     memmove(new_block, block, block->val * sizeof(union buflib_data));
 
     return true;
-#endif
 }
 
 /* Compact allocations and handle table, adjusting handle pointers as needed.

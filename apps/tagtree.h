@@ -30,19 +30,14 @@
 #define TAGMENU_MAX_MENUS  32
 #define TAGMENU_MAX_FMTS   32
 
-struct tagentry {
-    char *name;
-    int newtable;
-    int extraseek;
-};
-
 bool tagtree_export(void);
 bool tagtree_import(void);
 void tagtree_init(void) INIT_ATTR;
 int tagtree_enter(struct tree_context* c);
 void tagtree_exit(struct tree_context* c);
 int tagtree_load(struct tree_context* c);
-struct tagentry* tagtree_get_entry(struct tree_context *c, int id);
+char* tagtree_get_entry_name(struct tree_context *c, int id,
+                                    char* buf, size_t bufsize);
 bool tagtree_insert_selection_playlist(int position, bool queue);
 char *tagtree_get_title(struct tree_context* c);
 int tagtree_get_attr(struct tree_context* c);

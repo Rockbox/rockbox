@@ -184,6 +184,26 @@ static unsigned char highest_attr = 0;
 static int viewer_count = 0;
 
 static int strdup_handle, strdup_bufsize, strdup_cur_idx;
+static int move_callback(int handle, void* current, void* new)
+{
+    /*could compare to strdup_handle, but ops is only used once */
+    (void)handle;
+    size_t diff = new - current;
+#define FIX_PTR(x) \
+    { if ((void*)x > current && (void*)x < (current+strdup_bufsize)) x+= diff; }
+    for(int i = 0; i < filetype_count; i++)
+    {
+        FIX_PTR(filetypes[i].extension);
+        FIX_PTR(filetypes[i].plugin);
+    }
+    return BUFLIB_CB_OK;
+}
+
+static struct buflib_callbacks ops = {
+    .move_callback = move_callback,
+    .shrink_callback = NULL,
+};
+
 static char *filetypes_strdup(char* string)
 {
     char *buffer = core_get_data(strdup_handle) + strdup_cur_idx;
@@ -323,7 +343,7 @@ void  filetype_init(void)
         return;
 
     strdup_bufsize = filesize(fd);
-    strdup_handle = core_alloc("filetypes", strdup_bufsize);
+    strdup_handle = core_alloc_ex("filetypes", strdup_bufsize, &ops);
     if (strdup_handle <= 0)
         return;
     read_builtin_types();

@@ -403,9 +403,6 @@ static void init(void)
 #endif /* CONFIG_CODEC != SWCODEC */
 
     scrobbler_init();
-#if CONFIG_CODEC == SWCODEC && defined (HAVE_PITCHSCREEN)
-    tdspeed_init();
-#endif /* CONFIG_CODEC == SWCODEC */
 
     audio_init();
     
@@ -659,9 +656,6 @@ static void init(void)
     tree_mem_init();
     filetype_init();
     scrobbler_init();
-#if CONFIG_CODEC == SWCODEC && defined (HAVE_PITCHSCREEN)
-    tdspeed_init();
-#endif /* CONFIG_CODEC == SWCODEC */
     theme_init_buffer();
 
 #if CONFIG_CODEC != SWCODEC

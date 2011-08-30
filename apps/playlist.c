@@ -993,14 +993,14 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
     unsigned int current = playlist->indices[playlist->index];
 
     if (playlist->amount > 0)
-        qsort(playlist->indices, playlist->amount,
+        qsort((void*)playlist->indices, playlist->amount,
             sizeof(playlist->indices[0]), compare);
 
 #ifdef HAVE_DIRCACHE
     /** We need to re-check the song names from disk because qsort can't
      * sort two arrays at once :/
      * FIXME: Please implement a better way to do this. */
-    memset(playlist->filenames, 0xff, playlist->max_playlist_size * sizeof(int));
+    memset((void*)playlist->filenames, 0xff, playlist->max_playlist_size * sizeof(int));
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 
@@ -1378,7 +1378,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     
     if (playlist->in_ram && !control_file && max < 0)
     {
-        max = strlcpy(tmp_buf, &playlist->buffer[seek], sizeof(tmp_buf));
+        max = strlcpy(tmp_buf, (char*)&playlist->buffer[seek], sizeof(tmp_buf));
     }
     else if (max < 0)
     {
@@ -1534,9 +1534,10 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
             break;
         }
         
-        files = tc->cache.entries;
+        files = tree_get_entries(tc);
         num_files = tc->filesindir;
 
+        tree_lock_cache(tc);
         for (i=0; i<num_files; i++)
         {
             /* user abort */
@@ -1562,6 +1563,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
                     start_dir = NULL;
             }
         }
+        tree_unlock_cache(tc);
 
         if (!exit)
         {
@@ -1612,7 +1614,7 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
         return -2;
     }
     
-    files = tc->cache.entries;
+    files = tree_get_entries(tc);
     num_files = tc->filesindir;
     
     for (i=0; i<num_files; i++)
@@ -1629,6 +1631,7 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
     if (has_music)
         return 0;
         
+    tree_lock_cache(tc);
     if (has_subdir && recurse)
     {
         for (i=0; i<num_files; i++)
@@ -1647,6 +1650,7 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
             }
         }
     }
+    tree_unlock_cache(tc);
 
     if (result < 0)
     {
@@ -1925,6 +1929,31 @@ static int rotate_index(const struct playlist_info* playlist, int index)
 }
 
 /*
+ * Need no movement protection since all 3 allocations are not passed to
+ * other functions which can yield().
+ */
+static int move_callback(int handle, void* current, void* new)
+{
+    (void)handle;
+    struct playlist_info* playlist = &current_playlist;
+    if (current == playlist->indices)
+        playlist->indices = new;
+    else if (current == playlist->filenames)
+        playlist->filenames = new;
+    /* buffer can possibly point to a new buffer temporarily (playlist_save()).
+     * just don't overwrite the pointer to that temp buffer */
+    else if (current == playlist->buffer)
+        playlist->buffer = new;
+
+    return BUFLIB_CB_OK;
+}
+
+
+static struct buflib_callbacks ops = {
+    .move_callback = move_callback,
+    .shrink_callback = NULL,
+};
+/*
  * Initialize playlist entries at startup
  */
 void playlist_init(void)
@@ -1941,20 +1970,23 @@ void playlist_init(void)
     playlist->fd = -1;
     playlist->control_fd = -1;
     playlist->max_playlist_size = global_settings.max_files_in_playlist;
-    handle = core_alloc("playlist idx", playlist->max_playlist_size * sizeof(int));
+    handle = core_alloc_ex("playlist idx",
+                                playlist->max_playlist_size * sizeof(int), &ops);
     playlist->indices = core_get_data(handle);
     playlist->buffer_size =
         AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir;
-    handle = core_alloc("playlist buf", playlist->buffer_size);
+    handle = core_alloc_ex("playlist buf",
+                                playlist->buffer_size, &ops);
     playlist->buffer = core_get_data(handle);
     playlist->control_mutex = &current_playlist_mutex;
 
     empty_playlist(playlist, true);
 
 #ifdef HAVE_DIRCACHE
-    handle = core_alloc("playlist dc", playlist->max_playlist_size * sizeof(int));
+    handle = core_alloc_ex("playlist dc",
+        playlist->max_playlist_size * sizeof(int), &ops);
     playlist->filenames = core_get_data(handle);
-    memset(playlist->filenames, 0xff,
+    memset((void*)playlist->filenames, 0xff,
            playlist->max_playlist_size * sizeof(int));
     create_thread(playlist_thread, playlist_stack, sizeof(playlist_stack),
                   0, playlist_thread_name IF_PRIO(, PRIORITY_BACKGROUND)
@@ -2404,7 +2436,7 @@ int playlist_add(const char *filename)
 #endif
     playlist->amount++;
     
-    strcpy(&playlist->buffer[playlist->buffer_end_pos], filename);
+    strcpy((char*)&playlist->buffer[playlist->buffer_end_pos], filename);
     playlist->buffer_end_pos += len;
     playlist->buffer[playlist->buffer_end_pos++] = '\0';
 
@@ -2731,6 +2763,7 @@ int playlist_create_ex(struct playlist_info* playlist,
         }
 
         playlist->buffer_size = 0;
+        playlist->buffer_handle = -1;
         playlist->buffer = NULL;
         playlist->control_mutex = &created_playlist_mutex;
     }
@@ -2779,10 +2812,10 @@ int playlist_set_current(struct playlist_info* playlist)
 
     if (playlist->indices && playlist->indices != current_playlist.indices)
     {
-        memcpy(current_playlist.indices, playlist->indices,
+        memcpy((void*)current_playlist.indices, (void*)playlist->indices,
                playlist->max_playlist_size*sizeof(int));
 #ifdef HAVE_DIRCACHE
-        memcpy(current_playlist.filenames, playlist->filenames,
+        memcpy((void*)current_playlist.filenames, (void*)playlist->filenames,
                playlist->max_playlist_size*sizeof(int));
 #endif
     }
@@ -3358,6 +3391,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     char tmp_buf[MAX_PATH+1];
     int result = 0;
     bool overwrite_current = false;
+    int old_handle = -1;
     char* old_buffer = NULL;
     size_t old_buffer_size = 0;
 
@@ -3380,15 +3414,16 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         {
             /* not enough buffer space to store updated indices */
             /* Try to get a buffer */
-            old_buffer = playlist->buffer;
+            old_handle = playlist->buffer_handle;
+            /* can ignore volatile here, because core_get_data() is called later */
+            old_buffer = (char*)playlist->buffer;
             old_buffer_size = playlist->buffer_size;
             playlist->buffer = plugin_get_buffer((size_t*)&playlist->buffer_size);
             if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
             {
-                playlist->buffer = old_buffer;
-                playlist->buffer_size = old_buffer_size;
                 splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
-                return -1;
+                result = -1;
+                goto reset_old_buffer;
             }
         }
 
@@ -3409,12 +3444,8 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     if (fd < 0)
     {
         splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
-        if (old_buffer != NULL)
-        {
-            playlist->buffer = old_buffer;
-            playlist->buffer_size = old_buffer_size;
-        }
-        return -1;
+        result = -1;
+        goto reset_old_buffer;
     }
 
     display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
@@ -3514,11 +3545,12 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     }
 
     cpu_boost(false);
-    if (old_buffer != NULL)
-    {
-        playlist->buffer = old_buffer;
-        playlist->buffer_size = old_buffer_size;
-    }
+
+reset_old_buffer:
+    if (old_handle > 0)
+        old_buffer = core_get_data(old_handle);
+    playlist->buffer = old_buffer;
+    playlist->buffer_size = old_buffer_size;
 
     return result;
 }
@@ -3534,9 +3566,9 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
     char buf[MAX_PATH+1];
     int result = 0;
     int num_files = 0;
-    int i;
-    struct entry *files;
+    int i;;
     struct tree_context* tc = tree_get_context();
+    struct tree_cache* cache = &tc->cache;
     int old_dirfilter = *(tc->dirfilter);
 
     if (!callback)
@@ -3552,7 +3584,6 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
         return -1;
     }
 
-    files = tc->cache.entries;
     num_files = tc->filesindir;
 
     /* we've overwritten the dircache so tree browser will need to be
@@ -3568,6 +3599,7 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
             break;
         }
 
+        struct entry *files = core_get_data(cache->entries_handle);
         if (files[i].attr & ATTR_DIRECTORY)
         {
             if (recurse)
@@ -3586,8 +3618,7 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
                     result = -1;
                     break;
                 }
-                    
-                files = tc->cache.entries;
+
                 num_files = tc->filesindir;
                 if (!num_files)
                 {

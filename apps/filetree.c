@@ -29,6 +29,7 @@
 #include <limits.h>
 #include "bookmark.h"
 #include "tree.h"
+#include "core_alloc.h"
 #include "settings.h"
 #include "filetypes.h"
 #include "talk.h"
@@ -60,7 +61,8 @@ int ft_build_playlist(struct tree_context* c, int start_index)
     int i;
     int start=start_index;
 
-    struct entry *entries = c->cache.entries;
+    tree_lock_cache(c);
+    struct entry *entries = tree_get_entries(c);
 
     for(i = 0;i < c->filesindir;i++)
     {
@@ -76,6 +78,8 @@ int ft_build_playlist(struct tree_context* c, int start_index)
                 start_index--;
         }
     }
+
+    tree_unlock_cache(c);
 
     return start_index;
 }
@@ -127,13 +131,15 @@ static void check_file_thumbnails(struct tree_context* c)
 {
     int i;
     struct dirent *entry;
-    struct entry* entries = c->cache.entries;
+    struct entry* entries;
     DIR *dir;
 
     dir = opendir(c->currdir);
     if(!dir)
         return;
     /* mark all files as non talking, except the .talk ones */
+    entries = tree_get_entries(c);
+    tree_lock_cache(c);
     for (i=0; i < c->filesindir; i++)
     {
         if (entries[i].attr & ATTR_DIRECTORY)
@@ -177,6 +183,7 @@ static void check_file_thumbnails(struct tree_context* c)
             }
         }
     }
+    tree_unlock_cache(c);
     closedir(dir);
 }
 
@@ -287,11 +294,11 @@ int ft_load(struct tree_context* c, const char* tempdir)
     c->dirsindir = 0;
     c->dirfull = false;
 
+    tree_lock_cache(c);
     while ((entry = readdir(dir))) {
         int len;
         struct dirinfo info;
-        struct entry* table = c->cache.entries;
-        struct entry* dptr = &table[files_in_dir];
+        struct entry* dptr = tree_get_entry_at(c, files_in_dir);
         if (!entry)
             break;
 
@@ -369,7 +376,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
 
         ++files_in_dir;
 
-        dptr->name = &c->cache.name_buffer[name_buffer_used];
+        dptr->name = core_get_data(c->cache.name_buffer_handle)+name_buffer_used;
         dptr->time_write =
             (long)info.wrtdate<<16 |
             (long)info.wrttime; /* in one # */
@@ -384,13 +391,14 @@ int ft_load(struct tree_context* c, const char* tempdir)
     closedir(dir);
 
     compare_sort_dir = c->sort_dir;
-    qsort(c->cache.entries, files_in_dir, sizeof(struct entry), compare);
+    qsort(tree_get_entries(c), files_in_dir, sizeof(struct entry), compare);
 
     /* If thumbnail talking is enabled, make an extra run to mark files with
        associated thumbnails, so we don't do unsuccessful spinups later. */
     if (global_settings.talk_file_clip)
         check_file_thumbnails(c); /* map .talk to ours */
 
+    tree_unlock_cache(c);
     return 0;
 }
 #ifdef HAVE_LCD_BITMAP
@@ -424,15 +432,15 @@ int ft_enter(struct tree_context* c)
 {
     int rc = GO_TO_PREVIOUS;
     char buf[MAX_PATH];
-    struct entry* table = c->cache.entries;
-    struct entry *file = &table[c->selected_item];
+    struct entry* file = tree_get_entry_at(c, c->selected_item);
+    int file_attr = file->attr;
 
     if (c->currdir[1])
         snprintf(buf,sizeof(buf),"%s/%s",c->currdir, file->name);
     else
         snprintf(buf,sizeof(buf),"/%s",file->name);
 
-    if (file->attr & ATTR_DIRECTORY) {
+    if (file_attr & ATTR_DIRECTORY) {
         memcpy(c->currdir, buf, sizeof(c->currdir));
         if ( c->dirlevel < MAX_DIR_LEVELS )
             c->selected_item_history[c->dirlevel] = c->selected_item;
@@ -444,7 +452,7 @@ int ft_enter(struct tree_context* c)
         bool play = false;
         int start_index=0;
 
-        switch ( file->attr & FILE_ATTR_MASK ) {
+        switch ( file_attr & FILE_ATTR_MASK ) {
             case FILE_ATTR_M3U:
                 if (!bookmark_autoload(buf))
                     playlist_viewer_ex(buf);
@@ -612,7 +620,7 @@ int ft_enter(struct tree_context* c)
                 char *plugin = buf, *argument = NULL, lua_path[MAX_PATH];
                 int ret;
 
-                if ((file->attr & FILE_ATTR_MASK) == FILE_ATTR_LUA) {
+                if ((file_attr & FILE_ATTR_MASK) == FILE_ATTR_LUA) {
                     snprintf(lua_path, sizeof(lua_path)-1, "%s/lua.rock", VIEWERS_DIR); /* Use a #define here ? */
                     plugin = lua_path;
                     argument = buf;
@@ -658,6 +666,7 @@ int ft_enter(struct tree_context* c)
                     break;
                 }
 
+                struct entry* file = tree_get_entry_at(c, c->selected_item);
                 plugin = filetype_get_plugin(file);
                 if (plugin)
                 {

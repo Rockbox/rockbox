@@ -80,15 +80,16 @@ struct playlist_info
     int  control_fd;     /* descriptor of the open control file     */
     bool control_created; /* has control file been created?         */
     int  dirlen;         /* Length of the path to the playlist file */
-    unsigned long *indices; /* array of indices                     */
-    int *filenames;      /* Array of dircache indices */
+    volatile unsigned long *indices; /* array of indices            */
+    volatile int *filenames;         /* Array of dircache indices   */
     int  max_playlist_size; /* Max number of files in playlist. Mirror of
                               global_settings.max_files_in_playlist */
     bool in_ram;         /* playlist stored in ram (dirplay)        */
+    int buffer_handle;   /* handle to the below buffer (-1 if non-buflib) */
 
     union {
-        char *buffer;    /* buffer for in-ram playlists             */
-        int  *seek_buf;  /* buffer for seeks in real playlists      */
+        volatile char *buffer;/* buffer for in-ram playlists        */
+        int  *seek_buf;       /* buffer for seeks in real playlists */
     };
     int  buffer_size;    /* size of buffer                          */
     int  buffer_end_pos; /* last position where buffer was written  */

@@ -38,6 +38,46 @@
 
 #define FIXED_BUFSIZE 3072 /* 48KHz factor 3.0 */
 
+static int32_t** dsp_src;
+static int handles[4];
+static int32_t *overlap_buffer[2] = { NULL, NULL };
+static int32_t *outbuf[2] = { NULL, NULL };
+
+static int move_callback(int handle, void* current, void* new)
+{
+    /* TODO */
+    (void)handle;
+    if (dsp_src)
+    {
+        int ch = (current == outbuf[0]) ? 0 : 1;
+        dsp_src[ch] = outbuf[ch] = new;
+    }
+    return BUFLIB_CB_OK;
+}
+
+static struct buflib_callbacks ops = {
+    .move_callback = move_callback,
+    .shrink_callback = NULL,
+};
+
+static int ovl_move_callback(int handle, void* current, void* new)
+{
+    /* TODO */
+    (void)handle;
+    if (dsp_src)
+    {
+        int ch = (current == overlap_buffer[0]) ? 0 : 1;
+        overlap_buffer[ch] = new;
+    }
+    return BUFLIB_CB_OK;
+}
+
+static struct buflib_callbacks ovl_ops = {
+    .move_callback = ovl_move_callback,
+    .shrink_callback = NULL,
+};
+
+
 static struct tdspeed_state_s
 {
     bool stereo;
@@ -51,39 +91,47 @@ static struct tdspeed_state_s
     int32_t *ovl_buff[2];   /* overlap buffer */
 } tdspeed_state;
 
-static int32_t *overlap_buffer[2] = { NULL, NULL };
-static int32_t *outbuf[2] = { NULL, NULL };
-
 void tdspeed_init(void)
 {
-    int handle;
-
     if (!global_settings.timestretch_enabled)
         return;
 
     /* Allocate buffers */
     if (overlap_buffer[0] == NULL)
     {
-        handle = core_alloc("tdspeed ovl left", FIXED_BUFSIZE * sizeof(int32_t));
-        overlap_buffer[0] = core_get_data(handle);
+        handles[0] = core_alloc_ex("tdspeed ovl left", FIXED_BUFSIZE * sizeof(int32_t), &ovl_ops);
+        overlap_buffer[0] = core_get_data(handles[0]);
     }
     if (overlap_buffer[1] == NULL)
     {
-        handle = core_alloc("tdspeed ovl right", FIXED_BUFSIZE * sizeof(int32_t));
-        overlap_buffer[1] = core_get_data(handle);
+        handles[1] = core_alloc_ex("tdspeed ovl right", FIXED_BUFSIZE * sizeof(int32_t), &ovl_ops);
+        overlap_buffer[1] = core_get_data(handles[1]);
     }
     if (outbuf[0] == NULL)
     {
-        handle = core_alloc("tdspeed left", TDSPEED_OUTBUFSIZE * sizeof(int32_t));
-        outbuf[0] = core_get_data(handle);
+        handles[2] = core_alloc_ex("tdspeed left", TDSPEED_OUTBUFSIZE * sizeof(int32_t), &ops);
+        outbuf[0] = core_get_data(handles[2]);
     }
     if (outbuf[1] == NULL)
     {
-        handle = core_alloc("tdspeed right", TDSPEED_OUTBUFSIZE * sizeof(int32_t));
-        outbuf[1] = core_get_data(handle);
+        handles[3] = core_alloc_ex("tdspeed right", TDSPEED_OUTBUFSIZE * sizeof(int32_t), &ops);
+        outbuf[1] = core_get_data(handles[3]);
     }
 }
 
+void tdspeed_finish(void)
+{
+    for(unsigned i = 0; i < ARRAYLEN(handles); i++)
+    {
+        if (handles[i] > 0)
+        {
+            core_free(handles[i]);
+            handles[i] = 0;
+        }
+    }
+    overlap_buffer[0] = overlap_buffer[1] = NULL;
+    outbuf[0]         = outbuf[1]         = NULL;
+}
 
 bool tdspeed_config(int samplerate, bool stereo, int32_t factor)
 {
@@ -390,6 +438,7 @@ long tdspeed_est_input_size(long size)
 
 int tdspeed_doit(int32_t *src[], int count)
 {
+    dsp_src = src;
     count = tdspeed_apply( (int32_t *[2]) { outbuf[0], outbuf[1] },
                            src, count, 0, TDSPEED_OUTBUFSIZE);
 

@@ -104,11 +104,17 @@ static int ft_play_dirname(char* name);
 static void ft_play_filename(char *dir, char *file);
 static void say_filetype(int attr);
 
-static struct entry* get_entry_at(struct tree_context *t, int index)
+struct entry* tree_get_entries(struct tree_context *t)
 {
-    struct entry* entries = t->cache.entries;
+    return core_get_data(t->cache.entries_handle);
+}
+
+struct entry* tree_get_entry_at(struct tree_context *t, int index)
+{
+    struct entry* entries = tree_get_entries(t);
     return &entries[index];
 }
+
 
 static const char* tree_get_filename(int selected_item, void *data,
                                      char *buffer, size_t buffer_len)
@@ -122,12 +128,12 @@ static const char* tree_get_filename(int selected_item, void *data,
 
     if (id3db)
     {
-        return tagtree_get_entry(&tc, selected_item)->name;
+        return tagtree_get_entry_name(&tc, selected_item, buffer, buffer_len);
     }
     else 
 #endif
     {
-        struct entry* e = get_entry_at(local_tc, selected_item);
+        struct entry* e = tree_get_entry_at(local_tc, selected_item);
         name = e->name;
         attr = e->attr;
     }
@@ -169,7 +175,7 @@ static int tree_get_filecolor(int selected_item, void * data)
     if (*tc.dirfilter == SHOW_ID3DB)
         return -1;
     struct tree_context * local_tc=(struct tree_context *)data;
-    struct entry* e = get_entry_at(local_tc, selected_item);
+    struct entry* e = tree_get_entry_at(local_tc, selected_item);
     return filetype_get_color(e->name, e->attr);
 }
 #endif
@@ -185,7 +191,7 @@ static enum themable_icons tree_get_fileicon(int selected_item, void * data)
     else
 #endif
     {
-        struct entry* e = get_entry_at(local_tc, selected_item);
+        struct entry* e = tree_get_entry_at(local_tc, selected_item);
         return filetype_get_icon(e->attr);
     }
 }
@@ -197,16 +203,17 @@ static int tree_voice_cb(int selected_item, void * data)
     int attr=0;
 #ifdef HAVE_TAGCACHE
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
+    char buf[AVERAGE_FILENAME_LENGTH*2];
 
     if (id3db)
     {
         attr = tagtree_get_attr(local_tc);
-        name = tagtree_get_entry(local_tc, selected_item)->name;
+        name = tagtree_get_entry_name(local_tc, selected_item, buf, sizeof(buf));
     }
     else
 #endif
     {
-        struct entry* e = get_entry_at(local_tc, selected_item);
+        struct entry* e = tree_get_entry_at(local_tc, selected_item);
         name = e->name;
         attr = e->attr;
     }
@@ -329,7 +336,7 @@ static int tree_get_file_position(char * filename)
     /* use lastfile to determine the selected item (default=0) */
     for (i=0; i < tc.filesindir; i++)
     {
-        e = get_entry_at(&tc, i);
+        e = tree_get_entry_at(&tc, i);
         if (!strcasecmp(e->name, filename))
             return(i);
     }
@@ -531,7 +538,7 @@ char* get_current_file(char* buffer, size_t buffer_len)
         return NULL;
 #endif
 
-    struct entry* e = get_entry_at(&tc, tc.selected_item);
+    struct entry* e = tree_get_entry_at(&tc, tc.selected_item);
     if (getcwd(buffer, buffer_len))
     {
         if (tc.dirlength)
@@ -650,7 +657,6 @@ static int dirbrowse(void)
     
     gui_synclist_draw(&tree_lists);
     while(1) {
-        struct entry *entries = tc.cache.entries;
         bool restore = false;
         if (tc.dirlevel < 0)
             tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
@@ -666,8 +672,9 @@ static int dirbrowse(void)
                 if ( numentries == 0 )
                     break;
 
+                short attr = tree_get_entry_at(&tc, tc.selected_item)->attr;
                 if ((tc.browse->flags & BROWSE_SELECTONLY) &&
-                    !(entries[tc.selected_item].attr & ATTR_DIRECTORY))
+                    !(attr & ATTR_DIRECTORY))
                 {
                     tc.browse->flags |= BROWSE_SELECTED;
                     get_current_file(tc.browse->buf, tc.browse->bufsize);
@@ -792,15 +799,14 @@ static int dirbrowse(void)
                     else
 #endif
                     {
-                        attr = entries[tc.selected_item].attr;
+                        struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
+                        attr = entry->attr;
 
                         if (currdir[1]) /* Not in / */
                             snprintf(buf, sizeof buf, "%s/%s",
-                                     currdir,
-                                     entries[tc.selected_item].name);
+                                     currdir, entry->name);
                         else /* In / */
-                            snprintf(buf, sizeof buf, "/%s",
-                                     entries[tc.selected_item].name);
+                            snprintf(buf, sizeof buf, "/%s", entry->name);
                     }
                     onplay_result = onplay(buf, attr, curr_context, hotkey);
                 }
@@ -999,10 +1005,36 @@ int rockbox_browse(struct browse_context *browse)
     return ret_val;
 }
 
+static int move_callback(int handle, void* current, void* new)
+{
+    struct tree_cache* cache = &tc.cache;
+    if (cache->lock_count > 0)
+        return BUFLIB_CB_CANNOT_MOVE;
+
+    size_t diff = new - current;
+    /* FIX_PTR makes sure to not accidentally update static allocations */
+#define FIX_PTR(x) \
+    { if ((void*)x > current && (void*)x < (current+cache->name_buffer_size)) x+= diff; }
+
+    if (handle == cache->name_buffer_handle)
+    {   /* update entry structs, *even if they are struct tagentry */
+        struct entry *this = core_get_data(cache->entries_handle);
+        struct entry *last = this + cache->max_entries;
+        for(; this < last; this++)
+            FIX_PTR(this->name);
+    }
+    /* nothing to do if entries moved */
+    return BUFLIB_CB_OK;
+}
+
+static struct buflib_callbacks ops = {
+    .move_callback = move_callback,
+    .shrink_callback = NULL,
+};
+
 void tree_mem_init(void)
 {
     /* initialize tree context struct */
-    int handle;
     struct tree_cache* cache = &tc.cache;
     memset(&tc, 0, sizeof(tc));
     tc.dirfilter = &global_settings.dirfilter;
@@ -1010,12 +1042,14 @@ void tree_mem_init(void)
 
     cache->name_buffer_size = AVERAGE_FILENAME_LENGTH *
         global_settings.max_files_in_dir;
-    handle = core_alloc("tree names", cache->name_buffer_size);
-    cache->name_buffer = core_get_data(handle);
+    cache->name_buffer_handle = core_alloc_ex("tree names",
+                                    cache->name_buffer_size,
+                                    &ops);
 
     cache->max_entries = global_settings.max_files_in_dir;
-    handle = core_alloc("tree entries", cache->max_entries*(sizeof(struct entry)));
-    cache->entries = core_get_data(handle);
+    cache->entries_handle = core_alloc_ex("tree entries",
+                                    cache->max_entries*(sizeof(struct entry)),
+                                    &ops);
     tree_get_filetypes(&filetypes, &filetypes_count);
 }
 

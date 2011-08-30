@@ -6,7 +6,6 @@
 
 /* not static so it can be discovered by core_get_data() */
 struct buflib_context core_ctx;
-
 void core_allocator_init(void)
 {
     buffer_init();

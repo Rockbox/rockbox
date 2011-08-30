@@ -255,6 +255,11 @@ int scrobbler_init(void)
         return -1;
 
     scrobbler_cache = core_alloc("scrobbler", SCROBBLER_MAX_CACHE*SCROBBLER_CACHE_LEN);
+    if (scrobbler_cache <= 0)
+    {
+        logf("SCROOBLER: OOM");
+        return -1;
+    }
 
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, scrobbler_change_event);
     cache_pos = 0;
@@ -288,6 +293,9 @@ void scrobbler_shutdown(void)
     {
         remove_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
         scrobbler_initialised = false;
+        /* get rid of the buffer */
+        core_free(scrobbler_cache);
+        scrobbler_cache = 0;
     }
 }
 

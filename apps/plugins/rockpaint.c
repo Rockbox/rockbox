@@ -948,7 +948,7 @@ static bool browse_fonts( char *dst, int dst_size )
 
     tree = rb->tree_get_context();
     backup = *tree;
-    dc = tree->cache.entries;
+    dc = rb->tree_get_entries(tree);
     a = backup.currdir+rb->strlen(backup.currdir)-1;
     if( *a != '/' )
     {

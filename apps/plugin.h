@@ -926,6 +926,8 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    struct entry* (*tree_get_entries)(struct tree_context* t);
+    struct entry* (*tree_get_entry_at)(struct tree_context* t, int index);
 };
 
 /* plugin header */

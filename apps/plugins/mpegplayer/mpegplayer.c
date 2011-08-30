@@ -1876,7 +1876,7 @@ static bool is_videofile(const char* file)
 static bool get_videofile(int direction, char* videofile, size_t bufsize)
 {
     struct tree_context *tree = rb->tree_get_context();
-    struct entry *dircache = tree->cache.entries;
+    struct entry *dircache = rb->tree_get_entries(tree);
     int i, step, end, found = 0;
     char *videoname = rb->strrchr(videofile, '/') + 1;
     size_t rest = bufsize - (videoname - videofile) - 1;
