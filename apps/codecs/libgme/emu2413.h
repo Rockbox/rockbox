@@ -137,7 +137,7 @@ EMU2413_API void OPLL_writeReg(OPLL *, e_uint32 reg, e_uint32 val);
 EMU2413_API e_uint32 OPLL_read(OPLL *, e_uint32 port);
 
 /* Synthsize */
-EMU2413_API e_int16 OPLL_calc(OPLL *) ;
+EMU2413_API e_int16 OPLL_calc(OPLL *) EMU2413_CALC_ICODE;
 EMU2413_API void OPLL_calc_stereo(OPLL *, e_int32 out[2]) ;
 EMU2413_API e_int16 *OPLL_update_buffer(OPLL *, e_uint32 length) ;
 

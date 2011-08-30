@@ -1423,6 +1423,8 @@ calc_slot_hat (OPLL_SLOT *slot, e_int32 pgout_cym, e_uint32 noise)
 }
 
 static e_int16
+calc (OPLL * opll) EMU2413_CALC_ICODE;
+static e_int16
 calc (OPLL * opll)
 {
   e_int32 i;
