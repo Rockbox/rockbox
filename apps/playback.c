@@ -40,6 +40,7 @@
 #include "pcmbuf.h"
 #include "playback.h"
 #include "misc.h"
+#include "settings.h"
 
 #ifdef HAVE_TAGCACHE
 #include "tagcache.h"
