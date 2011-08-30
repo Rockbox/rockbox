@@ -26,10 +26,6 @@
 #include "system.h"
 #include "cpu.h"
 
-#define CLAMP(x,min,max) \
-    if ((x)<(min)) (x)=(min);\
-    if ((x)>(max)) (x)=(max);
-
 /* the detected lcd type (0 or 1) */
 static int lcd_type;
 
@@ -306,26 +302,37 @@ void lcd_update_rect(int x, int y, int width, int height)
     fb_data *ptr;
     fb_data pixel;
     int row, col;
-    int x_end = x + width - 1;
-    int y_end = y + height - 1;
+    int x_end = x + width;
+    int y_end = y + height;
 
-    /* check/correct bounds */
-    CLAMP(x, 0, LCD_WIDTH - 1);
-    CLAMP(x_end, 0, LCD_WIDTH - 1);
-    CLAMP(y, 0, LCD_HEIGHT - 1);
-    CLAMP(y_end, 0, LCD_HEIGHT - 1);
-    if ((x > x_end) || (y > y_end)) {
+    /* check rectangle */
+    if ((x >= LCD_WIDTH) || (x_end <= 0) || (y >= LCD_HEIGHT) || (y_end <= 0)) {
+        /* rectangle is outside visible display, do nothing */
         return;
+    }
+    
+    /* correct rectangle (if necessary) */
+    if (x < 0) {
+        x = 0;
+    }
+    if (x_end > LCD_WIDTH) {
+        x_end = LCD_WIDTH;
+    }
+    if (y < 0) {
+        y = 0;
+    }
+    if (y_end > LCD_HEIGHT) {
+        y_end = LCD_HEIGHT;
     }
 
     /* setup GRAM write window */
-    lcd_setup_rect(x, x_end, y, y_end);
+    lcd_setup_rect(x, x_end - 1, y, y_end - 1);
 
     /* write to GRAM */
     lcd_write_cmd((lcd_type == 0) ? 0x08 : 0x0C);
-    for (row = y; row <= y_end; row++) {
+    for (row = y; row < y_end; row++) {
         ptr = &lcd_framebuffer[row][x];
-        for (col = x; col <= x_end; col++) {
+        for (col = x; col < x_end; col++) {
             pixel = *ptr++;
             lcd_write_dat((pixel >> 8) & 0xFF);
             lcd_write_dat((pixel >> 0) & 0xFF);
