@@ -78,7 +78,7 @@ static const char voice_thread_name[] = "voice";
 /* Voice thread synchronization objects */
 static struct event_queue voice_queue SHAREDBSS_ATTR;
 static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
-static bool voice_done SHAREDDATA_ATTR = true;
+static int quiet_counter SHAREDDATA_ATTR = 0;
 
 /* Buffer for decoded samples */
 static spx_int16_t voice_output_buf[VOICE_FRAME_SIZE] CACHEALIGN_ATTR;
@@ -96,20 +96,20 @@ static size_t voicebuf_sizes[VOICE_FRAMES];
 static uint32_t (* voicebuf)[VOICE_PCM_FRAME_COUNT];
 static unsigned int cur_buf_in, cur_buf_out;
 
+/* Voice processing states */
+enum voice_state
+{
+    VOICE_STATE_MESSAGE = 0,
+    VOICE_STATE_DECODE,
+    VOICE_STATE_BUFFER_INSERT,
+};
+
 /* A delay to not bring audio back to normal level too soon */
 #define QUIET_COUNT 3
 
-enum voice_thread_states
-{
-    TSTATE_STOPPED = 0,   /* Voice thread is stopped and awaiting commands */
-    TSTATE_DECODE,        /* Voice is decoding a clip */
-    TSTATE_BUFFER_INSERT, /* Voice is sending decoded audio to PCM */
-};
-
 enum voice_thread_messages
 {
-    Q_VOICE_NULL = 0, /* A message for thread sync - no effect on state */
-    Q_VOICE_PLAY,     /* Play a clip */
+    Q_VOICE_PLAY = 0, /* Play a clip */
     Q_VOICE_STOP,     /* Stop current clip */
 };
 
@@ -125,7 +125,6 @@ struct voice_info
  * internal functions */
 struct voice_thread_data
 {
-    volatile int state;     /* Thread state (TSTATE_*) */
     struct queue_event ev;  /* Last queue event pulled from queue */
     void *st;               /* Decoder instance */
     SpeexBits bits;         /* Bit cursor */
@@ -134,8 +133,13 @@ struct voice_thread_data
     const char *src[2];     /* Current output buffer pointers */
     int lookahead;          /* Number of samples to drop at start of clip */
     int count;              /* Count of samples remaining to send to PCM */
-    int quiet_counter;      /* Countdown until audio goes back to normal */
 };
+
+/* Functions called in their repective state that return the next state to
+   state machine loop - compiler may inline them at its discretion */
+static enum voice_state voice_message(struct voice_thread_data *td);
+static enum voice_state voice_decode(struct voice_thread_data *td);
+static enum voice_state voice_buffer_insert(struct voice_thread_data *td);
 
 /* Number of frames in queue */
 static inline int voice_unplayed_frames(void)
@@ -229,7 +233,7 @@ void mp3_play_pause(bool play)
 /* Tell if voice is still in a playing state */
 bool mp3_is_playing(void)
 {
-    return !voice_done;
+    return quiet_counter != 0;
 }
 
 /* This function is meant to be used by the buffer request functions to
@@ -247,7 +251,7 @@ void voice_wait(void)
      * new clip by the time we wait. This should be resolvable if conditions
      * ever require knowing the very clip you requested has finished. */
 
-    while (!voice_done)
+    while (quiet_counter != 0)
         sleep(1);
 }
 
@@ -255,7 +259,6 @@ void voice_wait(void)
  * setup the DSP parameters */
 static void voice_data_init(struct voice_thread_data *td)
 {
-    td->state = TSTATE_STOPPED;
     td->dsp = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
                                                  CODEC_IDX_VOICE);
 
@@ -265,106 +268,154 @@ static void voice_data_init(struct voice_thread_data *td)
     dsp_configure(td->dsp, DSP_SET_STEREO_MODE, STEREO_MONO);
 
     mixer_channel_set_amplitude(PCM_MIXER_CHAN_VOICE, MIX_AMP_UNITY);
-    td->quiet_counter = 0;
 }
 
 /* Voice thread message processing */
-static void voice_message(struct voice_thread_data *td)
+static enum voice_state voice_message(struct voice_thread_data *td)
 {
-    while (1)
+    if (quiet_counter > 0)
+        queue_wait_w_tmo(&voice_queue, &td->ev, HZ/10);
+    else
+        queue_wait(&voice_queue, &td->ev);
+
+    switch (td->ev.id)
     {
-        switch (td->ev.id)
+    case Q_VOICE_PLAY:
+        LOGFQUEUE("voice < Q_VOICE_PLAY");
+        if (quiet_counter == 0)
         {
-        case Q_VOICE_PLAY:
-            LOGFQUEUE("voice < Q_VOICE_PLAY");
-            voice_done = false;
-
-            /* Copy the clip info */
-            td->vi = *(struct voice_info *)td->ev.data;
-
-            /* Be sure audio buffer is initialized */
-            audio_restore_playback(AUDIO_WANT_VOICE);
-
-            /* We need nothing more from the sending thread - let it run */
-            queue_reply(&voice_queue, 1);
-
-            if (td->state == TSTATE_STOPPED)
-            {
-                /* Boost CPU now */
-                trigger_cpu_boost();
-            }
-            else
-            {
-                /* Stop any clip still playing */
-                voice_stop_playback();
-            }
-
-            /* Make audio play more softly and set delay to return to normal
-               playback level */
-            pcmbuf_soft_mode(true);
-            td->quiet_counter = QUIET_COUNT;
-
-            /* Clean-start the decoder */
-            td->st = speex_decoder_init(&speex_wb_mode);
-
-            /* Make bit buffer use our own buffer */
-            speex_bits_set_bit_buffer(&td->bits, td->vi.start, td->vi.size);
-            speex_decoder_ctl(td->st, SPEEX_GET_LOOKAHEAD, &td->lookahead);
-
-            td->state = TSTATE_DECODE;
-            return;
-
-        case SYS_TIMEOUT:
-            if (voice_unplayed_frames())
-            {
-                /* Waiting for PCM to finish */
-                break;
-            }
-
-            /* Drop through and stop the first time after clip runs out */
-            if (td->quiet_counter-- != QUIET_COUNT)
-            {
-                if (td->quiet_counter <= 0)
-                    pcmbuf_soft_mode(false);
-
-                break;
-            }
-
-            /* Fall-through */
-        case Q_VOICE_STOP:
-            LOGFQUEUE("voice < Q_VOICE_STOP");
-
-            td->state = TSTATE_STOPPED;
-            voice_done = true;
-
-            cancel_cpu_boost();
+            /* Boost CPU now */
+            trigger_cpu_boost();
+        }
+        else
+        {
+            /* Stop any clip still playing */
             voice_stop_playback();
-            break;
-
-        default:
-            /* Default messages get a reply and thread continues with no
-             * state transition */
-            LOGFQUEUE("voice < default");
-
-            if (td->state == TSTATE_STOPPED)
-                break;  /* Not in (active) playback state */
-
-            queue_reply(&voice_queue, 0);
-            return;
         }
 
-        if (td->quiet_counter > 0)
-            queue_wait_w_tmo(&voice_queue, &td->ev, HZ/10);
-        else
-            queue_wait(&voice_queue, &td->ev);
+        quiet_counter = QUIET_COUNT;
+
+        /* Copy the clip info */
+        td->vi = *(struct voice_info *)td->ev.data;
+
+        /* Be sure audio buffer is initialized */
+        audio_restore_playback(AUDIO_WANT_VOICE);
+
+        /* We need nothing more from the sending thread - let it run */
+        queue_reply(&voice_queue, 1);
+
+        /* Make audio play more softly and set delay to return to normal
+           playback level */
+        pcmbuf_soft_mode(true);
+
+        /* Clean-start the decoder */
+        td->st = speex_decoder_init(&speex_wb_mode);
+
+        /* Make bit buffer use our own buffer */
+        speex_bits_set_bit_buffer(&td->bits, td->vi.start, td->vi.size);
+        speex_decoder_ctl(td->st, SPEEX_GET_LOOKAHEAD, &td->lookahead);
+
+        return VOICE_STATE_DECODE;
+
+    case SYS_TIMEOUT:
+        if (voice_unplayed_frames())
+        {
+            /* Waiting for PCM to finish */
+            break;
+        }
+
+        /* Drop through and stop the first time after clip runs out */
+        if (quiet_counter-- != QUIET_COUNT)
+        {
+            if (quiet_counter <= 0)
+                pcmbuf_soft_mode(false);
+
+            break;
+        }
+
+        /* Fall-through */
+    case Q_VOICE_STOP:
+        LOGFQUEUE("voice < Q_VOICE_STOP");
+        cancel_cpu_boost();
+        voice_stop_playback();
+        break;
+
+    /* No default: no other message ids are sent */
     }
+
+    return VOICE_STATE_MESSAGE;
+}
+
+/* Decode frames or stop if all have completed */
+static enum voice_state voice_decode(struct voice_thread_data *td)
+{
+    if (!queue_empty(&voice_queue))
+        return VOICE_STATE_MESSAGE;
+
+    /* Decode the data */
+    if (speex_decode_int(td->st, &td->bits, voice_output_buf) < 0)
+    {
+        /* End of stream or error - get next clip */
+        td->vi.size = 0;
+
+        if (td->vi.get_more != NULL)
+            td->vi.get_more(&td->vi.start, &td->vi.size);
+
+        if (td->vi.start != NULL && (ssize_t)td->vi.size > 0)
+        {
+            /* Make bit buffer use our own buffer */
+            speex_bits_set_bit_buffer(&td->bits, td->vi.start, td->vi.size);
+            /* Don't skip any samples when we're stringing clips together */
+            td->lookahead = 0;
+        }
+        else
+        {
+            /* If all clips are done and not playing, force pcm playback. */
+            voice_start_playback();
+            return VOICE_STATE_MESSAGE;
+        }
+    }
+    else
+    {
+        yield();
+
+        /* Output the decoded frame */
+        td->count = VOICE_FRAME_SIZE - td->lookahead;
+        td->src[0] = (const char *)&voice_output_buf[td->lookahead];
+        td->src[1] = NULL;
+        td->lookahead -= MIN(VOICE_FRAME_SIZE, td->lookahead);
+
+        if (td->count > 0)
+            return VOICE_STATE_BUFFER_INSERT;
+    }
+
+    return VOICE_STATE_DECODE;
+}
+
+/* Process the PCM samples in the DSP and send out for mixing */
+static enum voice_state voice_buffer_insert(struct voice_thread_data *td)
+{
+    if (!queue_empty(&voice_queue))
+        return VOICE_STATE_MESSAGE;
+
+    char *dest = (char *)voice_buf_get();
+
+    if (dest != NULL)
+    {
+        voice_buf_commit(dsp_process(td->dsp, dest, td->src, td->count)
+                         * sizeof (int32_t));
+        return VOICE_STATE_DECODE;
+    }
+
+    sleep(0);
+    return VOICE_STATE_BUFFER_INSERT;
 }
 
 /* Voice thread entrypoint */
 static void NORETURN_ATTR voice_thread(void)
 {
     struct voice_thread_data td;
-    char *dest;
+    enum voice_state state = VOICE_STATE_MESSAGE;
 
     voice_data_init(&td);
 
@@ -374,95 +425,21 @@ static void NORETURN_ATTR voice_thread(void)
     while (!audio_is_thread_ready())
         sleep(0);
 
-    goto message_wait;
-
     while (1)
     {
-        td.state = TSTATE_DECODE;
-
-        if (!queue_empty(&voice_queue))
+        switch (state)
         {
-        message_wait:
-            queue_wait(&voice_queue, &td.ev);
-
-        message_process:
-            voice_message(&td);
-
-            /* Branch to initial start point or branch back to previous
-             * operation if interrupted by a message */
-            switch (td.state)
-            {
-            case TSTATE_DECODE:        goto voice_decode;
-            case TSTATE_BUFFER_INSERT: goto buffer_insert;
-            default:                   goto message_wait;
-            }
+        case VOICE_STATE_MESSAGE:
+            state = voice_message(&td);
+            break;
+        case VOICE_STATE_DECODE:
+            state = voice_decode(&td);
+            break;
+        case VOICE_STATE_BUFFER_INSERT:
+            state = voice_buffer_insert(&td);
+            break;
         }
-
-    voice_decode:
-        /* Decode the data */
-        if (speex_decode_int(td.st, &td.bits, voice_output_buf) < 0)
-        {
-            /* End of stream or error - get next clip */
-            td.vi.size = 0;
-
-            if (td.vi.get_more != NULL)
-                td.vi.get_more(&td.vi.start, &td.vi.size);
-
-            if (td.vi.start != NULL && (ssize_t)td.vi.size > 0)
-            {
-                /* Make bit buffer use our own buffer */
-                speex_bits_set_bit_buffer(&td.bits, td.vi.start, td.vi.size);
-                /* Don't skip any samples when we're stringing clips together */
-                td.lookahead = 0;
-
-                /* Paranoid check - be sure never to somehow get stuck in a
-                 * loop without listening to the queue */
-                yield();
-
-                if (!queue_empty(&voice_queue))
-                    goto message_wait;
-                else
-                    goto voice_decode;
-            }
-
-            /* If all clips are done and not playing, force pcm playback. */
-            voice_start_playback();
-
-            td.state = TSTATE_STOPPED;
-            td.ev.id = SYS_TIMEOUT;
-            goto message_process;
-        }
-
-        yield();
-
-        /* Output the decoded frame */
-        td.count = VOICE_FRAME_SIZE - td.lookahead;
-        td.src[0] = (const char *)&voice_output_buf[td.lookahead];
-        td.src[1] = NULL;
-        td.lookahead -= MIN(VOICE_FRAME_SIZE, td.lookahead);
-
-        if (td.count <= 0)
-            continue;
-
-        td.state = TSTATE_BUFFER_INSERT;
-
-    buffer_insert:
-        /* Process the PCM samples in the DSP and send out for mixing */
-
-        while (1)
-        {
-            if (!queue_empty(&voice_queue))
-                goto message_wait;
-
-            if ((dest = (char *)voice_buf_get()) != NULL)
-                break;
-
-            sleep(0);
-        }
-
-        voice_buf_commit(dsp_process(td.dsp, dest, td.src, td.count)
-                         * sizeof (int32_t));
-    } /* end while */
+    }
 }
 
 /* Initialize all synchronization objects create the thread */
