@@ -82,7 +82,7 @@ blargg_err_t Sgc_load_mem( struct Sgc_Emu* this, const void* data, long size )
 	this->m3u.size = 0;
 	this->track_count = this->header.song_count;
 	this->voice_count =  sega_mapping( this ) ? osc_count : sms_osc_count;
-	static int const types [osc_count + 1] = {
+	static int const types [sms_osc_count + fm_apu_osc_count] = {
 		wave_type+1, wave_type+2, wave_type+3, mixed_type+1, mixed_type+2
 	};
 	this->voice_types = types;
