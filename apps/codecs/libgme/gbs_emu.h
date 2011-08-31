@@ -196,9 +196,5 @@ static inline blip_time_t Time( struct Gbs_Emu* this )
 }
 
 void Jsr_then_stop( struct Gbs_Emu* this, byte const [] );
-void Write_io_inline( struct Gbs_Emu* this, int offset, int data, int base );
-void Write_io_( struct Gbs_Emu* this, int offset, int data );
-int  Read_io(  struct Gbs_Emu* this, int offset );
-void Write_io( struct Gbs_Emu* this, int offset, int data );
 
 #endif

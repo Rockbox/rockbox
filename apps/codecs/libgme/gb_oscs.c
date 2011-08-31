@@ -30,7 +30,7 @@ void Osc_reset( struct Gb_Osc* this )
 	this->enabled  = false;
 }
 
-inline void Osc_update_amp( struct Gb_Osc* this, blip_time_t time, int new_amp )
+static inline void Osc_update_amp( struct Gb_Osc* this, blip_time_t time, int new_amp )
 {
 	Blip_set_modified( this->output );
 	int delta = new_amp - this->last_amp;
@@ -76,14 +76,14 @@ void Square_clock_envelope( struct Gb_Square* this )
 	}
 }
 
-inline void reload_sweep_timer( struct Gb_Square* this )
+static inline void reload_sweep_timer( struct Gb_Square* this )
 {
 	this->sweep_delay = (this->osc.regs [0] & period_mask) >> 4;
 	if ( !this->sweep_delay )
 		this->sweep_delay = 8;
 }
 
-void calc_sweep( struct Gb_Square* this, bool update )
+static void calc_sweep( struct Gb_Square* this, bool update )
 {
 	struct Gb_Osc* osc = &this->osc;
 	int const shift = osc->regs [0] & shift_mask;
@@ -234,7 +234,7 @@ static inline void Square_zombie_volume( struct Gb_Square* this, int old, int da
 	this->volume = v & 0x0F;
 }
 
-bool Square_write_register( struct Gb_Square* this, int frame_phase, int reg, int old_data, int data )
+static bool Square_write_register( struct Gb_Square* this, int frame_phase, int reg, int old_data, int data )
 {
 	int const max_len = 64;
 	
@@ -275,7 +275,7 @@ bool Square_write_register( struct Gb_Square* this, int frame_phase, int reg, in
 	return false;
 }
 
-inline void Noise_write_register( struct Gb_Noise* this, int frame_phase, int reg, int old_data, int data )
+static inline void Noise_write_register( struct Gb_Noise* this, int frame_phase, int reg, int old_data, int data )
 {
 	int const max_len = 64;
 	
@@ -315,7 +315,7 @@ inline void Noise_write_register( struct Gb_Noise* this, int frame_phase, int re
 	}
 }
 
-inline void Sweep_write_register( struct Gb_Square* this, int frame_phase, int reg, int old_data, int data )
+static inline void Sweep_write_register( struct Gb_Square* this, int frame_phase, int reg, int old_data, int data )
 {
 	if ( reg == 0 && this->sweep_enabled && this->sweep_neg && !(data & 0x08) )
 		this->osc.enabled = false; // sweep negate disabled after used
@@ -331,7 +331,7 @@ inline void Sweep_write_register( struct Gb_Square* this, int frame_phase, int r
 	}
 }
 
-void corrupt_wave( struct Gb_Wave* this )
+static void corrupt_wave( struct Gb_Wave* this )
 {
 	int pos = ((this->osc.phase + 1) & (wave_bank_size - 1)) >> 1;
 	if ( pos < 4 )
@@ -343,7 +343,7 @@ void corrupt_wave( struct Gb_Wave* this )
 	}
 }
 
-inline void Wave_write_register( struct Gb_Wave* this, int frame_phase, int reg, int old_data, int data )
+static inline void Wave_write_register( struct Gb_Wave* this, int frame_phase, int reg, int old_data, int data )
 {
 	int const max_len = 256;
 	

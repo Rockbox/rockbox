@@ -334,7 +334,7 @@ static short const dmc_period_table [2] [16] = {
 	176, 148, 132, 118,  98,  78,  66,  50}
 };
 
-inline void Dmc_reload_sample( struct Nes_Dmc* this )
+static inline void Dmc_reload_sample( struct Nes_Dmc* this )
 {
 	this->address = 0x4000 + this->osc.regs [2] * 0x40;
 	this->osc.length_counter = this->osc.regs [3] * 0x10 + 1;

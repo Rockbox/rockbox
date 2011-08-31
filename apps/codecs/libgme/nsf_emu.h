@@ -209,11 +209,9 @@ static inline void Sound_set_gain( struct Nsf_Emu* this, int g )
 
 blargg_err_t run_clocks( struct Nsf_Emu* this, blip_time_t* duration, int );
 
-void map_memory( struct Nsf_Emu* this );
 void write_bank( struct Nsf_Emu* this, int index, int data );
 int cpu_read( struct Nsf_Emu* this, addr_t );
 void cpu_write( struct Nsf_Emu* this, addr_t, int );
-void push_byte( struct Nsf_Emu* this, int );
 addr_t get_addr( byte const [] );
 bool run_cpu_until( struct Nsf_Emu* this, nes_time_t end );
 

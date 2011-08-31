@@ -29,7 +29,7 @@ int Read_mem( struct Gbs_Emu* this, addr_t addr )
 	return LOG_MEM( addr, ">", result );
 }
 
-inline void Write_io_inline( struct Gbs_Emu* this, int offset, int data, int base )
+static inline void Write_io_inline( struct Gbs_Emu* this, int offset, int data, int base )
 {
 	if ( (unsigned) (offset - (io_addr - base)) < io_size )
 		Apu_write_register( &this->apu, Time( this ), offset + base, data & 0xFF );
@@ -66,12 +66,12 @@ void Write_mem( struct Gbs_Emu* this, addr_t addr, int data )
 #endif
 }
 
-void Write_io_( struct Gbs_Emu* this, int offset, int data )
+static void Write_io_( struct Gbs_Emu* this, int offset, int data )
 {
 	Write_io_inline( this, offset, data, io_base );
 }
 
-inline void Write_io( struct Gbs_Emu* this, int offset, int data )
+static inline void Write_io( struct Gbs_Emu* this, int offset, int data )
 {
 	(void) LOG_MEM( offset + io_base, "<", data );
 	
@@ -80,7 +80,7 @@ inline void Write_io( struct Gbs_Emu* this, int offset, int data )
 		Write_io_( this, offset, data );
 }
 
-int Read_io( struct Gbs_Emu* this, int offset )
+static int Read_io( struct Gbs_Emu* this, int offset )
 {
 	int const io_base = 0xFF00;
 	int result = this->ram [io_base - ram_addr + offset];

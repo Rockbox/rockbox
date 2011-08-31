@@ -135,7 +135,7 @@ sample_t const* resample_( struct Resampler* this, sample_t** out_,
     return in;
 }
 
-inline int resample_wrapper( struct Resampler* this, sample_t out [], int* out_size,
+static inline int resample_wrapper( struct Resampler* this, sample_t out [], int* out_size,
         sample_t const in [], int in_size )
 {
     assert( Resampler_rate( this ) );

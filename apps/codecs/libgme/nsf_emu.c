@@ -330,7 +330,7 @@ void write_bank( struct Nsf_Emu* this, int bank, int data )
 		Cpu_map_code( &this->cpu, (bank + 6) * this->rom.bank_size, this->rom.bank_size, rom_data, false );
 }
 
-void map_memory( struct Nsf_Emu* this )
+static void map_memory( struct Nsf_Emu* this )
 {
 	// Map standard things
 	Cpu_reset( &this->cpu, unmapped_code( this ) );
@@ -493,7 +493,7 @@ void Sound_set_tempo( struct Nsf_Emu* this, int t )
 #endif
 }
 
-inline void push_byte( struct Nsf_Emu* this, int b )
+static inline void push_byte( struct Nsf_Emu* this, int b )
 {
 	this->low_ram [0x100 + this->cpu.r.sp--] = b;
 }

@@ -36,9 +36,7 @@ struct Gb_Osc {
 
 // 11-bit frequency in NRx3 and NRx4
 static inline int Osc_frequency( struct Gb_Osc* this ) { return (this->regs [4] & 7) * 0x100 + this->regs [3]; }
-	
-void Osc_update_amp( struct Gb_Osc* this, blip_time_t, int new_amp );
-int Osc_write_trig( struct Gb_Osc* this, int frame_phase, int max_len, int old_data );
+
 void Osc_clock_length( struct Gb_Osc* this );
 void Osc_reset( struct Gb_Osc* this );
 
@@ -61,7 +59,6 @@ struct Gb_Square {
 	bool sweep_neg;
 };
 
-bool Square_write_register( struct Gb_Square* this, int frame_phase, int reg, int old_data, int data );
 void Square_run( struct Gb_Square* this, blip_time_t, blip_time_t );
 void Square_clock_envelope( struct Gb_Square* this );
 	 
@@ -85,7 +82,6 @@ static inline int Square_reload_env_timer( struct Gb_Square* this )
 // Sweep square
 
 void clock_sweep( struct Gb_Square* this );
-void Sweep_write_register( struct Gb_Square* this, int frame_phase, int reg, int old_data, int data );
 	
 static inline void Sweep_reset( struct Gb_Square* this )
 {
@@ -99,9 +95,6 @@ static inline void Sweep_reset( struct Gb_Square* this )
 	Osc_reset( &this->osc );
 	this->osc.delay = 0x40000000; // TODO: something less hacky (never clocked until first trigger)
 }
-	
-void calc_sweep( struct Gb_Square* this, bool update );
-void reload_sweep_timer( struct Gb_Square* this );
 
 // Noise 
 
@@ -118,7 +111,6 @@ struct Gb_Noise {
 };
 
 void Noise_run( struct Gb_Noise* this, blip_time_t, blip_time_t );
-void Noise_write_register( struct Gb_Noise* this, int frame_phase, int reg, int old_data, int data ); 
 	
 static inline void Noise_reset( struct Gb_Noise* this )
 {
@@ -159,7 +151,6 @@ struct Gb_Wave {
 	uint8_t* wave_ram;   // 32 bytes (64 nybbles), stored in APU
 };
 
-void Wave_write_register( struct Gb_Wave* this, int frame_phase, int reg, int old_data, int data );
 void Wave_run( struct Gb_Wave* this, blip_time_t, blip_time_t );
 
 static inline void Wave_reset( struct Gb_Wave* this )
@@ -173,8 +164,6 @@ static inline int Wave_period( struct Gb_Wave* this ) { return (2048 - Osc_frequ
 	
 // Non-zero if DAC is enabled
 static inline int Wave_dac_enabled( struct Gb_Wave* this ) { return this->osc.regs [0] & 0x80; }
-	
-void corrupt_wave( struct Gb_Wave* this );
 	
 static inline uint8_t* wave_bank( struct Gb_Wave* this ) { return &this->wave_ram [(~this->osc.regs [0] & bank40_mask) >> 2 & this->agb_mask]; }
 	
