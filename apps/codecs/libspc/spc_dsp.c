@@ -1338,17 +1338,18 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         int fb_0, fb_1;
 
         /* Apply FIR */
-        fb_0 = *(uint32_t *)echo_ptr;
 
         /* Keep last 8 samples */
         asm volatile (
+        "ldr    %[fb_0], [%[echo_p]]          \r\n"
         "add    %[fir_p], %[t_fir_p], #4      \r\n"
         "bic    %[t_fir_p], %[fir_p], %[mask] \r\n"
         "str    %[fb_0], [%[fir_p], #-4]      \r\n"
         /* duplicate at +8 eliminates wrap checking below */
         "str    %[fb_0], [%[fir_p], #28]      \r\n"
-        : [fir_p]"=&r"(fir_ptr), [t_fir_p]"+r"(this->fir_ptr)
-        : [fb_0]"r"(fb_0), [mask]"i"(~FIR_BUF_MASK));
+        : [fir_p]"=&r"(fir_ptr), [t_fir_p]"+r"(this->fir_ptr),
+          [fb_0]"=&r"(fb_0)
+        : [echo_p]"r"(echo_ptr), [mask]"i"(~FIR_BUF_MASK));
 
         fir_coeff = (int32_t *)this->fir_coeff;
 
