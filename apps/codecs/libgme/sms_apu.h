@@ -44,10 +44,10 @@ void Sms_apu_set_output( struct Sms_Apu* this, int i, struct Blip_Buffer* center
 
 // Emulates to time t, then writes data to Game Gear left/right assignment byte
 void Sms_apu_write_ggstereo( struct Sms_Apu* this, blip_time_t t, int data );
-	
+
 // Emulates to time t, then writes data
 void Sms_apu_write_data( struct Sms_Apu* this, blip_time_t t, int data );
-	
+
 // Emulates to time t, then subtracts t from the current time.
 // OK if previous write call had time slightly after t.
 void Sms_apu_end_frame( struct Sms_Apu* this, blip_time_t t );

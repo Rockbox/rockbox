@@ -46,7 +46,7 @@ enum { shift_mask = 0x07 };
 enum { square_phase_range = 8 };
 
 typedef struct Blip_Synth Synth;
-	
+
 struct Nes_Square
 {
 	struct Nes_Osc osc;
@@ -54,12 +54,12 @@ struct Nes_Square
 	int env_delay;
 	int phase;
 	int sweep_delay;
-		
+	
 	Synth* synth; // shared between squares
 };
 
 static inline void Square_set_synth( struct Nes_Square* this, Synth* s ) { this->synth = s; }
-	
+
 void Square_clock_sweep( struct Nes_Square* this, int adjust );
 void Square_run( struct Nes_Square* this, nes_time_t, nes_time_t );
 
@@ -73,15 +73,15 @@ static inline void Square_reset( struct Nes_Square* this )
 
 void Square_clock_envelope( struct Nes_Square* this );
 int Square_volume( struct Nes_Square* this );
-		
+
 // Nes_Triangle
 
 enum { Triangle_phase_range = 16 };
-	
+
 struct Nes_Triangle
 {
 	struct Nes_Osc osc;
-		
+	
 	int phase;
 	int linear_counter;
 	struct Blip_Synth synth;
@@ -123,11 +123,11 @@ static inline void Noise_reset( struct Nes_Noise* this )
 // Nes_Dmc
 
 enum { loop_flag = 0x40 };
-	
+
 struct Nes_Dmc
 {
 	struct Nes_Osc osc;
-		
+	
 	int address;    // address of next byte to read
 	int period;
 	int buf;
@@ -144,7 +144,7 @@ struct Nes_Dmc
 	bool pal_mode;
 	bool nonlinear;
 	
- 	int (*prg_reader)( void*, addr_t ); // needs to be initialized to prg read function
+ 	int (*prg_reader)( void*, int ); // needs to be initialized to prg read function
 	void* prg_reader_data;
 	
 	struct Nes_Apu* apu;

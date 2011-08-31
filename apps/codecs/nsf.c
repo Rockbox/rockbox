@@ -74,8 +74,8 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
    
-    if ((err = Nsf_load(&nsf_emu, buf, ci->filesize))) {
-        DEBUGF("NSF: Nsf_load failed (%s)\n", err);
+    if ((err = Nsf_load_mem(&nsf_emu, buf, ci->filesize))) {
+        DEBUGF("NSF: Nsf_load_mem failed (%s)\n", err);
         return CODEC_ERROR;
     }
 
@@ -116,7 +116,7 @@ next_track:
 
         /* Generate audio buffer */
         err = Nsf_play(&nsf_emu, CHUNK_SIZE, samples);
-        if (err || nsf_emu.track_ended) {
+        if (err || Track_ended(&nsf_emu)) {
             track++;
             if (track >= nsf_emu.track_count) break;
             goto next_track;

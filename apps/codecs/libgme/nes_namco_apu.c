@@ -68,8 +68,6 @@ void Namco_run_until( struct Nes_Namco_Apu* this, blip_time_t nes_end_time )
 		struct Blip_Buffer* output = osc->output;
 		if ( !output )
 			continue;
-		/* output->set_modified(); */
-		Blip_set_modified( output );
 		
 		blip_resampled_time_t time =
 				Blip_resampled_time( output, this->last_time ) + osc->delay;
@@ -85,12 +83,17 @@ void Namco_run_until( struct Nes_Namco_Apu* this, blip_time_t nes_end_time )
 			if ( !volume )
 				continue;
 			
-			blargg_long freq = (osc_reg [4] & 3) * 0x10000 + osc_reg [2] * 0x100L + osc_reg [0];
+			int freq = (osc_reg [4] & 3) * 0x10000 + osc_reg [2] * 0x100L + osc_reg [0];
 			if ( freq < 64 * active_oscs )
 				continue; // prevent low frequencies from excessively delaying freq changes
+			
+			int const master_clock_divider = 12; // NES time derived via divider of master clock
+			int const n106_divider = 45; // N106 then divides master clock by this
+			int const max_freq = 0x3FFFF;
+			int const lowest_freq_period = (max_freq + 1) * n106_divider / master_clock_divider;
+			// divide by 8 to avoid overflow
 			blip_resampled_time_t period =
-					/* output->resampled_duration( 983040 ) / freq * active_oscs; */
-					Blip_resampled_duration( output, 983040 ) / freq * active_oscs;
+					Blip_resampled_duration( output, lowest_freq_period / 8 ) / freq * 8 * active_oscs;
 			
 			int wave_size = 32 - (osc_reg [4] >> 2 & 7) * 4;
 			if ( !wave_size )
@@ -98,6 +101,8 @@ void Namco_run_until( struct Nes_Namco_Apu* this, blip_time_t nes_end_time )
 			
 			int last_amp = osc->last_amp;
 			int wave_pos = osc->wave_pos;
+			
+			Blip_set_modified( output );
 			
 			do
 			{

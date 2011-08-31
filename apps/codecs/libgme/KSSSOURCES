@@ -9,3 +9,4 @@ multi_buffer.c
 rom_data.c
 emu8950.c
 emuadpcm.c
+track_filter.c

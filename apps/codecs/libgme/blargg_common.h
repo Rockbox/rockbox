@@ -7,12 +7,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <limits.h>
 
 #undef BLARGG_COMMON_H
 // allow blargg_config.h to #include blargg_common.h
 #include "blargg_config.h"
+#include "blargg_source.h"
 #ifndef BLARGG_COMMON_H
 #define BLARGG_COMMON_H
 
@@ -98,19 +98,13 @@
 	static bool false = 0;
 #endif
 
-// blargg_long/blargg_ulong = at least 32 bits, int if it's big enough
-#include <limits.h>
-
-#if INT_MAX >= 0x7FFFFFFF
-	typedef int blargg_long;
-#else
-	typedef long blargg_long;
-#endif
-
-#if UINT_MAX >= 0xFFFFFFFF
-	typedef unsigned blargg_ulong;
-#else
-	typedef unsigned long blargg_ulong;
+/* My code depends on int being at least 32 bits. Almost everything these days
+uses at least 32-bit ints, so it's hard to even find a system with 16-bit ints
+to test with. The issue can't be gotten around by using a suitable blargg_int
+everywhere either, because int is often converted to implicitly when doing
+arithmetic on smaller types. */
+#if UINT_MAX < 0xFFFFFFFF
+    #error "int must be at least 32 bits"
 #endif
 
 // int8_t etc.

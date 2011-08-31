@@ -64,8 +64,6 @@ void Fme7_run_until( struct Nes_Fme7_Apu* this, blip_time_t end_time )
 		struct Blip_Buffer* const osc_output = this->oscs [index].output;
 		if ( !osc_output )
 			continue;
-		/* osc_output->set_modified(); */
-		Blip_set_modified( osc_output );
 		
 		// check for unsupported mode
 		#ifndef NDEBUG
@@ -92,11 +90,13 @@ void Fme7_run_until( struct Nes_Fme7_Apu* this, blip_time_t end_time )
 		int amp = volume;
 		if ( !this->phases [index] )
 			amp = 0;
+		
 		{
 			int delta = amp - this->oscs [index].last_amp;
 			if ( delta )
 			{
 				this->oscs [index].last_amp = amp;
+				Blip_set_modified( osc_output );
 				Synth_offset( &this->synth, this->last_time, delta, osc_output );
 			}
 		}
@@ -105,6 +105,7 @@ void Fme7_run_until( struct Nes_Fme7_Apu* this, blip_time_t end_time )
 		if ( time < end_time )
 		{
 			int delta = amp * 2 - volume;
+			Blip_set_modified( osc_output );
 			if ( volume )
 			{
 				do
@@ -123,7 +124,7 @@ void Fme7_run_until( struct Nes_Fme7_Apu* this, blip_time_t end_time )
 				// maintain phase when silent
 				int count = (end_time - time + period - 1) / period;
 				this->phases [index] ^= count & 1;
-				time += (blargg_long) count * period;
+				time += count * period;
 			}
 		}
 		

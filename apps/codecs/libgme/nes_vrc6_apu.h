@@ -1,6 +1,6 @@
 // Konami VRC6 sound chip emulator
 
-// Nes_Snd_Emu 0.1.8
+// Nes_Snd_Emu 0.2.0-pre
 #ifndef NES_VRC6_APU_H
 #define NES_VRC6_APU_H
 
@@ -14,7 +14,7 @@ enum { vrc6_addr_step = 0x1000 };
 
 struct Vrc6_Osc
 {
-	uint8_t regs [vrc6_reg_count];
+	uint8_t regs [3];
 	struct Blip_Buffer* output;
 	int delay;
 	int last_amp;

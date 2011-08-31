@@ -9,15 +9,12 @@
 #include "gb_apu.h"
 #include "gb_cpu.h"
 #include "m3u_playlist.h"
-
-/* typedef uint8_t byte; */
-typedef short sample_t;
+#include "track_filter.h"
 
 enum { joypad_addr = 0xFF00 };
 enum { ram_addr = 0xA000 };
 enum { hi_page = 0xFF00 - ram_addr };
 enum { io_base = 0xFF00 };
-enum { buf_size = 2048 };
 
 // Selects which sound hardware to use. AGB hardware is cleaner than the
 // others. Doesn't take effect until next start_track().
@@ -59,36 +56,19 @@ struct Gbs_Emu {
 	blip_time_t next_play;
 
 	// Sound 
-	long clock_rate_;
-	long sample_rate_;
+	int clock_rate_;
+	int sample_rate_;
 	unsigned buf_changed_count;
 	int voice_count_;
+	int const* voice_types_;
+	int mute_mask_;
 	int gain_;
 	int tempo_;
 	
 	// track-specific
 	byte track_count;
-	volatile bool track_ended;
 	int current_track_;
-	blargg_long out_time;  // number of samples played since start of track
-	blargg_long emu_time;  // number of samples emulator has generated since start of track
-	bool emu_track_ended_; // emulator has reached end of track
-	
-	// fading
-	blargg_long fade_start;
-	int fade_step;
-	
-	// silence detection
-	// Disable automatic end-of-track detection and skipping of silence at beginning
-	bool ignore_silence;
 
-	int max_initial_silence;
-	int mute_mask_;
-	int silence_lookahead; // speed to run emulator when looking ahead for silence
-	long silence_time;     // number of samples where most recent silence began
-	long silence_count;    // number of samples of silence to play before using buf
-	long buf_remain;       // number of samples left in silence buffer
-	
 	// Larger items at the end
 	// Header for currently loaded file
 	struct header_t header;
@@ -96,11 +76,12 @@ struct Gbs_Emu {
 	// M3u Playlist
 	struct M3u_Playlist m3u;
 	
+	struct setup_t tfilter;
+	struct Track_Filter track_filter;
+	
 	struct Gb_Apu apu;
 	struct Gb_Cpu cpu;
-	struct Stereo_Buffer stereo_buf;
-	
-	sample_t buf [buf_size];
+	struct Multi_Buffer stereo_buf;
 	
 	// rom & ram
 	struct Rom_Data rom; 
@@ -116,36 +97,48 @@ void Gbs_init( struct Gbs_Emu* this );
 void Gbs_stop( struct Gbs_Emu* this );
 
 // Loads a file from memory
-blargg_err_t Gbs_load( struct Gbs_Emu* this, void* data, long size );
+blargg_err_t Gbs_load_mem( struct Gbs_Emu* this, void* data, long size );
 
 // Set output sample rate. Must be called only once before loading file.
-blargg_err_t Gbs_set_sample_rate( struct Gbs_Emu* this, long sample_rate );
+blargg_err_t Gbs_set_sample_rate( struct Gbs_Emu* this, int sample_rate );
 
 // Start a track, where 0 is the first track. Also clears warning string.
 blargg_err_t Gbs_start_track( struct Gbs_Emu* this, int );
 
 // Generate 'count' samples info 'buf'. Output is in stereo. Any emulation
 // errors set warning string, and major errors also end track.
-blargg_err_t Gbs_play( struct Gbs_Emu* this, long count, sample_t* buf );
+blargg_err_t Gbs_play( struct Gbs_Emu* this, int count, sample_t* buf );
 
 // Track status/control
 // Number of milliseconds (1000 msec = 1 second) played since beginning of track
-long Track_tell( struct Gbs_Emu* this );
+int Track_tell( struct Gbs_Emu* this );
 
 // Seek to new time in track. Seeking backwards or far forward can take a while.
-blargg_err_t Track_seek( struct Gbs_Emu* this, long msec );
+blargg_err_t Track_seek( struct Gbs_Emu* this, int msec );
 
 // Skip n samples
-blargg_err_t Track_skip( struct Gbs_Emu* this, long n );
+blargg_err_t Track_skip( struct Gbs_Emu* this, int n );
 
 // Set start time and length of track fade out. Once fade ends track_ended() returns
 // true. Fade time can be changed while track is playing.
-void Track_set_fade( struct Gbs_Emu* this, long start_msec, long length_msec );
+void Track_set_fade( struct Gbs_Emu* this, int start_msec, int length_msec );
+
+// True if a track has reached its end
+static inline bool Track_ended( struct Gbs_Emu* this )
+{
+	return track_ended( &this->track_filter );
+}
+
+// Disables automatic end-of-track detection and skipping of silence at beginning
+static inline void Track_ignore_silence( struct Gbs_Emu* this, bool disable )
+{
+	this->track_filter.silence_ignored_ = disable;
+}
 
 // Get track length in milliseconds
-static inline long Track_get_length( struct Gbs_Emu* this, int n )
+static inline int Track_get_length( struct Gbs_Emu* this, int n )
 {
-	long length = 120 * 1000;  /* 2 minutes */ 
+	int length = 120 * 1000;  /* 2 minutes */ 
 	if ( (this->m3u.size > 0) && (n < this->m3u.size) ) {
 		struct entry_t* entry = &this->m3u.entries [n];
 		length = entry->length;
@@ -175,19 +168,18 @@ static inline void Sound_set_gain( struct Gbs_Emu* this, int g )
 	this->gain_ = g;
 }
 
-
 // Emulation (You shouldn't touch these)
 
-blargg_err_t Run_clocks( struct Gbs_Emu* this, blip_time_t duration );
-void Set_bank( struct Gbs_Emu* this, int );
-void Update_timer( struct Gbs_Emu* this );
+blargg_err_t run_clocks( struct Gbs_Emu* this, blip_time_t duration );
+void set_bank( struct Gbs_Emu* this, int );
+void update_timer( struct Gbs_Emu* this );
 
 // Runs CPU until time becomes >= 0
-void Run_cpu( struct Gbs_Emu* this );
+void run_cpu( struct Gbs_Emu* this );
 
 // Reads/writes memory and I/O
-int  Read_mem( struct Gbs_Emu* this, addr_t addr );
-void Write_mem( struct Gbs_Emu* this, addr_t addr, int data );
+int  read_mem( struct Gbs_Emu* this, addr_t addr );
+void write_mem( struct Gbs_Emu* this, addr_t addr, int data );
 
 // Current time
 static inline blip_time_t Time( struct Gbs_Emu* this ) 
@@ -195,6 +187,6 @@ static inline blip_time_t Time( struct Gbs_Emu* this )
 	return Cpu_time( &this->cpu ) + this->end_time; 
 }
 
-void Jsr_then_stop( struct Gbs_Emu* this, byte const [] );
+void jsr_then_stop( struct Gbs_Emu* this, byte const [] );
 
 #endif

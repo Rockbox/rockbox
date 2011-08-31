@@ -1,11 +1,13 @@
 // Sega Master System/Mark III, Sega Genesis/Mega Drive, BBC Micro VGM music file emulator
 
-// Game_Music_Emu 0.5.5
+// Game_Music_Emu 0.6-pre
 #ifndef VGM_EMU_H
 #define VGM_EMU_H
 
 #include "blargg_common.h"
 #include "blargg_source.h"
+
+#include "track_filter.h"
 #include "resampler.h"
 #include "multi_buffer.h"
 #include "ym2413_emu.h"
@@ -17,7 +19,6 @@ typedef int fm_time_t;
 
 enum { fm_time_bits = 12 };
 enum { blip_time_bits = 12 };
-enum { buf_size = 2048 };
 
 // VGM header format
 enum { header_size = 0x40 };
@@ -46,9 +47,9 @@ enum { gme_max_field = 63 };
 struct track_info_t
 {
 	/* times in milliseconds; -1 if unknown */
-	long length;
-	long intro_length;
-	long loop_length;
+	int length;
+	int intro_length;
+	int loop_length;
 	
 	/* empty string if not available */
 	char game      [64];
@@ -63,11 +64,11 @@ struct track_info_t
 // YM2413 sound chip emulator. I can provide one I've modified to work with the library.
 struct Vgm_Emu {
 	int fm_rate;
-	long psg_rate;
-	long vgm_rate;
+	int psg_rate;
+	int vgm_rate;
 	bool disable_oversampling;
 	
-	long fm_time_offset;
+	int fm_time_offset;
 	int fm_time_factor;
 
 	int blip_time_factor;
@@ -84,47 +85,34 @@ struct Vgm_Emu {
 	int dac_amp;
 	int dac_disabled; // -1 if disabled
 
-	struct Blip_Buffer blip_buf;
-
 	// general
-	long clock_rate_;
+	int current_track;
+	int clock_rate_;
 	unsigned buf_changed_count;
 	int max_initial_silence;
 	int voice_count;
+	int const *voice_types;
 	int mute_mask_;
 	int tempo;
 	int gain;
 	
-	long sample_rate;
-	
-	// track-specific
-	blargg_long out_time;  // number of samples played since start of track
-	blargg_long emu_time;  // number of samples emulator has generated since start of track
-	bool emu_track_ended_; // emulator has reached end of track
-	volatile bool track_ended;
-	
-	// fading
-	blargg_long fade_start;
-	int fade_step;
-	
-	// silence detection
-	int silence_lookahead; // speed to run emulator when looking ahead for silence
-	bool ignore_silence;
-	long silence_time;     // number of samples where most recent silence began
-	long silence_count;    // number of samples of silence to play before using buf
-	long buf_remain;       // number of samples left in silence buffer
+	int sample_rate;
 	
 	// larger items at the end
 	struct track_info_t info;
-	sample_t buf_ [buf_size];
+	
+	struct setup_t tfilter;
+	struct Track_Filter track_filter;
 
 	struct Ym2612_Emu ym2612;
 	struct Ym2413_Emu ym2413;
 	
 	struct Sms_Apu psg;
 	struct Blip_Synth pcm;
+	struct Blip_Buffer blip_buf;
+	
 	struct Resampler resampler;
-	struct Stereo_Buffer buf;
+	struct Multi_Buffer stereo_buf;
 };
 
 void Vgm_init( struct Vgm_Emu* this );
@@ -135,7 +123,7 @@ static inline void Vgm_disable_oversampling( struct Vgm_Emu* this, bool disable 
 
 // Header for currently loaded file
 static inline struct header_t *header( struct Vgm_Emu* this ) { return (struct header_t*) this->file_begin; }
-	
+
 // Basic functionality (see Gme_File.h for file loading/track info functions)
 blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_size, bool parse_info );
 
@@ -144,34 +132,46 @@ blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_
 static inline bool uses_fm( struct Vgm_Emu* this ) { return Ym2612_enabled( &this->ym2612 ) || Ym2413_enabled( &this->ym2413 ); }
 
 // Set output sample rate. Must be called only once before loading file.
-blargg_err_t Vgm_set_sample_rate( struct Vgm_Emu* this, long sample_rate );
-	
+blargg_err_t Vgm_set_sample_rate( struct Vgm_Emu* this, int sample_rate );
+
 // Start a track, where 0 is the first track. Also clears warning string.
 blargg_err_t Vgm_start_track( struct Vgm_Emu* this );
-	
+
 // Generate 'count' samples info 'buf'. Output is in stereo. Any emulation
 // errors set warning string, and major errors also end track.
-blargg_err_t Vgm_play( struct Vgm_Emu* this, long count, sample_t* buf );
-		
+blargg_err_t Vgm_play( struct Vgm_Emu* this, int count, sample_t* buf );
+
 // Track status/control
 
 // Number of milliseconds (1000 msec = 1 second) played since beginning of track
-long Track_tell( struct Vgm_Emu* this );
-	
+int Track_tell( struct Vgm_Emu* this );
+
 // Seek to new time in track. Seeking backwards or far forward can take a while.
-blargg_err_t Track_seek( struct Vgm_Emu* this, long msec );
-	
+blargg_err_t Track_seek( struct Vgm_Emu* this, int msec );
+
 // Skip n samples
-blargg_err_t Track_skip( struct Vgm_Emu* this, long n );
-		
+blargg_err_t Track_skip( struct Vgm_Emu* this, int n );
+
 // Set start time and length of track fade out. Once fade ends track_ended() returns
 // true. Fade time can be changed while track is playing.
-void Track_set_fade( struct Vgm_Emu* this, long start_msec, long length_msec );
+void Track_set_fade( struct Vgm_Emu* this, int start_msec, int length_msec );
+
+// True if a track has reached its end
+static inline bool Track_ended( struct Vgm_Emu* this )
+{
+	return track_ended( &this->track_filter );
+}
+
+// Disables automatic end-of-track detection and skipping of silence at beginning
+static inline void Track_ignore_silence( struct Vgm_Emu* this, bool disable )
+{
+	this->track_filter.silence_ignored_ = disable;
+}
 
 // Get track length in milliseconds
-static inline long Track_get_length( struct Vgm_Emu* this )
+static inline int Track_get_length( struct Vgm_Emu* this )
 {
-	long length = this->info.length;
+	int length = this->info.length;
 	if ( length <= 0 )
 	{
 		length = this->info.intro_length + 2 * this->info.loop_length; // intro + 2 loops
@@ -181,20 +181,20 @@ static inline long Track_get_length( struct Vgm_Emu* this )
 	
 	return length;
 }
-	
+
 // Sound customization
-	
+
 // Adjust song tempo, where 1.0 = normal, 0.5 = half speed, 2.0 = double speed.
 // Track length as returned by track_info() assumes a tempo of 1.0.
 void Sound_set_tempo( struct Vgm_Emu* this, int t );
-	
+
 // Mute/unmute voice i, where voice 0 is first voice
 void Sound_mute_voice( struct Vgm_Emu* this, int index, bool mute );
-	
+
 // Set muting state of all voices at once using a bit mask, where -1 mutes them all,
 // 0 unmutes them all, 0x01 mutes just the first voice, etc.
 void Sound_mute_voices( struct Vgm_Emu* this, int mask );
-	
+
 // Change overall output amplitude, where 1.0 results in minimal clamping.
 // Must be called before set_sample_rate().
 static inline void Sound_set_gain( struct Vgm_Emu* this, int g )
@@ -202,6 +202,5 @@ static inline void Sound_set_gain( struct Vgm_Emu* this, int g )
 	assert( !this->sample_rate ); // you must set gain before setting sample rate
 	this->gain = g;
 }
-
 
 #endif

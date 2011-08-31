@@ -20,7 +20,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 	#define LOG_MEM( addr, str, data ) data
 #endif
 
-int Read_mem( struct Gbs_Emu* this, addr_t addr )
+int read_mem( struct Gbs_Emu* this, addr_t addr )
 {
 	int result = *Cpu_get_code( &this->cpu, addr );
 	if ( (unsigned) (addr - io_addr) < io_size )
@@ -29,19 +29,19 @@ int Read_mem( struct Gbs_Emu* this, addr_t addr )
 	return LOG_MEM( addr, ">", result );
 }
 
-static inline void Write_io_inline( struct Gbs_Emu* this, int offset, int data, int base )
+static inline void write_io_inline( struct Gbs_Emu* this, int offset, int data, int base )
 {
 	if ( (unsigned) (offset - (io_addr - base)) < io_size )
 		Apu_write_register( &this->apu, Time( this ), offset + base, data & 0xFF );
 	else if ( (unsigned) (offset - (0xFF06 - base)) < 2 )
-		Update_timer( this );
+		update_timer( this );
 	else if ( offset == io_base - base )
 		this->ram [base - ram_addr + offset] = 0; // keep joypad return value 0
 	else
 		this->ram [base - ram_addr + offset] = 0xFF;
 }
 
-void Write_mem( struct Gbs_Emu* this, addr_t addr, int data )
+void write_mem( struct Gbs_Emu* this, addr_t addr, int data )
 {
 	(void) LOG_MEM( addr, "<", data );
 	
@@ -52,11 +52,11 @@ void Write_mem( struct Gbs_Emu* this, addr_t addr, int data )
 		
 		offset -= 0xE000 - ram_addr;
 		if ( (unsigned) offset < 0x1F80 )
-			Write_io_inline( this, offset, data, 0xE000 );
+			write_io_inline( this, offset, data, 0xE000 );
 	}
 	else if ( (unsigned) (offset - (0x2000 - ram_addr)) < 0x2000 )
 	{
-		Set_bank( this, data & 0xFF );
+		set_bank( this, data & 0xFF );
 	}
 #ifndef NDEBUG
 	else if ( unsigned (addr - 0x8000) < 0x2000 || unsigned (addr - 0xE000) < 0x1F00 )
@@ -66,21 +66,21 @@ void Write_mem( struct Gbs_Emu* this, addr_t addr, int data )
 #endif
 }
 
-static void Write_io_( struct Gbs_Emu* this, int offset, int data )
+static void write_io_( struct Gbs_Emu* this, int offset, int data )
 {
-	Write_io_inline( this, offset, data, io_base );
+	write_io_inline( this, offset, data, io_base );
 }
 
-static inline void Write_io( struct Gbs_Emu* this, int offset, int data )
+static inline void write_io( struct Gbs_Emu* this, int offset, int data )
 {
 	(void) LOG_MEM( offset + io_base, "<", data );
 	
 	this->ram [io_base - ram_addr + offset] = data;
 	if ( (unsigned) offset < 0x80 )
-		Write_io_( this, offset, data );
+		write_io_( this, offset, data );
 }
 
-static int Read_io( struct Gbs_Emu* this, int offset )
+static int read_io( struct Gbs_Emu* this, int offset )
 {
 	int const io_base = 0xFF00;
 	int result = this->ram [io_base - ram_addr + offset];
@@ -106,14 +106,14 @@ static int Read_io( struct Gbs_Emu* this, int offset )
 		check( out == Read_mem( emu, addr ) );\
 }
 
-#define READ_MEM(  emu, addr       ) Read_mem( emu, addr )
-#define WRITE_MEM( emu, addr, data ) Write_mem( emu, addr, data )
+#define READ_MEM(  emu, addr       ) read_mem( emu, addr )
+#define WRITE_MEM( emu, addr, data ) write_mem( emu, addr, data )
 
-#define WRITE_IO( emu, addr, data )  Write_io( emu, addr, data )
-#define READ_IO( emu, addr, out )    out = Read_io( emu, addr )
+#define WRITE_IO( emu, addr, data )  write_io( emu, addr, data )
+#define READ_IO( emu, addr, out )    out = read_io( emu, addr )
 
 #define CPU_BEGIN \
-void Run_cpu( struct Gbs_Emu* this )\
+void run_cpu( struct Gbs_Emu* this )\
 { \
 	struct Gb_Cpu* cpu = &this->cpu;
 	#include "gb_cpu_run.h"

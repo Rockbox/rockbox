@@ -1,56 +1,52 @@
 // PC Engine CPU emulator for use with HES music files
 
-// Game_Music_Emu 0.5.2
+// Game_Music_Emu 0.6-pre
 #ifndef HES_CPU_H
 #define HES_CPU_H
 
 #include "blargg_common.h"
+#include "blargg_source.h"
 
-typedef blargg_long hes_time_t; // clock cycle count
-typedef unsigned hes_addr_t; // 16-bit address
+typedef int hes_time_t; // clock cycle count
+typedef int hes_addr_t; // 16-bit address
 
 struct Hes_Emu;
 
-enum { future_hes_time = LONG_MAX / 2 + 1 };
-enum { page_size = 0x2000 };
-enum { page_shift = 13 };
-enum { page_count = 8 };
+enum { future_time = INT_MAX/2 + 1 };
+enum { page_bits = 13 };
+enum { page_size = 1 << page_bits };
+enum { page_count = 0x10000 / page_size };
 
-// Attempt to execute instruction here results in CPU advancing time to
-// lesser of irq_time() and end_time() (or end_time() if IRQs are
-// disabled)
-enum { idle_addr = 0x1FFF };
-	
 // Can read this many bytes past end of a page
 enum { cpu_padding = 8 };
-enum { irq_inhibit = 0x04 };
-
+enum { irq_inhibit_mask = 0x04 };
+enum { idle_addr = 0x1FFF };
 
 // Cpu state
-struct state_t {
-	uint8_t const* code_map [page_count + 1];
+struct cpu_state_t {
+	byte const* code_map [page_count + 1];
 	hes_time_t base;
-	blargg_long time;
+	int time;
 };
 
-// Cpu registers
+// NOT kept updated during emulation.
 struct registers_t {
 	uint16_t pc;
-	uint8_t a;
-	uint8_t x;
-	uint8_t y;
-	uint8_t status;
-	uint8_t sp;
+	byte a;
+	byte x;
+	byte y;
+	byte flags;
+	byte sp;
 };
 
 struct Hes_Cpu {
 	struct registers_t r;
 
-	hes_time_t irq_time;
-	hes_time_t end_time;
+	hes_time_t irq_time_;
+	hes_time_t end_time_;
 	
-	struct state_t* state; // points to state_ or a local copy within run()
-	struct state_t state_;
+	struct cpu_state_t* cpu_state; // points to state_ or a local copy within run()
+	struct cpu_state_t cpu_state_;
 	
 	// page mapping registers
 	uint8_t mmr [page_count + 1];
@@ -58,7 +54,10 @@ struct Hes_Cpu {
 };
 
 // Init cpu state
-void Cpu_init( struct Hes_Cpu* this );
+static inline void Cpu_init( struct Hes_Cpu* this )
+{
+	this->cpu_state = &this->cpu_state_;
+}
 
 // Reset hes cpu
 void Cpu_reset( struct Hes_Cpu* this );
@@ -67,29 +66,67 @@ void Cpu_reset( struct Hes_Cpu* this );
 // instructions were encountered.
 bool Cpu_run( struct Hes_Emu* this, hes_time_t end_time );
 
-void Cpu_set_mmr( struct Hes_Emu* this, int reg, int bank );
-
 // Time of ning of next instruction to be executed
 static inline hes_time_t Cpu_time( struct Hes_Cpu* this )
 {
-	return this->state->time + this->state->base;
+	return this->cpu_state->time + this->cpu_state->base;
 }
+
+static inline void Cpu_set_time( struct Hes_Cpu* this, hes_time_t t )    { this->cpu_state->time = t - this->cpu_state->base; }
+static inline void Cpu_adjust_time( struct Hes_Cpu* this, int delta )    { this->cpu_state->time += delta; }
+
+#define HES_CPU_PAGE( addr ) ((unsigned) (addr) >> page_bits)
+
+#ifdef BLARGG_NONPORTABLE
+	#define HES_CPU_OFFSET( addr ) (addr)
+#else
+	#define HES_CPU_OFFSET( addr ) ((addr) & (page_size - 1))
+#endif
 
 static inline uint8_t const* Cpu_get_code( struct Hes_Cpu* this, hes_addr_t addr )
 {
-	return this->state->code_map [addr >> page_shift] + addr
-	#if !defined (BLARGG_NONPORTABLE)
-		% (unsigned) page_size
-	#endif
-	;
+	return this->cpu_state_.code_map [HES_CPU_PAGE( addr )] + HES_CPU_OFFSET( addr );
 }
 
-static inline int Cpu_update_end_time( struct Hes_Cpu* this, uint8_t reg_status, hes_time_t t, hes_time_t irq )
+static inline void update_end_time( struct Hes_Cpu* this, hes_time_t end, hes_time_t irq )
 {
-	if ( irq < t && !(reg_status & irq_inhibit) ) t = irq;
-	int delta = this->state->base - t;
-	this->state->base = t;
-	return delta;
+	if ( end > irq && !(this->r.flags & irq_inhibit_mask) )
+		end = irq;
+	
+	this->cpu_state->time += this->cpu_state->base - end;
+	this->cpu_state->base = end;
+}
+
+static inline hes_time_t Cpu_end_time( struct Hes_Cpu* this ) { return this->end_time_; }
+
+static inline void Cpu_set_irq_time( struct Hes_Cpu* this, hes_time_t t )
+{
+	this->irq_time_ = t;
+	update_end_time( this, this->end_time_, t );
+}
+
+static inline void Cpu_set_end_time( struct Hes_Cpu* this, hes_time_t t )
+{
+	this->end_time_ = t;
+	update_end_time( this, t, this->irq_time_ );
+}
+
+static inline void Cpu_end_frame( struct Hes_Cpu* this, hes_time_t t )
+{
+	assert( this->cpu_state == &this->cpu_state_ );
+	this->cpu_state_.base -= t;
+	if ( this->irq_time_ < future_time ) this->irq_time_ -= t;
+	if ( this->end_time_ < future_time ) this->end_time_ -= t;
+}
+
+static inline void Cpu_set_mmr( struct Hes_Cpu* this, int reg, int bank, void const* code )
+{
+	assert( (unsigned) reg <= page_count ); // allow page past end to be set
+	assert( (unsigned) bank < 0x100 );
+	this->mmr [reg] = bank;
+	byte const* p = STATIC_CAST(byte const*,code) - HES_CPU_OFFSET( reg << page_bits );
+	this->cpu_state->code_map [reg] = p;
+	this->cpu_state_.code_map [reg] = p;
 }
 
 #endif

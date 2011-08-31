@@ -83,7 +83,7 @@ enum codec_status codec_run(void)
     }
    
     if ((err = Sgc_load_mem(&sgc_emu, buf, ci->filesize))) {
-        DEBUGF("SGC: Sgc_load failed (%s)\n", err);
+        DEBUGF("SGC: Sgc_load_mem failed (%s)\n", err);
         return CODEC_ERROR;
     }
 
@@ -110,7 +110,7 @@ next_track:
 
         /* Generate audio buffer */
         err = Sgc_play(&sgc_emu, CHUNK_SIZE, samples);
-        if (err || sgc_emu.track_ended) {
+        if (err || Track_ended(&sgc_emu)) {
             track++;
             if (track >= sgc_emu.track_count) break;
             goto next_track;

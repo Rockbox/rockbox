@@ -64,7 +64,7 @@ void Resampler_resize( struct Resampler* this, int pairs )
     }
 }
 
-void mix_samples( struct Resampler* this, struct Blip_Buffer* blip_buf, sample_t out_ [] )
+void mix_samples( struct Resampler* this, struct Blip_Buffer* blip_buf, dsample_t out_ [] )
 {
     int const bass = BLIP_READER_BASS( *blip_buf );
     BLIP_READER_BEGIN( sn, *blip_buf );
@@ -72,7 +72,7 @@ void mix_samples( struct Resampler* this, struct Blip_Buffer* blip_buf, sample_t
     int count = this->sample_buf_size >> 1;
     BLIP_READER_ADJ_( sn, count );
 
-    typedef sample_t stereo_dsample_t [2];
+    typedef dsample_t stereo_dsample_t [2];
     stereo_dsample_t* BLARGG_RESTRICT out = (stereo_dsample_t*) out_ + count;
     stereo_dsample_t const* BLARGG_RESTRICT in =
         (stereo_dsample_t const*) this->sample_buf + count;
@@ -97,14 +97,14 @@ void mix_samples( struct Resampler* this, struct Blip_Buffer* blip_buf, sample_t
     BLIP_READER_END( sn, *blip_buf );
 }
 
-sample_t const* resample_( struct Resampler* this, sample_t** out_,
-        sample_t const* out_end, sample_t const in [], int in_size )
+dsample_t const* resample_( struct Resampler* this, dsample_t** out_,
+        dsample_t const* out_end, dsample_t const in [], int in_size )
 {
     in_size -= write_offset;
     if ( in_size > 0 )
     {
-        sample_t* BLARGG_RESTRICT out = *out_;
-        sample_t const* const in_end = in + in_size;
+        dsample_t* BLARGG_RESTRICT out = *out_;
+        dsample_t const* const in_end = in + in_size;
 
         int const step = this->step;
         int       pos  = this->pos;
@@ -135,12 +135,12 @@ sample_t const* resample_( struct Resampler* this, sample_t** out_,
     return in;
 }
 
-static inline int resample_wrapper( struct Resampler* this, sample_t out [], int* out_size,
-        sample_t const in [], int in_size )
+static inline int resample_wrapper( struct Resampler* this, dsample_t out [], int* out_size,
+        dsample_t const in [], int in_size )
 {
     assert( Resampler_rate( this ) );
 
-    sample_t* out_ = out;
+    dsample_t* out_ = out;
     int result = resample_( this, &out_, out + *out_size, in, in_size ) - in;
     assert( out_ <= out + *out_size );
     assert( result <= in_size );
@@ -161,7 +161,7 @@ int skip_input( struct Resampler* this, int count )
     return count;
 }
 
-void play_frame_( struct Resampler* this, struct Blip_Buffer* blip_buf, sample_t* out )
+void play_frame_( struct Resampler* this, struct Blip_Buffer* blip_buf, dsample_t* out )
 {
     int pair_count = this->sample_buf_size >> 1;
     blip_time_t blip_time = Blip_count_clocks( blip_buf, pair_count );
@@ -185,7 +185,7 @@ void play_frame_( struct Resampler* this, struct Blip_Buffer* blip_buf, sample_t
     Blip_remove_samples( blip_buf, pair_count );
 }
 
-void Resampler_play( struct Resampler* this, int count, sample_t* out, struct Blip_Buffer* blip_buf )
+void Resampler_play( struct Resampler* this, int count, dsample_t* out, struct Blip_Buffer* blip_buf )
 {
     // empty extra buffer
     int remain = this->sample_buf_size - this->buf_pos;

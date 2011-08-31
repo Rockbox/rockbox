@@ -39,19 +39,19 @@ void Apu_init( struct Nes_Apu* this )
 	this->oscs [4] = &this->dmc.osc;
 	
 	Apu_output( this, NULL );
+	this->dmc.nonlinear = false;
 	Apu_volume( this, (int)FP_ONE_VOLUME );
 	Apu_reset( this, false, 0 );
 }
 
-void Apu_enable_nonlinear( struct Nes_Apu* this, int v )
+void Apu_enable_nonlinear_( struct Nes_Apu* this, double sq, double tnd )
 {
 	this->dmc.nonlinear = true;
-	Synth_volume( &this->square_synth, (int)((long long)(1.3 * 0.25751258 / 0.742467605 * 0.25 * FP_ONE_VOLUME) / amp_range * v) );
+	Synth_volume( &this->square_synth, (int)((long long)(sq * FP_ONE_VOLUME) / amp_range) );
 	
-	const int tnd = (int)(0.48 / 202 * 0.75 * FP_ONE_VOLUME);
-	Synth_volume( &this->triangle.synth, 3 * tnd );
-	Synth_volume( &this->noise.synth, 2 * tnd );
-	Synth_volume( &this->dmc.synth, tnd );
+	Synth_volume( &this->triangle.synth, tnd * 2.752 );
+	Synth_volume( &this->noise.synth   , tnd * 1.849 );
+	Synth_volume( &this->dmc.synth     , tnd );
 	
 	this->square1 .osc.last_amp = 0;
 	this->square2 .osc.last_amp = 0;
@@ -62,11 +62,13 @@ void Apu_enable_nonlinear( struct Nes_Apu* this, int v )
 
 void Apu_volume( struct Nes_Apu* this, int v )
 {
-	this->dmc.nonlinear = false;
-	Synth_volume( &this->square_synth,  (int)((long long)(0.1128 *FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) );
-	Synth_volume( &this->triangle.synth,(int)((long long)(0.12765*FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) );
-	Synth_volume( &this->noise.synth,   (int)((long long)(0.0741 *FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) );
-	Synth_volume( &this->dmc.synth,     (int)((long long)(0.42545*FP_ONE_VOLUME) * v / 127       / FP_ONE_VOLUME) );
+	if ( !this->dmc.nonlinear )
+	{
+		Synth_volume( &this->square_synth,  (int)((long long)((0.125 * (1.0 /1.11)) * FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) ); // was 0.1128   1.108
+		Synth_volume( &this->triangle.synth,(int)((long long)((0.150 * (1.0 /1.11)) * FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) ); // was 0.12765  1.175
+		Synth_volume( &this->noise.synth,   (int)((long long)((0.095 * (1.0 /1.11)) * FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) ); // was 0.0741   1.282
+		Synth_volume( &this->dmc.synth,     (int)((long long)((0.450 * (1.0 /1.11)) * FP_ONE_VOLUME) * v / 2048      / FP_ONE_VOLUME) ); // was 0.42545  1.058
+	}
 }
 
 void Apu_output( struct Nes_Apu* this, struct Blip_Buffer* buffer )

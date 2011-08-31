@@ -4,7 +4,6 @@
 
 #include "ym2612_emu.h"
 
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>

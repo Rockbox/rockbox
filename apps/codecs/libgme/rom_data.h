@@ -20,22 +20,22 @@ enum { max_rom_size = 2 * max_pad_size };
 
 struct  Rom_Data {
 	byte* file_data;
-	blargg_ulong file_size;
+	unsigned file_size;
 	
-	blargg_long rom_addr;
-	blargg_long bank_size;
-	blargg_long rom_size;
-	blargg_ulong pad_size;
-	blargg_long mask;
-	blargg_long size; // TODO: eliminate
-	blargg_long rsize_;
+	int rom_addr;
+	int bank_size;
+	int rom_size;
+	unsigned pad_size;
+	int mask;
+	int size; // TODO: eliminate
+	int rsize_;
 	
 	// Unmapped space
 	byte unmapped [max_rom_size];
 };
 
 // Initialize rom
-static inline void Rom_init( struct Rom_Data* this, blargg_long bank_size )
+static inline void Rom_init( struct Rom_Data* this, int bank_size )
 {
 	this->bank_size = bank_size;
 	this->pad_size = this->bank_size + pad_extra;
@@ -47,10 +47,10 @@ static inline void Rom_init( struct Rom_Data* this, blargg_long bank_size )
 blargg_err_t Rom_load( struct Rom_Data* this, const void* data, long size, int header_size, void* header_out, int fill );
 
 // Set address that file data should start at
-void Rom_set_addr( struct Rom_Data* this, long addr );
+void Rom_set_addr( struct Rom_Data* this, int addr );
 
 // Mask address to nearest power of two greater than size()
-static inline blargg_long mask_addr( blargg_long addr, blargg_long mask )
+static inline int mask_addr( int addr, int mask )
 {
 	#ifdef check
 		check( addr <= mask );
@@ -59,10 +59,10 @@ static inline blargg_long mask_addr( blargg_long addr, blargg_long mask )
 }
 
 // Pointer to page starting at addr. Returns unmapped() if outside data.
-static inline byte* Rom_at_addr( struct Rom_Data* this, blargg_long addr )
+static inline byte* Rom_at_addr( struct Rom_Data* this, int addr )
 {
-	blargg_ulong offset = mask_addr( addr, this->mask ) - this->rom_addr;
-	if ( offset > (blargg_ulong) (this->rsize_ - this->pad_size) )
+	unsigned offset = mask_addr( addr, this->mask ) - this->rom_addr;
+	if ( offset > (unsigned) (this->rsize_ - this->pad_size) )
 		offset = 0; // unmapped
 			
 	if ( offset < this->pad_size ) return &this->unmapped [offset];

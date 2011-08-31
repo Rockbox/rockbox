@@ -7,16 +7,15 @@
 #include "blargg_common.h"
 #include "multi_buffer.h"
 
-typedef short sample_t;
+typedef short dsample_t;
 
-enum { stereo = 2 };
 enum { max_buf_size = 3960 };
 enum { max_resampler_size = 5942 };
 enum { write_offset = 8 * stereo };
 enum { gain_bits = 14 };
 
 struct Resampler {
-    int (*callback)( void*, blip_time_t, int, sample_t* );
+    int (*callback)( void*, blip_time_t, int, dsample_t* );
     void* callback_data;
 
     int sample_buffer_size;
@@ -34,8 +33,8 @@ struct Resampler {
 
     int rate_;
 
-    sample_t sample_buf [max_buf_size];
-    sample_t buf [max_resampler_size];   // Internal resampler
+    dsample_t sample_buf [max_buf_size];
+    dsample_t buf [max_resampler_size];   // Internal resampler
 };
 
 static inline void Resampler_init( struct Resampler* this )
@@ -50,9 +49,9 @@ static inline void Resampler_init( struct Resampler* this )
 
 blargg_err_t Resampler_reset( struct Resampler* this, int max_pairs );
 void Resampler_resize( struct Resampler* this, int pairs_per_frame );
-void Resampler_play( struct Resampler* this, int count, sample_t* out, struct Blip_Buffer* );
+void Resampler_play( struct Resampler* this, int count, dsample_t* out, struct Blip_Buffer* );
 
-static inline void Resampler_set_callback(struct Resampler* this, int (*func)( void*, blip_time_t, int, sample_t* ), void* user_data )
+static inline void Resampler_set_callback(struct Resampler* this, int (*func)( void*, blip_time_t, int, dsample_t* ), void* user_data )
 {
     this->callback = func;
     this->callback_data = user_data;

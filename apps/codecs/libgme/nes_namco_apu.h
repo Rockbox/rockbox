@@ -15,13 +15,13 @@ enum { namco_data_reg_addr = 0x4800 };
 enum { namco_reg_count = 0x80 };
 
 struct Namco_Osc {
-	blargg_long delay;
+	int delay;
 	struct Blip_Buffer* output;
 	short last_amp;
 	short wave_pos;
 };
 
-struct Nes_Namco_Apu {	
+struct Nes_Namco_Apu {
 	struct Namco_Osc oscs [namco_osc_count];
 	
 	blip_time_t last_time;

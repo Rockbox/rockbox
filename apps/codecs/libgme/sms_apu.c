@@ -158,9 +158,7 @@ static void run_until( struct Sms_Apu* this, blip_time_t end_time )
 			if ( delta )
 			{
 				osc->last_amp = amp;
-				/* norm_synth.offset( last_time, delta, out ); */
 				Synth_offset( &this->synth, this->last_time, delta, out );
-				/* out->set_modified(); */
 				Blip_set_modified( out );
 			}
 		}
@@ -200,7 +198,6 @@ static void run_until( struct Sms_Apu* this, blip_time_t end_time )
 					do
 					{
 						delta = -delta;
-						/* norm_synth.offset( time, delta, out ); */
 						Synth_offset( &this->synth, time, delta, out );
 						time += period;
 					}
@@ -218,7 +215,6 @@ static void run_until( struct Sms_Apu* this, blip_time_t end_time )
 						if ( changed & 2 ) // true if bits 0 and 1 differ
 						{
 							delta = -delta;
-							/* fast_synth.offset_inline( time, delta, out ); */
 							Synth_offset_inline( &this->synth, time, delta, out );
 						}
 						time += period;

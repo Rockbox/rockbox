@@ -3,7 +3,6 @@
 #include "gbs_emu.h"
 
 #include "blargg_endian.h"
-#include "blargg_source.h"
 
 /* Copyright (C) 2003-2006 Shay Green. this module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -16,30 +15,17 @@ details. You should have received a copy of the GNU Lesser General Public
 License along with this module; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
+#include "blargg_source.h"
 
 const char gme_wrong_file_type [] = "Wrong file type for this emulator";
 
 int const idle_addr = 0xF00D;
 int const tempo_unit = 16;
 
-int const stereo = 2; // number of channels for stereo
-int const silence_max = 6; // seconds
-int const silence_threshold = 0x10;
-long const fade_block_size = 512;
-int const fade_shift = 8; // fade ends with gain at 1.0 / (1 << fade_shift)
-
 static void clear_track_vars( struct Gbs_Emu* this )
 {
-	this->current_track_   = -1;
-	this->out_time         = 0;
-	this->emu_time         = 0;
-	this->emu_track_ended_ = true;
-	this->track_ended      = true;
-	this->fade_start       = (blargg_long)(LONG_MAX / 2 + 1);
-	this->fade_step        = 1;
-	this->silence_time     = 0;
-	this->silence_count    = 0;
-	this->buf_remain       = 0;
+	this->current_track_    = -1;
+	track_stop( &this->track_filter );
 }
 
 void Gbs_init( struct Gbs_Emu* this )
@@ -50,11 +36,13 @@ void Gbs_init( struct Gbs_Emu* this )
 	
 	// Unload
 	this->header.timer_mode = 0;
-	clear_track_vars( this );
 
-	this->ignore_silence     = false;
-	this->silence_lookahead = 6;
-	this->max_initial_silence = 21;
+	// defaults
+	this->tfilter = *track_get_setup( &this->track_filter );
+	this->tfilter.max_initial = 21;
+	this->tfilter.lookahead   = 6;
+	this->track_filter.silence_ignored_ = false;
+
 	Sound_set_gain( this, (int)(FP_ONE_GAIN*1.2) );
 	
 	Rom_init( &this->rom, 0x4000 );
@@ -67,6 +55,11 @@ void Gbs_init( struct Gbs_Emu* this )
 	
 	// Reduce apu sound clicks?
 	Apu_reduce_clicks( &this->apu, true );
+	
+	// clears fields
+	this->voice_count_ = 0;
+	this->voice_types_ = 0;
+	clear_track_vars( this );
 }
 
 static blargg_err_t check_gbs_header( void const* header )
@@ -78,11 +71,12 @@ static blargg_err_t check_gbs_header( void const* header )
 
 // Setup
 
-blargg_err_t Gbs_load( struct Gbs_Emu* this, void* data, long size )
+blargg_err_t Gbs_load_mem( struct Gbs_Emu* this, void* data, long size )
 {
 	// Unload
 	this->header.timer_mode = 0;
 	this->voice_count_ = 0;
+	this->track_count = 0;
 	this->m3u.size = 0;
 	clear_track_vars( this );
 
@@ -112,20 +106,24 @@ blargg_err_t Gbs_load( struct Gbs_Emu* this, void* data, long size )
 	Rom_set_addr( &this->rom, load_addr );
 
 	this->voice_count_ = osc_count;
+	static int const types [osc_count] = {
+		wave_type+1, wave_type+2, wave_type+3, mixed_type+1
+	};
+	this->voice_types_ = types;
+	
 	Apu_volume( &this->apu, this->gain_ );
 
 	// Change clock rate & setup buffer
 	this->clock_rate_ = 4194304;
 	Buffer_clock_rate( &this->stereo_buf, 4194304 );
+	RETURN_ERR( Buffer_set_channel_count( &this->stereo_buf, this->voice_count_, this->voice_types_ ) );
 	this->buf_changed_count = Buffer_channels_changed_count( &this->stereo_buf );
 
 	// Post load
 	Sound_set_tempo( this, this->tempo_ );
-
-	// Remute voices
 	Sound_mute_voices( this, this->mute_mask_ );
 
-	// Reset track count
+	// Set track count
 	this->track_count = this->header.track_count;
 	return 0;
 }
@@ -134,7 +132,7 @@ blargg_err_t Gbs_load( struct Gbs_Emu* this, void* data, long size )
 
 // see gb_cpu_io.h for read/write functions
 
-void Set_bank( struct Gbs_Emu* this, int n )
+void set_bank( struct Gbs_Emu* this, int n )
 {
 	addr_t addr = mask_addr( n * this->rom.bank_size, this->rom.mask );
 	if ( addr == 0 && this->rom.size > this->rom.bank_size )
@@ -142,7 +140,7 @@ void Set_bank( struct Gbs_Emu* this, int n )
 	Cpu_map_code( &this->cpu, this->rom.bank_size, this->rom.bank_size, Rom_at_addr( &this->rom, addr ) );
 }
 
-void Update_timer( struct Gbs_Emu* this )
+void update_timer( struct Gbs_Emu* this )
 {
 	this->play_period = 70224 / tempo_unit; /// 59.73 Hz
 	
@@ -161,21 +159,21 @@ void Update_timer( struct Gbs_Emu* this )
 
 // Jumps to routine, given pointer to address in file header. Pushes idle_addr
 // as return address, NOT old PC.
-void Jsr_then_stop( struct Gbs_Emu* this, byte const addr [] )
+void jsr_then_stop( struct Gbs_Emu* this, byte const addr [] )
 {
 	check( this->cpu.r.sp == get_le16( this->header.stack_ptr ) );
 	this->cpu.r.pc = get_le16( addr );
-	Write_mem( this, --this->cpu.r.sp, idle_addr >> 8 );
-	Write_mem( this, --this->cpu.r.sp, idle_addr      );
+	write_mem( this, --this->cpu.r.sp, idle_addr >> 8 );
+	write_mem( this, --this->cpu.r.sp, idle_addr      );
 }
 
-static blargg_err_t Run_until( struct Gbs_Emu* this, int end )
+static blargg_err_t run_until( struct Gbs_Emu* this, int end )
 {
 	this->end_time = end;
 	Cpu_set_time( &this->cpu, Cpu_time( &this->cpu ) - end );
 	while ( true )
 	{
-		Run_cpu( this );
+		run_cpu( this );
 		if ( Cpu_time( &this->cpu ) >= 0 )
 			break;
 		
@@ -190,7 +188,7 @@ static blargg_err_t Run_until( struct Gbs_Emu* this, int end )
 			if ( Cpu_time( &this->cpu ) < this->next_play - this->end_time )
 				Cpu_set_time( &this->cpu, this->next_play - this->end_time );
 			this->next_play += this->play_period;
-			Jsr_then_stop( this, this->header.play_addr );
+			jsr_then_stop( this, this->header.play_addr );
 		}
 		else if ( this->cpu.r.pc > 0xFFFF )
 		{
@@ -208,9 +206,9 @@ static blargg_err_t Run_until( struct Gbs_Emu* this, int end )
 	return 0;
 }
 
-static blargg_err_t End_frame( struct Gbs_Emu* this, int end )
+static blargg_err_t end_frame( struct Gbs_Emu* this, int end )
 {
-	RETURN_ERR( Run_until( this, end ) );
+	RETURN_ERR( run_until( this, end ) );
 	
 	this->next_play -= end;
 	if ( this->next_play < 0 ) // happens when play routine takes too long
@@ -226,16 +224,19 @@ static blargg_err_t End_frame( struct Gbs_Emu* this, int end )
 	return 0;
 }
 
-blargg_err_t Run_clocks( struct Gbs_Emu* this, blip_time_t duration )
+blargg_err_t run_clocks( struct Gbs_Emu* this, blip_time_t duration )
 {
-	return End_frame( this, duration );
+	return end_frame( this, duration );
 }
 
-static blargg_err_t play_( struct Gbs_Emu* this, long count, sample_t* out )
+blargg_err_t play_( void* emu, int count, sample_t* out )
 {
-	long remain = count;
+	struct Gbs_Emu* this = (struct Gbs_Emu*) emu;
+	
+	int remain = count;
 	while ( remain )
 	{
+		Buffer_disable_immediate_removal( &this->stereo_buf );
 		remain -= Buffer_read_samples( &this->stereo_buf, &out [count - remain], remain );
 		if ( remain )
 		{
@@ -247,8 +248,8 @@ static blargg_err_t play_( struct Gbs_Emu* this, long count, sample_t* out )
 				Sound_mute_voices( this, this->mute_mask_ );
 			}
 			int msec = Buffer_length( &this->stereo_buf );
-			blip_time_t clocks_emulated = (blargg_long) msec * this->clock_rate_ / 1000;
-			RETURN_ERR( Run_clocks( this, clocks_emulated ) );
+			blip_time_t clocks_emulated = msec * this->clock_rate_ / 1000 - 100;
+			RETURN_ERR( run_clocks( this, clocks_emulated ) );
 			assert( clocks_emulated );
 			Buffer_end_frame( &this->stereo_buf, clocks_emulated );
 		}
@@ -256,7 +257,7 @@ static blargg_err_t play_( struct Gbs_Emu* this, long count, sample_t* out )
 	return 0;
 }
 
-blargg_err_t Gbs_set_sample_rate( struct Gbs_Emu* this, long rate )
+blargg_err_t Gbs_set_sample_rate( struct Gbs_Emu* this, int rate )
 {
 	require( !this->sample_rate_ ); // sample rate can't be changed once set
 	Buffer_init( &this->stereo_buf );
@@ -266,6 +267,8 @@ blargg_err_t Gbs_set_sample_rate( struct Gbs_Emu* this, long rate )
 	Buffer_bass_freq( &this->stereo_buf, 300 );
 	
 	this->sample_rate_ = rate;
+	RETURN_ERR( track_init( &this->track_filter, this ) );
+	this->tfilter.max_silence = 6 * stereo * this->sample_rate_;
 	return 0;
 }
 
@@ -296,7 +299,7 @@ void Sound_mute_voices( struct Gbs_Emu* this, int mask )
 		}
 		else
 		{
-			struct channel_t ch = Buffer_channel( &this->stereo_buf );
+			struct channel_t ch = Buffer_channel( &this->stereo_buf, i );
 			assert( (ch.center && ch.left && ch.right) ||
 					(!ch.center && !ch.left && !ch.right) ); // all or nothing
 			Apu_set_output( &this->apu, i, ch.center, ch.left, ch.right );
@@ -315,10 +318,9 @@ void Sound_set_tempo( struct Gbs_Emu* this, int t )
 		
 	this->tempo = (int) ((tempo_unit * FP_ONE_TEMPO) / t);
 	Apu_set_tempo( &this->apu, t );
-	Update_timer( this );
+	update_timer( this );
 }
 
-void fill_buf( struct Gbs_Emu* this );
 blargg_err_t Gbs_start_track( struct Gbs_Emu* this, int track )
 {
 	clear_track_vars( this );
@@ -330,7 +332,6 @@ blargg_err_t Gbs_start_track( struct Gbs_Emu* this, int track )
 	}
 
 	this->current_track_ = track;
-	
 	Buffer_clear( &this->stereo_buf );
 	
 	// Reset APU to state expected by most rips
@@ -364,268 +365,88 @@ blargg_err_t Gbs_start_track( struct Gbs_Emu* this, int track )
 	Cpu_reset( &this->cpu, this->rom.unmapped );
 	Cpu_map_code( &this->cpu, ram_addr, 0x10000 - ram_addr, this->ram );
 	Cpu_map_code( &this->cpu, 0, this->rom.bank_size, Rom_at_addr( &this->rom, 0 ) );
-	Set_bank( this, this->rom.size > this->rom.bank_size );
+	set_bank( this, this->rom.size > this->rom.bank_size );
 	
-	Update_timer( this );
+	update_timer( this );
 	this->next_play = this->play_period;
 	this->cpu.r.rp.fa  = track;
 	this->cpu.r.sp = get_le16( this->header.stack_ptr );
 	this->cpu_time  = 0;
-	Jsr_then_stop( this, this->header.init_addr );
+	jsr_then_stop( this, this->header.init_addr );
 	
-	this->emu_track_ended_ = false;
-	this->track_ended     = false;
+	// convert filter times to samples
+	struct setup_t s = this->tfilter;
+	s.max_initial *= this->sample_rate_ * stereo;
+	#ifdef GME_DISABLE_SILENCE_LOOKAHEAD
+		s.lookahead = 1;
+	#endif
+	track_setup( &this->track_filter, &s );
 	
-	if ( !this->ignore_silence )
-	{
-		// play until non-silence or end of track
-		long end;
-		for ( end = this->max_initial_silence * stereo * this->sample_rate_; this->emu_time < end; )
-		{
-			fill_buf( this );
-			if ( this->buf_remain | (int) this->emu_track_ended_ )
-				break;
-		}
-		
-		this->emu_time      = this->buf_remain;
-		this->out_time      = 0;
-		this->silence_time  = 0;
-		this->silence_count = 0;
-	}
-	/* return track_ended() ? warning() : 0; */
-	return 0;
+	return track_start( &this->track_filter );
 }
 
 
 // Track
 
-static blargg_long msec_to_samples( blargg_long msec, long sample_rate )
+static int msec_to_samples( int msec, int sample_rate )
 {
-	blargg_long sec = msec / 1000;
+	int sec = msec / 1000;
 	msec -= sec * 1000;
 	return (sec * sample_rate + msec * sample_rate / 1000) * stereo;
 }
 
-long Track_tell( struct Gbs_Emu* this ) 
+int Track_tell( struct Gbs_Emu* this ) 
 {
-	blargg_long rate = this->sample_rate_ * stereo;
-	blargg_long sec = this->out_time / rate;
-	return sec * 1000 + (this->out_time - sec * rate) * 1000 / rate;
+	int rate = this->sample_rate_ * stereo;
+	int sec = track_sample_count( &this->track_filter ) / rate;
+	return sec * 1000 + (track_sample_count( &this->track_filter ) - sec * rate) * 1000 / rate;
 }
 
-blargg_err_t Track_seek( struct Gbs_Emu* this, long msec )
+blargg_err_t Track_seek( struct Gbs_Emu* this, int msec )
 {
-	blargg_long time = msec_to_samples( msec, this->sample_rate_ );
-	if ( time < this->out_time )
-		RETURN_ERR( Gbs_start_track( this, this->current_track_ ) );
-	return Track_skip( this, time - this->out_time );
+	int time = msec_to_samples( msec, this->sample_rate_ );
+	if ( time < track_sample_count( &this->track_filter ) )
+	RETURN_ERR( Gbs_start_track( this, this->current_track_ ) );
+	return Track_skip( this, time - track_sample_count( &this->track_filter ) );
 }
 
-static blargg_err_t skip_( struct Gbs_Emu* this, long count )
+blargg_err_t skip_( void* emu, int count )
 {
+	struct Gbs_Emu* this = (struct Gbs_Emu*) emu;
+	
 	// for long skip, mute sound
-	const long threshold = 30000;
+	const int threshold = 32768;
 	if ( count > threshold )
 	{
 		int saved_mute = this->mute_mask_;
 		Sound_mute_voices( this, ~0 );
-		
-		while ( count > threshold / 2 && !this->emu_track_ended_ )
-		{
-			RETURN_ERR( play_( this, buf_size, this->buf ) );
-			count -= buf_size;
-		}
-		
+
+		int n = count - threshold/2;
+		n &= ~(2048-1); // round to multiple of 2048
+		count -= n;
+		RETURN_ERR( skippy_( &this->track_filter, n ) );
+
 		Sound_mute_voices( this, saved_mute );
 	}
-	
-	while ( count && !this->emu_track_ended_ )
-	{
-		long n = buf_size;
-		if ( n > count )
-			n = count;
-		count -= n;
-		RETURN_ERR( play_( this, n, this->buf ) );
-	}
-	return 0;
+
+	return skippy_( &this->track_filter, count );
 }
 
-blargg_err_t Track_skip( struct Gbs_Emu* this, long count )
+blargg_err_t Track_skip( struct Gbs_Emu* this, int count )
 {
 	require( this->current_track_ >= 0 ); // start_track() must have been called already
-	this->out_time += count;
-	
-	// remove from silence and buf first
-	{
-		long n = min( count, this->silence_count );
-		this->silence_count -= n;
-		count -= n;
-		
-		n = min( count, this->buf_remain );
-		this->buf_remain -= n;
-		count -= n;
-	}
-		
-	if ( count && !this->emu_track_ended_ )
-	{
-		this->emu_time += count;
-		// End track if error
-		if ( skip_( this, count ) )
-			this->emu_track_ended_ = true;
-	}
-	
-	if ( !(this->silence_count | this->buf_remain) ) // caught up to emulator, so update track ended
-		this->track_ended |= this->emu_track_ended_;
-	
-	return 0;
+	return track_skip( &this->track_filter, count );
 }
 
-// Fading
-
-void Track_set_fade( struct Gbs_Emu* this, long start_msec, long length_msec )
+void Track_set_fade( struct Gbs_Emu* this, int start_msec, int length_msec )
 {
-	this->fade_step = this->sample_rate_ * length_msec / (fade_block_size * fade_shift * 1000 / stereo);
-	this->fade_start = msec_to_samples( start_msec, this->sample_rate_ );
+	track_set_fade( &this->track_filter, msec_to_samples( start_msec, this->sample_rate_ ),
+		length_msec * this->sample_rate_ / (1000 / stereo) );
 }
 
-// unit / pow( 2.0, (double) x / step )
-static int int_log( blargg_long x, int step, int unit )
+blargg_err_t Gbs_play( struct Gbs_Emu* this, int out_count, sample_t* out )
 {
-	int shift = x / step;
-	int fraction = (x - shift * step) * unit / step;
-	return ((unit - fraction) + (fraction >> 1)) >> shift;
-}
-
-static void handle_fade( struct Gbs_Emu* this, long out_count, sample_t* out )
-{
-	int i;
-	for ( i = 0; i < out_count; i += fade_block_size )
-	{
-		int const shift = 14;
-		int const unit = 1 << shift;
-		int gain = int_log( (this->out_time + i - this->fade_start) / fade_block_size,
-				this->fade_step, unit );
-		if ( gain < (unit >> fade_shift) )
-			this->track_ended = this->emu_track_ended_ = true;
-		
-		sample_t* io = &out [i];
-		int count;
-		for ( count = min( fade_block_size, out_count - i ); count; --count )
-		{
-			*io = (sample_t) ((*io * gain) >> shift);
-			++io;
-		}
-	}
-}
-
-// Silence detection
-
-static void emu_play( struct Gbs_Emu* this, long count, sample_t* out )
-{
-	check( current_track_ >= 0 );
-	this->emu_time += count;
-	if ( this->current_track_ >= 0 && !this->emu_track_ended_ ) {
-		// End track if error
-		if ( play_( this, count, out ) ) this->emu_track_ended_ = true; 
-	}
-	else
-		memset( out, 0, count * sizeof *out );
-}
-
-// number of consecutive silent samples at end
-static long count_silence( sample_t* begin, long size )
-{
-	sample_t first = *begin;
-	*begin = silence_threshold; // sentinel
-	sample_t* p = begin + size;
-	while ( (unsigned) (*--p + silence_threshold / 2) <= (unsigned) silence_threshold ) { }
-	*begin = first;
-	return size - (p - begin);
-}
-
-// fill internal buffer and check it for silence
-void fill_buf( struct Gbs_Emu* this )
-{
-	assert( !this->buf_remain );
-	if ( !this->emu_track_ended_ )
-	{
-		emu_play( this, buf_size, this->buf );
-		long silence = count_silence( this->buf, buf_size );
-		if ( silence < buf_size )
-		{
-			this->silence_time = this->emu_time - silence;
-			this->buf_remain   = buf_size;
-			return;
-		}
-	}
-	this->silence_count += buf_size;
-}
-
-blargg_err_t Gbs_play( struct Gbs_Emu* this, long out_count, sample_t* out )
-{
-	if ( this->track_ended )
-	{
-		memset( out, 0, out_count * sizeof *out );
-	}
-	else
-	{
-		require( this->current_track_ >= 0 );
-		require( out_count % stereo == 0 );
-		
-		assert( this->emu_time >= this->out_time );
-		
-		long pos = 0;
-		if ( this->silence_count )
-		{
-			// during a run of silence, run emulator at >=2x speed so it gets ahead
-			long ahead_time = this->silence_lookahead * (this->out_time + out_count - this->silence_time) + this->silence_time;
-			while ( this->emu_time < ahead_time && !(this->buf_remain | this->emu_track_ended_) )
-				fill_buf( this );
-			
-			// fill with silence
-			pos = min( this->silence_count, out_count );
-			memset( out, 0, pos * sizeof *out );
-			this->silence_count -= pos;
-			
-			if ( this->emu_time - this->silence_time > silence_max * stereo * this->sample_rate_ )
-			{
-				this->track_ended  = this->emu_track_ended_ = true;
-				this->silence_count = 0;
-				this->buf_remain    = 0;
-			}
-		}
-		
-		if ( this->buf_remain )
-		{
-			// empty silence buf
-			long n = min( this->buf_remain, out_count - pos );
-			memcpy( &out [pos], this->buf + (buf_size - this->buf_remain), n * sizeof *out );
-			this->buf_remain -= n;
-			pos += n;
-		}
-		
-		// generate remaining samples normally
-		long remain = out_count - pos;
-		if ( remain )
-		{
-			emu_play( this, remain, out + pos );
-			this->track_ended |= this->emu_track_ended_;
-			
-			if ( !this->ignore_silence || this->out_time > this->fade_start )
-			{
-				// check end for a new run of silence
-				long silence = count_silence( out + pos, remain );
-				if ( silence < remain )
-					this->silence_time = this->emu_time - silence;
-				
-				if ( this->emu_time - this->silence_time >= buf_size )
-					fill_buf( this ); // cause silence detection on next play()
-			}
-		}
-		
-		if ( this->out_time > this->fade_start )
-			handle_fade( this, out_count, out );
-	}
-	this->out_time += out_count;
-	return 0;
+	require( this->current_track_ >= 0 );
+	require( out_count % stereo == 0 );
+	return track_play( &this->track_filter, out_count, out );
 }

@@ -74,7 +74,7 @@ enum codec_status codec_run(void)
     }
    
     if ((err = Ay_load_mem(&ay_emu, buf, ci->filesize))) {
-        DEBUGF("AY: Ay_load failed (%s)\n", err);
+        DEBUGF("AY: Ay_load_mem failed (%s)\n", err);
         return CODEC_ERROR;
     }
 
@@ -118,7 +118,7 @@ next_track:
 
         /* Generate audio buffer */
         err = Ay_play(&ay_emu, CHUNK_SIZE, samples);
-        if (err || ay_emu.track_ended) {
+        if (err || Track_ended(&ay_emu)) {
             track++;
             if (track >= ay_emu.track_count) break;
             goto next_track;

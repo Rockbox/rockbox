@@ -12,8 +12,8 @@ enum { adpcm_amp_range = 2048 };
 enum { adpcm_osc_count = 1 }; // 0 <= chan < osc_count
 
 // Registers are at io_addr to io_addr+io_size-1
-enum { io_addr = 0x1800 };
-enum { io_size = 0x400 };
+enum { adpcm_io_addr = 0x1800 };
+enum { adpcm_io_size = 0x400 };
 
 struct State
 {

@@ -16,8 +16,8 @@
 #include "ay_apu.h"
 #include "opl_apu.h"
 #include "m3u_playlist.h"
+#include "track_filter.h"
 
-typedef short sample_t;
 typedef int kss_time_t;
 typedef int kss_addr_t;
 typedef struct Z80_Cpu Kss_Cpu;
@@ -35,7 +35,6 @@ enum {
 enum { idle_addr = 0xFFFF };
 enum { scc_enabled_true = 0xC000 };
 enum { mem_size = 0x10000 };
-enum { buf_size = 2048 };
 
 // KSS file header
 enum { header_size = 0x20 };
@@ -53,7 +52,7 @@ struct header_t
 	byte bank_mode;
 	byte extra_header;
 	byte device_flags;
-		
+	
 	// KSSX extended data, if extra_header==0x10
 	byte data_size [4];
 	byte unused [4];
@@ -69,7 +68,7 @@ struct sms_t {
 	struct Sms_Apu psg;
 	struct Opl_Apu fm;
 };
-		
+
 struct msx_t {
 	struct Ay_Apu  psg;
 	struct Scc_Apu scc;
@@ -84,8 +83,6 @@ struct Kss_Emu {
 	bool scc_accessed;
 	bool gain_updated;
 	
-	int track_count;
-	
 	unsigned scc_enabled; // 0 or 0xC000
 	int bank_count;
 	
@@ -94,48 +91,34 @@ struct Kss_Emu {
 	int ay_latch;
 	
 	// general
-	int max_initial_silence;
 	int voice_count;
+	int const* voice_types;
 	int mute_mask_;
 	int tempo;
 	int gain;
 	
-	long sample_rate;
+	int sample_rate;
 	
 	// track-specific
+	int track_count;
 	int current_track;
-	blargg_long out_time;  // number of samples played since start of track
-	blargg_long emu_time;  // number of samples emulator has generated since start of track
-	bool emu_track_ended_; // emulator has reached end of track
-	volatile bool track_ended;
 	
-	// fading
-	blargg_long fade_start;
-	int fade_step;
-	
-	// silence detection
-	int silence_lookahead; // speed to run emulator when looking ahead for silence
-	bool ignore_silence;
-	long silence_time;     // number of samples where most recent silence began
-	long silence_count;    // number of samples of silence to play before using buf
-	long buf_remain;       // number of samples left in silence buffer
-	
-	struct Stereo_Buffer stereo_buffer; // NULL if using custom buffer
-	long clock_rate_;
+	int clock_rate_;
 	unsigned buf_changed_count;
 	
-		// M3u Playlist
+	// M3u Playlist
 	struct M3u_Playlist m3u;
 	
-	// large items
-	sample_t buf [buf_size];
+	struct setup_t tfilter;
+	struct Track_Filter track_filter;
 	
 	struct sms_t sms;
 	struct msx_t msx;
 
 	Kss_Cpu cpu;
+	struct Multi_Buffer stereo_buf; // NULL if using custom buffer
 	struct Rom_Data rom;
-		
+	
 	byte unmapped_read  [0x100];
 	byte unmapped_write [page_size];
 	byte ram [mem_size + cpu_padding];
@@ -148,34 +131,46 @@ blargg_err_t Kss_load_mem( struct Kss_Emu* this, const void* data, long size );
 blargg_err_t end_frame( struct Kss_Emu* this, kss_time_t );
 
 // Set output sample rate. Must be called only once before loading file.
-blargg_err_t Kss_set_sample_rate( struct Kss_Emu* this, long sample_rate );
+blargg_err_t Kss_set_sample_rate( struct Kss_Emu* this, int sample_rate );
 
 // Start a track, where 0 is the first track. Also clears warning string.
 blargg_err_t Kss_start_track( struct Kss_Emu* this, int track );
 
 // Generate 'count' samples info 'buf'. Output is in stereo. Any emulation
 // errors set warning string, and major errors also end track.
-blargg_err_t Kss_play( struct Kss_Emu* this, long count, sample_t* buf );
+blargg_err_t Kss_play( struct Kss_Emu* this, int count, sample_t* buf );
 
 // Track status/control
 
 // Number of milliseconds (1000 msec = 1 second) played since beginning of track
-long Track_tell( struct Kss_Emu* this );
+int Track_tell( struct Kss_Emu* this );
 
 // Seek to new time in track. Seeking backwards or far forward can take a while.
-blargg_err_t Track_seek( struct Kss_Emu* this, long msec );
+blargg_err_t Track_seek( struct Kss_Emu* this, int msec );
 
 // Skip n samples
-blargg_err_t Track_skip( struct Kss_Emu* this, long n );
+blargg_err_t Track_skip( struct Kss_Emu* this, int n );
 
 // Set start time and length of track fade out. Once fade ends track_ended() returns
 // true. Fade time can be changed while track is playing.
-void Track_set_fade( struct Kss_Emu* this, long start_msec, long length_msec );
+void Track_set_fade( struct Kss_Emu* this, int start_msec, int length_msec );
+
+// True if a track has reached its end
+static inline bool Track_ended( struct Kss_Emu* this )
+{
+	return track_ended( &this->track_filter );
+}
+
+// Disables automatic end-of-track detection and skipping of silence at beginning
+static inline void Track_ignore_silence( struct Kss_Emu* this, bool disable )
+{
+	this->track_filter.silence_ignored_ = disable;
+}
 
 // Get track length in milliseconds
-static inline long Track_get_length( struct Kss_Emu* this, int n )
+static inline int Track_get_length( struct Kss_Emu* this, int n )
 {
-	long length = 0;
+	int length = 0;
 	
 	if ( (this->m3u.size > 0) && (n < this->m3u.size) ) {
 		struct entry_t* entry = &this->m3u.entries [n];

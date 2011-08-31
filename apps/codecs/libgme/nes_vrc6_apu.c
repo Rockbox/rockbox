@@ -83,7 +83,6 @@ void run_square( struct Nes_Vrc6_Apu* this, struct Vrc6_Osc* osc, blip_time_t en
 	struct Blip_Buffer* output = osc->output;
 	if ( !output )
 		return;
-	Blip_set_modified( output );
 	
 	int volume = osc->regs [0] & 15;
 	if ( !(osc->regs [2] & 0x80) )
@@ -96,6 +95,7 @@ void run_square( struct Nes_Vrc6_Apu* this, struct Vrc6_Osc* osc, blip_time_t en
 	if ( delta )
 	{
 		osc->last_amp += delta;
+		Blip_set_modified( output );
 		Synth_offset( &this->square_synth, time, delta, output );
 	}
 	

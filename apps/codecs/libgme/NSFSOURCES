@@ -12,3 +12,4 @@ nsfe_info.c
 blip_buffer.c
 multi_buffer.c
 rom_data.c
+track_filter.c

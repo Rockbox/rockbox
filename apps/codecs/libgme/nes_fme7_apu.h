@@ -1,6 +1,6 @@
 // Sunsoft FME-7 sound emulator
 
-// Game_Music_Emu 0.5.5
+// Game_Music_Emu 0.6-pre
 #ifndef NES_FME7_APU_H
 #define NES_FME7_APU_H
 

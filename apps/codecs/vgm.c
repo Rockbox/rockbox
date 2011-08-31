@@ -130,7 +130,7 @@ enum codec_status codec_run(void)
 
         /* Generate audio buffer */
         err = Vgm_play(&vgm_emu, CHUNK_SIZE, samples);
-        if (err || vgm_emu.track_ended) break;
+        if (err || Track_ended(&vgm_emu)) break;
 
         ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE >> 1);
 

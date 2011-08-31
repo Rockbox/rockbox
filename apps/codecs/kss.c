@@ -98,7 +98,7 @@ next_track:
 
         /* Generate audio buffer */
         err = Kss_play(&kss_emu, CHUNK_SIZE, samples);
-        if (err || kss_emu.track_ended) {
+        if (err || Track_ended(&kss_emu)) {
             track++;
             if (track >= kss_emu.track_count) break;
             goto next_track;

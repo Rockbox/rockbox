@@ -154,8 +154,8 @@ blargg_err_t Info_load( struct Nsfe_Info* this, void* data, long size, struct Ns
 		byte block_header [2] [4];
 		RETURN_ERR( in_read( block_header, sizeof block_header, data, &offset, size ) );
 		
-		blargg_long chunk_size = get_le32( block_header [0] );
-		blargg_long tag  = get_le32( block_header [1] );
+		int chunk_size = get_le32( block_header [0] );
+		int tag  = get_le32( block_header [1] );
 		
 		switch ( tag )
 		{
@@ -168,7 +168,7 @@ blargg_err_t Info_load( struct Nsfe_Info* this, void* data, long size, struct Ns
 				finfo.track_count = 1;
 				finfo.first_track = 0;
 				
-				RETURN_ERR( in_read( &finfo, min( chunk_size, (blargg_long) nsfe_info_size ), 
+				RETURN_ERR( in_read( &finfo, min( chunk_size, nsfe_info_size ), 
 					(char*) data, &offset, size ) );
 				
 				if ( chunk_size > nsfe_info_size )
@@ -248,9 +248,9 @@ blargg_err_t Info_load( struct Nsfe_Info* this, void* data, long size, struct Ns
 	return 0;
 }
 
-long Track_length( struct Nsf_Emu* this, int n )
+int Track_length( struct Nsf_Emu* this, int n )
 {
-	long length = 0; 
+	int length = 0; 
 	if ( (this->m3u.size > 0) && (n < this->m3u.size) ) {
 		struct entry_t* entry = &this->m3u.entries [n];
 		length = entry->length;

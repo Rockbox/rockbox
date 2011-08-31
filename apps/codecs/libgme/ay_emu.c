@@ -17,12 +17,6 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #include "blargg_source.h"
 
-int const stereo = 2; // number of channels for stereo
-int const silence_max = 6; // seconds
-int const silence_threshold = 0x10;
-long const fade_block_size = 512;
-int const fade_shift = 8; // fade ends with gain at 1.0 / (1 << fade_shift)
-
 const char* const gme_wrong_file_type = "Wrong file type for this emulator";
 
 // TODO: probably don't need detailed errors as to why file is corrupt
@@ -38,16 +32,7 @@ int const cpc_clock = 2000000;
 static void clear_track_vars( struct Ay_Emu *this )
 {
 	this->current_track    = -1;
-	this->out_time         = 0;
-	this->emu_time         = 0;
-	this->emu_track_ended_ = true;
-	this->track_ended      = true;
-	this->fade_start       = INT_MAX / 2 + 1;
-	this->fade_step        = 1;
-	this->silence_time     = 0;
-	this->silence_count    = 0;
-	this->buf_remain       = 0;
-	/* warning(); // clear warning */
+	track_stop( &this->track_filter );
 }
 
 void Ay_init( struct Ay_Emu *this )
@@ -59,18 +44,21 @@ void Ay_init( struct Ay_Emu *this )
 	this->track_count  = 0;
 	
 	// defaults
-	this->max_initial_silence = 2;
-	this->ignore_silence      = false;
+	this->tfilter = *track_get_setup( &this->track_filter );
+	this->tfilter.max_initial = 2;
+	this->tfilter.lookahead   = 6;
+	this->track_filter.silence_ignored_ = false;
 	
-	this->voice_count = 0;
-	clear_track_vars( this );
 	this->beeper_output = NULL;
 	disable_beeper( this );
 	
 	Ay_apu_init( &this->apu );
 	Z80_init( &this->cpu );
-
-	this->silence_lookahead = 6 ;
+	
+	// clears fields
+	this->voice_count = 0;
+	this->voice_types = 0;
+	clear_track_vars( this );
 }
 
 // Track info
@@ -107,35 +95,22 @@ static blargg_err_t parse_header( byte const in [], int size, struct file_t* out
 	return 0;
 }
 
-long Track_get_length( struct Ay_Emu* this, int n )
-{
-	long length = 0;
-
-	byte const* track_info = get_data( &this->file, this->file.tracks + n * 4 + 2, 6 );
-	if ( track_info )
-		length = get_be16( track_info + 4 ) * (1000 / 50); // frames to msec 
-
-	if ( (this->m3u.size > 0) && (n < this->m3u.size) ) {
-		struct entry_t* entry = &this->m3u.entries [n];
-		length = entry->length;
-	} 
-	
-	if ( length <= 0 )
-		length = 120 * 1000;  /* 2 minutes */ 
-
-	return length;
-}
-
 // Setup
 
-static void change_clock_rate( struct Ay_Emu *this, long rate )
+static void change_clock_rate( struct Ay_Emu *this, int rate )
 {
 	this->clock_rate_ = rate;
 	Buffer_clock_rate( &this->stereo_buf, rate );
 }
 
-blargg_err_t Ay_load_mem( struct Ay_Emu *this, byte const in [], int size )
+blargg_err_t Ay_load_mem( struct Ay_Emu *this, byte const in [], long size )
 {
+	// Unload
+	this->voice_count = 0;
+	this->track_count = 0;
+	this->m3u.size = 0;
+	clear_track_vars( this );
+
 	assert( offsetof (struct header_t,track_info [2]) == header_size );
 	
 	RETURN_ERR( parse_header( in, size, &this->file ) );
@@ -144,19 +119,22 @@ blargg_err_t Ay_load_mem( struct Ay_Emu *this, byte const in [], int size )
 		warning( "Unknown file version" ); */
 	
 	this->voice_count = ay_osc_count + 1; // +1 for beeper
+	static int const types [ay_osc_count + 1] = {
+		wave_type+0, wave_type+1, wave_type+2, mixed_type+1
+	};
+	this->voice_types = types;
+	
 	Ay_apu_volume( &this->apu, this->gain);
 	
 	// Setup buffer
 	change_clock_rate( this, spectrum_clock );
+	RETURN_ERR( Buffer_set_channel_count( &this->stereo_buf, this->voice_count, this->voice_types ) );
 	this->buf_changed_count = Buffer_channels_changed_count( &this->stereo_buf );
 	
 	Sound_set_tempo( this, this->tempo );
-	
-	// Remute voices
 	Sound_mute_voices( this, this->mute_mask_ );
 	
 	this->track_count = this->file.header->max_track + 1;
-	this->m3u.size = 0;
 	return 0;
 }
 
@@ -298,7 +276,7 @@ enable_cpc:
 	}
 }
 
-blargg_err_t Ay_set_sample_rate( struct Ay_Emu *this, long rate )
+blargg_err_t Ay_set_sample_rate( struct Ay_Emu *this, int rate )
 {
 	require( !this->sample_rate ); // sample rate can't be changed once set
 	Buffer_init( &this->stereo_buf );
@@ -308,6 +286,8 @@ blargg_err_t Ay_set_sample_rate( struct Ay_Emu *this, long rate )
 	Buffer_bass_freq( &this->stereo_buf, 160 );
 	
 	this->sample_rate = rate;
+	RETURN_ERR( track_init( &this->track_filter, this ) );
+	this->tfilter.max_silence = 6 * stereo * this->sample_rate;
 	return 0;
 }
 
@@ -335,7 +315,7 @@ void Sound_mute_voices( struct Ay_Emu *this, int mask )
 		}
 		else
 		{
-			struct channel_t ch = Buffer_channel( &this->stereo_buf );
+			struct channel_t ch = Buffer_channel( &this->stereo_buf, i );
 			assert( (ch.center && ch.left && ch.right) ||
 					(!ch.center && !ch.left && !ch.right) ); // all or nothing
 			set_voice( this, i, ch.center );
@@ -359,7 +339,6 @@ void Sound_set_tempo( struct Ay_Emu *this, int t )
 	this->play_period = (blip_time_t) ((p * FP_ONE_TEMPO) / t);
 }
 
-void fill_buf( struct Ay_Emu *this );;
 blargg_err_t Ay_start_track( struct Ay_Emu *this, int track )
 {
 	clear_track_vars( this );
@@ -496,272 +475,109 @@ blargg_err_t Ay_start_track( struct Ay_Emu *this, int track )
 	Ay_apu_write_addr( &this->apu, 7 );
 	Ay_apu_write_data( &this->apu, 0, 0x38 );
 	
-	this->emu_track_ended_ = false;
-	this->track_ended      = false;
+	// convert filter times to samples
+	struct setup_t s = this->tfilter;
+	s.max_initial *= this->sample_rate * stereo;
+	#ifdef GME_DISABLE_SILENCE_LOOKAHEAD
+		s.lookahead = 1;
+	#endif
+	track_setup( &this->track_filter, &s );
 	
-	if ( !this->ignore_silence )
-	{
-		// play until non-silence or end of track
-		long end;
-		for ( end = this->max_initial_silence * stereo * this->sample_rate; this->emu_time < end; )
-		{
-			fill_buf( this );
-			if ( this->buf_remain | (int) this->emu_track_ended_ )
-				break;
-		}
-		
-		this->emu_time      = this->buf_remain;
-		this->out_time      = 0;
-		this->silence_time  = 0;
-		this->silence_count = 0;
-	}
-	/* return track_ended() ? warning() : 0; */
-	return 0;
+	return track_start( &this->track_filter );
 }
 
 // Tell/Seek
 
-static blargg_long msec_to_samples( blargg_long msec, long sample_rate )
+static int msec_to_samples( int msec, int sample_rate )
 {
-	blargg_long sec = msec / 1000;
+	int sec = msec / 1000;
 	msec -= sec * 1000;
 	return (sec * sample_rate + msec * sample_rate / 1000) * stereo;
 }
 
-long Track_tell( struct Ay_Emu *this )
+int Track_tell( struct Ay_Emu *this )
 {
-	blargg_long rate = this->sample_rate * stereo;
-	blargg_long sec = this->out_time / rate;
-	return sec * 1000 + (this->out_time - sec * rate) * 1000 / rate;
+	int rate = this->sample_rate * stereo;
+	int sec = track_sample_count( &this->track_filter ) / rate;
+	return sec * 1000 + (track_sample_count( &this->track_filter ) - sec * rate) * 1000 / rate;
 }
 
-blargg_err_t Track_seek( struct Ay_Emu *this, long msec )
+blargg_err_t Track_seek( struct Ay_Emu *this, int msec )
 {
-	blargg_long time = msec_to_samples( msec, this->sample_rate );
-	if ( time < this->out_time )
-		RETURN_ERR( Ay_start_track( this, this->current_track ) );
-	return Track_skip( this, time - this->out_time );
+	int time = msec_to_samples( msec, this->sample_rate );
+	if ( time < track_sample_count( &this->track_filter ) )
+	RETURN_ERR( Ay_start_track( this, this->current_track ) );
+	return Track_skip( this, time - track_sample_count( &this->track_filter ) );
 }
 
-blargg_err_t play_( struct Ay_Emu *this, long count, sample_t* out );
-static blargg_err_t skip_( struct Ay_Emu *this, long count )
+blargg_err_t skip_( void *emu, int count )
 {
+	struct Ay_Emu* this = (struct Ay_Emu*) emu;
+	
 	// for long skip, mute sound
-	const long threshold = 30000;
+	const int threshold = 32768;
 	if ( count > threshold )
 	{
 		int saved_mute = this->mute_mask_;
 		Sound_mute_voices( this, ~0 );
-		
-		while ( count > threshold / 2 && !this->emu_track_ended_ )
-		{
-			RETURN_ERR( play_( this, buf_size, this->buf ) );
-			count -= buf_size;
-		}
-		
+
+		int n = count - threshold/2;
+		n &= ~(2048-1); // round to multiple of 2048
+		count -= n;
+		RETURN_ERR( skippy_( &this->track_filter, n ) );
+
 		Sound_mute_voices( this, saved_mute );
 	}
-	
-	while ( count && !this->emu_track_ended_ )
-	{
-		long n = buf_size;
-		if ( n > count )
-			n = count;
-		count -= n;
-		RETURN_ERR( play_( this, n, this->buf ) );
-	}
-	return 0;
+
+	return skippy_( &this->track_filter, count );
 }
 
-blargg_err_t Track_skip( struct Ay_Emu *this, long count )
+blargg_err_t Track_skip( struct Ay_Emu *this, int count )
 {
 	require( this->current_track >= 0 ); // start_track() must have been called already
-	this->out_time += count;
+	return track_skip( &this->track_filter, count );
+}
+
+int Track_get_length( struct Ay_Emu* this, int n )
+{
+	int length = 0;
+
+	byte const* track_info = get_data( &this->file, this->file.tracks + n * 4 + 2, 6 );
+	if ( track_info )
+		length = get_be16( track_info + 4 ) * (1000 / 50); // frames to msec 
+
+	if ( (this->m3u.size > 0) && (n < this->m3u.size) ) {
+		struct entry_t* entry = &this->m3u.entries [n];
+		length = entry->length;
+	} 
 	
-	// remove from silence and buf first
-	{
-		long n = min( count, this->silence_count );
-		this->silence_count -= n;
-		count -= n;
-		
-		n = min( count, this->buf_remain );
-		this->buf_remain -= n;
-		count -= n;
-	}
-		
-	if ( count && !this->emu_track_ended_ )
-	{
-		this->emu_time += count;
-		
-		// End track if error
-		if ( skip_( this, count ) )
-			this->emu_track_ended_ = true;
-	}
+	if ( length <= 0 )
+		length = 120 * 1000;  /* 2 minutes */ 
+
+	return length;
+}
+
+void Track_set_fade( struct Ay_Emu *this, int start_msec, int length_msec )
+{
+	track_set_fade( &this->track_filter, msec_to_samples( start_msec, this->sample_rate ),
+		length_msec * this->sample_rate / (1000 / stereo) );
+}
+
+blargg_err_t Ay_play( struct Ay_Emu *this, int out_count, sample_t* out )
+{
+	require( this->current_track >= 0 );
+	require( out_count % stereo == 0 );
+	return track_play( &this->track_filter, out_count, out );
+}
+
+blargg_err_t play_( void *emu, int count, sample_t* out )
+{
+	struct Ay_Emu* this = (struct Ay_Emu*) emu;
 	
-	if ( !(this->silence_count | this->buf_remain) ) // caught up to emulator, so update track ended
-		this->track_ended |= this->emu_track_ended_;
-	
-	return 0;
-}
-
-// Fading
-
-void Track_set_fade( struct Ay_Emu *this, long start_msec, long length_msec )
-{
-	this->fade_step = this->sample_rate * length_msec / (fade_block_size * fade_shift * 1000 / stereo);
-	this->fade_start = msec_to_samples( start_msec, this->sample_rate );
-}
-
-// unit / pow( 2.0, (double) x / step )
-static int int_log( blargg_long x, int step, int unit )
-{
-	int shift = x / step;
-	int fraction = (x - shift * step) * unit / step;
-	return ((unit - fraction) + (fraction >> 1)) >> shift;
-}
-
-static void handle_fade( struct Ay_Emu *this, long out_count, sample_t* out )
-{
-	int i;
-	for ( i = 0; i < out_count; i += fade_block_size )
-	{
-		int const shift = 14;
-		int const unit = 1 << shift;
-		int gain = int_log( (this->out_time + i - this->fade_start) / fade_block_size,
-				this->fade_step, unit );
-		if ( gain < (unit >> fade_shift) )
-			this->track_ended = this->emu_track_ended_ = true;
-		
-		sample_t* io = &out [i];
-		int count;
-		for ( count = min( fade_block_size, out_count - i ); count; --count )
-		{
-			*io = (sample_t) ((*io * gain) >> shift);
-			++io;
-		}
-	}
-}
-
-// Silence detection
-
-static void emu_play( struct Ay_Emu *this, long count, sample_t* out )
-{
-	check( current_track_ >= 0 );
-	this->emu_time += count;
-	if ( this->current_track >= 0 && !this->emu_track_ended_ ) {
-		if ( play_( this, count, out ) )
-			this->emu_track_ended_ = true;
-	}
-	else
-		memset( out, 0, count * sizeof *out );
-}
-
-// number of consecutive silent samples at end
-static long count_silence( sample_t* begin, long size )
-{
-	sample_t first = *begin;
-	*begin = silence_threshold; // sentinel
-	sample_t* p = begin + size;
-	while ( (unsigned) (*--p + silence_threshold / 2) <= (unsigned) silence_threshold ) { }
-	*begin = first;
-	return size - (p - begin);
-}
-
-// fill internal buffer and check it for silence
-void fill_buf( struct Ay_Emu *this )
-{
-	assert( !this->buf_remain );
-	if ( !this->emu_track_ended_ )
-	{
-		emu_play( this, buf_size, this->buf );
-		long silence = count_silence( this->buf, buf_size );
-		if ( silence < buf_size )
-		{
-			this->silence_time = this->emu_time - silence;
-			this->buf_remain   = buf_size;
-			return;
-		}
-	}
-	this->silence_count += buf_size;
-}
-
-blargg_err_t Ay_play( struct Ay_Emu *this, long out_count, sample_t* out )
-{
-	if ( this->track_ended )
-	{
-		memset( out, 0, out_count * sizeof *out );
-	}
-	else
-	{
-		require( this->current_track >= 0 );
-		require( out_count % stereo == 0 );
-		
-		assert( this->emu_time >= this->out_time );
-		
-		// prints nifty graph of how far ahead we are when searching for silence
-		//debug_printf( "%*s \n", int ((emu_time - out_time) * 7 / sample_rate()), "*" );
-		
-		long pos = 0;
-		if ( this->silence_count )
-		{
-			// during a run of silence, run emulator at >=2x speed so it gets ahead
-			long ahead_time = this->silence_lookahead * (this->out_time + out_count - this->silence_time) + this->silence_time;
-			while ( this->emu_time < ahead_time && !(this->buf_remain | this->emu_track_ended_) )
-				fill_buf( this );
-			
-			// fill with silence
-			pos = min( this->silence_count, out_count );
-			memset( out, 0, pos * sizeof *out );
-			this->silence_count -= pos;
-			
-			if ( this->emu_time - this->silence_time > silence_max * stereo * this->sample_rate )
-			{
-				this->track_ended   = this->emu_track_ended_ = true;
-				this->silence_count = 0;
-				this->buf_remain    = 0;
-			}
-		}
-		
-		if ( this->buf_remain )
-		{
-			// empty silence buf
-			long n = min( this->buf_remain, out_count - pos );
-			memcpy( &out [pos], this->buf + (buf_size - this->buf_remain), n * sizeof *out );
-			this->buf_remain -= n;
-			pos += n;
-		}
-		
-		// generate remaining samples normally
-		long remain = out_count - pos;
-		if ( remain )
-		{
-			emu_play( this, remain, out + pos );
-			this->track_ended |= this->emu_track_ended_;
-			
-			if ( !this->ignore_silence || this->out_time > this->fade_start )
-			{
-				// check end for a new run of silence
-				long silence = count_silence( out + pos, remain );
-				if ( silence < remain )
-					this->silence_time = this->emu_time - silence;
-				
-				if ( this->emu_time - this->silence_time >= buf_size )
-					fill_buf( this ); // cause silence detection on next play()
-			}
-		}
-		
-		if ( this->out_time > this->fade_start )
-			handle_fade( this, out_count, out );
-	}
-	this->out_time += out_count;
-	return 0;
-}
-
-blargg_err_t play_( struct Ay_Emu *this, long count, sample_t* out )
-{
-	long remain = count;
+	int remain = count;
 	while ( remain )
 	{
+		Buffer_disable_immediate_removal( &this->stereo_buf );
 		remain -= Buffer_read_samples( &this->stereo_buf, &out [count - remain], remain );
 		if ( remain )
 		{
@@ -773,7 +589,7 @@ blargg_err_t play_( struct Ay_Emu *this, long count, sample_t* out )
 				Sound_mute_voices( this, this->mute_mask_ );
 			}
 			int msec = Buffer_length( &this->stereo_buf );
-			blip_time_t clocks_emulated = (blargg_long) msec * this->clock_rate_ / 1000 - 100;
+			blip_time_t clocks_emulated = msec * this->clock_rate_ / 1000 - 100;
 			RETURN_ERR( run_clocks( this, &clocks_emulated, msec ) );
 			assert( clocks_emulated );
 			Buffer_end_frame( &this->stereo_buf, clocks_emulated );

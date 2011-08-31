@@ -64,45 +64,60 @@ static inline void blargg_verify_byte_order( void )
 	#endif
 }
 
-static inline unsigned get_le16( void const* p ) {
-	return  ((unsigned char const*) p) [1] * 0x100u +
-			((unsigned char const*) p) [0];
+static inline unsigned get_le16( void const* p )
+{
+	return  (unsigned) ((unsigned char const*) p) [1] << 8 |
+			(unsigned) ((unsigned char const*) p) [0];
 }
-static inline unsigned get_be16( void const* p ) {
-	return  ((unsigned char const*) p) [0] * 0x100u +
-			((unsigned char const*) p) [1];
+
+static inline unsigned get_be16( void const* p )
+{
+	return  (unsigned) ((unsigned char const*) p) [0] << 8 |
+			(unsigned) ((unsigned char const*) p) [1];
 }
-static inline blargg_ulong get_le32( void const* p ) {
-	return  ((unsigned char const*) p) [3] * 0x01000000u +
-			((unsigned char const*) p) [2] * 0x00010000u +
-			((unsigned char const*) p) [1] * 0x00000100u +
-			((unsigned char const*) p) [0];
+
+static inline unsigned get_le32( void const* p )
+{
+	return  (unsigned) ((unsigned char const*) p) [3] << 24 |
+			(unsigned) ((unsigned char const*) p) [2] << 16 |
+			(unsigned) ((unsigned char const*) p) [1] <<  8 |
+			(unsigned) ((unsigned char const*) p) [0];
 }
-static inline blargg_ulong get_be32( void const* p ) {
-	return  ((unsigned char const*) p) [0] * 0x01000000u +
-			((unsigned char const*) p) [1] * 0x00010000u +
-			((unsigned char const*) p) [2] * 0x00000100u +
-			((unsigned char const*) p) [3];
+
+static inline unsigned get_be32( void const* p )
+{
+	return  (unsigned) ((unsigned char const*) p) [0] << 24 |
+			(unsigned) ((unsigned char const*) p) [1] << 16 |
+			(unsigned) ((unsigned char const*) p) [2] <<  8 |
+			(unsigned) ((unsigned char const*) p) [3];
 }
-static inline void set_le16( void* p, unsigned n ) {
+
+static inline void set_le16( void* p, unsigned n )
+{
 	((unsigned char*) p) [1] = (unsigned char) (n >> 8);
 	((unsigned char*) p) [0] = (unsigned char) n;
 }
-static inline void set_be16( void* p, unsigned n ) {
+
+static inline void set_be16( void* p, unsigned n )
+{
 	((unsigned char*) p) [0] = (unsigned char) (n >> 8);
 	((unsigned char*) p) [1] = (unsigned char) n;
 }
-static inline void set_le32( void* p, blargg_ulong n ) {
-	((unsigned char*) p) [3] = (unsigned char) (n >> 24);
-	((unsigned char*) p) [2] = (unsigned char) (n >> 16);
-	((unsigned char*) p) [1] = (unsigned char) (n >> 8);
+
+static inline void set_le32( void* p, unsigned n )
+{
 	((unsigned char*) p) [0] = (unsigned char) n;
+	((unsigned char*) p) [1] = (unsigned char) (n >> 8);
+	((unsigned char*) p) [2] = (unsigned char) (n >> 16);
+	((unsigned char*) p) [3] = (unsigned char) (n >> 24);
 }
-static inline void set_be32( void* p, blargg_ulong n ) {
-	((unsigned char*) p) [0] = (unsigned char) (n >> 24);
-	((unsigned char*) p) [1] = (unsigned char) (n >> 16);
-	((unsigned char*) p) [2] = (unsigned char) (n >> 8);
+
+static inline void set_be32( void* p, unsigned n )
+{
 	((unsigned char*) p) [3] = (unsigned char) n;
+	((unsigned char*) p) [2] = (unsigned char) (n >> 8);
+	((unsigned char*) p) [1] = (unsigned char) (n >> 16);
+	((unsigned char*) p) [0] = (unsigned char) (n >> 24);
 }
 
 #if defined(BLARGG_NONPORTABLE)
@@ -132,15 +147,21 @@ static inline void set_be32( void* p, blargg_ulong n ) {
 
 #ifndef GET_LE16
 	#define GET_LE16( addr )        get_le16( addr )
-	#define GET_LE32( addr )        get_le32( addr )
 	#define SET_LE16( addr, data )  set_le16( addr, data )
+#endif
+
+#ifndef GET_LE32
+	#define GET_LE32( addr )        get_le32( addr )
 	#define SET_LE32( addr, data )  set_le32( addr, data )
 #endif
 
 #ifndef GET_BE16
 	#define GET_BE16( addr )        get_be16( addr )
-	#define GET_BE32( addr )        get_be32( addr )
 	#define SET_BE16( addr, data )  set_be16( addr, data )
+#endif
+
+#ifndef GET_BE32
+	#define GET_BE32( addr )        get_be32( addr )
 	#define SET_BE32( addr, data )  set_be32( addr, data )
 #endif
 

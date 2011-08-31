@@ -90,7 +90,7 @@ static inline nes_time_t Square_maintain_phase( struct Nes_Square* this, nes_tim
 	{
 		int count = (remain + timer_period - 1) / timer_period;
 		this->phase = (this->phase + count) & (square_phase_range - 1);
-		time += (blargg_long) count * timer_period;
+		time += count * timer_period;
 	}
 	return time;
 }
@@ -107,8 +107,6 @@ void Square_run( struct Nes_Square* this, nes_time_t time, nes_time_t end_time )
 		return;
 	}
 	
-	Blip_set_modified( osc->output );
-	
 	int offset = period >> (osc->regs [1] & shift_mask);
 	if ( osc->regs [1] & negate_flag )
 		offset = 0;
@@ -117,6 +115,7 @@ void Square_run( struct Nes_Square* this, nes_time_t time, nes_time_t end_time )
 	if ( volume == 0 || period < 8 || (period + offset) >= 0x800 )
 	{
 		if ( osc->last_amp ) {
+			Blip_set_modified( osc->output );
 			Synth_offset( this->synth, time, -osc->last_amp, osc->output );
 			osc->last_amp = 0;
 		}
@@ -137,6 +136,7 @@ void Square_run( struct Nes_Square* this, nes_time_t time, nes_time_t end_time )
 		if ( this->phase < duty )
 			amp ^= volume;
 		
+		Blip_set_modified( osc->output );
 		{
 			int delta = Osc_update_amp( osc, amp );
 			if ( delta )
@@ -201,7 +201,7 @@ static inline nes_time_t Triangle_maintain_phase( struct Nes_Triangle* this, nes
 		int count = (remain + timer_period - 1) / timer_period;
 		this->phase = ((unsigned) this->phase + 1 - count) & (Triangle_phase_range * 2 - 1);
 		this->phase++;
-		time += (blargg_long) count * timer_period;
+		time += count * timer_period;
 	}
 	return time;
 }
@@ -219,14 +219,15 @@ void Triangle_run( struct Nes_Triangle* this, nes_time_t time, nes_time_t end_ti
 		return;
 	}
 	
-	Blip_set_modified( osc->output );
-	
 	// to do: track phase when period < 3
 	// to do: Output 7.5 on dac when period < 2? More accurate, but results in more clicks.
 	
 	int delta = Osc_update_amp( osc, Triangle_calc_amp( this ) );
 	if ( delta )
+	{
+		Blip_set_modified( osc->output );
 		Synth_offset( &this->synth, time, delta, osc->output );
+	}
 	
 	time += osc->delay;
 	if ( osc->length_counter == 0 || this->linear_counter == 0 || timer_period < 3 )
@@ -243,13 +244,15 @@ void Triangle_run( struct Nes_Triangle* this, nes_time_t time, nes_time_t end_ti
 			phase -= Triangle_phase_range;
 			volume = -volume;
 		}
+		Blip_set_modified( osc->output );
 		
 		do {
 			if ( --phase == 0 ) {
 				phase = Triangle_phase_range;
 				volume = -volume;
 			}
-			else {
+			else 
+			{
 				Synth_offset_inline( &this->synth, time, volume, output );
 			}
 			
@@ -340,17 +343,26 @@ static inline void Dmc_reload_sample( struct Nes_Dmc* this )
 	this->osc.length_counter = this->osc.regs [3] * 0x10 + 1;
 }
 
-static byte const dac_table [128] =
+static int const dmc_table [128] =
 {
-	 0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9,10,11,12,13,14,
-	15,15,16,17,18,19,20,20,21,22,23,24,24,25,26,27,
-	27,28,29,30,31,31,32,33,33,34,35,36,36,37,38,38,
-	39,40,41,41,42,43,43,44,45,45,46,47,47,48,48,49,
-	50,50,51,52,52,53,53,54,55,55,56,56,57,58,58,59,
-	59,60,60,61,61,62,63,63,64,64,65,65,66,66,67,67,
-	68,68,69,70,70,71,71,72,72,73,73,74,74,75,75,75,
-	76,76,77,77,78,78,79,79,80,80,81,81,82,82,82,83,
+   0,  24,  48,  71,  94, 118, 141, 163, 186, 209, 231, 253, 275, 297, 319, 340,
+ 361, 383, 404, 425, 445, 466, 486, 507, 527, 547, 567, 587, 606, 626, 645, 664,
+ 683, 702, 721, 740, 758, 777, 795, 813, 832, 850, 867, 885, 903, 920, 938, 955,
+ 972, 989,1006,1023,1040,1056,1073,1089,1105,1122,1138,1154,1170,1185,1201,1217,
+1232,1248,1263,1278,1293,1308,1323,1338,1353,1368,1382,1397,1411,1425,1440,1454,
+1468,1482,1496,1510,1523,1537,1551,1564,1578,1591,1604,1618,1631,1644,1657,1670,
+1683,1695,1708,1721,1733,1746,1758,1771,1783,1795,1807,1819,1831,1843,1855,1867,
+1879,1890,1902,1914,1925,1937,1948,1959,1971,1982,1993,2004,2015,2026,2037,2048,
 };
+
+static inline int update_amp_nonlinear( struct Nes_Dmc* this, int in )
+{
+	if ( !this->nonlinear )
+		in = dmc_table [in];
+	int delta = in - this->osc.last_amp;
+	this->osc.last_amp = in;
+	return delta;
+}
 
 void Dmc_write_register( struct Nes_Dmc* this, int addr, int data )
 {
@@ -363,14 +375,7 @@ void Dmc_write_register( struct Nes_Dmc* this, int addr, int data )
 	}
 	else if ( addr == 1 )
 	{
-		int old_dac = this->dac;
 		this->dac = data & 0x7F;
-		
-		// adjust last_amp so that "pop" amplitude will be properly non-linear
-		// with respect to change in dac
-		int faked_nonlinear = this->dac - (dac_table [this->dac] - dac_table [old_dac]);
-		if ( !this->nonlinear )
-			this->osc.last_amp = faked_nonlinear;
 	}
 }
 
@@ -407,16 +412,15 @@ void Dmc_fill_buffer( struct Nes_Dmc* this )
 void Dmc_run( struct Nes_Dmc* this, nes_time_t time, nes_time_t end_time )
 {
 	struct Nes_Osc* osc = &this->osc;
-	int delta = Osc_update_amp( osc, this->dac );
+	int delta = update_amp_nonlinear( this, this->dac );
 	if ( !osc->output )
 	{
 		this->silence = true;
 	}
-	else
+	else if ( delta )
 	{
 		Blip_set_modified( osc->output );
-		if ( delta )
-			Synth_offset( &this->synth, time, delta, osc->output );
+		Synth_offset( &this->synth, time, delta, osc->output );
 	}
 	
 	time += osc->delay;
@@ -435,6 +439,8 @@ void Dmc_run( struct Nes_Dmc* this, nes_time_t time, nes_time_t end_time )
 			const int period = this->period;
 			int bits = this->bits;
 			int dac = this->dac;
+			if ( output )
+				Blip_set_modified( output );
 			
 			do
 			{
@@ -444,7 +450,7 @@ void Dmc_run( struct Nes_Dmc* this, nes_time_t time, nes_time_t end_time )
 					bits >>= 1;
 					if ( (unsigned) (dac + step) <= 0x7F ) {
 						dac += step;
-						Synth_offset_inline( &this->synth, time, step, output );
+						Synth_offset_inline( &this->synth, time, update_amp_nonlinear( this, dac ), output );
 					}
 				}
 				
@@ -456,7 +462,8 @@ void Dmc_run( struct Nes_Dmc* this, nes_time_t time, nes_time_t end_time )
 					if ( !this->buf_full ) {
 						this->silence = true;
 					}
-					else {
+					else
+					{
 						this->silence = false;
 						bits = this->buf;
 						this->buf_full = false;
@@ -469,7 +476,7 @@ void Dmc_run( struct Nes_Dmc* this, nes_time_t time, nes_time_t end_time )
 			while ( time < end_time );
 			
 			this->dac = dac;
-			osc->last_amp = dac;
+			//osc->last_amp = dac;
 			this->bits = bits;
 		}
 		this->bits_remain = bits_remain;
@@ -519,14 +526,15 @@ void Noise_run( struct Nes_Noise* this, nes_time_t time, nes_time_t end_time )
 		return;
 	}
 	
-	Blip_set_modified( osc->output );
-	
 	const int volume = Noise_volume( this );
 	int amp = (this->noise & 1) ? volume : 0;
 	{
 		int delta = Osc_update_amp( osc, amp );
 		if ( delta )
+		{
+			Blip_set_modified( osc->output );
 			Synth_offset( &this->synth, time, delta, osc->output );
+		}
 	}
 	
 	time += osc->delay;
@@ -557,6 +565,7 @@ void Noise_run( struct Nes_Noise* this, nes_time_t time, nes_time_t end_time )
 			int noise = this->noise;
 			int delta = amp * 2 - volume;
 			const int tap = (osc->regs [2] & mode_flag ? 8 : 13);
+			Blip_set_modified( osc->output );
 			
 			do {
 				int feedback = (noise << tap) ^ (noise << 14);

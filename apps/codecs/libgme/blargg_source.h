@@ -2,16 +2,13 @@
 #ifndef BLARGG_SOURCE_H
 #define BLARGG_SOURCE_H
 
-// If debugging is enabled, abort program if expr is false. Meant for checking
-// internal state and consistency. A failed assertion indicates a bug in the module.
-// void assert( bool expr );
-#include <assert.h>
-
 // If debugging is enabled and expr is false, abort program. Meant for checking
 // caller-supplied parameters and operations that are outside the control of the
 // module. A failed requirement indicates a bug outside the module.
 // void require( bool expr );
 #if defined(ROCKBOX)
+#undef assert
+#define assert( expr )
 #undef require
 #define require( expr )
 #else
@@ -36,28 +33,36 @@ static inline void blargg_dprintf_( const char* fmt, ... ) { }
 #undef check
 #define check( expr ) ((void) 0)
 
-// If expr yields error string, return it from current function, otherwise continue.
-#undef RETURN_ERR
-#define RETURN_ERR( expr ) do {                         \
-		blargg_err_t blargg_return_err_ = (expr);               \
-		if ( blargg_return_err_ ) return blargg_return_err_;    \
+/* If expr yields non-NULL error string, returns it from current function,
+otherwise continues normally. */
+#undef  RETURN_ERR
+#define RETURN_ERR( expr ) \
+	do {\
+		blargg_err_t blargg_return_err_ = (expr);\
+		if ( blargg_return_err_ )\
+			return blargg_return_err_;\
 	} while ( 0 )
 
-// If ptr is 0, return out of memory error string.
-#undef CHECK_ALLOC
-#define CHECK_ALLOC( ptr ) do { if ( (ptr) == 0 ) return "Out of memory"; } while ( 0 )
+/* If ptr is NULL, returns out-of-memory error, otherwise continues normally. */
+#undef  CHECK_ALLOC
+#define CHECK_ALLOC( ptr ) \
+	do {\
+		if ( !(ptr) )\
+			return "Out of memory";\
+	} while ( 0 )
 
 #ifndef max
 	#define max(a,b) (((a) > (b)) ? (a) : (b))
 #endif
+
 #ifndef min
 	#define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
-// TODO: good idea? bad idea?
-#undef byte
-#define byte byte_
-typedef unsigned char byte;
+// typedef unsigned char byte;
+typedef unsigned char blargg_byte;
+#undef  byte
+#define byte blargg_byte
 
 // deprecated
 #define BLARGG_CHECK_ALLOC CHECK_ALLOC

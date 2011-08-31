@@ -67,8 +67,8 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    if ((err = Hes_load(&hes_emu, buf, ci->filesize))) {
-        DEBUGF("HES: Hes_load failed (%s)\n", err);
+    if ((err = Hes_load_mem(&hes_emu, buf, ci->filesize))) {
+        DEBUGF("HES: Hes_load_mem failed (%s)\n", err);
         return CODEC_ERROR;
     }
 
@@ -95,7 +95,7 @@ next_track:
 
         /* Generate audio buffer */
         err = Hes_play(&hes_emu, CHUNK_SIZE, samples);
-        if (err || hes_emu.track_ended) {
+        if (err || Track_ended(&hes_emu)) {
             track++;
             if (track >= hes_emu.track_count) break;
             goto next_track;

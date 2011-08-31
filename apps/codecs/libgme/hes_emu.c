@@ -21,28 +21,14 @@ int const vdp_mask    = 0x02;
 int const i_flag_mask = 0x04;
 int const unmapped    = 0xFF;
 
-long const period_60hz = 262 * 455L; // scanlines * clocks per scanline
-
-int const stereo = 2; // number of channels for stereo
-int const silence_max = 6; // seconds
-int const silence_threshold = 0x10;
-long const fade_block_size = 512;
-int const fade_shift = 8; // fade ends with gain at 1.0 / (1 << fade_shift)
+int const period_60hz = 262 * 455; // scanlines * clocks per scanline
 
 const char gme_wrong_file_type [] = "Wrong file type for this emulator";
 
 static void clear_track_vars( struct Hes_Emu* this )
 {
-	this->current_track_   = -1;
-	this->out_time         = 0;
-	this->emu_time         = 0;
-	this->emu_track_ended_ = true;
-	this->track_ended      = true;
-	this->fade_start       = (blargg_long)(LONG_MAX / 2 + 1);
-	this->fade_step        = 1;
-	this->silence_time     = 0;
-	this->silence_count    = 0;
-	this->buf_remain       = 0;
+	this->current_track_    = -1;
+	track_stop( &this->track_filter );
 }
 
 void Hes_init( struct Hes_Emu* this )
@@ -52,15 +38,12 @@ void Hes_init( struct Hes_Emu* this )
 	this->tempo_       = (int)(FP_ONE_TEMPO);
 
 	// defaults
-	this->max_initial_silence = 2;
-	this->ignore_silence     = false;
-
-	// Unload
-	this->voice_count_ = 0;
-	clear_track_vars( this );
+	this->tfilter = *track_get_setup( &this->track_filter );
+	this->tfilter.max_initial = 2;
+	this->tfilter.lookahead   = 6;
+	this->track_filter.silence_ignored_ = false;
 
 	this->timer.raw_load = 0;
-	this->silence_lookahead = 6;
 	Sound_set_gain( this, (int)(FP_ONE_GAIN*1.11) );
 
 	Rom_init( &this->rom, 0x2000 );
@@ -71,6 +54,11 @@ void Hes_init( struct Hes_Emu* this )
 
 	/* Set default track count */
 	this->track_count = 255;
+	
+	// clears fields
+	this->voice_count_ = 0;
+	this->voice_types_ = 0;
+	clear_track_vars( this );
 }
 
 static blargg_err_t check_hes_header( void const* header )
@@ -82,10 +70,12 @@ static blargg_err_t check_hes_header( void const* header )
 
 // Setup
 
-blargg_err_t Hes_load( struct Hes_Emu* this, void* data, long size )
+blargg_err_t Hes_load_mem( struct Hes_Emu* this, void* data, long size )
 {
 	// Unload
 	this->voice_count_ = 0;
+	this->track_count = 255;
+	this->m3u.size = 0;
 	clear_track_vars( this );
              
 	assert( offsetof (struct header_t,unused [4]) == header_size );
@@ -106,15 +96,15 @@ blargg_err_t Hes_load( struct Hes_Emu* this, void* data, long size )
 	// many files have bad sizes in the only block, so it's simpler to
 	// just try to load the damn data as best as possible.
 	
-	long addr = get_le32( this->header.addr );
-	/* long rom_size = get_le32( this->header.size ); */
-	long const rom_max = 0x100000;
-	if ( addr & ~(rom_max - 1) )
+	int addr = get_le32( this->header.addr );
+	/* int rom_size = get_le32( this->header.size ); */
+	int const rom_max = 0x100000;
+	if ( (unsigned) addr >= (unsigned) rom_max )
 	{
 		/* warning( "Invalid address" ); */
 		addr &= rom_max - 1;
 	}
-	/* if ( (unsigned long) (addr + size) > (unsigned long) rom_max )
+	/* if ( (unsigned) (addr + size) > (unsigned) rom_max )
 		warning( "Invalid size" );
 	
 	if ( rom_size != rom.file_size() )
@@ -130,6 +120,10 @@ blargg_err_t Hes_load( struct Hes_Emu* this, void* data, long size )
 	Rom_set_addr( &this->rom, addr );
 	
 	this->voice_count_ = osc_count + adpcm_osc_count;
+	static int const types [osc_count + adpcm_osc_count] = {
+		wave_type+0, wave_type+1, wave_type+2, wave_type+3, mixed_type+0, mixed_type+1, mixed_type+2
+	};
+	this->voice_types_ = types;
 	
 	Apu_volume( &this->apu, this->gain_ );
 	Adpcm_volume( &this->adpcm, this->gain_ );
@@ -137,21 +131,17 @@ blargg_err_t Hes_load( struct Hes_Emu* this, void* data, long size )
     // Setup buffer	
 	this->clock_rate_ = 7159091;
 	Buffer_clock_rate( &this->stereo_buf, 7159091 );
+	RETURN_ERR( Buffer_set_channel_count( &this->stereo_buf, this->voice_count_, this->voice_types_ ) );
 	this->buf_changed_count = Buffer_channels_changed_count( &this->stereo_buf );
 	
 	Sound_set_tempo( this, this->tempo_ );
 	Sound_mute_voices( this, this->mute_mask_ );
 	
-	// Reset track count
-	this->track_count = 255;
-	this->m3u.size = 0;
 	return 0;
 }
 
-
 // Emulation
 
-void recalc_timer_load( struct Hes_Emu* this );
 void recalc_timer_load( struct Hes_Emu* this )
 {
 	this->timer.load = this->timer.raw_load * this->timer_base + 1;
@@ -159,9 +149,25 @@ void recalc_timer_load( struct Hes_Emu* this )
 
 // Hardware
 
-void irq_changed( struct Hes_Emu* this );
-void run_until( struct Hes_Emu* this, hes_time_t present );
-void Cpu_write_vdp( struct Hes_Emu* this, int addr, int data )
+void run_until( struct Hes_Emu* this, hes_time_t present )
+{
+	while ( this->vdp.next_vbl < present )
+		this->vdp.next_vbl += this->play_period;
+	
+	hes_time_t elapsed = present - this->timer.last_time;
+	if ( elapsed > 0 )
+	{
+		if ( this->timer.enabled )
+		{
+			this->timer.count -= elapsed;
+			if ( this->timer.count <= 0 )
+				this->timer.count += this->timer.load;
+		}
+		this->timer.last_time = present;
+	}
+}
+
+void write_vdp( struct Hes_Emu* this, int addr, int data )
 {
 	switch ( addr )
 	{
@@ -178,77 +184,33 @@ void Cpu_write_vdp( struct Hes_Emu* this, int addr, int data )
 			this->vdp.control = data;
 			irq_changed( this );
 		}
-		else
+		/* else
 		{
-			dprintf( "VDP not supported: $%02X <- $%02X\n", this->vdp.latch, data );
-		}
+			dprintf( "VDP not supported: $%02X <- $%02X\n", vdp.latch, data );
+		} */
 		break;
 	
 	case 3:
-		dprintf( "VDP MSB not supported: $%02X <- $%02X\n", this->vdp.latch, data );
+		/* dprintf( "VDP MSB not supported: $%02X <- $%02X\n", vdp.latch, data ); */
 		break;
 	}
 }
 
-int Cpu_done( struct Hes_Emu* this )
-{
-	check( time() >= end_time() ||
-			(!(r.status & i_flag_mask) && time() >= irq_time()) );
-	
-	if ( !(this->cpu.r.status & i_flag_mask) )
-	{
-		hes_time_t present = Cpu_time( &this->cpu );
-		
-		if ( this->irq.timer <= present && !(this->irq.disables & timer_mask) )
-		{
-			this->timer.fired = true;
-			this->irq.timer = (hes_time_t)future_hes_time;
-			irq_changed( this ); // overkill, but not worth writing custom code
-			#if defined (GME_FRAME_HOOK_DEFINED)
-			{
-				unsigned const threshold = period_60hz / 30;
-				unsigned long elapsed = present - last_frame_hook;
-				if ( elapsed - period_60hz + threshold / 2 < threshold )
-				{
-					last_frame_hook = present;
-					GME_FRAME_HOOK( this );
-				}
-			}
-			#endif
-			return 0x0A;
-		}
-		
-		if ( this->irq.vdp <= present && !(this->irq.disables & vdp_mask) )
-		{
-			// work around for bugs with music not acknowledging VDP
-			//run_until( present );
-			//irq.vdp = future_hes_time;
-			//irq_changed();
-			#if defined(GME_FRAME_HOOK_DEFINED)
-				last_frame_hook = present;
-				GME_FRAME_HOOK( this );
-			#endif
-			return 0x08;
-		}
-	}
-	return 0;
-}
-
-void Emu_cpu_write( struct Hes_Emu* this, hes_addr_t addr, int data )
+void write_mem_( struct Hes_Emu* this, hes_addr_t addr, int data )
 {
 	hes_time_t time = Cpu_time( &this->cpu );
-	if ( (unsigned) (addr - start_addr) <= end_addr - start_addr )
+	if ( (unsigned) (addr - apu_io_addr) < apu_io_size )
 	{
-		GME_APU_HOOK( this, addr - apu.start_addr, data );
-		// avoid going way past end when a long block xfer is writing to I/O space
-		hes_time_t t = min( time, this->cpu.end_time + 8 );
+		// Avoid going way past end when a long block xfer is writing to I/O space.
+		// Not a problem for other registers below because they don't write to
+		// Blip_Buffer.
+		hes_time_t t = min( time, Cpu_end_time( &this->cpu ) + 8 );
 		Apu_write_data( &this->apu, t, addr, data );
 		return;
 	}
-	
-	if ( (unsigned) (addr - io_addr) < io_size )
+	if ( (unsigned) (addr - adpcm_io_addr) < adpcm_io_size )
 	{
-		hes_time_t t = min( time, this->cpu.end_time + 6 );
+		hes_time_t t = min( time, Cpu_end_time( &this->cpu ) + 6 );
 		Adpcm_write_data( &this->adpcm, t, addr, data );
 		return;
 	}
@@ -258,7 +220,7 @@ void Emu_cpu_write( struct Hes_Emu* this, hes_addr_t addr, int data )
 	case 0x0000:
 	case 0x0002:
 	case 0x0003:
-		Cpu_write_vdp( this, addr, data );
+		write_vdp( this, addr, data );
 		return;
 	
 	case 0x0C00: {
@@ -282,11 +244,8 @@ void Emu_cpu_write( struct Hes_Emu* this, hes_addr_t addr, int data )
 	case 0x1402:
 		run_until( this, time );
 		this->irq.disables = data;
-		
-		// flag questionable values
-		if ( (data & 0xF8) && (data & 0xF8) != 0xF8 ) {
-			dprintf( "Int mask: $%02X\n", data );
-		}
+		/* if ( (data & 0xF8) && (data & 0xF8) != 0xF8 ) // flag questionable values
+			dprintf( "Int mask: $%02X\n", data ); */
 		break;
 	
 	case 0x1403:
@@ -305,7 +264,7 @@ void Emu_cpu_write( struct Hes_Emu* this, hes_addr_t addr, int data )
 		return;
 		
 	default:
-		dprintf( "unmapped write $%04X <- $%02X\n", addr, data );
+		/* dprintf( "unmapped write $%04X <- $%02X\n", addr, data ); */
 		return;
 #endif
 	}
@@ -313,7 +272,7 @@ void Emu_cpu_write( struct Hes_Emu* this, hes_addr_t addr, int data )
 	irq_changed( this );
 }
 
-int Emu_cpu_read( struct Hes_Emu* this, hes_addr_t addr )
+int read_mem_( struct Hes_Emu* this, hes_addr_t addr )
 {
 	hes_time_t time = Cpu_time( &this->cpu );
 	addr &= page_size - 1;
@@ -322,21 +281,21 @@ int Emu_cpu_read( struct Hes_Emu* this, hes_addr_t addr )
 	case 0x0000:
 		if ( this->irq.vdp > time )
 			return 0;
-		this->irq.vdp = (hes_time_t)future_hes_time;
+		this->irq.vdp = future_time;
 		run_until( this, time );
 		irq_changed( this );
 		return 0x20;
 		
-	case 0x0002:
+	/* case 0x0002:
 	case 0x0003:
 		dprintf( "VDP read not supported: %d\n", addr );
-		return 0;
+		return 0; */
 	
 	case 0x0C01:
 		//return timer.enabled; // TODO: remove?
 	case 0x0C00:
 		run_until( this, time );
-		dprintf( "Timer count read\n" );
+		/* dprintf( "Timer count read\n" ); */
 		return (unsigned) (this->timer.count - 1) / this->timer_base;
 	
 	case 0x1402:
@@ -349,7 +308,7 @@ int Emu_cpu_read( struct Hes_Emu* this, hes_addr_t addr )
 			if ( this->irq.vdp   <= time ) status |= vdp_mask;
 			return status;
 		}
-		
+
 	case 0x180A:
 	case 0x180B:
 	case 0x180C:
@@ -358,38 +317,16 @@ int Emu_cpu_read( struct Hes_Emu* this, hes_addr_t addr )
 		
 	#ifndef NDEBUG
 		case 0x1000: // I/O port
-		// case 0x180C: // CD-ROM
-		// case 0x180D:
+		//case 0x180C: // CD-ROM
+		//case 0x180D:
 			break;
 		
-		default:
-			dprintf( "unmapped read  $%04X\n", addr );
+		/* default:
+			dprintf( "unmapped read  $%04X\n", addr ); */
 	#endif
 	}
 	
 	return unmapped;
-}
-
-// see hes_cpu_io.h for core read/write functions
-
-// Emulation
-
-void run_until( struct Hes_Emu* this, hes_time_t present )
-{
-	while ( this->vdp.next_vbl < present )
-		this->vdp.next_vbl += this->play_period;
-	
-	hes_time_t elapsed = present - this->timer.last_time;
-	if ( elapsed > 0 )
-	{
-		if ( this->timer.enabled )
-		{
-			this->timer.count -= elapsed;
-			if ( this->timer.count <= 0 )
-				this->timer.count += this->timer.load;
-		}
-		this->timer.last_time = present;
-	}
 }
 
 void irq_changed( struct Hes_Emu* this )
@@ -398,31 +335,57 @@ void irq_changed( struct Hes_Emu* this )
 	
 	if ( this->irq.timer > present )
 	{
-		this->irq.timer = (hes_time_t)future_hes_time;
+		this->irq.timer = future_time;
 		if ( this->timer.enabled && !this->timer.fired )
 			this->irq.timer = present + this->timer.count;
 	}
 	
 	if ( this->irq.vdp > present )
 	{
-		this->irq.vdp = (hes_time_t)future_hes_time;
+		this->irq.vdp = future_time;
 		if ( this->vdp.control & 0x08 )
 			this->irq.vdp = this->vdp.next_vbl;
 	}
 	
-	hes_time_t time = (hes_time_t)future_hes_time;
+	hes_time_t time = future_time;
 	if ( !(this->irq.disables & timer_mask) ) time = this->irq.timer;
 	if ( !(this->irq.disables &   vdp_mask) ) time = min( time, this->irq.vdp );
 	
-	// Set cpu irq time
-	this->cpu.state->time += Cpu_update_end_time( &this->cpu, this->cpu.r.status, 
-					this->cpu.end_time, (this->cpu.irq_time = time) );
+	Cpu_set_irq_time( &this->cpu, time );
 }
 
-static void adjust_time( blargg_long* time, hes_time_t delta );
-static void adjust_time( blargg_long* time, hes_time_t delta )
+int cpu_done( struct Hes_Emu* this )
 {
-	if ( *time < (blargg_long)future_hes_time )
+	check( Cpu_time( &this->cpu ) >= Cpu_end_time( &this->cpu ) ||
+			(!(this->cpu.r.flags & i_flag_mask) && Cpu_time( &this->cpu ) >= Cpu_irq_time( &this->cpu )) );
+	
+	if ( !(this->cpu.r.flags & i_flag_mask) )
+	{
+		hes_time_t present = Cpu_time( &this->cpu );
+		
+		if ( this->irq.timer <= present && !(this->irq.disables & timer_mask) )
+		{
+			this->timer.fired = true;
+			this->irq.timer = future_time;
+			irq_changed( this ); // overkill, but not worth writing custom code
+			return 0x0A;
+		}
+		
+		if ( this->irq.vdp <= present && !(this->irq.disables & vdp_mask) )
+		{
+			// work around for bugs with music not acknowledging VDP
+			//run_until( present );
+			//irq.vdp = cpu.future_time;
+			//irq_changed();
+			return 0x08;
+		}
+	}
+	return -1;
+}
+
+static void adjust_time( hes_time_t* time, hes_time_t delta )
+{
+	if ( *time < future_time )
 	{
 		*time -= delta;
 		if ( *time < 0 )
@@ -430,15 +393,13 @@ static void adjust_time( blargg_long* time, hes_time_t delta )
 	}
 }
 
-blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ );
-blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ )
+blargg_err_t end_frame( struct Hes_Emu* this, hes_time_t duration )
 {
-	blip_time_t duration = *duration_; // cache
+	/* if ( run_cpu( this, duration ) )
+		warning( "Emulation error (illegal instruction)" ); */
+	run_cpu( this, duration );
 	
-	Cpu_run( this, duration );
-	/* warning( "Emulation error (illegal instruction)" ); */
-	
-	check( time() >= duration );
+	check( Cpu_time( &this->cpu ) >= duration );
 	//check( time() - duration < 20 ); // Txx instruction could cause going way over
 	
 	run_until( this, duration );
@@ -446,15 +407,7 @@ blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ )
 	// end time frame
 	this->timer.last_time -= duration;
 	this->vdp.next_vbl    -= duration;
-	#if defined (GME_FRAME_HOOK_DEFINED)
-		last_frame_hook -= *duration;
-	#endif
-
-	// End cpu frame
-	this->cpu.state_.base -= duration;
-	if ( this->cpu.irq_time < (hes_time_t)future_hes_time ) this->cpu.irq_time -= duration;
-	if ( this->cpu.end_time < (hes_time_t)future_hes_time ) this->cpu.end_time -= duration;
-	
+	Cpu_end_frame( &this->cpu, duration );
 	adjust_time( &this->irq.timer, duration );
 	adjust_time( &this->irq.vdp,   duration );
 	Apu_end_frame( &this->apu, duration );
@@ -463,24 +416,31 @@ blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ )
 	return 0;
 }
 
-blargg_err_t play_( struct Hes_Emu* this, long count, sample_t* out );
-blargg_err_t play_( struct Hes_Emu* this, long count, sample_t* out )
+blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ )
 {
-	long remain = count;
+	return end_frame( this, *duration_ );
+}
+
+blargg_err_t play_( void *emu, int count, sample_t out [] )
+{
+	struct Hes_Emu* this = (struct Hes_Emu*) emu;
+	
+	int remain = count;
 	while ( remain )
 	{
+		Buffer_disable_immediate_removal( &this->stereo_buf );
 		remain -= Buffer_read_samples( &this->stereo_buf, &out [count - remain], remain );
 		if ( remain )
 		{
 			if ( this->buf_changed_count != Buffer_channels_changed_count( &this->stereo_buf ) )
 			{
 				this->buf_changed_count = Buffer_channels_changed_count( &this->stereo_buf );
+				
 				// Remute voices
 				Sound_mute_voices( this, this->mute_mask_ );
 			}
-
 			int msec = Buffer_length( &this->stereo_buf );
-			blip_time_t clocks_emulated = (blargg_long) msec * this->clock_rate_ / 1000;
+			blip_time_t clocks_emulated = msec * this->clock_rate_ / 1000 - 100;
 			RETURN_ERR( run_clocks( this, &clocks_emulated ) );
 			assert( clocks_emulated );
 			Buffer_end_frame( &this->stereo_buf, clocks_emulated );
@@ -489,10 +449,9 @@ blargg_err_t play_( struct Hes_Emu* this, long count, sample_t* out )
 	return 0;
 }
 
-
 // Music emu
 
-blargg_err_t Hes_set_sample_rate( struct Hes_Emu* this, long rate )
+blargg_err_t Hes_set_sample_rate( struct Hes_Emu* this, int rate )
 {
 	require( !this->sample_rate_ ); // sample rate can't be changed once set
 	Buffer_init( &this->stereo_buf );
@@ -502,6 +461,8 @@ blargg_err_t Hes_set_sample_rate( struct Hes_Emu* this, long rate )
 	Buffer_bass_freq( &this->stereo_buf, 60 );
 	
 	this->sample_rate_ = rate;
+	RETURN_ERR( track_init( &this->track_filter, this ) );
+	this->tfilter.max_silence = 6 * stereo * this->sample_rate_;
 	return 0;
 }
 
@@ -521,7 +482,7 @@ void Sound_mute_voices( struct Hes_Emu* this, int mask )
 	this->mute_mask_ = mask;
 
 	// Set adpcm voice
-	struct channel_t ch = Buffer_channel( &this->stereo_buf );
+	struct channel_t ch = Buffer_channel( &this->stereo_buf, this->voice_count_ );
 	if ( mask & (1 << this->voice_count_ ) )
 		Adpcm_set_output( &this->adpcm, 0, 0, 0, 0 );
 	else
@@ -536,7 +497,8 @@ void Sound_mute_voices( struct Hes_Emu* this, int mask )
 			Apu_osc_output( &this->apu, i, 0, 0, 0 );
 		}
 		else
-		{	
+		{
+			struct channel_t ch = Buffer_channel( &this->stereo_buf, i );
 			assert( (ch.center && ch.left && ch.right) ||
 					(!ch.center && !ch.left && !ch.right) ); // all or nothing
 			Apu_osc_output( &this->apu, i, ch.center, ch.left, ch.right );
@@ -557,7 +519,6 @@ void Sound_set_tempo( struct Hes_Emu* this, int t )
 	this->tempo_ = t;
 }
 
-void fill_buf( struct Hes_Emu* this );
 blargg_err_t Hes_start_track( struct Hes_Emu* this, int track )
 {
 	clear_track_vars( this );
@@ -572,7 +533,7 @@ blargg_err_t Hes_start_track( struct Hes_Emu* this, int track )
 	
 	Buffer_clear( &this->stereo_buf );
 	
-	memset( this->cpu.ram, 0, sizeof this->cpu.ram ); // some HES music relies on zero fill
+	memset( this->ram, 0, sizeof this->ram ); // some HES music relies on zero fill
 	memset( this->sgx, 0, sizeof this->sgx );
 	
 	Apu_reset( &this->apu );
@@ -581,12 +542,12 @@ blargg_err_t Hes_start_track( struct Hes_Emu* this, int track )
 	
 	unsigned i;
 	for ( i = 0; i < sizeof this->header.banks; i++ )
-		Cpu_set_mmr( this, i, this->header.banks [i] );
-	Cpu_set_mmr( this, page_count, 0xFF ); // unmapped beyond end of address space
+		set_mmr( this, i, this->header.banks [i] );
+	set_mmr( this, page_count, 0xFF ); // unmapped beyond end of address space
 	
 	this->irq.disables  = timer_mask | vdp_mask;
-	this->irq.timer     = (hes_time_t)future_hes_time;
-	this->irq.vdp       = (hes_time_t)future_hes_time;
+	this->irq.timer     = future_time;
+	this->irq.vdp       = future_time;
 	
 	this->timer.enabled = false;
 	this->timer.raw_load= 0x80;
@@ -598,280 +559,86 @@ blargg_err_t Hes_start_track( struct Hes_Emu* this, int track )
 	this->vdp.control   = 0;
 	this->vdp.next_vbl  = 0;
 	
-	this->cpu.ram [0x1FF] = (idle_addr - 1) >> 8;
-	this->cpu.ram [0x1FE] = (idle_addr - 1) & 0xFF;
+	this->ram [0x1FF] = (idle_addr - 1) >> 8;
+	this->ram [0x1FE] = (idle_addr - 1) & 0xFF;
 	this->cpu.r.sp = 0xFD;
 	this->cpu.r.pc = get_le16( this->header.init_addr );
 	this->cpu.r.a  = track;
 	
 	recalc_timer_load( this );
-	this->last_frame_hook = 0;
 	
-	this->emu_track_ended_ = false;
-	this->track_ended     = false;
+	// convert filter times to samples
+	struct setup_t s = this->tfilter;
+	s.max_initial *= this->sample_rate_ * stereo;
+	#ifdef GME_DISABLE_SILENCE_LOOKAHEAD
+		s.lookahead = 1;
+	#endif
+	track_setup( &this->track_filter, &s );
 	
-	if ( !this->ignore_silence )
-	{
-		// play until non-silence or end of track
-		long end;
-		for ( end =this-> max_initial_silence * stereo * this->sample_rate_; this->emu_time < end; )
-		{
-			fill_buf( this );
-			if ( this->buf_remain | (int) this->emu_track_ended_ )
-				break;
-		}
-		
-		this->emu_time      = this->buf_remain;
-		this->out_time      = 0;
-		this->silence_time  = 0;
-		this->silence_count = 0;
-	}
-	/* return track_ended() ? warning() : 0; */
-	return 0;
+	return track_start( &this->track_filter );
 }
 
 // Tell/Seek
 
-static blargg_long msec_to_samples( blargg_long msec, long sample_rate )
+static int msec_to_samples( int msec, int sample_rate )
 {
-	blargg_long sec = msec / 1000;
+	int sec = msec / 1000;
 	msec -= sec * 1000;
 	return (sec * sample_rate + msec * sample_rate / 1000) * stereo;
 }
 
-long Track_tell( struct Hes_Emu* this )
+int Track_tell( struct Hes_Emu* this )
 {
-	blargg_long rate = this->sample_rate_ * stereo;
-	blargg_long sec = this->out_time / rate;
-	return sec * 1000 + (this->out_time - sec * rate) * 1000 / rate;
+	int rate = this->sample_rate_ * stereo;
+	int sec = track_sample_count( &this->track_filter ) / rate;
+	return sec * 1000 + (track_sample_count( &this->track_filter ) - sec * rate) * 1000 / rate;
 }
 
-blargg_err_t Track_seek( struct Hes_Emu* this, long msec )
+blargg_err_t Track_seek( struct Hes_Emu* this, int msec )
 {
-	blargg_long time = msec_to_samples( msec, this->sample_rate_ );
-	if ( time < this->out_time )
-		RETURN_ERR( Hes_start_track( this, this->current_track_ ) );
-	return Track_skip( this, time - this->out_time );
+	int time = msec_to_samples( msec, this->sample_rate_ );
+	if ( time < track_sample_count( &this->track_filter ) )
+	RETURN_ERR( Hes_start_track( this, this->current_track_ ) );
+	return Track_skip( this, time - track_sample_count( &this->track_filter ) );
 }
 
-blargg_err_t skip_( struct Hes_Emu* this, long count );
-blargg_err_t skip_( struct Hes_Emu* this, long count )
+blargg_err_t skip_( void* emu, int count )
 {
+	struct Hes_Emu* this = (struct Hes_Emu*) emu;
+	
 	// for long skip, mute sound
-	const long threshold = 30000;
+	const int threshold = 32768;
 	if ( count > threshold )
 	{
 		int saved_mute = this->mute_mask_;
 		Sound_mute_voices( this, ~0 );
-		
-		while ( count > threshold / 2 && !this->emu_track_ended_ )
-		{
-			RETURN_ERR( play_( this, buf_size, this->buf ) );
-			count -= buf_size;
-		}
-		
+
+		int n = count - threshold/2;
+		n &= ~(2048-1); // round to multiple of 2048
+		count -= n;
+		RETURN_ERR( skippy_( &this->track_filter, n ) );
+
 		Sound_mute_voices( this, saved_mute );
 	}
-	
-	while ( count && !this->emu_track_ended_ )
-	{
-		long n = buf_size;
-		if ( n > count )
-			n = count;
-		count -= n;
-		RETURN_ERR( play_( this, n, this->buf ) );
-	}
-	return 0;
+
+	return skippy_( &this->track_filter, count );
 }
 
-blargg_err_t Track_skip( struct Hes_Emu* this, long count )
+blargg_err_t Track_skip( struct Hes_Emu* this, int count )
 {
 	require( this->current_track_ >= 0 ); // start_track() must have been called already
-	this->out_time += count;
-	
-	// remove from silence and buf first
-	{
-		long n = min( count, this->silence_count );
-		this->silence_count -= n;
-		count -= n;
-		
-		n = min( count, this->buf_remain );
-		this->buf_remain -= n;
-		count -= n;
-	}
-		
-	if ( count && !this->emu_track_ended_ )
-	{
-		this->emu_time += count;
-		
-		// End track if error
-		if ( skip_( this, count ) )
-			this->emu_track_ended_ = true;
-	}
-	
-	if ( !(this->silence_count | this->buf_remain) ) // caught up to emulator, so update track ended
-		this->track_ended |= this->emu_track_ended_;
-	
-	return 0;
+	return track_skip( &this->track_filter, count );
 }
 
-
-
-// Fading
-
-void Track_set_fade( struct Hes_Emu* this, long start_msec, long length_msec )
+void Track_set_fade( struct Hes_Emu* this, int start_msec, int length_msec )
 {
-	this->fade_step = this->sample_rate_ * length_msec / (fade_block_size * fade_shift * 1000 / stereo);
-	this->fade_start = msec_to_samples( start_msec, this->sample_rate_ );
+	track_set_fade( &this->track_filter, msec_to_samples( start_msec, this->sample_rate_ ),
+		length_msec * this->sample_rate_ / (1000 / stereo) );
 }
 
-// unit / pow( 2.0, (double) x / step )
-static int int_log( blargg_long x, int step, int unit );
-static int int_log( blargg_long x, int step, int unit )
+blargg_err_t Hes_play( struct Hes_Emu* this, int out_count, sample_t* out )
 {
-	int shift = x / step;
-	int fraction = (x - shift * step) * unit / step;
-	return ((unit - fraction) + (fraction >> 1)) >> shift;
-}
-
-void handle_fade( struct Hes_Emu* this, long out_count, sample_t* out );
-void handle_fade( struct Hes_Emu* this, long out_count, sample_t* out )
-{
-	int i;
-	for ( i = 0; i < out_count; i += fade_block_size )
-	{
-		int const shift = 14;
-		int const unit = 1 << shift;
-		int gain = int_log( (this->out_time + i - this->fade_start) / fade_block_size,
-				this->fade_step, unit );
-		if ( gain < (unit >> fade_shift) )
-			this->track_ended = this->emu_track_ended_ = true;
-		
-		sample_t* io = &out [i];
-		int count;
-		for ( count = min( fade_block_size, out_count - i ); count; --count )
-		{
-			*io = (sample_t) ((*io * gain) >> shift);
-			++io;
-		}
-	}
-}
-
-// Silence detection
-
-void emu_play( struct Hes_Emu* this, long count, sample_t* out );
-void emu_play( struct Hes_Emu* this, long count, sample_t* out )
-{
-	check( current_track_ >= 0 );
-	this->emu_time += count;
-	if ( this->current_track_ >= 0 && !this->emu_track_ended_ ) {
-		
-		// End track if error
-		if ( play_( this, count, out ) )
-			this->emu_track_ended_ = true;
-	}
-	else
-		memset( out, 0, count * sizeof *out );
-}
-
-// number of consecutive silent samples at end
-static long count_silence( sample_t* begin, long size );
-static long count_silence( sample_t* begin, long size )
-{
-	sample_t first = *begin;
-	*begin = silence_threshold; // sentinel
-	sample_t* p = begin + size;
-	while ( (unsigned) (*--p + silence_threshold / 2) <= (unsigned) silence_threshold ) { }
-	*begin = first;
-	return size - (p - begin);
-}
-
-// fill internal buffer and check it for silence
-void fill_buf( struct Hes_Emu* this )
-{
-	assert( !this->buf_remain );
-	if ( !this->emu_track_ended_ )
-	{
-		emu_play( this, buf_size, this->buf );
-		long silence = count_silence( this->buf, buf_size );
-		if ( silence < buf_size )
-		{
-			this->silence_time = this->emu_time - silence;
-			this->buf_remain   = buf_size;
-			return;
-		}
-	}
-	this->silence_count += buf_size;
-}
-
-blargg_err_t Hes_play( struct Hes_Emu* this, long out_count, sample_t* out )
-{
-	if ( this->track_ended )
-	{
-		memset( out, 0, out_count * sizeof *out );
-	}
-	else
-	{
-		require( this->current_track_ >= 0 );
-		require( out_count % stereo == 0 );
-		
-		assert( this->emu_time >= this->out_time );
-		
-		// prints nifty graph of how far ahead we are when searching for silence
-		//dprintf( "%*s \n", int ((emu_time - out_time) * 7 / sample_rate()), "*" );
-		
-		long pos = 0;
-		if ( this->silence_count )
-		{
-			// during a run of silence, run emulator at >=2x speed so it gets ahead
-			long ahead_time = this->silence_lookahead * (this->out_time + out_count - this->silence_time) + this->silence_time;
-			while ( this->emu_time < ahead_time && !(this->buf_remain | this->emu_track_ended_) )
-				fill_buf( this );
-			
-			// fill with silence
-			pos = min( this->silence_count, out_count );
-			memset( out, 0, pos * sizeof *out );
-			this->silence_count -= pos;
-			
-			if ( this->emu_time - this->silence_time > silence_max * stereo * this->sample_rate_ )
-			{
-				this->track_ended  = this->emu_track_ended_ = true;
-				this->silence_count = 0;
-				this->buf_remain    = 0;
-			}
-		}
-		
-		if ( this->buf_remain )
-		{
-			// empty silence buf
-			long n = min( this->buf_remain, out_count - pos );
-			memcpy( &out [pos], this->buf + (buf_size - this->buf_remain), n * sizeof *out );
-			this->buf_remain -= n;
-			pos += n;
-		}
-		
-		// generate remaining samples normally
-		long remain = out_count - pos;
-		if ( remain )
-		{
-			emu_play( this, remain, out + pos );
-			this->track_ended |= this->emu_track_ended_;
-			
-			if ( !this->ignore_silence || this->out_time > this->fade_start )
-			{
-				// check end for a new run of silence
-				long silence = count_silence( out + pos, remain );
-				if ( silence < remain )
-					this->silence_time = this->emu_time - silence;
-				
-				if ( this->emu_time - this->silence_time >= buf_size )
-					fill_buf( this ); // cause silence detection on next play()
-			}
-		}
-		
-		if ( this->out_time > this->fade_start )
-			handle_fade( this, out_count, out );
-	}
-	this->out_time += out_count;
-	return 0;
+	require( this->current_track_ >= 0 );
+	require( out_count % stereo == 0 );
+	return track_play( &this->track_filter, out_count, out );
 }
