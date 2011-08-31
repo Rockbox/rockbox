@@ -311,7 +311,7 @@ static int const blip_reader_default_bass = 9;
 
 //// BLIP_CLAMP
 
-#if ARM_ARCH >= 6
+#if defined(CPU_ARM) && (ARM_ARCH >= 6)
 	#define BLIP_CLAMP( sample, out ) \
 		({ \
 		asm ("ssat %0, #16, %1" \
