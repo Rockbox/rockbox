@@ -450,7 +450,7 @@ static bool dbg_buflib_allocs(void)
     simplelist_info_init(&info, "mem allocs", core_get_num_blocks(), NULL);
     info.get_name = bf_getname;
     info.action_callback = bf_action_cb;
-    info.timeout = HZ/2;
+    info.timeout = TIMEOUT_BLOCK;
     return simplelist_show_list(&info);
 }
 
