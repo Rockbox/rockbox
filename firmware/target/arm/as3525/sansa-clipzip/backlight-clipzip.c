@@ -39,10 +39,18 @@ void _backlight_on(void)
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
     sleep(1);
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
+
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true);
+#endif
 }
 
 void _backlight_off(void)
 {
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(false);
+#endif
+
     GPIOB_PIN(1) = 0;
     
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);

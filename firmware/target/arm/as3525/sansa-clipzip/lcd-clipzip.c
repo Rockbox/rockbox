@@ -29,6 +29,11 @@
 /* the detected lcd type (0 or 1) */
 static int lcd_type;
 
+#ifdef HAVE_LCD_ENABLE
+/* whether the lcd is currently enabled or not */
+static bool lcd_enabled;
+#endif
+
 /* initialises the host lcd hardware, returns the lcd type */
 int lcd_hw_init(void)
 {
@@ -262,6 +267,57 @@ static void lcd_init_type1(void)
     lcd_write_dat(0x00);
 }
 
+#ifdef HAVE_LCD_ENABLE
+/* enables/disables the lcd */
+void lcd_enable(bool on)
+{
+    lcd_enabled = on;
+
+    if (lcd_type == 0) {
+        if (on) {
+            lcd_write(0x14, 0x00);
+            lcd_write(0x02, 0x01);
+            lcd_write(0xD2, 0x04);
+            lcd_write(0xD0, 0x80);
+            sleep(HZ * 100/1000);
+
+            lcd_write(0xD0, 0x00);
+        }
+        else {
+            lcd_write(0xD2, 0x05);
+            lcd_write(0xD0, 0x80);
+            sleep(HZ * 100/1000);
+
+            lcd_write(0x02, 0x00);
+            lcd_write(0xD0, 0x00);
+            lcd_write(0x14, 0x01);
+        }
+    }
+    else {
+        if (on) {
+            lcd_write_cmd(0x03);
+            lcd_write_dat(0x00);
+
+            lcd_write_cmd(0x02);
+            lcd_write_dat(0x01);
+        }
+        else {
+            lcd_write_cmd(0x02);
+            lcd_write_dat(0x00);
+
+            lcd_write_cmd(0x03);
+            lcd_write_dat(0x01);
+        }
+    }
+}
+
+/* returns true if the lcd is enabled */
+bool lcd_active(void)
+{
+    return lcd_enabled;
+}
+#endif /* HAVE_LCD_ENABLE */
+
 /* initialises the lcd */
 void lcd_init_device(void)
 {
@@ -272,6 +328,7 @@ void lcd_init_device(void)
     else {
         lcd_init_type1();
     }
+    lcd_enable(true);
 }
 
 /* sets up the lcd to receive frame buffer data */

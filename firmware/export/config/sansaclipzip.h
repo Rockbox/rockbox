@@ -48,7 +48,7 @@
 #define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 swapped */
 
 /* define this if you have LCD enable function */
-//#define HAVE_LCD_ENABLE
+#define HAVE_LCD_ENABLE
 
 #ifndef BOOTLOADER
 /* Define this if your LCD can be put to sleep.
