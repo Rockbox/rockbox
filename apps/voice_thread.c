@@ -217,9 +217,6 @@ void mp3_play_data(const unsigned char* start, int size,
 /* Stop current voice clip from playing */
 void mp3_play_stop(void)
 {
-    if(!audio_is_thread_ready())
-       return;
-
     LOGFQUEUE("mp3 >| voice Q_VOICE_STOP");
     queue_send(&voice_queue, Q_VOICE_STOP, 0);
 }
@@ -419,12 +416,6 @@ static void NORETURN_ATTR voice_thread(void)
 
     voice_data_init(&td);
 
-    /* audio thread will only set this once after it finished the final
-     * audio hardware init so this little construct is safe - even
-     * cross-core. */
-    while (!audio_is_thread_ready())
-        sleep(0);
-
     while (1)
     {
         switch (state)
@@ -449,18 +440,11 @@ void voice_thread_init(void)
     queue_init(&voice_queue, false);
 
     voice_thread_id = create_thread(voice_thread, voice_stack,
-            sizeof(voice_stack), CREATE_THREAD_FROZEN,
-            voice_thread_name IF_PRIO(, PRIORITY_VOICE) IF_COP(, CPU));
+            sizeof(voice_stack), 0, voice_thread_name
+            IF_PRIO(, PRIORITY_VOICE) IF_COP(, CPU));
 
     queue_enable_queue_send(&voice_queue, &voice_queue_sender_list,
                             voice_thread_id);
-} /* voice_thread_init */
-
-/* Unfreeze the voice thread */
-void voice_thread_resume(void)
-{
-    logf("Thawing voice thread");
-    thread_thaw(voice_thread_id);
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING

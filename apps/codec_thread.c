@@ -411,25 +411,6 @@ static bool codec_loop_track_callback(void)
     return global_settings.repeat_mode == REPEAT_ONE;
 }
 
-/* Initialize codec API */
-void codec_init_codec_api(void)
-{
-    ci.dsp                 = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
-                                                                CODEC_IDX_AUDIO);
-    ci.codec_get_buffer    = codec_get_buffer_callback;
-    ci.pcmbuf_insert       = codec_pcmbuf_insert_callback;
-    ci.set_elapsed         = audio_codec_update_elapsed;
-    ci.read_filebuf        = codec_filebuf_callback;
-    ci.request_buffer      = codec_request_buffer_callback;
-    ci.advance_buffer      = codec_advance_buffer_callback;
-    ci.seek_buffer         = codec_seek_buffer_callback;
-    ci.seek_complete       = codec_seek_complete_callback;
-    ci.set_offset          = audio_codec_update_offset;
-    ci.configure           = codec_configure_callback;
-    ci.get_command         = codec_get_command_callback;
-    ci.loop_track          = codec_loop_track_callback;
-}
-
 
 /** --- CODEC THREAD --- **/
 
@@ -626,23 +607,33 @@ static void NORETURN_ATTR codec_thread(void)
 
 /** --- Miscellaneous external interfaces -- **/
 
-/* Create the codec thread and init kernel objects */
-void make_codec_thread(void)
+/* Initialize playback's codec interface */
+void codec_thread_init(void)
 {
+    /* Init API */
+    ci.dsp              = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
+                                                             CODEC_IDX_AUDIO);
+    ci.codec_get_buffer = codec_get_buffer_callback;
+    ci.pcmbuf_insert    = codec_pcmbuf_insert_callback;
+    ci.set_elapsed      = audio_codec_update_elapsed;
+    ci.read_filebuf     = codec_filebuf_callback;
+    ci.request_buffer   = codec_request_buffer_callback;
+    ci.advance_buffer   = codec_advance_buffer_callback;
+    ci.seek_buffer      = codec_seek_buffer_callback;
+    ci.seek_complete    = codec_seek_complete_callback;
+    ci.set_offset       = audio_codec_update_offset;
+    ci.configure        = codec_configure_callback;
+    ci.get_command      = codec_get_command_callback;
+    ci.loop_track       = codec_loop_track_callback;
+
+    /* Init threading */
     queue_init(&codec_queue, false);
     codec_thread_id = create_thread(
-            codec_thread, codec_stack, sizeof(codec_stack),
-            CREATE_THREAD_FROZEN,
+            codec_thread, codec_stack, sizeof(codec_stack), 0,
             codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK)
             IF_COP(, CPU));
     queue_enable_queue_send(&codec_queue, &codec_queue_sender_list,
                             codec_thread_id);
-}
-
-/* Unfreeze the codec thread */
-void codec_thread_resume(void)
-{
-    thread_thaw(codec_thread_id);
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING

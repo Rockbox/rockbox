@@ -28,14 +28,12 @@
 const char *get_codec_filename(int cod_spec);
 
 /* codec thread */
+void codec_thread_init(void);
 
 /* Audio MUST be stopped before requesting callback! */
 void codec_thread_do_callback(void (*fn)(void),
                               unsigned int *codec_thread_id);
 
-void codec_init_codec_api(void);
-void make_codec_thread(void);
-void codec_thread_resume(void);
 #ifdef HAVE_PRIORITY_SCHEDULING
 int codec_thread_get_priority(void);
 int codec_thread_set_priority(int priority);

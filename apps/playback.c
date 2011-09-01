@@ -3813,14 +3813,11 @@ void audio_init(void)
 
     pcm_init();
 
-    codec_init_codec_api();
-
-    make_codec_thread();
+    codec_thread_init();
 
     /* This thread does buffer, so match its priority */
     audio_thread_id = create_thread(audio_thread, audio_stack,
-                  sizeof(audio_stack), CREATE_THREAD_FROZEN,
-                  audio_thread_name
+                  sizeof(audio_stack), 0, audio_thread_name
                   IF_PRIO(, MIN(PRIORITY_BUFFERING, PRIORITY_USER_INTERFACE))
                   IF_COP(, CPU));
 
@@ -3853,11 +3850,4 @@ void audio_init(void)
 #ifdef HAVE_DISK_STORAGE
     audio_set_buffer_margin(global_settings.buffer_margin);
 #endif
-
-    /* It's safe to let the threads run now */
-#ifdef PLAYBACK_VOICE
-    voice_thread_resume();
-#endif
-    codec_thread_resume();
-    thread_thaw(audio_thread_id);
 }
