@@ -22,7 +22,6 @@
 #include "config.h"
 
 #include "lcd.h"
-#include "lcd-clip.h"
 #include "system.h"
 #include "cpu.h"
 
@@ -35,7 +34,7 @@ static bool lcd_enabled;
 #endif
 
 /* initialises the host lcd hardware, returns the lcd type */
-int lcd_hw_init(void)
+static int lcd_hw_init(void)
 {
     /* configure SSP */
     bitset32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE);
@@ -58,9 +57,11 @@ int lcd_hw_init(void)
     /* configure GPIO B3 (lcd type detect) as input */
     GPIOB_DIR &= ~(1<<3);
 
-    /* configure GPIO A5 (lcd reset# ?) as output and set low */
+    /* configure GPIO A5 (lcd reset#) as output and perform lcd reset */
     GPIOA_DIR |= (1 << 5);
     GPIOA_PIN(5) = 0;
+    sleep(HZ * 50/1000);
+    GPIOA_PIN(5) = (1 << 5);
 
     /* detect lcd type on GPIO B3 */    
     return GPIOB_PIN(3) ? 1 : 0;
