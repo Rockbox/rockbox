@@ -1,7 +1,7 @@
 $publicrelease="3.9.1";
 $manualrelease="3.9.1";
 $voicerelease="3.9.1";
-$releasedate="18 August 2011";
+$releasedate="01 September 2011";
 $releasenotes="/wiki/ReleaseNotes391";
 
 %builds = (
