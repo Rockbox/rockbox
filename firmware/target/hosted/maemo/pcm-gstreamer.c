@@ -397,7 +397,7 @@ void pcm_shutdown_gstreamer(void)
     g_main_loop_unref (pcm_loop);
 }
 
-void pcm_postinit(void)
+void pcm_play_dma_postinit(void)
 {
 }
 

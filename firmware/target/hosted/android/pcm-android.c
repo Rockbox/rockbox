@@ -206,7 +206,7 @@ void pcm_play_dma_init(void)
     write_method      = e->GetMethodID(env_ptr, RockboxPCM_class, "write", "([BII)I");
 }
 
-void pcm_postinit(void)
+void pcm_play_dma_postinit(void)
 {
 }
 

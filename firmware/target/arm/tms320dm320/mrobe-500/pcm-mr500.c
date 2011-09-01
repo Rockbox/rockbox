@@ -35,7 +35,7 @@
  */
 static void *start;
 
-void pcm_postinit(void)
+void pcm_play_dma_postinit(void)
 {
     /* Configure clock divider */
     tsc2100_writereg(CONTROL_PAGE2, TSPP1_ADDRESS, 0x1120);

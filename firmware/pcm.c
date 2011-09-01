@@ -43,6 +43,7 @@
  *   Semi-private -
  *      pcm_play_get_more_callback
  *      pcm_play_dma_init
+ *      pcm_play_dma_postinit
  *      pcm_play_dma_start
  *      pcm_play_dma_stop
  *      pcm_play_dma_pause
@@ -79,6 +80,9 @@
  *
  */
 
+/* 'true' when all stages of pcm initialization have completed */
+static bool pcm_is_ready = false;
+
 /* the registered callback function to ask for more mp3 data */
 static pcm_play_callback_type pcm_callback_for_more SHAREDBSS_ATTR = NULL;
 void (* pcm_play_dma_started)(void) SHAREDBSS_ATTR = NULL;
@@ -103,6 +107,12 @@ static void pcm_play_stopped(void)
     pcm_play_dma_started = NULL;
     pcm_paused = false;
     pcm_playing = false;
+}
+
+static void pcm_wait_for_init(void)
+{
+    while (!pcm_is_ready)
+        sleep(0);
 }
 
 /**
@@ -228,6 +238,23 @@ void pcm_init(void)
 
     logf(" pcm_play_dma_init");
     pcm_play_dma_init();
+}
+
+/* Finish delayed init */
+void pcm_postinit(void)
+{
+    logf("pcm_postinit");
+
+    logf(" pcm_play_dma_postinit");
+
+    pcm_play_dma_postinit();
+
+    pcm_is_ready = true;
+}
+
+bool pcm_is_initialized(void)
+{
+    return pcm_is_ready;
 }
 
 /* Common code to pcm_play_data and pcm_play_pause */
@@ -402,6 +429,8 @@ void pcm_apply_settings(void)
 {
     logf("pcm_apply_settings");
 
+    pcm_wait_for_init();
+
     if (pcm_sampr != pcm_curr_sampr)
     {
         logf(" pcm_dma_apply_settings");
@@ -486,6 +515,8 @@ bool pcm_is_recording(void)
 void pcm_init_recording(void)
 {
     logf("pcm_init_recording");
+
+    pcm_wait_for_init();
 
     /* Stop the beasty before attempting recording */
     mixer_reset();

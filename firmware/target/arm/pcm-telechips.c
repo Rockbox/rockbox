@@ -57,11 +57,6 @@ struct dma_data dma_play_data SHAREDBSS_ATTR =
     .state = 0
 };
 
-void pcm_postinit(void)
-{
-    audiohw_postinit();
-}
-
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     unsigned long addr = (unsigned long)dma_play_data.p;
@@ -108,6 +103,11 @@ void pcm_play_dma_init(void)
 #if NUM_CORES > 1
     dma_play_data.core = 0; /* no core in control */
 #endif
+}
+
+void pcm_play_dma_postinit(void)
+{
+    audiohw_postinit();
 }
 
 void pcm_dma_apply_settings(void)

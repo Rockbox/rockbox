@@ -152,7 +152,7 @@ void pcm_play_dma_init(void)
     audiohw_preinit();
 }
 
-void pcm_postinit(void)
+void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();
 }

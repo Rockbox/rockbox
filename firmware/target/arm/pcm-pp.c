@@ -527,7 +527,7 @@ void pcm_play_dma_init(void)
     IISCONFIG |= IIS_TXFIFOEN;
 }
 
-void pcm_postinit(void)
+void void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();
 }

@@ -410,7 +410,7 @@ void pcm_play_dma_init(void)
     pcm_dma_apply_settings_nolock();
 }
 
-void pcm_postinit(void)
+void pcm_play_dma_postinit(void)
 {
 }
 

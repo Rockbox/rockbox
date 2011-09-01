@@ -183,8 +183,7 @@ static struct albumart_slot
 /* Buffer and thread state tracking */
 static enum filling_state
 {
-    STATE_BOOT = 0, /* audio thread is not ready yet */
-    STATE_IDLE,     /* audio is stopped: nothing to do */
+    STATE_IDLE = 0, /* audio is stopped: nothing to do */
     STATE_FILLING,  /* adding tracks to the buffer */
     STATE_FULL,     /* can't add any more tracks */
     STATE_END_OF_PLAYLIST, /* all remaining tracks have been added */
@@ -194,7 +193,7 @@ static enum filling_state
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     STATE_USB,      /* USB mode, ignore most messages */
 #endif
-} filling = STATE_BOOT;
+} filling = STATE_IDLE;
 
 /* Track info - holds information about each track in the buffer */
 struct track_info
@@ -2917,8 +2916,6 @@ static void audio_thread(void)
 
     pcm_postinit();
 
-    filling = STATE_IDLE;
-
     while (1)
     {
         switch (filling)
@@ -3715,12 +3712,6 @@ int audio_get_file_pos(void)
 unsigned long audio_prev_elapsed(void)
 {
     return prev_track_elapsed;
-}
-
-/* Is the audio thread ready to accept commands? */
-bool audio_is_thread_ready(void)
-{
-    return filling != STATE_BOOT;
 }
 
 /* Return total file buffer length after accounting for the talk buf */

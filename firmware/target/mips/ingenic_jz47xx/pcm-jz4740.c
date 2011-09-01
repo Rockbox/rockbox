@@ -33,7 +33,7 @@
  ** Playback DMA transfer
  **/
 
-void pcm_postinit(void)
+void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();
 

@@ -418,7 +418,7 @@ void radio_screen(void)
     /* turn on radio */
 #if CONFIG_CODEC == SWCODEC
     /* This should be done before touching audio settings */
-    while (!audio_is_thread_ready())
+    while (!pcm_is_initialized())
        sleep(0);
 
     audio_set_input_source(AUDIO_SRC_FMRADIO,

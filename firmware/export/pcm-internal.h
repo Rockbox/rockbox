@@ -66,6 +66,7 @@ extern volatile bool pcm_paused;
 void pcm_play_dma_lock(void);
 void pcm_play_dma_unlock(void);
 void pcm_play_dma_init(void) INIT_ATTR;
+void pcm_play_dma_postinit(void);
 void pcm_play_dma_start(const void *addr, size_t size);
 void pcm_play_dma_stop(void);
 void pcm_play_dma_pause(bool pause);

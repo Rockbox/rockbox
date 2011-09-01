@@ -203,7 +203,7 @@ void pcm_play_dma_init(void)
 #endif
 } /* pcm_play_dma_init */
 
-void pcm_postinit(void)
+void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();
     iis_play_reset();

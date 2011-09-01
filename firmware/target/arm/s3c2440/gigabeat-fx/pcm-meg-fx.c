@@ -94,7 +94,7 @@ void pcm_play_dma_init(void)
     bitset32(&INTMOD, DMA2_MASK);
 }
 
-void pcm_postinit(void)
+void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();
 }
