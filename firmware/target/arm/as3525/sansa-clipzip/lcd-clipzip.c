@@ -7,8 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 François Dinel
- * Copyright (C) 2008-2009 Rafaël Carré
+ * Copyright (C) 2011 Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -110,46 +109,45 @@ static void lcd_delay(int us)
     udelay(us);
 }
 
-/* initialises lcd type 0 */
+/*  Initialises lcd type 0
+ *  This appears to be a Visionox M00230 OLED display controlled by a SEPS114A.
+ */
 static void lcd_init_type0(void)
 {
-    lcd_write(0x01, 0x00);
-    lcd_write(0x14, 0x01);
+    lcd_write(0x01, 0x00);  /* SOFT_RESET */
+    lcd_write(0x14, 0x01);  /* STANDBY_ON_OFF */
     lcd_delay(5);
 
-    lcd_write(0x14, 0x00);
+    lcd_write(0x14, 0x00);  /* STANDBY_ON_OFF */
     lcd_delay(5);
 
-    lcd_write(0x0F, 0x41);
-    lcd_write(0xEA, 0x0A);
-    lcd_write(0xEB, 0x42);
-    lcd_write(0x18, 0x08);
-    lcd_write(0x1A, 0x0B);
-    lcd_write(0x48, 0x03);
-
-    /* lcd width/height */
-    lcd_write(0x30, 0x00);
-    lcd_write(0x31, 0x5F);
-    lcd_write(0x32, 0x00);
-    lcd_write(0x33, 0x5F);
-
-    lcd_write(0xE0, 0x10);
-    lcd_write(0xE1, 0x00);
-    lcd_write(0xE5, 0x00);
-    lcd_write(0x0D, 0x00);
-    lcd_write(0x1D, 0x01);
-    lcd_write(0x09, 0x00);
-    lcd_write(0x13, 0x00);
-    lcd_write(0x16, 0x05);
-    lcd_write(0x3A, 0x03);
-    lcd_write(0x3B, 0x03);
-    lcd_write(0x3C, 0x03);
-    lcd_write(0x3D, 0x45);
-    lcd_write(0x3E, 0x45);
-    lcd_write(0x3F, 0x45);
-    lcd_write(0x40, 0x62);
-    lcd_write(0x41, 0x3D);
-    lcd_write(0x42, 0x46);
+    lcd_write(0x0F, 0x41);  /* ANALOG_CONTROL */
+    lcd_write(0xEA, 0x0A);  /* ? */
+    lcd_write(0xEB, 0x42);  /* ? */
+    lcd_write(0x18, 0x08);  /* DISCHARGE_TIME */
+    lcd_write(0x1A, 0x0B);  /* OSC_ADJUST */
+    lcd_write(0x48, 0x03);  /* ROW_OVERLAP */
+    lcd_write(0x30, 0x00);  /* DISPLAY_X1 */
+    lcd_write(0x31, 0x5F);  /* DISPLAY_X2 */
+    lcd_write(0x32, 0x00);  /* DISPLAY_Y1 */
+    lcd_write(0x33, 0x5F);  /* DISPLAY_Y2 */
+    lcd_write(0xE0, 0x10);  /* RGB_IF */
+    lcd_write(0xE1, 0x00);  /* RGB_POL */
+    lcd_write(0xE5, 0x00);  /* DISPLAY_MODE_CONTROL */
+    lcd_write(0x0D, 0x00);  /* CPU_IF */
+    lcd_write(0x1D, 0x01);  /* MEMORY_WRITE_READ */
+    lcd_write(0x09, 0x00);  /* ROW_SCAN_DIRECTION */
+    lcd_write(0x13, 0x00);  /* ROW_SCAN_MODE */
+    lcd_write(0x16, 0x05);  /* PEAK_PULSE_DELAY */
+    lcd_write(0x3A, 0x03);  /* PEAK_PULSE_WIDTH_R */
+    lcd_write(0x3B, 0x03);  /* PEAK_PULSE_WIDTH_G */
+    lcd_write(0x3C, 0x03);  /* PEAK_PULSE_WIDTH_B */
+    lcd_write(0x3D, 0x45);  /* PRECHARGE_CURRENT_R */
+    lcd_write(0x3E, 0x45);  /* PRECHARGE_CURRENT_G */
+    lcd_write(0x3F, 0x45);  /* PRECHARGE_CURRENT_B */
+    lcd_write(0x40, 0x62);  /* COLUMN_CURRENT_R */
+    lcd_write(0x41, 0x3D);  /* COLUMN_CURRENT_G */
+    lcd_write(0x42, 0x46);  /* COLUMN_CURRENT_B */
 }
 
 /* writes a table entry (for type 1 LCDs) */
@@ -277,13 +275,13 @@ void lcd_enable(bool on)
 
     if (lcd_type == 0) {
         if (on) {
-            lcd_write(0x14, 0x00);
-            lcd_write(0x02, 0x01);
-            lcd_write(0xD2, 0x04);
-            lcd_write(0xD0, 0x80);
+            lcd_write(0x14, 0x00);  /* STANDBY_ON_OFF */
+            lcd_write(0x02, 0x01);  /* DISP_ON_OFF */
+            lcd_write(0xD2, 0x04);  /* SCREEN_SAVER_MODE */
+            lcd_write(0xD0, 0x80);  /* SCREEN_SAVER_CONTROL */
             sleep(HZ * 100/1000);
 
-            lcd_write(0xD0, 0x00);
+            lcd_write(0xD0, 0x00);  /* SCREEN_SAVER_CONTROL */
         }
         else {
             lcd_write(0xD2, 0x05);
@@ -337,10 +335,10 @@ void lcd_init_device(void)
 static void lcd_setup_rect(int x, int x_end, int y, int y_end)
 {
     if (lcd_type == 0) {
-        lcd_write(0x34, x);
-        lcd_write(0x35, x_end);
-        lcd_write(0x36, y);
-        lcd_write(0x37, y_end);
+        lcd_write(0x34, x);     /* MEM_X1 */
+        lcd_write(0x35, x_end); /* MEM_X2 */
+        lcd_write(0x36, y);     /* MEM_Y1 */
+        lcd_write(0x37, y_end); /* MEM_Y2 */
     }
     else {
         lcd_write_cmd(0x0A);
@@ -359,9 +357,9 @@ static void lcd_setup_rect(int x, int x_end, int y, int y_end)
 void lcd_brightness(uint8_t red, uint8_t green, uint8_t blue)
 {
     if (lcd_type == 0) {
-        lcd_write(0x40, red);
-        lcd_write(0x41, green);
-        lcd_write(0x42, blue);
+        lcd_write(0x40, red);   /* COLUMN_CURRENT_R */
+        lcd_write(0x41, green); /* COLUMN_CURRENT_G */
+        lcd_write(0x42, blue);  /* COLUMN_CURRENT_B */
     }
     else {
         lcd_write_cmd(0x0E);
@@ -404,7 +402,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     lcd_setup_rect(x, x_end - 1, y, y_end - 1);
 
     /* write to GRAM */
-    lcd_write_cmd((lcd_type == 0) ? 0x08 : 0x0C);
+    lcd_write_cmd((lcd_type == 0) ? 0x08 : 0x0C);   /* DDRAM_DATA_ACCESS_PORT */
     for (row = y; row < y_end; row++) {
         ptr = &lcd_framebuffer[row][x];
         for (col = x; col < x_end; col++) {
