@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include "lcd.h"
+#include "lcd-target.h"
 #include "system.h"
 #include "cpu.h"
 
@@ -154,7 +155,7 @@ static void lcd_init_type0(void)
 /* writes a table entry (for type 1 LCDs) */
 static void lcd_write_table(uint8_t val)
 {
-    lcd_write_dat((val >> 4) & 0x07);
+    lcd_write_dat((val >> 4) & 0x0F);
     lcd_write_dat((val >> 0) & 0x0F);
 }
 
@@ -351,6 +352,22 @@ static void lcd_setup_rect(int x, int x_end, int y, int y_end)
         lcd_write_dat((y >> 0) & 0xFF);
         lcd_write_dat((y_end >> 8) & 0xFF);
         lcd_write_dat((y_end >> 0) & 0xFF);
+    }
+}
+
+/* sets the brightness of the OLED */
+void lcd_brightness(uint8_t red, uint8_t green, uint8_t blue)
+{
+    if (lcd_type == 0) {
+        lcd_write(0x40, red);
+        lcd_write(0x41, green);
+        lcd_write(0x42, blue);
+    }
+    else {
+        lcd_write_cmd(0x0E);
+        lcd_write_table(red);
+        lcd_write_table(green);
+        lcd_write_table(blue);
     }
 }
 
