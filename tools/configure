@@ -3232,6 +3232,9 @@ case $modelname in
   sansac200)
      gdbstub=", (E)raser"
      ;;
+  sansae200)
+     gdbstub=", (E)raser"
+     ;;
   *)
      ;;
 esac
@@ -3253,20 +3256,9 @@ fi
     [Ee])
       appsdir='$(ROOTDIR)/bootloader'
       apps="bootloader"
-      echo "C2(4)0 or C2(5)0"
-      variant=`input`
-      case $variant in
-        4)
-           extradefines="$extradefines -DBOOTLOADER -DC200_ERASE -DC240_ERASE -ffunction-sections -fdata-sections"
-           echo "c240 eraser build selected"
-        ;;
-        5)
-           extradefines="$extradefines -DBOOTLOADER -DC200_ERASE -DC250_ERASE -ffunction-sections -fdata-sections"
-           echo "c240 eraser build selected"
-        ;;
-      esac
+      extradefines="$extradefines -DBOOTLOADER -DSANSA_PP_ERASE -ffunction-sections -fdata-sections"
       bootloader="1"
-      echo "c200 eraser build selected"
+      echo "sansa eraser build selected"
       ;;
     [Bb])
       if test $t_manufacturer = "archos"; then

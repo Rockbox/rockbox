@@ -33,7 +33,7 @@ MEMORY
 
 SECTIONS
 {
-#ifdef C200_ERASE
+#ifdef SANSA_PP_ERASE
   . = IRAMORIG+0x4000;
 #else
   . = IRAMORIG;

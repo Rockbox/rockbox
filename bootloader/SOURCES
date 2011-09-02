@@ -18,10 +18,9 @@ show_logo.c
       defined(SAMSUNG_YH925) || defined(SANSA_VIEW)
 #ifdef E200R_INSTALLER
 main-e200r-installer.c
-#elif defined(C240_ERASE)
-main-c240wipe.c
-#elif defined(C250_ERASE)
-main-c250wipe.c
+#elif defined(SANSA_PP_ERASE)
+main-ppsansawipe.c
+fat32format.c
 #else
 show_logo.c
 main-pp.c
