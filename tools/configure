@@ -655,7 +655,7 @@ androidcc () {
         echo "environment variable point to the root directory of the Android NDK."
         exit
     fi
-    buildhost=`uname | tr [:upper:] [:lower:]`
+    buildhost=$(uname | tr "[:upper:]" "[:lower:]")
     gccchoice="4.4.3"
     gcctarget="arm-linux-androideabi-"
     gccprefix=$ANDROID_NDK_PATH/toolchains/$gcctarget$gccchoice/prebuilt/$buildhost-x86
