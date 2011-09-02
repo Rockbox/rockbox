@@ -45,8 +45,7 @@
 #define WORD_FRACBITS           27
 
 #define NATIVE_DEPTH            16
-/* If the small buffer size changes, check the assembly code! */
-#define SMALL_SAMPLE_BUF_COUNT  256
+#define SMALL_SAMPLE_BUF_COUNT  128 /* Per channel */
 #define DEFAULT_GAIN            0x01000000
 
 /* enums to index conversion properly with stereo mode and other settings */
@@ -242,25 +241,23 @@ static bool crossfeed_enabled;
  * of copying needed is minimized for that case.
  */
 
-#define RESAMPLE_RATIO          4 /* Enough for 11,025 Hz -> 44,100 Hz */
+#define RESAMPLE_RATIO              4 /* Enough for 11,025 Hz -> 44,100 Hz */
+#define SMALL_RESAMPLE_BUF_COUNT    (SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO)
+#define BIG_SAMPLE_BUF_COUNT        SMALL_RESAMPLE_BUF_COUNT
+#define BIG_RESAMPLE_BUF_COUNT      (BIG_SAMPLE_BUF_COUNT * RESAMPLE_RATIO)
 
-static int32_t small_sample_buf[SMALL_SAMPLE_BUF_COUNT] IBSS_ATTR;
-static int32_t small_resample_buf[SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO] IBSS_ATTR;
+static int32_t small_sample_buf[2][SMALL_SAMPLE_BUF_COUNT] IBSS_ATTR;
+static int32_t small_resample_buf[2][SMALL_RESAMPLE_BUF_COUNT] IBSS_ATTR;
 
 #ifdef HAVE_PITCHSCREEN
-static int32_t *big_sample_buf = NULL;
-static int32_t *big_resample_buf = NULL;
-static int big_sample_buf_count = -1;  /* -1=unknown, 0=not available */
+static int32_t (* big_sample_buf)[BIG_SAMPLE_BUF_COUNT] = NULL;
+static int32_t (* big_resample_buf)[BIG_RESAMPLE_BUF_COUNT] = NULL;
 #endif
 
 static int sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
-static int32_t *sample_buf = small_sample_buf;
-static int32_t *resample_buf = small_resample_buf;
-
-#define SAMPLE_BUF_LEFT_CHANNEL 0
-#define SAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2)
-#define RESAMPLE_BUF_LEFT_CHANNEL 0
-#define RESAMPLE_BUF_RIGHT_CHANNEL (sample_buf_count/2 * RESAMPLE_RATIO)
+static int32_t *sample_buf[2] = { small_sample_buf[0], small_sample_buf[1] };
+static int resample_buf_count = SMALL_RESAMPLE_BUF_COUNT;
+static int32_t *resample_buf[2] = { small_resample_buf[0], small_resample_buf[1] };
 
 /* compressor */
 static struct   compressor_menu c_menu;
@@ -297,14 +294,19 @@ static void tdspeed_setup(struct dsp_config *dspc)
 {
     /* Assume timestretch will not be used */
     dspc->tdspeed_active = false;
-    sample_buf = small_sample_buf;
-    resample_buf = small_resample_buf;
+    sample_buf[0] = small_sample_buf[0];
+    sample_buf[1] = small_sample_buf[1];
+    resample_buf[0] = small_resample_buf[0];
+    resample_buf[1] = small_resample_buf[1];
     sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
+    resample_buf_count = SMALL_RESAMPLE_BUF_COUNT;
 
-    if(!dsp_timestretch_available())
+    if (!dsp_timestretch_available())
         return; /* Timestretch not enabled or buffer not allocated */
+
     if (dspc->tdspeed_percent == 0)
         dspc->tdspeed_percent = PITCH_SPEED_100;
+
     if (!tdspeed_config(
         dspc->codec_frequency == 0 ? NATIVE_FREQUENCY : dspc->codec_frequency,
         dspc->stereo_mode != STEREO_MONO,
@@ -313,9 +315,12 @@ static void tdspeed_setup(struct dsp_config *dspc)
 
     /* Timestretch is to be used */
     dspc->tdspeed_active = true;
-    sample_buf = big_sample_buf;
-    sample_buf_count = big_sample_buf_count;
-    resample_buf = big_resample_buf;
+    sample_buf[0] = big_sample_buf[0];
+    sample_buf[1] = big_sample_buf[1];
+    resample_buf[0] = big_resample_buf[0];
+    resample_buf[1] = big_resample_buf[1];
+    sample_buf_count = BIG_SAMPLE_BUF_COUNT;
+    resample_buf_count = BIG_RESAMPLE_BUF_COUNT;
 }
 
 
@@ -337,31 +342,41 @@ void dsp_timestretch_enable(bool enabled)
 {
     /* Hook to set up timestretch buffer on first call to settings_apply() */
     static int handle;
+
     if (enabled)
     {
-        if (big_sample_buf_count > 0)
+        if (big_sample_buf)
             return; /* already allocated and enabled */
+
         /* Set up timestretch buffers */
-        big_sample_buf_count = SMALL_SAMPLE_BUF_COUNT * RESAMPLE_RATIO;
-        big_sample_buf = small_resample_buf;
+        big_sample_buf = &small_resample_buf[0];
+
         handle = core_alloc_ex("resample buf",
-                big_sample_buf_count * RESAMPLE_RATIO * sizeof(int32_t), &ops);
-        if (handle > 0)
-        {   /* success, now setup tdspeed */
+                               2 * BIG_RESAMPLE_BUF_COUNT * sizeof(int32_t),
+                               &ops);
+
+        enabled = handle > 0;
+
+        if (enabled)
+        {
+            /* success, now setup tdspeed */
             big_resample_buf = core_get_data(handle);
+
             tdspeed_init();
             tdspeed_setup(&AUDIO_DSP);
         }
     }
-    if (!enabled || (handle <= 0)) /* disable */
+
+    if (!enabled)
     {
         dsp_set_timestretch(PITCH_SPEED_100);
         tdspeed_finish();
+
         if (handle > 0)
             core_free(handle);
+
         handle = 0;
         big_sample_buf = NULL;
-        big_sample_buf_count = 0;
     }
 }
 
@@ -378,9 +393,9 @@ int32_t dsp_get_timestretch()
 
 bool dsp_timestretch_available()
 {
-    return (global_settings.timestretch_enabled && big_sample_buf_count > 0);
+    return (global_settings.timestretch_enabled && big_sample_buf);
 }
-#endif
+#endif /* HAVE_PITCHSCREEN */
 
 /* Convert count samples to the internal format, if needed.  Updates src
  * to point past the samples "consumed" and dst is set to point to the
@@ -394,7 +409,7 @@ static void sample_input_lte_native_mono(
 {
     const int16_t *s = (int16_t *) src[0];
     const int16_t * const send = s + count;
-    int32_t *d = dst[0] = dst[1] = &sample_buf[SAMPLE_BUF_LEFT_CHANNEL];
+    int32_t *d = dst[0] = dst[1] = sample_buf[0];
     int scale = WORD_SHIFT;
 
     while (s < send)
@@ -411,8 +426,8 @@ static void sample_input_lte_native_i_stereo(
 {
     const int32_t *s = (int32_t *) src[0];
     const int32_t * const send = s + count;
-    int32_t *dl = dst[0] = &sample_buf[SAMPLE_BUF_LEFT_CHANNEL];
-    int32_t *dr = dst[1] = &sample_buf[SAMPLE_BUF_RIGHT_CHANNEL];
+    int32_t *dl = dst[0] = sample_buf[0];
+    int32_t *dr = dst[1] = sample_buf[1];
     int scale = WORD_SHIFT;
 
     while (s < send)
@@ -437,8 +452,8 @@ static void sample_input_lte_native_ni_stereo(
     const int16_t *sl = (int16_t *) src[0];
     const int16_t *sr = (int16_t *) src[1];
     const int16_t * const slend = sl + count;
-    int32_t *dl = dst[0] = &sample_buf[SAMPLE_BUF_LEFT_CHANNEL];
-    int32_t *dr = dst[1] = &sample_buf[SAMPLE_BUF_RIGHT_CHANNEL];
+    int32_t *dl = dst[0] = sample_buf[0];
+    int32_t *dr = dst[1] = sample_buf[1];
     int scale = WORD_SHIFT;
 
     while (sl < slend)
@@ -465,8 +480,8 @@ static void sample_input_gt_native_i_stereo(
 {
     const int32_t *s = (int32_t *)src[0];
     const int32_t * const send = s + 2*count;
-    int32_t *dl = dst[0] = &sample_buf[SAMPLE_BUF_LEFT_CHANNEL];
-    int32_t *dr = dst[1] = &sample_buf[SAMPLE_BUF_RIGHT_CHANNEL];
+    int32_t *dl = dst[0] = sample_buf[0];
+    int32_t *dr = dst[1] = sample_buf[1];
 
     while (s < send)
     {
@@ -776,8 +791,8 @@ static inline int resample(struct dsp_config *dsp, int count, int32_t *src[])
 {
     int32_t *dst[2] =
     {
-        &resample_buf[RESAMPLE_BUF_LEFT_CHANNEL],
-        &resample_buf[RESAMPLE_BUF_RIGHT_CHANNEL],
+        resample_buf[0],
+        resample_buf[1]
     };
 
     count = dsp->resample(count, &dsp->data, (const int32_t **)src, dst);
@@ -1254,7 +1269,7 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
        will be preloaded to be used for the call if not. */
     while (count > 0)
     {
-        int samples = MIN(sample_buf_count/2, count);
+        int samples = MIN(sample_buf_count, count);
         count -= samples;
 
         dsp->input_samples(samples, src, tmp);
@@ -1271,7 +1286,7 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
             t2[0] = tmp[0]+chunk_offset;
             t2[1] = tmp[1]+chunk_offset;
 
-            int chunk = MIN(sample_buf_count/2, samples);
+            int chunk = MIN(sample_buf_count, samples);
             chunk_offset += chunk;
             samples -= chunk;
 
@@ -1341,12 +1356,12 @@ int dsp_output_count(struct dsp_config *dsp, int count)
     }
 
     /* Now we have the resampled sample count which must not exceed
-     * RESAMPLE_BUF_RIGHT_CHANNEL to avoid resample buffer overflow. One
+     * resample_buf_count to avoid resample buffer overflow. One
      * must call dsp_input_count() to get the correct input sample
      * count.
      */
-    if (count > RESAMPLE_BUF_RIGHT_CHANNEL)
-        count = RESAMPLE_BUF_RIGHT_CHANNEL;
+    if (count > resample_buf_count)
+        count = resample_buf_count;
         
     return count;
 }
