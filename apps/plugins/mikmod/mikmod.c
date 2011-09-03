@@ -115,11 +115,11 @@ void mmsupp_printf(const char *fmt, ...)
 {
     static int p_xtpt = 0;
     char p_buf[LINE_LENGTH];
-    bool ok;
+    /* bool ok; */
     va_list ap;
 
     va_start(ap, fmt);
-    ok = rb->vsnprintf(p_buf, sizeof(p_buf), fmt, ap);
+    /* ok = */ (void)rb->vsnprintf(p_buf, sizeof(p_buf), fmt, ap);
     va_end(ap);
 
     int i=0;
