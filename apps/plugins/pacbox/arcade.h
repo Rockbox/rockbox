@@ -189,8 +189,9 @@ void renderSprites( unsigned char * buffer );
     @return 0 if successful, otherwise the patch could not be applied
             (probably because the loaded ROM set does not support it)
 */
+/* rockbox: not used
 int setSpeedHack( int enabled );
-
+*/
 /* Implementation of the Z80 Environment interface */
 unsigned char readByteHigh( unsigned addr );
 

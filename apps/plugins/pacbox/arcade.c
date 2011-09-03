@@ -45,7 +45,7 @@ static fb_data rgb_to_gray(unsigned int r, unsigned int g, unsigned int b)
 }
 #endif
 
-unsigned char   color_data_[256] = {
+static unsigned char color_data_[256] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x0b, 0x01,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x0b, 0x03,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x0b, 0x05,
@@ -80,7 +80,7 @@ unsigned char   color_data_[256] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-unsigned char palette_data_[0x20] = {
+static unsigned char palette_data_[0x20] = {
        0x00, 0x07, 0x66, 0xef, 0x00, 0xf8, 0xea, 0x6f,
        0x00, 0x3f, 0x00, 0xc9, 0x38, 0xaa, 0xaf, 0xf6,
        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -238,7 +238,7 @@ int run(void)
 }
 
 /** Returns the status of the coin lockout door. */
-unsigned char getCoinLockout(void) {
+static unsigned char getCoinLockout(void) {
     return output_devices_ & CoinLockout ? 1 : 0;
 }
 
@@ -355,7 +355,7 @@ void decodeROMs(void)
 #endif
 }
 
-void getDeviceInfo( enum InputDevice device, unsigned char * mask, unsigned char ** port )
+static void getDeviceInfo( enum InputDevice device, unsigned char * mask, unsigned char ** port )
 {
     static unsigned char MaskInfo[] = {
          0x01 , // Joy1_Up
@@ -405,7 +405,7 @@ void getDeviceInfo( enum InputDevice device, unsigned char * mask, unsigned char
     }
 }
 
-enum InputDeviceMode getDeviceMode( enum InputDevice device )
+static enum InputDeviceMode getDeviceMode( enum InputDevice device )
 {
     unsigned char mask;
     unsigned char * port;
@@ -500,7 +500,7 @@ static inline void drawChar( unsigned char * buffer, int index, int ox, int oy, 
 }
 #endif
 
-inline void drawSprite( unsigned char * buffer, int index )
+static inline void drawSprite( unsigned char * buffer, int index )
 {
     struct PacmanSprite ps = sprites_[index];
     int x,y;
@@ -654,6 +654,7 @@ void playSound( int16_t * buf, int len )
 }
 
 /* Enables/disables the speed hack. */
+/* rockbox: not used
 int setSpeedHack( int enabled )
 {
     int result = 0;
@@ -679,3 +680,4 @@ int setSpeedHack( int enabled )
 
     return result;
 }
+*/
