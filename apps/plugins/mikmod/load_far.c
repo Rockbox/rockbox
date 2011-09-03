@@ -180,6 +180,7 @@ int FAR_Load(int curious)
 	FARSAMPLE s;
 	FARNOTE *crow;
 	UBYTE smap[8];
+    (void)curious;
 
 	/* try to read module header (first part) */
 	_mm_read_UBYTES(mh1->id,4,modreader);

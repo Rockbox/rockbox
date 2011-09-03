@@ -388,6 +388,7 @@ int IMF_Load(int curious)
 	ULONG *nextwav=NULL;
 	UWORD wavcnt=0;
 	UBYTE id[4];
+    (void)curious;
 
 	/* try to read the module header */
 	_mm_read_string(mh->songname,32,modreader);
@@ -515,9 +516,9 @@ int IMF_Load(int curious)
 		ih. name##beg=_mm_read_UBYTE(modreader);		\
 		ih. name##end=_mm_read_UBYTE(modreader);		\
 		ih. name##flg=_mm_read_UBYTE(modreader);		\
-		_mm_read_UBYTE(modreader);						\
-		_mm_read_UBYTE(modreader);						\
-		_mm_read_UBYTE(modreader)
+		(void)_mm_read_UBYTE(modreader);						\
+		(void)_mm_read_UBYTE(modreader);						\
+		(void)_mm_read_UBYTE(modreader)
 #else
 #define IMF_FinishLoadingEnvelope(name)				\
 		ih. name/**/pts=_mm_read_UBYTE(modreader);	\
@@ -525,9 +526,9 @@ int IMF_Load(int curious)
 		ih. name/**/beg=_mm_read_UBYTE(modreader);	\
 		ih. name/**/end=_mm_read_UBYTE(modreader);	\
 		ih. name/**/flg=_mm_read_UBYTE(modreader);	\
-		_mm_read_UBYTE(modreader);					\
-		_mm_read_UBYTE(modreader);					\
-		_mm_read_UBYTE(modreader)
+		(void)_mm_read_UBYTE(modreader);					\
+		(void)_mm_read_UBYTE(modreader);					\
+		(void)_mm_read_UBYTE(modreader)
 #endif
 
 		IMF_FinishLoadingEnvelope(vol);
@@ -626,7 +627,7 @@ int IMF_Load(int curious)
 			}
 
 			_mm_read_string(s->samplename,13,modreader);
-			_mm_read_UBYTE(modreader);_mm_read_UBYTE(modreader);_mm_read_UBYTE(modreader);
+			(void)_mm_read_UBYTE(modreader);(void)_mm_read_UBYTE(modreader);(void)_mm_read_UBYTE(modreader);
 			s->length    =_mm_read_I_ULONG(modreader);
 			s->loopstart =_mm_read_I_ULONG(modreader);
 			s->loopend   =_mm_read_I_ULONG(modreader);

@@ -131,6 +131,7 @@ int ULT_Load(int curious)
 	ULTSAMPLE s;
 	ULTHEADER mh;
 	UBYTE nos,noc,rbnop;
+    (void)curious;
 
 	/* try to read module header */
 	_mm_read_string(mh.id,15,modreader);

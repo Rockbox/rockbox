@@ -250,6 +250,7 @@ int S69_Load(int curious)
 	int i;
 	SAMPLE *current;
 	S69SAMPLE sample;
+    (void)curious;
 
 	/* module header */
 	_mm_read_UBYTES(mh->marker,2,modreader);

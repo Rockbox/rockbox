@@ -50,9 +50,6 @@ static unsigned char* audio_buffer;
 static size_t audio_buffer_free;
 
 
-/* The rockbox plugin interface */
-MEM_FUNCTION_WRAPPERS;
-
 bool quit;
 int playingtime IBSS_ATTR;
 MODULE *module IBSS_ATTR;
@@ -147,10 +144,12 @@ void mmsupp_printf(const char *fmt, ...)
 /************************* File Access ***************************/
 
 /* support function for qsort() */
+/* not used
 static int compare(const void* p1, const void* p2)
 {
     return rb->strcasecmp(*((char **)p1), *((char **)p2));
 }
+*/
 
 bool mod_ext(const char ext[])
 {
@@ -290,7 +289,7 @@ void get_more(unsigned char** start, size_t* size)
 #endif
 }
 
-void showinfo()
+void showinfo(void)
 {
     char statustext[LINE_LENGTH];
 
@@ -348,9 +347,9 @@ void showinfo()
     rb->lcd_update();
 }
 
-void showsamples()
+void showsamples(void)
 {
-    int i, j;
+    int i;
     char statustext[LINE_LENGTH];
 
     if ( screenupdated )
@@ -367,9 +366,9 @@ void showsamples()
     screenupdated = true;
 }
 
-void showinstruments()
+void showinstruments(void)
 {
-    int i, j;
+    int i;
     char statustext[LINE_LENGTH];
 
     if ( screenupdated )
@@ -386,7 +385,7 @@ void showinstruments()
     screenupdated = true;
 }
 
-void showcomments()
+void showcomments(void)
 {
     int i, j=0, k=0, l;
     char statustext[LINE_LENGTH];
@@ -425,7 +424,7 @@ void showcomments()
     screenupdated = true;
 }
 
-int changedisplay()
+void changedisplay(void)
 {
     display = (display+1) % 4;
 
@@ -494,7 +493,7 @@ static struct configdata config[] =
     { TYPE_BOOL, 0, 1, { .bool_p = &settings.boost }, "CPU Boost", NULL},
 };
 
-void applysettings()
+void applysettings(void)
 {
     md_pansep = settings.pansep;
     md_reverb = settings.reverb;
@@ -525,7 +524,6 @@ void applysettings()
 int settings_menu(void)
 {
     int selection = 0;
-    bool old_val;
 
     MENUITEM_STRINGLIST(settings_menu, "Mikmod Settings", NULL, "Panning Separation",
                         "Reverberation", "Interpolation", "Reverse Channels", "Surround",

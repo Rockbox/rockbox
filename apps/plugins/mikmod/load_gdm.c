@@ -343,6 +343,7 @@ int GDM_Load(int curious)
 	SAMPLE *q;
 	GDMSAMPLE s;
 	ULONG position;
+    (void)curious;
 
 	/* read header */
 	_mm_read_string(mh->id1,4,modreader);

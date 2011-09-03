@@ -147,12 +147,12 @@ static int LoadModuleHeader(MODULEHEADER *mh)
    Returns:  0 indecisive; 1 = UST; 2 = 15-inst                               */
 static int CheckPatternType(int numpat)
 {
-	int t;
+	unsigned int t;
 	UBYTE eff, dat;
 
 	for(t=0;t<numpat*(64U*4);t++) {
 		/* Load the pattern into the temp buffer and scan it */
-		_mm_read_UBYTE(modreader);_mm_read_UBYTE(modreader);
+		(void)_mm_read_UBYTE(modreader);(void)_mm_read_UBYTE(modreader);
 		eff = _mm_read_UBYTE(modreader);
 		dat = _mm_read_UBYTE(modreader);
 
@@ -372,7 +372,8 @@ static UBYTE *M15_ConvertTrack(MODNOTE* n)
 /* Loads all patterns of a modfile and converts them into the 3 byte format. */
 static int M15_LoadPatterns(void)
 {
-	int t,s,tracks=0;
+	int t,tracks=0;
+    unsigned int s;
 
 	if(!AllocPatterns()) return 0;
 	if(!AllocTracks()) return 0;

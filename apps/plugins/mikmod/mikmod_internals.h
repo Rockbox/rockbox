@@ -140,7 +140,9 @@ extern void _mm_iobase_setcur(MREADER*);
 extern void _mm_iobase_revert(MREADER*);
 extern int _mm_fopen(CHAR*,CHAR*);
 extern int	_mm_fclose(int);
+#if !defined(ROCKBOX)
 extern void _mm_write_string(CHAR*,MWRITER*);
+#endif
 extern int  _mm_read_string (CHAR*,int,MREADER*);
 
 extern SWORD _mm_read_M_SWORD(MREADER*);

@@ -145,6 +145,7 @@ int MTM_Load(int curious)
 	int t,u;
 	MTMSAMPLE s;
 	SAMPLE *q;
+    (void)curious;
 
 	/* try to read module header  */
 	_mm_read_UBYTES(mh->id,3,modreader);
@@ -219,7 +220,7 @@ int MTM_Load(int curious)
 	if(!AllocPositions(of.numpos)) return 0;
 	for(t=0;t<of.numpos;t++)
 		of.positions[t]=_mm_read_UBYTE(modreader);
-	for(;t<128;t++) _mm_read_UBYTE(modreader);
+	for(;t<128;t++) (void)_mm_read_UBYTE(modreader);
 	if(_mm_eof(modreader)) {
 		_mm_errno = MMERR_LOADING_HEADER;
 		return 0;

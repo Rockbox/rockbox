@@ -504,6 +504,7 @@ int UNI_Load(int curious)
 	char *modtype,*oldtype=NULL;
 	INSTRUMENT *d;
 	SAMPLE *q;
+    (void)curious;
 	
 	/* read module header */
 	_mm_read_UBYTES(mh.id,4,modreader);
@@ -514,7 +515,7 @@ int UNI_Load(int curious)
 
 	if(universion>=6) {
 		if (universion==6)
-			_mm_read_UBYTE(modreader);
+			(void)_mm_read_UBYTE(modreader);
 		else
 			universion=_mm_read_M_UWORD(modreader);
 

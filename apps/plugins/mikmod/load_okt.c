@@ -203,7 +203,7 @@ static int OKT_doSAMP(int len)
 		s.len = _mm_read_M_ULONG(modreader);
 		s.loopbeg = _mm_read_M_UWORD(modreader) * 2;
 		s.looplen = _mm_read_M_UWORD(modreader) * 2;
-		_mm_read_UBYTE(modreader);
+		(void)_mm_read_UBYTE(modreader);
 		s.volume = _mm_read_UBYTE(modreader);
 		_mm_read_M_UWORD(modreader);
 
@@ -330,6 +330,7 @@ int OKT_Load(int curious)
 	int seen_cmod = 0, seen_samp = 0, seen_slen = 0, seen_plen = 0, seen_patt
 			= 0, seen_spee = 0;
 	int patnum = 0, insnum = 0;
+    (void)curious;
 
 	/* skip OKTALYZER header */
 	_mm_fseek(modreader, 8, SEEK_SET);

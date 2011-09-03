@@ -237,6 +237,7 @@ int DSM_Load(int curious)
 	DSMINST s;
 	SAMPLE *q;
 	int cursmp=0,curpat=0,track=0;
+    (void)curious;
 
 	blocklp=0;
 	blockln=12;

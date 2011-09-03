@@ -217,7 +217,7 @@ GT_CHUNK *loadChunk(void)
 		_mm_read_M_ULONGS(&new_chunk->gt2.chunk_size, 1, modreader);
 		new_chunk->gt2.module_name[32] = 0;
 		_mm_read_UBYTES(&new_chunk->gt2.module_name, 32, modreader);
-		new_chunk->gt2.module_name[160] = 0;
+		new_chunk->gt2.comments_author[160] = 0;
 		_mm_read_UBYTES(&new_chunk->gt2.comments_author, 160, modreader);
 		_mm_read_UBYTES(&new_chunk->gt2.date_day, 1, modreader);
 		_mm_read_UBYTES(&new_chunk->gt2.date_month, 1, modreader);
@@ -332,6 +332,7 @@ int GT2_Test(void)
 int GT2_Load(int curious)
 {
 	GT_CHUNK *tmp;
+    (void)curious;
 
 	_mm_fseek(modreader, 0, SEEK_SET);
 	while (	(tmp = loadChunk() )) 

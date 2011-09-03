@@ -224,7 +224,8 @@ static UBYTE *STM_ConvertTrack(STMNOTE *n)
 
 static int STM_LoadPatterns(void)
 {
-	int t,s,tracks=0;
+	int t,tracks=0;
+    unsigned int s;
 
 	if(!AllocPatterns()) return 0;
 	if(!AllocTracks()) return 0;
@@ -254,6 +255,7 @@ int STM_Load(int curious)
 	int t; 
 	ULONG MikMod_ISA; /* We must generate our own ISA, it's not stored in stm */
 	SAMPLE *q;
+    (void)curious;
 
 	/* try to read stm header */
 	_mm_read_string(mh->songname,20,modreader);

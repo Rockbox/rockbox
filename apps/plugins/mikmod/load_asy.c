@@ -237,7 +237,8 @@ static UBYTE *ConvertTrack(MODNOTE *n)
 /* Loads all patterns of a modfile and converts them into the 3 byte format. */
 static int ML_LoadPatterns(void)
 {
-	int t, s, tracks = 0;
+	int t, tracks = 0;
+    unsigned int s;
 
 	if (!AllocPatterns()) {
 		return 0;
@@ -277,6 +278,7 @@ static int ASY_Load(int curious)
 	MSAMPINFO *s;
 	CHAR *descr=asylum;
 	ULONG seekpos;
+    (void)curious;
 
 	// no title in asylum amf files :(
 	strcpy(mh->songname, "");
@@ -286,7 +288,7 @@ static int ASY_Load(int curious)
 	mh->num_orders = _mm_read_UBYTE(modreader);
 	
 	// skip unknown byte
-	_mm_read_UBYTE(modreader);
+	(void)_mm_read_UBYTE(modreader);
 	_mm_read_UBYTES(mh->positions, 256, modreader);
 	
 	/* read samples headers*/
@@ -300,7 +302,7 @@ static int ASY_Load(int curious)
 		
 		s->finetune = _mm_read_UBYTE(modreader);
 		s->volume = _mm_read_UBYTE(modreader);
-		_mm_read_UBYTE(modreader); // skip unknown byte
+		(void)_mm_read_UBYTE(modreader); // skip unknown byte
 		s->length = _mm_read_I_ULONG(modreader);
 		s->reppos = _mm_read_I_ULONG(modreader);
 		s->replen = _mm_read_I_ULONG(modreader);

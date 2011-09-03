@@ -332,12 +332,14 @@ static UBYTE* AMF_ConvertTrack(void)
 
 int AMF_Load(int curious)
 {
-	int t,u,realtrackcnt,realsmpcnt,defaultpanning;
+	int u,defaultpanning;
+    unsigned int t,realtrackcnt,realsmpcnt;
 	AMFSAMPLE s;
 	SAMPLE *q;
 	UWORD *track_remap;
 	ULONG samplepos;
 	int channel_remap[16];
+    (void)curious;
 
 	/* try to read module header  */
 	_mm_read_UBYTES(mh->id,3,modreader);
@@ -505,7 +507,7 @@ int AMF_Load(int curious)
 			realtrackcnt=track_remap[t];
 	for(t=0;t<of.numpat*of.numchn;t++)
 		of.patterns[t]=(of.patterns[t]<=mh->numtracks)?
-		               track_remap[of.patterns[t]]-1:realtrackcnt;
+		               track_remap[of.patterns[t]]-1:(int)realtrackcnt;
 
 	MikMod_free(track_remap);
 

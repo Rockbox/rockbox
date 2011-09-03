@@ -80,6 +80,7 @@ static long _mm_MemReader_Tell(MREADER* reader);
 int _mm_fopen(CHAR* fname,CHAR* attrib)
 {
 	int fp;
+    (void)attrib;
 
 	//if(!(fp=fopen(fname,attrib))) {
 	//	_mm_errno = MMERR_OPENING_FILE;
@@ -212,11 +213,17 @@ static long _mm_FileWriter_Tell(MWRITER* writer)
 static int _mm_FileWriter_Write(MWRITER* writer,void* ptr,size_t size)
 {
 	//return (fwrite(ptr,size,1,((MFILEWRITER*)writer)->file)==size);
-	return (write(ptr,size,((MFILEWRITER*)writer)->file)==size);
+	//return (write(ptr,size,((MFILEWRITER*)writer)->file)==(int)size);
+    (void)writer;
+    (void)ptr;
+    (void)size;
+    return 0;
 }
 
 static int _mm_FileWriter_Put(MWRITER* writer,int value)
 {
+    (void)writer;
+    (void)value;
 	//return fputc(value,((MFILEWRITER*)writer)->file);
     return 1; // TODO
 }
@@ -292,7 +299,7 @@ static int _mm_MemReader_Read(MREADER* reader,void* ptr,size_t size)
 	s = ((MMEMREADER*)reader)->buffer;
 	s += ((MMEMREADER*)reader)->pos;
 
-	if ( ((MMEMREADER*)reader)->pos + size > ((MMEMREADER*)reader)->len) 
+	if ( ((MMEMREADER*)reader)->pos + (long)size > ((MMEMREADER*)reader)->len) 
 	{
 		((MMEMREADER*)reader)->pos = ((MMEMREADER*)reader)->len;
 		return 0; /* not enough remaining bytes */
@@ -354,7 +361,6 @@ static long _mm_MemReader_Tell(MREADER* reader)
 }
 
 /*========== Write functions */
-
 void _mm_write_string(CHAR* data,MWRITER* writer)
 {
 	if(data)
