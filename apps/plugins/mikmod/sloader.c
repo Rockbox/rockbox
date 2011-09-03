@@ -230,7 +230,10 @@ static int SL_LoadInternal(void* buffer,UWORD infmt,UWORD outfmt,int scalefactor
 
 	int result,c_block=0;	/* compression bytes until next block */
 	ITPACK status;
-	UWORD incnt;
+	UWORD incnt = 0;
+    
+    memset(&status, 0, sizeof(status)); /* initialize status */
+    
 
 	while(length) {
 		stodo=(length<SLBUFSIZE)?length:SLBUFSIZE;
