@@ -331,7 +331,9 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     struct tm tm;
     DIRENT_T *x11;
 
+#ifdef EOVERFLOW
 read_next:
+#endif
     x11 = READDIR(dir->dir);
 
     if(!x11)
