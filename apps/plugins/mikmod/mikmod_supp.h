@@ -18,10 +18,15 @@
 #define qsort(a,b,c,d)		rb->qsort(a,b,c,d)
 #define atoi(a)				rb->atoi(a)
 
+#undef strlen
 #define strlen(a)           rb->strlen(a)
+#undef strcpy
 #define strcpy(a,b)         rb->strcpy(a,b)
+#undef strcat
 #define strcat(a,b)         rb->strcat(a,b)
+#undef strncmp
 #define strncmp(a,b,c)      rb->strncmp(a,b,c)
+#undef strcasecmp
 #define strcasecmp(a,b)     rb->strcasecmp(a,b)
 
 #undef open
@@ -43,8 +48,11 @@
 #define realloc(x,y)	tlsf_realloc(x,y)
 #define calloc(x,y)		tlsf_calloc(x,y)
 
+#undef strncat
 #define strncat mmsupp_strncat
+#undef printf
 #define printf mmsupp_printf
+#undef sprintf
 #define sprintf mmsupp_sprintf
 
 #define fprintf(...)
