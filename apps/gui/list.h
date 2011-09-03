@@ -213,10 +213,14 @@ struct simplelist_info {
         /* action_callback notes:
             action == the action pressed by the user 
                 _after_ gui_synclist_do_button returns.
-            lists == the lists sturct so the callack can get selection and count etc. */
+            lists == the lists struct so the callback can get selection and count etc. */
+    enum themable_icons title_icon;
     list_get_icon *get_icon; /* can be NULL */
     list_get_name *get_name; /* NULL if you're using simplelist_addline() */
     list_speak_item *get_talk; /* can be NULL to not speak */
+#ifdef HAVE_LCD_COLOR
+    list_get_color *get_color;
+#endif
     void *callback_data; /* data for callbacks */
 };
 
@@ -242,9 +246,11 @@ void simplelist_addline(int line_number, const char *fmt, ...);
     info.hide_selection = false;
     info.scroll_all = false;
     info.action_callback = NULL;
+    info.title_icon = Icon_NOICON;
     info.get_icon = NULL;
     info.get_name = NULL;
     info.get_voice = NULL;
+    info.get_color = NULL;
     info.timeout = HZ/10;
     info.selection = 0;
 */

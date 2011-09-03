@@ -823,11 +823,15 @@ bool simplelist_show_list(struct simplelist_info *info)
                       info->scroll_all, info->selection_size, NULL);
 
     if (info->title)
-        gui_synclist_set_title(&lists, info->title, NOICON);
+        gui_synclist_set_title(&lists, info->title, info->title_icon);
     if (info->get_icon)
         gui_synclist_set_icon_callback(&lists, info->get_icon);
     if (info->get_talk)
         gui_synclist_set_voice_callback(&lists, info->get_talk);
+#ifdef HAVE_LCD_COLOR
+    if (info->get_color)
+        gui_synclist_set_color_callback(&lists, info->get_color);
+#endif
 
     if (info->hide_selection)
     {
@@ -909,9 +913,13 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->timeout = HZ/10;
     info->selection = 0;
     info->action_callback = NULL;
+    info->title_icon = Icon_NOICON;
     info->get_icon = NULL;
     info->get_name = NULL;
     info->get_talk = NULL;
+#ifdef HAVE_LCD_COLOR
+    info->get_color = NULL;
+#endif
     info->callback_data = data;
     simplelist_line_count = 0;
 }
