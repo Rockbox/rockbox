@@ -18,7 +18,12 @@ DOOM_OBJ := $(call c2obj, $(DOOM_SRC))
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(DOOM_SRC)
 
-DOOMCFLAGS = $(PLUGINFLAGS) -Wno-strict-prototypes -O2 -fno-strict-aliasing -fgnu89-inline
+DOOMCFLAGS = $(PLUGINFLAGS) -Wno-strict-prototypes -O2 -fno-strict-aliasing
+
+# Set '-fgnu89-inline' if supported for the target.
+ifneq ($(CPU),mips)
+    DOOMCFLAGS += -fgnu89-inline
+endif
 
 ifndef APP_TYPE
 ifeq ($(TARGET), IRIVER_H100)

@@ -18,7 +18,12 @@ MPEG_OBJ := $(call c2obj, $(MPEG_SRC))
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(MPEG_SRC)
 
-MPEGCFLAGS = $(PLUGINFLAGS) -fgnu89-inline
+# Set '-fgnu89-inline' if supported for the target.
+ifneq ($(CPU),mips)
+    MPEGCFLAGS = $(PLUGINFLAGS) -fgnu89-inline
+else
+    MPEGCFLAGS = $(PLUGINFLAGS)
+endif
 
 $(MPEGBUILDDIR)/mpegplayer.rock: $(MPEG_OBJ) $(CODECDIR)/libmad-mpeg.a
 
