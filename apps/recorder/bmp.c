@@ -494,9 +494,7 @@ int read_bmp_fd(int fd,
     unsigned int resize = IMG_NORESIZE;
 
 #ifdef HAVE_REMOTE_LCD
-    bool remote = false;
     if (format & FORMAT_REMOTE) {
-        remote = true;
 #if LCD_REMOTE_DEPTH == 1
         format = FORMAT_MONO;
 #endif
