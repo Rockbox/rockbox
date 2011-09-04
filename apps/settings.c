@@ -1087,6 +1087,20 @@ const struct settings_list* find_setting(const void* variable, int *id)
     }
     return NULL;
 }
+const struct settings_list* find_setting_by_cfgname(const char* name, int *id)
+{
+    int i;
+    for (i=0; i<nb_settings; i++)
+    {
+        if (settings[i].cfg_name &&
+            !strcmp(settings[i].cfg_name, name))
+        {
+            if (id) *id = i;
+            return &settings[i];
+        }
+    }
+    return NULL;
+}
 
 bool set_bool(const char* string, const bool* variable )
 {

@@ -620,13 +620,8 @@ static int parse_setting_and_lang(struct skin_element *element,
     }
     else
     {
-        /* Find the setting */
-        for (i=0; i<nb_settings; i++)
-            if (settings[i].cfg_name &&
-                !strcmp(settings[i].cfg_name, temp))
-                break;
 #ifndef __PCTOOL__
-        if (i == nb_settings)
+        if (find_setting_by_cfgname(temp, &i) == NULL)
             return WPS_ERROR_INVALID_PARAM;
 #endif
     }
@@ -1148,14 +1143,10 @@ static int touchregion_setup_setting(struct skin_element *element, int param_no,
     int p = param_no;
     char *name = element->params[p++].data.text;
     int j;
-    /* Find the setting */
-    for (j=0; j<nb_settings; j++)
-        if (settings[j].cfg_name &&
-            !strcmp(settings[j].cfg_name, name))
-            break;
-    if (j==nb_settings)
+
+    region->setting_data.setting = find_setting_by_cfgname(name, &j);
+    if (region->setting_data.setting == NULL)
         return WPS_ERROR_INVALID_PARAM;
-    region->setting_data.setting = (void*)&settings[j];
     if (region->action == ACTION_SETTINGS_SET)
     {
         char* text;
