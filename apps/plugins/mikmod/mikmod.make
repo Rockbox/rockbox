@@ -18,12 +18,7 @@ MIKMOD_OBJ := $(call c2obj, $(MIKMOD_SRC))
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(MIKMOD_SRC)
 
-MIKMODCFLAGS = $(PLUGINFLAGS) -I$(MIKMODSRCDIR)
-ifeq ($(CPU),coldfire)
-    MIKMODCFLAGS += -O0
-else
-    MIKMODCFLAGS += -O2
-endif
+MIKMODCFLAGS = $(PLUGINFLAGS) -I$(MIKMODSRCDIR) -O2
 
 $(MIKMODBUILDDIR)/mikmod.rock: $(MIKMOD_OBJ) $(CODECDIR)/libtlsf.a
 
