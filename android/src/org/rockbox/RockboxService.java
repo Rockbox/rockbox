@@ -169,7 +169,11 @@ public class RockboxService extends Service
             {
                 final int BUFFER = 8*1024;
                 String rockboxDirPath = "/data/data/org.rockbox/app_rockbox/rockbox";
+                String rockboxCreditsPath = "/data/data/org.rockbox/app_rockbox/rockbox/rocks/viewers";
+                String rockboxSdDirPath = "/sdcard/rockbox";
                 File rockboxDir = new File(rockboxDirPath);
+                File rockboxSdDir = new File(rockboxSdDirPath);
+                File rockboxCreditsDir = new File(rockboxCreditsPath);
 
                 /* load library before unzipping which may take a while */
                 synchronized (lock) {
@@ -184,7 +188,16 @@ public class RockboxService extends Service
                  */
                 File libMisc = new File("/data/data/org.rockbox/lib/libmisc.so");
                 /* use arbitrary file to determine whether extracting is needed */
-                File arbitraryFile = new File(rockboxDir, "viewers.config");
+                File arbitraryFile = new File(rockboxCreditsPath, "credits.rock");
+                File rockboxInfoFile = new File(rockboxSdDirPath, "rockbox-info.txt");
+                boolean extractToSd = false;
+                if(rockboxInfoFile.exists()) {
+                    extractToSd = true;
+                    LOG("extracting resources to SD card");
+                }
+                else {
+                    LOG("extracting resources to internal memory");
+                }
                 if (!arbitraryFile.exists() || (libMisc.lastModified() > arbitraryFile.lastModified()))
                 {
                     try
@@ -202,7 +215,16 @@ public class RockboxService extends Service
                            /* strip off /.rockbox when extracting */
                            String fileName = entry.getName();
                            int slashIndex = fileName.indexOf('/', 1);
-                           file = new File(rockboxDirPath + fileName.substring(slashIndex));
+                           /* codecs are now stored as libs, only keep rocks on internal */
+                           if(extractToSd == false
+                               || fileName.substring(slashIndex).startsWith("/rocks"))
+                           {
+                               file = new File(rockboxDirPath + fileName.substring(slashIndex));
+                           }
+                           else
+                           {
+                               file = new File(rockboxSdDirPath + fileName.substring(slashIndex));
+                           }
 
                            if (!entry.isDirectory())
                            {
@@ -230,6 +252,7 @@ public class RockboxService extends Service
                                resultReceiver.send(RESULT_LIB_LOAD_PROGRESS, progressData);
                            }
                         }
+                        arbitraryFile.setLastModified(libMisc.lastModified());
                     } catch(Exception e) {
                         LOG("Exception when unzipping", e);
                         e.printStackTrace();
