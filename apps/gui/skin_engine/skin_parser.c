@@ -1140,6 +1140,7 @@ static const struct touchaction touchactions[] = {
 static int touchregion_setup_setting(struct skin_element *element, int param_no,
                                      struct touchregion *region)
 {
+#ifndef __PCTOOL__
     int p = param_no;
     char *name = element->params[p++].data.text;
     int j;
@@ -1147,6 +1148,7 @@ static int touchregion_setup_setting(struct skin_element *element, int param_no,
     region->setting_data.setting = find_setting_by_cfgname(name, &j);
     if (region->setting_data.setting == NULL)
         return WPS_ERROR_INVALID_PARAM;
+
     if (region->action == ACTION_SETTINGS_SET)
     {
         char* text;
@@ -1155,7 +1157,7 @@ static int touchregion_setup_setting(struct skin_element *element, int param_no,
             &region->setting_data;
         if (element->params_count < p+1)
             return -1;
-#ifndef __PCTOOL__
+
         text = element->params[p++].data.text;
         switch (settings[j].flags&F_T_MASK)
         {
@@ -1190,9 +1192,10 @@ static int touchregion_setup_setting(struct skin_element *element, int param_no,
         default:
             return -1;
         }
-#endif /* __PCTOOL__ */
     }
     return p-param_no;
+#endif /* __PCTOOL__ */
+    return 0;
 }
 
 static int parse_touchregion(struct skin_element *element,
