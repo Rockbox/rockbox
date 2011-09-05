@@ -42,7 +42,6 @@ void usb_remove_int(void)
 
 void usb_drv_usb_detect_event()
 {
-    printf("usb_drv_usb_detect_event");
     usb_status_event(USB_INSERTED);
 }
 

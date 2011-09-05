@@ -92,9 +92,6 @@ static void usb_mode(int connect_timeout)
 
     /* Put drivers initialized for USB connection into a known state */
     usb_close();
-
-    system_exception_wait();
-    power_off();
 }
 #else /* !HAVE_BOOTLOADER_USB_MODE */
 static void usb_mode(int connect_timeout)
@@ -141,17 +138,14 @@ void main(uint32_t arg)
     if(ret < 0)
         error(EATA, ret, true);
 
-    if(usb_plugged())
-        usb_mode(HZ * 2);
-
     while(!disk_init(IF_MV(0)))
         printf("disk_init failed!");
 
     if((ret = disk_mount_all()) <= 0)
         error(EDISK, ret, false);
 
-    if(button_read_device() & BUTTON_VOL_UP)
-        printf("Booting from SD card required.");
+    if(usb_plugged())
+        usb_mode(HZ);
 
     printf("Loading firmware");
 
@@ -164,7 +158,7 @@ void main(uint32_t arg)
     }
 
     kernel_entry = (void*) loadbuffer;
-    //cpucache_invalidate();
+    cpucache_invalidate();
     printf("Executing");
     kernel_entry();
     printf("ERR: Failed to boot");
