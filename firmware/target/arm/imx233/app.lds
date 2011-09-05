@@ -17,7 +17,7 @@ STARTUP(target/arm/imx233/crt0.o)
 #define DRAMSIZE (DRAM_SIZE - PLUGINSIZE - CODECSIZE - FRAME_SIZE - TTB_SIZE)
 
 /* End of the audio buffer, where the codec buffer starts */
-#define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
+#define ENDAUDIOADDR  (CACHED_DRAM_ADDR + DRAMSIZE)
 
 /* Where the codec buffer ends, and the plugin buffer starts */
 #define ENDADDR (ENDAUDIOADDR + CODEC_SIZE)
@@ -29,15 +29,14 @@ STARTUP(target/arm/imx233/crt0.o)
 MEMORY
 {
     IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
-    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+    DRAM : ORIGIN = CACHED_DRAM_ADDR, LENGTH = DRAM_SIZE - TTB_SIZE - FRAME_SIZE
+    UNCACHED_DRAM : ORIGIN = UNCACHED_DRAM_ADDR, LENGTH = DRAM_SIZE - TTB_SIZE - FRAME_SIZE
 }
 
 SECTIONS
 {
     .text :
     {
-        loadaddress = .;
-        _loadaddress = .;
         *(.text*)
     } > DRAM
 
@@ -89,10 +88,23 @@ SECTIONS
         stackend = .;
     } > DRAM
 
+    /* treat .bss and .ncbss as a single section */
     .bss (NOLOAD) :
     {
         _edata = .;
         *(.bss*);
+    } > DRAM
+
+    /* align on cache size boundary to avoid mixing cached and noncached stuff */
+    .ncbss . - CACHED_DRAM_ADDR + UNCACHED_DRAM_ADDR (NOLOAD) :
+    {
+        . = ALIGN(CACHEALIGN_SIZE);
+        *(.ncbss*)
+        . = ALIGN(CACHEALIGN_SIZE);
+    } AT> DRAM
+
+    .bssendadr . - UNCACHED_DRAM_ADDR + CACHED_DRAM_ADDR (NOLOAD) :
+    {
         _end = .;
     } > DRAM
 

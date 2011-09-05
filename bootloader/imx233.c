@@ -138,6 +138,8 @@ void main(uint32_t arg)
     if(ret < 0)
         error(EATA, ret, true);
 
+    /* NOTE: allow disk_init and disk_mount_all to fail since we can do USB after.
+     * We need this order to determine the correct logical sector size */
     while(!disk_init(IF_MV(0)))
         printf("disk_init failed!");
 
