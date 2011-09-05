@@ -174,6 +174,9 @@ uclcopy:
         cmp     r2, #0              @ test input from pins
         bne     boot_of             @ branch directly to OF if either pin high
 
+#elif defined(SANSA_CLIPZIP)
+        @ just boot the OF
+        b       boot_of
 
 #elif defined(SANSA_C200V2)
 .set BUTTON_LEFT,      (1<< 2)
