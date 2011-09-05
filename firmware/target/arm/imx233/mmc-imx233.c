@@ -41,8 +41,14 @@
 /** When set, this values restrict the windows of the read and writes */
 static unsigned mmc_window_start = 0;
 static unsigned mmc_window_end = INT_MAX;
+static bool mmc_window_enable = true;
 
 static struct mutex mmc_mutex;
+
+void imx233_mmc_disable_window(void)
+{
+    mmc_window_enable = false;
+}
 
 int mmc_init(void)
 {
@@ -123,34 +129,37 @@ int mmc_init(void)
     imx233_ssp_set_timings(MMC_SSP, 2, 0, 0xffff);
 
     #ifdef SANSA_FUZEPLUS
-    /**
-     * The Fuze+ uses a strange layout: is has a first MBR at sector 0 with four entries:
-     * 1) Actual user partition
-     * 2) Sigmatel boot partition
-     * 3)4) Other (certificate related ?) partitions
-     * The partition 1) has type 1 but it's actually a type 5 (logical partition) with
-     * a second partition table with usually one entry which is the FAT32 one.
-     * The first table uses 512-byte sector size and the second one usually uses
-     * 2048-byte logical sector size.
-     *
-     * We restrict mmc window to the user partition */
-    uint8_t mbr[512];
-    mmc_window_start = 0;
-    mmc_window_end = INT_MAX;
-    ret = mmc_read_sectors(IF_MD2(0,) 0, 1, mbr);
-    if(ret != 0)
-        return -100;
-    if(mbr[510] != 0x55 || mbr[511] != 0xAA)
-        return -101; /* invalid MBR */
-    /* sanity check that the first partition is greater than 2Gib */
-    uint8_t *ent = &mbr[446];
-    mmc_window_start = ent[8] | ent[9] << 8 | ent[10] << 16 | ent[11] << 24;
-    mmc_window_end = (ent[12] | ent[13] << 8 | ent[14] << 16 | ent[15] << 24) +
-        mmc_window_start;
-    if(ent[4] == 0x53)
-        return -102; /* sigmatel partition */
-    if((mmc_window_end - mmc_window_start) < 4 * 1024 * 1024)
-        return -103; /* partition too small */
+    if(mmc_window_enable)
+    {
+        /**
+         * The Fuze+ uses a strange layout: is has a first MBR at sector 0 with four entries:
+         * 1) Actual user partition
+         * 2) Sigmatel boot partition
+         * 3)4) Other (certificate related ?) partitions
+         * The partition 1) has type 1 but it's actually a type 5 (logical partition) with
+         * a second partition table with usually one entry which is the FAT32 one.
+         * The first table uses 512-byte sector size and the second one usually uses
+         * 2048-byte logical sector size.
+         *
+         * We restrict mmc window to the user partition */
+        uint8_t mbr[512];
+        mmc_window_start = 0;
+        mmc_window_end = INT_MAX;
+        ret = mmc_read_sectors(IF_MD2(0,) 0, 1, mbr);
+        if(ret != 0)
+            return -100;
+        if(mbr[510] != 0x55 || mbr[511] != 0xAA)
+            return -101; /* invalid MBR */
+        /* sanity check that the first partition is greater than 2Gib */
+        uint8_t *ent = &mbr[446];
+        mmc_window_start = ent[8] | ent[9] << 8 | ent[10] << 16 | ent[11] << 24;
+        mmc_window_end = (ent[12] | ent[13] << 8 | ent[14] << 16 | ent[15] << 24) +
+            mmc_window_start;
+        if(ent[4] == 0x53)
+            return -102; /* sigmatel partition */
+        if((mmc_window_end - mmc_window_start) < 4 * 1024 * 1024)
+            return -103; /* partition too small */
+    }
     #endif
 
     return 0;
@@ -220,4 +229,10 @@ bool mmc_present(IF_MD(int drive))
 {
     IF_MD((void) drive);
     return true;
+}
+
+bool mmc_removable(IF_MD(int drive))
+{
+    IF_MD((void) drive);
+    return false;
 }

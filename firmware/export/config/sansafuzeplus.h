@@ -172,7 +172,7 @@
 #define USB_VENDOR_ID 0x0781
 #define USB_PRODUCT_ID 0x74e1
 #define HAVE_USB_HID_MOUSE
-//#define HAVE_BOOTLOADER_USB_MODE
+#define HAVE_BOOTLOADER_USB_MODE
 
 /* The fuze+ actually interesting partition table does not use 512-byte sector
  * (usually 2048 logical sector size) */

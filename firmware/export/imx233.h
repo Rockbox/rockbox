@@ -21,17 +21,41 @@
 #ifndef __IMX233_H__
 #define __IMX233_H__
 
+/*
+ * Chip Memory Map:
+ *   0x00000000 - 0x00007fff: on chip ram
+ *   0x40000000 - 0x5fffffff: dram (512Mb max)
+ *   0x80000000 - 0x80100000: memory mapped registers
+ * We use the following map:
+ *   0x60000000 - 0x7fffffff: dram (cached)
+ *   0x90000000 - 0xafffffff: dram (buffered)
+ *   everything else        : identity mapped (uncached)
+ *
+ * As a side note it's important to notice that uncached dram is identity mapped
+ */
+
 #define IRAM_ORIG           0
 #define IRAM_SIZE           0x8000
 #define DRAM_ORIG           0x40000000
 #define DRAM_SIZE           (MEMORYSIZE * 0x100000)
 
+#define UNCACHED_DRAM_ADDR  0x40000000
+#define CACHED_DRAM_ADDR    0x60000000
+#define BUFFERED_DRAM_ADDR  0x90000000
+#define CACHEALIGN_SIZE     32
+
+#define PHYSICAL_ADDR(a) \
+    ((typeof(a))((uintptr_t)(a) >= CACHED_DRAM_ADDR ? \
+        ((uintptr_t)(a) - CACHED_DRAM_ADDR + UNCACHED_DRAM_ADDR) \
+        :(uintptr_t)(a)))
+#define UNCACHED_ADDR(a) PHYSICAL_ADDR(a)
+
 #define TTB_BASE_ADDR   (DRAM_ORIG + DRAM_SIZE - TTB_SIZE)
 #define TTB_SIZE        0x4000
 #define TTB_BASE        ((unsigned long *)TTB_BASE_ADDR)
 #define FRAME_SIZE      (LCD_WIDTH * LCD_HEIGHT * LCD_DEPTH / 8)
-#define LCD_FRAME_ADDR  (DRAM_ORIG + DRAM_SIZE - TTB_SIZE - FRAME_SIZE)
-#define FRAME           ((unsigned short *)LCD_FRAME_ADDR)
+#define FRAME_PHYS_ADDR (DRAM_ORIG + DRAM_SIZE - TTB_SIZE - FRAME_SIZE)
+#define FRAME           ((void *)(FRAME_PHYS_ADDR - UNCACHED_DRAM_ADDR + BUFFERED_DRAM_ADDR))
 
 /* USBOTG */
 #define USB_QHARRAY_ATTR    __attribute__((section(".qharray"),nocommon,aligned(2048)))
@@ -52,5 +76,7 @@
 
 #define CACHEALIGN_BITS     4
 
+#define __XTRACT(reg, field)    ((reg & reg##__##field##_BM) >> reg##__##field##_BP)
+#define __XTRACT_EX(val, field)    (((val) & field##_BM) >> field##_BP)
 
 #endif /* __IMX233_H__ */

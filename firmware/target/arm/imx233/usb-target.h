@@ -18,69 +18,19 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef USB_TARGET_H
+#define USB_TARGET_H
 
 #include "config.h"
-#include "cpu.h"
-#include "string.h"
-#include "usb.h"
-#include "usb_drv.h"
-#include "usb_core.h"
-#include "usb-target.h"
-#include "system.h"
-#include "system-target.h"
 
+#ifdef HAVE_BOOTLOADER_USB_MODE
+#define USB_DRIVER_CLOSE
+#endif
 
-void usb_insert_int(void)
-{
-    usb_status_event(USB_POWERED);
-}
+void usb_init_device(void);
+int usb_detect(void);
+void usb_insert_int(void);
+void usb_remove_int(void);
+bool usb_plugged(void);
 
-void usb_remove_int(void)
-{
-    usb_status_event(USB_UNPOWERED);
-}
-
-void usb_drv_usb_detect_event()
-{
-    printf("usb_drv_usb_detect_event");
-    usb_status_event(USB_INSERTED);
-}
-
-void usb_attach(void)
-{
-    usb_drv_attach();
-}
-
-void usb_drv_int_enable(bool enable)
-{
-    imx233_enable_interrupt(INT_SRC_USB_CTRL, enable);
-}
-
-void INT_USB_CTRL(void)
-{
-    usb_drv_int();
-}
-
-void usb_init_device(void)
-{
-    usb_drv_startup();
-}
-
-int usb_detect(void)
-{
-    return usb_plugged() ? USB_INSERTED : USB_EXTRACTED;
-}
-
-bool usb_plugged(void)
-{
-    return !!(HW_POWER_STS & HW_POWER_STS__VBUSVALID);
-}
-
-void usb_enable(bool on)
-{
-    /* FIXME: power up/down usb phy and pll usb */
-    if(on)
-        usb_core_init();
-    else
-        usb_core_exit();
-}
+#endif /* USB_TARGET_H */

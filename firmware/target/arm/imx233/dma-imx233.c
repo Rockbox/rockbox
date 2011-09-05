@@ -107,7 +107,8 @@ bool imx233_dma_is_channel_error_irq(unsigned chan)
 }
 
 /* Commit and/or discard all DMA descriptors and buffers pointed by them,
- * handle circular lists */
+ * handle circular lists. At the same time, convert virtual pointers to
+ * real ones */
 static void imx233_dma_commit_and_discard(struct apb_dma_command_t *cmd)
 {
     /* We handle circular descriptors by using unused bits:
@@ -121,13 +122,15 @@ static void imx233_dma_commit_and_discard(struct apb_dma_command_t *cmd)
     {
         cur->cmd = (cur->cmd & ~HW_APB_CHx_CMD__UNUSED_BM) | HW_APB_CHx_CMD__UNUSED_MAGIC;
         int op = cur->cmd & HW_APB_CHx_CMD__COMMAND_BM;
-        int sz = (cur->cmd & HW_APB_CHx_CMD__XFER_COUNT_BM) >> HW_APB_CHx_CMD__XFER_COUNT_BP;
+        int sz = __XTRACT_EX(cur->cmd, HW_APB_CHx_CMD__XFER_COUNT);
         /* device > host: discard */
         if(op == HW_APB_CHx_CMD__COMMAND__WRITE)
             discard_dcache_range(cur->buffer, sz);
         /* host > device: commit and discard */
         else if(op == HW_APB_CHx_CMD__COMMAND__READ)
             commit_discard_dcache_range(cur->buffer, sz);
+        /* Virtual to physical buffer pointer conversion */
+        cur->buffer = PHYSICAL_ADDR(cur->buffer);
         /* chain ? */
         if(cur->cmd & HW_APB_CHx_CMD__CHAIN)
             cur = cur->next;
@@ -139,15 +142,21 @@ static void imx233_dma_commit_and_discard(struct apb_dma_command_t *cmd)
     while((cur->cmd & HW_APB_CHx_CMD__UNUSED_BM) != 0)
     {
         cur->cmd = cur->cmd & ~HW_APB_CHx_CMD__UNUSED_BM;
-        int sz = (cur->cmd & HW_APB_CHx_CMD__CMDWORDS_BM) >> HW_APB_CHx_CMD__CMDWORDS_BP;
-        /* commit descriptor (don't discard since we access it after) */
-        commit_dcache_range(cur,
-            sizeof(struct apb_dma_command_t) + sizeof(uint32_t) * sz);
+        int sz = __XTRACT_EX(cur->cmd, HW_APB_CHx_CMD__CMDWORDS) * sizeof(uint32_t);
+        /* commit descriptor and discard descriptor */
         /* chain ? */
         if(cur->cmd & HW_APB_CHx_CMD__CHAIN)
-            cur = cur->next;
+        {
+            struct apb_dma_command_t *next = cur->next;
+            cur->next = PHYSICAL_ADDR(cur->next);
+            commit_dcache_range(cur, sizeof(struct apb_dma_command_t) + sz);
+            cur = next;
+        }
         else
+        {
+            commit_dcache_range(cur, sizeof(struct apb_dma_command_t) + sz);
             break;
+        }
     }
 }
 
@@ -156,12 +165,12 @@ void imx233_dma_start_command(unsigned chan, struct apb_dma_command_t *cmd)
     imx233_dma_commit_and_discard(cmd);
     if(APB_IS_APBX_CHANNEL(chan))
     {
-        HW_APBX_CHx_NXTCMDAR(APB_GET_DMA_CHANNEL(chan)) = (uint32_t)cmd;
+        HW_APBX_CHx_NXTCMDAR(APB_GET_DMA_CHANNEL(chan)) = (uint32_t)PHYSICAL_ADDR(cmd);
         HW_APBX_CHx_SEMA(APB_GET_DMA_CHANNEL(chan)) = 1;
     }
     else
     {
-        HW_APBH_CHx_NXTCMDAR(APB_GET_DMA_CHANNEL(chan)) = (uint32_t)cmd;
+        HW_APBH_CHx_NXTCMDAR(APB_GET_DMA_CHANNEL(chan)) = (uint32_t)PHYSICAL_ADDR(cmd);
         HW_APBH_CHx_SEMA(APB_GET_DMA_CHANNEL(chan)) = 1;
     }
 }

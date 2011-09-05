@@ -23,9 +23,33 @@
 #include "system.h"
 #include "power.h"
 #include "system-target.h"
+#include "usb-target.h"
+
+void INT_VDD5V(void)
+{
+    if(HW_POWER_CTRL & HW_POWER_CTRL__VBUSVALID_IRQ)
+    {
+        if(HW_POWER_STS & HW_POWER_STS__VBUSVALID)
+            usb_insert_int();
+        else
+            usb_remove_int();
+        /* reverse polarity */
+        __REG_TOG(HW_POWER_CTRL) = HW_POWER_CTRL__POLARITY_VBUSVALID;
+        /* enable int */
+        __REG_CLR(HW_POWER_CTRL) = HW_POWER_CTRL__VBUSVALID_IRQ;
+    }
+}
 
 void power_init(void)
 {
+    /* clear vbusvalid irq and set correct polarity */
+    __REG_CLR(HW_POWER_CTRL) = HW_POWER_CTRL__VBUSVALID_IRQ;
+    if(HW_POWER_STS & HW_POWER_STS__VBUSVALID)
+        __REG_CLR(HW_POWER_CTRL) = HW_POWER_CTRL__POLARITY_VBUSVALID;
+    else
+        __REG_SET(HW_POWER_CTRL) = HW_POWER_CTRL__POLARITY_VBUSVALID;
+    __REG_SET(HW_POWER_CTRL) = HW_POWER_CTRL__ENIRQ_VBUS_VALID;
+    imx233_enable_interrupt(INT_SRC_VDD5V, true);
 }
 
 void power_off(void)

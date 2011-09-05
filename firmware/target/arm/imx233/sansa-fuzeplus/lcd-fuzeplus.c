@@ -509,7 +509,7 @@ void lcd_update(void)
     imx233_lcdif_set_data_format(false, false, false); /* RGB565, don't care, don't care */
     lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
                          LCD_WIDTH * LCD_HEIGHT, 1);
-    imx233_lcdif_dma_send(FRAME, LCD_WIDTH, LCD_HEIGHT);
+    imx233_lcdif_dma_send((void *)FRAME_PHYS_ADDR, LCD_WIDTH, LCD_HEIGHT);
 }
 
 void lcd_update_rect(int x, int y, int width, int height)

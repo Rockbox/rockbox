@@ -57,6 +57,7 @@ default_interrupt(INT_I2C_ERROR);
 default_interrupt(INT_GPIO0);
 default_interrupt(INT_GPIO1);
 default_interrupt(INT_GPIO2);
+default_interrupt(INT_VDD5V);
 
 typedef void (*isr_t)(void);
 
@@ -78,6 +79,7 @@ static isr_t isr_table[INT_SRC_NR_SOURCES] =
     [INT_SRC_GPIO0] = INT_GPIO0,
     [INT_SRC_GPIO1] = INT_GPIO1,
     [INT_SRC_GPIO2] = INT_GPIO2,
+    [INT_SRC_VDD5V] = INT_VDD5V,
 };
 
 static void UIRQ(void)
@@ -147,10 +149,8 @@ static void set_page_tables(void)
     map_section(0, 0, 0x1000, CACHE_NONE);
 
     /* map RAM and enable caching for it */
-    map_section(DRAM_ORIG, DRAM_ORIG, MEMORYSIZE, CACHE_ALL);
-    
-    /* enable buffered writing for the framebuffer */
-    map_section((int)FRAME, (int)FRAME, 1, BUFFERED);
+    map_section(DRAM_ORIG, CACHED_DRAM_ADDR, MEMORYSIZE, CACHE_ALL);
+    map_section(DRAM_ORIG, BUFFERED_DRAM_ADDR, MEMORYSIZE, BUFFERED);
 }
 
 void memory_init(void)

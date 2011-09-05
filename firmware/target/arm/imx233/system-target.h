@@ -26,43 +26,10 @@
 #include "panic.h"
 
 #include "clock-target.h" /* CPUFREQ_* are defined here */
+#include "power-imx233.h"
 
 #define HW_DIGCTL_BASE          0x8001C000
 #define HW_DIGCTL_MICROSECONDS  (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xC0))
-
-#define HW_POWER_BASE           0x80044000
-
-#define HW_POWER_CTRL           (*(volatile uint32_t *)(HW_POWER_BASE + 0x0))
-
-#define HW_POWER_5VCTRL         (*(volatile uint32_t *)(HW_POWER_BASE + 0x10))
-
-#define HW_POWER_MINPWR         (*(volatile uint32_t *)(HW_POWER_BASE + 0x20))
-
-#define HW_POWER_CHARGE         (*(volatile uint32_t *)(HW_POWER_BASE + 0x30))
-
-#define HW_POWER_VDDDCTRL       (*(volatile uint32_t *)(HW_POWER_BASE + 0x40))
-#define HW_POWER_VDDDCTRL__TRG_BP   0
-#define HW_POWER_VDDDCTRL__TRG_BM   0x1f
-#define HW_POWER_VDDDCTRL__TRG_STEP 25 /* mV */
-#define HW_POWER_VDDDCTRL__TRG_MIN  800 /* mV */
-
-#define HW_POWER_VDDACTRL       (*(volatile uint32_t *)(HW_POWER_BASE + 0x50))
-
-#define HW_POWER_VDDIOCTRL      (*(volatile uint32_t *)(HW_POWER_BASE + 0x60))
-
-#define HW_POWER_VDDMEMCTRL     (*(volatile uint32_t *)(HW_POWER_BASE + 0x70))
-
-#define HW_POWER_MISC           (*(volatile uint32_t *)(HW_POWER_BASE + 0x90))
-
-#define HW_POWER_STS            (*(volatile uint32_t *)(HW_POWER_BASE + 0xc0))
-#define HW_POWER_STS__PSWITCH_BP    20
-#define HW_POWER_STS__PSWITCH_BM    (3 << 20)
-
-#define HW_POWER_BATTMONITOR    (*(volatile uint32_t *)(HW_POWER_BASE + 0xe0))
-
-#define HW_POWER_RESET          (*(volatile uint32_t *)(HW_POWER_BASE + 0x100))
-#define HW_POWER_RESET__UNLOCK  0x3E770000
-#define HW_POWER_RESET__PWD     0x1
 
 #define HW_ICOLL_BASE           0x80000000
 
@@ -83,6 +50,7 @@
 #define HW_ICOLL_INTERRUPT__ENFIQ       0x10
 
 #define INT_SRC_SSP2_ERROR  2
+#define INT_SRC_VDD5V       3
 #define INT_SRC_USB_CTRL    11
 #define INT_SRC_SSP1_DMA    14
 #define INT_SRC_SSP1_ERROR  15

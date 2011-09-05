@@ -227,3 +227,9 @@ bool sd_present(IF_MD(int drive))
     return imx233_ssp_sdmmc_detect(SD_SSP);
 }
 
+bool sd_removable(IF_MD(int drive))
+{
+    IF_MD((void) drive);
+    return true;
+}
+

@@ -33,6 +33,9 @@
     ldr     pc, =irq_handler
     ldr     pc, =fiq_handler
 
+/* When starting, we are running at 0x40000000 but the code
+ * assumes DRAM is somewhere else (for caching) so we first need to
+ * setup the MMU and then jump to the right location */
 .text
 .global start
 start:
@@ -45,6 +48,13 @@ start:
     ldr     r1, =0x3005
     bic     r0, r1
     mcr     p15, 0, r0, c1, c0, 0
+
+    /* Enable MMU */
+    bl      memory_init
+
+    /* Jump to real location */
+    ldr     pc, =remap
+remap:
 
     /* Zero out IBSS */
     ldr     r2, =_iedata
@@ -113,9 +123,6 @@ start:
     ldr     sp, =irq_stack
     msr     cpsr_c, #0xdb
     ldr     sp, =irq_stack
-
-    /* Enable MMU */
-    bl      memory_init
 
     /* Switch back to supervisor mode */
     msr     cpsr_c, #0xd3

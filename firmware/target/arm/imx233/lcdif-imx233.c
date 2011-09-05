@@ -79,7 +79,7 @@ void imx233_lcdif_set_word_length(unsigned word_length)
 
 unsigned imx233_lcdif_enable_irqs(unsigned irq_bm)
 {
-    unsigned old_msk = (HW_LCDIF_CTRL1 & HW_LCDIF_CTRL1__IRQ_EN_BM) >>HW_LCDIF_CTRL1__IRQ_EN_BP ;
+    unsigned old_msk = __XTRACT(HW_LCDIF_CTRL1, IRQ_EN);
     /* clear irq status */
     __REG_CLR(HW_LCDIF_CTRL1) = irq_bm << HW_LCDIF_CTRL1__IRQ_BP;
     /* disable irqs */

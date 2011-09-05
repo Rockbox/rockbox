@@ -9,7 +9,8 @@ STARTUP(target/arm/imx233/crt0.o)
 MEMORY
 {
     IRAM : ORIGIN = IRAM_ORIG, LENGTH = IRAM_SIZE
-    DRAM : ORIGIN = DRAM_ORIG, LENGTH = DRAM_SIZE - TTB_SIZE - FRAME_SIZE
+    DRAM : ORIGIN = CACHED_DRAM_ADDR, LENGTH = DRAM_SIZE - TTB_SIZE - FRAME_SIZE
+    UNCACHED_DRAM : ORIGIN = UNCACHED_DRAM_ADDR, LENGTH = DRAM_SIZE - TTB_SIZE - FRAME_SIZE
 }
 
 SECTIONS
@@ -57,10 +58,23 @@ SECTIONS
         stackend = .;
     } > DRAM
 
+    /* treat .bss and .ncbss as a single section */
     .bss (NOLOAD) :
     {
         _edata = .;
         *(.bss*);
+    } > DRAM
+
+    /* align on cache size boundary to avoid mixing cached and noncached stuff */
+    .ncbss . - CACHED_DRAM_ADDR + UNCACHED_DRAM_ADDR (NOLOAD) :
+    {
+        . = ALIGN(CACHEALIGN_SIZE);
+        *(.ncbss*)
+        . = ALIGN(CACHEALIGN_SIZE);
+    } AT> DRAM
+
+    .bssendadr . - UNCACHED_DRAM_ADDR + CACHED_DRAM_ADDR (NOLOAD) :
+    {
         _end = .;
     } > DRAM
 }

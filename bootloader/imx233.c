@@ -39,6 +39,69 @@
 #include "fmradio_i2c.h"
 
 #include "usb.h"
+#include "usb-target.h"
+
+#include "clkctrl-imx233.h"
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+static void usb_mode(int connect_timeout)
+{
+    int button;
+    
+    usb_init();
+    usb_start_monitoring();
+
+    /* Wait for threads to connect or cable is pulled */
+    printf("USB: Connecting");
+
+    long end_tick = current_tick + connect_timeout;
+
+    while(1)
+    {
+        button = button_get_w_tmo(HZ/10);
+
+        if(button == SYS_USB_CONNECTED)
+            break; /* Hit */
+
+        if(TIME_AFTER(current_tick, end_tick))
+        {
+            /* Timed out waiting for the connect - will happen when connected
+             * to a charger through the USB port */
+            printf("USB: Timed out");
+            break;
+        }
+
+        if(!usb_plugged())
+            break; /* Cable pulled */
+    }
+
+    if(button == SYS_USB_CONNECTED)
+    {
+        /* Got the message - wait for disconnect */
+        printf("Bootloader USB mode");
+
+        usb_acknowledge(SYS_USB_CONNECTED_ACK);
+
+        while(1)
+        {
+            button = button_get_w_tmo(HZ/2);
+            if(button == SYS_USB_DISCONNECTED)
+                break;
+        }
+    }
+
+    /* Put drivers initialized for USB connection into a known state */
+    usb_close();
+
+    system_exception_wait();
+    power_off();
+}
+#else /* !HAVE_BOOTLOADER_USB_MODE */
+static void usb_mode(int connect_timeout)
+{
+    (void) connect_timeout;
+}
+#endif /* HAVE_BOOTLOADER_USB_MODE */
 
 void main(uint32_t arg) NORETURN_ATTR;
 void main(uint32_t arg)
@@ -51,6 +114,7 @@ void main(uint32_t arg)
     system_init();
     kernel_init();
 
+    power_init();
     enable_irq();
 
     lcd_init();
@@ -59,32 +123,32 @@ void main(uint32_t arg)
 
     backlight_init();
 
-    button_init_device();
+    button_init();
 
     //button_debug_screen();
-    printf("arg=%c%c%c%c", arg >> 24,
-        (arg >> 16) & 0xff, (arg >> 8) & 0xff, (arg & 0xff));
+    printf("arg=%x", arg);
+
+#ifdef SANSA_FUZEPLUS
+    extern void imx233_mmc_disable_window(void);
+    if(arg == 0xfee1dead)
+    {
+        printf("Disable MMC window.");
+        imx233_mmc_disable_window();
+    }
+#endif
 
     ret = storage_init();
     if(ret < 0)
         error(EATA, ret, true);
 
-    #ifdef HAVE_BOOTLOADER_USB_MODE
-    usb_init();
-    usb_core_enable_driver(USB_DRIVER_SERIAL, true);
-    usb_attach();
-    while(!(button_read_device() & BUTTON_POWER))
-        yield();
-    power_off();
-    #endif /* HAVE_BOOTLOADER_USB_MODE */
+    if(usb_plugged())
+        usb_mode(HZ * 2);
 
     while(!disk_init(IF_MV(0)))
-        panicf("disk_init failed!");
+        printf("disk_init failed!");
 
-    while((ret = disk_mount_all()) <= 0)
-    {
-        error(EDISK, ret, true);
-    }
+    if((ret = disk_mount_all()) <= 0)
+        error(EDISK, ret, false);
 
     if(button_read_device() & BUTTON_VOL_UP)
         printf("Booting from SD card required.");
