@@ -52,7 +52,7 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     lcd_putsf(0, line++, "at %08x" IF_COP(" (%d)"), pc
              IF_COP(, CURRENT_CORE));
 
-#if !defined(CPU_ARM7TDMI) /* arm7tdmi has no MPU/MMU */
+#if !defined(CPU_ARM7TDMI) && (CONFIG_CPU != RK27XX) /* arm7tdmi has no MPU/MMU */
     if(num == 1 || num == 2) /* prefetch / data abort */
     {
         register unsigned status;
