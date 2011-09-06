@@ -325,4 +325,6 @@ keymaps/keymap-android.c
 keymaps/keymap-sdl.c
 #elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
 keymaps/keymap-fuzeplus.c
+#elif CONFIG_KEYPAD == RK27XX_GENERIC_PAD
+keymaps/keymap-rk27xx-generic.c
 #endif

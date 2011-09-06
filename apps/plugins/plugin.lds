@@ -165,6 +165,12 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAM DRAM
 #define IRAMSIZE 0
 /* The bit of IRAM that is available is used in the core */
+
+#elif CONFIG_CPU == RK27XX
+#define DRAMORIG 0x60000000
+#define IRAM DRAM
+#define IRAMSIZE 0
+
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif

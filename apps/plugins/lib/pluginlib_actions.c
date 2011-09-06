@@ -209,7 +209,15 @@ const struct button_mapping pla_main_ctx[] =
     { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_REW|BUTTON_REPEAT,          BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_FF|BUTTON_REPEAT,           BUTTON_NONE},
-
+#elif (CONFIG_KEYPAD == RK27XX_GENERIC_PAD)
+    { PLA_UP,                BUTTON_REW,                        BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_FF,                         BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_REW|BUTTON_M,               BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_FF|BUTTON_M,                BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_REW|BUTTON_REPEAT,          BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_FF|BUTTON_REPEAT,           BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_REW|BUTTON_M|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_FF|BUTTON_M|BUTTON_REPEAT,  BUTTON_NONE},
 #else
 #   ifndef HAVE_TOUCHSCREEN
 #       error pluginlib_actions: No directions defined
@@ -382,6 +390,12 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_ENTER,                       BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_ENTER|BUTTON_REL,            BUTTON_ENTER},
     {PLA_SELECT_REPEAT,     BUTTON_ENTER|BUTTON_REPEAT,         BUTTON_NONE},
+#elif (CONFIG_KEYPAD == RK27XX_GENERIC_PAD)                                      
+    {PLA_CANCEL,            BUTTON_M,                           BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_M|BUTTON_REPEAT,             BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
 #else
 #   ifndef HAVE_TOUCHSCREEN
 #       error pluginlib_actions: No actions defined
