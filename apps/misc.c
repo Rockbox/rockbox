@@ -1079,22 +1079,22 @@ static enum current_activity
 static int current_activity_top = 0;
 void push_current_activity(enum current_activity screen)
 {
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
     int i;
 #endif
     current_activity[current_activity_top++] = screen;
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
     FOR_NB_SCREENS(i)
         skinlist_set_cfg(i, NULL);
 #endif
 }
 void pop_current_activity(void)
 {
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
     int i;
 #endif
     current_activity_top--;
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
     FOR_NB_SCREENS(i)
         skinlist_set_cfg(i, NULL);
 #endif

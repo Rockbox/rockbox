@@ -1815,6 +1815,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_IMAGE_DISPLAY:
                     function = parse_image_load;
                     break;
+                case SKIN_TOKEN_LIST_ITEM_CFG:
+                    function = parse_listitemviewport;
+                    break;
 #endif
 #ifdef HAVE_TOUCHSCREEN
                 case SKIN_TOKEN_TOUCHREGION:
@@ -1840,9 +1843,6 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     function = parse_skinvar;
                     break;
 #endif
-                case SKIN_TOKEN_LIST_ITEM_CFG:
-                    function = parse_listitemviewport;
-                    break;
                 default:
                     break;
             }
