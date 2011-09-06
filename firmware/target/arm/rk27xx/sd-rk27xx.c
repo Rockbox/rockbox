@@ -49,6 +49,11 @@
 
 #define RES_NO (-1)
 
+#define RK27XX_SD_DEBUG
+/* debug stuff */
+unsigned long sd_debug_time_rd = 0;
+unsigned long sd_debug_time_wr = 0;
+
 static tCardInfo card_info;
 
 /* for compatibility */
@@ -275,8 +280,6 @@ static int sd_init_card(void)
 
     /*  End of Card Identification Mode   ************************************/
 
-    /*  Card back to full speed  25MHz*/
-    SD_CTRL = (SD_CTRL & ~0x7FF) | 1; /* FIXME check this divider - OF uses 0 here*/
 
     /* CMD9 send CSD */
     if(!send_cmd(SD_SEND_CSD, card_info.rca, RES_R2, card_info.csd))
@@ -290,6 +293,13 @@ static int sd_init_card(void)
     if (!sd_wait_card_busy())
         return -21;
 
+    /* CMD6 */
+    if(!send_cmd(SD_SWITCH_FUNC, 0x80fffff1, RES_R1, &response))
+        return -8;
+    sleep(HZ/10);
+
+    /*  Card back to full speed  25MHz*/
+    SD_CTRL = (SD_CTRL & ~0x7FF);
     card_info.initialized = 1;
 
     return 0;
@@ -399,6 +409,23 @@ static void init_controller(void)
     MMU_CTRL = MMU_MMU0_BUFII | MMU_CPU_BUFI | MMU_BUFII_RESET |
                MMU_BUFII_BYTE | MMU_BUFI_RESET | MMU_BUFI_WORD;
 
+    /* setup A2A DMA CH0 for SD reads */
+    A2A_ISRC0 = (unsigned long)(&MMU_DATA);
+    A2A_ICNT0 = 512;
+    A2A_LCNT0 = 1;
+
+    /* setup A2A DMA CH1 for SD writes */
+    A2A_IDST1 = (unsigned long)(&MMU_DATA);
+    A2A_ICNT1 = 512;
+    A2A_LCNT1 = 1;
+
+    /* src and dst for CH0 and CH1 is AHB0 */
+    A2A_DOMAIN = 0;
+
+#ifdef RK27XX_SD_DEBUG
+    /* setup Timer1 for profiling purposes */
+    TMR1CON = (1<<8)|(1<<3);
+#endif
 }
 
 int sd_init(void)
@@ -424,6 +451,40 @@ int sd_init(void)
     return 0;
 }
 
+static inline void read_sd_data(unsigned char **dst)
+{
+    commit_discard_dcache_range((const void *)*dst, 512);
+
+    A2A_IDST0 = (unsigned long)*dst;
+    A2A_CON0  = (3<<9) |    /* burst 16 */
+                (1<<6) |    /* fixed src */
+                (1<<3) |    /* DMA start */
+                (2<<1) |    /* word transfer size */
+                (1<<0);     /* software mode */
+
+    /* wait for DMA engine to finish transfer */
+    while (A2A_DMA_STS & 1);
+
+    *dst += 512;
+}
+
+static inline void write_sd_data(unsigned char **src)
+{
+    commit_discard_dcache_range((const void *)*src, 512);
+
+    A2A_ISRC1 = (unsigned long)*src;
+    A2A_CON1  = (3<<9) |    /* burst 16 */
+                (1<<5) |    /* fixed dst */
+                (1<<3) |    /* DMA start */
+                (2<<1) |    /* word transfer size */
+                (1<<0);     /* software mode */
+
+    /* wait for DMA engine to finish transfer */
+    while (A2A_DMA_STS & 2);
+
+    *src += 512;
+}
+
 int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
                     void* buf)
 {
@@ -443,12 +504,6 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
 
     if(!(card_info.ocr & (1<<30)))
         start <<= 9; /* not SDHC */
-
-    /* setup A2A DMA CH0 */
-    A2A_ISRC0 = (unsigned long)(&MMU_DATA);
-    A2A_ICNT0 = 512;
-    A2A_LCNT0 = 1;
-    A2A_DOMAIN = 0;
 
     while (retry_cnt++ < 20)
     {
@@ -484,9 +539,17 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
 
         while (cnt > 0)
         {
+#ifdef RK27XX_SD_DEBUG
+            /* debug stuff */
+            TMR1LR = 0xffffffff;
+#endif
             /* wait for transfer completion */
             semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
+#ifdef RK27XX_DEBUG
+            /* debug stuff */
+            sd_debug_time_rd = 0xffffffff - TMR1CVR;
+#endif
             if (retry)
             {
                 /* data transfer error */
@@ -497,23 +560,14 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
             /* exchange buffers */
             mmu_switch_buff();
 
-            A2A_IDST0 = (unsigned long)dst;
-            A2A_CON0  = (3<<9) |    /* burst 16 */
-                        (1<<6) |    /* fixed src */
-                        (1<<3) |    /* DMA start */
-                        (2<<1) |    /* word transfer size */
-                        (1<<0);     /* software mode */
-
-            /* wait for DMA engine to finish transfer */
-            while (A2A_DMA_STS & 1);
-
-            dst += 512;
             cnt--;
 
             if (cnt == 0)
             {
                 if (!send_cmd(SD_STOP_TRANSMISSION, 0, RES_R1b, &response))
                     ret = -4;
+
+                read_sd_data(&dst);
 
                 break;
             }
@@ -523,6 +577,9 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
                 SD_DATAT = DATA_XFER_START | DATA_XFER_READ |
                            DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
                            DATA_XFER_SINGLE;
+
+                read_sd_data(&dst);
+
             }
             else
             {
@@ -530,6 +587,8 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
                 SD_DATAT = DATA_XFER_START | DATA_XFER_READ |
                            DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
                            DATA_XFER_MULTI;
+
+                read_sd_data(&dst);
             }
 
             last_disk_activity = current_tick;
@@ -561,6 +620,12 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     (void) buf;
     return -1;
 #else
+
+#ifdef RK27XX_SD_DEBUG
+    /* debug stuff */
+    TMR1LR = 0xffffffff;
+#endif
+
     unsigned long response;
     unsigned int retry_cnt = 0;
     int cnt, ret = 0;
@@ -576,12 +641,6 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     if(!(card_info.ocr & (1<<30)))
         start <<= 9; /* not SDHC */
 
-    /* setup A2A DMA CH0 */
-    A2A_IDST0 = (unsigned long)(&MMU_DATA);
-    A2A_ICNT0 = 512;
-    A2A_LCNT0 = 1;
-    A2A_DOMAIN = 0;
-
     while (retry_cnt++ < 20)
     {
         cnt = count;
@@ -591,17 +650,7 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
         retry = false;       /* reset retry flag */
         mmu_buff_reset();    /* reset recive buff state */
 
-        /* transfer data from receive buffer to the dest
-         * for (i=0; i<(512/4); i++)
-         *    MMU_DATA = *src++;
-         *
-         * Below is DMA version in software mode.
-         */
-
-        A2A_ISRC0 = (unsigned long)src;
-        A2A_CON0  = (3<<9) | (1<<5) | (1<<3) | (2<<1) | (1<<0);
-
-        while (A2A_DMA_STS & 1);
+        write_sd_data(&src); /* put data into transfer buffer */
 
         if (!send_cmd(SD_WRITE_MULTIPLE_BLOCK, start, RES_R1, &response))
         {
@@ -629,20 +678,9 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                            DATA_BUS_1LINE | DATA_XFER_DMA_DIS |
                            DATA_XFER_MULTI;
 
-                /* transfer data from receive buffer to the dest
-                 * for (i=0; i<(512/4); i++)
-                 *    MMU_DATA = *src++;
-                 *
-                 * Below is DMA version in software mode.
-                 */
-                src += 512;
-
-                A2A_ISRC0 = (unsigned long)src;
-                A2A_CON0  = (3<<9) | (1<<5) | (1<<3) | (2<<1) | (1<<0);
-
-                while (A2A_DMA_STS & 1);
+                /* put more data */
+                write_sd_data(&src);
             }
-
             /* wait for transfer completion */
             semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
@@ -669,6 +707,11 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
 
     sd_enable(false);
     mutex_unlock(&sd_mtx);
+
+#ifdef RK27XX_SD_DEBUG
+    /* debug stuff */
+    sd_debug_time_wr = 0xffffffff - TMR1CVR;
+#endif
 
     return ret;
    
