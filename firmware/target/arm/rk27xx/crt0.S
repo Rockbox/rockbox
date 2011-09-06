@@ -47,14 +47,20 @@ newstart2:
     mov     r0, #0x18000000
     add     r0, r0, #0x1c000
 
-    /* setup ARM core freq = 200MHz */
-    /* AHB bus freq (HCLK) = 100MHz */
-    /* APB bus freq (PCLK) = 50MHz  */
+    /* setup ARM core freq = 200MHz
+     * AHB bus freq (HCLK) = 100MHz
+     * APB bus freq (PCLK) = 50MHz
+     * Note: it seems there is no way to run AHB bus at ARM freq
+     * bit2 in DIVCON1 must have different meaning to what datasheet
+     * states. It influences SDRAM read speed but does not change
+     * APB freq
+     */
     ldr     r1, [r0,#0x14]   /* SCU_DIVCON1 */
-    orr     r1, #9           /* ARM slow mode, HCLK:PCLK = 2:1 */
+    bic     r1, r1, #0x1f
+    orr     r1, r1, #9       /* ((1<<3)|(1<<0)) ARM slow mode, HCLK:PCLK = 2:1 */
     str     r1, [r0,#0x14]
 
-    ldr     r1,=0x01970c70   /* (1<<24) | (1<<23) | (23<<16) | (199<<4) */
+    ldr     r1,=0x1850310    /* ((1<<24)|(1<<23)|(5<<16)|(49<<4)) */
     str     r1, [r0,#0x08]
 
     ldr     r2,=0x40000
@@ -62,11 +68,11 @@ newstart2:
     ldr     r1, [r0,#0x2c]   /* SCU_STATUS */
     tst     r1, #1           /* ARM pll lock */
     bne     1f
-    subs    r2, #1
+    subs    r2, r2, #1
     bne     1b
 1:
     ldr     r1, [r0,#0x14]   /* SCU_DIVCON1 */
-    bic     r1, #5           /* leave ARM slow mode, ARMclk:HCLK = 2:1 */
+    bic     r1, #1           /* leave ARM slow mode */
     str     r1, [r0,#0x14]
   
 #if defined(BOOTLOADER)
@@ -75,7 +81,6 @@ newstart2:
     str     r1, [r0, #4]
 #endif
 
-#if 0
     /* setup caches */
     ldr     r0, =0xefff0000    /* cache controler base address */
     ldrh    r1, [r0]
@@ -110,7 +115,6 @@ newstart2:
     ldr     r1, [r0]
     orr     r1, r1, #0x80000000
     str     r1, [r0]           /* global cache enable */
-#endif
 
     /* Copy interrupt vectors to iram */
     ldr     r2, =_intvectstart
