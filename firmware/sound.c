@@ -242,7 +242,7 @@ static void set_prescaled_volume(void)
    || defined(HAVE_WM8711) || defined(HAVE_WM8721) || defined(HAVE_WM8731) \
    || defined(HAVE_WM8750) || defined(HAVE_WM8751) || defined(HAVE_AS3514) \
    || defined(HAVE_TSC2100) || defined(HAVE_AK4537) || defined(HAVE_UDA1341) \
-   || defined(HAVE_CS42L55)
+   || defined(HAVE_CS42L55) || defined(HAVE_RK27XX_CODEC)
     audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) \
     || (defined(HAVE_WM8751) && defined(TOSHIBA_GIGABEAT_F)) \
