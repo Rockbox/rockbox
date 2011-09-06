@@ -103,12 +103,6 @@ static void lcd_write(uint8_t cmd, uint8_t data)
     lcd_write_dat(data);
 }
 
-/* delays during lcd initialisation (for type 0 LCDs) */
-static void lcd_delay(int us)
-{
-    udelay(us);
-}
-
 /*  Initialises lcd type 0
  *  This appears to be a Visionox M00230 OLED display controlled by a SEPS114A.
  */
@@ -116,10 +110,10 @@ static void lcd_init_type0(void)
 {
     lcd_write(0x01, 0x00);  /* SOFT_RESET */
     lcd_write(0x14, 0x01);  /* STANDBY_ON_OFF */
-    lcd_delay(5);
+    sleep(1);   /* actually only 5 ms needed */
 
     lcd_write(0x14, 0x00);  /* STANDBY_ON_OFF */
-    lcd_delay(5);
+    sleep(1);   /* actually only 5 ms needed */
 
     lcd_write(0x0F, 0x41);  /* ANALOG_CONTROL */
     lcd_write(0xEA, 0x0A);  /* ? */
