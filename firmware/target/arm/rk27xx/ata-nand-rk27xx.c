@@ -80,9 +80,9 @@ void nand_get_info(IF_MD2(int drive,) struct storage_info *info)
     uint32_t ppb = ftl_banks * (*ftl_nand_type).pagesperblock;
     (*info).sector_size = SECTOR_SIZE;
     (*info).num_sectors = (*ftl_nand_type).userblocks * ppb;
-    (*info).vendor = "Apple";
-    (*info).product = "iPod Nano 2G";
-    (*info).revision = "1.0";
+    (*info).vendor = "";
+    (*info).product = "";
+    (*info).revision = "";
 }
 
 long nand_last_disk_activity(void)
