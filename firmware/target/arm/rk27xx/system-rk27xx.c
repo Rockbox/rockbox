@@ -169,13 +169,31 @@ void cpucache_commit_discard(void)
     CACHEOP = 0x02;
 
     /* wait for invalidate process to complete */
-    while (CACHEOP & 0x01);
+    while (CACHEOP & 0x03);
 
     /* invalidate cache way 1 */
     CACHEOP = 0x80000002;
 
     /* wait for invalidate process to complete */
-    while (CACHEOP & 0x01);   
+    while (CACHEOP & 0x03);   
 }
 
 void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")));
+
+void commit_discard_dcache_range (const void *base, unsigned int size)
+{
+    int cnt = size + ((unsigned long)base & 0x1f);
+    unsigned long opcode = ((unsigned long)base & 0xffffffe0) | 0x01;
+
+    while (cnt > 0)
+    {
+        CACHEOP = opcode;
+
+        while (CACHEOP & 0x03);
+
+        cnt -= 32;
+        opcode += 32;
+    }
+}
+
+void clean_dcache_range(const void *base, unsigned int size) __attribute__((alias("commit_discard_dcache_range")));
