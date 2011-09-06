@@ -353,6 +353,8 @@ drivers/audio/ak4537.c
 drivers/audio/uda1341.c
 #elif defined(HAVE_CS42L55)
 drivers/audio/cs42l55.c
+#elif defined (HAVE_RK27XX_CODEC)
+drivers/audio/rk27xx_codec.c
 #endif /* defined(HAVE_*) */
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
@@ -391,6 +393,8 @@ target/arm/as3525/usb-drv-as3525.c
 target/arm/as3525/usb-drv-as3525v2.c
 #elif CONFIG_USBOTG == USBOTG_ISP1583
 drivers/isp1583.c
+#elif CONFIG_USBOTG == USBOTG_RK27XX
+target/arm/rk27xx/usb-drv-rk27xx.c
 #endif
 #else /* !defined(HAVE_USBSTACK) */
 #if CONFIG_USBOTG == USBOTG_ISP1362	 
@@ -1665,10 +1669,18 @@ target/arm/rk27xx/lcd-rk27xx.c
 target/arm/rk27xx/adc-rk27xx.c
 target/arm/rk27xx/sd-rk27xx.c
 target/arm/rk27xx/ftl-rk27xx.c
+target/arm/rk27xx/nand-rk27xx.c
+target/arm/rk27xx/usb-rk27xx.c
+#ifndef BOOTLOADER
+target/arm/rk27xx/pcm-rk27xx.c
+target/arm/rk27xx/debug-rk27xx.c
+#endif
 #endif
 
 #if defined(RK27_GENERIC)
 target/arm/rk27xx/rk27generic/button-rk27generic.c
+target/arm/rk27xx/rk27generic/powermgmt-rk27generic.c
+target/arm/rk27xx/rk27generic/power-rk27generic.c
 #endif
 #endif
 
