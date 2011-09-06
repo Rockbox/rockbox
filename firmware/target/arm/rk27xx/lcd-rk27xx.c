@@ -302,3 +302,18 @@ void lcd_update_rect(int x, int y, int width, int height)
     (void)height;
     lcd_update();
 }
+
+/* Blit a YUV bitmap directly to the LCD */
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    (void)src;
+    (void)src_x;
+    (void)src_y;
+    (void)stride;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
+}
