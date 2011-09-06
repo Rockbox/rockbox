@@ -139,6 +139,7 @@
 #define SDL_PAD            46
 #define MPIO_HD300_PAD     47
 #define SANSA_FUZEPLUS_PAD 48
+#define RK27XX_GENERIC_PAD 49
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -309,6 +310,7 @@ Lyre prototype 1 */
 #define USBOTG_AS3525   3525 /* AMS AS3525 */
 #define USBOTG_AS3525v2 3535 /* AMS AS3525v2 FIXME : same as S3C6400X */
 #define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701/S5L8702/S5L8720 */
+#define USBOTG_RK27XX   2700 /* Rockchip rk27xx */
 
 /* Multiple cores */
 #define CPU 0
@@ -767,6 +769,9 @@ Lyre prototype 1 */
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_DRV
 #elif CONFIG_USBOTG == USBOTG_AS3525v2
+#define USB_STATUS_BY_EVENT
+#define USB_DETECT_BY_CORE
+#elif CONFIG_USBOTG == USBOTG_RK27XX
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_CORE
 #endif /* CONFIG_USB == */

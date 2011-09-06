@@ -13,7 +13,7 @@
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
-#define INPUT_SRC_CAPS (SRC_CAP_LINEIN)
+/* #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FM) */
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11 \
@@ -61,6 +61,7 @@
 #define CONFIG_STORAGE (STORAGE_SD | STORAGE_NAND)
 
 #define CONFIG_NAND NAND_RK27XX
+#define HAVE_SW_TONE_CONTROLS
 
 /* commented for now */
 /* #define HAVE_HOTSWAP */
@@ -90,7 +91,7 @@
 /* TODO: #define HAVE_LCD_SLEEP_SETTING */
 #endif
 
-#define CONFIG_KEYPAD IPOD_4G_PAD
+#define CONFIG_KEYPAD RK27XX_GENERIC_PAD
 
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
@@ -107,18 +108,17 @@
 #define CONFIG_LCD LCD_SPFD5420A
 
 /* Define the type of audio codec */
-/* #define HAVE_RK27XX_CODEC */
+#define HAVE_RK27XX_CODEC
 
 /* #define HAVE_PCM_DMA_ADDRESS */
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
-
-/* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      0
 #define MAX_BRIGHTNESS_SETTING      31
-#define DEFAULT_BRIGHTNESS_SETTING  18
+#define DEFAULT_BRIGHTNESS_SETTING   20
+#define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_HW_REG
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
@@ -147,6 +147,17 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* USB On-the-go */
+#define CONFIG_USBOTG USBOTG_RK27XX
+
+/* enable these for the experimental usb stack */
+#define HAVE_USBSTACK
+
+#define USE_ROCKBOX_USB
+#define USB_VENDOR_ID 0x071b
+#define USB_PRODUCT_ID 0x3202
+#define HAVE_BOOTLOADER_USB_MODE
+
 /* Define this if your LCD can set contrast */
 /* #define HAVE_LCD_CONTRAST */
 
@@ -160,7 +171,7 @@
 #define CPU_FREQ        200000000
 
 /* define this if the hardware can be powered off while charging */
-#define HAVE_POWEROFF_WHILE_CHARGING
+/* #define HAVE_POWEROFF_WHILE_CHARGING */
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
