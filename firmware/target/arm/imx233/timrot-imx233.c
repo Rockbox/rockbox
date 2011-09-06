@@ -39,6 +39,8 @@ define_timer_irq(3)
 void imx233_setup_timer(unsigned timer_nr, bool reload, unsigned count,
     unsigned src, unsigned prescale, bool polarity, imx233_timer_fn_t fn)
 {
+    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
+    
     timer_fns[timer_nr] = fn;
     
     HW_TIMROT_TIMCTRL(timer_nr) = src | prescale;
@@ -65,6 +67,8 @@ void imx233_setup_timer(unsigned timer_nr, bool reload, unsigned count,
         imx233_enable_interrupt(INT_SRC_TIMER(timer_nr), false);
     /* finally update */
     __REG_SET(HW_TIMROT_TIMCTRL(timer_nr)) = HW_TIMROT_TIMCTRL__UPDATE;
+
+    restore_interrupt(oldstatus);
 }
 
 void imx233_timrot_init(void)

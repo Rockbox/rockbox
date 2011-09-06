@@ -20,18 +20,41 @@
  ****************************************************************************/
 #include "kernel.h"
 #include "timrot-imx233.h"
-#include "clkctrl-imx233.h"
+#include "timer.h"
 
-static void tick_timer(void)
+static long timer_cycles = 0;
+
+static void timer_fn()
 {
-    /* Run through the list of tick tasks */
-    call_tick_tasks();
+    if(pfn_timer)
+        pfn_timer();
 }
 
-void tick_start(unsigned int interval_in_ms)
+bool timer_set(long cycles, bool start)
 {
-    /* use the 1-kHz XTAL clock source */
-    imx233_setup_timer(TICK_TIMER_NR, true, interval_in_ms,
-        HW_TIMROT_TIMCTRL__SELECT_1KHZ_XTAL, HW_TIMROT_TIMCTRL__PRESCALE_1,
-        false, &tick_timer);
+    timer_stop();
+    
+    if(start && pfn_unregister)
+    {
+        pfn_unregister();
+        pfn_unregister = NULL;
+    }
+
+    timer_cycles = cycles;
+
+    return true;
+}
+
+bool timer_start(IF_COP_VOID(int core))
+{
+    imx233_setup_timer(USER_TIMER_NR, true, timer_cycles,
+        HW_TIMROT_TIMCTRL__SELECT_TICK_ALWAYS, HW_TIMROT_TIMCTRL__PRESCALE_1,
+            false, &timer_fn);
+    return true;
+}
+
+void timer_stop(void)
+{
+    imx233_setup_timer(USER_TIMER_NR, false, 0, HW_TIMROT_TIMCTRL__SELECT_NEVER_TICK,
+        HW_TIMROT_TIMCTRL__PRESCALE_1, false, NULL);
 }

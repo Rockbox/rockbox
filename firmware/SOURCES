@@ -513,6 +513,10 @@ target/arm/imx233/debug-imx233.c
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 target/arm/imx233/usb-imx233.c
 #endif
+#ifndef BOOTLOADER
+target/arm/imx233/pcm-imx233.c
+target/arm/imx233/timer-imx233.c
+#endif
 #endif /* IMX233 */
 
 #if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2

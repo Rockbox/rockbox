@@ -57,6 +57,16 @@
 #define FRAME_PHYS_ADDR (DRAM_ORIG + DRAM_SIZE - TTB_SIZE - FRAME_SIZE)
 #define FRAME           ((void *)(FRAME_PHYS_ADDR - UNCACHED_DRAM_ADDR + BUFFERED_DRAM_ADDR))
 
+/* Timer runs at APBX speed which is derived from ref_xtal@24MHz */
+#define TIMER_FREQ      24000000
+
+#ifdef SANSA_FUZEPLUS
+#define TICK_TIMER_NR   0
+#define USER_TIMER_NR   1
+#else
+#error Select timers !
+#endif
+
 /* USBOTG */
 #define USB_QHARRAY_ATTR    __attribute__((section(".qharray"),nocommon,aligned(2048)))
 #define USB_NUM_ENDPOINTS   5

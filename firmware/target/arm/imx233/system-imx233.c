@@ -127,6 +127,12 @@ void system_exception_wait(void)
     while(!button_read_device());
 }
 
+int system_memory_guard(int newmode)
+{
+    (void)newmode;
+    return 0;
+}
+
 void imx233_enable_interrupt(int src, bool enable)
 {
     if(enable)
