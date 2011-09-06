@@ -488,6 +488,7 @@ static int parse_listitemviewport(struct skin_element *element,
                                   struct wps_token *token,
                                   struct wps_data *wps_data)
 {
+#ifndef __PCTOOL__
     struct listitem_viewport_cfg *cfg = 
         (struct listitem_viewport_cfg *)skin_buffer_alloc(
                                 sizeof(struct listitem_viewport_cfg));
@@ -506,6 +507,7 @@ static int parse_listitemviewport(struct skin_element *element,
         !strcmp(element->params[3].data.text, "tile"))
         cfg->tile = true;
     token->value.data = (void*)cfg;
+#endif
     return 0;
 }
 
