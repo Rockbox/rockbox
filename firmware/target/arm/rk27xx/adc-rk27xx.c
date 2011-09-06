@@ -26,7 +26,7 @@
 #include "thread.h"
 #include "adc.h"
 
-unsigned int adc_scan(int channel)
+unsigned short adc_read(int channel)
 {
     ADC_CTRL = (1<<4)|(1<<3) | (channel & (NUM_ADC_CHANNELS - 1));
 
