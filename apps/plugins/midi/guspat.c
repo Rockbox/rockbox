@@ -122,7 +122,7 @@ struct GWaveform * loadWaveform(int file)
     /* Byte-swap if necessary. Gus files are little endian */
     for(a=0; a<wav->numSamples; a++)
     {
-        ((unsigned short *) wav->data)[a] = letoh16(((unsigned short *) wav->data)[a]);
+        ((uint16_t*) wav->data)[a] = letoh16(((uint16_t *) wav->data)[a]);
     }
 #endif
 
@@ -130,7 +130,7 @@ struct GWaveform * loadWaveform(int file)
     if(wav->mode & 2)
     {
         for(a=0; a<wav->numSamples; a++)
-            ((short *) wav->data)[a] = ((unsigned short *) wav->data)[a] - 32768;
+            ((int16_t *) wav->data)[a] = ((uint16_t *) wav->data)[a] - 32768;
 
     }
 

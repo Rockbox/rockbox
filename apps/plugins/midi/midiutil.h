@@ -148,7 +148,7 @@ int readTwoBytes(int file);
 int readFourBytes(int file);
 int readVarData(int file);
 int eof(int fd);
-unsigned char * readData(int file, int len);
+void * readData(int file, int len);
 
 #define malloc(n) my_malloc(n)
 void * my_malloc(int size);

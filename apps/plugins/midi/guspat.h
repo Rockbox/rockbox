@@ -50,7 +50,7 @@ struct GWaveform
     unsigned int scaleFactor;
 
     unsigned char * res;
-    signed char * data;
+    int16_t * data;
 };
 
 

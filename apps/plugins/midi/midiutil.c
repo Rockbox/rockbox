@@ -114,9 +114,9 @@ unsigned char readChar(int file)
     return buf[0];
 }
 
-unsigned char * readData(int file, int len)
+void * readData(int file, int len)
 {
-    unsigned char * dat = malloc(len);
+    void * dat = malloc(len);
     rb->read(file, dat, len);
     return dat;
 }

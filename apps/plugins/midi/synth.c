@@ -201,8 +201,6 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     return 0;
 }
 
-#define getSample(s,wf) ((short *)(wf)->data)[s]
-
 void setPoint(struct SynthObject * so, int pt) ICODE_ATTR;
 void setPoint(struct SynthObject * so, int pt)
 {
@@ -269,6 +267,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
     register unsigned int cp_temp = so->cp;
 
     wf = so->wf;
+    const int16_t *sample_data = wf->data;
 
     const unsigned int pan = chPan[so->ch];
     const int volscale = so->volscale;
@@ -309,7 +308,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
             cp_temp += so->delta;
         }
 
-        s2 = getSample((cp_temp >> FRACTSIZE)+1, wf);
+        s2 = sample_data[(cp_temp >> FRACTSIZE)+1];
 
         if(LIKELY(mode_mask28))
         {
@@ -319,7 +318,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
                 if(UNLIKELY(mode_mask_looprev))
                 {
                     cp_temp += diff_loop;
-                    s2=getSample((cp_temp >> FRACTSIZE), wf);
+                    s2 = sample_data[cp_temp >> FRACTSIZE];
                 }
                 else
                 {
@@ -333,7 +332,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
                 if(UNLIKELY(!mode_mask24))
                 {
                     cp_temp -= diff_loop;
-                    s2=getSample((cp_temp >> FRACTSIZE), wf);
+                    s2 = sample_data[cp_temp >> FRACTSIZE];
                 }
                 else
                 {
@@ -346,7 +345,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
         if(UNLIKELY(cp_temp >= num_samples))
         {
             cp_temp -= so->delta;
-            s2 = getSample((cp_temp >> FRACTSIZE)+1, wf);
+            s2 = sample_data[(cp_temp >> FRACTSIZE)+1];
 
             if (!rampdown) /* stop voice */
             {
@@ -356,7 +355,7 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
         }
 
         /* Better, working, linear interpolation    */
-        s1=getSample((cp_temp >> FRACTSIZE), wf);
+        s1 = sample_data[cp_temp >> FRACTSIZE];
 
         s1 +=((signed)((s2 - s1) * (cp_temp & ((1<<FRACTSIZE)-1)))>>FRACTSIZE);
 
