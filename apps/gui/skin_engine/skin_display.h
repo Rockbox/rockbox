@@ -36,6 +36,11 @@ void draw_playlist_viewer_list(struct gui_wps *gwps, struct playlistviewer *view
 void clear_image_pos(struct gui_wps *gwps, struct gui_img *img);
 void wps_draw_image(struct gui_wps *gwps, struct gui_img *img, int subimage);
 void wps_display_images(struct gui_wps *gwps, struct viewport* vp);
+
+
+void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
+                        struct skin_viewport* skin_viewport, unsigned long refresh_type);
+
 #endif
 
 /* Evaluate the conditional that is at *token_index and return whether a skip

@@ -483,6 +483,32 @@ static int parse_viewport_gradient_setup(struct skin_element *element,
 }
 #endif
 
+
+static int parse_listitemviewport(struct skin_element *element,
+                                  struct wps_token *token,
+                                  struct wps_data *wps_data)
+{
+    struct listitem_viewport_cfg *cfg = 
+        (struct listitem_viewport_cfg *)skin_buffer_alloc(
+                                sizeof(struct listitem_viewport_cfg));
+    if (!cfg)
+        return -1;
+    cfg->data = wps_data;
+    cfg->tile = false;
+    cfg->label = element->params[0].data.text;
+    cfg->width = -1;
+    cfg->height = -1;
+    if (!isdefault(&element->params[1]))
+        cfg->width = element->params[1].data.number;
+    if (!isdefault(&element->params[2]))
+        cfg->height = element->params[2].data.number;
+    if (element->params_count > 3 &&
+        !strcmp(element->params[3].data.text, "tile"))
+        cfg->tile = true;
+    token->value.data = (void*)cfg;
+    return 0;
+}
+
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 static int parse_viewporttextstyle(struct skin_element *element,
                                    struct wps_token *token,
@@ -877,6 +903,8 @@ static int parse_progressbar_tag(struct skin_element* element,
         token->type = SKIN_TOKEN_PEAKMETER_LEFTBAR;
     else if (token->type == SKIN_TOKEN_PEAKMETER_RIGHT)
         token->type = SKIN_TOKEN_PEAKMETER_RIGHTBAR;
+    else if (token->type == SKIN_TOKEN_LIST_NEEDS_SCROLLBAR)
+        token->type = SKIN_TOKEN_LIST_SCROLLBAR;
     pb->type = token->type;
         
     return 0;
@@ -1719,6 +1747,7 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_PLAYER_PROGRESSBAR:
                 case SKIN_TOKEN_PEAKMETER_LEFT:
                 case SKIN_TOKEN_PEAKMETER_RIGHT:
+                case SKIN_TOKEN_LIST_NEEDS_SCROLLBAR:
 #ifdef HAVE_RADIO_RSSI
                 case SKIN_TOKEN_TUNER_RSSI:
 #endif
@@ -1809,6 +1838,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     function = parse_skinvar;
                     break;
 #endif
+                case SKIN_TOKEN_LIST_ITEM_CFG:
+                    function = parse_listitemviewport;
+                    break;
                 default:
                     break;
             }

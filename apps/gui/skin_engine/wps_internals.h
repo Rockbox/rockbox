@@ -193,6 +193,7 @@ struct viewport_colour {
     struct viewport *vp;
     unsigned colour;
 };
+
 #ifdef HAVE_TOUCHSCREEN
 struct touchregion {
     char* label;            /* label to identify this region */

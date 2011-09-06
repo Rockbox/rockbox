@@ -121,6 +121,9 @@ bool list_display_title(struct gui_synclist *list, enum screen_type screen)
 static int list_get_nb_lines(struct gui_synclist *list, enum screen_type screen)
 {
     struct viewport vp = *list->parent[screen];
+    int skin_count = skinlist_get_line_count(screen, list);
+    if (skin_count >= 0)
+        return skin_count;
     if (list_display_title(list, screen))
         vp.height -= font_get(list->parent[screen]->font)->height;
     return viewport_get_nb_lines(&vp);
@@ -239,7 +242,10 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
 #endif
     FOR_NB_SCREENS(i)
     {
-        list_draw(&screens[i], gui_list);
+#ifdef HAVE_LCD_BITMAP        
+        if (!skinlist_draw(&screens[i], gui_list))
+#endif
+            list_draw(&screens[i], gui_list);
     }
 }
 

@@ -75,6 +75,7 @@ gui/icon.c
 gui/list.c
 #ifdef HAVE_LCD_BITMAP
 gui/bitmap/list.c
+gui/bitmap/list-skinned.c
 #else
 gui/charcell/list.c
 #endif

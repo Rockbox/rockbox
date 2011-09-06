@@ -46,6 +46,7 @@
 #include "playlist.h"
 #include "root_menu.h"
 #include "misc.h"
+#include "list.h"
 
 
 #define MAX_LINE 1024
@@ -142,6 +143,11 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             }
         }
         break;
+        case SKIN_TOKEN_LIST_ITEM_CFG:
+            if (do_refresh)
+                skinlist_set_cfg(gwps->display->screen_type, 
+                                    token->value.data);
+            break;
 #ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_UIVIEWPORT_ENABLE:
             sb_set_info_vp(gwps->display->screen_type, 
@@ -164,6 +170,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_PROGRESSBAR:
         case SKIN_TOKEN_TUNER_RSSI_BAR:
+        case SKIN_TOKEN_LIST_SCROLLBAR:
         {
             struct progressbar *bar = (struct progressbar*)token->value.data;
             if (do_refresh)
@@ -488,10 +495,10 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 if (!do_non_text_tags(info->gwps, info, child, &info->skin_vp->vp))
                 {
                     static char tempbuf[128];
-                    const char *value = get_token_value(info->gwps, child->data,
+                    const char *valuestr = get_token_value(info->gwps, child->data,
                                                         info->offset, tempbuf,
                                                         sizeof(tempbuf), NULL);
-                    if (value)
+                    if (valuestr)
                     {
 #if CONFIG_RTC
                         if (child->tag->flags&SKIN_RTC_REFRESH)
@@ -499,7 +506,7 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
 #endif
                         needs_update = needs_update || 
                                 ((child->tag->flags&info->refresh_type)!=0);
-                        strlcat(info->cur_align_start, value, 
+                        strlcat(info->cur_align_start, valuestr, 
                                 info->buf_size - (info->cur_align_start-info->buf));
                     }
                 }
@@ -612,8 +619,8 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
     return changed_lines || ret;
 }
 
-static void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
-                                 struct skin_viewport* skin_viewport, unsigned long refresh_type)
+void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
+                        struct skin_viewport* skin_viewport, unsigned long refresh_type)
 {
     struct screen *display = gwps->display;
     char linebuf[MAX_LINE];
@@ -784,10 +791,11 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 }
 
 #ifdef HAVE_LCD_BITMAP
-static __attribute__((noinline)) void skin_render_playlistviewer(struct playlistviewer* viewer,
-                                       struct gui_wps *gwps,
-                                       struct skin_viewport* skin_viewport,
-                                       unsigned long refresh_type)
+static __attribute__((noinline)) 
+void skin_render_playlistviewer(struct playlistviewer* viewer,
+                                struct gui_wps *gwps,
+                                struct skin_viewport* skin_viewport,
+                                unsigned long refresh_type)
 {
     struct screen *display = gwps->display;
     char linebuf[MAX_LINE];

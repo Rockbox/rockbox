@@ -28,7 +28,7 @@
 #include "screen_access.h"
 #include "settings.h"
 #include "misc.h"
-
+#include "list.h"
 /*some short cuts for fg/bg/line selector handling */
 #ifdef HAVE_LCD_COLOR
 #define FG_FALLBACK global_settings.fg_color
@@ -178,6 +178,7 @@ static void toggle_theme(enum screen_type screen, bool force)
         screens[screen].backdrop_show(NULL);
 #endif
         screens[screen].stop_scroll();
+        skinlist_set_cfg(screen, NULL);
     }
     /* let list initialize viewport in case viewport dimensions is changed. */
     send_event(GUI_EVENT_THEME_CHANGED, NULL);

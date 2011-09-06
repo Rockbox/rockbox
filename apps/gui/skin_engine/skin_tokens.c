@@ -71,6 +71,7 @@
 #include "radio.h"
 #include "tuner.h"
 #endif
+#include "list.h"
 
 #define NOINLINE __attribute__ ((noinline))
 
@@ -894,6 +895,17 @@ const char *get_token_value(struct gui_wps *gwps,
                 *intval = sb_get_icon(gwps->display->screen_type);
             snprintf(buf, buf_size, "%d",sb_get_icon(gwps->display->screen_type));
             return buf;
+        case SKIN_TOKEN_LIST_ITEM_TEXT:
+            return skinlist_get_item_text();
+        case SKIN_TOKEN_LIST_ITEM_IS_SELECTED:
+            return skinlist_is_selected_item()?"s":"";
+        case SKIN_TOKEN_LIST_ITEM_ICON:
+            if (intval)
+                *intval = skinlist_get_item_icon();
+            snprintf(buf, buf_size, "%d",skinlist_get_item_icon());
+            return buf;
+        case SKIN_TOKEN_LIST_NEEDS_SCROLLBAR:
+            return skinlist_needs_scrollbar(gwps->display->screen_type) ? "s" : "";
 #endif
         case SKIN_TOKEN_PLAYLIST_NAME:
             return playlist_name(NULL, buf, buf_size);

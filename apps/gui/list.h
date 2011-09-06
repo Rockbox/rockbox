@@ -25,6 +25,7 @@
 #include "config.h"
 #include "icon.h"
 #include "screen_access.h"
+#include "skin_engine/skin_engine.h"
 
 #define SCROLLBAR_WIDTH global_settings.scrollbar_width
 
@@ -173,6 +174,27 @@ extern bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,
 extern bool gui_synclist_do_button(struct gui_synclist * lists,
                                        int *action,
                                        enum list_wrap);
+#if defined(HAVE_LCD_BITMAP) && !defined(PLUGIN)
+struct listitem_viewport_cfg {
+    struct wps_data *data;
+    char*   label;
+    int     width;
+    int     height;
+    int     xmargin;
+    int     ymargin;
+    bool    tile;
+    struct skin_viewport selected_item_vp;
+};
+bool skinlist_draw(struct screen *display, struct gui_synclist *list);
+bool skinlist_is_selected_item(void);
+void skinlist_set_cfg(enum screen_type screen,
+                      struct listitem_viewport_cfg *cfg);
+const char* skinlist_get_item_text(void);
+enum themable_icons skinlist_get_item_icon(void);
+bool skinlist_needs_scrollbar(enum screen_type screen);
+void skinlist_get_scrollbar(int* nb_item, int* first_shown, int* last_shown);
+int skinlist_get_line_count(enum screen_type screen, struct gui_synclist *list);
+#endif
 
 #if  defined(HAVE_TOUCHSCREEN)
 /* this needs to be fixed if we ever get more than 1 touchscreen on a target */
