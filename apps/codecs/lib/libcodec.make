@@ -16,7 +16,7 @@ $(CODECLIB): $(CODECLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-CODECLIBFLAGS = $(filter-out -O%,$(CODECFLAGS)) -ffunction-sections
+CODECLIBFLAGS = $(filter-out -O%,$(CODECFLAGS))
 
 ifeq ($(MEMORYSIZE),2)
     CODECLIBFLAGS += -Os
@@ -24,6 +24,11 @@ else ifeq ($(CPU),coldfire)
     CODECLIBFLAGS += -O2
 else
     CODECLIBFLAGS += -O1
+endif
+
+# Do not use '-ffunction-sections' when compiling sdl-sim
+ifneq ($(findstring sdl-sim, $(APP_TYPE)), sdl-sim)
+    CODECLIBFLAGS += -ffunction-sections
 endif
 
 $(CODECDIR)/lib/%.o: $(ROOTDIR)/apps/codecs/lib/%.c

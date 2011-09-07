@@ -16,10 +16,15 @@ $(TLSFLIB): $(TLSFLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-TLSFLIBFLAGS = $(CODECFLAGS) -ffunction-sections
+TLSFLIBFLAGS = $(CODECFLAGS)
 
 ifdef APP_TYPE
     TLSFLIBFLAGS += -DTLSF_STATISTIC=1
+endif
+
+# Do not use '-ffunction-sections' when compiling sdl-sim
+ifneq ($(findstring sdl-sim, $(APP_TYPE)), sdl-sim)
+    TLSFLIBFLAGS += -ffunction-sections
 endif
 
 $(CODECDIR)/lib/tlsf/src/%.o: $(APPSDIR)/codecs/lib/tlsf/src/%.c
