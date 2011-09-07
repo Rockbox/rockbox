@@ -1520,9 +1520,11 @@ int read_pfraw(char* filename, int prio)
                 sizeof( pix_t ) * bmph.width * bmph.height;
 
     int hid;
-    while (!(hid = rb->buflib_alloc(&buf_ctx, size)) && free_slide_prio(prio));
+    do {
+        hid = rb->buflib_alloc(&buf_ctx, size);
+    } while (hid < 0 && free_slide_prio(prio));
 
-    if (!hid) {
+    if (hid < 0) {
         rb->close( fh );
         return 0;
     }

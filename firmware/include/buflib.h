@@ -153,7 +153,8 @@ size_t buflib_available(struct buflib_context *ctx);
  *
  * size: How many bytes to allocate
  *
- * Returns: An integer handle identifying this allocation
+ * Returns: A positive integer handle identifying this allocation, or
+ * a negative value on error (0 is also not a valid handle)
  */
 int buflib_alloc(struct buflib_context *context, size_t size);
 
@@ -166,7 +167,8 @@ int buflib_alloc(struct buflib_context *context, size_t size);
  * size: How many bytes to allocate
  * ops: a struct with pointers to callback functions (see above)
  *
- * Returns: An integer handle identifying this allocation
+ * Returns: A positive integer handle identifying this allocation, or
+ * a negative value on error (0 is also not a valid handle)
  */
 int buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
                     struct buflib_callbacks *ops);
@@ -188,7 +190,8 @@ int buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
  * size: The actual size will be returned into size
  * ops: a struct with pointers to callback functions
  *
- * Returns: An integer handle identifying this allocation
+ * Returns: A positive integer handle identifying this allocation, or
+ * a negative value on error (0 is also not a valid handle)
  */
 int buflib_alloc_maximum(struct buflib_context* ctx, const char* name,
                     size_t *size, struct buflib_callbacks *ops);
@@ -233,7 +236,7 @@ bool buflib_shrink(struct buflib_context *ctx, int handle, void* newstart, size_
 /**
  * Frees memory associated with the given handle
  *
- * Returns: 0 (to invalidate handles in one line)
+ * Returns: 0 (to invalidate handles in one line, 0 is not a valid handle)
  */
 int buflib_free(struct buflib_context *context, int handle);
 

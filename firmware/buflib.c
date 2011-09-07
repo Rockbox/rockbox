@@ -425,7 +425,7 @@ handle_alloc:
                     goto handle_alloc;
                 }
             }
-            return 0;
+            return -1;
         }
     }
 
@@ -471,7 +471,7 @@ buffer_alloc:
         } else {
             handle->val=1;
             handle_free(ctx, handle);
-            return 0;
+            return -2;
         }
     }
 
