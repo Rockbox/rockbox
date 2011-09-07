@@ -272,6 +272,8 @@ void option_select_next_val(const struct settings_list *setting,
                 val = max;
         }
         *value = val;
+        if (apply)
+            sound_set(setting_id, val);
     }
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {
@@ -308,6 +310,8 @@ void option_select_next_val(const struct settings_list *setting,
             }
         }
         *value = val;
+        if (apply && tbl_info->option_callback)
+            tbl_info->option_callback(val);
     }
 }
 #endif
