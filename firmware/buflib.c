@@ -687,7 +687,7 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
 
 const char* buflib_get_name(struct buflib_context *ctx, int handle)
 {
-    union buflib_data *data = (union buflib_data*)ALIGN_DOWN((intptr_t)buflib_get_data(ctx, handle), sizeof (*data));
+    union buflib_data *data = ALIGN_DOWN(buflib_get_data(ctx, handle), sizeof (*data));
     size_t len = data[-1].val;
     if (len <= 1)
         return NULL;
