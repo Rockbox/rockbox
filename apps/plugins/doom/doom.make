@@ -20,8 +20,8 @@ OTHER_SRC += $(DOOM_SRC)
 
 DOOMCFLAGS = $(PLUGINFLAGS) -Wno-strict-prototypes -O2 -fno-strict-aliasing
 
-# Set '-fgnu89-inline' if supported for the target.
-ifneq ($(CPU),mips)
+# Set '-fgnu89-inline' if supported (GCCVER >= 4.1.3, GCCNUM >= 401)
+ifeq ($(shell expr $(GCCNUM) \>= 401),1)
     DOOMCFLAGS += -fgnu89-inline
 endif
 

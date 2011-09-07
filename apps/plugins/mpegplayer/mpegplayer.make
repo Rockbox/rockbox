@@ -18,8 +18,8 @@ MPEG_OBJ := $(call c2obj, $(MPEG_SRC))
 # add source files to OTHER_SRC to get automatic dependencies
 OTHER_SRC += $(MPEG_SRC)
 
-# Set '-fgnu89-inline' if supported for the target.
-ifneq ($(CPU),mips)
+# Set '-fgnu89-inline' if supported (GCCVER >= 4.1.3, GCCNUM >= 401)
+ifeq ($(shell expr $(GCCNUM) \>= 401),1)
     MPEGCFLAGS = $(PLUGINFLAGS) -fgnu89-inline
 else
     MPEGCFLAGS = $(PLUGINFLAGS)
