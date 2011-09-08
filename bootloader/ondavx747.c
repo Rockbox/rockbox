@@ -35,7 +35,7 @@
 #include "adc.h"
 #include "version.h"
 
-extern int show_logo(void);
+extern void show_logo(void);
 extern void power_off(void);
 
 static void show_splash(int timeout, const char *msg)

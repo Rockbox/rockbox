@@ -37,7 +37,7 @@
 #define TEXT_WIDTH ((sizeof(BOOT_VERSION)-1)*SYSFONT_WIDTH)
 #define TEXT_XPOS ((TEXT_WIDTH > LCD_WIDTH) ? 0 : ((LCD_WIDTH - TEXT_WIDTH) / 2))
 
-int show_logo( void )
+void show_logo( void )
 {
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
@@ -53,6 +53,4 @@ int show_logo( void )
 #endif
 
     lcd_update();
-    
-    return 0;
 }

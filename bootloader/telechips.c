@@ -46,7 +46,7 @@
 #include "version.h"
 
 /* Show the Rockbox logo - in show_logo.c */
-extern int show_logo(void);
+extern void show_logo(void);
 
 /* Address to load main Rockbox image to */
 #define LOAD_ADDRESS 0x20000000 /* DRAM_START */

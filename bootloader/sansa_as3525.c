@@ -40,7 +40,7 @@
 #include "panic.h"
 #include "power.h"
 
-int show_logo(void);
+void show_logo(void);
 
 #ifdef USE_ROCKBOX_USB
 static void usb_mode(void)

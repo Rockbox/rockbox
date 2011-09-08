@@ -56,7 +56,7 @@ void lcd_reset(void);
 #endif
 
 /* Show the Rockbox logo - in show_logo.c */
-extern int show_logo(void);
+extern void show_logo(void);
 
 /* Button definitions */
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
