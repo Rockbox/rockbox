@@ -77,6 +77,7 @@ struct gui_img {
     short int num_subimages;      /* number of sub-images */
     short int subimage_height;    /* height of each sub-image */
     struct bitmap bm;
+    int buflib_handle;
     const char *label;
     bool loaded;            /* load state */
     bool always_display;    /* not using the preload/display mechanism */

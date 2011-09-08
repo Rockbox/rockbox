@@ -22,6 +22,7 @@
 #include "config.h"
 #include <stdio.h>
 #include "string-extra.h"
+#include "core_alloc.h"
 #include "misc.h"
 #include "font.h"
 #include "system.h"
@@ -247,15 +248,16 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     if (pb->backdrop)
     {
         struct gui_img *img = pb->backdrop;
+        char *img_data = core_get_data(img->buflib_handle);
 #if LCD_DEPTH > 1
         if(img->bm.format == FORMAT_MONO) {
 #endif
-            display->mono_bitmap_part(img->bm.data,
+            display->mono_bitmap_part(img_data,
                                       0, 0, img->bm.width,
                                       x, y, width, height);
 #if LCD_DEPTH > 1
         } else {
-            display->transparent_bitmap_part((fb_data *)img->bm.data,
+            display->transparent_bitmap_part((fb_data *)img_data,
                                              0, 0,
                                              STRIDE(display->screen_type,
                                              img->bm.width, img->bm.height),
@@ -268,9 +270,13 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     if (!pb->nobar)
     {
         if (pb->image)
+        {
+            char *img_data = core_get_data(pb->image->buflib_handle);
+            pb->image->bm.data = img_data;
             gui_bitmap_scrollbar_draw(display, &pb->image->bm,
                                     x, y, width, height,
                                     length, 0, end, flags);
+        }
         else
             gui_scrollbar_draw(display, x, y, width, height,
                                length, 0, end, flags);
@@ -281,6 +287,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         int xoff = 0, yoff = 0;
         int w = width, h = height;
         struct gui_img *img = pb->slider;
+        char *img_data = core_get_data(img->buflib_handle);
 
         if (flags&HORIZONTAL)
         {
@@ -301,12 +308,12 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
 #if LCD_DEPTH > 1
         if(img->bm.format == FORMAT_MONO) {
 #endif
-            display->mono_bitmap_part(img->bm.data,
+            display->mono_bitmap_part(img_data,
                                       0, 0, img->bm.width,
                                       x + xoff, y + yoff, w, h);
 #if LCD_DEPTH > 1
         } else {
-            display->transparent_bitmap_part((fb_data *)img->bm.data,
+            display->transparent_bitmap_part((fb_data *)img_data,
                                              0, 0,
                                              STRIDE(display->screen_type,
                                              img->bm.width, img->bm.height),
@@ -350,6 +357,7 @@ void clear_image_pos(struct gui_wps *gwps, struct gui_img *img)
 void wps_draw_image(struct gui_wps *gwps, struct gui_img *img, int subimage)
 {
     struct screen *display = gwps->display;
+    char *img_data = core_get_data(img->buflib_handle);
     if(img->always_display)
         display->set_drawmode(DRMODE_FG);
     else
@@ -358,14 +366,14 @@ void wps_draw_image(struct gui_wps *gwps, struct gui_img *img, int subimage)
 #if LCD_DEPTH > 1
     if(img->bm.format == FORMAT_MONO) {
 #endif
-        display->mono_bitmap_part(img->bm.data,
+        display->mono_bitmap_part(img_data,
                                   0, img->subimage_height * subimage,
                                   img->bm.width, img->x,
                                   img->y, img->bm.width,
                                   img->subimage_height);
 #if LCD_DEPTH > 1
     } else {
-        display->transparent_bitmap_part((fb_data *)img->bm.data,
+        display->transparent_bitmap_part((fb_data *)img_data,
                                          0, img->subimage_height * subimage,
                                          STRIDE(display->screen_type,
                                             img->bm.width, img->bm.height),

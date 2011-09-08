@@ -43,16 +43,8 @@ enum skinnable_screens {
 
 
 #ifdef HAVE_LCD_BITMAP
-#define MAIN_BUFFER (2*LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8)
 
-#if (NB_SCREENS > 1)
-#define REMOTE_BUFFER (2*(LCD_REMOTE_HEIGHT*LCD_REMOTE_WIDTH*LCD_REMOTE_DEPTH/8))
-#else
-#define REMOTE_BUFFER 0
-#endif
-
-
-#define SKIN_BUFFER_SIZE (MAIN_BUFFER + REMOTE_BUFFER + SKIN_FONT_SIZE) + \
+#define SKIN_BUFFER_SIZE (2048 + SKIN_FONT_SIZE) + \
                          (WPS_MAX_TOKENS * \
                          (sizeof(struct wps_token) + (sizeof(struct skin_element))))
 #endif

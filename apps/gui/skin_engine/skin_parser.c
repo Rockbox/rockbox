@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "config.h"
+#include "core_alloc.h"
 #include "file.h"
 #include "misc.h"
 #include "plugin.h"
@@ -364,6 +365,7 @@ static int parse_image_load(struct skin_element *element,
     img->always_display = false;
     img->display = -1;
     img->using_preloaded_icons = false;
+    img->buflib_handle = -1;
 
     /* save current viewport */
     img->vp = &curr_vp->vp;
@@ -885,6 +887,7 @@ static int parse_progressbar_tag(struct skin_element* element,
             img->always_display = false;
             img->display = -1;
             img->using_preloaded_icons = false;
+            img->buflib_handle = -1;
             img->vp = &curr_vp->vp;
             struct skin_token_list *item = 
                     (struct skin_token_list *)new_skin_token_list_item(NULL, img);
@@ -1389,10 +1392,20 @@ static bool check_feature_tag(const int type)
  **/
 static void skin_data_reset(struct wps_data *wps_data)
 {
-    wps_data->tree = NULL;
 #ifdef HAVE_LCD_BITMAP
+#ifndef __PCTOOL__
+    struct skin_token_list *list = wps_data->images;
+    while (list)
+    {
+        struct gui_img *img = (struct gui_img*)list->token->value.data;
+        if (img->buflib_handle > 0)
+            core_free(img->buflib_handle);
+        list = list->next;
+    }
+#endif
     wps_data->images = NULL;
 #endif
+    wps_data->tree = NULL;
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     if (wps_data->backdrop_id >= 0)
         skin_backdrop_unload(wps_data->backdrop_id);
@@ -1430,11 +1443,33 @@ static void skin_data_reset(struct wps_data *wps_data)
 }
 
 #ifdef HAVE_LCD_BITMAP
-static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char* bmpdir)
+#ifndef __PCTOOL__
+static int currently_loading_handle = -1;
+static int buflib_move_callback(int handle, void* current, void* new)
+{
+    (void)current;
+    (void)new;
+    if (handle == currently_loading_handle)
+        return BUFLIB_CB_CANNOT_MOVE;
+    return BUFLIB_CB_OK;
+}
+static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL};
+static void lock_handle(int handle)
+{
+    currently_loading_handle = handle;
+}
+static void unlock_handle(void)
+{
+    currently_loading_handle = -1;
+}
+#endif
+
+static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char* bmpdir)
 {
     (void)wps_data; /* only needed for remote targets */
     char img_path[MAX_PATH];
     int fd;
+    int handle;
     get_image_filename(bitmap->data, bmpdir,
                        img_path, sizeof(img_path));
 
@@ -1451,35 +1486,44 @@ static bool load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char
     if (fd < 0)
     {
         DEBUGF("Couldn't open %s\n", img_path);
-        return false;
+        return fd;
     }
+#ifndef __PCTOOL__
     size_t buf_size = read_bmp_fd(fd, bitmap, 0, 
-                                    format|FORMAT_RETURN_SIZE, NULL);  
-    char* imgbuf = (char*)skin_buffer_alloc(buf_size);
-    if (!imgbuf)
+                                    format|FORMAT_RETURN_SIZE, NULL);
+    handle = core_alloc_ex(bitmap->data, buf_size, &buflib_ops);
+    if (handle < 0)
     {
 #ifndef APPLICATION
         DEBUGF("Not enough skin buffer: need %zd more.\n", 
                 buf_size - skin_buffer_freespace());
 #endif
         close(fd);
-        return NULL;
+        return handle;
     }
     lseek(fd, 0, SEEK_SET);
-    bitmap->data = imgbuf;
+    lock_handle(handle);
+    bitmap->data = core_get_data(handle);
     int ret = read_bmp_fd(fd, bitmap, buf_size, format, NULL);
-
+    bitmap->data = NULL; /* do this to force a crash later if the 
+                            caller doesnt call core_get_data() */
+    unlock_handle();
     close(fd);
     if (ret > 0)
     {
-        return true;
+        return handle;
     }
     else
     {
         /* Abort if we can't load an image */
         DEBUGF("Couldn't load '%s'\n", img_path);
-        return false;
+        core_free(handle);
+        return -1;
     }
+#else /* !__PCTOOL__ */
+    close(fd);
+    return 1;
+#endif
 }
 
 static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
@@ -1501,7 +1545,8 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
             }
             else
             {
-                img->loaded = load_skin_bmp(wps_data, &img->bm, bmpdir);
+                img->buflib_handle = load_skin_bmp(wps_data, &img->bm, bmpdir);
+                img->loaded = img->buflib_handle >= 0;
                 if (img->loaded)
                     img->subimage_height = img->bm.height / img->num_subimages;
                 else
