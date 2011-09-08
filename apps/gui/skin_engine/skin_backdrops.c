@@ -41,10 +41,10 @@ static struct skin_backdrop {
 } backdrops[NB_BDROPS];
 
 #define NB_BDROPS SKINNABLE_SCREENS_COUNT*NB_SCREENS
-int handle_being_loaded;
-int current_lcd_backdrop[NB_SCREENS];
+static int handle_being_loaded;
+static int current_lcd_backdrop[NB_SCREENS];
 
-int buflib_move_callback(int handle, void* current, void* new)
+static int buflib_move_callback(int handle, void* current, void* new)
 {
     int i;
     if (handle == handle_being_loaded)
