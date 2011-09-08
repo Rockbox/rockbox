@@ -938,14 +938,15 @@ draw_stone_raw (int pixel_x, int pixel_y, bool black)
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground (black ? BLACK_COLOR : WHITE_COLOR);
 #else
-    if (black)
-    {
-        rb->lcd_set_drawmode (DRMODE_SOLID);
-    }
-    else
-    {
-        rb->lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
-    }
+    int draw_mode;
+/* check whether foreground is bright or dark */
+#if defined(HAVE_NEGATIVE_LCD)
+    draw_mode = DRMODE_SOLID | (black ? DRMODE_INVERSEVID : 0);
+#else
+    draw_mode = DRMODE_SOLID | (black ? 0 : DRMODE_INVERSEVID);
+#endif /* HAVE_NEGATIVE_LCD */
+
+    rb->lcd_set_drawmode (draw_mode);
 #endif
 
     draw_circle (pixel_x + LINE_OFFSET,
@@ -955,17 +956,11 @@ draw_stone_raw (int pixel_x, int pixel_y, bool black)
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground (black ? WHITE_COLOR : BLACK_COLOR);
 #else
-    if (black)
-    {
-        rb->lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
-    }
-    else
-    {
-        rb->lcd_set_drawmode (DRMODE_SOLID);
-    }
+    rb->lcd_set_drawmode (draw_mode ^ DRMODE_INVERSEVID);
 #endif /* LCD_DEPTH > 1 */
 
-    if (!black)
+    /* outline stones of background color only */
+    if (draw_mode & DRMODE_INVERSEVID)
     {
         draw_circle (pixel_x + LINE_OFFSET,
                      pixel_y + LINE_OFFSET, LINE_OFFSET, false);
