@@ -292,8 +292,10 @@ void gui_message_loop(void)
 
     do {
         /* wait for the next event */
-        while(SDL_WaitEvent(&event) == 0)
+        if(SDL_WaitEvent(&event) == 0) {
             printf("SDL_WaitEvent() error\n");
+            return; /* error, out of here */
+        }
 
         sim_enter_irq_handler();
         quit = event_handler(&event);
