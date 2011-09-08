@@ -147,26 +147,30 @@ findtool(){
 # scan the $PATH for sdl-config - check whether for a (cross-)win32
 # sdl as requested
 findsdl(){
-  file="sdl-config"
+  # sdl-config might (not) be prefixed for cross compiles so try both.
+  files="sdl-config:${CROSS}sdl-config"
   winbuild="$1"
 
   IFS=":"
-  for path in $PATH
+  for file in $files
   do
-    #echo "checks for $file in $path" >&2
-    if test -f "$path/$file"; then
-      if [ "0" != `$path/$file --libs |grep -c mwindows` ]; then
-        if [ "yes" = "${winbuild}" ]; then
-          echo "$path/$file"
-          return
-        fi
-      else
-        if [ "yes" != "${winbuild}" ]; then
-          echo "$path/$file"
-          return
+    for path in $PATH
+    do
+      #echo "checks for $file in $path" >&2
+      if test -f "$path/$file"; then
+        if [ "0" != `$path/$file --libs |grep -c mwindows` ]; then
+          if [ "yes" = "${winbuild}" ]; then
+            echo "$path/$file"
+            return
+          fi
+        else
+          if [ "yes" != "${winbuild}" ]; then
+            echo "$path/$file"
+            return
+          fi
         fi
       fi
-    fi
+    done
   done
 }
 
@@ -233,6 +237,7 @@ simcc () {
    LDOPTS="$LDOPTS -mconsole"
    output="$output.exe"
    winbuild="yes"
+   CROSS=${CROSS:-"i586-mingw32msvc-"}
    SHARED_CFLAGS=''
  else
  case $uname in
@@ -360,7 +365,7 @@ EOF
  else
    # We are crosscompiling
    # add cross-compiler option(s)
-   prefixtools i586-mingw32msvc-
+   prefixtools $CROSS
    LDOPTS="$LDOPTS -mconsole"
    fibers=`check_fiber`
    output="rockboxui.exe"
@@ -3445,7 +3450,7 @@ else
    ""|"$CROSS_COMPILE")
      # simulator
    ;;
-   i586-mingw32msvc-)
+   ${CROSS})
      # cross-compile for win32
    ;;
    *)
