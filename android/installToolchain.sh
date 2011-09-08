@@ -80,7 +80,7 @@ fi
 
 if [ -z "$(find $SDK_PATH/platforms -type d -name 'android-*')" ]; then
     echo " * Installing Android platforms..."
-    $SDK_PATH/$ANDROID update sdk --no-ui --filter platform,platform-tools,tool
+    $SDK_PATH/$ANDROID update sdk --no-ui --filter platform,platform-tool,tool
 fi
 
 cat <<EOF
