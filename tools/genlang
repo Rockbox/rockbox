@@ -121,7 +121,23 @@ if(!$target && !$update && !$sortfile) {
     print STDERR "Please specify a target (with -t)!\n";
     exit;
 }
-my @target_parts = split ':', $target;
+
+# Build up a regex which can be applied to target wildcard lists. We only need
+# to support prefix matches, so a target parameter of foo:bar can be expanded
+# to the regex "\*|f\*|fo\*|foo|b\*|ba\*|bar" and applied to the wildcard list
+# (plus end-of-string or commas on either side). The regex engine should
+# discard any duplicates generated for us in the process of constructing the
+# state machine, so we don't bother to check.
+my $target_regex = "(?:^|,) *(?:\\*";
+foreach my $target_part (split ':', $target) {
+    for (my $c=1; $c<length $target_part; $c++) {
+        my $partial = substr $target_part, 0, $c;
+        $target_regex .= "|$partial\\*";
+    }
+    $target_regex .= "|$target_part";
+}
+$target_regex .= ") *(?:,|\$)";
+$target_regex = qr/$target_regex/;
 
 my $binpath = "";
 if ($binary =~ m|(.*)/[^/]+|) {
@@ -178,21 +194,10 @@ sub options {
 sub parsetarget {
     my ($debug, $strref, $full, $n, $v)=@_;
     my $string;
-    my @all= split(" *, *", $n);
-    my $test;
-    for $test (@all) {
-        $test =~ s/\*/.*/g;
-        $test =~ s/\?/./g;
-
-#        print "TEST ($debug) $target for $test\n";
-        for my $part (@target_parts) {
-            if($part =~ /^$test\z/) {
-                $string = $v;
-#                print "MATCH: $test => $v\n";
-                $$strref = $string;
-                return $string;
-            }
-        }
+    if ($n =~ $target_regex) {
+        $string = $v;
+        $$strref = $string;
+        return $string;
     }
 }
 
