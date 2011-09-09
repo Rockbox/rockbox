@@ -44,13 +44,15 @@ void Apu_init( struct Nes_Apu* this )
 	Apu_reset( this, false, 0 );
 }
 
-void Apu_enable_nonlinear_( struct Nes_Apu* this, double sq, double tnd )
+#if 0
+// sq and tnd must use a fixed point frac where 1.0 = FP_ONE_VOLUME
+void Apu_enable_nonlinear_( struct Nes_Apu* this, int sq, int tnd )
 {
 	this->dmc.nonlinear = true;
-	Synth_volume( &this->square_synth, (int)((long long)(sq * FP_ONE_VOLUME) / amp_range) );
+	Synth_volume( &this->square_synth, sq );
 	
-	Synth_volume( &this->triangle.synth, tnd * 2.752 );
-	Synth_volume( &this->noise.synth   , tnd * 1.849 );
+	Synth_volume( &this->triangle.synth, (int)((long long)(FP_ONE_VOLUME * 2.752) * tnd / FP_ONE_VOLUME) );
+	Synth_volume( &this->noise.synth   , (int)((long long)(FP_ONE_VOLUME * 1.849) * tnd / FP_ONE_VOLUME) );
 	Synth_volume( &this->dmc.synth     , tnd );
 	
 	this->square1 .osc.last_amp = 0;
@@ -59,15 +61,16 @@ void Apu_enable_nonlinear_( struct Nes_Apu* this, double sq, double tnd )
 	this->noise   .osc.last_amp = 0;
 	this->dmc     .osc.last_amp = 0;
 }
+#endif
 
 void Apu_volume( struct Nes_Apu* this, int v )
 {
 	if ( !this->dmc.nonlinear )
 	{
-		Synth_volume( &this->square_synth,  (int)((long long)((0.125 * (1.0 /1.11)) * FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) ); // was 0.1128   1.108
-		Synth_volume( &this->triangle.synth,(int)((long long)((0.150 * (1.0 /1.11)) * FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) ); // was 0.12765  1.175
-		Synth_volume( &this->noise.synth,   (int)((long long)((0.095 * (1.0 /1.11)) * FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) ); // was 0.0741   1.282
-		Synth_volume( &this->dmc.synth,     (int)((long long)((0.450 * (1.0 /1.11)) * FP_ONE_VOLUME) * v / 2048      / FP_ONE_VOLUME) ); // was 0.42545  1.058
+		Synth_volume( &this->square_synth,  (int)((long long)((0.125 / 1.11) * FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) ); // was 0.1128   1.108
+		Synth_volume( &this->triangle.synth,(int)((long long)((0.150 / 1.11) * FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) ); // was 0.12765  1.175
+		Synth_volume( &this->noise.synth,   (int)((long long)((0.095 / 1.11) * FP_ONE_VOLUME) * v / amp_range / FP_ONE_VOLUME) ); // was 0.0741   1.282
+		Synth_volume( &this->dmc.synth,     (int)((long long)((0.450 / 1.11) * FP_ONE_VOLUME) * v / 2048      / FP_ONE_VOLUME) ); // was 0.42545  1.058
 	}
 }
 

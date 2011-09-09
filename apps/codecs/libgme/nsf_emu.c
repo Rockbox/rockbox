@@ -299,10 +299,6 @@ blargg_err_t Nsf_post_load( struct Nsf_Emu* this )
 	blargg_err_t err = init_sound( this );
 	if ( err )
 		return err;
-	
-	// Post load
-	Sound_set_tempo( this, this->tempo );
-	Sound_mute_voices( this, this->mute_mask_ );
 
 	// Set track_count
 	this->track_count = this->header.track_count;
@@ -312,6 +308,10 @@ blargg_err_t Nsf_post_load( struct Nsf_Emu* this )
 	Buffer_clock_rate( &this->stereo_buf, this->clock_rate__ );
 	RETURN_ERR( Buffer_set_channel_count( &this->stereo_buf, this->voice_count, this->voice_types ) );
     this->buf_changed_count = Buffer_channels_changed_count( &this->stereo_buf );
+	
+	// Post load
+	Sound_set_tempo( this, this->tempo );
+	Sound_mute_voices( this, this->mute_mask_ );
 	return 0;
 }
 

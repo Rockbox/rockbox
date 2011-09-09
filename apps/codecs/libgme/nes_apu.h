@@ -130,6 +130,8 @@ static inline nes_time_t Dmc_next_read_time( struct Nes_Dmc* this )
 static inline nes_time_t Apu_next_dmc_read_time( struct Nes_Apu* this ) { return Dmc_next_read_time( &this->dmc ); }
 void Apu_irq_changed( struct Nes_Apu* this );
 
+#if 0
 // Experimental
-void Apu_enable_nonlinear_( struct Nes_Apu* this, double sq, double tnd );
+void Apu_enable_nonlinear_( struct Nes_Apu* this, int sq, int tnd );
+#endif
 #endif

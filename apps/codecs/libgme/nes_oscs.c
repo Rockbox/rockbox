@@ -565,7 +565,7 @@ void Noise_run( struct Nes_Noise* this, nes_time_t time, nes_time_t end_time )
 			int noise = this->noise;
 			int delta = amp * 2 - volume;
 			const int tap = (osc->regs [2] & mode_flag ? 8 : 13);
-			Blip_set_modified( osc->output );
+			Blip_set_modified( output );
 			
 			do {
 				int feedback = (noise << tap) ^ (noise << 14);

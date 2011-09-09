@@ -107,6 +107,7 @@ void run_square( struct Nes_Vrc6_Apu* this, struct Vrc6_Osc* osc, blip_time_t en
 		if ( time < end_time )
 		{
 			int phase = osc->phase;
+			Blip_set_modified( output );
 			
 			do
 			{

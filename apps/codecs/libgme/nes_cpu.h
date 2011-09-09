@@ -48,11 +48,14 @@ struct Nes_Cpu {
 	struct cpu_state_t cpu_state_;
 };
 
-static inline void Cpu_init( struct Nes_Cpu* this ) { this->cpu_state = &this->cpu_state_; }
+static inline void Cpu_init( struct Nes_Cpu* this )
+{
+	this->cpu_state = &this->cpu_state_;
+}
 
 // Clears registers and maps all pages to unmapped_page
 void Cpu_reset( struct Nes_Cpu* this, void const* unmapped_page );
-	
+
 // Maps code memory (memory accessed via the program counter). Start and size
 // must be multiple of page_size. If mirror_size is non-zero, the first
 // mirror_size bytes are repeated over the range. mirror_size must be a
@@ -101,6 +104,6 @@ static inline void Cpu_set_end_time( struct Nes_Cpu* this, nes_time_t t )
 {
 	this->end_time = t;
 	Cpu_update_end_time( this, t, this->irq_time );
-}   
+}
 
 #endif

@@ -215,9 +215,7 @@ static blargg_err_t check_vgm_header( struct header_t* h )
 static void set_voice( struct Vgm_Emu* this, int i, struct Blip_Buffer* c, struct Blip_Buffer* l, struct Blip_Buffer* r )
 {
 	if ( i < sms_osc_count ) {
-		int j;
-		for ( j = sms_osc_count; --j >= 0; )
-			Sms_apu_set_output( &this->psg, j, c, l, r );
+		Sms_apu_set_output( &this->psg, i, c, l, r );
 	}
 }
 
@@ -294,6 +292,9 @@ blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_
 	// Post load
 	Sound_set_tempo( this, this->tempo );
 	Sound_mute_voices( this, this->mute_mask_ );
+	
+	// so we can start playback
+	this->current_track = 0;
 	return 0;
 }
 
