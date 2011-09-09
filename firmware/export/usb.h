@@ -145,4 +145,8 @@ void usb_firewire_connect_event(void);
 void usb_set_hid(bool enable);
 #endif
 
+#if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
+void usb_set_skip_first_drive(bool skip);
+#endif
+
 #endif

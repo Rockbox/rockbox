@@ -36,12 +36,6 @@
 /* For sector filter macro definitions */
 #include "usb-target.h"
 
-/* Enable the following define to export only the SD card slot. This
- * is useful for USBCV MSC tests, as those are destructive.
- * This won't work right if the device doesn't have a card slot.
- */
-//#define HIDE_FIRST_DRIVE
-
 #ifdef USB_USE_RAMDISK
 #define RAMDISK_SIZE 2048
 #endif
@@ -314,6 +308,10 @@ static bool locked[NUM_DRIVES];
 static int usb_interface;
 static int ep_in, ep_out;
 
+#if defined(HAVE_MULTIDRIVE)
+static bool skip_first = 0;
+#endif
+
 #ifdef USB_USE_RAMDISK
 static unsigned char* ramdisk_buffer;
 #endif
@@ -397,6 +395,13 @@ void usb_storage_notify_hotswap(int volume,bool inserted)
            At least try to keep our state consistent */
         locked[volume]=false;
     }
+}
+#endif
+
+#ifdef HAVE_MULTIDRIVE
+void usb_set_skip_first_drive(bool skip)
+{
+    skip_first = skip;
 }
 #endif
 
@@ -690,8 +695,8 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* des
     switch (req->bRequest) {
         case USB_BULK_GET_MAX_LUN: {
             *tb.max_lun = storage_num_drives() - 1;
-#ifdef HIDE_FIRST_DRIVE
-            *tb.max_lun --;
+#if defined(HAVE_MULTIDRIVE)
+            if(skip_first) (*tb.max_lun) --;
 #endif
             logf("ums: getmaxlun");
             usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
@@ -777,8 +782,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
      * bogus data */
     cbw->signature=0;
 
-#ifdef HIDE_FIRST_DRIVE
-    lun++;
+#if defined(HAVE_MULTIDRIVE)
+    if(skip_first) lun++;
 #endif
 
     storage_get_info(lun,&info);

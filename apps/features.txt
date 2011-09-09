@@ -96,6 +96,10 @@ pitchscreen
 multivolume
 #endif
 
+#if defined(HAVE_MULTIDRIVE) && defined(USB_ENABLE_STORAGE)
+multidrive_usb
+#endif
+
 #if defined(HAVE_QUICKSCREEN)
 quickscreen
 #endif

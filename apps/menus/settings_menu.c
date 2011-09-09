@@ -268,6 +268,9 @@ MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 MENUITEM_SETTING(usb_hid, &global_settings.usb_hid, NULL);
 MENUITEM_SETTING(usb_keypad_mode, &global_settings.usb_keypad_mode, NULL);
 #endif
+#if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
+MENUITEM_SETTING(usb_skip_first_drive, &global_settings.usb_skip_first_drive, NULL);
+#endif
 
 #ifdef HAVE_MORSE_INPUT
 MENUITEM_SETTING(morse_input, &global_settings.morse_input, NULL);
@@ -329,6 +332,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #ifdef USB_ENABLE_HID
             &usb_hid,
             &usb_keypad_mode,
+#endif
+#if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
+            &usb_skip_first_drive,
 #endif
          );
 

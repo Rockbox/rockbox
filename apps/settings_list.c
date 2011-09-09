@@ -1791,6 +1791,10 @@ const struct settings_list settings[] = {
     ), /* CHOICE_SETTING( usb_keypad_mode ) */
 #endif
 
+#if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
+    OFFON_SETTING(0, usb_skip_first_drive, LANG_USB_SKIP_FIRST_DRIVE, false, "usb skip first drive", usb_set_skip_first_drive),
+#endif
+
     /* Customizable list */
 #ifdef HAVE_LCD_BITMAP
     VIEWPORT_SETTING(ui_vp_config, "ui viewport"),

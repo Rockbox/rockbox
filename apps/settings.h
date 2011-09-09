@@ -772,6 +772,10 @@ struct user_settings
     int usb_keypad_mode;
 #endif
 
+#if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
+    bool usb_skip_first_drive;
+#endif
+
 #ifdef HAVE_LCD_BITMAP
     unsigned char ui_vp_config[64]; /* viewport string for the lists */
 #ifdef HAVE_REMOTE_LCD
