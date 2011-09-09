@@ -72,7 +72,6 @@
 #include "tuner.h"
 #endif
 #include "list.h"
-#include "strnatcmp.h"
 
 #define NOINLINE __attribute__ ((noinline))
 
