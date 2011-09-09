@@ -493,9 +493,7 @@ buffer_alloc:
     name_len_slot = (union buflib_data*)B_ALIGN_UP(block[3].name + name_len);
     name_len_slot->val = 1 + name_len/sizeof(union buflib_data);
     handle->alloc = (char*)(name_len_slot + 1);
-    /* If we have just taken the first free block, the next allocation search
-     * can save some time by starting after this block.
-     */
+
     block += size;
     /* alloc_end must be kept current if we're taking the last block. */
     if (last)
