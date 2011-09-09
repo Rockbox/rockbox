@@ -47,7 +47,6 @@ struct buflib_context
     union buflib_data *handle_table;
     union buflib_data *first_free_handle;
     union buflib_data *last_handle;
-    union buflib_data *first_free_block;
     union buflib_data *buf_start;
     union buflib_data *alloc_end;
     bool compact;
