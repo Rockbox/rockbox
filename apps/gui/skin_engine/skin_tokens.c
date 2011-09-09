@@ -72,6 +72,7 @@
 #include "tuner.h"
 #endif
 #include "list.h"
+#include "strnatcmp.h"
 
 #define NOINLINE __attribute__ ((noinline))
 
@@ -739,11 +740,10 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
     switch (lif->operand.type)
     {
         case STRING:
-            if (lif->op == IF_EQUALS)
-                return (out_text && strcmp(out_text, lif->operand.data.text) == 0)
-                                    ? "eq" : NULL;
-            else
+            if (out_text == NULL)
                 return NULL;
+            a = strcmp(out_text, lif->operand.data.text);
+            b = 0;
             break;
         case INTEGER:
         case DECIMAL:
