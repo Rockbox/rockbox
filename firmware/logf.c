@@ -188,7 +188,7 @@ static int logf_push(void *userp, unsigned char c)
     logfbuffer[logfindex++] = c;
     check_logfindex();
     
-#if defined(HAVE_SERIAL) && !defined(SIMULATOR)
+#if defined(HAVE_SERIAL) && !defined(SIMULATOR) && defined(LOGF_SERIAL)
     if(c != '\0')
     {
         char buf[2];
@@ -225,7 +225,7 @@ void _logf(const char *fmt, ...)
     /* add trailing zero */
     logf_push(NULL, '\0');
     
-#if defined(HAVE_SERIAL) && !defined(SIMULATOR)
+#if defined(HAVE_SERIAL) && !defined(SIMULATOR) && defined(LOGF_SERIAL)
     serial_tx("\r\n");
 #endif
 #ifdef USB_ENABLE_SERIAL

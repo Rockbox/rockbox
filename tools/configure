@@ -16,6 +16,7 @@ GLOBAL_LDOPTS=""
 extradefines=""
 use_logf="#undef ROCKBOX_HAS_LOGF"
 use_bootchart="#undef DO_BOOTCHART"
+use_logf_serial="#undef LOGF_SERIAL"
 
 scriptver=`echo '$Revision$' | sed -e 's:\\$::g' -e 's/Revision: //'`
 
@@ -715,7 +716,7 @@ whichadvanced () {
     echo ""
     printf "Enter your developer options (press only enter when done)\n\
 (D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile,\n\
-(T)est plugins, S(m)all C lib:"
+(T)est plugins, S(m)all C lib, Logf to Ser(i)al port:"
     if [ "$modelname" = "archosplayer" ]; then
       printf ", Use (A)TA poweroff"
     fi
@@ -762,9 +763,14 @@ whichadvanced () {
         extradefines="$extradefines -DHAVE_TEST_PLUGINS"
         ;;
       [Cc])
-          echo "bootchart enabled (logf also enabled)"
+        echo "bootchart enabled (logf also enabled)"
         bootchart="yes"
         logf="yes"
+        ;;
+      [Ii])
+        echo "Logf to serial port enabled (logf also enabled)"
+        logf="yes"
+        logf_serial="yes"
         ;;
       [Ss])
         echo "Simulator build enabled"
@@ -844,6 +850,9 @@ whichadvanced () {
   fi
   if [ "yes" = "$logf" ]; then
     use_logf="#define ROCKBOX_HAS_LOGF 1"
+  fi
+  if [ "yes" = "$logf_serial" ]; then
+    use_logf_serial="#define LOGF_SERIAL 1"
   fi
   if [ "yes" = "$bootchart" ]; then
     use_bootchart="#define DO_BOOTCHART 1"
@@ -3706,6 +3715,9 @@ cat > autoconf.h <<EOF
 
 /* Define this if you build rockbox to support the logf logging and display */
 ${use_logf}
+
+/* Define this if you want logf to output to the serial port */
+${use_logf_serial}
 
 /* Define this to record a chart with timings for the stages of boot */
 ${use_bootchart}
