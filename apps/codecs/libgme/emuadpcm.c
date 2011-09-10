@@ -117,7 +117,7 @@ void restart(struct Y8950Adpcm* this_)
 	this_->diff = DDEF;
 	this_->nextLeveling = 0;
 	this_->sampleStep = 0;
-	this_->volumeWStep = (int)((double)this_->volume * this_->step / MAX_STEP);
+	this_->volumeWStep = (int)((long long)this_->volume * this_->step / MAX_STEP);
 }
 
 void ADPCM_writeReg(struct Y8950Adpcm* this_, byte rg, byte data)
@@ -176,23 +176,22 @@ void ADPCM_writeReg(struct Y8950Adpcm* this_, byte rg, byte data)
 		case 0x10: // DELTA-N (L) 
 			this_->delta = (this_->delta & 0xFF00) | data;
 			this_->step = rate_adjust(this_->delta<<GETA_BITS, this_->sampleRate, this_->clockRate);
-			this_->volumeWStep = (int)((double)this_->volume * this_->step / MAX_STEP);
+			this_->volumeWStep = (int)((long long)this_->volume * this_->step / MAX_STEP);
 			break;
 		case 0x11: // DELTA-N (H) 
 			this_->delta = (this_->delta & 0x00FF) | (data << 8);
 			this_->step = rate_adjust(this_->delta<<GETA_BITS, this_->sampleRate, this_->clockRate);
-			this_->volumeWStep = (int)((double)this_->volume * this_->step / MAX_STEP);
+			this_->volumeWStep = (int)((long long)this_->volume * this_->step / MAX_STEP);
 			break;
 
 		case 0x12: { // ENVELOP CONTROL 
 			int oldVol = this_->volume;
 			this_->volume = (data * ADPCM_VOLUME) >> 8;
 			if (oldVol != 0) {
-				double factor = (double)this_->volume / (double)oldVol;
-				this_->output =     (int)((double)this_->output     * factor);
-				this_->sampleStep = (int)((double)this_->sampleStep * factor);
+				this_->output =     (int)(((long long)this_->output     * this_->volume) / oldVol);
+				this_->sampleStep = (int)(((long long)this_->sampleStep * this_->volume) / oldVol);
 			}
-			this_->volumeWStep = (int)((double)this_->volume * this_->step / MAX_STEP);
+			this_->volumeWStep = (int)((long long)this_->volume * this_->step / MAX_STEP);
 			break;
 		}
 		case 0x0D: // PRESCALE (L) 
@@ -290,7 +289,7 @@ int ADPCM_calcSample(struct Y8950Adpcm* this_)
 		
 		/* TODO: Used fixed point math here */
 	#if !defined(ROCKBOX)
-		this_->output += (int)((double)this_->sampleStep * ((double)this_->nowStep/(double)this_->step));
+		this_->output += (int)(((long long)this_->sampleStep * this_->nowStep) / this_->step);
 	#endif
 	}
 	this_->output += this_->sampleStep;

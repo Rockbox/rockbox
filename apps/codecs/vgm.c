@@ -134,7 +134,7 @@ enum codec_status codec_run(void)
 
         ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE >> 1);
 
-        elapsed_time += (CHUNK_SIZE / 2) / 44.1;
+        elapsed_time += (CHUNK_SIZE / 2) * 10 / 441;
         ci->set_elapsed(elapsed_time);
     }
 

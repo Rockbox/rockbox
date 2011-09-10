@@ -238,11 +238,11 @@ void OPL_changeStatusMask(struct Y8950* this_, byte newMask);
 
 
 // Adjust envelope speed which depends on sampling rate
-static inline unsigned int rate_adjust(double x, int rate, int clk)
+static inline unsigned int rate_adjust(int x, int rate, int clk)
 {
-	double tmp = x * clk / 72 / rate + 0.5; // +0.5 to round
+	unsigned int tmp = (long long)x * clk / 72 / rate;
 //	assert (tmp <= 4294967295U);
-	return (unsigned int)tmp;
+	return tmp;
 }
 
 #endif

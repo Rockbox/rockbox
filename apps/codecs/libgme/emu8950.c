@@ -494,8 +494,8 @@ void OPL_setSampleRate(struct Y8950* this, int sampleRate, int clockRate)
 	makeDphaseARTable(sampleRate, clockRate);
 	makeDphaseDRTable(sampleRate, clockRate);
 	makeDphaseNoiseTable(sampleRate, clockRate);
-	this->pm_dphase = rate_adjust(PM_SPEED * PM_DP_WIDTH / (clockRate/72), sampleRate, clockRate);
-	this->am_dphase = rate_adjust(AM_SPEED * AM_DP_WIDTH / (clockRate/72), sampleRate, clockRate);
+	this->pm_dphase = rate_adjust( (int)(PM_SPEED * PM_DP_WIDTH) / (clockRate/72), sampleRate, clockRate);
+	this->am_dphase = rate_adjust( (int)(AM_SPEED * AM_DP_WIDTH) / (clockRate/72), sampleRate, clockRate);
 }
 
 // Reset whole of opl except patch datas.
