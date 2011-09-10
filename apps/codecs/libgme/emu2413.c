@@ -182,8 +182,21 @@ static e_uint16 halfsintable[PG_WIDTH];
 static e_uint16 *waveform[2] = { fullsintable, halfsintable };
 
 /* LFO Table */
-static e_int32 pmtable[PM_PG_WIDTH];
-static e_int32 amtable[AM_PG_WIDTH];
+#ifdef EMU2413_CALCUL_TABLES
+    static e_int32 pmtable[PM_PG_WIDTH];
+    static e_int32 amtable[AM_PG_WIDTH];
+    #define PMTABLE(x) pmtable[x]
+    #define AMTABLE(x) amtable[x]
+#else
+    #define PMTABLE(x) (e_int32)pm_coeff[x]
+    #if (PM_PG_WIDTH != 256)
+        #error PM_PG_WIDTH must be set to 256 if EMU2413_CALCUL_TABLES is not defined
+    #endif
+    #define AMTABLE(x) (e_int32)am_coeff[x]
+    #if (AM_PG_WIDTH != 256)
+        #error AM_PG_WIDTH must be set to 256 if EMU2413_CALCUL_TABLES is not defined
+    #endif
+#endif
 
 /* Phase delta for LFO */
 static e_uint32 pm_dphase;
@@ -193,7 +206,15 @@ static e_uint32 am_dphase;
 static e_int16 DB2LIN_TABLE[(DB_MUTE + DB_MUTE) * 2];
 
 /* Liner to Log curve conversion table (for Attack rate). */
-static e_uint16 AR_ADJUST_TABLE[1 << EG_BITS];
+#ifdef EMU2413_CALCUL_TABLES
+    static e_uint16 ar_adjust_table[1 << EG_BITS];
+    #define AR_ADJUST_TABLE(x) ar_adjust_table[x]
+#else
+    #define AR_ADJUST_TABLE(x) ar_adjust_coeff[x]
+    #if (EG_BITS != 7)
+        #error EG_BITS must be set to 7 if EMU2413_CALCUL_TABLES is not defined
+    #endif
+#endif
 
 /* Empty voice data */
 static OPLL_PATCH null_patch = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -225,6 +246,7 @@ static e_uint32 dphaseTable[512][8][16];
                   Create tables
  
 ****************************************************/
+#ifdef EMU2413_CALCUL_TABLES
 INLINE static e_int32
 Min (e_int32 i, e_int32 j)
 {
@@ -240,15 +262,11 @@ makeAdjustTable (void)
 {
   e_int32 i;
 
-  AR_ADJUST_TABLE[0] = (1 << EG_BITS) - 1;
+  ar_adjust_table[0] = (1 << EG_BITS) - 1;
   for (i = 1; i < (1<<EG_BITS); i++)
-  #ifdef EMU2413_CALCUL_TABLES
-    AR_ADJUST_TABLE[i] = (e_uint16) ((double) (1<<EG_BITS)-1 - ((1<<EG_BITS)-1)*log(i)/log(127));
-  #else
-    AR_ADJUST_TABLE[i] = ar_adjust_coeff[i];
-  #endif
+    ar_adjust_table[i] = (e_uint16) ((double) (1<<EG_BITS)-1 - ((1<<EG_BITS)-1)*log(i)/log(127));
 }
-
+#endif
 
 /* Table for dB(0 -- (1<<DB_BITS)-1) to Liner(0 -- DB2LIN_AMP_WIDTH) */
 static void
@@ -308,6 +326,7 @@ makeSinTable (void)
     halfsintable[i] = fullsintable[0];
 }
 
+#ifdef EMU2413_CALCUL_TABLES
 static double saw(double phase)
 {
   if(phase <= PI/2)
@@ -326,11 +345,7 @@ makePmTable (void)
 
   for (i = 0; i < PM_PG_WIDTH; i++)
     /* pmtable[i] = (e_int32) ((double) PM_AMP * pow (2, (double) PM_DEPTH * sin (2.0 * PI * i / PM_PG_WIDTH) / 1200)); */
-  #ifdef EMU2413_CALCUL_TABLES
     pmtable[i] = (e_int32) ((double) PM_AMP * pow (2, (double) PM_DEPTH * saw (2.0 * PI * i / PM_PG_WIDTH) / 1200));    
-  #else
-    pmtable[i] = pm_coeff[i];
-  #endif
 }
 
 /* Table for Amp Modulator */
@@ -343,6 +358,7 @@ makeAmTable (void)
     /* amtable[i] = (e_int32) ((double) AM_DEPTH / 2 / DB_STEP * (1.0 + sin (2.0 * PI * i / PM_PG_WIDTH))); */
     amtable[i] = (e_int32) ((double) AM_DEPTH / 2 / DB_STEP * (1.0 + saw (2.0 * PI * i / PM_PG_WIDTH)));
 }
+#endif
 
 #if !defined(ROCKBOX)
 /* Phase increment counter table */
@@ -363,10 +379,11 @@ makeDphaseTable (void)
 static void
 makeTllTable (void)
 {
-#define dB2(x) ((x)*2)
+/* Multiplication owith 8 to have an integer result. This allows to remove floating point operation. */
+#define dB2(x) (int)((x)*2*8)
 
-  static double kltable[16] = {
-    dB2 (0.000), dB2 (9.000), dB2 (12.000), dB2 (13.875), dB2 (15.000), dB2 (16.125), dB2 (16.875), dB2 (17.625),
+  static int kltable[16] = {
+    dB2 ( 0.000), dB2 ( 9.000), dB2 (12.000), dB2 (13.875), dB2 (15.000), dB2 (16.125), dB2 (16.875), dB2 (17.625),
     dB2 (18.000), dB2 (18.750), dB2 (19.125), dB2 (19.500), dB2 (19.875), dB2 (20.250), dB2 (20.625), dB2 (21.000)
   };
 
@@ -384,11 +401,12 @@ makeTllTable (void)
           }
           else
           {
-            tmp = (e_int32) (kltable[fnum] - dB2 (3.000) * (7 - block));
+            tmp = (e_int32) ((kltable[fnum] - dB2 (3.000) * (7 - block))/8);
             if (tmp <= 0)
               tllTable[fnum][block][TL][KL] = TL2EG (TL);
             else
-              tllTable[fnum][block][TL][KL] = (e_uint32) ((tmp >> (3 - KL)) / EG_STEP) + TL2EG (TL);
+              /* tllTable[fnum][block][TL][KL] = (e_uint32) ((tmp >> (3 - KL)) / EG_STEP) + TL2EG (TL); */
+              tllTable[fnum][block][TL][KL] = (e_uint32) ((tmp << KL) / (int)(EG_STEP*8)) + TL2EG (TL);
           }
         }
 }
@@ -727,7 +745,7 @@ INLINE static void
 slotOff (OPLL_SLOT * slot)
 {
   if (slot->eg_mode == ATTACK)
-    slot->eg_phase = EXPAND_BITS (AR_ADJUST_TABLE[HIGHBITS (slot->eg_phase, EG_DP_BITS - EG_BITS)], EG_BITS, EG_DP_BITS);
+    slot->eg_phase = EXPAND_BITS (AR_ADJUST_TABLE(HIGHBITS (slot->eg_phase, EG_DP_BITS - EG_BITS)), EG_BITS, EG_DP_BITS);
   slot->eg_mode = RELEASE;
   UPDATE_EG(slot);
 }
@@ -993,8 +1011,8 @@ internal_refresh (void)
 #endif
   makeDphaseARTable ();
   makeDphaseDRTable ();
-  pm_dphase = (e_uint32) RATE_ADJUST (PM_SPEED * PM_DP_WIDTH / (clk / 72));
-  am_dphase = (e_uint32) RATE_ADJUST (AM_SPEED * AM_DP_WIDTH / (clk / 72));
+  pm_dphase = (e_uint32) RATE_ADJUST ((int)(PM_SPEED * PM_DP_WIDTH) / (clk / 72));
+  am_dphase = (e_uint32) RATE_ADJUST ((int)(AM_SPEED * AM_DP_WIDTH) / (clk / 72));
 }
 
 static void
@@ -1003,10 +1021,12 @@ maketables (e_uint32 c, e_uint32 r)
   if (c != clk)
   {
     clk = c;
+#ifdef EMU2413_CALCUL_TABLES
     makePmTable ();
     makeAmTable ();
-    makeDB2LinTable ();
     makeAdjustTable ();
+#endif
+    makeDB2LinTable ();
     makeTllTable ();
     makeRksTable ();
     makeSinTable ();
@@ -1173,8 +1193,8 @@ update_ampm (OPLL * opll)
 {
   opll->pm_phase = (opll->pm_phase + pm_dphase) & (PM_DP_WIDTH - 1);
   opll->am_phase = (opll->am_phase + am_dphase) & (AM_DP_WIDTH - 1);
-  opll->lfo_am = amtable[HIGHBITS (opll->am_phase, AM_DP_BITS - AM_PG_BITS)];
-  opll->lfo_pm = pmtable[HIGHBITS (opll->pm_phase, PM_DP_BITS - PM_PG_BITS)];
+  opll->lfo_am = AMTABLE(HIGHBITS (opll->am_phase, AM_DP_BITS - AM_PG_BITS));
+  opll->lfo_pm = PMTABLE(HIGHBITS (opll->pm_phase, PM_DP_BITS - PM_PG_BITS));
 }
 
 /* PG */
@@ -1215,7 +1235,7 @@ calc_envelope (OPLL_SLOT * slot, e_int32 lfo)
   switch (slot->eg_mode)
   {
   case ATTACK:
-    egout = AR_ADJUST_TABLE[HIGHBITS (slot->eg_phase, EG_DP_BITS - EG_BITS)];
+    egout = AR_ADJUST_TABLE(HIGHBITS (slot->eg_phase, EG_DP_BITS - EG_BITS));
     slot->eg_phase += slot->eg_dphase;
     if((EG_DP_WIDTH & slot->eg_phase)||(slot->patch->AR==15))
     {
