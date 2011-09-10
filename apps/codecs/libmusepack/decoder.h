@@ -91,7 +91,7 @@ struct mpc_decoder_t {
     MPC_SAMPLE_FORMAT *V_R;
     MPC_SAMPLE_FORMAT *Y_L;
     MPC_SAMPLE_FORMAT *Y_R;
-    MPC_SAMPLE_FORMAT SCF[256]; ///< holds adapted scalefactors (for clipping prevention)
+    mpc_uint32_t  SCF[256];          ///< holds adapted scalefactors (for clipping prevention)
     //@}
 };
 

@@ -58,7 +58,7 @@ typedef struct mpc_streaminfo {
     mpc_uint32_t         channels;           ///< Number of channels in stream
     mpc_uint32_t         stream_version;     ///< Streamversion of stream
     mpc_uint32_t         bitrate;            ///< Bitrate of stream file (in bps)
-    double               average_bitrate;    ///< Average bitrate of stream (in bits/sec)
+    mpc_uint32_t         average_bitrate;    ///< Average bitrate of stream (in bits/sec)
     mpc_uint32_t         max_band;           ///< Maximum band-index used in stream (0...31)
     mpc_uint32_t         ms;                 ///< Mid/side stereo (0: off, 1: on)
     mpc_uint32_t         fast_seek;          ///< True if stream supports fast-seeking (sv7)
@@ -87,7 +87,7 @@ typedef struct mpc_streaminfo {
     char                 encoder[256];       ///< Encoder name
 */
     mpc_bool_t           pns;                ///< pns used
-    float                profile;            ///< Quality profile of stream
+    mpc_uint32_t         profile;            ///< Quality profile of stream
 /* rockbox: not used    
     const char*          profile_name;       ///< Name of profile used by stream
 */

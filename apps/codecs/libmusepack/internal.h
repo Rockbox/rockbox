@@ -99,7 +99,7 @@ static mpc_inline mpc_status mpc_check_key(char * key)
 
 /// helper functions used by multiple files
 mpc_uint32_t mpc_random_int(mpc_decoder *d); // in synth_filter.c
-void mpc_decoder_init_quant(mpc_decoder *d, double scale_factor);
+void mpc_decoder_init_quant(mpc_decoder *d, MPC_SAMPLE_FORMAT factor); // in requant.c
 void mpc_decoder_synthese_filter_float(mpc_decoder *d, MPC_SAMPLE_FORMAT* OutData, mpc_int_t channels);
 unsigned long mpc_crc32(unsigned char *buf, int len);
 

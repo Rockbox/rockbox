@@ -251,7 +251,7 @@ static void mpc_decoder_setup(mpc_decoder *d)
     memset(d->Y_L, 0, sizeof(g_Y_L));
     memset(d->Y_R, 0, sizeof(g_Y_R));
 
-    mpc_decoder_init_quant(d, 1.0f);
+    mpc_decoder_init_quant(d, MAKE_MPC_SAMPLE(1.0));
 }
 
 static void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)

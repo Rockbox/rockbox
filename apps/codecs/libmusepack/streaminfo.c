@@ -167,8 +167,8 @@ streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r)
     else
         si->samples -= MPC_DECODER_SYNTH_DELAY;
 
-    si->average_bitrate = (si->tag_offset  - si->header_position) * 8.0
-            *  si->sample_freq / si->samples;
+    si->average_bitrate = 8LL * (si->tag_offset - si->header_position) 
+                          *  si->sample_freq / si->samples;
 
     return check_streaminfo(si);
 }
@@ -216,8 +216,8 @@ streaminfo_read_header_sv8(mpc_streaminfo* si, const mpc_bits_reader * r_in,
     si->bitrate = 0;
 
     if ((si->samples - si->beg_silence) != 0)
-        si->average_bitrate = (si->tag_offset - si->header_position) * 8.0
-                *  si->sample_freq / (si->samples - si->beg_silence);
+        si->average_bitrate = 8LL * (si->tag_offset - si->header_position) 
+                              *  si->sample_freq / (si->samples - si->beg_silence);
 
     return check_streaminfo(si);
 }
@@ -227,7 +227,7 @@ void  streaminfo_encoder_info(mpc_streaminfo* si, const mpc_bits_reader * r_in)
 {
     mpc_bits_reader r = *r_in;
 
-    si->profile            = mpc_bits_read(&r, 7) / 8.;
+    si->profile            = mpc_bits_read(&r, 7); // to be divided by 8
 /* rockbox: not used    
     si->profile_name       = mpc_get_version_string(si->profile);
 */
