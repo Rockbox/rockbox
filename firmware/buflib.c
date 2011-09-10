@@ -179,7 +179,7 @@ handle_table_shrink(struct buflib_context *ctx)
     for (handle = ctx->last_handle; !(handle->alloc); handle++);
     if (handle > ctx->first_free_handle)
         ctx->first_free_handle = handle - 1;
-    rv = handle == ctx->last_handle;
+    rv = handle != ctx->last_handle;
     ctx->last_handle = handle;
     return rv;
 }
