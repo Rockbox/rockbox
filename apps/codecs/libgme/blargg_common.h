@@ -21,6 +21,7 @@
 #endif
 
 // common defines
+#define FP_ONE_CLOCK  (1LL << 12)
 #define FP_ONE_TEMPO  (1LL << 24)
 #define FP_ONE_GAIN   (1LL << 24)
 #define FP_ONE_VOLUME FP_ONE_GAIN

@@ -461,44 +461,23 @@ static int YM_SET( struct Ym2612_Impl* impl, int Adr, int data )
 	return 0;
 }
 
-#if defined(ROCKBOX)
-double fabs(double x)
-{
-	if (x < 0.0) return -x;
-	return x;
-}
-
-double ipow(double a,int b)
-{
-	if (b < 0) {
-		a = 1.0 / a;
-		b = -b;
-	}
-	double result = 1.0;
-	while(b) {
-		if (b & 1) result*=a;
-		a *= a;
-		b >>= 1;
-	}
-	return result; 
-}
-#endif
-
 void impl_reset( struct Ym2612_Impl* impl );
-static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double clock_rate )
+static void impl_set_rate( struct Ym2612_Impl* impl, int sample_rate, int clock_rate )
 {
 	assert( sample_rate );
 	assert( !clock_rate || clock_rate > sample_rate );
-		
+	
 	int i;
 
 	// 144 = 12 * (prescale * 2) = 12 * 6 * 2
 	// prescale set to 6 by default
 	
-	double Frequence = (clock_rate ? clock_rate / sample_rate / 144.0 : 1.0);
-	if ( fabs( Frequence - 1.0 ) < 0.0000001 )
-		Frequence = 1.0;
-	impl->YM2612.TimerBase = (int) (Frequence * 4096.0);
+	int Frequency = (clock_rate ? (int)((FP_ONE_CLOCK * clock_rate) / sample_rate / 144) : (int)FP_ONE_CLOCK);
+	if ( abs( Frequency - FP_ONE_CLOCK ) < 1 )
+		Frequency = FP_ONE_CLOCK;
+	impl->YM2612.TimerBase = Frequency;
+    
+    /* double Frequence = (double)Frequency / FP_ONE_CLOCK; */
 
 	// Tableau TL :
 	// [0     -  4095] = +output  [4095  - ...] = +output overflow (fill with 0)
@@ -571,11 +550,18 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 	{
 		// Attack curve (x^8 - music level 2 Vectorman 2)
 	#if defined(ROCKBOX)
-		double x = ipow( ((ENV_LENGHT - 1) - i) / (double) ENV_LENGHT, 8.0 );
+        int k;
+        int prescale = (31 - 2*ENV_HBITS); /* used to gain higher precision */
+        int x = ENV_LENGHT * (1 << prescale);
+        for ( k = 0; k < 8; ++k)
+        {
+            x = ( x * ((ENV_LENGHT - 1) - i) ) / ENV_LENGHT;
+        }
+        x >>= prescale;
 	#else
 		double x = pow( ((ENV_LENGHT - 1) - i) / (double) ENV_LENGHT, 8.0 );
+        x *= ENV_LENGHT;
 	#endif
-		x *= ENV_LENGHT;
 
 		impl->g.ENV_TAB [i] = (int) x;
 
@@ -586,7 +572,7 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 		impl->g.ENV_TAB [i + ENV_LENGHT * 2] = 0;
 	
 	impl->g.ENV_TAB [ENV_END >> ENV_LBITS] = ENV_LENGHT - 1;      // for the stopped state
-	
+
 	// Tableau pour la conversion Attack -> Decay and Decay -> Attack
 	
 	int j = ENV_LENGHT - 1;
@@ -599,28 +585,33 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 	}
 
 	// Tableau pour le Substain Level
-	
+
 	for ( i = 0; i < 15; i++ )
 	{
-		double x = i * 3 / ENV_STEP; // 3 and not 6 (Mickey Mania first music for test)
+		int x = i * 3 * (int)( (1 << ENV_LBITS) / ENV_STEP); // 3 and not 6 (Mickey Mania first music for test)
 
-		impl->g.SL_TAB [i] = ((int) x << ENV_LBITS) + ENV_DECAY;
+		impl->g.SL_TAB [i] = x + ENV_DECAY;
 	}
 
 	impl->g.SL_TAB [15] = ((ENV_LENGHT - 1) << ENV_LBITS) + ENV_DECAY; // special case : volume off
 
 	// Tableau Frequency Step
+
 	{
-		// 0.5 because MUL = value * 2
+		// * 1 / 2 because MUL = value * 2
 	#if SIN_LBITS + SIN_HBITS - (21 - 7) < 0
-		double const factor = 0.5 / (1 << ((21 - 7) - SIN_LBITS - SIN_HBITS)) * Frequence;
+		/* double const factor = Frequence / 2.0 / (1 << ((21 - 7) - SIN_LBITS - SIN_HBITS)); */
+        int const factor = (int)(Frequency / 2 / (1 << ((21 - 7) - SIN_LBITS - SIN_HBITS)) / FP_ONE_CLOCK);
 	#else
-		double const factor = 0.5 * (1 << (SIN_LBITS + SIN_HBITS - (21 - 7))) * Frequence;
+		/* double const factor = Frequence / 2.0 * (1 << (SIN_LBITS + SIN_HBITS - (21 - 7))); */
+        int const factor = (int)(Frequency / 2 * (1 << (SIN_LBITS + SIN_HBITS - (21 - 7))) / FP_ONE_CLOCK);
 	#endif
 		for ( i = 0; i < 2048; i++ )
-			impl->g.FINC_TAB [i] = (unsigned) (i * factor);
+        {
+			impl->g.FINC_TAB [i] = i * factor;
+        }
 	}
-	
+
 	// Tableaux Attack & Decay Rate
 
 	for ( i = 0; i < 4; i++ )
@@ -628,19 +619,23 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 		impl->g.AR_TAB [i] = 0;
 		impl->g.DR_TAB [i] = 0;
 	}
-	
+
 	for ( i = 0; i < 60; i++ )
-	{
-		double x =
-				(1.0 + ((i & 3) * 0.25)) *      // bits 0-1 : x1.00, x1.25, x1.50, x1.75
+	{        
+        long long x =
+				(4LL + ((i & 3))) *             // bits 0-1 : 4*(x1.00, x1.25, x1.50, x1.75)
 				(ENV_LENGHT << ENV_LBITS) *     // on ajuste pour le tableau impl->g.ENV_TAB
-				Frequence *
-				(1 << (i >> 2));                // bits 2-5 : shift bits (x2^0 - x2^15)     
+				Frequency  *
+				(1 << (i >> 2)) /               // bits 2-5 : shift bits (x2^0 - x2^15)
+                FP_ONE_CLOCK / 4;
+                
+        long long x_AR = x / AR_RATE;
+        long long x_DR = x / DR_RATE;
 		
-		impl->g.AR_TAB [i + 4] = (unsigned int) (x / AR_RATE);
-		impl->g.DR_TAB [i + 4] = (unsigned int) (x / DR_RATE);
-	}
-	
+		impl->g.AR_TAB [i + 4] = (unsigned int) ( x_AR > ((1LL<<32) - 1) ? ((1LL<<32) - 1) : x_AR );
+		impl->g.DR_TAB [i + 4] = (unsigned int) ( x_DR > ((1LL<<32) - 1) ? ((1LL<<32) - 1) : x_DR );
+    }
+
 	for ( i = 64; i < 96; i++ )
 	{
 		impl->g.AR_TAB [i] = impl->g.AR_TAB [63];
@@ -651,36 +646,39 @@ static void impl_set_rate( struct Ym2612_Impl* impl, double sample_rate, double 
 	
 	for ( i = 96; i < 128; i++ )
 		impl->g.AR_TAB [i] = 0;
-	
+
 	// Tableau Detune
 	{
 	#if SIN_LBITS + SIN_HBITS - 21 < 0
-		double const factor = 1.0 / (1 << (21 - SIN_LBITS - SIN_HBITS)) * Frequence;
+		/* double const factor = 1.0 / (1 << (21 - SIN_LBITS - SIN_HBITS)) * Frequence; */
+        int const factor = Frequency / (1 << (21 - SIN_LBITS - SIN_HBITS)) / FP_ONE_CLOCK;
 	#else
-		double const factor =       (1 << (SIN_LBITS + SIN_HBITS - 21)) * Frequence;
+		/* double const factor = (1 << (SIN_LBITS + SIN_HBITS - 21)) * Frequence; */
+        int const factor = Frequency * (1 << (SIN_LBITS + SIN_HBITS - 21)) / FP_ONE_CLOCK;
 	#endif
 		for ( i = 0; i < 4; i++ )
 		{
 			int j;
 			for ( j = 0; j < 32; j++ )
 			{
-				double y = DT_DEF_TAB [(i << 5) + j] * factor;
+				/* double y = DT_DEF_TAB [(i << 5) + j] * factor; */
+                int y = DT_DEF_TAB [(i << 5) + j] * factor;
 				
 				impl->g.DT_TAB [i + 0] [j] = (int)  y;
 				impl->g.DT_TAB [i + 4] [j] = (int) -y;
 			}
 		}
 	}
-	
+
 	// Tableau LFO
-	impl->g.LFO_INC_TAB [0] = (unsigned) (3.98 * (1 << (LFO_HBITS + LFO_LBITS)) / sample_rate);
-	impl->g.LFO_INC_TAB [1] = (unsigned) (5.56 * (1 << (LFO_HBITS + LFO_LBITS)) / sample_rate);
-	impl->g.LFO_INC_TAB [2] = (unsigned) (6.02 * (1 << (LFO_HBITS + LFO_LBITS)) / sample_rate);
-	impl->g.LFO_INC_TAB [3] = (unsigned) (6.37 * (1 << (LFO_HBITS + LFO_LBITS)) / sample_rate);
-	impl->g.LFO_INC_TAB [4] = (unsigned) (6.88 * (1 << (LFO_HBITS + LFO_LBITS)) / sample_rate);
-	impl->g.LFO_INC_TAB [5] = (unsigned) (9.63 * (1 << (LFO_HBITS + LFO_LBITS)) / sample_rate);
-	impl->g.LFO_INC_TAB [6] = (unsigned) (48.1 * (1 << (LFO_HBITS + LFO_LBITS)) / sample_rate);
-	impl->g.LFO_INC_TAB [7] = (unsigned) (72.2 * (1 << (LFO_HBITS + LFO_LBITS)) / sample_rate);
+	impl->g.LFO_INC_TAB [0] = (int) (3.98 * (1 << (LFO_HBITS + LFO_LBITS))) / sample_rate;
+	impl->g.LFO_INC_TAB [1] = (int) (5.56 * (1 << (LFO_HBITS + LFO_LBITS))) / sample_rate;
+	impl->g.LFO_INC_TAB [2] = (int) (6.02 * (1 << (LFO_HBITS + LFO_LBITS))) / sample_rate;
+	impl->g.LFO_INC_TAB [3] = (int) (6.37 * (1 << (LFO_HBITS + LFO_LBITS))) / sample_rate;
+	impl->g.LFO_INC_TAB [4] = (int) (6.88 * (1 << (LFO_HBITS + LFO_LBITS))) / sample_rate;
+	impl->g.LFO_INC_TAB [5] = (int) (9.63 * (1 << (LFO_HBITS + LFO_LBITS))) / sample_rate;
+	impl->g.LFO_INC_TAB [6] = (int) (48.1 * (1 << (LFO_HBITS + LFO_LBITS))) / sample_rate;
+	impl->g.LFO_INC_TAB [7] = (int) (72.2 * (1 << (LFO_HBITS + LFO_LBITS))) / sample_rate;
 	
 	impl_reset( impl );
 }
@@ -693,7 +691,7 @@ const char* Ym2612_set_rate( struct Ym2612_Emu* this, int sample_rate, int clock
 	if (last_sample_rate == sample_rate && last_clock_rate == clock_rate) return 0;
 #endif
 	memset( &this->impl.YM2612, 0, sizeof this->impl.YM2612 );
-	impl_set_rate( &this->impl, (double)sample_rate, (double)clock_rate );
+	impl_set_rate( &this->impl, sample_rate, clock_rate );
 	
 	return 0;
 }
