@@ -35,7 +35,7 @@ blargg_err_t track_init( struct Track_Filter* this, void* emu )
 	return 0;
 }
 
-void clear_time_vars( struct Track_Filter* this )
+static void clear_time_vars( struct Track_Filter* this )
 {
 	this->emu_time      = this->buf_remain;
 	this->out_time      = 0;
@@ -77,7 +77,7 @@ blargg_err_t track_start( struct Track_Filter* this )
 	return this->emu_error;
 }
 
-void end_track_if_error( struct Track_Filter* this, blargg_err_t err )
+static void end_track_if_error( struct Track_Filter* this, blargg_err_t err )
 {
 	if ( err )
 	{
@@ -138,7 +138,7 @@ void track_set_fade( struct Track_Filter* this, int start, int length )
 		this->fade_step = 1;
 }
 
-bool is_fading( struct Track_Filter* this )
+static bool is_fading( struct Track_Filter* this )
 {
 	return this->out_time >= this->fade_start && this->fade_start != indefinite_count;
 }
@@ -151,7 +151,7 @@ static int int_log( int x, int step, int unit )
 	return ((unit - fraction) + (fraction >> 1)) >> shift;
 }
 
-void handle_fade( struct Track_Filter* this, sample_t out [], int out_count )
+static void handle_fade( struct Track_Filter* this, sample_t out [], int out_count )
 {
 	int i;
 	for ( i = 0; i < out_count; i += fade_block_size )
@@ -174,7 +174,7 @@ void handle_fade( struct Track_Filter* this, sample_t out [], int out_count )
 
 // Silence detection
 
-void emu_play( struct Track_Filter* this, sample_t out [], int count )
+static void emu_play( struct Track_Filter* this, sample_t out [], int count )
 {
 	this->emu_time += count;
 	if ( !this->emu_track_ended_ )

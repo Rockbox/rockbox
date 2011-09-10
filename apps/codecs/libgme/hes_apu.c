@@ -134,7 +134,7 @@ void Apu_osc_output( struct Hes_Apu* this, int i, struct Blip_Buffer* center, st
 	balance_changed( this, o );
 }
 
-void run_osc( struct Hes_Osc* o, struct Blip_Synth* syn, blip_time_t end_time )
+static void run_osc( struct Hes_Osc* o, struct Blip_Synth* syn, blip_time_t end_time )
 {
 	int vol0 = o->volume [0];
 	int vol1 = o->volume [1];

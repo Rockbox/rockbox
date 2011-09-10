@@ -142,7 +142,7 @@ blargg_err_t Hes_load_mem( struct Hes_Emu* this, void* data, long size )
 
 // Emulation
 
-void recalc_timer_load( struct Hes_Emu* this )
+static void recalc_timer_load( struct Hes_Emu* this )
 {
 	this->timer.load = this->timer.raw_load * this->timer_base + 1;
 }
@@ -393,7 +393,7 @@ static void adjust_time( hes_time_t* time, hes_time_t delta )
 	}
 }
 
-blargg_err_t end_frame( struct Hes_Emu* this, hes_time_t duration )
+static blargg_err_t end_frame( struct Hes_Emu* this, hes_time_t duration )
 {
 	/* if ( run_cpu( this, duration ) )
 		warning( "Emulation error (illegal instruction)" ); */
@@ -416,7 +416,7 @@ blargg_err_t end_frame( struct Hes_Emu* this, hes_time_t duration )
 	return 0;
 }
 
-blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ )
+static blargg_err_t run_clocks( struct Hes_Emu* this, blip_time_t* duration_ )
 {
 	return end_frame( this, *duration_ );
 }
