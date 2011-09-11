@@ -118,14 +118,14 @@ void gui_sync_skin_init(void)
         {
             skins[j][i].buffer_start = NULL;
             skins[j][i].needs_full_update = true;
+            skins[j][i].gui_wps.data = &skins[j][i].data;
+            skins[j][i].gui_wps.display = &screens[i];
+            memset(skins[j][i].gui_wps.data, 0, sizeof(struct wps_data));
+            skins[j][i].data.wps_loaded = false;
 #ifdef HAVE_ALBUMART
             skins[j][i].data.albumart = NULL;
             skins[j][i].data.playback_aa_slot = -1;
 #endif
-            skins[j][i].gui_wps.data = &skins[j][i].data;
-            skins[j][i].data.wps_loaded = false;
-            skins[j][i].gui_wps.display = &screens[i];
-            memset(skins[j][i].gui_wps.data, 0, sizeof(struct wps_data));
         }
     }
 }
