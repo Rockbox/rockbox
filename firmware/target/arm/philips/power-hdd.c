@@ -61,7 +61,7 @@ void power_init(void)
     GPIOD_OUTPUT_VAL |=  0x80; /*    high */
 
     GPIOA_OUTPUT_EN  &= ~0x20; /* CLK */
-    
+
     GPIOA_OUTPUT_EN  |=  0x10; /* set DATA */
     GPIOA_OUTPUT_VAL |=  0x10; /*     high */
 
@@ -70,8 +70,6 @@ void power_init(void)
         logf("touchpad not ready");
     }
 #if defined(PHILIPS_HDD6330)
-    /* set the maximum touch sensivity */
-    touchpad_set_parameter(0,0x20,0x7785);
     /* reduce transmission overhead */
     touchpad_set_parameter(0,0x21,0x0008);
     /* set GPO_LEVELS = 0 - for the buttonlights */
