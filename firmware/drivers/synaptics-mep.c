@@ -590,7 +590,7 @@ int touchpad_read_device(char *data, int len)
 int touchpad_set_parameter(char mod_nr, char par_nr, unsigned int param)
 {
     char data[4];
-    int val=0;
+    int i, val=0;
 
     if (syn_status)
     {
@@ -601,7 +601,16 @@ int touchpad_set_parameter(char mod_nr, char par_nr, unsigned int param)
         data[2]=(param >> 8) & 0xff; /* param_hi */
         data[3]=param & 0xff;        /* param_lo */
         syn_send(data,4);
-        val=syn_read(data,1); /* get the simple ACK = 0x18 */
+        val=syn_read(data,4); /* try to get the simple ACK = 0x18 */
+
+        /* modules > 0 sometimes don't give ACK immediately but other packets like */
+        /* absolute from the scroll strip, so it has to be ignored until we receive ACK */
+        if ((mod_nr > 0) && ((data[0] & 7) != 0))
+        for (i = 0; i < 2; i++)
+        {
+            val=syn_read(data,4);
+            if (data[0] == 0x18) break;
+        }
 
         syn_enable_int(true);
     }

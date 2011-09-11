@@ -55,26 +55,26 @@ void _buttonlight_on(void)
 {
     if (!buttonlight_status)
     {
+        /* enable 1 led (from 2) for MENU - GPO, module 1 */
+        /* no need to enable led for the hidden button */
+        touchpad_set_parameter(0x01,0x21,0x01);
         /* enable 3 leds (from 5) for PREV, PLAY and NEXT, */
         /* skip 2 leds because their light does not pass */
         /* through the panel anyway - on GPOs, module 0 */
         touchpad_set_parameter(0x00,0x22,0x15);
-        /* enable 1 led (from 2) for MENU - GPO, module 1 */
-        /* no need to enable led for the hidden button */
-        touchpad_set_parameter(0x01,0x21,0x01);
         /* left, right and the scrollstrip */
         touchpad_set_buttonlights(BUTTONLIGHT_MASK, buttonight_brightness);
         buttonlight_status = 1;
     }
 }
- 
+
 void _buttonlight_off(void)
 {
     if (buttonlight_status)
     {
         /* disable all leds on GPOs for module 0 and 1 */
-        touchpad_set_parameter(0x00,0x22,0x00);
         touchpad_set_parameter(0x01,0x21,0x00);
+        touchpad_set_parameter(0x00,0x22,0x00);
         touchpad_set_buttonlights(BUTTONLIGHT_MASK, 0);
         buttonlight_status = 0;
     }
@@ -82,8 +82,8 @@ void _buttonlight_off(void)
 
 void _buttonlight_set_brightness(int brightness)
 {
-    touchpad_set_parameter(0x00,0x22,0x15);
     touchpad_set_parameter(0x01,0x21,0x01);
+    touchpad_set_parameter(0x00,0x22,0x15);
     buttonight_brightness = brightness - 1;
     touchpad_set_buttonlights(BUTTONLIGHT_MASK, buttonight_brightness);
     buttonlight_status = 1;
