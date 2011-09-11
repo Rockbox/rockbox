@@ -125,6 +125,7 @@ void gui_sync_skin_init(void)
             skins[j][i].gui_wps.data = &skins[j][i].data;
             skins[j][i].data.wps_loaded = false;
             skins[j][i].gui_wps.display = &screens[i];
+            memset(skins[j][i].gui_wps.data, 0, sizeof(struct wps_data));
         }
     }
 }
