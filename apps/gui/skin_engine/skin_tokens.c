@@ -868,7 +868,34 @@ const char *get_token_value(struct gui_wps *gwps,
             struct logical_if *lif = token->value.data;
             return get_lif_token_value(gwps, lif, offset, buf, buf_size);
         }
-        break;           
+        break;
+        case SKIN_TOKEN_SUBSTRING:
+        {
+            struct substring *ss = token->value.data;
+            const char *token_val = get_token_value(gwps, ss->token, offset,
+                                                    buf, buf_size, intval);
+            int ret_len = ss->length;
+            if (token_val)
+            {
+                int len = strlen(token_val);
+                if (len < ss->start)
+                    return NULL;
+                if (ret_len < 0)
+                    ret_len = strlen(token_val) - ss->start;
+                if (token_val != buf)
+                {
+                    memcpy(buf, &token_val[ss->start], ret_len);
+                }
+                else
+                {
+                    buf = &buf[ss->start];
+                }
+                buf[ret_len] = '\0';
+                return buf;
+            }
+            return NULL;
+        }
+        break;        
             
         case SKIN_TOKEN_CHARACTER:
             if (token->value.c == '\n')

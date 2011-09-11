@@ -279,6 +279,8 @@ enum skin_token_type {
     SKIN_TOKEN_VAR_SET,
     SKIN_TOKEN_VAR_GETVAL,
     SKIN_TOKEN_VAR_TIMEOUT,
+
+    SKIN_TOKEN_SUBSTRING,
 };
 
 /*

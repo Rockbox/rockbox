@@ -288,6 +288,12 @@ struct logical_if {
     int num_options;
 };
 
+struct substring {
+    int start;
+    int length;
+    struct wps_token *token;
+};
+
 #ifdef HAVE_SKIN_VARIABLES
 struct skin_var {
     const char *label;
