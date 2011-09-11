@@ -877,18 +877,19 @@ const char *get_token_value(struct gui_wps *gwps,
             int ret_len = ss->length;
             if (token_val)
             {
-                int len = strlen(token_val);
+                int len = utf8length(token_val);
                 if (len < ss->start)
                     return NULL;
+                int realstart = utf8seek(token_val, ss->start);
                 if (ret_len < 0)
-                    ret_len = strlen(token_val) - ss->start;
+                    ret_len = strlen(token_val) - realstart;
                 if (token_val != buf)
                 {
-                    memcpy(buf, &token_val[ss->start], ret_len);
+                    memcpy(buf, &token_val[realstart], ret_len);
                 }
                 else
                 {
-                    buf = &buf[ss->start];
+                    buf = &buf[realstart];
                 }
                 buf[ret_len] = '\0';
                 return buf;
