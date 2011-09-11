@@ -47,7 +47,7 @@ void _backlight_off(void)
 }
 
 #ifdef HAVE_BUTTON_LIGHT
-#define BUTTONLIGHT_MASK 0x7f
+#define BUTTONLIGHT_MASK 0x64
 static unsigned short buttonight_brightness = DEFAULT_BRIGHTNESS_SETTING - 1;
 static unsigned short buttonlight_status = 0;
 
@@ -62,7 +62,7 @@ void _buttonlight_on(void)
         /* skip 2 leds because their light does not pass */
         /* through the panel anyway - on GPOs, module 0 */
         touchpad_set_parameter(0x00,0x22,0x15);
-        /* left, right and the scrollstrip */
+        /* left, right and the scrollstrip (1 led from 5) */
         touchpad_set_buttonlights(BUTTONLIGHT_MASK, buttonight_brightness);
         buttonlight_status = 1;
     }
