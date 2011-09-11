@@ -135,6 +135,9 @@
 #define HAVE_BUTTON_LIGHT
 #define HAVE_BUTTONLIGHT_BRIGHTNESS
 
+/* Define this if you can detect headphones */
+#define HAVE_HEADPHONE_DETECTION
+
 #define BATTERY_CAPACITY_DEFAULT 840 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN     800 /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX    1200 /* max. capacity selectable */
