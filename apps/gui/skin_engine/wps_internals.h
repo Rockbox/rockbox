@@ -294,6 +294,11 @@ struct substring {
     struct wps_token *token;
 };
 
+struct listitem {
+    bool wrap;
+    short offset;
+};
+
 #ifdef HAVE_SKIN_VARIABLES
 struct skin_var {
     const char *label;

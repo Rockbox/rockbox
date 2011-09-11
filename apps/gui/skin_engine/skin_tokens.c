@@ -922,14 +922,21 @@ const char *get_token_value(struct gui_wps *gwps,
             snprintf(buf, buf_size, "%d",sb_get_icon(gwps->display->screen_type));
             return buf;
         case SKIN_TOKEN_LIST_ITEM_TEXT:
-            return skinlist_get_item_text();
+        {
+            struct listitem *li = (struct listitem *)token->value.data;
+            return skinlist_get_item_text(li->offset, li->wrap, buf, buf_size);
+        }
         case SKIN_TOKEN_LIST_ITEM_IS_SELECTED:
             return skinlist_is_selected_item()?"s":"";
         case SKIN_TOKEN_LIST_ITEM_ICON:
+        {
+            struct listitem *li = (struct listitem *)token->value.data;
+            int icon = skinlist_get_item_icon(li->offset, li->wrap);
             if (intval)
-                *intval = skinlist_get_item_icon();
-            snprintf(buf, buf_size, "%d",skinlist_get_item_icon());
+                *intval = icon;
+            snprintf(buf, buf_size, "%d", icon);
             return buf;
+        }
         case SKIN_TOKEN_LIST_NEEDS_SCROLLBAR:
             return skinlist_needs_scrollbar(gwps->display->screen_type) ? "s" : "";
 #endif

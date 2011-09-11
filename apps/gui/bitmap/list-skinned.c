@@ -43,9 +43,8 @@
 #include "appevents.h"
 
 static struct listitem_viewport_cfg *listcfg[NB_SCREENS] = {NULL};
-static const char *current_item_text_ptr;
-static char current_item_text[MAX_PATH];
-static enum themable_icons current_item_icon;
+struct gui_synclist *current_list;
+
 void skinlist_set_cfg(enum screen_type screen,
                       struct listitem_viewport_cfg *cfg)
 {
@@ -54,7 +53,7 @@ void skinlist_set_cfg(enum screen_type screen,
         if (listcfg[screen])
             screens[screen].scroll_stop(&listcfg[screen]->selected_item_vp.vp);
         listcfg[screen] = cfg;
-        current_item_text_ptr = "";
+        current_list = NULL;
     }
 }
 
@@ -64,15 +63,41 @@ static bool skinlist_is_configured(enum screen_type screen,
     return (listcfg[screen] != NULL) &&
             (!list || (list && list->selected_size == 1));
 }
-
-const char* skinlist_get_item_text(void)
+static int current_drawing_line;
+static int offset_to_item(int offset, bool wrap)
 {
-    const char* ret = P2STR((unsigned char*)current_item_text_ptr);
-    return ret;
+    int item = current_drawing_line + offset;
+    if (!current_list)
+        return -1;
+    if (item < 0)
+    {
+        if (!wrap)
+            return -1;
+        else
+            item = (item + current_list->nb_items) % current_list->nb_items;
+    }
+    else if (item >= current_list->nb_items && !wrap)
+        return -1;
+    else
+        item = item % current_list->nb_items;
+    return item;
 }
-enum themable_icons skinlist_get_item_icon(void)
+const char* skinlist_get_item_text(int offset, bool wrap, char* buf, size_t buf_size)
 {
-    return current_item_icon;
+    int item = offset_to_item(offset, wrap);
+    if (item < 0 || !current_list)
+        return NULL;
+    const char* ret = current_list->callback_get_item_name(
+                    item, current_list->data, buf, buf_size);
+    return P2STR((unsigned char*)ret);
+}
+
+enum themable_icons skinlist_get_item_icon(int offset, bool wrap)
+{
+    int item = offset_to_item(offset, wrap);
+    if (item < 0 || !current_list || current_list->callback_get_item_icon == NULL)
+        return Icon_NOICON;
+    return current_list->callback_get_item_icon(item, current_list->data);
 }
 
 static bool is_selected = false;
@@ -130,6 +155,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     struct gui_wps wps;
     if (!skinlist_is_configured(screen, list))
         return false;
+    current_list = list;
     wps.display = display;
     wps.data = listcfg[screen]->data;
     display_lines = skinlist_get_line_count(screen, list);
@@ -146,14 +172,9 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
         struct skin_viewport* skin_viewport;
         if (list_start_item+cur_line+1 > list->nb_items)
             break;
+        current_drawing_line = list_start_item+cur_line;
         is_selected = list->show_selection_marker &&
                 list_start_item+cur_line == list->selected_item;
-        current_item_text_ptr = list->callback_get_item_name(
-                    list_start_item+cur_line,
-                    list->data, current_item_text, MAX_PATH);
-        if (list->callback_get_item_icon != NULL)
-            current_item_icon = list->callback_get_item_icon(
-                                    list_start_item+cur_line, list->data);
         
         for (viewport = listcfg[screen]->data->tree;
              viewport;
@@ -219,9 +240,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     }
     display->set_viewport(parent);
     display->update_viewport();
-    current_item_text_ptr = list->callback_get_item_name(
-                list->selected_item,
-                list->data, current_item_text, 2048);
+    current_drawing_line = list->selected_item;
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     /* Abuse the callback to force the sbs to update */
     send_event(LCD_EVENT_ACTIVATION, NULL);

@@ -485,6 +485,27 @@ static int parse_viewport_gradient_setup(struct skin_element *element,
 }
 #endif
 
+static int parse_listitem(struct skin_element *element,
+                        struct wps_token *token,
+                        struct wps_data *wps_data)
+{
+    (void)wps_data;
+    struct listitem *li = (struct listitem *)skin_buffer_alloc(sizeof(struct listitem));
+    if (!li)
+        return 1;
+    token->value.data = li;
+    if (element->params_count == 0)
+        li->offset = 0;
+    else
+    {
+        li->offset = element->params[0].data.number;
+        if (element->params_count > 1)
+            li->wrap = strcasecmp(element->params[1].data.text, "nowrap") != 0;
+        else
+            li->wrap = true;
+    }
+    return 0;
+}
 
 static int parse_listitemviewport(struct skin_element *element,
                                   struct wps_token *token,
@@ -1826,6 +1847,10 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_TRACK_STARTING:
                 case SKIN_TOKEN_TRACK_ENDING:
                     function = parse_timeout_tag;
+                    break;
+                case SKIN_TOKEN_LIST_ITEM_TEXT:
+                case SKIN_TOKEN_LIST_ITEM_ICON:
+                    function = parse_listitem;
                     break;
 #ifdef HAVE_LCD_BITMAP
                 case SKIN_TOKEN_DISABLE_THEME:
