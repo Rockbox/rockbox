@@ -1848,11 +1848,11 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_TRACK_ENDING:
                     function = parse_timeout_tag;
                     break;
+#ifdef HAVE_LCD_BITMAP
                 case SKIN_TOKEN_LIST_ITEM_TEXT:
                 case SKIN_TOKEN_LIST_ITEM_ICON:
                     function = parse_listitem;
                     break;
-#ifdef HAVE_LCD_BITMAP
                 case SKIN_TOKEN_DISABLE_THEME:
                 case SKIN_TOKEN_ENABLE_THEME:
                 case SKIN_TOKEN_DRAW_INBUILTBAR:
