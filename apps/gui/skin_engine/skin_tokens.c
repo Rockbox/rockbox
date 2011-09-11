@@ -874,24 +874,29 @@ const char *get_token_value(struct gui_wps *gwps,
             struct substring *ss = token->value.data;
             const char *token_val = get_token_value(gwps, ss->token, offset,
                                                     buf, buf_size, intval);
-            int ret_len = ss->length;
             if (token_val)
             {
-                int len = utf8length(token_val);
-                if (len < ss->start)
+                int start_byte, end_byte, byte_len;
+                int utf8_len = utf8length(token_val);
+
+                if (utf8_len < ss->start)
                     return NULL;
-                int realstart = utf8seek(token_val, ss->start);
-                if (ret_len < 0)
-                    ret_len = strlen(token_val) - realstart;
-                if (token_val != buf)
-                {
-                    memcpy(buf, &token_val[realstart], ret_len);
-                }
+
+                start_byte = utf8seek(token_val, ss->start);
+
+                if (ss->length < 0 || (ss->start + ss->length) > utf8_len)
+                    end_byte = strlen(token_val);
                 else
-                {
-                    buf = &buf[realstart];
-                }
-                buf[ret_len] = '\0';
+                    end_byte = utf8seek(token_val, ss->start + ss->length);
+
+                byte_len = end_byte - start_byte;
+
+                if (token_val != buf)
+                    memcpy(buf, &token_val[start_byte], byte_len);
+                else
+                    buf = &buf[start_byte];
+
+                buf[byte_len] = '\0';
                 return buf;
             }
             return NULL;
