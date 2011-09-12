@@ -203,4 +203,168 @@ static inline void fft8(FFTComplex *z)
                   : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7",
                     "a0", "a1", "a2", "a3", "a4", "cc", "memory");
 }
+
+#define FFT_FFMPEG_INCL_OPTIMISED_TRANSFORM
+
+static inline FFTComplex* TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wre, FFTSample wim)
+{
+    asm volatile ("move.l   (%[z2]),   %%d5\n\t"
+                  "mac.l    %%d5,      %[wre], (4, %[z2]), %%d4, %%acc0\n\t"
+                  "mac.l    %%d4,      %[wim], %%acc0\n\t"
+                  "mac.l    %%d4,      %[wre], (%[z3]), %%d6, %%acc1\n\t"
+                  "msac.l   %%d5,      %[wim], (4,%[z3]), %%d7, %%acc1\n\t"
+                  "mac.l    %%d6,      %[wre], %%acc2\n\t"
+                  "msac.l   %%d7,      %[wim], %%acc2\n\t"
+                  "mac.l    %%d7,      %[wre], %%acc3\n\t"
+                  "mac.l    %%d6,      %[wim], %%acc3\n\t"
+
+                  "movclr.l %%acc0,    %[wre]\n\t"     /* t1 */
+                  "movclr.l %%acc2,    %[wim]\n\t"     /* t5 */
+
+                  "movem.l  (%[z]),    %%d4-%%d5\n\t"  /* load z0 */
+                  "move.l   %%d4,      %%d6\n\t"
+                  "move.l   %[wim],    %%d7\n\t"
+                  "sub.l    %[wre],    %[wim]\n\t"     /* t5 = t5-t1 */
+                  "add.l    %[wre],    %%d7\n\t"
+                  "sub.l    %%d7,      %%d6\n\t"       /* d6 = a0re - (t5+t1) => a2re */
+                  "add.l    %%d7,      %%d4\n\t"       /* d4 = a0re + (t5+t1) => a0re */
+
+                  "movclr.l %%acc3,    %%d7\n\t"       /* t6 */
+                  "movclr.l %%acc1,    %%d3\n\t"       /* t2 */
+                  
+                  "move.l   %%d3,      %[wre]\n\t"
+                  "add.l    %%d7,      %[wre]\n\t"
+                  "sub.l    %%d7,      %%d3\n\t"       /* t2 = t6-t2 */
+                  "move.l   %%d5,      %%d7\n\t"
+                  "sub.l    %[wre],    %%d7\n\t"       /* d7 = a0im - (t2+t6) => a2im */
+
+                  "movem.l  %%d6-%%d7, (%[z2])\n\t"    /* store z2 */
+                  "add.l    %[wre],    %%d5\n\t"       /* d5 = a0im + (t2+t6) => a0im */
+                  "movem.l  %%d4-%%d5, (%[z])\n\t"     /* store z0 */
+
+                  "movem.l  (%[z1]),   %%d4-%%d5\n\t"  /* load z1 */
+                  "move.l   %%d4,      %%d6\n\t"
+
+                  "sub.l    %%d3,      %%d6\n\t"       /* d6 = a1re - (t2-t6) => a3re */
+                  "add.l    %%d3,      %%d4\n\t"       /* d4 = a1re + (t2-t6) => a1re */
+
+                  "move.l   %%d5,      %%d7\n\t"
+                  "sub.l    %[wim],    %%d7\n\t"
+                  "movem.l  %%d6-%%d7, (%[z3])\n\t"    /* store z3 */
+                  "add.l    %[wim],    %%d5\n\t"
+                  "movem.l  %%d4-%%d5, (%[z1])\n\t"    /* store z1 */
+
+                  : [wre] "+r" (wre), [wim] "+r" (wim) /* we clobber these after using them */
+                  : [z] "a" (z), [z1] "a" (&z[n]), [z2] "a" (&z[2*n]), [z3] "a" (&z[3*n])
+                  : "d3", "d4", "d5", "d6", "d7", "cc", "memory");
+     return z+1;
+}
+
+static inline FFTComplex* TRANSFORM_W01(FFTComplex * z, unsigned int n, const FFTSample * w)
+{
+    return TRANSFORM(z, n, w[0], w[1]);
+}
+
+static inline FFTComplex* TRANSFORM_W10(FFTComplex * z, unsigned int n, const FFTSample * w)
+{
+    return TRANSFORM(z, n, w[1], w[0]);
+}
+
+static inline FFTComplex* TRANSFORM_ZERO(FFTComplex * z, unsigned int n)
+{
+    asm volatile("movem.l (%[z]), %%d4-%%d5\n\t" /* load z0 */
+                 "move.l  %%d4, %%d6\n\t"
+                 "movem.l (%[z2]), %%d2-%%d3\n\t" /* load z2 */
+                 "movem.l (%[z3]), %%d0-%%d1\n\t" /* load z0 */
+                 "move.l  %%d0, %%d7\n\t"
+                 "sub.l   %%d2, %%d0\n\t"
+                 "add.l   %%d2, %%d7\n\t"
+                 "sub.l   %%d7, %%d6\n\t" /* d6 = a0re - (t5+t1) => a2re */
+                 "add.l   %%d7, %%d4\n\t" /* d4 = a0re + (t5+t1) => a0re */
+
+                 "move.l  %%d5, %%d7\n\t"
+                 "move.l  %%d3, %%d2\n\t"
+                 "add.l   %%d1, %%d2\n\t"
+                 "sub.l   %%d2, %%d7\n\t" /* d7 = a0im - (t2+t6) => a2im */
+                 "movem.l %%d6-%%d7, (%[z2])\n\t" /* store z2 */
+                 "add.l   %%d2, %%d5\n\t" /* d5 = a0im + (t2+t6) => a0im */
+                 "movem.l %%d4-%%d5, (%[z])\n\t" /* store z0 */
+
+                 "movem.l (%[z1]), %%d4-%%d5\n\t" /* load z1 */
+                 "move.l  %%d4, %%d6\n\t"
+                 "sub.l   %%d1, %%d3\n\t"
+                 "sub.l   %%d3, %%d6\n\t" /* d6 = a1re - (t2-t6) => a3re */
+                 "add.l   %%d3, %%d4\n\t" /* d4 = a1re + (t2-t6) => a1re */
+
+                 "move.l  %%d5, %%d7\n\t"
+                 "sub.l   %%d0, %%d7\n\t"
+                 "movem.l %%d6-%%d7, (%[z3])\n\t" /* store z3 */
+                 "add.l   %%d0, %%d5\n\t"
+
+                 "movem.l %%d4-%%d5, (%[z1])\n\t" /* store z1 */
+
+                 :
+                 : [z] "a" (z), [z1] "a" (&z[n]), [z2] "a" (&z[2*n]), [z3] "a" (&z[3*n])
+                 : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "cc", "memory");
+    return z+1;
+}
+
+static inline FFTComplex* TRANSFORM_EQUAL(FFTComplex * z, unsigned int n)
+{
+    asm volatile ("move.l   (%[z2]),   %%d5\n\t"
+                  "mac.l    %%d5,      %[PI2_8], (4, %[z2]), %%d5, %%acc0\n\t"
+                  "mac.l    %%d5,      %[PI2_8], (%[z3]), %%d5, %%acc1\n\t"
+                  "mac.l    %%d5,      %[PI2_8], (4,%[z3]), %%d5, %%acc2\n\t"
+                  "mac.l    %%d5,      %[PI2_8], %%acc3\n\t"
+
+                  "movclr.l %%acc0,    %%d0\n\t"
+                  "movclr.l %%acc1,    %%d1\n\t"
+                  "movclr.l %%acc2,    %%d2\n\t"
+                  "movclr.l %%acc3,    %%d3\n\t"
+                  
+                  "move.l   %%d0, %%d7\n\t"
+                  "add.l    %%d1, %%d0\n\t"            /* d0 == t1 */
+                  "sub.l    %%d7, %%d1\n\t"            /* d1 == t2 */
+
+                  "move.l   %%d3, %%d7\n\t"
+                  "add.l    %%d2, %%d3\n\t"            /* d3 == t6 */
+                  "sub.l    %%d7, %%d2\n\t"            /* d2 == t5 */
+
+                  "movem.l  (%[z]),    %%d4-%%d5\n\t"  /* load z0 */
+                  "move.l   %%d4,      %%d6\n\t"
+                  "move.l   %%d2,      %%d7\n\t"
+                  "sub.l    %%d0,      %%d2\n\t"       /* t5 = t5-t1 */
+                  "add.l    %%d0,      %%d7\n\t"
+                  "sub.l    %%d7,      %%d6\n\t"       /* d6 = a0re - (t5+t1) => a2re */
+                  "add.l    %%d7,      %%d4\n\t"       /* d4 = a0re + (t5+t1) => a0re */
+
+                  "move.l   %%d1,      %%d0\n\t"
+                  "add.l    %%d3,      %%d0\n\t"
+                  "sub.l    %%d3,      %%d1\n\t"       /* t2 = t6-t2 */
+                  "move.l   %%d5,      %%d7\n\t"
+                  "sub.l    %%d0,    %%d7\n\t"         /* d7 = a0im - (t2+t6) => a2im */
+
+                  "movem.l  %%d6-%%d7, (%[z2])\n\t"    /* store z2 */
+                  "add.l    %%d0,    %%d5\n\t"         /* d5 = a0im + (t2+t6) => a0im */
+                  "movem.l  %%d4-%%d5, (%[z])\n\t"     /* store z0 */
+
+                  "movem.l  (%[z1]),   %%d4-%%d5\n\t"  /* load z1 */
+                  "move.l   %%d4,      %%d6\n\t"
+
+                  "sub.l    %%d1,      %%d6\n\t"       /* d6 = a1re - (t2-t6) => a3re */
+                  "add.l    %%d1,      %%d4\n\t"       /* d4 = a1re + (t2-t6) => a1re */
+
+                  "move.l   %%d5,      %%d7\n\t"
+                  "sub.l    %%d2,    %%d7\n\t"
+                  "movem.l  %%d6-%%d7, (%[z3])\n\t"    /* store z3 */
+                  "add.l    %%d2,    %%d5\n\t"
+                  "movem.l  %%d4-%%d5, (%[z1])\n\t"    /* store z1 */
+
+                  :
+                  : [z] "a" (z), [z1] "a" (&z[n]), [z2] "a" (&z[2*n]), [z3] "a" (&z[3*n]), [PI2_8] "r" (cPI2_8)
+                  : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "cc", "memory");
+
+    return z+1;
+}
+
 #endif /* CPU_COLDIFRE */

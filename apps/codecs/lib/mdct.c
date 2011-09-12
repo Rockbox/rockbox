@@ -134,12 +134,50 @@ void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input)
             }
             else
             {   
-                 T = sincos_lookup1;
-                 newstep = 2;
+                T = sincos_lookup1;
+                newstep = 2;
             }
         
             while(z1<z2)
             {
+#ifdef CPU_COLDFIRE
+                asm volatile ("movem.l (%[z1]), %%d0-%%d1\n\t"
+                              "movem.l (%[T]), %%d2-%%d3\n\t"
+                              "mac.l %%d1, %%d2, %%acc0\n\t"
+                              "msac.l %%d0, %%d3, %%acc0\n\t"
+                              "mac.l %%d0, %%d2, %%acc1\n\t"
+                              "mac.l %%d1, %%d3, %%acc1\n\t"
+
+                              "lea (%[newstep]*4, %[T]), %[T]\n\t"
+
+                              "movem.l (%[z2]), %%d0-%%d1\n\t"
+                              "movem.l (%[T]), %%d2-%%d3\n\t"
+                              "mac.l %%d1, %%d3, %%acc2\n\t"
+                              "msac.l %%d0, %%d2, %%acc2\n\t"
+                              "mac.l %%d0, %%d3, %%acc3\n\t"
+                              "mac.l %%d1, %%d2, %%acc3\n\t"
+
+                              "lea (%[newstep]*4, %[T]), %[T]\n\t"
+
+                              "movclr.l %%acc0, %%d0\n\t"
+                              "movclr.l %%acc1, %%d2\n\t"
+                              "movclr.l %%acc2, %%d1\n\t"
+                              "movclr.l %%acc3, %%d3\n\t"
+
+                              "neg.l %%d0\n\t"
+                              "neg.l %%d1\n\t"
+                              "neg.l %%d2\n\t"
+                              "neg.l %%d3\n\t"
+
+                              "movem.l %%d0/%%d3, (%[z1])\n\t"
+                              "movem.l %%d1/%%d2, (%[z2])\n\t"
+
+                              "addq.l #8, %[z1]\n\t"
+                              "subq.l #8, %[z2]\n\t"
+                              : [z1] "+a" (z1), [z2] "+a" (z2), [T] "+a" (T)
+                              : [newstep] "d" (newstep)
+                              : "d0", "d1", "d2", "d3", "cc", "memory");
+#else
                 fixed32 r0,i0,r1,i1;
                 XNPROD31_R(z1[1], z1[0], T[0], T[1], r0, i1 ); T+=newstep;
                 XNPROD31_R(z2[1], z2[0], T[1], T[0], r1, i0 ); T+=newstep;
@@ -149,6 +187,7 @@ void ff_imdct_half(unsigned int nbits, fixed32 *output, const fixed32 *input)
                 z2[1] = -i1;
                 z1+=2;
                 z2-=2;
+#endif
             }
             
             break;
