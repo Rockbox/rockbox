@@ -130,7 +130,7 @@ if(!$target && !$update && !$sortfile) {
 # state machine, so we don't bother to check.
 my $target_regex = "(?:^|,) *(?:\\*";
 foreach my $target_part (split ':', $target) {
-    for (my $c=1; $c<length $target_part; $c++) {
+    for (my $c=1; $c<=length $target_part; $c++) {
         my $partial = substr $target_part, 0, $c;
         $target_regex .= "|$partial\\*";
     }
