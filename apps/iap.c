@@ -50,14 +50,36 @@
 /*
  * This macro is meant to be used inside an IAP mode message handler.
  * It is passed the expected minimum length of the message buffer.
- * If the buffer does not have the required lenght a General Lingo ACK
+ * If the buffer does not have the required lenght an ACK
  * packet with a Bad Parameter error is generated.
  *
- * Do not use for Extended Interface Lingo (0x04)!
+ * Used for Lingo 0x00
  */
-#define CHECKLEN(x) do { \
-        if (len < x) { \
+#define CHECKLEN0(x) do { \
+        if (len < (x)) { \
             cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM); \
+            return; \
+        }} while(0)
+
+/* The CHECKLEN0() macro, for Lingo 0x02 */
+#define CHECKLEN2(x) do { \
+        if (len < (x)) { \
+            cmd_ack_mode2(cmd, IAP_ACK_BAD_PARAM); \
+            return; \
+        }} while(0)
+
+/* The CHECKLEN0() macro, for Lingo 0x03 */
+#define CHECKLEN3(x) do { \
+        if (len < (x)) { \
+            cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM); \
+            return; \
+        }} while(0)
+
+/* The CHECKLEN0() macro, for Lingo 0x04
+ */
+#define CHECKLEN4(x) do { \
+        if (len < (x)) { \
+            cmd_ack_mode4(cmd, IAP_ACK_BAD_PARAM); \
             return; \
         }} while(0)
 
@@ -133,20 +155,34 @@ static enum interface_state interface_state = IST_STANDARD;
 static unsigned char lingo_versions[32][2] = {
     {1, 0},     /* General lingo, 0x00 */
     {0, 0},     /* Microphone lingo, 0x01, unsupported */
-    {0, 0},     /* Simple remote lingo, 0x02, unsupported */
-    {0, 0},     /* Display remote lingo, 0x03, unsupported */
+    {1, 1},     /* Simple remote lingo, 0x02 */
+    {1, 0},     /* Display remote lingo, 0x03 */
     {1, 0},     /* Extended Interface lingo, 0x04 */
     {}          /* All others are unsupported */
 };
-#define LINGO_SUPPORTED(x) (LINGO_MAJOR(x&0x1f) > 0)
-#define LINGO_MAJOR(x) (lingo_versions[x&0x1f][0])
-#define LINGO_MINOR(x) (lingo_versions[x&0x1f][1])
+#define LINGO_SUPPORTED(x) (LINGO_MAJOR((x)&0x1f) > 0)
+#define LINGO_MAJOR(x) (lingo_versions[(x)&0x1f][0])
+#define LINGO_MINOR(x) (lingo_versions[(x)&0x1f][1])
 
 /* The list of lingoes an attached device has negotiated using
  * Identify or IdentifyDeviceLingoes
  */
 static uint32_t device_lingoes = 0;
-#define DEVICE_LINGO_SUPPORTED(x) (device_lingoes & BIT_N(x&0x1f))
+#define DEVICE_LINGO_SUPPORTED(x) (device_lingoes & BIT_N((x)&0x1f))
+
+/* States of the authentication state machine */
+enum authen_state {
+    AUST_NONE,      /* Initial state, no message sent */
+    AUST_INIT,      /* Remote side has requested authentication */
+    AUST_CERTREQ,   /* Remote certificate requested */
+    AUST_CERTDONE,  /* Certificate received */
+    AUST_CHASENT,   /* Challenge sent */
+    AUST_CHADONE,   /* Challenge response received */
+    AUST_AUTH,      /* Authentication complete */
+};
+/* State of authentication device->iPod */
+static enum authen_state device_ipod_auth = AUST_NONE;
+#define DEVICE_AUTHENTICATED (device_ipod_auth == AUST_AUTH)
 
 static void put_u32(unsigned char *buf, uint32_t data)
 {
@@ -425,7 +461,7 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
     /* We expect at least two bytes in the buffer, one for the
      * lingo, one for the command
      */
-    CHECKLEN(2);
+    CHECKLEN0(2);
 
     switch (cmd) {
         /* RequestIdentify (0x00)
@@ -465,7 +501,7 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             /* This is sufficient even for Lingo 0x05, as we are
              * not actually reading from the extended bits for now
              */
-            CHECKLEN(3);
+            CHECKLEN0(3);
 
             /* Issuing this command exits any extended interface states */
             interface_state_change(IST_STANDARD);
@@ -495,6 +531,12 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
 
             if (lingo < 32) {
                 device_lingoes = BIT_N(lingo);
+                if (lingo == 0) {
+                    /* For historical reasons, Identify with a Lingo of 0x00 also
+                     * enables access to Lingo 0x02
+                     */
+                    device_lingoes = 0 | BIT_N(0x02);
+                }
             } else {
                 device_lingoes = 0;
             }
@@ -730,12 +772,12 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             break;
         }
 
-        /* ReturniPodSerialNum (0x0C)
+        /* ReturniPodSerialNum (0x0E)
          *
          * Sent from the iPod to the device
          */
 
-        /* RequestLingoProtocolVersion
+        /* RequestLingoProtocolVersion (0x0F)
          *
          * Packet format (offset in buf[]: Description)
          * 0x00: Lingo ID: General Lingo, always 0x00
@@ -761,7 +803,7 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             unsigned char data[] = {0x00, 0x10, 0x00, 0x00, 0x00};
             unsigned char lingo = buf[2];
 
-            CHECKLEN(3);
+            CHECKLEN0(3);
 
             /* Supported lingos and versions are read from the lingo_versions
              * array
@@ -777,7 +819,12 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             break;
         }
 
-        /* IdentifyDeviceLingoes
+        /* ReturnLingoProtocolVersion (0x10)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* IdentifyDeviceLingoes (0x13);
          *
          * Used by a device to inform the iPod of the devices
          * presence and of the lingoes the device supports.
@@ -801,7 +848,7 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             bool seen_unsupported = false;
             unsigned char i;
 
-            CHECKLEN(14);
+            CHECKLEN0(14);
 
             /* Issuing this command exits any extended interface states */
             interface_state_change(IST_STANDARD);
@@ -900,125 +947,435 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             break;
         }
         
-        /* default response is with cmd ok packet */
+        /* The default response is IAP_ACK_BAD_PARAM */
         default:
         {
-            cmd_ok_mode0(cmd);
+            cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
             break;
         }
     }
+}
+
+static void cmd_ack_mode2(unsigned char cmd, unsigned char status)
+{
+    unsigned char data[] = {0x02, 0x01, status, cmd};
+    iap_send_pkt(data, sizeof(data));
+}
+
+static void cmd_ok_mode2(unsigned char cmd)
+{
+    cmd_ack_mode2(cmd, IAP_ACK_OK);
 }
 
 static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
 {
-    if(buf[1] != 0) return;
-    iap_remotebtn = BUTTON_NONE;
-    iap_remotetick = false;
-    
-    if(len >= 3 && buf[2] != 0)
-    {
-        if(buf[2] & 1)
-            iap_remotebtn |= BUTTON_RC_PLAY;
-        if(buf[2] & 2)
-            iap_remotebtn |= BUTTON_RC_VOL_UP;
-        if(buf[2] & 4)
-            iap_remotebtn |= BUTTON_RC_VOL_DOWN;
-        if(buf[2] & 8)
-            iap_remotebtn |= BUTTON_RC_RIGHT;
-        if(buf[2] & 16)
-            iap_remotebtn |= BUTTON_RC_LEFT;
+    unsigned int cmd = buf[1];
+
+    /* We expect at least three bytes in the buffer, one for the
+     * lingo, one for the command, and one for the first button
+     * state bits.
+     */
+    CHECKLEN2(3);
+
+    /* Lingo 0x02 must have been negotiated */
+    if (!DEVICE_LINGO_SUPPORTED(0x02)) {
+        cmd_ack_mode2(cmd, IAP_ACK_BAD_PARAM);
     }
-    else if(len >= 4 && buf[3] != 0)
+
+    switch (cmd)
     {
-        if(buf[3] & 1) /* play */
+        /* ContextButtonStatus (0x00)
+         *
+         * Transmit button events from the device to the iPod
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Simple Remote Lingo, always 0x02
+         * 0x01: Command, always 0x00
+         * 0x02: Button states 0:7
+         * 0x03: Button states 8:15 (optional)
+         * 0x04: Button states 16:23 (optional)
+         * 0x05: Button states 24:31 (optional)
+         *
+         * Returns: (none)
+         */
+        case 0x00:
         {
-            if (audio_status() != AUDIO_STATUS_PLAY)
+            iap_remotebtn = BUTTON_NONE;
+            iap_remotetick = false;
+            
+            if(len >= 3 && buf[2] != 0)
             {
-                iap_remotebtn |= BUTTON_RC_PLAY;
-                iap_repeatbtn = 2;
-                iap_remotetick = false;
-                iap_changedctr = 1;
+                if(buf[2] & 1)
+                    iap_remotebtn |= BUTTON_RC_PLAY;
+                if(buf[2] & 2)
+                    iap_remotebtn |= BUTTON_RC_VOL_UP;
+                if(buf[2] & 4)
+                    iap_remotebtn |= BUTTON_RC_VOL_DOWN;
+                if(buf[2] & 8)
+                    iap_remotebtn |= BUTTON_RC_RIGHT;
+                if(buf[2] & 16)
+                    iap_remotebtn |= BUTTON_RC_LEFT;
             }
+            else if(len >= 4 && buf[3] != 0)
+            {
+                if(buf[3] & 1) /* play */
+                {
+                    if (audio_status() != AUDIO_STATUS_PLAY)
+                    {
+                        iap_remotebtn |= BUTTON_RC_PLAY;
+                        iap_repeatbtn = 2;
+                        iap_remotetick = false;
+                        iap_changedctr = 1;
+                    }
+                }
+                if(buf[3] & 2) /* pause */
+                {
+                    if (audio_status() == AUDIO_STATUS_PLAY)
+                    {
+                        iap_remotebtn |= BUTTON_RC_PLAY;
+                        iap_repeatbtn = 2;
+                        iap_remotetick = false;
+                        iap_changedctr = 1;
+                    }
+                }
+                if((buf[3] & 128) && !iap_btnshuffle) /* shuffle */
+                {
+                    iap_btnshuffle = true;
+                    if(!global_settings.playlist_shuffle)
+                    {
+                        global_settings.playlist_shuffle = 1;
+                        settings_save();
+                        if (audio_status() & AUDIO_STATUS_PLAY)
+                            playlist_randomise(NULL, current_tick, true);
+                    }
+                    else if(global_settings.playlist_shuffle)
+                    {
+                        global_settings.playlist_shuffle = 0;
+                        settings_save();
+                        if (audio_status() & AUDIO_STATUS_PLAY)
+                            playlist_sort(NULL, true);
+                    }
+                }
+                else
+                    iap_btnshuffle = false;
+            }
+            else if(len >= 5 && buf[4] != 0)
+            {
+                if((buf[4] & 1) && !iap_btnrepeat) /* repeat */
+                {
+                    int oldmode = global_settings.repeat_mode;
+                    iap_btnrepeat = true;
+                
+                    if (oldmode == REPEAT_ONE)
+                            global_settings.repeat_mode = REPEAT_OFF;
+                    else if (oldmode == REPEAT_ALL)
+                            global_settings.repeat_mode = REPEAT_ONE;
+                    else if (oldmode == REPEAT_OFF)
+                            global_settings.repeat_mode = REPEAT_ALL;
+
+                    settings_save();
+                    if (audio_status() & AUDIO_STATUS_PLAY)
+                    audio_flush_and_reload_tracks();
+                }
+                else
+                    iap_btnrepeat = false;
+
+                if(buf[4] & 16) /* ffwd */
+                {
+                    iap_remotebtn |= BUTTON_RC_RIGHT;
+                }
+                if(buf[4] & 32) /* frwd */
+                {
+                    iap_remotebtn |= BUTTON_RC_LEFT;
+                }
+            }
+
+            break;
         }
-        if(buf[3] & 2) /* pause */
+        /* ACK (0x01)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* ImageButtonStatus (0x02)
+         *
+         * Transmit image button events from the device to the iPod
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Simple Remote Lingo, always 0x02
+         * 0x01: Command, always 0x02
+         * 0x02: Button states 0:7
+         * 0x03: Button states 8:15 (optional)
+         * 0x04: Button states 16:23 (optional)
+         * 0x05: Button states 24:31 (optional)
+         *
+         * This command requires authentication
+         *
+         * Returns on success:
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_ACK_*
+         */
+        case 0x02:
         {
-            if (audio_status() == AUDIO_STATUS_PLAY)
-            {
-                iap_remotebtn |= BUTTON_RC_PLAY;
-                iap_repeatbtn = 2;
-                iap_remotetick = false;
-                iap_changedctr = 1;
+            if (!DEVICE_AUTHENTICATED) {
+                cmd_ack_mode2(cmd, IAP_ACK_NO_AUTHEN);
             }
+
+            cmd_ack_mode2(cmd, IAP_ACK_CMD_FAILED);
+            break;
         }
-        if((buf[3] & 128) && !iap_btnshuffle) /* shuffle */
+
+        /* VideoButtonStatus (0x03)
+         *
+         * Transmit video button events from the device to the iPod
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Simple Remote Lingo, always 0x02
+         * 0x01: Command, always 0x03
+         * 0x02: Button states 0:7
+         * 0x03: Button states 8:15 (optional)
+         * 0x04: Button states 16:23 (optional)
+         * 0x05: Button states 24:31 (optional)
+         *
+         * This command requires authentication
+         *
+         * Returns on success:
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_ACK_*
+         */
+        case 0x03:
         {
-            iap_btnshuffle = true;
-            if(!global_settings.playlist_shuffle)
-            {
-                global_settings.playlist_shuffle = 1;
-                settings_save();
-                if (audio_status() & AUDIO_STATUS_PLAY)
-                    playlist_randomise(NULL, current_tick, true);
+            if (!DEVICE_AUTHENTICATED) {
+                cmd_ack_mode2(cmd, IAP_ACK_NO_AUTHEN);
             }
-            else if(global_settings.playlist_shuffle)
-            {
-                global_settings.playlist_shuffle = 0;
-                settings_save();
-                if (audio_status() & AUDIO_STATUS_PLAY)
-                    playlist_sort(NULL, true);
-            }
+
+            cmd_ack_mode2(cmd, IAP_ACK_CMD_FAILED);
+            break;
         }
-        else
-            iap_btnshuffle = false;
-    }
-    else if(len >= 5 && buf[4] != 0)
-    {
-        if((buf[4] & 1) && !iap_btnrepeat) /* repeat */
+
+        /* AudioButtonStatus (0x04)
+         *
+         * Transmit audio button events from the device to the iPod
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Simple Remote Lingo, always 0x02
+         * 0x01: Command, always 0x04
+         * 0x02: Button states 0:7
+         * 0x03: Button states 8:15 (optional)
+         * 0x04: Button states 16:23 (optional)
+         * 0x05: Button states 24:31 (optional)
+         *
+         * This command requires authentication
+         *
+         * Returns on success:
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_ACK_*
+         */
+        case 0x04:
         {
-            int oldmode = global_settings.repeat_mode;
-            iap_btnrepeat = true;
+            if (!DEVICE_AUTHENTICATED) {
+                cmd_ack_mode2(cmd, IAP_ACK_NO_AUTHEN);
+            }
+
+            cmd_ack_mode2(cmd, IAP_ACK_CMD_FAILED);
+            break;
+        }
         
-            if (oldmode == REPEAT_ONE)
-                    global_settings.repeat_mode = REPEAT_OFF;
-            else if (oldmode == REPEAT_ALL)
-                    global_settings.repeat_mode = REPEAT_ONE;
-            else if (oldmode == REPEAT_OFF)
-                    global_settings.repeat_mode = REPEAT_ALL;
-
-            settings_save();
-            if (audio_status() & AUDIO_STATUS_PLAY)
-            audio_flush_and_reload_tracks();
-        }
-        else
-            iap_btnrepeat = false;
-
-        if(buf[4] & 16) /* ffwd */
+        /* The default response is IAP_ACK_BAD_PARAM */
+        default:
         {
-            iap_remotebtn |= BUTTON_RC_RIGHT;
-        }
-        if(buf[4] & 32) /* frwd */
-        {
-            iap_remotebtn |= BUTTON_RC_LEFT;
+            cmd_ack_mode2(cmd, IAP_ACK_BAD_PARAM);
+            break;
         }
     }
 }
 
+/* Lingo 0x03: Display Remote Lingo
+ *
+ * A bit of a hodgepogde of odds and ends.
+ *
+ * Used to control the equalizer in version 1.00 of the Lingo, but later
+ * grew functions to control album art transfer and check the player
+ * status.
+ *
+ * TODO:
+ * - Actually support multiple equalizer profiles, currently only the
+ *   profile 0 (equalizer disabled) is supported
+ */
+
+static void cmd_ack_mode3(unsigned char cmd, unsigned char status)
+{
+    unsigned char data[] = {0x03, 0x00, status, cmd};
+    iap_send_pkt(data, sizeof(data));
+}
+
+static void cmd_ok_mode3(unsigned char cmd)
+{
+    cmd_ack_mode3(cmd, IAP_ACK_OK);
+}
+
 static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
 {
-    (void)len;    /* len currently unused */
-
     unsigned int cmd = buf[1];
+
+    /* We expect at least two bytes in the buffer, one for the
+     * state bits.
+     */
+    CHECKLEN3(2);
+
+    /* Lingo 0x03 must have been negotiated */
+    if (!DEVICE_LINGO_SUPPORTED(0x03)) {
+        cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+    }
+
     switch (cmd)
     {
-        /* GetCurrentEQProfileIndex */
+        /* ACK (0x00)
+         *
+         * Sent from the iPod to the device 
+         */
+
+        /* GetCurrentEQProfileIndex (0x01)
+         *
+         * Return the index of the current equalizer profile.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x01
+         *
+         * Returns:
+         * RetCurrentEQProfileIndex
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x02
+         * 0x02-0x05: Index as an unsigned 32bit integer
+         */
         case 0x01:
         {
-            /* RetCurrentEQProfileIndex */
             unsigned char data[] = {0x03, 0x02, 0x00, 0x00, 0x00, 0x00};
+
             iap_send_pkt(data, sizeof(data));
             break;
         }
 
+        /* RetCurrentEQProfileIndex (0x02)
+         *
+         * Sent from the iPod to the device
+         */
+        
+        /* SetCurrentEQProfileIndex (0x03)
+         *
+         * Set the active equalizer profile
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x03
+         * 0x02-0x05: Profile index to activate
+         * 0x06: Whether to restore the previous profile on detach
+         *
+         * Returns on success:
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_ACK_CMD_FAILED
+         *
+         * TODO: Figure out return code for invalid index
+         */
+        case 0x03:
+        {
+            uint32_t index;
+
+            CHECKLEN3(7);
+
+            index = get_u32(&buf[2]);
+
+            if (index > 0) {
+                cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+
+            /* Currently, we just ignore the command and acknowledge it */
+            cmd_ok_mode3(cmd);
+            break;
+        }
+
+        /* GetNumEQProfiles (0x04)
+         *
+         * Get the number of available equalizer profiles
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x04
+         *
+         * Returns:
+         * RetNumEQProfiles
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x05
+         * 0x02-0x05: Number as an unsigned 32bit integer
+         */
+        case 0x04:
+        {
+            /* Return one profile (0, the disabled profile) */
+            unsigned char data[] = {0x03, 0x05, 0x00, 0x00, 0x00, 0x01};
+
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* RetNumEQProfiles (0x05)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetIndexedEQProfileName (0x06)
+         *
+         * Return the name of the indexed equalizer profile
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x06
+         * 0x02-0x05: Profile index to get the name of
+         *
+         * Returns on success:
+         * RetIndexedEQProfileName
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x06
+         * 0x02-0xNN: Name as an UTF-8 null terminated string
+         *
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAM
+         *
+         * TODO: Figure out return code for out of range index
+         */
+        case 0x06:
+        {
+            uint32_t index;
+            unsigned char data[] = {0x03, 0x07, 'D', 'e', 'f', 'a', 'u', 'l', 't', 0x00};
+
+            index = get_u32(&buf[2]);
+
+            if (index > 0) {
+                cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+
+#if 0
         /* SetRemoteEventNotification */
         case 0x08:
         {
@@ -1047,15 +1404,29 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 sound_set_volume(global_settings.volume);   /* indent BUG? */
             break;
         }
+#endif
+        
+        /* The default response is IAP_ACK_BAD_PARAM */
+        default:
+        {
+            cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+            break;
+        }
     }
+}
+
+static void cmd_ack_mode4(unsigned int cmd, unsigned char status)
+{
+    unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, status};
+
+    data[4] = (cmd >> 8) & 0xFF;
+    data[5] = (cmd >> 0) & 0xFF;
+    iap_send_pkt(data, sizeof(data));
 }
 
 static void cmd_ok_mode4(unsigned int cmd)
 {
-    unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, 0x00};
-    data[4] = (cmd >> 8) & 0xFF;
-    data[5] = (cmd >> 0) & 0xFF;
-    iap_send_pkt(data, sizeof(data));
+    cmd_ack_mode4(cmd, IAP_ACK_OK);
 }
 
 static void get_playlist_name(unsigned char *dest,
@@ -1087,9 +1458,16 @@ static void get_playlist_name(unsigned char *dest,
 
 static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
 {
-    (void)len;    /* len currently unused */
-
     unsigned int cmd = (buf[1] << 8) | buf[2];
+
+    /* Lingo 0x04 commands are at least 3 bytes in length */
+    CHECKLEN4(3);
+
+    /* Lingo 0x04 must have been negotiated */
+    if (!DEVICE_LINGO_SUPPORTED(0x04)) {
+        cmd_ack_mode4(cmd, IAP_ACK_BAD_PARAM);
+    }
+
     switch (cmd)
     {
         /* GetAudioBookSpeed */
@@ -1111,14 +1489,75 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
             break;
         }
         
-        /* RequestProtocolVersion */
+        /* RequestProtocolVersion (0x0012)
+         *
+         * This command is deprecated.
+         *
+         * Return the Extended Interface Protocol version
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Extended Interface Protocol Lingo, always 0x04
+         * 0x01-0x02: Command, always 0x0012
+         *
+         * Returns:
+         * ReturnProtocolVersion
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Extended Interface Protocol Lingo, always 0x04
+         * 0x01-0x02: Command, always 0x0013
+         * 0x03: Major protocol version
+         * 0x04: Minor protocol version
+         */
         case 0x0012:
         {
-            /* ReturnProtocolVersion */
-            unsigned char data[] = {0x04, 0x00, 0x13, 0x01, 0x0B};
+            unsigned char data[] = {0x04, 0x00, 0x13, 0x00, 0x00};
+
+            data[3] = LINGO_MAJOR(0x04);
+            data[4] = LINGO_MINOR(0x04);
+
             iap_send_pkt(data, sizeof(data));
             break;
         }
+
+        /* ReturnProtocolVersion (0x0013)
+         *
+         * This command is deprecated.
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* RequestiPodName (0x0014)
+         *
+         * This command is deprecated.
+         *
+         * Retrieves the name of the iPod
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Extended Interface Protocol Lingo, always 0x04
+         * 0x01-0x02: Command, always 0x0014
+         *
+         * Returns:
+         * ReturniPodName
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Extended Interface Protocol Lingo, always 0x04
+         * 0x01-0x02: Command, always 0x0015
+         * 0x03-0xNN: iPod name as NULL-terminated UTF8 string
+         */
+        case 0x0014:
+        {
+            unsigned char data[] = {0x04, 0x00, 0x015, 'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
+
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* ReturniPodName (0x0015)
+         *
+         * This command is deprecated.
+         *
+         * Sent from the iPod to the device
+         */
 
         /* SelectDBRecord */
         case 0x0017:
@@ -1471,8 +1910,8 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
         
         default:
         {
-            /* default response is with cmd ok packet */
-            cmd_ok_mode4(cmd);
+            /* The default response is IAP_ACK_BAD_PARAM */
+            cmd_ack_mode4(cmd, IAP_ACK_BAD_PARAM);
             break;
         }
     }
