@@ -34,11 +34,20 @@
 #define LCD_REG_VERT_ADDR_START   0x0a
 #define LCD_REG_VERT_ADDR_END     0x0b
 
+/* whether the lcd is currently enabled or not */
+static bool lcd_enabled;
+
 /* Display status */
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
+/* Value used for flipping. Must be remembered when display is turned off. */
+static unsigned short flip;
+
 /* Used for flip offset correction */
 static int x_offset;
+
+/* Inverse value. Must be remembered when display is turned off. */
+static unsigned short invert;
 
 /* wait for LCD */
 static inline void lcd_wait_write(void)
@@ -63,15 +72,53 @@ static void lcd_send_reg(unsigned reg)
 
 void lcd_init_device(void)
 {
-    lcd_send_reg(LCD_REG_UNKNOWN_00);
-    lcd_send_data(0x00);
-    lcd_send_reg(LCD_REG_UNKNOWN_01);
-    lcd_send_data(0x48);
-    lcd_send_reg(LCD_REG_UNKNOWN_05);
-    lcd_send_data(0x0f);
-
     x_offset = 16;
+    invert = 0x00;
+    flip   = 0x40;
+
+    lcd_enabled = true;
 }
+
+#ifdef HAVE_LCD_ENABLE
+/* enable / disable lcd */
+void lcd_enable(bool on)
+{
+    if (on == lcd_enabled)
+        return;
+
+    if (on) /* lcd_display_on() */
+    {
+        lcd_send_reg(LCD_REG_UNKNOWN_00);
+        lcd_send_data(0x00 | invert);
+        lcd_send_reg(LCD_REG_UNKNOWN_01);
+        lcd_send_data(0x08 | flip);
+        lcd_send_reg(LCD_REG_UNKNOWN_05);
+        lcd_send_data(0x0f);
+        sleep(HZ/10); /* 100ms */
+
+        /* Probably out of sync and we don't wanna pepper the code with
+           lcd_update() calls for this. */
+        lcd_update();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+
+        lcd_enabled = true;
+    }
+    else /* lcd_display_off() */
+    {
+        lcd_send_reg(LCD_REG_UNKNOWN_00);
+        lcd_send_data(0x08);
+
+        lcd_enabled = false;
+    }
+}
+
+
+bool lcd_active(void)
+{
+    return lcd_enabled;
+}
+#endif /* HAVE_LCD_ENABLE */
+
 
 /*** hardware configuration ***/
 int lcd_default_contrast(void)
@@ -86,7 +133,7 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    int invert = (yesno) ? 0x40 : 0x00;
+    invert = (yesno) ? 0x40 : 0x00;
     lcd_send_reg(LCD_REG_UNKNOWN_00);
     lcd_send_data(invert);
 }
@@ -94,10 +141,10 @@ void lcd_set_invert_display(bool yesno)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    int flip = (yesno) ? 0x88 : 0x48;
+    flip = (yesno) ? 0x80 : 0x40;
     x_offset = (yesno) ? 4 : 16;
     lcd_send_reg(LCD_REG_UNKNOWN_01);
-    lcd_send_data(flip);
+    lcd_send_data(0x08 | flip);
 }
 
 void lcd_yuv_set_options(unsigned options)
@@ -208,7 +255,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     unsigned long *addr;
     int new_x, new_width;
 
-    /* Ensure x and width are both even - so we can read 32-bit aligned 
+    /* Ensure x and width are both even - so we can read 32-bit aligned
        data from lcd_framebuffer */
     new_x = x&~1;
     new_width = width&~1;
@@ -249,7 +296,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         h = height;
 
         /* calculate how much we can do in one go */
-        if (pixels_to_write > 0x10000) 
+        if (pixels_to_write > 0x10000)
         {
             h = (0x10000/2) / width;
             pixels_to_write = (width * h) * 2;
@@ -260,10 +307,10 @@ void lcd_update_rect(int x, int y, int width, int height)
         LCD2_BLOCK_CTRL = 0x34000000;
 
         /* for each row */
-        for (r = 0; r < h; r++) 
+        for (r = 0; r < h; r++)
         {
             /* for each column */
-            for (c = 0; c < width; c += 2) 
+            for (c = 0; c < width; c += 2)
             {
                 while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
 

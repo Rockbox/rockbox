@@ -22,6 +22,7 @@
 #include "backlight-target.h"
 #include "system.h"
 #include "backlight.h"
+#include "lcd.h"
 #include "synaptics-mep.h"
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
@@ -36,6 +37,10 @@ void _backlight_set_brightness(int brightness)
 
 void _backlight_on(void)
 {
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true);
+#endif
+
     GPO32_ENABLE |= 0x400;
     GPO32_VAL    |= 0x400;
 }
@@ -44,6 +49,10 @@ void _backlight_off(void)
 {
     GPO32_ENABLE |= 0x400;
     GPO32_VAL    &= ~0x400;
+
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(false);
+#endif
 }
 
 #ifdef HAVE_BUTTON_LIGHT
