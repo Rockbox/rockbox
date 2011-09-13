@@ -33,9 +33,9 @@
     ldr     pc, =irq_handler
     ldr     pc, =fiq_handler
 
-/* When starting, we are running at 0x40000000 but the code
- * assumes DRAM is somewhere else (for caching) so we first need to
- * setup the MMU and then jump to the right location */
+/* When starting, we are running at 0x4xxxxxxx (uncached) but the code
+ * assumes DRAM is somewhere else (cached) so we first need to
+ * setup the MMU and then jump to the right location. */
 .text
 .global start
 start:
@@ -49,9 +49,12 @@ start:
     bic     r0, r1
     mcr     p15, 0, r0, c1, c0, 0
 
+    /* To call the C code we need a stack, since the stack is in virtual memory
+     * use the stack's physical address */
+    ldr     sp, =stackend_phys
+
     /* Enable MMU */
     bl      memory_init
-
     /* Jump to real location */
     ldr     pc, =remap
 remap:

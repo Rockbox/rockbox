@@ -9,9 +9,6 @@ STARTUP(target/arm/imx233/crt0.o)
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE
 #define CODECSIZE CODEC_SIZE
 
-#define DRAMORIG DRAM_ORIG
-#define IRAMORIG IRAM_ORIG
-
 #define IRAMSIZE IRAM_SIZE
 
 #define DRAMSIZE (DRAM_SIZE - PLUGINSIZE - CODECSIZE - FRAME_SIZE - TTB_SIZE)
@@ -28,26 +25,24 @@ STARTUP(target/arm/imx233/crt0.o)
 
 MEMORY
 {
-    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+    IRAM : ORIGIN = IRAM_ORIG, LENGTH = IRAMSIZE
     DRAM : ORIGIN = CACHED_DRAM_ADDR, LENGTH = DRAM_SIZE - TTB_SIZE - FRAME_SIZE
-    UNCACHED_DRAM : ORIGIN = UNCACHED_DRAM_ADDR, LENGTH = DRAM_SIZE - TTB_SIZE - FRAME_SIZE
+    UDRAM : ORIGIN = UNCACHED_DRAM_ADDR, LENGTH = DRAM_SIZE - TTB_SIZE - FRAME_SIZE
 }
 
 SECTIONS
 {
+    loadaddress = UNCACHED_DRAM_ADDR;
+    _loadaddress = UNCACHED_DRAM_ADDR;
+        
     .text :
     {
         *(.text*)
-    } > DRAM
-
-    .data :
-    {
         *(.data*)
         *(.rodata*)
-        _dataend = . ;
     } > DRAM
 
-    .iram :
+    .itext :
     {
         _iramstart = .; // always 0
         *(.vectors)
@@ -59,7 +54,7 @@ SECTIONS
         _iramend = .;
     } > IRAM AT> DRAM
 
-    _iramcopy = LOADADDR(.iram);
+    _iramcopy = LOADADDR(.itext);
 
     .ibss (NOLOAD) :
     {
@@ -75,6 +70,7 @@ SECTIONS
         . = ALIGN(4);
         _initstart = .;
         *(.init)
+        . = ALIGN(0x4);
         _initend = .;
     } AT> DRAM
 
@@ -87,6 +83,9 @@ SECTIONS
         . += 0x2000;
         stackend = .;
     } > DRAM
+
+    /* physical address of the stack */
+    stackend_phys = stackend - CACHED_DRAM_ADDR + UNCACHED_DRAM_ADDR;
 
     /* treat .bss and .ncbss as a single section */
     .bss (NOLOAD) :
