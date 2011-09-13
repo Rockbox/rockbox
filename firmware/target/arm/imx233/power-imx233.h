@@ -40,6 +40,12 @@
 #define HW_POWER_MINPWR         (*(volatile uint32_t *)(HW_POWER_BASE + 0x20))
 
 #define HW_POWER_CHARGE         (*(volatile uint32_t *)(HW_POWER_BASE + 0x30))
+#define HW_POWER_CHARGE__BATTCHRG_I_BP  0
+#define HW_POWER_CHARGE__BATTCHRG_I_BM  0x3f
+#define HW_POWER_CHARGE__STOP_ILIMIT_BP 8
+#define HW_POWER_CHARGE__STOP_ILIMIT_BM 0xf00
+#define HW_POWER_CHARGE__PWD_BATTCHRG   (1 << 16)
+#define HW_POWER_CHARGE__CHRG_STS_OFF   (1 << 19)
 
 #define HW_POWER_VDDDCTRL       (*(volatile uint32_t *)(HW_POWER_BASE + 0x40))
 #define HW_POWER_VDDDCTRL__TRG_BP   0
