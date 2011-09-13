@@ -93,8 +93,7 @@ void imx233_ssp_init(void)
 void imx233_ssp_start(int ssp)
 {
     /* Gate block */
-    __REG_CLR(HW_SSP_CTRL0(ssp)) = __BLOCK_CLKGATE;
-    while(HW_SSP_CTRL0(ssp) & __BLOCK_CLKGATE);
+    imx233_reset_block(&HW_SSP_CTRL0(ssp));
     /* Gate dma channel */
     imx233_dma_clkgate_channel(APB_SSP(ssp), true);
     /* If first block to start, start SSP clock */

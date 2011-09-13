@@ -28,6 +28,7 @@
 #include "system.h"
 #include "system-target.h"
 #include "pinctrl-imx233.h"
+#include "dma-imx233.h"
 
 /* ssp can value 1 or 2 */
 #define __SSP_SELECT(ssp, ssp1, ssp2) ((ssp) == 1 ? (ssp1) : (ssp2))
@@ -129,6 +130,8 @@
 #define HW_SSP_DEBUG(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x100))
 
 #define HW_SSP_VERSION(ssp) (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x110))
+
+#define IMX233_MAX_SSP_XFER_SIZE            IMX233_MAX_SINGLE_DMA_XFER_SIZE
 
 enum imx233_ssp_error_t
 {
