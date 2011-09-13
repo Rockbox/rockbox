@@ -513,12 +513,16 @@ target/arm/imx233/pinctrl-imx233.c
 target/arm/imx233/power-imx233.c
 target/arm/imx233/powermgmt-imx233.c
 target/arm/imx233/adc-imx233.c
+target/arm/imx233/lradc-imx233.c
 target/arm/imx233/debug-imx233.c
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 target/arm/imx233/usb-imx233.c
 #endif
 #ifndef BOOTLOADER
+#ifdef HAVE_IMX233_CODEC
 target/arm/imx233/pcm-imx233.c
+target/arm/imx233/audiohw-imx233.c
+#endif
 target/arm/imx233/timer-imx233.c
 #endif
 #endif /* IMX233 */
@@ -1482,6 +1486,10 @@ target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/debug-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/power-fuzeplus.c
+target/arm/imx233/sansa-fuzeplus/adc-fuzeplus.c
+#ifndef BOOTLOADER
+target/arm/imx233/sansa-fuzeplus/audio-fuzeplus.c
+#endif
 #endif /* SIMULATOR */
 #endif
 
