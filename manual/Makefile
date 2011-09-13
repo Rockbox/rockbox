@@ -7,6 +7,10 @@
 # $Id$
 #
 
+ifndef V
+SILENT=@
+endif
+
 # Needed to build the features list.
 INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDIR)	\
  -I$(BUILDDIR)/bitmaps -I$(OBJDIR)
@@ -33,6 +37,7 @@ manual-prep: rockbox.tex
 	@mv $(OBJDIR)/Makefile.pdflatex $(OBJDIR)/Makefile
 
 $(OBJDIR)/features: $(ROOTDIR)/apps/features.txt
+	@echo "processing $(notdir $^)"
 	$(SILENT)mkdir -p `dirname $@`
 	$(SILENT)cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
