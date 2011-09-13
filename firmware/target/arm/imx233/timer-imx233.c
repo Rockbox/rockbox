@@ -24,7 +24,7 @@
 
 static long timer_cycles = 0;
 
-static void timer_fn()
+static void timer_fn(void)
 {
     if(pfn_timer)
         pfn_timer();
