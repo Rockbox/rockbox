@@ -28,8 +28,8 @@
 void imx233_dma_init(void)
 {
     /* Enable APHB and APBX */
-    __REG_CLR(HW_APBH_CTRL0) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
-    __REG_CLR(HW_APBX_CTRL0) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
+    imx233_reset_block(&HW_APBH_CTRL0);
+    imx233_reset_block(&HW_APBX_CTRL0);
 }
 
 void imx233_dma_reset_channel(unsigned chan)

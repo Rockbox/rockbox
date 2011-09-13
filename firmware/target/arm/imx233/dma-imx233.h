@@ -152,6 +152,9 @@ struct apb_dma_command_t
 #define HW_APB_CHx_SEMA__PHORE_BM           0xff0000
 #define HW_APB_CHx_SEMA__PHORE_BP           16
 
+/* A single descriptor cannot transfer more than 2^16 bytes */
+#define IMX233_MAX_SINGLE_DMA_XFER_SIZE     (1 << 16)
+
 void imx233_dma_init(void);
 void imx233_dma_reset_channel(unsigned chan);
 /* only apbh channel have clkgate control */
