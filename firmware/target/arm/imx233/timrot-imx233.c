@@ -73,8 +73,7 @@ void imx233_setup_timer(unsigned timer_nr, bool reload, unsigned count,
 
 void imx233_timrot_init(void)
 {
-    __REG_CLR(HW_TIMROT_ROTCTRL) = __BLOCK_CLKGATE;
-    __REG_CLR(HW_TIMROT_ROTCTRL) = __BLOCK_SFTRST;
+    imx233_reset_block(&HW_TIMROT_ROTCTRL);
     /* enable xtal path to timrot */
     imx233_enable_timrot_xtal_clk32k(true);
 }
