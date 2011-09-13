@@ -12726,3 +12726,20 @@
     *: "Reset Playlist Catalog Directory"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </voice>
+</phrase>
