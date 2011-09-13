@@ -41,7 +41,8 @@
 #include "usb.h"
 #include "usb-target.h"
 
-#include "clkctrl-imx233.h"
+extern char loadaddress[];
+extern char loadaddressend[];
 
 #ifdef HAVE_BOOTLOADER_USB_MODE
 static void usb_mode(int connect_timeout)
@@ -151,8 +152,8 @@ void main(uint32_t arg)
 
     printf("Loading firmware");
 
-    loadbuffer = (unsigned char*)DRAM_ORIG; /* DRAM */
-    buffer_size = (int)(loadbuffer + DRAM_SIZE - TTB_SIZE);
+    loadbuffer = (unsigned char*)loadaddress;
+    buffer_size = (int)(loadaddressend - loadaddress);
 
     while((ret = load_firmware(loadbuffer, BOOTFILE, buffer_size)) < 0)
     {
@@ -160,8 +161,9 @@ void main(uint32_t arg)
     }
 
     kernel_entry = (void*) loadbuffer;
-    cpucache_invalidate();
     printf("Executing");
+    disable_interrupt(IRQ_FIQ_STATUS);
+    commit_discard_idcache();
     kernel_entry();
     printf("ERR: Failed to boot");
 
