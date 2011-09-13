@@ -27,6 +27,7 @@
 #include "power.h"
 #include "logf.h"
 #include "usb.h"
+#include "backlight-target.h"
 #include "synaptics-mep.h"
 
 void power_init(void)
@@ -110,6 +111,8 @@ bool ide_powered(void)
 
 void power_off(void)
 {
+    _backlight_off();
+
     /* power off bit */
     GPIOB_ENABLE |= 0x80;
     GPIOB_OUTPUT_VAL &= ~0x80;
