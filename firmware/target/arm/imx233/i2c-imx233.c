@@ -55,7 +55,7 @@ void INT_I2C_DMA(void)
 
 void i2c_init(void)
 {
-    __REG_SET(HW_I2C_CTRL0) = __BLOCK_SFTRST | __BLOCK_CLKGATE;
+    imx233_reset_block(&HW_I2C_CTRL0);
     /* setup pins (must be done when shutdown) */
     imx233_set_pin_function(0, 30, PINCTRL_FUNCTION_MAIN);
     imx233_set_pin_function(0, 31, PINCTRL_FUNCTION_MAIN);
