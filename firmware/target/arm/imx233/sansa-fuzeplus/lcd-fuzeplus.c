@@ -39,7 +39,7 @@ extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
 static unsigned lcd_yuv_options = 0;
 
 #ifdef HAVE_LCD_ENABLE
-static bool lcd_on = false;
+static bool lcd_on = true;
 #endif
 
 static enum lcd_kind_t
@@ -383,7 +383,7 @@ void lcd_init_device(void)
         case LCD_KIND_7783: lcd_init_seq_7783(); break;
         case LCD_KIND_9325: lcd_init_seq_9325(); break;
         default:
-            lcd_kind = LCD_KIND_9325;
+            lcd_kind = LCD_KIND_7783;
             lcd_init_seq_7783(); break;
     }
 }
