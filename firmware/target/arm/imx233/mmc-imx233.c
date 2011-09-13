@@ -42,6 +42,9 @@
 static unsigned mmc_window_start = 0;
 static unsigned mmc_window_end = INT_MAX;
 static bool mmc_window_enable = true;
+static long mmc_last_activity = -1;
+static bool mmc_is_active = false;
+static unsigned mmc_size = 0;
 
 static struct mutex mmc_mutex;
 
@@ -128,6 +131,16 @@ int mmc_init(void)
      * gives bitrate of 96 / 2 / 1 = 48MHz */
     imx233_ssp_set_timings(MMC_SSP, 2, 0, 0xffff);
 
+    /* read extended CSD */
+    {
+        uint8_t ext_csd[512];
+        ret = imx233_ssp_sd_mmc_transfer(MMC_SSP, 8, 0, SSP_SHORT_RESP, ext_csd, 1, true, true, &status);
+        if(ret != 0)
+            return -12;
+        uint32_t *sec_count = (void *)&ext_csd[212];
+        mmc_size = *sec_count;
+    }
+
     #ifdef SANSA_FUZEPLUS
     if(mmc_window_enable)
     {
@@ -159,6 +172,7 @@ int mmc_init(void)
             return -102; /* sigmatel partition */
         if((mmc_window_end - mmc_window_start) < 4 * 1024 * 1024)
             return -103; /* partition too small */
+        mmc_size = mmc_window_end - mmc_window_start;
     }
     #endif
 
@@ -178,14 +192,14 @@ void mmc_get_info(IF_MD2(int drive,) struct storage_info *info)
     (void) drive;
 #endif
     info->sector_size = 512;
-    info->num_sectors = 0xECC000 - 0x0001ac00;
+    info->num_sectors = mmc_size;
     info->vendor = "Rockbox";
     info->product = "Internal Storage";
     info->revision = "0.00";
 }
 #endif
 
-int mmc_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void *buf)
+static int transfer_sectors(IF_MD2(int drive,) unsigned long start, int count, void *buf, bool read)
 {
     IF_MD((void) drive);
     /* check window */
@@ -197,32 +211,45 @@ int mmc_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void *bu
     int ret = 0;
     uint32_t resp;
 
-    if(count == 1)
+    mmc_last_activity = current_tick;
+    mmc_is_active = true;
+
+    do
     {
-        ret = imx233_ssp_sd_mmc_transfer(MMC_SSP, 17, start, SSP_SHORT_RESP, buf,
-            count, false, true, &resp);
-    }
-    else
-    {
-        ret = imx233_ssp_sd_mmc_transfer(MMC_SSP, 23, count, SSP_SHORT_RESP, NULL,
-            0, false, false, &resp);
-        if(ret == 0)
-            ret = imx233_ssp_sd_mmc_transfer(MMC_SSP, 18, start, SSP_SHORT_RESP, buf,
-                count, false, true, &resp);
-    }
+        int this_count = MIN(count, IMX233_MAX_SSP_XFER_SIZE / 512);
+        if(this_count == 1)
+        {
+            ret = imx233_ssp_sd_mmc_transfer(MMC_SSP, read ? 17 : 24, start,
+                SSP_SHORT_RESP, buf, this_count, false, read, &resp);
+        }
+        else
+        {
+            ret = imx233_ssp_sd_mmc_transfer(MMC_SSP, 23, this_count, SSP_SHORT_RESP, NULL,
+                0, false, false, &resp);
+            if(ret == 0)
+                ret = imx233_ssp_sd_mmc_transfer(MMC_SSP, read ? 18 : 25, start,
+                    SSP_SHORT_RESP, buf, this_count, false, read, &resp);
+        }
+        count -= this_count;
+        start += this_count;
+        buf += this_count * 512;
+    }while(count != 0 && ret == SSP_SUCCESS);
+
+    mmc_is_active = false;
 
     mutex_unlock(&mmc_mutex);
 
     return ret;
 }
 
+int mmc_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void *buf)
+{
+    return transfer_sectors(IF_MD2(drive,) start, count, buf, true);
+}
+
 int mmc_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf)
 {
-    IF_MD((void) drive);
-    (void) start;
-    (void) count;
-    (void) buf;
-    return -1;
+    return transfer_sectors(IF_MD2(drive,) start, count, (void *)buf, false);
 }
 
 bool mmc_present(IF_MD(int drive))
@@ -235,4 +262,56 @@ bool mmc_removable(IF_MD(int drive))
 {
     IF_MD((void) drive);
     return false;
+}
+
+void mmc_sleep(void)
+{
+}
+
+void mmc_sleepnow(void)
+{
+}
+
+bool mmc_disk_is_active(void)
+{
+    return mmc_is_active;
+}
+
+bool mmc_usb_active(void)
+{
+    return mmc_disk_is_active();
+}
+
+int mmc_soft_reset(void)
+{
+    return 0;
+}
+
+int mmc_flush(void)
+{
+    return 0;
+}
+
+void mmc_spin(void)
+{
+}
+
+void mmc_spindown(int seconds)
+{
+    (void) seconds;
+}
+
+long mmc_last_disk_activity(void)
+{
+    return mmc_last_activity;
+}
+
+int mmc_spinup_time(void)
+{
+    return 0;
+}
+
+void mmc_enable(bool enable)
+{
+    (void) enable;
 }
