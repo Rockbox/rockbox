@@ -233,3 +233,8 @@ bool sd_removable(IF_MD(int drive))
     return true;
 }
 
+long sd_last_disk_activity(void)
+{
+    return 0;
+}
+
