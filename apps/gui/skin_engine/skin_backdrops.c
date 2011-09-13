@@ -181,9 +181,13 @@ void skin_backdrop_show(int backdrop_id)
         backdrops[backdrop_id].name[2] == '\0'))
     {
         screens[screen].backdrop_show(NULL);
+        current_lcd_backdrop[screen] = -1;
     }
     else if (backdrops[backdrop_id].buffer)
+    {
         screens[screen].backdrop_show(backdrops[backdrop_id].buffer);
+        current_lcd_backdrop[screen] = backdrop_id;
+    }
 }
 
 void skin_backdrop_unload(int backdrop_id)
