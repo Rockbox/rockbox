@@ -41,18 +41,7 @@ void imx233_lcdif_enable(bool enable)
 
 void imx233_lcdif_reset(void)
 {
-    //imx233_reset_block(&HW_LCDIF_CTRL);// doesn't work
-    while(HW_LCDIF_CTRL & __BLOCK_CLKGATE)
-        HW_LCDIF_CTRL &= ~__BLOCK_CLKGATE;
-    while(!(HW_LCDIF_CTRL & __BLOCK_SFTRST))
-        HW_LCDIF_CTRL |= __BLOCK_SFTRST;
-    while(HW_LCDIF_CTRL & __BLOCK_CLKGATE)
-        HW_LCDIF_CTRL &= ~__BLOCK_CLKGATE;
-    while(HW_LCDIF_CTRL & __BLOCK_SFTRST)
-        HW_LCDIF_CTRL &= ~__BLOCK_SFTRST;
-    while(HW_LCDIF_CTRL & __BLOCK_CLKGATE)
-        HW_LCDIF_CTRL &= ~__BLOCK_CLKGATE;
-    __REG_SET(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
+    imx233_reset_block(&HW_LCDIF_CTRL);
 }
 
 void imx233_lcdif_set_timings(unsigned data_setup, unsigned data_hold,
