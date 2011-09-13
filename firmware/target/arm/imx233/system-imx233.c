@@ -58,6 +58,14 @@ default_interrupt(INT_GPIO0);
 default_interrupt(INT_GPIO1);
 default_interrupt(INT_GPIO2);
 default_interrupt(INT_VDD5V);
+default_interrupt(INT_LRADC_CH0);
+default_interrupt(INT_LRADC_CH1);
+default_interrupt(INT_LRADC_CH2);
+default_interrupt(INT_LRADC_CH3);
+default_interrupt(INT_LRADC_CH4);
+default_interrupt(INT_LRADC_CH5);
+default_interrupt(INT_LRADC_CH6);
+default_interrupt(INT_LRADC_CH7);
 
 typedef void (*isr_t)(void);
 
@@ -80,6 +88,14 @@ static isr_t isr_table[INT_SRC_NR_SOURCES] =
     [INT_SRC_GPIO1] = INT_GPIO1,
     [INT_SRC_GPIO2] = INT_GPIO2,
     [INT_SRC_VDD5V] = INT_VDD5V,
+    [INT_SRC_LRADC_CHx(0)] = INT_LRADC_CH0,
+    [INT_SRC_LRADC_CHx(1)] = INT_LRADC_CH1,
+    [INT_SRC_LRADC_CHx(2)] = INT_LRADC_CH2,
+    [INT_SRC_LRADC_CHx(3)] = INT_LRADC_CH3,
+    [INT_SRC_LRADC_CHx(4)] = INT_LRADC_CH4,
+    [INT_SRC_LRADC_CHx(5)] = INT_LRADC_CH5,
+    [INT_SRC_LRADC_CHx(6)] = INT_LRADC_CH6,
+    [INT_SRC_LRADC_CHx(7)] = INT_LRADC_CH7,
 };
 
 static void UIRQ(void)
@@ -100,7 +116,7 @@ void fiq_handler(void)
 {
 }
 
-static void imx233_chip_reset(void)
+void imx233_chip_reset(void)
 {
     HW_CLKCTRL_RESET = HW_CLKCTRL_RESET_CHIP;
 }
@@ -168,6 +184,7 @@ void memory_init(void)
 
 void system_init(void)
 {
+    imx233_reset_block(&HW_ICOLL_CTRL);
     /* disable all interrupts */
     for(int i = 0; i < INT_SRC_NR_SOURCES; i++)
     {
@@ -196,13 +213,14 @@ bool imx233_us_elapsed(uint32_t ref, unsigned us_delay)
 
 void imx233_reset_block(volatile uint32_t *block_reg)
 {
-    __REG_CLR(*block_reg) = __BLOCK_SFTRST;
-    while(*block_reg & __BLOCK_SFTRST);
-    __REG_CLR(*block_reg) = __BLOCK_CLKGATE;
+    /* soft-reset */
     __REG_SET(*block_reg) = __BLOCK_SFTRST;
+    /* make sure block is gated off */
     while(!(*block_reg & __BLOCK_CLKGATE));
+    /* bring block out of reset */
     __REG_CLR(*block_reg) = __BLOCK_SFTRST;
     while(*block_reg & __BLOCK_SFTRST);
+    /* make sure clock is running */
     __REG_CLR(*block_reg) = __BLOCK_CLKGATE;
     while(*block_reg & __BLOCK_CLKGATE);
 }
@@ -218,6 +236,7 @@ void set_cpu_frequency(long frequency)
 {
     switch(frequency)
     {
+        #if 0
         case IMX233_CPUFREQ_454_MHz:
             /* clk_h@clk_p/3 */
             imx233_set_clock_divisor(CLK_AHB, 3);
@@ -228,6 +247,7 @@ void set_cpu_frequency(long frequency)
              * clk_p@454.74 MHz
              * clk_h@151.58 MHz */
             break;
+        #endif
         default:
             break;
     }
