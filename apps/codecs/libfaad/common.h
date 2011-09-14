@@ -151,10 +151,9 @@ extern struct codec_api* ci;
   #undef ERROR_RESILIENCE
 #endif
 
+#if CODEC_SIZE >= 0x80000
 #define SBR_DEC
 //#define SBR_LOW_POWER /* Does not work yet in rockbox. */
-
-#if CODEC_SIZE >= 0x80000
 #define PS_DEC
 #endif
 
