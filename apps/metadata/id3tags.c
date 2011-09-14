@@ -579,7 +579,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
                     if(str[1] == 0)
                         le = true;
 
-                do {
+                while ((i < *len) && (str[0] || str[1])) {
                     if(le)
                         utf8 = utf16LEdecode(str, utf8, 1);
                     else
@@ -587,7 +587,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
 
                     str+=2;
                     i += 2;
-                } while((str[0] || str[1]) && (i < *len));
+                }
 
                 *utf8++ = 0; /* Terminate the string */
                 templen += (strlen(&utf8buf[templen]) + 1);
@@ -962,10 +962,10 @@ void setid3v2title(int fd, struct mp3entry *entry)
                 if((tr->tag_length == 4 && !memcmp( header, "COMM", 4)) ||
                    (tr->tag_length == 3 && !memcmp( header, "COM", 3))) {
                     int offset;
-                    if(!strncmp(tag+4, "iTun", 4)) {
+                    if(bytesread >= 8 && !strncmp(tag+4, "iTun", 4)) {
 #if CONFIG_CODEC == SWCODEC
                         /* check for iTunes gapless information */
-                        if(!strncmp(tag+4, "iTunSMPB", 8))
+                        if(bytesread >= 12 && !strncmp(tag+4, "iTunSMPB", 8))
                             itunes_gapless = true;
                         else
 #endif
@@ -999,6 +999,10 @@ void setid3v2title(int fd, struct mp3entry *entry)
                     while ( bytesread > 0 && isspace(tag[bytesread-1]))
                         bytesread--;
                 }
+
+                if(bytesread == 0)
+                    /* Skip empty frames */
+                    break;
 
                 tag[bytesread] = 0;
                 bufferpos += bytesread + 1;
@@ -1040,10 +1044,6 @@ void setid3v2title(int fd, struct mp3entry *entry)
 #endif
                 if( tr->ppFunc )
                     bufferpos = tr->ppFunc(entry, tag, bufferpos);
-
-                /* Seek to the next frame */
-                if(framelen < totframelen)
-                    lseek(fd, totframelen - framelen, SEEK_CUR);
                 break;
             }
         }
@@ -1059,6 +1059,10 @@ void setid3v2title(int fd, struct mp3entry *entry)
                 if( lseek(fd, totframelen, SEEK_CUR) == -1 )
                     return;
             }
+        } else {
+            /* Seek to the next frame */
+            if(framelen < totframelen)
+                lseek(fd, totframelen - framelen, SEEK_CUR);
         }
     }
 }
