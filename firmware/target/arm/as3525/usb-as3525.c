@@ -45,18 +45,23 @@ void usb_enable(bool on)
 void usb_insert_int(void)
 {
     usb_status = USB_INSERTED;
+#ifdef USB_STATUS_BY_EVENT
     usb_status_event(USB_POWERED);
+#endif
 }
 
 void usb_remove_int(void)
 {
     usb_status = USB_EXTRACTED;
+#ifdef USB_STATUS_BY_EVENT
     usb_status_event(USB_UNPOWERED);
+#endif
 }
 
 void usb_drv_usb_detect_event(void)
 {
-#if CONFIG_CPU != AS3525v2 || defined(USE_ROCKBOX_USB)
+#if (CONFIG_CPU != AS3525v2 || defined(USE_ROCKBOX_USB)) \
+    && defined (USB_STATUS_BY_EVENT)
 /* Rebooting on USB plug can crash these players in a state where
  * hardware power off (pressing the power button) doesn't work anymore
  * TODO: Implement USB in rockbox for these players */
