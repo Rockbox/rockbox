@@ -76,7 +76,8 @@ static inline void usb_disable_pll(void)
 
 void usb_attach(void)
 {
-    usb_enable(true);
+    logf("usb-drv: attach");
+    /* Nothing to do */
 }
 
 static void usb_tick(void);
@@ -768,7 +769,6 @@ void INT_USB(void)
         }
         if (intr & USB_DEV_INTR_USB_RESET) {/* usb reset from host? */
             logf("usb reset\n");
-            usb_drv_usb_detect_event();
             reset_endpoints(1);
             usb_core_bus_reset();
             intr &= ~USB_DEV_INTR_USB_RESET;
