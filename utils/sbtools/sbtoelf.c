@@ -371,7 +371,7 @@ static void extract(unsigned long filesize)
 
     if(memcmp(sb_header->signature, "STMP", 4) != 0)
         bugp("Bad signature");
-    if(sb_header->image_size * BLOCK_SIZE != filesize)
+    if(sb_header->image_size * BLOCK_SIZE > filesize)
         bugp("File size mismatch");
     if(sb_header->header_size * BLOCK_SIZE != sizeof(struct sb_header_t))
         bugp("Bad header size");
