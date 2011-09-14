@@ -812,10 +812,6 @@ int plugin_load(const char* plugin, const void* parameter)
     struct plugin_header *p_hdr;
     struct lc_header     *hdr;
 
-#if LCD_DEPTH > 1
-    fb_data* old_backdrop;
-#endif
-
     if (current_plugin_handle && pfn_tsr_exit)
     {    /* if we have a resident old plugin and a callback */
         if (pfn_tsr_exit(!strcmp(current_plugin, plugin)) == false )
@@ -869,9 +865,6 @@ int plugin_load(const char* plugin, const void* parameter)
 
     *(p_hdr->api) = &rockbox_api;
 
-#if defined HAVE_LCD_BITMAP && LCD_DEPTH > 1
-    old_backdrop = lcd_get_backdrop();
-#endif
     lcd_clear_display();
     lcd_update();
 
@@ -914,7 +907,6 @@ int plugin_load(const char* plugin, const void* parameter)
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_UI);
 #if LCD_DEPTH > 1
-    lcd_set_backdrop(old_backdrop);
 #ifdef HAVE_LCD_COLOR
     lcd_set_drawinfo(DRMODE_SOLID, global_settings.fg_color,
                                    global_settings.bg_color);
@@ -942,7 +934,7 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     FOR_NB_SCREENS(i)
-        viewportmanager_theme_undo(i, false);
+        viewportmanager_theme_undo(i, true);
 
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
     if(open_files != 0 && !current_plugin_handle)
