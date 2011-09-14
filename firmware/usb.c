@@ -57,11 +57,6 @@
 #define USB_FULL_INIT
 #endif
 
-#if defined(USB_DETECT_BY_DRV) || defined(USB_DETECT_BY_CORE)
-/* These aren't treated differently here */
-#define USB_DELAYED_INSERT
-#endif
-
 #ifdef HAVE_LCD_BITMAP
 bool do_screendump_instead_of_usb = false;
 #endif
@@ -370,7 +365,7 @@ static void usb_thread(void) NORETURN_ATTR;
 #endif
 static void usb_thread(void)
 {
-#ifdef USB_DELAYED_INSERT
+#ifdef USB_DETECT_BY_CORE
     bool host_detected = false;
 #endif
     int num_acks_to_expect = 0;
@@ -392,7 +387,7 @@ static void usb_thread(void)
 #endif /* HAVE_USBSTACK */
 
         case USB_INSERTED:
-#ifdef USB_DELAYED_INSERT
+#ifdef USB_DETECT_BY_CORE
             if(usb_state != USB_POWERED)
                 break;
 
@@ -400,7 +395,7 @@ static void usb_thread(void)
                 break; /* Drivers configured but we're still USB_POWERED */
 
             host_detected = true;
-#else /* !USB_DELAYED_INSERT */
+#else /* !USB_DETECT_BY_CORE */
             if(usb_state != USB_EXTRACTED)
                 break;
 
@@ -408,7 +403,7 @@ static void usb_thread(void)
                 break;
 
             usb_state = USB_POWERED;
-#endif /* USB_DELAYED_INSERT */
+#endif /* USB_DETECT_BY_CORE */
 
             if(usb_power_button())
             {
@@ -461,7 +456,7 @@ static void usb_thread(void)
             break;
             /* SYS_USB_CONNECTED_ACK */
 
-#ifdef USB_DELAYED_INSERT
+#ifdef USB_DETECT_BY_CORE
         /* In this case, these events handle cable insertion. USB driver or
            core determines USB_INSERTED. */
         case USB_POWERED:
@@ -481,7 +476,7 @@ static void usb_thread(void)
                 usb_enable(false);
             /* Fall-through - other legal states can be USB_INSERTED or
                USB_SCREENDUMP */
-#endif /* USB_DELAYED_INSERT */
+#endif /* USB_DETECT_BY_CORE */
         case USB_EXTRACTED:
             if(usb_state == USB_EXTRACTED)
                 break;
@@ -495,7 +490,7 @@ static void usb_thread(void)
 
             /* Ok to broadcast disconnect now */
             usb_configure_drivers(USB_EXTRACTED);
-#ifdef USB_DELAYED_INSERT
+#ifdef USB_DETECT_BY_CORE
             host_detected = false;
 #endif
             break;
@@ -549,9 +544,9 @@ void usb_status_event(int current_status)
 {
     /* Caller isn't expected to filter for changes in status.
      * current_status:
-     *   USB_DETECT_BY_DRV/CORE: USB_POWERED, USB_UNPOWERED,
-                                 USB_INSERTED (driver/core)
-     *                     else: USB_INSERTED, USB_EXTRACTED
+     *   USB_DETECT_BY_CORE: USB_POWERED, USB_UNPOWERED,
+                             USB_INSERTED (core)
+     *                 else: USB_INSERTED, USB_EXTRACTED
      */
     if(usb_monitor_enabled)
     {
@@ -572,7 +567,7 @@ void usb_start_monitoring(void)
     /* An event may have been missed because it was sent before monitoring
      * was enabled due to the connector already having been inserted before
      * before or during boot. */
-#ifdef USB_DELAYED_INSERT
+#ifdef USB_DETECT_BY_CORE
     /* Filter the status - USB_INSERTED may happen later */
     status = (status == USB_EXTRACTED) ? USB_UNPOWERED : USB_POWERED;
 #endif

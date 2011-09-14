@@ -226,9 +226,7 @@ void usb_insert_int(void)
     timeout_register(&usb_oneshot, usb_timeout_event, HZ/5, val);
 }
 
-/* USB_DETECT_BY_DRV: Called during the bus reset interrupt when in detect mode
- * USB_DETECT_BY_CORE: Called when device descriptor is requested
- */
+/* USB_DETECT_BY_CORE: Called when device descriptor is requested */
 void usb_drv_usb_detect_event(void)
 {
     /* Filter for invalid bus reset when unplugging by checking the pin state. */
