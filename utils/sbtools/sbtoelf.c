@@ -71,7 +71,6 @@ char BLUE[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 
 /* globals */
 
-size_t g_sz;	/* file size */
 uint8_t *g_buf; /* file content */
 #define PREFIX_SIZE     128
 char out_prefix[PREFIX_SIZE];
@@ -377,6 +376,14 @@ static void extract(unsigned long filesize)
         bugp("Bad header size");
     if(sb_header->sec_hdr_size * BLOCK_SIZE != sizeof(struct sb_section_header_t))
         bugp("Bad section header size");
+
+    if(filesize > sb_header->image_size * BLOCK_SIZE)
+    {
+        color(GREY);
+        printf("[Restrict file size from %lu to %d bytes]\n", filesize,
+            sb_header->image_size * BLOCK_SIZE);
+        filesize = sb_header->image_size * BLOCK_SIZE;
+    }
 
     color(BLUE);
     printf("Basic info:\n");
@@ -763,10 +770,9 @@ int main(int argc, const char **argv)
 
     if(fstat(fd, &st) == -1)
         bugp("firmware stat() failed");
-    g_sz = st.st_size;
 
-    g_buf = xmalloc(g_sz);
-    if(read(fd, g_buf, g_sz) != (ssize_t)g_sz) /* load the whole file into memory */
+    g_buf = xmalloc(st.st_size);
+    if(read(fd, g_buf, st.st_size) != (ssize_t)st.st_size) /* load the whole file into memory */
         bugp("reading firmware");
 
     close(fd);
