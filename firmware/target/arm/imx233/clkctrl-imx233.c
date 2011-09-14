@@ -118,3 +118,11 @@ void imx233_set_bypass_pll(enum imx233_clock_t clk, bool bypass)
         __REG_CLR(HW_CLKCTRL_CLKSEQ) = msk;
 }
 
+void imx233_enable_usb_pll(bool enable)
+{
+    if(enable)
+        __REG_SET(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS;
+    else
+        __REG_CLR(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS;
+}
+

@@ -28,8 +28,9 @@
 #define HW_CLKCTRL_BASE     0x80040000
 
 #define HW_CLKCTRL_PLLCTRL0 (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x0))
-#define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BP 20
-#define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BM (3 << 20)
+#define HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS    (1 << 18)
+#define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BP     20
+#define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BM     (3 << 20)
 
 #define HW_CLKCTRL_PLLCTRL1 (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x10))
 
@@ -90,5 +91,6 @@ void imx233_set_clock_divisor(enum imx233_clock_t clk, int div);
 /* call with fracdiv=0 to disable it */
 void imx233_set_fractional_divisor(enum imx233_clock_t clk, int fracdiv);
 void imx233_set_bypass_pll(enum imx233_clock_t clk, bool bypass);
+void imx233_enable_usb_pll(bool enable);
 
 #endif /* CLKCTRL_IMX233_H */

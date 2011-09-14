@@ -28,9 +28,21 @@
 #include "clock-target.h" /* CPUFREQ_* are defined here */
 #include "power-imx233.h"
 
+/* Digital control */
 #define HW_DIGCTL_BASE          0x8001C000
+#define HW_DIGCTL_CTRL          (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0))
+#define HW_DIGCTL_CTRL__USB_CLKGATE (1 << 2)
+
 #define HW_DIGCTL_MICROSECONDS  (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xC0))
 
+/* USB Phy */
+#define HW_USBPHY_BASE          0x8007C000 
+#define HW_USBPHY_PWD           (*(volatile uint32_t *)(HW_USBPHY_BASE + 0))
+#define HW_USBPHY_PWD__ALL      (7 << 10 | 0xf << 17)
+
+#define HW_USBPHY_CTRL          (*(volatile uint32_t *)(HW_USBPHY_BASE + 0x30))
+
+/* Interrupt collector */
 #define HW_ICOLL_BASE           0x80000000
 
 #define HW_ICOLL_VECTOR         (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x0))
@@ -89,6 +101,8 @@ void udelay(unsigned us);
 bool imx233_us_elapsed(uint32_t ref, unsigned us_delay);
 void imx233_reset_block(volatile uint32_t *block_reg);
 void power_off(void);
+void imx233_enable_usb_controller(bool enable);
+void imx233_enable_usb_phy(bool enable);
 
 void udelay(unsigned usecs);
 

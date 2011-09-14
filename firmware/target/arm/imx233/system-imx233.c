@@ -253,3 +253,25 @@ void set_cpu_frequency(long frequency)
     }
 }
 #endif
+
+void imx233_enable_usb_controller(bool enable)
+{
+    if(enable)
+        __REG_CLR(HW_DIGCTL_CTRL) = HW_DIGCTL_CTRL__USB_CLKGATE;
+    else
+        __REG_SET(HW_DIGCTL_CTRL) = HW_DIGCTL_CTRL__USB_CLKGATE;
+}
+
+void imx233_enable_usb_phy(bool enable)
+{
+    if(enable)
+    {
+        __REG_CLR(HW_USBPHY_CTRL) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
+        __REG_CLR(HW_USBPHY_PWD) = HW_USBPHY_PWD__ALL;
+    }
+    else
+    {
+        __REG_SET(HW_USBPHY_PWD) = HW_USBPHY_PWD__ALL;
+        __REG_SET(HW_USBPHY_CTRL) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
+    }
+}
