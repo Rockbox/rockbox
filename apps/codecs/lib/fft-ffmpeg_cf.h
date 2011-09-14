@@ -212,16 +212,15 @@ static inline FFTComplex* TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wr
                   "mac.l    %%d5,      %[wre], (4, %[z2]), %%d4, %%acc0\n\t"
                   "mac.l    %%d4,      %[wim], %%acc0\n\t"
                   "mac.l    %%d4,      %[wre], (%[z3]), %%d6, %%acc1\n\t"
-                  "msac.l   %%d5,      %[wim], (4,%[z3]), %%d7, %%acc1\n\t"
-                  "mac.l    %%d6,      %[wre], %%acc2\n\t"
-                  "msac.l   %%d7,      %[wim], %%acc2\n\t"
+                  "msac.l   %%d5,      %[wim], (4, %[z3]), %%d7, %%acc1\n\t"
+                  "mac.l    %%d6,      %[wre], (%[z])+, %%d4, %%acc2\n\t"
+                  "msac.l   %%d7,      %[wim], (%[z])+, %%d5, %%acc2\n\t"
                   "mac.l    %%d7,      %[wre], %%acc3\n\t"
                   "mac.l    %%d6,      %[wim], %%acc3\n\t"
 
                   "movclr.l %%acc0,    %[wre]\n\t"     /* t1 */
                   "movclr.l %%acc2,    %[wim]\n\t"     /* t5 */
 
-                  "movem.l  (%[z]),    %%d4-%%d5\n\t"  /* load z0 */
                   "move.l   %%d4,      %%d6\n\t"
                   "move.l   %[wim],    %%d7\n\t"
                   "sub.l    %[wre],    %[wim]\n\t"     /* t5 = t5-t1 */
@@ -240,7 +239,7 @@ static inline FFTComplex* TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wr
 
                   "movem.l  %%d6-%%d7, (%[z2])\n\t"    /* store z2 */
                   "add.l    %[wre],    %%d5\n\t"       /* d5 = a0im + (t2+t6) => a0im */
-                  "movem.l  %%d4-%%d5, (%[z])\n\t"     /* store z0 */
+                  "movem.l  %%d4-%%d5, (-8, %[z])\n\t"     /* store z0 */
 
                   "movem.l  (%[z1]),   %%d4-%%d5\n\t"  /* load z1 */
                   "move.l   %%d4,      %%d6\n\t"
@@ -254,10 +253,11 @@ static inline FFTComplex* TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wr
                   "add.l    %[wim],    %%d5\n\t"
                   "movem.l  %%d4-%%d5, (%[z1])\n\t"    /* store z1 */
 
-                  : [wre] "+r" (wre), [wim] "+r" (wim) /* we clobber these after using them */
-                  : [z] "a" (z), [z1] "a" (&z[n]), [z2] "a" (&z[2*n]), [z3] "a" (&z[3*n])
+                  : [wre] "+r" (wre), [wim] "+r" (wim), /* we clobber these after using them */
+                    [z] "+a" (z)
+                  : [z1] "a" (&z[n]), [z2] "a" (&z[2*n]), [z3] "a" (&z[3*n])
                   : "d3", "d4", "d5", "d6", "d7", "cc", "memory");
-     return z+1;
+    return z;
 }
 
 static inline FFTComplex* TRANSFORM_W01(FFTComplex * z, unsigned int n, const FFTSample * w)
@@ -311,11 +311,12 @@ static inline FFTComplex* TRANSFORM_ZERO(FFTComplex * z, unsigned int n)
 
 static inline FFTComplex* TRANSFORM_EQUAL(FFTComplex * z, unsigned int n)
 {
-    asm volatile ("move.l   (%[z2]),   %%d5\n\t"
-                  "mac.l    %%d5,      %[PI2_8], (4, %[z2]), %%d5, %%acc0\n\t"
-                  "mac.l    %%d5,      %[PI2_8], (%[z3]), %%d5, %%acc1\n\t"
-                  "mac.l    %%d5,      %[PI2_8], (4,%[z3]), %%d5, %%acc2\n\t"
-                  "mac.l    %%d5,      %[PI2_8], %%acc3\n\t"
+    asm volatile ("movem.l  (%[z2]),    %%d0-%%d1\n\t"
+                  "move.l   %[_cPI2_8], %%d2\n\t"
+                  "mac.l    %%d0,       %%d2, (%[z3]),    %%d0, %%acc0\n\t"
+                  "mac.l    %%d1,       %%d2, (4, %[z3]), %%d1, %%acc1\n\t"
+                  "mac.l    %%d0,       %%d2, (%[z]),     %%d4, %%acc2\n\t"
+                  "mac.l    %%d1,       %%d2, (4, %[z]),  %%d5, %%acc3\n\t"
 
                   "movclr.l %%acc0,    %%d0\n\t"
                   "movclr.l %%acc1,    %%d1\n\t"
@@ -330,7 +331,6 @@ static inline FFTComplex* TRANSFORM_EQUAL(FFTComplex * z, unsigned int n)
                   "add.l    %%d2, %%d3\n\t"            /* d3 == t6 */
                   "sub.l    %%d7, %%d2\n\t"            /* d2 == t5 */
 
-                  "movem.l  (%[z]),    %%d4-%%d5\n\t"  /* load z0 */
                   "move.l   %%d4,      %%d6\n\t"
                   "move.l   %%d2,      %%d7\n\t"
                   "sub.l    %%d0,      %%d2\n\t"       /* t5 = t5-t1 */
@@ -360,8 +360,8 @@ static inline FFTComplex* TRANSFORM_EQUAL(FFTComplex * z, unsigned int n)
                   "add.l    %%d2,    %%d5\n\t"
                   "movem.l  %%d4-%%d5, (%[z1])\n\t"    /* store z1 */
 
-                  :
-                  : [z] "a" (z), [z1] "a" (&z[n]), [z2] "a" (&z[2*n]), [z3] "a" (&z[3*n]), [PI2_8] "r" (cPI2_8)
+                  :: [z] "a" (z), [z1] "a" (&z[n]), [z2] "a" (&z[2*n]), [z3] "a" (&z[3*n]),
+                    [_cPI2_8] "i" (cPI2_8)
                   : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "cc", "memory");
 
     return z+1;
