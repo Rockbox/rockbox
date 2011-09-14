@@ -428,53 +428,6 @@ void usb_drv_startup(void)
     }
 }
 
-/* manual: 32.14.1 Device Controller Initialization */
-static void _usb_drv_init(bool attach)
-{
-    usb_drv_reset();
-
-    REG_USBMODE = USBMODE_CTRL_MODE_DEVICE;
-
-#ifdef USB_NO_HIGH_SPEED
-    /* Force device to full speed */
-    /* See 32.9.5.9.2 */
-    REG_PORTSC1 |= PORTSCX_PORT_FORCE_FULL_SPEED;
-#endif
-
-    init_control_queue_heads();
-    memset(td_array, 0, sizeof td_array);
-
-    REG_ENDPOINTLISTADDR = (unsigned int)qh_array;
-    REG_DEVICEADDR = 0;
-
-    if (!attach) {
-        /* enable RESET interrupt */
-        REG_USBINTR = USBINTR_RESET_EN;
-    }
-    else
-    {
-        /* enable USB interrupts */
-        REG_USBINTR =
-            USBINTR_INT_EN |
-            USBINTR_ERR_INT_EN |
-            USBINTR_PTC_DETECT_EN |
-            USBINTR_RESET_EN;
-    }
-
-    usb_drv_int_enable(true);
-
-    /* go go go */
-    REG_USBCMD |= USBCMD_RUN;
-
-    logf("usb_drv_init() finished");
-    logf("usb id %x", REG_ID);
-    logf("usb dciversion %x", REG_DCIVERSION);
-    logf("usb dccparams %x", REG_DCCPARAMS);
-
-    /* now a bus reset will occur. see bus_reset() */
-    (void)attach;
-}
-
 #ifdef LOGF_ENABLE
 #define XFER_DIR_STR(dir) ((dir) ? "IN" : "OUT")
 #define XFER_TYPE_STR(type) \
@@ -496,25 +449,50 @@ static void log_ep(int ep_num, int ep_dir, char* prefix)
 #define log_ep(...)
 #endif
 
+/* manual: 32.14.1 Device Controller Initialization */
 void usb_drv_init(void)
 {
-#ifdef USB_DETECT_BY_CORE
     /* USB core decides */
-    _usb_drv_init(true);
-#else
-    /* Use bus reset condition */
-    _usb_drv_init(false);
+    usb_drv_reset();
+
+    REG_USBMODE = USBMODE_CTRL_MODE_DEVICE;
+
+#ifdef USB_NO_HIGH_SPEED
+    /* Force device to full speed */
+    /* See 32.9.5.9.2 */
+    REG_PORTSC1 |= PORTSCX_PORT_FORCE_FULL_SPEED;
 #endif
+
+    init_control_queue_heads();
+    memset(td_array, 0, sizeof td_array);
+
+    REG_ENDPOINTLISTADDR = (unsigned int)qh_array;
+    REG_DEVICEADDR = 0;
+
+    /* enable USB interrupts */
+    REG_USBINTR =
+        USBINTR_INT_EN |
+        USBINTR_ERR_INT_EN |
+        USBINTR_PTC_DETECT_EN |
+        USBINTR_RESET_EN;
+
+    usb_drv_int_enable(true);
+
+    /* go go go */
+    REG_USBCMD |= USBCMD_RUN;
+
+    logf("usb_drv_init() finished");
+    logf("usb id %x", REG_ID);
+    logf("usb dciversion %x", REG_DCIVERSION);
+    logf("usb dccparams %x", REG_DCCPARAMS);
+
+    /* now a bus reset will occur. see bus_reset() */
 }
 
 /* fully enable driver */
 void usb_drv_attach(void)
 {
     logf("usb_drv_attach");
-#ifndef USB_DETECT_BY_CORE
-    sleep(HZ/10);
-    _usb_drv_init(true);
-#endif
 }
 
 void usb_drv_exit(void)
@@ -563,17 +541,8 @@ void usb_drv_int(void)
     /* reset interrupt */
     if (status & USBSTS_RESET) {
         REG_USBSTS = USBSTS_RESET;
-
-        if (UNLIKELY(usbintr == USBINTR_RESET_EN)) {
-            /* USB detected - detach and inform */
-            usb_drv_stop();
-            usb_drv_usb_detect_event();
-        }
-        else
-        {
-            bus_reset();
-            usb_core_bus_reset(); /* tell mom */
-        }
+        bus_reset();
+        usb_core_bus_reset(); /* tell mom */
     }
 
     /* port change */

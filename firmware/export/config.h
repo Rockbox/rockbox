@@ -736,7 +736,7 @@ Lyre prototype 1 */
 /* Priority in bootloader is wanted */
 #define HAVE_PRIORITY_SCHEDULING
 #define USB_STATUS_BY_EVENT
-#define USB_DETECT_BY_DRV
+#define USB_DETECT_BY_CORE
 #if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_ARC
 #define INCLUDE_TIMEOUT_API
 #endif
@@ -763,7 +763,7 @@ Lyre prototype 1 */
 #ifdef HAVE_USBSTACK
 #if CONFIG_USBOTG == USBOTG_ARC
 #define USB_STATUS_BY_EVENT
-#define USB_DETECT_BY_DRV
+#define USB_DETECT_BY_CORE
 #define INCLUDE_TIMEOUT_API
 #elif CONFIG_USBOTG == USBOTG_AS3525
 #define USB_STATUS_BY_EVENT
@@ -778,12 +778,6 @@ Lyre prototype 1 */
 #endif /* HAVE_USBSTACK */
 
 #endif /* BOOTLOADER */
-
-#ifdef PHILIPS_SA9200
-/* Instead use the request for a device descriptor to detect a host */
-#undef USB_DETECT_BY_DRV
-#define USB_DETECT_BY_CORE
-#endif
 
 #if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) \
