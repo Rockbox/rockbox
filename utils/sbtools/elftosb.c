@@ -817,6 +817,7 @@ static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
     close(fd);
     if(!src->loaded)
         bug("error loading elf file '%s' (id '%s')\n", src->filename, id);
+    elf_translate_addresses(&src->elf);
 }
 
 static void load_bin_by_id(struct cmd_file_t *cmd_file, const char *id)

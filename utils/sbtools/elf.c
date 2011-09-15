@@ -155,6 +155,21 @@ static struct elf_section_t *elf_add_section(struct elf_params_t *params)
     return sec;
 }
 
+static struct elf_segment_t *elf_add_segment(struct elf_params_t *params)
+{
+    struct elf_segment_t *seg = xmalloc(sizeof(struct elf_section_t));
+    if(params->first_segment == NULL)
+        params->first_segment = params->last_segment = seg;
+    else
+    {
+        params->last_segment->next = seg;
+        params->last_segment = seg;
+    }
+    seg->next = NULL;
+
+    return seg;
+}
+
 void elf_add_load_section(struct elf_params_t *params,
     uint32_t load_addr, uint32_t size, const void *section)
 {
@@ -406,7 +421,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
     }
     /* run through sections */
     printf(user, false, "ELF file:\n");
-    for(int i = 1; i< ehdr.e_shnum; i++)
+    for(int i = 1; i < ehdr.e_shnum; i++)
     {
         uint32_t off = ehdr.e_shoff + i * ehdr.e_shentsize;
         Elf32_Shdr shdr;
@@ -437,7 +452,49 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
         }
         
     }
+    /* run through segments */
+    for(int i = 1; i < ehdr.e_phnum; i++)
+    {
+        uint32_t off = ehdr.e_phoff + i * ehdr.e_phentsize;
+        Elf32_Phdr phdr;
+        memset(&phdr, 0, sizeof(phdr));
+        if(!read(user, off, &phdr, sizeof(phdr)))
+            error_printf("error reading elf segment header");
+        if(phdr.p_type != PT_LOAD)
+            continue;
+        struct elf_segment_t *seg = elf_add_segment(params);
+        seg->vaddr = phdr.p_vaddr;
+        seg->paddr = phdr.p_paddr;
+        seg->vsize = phdr.p_memsz;
+        seg->psize = phdr.p_filesz;
+        printf(user, false, "create segment [%#x,+%#x[ -> [%#x,+%#x[\n",
+            seg->vaddr, seg->vsize, seg->paddr, seg->psize);
+    }
+    
     return true;
+}
+
+uint32_t elf_translate_virtual_address(struct elf_params_t *params, uint32_t addr)
+{
+    struct elf_segment_t *seg = params->first_segment;
+    while(seg)
+    {
+        if(seg->vaddr <= addr && addr < seg->vaddr + seg->vsize)
+            return addr - seg->vaddr + seg->paddr;
+        seg = seg->next;
+    }
+    return addr;
+}
+
+void elf_translate_addresses(struct elf_params_t *params)
+{
+    struct elf_section_t *sec = params->first_section;
+    while(sec)
+    {
+        sec->addr = elf_translate_virtual_address(params, sec->addr);
+        sec = sec->next;
+    }
+    params->start_addr = elf_translate_virtual_address(params, params->start_addr);
 }
 
 bool elf_is_empty(struct elf_params_t *params)
