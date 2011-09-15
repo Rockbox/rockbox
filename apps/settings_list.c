@@ -429,6 +429,8 @@ static int find_setting_by_name(char*name)
 {
     int i = 0;
     const struct settings_list *setting;
+    if (!strcmp(name, "-"))
+        return -1;
     while (i<nb_settings)
     {
         setting = &settings[i];
@@ -446,7 +448,13 @@ static void qs_load_from_cfg(void* var, char*value)
 }
 static char* qs_write_to_cfg(void* setting, char*buf, int buf_len)
 {
-    const struct settings_list *var = &settings[*(int*)setting];
+    int index = *(int*)setting;
+    if (index < 0 || index >= nb_settings - 1)
+    {
+        strlcpy(buf, "-", buf_len);
+        return buf;
+    }
+    const struct settings_list *var = &settings[index];
     strlcpy(buf, var->cfg_name, buf_len);
     return buf;
 }
