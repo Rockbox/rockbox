@@ -219,7 +219,9 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                     case F_T_INT:
                     case F_T_UINT:
                         *(int*)s->setting = data->value.number;
-                        if (s->flags&F_CHOICE_SETTING)
+                        if ((s->flags & F_T_SOUND) == F_T_SOUND)
+                            sound_set(s->sound_setting->setting, data->value.number);
+                        else if (s->flags&F_CHOICE_SETTING)
                             f = s->choice_setting->option_callback;
                         else if (s->flags&F_TABLE_SETTING)
                             f = s->table_setting->option_callback;
