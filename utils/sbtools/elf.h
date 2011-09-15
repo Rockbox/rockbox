@@ -1,3 +1,26 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2011 Amaury Pouly
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+#ifndef __ELF_H__
+#define __ELF_H__
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -67,3 +90,5 @@ void elf_set_start_addr(struct elf_params_t *params, uint32_t addr);
 bool elf_get_start_addr(struct elf_params_t *params, uint32_t *addr);
 int elf_get_nr_sections(struct elf_params_t *params);
 void elf_release(struct elf_params_t *params);
+
+#endif /* __ELF_H__ */

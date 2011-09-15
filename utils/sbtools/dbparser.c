@@ -1,0 +1,626 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2011 Amaury Pouly
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include <stdio.h>
+#include <ctype.h>
+#include <stdint.h>
+#include "dbparser.h"
+
+typedef uint8_t byte;
+
+extern bool g_debug;
+extern void *xmalloc(size_t s);
+extern int convxdigit(char digit, byte *val);
+
+#define bug(...) do { fprintf(stderr, __VA_ARGS__); exit(1); } while(0)
+#define bugp(...) do { fprintf(stderr, __VA_ARGS__); perror(" "); exit(1); } while(0)
+
+enum lexem_type_t
+{
+    LEX_IDENTIFIER,
+    LEX_LPAREN,
+    LEX_RPAREN,
+    LEX_NUMBER,
+    LEX_STRING, /* double-quoted string */
+    LEX_EQUAL,
+    LEX_SEMICOLON,
+    LEX_LBRACE,
+    LEX_RBRACE,
+    LEX_RANGLE,
+    LEX_EOF
+};
+
+struct lexem_t
+{
+    enum lexem_type_t type;
+    char *str;
+    uint32_t num;
+    int line;
+    const char *file;
+};
+
+struct context_t
+{
+    const char *file;
+    char *begin;
+    char *end;
+    char *ptr;
+    int line;
+};
+
+#define parse_error(ctx, ...) \
+    do { fprintf(stderr, "%s:%d: ", ctx->file, ctx->line); \
+        fprintf(stderr, __VA_ARGS__); exit(2); } while(0)
+
+static void advance(struct context_t *ctx, int nr_chars)
+{
+    while(nr_chars--)
+    {
+        if(*(ctx->ptr++) == '\n')
+            ctx->line++;
+    }
+}
+
+static inline bool eof(struct context_t *ctx)
+{
+    return ctx->ptr == ctx->end;
+}
+
+static inline bool next_valid(struct context_t *ctx, int nr)
+{
+    return ctx->ptr + nr < ctx->end;
+}
+
+static inline char cur_char(struct context_t *ctx)
+{
+    return *ctx->ptr;
+}
+
+static inline char next_char(struct context_t *ctx, int nr)
+{
+    return ctx->ptr[nr];
+}
+
+static inline void locate_lexem(struct lexem_t *lex, struct context_t *ctx)
+{
+    lex->file = ctx->file;
+    lex->line = ctx->line;
+}
+
+static void __parse_string(struct context_t *ctx, void *user, void (*emit_fn)(void *user, char c))
+{
+    while(!eof(ctx))
+    {
+        if(cur_char(ctx) == '"')
+            break;
+        else if(cur_char(ctx) == '\\')
+        {
+            advance(ctx, 1);
+            if(eof(ctx))
+                parse_error(ctx, "Unfinished string\n");
+            if(cur_char(ctx) == '\\') emit_fn(user, '\\');
+            else if(cur_char(ctx) == '\'') emit_fn(user, '\'');
+            else if(cur_char(ctx) == '\"') emit_fn(user, '\"');
+            else parse_error(ctx, "Unknown escape sequence \\%c\n", cur_char(ctx));
+            advance(ctx, 1);
+        }
+        else
+        {
+            emit_fn(user, cur_char(ctx));
+            advance(ctx, 1);
+        }
+    }
+    if(eof(ctx) || cur_char(ctx) != '"')
+        parse_error(ctx, "Unfinished string\n");
+    advance(ctx, 1);
+}
+
+static void __parse_string_emit(void *user, char c)
+{
+    char **pstr = (char **)user;
+    *(*pstr)++ = c;
+}
+
+static void __parse_string_count(void *user, char c)
+{
+    (void) c;
+    (*(int *)user)++;
+}
+
+static void parse_string(struct context_t *ctx, struct lexem_t *lexem)
+{
+    locate_lexem(lexem, ctx);
+    /* skip " */
+    advance(ctx, 1);
+    /* compute length */
+    struct context_t cpy_ctx = *ctx;
+    int length = 0;
+    __parse_string(&cpy_ctx, (void *)&length, __parse_string_count);
+    /* parse again */
+    lexem->type = LEX_STRING;
+    lexem->str = xmalloc(length + 1);
+    lexem->str[length] = 0;
+    char *pstr = lexem->str;
+    __parse_string(ctx, (void *)&pstr, __parse_string_emit);
+}
+
+static void parse_ascii_number(struct context_t *ctx, struct lexem_t *lexem)
+{
+    locate_lexem(lexem, ctx);
+    /* skip ' */
+    advance(ctx, 1);
+    /* we expect n<=4 character and then '  */
+    int len = 0;
+    uint32_t value = 0;
+    while(!eof(ctx))
+    {
+        if(cur_char(ctx) != '\'')
+        {
+            value = value << 8 | cur_char(ctx);
+            len++;
+            advance(ctx, 1);
+        }
+        else
+            break;
+    }
+    if(eof(ctx) || cur_char(ctx) != '\'')
+        parse_error(ctx, "Unterminated ascii number literal\n");
+    if(len == 0 || len > 4)
+        parse_error(ctx, "Invalid ascii number literal length: only 1 to 4 characters allowed\n");
+    /* skip ' */
+    advance(ctx, 1);
+    lexem->type = LEX_NUMBER;
+    lexem->num = value;
+}
+
+static void parse_number(struct context_t *ctx, struct lexem_t *lexem)
+{
+    locate_lexem(lexem, ctx);
+    /* check base */
+    int base = 10;
+    if(cur_char(ctx) == '0' && next_valid(ctx, 1) && next_char(ctx, 1) == 'x')
+    {
+        advance(ctx, 2);
+        base = 16;
+    }
+
+    lexem->type = LEX_NUMBER;
+    lexem->num = 0;
+    while(!eof(ctx) && isxdigit(cur_char(ctx)))
+    {
+        if(base == 10 && !isdigit(cur_char(ctx)))
+            break;
+        byte v;
+        if(convxdigit(cur_char(ctx), &v))
+            break;
+        lexem->num = base * lexem->num + v;
+        advance(ctx, 1);
+    }
+}
+
+static void parse_identifier(struct context_t *ctx, struct lexem_t *lexem)
+{
+    locate_lexem(lexem, ctx);
+    /* remember position */
+    char *old = ctx->ptr;
+    while(!eof(ctx) && (isalnum(cur_char(ctx)) || cur_char(ctx) == '_'))
+        advance(ctx, 1);
+    lexem->type = LEX_IDENTIFIER;
+    int len = ctx->ptr - old;
+    lexem->str = xmalloc(len + 1);
+    lexem->str[len] = 0;
+    memcpy(lexem->str, old, len);
+}
+
+static void next_lexem(struct context_t *ctx, struct lexem_t *lexem)
+{
+    #define ret_simple(t, adv) \
+        do {locate_lexem(lexem, ctx); \
+            lexem->type = t; \
+            advance(ctx, adv); \
+            return;} while(0)
+    while(!eof(ctx))
+    {
+        char c = cur_char(ctx);
+        /* skip whitespace */
+        if(c == ' ' || c == '\t' || c == '\n' || c == '\r')
+        {
+            advance(ctx, 1);
+            continue;
+        }
+        /* skip C++ style comments */
+        if(c == '/' && next_valid(ctx, 1) && next_char(ctx, 1) == '/')
+        {
+            while(!eof(ctx) && cur_char(ctx) != '\n')
+                advance(ctx, 1);
+            continue;
+        }
+        /* skip C-style comments */
+        if(c == '/' && next_valid(ctx, 1) && next_char(ctx, 1) == '*')
+        {
+            advance(ctx, 2);
+            while(true)
+            {
+                if(!next_valid(ctx, 1))
+                    parse_error(ctx, "Unterminated comment");
+                if(cur_char(ctx) == '*' && next_char(ctx, 1) == '/')
+                {
+                    advance(ctx, 2);
+                    break;
+                }
+                advance(ctx, 1);
+            }
+            continue;
+        }
+        break;
+    }
+    if(eof(ctx)) ret_simple(LEX_EOF, 0);
+    char c = cur_char(ctx);
+    if(c == '(') ret_simple(LEX_LPAREN, 1);
+    if(c == ')') ret_simple(LEX_RPAREN, 1);
+    if(c == '{') ret_simple(LEX_LBRACE, 1);
+    if(c == '}') ret_simple(LEX_RBRACE, 1);
+    if(c == '>') ret_simple(LEX_RANGLE, 1);
+    if(c == '=') ret_simple(LEX_EQUAL, 1);
+    if(c == ';') ret_simple(LEX_SEMICOLON, 1);
+    if(c == '"') return parse_string(ctx, lexem);
+    if(c == '\'') return parse_ascii_number(ctx, lexem);
+    if(isdigit(c)) return parse_number(ctx, lexem);
+    if(isalpha(c) || c == '_') return parse_identifier(ctx, lexem);
+    parse_error(ctx, "Unexpected character '%c'\n", c);
+    #undef ret_simple
+}
+
+#if 0
+static void log_lexem(struct lexem_t *lexem)
+{
+    switch(lexem->type)
+    {
+        case LEX_EOF: printf("<eof>"); break;
+        case LEX_EQUAL: printf("="); break;
+        case LEX_IDENTIFIER: printf("id(%s)", lexem->str); break;
+        case LEX_LPAREN: printf("("); break;
+        case LEX_RPAREN: printf(")"); break;
+        case LEX_LBRACE: printf("{"); break;
+        case LEX_RBRACE: printf("}"); break;
+        case LEX_SEMICOLON: printf(";"); break;
+        case LEX_NUMBER: printf("num(%d)", lexem->num); break;
+        case LEX_STRING: printf("str(%s)", lexem->str); break;
+        default: printf("<unk>");
+    }
+}
+#endif
+
+struct cmd_source_t *db_find_source_by_id(struct cmd_file_t *cmd_file, const char *id)
+{
+    struct cmd_source_t *src = cmd_file->source_list;
+    while(src)
+    {
+        if(strcmp(src->identifier, id) == 0)
+            return src;
+        src = src->next;
+    }
+    return NULL;
+}
+
+static void generate_default_version(struct sb_version_t *ver)
+{
+    ver->major = 0x999;
+    ver->minor = 0x999;
+    ver->revision = 0x999;
+}
+
+#define INVALID_SB_SUBVERSION   0xffff
+
+static uint16_t parse_sb_subversion(char *str)
+{
+    int len = strlen(str);
+    uint16_t n = 0;
+    if(len == 0 || len > 4)
+        return INVALID_SB_SUBVERSION;
+    for(int i = 0; i < len; i++)
+    {
+        if(!isdigit(str[i]))
+            return INVALID_SB_SUBVERSION;
+        n = n << 4 | (str[i] - '0');
+    }
+    return n;
+}
+
+bool db_parse_sb_version(struct sb_version_t *ver, char *str)
+{
+    int len = strlen(str);
+    int cnt = 0;
+    int pos[2];
+
+    for(int i = 0; i < len; i++)
+    {
+        if(str[i] != '.')
+            continue;
+        if(cnt == 2)
+            return false;
+        pos[cnt++] = i + 1;
+        str[i] = 0;
+    }
+    if(cnt != 2)
+        return false;
+    ver->major = parse_sb_subversion(str);
+    ver->minor = parse_sb_subversion(str + pos[0]);
+    ver->revision = parse_sb_subversion(str + pos[1]);
+    return ver->major != INVALID_SB_SUBVERSION &&
+        ver->minor != INVALID_SB_SUBVERSION &&
+        ver->revision != INVALID_SB_SUBVERSION;
+}
+
+#undef parse_error
+#define parse_error(lexem, ...) \
+    do { fprintf(stderr, "%s:%d: ", lexem.file, lexem.line); \
+        fprintf(stderr, __VA_ARGS__); exit(2); } while(0)
+
+struct cmd_file_t *db_parse_file(const char *file)
+{
+    size_t size;
+    FILE *f = fopen(file, "r");
+    if(f == NULL)
+        bugp("Cannot open file '%s'", file);
+    fseek(f, 0, SEEK_END);
+    size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    char *buf = xmalloc(size);
+    if(fread(buf, size, 1, f) != 1)
+        bugp("Cannot read file '%s'", file);
+    fclose(f);
+
+    if(g_debug)
+        printf("Parsing db file '%s'\n", file);
+    struct cmd_file_t *cmd_file = xmalloc(sizeof(struct cmd_file_t));
+    memset(cmd_file, 0, sizeof(struct cmd_file_t));
+
+    generate_default_version(&cmd_file->product_ver);
+    generate_default_version(&cmd_file->component_ver);
+
+    struct lexem_t lexem;
+    struct context_t ctx;
+    ctx.file = file;
+    ctx.line = 1;
+    ctx.begin = buf;
+    ctx.ptr = buf;
+    ctx.end = buf + size;
+    #define next() next_lexem(&ctx, &lexem)
+    /* init lexer */
+    next();
+    /* options ? */
+    if(lexem.type == LEX_IDENTIFIER && !strcmp(lexem.str, "options"))
+    {
+        next();
+        if(lexem.type != LEX_LBRACE)
+            parse_error(lexem, "'{' expected after 'options'\n");
+
+        while(true)
+        {
+            next();
+            if(lexem.type == LEX_RBRACE)
+                break;
+            if(lexem.type != LEX_IDENTIFIER)
+                parse_error(lexem, "Identifier expected in options\n");
+            char *opt = lexem.str;
+            next();
+            if(lexem.type != LEX_EQUAL)
+                parse_error(lexem, "'=' expected after identifier\n");
+            next();
+            if(!strcmp(opt, "productVersion") || !strcmp(opt, "componentVersion"))
+            {
+                if(lexem.type != LEX_STRING)
+                    parse_error(lexem, "String expected after '='\n");
+                bool ret;
+                if(!strcmp(opt, "productVersion"))
+                    ret = db_parse_sb_version(&cmd_file->product_ver, lexem.str);
+                else
+                    ret = db_parse_sb_version(&cmd_file->component_ver, lexem.str);
+                if(!ret)
+                    parse_error(lexem, "Invalid product/component version");
+            }
+            else
+                parse_error(lexem, "Unknown option '%s'\n", opt);
+            next();
+            if(lexem.type != LEX_SEMICOLON)
+               parse_error(lexem, "';' expected after string\n");
+        }
+        next();
+    }
+    /* sources */
+    if(lexem.type != LEX_IDENTIFIER || strcmp(lexem.str, "sources"))
+        parse_error(lexem, "'sources' expected\n");
+    next();
+    if(lexem.type != LEX_LBRACE)
+        parse_error(lexem, "'{' expected after 'sources'\n");
+
+    while(true)
+    {
+        next();
+        if(lexem.type == LEX_RBRACE)
+            break;
+        struct cmd_source_t *src = xmalloc(sizeof(struct cmd_source_t));
+        memset(src, 0, sizeof(struct cmd_source_t));
+        src->next = cmd_file->source_list;
+        if(lexem.type != LEX_IDENTIFIER)
+            parse_error(lexem, "identifier expected in sources\n");
+        src->identifier = lexem.str;
+        next();
+        if(lexem.type != LEX_EQUAL)
+            parse_error(lexem, "'=' expected after identifier\n");
+        next();
+        if(lexem.type != LEX_STRING)
+            parse_error(lexem, "String expected after '='\n");
+        src->filename = lexem.str;
+        next();
+        if(lexem.type != LEX_SEMICOLON)
+            parse_error(lexem, "';' expected after string\n");
+        if(db_find_source_by_id(cmd_file, src->identifier) != NULL)
+            parse_error(lexem, "Duplicate source identifier\n");
+        /* type filled later */
+        src->type = CMD_SRC_UNK;
+        cmd_file->source_list = src;
+    }
+
+    /* sections */
+    struct cmd_section_t *end_sec = NULL;
+    while(true)
+    {
+        struct cmd_section_t *sec = xmalloc(sizeof(struct cmd_section_t));
+        struct cmd_inst_t *end_list = NULL;
+        memset(sec, 0, sizeof(struct cmd_section_t));
+        next();
+        if(lexem.type == LEX_EOF)
+            break;
+        if(lexem.type != LEX_IDENTIFIER || strcmp(lexem.str, "section") != 0)
+            parse_error(lexem, "'section' expected\n");
+        next();
+        if(lexem.type != LEX_LPAREN)
+            parse_error(lexem, "'(' expected after 'section'\n");
+        next();
+        /* can be a number or a 4 character long string */
+        if(lexem.type == LEX_NUMBER)
+        {
+            sec->identifier = lexem.num;
+        }
+        else
+            parse_error(lexem, "Number expected as section identifier\n");
+        
+        next();
+        if(lexem.type != LEX_RPAREN)
+            parse_error(lexem, "')' expected after section identifier\n");
+        next();
+        if(lexem.type != LEX_LBRACE)
+            parse_error(lexem, "'{' expected after section directive\n");
+        /* commands */
+        while(true)
+        {
+            struct cmd_inst_t *inst = xmalloc(sizeof(struct cmd_inst_t));
+            memset(inst, 0, sizeof(struct cmd_inst_t));
+            next();
+            if(lexem.type == LEX_RBRACE)
+                break;
+            if(lexem.type != LEX_IDENTIFIER)
+                parse_error(lexem, "Instruction expected in section\n");
+            if(strcmp(lexem.str, "load") == 0)
+                inst->type = CMD_LOAD;
+            else if(strcmp(lexem.str, "call") == 0)
+                inst->type = CMD_CALL;
+            else if(strcmp(lexem.str, "jump") == 0)
+                inst->type = CMD_JUMP;
+            else if(strcmp(lexem.str, "mode") == 0)
+                inst->type = CMD_MODE;
+            else
+                parse_error(lexem, "Instruction expected in section\n");
+            next();
+
+            if(inst->type == CMD_LOAD)
+            {
+                if(lexem.type != LEX_IDENTIFIER)
+                    parse_error(lexem, "Identifier expected after instruction\n");
+                inst->identifier = lexem.str;
+                if(db_find_source_by_id(cmd_file, inst->identifier) == NULL)
+                    parse_error(lexem, "Undefined reference to source '%s'\n", inst->identifier);
+                next();
+                if(lexem.type == LEX_RANGLE)
+                {
+                    // load at
+                    inst->type = CMD_LOAD_AT;
+                    next();
+                    if(lexem.type != LEX_NUMBER)
+                        parse_error(lexem, "Number expected for loading address\n");
+                    inst->addr = lexem.num;
+                    next();
+                }
+                if(lexem.type != LEX_SEMICOLON)
+                    parse_error(lexem, "';' expected after command\n");
+            }
+            else if(inst->type == CMD_CALL || inst->type == CMD_JUMP)
+            {
+                if(lexem.type == LEX_IDENTIFIER)
+                {
+                    inst->identifier = lexem.str;
+                    if(db_find_source_by_id(cmd_file, inst->identifier) == NULL)
+                        parse_error(lexem, "Undefined reference to source '%s'\n", inst->identifier);
+                    next();
+                }
+                else if(lexem.type == LEX_NUMBER)
+                {
+                    inst->type = (inst->type == CMD_CALL) ? CMD_CALL_AT : CMD_JUMP_AT;
+                    inst->addr = lexem.num;
+                    next();
+                }
+                else
+                    parse_error(lexem, "Identifier or number expected after jump/load\n");
+                
+                if(lexem.type == LEX_LPAREN)
+                {
+                    next();
+                    if(lexem.type != LEX_NUMBER)
+                        parse_error(lexem, "Expected numeral expression after (\n");
+                    inst->argument = lexem.num;
+                    next();
+                    if(lexem.type != LEX_RPAREN)
+                        parse_error(lexem, "Expected closing brace\n");
+                    next();
+                }
+                if(lexem.type != LEX_SEMICOLON)
+                    parse_error(lexem, "Expected ';' after command\n");
+            }
+            else if(inst->type == CMD_MODE)
+            {
+                if(lexem.type != LEX_NUMBER)
+                    parse_error(lexem, "Number expected after 'mode'\n");
+                inst->argument = lexem.num;
+                next();
+                if(lexem.type != LEX_SEMICOLON)
+                    parse_error(lexem, "Expected ';' after command\n");
+            }
+            else
+                parse_error(lexem, "Internal error");
+            if(end_list == NULL)
+            {
+                sec->inst_list = inst;
+                end_list = inst;
+            }
+            else
+            {
+                end_list->next = inst;
+                end_list = inst;
+            }
+        }
+
+        if(end_sec == NULL)
+        {
+            cmd_file->section_list = sec;
+            end_sec = sec;
+        }
+        else
+        {
+            end_sec->next = sec;
+            end_sec = sec;
+        }
+    }
+    #undef next
+
+    return cmd_file;
+}

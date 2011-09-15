@@ -18,6 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __SB_H__
+#define __SB_H__
 
 #include <stdint.h>
 
@@ -147,3 +149,5 @@ struct sb_instruction_tag_t
     uint32_t len; /* length of the section */
     uint32_t flags; /* section flags */
 } __attribute__((packed));
+
+#endif /* __SB_H__ */
