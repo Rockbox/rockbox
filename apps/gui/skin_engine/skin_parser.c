@@ -1431,6 +1431,7 @@ static bool check_feature_tag(const int type)
  */
 void skin_data_free_buflib_allocs(struct wps_data *wps_data)
 {
+    (void)wps_data;
 #ifdef HAVE_LCD_BITMAP
 #ifndef __PCTOOL__
     struct skin_token_list *list = wps_data->images;
