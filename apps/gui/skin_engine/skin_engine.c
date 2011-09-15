@@ -55,34 +55,7 @@ void theme_init_buffer(void)
 }
 #endif
 
-void settings_apply_skins(void)
-{
-    int i, j;
-    skin_buffer_init(skin_buffer, SKIN_BUFFER_SIZE);
-    
-#ifdef HAVE_LCD_BITMAP
-    skin_backdrop_init();
-    skin_font_init();
-#endif
-    gui_sync_skin_init();
-
-    /* Make sure each skin is loaded */
-    for (i=0; i<SKINNABLE_SCREENS_COUNT; i++)
-    {
-        FOR_NB_SCREENS(j)
-            skin_get_gwps(i, j);
-    }
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    skin_backdrops_preload(); /* should maybe check the retval here... */
-#endif
-    viewportmanager_theme_changed(THEME_STATUSBAR);
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    FOR_NB_SCREENS(i)
-        skin_backdrop_show(sb_get_backdrop(i));
-#endif
-}
-
-
+void skin_data_free_buflib_allocs(struct wps_data *wps_data);
 char* wps_default_skin(enum screen_type screen);
 char* default_radio_skin(enum screen_type screen);
 
@@ -128,6 +101,40 @@ void gui_sync_skin_init(void)
 #endif
         }
     }
+}
+
+void settings_apply_skins(void)
+{
+    int i, j;
+
+    for (i=0; i<SKINNABLE_SCREENS_COUNT; i++)
+    {
+        FOR_NB_SCREENS(j)
+            skin_data_free_buflib_allocs(&skins[j][i].data);
+    }
+
+    skin_buffer_init(skin_buffer, SKIN_BUFFER_SIZE);
+    
+#ifdef HAVE_LCD_BITMAP
+    skin_backdrop_init();
+    skin_font_init();
+#endif
+    gui_sync_skin_init();
+
+    /* Make sure each skin is loaded */
+    for (i=0; i<SKINNABLE_SCREENS_COUNT; i++)
+    {
+        FOR_NB_SCREENS(j)
+            skin_get_gwps(i, j);
+    }
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    skin_backdrops_preload(); /* should maybe check the retval here... */
+#endif
+    viewportmanager_theme_changed(THEME_STATUSBAR);
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    FOR_NB_SCREENS(i)
+        skin_backdrop_show(sb_get_backdrop(i));
+#endif
 }
 
 void skin_load(enum skinnable_screens skin, enum screen_type screen,

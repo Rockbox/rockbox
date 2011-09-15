@@ -1424,12 +1424,12 @@ static bool check_feature_tag(const int type)
     }
 }
 
-/*
- * initial setup of wps_data; does reset everything
- * except fields which need to survive, i.e.
- * 
- **/
-static void skin_data_reset(struct wps_data *wps_data)
+/* This is used to free any buflib allocations before the rest of
+ * wps_data is reset.
+ * The call to this in settings_apply_skins() is the last chance to do
+ * any core_free()'s before wps_data is trashed and those handles lost
+ */
+void skin_data_free_buflib_allocs(struct wps_data *wps_data)
 {
 #ifdef HAVE_LCD_BITMAP
 #ifndef __PCTOOL__
@@ -1442,6 +1442,18 @@ static void skin_data_reset(struct wps_data *wps_data)
         list = list->next;
     }
 #endif
+#endif
+}
+
+/*
+ * initial setup of wps_data; does reset everything
+ * except fields which need to survive, i.e.
+ * Also called if the load fails
+ **/
+static void skin_data_reset(struct wps_data *wps_data)
+{
+    skin_data_free_buflib_allocs(wps_data);
+#ifdef HAVE_LCD_BITMAP
     wps_data->images = NULL;
 #endif
     wps_data->tree = NULL;
