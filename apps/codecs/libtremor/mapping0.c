@@ -228,23 +228,25 @@ static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, int n)
 
 #elif defined CPU_COLDFIRE
 
-#define MAGANG( _mag, _ang, _pcmA, _pcmM, _off )\
+#define MAGANG( _mag, _ang, _off )\
 {\
-    int temp;\
-    asm volatile( "move.l %[ang], %[temp]\n\t"\
-                  "tst.l %[mag]\n\t"\
+    asm volatile( "tst.l %[mag]\n\t"\
                   "bgt.s 1f\n\t"\
-                  "neg.l %[temp]\n\t"\
+                  "neg.l %[ang]\n\t" /* neg sets cc so we might as well jump */ \
+                  "ble.s 2f\n\t"\
+                  ".word 0x51fb\n\t" /* trapf.l, shadow next 2 insns */ \
+                                     /* if we didn't jump, the next test will */ \
+                                     /* false anyway */ \
                   "1:\n\t"\
                   "tst.l %[ang]\n\t"\
                   "bgt.s 2f\n\t"\
-                  "add.l %[mag], %[temp]\n\t"\
-                  "move.l %[temp], (" #_off ", %[pcmM])\n\t"\
+                  "add.l %[mag], %[ang]\n\t"\
+                  "move.l %[ang], (" #_off ", %[pcmM])\n\t"\
                   ".word 0x51fa\n\t" /* trapf.w, shadow next insn */ \
                   "2:\n\t"\
-                  "sub.l %[temp], %[mag]\n\t"\
+                  "sub.l %[ang], %[mag]\n\t"\
                   "move.l %[mag], (%[pcmA])+\n\t"\
-                  : [mag] "+r" ( ( _mag ) ), [ang] "+d" ( ( _ang ) ), [temp] "=&d" (temp),\
+                  : [mag] "+r" ( ( _mag ) ), [ang] "+d" ( ( _ang ) ),\
                     [pcmA] "+a" (pcmA)\
                   : [pcmM] "a" (pcmM)\
                   : "cc", "memory" );\
@@ -262,10 +264,11 @@ static inline void channel_couple(ogg_int32_t *pcmM, ogg_int32_t *pcmA, unsigned
                       [A0] "=r" (A0), [A1] "=r" (A1), [A2] "=r" (A2), [A3] "=r" (A3)
                     : [pcmM] "a" (pcmM), [pcmA] "a" (pcmA) );
 
-      MAGANG( M0, A0, pcmA, pcmM, 0 );
-      MAGANG( M1, A1, pcmA, pcmM, 4 );
-      MAGANG( M2, A2, pcmA, pcmM, 8 );
-      MAGANG( M3, A3, pcmA, pcmM, 12 );
+      /* use offsets instead of autoinc since the store to pcmM is conditional */
+      MAGANG( M0, A0, 0 );
+      MAGANG( M1, A1, 4 );
+      MAGANG( M2, A2, 8 );
+      MAGANG( M3, A3, 12 );
 
       asm volatile( "lea.l (4*4, %[pcmM]), %[pcmM]\n\t"
                     : [pcmM] "+a" (pcmM));
