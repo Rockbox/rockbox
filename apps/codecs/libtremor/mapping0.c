@@ -147,8 +147,10 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
     info->coupling_steps=oggpack_read(opb,8)+1;
     if(info->coupling_steps<=0)goto err_out;
     for(i=0;i<info->coupling_steps;i++){
-      int testM=info->coupling_mag[i]=oggpack_read(opb,ilog(vi->channels));
-      int testA=info->coupling_ang[i]=oggpack_read(opb,ilog(vi->channels));
+      int testM=oggpack_read(opb,ilog(vi->channels));
+      info->coupling_mag[i]=testM;
+      int testA=oggpack_read(opb,ilog(vi->channels));
+      info->coupling_ang[i]=testA;
 
       if(testM<0 || 
          testA<0 || 

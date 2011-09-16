@@ -110,7 +110,7 @@ typedef struct{
 
 typedef struct vorbis_info_mapping0{
   int   submaps;  /* <= 16 */
-  int   chmuxlist[256];   /* up to 256 channels in a Vorbis stream */
+  int   chmuxlist[CHANNELS];   /* up to 256 channels in a Vorbis stream */
   
   int   floorsubmap[16];   /* [mux] submap to floors */
   int   residuesubmap[16]; /* [mux] submap to residue */
@@ -121,8 +121,8 @@ typedef struct vorbis_info_mapping0{
 #endif
 
   int   coupling_steps;
-  int   coupling_mag[256];
-  int   coupling_ang[256];
+  unsigned char coupling_mag[256];
+  unsigned char coupling_ang[256];
 } vorbis_info_mapping0;
 
 #endif
