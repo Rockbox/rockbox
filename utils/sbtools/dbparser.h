@@ -43,7 +43,11 @@ struct bin_param_t
 struct cmd_source_t
 {
     char *identifier;
+    bool is_extern;
+    // <union>
+    int extern_nr;
     char *filename;
+    // </union>
     struct cmd_source_t *next;
     /* for later use */
     enum cmd_source_type_t type;
@@ -72,23 +76,41 @@ struct cmd_inst_t
     struct cmd_inst_t *next;
 };
 
+struct cmd_option_t
+{
+    char *name;
+    bool is_string;
+    /* <union> */
+        uint32_t val;
+        char *str;
+    /* </union> */
+    struct cmd_option_t *next;
+};
+
 struct cmd_section_t
 {
     uint32_t identifier;
-    struct cmd_inst_t *inst_list;
+    bool is_data;
+    // <union>
+        struct cmd_inst_t *inst_list;
+        char *source_id;
+    // </union>
     struct cmd_section_t *next;
+    struct cmd_option_t *opt_list;
 };
 
 struct cmd_file_t
 {
-    struct sb_version_t product_ver;
-    struct sb_version_t component_ver;
+    struct cmd_option_t *opt_list;
+    struct cmd_option_t *constant_list; /* constant all always integers */
     struct cmd_source_t *source_list;
     struct cmd_section_t *section_list;
 };
 
 struct cmd_source_t *db_find_source_by_id(struct cmd_file_t *cmd_file, const char *id);
+struct cmd_option_t *db_find_option_by_id(struct cmd_option_t *opt, const char *name);
 bool db_parse_sb_version(struct sb_version_t *ver, char *str);
+void db_generate_default_sb_version(struct sb_version_t *ver);
 struct cmd_file_t *db_parse_file(const char *file);
 
 #endif /* __DBPARSER__ */

@@ -33,6 +33,7 @@
 #include <time.h>
 #include <stdarg.h>
 #include <strings.h>
+#include <getopt.h>
 
 #include "crypto.h"
 #include "elf.h"
@@ -46,6 +47,8 @@
 #define bugp(a) do { perror("ERROR: "a); exit(1); } while(0)
 
 bool g_debug = false;
+char **g_extern;
+int g_extern_count;
 
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
 
@@ -106,6 +109,16 @@ typedef byte (*key_array_t)[16];
 
 int g_nr_keys;
 key_array_t g_key_array;
+
+static void add_keys(key_array_t ka, int kac)
+{
+    key_array_t new_ka = xmalloc((g_nr_keys + kac) * 16);
+    memcpy(new_ka, g_key_array, g_nr_keys * 16);
+    memcpy(new_ka + g_nr_keys, ka, kac * 16);
+    free(g_key_array);
+    g_key_array = new_ka;
+    g_nr_keys += kac;
+}
 
 static key_array_t read_keys(const char *key_file, int *num_keys)
 {
@@ -168,6 +181,8 @@ static key_array_t read_keys(const char *key_file, int *num_keys)
  * command file to sb conversion
  */
 
+#define SB_INST_DATA    0xff
+
 struct sb_inst_t
 {
     uint8_t inst; /* SB_INST_* */
@@ -186,6 +201,9 @@ struct sb_inst_t
 struct sb_section_t
 {
     uint32_t identifier;
+    bool is_data;
+    bool is_cleartext;
+    // data sections are handled as a single SB_INST_DATA virtual instruction 
     int nr_insts;
     struct sb_inst_t *insts;
     /* for production use */
@@ -221,6 +239,16 @@ static void elf_printf(void *user, bool error, const char *fmt, ...)
     va_end(args);
 }
 
+static void resolve_extern(struct cmd_source_t *src)
+{
+    if(!src->is_extern)
+        return;
+    src->is_extern = false;
+    if(src->extern_nr < 0 || src->extern_nr >= g_extern_count)
+        bug("There aren't enough file on command file to resolve extern(%d)\n", src->extern_nr);
+    src->filename = g_extern[src->extern_nr];
+}
+
 static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
 {
     struct cmd_source_t *src = db_find_source_by_id(cmd_file, id);
@@ -231,6 +259,9 @@ static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
         return;
     if(src->type != CMD_SRC_UNK)
         bug("source '%s' seen both as elf and binary file\n", id);
+    /* resolve potential extern file */
+    resolve_extern(src);
+    /* load it */
     src->type = CMD_SRC_ELF;
     int fd = open(src->filename, O_RDONLY);
     if(fd < 0)
@@ -255,6 +286,9 @@ static void load_bin_by_id(struct cmd_file_t *cmd_file, const char *id)
         return;
     if(src->type != CMD_SRC_UNK)
         bug("source '%s' seen both as elf and binary file\n", id);
+    /* resolve potential extern file */
+    resolve_extern(src);
+    /* load it */
     src->type = CMD_SRC_BIN;
     int fd = open(src->filename, O_RDONLY);
     if(fd < 0)
@@ -274,8 +308,8 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
     struct sb_file_t *sb = xmalloc(sizeof(struct sb_file_t));
     memset(sb, 0, sizeof(struct sb_file_t));
 
-    sb->product_ver = cmd_file->product_ver;
-    sb->component_ver = cmd_file->component_ver;
+    db_generate_default_sb_version(&sb->product_ver);
+    db_generate_default_sb_version(&sb->component_ver);
     
     if(g_debug)
         printf("Applying command file...\n");
@@ -295,103 +329,136 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
     {
         struct sb_section_t *sec = &sb->sections[i];
         sec->identifier = csec->identifier;
-        /* count instructions */
-        struct cmd_inst_t *cinst = csec->inst_list;
-        while(cinst)
-        {
-            if(cinst->type == CMD_LOAD)
-            {
-                load_elf_by_id(cmd_file, cinst->identifier);
-                struct elf_params_t *elf = &db_find_source_by_id(cmd_file, cinst->identifier)->elf;
-                sec->nr_insts += elf_get_nr_sections(elf);
-            }
-            else if(cinst->type == CMD_JUMP || cinst->type == CMD_CALL)
-            {
-                load_elf_by_id(cmd_file, cinst->identifier);
-                struct elf_params_t *elf = &db_find_source_by_id(cmd_file, cinst->identifier)->elf;
-                if(!elf_get_start_addr(elf, NULL))
-                    bug("cannot jump/call '%s' because it has no starting point !\n", cinst->identifier);
-                sec->nr_insts++;
-            }
-            else if(cinst->type == CMD_CALL_AT || cinst->type == CMD_JUMP_AT)
-            {
-                sec->nr_insts++;
-            }
-            else if(cinst->type == CMD_LOAD_AT)
-            {
-                load_bin_by_id(cmd_file, cinst->identifier);
-                sec->nr_insts++;
-            }
-            else if(cinst->type == CMD_MODE)
-            {
-                sec->nr_insts++;
-            }
-            else
-                bug("die\n");
-            
-            cinst = cinst->next;
-        }
 
-        sec->insts = xmalloc(sec->nr_insts * sizeof(struct sb_inst_t));
-        memset(sec->insts, 0, sec->nr_insts * sizeof(struct sb_inst_t));
-        /* flatten */
-        int idx = 0;
-        cinst = csec->inst_list;
-        while(cinst)
+        /* options */
+        do
         {
-            if(cinst->type == CMD_LOAD)
+            struct cmd_option_t *opt = db_find_option_by_id(csec->opt_list, "cleartext");
+            if(opt != NULL)
             {
-                struct elf_params_t *elf = &db_find_source_by_id(cmd_file, cinst->identifier)->elf;
-                struct elf_section_t *esec = elf->first_section;
-                while(esec)
+                if(opt->is_string)
+                    bug("Cleartext section attribute must be an integer\n");
+                if(opt->val != 0 && opt->val != 1)
+                    bug("Cleartext section attribute must be 0 or 1\n");
+                sec->is_cleartext = opt->val;
+            }
+        }while(0);
+
+        if(csec->is_data)
+        {
+            sec->is_data = true;
+            sec->nr_insts = 1;
+            sec->insts = xmalloc(sec->nr_insts * sizeof(struct sb_inst_t));
+            memset(sec->insts, 0, sec->nr_insts * sizeof(struct sb_inst_t));
+
+            load_bin_by_id(cmd_file, csec->source_id);
+            struct bin_param_t *bin = &db_find_source_by_id(cmd_file, csec->source_id)->bin;
+
+            sec->insts[0].inst = SB_INST_DATA;
+            sec->insts[0].size = bin->size;
+            sec->insts[0].data = bin->data;
+        }
+        else
+        {
+            sec->is_data = false;
+            /* count instructions and loads things */
+            struct cmd_inst_t *cinst = csec->inst_list;
+            while(cinst)
+            {
+                if(cinst->type == CMD_LOAD)
                 {
-                    if(esec->type == EST_LOAD)
-                    {
-                        sec->insts[idx].inst = SB_INST_LOAD;
-                        sec->insts[idx].addr = esec->addr;
-                        sec->insts[idx].size = esec->size;
-                        sec->insts[idx++].data = esec->section;
-                    }
-                    else if(esec->type == EST_FILL)
-                    {
-                        sec->insts[idx].inst = SB_INST_FILL;
-                        sec->insts[idx].addr = esec->addr;
-                        sec->insts[idx].size = esec->size;
-                        sec->insts[idx++].pattern = esec->pattern;
-                    }
-                    esec = esec->next;
+                    load_elf_by_id(cmd_file, cinst->identifier);
+                    struct elf_params_t *elf = &db_find_source_by_id(cmd_file, cinst->identifier)->elf;
+                    sec->nr_insts += elf_get_nr_sections(elf);
                 }
+                else if(cinst->type == CMD_JUMP || cinst->type == CMD_CALL)
+                {
+                    load_elf_by_id(cmd_file, cinst->identifier);
+                    struct elf_params_t *elf = &db_find_source_by_id(cmd_file, cinst->identifier)->elf;
+                    if(!elf_get_start_addr(elf, NULL))
+                        bug("cannot jump/call '%s' because it has no starting point !\n", cinst->identifier);
+                    sec->nr_insts++;
+                }
+                else if(cinst->type == CMD_CALL_AT || cinst->type == CMD_JUMP_AT)
+                {
+                    sec->nr_insts++;
+                }
+                else if(cinst->type == CMD_LOAD_AT)
+                {
+                    load_bin_by_id(cmd_file, cinst->identifier);
+                    sec->nr_insts++;
+                }
+                else if(cinst->type == CMD_MODE)
+                {
+                    sec->nr_insts++;
+                }
+                else
+                    bug("die\n");
+                
+                cinst = cinst->next;
             }
-            else if(cinst->type == CMD_JUMP || cinst->type == CMD_CALL)
+
+            sec->insts = xmalloc(sec->nr_insts * sizeof(struct sb_inst_t));
+            memset(sec->insts, 0, sec->nr_insts * sizeof(struct sb_inst_t));
+            /* flatten */
+            int idx = 0;
+            cinst = csec->inst_list;
+            while(cinst)
             {
-                struct elf_params_t *elf = &db_find_source_by_id(cmd_file, cinst->identifier)->elf;
-                sec->insts[idx].argument = cinst->argument;
-                sec->insts[idx].inst = (cinst->type == CMD_JUMP) ? SB_INST_JUMP : SB_INST_CALL;
-                sec->insts[idx++].addr = elf->start_addr;
+                if(cinst->type == CMD_LOAD)
+                {
+                    struct elf_params_t *elf = &db_find_source_by_id(cmd_file, cinst->identifier)->elf;
+                    struct elf_section_t *esec = elf->first_section;
+                    while(esec)
+                    {
+                        if(esec->type == EST_LOAD)
+                        {
+                            sec->insts[idx].inst = SB_INST_LOAD;
+                            sec->insts[idx].addr = esec->addr;
+                            sec->insts[idx].size = esec->size;
+                            sec->insts[idx++].data = esec->section;
+                        }
+                        else if(esec->type == EST_FILL)
+                        {
+                            sec->insts[idx].inst = SB_INST_FILL;
+                            sec->insts[idx].addr = esec->addr;
+                            sec->insts[idx].size = esec->size;
+                            sec->insts[idx++].pattern = esec->pattern;
+                        }
+                        esec = esec->next;
+                    }
+                }
+                else if(cinst->type == CMD_JUMP || cinst->type == CMD_CALL)
+                {
+                    struct elf_params_t *elf = &db_find_source_by_id(cmd_file, cinst->identifier)->elf;
+                    sec->insts[idx].argument = cinst->argument;
+                    sec->insts[idx].inst = (cinst->type == CMD_JUMP) ? SB_INST_JUMP : SB_INST_CALL;
+                    sec->insts[idx++].addr = elf->start_addr;
+                }
+                else if(cinst->type == CMD_JUMP_AT || cinst->type == CMD_CALL_AT)
+                {
+                    sec->insts[idx].argument = cinst->argument;
+                    sec->insts[idx].inst = (cinst->type == CMD_JUMP_AT) ? SB_INST_JUMP : SB_INST_CALL;
+                    sec->insts[idx++].addr = cinst->addr;
+                }
+                else if(cinst->type == CMD_LOAD_AT)
+                {
+                    struct bin_param_t *bin = &db_find_source_by_id(cmd_file, cinst->identifier)->bin;
+                    sec->insts[idx].inst = SB_INST_LOAD;
+                    sec->insts[idx].addr = cinst->addr;
+                    sec->insts[idx].data = bin->data;
+                    sec->insts[idx++].size = bin->size;
+                }
+                else if(cinst->type == CMD_MODE)
+                {
+                    sec->insts[idx].inst = SB_INST_MODE;
+                    sec->insts[idx++].addr = cinst->argument;
+                }
+                else
+                    bug("die\n");
+                
+                cinst = cinst->next;
             }
-            else if(cinst->type == CMD_JUMP_AT || cinst->type == CMD_CALL_AT)
-            {
-                sec->insts[idx].argument = cinst->argument;
-                sec->insts[idx].inst = (cinst->type == CMD_JUMP_AT) ? SB_INST_JUMP : SB_INST_CALL;
-                sec->insts[idx++].addr = cinst->addr;
-            }
-            else if(cinst->type == CMD_LOAD_AT)
-            {
-                struct bin_param_t *bin = &db_find_source_by_id(cmd_file, cinst->identifier)->bin;
-                sec->insts[idx].inst = SB_INST_LOAD;
-                sec->insts[idx].addr = cinst->addr;
-                sec->insts[idx].data = bin->data;
-                sec->insts[idx++].size = bin->size;
-            }
-            else if(cinst->type == CMD_MODE)
-            {
-                sec->insts[idx].inst = SB_INST_MODE;
-                sec->insts[idx++].addr = cinst->argument;
-            }
-            else
-                bug("die\n");
-            
-            cinst = cinst->next;
         }
     }
 
@@ -399,7 +466,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
 }
 
 /**
- * Sb file production
+ * SB file production
  */
 
 static void fill_gaps(struct sb_file_t *sb)
@@ -436,6 +503,16 @@ static void compute_sb_offsets(struct sb_file_t *sb)
         sb->image_size += sizeof(struct sb_instruction_tag_t) / BLOCK_SIZE;
         
         struct sb_section_t *sec = &sb->sections[i];
+
+        if(g_debug)
+        {
+            printf("%s section 0x%08x", sec->is_data ? "Data" : "Boot",
+                sec->identifier);
+            if(sec->is_cleartext)
+                printf(" (cleartext)");
+            printf("\n");
+        }
+        
         sec->file_offset = sb->image_size;
         for(int j = 0; j < sec->nr_insts; j++)
         {
@@ -443,7 +520,7 @@ static void compute_sb_offsets(struct sb_file_t *sb)
             if(inst->inst == SB_INST_CALL || inst->inst == SB_INST_JUMP)
             {
                 if(g_debug)
-                    printf("%s | addr=0x%08x | arg=0x%08x\n",
+                    printf("  %s | addr=0x%08x | arg=0x%08x\n",
                         inst->inst == SB_INST_CALL ? "CALL" : "JUMP", inst->addr, inst->argument);
                 sb->image_size += sizeof(struct sb_instruction_call_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_call_t) / BLOCK_SIZE;
@@ -451,7 +528,7 @@ static void compute_sb_offsets(struct sb_file_t *sb)
             else if(inst->inst == SB_INST_FILL)
             {
                 if(g_debug)
-                    printf("FILL | addr=0x%08x | len=0x%08x | pattern=0x%08x\n",
+                    printf("  FILL | addr=0x%08x | len=0x%08x | pattern=0x%08x\n",
                         inst->addr, inst->size, inst->pattern);
                 sb->image_size += sizeof(struct sb_instruction_fill_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_fill_t) / BLOCK_SIZE;
@@ -459,7 +536,7 @@ static void compute_sb_offsets(struct sb_file_t *sb)
             else if(inst->inst == SB_INST_LOAD)
             {
                 if(g_debug)
-                    printf("LOAD | addr=0x%08x | len=0x%08x\n", inst->addr, inst->size);
+                    printf("  LOAD | addr=0x%08x | len=0x%08x\n", inst->addr, inst->size);
                 /* load header */
                 sb->image_size += sizeof(struct sb_instruction_load_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_load_t) / BLOCK_SIZE;
@@ -470,9 +547,16 @@ static void compute_sb_offsets(struct sb_file_t *sb)
             else if(inst->inst == SB_INST_MODE)
             {
                 if(g_debug)
-                    printf("MODE | mod=0x%08x", inst->addr);
+                    printf("  MODE | mod=0x%08x", inst->addr);
                 sb->image_size += sizeof(struct sb_instruction_mode_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_mode_t) / BLOCK_SIZE;
+            }
+            else if(inst->inst == SB_INST_DATA)
+            {
+                if(g_debug)
+                    printf("  DATA | size=0x%08x\n", inst->size);
+                sb->image_size += ROUND_UP(inst->size, BLOCK_SIZE) / BLOCK_SIZE;
+                sec->sec_size += ROUND_UP(inst->size, BLOCK_SIZE) / BLOCK_SIZE;
             }
             else
                 bug("die on inst %d\n", inst->inst);
@@ -544,7 +628,8 @@ static void produce_sb_section_header(struct sb_section_t *sec,
     sec_hdr->identifier = sec->identifier;
     sec_hdr->offset = sec->file_offset;
     sec_hdr->size = sec->sec_size;
-    sec_hdr->flags = SECTION_BOOTABLE;
+    sec_hdr->flags = (sec->is_data ? 0 : SECTION_BOOTABLE)
+        | (sec->is_cleartext ? SECTION_CLEARTEXT : 0);
 }
 
 static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
@@ -563,7 +648,8 @@ static void produce_section_tag_cmd(struct sb_section_t *sec,
     tag->hdr.flags = is_last ? SB_INST_LAST_TAG : 0;
     tag->identifier = sec->identifier;
     tag->len = sec->sec_size;
-    tag->flags = SECTION_BOOTABLE;
+    tag->flags = (sec->is_data ? 0 : SECTION_BOOTABLE)
+        | (sec->is_cleartext ? SECTION_CLEARTEXT : 0);
     tag->hdr.checksum = instruction_checksum(&tag->hdr);
 }
 
@@ -671,21 +757,24 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
         {
             struct sb_inst_t *inst = &sb->sections[i].insts[j];
             /* command */
-            struct sb_instruction_common_t cmd;
-            produce_sb_instruction(inst, &cmd);
-            if(g_nr_keys > 0)
-                cbc_mac((byte *)&cmd, (byte *)&cmd, sizeof(cmd) / BLOCK_SIZE,
-                    real_key, cur_cbc_mac, &cur_cbc_mac, 1);
-            sha_1_update(&file_sha1, (byte *)&cmd, sizeof(cmd));
-            write(fd, &cmd, sizeof(cmd));
+            if(inst->inst != SB_INST_DATA)
+            {
+                struct sb_instruction_common_t cmd;
+                produce_sb_instruction(inst, &cmd);
+                if(g_nr_keys > 0 && !sb->sections[i].is_cleartext)
+                    cbc_mac((byte *)&cmd, (byte *)&cmd, sizeof(cmd) / BLOCK_SIZE,
+                        real_key, cur_cbc_mac, &cur_cbc_mac, 1);
+                sha_1_update(&file_sha1, (byte *)&cmd, sizeof(cmd));
+                write(fd, &cmd, sizeof(cmd));
+            }
             /* data */
-            if(inst->inst == SB_INST_LOAD)
+            if(inst->inst == SB_INST_LOAD || inst->inst == SB_INST_DATA)
             {
                 uint32_t sz = inst->size + inst->padding_size;
                 byte *data = xmalloc(sz);
                 memcpy(data, inst->data, inst->size);
                 memcpy(data + inst->size, inst->padding, inst->padding_size);
-                if(g_nr_keys > 0)
+                if(g_nr_keys > 0 && !sb->sections[i].is_cleartext)
                     cbc_mac(data, data, sz / BLOCK_SIZE,
                         real_key, cur_cbc_mac, &cur_cbc_mac, 1);
                 sha_1_update(&file_sha1, data, sz);
@@ -706,22 +795,94 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     close(fd);
 }
 
-int main(int argc, const char **argv)
+void usage(void)
 {
-    if(argc != 4)
+    printf("Usage: elftosb [options | file]...\n");
+    printf("Options:\n");
+    printf("  -?/--help:\t\tDisplay this message\n");
+    printf("  -o <file>\tSet output file\n");
+    printf("  -c <file>\tSet command file\n");
+    printf("  -d/--debug\tEnable debug output\n");
+    printf("  -k <file>\t\tAdd key file\n");
+    printf("  -z\t\tAdd zero key\n");
+    exit(1);
+}
+
+static byte g_zero_key[16] = {0};
+
+int main(int argc, char **argv)
+{
+    char *cmd_filename = NULL;
+    char *output_filename = NULL;
+    
+    while(1)
     {
-        printf("Usage: %s <cmd file> <key file> <out file>\n",*argv);
-        printf("To enable debug mode, set environement variable SB_DEBUG to YES\n");
-        return 1;
+        static struct option long_options[] =
+        {
+            {"help", no_argument, 0, '?'},
+            {"debug", no_argument, 0, 'd'},
+            {0, 0, 0, 0}
+        };
+
+        int c = getopt_long(argc, argv, "?do:c:k:z", long_options, NULL);
+        if(c == -1)
+            break;
+        switch(c)
+        {
+            case 'd':
+                g_debug = true;
+                break;
+            case '?':
+                usage();
+                break;
+            case 'o':
+                output_filename = optarg;
+                break;
+            case 'c':
+                cmd_filename = optarg;
+                break;
+            case 'k':
+            {
+                int kac;
+                key_array_t ka = read_keys(optarg, &kac);
+                add_keys(ka, kac);
+                break;
+            }
+            case 'z':
+            {
+                add_keys(&g_zero_key, 1);
+                break;
+            }
+            default:
+                abort();
+        }
     }
 
-    if(strcasecmp(s_getenv("SB_DEBUG"), "YES") == 0)
-        g_debug = true;
+    if(!cmd_filename)
+        bug("You must specify a command file\n");
+    if(!output_filename)
+        bug("You must specify an output file\n");
 
-    g_key_array = read_keys(argv[2], &g_nr_keys);
-    struct cmd_file_t *cmd_file = db_parse_file(argv[1]);
+    g_extern = &argv[optind];
+    g_extern_count = argc - optind;
+
+    if(g_debug)
+    {
+        printf("key: %d\n", g_nr_keys);
+        for(int i = 0; i < g_nr_keys; i++)
+        {
+            for(int j = 0; j < 16; j++)
+                printf(" %02x", g_key_array[i][j]);
+            printf("\n");
+        }
+
+        for(int i = 0; i < g_extern_count; i++)
+            printf("extern(%d)=%s\n", i, g_extern[i]);
+    }
+
+    struct cmd_file_t *cmd_file = db_parse_file(cmd_filename);
     struct sb_file_t *sb_file = apply_cmd_file(cmd_file);
-    produce_sb_file(sb_file, argv[3]);
+    produce_sb_file(sb_file, output_filename);
     
     return 0;
 }

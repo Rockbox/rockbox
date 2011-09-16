@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <string.h>
 #include "dbparser.h"
 
 typedef uint8_t byte;
@@ -45,6 +46,10 @@ enum lexem_type_t
     LEX_LBRACE,
     LEX_RBRACE,
     LEX_RANGLE,
+    LEX_OR,
+    LEX_LSHIFT,
+    LEX_COLON,
+    LEX_LE,
     LEX_EOF
 };
 
@@ -274,6 +279,8 @@ static void next_lexem(struct context_t *ctx, struct lexem_t *lexem)
     }
     if(eof(ctx)) ret_simple(LEX_EOF, 0);
     char c = cur_char(ctx);
+    bool nv = next_valid(ctx, 1);
+    char nc = nv  ? next_char(ctx, 1) : 0;
     if(c == '(') ret_simple(LEX_LPAREN, 1);
     if(c == ')') ret_simple(LEX_RPAREN, 1);
     if(c == '{') ret_simple(LEX_LBRACE, 1);
@@ -281,6 +288,10 @@ static void next_lexem(struct context_t *ctx, struct lexem_t *lexem)
     if(c == '>') ret_simple(LEX_RANGLE, 1);
     if(c == '=') ret_simple(LEX_EQUAL, 1);
     if(c == ';') ret_simple(LEX_SEMICOLON, 1);
+    if(c == ',') ret_simple(LEX_COLON, 1);
+    if(c == '|') ret_simple(LEX_OR, 1);
+    if(c == '<' && nv && nc == '<') ret_simple(LEX_LSHIFT, 2);
+    if(c == '<' && nv && nc == '=') ret_simple(LEX_LE, 2);
     if(c == '"') return parse_string(ctx, lexem);
     if(c == '\'') return parse_ascii_number(ctx, lexem);
     if(isdigit(c)) return parse_number(ctx, lexem);
@@ -304,6 +315,8 @@ static void log_lexem(struct lexem_t *lexem)
         case LEX_SEMICOLON: printf(";"); break;
         case LEX_NUMBER: printf("num(%d)", lexem->num); break;
         case LEX_STRING: printf("str(%s)", lexem->str); break;
+        case LEX_OR: printf("|"); break;
+        case LEX_LSHIFT: printf("<<"); break;
         default: printf("<unk>");
     }
 }
@@ -321,11 +334,15 @@ struct cmd_source_t *db_find_source_by_id(struct cmd_file_t *cmd_file, const cha
     return NULL;
 }
 
-static void generate_default_version(struct sb_version_t *ver)
+struct cmd_option_t *db_find_option_by_id(struct cmd_option_t *opt, const char *name)
 {
-    ver->major = 0x999;
-    ver->minor = 0x999;
-    ver->revision = 0x999;
+    while(opt)
+    {
+        if(strcmp(opt->name, name) == 0)
+            return opt;
+        opt = opt->next;
+    }
+    return NULL;
 }
 
 #define INVALID_SB_SUBVERSION   0xffff
@@ -375,6 +392,68 @@ bool db_parse_sb_version(struct sb_version_t *ver, char *str)
     do { fprintf(stderr, "%s:%d: ", lexem.file, lexem.line); \
         fprintf(stderr, __VA_ARGS__); exit(2); } while(0)
 
+struct lex_ctx_t
+{
+    struct context_t ctx;
+    struct lexem_t lexem;
+};
+
+static inline void next(struct lex_ctx_t *ctx)
+{
+    next_lexem(&ctx->ctx, &ctx->lexem);
+}
+
+static uint32_t parse_term_expr(struct lex_ctx_t *ctx, struct cmd_option_t *const_list)
+{
+    uint32_t ret = 0;
+    if(ctx->lexem.type == LEX_NUMBER)
+        ret = ctx->lexem.num;
+    else if(ctx->lexem.type == LEX_IDENTIFIER)
+    {
+        struct cmd_option_t *c = db_find_option_by_id(const_list, ctx->lexem.str);
+        if(c == NULL)
+            parse_error(ctx->lexem, "Undefined reference to constant '%s'\n", ctx->lexem.str);
+        if(c->is_string)
+            parse_error(ctx->lexem, "Internal error: constant '%s' is not an integer\n", ctx->lexem.str);
+        ret = c->val;
+    }
+    else
+        parse_error(ctx->lexem, "Number or constant identifier expected\n");
+    next(ctx);
+    return ret;
+}
+
+static uint32_t parse_shift_expr(struct lex_ctx_t *ctx, struct cmd_option_t *const_list)
+{
+    uint32_t v = parse_term_expr(ctx, const_list);
+    while(ctx->lexem.type == LEX_LSHIFT)
+    {
+        next(ctx);
+        v <<= parse_term_expr(ctx, const_list);
+    }
+    return v;
+}
+
+static uint32_t parse_or_expr(struct lex_ctx_t *ctx, struct cmd_option_t *const_list)
+{
+    uint32_t v = parse_shift_expr(ctx, const_list);
+    while(ctx->lexem.type == LEX_OR)
+    {
+        next(ctx);
+        v |= parse_shift_expr(ctx, const_list);
+    }
+    return v;
+}
+
+static uint32_t parse_intexpr(struct lex_ctx_t *ctx, struct cmd_option_t *const_list)
+{
+    return parse_or_expr(ctx, const_list);
+}
+
+#define NR_INITIAL_CONSTANTS    4
+static char *init_const_name[NR_INITIAL_CONSTANTS] = {"true", "false", "yes", "no"};
+static uint32_t init_const_value[NR_INITIAL_CONSTANTS] = {1, 0, 1, 0};
+
 struct cmd_file_t *db_parse_file(const char *file)
 {
     size_t size;
@@ -394,19 +473,58 @@ struct cmd_file_t *db_parse_file(const char *file)
     struct cmd_file_t *cmd_file = xmalloc(sizeof(struct cmd_file_t));
     memset(cmd_file, 0, sizeof(struct cmd_file_t));
 
-    generate_default_version(&cmd_file->product_ver);
-    generate_default_version(&cmd_file->component_ver);
+    /* add initial constants */
+    for(int i = 0; i < NR_INITIAL_CONSTANTS; i++)
+    {
+        struct cmd_option_t *opt = xmalloc(sizeof(struct cmd_option_t));
+        memset(opt, 0, sizeof(struct cmd_option_t));
+        opt->name = init_const_name[i];
+        opt->is_string = false;
+        opt->val = init_const_value[i];
+        opt->next = cmd_file->constant_list;
+        cmd_file->constant_list = opt;
+    }
 
-    struct lexem_t lexem;
-    struct context_t ctx;
-    ctx.file = file;
-    ctx.line = 1;
-    ctx.begin = buf;
-    ctx.ptr = buf;
-    ctx.end = buf + size;
-    #define next() next_lexem(&ctx, &lexem)
+    struct lex_ctx_t lctx;
+    lctx.ctx.file = file;
+    lctx.ctx.line = 1;
+    lctx.ctx.begin = buf;
+    lctx.ctx.ptr = buf;
+    lctx.ctx.end = buf + size;
+    #define next() next(&lctx)
+    #define lexem lctx.lexem
     /* init lexer */
     next();
+    /* constants ? */
+    if(lexem.type == LEX_IDENTIFIER && !strcmp(lexem.str, "constants"))
+    {
+        next();
+        if(lexem.type != LEX_LBRACE)
+            parse_error(lexem, "'{' expected after 'constants'\n");
+
+        while(true)
+        {
+            struct cmd_option_t *opt = xmalloc(sizeof(struct cmd_option_t));
+            memset(opt, 0, sizeof(struct cmd_option_t));
+            next();
+            if(lexem.type == LEX_RBRACE)
+                break;
+            if(lexem.type != LEX_IDENTIFIER)
+                parse_error(lexem, "Identifier expected in constants\n");
+            opt->name = lexem.str;
+            next();
+            if(lexem.type != LEX_EQUAL)
+                parse_error(lexem, "'=' expected after identifier\n");
+            next();
+            opt->is_string = false;
+            opt->val = parse_intexpr(&lctx, cmd_file->constant_list);
+            opt->next = cmd_file->constant_list;
+            cmd_file->constant_list = opt;
+            if(lexem.type != LEX_SEMICOLON)
+               parse_error(lexem, "';' expected after string\n");
+        }
+        next();
+    }
     /* options ? */
     if(lexem.type == LEX_IDENTIFIER && !strcmp(lexem.str, "options"))
     {
@@ -416,31 +534,31 @@ struct cmd_file_t *db_parse_file(const char *file)
 
         while(true)
         {
+            struct cmd_option_t *opt = xmalloc(sizeof(struct cmd_option_t));
+            memset(opt, 0, sizeof(struct cmd_option_t));
             next();
             if(lexem.type == LEX_RBRACE)
                 break;
             if(lexem.type != LEX_IDENTIFIER)
                 parse_error(lexem, "Identifier expected in options\n");
-            char *opt = lexem.str;
+            opt->name = lexem.str;
             next();
             if(lexem.type != LEX_EQUAL)
                 parse_error(lexem, "'=' expected after identifier\n");
             next();
-            if(!strcmp(opt, "productVersion") || !strcmp(opt, "componentVersion"))
+            if(lexem.type == LEX_STRING)
             {
-                if(lexem.type != LEX_STRING)
-                    parse_error(lexem, "String expected after '='\n");
-                bool ret;
-                if(!strcmp(opt, "productVersion"))
-                    ret = db_parse_sb_version(&cmd_file->product_ver, lexem.str);
-                else
-                    ret = db_parse_sb_version(&cmd_file->component_ver, lexem.str);
-                if(!ret)
-                    parse_error(lexem, "Invalid product/component version");
+                opt->is_string = true;
+                opt->str = lexem.str;
+                next();
             }
             else
-                parse_error(lexem, "Unknown option '%s'\n", opt);
-            next();
+            {
+                opt->is_string = false;
+                opt->val = parse_intexpr(&lctx, cmd_file->constant_list);
+            }
+            opt->next = cmd_file->opt_list;
+            cmd_file->opt_list = opt;
             if(lexem.type != LEX_SEMICOLON)
                parse_error(lexem, "';' expected after string\n");
         }
@@ -460,7 +578,6 @@ struct cmd_file_t *db_parse_file(const char *file)
             break;
         struct cmd_source_t *src = xmalloc(sizeof(struct cmd_source_t));
         memset(src, 0, sizeof(struct cmd_source_t));
-        src->next = cmd_file->source_list;
         if(lexem.type != LEX_IDENTIFIER)
             parse_error(lexem, "identifier expected in sources\n");
         src->identifier = lexem.str;
@@ -468,16 +585,34 @@ struct cmd_file_t *db_parse_file(const char *file)
         if(lexem.type != LEX_EQUAL)
             parse_error(lexem, "'=' expected after identifier\n");
         next();
-        if(lexem.type != LEX_STRING)
-            parse_error(lexem, "String expected after '='\n");
-        src->filename = lexem.str;
-        next();
+        if(lexem.type == LEX_STRING)
+        {
+            src->is_extern = false;
+            src->filename = lexem.str;
+            next();
+        }
+        else if(lexem.type == LEX_IDENTIFIER && !strcmp(lexem.str, "extern"))
+        {
+            src->is_extern = true;
+            src->filename = "<extern>";
+            next();
+            if(lexem.type != LEX_LPAREN)
+                parse_error(lexem, "'(' expected after 'extern'\n");
+            next();
+            src->extern_nr = parse_intexpr(&lctx, cmd_file->constant_list);
+            if(lexem.type != LEX_RPAREN)
+                parse_error(lexem, "')' expected\n");
+            next();
+        }
+        else
+            parse_error(lexem, "String or 'extern' expected after '='\n");
         if(lexem.type != LEX_SEMICOLON)
-            parse_error(lexem, "';' expected after string\n");
+            parse_error(lexem, "';' expected\n");
         if(db_find_source_by_id(cmd_file, src->identifier) != NULL)
             parse_error(lexem, "Duplicate source identifier\n");
         /* type filled later */
         src->type = CMD_SRC_UNK;
+        src->next = cmd_file->source_list;
         cmd_file->source_list = src;
     }
 
@@ -497,117 +632,143 @@ struct cmd_file_t *db_parse_file(const char *file)
         if(lexem.type != LEX_LPAREN)
             parse_error(lexem, "'(' expected after 'section'\n");
         next();
-        /* can be a number or a 4 character long string */
-        if(lexem.type == LEX_NUMBER)
+        /* can be any number */
+        sec->identifier = parse_intexpr(&lctx, cmd_file->constant_list);
+        /* options ? */
+        if(lexem.type == LEX_SEMICOLON)
         {
-            sec->identifier = lexem.num;
+            do
+            {
+                next();
+                struct cmd_option_t *opt = xmalloc(sizeof(struct cmd_option_t));
+                memset(opt, 0, sizeof(struct cmd_option_t));
+                if(lexem.type != LEX_IDENTIFIER)
+                    parse_error(lexem, "Identifier expected for section option\n");
+                opt->name = lexem.str;
+                next();
+                if(lexem.type != LEX_EQUAL)
+                    parse_error(lexem, "'=' expected after option identifier\n");
+                next();
+                if(lexem.type == LEX_STRING)
+                {
+                    opt->is_string = true;
+                    opt->str = lexem.str;
+                    next();
+                }
+                else
+                {
+                    opt->is_string = false;
+                    opt->val = parse_intexpr(&lctx, cmd_file->constant_list);
+                }
+                opt->next = sec->opt_list;
+                sec->opt_list = opt;
+            }while(lexem.type == LEX_COLON);
         }
-        else
-            parse_error(lexem, "Number expected as section identifier\n");
-        
-        next();
         if(lexem.type != LEX_RPAREN)
             parse_error(lexem, "')' expected after section identifier\n");
         next();
-        if(lexem.type != LEX_LBRACE)
-            parse_error(lexem, "'{' expected after section directive\n");
-        /* commands */
-        while(true)
+        if(lexem.type == LEX_LBRACE)
         {
-            struct cmd_inst_t *inst = xmalloc(sizeof(struct cmd_inst_t));
-            memset(inst, 0, sizeof(struct cmd_inst_t));
-            next();
-            if(lexem.type == LEX_RBRACE)
-                break;
-            if(lexem.type != LEX_IDENTIFIER)
-                parse_error(lexem, "Instruction expected in section\n");
-            if(strcmp(lexem.str, "load") == 0)
-                inst->type = CMD_LOAD;
-            else if(strcmp(lexem.str, "call") == 0)
-                inst->type = CMD_CALL;
-            else if(strcmp(lexem.str, "jump") == 0)
-                inst->type = CMD_JUMP;
-            else if(strcmp(lexem.str, "mode") == 0)
-                inst->type = CMD_MODE;
-            else
-                parse_error(lexem, "Instruction expected in section\n");
-            next();
-
-            if(inst->type == CMD_LOAD)
+            sec->is_data = false;
+            /* commands */
+            while(true)
             {
-                if(lexem.type != LEX_IDENTIFIER)
-                    parse_error(lexem, "Identifier expected after instruction\n");
-                inst->identifier = lexem.str;
-                if(db_find_source_by_id(cmd_file, inst->identifier) == NULL)
-                    parse_error(lexem, "Undefined reference to source '%s'\n", inst->identifier);
+                struct cmd_inst_t *inst = xmalloc(sizeof(struct cmd_inst_t));
+                memset(inst, 0, sizeof(struct cmd_inst_t));
                 next();
-                if(lexem.type == LEX_RANGLE)
+                if(lexem.type == LEX_RBRACE)
+                    break;
+                if(lexem.type != LEX_IDENTIFIER)
+                    parse_error(lexem, "Instruction expected in section\n");
+                if(strcmp(lexem.str, "load") == 0)
+                    inst->type = CMD_LOAD;
+                else if(strcmp(lexem.str, "call") == 0)
+                    inst->type = CMD_CALL;
+                else if(strcmp(lexem.str, "jump") == 0)
+                    inst->type = CMD_JUMP;
+                else if(strcmp(lexem.str, "mode") == 0)
+                    inst->type = CMD_MODE;
+                else
+                    parse_error(lexem, "Instruction expected in section\n");
+                next();
+
+                if(inst->type == CMD_LOAD)
                 {
-                    // load at
-                    inst->type = CMD_LOAD_AT;
-                    next();
-                    if(lexem.type != LEX_NUMBER)
-                        parse_error(lexem, "Number expected for loading address\n");
-                    inst->addr = lexem.num;
-                    next();
-                }
-                if(lexem.type != LEX_SEMICOLON)
-                    parse_error(lexem, "';' expected after command\n");
-            }
-            else if(inst->type == CMD_CALL || inst->type == CMD_JUMP)
-            {
-                if(lexem.type == LEX_IDENTIFIER)
-                {
+                    if(lexem.type != LEX_IDENTIFIER)
+                        parse_error(lexem, "Identifier expected after instruction\n");
                     inst->identifier = lexem.str;
                     if(db_find_source_by_id(cmd_file, inst->identifier) == NULL)
                         parse_error(lexem, "Undefined reference to source '%s'\n", inst->identifier);
                     next();
+                    if(lexem.type == LEX_RANGLE)
+                    {
+                        // load at
+                        inst->type = CMD_LOAD_AT;
+                        next();
+                        inst->addr = parse_intexpr(&lctx, cmd_file->constant_list);
+                    }
+                    if(lexem.type != LEX_SEMICOLON)
+                        parse_error(lexem, "';' expected after command\n");
                 }
-                else if(lexem.type == LEX_NUMBER)
+                else if(inst->type == CMD_CALL || inst->type == CMD_JUMP)
                 {
-                    inst->type = (inst->type == CMD_CALL) ? CMD_CALL_AT : CMD_JUMP_AT;
-                    inst->addr = lexem.num;
-                    next();
+                    if(lexem.type == LEX_IDENTIFIER)
+                    {
+                        inst->identifier = lexem.str;
+                        if(db_find_source_by_id(cmd_file, inst->identifier) == NULL)
+                            parse_error(lexem, "Undefined reference to source '%s'\n", inst->identifier);
+                        next();
+                    }
+                    else
+                    {
+                        inst->type = (inst->type == CMD_CALL) ? CMD_CALL_AT : CMD_JUMP_AT;
+                        inst->addr = parse_intexpr(&lctx, cmd_file->constant_list);
+                    }
+                    
+                    if(lexem.type == LEX_LPAREN)
+                    {
+                        next();
+                        inst->argument = parse_intexpr(&lctx, cmd_file->constant_list);
+                        if(lexem.type != LEX_RPAREN)
+                            parse_error(lexem, "Expected closing brace\n");
+                        next();
+                    }
+                    if(lexem.type != LEX_SEMICOLON)
+                        parse_error(lexem, "';' expected after command\n");
+                }
+                else if(inst->type == CMD_MODE)
+                {
+                    inst->argument = parse_intexpr(&lctx, cmd_file->constant_list);
+                    if(lexem.type != LEX_SEMICOLON)
+                        parse_error(lexem, "Expected ';' after command\n");
                 }
                 else
-                    parse_error(lexem, "Identifier or number expected after jump/load\n");
-                
-                if(lexem.type == LEX_LPAREN)
+                    parse_error(lexem, "Internal error");
+                if(end_list == NULL)
                 {
-                    next();
-                    if(lexem.type != LEX_NUMBER)
-                        parse_error(lexem, "Expected numeral expression after (\n");
-                    inst->argument = lexem.num;
-                    next();
-                    if(lexem.type != LEX_RPAREN)
-                        parse_error(lexem, "Expected closing brace\n");
-                    next();
+                    sec->inst_list = inst;
+                    end_list = inst;
                 }
-                if(lexem.type != LEX_SEMICOLON)
-                    parse_error(lexem, "Expected ';' after command\n");
-            }
-            else if(inst->type == CMD_MODE)
-            {
-                if(lexem.type != LEX_NUMBER)
-                    parse_error(lexem, "Number expected after 'mode'\n");
-                inst->argument = lexem.num;
-                next();
-                if(lexem.type != LEX_SEMICOLON)
-                    parse_error(lexem, "Expected ';' after command\n");
-            }
-            else
-                parse_error(lexem, "Internal error");
-            if(end_list == NULL)
-            {
-                sec->inst_list = inst;
-                end_list = inst;
-            }
-            else
-            {
-                end_list->next = inst;
-                end_list = inst;
+                else
+                {
+                    end_list->next = inst;
+                    end_list = inst;
+                }
             }
         }
+        else if(lexem.type == LEX_LE)
+        {
+            sec->is_data = true;
+            next();
+            if(lexem.type != LEX_IDENTIFIER)
+                parse_error(lexem, "Identifier expected after '<='\n");
+            sec->source_id = lexem.str;
+            next();
+            if(lexem.type != LEX_SEMICOLON)
+                parse_error(lexem, "';' expected after identifier\n");
+        }
+        else
+            parse_error(lexem, "'{' or '<=' expected after section directive\n");
 
         if(end_sec == NULL)
         {
@@ -620,7 +781,13 @@ struct cmd_file_t *db_parse_file(const char *file)
             end_sec = sec;
         }
     }
+    #undef lexem
     #undef next
 
     return cmd_file;
+}
+
+void db_generate_default_sb_version(struct sb_version_t *ver)
+{
+    ver->major = ver->minor = ver->revision = 0x999;
 }
