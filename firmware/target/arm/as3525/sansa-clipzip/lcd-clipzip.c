@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: lcd-clipzip.c 30465 2011-09-06 16:55:52Z bertrik $
  *
  * Copyright (C) 2011 Bertrik Sikken
  *
@@ -145,7 +145,7 @@ static void lcd_init_type0(void)
 }
 
 /* writes a table entry (for type 1 LCDs) */
-static void lcd_write_table(uint8_t val)
+static void lcd_write_nibbles(uint8_t val)
 {
     lcd_write_dat((val >> 4) & 0x0F);
     lcd_write_dat((val >> 0) & 0x0F);
@@ -202,16 +202,11 @@ static void lcd_init_type1(void)
     lcd_write_cmd(0x09);
     lcd_write_dat(0x07);
 
-    /* lcd width/height */
     lcd_write_cmd(0x0A);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x05);
-    lcd_write_dat(0x0F);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x00);
-    lcd_write_dat(0x05);
-    lcd_write_dat(0x0F);
+    lcd_write_nibbles(0);
+    lcd_write_nibbles(LCD_WIDTH - 1);
+    lcd_write_nibbles(0);
+    lcd_write_nibbles(LCD_HEIGHT - 1);
 
     lcd_write_cmd(0x0B);
     lcd_write_dat(0x00);
@@ -220,12 +215,9 @@ static void lcd_init_type1(void)
     lcd_write_dat(0x00);
 
     lcd_write_cmd(0x0E);
-    lcd_write_dat(0x04);
-    lcd_write_dat(0x02);
-    lcd_write_dat(0x02);
-    lcd_write_dat(0x05);
-    lcd_write_dat(0x03);
-    lcd_write_dat(0x0F);
+    lcd_write_nibbles(0x42);
+    lcd_write_nibbles(0x25);
+    lcd_write_nibbles(0x3F);
 
     lcd_write_cmd(0x0F);
     lcd_write_dat(0x0A);
@@ -251,7 +243,7 @@ static void lcd_init_type1(void)
 
     lcd_write_cmd(0x3A);
     for (i = 0; i < 256; i++) {
-        lcd_write_table(curve[i]);
+        lcd_write_nibbles(curve[i]);
     }
 
     lcd_write_cmd(0x3C);
@@ -336,14 +328,10 @@ static void lcd_setup_rect(int x, int x_end, int y, int y_end)
     }
     else {
         lcd_write_cmd(0x0A);
-        lcd_write_dat((x >> 8) & 0xFF);
-        lcd_write_dat((x >> 0) & 0xFF);
-        lcd_write_dat((x_end >> 8) & 0xFF);
-        lcd_write_dat((x_end >> 0) & 0xFF);
-        lcd_write_dat((y >> 8) & 0xFF);
-        lcd_write_dat((y >> 0) & 0xFF);
-        lcd_write_dat((y_end >> 8) & 0xFF);
-        lcd_write_dat((y_end >> 0) & 0xFF);
+        lcd_write_nibbles(x);
+        lcd_write_nibbles(x_end);
+        lcd_write_nibbles(y);
+        lcd_write_nibbles(y_end);
     }
 }
 
@@ -357,9 +345,9 @@ void lcd_brightness(uint8_t red, uint8_t green, uint8_t blue)
     }
     else {
         lcd_write_cmd(0x0E);
-        lcd_write_table(red);
-        lcd_write_table(green);
-        lcd_write_table(blue);
+        lcd_write_nibbles(red);
+        lcd_write_nibbles(green);
+        lcd_write_nibbles(blue);
     }
 }
 
