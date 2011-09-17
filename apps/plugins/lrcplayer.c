@@ -449,7 +449,11 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
         int nword;
         int word_count, word_width;
         const unsigned char *str;
-    } sp, cr;
+    } 
+#ifndef HAVE_LCD_CHARCELLS 
+        sp, 
+#endif
+        cr;
 
     lrc_buffer_used = (lrc_buffer_used+3)&~3; /* 4 bytes aligned */
     lrc_brpos = (struct lrc_brpos *) &lrc_buffer[lrc_buffer_used];
@@ -508,15 +512,19 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
     cr.nword = lrc_line->nword;
     lrc_word = lrc_line->words+cr.nword;
     cr.str = (lrc_word-1)->word;
+#ifndef HAVE_LCD_CHARCELLS
     sp.word_count = 0;
     sp.word_width = 0;
     sp.nword = 0;
     sp.count = 0;
     sp.width = 0;
+#endif
     do {
         cr.count = 0;
         cr.width = 0;
+#ifndef HAVE_LCD_CHARCELLS
         sp.str = NULL;
+#endif
 
         while (1)
         {

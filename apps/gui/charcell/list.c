@@ -54,11 +54,9 @@ void list_draw(struct screen *display, struct gui_synclist *gui_list)
     bool draw_icons = (gui_list->callback_get_item_icon != NULL);
     bool draw_cursor;
     int i;
-    int lines;
     int start, end;
 
     display->set_viewport(NULL);
-    lines = display->getnblines();
 
     display->clear_display();
     start = 0;

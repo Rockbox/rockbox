@@ -619,7 +619,10 @@ static int dirbrowse(void)
 {
     int numentries=0;
     char buf[MAX_PATH];
-    int button, oldbutton;
+    int button;
+#ifdef HAVE_LCD_BITMAP
+    int oldbutton;
+#endif
     bool reload_root = false;
     int lastfilter = *tc.dirfilter;
     bool lastsortcase = global_settings.sort_case;
@@ -663,7 +666,9 @@ static int dirbrowse(void)
 
         button = get_action(CONTEXT_TREE,
                             list_do_action_timeout(&tree_lists, HZ/2));
+#ifdef HAVE_LCD_BITMAP
         oldbutton = button;
+#endif
         gui_synclist_do_button(&tree_lists, &button,LIST_WRAP_UNLESS_HELD);
         tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
         switch ( button ) {
