@@ -46,16 +46,6 @@
     ((long)array[pos] | ((long)array[pos+1] << 8 ) |        \
      ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
-static const unsigned char fat_partition_types[] = {
-    0x0b, 0x1b, /* FAT32 + hidden variant */
-    0x0c, 0x1c, /* FAT32 (LBA) + hidden variant */
-#ifdef HAVE_FAT16SUPPORT
-    0x04, 0x14, /* FAT16 <= 32MB + hidden variant */
-    0x06, 0x16, /* FAT16  > 32MB + hidden variant */
-    0x0e, 0x1e, /* FAT16 (LBA) + hidden variant */
-#endif
-};
-
 static struct partinfo part[NUM_DRIVES*4]; /* space for 4 partitions on 2 drives */
 static int vol_drive[NUM_VOLUMES]; /* mounted to which drive (-1 if none) */
 static struct mutex disk_mutex;
