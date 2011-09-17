@@ -189,9 +189,8 @@ int disk_mount(int drive)
 #endif
     for (; volume != -1 && i<4 && mounted<NUM_VOLUMES_PER_DRIVE; i++)
     {
-        if (memchr(fat_partition_types, pinfo[i].type,
-                   sizeof(fat_partition_types)) == NULL)
-            continue;  /* not an accepted partition type */
+        if (pinfo[i].type == 0 || pinfo[i].type == 5)
+            continue;  /* skip free/extended partitions */
 
 #ifdef MAX_LOG_SECTOR_SIZE
         int j;
