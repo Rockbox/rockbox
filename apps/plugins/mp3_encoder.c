@@ -839,7 +839,7 @@ static int  count_bigv ( short *ix, uint32_t start, uint32_t end, int table0, in
                   int *bits);
 
 
-bool checkString(int fd, char *string)
+static bool checkString(int fd, char *string)
 {
   char temp[4];
 
@@ -849,7 +849,7 @@ bool checkString(int fd, char *string)
   return !rb->memcmp(temp, string, 4);
 }
 
-int Read16BitsLowHigh(int fd)
+static int Read16BitsLowHigh(int fd)
 {
   char first, second;
 
@@ -860,7 +860,7 @@ int Read16BitsLowHigh(int fd)
 }
 
 
-int Read32BitsLowHigh(int fd)
+static int Read32BitsLowHigh(int fd)
 {
   int first  = 0xffff & Read16BitsLowHigh(fd);
   int second = 0xffff & Read16BitsLowHigh(fd);
@@ -868,7 +868,7 @@ int Read32BitsLowHigh(int fd)
   return (second << 16) + first;
 }
 
-int wave_open(void)
+static int wave_open(void)
 {
   unsigned short  wFormatTag;
   /* rockbox: comment 'set but unused" variable
@@ -912,7 +912,7 @@ int wave_open(void)
   return 0;
 }
 
-int read_samples(uint16_t *buffer, int num_samples)
+static int read_samples(uint16_t *buffer, int num_samples)
 {
   uint16_t tmpbuf[MAX_SAMP_PER_FRAME*2]; /*  SAMP_PER_FRAME*MAX_CHANNELS */
   int byte_per_sample = cfg.channels * 2; /* requires bits_per_sample==16 */
@@ -1247,7 +1247,7 @@ void putbits(uint32_t val, uint32_t nbit)
 /*  of the Huffman tables as defined in the IS (Table B.7), and will not   */
 /*  work with any arbitrary tables.                                        */
 /***************************************************************************/
-int choose_table( short *ix, uint32_t begin, uint32_t end, int *bits )
+static int choose_table( short *ix, uint32_t begin, uint32_t end, int *bits )
 {
   uint32_t i;
   int    max, table0, table1;
@@ -1392,7 +1392,7 @@ int count_bigv(short *ix, uint32_t start, uint32_t end, int table0,
 /* Function: Calculation of rzero, count1, address3                      */
 /* (Partitions ix into big values, quadruples and zeros).                */
 /*************************************************************************/
-int calc_runlen( short *ix, side_info_t *si )
+static int calc_runlen( short *ix, side_info_t *si )
 {
   int  p, i, sum = 0;
 
@@ -1438,7 +1438,7 @@ int calc_runlen( short *ix, side_info_t *si )
 /*************************************************************************/
 /*   Function: Quantization of the vector xr ( -> ix)                    */
 /*************************************************************************/
-int quantize_int(int *xr, short *ix, side_info_t *si)
+static int quantize_int(int *xr, short *ix, side_info_t *si)
 {
   unsigned int i, idx, s, frac_pow[] = { 0x10000, 0xd745, 0xb505, 0x9838 };
 
@@ -1470,7 +1470,7 @@ int quantize_int(int *xr, short *ix, side_info_t *si)
 /*************************************************************************/
 /* subdivides the bigvalue region which will use separate Huffman tables */
 /*************************************************************************/
-void subdivide(side_info_t *si)
+static void subdivide(side_info_t *si)
 {
   int scfb, count0, count1;
   
@@ -1498,7 +1498,7 @@ void subdivide(side_info_t *si)
 /*******************************************************************/
 /* Count the number of bits necessary to code the bigvalues region */
 /*******************************************************************/
-int bigv_bitcount(short *ix, side_info_t *gi)
+static int bigv_bitcount(short *ix, side_info_t *gi)
 {
   int b1=0, b2=0, b3=0;
 
@@ -1519,7 +1519,7 @@ int bigv_bitcount(short *ix, side_info_t *gi)
   return b1+b2+b3;
 }
 
-int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
+static int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
 {
   int bits = 10000;
 
@@ -1536,7 +1536,7 @@ int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
 /************************************************************************/
 /* The code selects the best quantStep for a particular set of scalefacs*/
 /************************************************************************/ 
-int inner_loop(int *xr, int max_bits, side_info_t *si)
+static int inner_loop(int *xr, int max_bits, side_info_t *si)
 {
   int bits;
 
@@ -1560,7 +1560,7 @@ int inner_loop(int *xr, int max_bits, side_info_t *si)
   return bits;
 }
 
-void iteration_loop(int *xr, side_info_t *si, int gr_cnt)
+static void iteration_loop(int *xr, side_info_t *si, int gr_cnt)
 {
   int remain, tar_bits, max_bits = cfg.mean_bits;
 
@@ -2072,7 +2072,7 @@ static int find_samplerate_index(uint16_t freq, int *mp3_type)
   return 0;
 }
 
-void init_mp3_encoder_engine(bool stereo, int bitrate, uint16_t sample_rate)
+static void init_mp3_encoder_engine(bool stereo, int bitrate, uint16_t sample_rate)
 {
   uint32_t  avg_byte_per_frame;
 
@@ -2130,7 +2130,7 @@ void init_mp3_encoder_engine(bool stereo, int bitrate, uint16_t sample_rate)
                                           : (cfg.channels == 1 ?  72 : 136));
 }
 
-void set_scale_facs(int *mdct_freq)
+static void set_scale_facs(int *mdct_freq)
 {
   unsigned int i, is, ie, k, s;
   int max_freq_val, avrg_freq_val;
@@ -2163,7 +2163,7 @@ void set_scale_facs(int *mdct_freq)
   }
 }
 
-void compress(void)
+static void compress(void)
 {
   int      i, gr, gr_cnt;
   uint32_t max;
@@ -2369,7 +2369,7 @@ void compress(void)
 int  num_file;
 char mp3_name[80];
 
-void get_mp3_filename(const char *wav_name)
+static void get_mp3_filename(const char *wav_name)
 {
     rb->strlcpy(mp3_name, wav_name, sizeof(mp3_name));
     rb->strlcpy(mp3_name + rb->strlen(mp3_name) - 4, ".mp3", 5);

@@ -75,7 +75,7 @@ static enum themable_icons list_get_icon_cb(int selected_item, void *data)
         return Icon_NOICON;
 }
 
-bool save_changes(void)
+static bool save_changes(void)
 {
     int fd;
     int i;
@@ -123,7 +123,7 @@ bool save_changes(void)
     return true;
 }
 
-void create_view(struct gui_synclist *lists)
+static void create_view(struct gui_synclist *lists)
 {
     unsigned int cnt = 0;
     int i, j;
@@ -168,7 +168,7 @@ void create_view(struct gui_synclist *lists)
     }
 }
 
-bool toggle(int selected_item)
+static bool toggle(int selected_item)
 {
     if (items_list[view_id_list[selected_item]].flag == FL_CATEGORY)
         return false;
@@ -179,7 +179,7 @@ bool toggle(int selected_item)
     return true;
 }
 
-void update_category_string(void)
+static void update_category_string(void)
 {
     if (show_categories)
         rb->strcpy(category_string,"Hide categories");
@@ -187,7 +187,7 @@ void update_category_string(void)
         rb->strcpy(category_string,"Show categories");
 }
 
-enum plugin_status load_file(void)
+static enum plugin_status load_file(void)
 {
     int fd;
     static char temp_line[DESC_SIZE];

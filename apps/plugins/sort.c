@@ -81,7 +81,7 @@ static void sort_buffer(void)
     rb->qsort(pointers, num_entries, sizeof(char *), compare);
 }
 
-int read_buffer(int offset)
+static int read_buffer(int offset)
 {
     int fd;
     char *buf_ptr;

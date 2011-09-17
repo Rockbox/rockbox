@@ -115,12 +115,12 @@ static bool cancel;
 #endif
 
 /* we don't have yet a filetype attribute for image files */
-const char *image_exts[] = {"bmp","jpg","jpe","jpeg","png","ppm"};
+static const char *image_exts[] = {"bmp","jpg","jpe","jpeg","png","ppm"};
 
 /* neither for video ones */
-const char *video_exts[] = {"mpg","mpeg","mpv","m2v"};
+static const char *video_exts[] = {"mpg","mpeg","mpv","m2v"};
 
-void prn(const char *str, int y)
+static void prn(const char *str, int y)
 {
     rb->lcd_puts(0,y,str);
 #ifdef HAVE_REMOTE_LCD
@@ -128,7 +128,7 @@ void prn(const char *str, int y)
 #endif
 }
 
-void update_screen(void)
+static void update_screen(void)
 {
     char buf[32];
 
@@ -165,7 +165,7 @@ void update_screen(void)
 #endif
 }
 
-void traversedir(char* location, char* name)
+static void traversedir(char* location, char* name)
 {
     int button;
     struct dirent *entry;

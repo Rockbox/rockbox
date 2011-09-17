@@ -630,7 +630,7 @@ static void cube_draw(void)
     }
 }
 
-void cleanup(void)
+static void cleanup(void)
 {
 #ifdef USEGSLIB
     grey_release();

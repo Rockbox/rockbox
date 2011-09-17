@@ -48,7 +48,7 @@ struct stWord
 #ifdef ROCKBOX_BIG_ENDIAN
 #define reverse(x) x
 #else
-long reverse (long N) {
+static long reverse (long N) {
     unsigned char B[4];
     B[0] = (N & 0x000000FF) >> 0;
     B[1] = (N & 0x0000FF00) >> 8;

@@ -415,7 +415,7 @@ static struct highscore highscores[NUM_SCORES];
 #define LEVELS_FILE PLUGIN_GAMES_DIR "/snake2.levels"
 #define SCORE_FILE  PLUGIN_GAMES_DATA_DIR "/snake2.score"
 
-int load_all_levels(void)
+static int load_all_levels(void)
 {
     int linecnt = 0;
     int fd;
@@ -465,7 +465,7 @@ int load_all_levels(void)
 ** Completely clear the board of walls and/or snake
 */
 
-void clear_board( void)
+static void clear_board( void)
 {
     int x,y;
 
@@ -478,7 +478,7 @@ void clear_board( void)
     }
 }
 
-int load_level( int level_number )
+static int load_level( int level_number )
 {
     int x,y;
     clear_board();
@@ -510,7 +510,7 @@ int load_level( int level_number )
 ** in the direction buffer. If there is something in the
 ** next part of the buffer then that is moved to the first place
 */
-void get_direction( void )
+static void get_direction( void )
 {
     /*if 1st place is empty*/
     if(ardirectionbuffer[0] != -1)
@@ -532,7 +532,7 @@ void get_direction( void )
 /*
 ** Sets the direction
 */
-void set_direction(int newdir)
+static void set_direction(int newdir)
 {
     if(ardirectionbuffer[0] != newdir)
     {
@@ -552,7 +552,7 @@ void set_direction(int newdir)
     }
 }
 
-void new_level(int level)
+static void new_level(int level)
 {
     load_level(level);
 
@@ -573,7 +573,7 @@ void new_level(int level)
     num_apples_to_got=0;
 }
 
-void init_snake(void)
+static void init_snake(void)
 {
     num_apples_to_get=1;
     if(game_type == 1)
@@ -583,7 +583,7 @@ void init_snake(void)
 }
 
 #if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
-void draw_frame_bitmap(int header_type)
+static void draw_frame_bitmap(int header_type)
 {
     rb->lcd_bitmap(header_type==1? snake2_header1: snake2_header2, 0, 0,
                    BMPWIDTH_snake2_header, BMPHEIGHT_snake2_header);
@@ -602,7 +602,7 @@ void draw_frame_bitmap(int header_type)
 ** Draws the apple. If it doesn't exist then
 ** a new one get's created.
 */
-void draw_apple_bit(int x, int y)
+static void draw_apple_bit(int x, int y)
 {
     rb->lcd_fillrect((CENTER_X+x*MULTIPLIER)+1, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_2, MODIFIER_1);
@@ -610,7 +610,7 @@ void draw_apple_bit(int x, int y)
                      MODIFIER_1, MODIFIER_2);
 }
 
-void draw_apple( void )
+static void draw_apple( void )
 {
     int x,y;
 
@@ -646,7 +646,7 @@ void draw_apple( void )
     * x x *
     * x x *
 */
-void draw_vertical_bit(int x, int y)
+static void draw_vertical_bit(int x, int y)
 {
     rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_2, MODIFIER_1);
@@ -658,7 +658,7 @@ void draw_vertical_bit(int x, int y)
     X X X X
     * * * *
 */
-void draw_horizontal_bit(int x, int y)
+static void draw_horizontal_bit(int x, int y)
 {
     rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
                      MODIFIER_1, MODIFIER_2);
@@ -670,7 +670,7 @@ void draw_horizontal_bit(int x, int y)
     * X X X
     * X X *
 */
-void draw_n_to_e_bit(int x, int y)
+static void draw_n_to_e_bit(int x, int y)
 {
     rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER+2,
                      MODIFIER_2, MODIFIER_2);
@@ -684,7 +684,7 @@ void draw_n_to_e_bit(int x, int y)
    * X X X
    * X X *
 */
-void draw_w_to_s_bit(int x, int y)
+static void draw_w_to_s_bit(int x, int y)
 {
     draw_n_to_e_bit(x,y);
 }
@@ -695,7 +695,7 @@ void draw_w_to_s_bit(int x, int y)
    X X X *
    * X X *
 */
-void draw_n_to_w_bit(int x, int y)
+static void draw_n_to_w_bit(int x, int y)
 {
     rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
                      MODIFIER_2, MODIFIER_2);
@@ -709,7 +709,7 @@ void draw_n_to_w_bit(int x, int y)
    X X X *
    * X X *
 */
-void draw_e_to_s_bit(int x, int y)
+static void draw_e_to_s_bit(int x, int y)
 {
     draw_n_to_w_bit(x, y);
 }
@@ -720,7 +720,7 @@ void draw_e_to_s_bit(int x, int y)
    * * X X
    * * * *
 */
-void draw_s_to_e_bit(int x, int y)
+static void draw_s_to_e_bit(int x, int y)
 {
     rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_2, MODIFIER_2);
@@ -734,7 +734,7 @@ void draw_s_to_e_bit(int x, int y)
    * * X X
    * * * *
 */
-void draw_w_to_n_bit(int x, int y)
+static void draw_w_to_n_bit(int x, int y)
 {
     draw_s_to_e_bit(x,y);
 }
@@ -745,7 +745,7 @@ void draw_w_to_n_bit(int x, int y)
    X X * *
    * * * *
 */
-void draw_e_to_n_bit(int x, int y)
+static void draw_e_to_n_bit(int x, int y)
 {
     rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_2, MODIFIER_2);
@@ -759,21 +759,22 @@ void draw_e_to_n_bit(int x, int y)
    X X * *
    * * * *
 */
-void draw_s_to_w_bit(int x, int y)
+static void draw_s_to_w_bit(int x, int y)
 {
     draw_e_to_n_bit(x, y);
 }
 
-void draw_head_bit(int x, int y)
+static void draw_head_bit(int x, int y)
 {
     rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_1, MODIFIER_1);
 }
 
+#if 0 /* unused */
 /*
 ** Draws a wall/obsticals
 */
-void draw_boundary ( void )
+static void draw_boundary ( void )
 {
     int x, y;
 
@@ -799,11 +800,12 @@ void draw_boundary ( void )
     board[0][HEIGHT-1]       = SOUTH_EAST;
     board[WIDTH-1][HEIGHT-1] = EAST_NORTH;
 }
+#endif
 
 /*
 ** Redraw the entire board
 */
-void redraw (void)
+static void redraw (void)
 {
     int x,y;
 
@@ -860,7 +862,7 @@ void redraw (void)
 ** Draws the snake bit described by nCurrentBit at position x/y
 ** deciding whether it's a corner bit by examing the nPrevious bit
 */
-void draw_snake_bit(int currentbit, int previousbit, int x, int y)
+static void draw_snake_bit(int currentbit, int previousbit, int x, int y)
 {
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     draw_head_bit(x, y);
@@ -942,7 +944,7 @@ void draw_snake_bit(int currentbit, int previousbit, int x, int y)
     }
 }
 
-void redraw_snake(void)
+static void redraw_snake(void)
 {
     int x = tailx, y = taily;
     int olddir, newdir = board[x][y];
@@ -989,7 +991,7 @@ void redraw_snake(void)
 /*
 ** Death 'sequence' and end game stuff.
 */
-void die (void)
+static void die (void)
 {
     int button;
     bool done=false;
@@ -1045,7 +1047,7 @@ void die (void)
 ** sets of the death sequence. What we want is it to only return a true/false
 ** depending on whether a collision occured.
 */
-void collision ( int x, int y )
+static void collision ( int x, int y )
 {
     int bdeath=0;
 
@@ -1096,7 +1098,7 @@ void collision ( int x, int y )
     }
 }
 
-void move( void )
+static void move( void )
 {
     int taildir;
     /*this actually sets the dir variable.*/
@@ -1177,7 +1179,7 @@ void move( void )
         applecountdown--;
 }
 
-void frame (void)
+static void frame (void)
 {
     int olddir, noldx, noldy, temp;
     noldx  = headx;
@@ -1235,7 +1237,7 @@ void frame (void)
     rb->lcd_update();
 }
 
-void game_pause (void)
+static void game_pause (void)
 {
     int button;
 
@@ -1276,7 +1278,7 @@ void game_pause (void)
     }
 }
 
-void game (void)
+static void game (void)
 {
     int button;
 
@@ -1365,7 +1367,7 @@ void game (void)
 
 }
 
-void select_maze(void)
+static void select_maze(void)
 {
     int button;
 
@@ -1440,7 +1442,7 @@ void select_maze(void)
 
 }
 
-void game_init(void)
+static void game_init(void)
 {
     int selection = 0;
 

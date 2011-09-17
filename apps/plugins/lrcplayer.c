@@ -148,7 +148,7 @@ static struct viewport vp_lyrics[NB_SCREENS];
 #else /* HAVE_LCD_BITMAP */
 #define LST_OFF_Y 1
 #endif
-int lrc_set_time(const char *title, const char *unit, long *pval,
+static int lrc_set_time(const char *title, const char *unit, long *pval,
                  int step, int min, int max, int flags)
 {
     const struct button_mapping *lst_contexts[] = {

@@ -802,7 +802,7 @@ void solitaire_init(void);
 enum { MENU_RESUME, MENU_SAVE_AND_QUIT, MENU_QUIT, MENU_USB };
 
 static bool _ingame;
-int solitaire_menu_cb(int action, const struct menu_item_ex *this_item)
+static int solitaire_menu_cb(int action, const struct menu_item_ex *this_item)
 {
     int i = (intptr_t)this_item;
     if( action == ACTION_REQUEST_MENUITEM )
@@ -813,7 +813,7 @@ int solitaire_menu_cb(int action, const struct menu_item_ex *this_item)
     return action;
 }
 
-int solitaire_menu(bool in_game)
+static int solitaire_menu(bool in_game)
 {
     int selected = 0;
     int result = -1;
@@ -907,7 +907,7 @@ int stacks[SUITS];
  * Card handling routines
  */
 
-int next_random_card( card_t *deck )
+static int next_random_card( card_t *deck )
 {
     int i,r;
 
@@ -1012,7 +1012,7 @@ void solitaire_init( void )
 }
 
 /* find the column number in which 'card' can be found */
-int find_card_col( int card )
+static int find_card_col( int card )
 {
     int i;
     int c;
@@ -1044,7 +1044,7 @@ int find_card_col( int card )
 
 /* find the card preceding 'card' */
 /* if it doesn't exist, return NOT_A_CARD */
-int find_prev_card( int card ){
+static int find_prev_card( int card ){
     int i;
 
     for( i=0; i < NUM_CARDS; i++ )
@@ -1056,7 +1056,7 @@ int find_prev_card( int card ){
 }
 
 /* find the last card of a given column */
-int find_last_card( int col )
+static int find_last_card( int col )
 {
     int c;
 
@@ -1085,7 +1085,7 @@ int find_last_card( int col )
 
 enum move { MOVE_OK, MOVE_NOT_OK };
 
-enum move move_card( int dest_col, int src_card )
+static enum move move_card( int dest_col, int src_card )
 {
     /* the column on which to take src_card */
     int src_col;
@@ -1238,7 +1238,7 @@ enum { SOLITAIRE_WIN, SOLITAIRE_SAVE_AND_QUIT, SOLITAIRE_QUIT, SOLITAIRE_USB };
 #define BC_MYSPEED (6*BC_ACCEL)
 #define BC_MXSPEED (6*LCD_HEIGHT/128)
 
-int bouncing_cards( void )
+static int bouncing_cards( void )
 {
     int i, j, x, vx, y, fp_y, fp_vy, button;
 
@@ -1299,7 +1299,7 @@ int bouncing_cards( void )
 /**
  * Game save/load routines
  */
-void get_save_filename( char *buf )
+static void get_save_filename( char *buf )
 {
 #ifdef APPLICATION
     rb->snprintf(buf, sizeof(buf), PLUGIN_DATA_DIR "/sol.save");
@@ -1312,14 +1312,14 @@ void get_save_filename( char *buf )
 #endif
 }
 
-int open_save_file( int flags )
+static int open_save_file( int flags )
 {
     char buf[MAX_PATH];
     get_save_filename( buf );
     return rb->open( buf, flags, 0666);
 }
 
-void delete_save_file( void )
+static void delete_save_file( void )
 {
     char buf[MAX_PATH];
     get_save_filename( buf );
@@ -1329,7 +1329,7 @@ void delete_save_file( void )
 #ifdef write
 #   undef write
 #endif
-int save_write( int fd, const void *buf, size_t count, int *checksum )
+static int save_write( int fd, const void *buf, size_t count, int *checksum )
 {
     size_t i;
     if( rb->write( fd, buf, count ) < (ssize_t)count )
@@ -1342,7 +1342,7 @@ int save_write( int fd, const void *buf, size_t count, int *checksum )
 #ifdef read
 #   undef read
 #endif
-int save_read( int fd, void *buf, size_t count, int *checksum )
+static int save_read( int fd, void *buf, size_t count, int *checksum )
 {
     size_t i;
     if( rb->read( fd, buf, count ) < (ssize_t)count )
@@ -1352,7 +1352,7 @@ int save_read( int fd, void *buf, size_t count, int *checksum )
     return 0;
 }
 
-int save_game( void )
+static int save_game( void )
 {
     int fd = open_save_file( O_CREAT|O_WRONLY|O_TRUNC );
     int checksum = 42;
@@ -1378,7 +1378,7 @@ int save_game( void )
     return 0;
 }
 
-int load_game( void )
+static int load_game( void )
 {
     int checksum, retval;
     
@@ -1422,7 +1422,7 @@ int load_game( void )
  * game will resume.
  */
 
-int solitaire( int skipmenu )
+static int solitaire( int skipmenu )
 {
 
     int i,j;

@@ -47,7 +47,7 @@ bool tidy_loaded_and_changed = false;
 #define DEFAULT_FILES PLUGIN_APPS_DATA_DIR "/disktidy.config"
 #define CUSTOM_FILES  PLUGIN_APPS_DATA_DIR "/disktidy_custom.config"
 
-void add_item(const char* name, int index)
+static void add_item(const char* name, int index)
 {
     char *a;
     struct tidy_type *entry = tidy_types + index;
@@ -115,7 +115,7 @@ static int find_file_string(const char *file, char *last_group)
     return i;
 }
 
-bool tidy_load_file(const char* file)
+static bool tidy_load_file(const char* file)
 {
     int fd = rb->open(file, O_RDONLY), i;
     char buf[MAX_PATH], *str, *remove;
@@ -165,7 +165,7 @@ static bool match(struct tidy_type *tidy_type, char *string, int len)
                         string + len - tidy_type->post) == 0);
 }
 
-bool tidy_remove_item(char *item, int attr)
+static bool tidy_remove_item(char *item, int attr)
 {
     int i;
     int len;
@@ -186,7 +186,7 @@ bool tidy_remove_item(char *item, int attr)
     return ret;
 }
 
-void tidy_lcd_status(const char *name)
+static void tidy_lcd_status(const char *name)
 {
     /* display status text */
     rb->lcd_clear_display();
@@ -198,7 +198,7 @@ void tidy_lcd_status(const char *name)
     rb->lcd_update();
 }
 
-int tidy_path_append_entry(char *path, struct dirent *entry, int *path_length)
+static int tidy_path_append_entry(char *path, struct dirent *entry, int *path_length)
 {
     int name_len = rb->strlen(entry->d_name);
     /* for the special case of path="/" this is one bigger but it's not a problem */
@@ -223,7 +223,7 @@ int tidy_path_append_entry(char *path, struct dirent *entry, int *path_length)
     return 1;
 }
 
-void tidy_path_remove_entry(char *path, int old_path_length, int *path_length)
+static void tidy_path_remove_entry(char *path, int old_path_length, int *path_length)
 {
     path[old_path_length] = '\0';
     *path_length = old_path_length;
@@ -233,7 +233,7 @@ void tidy_path_remove_entry(char *path, int old_path_length, int *path_length)
    removing all files and directories in that directory.
    path is assumed to be array of size MAX_PATH.
 */
-enum tidy_return tidy_removedir(char *path, int *path_length)
+static enum tidy_return tidy_removedir(char *path, int *path_length)
 {
     /* delete directory */
     struct dirent *entry;
@@ -307,7 +307,7 @@ enum tidy_return tidy_removedir(char *path, int *path_length)
 }
 
 /* path is assumed to be array of size MAX_PATH */
-enum tidy_return tidy_clean(char *path, int *path_length)
+static enum tidy_return tidy_clean(char *path, int *path_length)
 {
     /* deletes junk files and dirs left by system */
     struct dirent *entry;
@@ -400,7 +400,7 @@ enum tidy_return tidy_clean(char *path, int *path_length)
     }
 }
 
-enum tidy_return tidy_do(void)
+static enum tidy_return tidy_do(void)
 {
     /* clean disk and display num of items removed */
     enum tidy_return status;
@@ -432,7 +432,7 @@ enum tidy_return tidy_do(void)
     return status;
 }
 
-enum themable_icons get_icon(int item, void * data)
+static enum themable_icons get_icon(int item, void * data)
 {
     (void)data;
     if (tidy_types[item].filestring[0] == '<') /* special type */
@@ -456,7 +456,7 @@ static const char* get_name(int selected_item, void * data,
     return tidy_types[selected_item].filestring;
 }
 
-int list_action_callback(int action, struct gui_synclist *lists)
+static int list_action_callback(int action, struct gui_synclist *lists)
 {
     if (action == ACTION_STD_OK)
     {
@@ -499,7 +499,7 @@ int list_action_callback(int action, struct gui_synclist *lists)
     return action;
 }
 
-enum tidy_return tidy_lcd_menu(void)
+static enum tidy_return tidy_lcd_menu(void)
 {
     int selection = 0;
     enum tidy_return status = TIDY_RETURN_OK;

@@ -68,10 +68,10 @@ static struct configdata config[] =
     {TYPE_ENUM, 0, 8, { .int_p = &sides_index }, "side count", sides_conf}
 };
 
-void dice_init(struct dices* dice);
-void dice_roll(struct dices* dice);
-void dice_print(struct dices* dice, struct screen* display);
-bool dice_menu(struct dices* dice);
+static void dice_init(struct dices* dice);
+static void dice_roll(struct dices* dice);
+static void dice_print(struct dices* dice, struct screen* display);
+static bool dice_menu(struct dices* dice);
 
 /* plugin entry point */
 enum plugin_status plugin_start(const void* parameter) {
@@ -107,13 +107,13 @@ enum plugin_status plugin_start(const void* parameter) {
     }
 }
 
-void dice_init(struct dices* dice){
+static void dice_init(struct dices* dice){
     dice->nb_dices=INITIAL_NB_DICES;
     sides_index=INITIAL_NB_SIDES;
 
 }
 
-void dice_roll(struct dices* dice) {
+static void dice_roll(struct dices* dice) {
     int i;
     dice->total = 0;
     for (i=0; i<dice->nb_dices; i++) {
@@ -122,7 +122,7 @@ void dice_roll(struct dices* dice) {
     }
 }
 
-void dice_print_string_buffer(struct dices* dice, char* buffer,
+static void dice_print_string_buffer(struct dices* dice, char* buffer,
                               int start, int end){
     int i, written;
     for (i=start; i<end; i++) {
@@ -132,7 +132,7 @@ void dice_print_string_buffer(struct dices* dice, char* buffer,
     }
 }
 
-void dice_print(struct dices* dice, struct screen* display){
+static void dice_print(struct dices* dice, struct screen* display){
     char buffer[PRINT_BUFFER_LENGTH];
     /* display characteristics */
     int char_height, char_width;
@@ -171,7 +171,7 @@ void dice_print(struct dices* dice, struct screen* display){
     display->update();
 }
 
-bool dice_menu(struct dices * dice) {
+static bool dice_menu(struct dices * dice) {
     int selection;
     bool menu_quit = false, result = false;
 

@@ -330,7 +330,7 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
 /* 
  * Load saved stopwatch state, if exists.
  */
-void load_stopwatch(void)
+static void load_stopwatch(void)
 {
     int fd;
     
@@ -370,7 +370,7 @@ void load_stopwatch(void)
 /* 
  * Save stopwatch state.
  */
-void save_stopwatch(void)
+static void save_stopwatch(void)
 {
     int fd;
     
