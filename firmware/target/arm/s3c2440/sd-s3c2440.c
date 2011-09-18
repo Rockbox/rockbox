@@ -44,10 +44,6 @@
 #define CARD_NUM_SLOT   0
 #define NUM_CARDS       2
 
-#if NUM_CARDS < NUM_DRIVES
-#error NUM_CARDS less than NUM_DRIVES
-#endif
-
 #define EC_OK                    0
 #define EC_FAILED                1
 #define EC_NOCARD                2
