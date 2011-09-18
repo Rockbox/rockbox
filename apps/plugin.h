@@ -985,6 +985,7 @@ void plugin_tsr(bool (*exit_callback)(bool reenter));
 
 /* defined by the plugin */
 extern const struct plugin_api *rb;
+enum plugin_status plugin_start(const void* parameter);
 enum plugin_status plugin__start(const void* parameter)
     NO_PROF_ATTR;
 
