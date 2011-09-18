@@ -190,6 +190,7 @@ bool skinlist_is_selected_item(void);
 void skinlist_set_cfg(enum screen_type screen,
                       struct listitem_viewport_cfg *cfg);
 const char* skinlist_get_item_text(int offset, bool wrap, char* buf, size_t buf_size);
+int skinlist_get_item_number(void);
 enum themable_icons skinlist_get_item_icon(int offset, bool wrap);
 bool skinlist_needs_scrollbar(enum screen_type screen);
 void skinlist_get_scrollbar(int* nb_item, int* first_shown, int* last_shown);

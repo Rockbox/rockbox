@@ -932,6 +932,11 @@ const char *get_token_value(struct gui_wps *gwps,
             struct listitem *li = (struct listitem *)token->value.data;
             return skinlist_get_item_text(li->offset, li->wrap, buf, buf_size);
         }
+        case SKIN_TOKEN_LIST_ITEM_NUMBER:
+            if (intval)
+                *intval = skinlist_get_item_number();
+            snprintf(buf, buf_size, "%d",skinlist_get_item_number());
+            return buf;
         case SKIN_TOKEN_LIST_ITEM_IS_SELECTED:
             return skinlist_is_selected_item()?"s":"";
         case SKIN_TOKEN_LIST_ITEM_ICON:

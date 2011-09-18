@@ -82,6 +82,12 @@ static int offset_to_item(int offset, bool wrap)
         item = item % current_list->nb_items;
     return item;
 }
+
+int skinlist_get_item_number()
+{
+    return current_drawing_line;
+}
+
 const char* skinlist_get_item_text(int offset, bool wrap, char* buf, size_t buf_size)
 {
     int item = offset_to_item(offset, wrap);
