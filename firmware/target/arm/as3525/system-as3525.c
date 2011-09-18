@@ -270,6 +270,23 @@ void system_init(void)
     dma_init();
 
     ascodec_init();
+    
+#if (CONFIG_CPU == AS3525v2)
+    /* PLL:       disable audio PLL, we use MCLK already */
+    ascodec_write_pmu(0x1A, 7, 0x02);
+    /* DCDC_Cntr: set switching speed of CVDD1/2 power supplies to 1 MHz */
+    ascodec_write_pmu(0x17, 7, 0x30);
+    /* Out_Cntr2: set drive strength of 24 MHz and 32 kHz clocks to 1 mA */
+    ascodec_write_pmu(0x1A, 2, 0xCC);
+    /* CHGVBUS2:  set VBUS threshold to 3.18V and EOC threshold to 30% CC */
+    ascodec_write_pmu(0x19, 2, 0x41);
+#if 0   /* don't set higher voltage until impact on runtime has been checked */
+    /* PVDD1:     set PVDD1 power supply to 2.5 V */
+    ascodec_write_pmu(0x18, 1, 0x35);
+    /* AVDD17:    set AVDD17 power supply to 2.5V */
+    ascodec_write_pmu(0x18, 7, 0x31);
+#endif
+#endif /* (CONFIG_CPU == AS3525v2) */
 
 #ifndef BOOTLOADER
     /* setup isr for microsd monitoring and for fuzev2 scrollwheel irq */

@@ -126,9 +126,6 @@ static void enable_charger(void)
 void powermgmt_init_target(void)
 {
     /* Everything CHARGER, OFF! */
-#if CONFIG_CPU == AS3525v2
-    ascodec_write_pmu(AS3543_CHARGER, 2, 0x01); //EOC current theshold 30%
-#endif
     ascodec_monitor_endofch();
     ascodec_write_charger(TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
 }
