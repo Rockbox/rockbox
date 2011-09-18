@@ -137,7 +137,7 @@ static bool hs_card = false;
 #endif
 
 static struct semaphore transfer_completion_signal;
-static volatile unsigned int transfer_error[NUM_VOLUMES];
+static volatile unsigned int transfer_error[NUM_DRIVES];
 #define PL180_MAX_TRANSFER_ERRORS 10
 
 #define UNALIGNED_NUM_SECTORS 10

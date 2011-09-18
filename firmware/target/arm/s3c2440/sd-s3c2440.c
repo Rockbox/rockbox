@@ -120,7 +120,7 @@ static const char               sd_thread_name[] = "sd";
 static struct mutex             sd_mtx SHAREDBSS_ATTR;
 static struct event_queue       sd_queue;
 static struct semaphore         transfer_completion_signal;
-static volatile unsigned int    transfer_error[NUM_VOLUMES];
+static volatile unsigned int    transfer_error[NUM_DRIVES];
 /* align on cache line size */
 static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE] 
                         __attribute__((aligned(32)));
