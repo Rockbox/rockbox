@@ -349,7 +349,6 @@ void ThemesInstallWindow::accept()
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
 
-    connect(logger, SIGNAL(closed()), this, SLOT(close()));
     connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
     connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
     connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
