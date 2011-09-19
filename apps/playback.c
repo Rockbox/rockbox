@@ -744,7 +744,7 @@ size_t audio_buffer_available(void)
 
 /* Set up the audio buffer for playback
  * filebuflen must be pre-initialized with the maximum size */
-static void audio_reset_buffer_noalloc(void)
+static void audio_reset_buffer_noalloc(void* filebuf)
 {
     /*
      * Layout audio buffer as follows:
@@ -761,7 +761,6 @@ static void audio_reset_buffer_noalloc(void)
     /* Initially set up file buffer as all space available */
     size_t allocsize;
 
-    void* filebuf = core_get_data(audiobuf_handle);
     /* Subtract whatever voice needs */
     allocsize = talkbuf_init(filebuf);
     allocsize = ALIGN_UP(allocsize, sizeof (intptr_t));
@@ -829,30 +828,44 @@ bufpanic:
 /* Buffer must not move. */
 static int shrink_callback(int handle, unsigned hints, void* start, size_t old_size)
 {
+    long offset = audio_current_track()->offset;
+    int status = audio_status();
+    /* TODO: Do it without stopping playback, if possible */
+    /* don't call audio_hard_stop() as it frees this handle */
+    if (thread_self() == audio_thread_id)
+    {   /* inline case Q_AUDIO_STOP (audio_hard_stop() response
+         * if we're in the audio thread */
+        audio_stop_playback();
+        queue_clear(&audio_queue);
+    }
+    else
+        audio_queue_send(Q_AUDIO_STOP, 1);
+#ifdef PLAYBACK_VOICE
+    voice_stop();
+#endif
     /* we should be free to change the buffer now */
     size_t wanted_size = (hints & BUFLIB_SHRINK_SIZE_MASK);
     ssize_t size = (ssize_t)old_size - wanted_size;
+    /* set final buffer size before calling audio_reset_buffer_noalloc() */
+    filebuflen = size;
     switch (hints & BUFLIB_SHRINK_POS_MASK)
     {
         case BUFLIB_SHRINK_POS_BACK:
             core_shrink(handle, start, size);
+            audio_reset_buffer_noalloc(start);
             break;
         case BUFLIB_SHRINK_POS_FRONT:
             core_shrink(handle, start + wanted_size, size);
+            audio_reset_buffer_noalloc(start + wanted_size);
             break;
     }
-    /* set final buffer size before calling audio_start_playback()
-     * (which calls audio_reset_buffer_noalloc() which needs the new size) */
-    filebuflen = size;
-    /* TODO: Do it without stopping playback, if possible */
-    /* don't call audio_hard_stop() as it frees this handle */
-    if (thread_self() == audio_thread_id)
-    {   /* inline case Q_AUDIO_REMAKE_AUDIO_BUFFER to avoid deadlock if
-         * we're in the audio thread */
-        audio_start_playback(0, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
+    if ((status & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY)
+    {
+        if (thread_self() == audio_thread_id)
+            audio_start_playback(offset, 0);  /* inline Q_AUDIO_PLAY */
+        else
+            audio_play(offset);
     }
-    else
-        audio_queue_send(Q_AUDIO_REMAKE_AUDIO_BUFFER, 0);
 
     return BUFLIB_CB_OK;
 }
@@ -870,8 +883,9 @@ static void audio_reset_buffer(void)
         audiobuf_handle = 0;
     }
     audiobuf_handle = core_alloc_maximum("audiobuf", &filebuflen, &ops);
+    unsigned char *filebuf = core_get_data(audiobuf_handle);
 
-    audio_reset_buffer_noalloc();
+    audio_reset_buffer_noalloc(filebuf);
 }
 
 /* Set the buffer margin to begin rebuffering when 'seconds' from empty */
@@ -1935,6 +1949,14 @@ static int audio_fill_file_buffer(void)
     if (play_status == PLAY_STOPPED)
         return LOAD_TRACK_ERR_FAILED;
 
+    trigger_cpu_boost();
+
+    /* Must reset the buffer before use if trashed or voice only - voice
+       file size shouldn't have changed so we can go straight from
+       AUDIOBUF_STATE_VOICED_ONLY to AUDIOBUF_STATE_INITIALIZED */
+    if (buffer_state != AUDIOBUF_STATE_INITIALIZED)
+        audio_reset_buffer();
+
     logf("Starting buffer fill");
 
     int trackstat = audio_load_track();
@@ -2445,17 +2467,7 @@ static void audio_start_playback(size_t offset, unsigned int flags)
         send_event(PLAYBACK_EVENT_START_PLAYBACK, NULL);
     }
 
-    /* Must reset the buffer before use if trashed or voice only - voice
-       file size shouldn't have changed so we can go straight from
-       AUDIOBUF_STATE_VOICED_ONLY to AUDIOBUF_STATE_INITIALIZED */
-    if (buffer_state != AUDIOBUF_STATE_INITIALIZED)
-    {
-        /* If not alloced, that must be done as well */
-        audiobuf_handle <= 0 ?
-            audio_reset_buffer() : audio_reset_buffer_noalloc();
-    }
-
-    /* Fill the buffer, assumed to be setup already here, thus realloc=false */
+    /* Fill the buffer */
     int trackstat = audio_fill_file_buffer();
 
     if (trackstat >= LOAD_TRACK_OK)
