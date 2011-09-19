@@ -59,3 +59,16 @@ ok(defined($l) && ($c == 6) && ($l == 8), "Found message in buffer");
 $ipod->{-inbuf} = "\x00\xFF\x55\x00\xFF\xFF\xFF\x55\x04\x00\x02\x00\x06\xF4\x00";
 $m = $ipod->_message();
 ok(defined($m) && ($ipod->{-inbuf} eq "\x00"), "Retrieved message from buffer");
+
+# Return two messages from buffer
+$ipod->{-inbuf} = "\xffU\x04\x00\x02\x00\x13\xe7\xffU\x02\x00\x14\xea";
+$m = $ipod->_message();
+subtest "First message" => sub {
+    ok(defined($m), "Message received");
+    is($m, "\xffU\x04\x00\x02\x00\x13\xe7");
+};
+$m = $ipod->_message();
+subtest "Second message" => sub {
+    ok(defined($m), "Message received");
+    is($m, "\xffU\x02\x00\x14\xea");
+};

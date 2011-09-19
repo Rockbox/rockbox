@@ -83,12 +83,31 @@
             return; \
         }} while(0)
 
+/* Check for authenticated state, and return an ACK Not
+ * Authenticated on failure.
+ *
+ * Used for Lingo 0x00
+ */
+#define CHECKAUTH0 do { \
+        if (!DEVICE_AUTHENTICATED) { \
+            cmd_ack_mode0(cmd, IAP_ACK_NO_AUTHEN); \
+            return; \
+        }} while(0)
+
+/* MS_TO_TICKS converts a milisecond time period into the
+ * corresponding amount of ticks. If the time period cannot
+ * be accurately measured in ticks it will round up.
+ */
+#if (HZ>1000)
+#error "HZ is >1000, please fix MS_TO_TICKS"
+#endif
 #define MS_PER_HZ (1000/HZ)
+#define MS_TO_TICKS(x) (((x)+MS_PER_HZ-1)/MS_PER_HZ)
 /* IAP specifies a timeout of 25ms for traffic from a device to the iPod.
  * Depending on HZ this cannot be accurately measured. Find out the next
  * best thing.
  */
-#define IAP_PKT_TIMEOUT ((25+MS_PER_HZ-1)/MS_PER_HZ)
+#define IAP_PKT_TIMEOUT (MS_TO_TICKS(25))
 
 #define IAP_ACK_OK          (0x00)  /* Success */
 #define IAP_ACK_UNKNOWN_DB  (0x01)  /* Unknown Database Category */
@@ -153,7 +172,7 @@ static enum interface_state interface_state = IST_STANDARD;
  * of 0 means unsupported
  */
 static unsigned char lingo_versions[32][2] = {
-    {1, 0},     /* General lingo, 0x00 */
+    {1, 1},     /* General lingo, 0x00 */
     {0, 0},     /* Microphone lingo, 0x01, unsupported */
     {1, 1},     /* Simple remote lingo, 0x02 */
     {1, 0},     /* Display remote lingo, 0x03 */
@@ -164,25 +183,36 @@ static unsigned char lingo_versions[32][2] = {
 #define LINGO_MAJOR(x) (lingo_versions[(x)&0x1f][0])
 #define LINGO_MINOR(x) (lingo_versions[(x)&0x1f][1])
 
-/* The list of lingoes an attached device has negotiated using
- * Identify or IdentifyDeviceLingoes
- */
-static uint32_t device_lingoes = 0;
-#define DEVICE_LINGO_SUPPORTED(x) (device_lingoes & BIT_N((x)&0x1f))
-
 /* States of the authentication state machine */
 enum authen_state {
     AUST_NONE,      /* Initial state, no message sent */
     AUST_INIT,      /* Remote side has requested authentication */
     AUST_CERTREQ,   /* Remote certificate requested */
+    AUST_CERTBEG,   /* Certificate is being received */
     AUST_CERTDONE,  /* Certificate received */
     AUST_CHASENT,   /* Challenge sent */
     AUST_CHADONE,   /* Challenge response received */
     AUST_AUTH,      /* Authentication complete */
 };
-/* State of authentication device->iPod */
-static enum authen_state device_ipod_auth = AUST_NONE;
-#define DEVICE_AUTHENTICATED (device_ipod_auth == AUST_AUTH)
+/* State of authentication */
+struct auth_t {
+    enum authen_state state;        /* Current state of authentication */
+    unsigned char max_section;      /* The maximum number of certificate sections */
+    unsigned char next_section;     /* The next expected section number */
+};
+
+/* A struct describing an attached device and it's current
+ * state
+ */
+static struct device_t {
+    struct auth_t auth;             /* Authentication state */
+    uint32_t lingoes;               /* Negotiated lingoes */
+    uint32_t notifications;         /* Requested notifications */
+    bool do_notify;                 /* Notifications enabled */
+} device;
+#define DEVICE_AUTHENTICATED (device.auth.state == AUST_AUTH)
+#define DEVICE_AUTH_RUNNING (device.auth.state != AUST_NONE)
+#define DEVICE_LINGO_SUPPORTED(x) (device.lingoes & BIT_N((x)&0x1f))
 
 static void put_u32(unsigned char *buf, uint32_t data)
 {
@@ -197,14 +227,30 @@ static uint32_t get_u32(const unsigned char *buf)
     return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
 }
 
+static void reset_auth(struct auth_t* auth)
+{
+    auth->state = AUST_NONE;
+    auth->max_section = 0;
+    auth->next_section = 0;
+}
+
+static void reset_device(struct device_t* device)
+{
+    reset_auth(&(device->auth));
+    device->lingoes = 0;
+    device->notifications = 0;
+    device->do_notify = false;
+}
+
 static void iap_task(void)
 {
     static int count = 0;
 
-    count += iap_pollspeed;
-    if (count < (500/10)) return;
+    /* Schedule a call to iap_periodic every 100ms */
 
-    /* exec every 500ms if pollspeed == 1 */
+    count += 1;
+    if (count < MS_TO_TICKS(100)) return;
+
     count = 0;
     queue_post(&button_queue, SYS_IAP_PERIODIC, 0);
 }
@@ -219,11 +265,12 @@ static void iap_track_changed(void *ignored)
 void iap_setup(int ratenum)
 {
     iap_bitrate_set(ratenum);
-    iap_pollspeed = 0;
+    iap_pollspeed = 1;
     iap_remotetick = true;
     iap_updateflag = false;
     iap_changedctr = 0;
     iap_setupflag = true;
+    reset_device(&device);
     iap_remotebtn = BUTTON_NONE;
     tick_add_task(iap_task);
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, iap_track_changed);
@@ -384,8 +431,53 @@ bool iap_getc(unsigned char x)
 
 void iap_periodic(void)
 {
+    static int count;
+
     if(!iap_setupflag) return;
-    if(!iap_pollspeed) return;
+
+    /* Handle pending authentication tasks
+     */
+    switch (device.auth.state)
+    {
+        case AUST_INIT:
+        {
+            /* Send out GetDevAuthenticationInfo */
+            unsigned char data[] = {0x00, 0x14};
+
+            iap_send_pkt(data, sizeof(data));
+            device.auth.state = AUST_CERTREQ;
+            break;
+        }
+
+        case AUST_CERTDONE:
+        {
+            /* Send out GetDevAuthenticationSignature, with
+             * 20 bytes of challenge and a retry counter of 1
+             */
+            unsigned char data[] = {0x00, 0x17, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x01};
+
+            iap_send_pkt(data, sizeof(data));
+            device.auth.state = AUST_CHASENT;
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+
+
+    if (!device.do_notify) return;
+    if (device.notifications == 0) return;
+
+    /* Even if iap_periodic is called every 100ms, notifications
+     * are sent on a longer timescale.
+     */
+    count += iap_pollspeed;
+    if (count < 5) return;
+
+    count = 0;
     
     /* PlayStatusChangeNotification */
     unsigned char data[] = {0x04, 0x00, 0x27, 0x04, 0x00, 0x00, 0x00, 0x00};
@@ -503,8 +595,11 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
              */
             CHECKLEN0(3);
 
-            /* Issuing this command exits any extended interface states */
+            /* Issuing this command exits any extended interface states
+             * and resets authentication
+             */
             interface_state_change(IST_STANDARD);
+            reset_auth(&(device.auth));
             
             switch (lingo) {
                 case 0x04:
@@ -530,15 +625,15 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             }
 
             if (lingo < 32) {
-                device_lingoes = BIT_N(lingo);
+                device.lingoes = BIT_N(lingo);
                 if (lingo == 0) {
                     /* For historical reasons, Identify with a Lingo of 0x00 also
                      * enables access to Lingo 0x02
                      */
-                    device_lingoes = 0 | BIT_N(0x02);
+                    device.lingoes = 0 | BIT_N(0x02);
                 }
             } else {
-                device_lingoes = 0;
+                device.lingoes = 0;
             }
             break;
         }
@@ -840,11 +935,13 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          * IAP_ACK_OK
          *
          * Returns on failure:
-         * IAP_CMD_FAILED
+         * IAP_ACK_CMD_FAILED
          */
         case 0x13:
         {
             uint32_t lingoes = get_u32(&buf[2]);
+            uint32_t options = get_u32(&buf[6]);
+            uint32_t deviceid = get_u32(&buf[0x0A]);
             bool seen_unsupported = false;
             unsigned char i;
 
@@ -871,13 +968,40 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
                 seen_unsupported = true;
             }
 
-            device_lingoes = 0;
+            /* Specifying a deviceid without requesting authentication is
+             * an error
+             */
+            if (deviceid && !(options & 0x03))
+                seen_unsupported = true;
+
+            /* Specifying authentication without a deviceid is an error */
+            if (!deviceid && (options & 0x03))
+                seen_unsupported = true;
+
+            device.lingoes = 0;
             if (seen_unsupported) {
                 cmd_ack_mode0(cmd, IAP_ACK_CMD_FAILED);
+                break;
             } else {
-                cmd_ok_mode0(cmd);
-                device_lingoes = lingoes;
+                device.lingoes = lingoes;
+                /* Seeing a valid IdentifyDeviceLingoes packet resets
+                 * authentication
+                 */
+                reset_auth(&(device.auth));
             }
+
+            /* If a new authentication is requested, start the auth
+             * process.
+             * The periodic handler will take care of sending out the
+             * GetDevAuthenticationInfo packet
+             */
+            if (deviceid && (options & 0x03) && !DEVICE_AUTH_RUNNING) {
+                reset_auth(&(device.auth));
+                device.auth.state = AUST_INIT;
+            }
+
+            cmd_ok_mode0(cmd);
+
 
 #if 0
             /* Bit 5: RF Transmitter lingo */
@@ -908,32 +1032,269 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             break;
         }
 
-        /* RetDevAuthenticationInfo */
+        /* GetDevAuthenticationInfo (0x14)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* RetDevAuthenticationInfo (0x15)
+         *
+         * Send certificate information from the device to the iPod.
+         * The certificate may come in multiple parts and has
+         * to be reassembled.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x15
+         * 0x02: Authentication major version
+         * 0x03: Authentication minor version
+         * 0x04: Certificate current section index
+         * 0x05: Certificate maximum section index
+         * 0x06-0xNN: Certificate data
+         *
+         * Returns on success:
+         * IAP_ACK_OK for intermediate sections
+         * AckDevAuthenticationInfo for the last section
+         *
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAMETER
+         * AckDevAuthenticationInfo for version mismatches
+         *
+         */
         case 0x15:
         {
-            /* AckDevAuthenticationInfo */
-            unsigned char data0[] = {0x00, 0x16, 0x00};
-            iap_send_pkt(data0, sizeof(data0));
-            /* GetAccessoryInfo */
-            unsigned char data1[] = {0x00, 0x27, 0x00};
-            iap_send_pkt(data1, sizeof(data1));
-            /* AckDevAuthenticationStatus, mandatory to enable some hardware */
-            unsigned char data2[] = {0x00, 0x19, 0x00};
-            iap_send_pkt(data2, sizeof(data2));
-            if (radio_present == 1)
-            {
-                /* GetTunerCaps */
-                unsigned char data3[] = {0x07, 0x01};
-                iap_send_pkt(data3, sizeof(data3));
+            /* There are two formats of this packet. One with only
+             * the version information bytes (for Auth version 1.0)
+             * and the long form shown above
+             */
+            CHECKLEN0(4);
+
+            if (!DEVICE_AUTH_RUNNING) {
+                cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+                break;
             }
-            iap_set_remote_volume();
+
+            /* We only support version 2.0 */
+            if ((buf[2] != 2) || (buf[3] != 0)) {
+                /* Version mismatches are signalled by AckDevAuthenticationInfo
+                 * with the status set to Authentication Information unsupported
+                 */
+                unsigned char data[] = {0x00, 0x16, 0x08};
+
+                reset_auth(&(device.auth));
+                iap_send_pkt(data, sizeof(data));
+                break;
+            }
+
+            /* There must be at least one byte of certificate data
+             * in the packet
+             */
+            CHECKLEN0(7);
+
+            switch (device.auth.state)
+            {
+                /* This is the first packet. Note the maximum section number
+                 * so we can check it later.
+                 */
+                case AUST_CERTREQ:
+                {
+                    device.auth.max_section = buf[5];
+                    device.auth.state = AUST_CERTBEG;
+
+                    /* Intentional fall-through */
+                }
+                /* All following packets */
+                case AUST_CERTBEG:
+                {
+                    /* Check if this is the expected section */
+                    if (buf[4] != device.auth.next_section) {
+                        cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+                        break;
+                    }
+
+                    /* Is this the last section? */
+                    if (device.auth.next_section == device.auth.max_section) {
+                        /* If we could really do authentication we'd have to
+                         * check the certificate here. Since we can't, just acknowledge
+                         * the packet with an "everything OK" AckDevAuthenticationInfo
+                         */
+                        unsigned char data[] = {0x00, 0x16, 0x00};
+
+                        iap_send_pkt(data, sizeof(data));
+                        device.auth.state = AUST_CERTDONE;
+                    } else {
+                        device.auth.next_section++;
+                        cmd_ok_mode0(cmd);
+                    }
+                    break;
+                }
+
+                default:
+                {
+                    cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+                    break;
+                }
+            }
+
             break;
         }
 
-        /* RetDevAuthenticationSignature */
+        /* AckDevAuthenticationInfo (0x16)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetDevAuthenticationSignature (0x17)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* RetDevAuthenticationSignature (0x18)
+         *
+         * Return a calculated signature based on the device certificate
+         * and the challenge sent with GetDevAuthenticationSignature
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x17
+         * 0x02-0xNN: Certificate data
+         *
+         * Returns on success:
+         * AckDevAuthenticationStatus
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x19
+         * 0x02: Status (0x00: OK)
+         *
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAM
+         *
+         * TODO:
+         * There is a timeout of 75 seconds between GetDevAuthenticationSignature
+         * and RetDevAuthenticationSignature for Auth 2.0. This is currently not
+         * checked.
+         */
         case 0x18:
         {
-            /* Isn't used since we don't send the 0x00 0x17 command */
+            unsigned char data[] = {0x00, 0x19, 0x00};
+
+            if (device.auth.state != AUST_CHASENT) {
+                cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+
+            /* Here we could check the signature. Since we can't, just
+             * acknowledge and go to authenticated status
+             */
+            iap_send_pkt(data, sizeof(data));
+            device.auth.state = AUST_AUTH;
+            break;
+        }
+
+        /* AckDevAuthenticationStatus (0x19)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetiPodAuthenticationInfo (0x1A)
+         *
+         * Obtain authentication information from the iPod.
+         * This cannot be implemented without posessing an Apple signed
+         * certificate and the corresponding private key.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x1A
+         *
+         * This command requires authentication
+         *
+         * Returns:
+         * IAP_ACK_CMD_FAILED
+         */
+        case 0x1A:
+        {
+            CHECKAUTH0;
+
+            cmd_ack_mode0(cmd, IAP_ACK_CMD_FAILED);
+            break;
+        }
+
+        /* RetiPodAuthenticationInfo (0x1B)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* AckiPodAuthenticationInfo (0x1C)
+         *
+         * Confirm authentication information from the iPod.
+         * This cannot be implemented without posessing an Apple signed
+         * certificate and the corresponding private key.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x1C
+         * 0x02: Authentication state (0x00: OK)
+         *
+         * This command requires authentication
+         *
+         * Returns: (none)
+         */
+        case 0x1C:
+        {
+            CHECKAUTH0;
+
+            break;
+        }
+
+        /* GetiPodAuthenticationSignature (0x1D)
+         *
+         * Send challenge information to the iPod.
+         * This cannot be implemented without posessing an Apple signed
+         * certificate and the corresponding private key.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x1D
+         * 0x02-0x15: Challenge
+         *
+         * This command requires authentication
+         *
+         * Returns:
+         * IAP_ACK_CMD_FAILED
+         */
+        case 0x1D:
+        {
+            CHECKAUTH0;
+
+            cmd_ack_mode0(cmd, IAP_ACK_CMD_FAILED);
+            break;
+        }
+
+        /* RetiPodAuthenticationSignature (0x1E)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* AckiPodAuthenticationStatus (0x1F)
+         *
+         * Confirm chellenge information from the iPod.
+         * This cannot be implemented without posessing an Apple signed
+         * certificate and the corresponding private key.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x1C
+         * 0x02: Challenge state (0x00: OK)
+         *
+         * This command requires authentication
+         *
+         * Returns: (none)
+         */
+        case 0x1F:
+        {
+            CHECKAUTH0;
+
             break;
         }
 
@@ -955,6 +1316,14 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
         }
     }
 }
+
+/* Lingo 0x02, Simple Remote Lingo
+ *
+ * TODO:
+ * - Fix cmd 0x00 handling, there has to be a more elegant way of doing
+ *   this
+ * - Implement at least cmd 0x04
+ */
 
 static void cmd_ack_mode2(unsigned char cmd, unsigned char status)
 {
@@ -1121,6 +1490,7 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
         {
             if (!DEVICE_AUTHENTICATED) {
                 cmd_ack_mode2(cmd, IAP_ACK_NO_AUTHEN);
+                break;
             }
 
             cmd_ack_mode2(cmd, IAP_ACK_CMD_FAILED);
@@ -1151,6 +1521,7 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
         {
             if (!DEVICE_AUTHENTICATED) {
                 cmd_ack_mode2(cmd, IAP_ACK_NO_AUTHEN);
+                break;
             }
 
             cmd_ack_mode2(cmd, IAP_ACK_CMD_FAILED);
@@ -1181,6 +1552,7 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
         {
             if (!DEVICE_AUTHENTICATED) {
                 cmd_ack_mode2(cmd, IAP_ACK_NO_AUTHEN);
+                break;
             }
 
             cmd_ack_mode2(cmd, IAP_ACK_CMD_FAILED);
@@ -1466,6 +1838,7 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
     /* Lingo 0x04 must have been negotiated */
     if (!DEVICE_LINGO_SUPPORTED(0x04)) {
         cmd_ack_mode4(cmd, IAP_ACK_BAD_PARAM);
+        return;
     }
 
     switch (cmd)
@@ -1713,7 +2086,7 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
         /* SetPlayStatusChangeNotification */
         case 0x0026:
         {
-            iap_pollspeed = buf[3] ? 1 : 0;
+            device.do_notify = buf[3] ? true : false;
             /* respond with cmd ok packet */
             cmd_ok_mode4(cmd);
             break;

@@ -107,6 +107,31 @@ sub _h_00_0005 {
     return 1;
 }
 
+sub _h_00_000d {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+
+    printf("RequestiPodModelNum (0x00, 0x0D) D->I\n");
+
+    return 1;
+}
+
+sub _h_00_000e {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my ($modelnum, $name);
+
+    ($modelnum, $name) = unpack("NZ*", $data);
+
+    printf("ReturniPodModelNum (0x00, 0x0E) I->D\n");
+    printf(" Model number:          %08x\n", $modelnum);
+    printf(" Model name:            %s\n", $name);
+
+    return 1;
+}
+
 sub _h_00_000f {
     my $self = shift;
     my $data = shift;
@@ -347,6 +372,338 @@ sub _h_00_0027 {
         $lingo = unpack("xC", $data);
         printf(" Lingo:                0x%02x\n", $lingo);
     }
+
+    return 1;
+}
+
+sub _h_00_002b {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my ($class, $setting);
+
+    ($class, $setting) = unpack("CC", $data);
+
+    printf("SetiPodPreferences (0x00, 0x2B) D->I\n");
+    printf(" Class:             %s (%d)\n", (
+        "Video out setting",
+        "Screen configuration",
+        "Video signal format",
+        "Line out usage",
+        "Reserved",
+        "Reserved",
+        "Reserved",
+        "Reserved",
+        "Video-out connection",
+        "Closed captioning",
+        "Video monitor aspect ratio",
+        "Reserved",
+        "Subtitles",
+        "Video alternate audio channel")[$class], $class);
+    printf(" Setting:           %s (%d)\n", (
+        ["Off",
+         "On",
+         "Ask user"],
+        ["Fill screen",
+         "Fit to screen edge"],
+        ["NTSC",
+         "PAL"],
+        ["Not used",
+         "Used"],
+        [],
+        [],
+        [],
+        [],
+        ["None",
+         "Composite",
+         "S-video",
+         "Component"],
+        ["Off",
+         "On"],
+        ["4:3",
+         "16:9"],
+        [],
+        ["Off",
+         "On"],
+        ["Off",
+         "On"])[$class][$setting], $setting);
+
+    return 1;
+}
+
+sub _h_00_0038 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my ($transid, $status);
+
+    ($transid, $status) = unpack("nC", $data);
+    
+    printf("EndIDPS (0x00, 0x38) D->I\n");
+    printf(" TransID:          %d\n", $transid);
+    printf(" Action:           %s (%d)\n", (
+        "Finished",
+        "Reset")[$status], $status);
+
+    return 1;
+}
+
+sub _h_02_0000 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my @keys;
+
+    @keys = unpack("CCCC", $data);
+
+    printf("ContextButtonStatus (0x02, 0x00) D->I\n");
+    printf(" Buttons:\n");
+    printf("  Play/Pause\n") if ($keys[0] & 0x01);
+    printf("  Volume Up\n") if ($keys[0] & 0x02);
+    printf("  Volume Down\n") if ($keys[0] & 0x04);
+    printf("  Next Track\n") if ($keys[0] & 0x08);
+    printf("  Previous Track\n") if ($keys[0] & 0x10);
+    printf("  Next Album\n") if ($keys[0] & 0x20);
+    printf("  Previous Album\n") if ($keys[0] & 0x40);
+    printf("  Stop\n") if ($keys[0] & 0x80);
+
+    if (exists($keys[1])) {
+        printf("  Play/Resume\n") if ($keys[1] & 0x01);
+        printf("  Pause\n") if ($keys[1] & 0x02);
+        printf("  Mute toggle\n") if ($keys[1] & 0x04);
+        printf("  Next Chapter\n") if ($keys[1] & 0x08);
+        printf("  Previous Chapter\n") if ($keys[1] & 0x10);
+        printf("  Next Playlist\n") if ($keys[1] & 0x20);
+        printf("  Previous Playlist\n") if ($keys[1] & 0x40);
+        printf("  Shuffle Setting Advance\n") if ($keys[1] & 0x80);
+    }
+
+    if (exists($keys[2])) {
+        printf("  Repeat Setting Advance\n") if ($keys[2] & 0x01);
+        printf("  Power On\n") if ($keys[2] & 0x02);
+        printf("  Power Off\n") if ($keys[2] & 0x04);
+        printf("  Backlight for 30 seconds\n") if ($keys[2] & 0x08);
+        printf("  Begin FF\n") if ($keys[2] & 0x10);
+        printf("  Begin REW\n") if ($keys[2] & 0x20);
+        printf("  Menu\n") if ($keys[2] & 0x40);
+        printf("  Select\n") if ($keys[2] & 0x80);
+    }
+
+    if (exists($keys[3])) {
+        printf("  Up Arrow\n") if ($keys[3] & 0x01);
+        printf("  Down Arrow\n") if ($keys[3] & 0x02);
+        printf("  Backlight off\n") if ($keys[3] & 0x04);
+    }
+
+    return 1;
+}
+
+sub _h_03_0000 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $res;
+    my $cmd;
+
+    ($res, $cmd) = unpack("CC", $data);
+
+    printf("ACK (0x03, 0x00) I->D\n");
+    printf(" Acknowledged command: 0x%02x\n", $cmd);
+    printf(" Status:               %s (%d)\n",
+        ("Success",
+         "ERROR: Unknown Database Category",
+         "ERROR: Command Failed",
+         "ERROR: Out Of Resource",
+         "ERROR: Bad Parameter",
+         "ERROR: Unknown ID",
+         "Command Pending",
+         "ERROR: Not Authenticated",
+         "ERROR: Bad Authentication Version",
+         "ERROR: Accessory Power Mode Request Failed",
+         "ERROR: Certificate Invalid",
+         "ERROR: Certificate permissions invalid",
+         "ERROR: File is in use",
+         "ERROR: Invalid file handle",
+         "ERROR: Directory not empty",
+         "ERROR: Operation timed out",
+         "ERROR: Command unavailable in this iPod mode",
+         "ERROR: Invalid accessory resistor ID",
+         "Reserved",
+         "Reserved",
+         "Reserved",
+         "ERROR: Maximum number of accessory connections already reached")[$res], $res);
+
+    return 1;
+}
+
+sub _h_03_0008 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $events;;
+
+    $events = unpack("N", $data);
+
+    printf("SetRemoteEventsNotification (0x03, 0x08) D->I\n");
+    printf(" Events:\n");
+    printf("  Track position in ms\n") if ($events & 0x00000001);
+    printf("  Track playback index\n") if ($events & 0x00000002);
+    printf("  Chapter index\n") if ($events & 0x00000004);
+    printf("  Play status\n") if ($events & 0x00000008);
+    printf("  Mute/UI volume\n") if ($events & 0x00000010);
+    printf("  Power/Battery\n") if ($events & 0x00000020);
+    printf("  Equalizer setting\n") if ($events & 0x00000040);
+    printf("  Shuffle setting\n") if ($events & 0x00000080);
+    printf("  Repeat setting\n") if ($events & 0x00000100);
+    printf("  Date and time setting\n") if ($events & 0x00000200);
+    printf("  Alarm setting\n") if ($events & 0x00000400);
+    printf("  Backlight state\n") if ($events & 0x00000800);
+    printf("  Hold switch state\n") if ($events & 0x00001000);
+    printf("  Sound check state\n") if ($events & 0x00002000);
+    printf("  Audiobook speed\n") if ($events & 0x00004000);
+    printf("  Track position in s\n") if ($events & 0x00008000);
+    printf("  Mute/UI/Absolute volume\n") if ($events & 0x00010000);
+
+    return 1;
+}
+
+sub _h_03_000c {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $info;
+
+    $info = unpack("C", $data);
+
+    printf("GetiPodStateInfo (0x03, 0x0C) D->I\n");
+    printf(" Info to get:           %s (%d)\n", (
+        "Track time in ms",
+        "Track playback index",
+        "Chapter information",
+        "Play status",
+        "Mute and volume information",
+        "Power and battery status",
+        "Equalizer setting",
+        "Shuffle setting",
+        "Repeat setting",
+        "Date and time",
+        "Alarm state and time",
+        "Backlight state",
+        "Hold switch state",
+        "Audiobook speed",
+        "Track time in seconds",
+        "Mute/UI/Absolute volume")[$info], $info);
+
+    return 1;
+}
+
+
+sub _h_03_000e {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $type;
+    my $info;
+
+    $type = unpack("C", $data);
+
+    printf("SetiPodStateInfo (0x03, 0x0E) D->I\n");
+
+    if ($type == 0x00) {
+        $info = unpack("xN", $data);
+        printf(" Type:             Track position\n");
+        printf(" Position:         %d ms\n", $info);
+    } elsif ($type == 0x01) {
+        $info = unpack("xN", $data);
+        printf(" Type:             Track index\n");
+        printf(" Index:            %d\n", $info);
+    } elsif ($type == 0x02) {
+        $info = unpack("xn", $data);
+        printf(" Type:             Chapter index\n");
+        printf(" Index:            %d\n", $info);
+    } elsif ($type == 0x03) {
+        $info = unpack("xC", $data);
+        printf(" Type:             Play status\n");
+        printf(" Status:           %s (%d)\n", (
+            "Stopped",
+            "Playing",
+            "Paused",
+            "FF",
+            "REW",
+            "End FF/REW")[$info], $info);
+    } elsif ($type == 0x04) {
+        $info = [unpack("xCCC", $data)];
+        printf(" Type:             Mute/Volume\n");
+        printf(" Mute State:       %s\n", $info->[0]?"On":"Off");
+        printf(" Volume level:     %d\n", $info->[1]);
+        printf(" Restore on exit:  %d\n", $info->[2]?"Yes":"No");
+    } elsif ($type == 0x06) {
+        $info = [unpack("xNC", $data)];
+        printf(" Type:             Equalizer\n");
+        printf(" Index:            %d\n", $info->[0]);
+        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+    } elsif ($type == 0x07) {
+        $info = [unpack("xCC", $data)];
+        printf(" Type:             Shuffle\n");
+        printf(" Shuffle State:    %s\n", $info->[0]?"On":"Off");
+        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+    } elsif ($type == 0x08) {
+        $info = [unpack("xCC", $data)];
+        printf(" Type:             Repeat\n");
+        printf(" Repeat State:     %s\n", $info->[0]?"On":"Off");
+        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+    } elsif ($type == 0x09) {
+        $info = [unpack("xnCCCC", $data)];
+        printf(" Type:             Date\n");
+        printf(" Date:             %02d.%02d.%04d %02d:%02d\n", $info->[2], $info->[1], $info->[0], $info->[3], $info->[4]);
+    } elsif ($type == 0x0A) {
+        $info = [unpack("xCCCC", $data)];
+        printf(" Type:             Alarm\n");
+        printf(" Alarm State:      %s\n", $info->[0]?"On":"Off");
+        printf(" Time:             %02d:%02d\n", $info->[1], $info->[2]);
+        printf(" Restore on exit:  %d\n", $info->[3]?"Yes":"No");
+    } elsif ($type == 0x0B) {
+        $info = [unpack("xCC", $data)];
+        printf(" Type:             Backlight\n");
+        printf(" Backlight State:     %s\n", $info->[0]?"On":"Off");
+        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+    } elsif ($type == 0x0D) {
+        $info = [unpack("xCC", $data)];
+        printf(" Type:             Sound check\n");
+        printf(" Sound check:      %s\n", $info->[0]?"On":"Off");
+        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+    } elsif ($type == 0x0E) {
+        $info = [unpack("xCC", $data)];
+        printf(" Type:             Audiobook speed\n");
+        printf(" Speed:            %s\n", $info->[0]==0x00?"Normal":$info->[0]==0x01?"Faster":$info->[0]==0xFF?"Slower":"Reserved");
+        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+    } elsif ($type == 0x0F) {
+        $info = unpack("xN", $data);
+        printf(" Type:             Track position\n");
+        printf(" Position:         %d s\n", $info);
+    } elsif ($type == 0x10) {
+        $info = [unpack("xCCCC", $data)];
+        printf(" Type:             Mute/UI/Absolute volume\n");
+        printf(" Mute State:       %s\n", $info->[0]?"On":"Off");
+        printf(" UI Volume level:  %d\n", $info->[1]);
+        printf(" Absolute Volume:  %d\n", $info->[2]);
+        printf(" Restore on exit:  %d\n", $info->[3]?"Yes":"No");
+    } else {
+        printf(" Reserved\n");
+    }
+
+    return 1;
+}
+
+
+
+
+sub _h_03_000f {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+
+    print("GetPlayStatus (0x03, 0x0F) D->I\n");
 
     return 1;
 }
@@ -955,26 +1312,66 @@ sub _h_04_0037 {
 
     return 1;
 }
-    
+
+sub _h_07_0005 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $control;
+
+    $control = unpack("C", $data);
+
+    printf("SetTunerCtrl (0x07, 0x05) I->D\n");
+    printf(" Options:\n");
+    printf("  Power %s\n", ($control & 0x01)?"on":"off");
+    printf("  Status change notifications %s\n", ($control & 0x02)?"on":"off");
+    printf("  Raw mode %s\n", ($control & 0x04)?"on":"off");
+}
+
+sub _h_07_0020 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $options;
+
+    $options = unpack("N", $data);
+
+    printf("SetRDSNotifyMask (0x07, 0x20) I->D\n");
+    printf(" Options:\n");
+    printf("  Radiotext\n") if ($options & 0x00000010);
+    printf("  Program Service Name\n") if ($options & 0x40000000);
+    printf("  Reserved\n") if ($options & 0xBFFFFFEF);
+
+    return 1;
+}
+
+sub _h_07_0024 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+
+    printf("Reserved command (0x07, 0x24) I->D\n");
+
+    return 1;
+}
 
 
 package main;
 
 use Device::iPod;
+use Getopt::Long;
 use strict;
 
 my $decoder;
 my $device;
+my $unpacker;
 my $line;
 
-$decoder = iap::decode->new();
-$device = Device::iPod->new();
-
-while ($line = <>) {
+sub unpack_hexstring {
+    my $line = shift;
     my $m;
     my @m;
 
-    chomp($line);
     $line =~ s/(..)/chr(hex($1))/ge;
     $device->{-inbuf} = $line;
 
@@ -983,8 +1380,44 @@ while ($line = <>) {
     @m = $device->_unframe_cmd($m);
     unless(@m) {
         printf("Line %d: Error decoding frame: %s\n", $., $device->error());
-        next;
+        return ();
     }
+
+    return @m;
+}
+
+sub unpack_iaplog {
+    my $line = shift;
+    my @m;
+
+    return () unless ($line =~ /^[RT]: /);
+
+    $line =~ s/^[RT]: //;
+    $line =~ s/\\x(..)/chr(hex($1))/ge;
+    $line =~ s/\\\\/\\/g;
+
+    @m = unpack("CCa*", $line);
+    if ($m[0] == 0x04) {
+        @m = unpack("Cna*", $line);
+    }
+
+    return @m;
+}
+
+
+$decoder = iap::decode->new();
+$device = Device::iPod->new();
+$unpacker = \&unpack_iaplog;
+
+GetOptions("hexstring" => sub {$unpacker = \&unpack_hexstring});
+
+while ($line = <>) {
+    my @m;
+
+    chomp($line);
+
+    @m = $unpacker->($line);
+    next unless (@m);
 
     printf("Line %d: ", $.);
     $decoder->display(@m);

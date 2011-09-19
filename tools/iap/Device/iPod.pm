@@ -125,9 +125,11 @@ sub recvmsg {
 
 sub emptyrecv {
     my $self = shift;
+    my $m;
 
-    do {
-    } while ($self->_fillbuf());
+    while ($m = $self->_fillbuf()) {
+        printf("Discarded %s\n", $self->_hexstring($m)) if (defined($m) && $self->{-debug});
+    }
 }
 
 sub error {
