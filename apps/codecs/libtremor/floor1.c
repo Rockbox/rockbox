@@ -24,6 +24,7 @@
 #include "registry.h"
 #include "codebook.h"
 #include "misc.h"
+#include "ffmpeg_render_line.h"
 
 #define floor1_rangedB 140 /* floor 1 fixed at -140dB to 0dB range */
 
@@ -287,8 +288,6 @@ static const ogg_int32_t FLOOR_fromdB_LOOKUP[256] ICONST_ATTR = {
   XdB(0x69f80e9a), XdB(0x70dafda8), XdB(0x78307d76), XdB(0x7fffffff),
 };
 
-#include "ffmpeg_render_line.h"
-
 static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in)
     ICODE_ATTR_TREMOR_NOT_MDCT;
 static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
@@ -406,7 +405,7 @@ static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
         /* guard lookup against out-of-range values */
         hy=(hy<0?0:hy>255?255:hy);
 
-        render_line(lx, ly, hx, hy, out);
+        render_line(lx, ly, hx, hy, FLOOR_fromdB_LOOKUP, out);
         
         lx=hx;
         ly=hy;
