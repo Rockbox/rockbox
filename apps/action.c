@@ -265,7 +265,7 @@ static int get_action_worker(int context, int timeout,
     last_context = context;
 #ifndef HAS_BUTTON_HOLD
     screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
-    if (screen_has_lock && keys_locked)
+    if (is_keys_locked())
     {
         if (button == unlock_combo)
         {
