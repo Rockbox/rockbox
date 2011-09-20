@@ -112,6 +112,7 @@ bool ide_powered(void)
 void power_off(void)
 {
     _backlight_off();
+    sleep(HZ/10);
 
     /* power off bit */
     GPIOB_ENABLE |= 0x80;
