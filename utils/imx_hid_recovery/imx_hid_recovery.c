@@ -48,7 +48,11 @@ int main(int argc, char **argv)
     
     libusb_set_debug(NULL, 3);
     
+    /* MX23 */
     dev = libusb_open_device_with_vid_pid(NULL, 0x066F, 0x3780);
+    if(dev == NULL)
+        /* MX28 */
+        dev = libusb_open_device_with_vid_pid(NULL, 0x15A2, 0x004F);
     if(dev == NULL)
     {
         printf("Cannot open device\n");
