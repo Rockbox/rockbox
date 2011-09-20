@@ -12927,3 +12927,17 @@
     *: "Einschlafzeit beim Einschalten aktivieren"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LOCK_VOLUME_KEYS
+  desc:
+  user: core
+  <source>
+    *: "Lock volume keys"
+  </source>
+  <dest>
+    *: "Lautstärketasten sperren"
+  </dest>
+  <voice>
+    *: "Lautstärketasten sperren"
+  </voice>
+</phrase>
