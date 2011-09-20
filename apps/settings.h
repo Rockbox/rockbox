@@ -218,7 +218,7 @@ void reset_setting(const struct settings_list *setting, void *var);
 void settings_reset(void);
 void sound_settings_apply(void);
 
-/* call this after loading a .wps/.rwps pr other skin files, so that the
+/* call this after loading a .wps/.rwps or other skin files, so that the
  * skin buffer is reset properly
  */
 void settings_apply_skins(void);
