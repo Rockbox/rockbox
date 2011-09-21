@@ -89,9 +89,9 @@ extern void audiohw_set_sampr_dividers(int fsel);
 #endif
 
 #define AS3514_SYSTEM     0x20
-#define AS3514_CVDD_DCDC3 0x21
 
 #ifndef HAVE_AS3543
+#define AS3514_CVDD_DCDC3 0x21
 #define AS3514_CHARGER    0x22
 #define AS3514_DCDC15     0x23
 #define AS3514_SUPERVISOR 0x24

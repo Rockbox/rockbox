@@ -357,8 +357,10 @@ static void ascodec_wait(struct ascodec_request *req)
 static void ascodec_async_write(unsigned int index, unsigned int value,
                          struct ascodec_request *req)
 {
+#ifndef HAVE_AS3543
     if (index == AS3514_CVDD_DCDC3) /* prevent setting of the LREG_CP_not bit */
         value &= ~(1 << 5);
+#endif
 
     ascodec_req_init(req, ASCODEC_REQ_WRITE, index, 1);
     req->data[0] = value;
