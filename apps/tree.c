@@ -1019,7 +1019,7 @@ static int move_callback(int handle, void* current, void* new)
     size_t diff = new - current;
     /* FIX_PTR makes sure to not accidentally update static allocations */
 #define FIX_PTR(x) \
-    { if ((void*)x > current && (void*)x < (current+cache->name_buffer_size)) x+= diff; }
+    { if ((void*)x >= current && (void*)x < (current+cache->name_buffer_size)) x+= diff; }
 
     if (handle == cache->name_buffer_handle)
     {   /* update entry structs, *even if they are struct tagentry */

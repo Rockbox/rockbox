@@ -190,7 +190,7 @@ static int move_callback(int handle, void* current, void* new)
     (void)handle;
     size_t diff = new - current;
 #define FIX_PTR(x) \
-    { if ((void*)x > current && (void*)x < (current+strdup_bufsize)) x+= diff; }
+    { if ((void*)x >= current && (void*)x < (current+strdup_bufsize)) x+= diff; }
     for(int i = 0; i < filetype_count; i++)
     {
         FIX_PTR(filetypes[i].extension);
