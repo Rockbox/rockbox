@@ -187,7 +187,7 @@ static inline void XNPROD31(int32_t a, int32_t b,
 #define _V_VECT_OPS
 
 static inline
-void vect_add(int32_t *x, int32_t *y, int n)
+void vect_add(int32_t *x, const int32_t *y, int n)
 {
   while (n>0) {
     *x++ += *y++;
@@ -196,7 +196,7 @@ void vect_add(int32_t *x, int32_t *y, int n)
 }
 
 static inline
-void vect_copy(int32_t *x, int32_t *y, int n)
+void vect_copy(int32_t *x, const int32_t *y, int n)
 {
   while (n>0) {
     *x++ = *y++;
@@ -205,7 +205,7 @@ void vect_copy(int32_t *x, int32_t *y, int n)
 }
 
 static inline
-void vect_mult_fw(int32_t *data, int32_t *window, int n)
+void vect_mult_fw(int32_t *data, const int32_t *window, int n)
 {
   while(n>0) {
     *data = MULT31(*data, *window);
@@ -216,7 +216,7 @@ void vect_mult_fw(int32_t *data, int32_t *window, int n)
 }
 
 static inline
-void vect_mult_bw(int32_t *data, int32_t *window, int n)
+void vect_mult_bw(int32_t *data, const int32_t *window, int n)
 {
   while(n>0) {
     *data = MULT31(*data, *window);

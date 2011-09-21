@@ -22,6 +22,8 @@
 #include "ivorbiscodec.h"
 #include "os_types.h"
 
+#include "codeclib_misc.h"
+
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
   
@@ -37,7 +39,7 @@ extern int _ilog(unsigned int v);
 #ifndef  _LOW_ACCURACY_
 /* 64 bit multiply */
 /* #include <sys/types.h> */
-
+#if 0
 #if BYTE_ORDER==LITTLE_ENDIAN
 union magic {
   struct {
@@ -70,7 +72,7 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
   magic.whole  = (ogg_int64_t)x * y;
   return ((ogg_uint32_t)(magic.halves.lo)>>15) | ((magic.halves.hi)<<17);
 }
-
+#endif
 #else
 /* 32 bit multiply, more portable but less accurate */
 
@@ -119,10 +121,11 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
 
 /* replaced XPROD32 with a macro to avoid memory reference 
    _x, _y are the results (must be l-values) */
+/*
 #define XPROD32(_a, _b, _t, _v, _x, _y) \
   { (_x)=MULT32(_a,_t)+MULT32(_b,_v);   \
     (_y)=MULT32(_b,_t)-MULT32(_a,_v); }
-
+*/
 
 #ifdef __i386__
 
@@ -134,7 +137,7 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
     *(_y)=MULT31(_b,_t)+MULT31(_a,_v); }
 
 #else
-
+/*
 static inline void XPROD31(ogg_int32_t  a, ogg_int32_t  b,
                            ogg_int32_t  t, ogg_int32_t  v,
                            ogg_int32_t *x, ogg_int32_t *y)
@@ -150,8 +153,36 @@ static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
   *x = MULT31(a, t) - MULT31(b, v);
   *y = MULT31(b, t) + MULT31(a, v);
 }
+*/
+#endif
+#ifndef _TREMOR_VECT_OPS
+#define _TREMOR_VECT_OPS
+static inline 
+void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
+{
+    vect_add(x, y, n );
+}
+
+static inline 
+void vect_add_right_left(ogg_int32_t *x, const ogg_int32_t *y, int n)
+{
+    vect_add(x, y, n );
+}
+
+static inline
+void ogg_vect_mult_fw(int32_t *data, const int32_t *window, int n)
+{
+    vect_mult_fw(data, window, n);
+}
+
+static inline
+void ogg_vect_mult_bw(int32_t *data, const int32_t *window, int n)
+{
+    vect_mult_bw(data, window, n);
+}
 #endif
 
+#if 0
 #ifndef _V_VECT_OPS
 #define _V_VECT_OPS
 
@@ -174,7 +205,7 @@ void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
 }
 
 static inline 
-void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
+void ogg_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   while(n>0) {
     *data = MULT31(*data, *window);
@@ -185,7 +216,7 @@ void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 }
 
 static inline
-void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
+void ogg_vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   while(n>0) {
     *data = MULT31(*data, *window);
@@ -202,8 +233,6 @@ static inline void vect_copy(ogg_int32_t *x, const ogg_int32_t *y, int n)
 }
 #endif
 
-#endif
-
 static inline ogg_int32_t VFLOAT_MULT(ogg_int32_t a,ogg_int32_t ap,
                                       ogg_int32_t b,ogg_int32_t bp,
                                       ogg_int32_t *p){
@@ -218,7 +247,8 @@ static inline ogg_int32_t VFLOAT_MULT(ogg_int32_t a,ogg_int32_t ap,
   }else
     return 0;
 }
-
+#endif
+#endif
 static inline ogg_int32_t VFLOAT_MULTI(ogg_int32_t a,ogg_int32_t ap,
                                       ogg_int32_t i,
                                       ogg_int32_t *p){
@@ -226,7 +256,7 @@ static inline ogg_int32_t VFLOAT_MULTI(ogg_int32_t a,ogg_int32_t ap,
   int ip=_ilog(abs(i))-31;
   return VFLOAT_MULT(a,ap,i<<-ip,ip,p);
 }
-
+#if 0
 static inline ogg_int32_t VFLOAT_ADD(ogg_int32_t a,ogg_int32_t ap,
                                       ogg_int32_t b,ogg_int32_t bp,
                                       ogg_int32_t *p){
@@ -268,6 +298,6 @@ static inline ogg_int32_t VFLOAT_ADD(ogg_int32_t a,ogg_int32_t ap,
   }
   return(a);
 }
-
+#endif
 #endif
 

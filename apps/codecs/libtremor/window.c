@@ -73,8 +73,8 @@ void _vorbis_apply_window(ogg_int32_t *d,const void *window_p[2],
      outside that region are not added (so don't need to be zerod). see block.c
      memset((void *)&d[0], 0, sizeof(ogg_int32_t)*leftbegin); */
 
-  vect_mult_fw(&d[leftbegin], &window[lW][0], leftend-leftbegin);
-  vect_mult_bw(&d[rightbegin], &window[nW][rn/2-1], rightend-rightbegin);
+  ogg_vect_mult_fw(&d[leftbegin], &window[lW][0], leftend-leftbegin);
+  ogg_vect_mult_bw(&d[rightbegin], &window[nW][rn/2-1], rightend-rightbegin);
 
   /* Again - memset not needed
      memset((void *)&d[rightend], 0, sizeof(ogg_int32_t)*(n-rightend)); */

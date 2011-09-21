@@ -44,17 +44,17 @@ static inline int32_t MULT31(int32_t x, int32_t y) {
 }
 
 #define INCL_OPTIMIZED_MULT31_SHIFT15
+/* NOTE: this requires that the emac is *NOT* rounding */
 static inline int32_t MULT31_SHIFT15(int32_t x, int32_t y) {
   int32_t r;
 
   asm volatile ("mac.l %[x], %[y], %%acc0;"  /* multiply */
                 "mulu.l %[y], %[x];"         /* get lower half, avoid emac stall */
                 "movclr.l %%acc0, %[r];"     /* get higher half */
-                "asl.l #8, %[r];"            /* hi<<16, plus one free */
-                "asl.l #8, %[r];"
+                "swap %[r];"                 /* hi<<16, plus one free */
                 "lsr.l #8, %[x];"            /* (unsigned)lo >> 15 */
                 "lsr.l #7, %[x];"
-                "or.l %[x], %[r];"           /* logical-or results */
+                "move.w %[x], %[r];"         /* logical-or results */
                 : [r] "=&d" (r), [x] "+d" (x)
                 : [y] "d" (y)
                 : "cc");
@@ -202,7 +202,7 @@ void vect_add(int32_t *x, const int32_t *y, int n)
 }
 
 static inline
-void vect_copy(int32_t *x, int32_t *y, int n)
+void vect_copy(int32_t *x, const int32_t *y, int n)
 {
   /* align to 16 bytes */
   while(n>0 && (int)x&15) {
@@ -228,7 +228,7 @@ void vect_copy(int32_t *x, int32_t *y, int n)
 }
 
 static inline
-void vect_mult_fw(int32_t *data, int32_t *window, int n)
+void vect_mult_fw(int32_t *data, const int32_t *window, int n)
 {
   /* ensure data is aligned to 16-bytes */
   while(n>0 && (int)data&15) {
@@ -282,7 +282,7 @@ void vect_mult_fw(int32_t *data, int32_t *window, int n)
 }
 
 static inline
-void vect_mult_bw(int32_t *data, int32_t *window, int n)
+void vect_mult_bw(int32_t *data, const int32_t *window, int n)
 {
   /* ensure at least data is aligned to 16-bytes */
   while(n>0 && (int)data&15) {

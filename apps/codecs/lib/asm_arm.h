@@ -166,7 +166,7 @@ static inline void XNPROD31(int32_t  a, int32_t  b,
 
 /* asm versions of vector operations for block.c, window.c */
 static inline
-void vect_add(int32_t *x, int32_t *y, int n)
+void vect_add(int32_t *x, const int32_t *y, int n)
 {
   while (n>=4) {
     asm volatile ("ldmia %[x], {r0, r1, r2, r3};"
@@ -190,7 +190,7 @@ void vect_add(int32_t *x, int32_t *y, int n)
 }
 
 static inline
-void vect_copy(int32_t *x, int32_t *y, int n)
+void vect_copy(int32_t *x, const int32_t *y, int n)
 {
   while (n>=4) {
     asm volatile ("ldmia %[y]!, {r0, r1, r2, r3};"
@@ -208,7 +208,7 @@ void vect_copy(int32_t *x, int32_t *y, int n)
 }
 
 static inline
-void vect_mult_fw(int32_t *data, int32_t *window, int n)
+void vect_mult_fw(int32_t *data, const int32_t *window, int n)
 {
   while (n>=4) {
     asm volatile ("ldmia %[d], {r0, r1, r2, r3};"
@@ -237,7 +237,7 @@ void vect_mult_fw(int32_t *data, int32_t *window, int n)
 }
 
 static inline
-void vect_mult_bw(int32_t *data, int32_t *window, int n)
+void vect_mult_bw(int32_t *data, const int32_t *window, int n)
 {
   while (n>=4) {
     asm volatile ("ldmia %[d], {r0, r1, r2, r3};"

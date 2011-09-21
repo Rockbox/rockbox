@@ -19,33 +19,8 @@
 
 #if !defined(_V_WIDE_MATH) && !defined(_LOW_ACCURACY_)
 #define _V_WIDE_MATH
-
-static inline ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
-  int lo,hi;
-  asm volatile("smull\t%0, %1, %2, %3"
-               : "=&r"(lo),"=&r"(hi)
-               : "%r"(x),"r"(y) );
-  return(hi);
-}
-
-static inline ogg_int32_t MULT31(ogg_int32_t x, ogg_int32_t y) {
-  return MULT32(x,y)<<1;
-}
-
-static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
-  int lo,hi;
-  asm volatile("smull   %0, %1, %2, %3\n\t"
-               "movs    %0, %0, lsr #15\n\t"
-               "adc     %1, %0, %1, lsl #17\n\t"
-               : "=&r"(lo),"=&r"(hi)
-               : "%r"(x),"r"(y)
-               : "cc");
-  return(hi);
-}
-
-#ifndef _V_VECT_OPS
-#define _V_VECT_OPS
-
+#ifndef _TREMOR_VECT_OPS
+#define _TREMOR_VECT_OPS
 /* asm versions of vector operations for block.c, window.c */
 /* SOME IMPORTANT NOTES: this implementation of vect_mult_bw does
    NOT do a final shift, meaning that the result of vect_mult_bw is
@@ -114,7 +89,7 @@ void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
 
 #if ARM_ARCH >= 6
 static inline 
-void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
+void ogg_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   /* Note, mult_fw uses MULT31 */
   do{
@@ -139,7 +114,7 @@ void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 }
 #else
 static inline 
-void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
+void ogg_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   /* Note, mult_fw uses MULT31 */
   do{
@@ -166,7 +141,7 @@ void vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 
 #if ARM_ARCH >= 6
 static inline
-void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
+void ogg_vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   /* NOTE mult_bw uses MULT_32 i.e. doesn't shift result left at end */
   /* On ARM, we can do the shift at the same time as the overlap-add */
@@ -187,7 +162,7 @@ void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 }
 #else
 static inline
-void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
+void ogg_vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   /* NOTE mult_bw uses MULT_32 i.e. doesn't shift result left at end */
   /* On ARM, we can do the shift at the same time as the overlap-add */
@@ -207,14 +182,7 @@ void vect_mult_bw(ogg_int32_t *data, LOOKUP_T *window, int n)
   } while (n);
 }
 #endif
-
-static inline void vect_copy(ogg_int32_t *x, const ogg_int32_t *y, int n)
-{
-  memcpy(x,y,n*sizeof(ogg_int32_t));
-}
-
 #endif
-
 #endif
 
 #ifndef _V_LSP_MATH_ASM

@@ -19,6 +19,7 @@
 #ifndef _OS_TYPES_H
 #define _OS_TYPES_H
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <codecs.h>
 
@@ -49,9 +50,9 @@ void ogg_free(void *ptr);
 void iram_malloc_init(void);
 void *iram_malloc(size_t size);
 
-   typedef short ogg_int16_t;
-   typedef int ogg_int32_t;
-   typedef unsigned int ogg_uint32_t;
-   typedef long long ogg_int64_t;
+   typedef int16_t ogg_int16_t;
+   typedef int32_t ogg_int32_t;
+   typedef uint32_t ogg_uint32_t;
+   typedef int64_t ogg_int64_t;
 
 #endif  /* _OS_TYPES_H */
