@@ -25,7 +25,7 @@
 #include "window.h"
 #include "registry.h"
 #include "misc.h"
-#include "ffmpeg_render_line.h"
+#include "ffmpeg_stuff.h"
 //#include <codecs/lib/codeclib.h>
 
 static int ilog(unsigned int v){

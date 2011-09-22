@@ -24,7 +24,7 @@
 #include "registry.h"
 #include "codebook.h"
 #include "misc.h"
-#include "ffmpeg_render_line.h"
+#include "ffmpeg_stuff.h"
 
 #define floor1_rangedB 140 /* floor 1 fixed at -140dB to 0dB range */
 
