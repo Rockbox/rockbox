@@ -59,7 +59,13 @@ typedef struct vorbis_info{
 typedef struct vorbis_dsp_state{
   vorbis_info *vi;
 
-  ogg_int32_t **pcm;
+  ogg_int32_t *residues[2];
+  ogg_int32_t *floors;
+  ogg_int32_t *saved;
+  ogg_int32_t *saved_ptr[CHANNELS];
+
+  int ri;
+
   ogg_int32_t **pcmb;
   ogg_int32_t **pcmret;
   int      pcm_storage;
@@ -71,23 +77,15 @@ typedef struct vorbis_dsp_state{
   long lW;
   long W;
   long nW;
-  long centerW;
 
   ogg_int64_t granulepos;
   ogg_int64_t sequence;
 
   void       *backend_state;
-  
-  ogg_int32_t *first_pcm;       /* PCM buffer (for normal RAM or IRAM)*/
-#ifdef TREMOR_USE_IRAM
-  ogg_int32_t *iram_double_pcm; /* PCM 2nd buffer for IRAM */
-#endif
-  bool reset_pcmb;
 } vorbis_dsp_state;
 
 typedef struct vorbis_block{
   /* necessary stream state for linking to the framing abstraction */
-  ogg_int32_t  **pcm;       /* this is a pointer into local storage */ 
   oggpack_buffer opb;
   
   long  lW;

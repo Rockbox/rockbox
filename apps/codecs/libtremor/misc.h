@@ -26,7 +26,6 @@
 
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
-  
 
 /* Some prototypes that were not defined elsewhere */
 void *_vorbis_block_alloc(vorbis_block *vb,long bytes);
@@ -154,32 +153,6 @@ static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
   *y = MULT31(b, t) + MULT31(a, v);
 }
 */
-#endif
-#ifndef _TREMOR_VECT_OPS
-#define _TREMOR_VECT_OPS
-static inline 
-void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
-{
-    vect_add(x, y, n );
-}
-
-static inline 
-void vect_add_right_left(ogg_int32_t *x, const ogg_int32_t *y, int n)
-{
-    vect_add(x, y, n );
-}
-
-static inline
-void ogg_vect_mult_fw(int32_t *data, const int32_t *window, int n)
-{
-    vect_mult_fw(data, window, n);
-}
-
-static inline
-void ogg_vect_mult_bw(int32_t *data, const int32_t *window, int n)
-{
-    vect_mult_bw(data, window, n);
-}
 #endif
 
 #if 0

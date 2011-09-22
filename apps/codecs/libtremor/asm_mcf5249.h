@@ -28,37 +28,5 @@
 
 #define MB()
 
-#ifndef _TREMOR_VECT_OPS
-#define _TREMOR_VECT_OPS
-static inline 
-void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
-{
-    /* coldfire asm has symmetrical versions of vect_add_right_left
-       and vect_add_left_right  (since symmetrical versions of
-       vect_mult_fw and vect_mult_bw  i.e.  both use MULT31) */
-    vect_add(x, y, n );
-}
-
-static inline 
-void vect_add_right_left(ogg_int32_t *x, const ogg_int32_t *y, int n)
-{
-    /* coldfire asm has symmetrical versions of vect_add_right_left
-       and vect_add_left_right  (since symmetrical versions of
-       vect_mult_fw and vect_mult_bw  i.e.  both use MULT31) */
-    vect_add(x, y, n );
-}
-
-static inline
-void ogg_vect_mult_fw(int32_t *data, const int32_t *window, int n)
-{
-    vect_mult_fw(data, window, n);
-}
-
-static inline
-void ogg_vect_mult_bw(int32_t *data, const int32_t *window, int n)
-{
-    vect_mult_bw(data, window, n);
-}
-#endif
 #endif
 #endif

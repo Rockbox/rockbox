@@ -25,15 +25,13 @@
 #include "os.h"
 
 
-static ogg_int32_t *ipcm_vect[CHANNELS] IBSS_ATTR;
-
 static inline int _vorbis_synthesis1(vorbis_block *vb,ogg_packet *op,int decodep){
   vorbis_dsp_state     *vd= vb ? vb->vd : 0;
   private_state        *b= vd ? (private_state *)vd->backend_state: 0;
   vorbis_info          *vi= vd ? vd->vi : 0;
   codec_setup_info     *ci= vi ? (codec_setup_info *)vi->codec_setup : 0;
   oggpack_buffer       *opb=vb ? &vb->opb : 0;
-  int                   type,mode,i;
+  int                   type,mode;
  
   if (!vd || !b || !vi || !ci || !opb) {
     return OV_EBADPACKET;
@@ -75,22 +73,8 @@ static inline int _vorbis_synthesis1(vorbis_block *vb,ogg_packet *op,int decodep
 
   if(decodep && vi->channels<=CHANNELS)
   {
-    vb->pcm = ipcm_vect;
-
     /* set pcm end point */
     vb->pcmend=ci->blocksizes[vb->W];
-    /* use statically allocated buffer */
-    if(vd->reset_pcmb || vb->pcm[0]==NULL)
-    {
-      /* one-time initialisation at codec start
-         NOT for every block synthesis start
-         allows us to flip between buffers once initialised
-         by simply flipping pointers */
-      for(i=0; i<vi->channels; i++)
-        vb->pcm[i] = &vd->first_pcm[i*ci->blocksizes[1]];
-        
-    }
-    vd->reset_pcmb = false;
       
     /* unpack_header enforces range checking */
     type=ci->map_type[ci->mode_param[mode]->mapping];
@@ -98,8 +82,6 @@ static inline int _vorbis_synthesis1(vorbis_block *vb,ogg_packet *op,int decodep
   }else{
     /* no pcm */
     vb->pcmend=0;
-    vb->pcm=NULL;
-    
     return(0);
   }
 }

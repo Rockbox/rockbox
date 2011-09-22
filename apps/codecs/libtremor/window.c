@@ -53,7 +53,7 @@ const void *_vorbis_window(int type, int left){
     return(0);
   }
 }
-
+#if 0
 void _vorbis_apply_window(ogg_int32_t *d,const void *window_p[2],
                           long *blocksizes,
                           int lW,int W,int nW){
@@ -79,4 +79,4 @@ void _vorbis_apply_window(ogg_int32_t *d,const void *window_p[2],
   /* Again - memset not needed
      memset((void *)&d[rightend], 0, sizeof(ogg_int32_t)*(n-rightend)); */
 }
-
+#endif

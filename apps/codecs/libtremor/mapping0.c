@@ -302,7 +302,6 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   vorbis_dsp_state     *vd=vb->vd;
   vorbis_info          *vi=vd->vi;
   codec_setup_info     *ci=(codec_setup_info *)vi->codec_setup;
-  private_state        *b=(private_state *)vd->backend_state;
   vorbis_look_mapping0 *look=(vorbis_look_mapping0 *)l;
   vorbis_info_mapping0 *info=look->map;
 
@@ -329,8 +328,8 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
     if(floormemo[i])
       nonzero[i]=1;
     else
-      nonzero[i]=0;      
-    memset(vb->pcm[i],0,sizeof(*vb->pcm[i])*n/2);
+      nonzero[i]=0;
+    memset(vd->floors + i * ci->blocksizes[vb->W]/2,0,sizeof(ogg_int32_t)*n/2);
   }
 
   /* channel coupling can 'dirty' the nonzero listing */
@@ -351,7 +350,7 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
           zerobundle[ch_in_bundle]=1;
         else
           zerobundle[ch_in_bundle]=0;
-        pcmbundle[ch_in_bundle++]=vb->pcm[j];
+        pcmbundle[ch_in_bundle++] = vd->floors + j * ci->blocksizes[vb->W]/2;
       }
     }
 
@@ -365,8 +364,8 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
 
   /* channel coupling */
   for(i=info->coupling_steps-1;i>=0;i--){
-    ogg_int32_t *pcmM=vb->pcm[info->coupling_mag[i]];
-    ogg_int32_t *pcmA=vb->pcm[info->coupling_ang[i]];
+    ogg_int32_t *pcmM = vd->floors + info->coupling_mag[i] * ci->blocksizes[vb->W]/2;
+    ogg_int32_t *pcmA = vd->floors + info->coupling_ang[i] * ci->blocksizes[vb->W]/2;
     channel_couple(pcmM,pcmA,n);
   }
 
@@ -378,24 +377,21 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
 
   /* transform the PCM data; takes PCM vector, vb; modifies PCM vector */
   /* only MDCT right now.... */
-
   for(i=0;i<vi->channels;i++){
-    ogg_int32_t *pcm=vb->pcm[i];
+    ogg_int32_t *pcm = vd->floors + i*ci->blocksizes[vb->W]/2;
     int submap=info->chmuxlist[i];
     
     if(nonzero[i]) {
       /* compute and apply spectral envelope */
       look->floor_func[submap]->
         inverse2(vb,look->floor_look[submap],floormemo[i],pcm);
-        
-      ff_imdct_calc(ci->blocksizes_nbits[vb->W],
-                    (int32_t*)pcm,
-                    (int32_t*)pcm);
-      /* window the data */
-      _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
+
+      ff_imdct_half(ci->blocksizes_nbits[vb->W],
+                    (int32_t*)vd->residues[vd->ri] + i*ci->blocksizes[vb->W]/2,
+                    (int32_t*)&vd->floors[i*ci->blocksizes[vb->W]/2]);
     }
-    else 
-      memset(pcm, 0, sizeof(ogg_int32_t)*n);
+    else
+      memset(vd->residues[vd->ri] + i*ci->blocksizes[vb->W]/2, 0, sizeof(ogg_int32_t)*n/2);
   }
 
   //for(j=0;j<vi->channels;j++)

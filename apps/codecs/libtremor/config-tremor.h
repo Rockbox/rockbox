@@ -40,10 +40,10 @@
 
 /* Define CPU of Normal IRAM (96KB)                    */
 #else
-/* PCM_BUFFER    : 16384 Byte (2048*2*4)               *
- * WINDOW_LOOKUP : 4608 Byte (128*4 + 1024*4)          *
- * TOTAL         : 20992                               */
-#define IRAM_IBSS_SIZE 20992
+/* floor and double residue buffer : 24576 Byte (2048/2*4*2*3)  *
+ * WINDOW_LOOKUP                   : 4608 Byte (128*4 + 1024*4) *
+ * TOTAL                           : 29184                      */
+#define IRAM_IBSS_SIZE 29184
 #endif
 #endif
 
