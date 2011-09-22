@@ -28,6 +28,7 @@
 #include "cpu.h"
 #include "system.h"
 #include "kernel.h"
+#include "thread.h"
 #include "serial.h"
 #include "appevents.h"
 
@@ -124,14 +125,57 @@
 /* 0x0C-0x10 reserved */
 #define IAP_ACK_RES_INVAL   (0x11)  /* Invalid accessory resistor value */
 
+/* Events in the iap_queue */
+#define IAP_EV_TICK         (1)     /* The regular task timeout */
+#define IAP_EV_MSG_RCVD     (2)     /* A complete message has been received from the device */
+
+/* Add a button to the remote button bitfield. Also set iap_repeatbtn=2
+ * if it's not already set
+ */
+#define REMOTE_BUTTON(x) do { \
+        iap_remotebtn |= (x); \
+        iap_timeoutbtn = 3; \
+        iap_repeatbtn = 0; \
+        } while(0)
+        
+/* Used to control the rate from calls to iap_periodic (roughly 10HZ) to
+ * notifications sent to the device (normally 2HZ, higher for certain
+ * events, for example volume changes). The maximum useful value is 5,
+ * which sets the notification rate to 5HZ.
+ * Don't set this to 0 to disable notifications, use device.do_notify for
+ * that
+ */
 static volatile int iap_pollspeed = 0;
-static volatile bool iap_remotetick = true;
-static bool iap_setupflag = false, iap_updateflag = false;
+static bool iap_setupflag = false, iap_updateflag = false, iap_running = false;
+/* This is set to true if a SYS_POWEROFF message is received,
+ * signalling impending power off
+ */
+static bool iap_shutdown = false;
 static int iap_changedctr = 0;
+static struct timeout iap_task_tmo;
 
 static unsigned long iap_remotebtn = 0;
+/* Used for one-shot buttons (buttons that go out by themselves after a
+ * short time, without the device having to send an explicit "button up"
+ * event.
+ * If !0, the button will go out on it's own
+ */
 static int iap_repeatbtn = 0;
+/* Used to time out button down events in case we miss the button up event
+ * from the device somehow.
+ * If a device sends a button down event it's required to repeat that event
+ * every 30 to 100ms as long as the button is pressed, and send an explicit
+ * button up event if the button is released.
+ * In case the button up event is lost any down events will time out after
+ * ~200ms.
+ * iap_periodic() will count down this variable and reset all buttons if
+ * it reaches 0
+ */
+static unsigned int iap_timeoutbtn = 0;
 static bool iap_btnrepeat = false, iap_btnshuffle = false;
+
+static long thread_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+static struct event_queue iap_queue;
 
 static unsigned char serbuf[RX_BUFLEN];
 static volatile bool serbuf_lock = false;
@@ -172,9 +216,9 @@ static enum interface_state interface_state = IST_STANDARD;
  * of 0 means unsupported
  */
 static unsigned char lingo_versions[32][2] = {
-    {1, 1},     /* General lingo, 0x00 */
+    {1, 5},     /* General lingo, 0x00 */
     {0, 0},     /* Microphone lingo, 0x01, unsupported */
-    {1, 1},     /* Simple remote lingo, 0x02 */
+    {1, 2},     /* Simple remote lingo, 0x02 */
     {1, 0},     /* Display remote lingo, 0x03 */
     {1, 0},     /* Extended Interface lingo, 0x04 */
     {}          /* All others are unsupported */
@@ -201,14 +245,30 @@ struct auth_t {
     unsigned char next_section;     /* The next expected section number */
 };
 
+/* State of GetAccessoryInfo */
+enum accinfo_state {
+    ACCST_NONE,     /* Initial state, no message sent */
+    ACCST_INIT,     /* Send out GetAccessoryInfo */
+    ACCST_SENT,     /* Wait for RetAccessoryInfo */
+};
+
 /* A struct describing an attached device and it's current
  * state
  */
 static struct device_t {
     struct auth_t auth;             /* Authentication state */
+    enum accinfo_state accinfo;     /* Accessory information state */
     uint32_t lingoes;               /* Negotiated lingoes */
-    uint32_t notifications;         /* Requested notifications */
+    uint32_t notifications;         /* Requested notifications. These are just the
+                                     * notifications explicitly requested by the
+                                     * device
+                                     */
     bool do_notify;                 /* Notifications enabled */
+    bool do_power_notify;           /* Whether to send power change notifications.
+                                     * These are sent automatically to all devices
+                                     * that used IdentifyDeviceLingoes to identify
+                                     * themselves, independent of other notifications
+                                     */
 } device;
 #define DEVICE_AUTHENTICATED (device.auth.state == AUST_AUTH)
 #define DEVICE_AUTH_RUNNING (device.auth.state != AUST_NONE)
@@ -240,19 +300,50 @@ static void reset_device(struct device_t* device)
     device->lingoes = 0;
     device->notifications = 0;
     device->do_notify = false;
+    device->do_power_notify = false;
+    device->accinfo = ACCST_NONE;
 }
 
-static void iap_task(void)
+static int iap_task(struct timeout *tmo __attribute__ ((unused)))
 {
-    static int count = 0;
+    queue_post(&iap_queue, IAP_EV_TICK, 0);
+    return MS_TO_TICKS(100);
+}
 
-    /* Schedule a call to iap_periodic every 100ms */
+/* This thread is waiting for events posted to iap_queue and calls
+ * the appropriate subroutines in response
+ */
+static void iap_thread(void)
+{
+    struct queue_event ev;
+    while(1) {
+        queue_wait(&iap_queue, &ev);
+        switch (ev.id)
+        {
+            /* Handle the regular 100ms tick used for driving the
+             * authentication state machine and notifications
+             */
+            case IAP_EV_TICK:
+            {
+                iap_periodic();
+                break;
+            }
 
-    count += 1;
-    if (count < MS_TO_TICKS(100)) return;
+            /* Handle a newly received message from the device */
+            case IAP_EV_MSG_RCVD:
+            {
+                iap_handlepkt();
+                break;
+            }
 
-    count = 0;
-    queue_post(&button_queue, SYS_IAP_PERIODIC, 0);
+            /* Handle poweroff message */
+            case SYS_POWEROFF:
+            {
+                iap_shutdown = true;
+                break;
+            }
+        }
+    }
 }
 
 /* called by playback when the next track starts */
@@ -262,18 +353,37 @@ static void iap_track_changed(void *ignored)
     iap_changedctr = 1;
 }
 
+/* Do general setup of the needed infrastructure.
+ *
+ * Please note that a lot of additional work is done by iap_start()
+ */
 void iap_setup(int ratenum)
 {
     iap_bitrate_set(ratenum);
     iap_pollspeed = 1;
-    iap_remotetick = true;
     iap_updateflag = false;
     iap_changedctr = 0;
-    iap_setupflag = true;
-    reset_device(&device);
     iap_remotebtn = BUTTON_NONE;
-    tick_add_task(iap_task);
+    iap_setupflag = true;
+}
+
+/* Actually bring up the message queue, message handler thread and
+ * notification timer
+ */
+static void iap_start(void)
+{
+    unsigned int tid;
+    reset_device(&device);
+    queue_init(&iap_queue, true);
+    tid = create_thread(iap_thread, thread_stack, sizeof(thread_stack),
+            0, "iap"
+            IF_PRIO(, PRIORITY_SYSTEM)
+            IF_COP(, CPU));
+    if (!tid)
+        panicf("Could not create iap thread");
+    timeout_register(&iap_task_tmo, iap_task, MS_TO_TICKS(100), (intptr_t)NULL);
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, iap_track_changed);
+    iap_running = true;
 }
 
 void iap_bitrate_set(int ratenum)
@@ -413,7 +523,12 @@ bool iap_getc(unsigned char x)
         s->check += x;
         if ((s->check & 0xFF) == 0) {
             /* done, received a valid frame */
-            queue_post(&button_queue, SYS_IAP_HANDLEPKT, 0);
+            /* The IAP handler infrastructure may not actually be running yet,
+             * it's started by the first successfully decoded packet
+             */
+            if (!iap_running)
+                iap_start();
+            queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
         }
         s->state = ST_SYNC;
         serbuf_lock = false;
@@ -435,8 +550,7 @@ void iap_periodic(void)
 
     if(!iap_setupflag) return;
 
-    /* Handle pending authentication tasks
-     */
+    /* Handle pending authentication tasks */
     switch (device.auth.state)
     {
         case AUST_INIT:
@@ -465,6 +579,36 @@ void iap_periodic(void)
         {
             break;
         }
+    }
+
+    /* Time out button down events */
+    if (iap_timeoutbtn)
+        iap_timeoutbtn -= 1;
+
+    if (!iap_timeoutbtn)
+    {
+        iap_remotebtn = BUTTON_NONE;
+        iap_repeatbtn = 0;
+    }
+
+    /* Handle power down messages. */
+    if (iap_shutdown && device.do_power_notify)
+    {
+        /* NotifyiPodStateChange */
+        unsigned char data[] = {0x00, 0x23, 0x01};
+
+        iap_send_pkt(data, sizeof(data));
+        iap_shutdown = false;
+    }
+
+    /* Handle GetAccessoryInfo messages */
+    if (device.accinfo == ACCST_INIT)
+    {
+        /* GetAccessoryInfo */
+        unsigned char data[] = {0x00, 0x27, 0x00};
+
+        iap_send_pkt(data, sizeof(data));
+        device.accinfo = ACCST_SENT;
     }
 
 
@@ -517,9 +661,8 @@ static void interface_state_change(enum interface_state new)
         ((interface_state == IST_STANDARD) && (new == IST_EXTENDED))) {
         if (audio_status() == AUDIO_STATUS_PLAY)
         {
-            iap_remotebtn |= BUTTON_RC_PLAY;
+            REMOTE_BUTTON(BUTTON_RC_PLAY);
             iap_repeatbtn = 2;
-            iap_remotetick = false;
             iap_changedctr = 1;
         }
     }
@@ -585,6 +728,10 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          * 0x05-N: Datafields holding the number of bits specified in 0x04
          *
          * Returns: (none)
+         * 
+         * TODO:
+         * BeginHighPower/EndHighPower should be send in the periodic handler,
+         * depending on the current play status
          */
         case 0x01:
         {
@@ -600,6 +747,9 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
              */
             interface_state_change(IST_STANDARD);
             reset_auth(&(device.auth));
+
+            /* Devices using Identify do not get power off notifications */
+            device.do_power_notify = false;
             
             switch (lingo) {
                 case 0x04:
@@ -988,16 +1138,24 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
                  * authentication
                  */
                 reset_auth(&(device.auth));
+
+                /* Devices using IdentifyDeviceLingoes get power off notifications */
+                device.do_power_notify = true;
             }
 
             /* If a new authentication is requested, start the auth
              * process.
              * The periodic handler will take care of sending out the
              * GetDevAuthenticationInfo packet
+             *
+             * If no authentication is requested, schedule the start of
+             * GetAccessoryInfo
              */
             if (deviceid && (options & 0x03) && !DEVICE_AUTH_RUNNING) {
                 reset_auth(&(device.auth));
                 device.auth.state = AUST_INIT;
+            } else {
+                device.accinfo = ACCST_INIT;
             }
 
             cmd_ok_mode0(cmd);
@@ -1117,11 +1275,14 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
                         /* If we could really do authentication we'd have to
                          * check the certificate here. Since we can't, just acknowledge
                          * the packet with an "everything OK" AckDevAuthenticationInfo
+                         *
+                         * Also, start GetAccessoryInfo process
                          */
                         unsigned char data[] = {0x00, 0x16, 0x00};
 
                         iap_send_pkt(data, sizeof(data));
                         device.auth.state = AUST_CERTDONE;
+                        device.accinfo = ACCST_INIT;
                     } else {
                         device.auth.next_section++;
                         cmd_ok_mode0(cmd);
@@ -1298,13 +1459,164 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             break;
         }
 
-        /* GetIpodOptions */
+        /* NotifyiPodStateChange (0x23)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetIpodOptions (0x24)
+         *
+         * Request supported features of the iPod
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x24
+         *
+         * Retuns:
+         * RetiPodOptions
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x25
+         * 0x02-0x09: Options as a bitfield
+         */
         case 0x24:
         {
-            /* RetIpodOptions (ipod video send this) */
-            unsigned char data[] = {0x00, 0x25, 0x00, 0x00, 0x00,
-                                    0x00, 0x00, 0x00, 0x00, 0x01};
+            /* RetIpodOptions */
+            unsigned char data[] = {0x00, 0x25, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+            /* There are only two features that can be communicated via this
+             * function, video support and the ability to control line-out usage.
+             * Rockbox supports neither
+             */
             iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* RetiPodOptions (0x25)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetAccessoryInfo (0x27)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* RetAccessoryInfo (0x28)
+         *
+         * Send information about the device
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x28
+         * 0x02: Accessory info type
+         * 0x03-0xNN: Accessory information (depends on 0x02)
+         *
+         * Returns: (none)
+         *
+         * TODO: Actually do something with the information received here,
+         * sending out additional requests for all the categories the
+         * device supports
+         */
+        case 0x28:
+        {
+            /* Currently, nothing is done with the information */
+            break;
+        }
+
+        /* GetiPodPreferences (0x29)
+         *
+         * Retrieve information about the current state of the
+         * iPod.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x29
+         * 0x02: Information class requested
+         *
+         * This command requires authentication
+         *
+         * Returns on success:
+         * RetiPodPreferences
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x2A
+         * 0x02: Information class provided
+         * 0x03: Information
+         *
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAM
+         */
+        case 0x29:
+        {
+            unsigned char data[] = {0x00, 0x2A, 0x00, 0x00};
+
+            CHECKLEN0(3);
+            CHECKAUTH0;
+
+            /* The only information really supported is 0x03, Line-out usage.
+             * All others are video related
+             */
+            if (buf[2] == 0x03) {
+                data[2] = 0x03;
+                data[3] = 0x01;     /* Line-out enabled */
+
+                iap_send_pkt(data, sizeof(data));
+            } else {
+                cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+            }
+
+            break;
+        }
+
+        /* RetiPodPreference (0x2A)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* SetiPodPreferences (0x2B)
+         *
+         * Set preferences on the iPod
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x29
+         * 0x02: Prefecence class requested
+         * 0x03: Preference setting
+         * 0x04: Restore on exit
+         *
+         * This command requires authentication
+         *
+         * Returns on success:
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAM
+         * IAP_ACK_CMD_FAILED
+         */
+        case 0x2B:
+        {
+            CHECKLEN0(5);
+            CHECKAUTH0;
+
+            /* The only information really supported is 0x03, Line-out usage.
+             * All others are video related
+             */
+            if (buf[2] == 0x03) {
+                /* If line-out disabled is requested, reply with IAP_ACK_CMD_FAILED,
+                 * otherwise with IAP_ACK_CMD_OK
+                 */
+                if (buf[3] == 0x00) {
+                    cmd_ack_mode0(cmd, IAP_ACK_CMD_FAILED);
+                } else {
+                    cmd_ok_mode0(cmd);
+                }
+            } else {
+                cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+            }
+
             break;
         }
         
@@ -1349,6 +1661,7 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
     /* Lingo 0x02 must have been negotiated */
     if (!DEVICE_LINGO_SUPPORTED(0x02)) {
         cmd_ack_mode2(cmd, IAP_ACK_BAD_PARAM);
+        return;
     }
 
     switch (cmd)
@@ -1370,42 +1683,32 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
         case 0x00:
         {
             iap_remotebtn = BUTTON_NONE;
-            iap_remotetick = false;
+            iap_timeoutbtn = 0;
             
-            if(len >= 3 && buf[2] != 0)
+            if(buf[2] != 0)
             {
                 if(buf[2] & 1)
-                    iap_remotebtn |= BUTTON_RC_PLAY;
+                    REMOTE_BUTTON(BUTTON_RC_PLAY);
                 if(buf[2] & 2)
-                    iap_remotebtn |= BUTTON_RC_VOL_UP;
+                    REMOTE_BUTTON(BUTTON_RC_VOL_UP);
                 if(buf[2] & 4)
-                    iap_remotebtn |= BUTTON_RC_VOL_DOWN;
+                    REMOTE_BUTTON(BUTTON_RC_VOL_DOWN);
                 if(buf[2] & 8)
-                    iap_remotebtn |= BUTTON_RC_RIGHT;
+                    REMOTE_BUTTON(BUTTON_RC_RIGHT);
                 if(buf[2] & 16)
-                    iap_remotebtn |= BUTTON_RC_LEFT;
+                    REMOTE_BUTTON(BUTTON_RC_LEFT);
             }
             else if(len >= 4 && buf[3] != 0)
             {
                 if(buf[3] & 1) /* play */
                 {
                     if (audio_status() != AUDIO_STATUS_PLAY)
-                    {
-                        iap_remotebtn |= BUTTON_RC_PLAY;
-                        iap_repeatbtn = 2;
-                        iap_remotetick = false;
-                        iap_changedctr = 1;
-                    }
+                        REMOTE_BUTTON(BUTTON_RC_PLAY);
                 }
                 if(buf[3] & 2) /* pause */
                 {
                     if (audio_status() == AUDIO_STATUS_PLAY)
-                    {
-                        iap_remotebtn |= BUTTON_RC_PLAY;
-                        iap_repeatbtn = 2;
-                        iap_remotetick = false;
-                        iap_changedctr = 1;
-                    }
+                        REMOTE_BUTTON(BUTTON_RC_PLAY);
                 }
                 if((buf[3] & 128) && !iap_btnshuffle) /* shuffle */
                 {
@@ -1450,13 +1753,9 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
                     iap_btnrepeat = false;
 
                 if(buf[4] & 16) /* ffwd */
-                {
-                    iap_remotebtn |= BUTTON_RC_RIGHT;
-                }
+                    REMOTE_BUTTON(BUTTON_RC_RIGHT);
                 if(buf[4] & 32) /* frwd */
-                {
-                    iap_remotebtn |= BUTTON_RC_LEFT;
-                }
+                    REMOTE_BUTTON(BUTTON_RC_LEFT);
             }
 
             break;
@@ -1550,12 +1849,24 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
          */
         case 0x04:
         {
+            unsigned char repeatbuf[6];
+
             if (!DEVICE_AUTHENTICATED) {
                 cmd_ack_mode2(cmd, IAP_ACK_NO_AUTHEN);
                 break;
             }
 
-            cmd_ack_mode2(cmd, IAP_ACK_CMD_FAILED);
+            /* This is basically the same command as ContextButtonStatus (0x00),
+             * with the difference that it requires authentication and that
+             * it returns an ACK packet to the device.
+             * So just route it through the handler again, with 0x00 as the
+             * command
+             */
+            memcpy(repeatbuf, buf, 6);
+            repeatbuf[1] = 0x00;
+            iap_handlepkt_mode2((len<6)?len:6, repeatbuf);
+
+            cmd_ack_mode2(cmd, IAP_ACK_OK);
             break;
         }
         
@@ -1604,6 +1915,7 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
     /* Lingo 0x03 must have been negotiated */
     if (!DEVICE_LINGO_SUPPORTED(0x03)) {
         cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+        return;
     }
 
     switch (cmd)
@@ -1837,6 +2149,12 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
 
     /* Lingo 0x04 must have been negotiated */
     if (!DEVICE_LINGO_SUPPORTED(0x04)) {
+        cmd_ack_mode4(cmd, IAP_ACK_BAD_PARAM);
+        return;
+    }
+
+    /* All these commands require extended interface mode */
+    if (interface_state != IST_EXTENDED) {
         cmd_ack_mode4(cmd, IAP_ACK_BAD_PARAM);
         return;
     }
@@ -2131,38 +2449,31 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
                 case 0x01: /* play/pause */
                     iap_remotebtn = BUTTON_RC_PLAY;
                     iap_repeatbtn = 2;
-                    iap_remotetick = false;
                     iap_changedctr = 1;
                     break;
                 case 0x02: /* stop */
                     iap_remotebtn = BUTTON_RC_PLAY|BUTTON_REPEAT;
                     iap_repeatbtn = 2;
-                    iap_remotetick = false;
                     iap_changedctr = 1;
                     break;
                 case 0x03: /* skip++ */
                     iap_remotebtn = BUTTON_RC_RIGHT;
                     iap_repeatbtn = 2;
-                    iap_remotetick = false;
                     break;
                 case 0x04: /* skip-- */
                     iap_remotebtn = BUTTON_RC_LEFT;
                     iap_repeatbtn = 2;
-                    iap_remotetick = false;
                     break;
                 case 0x05: /* ffwd */
                     iap_remotebtn = BUTTON_RC_RIGHT;
-                    iap_remotetick = false;
                     if(iap_pollspeed) iap_pollspeed = 5;
                     break;
                 case 0x06: /* frwd */
                     iap_remotebtn = BUTTON_RC_LEFT;
-                    iap_remotetick = false;
                     if(iap_pollspeed) iap_pollspeed = 5;
                     break;
                 case 0x07: /* end ffwd/frwd */
                     iap_remotebtn = BUTTON_NONE;
-                    iap_remotetick = false;
                     if(iap_pollspeed) iap_pollspeed = 1;
                     break;
             }
@@ -2333,9 +2644,9 @@ void iap_handlepkt(void)
 
     /* if we are waiting for a remote button to go out,
        delay the handling of the new packet */
-    if(!iap_remotetick)
+    if(iap_repeatbtn)
     {
-        queue_post(&button_queue, SYS_IAP_HANDLEPKT, 0);
+        queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
         return;
     }
 
@@ -2365,11 +2676,8 @@ int remote_control_rx(void)
         if(!iap_repeatbtn)
         {
             iap_remotebtn = BUTTON_NONE;
-            iap_remotetick = true;
         }
     }
-    else
-        iap_remotetick = true;
 
     return btn;
 }

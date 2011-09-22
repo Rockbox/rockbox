@@ -275,3 +275,6 @@ subtest "ACK Bad Parameter" => sub {
     is($c, 0x02, "Response command");
     is($p, "\x04\xFF", "Response payload");
 };
+
+# Empty the buffer
+$ipod->emptyrecv();

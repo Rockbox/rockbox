@@ -215,3 +215,6 @@ subtest "ACK Not Authenticated" => sub {
     is($c, 0x01, "Response command");
     is($p, "\x07\x04", "Response payload");
 };
+
+# Empty the buffer
+$ipod->emptyrecv();

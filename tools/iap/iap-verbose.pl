@@ -330,7 +330,7 @@ sub _h_00_0025 {
 
     ($ophi, $oplo) = unpack("NN", $data);
 
-    printf("RetiPodOptions (0x00, 0x24) I->D\n");
+    printf("RetiPodOptions (0x00, 0x25) I->D\n");
     printf(" Options:\n");
     printf("  iPod supports SetiPodPreferences\n") if ($oplo & 0x02);
     printf("  iPod supports video\n") if ($oplo & 0x01);
@@ -636,22 +636,22 @@ sub _h_03_000e {
         printf(" Type:             Mute/Volume\n");
         printf(" Mute State:       %s\n", $info->[0]?"On":"Off");
         printf(" Volume level:     %d\n", $info->[1]);
-        printf(" Restore on exit:  %d\n", $info->[2]?"Yes":"No");
+        printf(" Restore on exit:  %s\n", $info->[2]?"Yes":"No");
     } elsif ($type == 0x06) {
         $info = [unpack("xNC", $data)];
         printf(" Type:             Equalizer\n");
         printf(" Index:            %d\n", $info->[0]);
-        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+        printf(" Restore on exit:  %s\n", $info->[1]?"Yes":"No");
     } elsif ($type == 0x07) {
         $info = [unpack("xCC", $data)];
         printf(" Type:             Shuffle\n");
         printf(" Shuffle State:    %s\n", $info->[0]?"On":"Off");
-        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+        printf(" Restore on exit:  %s\n", $info->[1]?"Yes":"No");
     } elsif ($type == 0x08) {
         $info = [unpack("xCC", $data)];
         printf(" Type:             Repeat\n");
         printf(" Repeat State:     %s\n", $info->[0]?"On":"Off");
-        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+        printf(" Restore on exit:  %s\n", $info->[1]?"Yes":"No");
     } elsif ($type == 0x09) {
         $info = [unpack("xnCCCC", $data)];
         printf(" Type:             Date\n");
@@ -661,22 +661,22 @@ sub _h_03_000e {
         printf(" Type:             Alarm\n");
         printf(" Alarm State:      %s\n", $info->[0]?"On":"Off");
         printf(" Time:             %02d:%02d\n", $info->[1], $info->[2]);
-        printf(" Restore on exit:  %d\n", $info->[3]?"Yes":"No");
+        printf(" Restore on exit:  %s\n", $info->[3]?"Yes":"No");
     } elsif ($type == 0x0B) {
         $info = [unpack("xCC", $data)];
         printf(" Type:             Backlight\n");
-        printf(" Backlight State:     %s\n", $info->[0]?"On":"Off");
-        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+        printf(" Backlight State:  %s\n", $info->[0]?"On":"Off");
+        printf(" Restore on exit:  %s\n", $info->[1]?"Yes":"No");
     } elsif ($type == 0x0D) {
         $info = [unpack("xCC", $data)];
         printf(" Type:             Sound check\n");
         printf(" Sound check:      %s\n", $info->[0]?"On":"Off");
-        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+        printf(" Restore on exit:  %s\n", $info->[1]?"Yes":"No");
     } elsif ($type == 0x0E) {
         $info = [unpack("xCC", $data)];
         printf(" Type:             Audiobook speed\n");
         printf(" Speed:            %s\n", $info->[0]==0x00?"Normal":$info->[0]==0x01?"Faster":$info->[0]==0xFF?"Slower":"Reserved");
-        printf(" Restore on exit:  %d\n", $info->[1]?"Yes":"No");
+        printf(" Restore on exit:  %s\n", $info->[1]?"Yes":"No");
     } elsif ($type == 0x0F) {
         $info = unpack("xN", $data);
         printf(" Type:             Track position\n");
@@ -687,7 +687,7 @@ sub _h_03_000e {
         printf(" Mute State:       %s\n", $info->[0]?"On":"Off");
         printf(" UI Volume level:  %d\n", $info->[1]);
         printf(" Absolute Volume:  %d\n", $info->[2]);
-        printf(" Restore on exit:  %d\n", $info->[3]?"Yes":"No");
+        printf(" Restore on exit:  %s\n", $info->[3]?"Yes":"No");
     } else {
         printf(" Reserved\n");
     }
