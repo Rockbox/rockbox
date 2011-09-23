@@ -33,15 +33,22 @@
     ldr     pc, =irq_handler
     ldr     pc, =fiq_handler
 
-/* When starting, we are running at 0x4xxxxxxx (uncached) but the code
- * assumes DRAM is somewhere else (cached) so we first need to
- * setup the MMU and then jump to the right location. */
+/* When starting, we will be running at 0x40000000 most probably
+ * but the code is expected to be loaded at 0x4xxxxxxx (uncached) and to be
+ * running at virtual address 0xyyyyyyyy (cached). So we first
+ * need to move everything to the right locationn then we setup the mmu and
+ * jump to the final virtual address. */
 .text
 .global start
+    /** The code below must be able to run at any address **/
 start:
+    /* Copy running address */
+    sub     r7, pc, #8
     /* Save r0 */
     mov     r6, r0
-    msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
+
+    /* enter supervisor mode, disable IRQ/FIQ */
+    msr     cpsr_c, #0xd3
     /* Disable MMU, disable caching and buffering;
      * use low exception range address (the core uses high range by default) */
     mrc     p15, 0, r0, c1, c0, 0
@@ -55,10 +62,25 @@ start:
 
     /* Enable MMU */
     bl      memory_init
+
+    /* Copy the DRAM
+     * Assume the dram binary blob is located at the loading address (r5) */
+    mov    r2, r7
+    ldr    r3, =_dramcopystart
+    ldr    r4, =_dramcopyend
+1:
+    cmp     r4, r3
+    ldrhi   r5, [r2], #4
+    strhi   r5, [r3], #4
+    bhi     1b
+
+    mov     r2, #0
+    mcr     p15, 0, r2, c7, c5, 0   @ Invalidate ICache
+    
     /* Jump to real location */
     ldr     pc, =remap
 remap:
-
+    /** The code below is be running at the right virtual address **/
     /* Zero out IBSS */
     ldr     r2, =_iedata
     ldr     r3, =_iend
@@ -132,6 +154,7 @@ remap:
 
     /* Jump to main */
     mov     r0, r6
+    mov     r1, r7
     bl      main
 1:
     b       1b

@@ -34,6 +34,11 @@ SECTIONS
 {
     loadaddress = UNCACHED_DRAM_ADDR;
     _loadaddress = UNCACHED_DRAM_ADDR;
+
+    .dramcopystart (NOLOAD) :
+    {
+        _dramcopystart = .;
+    } > DRAM
         
     .text :
     {
@@ -75,6 +80,11 @@ SECTIONS
     } AT> DRAM
 
     _initcopy = LOADADDR(.init);
+
+    .dramcopyend (NOLOAD) :
+    {
+        _dramcopyend = .;
+    } > DRAM
 
     .stack (NOLOAD) :
     {

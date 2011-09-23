@@ -26,6 +26,11 @@ SECTIONS
     _loadaddress = UNCACHED_DRAM_ADDR;
     loadaddressend = UNCACHED_DRAM_ADDR + RAM_HOLE;
     _loadaddressend = UNCACHED_DRAM_ADDR + RAM_HOLE;
+
+    .dramcopystart (NOLOAD) :
+    {
+        _dramcopystart = .;
+    } > DRAM
     
     .text :
     {
@@ -47,6 +52,11 @@ SECTIONS
     } > IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.itext);
+
+    .dramcopyend (NOLOAD) :
+    {
+        _dramcopyend = .;
+    } > DRAM
 
     .ibss (NOLOAD) :
     {

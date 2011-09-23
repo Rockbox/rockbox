@@ -101,8 +101,8 @@ static void usb_mode(int connect_timeout)
 }
 #endif /* HAVE_BOOTLOADER_USB_MODE */
 
-void main(uint32_t arg) NORETURN_ATTR;
-void main(uint32_t arg)
+void main(uint32_t arg, uint32_t addr) NORETURN_ATTR;
+void main(uint32_t arg, uint32_t addr)
 {
     unsigned char* loadbuffer;
     int buffer_size;
@@ -124,7 +124,7 @@ void main(uint32_t arg)
     button_init();
 
     //button_debug_screen();
-    printf("arg=%x", arg);
+    printf("arg=%x addr=%x", arg, addr);
 
 #ifdef SANSA_FUZEPLUS
     extern void imx233_mmc_disable_window(void);
