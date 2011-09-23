@@ -110,11 +110,10 @@ static inline void window_overlap_add(unsigned int blocksize, unsigned int lastb
     unsigned retlen = (blocksize + lastblock) / 4;
     int j;
     for (j = 0; j < ch; j++) {
-        ogg_int32_t *residue   = v->residues[v->ri] + j * blocksize / 2;
-        ogg_int32_t *saved;
-        saved = v->saved_ptr[j];
-        ogg_int32_t       *ret = v->floors + j * retlen;
-        ogg_int32_t       *buf = residue;
+        ogg_int32_t *residue = v->residues[v->ri] + j * blocksize / 2;
+        ogg_int32_t   *saved = v->saved_ptr[j];
+        ogg_int32_t     *ret = v->floors + j * retlen;
+        ogg_int32_t     *buf = residue;
 
         if (v->W == v->lW) {
             ff_vector_fmul_window_c(ret, saved, buf, win, blocksize / 4);
