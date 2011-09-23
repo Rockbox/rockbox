@@ -16,7 +16,55 @@
  ********************************************************************/
 
 #ifdef _ARM_ASSEM_
+#if ARM_ARCH < 6
+#define INCL_OPTIMIZED_VECTOR_FMUL_WINDOW
+static inline void ff_vector_fmul_window_c(ogg_int32_t *dst, const ogg_int32_t *src0,
+                                           const ogg_int32_t *src1, const ogg_int32_t *win, int len)
+{
+    /* len is always a power of 2 and always >= 16 so this is unrolled 2 times*/
+    ogg_int32_t *dst0 = dst, *dst1 = dst + 2*len;
+    const ogg_int32_t *win0 = win, *win1 = win + 2*len;
+    src1 += len;
+    asm volatile ("cmp %[len], #0\n\t"
+                  "b 1f\n\t"
+                  "0:\n\t"
+                  "ldr r0, [%[src0]], #4\n\t"
+                  "ldr r1, [%[src1], #-4]!\n\t"
+                  "ldr r2, [%[win0]], #4\n\t"
+                  "ldr r3, [%[win1], #-4]!\n\t"
+                  "smull r4, r5, r0, r2\n\t"
+                  "smlal r4, r5, r1, r3\n\t"
+                  "rsb r2, r2, #0\n\t"
+                  "lsl r5, r5, #1\n\t"
+                  "str r5, [%[dst1], #-4]!\n\t"
+                  "smull r4, r5, r0, r3\n\t"
+                  "smlal r4, r5, r1, r2\n\t"
+                  "ldr r0, [%[src0]], #4\n\t"
+                  "ldr r1, [%[src1], #-4]!\n\t"
+                  "lsl r5, r5, #1\n\t"
+                  "str r5, [%[dst0]], #4\n\t"
 
+                  "ldr r2, [%[win0]], #4\n\t"
+                  "ldr r3, [%[win1], #-4]!\n\t"
+                  "smull r4, r5, r0, r2\n\t"
+                  "smlal r4, r5, r1, r3\n\t"
+                  "rsb r2, r2, #0\n\t"
+                  "lsl r5, r5, #1\n\t"
+                  "str r5, [%[dst1], #-4]!\n\t"
+                  "smull r4, r5, r0, r3\n\t"
+                  "smlal r4, r5, r1, r2\n\t"
+                  "subs %[len], %[len], #2\n\t"
+                  "lsl r5, r5, #1\n\t"
+                  "str r5, [%[dst0]], #4\n\t"
+                  "1:\n\t"
+                  "bgt 0b\n\t"
+                  : [dst0] "+r" (dst0), [dst1] "+r" (dst1),
+                    [src0] "+r" (src0), [src1] "+r" (src1),
+                    [win0] "+r" (win0), [win1] "+r" (win1),
+                    [len] "+r" (len)
+                  :: "r0", "r1", "r2", "r3", "r4", "r5", "cc", "memory");
+}
+#endif
 #ifndef _V_LSP_MATH_ASM
 #define _V_LSP_MATH_ASM
 
