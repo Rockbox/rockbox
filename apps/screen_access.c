@@ -69,7 +69,7 @@ static int screen_helper_getnblines(void)
 
 void screen_helper_setfont(int font)
 {
-    (int)font;
+    (void)font;
 #ifdef HAVE_LCD_BITMAP
     if (font == FONT_UI)
         font = global_status.font_id[SCREEN_MAIN];
