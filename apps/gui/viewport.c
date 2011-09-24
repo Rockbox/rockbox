@@ -272,13 +272,10 @@ void viewportmanager_theme_changed(const int which)
         screens[SCREEN_MAIN].has_buttonbar = global_settings.buttonbar;
     }
 #endif
-    if (which & THEME_UI_VIEWPORT)
-    {
-    }
     if (which & THEME_LANGUAGE)
     {
     }
-    if (which & THEME_STATUSBAR)
+    if (which & (THEME_STATUSBAR|THEME_UI_VIEWPORT))
     {
         FOR_NB_SCREENS(i)
         {
@@ -324,7 +321,7 @@ void viewport_set_fullscreen(struct viewport *vp,
 #ifndef __PCTOOL__
     set_default_align_flags(vp);
 #endif
-    vp->font = FONT_UI + screen; /* default to UI to discourage SYSFONT use */
+    vp->font = global_status.font_id[screen];
     vp->drawmode = DRMODE_SOLID;
 #if LCD_DEPTH > 1
 #ifdef HAVE_REMOTE_LCD

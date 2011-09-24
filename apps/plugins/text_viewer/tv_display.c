@@ -255,7 +255,7 @@ void tv_set_layout(bool show_scrollbar)
     int scrollbar_height = (show_scrollbar && preferences->horizontal_scrollbar)?
                            TV_SCROLLBAR_HEIGHT + 1 : 0;
 
-    row_height = preferences->font->height;
+    row_height = rb->font_get(preferences->font_id)->height;
 
     header.x = 0;
     header.y = 0;
@@ -282,6 +282,7 @@ void tv_set_layout(bool show_scrollbar)
     vp_text.y += vertical_scrollbar.y;
     vp_text.width = horizontal_scrollbar.w;
     vp_text.height = vertical_scrollbar.h;
+    vp_text.font = preferences->font_id;
 #else
     (void) show_scrollbar;
 
@@ -334,16 +335,20 @@ static void tv_change_viewport(void)
 static bool tv_set_font(const unsigned char *font)
 {
     unsigned char path[MAX_PATH];
-
     if (font != NULL && *font != '\0')
     {
         rb->snprintf(path, MAX_PATH, "%s/%s.fnt", FONT_DIR, font);
-        if (rb->font_load(NULL, path) < 0)
+        if (preferences->font_id >= 0 &&
+            (preferences->font_id != rb->global_status->font_id[SCREEN_MAIN]))
+            rb->font_unload(preferences->font_id);
+        tv_change_fontid(rb->font_load(path));
+        if (preferences->font_id < 0)
         {
             rb->splash(HZ/2, "font load failed");
             return false;
         }
     }
+    vp_text.font = preferences->font_id;
     return true;
 }
 #endif
@@ -375,7 +380,7 @@ static int tv_change_preferences(const struct tv_preferences *oldp)
 
             return (tv_set_preferences(&new_prefs))? TV_CALLBACK_STOP : TV_CALLBACK_ERROR;
         }
-        col_width = 2 * rb->font_get_width(preferences->font, ' ');
+        col_width = 2 * rb->font_get_width(rb->font_get(preferences->font_id), ' ');
         font_changing = false;
     }
 #else
@@ -402,9 +407,10 @@ void tv_finalize_display(void)
 {
 #ifdef HAVE_LCD_BITMAP
     /* restore font */
-    if (rb->strcmp(rb->global_settings->font_file, preferences->font_name))
+    if (preferences->font_id >= 0 &&
+        (preferences->font_id != rb->global_status->font_id[SCREEN_MAIN]))
     {
-        tv_set_font(rb->global_settings->font_file);
+        rb->font_unload(preferences->font_id);
     }
 
     /* undo viewport */

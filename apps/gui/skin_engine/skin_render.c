@@ -31,6 +31,7 @@
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
 #endif
+#include "settings.h"
 #include "skin_display.h"
 #include "skin_engine.h"
 #include "skin_parser.h"
@@ -650,6 +651,10 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
         img->display = -1;
         imglist = imglist->next;
     }
+
+    /* fix font ID's */
+    if (skin_viewport->parsed_fontid == 1)
+        skin_viewport->vp.font = global_status.font_id[display->screen_type];
 #endif
     
     while (line)

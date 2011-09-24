@@ -95,7 +95,7 @@ struct tv_preferences {
 
 #ifdef HAVE_LCD_BITMAP
     unsigned char font_name[MAX_PATH];
-    struct font *font;
+    int font_id;
 #endif
     unsigned char file_name[MAX_PATH];
 };
@@ -151,4 +151,6 @@ void tv_set_default_preferences(struct tv_preferences *p);
  */
 void tv_add_preferences_change_listner(int (*listner)(const struct tv_preferences *oldp));
 
+
+void tv_change_fontid(int id);
 #endif

@@ -278,6 +278,9 @@ struct system_status
     signed char last_screen;
     int  viewer_icon_count;
     int last_volume_change; /* tick the last volume change happened. skins use this */
+#ifdef HAVE_LCD_BITMAP
+    int font_id[NB_SCREENS]; /* font id of the settings font for each screen */
+#endif
 };
 
 struct user_settings

@@ -433,6 +433,11 @@ RB_WRAP(font_getstringsize)
     int fontnumber = luaL_checkint(L, 2);
     int w, h;
 
+    if (fontnumber == FONT_UI)
+        fontnumber = rb->global_status->font_id[SCREEN_MAIN];
+    else
+        fontnumber = FONT_SYSFIXED;
+
     int result = rb->font_getstringsize(str, &w, &h, fontnumber);
     lua_pushinteger(L, result);
     lua_pushinteger(L, w);

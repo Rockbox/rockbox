@@ -105,9 +105,6 @@ gui/viewport.c
 gui/skin_engine/skin_backdrops.c
 gui/skin_engine/skin_display.c
 gui/skin_engine/skin_engine.c
-#ifdef HAVE_LCD_BITMAP
-gui/skin_engine/skin_fonts.c
-#endif
 gui/skin_engine/skin_parser.c
 gui/skin_engine/skin_render.c
 gui/skin_engine/skin_tokens.c

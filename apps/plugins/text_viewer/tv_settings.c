@@ -218,7 +218,7 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
 #ifdef HAVE_LCD_BITMAP
     rb->strlcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
 
-    prefs->font = rb->font_get(FONT_UI);
+    prefs->font_id = rb->global_status->font_id[SCREEN_MAIN];
 #endif
 
     return true;

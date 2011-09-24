@@ -182,6 +182,7 @@ struct skin_viewport {
     char hidden_flags;
     bool is_infovp;
     char* label;
+    int   parsed_fontid;
 #if LCD_DEPTH > 1
     unsigned start_fgcolour;
     unsigned start_bgcolour;
@@ -325,6 +326,8 @@ struct wps_data
     struct skin_element *tree;
 #ifdef HAVE_LCD_BITMAP
     struct skin_token_list *images;
+    int *font_ids;
+    int font_count;
 #endif
 #if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
     struct {

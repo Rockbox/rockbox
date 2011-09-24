@@ -265,7 +265,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     int retval = 0;
 
-    rb->lcd_setfont(0);
+    rb->lcd_setfont(FONT_SYSFIXED);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);

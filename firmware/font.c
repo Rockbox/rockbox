@@ -34,6 +34,7 @@
 #include "system.h"
 #include "font.h"
 #include "file.h"
+#include "core_alloc.h"
 #include "debug.h"
 #include "panic.h"
 #include "rbunicode.h"
@@ -74,19 +75,58 @@ extern struct font sysfont;
 
 #ifndef BOOTLOADER
 
-/* structure filled in by font_load */
-static struct font font_ui;
-/* static buffer allocation structures */
-static unsigned char main_buf[MAX_FONT_SIZE] CACHEALIGN_ATTR;
-#ifdef HAVE_REMOTE_LCD
-#define REMOTE_FONT_SIZE 10000
-static struct font remote_font_ui;
-static unsigned char remote_buf[REMOTE_FONT_SIZE] CACHEALIGN_ATTR;
-#endif
+struct buflib_alloc_data {
+    struct font font;
+    bool handle_locked; /* is the buflib handle currently locked? */
+    int refcount;       /* how many times has this font been loaded? */
+    unsigned char buffer[MAX_FONT_SIZE];
+};
+static int buflib_allocations[MAXFONTS];
+static int handle_for_glyphcache;
 
-/* system font table, in order of FONT_xxx definition */
-static struct font* sysfonts[MAXFONTS] = { &sysfont, &font_ui, NULL};
+static int buflibmove_callback(int handle, void* current, void* new)
+{
+    (void)handle;
+    struct buflib_alloc_data *alloc = (struct buflib_alloc_data*)current;
+    size_t diff = new - current;
 
+    if (alloc->handle_locked)
+        return BUFLIB_CB_CANNOT_MOVE;
+
+    alloc->font.bits += diff;
+    alloc->font.offset += diff;
+    if (alloc->font.width)
+        alloc->font.width += diff;
+
+    alloc->font.buffer_start += diff;
+    alloc->font.buffer_end += diff;
+    alloc->font.buffer_position += diff;
+
+    alloc->font.cache._index += diff;
+
+    return BUFLIB_CB_OK;
+}
+static void lock_font_handle(int handle, bool lock)
+{
+    struct buflib_alloc_data *alloc = core_get_data(handle);
+    alloc->handle_locked = lock;
+}
+
+static struct buflib_callbacks buflibops = {buflibmove_callback, NULL };
+
+static inline struct font *pf_from_handle(int handle)
+{
+    struct buflib_alloc_data *alloc = core_get_data(handle);
+    struct font *pf = &alloc->font;
+    return pf;
+}
+
+static inline unsigned char *buffer_from_handle(int handle)
+{
+    struct buflib_alloc_data *alloc = core_get_data(handle);
+    unsigned char* buffer = alloc->buffer;
+    return buffer;
+}
 
 /* Font cache structures */
 static void cache_create(struct font* pf);
@@ -95,13 +135,10 @@ static void glyph_cache_load(struct font* pf);
 
 void font_init(void)
 {
-    int i = SYSTEMFONTCOUNT;
+    int i = 0;
     while (i<MAXFONTS)
-        sysfonts[i++] = NULL;
-    font_reset(NULL);
-#ifdef HAVE_REMOTE_LCD
-    font_reset(&remote_font_ui);
-#endif
+        buflib_allocations[i++] = -1;
+    handle_for_glyphcache = -1;
 }
 
 /* Check if we have x bytes left in the file buffer */
@@ -137,26 +174,6 @@ static int glyph_bytes( struct font *pf, int width )
     return pf->depth ?
         (pf->height * width + 1) / 2:
         width * ((pf->height + 7) / 8);
-}
-
-void font_reset(struct font *pf)
-{
-    unsigned char* buffer = NULL;
-    size_t buf_size = 0;
-    if (pf == NULL)
-        pf = &font_ui;
-    else
-    {
-        buffer = pf->buffer_start;
-        buf_size = pf->buffer_size;
-    }
-    memset(pf, 0, sizeof(struct font));
-    pf->fd = -1;
-    if (buffer)
-    {
-        pf->buffer_start = buffer;
-        pf->buffer_size = buf_size;
-    }
 }
 
 static struct font* font_load_header(struct font *pf)
@@ -320,18 +337,27 @@ static struct font* font_load_cached(struct font* pf)
     return pf;
 }
 
-static bool internal_load_font(struct font* pf, const char *path,
+static void font_reset(int font_id)
+{
+    struct font *pf = pf_from_handle(buflib_allocations[font_id]);
+    // fixme
+    memset(pf, 0, sizeof(struct font));
+    pf->fd = -1;
+}
+
+
+static bool internal_load_font(int font_id, const char *path,
                                char *buf, size_t buf_size)
 {
     int size;
-    
+    struct font* pf = pf_from_handle(buflib_allocations[font_id]);
     /* save loaded glyphs */
     glyph_cache_save(pf);
     /* Close font file handle */
     if (pf->fd >= 0)
         close(pf->fd);
 
-    font_reset(pf);
+    font_reset(font_id);
 
     /* open and read entire font file*/
     pf->fd = open(path, O_RDONLY|O_BINARY);
@@ -393,80 +419,117 @@ static bool internal_load_font(struct font* pf, const char *path,
     return true;
 }
 
-#ifdef HAVE_REMOTE_LCD
-/* Load a font into the special remote ui font slot */
-int font_load_remoteui(const char* path)
+static int find_font_index(const char* path)
 {
-    struct font* pf = &remote_font_ui;
-    if (!path)
-    {
-        if (sysfonts[FONT_UI_REMOTE] && sysfonts[FONT_UI_REMOTE] != sysfonts[FONT_UI])
-            font_unload(FONT_UI_REMOTE);
-        sysfonts[FONT_UI_REMOTE] = NULL;
-        return FONT_UI;
-    }
-    if (!internal_load_font(pf, path, remote_buf, REMOTE_FONT_SIZE))
-    {
-        sysfonts[FONT_UI_REMOTE] = NULL;
-        return -1;
-    }
-    
-    sysfonts[FONT_UI_REMOTE] = pf;
-    return FONT_UI_REMOTE;
-}
-#endif
+    int index = 0, handle;
 
+    while (index < MAXFONTS)
+    {
+        handle = buflib_allocations[index];
+        if (handle > 0 && !strcmp(core_get_name(handle), path))
+            return index;
+        index++;
+    }
+    return FONT_SYSFIXED;
+}
+
+static int alloc_and_init(int font_idx, const char* name)
+{
+    int *phandle = &buflib_allocations[font_idx];
+    int handle = *phandle;
+    struct buflib_alloc_data *pdata;
+    struct font *pf;
+    if (handle > 0)
+        return handle;
+    *phandle = core_alloc_ex(name, sizeof(struct buflib_alloc_data), &buflibops);
+    handle = *phandle;
+    if (handle < 0)
+        return handle;
+    pdata = core_get_data(handle);
+    pf = &pdata->font;
+    font_reset(font_idx);
+    pdata->handle_locked = false;
+    pdata->refcount = 1;
+    pf->buffer_position = pf->buffer_start = buffer_from_handle(handle);
+    pf->buffer_size = MAX_FONT_SIZE;
+    return handle;
+}
+
+const char* font_filename(int font_id)
+{
+    int handle = buflib_allocations[font_id];
+    if (handle > 0)
+        return core_get_name(handle);
+    return NULL;
+}
+    
 /* read and load font into incore font structure,
  * returns the font number on success, -1 on failure */
-int font_load(struct font* pf, const char *path)
+int font_load(const char *path)
 {
-    int font_id = -1;
+    int font_id = find_font_index(path);
     char *buffer;
     size_t buffer_size;
-    if (pf == NULL)
+    int *handle;
+
+    if (font_id > FONT_SYSFIXED)
     {
-        pf = &font_ui;
-        font_id = FONT_UI;
+        /* already loaded, no need to reload */
+        struct buflib_alloc_data *pd = core_get_data(buflib_allocations[font_id]);
+        pd->refcount++;
+        //printf("reusing handle %d for %s (count: %d)\n", font_id, path, pd->refcount); 
+        return font_id;
     }
-    else
+
+    for (font_id = FONT_FIRSTUSERFONT; font_id < MAXFONTS; font_id++)
     {
-        for (font_id = SYSTEMFONTCOUNT; font_id < MAXFONTS; font_id++)
+        handle = &buflib_allocations[font_id];
+        if (*handle < 0)
         {
-            if (sysfonts[font_id] == NULL)
-                break;
+            break;
         }
-        if (font_id == MAXFONTS)
-            return -1; /* too many fonts */
     }
-    
-    if (font_id == FONT_UI)
-    {
-        /* currently, font loading replaces earlier font allocation*/
-        buffer = (unsigned char *)(((intptr_t)main_buf + 3) & ~3);
-        /* make sure above doesn't exceed */
-        buffer_size = MAX_FONT_SIZE-3; 
-    }
-    else
-    {
-        buffer = pf->buffer_start;
-        buffer_size = pf->buffer_size;
-    }
-    
-    if (!internal_load_font(pf, path, buffer, buffer_size))
+    handle = &buflib_allocations[font_id];
+    *handle = alloc_and_init(font_id, path);
+    if (*handle < 0)
         return -1;
+
+    if (handle_for_glyphcache < 0)
+        handle_for_glyphcache = *handle;
+
+    buffer = buffer_from_handle(*handle);
+    buffer_size = MAX_FONT_SIZE; //FIXME
+    lock_font_handle(*handle, true);
+
+    if (!internal_load_font(font_id, path, buffer, buffer_size))
+    {
+        lock_font_handle(*handle, false);
+        core_free(*handle);
+        *handle = -1;
+        return -1;
+    }
         
-    sysfonts[font_id] = pf;
+    lock_font_handle(*handle, false);
+    //printf("%s -> [%d] -> %d\n", path, font_id, *handle);
     return font_id; /* success!*/
 }
 
 void font_unload(int font_id)
 {
-    struct font* pf = sysfonts[font_id];
-    if (font_id >= SYSTEMFONTCOUNT && pf)
+    int *handle = &buflib_allocations[font_id];
+    struct buflib_alloc_data *pdata = core_get_data(*handle);
+    struct font* pf = &pdata->font;
+    pdata->refcount--;
+    if (pdata->refcount < 1)
     {
-        if (pf->fd >= 0)
+        //printf("freeing id: %d %s\n", font_id, core_get_name(*handle));
+        if (pf && pf->fd >= 0)
             close(pf->fd);
-        sysfonts[font_id] = NULL;
+        if (*handle > 0)
+            core_free(*handle);
+        if (handle_for_glyphcache == *handle)
+            handle_for_glyphcache = -1; // should find the next available handle
+        *handle = -1;
     }
 }
 
@@ -478,14 +541,35 @@ void font_unload(int font_id)
 struct font* font_get(int font)
 {
     struct font* pf;
+    if (font == FONT_UI)
+        font = MAXFONTS-1;
+    if (font <= FONT_SYSFIXED)
+        return &sysfont;
 
     while (1) {
-        pf = sysfonts[font];
+        struct buflib_alloc_data *alloc = core_get_data(buflib_allocations[font]);
+        pf = &alloc->font;
         if (pf && pf->height)
             return pf;
         if (--font < 0)
-            panicf("No font!");
+            return &sysfont;
     }
+}
+
+static int pf_to_handle(struct font* pf)
+{
+    int i;
+    for (i=0; i<MAXFONTS; i++)
+    {
+        int handle = buflib_allocations[i];
+        if (handle > 0)
+        {
+            struct buflib_alloc_data *pdata = core_get_data(handle);
+            if (pf == &pdata->font)
+                return handle;
+        }
+    }
+    return -1;
 }
 
 /*
@@ -495,9 +579,12 @@ static void
 load_cache_entry(struct font_cache_entry* p, void* callback_data)
 {
     struct font* pf = callback_data;
+    int handle = pf_to_handle(pf);
     unsigned short char_code = p->_char_code;
     unsigned char tmp[2];
 
+    if (handle > 0)
+        lock_font_handle(handle, true);
     if (pf->file_width_offset)
     {
         int width_offset = pf->file_width_offset + char_code;
@@ -531,6 +618,9 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
     lseek(pf->fd, file_offset, SEEK_SET);
     int src_bytes = glyph_bytes(pf, p->width);
     read(pf->fd, p->bitmap, src_bytes);
+
+    if (handle > 0)
+        lock_font_handle(handle, false);
 }
 
 /*
@@ -572,7 +662,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
     if (pf->fd >= 0 && pf != &sysfont)
     {
         bits =
-            (unsigned char*)font_cache_get(&pf->cache,char_code,load_cache_entry,pf)->bitmap;
+            (unsigned char*)font_cache_get(&pf->cache,char_code,load_cache_entry, pf)->bitmap;
     }
     else
     {
@@ -594,7 +684,8 @@ static int cache_fd;
 static void glyph_file_write(void* data)
 {
     struct font_cache_entry* p = data;
-    struct font* pf = &font_ui;
+    int handle = handle_for_glyphcache;
+    struct font* pf = pf_from_handle(handle);
     unsigned short ch;
     unsigned char tmp[2];
 
@@ -617,9 +708,9 @@ static void glyph_file_write(void* data)
 /* save the char codes of the loaded glyphs to a file */
 void glyph_cache_save(struct font* pf)
 {
-    if (!pf)
-        pf = &font_ui;
-    if (pf->fd >= 0 && pf == &font_ui) 
+    if (pf != pf_from_handle(handle_for_glyphcache))
+        return;
+    if (pf->fd >= 0) 
     {
         cache_fd = open(GLYPH_CACHE_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
         if (cache_fd < 0)
@@ -675,9 +766,10 @@ static int ushortcmp(const void *a, const void *b)
 }
 static void glyph_cache_load(struct font* pf)
 {
-
+    if (handle_for_glyphcache <= 0)
+        return;
 #define MAX_SORT 256
-    if (pf->fd >= 0) {
+    if (pf->fd >= 0 && pf == pf_from_handle(handle_for_glyphcache)) {
         int fd;
         int i, size;
         unsigned char tmp[2];

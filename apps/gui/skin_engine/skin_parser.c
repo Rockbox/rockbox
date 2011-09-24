@@ -62,7 +62,6 @@
 #include "radio.h"
 #include "tuner.h"
 #endif
-#include "skin_fonts.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
@@ -77,6 +76,12 @@
 
 #define WPS_ERROR_INVALID_PARAM         -1
 
+#if LCD_HEIGHT > 160
+#define SKIN_FONT_SIZE (1024*10)
+#else
+#define SKIN_FONT_SIZE (1024*3)
+#endif
+#define GLYPHS_TO_CACHE 256
 
 static bool isdefault(struct skin_tag_parameter *param)
 {
@@ -415,8 +420,13 @@ static int parse_font_load(struct skin_element *element,
         glyphs = element->params[2].data.number;
     else
         glyphs = GLYPHS_TO_CACHE;
+    if (id < 2)
+    {
+        DEBUGF("font id must be >= 2\n");
+        return 1;
+    }
 #if defined(DEBUG) || defined(SIMULATOR)
-    if (skinfonts[id-FONT_FIRSTUSERFONT].name != NULL)
+    if (skinfonts[id-2].name != NULL)
     {
         DEBUGF("font id %d already being used\n", id);
     }
@@ -426,9 +436,9 @@ static int parse_font_load(struct skin_element *element,
     ptr = strchr(filename, '.');
     if (!ptr || strncmp(ptr, ".fnt", 4))
         return WPS_ERROR_INVALID_PARAM;
-    skinfonts[id-FONT_FIRSTUSERFONT].id = -1;
-    skinfonts[id-FONT_FIRSTUSERFONT].name = filename;
-    skinfonts[id-FONT_FIRSTUSERFONT].glyphs = glyphs;
+    skinfonts[id-2].id = -1;
+    skinfonts[id-2].name = filename;
+    skinfonts[id-2].glyphs = glyphs;
 
     return 0;
 }
@@ -1442,6 +1452,11 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
             core_free(img->buflib_handle);
         list = list->next;
     }
+    if (wps_data->font_ids != NULL)
+    {
+        while (wps_data->font_count > 0)
+            font_unload(wps_data->font_ids[--wps_data->font_count]);
+    }
 #endif
 #endif
 }
@@ -1617,6 +1632,8 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
 static bool skin_load_fonts(struct wps_data *data)
 {
     /* don't spit out after the first failue to aid debugging */
+    int id_array[MAXUSERFONTS];
+    int font_count = 0;
     bool success = true;
     struct skin_element *vp_list;
     int font_id;
@@ -1628,19 +1645,20 @@ static bool skin_load_fonts(struct wps_data *data)
                 (struct skin_viewport*)vp_list->data;
         struct viewport *vp = &skin_vp->vp;
 
-
-        if (vp->font <= FONT_UI)
+        font_id = skin_vp->parsed_fontid;
+        if (font_id == 1)
         {   /* the usual case -> built-in fonts */
-#ifdef HAVE_REMOTE_LCD
-            if (vp->font == FONT_UI)
-                vp->font += curr_screen;
-#endif
+            vp->font = global_status.font_id[curr_screen];
             continue;
         }
-        font_id = vp->font;
+        else if (font_id <= 0)
+        {
+            vp->font = FONT_SYSFIXED;
+            continue;
+        }
 
         /* now find the corresponding skin_font */
-        struct skin_font *font = &skinfonts[font_id-FONT_FIRSTUSERFONT];
+        struct skin_font *font = &skinfonts[font_id-2];
         if (!font->name)
         {
             if (success)
@@ -1655,10 +1673,12 @@ static bool skin_load_fonts(struct wps_data *data)
          * multiple viewports use the same */
         if (font->id < 0)
         {
-            char *dot = strchr(font->name, '.');
-            *dot = '\0';
-            font->id = skin_font_load(font->name,
-                       skinfonts[font_id-FONT_FIRSTUSERFONT].glyphs);
+            char path[MAX_PATH];
+            snprintf(path, sizeof path, FONT_DIR "/%s", font->name);
+            font->id = font_load(path/*,
+                       skinfonts[font_id-FONT_FIRSTUSERFONT].glyphs*/);
+            //printf("[%d] %s -> %d\n",font_id, font->name, font->id);
+            id_array[font_count++] = font->id;
         }
 
         if (font->id < 0)
@@ -1667,12 +1687,23 @@ static bool skin_load_fonts(struct wps_data *data)
                     font_id, font->name);
             font->name = NULL; /* to stop trying to load it again if we fail */
             success = false;
-            font->name = NULL;
             continue;
         }
 
         /* finally, assign the font_id to the viewport */
         vp->font = font->id;
+    }
+    if (success)
+    {
+        data->font_ids = skin_buffer_alloc(font_count * sizeof(int));
+        if (data->font_ids == NULL)
+        {
+            while (font_count > 0)
+                font_unload(id_array[--font_count]);
+            return false;
+        }
+        memcpy(data->font_ids, id_array, sizeof(int)*font_count);
+        data->font_count = font_count;
     }
     return success;
 }
@@ -1690,17 +1721,12 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     skin_vp->hidden_flags = 0;
     skin_vp->label = NULL;
     skin_vp->is_infovp = false;
+    skin_vp->parsed_fontid = 1;
     element->data = skin_vp;
     curr_vp = skin_vp;
     curr_viewport_element = element;
     
     viewport_set_defaults(&skin_vp->vp, curr_screen);
-#ifdef HAVE_REMOTE_LCD
-    /* viewport_set_defaults() sets the font to FONT_UI+curr_screen.
-     * This parser requires font 1 to always be the UI font, 
-     * so force it back to FONT_UI and handle the screen number at the end */
-    skin_vp->vp.font = FONT_UI;
-#endif
     
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     skin_vp->start_fgcolour = skin_vp->vp.fg_pattern;
@@ -1788,9 +1814,7 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
 #ifdef HAVE_LCD_BITMAP
     /* font */
     if (!isdefault(param))
-    {
-        skin_vp->vp.font = param->data.number;
-    }
+        skin_vp->parsed_fontid = param->data.number;
 #endif
     if ((unsigned) skin_vp->vp.x >= (unsigned) display->lcdwidth ||
         skin_vp->vp.width + skin_vp->vp.x > display->lcdwidth ||

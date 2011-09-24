@@ -107,9 +107,9 @@ void settings_apply_skins(void)
 {
     int i, j;
 
-    for (i=0; i<SKINNABLE_SCREENS_COUNT; i++)
+    for(j=0; j<SKINNABLE_SCREENS_COUNT; j++)
     {
-        FOR_NB_SCREENS(j)
+        FOR_NB_SCREENS(i)
             skin_data_free_buflib_allocs(&skins[j][i].data);
     }
 
@@ -117,7 +117,6 @@ void settings_apply_skins(void)
     
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
-    skin_font_init();
 #endif
     gui_sync_skin_init();
 

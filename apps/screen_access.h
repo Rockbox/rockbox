@@ -28,9 +28,11 @@
 
 #if defined(HAVE_REMOTE_LCD) && !defined (ROCKBOX_HAS_LOGF)
 #define NB_SCREENS 2
+void screen_helper_remote_setfont(int font);
 #else
 #define NB_SCREENS 1
 #endif
+void screen_helper_setfont(int font);
 
 #if NB_SCREENS == 1
 #define FOR_NB_SCREENS(i) i = 0;

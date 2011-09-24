@@ -470,7 +470,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->splash(HZ*2, " Play .MID file ");
         return PLUGIN_OK;
     }
-    rb->lcd_setfont(0);
+    rb->lcd_setfont(FONT_SYSFIXED);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);

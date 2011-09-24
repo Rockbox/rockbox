@@ -125,7 +125,7 @@ int do_user_menu(void) {
         }
     }
 
-    rb->lcd_setfont(0); /* Reset the font */
+    rb->lcd_setfont(FONT_SYSFIXED); /* Reset the font */
     rb->lcd_clear_display(); /* Clear display for screen size changes */
     
     /* Keep the RTC in sync */

@@ -823,7 +823,7 @@ int playfile(char* filename)
                     retval = menureturn;
                 }
             }
-            rb->lcd_setfont(0);
+            rb->lcd_setfont(FONT_SYSFIXED);
             screenupdated = false;
             break;
             
@@ -877,7 +877,7 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_OK;
     }
 
-    rb->lcd_setfont(0);
+    rb->lcd_setfont(FONT_SYSFIXED);
 
     rb->pcm_play_stop();
 #if INPUT_SRC_CAPS != 0

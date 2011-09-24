@@ -95,7 +95,7 @@ static int tv_glyph_width(int ch)
     if (rb->is_diacritic(ch, NULL))
         return 0;
 
-    return rb->font_get_width(preferences->font, ch);
+    return rb->font_get_width(rb->font_get(preferences->font_id), ch);
 #else
     return 1;
 #endif

@@ -114,7 +114,7 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->footer_mode = true;
     p->statusbar   = true;
     rb->strlcpy(p->font_name, rb->global_settings->font_file, MAX_PATH);
-    p->font = rb->font_get(FONT_UI);
+    p->font_id = rb->global_status->font_id[SCREEN_MAIN];
 #else
     p->header_mode = false;
     p->footer_mode = false;
@@ -132,4 +132,12 @@ void tv_add_preferences_change_listner(int (*listner)(const struct tv_preference
 {
     if (listner_count < TV_MAX_LISTNERS)
         listners[listner_count++] = listner;
+}
+
+void tv_change_fontid(int id)
+{
+    (void)id;
+#ifdef HAVE_LCD_BITMAP
+    prefs.font_id = id;
+#endif
 }

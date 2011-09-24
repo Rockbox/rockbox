@@ -67,6 +67,15 @@ static int screen_helper_getnblines(void)
     return height / screens[0].getcharheight();
 }
 
+void screen_helper_setfont(int font)
+{
+#ifdef HAVE_LCD_BITMAP
+    if (font == FONT_UI)
+        font = global_status.font_id[SCREEN_MAIN];
+    lcd_setfont(font);
+#endif
+}
+
 #if NB_SCREENS == 2
 static int screen_helper_remote_getcharwidth(void)
 {
@@ -99,6 +108,13 @@ static int screen_helper_remote_getnblines(void)
 #endif
     return height / screens[1].getcharheight();
 }
+
+void screen_helper_remote_setfont(int font)
+{
+    if (font == FONT_UI)
+        font = global_status.font_id[SCREEN_REMOTE];
+    lcd_remote_setfont(font);
+}
 #endif
 
 struct screen screens[NB_SCREENS] =
@@ -129,7 +145,7 @@ struct screen screens[NB_SCREENS] =
         .getheight=&lcd_getheight,
         .getstringsize=&lcd_getstringsize,
 #ifdef HAVE_LCD_BITMAP
-        .setfont=&lcd_setfont,
+        .setfont=screen_helper_setfont,
         .getfont=&lcd_getfont,
         .mono_bitmap=&lcd_mono_bitmap,
         .mono_bitmap_part=&lcd_mono_bitmap_part,
@@ -229,7 +245,7 @@ struct screen screens[NB_SCREENS] =
         .getheight=&lcd_remote_getheight,
         .getstringsize=&lcd_remote_getstringsize,
 #if 1 /* all remote LCDs are bitmapped so far */
-        .setfont=&lcd_remote_setfont,
+        .setfont=screen_helper_setfont,
         .getfont=&lcd_remote_getfont,
         .mono_bitmap=&lcd_remote_mono_bitmap,
         .mono_bitmap_part=&lcd_remote_mono_bitmap_part,

@@ -22,6 +22,7 @@
 #define _FONT_H
 
 #include "inttypes.h"
+#include "stdbool.h"
 
 /*
  * Incore font and image definitions
@@ -46,18 +47,14 @@
  * Fonts are specified in firmware/font.c.
  */
 enum {
-    FONT_SYSFIXED, /* system fixed pitch font*/
-    FONT_UI,       /* system porportional font*/
-#ifdef HAVE_REMOTE_LCD
-    FONT_UI_REMOTE, /* UI font for remote LCD */
-#endif
-    SYSTEMFONTCOUNT, /* Number of fonts reserved for the system and ui */
-    FONT_FIRSTUSERFONT = 2
+    FONT_SYSFIXED = -1, /* system fixed pitch font*/
+    FONT_FIRSTUSERFONT = 0, /* first id for the user fonts */
 };
 #define MAXUSERFONTS 8
 
 /* SYSFONT, FONT_UI, FONT_UI_REMOTE + MAXUSERFONTS fonts in skins */
-#define MAXFONTS (SYSTEMFONTCOUNT + MAXUSERFONTS)
+#define MAXFONTS (FONT_FIRSTUSERFONT + MAXUSERFONTS)
+#define FONT_UI MAXFONTS
 
 /*
  * .fnt loadable font file format definition
@@ -105,7 +102,7 @@ struct font {
     unsigned char *buffer_start;    /* buffer to store the font in */       
     unsigned char *buffer_position; /* position in the buffer */    
     unsigned char *buffer_end;      /* end of the buffer */
-    int          buffer_size;       /* size of the buffer in bytes */
+    int            buffer_size;     /* size of the buffer in bytes */
 #ifndef __PCTOOL__    
     struct font_cache cache;
     uint32_t file_width_offset;    /* offset to file width data    */
@@ -117,17 +114,13 @@ struct font {
 
 /* font routines*/
 void font_init(void) INIT_ATTR;
-#ifdef HAVE_REMOTE_LCD
-/* Load a font into the special remote ui font slot */
-int font_load_remoteui(const char* path);
-#endif
-int font_load(struct font* pf, const char *path);
+const char* font_filename(int font_id);
+int font_load(const char *path);
 int font_glyphs_to_bufsize(const char *path, int glyphs);
 void font_unload(int font_id);
 
 struct font* font_get(int font);
 
-void font_reset(struct font *pf);
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber);
 int font_get_width(struct font* ft, unsigned short ch);
 const unsigned char * font_get_bits(struct font* ft, unsigned short ch);

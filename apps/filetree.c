@@ -404,27 +404,31 @@ int ft_load(struct tree_context* c, const char* tempdir)
 #ifdef HAVE_LCD_BITMAP
 static void ft_load_font(char *file)
 {
+    int current_font_id;
+    enum screen_type screen = SCREEN_MAIN;
 #if NB_SCREENS > 1
     MENUITEM_STRINGLIST(menu, ID2P(LANG_CUSTOM_FONT), NULL, 
                         ID2P(LANG_MAIN_SCREEN), ID2P(LANG_REMOTE_SCREEN))
     switch (do_menu(&menu, NULL, NULL, false))
     {
-        case 0: /* main lcd */        
-            splash(0, ID2P(LANG_WAIT));
-            font_load(NULL, file);
+        case 0: /* main lcd */
+            screen = SCREEN_MAIN;
             set_file(file, (char *)global_settings.font_file, MAX_FILENAME);
             break;
         case 1: /* remote */
-            splash(0, ID2P(LANG_WAIT));
-            font_load_remoteui(file);
+            screen = SCREEN_REMOTE;
             set_file(file, (char *)global_settings.remote_font_file, MAX_FILENAME);
             break;
     }
 #else
-    splash(0, ID2P(LANG_WAIT));
-    font_load(NULL, file);
     set_file(file, (char *)global_settings.font_file, MAX_FILENAME);
 #endif
+    splash(0, ID2P(LANG_WAIT));
+    current_font_id = global_status.font_id[screen];
+    if (current_font_id >= 0)
+        font_unload(current_font_id);
+    global_status.font_id[screen] = font_load(file);
+    viewportmanager_theme_changed(THEME_UI_VIEWPORT);
 }    
 #endif
 

@@ -667,7 +667,7 @@ enum plugin_status plugin_start(const void* parameter)
    rb->cpu_boost(true);
 #endif
 
-   rb->lcd_setfont(0);
+   rb->lcd_setfont(FONT_SYSFIXED);
 
    // We're using doom's memory management since it implements a proper free (and re-uses the memory)
    // and now with prboom's code: realloc and calloc
@@ -712,7 +712,7 @@ enum plugin_status plugin_start(const void* parameter)
 
    Dhandle_ver( namemap[ result ] );
 
-   rb->lcd_setfont(0);
+   rb->lcd_setfont(FONT_SYSFIXED);
 
    rb->lcd_clear_display();
 

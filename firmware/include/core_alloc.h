@@ -33,4 +33,11 @@ static inline void* core_get_data(int handle)
     extern struct buflib_context core_ctx;
     return buflib_get_data(&core_ctx, handle);
 }
+
+static inline const char* core_get_name(int handle)
+{
+    extern struct buflib_context core_ctx;
+    return buflib_get_name(&core_ctx, handle);
+}
+
 #endif /* __CORE_ALLOC_H__ */

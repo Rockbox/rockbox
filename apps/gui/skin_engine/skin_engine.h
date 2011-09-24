@@ -25,7 +25,6 @@
 
 #ifndef PLUGIN
 
-#include "skin_fonts.h"
 #include "tag_table.h"
 
 #include "wps_internals.h" /* TODO: remove this line.. shoudlnt be needed */
@@ -44,8 +43,7 @@ enum skinnable_screens {
 
 #ifdef HAVE_LCD_BITMAP
 
-#define SKIN_BUFFER_SIZE (2048 + SKIN_FONT_SIZE) + \
-                         (WPS_MAX_TOKENS * \
+#define SKIN_BUFFER_SIZE (WPS_MAX_TOKENS * \
                          (sizeof(struct wps_token) + (sizeof(struct skin_element))))
 #endif
 

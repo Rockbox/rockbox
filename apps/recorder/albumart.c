@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
 #include "string-extra.h"
 #include "system.h"
 #include "albumart.h"
