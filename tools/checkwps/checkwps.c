@@ -149,6 +149,8 @@ struct user_settings global_settings = {
 #endif
 };
 
+struct system_status global_status;
+
 int getwidth(void) { return LCD_WIDTH; }
 int getheight(void) { return LCD_HEIGHT; }
 #ifdef HAVE_REMOTE_LCD
@@ -218,9 +220,9 @@ bool radio_hardware_present(void)
 
 #ifdef HAVE_LCD_BITMAP
 static int loaded_fonts = 0;
-int font_load(struct font* pf, const char *path)
+int font_load(const char *path)
 {
-    int id = SYSTEMFONTCOUNT + loaded_fonts;
+    int id = 2 + loaded_fonts;
     loaded_fonts++;
     return id;
 }
@@ -273,9 +275,6 @@ int main(int argc, char **argv)
     }
 
     skin_buffer_init(buffer, SKIN_BUFFER_SIZE);
-#ifdef HAVE_LCD_BITMAP
-    skin_font_init();
-#endif
 
     /* Go through every skin that was thrown at us, error out at the first
      * flawed wps */

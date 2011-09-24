@@ -336,7 +336,9 @@ static void init_tagcache(void)
 
 static void init(void)
 {
+#ifdef HAVE_LCD_BITMAP
     int i;
+#endif
     system_init();
     core_allocator_init();
     kernel_init();
