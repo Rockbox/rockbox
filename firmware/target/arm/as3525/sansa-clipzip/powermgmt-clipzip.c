@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2011 Bertrik Sikken
+ * Copyright © 2008 Rafaël Carré
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,44 +19,32 @@
  *
  ****************************************************************************/
 
-#include <stdbool.h>
 #include "config.h"
-#include "backlight-target.h"
-#include "lcd.h"
-#include "as3525v2.h"
-#include "ascodec-target.h"
 
-bool _backlight_init()
+/* The battery manufacturer's website shows discharge curves down to 3.0V,
+   so 'dangerous' and 'shutoff' levels of 3.4V and 3.3V should be safe.
+ */
+const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    /* GPIO B1 controls backlight */
-    GPIOB_DIR |= (1 << 1);
-    
-    return true;
-}
+    3400
+};
 
-void _backlight_on(void)
+const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    GPIOB_PIN(1) = (1 << 1);
-    
-    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
-    sleep(1);
-    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
-    sleep(1);
-    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
+    3300
+};
 
-#ifdef HAVE_LCD_ENABLE
-    lcd_enable(true);
-#endif
-}
-
-void _backlight_off(void)
+/* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
+const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-#ifdef HAVE_LCD_ENABLE
-    lcd_enable(false);
-#endif
+    { 3300, 3653, 3701, 3735, 3768, 3790, 3833, 3900, 3966, 4056, 4140 }
+};
 
-    GPIOB_PIN(1) = 0;
-    
-    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
-}
+#if CONFIG_CHARGING
+/* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
+const unsigned short percent_to_volt_charge[11] =
+{
+    3427, 3786, 3842, 3877, 3896, 3924, 3971, 4028, 4084, 4161, 4190
+};
+#endif /* CONFIG_CHARGING */
 

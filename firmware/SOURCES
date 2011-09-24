@@ -1501,8 +1501,6 @@ target/arm/as3525/sansa-clipzip/backlight-clipzip.c
 #ifndef BOOTLOADER
 target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clipzip/powermgmt-clipzip.c
-//target/arm/as3525/sansa-clipzip/lcd-as-clip-plus.S
-target/arm/as3525/tuner-as3525v2.c
 #endif /* !BOOTLOADER */
 #endif /* !SIMULATOR */
 #endif /* SANSA_CLIPZIP */

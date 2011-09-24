@@ -2541,7 +2541,7 @@ fi
     output="rockbox.sansa"
     bootoutput="bootloader-clipzip.sansa"
     appextra="recorder:gui:radio"
-    plugins="yes"
+    plugins=""
     swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"

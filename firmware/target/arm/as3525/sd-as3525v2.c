@@ -378,6 +378,9 @@ static inline bool card_detect_target(void)
     return GPIOA_PIN(2);
 #elif defined(SANSA_CLIPPLUS)
     return !(GPIOA_PIN(2));
+#elif defined(SANSA_CLIPZIP)
+    /* TODO for ClipZip: determine polarity of uSD detect */
+    return false;
 #else
 #error "microSD pin not defined for your target"
 #endif

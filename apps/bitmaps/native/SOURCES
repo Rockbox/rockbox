@@ -47,6 +47,8 @@ rockboxlogo.640x198x16.bmp
 usblogo.176x48x16.bmp
 #elif LCD_WIDTH >= 128
 usblogo.128x37x16.bmp
+#elif LCD_WIDTH >= 88
+usblogo.88x24x16.bmp
 #endif
 #elif LCD_DEPTH > 1 /* greyscale */
 #ifdef IPOD_1G2G /* use firewire logo */
