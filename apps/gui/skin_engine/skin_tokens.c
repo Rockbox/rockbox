@@ -934,8 +934,8 @@ const char *get_token_value(struct gui_wps *gwps,
         }
         case SKIN_TOKEN_LIST_ITEM_NUMBER:
             if (intval)
-                *intval = skinlist_get_item_number();
-            snprintf(buf, buf_size, "%d",skinlist_get_item_number());
+                *intval = skinlist_get_item_number() + 1;
+            snprintf(buf, buf_size, "%d",skinlist_get_item_number()) + 1;
             return buf;
         case SKIN_TOKEN_LIST_ITEM_IS_SELECTED:
             return skinlist_is_selected_item()?"s":"";
