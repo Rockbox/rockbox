@@ -1675,12 +1675,14 @@ static bool skin_load_fonts(struct wps_data *data)
         {
             char path[MAX_PATH];
             snprintf(path, sizeof path, FONT_DIR "/%s", font->name);
+#ifndef __PCTOOL__
             if (skinfonts[font_id-2].glyphs > 0)
             {
                 font->id = font_load_ex(path,
                         font_glyphs_to_bufsize(path, skinfonts[font_id-2].glyphs));
             }
             else
+#endif
                 font->id = font_load(path);
             //printf("[%d] %s -> %d\n",font_id, font->name, font->id);
             id_array[font_count++] = font->id;
