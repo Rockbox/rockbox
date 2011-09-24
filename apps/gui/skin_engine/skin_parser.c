@@ -419,7 +419,7 @@ static int parse_font_load(struct skin_element *element,
     if(element->params_count > 2)
         glyphs = element->params[2].data.number;
     else
-        glyphs = GLYPHS_TO_CACHE;
+        glyphs = 0;
     if (id < 2)
     {
         DEBUGF("font id must be >= 2\n");
@@ -1675,8 +1675,13 @@ static bool skin_load_fonts(struct wps_data *data)
         {
             char path[MAX_PATH];
             snprintf(path, sizeof path, FONT_DIR "/%s", font->name);
-            font->id = font_load(path/*,
-                       skinfonts[font_id-FONT_FIRSTUSERFONT].glyphs*/);
+            if (skinfonts[font_id-2].glyphs > 0)
+            {
+                font->id = font_load_ex(path,
+                        font_glyphs_to_bufsize(path, skinfonts[font_id-2].glyphs));
+            }
+            else
+                font->id = font_load(path);
             //printf("[%d] %s -> %d\n",font_id, font->name, font->id);
             id_array[font_count++] = font->id;
         }
@@ -1693,18 +1698,16 @@ static bool skin_load_fonts(struct wps_data *data)
         /* finally, assign the font_id to the viewport */
         vp->font = font->id;
     }
-    if (success)
+    data->font_ids = skin_buffer_alloc(font_count * sizeof(int));
+    if (!success || data->font_ids == NULL)
     {
-        data->font_ids = skin_buffer_alloc(font_count * sizeof(int));
-        if (data->font_ids == NULL)
-        {
-            while (font_count > 0)
-                font_unload(id_array[--font_count]);
-            return false;
-        }
-        memcpy(data->font_ids, id_array, sizeof(int)*font_count);
-        data->font_count = font_count;
+        while (font_count > 0)
+            font_unload(id_array[--font_count]);
+        data->font_ids = NULL;
+        return false;
     }
+    memcpy(data->font_ids, id_array, sizeof(int)*font_count);
+    data->font_count = font_count;
     return success;
 }
 

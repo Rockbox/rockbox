@@ -79,7 +79,7 @@ struct buflib_alloc_data {
     struct font font;
     bool handle_locked; /* is the buflib handle currently locked? */
     int refcount;       /* how many times has this font been loaded? */
-    unsigned char buffer[MAX_FONT_SIZE];
+    unsigned char buffer[];
 };
 static int buflib_allocations[MAXFONTS];
 static int handle_for_glyphcache;
@@ -349,7 +349,7 @@ static void font_reset(int font_id)
 static bool internal_load_font(int font_id, const char *path,
                                char *buf, size_t buf_size)
 {
-    int size;
+    size_t size;
     struct font* pf = pf_from_handle(buflib_allocations[font_id]);
     /* save loaded glyphs */
     glyph_cache_save(pf);
@@ -433,15 +433,16 @@ static int find_font_index(const char* path)
     return FONT_SYSFIXED;
 }
 
-static int alloc_and_init(int font_idx, const char* name)
+static int alloc_and_init(int font_idx, const char* name, size_t size)
 {
     int *phandle = &buflib_allocations[font_idx];
     int handle = *phandle;
     struct buflib_alloc_data *pdata;
     struct font *pf;
+    size_t alloc_size = size + sizeof(struct buflib_alloc_data);
     if (handle > 0)
         return handle;
-    *phandle = core_alloc_ex(name, sizeof(struct buflib_alloc_data), &buflibops);
+    *phandle = core_alloc_ex(name, alloc_size, &buflibops);
     handle = *phandle;
     if (handle < 0)
         return handle;
@@ -451,7 +452,7 @@ static int alloc_and_init(int font_idx, const char* name)
     pdata->handle_locked = false;
     pdata->refcount = 1;
     pf->buffer_position = pf->buffer_start = buffer_from_handle(handle);
-    pf->buffer_size = MAX_FONT_SIZE;
+    pf->buffer_size = size;
     return handle;
 }
 
@@ -465,17 +466,44 @@ const char* font_filename(int font_id)
     
 /* read and load font into incore font structure,
  * returns the font number on success, -1 on failure */
-int font_load(const char *path)
+int font_load_ex(const char *path, size_t buffer_size)
 {
     int font_id = find_font_index(path);
     char *buffer;
-    size_t buffer_size;
     int *handle;
 
     if (font_id > FONT_SYSFIXED)
     {
         /* already loaded, no need to reload */
         struct buflib_alloc_data *pd = core_get_data(buflib_allocations[font_id]);
+        if (pd->font.buffer_size < buffer_size)
+        {
+            int old_refcount, old_id;
+            /* reload the font:
+             * 1) save of refcont and id
+             * 2) force unload (set refcount to 1 to make sure it get unloaded)
+             * 3) reload with the larger buffer
+             * 4) restore the id and refcount
+             */
+            old_id = font_id;
+            old_refcount = pd->refcount;
+            pd->refcount = 1;
+            font_unload(font_id);
+            font_id = font_load_ex(path, buffer_size);
+            if (font_id < 0)
+            {
+                // not much we can do here, maybe try reloading with the small buffer again
+                return -1;
+            }
+            if (old_id != font_id)
+            {
+                buflib_allocations[old_id] = buflib_allocations[font_id];
+                buflib_allocations[font_id] = -1;
+                font_id = old_id;
+            }
+            pd = core_get_data(buflib_allocations[font_id]);
+            pd->refcount = old_refcount;
+        }
         pd->refcount++;
         //printf("reusing handle %d for %s (count: %d)\n", font_id, path, pd->refcount); 
         return font_id;
@@ -490,7 +518,7 @@ int font_load(const char *path)
         }
     }
     handle = &buflib_allocations[font_id];
-    *handle = alloc_and_init(font_id, path);
+    *handle = alloc_and_init(font_id, path, buffer_size);
     if (*handle < 0)
         return -1;
 
@@ -498,7 +526,6 @@ int font_load(const char *path)
         handle_for_glyphcache = *handle;
 
     buffer = buffer_from_handle(*handle);
-    buffer_size = MAX_FONT_SIZE; //FIXME
     lock_font_handle(*handle, true);
 
     if (!internal_load_font(font_id, path, buffer, buffer_size))
@@ -512,6 +539,10 @@ int font_load(const char *path)
     lock_font_handle(*handle, false);
     //printf("%s -> [%d] -> %d\n", path, font_id, *handle);
     return font_id; /* success!*/
+}
+int font_load(const char *path)
+{
+    return font_load_ex(path, MAX_FONT_SIZE);
 }
 
 void font_unload(int font_id)

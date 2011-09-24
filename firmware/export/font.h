@@ -21,6 +21,7 @@
 #ifndef _FONT_H
 #define _FONT_H
 
+#include <stdlib.h>
 #include "inttypes.h"
 #include "stdbool.h"
 
@@ -102,7 +103,7 @@ struct font {
     unsigned char *buffer_start;    /* buffer to store the font in */       
     unsigned char *buffer_position; /* position in the buffer */    
     unsigned char *buffer_end;      /* end of the buffer */
-    int            buffer_size;     /* size of the buffer in bytes */
+    size_t         buffer_size;     /* size of the buffer in bytes */
 #ifndef __PCTOOL__    
     struct font_cache cache;
     uint32_t file_width_offset;    /* offset to file width data    */
@@ -116,6 +117,7 @@ struct font {
 void font_init(void) INIT_ATTR;
 const char* font_filename(int font_id);
 int font_load(const char *path);
+int font_load_ex(const char *path, size_t buffer_size);
 int font_glyphs_to_bufsize(const char *path, int glyphs);
 void font_unload(int font_id);
 
