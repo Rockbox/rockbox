@@ -93,7 +93,6 @@ struct skin_element* skin_parse(const char* document)
 
     while(*cursor != '\0')
     {
-
         if(!root)
             to_write = &root;
         else
@@ -227,7 +226,17 @@ static struct skin_element* skin_parse_viewport(const char** document)
         }
         else
         {
-
+#ifdef ROCKBOX
+            /* strip all leading comments */
+            while(*cursor == '#')
+            {
+                skip_comment(&cursor);
+                skin_line++;
+                
+            }
+            if (check_viewport(cursor))
+                break;
+#endif
             *to_write = skin_parse_line(&cursor);
             last = *to_write;
             if(!last)
@@ -243,6 +252,18 @@ static struct skin_element* skin_parse_viewport(const char** document)
             cursor++;
             skin_line++;
         }
+#ifdef ROCKBOX
+        /* strip all comments */
+        while(*cursor == '#')
+        {
+            skip_comment(&cursor);
+            skin_line++;
+            
+        }
+        if (check_viewport(cursor))
+            break;
+#endif
+
     }
     while(*cursor != '\0' && !(check_viewport(cursor) && cursor != *document));
 
@@ -358,7 +379,6 @@ static struct skin_element* skin_parse_line_optional(const char** document,
                 return NULL;
         }
     }
-
 
     /* Moving up the calling function's pointer */
     *document = cursor;
