@@ -27,6 +27,7 @@
 #include "config.h"
 #include "core_alloc.h"
 #include "action.h"
+#include "misc.h"
 #include "crc32.h"
 #include "settings.h"
 #include "wps.h"
@@ -53,6 +54,7 @@ static size_t skin_buffer_size;
 static char *skin_buffer = NULL;
 static int buflib_move_callback(int handle, void* current, void* new)
 {
+    (void)handle;
     (void)current;
     (void)new;
     return BUFLIB_CB_CANNOT_MOVE;
