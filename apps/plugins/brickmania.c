@@ -2407,6 +2407,12 @@ static int brickmania_game_loop(void)
         }
         else
         {
+            resume = false;
+            if(resume_file)
+            {
+                rb->remove(SAVE_FILE);
+                resume_file = false;
+            }
 #ifdef HAVE_LCD_COLOR
             rb->lcd_bitmap_transparent(brickmania_gameover,
                            (LCD_WIDTH - INT3(GAMEOVER_WIDTH))/2,
