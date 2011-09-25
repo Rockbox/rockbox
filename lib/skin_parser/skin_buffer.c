@@ -98,9 +98,17 @@ void skin_buffer_init(char* buffer, size_t size)
 }
 
 /* Allocate size bytes from the buffer */
+#ifdef DEBUG_SKIN_ALLOCATIONS
+void* skin_buffer_alloc_ex(size_t size, char* debug)
+{
+    void *retval = NULL;
+    printf("%d %s\n", size, debug);
+#else
 void* skin_buffer_alloc(size_t size)
 {
     void *retval = NULL;
+#endif
+
 #ifdef USE_ROCKBOX_ALLOC
     /* 32-bit aligned */
     size = (size + 3) & ~3;

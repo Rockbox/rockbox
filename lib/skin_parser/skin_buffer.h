@@ -27,7 +27,18 @@
 #define _SKIN_BUFFFER_H_
 void skin_buffer_init(char* buffer, size_t size);
 /* Allocate size bytes from the buffer */
+
+/* #define DEBUG_SKIN_ALLOCATIONS */
+
+#ifdef DEBUG_SKIN_ALLOCATIONS 
+#define FOO(X) #X
+#define STRNG(X) FOO(X)
+#define skin_buffer_alloc(s) skin_buffer_alloc_ex(s, __FILE__ ":" STRNG(__LINE__))
+void* skin_buffer_alloc_ex(size_t size, char* str);
+#else
 void* skin_buffer_alloc(size_t size);
+#endif
+
 
 /* get the number of bytes currently being used */
 size_t skin_buffer_usage(void);
