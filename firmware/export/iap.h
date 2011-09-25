@@ -22,7 +22,7 @@
 
 #include <stdbool.h>
 
-#define RX_BUFLEN 260
+#define RX_BUFLEN 512
 #define TX_BUFLEN 128
 
 extern bool iap_getc(unsigned char x);

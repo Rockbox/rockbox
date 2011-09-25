@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include "panic.h"
 #include "iap.h"
 #include "button.h"
 #include "config.h"
@@ -56,12 +57,31 @@ static int iap_repeatbtn = 0;
 static bool iap_btnrepeat = false, iap_btnshuffle = false;
 
 static unsigned char serbuf[RX_BUFLEN];
-static int serbuf_i = 0;
 
 static unsigned char response[TX_BUFLEN];
-static int responselen;
 
 static char cur_dbrecord[5] = {0};
+
+/* states of the iap de-framing state machine */
+enum fsm_state {
+    ST_SYNC,    /* wait for 0xFF sync byte */
+    ST_SOF,     /* wait for 0x55 start-of-frame byte */
+    ST_LEN,     /* receive length byte (small packet) */
+    ST_LENH,    /* receive length high byte (large packet) */
+    ST_LENL,    /* receive length low byte (large packet) */
+    ST_DATA,    /* receive data */
+    ST_CHECK    /* verify checksum */
+};
+
+static struct state_t {
+    enum fsm_state state;   /* current fsm state */
+    unsigned int len;       /* payload data length */
+    unsigned char *payload; /* payload data pointer */
+    unsigned int check;     /* running checksum over [len,payload,check] */
+    unsigned int count;     /* playload bytes counter */
+} frame_state = {
+    .state = ST_SYNC
+};
 
 static void put_u32(unsigned char *buf, uint32_t data)
 {
@@ -142,7 +162,7 @@ void iap_bitrate_set(int ratenum)
 
 void iap_send_pkt(const unsigned char * data, int len)
 {
-    int i, chksum;
+    int i, chksum, responselen;
     
     if(len > TX_BUFLEN-4) len = TX_BUFLEN-4;
     responselen = len + 4;
@@ -168,37 +188,75 @@ void iap_send_pkt(const unsigned char * data, int len)
 
 bool iap_getc(unsigned char x)
 {
-    static unsigned char last_x = 0;
-    static bool newpkt = true;
-    static unsigned char chksum = 0;
-            
-    /* Restart if the sync word is seen */
-    if(x == 0x55 && last_x == 0xff/* && newpkt*/)
-    {
-        serbuf[0] = 0;
-        serbuf_i = 0;
-        chksum = 0;
-        newpkt = false;
-    }
-    else
-    {
-        if(serbuf_i >= RX_BUFLEN)
-            serbuf_i = 0;
-
-        serbuf[serbuf_i++] = x;
-        chksum += x;
-    }
-    last_x = x;
-
-    /* Broadcast to queue if we have a complete message */
-    if(serbuf_i && (serbuf_i == serbuf[0]+2))
-    {
-        serbuf_i = 0;
-        newpkt = true;
-        if(chksum == 0)
+    struct state_t *s = &frame_state;
+    
+    /* run state machine to detect and extract a valid frame */
+    switch (s->state) {
+    case ST_SYNC:
+        if (x == 0xFF) {
+            s->state = ST_SOF;
+        }
+        break;
+    case ST_SOF:
+        if (x == 0x55) {
+            /* received a valid sync/SOF pair */
+            s->state = ST_LEN;
+        } else {
+            s->state = ST_SYNC;
+            return iap_getc(x);
+        }
+        break;
+    case ST_LEN:
+        s->check = x;
+        s->count = 0;
+        s->payload = serbuf;
+        if (x == 0) {
+            /* large packet */
+            s->state = ST_LENH;
+        } else {
+            /* small packet */
+            s->len = x;
+            s->state = ST_DATA;
+        }
+        break;
+    case ST_LENH:
+        s->check += x;
+        s->len = x << 8;
+        s->state = ST_LENL;
+        break;
+    case ST_LENL:
+        s->check += x;
+        s->len += x;
+        if ((s->len == 0) || (s->len > RX_BUFLEN)) {
+            /* invalid length */
+            s->state = ST_SYNC;
+            return iap_getc(x);
+        } else {
+            s->state = ST_DATA;
+        }
+        break;
+    case ST_DATA:
+        s->check += x;
+        s->payload[s->count++] = x;
+        if (s->count == s->len) {
+            s->state = ST_CHECK;
+        }
+        break;
+    case ST_CHECK:
+        s->check += x;
+        if ((s->check & 0xFF) == 0) {
+            /* done, received a valid frame */
             queue_post(&button_queue, SYS_IAP_HANDLEPKT, 0);
+        }
+        s->state = ST_SYNC;
+        break;
+    default:
+        panicf("Unhandled iap state %d", (int) s->state);
+        break;
     }
-    return newpkt;
+    
+    /* return true while still hunting for the sync and start-of-frame byte */
+    return (s->state == ST_SYNC) || (s->state == ST_SOF);
 }
 
 void iap_periodic(void)
@@ -1004,8 +1062,9 @@ static void iap_handlepkt_mode7(unsigned int len, const unsigned char *buf)
 
 void iap_handlepkt(void)
 {
+    struct state_t *s = &frame_state;
+
     if(!iap_setupflag) return;
-    if(serbuf[0] == 0) return;
 
     /* if we are waiting for a remote button to go out,
        delay the handling of the new packet */
@@ -1015,20 +1074,15 @@ void iap_handlepkt(void)
         return;
     }
 
-    /* get length and payload from serbuf */
-    unsigned int len = serbuf[0];
-    unsigned char *payload = &serbuf[1];
-    
-    unsigned char mode = payload[0];
+    /* handle command by mode */
+    unsigned char mode = s->payload[0];
     switch (mode) {
-    case 0: iap_handlepkt_mode0(len, payload); break;
-    case 2: iap_handlepkt_mode2(len, payload); break;
-    case 3: iap_handlepkt_mode3(len, payload); break;
-    case 4: iap_handlepkt_mode4(len, payload); break;
-    case 7: iap_handlepkt_mode7(len, payload); break;
+    case 0: iap_handlepkt_mode0(s->len, s->payload); break;
+    case 2: iap_handlepkt_mode2(s->len, s->payload); break;
+    case 3: iap_handlepkt_mode3(s->len, s->payload); break;
+    case 4: iap_handlepkt_mode4(s->len, s->payload); break;
+    case 7: iap_handlepkt_mode7(s->len, s->payload); break;
     }
-
-    serbuf[0] = 0;
 }
 
 int remote_control_rx(void)
