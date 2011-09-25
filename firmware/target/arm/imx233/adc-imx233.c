@@ -22,6 +22,8 @@
 #include "config.h"
 #include "adc.h"
 #include "adc-target.h"
+#include "system.h"
+#include "adc-imx233.h"
 
 /* dedicate two channels to temperature sensing
  * dedicate channel 7 to battery

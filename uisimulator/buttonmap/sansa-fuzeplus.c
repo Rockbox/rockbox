@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 Thomas Martitz
+ * Copyright (C) 2011 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,26 +39,19 @@ int key_to_button(int keyboard_button)
             break;
         case SDLK_KP8:
         case SDLK_UP:
-            new_btn = BUTTON_SCROLL_BACK;
+            new_btn = BUTTON_UP;
             break;
         case SDLK_KP2:
         case SDLK_DOWN:
-            new_btn = BUTTON_SCROLL_FWD;
+            new_btn = BUTTON_DOWN;
             break;
         case SDLK_PAGEUP:
         case SDLK_KP9:
-            new_btn = BUTTON_UP;
+            new_btn = BUTTON_PLAYPAUSE;
             break;
-        case SDLK_PAGEDOWN:
-        case SDLK_KP3:
-            new_btn = BUTTON_DOWN;
-            break;
-        case SDLK_KP_MINUS:
-        case SDLK_KP1:
-            new_btn = BUTTON_POWER;
-            break;
-        case SDLK_KP_MULTIPLY:
-            new_btn = BUTTON_HOME;
+        case SDLK_INSERT:
+        case SDLK_KP7:
+            new_btn = BUTTON_BACK;
             break;
         case SDLK_KP5:
         case SDLK_SPACE:
@@ -66,26 +59,30 @@ int key_to_button(int keyboard_button)
         case SDLK_RETURN:
             new_btn = BUTTON_SELECT;
             break;
-        case SDL_BUTTON_WHEELUP:
-            new_btn = BUTTON_SCROLL_BACK;
+        case SDLK_KP_PLUS:
+            new_btn = BUTTON_VOL_UP;
             break;
-        case SDL_BUTTON_WHEELDOWN:
-            new_btn = BUTTON_SCROLL_FWD;
+        case SDLK_KP_MINUS:
+            new_btn = BUTTON_VOL_DOWN;
+            break;
+        case SDLK_HOME:
+        case SDLK_KP1:
+            new_btn = BUTTON_POWER;
             break;
     }
     return new_btn;
 }
 
 struct button_map bm[] = {
-    { SDLK_KP7, 70, 400, 15, "Back" },
-    { SDLK_KP9, 258, 400, 15, "Play/Pause" },
-    { SDLK_KP5, 162, 476, 15, "Select" },
-    { SDLK_KP8, 162, 407, 35, "Up" },
-    { SDLK_KP2, 162, 546, 35, "Down" },
-    { SDLK_KP6, 233, 546, 35, "Right" },
-    { SDLK_KP4, 92, 476, 35, "Left" },
-    { SDLK_KP_MINUS, 20, 190, 20, "Volume-" },
-    { SDLK_KP_PLUS, 20, 130, 20, "Volume+" },
-    { SDLK_KP1, 160, 15, 15, "Power" },
+    { SDLK_KP8,          70, 265, 35, "Scroll Back" },
+    { SDLK_KP9,         141, 255, 31, "Play" },
+    { SDLK_KP_MULTIPLY, 228, 267, 18, "Home" },
+    { SDLK_LEFT,         69, 329, 31, "Left" },
+    { SDLK_SPACE,       141, 330, 20, "Select" },
+    { SDLK_RIGHT,       214, 331, 23, "Right" },
+    { SDLK_KP3,         142, 406, 30, "Menu" },
+    { SDLK_DOWN,        221, 384, 24, "Scroll Fwd" },
+    { SDLK_KP_MINUS,    270, 299, 25, "Power" },
+    { SDLK_h,           269, 358, 26, "Hold" },
     { 0, 0, 0, 0, "None" }
 };

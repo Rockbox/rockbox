@@ -65,5 +65,7 @@ pbell-vibe500.c
 mpio-hd200.c
 #elif CONFIG_KEYPAD == MPIO_HD300_PAD
 mpio-hd300.c
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+sansa-fuzeplus.c
 #endif
 #endif /* SIMULATOR */

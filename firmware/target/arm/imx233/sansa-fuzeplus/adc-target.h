@@ -21,10 +21,6 @@
 #ifndef _ADC_TARGET_H_
 #define _ADC_TARGET_H_
 
-#include "system.h"
-#include "lradc-imx233.h"
-#include "adc-imx233.h"
-
 #define NUM_ADC_CHANNELS    4
 
 #define ADC_BATTERY         0
