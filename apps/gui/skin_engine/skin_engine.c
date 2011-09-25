@@ -45,6 +45,7 @@ static bool skins_initialising = true;
 /* App uses the host malloc to manage the buffer */
 #ifdef APPLICATION
 #define skin_buffer NULL
+#define skin_buffer_size 0
 void theme_init_buffer(void)
 {
     skins_initialising = false;
