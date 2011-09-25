@@ -103,7 +103,7 @@ static int buflibmove_callback(int handle, void* current, void* new)
     alloc->font.buffer_position += diff;
 
     alloc->font.cache._index += diff;
-    alloc->font.cache._lr.base += diff;
+    alloc->font.cache._lru._base += diff;
 
     return BUFLIB_CB_OK;
 }
