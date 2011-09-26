@@ -1,3 +1,9 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
 
 #change for releases
 ifndef APPVERSION
@@ -33,6 +39,7 @@ else
 OBJDIR = $(TARGET_DIR)build/
 endif
 
+TARGET_DIR ?= $(shell pwd)
 
 all: $(OUTPUT)
 
@@ -52,9 +59,11 @@ $(OBJDIR)%.o: %.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-libmkmpioboot$(RBARCH).a: $(LIBOBJS)
-	@echo AR $@
-	$(SILENT)$(AR) rucs $(TARGET_DIR)$@ $^
+libmkmpioboot$(RBARCH).a: $(TARGET_DIR)libmkmpioboot$(RBARCH).a
+
+$(TARGET_DIR)libmkmpioboot$(RBARCH).a: $(LIBOBJS)
+	@echo AR $(notdir $@)
+	$(SILENT)$(AR) rucs $@ $^
 
 # building the standalone executable
 $(OUTPUT): $(OBJS) $(EXTRADEPS)
@@ -68,7 +77,7 @@ $(TARGET_DIR)libmkmpiobooti386.a:
 
 $(TARGET_DIR)libmkmpiobootppc.a:
 	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libmkmpiobootppc.a
-endif    
+endif
 
 libmkmpioboot-universal: $(TARGET_DIR)libmkmpiobooti386.a $(TARGET_DIR)libmkmpiobootppc.a
 	@echo lipo $(TARGET_DIR)libmkmpioboot.a

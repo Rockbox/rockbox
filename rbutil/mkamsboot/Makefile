@@ -1,9 +1,15 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
 
 #change for releases
 ifndef APPVERSION
-APPVERSION=`../../tools/version.sh ../../`
+APPVERSION=$(shell ../../tools/version.sh ../../)
 endif
-
+TARGET_DIR ?= $(shell pwd)/
 # We use the UCL code available in the Rockbox tools/ directory
 CFLAGS=-I../../tools/ucl/include -Wall -DVERSION=\"$(APPVERSION)\"
 
@@ -37,10 +43,10 @@ endif
 all: $(OUTPUT)
 
 # additional link dependencies for the standalone executable
-LIBUCL=../../tools/ucl/src/libucl$(RBARCH).a
+LIBUCL=$(OBJDIR)libucl$(RBARCH).a
 
 $(LIBUCL):
-	$(MAKE) -C ../../tools/ucl/src $(TARGET_DIR)libucl$(RBARCH).a
+	$(SILENT)$(MAKE) -C ../../tools/ucl/src TARGET_DIR=$(OBJDIR) libucl$(RBARCH).a
 
 # inputs
 LIBSOURCES := dualboot.c md5.c mkamsboot.c
@@ -58,9 +64,11 @@ $(OBJDIR)%.o: %.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-libmkamsboot$(RBARCH).a: $(LIBOBJS)
-	@echo AR $@
-	$(SILENT)$(AR) rucs $(TARGET_DIR)$@ $^
+libmkamsboot$(RBARCH).a: $(TARGET_DIR)libmkamsboot$(RBARCH).a
+
+$(TARGET_DIR)libmkamsboot$(RBARCH).a: $(LIBOBJS)
+	@echo AR $(notdir $@)
+	$(SILENT)$(AR) rucs $@ $^
 
 # building the standalone executable
 $(OUTPUT): $(OBJS) $(EXTRADEPS)
@@ -74,7 +82,7 @@ $(TARGET_DIR)libmkamsbooti386.a:
 
 $(TARGET_DIR)libmkamsbootppc.a:
 	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libmkamsbootppc.a
-endif    
+endif
 
 libmkamsboot-universal: $(TARGET_DIR)libmkamsbooti386.a $(TARGET_DIR)libmkamsbootppc.a
 	@echo lipo $(TARGET_DIR)libmkamsboot.a

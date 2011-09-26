@@ -70,25 +70,25 @@ mac {
 # here. This assumes that QMAKE_CC will always be "gcc", maybe with a postfix.
 MYAR = $$replace(QMAKE_CC,gcc.*,ar)
 
-rbspeex.commands = @$(MAKE) \
+rbspeex.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/rbspeex \
         librbspeex$$RBLIBPOSTFIX \
         SYS_SPEEX=\"$$LIBSPEEX\" \
         CC=\"$$QMAKE_CC\" AR=\"$$MYAR\"
-libucl.commands = @$(MAKE) \
+libucl.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/ucl/src \
         libucl$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC\" AR=\"$$MYAR\"
-libmkamsboot.commands = @$(MAKE) \
+libmkamsboot.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkamsboot \
         APPVERSION=\"rbutil\" \
         libmkamsboot$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC\" AR=\"$$MYAR\"
-libmktccboot.commands = @$(MAKE) \
+libmktccboot.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mktccboot \
         libmktccboot$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC\" AR=\"$$MYAR\"
-libmkmpioboot.commands = @$(MAKE) \
+libmkmpioboot.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkmpioboot \
         APPVERSION=\"rbutil\" \
         libmkmpioboot$$RBLIBPOSTFIX \

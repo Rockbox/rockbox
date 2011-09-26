@@ -34,29 +34,34 @@ ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 endif
 
-OUT = $(TARGET_DIR)build$(RBARCH)
+TARGET_DIR ?= $(shell pwd)/
+OBJDIR = $(TARGET_DIR)build$(RBARCH)
 
 all: $(OUTPUT)
 
 # inputs
 LIBSOURCES := mktccboot.c $(TOOLSDIR)/telechips.o
 SOURCES := $(LIBSOURCES) main.c
-OBJS := $(patsubst %.c,%.o,$(addprefix $(OUT)/,$(notdir $(SOURCES))))
-LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OUT)/,$(notdir $(LIBSOURCES))))
+OBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR)/,$(notdir $(SOURCES))))
+LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR)/,$(notdir $(LIBSOURCES))))
 EXTRADEPS :=
 
 # rule for sources from tools dir
-$(OUT)/%.o: $(TOOLSDIR)/%.c $(OUT)
+$(OBJDIR)/%.o: $(TOOLSDIR)/%.c
 	@echo CC $<
+	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-$(OUT)/%.o: %.c $(OUT)
+$(OBJDIR)/%.o: %.c
 	@echo CC $<
+	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
 
-libmktccboot$(RBARCH).a: $(LIBOBJS)
-	@echo AR $@
-	$(SILENT)$(AR) rucs $(TARGET_DIR)$@ $^
+libmktccboot$(RBARCH).a: $(TARGET_DIR)libmktccboot$(RBARCH).a
+
+$(TARGET_DIR)libmktccboot$(RBARCH).a: $(LIBOBJS)
+	@echo AR $(notdir $@)
+	$(SILENT)$(AR) rucs $@ $^
 
 # building the standalone executable
 $(OUTPUT): $(OBJS) $(EXTRADEPS)
@@ -70,16 +75,16 @@ $(TARGET_DIR)libmktccbooti386.a:
 
 $(TARGET_DIR)libmktccbootppc.a:
 	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libmktccbootppc.a
-endif    
-    
+endif
+
 libmktccboot-universal: $(TARGET_DIR)libmktccbooti386.a $(TARGET_DIR)libmktccbootppc.a
 	@echo lipo $(TARGET_DIR)libmktccboot.a
 	$(SILENT) rm -f $(TARGET_DIR)libmktccboot.a
 	$(SILENT)lipo -create $(TARGET_DIR)libmktccbootppc.a $(TARGET_DIR)libmktccbooti386.a -output $(TARGET_DIR)libmktccboot.a
-    
+
 clean:
 	rm -f $(OUTPUT) $(TARGET_DIR)libmktccboot*.a mktccboot.dmg
-	rm -rf $(OUT)
+	rm -rf $(OBJDIR)
 
 mktccboot-i386:
 	$(MAKE) RBARCH=i386
@@ -96,8 +101,5 @@ mktccboot.dmg: mktccboot-mac
 	mkdir -p mktccboot-dmg
 	cp -p mktccboot-mac mktccboot-dmg
 	hdiutil create -srcfolder mktccboot-dmg mktccboot.dmg
-    
-$(OUT):
-	@echo MKDIR $(OUT)
-	$(SILENT)mkdir $(OUT)
+
 
