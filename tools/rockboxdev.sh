@@ -30,7 +30,7 @@ else
 fi
 
 if [ -z $GNU_MIRROR ] ; then
-    GNU_MIRROR=http://mirrors.kernel.org/gnu
+    GNU_MIRROR=http://ftp.sunet.se/pub/gnu
 fi
 
 # These are the tools this script requires and depends upon.
