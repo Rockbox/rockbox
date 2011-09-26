@@ -26,8 +26,9 @@ TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
 {
     m_TTSTemplate = "cscript //nologo \"%exe\" /language:%lang /voice:\"%voice\""
         " /speed:%speed \"%options\"";
-    defaultLanguage ="english";
-    m_sapi4 =false;
+    defaultLanguage = "english";
+    m_sapi4 = false;
+    m_started = false;
 }
 
 TTSBase::Capabilities TTSSapi::capabilities()
@@ -138,9 +139,29 @@ bool TTSSapi::start(QString *errStr)
     voicestream = new QTextStream(voicescript);
     voicestream->setCodec("UTF16-LE");
 
+    m_started = true;
     return true;
 }
 
+QString TTSSapi::voiceVendor(void)
+{
+    bool keeprunning = m_started;
+    QString vendor;
+    if(!m_started) {
+        QString error;
+        start(&error);
+    }
+    *voicestream << "QUERY\tVENDOR\r\n";
+    voicestream->flush();
+    while((vendor = voicestream->readLine()).isEmpty())
+            QCoreApplication::processEvents();
+
+    qDebug() << "[TTSSAPI] TTS vendor:" << vendor;
+    if(!keeprunning) {
+        stop();
+    }
+    return vendor;
+}
 
 QStringList TTSSapi::getVoiceList(QString language)
 {
@@ -226,6 +247,7 @@ bool TTSSapi::stop()
             | QFile::ReadGroup | QFile::WriteGroup | QFile::ExeGroup
             | QFile::ReadOther | QFile::WriteOther | QFile::ExeOther );
     QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
+    m_started = false;
     return true;
 }
 

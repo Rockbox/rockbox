@@ -42,6 +42,7 @@ class TTSSapi : public TTSBase
         TTSStatus voice(QString text,QString wavfile, QString *errStr);
         bool start(QString *errStr);
         bool stop();
+        QString voiceVendor(void);
         Capabilities capabilities();
 
         // for settings
@@ -49,8 +50,8 @@ class TTSSapi : public TTSBase
         void generateSettings();
         void saveSettings();
 
-        private slots:
-            void updateVoiceList();
+    private slots:
+        void updateVoiceList();
 
     private:
         QStringList getVoiceList(QString language);
@@ -66,6 +67,7 @@ class TTSSapi : public TTSBase
         QString m_TTSVoice;
         QString m_TTSSpeed;
         bool m_sapi4;
+        bool m_started;
 };
 
 

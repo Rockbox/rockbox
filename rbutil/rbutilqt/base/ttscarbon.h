@@ -45,6 +45,7 @@ class TTSCarbon : public TTSBase
         bool start(QString *errStr);
         //! child class should stop
         bool stop() ;
+        QString voiceVendor(void) { return QString(); }
 
         // configuration
         //! Child class should return true, when configuration is good

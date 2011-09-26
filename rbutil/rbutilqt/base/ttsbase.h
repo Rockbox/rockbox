@@ -47,6 +47,7 @@ class TTSBase : public EncTtsSettingInterface
         //! child class should stop
         virtual bool stop() =0;
         
+        virtual QString voiceVendor(void) = 0;
         // configuration
         //! Child class should return true, when configuration is good
         virtual bool configOk()=0;        
@@ -60,7 +61,7 @@ class TTSBase : public EncTtsSettingInterface
         // static functions
         static TTSBase* getTTS(QObject* parent,QString ttsname);
         static QStringList getTTSList();
-        static QString getTTSName(QString tts); 
+        static QString getTTSName(QString tts);
                 
     private:
         //inits the tts List
