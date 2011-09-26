@@ -10,6 +10,10 @@ BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini1g.h ipodmini2g.h ipod
 # Releases of ipodpatcher are created with "make RELEASE=1".  This
 # enables BOOTOBJS and uses the VERSION string defined in main.c
 
+ifndef V
+SILENT = @
+endif
+
 ifdef RELEASE
 CFLAGS+=-DRELEASE
 BOOTOBJS=1
@@ -79,33 +83,13 @@ ipodpatcher-ppc: $(SRC) ipodio-posix.c $(BOOTSRC)
 ipod2c: ipod2c.c
 	$(NATIVECC) $(CFLAGS) -o ipod2c ipod2c.c
 
-ipod1g2g.c: bootloader-ipod1g2g.ipod ipod2c
-	./ipod2c bootloader-ipod1g2g.ipod ipod1g2g
+%.c: bootloader-%.ipod ipod2c
+	@echo IPOD2C $<
+	$(SILENT)./ipod2c $< $*
 
-ipod3g.c: bootloader-ipod3g.ipod ipod2c
-	./ipod2c bootloader-ipod3g.ipod ipod3g
-
-ipod4g.c: bootloader-ipod4g.ipod ipod2c
-	./ipod2c bootloader-ipod4g.ipod ipod4g
-
-ipodcolor.c: bootloader-ipodcolor.ipod ipod2c
-	./ipod2c bootloader-ipodcolor.ipod ipodcolor
-
-ipodmini1g.c: bootloader-ipodmini1g.ipod ipod2c
-	./ipod2c bootloader-ipodmini1g.ipod ipodmini1g
-
-ipodmini2g.c: bootloader-ipodmini2g.ipod ipod2c
-	./ipod2c bootloader-ipodmini2g.ipod ipodmini2g
-
-ipodnano1g.c: bootloader-ipodnano1g.ipod ipod2c
-	./ipod2c bootloader-ipodnano1g.ipod ipodnano1g
-
-ipodvideo.c: bootloader-ipodvideo.ipod ipod2c
-	./ipod2c bootloader-ipodvideo.ipod ipodvideo
-
-ipodnano2g.c: bootloader-ipodnano2g.ipodx ipod2c
-	./ipod2c bootloader-ipodnano2g.ipodx ipodnano2g
-
+%.c: bootloader-%.ipodx ipod2c
+	@echo IPOD2C $<
+	$(SILENT)./ipod2c $< $*
 
 clean:
 	rm -f ipodpatcher.exe ipodpatcher-rc.o ipodpatcher-mac ipodpatcher-i386 ipodpatcher-ppc ipodpatcher ipod2c *~ $(BOOTSRC) $(BOOT_H)
