@@ -172,9 +172,12 @@ static int32_t readlong(struct font *pf)
 
 static int glyph_bytes( struct font *pf, int width )
 {
-    return pf->depth ?
-        (pf->height * width + 1) / 2:
-        width * ((pf->height + 7) / 8);
+    int ret;
+    if (pf->depth)
+        ret = ( pf->height * width + 1 ) / 2;
+    else
+        ret = width * ((pf->height + 7) / 8);
+    return (ret + 1) & ~1;
 }
 
 static struct font* font_load_header(struct font *pf)
