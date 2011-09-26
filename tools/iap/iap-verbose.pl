@@ -376,6 +376,45 @@ sub _h_00_0027 {
     return 1;
 }
 
+sub _h_00_0028 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $acctype;
+    my $accparam;
+
+    $acctype = unpack("C", $data);
+
+    printf("RetAccessoryInfo (0x00, 0x28) D->I\n");
+    printf(" Accessory Info Type:      %s (%d)\n", (
+        "Info capabilities",
+        "Name",
+        "Minimum supported iPod firmware version",
+        "Minimum supported lingo version",
+        "Firmware version",
+        "Hardware version",
+        "Manufacturer",
+        "Model Number",
+        "Serial Number",
+        "Maximum payload size")[$acctype], $acctype);
+
+    if ($acctype == 0x00) {
+        $accparam = unpack("xN", $data);
+        printf("  Accessory Info capabilities\n") if ($accparam & 0x01);
+        printf("  Accessory name\n") if ($accparam & 0x02);
+        printf("  Accessory minimum supported iPod firmware\n") if ($accparam & 0x04);
+        printf("  Accessory minimum supported lingo version\n") if ($accparam & 0x08);
+        printf("  Accessory firmware version\n") if ($accparam & 0x10);
+        printf("  Accessory hardware version\n") if ($accparam & 0x20);
+        printf("  Accessory manufacturer\n") if ($accparam & 0x40);
+        printf("  Accessory model number\n") if ($accparam & 0x80);
+        printf("  Accessory serial number\n") if ($accparam & 0x100);
+        printf("  Accessory incoming max packet size\n") if ($accparam & 0x200);
+    }
+
+    return 1;
+}
+
 sub _h_00_002b {
     my $self = shift;
     my $data = shift;
@@ -435,11 +474,25 @@ sub _h_00_0038 {
     my $self = shift;
     my $data = shift;
     my $state = shift;
+    my $transid;
+
+    $transid = unpack("n", $data);
+    
+    printf("StartIDPS (0x00, 0x38) D->I\n");
+    printf(" TransID:          %d\n", $transid);
+
+    return 1;
+}
+
+sub _h_00_003b {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
     my ($transid, $status);
 
     ($transid, $status) = unpack("nC", $data);
     
-    printf("EndIDPS (0x00, 0x38) D->I\n");
+    printf("EndIDPS (0x00, 0x3B) D->I\n");
     printf(" TransID:          %d\n", $transid);
     printf(" Action:           %s (%d)\n", (
         "Finished",
@@ -597,6 +650,111 @@ sub _h_03_000c {
     return 1;
 }
 
+sub _h_03_000d {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $type;
+    my $info;
+
+    $type = unpack("C", $data);
+
+    printf("RetiPodStateInfo (0x03, 0x0E) D->I\n");
+
+    if ($type == 0x00) {
+        $info = unpack("xN", $data);
+        printf(" Type:             Track position\n");
+        printf(" Position:         %d ms\n", $info);
+    } elsif ($type == 0x01) {
+        $info = unpack("xN", $data);
+        printf(" Type:             Track index\n");
+        printf(" Index:            %d\n", $info);
+    } elsif ($type == 0x02) {
+        $info = [ unpack("xNnn", $data) ];
+        printf(" Type:             Chapter Information\n");
+        printf(" Playing Track:    %d\n", $info->[0]);
+        printf(" Chapter count:    %d\n", $info->[1]);
+        printf(" Chapter index:    %d\n", $info->[2]);
+    } elsif ($type == 0x03) {
+        $info = unpack("xC", $data);
+        printf(" Type:             Play status\n");
+        printf(" Status:           %s (%d)\n", (
+            "Stopped",
+            "Playing",
+            "Paused",
+            "FF",
+            "REW",
+            "End FF/REW")[$info], $info);
+    } elsif ($type == 0x04) {
+        $info = [unpack("xCC", $data)];
+        printf(" Type:             Mute/Volume\n");
+        printf(" Mute State:       %s\n", $info->[0]?"On":"Off");
+        printf(" Volume level:     %d\n", $info->[1]);
+    } elsif ($type == 0x05) {
+        $info = [unpack("xCC", $data)];
+        printf(" Type:             Battery Information\n");
+        printf(" Power state:      %s (%d)\n", (
+            "Internal, low power (<30%)",
+            "Internal",
+            "External battery pack, no charging",
+            "External power, no charging",
+            "External power, charging",
+            "External power, charged")[$info->[0]], $info->[0]);
+        printf(" Battery level:    %d%%\n", $info->[1]*100/255);
+    } elsif ($type == 0x06) {
+        $info = [unpack("xN", $data)];
+        printf(" Type:             Equalizer\n");
+        printf(" Index:            %d\n", $info->[0]);
+    } elsif ($type == 0x07) {
+        $info = [unpack("xC", $data)];
+        printf(" Type:             Shuffle\n");
+        printf(" Shuffle State:    %s\n", $info->[0]?"On":"Off");
+    } elsif ($type == 0x08) {
+        $info = [unpack("xC", $data)];
+        printf(" Type:             Repeat\n");
+        printf(" Repeat State:     %s\n", $info->[0]?"On":"Off");
+    } elsif ($type == 0x09) {
+        $info = [unpack("xnCCCC", $data)];
+        printf(" Type:             Date\n");
+        printf(" Date:             %02d.%02d.%04d %02d:%02d\n", $info->[2], $info->[1], $info->[0], $info->[3], $info->[4]);
+    } elsif ($type == 0x0A) {
+        $info = [unpack("xCCC", $data)];
+        printf(" Type:             Alarm\n");
+        printf(" Alarm State:      %s\n", $info->[0]?"On":"Off");
+        printf(" Time:             %02d:%02d\n", $info->[1], $info->[2]);
+    } elsif ($type == 0x0B) {
+        $info = [unpack("xC", $data)];
+        printf(" Type:             Backlight\n");
+        printf(" Backlight State:  %s\n", $info->[0]?"On":"Off");
+    } elsif ($type == 0x0C) {
+        $info = [unpack("xC", $data)];
+        printf(" Type:             Hold switch\n");
+        printf(" Switch State:     %s\n", $info->[0]?"On":"Off");
+    } elsif ($type == 0x0D) {
+        $info = [unpack("xC", $data)];
+        printf(" Type:             Sound check\n");
+        printf(" Sound check:      %s\n", $info->[0]?"On":"Off");
+    } elsif ($type == 0x0E) {
+        $info = [unpack("xC", $data)];
+        printf(" Type:             Audiobook speed\n");
+        printf(" Speed:            %s\n", $info->[0]==0x00?"Normal":$info->[0]==0x01?"Faster":$info->[0]==0xFF?"Slower":"Reserved");
+    } elsif ($type == 0x0F) {
+        $info = unpack("xN", $data);
+        printf(" Type:             Track position\n");
+        printf(" Position:         %d s\n", $info);
+    } elsif ($type == 0x10) {
+        $info = [unpack("xCCC", $data)];
+        printf(" Type:             Mute/UI/Absolute volume\n");
+        printf(" Mute State:       %s\n", $info->[0]?"On":"Off");
+        printf(" UI Volume level:  %d\n", $info->[1]);
+        printf(" Absolute Volume:  %d\n", $info->[2]);
+    } else {
+        printf(" Reserved\n");
+    }
+
+    return 1;
+}
+
 
 sub _h_03_000e {
     my $self = shift;
@@ -695,15 +853,107 @@ sub _h_03_000e {
     return 1;
 }
 
-
-
-
 sub _h_03_000f {
     my $self = shift;
     my $data = shift;
     my $state = shift;
 
     print("GetPlayStatus (0x03, 0x0F) D->I\n");
+
+    return 1;
+}
+
+sub _h_03_0010 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my ($status, $idx, $len, $pos);
+
+    ($status, $idx, $len, $pos) = unpack("CNNN", $data);
+
+    printf("RetPlayStatus (0x03, 0x10) I->D\n");
+    printf(" Status:          %s (%d)\n", (
+        "Stopped",
+        "Playing",
+        "Paused")[$status], $status);
+    if ($status != 0x00) {
+        printf(" Track index:       %d\n", $idx);
+        printf(" Track length:      %d\n", $len);
+        printf(" Track position:    %d\n", $pos);
+    }
+
+    return 1;
+}
+
+sub _h_03_0012 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my ($info, $tidx, $cidx);
+
+    ($info, $tidx, $cidx) = unpack("CNn", $data);
+
+    printf("GetIndexedPlayingTrackInfo (0x03, 0x12) D->I\n");
+    printf(" Requested info:         %s (%d)\n", (
+            "Track caps/info",
+            "Chapter time/name",
+            "Artist name",
+            "Album name",
+            "Genre name",
+            "Track title",
+            "Composer name",
+            "Lyrics",
+            "Artwork count")[$info], $info);
+    printf(" Track index:            %d\n", $tidx);
+    printf(" Chapter index:          %d\n", $cidx);
+
+    return 1;
+}
+
+sub _h_03_0013 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $info;
+
+    $info = unpack("C", $data);
+    printf("RetIndexedPlayingTrackInfo (0x03, 0x13) I->D\n");
+    printf(" Returned info:         %s (%d)\n", (
+            "Track caps/info",
+            "Chapter time/name",
+            "Artist name",
+            "Album name",
+            "Genre name",
+            "Track title",
+            "Composer name",
+            "Lyrics",
+            "Artwork count")[$info], $info);
+    if ($info == 0x00) {
+        my ($caps, $len, $chap) = unpack("xNNn", $data);
+        printf("  Track is audiobook\n") if ($caps & 0x01);
+        printf("  Track has chapters\n") if ($caps & 0x02);
+        printf("  Track has artwork\n") if ($caps & 0x04);
+        printf("  Track contains video\n") if ($caps & 0x80);
+        printf("  Track queued as video\n") if ($caps & 0x100);
+
+        printf("  Track length:        %d ms\n", $len);
+        printf("  Track chapters:      %d\n", $chap);
+    } elsif ($info == 0x01) {
+        my ($len, $name) = unpack("xNZ*");
+        printf("  Chapter time:        %d ms\n", $len);
+        printf("  Chapter name:        %s\n", $name);
+    } elsif ($info >= 0x02 && $info <= 0x06) {
+        my $name = unpack("xZ*", $data);
+        printf("  Name/Title:          %s\n", $name)
+    } elsif ($info == 0x07) {
+        my ($info, $index, $data) = unpack("xCnZ*");
+        printf("  Part of multiple packets\n") if ($info & 0x01);
+        printf("  Is last packet\n") if ($info & 0x02);
+        printf("  Packet index:        %d\n", $index);
+        printf("  Data:                %s\n", $data);
+    } elsif ($info == 0x08) {
+
+    }
 
     return 1;
 }
@@ -1390,7 +1640,10 @@ sub unpack_iaplog {
     my $line = shift;
     my @m;
 
-    return () unless ($line =~ /^[RT]: /);
+    unless ($line =~ /^[RT]: /) {
+        printf("Skipped: %s\n", $line);
+        return ();
+    }
 
     $line =~ s/^[RT]: //;
     $line =~ s/\\x(..)/chr(hex($1))/ge;

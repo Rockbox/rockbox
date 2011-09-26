@@ -22,7 +22,9 @@
 
 #include <stdbool.h>
 
-#define RX_BUFLEN 512
+/* This is just the payload size, without sync, length and checksum */
+#define RX_BUFLEN (64*1024)
+/* This is the entire frame length, sync, length, payload and checksum */
 #define TX_BUFLEN 128
 
 extern bool iap_getc(unsigned char x);

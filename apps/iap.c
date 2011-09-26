@@ -31,6 +31,7 @@
 #include "thread.h"
 #include "serial.h"
 #include "appevents.h"
+#include "timefuncs.h"
 
 #include "playlist.h"
 #include "playback.h"
@@ -95,6 +96,13 @@
             return; \
         }} while(0)
 
+/* The CHECKAUTH0 macro, for Lingo 0x03 */
+#define CHECKAUTH3 do { \
+        if (!DEVICE_AUTHENTICATED) { \
+            cmd_ack_mode3(cmd, IAP_ACK_NO_AUTHEN); \
+            return; \
+        }} while(0)
+
 /* MS_TO_TICKS converts a milisecond time period into the
  * corresponding amount of ticks. If the time period cannot
  * be accurately measured in ticks it will round up.
@@ -129,36 +137,26 @@
 #define IAP_EV_TICK         (1)     /* The regular task timeout */
 #define IAP_EV_MSG_RCVD     (2)     /* A complete message has been received from the device */
 
-/* Add a button to the remote button bitfield. Also set iap_repeatbtn=2
- * if it's not already set
+/* Add a button to the remote button bitfield. Also set iap_repeatbtn=1
+ * to ensure a button press is at least delivered once.
  */
 #define REMOTE_BUTTON(x) do { \
         iap_remotebtn |= (x); \
         iap_timeoutbtn = 3; \
-        iap_repeatbtn = 0; \
+        iap_repeatbtn = 2; \
         } while(0)
         
-/* Used to control the rate from calls to iap_periodic (roughly 10HZ) to
- * notifications sent to the device (normally 2HZ, higher for certain
- * events, for example volume changes). The maximum useful value is 5,
- * which sets the notification rate to 5HZ.
- * Don't set this to 0 to disable notifications, use device.do_notify for
- * that
- */
-static volatile int iap_pollspeed = 0;
 static bool iap_setupflag = false, iap_updateflag = false, iap_running = false;
 /* This is set to true if a SYS_POWEROFF message is received,
  * signalling impending power off
  */
 static bool iap_shutdown = false;
-static int iap_changedctr = 0;
 static struct timeout iap_task_tmo;
 
 static unsigned long iap_remotebtn = 0;
-/* Used for one-shot buttons (buttons that go out by themselves after a
- * short time, without the device having to send an explicit "button up"
- * event.
- * If !0, the button will go out on it's own
+/* Used to make sure a button press is delivered to the processing
+ * backend. While this is !0, no new incoming messasges are processed.
+ * Counted down by remote_control_rx()
  */
 static int iap_repeatbtn = 0;
 /* Used to time out button down events in case we miss the button up event
@@ -174,7 +172,7 @@ static int iap_repeatbtn = 0;
 static unsigned int iap_timeoutbtn = 0;
 static bool iap_btnrepeat = false, iap_btnshuffle = false;
 
-static long thread_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+static long thread_stack[(DEFAULT_STACK_SIZE*2)/sizeof(long)];
 static struct event_queue iap_queue;
 
 static unsigned char serbuf[RX_BUFLEN];
@@ -263,16 +261,46 @@ static struct device_t {
                                      * notifications explicitly requested by the
                                      * device
                                      */
+    uint32_t changed_notifications; /* Tracks notifications that changed since the last
+                                     * call to SetRemoteEventNotification or GetRemoteEventStatus
+                                     */
     bool do_notify;                 /* Notifications enabled */
     bool do_power_notify;           /* Whether to send power change notifications.
                                      * These are sent automatically to all devices
                                      * that used IdentifyDeviceLingoes to identify
                                      * themselves, independent of other notifications
                                      */
+
+    uint32_t trackpos_ms;           /* These fields are to save the current state */
+    uint32_t track_index;           /* of various fields so we can send a notification */
+    uint32_t chapter_index;         /* if they change */
+    unsigned char play_status;
+    bool mute;
+    unsigned char volume;
+    unsigned char power_state;
+    unsigned char battery_level;
+    uint32_t equalizer_index;
+    unsigned char shuffle;
+    unsigned char repeat;
+    struct tm datetime;
+    unsigned char alarm_state;
+    unsigned char alarm_hour;
+    unsigned char alarm_minute;
+    unsigned char backlight;
+    bool hold;
+    unsigned char soundcheck;
+    unsigned char audiobook;
+    uint16_t trackpos_s;
 } device;
 #define DEVICE_AUTHENTICATED (device.auth.state == AUST_AUTH)
 #define DEVICE_AUTH_RUNNING (device.auth.state != AUST_NONE)
 #define DEVICE_LINGO_SUPPORTED(x) (device.lingoes & BIT_N((x)&0x1f))
+
+static void put_u16(unsigned char *buf, uint16_t data)
+{
+    buf[0] = (data >>  8) & 0xFF;
+    buf[1] = (data >>  0) & 0xFF;
+}
 
 static void put_u32(unsigned char *buf, uint32_t data)
 {
@@ -299,6 +327,7 @@ static void reset_device(struct device_t* device)
     reset_auth(&(device->auth));
     device->lingoes = 0;
     device->notifications = 0;
+    device->changed_notifications = 0;
     device->do_notify = false;
     device->do_power_notify = false;
     device->accinfo = ACCST_NONE;
@@ -350,7 +379,6 @@ static void iap_thread(void)
 static void iap_track_changed(void *ignored)
 {
     (void)ignored;
-    iap_changedctr = 1;
 }
 
 /* Do general setup of the needed infrastructure.
@@ -360,9 +388,7 @@ static void iap_track_changed(void *ignored)
 void iap_setup(int ratenum)
 {
     iap_bitrate_set(ratenum);
-    iap_pollspeed = 1;
     iap_updateflag = false;
-    iap_changedctr = 0;
     iap_remotebtn = BUTTON_NONE;
     iap_setupflag = true;
 }
@@ -449,6 +475,9 @@ bool iap_getc(unsigned char x)
     struct state_t *s = &frame_state;
     static long pkt_timeout;
 
+    if (!iap_setupflag)
+        return false;
+
     /* Check the time since the last packet arrived. */
     if ((s->state != ST_SYNC) && TIME_AFTER(current_tick, pkt_timeout)) {
         /* Packet timeouts only make sense while not waiting for the
@@ -529,9 +558,11 @@ bool iap_getc(unsigned char x)
             if (!iap_running)
                 iap_start();
             queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
+        } else {
+            /* Invalid frame, release lock */
+            serbuf_lock = false;
         }
         s->state = ST_SYNC;
-        serbuf_lock = false;
         break;
     default:
         panicf("Unhandled iap state %d", (int) s->state);
@@ -542,6 +573,20 @@ bool iap_getc(unsigned char x)
     
     /* return true while still hunting for the sync and start-of-frame byte */
     return (s->state == ST_SYNC) || (s->state == ST_SOF);
+}
+
+static uint32_t iap_get_trackpos(void)
+{
+    struct mp3entry *id3 = audio_current_track();
+
+    return id3->elapsed;
+}
+
+static uint32_t iap_get_trackindex(void)
+{
+    struct playlist_info* playlist = playlist_get_current();
+
+    return (playlist->index - playlist->first_index);
 }
 
 void iap_periodic(void)
@@ -598,7 +643,10 @@ void iap_periodic(void)
         unsigned char data[] = {0x00, 0x23, 0x01};
 
         iap_send_pkt(data, sizeof(data));
-        iap_shutdown = false;
+
+        /* No further actions, we're going down */
+        reset_device(&device);
+        return;
     }
 
     /* Handle GetAccessoryInfo messages */
@@ -615,40 +663,296 @@ void iap_periodic(void)
     if (!device.do_notify) return;
     if (device.notifications == 0) return;
 
-    /* Even if iap_periodic is called every 100ms, notifications
-     * are sent on a longer timescale.
-     */
-    count += iap_pollspeed;
-    if (count < 5) return;
+    /* Volume change notifications are sent every 100ms */
+    if (device.notifications & (BIT_N(4) | BIT_N(16))) {
+        /* Currently we do not track volume changes, so this is
+         * never sent.
+         *
+         * TODO: Fix volume tracking
+         */
+    }
+
+    /* All other events are sent every 500ms */
+    count += 1;
+    if (count < 4) return;
 
     count = 0;
     
-    /* PlayStatusChangeNotification */
-    unsigned char data[] = {0x04, 0x00, 0x27, 0x04, 0x00, 0x00, 0x00, 0x00};
-    unsigned long time_elapsed = audio_current_track()->elapsed;
-
-    time_elapsed += wps_get_ff_rewind_count();
-
-    data[3] = 0x04; /* playing */
-
-    /* If info has changed, don't flag it right away */
-    if(iap_changedctr && iap_changedctr++ >= iap_pollspeed * 2)
+    /* RemoteEventNotification */
+    unsigned char data[11] = {0x03, 0x09};
+    
+    /* Track position (ms)  or Track position (s) */
+    if (device.notifications & (BIT_N(0) | BIT_N(15)))
     {
-        /* track info has changed */
-        iap_changedctr = 0;
-        data[3] = 0x01; /* 0x02 has same effect?  */
-        iap_updateflag = true;
+        uint32_t t;
+        uint16_t ts;
+        bool changed;
+
+        t = iap_get_trackpos();
+        ts = (t / 1000) & 0xFFFF;
+
+        if ((device.notifications & BIT_N(0)) && (device.trackpos_ms != t))
+        {
+            data[2] = 0x00;
+            put_u32(&data[3], t);
+            device.changed_notifications |= BIT_N(0);
+            changed = true;
+
+            iap_send_pkt(data, 7);
+        }
+
+        if ((device.notifications & BIT_N(15)) && (device.trackpos_s != ts)) {
+            data[2] = 0x0F;
+            put_u16(&data[3], ts);
+            device.changed_notifications |= BIT_N(15);
+            changed = true;
+
+            iap_send_pkt(data, 2);
+        }
+
+        if (changed)
+        {
+            device.trackpos_ms = t;
+            device.trackpos_s = t;
+        }
     }
 
-    put_u32(&data[4], time_elapsed);
-    iap_send_pkt(data, sizeof(data));
-}
+    /* Track index */
+    if (device.notifications & BIT_N(1))
+    {
+        uint32_t index;
 
-static void iap_set_remote_volume(void)
-{
-    unsigned char data[] = {0x03, 0x0D, 0x04, 0x00, 0x00};
-    data[4] = (char)((global_settings.volume+58) * 4);
-    iap_send_pkt(data, sizeof(data));
+        index = iap_get_trackindex();
+
+        if (device.track_index != index) {
+            data[2] = 0x01;
+            put_u32(&data[3], index);
+            device.changed_notifications |= BIT_N(1);
+
+            iap_send_pkt(data, 7);
+
+            device.track_index = index;
+        }
+    }
+
+    /* Chapter index */
+    if (device.notifications & BIT_N(2))
+    {
+        uint32_t index;
+
+        index = iap_get_trackindex();
+
+        if (device.track_index != index)
+        {
+            data[2] = 0x02;
+            put_u32(&data[3], index);
+            put_u16(&data[7], 0);
+            put_u16(&data[9], 0xFFFF);
+            device.changed_notifications |= BIT_N(2);
+
+            iap_send_pkt(data, 11);
+
+            device.track_index = index;
+        }
+    }
+
+    /* Play status */
+    if (device.notifications & BIT_N(3))
+    {
+        unsigned char play_status;
+
+        play_status = audio_status();
+
+        if (device.play_status != play_status)
+        {
+            data[2] = 0x03;
+            if (play_status & AUDIO_STATUS_PLAY) {
+                /* Playing or paused */
+                if (play_status & AUDIO_STATUS_PAUSE) {
+                    /* Paused */
+                    data[2] = 0x02;
+                } else {
+                    /* Playing */
+                    data[2] = 0x01;
+                }
+            }
+            device.changed_notifications |= BIT_N(3);
+
+            iap_send_pkt(data, 4);
+
+            device.play_status = play_status;
+        }
+    }
+
+    /* Power/Battery */
+    if (device.notifications & BIT_N(5))
+    {
+        unsigned char power_state;
+        unsigned char battery_l;
+
+        power_state = charger_input_state;
+        battery_l = battery_level();
+
+        if ((device.power_state != power_state) || (device.battery_level != battery_l))
+        {
+            data[0x02] = 0x05;
+            if (power_state == NO_CHARGER) {
+                if (battery_l < 30) {
+                    data[0x03] = 0x00;
+                } else {
+                    data[0x03] = 0x01;
+                }
+                data[0x04] = (char)((battery_l * 255)/100);
+            } else {
+                data[0x03] = 0x04;
+                data[0x04] = 0x00;
+            }
+            device.changed_notifications |= BIT_N(5);
+
+            iap_send_pkt(data, 5);
+
+            device.power_state = power_state;
+            device.battery_level = battery_l;
+        }
+    }
+
+    /* Equalizer state
+     * This is not handled yet.
+     *
+     * TODO: Fix equalizer handling
+     */
+
+    /* Shuffle */
+    if (device.notifications & BIT_N(7))
+    {
+        unsigned char shuffle;
+
+        shuffle = global_settings.playlist_shuffle;
+
+        if (device.shuffle != shuffle)
+        {
+            data[0x02] = 0x07;
+            data[0x03] = shuffle?0x01:0x00;
+            device.changed_notifications |= BIT_N(7);
+
+            iap_send_pkt(data, 4);
+
+            device.shuffle = shuffle;
+        }
+    }
+
+    /* Repeat */
+    if (device.notifications & BIT_N(8))
+    {
+        unsigned char repeat;
+
+        repeat = global_settings.repeat_mode;
+
+        if (device.repeat != repeat)
+        {
+            data[0x02] = 0x08;
+            switch (repeat)
+            {
+                case REPEAT_OFF:
+                {
+                    data[0x03] = 0x00;
+                    break;
+                }
+
+                case REPEAT_ONE:
+                {
+                    data[0x03] = 0x01;
+                    break;
+                }
+
+                case REPEAT_ALL:
+                {
+                    data[0x03] = 0x02;
+                    break;
+                }
+            }
+            device.changed_notifications |= BIT_N(8);
+
+            iap_send_pkt(data, 4);
+
+            device.repeat = repeat;
+        }
+    }
+
+    /* Date/Time */
+    if (device.notifications & BIT_N(9))
+    {
+        struct tm* tm;
+
+        tm = get_time();
+
+        if (memcmp(tm, &(device.datetime), sizeof(struct tm)))
+        {
+            data[0x02] = 0x09;
+            data[0x03] = ((tm->tm_year+1900) >> 8) & 0xFF;
+            data[0x04] = (tm->tm_year+1900) & 0xFF;
+
+            /* Month */
+            data[0x05] = tm->tm_mon+1;
+
+            /* Day */
+            data[0x06] = tm->tm_mday;
+
+            /* Hour */
+            data[0x07] = tm->tm_hour;
+
+            /* Minute */
+            data[0x08] = tm->tm_min;
+
+            device.changed_notifications |= BIT_N(9);
+
+            iap_send_pkt(data, 9);
+
+            memcpy(&(device.datetime), tm, sizeof(struct tm));
+        }
+    }
+
+    /* Alarm
+     * This is not supported yet.
+     *
+     * TODO: Fix alarm handling
+     */
+
+    /* Backlight
+     * This is not supported yet.
+     *
+     * TODO: Fix backlight handling
+     */
+
+    /* Hold switch */
+    if (device.notifications & BIT_N(0x0C))
+    {
+        unsigned char hold;
+
+        hold = button_hold();
+        if (device.hold != hold) {
+            data[0x02] = 0x0C;
+            data[0x03] = hold?0x01:0x00;
+
+            device.changed_notifications |= BIT_N(0x0C);
+
+            iap_send_pkt(data, 4);
+
+            device.hold = hold;
+        }
+    }
+
+    /* Sound check
+     * This is not supported yet.
+     *
+     * TODO: Fix sound check handling
+     */
+
+    /* Audiobook check
+     * This is not supported yet.
+     *
+     * TODO: Fix audiobook handling
+     */
 }
 
 /* Change the current interface state.
@@ -662,8 +966,6 @@ static void interface_state_change(enum interface_state new)
         if (audio_status() == AUDIO_STATUS_PLAY)
         {
             REMOTE_BUTTON(BUTTON_RC_PLAY);
-            iap_repeatbtn = 2;
-            iap_changedctr = 1;
         }
     }
 
@@ -676,10 +978,7 @@ static void cmd_ack_mode0(unsigned char cmd, unsigned char status)
     iap_send_pkt(data, sizeof(data));
 }
 
-static void cmd_ok_mode0(unsigned char cmd)
-{
-    cmd_ack_mode0(cmd, IAP_ACK_OK);
-}
+#define cmd_ok_mode0(cmd) cmd_ack_mode0((cmd), IAP_ACK_OK)
 
 static void cmd_pending_mode0(unsigned char cmd, uint32_t msdelay) {
     unsigned char data[] = {0x00, 0x02, 0x06, cmd, 0x00, 0x00, 0x00, 0x00};
@@ -746,11 +1045,8 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
              * and resets authentication
              */
             interface_state_change(IST_STANDARD);
-            reset_auth(&(device.auth));
+            reset_device(&device);
 
-            /* Devices using Identify do not get power off notifications */
-            device.do_power_notify = false;
-            
             switch (lingo) {
                 case 0x04:
                 {
@@ -1132,16 +1428,12 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             if (seen_unsupported) {
                 cmd_ack_mode0(cmd, IAP_ACK_CMD_FAILED);
                 break;
-            } else {
-                device.lingoes = lingoes;
-                /* Seeing a valid IdentifyDeviceLingoes packet resets
-                 * authentication
-                 */
-                reset_auth(&(device.auth));
-
-                /* Devices using IdentifyDeviceLingoes get power off notifications */
-                device.do_power_notify = true;
             }
+            reset_device(&device);
+            device.lingoes = lingoes;
+
+            /* Devices using IdentifyDeviceLingoes get power off notifications */
+            device.do_power_notify = true;
 
             /* If a new authentication is requested, start the auth
              * process.
@@ -1152,7 +1444,6 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
              * GetAccessoryInfo
              */
             if (deviceid && (options & 0x03) && !DEVICE_AUTH_RUNNING) {
-                reset_auth(&(device.auth));
                 device.auth.state = AUST_INIT;
             } else {
                 device.accinfo = ACCST_INIT;
@@ -1643,10 +1934,7 @@ static void cmd_ack_mode2(unsigned char cmd, unsigned char status)
     iap_send_pkt(data, sizeof(data));
 }
 
-static void cmd_ok_mode2(unsigned char cmd)
-{
-    cmd_ack_mode2(cmd, IAP_ACK_OK);
-}
+#define cmd_ok_mode2(cmd) cmd_ack_mode2((cmd), IAP_ACK_OK)
 
 static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
 {
@@ -1866,7 +2154,7 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
             repeatbuf[1] = 0x00;
             iap_handlepkt_mode2((len<6)?len:6, repeatbuf);
 
-            cmd_ack_mode2(cmd, IAP_ACK_OK);
+            cmd_ok_mode2(cmd);
             break;
         }
         
@@ -1898,10 +2186,7 @@ static void cmd_ack_mode3(unsigned char cmd, unsigned char status)
     iap_send_pkt(data, sizeof(data));
 }
 
-static void cmd_ok_mode3(unsigned char cmd)
-{
-    cmd_ack_mode3(cmd, IAP_ACK_OK);
-}
+#define cmd_ok_mode3(cmd) cmd_ack_mode3((cmd), IAP_ACK_OK)
 
 static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
 {
@@ -2058,28 +2343,73 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
             break;
         }
 
+        /* RetIndexedQUProfileName (0x07)
+         *
+         * Sent from the iPod to the device
+         */
 
-#if 0
-        /* SetRemoteEventNotification */
+        /* SetRemoteEventNotification (0x08)
+         *
+         * Set events the device would like to be notified about
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x08
+         * 0x02-0x05: Event bitmask
+         *
+         * Returns:
+         * IAP_ACK_OK
+         */
         case 0x08:
         {
-            /* ACK */
-            unsigned char data[] = {0x03, 0x00, 0x00, 0x08};
-            iap_send_pkt(data, sizeof(data));
+            struct tm* tm;
+
+            CHECKLEN3(6);
+            CHECKAUTH3;
+
+            /* Save the current state of the various attributes we track */
+            device.trackpos_ms = iap_get_trackpos();
+            device.track_index = iap_get_trackindex();
+            device.chapter_index = 0;
+            device.play_status = audio_status();
+            /* TODO: Fix this */
+            device.mute = false;
+            device.volume = 0x80;
+            device.power_state = charger_input_state;
+            device.battery_level = battery_level();
+            /* TODO: Fix this */
+            device.equalizer_index = 0;
+            device.shuffle = global_settings.playlist_shuffle;
+            device.repeat = global_settings.repeat_mode;
+            tm = get_time();
+            memcpy(&(device.datetime), tm, sizeof(struct tm));
+            device.alarm_state = 0;
+            device.alarm_hour = 0;
+            device.alarm_minute = 0;
+            /* TODO: Fix this */
+            device.backlight = 0;
+            device.hold = button_hold();
+            device.soundcheck = 0;
+            device.audiobook = 0;
+            device.trackpos_s = (device.trackpos_ms/1000) & 0xFFFF;
+
+            /* Get the notification bits */
+            device.do_notify = false;
+            device.changed_notifications = 0;
+            device.notifications = get_u32(&buf[0x02]);
+            if (device.notifications)
+                device.do_notify = true;
+
+            cmd_ok_mode3(cmd);
             break;
         }
-        
-        /* GetiPodStateInfo */
-        case 0x0C:
-        {
-            /* request ipod volume */
-            if (buf[2] == 0x04)
-            {
-                iap_set_remote_volume();
-            }
-            break;
-        }
-        
+
+        /* RemoteEventNotification (0x09)
+         *
+         * Sent from the iPod to the device
+         */
+
+#if 0
         /* SetiPodStateInfo */
         case 0x0E:
         {
@@ -2089,6 +2419,545 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
             break;
         }
 #endif
+
+        /* GetiPodStateInfo (0x0C)
+         *
+         * Request state information from the iPod
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x0C
+         * 0x02: Type information
+         *
+         * This command requires authentication
+         *
+         * Returns:
+         * RetiPodStateInfo
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x0D
+         * 0x02: Type information
+         * 0x03-0xNN: State information
+         */
+        case 0x0C:
+        {
+            unsigned char data[] = {0x03, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                      0x00, 0x00, 0x00, 0x00};
+            struct mp3entry* id3;
+            struct playlist_info* playlist;
+            int play_status;
+            struct tm* tm;
+
+            CHECKLEN3(3);
+            CHECKAUTH3;
+
+            data[0x02] = buf[0x02];
+            switch (buf[0x02])
+            {
+                /* 0x00: Track position
+                 * Data length: 4
+                 */
+                case 0x00:
+                {
+                    id3 = audio_current_track();
+                    put_u32(&data[0x03], id3->elapsed);
+
+                    iap_send_pkt(data, 7);
+                    break;
+                }
+
+                /* 0x01: Track index
+                 * Data length: 4
+                 */
+                case 0x01:
+                {
+                    playlist = playlist_get_current();
+                    put_u32(&data[0x03], (playlist->index - playlist->first_index));
+
+                    iap_send_pkt(data, 7);
+                    break;
+                }
+
+                /* 0x02: Chapter information
+                 * Data length: 8
+                 */
+                case 0x02:
+                {
+                    playlist = playlist_get_current();
+                    put_u32(&data[0x03], (playlist->index - playlist->first_index));
+                    /* Indicate that track does not have chapters */
+                    put_u32(&data[0x07], 0x0000FFFF);
+
+                    iap_send_pkt(data, 11);
+                    break;
+                }
+
+                /* 0x03: Play status
+                 * Data length: 1
+                 */
+                case 0x03:
+                {
+                    /* TODO: Handle FF/REW
+                     */
+                    play_status = audio_status();
+                    if (play_status & AUDIO_STATUS_PLAY) {
+                        if (play_status & AUDIO_STATUS_PAUSE) {
+                            data[0x03] = 0x02;
+                        } else {
+                            data[0x03] = 0x01;
+                        }
+                    } else {
+                        data[0x03] = 0x00;
+                    }
+
+                    iap_send_pkt(data, 4);
+                    break;
+                }
+
+                /* 0x04: Mute/UI/Volume
+                 * Data length: 2
+                 */
+                case 0x04:
+                {
+                    /* Figuring out what the current volume is
+                     * seems to be tricky.
+                     * TODO: Fix.
+                     */
+
+                    /* Mute status */
+                    data[0x03] = 0x00;
+                    /* Volume */
+                    data[0x04] = 0x80;
+
+                    iap_send_pkt(data, 5);
+                    break;
+                }
+
+                /* 0x05: Power/Battery
+                 * Data length: 2
+                 */
+                case 0x05:
+                {
+                    if (charger_input_state == NO_CHARGER) {
+                        if (battery_level() < 30) {
+                            data[0x03] = 0x00;
+                        } else {
+                            data[0x03] = 0x01;
+                        }
+                        data[0x04] = (char)((battery_level() * 255)/100);
+                    } else {
+                        data[0x03] = 0x04;
+                        data[0x04] = 0x00;
+                    }
+
+                    iap_send_pkt(data, 5);
+                    break;
+                }
+
+                /* 0x06: Equalizer state
+                 * Data length: 4
+                 */
+                case 0x06:
+                {
+                    /* Currently only one equalizer setting supported, 0 */
+                    iap_send_pkt(data, 7);
+                    break;
+                }
+
+                /* 0x07: Shuffle
+                 * Data length: 1
+                 */
+                case 0x07:
+                {
+                    data[0x03] = global_settings.playlist_shuffle?0x01:0x00;
+
+                    iap_send_pkt(data, 4);
+                    break;
+                }
+
+                /* 0x08: Repeat
+                 * Data length: 1
+                 */
+                case 0x08:
+                {
+                    switch (global_settings.repeat_mode)
+                    {
+                        case REPEAT_OFF:
+                        {
+                            data[0x03] = 0x00;
+                            break;
+                        }
+
+                        case REPEAT_ONE:
+                        {
+                            data[0x03] = 0x01;
+                            break;
+                        }
+
+                        case REPEAT_ALL:
+                        {
+                            data[0x03] = 0x02;
+                            break;
+                        }
+                    }
+
+                    iap_send_pkt(data, 4);
+                    break;
+                }
+
+                /* 0x09: Data/Time
+                 * Data length: 6
+                 */
+                case 0x09:
+                {
+                    tm = get_time();
+
+                    /* Year */
+                    data[0x03] = ((tm->tm_year+1900) >> 8) & 0xFF;
+                    data[0x04] = (tm->tm_year+1900) & 0xFF;
+
+                    /* Month */
+                    data[0x05] = tm->tm_mon+1;
+
+                    /* Day */
+                    data[0x06] = tm->tm_mday;
+
+                    /* Hour */
+                    data[0x07] = tm->tm_hour;
+
+                    /* Minute */
+                    data[0x08] = tm->tm_min;
+
+                    iap_send_pkt(data, 9);
+                    break;
+                }
+
+                /* 0x0A: Alarm
+                 * Data length: 3
+                 */
+                case 0x0A:
+                {
+                    /* Alarm not supported, always off */
+
+                    iap_send_pkt(data, 6);
+                    break;
+                }
+
+                /* 0x0B: Backlight
+                 * Data length: 1
+                 */
+                case 0x0B:
+                {
+                    /* TOOD: Find out how to do this */
+
+                    iap_send_pkt(data, 4);
+                    break;
+                }
+
+                /* 0x0C: Hold switch
+                 * Data length: 1
+                 */
+                case 0x0C:
+                {
+                    data[0x03] = button_hold()?0x01:0x00;
+
+                    iap_send_pkt(data, 4);
+                    break;
+                }
+
+                /* 0x0D: Sound check
+                 * Data length: 1
+                 */
+                case 0x0D:
+                {
+                    /* TODO: Find out what the hell this is. Default to off */
+
+                    iap_send_pkt(data, 4);
+                    break;
+                }
+
+                /* 0x0E: Audiobook
+                 * Data length: 1
+                 */
+                case 0x0E:
+                {
+                    /* Default to normal */
+
+                    iap_send_pkt(data, 4);
+                    break;
+                }
+
+                /* 0x0F: Track position in seconds
+                 * Data length: 2
+                 */
+                case 0x0F:
+                {
+                    unsigned int pos;
+
+                    id3 = audio_current_track();
+                    pos = id3->elapsed/1000;
+
+                    data[0x03] = (pos >> 8) & 0xFF;
+                    data[0x04] = pos & 0xFF;
+
+                    iap_send_pkt(data, 5);
+                    break;
+                }
+
+                /* 0x10: Mute/UI/Absolute volume
+                 * Data length: 3
+                 */
+                case 0x10:
+                {
+                    /* TODO: See volume above */
+                    data[0x03] = 0x00;
+                    data[0x04] = 0x80;
+                    data[0x05] = 0x80;
+
+                    iap_send_pkt(data, 6);
+                    break;
+                }
+
+                default:
+                {
+                    cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                    break;
+                }
+            }
+            break;
+        }
+
+        /* RetiPodStateInfo (0x0D)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetPlayStatus (0x0F)
+         *
+         * Request the current play status information
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x0F
+         *
+         * This command requires authentication
+         *
+         * Returns:
+         * RetPlayStatus
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x10
+         * 0x02: Play state
+         * 0x03-0x06: Current track index
+         * 0x07-0x0A: Current track length (ms)
+         * 0x0B-0x0E: Current track position (ms)
+         */
+        case 0x0F:
+        {
+            unsigned char data[] = {0x03, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                      0x00, 0x00, 0x00, 0x00,
+                                                      0x00, 0x00, 0x00, 0x00};
+            int play_status;
+            struct mp3entry* id3;
+            struct playlist_info* playlist;
+
+            CHECKAUTH3;
+
+            play_status = audio_status();
+
+            if (play_status & AUDIO_STATUS_PLAY) {
+                /* Playing or paused */
+                if (play_status & AUDIO_STATUS_PAUSE) {
+                    /* Paused */
+                    data[2] = 0x02;
+                } else {
+                    /* Playing */
+                    data[2] = 0x01;
+                }
+                playlist = playlist_get_current();
+                put_u32(&data[0x03], (playlist->index - playlist->first_index));
+                id3 = audio_current_track();
+                put_u32(&data[0x07], id3->length);
+                put_u32(&data[0x0B], id3->elapsed);
+            } else {
+                /* Stopped. Nothing to be done, all values are 0x00 */
+            }
+
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* RetPlayStatus (0x10)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetIndexedPlayingTrackInfo (0x12)
+         *
+         * Request information about a given track
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x12
+         * 0x02: Type of information to retrieve
+         * 0x03-0x06: Track index
+         * 0x07-0x08: Chapter index
+         *
+         * This command requires authentication.
+         *
+         * Returns:
+         * RetIndexedPlayingTrackInfo
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x13
+         * 0x02: Type of information returned
+         * 0x03-0xNN: Information
+         */
+        case 0x12:
+        {
+            /* Until the grand TX buffer rewrite, this will return pseudo
+             * information for almost all fields
+             *
+             * TODO: Fix.
+             */
+
+            unsigned char data[] = {0x03, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+            uint32_t track_index;
+            struct playlist_track_info track;
+
+            CHECKLEN3(0x09);
+            CHECKAUTH3;
+
+            track_index = get_u32(&buf[0x03]);
+            if (-1 == playlist_get_track_info(NULL, track_index, &track)) {
+                cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+
+            data[2] = buf[2];
+            switch (buf[2])
+            {
+                /* 0x00: Track caps/info
+                 * Information length: 10 bytes
+                 */
+                case 0x00:
+                {
+                    /* Track capabilities. None of these are supported, yet */
+                    put_u32(&data[0x03], 0);
+
+                    /* Track length in ms */
+                    put_u32(&data[0x07], 180000);
+
+                    /* Chapter count, stays at 0 */
+                    iap_send_pkt(data, 13);
+                    break;
+                }
+
+                /* 0x01: Chapter time/name
+                 * Information length: 4+variable
+                 */
+                case 0x01:
+                {
+                    /* Chapter length, set at 0 (no chapters) */
+                    
+                    /* Chapter name, empty */
+                    iap_send_pkt(data, 5);
+                    break;
+                }
+
+                /* 0x02, Artist name
+                 * Information length: variable
+                 */
+                case 0x02:
+                {
+                    /* Artist name */
+                    strlcpy(&data[0x03], "XArtist", 16);
+                    iap_send_pkt(data, 11);
+                    break;
+                }
+
+                /* 0x03, Album name
+                 * Information length: variable
+                 */
+                case 0x03:
+                {
+                    /* Album name */
+                    strlcpy(&data[0x03], "XAlbum", 16);
+                    iap_send_pkt(data, 10);
+                    break;
+                }
+
+                /* 0x04, Genre name
+                 * Information length: variable
+                 */
+                case 0x04:
+                {
+                    /* Genre name */
+                    strlcpy(&data[0x03], "XGenre", 16);
+                    iap_send_pkt(data, 10);
+                    break;
+                }
+
+                /* 0x05, Track title
+                 * Information length: variable
+                 */
+                case 0x05:
+                {
+                    /* Track title */
+                    strlcpy(&data[0x03], "XTitle", 16);
+                    iap_send_pkt(data, 10);
+                    break;
+                }
+
+                /* 0x06, Composer name
+                 * Information length: variable
+                 */
+                case 0x06:
+                {
+                    /* Track title */
+                    strlcpy(&data[0x03], "XComposer", 16);
+                    iap_send_pkt(data, 13);
+                    break;
+                }
+
+                /* 0x07, Lyrics
+                 * Information length: variable
+                 */
+                case 0x07:
+                {
+                    /* Packet information bits. All 0 (single packet) */
+                    iap_send_pkt(data, 6);
+                    break;
+                }
+
+                /* 0x08, Artwork count
+                 * Information length: variable
+                 */
+                case 0x08:
+                {
+                    /* No artwork, return packet containing just the type byte */
+                    iap_send_pkt(data, 3);
+                    break;
+                }
+
+                default:
+                {
+                    cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                    break;
+                }
+            }
+
+            break;
+        }
+        
+        /* RetIndexedPlayingTrackInfo (0x13)
+         *
+         * Sent from the iPod to the device
+         */
         
         /* The default response is IAP_ACK_BAD_PARAM */
         default:
@@ -2108,10 +2977,7 @@ static void cmd_ack_mode4(unsigned int cmd, unsigned char status)
     iap_send_pkt(data, sizeof(data));
 }
 
-static void cmd_ok_mode4(unsigned int cmd)
-{
-    cmd_ack_mode4(cmd, IAP_ACK_OK);
-}
+#define cmd_ok_mode4(cmd) cmd_ack_mode4((cmd), IAP_ACK_OK)
 
 static void get_playlist_name(unsigned char *dest,
                               unsigned long item_offset,
@@ -2449,12 +3315,10 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
                 case 0x01: /* play/pause */
                     iap_remotebtn = BUTTON_RC_PLAY;
                     iap_repeatbtn = 2;
-                    iap_changedctr = 1;
                     break;
                 case 0x02: /* stop */
                     iap_remotebtn = BUTTON_RC_PLAY|BUTTON_REPEAT;
                     iap_repeatbtn = 2;
-                    iap_changedctr = 1;
                     break;
                 case 0x03: /* skip++ */
                     iap_remotebtn = BUTTON_RC_RIGHT;
@@ -2466,15 +3330,12 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
                     break;
                 case 0x05: /* ffwd */
                     iap_remotebtn = BUTTON_RC_RIGHT;
-                    if(iap_pollspeed) iap_pollspeed = 5;
                     break;
                 case 0x06: /* frwd */
                     iap_remotebtn = BUTTON_RC_LEFT;
-                    if(iap_pollspeed) iap_pollspeed = 5;
                     break;
                 case 0x07: /* end ffwd/frwd */
                     iap_remotebtn = BUTTON_NONE;
-                    if(iap_pollspeed) iap_pollspeed = 1;
                     break;
             }
             /* respond with cmd ok packet */
@@ -2647,6 +3508,7 @@ void iap_handlepkt(void)
     if(iap_repeatbtn)
     {
         queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
+        sleep(1);
         return;
     }
 
@@ -2671,13 +3533,7 @@ int remote_control_rx(void)
 {
     int btn = iap_remotebtn;
     if(iap_repeatbtn)
-    {
         iap_repeatbtn--;
-        if(!iap_repeatbtn)
-        {
-            iap_remotebtn = BUTTON_NONE;
-        }
-    }
 
     return btn;
 }
