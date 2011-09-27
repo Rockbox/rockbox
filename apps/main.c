@@ -446,8 +446,6 @@ static void init(void)
      * before any other moveable allocs. */
     theme_init_buffer();
 
-    settings_reset();
-
     i2c_init();
     
     power_init();
@@ -468,6 +466,8 @@ static void init(void)
         global_status.font_id[rc] = FONT_SYSFIXED;
     font_init();
 #endif
+    
+    settings_reset();
 
     CHART(">show_logo");
     show_logo();
