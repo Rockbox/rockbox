@@ -4947,7 +4947,7 @@
   </source>
   <dest>
     *: none
-    recording: "Aukerak Gordetzen"
+    recording: "Grabazio Aukerak"
   </dest>
   <voice>
     *: none
@@ -6055,7 +6055,7 @@
   </source>
   <dest>
     *: none
-    recording: "Behin
+    recording: "Behin"
   </dest>
   <voice>
     *: none
@@ -6342,7 +6342,7 @@
     *: "Zerrenda Ikusle Aukerak"
   </dest>
   <voice>
-    *: "Playlist Viewer Settings"
+    *: "Zerrenda Ikusle Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -6356,7 +6356,7 @@
     *: "Ikusi Uneko Zerrenda"
   </dest>
   <voice>
-    *: "View Current Playlist"
+    *: "Ikusi Uneko Zerrenda"
   </voice>
 </phrase>
 <phrase>
@@ -6370,7 +6370,7 @@
     *: "Mugitu"
   </dest>
   <voice>
-    *: "Move"
+    *: "Mugitu"
   </voice>
 </phrase>
 <phrase>
@@ -6381,10 +6381,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Indizea Erakutsi"
+    *: "Indizeak Erakutsi"
   </dest>
   <voice>
-    *: "Show Indices"
+    *: "Indizeak Erakutsi"
   </voice>
 </phrase>
 <phrase>
@@ -6398,7 +6398,7 @@
     *: "Abestia Erakutsi"
   </dest>
   <voice>
-    *: "Track Display"
+    *: "Abestia Erakutsi"
   </voice>
 </phrase>
 <phrase>
@@ -6412,7 +6412,7 @@
     *: "Abesti Izena Soilik"
   </dest>
   <voice>
-    *: "Track Name Only"
+    *: "Abesti Izena Soilik"
   </voice>
 </phrase>
 <phrase>
@@ -6426,7 +6426,7 @@
     *: "Ezabatu"
   </dest>
   <voice>
-    *: "Remove"
+    *: "Ezabatu"
   </voice>
 </phrase>
 <phrase>
@@ -6440,7 +6440,7 @@
     *: "Gorde Uneko Zerrenda"
   </dest>
   <voice>
-    *: "Save Current Playlist"
+    *: "Gorde Uneko Zerrenda"
   </voice>
 </phrase>
 <phrase>
@@ -6454,7 +6454,7 @@
     *: "%d abesti gordeak (%s)"
   </dest>
   <voice>
-    *: "tracks saved"
+    *: "abestiak gordeta"
   </voice>
 </phrase>
 <phrase>
@@ -6468,7 +6468,7 @@
     *: "Zerrenda Katalogoa"
   </dest>
   <voice>
-    *: "Playlist Catalogue"
+    *: "Zerrenda Katalogoa"
   </voice>
 </phrase>
 <phrase>
@@ -6482,7 +6482,7 @@
     *: "Errekurtsiboki Direktoriak Txertatu"
   </dest>
   <voice>
-    *: "Recursively Insert Directories"
+    *: "Errekurtsiboki Direktoriak Txertatu"
   </voice>
 </phrase>
 <phrase>
@@ -6496,7 +6496,7 @@
     *: "Errekurtsiboki?"
   </dest>
   <voice>
-    *: "Recursively?"
+    *: "Errekurtsiboki?"
   </voice>
 </phrase>
 <phrase>
@@ -6510,7 +6510,7 @@
     *: "Abixatu Zerrenda Dinamikoa Ezabatzean"
   </dest>
   <voice>
-    *: "Warn When Erasing Dynamic Playlist"
+    *: "Abixatu Zerrenda Dinamikoa Ezabatzean"
   </voice>
 </phrase>
 <phrase>
@@ -6850,7 +6850,7 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Queue Shuffled"
+    *: "Zerrendatu Nahasita"
   </dest>
   <voice>
     *: "Queue Shuffled"
@@ -11921,7 +11921,7 @@
     *: "Insert Last Shuffled"
   </source>
   <dest>
-    *: "Txertatu Nahasita Bukaeran"
+    *: "Txertatu Nahasita Amaieran"
   </dest>
   <voice>
     *: "Insert Last Shuffled"
@@ -11935,7 +11935,7 @@
     *: "Queue Last Shuffled"
   </source>
   <dest>
-    *: "Zerrendatu Nahasita Bukaeran"
+    *: "Zerrendatu Nahasita Amaieran"
   </dest>
   <voice>
     *: "Queue Last Shuffled"
