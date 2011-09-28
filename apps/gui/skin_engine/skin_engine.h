@@ -100,6 +100,7 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
 struct wps_state *skin_get_global_state(void);
 void gui_sync_skin_init(void);
 
+void skin_unload_all(void);
 
 bool skin_do_full_update(enum skinnable_screens skin, enum screen_type screen);
 void skin_request_full_update(enum skinnable_screens skin);

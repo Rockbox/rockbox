@@ -1452,11 +1452,13 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
             core_free(img->buflib_handle);
         list = list->next;
     }
+    wps_data->images = NULL;
     if (wps_data->font_ids != NULL)
     {
         while (wps_data->font_count > 0)
             font_unload(wps_data->font_ids[--wps_data->font_count]);
     }
+    wps_data->font_ids = NULL;
 #endif
 #endif
 }

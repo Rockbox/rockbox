@@ -129,7 +129,7 @@ void gui_sync_skin_init(void)
     }
 }
 
-void settings_apply_skins(void)
+void skin_unload_all(void)
 {
     int i, j;
 
@@ -140,12 +140,17 @@ void settings_apply_skins(void)
     }
 
     skin_buffer_init(skin_buffer, skin_buffer_size);
-    
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
 #endif
     gui_sync_skin_init();
+}
 
+void settings_apply_skins(void)
+{
+    int i, j;
+
+    skin_unload_all();
     /* Make sure each skin is loaded */
     for (i=0; i<SKINNABLE_SCREENS_COUNT; i++)
     {
