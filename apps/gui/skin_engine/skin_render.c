@@ -303,7 +303,9 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
     else if (branch->type == LINE && branch->children_count)
     {
         struct skin_element *child = branch->children[0];
+#if defined(HAVE_LCD_BITMAP) || defined(HAVE_ALBUMART)
         struct wps_token *token;
+#endif
         while (child)
         {
             if (child->type == CONDITIONAL)
@@ -321,7 +323,9 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                 child = child->next;
                 continue;
             }
+#if defined(HAVE_LCD_BITMAP) || defined(HAVE_ALBUMART)
             token = (struct wps_token *)child->data;
+#endif
 #ifdef HAVE_LCD_BITMAP
             /* clear all pictures in the conditional and nested ones */
             if (token->type == SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY)
