@@ -40,9 +40,6 @@ public class RockboxActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                             WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         Intent intent = new Intent(this, RockboxService.class);
         intent.setAction(Intent.ACTION_MAIN);
         intent.putExtra("callback", new ResultReceiver(new Handler(getMainLooper())) {
