@@ -557,6 +557,7 @@ int font_load(const char *path)
     size = filesize(fd);    
     if (size > MAX_FONT_SIZE)
         size = MAX_FONT_SIZE;
+    close(fd);
     return font_load_ex(path, size);
 }
 
