@@ -550,7 +550,14 @@ int font_load_ex(const char *path, size_t buffer_size)
 }
 int font_load(const char *path)
 {
-    return font_load_ex(path, MAX_FONT_SIZE);
+    int size;
+    int fd = open( path, O_RDONLY );
+    if ( fd < 0 )
+        return -1;
+    size = filesize(fd);    
+    if (size > MAX_FONT_SIZE)
+        size = MAX_FONT_SIZE;
+    return font_load_ex(path, size);
 }
 
 void font_unload(int font_id)
