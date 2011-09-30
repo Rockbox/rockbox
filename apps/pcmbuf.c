@@ -45,7 +45,9 @@
    Can be any number of samples but power of two sizes make for faster and
    smaller math - must be < 65536 bytes */
 #define PCMBUF_CHUNK_SIZE    8192u
-#define PCMBUF_GUARD_SIZE    1024u
+
+/* Massive size is a nasty temp fix */
+#define PCMBUF_GUARD_SIZE    (1024u*12*((NATIVE_FREQUENCY+7999)/8000))
 
 /* Mnemonics for common data commit thresholds */
 #define COMMIT_CHUNKS        PCMBUF_CHUNK_SIZE
