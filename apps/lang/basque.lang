@@ -27,7 +27,7 @@
     *: "Bai"
   </dest>
   <voice>
-    *: "Yes"
+    *: "Bai"
   </voice>
 </phrase>
 <phrase>
@@ -41,7 +41,7 @@
     *: "Ez"
   </dest>
   <voice>
-    *: "No"
+    *: "Ez"
   </voice>
 </phrase>
 <phrase>
@@ -55,7 +55,7 @@
     *: "Gaitu"
   </dest>
   <voice>
-    *: "On"
+    *: "Gaitu"
   </voice>
 </phrase>
 <phrase>
@@ -69,7 +69,7 @@
     *: "Ezgaitu"
   </dest>
   <voice>
-    *: "Off"
+    *: "Ezgaitu"
   </voice>
 </phrase>
 <phrase>
@@ -83,7 +83,7 @@
     *: "Galdetu"
   </dest>
   <voice>
-    *: "Ask"
+    *: "Galdetu"
   </voice>
 </phrase>
 <phrase>
@@ -97,7 +97,7 @@
     *: "Beti"
   </dest>
   <voice>
-    *: "Always"
+    *: "Beti"
   </voice>
 </phrase>
 <phrase>
@@ -111,7 +111,7 @@
     *: "Normala"
   </dest>
   <voice>
-    *: "Normal"
+    *: "Normala"
   </voice>
 </phrase>
 <phrase>
@@ -125,7 +125,7 @@
     *: "Irabazia"
   </dest>
   <voice>
-    *: "Gain"
+    *: "Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -139,7 +139,7 @@
     *: "Kargatzen..."
   </dest>
   <voice>
-    *: "Loading"
+    *: "Kargatzen"
   </voice>
 </phrase>
 <phrase>
@@ -167,7 +167,7 @@
     *: "Diska eskaneatzen..."
   </dest>
   <voice>
-    *: "Scanning disk"
+    *: "Diska eskaneatzen"
   </voice>
 </phrase>
 <phrase>
@@ -181,7 +181,7 @@
     *: "Itzaltzen..."
   </dest>
   <voice>
-    *: "Shutting down"
+    *: "Itzaltzen"
   </voice>
 </phrase>
 <phrase>
@@ -195,7 +195,7 @@
     *: "Ezetsia"
   </dest>
   <voice>
-    *: "Cancelled"
+    *: "Ezetsia"
   </voice>
 </phrase>
 <phrase>
@@ -209,7 +209,7 @@
     *: "Akatsa"
   </dest>
   <voice>
-    *: "Failed"
+    *: "Akatsa"
   </voice>
 </phrase>
 <phrase>
@@ -223,7 +223,7 @@
     *: "Kanalak"
   </dest>
   <voice>
-    *: "Channels"
+    *: "Kanalak"
   </voice>
 </phrase>
 <phrase>
@@ -237,7 +237,7 @@
     *: "Ziur Zaude?"
   </dest>
   <voice>
-    *: "Are You Sure?"
+    *: "Ziur Zaude?"
   </voice>
 </phrase>
 <phrase>
@@ -260,7 +260,7 @@
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "SELECT = Bai"
     mrobe500: "PLAY, POWER, or top-right = Bai"
     archosplayer: "(PLAY/STOP)"
-    vibe500: "OK = Yes"
+    vibe500: "OK = Bai"
   </dest>
   <voice>
     *: ""
@@ -308,7 +308,7 @@
     *: "Azken Lastermarkak"
   </dest>
   <voice>
-    *: "Recent Bookmarks"
+    *: "Azken Lastermarkak"
   </voice>
 </phrase>
 <phrase>
@@ -322,7 +322,7 @@
     *: "Fitxategiak"
   </dest>
   <voice>
-    *: "Files"
+    *: "Fitxategiak"
   </voice>
 </phrase>
 <phrase>
@@ -336,7 +336,7 @@
     *: "Datubasea"
   </dest>
   <voice>
-    *: "Database"
+    *: "Datubasea"
   </voice>
 </phrase>
 <phrase>
@@ -350,7 +350,7 @@
     *: "Orain Jotzen"
   </dest>
   <voice>
-    *: "Now Playing"
+    *: "Orain Jotzen"
   </voice>
 </phrase>
 <phrase>
@@ -364,7 +364,7 @@
     *: "Berrekin"
   </dest>
   <voice>
-    *: "Resume Playback"
+    *: "Berrekin"
   </voice>
 </phrase>
 <phrase>
@@ -378,7 +378,7 @@
     *: "Aukerak"
   </dest>
   <voice>
-    *: "Settings"
+    *: "Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -395,7 +395,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording"
+    recording: "Grabazioa"
   </voice>
 </phrase>
 <phrase>
@@ -412,7 +412,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio"
+    radio: "FM Irratia"
   </voice>
 </phrase>
 <phrase>
@@ -426,7 +426,7 @@
     *: "Zerrendak"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "Zerrendak"
   </voice>
 </phrase>
 <phrase>
@@ -440,7 +440,7 @@
     *: "Pluginak"
   </dest>
   <voice>
-    *: "Plugins"
+    *: "Pluginak"
   </voice>
 </phrase>
 <phrase>
@@ -454,7 +454,7 @@
     *: "Sistema"
   </dest>
   <voice>
-    *: "System"
+    *: "Sistema"
   </voice>
 </phrase>
 <phrase>
@@ -468,7 +468,7 @@
     *: "Aukeratu Esteka"
   </dest>
   <voice>
-    *: "Select Bookmark"
+    *: "Aukeratu Esteka"
   </voice>
 </phrase>
 <phrase>
@@ -482,7 +482,7 @@
     *: "<Ez Berrekin>"
   </dest>
   <voice>
-    *: "Do not resume"
+    *: "Ez Berrekin"
   </voice>
 </phrase>
 <phrase>
@@ -510,7 +510,7 @@
     *: "<Lastermarka Okerra>"
   </dest>
   <voice>
-    *: "Invalid Bookmark"
+    *: "Lastermarka Okerra"
   </voice>
 </phrase>
 <phrase>
@@ -524,7 +524,7 @@
     *: "Lastermarka Ekintzak"
   </dest>
   <voice>
-    *: "Bookmark Actions"
+    *: "Lastermarka Ekintzak"
   </voice>
 </phrase>
 <phrase>
@@ -538,7 +538,7 @@
     *: "Berrekin"
   </dest>
   <voice>
-    *: "Resume"
+    *: "Berrekin"
   </voice>
 </phrase>
 <phrase>
@@ -552,7 +552,7 @@
     *: "Ezabatu"
   </dest>
   <voice>
-    *: "Delete"
+    *: "Ezabatu"
   </voice>
 </phrase>
 <phrase>
@@ -566,7 +566,7 @@
     *: "Sortu Esteka?"
   </dest>
   <voice>
-    *: "Create a Bookmark?"
+    *: "Sortu Esteka?"
   </voice>
 </phrase>
 <phrase>
@@ -580,7 +580,7 @@
     *: "Esteka Sortua"
   </dest>
   <voice>
-    *: "Bookmark Created"
+    *: "Esteka Sortua"
   </voice>
 </phrase>
 <phrase>
@@ -594,7 +594,7 @@
     *: "Esteka Akatsa!"
   </dest>
   <voice>
-    *: "Bookmark Failed!"
+    *: "Esteka Akatsa!"
   </voice>
 </phrase>
 <phrase>
@@ -608,7 +608,7 @@
     *: "Esteka Hutsa"
   </dest>
   <voice>
-    *: "Bookmark Empty"
+    *: "Esteka Hutsa"
   </voice>
 </phrase>
 <phrase>
@@ -622,7 +622,7 @@
     *: "Soinu Aukerak"
   </dest>
   <voice>
-    *: "Sound Settings"
+        *: "Soinu Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -636,7 +636,7 @@
     *: "Bolumena"
   </dest>
   <voice>
-    *: "Volume"
+    *: "Bolumena"
   </voice>
 </phrase>
 <phrase>
@@ -650,7 +650,7 @@
     *: "Baxuak"
   </dest>
   <voice>
-    *: "Bass"
+    *: "Baxuak"
   </voice>
 </phrase>
 <phrase>
@@ -664,7 +664,7 @@
     *: "Altuak"
   </dest>
   <voice>
-    *: "Treble"
+    *: "Altuak"
   </voice>
 </phrase>
 <phrase>
@@ -678,7 +678,7 @@
     *: "Balantzea"
   </dest>
   <voice>
-    *: "Balance"
+    *: "Balantzea"
   </voice>
 </phrase>
 <phrase>
@@ -692,7 +692,7 @@
     *: "Kanal Konfigurazioa"
   </dest>
   <voice>
-    *: "Channel Configuration"
+    *: "Kanal Konfigurazioa"
   </voice>
 </phrase>
 <phrase>
@@ -734,7 +734,7 @@
     *: "Pertsonalizatua"
   </dest>
   <voice>
-    *: "Custom"
+    *: "Pertsonalizatua"
   </voice>
 </phrase>
 <phrase>
@@ -748,7 +748,7 @@
     *: "Mono Ezker"
   </dest>
   <voice>
-    *: "Mono Left"
+    *: "Mono Ezker"
   </voice>
 </phrase>
 <phrase>
@@ -762,7 +762,7 @@
     *: "Mono Eskuin"
   </dest>
   <voice>
-    *: "Mono Right"
+    *: "Mono Eskuin"
   </voice>
 </phrase>
 <phrase>
@@ -779,7 +779,7 @@
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono Left plus Right"
+    recording_swcodec: "Mono Ezker gehi Eskuin"
   </voice>
 </phrase>
 <phrase>
@@ -790,10 +790,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "Karaoke"
+    *: "Karaokea"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "Karaokea"
   </voice>
 </phrase>
 <phrase>
@@ -807,7 +807,7 @@
     *: "Stereo Zabalera"
   </dest>
   <voice>
-    *: "Stereo Width"
+    *: "Stereo Zabalera"
   </voice>
 </phrase>
 <phrase>
@@ -820,11 +820,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Crossfeed"
+    swcodec: "Erreproduzioa Iraungipenarekin"
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfeed"
+    swcodec: "Erreproduzioa Iraungipenarekin"
   </voice>
 </phrase>
 <phrase>
@@ -841,7 +841,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Direct gain"
+    swcodec: "Irabazi zuzena"
   </voice>
 </phrase>
 <phrase>
@@ -858,7 +858,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cross gain"
+    swcodec: "Zeharkako irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -875,7 +875,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "High-frequency attenuation"
+    swcodec: "Gain-frekuentzia atenuazioa"
   </voice>
 </phrase>
 <phrase>
@@ -892,7 +892,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "High-frequency cutoff"
+    swcodec: "Gain-frekuentzia mozketa"
   </voice>
 </phrase>
 <phrase>
@@ -909,7 +909,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Equalizer"
+    swcodec: "Ekualizatzailea"
   </voice>
 </phrase>
 <phrase>
@@ -926,7 +926,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Enable equalizer"
+    swcodec: "Ekualizatzailea gaitu"
   </voice>
 </phrase>
 <phrase>
@@ -943,7 +943,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Graphical equalizer"
+    swcodec: "Ekualizatzaile grafikoa"
   </voice>
 </phrase>
 <phrase>
@@ -956,11 +956,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Precut"
+    swcodec: "Aurremozketa"
   </dest>
   <voice>
     *: none
-    swcodec: "Pre-cut"
+    swcodec: "Aurremozketa"
   </voice>
 </phrase>
 <phrase>
@@ -977,7 +977,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Simple equalizer settings"
+    swcodec: "Ekualizatzaile arrunt aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -994,7 +994,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Advanced equalizer settings"
+    swcodec: "Ekualizatzaile aurreratu aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -1007,11 +1007,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Gorde EK Autaketa"
+    swcodec: "Gorde EK Ezarpenak"
   </dest>
   <voice>
     *: none
-    swcodec: "Save equalizer preset"
+    swcodec: "Gorde ekualizatzaile ezarpenak"
   </voice>
 </phrase>
 <phrase>
@@ -1024,11 +1024,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Arakatu EK Autaketa"
+    swcodec: "Arakatu EK Ezarpenak"
   </dest>
   <voice>
     *: none
-    swcodec: "Browse equalizer presets"
+    swcodec: "Arakatu ekualizatzaile ezarpenak"
   </voice>
 </phrase>
 <phrase>
@@ -1062,7 +1062,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "hertz band gain"
+    swcodec: "hertzio banda irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -1075,11 +1075,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Low Shelf Filter"
+    swcodec: "Maila Baxuko Iragazkia"
   </dest>
   <voice>
     *: none
-    swcodec: "Low shelf filter"
+    swcodec: "Maila Baxuko Iragazkia"
   </voice>
 </phrase>
 <phrase>
@@ -1092,11 +1092,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Peak Filter %d"
+    swcodec: "Piko Iragazkia %d"
   </dest>
   <voice>
     *: none
-    swcodec: "Peak filter"
+    swcodec: "Piko iragazkia"
   </voice>
 </phrase>
 <phrase>
@@ -1109,11 +1109,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "High Shelf Filter"
+    swcodec: "Maila Altuko Iragazkia"
   </dest>
   <voice>
     *: none
-    swcodec: "High shelf filter"
+    swcodec: "Maila Altuko Iragazkia"
   </voice>
 </phrase>
 <phrase>
@@ -1130,7 +1130,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Mozketa Frekuentzia"
   </voice>
 </phrase>
 <phrase>
@@ -1147,7 +1147,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Centre frequency"
+    swcodec: "Frekuentzia ertaina"
   </voice>
 </phrase>
 <phrase>
@@ -1181,7 +1181,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Dithering"
+    swcodec: "Bilbea"
   </voice>
 </phrase>
 <phrase>
@@ -1198,7 +1198,7 @@
   </dest>
   <voice>
     *: none
-    masf: "Loudness"
+    masf: "Ozentasuna"
   </voice>
 </phrase>
 <phrase>
@@ -1215,7 +1215,7 @@
   </dest>
   <voice>
     *: none
-    masf: "Auto Volume"
+    masf: "Auto Bolumena"
   </voice>
 </phrase>
 <phrase>
@@ -1228,7 +1228,7 @@
   </source>
   <dest>
     *: none
-    masf: "AV Decay Time"
+    masf: "AV Erortze Denbora"
   </dest>
   <voice>
     *: none
@@ -1249,7 +1249,7 @@
   </dest>
   <voice>
     *: none
-    masf: "Super Bass"
+    masf: "Super Baxua"
   </voice>
 </phrase>
 <phrase>
@@ -1266,7 +1266,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Enable"
+    masf: "MDB Gaitu"
   </voice>
 </phrase>
 <phrase>
@@ -1283,7 +1283,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Strength"
+    masf: "MDB Indarra"
   </voice>
 </phrase>
 <phrase>
@@ -1296,11 +1296,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB Harmonics"
+    masf: "MDB Harmonikoak"
   </dest>
   <voice>
     *: none
-    masf: "MDB Harmonics"
+    masf: "MDB Harmonikoak"
   </voice>
 </phrase>
 <phrase>
@@ -1313,11 +1313,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB Centre Frequency"
+    masf: "MDB Frekuentzia Zentrua"
   </dest>
   <voice>
     *: none
-    masf: "MDB Centre Frequency"
+    masf: "MDB Frekuentzia Zentrua"
   </voice>
 </phrase>
 <phrase>
@@ -1330,11 +1330,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB Shape"
+    masf: "MDBren Era"
   </dest>
   <voice>
     *: none
-    masf: "MDB Shape"
+    masf: "MDBren Era"
   </voice>
 </phrase>
 <phrase>
@@ -1348,7 +1348,7 @@
     *: "Aukera Orokorrak"
   </dest>
   <voice>
-    *: "General Settings"
+    *: "Aukera Orokorrak"
   </voice>
 </phrase>
 <phrase>
@@ -1362,7 +1362,7 @@
     *: "Erreproduzio Aukerak"
   </dest>
   <voice>
-    *: "Playback Settings"
+    *: "Erreproduzio Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -1376,7 +1376,7 @@
     *: "Nahasi"
   </dest>
   <voice>
-    *: "Shuffle"
+    *: "Nahasi"
   </voice>
 </phrase>
 <phrase>
@@ -1390,7 +1390,7 @@
     *: "Errepikatu"
   </dest>
   <voice>
-    *: "Repeat"
+    *: "Errepikatu"
   </voice>
 </phrase>
 <phrase>
@@ -1404,7 +1404,7 @@
     *: "Dena"
   </dest>
   <voice>
-    *: "All"
+    *: "Dena"
   </voice>
 </phrase>
 <phrase>
@@ -1418,7 +1418,7 @@
     *: "Bakarra"
   </dest>
   <voice>
-    *: "One"
+    *: "Bakarra"
   </voice>
 </phrase>
 <phrase>
@@ -1446,7 +1446,7 @@
     *: "Erreproduzitu Aukeratua Lehenbizi"
   </dest>
   <voice>
-    *: "Play Selected File First"
+    *: "Erreproduzitu Aukeratua Lehenbizi"
   </voice>
 </phrase>
 <phrase>
@@ -1460,7 +1460,7 @@
     *: "Aurreratu/Atzeratu"
   </dest>
   <voice>
-    *: "Fast forward and Rewind"
+    *: "Aurreratu/Atzeratu"
   </voice>
 </phrase>
 <phrase>
@@ -1474,7 +1474,7 @@
     *: "FF/RW Pausu Min"
   </dest>
   <voice>
-    *: "Minimum Step"
+    *: "Gutxieneko Pausua"
   </voice>
 </phrase>
 <phrase>
@@ -1488,7 +1488,7 @@
     *: "FF/RW Azelerazioa"
   </dest>
   <voice>
-    *: "Acceleration"
+    *: "Azelerazioa"
   </voice>
 </phrase>
 <phrase>
@@ -1504,7 +1504,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Anti-Skip Buffer"
+    *: "Salto Aurkako Buferra"
     flash_storage: none
   </voice>
 </phrase>
@@ -1519,7 +1519,7 @@
     *: "Iraungi Gelditze/Pausatzean"
   </dest>
   <voice>
-    *: "Fade On Stop and Pause"
+    *: "Iraungi Gelditze/Pausatzean"
   </voice>
 </phrase>
 <phrase>
@@ -1533,7 +1533,7 @@
     *: "Festa Modua"
   </dest>
   <voice>
-    *: "Party Mode"
+    *: "Festa Modua"
   </voice>
 </phrase>
 <phrase>
@@ -1550,7 +1550,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "Gainjartzea"
   </voice>
 </phrase>
 <phrase>
@@ -1567,7 +1567,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Enable Crossfade"
+    crossfade: "Gaitu Gainjartzea"
   </voice>
 </phrase>
 <phrase>
@@ -1584,7 +1584,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Manual Track Skip Only"
+    crossfade: "Eskuz Saltatzean Soilik"
   </voice>
 </phrase>
 <phrase>
@@ -1601,7 +1601,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Shuffle or Manual Track Skip"
+    crossfade: "Nahasita edo Eskuz Saltazean"
   </voice>
 </phrase>
 <phrase>
@@ -1618,7 +1618,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-In Delay"
+    crossfade: "Agertze Atzerapena"
   </voice>
 </phrase>
 <phrase>
@@ -1635,7 +1635,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-In Duration"
+    crossfade: "Agertze Iraupena"
   </voice>
 </phrase>
 <phrase>
@@ -1652,7 +1652,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-Out Delay"
+    crossfade: "Desagertze Atzerapena"
   </voice>
 </phrase>
 <phrase>
@@ -1669,7 +1669,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-Out Duration"
+    crossfade: "Desagertze Iraupena"
   </voice>
 </phrase>
 <phrase>
@@ -1686,7 +1686,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-Out Mode"
+    crossfade: "Desagertze Modua"
   </voice>
 </phrase>
 <phrase>
@@ -1714,10 +1714,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "Bolumen Berdintzea"
   </dest>
   <voice>
-    *: "Replaygain"
+    *: "Bolumen Berdintzea"
   </voice>
 </phrase>
 <phrase>
@@ -1730,11 +1730,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Prevent Clipping"
+    swcodec: "Mozketak Saihestu"
   </dest>
   <voice>
     *: none
-    swcodec: "Prevent Clipping"
+        swcodec: "Mozketak Saihestu"
   </voice>
 </phrase>
 <phrase>
@@ -1745,10 +1745,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Replaygain Type"
+    *: "Bolumen Berdintze Mota"
   </dest>
   <voice>
-    *: "Replaygain Type"
+    *: "Bolumen Berdintze Mota"
   </voice>
 </phrase>
 <phrase>
@@ -1762,7 +1762,7 @@
     *: "Album Irabazia"
   </dest>
   <voice>
-    *: "Album Gain"
+    *: "Album Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -1776,7 +1776,7 @@
     *: "Abesti Irabazia"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "Abesti Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -1790,7 +1790,7 @@
     *: "Abesti Irabazia Nahastean"
   </dest>
   <voice>
-    *: "Track Gain if Shuffling"
+    *: "Abesti Irabazia Nahastean"
   </voice>
 </phrase>
 <phrase>
@@ -1804,7 +1804,7 @@
     *: "Pre-amp"
   </dest>
   <voice>
-    *: "Preamp"
+    *: "Preanplifikazioa"
   </voice>
 </phrase>
 <phrase>
@@ -1821,7 +1821,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Track Skip Beep"
+    swcodec: "Abesti Aldatze Soinua"
   </voice>
 </phrase>
 <phrase>
@@ -1838,7 +1838,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Weak"
+    swcodec: "Isila"
   </voice>
 </phrase>
 <phrase>
@@ -1855,7 +1855,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Moderate"
+    swcodec: "Ertaina"
   </voice>
 </phrase>
 <phrase>
@@ -1872,7 +1872,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Strong"
+    swcodec: "Zaratatsua"
   </voice>
 </phrase>
 <phrase>
@@ -1889,7 +1889,7 @@
   </dest>
   <voice>
     *: none
-    spdif_power: "Optical Output"
+    spdif_power: "Irteera Optikoa"
   </voice>
 </phrase>
 <phrase>
@@ -1903,7 +1903,7 @@
     *: "Auto-Aldatu Direktorioa"
   </dest>
   <voice>
-    *: "Auto-Change Directory"
+    *: "Auto-Aldatu Direktorioa"
   </voice>
 </phrase>
 <phrase>
@@ -1917,7 +1917,7 @@
     *: "Ausazkoa"
   </dest>
   <voice>
-    *: "Random"
+    *: "Ausazkoa"
   </voice>
 </phrase>
 <phrase>
@@ -1942,10 +1942,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Cuesheet Support"
+    *: "Cuesheet Euskarria"
   </dest>
   <voice>
-    *: "Cuesheet Support"
+    *: "Cuesheet Euskarria"
   </voice>
 </phrase>
 <phrase>
@@ -1962,7 +1962,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause on Headphone Unplug"
+    headphone_detection: "Pausatu Kaskoak Ateratzean"
   </voice>
 </phrase>
 <phrase>
@@ -1979,7 +1979,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause and Resume"
+    headphone_detection: "Pausatu eta Berrekin"
   </voice>
 </phrase>
 <phrase>
@@ -2010,7 +2010,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "Berrekitea ekidin kaskoak desentxufaturik badaude"
   </voice>
 </phrase>
 <phrase>
@@ -2024,7 +2024,7 @@
     *: "Fitxategiak Nola Ikusi"
   </dest>
   <voice>
-    *: "File View"
+    *: "Fitxategiak Nola Ikusi"
   </voice>
 </phrase>
 <phrase>
@@ -2038,7 +2038,7 @@
     *: "Ordenatu Larri/Xehe"
   </dest>
   <voice>
-    *: "Sort Case Sensitive"
+    *: "Ordenatu Larri Xehe"
   </voice>
 </phrase>
 <phrase>
@@ -2052,7 +2052,7 @@
     *: "Ordenatu Direktorioak"
   </dest>
   <voice>
-    *: "sort directories"
+    *: "ordenatu direktorioak"
   </voice>
 </phrase>
 <phrase>
@@ -2066,7 +2066,7 @@
     *: "Ordenatu Fitxategiak"
   </dest>
   <voice>
-    *: "sort files"
+    *: "ordenatu fitxategiak"
   </voice>
 </phrase>
 <phrase>
@@ -2080,7 +2080,7 @@
     *: "Alfabetikoki"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "Alfabetikoki"
   </voice>
 </phrase>
 <phrase>
@@ -2094,7 +2094,7 @@
     *: "Dataz"
   </dest>
   <voice>
-    *: "By Date"
+    *: "Dataz"
   </voice>
 </phrase>
 <phrase>
@@ -2108,7 +2108,7 @@
     *: "Data Berrienaz"
   </dest>
   <voice>
-    *: "By Newest Date"
+    *: "Data Berrienaz"
   </voice>
 </phrase>
 <phrase>
@@ -2122,7 +2122,7 @@
     *: "Moetaz"
   </dest>
   <voice>
-    *: "By Type"
+    *: "Moetaz"
   </voice>
 </phrase>
 <phrase>
@@ -2136,7 +2136,7 @@
     *: "Erakutsi Fitxategiak"
   </dest>
   <voice>
-    *: "Show Files"
+    *: "Erakutsi Fitxategiak"
   </voice>
 </phrase>
 <phrase>
@@ -2150,7 +2150,7 @@
     *: "Jasandakoak"
   </dest>
   <voice>
-    *: "Supported"
+    *: "Jasandakoak"
   </voice>
 </phrase>
 <phrase>
@@ -2164,7 +2164,7 @@
     *: "Musikakoak"
   </dest>
   <voice>
-    *: "Music"
+    *: "Musikakoak"
   </voice>
 </phrase>
 <phrase>
@@ -2178,7 +2178,7 @@
     *: "Jarraitu Zerrenda"
   </dest>
   <voice>
-    *: "Follow Playlist"
+    *: "Jarraitu Zerrenda"
   </voice>
 </phrase>
 <phrase>
@@ -2192,7 +2192,7 @@
     *: "Erakutsi Helbidea"
   </dest>
   <voice>
-    *: "Show Path"
+    *: "Erakutsi Helbidea"
   </voice>
 </phrase>
 <phrase>
@@ -2206,7 +2206,7 @@
     *: "Uneko Direkorioa Soilik"
   </dest>
   <voice>
-    *: "Current Directory Only"
+    *: "Uneko Direkorioa Soilik"
   </voice>
 </phrase>
 <phrase>
@@ -2220,7 +2220,7 @@
     *: "Helbide Osoa"
   </dest>
   <voice>
-    *: "Full Path"
+    *: "Helbide Osoa"
   </voice>
 </phrase>
 <phrase>
@@ -2246,7 +2246,7 @@
     archosplayer: "Datubasea Eraikitzen %d aurkituak"
   </dest>
   <voice>
-    *: "entries found for database"
+    *: "sarrera aurkiturik datubaserako"
   </voice>
 </phrase>
 <phrase>
@@ -2263,7 +2263,7 @@
   </dest>
   <voice>
     *: none
-    tc_ramcache: "Load to RAM"
+    tc_ramcache: "RAMean kargatu"
   </voice>
 </phrase>
 <phrase>
@@ -2277,7 +2277,7 @@
     *: "Auto Eguneratu"
   </dest>
   <voice>
-    *: "Auto Update"
+    *: "Auto Eguneratu"
   </voice>
 </phrase>
 <phrase>
@@ -2291,7 +2291,7 @@
     *: "Hasieratu Orain"
   </dest>
   <voice>
-    *: "Initialize Now"
+    *: "Hasieratu Orain"
   </voice>
 </phrase>
 <phrase>
@@ -2305,7 +2305,7 @@
     *: "Eguneratu Orain"
   </dest>
   <voice>
-    *: "Update Now"
+    *: "Eguneratu Orain"
   </voice>
 </phrase>
 <phrase>
@@ -2319,7 +2319,7 @@
     *: "Blokatu Runtime Datuak"
   </dest>
   <voice>
-    *: "Gather Runtime Data"
+    *: "Blokatu Runtime Datuak"
   </voice>
 </phrase>
 <phrase>
@@ -2333,7 +2333,7 @@
     *: "Esportatu Aldaketak"
   </dest>
   <voice>
-    *: "Export Modifications"
+    *: "Esportatu Aldaketak"
   </voice>
 </phrase>
 <phrase>
@@ -2344,10 +2344,10 @@
     *: "Import Modifications"
   </source>
   <dest>
-    *: "Importatu Aldaketak"
+    *: "Inportatu Aldaketak"
   </dest>
   <voice>
-    *: "Import Modifications"
+    *: "Inportatu Aldaketak"
   </voice>
 </phrase>
 <phrase>
@@ -2361,7 +2361,7 @@
     *: "Atzeko planoan eguneratzen"
   </dest>
   <voice>
-    *: "Updating in background"
+    *: "Atzeko planoan eguneratzen"
   </voice>
 </phrase>
 <phrase>
@@ -2375,7 +2375,7 @@
     *: "Datubasea esleitzen"
   </dest>
   <voice>
-    *: "Committing database"
+    *: "Datubasea esleitzen"
   </voice>
 </phrase>
 <phrase>
@@ -2389,7 +2389,7 @@
     *: "Datubasea ez dago prest"
   </dest>
   <voice>
-    *: "Database is not ready"
+    *: "Datubasea ez dago prest"
   </voice>
 </phrase>
 <phrase>
@@ -2403,7 +2403,7 @@
     *: "<Abesti guztiak>"
   </dest>
   <voice>
-    *: "All tracks"
+    *: "Abesti guztiak"
   </voice>
 </phrase>
 <phrase>
@@ -2417,7 +2417,7 @@
     *: "Bistaratzea"
   </dest>
   <voice>
-    *: "Display"
+    *: "Bistaratzea"
   </voice>
 </phrase>
 <phrase>
@@ -2434,7 +2434,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Font"
+    lcd_bitmap: "Fuentea"
   </voice>
 </phrase>
 <phrase>
@@ -2448,7 +2448,7 @@
     *: "Erreproduzio Pantaila"
   </dest>
   <voice>
-    *: "While playing screen"
+    *: "Erreproduzio Pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -2465,7 +2465,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote While Playing Screen"
+    remote: "Urruneko Erreproduzio Pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -2479,7 +2479,7 @@
     *: "LCD Aukerak"
   </dest>
   <voice>
-    *: "LCD Settings"
+    *: "L C D Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -2493,7 +2493,7 @@
     *: "Atzeko-argia"
   </dest>
   <voice>
-    *: "Backlight"
+    *: "Atzeko-argia"
   </voice>
 </phrase>
 <phrase>
@@ -2510,7 +2510,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Backlight (While Plugged In)"
+    charging: "Atzeko-argia (Konektaturik)"
   </voice>
 </phrase>
 <phrase>
@@ -2527,7 +2527,7 @@
   </dest>
   <voice>
     *: none
-    hold_button: "Backlight on hold"
+    hold_button: "Atzeko-argia Sakatuta"
   </voice>
 </phrase>
 <phrase>
@@ -2538,10 +2538,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "Atzeko-argi Epigrafea"
+    *: "Atzeko-argia Abesti Haseran"
   </dest>
   <voice>
-    *: "Caption Backlight"
+    *: "Atzeko-argia Abesti Haseran"
   </voice>
 </phrase>
 <phrase>
@@ -2558,7 +2558,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Backlight Fade In"
+    backlight_fade*: "Atzeko-argia Agertzean"
   </voice>
 </phrase>
 <phrase>
@@ -2575,7 +2575,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Backlight Fade Out"
+    backlight_fade*: "Atzeko-argia Desagertzean"
   </voice>
 </phrase>
 <phrase>
@@ -2589,7 +2589,7 @@
     *: "Lehen Botoia Sakatzean Atzeko-argia Gaitu"
   </dest>
   <voice>
-    *: "First Buttonpress Enables Backlight Only"
+    *: "Lehen Botoia Sakatzean Atzeko-argia Gaitu"
   </voice>
 </phrase>
 <phrase>
@@ -2602,11 +2602,11 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "Lo (Atzeko-argi Itzaltzean)"
+    lcd_sleep: "Lo (Atzeko-argia Itzaltzean)"
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Sleep after backlight off"
+    lcd_sleep: "Lo atzeko argia itzaltzean"
   </voice>
 </phrase>
 <phrase>
@@ -2623,7 +2623,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: "Inoiz"
   </voice>
 </phrase>
 <phrase>
@@ -2640,7 +2640,7 @@
   </dest>
   <voice>
     *: none
-    backlight_brightness: "Brightness"
+    backlight_brightness: "Distira"
   </voice>
 </phrase>
 <phrase>
@@ -2654,7 +2654,7 @@
     *: "Kontrastea"
   </dest>
   <voice>
-    *: "Contrast"
+    *: "Kontrastea"
   </voice>
 </phrase>
 <phrase>
@@ -2671,7 +2671,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD Modua"
   </voice>
 </phrase>
 <phrase>
@@ -2688,7 +2688,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Alderantziz"
   </voice>
 </phrase>
 <phrase>
@@ -2705,7 +2705,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: "Goitik Behera"
   </voice>
 </phrase>
 <phrase>
@@ -2722,7 +2722,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Line Selector Type"
+    lcd_bitmap: "Aukera Lerro Moeta"
   </voice>
 </phrase>
 <phrase>
@@ -2739,7 +2739,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Pointer"
+    lcd_bitmap: "Erakuslea"
   </voice>
 </phrase>
 <phrase>
@@ -2756,7 +2756,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Inverse Bar"
+    lcd_bitmap: "Barra Alderantziz"
   </voice>
 </phrase>
 <phrase>
@@ -2773,7 +2773,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Clear Backdrop"
+    lcd_non-mono: "Garbitu Hondoa"
   </voice>
 </phrase>
 <phrase>
@@ -2790,7 +2790,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Background Colour"
+    lcd_color: "Hondoko Kolorea"
   </voice>
 </phrase>
 <phrase>
@@ -2807,7 +2807,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Foreground Colour"
+    lcd_color: "Gaineko Kolorea"
   </voice>
 </phrase>
 <phrase>
@@ -2824,7 +2824,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Reset Colours"
+    lcd_color: "Berrezarri Koloreak"
   </voice>
 </phrase>
 <phrase>
@@ -2892,7 +2892,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote LCD settings"
+    remote: "Urruneko-LCD Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -2909,7 +2909,7 @@
   </dest>
   <voice>
     *: none
-    remote_ticking: "Reduce Ticking"
+    remote_ticking: "Tickina Gutxitu"
   </voice>
 </phrase>
 <phrase>
@@ -2923,7 +2923,7 @@
     *: "Erakutsi Ikonoak"
   </dest>
   <voice>
-    *: "Show Icons"
+    *: "Erakutsi Ikonoak"
   </voice>
 </phrase>
 <phrase>
@@ -2937,7 +2937,7 @@
     *: "Korritzea"
   </dest>
   <voice>
-    *: "Scrolling"
+    *: "Korritzea"
   </voice>
 </phrase>
 <phrase>
@@ -2965,7 +2965,7 @@
     *: "Korritze Abiadura"
   </dest>
   <voice>
-    *: "Scroll Speed"
+    *: "Korritze Abiadura"
   </voice>
 </phrase>
 <phrase>
@@ -2979,7 +2979,7 @@
     *: "Korritze Atzerapena Hastea"
   </dest>
   <voice>
-    *: "Scroll Start Delay"
+    *: "Korritze Atzerapena Hastea"
   </voice>
 </phrase>
 <phrase>
@@ -2993,7 +2993,7 @@
     *: "Korritze Pausu Tamaina"
   </dest>
   <voice>
-    *: "Scroll Step Size"
+    *: "Korritze Pausu Tamaina"
   </voice>
 </phrase>
 <phrase>
@@ -3021,7 +3021,7 @@
     *: "Norabidebiko Korritze Muga"
   </dest>
   <voice>
-    *: "Bidirectional Scroll Limit"
+    *: "Norabidebiko Korritze Muga"
   </voice>
 </phrase>
 <phrase>
@@ -3038,7 +3038,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Scrolling Options"
+    remote: "Urruneko Korritze Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -3055,7 +3055,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    lcd_bitmap: "Pantailatik Kanpoko Korritzea"
   </voice>
 </phrase>
 <phrase>
@@ -3072,7 +3072,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    lcd_bitmap: "Pantaila Korritze Pausu Tamaina"
   </voice>
 </phrase>
 <phrase>
@@ -3086,7 +3086,7 @@
     *: "Orri Korritzea"
   </dest>
   <voice>
-    *: "Paged scrolling"
+    *: "Orri Korritzea"
   </voice>
 </phrase>
 <phrase>
@@ -3102,7 +3102,7 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Start Delay"
+    *: "Zerrendatu Azelerazio Hasera Atzerapena"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -3119,7 +3119,7 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Speed"
+    *: "Zerrendatu Azelerazio Abiadura"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -3137,7 +3137,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status- and Scrollbar"
+    lcd_bitmap: "Egoera-/Korritze-barra"
   </voice>
 </phrase>
 <phrase>
@@ -3154,7 +3154,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: "Korritze Barra"
   </voice>
 </phrase>
 <phrase>
@@ -3171,7 +3171,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: "Egoera Barra"
   </voice>
 </phrase>
 <phrase>
@@ -3188,7 +3188,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "Button Bar"
+    recorder_pad: "Botoi Barra"
   </voice>
 </phrase>
 <phrase>
@@ -3205,7 +3205,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Volume Display"
+    lcd_bitmap: "Bolumena Bistaratzea"
   </voice>
 </phrase>
 <phrase>
@@ -3222,7 +3222,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Battery Display"
+    lcd_bitmap: "Bateria Bistaratzea"
   </voice>
 </phrase>
 <phrase>
@@ -3239,7 +3239,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Graphic"
+    lcd_bitmap: "Grafikoa"
   </voice>
 </phrase>
 <phrase>
@@ -3256,7 +3256,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Numeric"
+    lcd_bitmap: "Zenbakizkoa"
   </voice>
 </phrase>
 <phrase>
@@ -3268,11 +3268,11 @@
     masd: none
   </source>
   <dest>
-    *: "Peak Meter"
+    *: "Piko Neurtzailea"
     masd: none
   </dest>
   <voice>
-    *: "Peak Meter"
+    *: "Piko Neurtzailea"
     masd: none
   </voice>
 </phrase>
@@ -3285,11 +3285,11 @@
     masd: none
   </source>
   <dest>
-    *: "Clip Hold Time"
+    *: "Mozketen Iraupen Denbora"
     masd: none
   </dest>
   <voice>
-    *: "Clip Hold Time"
+    *: "Mozketen Iraupen Denbora"
     masd: none
   </voice>
 </phrase>
@@ -3302,11 +3302,11 @@
     masd: none
   </source>
   <dest>
-    *: "Peak Hold Time"
+    *: "Espektro Analizatzaile Denbora"
     masd: none
   </dest>
   <voice>
-    *: "Peak Hold Time"
+    *: "Espektro Analizatzaile Denbora"
     masd: none
   </voice>
 </phrase>
@@ -3319,11 +3319,11 @@
     masd: none
   </source>
   <dest>
-    *: "Eternal"
+    *: "Betirakoa"
     masd: none
   </dest>
   <voice>
-    *: "Eternal"
+    *: "Betirakoa"
     masd: none
   </voice>
 </phrase>
@@ -3336,11 +3336,11 @@
     masd: none
   </source>
   <dest>
-    *: "Peak Release"
+    *: "Espektro Analizatzaile Jaitsiera"
     masd: none
   </dest>
   <voice>
-    *: "Peak Release"
+    *: "Espektro Analizatzaile Jaitsiera"
     masd: none
   </voice>
 </phrase>
@@ -3357,7 +3357,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Scale"
+    *: "Eskala"
     masd: none
   </voice>
 </phrase>
@@ -3374,7 +3374,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Logarithmic decibel"
+    *: "Dezibelio logaritmiko"
     masd: none
   </voice>
 </phrase>
@@ -3391,7 +3391,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Linear percent"
+    *: "Ehuneko lineala"
     masd: none
   </voice>
 </phrase>
@@ -3408,7 +3408,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Minimum Of Range"
+    *: "Tartearen Gutxienezkoa"
     masd: none
   </voice>
 </phrase>
@@ -3425,7 +3425,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Maximum Of Range"
+    *: "Tartearen Gehienezkoa"
     masd: none
   </voice>
 </phrase>
@@ -3440,7 +3440,7 @@
     *: "Berezko Kodeaketa"
   </dest>
   <voice>
-    *: "Default codepage"
+    *: "Berezko Kodeaketa"
   </voice>
 </phrase>
 <phrase>
@@ -3454,7 +3454,7 @@
     *: "Latindarra1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latin 1"
+    *: " Latindarra 1"
   </voice>
 </phrase>
 <phrase>
@@ -3468,7 +3468,7 @@
     *: "Greziera (ISO-8859-7)"
   </dest>
   <voice>
-    *: "Greek"
+    *: "Greziera"
   </voice>
 </phrase>
 <phrase>
@@ -3485,7 +3485,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Hebrew"
+    lcd_bitmap: "Hebreera"
   </voice>
 </phrase>
 <phrase>
@@ -3499,7 +3499,7 @@
     *: "Zirilikoa (CP1251)"
   </dest>
   <voice>
-    *: "Cyrillic"
+    *: "Zirilikoa"
   </voice>
 </phrase>
 <phrase>
@@ -3516,7 +3516,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Thai"
+    lcd_bitmap: "Thailandarra"
   </voice>
 </phrase>
 <phrase>
@@ -3533,7 +3533,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Arabic"
+    lcd_bitmap: "Arabiarra"
   </voice>
 </phrase>
 <phrase>
@@ -3547,7 +3547,7 @@
     *: "Turkiarra (ISO-8859-9)"
   </dest>
   <voice>
-    *: "Turkish"
+    *: "Turkiarra"
   </voice>
 </phrase>
 <phrase>
@@ -3561,7 +3561,7 @@
     *: "Latindar Hedatua (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Latin extended"
+    *: "Latindar Hedatua"
   </voice>
 </phrase>
 <phrase>
@@ -3578,7 +3578,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Japanese"
+    lcd_bitmap: "Japoniarra"
   </voice>
 </phrase>
 <phrase>
@@ -3595,7 +3595,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Simplified Chinese"
+    lcd_bitmap: "Txinatar Arrunta"
   </voice>
 </phrase>
 <phrase>
@@ -3612,7 +3612,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Korean"
+    lcd_bitmap: "Korearra"
   </voice>
 </phrase>
 <phrase>
@@ -3629,7 +3629,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Traditional Chinese"
+    lcd_bitmap: "Txinatar Tradizionala"
   </voice>
 </phrase>
 <phrase>
@@ -3643,7 +3643,7 @@
     *: "Unikodea (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "Unikodea"
   </voice>
 </phrase>
 <phrase>
@@ -3663,7 +3663,7 @@
   <voice>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansafuze*,sansae200*: "Errubera Argia Itzaltzen"
   </voice>
 </phrase>
 <phrase>
@@ -3680,7 +3680,7 @@
   </dest>
   <voice>
     *: none
-    buttonlight_brightness: "Button Light Brightness"
+    buttonlight_brightness: "Argi Dizdira Botoia"
   </voice>
 </phrase>
 <phrase>
@@ -3694,7 +3694,7 @@
     *: "Hasera Pantaila"
   </dest>
   <voice>
-    *: "Start Screen"
+    *: "Hasera Pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -3708,7 +3708,7 @@
     *: "Menu Nagusia"
   </dest>
   <voice>
-    *: "Main Menu"
+    *: "Menu Nagusia"
   </voice>
 </phrase>
 <phrase>
@@ -3722,7 +3722,7 @@
     *: "Aurreko Pantaila"
   </dest>
   <voice>
-    *: "Previous Screen"
+    *: "Aurreko Pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -3736,7 +3736,7 @@
     *: "Bateria"
   </dest>
   <voice>
-    *: "Battery"
+    *: "Bateria"
   </voice>
 </phrase>
 <phrase>
@@ -3750,7 +3750,7 @@
     *: "Bateria Gaitasuna"
   </dest>
   <voice>
-    *: "Battery Capacity"
+    *: "Bateria Gaitasuna"
   </voice>
 </phrase>
 <phrase>
@@ -3767,7 +3767,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Battery type"
+    battery_types: "Bateria mota"
   </voice>
 </phrase>
 <phrase>
@@ -3784,7 +3784,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Alkaline"
+    battery_types: "Alkalinoa"
   </voice>
 </phrase>
 <phrase>
@@ -3801,7 +3801,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Nickel metal hydride"
+    battery_types: "Nickel metal hibridoa"
   </voice>
 </phrase>
 <phrase>
@@ -3815,7 +3815,7 @@
     *: "Diskoa"
   </dest>
   <voice>
-    *: "Disk"
+    *: "Diskoa"
   </voice>
 </phrase>
 <phrase>
@@ -3831,7 +3831,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Disk Spindown"
+    *: "Diskoa Ezgaitzen"
     flash_storage: none
   </voice>
 </phrase>
@@ -3845,11 +3845,11 @@
   </source>
   <dest>
     *: none
-    dircache: "Directorio Katxea"
+    dircache: "Direktorio Katxea"
   </dest>
   <voice>
     *: none
-    dircache: "Directory Cache"
+    dircache: "Direktorio Katxea"
   </voice>
 </phrase>
 <phrase>
@@ -3866,7 +3866,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Time and Date"
+    rtc: "Ordua eta Data"
   </voice>
 </phrase>
 <phrase>
@@ -3883,7 +3883,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Set Time and Date"
+    rtc: "Ezarri Ordu/Data"
   </voice>
 </phrase>
 <phrase>
@@ -3900,7 +3900,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Time Format"
+    rtc: "Denbora Formatua"
   </voice>
 </phrase>
 <phrase>
@@ -3917,7 +3917,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "12 Hour Clock"
+    rtc: "12 Ordu"
   </voice>
 </phrase>
 <phrase>
@@ -3934,7 +3934,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "24 Hour Clock"
+    rtc: "24 Ordu"
   </voice>
 </phrase>
 <phrase>
@@ -4136,7 +4136,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "January"
+    rtc: "Urtarrila"
   </voice>
 </phrase>
 <phrase>
@@ -4153,7 +4153,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "February"
+    rtc: "Otsaila"
   </voice>
 </phrase>
 <phrase>
@@ -4170,7 +4170,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "March"
+    rtc: "Martxoa"
   </voice>
 </phrase>
 <phrase>
@@ -4187,7 +4187,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "April"
+    rtc: "Apirila"
   </voice>
 </phrase>
 <phrase>
@@ -4204,7 +4204,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "May"
+    rtc: "Maiatza"
   </voice>
 </phrase>
 <phrase>
@@ -4221,7 +4221,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "June"
+    rtc: "Ekaina"
   </voice>
 </phrase>
 <phrase>
@@ -4238,7 +4238,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "July"
+    rtc: "Uztaila"
   </voice>
 </phrase>
 <phrase>
@@ -4255,7 +4255,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "August"
+    rtc: "Abendua"
   </voice>
 </phrase>
 <phrase>
@@ -4272,7 +4272,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "September"
+    rtc: "Iraila"
   </voice>
 </phrase>
 <phrase>
@@ -4289,7 +4289,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "October"
+    rtc: "Urria"
   </voice>
 </phrase>
 <phrase>
@@ -4306,7 +4306,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "November"
+    rtc: "Azaroa"
   </voice>
 </phrase>
 <phrase>
@@ -4323,7 +4323,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "December"
+    rtc: "Abendua"
   </voice>
 </phrase>
 <phrase>
@@ -4334,10 +4334,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Itzalte Denbora"
+    *: "Desaktibatze Denbora"
   </dest>
   <voice>
-    *: "Idle Poweroff"
+    *: "Desaktibatze Denbora"
   </voice>
 </phrase>
 <phrase>
@@ -4348,10 +4348,10 @@
     *: "Sleep Timer"
   </source>
   <dest>
-    *: "Itzaltzeko Denbora"
+    *: "Lotarako Denbora"
   </dest>
   <voice>
-    *: "Sleep Timer"
+    *: "Lotarako Denbora"
   </voice>
 </phrase>
 <phrase>
@@ -4365,7 +4365,7 @@
     *: "Mugak"
   </dest>
   <voice>
-    *: "Limits"
+    *: "Mugak"
   </voice>
 </phrase>
 <phrase>
@@ -4379,7 +4379,7 @@
     *: "Gehienezko Sarrerak Arakatzailean"
   </dest>
   <voice>
-    *: "Maximum entries in file browser"
+    *: "Gehienezko Sarrerak Arakatzailean"
   </voice>
 </phrase>
 <phrase>
@@ -4393,7 +4393,7 @@
     *: "Gehienezko Zerrendaren Tamaina"
   </dest>
   <voice>
-    *: "Maximum playlist size"
+    *: "Gehienezko Zerrendaren Tamaina"
   </voice>
 </phrase>
 <phrase>
@@ -4410,7 +4410,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Car Adapter Mode"
+    charging: "Kotxerako Modua"
   </voice>
 </phrase>
 <phrase>
@@ -4427,7 +4427,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Wake-Up Alarm"
+    alarm: "Esnatze Alarma"
   </voice>
 </phrase>
 <phrase>
@@ -4444,7 +4444,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "Alarma Pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -4478,7 +4478,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Waking up in"
+    alarm: "Esnatze Ordua"
   </voice>
 </phrase>
 <phrase>
@@ -4495,7 +4495,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm set"
+    alarm: "Alarma Ezarri"
   </voice>
 </phrase>
 <phrase>
@@ -4512,7 +4512,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Time Is Too Soon!"
+    alarm: "Alarma Ordua Goizegi!"
   </voice>
 </phrase>
 <phrase>
@@ -4556,7 +4556,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Disabled"
+    alarm: "Alarma Ezgaitua"
   </voice>
 </phrase>
 <phrase>
@@ -4570,7 +4570,7 @@
     *: "Estekatzen"
   </dest>
   <voice>
-    *: "Bookmarking"
+    *: "Estekatzen"
   </voice>
 </phrase>
 <phrase>
@@ -4584,7 +4584,7 @@
     *: "Markatu Gelditzean"
   </dest>
   <voice>
-    *: "Bookmark on Stop"
+    *: "Markatu Gelditzean"
   </voice>
 </phrase>
 <phrase>
@@ -4598,7 +4598,7 @@
     *: "Bai - Azkenak soilik"
   </dest>
   <voice>
-    *: "Yes - Recent only"
+    *: "Bai - Azkenak soilik"
   </voice>
 </phrase>
 <phrase>
@@ -4612,7 +4612,7 @@
     *: "Galdetu - Azkenak soilik"
   </dest>
   <voice>
-    *: "Ask - Recent only"
+    *: "Galdetu - Azkenak soilik"
   </voice>
 </phrase>
 <phrase>
@@ -4626,7 +4626,7 @@
     *: "Kargatu Azken Estekak"
   </dest>
   <voice>
-    *: "Load Last Bookmark"
+    *: "Kargatu Azken Estekak"
   </voice>
 </phrase>
 <phrase>
@@ -4640,7 +4640,7 @@
     *: "Azken Esteken Zerrenda Mantendu?"
   </dest>
   <voice>
-    *: "Maintain a List of Recent Bookmarks?"
+    *: "Azken Esteken Zerrenda Mantendu?"
   </voice>
 </phrase>
 <phrase>
@@ -4654,7 +4654,7 @@
     *: "Bakarra soilik"
   </dest>
   <voice>
-    *: "Unique only"
+    *: "Bakarra soilik"
   </voice>
 </phrase>
 <phrase>
@@ -4668,7 +4668,7 @@
     *: "Hizkuntza"
   </dest>
   <voice>
-    *: "Language"
+    *: "Hizkuntza"
   </voice>
 </phrase>
 <phrase>
@@ -4682,7 +4682,7 @@
     *: "Hizkuntza Berria"
   </dest>
   <voice>
-    *: "New Language"
+    *: "Hizkuntza Berria"
   </voice>
 </phrase>
 <phrase>
@@ -4696,7 +4696,7 @@
     *: "Ahotsa"
   </dest>
   <voice>
-    *: "Voice"
+    *: "Ahotsa"
   </voice>
 </phrase>
 <phrase>
@@ -4710,7 +4710,7 @@
     *: "Ahots Menuak"
   </dest>
   <voice>
-    *: "Voice Menus"
+    *: "Ahots Menuak"
   </voice>
 </phrase>
 <phrase>
@@ -4724,7 +4724,7 @@
     *: "Ahots Direktorioak"
   </dest>
   <voice>
-    *: "Voice Directories"
+    *: "Ahots Direktorioak"
   </voice>
 </phrase>
 <phrase>
@@ -4738,7 +4738,7 @@
     *: "Erabili Direktorio .talk Klipak"
   </dest>
   <voice>
-    *: "Use Directory .talk Clips"
+    *: "Erabili Direktorio .talk Klipak"
   </voice>
 </phrase>
 <phrase>
@@ -4749,10 +4749,10 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Ahos Fitxategi Izenak"
+    *: "Ahots Fitxategi Izenak"
   </dest>
   <voice>
-    *: "Voice Filenames"
+    *: "Ahots Fitxategi Izenak"
   </voice>
 </phrase>
 <phrase>
@@ -4766,7 +4766,7 @@
     *: "Erabili .talk Fitxategi Klipak"
   </dest>
   <voice>
-    *: "Use File .talk Clips"
+    *: "Erabili .talk Fitxategi Klipak"
   </voice>
 </phrase>
 <phrase>
@@ -4780,7 +4780,7 @@
     *: "Zenbakiak"
   </dest>
   <voice>
-    *: "Numbers"
+    *: "Zenbakiak"
   </voice>
 </phrase>
 <phrase>
@@ -4791,10 +4791,10 @@
     *: "Spell"
   </source>
   <dest>
-    *: "Deletreatu"
+    *: "Letreiatu"
   </dest>
   <voice>
-    *: "Spell"
+    *: "Letreiatu"
   </voice>
 </phrase>
 <phrase>
@@ -4808,7 +4808,7 @@
     *: ".talk Klipa"
   </dest>
   <voice>
-    *: "talk Clip"
+    *: "talk klipa"
   </voice>
 </phrase>
 <phrase>
@@ -4822,7 +4822,7 @@
     *: "Aukerak Kudeatu"
   </dest>
   <voice>
-    *: "Manage Settings"
+    *: "Aukerak Kudeatu"
   </voice>
 </phrase>
 <phrase>
@@ -4836,7 +4836,7 @@
     *: "Arakatu .cfg Fitxategiak"
   </dest>
   <voice>
-    *: "Browse configuration files"
+        *: "Arakatu konfigurazio fitxategiak"
   </voice>
 </phrase>
 <phrase>
@@ -4850,7 +4850,7 @@
     *: "Aukerak Kargaturik"
   </dest>
   <voice>
-    *: "Settings Loaded"
+    *: "Aukerak Kargaturik"
   </voice>
 </phrase>
 <phrase>
@@ -4864,7 +4864,7 @@
     *: "Aukerak Berrezarri"
   </dest>
   <voice>
-    *: "Reset Settings"
+    *: "Aukerak Berrezarri"
   </voice>
 </phrase>
 <phrase>
@@ -4878,7 +4878,7 @@
     *: "Garbituta"
   </dest>
   <voice>
-    *: "Settings Cleared"
+    *: "Garbituta"
   </voice>
 </phrase>
 <phrase>
@@ -4892,7 +4892,7 @@
     *: "Gorde .cfg Fitxategia"
   </dest>
   <voice>
-    *: "Save configuration file"
+    *: "Gorde konfigurazio Fitxategia"
   </voice>
 </phrase>
 <phrase>
@@ -4906,7 +4906,7 @@
     *: "Aukerak Gorderik"
   </dest>
   <voice>
-    *: "Settings Saved"
+    *: "Aukerak Gorderik"
   </voice>
 </phrase>
 <phrase>
@@ -4920,7 +4920,7 @@
     *: "Gorde Gai Aukerak"
   </dest>
   <voice>
-    *: "Save Theme Settings"
+    *: "Gorde Gai Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -4934,7 +4934,7 @@
     *: "Arakatu Gai Fitxategiak"
   </dest>
   <voice>
-    *: "Browse Theme Files"
+    *: "Arakatu Gai Fitxategiak"
   </voice>
 </phrase>
 <phrase>
@@ -4951,7 +4951,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording Settings"
+    recording: "Grabazio Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -4968,7 +4968,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio Menu"
+    radio: "FM Irrati Menua"
   </voice>
 </phrase>
 <phrase>
@@ -4985,7 +4985,7 @@
   </dest>
   <voice>
     *: none
-    radio: "No presets"
+    radio: "Ezarpenik Ez"
   </voice>
 </phrase>
 <phrase>
@@ -5002,7 +5002,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Add Preset"
+    radio: "Gehitu Ezarpena"
   </voice>
 </phrase>
 <phrase>
@@ -5019,7 +5019,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Edit Preset"
+    radio: "Editatu Ezarpenak"
   </voice>
 </phrase>
 <phrase>
@@ -5036,7 +5036,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Remove Preset"
+    radio: "Ezabatu Ezarpenak"
   </voice>
 </phrase>
 <phrase>
@@ -5053,7 +5053,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset Save Failed"
+    radio: "Ezarpenak Gordetzean Akatsa"
   </voice>
 </phrase>
 <phrase>
@@ -5070,7 +5070,7 @@
   </dest>
   <voice>
     *: none
-    radio: "The Preset List is Full"
+    radio: "Ezarpenen Zerrenda Betea"
   </voice>
 </phrase>
 <phrase>
@@ -5138,7 +5138,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset"
+    radio: "Ezarpenak"
   </voice>
 </phrase>
 <phrase>
@@ -5189,7 +5189,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Force Mono"
+    radio: "Behartu Mono"
   </voice>
 </phrase>
 <phrase>
@@ -5223,7 +5223,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Auto scan presets"
+    radio: "Auto-Eskaneatu Ezarpenak"
   </voice>
 </phrase>
 <phrase>
@@ -5240,7 +5240,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Current Presets?"
+    radio: "Garbitu Uneko Ezarpenak?"
   </voice>
 </phrase>
 <phrase>
@@ -5291,7 +5291,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Scan"
+    radio: "Eskaneatu"
   </voice>
 </phrase>
 <phrase>
@@ -5308,7 +5308,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Load Preset List"
+    radio: "Kargatu Aurrezarritako Zerrenda"
   </voice>
 </phrase>
 <phrase>
@@ -5325,7 +5325,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Save Preset List"
+    radio: "Gorde Aurrezarritako Zerrenda"
   </voice>
 </phrase>
 <phrase>
@@ -5342,7 +5342,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Preset List"
+    radio: "Garbitu Aurrezarritako Zerrenda"
   </voice>
 </phrase>
 <phrase>
@@ -5359,7 +5359,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset List"
+    radio: "Aurrezarritako Zerrenda"
   </voice>
 </phrase>
 <phrase>
@@ -5376,7 +5376,7 @@
   </dest>
   <voice>
     *: none
-    radio: "No settings found. Autoscan?"
+    radio: "Ez da aukerarik auriktu. Autoskaneatu?"
   </voice>
 </phrase>
 <phrase>
@@ -5410,7 +5410,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Region"
+    radio: "Lurraldea"
   </voice>
 </phrase>
 <phrase>
@@ -5427,7 +5427,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Europe"
+    radio: "Europa"
   </voice>
 </phrase>
 <phrase>
@@ -5444,7 +5444,7 @@
   </dest>
   <voice>
     *: none
-    radio: "US and Canada"
+    radio: "Estatu Batuak Kanada"
   </voice>
 </phrase>
 <phrase>
@@ -5461,7 +5461,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Japan"
+    radio: "Japon"
   </voice>
 </phrase>
 <phrase>
@@ -5495,7 +5495,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Format"
+    recording: "Formatua"
   </voice>
 </phrase>
 <phrase>
@@ -5580,7 +5580,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Encoder Settings"
+    recording: "Kodetzaile Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -5597,7 +5597,7 @@
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Bitrate"
+    recording_swcodec: "Bit-tasa"
   </voice>
 </phrase>
 <phrase>
@@ -5614,7 +5614,7 @@
   </dest>
   <voice>
     *: none
-    recording: "No settings available"
+    recording: "Aukerak gabe"
   </voice>
 </phrase>
 <phrase>
@@ -5631,7 +5631,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "Kalitatea"
   </voice>
 </phrase>
 <phrase>
@@ -5648,7 +5648,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Frequency"
+    recording: "Frekuentzia"
   </voice>
 </phrase>
 <phrase>
@@ -5665,7 +5665,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Same As Source"
+    recording: "Jatorriaren Bera"
   </voice>
 </phrase>
 <phrase>
@@ -5682,7 +5682,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "Jatorria"
   </voice>
 </phrase>
 <phrase>
@@ -5697,12 +5697,12 @@
   <dest>
     *: none
     recording: "Mikrofonoa"
-    iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    iriverh100,iriverh120,iriverh300: "Barne Mikrofonoa"
   </dest>
   <voice>
     *: none
-    recording: "Microphone"
-    iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Mikrofonoa"
+    iriverh100,iriverh120,iriverh300: "Barne Mikrofonoa"
   </voice>
 </phrase>
 <phrase>
@@ -5719,7 +5719,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "Digitala"
   </voice>
 </phrase>
 <phrase>
@@ -5736,7 +5736,7 @@
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Line In"
+    recording,archosplayer: "Sarrera"
   </voice>
 </phrase>
 <phrase>
@@ -5753,7 +5753,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Independent Frames"
+    recording_hwcodec: "Frame Independienteak"
   </voice>
 </phrase>
 <phrase>
@@ -5770,7 +5770,7 @@
   </dest>
   <voice>
     *: none
-    recording: "File Split Options"
+    recording: "Fitxategi Zatitze Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -5787,7 +5787,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Measure"
+    recording: "Zatitze Neurria"
   </voice>
 </phrase>
 <phrase>
@@ -5804,7 +5804,7 @@
   </dest>
   <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "Zer egin Zatitzean"
   </voice>
 </phrase>
 <phrase>
@@ -5817,11 +5817,11 @@
   </source>
   <dest>
     *: none
-    recording: "Fitxategi berri hasi"
+    recording: "Fitxategi berria hasi"
   </dest>
   <voice>
     *: none
-    recording: "Start new file"
+    recording: "Fitxategi berria hasi"
   </voice>
 </phrase>
 <phrase>
@@ -5838,7 +5838,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop recording"
+    recording: "Gelditu grabaketa"
   </voice>
 </phrase>
 <phrase>
@@ -5855,7 +5855,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Time"
+    recording: "Moztu Denbora"
   </voice>
 </phrase>
 <phrase>
@@ -5872,7 +5872,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "Moztu Fitxategi Tamaina"
   </voice>
 </phrase>
 <phrase>
@@ -5885,11 +5885,11 @@
   </source>
   <dest>
     *: none
-    recording: "Prerecord Time"
+    recording: "Aurregrabazio Denbora"
   </dest>
   <voice>
     *: none
-    recording: "Pre-Record time"
+    recording: "Aurregrabazio denbora"
   </voice>
 </phrase>
 <phrase>
@@ -5906,7 +5906,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Directory"
+    recording: "Direktorioa"
   </voice>
 </phrase>
 <phrase>
@@ -5923,7 +5923,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Ezarri Grabazio Direktorio Gisa"
   </voice>
 </phrase>
 <phrase>
@@ -5940,7 +5940,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clear Recording Directory"
+    recording: "Garbitu Grabatze Direktorioa"
   </voice>
 </phrase>
 <phrase>
@@ -5957,7 +5957,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Can't write to recording directory"
+    recording: "Ezin da grabatze direktorioan idatzi"
   </voice>
 </phrase>
 <phrase>
@@ -5991,7 +5991,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Main unit only"
+    remote: "Unitate nagusia soilik"
   </voice>
 </phrase>
 <phrase>
@@ -6008,7 +6008,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote unit only"
+    remote: "Urruneko Unitatea Soilik"
   </voice>
 </phrase>
 <phrase>
@@ -6025,7 +6025,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Main and remote unit"
+    remote: "Unitate Nagusia eta Urrunekoa"
   </voice>
 </phrase>
 <phrase>
@@ -6042,7 +6042,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Abiarazlea"
   </voice>
 </phrase>
 <phrase>
@@ -6059,7 +6059,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Once"
+    recording: "Behin"
   </voice>
 </phrase>
 <phrase>
@@ -6072,11 +6072,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigtype"
+    recording: "Kliskagailu"
   </dest>
   <voice>
     *: none
-    recording: "Trigger type"
+    recording: " Kliskagailu mota"
   </voice>
 </phrase>
 <phrase>
@@ -6093,7 +6093,7 @@
   </dest>
   <voice>
     *: none
-    recording: "New file"
+    recording: "Fitxategi Berria"
   </voice>
 </phrase>
 <phrase>
@@ -6110,7 +6110,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "Gelditu"
   </voice>
 </phrase>
 <phrase>
@@ -6123,11 +6123,11 @@
   </source>
   <dest>
     *: none
-    recording: "Hasi Gainean"
+    recording: "Honen Gainetik Hasi:"
   </dest>
   <voice>
     *: none
-    recording: "Start Above"
+    recording: "Honen Gainetik Hasi:"
   </voice>
 </phrase>
 <phrase>
@@ -6140,11 +6140,11 @@
   </source>
   <dest>
     *: none
-    recording: "for at least"
+    recording: "gutxienez"
   </dest>
   <voice>
     *: none
-    recording: "for at least"
+    recording: "gutxienez"
   </voice>
 </phrase>
 <phrase>
@@ -6157,11 +6157,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop Below"
+    recording: "Gelditu Honen Azpitik:"
   </dest>
   <voice>
     *: none
-    recording: "Stop Below"
+    recording: "Gelditu Honen Azpitik:"
   </voice>
 </phrase>
 <phrase>
@@ -6174,11 +6174,11 @@
   </source>
   <dest>
     *: none
-    recording: "Presplit Gap"
+    recording: "Mozketen Aurreko Tartea"
   </dest>
   <voice>
     *: none
-    recording: "Presplit Gap"
+    recording: "Mozketen Aurreko Tartea"
   </voice>
 </phrase>
 <phrase>
@@ -6208,11 +6208,11 @@
   </source>
   <dest>
     *: none
-    agc: "Safety (clip)"
+    agc: "Segurua (clip)"
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "Segurua (clip)"
   </voice>
 </phrase>
 <phrase>
@@ -6229,7 +6229,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "Live (mantso)"
   </voice>
 </phrase>
 <phrase>
@@ -6246,7 +6246,7 @@
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: "DJ set (mantso)"
   </voice>
 </phrase>
 <phrase>
@@ -6263,7 +6263,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "Ertaina"
   </voice>
 </phrase>
 <phrase>
@@ -6280,7 +6280,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "Ahotsa (azkar)"
   </voice>
 </phrase>
 <phrase>
@@ -6297,7 +6297,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Display OFF"
+    remote: "Urruneko Pantaila OFF"
   </voice>
 </phrase>
 <phrase>
@@ -6328,7 +6328,7 @@
     *: "Zerrenda Sortu"
   </dest>
   <voice>
-    *: "Create Playlist"
+    *: "Zerrenda Sortu"
   </voice>
 </phrase>
 <phrase>
@@ -6524,7 +6524,7 @@
     *: "Ezabatu zerrenda dinamikoa?"
   </dest>
   <voice>
-    *: "Erase dynamic playlist?"
+    *: "Ezabatu zerrenda dinamikoa?"
   </voice>
 </phrase>
 <phrase>
@@ -6541,7 +6541,7 @@
   </dest>
   <voice>
     *: none
-    soft_shutdown: "Shut down"
+    soft_shutdown: "Itzali"
   </voice>
 </phrase>
 <phrase>
@@ -6555,7 +6555,7 @@
     *: "Rockbox Info"
   </dest>
   <voice>
-    *: "Rockbox Info"
+    *: "Rockbox Informazioa"
   </voice>
 </phrase>
 <phrase>
@@ -6571,7 +6571,7 @@
     archosplayer: "Buf:"
   </dest>
   <voice>
-    *: "Buffer size"
+    *: "Buffer tamaina"
   </voice>
 </phrase>
 <phrase>
@@ -6589,7 +6589,7 @@
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Battery level"
+    *: "Bateria maila"
   </voice>
 </phrase>
 <phrase>
@@ -6603,7 +6603,7 @@
     *: "Diskoa:"
   </dest>
   <voice>
-    *: "Disk size"
+    *: "Disko tamaina"
   </voice>
 </phrase>
 <phrase>
@@ -6617,7 +6617,7 @@
     *: "Libre:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "Espazioa libre:"
   </voice>
 </phrase>
 <phrase>
@@ -6634,7 +6634,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: "Internal"
+    multivolume: "Internoa"
   </voice>
 </phrase>
 <phrase>
@@ -6656,7 +6656,7 @@
   <voice>
     *: none
     multivolume: "H D 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mikro S D"
     archosondio*: "M M C"
   </voice>
 </phrase>
@@ -6671,7 +6671,7 @@
     *: "Bertsioa"
   </dest>
   <voice>
-    *: "Version"
+    *: "Bertsioa"
   </voice>
 </phrase>
 <phrase>
@@ -6682,10 +6682,10 @@
     *: "Running Time"
   </source>
   <dest>
-    *: "Jotzen"
+    *: "Jotze Denbora"
   </dest>
   <voice>
-    *: "Running Time"
+    *: "Jotze Denbora"
   </voice>
 </phrase>
 <phrase>
@@ -6696,10 +6696,10 @@
     *: "Top Time"
   </source>
   <dest>
-    *: "Top Time"
+    *: "Gehienezko Denbora"
   </dest>
   <voice>
-    *: "Top Time"
+    *: "Gehienezko Denbora"
   </voice>
 </phrase>
 <phrase>
@@ -6713,7 +6713,7 @@
     *: "Garbitu Denbora?"
   </dest>
   <voice>
-    *: "Clear Time?"
+    *: "Garbitu Denbora?"
   </voice>
 </phrase>
 <phrase>
@@ -6724,10 +6724,10 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Debug (Keep Out!)"
+    *: "Arazketa (Ez Ukitu!)"
   </dest>
   <voice>
-    *: "Debug, keep out!"
+    *: "Arazketa, ez ukitu!"
   </voice>
 </phrase>
 <phrase>
@@ -6741,7 +6741,7 @@
     *: "Zerrenda"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "Zerrenda"
   </voice>
 </phrase>
 <phrase>
@@ -6755,7 +6755,7 @@
     *: "Txertatu"
   </dest>
   <voice>
-    *: "Insert"
+    *: "Txertatu"
   </voice>
 </phrase>
 <phrase>
@@ -6769,7 +6769,7 @@
     *: "Txertatu Hurrengoa"
   </dest>
   <voice>
-    *: "Insert Next"
+    *: "Txertatu Hurrengoa"
   </voice>
 </phrase>
 <phrase>
@@ -6783,7 +6783,7 @@
     *: "Txertatu Amaieran"
   </dest>
   <voice>
-    *: "Insert Last"
+    *: "Txertatu Amaieran"
   </voice>
 </phrase>
 <phrase>
@@ -6797,7 +6797,7 @@
     *: "Txertatu Nahasita"
   </dest>
   <voice>
-    *: "Insert Shuffled"
+    *: "Txertatu Nahasita"
   </voice>
 </phrase>
 <phrase>
@@ -6811,7 +6811,7 @@
     *: "Zerrendatu"
   </dest>
   <voice>
-    *: "Queue"
+    *: "Zerrendatu"
   </voice>
 </phrase>
 <phrase>
@@ -6825,7 +6825,7 @@
     *: "Zerrendatu Hurrengoa"
   </dest>
   <voice>
-    *: "Queue Next"
+    *: "Zerrendatu Hurrengoa"
   </voice>
 </phrase>
 <phrase>
@@ -6839,7 +6839,7 @@
     *: "Zerrendatu Amaieran"
   </dest>
   <voice>
-    *: "Queue Last"
+    *: "Zerrendatu Amaieran"
   </voice>
 </phrase>
 <phrase>
@@ -6853,7 +6853,7 @@
     *: "Zerrendatu Nahasita"
   </dest>
   <voice>
-    *: "Queue Shuffled"
+    *: "Zerrendatu Nahasita"
   </voice>
 </phrase>
 <phrase>
@@ -6867,7 +6867,7 @@
     *: "Erreproduzitu Hurrengoa"
   </dest>
   <voice>
-    *: "Play Next"
+    *: "Erreproduzitu Hurrengoa"
   </voice>
 </phrase>
 <phrase>
@@ -6881,7 +6881,7 @@
     *: "%d abesti txertatuak (%s)"
   </dest>
   <voice>
-    *: "tracks inserted"
+    *: "abesti txertatuak"
   </voice>
 </phrase>
 <phrase>
@@ -6895,7 +6895,7 @@
     *: "%d abesti zerrendatuak (%s)"
   </dest>
   <voice>
-    *: "tracks queued"
+    *: "abesti zerrendatuak"
   </voice>
 </phrase>
 <phrase>
@@ -6909,7 +6909,7 @@
     *: "Ikusi"
   </dest>
   <voice>
-    *: "View"
+    *: "Ikusi"
   </voice>
 </phrase>
 <phrase>
@@ -6923,7 +6923,7 @@
     *: "Zerrendan Bilatu"
   </dest>
   <voice>
-    *: "Search In Playlist"
+    *: "Zerrendan Bilatu"
   </voice>
 </phrase>
 <phrase>
@@ -6951,7 +6951,7 @@
     *: "Birnahasi"
   </dest>
   <voice>
-    *: "Reshuffle"
+    *: "Birnahasi"
   </voice>
 </phrase>
 <phrase>
@@ -6965,7 +6965,7 @@
     *: "Ikusi Katalogoa"
   </dest>
   <voice>
-    *: "View Catalogue"
+    *: "Ikusi Katalogoa"
   </voice>
 </phrase>
 <phrase>
@@ -6979,7 +6979,7 @@
     *: "Gehitu Zerrendara"
   </dest>
   <voice>
-    *: "Add to Playlist"
+    *: "Gehitu Zerrendara"
   </voice>
 </phrase>
 <phrase>
@@ -6993,7 +6993,7 @@
     *: "Gehitu Zerrenda Berrira"
   </dest>
   <voice>
-    *: "Add to New Playlist"
+    *: "Gehitu Zerrenda Berrira"
   </voice>
 </phrase>
 <phrase>
@@ -7007,7 +7007,7 @@
     *: "%s ez da existitzen"
   </dest>
   <voice>
-    *: "Playlist directory doesn't exist"
+    *: "Zerrenda direktorioa ez dago"
   </voice>
 </phrase>
 <phrase>
@@ -7021,7 +7021,7 @@
     *: "Zerrendarik Ez"
   </dest>
   <voice>
-    *: "No Playlists"
+    *: "Zerrendarik Ez"
   </voice>
 </phrase>
 <phrase>
@@ -7035,7 +7035,7 @@
     *: "Estekak"
   </dest>
   <voice>
-    *: "Bookmarks"
+    *: "Estekak"
   </voice>
 </phrase>
 <phrase>
@@ -7049,7 +7049,7 @@
     *: "Esteka Sortu"
   </dest>
   <voice>
-    *: "Create Bookmark"
+    *: "Esteka Sortu"
   </voice>
 </phrase>
 <phrase>
@@ -7063,7 +7063,7 @@
     *: "Estekak Zerrendatu"
   </dest>
   <voice>
-    *: "List Bookmarks"
+    *: "Estekak Zerrendatu"
   </voice>
 </phrase>
 <phrase>
@@ -7077,7 +7077,7 @@
     *: "Testuinguru Menua"
   </dest>
   <voice>
-    *: "Context Menu"
+    *: "Testuinguru Menua"
   </voice>
 </phrase>
 <phrase>
@@ -7091,7 +7091,7 @@
     *: "Ezarri Abesti Balorazioa"
   </dest>
   <voice>
-    *: "Set Song Rating"
+    *: "Ezarri Abesti Balorazioa"
   </voice>
 </phrase>
 <phrase>
@@ -7102,10 +7102,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Browse Cuesheet"
+    *: "Cuesheet Nabigazioa"
   </dest>
   <voice>
-    *: "Browse Cuesheet"
+    *: "Cuesheet Nabigazioa"
   </voice>
 </phrase>
 <phrase>
@@ -7119,7 +7119,7 @@
     *: "Erakutsi Informazioa"
   </dest>
   <voice>
-    *: "Show Track Info"
+    *: "Erakutsi Informazioa"
   </voice>
 </phrase>
 <phrase>
@@ -7385,7 +7385,7 @@
     *: "Berrizendatu"
   </dest>
   <voice>
-    *: "Rename"
+    *: "Berrizendatu"
   </voice>
 </phrase>
 <phrase>
@@ -7399,7 +7399,7 @@
     *: "Ebaki"
   </dest>
   <voice>
-    *: "Cut"
+    *: "Ebaki"
   </voice>
 </phrase>
 <phrase>
@@ -7413,7 +7413,7 @@
     *: "Kopiatu"
   </dest>
   <voice>
-    *: "Copy"
+    *: "Kopiatu"
   </voice>
 </phrase>
 <phrase>
@@ -7427,7 +7427,7 @@
     *: "Itsatsi"
   </dest>
   <voice>
-    *: "Paste"
+    *: "Itsatsi"
   </voice>
 </phrase>
 <phrase>
@@ -7441,7 +7441,7 @@
     *: "Fitxategi/direktoria badago. Gainidatzi?"
   </dest>
   <voice>
-    *: "File or directory exists. Overwrite?"
+    *: "Fitxategi/direktoria badago. Gainidatzi?"
   </voice>
 </phrase>
 <phrase>
@@ -7455,7 +7455,7 @@
     *: "Ezabatu"
   </dest>
   <voice>
-    *: "Delete"
+    *: "Ezabatu"
   </voice>
 </phrase>
 <phrase>
@@ -7469,7 +7469,7 @@
     *: "Ezabatu Direktoria"
   </dest>
   <voice>
-    *: "delete directory"
+    *: "ezabatu direktoria"
   </voice>
 </phrase>
 <phrase>
@@ -7483,7 +7483,7 @@
     *: "Ezabatu?"
   </dest>
   <voice>
-    *: "Really delete?"
+    *: "Ezabatu?"
   </voice>
 </phrase>
 <phrase>
@@ -7497,7 +7497,7 @@
     *: "Kopiatzen..."
   </dest>
   <voice>
-    *: "Copying"
+    *: "Kopiatzen..."
   </voice>
 </phrase>
 <phrase>
@@ -7511,7 +7511,7 @@
     *: "Ezabatzen..."
   </dest>
   <voice>
-    *: "Deleting"
+    *: "Ezabatzen..."
   </voice>
 </phrase>
 <phrase>
@@ -7525,7 +7525,7 @@
     *: "Mugitzen..."
   </dest>
   <voice>
-    *: "Moving"
+    *: "Mugitzen..."
   </voice>
 </phrase>
 <phrase>
@@ -7539,7 +7539,7 @@
     *: "Ezabatua"
   </dest>
   <voice>
-    *: "Deleted"
+    *: "Ezabatua"
   </voice>
 </phrase>
 <phrase>
@@ -7556,7 +7556,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Ezarri Hondo Gisa"
   </voice>
 </phrase>
 <phrase>
@@ -7604,7 +7604,7 @@
     *: "Ireki honekin..."
   </dest>
   <voice>
-    *: "open with"
+    *: "Ireki honekin..."
   </voice>
 </phrase>
 <phrase>
@@ -7618,7 +7618,7 @@
     *: "Sortu Direktorioa"
   </dest>
   <voice>
-    *: "Create Directory"
+    *: "Sortu Direktorioa"
   </voice>
 </phrase>
 <phrase>
@@ -7632,7 +7632,7 @@
     *: "Ezaugarriak"
   </dest>
   <voice>
-    *: "Properties"
+    *: "Ezaugarriak"
   </voice>
 </phrase>
 <phrase>
@@ -7646,7 +7646,7 @@
     *: "Gehitu Esteketara"
   </dest>
   <voice>
-    *: "Add to Shortcuts"
+    *: "Gehitu Esteketara"
   </voice>
 </phrase>
 <phrase>
@@ -7663,7 +7663,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "Tonua"
   </voice>
 </phrase>
 <phrase>
@@ -7745,7 +7745,7 @@
     *: "Zerrenda Bufferra Beterik"
   </dest>
   <voice>
-    *: "Playlist Buffer Full"
+    *: "Zerrenda Bufferra Beterik"
   </voice>
 </phrase>
 <phrase>
@@ -7761,7 +7761,7 @@
     archosplayer: "Zerrenda Amaiera"
   </dest>
   <voice>
-    *: "End of Song List"
+    *: " Zerrenda Amaiera
   </voice>
 </phrase>
 <phrase>
@@ -7789,7 +7789,7 @@
     *: "Berrekitekorik ezer"
   </dest>
   <voice>
-    *: "Nothing to resume"
+    *: "Berrekitekorik ezer"
   </voice>
 </phrase>
 <phrase>
@@ -7803,7 +7803,7 @@
     *: "Zerrenda kontrol fitxategi eguneratze akatsa"
   </dest>
   <voice>
-    *: "Error updating playlist control file"
+    *: "Zerrenda kontrol fitxategi eguneratze akatsa"
   </voice>
 </phrase>
 <phrase>
@@ -7817,7 +7817,7 @@
     *: "Fitxategi atzitze akatsa"
   </dest>
   <voice>
-    *: "Error accessing playlist file"
+    *: "Fitxategi atzitze akatsa"
   </voice>
 </phrase>
 <phrase>
@@ -7831,7 +7831,7 @@
     *: "Zerrenda kontrol fitxategi atzitze akatsa"
   </dest>
   <voice>
-    *: "Error accessing playlist control file"
+    *: "Zerrenda kontrol fitxategi atzitze akatsa"
   </voice>
 </phrase>
 <phrase>
@@ -7845,7 +7845,7 @@
     *: "Direktorio atzitze akatsa"
   </dest>
   <voice>
-    *: "Error accessing directory"
+    *: "Direktorio atzitze akatsa"
   </voice>
 </phrase>
 <phrase>
@@ -7859,7 +7859,7 @@
     *: "Zerrenda kontrol fitxategi baliogabea"
   </dest>
   <voice>
-    *: "Playlist control file is invalid"
+    *: "Zerrenda kontrol fitxategi baliogabea"
   </voice>
 </phrase>
 <phrase>
@@ -7873,7 +7873,7 @@
     *: "Pausa"
   </dest>
   <voice>
-    *: "Pause"
+    *: "Pausa"
   </voice>
 </phrase>
 <phrase>
@@ -7887,7 +7887,7 @@
     *: "Modua:"
   </dest>
   <voice>
-    *: "Mode:"
+    *: "Modua:"
   </voice>
 </phrase>
 <phrase>
@@ -7901,7 +7901,7 @@
     *: "Denbora"
   </dest>
   <voice>
-    *: "Time"
+    *: "Denbora"
   </voice>
 </phrase>
 /* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
@@ -7920,7 +7920,7 @@
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "Charge During U S B Connection"
+    usb_charging_enable: "U S B a Konektatzean Kargatu"
   </voice>
 </phrase>
 <phrase>
@@ -8005,7 +8005,7 @@
   </dest>
   <voice>
     *: none
-    recording: "minus infinity"
+    recording: "inf gutxiago"
   </voice>
 </phrase>
 <phrase>
@@ -8035,11 +8035,11 @@
   </source>
   <dest>
     *: none
-    archosondio*: "Please remove inserted MMC"
+    archosondio*: "Mesedez MMC txartela kendu"
   </dest>
   <voice>
     *: none
-    archosondio*: "Please remove multimedia card"
+    archosondio*: "Mesedez multimedia txartela kendu"
   </voice>
 </phrase>
 <phrase>
@@ -8053,7 +8053,7 @@
     *: "Abioa aldaturik"
   </dest>
   <voice>
-    *: "Boot changed"
+    *: "Abioa aldaturik"
   </voice>
 </phrase>
 <phrase>
@@ -8067,7 +8067,7 @@
     *: "Berrabiarazi orain?"
   </dest>
   <voice>
-    *: "Reboot now?"
+    *: "Berrabiarazi orain?"
   </voice>
 </phrase>
 <phrase>
@@ -8107,7 +8107,7 @@
     *: "Fitxategirik ez"
   </dest>
   <voice>
-    *: "No files"
+    *: "Fitxategirik ez"
   </voice>
 </phrase>
 <phrase>
@@ -8121,7 +8121,7 @@
     *: "Teklatu Berria"
   </dest>
   <voice>
-    *: "New Keyboard"
+    *: "Teklatu Berria"
   </voice>
 </phrase>
 <phrase>
@@ -8202,10 +8202,10 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "Filetype array full"
+    *: "Fitxategi mota zerrenda betea"
   </dest>
   <voice>
-    *: "Filetype array full"
+    *: "Fitxategi mota zerrenda betea"
   </voice>
 </phrase>
 <phrase>
@@ -8216,10 +8216,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Dir Buffer is Full!"
+    *: "Karpeta Buferra Betea!"
   </dest>
   <voice>
-    *: "Directory Buffer is Full!"
+    *: "Karpeta Buferra Betea!"
   </voice>
 </phrase>
 <phrase>
@@ -8233,7 +8233,7 @@
     *: "Izen Baliogabea!!"
   </dest>
   <voice>
-    *: "Invalid Filename"
+    *: "Izen Baliogabea"
   </voice>
 </phrase>
 <phrase>
@@ -8247,7 +8247,7 @@
     *: "Berrabiarazi gaitzeko"
   </dest>
   <voice>
-    *: "Please reboot to enable"
+    *: "Berrabiarazi gaitzeko"
   </voice>
 </phrase>
 <phrase>
@@ -8264,7 +8264,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Battery: Charging"
+    charging: "Bateria: Kargatzen"
   </voice>
 </phrase>
 <phrase>
@@ -8277,11 +8277,11 @@
   </source>
   <dest>
     *: none
-    archosrecorder: "Bateria: Top-Off Chg"
+    archosrecorder: "Bateria: Karga Egina"
   </dest>
   <voice>
     *: none
-    archosrecorder: "Top off charge"
+    archosrecorder: "Karga Egina"
   </voice>
 </phrase>
 <phrase>
@@ -8294,11 +8294,11 @@
   </source>
   <dest>
     *: none
-    charging: "Bateria: Trickle Chg"
+    charging: "Bateria: Mantentze Karga"
   </dest>
   <voice>
     *: none
-    charging: "Trickle charge"
+    charging: "Mantentze Karga"
   </voice>
 </phrase>
 <phrase>
@@ -8312,7 +8312,7 @@
     *: "KONTUZ! Bateria Baxua!"
   </dest>
   <voice>
-    *: "WARNING! Low Battery!"
+    *: "KONTUZ! Bateria Baxua!"
   </voice>
 </phrase>
 <phrase>
@@ -8326,7 +8326,7 @@
     *: "Bateria hutsa! KARGATU!"
   </dest>
   <voice>
-    *: "Battery empty! RECHARGE!"
+    *: "Bateria hutsa! KARGATU!"
   </voice>
 </phrase>
 <phrase>
@@ -8396,7 +8396,7 @@
     *: "."
   </dest>
   <voice>
-    *: "point"
+    *: "puntu"
   </voice>
 </phrase>
 <phrase>
@@ -8802,7 +8802,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hundred"
+    *: "ehun"
   </voice>
 </phrase>
 <phrase>
@@ -8816,7 +8816,7 @@
     *: ""
   </dest>
   <voice>
-    *: "thousand"
+    *: "mila"
   </voice>
 </phrase>
 <phrase>
@@ -8830,7 +8830,7 @@
     *: ""
   </dest>
   <voice>
-    *: "million"
+    *: "milioi"
   </voice>
 </phrase>
 <phrase>
@@ -8844,7 +8844,7 @@
     *: ""
   </dest>
   <voice>
-    *: "billion"
+    *: "bilioi"
   </voice>
 </phrase>
 <phrase>
@@ -8872,7 +8872,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "gehi"
   </voice>
 </phrase>
 <phrase>
@@ -8886,7 +8886,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milliseconds"
+    *: "milisegunduak"
   </voice>
 </phrase>
 <phrase>
@@ -8900,7 +8900,7 @@
     *: ""
   </dest>
   <voice>
-    *: "second"
+    *: "segundu"
   </voice>
 </phrase>
 <phrase>
@@ -8914,7 +8914,7 @@
     *: ""
   </dest>
   <voice>
-    *: "seconds"
+    *: "segunduak"
   </voice>
 </phrase>
 <phrase>
@@ -8928,7 +8928,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "minutu"
   </voice>
 </phrase>
 <phrase>
@@ -8942,7 +8942,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "minutuak"
   </voice>
 </phrase>
 <phrase>
@@ -8956,7 +8956,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hour"
+    *: "ordu"
   </voice>
 </phrase>
 <phrase>
@@ -8970,7 +8970,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hours"
+    *: "orduak"
   </voice>
 </phrase>
 <phrase>
@@ -8984,7 +8984,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "kilohertzio"
   </voice>
 </phrase>
 <phrase>
@@ -8998,7 +8998,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "dezibelio"
   </voice>
 </phrase>
 <phrase>
@@ -9012,7 +9012,7 @@
     *: ""
   </dest>
   <voice>
-    *: "percent"
+    *: "ehuneko"
   </voice>
 </phrase>
 <phrase>
@@ -9026,7 +9026,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-amp hours"
+    *: "milli-amp orduan"
   </voice>
 </phrase>
 <phrase>
@@ -9054,7 +9054,7 @@
     *: ""
   </dest>
   <voice>
-    *: "per second"
+    *: "segunduko"
   </voice>
 </phrase>
 <phrase>
@@ -9068,7 +9068,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "hertzio"
   </voice>
 </phrase>
 <phrase>
@@ -9082,7 +9082,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilobits per second"
+    *: "kilobit segunduko"
   </voice>
 </phrase>
 <phrase>
@@ -9460,7 +9460,7 @@
     *: ""
   </dest>
   <voice>
-    *: "dot"
+    *: "puntu"
   </voice>
 </phrase>
 <phrase>
@@ -9488,7 +9488,7 @@
     *: ""
   </dest>
   <voice>
-    *: "file"
+    *: "fitxategia"
   </voice>
 </phrase>
 <phrase>
@@ -9502,7 +9502,7 @@
     *: ""
   </dest>
   <voice>
-    *: "folder"
+    *: "karpeta"
   </voice>
 </phrase>
 <phrase>
@@ -9516,7 +9516,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "audioa"
   </voice>
 </phrase>
 <phrase>
@@ -9530,7 +9530,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuration"
+    *: "konfigurazioa"
   </voice>
 </phrase>
 <phrase>
@@ -9544,7 +9544,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "erreproduzio-bitartean-pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -9558,7 +9558,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plugin"
+    *: "plugina"
   </voice>
 </phrase>
 <phrase>
@@ -9572,7 +9572,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "fuentea"
   </voice>
 </phrase>
 <phrase>
@@ -9586,7 +9586,7 @@
     *: ""
   </dest>
   <voice>
-    *: "bookmark"
+    *: "lastermarka"
   </voice>
 </phrase>
 <phrase>
@@ -9600,7 +9600,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "firmwarea"
   </voice>
 </phrase>
 <phrase>
@@ -9617,7 +9617,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote while-playing-screen"
+    remote: "urruneko erreproduzian-bitarteko-pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -9631,7 +9631,7 @@
     *: ""
   </dest>
   <voice>
-    *: "keyboard"
+    *: "teklatua"
   </voice>
 </phrase>
 <phrase>
@@ -9659,7 +9659,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "Indizea"
   </voice>
 </phrase>
 <phrase>
@@ -9676,7 +9676,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Current time:"
+    rtc: "Uneko denbora:"
   </voice>
 </phrase>
 <phrase>
@@ -9710,7 +9710,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: " Mozketa Frekuentzia"
   </voice>
 </phrase>
 <phrase>
@@ -9727,7 +9727,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Gain"
+    swcodec: "Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -9774,7 +9774,7 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Option"
+    recorder_pad: "Aukera"
   </dest>
   <voice>
     *: none
@@ -9846,7 +9846,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "Kalitatea"
   </voice>
 </phrase>
 <phrase>
@@ -9863,7 +9863,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Frequency"
+    recording: "Frekuentzia"
   </voice>
 </phrase>
 <phrase>
@@ -9880,7 +9880,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "Iturburua"
   </voice>
 </phrase>
 <phrase>
@@ -9897,7 +9897,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Internal Microphone"
+    recording: "Barne Mikrofonoa"
   </voice>
 </phrase>
 <phrase>
@@ -9914,7 +9914,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Line In"
+    recording: "Sarrera"
   </voice>
 </phrase>
 <phrase>
@@ -9931,7 +9931,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "Digitala"
   </voice>
 </phrase>
 <phrase>
@@ -9948,7 +9948,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Channels"
+    recording: "Kanalak"
   </voice>
 </phrase>
 <phrase>
@@ -9965,7 +9965,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Abiarazlea"
   </voice>
 </phrase>
 <phrase>
@@ -9979,7 +9979,7 @@
     *: ""
   </dest>
   <voice>
-    *: "of"
+    *: "tik"
   </voice>
 </phrase>
 <phrase>
@@ -9993,7 +9993,7 @@
     *: "Jokuak"
   </dest>
   <voice>
-    *: "Games"
+    *: "Jokuak"
   </voice>
 </phrase>
 <phrase>
@@ -10007,7 +10007,7 @@
     *: "Aplikazioak"
   </dest>
   <voice>
-    *: "Applications"
+    *: "Aplikazioak"
   </voice>
 </phrase>
 <phrase>
@@ -10018,10 +10018,10 @@
     *: "Demos"
   </source>
   <dest>
-    *: "Demos"
+    *: "Demoak"
   </dest>
   <voice>
-    *: "Demos"
+    *: "Demoak"
   </voice>
 </phrase>
 <phrase>
@@ -10049,7 +10049,7 @@
     *: "Erakutsi Luzapenak"
   </dest>
   <voice>
-    *: "Show Filename Extensions"
+    *: "Erakutsi Luzapenak"
   </voice>
 </phrase>
 <phrase>
@@ -10063,7 +10063,7 @@
     *: "Soilik Ezezagunetan"
   </dest>
   <voice>
-    *: "Only Unknown Types"
+    *: "Soilik Ezezagunetan"
   </voice>
 </phrase>
 <phrase>
@@ -10077,7 +10077,7 @@
     *: "Soilik Mota Guztiak Ikustean"
   </dest>
   <voice>
-    *: "Only When Viewing All Types"
+    *: "Soilik Mota Guztiak Ikustean"
   </voice>
 </phrase>
 <phrase>
@@ -10091,7 +10091,7 @@
     *: ""
   </dest>
   <voice>
-    *: "units per tick"
+    *: "unitateak tickeko"
   </voice>
 </phrase>
 <phrase>
@@ -10108,7 +10108,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "o'clock"
+    rtc: "puntuan"
   </voice>
 </phrase>
 <phrase>
@@ -10176,7 +10176,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clip Counter"
+    recording: "Klip Kontatzailea"
   </voice>
 </phrase>
 <phrase>
@@ -10193,7 +10193,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Primary Colour"
+    lcd_color: "Lehen Kolorea"
   </voice>
 </phrase>
 <phrase>
@@ -10210,7 +10210,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Secondary Colour"
+    lcd_color: "Bigarren Kolorea"
   </voice>
 </phrase>
 <phrase>
@@ -10227,7 +10227,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Text Colour"
+    lcd_color: "Testu Kolorea"
   </voice>
 </phrase>
 <phrase>
@@ -10244,7 +10244,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Solid Colour)"
+    lcd_color: "Bar (Kolore Solidoa)"
   </voice>
 </phrase>
 <phrase>
@@ -10261,7 +10261,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Gradient Colour)"
+    lcd_color: "Bar (Kolore Gradientea)"
   </voice>
 </phrase>
 <phrase>
@@ -10275,7 +10275,7 @@
     *: "Europa Erdialdekoa (CP1250)"
   </dest>
   <voice>
-    *: "Central European"
+    *: "Europa Erdialdekoa"
   </voice>
 </phrase>
 <phrase>
@@ -10289,7 +10289,7 @@
     *: "Gai Aukerak"
   </dest>
   <voice>
-    *: "Theme Settings"
+    *: "Gai Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -10306,7 +10306,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Colours"
+    lcd_color: "Koloreak"
   </voice>
 </phrase>
 <phrase>
@@ -10323,7 +10323,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Line Selector Colours"
+    lcd_color: "Aukera Lerroaren Koloreak"
   </voice>
 </phrase>
 <phrase>
@@ -10337,7 +10337,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Edit"
+    *: "Editatu"
   </voice>
 </phrase>
 <phrase>
@@ -10351,7 +10351,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Blank"
+    *: "Hutsa"
   </voice>
 </phrase>
 <phrase>
@@ -10365,7 +10365,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Empty list"
+    *: "Zerrenda hutsa"
   </voice>
 </phrase>
 <phrase>
@@ -10378,11 +10378,11 @@
   </source>
   <dest>
     *: none
-    multivolume: "Not present"
+    multivolume: "Ez dago"
   </dest>
   <voice>
     *: none
-    multivolume: "Not present"
+    multivolume: "Ez dago"
   </voice>
 </phrase>
 <phrase>
@@ -10393,10 +10393,10 @@
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "Announce Battery Level"
+    *: "Bateriaren Maila Jakinarazi"
   </dest>
   <voice>
-    *: "Announce Battery Level"
+    *: "Bateriaren Maila Jakinarazi"
   </voice>
 </phrase>
 <phrase>
@@ -10410,7 +10410,7 @@
     *: "Esan Fitxtegi Moeta"
   </dest>
   <voice>
-    *: "Say File Type"
+    *: "Esan Fitxtegi Moeta"
   </voice>
 </phrase>
 <phrase>
@@ -10427,7 +10427,7 @@
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Baxuen Mozketa"
   </voice>
 </phrase>
 <phrase>
@@ -10444,7 +10444,7 @@
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Altuen Mozketa"
   </voice>
 </phrase>
 <phrase>
@@ -10458,7 +10458,7 @@
     *: "<Ausazkoa>"
   </dest>
   <voice>
-    *: "Random"
+    *: "<Ausazkoa>"
   </voice>
 </phrase>
 <phrase>
@@ -10472,7 +10472,7 @@
     *: "Gorde Soinu Aukerak"
   </dest>
   <voice>
-    *: "Save Sound Settings"
+    *: "Gorde Soinu Aukerak"
   </voice>
 </phrase>
 <phrase>
@@ -10489,7 +10489,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Keyclick"
+    swcodec: "Keyclicka"
   </voice>
 </phrase>
 <phrase>
@@ -10502,11 +10502,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Klicken Errepikapea"
+    swcodec: "Klicken Errepikapena"
   </dest>
   <voice>
     *: none
-    swcodec: "Keyclick Repeats"
+    swcodec: "Klicken Errepikapena"
   </voice>
 </phrase>
 <phrase>
@@ -10519,11 +10519,11 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Accessory Power Supply"
+    accessory_supply: "Osagarriaren Alimentazioa"
   </dest>
   <voice>
     *: none
-    accessory_supply: "Accessory Power Supply"
+    accessory_supply: "Osagarriaren Alimentazioa"
   </voice>
 </phrase>
 <phrase>
@@ -10537,7 +10537,7 @@
     *: "Ezezaguna"
   </dest>
   <voice>
-    *: "Unknown"
+    *: "Ezezaguna"
   </voice>
 </phrase>
 <phrase>
@@ -10551,7 +10551,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Quick screen"
+    *: "Pantaila azkarra"
   </voice>
 </phrase>
 <phrase>
@@ -10565,7 +10565,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "Ados"
   </voice>
 </phrase>
 <phrase>
@@ -10582,7 +10582,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Gelditu Grabatzez Eta Itzali"
   </voice>
 </phrase>
 <phrase>
@@ -10599,7 +10599,7 @@
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx: "Taktilaren Sentikortasuna"
   </voice>
 </phrase>
 <phrase>
@@ -10612,11 +10612,11 @@
   </source>
   <dest>
     *: none
-    gigabeatfx: "High"
+    gigabeatfx: "Altua"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "High"
+    gigabeatfx: "Altua"
   </voice>
 </phrase>
 <phrase>
@@ -10633,7 +10633,7 @@
   </dest>
   <voice>
     *: none
-    serial_port: "Serial Bitrate"
+    serial_port: "Serieko Bitratea"
   </voice>
 </phrase>
 <phrase>
@@ -10650,7 +10650,7 @@
   </dest>
   <voice>
     *: none
-    serial_port: "Automatic"
+    serial_port: "Automatikoa"
   </voice>
 </phrase>
 <phrase>
@@ -10732,7 +10732,7 @@
     *: "Oso motel"
   </dest>
   <voice>
-    *: "Very slow"
+    *: "Oso motel"
   </voice>
 </phrase>
 <phrase>
@@ -10746,7 +10746,7 @@
     *: "Motel"
   </dest>
   <voice>
-    *: "Slow"
+    *: "Motel"
   </voice>
 </phrase>
 <phrase>
@@ -10760,7 +10760,7 @@
     *: "Oso azkar"
   </dest>
   <voice>
-    *: "Very fast"
+    *: "Oso azkar"
   </voice>
 </phrase>
 <phrase>
@@ -10774,7 +10774,7 @@
     *: "Azkar"
   </dest>
   <voice>
-    *: "Fast"
+    *: "Azkar"
   </voice>
 </phrase>
 <phrase>
@@ -10788,7 +10788,7 @@
     *: "Salto Luzera"
   </dest>
   <voice>
-    *: "Skip Length"
+    *: "Salto Luzera"
   </voice>
 </phrase>
 <phrase>
@@ -10802,7 +10802,7 @@
     *: "Saltatu Abestia"
   </dest>
   <voice>
-    *: "Skip Track"
+    *: "Saltatu Abestia"
   </voice>
 </phrase>
 <phrase>
@@ -10816,7 +10816,7 @@
     *: ""
   </dest>
   <voice>
-    *: "slash"
+    *: "barra"
   </voice>
 </phrase>
 <phrase>
@@ -10829,11 +10829,11 @@
   </source>
   <dest>
     *: none
-    recording: "Irabazia EZK"
+    recording: "EZK Irabazia"
   </dest>
   <voice>
     *: none
-    recording: "Gain Left"
+    recording: "Ezker Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -10846,11 +10846,11 @@
   </source>
   <dest>
     *: none
-    recording: "Irabazia ESK"
+    recording: "ESK Irabazia"
   </dest>
   <voice>
     *: none
-    recording: "Gain Right"
+    recording: "Eskuin Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -10863,11 +10863,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: "IKA"
   </dest>
   <voice>
     *: none
-    agc: "Automatic gain control"
+    agc: "I K A Irabazi kontrol automatikoa"
   </voice>
 </phrase>
 <phrase>
@@ -10880,11 +10880,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC clip time"
+    agc: "IKA klip denbora"
   </dest>
   <voice>
     *: none
-    agc: "AGC clip time"
+    agc: "IKA klip denbora"
   </voice>
 </phrase>
 <phrase>
@@ -10897,11 +10897,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC max. gain"
+    agc: "IKA irabazi max."
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum gain"
+    agc: "IKA irabazi maximoa"
   </voice>
 </phrase>
 <phrase>
@@ -10986,7 +10986,7 @@
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono mode"
+    recording_swcodec: "Mono modua"
   </voice>
 </phrase>
 <phrase>
@@ -11000,7 +11000,7 @@
     *: "Bilaketa Emaitzak"
   </dest>
   <voice>
-    *: "Search Results"
+    *: "Bilaketa Emaitzak"
   </voice>
 </phrase>
 <phrase>
@@ -11014,7 +11014,7 @@
     *: "Ezkerra"
   </dest>
   <voice>
-    *: "Left"
+    *: "Ezkerra"
   </voice>
 </phrase>
 <phrase>
@@ -11028,7 +11028,7 @@
     *: "Eskubia"
   </dest>
   <voice>
-    *: "Right"
+    *: "Eskubia"
   </voice>
 </phrase>
 <phrase>
@@ -11042,7 +11042,7 @@
     *: "Aukerak Berrezarri"
   </dest>
   <voice>
-    *: "Reset Setting"
+    *: "Aukerak Berrezarri"
   </voice>
 </phrase>
 <phrase>
@@ -11055,11 +11055,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Left Quickscreen Item"
+    quickscreen: "Pantaila-azkarrean Ezkerrean Ezarri"
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Left Quickscreen Item"
+    quickscreen: "Pantaila-azkarrean Ezkerrean Ezarri"
   </voice>
 </phrase>
 <phrase>
@@ -11072,11 +11072,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Right Quickscreen Item"
+    quickscreen: "Pantaila-azkarrean Eskuinean Ezarri"
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Right Quickscreen Item"
+    quickscreen: "Pantaila-azkarrean Eskuinean Ezarri"
   </voice>
 </phrase>
 <phrase>
@@ -11089,11 +11089,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Bottom Quickscreen Item"
+    quickscreen: "Pantaila-azkarrean Behean Ezarri"
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Bottom Quickscreen Item"
+    quickscreen: "Pantaila-azkarrean Behean Ezarri"
   </voice>
 </phrase>
 <phrase>
@@ -11107,7 +11107,7 @@
     *: "Kredituak"
   </dest>
   <voice>
-    *: "Credits"
+    *: "Kredituak"
   </voice>
 </phrase>
 <phrase>
@@ -11121,7 +11121,7 @@
     *: "Zenbakiak kontuan hartu"
   </dest>
   <voice>
-    *: "Interpret numbers when sorting"
+    *: "Zenbakiak kontuan hartu"
   </voice>
 </phrase>
 <phrase>
@@ -11135,7 +11135,7 @@
     *: "Digitu gisa"
   </dest>
   <voice>
-    *: "As digits"
+    *: "Digitu gisa"
   </voice>
 </phrase>
 <phrase>
@@ -11149,7 +11149,7 @@
     *: "Zenbaki oso gisa"
   </dest>
   <voice>
-    *: "As whole numbers"
+    *: "Zenbaki oso gisa"
   </voice>
 </phrase>
 <phrase>
@@ -11166,7 +11166,7 @@
   </dest>
   <voice>
     *: none
-    speaker: "Enable Speaker"
+    speaker: "Gaitu Bozgorailua"
   </voice>
 </phrase>
 <phrase>
@@ -11183,7 +11183,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen Mode"
+    touchscreen: "Taktil Modua"
   </voice>
 </phrase>
 <phrase>
@@ -11200,7 +11200,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "3 by 3 grid"
+    touchscreen: "3x3 Sareta"
   </voice>
 </phrase>
 <phrase>
@@ -11217,7 +11217,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Absolute Point"
+    touchscreen: "Puntu Absolutua"
   </voice>
 </phrase>
 <phrase>
@@ -11231,7 +11231,7 @@
     *: "Saihestu Abesti Saltoak"
   </dest>
   <voice>
-    *: "Prevent Track Skipping"
+    *: "Saihestu Abesti Saltoak"
   </voice>
 </phrase>
 <phrase>
@@ -11248,7 +11248,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Timestretch"
+    swcodec: "Denbora-luzatzea"
   </voice>
 </phrase>
 <phrase>
@@ -11265,7 +11265,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Speed"
+    swcodec: "Abiadura"
   </voice>
 </phrase>
 <phrase>
@@ -11282,7 +11282,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen Settings"
+    touchscreen: "Aukera Taktilak"
   </voice>
 </phrase>
 <phrase>
@@ -11299,7 +11299,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Calibrate"
+    touchscreen: "Kalibratu"
   </voice>
 </phrase>
 <phrase>
@@ -11316,7 +11316,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Reset Calibration"
+    touchscreen: "Kalibrazioa Berrezarri"
   </voice>
 </phrase>
 <phrase>
@@ -11330,7 +11330,7 @@
     *: "Goian"
   </dest>
   <voice>
-    *: "Top"
+    *: "Goian"
   </voice>
 </phrase>
 <phrase>
@@ -11344,7 +11344,7 @@
     *: "Behean"
   </dest>
   <voice>
-    *: "Bottom"
+    *: "Behean"
   </voice>
 </phrase>
 <phrase>
@@ -11361,7 +11361,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Statusbar"
+    remote: "Urruneko Korritze Barra"
   </voice>
 </phrase>
 <phrase>
@@ -11374,11 +11374,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitonua"
+    pitchscreen: "Tonuerdia"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Semitone"
+    pitchscreen: "Tonuerdia"
   </voice>
 </phrase>
 <phrase>
@@ -11395,7 +11395,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "Muga"
   </voice>
 </phrase>
 <phrase>
@@ -11412,7 +11412,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Rate"
+    pitchscreen: "Tasa"
   </voice>
 </phrase>
 <phrase>
@@ -11425,11 +11425,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB Keypad Mode"
+    usb_hid: "USB Teklatu Modua"
   </dest>
   <voice>
     *: none
-    usb_hid: "USB Keypad Mode"
+    usb_hid: "USB Teklatu Modua"
   </voice>
 </phrase>
 <phrase>
@@ -11463,7 +11463,7 @@
   </dest>
   <voice>
     *: none
-    usb_hid: "Presentation"
+    usb_hid: "Aurkezpena"
   </voice>
 </phrase>
 <phrase>
@@ -11480,7 +11480,7 @@
   </dest>
   <voice>
     *: none
-    usb_hid: "Browser"
+    usb_hid: "Arakatzailea"
   </voice>
 </phrase>
 <phrase>
@@ -11497,7 +11497,7 @@
   </dest>
   <voice>
     *: none
-    usb_hid: "Mouse"
+    usb_hid: "Xagua"
   </voice>
 </phrase>
 <phrase>
@@ -11511,7 +11511,7 @@
     *: "Azalaren RAM erabilera:"
   </dest>
   <voice>
-    *: "Skin RAM usage"
+    *: "Azalaren RAM erabilera:"
   </voice>
 </phrase>
 <phrase>
@@ -11528,7 +11528,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll bar width"
+    lcd_bitmap: "Korritze Barraren Zabalera"
   </voice>
 </phrase>
 <phrase>
@@ -11545,7 +11545,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll bar position"
+        lcd_bitmap: "Korritze Barraren Posizioa"
   </voice>
 </phrase>
 <phrase>
@@ -11562,7 +11562,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Compressor"
+    swcodec: "Konpresorea"
   </voice>
 </phrase>
 <phrase>
@@ -11575,11 +11575,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Top Quickscreen Item"
+    quickscreen: "Pantaila-azkarrean Goian Ezarri"
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Top Quickscreen Item"
+    quickscreen: "Pantaila-azkarrean Goian Ezarri"
   </voice>
 </phrase>
 <phrase>
@@ -11596,7 +11596,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Italy"
+    radio: "Italia"
   </voice>
 </phrase>
 <phrase>
@@ -11613,7 +11613,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Other"
+    radio: "Beste bat"
   </voice>
 </phrase>
 <phrase>
@@ -11630,7 +11630,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Threshold"
+    swcodec: "Atalasea"
   </voice>
 </phrase>
 <phrase>
@@ -11647,7 +11647,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Ratio"
+    swcodec: "Ratioa"
   </voice>
 </phrase>
 <phrase>
@@ -11664,7 +11664,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "2 to 1"
+    swcodec: "2 1"
   </voice>
 </phrase>
 <phrase>
@@ -11681,7 +11681,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "4 to 1"
+    swcodec: "4 1"
   </voice>
 </phrase>
 <phrase>
@@ -11698,7 +11698,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "6 to 1"
+    swcodec: "6 1"
   </voice>
 </phrase>
 <phrase>
@@ -11715,7 +11715,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "10 to 1"
+    swcodec: "10 1"
   </voice>
 </phrase>
 <phrase>
@@ -11732,7 +11732,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Limit"
+    swcodec: "Muga"
   </voice>
 </phrase>
 <phrase>
@@ -11745,11 +11745,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Makeup Gain"
+    swcodec: "Konpentsazio Irabazia"
   </dest>
   <voice>
     *: none
-    swcodec: "Makeup Gain"
+    swcodec: "Konpentsazio Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -11779,11 +11779,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Knee"
+    swcodec: "Ertza"
   </dest>
   <voice>
     *: none
-    swcodec: "Knee"
+    swcodec: "Ertza"
   </voice>
 </phrase>
 <phrase>
@@ -11796,11 +11796,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Hard Knee"
+    swcodec: "Ertz Gogorra"
   </dest>
   <voice>
     *: none
-    swcodec: "Hard Knee"
+    swcodec: "Ertz Gogorra"
   </voice>
 </phrase>
 <phrase>
@@ -11813,11 +11813,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Soft Knee"
+    swcodec: "Ertz Leuna"
   </dest>
   <voice>
     *: none
-    swcodec: "Soft Knee"
+        swcodec: "Ertz Leuna"
   </voice>
 </phrase>
 <phrase>
@@ -11834,7 +11834,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Release Time"
+    swcodec: "Bertsio Data"
   </voice>
 </phrase>
 <phrase>
@@ -11845,10 +11845,10 @@
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Skip to Outro"
+    *: "Amaierara Saltatu"
   </dest>
   <voice>
-    *: "Skip to Outro"
+    *: "Amaierara Saltatu"
   </voice>
 </phrase>
 <phrase>
@@ -11862,7 +11862,7 @@
     *: "Pertsonalizatua"
   </dest>
   <voice>
-    *: "Custom"
+    *: "Pertsonalizatua"
   </voice>
 </phrase>
 <phrase>
@@ -11876,7 +11876,7 @@
     *: ""
   </dest>
   <voice>
-    *: "statusbar skin"
+    *: "egoera barra azala"
   </voice>
 </phrase>
 <phrase>
@@ -11893,7 +11893,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote statusbar skin"
+    remote: "urruneko egoerabarra azala"
   </voice>
 </phrase>
 <phrase>
@@ -11910,7 +11910,7 @@
   </dest>
   <voice>
     *: none
-    usb_hid: "USB Human Interface Device"
+    usb_hid: "USB Giza Interfaze Unitatea"
   </voice>
 </phrase>
 <phrase>
@@ -11924,7 +11924,7 @@
     *: "Txertatu Nahasita Amaieran"
   </dest>
   <voice>
-    *: "Insert Last Shuffled"
+    *: "Txertatu Nahasita Amaieran"
   </voice>
 </phrase>
 <phrase>
@@ -11938,7 +11938,7 @@
     *: "Zerrendatu Nahasita Amaieran"
   </dest>
   <voice>
-    *: "Queue Last Shuffled"
+    *: "Zerrendatu Nahasita Amaieran"
   </voice>
 </phrase>
 <phrase>
@@ -11955,7 +11955,7 @@
   </dest>
   <voice>
     *: none
-    morse_input: "Use Morse Code Input"
+    morse_input: "Erabili Morse Kodea"
   </voice>
 </phrase>
 <phrase>
@@ -11972,7 +11972,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Automatic Track Change Only"
+    crossfade: "Abesti Aldatze Automatikoan Soilik"
   </voice>
 </phrase>
 <phrase>
@@ -11986,7 +11986,7 @@
     *: "Hurrengo Abestia:"
   </dest>
   <voice>
-    *: "Next Track:"
+    *: "Hurrengo Abestia:"
   </voice>
 </phrase>
 <phrase>
@@ -12000,7 +12000,7 @@
     *: "Hurrengo:"
   </dest>
   <voice>
-    *: "Next:"
+    *: "Hurrengo:"
   </voice>
 </phrase>
 <phrase>
@@ -12014,7 +12014,7 @@
     *: "-"
   </dest>
   <voice>
-    *: "of"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12031,7 +12031,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Base Skin"
+    lcd_bitmap: "Azala"
   </voice>
 </phrase>
 <phrase>
@@ -12048,7 +12048,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Remote Base Skin"
+    lcd_bitmap: "Urruneko Azala"
   </voice>
 </phrase>
 <phrase>
@@ -12065,7 +12065,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Main Screen"
+    remote: "Pantaila Nagusia"
   </voice>
 </phrase>
 <phrase>
@@ -12082,7 +12082,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Screen"
+    remote: "Urruneko Pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -12099,7 +12099,7 @@
   </dest>
   <voice>
     *: none
-    histogram: "Histogram interval"
+    histogram: "Histograma tartea"
   </voice>
 </phrase>
 <phrase>
@@ -12116,7 +12116,7 @@
   </dest>
   <voice>
     *: none
-    lineout_poweroff: "Line Out"
+    lineout_poweroff: "Irteera Linea"
   </voice>
 </phrase>
 <phrase>
@@ -12133,7 +12133,7 @@
   </dest>
   <voice>
     *: none
-    hotkey: "Hotkey"
+    hotkey: "Botoia"
   </voice>
 </phrase>
 <phrase>
@@ -12150,7 +12150,7 @@
   </dest>
   <voice>
     *: none
-    hotkey: "WPS Hotkey"
+    hotkey: "WPS Botoia"
   </voice>
 </phrase>
 <phrase>
@@ -12167,7 +12167,7 @@
   </dest>
   <voice>
     *: none
-    hotkey: "File Browser Hotkey"
+    hotkey: "Arakatzaile Botoia"
   </voice>
 </phrase>
 <phrase>
@@ -12184,7 +12184,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Rewind before resume"
+    swcodec: "Atzeratu berrekin aurretik"
   </voice>
 </phrase>
 <phrase>
@@ -12201,7 +12201,7 @@
   </dest>
   <voice>
     *: none
-    radio_remote: "Remote Radio Screen"
+    radio_remote: "Urruneko Irrati Pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -12218,7 +12218,7 @@
   </dest>
   <voice>
     *: none
-    radio: "radio screen skin"
+    radio: "irrati pantaila azala"
   </voice>
 </phrase>
 <phrase>
@@ -12235,7 +12235,7 @@
   </dest>
   <voice>
     *: none
-    radio_remote: "remote radio screen skin"
+    radio_remote: "urruneko irrati pantaila azala"
   </voice>
 </phrase>
 <phrase>
@@ -12269,7 +12269,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats: "Tonu Kontrolak"
   </voice>
 </phrase>
 <phrase>
@@ -12286,7 +12286,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats: "Tonu Kontrol Aukera Aurreratua"
   </voice>
 </phrase>
 <phrase>
@@ -12303,7 +12303,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Gain"
+    gigabeats: "Banda Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -12320,7 +12320,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Frequency"
+    gigabeats: "Band Frekuentzia"
   </voice>
 </phrase>
 <phrase>
@@ -12337,7 +12337,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Width"
+    gigabeats: "Banda Zabalera"
   </voice>
 </phrase>
 <phrase>
@@ -12354,7 +12354,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Narrow"
+    gigabeats: "Estu"
   </voice>
 </phrase>
 <phrase>
@@ -12371,7 +12371,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Wide"
+    gigabeats: "Zabalera"
   </voice>
 </phrase>
 <phrase>
@@ -12388,7 +12388,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300: "3-D Indartzea"
   </voice>
 </phrase>
 <phrase>
@@ -12399,10 +12399,10 @@
     *: "<Untagged>"
   </source>
   <dest>
-    *: "<Etiketa gabea>"
+    *: "<Etiketatu gabea>"
   </dest>
   <voice>
-    *: "Untagged"
+    *: "Etiketatu gabea"
   </voice>
 </phrase>
 <phrase>
@@ -12419,7 +12419,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Radio Screen"
+    radio: "Irrati Pantaila"
   </voice>
 </phrase>
 <phrase>
@@ -12447,7 +12447,7 @@
     *: "Behartu"
   </dest>
   <voice>
-    *: "Force"
+    *: "Behartu"
   </voice>
 </phrase>
 <phrase>
@@ -12461,7 +12461,7 @@
     *: "PictureFlow"
   </dest>
   <voice>
-    *: "open picture flow"
+    *: "ireki picture flow"
   </voice>
 </phrase>
 <phrase>
@@ -12478,7 +12478,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "Ados"
   </voice>
 </phrase>
 <phrase>
@@ -12495,7 +12495,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Del"
+    touchscreen: "Ezabatu"
   </voice>
 </phrase>
 <phrase>
@@ -12512,7 +12512,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Cancel"
+    touchscreen: "Ezetsi"
   </voice>
 </phrase>
 <phrase>
@@ -12526,7 +12526,7 @@
     *: "Eguneratu gelditzean"
   </dest>
   <voice>
-    *: "Update on Stop"
+    *: "Eguneratu gelditzean"
   </voice>
 </phrase>
 <phrase>
@@ -12540,7 +12540,7 @@
     *: "Hasi Nabigatzailea Hemen"
   </dest>
   <voice>
-    *: "Start File Browser Here"
+    *: "Hasi Nabigatzailea Hemen"
   </voice>
 </phrase>
 <phrase>
@@ -12554,7 +12554,7 @@
     *: "Hasi Nabigatzailea Erroan"
   </dest>
   <voice>
-    *: "Start File Browser at root"
+    *: "Hasi Nabigatzailea Erroan"
   </voice>
 </phrase>
 <phrase>
@@ -12571,7 +12571,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Signal strength:"
+    radio: "Seinalearen indarra:"
   </voice>
 </phrase>
 <phrase>
@@ -12585,7 +12585,7 @@
     *: "Tamaina"
   </dest>
   <voice>
-    *: "Filesize"
+    *: "Tamaina"
   </voice>
 </phrase>
 <phrase>
@@ -12627,7 +12627,7 @@
     *: "Berrekin automatikoki"
   </dest>
   <voice>
-    *: "Automatic resume"
+    *: "Berrekin automatikoki"
   </voice>
 </phrase>
 <phrase>
@@ -12641,7 +12641,7 @@
     *: "Berrekin abesti aldaketa automatikoan"
   </dest>
   <voice>
-    *: "Resume on automatic track change"
+    *: "Berrekin abesti aldaketa automatikoan"
   </voice>
 </phrase>
 <phrase>
@@ -12655,7 +12655,7 @@
     *: "Direktorio pertsonalizatuetan soilik"
   </dest>
   <voice>
-    *: "In custom directories only"
+    *: "Direktorio pertsonalizatuetan soilik"
   </voice>
 </phrase>
 <phrase>
@@ -12669,7 +12669,7 @@
     *: "Atzeratu Pausa egitean"
   </dest>
   <voice>
-    *: "Rewind on Pause"
+    *: "Atzeratu Pausa egitean"
   </voice>
 </phrase>
 <phrase>
@@ -12683,7 +12683,7 @@
     *: "Ezarri Zerrenda Katalogo Direktorio Gisa"
   </dest>
   <voice>
-    *: "Set As Playlist Catalogue Directory"
+    *: "Ezarri Zerrenda Katalogo Direktorio Gisa"
   </voice>
 </phrase>
 <phrase>
@@ -12697,7 +12697,7 @@
     *: "Berrezarri Zerrenda Katalogo Direktorioa"
   </dest>
   <voice>
-    *: "Reset Playlist Catalogue Directory"
+    *: "Berrezarri Zerrenda Katalogo Direktorioa"
   </voice>
 </phrase>
 <phrase>
@@ -12711,7 +12711,7 @@
     *: "Uneko Zerrenda"
   </dest>
   <voice>
-    *: "Current Playlist"
+    *: "Uneko Zerrenda"
   </voice>
 </phrase>
 <phrase>
@@ -12725,6 +12725,23 @@
     *: "Aldaketak Gorde?"
   </dest>
   <voice>
-    *: "Save Changes?"
+    *: "Aldaketak Gorde?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "USB Gorde Barne Unitatea"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "USB Gorde Barne Unitatea"
   </voice>
 </phrase>
