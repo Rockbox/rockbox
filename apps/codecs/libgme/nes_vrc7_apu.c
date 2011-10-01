@@ -32,7 +32,6 @@ void Vrc7_reset( struct Nes_Vrc7_Apu* this )
 void Vrc7_set_rate( struct Nes_Vrc7_Apu* this, int r )
 {
 	OPLL_set_quality( &this->opll, r < 44100 ? 0 : 1 );
-    OPLL_set_rate( &this->opll, (e_uint32)r );
 }
 
 void Vrc7_write_reg( struct Nes_Vrc7_Apu* this, int data )
