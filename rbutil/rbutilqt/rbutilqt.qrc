@@ -33,7 +33,7 @@
         <file>icons/themes_btn.png</file>
         <file>icons/user-trash-full.png</file>
         <file>icons/view-refresh.png</file>
-        <file>icons/wizard.xpm</file>
+        <file>icons/wizard.jpg</file>
         <file alias="icons/rockbox-clef.svg">../../docs/logo/rockbox-clef.svg</file>
     </qresource>
     <qresource prefix="/ini" >
