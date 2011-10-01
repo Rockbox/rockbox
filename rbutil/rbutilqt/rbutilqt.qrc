@@ -1,12 +1,13 @@
 <RCC>
-    <qresource prefix="/" >
+    <qresource prefix="/">
         <file>../../docs/CREDITS</file>
         <file>../../docs/gpl-2.0.html</file>
     </qresource>
-     <qresource>
+    <qresource>
         <file alias="builtin/VOICE_PAUSE.wav">../../tools/VOICE_PAUSE.wav</file>
+        <file alias="builtin/voice-corrections.txt">../../tools/voice-corrections.txt</file>
     </qresource>
-    <qresource prefix="/" >
+    <qresource prefix="/">
         <file>icons/audio-input-microphone.png</file>
         <file>icons/bootloader_btn.png</file>
         <file>icons/dialog-error.png</file>
@@ -36,7 +37,7 @@
         <file>icons/wizard.jpg</file>
         <file alias="icons/rockbox-clef.svg">../../docs/logo/rockbox-clef.svg</file>
     </qresource>
-    <qresource prefix="/ini" >
+    <qresource prefix="/ini">
         <file>rbutil.ini</file>
     </qresource>
 </RCC>

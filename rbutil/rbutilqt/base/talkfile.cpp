@@ -50,6 +50,7 @@ bool TalkFileCreator::createTalkFiles()
     // generate entries
     {
         TalkGenerator generator(this);
+        // no string corrections yet: do not set language for TalkGenerator.
         connect(&generator,SIGNAL(done(bool)),this,SIGNAL(done(bool)));
         connect(&generator,SIGNAL(logItem(QString,int)),this,SIGNAL(logItem(QString,int)));
         connect(&generator,SIGNAL(logProgress(int,int)),this,SIGNAL(logProgress(int,int)));

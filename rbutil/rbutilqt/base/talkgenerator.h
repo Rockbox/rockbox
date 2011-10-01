@@ -67,11 +67,13 @@ public:
 
     TalkGenerator(QObject* parent);
     Status process(QList<TalkEntry>* list,int wavtrimth = -1);
+    QString correctString(QString s);
 
 public slots:
     void abort();
     void encProgress(int value);
     void ttsProgress(int value);
+    void setLang(QString name);
 
 signals:
     void done(bool);
@@ -95,6 +97,15 @@ private:
 
     bool m_ttsWarnings;
     bool m_userAborted;
+    QString m_lang;
+
+    struct CorrectionItems
+    {
+        QString search;
+        QString replace;
+        QString modifier;
+    };
+    QList<struct CorrectionItems> m_corrections;
 };
 
 

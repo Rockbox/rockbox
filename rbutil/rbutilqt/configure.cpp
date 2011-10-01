@@ -205,6 +205,7 @@ void Config::accept()
     RbSettings::setValue(RbSettings::CacheOffline, ui.cacheOfflineMode->isChecked());
 
     // tts settings
+    RbSettings::setValue(RbSettings::UseTtsCorrections, ui.ttsCorrections->isChecked());
     int i = ui.comboTts->currentIndex();
     RbSettings::setValue(RbSettings::Tts, ui.comboTts->itemData(i).toString());
 
@@ -288,6 +289,9 @@ void Config::setUserSettings()
     ui.cacheDisable->setChecked(RbSettings::value(RbSettings::CacheDisabled).toBool());
     ui.cacheOfflineMode->setChecked(RbSettings::value(RbSettings::CacheOffline).toBool());
     updateCacheInfo(RbSettings::value(RbSettings::CachePath).toString());
+
+    // TTS tab
+    ui.ttsCorrections->setChecked(RbSettings::value(RbSettings::UseTtsCorrections).toBool());
 }
 
 

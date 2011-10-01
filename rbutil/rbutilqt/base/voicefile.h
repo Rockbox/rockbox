@@ -40,7 +40,7 @@ public:
     bool createVoiceFile();
 
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
-    void setLang(QString name){m_lang =name;}
+    void setLang(QString name) { m_lang = name; }
     void setWavtrimThreshold(int th){m_wavtrimThreshold = th;}
     
 public slots:
@@ -56,8 +56,9 @@ private slots:
     void downloadDone(bool error);
 
 private:
+
     void cleanup();
-    
+
     HttpGet *getter;
     QString filename;  //the temporary file
     QString m_mountpoint;  //mountpoint of the device

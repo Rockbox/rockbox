@@ -449,6 +449,13 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0" colspan="3">
+           <widget class="QCheckBox" name="ttsCorrections">
+            <property name="text">
+             <string>&amp;Use string corrections for TTS</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

@@ -48,6 +48,7 @@ const static struct {
 #else
     { RbSettings::Tts,                  "tts",                  "espeak" },
 #endif
+    { RbSettings::UseTtsCorrections,    "use_tts_corrections",  "true" },
     { RbSettings::LastTalkedFolder,     "last_talked_folder",   "" },
     { RbSettings::VoiceLanguage,        "voicelanguage",        "" },
     { RbSettings::TtsLanguage,          ":tts:/language",       "" },

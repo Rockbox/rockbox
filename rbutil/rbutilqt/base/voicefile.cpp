@@ -132,6 +132,7 @@ void VoiceFileCreator::downloadDone(bool error)
     QString id, voice;
     bool idfound = false;
     bool voicefound=false;
+    bool useCorrection = RbSettings::value(RbSettings::UseTtsCorrections).toBool();
     while (!in.atEnd())
     {
         QString line = in.readLine();
@@ -151,7 +152,8 @@ void VoiceFileCreator::downloadDone(bool error)
             TalkGenerator::TalkEntry entry;
             entry.toSpeak = voice;
             entry.wavfilename = m_path + "/" + id + ".wav";
-            entry.talkfilename = m_path + "/" + id + ".mp3";   //voicefont wants them with .mp3 extension
+            //voicefont wants them with .mp3 extension
+            entry.talkfilename = m_path + "/" + id + ".mp3";
             entry.voiced = false;
             entry.encoded = false;
             if(id == "VOICE_PAUSE")
@@ -178,6 +180,9 @@ void VoiceFileCreator::downloadDone(bool error)
     // generate files
     {
         TalkGenerator generator(this);
+        // set language for string correction. If not set no correction will be made.
+        if(useCorrection)
+            generator.setLang(m_lang);
         connect(&generator,SIGNAL(done(bool)),this,SIGNAL(done(bool)));
         connect(&generator,SIGNAL(logItem(QString,int)),this,SIGNAL(logItem(QString,int)));
         connect(&generator,SIGNAL(logProgress(int,int)),this,SIGNAL(logProgress(int,int)));

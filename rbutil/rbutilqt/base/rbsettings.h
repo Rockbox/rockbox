@@ -42,6 +42,7 @@ class RbSettings : public QObject
             Platform,
             Language,
             Tts,
+            UseTtsCorrections,
             LastTalkedFolder,
             VoiceLanguage,
             TtsLanguage,

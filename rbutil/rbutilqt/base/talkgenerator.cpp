@@ -25,6 +25,7 @@
 TalkGenerator::TalkGenerator(QObject* parent): QObject(parent), encFutureWatcher(this), ttsFutureWatcher(this)
 {
     m_userAborted = false;
+    m_lang = "";
 }
 
 //! \brief Creates Talkfiles.
@@ -113,6 +114,11 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
         (*list)[i].refs.tts = m_tts;
         (*list)[i].refs.wavtrim = wavtrimth;
         (*list)[i].refs.generator = this;
+        // enable voice corrections only if a language is set.
+        if(!m_lang.isEmpty()) {
+            QString s = (*list)[i].toSpeak;
+            (*list)[i].toSpeak = correctString(s);
+        }
 
         // skip duplicated wav entries
         if(!duplicates.contains(list->at(i).wavfilename))
@@ -247,7 +253,7 @@ TalkGenerator::Status TalkGenerator::encodeList(QList<TalkEntry>* list)
                                                TalkGenerators.*/
     }
 
-    connect(&encFutureWatcher, SIGNAL(progressValueChanged(int)), 
+    connect(&encFutureWatcher, SIGNAL(progressValueChanged(int)),
             this, SLOT(encProgress(int)));
     encFutureWatcher.setFuture(QtConcurrent::map(*list, &TalkGenerator::encEntryPoint));
 
@@ -302,3 +308,76 @@ void TalkGenerator::abort()
     m_userAborted = true;
 }
 
+QString TalkGenerator::correctString(QString s)
+{
+    QString corrected = s;
+    int i = 0;
+    int max = m_corrections.size();
+    while(i < max) {
+        corrected = corrected.replace(QRegExp(m_corrections.at(i).search,
+                m_corrections.at(i).modifier.contains("i")
+                    ? Qt::CaseInsensitive : Qt::CaseSensitive),
+                m_corrections.at(i).replace);
+        i++;
+    }
+
+    if(corrected != s)
+        qDebug() << "[VoiceFileCreator] corrected string" << s << "to" << corrected;
+
+    return corrected;
+}
+
+
+void TalkGenerator::setLang(QString name)
+{
+    m_lang = name;
+
+    // re-initialize corrections list
+    m_corrections.clear();
+    QFile correctionsFile(":/builtin/voice-corrections.txt");
+    correctionsFile.open(QIODevice::ReadOnly);
+
+    QString engine = RbSettings::value(RbSettings::Tts).toString();
+    TTSBase* tts = TTSBase::getTTS(this,RbSettings::value(RbSettings::Tts).toString());
+    QString vendor = tts->voiceVendor();
+    delete tts;
+
+    if(m_lang.isEmpty())
+        m_lang = "english";
+    qDebug() << "[TalkGenerator] building string corrections list for"
+             << m_lang << engine << vendor;
+    QTextStream stream(&correctionsFile);
+    while(!stream.atEnd()) {
+        QString line = stream.readLine();
+        if(line.startsWith(" ") || line.length() < 10)
+            continue;
+        // separator is first character
+        QString separator = line.at(0);
+        line.remove(0, 1);
+        QStringList items = line.split(separator);
+        // we need to have at least 6 separate entries.
+        if(items.size() < 6)
+            continue;
+
+        QRegExp re_lang(items.at(0));
+        QRegExp re_engine(items.at(1));
+        QRegExp re_vendor(items.at(2));
+        if(!re_lang.exactMatch(m_lang)) {
+            continue;
+        }
+        if(!re_vendor.exactMatch(vendor)) {
+            continue;
+        }
+        if(!re_engine.exactMatch(engine)) {
+            continue;
+        }
+        struct CorrectionItems co;
+        co.search = items.at(3);
+        co.replace = items.at(4);
+        // Qt uses backslash for back references, Perl uses dollar sign.
+        co.replace.replace(QRegExp("\\$(\\d+)"), "\\\\1");
+        co.modifier = items.at(5);
+        m_corrections.append(co);
+    }
+    correctionsFile.close();
+}
