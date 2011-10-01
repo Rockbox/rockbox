@@ -23,7 +23,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="rbutilqt.qrc">:/icons/wizard.xpm</pixmap>
+      <pixmap resource="rbutilqt.qrc">:/icons/wizard.jpg</pixmap>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
