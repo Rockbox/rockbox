@@ -286,21 +286,30 @@ void lcd_init_device()
  */
 void lcd_update()
 {
-    unsigned int x,y;
-
-    for (y=0; y<240; y++)
-        for (x=0; x<400; x++)
-            LCD_DATA = lcd_pixel_transform(lcd_framebuffer[y][x]);
+    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
-/* not implemented yet */
+
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    lcd_update();
+    int px = x, py = y;
+    int pxmax = x + width, pymax = y + height;
+
+    /* addresses setup */
+    lcd_write_reg(WINDOW_H_START,  y);
+    lcd_write_reg(WINDOW_H_END,    pymax-1);
+    lcd_write_reg(WINDOW_V_START,  x);
+    lcd_write_reg(WINDOW_V_END,    pxmax-1);
+    lcd_write_reg(GRAM_H_ADDR,     y);
+    lcd_write_reg(GRAM_V_ADDR,     x);
+
+    lcd_cmd(GRAM_WRITE);
+
+    for (py=y; py<pymax; py++)
+    {
+        for (px=x; px<pxmax; px++)
+            LCD_DATA = lcd_pixel_transform(lcd_framebuffer[py][px]);
+    }
 }
 
 /* Blit a YUV bitmap directly to the LCD */
