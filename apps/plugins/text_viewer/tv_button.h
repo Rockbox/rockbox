@@ -413,6 +413,17 @@
 #define TV_AUTOSCROLL   BUTTON_ENTER
 #define TV_BOOKMARK     BUTTON_PLAY
 
+/* Sansa Fuze+ keys */
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+#define TV_QUIT         BUTTON_POWER
+#define TV_SCROLL_UP    BUTTON_UP
+#define TV_SCROLL_DOWN  BUTTON_DOWN
+#define TV_SCREEN_LEFT  BUTTON_LEFT
+#define TV_SCREEN_RIGHT BUTTON_RIGHT
+#define TV_MENU         BUTTON_SELECT
+#define TV_AUTOSCROLL   BUTTON_BACK
+#define TV_BOOKMARK     BUTTON_PLAYPAUSE
+
 #else
 #error No keymap defined!
 #endif
