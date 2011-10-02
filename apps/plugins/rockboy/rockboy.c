@@ -318,6 +318,18 @@ static void setoptions (void)
         options.SELECT = (BUTTON_ENTER | BUTTON_REPEAT);
         options.MENU   = (BUTTON_MENU | BUTTON_REPEAT);
 
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+        options.UP     = BUTTON_UP;
+        options.DOWN   = BUTTON_DOWN;
+        options.LEFT   = BUTTON_LEFT;
+        options.RIGHT  = BUTTON_RIGHT;
+
+        options.A      = BUTTON_BACK;
+        options.B      = BUTTON_PLAYPAUSE;
+        options.START  = BUTTON_SELECT;
+        options.SELECT = (BUTTON_PLAYPAUSE | BUTTON_REPEAT);
+        options.MENU   = (BUTTON_SELECT | BUTTON_REPEAT);
+
 #else
 #error No Keymap Defined!
 #endif
