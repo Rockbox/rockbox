@@ -166,6 +166,87 @@ void button_debug_screen(void)
     }
 }
 
+struct button_area_t
+{
+    /* define a rectangle region */
+    int lx, ly;
+    int rx, ry;
+    int button;
+};
+
+static struct button_area_t button_areas[] =
+{
+    {1300, 600, 1700, 1100, BUTTON_SELECT},
+    {500, 600, 1100, 1100, BUTTON_LEFT},
+    {1900, 600, 2500, 1100, BUTTON_RIGHT},
+    {1300, 0, 1700, 400, BUTTON_DOWN},
+    {1300, 1300, 1700, 1800, BUTTON_UP},
+    {2500, 1600, 2900, 1800, BUTTON_PLAYPAUSE},
+    {300, 1600, 500, 1800, BUTTON_BACK},
+    {0, 0, 0, 0, 0},
+};
+
+static int touchpad_btns = 0;
+static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
+static const char rmi_thread_name[] = "rmi";
+static struct semaphore rmi_sema;
+
+static int find_button(int x, int y)
+{
+    struct button_area_t *area = button_areas;
+    for(; area->button != 0; area++)
+    {
+        if(area->lx <= x && x <= area->rx &&
+                area->ly <= y && y <= area->ry)
+            return area->button;
+    }
+    return 0;
+}
+
+int touchpad_read_device(void)
+{
+    return touchpad_btns;
+}
+
+void rmi_attn_cb(int bank, int pin)
+{
+    (void) bank;
+    (void) pin;
+    semaphore_release(&rmi_sema);
+}
+
+void rmi_thread(void)
+{
+    semaphore_init(&rmi_sema, 1, 0);
+    while(1)
+    {
+        imx233_setup_pin_irq(0, 27, true, true, false, &rmi_attn_cb);
+        semaphore_wait(&rmi_sema, TIMEOUT_BLOCK);
+        /* clear interrupt */
+        rmi_read_single(RMI_INTERRUPT_REQUEST);
+        /* read data */
+        union
+        {
+            unsigned char data[10];
+            struct
+            {
+                struct rmi_2d_absolute_data_t absolute;
+                struct rmi_2d_relative_data_t relative;
+                struct rmi_2d_gesture_data_t gesture;
+            }s;
+        }u;
+        rmi_read(RMI_DATA_REGISTER(0), 10, u.data);
+        int absolute_x = u.s.absolute.x_msb << 8 | u.s.absolute.x_lsb;
+        int absolute_y = u.s.absolute.y_msb << 8 | u.s.absolute.y_lsb;
+        int nr_fingers = u.s.absolute.misc & 7;
+
+        if(nr_fingers == 0)
+            touchpad_btns = 0;
+        else
+            touchpad_btns = find_button(absolute_x, absolute_y);
+    }
+}
+
 void button_init_device(void)
 {
     /* Synaptics TouchPad information:
@@ -192,7 +273,7 @@ void button_init_device(void)
      * The B0P26 line seems to be related to the touchpad
      */
      
-    /* for touchpad ? */
+    /* touchpad CE ? */
     imx233_set_pin_function(0, 26, PINCTRL_FUNCTION_GPIO);
     imx233_enable_gpio_output(0, 26, false);
     imx233_set_pin_drive_strength(0, 26, PINCTRL_DRIVE_8mA);
@@ -204,12 +285,21 @@ void button_init_device(void)
         RMI_2D_GESTURE_PRESS_TIME_300MS |
         RMI_2D_GESTURE_FLICK_DIST_4MM << RMI_2D_GESTURE_FLICK_DIST_BP |
         RMI_2D_GESTURE_FLICK_TIME_700MS << RMI_2D_GESTURE_FLICK_TIME_BP);
+
+    create_thread(rmi_thread, rmi_stack, sizeof(rmi_stack), 0,
+            rmi_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
 }
 
 #else
 
 void button_init_device(void)
 {
+    
+}
+
+int touchpad_read_device(void)
+{
+    return 0;
 }
 
 #endif
@@ -230,5 +320,5 @@ int button_read_device(void)
         case 3: res |= BUTTON_VOL_UP; break;
         default: break;
     }
-    return res;
+    return res | touchpad_read_device();
 }
