@@ -134,6 +134,12 @@
 #   define LAMP_UP         BUTTON_UP
 #   define LAMP_DOWN       BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_UP         BUTTON_UP
+#   define LAMP_DOWN       BUTTON_DOWN
+
 #else
 #   error Missing key definitions for this keypad
 #endif
