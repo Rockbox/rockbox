@@ -12,10 +12,6 @@
   <property name="windowTitle" >
    <string>About Rockbox Utility</string>
   </property>
-  <property name="windowIcon" >
-   <iconset resource="rbutilqt.qrc" >
-    <normaloff>:/icons/rockbox-1.png</normaloff>:/icons/rockbox-1.png</iconset>
-  </property>
   <layout class="QGridLayout" name="gridLayout" >
    <item row="0" column="0" colspan="3" >
     <layout class="QHBoxLayout" >

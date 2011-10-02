@@ -27,8 +27,12 @@
         <file>icons/rbutil.png</file>
         <file>icons/rembootloader_btn.png</file>
         <file>icons/remrb_btn.png</file>
-        <file>icons/rockbox-1.png</file>
-        <file>icons/rockbox-5.png</file>
+        <file>icons/rockbox-16.png</file>
+        <file>icons/rockbox-32.png</file>
+        <file>icons/rockbox-48.png</file>
+        <file>icons/rockbox-64.png</file>
+        <file>icons/rockbox-128.png</file>
+        <file>icons/rockbox-256.png</file>
         <file>icons/system-search.png</file>
         <file>icons/talkfile_btn.png</file>
         <file>icons/themes_btn.png</file>

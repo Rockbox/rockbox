@@ -77,8 +77,12 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 #endif
 #if defined(Q_OS_WIN32)
     QIcon windowIcon = QIcon();
-    windowIcon.addFile(":/icons/rockbox-1.png");
-    windowIcon.addFile(":/icons/rockbox-5.png");
+    windowIcon.addFile(":/icons/rockbox-16.png");
+    windowIcon.addFile(":/icons/rockbox-32.png");
+    windowIcon.addFile(":/icons/rockbox-48.png");
+    windowIcon.addFile(":/icons/rockbox-64.png");
+    windowIcon.addFile(":/icons/rockbox-128.png");
+    windowIcon.addFile(":/icons/rockbox-256.png");
     this->setWindowIcon(windowIcon);
 #endif
 #if defined(Q_OS_MACX)

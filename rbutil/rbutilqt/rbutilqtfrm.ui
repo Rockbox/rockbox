@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="rbutilqt.qrc">
-    <normaloff>:/icons/rockbox-1.png</normaloff>:/icons/rockbox-1.png</iconset>
+    <normaloff>:/icons/rockbox-32.png</normaloff>:/icons/rockbox-32.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout">
