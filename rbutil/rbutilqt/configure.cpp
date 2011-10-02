@@ -582,6 +582,14 @@ void Config::updateLanguage()
 
     qApp->installTranslator(translator);
     qApp->installTranslator(qttrans);
+    //: This string is used to indicate the writing direction. Translate it
+    //: to "RTL" (without quotes) for RTL languages. Anything else will get
+    //: treated as LTR language.
+    if(QObject::tr("LTR") == "RTL")
+        qApp->setLayoutDirection(Qt::RightToLeft);
+    else
+        qApp->setLayoutDirection(Qt::LeftToRight);
+
     RbUtilQt::translators.append(translator);
     RbUtilQt::translators.append(qttrans);
 
