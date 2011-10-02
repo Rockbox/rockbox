@@ -171,6 +171,13 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAM DRAM
 #define IRAMSIZE 0
 
+#elif CONFIG_CPU == IMX233
+#include "cpu.h"
+/* The IRAM is too small and already partly used by the core */
+#define DRAMORIG CACHED_DRAM_ADDR
+#define IRAM DRAM
+#define IRAMSIZE 0
+
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif

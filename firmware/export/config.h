@@ -841,7 +841,7 @@ Lyre prototype 1 */
     (CONFIG_CPU == AS3525v2 && !defined(PLUGIN) && !defined(CODEC) && !defined(BOOTLOADER)) || /* AS3525v2: core only */ \
     (CONFIG_CPU == PNX0101) || \
     (CONFIG_CPU == TCC7801) || \
-    (CONFIG_CPU == IMX233) || \
+    (CONFIG_CPU == IMX233 && !defined(PLUGIN) && !defined(CODEC)) || /* IMX233: core only */ \
     defined(CPU_S5L870X)) || /* Samsung S5L8700: core, plugins, codecs */ \
     (CONFIG_CPU == JZ4732 && !defined(PLUGIN) && !defined(CODEC)) /* Jz4740: core only */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
@@ -850,7 +850,7 @@ Lyre prototype 1 */
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
 #if CONFIG_CPU != SH7034 && (CONFIG_CPU != AS3525 || MEMORYSIZE > 2) \
-    && CONFIG_CPU != JZ4732 && CONFIG_CPU != AS3525v2
+    && CONFIG_CPU != JZ4732 && CONFIG_CPU != AS3525v2 && CONFIG_CPU != IMX233
 #define PLUGIN_USE_IRAM
 #endif
 #if defined(CPU_ARM) && !defined(__ARM_EABI__)
