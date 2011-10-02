@@ -396,6 +396,16 @@
 #define CB_LEVEL   BUTTON_REC
 #define CB_MENU    (BUTTON_MENU | BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+#define CB_SELECT  BUTTON_SELECT
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_LEFT
+#define CB_RIGHT   BUTTON_RIGHT
+#define CB_PLAY    BUTTON_PLAYPAUSE
+#define CB_LEVEL   BUTTON_BACK
+#define CB_MENU    (BUTTON_PLAYPAUSE | BUTTON_REPEAT)
+
 #else
 #error No keymap defined!
 #endif
