@@ -216,6 +216,15 @@
 #define ZX_LEFT         BUTTON_REW
 #define ZX_RIGHT        BUTTON_FF
 
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+
+#define ZX_MENU         BUTTON_PLAYPAUSE
+#define ZX_UP           BUTTON_UP
+#define ZX_DOWN         BUTTON_DOWN
+#define ZX_SELECT       BUTTON_SELECT
+#define ZX_LEFT         BUTTON_LEFT
+#define ZX_RIGHT        BUTTON_RIGHT
+
 #else
 #error Keymap not defined!
 
