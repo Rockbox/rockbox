@@ -903,6 +903,7 @@ void Config::changeEvent(QEvent *e)
 {
     if(e->type() == QEvent::LanguageChange) {
         ui.retranslateUi(this);
+        updateCacheInfo(ui.cachePath->text());
     } else {
         QWidget::changeEvent(e);
     }
