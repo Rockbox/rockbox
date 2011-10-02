@@ -345,16 +345,19 @@ void  filetype_init(void)
     strdup_bufsize = filesize(fd);
     strdup_handle = core_alloc_ex("filetypes", strdup_bufsize, &ops);
     if (strdup_handle < 0)
+    {
+        close(fd);
         return;
+    }
     read_builtin_types();
     read_config(fd);
+    close(fd);
 #ifdef HAVE_LCD_BITMAP
     read_viewer_theme_file();
 #endif
 #ifdef HAVE_LCD_COLOR
     read_color_theme_file();
 #endif
-    close(fd);
     core_shrink(strdup_handle, core_get_data(strdup_handle), strdup_cur_idx);
 }
 
@@ -437,7 +440,6 @@ static void read_config(int fd)
             file_type->icon = Icon_Last_Themeable + atoi(s);
         filetype_count++;
     }
-    close(fd);
 }
 
 int filetype_get_attr(const char* file)
