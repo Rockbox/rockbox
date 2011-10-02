@@ -317,4 +317,12 @@ void InstallWindow::setDetailsArchived(bool show)
 }
 
 
+void InstallWindow::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+    } else {
+        QWidget::changeEvent(e);
+    }
+}
 

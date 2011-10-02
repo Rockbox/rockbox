@@ -54,6 +54,16 @@ void PreviewDlg::leaveEvent(QEvent * event)
     this->close();
 }
 
+
+void PreviewDlg::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+    } else {
+        QWidget::changeEvent(e);
+    }
+}
+
 PreviewLabel::PreviewLabel(QWidget * parent, Qt::WindowFlags f)
             :QLabel(parent,f)
 {

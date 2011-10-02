@@ -89,3 +89,13 @@ void UninstallWindow::UninstallMethodChanged(bool complete)
        ui.smartGroupBox->setEnabled(true);
 }
 
+
+void UninstallWindow::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+    } else {
+        QWidget::changeEvent(e);
+    }
+}
+

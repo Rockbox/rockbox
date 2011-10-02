@@ -46,6 +46,7 @@ class CreateVoiceWindow : public QDialog
         void settingsUpdated(void);
 
     private:
+        void changeEvent(QEvent *event);
         VoiceFileCreator* voicecreator;
         Ui::CreateVoiceFrm ui;
         ProgressLoggerGui* logger;

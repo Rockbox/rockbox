@@ -31,13 +31,14 @@ class Sysinfo : public QDialog
 
     public:
         Sysinfo(QWidget *parent = 0);
-        
+
         static QString getInfo();
     private:
+        void changeEvent(QEvent *event);
         Ui::SysinfoFrm ui;
 
     private slots:
-        void updateSysinfo(void);
+         void updateSysinfo(void);
 
 };
 

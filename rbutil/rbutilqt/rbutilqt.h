@@ -25,6 +25,8 @@
 
 #include <QSettings>
 #include <QTemporaryFile>
+#include <QList>
+#include <QTranslator>
 
 #include "ui_rbutilqtfrm.h"
 #include "httpget.h"
@@ -38,10 +40,12 @@ class RbUtilQt : public QMainWindow
 
     public:
         RbUtilQt(QWidget *parent = 0);
+        static QList<QTranslator*> translators;
 
     private:
         Ui::RbUtilQtFrm ui;
 
+        void changeEvent(QEvent *e);
         void initDeviceNames(void);
         QString deviceName(QString);
         QString platform;
@@ -110,7 +114,7 @@ class RbUtilQt : public QMainWindow
         void installPortable(void);
         void updateInfo(void);
         void updateTabs(int);
-        
+
         void checkUpdate(void);
         void downloadUpdateDone(bool errror);
 };

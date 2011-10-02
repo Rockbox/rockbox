@@ -81,3 +81,12 @@ QString Sysinfo::getInfo()
 }
 
 
+void Sysinfo::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+    } else {
+        QWidget::changeEvent(e);
+    }
+}
+

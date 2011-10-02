@@ -57,6 +57,8 @@
 #include <windows.h>
 #endif
 
+QList<QTranslator*> RbUtilQt::translators;
+
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 {
     // startup log
@@ -1377,6 +1379,16 @@ void RbUtilQt::downloadUpdateDone(bool error)
         else {
             ui.statusbar->showMessage(tr("Rockbox Utility is up to date."), 5000);
         }
+    }
+}
+
+
+void RbUtilQt::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+    } else {
+        QMainWindow::changeEvent(e);
     }
 }
 

@@ -121,3 +121,13 @@ void SysTrace::flush(void)
     }
 }
 
+
+void SysTrace::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+    } else {
+        QWidget::changeEvent(e);
+    }
+}
+

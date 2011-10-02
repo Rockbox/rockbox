@@ -36,6 +36,7 @@ public:
     void setText(QString text);
 
 private slots:
+    void changeEvent(QEvent *event);
     void mouseMoveEvent(QMouseEvent * event);
     void leaveEvent(QEvent * event);
 

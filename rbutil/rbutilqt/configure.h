@@ -52,6 +52,7 @@ class Config : public QDialog
         QUrl proxy;
         QString mountpoint;
         void updateCacheInfo(QString);
+        void changeEvent(QEvent *event);
 
     private slots:
         void setNoProxy(bool);

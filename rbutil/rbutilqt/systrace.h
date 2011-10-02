@@ -35,6 +35,7 @@ class SysTrace : public QDialog
         static void save(QString filename = "");
     private:
         static void flush(void);
+        void changeEvent(QEvent *event);
         Ui::SysTraceFrm ui;
         static QString debugbuffer;
         static QString lastmessage;
@@ -44,7 +45,7 @@ class SysTrace : public QDialog
         void saveCurrentTrace(void);
         void savePreviousTrace(void);
         void refresh(void);
-        
+
 };
 
 #endif

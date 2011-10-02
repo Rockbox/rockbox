@@ -40,7 +40,9 @@ class UninstallWindow : public QDialog
     private slots:
         void selectionChanged();
         void UninstallMethodChanged(bool complete);
+
     private:
+        void changeEvent(QEvent *event);
         Uninstaller* uninstaller;
         Ui::UninstallFrm ui;
         ProgressLoggerGui* logger;

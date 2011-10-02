@@ -71,7 +71,13 @@ int main( int argc, char ** argv ) {
     if(QObject::tr("LTR") == "RTL")
         app.setLayoutDirection(Qt::RightToLeft);
 
+    // keep a list of installed translators. Needed to be able uninstalling them
+    // later again (in case of translation changes)
+    QList<QTranslator*> translators;
+    translators.append(&translator);
+    translators.append(&qttrans);
     RbUtilQt window(0);
+    RbUtilQt::translators = translators;
     window.show();
 
 //    app.connect( &app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()) );

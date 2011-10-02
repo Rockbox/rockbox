@@ -359,3 +359,13 @@ void ThemesInstallWindow::accept()
 
 }
 
+
+void ThemesInstallWindow::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+    } else {
+        QWidget::changeEvent(e);
+    }
+}
+

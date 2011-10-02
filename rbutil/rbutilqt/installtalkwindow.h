@@ -33,7 +33,7 @@ class InstallTalkWindow : public QDialog
     Q_OBJECT
     public:
         InstallTalkWindow(QWidget *parent = 0);
-        
+
     public slots:
         void accept(void);
         void change(void);
@@ -46,6 +46,7 @@ class InstallTalkWindow : public QDialog
         void settingsUpdated(void);
 
     private:
+        void changeEvent(QEvent *event);
         TalkFileCreator* talkcreator;
         Ui::InstallTalkFrm ui;
         ProgressLoggerGui* logger;

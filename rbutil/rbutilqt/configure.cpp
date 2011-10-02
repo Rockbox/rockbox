@@ -39,6 +39,7 @@
 #include <tchar.h>
 #include <windows.h>
 #endif
+#include "rbutilqt.h"
 
 #define DEFAULT_LANG "English (en)"
 #define DEFAULT_LANG_CODE "en"
@@ -147,13 +148,6 @@ void Config::accept()
     else proxyType = "manual";
     RbSettings::setValue(RbSettings::ProxyType, proxyType);
 
-    // language
-    if(RbSettings::value(RbSettings::Language).toString() != language
-            && !language.isEmpty()) {
-        QMessageBox::information(this, tr("Language changed"),
-            tr("You need to restart the application for the changed language "
-               "to take effect."));
-    }
     RbSettings::setValue(RbSettings::Language, language);
 
     // mountpoint
@@ -563,10 +557,36 @@ QString Config::languageName(const QString &qmFile)
 void Config::updateLanguage()
 {
     qDebug() << "[Config] update selected language";
+
+    // remove all old translators
+    for(int i = 0; i < RbUtilQt::translators.size(); ++i) {
+        qApp->removeTranslator(RbUtilQt::translators.at(i));
+        // do not delete old translators, this confuses Qt.
+    }
+    RbUtilQt::translators.clear();
     QList<QListWidgetItem*> a = ui.listLanguages->selectedItems();
     if(a.size() > 0)
         language = lang.value(a.at(0)->text());
     qDebug() << "[Config] new language:" << language;
+
+    QString applang = QLocale::system().name();
+    QTranslator *translator = new QTranslator(qApp);
+    QTranslator *qttrans = new QTranslator(qApp);
+    QString absolutePath = QCoreApplication::instance()->applicationDirPath();
+
+    if(!translator->load("rbutil_" + language, absolutePath))
+        translator->load("rbutil_" + language, ":/lang");
+    if(!qttrans->load("qt_" + language,
+                QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+        qttrans->load("qt_" + language, ":/lang");
+
+    qApp->installTranslator(translator);
+    qApp->installTranslator(qttrans);
+    RbUtilQt::translators.append(translator);
+    RbUtilQt::translators.append(qttrans);
+
+    QLocale::setDefault(language);
+
 }
 
 
@@ -876,5 +896,15 @@ void Config::configEnc()
     gui.exec();
 
     updateEncState();
+}
+
+
+void Config::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+    } else {
+        QWidget::changeEvent(e);
+    }
 }
 

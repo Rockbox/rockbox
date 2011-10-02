@@ -46,6 +46,7 @@ class InstallWindow : public QDialog
         ZipInstaller* installer;
         QString m_backupName;
         void resizeEvent(QResizeEvent*);
+        void changeEvent(QEvent *event);
 
         void changeBackupPath(QString);
         void updateBackupLocation(void);

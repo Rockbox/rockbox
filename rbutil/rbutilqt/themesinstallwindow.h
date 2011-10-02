@@ -49,6 +49,7 @@ class ThemesInstallWindow : public QDialog
         HttpGet igetter;
         QTemporaryFile themesInfo;
         void resizeEvent(QResizeEvent*);
+        void changeEvent(QEvent *event);
         QByteArray imgData;
         ProgressLoggerGui *logger;
         ZipInstaller *installer;
