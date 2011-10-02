@@ -75,6 +75,9 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define ASM
 #include "cpu.h"
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - TTB_SIZE)
+#elif CONFIG_CPU==IMX233
+#include "cpu.h"
+#define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - FRAME_SIZE - TTB_SIZE)
 #endif
 
  /* default to full RAM (minus codecs&plugins) unless specified otherwise */

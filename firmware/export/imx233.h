@@ -44,6 +44,8 @@
 #define BUFFERED_DRAM_ADDR  0x90000000
 #define CACHEALIGN_SIZE     32
 
+#define NOCACHE_BASE        (UNCACHED_DRAM_ADDR - CACHED_DRAM_ADDR)
+
 #define PHYSICAL_ADDR(a) \
     ((typeof(a))((uintptr_t)(a) >= CACHED_DRAM_ADDR ? \
         ((uintptr_t)(a) - CACHED_DRAM_ADDR + UNCACHED_DRAM_ADDR) \

@@ -2521,7 +2521,7 @@ fi
     boottool="true"
     bootoutput=""
     appextra="gui:recorder:radio"
-    plugins="no"
+    plugins="yes"
     swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
