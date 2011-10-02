@@ -243,6 +243,17 @@
 #define PACMAN_COIN     BUTTON_OK
 #define PACMAN_MENU     BUTTON_MENU
 
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+
+#define PACMAN_UP       BUTTON_UP
+#define PACMAN_DOWN     BUTTON_DOWN
+#define PACMAN_LEFT     BUTTON_LEFT
+#define PACMAN_RIGHT    BUTTON_RIGHT
+#define PACMAN_1UP      BUTTON_SELECT
+#define PACMAN_2UP      BUTTON_BACK
+#define PACMAN_COIN     BUTTON_PLAYPAUSE
+#define PACMAN_MENU     BUTTON_POWER
+
 #else
 
 #error Keymap not defined!
