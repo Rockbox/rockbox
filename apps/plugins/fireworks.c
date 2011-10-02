@@ -126,6 +126,10 @@
 #define BTN_MENU BUTTON_MENU
 #define BTN_FIRE BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+#define BTN_MENU BUTTON_SELECT
+#define BTN_FIRE BUTTON_PLAYPAUSE
+
 #elif defined(HAVE_TOUCHSCREEN)
     /* This is a touchscreen target */
 #else
