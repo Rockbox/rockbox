@@ -229,6 +229,12 @@
 #define BATTERY_ON_TXT  "PLAY - start"
 #define BATTERY_OFF_TXT "REC"
 
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+#define BATTERY_ON  BUTTON_PLAYPAUSE
+#define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT  "PLAYPAUSE - start"
+#define BATTERY_OFF_TXT "POWER"
+
 #else
 #error No keymap defined!
 #endif
