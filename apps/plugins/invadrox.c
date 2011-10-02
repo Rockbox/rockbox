@@ -220,6 +220,13 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define RIGHT BUTTON_ENTER
 #define FIRE  BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+
+#define QUIT  BUTTON_POWER
+#define LEFT  BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define FIRE  BUTTON_SELECT
+
 #else
     #error INVADROX: Unsupported keypad
 #endif
