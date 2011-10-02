@@ -42,9 +42,9 @@ bool _backlight_init(void)
     imx233_set_pin_function(1, 28, PINCTRL_FUNCTION_GPIO);
     imx233_set_pin_drive_strength(1, 28, PINCTRL_DRIVE_8mA);
     imx233_enable_gpio_output(1, 28, true);
-    imx233_set_gpio_output(1, 29, true);
-    udelay(600);
-    _backlight_set_brightness(100);
+    #ifndef HAVE_BACKLIGHT_BRIGHTNESS
+    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    #endif
     return true;
 }
 
