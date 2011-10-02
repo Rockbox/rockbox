@@ -240,6 +240,14 @@ GREY_INFO_STRUCT
 #   define FFT_AMP_SCALE    BUTTON_PLAY
 #   define FFT_QUIT        (BUTTON_REC | BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_ORIENTATION  BUTTON_BACK
+#   define FFT_WINDOW       BUTTON_SELECT
+#   define FFT_AMP_SCALE    BUTTON_PLAYPAUSE
+#   define FFT_QUIT         BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
