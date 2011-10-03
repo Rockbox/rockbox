@@ -1640,12 +1640,12 @@ sub unpack_iaplog {
     my $line = shift;
     my @m;
 
-    unless ($line =~ /^[RT]: /) {
+    unless ($line =~ /^(?:\[\d+\] )?[RT]::? /) {
         printf("Skipped: %s\n", $line);
         return ();
     }
 
-    $line =~ s/^[RT]: //;
+    $line =~ s/^(?:\[\d+\] )?[RT]::? //;
     $line =~ s/\\x(..)/chr(hex($1))/ge;
     $line =~ s/\\\\/\\/g;
 

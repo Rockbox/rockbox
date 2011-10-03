@@ -32,6 +32,7 @@
 #include "serial.h"
 #include "appevents.h"
 #include "timefuncs.h"
+#include "core_alloc.h"
 
 #include "playlist.h"
 #include "playback.h"
@@ -136,6 +137,7 @@
 /* Events in the iap_queue */
 #define IAP_EV_TICK         (1)     /* The regular task timeout */
 #define IAP_EV_MSG_RCVD     (2)     /* A complete message has been received from the device */
+#define IAP_EV_MALLOC       (3)     /* Allocate memory for the RX/TX buffers */
 
 /* Add a button to the remote button bitfield. Also set iap_repeatbtn=1
  * to ensure a button press is at least delivered once.
@@ -146,6 +148,7 @@
         iap_repeatbtn = 2; \
         } while(0)
         
+static bool iap_started = false;
 static bool iap_setupflag = false, iap_updateflag = false, iap_running = false;
 /* This is set to true if a SYS_POWEROFF message is received,
  * signalling impending power off
@@ -175,10 +178,85 @@ static bool iap_btnrepeat = false, iap_btnshuffle = false;
 static long thread_stack[(DEFAULT_STACK_SIZE*2)/sizeof(long)];
 static struct event_queue iap_queue;
 
-static unsigned char serbuf[RX_BUFLEN];
 static volatile bool serbuf_lock = false;
 
-static unsigned char response[TX_BUFLEN];
+/* These are pointer used to manage a dynamically allocated buffer which
+ * will hold both the RX and TX side of things.
+ *
+ * iap_buffer_handle is the handle returned from core_alloc()
+ * iap_buffers points to the start of the complete buffer
+ *
+ * The buffer is partitioned as follows:
+ * - TX_BUFLEN+6 bytes for the TX buffer
+ *   The 6 extra bytes are for the sync byte, the SOP byte, the length indicators
+ *   (3 bytes) and the checksum byte.
+ *   iap_txstart points to the beginning of the TX buffer
+ *   iap_txpayload points to the beginning of the payload portion of the TX buffer
+ *   iap_txnext points to the position where the next byte will be placed
+ *
+ * - RX_BUFLEN bytes for the RX buffer
+ *   iap_rxstart points to the beginning of the RX buffer
+ *
+ * The RX buffer is placed behind the TX buffer so that an eventual TX
+ * buffer overflow has some place to spill into where it will not cause
+ * immediate damage. See the comments for IAP_TX_* and iap_send_tx()
+ */
+static int iap_buffer_handle;
+static unsigned char* iap_buffers;
+static unsigned char* iap_rxstart;
+static unsigned char* iap_txstart;
+static unsigned char* iap_txpayload;
+static unsigned char* iap_txnext;
+
+/* These are a number of helper macros to manage the dynamic TX buffer content
+ * These macros DO NOT CHECK for buffer overflow. iap_send_tx() will, but
+ * it might be too late at that point. See the current size of TX_BUFLEN
+ */
+
+/* Initialize the TX buffer with a lingo and command ID. This will reset the 
+ * data pointer, effectively invalidating unsent information in the TX buffer.
+ * There are two versions of this, one for 1 byte command IDs (all Lingoes except
+ * 0x04) and one for two byte command IDs (Lingo 0x04)
+ */
+#define IAP_TX_INIT(lingo, command) do { \
+        iap_txnext = iap_txpayload; \
+        IAP_TX_PUT((lingo)); \
+        IAP_TX_PUT((command)); \
+        } while (0)
+
+#define IAP_TX_INIT4(lingo, command) do { \
+        iap_txnext = iap_txpayload; \
+        IAP_TX_PUT((lingo)); \
+        IAP_TX_PUT_U16((command)); \
+        } while (0)
+
+/* Put an unsigned char into the TX buffer */
+#define IAP_TX_PUT(data) *(iap_txnext++) = (data)
+
+/* Put a 16bit unsigned quantity into the TX buffer */
+#define IAP_TX_PUT_U16(data) do { \
+        put_u16(iap_txnext, (data)); \
+        iap_txnext += 2; \
+        } while (0)
+
+/* Put a 32bit unsigned quantity into the TX buffer */
+#define IAP_TX_PUT_U32(data) do { \
+        put_u32(iap_txnext, (data)); \
+        iap_txnext += 4; \
+        } while (0)
+
+/* Put an arbitrary amount of data (identified by a char pointer and 
+ * a length) into the TX buffer
+ */
+#define IAP_TX_PUT_DATA(data, len) do { \
+        memcpy(iap_txnext, (unsigned char *)(data), (len)); \
+        iap_txnext += (len); \
+        } while(0)
+
+/* Put a NULL terminated string into the TX buffer, including the
+ * NULL byte
+ */
+#define IAP_TX_PUT_STRING(str) IAP_TX_PUT_DATA((str), strlen((str))+1)
 
 static char cur_dbrecord[5] = {0};
 
@@ -196,7 +274,6 @@ enum fsm_state {
 static struct state_t {
     enum fsm_state state;   /* current fsm state */
     unsigned int len;       /* payload data length */
-    unsigned char *payload; /* payload data pointer */
     unsigned int check;     /* running checksum over [len,payload,check] */
     unsigned int count;     /* playload bytes counter */
 } frame_state = {
@@ -296,6 +373,15 @@ static struct device_t {
 #define DEVICE_AUTH_RUNNING (device.auth.state != AUST_NONE)
 #define DEVICE_LINGO_SUPPORTED(x) (device.lingoes & BIT_N((x)&0x1f))
 
+static int iap_move_callback(int handle, void* current, void* new);
+
+static struct buflib_callbacks iap_buflib_callbacks = {
+    iap_move_callback,
+    NULL
+};
+
+static void iap_malloc(void);
+
 static void put_u16(unsigned char *buf, uint16_t data)
 {
     buf[0] = (data >>  8) & 0xFF;
@@ -365,6 +451,15 @@ static void iap_thread(void)
                 break;
             }
 
+            /* Handle memory allocation. This is used only once, during
+             * startup
+             */
+            case IAP_EV_MALLOC:
+            {
+                iap_malloc();
+                break;
+            }
+
             /* Handle poweroff message */
             case SYS_POWEROFF:
             {
@@ -391,14 +486,22 @@ void iap_setup(int ratenum)
     iap_updateflag = false;
     iap_remotebtn = BUTTON_NONE;
     iap_setupflag = true;
+    iap_started = false;
+    iap_running = false;
 }
 
 /* Actually bring up the message queue, message handler thread and
  * notification timer
+ *
+ * NOTE: This is running in interrupt context
  */
 static void iap_start(void)
 {
     unsigned int tid;
+
+    if (iap_started)
+        return;
+
     reset_device(&device);
     queue_init(&iap_queue, true);
     tid = create_thread(iap_thread, thread_stack, sizeof(thread_stack),
@@ -409,6 +512,27 @@ static void iap_start(void)
         panicf("Could not create iap thread");
     timeout_register(&iap_task_tmo, iap_task, MS_TO_TICKS(100), (intptr_t)NULL);
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, iap_track_changed);
+
+    /* Since we cannot allocate memory while in interrupt context
+     * post a message to our own queue to get that done
+     */
+    queue_post(&iap_queue, IAP_EV_MALLOC, 0);
+    iap_started = true;
+}
+
+static void iap_malloc(void)
+{
+    if (iap_running)
+        return;
+
+    iap_buffer_handle = core_alloc_ex("iap", RX_BUFLEN+TX_BUFLEN+6, &iap_buflib_callbacks);
+    if (iap_buffer_handle < 0)
+        panicf("Could not allocate buffer memory");
+    iap_buffers = core_get_data(iap_buffer_handle);
+    iap_txstart = iap_buffers;
+    iap_txpayload = iap_txstart+5;
+    iap_txnext = iap_txpayload;
+    iap_rxstart = iap_buffers+(TX_BUFLEN+6);
     iap_running = true;
 }
 
@@ -444,30 +568,66 @@ void iap_bitrate_set(int ratenum)
    checksum (length+mode+parameters+checksum == 0)
 */
 
+/* Send the current content of the TX buffer.
+ * This will check for TX buffer overflow and panic, but it might
+ * be too late by then (although one would have to overflow the complete
+ * RX buffer as well)
+ */
+static void iap_send_tx(void)
+{
+    int i, chksum;
+    ptrdiff_t txlen;
+    unsigned char* txstart;
+
+    txlen = iap_txnext - iap_txpayload;
+
+    if (txlen <= 0)
+        return;
+
+    if (txlen > TX_BUFLEN)
+        panicf("IAP: TX buffer overflow");
+
+    if (txlen < 256)
+    {
+        /* Short packet */
+        txstart = iap_txstart+2;
+        *(txstart+2) = txlen;
+        chksum = txlen;
+    } else {
+        /* Long packet */
+        txstart = iap_txstart;
+        *(txstart+2) = 0x00;
+        *(txstart+3) = (txlen >> 8) & 0xFF;
+        *(txstart+4) = (txlen) & 0xFF;
+        chksum = *(txstart+3) + *(txstart+4);
+    }
+    *(txstart) = 0xFF;
+    *(txstart+1) = 0x55;
+
+    for (i=0; i<txlen; i++)
+    {
+        chksum += iap_txpayload[i];
+    }
+    *(iap_txnext) = 0x100 - (chksum & 0xFF);
+
+    for (i=0; i <= (iap_txnext - txstart); i++)
+    {
+        while(!tx_rdy()) ;
+        tx_writec(txstart[i]);
+    }
+}
+
+/* This is just a compatibility wrapper around the new TX buffer
+ * infrastructure
+ */
 void iap_send_pkt(const unsigned char * data, int len)
 {
-    int i, chksum, responselen;
-    
-    if(len > TX_BUFLEN-4) len = TX_BUFLEN-4;
-    responselen = len + 4;
-    
-    response[0] = 0xFF;
-    response[1] = 0x55;
-    
-    chksum = response[2] = len;
-    for(i = 0; i < len; i ++)
-    {
-        chksum += data[i];
-        response[i+3] = data[i];
-    }
+    if (!iap_running)
+        return;
 
-    response[i+3] = 0x100 - (chksum & 0xFF);
-    
-    for(i = 0; i < responselen; i ++)
-    {
-        while (!tx_rdy()) ;
-        tx_writec(response[i]);
-    }
+    iap_txnext = iap_txpayload;
+    IAP_TX_PUT_DATA(data, len);
+    iap_send_tx();
 }    
 
 bool iap_getc(unsigned char x)
@@ -492,6 +652,15 @@ bool iap_getc(unsigned char x)
     switch (s->state) {
     case ST_SYNC:
         if (x == 0xFF) {
+            /* The IAP infrastructure is started by the first received sync
+             * byte. It takes a while to spin up, so do not advance the state
+             * machine until it has started.
+             */
+            if (!iap_running)
+            {
+                iap_start();
+                break;
+            }
             s->state = ST_SOF;
         }
         break;
@@ -514,7 +683,6 @@ bool iap_getc(unsigned char x)
     
         s->check = x;
         s->count = 0;
-        s->payload = serbuf;
         if (x == 0) {
             /* large packet */
             s->state = ST_LENH;
@@ -543,7 +711,7 @@ bool iap_getc(unsigned char x)
         break;
     case ST_DATA:
         s->check += x;
-        s->payload[s->count++] = x;
+        iap_rxstart[s->count++] = x;
         if (s->count == s->len) {
             s->state = ST_CHECK;
         }
@@ -552,11 +720,6 @@ bool iap_getc(unsigned char x)
         s->check += x;
         if ((s->check & 0xFF) == 0) {
             /* done, received a valid frame */
-            /* The IAP handler infrastructure may not actually be running yet,
-             * it's started by the first successfully decoded packet
-             */
-            if (!iap_running)
-                iap_start();
             queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
         } else {
             /* Invalid frame, release lock */
@@ -601,9 +764,9 @@ void iap_periodic(void)
         case AUST_INIT:
         {
             /* Send out GetDevAuthenticationInfo */
-            unsigned char data[] = {0x00, 0x14};
+            IAP_TX_INIT(0x00, 0x14);
 
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             device.auth.state = AUST_CERTREQ;
             break;
         }
@@ -613,9 +776,16 @@ void iap_periodic(void)
             /* Send out GetDevAuthenticationSignature, with
              * 20 bytes of challenge and a retry counter of 1
              */
-            unsigned char data[] = {0x00, 0x17, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x01};
+            unsigned char challenge[20] = {0x00, 0x01, 0x02, 0x03, 0x04, 
+                                           0x05, 0x06, 0x07, 0x08, 0x09,
+                                           0x0A, 0x0B, 0x0C, 0x0D, 0x0E,
+                                           0x0F, 0x10, 0x11, 0x12, 0x13};
 
-            iap_send_pkt(data, sizeof(data));
+            IAP_TX_INIT(0x00, 0x17);
+            IAP_TX_PUT_DATA(challenge, 20);
+            IAP_TX_PUT(0x01);
+
+            iap_send_tx();
             device.auth.state = AUST_CHASENT;
             break;
         }
@@ -640,9 +810,10 @@ void iap_periodic(void)
     if (iap_shutdown && device.do_power_notify)
     {
         /* NotifyiPodStateChange */
-        unsigned char data[] = {0x00, 0x23, 0x01};
+        IAP_TX_INIT(0x00, 0x23);
+        IAP_TX_PUT(0x01);
 
-        iap_send_pkt(data, sizeof(data));
+        iap_send_tx();
 
         /* No further actions, we're going down */
         reset_device(&device);
@@ -653,9 +824,10 @@ void iap_periodic(void)
     if (device.accinfo == ACCST_INIT)
     {
         /* GetAccessoryInfo */
-        unsigned char data[] = {0x00, 0x27, 0x00};
+        IAP_TX_INIT(0x00, 0x27);
+        IAP_TX_PUT(0x00);
 
-        iap_send_pkt(data, sizeof(data));
+        iap_send_tx();
         device.accinfo = ACCST_SENT;
     }
 
@@ -674,12 +846,11 @@ void iap_periodic(void)
 
     /* All other events are sent every 500ms */
     count += 1;
-    if (count < 4) return;
+    if (count < 5) return;
 
     count = 0;
     
     /* RemoteEventNotification */
-    unsigned char data[11] = {0x03, 0x09};
     
     /* Track position (ms)  or Track position (s) */
     if (device.notifications & (BIT_N(0) | BIT_N(15)))
@@ -693,27 +864,29 @@ void iap_periodic(void)
 
         if ((device.notifications & BIT_N(0)) && (device.trackpos_ms != t))
         {
-            data[2] = 0x00;
-            put_u32(&data[3], t);
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x00);
+            IAP_TX_PUT_U32(t);
             device.changed_notifications |= BIT_N(0);
             changed = true;
 
-            iap_send_pkt(data, 7);
+            iap_send_tx();
         }
 
         if ((device.notifications & BIT_N(15)) && (device.trackpos_s != ts)) {
-            data[2] = 0x0F;
-            put_u16(&data[3], ts);
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x0F);
+            IAP_TX_PUT_U16(ts);
             device.changed_notifications |= BIT_N(15);
             changed = true;
 
-            iap_send_pkt(data, 2);
+            iap_send_tx();
         }
 
         if (changed)
         {
             device.trackpos_ms = t;
-            device.trackpos_s = t;
+            device.trackpos_s = ts;
         }
     }
 
@@ -725,11 +898,12 @@ void iap_periodic(void)
         index = iap_get_trackindex();
 
         if (device.track_index != index) {
-            data[2] = 0x01;
-            put_u32(&data[3], index);
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x01);
+            IAP_TX_PUT_U32(index);
             device.changed_notifications |= BIT_N(1);
 
-            iap_send_pkt(data, 7);
+            iap_send_tx();
 
             device.track_index = index;
         }
@@ -744,13 +918,14 @@ void iap_periodic(void)
 
         if (device.track_index != index)
         {
-            data[2] = 0x02;
-            put_u32(&data[3], index);
-            put_u16(&data[7], 0);
-            put_u16(&data[9], 0xFFFF);
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x02);
+            IAP_TX_PUT_U32(index);
+            IAP_TX_PUT_U16(0);
+            IAP_TX_PUT_U16(0xFFFF);
             device.changed_notifications |= BIT_N(2);
 
-            iap_send_pkt(data, 11);
+            iap_send_tx();
 
             device.track_index = index;
         }
@@ -765,20 +940,23 @@ void iap_periodic(void)
 
         if (device.play_status != play_status)
         {
-            data[2] = 0x03;
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x03);
             if (play_status & AUDIO_STATUS_PLAY) {
                 /* Playing or paused */
                 if (play_status & AUDIO_STATUS_PAUSE) {
                     /* Paused */
-                    data[2] = 0x02;
+                    IAP_TX_PUT(0x02);
                 } else {
                     /* Playing */
-                    data[2] = 0x01;
+                    IAP_TX_PUT(0x01);
                 }
+            } else {
+                IAP_TX_PUT(0x00);
             }
             device.changed_notifications |= BIT_N(3);
 
-            iap_send_pkt(data, 4);
+            iap_send_tx();
 
             device.play_status = play_status;
         }
@@ -795,21 +973,22 @@ void iap_periodic(void)
 
         if ((device.power_state != power_state) || (device.battery_level != battery_l))
         {
-            data[0x02] = 0x05;
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x05);
             if (power_state == NO_CHARGER) {
                 if (battery_l < 30) {
-                    data[0x03] = 0x00;
+                    IAP_TX_PUT(0x00);
                 } else {
-                    data[0x03] = 0x01;
+                    IAP_TX_PUT(0x01);
                 }
-                data[0x04] = (char)((battery_l * 255)/100);
+                IAP_TX_PUT((char)((battery_l * 255)/100));
             } else {
-                data[0x03] = 0x04;
-                data[0x04] = 0x00;
+                IAP_TX_PUT(0x04);
+                IAP_TX_PUT(0x00);
             }
             device.changed_notifications |= BIT_N(5);
 
-            iap_send_pkt(data, 5);
+            iap_send_tx();
 
             device.power_state = power_state;
             device.battery_level = battery_l;
@@ -831,11 +1010,12 @@ void iap_periodic(void)
 
         if (device.shuffle != shuffle)
         {
-            data[0x02] = 0x07;
-            data[0x03] = shuffle?0x01:0x00;
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x07);
+            IAP_TX_PUT(shuffle?0x01:0x00);
             device.changed_notifications |= BIT_N(7);
 
-            iap_send_pkt(data, 4);
+            iap_send_tx();
 
             device.shuffle = shuffle;
         }
@@ -850,30 +1030,31 @@ void iap_periodic(void)
 
         if (device.repeat != repeat)
         {
-            data[0x02] = 0x08;
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x08);
             switch (repeat)
             {
                 case REPEAT_OFF:
                 {
-                    data[0x03] = 0x00;
+                    IAP_TX_PUT(0x00);
                     break;
                 }
 
                 case REPEAT_ONE:
                 {
-                    data[0x03] = 0x01;
+                    IAP_TX_PUT(0x01);
                     break;
                 }
 
                 case REPEAT_ALL:
                 {
-                    data[0x03] = 0x02;
+                    IAP_TX_PUT(0x02);
                     break;
                 }
             }
             device.changed_notifications |= BIT_N(8);
 
-            iap_send_pkt(data, 4);
+            iap_send_tx();
 
             device.repeat = repeat;
         }
@@ -888,25 +1069,25 @@ void iap_periodic(void)
 
         if (memcmp(tm, &(device.datetime), sizeof(struct tm)))
         {
-            data[0x02] = 0x09;
-            data[0x03] = ((tm->tm_year+1900) >> 8) & 0xFF;
-            data[0x04] = (tm->tm_year+1900) & 0xFF;
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x09);
+            IAP_TX_PUT_U16(tm->tm_year);
 
             /* Month */
-            data[0x05] = tm->tm_mon+1;
+            IAP_TX_PUT(tm->tm_mon+1);
 
             /* Day */
-            data[0x06] = tm->tm_mday;
+            IAP_TX_PUT(tm->tm_mday);
 
             /* Hour */
-            data[0x07] = tm->tm_hour;
+            IAP_TX_PUT(tm->tm_hour);
 
             /* Minute */
-            data[0x08] = tm->tm_min;
+            IAP_TX_PUT(tm->tm_min);
 
             device.changed_notifications |= BIT_N(9);
 
-            iap_send_pkt(data, 9);
+            iap_send_tx();
 
             memcpy(&(device.datetime), tm, sizeof(struct tm));
         }
@@ -931,12 +1112,13 @@ void iap_periodic(void)
 
         hold = button_hold();
         if (device.hold != hold) {
-            data[0x02] = 0x0C;
-            data[0x03] = hold?0x01:0x00;
+            IAP_TX_INIT(0x03, 0x09);
+            IAP_TX_PUT(0x0C);
+            IAP_TX_PUT(hold?0x01:0x00);
 
             device.changed_notifications |= BIT_N(0x0C);
 
-            iap_send_pkt(data, 4);
+            iap_send_tx();
 
             device.hold = hold;
         }
@@ -974,17 +1156,21 @@ static void interface_state_change(enum interface_state new)
 
 static void cmd_ack_mode0(unsigned char cmd, unsigned char status)
 {
-    unsigned char data[] = {0x00, 0x02, status, cmd};
-    iap_send_pkt(data, sizeof(data));
+    IAP_TX_INIT(0x00, 0x02);
+    IAP_TX_PUT(status);
+    IAP_TX_PUT(cmd);
+    iap_send_tx();
 }
 
 #define cmd_ok_mode0(cmd) cmd_ack_mode0((cmd), IAP_ACK_OK)
 
-static void cmd_pending_mode0(unsigned char cmd, uint32_t msdelay) {
-    unsigned char data[] = {0x00, 0x02, 0x06, cmd, 0x00, 0x00, 0x00, 0x00};
-
-    put_u32(&data[4], msdelay);
-    iap_send_pkt(data, sizeof(data));
+static void cmd_pending_mode0(unsigned char cmd, uint32_t msdelay)
+{
+    IAP_TX_INIT(0x00, 0x02);
+    IAP_TX_PUT(0x06);
+    IAP_TX_PUT(cmd);
+    IAP_TX_PUT_U32(msdelay);
+    iap_send_tx();
 }
 
 
@@ -1064,8 +1250,9 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
                     /* FF 55 06 00 01 05 00 02 01 F1 (mode switch) */
                     sleep(HZ/3);
                     /* RF Transmitter: Begin transmission */
-                    unsigned char data[] = {0x05, 0x02};
-                    iap_send_pkt(data, sizeof(data));
+                    IAP_TX_INIT(0x05, 0x02);
+
+                    iap_send_tx();
                     break;
                 }
             }
@@ -1112,17 +1299,18 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          */
         case 0x03:
         {
-            unsigned char data[] = {0x00, 0x04, 0x00};
-
             if (!DEVICE_LINGO_SUPPORTED(0x04)) {
                 cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
                 break;
             }
 
-            if (interface_state == IST_EXTENDED) {
-                data[2] = 0x01;
-            }
-            iap_send_pkt(data, sizeof(data));
+            IAP_TX_INIT(0x00, 0x04);
+            if (interface_state == IST_EXTENDED)
+                IAP_TX_PUT(0x01);
+            else
+                IAP_TX_PUT(0x00);
+
+            iap_send_tx();
             break;
         }
 
@@ -1209,9 +1397,10 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          */
         case 0x07:
         {
-            unsigned char data[] = {0x00, 0x08, 'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
+            IAP_TX_INIT(0x00, 0x08);
+            IAP_TX_PUT_STRING("ROCKBOX");
 
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             break;
         }
 
@@ -1242,9 +1431,12 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
         case 0x09:
         {
             /* ipod5G firmware version */
-            unsigned char data[] = {0x00, 0x0A, 0x01, 0x02, 0x01};
+            IAP_TX_INIT(0x00, 0x0A);
+            IAP_TX_PUT(0x01);
+            IAP_TX_PUT(0x02);
+            IAP_TX_PUT(0x01);
 
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             break;
         } 
 
@@ -1271,9 +1463,10 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          */
         case 0x0B:
         {
-            unsigned char data[] = {0x00, 0x0C, '0', '1', '2', '3', '4', '5', '6', '7', '8', 0x00};
+            IAP_TX_INIT(0x00, 0x0C);
+            IAP_TX_PUT_STRING("0123456789");
 
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             break;
         }
 
@@ -1306,10 +1499,12 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             /*{0x00, 0x0E, 0x00, 0x0B, 0x00, 0x05, 0x50, 0x41, 0x31, 0x34, 
                     0x37, 0x4C, 0x4C, 0x00};    PA147LL (IPOD 5G 60 GO) */
             /* ReturniPodModelNum */
-            unsigned char data[] = {0x00, 0x0E, 0x00, 0x0B, 0x00, 0x10,
-                                'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
 
-            iap_send_pkt(data, sizeof(data));
+            IAP_TX_INIT(0x00, 0x0E);
+            IAP_TX_PUT_U32(0x000B0010);
+            IAP_TX_PUT_STRING("ROCKBOX");
+
+            iap_send_tx();
             break;
         }
 
@@ -1340,8 +1535,6 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          */
         case 0x0F:
         {
-            /* ReturnLingoProtocolVersion */
-            unsigned char data[] = {0x00, 0x10, 0x00, 0x00, 0x00};
             unsigned char lingo = buf[2];
 
             CHECKLEN0(3);
@@ -1350,10 +1543,12 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
              * array
              */
             if (LINGO_SUPPORTED(lingo)) {
-                data[2] = lingo;
-                data[3] = LINGO_MAJOR(lingo);
-                data[4] = LINGO_MINOR(lingo);
-                iap_send_pkt(data, sizeof(data));
+                IAP_TX_INIT(0x00, 0x10);
+                IAP_TX_PUT(lingo);
+                IAP_TX_PUT(LINGO_MAJOR(lingo));
+                IAP_TX_PUT(LINGO_MINOR(lingo));
+
+                iap_send_tx();
             } else {
                 cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
             }
@@ -1528,10 +1723,12 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
                 /* Version mismatches are signalled by AckDevAuthenticationInfo
                  * with the status set to Authentication Information unsupported
                  */
-                unsigned char data[] = {0x00, 0x16, 0x08};
-
                 reset_auth(&(device.auth));
-                iap_send_pkt(data, sizeof(data));
+
+                IAP_TX_INIT(0x00, 0x16);
+                IAP_TX_PUT(0x08);
+
+                iap_send_tx();
                 break;
             }
 
@@ -1569,9 +1766,10 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
                          *
                          * Also, start GetAccessoryInfo process
                          */
-                        unsigned char data[] = {0x00, 0x16, 0x00};
+                        IAP_TX_INIT(0x00, 0x16);
+                        IAP_TX_PUT(0x00);
 
-                        iap_send_pkt(data, sizeof(data));
+                        iap_send_tx();
                         device.auth.state = AUST_CERTDONE;
                         device.accinfo = ACCST_INIT;
                     } else {
@@ -1629,8 +1827,6 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          */
         case 0x18:
         {
-            unsigned char data[] = {0x00, 0x19, 0x00};
-
             if (device.auth.state != AUST_CHASENT) {
                 cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
                 break;
@@ -1639,7 +1835,10 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             /* Here we could check the signature. Since we can't, just
              * acknowledge and go to authenticated status
              */
-            iap_send_pkt(data, sizeof(data));
+            IAP_TX_INIT(0x00, 0x19);
+            IAP_TX_PUT(0x00);
+
+            iap_send_tx();
             device.auth.state = AUST_AUTH;
             break;
         }
@@ -1773,14 +1972,15 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          */
         case 0x24:
         {
-            /* RetIpodOptions */
-            unsigned char data[] = {0x00, 0x25, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
             /* There are only two features that can be communicated via this
              * function, video support and the ability to control line-out usage.
              * Rockbox supports neither
              */
-            iap_send_pkt(data, sizeof(data));
+            IAP_TX_INIT(0x00, 0x25);
+            IAP_TX_PUT_U32(0x00);
+            IAP_TX_PUT_U32(0x00);
+
+            iap_send_tx();
             break;
         }
 
@@ -1842,19 +2042,18 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          */
         case 0x29:
         {
-            unsigned char data[] = {0x00, 0x2A, 0x00, 0x00};
-
             CHECKLEN0(3);
             CHECKAUTH0;
 
+            IAP_TX_INIT(0x00, 0x2A);
             /* The only information really supported is 0x03, Line-out usage.
              * All others are video related
              */
             if (buf[2] == 0x03) {
-                data[2] = 0x03;
-                data[3] = 0x01;     /* Line-out enabled */
+                IAP_TX_PUT(0x03);
+                IAP_TX_PUT(0x01);   /* Line-out enabled */
 
-                iap_send_pkt(data, sizeof(data));
+                iap_send_tx();
             } else {
                 cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
             }
@@ -1930,8 +2129,11 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
 
 static void cmd_ack_mode2(unsigned char cmd, unsigned char status)
 {
-    unsigned char data[] = {0x02, 0x01, status, cmd};
-    iap_send_pkt(data, sizeof(data));
+    IAP_TX_INIT(0x02, 0x01);
+    IAP_TX_PUT(status);
+    IAP_TX_PUT(cmd);
+
+    iap_send_tx();
 }
 
 #define cmd_ok_mode2(cmd) cmd_ack_mode2((cmd), IAP_ACK_OK)
@@ -2182,8 +2384,11 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
 
 static void cmd_ack_mode3(unsigned char cmd, unsigned char status)
 {
-    unsigned char data[] = {0x03, 0x00, status, cmd};
-    iap_send_pkt(data, sizeof(data));
+    IAP_TX_INIT(0x03, 0x00);
+    IAP_TX_PUT(status);
+    IAP_TX_PUT(cmd);
+
+    iap_send_tx();
 }
 
 #define cmd_ok_mode3(cmd) cmd_ack_mode3((cmd), IAP_ACK_OK)
@@ -2228,9 +2433,10 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
          */
         case 0x01:
         {
-            unsigned char data[] = {0x03, 0x02, 0x00, 0x00, 0x00, 0x00};
+            IAP_TX_INIT(0x03, 0x02);
+            IAP_TX_PUT_U32(0x00);
 
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             break;
         }
 
@@ -2293,10 +2499,11 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
          */
         case 0x04:
         {
+            IAP_TX_INIT(0x03, 0x05);
             /* Return one profile (0, the disabled profile) */
-            unsigned char data[] = {0x03, 0x05, 0x00, 0x00, 0x00, 0x01};
+            IAP_TX_PUT_U32(0x01);
 
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             break;
         }
 
@@ -2330,7 +2537,6 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
         case 0x06:
         {
             uint32_t index;
-            unsigned char data[] = {0x03, 0x07, 'D', 'e', 'f', 'a', 'u', 'l', 't', 0x00};
 
             index = get_u32(&buf[2]);
 
@@ -2338,8 +2544,10 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
                 break;
             }
+            IAP_TX_INIT(0x03, 0x07);
+            IAP_TX_PUT_STRING("Default");
 
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             break;
         }
 
@@ -2442,8 +2650,6 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
          */
         case 0x0C:
         {
-            unsigned char data[] = {0x03, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                                      0x00, 0x00, 0x00, 0x00};
             struct mp3entry* id3;
             struct playlist_info* playlist;
             int play_status;
@@ -2452,7 +2658,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
             CHECKLEN3(3);
             CHECKAUTH3;
 
-            data[0x02] = buf[0x02];
+            IAP_TX_INIT(0x03, 0x0D);
+            IAP_TX_PUT(buf[0x02]);
+
             switch (buf[0x02])
             {
                 /* 0x00: Track position
@@ -2461,9 +2669,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x00:
                 {
                     id3 = audio_current_track();
-                    put_u32(&data[0x03], id3->elapsed);
+                    IAP_TX_PUT_U32(id3->elapsed);
 
-                    iap_send_pkt(data, 7);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2473,9 +2681,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x01:
                 {
                     playlist = playlist_get_current();
-                    put_u32(&data[0x03], (playlist->index - playlist->first_index));
+                    IAP_TX_PUT_U32(playlist->index - playlist->first_index);
 
-                    iap_send_pkt(data, 7);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2485,11 +2693,12 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x02:
                 {
                     playlist = playlist_get_current();
-                    put_u32(&data[0x03], (playlist->index - playlist->first_index));
+                    IAP_TX_PUT_U32(playlist->index - playlist->first_index);
                     /* Indicate that track does not have chapters */
-                    put_u32(&data[0x07], 0x0000FFFF);
+                    IAP_TX_PUT_U16(0x0000);
+                    IAP_TX_PUT_U16(0xFFFF);
 
-                    iap_send_pkt(data, 11);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2503,15 +2712,15 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                     play_status = audio_status();
                     if (play_status & AUDIO_STATUS_PLAY) {
                         if (play_status & AUDIO_STATUS_PAUSE) {
-                            data[0x03] = 0x02;
+                            IAP_TX_PUT(0x02);
                         } else {
-                            data[0x03] = 0x01;
+                            IAP_TX_PUT(0x01);
                         }
                     } else {
-                        data[0x03] = 0x00;
+                        IAP_TX_PUT(0x00);
                     }
 
-                    iap_send_pkt(data, 4);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2526,11 +2735,11 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                      */
 
                     /* Mute status */
-                    data[0x03] = 0x00;
+                    IAP_TX_PUT(0x00);
                     /* Volume */
-                    data[0x04] = 0x80;
+                    IAP_TX_PUT(0x80);
 
-                    iap_send_pkt(data, 5);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2541,17 +2750,17 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 {
                     if (charger_input_state == NO_CHARGER) {
                         if (battery_level() < 30) {
-                            data[0x03] = 0x00;
+                            IAP_TX_PUT(0x00);
                         } else {
-                            data[0x03] = 0x01;
+                            IAP_TX_PUT(0x01);
                         }
-                        data[0x04] = (char)((battery_level() * 255)/100);
+                        IAP_TX_PUT((char)((battery_level() * 255)/100));
                     } else {
-                        data[0x03] = 0x04;
-                        data[0x04] = 0x00;
+                        IAP_TX_PUT(0x04);
+                        IAP_TX_PUT(0x00);
                     }
 
-                    iap_send_pkt(data, 5);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2561,7 +2770,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x06:
                 {
                     /* Currently only one equalizer setting supported, 0 */
-                    iap_send_pkt(data, 7);
+                    IAP_TX_PUT_U32(0x00);
+
+                    iap_send_tx();
                     break;
                 }
 
@@ -2570,9 +2781,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                  */
                 case 0x07:
                 {
-                    data[0x03] = global_settings.playlist_shuffle?0x01:0x00;
+                    IAP_TX_PUT(global_settings.playlist_shuffle?0x01:0x00);
 
-                    iap_send_pkt(data, 4);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2585,24 +2796,24 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                     {
                         case REPEAT_OFF:
                         {
-                            data[0x03] = 0x00;
+                            IAP_TX_PUT(0x00);
                             break;
                         }
 
                         case REPEAT_ONE:
                         {
-                            data[0x03] = 0x01;
+                            IAP_TX_PUT(0x01);
                             break;
                         }
 
                         case REPEAT_ALL:
                         {
-                            data[0x03] = 0x02;
+                            IAP_TX_PUT(0x02);
                             break;
                         }
                     }
 
-                    iap_send_pkt(data, 4);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2614,22 +2825,21 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                     tm = get_time();
 
                     /* Year */
-                    data[0x03] = ((tm->tm_year+1900) >> 8) & 0xFF;
-                    data[0x04] = (tm->tm_year+1900) & 0xFF;
+                    IAP_TX_PUT_U16(tm->tm_year);
 
                     /* Month */
-                    data[0x05] = tm->tm_mon+1;
+                    IAP_TX_PUT(tm->tm_mon+1);
 
                     /* Day */
-                    data[0x06] = tm->tm_mday;
+                    IAP_TX_PUT(tm->tm_mday);
 
                     /* Hour */
-                    data[0x07] = tm->tm_hour;
+                    IAP_TX_PUT(tm->tm_hour);
 
                     /* Minute */
-                    data[0x08] = tm->tm_min;
+                    IAP_TX_PUT(tm->tm_min);
 
-                    iap_send_pkt(data, 9);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2639,8 +2849,11 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x0A:
                 {
                     /* Alarm not supported, always off */
+                    IAP_TX_PUT(0x00);
+                    IAP_TX_PUT(0x00);
+                    IAP_TX_PUT(0x00);
 
-                    iap_send_pkt(data, 6);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2650,8 +2863,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x0B:
                 {
                     /* TOOD: Find out how to do this */
+                    IAP_TX_PUT(0x00);
 
-                    iap_send_pkt(data, 4);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2660,9 +2874,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                  */
                 case 0x0C:
                 {
-                    data[0x03] = button_hold()?0x01:0x00;
+                    IAP_TX_PUT(button_hold()?0x01:0x00);
 
-                    iap_send_pkt(data, 4);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2672,8 +2886,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x0D:
                 {
                     /* TODO: Find out what the hell this is. Default to off */
+                    IAP_TX_PUT(0x00);
 
-                    iap_send_pkt(data, 4);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2683,8 +2898,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x0E:
                 {
                     /* Default to normal */
+                    IAP_TX_PUT(0x00);
 
-                    iap_send_pkt(data, 4);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2698,10 +2914,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                     id3 = audio_current_track();
                     pos = id3->elapsed/1000;
 
-                    data[0x03] = (pos >> 8) & 0xFF;
-                    data[0x04] = pos & 0xFF;
+                    IAP_TX_PUT_U16(pos);
 
-                    iap_send_pkt(data, 5);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2711,11 +2926,11 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x10:
                 {
                     /* TODO: See volume above */
-                    data[0x03] = 0x00;
-                    data[0x04] = 0x80;
-                    data[0x05] = 0x80;
+                    IAP_TX_PUT(0x00);
+                    IAP_TX_PUT(0x80);
+                    IAP_TX_PUT(0x80);
 
-                    iap_send_pkt(data, 6);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2756,14 +2971,13 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
          */
         case 0x0F:
         {
-            unsigned char data[] = {0x03, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                                      0x00, 0x00, 0x00, 0x00,
-                                                      0x00, 0x00, 0x00, 0x00};
             int play_status;
             struct mp3entry* id3;
             struct playlist_info* playlist;
 
             CHECKAUTH3;
+
+            IAP_TX_INIT(0x03, 0x10);
 
             play_status = audio_status();
 
@@ -2771,21 +2985,25 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 /* Playing or paused */
                 if (play_status & AUDIO_STATUS_PAUSE) {
                     /* Paused */
-                    data[2] = 0x02;
+                    IAP_TX_PUT(0x02);
                 } else {
                     /* Playing */
-                    data[2] = 0x01;
+                    IAP_TX_PUT(0x01);
                 }
                 playlist = playlist_get_current();
-                put_u32(&data[0x03], (playlist->index - playlist->first_index));
+                IAP_TX_PUT_U32(playlist->index - playlist->first_index);
                 id3 = audio_current_track();
-                put_u32(&data[0x07], id3->length);
-                put_u32(&data[0x0B], id3->elapsed);
+                IAP_TX_PUT_U32(id3->length);
+                IAP_TX_PUT_U32(id3->elapsed);
             } else {
-                /* Stopped. Nothing to be done, all values are 0x00 */
+                /* Stopped, all values are 0x00 */
+                IAP_TX_PUT(0x00);
+                IAP_TX_PUT_U32(0x00);
+                IAP_TX_PUT_U32(0x00);
+                IAP_TX_PUT_U32(0x00);
             }
 
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             break;
         }
 
@@ -2823,9 +3041,6 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
              *
              * TODO: Fix.
              */
-
-            unsigned char data[] = {0x03, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
             uint32_t track_index;
             struct playlist_track_info track;
 
@@ -2838,7 +3053,8 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 break;
             }
 
-            data[2] = buf[2];
+            IAP_TX_INIT(0x03, 0x13);
+            IAP_TX_PUT(buf[2]);
             switch (buf[2])
             {
                 /* 0x00: Track caps/info
@@ -2847,13 +3063,15 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x00:
                 {
                     /* Track capabilities. None of these are supported, yet */
-                    put_u32(&data[0x03], 0);
+                    IAP_TX_PUT_U32(0x00);
 
                     /* Track length in ms */
-                    put_u32(&data[0x07], 180000);
+                    IAP_TX_PUT_U32(180000);
 
                     /* Chapter count, stays at 0 */
-                    iap_send_pkt(data, 13);
+                    IAP_TX_PUT_U16(0x00);
+
+                    iap_send_tx();
                     break;
                 }
 
@@ -2863,9 +3081,12 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x01:
                 {
                     /* Chapter length, set at 0 (no chapters) */
+                    IAP_TX_PUT_U32(0x00);
                     
                     /* Chapter name, empty */
-                    iap_send_pkt(data, 5);
+                    IAP_TX_PUT_STRING("");
+
+                    iap_send_tx();
                     break;
                 }
 
@@ -2875,8 +3096,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x02:
                 {
                     /* Artist name */
-                    strlcpy(&data[0x03], "XArtist", 16);
-                    iap_send_pkt(data, 11);
+                    IAP_TX_PUT_STRING("XArtist");
+
+                    iap_send_tx();
                     break;
                 }
 
@@ -2886,8 +3108,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x03:
                 {
                     /* Album name */
-                    strlcpy(&data[0x03], "XAlbum", 16);
-                    iap_send_pkt(data, 10);
+                    IAP_TX_PUT_STRING("XAlbum");
+
+                    iap_send_tx();
                     break;
                 }
 
@@ -2897,8 +3120,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x04:
                 {
                     /* Genre name */
-                    strlcpy(&data[0x03], "XGenre", 16);
-                    iap_send_pkt(data, 10);
+                    IAP_TX_PUT_STRING("XGenre");
+
+                    iap_send_tx();
                     break;
                 }
 
@@ -2908,8 +3132,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x05:
                 {
                     /* Track title */
-                    strlcpy(&data[0x03], "XTitle", 16);
-                    iap_send_pkt(data, 10);
+                    IAP_TX_PUT_STRING("XTitle");
+
+                    iap_send_tx();
                     break;
                 }
 
@@ -2919,8 +3144,9 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x06:
                 {
                     /* Track title */
-                    strlcpy(&data[0x03], "XComposer", 16);
-                    iap_send_pkt(data, 13);
+                    IAP_TX_PUT_STRING("XComposer");
+
+                    iap_send_tx();
                     break;
                 }
 
@@ -2930,7 +3156,15 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x07:
                 {
                     /* Packet information bits. All 0 (single packet) */
-                    iap_send_pkt(data, 6);
+                    IAP_TX_PUT(0x00);
+
+                    /* Packet index */
+                    IAP_TX_PUT_U16(0x00);
+
+                    /* Lyrics */
+                    IAP_TX_PUT_STRING("");
+
+                    iap_send_tx();
                     break;
                 }
 
@@ -2940,7 +3174,7 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                 case 0x08:
                 {
                     /* No artwork, return packet containing just the type byte */
-                    iap_send_pkt(data, 3);
+                    iap_send_tx();
                     break;
                 }
 
@@ -2970,11 +3204,11 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
 
 static void cmd_ack_mode4(unsigned int cmd, unsigned char status)
 {
-    unsigned char data[] = {0x04, 0x00, 0x01, 0x00, 0x00, status};
+    IAP_TX_INIT4(0x04, 0x0001);
+    IAP_TX_PUT(status);
+    IAP_TX_PUT_U16(cmd);
 
-    data[4] = (cmd >> 8) & 0xFF;
-    data[5] = (cmd >> 0) & 0xFF;
-    iap_send_pkt(data, sizeof(data));
+    iap_send_tx();
 }
 
 #define cmd_ok_mode4(cmd) cmd_ack_mode4((cmd), IAP_ACK_OK)
@@ -3067,12 +3301,11 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
          */
         case 0x0012:
         {
-            unsigned char data[] = {0x04, 0x00, 0x13, 0x00, 0x00};
+            IAP_TX_INIT4(0x04, 0x0013);
+            IAP_TX_PUT(LINGO_MAJOR(0x04));
+            IAP_TX_PUT(LINGO_MINOR(0x04));
 
-            data[3] = LINGO_MAJOR(0x04);
-            data[4] = LINGO_MINOR(0x04);
-
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             break;
         }
 
@@ -3103,9 +3336,10 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
          */
         case 0x0014:
         {
-            unsigned char data[] = {0x04, 0x00, 0x015, 'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
+            IAP_TX_INIT4(0x04, 0x0015);
+            IAP_TX_PUT_STRING("ROCKBOX");
 
-            iap_send_pkt(data, sizeof(data));
+            iap_send_tx();
             break;
         }
 
@@ -3513,13 +3747,13 @@ void iap_handlepkt(void)
     }
 
     /* handle command by mode */
-    unsigned char mode = s->payload[0];
+    unsigned char mode = iap_rxstart[0];
     switch (mode) {
-    case 0: iap_handlepkt_mode0(s->len, s->payload); break;
-    case 2: iap_handlepkt_mode2(s->len, s->payload); break;
-    case 3: iap_handlepkt_mode3(s->len, s->payload); break;
-    case 4: iap_handlepkt_mode4(s->len, s->payload); break;
-    case 7: iap_handlepkt_mode7(s->len, s->payload); break;
+    case 0: iap_handlepkt_mode0(s->len, iap_rxstart); break;
+    case 2: iap_handlepkt_mode2(s->len, iap_rxstart); break;
+    case 3: iap_handlepkt_mode3(s->len, iap_rxstart); break;
+    case 4: iap_handlepkt_mode4(s->len, iap_rxstart); break;
+    case 7: iap_handlepkt_mode7(s->len, iap_rxstart); break;
     }
     
     /* release the lock on serbuf */
@@ -3540,6 +3774,18 @@ int remote_control_rx(void)
 
 const unsigned char *iap_get_serbuf(void)
 {
-    return serbuf;
+    return iap_rxstart;
 }
 
+static int iap_move_callback(int handle, void* current, void* new)
+{
+    (void) handle;
+    (void) current;
+
+    iap_txstart = new;
+    iap_txpayload = iap_txstart+5;
+    iap_txnext = iap_txpayload;
+    iap_rxstart = iap_buffers+(TX_BUFLEN+6);
+
+    return BUFLIB_CB_OK;
+}
