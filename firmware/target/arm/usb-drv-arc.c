@@ -493,6 +493,7 @@ void usb_drv_init(void)
 void usb_drv_attach(void)
 {
     logf("usb_drv_attach");
+    usb_drv_init();
 }
 
 void usb_drv_exit(void)
