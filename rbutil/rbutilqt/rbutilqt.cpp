@@ -1387,6 +1387,10 @@ void RbUtilQt::changeEvent(QEvent *e)
 {
     if(e->type() == QEvent::LanguageChange) {
         ui.retranslateUi(this);
+        buildInfo.open();
+        ServerInfo::readBuildInfo(buildInfo.fileName());
+        buildInfo.close();
+        updateDevice();
     } else {
         QMainWindow::changeEvent(e);
     }
