@@ -710,7 +710,7 @@ bool need_to_play = false;
 short sndbuf[sizeof(sound)*2];
 
 /* Convert the mono "tock" sample to interleaved stereo */
-void prepare_tock(void)
+static void prepare_tock(void)
 {
     int i;
     for(i = 0;i < (int)sizeof(sound)/2;i++) {
@@ -719,20 +719,20 @@ void prepare_tock(void)
     }
 }
 
-void play_tock(void)
+static void play_tock(void)
 {
     rb->pcm_play_data(NULL,(unsigned char *)sndbuf,sizeof(sndbuf));
 }
 
 #endif /* CONFIG_CODEC != SWCODEC */
 
-void calc_period(void)
+static void calc_period(void)
 {
     period =  61440/bpm-1; /* (60*1024)/bpm; */
 }
 
 
-void metronome_draw(struct screen* display)
+static void metronome_draw(struct screen* display)
 {
     display->clear_display();
 
@@ -779,7 +779,7 @@ void metronome_draw(struct screen* display)
     display->update();
 }
 
-void draw_display(void)
+static void draw_display(void)
 {
     int i;
     FOR_NB_SCREENS(i)
@@ -788,7 +788,7 @@ void draw_display(void)
 
 /* helper function to change the volume by a certain amount, +/-
    ripped from video.c */
-void change_volume(int delta)
+static void change_volume(int delta)
 {
     int minvol = rb->sound_min(SOUND_VOLUME);
     int maxvol = rb->sound_max(SOUND_VOLUME);
@@ -804,7 +804,7 @@ void change_volume(int delta)
 }
 
 /*function to accelerate bpm change*/
-void change_bpm(int direction)
+static void change_bpm(int direction)
 {
     if((bpm_step_counter < 20)
             || (bpm > 389)
@@ -822,7 +822,7 @@ void change_bpm(int direction)
     bpm_step_counter++;
 }
 
-void timer_callback(void)
+static void timer_callback(void)
 {
     if(minitick >= period){
         minitick = 0;
@@ -847,7 +847,7 @@ void timer_callback(void)
     }
 }
 
-void cleanup(void)
+static void cleanup(void)
 {
     rb->timer_unregister();
     MET_PLAY_STOP; /* stop audio ISR */
@@ -857,7 +857,7 @@ void cleanup(void)
 #endif
 }
 
-void tap(void)
+static void tap(void)
 {
     if (tap_count == 0 || tap_time < tap_count) {
         tap_time = 0;

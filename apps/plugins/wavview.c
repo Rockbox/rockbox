@@ -70,7 +70,7 @@ static uint32_t center = 0;
 static uint32_t ppp = 1;
 
 /* helper function copied from libwavpack bits.c */
-void little_endian_to_native (void *data, char *format)
+static void little_endian_to_native (void *data, char *format)
 {
     unsigned char *cp = (unsigned char *) data;
 
@@ -262,7 +262,7 @@ static int readwavpeaks(const char *filename)
     return 0;
 }
 
-int displaypeaks(void)
+static int displaypeaks(void)
 {
     register int x = 0;
     register int lymin = INT_MAX;
@@ -334,7 +334,7 @@ int displaypeaks(void)
     return 0;
 }
 
-void show_help(void)
+static void show_help(void)
 {
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, "WAVVIEW USAGE:");

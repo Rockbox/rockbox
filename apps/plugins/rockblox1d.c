@@ -190,7 +190,7 @@
 #  define NEXT_Y (int)((LCD_HEIGHT * 0.8)/2-NEXT_H/2)
 #endif
 
-void draw_brick(int pos, int length) {
+static void draw_brick(int pos, int length) {
     int i = pos;
     rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
     rb->lcd_fillrect(CENTER_X, CENTER_Y, WIDTH, WIDTH * TILES + TILES);
