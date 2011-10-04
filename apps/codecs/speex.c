@@ -438,7 +438,7 @@ enum codec_status codec_run(void)
                 LOGF("Speex seek page:%lld,%lld,%ld,%lld,%d\n",
                      ((spx_int64_t)param/1000) *
                      (spx_int64_t)samplerate,
-                     page_granule, param,
+                     page_granule, (long)param,
                      (page_granule/samplerate)*1000, samplerate);
 
                 speex_seek_page_granule(((spx_int64_t)param/1000) *
