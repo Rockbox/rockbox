@@ -38,7 +38,6 @@ void unpause_action(bool may_fade, bool updatewps);
 void fade(bool fade_in, bool updatewps);
 
 bool ffwd_rew(int button);
-void display_keylock_text(bool locked);
 void wps_do_playpause(bool updatewps);
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
