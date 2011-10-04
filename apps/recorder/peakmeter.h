@@ -52,7 +52,6 @@ extern int  peak_meter_get_min(void);
 extern int  peak_meter_get_max(void);
 extern void peak_meter_set_use_dbfs(bool use);
 extern bool peak_meter_get_use_dbfs(void);
-extern int  calc_db (int isample);
 extern int  peak_meter_db2sample(int db);
 extern unsigned short peak_meter_scale_value(unsigned short val, int meterwidth);
 

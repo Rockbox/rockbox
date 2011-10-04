@@ -227,7 +227,7 @@ static int db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
  *               range of -12dB to 0dB (78.0 to 90.0dB).
  */
 
-int calc_db (int isample) 
+static int calc_db (int isample) 
 {
     /* return n+m*(isample-istart)/100 */
     int n;
@@ -243,13 +243,13 @@ int calc_db (int isample)
                 if (isample < 5) {
                     istart = 1; /* Range 1 */
                     n = 98;
-                m = 34950;
-            }
-        else {
+                    m = 34950;
+                }
+                else {
                     istart = 5; /* Range 2 */
                     n = 1496;
-                m = 7168;
-            }
+                    m = 7168;
+                }
             }
             else {
                 istart = 24;  /* Range 3 */

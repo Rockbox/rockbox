@@ -30,9 +30,6 @@
 #include "menu.h"
 #include "tree.h"
 #include "list.h"
-#ifdef HAVE_LCD_BITMAP
-#include "peakmeter.h"
-#endif
 #include "color_picker.h"
 #include "lcd.h"
 #include "lcd-remote.h"

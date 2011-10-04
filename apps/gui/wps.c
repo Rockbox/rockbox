@@ -42,7 +42,6 @@
 #include "playlist.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
-#include "peakmeter.h"
 #endif
 #include "lang.h"
 #include "bookmark.h"
