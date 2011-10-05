@@ -1706,7 +1706,10 @@ static bool skin_load_fonts(struct wps_data *data)
     if (!success || data->font_ids == NULL)
     {
         while (font_count > 0)
-            font_unload(id_array[--font_count]);
+        {
+            if(id_array[--font_count] != -1)
+                font_unload(id_array[font_count]);
+        }
         data->font_ids = NULL;
         return false;
     }
