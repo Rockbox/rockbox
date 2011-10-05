@@ -385,11 +385,7 @@ static void crossfeed_cross_set(int val)
 static void compressor_set(int val)
 {
     (void)val;
-    dsp_set_compressor(global_settings.compressor_threshold,
-                       global_settings.compressor_makeup_gain,
-                       global_settings.compressor_ratio,
-                       global_settings.compressor_knee,
-                       global_settings.compressor_release_time);
+    dsp_set_compressor();
 }
 
 static const char* db_format(char* buffer, size_t buffer_size, int value,

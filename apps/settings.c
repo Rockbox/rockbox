@@ -989,11 +989,7 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_PITCHSCREEN
     dsp_timestretch_enable(global_settings.timestretch_enabled);
 #endif
-    dsp_set_compressor(global_settings.compressor_threshold,
-                       global_settings.compressor_makeup_gain,
-                       global_settings.compressor_ratio,
-                       global_settings.compressor_knee,
-                       global_settings.compressor_release_time);
+    dsp_set_compressor();
 #endif
 
 #ifdef HAVE_SPDIF_POWER

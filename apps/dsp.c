@@ -133,15 +133,6 @@ struct eq_state
                                 /* 10ch */
 };
 
-struct compressor_menu
-{
-    int  threshold;     /* dB - from menu */
-    bool auto_gain;     /* 0 = off, 1 = auto */
-    int  ratio;         /* from menu */
-    bool soft_knee;     /* 0 = hard knee, 1 = soft knee */     
-    int  release;       /* samples - from menu */
-};
-
 /* Include header with defines which functions are implemented in assembly
    code for the target */
 #include <dsp_asm.h>
@@ -260,13 +251,12 @@ static int resample_buf_count = SMALL_RESAMPLE_BUF_COUNT;
 static int32_t *resample_buf[2] = { small_resample_buf[0], small_resample_buf[1] };
 
 /* compressor */
-static struct   compressor_menu c_menu;
 static int32_t comp_rel_slope IBSS_ATTR;   /* S7.24 format */
 static int32_t comp_makeup_gain IBSS_ATTR; /* S7.24 format */
 static int32_t comp_curve[66] IBSS_ATTR;   /* S7.24 format */
 static int32_t release_gain IBSS_ATTR;     /* S7.24 format */
 #define UNITY (1L << 24)                   /* unity gain in S7.24 format */
-static void     compressor_process(int count, int32_t *buf[]);
+static void    compressor_process(int count, int32_t *buf[]);
 
 
 /* Clip sample to signed 16 bit range */
@@ -1607,55 +1597,61 @@ void dsp_set_replaygain(void)
 
 /** SET COMPRESSOR
  *  Called by the menu system to configure the compressor process */
-void dsp_set_compressor(int c_threshold, int c_gain, int c_ratio,
-                        int c_knee, int c_release)
+void dsp_set_compressor(void)
 {
-    bool changed = false;
-    bool active = (c_threshold < 0);
-    bool new_auto_gain = (c_gain == 1);
-    const int comp_ratio[] = {2, 4, 6, 10, 0};
-    int  new_ratio = comp_ratio[c_ratio];
-    bool new_knee = (c_knee == 1);
-    int  new_release = c_release * NATIVE_FREQUENCY / 1000;
+    static int curr_set[5];
+    int new_set[5] = {
+        global_settings.compressor_threshold,
+        global_settings.compressor_makeup_gain,
+        global_settings.compressor_ratio,
+        global_settings.compressor_knee,
+        global_settings.compressor_release_time};
     
-    if (c_menu.threshold != c_threshold)
-    {
-        changed = true;
-        c_menu.threshold = c_threshold;
-        logf("   Compressor Threshold: %d dB\tEnabled: %s",
-            c_menu.threshold, active ? "Yes" : "No");
-    }
+    /* make menu values useful */
+    int  threshold  =  new_set[0];
+    bool auto_gain  = (new_set[1] == 1);
+    const int comp_ratios[] = {2, 4, 6, 10, 0};
+    int  ratio      =  comp_ratios[new_set[2]];
+    bool soft_knee  = (new_set[3] == 1);
+    int  release    =  new_set[4] * NATIVE_FREQUENCY / 1000;
 
-    if (c_menu.auto_gain != new_auto_gain)
+    bool changed = false;
+    bool active  = (threshold < 0);
+
+    int i;
+    for (i = 0; i < 5; i++)
     {
-        changed = true;
-        c_menu.auto_gain = new_auto_gain;
-        logf("   Compressor Makeup Gain: %s",
-            c_menu.auto_gain ? "Auto" : "Off");
-    }
-    
-    if (c_menu.ratio != new_ratio)
-    {
-        changed = true;
-        c_menu.ratio = new_ratio;
-        if (c_menu.ratio)
-            { logf("   Compressor Ratio: %d:1", c_menu.ratio); }
-        else
-            { logf("   Compressor Ratio: Limit"); }
-    }
-    
-    if (c_menu.soft_knee != new_knee)
-    {
-        changed = true;
-        c_menu.soft_knee = new_knee;
-        logf("   Compressor Knee: %s", c_menu.soft_knee==1?"Soft":"Hard");
-    }
-    
-    if (c_menu.release != new_release)
-    {
-        changed = true;
-        c_menu.release = new_release;
-        logf("   Compressor Release: %d", c_menu.release);
+        if (curr_set[i] != new_set[i])
+        {
+            changed = true;
+            curr_set[i] = new_set[i];
+            
+#if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
+            switch (i)
+            {
+            case 0:
+                logf("   Compressor Threshold: %d dB\tEnabled: %s",
+                    threshold, active ? "Yes" : "No");
+                break;
+            case 1:
+                logf("   Compressor Makeup Gain: %s",
+                    auto_gain ? "Auto" : "Off");
+                break;
+            case 2:
+                if (ratio)
+                    { logf("   Compressor Ratio: %d:1", ratio); }
+                else
+                    { logf("   Compressor Ratio: Limit"); }
+                break;
+            case 3:
+                logf("   Compressor Knee: %s", soft_knee?"Soft":"Hard");
+                break;
+            case 4:
+                logf("   Compressor Release: %d", release);
+                break;
+            }
+#endif
+        }
     }
 
     if (changed && active)
@@ -1685,17 +1681,17 @@ void dsp_set_compressor(int c_threshold, int c_gain, int c_ratio,
                    [3] = 0 db input
                    [4] = ~+12db input (2 bits clipping overhead) */
         
-        db_curve[1].db = c_menu.threshold << 16;
-        if (c_menu.soft_knee)
+        db_curve[1].db = threshold << 16;
+        if (soft_knee)
         {
             /* bottom of knee is 3dB below the threshold for soft knee*/
             db_curve[0].db = db_curve[1].db - (3 << 16);
             /* top of knee is 3dB above the threshold for soft knee */
             db_curve[2].db = db_curve[1].db + (3 << 16);
-            if (c_menu.ratio)
+            if (ratio)
                 /* offset = -3db * (ratio - 1) / ratio */
                 db_curve[2].offset = (int32_t)((long long)(-3 << 16)
-                    * (c_menu.ratio - 1) / c_menu.ratio);
+                    * (ratio - 1) / ratio);
             else
                 /* offset = -3db for hard limit */
                 db_curve[2].offset = (-3 << 16);
@@ -1703,26 +1699,26 @@ void dsp_set_compressor(int c_threshold, int c_gain, int c_ratio,
         else
         {
             /* bottom of knee is at the threshold for hard knee */
-            db_curve[0].db = c_menu.threshold << 16;
+            db_curve[0].db = threshold << 16;
             /* top of knee is at the threshold for hard knee */
-            db_curve[2].db = c_menu.threshold << 16;
+            db_curve[2].db = threshold << 16;
             db_curve[2].offset = 0;
         }
         
         /* Calculate 0db and ~+12db offsets */
         db_curve[4].db = 0xC0A8C; /* db of 2 bits clipping */
-        if (c_menu.ratio)
+        if (ratio)
         {
             /* offset = threshold * (ratio - 1) / ratio */
-            db_curve[3].offset = (int32_t)((long long)(c_menu.threshold << 16)
-                * (c_menu.ratio - 1) / c_menu.ratio);
+            db_curve[3].offset = (int32_t)((long long)(threshold << 16)
+                * (ratio - 1) / ratio);
             db_curve[4].offset = (int32_t)((long long)-db_curve[4].db
-                * (c_menu.ratio - 1) / c_menu.ratio) + db_curve[3].offset;
+                * (ratio - 1) / ratio) + db_curve[3].offset;
         }
         else
         {
             /* offset = threshold for hard limit */
-            db_curve[3].offset = (c_menu.threshold << 16);
+            db_curve[3].offset = (threshold << 16);
             db_curve[4].offset = -db_curve[4].db + db_curve[3].offset;
         }
         
@@ -1744,7 +1740,7 @@ void dsp_set_compressor(int c_threshold, int c_gain, int c_ratio,
             
             /* if soft knee and below top of knee,
                interpolate along soft knee slope */
-            else if (c_menu.soft_knee && (this_db <= db_curve[2].db))
+            else if (soft_knee && (this_db <= db_curve[2].db))
                 comp_curve[i] = fp_factor(fp_mul(
                     ((this_db - db_curve[0].db) / 6),
                     db_curve[2].offset, 16), 16) << 8;
@@ -1787,12 +1783,12 @@ void dsp_set_compressor(int c_threshold, int c_gain, int c_ratio,
 #endif
         
         /* if using auto peak, then makeup gain is max offset - .1dB headroom */
-        comp_makeup_gain = c_menu.auto_gain ?
+        comp_makeup_gain = auto_gain ?
             fp_factor(-(db_curve[3].offset) - 0x199A, 16) << 8 : UNITY;
         logf("Makeup gain:\t%.6f", (float)comp_makeup_gain / UNITY);
 
         /* calculate per-sample gain change a rate of 10db over release time */
-        comp_rel_slope = 0xAF0BB2 / c_menu.release;
+        comp_rel_slope = 0xAF0BB2 / release;
         logf("Release slope:\t%.6f", (float)comp_rel_slope / UNITY);
         
         release_gain = UNITY;
