@@ -594,10 +594,13 @@ struct font* font_get(int font)
         return &sysfont;
 
     while (1) {
-        struct buflib_alloc_data *alloc = core_get_data(buflib_allocations[font]);
-        pf = &alloc->font;
-        if (pf && pf->height)
-            return pf;
+        if (buflib_allocations[font] > 0)
+        {
+            struct buflib_alloc_data *alloc = core_get_data(buflib_allocations[font]);
+            pf = &alloc->font;
+            if (pf && pf->height)
+                return pf;
+        }
         if (--font < 0)
             return &sysfont;
     }
