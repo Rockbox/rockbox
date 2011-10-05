@@ -6,6 +6,9 @@
 
 /* not static so it can be discovered by core_get_data() */
 struct buflib_context core_ctx;
+
+/* debug test alloc */
+static int test_alloc;
 void core_allocator_init(void)
 {
     buffer_init();
@@ -13,6 +16,17 @@ void core_allocator_init(void)
     void *start = buffer_get_buffer(&size);
     buflib_init(&core_ctx, start, size);
     buffer_release_buffer(size);
+
+    test_alloc = core_alloc("test", 112);
+}
+
+bool core_test_free(void)
+{
+    bool ret = test_alloc > 0;
+    if (ret)
+        test_alloc = core_free(test_alloc);
+
+    return ret;
 }
 
 int core_alloc(const char* name, size_t size)
