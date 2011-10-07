@@ -625,8 +625,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
 {
     short x, y;
     const enum screen_type screen = SCREEN_MAIN;
-    struct viewport *info_vp = sb_skin_get_info_vp(screen);
-    const int button = action_get_touchscreen_press_in_vp(&x, &y, info_vp);
+    struct viewport *parent = gui_list->parent[screen];
+    const int button = action_get_touchscreen_press_in_vp(&x, &y, parent);
     const int list_start_item = gui_list->start_item[screen];
     const int line_height = font_get(gui_list->parent[screen]->font)->height;
     const struct viewport *list_text_vp = &list_text[screen];
@@ -652,7 +652,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
         return ACTION_NONE;
     }
 
-    /* x and y are relative to info_vp */
+    /* x and y are relative to parent */
     if (gui_list->callback_get_item_icon != NULL)
         icon_width += get_icon_width(screen);
     if (show_cursor)
