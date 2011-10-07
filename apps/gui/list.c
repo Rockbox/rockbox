@@ -82,9 +82,6 @@ static void list_init_viewports(struct gui_synclist *list)
 {
     int i, parent_used;
 
-    if (!list)
-        return;
-
     parent_used = (*list->parent != &parent[SCREEN_MAIN]);
 
     if (!parent_used)
@@ -99,7 +96,7 @@ static void list_init_viewports(struct gui_synclist *list)
 #endif
         }
     }
-    list->dirty_tick = false;
+    list->dirty_tick = current_tick;
 }
 #else
 static struct viewport parent[NB_SCREENS] =
