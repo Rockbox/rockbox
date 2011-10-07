@@ -774,10 +774,13 @@ bool browse_id3(void)
     gui_synclist_draw(&id3_lists);
     while (true) {
         key = get_action(CONTEXT_LIST,HZ/2);
-        if(key!=ACTION_NONE && key!=ACTION_UNKNOWN
-        && !gui_synclist_do_button(&id3_lists, &key,LIST_WRAP_UNLESS_HELD))
+        if(!gui_synclist_do_button(&id3_lists, &key,LIST_WRAP_UNLESS_HELD))
         {
-            return(default_event_handler(key) == SYS_USB_CONNECTED);
+            if (key == ACTION_STD_OK || key == ACTION_STD_CANCEL)
+                return false;
+            else if (key == ACTION_STD_MENU ||
+                        default_event_handler(key) == SYS_USB_CONNECTED)
+                return true;
         }
     }
 }

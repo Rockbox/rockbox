@@ -978,9 +978,17 @@ static int view_cue_item_callback(int action,
 MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
                   view_cue, NULL, view_cue_item_callback, Icon_NOICON);
 
+
+static int browse_id3_wrapper(void)
+{
+    if (browse_id3())
+        return GO_TO_ROOT;
+    return GO_TO_PREVIOUS;
+}
+
 /* CONTEXT_WPS items */
-MENUITEM_FUNCTION(browse_id3_item, 0, ID2P(LANG_MENU_SHOW_ID3_INFO),
-                  browse_id3, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(browse_id3_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_MENU_SHOW_ID3_INFO),
+                  browse_id3_wrapper, NULL, NULL, Icon_NOICON);
 #ifdef HAVE_PITCHSCREEN
 MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
                   gui_syncpitchscreen_run, NULL, NULL, Icon_Audio);
