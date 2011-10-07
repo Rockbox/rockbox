@@ -61,6 +61,11 @@ void list_draw(struct screen *display, struct gui_synclist *list);
 static long last_dirty_tick;
 static struct viewport parent[NB_SCREENS];
 
+static bool list_is_dirty(struct gui_synclist *list)
+{
+    return TIME_BEFORE(list->dirty_tick, last_dirty_tick);
+}
+
 static void list_force_reinit(void *param)
 {
     (void)param;
@@ -109,6 +114,7 @@ static struct viewport parent[NB_SCREENS] =
 };
 
 #define list_init_viewports(a)
+#define list_is_dirty(a) false
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -229,24 +235,17 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list,
 }
 #endif
 
-static bool is_dirty(struct gui_synclist *list)
-{
-    return TIME_BEFORE(list->dirty_tick, last_dirty_tick);
-}
-
 /*
  * Force a full screen update.
  */
 void gui_synclist_draw(struct gui_synclist *gui_list)
 {
     int i;
-#ifdef HAVE_LCD_BITMAP
-    if (is_dirty(gui_list))
+    if (list_is_dirty(gui_list))
     {
         list_init_viewports(gui_list);
         gui_synclist_select_item(gui_list, gui_list->selected_item);
     }
-#endif
     FOR_NB_SCREENS(i)
     {
 #ifdef HAVE_LCD_BITMAP        
