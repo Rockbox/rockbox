@@ -88,26 +88,23 @@ static int buflibmove_callback(int handle, void* current, void* new)
 {
     (void)handle;
     struct buflib_alloc_data *alloc = (struct buflib_alloc_data*)current;
-    size_t diff = new - current;
+    ptrdiff_t diff = new - current;
 
     if (alloc->handle_locked)
         return BUFLIB_CB_CANNOT_MOVE;
 
-    if (alloc->font.bits)
-        alloc->font.bits += diff;
-    if (alloc->font.offset)
-        alloc->font.offset += diff;
-    if (alloc->font.width)
-        alloc->font.width += diff;
+#define UPDATE(x) if (x) { x = PTR_ADD(x, diff); }
 
-    alloc->font.buffer_start += diff;
-    alloc->font.buffer_end += diff;
-    alloc->font.buffer_position += diff;
+    UPDATE(alloc->font.bits);
+    UPDATE(alloc->font.offset);
+    UPDATE(alloc->font.width);
 
-    if (alloc->font.cache._index)
-        alloc->font.cache._index += diff;
-    if (alloc->font.cache._lru._base)
-        alloc->font.cache._lru._base += diff;
+    UPDATE(alloc->font.buffer_start);
+    UPDATE(alloc->font.buffer_end);
+    UPDATE(alloc->font.buffer_position);
+
+    UPDATE(alloc->font.cache._index);
+    UPDATE(alloc->font.cache._lru._base);
 
     return BUFLIB_CB_OK;
 }

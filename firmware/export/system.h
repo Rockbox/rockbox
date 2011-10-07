@@ -124,6 +124,8 @@ int get_cpu_boost_counter(void);
     ptr = (typeof(ptr))tmp_ptr1; \
 }
 
+#define PTR_ADD(ptr, x) ((typeof(ptr))((char*)(ptr) + (x)))
+#define PTR_SUB(ptr, x) ((typeof(ptr))((char*)(ptr) - (x)))
 
 /* newer? SDL includes endian.h, So we ignore it */
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED) || defined(__PCTOOL__)
