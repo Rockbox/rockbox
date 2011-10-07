@@ -58,17 +58,18 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
 void list_draw(struct screen *display, struct gui_synclist *list);
 
 #ifdef HAVE_LCD_BITMAP
-static int list_need_reinit = false;
+static long last_dirty_tick;
 static struct viewport parent[NB_SCREENS];
 
 static void list_force_reinit(void *param)
 {
     (void)param;
-    list_need_reinit = true;
+    last_dirty_tick = current_tick;
 }
 
 void list_init(void)
 {
+    last_dirty_tick = current_tick;
     add_event(GUI_EVENT_THEME_CHANGED, false, list_force_reinit);
 }
 
@@ -93,7 +94,7 @@ static void list_init_viewports(struct gui_synclist *list)
 #endif
         }
     }
-    list_need_reinit = false;
+    list->dirty_tick = false;
 }
 #else
 static struct viewport parent[NB_SCREENS] =
@@ -178,6 +179,7 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->title_icon = Icon_NOICON;
 
     gui_list->scheduled_talk_tick = gui_list->last_talked_tick = 0;
+    gui_list->dirty_tick = current_tick;
     gui_list->show_selection_marker = true;
 
 #ifdef HAVE_LCD_COLOR
@@ -227,6 +229,11 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list,
 }
 #endif
 
+static bool is_dirty(struct gui_synclist *list)
+{
+    return TIME_BEFORE(list->dirty_tick, last_dirty_tick);
+}
+
 /*
  * Force a full screen update.
  */
@@ -234,7 +241,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
 {
     int i;
 #ifdef HAVE_LCD_BITMAP
-    if (list_need_reinit)
+    if (is_dirty(gui_list))
     {
         list_init_viewports(gui_list);
         gui_synclist_select_item(gui_list, gui_list->selected_item);

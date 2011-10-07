@@ -103,7 +103,7 @@ struct gui_synclist
 #ifdef HAVE_LCD_BITMAP
     int offset_position[NB_SCREENS]; /* the list's screen scroll placement in pixels */
 #endif
-    long scheduled_talk_tick, last_talked_tick;
+    long scheduled_talk_tick, last_talked_tick, dirty_tick;
 
     list_get_icon *callback_get_item_icon;
     list_get_name *callback_get_item_name;
