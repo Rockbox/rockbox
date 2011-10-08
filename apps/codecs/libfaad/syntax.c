@@ -2165,7 +2165,7 @@ static uint8_t dynamic_range_info(bitfile *ld, drc_info *drc)
         n++;
         drc->num_bands += band_incr;
 
-        for (i = 0; i < drc->num_bands; i++);
+        for (i = 0; i < drc->num_bands; i++)
         {
             drc->band_top[i] = (uint8_t)faad_getbits(ld, 8
                 DEBUGVAR(1,97,"dynamic_range_info(): band_top"));
