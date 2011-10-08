@@ -992,48 +992,48 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
     
     if (children == 0)
     {
-		const char* emptyline= "";
-		children = 1;
-		element->children = skin_alloc_children(children);
-		if (!element->children)
-			return 0;
-		element->children_count = children;
-		element->children[0] = skin_parse_code_as_arg(&emptyline);
-	}
-	else
-	{	
-		element->children = skin_alloc_children(children);
-		if (!element->children)
-			return 0;
-		element->children_count = children;
+        const char* emptyline= "";
+        children = 1;
+        element->children = skin_alloc_children(children);
+        if (!element->children)
+            return 0;
+        element->children_count = children;
+        element->children[0] = skin_parse_code_as_arg(&emptyline);
+    }
+    else
+    {    
+        element->children = skin_alloc_children(children);
+        if (!element->children)
+            return 0;
+        element->children_count = children;
 
-		for(i = 0; i < children; i++)
-		{
-			element->children[i] = skin_parse_code_as_arg(&cursor);
-			if (element->children[i] == NULL)
-				return 0;
-			skip_whitespace(&cursor);
+        for(i = 0; i < children; i++)
+        {
+            element->children[i] = skin_parse_code_as_arg(&cursor);
+            if (element->children[i] == NULL)
+                return 0;
+            skip_whitespace(&cursor);
 #ifdef ROCKBOX
-			if ((element->tag->flags&FEATURE_TAG) && feature_available)
-				cursor = conditional_end;
+            if ((element->tag->flags&FEATURE_TAG) && feature_available)
+                cursor = conditional_end;
 #endif
 
-			if(i < children - 1 && *cursor != ENUMLISTSEPARATESYM)
-			{
-				skin_error(SEPARATOR_EXPECTED, cursor);
-				return 0;
-			}
-			else if(i == children - 1 && *cursor != ENUMLISTCLOSESYM)
-			{
-				skin_error(CLOSE_EXPECTED, cursor);
-				return 0;
-			}
-			else
-			{
-				cursor++;
-			}
-		}
-	}
+            if(i < children - 1 && *cursor != ENUMLISTSEPARATESYM)
+            {
+                skin_error(SEPARATOR_EXPECTED, cursor);
+                return 0;
+            }
+            else if(i == children - 1 && *cursor != ENUMLISTCLOSESYM)
+            {
+                skin_error(CLOSE_EXPECTED, cursor);
+                return 0;
+            }
+            else
+            {
+                cursor++;
+            }
+        }
+    }
     *document = cursor;
 
     return 1;
