@@ -37,6 +37,7 @@ static void _v_readstring(oggpack_buffer *o,char *buf,int bytes){
   }
 }
 
+/*
 void vorbis_comment_init(vorbis_comment *vc){
   memset(vc,0,sizeof(*vc));
 }
@@ -54,6 +55,7 @@ void vorbis_comment_clear(vorbis_comment *vc){
     memset(vc,0,sizeof(*vc));
   }
 }
+*/
 
 /* blocksize 0 is guaranteed to be short, 1 is guarantted to be long.
    They may be equal, but short will never ge greater than long */
@@ -141,6 +143,7 @@ static int _vorbis_unpack_info(vorbis_info *vi,oggpack_buffer *opb){
   return(OV_EBADHEADER);
 }
 
+#if 0
 static int _vorbis_unpack_comment(vorbis_comment *vc,oggpack_buffer *opb){
   int vendorlen;
   vendorlen=oggpack_read(opb,32);
@@ -156,6 +159,7 @@ static int _vorbis_unpack_comment(vorbis_comment *vc,oggpack_buffer *opb){
   vorbis_comment_clear(vc);
   return(OV_EBADHEADER);
 }
+#endif
 
 /* all of the real encoding details are here.  The modes, books,
    everything */
@@ -267,9 +271,9 @@ int vorbis_synthesis_idheader(ogg_packet *op){
    with bitstream comments and a third packet that holds the
    codebook. */
 
-int vorbis_synthesis_headerin(vorbis_info *vi,vorbis_comment *vc,ogg_packet *op){
+int vorbis_synthesis_headerin(vorbis_info *vi,ogg_packet *op){
   oggpack_buffer opb;
-  
+
   if(op){
     oggpack_readinit(&opb,op->packet,op->bytes);
 
@@ -303,10 +307,11 @@ int vorbis_synthesis_headerin(vorbis_info *vi,vorbis_comment *vc,ogg_packet *op)
           return(OV_EBADHEADER);
         }
 
-        return(_vorbis_unpack_comment(vc,&opb));
+        /*return(_vorbis_unpack_comment(vc,&opb));*/
+        return 0;
 
       case 0x05: /* least significant *bit* is read first */
-        if(vi->rate==0 || vc->vendor==NULL){
+        if(vi->rate==0 /*|| vc->vendor==NULL*/){
           /* um... we didn;t get the initial header or comments yet */
           return(OV_EBADHEADER);
         }

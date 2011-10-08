@@ -66,7 +66,7 @@ typedef struct OggVorbis_File {
   ogg_uint32_t    *serialnos;
   ogg_int64_t     *pcmlengths;
   vorbis_info     *vi;
-  vorbis_comment  *vc;
+/*  vorbis_comment  *vc; */
 
   /* Decoding working state local storage */
   ogg_int64_t      pcm_offset;

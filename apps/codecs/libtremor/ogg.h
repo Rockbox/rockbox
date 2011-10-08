@@ -227,6 +227,8 @@ extern int      ogg_stream_flush(ogg_stream_state *os, ogg_page *og);
 #endif
 /* Ogg BITSTREAM PRIMITIVES: decoding **************************/
 
+extern int      _os_body_expand(ogg_stream_state *os,int needed);
+
 extern int      ogg_sync_init(ogg_sync_state *oy);
 extern int      ogg_sync_clear(ogg_sync_state *oy);
 extern int      ogg_sync_reset(ogg_sync_state *oy);
@@ -241,7 +243,7 @@ extern long     ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og);
 /*
 extern int      ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og);
 */
-extern int      ogg_stream_pagein(ogg_stream_state *os, ogg_page *og);
+extern int      ogg_stream_pagein(ogg_stream_state *os, ogg_page *og, bool copy_body);
 extern int      ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op);
 extern int      ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op);
 

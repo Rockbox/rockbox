@@ -236,7 +236,7 @@ int ogg_stream_destroy(ogg_stream_state *os){
 /* Helpers for ogg_stream_encode; this keeps the structure and
    what's happening fairly clear */
 
-static int _os_body_expand(ogg_stream_state *os,int needed){
+int _os_body_expand(ogg_stream_state *os,int needed){
   if(os->body_storage<=os->body_fill+needed){
     void *ret;
     ret=_ogg_realloc(os->body_data,(os->body_storage+needed+1024)*
@@ -783,7 +783,7 @@ int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
 /* add the incoming page to the stream state; we decompose the page
    into packet segments here as well. */
 
-int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
+int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og, bool copy_body){
   unsigned char *header=og->header;
   unsigned char *body=og->body;
   long           bodysize=og->body_len;
@@ -868,8 +868,10 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   }
   
   if(bodysize){
-    if(_os_body_expand(os,bodysize)) return -1;
-    memcpy(os->body_data+os->body_fill,body,bodysize);
+    if(copy_body){
+      if(_os_body_expand(os,bodysize)) return -1;
+      memcpy(os->body_data+os->body_fill,body,bodysize);
+    }
     os->body_fill+=bodysize;
   }
 
