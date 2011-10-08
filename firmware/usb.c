@@ -66,7 +66,7 @@ bool do_screendump_instead_of_usb = false;
 /* We assume that the USB cable is extracted */
 static int usb_state = USB_EXTRACTED;
 
-#if (CONFIG_STORAGE & STORAGE_MMC) && defined(USB_FULL_INIT)
+#if (CONFIG_STORAGE & STORAGE_MMC) && defined(USB_FULL_INIT) && !defined(HAVE_USBSTACK)
 static int usb_mmc_countdown = 0;
 #endif
 
