@@ -30,9 +30,9 @@ struct header_t
 };
 
 struct file_t {
-	struct header_t const* header;
-	byte const* tracks;
-	byte const* end;    /* end of file data */
+    struct header_t const* header;
+    byte const* tracks;
+    byte const* end;    /* end of file data */
 };
 
 static int get_be16( const void *a )
