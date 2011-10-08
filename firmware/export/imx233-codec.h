@@ -24,6 +24,8 @@
 #define VOLUME_MIN -1000
 #define VOLUME_MAX  -5
 
+#define AUDIOHW_CAPS    DEPTH_3D_CAP
+
 void audiohw_set_volume(int v);
 
 #endif /* __IMX233_CODEC_H_ */
