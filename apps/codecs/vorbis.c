@@ -247,7 +247,7 @@ done:
         size_t bufsize;
         void* buf = ci->codec_get_buffer(&bufsize);
 
-        DEBUGF("Vorbis: Memory max: %u\n", get_max_size(buf));
+        DEBUGF("Vorbis: Memory max: %zu\n", get_max_size(buf));
     }
 #endif
     ogg_malloc_destroy();
