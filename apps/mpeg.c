@@ -142,6 +142,7 @@ static bool checked_for_cuesheet = false;
 
 static const char mpeg_thread_name[] = "mpeg";
 static unsigned int audio_thread_id;
+static bool audio_is_initialized;
 static unsigned int mpeg_errno;
 
 static bool playing = false;    /* We are playing an MP3 stream */
@@ -558,8 +559,9 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
     (void)talk_buf; /* always grab the voice buffer for now */
 
-    audio_hard_stop();
-    
+    if (audio_is_initialized)
+        audio_hard_stop();
+
     if (!buffer_size) /* special case for talk_init() */
         return NULL;
 
@@ -3017,6 +3019,7 @@ void audio_init(void)
     dbg_cnt2us(0);
 #endif /* !SIMULATOR */
 #endif /* DEBUG */
+    audio_is_initialized = true;
 }
 
 #endif /* CONFIG_CODEC != SWCODEC */
