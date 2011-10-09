@@ -558,8 +558,10 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
     (void)talk_buf; /* always grab the voice buffer for now */
 
-    if (buffer_size) /* special case for talk_init() */
-        audio_hard_stop();
+    audio_hard_stop();
+    
+    if (!buffer_size) /* special case for talk_init() */
+        return NULL;
 
     if (!audiobuf_handle)
     {
@@ -571,9 +573,9 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
             *buffer_size = audiobuflen;
     }
     mpeg_audiobuf = core_get_data(audiobuf_handle);
-
-    if (!buffer_size) /* special case for talk_init() */
-        talkbuf_init(mpeg_audiobuf);
+    /* tell talk about the new buffer, don't re-enable just yet because the
+     * buffer is stolen */
+    talkbuf_init(mpeg_audiobuf);
 
     return mpeg_audiobuf;
 }

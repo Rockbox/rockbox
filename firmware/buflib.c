@@ -628,7 +628,11 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
 {
     /* limit name to 16 since that's what buflib_available() accounts for it */
     char buf[16];
+
     *size = buflib_available(ctx);
+    if (*size <= 0) /* OOM */
+        return -1;
+
     strlcpy(buf, name, sizeof(buf));
 
     return buflib_alloc_ex(ctx, *size, buf, ops);
