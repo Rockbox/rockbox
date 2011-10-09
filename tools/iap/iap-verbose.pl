@@ -182,6 +182,8 @@ sub _h_00_0013 {
     printf("  Power:               %s\n", ("Low", "Intermittent high", "Reserved", "Constant high")[($options & 0x0C) >> 2]);
     printf(" Device ID:            0x%08x\n", $devid);
 
+    delete($self->{-state}->{'_h_00_0015'});
+
     return 1;
 }
 
@@ -412,6 +414,28 @@ sub _h_00_0028 {
         printf("  Accessory incoming max packet size\n") if ($accparam & 0x200);
     }
 
+    if ($acctype ~~ [0x01, 0x06, 0x07, 0x08]) {
+        $accparam = unpack("xZ*", $data);
+        printf(" Data:             %s\n", $accparam);
+    }
+
+    if ($acctype == 0x02) {
+        $accparam = [ unpack("xNCCC", $data) ];
+        printf(" Model ID:         %08x\n", $accparam->[0]);
+        printf(" Firmware version: %d.%02d.%02d\n", $accparam->[1], $accparam->[2], $accparam->[3]);
+    }
+
+    if ($acctype == 0x03) {
+        $accparam = [ unpack("xCCC", $data) ];
+        printf(" Lingo:            %02x\n", $accparam->[0]);
+        printf(" Version:          %d.%02d\n", $accparam->[1], $accparam->[2]);
+    }
+
+    if ($acctype ~~ [0x04, 0x05]) {
+        $accparam = [ unpack("xCCC", $data) ];
+        printf(" Version:           %d.%02d.%02d\n", @{$accparam});
+    }
+
     return 1;
 }
 
@@ -547,6 +571,44 @@ sub _h_02_0000 {
         printf("  Down Arrow\n") if ($keys[3] & 0x02);
         printf("  Backlight off\n") if ($keys[3] & 0x04);
     }
+
+    return 1;
+}
+
+sub _h_02_0001 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $res;
+    my $cmd;
+
+    ($res, $cmd) = unpack("CC", $data);
+
+    printf("ACK (0x02, 0x01) I->D\n");
+    printf(" Acknowledged command: 0x%02x\n", $cmd);
+    printf(" Status:               %s (%d)\n",
+        ("Success",
+         "ERROR: Unknown Database Category",
+         "ERROR: Command Failed",
+         "ERROR: Out Of Resource",
+         "ERROR: Bad Parameter",
+         "ERROR: Unknown ID",
+         "Command Pending",
+         "ERROR: Not Authenticated",
+         "ERROR: Bad Authentication Version",
+         "ERROR: Accessory Power Mode Request Failed",
+         "ERROR: Certificate Invalid",
+         "ERROR: Certificate permissions invalid",
+         "ERROR: File is in use",
+         "ERROR: Invalid file handle",
+         "ERROR: Directory not empty",
+         "ERROR: Operation timed out",
+         "ERROR: Command unavailable in this iPod mode",
+         "ERROR: Invalid accessory resistor ID",
+         "Reserved",
+         "Reserved",
+         "Reserved",
+         "ERROR: Maximum number of accessory connections already reached")[$res], $res);
 
     return 1;
 }

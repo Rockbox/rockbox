@@ -258,6 +258,14 @@ static unsigned char* iap_txnext;
  */
 #define IAP_TX_PUT_STRING(str) IAP_TX_PUT_DATA((str), strlen((str))+1)
 
+/* The Model ID of the iPod we emulate. Currently a 160GB classic */
+#define IAP_IPOD_MODEL (0x00130200U)
+
+/* The firmware version we emulate. Currently 2.0.3 */
+#define IAP_IPOD_FIRMWARE_MAJOR (2)
+#define IAP_IPOD_FIRMWARE_MINOR (0)
+#define IAP_IPOD_FIRMWARE_REV   (3)
+
 static char cur_dbrecord[5] = {0};
 
 /* states of the iap de-framing state machine */
@@ -291,10 +299,10 @@ static enum interface_state interface_state = IST_STANDARD;
  * of 0 means unsupported
  */
 static unsigned char lingo_versions[32][2] = {
-    {1, 5},     /* General lingo, 0x00 */
+    {1, 8},     /* General lingo, 0x00 */
     {0, 0},     /* Microphone lingo, 0x01, unsupported */
     {1, 2},     /* Simple remote lingo, 0x02 */
-    {1, 0},     /* Display remote lingo, 0x03 */
+    {1, 5},     /* Display remote lingo, 0x03 */
     {1, 0},     /* Extended Interface lingo, 0x04 */
     {}          /* All others are unsupported */
 };
@@ -323,8 +331,9 @@ struct auth_t {
 /* State of GetAccessoryInfo */
 enum accinfo_state {
     ACCST_NONE,     /* Initial state, no message sent */
-    ACCST_INIT,     /* Send out GetAccessoryInfo */
-    ACCST_SENT,     /* Wait for RetAccessoryInfo */
+    ACCST_INIT,     /* Send out initial GetAccessoryInfo */
+    ACCST_SENT,     /* Wait for initial RetAccessoryInfo */
+    ACCST_DATA,     /* Query device information, according to capabilities */
 };
 
 /* A struct describing an attached device and it's current
@@ -368,6 +377,10 @@ static struct device_t {
     unsigned char soundcheck;
     unsigned char audiobook;
     uint16_t trackpos_s;
+    uint32_t capabilities;          /* Capabilities of the device, as returned by type 0
+                                     * of GetAccessoryInfo
+                                     */
+    uint32_t capabilities_queried;  /* Capabilities already queried */
 } device;
 #define DEVICE_AUTHENTICATED (device.auth.state == AUST_AUTH)
 #define DEVICE_AUTH_RUNNING (device.auth.state != AUST_NONE)
@@ -381,14 +394,18 @@ static struct buflib_callbacks iap_buflib_callbacks = {
 };
 
 static void iap_malloc(void);
+static void iap_shuffle_state(bool state);
+static void iap_repeat_state(unsigned char state);
+static void iap_repeat_next(void);
+static void iap_fill_power_state(void);
 
-static void put_u16(unsigned char *buf, uint16_t data)
+static void put_u16(unsigned char *buf, const uint16_t data)
 {
     buf[0] = (data >>  8) & 0xFF;
     buf[1] = (data >>  0) & 0xFF;
 }
 
-static void put_u32(unsigned char *buf, uint32_t data)
+static void put_u32(unsigned char *buf, const uint32_t data)
 {
     buf[0] = (data >> 24) & 0xFF;
     buf[1] = (data >> 16) & 0xFF;
@@ -399,6 +416,11 @@ static void put_u32(unsigned char *buf, uint32_t data)
 static uint32_t get_u32(const unsigned char *buf)
 {
     return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+}
+
+static uint16_t get_u16(const unsigned char *buf)
+{
+    return (buf[0] << 8) | buf[1];
 }
 
 static void reset_auth(struct auth_t* auth)
@@ -417,10 +439,14 @@ static void reset_device(struct device_t* device)
     device->do_notify = false;
     device->do_power_notify = false;
     device->accinfo = ACCST_NONE;
+    device->capabilities = 0;
+    device->capabilities_queried = 0;
 }
 
-static int iap_task(struct timeout *tmo __attribute__ ((unused)))
+static int iap_task(struct timeout *tmo)
 {
+    (void) tmo;
+
     queue_post(&iap_queue, IAP_EV_TICK, 0);
     return MS_TO_TICKS(100);
 }
@@ -480,7 +506,7 @@ static void iap_track_changed(void *ignored)
  *
  * Please note that a lot of additional work is done by iap_start()
  */
-void iap_setup(int ratenum)
+void iap_setup(const int ratenum)
 {
     iap_bitrate_set(ratenum);
     iap_updateflag = false;
@@ -536,7 +562,7 @@ static void iap_malloc(void)
     iap_running = true;
 }
 
-void iap_bitrate_set(int ratenum)
+void iap_bitrate_set(const int ratenum)
 {
     switch(ratenum)
     {
@@ -620,7 +646,7 @@ static void iap_send_tx(void)
 /* This is just a compatibility wrapper around the new TX buffer
  * infrastructure
  */
-void iap_send_pkt(const unsigned char * data, int len)
+void iap_send_pkt(const unsigned char * data, const int len)
 {
     if (!iap_running)
         return;
@@ -630,7 +656,7 @@ void iap_send_pkt(const unsigned char * data, int len)
     iap_send_tx();
 }    
 
-bool iap_getc(unsigned char x)
+bool iap_getc(const unsigned char x)
 {
     struct state_t *s = &frame_state;
     static long pkt_timeout;
@@ -774,15 +800,13 @@ void iap_periodic(void)
         case AUST_CERTDONE:
         {
             /* Send out GetDevAuthenticationSignature, with
-             * 20 bytes of challenge and a retry counter of 1
+             * 20 bytes of challenge and a retry counter of 1.
+             * Since we do not really care about the content of the
+             * challenge we just use the first 20 bytes of whatever
+             * is in the RX buffer right now.
              */
-            unsigned char challenge[20] = {0x00, 0x01, 0x02, 0x03, 0x04, 
-                                           0x05, 0x06, 0x07, 0x08, 0x09,
-                                           0x0A, 0x0B, 0x0C, 0x0D, 0x0E,
-                                           0x0F, 0x10, 0x11, 0x12, 0x13};
-
             IAP_TX_INIT(0x00, 0x17);
-            IAP_TX_PUT_DATA(challenge, 20);
+            IAP_TX_PUT_DATA(iap_rxstart, 20);
             IAP_TX_PUT(0x01);
 
             iap_send_tx();
@@ -831,6 +855,73 @@ void iap_periodic(void)
         device.accinfo = ACCST_SENT;
     }
 
+    if (device.accinfo == ACCST_DATA)
+    {
+        int first_set;
+
+        /* Find the first bit set in the capabilities field,
+         * ignoring those we already asked for
+         */
+        first_set = find_first_set_bit(device.capabilities & (~device.capabilities_queried));
+
+        if (first_set != 32)
+        {
+            /* Add bit to queried cababilities */
+            device.capabilities_queried |= BIT_N(first_set);
+
+            switch (first_set)
+            {
+                /* Name */
+                case 0x01:
+                /* Firmware version */
+                case 0x04:
+                /* Hardware version */
+                case 0x05:
+                /* Manufacturer */
+                case 0x06:
+                /* Model number */
+                case 0x07:
+                /* Serial number */
+                case 0x08:
+                /* Maximum payload size */
+                case 0x09:
+                {
+                    IAP_TX_INIT(0x00, 0x27);
+                    IAP_TX_PUT(first_set);
+
+                    iap_send_tx();
+                    break;
+                }
+
+                /* Minimum supported iPod firmware version */
+                case 0x02:
+                {
+                    IAP_TX_INIT(0x00, 0x27);
+                    IAP_TX_PUT(2);
+                    IAP_TX_PUT_U32(IAP_IPOD_MODEL);
+                    IAP_TX_PUT(IAP_IPOD_FIRMWARE_MAJOR);
+                    IAP_TX_PUT(IAP_IPOD_FIRMWARE_MINOR);
+                    IAP_TX_PUT(IAP_IPOD_FIRMWARE_REV);
+
+                    iap_send_tx();
+                    break;
+                }
+
+                /* Minimum supported lingo version. Queries Lingo 0 */
+                case 0x03:
+                {
+                    IAP_TX_INIT(0x00, 0x27);
+                    IAP_TX_PUT(3);
+                    IAP_TX_PUT(0);
+
+                    iap_send_tx();
+                    break;
+                }
+            }
+
+            device.accinfo = ACCST_SENT;
+        }
+    }
 
     if (!device.do_notify) return;
     if (device.notifications == 0) return;
@@ -975,17 +1066,8 @@ void iap_periodic(void)
         {
             IAP_TX_INIT(0x03, 0x09);
             IAP_TX_PUT(0x05);
-            if (power_state == NO_CHARGER) {
-                if (battery_l < 30) {
-                    IAP_TX_PUT(0x00);
-                } else {
-                    IAP_TX_PUT(0x01);
-                }
-                IAP_TX_PUT((char)((battery_l * 255)/100));
-            } else {
-                IAP_TX_PUT(0x04);
-                IAP_TX_PUT(0x00);
-            }
+
+            iap_fill_power_state();
             device.changed_notifications |= BIT_N(5);
 
             iap_send_tx();
@@ -1141,7 +1223,7 @@ void iap_periodic(void)
  * On a change from IST_EXTENDED to IST_STANDARD, or from IST_STANDARD
  * to IST_EXTENDED, pause playback, if playing
  */
-static void interface_state_change(enum interface_state new)
+static void interface_state_change(const enum interface_state new)
 {
     if (((interface_state == IST_EXTENDED) && (new == IST_STANDARD)) ||
         ((interface_state == IST_STANDARD) && (new == IST_EXTENDED))) {
@@ -1154,7 +1236,7 @@ static void interface_state_change(enum interface_state new)
     interface_state = new;
 }
 
-static void cmd_ack_mode0(unsigned char cmd, unsigned char status)
+static void cmd_ack_mode0(const unsigned char cmd, const unsigned char status)
 {
     IAP_TX_INIT(0x00, 0x02);
     IAP_TX_PUT(status);
@@ -1164,7 +1246,7 @@ static void cmd_ack_mode0(unsigned char cmd, unsigned char status)
 
 #define cmd_ok_mode0(cmd) cmd_ack_mode0((cmd), IAP_ACK_OK)
 
-static void cmd_pending_mode0(unsigned char cmd, uint32_t msdelay)
+static void cmd_pending_mode0(const unsigned char cmd, const uint32_t msdelay)
 {
     IAP_TX_INIT(0x00, 0x02);
     IAP_TX_PUT(0x06);
@@ -1174,7 +1256,7 @@ static void cmd_pending_mode0(unsigned char cmd, uint32_t msdelay)
 }
 
 
-static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
+static void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
 {
     unsigned int cmd = buf[1];
 
@@ -1430,11 +1512,10 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          */
         case 0x09:
         {
-            /* ipod5G firmware version */
             IAP_TX_INIT(0x00, 0x0A);
-            IAP_TX_PUT(0x01);
-            IAP_TX_PUT(0x02);
-            IAP_TX_PUT(0x01);
+            IAP_TX_PUT(IAP_IPOD_FIRMWARE_MAJOR);
+            IAP_TX_PUT(IAP_IPOD_FIRMWARE_MINOR);
+            IAP_TX_PUT(IAP_IPOD_FIRMWARE_REV);
 
             iap_send_tx();
             break;
@@ -1495,13 +1576,8 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          */
         case 0x0D:
         {
-            /* ipod is supposed to work only with 5G and nano 2G */
-            /*{0x00, 0x0E, 0x00, 0x0B, 0x00, 0x05, 0x50, 0x41, 0x31, 0x34, 
-                    0x37, 0x4C, 0x4C, 0x00};    PA147LL (IPOD 5G 60 GO) */
-            /* ReturniPodModelNum */
-
             IAP_TX_INIT(0x00, 0x0E);
-            IAP_TX_PUT_U32(0x000B0010);
+            IAP_TX_PUT_U32(IAP_IPOD_MODEL);
             IAP_TX_PUT_STRING("ROCKBOX");
 
             iap_send_tx();
@@ -2006,13 +2082,39 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
          *
          * Returns: (none)
          *
-         * TODO: Actually do something with the information received here,
-         * sending out additional requests for all the categories the
-         * device supports
+         * TODO: Actually do something with the information received here.
+         * Some devices actually expect us to request the data they
+         * offer, so completely ignoring this does not work, either.
          */
         case 0x28:
         {
-            /* Currently, nothing is done with the information */
+            CHECKLEN0(3);
+
+            switch (buf[0x02])
+            {
+                /* Info capabilities */
+                case 0x00:
+                {
+                    CHECKLEN0(7);
+
+                    device.capabilities = get_u32(&buf[0x03]);
+                    /* Type 0x00 was already queried, that's where this information comes from */
+                    device.capabilities_queried = 0x01;
+                    device.capabilities &= ~0x01;
+                    break;
+                }
+
+                /* For now, ignore all other information */
+                default:
+                {
+                    break;
+                }
+            }
+
+            /* If there are any unqueried capabilities left, do so */
+            if (device.capabilities)
+                device.accinfo = ACCST_DATA;
+
             break;
         }
 
@@ -2127,7 +2229,7 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
  * - Implement at least cmd 0x04
  */
 
-static void cmd_ack_mode2(unsigned char cmd, unsigned char status)
+static void cmd_ack_mode2(const unsigned char cmd, const unsigned char status)
 {
     IAP_TX_INIT(0x02, 0x01);
     IAP_TX_PUT(status);
@@ -2138,7 +2240,7 @@ static void cmd_ack_mode2(unsigned char cmd, unsigned char status)
 
 #define cmd_ok_mode2(cmd) cmd_ack_mode2((cmd), IAP_ACK_OK)
 
-static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
+static void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
 {
     unsigned int cmd = buf[1];
 
@@ -2382,7 +2484,7 @@ static void iap_handlepkt_mode2(unsigned int len, const unsigned char *buf)
  *   profile 0 (equalizer disabled) is supported
  */
 
-static void cmd_ack_mode3(unsigned char cmd, unsigned char status)
+static void cmd_ack_mode3(const unsigned char cmd, const unsigned char status)
 {
     IAP_TX_INIT(0x03, 0x00);
     IAP_TX_PUT(status);
@@ -2393,7 +2495,7 @@ static void cmd_ack_mode3(unsigned char cmd, unsigned char status)
 
 #define cmd_ok_mode3(cmd) cmd_ack_mode3((cmd), IAP_ACK_OK)
 
-static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
+static void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
 {
     unsigned int cmd = buf[1];
 
@@ -2538,6 +2640,8 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
         {
             uint32_t index;
 
+            CHECKLEN3(6);
+
             index = get_u32(&buf[2]);
 
             if (index > 0) {
@@ -2617,16 +2721,41 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
          * Sent from the iPod to the device
          */
 
-#if 0
-        /* SetiPodStateInfo */
-        case 0x0E:
+        /* GetRemoteEventStatus (0x0A)
+         *
+         * Request the events changed since the last call to GetREmoteEventStatus
+         * or SetRemoteEventNotification
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x0A
+         *
+         * This command requires authentication
+         *
+         * Returns:
+         * RetRemoteEventNotification
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x0B
+         * 0x02-0x05: Event status bits
+         */
+        case 0x0A:
         {
-            if (buf[2] == 0x04)
-                global_settings.volume = (-58)+((int)buf[4]+1)/4;
-                sound_set_volume(global_settings.volume);   /* indent BUG? */
+            CHECKAUTH3;
+            IAP_TX_INIT(0x03, 0x0B);
+            IAP_TX_PUT_U32(device.changed_notifications);
+
+            iap_send_tx();
+
+            device.changed_notifications = 0;
             break;
         }
-#endif
+
+        /* RetRemoteEventStatus (0x0B)
+         *
+         * Sent from the iPod to the device
+         */
 
         /* GetiPodStateInfo (0x0C)
          *
@@ -2748,17 +2877,7 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
                  */
                 case 0x05:
                 {
-                    if (charger_input_state == NO_CHARGER) {
-                        if (battery_level() < 30) {
-                            IAP_TX_PUT(0x00);
-                        } else {
-                            IAP_TX_PUT(0x01);
-                        }
-                        IAP_TX_PUT((char)((battery_level() * 255)/100));
-                    } else {
-                        IAP_TX_PUT(0x04);
-                        IAP_TX_PUT(0x00);
-                    }
+                    iap_fill_power_state();
 
                     iap_send_tx();
                     break;
@@ -2948,6 +3067,296 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
          * Sent from the iPod to the device
          */
 
+        /* SetiPodStateInfo (0x0E)
+         *
+         * Set status information to new values
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x0E
+         * 0x02: Type of information to change
+         * 0x03-0xNN: New information
+         *
+         * This command requires authentication
+         *
+         * Returns on success:
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_ACK_CMD_FAILED
+         * IAP_ACK_BAD_PARAM
+         */
+        case 0x0E:
+        {
+            CHECKLEN3(3);
+            CHECKAUTH3;
+            switch (buf[0x02])
+            {
+                /* Track position (ms)
+                 * Data length: 4
+                 */
+                case 0x00:
+                {
+                    uint32_t pos;
+
+                    CHECKLEN3(7);
+                    pos = get_u32(&buf[0x03]);
+                    audio_ff_rewind(pos);
+
+                    cmd_ok_mode3(cmd);
+                    break;
+                }
+
+                /* Track index
+                 * Data length: 4
+                 */
+                case 0x01:
+                {
+                    uint32_t index;
+
+                    CHECKLEN3(7);
+                    index = get_u32(&buf[0x03]);
+                    audio_skip(index-iap_get_trackindex());
+
+                    cmd_ok_mode3(cmd);
+                    break;
+                }
+
+                /* Chapter index
+                 * Data length: 2
+                 */
+                case 0x02:
+                {
+                    /* This is not supported */
+                    cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+                    break;
+                }
+
+                /* Play status
+                 * Data length: 1
+                 */
+                case 0x03:
+                {
+                    CHECKLEN3(4);
+                    switch(buf[0x03])
+                    {
+                        case 0x00:
+                        {
+                            audio_stop();
+                            cmd_ok_mode3(cmd);
+                            break;
+                        }
+
+                        case 0x01:
+                        {
+                            audio_resume();
+                            cmd_ok_mode3(cmd);
+                            break;
+                        }
+
+                        case 0x02:
+                        {
+                            audio_pause();
+                            cmd_ok_mode3(cmd);
+                            break;
+                        }
+
+                        default:
+                        {
+                            cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+                            break;
+                        }
+                    }
+                    break;
+                }
+
+                /* Volume/Mute
+                 * Data length: 2
+                 * TODO: Fix this
+                 */
+                case 0x04:
+                {
+                    CHECKLEN3(5);
+                    cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+                    break;
+                }
+
+                /* Equalizer
+                 * Data length: 5
+                 */
+                case 0x06:
+                {
+                    uint32_t index;
+
+                    CHECKLEN3(8);
+                    index = get_u32(&buf[0x03]);
+                    if (index == 0) {
+                        cmd_ok_mode3(cmd);
+                    } else {
+                        cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                    }
+                    break;
+                }
+
+                /* Shuffle
+                 * Data length: 2
+                 */
+                case 0x07:
+                {
+                    CHECKLEN3(5);
+
+                    switch(buf[0x03])
+                    {
+                        case 0x00:
+                        {
+                            iap_shuffle_state(false);
+                            cmd_ok_mode3(cmd);
+                            break;
+                        }
+                        case 0x01:
+                        case 0x02:
+                        {
+                            iap_shuffle_state(true);
+                            cmd_ok_mode3(cmd);
+                            break;
+                        }
+
+                        default:
+                        {
+                            cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                            break;
+                        }
+                    }
+                    break;
+                }
+
+                /* Repeat
+                 * Data length: 2
+                 */
+                case 0x08:
+                {
+                    CHECKLEN3(5);
+
+                    switch(buf[0x03])
+                    {
+                        case 0x00:
+                        {
+                            iap_repeat_state(REPEAT_OFF);
+                            cmd_ok_mode3(cmd);
+                            break;
+                        }
+                        case 0x01:
+                        {
+                            iap_repeat_state(REPEAT_ONE);
+                            cmd_ok_mode3(cmd);
+                            break;
+                        }
+                        case 0x02:
+                        {
+                            iap_repeat_state(REPEAT_ALL);
+                            cmd_ok_mode3(cmd);
+                            break;
+                        }
+                        default:
+                        {
+                            cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                            break;
+                        }
+                    }
+                    break;
+                }
+
+                /* Date/Time
+                 * Data length: 6
+                 */
+                case 0x09:
+                {
+                    CHECKLEN3(9);
+                    
+                    cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+                    break;
+                }
+
+                /* Alarm
+                 * Data length: 4
+                 */
+                case 0x0A:
+                {
+                    CHECKLEN3(7);
+                    
+                    cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+                    break;
+                }
+
+                /* Backlight
+                 * Data length: 2
+                 */
+                case 0x0B:
+                {
+                    CHECKLEN3(5);
+                    
+                    cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+                    break;
+                }
+
+                /* Sound check
+                 * Data length: 2
+                 */
+                case 0x0D:
+                {
+                    CHECKLEN3(5);
+                    
+                    cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+                    break;
+                }
+
+                /* Audio book speed
+                 * Data length: 1
+                 */
+                case 0x0E:
+                {
+                    CHECKLEN3(4);
+                    
+                    cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+                    break;
+                }
+
+                /* Track position (s)
+                 * Data length: 2
+                 */
+                case 0x0F:
+                {
+                    uint16_t pos;
+
+                    CHECKLEN3(5);
+                    pos = get_u16(&buf[0x03]);
+                    audio_ff_rewind(1000L * pos);
+
+                    cmd_ok_mode3(cmd);
+                    break;
+                }
+
+                /* Volume/Mute/Absolute
+                 * Data length: 4
+                 * TODO: Fix this
+                 */
+                case 0x10:
+                {
+                    CHECKLEN3(7);
+                    cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+                    break;
+                }
+
+                default:
+                {
+                    cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                    break;
+                }
+            }
+
+            break;
+        }
+
         /* GetPlayStatus (0x0F)
          *
          * Request the current play status information
@@ -3011,6 +3420,45 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
          *
          * Sent from the iPod to the device
          */
+
+        /* SetCurrentPlayingTrack (0x11)
+         *
+         * Set the current playing track
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x11
+         * 0x02-0x05: Index of track to play
+         *
+         * This command requires authentication
+         *
+         * Returns on success:
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAM
+         */
+        case 0x11:
+        {
+            uint32_t index;
+            uint32_t trackcount;
+
+            CHECKAUTH3;
+            CHECKLEN3(6);
+
+            index = get_u32(&buf[0x02]);
+            trackcount = playlist_amount();
+
+            if (index >= trackcount)
+            {
+                cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+            audio_skip(index-iap_get_trackindex());
+            cmd_ok_mode3(cmd);
+
+            break;
+        }
 
         /* GetIndexedPlayingTrackInfo (0x12)
          *
@@ -3192,6 +3640,269 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
          *
          * Sent from the iPod to the device
          */
+
+        /* GetNumPlayingTracks (0x14)
+         *
+         * Request the number of tracks in the current playlist
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x14
+         *
+         * This command requires authentication.
+         *
+         * Returns:
+         * RetNumPlayingTracks
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x15
+         * 0x02-0xNN: Number of tracks
+         */
+        case 0x14:
+        {
+            CHECKAUTH3;
+            
+            IAP_TX_INIT(0x03, 0x15);
+            IAP_TX_PUT_U32(playlist_amount());
+
+            iap_send_tx();
+        }
+
+        /* RetNumPlayingTracks (0x15)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetArtworkFormats (0x16)
+         *
+         * Request a list of supported artwork formats
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x16
+         *
+         * This command requires authentication.
+         *
+         * Returns:
+         * RetArtworkFormats
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x17
+         * 0x02-0xNN: list of 7 byte format descriptors
+         */
+        case 0x16:
+        {
+            CHECKAUTH3;
+
+            /* We return the empty list, meaning no artwork
+             * TODO: Fix to return actual artwork formats
+             */
+            IAP_TX_INIT(0x03, 0x17);
+
+            iap_send_tx();
+            break;
+        }
+
+        /* RetArtworkFormats (0x17)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetTrackArtworkData (0x18)
+         *
+         * Request artwork for the given track
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x18
+         * 0x02-0x05: Track index
+         * 0x06-0x07: Format ID
+         * 0x08-0x0B: Track offset in ms
+         *
+         * This command requires authentication.
+         *
+         * Returns:
+         * RetTrackArtworkData
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x19
+         * 0x02-0x03: Descriptor index
+         * 0x04: Pixel format code
+         * 0x05-0x06: Image width in pixels
+         * 0x07-0x08: Image height in pixels
+         * 0x09-0x0A: Inset rectangle, top left x
+         * 0x0B-0x0C: Inset rectangle, top left y
+         * 0x0D-0x0E: Inset rectangle, bottom right x
+         * 0x0F-0x10: Inset rectangle, bottom right y
+         * 0x11-0x14: Row size in bytes
+         * 0x15-0xNN: Image data
+         *
+         * If the image data does not fit in a single packet, subsequent
+         * packets omit bytes 0x04-0x14.
+         */
+        case 0x18:
+        {
+            CHECKAUTH3;
+            CHECKLEN3(0x0C);
+
+            /* No artwork support currently */
+            cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+            break;
+        }
+
+        /* RetTrackArtworkFormat (0x19)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetPowerBatteryState (0x1A)
+         *
+         * Request the current power state
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x1A
+         *
+         * This command requires authentication.
+         *
+         * Returns:
+         * RetPowerBatteryState
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x1B
+         * 0x02: Power state
+         * 0x03: Battery state
+         */
+        case 0x1A:
+        {
+            IAP_TX_INIT(0x03, 0x1B);
+            
+            iap_fill_power_state();
+            iap_send_tx();
+            break;
+        }
+
+        /* RetPowerBatteryState (0x1B)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* GetSoundCheckState (0x1C)
+         *
+         * Request the current sound check state
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x1C
+         *
+         * This command requires authentication.
+         *
+         * Returns:
+         * RetSoundCheckState
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x1D
+         * 0x02: Sound check state
+         */
+        case 0x1C:
+        {
+            CHECKAUTH3;
+
+            IAP_TX_INIT(0x03, 0x1D);
+            IAP_TX_PUT(0x00);       /* Always off */
+
+            iap_send_tx();
+            break;
+        }
+
+        /* RetSoundCheckState (0x1D)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* SetSoundCheckState (0x1E)
+         *
+         * Set the sound check state
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x1E
+         * 0x02: Sound check state
+         * 0x03: Restore on exit
+         *
+         * This command requires authentication.
+         *
+         * Returns on success
+         * IAP_ACK_OK
+         *
+         * Returns on failure
+         * IAP_ACK_CMD_FAILED
+         */
+        case 0x1E:
+        {
+            CHECKAUTH3;
+            CHECKLEN3(4);
+            
+            /* Sound check is not supported right now
+             * TODO: Fix
+             */
+
+            cmd_ack_mode3(cmd, IAP_ACK_CMD_FAILED);
+            break;
+        }
+
+        /* GetTrackArtworkTimes (0x1F)
+         *
+         * Request a list of timestamps at which artwork exists in a track
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x1F
+         * 0x02-0x05: Track index
+         * 0x06-0x07: Format ID
+         * 0x08-0x09: Artwork Index
+         * 0x0A-0x0B: Artwork count
+         *
+         * This command requires authentication.
+         *
+         * Returns:
+         * RetTrackArtworkTimes
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: Display Remote Lingo, always 0x03
+         * 0x01: Command, always 0x20
+         * 0x02-0x05: Offset in ms
+         *
+         * Bytes 0x02-0x05 can be repeated multiple times
+         */
+        case 0x1F:
+        {
+            uint32_t index;
+
+            CHECKAUTH3;
+            CHECKLEN3(0x0C);
+
+            /* Artwork is currently unsuported, just check for a valid
+             * track index
+             */
+            index = get_u32(&buf[0x02]);
+            if (index >= playlist_amount())
+            {
+                cmd_ack_mode3(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+
+            /* Send an empty list */
+            IAP_TX_INIT(0x03, 0x20);
+
+            iap_send_tx();
+            break;
+        }
         
         /* The default response is IAP_ACK_BAD_PARAM */
         default:
@@ -3202,7 +3913,7 @@ static void iap_handlepkt_mode3(unsigned int len, const unsigned char *buf)
     }
 }
 
-static void cmd_ack_mode4(unsigned int cmd, unsigned char status)
+static void cmd_ack_mode4(const unsigned int cmd, const unsigned char status)
 {
     IAP_TX_INIT4(0x04, 0x0001);
     IAP_TX_PUT(status);
@@ -3240,7 +3951,7 @@ static void get_playlist_name(unsigned char *dest,
     closedir(dp);
 }
 
-static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
+static void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
 {
     unsigned int cmd = (buf[1] << 8) | buf[2];
 
@@ -3696,7 +4407,7 @@ static void iap_handlepkt_mode4(unsigned int len, const unsigned char *buf)
     }
 }
 
-static void iap_handlepkt_mode7(unsigned int len, const unsigned char *buf)
+static void iap_handlepkt_mode7(const unsigned int len, const unsigned char *buf)
 {
     unsigned int cmd = buf[1];
     switch (cmd)
@@ -3788,4 +4499,83 @@ static int iap_move_callback(int handle, void* current, void* new)
     iap_rxstart = iap_buffers+(TX_BUFLEN+6);
 
     return BUFLIB_CB_OK;
+}
+
+/* Change the shuffle state */
+static void iap_shuffle_state(const bool state)
+{
+    /* Set shuffle to enabled */
+    if(state && !global_settings.playlist_shuffle)
+    {
+        global_settings.playlist_shuffle = 1;
+        settings_save();
+        if (audio_status() & AUDIO_STATUS_PLAY)
+            playlist_randomise(NULL, current_tick, true);
+    }
+    /* Set shuffle to disabled */
+    else if(!state && global_settings.playlist_shuffle)
+    {
+        global_settings.playlist_shuffle = 0;
+        settings_save();
+        if (audio_status() & AUDIO_STATUS_PLAY)
+            playlist_sort(NULL, true);
+    }
+}
+
+/* Change the repeat state */
+static void iap_repeat_state(const unsigned char state)
+{
+    if (state != global_settings.repeat_mode)
+    {
+        global_settings.repeat_mode = state;
+        settings_save();
+        if (audio_status() & AUDIO_STATUS_PLAY)
+            audio_flush_and_reload_tracks();
+    }
+}
+
+static void iap_repeat_next(void)
+{
+    switch (global_settings.repeat_mode)
+    {
+        case REPEAT_OFF:
+        {
+            iap_repeat_state(REPEAT_ALL);
+            break;
+        }
+        case REPEAT_ALL:
+        {
+            iap_repeat_state(REPEAT_ONE);
+            break;
+        }
+        case REPEAT_ONE:
+        {
+            iap_repeat_state(REPEAT_OFF);
+            break;
+        }
+    }
+}
+
+/* This function puts the current power/battery state
+ * into the TX buffer. The buffer is assumed to be initialized
+ */
+static void iap_fill_power_state(void)
+{
+    unsigned char power_state;
+    unsigned char battery_l;
+
+    power_state = charger_input_state;
+    battery_l = battery_level();
+
+    if (power_state == NO_CHARGER) {
+        if (battery_l < 30) {
+            IAP_TX_PUT(0x00);
+        } else {
+            IAP_TX_PUT(0x01);
+        }
+        IAP_TX_PUT((char)((battery_l * 255)/100));
+    } else {
+        IAP_TX_PUT(0x04);
+        IAP_TX_PUT(0x00);
+    }
 }
