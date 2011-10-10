@@ -408,7 +408,7 @@ static void sync_audio_setting(int setting, bool global)
     #ifdef AUDIOHW_HAVE_TREBLE
         rb->sound_set(SOUND_TREBLE, (global || settings.tone_controls)
             ? rb->global_settings->treble
-            : rb->sound_default(SOUND_TREBLE);
+            : rb->sound_default(SOUND_TREBLE));
     #endif
 
     #ifdef AUDIOHW_HAVE_EQ
