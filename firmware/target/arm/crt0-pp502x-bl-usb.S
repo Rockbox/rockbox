@@ -239,6 +239,20 @@ start_stub_end:
     strhi   r0, [r1], #4
     bhi     1b
 
+    /* Set up stack for IRQ mode */ 
+    msr     cpsr_c, #0xd2 /* IRQ/FIQ disabled */
+    ldr     sp, =irq_stack
+    /* Let svc, abort and undefined modes use irq stack */
+    msr     cpsr_c, #0xd3
+    ldr     sp, =irq_stack
+    msr     cpsr_c, #0xd7 /* IRQ/FIQ disabled */
+    ldr     sp, =irq_stack
+    msr     cpsr_c, #0xdb /* IRQ/FIQ disabled */
+    ldr     sp, =irq_stack
+
+    /* Switch back to sys mode */
+    msr     cpsr_c, #0xdf
+
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr     r0, =0xdeadbeef
     ldr     r1, =stackbegin
@@ -247,18 +261,6 @@ start_stub_end:
     cmp     sp, r1
     strhi   r0, [r1], #4
     bhi     1b
-
-    /* Set up stack for IRQ mode */ 
-    msr     cpsr_c, #0xd2 /* IRQ/FIQ disabled */
-    ldr     sp, =irq_stack
-    /* Let abort and undefined modes use IRQ stack */
-    msr     cpsr_c, #0xd7 /* IRQ/FIQ disabled */
-    ldr     sp, =irq_stack
-    msr     cpsr_c, #0xdb /* IRQ/FIQ disabled */
-    ldr     sp, =irq_stack
-
-    /* Switch back to supervisor mode */
-    msr     cpsr_c, #0xd3
 
     /* execute the loader - this will load an image to 0x10000000 */
     ldr     r0, =main
@@ -335,12 +337,15 @@ undef_instr_handler:
     mov     r1, #0
     b       UIE
 
-/* We run supervisor mode most of the time, and should never see a software
-   exception being thrown. Perhaps make it illegal and call UIE?
+/* We run sys mode most of the time, and should never see a software
+   exception being thrown. Make it illegal and call UIE.
  */
 software_int_handler:
 reserved_handler:
-    movs    pc, lr
+    sub     r0, lr, #4
+    mov     r1, #4
+    b       UIE
+
 prefetch_abort_handler:
     sub     r0, lr, #4
     mov     r1, #1

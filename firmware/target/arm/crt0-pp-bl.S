@@ -61,7 +61,7 @@ start:
     .equ    CACHE_ENAB,  0x1
 #endif
 
-    msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
+    msr    cpsr_c, #0xdf /* enter sys mode, disable IRQ */
 #ifndef E200R_INSTALLER
 /* 1 - Copy the bootloader to IRAM */
     /* get the high part of our execute address */

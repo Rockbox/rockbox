@@ -169,23 +169,25 @@ _start:
     msr     cpsr_c, #0xd2           /* Go into irq state */
     ldr     sp, =_irq_stack_start   /* set the irq stack pointer */
 
-    /* This should not be needed, but set the stack location for abort and
-    * undefined to at least a known stack location (IRQ)
-    */
-    msr     cpsr_c, #0xd7           /* Go into abort state */
+    /* SVC, ABT, UNDEF share irq stack */
+    msr     cpsr_c, #0xd3           /* Go into svc state */
+    ldr     sp, =_irq_stack_start /* set svc stack pointer */
+
+    msr     cpsr_c, #0xd7                    /* Go into abort state */
     ldr     sp, =_irq_stack_start   /* set the stack pointer */
 
-    msr     cpsr_c, #0xdb           /* Go into undefined state */
+    msr     cpsr_c, #0xdb                    /* Go into undefined state */
     ldr     sp, =_irq_stack_start   /* set the stack pointer */
 
     /* Initialize program stack */
-    msr     cpsr_c, #0xd3           /* Go into supervisor state */
+    msr     cpsr_c, #0xdf           /* Go into sys state */
+
     ldr     r0, =0xDEADBEEF         /* Can be taken out; left for clarity */
     ldr     r1, =_pro_stack_end     /* Stack counts backwards, so end is first*/
     ldr     r2, =_pro_stack_start
     bl      _init_section
 
-    ldr     sp, =_pro_stack_start   /* set the supervisor stack pointer */
+    ldr     sp, =_pro_stack_start   /* set the sys stack pointer */
 
     /* MMU initialization */ 
     bl      ttb_init
@@ -298,6 +300,8 @@ _delay_cycles:
  *      0: Undefined Instruction                                              *
  *      1: Prefetch Abort                                                     *
  *      2: Data Abort                                                         *
+ *      3: DIV0                                                               *
+ *      4: SWI                                                                *
  *  The exceptions return operations are documented in section A2.6 of the    *
  *  ARM Architecture Reference Manual.                                        *
  ******************************************************************************/
@@ -309,11 +313,12 @@ _undefined_instruction:
     bl     UIE
 
 /* A2.6.4: Software Interrupt exception - These should not happen in Rockbox,
- * but for now leave this as a placeholder and continue with the program.
- * LR=PC of next instruction.
+ * make it illegal
  */
 _software_interrupt:
-    mov    pc, lr
+    sub    r0, lr, #4
+    mov    r1, #4
+    bl     UIE
 
 /* A2.6.5 Prefetch Abort - This is also the BKPT instruction since this is a
  * v5 target.  Pass it on to UIE since it is not currently used.

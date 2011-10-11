@@ -33,6 +33,8 @@
 #define ARM_MODE_FIQ     0x11
 #define ARM_MODE_IRQ     0x12
 #define ARM_MODE_SVC     0x13
+#define ARM_MODE_UND     0x1b
+#define ARM_MODE_SYS     0x1f
 
 #define I_BIT            0x80
 #define F_BIT            0x40
@@ -163,6 +165,15 @@ _stack_init:
     * r2 = IRQ_STACK_SIZE
     */
 
+    /*- Set up Interrupt Mode and set IRQ Mode Stack */
+    msr      CPSR_c, #ARM_MODE_IRQ | I_BIT | F_BIT /* Enter in Mode Interrupt
+    * and disable IRQ (Interrupt) and FIQ (Fast Interrupt)
+    */
+
+    mov      sp, r0 /* sp (Interrupt Mode Stack Pointer) =
+    * TOP_OF_MEMORY (end of IRAM 1)
+    */
+
     /*- Set up Abort Mode and set ABT Mode Stack */
     msr      CPSR_c, #ARM_MODE_ABT | I_BIT | F_BIT /* Enter in Mode Abort
     * and disable IRQ (Interrupt) and FIQ (Fast Interrupt)
@@ -172,26 +183,27 @@ _stack_init:
     * (end of IRAM 1)
     */
 
-    /* put r0 with value of the new address for next Stack */
-    sub      r0, r0, r1 /* r0 = r0 - r1 --> r0 = (end of IRAM 1) -
-    * (ABT_STACK_SIZE)
-    */
-
-    /*- Set up Interrupt Mode and set IRQ Mode Stack */
-    msr      CPSR_c, #ARM_MODE_IRQ | I_BIT | F_BIT /* Enter in Mode Interrupt
+    /*- Set up Abort Mode and set ABT Mode Stack */
+    msr      CPSR_c, #ARM_MODE_UND | I_BIT | F_BIT /* Enter in Mode Undefined
     * and disable IRQ (Interrupt) and FIQ (Fast Interrupt)
     */
 
-    mov      sp, r0 /* sp (Interrupt Mode Stack Pointer) =
-    * TOP_OF_MEMORY (end of IRAM 1) - (ABT_STACK_SIZE)
+    mov      sp, r0 /* sp (ABT Mode Stack Pointer) = TOP_OF_MEMORY
+    * (end of IRAM 1)
     */
+
+    /*- Set up Supervisor Mode and set Supervisor Mode Stack */
+    msr      CPSR_c, #ARM_MODE_SVC | I_BIT | F_BIT
+    mov      sp, r0
 
     sub      r0, r0, r2 /* Put on r0 the new address for next
-    * Stack (Supervisor Mode)
+    * Stack (Sys Mode)
     */
 
-/*- Enable interrupt & Set up Supervisor Mode and set Supervisor Mode Stack */
-    msr      CPSR_c, #ARM_MODE_SVC | F_BIT
+    /*- Set up Sys Mode and set Sys Mode Stack */
+    msr      CPSR_c, #ARM_MODE_SYS | F_BIT /* Enter in Sys Mode
+    * and enable IRQ (Interrupt) and disable FIQ (Fast Interrupt)
+    */
     mov      sp, r0
 
 /*-----------------------------------------------------------------------------

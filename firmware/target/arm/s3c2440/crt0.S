@@ -527,7 +527,25 @@ bsszero:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     bsszero
-    
+
+    /* Set up stack for IRQ mode */
+    msr     cpsr_c, #0xd2
+    ldr     sp, =irq_stack
+    /* Set up stack for FIQ mode */ 
+    msr     cpsr_c, #0xd1
+    ldr     sp, =fiq_stack
+
+    /* Let svc, abort and undefined modes use irq stack */
+    msr     cpsr_c, #0xd3
+    ldr     sp, =irq_stack
+    msr     cpsr_c, #0xd7
+    ldr     sp, =irq_stack
+    msr     cpsr_c, #0xdb
+    ldr     sp, =irq_stack
+
+    /* Switch to sys mode */
+    msr     cpsr_c, #0xdf
+
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr     sp, =stackend
     mov     r3, sp
@@ -537,22 +555,6 @@ stackmunge:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     stackmunge
-
-     /* Set up stack for IRQ mode */
-    msr     cpsr_c, #0xd2
-    ldr     sp, =irq_stack
-    /* Set up stack for FIQ mode */ 
-    msr     cpsr_c, #0xd1
-    ldr     sp, =fiq_stack
-
-    /* Let abort and undefined modes use IRQ stack */
-    msr     cpsr_c, #0xd7
-    ldr     sp, =irq_stack
-    msr     cpsr_c, #0xdb
-    ldr     sp, =irq_stack
-    /* Switch to supervisor mode */
-    msr     cpsr_c, #0xd3
-    ldr     sp, =stackend
 
     /* Start the main function */
     ldr     lr, =vectors
@@ -573,12 +575,14 @@ undef_instr_handler:
     mov    r1, #0
     b      UIE
 
-/* We run supervisor mode most of the time, and should never see a software
-   exception being thrown. Perhaps make it illegal and call UIE?
+/* We run sys mode most of the time, and should never see a software
+   exception being thrown. Make it illegal and call UIE.
  */
 software_int_handler:
 reserved_handler:
-    movs   pc, lr
+    sub    r0, lr, #4
+    mov    r1, #4
+    b      UIE
 
 prefetch_abort_handler:
     sub    r0, lr, #4
@@ -749,4 +753,3 @@ irq_stack:
 /* 256 words of FIQ stack */
     .space 256*4
 fiq_stack:
-

@@ -156,6 +156,25 @@ newstart2:
     bhi     1b
 #endif
 
+    /* Set up stack for IRQ mode */ 
+    msr     cpsr_c, #0xd2
+    ldr     sp, =_irqstackend
+
+    /* Set up stack for FIQ mode */ 
+    msr     cpsr_c, #0xd1
+    ldr     sp, =_fiqstackend
+
+    /* Let svc, abort and undefined modes use irq stack */
+    msr     cpsr_c, #0xd3
+    ldr     sp, =_irqstackend
+    msr     cpsr_c, #0xd7
+    ldr     sp, =_irqstackend
+    msr     cpsr_c, #0xdb
+    ldr     sp, =_irqstackend
+
+    /* Switch to sys mode */
+    msr     cpsr_c, #0xdf
+
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr     sp, =stackend
     ldr     r2, =stackbegin
@@ -165,22 +184,6 @@ newstart2:
     strhi   r3, [r2], #4
     bhi     1b
 
-    /* Set up stack for IRQ mode */ 
-    msr     cpsr_c, #0xd2
-    ldr     sp, =_irqstackend
-
-    /* Set up stack for FIQ mode */ 
-    msr     cpsr_c, #0xd1
-    ldr     sp, =_fiqstackend
-
-    /* Let abort and undefined modes use IRQ stack */
-    msr     cpsr_c, #0xd7
-    ldr     sp, =_irqstackend
-    msr     cpsr_c, #0xdb
-    ldr     sp, =_irqstackend
-
-    /* Switch back to supervisor mode */
-    msr     cpsr_c, #0xd3
 
     bl      main
 
@@ -196,12 +199,6 @@ undef_instr_handler:
     mov    r1, #0
     b      UIE
 
-/* We run supervisor mode most of the time, and should never see a software
- * exception being thrown. Perhaps make it illegal and call UIE? */
-software_int_handler:
-reserved_handler:
-    movs   pc, lr
-
 prefetch_abort_handler:
     sub    r0, lr, #4
     mov    r1, #1
@@ -210,4 +207,12 @@ prefetch_abort_handler:
 data_abort_handler:
     sub    r0, lr, #8 
     mov    r1, #2
+    b      UIE
+
+/* We run sys mode most of the time, and should never see a software
+ * exception being thrown. Make it illegal and call UIE */
+software_int_handler:
+reserved_handler:
+    sub    r0, lr, #4
+    mov    r1, #5
     b      UIE

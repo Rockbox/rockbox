@@ -29,7 +29,8 @@ static const char* const uiename[] = {
     "Undefined instruction",
     "Prefetch abort",
     "Data abort",
-    "Divide by zero"
+    "Divide by zero",
+    "SWI"
 };
 
 /* Unexpected Interrupt or Exception handler. Currently only deals with

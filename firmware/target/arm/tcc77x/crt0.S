@@ -141,16 +141,16 @@ copied_start:
     ldr    r11, =dma_play_data
 #endif
 
-    /* Let abort and undefined modes use IRQ stack */
-    mov    r0,#0xd7
-    msr    cpsr, r0
+    /* Let svc, abort and undefined modes use irq stack */
+    msr    cpsr, #0xd3
     ldr    sp, =irq_stack
-    mov    r0,#0xdb
-    msr    cpsr, r0
+    msr    cpsr, #0xd7
+    ldr    sp, =irq_stack
+    msr    cpsr, #0xdb
     ldr    sp, =irq_stack
 
-    /* Switch to supervisor mode */
-    mov    r0,#0xd3
+    /* Switch to sys mode */
+    mov    r0,#0xdf
     msr    cpsr, r0
     ldr    sp, =stackend
     
@@ -222,12 +222,14 @@ undef_instr_handler:
     mov    r1, #0
     b      UIE
 
-/* We run supervisor mode most of the time, and should never see a software
-   exception being thrown. Perhaps make it illegal and call UIE?
+/* We run sys mode most of the time, and should never see a software
+   exception being thrown. Make it illegal and call UIE.
  */
 software_int_handler:
 reserved_handler:
-    movs   pc, lr
+    sub    r0, lr, #4
+    mov    r1, #4
+    b      UIE
 
 prefetch_abort_handler:
     sub    r0, lr, #4
@@ -255,4 +257,3 @@ irq_stack:
 /* 256 words of FIQ stack */
     .space 256*4
 fiq_stack:
-
