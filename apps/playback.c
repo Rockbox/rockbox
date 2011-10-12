@@ -1284,7 +1284,7 @@ static bool audio_get_track_metadata(int offset, struct mp3entry *id3)
 }
 
 /* Get a resume rewind adjusted offset from the ID3 */
-unsigned long resume_rewind_adjusted_offset(const struct mp3entry *id3)
+static unsigned long resume_rewind_adjusted_offset(const struct mp3entry *id3)
 {
     unsigned long offset = id3->offset;
     size_t resume_rewind = global_settings.resume_rewind *

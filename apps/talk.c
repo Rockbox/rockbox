@@ -734,7 +734,7 @@ bool talk_voice_required(void)
 #endif
 
 /* return size of voice file */
-int talk_get_buffer(void)
+static int talk_get_buffer(void)
 {
     int ret = voicefile_size;
 #if CONFIG_CODEC == SWCODEC
