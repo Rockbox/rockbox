@@ -281,12 +281,10 @@ void system_init(void)
     ascodec_write_pmu(0x1A, 2, 0xCC);
     /* CHGVBUS2:  set VBUS threshold to 3.18V and EOC threshold to 30% CC */
     ascodec_write_pmu(0x19, 2, 0x41);
-#if 0   /* don't set higher voltage until impact on runtime has been checked */
     /* PVDD1:     set PVDD1 power supply to 2.5 V */
     ascodec_write_pmu(0x18, 1, 0x35);
     /* AVDD17:    set AVDD17 power supply to 2.5V */
     ascodec_write_pmu(0x18, 7, 0x31);
-#endif
 #else
     ascodec_write(AS3514_CVDD_DCDC3, AS314_CP_DCDC3_SETTING);
 #endif /* HAVE_AS3543 */
