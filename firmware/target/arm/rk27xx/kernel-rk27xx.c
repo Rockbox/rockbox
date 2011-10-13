@@ -39,7 +39,7 @@ void tick_start(unsigned int interval_in_ms)
     unsigned int cycles = 50000 * interval_in_ms;
     
     /* enable timer clock */
-    SCU_CLKCFG &= (1<<28);
+    SCU_CLKCFG &= ~(1<<28);
     
     /* configure timer0 */
     TMR0LR = cycles;
