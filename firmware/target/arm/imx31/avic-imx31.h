@@ -74,9 +74,8 @@ static inline void avic_unmask_int(enum IMX31_INT_LIST ints)
     { AVIC_INTENNUM = ints; }
 
 /* Call a service routine while allowing preemption by interrupts of higher
- * priority. Avoid using any app or other SVC stack by doing it with a mini
- * "stack on irq stack". Avoid actually enabling IRQ until the routine
- * decides to do so; epilogue code will always disable them again. */
+ * priority. Avoid actually enabling IRQ until the routine decides to do so;
+ * epilogue code will always disable them again. */
 #define AVIC_NESTED_NI_CALL(fn, prio) \
 ({ asm volatile ( \
         "sub    lr, lr, #4          \n" /* prepare return address */ \
