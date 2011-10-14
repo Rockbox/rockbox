@@ -352,10 +352,12 @@ static void font_reset(int font_id)
 
 
 static bool internal_load_font(int font_id, const char *path,
-                               char *buf, size_t buf_size)
+                               char *buf, size_t buf_size,
+                               int handle
+                              )
 {
     size_t size;
-    struct font* pf = pf_from_handle(buflib_allocations[font_id]);
+    struct font* pf = pf_from_handle(handle);
     /* save loaded glyphs */
     glyph_cache_save(pf);
     /* Close font file handle */
@@ -475,7 +477,7 @@ int font_load_ex(const char *path, size_t buffer_size)
 {
     int font_id = find_font_index(path);
     char *buffer;
-    int *handle;
+    int handle;
 
     if (font_id > FONT_SYSFIXED)
     {
@@ -516,32 +518,32 @@ int font_load_ex(const char *path, size_t buffer_size)
 
     for (font_id = FONT_FIRSTUSERFONT; font_id < MAXFONTS; font_id++)
     {
-        handle = &buflib_allocations[font_id];
-        if (*handle < 0)
+        handle = buflib_allocations[font_id];
+        if (handle < 0)
         {
             break;
         }
     }
-    handle = &buflib_allocations[font_id];
-    *handle = alloc_and_init(font_id, path, buffer_size);
-    if (*handle < 0)
+    handle = alloc_and_init(font_id, path, buffer_size);
+    if (handle < 0)
         return -1;
 
     if (handle_for_glyphcache < 0)
-        handle_for_glyphcache = *handle;
+        handle_for_glyphcache = handle;
 
-    buffer = buffer_from_handle(*handle);
-    lock_font_handle(*handle, true);
+    buffer = buffer_from_handle(handle);
+    lock_font_handle(handle, true);
 
-    if (!internal_load_font(font_id, path, buffer, buffer_size))
+    if (!internal_load_font(font_id, path, buffer, buffer_size, handle))
     {
-        lock_font_handle(*handle, false);
-        core_free(*handle);
-        *handle = -1;
+        lock_font_handle(handle, false);
+        core_free(handle);
+        buflib_allocations[font_id] = -1;
         return -1;
     }
         
-    lock_font_handle(*handle, false);
+    lock_font_handle(handle, false);
+    buflib_allocations[font_id] = handle;
     //printf("%s -> [%d] -> %d\n", path, font_id, *handle);
     return font_id; /* success!*/
 }
