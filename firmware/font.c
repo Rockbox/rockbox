@@ -345,10 +345,8 @@ static struct font* font_load_cached(struct font* pf)
     return pf;
 }
 
-static bool internal_load_font(int font_id, const char *path,
-                               char *buf, size_t buf_size,
-                               int handle
-                              )
+static bool internal_load_font(const char *path, char *buf, 
+                               size_t buf_size, int handle)
 {
     size_t size;
     struct font* pf = pf_from_handle(handle);
@@ -520,7 +518,7 @@ int font_load_ex(const char *path, size_t buffer_size)
     buffer = buffer_from_handle(handle);
     lock_font_handle(handle, true);
 
-    if (!internal_load_font(font_id, path, buffer, buffer_size, handle))
+    if (!internal_load_font(path, buffer, buffer_size, handle))
     {
         lock_font_handle(handle, false);
         core_free(handle);
