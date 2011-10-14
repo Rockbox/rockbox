@@ -7711,7 +7711,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -9888,7 +9888,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -12297,15 +12297,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Verbetering"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Verbetering"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Verbetering"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Verbetering"
   </voice>
 </phrase>
 <phrase>
@@ -12675,5 +12675,78 @@
   </dest>
   <voice>
     *: "Terugspoelen bij pauzeren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Huidige speellijst"
+  </dest>
+  <voice>
+    *: "Huidige speellijst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "USB Verberg interne schijf"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "USB Verberg interne schijf"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Kies als speellijst catalogus map"
+  </dest>
+  <voice>
+    *: "Kies als speellijst catalogus map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Wijzigingen opslaan?"
+  </dest>
+  <voice>
+    *: "Wijzigingen opslaan?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Speellijst catalogus map terugzetten"
+  </dest>
+  <voice>
+    *: "Speellijst catalogus map terugzetten"
   </voice>
 </phrase>
