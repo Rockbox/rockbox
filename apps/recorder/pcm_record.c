@@ -39,6 +39,7 @@
 #ifdef HAVE_SPDIF_IN
 #include "spdif.h"
 #endif
+#undef DEBUG
 
 /***************************************************************************/
 
