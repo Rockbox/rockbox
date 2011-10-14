@@ -420,8 +420,8 @@ int mimic_of(usb_dev_handle *dh, bool vx767)
 {
     int err, fsize;
     unsigned char *buffer, *buffer2;
-    char cpu[8];
-    
+    char cpu[9];
+
     fprintf(stderr, "[INFO] Start!\n");
     _GET_CPU;
     _SET_ADDR(0x8000 << 16);
