@@ -241,9 +241,7 @@ static void __attribute__((used)) dvfs_int(void)
 static __attribute__((naked, interrupt("IRQ"))) void CCM_DVFS_HANDLER(void)
 {
     /* Audio can glitch with the long udelay if nested IRQ isn't allowed. */
-    AVIC_NESTED_NI_CALL_PROLOGUE(INT_PRIO_DVFS, 32*4);
-    asm volatile ("bl dvfs_int");
-    AVIC_NESTED_NI_CALL_EPILOGUE(32*4);
+    AVIC_NESTED_NI_CALL(dvfs_int, INT_PRIO_DVFS);
 }
 
 /* Initialize the DVFS hardware */

@@ -77,34 +77,24 @@ static inline void avic_unmask_int(enum IMX31_INT_LIST ints)
  * priority. Avoid using any app or other SVC stack by doing it with a mini
  * "stack on irq stack". Avoid actually enabling IRQ until the routine
  * decides to do so; epilogue code will always disable them again. */
-#define AVIC_NESTED_NI_CALL_PROLOGUE(prio, stacksize) \
+#define AVIC_NESTED_NI_CALL(fn, prio) \
 ({ asm volatile ( \
-        "sub    lr, lr, #4               \n" /* prepare return address */ \
-        "srsdb  #0x12!                   \n" /* save LR_irq and SPSR_irq */ \
-        "stmfd  sp!, { r0-r3, r12 }      \n" /* preserve context */ \
-        "mov    r0, #0x68000000          \n" /* AVIC_BASE_ADDR */ \
-        "mov    r1, %0                   \n" /* load interrupt level */ \
-        "ldr    r2, [r0, #0x04]          \n" /* save NIMASK */ \
-        "str    r1, [r0, #0x04]          \n" /* set interrupt level */ \
-        "mov    r0, sp                   \n" /* grab IRQ stack */ \
-        "sub    sp, sp, %1               \n" /* allocate space for routine to SP_irq */ \
-        "cps    #0x13                    \n" /* change to SVC mode */ \
-        "mov    r1, sp                   \n" /* save SP_svc */ \
-        "mov    sp, r0                   \n" /* switch to SP_irq *copy* */ \
-        "stmfd  sp!, { r1, r2, lr }      \n" /* push SP_svc, NIMASK and LR_svc */ \
-        : : "i"(prio), "i"(stacksize)); })
-
-#define AVIC_NESTED_NI_CALL_EPILOGUE(stacksize) \
-({ asm volatile ( \
-        "cpsid  i                        \n" /* disable IRQ */ \
-        "ldmfd  sp!, { r1, r2, lr }      \n" /* pop SP_svc, NIMASK and LR_svc */ \
-        "mov    sp, r1                   \n" /* restore SP_svc */ \
-        "cps    #0x12                    \n" /* return to IRQ mode */ \
-        "add    sp, sp, %0               \n" /* deallocate routine space */ \
-        "mov    r0, #0x68000000          \n" /* AVIC BASE ADDR */ \
-        "str    r2, [r0, #0x04]          \n" /* restore NIMASK */ \
-        "ldmfd  sp!, { r0-r3, r12 }      \n" /* reload context */ \
-        "rfefd  sp!                      \n" /* move stacked SPSR to CPSR, return */ \
-        : : "i"(stacksize)); })
-
+        "sub    lr, lr, #4          \n" /* prepare return address */ \
+        "srsdb  #0x12!              \n" /* save LR_irq and SPSR_irq */ \
+        "stmfd  sp!, { r0-r3, r12 } \n" /* preserve context */ \
+        "mov    r0, #0x68000000     \n" /* AVIC_BASE_ADDR */ \
+        "mov    r1, %0              \n" /* load interrupt level */ \
+        "ldr    r2, [r0, #0x04]     \n" /* save NIMASK */ \
+        "str    r1, [r0, #0x04]     \n" /* set interrupt level */ \
+        "cps    #0x13               \n" /* change to SVC mode */ \
+        "stmfd  sp!, { r2, lr }     \n" /* push NIMASK and LR_svc */ \
+        "bl     " #fn  "            \n" /* Call SVC routine */ \
+        "cpsid  i                   \n" /* disable IRQ */ \
+        "ldmfd  sp!, { r1, lr }     \n" /* pop NIMASK and LR_svc */ \
+        "cps    #0x12               \n" /* return to IRQ mode */ \
+        "mov    r0, #0x68000000     \n" /* AVIC BASE ADDR */ \
+        "str    r1, [r0, #0x04]     \n" /* restore NIMASK */ \
+        "ldmfd  sp!, { r0-r3, r12 } \n" /* reload context */ \
+        "rfefd  sp!                 \n" /* move stacked SPSR to CPSR, return */ \
+        : : "i"(prio)); })
 #endif /* AVIC_IMX31_H */

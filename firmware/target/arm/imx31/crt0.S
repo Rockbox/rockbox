@@ -32,8 +32,9 @@ start:
     b       prefetch_abort_handler
     b       data_abort_handler
     b       reserved_handler
+    /* These vectors are unused */
     subs    pc, lr, #4              @ b       irq_handler
-    b       fiq_handler
+    subs    pc, lr, #4              @ b       fiq_handler
     .balign 0x40, 0x6B
 
 /* Arm bootloader and startup code based on startup.s from the iPodLinux loader
@@ -80,7 +81,7 @@ remap_start:
     mcrne   p15, 0, r0, c7, c7, 0  /* invalidate I cache and D cache */
     mcr     p15, 0, r0, c8, c7, 0  /* invalidate TLBs */
     mcr     p15, 0, r0, c7, c10, 4 /* Drain the write buffer */
-    
+
     mcr     p15, 0, r0, c13, c0, 0
     mcr     p15, 0, r0, c13, c0, 1
 
@@ -100,7 +101,7 @@ remap_start:
     bic     r3, r3, #((1 << 2) |  /* L1 D-cache disabled */ \
                       (1 << 0))   /* MMU disabled */
     mcr     p15, 0, r3, c1, c0, 0
-    
+
     /*
      * Configure L2 Cache:
      * - 128k size(16k way)
@@ -175,7 +176,7 @@ remap_start:
     mov     r0, #0
     mcr     p15, 0, r0, c8, c7, 0 /* Invalidate TLB */
     mcr     p15, 0, r0, c7, c7, 0 /* Invalidate icache and dcache */
-    
+
     /* Auxilliary control register */
     mrc     p15, 0, r0, c1, c0, 1
     bic     r0, r0, #((1 << 6) | /* Restrict cache size OFF */ \
@@ -252,18 +253,18 @@ remap_end:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     1b
-    
-    /* Set up stack for IRQ mode */ 
+
+    /* Set up stack for IRQ mode */
     msr     cpsr_c, #0xd2
     ldr     sp, =irq_stack
 
-    /* Set up stack for FIQ mode */ 
-    msr     cpsr_c, #0xd1
-    ldr     sp, =fiq_stack
+    /* FIQ mode is unused, thus sp_FIQ is irrelevant for it */
 
-    /* Let svc, abort and undefined modes use irq stack */
+    /* Set up stack for SVC mode */
     msr     cpsr_c, #0xd3
-    ldr     sp, =irq_stack
+    ldr     sp, =svc_stack
+
+    /* Let abort and undefined modes use irq stack */
     msr     cpsr_c, #0xd7
     ldr     sp, =irq_stack
     msr     cpsr_c, #0xdb
@@ -286,7 +287,7 @@ remap_end:
     mrc     p15, 0, r3, c1, c0, 2
     orr     r3, r3, #0xf00000
     mcr     p15, 0, r3, c1, c0, 2
-    
+
     /* Enable VFP */
     mrc     p10, 7, r3, c8, c0, 0
     orr     r3, r3, #1<<30
@@ -314,7 +315,7 @@ remap_end:
     ldr     pc, [pc, #24]
     ldr     pc, [pc, #24]
     subs    pc, lr, #4          @ ldr     pc, [pc, #24]
-    ldr     pc, [pc, #24]
+    subs    pc, lr, #4          @ ldr     pc, [pc, #24]
     .word   newstart
     .word   undef_instr_handler
     .word   software_int_handler
@@ -322,7 +323,7 @@ remap_end:
     .word   data_abort_handler
     .word   reserved_handler
     .word   0                   @ irq_handler
-    .word   fiq_handler
+    .word   0                   @ fiq_handler
 #endif /* BOOTLOADER */
 
     .text
@@ -350,7 +351,7 @@ prefetch_abort_handler:
     b      UIE
 
 data_abort_handler:
-    sub    r0, lr, #8 
+    sub    r0, lr, #8
     mov    r1, #2
     b      UIE
 
@@ -360,8 +361,8 @@ data_abort_handler:
     .space   256*4
 irq_stack:
 
-/* 256 words of FIQ stack */
+/* 256 words of SVC stack */
     .section .bss
     .balign  32
     .space   256*4
-fiq_stack:
+svc_stack:

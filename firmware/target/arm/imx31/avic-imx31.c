@@ -103,6 +103,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
 }
 #endif /* 0 */
 
+#if 0
 /* Accoring to section 9.3.5 of the UM, the AVIC doesn't accelerate
  * fast interrupts and they must be dispatched */
 void __attribute__((naked)) fiq_handler(void)
@@ -115,6 +116,7 @@ void __attribute__((naked)) fiq_handler(void)
         "bx  r8                    \n" /* jump to FIQ service routine */
     );
 }
+#endif /* 0 */
 
 void INIT_ATTR avic_init(void)
 {
