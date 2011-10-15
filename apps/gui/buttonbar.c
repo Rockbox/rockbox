@@ -40,7 +40,6 @@
 static struct viewport bb_vp[NB_SCREENS];
 void gui_buttonbar_init(struct gui_buttonbar * buttonbar)
 {
-    int i;
     gui_buttonbar_unset(buttonbar);
     FOR_NB_SCREENS(i)
     {

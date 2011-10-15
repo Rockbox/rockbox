@@ -63,7 +63,6 @@
 int mmc_remove_request(void)
 {
     struct queue_event ev;
-    int i;
     FOR_NB_SCREENS(i)
         screens[i].clear_display();
     splash(0, ID2P(LANG_REMOVE_MMC));
