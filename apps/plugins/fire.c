@@ -303,7 +303,7 @@ static int init_grey(void)
 }
 #endif
 
-static int main(void)
+int main(void)
 {
     int action;
 

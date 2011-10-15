@@ -216,6 +216,7 @@ static int Available(unsigned char* pSnapshot)
 }
 
 /* debug function to draw buffer indicators */
+#ifdef VIDEO_DEBUG
 static void DrawBuf(void)
 {
     int ypos, fill, video, audio;
@@ -244,6 +245,7 @@ static void DrawBuf(void)
     else
         gPlay.bDirtyOSD = true; /* redraw it with next timer IRQ */
 }
+#endif
 
 
 /* helper function to draw a position indicator */

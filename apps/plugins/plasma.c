@@ -150,7 +150,7 @@ static void cleanup(void)
  * algorithm.
  */
 
-static int main(void)
+int main(void)
 {
     plasma_frequency = 1;
     int action, x, y;
