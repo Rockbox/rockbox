@@ -63,7 +63,6 @@ char* default_radio_skin(enum screen_type screen)
 
 void fms_fix_displays(enum fms_exiting toggle_state)
 {
-    int i;
     FOR_NB_SCREENS(i)
     {
         struct wps_data *data = skin_get_gwps(FM_SCREEN, i)->data;

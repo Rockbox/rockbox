@@ -120,7 +120,6 @@ char* wps_default_skin(enum screen_type screen)
 
 static void update_non_static(void)
 {
-    int i;
     FOR_NB_SCREENS(i)
         skin_update(WPS, i, SKIN_REFRESH_NON_STATIC);
 }
@@ -306,7 +305,6 @@ bool ffwd_rew(int button)
     int direction = -1;         /* forward=1 or backward=-1 */
     bool exit = false;
     bool usb = false;
-    int i = 0;
     const long ff_rw_accel = (global_settings.ff_rewind_accel + 3);
 
     if (button == ACTION_NONE)
@@ -630,8 +628,6 @@ static void wps_lcd_activation_hook(void *param)
 
 static void gwps_leave_wps(void)
 {
-    int i;
-
     FOR_NB_SCREENS(i)
     {
         skin_get_gwps(WPS, i)->display->stop_scroll();
@@ -657,7 +653,6 @@ static void gwps_leave_wps(void)
  * display the wps on entering or restoring */
 static void gwps_enter_wps(void)
 {
-    int i;
     struct gui_wps *gwps;
     struct screen *display;
     FOR_NB_SCREENS(i)
@@ -738,7 +733,6 @@ long gui_wps_show(void)
     bool bookmark = false;
     bool update = false;
     bool vol_changed = false;
-    int i;
     long last_left = 0, last_right = 0;
     struct wps_state *state = skin_get_global_state();
 

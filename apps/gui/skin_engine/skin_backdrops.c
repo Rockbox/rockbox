@@ -46,10 +46,9 @@ static int current_lcd_backdrop[NB_SCREENS];
 
 static int buflib_move_callback(int handle, void* current, void* new)
 {
-    int i;
     if (handle == handle_being_loaded)
         return BUFLIB_CB_CANNOT_MOVE;
-    for (i=0; i<NB_BDROPS; i++)
+    for (int i=0; i<NB_BDROPS; i++)
     {
         if (backdrops[i].buffer == current)
         {
@@ -65,9 +64,7 @@ static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL};
 static bool first_go = true;
 void skin_backdrop_init(void)
 {
-    int i;
-
-    for (i=0; i<NB_BDROPS; i++)
+    for (int i=0; i<NB_BDROPS; i++)
     {
         if (first_go)
             backdrops[i].buflib_handle = -1;

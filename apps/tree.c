@@ -270,7 +270,6 @@ bool check_rockboxdir(void)
     if(!dir_exists(ROCKBOX_DIR))
     {   /* No need to localise this message.
            If .rockbox is missing, it wouldn't work anyway */
-        int i;
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
         splash(HZ*2, "No .rockbox directory");
@@ -290,7 +289,6 @@ void tree_gui_init(void)
     strcpy(tc.currdir, "/");
 
 #ifdef HAVE_LCD_CHARCELLS
-    int i;
     FOR_NB_SCREENS(i)
         screens[i].double_height(false);
 #endif

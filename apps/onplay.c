@@ -464,7 +464,6 @@ static int cat_playlist_callback(int action,
 #ifdef HAVE_LCD_BITMAP
 static void draw_slider(void)
 {
-    int i;
     FOR_NB_SCREENS(i)
     {
         struct viewport vp;

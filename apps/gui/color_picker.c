@@ -420,7 +420,6 @@ bool set_color(struct screen *display, char *title,
         }
         else
         {
-            int i;
             FOR_NB_SCREENS(i)
                 draw_screen(&screens[i], title, &rgb, slider);
         }

@@ -781,7 +781,6 @@ static void metronome_draw(struct screen* display)
 
 static void draw_display(void)
 {
-    int i;
     FOR_NB_SCREENS(i)
         metronome_draw(rb->screens[i]);
 }

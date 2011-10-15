@@ -326,7 +326,6 @@ int plugin_main(void)
     int action;
     int sleep_time=DEFAULT_WAIT_TIME;
     int nb_wanted_polygons=DEFAULT_NB_POLYGONS;
-    int i;
     struct polygon_fifo polygons[NB_SCREENS];
     struct polygon_move move[NB_SCREENS]; /* This describes the movement of the leading
                                              polygon, the others just follow */

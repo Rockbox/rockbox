@@ -1452,7 +1452,6 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
     int result = -1;
     char *start_dir = NULL;
     bool exit = false;
-    int i;
     struct tree_context* tc = tree_get_context();
     int saved_dirfilter = *(tc->dirfilter);
 
@@ -1472,7 +1471,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
                 exit = true;
             while (!exit)
             {
-                i = rand()%folder_count;
+                int i = rand()%folder_count;
                 lseek(fd,sizeof(int) + (MAX_PATH*i),SEEK_SET);
                 read(fd,buffer,MAX_PATH);
                 if (check_subdir_for_music(buffer, "", false) ==0)

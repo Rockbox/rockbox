@@ -57,7 +57,6 @@ bool alarm_screen(void)
     struct tm *tm;
     int togo;
     int button;
-    int i;
     bool update = true;
     bool hour_wrapped = false;
     struct viewport vp[NB_SCREENS];

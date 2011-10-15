@@ -268,7 +268,6 @@ char* sb_create_from_settings(enum screen_type screen)
 
 void sb_skin_init(void)
 {
-    int i;
     FOR_NB_SCREENS(i)
     {
         oldinfovp_label[i] = NULL;

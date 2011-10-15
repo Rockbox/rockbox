@@ -328,7 +328,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int action;
     struct gui_synclist lists;
     const struct menu_item_ex *temp, *menu = start_menu;
-    int ret = 0, i;
+    int ret = 0;
     bool redraw_lists;
     int old_audio_status = audio_status();
     FOR_NB_SCREENS(i)

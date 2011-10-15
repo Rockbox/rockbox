@@ -283,7 +283,7 @@ struct keyboard_parameters param[NB_SCREENS];
 int zx_kbd_input(char* text/*, int buflen*/)
 {
     bool done = false;
-    int i, j, k, w, l;
+    int i, j, k, w;
     int text_w = 0;
 #ifdef ZX_WRITE_OUT_TEXT
     int editpos, len_utf8;

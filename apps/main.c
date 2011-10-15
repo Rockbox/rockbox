@@ -152,7 +152,6 @@ int main(void) INIT_ATTR MAIN_NORETURN_ATTR;
 int main(void)
 {
 #endif
-    int i;
     CHART(">init");
     init();
     CHART("<init");
@@ -336,9 +335,6 @@ static void init_tagcache(void)
 
 static void init(void)
 {
-#ifdef HAVE_LCD_BITMAP
-    int i;
-#endif
     system_init();
     core_allocator_init();
     kernel_init();
@@ -456,8 +452,8 @@ static void init(void)
     lcd_remote_init();
 #endif
 #ifdef HAVE_LCD_BITMAP
-    FOR_NB_SCREENS(rc)
-        global_status.font_id[rc] = FONT_SYSFIXED;
+    FOR_NB_SCREENS(i)
+        global_status.font_id[i] = FONT_SYSFIXED;
     font_init();
 #endif
     

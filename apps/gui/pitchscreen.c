@@ -733,7 +733,7 @@ static int pitchscreen_do_touchscreen(struct viewport vps[])
 
 int gui_syncpitchscreen_run(void)
 {
-    int button, i;
+    int button;
     int32_t pitch = sound_get_pitch();
     int32_t semitone;
 

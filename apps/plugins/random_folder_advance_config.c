@@ -46,7 +46,6 @@ struct file_format *list = NULL;
 static void update_screen(bool clear)
 {
     char buf[15];
-    int i;
 
     rb->snprintf(buf,sizeof(buf),"Folders: %d",dirs_count);
     FOR_NB_SCREENS(i)

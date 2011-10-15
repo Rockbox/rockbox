@@ -539,7 +539,6 @@ int handle_radio_presets(void)
 int presets_scan(void *viewports)
 {
     bool do_scan = true;
-    int i;
     struct viewport *vp = (struct viewport *)viewports;
 
     FOR_NB_SCREENS(i)

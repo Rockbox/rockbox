@@ -68,7 +68,6 @@ bool list_display_title(struct gui_synclist *list, enum screen_type screen);
 
 void gui_synclist_scroll_stop(struct gui_synclist *lists)
 {
-    int i;
     FOR_NB_SCREENS(i)
     {
         screens[i].scroll_stop(&list_text[i]);

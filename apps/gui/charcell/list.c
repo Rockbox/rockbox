@@ -40,7 +40,6 @@
 
 void gui_synclist_scroll_stop(struct gui_synclist *lists)
 {
-    int i;
     (void)lists;
     FOR_NB_SCREENS(i)
     {

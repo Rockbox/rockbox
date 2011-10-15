@@ -104,7 +104,6 @@ static void toggle_theme(enum screen_type screen, bool force)
     bool enable_event = false;
     static bool was_enabled[NB_SCREENS] = {false};
     static bool after_boot[NB_SCREENS] = {false};
-    int i;
 
     FOR_NB_SCREENS(i)
     {
@@ -233,7 +232,6 @@ int viewport_get_nb_lines(const struct viewport *vp)
 
 static void viewportmanager_redraw(void* data)
 {
-    int i;
     FOR_NB_SCREENS(i)
     {
 #ifdef HAVE_LCD_BITMAP
@@ -249,7 +247,6 @@ static void viewportmanager_redraw(void* data)
 void viewportmanager_init()
 {
 #ifdef HAVE_LCD_BITMAP
-    int i;
     FOR_NB_SCREENS(i)
     {
         theme_stack_top[i] = -1; /* the next call fixes this to 0 */
@@ -264,7 +261,6 @@ void viewportmanager_init()
 #ifdef HAVE_LCD_BITMAP
 void viewportmanager_theme_changed(const int which)
 {
-    int i;
 #ifdef HAVE_BUTTONBAR
     if (which & THEME_BUTTONBAR)
     {   /* don't handle further, the custom ui viewport ignores the buttonbar,

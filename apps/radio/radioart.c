@@ -99,7 +99,7 @@ static int load_radioart_image(struct radioart *ra, const char* preset_name,
 int radio_get_art_hid(struct dim *requested_dim)
 {
     int preset = radio_current_preset();
-    int i, free_idx = -1;
+    int free_idx = -1;
     const char* preset_name;
     if (radio_scan_mode() || preset < 0)
         return -1;
@@ -108,7 +108,7 @@ int radio_get_art_hid(struct dim *requested_dim)
         return -1;
 #endif
     preset_name = radio_get_preset_name(preset);
-    for(i=0;i<MAX_RADIOART_IMAGES;i++)
+    for (int i=0; i<MAX_RADIOART_IMAGES; i++)
     {
         if (radioart[i].handle < 0)
         {

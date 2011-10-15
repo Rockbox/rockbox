@@ -200,7 +200,6 @@ end:
 void splashf(int ticks, const char *fmt, ...)
 {
     va_list ap;
-    int i;
 
     /* If fmt is a lang ID then get the corresponding string (which
        still might contain % place holders). */

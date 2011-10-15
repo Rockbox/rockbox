@@ -34,11 +34,7 @@ void screen_helper_remote_setfont(int font);
 #endif
 void screen_helper_setfont(int font);
 
-#if NB_SCREENS == 1
-#define FOR_NB_SCREENS(i) i = 0;
-#else
-#define FOR_NB_SCREENS(i) for(i = 0; i < NB_SCREENS; i++)
-#endif
+#define FOR_NB_SCREENS(i) for(int i = 0; i < NB_SCREENS; i++)
 
 #ifdef HAVE_LCD_CHARCELLS
 #define MAX_LINES_ON_SCREEN 2

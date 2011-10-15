@@ -1383,7 +1383,6 @@ static int sokoban_menu(void)
 {
     int button;
     int selection = 0;
-    int i;
     bool menu_quit;
     int start_selected = 0;
     int prev_level = current_info.level.index;

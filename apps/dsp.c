@@ -1618,8 +1618,7 @@ void dsp_set_compressor(void)
     bool changed = false;
     bool active  = (threshold < 0);
 
-    int i;
-    for (i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
     {
         if (curr_set[i] != new_set[i])
         {
@@ -1657,7 +1656,6 @@ void dsp_set_compressor(void)
     if (changed && active)
     {
         /* configure variables for compressor operation */
-        int i;
         const int32_t db[] ={0x000000,   /* positive db equivalents in S15.16 format */
          0x241FA4, 0x1E1A5E, 0x1A94C8, 0x181518, 0x1624EA, 0x148F82, 0x1338BD, 0x120FD2,
          0x1109EB, 0x101FA4, 0x0F4BB6, 0x0E8A3C, 0x0DD840, 0x0D3377, 0x0C9A0E, 0x0C0A8C,
@@ -1728,7 +1726,7 @@ void dsp_set_compressor(void)
         comp_curve[0] = UNITY;
         /* comp_curve[1 to 63] are intermediate compression values corresponding
            to the 6 MSB of the input values of a non-clipped signal */
-        for (i = 1; i < 64; i++)
+        for (int i = 1; i < 64; i++)
         {
             /* db constants are stored as positive numbers;
                make them negative here */
@@ -1766,7 +1764,7 @@ void dsp_set_compressor(void)
         db_curve[1].offset = 0;
         db_curve[3].db = 0;
         
-        for (i = 0; i <= 4; i++)
+        for (int i = 0; i <= 4; i++)
         {
             logf("Curve[%d]: db: % 6.2f\toffset: % 6.2f", i,
                 (float)db_curve[i].db / (1 << 16),
@@ -1774,7 +1772,7 @@ void dsp_set_compressor(void)
         }
         
         logf("\nGain factors:");
-        for (i = 1; i <= 65; i++)
+        for (int i = 1; i <= 65; i++)
         {
             debugf("%02d: %.6f  ", i, (float)comp_curve[i] / UNITY);
             if (i % 4 == 0) debugf("\n");

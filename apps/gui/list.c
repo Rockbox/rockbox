@@ -80,7 +80,7 @@ void list_init(void)
 
 static void list_init_viewports(struct gui_synclist *list)
 {
-    int i, parent_used;
+    int parent_used;
 
     parent_used = (*list->parent != &parent[SCREEN_MAIN]);
 
@@ -156,7 +156,6 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     int selected_size, struct viewport list_parent[NB_SCREENS]
     )
 {
-    int i;
     gui_list->callback_get_item_icon = NULL;
     gui_list->callback_get_item_name = callback_get_item_name;
     gui_list->callback_speak_item = NULL;
@@ -237,7 +236,6 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list,
  */
 void gui_synclist_draw(struct gui_synclist *gui_list)
 {
-    int i;
     if (list_is_dirty(gui_list))
     {
         list_init_viewports(gui_list);
@@ -345,7 +343,6 @@ void gui_synclist_speak_item(struct gui_synclist *lists)
  */
 void gui_synclist_select_item(struct gui_synclist * gui_list, int item_number)
 {
-    int i;
     if (item_number >= gui_list->nb_items || item_number < 0)
         return;
     if (item_number != gui_list->selected_item)
@@ -380,13 +377,12 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
     }
     else if (gui_list->show_selection_marker == false)
     {
-        int i, nb_lines, screen_top;
         FOR_NB_SCREENS(i)
         {
-            nb_lines = list_get_nb_lines(gui_list, i);
+            int nb_lines = list_get_nb_lines(gui_list, i);
             if (offset > 0)
             {
-                screen_top = MAX(0, gui_list->nb_items - nb_lines);
+                int screen_top = MAX(0, gui_list->nb_items - nb_lines);
                 gui_list->start_item[i] = MIN(screen_top, gui_list->start_item[i] + 
                                                 gui_list->selected_size);
                 gui_list->selected_item = gui_list->start_item[i];
@@ -452,7 +448,6 @@ void gui_synclist_set_title(struct gui_synclist * gui_list,
     gui_list->title = title;
     gui_list->title_icon = icon;
 #ifdef HAVE_LCD_BITMAP
-    int i;
     FOR_NB_SCREENS(i)
         sb_set_title_text(title, icon, i);
 #endif
@@ -461,9 +456,6 @@ void gui_synclist_set_title(struct gui_synclist * gui_list,
 
 void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
 {
-#ifdef HAVE_LCD_BITMAP
-    int i;
-#endif
     lists->nb_items = nb_items;
 #ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
@@ -531,7 +523,6 @@ void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
  */
 static void gui_synclist_scroll_right(struct gui_synclist * lists)
 {
-    int i;
     FOR_NB_SCREENS(i)
     {
         /* FIXME: This is a fake right boundry limiter. there should be some
@@ -549,7 +540,6 @@ static void gui_synclist_scroll_right(struct gui_synclist * lists)
  */
 static void gui_synclist_scroll_left(struct gui_synclist * lists)
 {
-    int i;
     FOR_NB_SCREENS(i)
     {
         lists->offset_position[i] -= offset_step;
@@ -817,7 +807,7 @@ static const char* simplelist_static_getname(int item,
 bool simplelist_show_list(struct simplelist_info *info)
 {
     struct gui_synclist lists;
-    int action, old_line_count = simplelist_line_count, i;
+    int action, old_line_count = simplelist_line_count;
     list_get_name *getname;
     int wrap = LIST_WRAP_UNLESS_HELD;
     if (info->get_name)

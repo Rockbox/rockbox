@@ -153,7 +153,6 @@ void draw_message(struct screen* display, int msg, int y){
 }
 
 void load_settings(void){
-    int i;
     struct screen* display;
     FOR_NB_SCREENS(i){
         display=rb->screens[i];
@@ -179,7 +178,6 @@ void load_settings(void){
 }
 
 void save_settings(void){
-    int i;
     struct screen* display;
     if(!settings_needs_saving(&clock_settings))
         return;

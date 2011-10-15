@@ -38,7 +38,6 @@ static void atexit_cleanup(void);
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    int i;
     char* ext;
 
     atexit(atexit_cleanup);

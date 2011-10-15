@@ -142,7 +142,7 @@ static const unsigned char morse_codes[] = {
    call with NULL to reset keyboard    */
 int load_kbd(unsigned char* filename)
 {
-    int fd, l;
+    int fd;
     int i, line_len, max_line_len;
     unsigned char buf[4];
     unsigned short *pbuf;
@@ -331,7 +331,6 @@ int kbd_input(char* text, int buflen)
     bool done = false;
     struct keyboard_parameters * const param = kbd_param;
     struct edit_state state;
-    int l; /* screen loop variable */
     unsigned short ch;
     int ret = 0; /* assume success */
     FOR_NB_SCREENS(l)

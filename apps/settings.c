@@ -1067,9 +1067,7 @@ void reset_setting(const struct settings_list *setting, void *var)
 
 void settings_reset(void)
 {
-    int i;
-
-    for(i=0; i<nb_settings; i++)
+    for(int i=0; i<nb_settings; i++)
         reset_setting(&settings[i], settings[i].setting);
 #if defined (HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_reset();

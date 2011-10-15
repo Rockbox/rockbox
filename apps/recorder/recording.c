@@ -184,7 +184,7 @@ static bool remote_display_on = true;
 #endif
 
 /* as we have the ability to disable the remote, we need an alternative loop */
-#define FOR_NB_ACTIVE_SCREENS(i) for(i = 0; i < screen_update; i++)
+#define FOR_NB_ACTIVE_SCREENS(i) for(int i = 0; i < screen_update; i++)
 
 static bool update_list = false;   /* (GIU) list needs updating */
 
@@ -1042,7 +1042,6 @@ bool recording_screen(bool no_source)
     int peak_l, peak_r;
     int balance = 0;
 #endif
-    int i;
     int pm_x[NB_SCREENS];           /* peakmeter (and trigger bar) x pos */
     int pm_y[NB_SCREENS];           /* peakmeter y pos */
     int pm_h[NB_SCREENS];           /* peakmeter height */
@@ -2009,7 +2008,7 @@ static bool f2_rec_screen(void)
 
     bool exit = false;
     bool used = false;
-    int w, h, i;
+    int w, h;
     char buf[32];
     int button;
     struct audio_recording_options rec_options;
@@ -2140,7 +2139,7 @@ static bool f3_rec_screen(void)
 {
     bool exit = false;
     bool used = false;
-    int w, h, i;
+    int w, h;
     int button;
     const char *src_str[] =
     {

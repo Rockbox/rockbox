@@ -347,7 +347,6 @@ bool set_time_screen(const char* title, struct tm *tm)
     struct viewport viewports[NB_SCREENS];
     bool done = false, usb = false;
     int cursorpos = 0;
-    unsigned int s;
     unsigned char offsets_ptr[] =
         { OFF_HOURS, OFF_MINUTES, OFF_SECONDS, OFF_YEAR, 0, OFF_DAY };
 

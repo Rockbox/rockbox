@@ -253,7 +253,6 @@ static void system_restore(void)
 static bool clean_shutdown(void (*callback)(void *), void *parameter)
 {
     long msg_id = -1;
-    int i;
 
     scrobbler_poweroff();
 
@@ -1079,9 +1078,6 @@ static enum current_activity
 static int current_activity_top = 0;
 void push_current_activity(enum current_activity screen)
 {
-#if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
-    int i;
-#endif
     current_activity[current_activity_top++] = screen;
 #if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
     FOR_NB_SCREENS(i)
@@ -1090,9 +1086,6 @@ void push_current_activity(enum current_activity screen)
 }
 void pop_current_activity(void)
 {
-#if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
-    int i;
-#endif
     current_activity_top--;
 #if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
     FOR_NB_SCREENS(i)

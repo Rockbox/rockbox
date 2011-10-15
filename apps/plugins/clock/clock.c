@@ -110,7 +110,6 @@ enum plugin_status plugin_start(const void* parameter){
     int button;
     int last_second = -1;
     bool redraw=true;
-    int i;
     struct time time;
     struct counter counter;
     bool exit_clock = false;

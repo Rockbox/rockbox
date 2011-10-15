@@ -281,9 +281,6 @@ static const char * get_props(int selected_item, void* data,
 enum plugin_status plugin_start(const void* parameter)
 {
     struct gui_synclist properties_lists;
-#ifdef HAVE_LCD_BITMAP
-    int i;
-#endif
     int button;
     bool quit = false, usb = false;
     char file[MAX_PATH];

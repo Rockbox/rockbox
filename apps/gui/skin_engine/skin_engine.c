@@ -84,7 +84,7 @@ static struct gui_skin {
 
 void gui_sync_skin_init(void)
 {
-    int i, j;
+    int j;
     for(j=0; j<SKINNABLE_SCREENS_COUNT; j++)
     {
         FOR_NB_SCREENS(i)
@@ -105,7 +105,7 @@ void gui_sync_skin_init(void)
 
 void skin_unload_all(void)
 {
-    int i, j;
+    int j;
 
     for(j=0; j<SKINNABLE_SCREENS_COUNT; j++)
     {
@@ -123,7 +123,7 @@ void skin_unload_all(void)
 
 void settings_apply_skins(void)
 {
-    int i, j;
+    int i;
 
     skin_unload_all();
     /* Make sure each skin is loaded */
@@ -267,7 +267,6 @@ bool skin_do_full_update(enum skinnable_screens skin,
 /* tell a skin to do a full update next time */
 void skin_request_full_update(enum skinnable_screens skin)
 {
-    int i;
     FOR_NB_SCREENS(i)
         skins[skin][i].needs_full_update = true;
 }

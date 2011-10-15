@@ -195,9 +195,6 @@ bool ends_with(char *string, char *suffix)
 
 enum plugin_status plugin_start(const void* void_parameter)
 {
-#ifdef HAVE_LCD_BITMAP
-    int i;
-#endif
     bool leave_loop;
 
     /* This is a viewer, so a parameter must have been specified */

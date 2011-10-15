@@ -458,7 +458,7 @@ int rectrigger(void)
 {
     struct viewport vp[NB_SCREENS], triggervp[NB_SCREENS];
     struct gui_synclist lists;
-    int i, action = ACTION_REDRAW;
+    int action = ACTION_REDRAW;
     bool done = false, changed = true;
     const struct settings_list *settings[TRIG_OPTION_COUNT];
 
@@ -550,7 +550,7 @@ int rectrigger(void)
                                          pm_x, pm_y, pm_h, NB_SCREENS, triggervp);
         FOR_NB_SCREENS(i)
             screens[i].update();
-        i = gui_synclist_get_sel_pos(&lists);
+        int i = gui_synclist_get_sel_pos(&lists);
         switch (action)
         {
             case ACTION_STD_CANCEL:

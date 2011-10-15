@@ -692,7 +692,6 @@ int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
     (void)skin; /* silence charcell warning */
     int button = ACTION_NONE;
 #ifdef HAVE_LCD_BITMAP
-    int i;
     /* when the peak meter is enabled we want to have a
         few extra updates to make it look smooth. On the
         other hand we don't want to waste energy if it

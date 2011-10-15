@@ -403,7 +403,7 @@ static void peak_meter_set_min(int newmin)
 
     pm_db_min = calc_db(peak_meter_range_min);
     pm_db_range = pm_db_max - pm_db_min;
-    int i;
+
     FOR_NB_SCREENS(i)
         scales[i].db_scale_valid = false;
 }
@@ -452,7 +452,7 @@ static void peak_meter_set_max(int newmax)
 
     pm_db_max = calc_db(peak_meter_range_max);
     pm_db_range = pm_db_max - pm_db_min;
-    int i;
+
     FOR_NB_SCREENS(i)
         scales[i].db_scale_valid = false;
 }
@@ -493,7 +493,6 @@ bool peak_meter_get_use_dbfs(void)
  */
 void peak_meter_set_use_dbfs(bool use)
 {
-    int i;
     pm_use_dbfs = use;
     FOR_NB_SCREENS(i)
         scales[i].db_scale_valid = false;
@@ -571,7 +570,6 @@ void pm_reset_clipcount(void)
  */
 void peak_meter_playback(bool playback)
 {
-    int i;
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     (void)playback;
 #elif CONFIG_CODEC == SWCODEC
@@ -1313,7 +1311,6 @@ void peak_meter_draw_trig(int xpos[], int ypos[],
     int barend[NB_SCREENS];
     int icon;
     int ixpos[NB_SCREENS];
-    int i;
     int trigbar_width[NB_SCREENS];
 
     FOR_NB_SCREENS(i)
@@ -1374,7 +1371,7 @@ void peak_meter_draw_trig(int xpos[], int ypos[],
             return;
     }
 
-    for(i = 0; i < nb_screens; i++)
+    for(int i = 0; i < nb_screens; i++)
     {
         gui_scrollbar_draw(&screens[i], xpos[i] + ICON_PLAY_STATE_WIDTH + 1,
                                ypos[i] + 1, trigbar_width[i], TRIG_HEIGHT - 2,

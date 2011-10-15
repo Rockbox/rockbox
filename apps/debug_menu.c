@@ -293,7 +293,7 @@ static void dbg_audio_task(void)
 static bool dbg_buffering_thread(void)
 {
     int button;
-    int line, i;    
+    int line;    
     bool done = false;
     size_t bufused;
     size_t bufsize = pcmbuf_get_bufsize();
@@ -2120,7 +2120,6 @@ static const struct the_menu_item menuitems[] = {
     };
 static int menu_action_callback(int btn, struct gui_synclist *lists)
 {
-   int i;
     if (btn == ACTION_STD_OK)
     {
         FOR_NB_SCREENS(i)

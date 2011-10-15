@@ -124,7 +124,6 @@ static void pause(void)
 enum plugin_status plugin_start(const void* parameter)
 {
     int button;
-    int i;
     (void)parameter;
 
     if (!can_play()) {

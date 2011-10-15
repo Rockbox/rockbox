@@ -805,7 +805,6 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
 
 void gui_syncstatusbar_init(struct gui_syncstatusbar * bars)
 {
-    int i;
     FOR_NB_SCREENS(i) {
         gui_statusbar_init( &(bars->statusbars[i]) );
         gui_statusbar_set_screen( &(bars->statusbars[i]), &(screens[i]) );
@@ -818,7 +817,6 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
 #ifdef HAVE_LCD_BITMAP
     if(!global_settings.statusbar)
        return;
-    int i;
     struct viewport viewport;
     FOR_NB_SCREENS(i) {
         GET_RECT(viewport,statusbar_position(i),&screens[i]);

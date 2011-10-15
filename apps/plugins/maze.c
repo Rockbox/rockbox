@@ -495,7 +495,6 @@ enum plugin_status plugin_start(const void* parameter)
     int lastbutton = BUTTON_NONE;
 #endif
     int quit = 0;
-    int i;
     struct maze maze;
     (void)parameter;
 

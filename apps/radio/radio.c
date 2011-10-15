@@ -355,7 +355,6 @@ void radio_screen(void)
 {
     bool done = false;
     int button;
-    int i;
     bool stereo = false, last_stereo = false;
     int update_type = 0;
     bool screen_freeze = false;

@@ -202,7 +202,6 @@ static int time_menu_callback(int action,
                        const struct menu_item_ex *this_item)
 {
     (void)this_item;
-    int i;
     static int last_redraw = 0;
     bool redraw = false;
 
@@ -247,7 +246,7 @@ MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), time_menu_callback, Icon_NOICON,
 int time_screen(void* ignored)
 {
     (void)ignored;
-    int i, nb_lines, font_h, ret;
+    int nb_lines, font_h, ret;
     menu_was_pressed = false;
 
     push_current_activity(ACTIVITY_TIMEDATESCREEN);

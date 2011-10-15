@@ -1600,7 +1600,7 @@ static void display_state(void)
             info = "(no info)";
     }
 
-    int i, w, h;
+    int w, h;
     struct screen* display;
     FOR_NB_SCREENS(i)
     {
@@ -1640,7 +1640,7 @@ static void display_time(void)
                             current.elapsed/60000, (current.elapsed/1000)%60,
                             current.length/60000, (current.length)/1000%60);
 #ifdef HAVE_LCD_BITMAP
-    int y = (prefs.display_title? font_ui_height:0), i;
+    int y = (prefs.display_title? font_ui_height:0);
     FOR_NB_SCREENS(i)
     {
         struct screen* display = rb->screens[i];
@@ -1842,7 +1842,7 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
 static void display_lrcs(void)
 {
     long time_start, time_end, rin, len;
-    int i, nline[NB_SCREENS] = {0};
+    int nline[NB_SCREENS] = {0};
     struct lrc_line *lrc_center = current.ll_head;
 
     if (!lrc_center) return;
@@ -2773,7 +2773,6 @@ static int handle_button(void)
 static int lrc_main(void)
 {
     int ret = LRC_GOTO_MAIN;
-    int i;
     long id3_timeout = 0;
     bool update_display_state = true;
 

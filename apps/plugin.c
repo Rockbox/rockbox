@@ -809,7 +809,6 @@ static const struct plugin_api rockbox_api = {
 
 int plugin_load(const char* plugin, const void* parameter)
 {
-    int rc, i;
     struct plugin_header *p_hdr;
     struct lc_header     *hdr;
 
@@ -889,7 +888,7 @@ int plugin_load(const char* plugin, const void* parameter)
     open_files = 0;
 #endif
 
-    rc = p_hdr->entry_point(parameter);
+    int rc = p_hdr->entry_point(parameter);
     
     tree_unlock_cache(tree_get_context());
     pop_current_activity();

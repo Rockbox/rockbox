@@ -76,7 +76,7 @@ static bool dice_menu(struct dices* dice);
 /* plugin entry point */
 enum plugin_status plugin_start(const void* parameter) {
     (void)parameter;
-    int i, action;
+    int action;
 
     dice_init(&dice);
     rb->srand(*rb->current_tick);

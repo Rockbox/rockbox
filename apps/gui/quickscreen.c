@@ -307,7 +307,7 @@ static int quickscreen_touchscreen_button(const struct viewport
 
 static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
 {
-    int button, i, j;
+    int button;
     struct viewport parent[NB_SCREENS];
     struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
     struct viewport vp_icons[NB_SCREENS];
@@ -367,7 +367,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     cond_talk_ids_fq(VOICE_OK);
     FOR_NB_SCREENS(i)
     {   /* stop scrolling before exiting */
-        for (j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
+        for (int j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
             screens[i].scroll_stop(&vps[i][j]);
         viewportmanager_theme_undo(i, true);
     }
