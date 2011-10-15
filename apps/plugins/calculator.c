@@ -546,7 +546,7 @@ enum {cal_normal,  /* 0, normal status, display result */
 } calStatus;
 
 /* constant table for CORDIC algorithm */
-double cordicTable[51][2]= {
+static const double cordicTable[51][2]= {
  /* pow(2,0) - pow(2,-50)             atan(pow(2,0) - atan(pow(2,-50) */
     {1e+00,                                    7.853981633974483e-01},
     {5e-01,                                    4.636476090008061e-01},
@@ -601,21 +601,21 @@ double cordicTable[51][2]= {
     {8.8817841970012523233890533447265625e-16, 8.881784197001252e-16}
 };
 
-void doMultiple(double* operandOne, int* powerOne,
-                double  operandTwo, int  powerTwo);
-void doAdd (double* operandOne, int* powerOne,
-            double  operandTwo, int  powerTwo);
-void printResult(void);
-void formatResult(void);
-void oneOperand(void);
+static void doMultiple(double* operandOne, int* powerOne,
+                       double  operandTwo, int  powerTwo);
+static void doAdd (double* operandOne, int* powerOne,
+                   double  operandTwo, int  powerTwo);
+static void printResult(void);
+static void formatResult(void);
+static void oneOperand(void);
 
-void drawLines(void);
-void drawButtons(int group);
+static void drawLines(void);
+static void drawButtons(int group);
 
 /* -----------------------------------------------------------------------
-Handy funtions
+Handy functions
 ----------------------------------------------------------------------- */
-void cleartypingbuf(void)
+static void cleartypingbuf(void)
 {
     int k;
     for( k=1; k<=(DIGITLEN+1); k++)
@@ -623,21 +623,21 @@ void cleartypingbuf(void)
     typingbuf[0] = ' ';
     typingbufPointer = typingbuf+1;
 }
-void clearbuf(void)
+static void clearbuf(void)
 {
     int k;
     for(k=0;k<18;k++)
         buf[k]=' ';
     buf[18] = 0;
 }
-void clearResult(void)
+static void clearResult(void)
 {
     result = 0;
     power = 0;
     modifier = 0.1;
 }
 
-void clearInput(void)
+static void clearInput(void)
 {
     calStatus = cal_normal;
     clearResult();
@@ -647,25 +647,25 @@ void clearInput(void)
     drawLines();
 }
 
-void clearOperand(void)
+static void clearOperand(void)
 {
     operand = 0;
     operandPower = 0;
 }
 
-void clearMemTemp(void)
+static void clearMemTemp(void)
 {
     memTemp = 0;
     memTempPower = 0;
 }
 
-void clearOper(void)
+static void clearOper(void)
 {
     oper = ' ';
     operInputted = false;
 }
 
-void clearMem(void)
+static void clearMem(void)
 {
     clearInput();
     clearMemTemp();
@@ -674,7 +674,7 @@ void clearMem(void)
     btn = BUTTON_NONE;
 }
 
-void switchOperands(void)
+static void switchOperands(void)
 {
     double tempr = operand;
     int tempp = operandPower;
@@ -684,7 +684,7 @@ void switchOperands(void)
     power = tempp;
 }
 
-void drawLines(void)
+static void drawLines(void)
 {
     int i;
     rb->lcd_hline(0, LCD_WIDTH, Y_1_POS-1);
@@ -694,7 +694,7 @@ void drawLines(void)
         rb->lcd_vline(X_1_POS+i*REC_WIDTH, Y_1_POS, LCD_HEIGHT);
 }
 
-void drawButtons(int group)
+static void drawButtons(int group)
 {
     int i, j, w, h;
     for (i = 0; i <= 4; i++){
@@ -722,7 +722,7 @@ void drawButtons(int group)
 /* -----------------------------------------------------------------------
 Initiate calculator
 ----------------------------------------------------------------------- */
-void cal_initial (void)
+static void cal_initial (void)
 {
     int w,h;
 
@@ -761,7 +761,7 @@ void cal_initial (void)
    in it's private case for sqrt.
    Thanks BlueChip for his intro text and Dave Straayer for the actual name.
    ----------------------------------------------------------------------- */
-double mySqrt(double square)
+static double mySqrt(double square)
 {
     int k = 0;
     double temp = 0;
@@ -781,7 +781,7 @@ double mySqrt(double square)
    transcendFunc can do sin,cos,log,exp
    input parameter is angle
 ----------------------------------------------------------------------- */
-void transcendFunc(char* func, double* tt, int* ttPower)
+static void transcendFunc(char* func, double* tt, int* ttPower)
 {
     double t = (*tt)*M_PI/180; int tPower = *ttPower;
     int sign = 1;
@@ -861,8 +861,8 @@ void transcendFunc(char* func, double* tt, int* ttPower)
 /* -----------------------------------------------------------------------
    add in scientific number format
 ----------------------------------------------------------------------- */
-void doAdd (double* operandOne, int* powerOne,
-            double  operandTwo, int  powerTwo)
+static void doAdd (double* operandOne, int* powerOne,
+                   double  operandTwo, int  powerTwo)
 {
     if ( *powerOne >= powerTwo ){
         if (*powerOne - powerTwo <= DIGITLEN+1){
@@ -891,8 +891,8 @@ void doAdd (double* operandOne, int* powerOne,
 /* -----------------------------------------------------------------------
 multiple in scientific number format
 ----------------------------------------------------------------------- */
-void doMultiple(double* operandOne, int* powerOne,
-                double  operandTwo, int  powerTwo)
+static void doMultiple(double* operandOne, int* powerOne,
+                       double  operandTwo, int  powerTwo)
 {
     (*operandOne) *= operandTwo;
     (*powerOne) += powerTwo;
@@ -901,7 +901,7 @@ void doMultiple(double* operandOne, int* powerOne,
 /* -----------------------------------------------------------------------
 Handles all one operand calculations
 ----------------------------------------------------------------------- */
-void oneOperand(void)
+static void oneOperand(void)
 {
     int k = 0;
     if (buttonGroup == basicButtons){
@@ -988,7 +988,7 @@ void oneOperand(void)
 /* -----------------------------------------------------------------------
 Handles all two operands calculations
 ----------------------------------------------------------------------- */
-void twoOperands(void)
+static void twoOperands(void)
 {
     switch(oper){
         case '-':
@@ -1048,7 +1048,7 @@ static void move_with_wrap_and_shift(
 Print buttons when switching 1st and 2nd
 int group = {basicButtons, sciButtons}
 ----------------------------------------------------------------------- */
-void printButtonGroups(int group)
+static void printButtonGroups(int group)
 {
     drawButtons(group);
     drawLines();
@@ -1057,7 +1057,7 @@ void printButtonGroups(int group)
 /* -----------------------------------------------------------------------
 flash the currently marked button
 ----------------------------------------------------------------------- */
-void flashButton(void)
+static void flashButton(void)
 {
     int k, w, h;
     for (k=2;k>0;k--)
@@ -1083,7 +1083,8 @@ void flashButton(void)
 /* -----------------------------------------------------------------------
 pos is the position that needs animation. pos = [1~18]
 ----------------------------------------------------------------------- */
-void deleteAnimation(int pos)
+#if defined(CALCULATOR_CLEAR) || defined(CALCULATOR_OPERATORS)
+static void deleteAnimation(int pos)
 {
     int k, w, h, x;
     if (pos<1 || pos >18)
@@ -1102,6 +1103,7 @@ void deleteAnimation(int pos)
         rb->sleep(HZ/32);
     }
 }
+#endif
 
 /* -----------------------------------------------------------------------
 result may be one of these formats:
@@ -1114,7 +1116,7 @@ formatResult() change result to standard format: 0.xxxx
 if result is close to 0, let it be 0;
 if result is close to 1, let it be 0.1 and power++;
 ----------------------------------------------------------------------- */
-void formatResult(void)
+static void formatResult(void)
 {
     int resultsign = SIGN(result);
     result = ABS(result);
@@ -1160,7 +1162,7 @@ case SCIENTIFIC_FORMAT, let temppower = 1;
 case temppower >  0:  print '.' in the middle
 case temppower <= 0:  print '.' in the begining
 ----------------------------------------------------------------------- */
-void result2typingbuf(void)
+static void result2typingbuf(void)
 {
     bool haveDot = false;
     char tempchar = 0;
@@ -1244,7 +1246,7 @@ void result2typingbuf(void)
 /* -----------------------------------------------------------------------
 printResult() generates LCD display.
 ----------------------------------------------------------------------- */
-void printResult(void)
+static void printResult(void)
 {
     int k, w, h;
 
@@ -1321,7 +1323,7 @@ void printResult(void)
 Process typing buttons: 1-9, '.', sign
 main operand "result" and typingbuf are processed seperately here.
 ----------------------------------------------------------------------- */
-void typingProcess(void){
+static void typingProcess(void){
     switch( CAL_BUTTON ){
         case btn_sign:
             if (calStatus == cal_typing ||
@@ -1395,7 +1397,8 @@ void typingProcess(void){
 Handle delete operation
 main operand "result" and typingbuf are processed seperately here.
 ----------------------------------------------------------------------- */
-void doDelete(void){
+#ifdef CALCULATOR_CLEAR
+static void doDelete(void){
     deleteAnimation(18);
     switch(calStatus){
         case cal_dotted:
@@ -1434,10 +1437,11 @@ void doDelete(void){
             break;
     }
 }
+#endif
 /* -----------------------------------------------------------------------
 Handle buttons on basic screen
 ----------------------------------------------------------------------- */
-void basicButtonsProcess(void){
+static void basicButtonsProcess(void){
     switch (btn) {
         case CALCULATOR_INPUT:
             if (calStatus == cal_error && (CAL_BUTTON != btn_C) ) break;
@@ -1538,7 +1542,7 @@ void basicButtonsProcess(void){
 /* -----------------------------------------------------------------------
 Handle buttons on scientific screen
 ----------------------------------------------------------------------- */
-void sciButtonsProcess(void){
+static void sciButtonsProcess(void){
     switch (btn) {
         case CALCULATOR_INPUT:
             if (calStatus == cal_error && (CAL_BUTTON != sci_sci) ) break;
@@ -1613,7 +1617,7 @@ void sciButtonsProcess(void){
 move button index
 Invert display new button, invert back previous button
 ----------------------------------------------------------------------- */
-int handleButton(int button){
+static int handleButton(int button){
     switch(button)
     {
         case CALCULATOR_INPUT:
@@ -1721,9 +1725,6 @@ int handleButton(int button){
     }
 
     return 0;
-
-    prev_btn_row = btn_row;
-    prev_btn_col = btn_col;
 }
 
 /* -----------------------------------------------------------------------

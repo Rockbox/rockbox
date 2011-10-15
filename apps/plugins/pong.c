@@ -288,7 +288,7 @@ struct pong {
     struct player player[2];
 };
 
-void singlepad(int x, int y, int set)
+static void singlepad(int x, int y, int set)
 {
     if(set) {
         rb->lcd_fillrect(x, y, PAD_WIDTH, PAD_HEIGHT);
@@ -300,7 +300,7 @@ void singlepad(int x, int y, int set)
     }
 }
 
-void pad(struct pong *p, int pad)
+static void pad(struct pong *p, int pad)
 {
     struct player *player = &p->player[pad];
     /* clear existing pad */
@@ -313,7 +313,7 @@ void pad(struct pong *p, int pad)
     player->e_pad = player->w_pad;
 }
 
-bool wallcollide(struct pong *p, int pad)
+static bool wallcollide(struct pong *p, int pad)
 {
     /* we have already checked for pad-collision, just check if this hits
        the wall */
@@ -332,7 +332,7 @@ bool wallcollide(struct pong *p, int pad)
 /* returns true if the ball has hit a pad, and then the info variable
    will have extra angle info */
 
-bool padcollide(struct pong *p, int pad, int *info)
+static bool padcollide(struct pong *p, int pad, int *info)
 {
     struct player *player = &p->player[pad];
     int x = p->ball.x/RES;
@@ -366,7 +366,7 @@ bool padcollide(struct pong *p, int pad, int *info)
     return false; /* nah */
 }
 
-void bounce(struct pong *p, int pad, int info)
+static void bounce(struct pong *p, int pad, int info)
 {
     p->ball.speedx = -p->ball.speedx;
 
@@ -410,7 +410,7 @@ void bounce(struct pong *p, int pad, int info)
 #endif
 }
 
-void score(struct pong *p, int pad)
+static void score(struct pong *p, int pad)
 {
     if(pad)
         rb->splash(HZ/4, "right scores!");
@@ -436,7 +436,7 @@ void score(struct pong *p, int pad)
     p->player[1].e_pad = -1;
 }
 
-void ball(struct pong *p)
+static void ball(struct pong *p)
 {
     int oldx = p->ball.x/RES;
     int oldy = p->ball.y/RES;
@@ -487,7 +487,7 @@ void ball(struct pong *p)
     rb->lcd_fillrect(newx, newy, BALL_WIDTH, BALL_HEIGHT);
 }
 
-void padmove(int *pos, int dir)
+static void padmove(int *pos, int dir)
 {
     *pos += dir;
     if(*pos > (LCD_HEIGHT-PAD_HEIGHT))
@@ -496,7 +496,7 @@ void padmove(int *pos, int dir)
         *pos = 0;
 }
 
-void key_pad(struct pong *p, int pad, int up, int down)
+static void key_pad(struct pong *p, int pad, int up, int down)
 {
     struct player *player = &p->player[pad];
     if(player->iscpu) {
@@ -526,7 +526,7 @@ void key_pad(struct pong *p, int pad, int up, int down)
     }
 }
 
-int keys(struct pong *p)
+static int keys(struct pong *p)
 {
     int key;
 #ifdef PONG_PAUSE
@@ -609,7 +609,7 @@ int keys(struct pong *p)
     return 1; /* return 0 to exit game */
 }
 
-void showscore(struct pong *p)
+static void showscore(struct pong *p)
 {
     static char buffer[20];
     int w;
@@ -620,7 +620,7 @@ void showscore(struct pong *p)
     rb->lcd_putsxy( (LCD_WIDTH / 2) - (w / 2), 0, (unsigned char *)buffer);
 }
 
-void blink_demo(void)
+static void blink_demo(void)
 {
     static char buffer[30];
     int w;

@@ -290,8 +290,7 @@ struct CTerrain mRoof;
 static void chopDrawParticle(struct CParticle *mParticle);
 static void chopDrawBlock(struct CBlock *mBlock);
 static void chopRenderTerrain(struct CTerrain *ter, bool isground);
-void chopper_load(bool newgame);
-void cleanup_chopper(void);
+static void chopper_load(bool newgame);
 
 static void chopDrawPlayer(int x,int y) /* These are SCREEN coords, not world!*/
 {
@@ -335,7 +334,7 @@ static void chopClearTerrain(struct CTerrain *ter)
 }
 
 
-int iR(int low,int high)
+static int iR(int low,int high)
 {
     return low+rb->rand()%(high-low+1);
 }
@@ -394,7 +393,7 @@ static void chopTerrainNodeDeleteAndShift(struct CTerrain *ter,int nodeIndex)
 
 }
 
-int chopUpdateTerrainRecycling(struct CTerrain *ter)
+static int chopUpdateTerrainRecycling(struct CTerrain *ter)
 {
     int i=1;
     int iNewNodePos,g,v;
@@ -425,7 +424,7 @@ int chopUpdateTerrainRecycling(struct CTerrain *ter)
     return 1;
 }
 
-int chopTerrainHeightAtPoint(struct CTerrain *ter, int pX)
+static int chopTerrainHeightAtPoint(struct CTerrain *ter, int pX)
 {
 
     int iNodeIndexOne=0,iNodeIndexTwo=0, h, terY1, terY2, terX2, a, b;
@@ -462,7 +461,7 @@ int chopTerrainHeightAtPoint(struct CTerrain *ter, int pX)
 
 }
 
-int chopPointInTerrain(struct CTerrain *ter, int pX, int pY, int iTestType)
+static int chopPointInTerrain(struct CTerrain *ter, int pX, int pY, int iTestType)
 {
     int h = chopTerrainHeightAtPoint(ter, pX);
 
@@ -990,7 +989,7 @@ static void chopRenderTerrain(struct CTerrain *ter, bool isground)
     }
 }
 
-void chopper_load(bool newgame)
+static void chopper_load(bool newgame)
 {
 
     int i;

@@ -76,7 +76,7 @@ const struct button_mapping* plugin_contexts[]= {
 #ifndef HAVE_LCD_COLOR
 static unsigned char palette[256];
 
-void color_palette_init(unsigned char* palette)
+static void color_palette_init(unsigned char* palette)
 {
     int i;
     for(i=0;i<=160;i++)//palette[i]=(3/2)*i
@@ -95,7 +95,7 @@ static fb_data palette[256];
  * the "The Demo Effects Collection" GPL project
  * Copyright (C) 2002 W.P. van Paassen
  */
-void color_palette_init(fb_data* palette)
+static void color_palette_init(fb_data* palette)
 {
     int i;
     for (i = 0; i < 32; i++){
@@ -268,7 +268,7 @@ static inline void fire_draw(struct fire* fire)
 #endif
 }
 
-void cleanup(void *parameter)
+static void cleanup(void *parameter)
 {
     (void)parameter;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -283,7 +283,7 @@ void cleanup(void *parameter)
 
 
 #ifndef HAVE_LCD_COLOR
-int init_grey(void)
+static int init_grey(void)
 {
     unsigned char *gbuf;
     size_t gbuf_size = 0;
@@ -303,7 +303,7 @@ int init_grey(void)
 }
 #endif
 
-int main(void)
+static int main(void)
 {
     int action;
 

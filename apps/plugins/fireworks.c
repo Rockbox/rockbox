@@ -320,7 +320,7 @@ MENUITEM_STRINGLIST(menu, "Fireworks Menu", NULL,
                     "FPS (Speed)", "Playback Control", "Quit");
 
 /* called on startup. initializes all variables, etc */
-void init_all(void)
+static void init_all(void)
 {
     int j;
 
@@ -333,7 +333,7 @@ void init_all(void)
 
 /* called when a rocket hits its destination height.
  * prepares all associated fireworks to be expelled. */
-void init_explode(int x, int y, int firework, int points)
+static void init_explode(int x, int y, int firework, int points)
 {
     int i;
 
@@ -357,7 +357,7 @@ void init_explode(int x, int y, int firework, int points)
 
 /* called when a rocket is launched.
  * prepares said rocket to start moving towards its destination. */
-void init_rocket(int rocket)
+static void init_rocket(int rocket)
 {
     rb->srand(*rb->current_tick);
 
@@ -374,7 +374,7 @@ void init_rocket(int rocket)
 }
 
 /* startup/configuration menu. */
-void fireworks_menu(void)
+static void fireworks_menu(void)
 {
     int selected = 0, result;
     bool menu_quit = false;

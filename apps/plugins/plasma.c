@@ -83,7 +83,7 @@ static void wave_table_generate(void)
 
 #ifdef HAVE_LCD_COLOR
 /* Make a smooth colour cycle. */
-void shades_generate(int time)
+static void shades_generate(int time)
 {
     int i;
     unsigned red, green, blue;
@@ -129,7 +129,7 @@ static void shades_generate(void)
 }
 #endif
 
-void cleanup(void)
+static void cleanup(void)
 {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     if (boosted)
@@ -150,7 +150,7 @@ void cleanup(void)
  * algorithm.
  */
 
-int main(void)
+static int main(void)
 {
     plasma_frequency = 1;
     int action, x, y;

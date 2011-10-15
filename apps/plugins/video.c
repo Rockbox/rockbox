@@ -65,7 +65,7 @@
 
 
 /****************** prototypes ******************/
-void timer4_isr(void); /* IMIA4 ISR */
+static void timer4_isr(void); /* IMIA4 ISR */
 int check_button(void); /* determine next relative frame */
 
 
@@ -207,7 +207,7 @@ tFileHeader gFileHdr; /* file header */
 /****************** implementation ******************/
 
 /* tool function: return how much playable audio/video is left */
-int Available(unsigned char* pSnapshot)
+static int Available(unsigned char* pSnapshot)
 {
     if (pSnapshot <= gBuf.pBufFill)
         return gBuf.pBufFill - pSnapshot;
@@ -216,7 +216,7 @@ int Available(unsigned char* pSnapshot)
 }
 
 /* debug function to draw buffer indicators */
-void DrawBuf(void)
+static void DrawBuf(void)
 {
     int ypos, fill, video, audio;
 
@@ -247,7 +247,7 @@ void DrawBuf(void)
 
 
 /* helper function to draw a position indicator */
-void DrawPosition(int pos, int total)
+static void DrawPosition(int pos, int total)
 {
     int w, h;
     int sec; /* estimated seconds */
@@ -283,7 +283,7 @@ void DrawPosition(int pos, int total)
 }
 
 /* Put text on OSD and activate it for 1 second */
-void osd_show_text(void)
+static void osd_show_text(void)
 {
     int h, ypos;
 
@@ -305,7 +305,7 @@ void osd_show_text(void)
 }
 
 /* helper function to change the volume by a certain amount, +/- */
-void ChangeVolume(int delta)
+static void ChangeVolume(int delta)
 {
     int minvol = rb->sound_min(SOUND_VOLUME);
     int maxvol = rb->sound_max(SOUND_VOLUME);
@@ -325,7 +325,7 @@ void ChangeVolume(int delta)
 
 
 /* helper function to change the LCD contrast by a certain amount, +/- */
-void ChangeContrast(int delta)
+static void ChangeContrast(int delta)
 {
     static int mycontrast = -1; /* the "permanent" value while running */
     int contrast; /* updated value */
@@ -348,7 +348,7 @@ void ChangeContrast(int delta)
 
 
 /* sync the video to the current audio */
-void SyncVideo(void)
+static void SyncVideo(void)
 {
     tAudioFrameHeader* pAudioBuf;
 
@@ -370,7 +370,7 @@ void SyncVideo(void)
 
 
 /* timer interrupt handler to display a frame */
-void timer4_isr(void)
+static void timer4_isr(void)
 {
     int available;
     tAudioFrameHeader* pAudioBuf;
@@ -446,7 +446,7 @@ void timer4_isr(void)
 
 
 /* ISR function to get more mp3 data */
-void GetMoreMp3(unsigned char** start, size_t* size)
+static void GetMoreMp3(unsigned char** start, size_t* size)
 {
     int available;
     int advance;
@@ -476,7 +476,7 @@ void GetMoreMp3(unsigned char** start, size_t* size)
 }
 
 
-int WaitForButton(void)
+static int WaitForButton(void)
 {
     int button;
     
@@ -490,7 +490,7 @@ int WaitForButton(void)
 }
 
 
-bool WantResume(int fd)
+static bool WantResume(int fd)
 {
     int button;
 
@@ -507,7 +507,7 @@ bool WantResume(int fd)
 }
 
 
-int SeekTo(int fd, int nPos)
+static int SeekTo(int fd, int nPos)
 {
     int read_now, got_now;
 
@@ -574,7 +574,7 @@ int SeekTo(int fd, int nPos)
 }
 
 /* called from default_event_handler_ex() or at end of playback */
-void Cleanup(void *fd)
+static void Cleanup(void *fd)
 {
     rb->close(*(int*)fd); /* close the file */
 
@@ -592,7 +592,7 @@ void Cleanup(void *fd)
 }
 
 /* returns >0 if continue, =0 to stop, <0 to abort (USB) */
-int PlayTick(int fd)
+static int PlayTick(int fd)
 {
     int button;
     static int lastbutton = 0;
@@ -867,7 +867,7 @@ int PlayTick(int fd)
 }
 
 
-int main(char* filename)
+static int main(char* filename)
 {
     int file_size;
     int fd; /* file descriptor handle */

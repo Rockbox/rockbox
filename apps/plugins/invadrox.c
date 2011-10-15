@@ -740,7 +740,7 @@ static inline fb_data get_pixel(int x, int y)
 
 
 /* Draw "digits" least significant digits of num at (x,y) */
-void draw_number(int x, int y, int num, int digits)
+static void draw_number(int x, int y, int num, int digits)
 {
     int i;
     int d;
@@ -770,13 +770,13 @@ static inline void draw_score(void)
 }
 
 
-void draw_level(void)
+static void draw_level(void)
 {
     draw_number(LEVEL_X + 2 * NUM_SPACING, PLAYFIELD_Y + 2, level, 2);
 }
 
 
-void draw_lives(void)
+static void draw_lives(void)
 {
     int i;
     /* Lives num */
@@ -872,7 +872,7 @@ static inline bool next_alien(void)
  * Set curr_alien to first alive.
  * Return false if no-one is left alive.
  */
-bool first_alien(void)
+static bool first_alien(void)
 {
     int i, y;
 
@@ -892,7 +892,7 @@ bool first_alien(void)
 }
 
 
-bool move_aliens(void)
+static bool move_aliens(void)
 {
     int x, y, old_x, old_y;
 
@@ -1023,7 +1023,7 @@ static inline void fire_alpha(int xc, int yc, fb_data color)
 }
 
 
-void move_fire(void)
+static void move_fire(void)
 {
     bool hit_green = false;
     bool hit_white = false;
@@ -1244,7 +1244,7 @@ static inline void draw_bomb(int i)
 }
 
 
-void move_bombs(void)
+static void move_bombs(void)
 {
     int i, j, bomber;
     bool abort;
@@ -1410,7 +1410,7 @@ static inline void move_ship(void)
 
 
 /* Unidentified Flying Object */
-void move_ufo(void)
+static void move_ufo(void)
 {
     static int ufo_speed;
     static int counter;
@@ -1483,7 +1483,7 @@ void move_ufo(void)
 }
 
 
-void draw_background(void)
+static void draw_background(void)
 {
 
     rb->lcd_bitmap(invadrox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -1491,7 +1491,7 @@ void draw_background(void)
 }
 
 
-void new_level(void)
+static void new_level(void)
 {
     int i;
 
@@ -1604,7 +1604,7 @@ void new_level(void)
 }
 
 
-void init_invadrox(void)
+static void init_invadrox(void)
 {
     int i;
 
@@ -1756,7 +1756,7 @@ check_usb:
 }
 
 
-void game_loop(void)
+static void game_loop(void)
 {
     int i, end;
 

@@ -431,7 +431,7 @@ int font_height = 8;
 
 /* implementation */
 
-void anim_horizontal(int cur_left, int cur_right)
+static void anim_horizontal(int cur_left, int cur_right)
 {
     int cur_x, x;
     int left, right, dl, dr;
@@ -609,7 +609,7 @@ void anim_horizontal(int cur_left, int cur_right)
     last_pos = cur_x;
 }
 
-void anim_vertical(int cur_left, int cur_right)
+static void anim_vertical(int cur_left, int cur_right)
 {
     int cur_y, y;
     int left, right, dl, dr;
@@ -784,7 +784,7 @@ void anim_vertical(int cur_left, int cur_right)
     last_pos = cur_y;
 }
 
-void cleanup(void)
+static void cleanup(void)
 {
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_DEFAULT_FG);

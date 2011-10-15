@@ -359,7 +359,7 @@ static const fb_data * puzzle_bmp_ptr;
 static const char * initial_bmp_path=NULL;
 
 #ifdef HAVE_ALBUMART
-const char * get_albumart_bmp_path(void)
+static const char * get_albumart_bmp_path(void)
 {
     struct mp3entry* track = rb->audio_current_track();
 
@@ -374,10 +374,12 @@ const char * get_albumart_bmp_path(void)
 }
 #endif
 
-const char * get_random_bmp_path(void)
+#if 0 /* unused */
+static const char * get_random_bmp_path(void)
 {
     return(initial_bmp_path);
 }
+#endif
 
 static bool load_resize_bitmap(void)
 {

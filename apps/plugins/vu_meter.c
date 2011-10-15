@@ -433,7 +433,7 @@ struct saved_settings {
     int digital_decay; 
 } vumeter_settings;
 
-void reset_settings(void) {
+static void reset_settings(void) {
     vumeter_settings.meter_type=ANALOG;
     vumeter_settings.analog_use_db_scale=true;
     vumeter_settings.digital_use_db_scale=true;
@@ -443,7 +443,7 @@ void reset_settings(void) {
     vumeter_settings.digital_decay=0; 
 }
 
-void calc_scales(void)
+static void calc_scales(void)
 {
     unsigned int fx_log_factor = E_POW_5/half_width;
     unsigned int y,z;
@@ -477,7 +477,7 @@ void calc_scales(void)
     }
 }
 
-void load_settings(void) {
+static void load_settings(void) {
     int fp = rb->open(PLUGIN_DEMOS_DATA_DIR "/.vu_meter", O_RDONLY);
     if(fp>=0) {
             rb->read(fp, &vumeter_settings, sizeof(struct saved_settings));
@@ -489,7 +489,7 @@ void load_settings(void) {
     }
 }
 
-void save_settings(void) {
+static void save_settings(void) {
     int fp = rb->creat(PLUGIN_DEMOS_DATA_DIR "/.vu_meter", 0666);
     if(fp >= 0) {
         rb->write (fp, &vumeter_settings, sizeof(struct saved_settings));
@@ -497,7 +497,7 @@ void save_settings(void) {
     }
 }
 
-void change_volume(int delta) {
+static void change_volume(int delta) {
     int minvol = rb->sound_min(SOUND_VOLUME);
     int maxvol = rb->sound_max(SOUND_VOLUME);
     int vol = rb->global_settings->volume + delta;
@@ -602,7 +602,7 @@ static bool vu_meter_menu(void)
     return exit;
 }
 
-void draw_analog_minimeters(void) {
+static void draw_analog_minimeters(void) {
     rb->lcd_mono_bitmap(sound_speaker, quarter_width-28, 12, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
     if(analog_mini_1<left_needle_top_x)
@@ -628,7 +628,7 @@ void draw_analog_minimeters(void) {
     rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
-void draw_digital_minimeters(void) {
+static void draw_digital_minimeters(void) {
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * num_left_leds, 0));
 #endif
@@ -664,7 +664,7 @@ void draw_digital_minimeters(void) {
 #endif
 }
 
-void analog_meter(void) {
+static void analog_meter(void) {
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     int left_peak = rb->mas_codec_readreg(0xC);
@@ -723,7 +723,7 @@ void analog_meter(void) {
     }
 }
 
-void digital_meter(void) {
+static void digital_meter(void) {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     int left_peak = rb->mas_codec_readreg(0xC);
     int right_peak = rb->mas_codec_readreg(0xD);

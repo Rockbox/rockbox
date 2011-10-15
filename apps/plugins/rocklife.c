@@ -120,7 +120,7 @@ static inline unsigned char get_cell(int x, int y, char *pgrid) {
 }
 
 /* clear grid */
-void init_grid(char *pgrid){
+static void init_grid(char *pgrid){
     memset(pgrid, 0, GRID_W * GRID_H);
 }
 

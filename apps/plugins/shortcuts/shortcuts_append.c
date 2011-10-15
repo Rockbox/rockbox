@@ -25,7 +25,7 @@
 
 
 
-bool append_entry_to_file(sc_file_t *file, char *path, bool is_dir)
+static bool append_entry_to_file(sc_file_t *file, char *path, bool is_dir)
 {
     sc_entry_t entry;
 

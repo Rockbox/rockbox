@@ -399,7 +399,7 @@ static inline void starfield_move_and_draw(struct starfield * starfield)
 
 static struct starfield starfield;
 
-int plugin_main(void)
+static int plugin_main(void)
 {
     int button, avg_peak, t_disp=0;
     int font_h, font_w;

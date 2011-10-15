@@ -78,7 +78,7 @@ struct line_color
  * Compute a new random step to make the point bounce the borders of the screen
  */
 
-int get_new_step(int step)
+static int get_new_step(int step)
 {
     if(step>0)
         return -(MIN_STEP_RANGE + rb->rand() % (MAX_STEP_RANGE-MIN_STEP_RANGE));
@@ -108,7 +108,7 @@ struct polygon
 /*
  * Generates a random polygon (which fits the screen size though)
  */
-void polygon_init(struct polygon * polygon, struct screen * display)
+static void polygon_init(struct polygon * polygon, struct screen * display)
 {
     int i;
     for(i=0;i<NB_POINTS;++i)
@@ -122,7 +122,7 @@ void polygon_init(struct polygon * polygon, struct screen * display)
  * Draw the given polygon onto the screen
  */
 
-void polygon_draw(struct polygon * polygon, struct screen * display)
+static void polygon_draw(struct polygon * polygon, struct screen * display)
 {
     int i;
     for(i=0;i<NB_POINTS-1;++i)
@@ -144,7 +144,7 @@ struct polygon_move
     struct point move_steps[NB_POINTS];
 };
 
-void polygon_move_init(struct polygon_move * polygon_move)
+static void polygon_move_init(struct polygon_move * polygon_move)
 {
     int i;
     for(i=0;i<NB_POINTS;++i)
@@ -159,7 +159,8 @@ void polygon_move_init(struct polygon_move * polygon_move)
  * Update the given polygon's position according to the given informations in
  * polygon_move (polygon_move may be updated)
  */
-void polygon_update(struct polygon *polygon, struct screen * display, struct polygon_move *polygon_move)
+static void polygon_update(struct polygon *polygon, struct screen * display, 
+                           struct polygon_move *polygon_move)
 {
     int i, x, y, step;
     for(i=0;i<NB_POINTS;++i)
@@ -208,14 +209,14 @@ struct polygon_fifo
     struct polygon tab[MAX_POLYGONS];
 };
 
-void fifo_init(struct polygon_fifo * fifo)
+static void fifo_init(struct polygon_fifo * fifo)
 {
     fifo->fifo_tail=0;
     fifo->fifo_head=0;
     fifo->nb_items=0;
 }
 
-void fifo_push(struct polygon_fifo * fifo, struct polygon * polygon)
+static void fifo_push(struct polygon_fifo * fifo, struct polygon * polygon)
 {
     if(fifo->nb_items>=MAX_POLYGONS)
         return;
@@ -231,7 +232,7 @@ void fifo_push(struct polygon_fifo * fifo, struct polygon * polygon)
         fifo->fifo_head=0;
 }
 
-struct polygon * fifo_pop(struct polygon_fifo * fifo)
+static struct polygon * fifo_pop(struct polygon_fifo * fifo)
 {
     int index;
     if(fifo->nb_items==0)
@@ -248,7 +249,7 @@ struct polygon * fifo_pop(struct polygon_fifo * fifo)
  * Drawing stuffs
  */
 
-void polygons_draw(struct polygon_fifo * polygons, struct screen * display)
+static void polygons_draw(struct polygon_fifo * polygons, struct screen * display)
 {
     int i, j;
     for(i=0, j=polygons->fifo_tail;i<polygons->nb_items;++i, ++j)
@@ -259,7 +260,7 @@ void polygons_draw(struct polygon_fifo * polygons, struct screen * display)
     }
 }
 
-void cleanup(void)
+static void cleanup(void)
 {
     backlight_use_settings();
 #ifdef HAVE_REMOTE_LCD
@@ -268,14 +269,14 @@ void cleanup(void)
 }
 
 #ifdef HAVE_LCD_COLOR
-void color_randomize(struct line_color * color)
+static void color_randomize(struct line_color * color)
 {
     color->r = rb->rand()%255;
     color->g = rb->rand()%255;
     color->b = rb->rand()%255;
 }
 
-void color_init(struct line_color * color)
+static void color_init(struct line_color * color)
 {
     color_randomize(color);
     color->current_r=color->r;
@@ -283,7 +284,7 @@ void color_init(struct line_color * color)
     color->current_b=color->b;
 }
 
-void color_change(struct line_color * color)
+static void color_change(struct line_color * color)
 {
     if(color->current_r<color->r)
         ++color->current_r;
@@ -307,7 +308,7 @@ void color_change(struct line_color * color)
 #define COLOR_RGBPACK(color) \
     LCD_RGBPACK((color)->current_r, (color)->current_g, (color)->current_b)
 
-void color_apply(struct line_color * color, struct screen * display)
+static void color_apply(struct line_color * color, struct screen * display)
 {
     if (display->is_color){
         unsigned foreground=
@@ -321,7 +322,7 @@ void color_apply(struct line_color * color, struct screen * display)
  * Main function
  */
 
-int plugin_main(void)
+static int plugin_main(void)
 {
     int action;
     int sleep_time=DEFAULT_WAIT_TIME;

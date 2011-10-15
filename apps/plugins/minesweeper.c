@@ -381,28 +381,28 @@ typedef struct tile
 /* the height and width of the field */
 #define MAX_HEIGHT (LCD_HEIGHT/TileSize)
 #define MAX_WIDTH  (LCD_WIDTH/TileSize)
-int height = MAX_HEIGHT;
-int width = MAX_WIDTH;
-int top;
-int left;
+static int height = MAX_HEIGHT;
+static int width = MAX_WIDTH;
+static int top;
+static int left;
 
 /* The Minefield. Caution it is defined as Y, X! Not the opposite. */
-tile minefield[MAX_HEIGHT][MAX_WIDTH];
+static tile minefield[MAX_HEIGHT][MAX_WIDTH];
 
 /* total number of mines on the game */
-int mine_num = 0;
+static int mine_num = 0;
 
 /* percentage of mines on minefield used during generation */
-int percent = 16;
+static int percent = 16;
 
 /* number of tiles left on the game */
-int tiles_left;
+static int tiles_left;
 
 /* Because mines are set after the first move... */
-bool no_mines = true;
+static bool no_mines = true;
 
 /* We need a stack (created on discover()) for the cascade algorithm. */
-int stack_pos = 0;
+static int stack_pos = 0;
 
 #ifdef HAVE_TOUCHSCREEN
 
@@ -411,7 +411,7 @@ static struct ts_raster mine_raster = { 0, 0, MAX_WIDTH, MAX_HEIGHT, TileSize, T
 #endif
 
 
-void push( int *stack, int y, int x )
+static void push( int *stack, int y, int x )
 {
     if( stack_pos <= height*width )
     {
@@ -421,7 +421,7 @@ void push( int *stack, int y, int x )
 }
 
 /* Unveil tiles and push them to stack if they are empty. */
-void unveil( int *stack, int y, int x )
+static void unveil( int *stack, int y, int x )
 {
     if( x < 0 || y < 0 || x > width - 1 || y > height - 1
        || minefield[y][x].known
@@ -433,14 +433,14 @@ void unveil( int *stack, int y, int x )
         push( stack, y, x );
 }
 
-int is_flagged( int y, int x )
+static int is_flagged( int y, int x )
 {
     if( x >= 0 && y >= 0 && x < width && y < height && minefield[y][x].flag )
         return 1;
     return 0;
 }
 
-int neighbors_flagged( int y, int x )
+static int neighbors_flagged( int y, int x )
 {
     return is_flagged( y-1, x-1 ) +
            is_flagged( y-1, x ) +
@@ -453,7 +453,7 @@ int neighbors_flagged( int y, int x )
            is_flagged( y+1, x+1 );
 }
 
-bool discover( int y, int x, bool explore_neighbors )
+static bool discover( int y, int x, bool explore_neighbors )
 {
     /* Selected tile. */
     if( x < 0 || y < 0 || x > width - 1 || y > height - 1)
@@ -513,7 +513,7 @@ bool discover( int y, int x, bool explore_neighbors )
 }
 
 /* Reset the whole board for a new game. */
-void minesweeper_init( void )
+static void minesweeper_init( void )
 {
     rb->memset(minefield, 0, sizeof(minefield));
     no_mines = true;
@@ -524,7 +524,7 @@ void minesweeper_init( void )
 /* put mines on the mine field */
 /* there is p% chance that a tile is a mine */
 /* if the tile has coordinates (x,y), then it can't be a mine */
-void minesweeper_putmines( int p, int x, int y )
+static void minesweeper_putmines( int p, int x, int y )
 {
     int i,j;
 
@@ -585,7 +585,7 @@ void minesweeper_putmines( int p, int x, int y )
 
 /* A function that will uncover all the board, when the user wins or loses.
    can easily be expanded, (just a call assigned to a button) as a solver. */
-void mine_show( void )
+static void mine_show( void )
 {
     int i, j, button;
 
@@ -622,7 +622,7 @@ void mine_show( void )
 #endif
 }
 
-int count_tiles_left( void )
+static int count_tiles_left( void )
 {
     int tiles = 0;
     int i, j;
@@ -633,7 +633,7 @@ int count_tiles_left( void )
     return tiles;
 }
 
-int count_flags( void )
+static int count_flags( void )
 {
     int flags = 0;
     int i, j;
@@ -645,7 +645,7 @@ int count_flags( void )
 }
 
 /* welcome screen where player can chose mine percentage */
-enum minesweeper_status menu( void )
+static enum minesweeper_status menu( void )
 {
     int selection = 0, result = MINESWEEPER_QUIT;
     bool menu_quit = false;
@@ -698,7 +698,7 @@ enum minesweeper_status menu( void )
 }
 
 /* the big and ugly game function */
-enum minesweeper_status minesweeper( void )
+static enum minesweeper_status minesweeper( void )
 {
     int i, j;
     int button;

@@ -245,7 +245,7 @@ static void update_timebar(struct mp3entry *mp3)
  * Marks the entire area of the osci buffer invalid.
  * It will be drawn with new values in the next loop.
  */
-void splitedit_invalidate_osci(void)
+static void splitedit_invalidate_osci(void)
 {
     osci_valid = false;
     validation_start = ~(unsigned int)0;
@@ -254,7 +254,7 @@ void splitedit_invalidate_osci(void)
 /**
  * Returns the loop mode. See the LOOP_MODE_XXX constants above.
  */
-int splitedit_get_loop_mode(void)
+static int splitedit_get_loop_mode(void)
 {
     return loop_mode;
 }
@@ -300,7 +300,7 @@ static void update_icons(void)
 /**
  * Sets the loop mode. See the LOOP_MODE_XXX constants above.
  */
-void splitedit_set_loop_mode(int mode)
+static void splitedit_set_loop_mode(int mode)
 {
     int old_loop_mode = loop_mode;
     /* range restriction */
@@ -386,7 +386,7 @@ static void set_range_by_time(
 /**
  * Set the split point in screen coordinates
  */
-void splitedit_set_split_x(int newx)
+static void splitedit_set_split_x(int newx)
 {
     int minx = split_x - 2 > 0 ? split_x - 2: 0;
 
@@ -424,7 +424,7 @@ void splitedit_set_split_x(int newx)
 /**
  * returns the split point in screen coordinates
  */
-int splitedit_get_split_x(void)
+static int splitedit_get_split_x(void)
 {
     return split_x;
 }
@@ -502,7 +502,7 @@ static void scroll(struct mp3entry *mp3)
 /**
  * Zooms in by 3/4
  */
-void splitedit_zoom_in(struct mp3entry *mp3)
+static void splitedit_zoom_in(struct mp3entry *mp3)
 {
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     rb->lcd_fillrect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
@@ -516,7 +516,7 @@ void splitedit_zoom_in(struct mp3entry *mp3)
 /**
  * Zooms out by 4/3
  */
-void splitedit_zoom_out(struct mp3entry *mp3)
+static void splitedit_zoom_out(struct mp3entry *mp3)
 {
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     rb->lcd_fillrect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
@@ -915,9 +915,9 @@ static void save_editor(struct mp3entry *mp3, int splittime)
 /**
  * The main loop of the editor
  */
-unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
-                          unsigned int split_time,
-                          unsigned int range)
+static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
+                                      unsigned int split_time,
+                                      unsigned int range)
 {
     int button = BUTTON_NONE;
     int lastbutton = BUTTON_NONE;
