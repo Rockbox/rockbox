@@ -126,7 +126,7 @@ struct font* font_get(int font);
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber);
 int font_get_width(struct font* ft, unsigned short ch);
 const unsigned char * font_get_bits(struct font* ft, unsigned short ch);
-void glyph_cache_save(struct font* pf);
+void glyph_cache_save(int font_id);
 
 #else /* HAVE_LCD_BITMAP */
 

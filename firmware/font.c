@@ -70,6 +70,11 @@
 #define O_BINARY 0
 #endif
 
+/* Define this to try loading /.rockbox/.glyphcache    *
+ * when a font specific file fails. This requires the  *
+ * user to copy and rename a font glyph cache file     */
+//#define TRY_DEFAULT_GLYPHCACHE
+
 /* compiled-in font */
 extern struct font sysfont;
 
@@ -82,7 +87,9 @@ struct buflib_alloc_data {
     unsigned char buffer[];
 };
 static int buflib_allocations[MAXFONTS];
-static int handle_for_glyphcache;
+
+static int cache_fd;
+static struct font* cache_pf;
 
 static int buflibmove_callback(int handle, void* current, void* new)
 {
@@ -135,15 +142,15 @@ static inline unsigned char *buffer_from_handle(int handle)
 
 /* Font cache structures */
 static void cache_create(struct font* pf);
-static void glyph_cache_load(struct font* pf);
+static void glyph_cache_load(int fond_id);
 /* End Font cache structures */
 
 void font_init(void)
 {
     int i = 0;
+    cache_fd = -1;
     while (i<MAXFONTS)
         buflib_allocations[i++] = -1;
-    handle_for_glyphcache = -1;
 }
 
 /* Check if we have x bytes left in the file buffer */
@@ -345,7 +352,7 @@ static struct font* font_load_cached(struct font* pf)
     return pf;
 }
 
-static bool internal_load_font(const char *path, char *buf, 
+static bool internal_load_font(int font_id, const char *path, char *buf, 
                                size_t buf_size, int handle)
 {
     size_t size;
@@ -387,7 +394,7 @@ static bool internal_load_font(const char *path, char *buf,
             return false;
         }
 
-        glyph_cache_load(pf);
+        glyph_cache_load(font_id);
     }
     else
     {
@@ -512,13 +519,10 @@ int font_load_ex(const char *path, size_t buffer_size)
     if (handle < 0)
         return -1;
 
-    if (handle_for_glyphcache < 0)
-        handle_for_glyphcache = handle;
-
     buffer = buffer_from_handle(handle);
     lock_font_handle(handle, true);
 
-    if (!internal_load_font(path, buffer, buffer_size, handle))
+    if (!internal_load_font(font_id, path, buffer, buffer_size, handle))
     {
         lock_font_handle(handle, false);
         core_free(handle);
@@ -546,20 +550,40 @@ int font_load(const char *path)
 
 void font_unload(int font_id)
 {
-    int *handle = &buflib_allocations[font_id];
-    struct buflib_alloc_data *pdata = core_get_data(*handle);
+    if ( font_id == FONT_SYSFIXED )
+        return;
+    int handle = buflib_allocations[font_id];
+    if ( handle < 0 )
+        return;
+    struct buflib_alloc_data *pdata = core_get_data(handle);
     struct font* pf = &pdata->font;
     pdata->refcount--;
     if (pdata->refcount < 1)
     {
         //printf("freeing id: %d %s\n", font_id, core_get_name(*handle));
         if (pf && pf->fd >= 0)
+        {
+            glyph_cache_save(font_id);
             close(pf->fd);
-        if (*handle > 0)
-            core_free(*handle);
-        if (handle_for_glyphcache == *handle)
-            handle_for_glyphcache = -1; // should find the next available handle
-        *handle = -1;
+        }
+        if (handle > 0)
+            core_free(handle);
+        buflib_allocations[font_id] = -1;
+
+    }
+}
+
+void font_unload_all(void)
+{
+    int i;
+    for (i=0; i<MAXFONTS; i++)
+    {
+        if (buflib_allocations[i] > 0)
+        {
+            struct buflib_alloc_data *alloc = core_get_data(buflib_allocations[i]);
+            alloc->refcount = 1; /* force unload */
+            font_unload(i);
+        }
     }
 }
 
@@ -713,45 +737,74 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 
     return bits;
 }
-static int cache_fd;
+
+void font_path_to_glyph_path( const char *font_path, char *glyph_path)
+
+{
+    /* take full file name, cut extension, and add .glyphcache */
+    strlcpy(glyph_path, font_path, MAX_PATH);
+    glyph_path[strlen(glyph_path)-4] = '\0';
+    strcat(glyph_path, ".gc");
+}
+
+/* call with NULL to flush */
 static void glyph_file_write(void* data)
 {
     struct font_cache_entry* p = data;
-    int handle = handle_for_glyphcache;
-    struct font* pf = pf_from_handle(handle);
+    struct font* pf = cache_pf;
     unsigned short ch;
-    unsigned char tmp[2];
+    static int buffer_pos = 0;
+#define WRITE_BUFFER 256
+    static unsigned char buffer[WRITE_BUFFER];
 
+    /* flush buffer & reset */
+    if ( data == NULL || buffer_pos >= WRITE_BUFFER)
+    {
+        write(cache_fd, buffer, buffer_pos);
+        buffer_pos = 0;
+        if ( data == NULL )
+            return;
+    }
     if ( p->_char_code == 0xffff )
         return;
     
     ch = p->_char_code + pf->firstchar;
-
-    if ( cache_fd >= 0) {
-        tmp[0] = ch >> 8;
-        tmp[1] = ch & 0xff;
-        if (write(cache_fd, tmp, 2) != 2) {
-            close(cache_fd);
-            cache_fd = -1;
-        }
-    }
+    buffer[buffer_pos] = ch >> 8;
+    buffer[buffer_pos+1] = ch & 0xff;
+    buffer_pos += 2;
     return;
 }
 
 /* save the char codes of the loaded glyphs to a file */
-void glyph_cache_save(struct font* pf)
+void glyph_cache_save(int font_id)
 {
-    if (pf != pf_from_handle(handle_for_glyphcache))
+    int fd;
+
+    if( font_id < 0 )
         return;
-    if (pf->fd >= 0) 
+    int handle = buflib_allocations[font_id];
+    if ( handle < 0 )
+        return;
+
+    struct font *pf = pf_from_handle(handle);
+    if(pf && pf->fd >= 0)
     {
-        cache_fd = open(GLYPH_CACHE_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
-        if (cache_fd < 0)
+        /* FIXME: This sleep should not be necessary but without it   *
+         * unloading multiple fonts and saving glyphcache files       *
+         * quickly in succession creates multiple glyphcache files    *
+         * with the same name.                                        */
+        sleep(HZ/10);
+        char filename[MAX_PATH];
+        font_path_to_glyph_path(font_filename(font_id), filename);
+        fd = open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+        if (fd < 0)
             return;
 
-        lru_traverse(&pf->cache._lru, glyph_file_write);
-
-        if (cache_fd >= 0)
+        cache_pf = pf;
+        cache_fd = fd;
+        lru_traverse(&cache_pf->cache._lru, glyph_file_write);
+        glyph_file_write(NULL);
+        if (cache_fd >= 0) 
         {
             close(cache_fd);
             cache_fd = -1;
@@ -797,14 +850,15 @@ static int ushortcmp(const void *a, const void *b)
 {
     return ((int)(*(unsigned short*)a - *(unsigned short*)b));
 }
-static void glyph_cache_load(struct font* pf)
+static void glyph_cache_load(int font_id)
 {
-    if (handle_for_glyphcache <= 0)
+    int handle = buflib_allocations[font_id];   
+    if (handle < 0)
         return;
+    struct font *pf = pf_from_handle(handle);
 #define MAX_SORT 256
-    if (pf->fd >= 0 && pf == pf_from_handle(handle_for_glyphcache)) {
-        int fd;
-        int i, size;
+    if (pf->fd >= 0) {
+        int i, size, fd;
         unsigned char tmp[2];
         unsigned short ch;
         unsigned short glyphs[MAX_SORT];
@@ -815,9 +869,16 @@ static void glyph_cache_load(struct font* pf)
         if ( sort_size > MAX_SORT )
              sort_size = MAX_SORT;
 
-        fd = open(GLYPH_CACHE_FILE, O_RDONLY|O_BINARY);
+        char filename[MAX_PATH];
+        font_path_to_glyph_path(font_filename(font_id), filename);
+
+        fd = open(filename, O_RDONLY|O_BINARY);
+#ifdef TRY_DEFAULT_GLYPHCACHE
+        /* if font specific file fails, try default */
+        if (fd < 0)
+            fd = open(GLYPH_CACHE_FILE, O_RDONLY|O_BINARY);
+#endif
         if (fd >= 0) {
-            
             /* only read what fits */
             glyph_file_size = filesize( fd );
             if ( glyph_file_size > 2*pf->cache._capacity ) {
@@ -840,12 +901,8 @@ static void glyph_cache_load(struct font* pf)
                       ushortcmp );
 
                 /* load font bitmaps */
-                i = 0;
-                font_get_bits(pf, glyphs[i]);
-                for ( i = 1; i < size ; i++) {
-                     if ( glyphs[i] != glyphs[i-1] )
+                for( i = 0; i < size ; i++ )
                          font_get_bits(pf, glyphs[i]);
-                }
                 
                 /* redo to fix lru order */
                 for ( i = 0; i < size ; i++)
