@@ -120,6 +120,7 @@ int font_load(const char *path);
 int font_load_ex(const char *path, size_t buffer_size);
 int font_glyphs_to_bufsize(const char *path, int glyphs);
 void font_unload(int font_id);
+void font_unload_all(void);
 
 struct font* font_get(int font);
 
