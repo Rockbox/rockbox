@@ -29,6 +29,8 @@ struct font_cache
     struct lru _lru;
     int _size;
     int _capacity;
+    int _prev_char_code;
+    int _prev_result;
     short *_index; /* index of lru handles in char_code order */
 };
 

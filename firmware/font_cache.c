@@ -68,92 +68,55 @@ void font_cache_create(
         fcache->_index[i] = i; /* small cheat here */
 }
 
-/*******************************************************************************
- * font_cache_index_of
- ******************************************************************************/
-static int font_cache_index_of(
-           struct font_cache* fcache,
-           unsigned short char_code)
+/*************************************************************************
+ * Binary search that attempts a primary lucky guess that succeeds
+ * when there are consecutive codes in the cache between previous 
+ * search and new search. Returns a negative of insertion point if 
+ * not found.
+ ************************************************************************/
+int search( struct font_cache* fcache,
+                  unsigned short char_code,
+                  int *p_insertion_point )
 {
-    struct font_cache_entry* p;
-    int left, right, mid, c;
+    struct font_cache_entry *p;
+    int left, right, mid=-1, c;
     left = 0;
     right = fcache->_size - 1;
 
+    /* go for a lucky guess */
+    if ( fcache->_prev_char_code != -1 ) 
+        mid = char_code + 
+            fcache->_prev_result - fcache->_prev_char_code;
+            
+    /* check bounds or unset */        
+    if ( mid < 0 || mid > right )
+            mid = ( left + right ) / 2;
+
     do
     {
-        mid = (left + right) / 2;
-
         p = lru_data(&fcache->_lru, fcache->_index[mid]);
         c = p->_char_code - char_code;
 
         if (c == 0)
-            return mid;
-
+        {
+            fcache->_prev_result = mid;
+            fcache->_prev_char_code = char_code;
+            *p_insertion_point = mid;
+            return 1;
+        }
         if (c < 0)
             left = mid + 1;
         else
             right = mid - 1;
-    }
-    while (left <= right);
 
-    return -1;
-}
-
-/*******************************************************************************
- * font_cache_insertion_point
- ******************************************************************************/
-static int font_cache_insertion_point(
-       struct font_cache* fcache,
-       unsigned short char_code)
-{
-    struct font_cache_entry* p;
-    short *index = fcache->_index;
-
-    p = lru_data(&fcache->_lru, index[0]);
-    if (char_code < p->_char_code)
-        return -1;
-
-    p = lru_data(&fcache->_lru, index[fcache->_capacity - 1]);
-    if (char_code > p->_char_code)
-        return fcache->_capacity - 1;
-
-    int left, right, mid, c;
-
-    left = 0;
-    right = fcache->_capacity - 1;
-
-    do
-    {
         mid = (left + right) / 2;
-
-        p = lru_data(&fcache->_lru, index[mid]);
-        c = char_code - p->_char_code;
-
-        if (c >= 0)
-        {
-            p = lru_data(&fcache->_lru, index[mid+1]);
-            int z = char_code - p->_char_code;
-
-            if (z < 0)
-                return mid;
-
-            if (z == 0)
-                return mid + 1;
-        }
-
-        
-        if (c > 0)
-            left = mid + 1;
-        else
-            right = mid - 1;
     }
     while (left <= right);
-
+    
     /* not found */
-    return -2;
+    *p_insertion_point = mid;
+    return 0;
 }
-
 /*******************************************************************************
  * font_cache_get
  ******************************************************************************/
@@ -163,24 +126,33 @@ struct font_cache_entry* font_cache_get(
     void (*callback) (struct font_cache_entry* p, void *callback_data),
     void *callback_data)
 {
-    int insertion_point = font_cache_insertion_point(fcache, char_code);
-    if (insertion_point >= 0)
+    struct font_cache_entry* p;
+    int insertion_point;
+    int index_to_replace;
+    
+    if( search(fcache, char_code, &insertion_point))
     {
         short lru_handle = fcache->_index[insertion_point];
-        struct font_cache_entry* p = lru_data(&fcache->_lru, lru_handle);
+        p = lru_data(&fcache->_lru, lru_handle);
         if (p->_char_code == char_code)
         {
             lru_touch(&fcache->_lru, lru_handle);
             return lru_data(&fcache->_lru, lru_handle);
         }
     }
+    else  /* not found */
+    {
+        p = lru_data(&fcache->_lru, 
+                     fcache->_index[insertion_point+1]);
+        if ( char_code > p->_char_code )
+            insertion_point++;
+    }
 
-    /* not found */
+    /* find index to replace */
     short lru_handle_to_replace = fcache->_lru._head;
-    struct font_cache_entry* p =
-        lru_data(&fcache->_lru, lru_handle_to_replace);
-    int index_to_replace = font_cache_index_of(fcache, p->_char_code);
-
+    p = lru_data(&fcache->_lru, lru_handle_to_replace);
+    search(fcache, p->_char_code, &index_to_replace);
+        
     if (insertion_point < index_to_replace)
     {
         /* shift memory up */
@@ -209,7 +181,7 @@ struct font_cache_entry* font_cache_get(
         fcache->_size++;
 
     p->_char_code = char_code;
+    /* fill bitmap */
     callback(p, callback_data);
-
     return p;
 }
