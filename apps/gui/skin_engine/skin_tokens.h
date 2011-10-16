@@ -26,18 +26,17 @@
 #include "tag_table.h"
 
 struct wps_token {
-    enum skin_token_type type; /* enough to store the token type */
-    
-    /* Whether the tag (e.g. track name or the album) refers the
-       current or the next song (false=current, true=next) */
-    bool next;
-
     union {
         char c;
         unsigned short i;
         long l;
         void* data;
     } value;
+
+    enum skin_token_type type; /* enough to store the token type */
+    /* Whether the tag (e.g. track name or the album) refers the
+       current or the next song (false=current, true=next) */
+    bool next;
 };
 
 struct skin_token_list {

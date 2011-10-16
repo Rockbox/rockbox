@@ -86,15 +86,15 @@ struct skin_tag_parameter
             
 };
 
-/* Defines an element of a SKIN file */
+/* Defines an element of a SKIN file,
+ *
+ * This is allocated a lot, so it's optimized for size */
 struct skin_element
 {
-    /* Defines what type of element it is */
-    enum skin_element_type type;
-
-    /* The line on which it's defined in the source file */
-    int line;
-
+    /* Link to the next element */
+    struct skin_element* next;
+    /* Pointer to an array of children */
+    struct skin_element** children;
     /* Placeholder for element data
      * TEXT and COMMENT uses it for the text string
      * TAG, VIEWPORT, LINE, etc may use it for post parse extra storage
@@ -104,16 +104,17 @@ struct skin_element
     /* The tag or conditional name */
     const struct tag_info *tag;
 
-    /* Pointer to and size of an array of parameters */
-    int params_count;
+    /* Pointer to an array of parameters */
     struct skin_tag_parameter* params;
 
-    /* Pointer to and size of an array of children */
-    int children_count;
-    struct skin_element** children;
-
-    /* Link to the next element */
-    struct skin_element* next;
+    /* Number of elements in the children array */
+    short children_count;
+    /* The line on which it's defined in the source file */
+    short line;
+    /* Defines what type of element it is */
+    enum skin_element_type type;
+    /* Number of elements in the params array */
+    char params_count;
 };
 
 enum skin_cb_returnvalue

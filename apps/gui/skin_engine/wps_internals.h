@@ -135,7 +135,7 @@ struct align_pos {
 #define WPS_MAX_VIEWPORTS   24
 #define WPS_MAX_LINES       ((LCD_HEIGHT/5+1) * 2)
 #define WPS_MAX_SUBLINES    (WPS_MAX_LINES*3)
-#define WPS_MAX_TOKENS      1024
+#define WPS_MAX_TOKENS      1150
 #define WPS_MAX_STRINGS     128
 #define STRING_BUFFER_SIZE  1024
 #define WPS_MAX_COND_LEVEL  10
