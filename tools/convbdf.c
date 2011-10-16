@@ -1405,7 +1405,7 @@ int gen_c_source(struct font* pf, char *path)
             "  0,  /* ^ position */\n"
             "  0,  /* ^ end */\n"
             "  0,  /* ^ size  */\n"
-            "  {{0,0,0,0,0},0,0,0},   /* cache  */\n"
+            "  {{0,0,0,0,0},0,0,0,0,0},   /* cache  */\n"
             "  0,  /*   */\n"
             "  0,  /*   */\n"
             "  0,  /*   */\n"
