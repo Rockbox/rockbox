@@ -499,4 +499,15 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 #define WMC_RMIX2OUT4                    (1 << 1)
 #define WMC_RDAC2OUT4                    (1 << 0)
 
+/* For implementing samplerate conrol */
+struct wmc_srctrl_entry
+{
+    uint32_t plln  : 8;
+    uint32_t pllk1 : 6;
+    uint32_t pllk2 : 9;
+    uint32_t pllk3 : 9;
+    unsigned char mclkdiv;
+    unsigned char filter;
+};
+
 #endif /* _WM8978_H */

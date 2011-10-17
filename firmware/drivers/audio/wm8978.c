@@ -505,88 +505,7 @@ void audiohw_close(void)
 
 void audiohw_set_frequency(int fsel)
 {
-    /* For 16.9344MHz MCLK, codec as master. */
-    static const struct
-    {
-        uint32_t plln  : 8;
-        uint32_t pllk1 : 6;
-        uint32_t pllk2 : 9;
-        uint32_t pllk3 : 9;
-        unsigned char mclkdiv;
-        unsigned char filter;
-    } srctrl_table[HW_NUM_FREQ] =
-    {
-        [HW_FREQ_8] = /* PLL = 65.536MHz */
-        {
-            .plln    = 7 | WMC_PLL_PRESCALE,
-            .pllk1   = 0x2f,            /* 12414886 */
-            .pllk2   = 0x0b7,
-            .pllk3   = 0x1a6,
-            .mclkdiv = WMC_MCLKDIV_8,   /*  2.0480 MHz */
-            .filter  = WMC_SR_8KHZ,
-        },
-        [HW_FREQ_11] = /* PLL = off */
-        {
-            .mclkdiv = WMC_MCLKDIV_6,   /*  2.8224 MHz */
-            .filter  = WMC_SR_12KHZ,
-        },
-        [HW_FREQ_12] = /* PLL = 73.728 MHz */
-        {
-            .plln    = 8 | WMC_PLL_PRESCALE,
-            .pllk1   = 0x2d,            /* 11869595 */
-            .pllk2   = 0x08e,
-            .pllk3   = 0x19b,
-            .mclkdiv = WMC_MCLKDIV_6,   /*  3.0720 MHz */
-            .filter  = WMC_SR_12KHZ,
-        },
-        [HW_FREQ_16] = /* PLL = 65.536MHz */
-        {
-            .plln    = 7 | WMC_PLL_PRESCALE,
-            .pllk1   = 0x2f,            /* 12414886 */
-            .pllk2   = 0x0b7,
-            .pllk3   = 0x1a6,
-            .mclkdiv = WMC_MCLKDIV_4,   /*  4.0960 MHz */
-            .filter  = WMC_SR_16KHZ,
-        },
-        [HW_FREQ_22] = /* PLL = off */
-        {
-            .mclkdiv = WMC_MCLKDIV_3,   /*  5.6448 MHz */
-            .filter  = WMC_SR_24KHZ,
-        },
-        [HW_FREQ_24] = /* PLL = 73.728 MHz */
-        {
-            .plln    = 8 | WMC_PLL_PRESCALE,
-            .pllk1   = 0x2d,            /* 11869595 */
-            .pllk2   = 0x08e,
-            .pllk3   = 0x19b,
-            .mclkdiv = WMC_MCLKDIV_3,   /*  6.1440 MHz */
-            .filter  = WMC_SR_24KHZ,
-        },
-        [HW_FREQ_32] = /* PLL = 65.536MHz */
-        {
-            .plln    = 7 | WMC_PLL_PRESCALE,
-            .pllk1   = 0x2f,            /* 12414886 */
-            .pllk2   = 0x0b7,
-            .pllk3   = 0x1a6,
-            .mclkdiv = WMC_MCLKDIV_2,   /*  8.1920 MHz */
-            .filter  = WMC_SR_32KHZ,
-        },
-        [HW_FREQ_44] = /* PLL = off */
-        {
-            .mclkdiv = WMC_MCLKDIV_1_5, /* 11.2896 MHz */
-            .filter  = WMC_SR_48KHZ,
-        },
-        [HW_FREQ_48] = /* PLL = 73.728 MHz */
-        {
-            .plln    = 8 | WMC_PLL_PRESCALE,
-            .pllk1   = 0x2d,            /* 11869595 */
-            .pllk2   = 0x08e,
-            .pllk3   = 0x19b,
-            .mclkdiv = WMC_MCLKDIV_1_5, /* 12.2880 MHz */
-            .filter  = WMC_SR_48KHZ,
-        },
-    };
-
+    extern const struct wmc_srctrl_entry wmc_srctrl_table[HW_NUM_FREQ];
     unsigned int plln;
     unsigned int mclkdiv;
 
@@ -594,10 +513,10 @@ void audiohw_set_frequency(int fsel)
         fsel = HW_FREQ_DEFAULT;
 
     /* Setup filters. */
-    wmc_write(WMC_ADDITIONAL_CTRL, srctrl_table[fsel].filter);
+    wmc_write(WMC_ADDITIONAL_CTRL, wmc_srctrl_table[fsel].filter);
 
-    plln = srctrl_table[fsel].plln;
-    mclkdiv = srctrl_table[fsel].mclkdiv;
+    plln = wmc_srctrl_table[fsel].plln;
+    mclkdiv = wmc_srctrl_table[fsel].mclkdiv;
 
     if (plln != 0)
     {
@@ -605,9 +524,9 @@ void audiohw_set_frequency(int fsel)
 
         /* Program PLL. */
         wmc_write(WMC_PLL_N, plln);
-        wmc_write(WMC_PLL_K1, srctrl_table[fsel].pllk1);
-        wmc_write(WMC_PLL_K2, srctrl_table[fsel].pllk2);
-        wmc_write(WMC_PLL_K3, srctrl_table[fsel].pllk3);
+        wmc_write(WMC_PLL_K1, wmc_srctrl_table[fsel].pllk1);
+        wmc_write(WMC_PLL_K2, wmc_srctrl_table[fsel].pllk2);
+        wmc_write(WMC_PLL_K3, wmc_srctrl_table[fsel].pllk3);
 
         /* Turn on PLL. */
         wmc_set(WMC_POWER_MANAGEMENT1, WMC_PLLEN);
