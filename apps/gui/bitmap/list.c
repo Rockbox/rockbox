@@ -102,13 +102,15 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
     if (!list_display_title(list, screen))
         return false;
     *title_text_vp = *(list->parent[screen]);
-    title_text_vp->height = font_get(title_text_vp->font)->height;
+    title_text_vp->height = title_text_vp->line_height;
 
     if (list->title_icon != Icon_NOICON && global_settings.show_icons)
     {
         struct viewport title_icon = *title_text_vp;
 
         title_icon.width = get_icon_width(screen) + ICON_PADDING * 2;
+        title_icon.y += (title_icon.height - get_icon_height(screen)) / 2;
+        title_icon.height = get_icon_height(screen);
         if (VP_IS_RTL(&title_icon))
         {
             title_icon.x += title_text_vp->width - title_icon.width;
@@ -120,7 +122,7 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
         title_text_vp->width -= title_icon.width;
 
         display->set_viewport(&title_icon);
-        screen_put_icon(display, 0, 0, list->title_icon);
+        screen_put_iconxy(display, 0, 0, list->title_icon);
     }
 #ifdef HAVE_LCD_COLOR
     if (list->title_color >= 0)
@@ -136,7 +138,7 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
 void list_draw(struct screen *display, struct gui_synclist *list)
 {
     struct viewport list_icons;
-    int start, end, line_height, style, i;
+    int start, end, line_height, style, item_offset, i;
     const int screen = display->screen_type;
     const int list_start_item = list->start_item[screen];
     const int icon_width = get_icon_width(screen) + ICON_PADDING;
@@ -147,19 +149,21 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 #ifdef HAVE_LCD_COLOR
     unsigned char cur_line = 0;
 #endif
-    int item_offset;
+    int icon_yoffset = 0; /* to center the icon */
     bool show_title;
     struct viewport *list_text_vp = &list_text[screen];
 
-    line_height = font_get(parent->font)->height;
+    line_height = parent->line_height;
     display->set_viewport(parent);
     display->clear_viewport();
     display->scroll_stop(list_text_vp);
     *list_text_vp = *parent;
+    list_text_vp->line_height = line_height;
     if ((show_title = draw_title(display, list)))
     {
-        list_text_vp->y += line_height;
-        list_text_vp->height -= line_height;
+        int title_height = title_text[screen].height;
+        list_text_vp->y += title_height;
+        list_text_vp->height -= title_height;
     }
 
     const int nb_lines = viewport_get_nb_lines(list_text_vp);
@@ -232,6 +236,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             list_icons.x += list_text_vp->width + ICON_PADDING;
         else
             list_text_vp->x += list_icons.width + ICON_PADDING;
+        icon_yoffset = (line_height - get_icon_height(screen)) / 2;
     }
 
     for (i=start; i<end && i<list->nb_items; i++)
@@ -333,14 +338,18 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         display->set_viewport(&list_icons);
         if (list->callback_get_item_icon != NULL)
         {
-            screen_put_icon_with_offset(display, show_cursor?1:0,
-                                    (line),show_cursor?ICON_PADDING:0,draw_offset,
-                                    list->callback_get_item_icon(i, list->data));
+            int xoff = show_cursor ? get_icon_width(screen) + ICON_PADDING : 0;
+            screen_put_iconxy(display, xoff,
+                            line*line_height + draw_offset + icon_yoffset,
+                            list->callback_get_item_icon(i, list->data));
         }
+        /* do the cursor */
         if (show_cursor && i >= list->selected_item &&
                 i <  list->selected_item + list->selected_size)
         {
-            screen_put_icon_with_offset(display, 0, line, 0, draw_offset, Icon_Cursor);
+            screen_put_iconxy(display, 0,
+                            line*line_height + draw_offset + icon_yoffset,
+                            Icon_Cursor);
         }
     }
     display->set_viewport(parent);
@@ -369,8 +378,7 @@ static int scrollbar_scroll(struct gui_synclist * gui_list,
     {
         /* scrollbar scrolling is still line based */
         y_offset = 0;
-        int scrollbar_size = nb_lines*
-            font_get(gui_list->parent[screen]->font)->height;
+        int scrollbar_size = nb_lines*gui_list->parent[screen]->line_height;
         int actual_y = y - list_text[screen].y;
 
         int new_selection = (actual_y * gui_list->nb_items)
@@ -558,7 +566,7 @@ static int kinetic_callback(struct timeout *tmo)
         return 0;
 
     struct cb_data *data = (struct cb_data*)tmo->data;
-    int line_height = font_get(data->list->parent[0]->font)->height;
+    int line_height = data->list->parent[0]->line_height;
     /* ds = v*dt */
     int pixel_diff = data->velocity * RELOAD_INTERVAL / HZ;
     /* remember signedness to detect stopping */
@@ -627,7 +635,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list)
     struct viewport *parent = gui_list->parent[screen];
     const int button = action_get_touchscreen_press_in_vp(&x, &y, parent);
     const int list_start_item = gui_list->start_item[screen];
-    const int line_height = font_get(gui_list->parent[screen]->font)->height;
+    const int line_height = gui_list->parent[screen]->line_height;
     const struct viewport *list_text_vp = &list_text[screen];
     const bool old_released = released;
     const bool show_title = list_display_title(gui_list, screen);

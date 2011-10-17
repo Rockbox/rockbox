@@ -500,14 +500,25 @@ static int touch_mode_callback(int action,const struct menu_item_ex *this_item)
     }
     return action;
 }
+
+static int line_padding_callback(int action,const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+
+    if (action == ACTION_EXIT_MENUITEM)
+        viewportmanager_theme_changed(THEME_LISTS);
+    return action;
+}
+
 MENUITEM_SETTING(touch_mode, &global_settings.touch_mode, touch_mode_callback);
 
 MENUITEM_FUNCTION(touchscreen_menu_calibrate, 0, ID2P(LANG_TOUCHSCREEN_CALIBRATE), calibrate,
                     NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(touchscreen_menu_reset_calibration, 0, ID2P(LANG_TOUCHSCREEN_RESET_CALIBRATION), reset_mapping,
                     NULL, NULL, Icon_NOICON);
+MENUITEM_SETTING(list_line_padding, &global_settings.list_line_padding, line_padding_callback);
 
-MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, &touch_mode,
+MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, &list_line_padding, &touch_mode,
             &touchscreen_menu_calibrate, &touchscreen_menu_reset_calibration);
 #endif
 

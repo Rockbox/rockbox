@@ -562,6 +562,10 @@ struct user_settings
     int scrollbar_width;
 #endif
 
+#ifdef HAVE_TOUCHSCREEN
+    int list_line_padding;
+#endif
+
     /* goto current song when exiting WPS */
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */

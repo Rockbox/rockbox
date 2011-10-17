@@ -277,3 +277,8 @@ int get_icon_width(enum screen_type screen_type)
 {
     return ICON_WIDTH(screen_type);
 }
+
+int get_icon_height(enum screen_type screen_type)
+{
+    return ICON_HEIGHT(screen_type);
+}

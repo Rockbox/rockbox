@@ -286,6 +286,29 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 #endif /* HAVE_RECORDING */
 
+static const char* list_pad_formatter(char *buffer, size_t buffer_size,
+                                    int val, const char *unit)
+{
+    switch (val)
+    {
+        case -1: return str(LANG_AUTOMATIC);
+        case  0: return str(LANG_OFF);
+        default: break;
+    }
+    snprintf(buffer, buffer_size, "%d %s", val, unit);
+    return buffer;
+}
+
+static int32_t list_pad_getlang(int value, int unit)
+{
+    switch (value)
+    {
+        case -1: return LANG_AUTOMATIC;
+        case  0: return LANG_OFF;
+        default: return TALK_ID(value, unit);
+    }
+}
+
 static const char* formatter_unit_0_is_off(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
 {
@@ -740,6 +763,12 @@ const struct settings_list settings[] = {
     INT_SETTING(F_THEMESETTING, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6,
                 "scrollbar width",UNIT_INT, 3, MAX(LCD_WIDTH/10,25), 1,
                 NULL, NULL, NULL),
+#ifdef HAVE_TOUCHSCREEN
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, list_line_padding, LANG_LIST_LINE_PADDING,
+                  -1, "list padding", "off,auto", UNIT_PIXEL, list_pad_formatter,
+                  list_pad_getlang, NULL, 16,
+                  -1,0,2,4,6,8,10,12,16,20,24,28,32,38,44,50),
+#endif
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(F_THEMESETTING,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),
 #endif

@@ -12830,3 +12830,34 @@
     multidrive_usb: "USB Hide Internal Drive"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatic"
+  </dest>
+  <voice>
+    *: "Automatic"
+  </voice>
+</phrase>

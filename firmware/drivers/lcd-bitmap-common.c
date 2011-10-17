@@ -254,11 +254,12 @@ void LCDFN(putsxyf)(int x, int y, const unsigned char *fmt, ...)
 
 static void LCDFN(putsxyofs_style)(int xpos, int ypos,
                                    const unsigned char *str, int style,
-                                   int w, int h, int offset)
+                                   int h, int offset)
 {
     int lastmode = current_vp->drawmode;
-    int xrect = xpos + MAX(w - offset, 0);
-    int x = VP_IS_RTL(current_vp) ? xpos : xrect;
+    int text_ypos = ypos;
+    int line_height = font_get(current_vp->font)->height;
+    text_ypos += h/2 - line_height/2; /* center the text in the line */
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
     int oldfgcolor = current_vp->fg_pattern;
     int oldbgcolor = current_vp->bg_pattern;
@@ -284,21 +285,21 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
         current_vp->fg_pattern = current_vp->lst_pattern;
     }
     else {
-        lcd_fillrect(x, ypos, current_vp->width - xrect, h);
+        lcd_fillrect(xpos, ypos, current_vp->width - xpos, h);
         current_vp->drawmode = (style & STYLE_INVERT) ?
         (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     }
     if (str[0])
-        lcd_putsxyofs(xpos, ypos, offset, str);
+        lcd_putsxyofs(xpos, text_ypos, offset, str);
     current_vp->fg_pattern = oldfgcolor;
     current_vp->bg_pattern = oldbgcolor;
 #else
     current_vp->drawmode = DRMODE_SOLID | ((style & STYLE_INVERT) ?
                                            0 : DRMODE_INVERSEVID);
-    LCDFN(fillrect)(x, ypos, current_vp->width - xrect, h);
+    LCDFN(fillrect)(xpos, ypos, current_vp->width - xpos, h);
     current_vp->drawmode ^= DRMODE_INVERSEVID;
     if (str[0])
-        LCDFN(putsxyofs)(xpos, ypos, offset, str);
+        LCDFN(putsxyofs)(xpos, text_ypos, offset, str);
 #endif
     current_vp->drawmode = lastmode;
 }
@@ -309,15 +310,15 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
 void LCDFN(puts_style_xyoffset)(int x, int y, const unsigned char *str,
                               int style, int x_offset, int y_offset)
 {
-    int xpos, ypos, w, h;
+    int xpos, ypos, h;
     LCDFN(scroll_stop_line)(current_vp, y);
     if(!str)
         return;
 
-    LCDFN(getstringsize)(str, &w, &h);
+    h = current_vp->line_height ?: (int)font_get(current_vp->font)->height;
     xpos = x * LCDFN(getstringsize)(" ", NULL, NULL);
     ypos = y * h + y_offset;
-    LCDFN(putsxyofs_style)(xpos, ypos, str, style, w, h, x_offset);
+    LCDFN(putsxyofs_style)(xpos, ypos, str, style, h, x_offset);
 }
 
 void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
@@ -436,10 +437,9 @@ void LCDFN(puts_scroll_offset)(int x, int y, const unsigned char *string,
 
 void LCDFN(scroll_fn)(void)
 {
-    struct font* pf;
     struct scrollinfo* s;
     int index;
-    int xpos, ypos;
+    int xpos, ypos, height;
     struct viewport* old_vp = current_vp;
     bool makedelay;
 
@@ -451,15 +451,15 @@ void LCDFN(scroll_fn)(void)
             continue;
 
         LCDFN(set_viewport)(s->vp);
+        height = s->vp->line_height;
 
         if (s->backward)
             s->offset -= LCDFN(scroll_info).step;
         else
             s->offset += LCDFN(scroll_info).step;
 
-        pf = font_get(current_vp->font);
         xpos = s->startx;
-        ypos = s->y * pf->height + s->y_offset;
+        ypos = s->y * height + s->y_offset;
 
         makedelay = false;
         if (s->bidir) { /* scroll bidirectional */
@@ -488,10 +488,8 @@ void LCDFN(scroll_fn)(void)
             s->start_tick = current_tick + LCDFN(scroll_info).delay +
                     LCDFN(scroll_info).ticks;
 
-        LCDFN(putsxyofs_style)(xpos, ypos, s->line, s->style, s->width,
-                               pf->height, s->offset);
-        LCDFN(update_viewport_rect)(xpos, ypos, current_vp->width - xpos,
-                               pf->height);
+        LCDFN(putsxyofs_style)(xpos, ypos, s->line, s->style, height, s->offset);
+        LCDFN(update_viewport_rect)(xpos, ypos, current_vp->width-xpos, height);
     }
     LCDFN(set_viewport)(old_vp);
 }

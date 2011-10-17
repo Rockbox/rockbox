@@ -109,8 +109,11 @@ void icons_init(void);
 #ifdef HAVE_LCD_CHARCELLS
 # define CURSOR_CHAR 0xe10c
 # define get_icon_width(a) 6
+# define get_icon_height(a) 1 /* needs to be verified */
 #else
 int get_icon_width(enum screen_type screen_type);
+int get_icon_height(enum screen_type screen_type);
 #endif
+
 
 #endif /*_GUI_ICON_H_*/

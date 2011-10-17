@@ -35,6 +35,7 @@ int viewport_get_nb_lines(const struct viewport *vp);
 #define THEME_UI_VIEWPORT           (BIT_N(1))
 #define THEME_BUTTONBAR             (BIT_N(2))
 #define THEME_LANGUAGE              (BIT_N(3))
+#define THEME_LISTS                 (BIT_N(3))
 #define THEME_ALL                   (~(0u))
 
 #ifndef __PCTOOL__
