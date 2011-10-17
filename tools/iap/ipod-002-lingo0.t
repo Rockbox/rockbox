@@ -157,9 +157,6 @@ subtest "ReturnLingoProtocolVersion" => sub {
 # Empty the buffer
 $ipod->emptyrecv();
 
-# Empty the buffer
-$ipod->emptyrecv();
-
 # IdentifyDeviceLingoes(lingos=0x11, options=0x00, deviceid=0x00)
 # We expect an ACK OK message as response
 $m = $ipod->sendmsg(0x00, 0x13, "\x00\x00\x00\x11\x00\x00\x00\x00\x00\x00\x00\x00");

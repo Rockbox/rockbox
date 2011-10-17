@@ -175,10 +175,8 @@ static int iap_repeatbtn = 0;
 static unsigned int iap_timeoutbtn = 0;
 static bool iap_btnrepeat = false, iap_btnshuffle = false;
 
-static long thread_stack[(DEFAULT_STACK_SIZE*2)/sizeof(long)];
+static long thread_stack[(DEFAULT_STACK_SIZE*4)/sizeof(long)];
 static struct event_queue iap_queue;
-
-static volatile bool serbuf_lock = false;
 
 /* These are pointer used to manage a dynamically allocated buffer which
  * will hold both the RX and TX side of things.
@@ -194,16 +192,40 @@ static volatile bool serbuf_lock = false;
  *   iap_txpayload points to the beginning of the payload portion of the TX buffer
  *   iap_txnext points to the position where the next byte will be placed
  *
- * - RX_BUFLEN bytes for the RX buffer
+ * - RX_BUFLEN+2 bytes for the RX buffer
+ *   The RX buffer can hold multiple packets at once, up to it's
+ *   maximum capacity. Every packet consists of a two byte length
+ *   indicator followed by the actual payload. The length indicator
+ *   is two bytes for every length, even for packets with a length <256
+ *   bytes.
+ *
+ *   Once a packet has been processed from the RX buffer the rest
+ *   of the buffer (and the pointers below) are shifted to the front
+ *   so that the next packet again starts at the beginning of the
+ *   buffer. This happens with interrupts disabled, to prevent
+ *   writing into the buffer during the move.
+ *
  *   iap_rxstart points to the beginning of the RX buffer
+ *   iap_rxpayload starts to the beginning of the currently recieved
+ *   packet
+ *   iap_rxnext points to the position where the next incoming byte
+ *   will be placed
+ *   iap_rxlen is not a pointer, but an indicator of the free
+ *   space left in the RX buffer.
  *
  * The RX buffer is placed behind the TX buffer so that an eventual TX
  * buffer overflow has some place to spill into where it will not cause
  * immediate damage. See the comments for IAP_TX_* and iap_send_tx()
  */
+#define IAP_MALLOC_SIZE (TX_BUFLEN+6+RX_BUFLEN+2)
+#ifdef IAP_MALLOC_DYNAMIC
 static int iap_buffer_handle;
+#endif
 static unsigned char* iap_buffers;
 static unsigned char* iap_rxstart;
+static unsigned char* iap_rxpayload;
+static unsigned char* iap_rxnext;
+static uint32_t iap_rxlen;
 static unsigned char* iap_txstart;
 static unsigned char* iap_txpayload;
 static unsigned char* iap_txnext;
@@ -257,6 +279,15 @@ static unsigned char* iap_txnext;
  * NULL byte
  */
 #define IAP_TX_PUT_STRING(str) IAP_TX_PUT_DATA((str), strlen((str))+1)
+
+/* Put a NULL terminated string into the TX buffer, taking care not to
+ * overflow the buffer. If the string does not fit into the TX buffer
+ * it will be truncated, but always NULL terminated.
+ *
+ * This function is expensive compared to the other IAP_TX_PUT_*
+ * functions
+ */
+#define IAP_TX_PUT_STRLCPY(str) iap_tx_strlcpy(str)
 
 /* The Model ID of the iPod we emulate. Currently a 160GB classic */
 #define IAP_IPOD_MODEL (0x00130200U)
@@ -383,15 +414,17 @@ static struct device_t {
     uint32_t capabilities_queried;  /* Capabilities already queried */
 } device;
 #define DEVICE_AUTHENTICATED (device.auth.state == AUST_AUTH)
-#define DEVICE_AUTH_RUNNING (device.auth.state != AUST_NONE)
+#define DEVICE_AUTH_RUNNING ((device.auth.state != AUST_NONE) && (device.auth.state != AUST_AUTH))
 #define DEVICE_LINGO_SUPPORTED(x) (device.lingoes & BIT_N((x)&0x1f))
 
+#ifdef IAP_MALLOC_DYNAMIC
 static int iap_move_callback(int handle, void* current, void* new);
 
 static struct buflib_callbacks iap_buflib_callbacks = {
     iap_move_callback,
     NULL
 };
+#endif
 
 static void iap_malloc(void);
 static void iap_shuffle_state(bool state);
@@ -421,6 +454,26 @@ static uint32_t get_u32(const unsigned char *buf)
 static uint16_t get_u16(const unsigned char *buf)
 {
     return (buf[0] << 8) | buf[1];
+}
+
+static void iap_tx_strlcpy(const unsigned char *str)
+{
+    ptrdiff_t txfree;
+    size_t r;
+
+    txfree = TX_BUFLEN - (iap_txnext - iap_txstart);
+    r = strlcpy(iap_txnext, str, txfree);
+
+    if (r < txfree)
+    {
+        /* No truncation occured
+         * Account for the terminating \0
+         */
+        iap_txnext += (r+1);
+    } else {
+        /* Truncation occured, the TX buffer is now full. */
+        iap_txnext = iap_txstart + TX_BUFLEN;
+    }
 }
 
 static void reset_auth(struct auth_t* auth)
@@ -548,17 +601,28 @@ static void iap_start(void)
 
 static void iap_malloc(void)
 {
+#ifndef IAP_MALLOC_DYNAMIC
+    static unsigned char serbuf[IAP_MALLOC_SIZE];
+#endif
+
     if (iap_running)
         return;
 
-    iap_buffer_handle = core_alloc_ex("iap", RX_BUFLEN+TX_BUFLEN+6, &iap_buflib_callbacks);
+#ifdef IAP_MALLOC_DYNAMIC
+    iap_buffer_handle = core_alloc_ex("iap", IAP_MALLOC_SIZE, &iap_buflib_callbacks);
     if (iap_buffer_handle < 0)
         panicf("Could not allocate buffer memory");
     iap_buffers = core_get_data(iap_buffer_handle);
+#else
+    iap_buffers = serbuf;
+#endif
     iap_txstart = iap_buffers;
     iap_txpayload = iap_txstart+5;
     iap_txnext = iap_txpayload;
     iap_rxstart = iap_buffers+(TX_BUFLEN+6);
+    iap_rxpayload = iap_rxstart;
+    iap_rxnext = iap_rxpayload;
+    iap_rxlen = RX_BUFLEN+2;
     iap_running = true;
 }
 
@@ -668,7 +732,6 @@ bool iap_getc(const unsigned char x)
     if ((s->state != ST_SYNC) && TIME_AFTER(current_tick, pkt_timeout)) {
         /* Packet timeouts only make sense while not waiting for the
          * sync byte */
-         serbuf_lock = false;
          s->state = ST_SYNC;
          return iap_getc(x);
     }
@@ -687,6 +750,7 @@ bool iap_getc(const unsigned char x)
                 iap_start();
                 break;
             }
+            iap_rxnext = iap_rxpayload;
             s->state = ST_SOF;
         }
         break;
@@ -700,13 +764,6 @@ bool iap_getc(const unsigned char x)
         }
         break;
     case ST_LEN:
-        /* try to get a lock on serbuf */
-        if (serbuf_lock) {
-            s->state = ST_SYNC;
-            break;
-        }
-        serbuf_lock = true;
-    
         s->check = x;
         s->count = 0;
         if (x == 0) {
@@ -714,8 +771,16 @@ bool iap_getc(const unsigned char x)
             s->state = ST_LENH;
         } else {
             /* small packet */
+            if (x > (iap_rxlen-2))
+            {
+                /* Packet too long for buffer */
+                s->state = ST_SYNC;
+                break;
+            }
             s->len = x;
             s->state = ST_DATA;
+            put_u16(iap_rxnext, s->len);
+            iap_rxnext += 2;
         }
         break;
     case ST_LENH:
@@ -726,18 +791,20 @@ bool iap_getc(const unsigned char x)
     case ST_LENL:
         s->check += x;
         s->len += x;
-        if ((s->len == 0) || (s->len > RX_BUFLEN)) {
+        if ((s->len == 0) || (s->len > (iap_rxlen-2))) {
             /* invalid length */
-            serbuf_lock = false;
             s->state = ST_SYNC;
-            return iap_getc(x);
+            break;
         } else {
             s->state = ST_DATA;
+            put_u16(iap_rxnext, s->len);
+            iap_rxnext += 2;
         }
         break;
     case ST_DATA:
         s->check += x;
-        iap_rxstart[s->count++] = x;
+        *(iap_rxnext++) = x;
+        s->count += 1;
         if (s->count == s->len) {
             s->state = ST_CHECK;
         }
@@ -746,10 +813,10 @@ bool iap_getc(const unsigned char x)
         s->check += x;
         if ((s->check & 0xFF) == 0) {
             /* done, received a valid frame */
+            iap_rxpayload = iap_rxnext;
             queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
         } else {
-            /* Invalid frame, release lock */
-            serbuf_lock = false;
+            /* Invalid frame */
         }
         s->state = ST_SYNC;
         break;
@@ -762,6 +829,32 @@ bool iap_getc(const unsigned char x)
     
     /* return true while still hunting for the sync and start-of-frame byte */
     return (s->state == ST_SYNC) || (s->state == ST_SOF);
+}
+
+void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
+{
+    int tracknum;
+    int fd;
+    struct playlist_track_info info;
+
+    tracknum = track;
+
+    tracknum += playlist_get_first_index(NULL);
+    if(tracknum >= playlist_amount())
+        tracknum -= playlist_amount();
+
+    /* If the tracknumber is not the current one,
+       read id3 from disk */
+    if(playlist_next(0) != tracknum)
+    {
+        playlist_get_track_info(NULL, tracknum, &info);
+        fd = open(info.filename, O_RDONLY);
+        memset(id3, 0, sizeof(*id3));
+        get_metadata(id3, fd, info.filename);
+        close(fd);
+    } else {
+        memcpy(id3, audio_current_track(), sizeof(*id3));
+    }
 }
 
 static uint32_t iap_get_trackpos(void)
@@ -828,6 +921,8 @@ void iap_periodic(void)
     {
         iap_remotebtn = BUTTON_NONE;
         iap_repeatbtn = 0;
+        iap_btnshuffle = false;
+        iap_btnrepeat = false;
     }
 
     /* Handle power down messages. */
@@ -855,7 +950,11 @@ void iap_periodic(void)
         device.accinfo = ACCST_SENT;
     }
 
-    if (device.accinfo == ACCST_DATA)
+    /* Do not send requests for device information while
+     * an authentication is still running, this seems to
+     * confuse some devices
+     */
+    if (!DEVICE_AUTH_RUNNING && (device.accinfo == ACCST_DATA))
     {
         int first_set;
 
@@ -1340,13 +1439,16 @@ static void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf
             }
 
             if (lingo < 32) {
-                device.lingoes = BIT_N(lingo);
-                if (lingo == 0) {
-                    /* For historical reasons, Identify with a Lingo of 0x00 also
-                     * enables access to Lingo 0x02
-                     */
-                    device.lingoes = 0 | BIT_N(0x02);
-                }
+                /* All devices that Identify get access to Lingoes 0x00 and 0x02 */
+                device.lingoes = BIT_N(0x00) | BIT_N(0x02);
+
+                device.lingoes |= BIT_N(lingo);
+
+                /* Devices that Identify with Lingo 0x04 also gain access
+                 * to Lingo 0x03
+                 */
+                if (lingo == 0x04)
+                    device.lingoes |= BIT_N(0x03);
             } else {
                 device.lingoes = 0;
             }
@@ -2226,7 +2328,6 @@ static void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf
  * TODO:
  * - Fix cmd 0x00 handling, there has to be a more elegant way of doing
  *   this
- * - Implement at least cmd 0x04
  */
 
 static void cmd_ack_mode2(const unsigned char cmd, const unsigned char status)
@@ -2302,47 +2403,35 @@ static void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf
                     if (audio_status() == AUDIO_STATUS_PLAY)
                         REMOTE_BUTTON(BUTTON_RC_PLAY);
                 }
-                if((buf[3] & 128) && !iap_btnshuffle) /* shuffle */
+                if(buf[3] & 128) /* Shuffle */
                 {
-                    iap_btnshuffle = true;
-                    if(!global_settings.playlist_shuffle)
+                    if (!iap_btnshuffle)
                     {
-                        global_settings.playlist_shuffle = 1;
-                        settings_save();
-                        if (audio_status() & AUDIO_STATUS_PLAY)
-                            playlist_randomise(NULL, current_tick, true);
-                    }
-                    else if(global_settings.playlist_shuffle)
-                    {
-                        global_settings.playlist_shuffle = 0;
-                        settings_save();
-                        if (audio_status() & AUDIO_STATUS_PLAY)
-                            playlist_sort(NULL, true);
+                        iap_shuffle_state(!global_settings.playlist_shuffle);
+                        iap_btnshuffle = true;
                     }
                 }
-                else
-                    iap_btnshuffle = false;
             }
             else if(len >= 5 && buf[4] != 0)
             {
-                if((buf[4] & 1) && !iap_btnrepeat) /* repeat */
+                if(buf[4] & 1) /* repeat */
                 {
-                    int oldmode = global_settings.repeat_mode;
-                    iap_btnrepeat = true;
-                
-                    if (oldmode == REPEAT_ONE)
-                            global_settings.repeat_mode = REPEAT_OFF;
-                    else if (oldmode == REPEAT_ALL)
-                            global_settings.repeat_mode = REPEAT_ONE;
-                    else if (oldmode == REPEAT_OFF)
-                            global_settings.repeat_mode = REPEAT_ALL;
-
-                    settings_save();
-                    if (audio_status() & AUDIO_STATUS_PLAY)
-                    audio_flush_and_reload_tracks();
+                    if (!iap_btnrepeat)
+                    {
+                        iap_repeat_next();
+                        iap_btnrepeat = true;
+                    }
                 }
-                else
-                    iap_btnrepeat = false;
+
+                /* Power off
+                 * Not quite sure how to react to this, but stopping playback
+                 * is a good start.
+                 */
+                if (buf[4] & 0x04)
+                {
+                    if (audio_status() == AUDIO_STATUS_PLAY)
+                        REMOTE_BUTTON(BUTTON_RC_PLAY);
+                }
 
                 if(buf[4] & 16) /* ffwd */
                     REMOTE_BUTTON(BUTTON_RC_RIGHT);
@@ -3484,13 +3573,18 @@ static void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf
          */
         case 0x12:
         {
-            /* Until the grand TX buffer rewrite, this will return pseudo
-             * information for almost all fields
+            /* NOTE:
              *
-             * TODO: Fix.
+             * Retrieving the track information from a track which is not
+             * the currently playing track can take a seriously long time,
+             * in the order of several seconds.
+             *
+             * This most certainly violates the IAP spec, but there's no way
+             * around this for now.
              */
             uint32_t track_index;
             struct playlist_track_info track;
+            struct mp3entry id3;
 
             CHECKLEN3(0x09);
             CHECKAUTH3;
@@ -3510,11 +3604,12 @@ static void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf
                  */
                 case 0x00:
                 {
+                    iap_get_trackinfo(track_index, &id3);
                     /* Track capabilities. None of these are supported, yet */
                     IAP_TX_PUT_U32(0x00);
 
                     /* Track length in ms */
-                    IAP_TX_PUT_U32(180000);
+                    IAP_TX_PUT_U32(id3.length);
 
                     /* Chapter count, stays at 0 */
                     IAP_TX_PUT_U16(0x00);
@@ -3544,7 +3639,8 @@ static void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf
                 case 0x02:
                 {
                     /* Artist name */
-                    IAP_TX_PUT_STRING("XArtist");
+                    iap_get_trackinfo(track_index, &id3);
+                    IAP_TX_PUT_STRLCPY(id3.artist);
 
                     iap_send_tx();
                     break;
@@ -3556,7 +3652,8 @@ static void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf
                 case 0x03:
                 {
                     /* Album name */
-                    IAP_TX_PUT_STRING("XAlbum");
+                    iap_get_trackinfo(track_index, &id3);
+                    IAP_TX_PUT_STRLCPY(id3.album);
 
                     iap_send_tx();
                     break;
@@ -3568,7 +3665,8 @@ static void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf
                 case 0x04:
                 {
                     /* Genre name */
-                    IAP_TX_PUT_STRING("XGenre");
+                    iap_get_trackinfo(track_index, &id3);
+                    IAP_TX_PUT_STRLCPY(id3.genre_string);
 
                     iap_send_tx();
                     break;
@@ -3580,7 +3678,8 @@ static void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf
                 case 0x05:
                 {
                     /* Track title */
-                    IAP_TX_PUT_STRING("XTitle");
+                    iap_get_trackinfo(track_index, &id3);
+                    IAP_TX_PUT_STRLCPY(id3.title);
 
                     iap_send_tx();
                     break;
@@ -3591,8 +3690,9 @@ static void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf
                  */
                 case 0x06:
                 {
-                    /* Track title */
-                    IAP_TX_PUT_STRING("XComposer");
+                    /* Track Composer */
+                    iap_get_trackinfo(track_index, &id3);
+                    IAP_TX_PUT_STRLCPY(id3.composer);
 
                     iap_send_tx();
                     break;
@@ -4444,7 +4544,8 @@ static void iap_handlepkt_mode7(const unsigned int len, const unsigned char *buf
 
 void iap_handlepkt(void)
 {
-    struct state_t *s = &frame_state;
+    int level;
+    int length;
 
     if(!iap_setupflag) return;
 
@@ -4458,17 +4559,27 @@ void iap_handlepkt(void)
     }
 
     /* handle command by mode */
-    unsigned char mode = iap_rxstart[0];
+    length = get_u16(iap_rxstart);
+    unsigned char mode = *(iap_rxstart+2);
     switch (mode) {
-    case 0: iap_handlepkt_mode0(s->len, iap_rxstart); break;
-    case 2: iap_handlepkt_mode2(s->len, iap_rxstart); break;
-    case 3: iap_handlepkt_mode3(s->len, iap_rxstart); break;
-    case 4: iap_handlepkt_mode4(s->len, iap_rxstart); break;
-    case 7: iap_handlepkt_mode7(s->len, iap_rxstart); break;
+    case 0: iap_handlepkt_mode0(length, iap_rxstart+2); break;
+    case 2: iap_handlepkt_mode2(length, iap_rxstart+2); break;
+    case 3: iap_handlepkt_mode3(length, iap_rxstart+2); break;
+    case 4: iap_handlepkt_mode4(length, iap_rxstart+2); break;
+    case 7: iap_handlepkt_mode7(length, iap_rxstart+2); break;
     }
-    
-    /* release the lock on serbuf */
-    serbuf_lock = false;
+
+    /* Remove the handled packet from the RX buffer
+     * This needs to be done with interrupts disabled, to make
+     * sure the buffer and the pointers into it are handled
+     * cleanly
+     */
+    level = disable_irq_save();
+    memmove(iap_rxstart, iap_rxstart+(length+2), (RX_BUFLEN+2)-(length+2));
+    iap_rxnext -= (length+2);
+    iap_rxpayload -= (length+2);
+    iap_rxlen += (length+2);
+    restore_irq(level);
 
     /* poke the poweroff timer */
     reset_poweroff_timer();
@@ -4488,6 +4599,7 @@ const unsigned char *iap_get_serbuf(void)
     return iap_rxstart;
 }
 
+#ifdef IAP_MALLOC_DYNAMIC
 static int iap_move_callback(int handle, void* current, void* new)
 {
     (void) handle;
@@ -4500,6 +4612,7 @@ static int iap_move_callback(int handle, void* current, void* new)
 
     return BUFLIB_CB_OK;
 }
+#endif
 
 /* Change the shuffle state */
 static void iap_shuffle_state(const bool state)

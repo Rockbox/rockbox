@@ -54,6 +54,20 @@ sub generic {
     return 1;
 }
 
+sub _h_00_0001 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $lingo = shift;
+
+    $lingo = unpack("C", $data);
+
+    printf("Identify (0x00, 0x01) D->I\n");
+    printf(" Lingo:               0x%02x\n", $lingo);
+
+    return 1;
+}
+
 sub _h_00_0002 {
     my $self = shift;
     my $data = shift;
@@ -90,7 +104,7 @@ sub _h_00_0002 {
          "Reserved",
          "ERROR: Maximum number of accessory connections already reached")[$res], $res);
     if ($res == 6) {
-        # ($res, $cmd, $delay) = unpack("CCN", $data);
+        $delay = unpack("xxN", $data);
         printf(" Delay:                %d ms\n", $delay);
     }
 
@@ -416,25 +430,53 @@ sub _h_00_0028 {
 
     if ($acctype ~~ [0x01, 0x06, 0x07, 0x08]) {
         $accparam = unpack("xZ*", $data);
-        printf(" Data:             %s\n", $accparam);
+        printf(" Data:                     %s\n", $accparam);
     }
 
     if ($acctype == 0x02) {
         $accparam = [ unpack("xNCCC", $data) ];
-        printf(" Model ID:         %08x\n", $accparam->[0]);
-        printf(" Firmware version: %d.%02d.%02d\n", $accparam->[1], $accparam->[2], $accparam->[3]);
+        printf(" Model ID:                 %08x\n", $accparam->[0]);
+        printf(" Firmware version:         %d.%02d.%02d\n", $accparam->[1], $accparam->[2], $accparam->[3]);
     }
 
     if ($acctype == 0x03) {
         $accparam = [ unpack("xCCC", $data) ];
-        printf(" Lingo:            %02x\n", $accparam->[0]);
-        printf(" Version:          %d.%02d\n", $accparam->[1], $accparam->[2]);
+        printf(" Lingo:                    %02x\n", $accparam->[0]);
+        printf(" Version:                  %d.%02d\n", $accparam->[1], $accparam->[2]);
     }
 
     if ($acctype ~~ [0x04, 0x05]) {
         $accparam = [ unpack("xCCC", $data) ];
-        printf(" Version:           %d.%02d.%02d\n", @{$accparam});
+        printf(" Version:                  %d.%02d.%02d\n", @{$accparam});
     }
+
+    return 1;
+}
+
+sub _h_00_0029 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $class;
+
+    $class = unpack("C", $data);
+
+    printf("GetiPodPreferences (0x00, 0x29) D->I\n");
+    printf(" Class:                 %s (%d)\n", (
+        "Video out setting",
+        "Screen configuration",
+        "Video signal format",
+        "Line Out usage",
+        "(Reserved)",
+        "(Reserved)",
+        "(Reserved)",
+        "(Reserved)",
+        "Video out connection",
+        "Closed captioning",
+        "Video aspect ratio",
+        "(Reserved)",
+        "Subtitles",
+        "Video alternate audio channel")[$class], $class);
 
     return 1;
 }
@@ -521,6 +563,20 @@ sub _h_00_003b {
     printf(" Action:           %s (%d)\n", (
         "Finished",
         "Reset")[$status], $status);
+
+    return 1;
+}
+
+sub _h_00_004b {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $lingo;
+
+    $lingo = unpack("C", $data);
+
+    printf("GetiPodOptionsForLingo (0x00, 0x4B) D->I\n");
+    printf(" Lingo:               0x%02x\n", $lingo);
 
     return 1;
 }
@@ -678,6 +734,67 @@ sub _h_03_0008 {
     printf("  Audiobook speed\n") if ($events & 0x00004000);
     printf("  Track position in s\n") if ($events & 0x00008000);
     printf("  Mute/UI/Absolute volume\n") if ($events & 0x00010000);
+
+    return 1;
+}
+
+sub _h_03_0009 {
+    my $self = shift;
+    my $data = shift;
+    my $state = shift;
+    my $event;
+    my $eventdata;
+
+    $event = unpack("C", $data);
+
+    printf("RemoteEventNotification (0x03, 0x09) I->D\n");
+    printf(" Event:                %s (%d)\n", (
+        "Track position in ms",
+        "Track playback index",
+        "Chapter index",
+        "Play status",
+        "Mute/UI volume",
+        "Power/Battery",
+        "Equalizer setting",
+        "Shuffle setting",
+        "Repeat setting",
+        "Date and time setting",
+        "Alarm setting",
+        "Backlight state",
+        "Hold switch state",
+        "Sound check state",
+        "Audiobook speed",
+        "Track position in s",
+        "Mute/UI/Absolute volume")[$event], $event);
+
+    if ($event == 0x00) {
+        $eventdata = unpack("xN", $data);
+        printf("  Position:               %d ms\n", $eventdata);
+    } elsif ($event == 0x01) {
+        $eventdata = unpack("xN", $data);
+        printf("  Track:                  %d\n", $eventdata);
+    } elsif ($event == 0x02) {
+        $eventdata = [ unpack("xNnn", $data) ];
+        printf("  Track:                  %d\n", $eventdata->[0]);
+        printf("  Chapter count:          %d\n", $eventdata->[1]);
+        printf("  Chapter index:          %d\n", $eventdata->[2]);
+    } elsif ($event == 0x03) {
+        $eventdata = unpack("xC", $data);
+        printf("  Status:                 %s (%d)\n", (
+            "Stopped",
+            "Playing",
+            "Paused",
+            "FF",
+            "REW",
+            "End FF/REW")[$eventdata], $eventdata);
+    } elsif ($event == 0x04) {
+        $eventdata = [ unpack("xCC") ];
+        printf("  Mute:                   %s\n", $eventdata->[0]?"Off":"On");
+        printf("  Volume:                 %d\n", $eventdata->[1]);
+    } elsif ($event == 0x0F) {
+        $eventdata = unpack("xn", $data);
+        printf("  Position:               %d s\n", $eventdata);
+    }
 
     return 1;
 }
