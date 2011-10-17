@@ -325,4 +325,6 @@ keymaps/keymap-sdl.c
 keymaps/keymap-fuzeplus.c
 #elif CONFIG_KEYPAD == RK27XX_GENERIC_PAD
 keymaps/keymap-rk27xx-generic.c
+#elif CONFIG_KEYPAD == HM60X_PAD
+keymaps/keymap-hm60x.c
 #endif

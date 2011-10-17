@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright © 2009 Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,20 +18,31 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-#ifndef _DEBUG_TARGET_H_
-#define _DEBUG_TARGET_H_
-
 #include <stdbool.h>
+#include "config.h"
+#include "inttypes.h"
+#include "power.h"
+#include "panic.h"
+#include "system.h"
+#include "usb_core.h"   /* for usb_charging_maxcurrent_change */
 
-#ifdef RK27_GENERIC
-#define DEBUG_CANCEL BUTTON_VOL
-#elif defined(HM60X)
-#define DEBUG_CANCEL BUTTON_LEFT
-#endif
+void power_off(void)
+{
 
-bool dbg_hw_info(void);
-bool dbg_ports(void);
+}
 
-#endif /* _DEBUG_TARGET_H_ */
+void power_init(void)
+{
+    GPIO_PCDR |= (1<<0);
+    GPIO_PCCON |= (1<<0);
+}
 
+unsigned int power_input_status(void)
+{
+    return (usb_detect() == USB_INSERTED) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
+}
+
+bool charging_state(void)
+{
+   return true;
+}

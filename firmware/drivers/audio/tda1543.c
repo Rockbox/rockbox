@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ *
+ * Copyright (c) 2011 Andrew Ryabinin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,19 +20,27 @@
  *
  ****************************************************************************/
 
-#ifndef _DEBUG_TARGET_H_
-#define _DEBUG_TARGET_H_
+#include "config.h"
+#include "audio.h"
+#include "audiohw.h"
 
-#include <stdbool.h>
+const struct sound_settings_info audiohw_settings[] = {
+    [SOUND_VOLUME]        = {"dB", 0,  1,   -1,   0,   0},
+    /* HAVE_SW_TONE_CONTROLS */
+    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
+    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
+    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
+    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
+    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
+};
 
-#ifdef RK27_GENERIC
-#define DEBUG_CANCEL BUTTON_VOL
-#elif defined(HM60X)
-#define DEBUG_CANCEL BUTTON_LEFT
-#endif
+void audiohw_preinit(void) { }
 
-bool dbg_hw_info(void);
-bool dbg_ports(void);
+void audiohw_postinit(void) { }
 
-#endif /* _DEBUG_TARGET_H_ */
+void audiohw_close(void) { }
 
+void audiohw_set_frequency(int fsel)
+{
+    (void)fsel;
+}

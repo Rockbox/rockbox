@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2011 Andrew Ryabinin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,19 +19,28 @@
  *
  ****************************************************************************/
 
-#ifndef _DEBUG_TARGET_H_
-#define _DEBUG_TARGET_H_
+#include "config.h"
+#include "system.h"
+#include "button.h"
+#include "adc.h"
 
-#include <stdbool.h>
+void button_init_device(void) {
+    /* setup button gpio as input */
+    GPIO_PCCON &= ~(POWEROFF_BUTTON);
+}
 
-#ifdef RK27_GENERIC
-#define DEBUG_CANCEL BUTTON_VOL
-#elif defined(HM60X)
-#define DEBUG_CANCEL BUTTON_LEFT
-#endif
-
-bool dbg_hw_info(void);
-bool dbg_ports(void);
-
-#endif /* _DEBUG_TARGET_H_ */
-
+int button_read_device(void) {
+    int adc_val = adc_read(ADC_BUTTONS);
+    if (adc_val < 30) {
+        return BUTTON_UP | (GPIO_PCDR & POWEROFF_BUTTON);
+    } else if (adc_val < 250) {
+        return BUTTON_RIGHT | (GPIO_PCDR & POWEROFF_BUTTON);
+    } else if (adc_val < 380) {
+        return BUTTON_LEFT | (GPIO_PCDR & POWEROFF_BUTTON);
+    } else if (adc_val < 450) {
+        return BUTTON_DOWN | (GPIO_PCDR & POWEROFF_BUTTON);
+    } else if (adc_val < 560) {
+        return BUTTON_PLAY | (GPIO_PCDR & POWEROFF_BUTTON);
+    }
+    return (GPIO_PCDR & POWEROFF_BUTTON);
+}

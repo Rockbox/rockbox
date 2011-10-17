@@ -140,6 +140,7 @@
 #define MPIO_HD300_PAD     47
 #define SANSA_FUZEPLUS_PAD 48
 #define RK27XX_GENERIC_PAD 49
+#define HM60X_PAD          50
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -226,6 +227,7 @@
 #define LCD_FUZEPLUS  41
 #define LCD_SPFD5420A 42 /* rk27xx */
 #define LCD_CLIPZIP   43 /* as used by the Sandisk Sansa Clip Zip */
+#define LCD_HX8340B   44 /* as used by the HiFiMAN HM-601/HM-602/HM-801 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -459,6 +461,8 @@ Lyre prototype 1 */
 #include "config/mpiohd300.h"
 #elif defined(RK27_GENERIC)
 #include "config/rk27generic.h"
+#elif defined(HM60X)
+#include "config/hifimanhm60x.h"
 #elif defined(SDLAPP)
 #include "config/sdlapp.h"
 #elif defined(ANDROID)

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2011 Andrew Ryabinin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,20 +18,27 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-#ifndef _DEBUG_TARGET_H_
-#define _DEBUG_TARGET_H_
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
 
 #include <stdbool.h>
+#include "config.h"
 
-#ifdef RK27_GENERIC
-#define DEBUG_CANCEL BUTTON_VOL
-#elif defined(HM60X)
-#define DEBUG_CANCEL BUTTON_LEFT
-#endif
+void button_init_device(void);
+int button_read_device(void);
 
-bool dbg_hw_info(void);
-bool dbg_ports(void);
 
-#endif /* _DEBUG_TARGET_H_ */
+#define BUTTON_UP          0x00000001
+#define BUTTON_DOWN        0x00000004
+#define BUTTON_LEFT        0x00000008
+#define BUTTON_RIGHT       0x00000010
+#define BUTTON_PLAY        0x00000020
 
+
+#define BUTTON_REMOTE      0
+
+
+#define POWEROFF_BUTTON 0x02
+#define POWEROFF_COUNT 30
+
+#endif /* _BUTTON_TARGET_H_ */

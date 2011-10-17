@@ -25,7 +25,9 @@
 #include "system.h"
 #include "cpu.h"
 #include "spfd5420a.h"
+#include "lcdif-rk27xx.h"
 
+/* TODO: convert to udelay() */
 static inline void delay_nop(int cycles)
 {
     asm volatile ("1: subs %[n], %[n], #1     \n\t"
@@ -34,17 +36,6 @@ static inline void delay_nop(int cycles)
                   : [n] "r" (cycles));
 }
 
-static unsigned int lcd_data_transform(unsigned int data)
-{
-    /* 18 bit interface */
-    unsigned int r, g, b;
-    r = (data & 0x0000fc00)<<8;
-    /* g = ((data & 0x00000300) >> 2) | ((data & 0x000000e0) >> 3); */
-    g = ((data & 0x00000300) << 6) | ((data & 0x000000e0) << 5);
-    b = (data & 0x00000001f) << 3;
-
-    return (r | g | b);
-}
 
 /* converts RGB565 pixel into internal lcd bus format */
 static unsigned int lcd_pixel_transform(unsigned short rgb565)
@@ -57,93 +48,8 @@ static unsigned int lcd_pixel_transform(unsigned short rgb565)
     return r<<19 | g<<10 | b<<3;
 }
 
-static void lcd_cmd(unsigned int cmd)
-{
-    LCD_COMMAND = lcd_data_transform(cmd);
-}
-
-static void lcd_data(unsigned int data)
-{
-    LCD_DATA = lcd_data_transform(data);
-}
-
-static void lcd_write_reg(unsigned int reg, unsigned int val)
-{
-    lcd_cmd(reg);
-    lcd_data(val);
-}
-
-static void lcdctrl_bypass(unsigned int on_off)
-{
-    while (!(LCDC_STA & LCDC_MCU_IDLE));
-
-    if (on_off)
-        MCU_CTRL |= MCU_CTRL_BYPASS;
-    else
-        MCU_CTRL &= ~MCU_CTRL_BYPASS;
-}
-
-/* This part is unclear. I am unable to use buffered/FIFO based writes
- * to lcd. Depending on settings of IF I get various patterns on display
- * but not what I want to display apparently.
- */
-static void lcdctrl_init(void)
-{
-    /* alpha b111
-     * stop at current frame complete
-     * MCU mode
-     * 24b RGB
-     */
-    LCDC_CTRL = ALPHA(7) | LCDC_STOP | LCDC_MCU | RGB24B;
-    MCU_CTRL = ALPHA_BASE(0x3f) | MCU_CTRL_BYPASS;
-
-    HOR_ACT = 400 + 3;    /* define horizonatal active region */
-    VERT_ACT = 240;       /* define vertical active region */
-    VERT_PERIOD = 0xfff;  /* CSn/WEn/RDn signal timings */
-
-    LINE0_YADDR = LINE_ALPHA_EN | 0x7fe;
-    LINE1_YADDR = LINE_ALPHA_EN | ((1 * 400) - 2);
-    LINE2_YADDR = LINE_ALPHA_EN | ((2 * 400) - 2);
-    LINE3_YADDR = LINE_ALPHA_EN | ((3 * 400) - 2);
-
-    LINE0_UVADDR = 0x7fe + 1;
-    LINE1_UVADDR = ((1 * 400) - 2 + 1);
-    LINE2_UVADDR = ((2 * 400) - 2 + 1);
-    LINE3_UVADDR = ((3 * 400) - 2 + 1);
-
-#if 0
-    LINE0_YADDR = 0;
-    LINE1_YADDR = (1 * 400);
-    LINE2_YADDR = (2 * 400);
-    LINE3_YADDR = (3 * 400);
-
-    LINE0_UVADDR = 1;
-    LINE1_UVADDR = (1 * 400) + 1;
-    LINE2_UVADDR = (2 * 400) + 1;
-    LINE3_UVADDR = (3 * 400) + 1;
-
-    START_X = 0;
-    START_Y = 0;
-    DELTA_X = 0x200; /* no scaling */
-    DELTA_Y = 0x200; /* no scaling */
-#endif
-    LCDC_INTR_MASK = INTR_MASK_LINE; /* INTR_MASK_EVENLINE; */
-}
-
-/* configure pins to drive lcd in 18bit mode */
-static void iomux_lcd(void)
-{
-    unsigned long muxa;
-
-    muxa = SCU_IOMUXA_CON & ~(IOMUX_LCD_VSYNC|IOMUX_LCD_DEN|0xff);
-    muxa |= IOMUX_LCD_D18|IOMUX_LCD_D20|IOMUX_LCD_D22|IOMUX_LCD_D17|IOMUX_LCD_D16;
-
-    SCU_IOMUXA_CON = muxa;
-    SCU_IOMUXB_CON |= IOMUX_LCD_D815;
-}
-
 /* not tested */
-static void lcd_sleep(unsigned int sleep)
+static void lcd_sleep(bool sleep)
 {
     if (sleep)
     {
@@ -165,14 +71,9 @@ static void lcd_sleep(unsigned int sleep)
     lcd_cmd(GRAM_WRITE);
 }
 
-void lcd_init_device()
+void lcd_display_init()
 {
     unsigned int x, y;
-
-    iomux_lcd();       /* setup pins for 18bit lcd interface */
-    lcdctrl_init();    /* basic lcdc module configuration */
-
-    lcdctrl_bypass(1); /* run in bypass mode - all writes goes directly to lcd controller */
 
     lcd_write_reg(RESET, 0x0001);
     delay_nop(10000);
@@ -265,30 +166,12 @@ void lcd_init_device()
     /* clear screen */
     lcd_cmd(GRAM_WRITE);
 
-    for (x=0; x<400; x++)
-        for(y=0; y<240; y++)
+    for (x=0; x<LCD_WIDTH; x++)
+        for(y=0; y<LCD_HEIGHT; y++)
             lcd_data(0x000000);
 
-    lcd_sleep(0);
+    lcd_sleep(false);
 }
-
-/* This is ugly hack. We drive lcd in bypass mode
- * where all writes goes directly to lcd controller.
- * This is suboptimal at best. IF module povides
- * FIFO, internal sram buffer, hardware scaller,
- * DMA signals, hardware alpha blending and more.
- * BUT the fact is that I have no idea how to use
- * this modes. Datasheet floating around is very
- * unclean in this regard and OF uses ackward
- * lcd update routines which are hard to understand.
- * Moreover OF sets some bits in IF module registers
- * which are referred as reseved in datasheet.
- */
-void lcd_update()
-{
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-}
-
 
 void lcd_update_rect(int x, int y, int width, int height)
 {

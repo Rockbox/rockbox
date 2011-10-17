@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ *
+ * Copyright (c) 2011 Andrew Ryabinin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,20 +19,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __TDA1543_H_
+#define __TDA1543_H_
 
-#ifndef _DEBUG_TARGET_H_
-#define _DEBUG_TARGET_H_
+#define VOLUME_MIN   -1
+#define VOLUME_MAX   0
 
-#include <stdbool.h>
 
-#ifdef RK27_GENERIC
-#define DEBUG_CANCEL BUTTON_VOL
-#elif defined(HM60X)
-#define DEBUG_CANCEL BUTTON_LEFT
-#endif
-
-bool dbg_hw_info(void);
-bool dbg_ports(void);
-
-#endif /* _DEBUG_TARGET_H_ */
-
+#endif /* __TDA1543_H_ */
