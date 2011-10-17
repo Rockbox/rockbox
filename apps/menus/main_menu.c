@@ -430,18 +430,13 @@ static int sleep_timer(void)
 
 static int seconds_to_min(int secs)
 {
-    int min = secs / 60;
-    if ((secs % 60) > 50) /* round up for 50+ seconds */
-        min++;
-
-    return min;
+    return (secs + 10) / 60;  /* round up for 50+ seconds */
 }
 
 static char* sleep_timer_getname(int selected_item, void * data, char *buffer)
 {
     (void)selected_item;
     (void)data;
-    (void)buffer;
     int sec = get_sleep_timer();
     char timer_buf[10];
     /* we have no sprintf, so MAX_PATH is a guess */
