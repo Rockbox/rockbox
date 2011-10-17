@@ -1399,8 +1399,18 @@ int gen_c_source(struct font* pf, char *path)
             "  %s  /* offset */\n"
             "  %s\n"
             "  %d,  /* defaultchar */\n"
-            "  %d,  /* bits_size */\n"
-            "  -1,  /* font fd */\n"
+            "  %d,  /* bits_size */\n",
+            pf->maxwidth, pf->height,
+            pf->ascent,
+            pf->firstchar,
+            pf->size, 0,
+            obuf,
+            buf,
+            pf->defaultchar,
+            pf->bits_size
+           );
+    
+    fprintf(ofp, "  -1,  /* font fd */\n"
             "  -1,  /* font fd width */\n"
             "  -1,  /* font fd offset */\n"
             "  0,  /* buffer start */\n"
@@ -1412,15 +1422,8 @@ int gen_c_source(struct font* pf, char *path)
             "  0,  /*   */\n"
             "  0,  /*   */\n"
             "};\n"
-            "#endif /* HAVE_LCD_BITMAP */\n",
-            pf->maxwidth, pf->height,
-            pf->ascent,
-            pf->firstchar,
-            pf->size, 0,
-            obuf,
-            buf,
-            pf->defaultchar,
-            pf->bits_size);
+            "#endif /* HAVE_LCD_BITMAP */\n"
+          );
 
     return 0;
 }
