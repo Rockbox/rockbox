@@ -220,6 +220,7 @@ bool radio_hardware_present(void)
 
 #ifdef HAVE_LCD_BITMAP
 static int loaded_fonts = 0;
+static struct font _font;
 int font_load(const char *path)
 {
     int id = 2 + loaded_fonts;
@@ -230,6 +231,11 @@ int font_load(const char *path)
 void font_unload(int font_id)
 {
     (void)font_id;
+}
+
+struct font* font_get(int font)
+{
+    return &_font;
 }
 #endif
 

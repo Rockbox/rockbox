@@ -286,6 +286,8 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 #endif /* HAVE_RECORDING */
 
+#ifdef HAVE_TOUCHSCREEN
+
 static const char* list_pad_formatter(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
 {
@@ -309,6 +311,7 @@ static int32_t list_pad_getlang(int value, int unit)
     }
 }
 
+#endif /* HAVE_TOUCHSCREEN */
 static const char* formatter_unit_0_is_off(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
 {
