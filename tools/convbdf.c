@@ -1401,6 +1401,8 @@ int gen_c_source(struct font* pf, char *path)
             "  %d,  /* defaultchar */\n"
             "  %d,  /* bits_size */\n"
             "  -1,  /* font fd */\n"
+            "  -1,  /* font fd width */\n"
+            "  -1,  /* font fd offset */\n"
             "  0,  /* buffer start */\n"
             "  0,  /* ^ position */\n"
             "  0,  /* ^ end */\n"

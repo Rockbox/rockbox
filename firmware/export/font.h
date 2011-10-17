@@ -100,6 +100,8 @@ struct font {
     
     /* file, buffer and cache management */
     int          fd;              /* fd for the font file. >= 0 if cached */
+    int          fd_width;        /* fd for the font file. >= 0 if cached */
+    int          fd_offset;       /* fd for the font file. >= 0 if cached */    
     unsigned char *buffer_start;    /* buffer to store the font in */       
     unsigned char *buffer_position; /* position in the buffer */    
     unsigned char *buffer_end;      /* end of the buffer */
