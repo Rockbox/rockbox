@@ -202,15 +202,15 @@ static bool game_finished;
 struct touchbutton reversi_buttons[TOUCHBUTTON_COUNT] = 
   {
     { {B_MENU_X, B_MENU_Y, B_MENU_W, B_MENU_H, 0, FONT_UI, 
-        STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
+        -1, STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
       false, REVERSI_BUTTON_MENU, false, "Menu", NULL },
       
     { {B_QUIT_X, B_QUIT_Y, B_QUIT_W, B_QUIT_H, 0, FONT_UI, 
-        STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
+        -1, STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
       false, REVERSI_BUTTON_QUIT, false, "Quit", NULL },
       
     { {0, 0, XOFS+BOARD_WIDTH, YOFS+BOARD_HEIGHT, 0, 0, 
-        STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
+        -1, STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
       false, REVERSI_BUTTON_MAKE_MOVE, true, NULL, NULL }
 };
 #endif

@@ -86,8 +86,6 @@ int touchbutton_get(struct touchbutton *data, int button, int num_buttons) {
  */
 void touchbutton_draw(struct touchbutton *data, int num_buttons) {
     int i;
-    /* These store the width and height of the title offset */
-    int title_width, title_height;
     struct screen *lcd = rb->screens[SCREEN_MAIN];
 
     /* Loop over all the elements in data */
@@ -98,36 +96,15 @@ void touchbutton_draw(struct touchbutton *data, int num_buttons) {
              *  operations are within the button location.
              */
             lcd->set_viewport(&data[i].vp);
-            
-            /* Get the string size so that the title can be centered. */
-            lcd->getstringsize(data[i].title, &title_width, &title_height);
-            
-            /* Center the title vertically */
-            title_height=(data[i].vp.height-title_height)/2;
-            
-            /* If the above calculation was negative, reset to 0 */
-            if(title_height<0) {
-                title_height=0;
-            }
-            
-            /* Center the title horizontally */
-            title_width=(data[i].vp.width-title_width)/2;
-            
-            /* If the above calculation was negative, reset to 0 */
-            if(title_width<0) {
-                title_width=0;
-            }
+
+            /* Set line_height to height, then it'll center for us */
+            data[i].vp.line_height = data[i].vp.height;
+            data[i].vp.flags |= VP_FLAG_ALIGN_RIGHT;
             
             /* If the width offset was 0, use a scrolling puts, else center and
              *  print the title.
              */
-            if(title_width==0) {
-                lcd->puts_scroll_style_xyoffset(0, 0, data[i].title,
-                                                STYLE_DEFAULT, 0, title_height);
-            } else {
-                lcd->putsxy(title_width, title_height, data[i].title);
-            }
-            
+            lcd->puts_scroll_style(0, 0, data[i].title, STYLE_DEFAULT);
             /* Draw bounding box around the button location. */
             lcd->draw_border_viewport();
         }

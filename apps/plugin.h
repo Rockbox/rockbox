@@ -147,12 +147,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 212
+#define PLUGIN_API_VERSION 213
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 210
+#define PLUGIN_MIN_API_VERSION 213
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -601,6 +601,22 @@ struct plugin_api {
     unsigned long (*utf8length)(const unsigned char *utf8);
     int (*utf8seek)(const unsigned char* utf8, int offset);
 
+    /* the buflib memory management library */
+    void   (*buflib_init)(struct buflib_context* ctx, void* buf, size_t size);
+    size_t (*buflib_available)(struct buflib_context* ctx);
+    int    (*buflib_alloc)(struct buflib_context* ctx, size_t size);
+    int    (*buflib_alloc_ex)(struct buflib_context* ctx, size_t size,
+                              const char* name, struct buflib_callbacks *ops);
+    int    (*buflib_alloc_maximum)(struct buflib_context* ctx, const char* name,
+                                   size_t* size, struct buflib_callbacks *ops);
+    void   (*buflib_buffer_in)(struct buflib_context* ctx, int size);
+    void*  (*buflib_buffer_out)(struct buflib_context* ctx, size_t* size);
+    int    (*buflib_free)(struct buflib_context* ctx, int handle);
+    bool   (*buflib_shrink)(struct buflib_context* ctx, int handle,
+                            void* new_start, size_t new_size);
+    void*  (*buflib_get_data)(struct buflib_context* ctx, int handle);
+    const char* (*buflib_get_name)(struct buflib_context* ctx, int handle);
+
     /* sound */
     void (*sound_set)(int setting, int value);
     int (*sound_default)(int setting);
@@ -862,6 +878,9 @@ struct plugin_api {
 #endif
     int (*show_logo)(void);
     struct tree_context* (*tree_get_context)(void);
+    struct entry* (*tree_get_entries)(struct tree_context* t);
+    struct entry* (*tree_get_entry_at)(struct tree_context* t, int index);
+
     void (*set_current_file)(const char* path);
     void (*set_dirfilter)(int l_dirfilter);
 
@@ -928,24 +947,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    struct entry* (*tree_get_entries)(struct tree_context* t);
-    struct entry* (*tree_get_entry_at)(struct tree_context* t, int index);
-
-    /* the buflib memory management library */
-    void   (*buflib_init)(struct buflib_context* ctx, void* buf, size_t size);
-    size_t (*buflib_available)(struct buflib_context* ctx);
-    int    (*buflib_alloc)(struct buflib_context* ctx, size_t size);
-    int    (*buflib_alloc_ex)(struct buflib_context* ctx, size_t size,
-                              const char* name, struct buflib_callbacks *ops);
-    int    (*buflib_alloc_maximum)(struct buflib_context* ctx, const char* name,
-                                   size_t* size, struct buflib_callbacks *ops);
-    void   (*buflib_buffer_in)(struct buflib_context* ctx, int size);
-    void*  (*buflib_buffer_out)(struct buflib_context* ctx, size_t* size);
-    int    (*buflib_free)(struct buflib_context* ctx, int handle);
-    bool   (*buflib_shrink)(struct buflib_context* ctx, int handle,
-                            void* new_start, size_t new_size);
-    void*  (*buflib_get_data)(struct buflib_context* ctx, int handle);
-    const char* (*buflib_get_name)(struct buflib_context* ctx, int handle);
     
 };
 

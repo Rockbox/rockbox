@@ -556,8 +556,12 @@ extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
  * once needed
  */
 
+#if defined(LCD_DPI) && (LCD_DPI > 0)
 /* returns the pixel density of the display */
+static inline int lcd_get_dpi(void) { return LCD_DPI; }
+#else
 extern int lcd_get_dpi(void);
-#endif
+#endif /* LCD_DPI */
+#endif /* HAVE_TOUCHSCREEN */
 
 #endif /* __LCD_H__ */
