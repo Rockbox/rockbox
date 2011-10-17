@@ -12863,7 +12863,7 @@
 </phrase>
 <phrase>
   id: LANG_SLEEP_TIMER_DURATION
-  desc: default sleep timer duration in minutes
+  desc: default sleep timer duration in minutes (unused in UI)
   user: core
   <source>
     *: "Default Sleep Timer Duration"
@@ -12887,5 +12887,19 @@
   </dest>
   <voice>
     *: "Start Sleep Timer On Boot"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Cancel Sleep Timer"
+  </dest>
+  <voice>
+    *: "Cancel Sleep Timer"
   </voice>
 </phrase>

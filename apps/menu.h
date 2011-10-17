@@ -198,7 +198,7 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected,
     static const struct menu_get_name_and_icon name##_                      \
         = {callback,text_callback,voice_callback,text_cb_data,icon};        \
     static const struct menu_func name##__ = {{(void*)func}, param};           \
-    static const struct menu_item_ex name   =                                  \
+    const struct menu_item_ex name   =                                  \
         { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                            \
          { .function = & name##__}, {.menu_get_name_and_icon = & name##_}};
 

@@ -419,21 +419,71 @@ static void sleep_timer_set(int minutes)
 
 static int sleep_timer(void)
 {
-    int minutes = get_sleep_timer() ? 0 : global_settings.sleeptimer_duration;
-    return (int)set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
-                   &sleep_timer_set, 5, 0, 300, sleep_timer_formatter);
+    int minutes = global_settings.sleeptimer_duration;
+    if (get_sleep_timer())
+        sleep_timer_set(0);
+    else
+        set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
+                   &sleep_timer_set, 5, 0, 300, sleep_timer_formatter); 
+    return 0;
 }
 
+static int seconds_to_min(int secs)
+{
+    int min = secs / 60;
+    if ((secs % 60) > 50) /* round up for 50+ seconds */
+        min++;
+
+    return min;
+}
+
+static char* sleep_timer_getname(int selected_item, void * data, char *buffer)
+{
+    (void)selected_item;
+    (void)data;
+    (void)buffer;
+    int sec = get_sleep_timer();
+    char timer_buf[10];
+    /* we have no sprintf, so MAX_PATH is a guess */
+    if (sec > 0)
+    {   /* show cancel and countdown if running */
+        snprintf(buffer, MAX_PATH, "%s (%s)", str(LANG_SLEEP_TIMER_CANCEL_CURRENT),
+                sleep_timer_formatter(timer_buf, sizeof(timer_buf), seconds_to_min(sec), NULL));
+    }
+    else
+        snprintf(buffer, MAX_PATH, "%s", str(LANG_SLEEP_TIMER));
+
+    return buffer;
+}
+
+static int sleep_timer_voice(int selected_item, void*data)
+{
+    (void)selected_item;
+    (void)data;
+    int seconds = get_sleep_timer();
+    if (seconds > 0)
+    {
+        long talk_ids[] = {
+            LANG_SLEEP_TIMER_CANCEL_CURRENT,
+            VOICE_PAUSE,
+            seconds_to_min(seconds) | UNIT_MIN << UNIT_SHIFT,
+            TALK_FINAL_ID
+        };
+        talk_idarray(talk_ids, true);
+    }
+    else
+        talk_id(LANG_SLEEP_TIMER, true);
+    return 0;
+}
 
 #if CONFIG_RTC
 int time_screen(void* ignored);
 MENUITEM_FUNCTION(timedate_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_TIME_MENU),
                     time_screen, NULL,  NULL, Icon_Menu_setting );
 #endif
-/* Sleep timer items are in the time/date screen if there is a RTC */
-MENUITEM_FUNCTION(sleep_timer_call, 0, ID2P(LANG_SLEEP_TIMER), sleep_timer,
-                    NULL, NULL, Icon_Menu_setting); /* make it look like a 
-                                                       setting to the user */
+MENUITEM_FUNCTION_DYNTEXT(sleep_timer_call, 0, sleep_timer, NULL, sleep_timer_getname,
+                          sleep_timer_voice, NULL, NULL, Icon_Menu_setting);
+                           /* make it look like a setting to the user */
 #if CONFIG_RTC == 0
 MENUITEM_SETTING(sleeptimer_on_startup,
                  &global_settings.sleeptimer_on_startup, NULL);
