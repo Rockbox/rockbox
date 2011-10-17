@@ -412,12 +412,14 @@ static const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
 
 static void sleep_timer_set(int minutes)
 {
+    if (minutes)
+        global_settings.sleeptimer_duration = minutes;
     set_sleep_timer(minutes * 60);
 }
 
 static int sleep_timer(void)
 {
-    int minutes = (get_sleep_timer() + 59) / 60; /* round up */
+    int minutes = get_sleep_timer() ? 0 : global_settings.sleeptimer_duration;
     return (int)set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
                    &sleep_timer_set, 5, 0, 300, sleep_timer_formatter);
 }
@@ -428,10 +430,14 @@ int time_screen(void* ignored);
 MENUITEM_FUNCTION(timedate_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_TIME_MENU),
                     time_screen, NULL,  NULL, Icon_Menu_setting );
 #endif
-/* This item is in the time/date screen if there is a RTC */
+/* Sleep timer items are in the time/date screen if there is a RTC */
 MENUITEM_FUNCTION(sleep_timer_call, 0, ID2P(LANG_SLEEP_TIMER), sleep_timer,
                     NULL, NULL, Icon_Menu_setting); /* make it look like a 
                                                        setting to the user */
+#if CONFIG_RTC == 0
+MENUITEM_SETTING(sleeptimer_on_startup,
+                 &global_settings.sleeptimer_on_startup, NULL);
+#endif
 
 MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_CREDITS),
                    (menu_function)show_credits, NULL, NULL, Icon_NOICON);
@@ -479,7 +485,7 @@ MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), mainmenu_callback,
 #if CONFIG_RTC
         &timedate_item,
 #else
-        &sleep_timer_call,
+        &sleep_timer_call, &sleeptimer_on_startup,
 #endif
         &manage_settings,
         );

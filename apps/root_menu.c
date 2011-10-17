@@ -660,6 +660,9 @@ void root_menu(void)
             next_screen = GO_TO_ROOT;
 #endif
 
+    if (global_settings.sleeptimer_on_startup)
+        set_sleep_timer(global_settings.sleeptimer_duration * 60);
+
     while (true)
     {
         switch (next_screen)

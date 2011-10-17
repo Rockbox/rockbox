@@ -12861,3 +12861,31 @@
     *: "Automatic"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Default Sleep Timer Duration"
+  </dest>
+  <voice>
+    *: "Default Sleep Timer Duration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Start Sleep Timer On Boot"
+  </dest>
+  <voice>
+    *: "Start Sleep Timer On Boot"
+  </voice>
+</phrase>

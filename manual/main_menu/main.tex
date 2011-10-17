@@ -203,7 +203,9 @@ pages of information.}
       \item[Sleep Timer:]
         The \setting{Sleep Timer} powers off your \dap{} after playing for a given
         time. It can be set from \setting{Off} to 5 hours in 5 minute steps.
-        The \setting{Sleep Timer} is reset on boot.
+        While the \setting{Sleep Timer} is reset on boot, the value selected is
+        retained and will be used as the default from then on.
+        If the sleep timer is currently active, \setting{Off} will be highlighted,
       \opt{alarm}{
         \item[Wake-Up Alarm:]
             This option will make the \dap{} start up at the specified time.
@@ -212,12 +214,13 @@ pages of information.}
             \ActionAlarmSet{} confirms the alarm, and \ActionAlarmCancel{} cancels setting
             an alarm. If the \dap{} is turned on again before the alarm occurs, the alarm
             will be cancelled.
-
         \opt{recording,radio}{
             \item[Alarm Wake Up Screen:]
             This option controls what the \dap{} does when it is woken up by the alarm.
         }%\opt{recording,radio}
       }%\opt{alarm}
+      \item[Start Sleep Timer On Boot:]
+          If set, a \setting{Sleep Timer} will be initiated when the device starts.
       \item [Time Format:] Choose 12 or 24 hour clock.
     \end{description}
 }%\opt{rtc}
@@ -241,7 +244,11 @@ pages of information.}
   \item[Sleep Timer:]
     The \setting{Sleep Timer} powers off your \dap{} after playing for a given
     time. It can be set from \setting{Off} to 5 hours in 5 minute steps.
-    The \setting{Sleep Timer} is reset on boot.
+    While the \setting{Sleep Timer} is reset on boot, the value selected is
+    retained and will be used as the default from then on.
+    If the sleep timer is currently active, \setting{Off} will be highlighted,
+  \item[Start Sleep Timer On Boot:]
+    If set, a \setting{Sleep Timer} will be initiated when the device starts.
 }
 
 \item[Running Time:]

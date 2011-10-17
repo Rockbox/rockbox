@@ -136,6 +136,9 @@ MENUITEM_FUNCTION(alarm_wake_up_screen, 0, ID2P(LANG_ALARM_WAKEUP_SCREEN),
 #endif /* CONFIG_TUNER || defined(HAVE_RECORDING) */
 
 #endif /* HAVE_RTC_ALARM */
+MENUITEM_SETTING(sleeptimer_on_startup,
+                 &global_settings.sleeptimer_on_startup, NULL);
+
 static void talk_timedate(void)
 {
     struct tm *tm = get_time();
@@ -241,7 +244,7 @@ MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), time_menu_callback, Icon_NOICON,
           &alarm_wake_up_screen,
 #endif
 #endif
-          &timeformat);
+          &sleeptimer_on_startup, &timeformat);
 
 int time_screen(void* ignored)
 {

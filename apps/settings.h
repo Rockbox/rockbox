@@ -798,6 +798,9 @@ struct user_settings
     int compressor_release_time;
 #endif
 
+    int sleeptimer_duration;
+    bool sleeptimer_on_startup;
+
 #ifdef HAVE_MORSE_INPUT
     bool morse_input; /* text input method setting */
 #endif
