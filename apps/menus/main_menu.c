@@ -441,14 +441,8 @@ MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
                    (menu_function)debug_menu, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_System_menu,
-#if CONFIG_RTC
-          &timedate_item,
-#endif
-          &show_info_item, &show_credits_item, &show_runtime_item, 
-#if CONFIG_RTC == 0
-          &sleep_timer_call, 
-#endif
-          &debug_menu_item);
+          &show_info_item, &show_credits_item,
+          &show_runtime_item, &debug_menu_item);
 /*      INFO MENU                  */
 /***********************************/
 
@@ -481,6 +475,11 @@ MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), mainmenu_callback,
         &settings_menu_item, &theme_menu,
 #ifdef HAVE_RECORDING
         &recording_settings,
+#endif
+#if CONFIG_RTC
+        &timedate_item,
+#else
+        &sleep_timer_call,
 #endif
         &manage_settings,
         );
