@@ -1701,6 +1701,7 @@ static bool skin_load_fonts(struct wps_data *data)
 
         /* finally, assign the font_id to the viewport */
         vp->font = font->id;
+        vp->line_height = font_get(vp->font)->height;
     }
     data->font_ids = skin_buffer_alloc(font_count * sizeof(int));
     if (!success || data->font_ids == NULL)
