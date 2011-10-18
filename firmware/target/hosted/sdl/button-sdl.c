@@ -280,6 +280,17 @@ static bool event_handler(SDL_Event *event)
     case SDL_USEREVENT:
         return true;
         break;
+
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    case SDL_VIDEORESIZE:
+       lcd_width = event->resize.w;
+       lcd_height = event->resize.h;
+       printf("Video resize: %d x %d\n", LCD_WIDTH, LCD_HEIGHT);
+       lcd_framebuffer = realloc(lcd_framebuffer,
+                                 lcd_width * lcd_height * sizeof(fb_data));
+       queue_broadcast(SYS_SCREEN_CHANGED, 0);
+       break;
+#endif
     }
 
     return false;

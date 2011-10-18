@@ -136,6 +136,9 @@ static int sdl_event_thread(void * param)
     /* Fullscreen mode for maemo app */
     flags |= SDL_FULLSCREEN;
 #endif
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    flags |= SDL_VIDEORESIZE;
+#endif
 
     if ((gui_surface = SDL_SetVideoMode(width * display_zoom, height * display_zoom, depth, flags)) == NULL) {
         panicf("%s", SDL_GetError());
