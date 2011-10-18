@@ -66,6 +66,8 @@ default_interrupt(INT_LRADC_CH4);
 default_interrupt(INT_LRADC_CH5);
 default_interrupt(INT_LRADC_CH6);
 default_interrupt(INT_LRADC_CH7);
+default_interrupt(INT_DAC_DMA);
+default_interrupt(INT_DAC_ERROR);
 
 typedef void (*isr_t)(void);
 
@@ -96,6 +98,8 @@ static isr_t isr_table[INT_SRC_NR_SOURCES] =
     [INT_SRC_LRADC_CHx(5)] = INT_LRADC_CH5,
     [INT_SRC_LRADC_CHx(6)] = INT_LRADC_CH6,
     [INT_SRC_LRADC_CHx(7)] = INT_LRADC_CH7,
+    [INT_SRC_DAC_DMA] = INT_DAC_DMA,
+    [INT_SRC_DAC_ERROR] = INT_DAC_ERROR,
 };
 
 static void UIRQ(void)
@@ -108,7 +112,7 @@ void irq_handler(void)
 {
     HW_ICOLL_VECTOR = HW_ICOLL_VECTOR; /* notify icoll that we entered ISR */
     (*(isr_t *)HW_ICOLL_VECTOR)();
-    /* acknowledge completion of IRQ (all use the same priority 0 */
+    /* acknowledge completion of IRQ (all use the same priority 0) */
     HW_ICOLL_LEVELACK = HW_ICOLL_LEVELACK__LEVEL0;
 }
 
