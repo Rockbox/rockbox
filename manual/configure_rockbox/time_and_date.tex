@@ -1,0 +1,23 @@
+% $Id:$ %
+
+Time related menu options. Pressing \ActionStdContext{} will voice the current time
+if voice support is enabled.
+
+\begin{description}
+  \item[Set Time/Date:] Set current time and date.
+  \opt{alarm}{
+    \item[Wake-Up Alarm:]
+        This option will make the \dap{} start up at the specified time.
+        Use \ActionSettingInc{} and \ActionSettingDec{} to adjust the minutes setting,
+        \ActionAlarmHoursDec{} and \ActionAlarmHoursInc{} to adjust the hours.
+        \ActionAlarmSet{} confirms the alarm, and \ActionAlarmCancel{} cancels setting
+        an alarm. If the \dap{} is turned on again before the alarm occurs, the alarm
+        will be cancelled.
+    \opt{recording,radio}{
+        \item[Alarm Wake Up Screen:]
+        This option controls what the \dap{} does when it is woken up by the alarm.
+    }%\opt{recording,radio}
+  }%\opt{alarm}
+  \input{configure_rockbox/sleep_timer.tex}
+  \item[Time Format:] Choose 12 or 24 hour clock.
+\end{description}
