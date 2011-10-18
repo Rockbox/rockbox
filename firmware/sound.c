@@ -250,7 +250,7 @@ static void set_prescaled_volume(void)
     audiohw_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
 #endif
 
-#elif defined(HAVE_TLV320) || defined(HAVE_WM8978) || defined(HAVE_WM8985)
+#elif defined(HAVE_TLV320) || defined(HAVE_WM8978) || defined(HAVE_WM8985) || defined(HAVE_IMX233_CODEC)
     audiohw_set_headphone_vol(tenthdb2master(l), tenthdb2master(r));
 #elif defined(HAVE_JZ4740_CODEC) || defined(HAVE_SDL_AUDIO) || defined(ANDROID)
     audiohw_set_volume(current_volume);
