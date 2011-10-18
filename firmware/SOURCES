@@ -522,8 +522,10 @@ target/arm/imx233/usb-imx233.c
 #endif
 #ifndef BOOTLOADER
 #ifdef HAVE_IMX233_CODEC
+target/arm/imx233/audioout-imx233.c
+target/arm/imx233/audioin-imx233.c
 target/arm/imx233/pcm-imx233.c
-target/arm/imx233/audiohw-imx233.c
+drivers/audio/imx233-codec.c
 #endif
 target/arm/imx233/timer-imx233.c
 #endif

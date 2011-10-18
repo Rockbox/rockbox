@@ -22,6 +22,8 @@
 #include "system.h"
 #include "audiohw.h"
 #include "audio.h"
+#include "audioout-imx233.h"
+#include "audioin-imx233.h"
 
 void audio_input_mux(int source, unsigned flags)
 {
