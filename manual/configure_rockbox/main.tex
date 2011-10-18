@@ -21,6 +21,12 @@
     \input{configure_rockbox/language.tex}
     \input{configure_rockbox/voice.tex}
     \input{configure_rockbox/hotkey_settings.tex}
+    \nopt{rtc}{
+      \section{\label{ref:sleep_timer}Sleep Timer}
+      \begin{description}
+        \input{configure_rockbox/sleep_timer.tex}
+      \end{description}
+    }
 
 \chapter{Theme Settings}
 \label{ref:configure_rockbox_themes}
@@ -30,4 +36,9 @@
 \chapter{Recording Settings}
 \label{ref:Recordingsettings}
   \input{configure_rockbox/recording_settings.tex}
+}
+
+\opt{rtc}{
+\chapter{Time and Date}
+  \input{configure_rockbox/time_and_date.tex}
 }
