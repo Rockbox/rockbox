@@ -63,8 +63,8 @@ static int put_message(struct screen *display,
     int i;
     for(i=0; i<message->nb_lines && i+start<max_y; i++)
     {
-        display->puts_scroll(0, i+start, 
-                             P2STR((unsigned char *)message->message_lines[i]));
+        display->xprintf(0, i+start, 0, STYLE_SCROLLED,
+                         P2STR((unsigned char *)message->message_lines[i]));
     }
     return i;
 }
@@ -98,22 +98,23 @@ static void gui_yesno_draw(struct gui_yesno * yn)
         vp->fg_pattern = LCD_RGBPACK(0,255,0);
         display->drawrect(0, rect_h, rect_w, rect_h);
         display->getstringsize(str(LANG_SET_BOOL_YES), &w, &h);
-        display->putsxy((rect_w-w)/2, rect_h+(rect_h-h)/2, str(LANG_SET_BOOL_YES));
+        display->printf((rect_w-w)/2, rect_h+(rect_h-h)/2, str(LANG_SET_BOOL_YES));
         vp->fg_pattern = LCD_RGBPACK(255,0,0);
         display->drawrect(rect_w, rect_h, rect_w, rect_h);
         display->getstringsize(str(LANG_SET_BOOL_NO), &w, &h);
-        display->putsxy(rect_w + (rect_w-w)/2, rect_h+(rect_h-h)/2, str(LANG_SET_BOOL_NO));
+        display->printf(rect_w + (rect_w-w)/2, rect_h+(rect_h-h)/2, str(LANG_SET_BOOL_NO));
         vp->fg_pattern = old_pattern;
     }
 #else
     /* Space remaining for yes / no text ? */
     if(line_shift+2 <= vp_lines)
     {
+        int h = display->getcharheight();
         if(line_shift+3 <= vp_lines)
             line_shift++;
-        display->puts(0, line_shift, str(LANG_CONFIRM_WITH_BUTTON));
+        display->printf(0, line_shift * h, str(LANG_CONFIRM_WITH_BUTTON));
 #ifdef HAVE_LCD_BITMAP
-        display->puts(0, line_shift+1, str(LANG_CANCEL_WITH_ANY));
+        display->printf(0, (line_shift+1) * h, str(LANG_CANCEL_WITH_ANY));
 #endif
     }
 #endif

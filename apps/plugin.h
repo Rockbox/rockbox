@@ -182,17 +182,13 @@ struct plugin_api {
     void (*lcd_update)(void);
     void (*lcd_clear_display)(void);
     int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
-    void (*lcd_putsxy)(int x, int y, const unsigned char *string);
-    void (*lcd_putsxyf)(int x, int y, const unsigned char *fmt, ...);
-    void (*lcd_puts)(int x, int y, const unsigned char *string);
-    void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
-    void (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
+    void (*lcd_printf)(int x, int y, const unsigned char *fmt, ...);
+    void (*lcd_xprintf)(int x, int y, int xcrop, unsigned int style, const unsigned char* fmt, ...);
     void (*lcd_stop_scroll)(void);
 #ifdef HAVE_LCD_CHARCELLS
     void (*lcd_define_pattern)(unsigned long ucs, const char *pattern);
     unsigned long (*lcd_get_locked_pattern)(void);
     void (*lcd_unlock_pattern)(unsigned long ucs);
-    void (*lcd_putc)(int x, int y, unsigned long ucs);
     void (*lcd_put_cursor)(int x, int y, unsigned long ucs);
     void (*lcd_remove_cursor)(void);
     void (*lcd_icon)(int icon, bool enable);
@@ -254,9 +250,6 @@ struct plugin_api {
                             int width, int height);
     void (*lcd_pal256_update_pal)(fb_data *palette);
 #endif
-    void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
-    void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
-                                  int style);
 #ifdef HAVE_LCD_INVERT
     void (*lcd_set_invert_display)(bool yesno);
 #endif /* HAVE_LCD_INVERT */
@@ -313,8 +306,8 @@ struct plugin_api {
     /* remote lcd */
     void (*lcd_remote_set_contrast)(int x);
     void (*lcd_remote_clear_display)(void);
-    void (*lcd_remote_puts)(int x, int y, const unsigned char *string);
-    void (*lcd_remote_puts_scroll)(int x, int y, const unsigned char* string);
+    void (*lcd_remote_printf)(int x, int y, const unsigned char *fmt, ...);
+    void (*lcd_remote_printf)(int x, int y, int xcrop, unsigned int style, const unsigned char *fmt, ...);
     void (*lcd_remote_stop_scroll)(void);
     void (*lcd_remote_set_drawmode)(int mode);
     int  (*lcd_remote_get_drawmode)(void);
@@ -331,10 +324,6 @@ struct plugin_api {
                                         int width, int height);
     void (*lcd_remote_mono_bitmap)(const unsigned char *src, int x, int y,
                                    int width, int height);
-    void (*lcd_remote_putsxy)(int x, int y, const unsigned char *string);
-    void (*lcd_remote_puts_style)(int x, int y, const unsigned char *str, int style);
-    void (*lcd_remote_puts_scroll_style)(int x, int y, const unsigned char* string,
-                                         int style);
     fb_remote_data* lcd_remote_framebuffer;
     void (*lcd_remote_update)(void);
     void (*lcd_remote_update_rect)(int x, int y, int width, int height);

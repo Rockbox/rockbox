@@ -1540,11 +1540,12 @@ bool recording_screen(bool no_source)
                    NOTE 2: to be replaced by a global LCD_off() routine */
                 if(remote_display_on)
                 {
+                    int h = screens[1].getcharheight();
                     /* switch to single screen, leave message on remote */
                     screen_update = 1;
                     screens[1].clear_viewport();
-                    screens[1].puts(0, 0, str(LANG_REMOTE_LCD_OFF));
-                    screens[1].puts(0, 1, str(LANG_REMOTE_LCD_ON));
+                    screens[1].printf(0, 0, str(LANG_REMOTE_LCD_OFF));
+                    screens[1].printf(0, h, str(LANG_REMOTE_LCD_ON));
                     screens[1].update_viewport();
                 }
                 else
@@ -1761,7 +1762,7 @@ bool recording_screen(bool no_source)
             }
 
             FOR_NB_ACTIVE_SCREENS(i)
-                screens[i].puts(0, 0, buf);
+                screens[i].printf(0, 0, buf);
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
@@ -1793,8 +1794,10 @@ bool recording_screen(bool no_source)
                 }
             }
 
-            FOR_NB_ACTIVE_SCREENS(i)
-                screens[i].puts(0, 1, buf);
+            FOR_NB_ACTIVE_SCREENS(i) {
+                int h = screens[i].getcharheight();
+                screens[i].printf(0, h, buf);
+            }
 
             /* We will do file splitting regardless, either at the end of
             a split interval, or when the filesize approaches the 2GB
@@ -1830,13 +1833,14 @@ bool recording_screen(bool no_source)
                 int clipcount = pm_get_clipcount();
                 FOR_NB_ACTIVE_SCREENS(i)
                 {
+                    int h = screens[i].getcharheight();
                     if(!compact_view[i])
                     {
-                        screens[i].puts(0, 2, str(LANG_PM_CLIPCOUNT));
-                        screens[i].putsf(0, 3, "%4d", clipcount);
+                        screens[i].printf(0, 2*h, str(LANG_PM_CLIPCOUNT));
+                        screens[i].printf(0, 3*h, "%4d", clipcount);
                     }
                     else
-                        screens[i].putsf(0, 2, "%4d", clipcount);
+                        screens[i].printf(0, 2*h, "%4d", clipcount);
                 }
             }
 
@@ -2028,14 +2032,14 @@ static bool f2_rec_screen(void)
             screens[i].clear_display();
 
             /* Recording quality */
-            screens[i].putsxy(0, LCD_HEIGHT/2 - h*2,
-                str(LANG_SYSFONT_RECORDING_QUALITY));
+            screens[i].printf(0, LCD_HEIGHT/2 - h*2,
+                              str(LANG_SYSFONT_RECORDING_QUALITY));
         }
 
             snprintf(buf, sizeof(buf), "%d", global_settings.rec_quality);
         FOR_NB_SCREENS(i)
         {
-            screens[i].putsxy(0, LCD_HEIGHT/2-h, buf);
+            screens[i].printf(0, LCD_HEIGHT/2-h, buf);
             screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
                         LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
         }
@@ -2046,9 +2050,9 @@ static bool f2_rec_screen(void)
         FOR_NB_SCREENS(i)
         {
             screens[i].getstringsize(buf,&w,&h);
-            screens[i].putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
+            screens[i].printf((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
             screens[i].getstringsize(ptr, &w, &h);
-            screens[i].putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
+            screens[i].printf((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
             screens[i].mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                             LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
         }
@@ -2067,13 +2071,13 @@ static bool f2_rec_screen(void)
         FOR_NB_SCREENS(i)
         {
             screens[i].getstringsize(str(LANG_SYSFONT_CHANNELS), &w, &h);
-            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2,
+            screens[i].printf(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2,
                               str(LANG_SYSFONT_CHANNELS));
             screens[i].getstringsize(str(LANG_SYSFONT_MODE), &w, &h);
-            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h,
+            screens[i].printf(LCD_WIDTH - w, LCD_HEIGHT/2 - h,
                               str(LANG_SYSFONT_MODE));
             screens[i].getstringsize(ptr, &w, &h);
-            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
+            screens[i].printf(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
             screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
                         LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8);
 
@@ -2163,11 +2167,11 @@ static bool f3_rec_screen(void)
             screens[i].clear_display();
 
             /* Recording source */
-            screens[i].putsxy(0, LCD_HEIGHT/2 - h*2,
+            screens[i].printf(0, LCD_HEIGHT/2 - h*2,
                 str(LANG_SYSFONT_RECORDING_SOURCE));
 
             screens[i].getstringsize(ptr, &w, &h);
-            screens[i].putsxy(0, LCD_HEIGHT/2-h, ptr);
+            screens[i].printf(0, LCD_HEIGHT/2-h, ptr);
             screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
                             LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
         }
@@ -2177,7 +2181,7 @@ static bool f3_rec_screen(void)
         FOR_NB_SCREENS(i)
         {
             screens[i].getstringsize(ptr,&w,&h);
-            screens[i].putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, ptr);
+            screens[i].printf((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, ptr);
             screens[i].mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                         LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
 

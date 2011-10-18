@@ -176,7 +176,7 @@ static void draw_screen(struct screen *display, char *title,
     /* Draw title string */
     set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
     vp.flags |= VP_FLAG_ALIGN_CENTER;
-    display->putsxy(0, MARGIN_TOP, title);
+    display->printf(0, MARGIN_TOP, title);
 
     /* Get slider positions and top starting position */
     max_label_width = label_get_max_width(display);
@@ -250,11 +250,11 @@ static void draw_screen(struct screen *display, char *title,
         buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
         buf[1] = '\0';
         vp.flags &= ~VP_FLAG_ALIGNMENT_MASK;
-        display->putsxy(text_x, text_top, buf);
+        display->printf(text_x, text_top, buf);
         /* Draw color value */
         snprintf(buf, 3, "%02d", rgb->rgb_val[i]);
         vp.flags |= VP_FLAG_ALIGN_RIGHT;
-        display->putsxy(text_x, text_top, buf);
+        display->printf(text_x, text_top, buf);
 
         /* Draw scrollbar */
         gui_scrollbar_draw(display,                     /* screen */
@@ -293,7 +293,7 @@ static void draw_screen(struct screen *display, char *title,
             set_drawinfo(display, DRMODE_FG, get_black_or_white(rgb),
                          background_color);
 
-            display->putsxy(0, top + (height - char_height) / 2, buf);
+            display->printf(0, top + (height - char_height) / 2, buf);
 
             /* Draw border around the rect */
             set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
@@ -309,7 +309,7 @@ static void draw_screen(struct screen *display, char *title,
         if (height >= char_height)
         {
             set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
-            display->putsxy(0, top + (height - char_height) / 2, buf);
+            display->printf(0, top + (height - char_height) / 2, buf);
         }
     }
 

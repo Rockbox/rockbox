@@ -93,7 +93,7 @@ void gui_synclist_scroll_stop(struct gui_synclist *lists)
 static bool draw_title(struct screen *display, struct gui_synclist *list)
 {
     const int screen = display->screen_type;
-    int style = STYLE_DEFAULT;
+    int style = STYLE_SCROLLED;
     struct viewport *title_text_vp = &title_text[screen];
 
     if (sb_set_title_text(list->title, list->title_icon, screen))
@@ -131,7 +131,7 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
     }
 #endif
     display->set_viewport(title_text_vp);
-    display->puts_scroll_style(0, 0, list->title, style);
+    display->xprintf(0, 0, 0, style, list->title);
     return true;
 }
 
@@ -313,26 +313,19 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             }
 #endif
             /* if the text is smaller than the viewport size */
-            if (item_offset> item_width - (list_text_vp->width - text_pos))
-            {
-                /* don't scroll */
-                display->puts_style_xyoffset(0, line, entry_name,
-                        style, item_offset, draw_offset);
-            }
-            else
-            {
-                display->puts_scroll_style_xyoffset(0, line, entry_name,
-                        style, item_offset, draw_offset);
-            }
+            if (item_offset <= item_width - (list_text_vp->width - text_pos))
+                style |= STYLE_SCROLLED;
+
+            display->xprintf(0, line * line_height + draw_offset,
+                             item_offset, style, entry_name);
         }
         else
         {
             if (list->scroll_all)
-                display->puts_scroll_style_xyoffset(0, line, entry_name,
-                        style, item_offset, draw_offset);
-            else
-                display->puts_style_xyoffset(0, line, entry_name,
-                        style, item_offset, draw_offset);
+                style |= STYLE_SCROLLED;
+
+            display->xprintf(0, line * line_height + draw_offset,
+                             item_offset, style, entry_name);
         }
         /* do the icon */
         display->set_viewport(&list_icons);

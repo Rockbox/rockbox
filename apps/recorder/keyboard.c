@@ -911,7 +911,7 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
                 *utf8 = 0;
 
                 sc->getstringsize(outline, &w, &h);
-                sc->putsxy(i*pm->font_w + (pm->font_w-w) / 2,
+                sc->printf(i*pm->font_w + (pm->font_w-w) / 2,
                            j*pm->font_h + (pm->font_h-h) / 2, outline);
             }
         }
@@ -956,7 +956,7 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
         j = utf8seek(utf8, 1);
         strlcpy(outline, utf8, j+1);
         sc->getstringsize(outline, &w, NULL);
-        sc->putsxy(text_margin + i*pm->text_w + (pm->text_w-w)/2,
+        sc->printf(text_margin + i*pm->text_w + (pm->text_w-w)/2,
                    pm->main_y, outline);
         utf8 += j;
         i++;
@@ -975,7 +975,7 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
         else
         {
             sc->getstringsize("<", &w, NULL);
-            sc->putsxy(text_margin - w, pm->main_y, "<");
+            sc->printf(text_margin - w, pm->main_y, "<");
         }
     }
 
@@ -990,7 +990,7 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
         }
         else
         {
-            sc->putsxy(sc_w - text_margin, pm->main_y, ">");
+            sc->printf(sc_w - text_margin, pm->main_y, ">");
         }
     }
 
@@ -1033,7 +1033,7 @@ static void kbd_draw_buttons(struct keyboard_parameters *pm, struct screen *sc)
         /* button to flip page. */
         vp.y = pm->lines*pm->font_h;
         sc->hline(0, sc_w - 1, 0);
-        sc->putsxy(0, text_y, ">");
+        sc->printf(0, text_y, ">");
     }
     /* OK/Del/Cancel buttons */
     button_h = MAX(MIN_GRID_SIZE*2, button_h);
@@ -1042,13 +1042,13 @@ static void kbd_draw_buttons(struct keyboard_parameters *pm, struct screen *sc)
     vp.height = button_h;
     sc->hline(0, sc_w - 1, 0);
     vp.width = sc_w/3;
-    sc->putsxy(0, text_y, str(LANG_KBD_OK));
+    sc->printf(0, text_y, str(LANG_KBD_OK));
     vp.x += vp.width;
     sc->vline(0, 0, button_h);
-    sc->putsxy(0, text_y, str(LANG_KBD_DELETE));
+    sc->printf(0, text_y, str(LANG_KBD_DELETE));
     vp.x += vp.width;
     sc->vline(0, 0, button_h);
-    sc->putsxy(0, text_y, str(LANG_KBD_CANCEL));
+    sc->printf(0, text_y, str(LANG_KBD_CANCEL));
     sc->set_viewport(NULL);
 }
 

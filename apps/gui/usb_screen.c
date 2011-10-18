@@ -214,13 +214,11 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 #ifdef USB_ENABLE_HID
             if (usb_hid)
             {
-                char modestring[100];
                 screen->set_viewport(&usb_screen_vps->title);
                 usb_screen_vps->title.flags |= VP_FLAG_ALIGN_CENTER;
-                snprintf(modestring, sizeof(modestring), "%s: %s",
-                        str(LANG_USB_KEYPAD_MODE),
-                        str(keypad_mode_name_get()));
-                screen->puts_scroll(0, 0, modestring);
+                screen->xprintf(0,0,0,STYLE_SCROLLED, "%s: %s",
+                                str(LANG_USB_KEYPAD_MODE),
+                                str(keypad_mode_name_get()));
             }
 #endif /* USB_ENABLE_HID */
         }
@@ -228,7 +226,7 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 
 #else /* HAVE_LCD_BITMAP */
         screen->double_height(false);
-        screen->puts_scroll(0, 0, "[USB Mode]");
+        screen->printf(0, 0, "[USB Mode]");
         status_set_param(false);
         status_set_audio(false);
         status_set_usb(true);

@@ -185,13 +185,8 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 
     /* print the message to screen */
     for (i = 0; i <= line; i++, y+=h)
-    {
-#ifdef HAVE_LCD_BITMAP
-        screen->putsxy(0, y, lines[i]);
-#else
-        screen->puts(0, y, lines[i]);
-#endif
-    }
+        screen->printf(0, y, lines[i]);
+
     screen->update_viewport();
 end:
     screen->set_viewport(NULL);

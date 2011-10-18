@@ -191,8 +191,9 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
         d = str(LANG_UNKNOWN);
     }
 
-    display->puts(0, line++, t);
-    display->puts(0, line, d);
+    int lh = display->getcharheight();
+    display->printf(0, line++ * lh, t);
+    display->printf(0, line * lh, d);
 
     display->update_viewport();
     display->set_viewport(NULL);

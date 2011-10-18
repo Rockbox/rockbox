@@ -57,6 +57,7 @@
 #include "yesno.h"
 #include "viewport.h"
 #include "list.h"
+#include "appevents.h"
 
 #include "debug.h"
 
@@ -667,6 +668,11 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             /* not supported yet, needs to be done in the WPS */
             return 0;
 #endif
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+        case SYS_SCREEN_CHANGED:
+            send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+            break;
+#endif
     }
     return 0;
 }
@@ -689,7 +695,7 @@ int show_logo( void )
     /* display the logo in the blue area of the screen */
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
-    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
+    lcd_printf((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
                0, (unsigned char *)version);
     lcd_bitmap(rockboxlogo, (LCD_WIDTH - BMPWIDTH_rockboxlogo) / 2, 16,
             BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
@@ -698,7 +704,7 @@ int show_logo( void )
             BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
-    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
+    lcd_printf((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
                LCD_HEIGHT-font_h, (unsigned char *)version);
 #endif
     lcd_setfont(FONT_UI);
@@ -708,8 +714,8 @@ int show_logo( void )
 
     lcd_clear_display();
     lcd_double_height(true);
-    lcd_puts(0, 0, rockbox);
-    lcd_puts_scroll(0, 1, rbversion);
+    lcd_printf(0, 0, rockbox);
+    lcd_xprintf(0, 1, 0, STYLE_SCROLLED, rbversion);
 #endif
     lcd_update();
 
@@ -719,7 +725,7 @@ int show_logo( void )
                       BMPHEIGHT_remote_rockboxlogo);
     lcd_remote_setfont(FONT_SYSFIXED);
     lcd_remote_getstringsize((unsigned char *)"A", &font_w, &font_h);
-    lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
+    lcd_remote_printf((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
                        LCD_REMOTE_HEIGHT-font_h, (unsigned char *)version);
     lcd_remote_setfont(FONT_UI);
     lcd_remote_update();

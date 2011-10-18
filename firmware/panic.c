@@ -71,14 +71,15 @@ void panicf( const char *fmt, ...)
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
     lcd_set_viewport(NULL);
-    lcd_puts(1, y++, (unsigned char *)"*PANIC*");
+    int lh = font_get(lcd_getfont())->height;
+    lcd_printf(1, y++ * lh, (unsigned char *)"*PANIC*");
     {
         /* wrap panic line */
         int i, len = strlen(panic_buf);
         for (i=0; i<len; i+=LINECHARS) {
             unsigned char c = panic_buf[i+LINECHARS];
             panic_buf[i+LINECHARS] = 0;
-            lcd_puts(1, y++, (unsigned char *)panic_buf+i);
+            lcd_printf(1, y++ * lh, (unsigned char *)panic_buf+i);
             panic_buf[i+LINECHARS] = c;
         }
     }

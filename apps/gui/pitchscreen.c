@@ -247,8 +247,8 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
         /* two arrows in the top row, left and right column */
         char *arrows[] = { "<", ">"};
         display->getstringsize(arrows[0], &w, &h);
-        display->putsxy(0, vp->height/2 - h/2, arrows[0]);
-        display->putsxy(vp->width - w, vp->height/2 - h/2, arrows[1]);
+        display->printf(0, vp->height/2 - h/2, arrows[0]);
+        display->printf(vp->width - w, vp->height/2 - h/2, arrows[1]);
 #endif
         /* UP: Pitch Up */
         if (global_settings.pitch_mode_semitone)
@@ -258,7 +258,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
 
         display->getstringsize(ptr, &w, NULL);
         /* draw text */
-        display->putsxy(vp->width/2 - w/2, 0, ptr);
+        display->printf(vp->width/2 - w/2, 0, ptr);
         display->update_viewport();
 
         /* DOWN: Pitch Down */
@@ -270,9 +270,9 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
         ptr = str(LANG_KBD_OK);
         display->getstringsize(ptr, &w, &h);
         /* one OK in the middle first column of the vp (at half height) */
-        display->putsxy(vp->width/6 - w/2, vp->height/2 - h/2, ptr);
+        display->printf(vp->width/6 - w/2, vp->height/2 - h/2, ptr);
         /* one OK in the middle of the last column of the vp (at half height) */
-        display->putsxy(5*vp->width/6 - w/2, vp->height/2 - h/2, ptr);
+        display->printf(5*vp->width/6 - w/2, vp->height/2 - h/2, ptr);
 #endif
         if (global_settings.pitch_mode_semitone)
             ptr = str(LANG_PITCH_DOWN_SEMITONE);
@@ -280,7 +280,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
             ptr = str(LANG_PITCH_DOWN);
         display->getstringsize(ptr, &w, &h);
         /* draw text */
-        display->putsxy(vp->width/2 - w/2, vp->height - h, ptr);
+        display->printf(vp->width/2 - w/2, vp->height - h, ptr);
         display->update_viewport();
     }
 
@@ -320,7 +320,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
             snprintf(buf, sizeof(buf), "%s:", str(LANG_PLAYBACK_RATE));
         }
         display->getstringsize(buf, &w, &h);
-        display->putsxy((pitch_viewports[PITCH_MID].width  / 2) - (w / 2),
+        display->printf((pitch_viewports[PITCH_MID].width  / 2) - (w / 2),
                         (pitch_viewports[PITCH_MID].height / 2) - h, buf);
         if (w > width_used)
             width_used = w;
@@ -356,7 +356,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     }
 
     display->getstringsize(buf, &w, &h);
-    display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
+    display->printf((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
         show_lang_pitch ? (pitch_viewports[PITCH_MID].height / 2) : 
                           (pitch_viewports[PITCH_MID].height / 2) - (h / 2), 
         buf);
@@ -370,7 +370,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
         {
             const char * const p = str(LANG_STRETCH_LIMIT);
             display->getstringsize(p, &w, &h);
-            display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
+            display->printf((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
                             (pitch_viewports[PITCH_MID].height / 2) + h, p);
             if (w > width_used)
                 width_used = w;
@@ -396,9 +396,9 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
 
     if (width_used <= pitch_viewports[PITCH_MID].width)
     {
-        display->putsxy(0, (pitch_viewports[PITCH_MID].height / 2) - (h / 2),
+        display->printf(0, (pitch_viewports[PITCH_MID].height / 2) - (h / 2),
                         leftlabel);
-        display->putsxy((pitch_viewports[PITCH_MID].width - w), 
+        display->printf((pitch_viewports[PITCH_MID].width - w), 
                         (pitch_viewports[PITCH_MID].height / 2) - (h / 2), 
                         rightlabel);
     }

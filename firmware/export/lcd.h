@@ -120,6 +120,7 @@ enum screen_type {
                                         (h)):STRIDE_REMOTE((w),(h)))
 
 #define STYLE_DEFAULT    0x00000000
+#define STYLE_SCROLLED   0x01000000
 #define STYLE_COLORED    0x10000000
 #define STYLE_INVERT     0x20000000
 #define STYLE_COLORBAR   0x40000000
@@ -191,24 +192,12 @@ extern void lcd_update(void);
 extern void lcd_update_viewport(void);
 extern void lcd_clear_viewport(void);
 extern void lcd_clear_display(void);
-extern void lcd_putsxy(int x, int y, const unsigned char *string);
-extern void lcd_putsxyf(int x, int y, const unsigned char *fmt, ...);
-extern void lcd_putsxy_style_offset(int x, int y, const unsigned char *str,
-                                    int style, int offset);
-extern void lcd_puts(int x, int y, const unsigned char *string);
-extern void lcd_putsf(int x, int y, const unsigned char *fmt, ...);
-extern void lcd_puts_style(int x, int y, const unsigned char *string, int style);
-extern void lcd_puts_offset(int x, int y, const unsigned char *str, int offset);
-extern void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
-                                  int offset);
-extern void lcd_putc(int x, int y, unsigned long ucs);
+extern void lcd_printf(int x, int y, const unsigned char *fmt, ...);
+extern void lcd_xprintf(int x, int y, int xcrop, unsigned int flags, const unsigned char *fmt, ...);
 extern void lcd_stop_scroll(void);
 extern void lcd_bidir_scroll(int threshold);
 extern void lcd_scroll_speed(int speed);
 extern void lcd_scroll_delay(int ms);
-extern void lcd_puts_scroll(int x, int y, const unsigned char* string);
-extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
-                                  int style);
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -487,15 +476,6 @@ extern void lcd_set_drawmode(int mode);
 extern int  lcd_get_drawmode(void);
 extern void lcd_setfont(int font);
 extern int lcd_getfont(void);
-
-extern void lcd_puts_style_offset(int x, int y, const unsigned char *str,
-                                  int style, int x_offset);
-extern void lcd_puts_style_xyoffset(int x, int y, const unsigned char *str,
-                                  int style, int x_offset, int y_offset);
-extern void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
-                                  int style, int x_offset);
-extern void lcd_puts_scroll_style_xyoffset(int x, int y, const unsigned char *string,
-                                  int style, int x_offset, int y_offset);
 
 /* low level drawing function pointer arrays */
 #if LCD_DEPTH >= 8

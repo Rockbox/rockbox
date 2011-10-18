@@ -436,7 +436,7 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
         snprintf(buffer, sizeof(buffer), "%3d", percent);
         display->getstringsize(buffer, &width, &height);
         if (height <= STATUSBAR_HEIGHT)
-            display->putsxy(STATUSBAR_BATTERY_X_POS
+            display->printf(STATUSBAR_BATTERY_X_POS
                              + STATUSBAR_BATTERY_WIDTH / 2
                              - width/2, STATUSBAR_Y_POS, buffer);
         display->setfont(FONT_UI);
@@ -467,7 +467,7 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
 
     if (percent == -1) {
         display->setfont(FONT_SYSFIXED);
-        display->putsxy(STATUSBAR_BATTERY_X_POS + STATUSBAR_BATTERY_WIDTH / 2
+        display->printf(STATUSBAR_BATTERY_X_POS + STATUSBAR_BATTERY_WIDTH / 2
                          - 4, STATUSBAR_Y_POS, "?");
         display->setfont(FONT_UI);
     }
@@ -519,7 +519,7 @@ static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
             display->getstringsize(buffer, &width, &height);
             if (height <= STATUSBAR_HEIGHT)
             {
-                display->putsxy(STATUSBAR_VOLUME_X_POS
+                display->printf(STATUSBAR_VOLUME_X_POS
                                  + STATUSBAR_VOLUME_WIDTH / 2
                                  - width/2, STATUSBAR_Y_POS, buffer);
             }
@@ -631,7 +631,7 @@ static void gui_statusbar_time(struct screen * display, struct tm *time)
     display->setfont(FONT_SYSFIXED);
     display->getstringsize(p, &width, &height);
     if (height <= STATUSBAR_HEIGHT) {
-        display->putsxy(STATUSBAR_TIME_X_END(display->getwidth()) - width,
+        display->printf(STATUSBAR_TIME_X_END(display->getwidth()) - width,
                         STATUSBAR_Y_POS, p);
     }
     display->setfont(FONT_UI);
@@ -754,7 +754,7 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
     snprintf(buffer, sizeof(buffer), "%d", global_settings.rec_quality);
     display->getstringsize(buffer, &width, &height);
     if (height <= STATUSBAR_HEIGHT)
-        display->putsxy(STATUSBAR_ENCODER_X_POS + 13, STATUSBAR_Y_POS, buffer);
+        display->printf(STATUSBAR_ENCODER_X_POS + 13, STATUSBAR_Y_POS, buffer);
 #endif /* CONFIG_CODEC == SWCODEC */
 
     /* Display Samplerate info in statusbar */
@@ -780,7 +780,7 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
     display->getstringsize(p, &width, &height);
 
     if (height <= STATUSBAR_HEIGHT)
-        display->putsxy(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, p);
+        display->printf(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, p);
 
     display->setfont(FONT_UI);
 #endif /* CONFIG_CODEC == SWCODEC */

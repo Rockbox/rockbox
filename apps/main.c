@@ -313,7 +313,7 @@ static void init_tagcache(void)
             }
 #else
             lcd_double_height(false);
-            lcd_putsf(0, 1, " DB [%d/%d]", ret, 
+            lcd_printf(0, 1, " DB [%d/%d]", ret, 
                 tagcache_get_max_commit_step());
             lcd_update();
 #endif
@@ -546,8 +546,8 @@ static void init(void)
     {
 #ifdef HAVE_LCD_BITMAP
         lcd_clear_display();
-        lcd_putsf(0, 1, "ATA error: %d", rc);
-        lcd_puts(0, 3, "Press ON to debug");
+        lcd_printf(0, SYSFONT_HEIGHT, "ATA error: %d", rc);
+        lcd_printf(0, 3*SYSFONT_HEIGHT, "Press ON to debug");
         lcd_update();
         while(!(button_get(true) & BUTTON_REL)); /* DO NOT CHANGE TO ACTION SYSTEM */
         dbg_ports();
@@ -592,12 +592,13 @@ static void init(void)
         CHART("<disk_mount_all");
         if (rc<=0)
         {
+            const int h = SYSFONT_HEIGHT;
             lcd_clear_display();
-            lcd_puts(0, 0, "No partition");
-            lcd_puts(0, 1, "found.");
+            lcd_printf(0, 0, "No partition");
+            lcd_printf(0, h, "found.");
 #ifdef HAVE_LCD_BITMAP
-            lcd_puts(0, 2, "Insert USB cable");
-            lcd_puts(0, 3, "and fix it.");
+            lcd_printf(0, 2*h, "Insert USB cable");
+            lcd_printf(0, 3*h, "and fix it.");
 #endif
             lcd_update();
 

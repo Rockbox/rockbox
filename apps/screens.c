@@ -460,11 +460,11 @@ bool set_time_screen(const char* title, struct tm *tm)
             screen->set_viewport(vp);
             screen->clear_viewport();
             /* display the screen title */
-            screen->puts_scroll(0, 0, title);
+            screen->xprintf(0, 0, 0, STYLE_SCROLLED, title);
 
             /* these are not selectable, so we draw them outside the loop */
             /* name of the week day */
-            screen->putsxy(0, cursor[3][INDEX_Y],
+            screen->printf(0, cursor[3][INDEX_Y],
                               str(LANG_WEEKDAY_SUNDAY + tm->tm_wday));
 
             pos = lang_is_rtl() ? rtl_idx[cursorpos] : cursorpos;
@@ -476,20 +476,21 @@ bool set_time_screen(const char* title, struct tm *tm)
                 if (pos == (int)i)
                     vp->drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
 
-                screen->putsxy(cursor[i][INDEX_X],
+                screen->printf(cursor[i][INDEX_X],
                                   cursor[i][INDEX_Y], ptr[i]);
 
                 vp->drawmode = DRMODE_SOLID;
 
-                screen->putsxy(cursor[i/4 +1][INDEX_X] - separator_width,
+                screen->printf(cursor[i/4 +1][INDEX_X] - separator_width,
                                   cursor[0][INDEX_Y], SEPARATOR);
             }
 
             /* print help text */
+            int lh = screen->getcharheight();
             if (nb_lines > 4)
-                screen->puts(0, 4, str(LANG_TIME_SET_BUTTON));
+                screen->printf(0, 4*lh, str(LANG_TIME_SET_BUTTON));
             if (nb_lines > 5)
-                screen->puts(0, 5, str(LANG_TIME_REVERT));
+                screen->printf(0, 5*lh, str(LANG_TIME_REVERT));
             screen->update_viewport();
             screen->set_viewport(NULL);
         }

@@ -585,13 +585,8 @@ void write_line(struct screen *display, struct align_pos *format_align,
                    (center_width > scroll_width) ||
                    (right_width > scroll_width)))
     {
-#ifdef HAVE_LCD_BITMAP
-        display->puts_scroll_style(0, line,
-                             (unsigned char *)format_align->left, style);
-#else
-        display->puts_scroll(0, line,
-                             (unsigned char *)format_align->left);
-#endif
+        display->xprintf(0, line * string_height, 0, style | STYLE_SCROLLED,
+                         format_align->left);
     }
     else
     {
@@ -604,42 +599,22 @@ void write_line(struct screen *display, struct align_pos *format_align,
 
         /* Nasty hack: we output an empty scrolling string,
         which will reset the scroller for that line */
-        display->puts_scroll(0, line, (unsigned char *)"");
-#ifdef HAVE_LCD_BITMAP
+        display->xprintf(0, line * string_height, 0, STYLE_SCROLLED,
+                         "");
         /* print aligned strings */
+        
+        int xpos = 0;
         if (left_width != 0)
-        {
-            display->puts_style_xyoffset(left_xpos/space_width, line,
-                            (unsigned char *)format_align->left, style, 0, 0);
+            xpos = left_xpos/space_width;
+        else
+            if (center_width != 0)
+                xpos = center_xpos;
+            else
+                if (right_width != 0)
+                    xpos = right_xpos;
 
-        }
-        if (center_width != 0)
-        {
-            display->puts_style_xyoffset(center_xpos/space_width, line,
-                            (unsigned char *)format_align->center, style, 0, 0);
-        }
-        if (right_width != 0)
-        {
-            display->puts_style_xyoffset(right_xpos/space_width, line,
-                            (unsigned char *)format_align->right, style, 0, 0);
-        }
-#else
-        if (left_width != 0)
-        {
-            display->putsxy(left_xpos, line,
-                    (unsigned char *)format_align->left);
-        }
-        if (center_width != 0)
-        {
-            display->putsxy(center_xpos, line,
-                    (unsigned char *)format_align->center);
-        }
-        if (right_width != 0)
-        {
-            display->putsxy(right_xpos, line,
-                    (unsigned char *)format_align->right);
-        }
-#endif
+        display->xprintf(xpos, line * string_height,
+                         0, style, format_align->left);
     }
 }
 

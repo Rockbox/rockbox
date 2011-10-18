@@ -279,14 +279,14 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
 
     /* Print out the band label */
     if (band == 0) {
-        screen->putsxy(x1, y1, "LS: ");
+        screen->printf(x1, y1, "LS: ");
         screen->getstringsize("LS:", &w, &h);
     } else if (band == 4) {
-        screen->putsxy(x1, y1, "HS: ");
+        screen->printf(x1, y1, "HS: ");
         screen->getstringsize("HS:", &w, &h);
     } else {
         snprintf(buf, sizeof(buf),  "PK%d:", band);
-        screen->putsxy(x1, y1, buf);
+        screen->printf(x1, y1, buf);
         screen->getstringsize(buf, &w, &h);
     }
 
@@ -302,7 +302,7 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
     snprintf(buf, sizeof(buf), "%s%2d.%d%s", gain < 0 ? "-" : " ",
         abs_gain / EQ_USER_DIVISOR, abs_gain % EQ_USER_DIVISOR,
         screen->lcdwidth >= 160 ? "dB" : "");
-    screen->putsxy(x1, y1, buf);
+    screen->printf(x1, y1, buf);
     screen->getstringsize(buf, &w, &h);
     x1 += w;
 
@@ -316,7 +316,7 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
              q % EQ_USER_DIVISOR, screen->lcdwidth >= 160 ? " Q" : "");
     screen->getstringsize(buf, &w, &h);
     x2 = x + width - w - 2;
-    screen->putsxy(x2, y1, buf);
+    screen->printf(x2, y1, buf);
 
     /* Print out cutoff part of status line (center between gain & Q) */
     if (mode == CUTOFF && selected)
@@ -328,7 +328,7 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
              screen->lcdwidth >= 160 ? "Hz" : "");
     screen->getstringsize(buf, &w, &h);
     x1 = x1 + (x2 - x1 - w)/2;
-    screen->putsxy(x1, y1, buf);
+    screen->printf(x1, y1, buf);
 
     /* Draw selection box */
     total_height = 3 + h + 1 + SCROLLBAR_SIZE + 3;
@@ -440,7 +440,7 @@ bool eq_menu_graphical(void)
                 snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                          str(LANG_SYSFONT_GAIN), "(dB)");
 
-                screens[i].putsxy(0, 0, buf);
+                screens[i].printf(0, 0, buf);
             } else if (mode == CUTOFF) {
                 /* cutoff */
                 setting = &global_settings.eq_band0_cutoff;
@@ -454,7 +454,7 @@ bool eq_menu_graphical(void)
                 snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                          str(LANG_SYSFONT_EQUALIZER_BAND_CUTOFF), "(Hz)");
 
-                screens[i].putsxy(0, 0, buf);
+                screens[i].printf(0, 0, buf);
             } else {
                 /* Q */
                 setting = &global_settings.eq_band0_q;
@@ -468,7 +468,7 @@ bool eq_menu_graphical(void)
                 snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                          str(LANG_EQUALIZER_BAND_Q), "");
 
-                screens[i].putsxy(0, 0, buf);
+                screens[i].printf(0, 0, buf);
             }
 
             /* Draw scrollbar if needed */

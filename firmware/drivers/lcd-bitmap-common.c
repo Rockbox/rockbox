@@ -240,30 +240,14 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
     }
 }
 
-/* put a string at a given pixel position */
-void LCDFN(putsxy)(int x, int y, const unsigned char *str)
-{
-    LCDFN(putsxyofs)(x, y, 0, str);
-}
-
-/* Formatting version of LCDFN(putsxy) */
-void LCDFN(putsxyf)(int x, int y, const unsigned char *fmt, ...)
-{
-    va_list ap;
-    char buf[256];
-    va_start(ap, fmt);
-    vsnprintf(buf, sizeof (buf), fmt, ap);
-    va_end(ap);
-    LCDFN(putsxy)(x, y, buf);
-}
-
-static void LCDFN(putsxyofs_style)(int xpos, int ypos,
-                                   const unsigned char *str, int style,
-                                   int h, int offset)
+static void LCDFN(puts_style)(int xpos, int ypos, int offset,
+                              unsigned int style,
+                              const unsigned char *str)
 {
     int lastmode = current_vp->drawmode;
     int text_ypos = ypos;
     int line_height = font_get(current_vp->font)->height;
+    int h = current_vp->line_height ?: (int)font_get(current_vp->font)->height;
     text_ypos += h/2 - line_height/2; /* center the text in the line */
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
     int oldfgcolor = current_vp->fg_pattern;
@@ -309,59 +293,12 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
     current_vp->drawmode = lastmode;
 }
 
-/*** Line oriented text output ***/
-
-/* put a string at a given char position */
-void LCDFN(puts_style_xyoffset)(int x, int y, const unsigned char *str,
-                              int style, int x_offset, int y_offset)
-{
-    int xpos, ypos, h;
-    LCDFN(scroll_stop_line)(current_vp, y);
-    if(!str)
-        return;
-
-    h = current_vp->line_height ?: (int)font_get(current_vp->font)->height;
-    xpos = x * LCDFN(getstringsize)(" ", NULL, NULL);
-    ypos = y * h + y_offset;
-    LCDFN(putsxyofs_style)(xpos, ypos, str, style, h, x_offset);
-}
-
-void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
-                              int style, int x_offset)
-{
-    LCDFN(puts_style_xyoffset)(x, y, str, style, x_offset, 0);
-}
-
-void LCDFN(puts)(int x, int y, const unsigned char *str)
-{
-    LCDFN(puts_style_offset)(x, y, str, STYLE_DEFAULT, 0);
-}
-
-/* Formatting version of LCDFN(puts) */
-void LCDFN(putsf)(int x, int y, const unsigned char *fmt, ...)
-{
-    va_list ap;
-    char buf[256];
-    va_start(ap, fmt);
-    vsnprintf(buf, sizeof (buf), fmt, ap);
-    va_end(ap);
-    LCDFN(puts)(x, y, buf);
-}
-
-void LCDFN(puts_style)(int x, int y, const unsigned char *str, int style)
-{
-    LCDFN(puts_style_offset)(x, y, str, style, 0);
-}
-
-void LCDFN(puts_offset)(int x, int y, const unsigned char *str, int offset)
-{
-    LCDFN(puts_style_offset)(x, y, str, STYLE_DEFAULT, offset);
-}
-
 /*** scrolling ***/
 
-void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string,
-                                     int style, int x_offset, int y_offset)
+static void LCDFN(puts_scroll_style)(int x, int y,
+                                     int xcrop,
+                                     int style,
+                                     const unsigned char *string)
 {
     struct scrollinfo* s;
     char *end;
@@ -377,7 +314,7 @@ void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string
     if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES)) return;
     if (!string)
         return;
-    LCDFN(puts_style_xyoffset)(x, y, string, style, x_offset, y_offset);
+    LCDFN(puts_style)(x, y, xcrop, style, string);
 
     LCDFN(getstringsize)(string, &w, &h);
 
@@ -419,29 +356,32 @@ void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string
 
     s->vp = current_vp;
     s->y = y;
-    s->offset = x_offset;
+    s->offset = xcrop;
     s->startx = x * LCDFN(getstringsize)(" ", NULL, NULL);
-    s->y_offset = y_offset;
     s->backward = false;
 
     LCDFN(scroll_info).lines++;
 }
 
-void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
+void LCDFN(printf)(int x, int y, const unsigned char *fmt, ...)
 {
-    LCDFN(puts_scroll_style)(x, y, string, STYLE_DEFAULT);
+    va_list ap;
+    char buf[256];
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof (buf), fmt, ap);
+    va_end(ap);
+    LCDFN(putsxyofs)(x, y, 0, buf);
 }
 
-void LCDFN(puts_scroll_style)(int x, int y, const unsigned char *string,
-                              int style)
+void LCDFN(xprintf)(int x, int y, int xcrop, unsigned int style,
+                    const unsigned char *fmt, ...)
 {
-     LCDFN(puts_scroll_style_offset)(x, y, string, style, 0);
-}
-
-void LCDFN(puts_scroll_offset)(int x, int y, const unsigned char *string,
-                               int offset)
-{
-     LCDFN(puts_scroll_style_offset)(x, y, string, STYLE_DEFAULT, offset);
+    va_list ap;
+    char buf[256];
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof (buf), fmt, ap);
+    va_end(ap);
+    LCDFN(puts_scroll_style)(x, y, xcrop, style, buf);
 }
 
 void LCDFN(scroll_fn)(void)
@@ -497,14 +437,8 @@ void LCDFN(scroll_fn)(void)
             s->start_tick = current_tick + LCDFN(scroll_info).delay +
                     LCDFN(scroll_info).ticks;
 
-        LCDFN(putsxyofs_style)(xpos, ypos, s->line, s->style, height, s->offset);
+        LCDFN(puts_scroll_style)(xpos, ypos, s->offset, s->style, s->line);
         LCDFN(update_viewport_rect)(xpos, ypos, current_vp->width-xpos, height);
     }
     LCDFN(set_viewport)(old_vp);
-}
-
-void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
-                                     int style, int x_offset)
-{
-    LCDFN(puts_scroll_style_xyoffset)(x, y, string, style, x_offset, 0);
 }

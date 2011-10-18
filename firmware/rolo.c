@@ -20,8 +20,6 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "lcd.h"
-#include "lcd-remote.h"
 #include "thread.h"
 #include "kernel.h"
 #include "button.h"
@@ -34,6 +32,7 @@
 #include "core_alloc.h"
 #include "storage.h"
 #include "rolo.h"
+#include "screen_access.h"
 
 #ifdef MI4_FORMAT
 #include "crc32-mi4.h"
@@ -100,15 +99,16 @@ void rolo_restart_cop(void)
 
 static void rolo_error(const char *text)
 {
+    struct screen* s = &screens[0];
     rolo_handle = core_free(rolo_handle);
-    lcd_clear_display();
-    lcd_puts(0, 0, "ROLO error:");
-    lcd_puts_scroll(0, 1, text);
-    lcd_update();
+    s->clear_display();
+    s->printf(0, 0, "ROLO error:");
+    s->xprintf(0, s->getcharheight(), 0, STYLE_SCROLLED, text);
+    s->update();
     button_get(true);
     button_get(true);
     button_get(true);
-    lcd_stop_scroll();
+    s->stop_scroll();
 }
 
 #if CONFIG_CPU == SH7034 || CONFIG_CPU == IMX31L
@@ -217,17 +217,16 @@ int rolo_load(const char* filename)
     unsigned char* ramstart = (void*)&loadaddress;
     unsigned char* filebuf;
     size_t filebuf_size;
+    struct screen* s = &screens[0];
+    const int h = s->getcharheight();
 
-    lcd_clear_display();
-    lcd_puts(0, 0, "ROLO...");
-    lcd_puts(0, 1, "Loading");
-    lcd_update();
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_clear_display();
-    lcd_remote_puts(0, 0, "ROLO...");
-    lcd_remote_puts(0, 1, "Loading");
-    lcd_remote_update();
-#endif
+    FOR_NB_SCREENS(i) {
+        struct screen* ss = &screens[i];
+        ss->clear_display();
+        ss->printf(0, 0, "ROLO...");
+        ss->printf(0, s->getcharheight(), "Loading");
+        ss->update();
+    }
 
     audio_stop();
 
@@ -258,13 +257,13 @@ int rolo_load(const char* filename)
 #endif
 
 #if defined(CPU_PP) && NUM_CORES > 1
-    lcd_puts(0, 2, "Waiting for coprocessor...");
-    lcd_update();
+    s->printf(0, 2*h, "Waiting for coprocessor...");
+    s->update();
     rolo_restart_cop();
     /* Wait for COP to be in safe code */
     while(cpu_reply != 1);
-    lcd_puts(0, 2, "                          ");
-    lcd_update();
+    s->printf(0, 2*h, "                          ");
+    s->update();
 #endif
 
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
@@ -300,17 +299,15 @@ int rolo_load(const char* filename)
     }
 
 #ifdef HAVE_STORAGE_FLUSH
-    lcd_puts(0, 1, "Flushing storage buffers");
-    lcd_update();
+    s->printf(0, h, "Flushing storage buffers");
+    s->update();
     storage_flush();
 #endif
 
-    lcd_puts(0, 1, "Executing");
-    lcd_update();
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_puts(0, 1, "Executing");
-    lcd_remote_update();
-#endif
+    FOR_NB_SCREENS(i) {
+        screens[i].printf(0, h, "Executing");
+        screens[i].update();
+    }
     adc_close();
 
 #if CONFIG_CPU != IMX31L /* We're not finished yet */
@@ -355,8 +352,8 @@ int rolo_load(const char* filename)
         return -1;
     }
 
-    lcd_puts(0, 1, "Descramble");
-    lcd_update();
+    s->printf(0, h, "Descramble");
+    s->update();
 
     checksum = descramble(filebuf + length, filebuf, length);
 
@@ -367,13 +364,13 @@ int rolo_load(const char* filename)
     }
 
 #ifdef HAVE_STORAGE_FLUSH
-    lcd_puts(0, 1, "Flushing      ");
-    lcd_update();
+    s->printf(0, h, "Flushing      ");
+    s->update();
     storage_flush();
 #endif
 
-    lcd_puts(0, 1, "Executing     ");
-    lcd_update();
+    s->printf(0, h, "Executing     ");
+    s->update();
 
     set_irq_level(HIGHEST_IRQ_LEVEL);
 

@@ -174,6 +174,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     int temp;
     display->set_viewport(parent);
     display->clear_viewport();
+    int lh = display->getcharheight();
     
     for (i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
     {
@@ -189,14 +190,12 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
 
         if (viewport_get_nb_lines(vp) < 2)
         {
-            char text[MAX_PATH];
-            snprintf(text, MAX_PATH, "%s: %s", title, value);
-            display->puts_scroll(0, 0, text);
+            display->xprintf(0, 0, 0, STYLE_SCROLLED, "%s: %s", title, value);
         }
         else
         {
-            display->puts_scroll(0, 0, title);
-            display->puts_scroll(0, 1, value);
+            display->xprintf(0, 0, 0, STYLE_SCROLLED, title);
+            display->xprintf(0, lh, 0, STYLE_SCROLLED, value);
         }
     }
     /* draw the icons */

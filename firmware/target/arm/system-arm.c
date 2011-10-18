@@ -45,13 +45,14 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     lcd_set_background(LCD_WHITE);
 #endif
     unsigned line = 0;
+    const int h = SYSFONT_HEIGHT;
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_set_viewport(NULL);
     lcd_clear_display();
-    lcd_puts(0, line++, uiename[num]);
-    lcd_putsf(0, line++, "at %08x" IF_COP(" (%d)"), pc
-             IF_COP(, CURRENT_CORE));
+    lcd_printf(0, line++ * h, uiename[num]);
+    lcd_printf(0, line++ * h, "at %08x" IF_COP(" (%d)"), pc
+               IF_COP(, CURRENT_CORE));
 
 #if !defined(CPU_ARM7TDMI) && (CONFIG_CPU != RK27XX) /* arm7tdmi has no MPU/MMU */
     if(num == 1 || num == 2) /* prefetch / data abort */
@@ -66,23 +67,23 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
 #endif
             asm volatile( "mrc p15, 0, %0, c5, c0, 0\n" : "=r"(status));
 
-        lcd_putsf(0, line++, "FSR 0x%x", status);
+        lcd_printf(0, line++ * h, "FSR 0x%x", status);
 
         unsigned int domain = (status >> 4) & 0xf;
         unsigned int fault = status & 0xf;
 #if ARM_ARCH >= 6
         fault |= (status & (1<<10)) >> 6; /* fault is 5 bits on armv6 */
 #endif
-        lcd_putsf(0, line++, "(domain %d, fault %d)", domain, fault);
+        lcd_printf(0, line++ * h, "(domain %d, fault %d)", domain, fault);
 
         if(num == 2) /* data abort */
         {
             register unsigned address;
             /* read FAR (fault address register) */
             asm volatile( "mrc p15, 0, %0, c6, c0\n" : "=r"(address));
-            lcd_putsf(0, line++, "address 0x%8x", address);
+            lcd_printf(0, line++ * h, "address 0x%8x", address);
 #if ARM_ARCH >= 6
-            lcd_putsf(0, line++, (status & (1<<11)) ? "(write)" : "(read)");
+            lcd_printf(0, line++ * h, (status & (1<<11)) ? "(write)" : "(read)");
 #endif
         }
     }   /* num == 1 || num == 2 // prefetch/data abort */
