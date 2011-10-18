@@ -52,6 +52,8 @@ void font_cache_create(
 
     fcache->_size = 1;
     fcache->_capacity = cache_size;
+    fcache->_prev_result = 0;
+    fcache->_prev_char_code = 0;
 
     /* set up index */
     fcache->_index = buf;
@@ -84,11 +86,10 @@ int search( struct font_cache* fcache,
     right = fcache->_size - 1;
 
     /* go for a lucky guess */
-    if ( fcache->_prev_char_code != -1 ) 
-        mid = char_code + 
-            fcache->_prev_result - fcache->_prev_char_code;
+    mid = char_code + 
+        fcache->_prev_result - fcache->_prev_char_code;
             
-    /* check bounds or unset */        
+    /* check bounds */        
     if ( mid < 0 || mid > right )
             mid = ( left + right ) / 2;
 
