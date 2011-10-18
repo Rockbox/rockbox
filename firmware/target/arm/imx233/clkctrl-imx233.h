@@ -50,6 +50,8 @@
 
 #define HW_CLKCTRL_XTAL     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x50))
 #define HW_CLKCTRL_XTAL__TIMROT_CLK32K_GATE (1 << 26)
+#define HW_CLKCTRL_XTAL__DRI_CLK24M_GATE    (1 << 28)
+#define HW_CLKCTRL_XTAL__FILT_CLK24M_GATE   (1 << 30)
 
 #define HW_CLKCTRL_PIX      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x60))
 #define HW_CLKCTRL_PIX__DIV_BM  0xfff
@@ -84,7 +86,15 @@ enum imx233_clock_t
     CLK_AHB /* div */
 };
 
-void imx233_enable_timrot_xtal_clk32k(bool enable);
+enum imx233_xtal_clkt_t
+{
+    XTAL_FILT = 1 << 30,
+    XTAL_DRI = 1 << 28,
+    XTAL_TIMROT = 1 << 26,
+};
+
+/* can use a mask of clocks */
+void imx233_enable_xtal_clock(enum imx233_xtal_clkt_t xtal_clk, bool enable);
 /* only use it for non-fractional clocks (ie not for IO) */
 void imx233_enable_clock(enum imx233_clock_t clk, bool enable);
 void imx233_set_clock_divisor(enum imx233_clock_t clk, int div);

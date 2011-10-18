@@ -23,12 +23,12 @@
 #define __CLK_CLKGATE   (1 << 31)
 #define __CLK_BUSY      (1 << 29)
 
-void imx233_enable_timrot_xtal_clk32k(bool enable)
+void imx233_enable_xtal_clock(enum imx233_xtal_clkt_t xtal_clk, bool enable)
 {
     if(enable)
-        __REG_CLR(HW_CLKCTRL_XTAL) = HW_CLKCTRL_XTAL__TIMROT_CLK32K_GATE;
+        __REG_CLR(HW_CLKCTRL_XTAL) = xtal_clk;
     else
-        __REG_SET(HW_CLKCTRL_XTAL) = HW_CLKCTRL_XTAL__TIMROT_CLK32K_GATE;
+        __REG_SET(HW_CLKCTRL_XTAL) = xtal_clk;
 }
 
 void imx233_enable_clock(enum imx233_clock_t clk, bool enable)

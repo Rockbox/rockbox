@@ -75,5 +75,5 @@ void imx233_timrot_init(void)
 {
     imx233_reset_block(&HW_TIMROT_ROTCTRL);
     /* enable xtal path to timrot */
-    imx233_enable_timrot_xtal_clk32k(true);
+    imx233_enable_xtal_clock(XTAL_TIMROT, true);
 }
