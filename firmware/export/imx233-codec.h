@@ -21,11 +21,16 @@
 #ifndef __IMX233_CODEC_H_
 #define __IMX233_CODEC_H_
 
+/* i.MX233 can boost up to 6dB in DAC mode and 12dB in line mode. Since mic/line
+ * already have adjustable gain, keep lowest of both. With chained DAC volume
+ * and headphone volume, the i.MX233 can achieve < -100dB but stay at -100dB. */
 #define VOLUME_MIN -1000
-#define VOLUME_MAX  -5
+#define VOLUME_MAX  60
 
-#define AUDIOHW_CAPS    DEPTH_3D_CAP
+#define AUDIOHW_CAPS    (DEPTH_3D_CAP | BASS_CAP | TREBLE_CAP)
 
-void audiohw_set_volume(int v);
+/* Work with half dB since the i.MX233 doesn't have a better resolution */
+int tenthdb2master(int tdb);
+void audiohw_set_headphone_vol(int vol_l, int vol_r);
 
 #endif /* __IMX233_CODEC_H_ */
