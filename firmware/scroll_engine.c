@@ -45,16 +45,26 @@ static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE*3];
 static const char scroll_name[] = "scroll";
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+static struct scrollinfo* lcd_scroll;
+#else
 static struct scrollinfo lcd_scroll[LCD_SCROLLABLE_LINES];
+#endif
 
 #ifdef HAVE_REMOTE_LCD
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+static struct scrollinfo* lcd_remote_scroll;
+#else
 static struct scrollinfo lcd_remote_scroll[LCD_REMOTE_SCROLLABLE_LINES];
+#endif
 static struct event_queue scroll_queue SHAREDBSS_ATTR;
 #endif
 
 struct scroll_screen_info lcd_scroll_info =
 {
+#ifndef HAVE_DYNAMIC_LCD_SIZE
     .scroll       = lcd_scroll,
+#endif
     .lines        = 0,
     .ticks        = 12,
     .delay        = HZ/2,
@@ -71,7 +81,9 @@ struct scroll_screen_info lcd_scroll_info =
 #ifdef HAVE_REMOTE_LCD
 struct scroll_screen_info lcd_remote_scroll_info =
 {
-    .scroll       = lcd_remote_scroll,
+#ifndef HAVE_DYNAMIC_LCD_SIZE
+    .scroll       = remote_lcd_scroll,
+#endif
     .lines        = 0,
     .ticks        = 12,
     .delay        = HZ/2,
@@ -348,5 +360,29 @@ void scroll_init(void)
                   sizeof(scroll_stack), 0, scroll_name
                   IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
+
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    int line_size = SCROLL_LINE_SIZE;
+    
+    lcd_scroll =
+        malloc(sizeof(struct scrollinfo) * LCD_SCROLLABLE_LINES);
+    lcd_scroll_info.line_size = line_size;
+
+    for (int i = 0; i < LCD_SCROLLABLE_LINES; i++)
+        lcd_scroll[i].line = malloc(line_size);
+
+    lcd_scroll_info.scroll = lcd_scroll;
+
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_scroll =
+        malloc(sizeof(struct scrollinfo) * LCD_REMOTE_SCROLLABLE_LINES);
+    lcd_remote_scroll_info.line_size = line_size;
+
+    for (int i = 0; i < LCD_REMOTE_SCROLLABLE_LINES; i++)
+        lcd_remote_scroll[i].line = malloc(line_size);
+
+    lcd_remote_scroll_info.scroll = lcd_remote_scroll;
+#endif /* HAVE_REMOTE_LCD */
+#endif /* HAVE_DYNAMIC_LCD_SIZE */
 }
 

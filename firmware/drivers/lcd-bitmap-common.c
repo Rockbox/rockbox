@@ -40,6 +40,11 @@
 #define MAIN_LCD
 #endif
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+int lcd_width;
+int lcd_height;
+#endif
+
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
 /* Fill a rectangle with a gradient */
 static void lcd_gradient_rect(int x1, int x2, int y, unsigned h,
@@ -384,7 +389,11 @@ void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string
     s->start_tick = current_tick + LCDFN(scroll_info).delay;
     s->style = style;
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    strlcpy(s->line, string, LCDFN(scroll_info).line_size);
+#else
     strlcpy(s->line, string, sizeof s->line);
+#endif
 
     /* get width */
     s->width = LCDFN(getstringsize)(s->line, &w, &h);

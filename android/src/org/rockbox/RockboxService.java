@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.ResultReceiver;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -80,6 +81,12 @@ public class RockboxService extends Service
         /* don't call the construtor here, the instances are managed by
          * android, so we can't just create a new one */
         return instance;
+    }
+
+    public int[] getResolution()
+    {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        return new int[] {metrics.widthPixels, metrics.heightPixels};
     }
 
     public boolean isRockboxRunning()

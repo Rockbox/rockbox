@@ -182,7 +182,11 @@ static int init_view(struct view_info *info,
 static void draw_text(struct view_info *info)
 {
 #ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+#define OUTPUT_SIZE MAX_LCD_WIDTH+1
+#else
 #define OUTPUT_SIZE LCD_WIDTH+1
+#endif
 #else
 #define OUTPUT_SIZE LCD_WIDTH*3+1
 #endif

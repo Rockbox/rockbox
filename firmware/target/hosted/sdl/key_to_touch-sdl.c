@@ -25,6 +25,7 @@
 #include "button.h"
 #include "buttonmap.h"
 #include "touchscreen.h"
+#include "lcd.h"
 
 int key_to_touch(int keyboard_button, unsigned int mouse_coords)
 {

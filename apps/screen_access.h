@@ -175,4 +175,8 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
  */
 extern struct screen screens[NB_SCREENS];
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+void screen_init(void) INIT_ATTR;
+#endif
+
 #endif /*_SCREEN_ACCESS_H_*/

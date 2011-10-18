@@ -1,5 +1,13 @@
 #ifdef HAVE_LCD_BITMAP
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+/* This is a hack to prevent buildtime errors popping up */
+#undef LCD_WIDTH
+#undef LCD_HEIGHT
+#define LCD_WIDTH 0
+#define LCD_HEIGHT 0
+#endif
+
 /* Rockbox logo */
 #if (LCD_DEPTH == 1)
 #if (LCD_WIDTH == 160)
@@ -9,6 +17,12 @@ rockboxlogo.128x42x1.bmp
 #else
 rockboxlogo.112x30x1.bmp
 #endif
+#elif defined(HAVE_DYNAMIC_LCD_SIZE)
+/* Currently only one screen size is supported.
+ * Ideally, we should compile in multiple logos and choose the correct one
+ * at runtime (and optionally discard the others using INIT_ATTR).
+ */
+rockboxlogo.320x98x16.bmp
 #elif (LCD_WIDTH == 96) && (LCD_DEPTH == 16)
 rockboxlogo.96x30x16.bmp
 #elif (LCD_WIDTH == 128) && (LCD_DEPTH == 2)
@@ -43,7 +57,9 @@ rockboxlogo.640x198x16.bmp
 
 /* USB logo */
 #ifdef HAVE_LCD_COLOR
-#if LCD_WIDTH > 176
+#if defined(HAVE_DYNAMIC_LCD_SIZE)
+usblogo.176x48x16.bmp
+#elif LCD_WIDTH > 176
 usblogo.176x48x16.bmp
 #elif LCD_WIDTH >= 128
 usblogo.128x37x16.bmp

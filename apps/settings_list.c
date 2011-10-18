@@ -205,8 +205,11 @@ static const char graphic_numeric[] = "graphic,numeric";
 #define DEFAULT_SBSNAME  "-"
 #define DEFAULT_FMS_NAME DEFAULT_WPSNAME
 
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP)
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+  #define DEFAULT_FONTNAME "27-Adobe-Helvetica"
+#else
 #if LCD_HEIGHT <= 64
   #define DEFAULT_FONTNAME "08-Rockfont"
 #elif LCD_HEIGHT <= 80
@@ -221,9 +224,10 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_FONTNAME "27-Adobe-Helvetica"
 #else
   #define DEFAULT_FONTNAME "35-Adobe-Helvetica"
-#endif
+#endif /* LCD_HEIGHT */
 
-#else
+#endif /* HAVE_DYNAMIC_LCD_SIZE */
+#else /* HAVE_LCD_BITMAP */
   #define DEFAULT_FONTNAME ""
 #endif
 
@@ -771,8 +775,13 @@ const struct settings_list settings[] = {
                   LANG_SCROLL_BAR, SCROLLBAR_LEFT, "scrollbar","off,left,right",
                   NULL, 3, ID2P(LANG_OFF), ID2P(LANG_LEFT), ID2P(LANG_RIGHT)),
     INT_SETTING(F_THEMESETTING, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6,
-                "scrollbar width",UNIT_INT, 3, MAX(LCD_WIDTH/10,25), 1,
-                NULL, NULL, NULL),
+                "scrollbar width",UNIT_INT, 3,
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+                MAX(DEFAULT_LCD_WIDTH/10,25),
+#else
+                MAX(LCD_WIDTH/10,25),
+#endif
+                1, NULL, NULL, NULL),
 #ifdef HAVE_TOUCHSCREEN
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, list_line_padding, LANG_LIST_LINE_PADDING,
                   -1, "list padding", "off,auto", UNIT_PIXEL, list_pad_formatter,
@@ -974,9 +983,21 @@ const struct settings_list settings[] = {
                   false, "Screen Scrolls Out Of View",
                   gui_list_screen_scroll_out_of_view),
     INT_SETTING(F_PADTITLE, scroll_step, LANG_SCROLL_STEP, 6, "scroll step",
-                UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL, lcd_scroll_step),
+                UNIT_PIXEL, 1,
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+                DEFAULT_LCD_WIDTH,
+#else
+                LCD_WIDTH,
+#endif
+                1, NULL, NULL, lcd_scroll_step),
     INT_SETTING(F_PADTITLE, screen_scroll_step, LANG_SCREEN_SCROLL_STEP, 16,
-                "screen scroll step", UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL,
+                "screen scroll step", UNIT_PIXEL, 1,
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+                DEFAULT_LCD_WIDTH,
+#else
+                LCD_WIDTH,
+#endif
+                1, NULL, NULL,
                 gui_list_screen_scroll_step),
 #endif /* HAVE_LCD_BITMAP */
     OFFON_SETTING(0,scroll_paginated,LANG_SCROLL_PAGINATED,

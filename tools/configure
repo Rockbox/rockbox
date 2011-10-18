@@ -111,8 +111,8 @@ app_set_lcd_size () {
     ARG_LCDWIDTH=$app_lcd_width
     ARG_LCDHEIGHT=$app_lcd_height
 
-    app_lcd_width="#define LCD_WIDTH $app_lcd_width"
-    app_lcd_height="#define LCD_HEIGHT $app_lcd_height"
+    app_lcd_width="#define DEFAULT_LCD_WIDTH $app_lcd_width"
+    app_lcd_height="#define DEFAULT_LCD_HEIGHT $app_lcd_height"
 }
 
 findarmgcc() {

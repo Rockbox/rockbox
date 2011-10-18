@@ -45,16 +45,22 @@
 
 /* max static loadable font buffer size */
 #ifndef MAX_FONT_SIZE
+
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+#define MAX_FONT_SIZE (LCD_HEIGHT > 64 ? (MEMORYSIZE > 2 ? 60000 : 10000) : 4000)
+#else /* HAVE_DYNAMIC_LCD_SIZE */
 #if LCD_HEIGHT > 64
 #if MEMORYSIZE > 2
 #define MAX_FONT_SIZE   60000
-#else
+#else /* MEMORYSIZE */
 #define MAX_FONT_SIZE   10000
-#endif
-#else
+#define MAX_FONT_SIZE (LCD_HEIGHT > 64 ? (MEMORYSIZE > 2 ? 60000 : 10000) : 4000)
+#endif /* MEMORYSIZE */
+#else /* LCD_HEIGHT */
 #define MAX_FONT_SIZE   4000
-#endif
-#endif
+#endif /* LCD_HEIGHT */
+#endif /* HAVE_DYNAMIC_LCD_SIZE */
+#endif /* MAX_FONT_SIZE */
 
 #ifndef FONT_HEADER_SIZE
 #define FONT_HEADER_SIZE 36

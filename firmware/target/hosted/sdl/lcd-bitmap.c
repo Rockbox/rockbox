@@ -88,6 +88,12 @@ unsigned long (*lcd_ex_getpixel)(int, int) = NULL;
 static const unsigned char colorindex[4] = {128, 85, 43, 0};
 #endif
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+#define LCD_PIXEL(x, y) (lcd_framebuffer + y * LCD_WIDTH + x)
+#else
+#define LCD_PIXEL(x, y) &(lcd_framebuffer[y][x])
+#endif
+
 static unsigned long get_lcd_pixel(int x, int y)
 {
 #if LCD_DEPTH == 1
@@ -113,7 +119,7 @@ static unsigned long get_lcd_pixel(int x, int y)
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
     return *(&lcd_framebuffer[0][0]+LCD_HEIGHT*x+y);
 #else
-    return lcd_framebuffer[y][x];
+    return *LCD_PIXEL(x, y);
 #endif
 #endif
 #endif
@@ -140,7 +146,7 @@ void lcd_update_rect(int x_start, int y_start, int width, int height)
     sdl_update_rect(lcd_surface, x_start, y_start, width, height,
                     LCD_WIDTH, LCD_HEIGHT, get_lcd_pixel);
     sdl_gui_update(lcd_surface, x_start, y_start, width,
-                   height + LCD_SPLIT_LINES, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
+                   height + LCD_SPLIT_LINES, LCD_WIDTH, LCD_HEIGHT,
                    background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
 }
 
@@ -168,7 +174,7 @@ void sim_backlight(int value)
 #endif /* LCD_DEPTH */
 
     sdl_gui_update(lcd_surface, 0, 0, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
-                   SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
+                   LCD_WIDTH, LCD_HEIGHT,
                    background ? UI_LCD_POSX : 0, background? UI_LCD_POSY : 0);
 }
 #endif /* HAVE_BACKLIGHT */
@@ -176,10 +182,14 @@ void sim_backlight(int value)
 /* initialise simulator lcd driver */
 void lcd_init_device(void)
 {
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    lcd_framebuffer = malloc(lcd_width * lcd_height * sizeof(fb_data));
+#endif
+
 #if LCD_DEPTH == 16
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                       SIM_LCD_WIDTH * display_zoom,
-                                       SIM_LCD_HEIGHT * display_zoom,
+                                       LCD_WIDTH * display_zoom,
+                                       LCD_HEIGHT * display_zoom,
                                        LCD_DEPTH, 0, 0, 0, 0);
 #elif LCD_DEPTH <= 8
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
@@ -217,7 +227,7 @@ void sim_lcd_ex_update_rect(int x_start, int y_start, int width, int height)
         sdl_update_rect(lcd_surface, x_start, y_start, width, height,
                         LCD_WIDTH, LCD_HEIGHT, lcd_ex_getpixel);
         sdl_gui_update(lcd_surface, x_start, y_start, width, 
-                       height + LCD_SPLIT_LINES, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
+                       height + LCD_SPLIT_LINES, LCD_WIDTH, LCD_HEIGHT,
                        background ? UI_LCD_POSX : 0,
                        background ? UI_LCD_POSY : 0);
     }
@@ -269,13 +279,16 @@ void lcd_blit_yuv(unsigned char * const src[3],
     width &= ~1;
     linecounter = height >> 1;
 
-#if LCD_WIDTH >= LCD_HEIGHT
-    dst     = &lcd_framebuffer[y][x];
-    row_end = dst + width;
-#else
-    dst     = &lcd_framebuffer[x][LCD_WIDTH - y - 1];
-    row_end = dst + LCD_WIDTH * width;
-#endif
+    if (LCD_WIDTH >= LCD_HEIGHT)
+    {
+        dst     = LCD_PIXEL(x, y);
+        row_end = dst + width;
+    }
+    else
+    {
+        dst     = LCD_PIXEL(x, LCD_WIDTH - y - 1);
+        row_end = dst + LCD_WIDTH * width;
+    }
 
     z    = stride * src_y;
     ysrc = src[0] + z + src_x;
@@ -314,11 +327,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-            dst++;
-#else
-            dst += LCD_WIDTH;
-#endif
+            if (LCD_WIDTH >= LCD_HEIGHT)
+                dst++;
+            else
+                dst += LCD_WIDTH;
 
             y = YFAC*(*ysrc++ - 16);
             r = y + rv;
@@ -334,11 +346,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-            dst++;
-#else
-            dst += LCD_WIDTH;
-#endif
+            if (LCD_WIDTH >= LCD_HEIGHT)
+                dst++;
+            else
+                dst += LCD_WIDTH;
         }
         while (dst < row_end);
 
@@ -346,13 +357,16 @@ void lcd_blit_yuv(unsigned char * const src[3],
         usrc    -= width >> 1;
         vsrc    -= width >> 1;
 
-#if LCD_WIDTH >= LCD_HEIGHT
-        row_end += LCD_WIDTH;
-        dst     += LCD_WIDTH - width;
-#else
-        row_end -= 1;
-        dst     -= LCD_WIDTH*width + 1;
-#endif
+        if (LCD_WIDTH >= LCD_HEIGHT)
+        {
+            row_end += LCD_WIDTH;
+            dst     += LCD_WIDTH - width;
+        }
+        else
+        {
+            row_end -= 1;
+            dst     -= LCD_WIDTH*width + 1;
+        }
 
         do
         {
@@ -379,11 +393,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-            dst++;
-#else
-            dst += LCD_WIDTH;
-#endif
+            if (LCD_WIDTH >= LCD_HEIGHT)
+                dst++;
+            else
+                dst += LCD_WIDTH;
 
             y = YFAC*(*ysrc++ - 16);
             r = y + rv;
@@ -399,11 +412,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-            dst++;
-#else
-            dst += LCD_WIDTH;
-#endif
+            if (LCD_WIDTH >= LCD_HEIGHT)
+                dst++;
+            else
+                dst += LCD_WIDTH;
         }
         while (dst < row_end);
 
@@ -411,20 +423,22 @@ void lcd_blit_yuv(unsigned char * const src[3],
         usrc    += stride >> 1;
         vsrc    += stride >> 1;
 
-#if LCD_WIDTH >= LCD_HEIGHT
-        row_end += LCD_WIDTH;
-        dst     += LCD_WIDTH - width;
-#else
-        row_end -= 1;
-        dst     -= LCD_WIDTH*width + 1;
-#endif
+        if (LCD_WIDTH >= LCD_HEIGHT)
+        {
+            row_end += LCD_WIDTH;
+            dst     += LCD_WIDTH - width;
+        }
+        else
+        {
+            row_end -= 1;
+            dst     -= LCD_WIDTH*width + 1;
+        }
     }
     while (--linecounter > 0);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-    lcd_update_rect(x, y, width, height);
-#else
-    lcd_update_rect(LCD_WIDTH - y - height, x, height, width);
-#endif
+    if (LCD_WIDTH >= LCD_HEIGHT)
+        lcd_update_rect(x, y, width, height);
+    else
+        lcd_update_rect(LCD_WIDTH - y - height, x, height, width);
 }
 #endif /* HAVE_LCD_COLOR */

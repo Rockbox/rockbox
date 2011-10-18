@@ -615,6 +615,24 @@ Lyre prototype 1 */
 #define LCD_SPLIT_LINES 0
 #endif
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+#define LCD_WIDTH  lcd_width
+#define LCD_HEIGHT lcd_height
+#ifdef HAVE_REMOTE_LCD
+#error unsupported config (HAVE_REMOTE_LCD && HAVE_DYNAMIC_LCD_SIZE)
+#endif
+#else /* HAVE_DYNAMIC_LCD_SIZE */
+#ifdef DEFAULT_LCD_HEIGHT
+#define LCD_HEIGHT DEFAULT_LCD_HEIGHT
+#endif
+#ifdef DEFAULT_LCD_WIDTH
+#define LCD_WIDTH DEFAULT_LCD_WIDTH
+#endif
+#ifndef MAX_LCD_WIDTH
+#define MAX_LCD_WIDTH LCD_WIDTH
+#endif
+#endif /* HAVE_DYNAMIC_LCD_SIZE */
+
 /* Simulator LCD dimensions. Set to standard dimensions if undefined */
 #ifndef SIM_LCD_WIDTH
 #define SIM_LCD_WIDTH LCD_WIDTH

@@ -33,7 +33,7 @@
 
 #define IMG_NORESIZE           0
 #define IMG_RESIZE             1
-#define BM_MAX_WIDTH (((LCD_WIDTH) + 7) & ~7)
+#define BM_MAX_WIDTH (((MAX_LCD_WIDTH) + 7) & ~7)
 
 struct uint8_rgb {
     uint8_t blue;

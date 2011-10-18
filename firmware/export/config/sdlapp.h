@@ -39,13 +39,9 @@
 /* LCD dimensions
  *
  * overriden by configure for application builds */
-#ifndef LCD_WIDTH
-#define LCD_WIDTH  320
-#endif
 
-#ifndef LCD_HEIGHT
-#define LCD_HEIGHT 480
-#endif
+#define HAVE_DYNAMIC_LCD_SIZE
+#define MAX_LCD_WIDTH 1024
 
 #define LCD_DEPTH  16
 #define LCD_PIXELFORMAT 565

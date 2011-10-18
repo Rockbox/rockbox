@@ -46,9 +46,12 @@ enum fill_opt {
 };
 
 /*** globals ***/
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+fb_data *lcd_framebuffer;
+#else
 fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
     IRAM_LCDFRAMEBUFFER CACHEALIGN_AT_LEAST_ATTR(16);
-
+#endif
 
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
@@ -57,8 +60,10 @@ static struct viewport default_vp =
 {
     .x        = 0,
     .y        = 0,
+#ifndef HAVE_DYNAMIC_LCD_SIZE
     .width    = LCD_WIDTH,
     .height   = LCD_HEIGHT,
+#endif
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
     .fg_pattern = LCD_DEFAULT_FG,
@@ -73,11 +78,15 @@ static struct viewport* current_vp IDATA_ATTR = &default_vp;
 /* LCD init */
 void lcd_init(void)
 {
-    lcd_clear_display();
-
     /* Call device specific init */
     lcd_init_device();
+    lcd_clear_display();
     scroll_init();
+
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    default_vp.width = LCD_WIDTH;
+    default_vp.height = LCD_HEIGHT;
+#endif
 }
 /*** Viewports ***/
 
@@ -203,7 +212,11 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 /*** low-level drawing functions ***/
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+#define LCDADDR(x, y) (lcd_framebuffer + y * LCD_WIDTH + x)
+#else
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
+#endif
 
 static void ICODE_ATTR setpixel(fb_data *address)
 {
@@ -247,7 +260,7 @@ void lcd_set_backdrop(fb_data* backdrop)
     lcd_backdrop = backdrop;
     if (backdrop)
     {
-        lcd_backdrop_offset = (long)backdrop - (long)&lcd_framebuffer[0][0];
+        lcd_backdrop_offset = (long)backdrop - (long)lcd_framebuffer;
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_backdrop;
     }
     else

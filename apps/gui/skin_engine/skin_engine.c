@@ -30,6 +30,7 @@
 #include "settings.h"
 #include "wps.h"
 #include "file.h"
+#include "filefuncs.h"
 #include "buffer.h"
 #if CONFIG_TUNER
 #include "radio.h"
@@ -239,6 +240,14 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
         if (strcmp(setting, "rockbox_failsafe"))
         {
             snprintf(buf, sizeof buf, WPS_DIR "/%s.%s", setting, ext);
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+            if (!file_exists(buf))
+            {
+                snprintf(buf, sizeof buf, WPS_DIR "/%s.%dx%dx%d.%s",
+                     setting, screens[screen].lcdwidth, 
+                     screens[screen].lcdheight, screens[screen].depth, ext);
+            }
+#endif
         }
         cpu_boost(true);
         skin_load(skin, screen, buf, true);

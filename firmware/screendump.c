@@ -53,20 +53,34 @@
 #define BMP_DATASIZE   (DUMP_BMP_LINESIZE * (LCD_HEIGHT+LCD_SPLIT_LINES))
 #define BMP_TOTALSIZE  (BMP_HEADERSIZE + BMP_DATASIZE)
 
-static const unsigned char bmpheader[] =
+#define ASSIGN_LE32(dst, x) memcpy((dst), (unsigned char[4]){LE32_CONST(x)}, 4);
+
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+#define BMPSIZE   0,0,0,0
+#define BMPWIDTH  0,0,0,0
+#define BMPHEIGHT 0,0,0,0
+#define BMPDATA   0,0,0,0
+#else
+#define BMPSIZE   LE32_CONST(BMP_TOTALSIZE)
+#define BMPWIDTH  LE32_CONST(LCD_WIDTH)
+#define BMPHEIGHT LE32_CONST(LCD_HEIGHT + LCD_SPLIT_LINES)
+#define BMPDATA   LE32_CONST(BMP_DATASIZE)
+#endif
+
+
+static unsigned char bmpheader[] =
 {
     0x42, 0x4d,                 /* 'BM' */
-    LE32_CONST(BMP_TOTALSIZE),  /* Total file size */
+    BMPSIZE,                    /* Total file size */
     0x00, 0x00, 0x00, 0x00,     /* Reserved */
     LE32_CONST(BMP_HEADERSIZE), /* Offset to start of pixel data */
-
     0x28, 0x00, 0x00, 0x00,     /* Size of (2nd) header */
-    LE32_CONST(LCD_WIDTH),      /* Width in pixels */
-    LE32_CONST(LCD_HEIGHT+LCD_SPLIT_LINES),  /* Height in pixels */
+    BMPWIDTH,                   /* Width in pixels */
+    BMPHEIGHT,                  /* Height in pixels */
     0x01, 0x00,                 /* Number of planes (always 1) */
     LE16_CONST(DUMP_BMP_BPP),   /* Bits per pixel 1/4/8/16/24 */
     LE32_CONST(BMP_COMPRESSION),/* Compression mode */
-    LE32_CONST(BMP_DATASIZE),   /* Size of bitmap data */
+    BMPDATA,                    /* Size of bitmap data */
     0xc4, 0x0e, 0x00, 0x00,     /* Horizontal resolution (pixels/meter) */
     0xc4, 0x0e, 0x00, 0x00,     /* Vertical resolution (pixels/meter) */
     LE32_CONST(BMP_NUMCOLORS),  /* Number of used colours */
@@ -136,6 +150,13 @@ void screen_dump(void)
     }
     else
     {
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+        ASSIGN_LE32(bmpheader + 2, BMP_TOTALSIZE);
+        ASSIGN_LE32(bmpheader + 10, BMP_HEADERSIZE);
+        ASSIGN_LE32(bmpheader + 18, LCD_WIDTH);
+        ASSIGN_LE32(bmpheader + 22, LCD_HEIGHT+LCD_SPLIT_LINES);
+        ASSIGN_LE32(bmpheader + 34, BMP_DATASIZE);
+#endif
         write(fd, bmpheader, sizeof(bmpheader));
 
         /* BMP image goes bottom up */
@@ -214,8 +235,11 @@ void screen_dump(void)
 #endif
 #elif LCD_DEPTH == 16
             dst_end = dst + LCD_WIDTH;
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+            src = &lcd_framebuffer[y * LCD_WIDTH];
+#else
             src = lcd_framebuffer[y];
-            
+#endif            
             do
             {
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)

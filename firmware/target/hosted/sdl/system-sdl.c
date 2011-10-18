@@ -61,6 +61,10 @@ char            having_new_lcd = true;      /* Used for player simulator */
 bool            sim_alarm_wakeup = false;
 const char     *sim_root_dir = NULL;
 extern int      display_zoom;
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+int             lcd_width = DEFAULT_LCD_WIDTH;
+int             lcd_height = DEFAULT_LCD_HEIGHT;
+#endif
 
 static SDL_Thread *evt_thread = NULL;
 
@@ -298,6 +302,19 @@ void sys_handle_argv(int argc, char *argv[])
                 background = false;
                 printf("Disabling background image.\n");
             } 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+            else if (!strcmp("--display", argv[x]))
+            {
+                x++;
+                if(x < argc)
+                {
+                    /* <width>x<height> */
+                    char *xchar = strchr(argv[x], 'x');
+                    lcd_width = atoi(argv[x]);
+                    lcd_height = atoi(xchar+1);
+                }
+            }
+#endif
 #ifdef HAVE_REMOTE_LCD
             else if (!strcmp("--noremote", argv[x]))
             {
@@ -353,6 +370,9 @@ void sys_handle_argv(int argc, char *argv[])
 #endif
                 printf("  --debugwps \t Print advanced WPS debug info\n");
                 printf("  --nobackground \t Disable the background image\n");
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+                printf("  --display WIDTHxHEIGHT\t Set the window size\n");
+#endif
 #ifdef HAVE_REMOTE_LCD
                 printf("  --noremote \t Disable the remote image (will disable backgrounds)\n");
 #endif

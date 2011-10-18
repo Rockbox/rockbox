@@ -1,5 +1,13 @@
 #ifdef HAVE_LCD_BITMAP
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+/* This is a hack to prevent buildtime errors popping up */
+#undef LCD_WIDTH
+#undef LCD_HEIGHT
+#define LCD_WIDTH 0
+#define LCD_HEIGHT 0
+#endif
+
 /* Brickmania */
 #ifdef HAVE_LCD_COLOR
 brickmania_gameover.112x54x16.bmp

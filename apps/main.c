@@ -351,6 +351,9 @@ static void init(void)
         global_status.font_id[i] = FONT_SYSFIXED;
     font_init();
 #endif
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    screen_init();
+#endif
     show_logo();
     button_init();
     powermgmt_init();

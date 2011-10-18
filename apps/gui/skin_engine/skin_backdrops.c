@@ -27,6 +27,7 @@
 #include "settings.h"
 #include "wps_internals.h"
 #include "skin_engine.h"
+#include "filefuncs.h"
 
 #if !defined(__PCTOOL__) && \
     ((LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)))
@@ -144,6 +145,21 @@ bool skin_backdrops_preload(void)
                 global_settings.backdrop_file[0] != '-' && filename[0] == '-')
             {
                 filename = global_settings.backdrop_file;
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+                if (!file_exists(filename))
+                {
+                    char copy[MAX_PATH];
+                    char* temp = backdrops[i].name+2; /* slightly hacky to get a buffer */
+                    char *ext = strrchr(copy, '.');
+                    size_t size = sizeof(backdrops[i].name) -2;
+                    *ext = '\0'; ext++;
+                    snprintf(temp, size, "%s.%dx%dx%d.%s", copy,
+                            screens[screen].lcdwidth, 
+                            screens[screen].lcdheight,
+                            screens[screen].depth, ext);
+                    filename = temp;
+                }
+#endif
             }
             if (*filename && *filename != '-')
             {

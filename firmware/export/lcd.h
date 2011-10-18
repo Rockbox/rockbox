@@ -408,7 +408,13 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define LCD_FBHEIGHT LCD_HEIGHT
 #endif
 /* The actual framebuffer */
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+extern fb_data *lcd_framebuffer;
+extern int lcd_width;
+extern int lcd_height;
+#else
 extern fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
+#endif
 
 /** Port-specific functions. Enable in port config file. **/
 #ifdef HAVE_REMOTE_LCD_AS_MAIN

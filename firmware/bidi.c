@@ -137,14 +137,32 @@ static void arabjoin(unsigned short * stringprt, int length)
 
 unsigned short *bidi_l2v(const unsigned char *str, int orientation)
 {
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    static unsigned short *utf16_buf = NULL;
+#else
     static unsigned short  utf16_buf[SCROLL_LINE_SIZE];
+#endif
     unsigned short *target, *tmp;
 #ifndef BOOTLOADER
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    static unsigned short *bidi_buf = NULL;
+#else
     static unsigned short  bidi_buf[SCROLL_LINE_SIZE];
+#endif
     unsigned short *heb_str; /* *broken_str */
     int block_start, block_end, block_type, block_length, i;
     int length = utf8length(str);
 #endif
+
+
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    /* FIXME: find somewhere better for this. */
+    if (utf16_buf == NULL)
+        utf16_buf = malloc(SCROLL_LINE_SIZE);
+    if (bidi_buf == NULL)
+        bidi_buf = malloc(SCROLL_LINE_SIZE);
+#endif
+
     /*
     long max_chars=0;
     int begin, end, char_count, orig_begin;

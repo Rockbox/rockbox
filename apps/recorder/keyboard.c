@@ -370,7 +370,7 @@ int kbd_input(char* text, int buflen)
             const unsigned char *p;
             int len = 0;
 
-#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 96
+#if (LCD_WIDTH >= 160 && LCD_HEIGHT >= 96) || defined(HAVE_DYNAMIC_LCD_SIZE)
             struct screen *sc = &screens[l];
 
             if (sc->getwidth() >= 160 && sc->getheight() >= 96)

@@ -122,8 +122,10 @@ struct screen screens[NB_SCREENS] =
 {
     {
         .screen_type=SCREEN_MAIN,
+#ifndef HAVE_DYNAMIC_LCD_SIZE
         .lcdwidth=LCD_WIDTH,
         .lcdheight=LCD_HEIGHT,
+#endif
         .depth=LCD_DEPTH,
         .getnblines=&screen_helper_getnblines,
 #if defined(HAVE_LCD_COLOR)
@@ -331,5 +333,13 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
     display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     display->fillrect(xstart, ystart, width, height);
     display->set_drawmode(DRMODE_SOLID);
+}
+#endif
+
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+void screen_init(void)
+{
+    screens[SCREEN_MAIN].lcdwidth = LCD_WIDTH;
+    screens[SCREEN_MAIN].lcdheight = LCD_HEIGHT;
 }
 #endif

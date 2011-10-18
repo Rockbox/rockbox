@@ -76,10 +76,14 @@
 
 #define WPS_ERROR_INVALID_PARAM         -1
 
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+#define SKIN_FONT_SIZE (LCD_HEIGHT > 160 ? 1024*10 : 1024*3)
+#else
 #if LCD_HEIGHT > 160
 #define SKIN_FONT_SIZE (1024*10)
 #else
 #define SKIN_FONT_SIZE (1024*3)
+#endif
 #endif
 #define GLYPHS_TO_CACHE 256
 

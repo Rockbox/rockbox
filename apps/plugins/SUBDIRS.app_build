@@ -1,7 +1,7 @@
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
 
-#ifdef HAVE_TAGCACHE
+#if defined(HAVE_TAGCACHE) && !defined(HAVE_DYNAMIC_LCD_SIZE)
 pictureflow
 #endif
 
@@ -11,7 +11,9 @@ pictureflow
 #if CONFIG_CODEC == SWCODEC
 
 #if MEMORYSIZE > 2 /* we need a lot of RAM for instruments */
+#ifndef HAVE_DYNAMIC_LCD_SIZE
 mikmod
+#endif
 #endif
 
 #endif /* CONFIG_CODEC == SWCODEC */

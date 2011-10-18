@@ -30,6 +30,7 @@
 
 extern JNIEnv *env_ptr;
 extern jobject RockboxService_instance;
+extern jclass  RockboxService_class;
 
 static jobject RockboxFramebuffer_instance;
 static jmethodID java_lcd_update;
@@ -75,11 +76,10 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
 
     /* Create native_buffer */
     jobject buffer = (*env)->NewDirectByteBuffer(env, lcd_framebuffer,
-                                               (jlong) sizeof(lcd_framebuffer));
-
+                            (jlong) (lcd_width * lcd_height * sizeof(fb_data)));
     /* we need to setup parts for the java object every time */
-    (*env)->CallVoidMethod(env, fb_instance, java_lcd_init,
-                          (jint)LCD_WIDTH, (jint)LCD_HEIGHT, buffer);
+    (*env)->CallVoidMethod(env, fb_instance, java_lcd_init, lcd_width,
+                           lcd_height, buffer);
 }
 
 /*
@@ -87,6 +87,19 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
  */
 void lcd_init_device(void)
 {
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    jmethodID getResolution = (*env_ptr)->GetMethodID(env_ptr, RockboxService_class, "getResolution", "()[I");
+    jintArray resolution = (jintArray) (*env_ptr)->CallObjectMethod(env_ptr, RockboxService_instance, getResolution);
+    jint *resolutionElements = (*env_ptr)->GetIntArrayElements(env_ptr, resolution, NULL);
+
+    lcd_width = resolutionElements[0];
+    lcd_height = resolutionElements[1];
+    (*env_ptr)->ReleaseIntArrayElements(env_ptr, resolution, resolutionElements, 0);
+#else
+    lcd_height = LCD_HEIGHT;
+    lcd_width = LCD_WIDTH;
+#endif
+    lcd_framebuffer = malloc(sizeof(fb_data) * lcd_width * lcd_height);
 }
 
 void lcd_update(void)
@@ -190,6 +203,8 @@ void lcd_yuv_set_options(unsigned options)
     (void)options;
 }
 
+#define LCDADDR(x, y) (lcd_framebuffer + y * LCD_WIDTH + x)
+
 /* Draw a partial YUV colour bitmap - similiar behavior to lcd_blit_yuv
    in the core */
 void lcd_blit_yuv(unsigned char * const src[3],
@@ -205,13 +220,13 @@ void lcd_blit_yuv(unsigned char * const src[3],
     width &= ~1;
     linecounter = height >> 1;
 
-#if LCD_WIDTH >= LCD_HEIGHT
-    dst     = &lcd_framebuffer[y][x];
-    row_end = dst + width;
-#else
-    dst     = &lcd_framebuffer[x][LCD_WIDTH - y - 1];
+    if (LCD_WIDTH >= LCD_HEIGHT) {
+        dst     = LCDADDR(y, x);
+        row_end = dst + width;
+    } else {
+    dst     = LCDADDR(x, LCD_WIDTH - y - 1);
     row_end = dst + LCD_WIDTH * width;
-#endif
+    }
 
     z    = stride * src_y;
     ysrc = src[0] + z + src_x;
@@ -250,11 +265,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-            dst++;
-#else
-            dst += LCD_WIDTH;
-#endif
+            if (LCD_WIDTH >= LCD_HEIGHT)
+                dst++;
+            else
+                dst += LCD_WIDTH;
 
             y = YFAC*(*ysrc++ - 16);
             r = y + rv;
@@ -270,11 +284,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-            dst++;
-#else
-            dst += LCD_WIDTH;
-#endif
+            if (LCD_WIDTH >= LCD_HEIGHT)
+                dst++;
+            else
+                dst += LCD_WIDTH;
         }
         while (dst < row_end);
 
@@ -282,13 +295,13 @@ void lcd_blit_yuv(unsigned char * const src[3],
         usrc    -= width >> 1;
         vsrc    -= width >> 1;
 
-#if LCD_WIDTH >= LCD_HEIGHT
-        row_end += LCD_WIDTH;
-        dst     += LCD_WIDTH - width;
-#else
-        row_end -= 1;
-        dst     -= LCD_WIDTH*width + 1;
-#endif
+        if (LCD_WIDTH >= LCD_HEIGHT) {
+            row_end += LCD_WIDTH;
+            dst     += LCD_WIDTH - width;
+        } else {
+            row_end -= 1;
+            dst     -= LCD_WIDTH*width + 1;
+        }
 
         do
         {
@@ -315,11 +328,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-            dst++;
-#else
-            dst += LCD_WIDTH;
-#endif
+            if (LCD_WIDTH >= LCD_HEIGHT)
+                dst++;
+            else
+                dst += LCD_WIDTH;
 
             y = YFAC*(*ysrc++ - 16);
             r = y + rv;
@@ -335,11 +347,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
             *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-            dst++;
-#else
-            dst += LCD_WIDTH;
-#endif
+            if (LCD_WIDTH >= LCD_HEIGHT)
+                dst++;
+            else
+                dst += LCD_WIDTH;
         }
         while (dst < row_end);
 
@@ -347,19 +358,18 @@ void lcd_blit_yuv(unsigned char * const src[3],
         usrc    += stride >> 1;
         vsrc    += stride >> 1;
 
-#if LCD_WIDTH >= LCD_HEIGHT
-        row_end += LCD_WIDTH;
-        dst     += LCD_WIDTH - width;
-#else
-        row_end -= 1;
-        dst     -= LCD_WIDTH*width + 1;
-#endif
+        if (LCD_WIDTH >= LCD_HEIGHT) {
+            row_end += LCD_WIDTH;
+            dst     += LCD_WIDTH - width;
+        } else {
+            row_end -= 1;
+            dst     -= LCD_WIDTH*width + 1;
+        }
     }
     while (--linecounter > 0);
 
-#if LCD_WIDTH >= LCD_HEIGHT
-    lcd_update_rect(x, y, width, height);
-#else
-    lcd_update_rect(LCD_WIDTH - y - height, x, height, width);
-#endif
+    if (LCD_WIDTH >= LCD_HEIGHT)
+        lcd_update_rect(x, y, width, height);
+    else
+        lcd_update_rect(LCD_WIDTH - y - height, x, height, width);
 }

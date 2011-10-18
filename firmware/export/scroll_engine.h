@@ -49,7 +49,11 @@ void lcd_remote_scroll_stop_line(const struct viewport* vp, int y);
 struct scrollinfo
 {
     struct viewport* vp;
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    char *line;
+#else
     char line[SCROLL_LINE_SIZE];
+#endif
 #ifdef HAVE_LCD_CHARCELLS
     int len;    /* length of line in chars */
 #endif
@@ -68,9 +72,12 @@ struct scrollinfo
 
 struct scroll_screen_info
 {
-    struct scrollinfo * const scroll;
+    struct scrollinfo * scroll;
     const int num_scroll; /* number of scrollable lines (also number of scroll structs) */
     int lines;  /* Number of currently scrolling lines */
+#ifdef HAVE_DYNAMIC_LCD_SIZE
+    int line_size; /* max chars storable on each scroll line */
+#endif
     long ticks; /* # of ticks between updates*/
     long delay; /* ticks delay before start */
     int bidir_limit;  /* percent */
