@@ -18,14 +18,16 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __audioin_imx233__
-#define __audioin_imx233__
+#include "audioout-imx233.h"
 
-#include "config.h"
-#include "cpu.h"
+void imx233_audioin_preinit(void)
+{
+}
 
-void imx233_audioin_preinit(void);
-void imx233_audioin_postinit(void);
-void imx233_audioin_close(void);
+void imx233_audioin_postinit(void)
+{
+}
 
-#endif /* __audioin_imx233__ */
+void imx233_audioin_close(void)
+{
+}
