@@ -65,6 +65,10 @@
 #define HW_APBH_CHx_DEBUG1(i)   (*(volatile uint32_t *)(HW_APBH_BASE + 0x90 + 0x70 * (i)))
 
 #define HW_APBH_CHx_DEBUG2(i)   (*(volatile uint32_t *)(HW_APBH_BASE + 0xa0 + 0x70 * (i)))
+#define HW_APBH_CHx_DEBUG2__AHB_BYTES_BP    0
+#define HW_APBH_CHx_DEBUG2__AHB_BYTES_BM    0xffff
+#define HW_APBH_CHx_DEBUG2__APB_BYTES_BP    16
+#define HW_APBH_CHx_DEBUG2__APB_BYTES_BM    0xffff0000
 
 /********
  * APHX *
@@ -104,6 +108,10 @@
 #define HW_APBX_CHx_DEBUG1(i)   (*(volatile uint32_t *)(HW_APBX_BASE + 0x150 + (i) * 0x70))
 
 #define HW_APBX_CHx_DEBUG2(i)   (*(volatile uint32_t *)(HW_APBX_BASE + 0x160 + (i) * 0x70))
+#define HW_APBX_CHx_DEBUG2__AHB_BYTES_BP    0
+#define HW_APBX_CHx_DEBUG2__AHB_BYTES_BM    0xffff
+#define HW_APBX_CHx_DEBUG2__APB_BYTES_BP    16
+#define HW_APBX_CHx_DEBUG2__APB_BYTES_BM    0xffff0000
 
 /**********
  * COMMON *
@@ -117,6 +125,32 @@ struct apb_dma_command_t
     /* PIO words follow */
 };
 
+#define DMA_INFO_CURCMDADDR (1 << 0)
+#define DMA_INFO_NXTCMDADDR (1 << 1)
+#define DMA_INFO_CMD        (1 << 2)
+#define DMA_INFO_BAR        (1 << 3)
+#define DMA_INFO_APB_BYTES  (1 << 4)
+#define DMA_INFO_AHB_BYTES  (1 << 5)
+#define DMA_INFO_FREEZED    (1 << 6)
+#define DMA_INFO_GATED      (1 << 7)
+#define DMA_INFO_INTERRUPT  (1 << 8)
+#define DMA_INFO_ALL        0x1ff
+
+struct imx233_dma_info_t
+{
+    unsigned long cur_cmd_addr;
+    unsigned long nxt_cmd_addr;
+    unsigned long cmd;
+    unsigned long bar;
+    unsigned apb_bytes;
+    unsigned ahb_bytes;
+    bool freezed;
+    bool gated;
+    bool int_enabled;
+    bool int_cmdcomplt;
+    bool int_error;
+};
+
 #define APBH_DMA_CHANNEL(i)     i
 #define APBX_DMA_CHANNEL(i)     ((i) | 0x10)
 #define APB_IS_APBX_CHANNEL(x)  ((x) & 0x10)
@@ -124,6 +158,7 @@ struct apb_dma_command_t
 
 #define APB_SSP(ssp)        APBH_DMA_CHANNEL(HW_APBH_SSP(ssp))
 #define APB_AUDIO_ADC       APBX_DMA_CHANNEL(HW_APBX_AUDIO_ADC)
+#define APB_AUDIO_DAC       APBX_DMA_CHANNEL(HW_APBX_AUDIO_DAC)
 #define APB_I2C             APBX_DMA_CHANNEL(HW_APBX_I2C)
 
 #define HW_APB_CHx_CMD__COMMAND_BM         0x3
@@ -160,6 +195,7 @@ void imx233_dma_reset_channel(unsigned chan);
 /* only apbh channel have clkgate control */
 void imx233_dma_clkgate_channel(unsigned chan, bool enable_clock);
 
+void imx233_dma_freeze_channel(unsigned chan, bool freeze);
 void imx233_dma_enable_channel_interrupt(unsigned chan, bool enable);
 /* clear both channel complete and error bits */
 void imx233_dma_clear_channel_interrupt(unsigned chan);
@@ -167,5 +203,8 @@ bool imx233_dma_is_channel_error_irq(unsigned chan);
 /* assume no command is in progress */
 void imx233_dma_start_command(unsigned chan, struct apb_dma_command_t *cmd);
 void imx233_dma_wait_completion(unsigned chan);
+/* get some info
+ * WARNING: if channel is not freezed, data might not be coherent ! */
+struct imx233_dma_info_t imx233_dma_get_info(unsigned chan, unsigned flags);
 
 #endif // __DMA_IMX233_H__

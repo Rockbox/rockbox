@@ -24,6 +24,8 @@
 #include "config.h"
 #include "system.h"
 #include "dma-imx233.h"
+#include "lcd.h"
+#include "string.h"
 
 void imx233_dma_init(void)
 {
@@ -34,12 +36,22 @@ void imx233_dma_init(void)
 
 void imx233_dma_reset_channel(unsigned chan)
 {
+    volatile uint32_t *ptr;
+    uint32_t bm;
     if(APB_IS_APBX_CHANNEL(chan))
-        __REG_SET(HW_APBX_CHANNEL_CTRL) =
-            HW_APBX_CHANNEL_CTRL__RESET_CHANNEL(APB_GET_DMA_CHANNEL(chan));
+    {
+        ptr = &HW_APBX_CHANNEL_CTRL;
+        bm = HW_APBX_CHANNEL_CTRL__RESET_CHANNEL(APB_GET_DMA_CHANNEL(chan));
+    }
     else
-        __REG_SET(HW_APBH_CTRL0) =
-            HW_APBH_CTRL0__RESET_CHANNEL(APB_GET_DMA_CHANNEL(chan));
+    {
+        ptr = &HW_APBH_CTRL0;
+        bm = HW_APBH_CTRL0__RESET_CHANNEL(APB_GET_DMA_CHANNEL(chan));
+    }
+    __REG_SET(*ptr) = bm;
+    /* wait for end of reset */
+    while(*ptr & bm)
+        ;
 }
 
 void imx233_dma_clkgate_channel(unsigned chan, bool enable_clock)
@@ -54,6 +66,27 @@ void imx233_dma_clkgate_channel(unsigned chan, bool enable_clock)
             HW_APBH_CTRL0__CLKGATE_CHANNEL(APB_GET_DMA_CHANNEL(chan));
 }
 
+void imx233_dma_freeze_channel(unsigned chan, bool freeze)
+{
+    volatile uint32_t *ptr;
+    uint32_t bm;
+    if(APB_IS_APBX_CHANNEL(chan))
+    {
+        ptr = &HW_APBX_CHANNEL_CTRL;
+        bm = HW_APBX_CHANNEL_CTRL__FREEZE_CHANNEL(APB_GET_DMA_CHANNEL(chan));
+    }
+    else
+    {
+        ptr = &HW_APBH_CTRL0;
+        bm = HW_APBH_CTRL0__FREEZE_CHANNEL(APB_GET_DMA_CHANNEL(chan));
+    }
+
+    if(freeze)
+        __REG_SET(*ptr) = bm;
+    else
+        __REG_CLR(*ptr) = bm;
+}
+
 void imx233_dma_enable_channel_interrupt(unsigned chan, bool enable)
 {
     volatile uint32_t *ptr;
@@ -65,7 +98,7 @@ void imx233_dma_enable_channel_interrupt(unsigned chan, bool enable)
     }
     else
     {
-        ptr = &HW_APBH_CTRL1;;
+        ptr = &HW_APBH_CTRL1;
         bm = HW_APBH_CTRL1__CHx_CMDCMPLT_IRQ_EN(APB_GET_DMA_CHANNEL(chan));
     }
 
@@ -186,3 +219,41 @@ void imx233_dma_wait_completion(unsigned chan)
     while(*sema & HW_APB_CHx_SEMA__PHORE_BM)
         yield();
 }
+
+struct imx233_dma_info_t imx233_dma_get_info(unsigned chan, unsigned flags)
+{
+    struct imx233_dma_info_t s;
+    memset(&s, 0, sizeof(s));
+    bool apbx = APB_IS_APBX_CHANNEL(chan);
+    int dmac = APB_GET_DMA_CHANNEL(chan);
+    if(flags & DMA_INFO_CURCMDADDR)
+        s.cur_cmd_addr = apbx ? HW_APBX_CHx_CURCMDAR(dmac) : HW_APBH_CHx_CURCMDAR(dmac);
+    if(flags & DMA_INFO_NXTCMDADDR)
+        s.nxt_cmd_addr = apbx ? HW_APBX_CHx_NXTCMDAR(dmac) : HW_APBH_CHx_NXTCMDAR(dmac);
+    if(flags & DMA_INFO_CMD)
+        s.cmd = apbx ? HW_APBX_CHx_CMD(dmac) : HW_APBH_CHx_CMD(dmac);
+    if(flags & DMA_INFO_BAR)
+        s.bar = apbx ? HW_APBX_CHx_BAR(dmac) : HW_APBH_CHx_BAR(dmac);
+    if(flags & DMA_INFO_AHB_BYTES)
+        s.ahb_bytes = apbx ? __XTRACT_EX(HW_APBX_CHx_DEBUG2(dmac), HW_APBX_CHx_DEBUG2__AHB_BYTES) :
+                __XTRACT_EX(HW_APBH_CHx_DEBUG2(dmac), HW_APBH_CHx_DEBUG2__AHB_BYTES);
+    if(flags & DMA_INFO_APB_BYTES)
+        s.apb_bytes = apbx ? __XTRACT_EX(HW_APBX_CHx_DEBUG2(dmac), HW_APBX_CHx_DEBUG2__APB_BYTES) :
+                __XTRACT_EX(HW_APBH_CHx_DEBUG2(dmac), HW_APBH_CHx_DEBUG2__APB_BYTES);
+    if(flags & DMA_INFO_FREEZED)
+        s.freezed = apbx ? HW_APBX_CHANNEL_CTRL & HW_APBX_CHANNEL_CTRL__FREEZE_CHANNEL(dmac) :
+                HW_APBH_CTRL0 & HW_APBH_CTRL0__FREEZE_CHANNEL(dmac);
+    if(flags & DMA_INFO_GATED)
+        s.gated = apbx ? false : HW_APBH_CTRL0 & HW_APBH_CTRL0__CLKGATE_CHANNEL(dmac);
+    if(flags & DMA_INFO_INTERRUPT)
+    {
+        s.int_enabled = apbx ? HW_APBX_CTRL1 & HW_APBX_CTRL1__CHx_CMDCMPLT_IRQ_EN(dmac) :
+                HW_APBH_CTRL1 & HW_APBH_CTRL1__CHx_CMDCMPLT_IRQ_EN(dmac);
+        s.int_cmdcomplt = apbx ? HW_APBX_CTRL1 & HW_APBX_CTRL1__CHx_CMDCMPLT_IRQ(dmac) :
+                HW_APBH_CTRL1 & HW_APBH_CTRL1__CHx_CMDCMPLT_IRQ(dmac);
+        s.int_error = apbx ? HW_APBX_CTRL2 & HW_APBX_CTRL2__CHx_ERROR_IRQ(dmac) :
+            HW_APBH_CTRL2 & HW_APBH_CTRL2__CHx_ERROR_IRQ(dmac);
+    }
+    return s;
+}
+
