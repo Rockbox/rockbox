@@ -41,8 +41,8 @@
 
 #define HAVE_LCD_ENABLE
 
-//#define HAVE_DYNAMIC_LCD_SIZE
-#define MAX_LCD_WIDTH 1024
+#define HAVE_DYNAMIC_LCD_SIZE
+#define MAX_LCD_WIDTH 1280
 
 /* define this to indicate your device's keypad */
 #define HAVE_TOUCHSCREEN

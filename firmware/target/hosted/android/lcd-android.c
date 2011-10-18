@@ -157,6 +157,30 @@ Java_org_rockbox_RockboxFramebuffer_surfaceDestroyed(JNIEnv *e, jobject this,
     RockboxFramebuffer_instance = NULL;
 }
 
+/*
+ * This is called immediately after any structural changes (format or size)
+ * have been made to the surface. You should at this point update the imagery
+ * in the surface. This method is always called at least once, after
+ * surfaceCreated(SurfaceHolder).
+ */
+JNIEXPORT void JNICALL
+Java_org_rockbox_RockboxFramebuffer_surfaceChanged(JNIEnv *e, jobject this,
+                                                   jobject surfaceholder,
+                                                   jint format,
+                                                   jint width,
+                                                   jint height)
+{
+   (void)e; (void)this; (void)surfaceholder; (void)format;
+
+   if ((width != lcd_width) || (height != lcd_height)) {
+      lcd_width = width;
+      lcd_height = height;
+      lcd_framebuffer = realloc(lcd_framebuffer,
+                                sizeof(fb_data) * width * height);
+      lcd_update();
+   }
+}
+
 bool lcd_active(void)
 {
     return display_on;
