@@ -12730,3 +12730,93 @@
     *: "Spara ändringar?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "USB - Visa inte intern disk"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "USB - Visa inte intern disk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Extra radhöjd i listor"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Extra radhöjd i listor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatisk"
+  </dest>
+  <voice>
+    *: "Automatisk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Förvald tid för insomningstimer"
+  </dest>
+  <voice>
+    *: "Förvald tid för insomningstajmer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Starta insomningstimer vid uppstart"
+  </dest>
+  <voice>
+    *: "Starta insomningstajmer vid uppstart"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Avbryt insomningstimer"
+  </dest>
+  <voice>
+    *: "Avbryt insomningstajmer"
+  </voice>
+</phrase>
