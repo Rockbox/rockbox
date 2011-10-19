@@ -35,6 +35,7 @@ deploy.svnpaths = \
              "tools/mkboot.h",
              "tools/voicefont.c",
              "tools/VOICE_PAUSE.wav",
+             "tools/voice-corrections.txt",
              "tools/wavtrim.h",
              "tools/iriver.h",
              "tools/mkboot.c",
