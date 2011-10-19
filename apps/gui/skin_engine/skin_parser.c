@@ -76,11 +76,6 @@
 
 #define WPS_ERROR_INVALID_PARAM         -1
 
-#if LCD_HEIGHT > 160
-#define SKIN_FONT_SIZE (1024*10)
-#else
-#define SKIN_FONT_SIZE (1024*3)
-#endif
 #define GLYPHS_TO_CACHE 256
 
 static bool isdefault(struct skin_tag_parameter *param)
@@ -419,7 +414,7 @@ static int parse_font_load(struct skin_element *element,
     if(element->params_count > 2)
         glyphs = element->params[2].data.number;
     else
-        glyphs = 0;
+        glyphs = GLYPHS_TO_CACHE;
     if (id < 2)
     {
         DEBUGF("font id must be >= 2\n");
@@ -1678,14 +1673,12 @@ static bool skin_load_fonts(struct wps_data *data)
             char path[MAX_PATH];
             snprintf(path, sizeof path, FONT_DIR "/%s", font->name);
 #ifndef __PCTOOL__
-            if (skinfonts[font_id-2].glyphs > 0)
-            {
-                font->id = font_load_ex(path,
-                        font_glyphs_to_bufsize(path, skinfonts[font_id-2].glyphs));
-            }
-            else
-#endif
+            font->id = font_load_ex(path,
+                font_glyphs_to_bufsize(path, skinfonts[font_id-2].glyphs));
+            
+#else
                 font->id = font_load(path);
+#endif
             //printf("[%d] %s -> %d\n",font_id, font->name, font->id);
             id_array[font_count++] = font->id;
         }
