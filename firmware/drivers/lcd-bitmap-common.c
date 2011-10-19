@@ -381,7 +381,10 @@ void LCDFN(xprintf)(int x, int y, int xcrop, unsigned int style,
     va_start(ap, fmt);
     vsnprintf(buf, sizeof (buf), fmt, ap);
     va_end(ap);
-    LCDFN(puts_scroll_style)(x, y, xcrop, style, buf);
+    if (style & STYLE_SCROLLED)
+       LCDFN(puts_scroll_style)(x, y, xcrop, style, buf);
+    else
+       LCDFN(puts_style)(x, y, xcrop, style, buf);
 }
 
 void LCDFN(scroll_fn)(void)

@@ -150,7 +150,7 @@ bool logfdisplay(void)
                 if(index >= user_index)
                 {
                     buf[0] = logfbuffer[i];
-                    lcd_putsxy(cur_x, cur_y, buf);
+                    lcd_printf(cur_x, cur_y, buf);
                 }
                 
                 /* update pointer */

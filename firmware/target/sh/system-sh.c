@@ -313,8 +313,8 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     lcd_clear_display();
     /* output exception */
     n = (n - (unsigned)UIE4 + 12)>>2; /* get exception or interrupt number */
-    lcd_putsf(0, 0, "I%02x:%s", n, irqname[n]);
-    lcd_putsf(0, 1, "at %08x", pc);
+    lcd_printf(0, 0, "I%02x:%s", n, irqname[n]);
+    lcd_printf(0, SYSFONT_HEIGHT, "at %08x", pc);
     lcd_update();
 
      /* try to restart firmware if ON is pressed */

@@ -92,21 +92,22 @@ bool dbg_ports(void)
 
     lcd_setfont(FONT_SYSFIXED);
 #endif
+    const int h = SYSFONT_HEIGHT;
     lcd_clear_display();
 
     while(1)
     {
 #ifdef HAVE_LCD_BITMAP
-        lcd_putsf(0, 0, "PADR: %04x", (unsigned short)PADR);
-        lcd_putsf(0, 1, "PBDR: %04x", (unsigned short)PBDR);
+        lcd_printf(0, 0, "PADR: %04x", (unsigned short)PADR);
+        lcd_printf(0, h, "PBDR: %04x", (unsigned short)PBDR);
 
-        lcd_putsf(0, 2, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
-        lcd_putsf(0, 3, "AN1: %03x AN5: %03x", adc_read(1), adc_read(5));
-        lcd_putsf(0, 4, "AN2: %03x AN6: %03x", adc_read(2), adc_read(6));
-        lcd_putsf(0, 5, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
+        lcd_printf(0, 2*h, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
+        lcd_printf(0, 3*h, "AN1: %03x AN5: %03x", adc_read(1), adc_read(5));
+        lcd_printf(0, 4*h, "AN2: %03x AN6: %03x", adc_read(2), adc_read(6));
+        lcd_printf(0, 5*h, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
 
         battery_read_info(&adc_battery_voltage, &adc_battery_level);
-        lcd_putsf(0, 6, "Batt: %d.%03dV %d%%  ", adc_battery_voltage / 1000,
+        lcd_printf(0, 6*h, "Batt: %d.%03dV %d%%  ", adc_battery_voltage / 1000,
                  adc_battery_voltage % 1000, adc_battery_level);
 
         lcd_update();
@@ -118,16 +119,16 @@ bool dbg_ports(void)
 #else /* !HAVE_LCD_BITMAP */
 
        if (currval == 0) {
-            lcd_putsf(0, 0, "PADR: %04x", (unsigned short)PADR);
+            lcd_printf(0, 0, "PADR: %04x", (unsigned short)PADR);
         } else if (currval == 1) {
-            lcd_putsf(0, 0, "PBDR: %04x", (unsigned short)PBDR);
+            lcd_printf(0, 0, "PBDR: %04x", (unsigned short)PBDR);
         } else {
             int idx = currval - 2; /* idx < 7 */
-            lcd_putsf(0, 0, "AN%d: %03x", idx, adc_read(idx));
+            lcd_printf(0, 0, "AN%d: %03x", idx, adc_read(idx));
         }
 
         battery_read_info(&adc_battery_voltage, NULL);
-        lcd_putsf(0, 1, "Batt: %d.%03dV", adc_battery_voltage / 1000,
+        lcd_printf(0, h, "Batt: %d.%03dV", adc_battery_voltage / 1000,
                  adc_battery_voltage % 1000);
         lcd_update();
 
@@ -190,27 +191,28 @@ bool dbg_hw_info(void)
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_SYSFIXED);
+    const int h = SYSFONT_HEIGHT;
 
-    lcd_puts(0, 0, "[Hardware info]");
+    lcd_printf(0, 0, "[Hardware info]");
 
-    lcd_putsf(0, 1, "ROM: %d.%02d", rom_version/100, rom_version%100);
+    lcd_printf(0, h, "ROM: %d.%02d", rom_version/100, rom_version%100);
 
-    lcd_putsf(0, 2, "Mask: 0x%04x", bitmask);
+    lcd_printf(0, 2*h, "Mask: 0x%04x", bitmask);
     if (got_id)
-        lcd_putsf(0, 3, "Flash: M=%02x D=%02x", manu, id);
+        lcd_printf(0, 3*h, "Flash: M=%02x D=%02x", manu, id);
     else
-        lcd_puts(0, 3, "Flash: M=?? D=??"); /* unknown, sorry */
+        lcd_printf(0, 3*h, "Flash: M=?? D=??"); /* unknown, sorry */
 
     if (has_bootrom)
     {
         if (rom_crc == 0x56DBA4EE) /* known Version 1 */
-            lcd_puts(0, 4, "Boot ROM: V1");
+            lcd_printf(0, 4*h, "Boot ROM: V1");
         else
-            lcd_putsf(0, 4, "ROMcrc: 0x%08x", rom_crc);
+            lcd_printf(0, 4*h, "ROMcrc: 0x%08x", rom_crc);
     }
     else
     {
-        lcd_puts(0, 4, "Boot ROM: none");
+        lcd_printf(0, 4*h, "Boot ROM: none");
     }
 
     lcd_update();
@@ -221,34 +223,34 @@ bool dbg_hw_info(void)
     lcd_setfont(FONT_UI);
 
 #else /* !HAVE_LCD_BITMAP */
-    lcd_puts(0, 0, "[HW Info]");
+    lcd_printf(0, 0, "[HW Info]");
     while(1)
     {
         switch(currval)
         {
             case 0:
-                lcd_putsf(0, 1, "ROM: %d.%02d",
+                lcd_printf(0, 1, "ROM: %d.%02d",
                          rom_version/100, rom_version%100);
                 break;
             case 1:
                 if (got_id)
-                    lcd_putsf(0, 1, "Flash:%02x,%02x", manu, id);
+                    lcd_printf(0, 1, "Flash:%02x,%02x", manu, id);
                 else
-                    lcd_puts(0, 1, "Flash:??,??"); /* unknown, sorry */
+                    lcd_printf(0, 1, "Flash:??,??"); /* unknown, sorry */
                 break;
             case 2:
                 if (has_bootrom)
                 {
                     if (rom_crc == 0x56DBA4EE) /* known Version 1 */
-                        lcd_puts(0, 1, "BootROM: V1");
+                        lcd_printf(0, 1, "BootROM: V1");
                     else if (rom_crc == 0x358099E8)
-                        lcd_puts(0, 1, "BootROM: V2");
+                        lcd_printf(0, 1, "BootROM: V2");
                         /* alternative boot ROM found in one single player so far */
                     else
-                        lcd_putsf(0, 1, "R: %08x", rom_crc);
+                        lcd_printf(0, 1, "R: %08x", rom_crc);
                 }
                 else
-                    lcd_puts(0, 1, "BootROM: no");
+                    lcd_printf(0, 1, "BootROM: no");
         }
 
         lcd_update();

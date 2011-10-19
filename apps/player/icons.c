@@ -85,11 +85,11 @@ extern void screen_put_iconxy(struct screen * screen,
                             int x, int y, enum themable_icons icon)
 {
     if (icon == Icon_NOICON)
-        screen->putchar(x, y, ' ');
+        screen->printf(x, y, " ");
     else if (icon >= Icon_Last_Themeable)
-        screen->putchar(x, y, old_Icon_Unknown);
+        screen->printf(x, y, "%c", old_Icon_Unknown);
     else
-        screen->putchar(x, y, icons[icon]);
+        screen->printf(x, y, "%c", icons[icon]);
 }
 
 void screen_put_cursorxy(struct screen * display, int x, int y, bool on)

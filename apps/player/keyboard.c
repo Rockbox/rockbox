@@ -128,21 +128,20 @@ int kbd_input(char* text, int buflen)
         {
             if (line_edit) 
             {
-                lcd_putc(0, 0, ' ');
-                lcd_putc(0, 1, KEYBOARD_ARROW);
+                lcd_printf(0, 0, " ");
+                lcd_printf(0, 1, "%c", KEYBOARD_ARROW);
             }
             else
             {
-                lcd_putc(0, 0, KEYBOARD_ARROW);
-                lcd_putc(0, 1, ' ');
+                lcd_printf(0, 0, "%c", KEYBOARD_ARROW);
+                lcd_printf(0, 1, " ");
             }
-            
-            lcd_putc(1, 0, KEYBOARD_INSERT_LEFT);
-            lcd_putc(2, 0, line[x]);
-            lcd_putc(3, 0, KEYBOARD_INSERT_RIGHT);
+
+            lcd_printf(1, 0, "%c%c%c",
+                       KEYBOARD_INSERT_LEFT, line[x], KEYBOARD_INSERT_RIGHT);
             for (i = 1; i < 8; i++)
             {
-                lcd_putc(i + 3, 0, line[(x+i)%linelen]);
+                lcd_printf(i + 3, 0, "%c", line[(x+i)%linelen]);
             }
 
             /* write out the text */
@@ -173,7 +172,7 @@ int kbd_input(char* text, int buflen)
             }
 
             lcd_remove_cursor();
-            lcd_puts(1, 1, temptext);
+            lcd_printf(1, 1, temptext);
             lcd_put_cursor(curpos + 1, 1, KEYBOARD_CURSOR);
 
             gui_syncstatusbar_draw(&statusbars, true);

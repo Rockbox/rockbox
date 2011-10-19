@@ -90,7 +90,7 @@ void list_draw(struct screen *display, struct gui_synclist *gui_list)
            current_item >= gui_list->selected_item &&
            current_item <  gui_list->selected_item + gui_list->selected_size)
         {/* The selected item must be displayed scrolling */
-            display->puts_scroll(text_pos, i, entry_name);
+            display->xprintf(text_pos, i, 0, STYLE_SCROLLED, entry_name);
 
             if (draw_cursor)
             {
@@ -102,14 +102,11 @@ void list_draw(struct screen *display, struct gui_synclist *gui_list)
         }
         else
         {/* normal item */
+            int style = 0;
             if(gui_list->scroll_all)
-            {
-                display->puts_scroll(text_pos, i, entry_name);
-            }
-            else
-            {
-                display->puts(text_pos, i, entry_name);
-            }
+                style |= STYLE_SCROLLED;
+
+            display->xprintf(text_pos, i, 0, style, entry_name);
         }
         /* Icons display */
         if(draw_icons)

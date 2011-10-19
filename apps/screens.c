@@ -93,18 +93,19 @@ static void charging_display_info(bool animate)
     const int pox_y = 32;
     static unsigned phase = 3;
     unsigned i;
+    const int h = SYSFONT_HEIGHT;
 
 #ifdef NEED_ATA_POWER_BATT_MEASURE
     if (ide_powered()) /* FM and V2 can only measure when ATA power is on */
 #endif
     {
         int battv = battery_voltage();
-        lcd_putsf(0, 7, "  Batt: %d.%02dV %d%%  ", battv / 1000,
-                 (battv % 1000) / 10, battery_level());
+        lcd_printf(0, 7*h, "  Batt: %d.%02dV %d%%  ", battv / 1000,
+                  (battv % 1000) / 10, battery_level());
     }
 
 #ifdef ARCHOS_RECORDER
-    lcd_puts(0, 2, "Charge mode:");
+    lcd_printf(0, 2*h, "Charge mode:");
 
     const char *s;
     if (charge_state == CHARGING)
@@ -116,7 +117,7 @@ static void charging_display_info(bool animate)
     else
         s = "not charging";
 
-    lcd_puts(0, 3, s);
+    lcd_printf(0, 3*h, s);
     if (!charger_enabled())
         animate = false;
 #endif /* ARCHOS_RECORDER */
@@ -194,18 +195,19 @@ static void charging_display_info(bool animate)
     unsigned i, ypos;
     static unsigned phase = 3;
     char buf[32];
+    const int h = SYSFONT_HEIGHT;
 
     battv = battery_voltage();
-    lcd_putsf(4, 1, " %d.%02dV", battv / 1000, (battv % 1000) / 10);
+    lcd_printf(4, h, " %d.%02dV", battv / 1000, (battv % 1000) / 10);
 
     memcpy(buf, logo_pattern, 32); /* copy logo patterns */
 
     if (!animate) /* build the screen */
     {
         lcd_double_height(false);
-        lcd_puts(0, 0, "[Charging]");
+        lcd_printf(0, 0, "[Charging]");
         for (i = 0; i < 4; i++)
-            lcd_putc(i, 1, logo_chars[i]);
+            lcd_printf(i, h, "%c", logo_chars[i]);
     }
     else          /* animate the logo */
     {

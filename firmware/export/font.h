@@ -135,6 +135,7 @@ void glyph_cache_save(int font_id);
 
 #define font_init()
 #define font_load(x)
+#define SYSFONT_HEIGHT 1
 
 #endif
 
