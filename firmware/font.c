@@ -965,6 +965,12 @@ void font_init(void)
 {
 }
 
+void font_lock(int font_id, bool lock)
+{
+    (void)font_id;
+    (void)lock;
+}
+
 /*
  * Bootloader only supports the built-in sysfont.
  */
