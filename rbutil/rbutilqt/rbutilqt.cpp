@@ -293,9 +293,15 @@ void RbUtilQt::about()
     QFile licence(":/docs/gpl-2.0.html");
     licence.open(QIODevice::ReadOnly);
     QTextStream c(&licence);
-    QString cline = c.readAll();
-    about.browserLicense->insertHtml(cline);
+    about.browserLicense->insertHtml(c.readAll());
     about.browserLicense->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
+
+    QFile speexlicense(":/docs/COPYING.SPEEX");
+    speexlicense.open(QIODevice::ReadOnly);
+    QTextStream s(&speexlicense);
+    about.browserSpeexLicense->insertHtml("<pre>" + s.readAll() + "</pre>");
+    about.browserSpeexLicense->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
+
     QFile credits(":/docs/CREDITS");
     credits.open(QIODevice::ReadOnly);
     QTextStream r(&credits);

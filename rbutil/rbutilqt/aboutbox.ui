@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0" >
  <class>aboutBox</class>
  <widget class="QWidget" name="aboutBox" >
@@ -21,7 +22,7 @@
         <string/>
        </property>
        <property name="pixmap" >
-        <pixmap resource="rbutilqt.qrc" >:/icons/rockbox-5.png</pixmap>
+        <pixmap>:/icons/rockbox-5.png</pixmap>
        </property>
       </widget>
      </item>
@@ -50,7 +51,7 @@
    <item row="1" column="0" colspan="3" >
     <widget class="QLabel" name="labelText" >
      <property name="text" >
-      <string>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/>© 2005 - 2011 The Rockbox Team.&lt;br/>Released under the GNU General Public License v2.&lt;br/>Uses icons by the &lt;a href="http://tango.freedesktop.org/">Tango Project&lt;/a>.&lt;br/>&lt;center>&lt;a href="http://www.rockbox.org">http://www.rockbox.org&lt;/a>&lt;/center></string>
+      <string>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2011 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</string>
      </property>
      <property name="textFormat" >
       <enum>Qt::RichText</enum>
@@ -123,6 +124,16 @@
           <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="licenseSpeex">
+      <attribute name="title">
+       <string>&amp;Speex License</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QTextBrowser" name="browserSpeexLicense"/>
        </item>
       </layout>
      </widget>
