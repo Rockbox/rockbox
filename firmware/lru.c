@@ -93,7 +93,6 @@ void lru_touch(struct lru* pl, short handle)
 
     /* insert current node at tail */
     struct lru_node* tail_node = lru_node_p(pl, pl->_tail);
-    short tail_node_next_handle = tail_node->_next; /* Bug fix */
 
     curr_node->_next = tail_node->_next;
     tail_node->_next = handle;
