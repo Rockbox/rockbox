@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "config.h"
+
 #include <stdbool.h>
 #include <inttypes.h>
 #include <string.h>
@@ -210,6 +211,7 @@ static int treble;                                  /* A/V */
 /* Settings applicable to audio codec only */
 #ifdef HAVE_PITCHSCREEN
 static int32_t  pitch_ratio = PITCH_SPEED_100;
+static int  big_sample_locks;
 #endif
 static int  channels_mode;
        long dsp_sw_gain;
@@ -280,16 +282,34 @@ void sound_set_pitch(int32_t percent)
                   AUDIO_DSP.codec_frequency);
 }
 
+static void tdspeed_set_pointers( bool time_stretch_active )
+{
+    if( time_stretch_active )
+    {
+        sample_buf_count = BIG_SAMPLE_BUF_COUNT;
+        resample_buf_count = BIG_RESAMPLE_BUF_COUNT;
+        sample_buf[0] = big_sample_buf[0];
+        sample_buf[1] = big_sample_buf[1];
+        resample_buf[0] = big_resample_buf[0];
+        resample_buf[1] = big_resample_buf[1];
+    }
+    else
+    {
+        sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
+        resample_buf_count = SMALL_RESAMPLE_BUF_COUNT;
+        sample_buf[0] = small_sample_buf[0];
+        sample_buf[1] = small_sample_buf[1];
+        resample_buf[0] = small_resample_buf[0];
+        resample_buf[1] = small_resample_buf[1];
+    }
+}
+ 
 static void tdspeed_setup(struct dsp_config *dspc)
 {
     /* Assume timestretch will not be used */
     dspc->tdspeed_active = false;
-    sample_buf[0] = small_sample_buf[0];
-    sample_buf[1] = small_sample_buf[1];
-    resample_buf[0] = small_resample_buf[0];
-    resample_buf[1] = small_resample_buf[1];
-    sample_buf_count = SMALL_SAMPLE_BUF_COUNT;
-    resample_buf_count = SMALL_RESAMPLE_BUF_COUNT;
+
+    tdspeed_set_pointers( false );
 
     if (!dsp_timestretch_available())
         return; /* Timestretch not enabled or buffer not allocated */
@@ -305,21 +325,31 @@ static void tdspeed_setup(struct dsp_config *dspc)
 
     /* Timestretch is to be used */
     dspc->tdspeed_active = true;
-    sample_buf[0] = big_sample_buf[0];
-    sample_buf[1] = big_sample_buf[1];
-    resample_buf[0] = big_resample_buf[0];
-    resample_buf[1] = big_resample_buf[1];
-    sample_buf_count = BIG_SAMPLE_BUF_COUNT;
-    resample_buf_count = BIG_RESAMPLE_BUF_COUNT;
+
+    tdspeed_set_pointers( true );
 }
 
 
 static int move_callback(int handle, void* current, void* new)
 {
-    /* TODO */
-    (void)handle;(void)current;;
+    (void)handle;(void)current;
+
+    if ( big_sample_locks > 0 )
+        return BUFLIB_CB_CANNOT_MOVE;
+    
     big_sample_buf = new;
+    
+    /* no allocation without timestretch enabled */
+    tdspeed_set_pointers( true );
     return BUFLIB_CB_OK;
+}
+
+void lock_sample_buf( bool lock )
+{
+    if ( lock )
+        big_sample_locks++;
+    else
+        big_sample_locks--;
 }
 
 static struct buflib_callbacks ops = {
@@ -331,8 +361,7 @@ static struct buflib_callbacks ops = {
 void dsp_timestretch_enable(bool enabled)
 {
     /* Hook to set up timestretch buffer on first call to settings_apply() */
-    static int handle;
-
+    static int handle = -1;
     if (enabled)
     {
         if (big_sample_buf)
@@ -340,12 +369,11 @@ void dsp_timestretch_enable(bool enabled)
 
         /* Set up timestretch buffers */
         big_sample_buf = &small_resample_buf[0];
-
         handle = core_alloc_ex("resample buf",
                                2 * BIG_RESAMPLE_BUF_COUNT * sizeof(int32_t),
                                &ops);
-
-        enabled = handle > 0;
+        big_sample_locks = 0;
+        enabled = handle >= 0;
 
         if (enabled)
         {
@@ -362,10 +390,10 @@ void dsp_timestretch_enable(bool enabled)
         dsp_set_timestretch(PITCH_SPEED_100);
         tdspeed_finish();
 
-        if (handle > 0)
+        if (handle >= 0)
             core_free(handle);
 
-        handle = 0;
+        handle = -1;
         big_sample_buf = NULL;
     }
 }
@@ -784,12 +812,12 @@ static inline int resample(struct dsp_config *dsp, int count, int32_t *src[])
         resample_buf[0],
         resample_buf[1]
     };
-
+    lock_sample_buf( true );
     count = dsp->resample(count, &dsp->data, (const int32_t **)src, dst);
 
     src[0] = dst[0];
     src[1] = dst[dsp->data.num_channels - 1];
-
+    lock_sample_buf( false );
     return count;
 }
 
