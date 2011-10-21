@@ -33,7 +33,7 @@ struct lru
     void *_base;
 };
 
-#define LRU_SLOT_OVERHEAD (2 * sizeof(short))
+#define LRU_SLOT_OVERHEAD (1 * sizeof(short))
 
 /* Create LRU list with specified size from buf. */
 void lru_create(struct lru* pl, void *buf, short size, short data_size);
