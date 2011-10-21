@@ -343,7 +343,7 @@ static void yearday_to_daymonth(int yd, int y, int *d, int *m)
         t=tnl;
     }
 
-    while(yd >= t[i] && i<12)
+    while(i<12 && yd >= t[i])
     {
         yd-=t[i];
         i++;
@@ -1233,7 +1233,7 @@ static void send_csw(int status)
 static void copy_padded(char *dest, char *src, int len)
 {
    int i=0;
-   while(src[i]!=0 && i<len)
+   while(i<len && src[i]!=0)
    {
       dest[i]=src[i];
       i++;
