@@ -101,6 +101,7 @@ void LCDFN(fill_viewport)(void)
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
     unsigned short *ucs;
+    font_lock(current_vp->font, true);
     struct font* pf = font_get(current_vp->font);
     int vp_flags = current_vp->flags;
     int rtl_next_non_diac_width, last_non_diacritic_width;
@@ -233,6 +234,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
             }
         }
     }
+    font_lock(current_vp->font, false);
 }
 
 /* put a string at a given pixel position */

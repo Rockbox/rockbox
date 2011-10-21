@@ -124,6 +124,14 @@ static void lock_font_handle(int handle, bool lock)
         alloc->handle_locks--;
 }
 
+void font_lock(int font_id, bool lock)
+{
+    if( font_id == FONT_SYSFIXED )
+        return;
+    if( buflib_allocations[font_id] >= 0 )
+        lock_font_handle(buflib_allocations[font_id], lock);
+}
+
 static struct buflib_callbacks buflibops = {buflibmove_callback, NULL };
 
 static inline struct font *pf_from_handle(int handle)
@@ -1007,6 +1015,7 @@ int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
     unsigned short ch;
     int width = 0;
 
+    font_lock( fontnumber, true );
     for (str = utf8decode(str, &ch); ch != 0 ; str = utf8decode(str, &ch))
     {
         if (is_diacritic(ch, NULL))
@@ -1019,6 +1028,7 @@ int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
         *w = width;
     if ( h )
         *h = pf->height;
+    font_lock( fontnumber, false );
     return width;
 }
 
