@@ -165,10 +165,10 @@ static int move_callback(int handle, void* current, void* new)
     }
     dircache_root = new;
 
-    d_names_start -= diff;
-    d_names_end -= diff;
-    dot -= diff;
-    dotdot -= diff;
+    d_names_start += diff;
+    d_names_end += diff;
+    dot += diff;
+    dotdot += diff;
 
     return BUFLIB_CB_OK;
 }
