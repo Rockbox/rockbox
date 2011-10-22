@@ -12,6 +12,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.widget.RemoteViews;
 
 public class RunForegroundManager
@@ -23,6 +24,7 @@ public class RunForegroundManager
     private NotificationManager mNM;
     private IRunForeground api;
     private Service mCurrentService;
+    private Handler mServiceHandler;
     private Intent mWidgetUpdate;
     private int iconheight;
 
@@ -60,6 +62,7 @@ public class RunForegroundManager
                 Logger.e("Cannot run in foreground: No available API");
             }
         }
+        mServiceHandler = new Handler(service.getMainLooper());
     }
 
     public void startForeground() 
@@ -88,44 +91,58 @@ public class RunForegroundManager
         mWidgetUpdate = null;
     }
 
-    public void updateNotification(String title, String artist, String album, String albumart)
+    public void updateNotification(final String title, final String artist, final String album, final String albumart)
     {
-        RemoteViews views = mNotification.contentView;
-        views.setTextViewText(R.id.title, title);
-        views.setTextViewText(R.id.content, artist+"\n"+album);
-        if (artist.equals(""))
-            mNotification.tickerText = title;
-        else
-            mNotification.tickerText = title+" - "+artist;
+        /* do this on the main thread for 2 reasons
+         * 1) Don't delay track switching with possibly costly albumart
+         *  loading (i.e. off-load from the Rockbox thread)
+         * 2) Work around a bug in Android where decodeFile() fails outside
+         *  of the main thread (http://stackoverflow.com/q/7228633)
+         */
+        mServiceHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                final RemoteViews views = mNotification.contentView;
+                views.setTextViewText(R.id.title, title);
+                views.setTextViewText(R.id.content, artist+"\n"+album);
+                if (artist.equals(""))
+                    mNotification.tickerText = title;
+                else
+                    mNotification.tickerText = title+" - "+artist;
 
-        if (albumart != null) {
-            /* The notification area doesn't have permissions to access the SD card.
-             * Push the data as Bitmap instead of Uri. Scale down to size of
-             * launcher icon -- broadcasting the unscaled image may yield in
-             * too much data, causing UI hangs of Rockbox. */
-            Bitmap b = BitmapFactory.decodeFile(albumart);
-            if(b != null) {
-                /* scale width to keep aspect ratio -- height is the constraint */
-                int scaledwidth = Math.round(iconheight*((float)b.getWidth()/b.getHeight()));
-                views.setImageViewBitmap(R.id.artwork,
-                    Bitmap.createScaledBitmap(b, scaledwidth, iconheight, false));
+                if (albumart != null) {
+                    /* The notification area doesn't have permissions to access the SD card.
+                     * Push the data as Bitmap instead of Uri. Scale down to size of
+                     * launcher icon -- broadcasting the unscaled image may yield in
+                     * too much data, causing UI hangs of Rockbox. */
+                    Bitmap b = BitmapFactory.decodeFile(albumart);
+                    if(b != null) {
+                        /* scale width to keep aspect ratio -- height is the constraint */
+                        int scaledwidth = Math.round(iconheight*((float)b.getWidth()/b.getHeight()));
+                        views.setImageViewBitmap(R.id.artwork,
+                            Bitmap.createScaledBitmap(b, scaledwidth, iconheight, false));
+                    }
+                    else {
+                        views.setImageViewResource(R.id.artwork, R.drawable.launcher);
+                    }
+                }
+                else {
+                    views.setImageViewResource(R.id.artwork, R.drawable.launcher);
+                }
+                mWidgetUpdate = new Intent("org.rockbox.TrackUpdateInfo");
+                mWidgetUpdate.putExtra("title", title);
+                mWidgetUpdate.putExtra("artist", artist);
+                mWidgetUpdate.putExtra("album", album);
+                mWidgetUpdate.putExtra("albumart", albumart);
+                mCurrentService.sendBroadcast(mWidgetUpdate);
+                
+                /* notify in this runnable to make sure the notification
+                 * has the correct albumart */
+                mNM.notify(R.string.notification, mNotification); 
             }
-            else {
-                views.setImageViewResource(R.id.artwork, R.drawable.launcher);
-            }
-        }
-        else {
-            views.setImageViewResource(R.id.artwork, R.drawable.launcher);
-        }
-
-        mNM.notify(R.string.notification, mNotification);
-
-        mWidgetUpdate = new Intent("org.rockbox.TrackUpdateInfo");
-        mWidgetUpdate.putExtra("title", title);
-        mWidgetUpdate.putExtra("artist", artist);
-        mWidgetUpdate.putExtra("album", album);
-        mWidgetUpdate.putExtra("albumart", albumart);
-        mCurrentService.sendBroadcast(mWidgetUpdate);
+        });       
     }
 
     public void resendUpdateNotification()
