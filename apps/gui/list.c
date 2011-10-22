@@ -133,6 +133,7 @@ bool list_display_title(struct gui_synclist *list, enum screen_type screen)
 static int list_get_nb_lines(struct gui_synclist *list, enum screen_type screen)
 {
     struct viewport *vp = list->parent[screen];
+    vp->line_height = font_get(vp->font)->height;
     int lines = skinlist_get_line_count(screen, list);
     if (lines < 0)
     {

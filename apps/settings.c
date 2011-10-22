@@ -886,6 +886,7 @@ void settings_apply(bool read_disk)
                 if (global_status.font_id[SCREEN_MAIN] >= 0)
                     font_unload(global_status.font_id[SCREEN_MAIN]);
                 rc = font_load(buf);
+                font_set_ui(rc);
                 CHART2("<font_load ", global_settings.font_file);
                 global_status.font_id[SCREEN_MAIN] = rc;
                 lcd_setfont(rc);
