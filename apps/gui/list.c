@@ -101,15 +101,7 @@ static void list_init_viewports(struct gui_synclist *list)
     {
         FOR_NB_SCREENS(i)
         {
-            list->parent[i] = &parent[i];
-            viewport_set_defaults(&parent[i], i);
-#ifdef HAVE_TOUCHSCREEN
-            parent[i].line_height = list_line_height(list->parent[i]);
-#endif
-#ifdef HAVE_BUTTONBAR
-            if (screens[i].has_buttonbar)
-                list->parent[i]->height -= BUTTONBAR_HEIGHT;
-#endif
+            gui_synclist_set_viewport_defaults(list->parent[i], i);
         }
     }
     list->dirty_tick = current_tick;
@@ -500,6 +492,19 @@ void gui_synclist_set_voice_callback(struct gui_synclist * lists,
                                      list_speak_item voice_callback)
 {
     lists->callback_speak_item = voice_callback;
+}
+
+void gui_synclist_set_viewport_defaults(struct viewport *vp,
+                                        enum screen_type screen)
+{
+    viewport_set_defaults(vp, screen);        
+#ifdef HAVE_TOUCHSCREEN
+    vp->line_height = list_line_height(vp);
+#endif
+#ifdef HAVE_BUTTONBAR
+    if (screens[screen].has_buttonbar)
+        vp->height -= BUTTONBAR_HEIGHT;
+#endif
 }
 
 #ifdef HAVE_LCD_COLOR

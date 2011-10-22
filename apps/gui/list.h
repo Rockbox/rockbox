@@ -145,6 +145,7 @@ extern void gui_synclist_init(
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
 extern void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback);
 extern void gui_synclist_set_voice_callback(struct gui_synclist * lists, list_speak_item voice_callback);
+extern void gui_synclist_set_viewport_defaults(struct viewport *vp, enum screen_type screen);
 #ifdef HAVE_LCD_COLOR
 extern void gui_synclist_set_color_callback(struct gui_synclist * lists, list_get_color color_callback);
 #endif

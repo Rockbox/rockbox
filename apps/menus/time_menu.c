@@ -265,11 +265,11 @@ int time_screen(void* ignored)
 #endif
         nb_lines = viewport_get_nb_lines(&clock_vps[i]);
 
-        menu[i] = clock_vps[i];
+        gui_synclist_set_viewport_defaults(&menu[i], i);
         /* force time to be drawn centered */
         clock_vps[i].flags |= VP_FLAG_ALIGN_CENTER;
 
-        font_h = font_get(clock_vps[i].font)->height;
+        font_h = clock_vps[i].line_height;
         nb_lines -= 2; /* at least 2 lines for menu */
         if (nb_lines > 4)
             nb_lines = 4;
