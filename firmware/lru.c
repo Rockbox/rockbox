@@ -23,6 +23,7 @@
 struct lru_node
 {
     short _next;
+    short _prev;
     unsigned char data[1]; /* place holder */
 };
 
@@ -47,9 +48,11 @@ void lru_create(struct lru* pl, void *buf, short size, short data_size)
     for (i=0; i<pl->_size; i++)
     {
         lru_node_p(pl, i)->_next = i + 1;
+        lru_node_p(pl, i)->_prev = i - 1;
     }
 
     /* Fix up head and tail to form circular buffer */
+    lru_node_p(pl, 0)->_prev = pl->_tail;
     lru_node_p(pl, pl->_tail)->_next = pl->_head;
 }
 
@@ -89,11 +92,20 @@ void lru_touch(struct lru* pl, short handle)
 
     /* Remove current node from linked list */
     struct lru_node* curr_node = lru_node_p(pl, handle);
+    struct lru_node* prev_node = lru_node_p(pl, curr_node->_prev);
+    struct lru_node* next_node = lru_node_p(pl, curr_node->_next);
+
+    prev_node->_next = curr_node->_next;
+    next_node->_prev = curr_node->_prev;
 
     /* insert current node at tail */
     struct lru_node* tail_node = lru_node_p(pl, pl->_tail);
+    short tail_node_next_handle = tail_node->_next; /* Bug fix */
+    struct lru_node* tail_node_next = lru_node_p(pl, tail_node_next_handle); /* Bug fix */
 
     curr_node->_next = tail_node->_next;
+    curr_node->_prev = pl->_tail;
+    tail_node_next->_prev = handle; /* Bug fix */
     tail_node->_next = handle;
 
     pl->_tail = handle;
