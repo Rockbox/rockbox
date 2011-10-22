@@ -95,11 +95,9 @@ static int list_line_height(const struct viewport *vp)
 
 static void list_init_viewports(struct gui_synclist *list)
 {
-    int parent_used;
+    bool parent_used = (*list->parent == &parent[SCREEN_MAIN]);
 
-    parent_used = (*list->parent != &parent[SCREEN_MAIN]);
-
-    if (!parent_used)
+    if (parent_used)
     {
         FOR_NB_SCREENS(i)
         {
