@@ -23,7 +23,6 @@
 struct lru_node
 {
     short _next;
-    short _prev;
     unsigned char data[1]; /* place holder */
 };
 
