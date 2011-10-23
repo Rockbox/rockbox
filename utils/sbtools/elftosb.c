@@ -203,6 +203,7 @@ struct sb_section_t
     uint32_t identifier;
     bool is_data;
     bool is_cleartext;
+    uint32_t alignment;
     // data sections are handled as a single SB_INST_DATA virtual instruction 
     int nr_insts;
     struct sb_inst_t *insts;
@@ -333,6 +334,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
         /* options */
         do
         {
+            /* cleartext */
             struct cmd_option_t *opt = db_find_option_by_id(csec->opt_list, "cleartext");
             if(opt != NULL)
             {
@@ -342,6 +344,23 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
                     bug("Cleartext section attribute must be 0 or 1\n");
                 sec->is_cleartext = opt->val;
             }
+            /* alignment */
+            opt = db_find_option_by_id(csec->opt_list, "alignment");
+            if(opt != NULL)
+            {
+                if(opt->is_string)
+                    bug("Cleartext section attribute must be an integer\n");
+                // n is a power of 2 iff n & (n - 1) = 0
+                // alignement cannot be lower than block size
+                if((opt->val & (opt->val - 1)) != 0)
+                    bug("Cleartext section attribute must be a power of two\n");
+                if(opt->val < BLOCK_SIZE)
+                    sec->alignment = BLOCK_SIZE;
+                else
+                    sec->alignment = opt->val;
+            }
+            else
+                sec->alignment = BLOCK_SIZE;
         }while(0);
 
         if(csec->is_data)
@@ -469,6 +488,16 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
  * SB file production
  */
 
+/* helper function to augment an array, free old array */
+void *augment_array(void *arr, size_t elem_sz, size_t cnt, void *aug, size_t aug_cnt)
+{
+    void *p = xmalloc(elem_sz * (cnt + aug_cnt));
+    memcpy(p, arr, elem_sz * cnt);
+    memcpy(p + elem_sz * cnt, aug, elem_sz * aug_cnt);
+    free(arr);
+    return p;
+}
+
 static void fill_gaps(struct sb_file_t *sb)
 {
     for(int i = 0; i < sb->nr_sections; i++)
@@ -501,6 +530,11 @@ static void compute_sb_offsets(struct sb_file_t *sb)
     {
         /* each section has a preliminary TAG command */
         sb->image_size += sizeof(struct sb_instruction_tag_t) / BLOCK_SIZE;
+        /* we might need to pad the section so compute next alignment */
+        uint32_t alignment = BLOCK_SIZE;
+        if((i + 1) < sb->nr_sections)
+            alignment = sb->sections[i + 1].alignment;
+        alignment /= BLOCK_SIZE; /* alignment in block sizes */
         
         struct sb_section_t *sec = &sb->sections[i];
 
@@ -560,6 +594,50 @@ static void compute_sb_offsets(struct sb_file_t *sb)
             }
             else
                 bug("die on inst %d\n", inst->inst);
+        }
+        /* we need to make sure next section starts on the right alignment.
+         * Since each section starts with a boot tag, we thus need to ensure
+         * that this sections ends at adress X such that X+BLOCK_SIZE is
+         * a multiple of the alignment.
+         * For data sections, we just add random data, otherwise we add nops */
+        uint32_t missing_sz = alignment - ((sb->image_size + 1) % alignment);
+        if(missing_sz != alignment)
+        {
+            struct sb_inst_t *aug_insts;
+            int nr_aug_insts = 0;
+
+            if(sb->sections[i].is_data)
+            {
+                nr_aug_insts = 1;
+                aug_insts = malloc(sizeof(struct sb_inst_t));
+                memset(aug_insts, 0, sizeof(struct sb_inst_t));
+                aug_insts[0].inst = SB_INST_DATA;
+                aug_insts[0].size = missing_sz * BLOCK_SIZE;
+                aug_insts[0].data = xmalloc(missing_sz * BLOCK_SIZE);
+                generate_random_data(aug_insts[0].data, missing_sz * BLOCK_SIZE);
+                if(g_debug)
+                    printf("  DATA | size=0x%08x\n", aug_insts[0].size);
+            }
+            else
+            {
+                nr_aug_insts = missing_sz;
+                aug_insts = malloc(sizeof(struct sb_inst_t) * nr_aug_insts);
+                memset(aug_insts, 0, sizeof(struct sb_inst_t) * nr_aug_insts);
+                for(int j = 0; j < nr_aug_insts; j++)
+                {
+                    aug_insts[j].inst = SB_INST_NOP;
+                    if(g_debug)
+                        printf("  NOOP\n");
+                }
+            }
+
+            sb->sections[i].insts = augment_array(sb->sections[i].insts, sizeof(struct sb_inst_t),
+                sb->sections[i].nr_insts, aug_insts, nr_aug_insts);
+            sb->sections[i].nr_insts += nr_aug_insts;
+
+            /* augment image and section size */
+            sb->image_size += missing_sz;
+            sec->sec_size += missing_sz;
         }
     }
     /* final signature */
@@ -678,6 +756,8 @@ void produce_sb_instruction(struct sb_inst_t *inst,
             break;
         case SB_INST_MODE:
             cmd->data = inst->addr;
+            break;
+        case SB_INST_NOP:
             break;
         default:
             bug("die\n");
@@ -799,11 +879,11 @@ void usage(void)
 {
     printf("Usage: elftosb [options | file]...\n");
     printf("Options:\n");
-    printf("  -?/--help:\t\tDisplay this message\n");
+    printf("  -?/--help\tDisplay this message\n");
     printf("  -o <file>\tSet output file\n");
     printf("  -c <file>\tSet command file\n");
     printf("  -d/--debug\tEnable debug output\n");
-    printf("  -k <file>\t\tAdd key file\n");
+    printf("  -k <file>\tAdd key file\n");
     printf("  -z\t\tAdd zero key\n");
     exit(1);
 }

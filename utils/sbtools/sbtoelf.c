@@ -260,8 +260,6 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
                 &buf[pos + sizeof(struct sb_instruction_load_t)]);
 
             pos += load->len + sizeof(struct sb_instruction_load_t);
-            // unsure about rounding
-            pos = ROUND_UP(pos, 16);
         }
         else if(hdr->opcode == SB_INST_FILL)
         {
@@ -283,8 +281,6 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
             elf_add_fill_section(&elf, fill->addr, fill->len, fill->pattern);
 
             pos += sizeof(struct sb_instruction_fill_t);
-            // fixme: useless as pos is a multiple of 16 and fill struct is 4-bytes wide ?
-            pos = ROUND_UP(pos, 16);
         }
         else if(hdr->opcode == SB_INST_CALL ||
                 hdr->opcode == SB_INST_JUMP)
@@ -311,8 +307,6 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
             elf_init(&elf);
 
             pos += sizeof(struct sb_instruction_call_t);
-            // fixme: useless as pos is a multiple of 16 and call struct is 4-bytes wide ?
-            pos = ROUND_UP(pos, 16);
         }
         else if(hdr->opcode == SB_INST_MODE)
         {
@@ -325,12 +319,20 @@ static void extract_section(int data_sec, char name[5], byte *buf, int size, con
             color(OFF);
             pos += sizeof(struct sb_instruction_mode_t);
         }
+        else if(hdr->opcode == SB_INST_NOP)
+        {
+            color(RED);
+            printf("NOOP\n");
+            pos += sizeof(struct sb_instruction_mode_t);
+        }
         else
         {
             color(RED);
             printf("Unknown instruction %d at address 0x%08lx\n", hdr->opcode, (unsigned long)pos);
             break;
         }
+
+        pos = ROUND_UP(pos, BLOCK_SIZE);
     }
 
     if(!elf_is_empty(&elf))
@@ -609,7 +611,7 @@ static void extract(unsigned long filesize)
         const char *indent = "    ";
         while(true)
         {
-            byte cmd[16];
+            byte cmd[BLOCK_SIZE];
             if(sb_header->nr_keys > 0)
                 cbc_mac(g_buf + offset, cmd, 1, real_key, iv, &iv, 0);
             else
@@ -620,7 +622,7 @@ static void extract(unsigned long filesize)
             if(checksum != hdr->checksum)
             {
                 color(GREY);
-                printf("[Bad checksum]");
+                printf("[Bad checksum']");
             }
             
             if(hdr->opcode == SB_INST_NOP)
@@ -628,6 +630,8 @@ static void extract(unsigned long filesize)
                 color(RED);
                 printf("NOOP\n");
                 offset += BLOCK_SIZE;
+                /* restart with IV */
+                memcpy(iv, g_buf, 16);
             }
             else if(hdr->opcode == SB_INST_TAG)
             {
