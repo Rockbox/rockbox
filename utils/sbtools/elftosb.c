@@ -773,6 +773,7 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
         bugp("cannot open output file");
 
     byte real_key[16];
+    byte crypto_iv[16];
     byte (*cbc_macs)[16] = xmalloc(16 * g_nr_keys);
     /* init CBC-MACs */
     for(int i = 0; i < g_nr_keys; i++)
@@ -791,6 +792,9 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     produce_sb_header(sb, &sb_hdr);
     sha_1_update(&file_sha1, (byte *)&sb_hdr, sizeof(sb_hdr));
     write(fd, &sb_hdr, sizeof(sb_hdr));
+    
+    memcpy(crypto_iv, &sb_hdr, 16);
+
     /* update CBC-MACs */
     for(int i = 0; i < g_nr_keys; i++)
         cbc_mac((byte *)&sb_hdr, NULL, sizeof(sb_hdr) / BLOCK_SIZE, g_key_array[i],
@@ -814,10 +818,52 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
         struct sb_key_dictionary_entry_t entry;
         memcpy(entry.hdr_cbc_mac, cbc_macs[i], 16);
         cbc_mac(real_key, entry.key, sizeof(real_key) / BLOCK_SIZE, g_key_array[i],
-            (byte *)&sb_hdr, NULL, 1);
+            crypto_iv, NULL, 1);
         
         write(fd, &entry, sizeof(entry));
         sha_1_update(&file_sha1, (byte *)&entry, sizeof(entry));
+    }
+
+    /* HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK */
+    /* Image crafting, don't use it unless you understand what you do */
+    if(strlen(s_getenv("SB_OVERRIDE_REAL_KEY")) != 0)
+    {
+        const char *key = s_getenv("SB_OVERRIDE_REAL_KEY");
+        if(strlen(key) != 32)
+            bugp("Cannot override real key: invalid key length\n");
+        for(int i = 0; i < 16; i++)
+        {
+            byte a, b;
+            if(convxdigit(key[2 * i], &a) || convxdigit(key[2 * i + 1], &b))
+            bugp("Cannot override real key: key should be a 128-bit key written in hexadecimal\n");
+            real_key[i] = (a << 4) | b;
+        }
+    }
+    if(strlen(s_getenv("SB_OVERRIDE_IV")) != 0)
+    {
+        const char *iv = s_getenv("SB_OVERRIDE_IV");
+        if(strlen(iv) != 32)
+            bugp("Cannot override iv: invalid key length\n");
+        for(int i = 0; i < 16; i++)
+        {
+            byte a, b;
+            if(convxdigit(iv[2 * i], &a) || convxdigit(iv[2 * i + 1], &b))
+            bugp("Cannot override iv: key should be a 128-bit key written in hexadecimal\n");
+            crypto_iv[i] = (a << 4) | b;
+        }
+        
+    }
+    /* KCAH KCAH KCAH KCAH KCAH KCAH KCAH KCAH KCAH KCAH KCAH KCAH KCAH KCAH */
+    if(g_debug)
+    {
+        printf("Real key: ");
+        for(int j = 0; j < 16; j++)
+            printf("%02x", real_key[j]);
+        printf("\n");
+        printf("IV      : ");
+        for(int j = 0; j < 16; j++)
+            printf("%02x", crypto_iv[j]);
+        printf("\n");
     }
     /* produce sections data */
     for(int i = 0; i< sb_hdr.nr_sections; i++)
@@ -827,12 +873,12 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
         produce_section_tag_cmd(&sb->sections[i], &tag_cmd, (i + 1) == sb_hdr.nr_sections);
         if(g_nr_keys > 0)
             cbc_mac((byte *)&tag_cmd, (byte *)&tag_cmd, sizeof(tag_cmd) / BLOCK_SIZE,
-                real_key, (byte *)&sb_hdr, NULL, 1);
+                real_key, crypto_iv, NULL, 1);
         sha_1_update(&file_sha1, (byte *)&tag_cmd, sizeof(tag_cmd));
         write(fd, &tag_cmd, sizeof(tag_cmd));
         /* produce other commands */
         byte cur_cbc_mac[16];
-        memcpy(cur_cbc_mac, (byte *)&sb_hdr, 16);
+        memcpy(cur_cbc_mac, crypto_iv, 16);
         for(int j = 0; j < sb->sections[i].nr_insts; j++)
         {
             struct sb_inst_t *inst = &sb->sections[i].insts[j];
@@ -869,7 +915,7 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     sha_1_output(&file_sha1, final_sig);
     generate_random_data(final_sig + 20, 12);
     if(g_nr_keys > 0)
-        cbc_mac(final_sig, final_sig, 2, real_key, (byte *)&sb_hdr, NULL, 1);
+        cbc_mac(final_sig, final_sig, 2, real_key, crypto_iv, NULL, 1);
     write(fd, final_sig, 32);
     
     close(fd);

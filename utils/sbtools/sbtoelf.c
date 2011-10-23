@@ -372,8 +372,10 @@ static void extract(unsigned long filesize)
 
     if(memcmp(sb_header->signature, "STMP", 4) != 0)
         bugp("Bad signature");
+    /*
     if(sb_header->image_size * BLOCK_SIZE > filesize)
         bugp("File size mismatch");
+    */
     if(sb_header->header_size * BLOCK_SIZE != sizeof(struct sb_header_t))
         bugp("Bad header size");
     if(sb_header->sec_hdr_size * BLOCK_SIZE != sizeof(struct sb_section_header_t))
@@ -555,6 +557,17 @@ static void extract(unsigned long filesize)
         }
     }
 
+    color(RED);
+    printf("  Summary:\n");
+    color(GREEN);
+    printf("    Real key: ");
+    color(YELLOW);
+    print_hex(real_key, 16, true);
+    color(GREEN);
+    printf("    IV      : ");
+    color(YELLOW);
+    print_hex(g_buf, 16, true);
+
     /* sections */
     if(strcasecmp(s_getenv("SB_RAW_CMD"), "YES") != 0)
     {
@@ -615,10 +628,11 @@ static void extract(unsigned long filesize)
         printf("Commands\n");
         uint32_t offset = sb_header->first_boot_tag_off * BLOCK_SIZE;
         byte iv[16];
-        memcpy(iv, g_buf, 16);
         const char *indent = "    ";
         while(true)
         {
+            /* restart with IV */
+            memcpy(iv, g_buf, 16);
             byte cmd[BLOCK_SIZE];
             if(sb_header->nr_keys > 0)
                 cbc_mac(g_buf + offset, cmd, 1, real_key, iv, &iv, 0);
@@ -638,8 +652,6 @@ static void extract(unsigned long filesize)
                 color(RED);
                 printf("NOOP\n");
                 offset += BLOCK_SIZE;
-                /* restart with IV */
-                memcpy(iv, g_buf, 16);
             }
             else if(hdr->opcode == SB_INST_TAG)
             {
@@ -712,8 +724,6 @@ static void extract(unsigned long filesize)
                 if(tag->hdr.flags & SB_INST_LAST_TAG)
                     break;
                 offset += size;
-                /* restart with IV */
-                memcpy(iv, g_buf, 16);
             }
             else
             {
