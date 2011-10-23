@@ -502,7 +502,9 @@ void gui_synclist_set_viewport_defaults(struct viewport *vp,
                                         enum screen_type screen)
 {
     viewport_set_defaults(vp, screen);
+#ifdef HAVE_LCD_BITMAP
     vp->line_height = list_line_height(vp);
+#endif
 #ifdef HAVE_BUTTONBAR
     if (screens[screen].has_buttonbar)
         vp->height -= BUTTONBAR_HEIGHT;
