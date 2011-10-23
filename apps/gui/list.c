@@ -84,14 +84,18 @@ static int line_height_from_lcd_dpi(const struct viewport *vp)
     /* the 4/12 factor is designed for reasonable item size on a 160dpi screen */
     return MAX(lcd_get_dpi()*4/12, (int)font_get(vp->font)->height);
 }
+#endif
 
 static int list_line_height(const struct viewport *vp)
 {
+#ifdef HAVE_TOUCHSCREEN
     if (global_settings.list_line_padding == -1)
         return line_height_from_lcd_dpi(vp);
     return font_get(vp->font)->height + global_settings.list_line_padding;
-}
+#else
+    return font_get(vp->font)->height;
 #endif
+}
 
 static void list_init_viewports(struct gui_synclist *list)
 {
@@ -133,7 +137,6 @@ bool list_display_title(struct gui_synclist *list, enum screen_type screen)
 static int list_get_nb_lines(struct gui_synclist *list, enum screen_type screen)
 {
     struct viewport *vp = list->parent[screen];
-    vp->line_height = font_get(vp->font)->height;
     int lines = skinlist_get_line_count(screen, list);
     if (lines < 0)
     {
@@ -498,10 +501,8 @@ void gui_synclist_set_voice_callback(struct gui_synclist * lists,
 void gui_synclist_set_viewport_defaults(struct viewport *vp,
                                         enum screen_type screen)
 {
-    viewport_set_defaults(vp, screen);        
-#ifdef HAVE_TOUCHSCREEN
+    viewport_set_defaults(vp, screen);
     vp->line_height = list_line_height(vp);
-#endif
 #ifdef HAVE_BUTTONBAR
     if (screens[screen].has_buttonbar)
         vp->height -= BUTTONBAR_HEIGHT;
