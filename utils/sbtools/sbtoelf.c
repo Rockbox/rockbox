@@ -484,6 +484,7 @@ static void extract(unsigned long filesize)
     /* encryption cbc-mac */
     key_array_t keys = NULL; /* array of 16-bytes keys */
     byte real_key[16];
+    bool valid_key = false; /* false until a matching key was found */
     if(sb_header->nr_keys > 0)
     {
         keys = read_keys(sb_header->nr_keys);
@@ -512,8 +513,12 @@ static void extract(unsigned long filesize)
             cbc_mac(g_buf, NULL, sb_header->header_size + sb_header->nr_sections,
                 keys[i], zero, &computed_cbc_mac, 1);
             color(RED);
-            if(memcmp(dict_entry->hdr_cbc_mac, computed_cbc_mac, 16) == 0)
+            bool ok = memcmp(dict_entry->hdr_cbc_mac, computed_cbc_mac, 16) == 0;
+            if(ok)
+            {
+                valid_key = true;
                 printf(" Ok\n");
+            }
             else
                 printf(" Failed\n");
             color(GREEN);
@@ -531,9 +536,9 @@ static void extract(unsigned long filesize)
             color(YELLOW);
             print_hex(decrypted_key, 16, false);
             /* cross-check or copy */
-            if(i == 0)
+            if(valid_key && ok)
                 memcpy(real_key, decrypted_key, 16);
-            else if(memcmp(real_key, decrypted_key, 16) == 0)
+            else if(valid_key && memcmp(real_key, decrypted_key, 16) == 0)
             {
                 color(RED);
                 printf(" Cross-Check Ok");
