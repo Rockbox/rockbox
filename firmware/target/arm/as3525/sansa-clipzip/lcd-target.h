@@ -23,5 +23,5 @@
 #include "config.h"
 
 /* target-specific OLED brightness function */
-void lcd_brightness(uint8_t red, uint8_t green, uint8_t blue);
+void oled_brightness(int brightness);
 

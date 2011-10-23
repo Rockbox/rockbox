@@ -336,18 +336,28 @@ static void lcd_setup_rect(int x, int x_end, int y, int y_end)
 }
 
 /* sets the brightness of the OLED */
-void lcd_brightness(uint8_t red, uint8_t green, uint8_t blue)
+void oled_brightness(int brightness)
 {
+    int r, g, b;
+
     if (lcd_type == 0) {
-        lcd_write(0x40, red);   /* COLUMN_CURRENT_R */
-        lcd_write(0x41, green); /* COLUMN_CURRENT_G */
-        lcd_write(0x42, blue);  /* COLUMN_CURRENT_B */
+        r = 2 + 16*brightness;
+        g = 1 + 10*brightness;
+        b = 1 + (23*brightness)/2;
+    
+        lcd_write(0x40, r); /* COLUMN_CURRENT_R */
+        lcd_write(0x41, g); /* COLUMN_CURRENT_G */
+        lcd_write(0x42, b); /* COLUMN_CURRENT_B */
     }
     else {
+        r = 6 + 10*brightness;
+        g = 1 + 6*brightness;
+        b = 3 + 10*brightness;
+    
         lcd_write_cmd(0x0E);
-        lcd_write_nibbles(red);
-        lcd_write_nibbles(green);
-        lcd_write_nibbles(blue);
+        lcd_write_nibbles(r);
+        lcd_write_nibbles(g);
+        lcd_write_nibbles(b);
     }
 }
 

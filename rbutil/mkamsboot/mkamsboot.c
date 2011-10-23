@@ -174,6 +174,7 @@ static struct md5sums sansasums[] = {
 #if 0 /* disabled for now because it's not been proven they can be patched */
     { MODEL_CLIPZIP, "1.01.12", "45adea0873326b5af34f096e5c402f78" },
     { MODEL_CLIPZIP, "1.01.15", "f62af954334cd9ba1a87a7fa58ec6074" },
+    { MODEL_CLIPZIP, "1.01.17", "27bcb343d6950f35dc261629e22ba60c" },
 #endif
 };
 
