@@ -27,8 +27,7 @@
 #include "lcdif-imx233.h"
 #include "clkctrl-imx233.h"
 #include "pinctrl-imx233.h"
-
-#define logf(...)
+#include "logf.h"
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
@@ -142,7 +141,6 @@ static void setup_lcdif(void)
     setup_parameters();
     common_lcd_enable(true);
     imx233_lcdif_enable_bus_master(true);
-    //imx233_lcdif_enable_irqs(HW_LCDIF__CUR_FRAME_DONE_IRQ);
 }
 
 static inline uint32_t encode_16_to_18(uint32_t a)
@@ -157,7 +155,7 @@ static inline uint32_t decode_18_to_16(uint32_t a)
 
 static void setup_lcdif_clock(void)
 {
-    /* the LCD seems to works at 24Mhz, so use the xtal clock with no divider */
+    /* the LCD seems to work at 24Mhz, so use the xtal clock with no divider */
     imx233_enable_clock(CLK_PIX, false);
     imx233_set_clock_divisor(CLK_PIX, 1);
     imx233_set_bypass_pll(CLK_PIX, true); /* use XTAL */
