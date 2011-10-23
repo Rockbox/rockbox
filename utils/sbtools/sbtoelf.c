@@ -538,15 +538,18 @@ static void extract(unsigned long filesize)
             /* cross-check or copy */
             if(valid_key && ok)
                 memcpy(real_key, decrypted_key, 16);
-            else if(valid_key && memcmp(real_key, decrypted_key, 16) == 0)
+            else if(valid_key)
             {
-                color(RED);
-                printf(" Cross-Check Ok");
-            }
-            else
-            {
-                color(RED);
-                printf(" Cross-Check Failed");
+                if(memcmp(real_key, decrypted_key, 16) == 0)
+                {
+                    color(RED);
+                    printf(" Cross-Check Ok");
+                }
+                else
+                {
+                    color(RED);
+                    printf(" Cross-Check Failed");
+                }
             }
             printf("\n");
         }
