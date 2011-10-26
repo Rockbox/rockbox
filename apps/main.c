@@ -408,7 +408,11 @@ static void init(void)
     scrobbler_init();
 
     audio_init();
-    
+
+#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING)
+    pcm_rec_init();
+#endif
+
     settings_apply_skins();
 }
 
@@ -687,7 +691,7 @@ static void init(void)
     audio_init();
     CHART("<audio_init");
 
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && !defined(SIMULATOR)
+#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING)
     pcm_rec_init();
 #endif
 
