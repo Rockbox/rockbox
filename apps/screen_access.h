@@ -109,8 +109,6 @@ struct screen
     void (*draw_border_viewport)(void);
     void (*drawpixel)(int x, int y);
     void (*drawline)(int x1, int y1, int x2, int y2);
-    void (*vline)(int x, int y1, int y2);
-    void (*hline)(int x1, int x2, int y);
 #endif /* HAVE_LCD_BITMAP || HAVE_REMOTE_LCD */
 
 #ifdef HAVE_LCD_CHARCELLS  /* no charcell remote LCDs so far */

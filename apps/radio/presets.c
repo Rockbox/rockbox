@@ -622,7 +622,7 @@ static inline void draw_vertical_line_mark(struct screen * screen,
                                            int x, int y, int h)
 {
     screen->set_drawmode(DRMODE_COMPLEMENT);
-    screen->vline(x, y, y+h-1);
+    screen->drawline(x, y, x, y+h-1);
 }
 
 /* draw the preset markers for a track of length "tracklen",

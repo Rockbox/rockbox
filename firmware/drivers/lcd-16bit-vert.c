@@ -74,6 +74,9 @@ static struct viewport* current_vp IDATA_ATTR = &default_vp;
 struct viewport* current_vp IDATA_ATTR = &default_vp;
 #endif
 
+static void lcd_hline(int x1, int x2, int y);
+static void lcd_vline(int x, int y1, int y2);
+
 /* LCD init */
 void lcd_init(void)
 {
@@ -433,7 +436,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 }
 
 /* Draw a horizontal line (optimised) */
-void lcd_hline(int x1, int x2, int y)
+static void lcd_hline(int x1, int x2, int y)
 {
     int x;
     fb_data *dst, *dst_end;
@@ -490,7 +493,7 @@ void lcd_hline(int x1, int x2, int y)
 }
 
 /* Draw a vertical line (optimised) */
-void lcd_vline(int x, int y1, int y2)
+static void lcd_vline(int x, int y1, int y2)
 {
     int y, height;
     unsigned bits = 0;

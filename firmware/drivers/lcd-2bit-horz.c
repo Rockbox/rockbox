@@ -64,6 +64,9 @@ static struct viewport* current_vp IBSS_ATTR;
 static unsigned fg_pattern IBSS_ATTR;
 static unsigned bg_pattern IBSS_ATTR;
 
+static void lcd_hline(int x1, int x2, int y);
+static void lcd_vline(int x, int y1, int y2);
+
 /* LCD init */
 void lcd_init(void)
 {
@@ -537,7 +540,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 }
 
 /* Draw a horizontal line (optimised) */
-void lcd_hline(int x1, int x2, int y)
+static void lcd_hline(int x1, int x2, int y)
 {
     int nx;
     unsigned char *dst;
@@ -598,7 +601,7 @@ void lcd_hline(int x1, int x2, int y)
 }
 
 /* Draw a vertical line (optimised) */
-void lcd_vline(int x, int y1, int y2)
+static void lcd_vline(int x, int y1, int y2)
 {
     int y;
     unsigned char *dst, *dst_end;

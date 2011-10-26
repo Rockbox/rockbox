@@ -145,6 +145,19 @@ static int close_wrapper(int fd);
 static int creat_wrapper(const char *pathname, mode_t mode);
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+/* translation for legacy lcd api */
+static void hline(int x1, int x2, int y)
+{
+   lcd_drawline(x1, y, x2, y);
+}
+
+static void vline(int x, int y1, int y2)
+{
+   lcd_drawline(x, y1, x, y2);
+}
+#endif
+
 static struct plugin_api rockbox_api = {
 
     /* lcd */
@@ -177,8 +190,8 @@ static struct plugin_api rockbox_api = {
     screen_helper_setfont,
     lcd_drawpixel,
     lcd_drawline,
-    lcd_hline,
-    lcd_vline,
+    hline,
+    vline,
     lcd_drawrect,
     lcd_fillrect,
     lcd_mono_bitmap_part,

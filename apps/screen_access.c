@@ -185,8 +185,6 @@ struct screen screens[NB_SCREENS] =
         .fill_viewport=&lcd_fill_viewport,
         .drawpixel=&lcd_drawpixel,
         .drawline=&lcd_drawline,
-        .vline=&lcd_vline,
-        .hline=&lcd_hline,
         .scroll_step=&lcd_scroll_step,
 #endif /* HAVE_LCD_BITMAP */
 
@@ -268,8 +266,6 @@ struct screen screens[NB_SCREENS] =
         .fill_viewport=&lcd_remote_fill_viewport,
         .drawpixel=&lcd_remote_drawpixel,
         .drawline=&lcd_remote_drawline,
-        .vline=&lcd_remote_vline,
-        .hline=&lcd_remote_hline,
         .scroll_step=&lcd_remote_scroll_step,
 #endif /* 1 */
 

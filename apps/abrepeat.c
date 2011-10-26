@@ -170,7 +170,7 @@ static void ab_draw_vertical_line_mark(struct screen * screen,
                                               int x, int y, int h)
 {
     screen->set_drawmode(DRMODE_COMPLEMENT);
-    screen->vline(x, y, y+h-1);
+    screen->drawline(x, y, x, y+h-1);
 }
 
 #define DIRECTION_RIGHT 1
@@ -183,7 +183,7 @@ static void ab_draw_arrow_mark(struct screen * screen,
     screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     while( h > 0 )
     {
-        screen->vline(x, y, y+h-1);
+        screen->drawline(x, y, x, y+h-1);
         h -= 2;
         y++;
         x += direction;

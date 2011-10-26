@@ -1113,7 +1113,8 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     /* draw left */
     display->fillrect (x, y, left, height / 2 - 2 );
     if (scales->pm_peak_left > 0) {
-        display->vline(x + scales->pm_peak_left, y, y + height / 2 - 2 );
+       display->drawline(x + scales->pm_peak_left, y,
+                         x + scales->pm_peak_left, y + height / 2 - 2 );
     }
     if (pm_clip_left) {
         display->fillrect(x + meterwidth, y, 3, height / 2 - 1);
@@ -1122,14 +1123,15 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     /* draw right */
     display->fillrect(x, y + height / 2 + 1, right, height / 2 - 2);
     if (scales->pm_peak_right > 0) {
-        display->vline( x + scales->pm_peak_right, y + height / 2, y + height - 2);
+        display->drawline( x + scales->pm_peak_right, y + height / 2,
+                           x + scales->pm_peak_right, y + height - 2);
     }
     if (pm_clip_right) {
         display->fillrect(x + meterwidth, y + height / 2, 3, height / 2 - 1);
     }
 
     /* draw scale end */
-    display->vline(x + meterwidth, y, y + height - 2);
+    display->drawline(x + meterwidth, y, x + meterwidth, y + height - 2);
 
     /* draw dots for scale marks */
     for (i = 0; i < db_scale_count; i++) {
@@ -1174,13 +1176,13 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         ycenter = y + height / 2;
         /* display threshold value */
         start_trigx = x+peak_meter_scale_value(trig_strt_threshold,meterwidth);
-        display->vline(start_trigx, ycenter - 2, ycenter);
+        display->drawline(start_trigx, ycenter - 2, start_trigx, ycenter);
         start_trigx ++;
         if (start_trigx < display->getwidth() ) display->drawpixel(start_trigx,
                                                                    ycenter - 1);
 
         stop_trigx = x + peak_meter_scale_value(trig_stp_threshold,meterwidth);
-        display->vline(stop_trigx, ycenter - 2, ycenter);
+        display->drawline(stop_trigx, ycenter - 2, stop_trigx, ycenter);
         if (stop_trigx > 0) display->drawpixel(stop_trigx - 1, ycenter - 1);
     }
 #endif /*HAVE_RECORDING*/
@@ -1463,7 +1465,7 @@ bool peak_meter_histogram(void)
 
         for (i = 0; i < PEEKS_PER_DRAW_SIZE; i++) {
             x = peeks_per_redraw[i] * (LCD_WIDTH - 1)/ max;
-            screens[0].hline(0, x, y + i);
+            screens[0].drawline(0, y + i, x, y + i);
         }
 
         y = PEEKS_PER_DRAW_SIZE + 1;
@@ -1475,7 +1477,7 @@ bool peak_meter_histogram(void)
 
         for (i = 0; i < TICKS_PER_DRAW_SIZE; i++) {
             x = ticks_per_redraw[i] * (LCD_WIDTH - 1)/ max;
-            screens[0].hline(0, x, y + i);
+            screens[0].drawline(0, y + i, x, y + i);
         }
         screens[0].update();
 
@@ -1536,7 +1538,8 @@ void histogram_draw(int x1, int x2, int y1, int y2, int width, int height)
 #endif
             else
                 lcd_set_foreground(LCD_HIST_OK);
-            lcd_vline(x1 + i, y1 + height - 2, y1 + height - history_l[j]);
+            lcd_drawline(x1 + i, y1 + height - 2,
+                         x1 + i, y1 + height - history_l[j]);
         }
         if (history_r[j])
         {
@@ -1548,7 +1551,8 @@ void histogram_draw(int x1, int x2, int y1, int y2, int width, int height)
 #endif
             else
                 lcd_set_foreground(LCD_HIST_OK);
-            lcd_vline(x2 + i, y2 + height - 2, y2 + height - history_r[j]);
+            lcd_drawline(x2 + i, y2 + height - 2,
+                         x2 + i, y2 + height - history_r[j]);
         }
     }
     lcd_set_foreground(

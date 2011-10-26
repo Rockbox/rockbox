@@ -941,7 +941,7 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
        doesn't collide */
     screen_clear_area(sc, 0, y - 1, sc_w, pm->font_h + 6);
 
-    sc->hline(0, sc_w - 1, y);
+    sc->drawline(0, y, sc_w - 1, y);
 
     /* write out the text */
     sc->setfont(pm->curfont);
@@ -998,10 +998,11 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
     i = text_margin + pm->curpos * pm->text_w;
 
     if (state->cur_blink)
-        sc->vline(i, pm->main_y, pm->main_y + pm->font_h - 1);
+        sc->drawline(i, pm->main_y, i, pm->main_y + pm->font_h - 1);
 
     if (state->hangul) /* draw underbar */
-        sc->hline(i - pm->text_w, i, pm->main_y + pm->font_h - 1);
+        sc->drawline(i - pm->text_w, pm->main_y + pm->font_h - 1,
+                     i, pm->main_y + pm->font_h - 1);
 
     if (pm->line_edit)
     {
@@ -1032,7 +1033,7 @@ static void kbd_draw_buttons(struct keyboard_parameters *pm, struct screen *sc)
     {
         /* button to flip page. */
         vp.y = pm->lines*pm->font_h;
-        sc->hline(0, sc_w - 1, 0);
+        sc->drawline(0, 0, sc_w - 1, 0);
         sc->printf(0, text_y, ">");
     }
     /* OK/Del/Cancel buttons */
@@ -1040,14 +1041,14 @@ static void kbd_draw_buttons(struct keyboard_parameters *pm, struct screen *sc)
     text_y = (button_h - text_h) / 2 + 1;
     vp.y = sc_h - button_h - 1;
     vp.height = button_h;
-    sc->hline(0, sc_w - 1, 0);
+    sc->drawline(0, 0, sc_w - 1, 0);
     vp.width = sc_w/3;
     sc->printf(0, text_y, str(LANG_KBD_OK));
     vp.x += vp.width;
-    sc->vline(0, 0, button_h);
+    sc->drawline(0, 0, 0, button_h);
     sc->printf(0, text_y, str(LANG_KBD_DELETE));
     vp.x += vp.width;
-    sc->vline(0, 0, button_h);
+    sc->drawline(0, 0, 0, button_h);
     sc->printf(0, text_y, str(LANG_KBD_CANCEL));
     sc->set_viewport(NULL);
 }

@@ -115,10 +115,10 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
     /* draw box */
 #ifdef HAVE_LCD_COLOR
     /* must avoid corners if case of (flags & FOREGROUND) */
-    screen->hline(inner_x, x + inner_wd, y);
-    screen->hline(inner_x, x + inner_wd, y + height - 1);
-    screen->vline(x, inner_y, y + inner_ht);
-    screen->vline(x + width - 1, inner_y, y + inner_ht);
+    screen->drawline(inner_x, y, x + inner_wd, y);
+    screen->drawline(inner_x, y + height - 1, x + inner_wd, y + height - 1);
+    screen->drawline(x, inner_y, x, y + inner_ht);
+    screen->drawline(x + width - 1, inner_y, x + width - 1, y + inner_ht);
 #else
     screen->drawrect(x, y, width, height);
 #endif

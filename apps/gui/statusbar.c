@@ -445,8 +445,8 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
     else {
         /* draw battery */
         display->drawrect(STATUSBAR_BATTERY_X_POS, STATUSBAR_Y_POS, 17, 7);
-        display->vline(STATUSBAR_BATTERY_X_POS + 17, STATUSBAR_Y_POS + 2,
-                       STATUSBAR_Y_POS + 4);
+        display->drawline(STATUSBAR_BATTERY_X_POS + 17, STATUSBAR_Y_POS + 2,
+                          STATUSBAR_BATTERY_X_POS + 17, STATUSBAR_Y_POS + 4);
 
         display->fillrect(STATUSBAR_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1,
                           fill, 5);
@@ -528,9 +528,10 @@ static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
             /* display volume bar */
             vol = (volume - minvol) * 14 / (maxvol - minvol);
             for(i=0; i < vol; i++) {
-                display->vline(STATUSBAR_VOLUME_X_POS + i,
-                               STATUSBAR_Y_POS + 6 - i / 2,
-                               STATUSBAR_Y_POS + 6);
+                display->drawline(STATUSBAR_VOLUME_X_POS + i,
+                                  STATUSBAR_Y_POS + 6 - i / 2,
+                                  STATUSBAR_VOLUME_X_POS + i,
+                                  STATUSBAR_Y_POS + 6);
             }
         }
     }

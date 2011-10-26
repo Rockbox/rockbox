@@ -490,8 +490,6 @@ extern lcd_blockfunc_type* const lcd_blockfuncs[8];
 
 extern void lcd_drawpixel(int x, int y);
 extern void lcd_drawline(int x1, int y1, int x2, int y2);
-extern void lcd_hline(int x1, int x2, int y);
-extern void lcd_vline(int x, int y1, int y2);
 extern void lcd_drawrect(int x, int y, int width, int height);
 extern void lcd_fillrect(int x, int y, int width, int height);
 extern void lcd_draw_border_viewport(void);
