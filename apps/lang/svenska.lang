@@ -423,7 +423,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -2240,6 +2240,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Skapar databas... %d hittade (AV = Återgå)"
@@ -2248,6 +2249,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Skapar databas... %d hittade (VÄNSTER = Återgå)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
     gogearsa9200: "Skapar databas... %d hittade (REW = Återgå)"
+    archosplayer: "Skapar DB %d hittade"
   </dest>
   <voice>
     *: "objekt hittade för databasen"
@@ -6463,7 +6465,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -12382,15 +12384,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D-förbättring"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D-förbättring"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D-förbättring"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D-förbättring"
   </voice>
 </phrase>
 <phrase>
