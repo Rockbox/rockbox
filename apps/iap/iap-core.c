@@ -1101,6 +1101,7 @@ void iap_interface_state_change(const enum interface_state new)
     interface_state = new;
 }
 
+#if 0
 static void iap_handlepkt_mode7(const unsigned int len, const unsigned char *buf)
 {
     unsigned int cmd = buf[1];
@@ -1135,6 +1136,7 @@ static void iap_handlepkt_mode7(const unsigned int len, const unsigned char *buf
         }
     }
 }
+#endif
 
 void iap_handlepkt(void)
 {
@@ -1160,7 +1162,7 @@ void iap_handlepkt(void)
     case 2: iap_handlepkt_mode2(length, iap_rxstart+2); break;
     case 3: iap_handlepkt_mode3(length, iap_rxstart+2); break;
     case 4: iap_handlepkt_mode4(length, iap_rxstart+2); break;
-    case 7: iap_handlepkt_mode7(length, iap_rxstart+2); break;
+    /* case 7: iap_handlepkt_mode7(length, iap_rxstart+2); break; */
     }
 
     /* Remove the handled packet from the RX buffer
