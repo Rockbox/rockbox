@@ -678,12 +678,11 @@ const struct settings_list settings[] = {
 
     CHOICE_SETTING(F_SOUNDSETTING, channel_config, LANG_CHANNEL_CONFIGURATION,
                    0,"channels",
-                   "stereo,mono,custom,mono left,mono right,karaoke,swap",
-                   sound_set_channels, 7,
+                   "stereo,mono,custom,mono left,mono right,karaoke",
+                   sound_set_channels, 6,
                    ID2P(LANG_CHANNEL_STEREO), ID2P(LANG_CHANNEL_MONO),
                    ID2P(LANG_CHANNEL_CUSTOM), ID2P(LANG_CHANNEL_LEFT),
-                   ID2P(LANG_CHANNEL_RIGHT), ID2P(LANG_CHANNEL_KARAOKE),
-                   ID2P(LANG_CHANNEL_SWAP)),
+                   ID2P(LANG_CHANNEL_RIGHT), ID2P(LANG_CHANNEL_KARAOKE)),
     SOUND_SETTING(F_SOUNDSETTING, stereo_width, LANG_STEREO_WIDTH,
                   "stereo_width", SOUND_STEREO_WIDTH),
 #ifdef AUDIOHW_HAVE_DEPTH_3D

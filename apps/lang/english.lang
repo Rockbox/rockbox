@@ -12903,20 +12903,3 @@
     *: "Cancel Sleep Timer"
   </voice>
 </phrase>
-<phrase>
-  id: LANG_CHANNEL_SWAP
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    swcodec: "Swap channels"
-  </source>
-  <dest>
-    *: none
-    swcodec: "Swap channels"
-  </dest>
-  <voice>
-    *: none
-    swcodec: "Swap channels"
-  </voice>
-</phrase>
