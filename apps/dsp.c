@@ -1175,6 +1175,18 @@ static void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
 }
 #endif /* DSP_HAVE_ASM_SOUND_CHAN_KARAOKE */
 
+static void channels_process_sound_chan_swap(int count, int32_t *buf[])
+{
+    int32_t *sl = buf[0], *sr = buf[1];
+
+    while (count-- > 0)
+    {
+        int32_t ch = *sl;
+        *sl++ = *sr;
+        *sr++ = ch;
+    }
+}
+
 static void dsp_set_channel_config(int value)
 {
     static const channels_process_fn_type channels_process_functions[] =
@@ -1186,6 +1198,7 @@ static void dsp_set_channel_config(int value)
         [SOUND_CHAN_MONO_LEFT]  = channels_process_sound_chan_mono_left,
         [SOUND_CHAN_MONO_RIGHT] = channels_process_sound_chan_mono_right,
         [SOUND_CHAN_KARAOKE]    = channels_process_sound_chan_karaoke,
+        [SOUND_CHAN_SWAP]       = channels_process_sound_chan_swap,
     };
 
     if ((unsigned)value >= ARRAYLEN(channels_process_functions) ||
