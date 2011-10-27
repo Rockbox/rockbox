@@ -506,6 +506,7 @@ static void usb_thread(void)
         case USB_REENABLE:
 #endif
             usb_handle_hotswap(ev.id);
+            break;
 #endif
 
         /* FIREWIRE */
@@ -738,7 +739,6 @@ void usb_close(void)
     tick_remove_task(usb_tick);
 #endif
     usb_monitor_enabled = false;
-
     queue_post(&usb_queue, USB_QUIT, 0);
     thread_wait(thread);
 }
