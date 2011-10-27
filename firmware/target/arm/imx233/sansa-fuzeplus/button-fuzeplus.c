@@ -26,6 +26,7 @@
 #include "synaptics-rmi.h"
 #include "lcd.h"
 #include "string.h"
+#include "usb.h"
 
 #ifndef BOOTLOADER
 
@@ -186,10 +187,12 @@ static struct button_area_t button_areas[] =
     {0, 0, 0, 0, 0},
 };
 
+#define RMI_INTERRUPT   1
+
 static int touchpad_btns = 0;
 static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
 static const char rmi_thread_name[] = "rmi";
-static struct semaphore rmi_sema;
+static struct event_queue rmi_queue;
 
 static int find_button(int x, int y)
 {
@@ -212,16 +215,26 @@ void rmi_attn_cb(int bank, int pin)
 {
     (void) bank;
     (void) pin;
-    semaphore_release(&rmi_sema);
+    /* the callback will not be fired until interrupt is enabled back so
+     * the queue will not overflow or contain multiple RMI_INTERRUPT events */
+    queue_post(&rmi_queue, RMI_INTERRUPT, 0);
 }
 
 void rmi_thread(void)
 {
-    semaphore_init(&rmi_sema, 1, 0);
+    struct queue_event ev;
+    
     while(1)
     {
-        imx233_setup_pin_irq(0, 27, true, true, false, &rmi_attn_cb);
-        semaphore_wait(&rmi_sema, TIMEOUT_BLOCK);
+        queue_wait(&rmi_queue, &ev);
+        /* handle usb connect and ignore all messages except rmi interrupts */
+        if(ev.id == SYS_USB_CONNECTED)
+        {
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            continue;
+        }
+        else if(ev.id != RMI_INTERRUPT)
+            continue;
         /* clear interrupt */
         rmi_read_single(RMI_INTERRUPT_REQUEST);
         /* read data */
@@ -244,6 +257,8 @@ void rmi_thread(void)
             touchpad_btns = 0;
         else
             touchpad_btns = find_button(absolute_x, absolute_y);
+        /* enable interrupt */
+        imx233_setup_pin_irq(0, 27, true, true, false, &rmi_attn_cb);
     }
 }
 
@@ -286,8 +301,11 @@ void button_init_device(void)
         RMI_2D_GESTURE_FLICK_DIST_4MM << RMI_2D_GESTURE_FLICK_DIST_BP |
         RMI_2D_GESTURE_FLICK_TIME_700MS << RMI_2D_GESTURE_FLICK_TIME_BP);
 
+    queue_init(&rmi_queue, true);
     create_thread(rmi_thread, rmi_stack, sizeof(rmi_stack), 0,
             rmi_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
+    /* enable interrupt */
+    imx233_setup_pin_irq(0, 27, true, true, false, &rmi_attn_cb);
 }
 
 #else
