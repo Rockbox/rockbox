@@ -418,17 +418,22 @@ void RbUtilQt::updateManual()
 {
     if(RbSettings::value(RbSettings::Platform) != "")
     {
-        QString manual= SystemInfo::value(SystemInfo::CurManual).toString();
+        QString manual = SystemInfo::value(SystemInfo::CurManual).toString();
+        QString buildservermodel = SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
+        QString pdfmanual = SystemInfo::value(SystemInfo::ManualUrl).toString();
+        QString htmlmanual = pdfmanual;
 
-        if(manual == "")
-            manual = "rockbox-"
-                + SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
-        QString pdfmanual;
-        pdfmanual = SystemInfo::value(SystemInfo::ManualUrl).toString()
-                            + "/" + manual + ".pdf";
-        QString htmlmanual;
-        htmlmanual = SystemInfo::value(SystemInfo::ManualUrl).toString()
-                            + "/" + manual + "/rockbox-build.html";
+        pdfmanual.replace("%EXTENSION%", "pdf");
+        htmlmanual.replace("%EXTENSION%", "html");
+        if(manual.isEmpty()) {
+            pdfmanual.replace("%MANUALBASENAME%", "rockbox-" + buildservermodel);
+            htmlmanual.replace("%MANUALBASENAME%", "rockbox-" + buildservermodel + "/rockbox-build");
+        }
+        else {
+            pdfmanual.replace("%MANUALBASENAME%", "rockbox-" + manual);
+            htmlmanual.replace("%MANUALBASENAME%", "rockbox-" + manual + "/rockbox-build");
+        }
+
         ui.labelPdfManual->setText(tr("<a href='%1'>PDF Manual</a>")
             .arg(pdfmanual));
         ui.labelHtmlManual->setText(tr("<a href='%1'>HTML Manual (opens in browser)</a>")
