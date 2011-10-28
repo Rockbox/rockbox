@@ -1043,6 +1043,7 @@ static bool set_backdrop(void)
             sizeof(global_settings.backdrop_file));
     settings_save();
     skin_backdrop_load_setting();
+    skin_backdrop_show(sb_get_backdrop(SCREEN_MAIN));
     return true;
 }
 MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),

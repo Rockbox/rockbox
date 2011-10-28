@@ -205,22 +205,23 @@ void skin_backdrop_load_setting(void)
             if (global_settings.backdrop_file[0] &&
                 global_settings.backdrop_file[0] != '-')
             {
-                if (!backdrops[i].buffer)
+                if (!backdrops[i].buflib_handle <= 0)
                 {
-                    bool loaded;
                     backdrops[i].buflib_handle =
                             core_alloc_ex(global_settings.backdrop_file,
                                         LCD_BACKDROP_BYTES, &buflib_ops);
                     if (backdrops[i].buflib_handle < 0)
                         return;
-                    backdrops[i].buffer = core_get_data(backdrops[i].buflib_handle);
-                    handle_being_loaded = backdrops[i].buflib_handle;
-                    loaded = screens[SCREEN_MAIN].backdrop_load(
-                                                       global_settings.backdrop_file,
-                                                       backdrops[i].buffer);
-                    handle_being_loaded = -1;
-                    backdrops[i].name[2] = loaded ? '.' : '\0';
                 }
+                bool loaded;
+                backdrops[i].buffer = core_get_data(backdrops[i].buflib_handle);
+                handle_being_loaded = backdrops[i].buflib_handle;
+                loaded = screens[SCREEN_MAIN].backdrop_load(
+                                                   global_settings.backdrop_file,
+                                                   backdrops[i].buffer);
+                handle_being_loaded = -1;
+                backdrops[i].name[2] = loaded ? '.' : '\0';
+                backdrops[i].loaded = loaded;
                 return;
             }
             else
