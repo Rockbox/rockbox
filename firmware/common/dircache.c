@@ -824,6 +824,15 @@ static int dircache_do_rebuild(void)
     return 1;
 }
 
+/*
+ * Free all associated resources, if any */
+static void dircache_free(void)
+{
+    if (dircache_handle > 0)
+        dircache_handle = core_free(dircache_handle);
+    dircache_size = allocated_size = 0;
+}
+
 /**
  * Internal thread that controls transparent cache building.
  */
@@ -846,7 +855,7 @@ static void dircache_thread(void)
             case DIRCACHE_BUILD:
                 thread_enabled = true;
                 if (dircache_do_rebuild() < 0)
-                    dircache_handle = core_free(dircache_handle);
+                    dircache_free();
                 thread_enabled = false;
                 break ;
                 
@@ -902,8 +911,8 @@ int dircache_build(int last_size)
         return 2;
     }
 
-    if (dircache_handle > 0)
-        dircache_handle = core_free(dircache_handle);
+    /* start by freeing, as we possibly re-allocate */
+    dircache_free();
 
     if (last_size > DIRCACHE_RESERVE && last_size < DIRCACHE_LIMIT )
     {
@@ -1130,8 +1139,7 @@ bool dircache_resume(void)
 void dircache_disable(void)
 {
     dircache_suspend();
-    dircache_handle = core_free(dircache_handle);
-    dircache_size = allocated_size = 0;
+    dircache_free();
 }
 
 /**
