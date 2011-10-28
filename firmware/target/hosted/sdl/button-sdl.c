@@ -33,6 +33,7 @@
 #include "sim_tasks.h"
 #include "buttonmap.h"
 #include "debug.h"
+#include "powermgmt.h"
 
 #ifdef HAVE_TOUCHSCREEN
 #include "touchscreen.h"
@@ -418,6 +419,7 @@ static void button_event(int key, bool pressed)
 #ifdef HAVE_BUTTON_LIGHT
         buttonlight_on();
 #endif
+        reset_poweroff_timer();
         queue_post(&button_queue, new_btn, 1<<24);
         new_btn &= ~(BUTTON_SCROLL_FWD | BUTTON_SCROLL_BACK);
     }

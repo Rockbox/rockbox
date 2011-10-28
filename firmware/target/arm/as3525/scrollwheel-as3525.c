@@ -23,6 +23,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
+#include "powermgmt.h"
 
 void scrollwheel(unsigned int wheel_value)
 {
@@ -108,6 +109,7 @@ void scrollwheel(unsigned int wheel_value)
         {
             buttonlight_on();
             backlight_on();
+            reset_poweroff_timer();
             queue_post(&button_queue, btn, ((wheel_delta+1)<<24));
             /* message posted - reset count and remember post */
             counter = 0;
