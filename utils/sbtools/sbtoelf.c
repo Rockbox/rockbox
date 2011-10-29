@@ -86,6 +86,17 @@ static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
     return sum;
 }
 
+static void elf_printf(void *user, bool error, const char *fmt, ...)
+{
+    if(!g_debug && !error)
+        return;
+    (void) user;
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+}
+
 static void elf_write(void *user, uint32_t addr, const void *buf, size_t count)
 {
     FILE *f = user;
@@ -105,7 +116,7 @@ static void extract_elf_section(struct elf_params_t *elf, int count, const char 
     
     if(fd == NULL)
         return ;
-    elf_write_file(elf, elf_write, fd);
+    elf_write_file(elf, elf_write, elf_printf, fd);
     fclose(fd);
 }
 
@@ -481,6 +492,15 @@ static void extract(unsigned long filesize)
         }
     }
 
+    if(getenv("SB_REAL_KEY") != 0)
+    {
+        struct crypto_key_t k;
+        char *env = getenv("SB_REAL_KEY");
+        if(!parse_key(&env, &k) || *env)
+            bug("Invalid SB_REAL_KEY");
+        memcpy(real_key, k.u.key, 16);
+    }
+
     color(RED);
     printf("  Summary:\n");
     color(GREEN);
@@ -751,6 +771,9 @@ int main(int argc, char **argv)
                 add_keys(&g_zero_key, 1);
                 break;
             }
+            case 'r':
+                g_raw_mode = true;
+                break;
             case 'a':
             {
                 struct crypto_key_t key;

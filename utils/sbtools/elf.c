@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "elf.h"
+#include "misc.h"
 
 /**
  * Definitions
@@ -219,7 +220,8 @@ void elf_add_fill_section(struct elf_params_t *params,
     sec->pattern = pattern;
 }
 
-void elf_write_file(struct elf_params_t *params, elf_write_fn_t write, void *user)
+void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
+    elf_printf_fn_t printf, void *user)
 {
     Elf32_Ehdr ehdr;
     uint32_t phnum = 0;
@@ -235,6 +237,10 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write, void *use
         {
             sec->offset = offset;
             offset += sec->size;
+        }
+        else
+        {
+            sec->offset = 0;
         }
         
         phnum++;
