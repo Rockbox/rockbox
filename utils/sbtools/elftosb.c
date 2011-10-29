@@ -21,13 +21,8 @@
  
 #define _ISOC99_SOURCE
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <inttypes.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
@@ -39,143 +34,18 @@
 #include "elf.h"
 #include "sb.h"
 #include "dbparser.h"
+#include "misc.h"
 
-#define _STR(a) #a
-#define STR(a) _STR(a)
-
-#define bug(...) do { fprintf(stderr,"["__FILE__":"STR(__LINE__)"]ERROR: "__VA_ARGS__); exit(1); } while(0)
-#define bugp(a) do { perror("ERROR: "a); exit(1); } while(0)
-
-bool g_debug = false;
 char **g_extern;
 int g_extern_count;
 
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
 
-/**
- * Misc
- */
-
-char *s_getenv(const char *name)
-{
-    char *s = getenv(name);
-    return s ? s : "";
-}
-
-void generate_random_data(void *buf, size_t sz)
-{
-    static int rand_fd = -1;
-    if(rand_fd == -1)
-        rand_fd = open("/dev/urandom", O_RDONLY);
-    if(rand_fd == -1)
-        bugp("failed to open /dev/urandom");
-    if(read(rand_fd, buf, sz) != (ssize_t)sz)
-        bugp("failed to read /dev/urandom");
-}
-
-void *xmalloc(size_t s) /* malloc helper, used in elf.c */
-{
-    void * r = malloc(s);
-    if(!r) bugp("malloc");
-    return r;
-}
-
-int convxdigit(char digit, byte *val)
-{
-    if(digit >= '0' && digit <= '9')
-    {
-        *val = digit - '0';
-        return 0;
-    }
-    else if(digit >= 'A' && digit <= 'F')
-    {
-        *val = digit - 'A' + 10;
-        return 0;
-    }
-    else if(digit >= 'a' && digit <= 'f')
-    {
-        *val = digit - 'a' + 10;
-        return 0;
-    }
-    else
-        return 1;
-}
-
-/**
- * Key file parsing
- */
-
-typedef byte (*key_array_t)[16];
-
-int g_nr_keys;
-key_array_t g_key_array;
-
-static void add_keys(key_array_t ka, int kac)
-{
-    key_array_t new_ka = xmalloc((g_nr_keys + kac) * 16);
-    memcpy(new_ka, g_key_array, g_nr_keys * 16);
-    memcpy(new_ka + g_nr_keys, ka, kac * 16);
-    free(g_key_array);
-    g_key_array = new_ka;
-    g_nr_keys += kac;
-}
-
-static key_array_t read_keys(const char *key_file, int *num_keys)
-{
-    int size;
-    struct stat st;
-    int fd = open(key_file,O_RDONLY);
-    if(fd == -1)
-        bugp("opening key file failed");
-    if(fstat(fd,&st) == -1)
-        bugp("key file stat() failed");
-    size = st.st_size;
-    char *buf = xmalloc(size);
-    if(read(fd, buf, size) != (ssize_t)size)
-        bugp("reading key file");
-    close(fd);
-
-    if(g_debug)
-        printf("Parsing key file '%s'...\n", key_file);
-    *num_keys = size ? 1 : 0;
-    char *ptr = buf;
-    /* allow trailing newline at the end (but no space after it) */
-    while(ptr != buf + size && (ptr + 1) != buf + size)
-    {
-        if(*ptr++ == '\n')
-            (*num_keys)++;
-    }
-
-    key_array_t keys = xmalloc(sizeof(byte[16]) * *num_keys);
-    int pos = 0;
-    for(int i = 0; i < *num_keys; i++)
-    {
-        /* skip ws */
-        while(pos < size && isspace(buf[pos]))
-            pos++;
-        /* enough space ? */
-        if((pos + 32) > size)
-            bugp("invalid key file");
-        for(int j = 0; j < 16; j++)
-        {
-            byte a, b;
-            if(convxdigit(buf[pos + 2 * j], &a) || convxdigit(buf[pos + 2 * j + 1], &b))
-                bugp(" invalid key, it should be a 128-bit key written in hexadecimal\n");
-            keys[i][j] = (a << 4) | b;
-        }
-        if(g_debug)
-        {
-            printf("Add key: ");
-            for(int j = 0; j < 16; j++)
-                printf("%02x", keys[i][j]);
-               printf("\n");
-        }
-        pos += 32;
-    }
-    free(buf);
-
-    return keys;
-}
+#define crypto_cbc(...) \
+    do { int ret = crypto_cbc(__VA_ARGS__); \
+        if(ret != CRYPTO_ERROR_SUCCESS) \
+            bug("crypto_cbc error: %d\n", ret); \
+    }while(0)
 
 /**
  * command file to sb conversion
@@ -224,9 +94,9 @@ struct sb_file_t
 
 static bool elf_read(void *user, uint32_t addr, void *buf, size_t count)
 {
-    if(lseek(*(int *)user, addr, SEEK_SET) == (off_t)-1)
+    if(fseek((FILE *)user, addr, SEEK_SET) == -1)
         return false;
-    return read(*(int *)user, buf, count) == (ssize_t)count;
+    return fread(buf, 1, count, (FILE *)user) == count;
 }
 
 static void elf_printf(void *user, bool error, const char *fmt, ...)
@@ -264,14 +134,14 @@ static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
     resolve_extern(src);
     /* load it */
     src->type = CMD_SRC_ELF;
-    int fd = open(src->filename, O_RDONLY);
-    if(fd < 0)
+    FILE *fd = fopen(src->filename, "rb");
+    if(fd == NULL)
         bug("cannot open '%s' (id '%s')\n", src->filename, id);
     if(g_debug)
         printf("Loading ELF file '%s'...\n", src->filename);
     elf_init(&src->elf);
-    src->loaded = elf_read_file(&src->elf, elf_read, elf_printf, &fd);
-    close(fd);
+    src->loaded = elf_read_file(&src->elf, elf_read, elf_printf, fd);
+    fclose(fd);
     if(!src->loaded)
         bug("error loading elf file '%s' (id '%s')\n", src->filename, id);
     elf_translate_addresses(&src->elf);
@@ -291,16 +161,17 @@ static void load_bin_by_id(struct cmd_file_t *cmd_file, const char *id)
     resolve_extern(src);
     /* load it */
     src->type = CMD_SRC_BIN;
-    int fd = open(src->filename, O_RDONLY);
-    if(fd < 0)
+    FILE *fd = fopen(src->filename, "rb");
+    if(fd == NULL)
         bug("cannot open '%s' (id '%s')\n", src->filename, id);
     if(g_debug)
         printf("Loading BIN file '%s'...\n", src->filename);
-    src->bin.size = lseek(fd, 0, SEEK_END);
-    lseek(fd, 0, SEEK_SET);
+    fseek(fd, 0, SEEK_END);
+    src->bin.size = ftell(fd);
+    fseek(fd, 0, SEEK_SET);
     src->bin.data = xmalloc(src->bin.size);
-    read(fd, src->bin.data, src->bin.size);
-    close(fd);
+    fread(src->bin.data, 1, src->bin.size, fd);
+    fclose(fd);
     src->loaded = true;
 }
 
@@ -767,12 +638,12 @@ void produce_sb_instruction(struct sb_inst_t *inst,
 
 static void produce_sb_file(struct sb_file_t *sb, const char *filename)
 {
-    int fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT,
-        S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if(fd < 0)
+    FILE *fd = fopen(filename, "wb");
+    if(fd == NULL)
         bugp("cannot open output file");
 
-    byte real_key[16];
+    struct crypto_key_t real_key;
+    real_key.method = CRYPTO_KEY;
     byte crypto_iv[16];
     byte (*cbc_macs)[16] = xmalloc(16 * g_nr_keys);
     /* init CBC-MACs */
@@ -782,7 +653,7 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     fill_gaps(sb);
     compute_sb_offsets(sb);
 
-    generate_random_data(real_key, sizeof(real_key));
+    generate_random_data(real_key.u.key, 16);
 
     /* global SHA-1 */
     struct sha_1_params_t file_sha1;
@@ -791,13 +662,13 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     struct sb_header_t sb_hdr;
     produce_sb_header(sb, &sb_hdr);
     sha_1_update(&file_sha1, (byte *)&sb_hdr, sizeof(sb_hdr));
-    write(fd, &sb_hdr, sizeof(sb_hdr));
+    fwrite(&sb_hdr, 1, sizeof(sb_hdr), fd);
     
     memcpy(crypto_iv, &sb_hdr, 16);
 
     /* update CBC-MACs */
     for(int i = 0; i < g_nr_keys; i++)
-        cbc_mac((byte *)&sb_hdr, NULL, sizeof(sb_hdr) / BLOCK_SIZE, g_key_array[i],
+        crypto_cbc((byte *)&sb_hdr, NULL, sizeof(sb_hdr) / BLOCK_SIZE, &g_key_array[i],
             cbc_macs[i], &cbc_macs[i], 1);
     
     /* produce and write section headers */
@@ -806,21 +677,21 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
         struct sb_section_header_t sb_sec_hdr;
         produce_sb_section_header(&sb->sections[i], &sb_sec_hdr);
         sha_1_update(&file_sha1, (byte *)&sb_sec_hdr, sizeof(sb_sec_hdr));
-        write(fd, &sb_sec_hdr, sizeof(sb_sec_hdr));
+        fwrite(&sb_sec_hdr, 1, sizeof(sb_sec_hdr), fd);
         /* update CBC-MACs */
         for(int j = 0; j < g_nr_keys; j++)
-            cbc_mac((byte *)&sb_sec_hdr, NULL, sizeof(sb_sec_hdr) / BLOCK_SIZE,
-                g_key_array[j], cbc_macs[j], &cbc_macs[j], 1);
+            crypto_cbc((byte *)&sb_sec_hdr, NULL, sizeof(sb_sec_hdr) / BLOCK_SIZE,
+                &g_key_array[j], cbc_macs[j], &cbc_macs[j], 1);
     }
     /* produce key dictionary */
     for(int i = 0; i < g_nr_keys; i++)
     {
         struct sb_key_dictionary_entry_t entry;
         memcpy(entry.hdr_cbc_mac, cbc_macs[i], 16);
-        cbc_mac(real_key, entry.key, sizeof(real_key) / BLOCK_SIZE, g_key_array[i],
+        crypto_cbc(real_key.u.key, entry.key, 1, &g_key_array[i],
             crypto_iv, NULL, 1);
         
-        write(fd, &entry, sizeof(entry));
+        fwrite(&entry, 1, sizeof(entry), fd);
         sha_1_update(&file_sha1, (byte *)&entry, sizeof(entry));
     }
 
@@ -836,7 +707,7 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
             byte a, b;
             if(convxdigit(key[2 * i], &a) || convxdigit(key[2 * i + 1], &b))
             bugp("Cannot override real key: key should be a 128-bit key written in hexadecimal\n");
-            real_key[i] = (a << 4) | b;
+            real_key.u.key[i] = (a << 4) | b;
         }
     }
     if(strlen(s_getenv("SB_OVERRIDE_IV")) != 0)
@@ -858,7 +729,7 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     {
         printf("Real key: ");
         for(int j = 0; j < 16; j++)
-            printf("%02x", real_key[j]);
+            printf("%02x", real_key.u.key[j]);
         printf("\n");
         printf("IV      : ");
         for(int j = 0; j < 16; j++)
@@ -872,10 +743,10 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
         struct sb_instruction_tag_t tag_cmd;
         produce_section_tag_cmd(&sb->sections[i], &tag_cmd, (i + 1) == sb_hdr.nr_sections);
         if(g_nr_keys > 0)
-            cbc_mac((byte *)&tag_cmd, (byte *)&tag_cmd, sizeof(tag_cmd) / BLOCK_SIZE,
-                real_key, crypto_iv, NULL, 1);
+            crypto_cbc((byte *)&tag_cmd, (byte *)&tag_cmd, sizeof(tag_cmd) / BLOCK_SIZE,
+                &real_key, crypto_iv, NULL, 1);
         sha_1_update(&file_sha1, (byte *)&tag_cmd, sizeof(tag_cmd));
-        write(fd, &tag_cmd, sizeof(tag_cmd));
+        fwrite(&tag_cmd, 1, sizeof(tag_cmd), fd);
         /* produce other commands */
         byte cur_cbc_mac[16];
         memcpy(cur_cbc_mac, crypto_iv, 16);
@@ -888,10 +759,10 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
                 struct sb_instruction_common_t cmd;
                 produce_sb_instruction(inst, &cmd);
                 if(g_nr_keys > 0 && !sb->sections[i].is_cleartext)
-                    cbc_mac((byte *)&cmd, (byte *)&cmd, sizeof(cmd) / BLOCK_SIZE,
-                        real_key, cur_cbc_mac, &cur_cbc_mac, 1);
+                    crypto_cbc((byte *)&cmd, (byte *)&cmd, sizeof(cmd) / BLOCK_SIZE,
+                        &real_key, cur_cbc_mac, &cur_cbc_mac, 1);
                 sha_1_update(&file_sha1, (byte *)&cmd, sizeof(cmd));
-                write(fd, &cmd, sizeof(cmd));
+                fwrite(&cmd, 1, sizeof(cmd), fd);
             }
             /* data */
             if(inst->inst == SB_INST_LOAD || inst->inst == SB_INST_DATA)
@@ -901,10 +772,10 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
                 memcpy(data, inst->data, inst->size);
                 memcpy(data + inst->size, inst->padding, inst->padding_size);
                 if(g_nr_keys > 0 && !sb->sections[i].is_cleartext)
-                    cbc_mac(data, data, sz / BLOCK_SIZE,
-                        real_key, cur_cbc_mac, &cur_cbc_mac, 1);
+                    crypto_cbc(data, data, sz / BLOCK_SIZE,
+                        &real_key, cur_cbc_mac, &cur_cbc_mac, 1);
                 sha_1_update(&file_sha1, data, sz);
-                write(fd, data, sz);
+                fwrite(data, 1, sz, fd);
                 free(data);
             }
         }
@@ -915,10 +786,10 @@ static void produce_sb_file(struct sb_file_t *sb, const char *filename)
     sha_1_output(&file_sha1, final_sig);
     generate_random_data(final_sig + 20, 12);
     if(g_nr_keys > 0)
-        cbc_mac(final_sig, final_sig, 2, real_key, crypto_iv, NULL, 1);
-    write(fd, final_sig, 32);
+        crypto_cbc(final_sig, final_sig, 2, &real_key, crypto_iv, NULL, 1);
+    fwrite(final_sig, 1, 32, fd);
     
-    close(fd);
+    fclose(fd);
 }
 
 void usage(void)
@@ -931,10 +802,16 @@ void usage(void)
     printf("  -d/--debug\tEnable debug output\n");
     printf("  -k <file>\tAdd key file\n");
     printf("  -z\t\tAdd zero key\n");
+    printf("  --single-key <key>\tAdd single key\n");
+    printf("  --usb-otp <vid>:<pid>\tAdd USB OTP device\n");
     exit(1);
 }
 
-static byte g_zero_key[16] = {0};
+static struct crypto_key_t g_zero_key =
+{
+    .method = CRYPTO_KEY,
+    .u.key = {0}
+};
 
 int main(int argc, char **argv)
 {
@@ -947,6 +824,8 @@ int main(int argc, char **argv)
         {
             {"help", no_argument, 0, '?'},
             {"debug", no_argument, 0, 'd'},
+            {"single-key", required_argument, 0, 's'},
+            {"usb-otp", required_argument, 0, 'u'},
             {0, 0, 0, 0}
         };
 
@@ -979,6 +858,42 @@ int main(int argc, char **argv)
                 add_keys(&g_zero_key, 1);
                 break;
             }
+            case 's':
+            {
+                struct crypto_key_t key;
+                key.method = CRYPTO_KEY;
+                if(strlen(optarg) != 32)
+                    bug("The key given in argument is invalid");
+                for(int i = 0; i < 16; i++)
+                {
+                    byte a, b;
+                    if(convxdigit(optarg[2 * i], &a) || convxdigit(optarg[2 * i + 1], &b))
+                        bugp("The key given in argument is invalid\n");
+                    key.u.key[i] = (a << 4) | b;
+                }
+                add_keys(&key, 1);
+                break;
+            }
+            case 'u':
+            {
+                int vid, pid;
+                char *p = strchr(optarg, ':');
+                if(p == NULL)
+                    bug("Invalid VID/PID\n");
+
+                char *end;
+                vid = strtol(optarg, &end, 16);
+                if(end != p)
+                    bug("Invalid VID/PID\n");
+                pid = strtol(p + 1, &end, 16);
+                if(end != (optarg + strlen(optarg)))
+                    bug("Invalid VID/PID\n");
+                struct crypto_key_t key;
+                key.method = CRYPTO_USBOTP;
+                key.u.vid_pid = vid << 16 | pid;
+                add_keys(&key, 1);
+                break;
+            }
             default:
                 abort();
         }
@@ -997,9 +912,8 @@ int main(int argc, char **argv)
         printf("key: %d\n", g_nr_keys);
         for(int i = 0; i < g_nr_keys; i++)
         {
-            for(int j = 0; j < 16; j++)
-                printf(" %02x", g_key_array[i][j]);
-            printf("\n");
+            printf("  ");
+            print_key(&g_key_array[i], true);
         }
 
         for(int i = 0; i < g_extern_count; i++)

@@ -28,21 +28,19 @@
 
 #define _ISOC99_SOURCE /* snprintf() */
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <inttypes.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <stdarg.h>
 #include <strings.h>
+#include <getopt.h>
 
 #include "crypto.h"
 #include "elf.h"
 #include "sb.h"
+#include "misc.h"
 
 #if 1 /* ANSI colors */
 
@@ -60,104 +58,24 @@ char BLUE[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 #	define color(a)
 #endif
 
-#define bug(...) do { fprintf(stderr,"ERROR: "__VA_ARGS__); exit(1); } while(0)
-#define bugp(a) do { perror("ERROR: "a); exit(1); } while(0)
-
 /* all blocks are sized as a multiple of 0x1ff */
 #define PAD_TO_BOUNDARY(x) (((x) + 0x1ff) & ~0x1ff)
 
 /* If you find a firmware that breaks the known format ^^ */
 #define assert(a) do { if(!(a)) { fprintf(stderr,"Assertion \"%s\" failed in %s() line %d!\n\nPlease send us your firmware!\n",#a,__func__,__LINE__); exit(1); } } while(0)
 
+#define crypto_cbc(...) \
+    do { int ret = crypto_cbc(__VA_ARGS__); \
+        if(ret != CRYPTO_ERROR_SUCCESS) \
+            bug("crypto_cbc error: %d\n", ret); \
+    }while(0)
+
 /* globals */
 
 uint8_t *g_buf; /* file content */
-#define PREFIX_SIZE     128
-char out_prefix[PREFIX_SIZE];
-const char *key_file;
-
-char *s_getenv(const char *name)
-{
-    char *s = getenv(name);
-    return s ? s : "";
-}
-
-void *xmalloc(size_t s) /* malloc helper, used in elf.c */
-{
-    void * r = malloc(s);
-    if(!r) bugp("malloc");
-    return r;
-}
-
-static void print_hex(byte *data, int len, bool newline)
-{
-    for(int i = 0; i < len; i++)
-        printf("%02X ", data[i]);
-    if(newline)
-        printf("\n");
-}
-
-static int convxdigit(char digit, byte *val)
-{
-    if(digit >= '0' && digit <= '9')
-    {
-        *val = digit - '0';
-        return 0;
-    }
-    else if(digit >= 'A' && digit <= 'F')
-    {
-        *val = digit - 'A' + 10;
-        return 0;
-    }
-    else if(digit >= 'a' && digit <= 'f')
-    {
-        *val = digit - 'a' + 10;
-        return 0;
-    }
-    else
-        return 1;
-}
-
-typedef byte (*key_array_t)[16];
-
-static key_array_t read_keys(int num_keys)
-{
-    int size;
-    struct stat st;
-    int fd = open(key_file,O_RDONLY);
-    if(fd == -1)
-        bugp("opening key file failed");
-    if(fstat(fd,&st) == -1)
-        bugp("key file stat() failed");
-    size = st.st_size;
-    char *buf = xmalloc(size);
-    if(read(fd, buf, size) != (ssize_t)size)
-        bugp("reading key file");
-    close(fd);
-
-    key_array_t keys = xmalloc(sizeof(byte[16]) * num_keys);
-    int pos = 0;
-    for(int i = 0; i < num_keys; i++)
-    {
-        /* skip ws */
-        while(pos < size && isspace(buf[pos]))
-            pos++;
-        /* enough space ? */
-        if((pos + 32) > size)
-            bugp("invalid key file (not enough keys)");
-        for(int j = 0; j < 16; j++)
-        {
-            byte a, b;
-            if(convxdigit(buf[pos + 2 * j], &a) || convxdigit(buf[pos + 2 * j + 1], &b))
-                bugp(" invalid key, it should be a 128-bit key written in hexadecimal\n");
-            keys[i][j] = (a << 4) | b;
-        }
-        pos += 32;
-    }
-    free(buf);
-
-    return keys;
-}
+char *g_out_prefix;
+bool g_debug;
+bool g_raw_mode;
 
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
 
@@ -195,17 +113,21 @@ static void extract_elf_section(struct elf_params_t *elf, int count, const char 
 
 static void extract_section(int data_sec, char name[5], byte *buf, int size, const char *indent)
 {
-    char filename[PREFIX_SIZE + 32];
-    snprintf(filename, sizeof filename, "%s%s.bin", out_prefix, name);
-    FILE *fd = fopen(filename, "wb");
-    if (fd != NULL) {
-        fwrite(buf, size, 1, fd);
-        fclose(fd);
+    char *filename = xmalloc(strlen(g_out_prefix) + strlen(name) + 5);
+    if(g_out_prefix)
+    {
+        sprintf(filename, "%s%s.bin", g_out_prefix, name);
+        FILE *fd = fopen(filename, "wb");
+        if (fd != NULL)
+        {
+            fwrite(buf, size, 1, fd);
+            fclose(fd);
+        }
     }
     if(data_sec)
         return;
 
-    snprintf(filename, sizeof filename, "%s%s", out_prefix, name);
+    sprintf(filename, "%s%s", g_out_prefix, name);
 
     /* elf construction */
     struct elf_params_t elf;
@@ -484,19 +406,23 @@ static void extract(unsigned long filesize)
     printf("0x%08x\n", sb_header->first_boot_sec_id);
 
     /* encryption cbc-mac */
-    key_array_t keys = NULL; /* array of 16-bytes keys */
     byte real_key[16];
     bool valid_key = false; /* false until a matching key was found */
     if(sb_header->nr_keys > 0)
     {
-        keys = read_keys(sb_header->nr_keys);
+        if(sb_header->nr_keys > g_nr_keys)
+        {
+            color(GREY);
+            bug("SB file has %d keys but only %d were specified on command line\n",
+                sb_header->nr_keys, g_nr_keys);
+        }
         color(BLUE);
         printf("Encryption data\n");
         for(int i = 0; i < sb_header->nr_keys; i++)
         {
             color(RED);
             printf("  Key %d: ", i);
-            print_hex(keys[i], 16, true);
+            print_key(&g_key_array[i], true);
             color(GREEN);
             printf("    CBC-MAC of headers: ");
 
@@ -512,8 +438,8 @@ static void extract(unsigned long filesize)
             byte computed_cbc_mac[16];
             byte zero[16];
             memset(zero, 0, 16);
-            cbc_mac(g_buf, NULL, sb_header->header_size + sb_header->nr_sections,
-                keys[i], zero, &computed_cbc_mac, 1);
+            crypto_cbc(g_buf, NULL, sb_header->header_size + sb_header->nr_sections,
+                &g_key_array[i], zero, &computed_cbc_mac, 1);
             color(RED);
             bool ok = memcmp(dict_entry->hdr_cbc_mac, computed_cbc_mac, 16) == 0;
             if(ok)
@@ -533,7 +459,7 @@ static void extract(unsigned long filesize)
             byte decrypted_key[16];
             byte iv[16];
             memcpy(iv, g_buf, 16); /* uses the first 16-bytes of SHA-1 sig as IV */
-            cbc_mac(dict_entry->key, decrypted_key, 1, keys[i], iv, NULL, 0);
+            crypto_cbc(dict_entry->key, decrypted_key, 1, &g_key_array[i], iv, NULL, 0);
             printf("    Decrypted key     : ");
             color(YELLOW);
             print_hex(decrypted_key, 16, false);
@@ -769,37 +695,127 @@ static void extract(unsigned long filesize)
         printf(" Failed\n");
 }
 
-int main(int argc, const char **argv)
+void usage(void)
 {
-    int fd;
-    struct stat st;
-    if(argc != 3 && argc != 4)
+    printf("Usage: sbtoelf [options] sb-file\n");
+    printf("Options:\n");
+    printf("  -?/--help\tDisplay this message\n");
+    printf("  -o <file>\tSet output prefix\n");
+    printf("  -d/--debug\tEnable debug output\n");
+    printf("  -k <file>\tAdd key file\n");
+    printf("  -z\t\tAdd zero key\n");
+    printf("  -r\t\tUse raw command mode\n");
+    printf("  --single-key <key>\tAdd single key\n");
+    printf("  --usb-otp <vid>:<pid>\tAdd USB OTP device\n");
+    exit(1);
+}
+
+static struct crypto_key_t g_zero_key =
+{
+    .method = CRYPTO_KEY,
+    .u.key = {0}
+};
+
+int main(int argc, char **argv)
+{
+    while(1)
     {
-        printf("Usage: %s <firmware> <key file> [<out prefix>]\n",*argv);
-        printf("To use raw command mode, set environment variable SB_RAW_CMD to YES\n");
-        return 1;
+        static struct option long_options[] =
+        {
+            {"help", no_argument, 0, '?'},
+            {"debug", no_argument, 0, 'd'},
+            {"single-key", required_argument, 0, 's'},
+            {"usb-otp", required_argument, 0, 'u'},
+            {0, 0, 0, 0}
+        };
+
+        int c = getopt_long(argc, argv, "?do:k:zr", long_options, NULL);
+        if(c == -1)
+            break;
+        switch(c)
+        {
+            case -1:
+                break;
+            case 'd':
+                g_debug = true;
+                break;
+            case '?':
+                usage();
+                break;
+            case 'o':
+                g_out_prefix = optarg;
+                break;
+            case 'k':
+            {
+                int kac;
+                key_array_t ka = read_keys(optarg, &kac);
+                add_keys(ka, kac);
+                break;
+            }
+            case 'z':
+            {
+                add_keys(&g_zero_key, 1);
+                break;
+            }
+            case 's':
+            {
+                struct crypto_key_t key;
+                key.method = CRYPTO_KEY;
+                if(strlen(optarg) != 32)
+                    bug("The key given in argument is invalid");
+                for(int i = 0; i < 16; i++)
+                {
+                    byte a, b;
+                    if(convxdigit(optarg[2 * i], &a) || convxdigit(optarg[2 * i + 1], &b))
+                        bugp("The key given in argument is invalid\n");
+                    key.u.key[i] = (a << 4) | b;
+                }
+                add_keys(&key, 1);
+                break;
+            }
+            case 'u':
+            {
+                int vid, pid;
+                char *p = strchr(optarg, ':');
+                if(p == NULL)
+                    bug("Invalid VID/PID\n");
+
+                char *end;
+                vid = strtol(optarg, &end, 16);
+                if(end != p)
+                    bug("Invalid VID/PID\n");
+                pid = strtol(p + 1, &end, 16);
+                if(end != (optarg + strlen(optarg)))
+                    bug("Invalid VID/PID\n");
+                struct crypto_key_t key;
+                key.method = CRYPTO_USBOTP;
+                key.u.vid_pid = vid << 16 | pid;
+                add_keys(&key, 1);
+                break;
+            }
+            default:
+                abort();
+        }
     }
 
-    if(argc == 4)
-        snprintf(out_prefix, PREFIX_SIZE, "%s", argv[3]);
-    else
-        strcpy(out_prefix, "");
+    if(argc - optind != 1)
+        bug("Missing sb file or too many files after options\n");
 
-    if( (fd = open(argv[1], O_RDONLY)) == -1 )
-        bugp("opening firmware failed");
+    const char *sb_file = argv[optind];
+    FILE *fd = fopen(sb_file, "rb");
+    if(fd == NULL)
+        bug("Cannot open input file\n");
+    fseek(fd, 0, SEEK_END);
+    size_t size = ftell(fd);
+    fseek(fd, 0, SEEK_SET);
 
-    key_file = argv[2];
-
-    if(fstat(fd, &st) == -1)
-        bugp("firmware stat() failed");
-
-    g_buf = xmalloc(st.st_size);
-    if(read(fd, g_buf, st.st_size) != (ssize_t)st.st_size) /* load the whole file into memory */
+    g_buf = xmalloc(size);
+    if(fread(g_buf, 1, size, fd) != size) /* load the whole file into memory */
         bugp("reading firmware");
 
-    close(fd);
+    fclose(fd);
 
-    extract(st.st_size);
+    extract(size);
 
     color(OFF);
 

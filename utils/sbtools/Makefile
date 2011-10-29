@@ -1,10 +1,22 @@
+DEFINES=-DCRYPTO_LIBUSB
+CC=gcc
+LD=gcc
+CFLAGS=-g -std=c99 -W -Wall `pkg-config --cflags libusb-1.0` $(DEFINES)
+LDFLAGS=`pkg-config --libs libusb-1.0`
+
 all: elftosb sbtoelf
 
-sbtoelf: sbtoelf.c crc.c crypto.h aes128.c sha1.c elf.c sb.h
-	gcc -g -std=c99 -o $@ -W -Wall $^
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-elftosb: elftosb.c crc.c crypto.h aes128.c sha1.c elf.c sb.h dbparser.h dbparser.c
-	gcc -g -std=c99 -o $@ -W -Wall $^
+sbtoelf: sbtoelf.o crc.o crypto.o aes128.o sha1.o elf.o misc.o
+	$(LD) $(LDFLAGS) -o $@ $^
+
+elftosb: elftosb.o crc.o crypto.o aes128.o sha1.o elf.o dbparser.o misc.o
+	$(LD) $(LDFLAGS) -o $@ $^
 
 clean:
-	rm -fr elftosb sbtoelf
+	rm -fr *.o
+
+veryclean:
+	rm -rf sbtoelf elftosb
