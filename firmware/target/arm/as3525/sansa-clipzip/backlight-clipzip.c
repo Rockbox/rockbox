@@ -25,11 +25,14 @@
 #include "lcd.h"
 #include "as3525v2.h"
 #include "ascodec-target.h"
+#include "lcd-target.h"
 
 bool _backlight_init()
 {
     /* GPIO B1 controls backlight */
     GPIOB_DIR |= (1 << 1);
+    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
+    GPIOB_PIN(1) = (1 << 1);
     
     return true;
 }
@@ -37,13 +40,6 @@ bool _backlight_init()
 void _backlight_on(void)
 {
     GPIOB_PIN(1) = (1 << 1);
-    
-    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
-    sleep(1);
-    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
-    sleep(1);
-    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
-
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true);
 #endif
@@ -54,9 +50,11 @@ void _backlight_off(void)
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false);
 #endif
-
     GPIOB_PIN(1) = 0;
-    
-    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
+}
+
+void _backlight_set_brightness(int brightness)
+{
+    oled_brightness(brightness);
 }
 

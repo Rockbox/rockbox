@@ -175,8 +175,12 @@ uclcopy:
         bne     boot_of             @ branch directly to OF if either pin high
 
 #elif defined(SANSA_CLIPZIP)
-        @ just boot the OF
-        b       boot_of
+        @ read pins
+        ldr     r0, =GPIOA
+        ldr     r1, [r0, #4*(1<<6)] @ read GPIO A6 "vol-"
+
+        cmp     r1, #0              @ test input from pins
+        bne     boot_of             @ branch directly to OF if either pin high
 
 #elif defined(SANSA_C200V2)
 .set BUTTON_LEFT,      (1<< 2)

@@ -376,11 +376,8 @@ static inline bool card_detect_target(void)
 #if defined(HAVE_MULTIDRIVE)
 #if defined(SANSA_FUZEV2)
     return GPIOA_PIN(2);
-#elif defined(SANSA_CLIPPLUS)
+#elif defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
     return !(GPIOA_PIN(2));
-#elif defined(SANSA_CLIPZIP)
-    /* TODO for ClipZip: determine polarity of uSD detect */
-    return false;
 #else
 #error "microSD pin not defined for your target"
 #endif
@@ -398,14 +395,14 @@ static bool send_cmd(const int drive, const int cmd, const int arg, const int fl
         !send_cmd(drive, SD_APP_CMD, card_info[drive].rca, MCI_RESP, response))
         return false;
 
-#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
     if (amsv2_variant == 1)
         GPIOB_PIN(5) = (drive == INTERNAL_AS3525) ? 1 << 5 : 0;
 #endif
 
     MCI_ARGUMENT = arg;
 
-#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
     if (amsv2_variant == 1)
         card_no = 1 << 16;
     else
@@ -565,7 +562,7 @@ static int sd_init_card(const int drive)
         return -17;
 
     /* Now that card is widebus make controller aware */
-#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
     if (amsv2_variant == 1)
         MCI_CTYPE |= 1<<1;
     else
@@ -575,7 +572,7 @@ static int sd_init_card(const int drive)
 #endif /* ! BOOTLOADER */
 
     /*  Set low power mode  */
-#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
     if (amsv2_variant == 1)
         MCI_CLKENA |= 1<<(1 + 16);
     else
@@ -673,7 +670,7 @@ static void init_controller(void)
     int card_mask = (1 << hcon_numcards) - 1;
     int pwr_mask;
 
-#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
     if (amsv2_variant == 1)
         pwr_mask = 1 << 1;
     else
@@ -738,7 +735,7 @@ int sd_init(void)
     semaphore_init(&transfer_completion_signal, 1, 0);
     semaphore_init(&command_completion_signal, 1, 0);
 
-#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
     if (amsv2_variant == 1)
         GPIOB_DIR |= 1 << 5;
 #endif

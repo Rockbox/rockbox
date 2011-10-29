@@ -45,7 +45,7 @@
 #define LCD_WIDTH  96
 #define LCD_HEIGHT 96
 #define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 swapped */
+#define LCD_PIXELFORMAT RGB565
 
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
@@ -113,6 +113,8 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
+
+#define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
@@ -189,9 +191,9 @@
 /** Port-specific settings **/
 
 /* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING      1   /* TODO */
-#define MAX_BRIGHTNESS_SETTING     12   /* TODO */
-#define DEFAULT_BRIGHTNESS_SETTING  6   /* TODO */
+#define MIN_BRIGHTNESS_SETTING      0
+#define MAX_BRIGHTNESS_SETTING      9
+#define DEFAULT_BRIGHTNESS_SETTING  6
 
 /* Default recording levels */
 #define DEFAULT_REC_MIC_GAIN    23

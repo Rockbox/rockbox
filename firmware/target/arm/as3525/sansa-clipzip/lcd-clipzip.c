@@ -51,12 +51,16 @@ static int lcd_hw_init(void)
     SSP_IMSC &= ~0xF;       /* disable interrupts */
     SSP_DMACR &= ~0x3;      /* disable DMA */
 
+    /* GPIO A3 is ??? but needs to be set */
+    GPIOA_DIR |= (1 << 3);
+    GPIOA_PIN(3) = (1 << 3);
+
     /* configure GPIO B2 (lcd D/C#) as output */
     GPIOB_DIR |= (1<<2);
 
     /* configure GPIO B3 (lcd type detect) as input */
     GPIOB_DIR &= ~(1<<3);
-
+    
     /* configure GPIO A5 (lcd reset#) as output and perform lcd reset */
     GPIOA_DIR |= (1 << 5);
     GPIOA_PIN(5) = 0;
@@ -154,7 +158,7 @@ static void lcd_write_nibbles(uint8_t val)
 /* initialises lcd type 1 */
 static void lcd_init_type1(void)
 {
-    static const uint8_t curve[256] = {
+    static const uint8_t curve[128] = {
         /* 5-bit curve */
         0, 5, 10, 15, 20, 25, 30, 35, 39, 43, 47, 51, 55, 59, 63, 67,
         71, 75, 79, 83, 87, 91, 95, 99, 103, 105, 109, 113, 117, 121, 123, 127,
@@ -242,7 +246,7 @@ static void lcd_init_type1(void)
     lcd_write_dat(0x10);
 
     lcd_write_cmd(0x3A);
-    for (i = 0; i < 256; i++) {
+    for (i = 0; i < 128; i++) {
         lcd_write_nibbles(curve[i]);
     }
 

@@ -71,13 +71,13 @@ int button_read_device(void)
     udelay(500);
     
     if (GPIOC_PIN(3)) {
-        buttons |= BUTTON_LEFT;
+        buttons |= BUTTON_RIGHT;
     }
     if (GPIOC_PIN(4)) {
         buttons |= BUTTON_SELECT;
     }
     if (GPIOC_PIN(5)) {
-        buttons |= BUTTON_RIGHT;
+        buttons |= BUTTON_UP;
     }
     
     /* key matrix buttons, second row */
@@ -86,13 +86,13 @@ int button_read_device(void)
     udelay(500);
     
     if (GPIOC_PIN(3)) {
-        buttons |= BUTTON_UP;
-    }
-    if (GPIOC_PIN(4)) {
         buttons |= BUTTON_HOME;
     }
-    if (GPIOC_PIN(5)) {
+    if (GPIOC_PIN(4)) {
         buttons |= BUTTON_DOWN;
+    }
+    if (GPIOC_PIN(5)) {
+        buttons |= BUTTON_LEFT;
     }
     
     /* deselect scan rows */

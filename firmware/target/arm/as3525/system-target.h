@@ -46,7 +46,7 @@
         ? (((uintptr_t)(a)) - IRAM_ORIG) \
         : ((uintptr_t)(a))))
 
-#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS)
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
 extern int amsv2_variant;
 #endif
 
