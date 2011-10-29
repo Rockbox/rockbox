@@ -32,6 +32,15 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
+/* define this if you want album art for this target */
+#define HAVE_ALBUMART
+
+/* define this to enable bitmap scaling */
+#define HAVE_BMP_SCALING
+
+/* define this to enable JPEG decoding */
+#define HAVE_JPEG
+
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
@@ -122,9 +131,9 @@
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
 #define CONFIG_STORAGE STORAGE_SD
 
-#define BATTERY_CAPACITY_DEFAULT 290    /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 290        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 290        /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 300    /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 300        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 300        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
