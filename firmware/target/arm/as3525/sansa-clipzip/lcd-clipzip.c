@@ -185,7 +185,7 @@ static void lcd_init_type1(void)
     lcd_write_dat(0x03);
 
     lcd_write_cmd(0x05);
-    lcd_write_dat(0x08);
+    lcd_write_dat(0x00);    /* 0x08 results in BGR colour */
 
     lcd_write_cmd(0x06);
     lcd_write_dat(0x00);
@@ -403,8 +403,8 @@ void lcd_update_rect(int x, int y, int width, int height)
         ptr = &lcd_framebuffer[row][x];
         for (col = x; col < x_end; col++) {
             pixel = *ptr++;
-            lcd_write_dat((pixel >> 8) & 0xFF);
             lcd_write_dat((pixel >> 0) & 0xFF);
+            lcd_write_dat((pixel >> 8) & 0xFF);
         }
     }
 }
