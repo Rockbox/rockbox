@@ -703,8 +703,7 @@ void usage(void)
     printf("  -k <file>\tAdd key file\n");
     printf("  -z\t\tAdd zero key\n");
     printf("  -r\t\tUse raw command mode\n");
-    printf("  --single-key <key>\tAdd single key\n");
-    printf("  --usb-otp <vid>:<pid>\tAdd USB OTP device\n");
+    printf("  --add-key <key>\tAdd single key (hex or usbotp)\n");
     exit(1);
 }
 
@@ -722,12 +721,11 @@ int main(int argc, char **argv)
         {
             {"help", no_argument, 0, '?'},
             {"debug", no_argument, 0, 'd'},
-            {"single-key", required_argument, 0, 's'},
-            {"usb-otp", required_argument, 0, 'u'},
+            {"add-key", required_argument, 0, 'a'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?do:k:zr", long_options, NULL);
+        int c = getopt_long(argc, argv, "?do:k:zra:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -753,39 +751,14 @@ int main(int argc, char **argv)
                 add_keys(&g_zero_key, 1);
                 break;
             }
-            case 's':
+            case 'a':
             {
                 struct crypto_key_t key;
-                key.method = CRYPTO_KEY;
-                if(strlen(optarg) != 32)
-                    bug("The key given in argument is invalid");
-                for(int i = 0; i < 16; i++)
-                {
-                    byte a, b;
-                    if(convxdigit(optarg[2 * i], &a) || convxdigit(optarg[2 * i + 1], &b))
-                        bugp("The key given in argument is invalid\n");
-                    key.u.key[i] = (a << 4) | b;
-                }
-                add_keys(&key, 1);
-                break;
-            }
-            case 'u':
-            {
-                int vid, pid;
-                char *p = strchr(optarg, ':');
-                if(p == NULL)
-                    bug("Invalid VID/PID\n");
-
-                char *end;
-                vid = strtol(optarg, &end, 16);
-                if(end != p)
-                    bug("Invalid VID/PID\n");
-                pid = strtol(p + 1, &end, 16);
-                if(end != (optarg + strlen(optarg)))
-                    bug("Invalid VID/PID\n");
-                struct crypto_key_t key;
-                key.method = CRYPTO_USBOTP;
-                key.u.vid_pid = vid << 16 | pid;
+                char *s = optarg;
+                if(!parse_key(&s, &key))
+                    bug("Invalid key specified as argument");
+                if(*s != 0)
+                    bug("Trailing characters after key specified as argument");
                 add_keys(&key, 1);
                 break;
             }
@@ -794,8 +767,14 @@ int main(int argc, char **argv)
         }
     }
 
+    if(g_out_prefix == NULL)
+        g_out_prefix = "";
+
     if(argc - optind != 1)
-        bug("Missing sb file or too many files after options\n");
+    {
+        usage();
+        return 1;
+    }
 
     const char *sb_file = argv[optind];
     FILE *fd = fopen(sb_file, "rb");

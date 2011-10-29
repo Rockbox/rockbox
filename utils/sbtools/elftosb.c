@@ -325,8 +325,9 @@ void usage(void)
     printf("  -d/--debug\tEnable debug output\n");
     printf("  -k <file>\tAdd key file\n");
     printf("  -z\t\tAdd zero key\n");
-    printf("  --single-key <key>\tAdd single key\n");
-    printf("  --usb-otp <vid>:<pid>\tAdd USB OTP device\n");
+    printf("  --add-key <key>\tAdd single key (hex or usbotp)\n");
+    printf("  --real-key <key>\tOverride real key\n");
+    printf("  --crypto-iv <iv>\tOverride crypto IV\n");
     exit(1);
 }
 
@@ -340,6 +341,10 @@ int main(int argc, char **argv)
 {
     char *cmd_filename = NULL;
     char *output_filename = NULL;
+    struct crypto_key_t real_key;
+    struct crypto_key_t crypto_iv;
+    real_key.method = CRYPTO_NONE;
+    crypto_iv.method = CRYPTO_NONE;
     
     while(1)
     {
@@ -347,12 +352,13 @@ int main(int argc, char **argv)
         {
             {"help", no_argument, 0, '?'},
             {"debug", no_argument, 0, 'd'},
-            {"single-key", required_argument, 0, 's'},
-            {"usb-otp", required_argument, 0, 'u'},
+            {"add-key", required_argument, 0, 'a'},
+            {"real-key", required_argument, 0, 'r'},
+            {"crypto-iv", required_argument, 0, 'i'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?do:c:k:z", long_options, NULL);
+        int c = getopt_long(argc, argv, "?do:c:k:za:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -379,40 +385,22 @@ int main(int argc, char **argv)
                 add_keys(&g_zero_key, 1);
                 break;
             }
-            case 's':
+            case 'a':
+            case 'r':
+            case 'i':
             {
                 struct crypto_key_t key;
-                key.method = CRYPTO_KEY;
-                if(strlen(optarg) != 32)
-                    bug("The key given in argument is invalid");
-                for(int i = 0; i < 16; i++)
-                {
-                    byte a, b;
-                    if(convxdigit(optarg[2 * i], &a) || convxdigit(optarg[2 * i + 1], &b))
-                        bugp("The key given in argument is invalid\n");
-                    key.u.key[i] = (a << 4) | b;
-                }
-                add_keys(&key, 1);
-                break;
-            }
-            case 'u':
-            {
-                int vid, pid;
-                char *p = strchr(optarg, ':');
-                if(p == NULL)
-                    bug("Invalid VID/PID\n");
-
-                char *end;
-                vid = strtol(optarg, &end, 16);
-                if(end != p)
-                    bug("Invalid VID/PID\n");
-                pid = strtol(p + 1, &end, 16);
-                if(end != (optarg + strlen(optarg)))
-                    bug("Invalid VID/PID\n");
-                struct crypto_key_t key;
-                key.method = CRYPTO_USBOTP;
-                key.u.vid_pid = vid << 16 | pid;
-                add_keys(&key, 1);
+                char *s = optarg;
+                if(!parse_key(&s, &key))
+                    bug("Invalid key/iv specified as argument");
+                if(*s != 0)
+                    bug("Trailing characters after key/iv specified as argument");
+                if(c == 'r')
+                    memcpy(&real_key, &key, sizeof(key));
+                else if(c == 'i')
+                    memcpy(&crypto_iv, &key, sizeof(key));
+                else
+                    add_keys(&key, 1);
                 break;
             }
             default:
@@ -443,6 +431,12 @@ int main(int argc, char **argv)
 
     struct cmd_file_t *cmd_file = db_parse_file(cmd_filename);
     struct sb_file_t *sb_file = apply_cmd_file(cmd_file);
+
+    if(real_key.method == CRYPTO_KEY)
+        sb_file->real_key = &real_key.u.key;
+    if(crypto_iv.method == CRYPTO_KEY)
+        sb_file->crypto_iv = &crypto_iv.u.key;
+        
     sb_produce_file(sb_file, output_filename);
     
     return 0;
