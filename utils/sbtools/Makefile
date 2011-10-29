@@ -9,10 +9,10 @@ all: elftosb sbtoelf
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-sbtoelf: sbtoelf.o crc.o crypto.o aes128.o sha1.o elf.o misc.o
+sbtoelf: sbtoelf.o crc.o crypto.o aes128.o sha1.o elf.o misc.o sb.o
 	$(LD) $(LDFLAGS) -o $@ $^
 
-elftosb: elftosb.o crc.o crypto.o aes128.o sha1.o elf.o dbparser.o misc.o
+elftosb: elftosb.o crc.o crypto.o aes128.o sha1.o elf.o dbparser.o misc.o sb.o
 	$(LD) $(LDFLAGS) -o $@ $^
 
 clean:

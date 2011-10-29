@@ -30,19 +30,22 @@
 #define bug(...) do { fprintf(stderr,"["__FILE__":"STR(__LINE__)"]ERROR: "__VA_ARGS__); exit(1); } while(0)
 #define bugp(a) do { perror("ERROR: "a); exit(1); } while(0)
 
+#define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
+
 extern bool g_debug;
 
 typedef struct crypto_key_t *key_array_t;
 int g_nr_keys;
 key_array_t g_key_array;
 
-char *s_getenv(const char *name);
+void *augment_array(void *arr, size_t elem_sz, size_t cnt, void *aug, size_t aug_cnt);
 void generate_random_data(void *buf, size_t sz);
 void *xmalloc(size_t s);
 int convxdigit(char digit, byte *val);
 void print_hex(byte *data, int len, bool newline);
 void add_keys(key_array_t ka, int kac);
-key_array_t read_keys(const char *key_file, int *num_keys);
+bool parse_key(char **str, struct crypto_key_t *key);
+void add_keys_from_file(const char *key_file);
 void print_key(struct crypto_key_t *key, bool newline);
 
 #endif /* __MISC_H__ */

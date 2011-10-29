@@ -29,13 +29,6 @@ bool g_debug = false;
 /**
  * Misc
  */
-
-char *s_getenv(const char *name)
-{
-    char *s = getenv(name);
-    return s ? s : "";
-}
-
 void generate_random_data(void *buf, size_t sz)
 {
     FILE *rand_fd = fopen("/dev/urandom", "rb");
@@ -74,11 +67,72 @@ int convxdigit(char digit, byte *val)
         return 1;
 }
 
+/* helper function to augment an array, free old array */
+void *augment_array(void *arr, size_t elem_sz, size_t cnt, void *aug, size_t aug_cnt)
+{
+    void *p = xmalloc(elem_sz * (cnt + aug_cnt));
+    memcpy(p, arr, elem_sz * cnt);
+    memcpy(p + elem_sz * cnt, aug, elem_sz * aug_cnt);
+    free(arr);
+    return p;
+}
+
 /**
  * Key file parsing
  */
 int g_nr_keys;
 key_array_t g_key_array;
+
+bool parse_key(char **pstr, struct crypto_key_t *key)
+{
+    char *str = *pstr;
+    /* ignore spaces */
+    while(isspace(*str))
+        str++;
+    /* CRYPTO_KEY: 32 hex characters
+     * CRYPTO_USBOTP: usbotp(vid:pid) where vid and pid are hex numbers */
+    if(isxdigit(str[0]))
+    {
+        if(strlen(str) < 32)
+            return false;
+        for(int j = 0; j < 16; j++)
+        {
+            byte a, b;
+            if(convxdigit(str[2 * j], &a) || convxdigit(str[2 * j + 1], &b))
+                return false;
+            key->u.key[j] = (a << 4) | b;
+        }
+        /* skip key */
+        *pstr = str + 32;
+        key->method = CRYPTO_KEY;
+        return true;
+    }
+    else
+    {
+        const char *prefix = "usbotp(";
+        if(strlen(str) < strlen(prefix))
+            return false;
+        if(strncmp(str, prefix, strlen(prefix)) != 0)
+            return false;
+        str += strlen(prefix);
+        /* vid */
+        long vid = strtol(str, &str, 16);
+        if(vid < 0 || vid > 0xffff)
+            return false;
+        if(*str++ != ':')
+            return false;
+        /* pid */
+        long pid = strtol(str, &str, 16);
+        if(pid < 0 || pid > 0xffff)
+            return false;
+        if(*str++ != ')')
+            return false;
+        *pstr = str;
+        key->method = CRYPTO_USBOTP;
+        key->u.vid_pid = vid << 16 | pid;
+        return true;
+    }
+}
 
 void add_keys(key_array_t ka, int kac)
 {
@@ -90,61 +144,46 @@ void add_keys(key_array_t ka, int kac)
     g_nr_keys += kac;
 }
 
-key_array_t read_keys(const char *key_file, int *num_keys)
+void add_keys_from_file(const char *key_file)
 {
     int size;
     FILE *fd = fopen(key_file, "r");
     if(fd == NULL)
-        bugp("opening key file failed");
+        bug("opening key file failed");
     fseek(fd, 0, SEEK_END);
     size = ftell(fd);
     fseek(fd, 0, SEEK_SET);
-    char *buf = xmalloc(size);
-    if(fread(buf, size, 1, fd) != (size_t)size)
-        bugp("reading key file");
+    char *buf = xmalloc(size + 1);
+    if(fread(buf, 1, size, fd) != (size_t)size)
+        bug("reading key file");
+    buf[size] = 0;
     fclose(fd);
 
     if(g_debug)
         printf("Parsing key file '%s'...\n", key_file);
-    *num_keys = size ? 1 : 0;
-    char *ptr = buf;
-    /* allow trailing newline at the end (but no space after it) */
-    while(ptr != buf + size && (ptr + 1) != buf + size)
+    char *p = buf;
+    while(1)
     {
-        if(*ptr++ == '\n')
-            (*num_keys)++;
-    }
-
-    key_array_t keys = xmalloc(sizeof(struct crypto_key_t) * *num_keys);
-    int pos = 0;
-    for(int i = 0; i < *num_keys; i++)
-    {
-        /* skip ws */
-        while(pos < size && isspace(buf[pos]))
-            pos++;
-        /* enough space ? */
-        if((pos + 32) > size)
-            bugp("invalid key file");
-        keys[i].method = CRYPTO_KEY;
-        for(int j = 0; j < 16; j++)
-        {
-            byte a, b;
-            if(convxdigit(buf[pos + 2 * j], &a) || convxdigit(buf[pos + 2 * j + 1], &b))
-                bugp(" invalid key, it should be a 128-bit key written in hexadecimal\n");
-            keys[i].u.key[j] = (a << 4) | b;
-        }
+        struct crypto_key_t k;
+        /* parse key */
+        if(!parse_key(&p, &k))
+            bug("invalid key file");
         if(g_debug)
         {
             printf("Add key: ");
-            for(int j = 0; j < 16; j++)
-                printf("%02x", keys[i].u.key[j]);
-               printf("\n");
+            print_key(&k, true);
         }
-        pos += 32;
+        add_keys(&k, 1);
+        /* request at least one space character before next key, or end of file */
+        if(*p != 0 && !isspace(*p))
+            bug("invalid key file");
+        /* skip whitespace */
+        while(isspace(*p))
+            p++;
+        if(*p == 0)
+            break;
     }
     free(buf);
-
-    return keys;
 }
 
 void print_hex(byte *data, int len, bool newline)

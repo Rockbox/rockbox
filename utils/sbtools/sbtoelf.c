@@ -77,8 +77,6 @@ char *g_out_prefix;
 bool g_debug;
 bool g_raw_mode;
 
-#define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
-
 static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
 {
     uint8_t sum = 90;
@@ -495,7 +493,7 @@ static void extract(unsigned long filesize)
     print_hex(g_buf, 16, true);
 
     /* sections */
-    if(strcasecmp(s_getenv("SB_RAW_CMD"), "YES") != 0)
+    if(!g_raw_mode)
     {
         color(BLUE);
         printf("Sections\n");
@@ -747,9 +745,7 @@ int main(int argc, char **argv)
                 break;
             case 'k':
             {
-                int kac;
-                key_array_t ka = read_keys(optarg, &kac);
-                add_keys(ka, kac);
+                add_keys_from_file(optarg);
                 break;
             }
             case 'z':

@@ -22,6 +22,7 @@
 #define __SB_H__
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define BLOCK_SIZE      16
 
@@ -149,5 +150,57 @@ struct sb_instruction_tag_t
     uint32_t len; /* length of the section */
     uint32_t flags; /* section flags */
 } __attribute__((packed));
+
+/*******
+ * API *
+ *******/
+
+#define SB_INST_DATA    0xff
+
+struct sb_inst_t
+{
+    uint8_t inst; /* SB_INST_* */
+    uint32_t size;
+    // <union>
+    void *data;
+    uint32_t pattern;
+    uint32_t addr;
+    // </union>
+    uint32_t argument; // for call and jump
+    /* for production use */
+    uint32_t padding_size;
+    uint8_t *padding;
+};
+
+struct sb_section_t
+{
+    uint32_t identifier;
+    bool is_data;
+    bool is_cleartext;
+    uint32_t alignment;
+    // data sections are handled as one or more SB_INST_DATA virtual instruction 
+    int nr_insts;
+    struct sb_inst_t *insts;
+    /* for production use */
+    uint32_t file_offset; /* in blocks */
+    uint32_t sec_size; /* in blocks */
+};
+
+struct sb_file_t
+{
+    /* override real, otherwise it is randomly generated */
+    uint8_t (*real_key)[16];
+    /* override crypto IV, use with caution ! Use NULL to generate it */
+    uint8_t (*crypto_iv)[16];
+    
+    int nr_sections;
+    struct sb_section_t *sections;
+    struct sb_version_t product_ver;
+    struct sb_version_t component_ver;
+    /* for production use */
+    uint32_t image_size; /* in blocks */
+};
+
+void sb_produce_file(struct sb_file_t *sb, const char *filename);
 
 #endif /* __SB_H__ */
