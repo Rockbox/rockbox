@@ -453,7 +453,7 @@ void LCDFN(scroll_fn)(void)
             continue;
 
         LCDFN(set_viewport)(s->vp);
-        height = s->vp->line_height;
+        height = s->vp->line_height ?: (int)font_get(s->vp->font)->height;
 
         if (s->backward)
             s->offset -= LCDFN(scroll_info).step;

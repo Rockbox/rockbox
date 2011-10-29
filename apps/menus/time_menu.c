@@ -269,7 +269,7 @@ int time_screen(void* ignored)
         /* force time to be drawn centered */
         clock_vps[i].flags |= VP_FLAG_ALIGN_CENTER;
 
-        font_h = clock_vps[i].line_height;
+        font_h = clock_vps[i].line_height ?: (int)font_get(clock_vps[i].font)->height;
         nb_lines -= 2; /* at least 2 lines for menu */
         if (nb_lines > 4)
             nb_lines = 4;
