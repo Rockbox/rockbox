@@ -220,17 +220,29 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 static int playback_callback(int action,const struct menu_item_ex *this_item)
 {
     static bool old_shuffle = false;
+    static int old_repeat = 0;
     switch (action)
     {
         case ACTION_ENTER_MENUITEM:
             if (this_item == &shuffle_item)
-                old_shuffle = global_settings.playlist_shuffle;
-            break;
-        case ACTION_EXIT_MENUITEM: /* on exit */
-            if ((this_item == &shuffle_item) &&
-                (old_shuffle != global_settings.playlist_shuffle)
-                && (audio_status() & AUDIO_STATUS_PLAY))
             {
+                old_shuffle = global_settings.playlist_shuffle;
+            }
+            else if (this_item == &repeat_mode)
+            {
+                old_repeat = global_settings.repeat_mode;
+            }
+            break;
+
+        case ACTION_EXIT_MENUITEM: /* on exit */
+            if (!(audio_status() & AUDIO_STATUS_PLAY))
+                break;
+
+            if (this_item == &shuffle_item)
+            {
+                if (old_shuffle == global_settings.playlist_shuffle)
+                    break;
+
 #if CONFIG_CODEC == SWCODEC
                 dsp_set_replaygain();
 #endif
@@ -243,6 +255,14 @@ static int playback_callback(int action,const struct menu_item_ex *this_item)
                     playlist_sort(NULL, true);
                 }
             }
+            else if (this_item == &repeat_mode)
+            {
+                if (old_repeat == global_settings.repeat_mode)
+                    break;
+
+                audio_flush_and_reload_tracks();
+            }
+
             break;
     }
     return action;
