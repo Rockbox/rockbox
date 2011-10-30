@@ -193,16 +193,6 @@ static enum
     TEMP_HIGH_LIMIT = 1,   /* Max temp */
 } temp_state = TEMP_STATE_NORMAL;
 
-/* Set power thread priority for charging mode or not */
-static inline void charging_set_thread_priority(bool charging)
-{
-#ifdef HAVE_PRIORITY_SCHEDULING
-    thread_set_priority(thread_self(),
-                        charging ? PRIORITY_REALTIME : PRIORITY_SYSTEM);
-#endif
-    (void)charging;
-}
-
 /* Update filtered charger current - exponential moving average */
 static bool charger_current_filter_step(void)
 {
@@ -411,8 +401,6 @@ static bool adjust_charger_current(void)
 
             if (i != MC13783_DATA_ERROR)
             {
-                charging_set_thread_priority(true);
-
                 /* Turn regulator logically ON. Hardware may still override.
                  */
                 i = mc13783_write_masked(MC13783_CHARGER, charger_setting,
@@ -467,7 +455,6 @@ static bool adjust_charger_current(void)
 
     adc_enable_channel(ADC_CHARGER_CURRENT, false);
     update_filtered_battery_voltage();
-    charging_set_thread_priority(false);
 
     return success;
 }
@@ -614,6 +601,10 @@ void INIT_ATTR powermgmt_init_target(void)
     const uint32_t regval_w =
         MC13783_VCHRG_4_050V | MC13783_ICHRG_0MA |
         MC13783_ICHRGTR_0MA | MC13783_OVCTRL_6_90V;
+
+    /* Must maintain watchdog timer and charger thus must always be able to
+       run even if playback is starved. */
+    thread_set_priority(thread_self(), PRIORITY_REALTIME);
 
     /* Use watchdog to shut system down if we lose control of the charging
      * hardware. */
@@ -808,8 +799,6 @@ static void charger_control(void)
         }
 
         autorecharge_counter = 0;
-
-        charging_set_thread_priority(true);
 
         if (stat_battery_reading(ADC_BATTERY) < BATT_VTRICKLE_CHARGE)
         {
