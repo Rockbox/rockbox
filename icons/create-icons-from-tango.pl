@@ -56,7 +56,7 @@ my @iconlist = (
     "devices/network-wireless",                 # Icon_Radio_screen ###
     "mimetypes/package-x-generic",              # Icon_file_view_menu
     "apps/utilities-system-monitor",            # Icon_EQ
-    "../rbutil/rbutilqt/icons/rockbox-clef.svg" # Icon_Rockbox
+    "../docs/logo/rockbox-clef.svg"             # Icon_Rockbox
 );
 
 
