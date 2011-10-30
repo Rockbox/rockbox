@@ -34,12 +34,13 @@
 #include "buffering.h" /* TYPE_PACKET_AUDIO */
 #include "codecs.h"
 #include "core_alloc.h" /* core_allocator_init */
-#include "debug.h"
 #include "dsp_core.h"
 #include "metadata.h"
 #include "settings.h"
 #include "sound.h"
 #include "tdspeed.h"
+#include "kernel.h"
+#include "platform.h"
 
 /***************** EXPORTED *****************/
 
@@ -581,6 +582,29 @@ static unsigned ci_sleep(unsigned ticks)
     return 0;
 }
 
+static void ci_debugf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+}
+
+#ifdef ROCKBOX_HAS_LOGF
+static void ci_logf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    putc('\n', stderr);
+    va_end(ap);
+}
+#endif
+
+static void commit_dcache(void) {}
+static void commit_discard_dcache(void) {}
+static void commit_discard_idcache(void) {}
+
 static struct codec_api ci = {
 
     0,                   /* filesize */
@@ -628,10 +652,10 @@ static struct codec_api ci = {
     memcmp,
     memchr,
 #if defined(DEBUG) || defined(SIMULATOR)
-    debugf,
+    ci_debugf,
 #endif
 #ifdef ROCKBOX_HAS_LOGF
-    debugf, /* logf */
+    ci_logf,
 #endif
 
     qsort,

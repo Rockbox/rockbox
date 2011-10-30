@@ -21,7 +21,6 @@
 #include <errno.h>
 #include <string.h>
 #include <math.h>
-#include "system.h"
 
 #include "ivorbiscodec.h"
 #include "ivorbisfile.h"

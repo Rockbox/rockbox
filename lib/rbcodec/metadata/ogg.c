@@ -23,8 +23,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include "platform.h"
 
-#include "system.h"
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
@@ -68,7 +68,7 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
     {
         return false;
     }
-    
+
     /* All Ogg streams start with OggS */
     if (memcmp(buf, "OggS", 4) != 0)
     {

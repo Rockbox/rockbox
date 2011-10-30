@@ -21,6 +21,8 @@
 #ifndef DSP_UTIL_H
 #define DSP_UTIL_H
 
+#include "gcc_extensions.h"
+
 /** Clip sample to signed 16 bit range **/
 
 #ifdef CPU_ARM

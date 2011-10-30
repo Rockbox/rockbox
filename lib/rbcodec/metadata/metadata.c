@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "string-extra.h"
-
+#include "platform.h"
 #include "debug.h"
 #include "logf.h"
 #include "cuesheet.h"

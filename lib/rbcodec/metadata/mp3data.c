@@ -37,8 +37,7 @@
 #include "debug.h"
 #include "logf.h"
 #include "mp3data.h"
-#include "file.h"
-#include "system.h"
+#include "platform.h"
 
 //#define DEBUG_VERBOSE
 

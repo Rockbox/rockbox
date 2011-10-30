@@ -10,8 +10,7 @@
 #include "ffmpeg_get_bits.h"
 
 #ifndef BUILD_STANDALONE
-  #include <config.h>
-  #include <system.h>
+  #include "platform.h"
 #else
   #include <stdio.h>
   #define IBSS_ATTR
