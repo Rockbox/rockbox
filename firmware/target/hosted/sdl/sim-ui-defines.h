@@ -325,7 +325,12 @@
 #define UI_LCD_POSX                 42 /* x position of lcd */
 #define UI_LCD_POSY                 42 /* y position of lcd */
 
-
+#elif defined(SANSA_CLIPZIP)
+#define UI_TITLE                    "Sansa Clip Zip"
+#define UI_WIDTH                    160 /* width of GUI window */
+#define UI_HEIGHT                   254 /* height of GUI window */
+#define UI_LCD_POSX                 33 /* x position of lcd */
+#define UI_LCD_POSY                 26 /* y position of lcd */
 
 #elif defined(PHILIPS_SA9200)
 #define UI_TITLE                    "Philips GoGear SA9200"
