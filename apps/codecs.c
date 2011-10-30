@@ -27,6 +27,8 @@
 #include <timefuncs.h>
 #include <ctype.h>
 #include <stdarg.h>
+#define LOGF_ENABLE
+#include "logf.h"
 #include "string-extra.h"
 #include "load_code.h"
 #include "debug.h"
@@ -51,9 +53,6 @@
 #include "splash.h"
 #include "general.h"
 #include "rbpaths.h"
-
-#define LOGF_ENABLE
-#include "logf.h"
 
 #if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 #define PREFIX(_x_) sim_ ## _x_

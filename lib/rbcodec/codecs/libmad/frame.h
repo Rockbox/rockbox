@@ -23,7 +23,6 @@
 # define LIBMAD_FRAME_H
 
 # include "fixed.h"
-# include "timer.h"
 # include "stream.h"
 
 enum mad_layer {

@@ -19,10 +19,8 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "system.h"
 #include <sound.h>
 #include "dsp.h"
-#include "dsp-util.h"
 #include "eq.h"
 #include "compressor.h"
 #include "kernel.h"
@@ -32,6 +30,7 @@
 #include "core_alloc.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
+#include "platform.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/

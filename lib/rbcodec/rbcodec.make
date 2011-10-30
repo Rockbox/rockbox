@@ -6,7 +6,8 @@
 #                     \/            \/     \/    \/            \/
 
 RBCODEC_LIB = $(RBCODEC_BLD)/librbcodec.a
-RBCODEC_SRC := $(call preprocess, $(RBCODEC_DIR)/SOURCES)
+RBCODEC_SRC := $(call preprocess, $(RBCODEC_DIR)/SOURCES, $(RBCODEC_CFLAGS) \
+	-imacros rbcodecconfig.h)
 RBCODEC_OBJ := $(call c2obj, $(RBCODEC_SRC))
 INCLUDES += -I$(RBCODEC_DIR) -I$(RBCODEC_DIR)/codecs -I$(RBCODEC_DIR)/dsp \
             -I$(RBCODEC_DIR)/metadata

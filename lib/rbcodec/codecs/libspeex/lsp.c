@@ -83,7 +83,9 @@ Heavily modified by Jean-Marc Valin (c) 2002-2006 (fixed-point,
 #include "config-speex.h"
 #endif
 
+#ifndef FIXED_POINT
 #include <math.h>
+#endif
 #include "lsp.h"
 #include "stack_alloc.h"
 #include "math_approx.h"

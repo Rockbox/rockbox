@@ -33,7 +33,9 @@
 #include "config-speex.h"
 #endif
 
+#ifndef FIXED_POINT
 #include <math.h>
+#endif
 #include "sb_celp.h"
 #include "filters.h"
 #include "lpc.h"
