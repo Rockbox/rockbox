@@ -41,7 +41,8 @@ bool _backlight_init(void)
 static inline int normalize_backlight(int val)
 {
     /* normalize to xx% brightness for sdl */
-    return ((val - MIN_BRIGHTNESS_SETTING + 1) * 100)/MAX_BRIGHTNESS_SETTING;
+    return ((val - MIN_BRIGHTNESS_SETTING + 1) * 100) /
+           (MAX_BRIGHTNESS_SETTING - MIN_BRIGHTNESS_SETTING + 1);
 }
 
 void _backlight_set_brightness(int val)
