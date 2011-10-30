@@ -39,6 +39,8 @@ isEmpty(VER) {
 }
 message("Qt version used:" $$VER)
 
+MACHINEFLAGS = $$find(QMAKE_CFLAGS, -m[63][42])
+
 RBBASE_DIR = $$_PRO_FILE_PWD_
 RBBASE_DIR = $$replace(RBBASE_DIR,/rbutil/rbutilqt,)
 
@@ -74,25 +76,25 @@ rbspeex.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/rbspeex \
         librbspeex$$RBLIBPOSTFIX \
         SYS_SPEEX=\"$$LIBSPEEX\" \
-        CC=\"$$QMAKE_CC\" AR=\"$$MYAR\"
+        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libucl.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/ucl/src \
         libucl$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC\" AR=\"$$MYAR\"
+        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libmkamsboot.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkamsboot \
         APPVERSION=\"rbutil\" \
         libmkamsboot$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC\" AR=\"$$MYAR\"
+        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libmktccboot.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mktccboot \
         libmktccboot$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC\" AR=\"$$MYAR\"
+        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libmkmpioboot.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkmpioboot \
         APPVERSION=\"rbutil\" \
         libmkmpioboot$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC\" AR=\"$$MYAR\"
+        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 QMAKE_EXTRA_TARGETS += rbspeex libucl libmkamsboot libmktccboot libmkmpioboot
 PRE_TARGETDEPS += rbspeex libucl libmkamsboot libmktccboot libmkmpioboot
 
