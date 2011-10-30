@@ -365,12 +365,22 @@ void oled_brightness(int brightness)
     }
 }
 
+/* Writes framebuffer data */
+void lcd_write_data(const fb_data *data, int count)
+{
+    fb_data pixel;
+
+    while (count--) {
+        pixel = *data++;
+        lcd_write_dat((pixel >> 0) & 0xFF);
+        lcd_write_dat((pixel >> 8) & 0xFF);
+    }
+}
+
 /* Updates a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    fb_data *ptr;
-    fb_data pixel;
-    int row, col;
+    int row;
     int x_end = x + width;
     int y_end = y + height;
 
@@ -393,6 +403,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (y_end > LCD_HEIGHT) {
         y_end = LCD_HEIGHT;
     }
+    width = x_end - x;
 
     /* setup GRAM write window */
     lcd_setup_rect(x, x_end - 1, y, y_end - 1);
@@ -400,12 +411,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     /* write to GRAM */
     lcd_write_cmd((lcd_type == 0) ? 0x08 : 0x0C);   /* DDRAM_DATA_ACCESS_PORT */
     for (row = y; row < y_end; row++) {
-        ptr = &lcd_framebuffer[row][x];
-        for (col = x; col < x_end; col++) {
-            pixel = *ptr++;
-            lcd_write_dat((pixel >> 0) & 0xFF);
-            lcd_write_dat((pixel >> 8) & 0xFF);
-        }
+        lcd_write_data(&lcd_framebuffer[row][x], width);
     }
 }
 
