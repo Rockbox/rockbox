@@ -46,6 +46,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
+#include "platform.h"
 #include "metadata.h"
 #include "metadata_parsers.h"
 

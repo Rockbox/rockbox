@@ -20,9 +20,9 @@
  ****************************************************************************/
 #include <inttypes.h>
 #include <stdio.h>
+#include "platform.h"
 
 #include "string-extra.h"
-#include "system.h"
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"

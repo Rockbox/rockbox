@@ -15,7 +15,6 @@
 // the malloc() system is provided.
 
 #include "wavpack.h"
-#include "system.h"
 
 #include <string.h>
 

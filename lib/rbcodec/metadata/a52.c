@@ -22,8 +22,8 @@
 #include <stdio.h>
 #include "metadata.h"
 #include "logf.h"
-
 #include "metadata_parsers.h"
+#include "platform.h"
 
 static const unsigned short a52_bitrates[] =
 {

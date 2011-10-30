@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include "platform.h"
 
 #include "metadata.h"
 #include "replaygain.h"
@@ -31,7 +32,6 @@
 #include "rbunicode.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "system.h"
 #include <codecs/libasf/asf.h>
 
 /* TODO: Just read the GUIDs into a 16-byte array, and use memcmp to compare */

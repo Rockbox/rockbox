@@ -22,8 +22,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include "platform.h"
 
-#include "system.h"
 #include "metadata.h"
 #include <string-extra.h>
 #include "metadata_common.h"

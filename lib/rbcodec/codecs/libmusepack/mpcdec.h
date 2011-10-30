@@ -39,9 +39,9 @@
 #pragma once
 #endif
 
+#include "platform.h"
 #include "reader.h"
 #include "streaminfo.h"
-#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {

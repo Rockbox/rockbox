@@ -22,9 +22,7 @@
 #ifndef __CODECLIB_H__
 #define __CODECLIB_H__
 
-#include <inttypes.h>
-#include <string.h>
-#include "config.h"
+#include "platform.h"
 #include "codecs.h"
 #include "mdct.h"
 #include "fft.h"

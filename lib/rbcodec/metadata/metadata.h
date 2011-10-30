@@ -22,10 +22,7 @@
 #ifndef _METADATA_H
 #define _METADATA_H
 
-#include <stdbool.h>
-#include "config.h"
-#include "file.h"
-
+#include "platform.h"
 
 /* Audio file types. */
 /* NOTE: The values of the AFMT_* items are used for the %fc tag in the WPS

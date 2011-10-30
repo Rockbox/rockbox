@@ -6,6 +6,32 @@
 #ifndef __BSWAP_H__
 #define __BSWAP_H__
 
+#include "platform.h"
+
+#ifndef bswap_16
+#define bswap_16(x) swap16(x)
+#endif
+#ifndef bswap_32
+#define bswap_32(x) swap32(x)
+#endif
+
+#ifndef bswap_64
+static inline uint64_t ByteSwap64(uint64_t x)
+{
+    union { 
+        uint64_t ll;
+        struct {
+           uint32_t l,h;
+        } l;
+    } r;
+    r.l.l = bswap_32 (x);
+    r.l.h = bswap_32 (x>>32);
+    return r.ll;
+}
+#define bswap_64(x) ByteSwap64(x)
+#endif
+
+#if 0
 #ifdef HAVE_BYTESWAP_H
 #include <byteswap.h>
 #else
@@ -13,9 +39,7 @@
 #ifdef ROCKBOX
 #include "codecs.h"
 
-/* rockbox' optimised inline functions */
-#define bswap_16(x) swap16(x)
-#define bswap_32(x) swap32(x)
+
 
 static inline uint64_t ByteSwap64(uint64_t x)
 {
@@ -127,7 +151,7 @@ static inline uint64_t ByteSwap64(uint64_t x)
 #endif  /* !ARCH_X86 */
 
 #endif  /* !HAVE_BYTESWAP_H */
-
+#endif
 // be2me ... BigEndian to MachineEndian
 // le2me ... LittleEndian to MachineEndian
 
