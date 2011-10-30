@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include <stdio.h>
+#include "platform.h"
 #include "metadata.h"
 #include "logf.h"
 

@@ -34,7 +34,9 @@
 #include "config-speex.h"
 #endif
 
+#ifndef FIXED_POINT
 #include <math.h>
+#endif
 #include "ltp.h"
 #include "stack_alloc.h"
 #include "filters.h"

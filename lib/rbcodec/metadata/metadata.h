@@ -22,9 +22,8 @@
 #ifndef _METADATA_H
 #define _METADATA_H
 
-#include <stdbool.h>
 #include "config.h"
-#include "file.h"
+#include "rbcodecconfig.h"
 
 
 /* Audio file types. */

@@ -25,9 +25,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include "platform.h"
 #include "strlcpy.h"
 #include "strcasecmp.h"
-#include "system.h"
 #include "metadata.h"
 #include "debug.h"
 #include "replaygain.h"

@@ -39,9 +39,9 @@
 #include "config.h"
 #include "file.h"
 #include "logf.h"
-#include "system.h"
 #include "replaygain.h"
 #include "rbunicode.h"
+#include "platform.h"
 
 #include "metadata.h"
 #include "mp3data.h"

@@ -36,8 +36,8 @@
 #include "config.h"
 #include "file.h"
 #include "logf.h"
+#include "platform.h"
 
-#include "system.h"
 #include "metadata.h"
 #include "mp3data.h"
 #include "metadata_common.h"

@@ -27,11 +27,7 @@
 #define NO_REDEFINES_PLEASE
 #endif
 
-#include <stdbool.h>
-#include <stdlib.h>
-#include "strlcpy.h"
-#include "config.h"
-#include "system.h"
+#include "rbcodecconfig.h"
 #include "metadata.h"
 #include "audio.h"
 #ifdef RB_PROFILE
@@ -43,7 +39,6 @@
 #include "pcm_record.h"
 #endif
 #include "dsp.h"
-#include "dsp-util.h"
 #endif
 
 #include "gcc_extensions.h"

@@ -31,6 +31,9 @@ WARBLE_CFLAGS = '-DCODECDIR="$(CODECDIR)"' $(shell sdl-config --cflags)
 WARBLE_LDFLAGS = -lm -ldl $(shell sdl-config --libs)
 
 include $(ROOTDIR)/tools/functions.make
+
+RBCODEC_CFLAGS += -D_FILE_H_ -DLOGF_H -DDEBUG_H -D_KERNEL_H_ # will be removed later
+WARBLE_CFLAGS += $(RBCODEC_CFLAGS)
 include ../rbcodec.make
 
 SRC = $(ROOTDIR)/firmware/buflib.c \
