@@ -171,10 +171,9 @@ static struct md5sums sansasums[] = {
     { MODEL_FUZEV2, "2.02.26", "d4f6f85c3e4a8ea8f2e5acc421641801" },
     { MODEL_FUZEV2, "2.03.31", "74fb197ccd51707388f3b233402186a6" },
     { MODEL_FUZEV2, "2.03.33", "1599cc73d02ea7fe53fe2d4379c24b66" },
-#if 1 /* disabled for now because it's not been proven they can be patched */
+    
     { MODEL_CLIPZIP, "1.01.12", "45adea0873326b5af34f096e5c402f78" },
     { MODEL_CLIPZIP, "1.01.15", "f62af954334cd9ba1a87a7fa58ec6074" },
-#endif
     { MODEL_CLIPZIP, "1.01.17", "27bcb343d6950f35dc261629e22ba60c" },
 };
 
