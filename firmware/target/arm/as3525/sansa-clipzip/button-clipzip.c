@@ -27,6 +27,59 @@
 #include "kernel.h"
 #include "system-target.h"
 
+static int keyscan(void)
+{
+    static int buttons = 0;
+    static int row = 1;
+
+    switch (row) {
+    
+    case 1:
+        /* read row 1 */
+        buttons &= ~(BUTTON_RIGHT | BUTTON_SELECT | BUTTON_UP);
+        if (GPIOC_PIN(3)) {
+            buttons |= BUTTON_RIGHT;
+        }
+        if (GPIOC_PIN(4)) {
+            buttons |= BUTTON_SELECT;
+        }
+        if (GPIOC_PIN(5)) {
+            buttons |= BUTTON_UP;
+        }
+        
+        /* prepare row 2 */
+        GPIOC_PIN(1) = 0;
+        GPIOC_PIN(2) = (1 << 2);
+        row = 2;
+        break;
+        
+    case 2:
+        /* read row 2 */
+        buttons &= ~(BUTTON_HOME | BUTTON_DOWN | BUTTON_LEFT);
+        if (GPIOC_PIN(3)) {
+            buttons |= BUTTON_HOME;
+        }
+        if (GPIOC_PIN(4)) {
+            buttons |= BUTTON_DOWN;
+        }
+        if (GPIOC_PIN(5)) {
+            buttons |= BUTTON_LEFT;
+        }
+    
+        /* prepare row 1 */
+        GPIOC_PIN(1) = (1 << 1);
+        GPIOC_PIN(2) = 0;
+        row = 1;
+        break;
+
+    default:
+        row = 1;
+        break;
+    }
+    
+    return buttons;
+}
+
 void button_init_device(void)
 {
     /* GPIO A6, A7 and D6 are direct button inputs */
@@ -39,15 +92,6 @@ void button_init_device(void)
     GPIOC_DIR &= ~((1 << 3) | (1 << 4) | (1 << 5));
 }
 
-/*  TODO:
-    Instead of using udelay to wait for buttons to settle, we could use a
-    simple state machine to alternate between key matrix rows (like we do on
-    the clip) and this way avoid burning cycles in the udelay.
-    
-    TODO:
-    Figure out the real mappings from GPIOs to buttons.
-    The current mapping is just an educated guess.
-*/
 int button_read_device(void)
 {
     int buttons = 0;
@@ -64,39 +108,9 @@ int button_read_device(void)
     if (GPIOA_PIN(7)) {
         buttons |= BUTTON_VOL_UP;
     }
-
-    /* key matrix buttons, first row */
-    GPIOC_PIN(1) = (1 << 1);
-    GPIOC_PIN(2) = 0;
-    udelay(500);
     
-    if (GPIOC_PIN(3)) {
-        buttons |= BUTTON_RIGHT;
-    }
-    if (GPIOC_PIN(4)) {
-        buttons |= BUTTON_SELECT;
-    }
-    if (GPIOC_PIN(5)) {
-        buttons |= BUTTON_UP;
-    }
-    
-    /* key matrix buttons, second row */
-    GPIOC_PIN(1) = 0;
-    GPIOC_PIN(2) = (1 << 2);
-    udelay(500);
-    
-    if (GPIOC_PIN(3)) {
-        buttons |= BUTTON_HOME;
-    }
-    if (GPIOC_PIN(4)) {
-        buttons |= BUTTON_DOWN;
-    }
-    if (GPIOC_PIN(5)) {
-        buttons |= BUTTON_LEFT;
-    }
-    
-    /* deselect scan rows */
-    GPIOC_PIN(2) = 0;
+    /* keyscan buttons */
+    buttons |= keyscan();
 
     return buttons;
 }
