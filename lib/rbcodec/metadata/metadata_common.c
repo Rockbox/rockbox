@@ -24,7 +24,7 @@
 #include <ctype.h>
 #include <inttypes.h>
 
-#include "system.h"
+#include "platform.h"
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"

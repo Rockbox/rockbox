@@ -7,20 +7,20 @@
 # $Id$
 #
 
-
-
 RBCODECLIB_DIR = $(ROOTDIR)/lib/rbcodec
 RBCODEC_BLD = $(BUILDDIR)/lib/rbcodec
 
-GCCOPTS += -D__PCTOOL__ $(TARGET) -DDEBUG -g -std=gnu99 `$(SDLCONFIG) --cflags` -DCODECDIR="\"$(CODECDIR)\""
+GCCOPTS += -D__PCTOOL__ $(TARGET) -DDEBUG -g -std=gnu99 \
+	`$(SDLCONFIG) --cflags` -DCODECDIR="\"$(CODECDIR)\""
+RBCODEC_CFLAGS += -D_FILE_H_ #-DLOGF_H -DDEBUG_H -D_KERNEL_H_ # will be removed later
 
 SRC= $(call preprocess, $(ROOTDIR)/lib/rbcodec/test/SOURCES)
 
-INCLUDES += -I$(ROOTDIR)/apps -I$(ROOTDIR)/apps/gui
-INCLUDES += -I$(ROOTDIR)/firmware/export -I$(ROOTDIR)/firmware/include \
-			-I$(ROOTDIR)/firmware/target/hosted \
-			-I$(ROOTDIR)/firmware/target/hosted/sdl
-
+INCLUDES += -I$(ROOTDIR)/lib/rbcodec/test \
+	-I$(ROOTDIR)/apps -I$(ROOTDIR)/apps/gui \
+	-I$(ROOTDIR)/firmware/export -I$(ROOTDIR)/firmware/include \
+	-I$(ROOTDIR)/firmware/target/hosted \
+	-I$(ROOTDIR)/firmware/target/hosted/sdl
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 

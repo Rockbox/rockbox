@@ -7,7 +7,8 @@
 
 # RBCODEC_BLD is defined in the calling Makefile
 RBCODECLIB_DIR := $(ROOTDIR)/lib/rbcodec
-RBCODECLIB_SRC := $(call preprocess, $(RBCODECLIB_DIR)/SOURCES)
+RBCODECLIB_SRC := $(call preprocess, $(RBCODECLIB_DIR)/SOURCES, \
+	$(RBCODEC_CFLAGS) -imacros rbcodecconfig.h)
 RBCODECLIB_OBJ := $(call c2obj, $(RBCODECLIB_SRC))
 RBCODECLIB := $(BUILDDIR)/lib/librbcodec.a
 

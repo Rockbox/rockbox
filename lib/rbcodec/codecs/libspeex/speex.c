@@ -37,7 +37,9 @@
 #endif
 
 #include "modes.h"
+#ifndef FIXED_POINT
 #include <math.h>
+#endif
 #include "os_support.h"
 
 #ifndef NULL

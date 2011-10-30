@@ -28,7 +28,6 @@
 # include "bit.h"
 # include "stream.h"
 # include "frame.h"
-# include "timer.h"
 # include "layer12.h"
 # include "layer3.h"
 # include "codeclib.h"

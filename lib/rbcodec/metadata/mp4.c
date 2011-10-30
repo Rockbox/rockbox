@@ -23,8 +23,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include "platform.h"
 
-#include "system.h"
 #include "errno.h"
 #include "metadata.h"
 #include "metadata_common.h"

@@ -15,7 +15,7 @@
 # The sed line is to prepend the directory to all source files
 
 preprocess = $(shell $(CC) $(PPCFLAGS) $(2) -E -P -x c -include config.h $(1) | \
-		grep -v '^\#' | \
+		grep -v '^\#' | grep -v "^ *$$" | \
 		sed -e 's:^..*:$(dir $(1))&:')
 
 preprocess2file = $(SILENT)$(CC) $(PPCFLAGS) $(3) -E -P -x c -include config.h $(1) | \

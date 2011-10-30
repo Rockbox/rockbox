@@ -35,11 +35,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <ctype.h>
+#include "platform.h"
 #include "string-extra.h"
-#include "config.h"
-#include "file.h"
 #include "logf.h"
-#include "system.h"
 #include "replaygain.h"
 #include "rbunicode.h"
 

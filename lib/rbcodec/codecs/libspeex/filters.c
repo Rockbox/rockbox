@@ -39,7 +39,9 @@
 #include "arch.h"
 #include "math_approx.h"
 #include "ltp.h"
+#ifndef FIXED_POINT
 #include <math.h>
+#endif
 
 #ifdef _USE_SSE
 #include "filters_sse.h"

@@ -24,13 +24,13 @@
 #include <ctype.h>
 #include <inttypes.h>
 
-#include "system.h"
+
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
 #include "rbunicode.h"
 #include "debug.h"
-
+#include "platform.h"
 #define MAX_SONGS  32
 
 static bool parse_dec(int *retval, const char *p, int minval, int maxval)

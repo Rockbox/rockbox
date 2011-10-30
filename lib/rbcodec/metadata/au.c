@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include "platform.h"
 
-#include "system.h"
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"

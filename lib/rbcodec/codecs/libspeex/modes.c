@@ -44,7 +44,9 @@
 #include "nb_celp.h"
 #include "vbr.h"
 #include "arch.h"
+#ifndef FIXED_POINT
 #include <math.h>
+#endif
 
 #ifndef NULL
 #define NULL 0

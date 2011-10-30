@@ -26,8 +26,9 @@
 #ifndef AVCODEC_GET_BITS_H
 #define AVCODEC_GET_BITS_H
 
-#include <stdint.h>
-#include <stdlib.h>
+//#include <stdint.h>
+//#include <stdlib.h>
+#include "platform.h"
 #include "ffmpeg_intreadwrite.h"
 //#include <assert.h>
 //#include "libavutil/bswap.h"
@@ -39,8 +40,12 @@
 #include "codecs.h"
 
 /* rockbox' optimised inline functions */
+#ifndef bswap_16
 #define bswap_16(x) swap16(x)
+#endif
+#ifndef bswap_32
 #define bswap_32(x) swap32(x)
+#endif
 
 #ifdef ROCKBOX_BIG_ENDIAN
 #define be2me_16(x) (x)
