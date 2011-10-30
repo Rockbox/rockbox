@@ -230,3 +230,45 @@ static int filesize(const char* filename)
     return sb.st_size;
 }
 
+/* Retrieve version of WMP as described in
+ * http://msdn.microsoft.com/en-us/library/dd562731%28VS.85%29.aspx
+ * Since we're after MTP support checking for the WMP6 key is not necessary.
+ */
+int mtp_wmp_version(void)
+{
+    DWORD ret;
+    HKEY hk;
+    DWORD type;
+    DWORD enable = -1;
+    DWORD enablelen = sizeof(DWORD);
+    char buf[32];
+    DWORD buflen = sizeof(buf);
+    int version = 0;
+
+    ret = RegOpenKeyExA(HKEY_LOCAL_MACHINE,
+        "SOFTWARE\\Microsoft\\Active Setup\\Installed Components\\{6BF52A52-394A-11d3-B153-00C04F79FAA6}",
+        0, KEY_QUERY_VALUE, &hk);
+
+    if(ret != ERROR_SUCCESS) {
+        return 0;
+    }
+    type = REG_DWORD;
+    ret = RegQueryValueExA(hk, "IsInstalled", NULL, &type, (LPBYTE)&enable, &enablelen);
+    if(ret != ERROR_SUCCESS) {
+        RegCloseKey(hk);
+        return 0;
+    }
+    if(enable) {
+        type = REG_SZ;
+        ret = RegQueryValueExA(hk, "Version", NULL, &type, (LPBYTE)buf, &buflen);
+    }
+    if(ret == ERROR_SUCCESS) {
+        /* get major version from registry value */
+        buf[31] = '\0';
+        version = atoi(buf);
+    }
+    RegCloseKey(hk);
+
+    return version;
+}
+

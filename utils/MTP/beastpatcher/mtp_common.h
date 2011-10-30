@@ -59,6 +59,10 @@ struct mtp_info_t
 #endif
 };
 
+#if defined(__WIN32__) || defined(_WIN32)
+int mtp_wmp_version(void);
+#endif
+
 /* Common functions for both libMTP and win32 */
 
 int mtp_init(struct mtp_info_t* mtp_info);

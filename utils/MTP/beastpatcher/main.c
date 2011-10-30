@@ -104,6 +104,13 @@ int main(int argc, char* argv[])
     if(argc > 1) {
         interactive = 0;
     }
+#if defined(__WIN32__) || defined(_WIN32)
+    if(mtp_wmp_version() < 11) {
+        fprintf(stderr, "beastpacher requires at least Windows Media Player 11 to run!\n");
+        fprintf(stderr, "Please update you installation of Windows Media Player.\n");
+        return -1;
+    }
+#endif
 
     i = 1;
     while(i < argc) {
