@@ -372,8 +372,8 @@ void lcd_write_data(const fb_data *data, int count)
 
     while (count--) {
         pixel = *data++;
-        lcd_write_dat((pixel >> 0) & 0xFF);
         lcd_write_dat((pixel >> 8) & 0xFF);
+        lcd_write_dat((pixel >> 0) & 0xFF);
     }
 }
 

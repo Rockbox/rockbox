@@ -2536,7 +2536,7 @@ fi
     target="-DSANSA_CLIPZIP"
     memory=8 # not sure
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     tool="$rootdir/tools/scramble -add=clzp"
     output="rockbox.sansa"
     bootoutput="bootloader-clipzip.sansa"
