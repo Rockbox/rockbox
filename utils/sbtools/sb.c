@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "misc.h"
 #include "crypto.h"
 #include "sb.h"
@@ -64,6 +65,7 @@ static void compute_sb_offsets(struct sb_file_t *sb)
         alignment /= BLOCK_SIZE; /* alignment in block sizes */
         
         struct sb_section_t *sec = &sb->sections[i];
+        sec->sec_size = 0;
 
         if(g_debug)
         {
@@ -203,7 +205,7 @@ static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
     sb_hdr->flags = 0;
     sb_hdr->image_size = sb->image_size;
     sb_hdr->header_size = sizeof(struct sb_header_t) / BLOCK_SIZE;
-    sb_hdr->first_boot_sec_id = sb->sections[0].identifier;
+    sb_hdr->first_boot_sec_id = sb->first_boot_sec_id;
     sb_hdr->nr_keys = g_nr_keys;
     sb_hdr->nr_sections = sb->nr_sections;
     sb_hdr->sec_hdr_size = sizeof(struct sb_section_header_t) / BLOCK_SIZE;
@@ -213,12 +215,17 @@ static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
         sizeof(struct sb_key_dictionary_entry_t) * sb_hdr->nr_keys / BLOCK_SIZE;
     generate_random_data(sb_hdr->rand_pad0, sizeof(sb_hdr->rand_pad0));
     generate_random_data(sb_hdr->rand_pad1, sizeof(sb_hdr->rand_pad1));
+    /* Version 1.0 has 6 bytes of random padding,
+     * Version 1.1 requires the last 4 bytes to be 'sgtl' */
+    if(sb->minor_version >= 1)
+        memcpy(&sb_hdr->rand_pad0[2], "sgtl", 4);
+    
     sb_hdr->timestamp = generate_timestamp();
     sb_hdr->product_ver = sb->product_ver;
     fix_version(&sb_hdr->product_ver);
     sb_hdr->component_ver = sb->component_ver;
     fix_version(&sb_hdr->component_ver);
-    sb_hdr->drive_tag = 0;
+    sb_hdr->drive_tag = sb->drive_tag;
 
     sha_1_init(&sha_1_params);
     sha_1_update(&sha_1_params, &sb_hdr->signature[0],
@@ -292,7 +299,7 @@ void produce_sb_instruction(struct sb_inst_t *inst,
     cmd->hdr.checksum = instruction_checksum(&cmd->hdr);
 }
 
-void sb_produce_file(struct sb_file_t *sb, const char *filename)
+void sb_write_file(struct sb_file_t *sb, const char *filename)
 {
     FILE *fd = fopen(filename, "wb");
     if(fd == NULL)
@@ -423,4 +430,671 @@ void sb_produce_file(struct sb_file_t *sb, const char *filename)
     fwrite(final_sig, 1, 32, fd);
     
     fclose(fd);
+}
+
+static void *memdup(void *p, size_t len)
+{
+    void *cpy = xmalloc(len);
+    memcpy(cpy, p, len);
+    return cpy;
+}
+
+static struct sb_section_t *read_section(bool data_sec, uint32_t id, byte *buf,
+    int size, const char *indent, void *u, sb_color_printf cprintf)
+{
+    #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
+    
+    struct sb_section_t *sec = xmalloc(sizeof(struct sb_section_t));
+    memset(sec, 0, sizeof(struct sb_section_t));
+    sec->identifier = id;
+    sec->is_data = data_sec;
+    sec->sec_size = ROUND_UP(size, BLOCK_SIZE) / BLOCK_SIZE;
+    
+    if(data_sec)
+    {
+        sec->nr_insts = 1;
+        sec->insts = xmalloc(sizeof(struct sb_inst_t));
+        memset(sec->insts, 0, sizeof(struct sb_inst_t));
+        sec->insts->inst = SB_INST_DATA;
+        sec->insts->size = size;
+        sec->insts->data = memdup(buf, size);
+        return sec;
+    }
+
+    /* Pretty print the content */
+    int pos = 0;
+    while(pos < size)
+    {
+        struct sb_inst_t inst;
+        memset(&inst, 0, sizeof(inst));
+
+        struct sb_instruction_header_t *hdr = (struct sb_instruction_header_t *)&buf[pos];
+        inst.inst = hdr->opcode;
+        
+        printf(OFF, "%s", indent);
+        uint8_t checksum = instruction_checksum(hdr);
+        if(checksum != hdr->checksum)
+            printf(GREY, "[Bad checksum]");
+        if(hdr->flags != 0)
+        {
+            printf(GREY, "[");
+            printf(BLUE, "f=%x", hdr->flags);
+            printf(GREY, "] ");
+        }
+        if(hdr->opcode == SB_INST_LOAD)
+        {
+            struct sb_instruction_load_t *load = (struct sb_instruction_load_t *)&buf[pos];
+            inst.size = load->len;
+            inst.addr = load->addr;
+            inst.data = memdup(load + 1, load->len);
+            
+            printf(RED, "LOAD");
+            printf(OFF, " | ");
+            printf(BLUE, "addr=0x%08x", load->addr);
+            printf(OFF, " | ");
+            printf(GREEN, "len=0x%08x", load->len);
+            printf(OFF, " | ");
+            printf(YELLOW, "crc=0x%08x", load->crc);
+            /* data is padded to 16-byte boundary with random data and crc'ed with it */
+            uint32_t computed_crc = crc(&buf[pos + sizeof(struct sb_instruction_load_t)],
+                ROUND_UP(load->len, 16));
+            if(load->crc == computed_crc)
+                printf(RED, "  Ok\n");
+            else
+                printf(RED, "  Failed (crc=0x%08x)\n", computed_crc);
+
+            pos += load->len + sizeof(struct sb_instruction_load_t);
+        }
+        else if(hdr->opcode == SB_INST_FILL)
+        {
+            struct sb_instruction_fill_t *fill = (struct sb_instruction_fill_t *)&buf[pos];
+            inst.pattern = fill->pattern;
+            inst.size = fill->len;
+            inst.addr = fill->addr;
+            
+            printf(RED, "FILL");
+            printf(OFF, " | ");
+            printf(BLUE, "addr=0x%08x", fill->addr);
+            printf(OFF, " | ");
+            printf(GREEN, "len=0x%08x", fill->len);
+            printf(OFF, " | ");
+            printf(YELLOW, "pattern=0x%08x\n", fill->pattern);
+
+            pos += sizeof(struct sb_instruction_fill_t);
+        }
+        else if(hdr->opcode == SB_INST_CALL ||
+                hdr->opcode == SB_INST_JUMP)
+        {
+            int is_call = (hdr->opcode == SB_INST_CALL);
+            struct sb_instruction_call_t *call = (struct sb_instruction_call_t *)&buf[pos];
+            inst.addr = call->addr;
+            inst.argument = call->arg;
+            
+            if(is_call)
+                printf(RED, "CALL");
+            else
+                printf(RED, "JUMP");
+            printf(OFF, " | ");
+            printf(BLUE, "addr=0x%08x", call->addr);
+            printf(OFF, " | ");
+            printf(GREEN, "arg=0x%08x\n", call->arg);
+
+            pos += sizeof(struct sb_instruction_call_t);
+        }
+        else if(hdr->opcode == SB_INST_MODE)
+        {
+            struct sb_instruction_mode_t *mode = (struct sb_instruction_mode_t *)hdr;
+            inst.argument = mode->mode;
+            
+            printf(RED, "MODE");
+            printf(OFF, " | ");
+            printf(BLUE, "mod=0x%08x\n", mode->mode);
+            
+            pos += sizeof(struct sb_instruction_mode_t);
+        }
+        else if(hdr->opcode == SB_INST_NOP)
+        {
+            printf(RED, "NOOP\n");
+            pos += sizeof(struct sb_instruction_mode_t);
+        }
+        else
+        {
+            printf(RED, "Unknown instruction %d at address 0x%08lx\n", hdr->opcode, (unsigned long)pos);
+            break;
+        }
+
+        sec->insts = augment_array(sec->insts, sizeof(struct sb_inst_t), sec->nr_insts++, &inst, 1);
+        pos = ROUND_UP(pos, BLOCK_SIZE);
+    }
+
+    return sec;
+    #undef printf
+}
+
+static void fill_section_name(char name[5], uint32_t identifier)
+{
+    name[0] = (identifier >> 24) & 0xff;
+    name[1] = (identifier >> 16) & 0xff;
+    name[2] = (identifier >> 8) & 0xff;
+    name[3] = identifier & 0xff;
+    for(int i = 0; i < 4; i++)
+        if(!isprint(name[i]))
+            name[i] = '_';
+    name[4] = 0;
+}
+
+static uint32_t guess_alignment(uint32_t off)
+{
+    /* find greatest power of two which divides the offset */
+    if(off == 0)
+        return 1;
+    uint32_t a = 1;
+    while(off % (2 * a) == 0)
+        a *= 2;
+    return a;
+}
+
+struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
+    sb_color_printf cprintf)
+{
+    #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
+    #define fatal(...) do { cprintf(u, true, GREY, __VA_ARGS__); return NULL; } while(0)
+    #define print_hex(c, p, len, nl) \
+        do { printf(c, ""); print_hex(p, len, nl); } while(0)
+
+    FILE *f = fopen(filename, "rb");
+    if(f == NULL)
+        fatal("Cannot open file for reading\n");
+    fseek(f, 0, SEEK_END);
+    long filesize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    uint8_t *buf = xmalloc(filesize);
+    fread(buf, 1, filesize, f);
+    fclose(f);
+    
+    struct sha_1_params_t sha_1_params;
+    struct sb_file_t *sb_file = xmalloc(sizeof(struct sb_file_t));
+    memset(sb_file, 0, sizeof(struct sb_file_t));
+    struct sb_header_t *sb_header = (struct sb_header_t *)buf;
+
+    sb_file->image_size = sb_header->image_size;
+    sb_file->minor_version = sb_header->minor_ver;
+    sb_file->flags = sb_header->flags;
+    sb_file->drive_tag = sb_header->drive_tag;
+    sb_file->first_boot_sec_id = sb_header->first_boot_sec_id;
+
+    if(memcmp(sb_header->signature, "STMP", 4) != 0)
+        fatal("Bad signature\n");
+    if(sb_header->image_size * BLOCK_SIZE > filesize)
+        fatal("File too small mismatch");
+    if(sb_header->header_size * BLOCK_SIZE != sizeof(struct sb_header_t))
+        fatal("Bad header size");
+    if(sb_header->sec_hdr_size * BLOCK_SIZE != sizeof(struct sb_section_header_t))
+        fatal("Bad section header size");
+
+    if(filesize > sb_header->image_size * BLOCK_SIZE)
+    {
+        printf(GREY, "[Restrict file size from %lu to %d bytes]\n", filesize,
+            sb_header->image_size * BLOCK_SIZE);
+        filesize = sb_header->image_size * BLOCK_SIZE;
+    }
+
+    printf(BLUE, "Basic info:\n");
+    printf(GREEN, "  SB version: ");
+    printf(YELLOW, "%d.%d\n", sb_header->major_ver, sb_header->minor_ver);
+    printf(GREEN, "  Header SHA-1: ");
+    byte *hdr_sha1 = sb_header->sha1_header;
+    print_hex(YELLOW, hdr_sha1, 20, false);
+    /* Check SHA1 sum */
+    byte computed_sha1[20];
+    sha_1_init(&sha_1_params);
+    sha_1_update(&sha_1_params, &sb_header->signature[0],
+        sizeof(struct sb_header_t) - sizeof(sb_header->sha1_header));
+    sha_1_finish(&sha_1_params);
+    sha_1_output(&sha_1_params, computed_sha1);
+    if(memcmp(hdr_sha1, computed_sha1, 20) == 0)
+        printf(RED, " Ok\n");
+    else
+        printf(RED, " Failed\n");
+    printf(GREEN, "  Flags: ");
+    printf(YELLOW, "%x\n", sb_header->flags);
+    printf(GREEN, "  Total file size : ");
+    printf(YELLOW, "%ld\n", filesize);
+    
+    /* Sizes and offsets */
+    printf(BLUE, "Sizes and offsets:\n");
+    printf(GREEN, "  # of encryption keys = ");
+    printf(YELLOW, "%d\n", sb_header->nr_keys);
+    printf(GREEN, "  # of sections = ");
+    printf(YELLOW, "%d\n", sb_header->nr_sections);
+
+    /* Versions */
+    printf(BLUE, "Versions\n");
+
+    printf(GREEN, "  Random 1: ");
+    print_hex(YELLOW, sb_header->rand_pad0, sizeof(sb_header->rand_pad0), true);
+    printf(GREEN, "  Random 2: ");
+    print_hex(YELLOW, sb_header->rand_pad1, sizeof(sb_header->rand_pad1), true);
+    
+    uint64_t micros = sb_header->timestamp;
+    time_t seconds = (micros / (uint64_t)1000000L);
+    struct tm tm_base = {0, 0, 0, 1, 0, 100, 0, 0, 1, 0, NULL}; /* 2000/1/1 0:00:00 */
+    seconds += mktime(&tm_base);
+    struct tm *time = gmtime(&seconds);
+    printf(GREEN, "  Creation date/time = ");
+    printf(YELLOW, "%s", asctime(time));
+
+    struct sb_version_t product_ver = sb_header->product_ver;
+    fix_version(&product_ver);
+    struct sb_version_t component_ver = sb_header->component_ver;
+    fix_version(&component_ver);
+
+    memcpy(&sb_file->product_ver, &product_ver, sizeof(product_ver));
+    memcpy(&sb_file->component_ver, &component_ver, sizeof(component_ver));
+
+    printf(GREEN, "  Product version   = ");
+    printf(YELLOW, "%X.%X.%X\n", product_ver.major, product_ver.minor, product_ver.revision);
+    printf(GREEN, "  Component version = ");
+    printf(YELLOW, "%X.%X.%X\n", component_ver.major, component_ver.minor, component_ver.revision);
+        
+    printf(GREEN, "  Drive tag = ");
+    printf(YELLOW, "%x\n", sb_header->drive_tag);
+    printf(GREEN, "  First boot tag offset = ");
+    printf(YELLOW, "%x\n", sb_header->first_boot_tag_off);
+    printf(GREEN, "  First boot section ID = ");
+    printf(YELLOW, "0x%08x\n", sb_header->first_boot_sec_id);
+
+    /* encryption cbc-mac */
+    byte real_key[16];
+    bool valid_key = false; /* false until a matching key was found */
+    if(sb_header->nr_keys > 0)
+    {
+        if(sb_header->nr_keys > g_nr_keys)
+        {
+            fatal("SB file has %d keys but only %d were specified\n",
+                sb_header->nr_keys, g_nr_keys);
+        }
+        printf(BLUE, "Encryption data\n");
+        for(int i = 0; i < sb_header->nr_keys; i++)
+        {
+            printf(RED, "  Key %d: ", i);
+            printf(YELLOW, "");
+            print_key(&g_key_array[i], true);
+            printf(GREEN, "    CBC-MAC of headers: ");
+
+            uint32_t ofs = sizeof(struct sb_header_t)
+                + sizeof(struct sb_section_header_t) * sb_header->nr_sections
+                + sizeof(struct sb_key_dictionary_entry_t) * i;
+            struct sb_key_dictionary_entry_t *dict_entry =
+                (struct sb_key_dictionary_entry_t *)&buf[ofs];
+            /* cbc mac */
+            print_hex(YELLOW, dict_entry->hdr_cbc_mac, 16, false);
+            /* check it */
+            byte computed_cbc_mac[16];
+            byte zero[16];
+            memset(zero, 0, 16);
+            crypto_cbc(buf, NULL, sb_header->header_size + sb_header->nr_sections,
+                &g_key_array[i], zero, &computed_cbc_mac, 1);
+            
+            bool ok = memcmp(dict_entry->hdr_cbc_mac, computed_cbc_mac, 16) == 0;
+            if(ok)
+            {
+                valid_key = true;
+                printf(RED, " Ok\n");
+            }
+            else
+                printf(RED, " Failed\n");
+            
+            printf(GREEN, "    Encrypted key     : ");
+            print_hex(YELLOW, dict_entry->key, 16, true);
+            /* decrypt */
+            byte decrypted_key[16];
+            byte iv[16];
+            memcpy(iv, buf, 16); /* uses the first 16-bytes of SHA-1 sig as IV */
+            crypto_cbc(dict_entry->key, decrypted_key, 1, &g_key_array[i], iv, NULL, 0);
+            printf(GREEN, "    Decrypted key     : ");
+            print_hex(YELLOW, decrypted_key, 16, false);
+            /* cross-check or copy */
+            if(valid_key && ok)
+                memcpy(real_key, decrypted_key, 16);
+            else if(valid_key)
+            {
+                if(memcmp(real_key, decrypted_key, 16) == 0)
+                    printf(RED, " Cross-Check Ok");
+                else
+                    printf(RED, " Cross-Check Failed");
+            }
+            printf(OFF, "\n");
+        }
+    }
+
+    if(getenv("SB_REAL_KEY") != 0)
+    {
+        struct crypto_key_t k;
+        char *env = getenv("SB_REAL_KEY");
+        if(!parse_key(&env, &k) || *env)
+            bug("Invalid SB_REAL_KEY");
+        memcpy(real_key, k.u.key, 16);
+    }
+
+    printf(RED, "  Summary:\n");
+    printf(GREEN, "    Real key: ");
+    print_hex(YELLOW, real_key, 16, true);
+    printf(GREEN, "    IV      : ");
+    print_hex(YELLOW, buf, 16, true);
+
+    sb_file->real_key = xmalloc(16);
+    memcpy(*sb_file->real_key, real_key, 16);
+    sb_file->crypto_iv = xmalloc(16);
+    memcpy(*sb_file->crypto_iv, buf, 16);
+
+    /* sections */
+    if(!raw_mode)
+    {
+        sb_file->nr_sections = sb_header->nr_sections;
+        sb_file->sections = xmalloc(sb_file->nr_sections * sizeof(struct sb_section_t));
+        memset(sb_file->sections, 0, sb_file->nr_sections * sizeof(struct sb_section_t));
+        printf(BLUE, "Sections\n");
+        for(int i = 0; i < sb_header->nr_sections; i++)
+        {
+            uint32_t ofs = sb_header->header_size * BLOCK_SIZE + i * sizeof(struct sb_section_header_t);
+            struct sb_section_header_t *sec_hdr = (struct sb_section_header_t *)&buf[ofs];
+        
+            char name[5];
+            fill_section_name(name, sec_hdr->identifier);
+            int pos = sec_hdr->offset * BLOCK_SIZE;
+            int size = sec_hdr->size * BLOCK_SIZE;
+            int data_sec = !(sec_hdr->flags & SECTION_BOOTABLE);
+            int encrypted = !(sec_hdr->flags & SECTION_CLEARTEXT) && sb_header->nr_keys > 0;
+        
+            printf(GREEN, "  Section ");
+            printf(YELLOW, "'%s'\n", name);
+            printf(GREEN, "    pos   = ");
+            printf(YELLOW, "%8x - %8x\n", pos, pos+size);
+            printf(GREEN, "    len   = ");
+            printf(YELLOW, "%8x\n", size);
+            printf(GREEN, "    flags = ");
+            printf(YELLOW, "%8x", sec_hdr->flags);
+            if(data_sec)
+                printf(RED, "  Data Section");
+            else
+                printf(RED, "  Boot Section");
+            if(encrypted)
+                printf(RED, " (Encrypted)");
+            printf(OFF, "\n");
+            
+            /* save it */
+            byte *sec = xmalloc(size);
+            if(encrypted)
+                cbc_mac(buf + pos, sec, size / BLOCK_SIZE, real_key, buf, NULL, 0);
+            else
+                memcpy(sec, buf + pos, size);
+
+            struct sb_section_t *s = read_section(data_sec, sec_hdr->identifier,
+                sec, size, "      ", u, cprintf);
+            if(s)
+            {
+                s->is_cleartext = !encrypted;
+                s->alignment = guess_alignment(pos);
+                memcpy(&sb_file->sections[i], s, sizeof(struct sb_section_t));
+                free(s);
+            }
+            
+            free(sec);
+        }
+    }
+    else
+    {
+        /* advanced raw mode */
+        printf(BLUE, "Commands\n");
+        uint32_t offset = sb_header->first_boot_tag_off * BLOCK_SIZE;
+        byte iv[16];
+        const char *indent = "    ";
+        while(true)
+        {
+            /* restart with IV */
+            memcpy(iv, buf, 16);
+            byte cmd[BLOCK_SIZE];
+            if(sb_header->nr_keys > 0)
+                cbc_mac(buf + offset, cmd, 1, real_key, iv, &iv, 0);
+            else
+                memcpy(cmd, buf + offset, BLOCK_SIZE);
+            struct sb_instruction_header_t *hdr = (struct sb_instruction_header_t *)cmd;
+            printf(OFF, "%s", indent);
+            uint8_t checksum = instruction_checksum(hdr);
+            if(checksum != hdr->checksum)
+                printf(GREY, "[Bad checksum']");
+            
+            if(hdr->opcode == SB_INST_NOP)
+            {
+                printf(RED, "NOOP\n");
+                offset += BLOCK_SIZE;
+            }
+            else if(hdr->opcode == SB_INST_TAG)
+            {
+                struct sb_instruction_tag_t *tag = (struct sb_instruction_tag_t *)hdr;
+                printf(RED, "BTAG");
+                printf(OFF, " | ");
+                printf(BLUE, "sec=0x%08x", tag->identifier);
+                printf(OFF, " | ");
+                printf(GREEN, "cnt=0x%08x", tag->len);
+                printf(OFF, " | ");
+                printf(YELLOW, "flg=0x%08x", tag->flags);
+                if(tag->hdr.flags & SB_INST_LAST_TAG)
+                {
+                    printf(OFF, " | ");
+                    printf(RED, " Last section");
+                }
+                printf(OFF, "\n");
+                offset += sizeof(struct sb_instruction_tag_t);
+
+                char name[5];
+                fill_section_name(name, tag->identifier);
+                int pos = offset;
+                int size = tag->len * BLOCK_SIZE;
+                int data_sec = !(tag->flags & SECTION_BOOTABLE);
+                int encrypted = !(tag->flags & SECTION_CLEARTEXT) && sb_header->nr_keys > 0;
+            
+                printf(GREEN, "%sSection ", indent);
+                printf(YELLOW, "'%s'\n", name);
+                printf(GREEN, "%s  pos   = ", indent);
+                printf(YELLOW, "%8x - %8x\n", pos, pos+size);
+                printf(GREEN, "%s  len   = ", indent);
+                printf(YELLOW, "%8x\n", size);
+                printf(GREEN, "%s  flags = ", indent);
+                printf(YELLOW, "%8x", tag->flags);
+                if(data_sec)
+                    printf(RED, "  Data Section");
+                else
+                    printf(RED, "  Boot Section");
+                if(encrypted)
+                    printf(RED, " (Encrypted)");
+                printf(OFF, "\n");
+
+                /* save it */
+                byte *sec = xmalloc(size);
+                if(encrypted)
+                    cbc_mac(buf + pos, sec, size / BLOCK_SIZE, real_key, buf, NULL, 0);
+                else
+                    memcpy(sec, buf + pos, size);
+                
+                struct sb_section_t *s = read_section(data_sec, tag->identifier,
+                    sec, size, "      ", u, cprintf);
+                if(s)
+                {
+                    s->is_cleartext = !encrypted;
+                    s->alignment = guess_alignment(pos);
+                    sb_file->sections = augment_array(sb_file->sections,
+                        sizeof(struct sb_section_t), sb_file->nr_sections++,
+                        s, 1);
+                    free(s);
+                }
+                free(sec);
+
+                /* last one ? */
+                if(tag->hdr.flags & SB_INST_LAST_TAG)
+                    break;
+                offset += size;
+            }
+            else
+            {
+                printf(RED, "Unknown instruction %d at address 0x%08lx\n", hdr->opcode, (long)offset);
+                break;
+            }
+        }
+    }
+    
+    /* final signature */
+    printf(BLUE, "Final signature:\n");
+    byte decrypted_block[32];
+    if(sb_header->nr_keys > 0)
+    {
+        printf(GREEN, "  Encrypted SHA-1:\n");
+        byte *encrypted_block = &buf[filesize - 32];
+        printf(OFF, "    ");
+        print_hex(YELLOW, encrypted_block, 16, true);
+        printf(OFF, "    ");
+        print_hex(YELLOW, encrypted_block + 16, 16, true);
+        /* decrypt it */
+        cbc_mac(encrypted_block, decrypted_block, 2, real_key, buf, NULL, 0);
+    }
+    else
+        memcpy(decrypted_block, &buf[filesize - 32], 32);
+    printf(GREEN, "  File SHA-1:\n    ");
+    print_hex(YELLOW, decrypted_block, 20, false);
+    /* check it */
+    sha_1_init(&sha_1_params);
+    sha_1_update(&sha_1_params, buf, filesize - 32);
+    sha_1_finish(&sha_1_params);
+    sha_1_output(&sha_1_params, computed_sha1);
+    if(memcmp(decrypted_block, computed_sha1, 20) == 0)
+        printf(RED, " Ok\n");
+    else
+        printf(RED, " Failed\n");
+    free(buf);
+    
+    return sb_file;
+    #undef printf
+    #undef fatal
+    #undef print_hex
+}
+
+void sb_dump(struct sb_file_t *file, void *u, sb_color_printf cprintf)
+{
+    #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
+    #define print_hex(c, p, len, nl) \
+        do { printf(c, ""); print_hex(p, len, nl); } while(0)
+    
+    #define TREE    RED
+    #define HEADER  GREEN
+    #define TEXT    YELLOW
+    #define TEXT2   BLUE
+    #define SEP     OFF
+    
+    printf(HEADER, "SB File\n");
+    printf(TREE, "+-");
+    printf(HEADER, "Version: ");
+    printf(TEXT, "1.%d\n", file->minor_version);
+    printf(TREE, "+-");
+    printf(HEADER, "Flags: ");
+    printf(TEXT, "%x\n", file->flags);
+    printf(TREE, "+-");
+    printf(HEADER, "Drive Tag: ");
+    printf(TEXT, "%x\n", file->drive_tag);
+    printf(TREE, "+-");
+    printf(HEADER, "First Boot Section ID: ");
+    char name[5];
+    fill_section_name(name, file->first_boot_sec_id);
+    printf(TEXT, "%08x (%s)\n", file->first_boot_sec_id, name);
+    
+    if(file->real_key)
+    {
+        printf(TREE, "+-");
+        printf(HEADER, "Real key: ");
+        print_hex(TEXT, *file->real_key, 16, true);
+    }
+    if(file->crypto_iv)
+    {
+        printf(TREE, "+-");
+        printf(HEADER, "IV      : ");
+        print_hex(TEXT, *file->crypto_iv, 16, true);
+    }
+    printf(TREE, "+-");
+    printf(HEADER, "Product Version: ");
+    printf(TEXT, "%X.%X.%X\n", file->product_ver.major, file->product_ver.minor,
+        file->product_ver.revision);
+    printf(TREE, "+-");
+    printf(HEADER, "Component Version: ");
+    printf(TEXT, "%X.%X.%X\n", file->component_ver.major, file->component_ver.minor,
+        file->component_ver.revision);
+    
+    for(int i = 0; i < file->nr_sections; i++)
+    {
+        struct sb_section_t *sec = &file->sections[i];
+        printf(TREE, "+-");
+        printf(HEADER, "Section\n");
+        printf(TREE,"|  +-");
+        printf(HEADER, "Identifier: ");
+        fill_section_name(name, sec->identifier);
+        printf(TEXT, "%08x (%s)\n", sec->identifier, name);
+        printf(TREE, "|  +-");
+        printf(HEADER, "Type: ");
+        printf(TEXT, "%s (%s)\n", sec->is_data ? "Data Section" : "Boot Section",
+            sec->is_cleartext ? "Cleartext" : "Encrypted");
+        printf(TREE, "|  +-");
+        printf(HEADER, "Alignment: ");
+        printf(TEXT, "%d (bytes)\n", sec->alignment);
+        printf(TREE, "|  +-");
+        printf(HEADER, "Instructions\n");
+        for(int j = 0; j < sec->nr_insts; j++)
+        {
+            struct sb_inst_t *inst = &sec->insts[j];
+            printf(TREE, "|  |  +-");
+            switch(inst->inst)
+            {
+                case SB_INST_DATA:
+                    printf(HEADER, "DATA");
+                    printf(SEP, " | ");
+                    printf(TEXT, "size=0x%08x\n", inst->size);
+                    break;
+                case SB_INST_CALL:
+                case SB_INST_JUMP:
+                    printf(HEADER, "%s", inst->inst == SB_INST_CALL ? "CALL" : "JUMP");
+                    printf(SEP, " | ");
+                    printf(TEXT, "addr=0x%08x", inst->addr);
+                    printf(SEP, " | ");
+                    printf(TEXT2, "arg=0x%08x\n", inst->argument);
+                    break;
+                case SB_INST_LOAD:
+                    printf(HEADER, "LOAD");
+                    printf(SEP, " | ");
+                    printf(TEXT, "addr=0x%08x", inst->addr);
+                    printf(SEP, " | ");
+                    printf(TEXT2, "len=0x%08x\n", inst->size);
+                    break;
+                case SB_INST_FILL:
+                    printf(HEADER, "FILL");
+                    printf(SEP, " | ");
+                    printf(TEXT, "addr=0x%08x", inst->addr);
+                    printf(SEP, " | ");
+                    printf(TEXT2, "len=0x%08x", inst->size);
+                    printf(SEP, " | ");
+                    printf(TEXT2, "pattern=0x%08x\n", inst->pattern);
+                    break;
+                case SB_INST_MODE:
+                    printf(HEADER, "MODE");
+                    printf(SEP, " | ");
+                    printf(TEXT, "mod=0x%08x\n", inst->addr);
+                    break;
+                case SB_INST_NOP:
+                    printf(HEADER, "NOOP\n");
+                    break;
+                default:
+                    printf(GREY, "[Unknown instruction %x]\n", inst->inst);
+            }
+        }
+    }
+    
+    #undef printf
+    #undef print_hex
 }

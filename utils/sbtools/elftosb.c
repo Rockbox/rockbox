@@ -436,8 +436,14 @@ int main(int argc, char **argv)
         sb_file->real_key = &real_key.u.key;
     if(crypto_iv.method == CRYPTO_KEY)
         sb_file->crypto_iv = &crypto_iv.u.key;
-        
-    sb_produce_file(sb_file, output_filename);
+
+    /* fill with default parameters since there is no command file support for them */
+    sb_file->drive_tag = 0;
+    sb_file->first_boot_sec_id = sb_file->sections[0].identifier;
+    sb_file->flags = 0;
+    sb_file->minor_version = 1;
+    
+    sb_write_file(sb_file, output_filename);
     
     return 0;
 }

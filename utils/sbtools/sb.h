@@ -24,6 +24,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "misc.h"
+
 #define BLOCK_SIZE      16
 
 /* All fields are in big-endian BCD */
@@ -161,12 +163,12 @@ struct sb_inst_t
 {
     uint8_t inst; /* SB_INST_* */
     uint32_t size;
+    uint32_t addr;
     // <union>
     void *data;
     uint32_t pattern;
-    uint32_t addr;
     // </union>
-    uint32_t argument; // for call and jump
+    uint32_t argument; // for call, jump and mode
     /* for production use */
     uint32_t padding_size;
     uint8_t *padding;
@@ -194,6 +196,10 @@ struct sb_file_t
     uint8_t (*crypto_iv)[16];
     
     int nr_sections;
+    uint16_t drive_tag;
+    uint32_t first_boot_sec_id;
+    uint16_t flags;
+    uint8_t minor_version;
     struct sb_section_t *sections;
     struct sb_version_t product_ver;
     struct sb_version_t component_ver;
@@ -201,6 +207,12 @@ struct sb_file_t
     uint32_t image_size; /* in blocks */
 };
 
-void sb_produce_file(struct sb_file_t *sb, const char *filename);
+void sb_write_file(struct sb_file_t *sb, const char *filename);
+
+typedef void (*sb_color_printf)(void *u, bool err, color_t c, const char *f, ...);
+struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
+    sb_color_printf printf);
+
+void sb_dump(struct sb_file_t *file, void *u, sb_color_printf printf);
 
 #endif /* __SB_H__ */

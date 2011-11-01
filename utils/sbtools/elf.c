@@ -223,6 +223,8 @@ void elf_add_fill_section(struct elf_params_t *params,
 void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
     elf_printf_fn_t printf, void *user)
 {
+    (void) printf;
+    
     Elf32_Ehdr ehdr;
     uint32_t phnum = 0;
     struct elf_section_t *sec = params->first_section;

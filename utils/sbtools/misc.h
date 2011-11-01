@@ -28,7 +28,7 @@
 #define STR(a) _STR(a)
 
 #define bug(...) do { fprintf(stderr,"["__FILE__":"STR(__LINE__)"]ERROR: "__VA_ARGS__); exit(1); } while(0)
-#define bugp(a) do { perror("ERROR: "a); exit(1); } while(0)
+#define bugp(...) do { fprintf(stderr, __VA_ARGS__); perror(" "); exit(1); } while(0)
 
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
 

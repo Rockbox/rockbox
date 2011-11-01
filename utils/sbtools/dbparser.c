@@ -24,15 +24,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "dbparser.h"
-
-typedef uint8_t byte;
-
-extern bool g_debug;
-extern void *xmalloc(size_t s);
-extern int convxdigit(char digit, byte *val);
-
-#define bug(...) do { fprintf(stderr, __VA_ARGS__); exit(1); } while(0)
-#define bugp(...) do { fprintf(stderr, __VA_ARGS__); perror(" "); exit(1); } while(0)
+#include "misc.h"
 
 enum lexem_type_t
 {
