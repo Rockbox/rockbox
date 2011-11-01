@@ -48,4 +48,10 @@ bool parse_key(char **str, struct crypto_key_t *key);
 void add_keys_from_file(const char *key_file);
 void print_key(struct crypto_key_t *key, bool newline);
 
+typedef char color_t[];
+
+extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
+void color(color_t c);
+void enable_color(bool enable);
+
 #endif /* __MISC_H__ */

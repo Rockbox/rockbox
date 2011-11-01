@@ -42,22 +42,6 @@
 #include "sb.h"
 #include "misc.h"
 
-#if 1 /* ANSI colors */
-
-#	define color(a) printf("%s",a)
-char OFF[] 		= { 0x1b, 0x5b, 0x31, 0x3b, '0', '0', 0x6d, '\0' };
-
-char GREY[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '0', 0x6d, '\0' };
-char RED[] 		= { 0x1b, 0x5b, 0x31, 0x3b, '3', '1', 0x6d, '\0' };
-char GREEN[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
-char YELLOW[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
-char BLUE[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
-
-#else
-	/* disable colors */
-#	define color(a)
-#endif
-
 /* all blocks are sized as a multiple of 0x1ff */
 #define PAD_TO_BOUNDARY(x) (((x) + 0x1ff) & ~0x1ff)
 
@@ -723,7 +707,8 @@ void usage(void)
     printf("  -k <file>\tAdd key file\n");
     printf("  -z\t\tAdd zero key\n");
     printf("  -r\t\tUse raw command mode\n");
-    printf("  --add-key <key>\tAdd single key (hex or usbotp)\n");
+    printf("  -a/--add-key <key>\tAdd single key (hex or usbotp)\n");
+    printf("  -n/--no-color\tDisable output colors\n");
     exit(1);
 }
 
@@ -742,15 +727,19 @@ int main(int argc, char **argv)
             {"help", no_argument, 0, '?'},
             {"debug", no_argument, 0, 'd'},
             {"add-key", required_argument, 0, 'a'},
+            {"no-color", no_argument, 0, 'n'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?do:k:zra:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?do:k:zra:n", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
         {
             case -1:
+                break;
+            case 'n':
+                enable_color(false);
                 break;
             case 'd':
                 g_debug = true;

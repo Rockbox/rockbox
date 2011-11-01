@@ -211,3 +211,24 @@ void print_key(struct crypto_key_t *key, bool newline)
     if(newline)
         printf("\n");
 }
+
+char OFF[] = { 0x1b, 0x5b, 0x31, 0x3b, '0', '0', 0x6d, '\0' };
+
+char GREY[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '0', 0x6d, '\0' };
+char RED[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '1', 0x6d, '\0' };
+char GREEN[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
+char YELLOW[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
+char BLUE[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
+
+static bool g_color_enable = true;
+
+void enable_color(bool enable)
+{
+    g_color_enable = enable;
+}
+
+void color(color_t c)
+{
+    if(g_color_enable)
+        printf("%s", (char *)c);
+}
