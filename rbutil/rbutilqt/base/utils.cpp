@@ -315,10 +315,10 @@ QString Utils::checkEnvironment(bool permission)
     if(!installed.isEmpty() && installed !=
        SystemInfo::value(SystemInfo::CurConfigureModel).toString())
     {
-        text += tr("<li>Target mismatch detected.\n"
-                "Installed target: %1, selected target: %2.</li>")
-            .arg(installed, SystemInfo::value(SystemInfo::CurPlatformName).toString());
-            // FIXME: replace installed by human-friendly name
+        text += tr("<li>Target mismatch detected.<br/>"
+                "Installed target: %1<br/>Selected target: %2.</li>")
+            .arg(SystemInfo::platformValue(installed, SystemInfo::CurPlatformName).toString(),
+                 SystemInfo::value(SystemInfo::CurPlatformName).toString());
     }
 
     if(!text.isEmpty())
