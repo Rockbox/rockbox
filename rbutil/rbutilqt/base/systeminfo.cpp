@@ -57,6 +57,7 @@ const static struct {
     { SystemInfo::CurEncoder,           ":platform:/encoder",   "" },
     { SystemInfo::CurBrand,             ":platform:/brand",     "" },
     { SystemInfo::CurName,              ":platform:/name",      "" },
+    { SystemInfo::CurBuildserverModel,  ":platform:/buildserver_modelname", "" },
     { SystemInfo::CurConfigureModel,    ":platform:/configure_modelname", "" },
 };
 
