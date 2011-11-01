@@ -76,12 +76,14 @@ static void elf_write(void *user, uint32_t addr, const void *buf, size_t count)
     fwrite(buf, count, 1, f);
 }
 
-static void extract_elf_section(struct elf_params_t *elf, int count, const char *prefix,
-    const char *indent)
+static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id)
 {
-    char *filename = xmalloc(strlen(prefix) + 32);
-    sprintf(filename, "%s.%d.elf", prefix, count);
-    printf("%swrite %s\n", indent, filename);
+    char name[5];
+    char *filename = xmalloc(strlen(g_out_prefix) + 32);
+    sb_fill_section_name(name, id);
+    sprintf(filename, "%s%s.%d.elf", g_out_prefix, name, count);
+    if(g_debug)
+        printf("Write boot section %s to %s\n", name, filename);
     
     FILE *fd = fopen(filename, "wb");
     free(filename);
@@ -92,12 +94,74 @@ static void extract_elf_section(struct elf_params_t *elf, int count, const char 
     fclose(fd);
 }
 
+static void extract_sb_section(struct sb_section_t *sec)
+{
+    if(sec->is_data)
+    {
+        char sec_name[5];
+        char *filename = xmalloc(strlen(g_out_prefix) + 32);
+        sb_fill_section_name(sec_name, sec->identifier);
+        sprintf(filename, "%s%s.bin", g_out_prefix, sec_name);
+        FILE *fd = fopen(filename, "wb");
+        if(fd == NULL)
+            bugp("Cannot open %s for writing\n", filename);
+        if(g_debug)
+            printf("Write data section %s to %s\n", sec_name, filename);
+        free(filename);
+        
+        for(int j = 0; j < sec->nr_insts; j++)
+        {
+            assert(sec->insts[j].inst == SB_INST_DATA);
+            fwrite(sec->insts[j].data, sec->insts[j].size, 1, fd);
+        }
+        fclose(fd);
+    }
+
+    int elf_count = 0;
+    struct elf_params_t elf;
+    elf_init(&elf);
+
+    for(int i = 0; i < sec->nr_insts; i++)
+    {
+        struct sb_inst_t *inst = &sec->insts[i];
+        switch(inst->inst)
+        {
+            case SB_INST_LOAD:
+                elf_add_load_section(&elf, inst->addr, inst->size, inst->data);
+                break;
+            case SB_INST_FILL:
+                elf_add_fill_section(&elf, inst->addr, inst->size, inst->pattern);
+                break;
+            case SB_INST_CALL:
+            case SB_INST_JUMP:
+                elf_set_start_addr(&elf, inst->addr);
+                extract_elf_section(&elf, elf_count++, sec->identifier);
+                elf_release(&elf);
+                elf_init(&elf);
+                break;
+            default:
+                /* ignore mode and nop */
+                break;
+        }
+    }
+
+    if(!elf_is_empty(&elf))
+        extract_elf_section(&elf, elf_count, sec->identifier);
+    elf_release(&elf);
+}
+
+static void extract_sb_file(struct sb_file_t *file)
+{
+    for(int i = 0; i < file->nr_sections; i++)
+        extract_sb_section(&file->sections[i]);
+}
+
 static void usage(void)
 {
     printf("Usage: sbtoelf [options] sb-file\n");
     printf("Options:\n");
     printf("  -?/--help\tDisplay this message\n");
-    printf("  -o <file>\tSet output prefix\n");
+    printf("  -o <prefix>\tEnable output and set prefix\n");
     printf("  -d/--debug\tEnable debug output*\n");
     printf("  -k <file>\tAdd key file\n");
     printf("  -z\t\tAdd zero key\n");
@@ -196,9 +260,6 @@ int main(int argc, char **argv)
         }
     }
 
-    if(g_out_prefix == NULL)
-        g_out_prefix = "";
-
     if(argc - optind != 1)
     {
         usage();
@@ -208,6 +269,9 @@ int main(int argc, char **argv)
     const char *sb_filename = argv[optind];
 
     struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, sb_printf);
+    color(OFF);
+    if(g_out_prefix)
+        extract_sb_file(file);
     if(g_debug)
     {
         color(GREY);

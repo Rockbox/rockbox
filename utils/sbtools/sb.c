@@ -571,7 +571,7 @@ static struct sb_section_t *read_section(bool data_sec, uint32_t id, byte *buf,
     #undef printf
 }
 
-static void fill_section_name(char name[5], uint32_t identifier)
+void sb_fill_section_name(char name[5], uint32_t identifier)
 {
     name[0] = (identifier >> 24) & 0xff;
     name[1] = (identifier >> 16) & 0xff;
@@ -773,7 +773,7 @@ struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
         struct crypto_key_t k;
         char *env = getenv("SB_REAL_KEY");
         if(!parse_key(&env, &k) || *env)
-            bug("Invalid SB_REAL_KEY");
+            bug("Invalid SB_REAL_KEY\n");
         memcpy(real_key, k.u.key, 16);
     }
 
@@ -801,7 +801,7 @@ struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
             struct sb_section_header_t *sec_hdr = (struct sb_section_header_t *)&buf[ofs];
         
             char name[5];
-            fill_section_name(name, sec_hdr->identifier);
+            sb_fill_section_name(name, sec_hdr->identifier);
             int pos = sec_hdr->offset * BLOCK_SIZE;
             int size = sec_hdr->size * BLOCK_SIZE;
             int data_sec = !(sec_hdr->flags & SECTION_BOOTABLE);
@@ -889,7 +889,7 @@ struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
                 offset += sizeof(struct sb_instruction_tag_t);
 
                 char name[5];
-                fill_section_name(name, tag->identifier);
+                sb_fill_section_name(name, tag->identifier);
                 int pos = offset;
                 int size = tag->len * BLOCK_SIZE;
                 int data_sec = !(tag->flags & SECTION_BOOTABLE);
@@ -1004,7 +1004,7 @@ void sb_dump(struct sb_file_t *file, void *u, sb_color_printf cprintf)
     printf(TREE, "+-");
     printf(HEADER, "First Boot Section ID: ");
     char name[5];
-    fill_section_name(name, file->first_boot_sec_id);
+    sb_fill_section_name(name, file->first_boot_sec_id);
     printf(TEXT, "%08x (%s)\n", file->first_boot_sec_id, name);
     
     if(file->real_key)
@@ -1035,7 +1035,7 @@ void sb_dump(struct sb_file_t *file, void *u, sb_color_printf cprintf)
         printf(HEADER, "Section\n");
         printf(TREE,"|  +-");
         printf(HEADER, "Identifier: ");
-        fill_section_name(name, sec->identifier);
+        sb_fill_section_name(name, sec->identifier);
         printf(TEXT, "%08x (%s)\n", sec->identifier, name);
         printf(TREE, "|  +-");
         printf(HEADER, "Type: ");

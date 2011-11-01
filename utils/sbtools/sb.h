@@ -213,6 +213,7 @@ typedef void (*sb_color_printf)(void *u, bool err, color_t c, const char *f, ...
 struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
     sb_color_printf printf);
 
+void sb_fill_section_name(char name[5], uint32_t identifier);
 void sb_dump(struct sb_file_t *file, void *u, sb_color_printf printf);
 
 #endif /* __SB_H__ */
