@@ -206,12 +206,12 @@ static int find_button(int x, int y)
     return 0;
 }
 
-int touchpad_read_device(void)
+static int touchpad_read_device(void)
 {
     return touchpad_btns;
 }
 
-void rmi_attn_cb(int bank, int pin)
+static void rmi_attn_cb(int bank, int pin)
 {
     (void) bank;
     (void) pin;
@@ -220,7 +220,7 @@ void rmi_attn_cb(int bank, int pin)
     queue_post(&rmi_queue, RMI_INTERRUPT, 0);
 }
 
-void rmi_thread(void)
+static void rmi_thread(void)
 {
     struct queue_event ev;
     
@@ -332,7 +332,7 @@ int button_read_device(void)
      * and the volume up button is recovery, it is not possible to know whether
      * power button is down when volume up is down (except if there is another
      * method but volume up and power don't seem to be wired to GPIO pins). */
-    switch((HW_POWER_STS & HW_POWER_STS__PSWITCH_BM) >> HW_POWER_STS__PSWITCH_BP)
+    switch(__XTRACT(HW_POWER_STS, PSWITCH))
     {
         case 1: res |= BUTTON_POWER; break;
         case 3: res |= BUTTON_VOL_UP; break;
