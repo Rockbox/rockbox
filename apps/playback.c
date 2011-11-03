@@ -828,6 +828,16 @@ bufpanic:
 /* Buffer must not move. */
 static int shrink_callback(int handle, unsigned hints, void* start, size_t old_size)
 {
+    /* filebuflen is, at this point, the buffering.c buffer size,
+     * i.e. the audiobuf except voice, scratch mem, pcm, ... */
+    ssize_t extradata_size = old_size - filebuflen;
+    /* check what buflib requests */
+    size_t wanted_size = (hints & BUFLIB_SHRINK_SIZE_MASK);
+    ssize_t size = (ssize_t)old_size - wanted_size;
+    /* keep at least 256K for the buffering */
+    if ((size - extradata_size) < 256*1024)
+        return BUFLIB_CB_CANNOT_SHRINK;
+
     long offset = audio_current_track()->offset;
     int status = audio_status();
     /* TODO: Do it without stopping playback, if possible */
@@ -843,10 +853,9 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
 #ifdef PLAYBACK_VOICE
     voice_stop();
 #endif
-    /* we should be free to change the buffer now */
-    size_t wanted_size = (hints & BUFLIB_SHRINK_SIZE_MASK);
-    ssize_t size = (ssize_t)old_size - wanted_size;
-    /* set final buffer size before calling audio_reset_buffer_noalloc() */
+    /* we should be free to change the buffer now
+     * set final buffer size before calling audio_reset_buffer_noalloc()
+     * (now it's the total size, the call will subtract voice etc) */
     filebuflen = size;
     switch (hints & BUFLIB_SHRINK_POS_MASK)
     {
