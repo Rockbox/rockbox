@@ -7,8 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- *
- * Copyright (c) 2011 Andrew Ryabinin
+ * Copyright © 2009 Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,11 +18,32 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __TDA1543_H_
-#define __TDA1543_H_
+#include <stdbool.h>
+#include "config.h"
+#include "inttypes.h"
+#include "power.h"
+#include "panic.h"
+#include "system.h"
+#include "usb_core.h"   /* for usb_charging_maxcurrent_change */
 
-#define VOLUME_MIN   -1
-#define VOLUME_MAX   0
+void power_off(void)
+{
+    GPIO_PCDR &= ~(1<<0);
+    while(1);
+}
 
+void power_init(void)
+{
+    GPIO_PCDR |= (1<<0);
+    GPIO_PCCON |= (1<<0);
+}
 
-#endif /* __TDA1543_H_ */
+unsigned int power_input_status(void)
+{
+    return (usb_detect() == USB_INSERTED) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
+}
+
+bool charging_state(void)
+{
+   return true;
+}

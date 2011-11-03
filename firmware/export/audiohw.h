@@ -74,8 +74,8 @@
 #include "cs42l55.h"
 #elif defined(HAVE_IMX233_CODEC)
 #include "imx233-codec.h"
-#elif defined(HAVE_TDA1543)
-#include "tda1543.h"
+#elif defined(HAVE_DUMMY_CODEC)
+#include "dummy_codec.h"
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 /* #include <SDL_audio.h> gives errors in other code areas,

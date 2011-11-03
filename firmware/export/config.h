@@ -141,6 +141,7 @@
 #define SANSA_FUZEPLUS_PAD 48
 #define RK27XX_GENERIC_PAD 49
 #define HM60X_PAD          50
+#define HM801_PAD          51
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -463,6 +464,8 @@ Lyre prototype 1 */
 #include "config/rk27generic.h"
 #elif defined(HM60X)
 #include "config/hifimanhm60x.h"
+#elif defined(HM801)
+#include "config/hifimanhm801.h"
 #elif defined(SDLAPP)
 #include "config/sdlapp.h"
 #elif defined(ANDROID)

@@ -4,13 +4,10 @@
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 79
+#define MODEL_NUMBER 80
 
-#define MODEL_NAME   "HiFiMAN HM-60x"
+#define MODEL_NAME   "HiFiMAN HM-801"
 
-/* Define bitmask of input sources - recordable bitmask can be defined
-   explicitly if different */
-/* #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FM) */
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_96 | SAMPR_CAP_48 | SAMPR_CAP_44 | \
@@ -85,7 +82,7 @@
 /* TODO: #define HAVE_LCD_SLEEP_SETTING */
 #endif
 
-#define CONFIG_KEYPAD HM60X_PAD
+#define CONFIG_KEYPAD HM801_PAD
 
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
@@ -93,16 +90,7 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
-/* define this if you have a real-time clock */
-/* #define CONFIG_RTC RTC_NANO2G */
-
-/* Define if the device can wake from an RTC alarm */
-/* #define HAVE_RTC_ALARM */
-
 #define CONFIG_LCD LCD_HX8340B
-
-/* Define the type of audio codec */
-/*#define HAVE_RK27XX_CODEC */
 
 /* #define HAVE_PCM_DMA_ADDRESS */
 
@@ -124,10 +112,10 @@
 #define PLUGIN_BUFFER_SIZE 0x80000
 
 /* TODO: Figure out real values */
-#define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN     300 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX     600 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC      10 /* capacity increment */
+#define BATTERY_CAPACITY_DEFAULT 4000 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN     3000 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX     4100 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC      50 /* capacity increment */
 #define BATTERY_TYPES_COUNT        1 /* only one type */
 
 /* Hardware controlled charging with monitoring */

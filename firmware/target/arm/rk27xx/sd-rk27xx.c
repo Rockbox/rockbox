@@ -126,10 +126,16 @@ static void mmu_buff_reset(void)
     MMU_CTRL |= MMU_BUFII_RESET | MMU_BUFI_RESET;
 }
 
-/* My generic device uses PC7 pin, active low */
 static inline bool card_detect_target(void)
 {
+#if defined(RK27_GENERIC)
+/* My generic device uses PC7 pin, active low */
     return !(GPIO_PCDR & 0x80);
+#elif defined(HM60X) || defined(HM801)
+    return !(GPIO_PFDR & (1<<2));
+#else
+#error "Unknown target"
+#endif
 }
 
 /* Send command to the SD card. Command finish is signaled in ISR */

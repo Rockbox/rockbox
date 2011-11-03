@@ -1292,6 +1292,7 @@ cat <<EOF
  202) Nokia N8xx
  203) Nokia N900          ==ROCKCHIP==           ==HiFiMAN==
  204) Pandora             180) rk27xx generic    190) HM-60x
+                                                 191) HM-801
 
 EOF
 
@@ -3052,6 +3053,29 @@ fi
     t_cpu="arm"
     t_manufacturer="rk27xx"
     t_model="hm60x"
+    ;;
+
+   191|hifimanhm801)
+    target_id=80
+    modelname="hifimanhm801"
+    target="-DHM801"
+    memory=16
+    arm7ejscc
+    tool="$rootdir/tools/scramble -add=rk27"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rk27"
+    bootoutput="bootloader.rk27"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="hm801"
     ;;
 
    200|sdlapp)

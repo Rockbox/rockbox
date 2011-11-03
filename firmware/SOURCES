@@ -355,8 +355,8 @@ drivers/audio/uda1341.c
 drivers/audio/cs42l55.c
 #elif defined (HAVE_RK27XX_CODEC)
 drivers/audio/rk27xx_codec.c
-#elif defined (HAVE_TDA1543)
-drivers/audio/tda1543.c
+#elif defined (HAVE_DUMMY_CODEC)
+drivers/audio/dummy_codec.c
 #endif /* defined(HAVE_*) */
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
@@ -1925,6 +1925,15 @@ thread.c
 target/arm/rk27xx/hm60x/button-hm60x.c
 target/arm/rk27xx/hm60x/powermgmt-hm60x.c
 target/arm/rk27xx/hm60x/power-hm60x.c
-target/arm/rk27xx/hm60x/lcd-hm60x.c
+target/arm/rk27xx/lcd-hifiman.c
+#endif
+#endif
+
+#ifndef SIMULATOR
+#if defined(HM801)
+target/arm/rk27xx/hm801/button-hm801.c
+target/arm/rk27xx/hm801/powermgmt-hm801.c
+target/arm/rk27xx/hm801/power-hm801.c
+target/arm/rk27xx/lcd-hifiman.c
 #endif
 #endif

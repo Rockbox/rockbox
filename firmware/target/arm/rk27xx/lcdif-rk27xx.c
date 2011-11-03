@@ -37,7 +37,7 @@ unsigned int lcd_data_transform(unsigned int data)
     /* g = ((data & 0x00000300) >> 2) | ((data & 0x000000e0) >> 3); */
     g = ((data & 0x00000300) << 6) | ((data & 0x000000e0) << 5);
     b = (data & 0x00000001f) << 3;
-#elif defined(HM60X)
+#elif defined(HM60X) || defined(HM801)
     /* 16 bit interface */
     r = (data & 0x0000f800) << 8;
     g = (data & 0x000007e0) << 5;
