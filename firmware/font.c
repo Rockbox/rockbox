@@ -801,8 +801,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
     return bits;
 }
 
-void font_path_to_glyph_path( const char *font_path, char *glyph_path)
-
+static void font_path_to_glyph_path( const char *font_path, char *glyph_path)
 {
     /* take full file name, cut extension, and add .glyphcache */
     strlcpy(glyph_path, font_path, MAX_PATH);

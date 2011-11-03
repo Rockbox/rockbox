@@ -344,7 +344,7 @@ static int move_callback(int handle, void* current, void* new)
     return BUFLIB_CB_OK;
 }
 
-void lock_sample_buf( bool lock )
+static void lock_sample_buf( bool lock )
 {
     if ( lock )
         big_sample_locks++;

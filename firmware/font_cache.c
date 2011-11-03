@@ -76,7 +76,7 @@ void font_cache_create(
  * search and new search. Returns a negative of insertion point if 
  * not found.
  ************************************************************************/
-int search( struct font_cache* fcache,
+static int search(struct font_cache* fcache,
                   unsigned short char_code,
                   int *p_insertion_point )
 {

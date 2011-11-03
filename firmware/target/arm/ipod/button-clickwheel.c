@@ -68,16 +68,16 @@
 
 int  old_wheel_value  = -1;
 int  new_wheel_value  = 0;
-int  repeat           = 0;
+static int  repeat           = 0;
 int  wheel_delta      = 0;
 bool wheel_is_touched = false;
 unsigned int  accumulated_wheel_delta = 0;
-unsigned int  wheel_repeat            = 0;
+static unsigned int  wheel_repeat            = 0;
 unsigned int  wheel_velocity          = 0;
-unsigned long last_wheel_usec         = 0;
+static unsigned long last_wheel_usec         = 0;
 
 /* Variable to use for setting button status in interrupt handler */
-int int_btn = BUTTON_NONE;
+static int int_btn = BUTTON_NONE;
 #ifdef HAVE_WHEEL_POSITION
     static int wheel_position = -1;
     static bool send_events = true;
