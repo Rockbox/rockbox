@@ -778,7 +778,7 @@ void talk_buffer_steal(void)
 int talk_id(int32_t id, bool enqueue)
 {
     long clipsize;
-    size_t temp;
+    size_t temp = voicefile_size;
     unsigned char* clipbuf;
     int32_t unit;
     int decimals;
