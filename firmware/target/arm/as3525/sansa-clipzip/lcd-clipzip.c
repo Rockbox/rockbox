@@ -108,7 +108,7 @@ static void lcd_write(uint8_t cmd, uint8_t data)
 }
 
 /*  Initialises lcd type 0
- *  This appears to be a Visionox M00230 OLED display controlled by a SEPS114A.
+ *  This appears to be a WiseChip OLED display controlled by a SEPS114A.
  */
 static void lcd_init_type0(void)
 {
@@ -131,7 +131,7 @@ static void lcd_init_type0(void)
     lcd_write(0x33, 0x5F);  /* DISPLAY_Y2 */
     lcd_write(0xE0, 0x10);  /* RGB_IF */
     lcd_write(0xE1, 0x00);  /* RGB_POL */
-    lcd_write(0xE5, 0x00);  /* DISPLAY_MODE_CONTROL */
+    lcd_write(0xE5, 0x80);  /* DISPLAY_MODE_CONTROL */
     lcd_write(0x0D, 0x00);  /* CPU_IF */
     lcd_write(0x1D, 0x01);  /* MEMORY_WRITE_READ */
     lcd_write(0x09, 0x00);  /* ROW_SCAN_DIRECTION */
@@ -155,7 +155,9 @@ static void lcd_write_nibbles(uint8_t val)
     lcd_write_dat((val >> 0) & 0x0F);
 }
 
-/* initialises lcd type 1 */
+/* Initialises lcd type 1
+ * This appears to be a Visionox OLED display, with an unknown controller
+ */
 static void lcd_init_type1(void)
 {
     static const uint8_t curve[128] = {
