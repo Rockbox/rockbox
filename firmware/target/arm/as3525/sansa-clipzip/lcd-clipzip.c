@@ -263,7 +263,9 @@ static void lcd_init_type1(void)
 /* enables/disables the lcd */
 void lcd_enable(bool on)
 {
-    lcd_enabled = on;
+    if (on == lcd_enabled) {
+        return;
+    }
 
     if (lcd_type == 0) {
         if (on) {
@@ -301,6 +303,8 @@ void lcd_enable(bool on)
             lcd_write_dat(0x01);
         }
     }
+    
+    lcd_enabled = on;
 }
 
 /* returns true if the lcd is enabled */
