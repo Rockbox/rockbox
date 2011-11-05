@@ -824,10 +824,15 @@ bufpanic:
     panicf("%s(): EOM (%zu > %zu)", __func__, allocsize, filebuflen);
 }
 
-
 /* Buffer must not move. */
 static int shrink_callback(int handle, unsigned hints, void* start, size_t old_size)
 {
+    struct queue_event ev;
+    static const long filter_list[][2] =
+    {
+        /* codec messages */
+        { Q_AUDIO_PLAY, Q_AUDIO_PLAY },
+    };
     /* filebuflen is, at this point, the buffering.c buffer size,
      * i.e. the audiobuf except voice, scratch mem, pcm, ... */
     ssize_t extradata_size = old_size - filebuflen;
@@ -838,9 +843,24 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     if ((size - extradata_size) < 256*1024)
         return BUFLIB_CB_CANNOT_SHRINK;
 
-    long offset = audio_current_track()->offset;
-    int status = audio_status();
+
     /* TODO: Do it without stopping playback, if possible */
+    long offset = audio_current_track()->offset;
+    bool playing = (audio_status() & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY;
+    /* There's one problem with stoping and resuming: If it happens in a too
+     * frequent fashion, the codecs lose the resume postion and playback
+     * begins from the beginning.
+     * To work around use queue_post() to effectively delay the resume in case
+     * we're called another time. However this has another problem: id3->offset
+     * gets zero since playback is stopped. Therefore, try to peek at the
+     * queue_post from the last call to get the correct offset. This also
+     * lets us conviniently remove the queue event so Q_AUDIO_START is only
+     * processed once. */
+    bool play_queued = queue_peek_ex(&audio_queue, &ev, QPEEK_REMOVE_EVENTS, filter_list);
+
+    if (playing && offset > 0) /* current id3->offset is king */
+        ev.data = offset;
+
     /* don't call audio_hard_stop() as it frees this handle */
     if (thread_self() == audio_thread_id)
     {   /* inline case Q_AUDIO_STOP (audio_hard_stop() response
@@ -868,12 +888,10 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
             audio_reset_buffer_noalloc(start + wanted_size);
             break;
     }
-    if ((status & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY)
+    if (playing || play_queued)
     {
-        if (thread_self() == audio_thread_id)
-            audio_start_playback(offset, 0);  /* inline Q_AUDIO_PLAY */
-        else
-            audio_play(offset);
+        /* post, to make subsequent calls not break the resume position */
+        audio_queue_post(Q_AUDIO_PLAY, ev.data);
     }
 
     return BUFLIB_CB_OK;
