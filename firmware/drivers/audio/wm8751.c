@@ -219,20 +219,22 @@ static void audiohw_mute(bool mute)
 /* Reset and power up the WM8751 */
 void audiohw_preinit(void)
 {
-#ifdef MROBE_100
+#if defined(MROBE_100)
     /* controls headphone ouput */
     GPIOL_ENABLE     |= 0x10;
     GPIOL_OUTPUT_EN  |= 0x10;
     GPIOL_OUTPUT_VAL |= 0x10; /* disable */
-#endif
-
-#ifdef MPIO_HD200
+#elif defined(MPIO_HD200)
     /* control headphone output
      * disabled on startup
      */
-    and_l(~(1<<25),&GPIO1_OUT);
+    and_l(~(1<<25), &GPIO1_OUT);
     or_l((1<<25), &GPIO1_ENABLE);
     or_l((1<<25), &GPIO1_FUNCTION);
+#elif defined(MPIO_HD300)
+    and_l(~(1<<5), &GPIO1_OUT);
+    or_l((1<<5), &GPIO1_ENABLE);
+    or_l((1<<5), &GPIO1_FUNCTION);
 #endif
 
     /*
@@ -322,15 +324,15 @@ void audiohw_postinit(void)
 
     audiohw_mute(false);
 
-#ifdef MROBE_100
+#if defined(MROBE_100)
     /* enable headphone output */
     GPIOL_OUTPUT_VAL &= ~0x10;
     GPIOL_OUTPUT_EN  |=  0x10;
-#endif
-
-#ifdef MPIO_HD200
+#elif defined(MPIO_HD200)
    /* enable headphone output */
-   or_l((1<<25),&GPIO1_OUT);
+   or_l((1<<25), &GPIO1_OUT);
+#elif defined(MPIO_HD300)
+   or_l((1<<5), &GPIO1_OUT);
 #endif
 }
 
@@ -394,9 +396,11 @@ void audiohw_close(void)
     /* 1. Set DACMU = 1 to soft-mute the audio DACs. */
     audiohw_mute(true);
 
-#ifdef MPIO_HD200
+#if defined(MPIO_HD200)
     /* disable headphone out */
     and_l(~(1<<25), &GPIO1_OUT);
+#elif defined(MPIO_HD300)
+    and_l(~(1<<5), &GPIO1_OUT);
 #endif
 
     /* 2. Disable all output buffers. */
