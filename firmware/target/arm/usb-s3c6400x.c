@@ -48,7 +48,11 @@ struct ep_type
 } ;
 
 static struct ep_type endpoints[USB_NUM_ENDPOINTS];
-static struct usb_ctrlrequest ctrlreq USB_DEVBSS_ATTR;
+static union
+{
+    unsigned char data[64];
+    struct usb_ctrlrequest req;
+} ctrlreq USB_DEVBSS_ATTR;
 
 int usb_drv_port_speed(void)
 {
@@ -70,7 +74,7 @@ static void reset_endpoints(int reinit)
     DOEPCTL0 = 0x8000;  /* EP0 OUT ACTIVE */
     DOEPTSIZ0 = 0x20080040;  /* EP0 OUT Transfer Size:
                                 64 Bytes, 1 Packet, 1 Setup Packet */
-    DOEPDMA0 = &ctrlreq;
+    DOEPDMA0 = &ctrlreq.data;
     DOEPCTL0 |= 0x84000000;  /* EP0 OUT ENABLE CLEARNAK */
     if (reinit)
     {
@@ -243,14 +247,14 @@ void INT_USB_FUNC(void)
                     invalidate_dcache();
                     if (i == 0)
                     {
-                        if (ctrlreq.bRequest == 5)
+                        if (ctrlreq.req.bRequest == 5)
                         {
                             /* Already set the new address here,
                                before passing the packet to the core.
                                See below (usb_drv_set_address) for details. */
-                            DCFG = (DCFG & ~0x7F0) | (ctrlreq.wValue << 4);
+                            DCFG = (DCFG & ~0x7F0) | (ctrlreq.req.wValue << 4);
                         }
-                        usb_core_control_request(&ctrlreq);
+                        usb_core_control_request(&ctrlreq.req);
                     }
                     else panicf("USB: SETUP done on OUT EP%d!?", i);
                 }
@@ -258,7 +262,7 @@ void INT_USB_FUNC(void)
                 if (!i)
                 {
                     DOEPTSIZ0 = 0x20080040;
-                    DOEPDMA0 = &ctrlreq;
+                    DOEPDMA0 = &ctrlreq.data;
                     DOEPCTL0 |= 0x84000000;
                 }
                 DOEPINT(i) = epints;
