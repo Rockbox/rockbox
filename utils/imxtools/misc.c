@@ -30,7 +30,7 @@ bool g_debug = false;
  * Misc
  */
 
-void *memdup(void *p, size_t len)
+void *memdup(const void *p, size_t len)
 {
     void *cpy = xmalloc(len);
     memcpy(cpy, p, len);
@@ -156,6 +156,7 @@ void clear_keys()
 {
     free(g_key_array);
     g_nr_keys = 0;
+    g_key_array = NULL;
 }
 
 void add_keys_from_file(const char *key_file)
