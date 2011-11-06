@@ -80,7 +80,7 @@ static struct crypto_key_t zero_key =
 static const struct imx_model_desc_t imx_models[] =
 {
     [MODEL_FUZEPLUS]  = { "Fuze+",  dualboot_fuzeplus, sizeof(dualboot_fuzeplus), "fuz+", 72,
-                          1, &zero_key },
+                          1, &zero_key, 0, 0x40000000 },
 };
 
 #define NR_IMX_SUMS     (sizeof(imx_sums) / sizeof(imx_sums[0]))
@@ -163,7 +163,7 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
         rock_sec.insts[0].size = boot_sz;
         rock_sec.insts[0].data = memdup(boot, boot_sz);
         rock_sec.insts[0].addr = imx_models[model].bootloader_addr;
-        rock_sec.insts[1].inst = SB_INST_CALL;
+        rock_sec.insts[1].inst = SB_INST_JUMP;
         rock_sec.insts[1].addr = imx_models[model].bootloader_addr;
         rock_sec.insts[1].argument = MAGIC_NORMAL;
 
@@ -187,7 +187,7 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
         new_insts[jump_idx + 0].size = boot_sz;
         new_insts[jump_idx + 0].data = memdup(boot, boot_sz);
         new_insts[jump_idx + 0].addr = imx_models[model].bootloader_addr;
-        new_insts[jump_idx + 1].inst = SB_INST_CALL;
+        new_insts[jump_idx + 1].inst = SB_INST_JUMP;
         new_insts[jump_idx + 1].addr = imx_models[model].bootloader_addr;
         new_insts[jump_idx + 1].argument = recovery ? MAGIC_RECOVERY : MAGIC_NORMAL;
         
