@@ -516,7 +516,9 @@ target/arm/imx233/power-imx233.c
 target/arm/imx233/powermgmt-imx233.c
 target/arm/imx233/adc-imx233.c
 target/arm/imx233/lradc-imx233.c
+#ifndef BOOTLOADER
 target/arm/imx233/debug-imx233.c
+#endif
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 target/arm/imx233/usb-imx233.c
 #endif
