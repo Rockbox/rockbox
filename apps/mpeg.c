@@ -516,7 +516,7 @@ static void audio_reset_buffer_noalloc(void* buf, size_t bufsize);
 static int shrink_callback(int handle, unsigned hints, void* start, size_t old_size)
 {
     long offset = audio_current_track()->offset;
-    int status = audio_status();
+    bool playing = (audio_status() & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY;
     /* TODO: Do it without stopping playback, if possible */
     /* don't call audio_hard_stop() as it frees this handle */
     if (thread_self() == audio_thread_id)
@@ -542,7 +542,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
             audio_reset_buffer_noalloc(start + wanted_size, size);
             break;
     }
-    if (!(status & AUDIO_STATUS_PAUSE))
+    if (playing)
     {   /* safe to call even from the audio thread (due to queue_post()) */
         audio_play(offset);
     }
@@ -554,6 +554,17 @@ static struct buflib_callbacks ops = {
     .move_callback = NULL,
     .shrink_callback = shrink_callback,
 };
+
+static size_t audio_talkbuf_init(char *bufstart)
+{
+    size_t ret = talkbuf_init(bufstart);
+    if (bufstart > (size_t)audiobuflen) /* does the voice even fit? */
+    {
+        talk_buffer_steal();
+        return 0;
+    }
+    return ret;
+}
 
 unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
@@ -577,7 +588,7 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
     mpeg_audiobuf = core_get_data(audiobuf_handle);
     /* tell talk about the new buffer, don't re-enable just yet because the
      * buffer is stolen */
-    talkbuf_init(mpeg_audiobuf);
+    audio_talkbuf_init(mpeg_audiobuf);
 
     return mpeg_audiobuf;
 }
@@ -2749,7 +2760,7 @@ static void audio_reset_buffer_noalloc(void* buf, size_t bufsize)
         mpeg_audiobuf = SKIPBYTES(mpeg_audiobuf, sizeof(struct cuesheet));
         audiobuflen -= sizeof(struct cuesheet);
     }
-    talkbuf_init(mpeg_audiobuf);
+    audio_talkbuf_init(mpeg_audiobuf);
 }
 
 static void audio_reset_buffer(void)
@@ -2819,7 +2830,7 @@ void audio_stop(void)
     playing = false;
 #endif /* SIMULATOR */
     /* give voice our entire buffer */
-    talkbuf_init(mpeg_audiobuf);
+    audio_talkbuf_init(mpeg_audiobuf);
 }
 
 /* dummy */
