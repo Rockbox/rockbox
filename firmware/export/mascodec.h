@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: mas.h 24154 2010-01-03 10:27:43Z Buschel $
+ * $Id$
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  *

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: dac.c 17847 2008-06-28 18:10:04Z bagder $
+ * $Id$
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  *

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: mas.c 18807 2008-10-14 11:12:20Z zagor $
+ * $Id$
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  *

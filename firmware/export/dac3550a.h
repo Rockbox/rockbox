@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: dac.h 24158 2010-01-03 11:31:14Z Buschel $
+ * $Id$
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  *

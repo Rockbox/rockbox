@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: lcd-clipzip.c 30465 2011-09-06 16:55:52Z bertrik $
+ * $Id$
  *
  * Copyright (C) 2011 Bertrik Sikken
  *
