@@ -113,14 +113,13 @@ struct queue_entry /* one entry of the internal queue */
 
 /***************** Globals *****************/
 
-#if CONFIG_STORAGE & STORAGE_MMC
-/* The MMC storage on the Ondios is slow enough that we want to buffer the
- * talk clips only when they are needed */
-#   define TALK_PROGRESSIVE_LOAD
-#elif CONFIG_CODEC == SWCODEC && MEMORYSIZE <= 2
-/* The entire voice file wouldn't fit in memory together with codecs, so we
- * load clips each time they are accessed */
-#   define TALK_PARTIAL_LOAD
+#if (CONFIG_CODEC == SWCODEC && MEMORYSIZE <= 2) \
+ || (CONFIG_STORAGE & STORAGE_MMC)
+/* On low memory swcodec targets the entire voice file wouldn't fit in memory
+ * together with codecs, so we load clips each time they are accessed.
+ * The Ondios have slow storage access and loading the entire voice file would
+ * take several seconds, so we use the same mechanism. */
+#define TALK_PARTIAL_LOAD
 #endif
 
 #ifdef TALK_PARTIAL_LOAD
@@ -213,10 +212,9 @@ static unsigned char* get_clip(long id, long* p_size)
     clipbuf = (unsigned char *) p_voicefile + p_voicefile->index[id].offset;
 #endif
 
-#if defined(TALK_PROGRESSIVE_LOAD) || defined(TALK_PARTIAL_LOAD)
+#ifdef TALK_PARTIAL_LOAD
     if (!(clipsize & LOADED_MASK))
     {   /* clip needs loading */
-#ifdef TALK_PARTIAL_LOAD
         int idx = 0;
         if (id == VOICE_PAUSE) {
             idx = QUEUE_SIZE;   /* we keep VOICE_PAUSE loaded */
@@ -242,7 +240,6 @@ static unsigned char* get_clip(long id, long* p_size)
             clip_age[idx] = 0; /* reset clip's age */
         }
         clipbuf = clip_buffer + idx * max_clipsize;
-#endif
 
         lseek(filehandle, p_voicefile->index[id].offset, SEEK_SET);
         if (read(filehandle, clipbuf, clipsize) != clipsize)
@@ -250,7 +247,6 @@ static unsigned char* get_clip(long id, long* p_size)
 
         p_voicefile->index[id].size |= LOADED_MASK; /* mark as loaded */
 
-#ifdef TALK_PARTIAL_LOAD
         if (id != VOICE_PAUSE) {
             if (buffered_id[idx] >= 0) {
                 /* mark previously loaded clip as unloaded */
@@ -258,11 +254,9 @@ static unsigned char* get_clip(long id, long* p_size)
             }
             buffered_id[idx] = id;
         }
-#endif
     }
     else
     {   /* clip is in memory already */
-#ifdef TALK_PARTIAL_LOAD
         /* Find where it was loaded */
         clipbuf = clip_buffer;
         if (id == VOICE_PAUSE) {
@@ -276,10 +270,9 @@ static unsigned char* get_clip(long id, long* p_size)
                     break;
                 }
         }
-#endif
         clipsize &= ~LOADED_MASK; /* without the extra bit gives true size */
     }
-#endif /* defined(TALK_PROGRESSIVE_LOAD) || defined(TALK_PARTIAL_LOAD) */
+#endif /* TALK_PARTIAL_LOAD */
 
     *p_size = clipsize;
     return clipbuf;
@@ -297,9 +290,6 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
 
     size_t load_size, alloc_size;
     ssize_t got_size;
-#ifndef TALK_PARTIAL_LOAD
-    size_t file_size;
-#endif
 #ifdef ROCKBOX_LITTLE_ENDIAN
     int i;
 #endif
@@ -313,23 +303,15 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
     if (!voicebuf.buf)
         goto load_err;
 
-#ifndef TALK_PARTIAL_LOAD
-    file_size = filesize(filehandle);
-    if (file_size > bufsize) /* won't fit? */
-        goto load_err;
-#endif
-
-#if defined(TALK_PROGRESSIVE_LOAD) || defined(TALK_PARTIAL_LOAD)
+#ifdef TALK_PARTIAL_LOAD
     /* load only the header for now */
     load_size = sizeof(struct voicefile);
-#else /* load the full file */
-    load_size = file_size; 
+#else 
+    /* load the entire file */
+    load_size = filesize(filehandle);
 #endif
-
-#ifdef TALK_PARTIAL_LOAD
     if (load_size > bufsize) /* won't fit? */
         goto load_err;
-#endif
 
     got_size = read(filehandle, voicebuf.buf, load_size);
     if (got_size != (ssize_t)load_size /* failure */)
@@ -357,15 +339,13 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
     else
         goto load_err;
 
-#if defined(TALK_PROGRESSIVE_LOAD) || defined(TALK_PARTIAL_LOAD)
+#ifdef TALK_PARTIAL_LOAD
     /* load the index table, now that we know its size from the header */
     load_size = (p_voicefile->id1_max + p_voicefile->id2_max)
                 * sizeof(struct clip_entry);
 
-#ifdef TALK_PARTIAL_LOAD
     if (load_size > bufsize) /* won't fit? */
         goto load_err;
-#endif
 
     got_size = read(filehandle, &p_voicefile->index[0], load_size);
     if (got_size != (ssize_t)load_size) /* read error */
@@ -375,7 +355,7 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
 #else
     close(filehandle);
     filehandle = -1;
-#endif /* defined(TALK_PROGRESSIVE_LOAD) || defined(TALK_PARTIAL_LOAD) */
+#endif /* TALK_PARTIAL_LOAD */
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
     for (i = 0; i < p_voicefile->id1_max + p_voicefile->id2_max; i++)
@@ -394,10 +374,6 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
 
 #ifdef TALK_PARTIAL_LOAD
     alloc_size += silence_len + QUEUE_SIZE;
-#else
-    /* allocate for the entire file, TALK_PROGRESSIVE_LOAD doesn't
-     * load everything just yet */
-    alloc_size = file_size;
 #endif
 
     if (alloc_size > bufsize)
@@ -736,11 +712,11 @@ bool talk_voice_required(void)
 /* return size of voice file */
 static int talk_get_buffer(void)
 {
-    int ret = voicefile_size;
 #if CONFIG_CODEC == SWCODEC
-    ret += MAX_THUMBNAIL_BUFSIZE;
+    return voicefile_size + MAX_THUMBNAIL_BUFSIZE;
+#else
+    return audio_buffer_available();
 #endif
-    return ret;
 }
 
 /* Sets the buffer for the voicefile and returns how many bytes of this
