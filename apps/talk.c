@@ -402,7 +402,6 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
 
     if (alloc_size > bufsize)
         goto load_err;
-    return;
 
     /* now move p_thumbnail behind the voice clip buffer */
     p_thumbnail = voicebuf.buf + alloc_size;
@@ -414,6 +413,7 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
     if (size_for_thumbnail <= 0)
         p_thumbnail = NULL;
 
+    return;
 load_err:
     p_voicefile = NULL;
     has_voicefile = false; /* don't try again */
@@ -778,7 +778,7 @@ void talk_buffer_steal(void)
 int talk_id(int32_t id, bool enqueue)
 {
     long clipsize;
-    size_t temp = voicefile_size;
+    size_t temp = talk_get_buffer();
     unsigned char* clipbuf;
     int32_t unit;
     int decimals;
@@ -795,7 +795,7 @@ int talk_id(int32_t id, bool enqueue)
         voicebuf = audio_get_buffer(true, &temp);
 
     if (p_voicefile == NULL && has_voicefile)
-        load_voicefile(false, voicebuf, MIN(voicefile_size,temp)); /* reload needed */
+        load_voicefile(false, voicebuf, MIN(talk_get_buffer(),temp)); /* reload needed */
 
     if (p_voicefile == NULL) /* still no voices? */
         return -1;
