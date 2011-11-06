@@ -1039,13 +1039,16 @@ struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
     #undef print_hex
 }
 
+void sb_free_instruction(struct sb_inst_t inst)
+{
+    free(inst.padding);
+    free(inst.data);
+}
+
 void sb_free_section(struct sb_section_t sec)
 {
     for(int j = 0; j < sec.nr_insts; j++)
-    {
-        free(sec.insts[j].padding);
-        free(sec.insts[j].data);
-    }
+        sb_free_instruction(sec.insts[j]);
     free(sec.insts);
 }
 

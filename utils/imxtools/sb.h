@@ -231,6 +231,7 @@ struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
 
 void sb_fill_section_name(char name[5], uint32_t identifier);
 void sb_dump(struct sb_file_t *file, void *u, sb_color_printf printf);
+void sb_free_instruction(struct sb_inst_t inst);
 void sb_free_section(struct sb_section_t file);
 void sb_free(struct sb_file_t *file);
 
