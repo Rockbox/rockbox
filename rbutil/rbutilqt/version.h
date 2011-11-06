@@ -26,7 +26,7 @@
 // rebuilds because of issues like dependency problems or library updates).
 // Usually empty.
 #define BUILDID ""
-#define VERSION "1.2.10" BUILDID
+#define VERSION "1.2.11" BUILDID
 #define PUREVERSION "SVN $Revision$"
 
 #define FULLVERSION VERSION" ("PUREVERSION"), built "__DATE__" "__TIME__
