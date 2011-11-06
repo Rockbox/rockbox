@@ -268,7 +268,15 @@ int main(int argc, char **argv)
 
     const char *sb_filename = argv[optind];
 
-    struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, sb_printf);
+    enum sb_error_t err;
+    struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, sb_printf, &err);
+    if(file == NULL)
+    {
+        color(OFF);
+        printf("SB read failed: %d\n", err);
+        return 1;
+    }
+    
     color(OFF);
     if(g_out_prefix)
         extract_sb_file(file);
@@ -283,12 +291,12 @@ int main(int argc, char **argv)
         /* sb_read_file will fill real key and IV but we don't want to override
          * them when looping back otherwise the output will be inconsistent and
          * garbage */
-        free(file->real_key);
-        file->real_key = NULL;
-        free(file->crypto_iv);
-        file->crypto_iv = NULL;
+        file->override_real_key = false;
+        file->override_crypto_iv = false;
         sb_write_file(file, loopback);
     }
+    sb_free(file);
+    clear_keys();
     
     return 0;
 }

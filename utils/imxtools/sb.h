@@ -191,9 +191,11 @@ struct sb_section_t
 struct sb_file_t
 {
     /* override real, otherwise it is randomly generated */
-    uint8_t (*real_key)[16];
+    bool override_real_key;
+    uint8_t real_key[16];
     /* override crypto IV, use with caution ! Use NULL to generate it */
-    uint8_t (*crypto_iv)[16];
+    bool override_crypto_iv;
+    uint8_t crypto_iv[16];
     
     int nr_sections;
     uint16_t drive_tag;
@@ -207,13 +209,29 @@ struct sb_file_t
     uint32_t image_size; /* in blocks */
 };
 
-void sb_write_file(struct sb_file_t *sb, const char *filename);
+enum sb_error_t
+{
+    SB_SUCCESS = 0,
+    SB_ERROR = -1,
+    SB_OPEN_ERROR = -2,
+    SB_READ_ERROR = -3,
+    SB_WRITE_ERROR = -4,
+    SB_FORMAT_ERROR = -5,
+    SB_CHECKSUM_ERROR = -6,
+    SB_NO_VALID_KEY = -7,
+    SB_FIRST_CRYPTO_ERROR = -8,
+    SB_LAST_CRYPTO_ERROR = SB_FIRST_CRYPTO_ERROR - CRYPTO_NUM_ERRORS,
+};
+
+enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename);
 
 typedef void (*sb_color_printf)(void *u, bool err, color_t c, const char *f, ...);
 struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
-    sb_color_printf printf);
+    sb_color_printf printf, enum sb_error_t *err);
 
 void sb_fill_section_name(char name[5], uint32_t identifier);
 void sb_dump(struct sb_file_t *file, void *u, sb_color_printf printf);
+void sb_free_section(struct sb_section_t file);
+void sb_free(struct sb_file_t *file);
 
 #endif /* __SB_H__ */

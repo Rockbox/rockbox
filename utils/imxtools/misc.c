@@ -29,6 +29,14 @@ bool g_debug = false;
 /**
  * Misc
  */
+
+void *memdup(void *p, size_t len)
+{
+    void *cpy = xmalloc(len);
+    memcpy(cpy, p, len);
+    return cpy;
+}
+
 void generate_random_data(void *buf, size_t sz)
 {
     FILE *rand_fd = fopen("/dev/urandom", "rb");
@@ -142,6 +150,12 @@ void add_keys(key_array_t ka, int kac)
     free(g_key_array);
     g_key_array = new_ka;
     g_nr_keys += kac;
+}
+
+void clear_keys()
+{
+    free(g_key_array);
+    g_nr_keys = 0;
 }
 
 void add_keys_from_file(const char *key_file)

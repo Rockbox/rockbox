@@ -38,6 +38,7 @@ typedef struct crypto_key_t *key_array_t;
 int g_nr_keys;
 key_array_t g_key_array;
 
+void *memdup(void *p, size_t len);
 void *augment_array(void *arr, size_t elem_sz, size_t cnt, void *aug, size_t aug_cnt);
 void generate_random_data(void *buf, size_t sz);
 void *xmalloc(size_t s);
@@ -47,6 +48,7 @@ void add_keys(key_array_t ka, int kac);
 bool parse_key(char **str, struct crypto_key_t *key);
 void add_keys_from_file(const char *key_file);
 void print_key(struct crypto_key_t *key, bool newline);
+void clear_keys();
 
 typedef char color_t[];
 

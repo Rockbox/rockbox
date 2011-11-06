@@ -102,7 +102,7 @@ struct cmd_section_t
 struct cmd_file_t
 {
     struct cmd_option_t *opt_list;
-    struct cmd_option_t *constant_list; /* constant all always integers */
+    struct cmd_option_t *constant_list; /* constant are always integers */
     struct cmd_source_t *source_list;
     struct cmd_section_t *section_list;
 };
@@ -112,5 +112,7 @@ struct cmd_option_t *db_find_option_by_id(struct cmd_option_t *opt, const char *
 bool db_parse_sb_version(struct sb_version_t *ver, char *str);
 void db_generate_default_sb_version(struct sb_version_t *ver);
 struct cmd_file_t *db_parse_file(const char *file);
+void db_free_option_list(struct cmd_option_t *opt_list);
+void db_free(struct cmd_file_t *file);
 
 #endif /* __DBPARSER__ */

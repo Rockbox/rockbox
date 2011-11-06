@@ -20,6 +20,7 @@
  ****************************************************************************/
  
 #define _ISOC99_SOURCE
+#define _POSIX_C_SOURCE 200809L /* for strdup */
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -77,7 +78,9 @@ static void resolve_extern(struct cmd_source_t *src)
     src->is_extern = false;
     if(src->extern_nr < 0 || src->extern_nr >= g_extern_count)
         bug("There aren't enough file on command file to resolve extern(%d)\n", src->extern_nr);
-    src->filename = g_extern[src->extern_nr];
+    /* first free the old src->filename content */
+    free(src->filename);
+    src->filename = strdup(g_extern[src->extern_nr]);
 }
 
 static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
@@ -206,7 +209,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
 
             sec->insts[0].inst = SB_INST_DATA;
             sec->insts[0].size = bin->size;
-            sec->insts[0].data = bin->data;
+            sec->insts[0].data = memdup(bin->data, bin->size);
         }
         else
         {
@@ -266,7 +269,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
                             sec->insts[idx].inst = SB_INST_LOAD;
                             sec->insts[idx].addr = esec->addr;
                             sec->insts[idx].size = esec->size;
-                            sec->insts[idx++].data = esec->section;
+                            sec->insts[idx++].data = memdup(esec->section, esec->size);
                         }
                         else if(esec->type == EST_FILL)
                         {
@@ -296,7 +299,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
                     struct bin_param_t *bin = &db_find_source_by_id(cmd_file, cinst->identifier)->bin;
                     sec->insts[idx].inst = SB_INST_LOAD;
                     sec->insts[idx].addr = cinst->addr;
-                    sec->insts[idx].data = bin->data;
+                    sec->insts[idx].data = memdup(bin->data, bin->size);
                     sec->insts[idx++].size = bin->size;
                 }
                 else if(cinst->type == CMD_MODE)
@@ -431,11 +434,18 @@ int main(int argc, char **argv)
 
     struct cmd_file_t *cmd_file = db_parse_file(cmd_filename);
     struct sb_file_t *sb_file = apply_cmd_file(cmd_file);
+    db_free(cmd_file);
 
     if(real_key.method == CRYPTO_KEY)
-        sb_file->real_key = &real_key.u.key;
+    {
+        sb_file->override_real_key = true;
+        memcpy(sb_file->real_key, real_key.u.key, 16);
+    }
     if(crypto_iv.method == CRYPTO_KEY)
-        sb_file->crypto_iv = &crypto_iv.u.key;
+    {
+        sb_file->override_crypto_iv = true;
+        memcpy(sb_file->crypto_iv, crypto_iv.u.key, 16);
+    }
 
     /* fill with default parameters since there is no command file support for them */
     sb_file->drive_tag = 0;
@@ -444,6 +454,8 @@ int main(int argc, char **argv)
     sb_file->minor_version = 1;
     
     sb_write_file(sb_file, output_filename);
+    sb_free(sb_file);
+    clear_keys();
     
     return 0;
 }

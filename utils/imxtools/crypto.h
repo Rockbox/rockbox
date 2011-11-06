@@ -63,6 +63,7 @@ void crypto_setup(enum crypto_method_t method, void *param);
 #define CRYPTO_ERROR_DEVREJECT  -5 /* device rejected cypto operation */
 #define CRYPTO_ERROR_DEVSILENT  -6 /* device did not notify completion */
 #define CRYPTO_ERROR_DEVERR     -7 /* device did something wrong (like return too small buffer) */
+#define CRYPTO_NUM_ERRORS       8
 /* return 0 on success, <0 on error */
 int crypto_apply(
     byte *in_data, /* Input data */
