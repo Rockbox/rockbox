@@ -132,18 +132,18 @@ void usb_drv_release_endpoint(int ep)
 
 static void usb_reset(void)
 {
-    volatile int i;
-
     DCTL = 0x802;  /* Soft Disconnect */
 
     OPHYPWR = 0;  /* PHY: Power up */
+    udelay(10);
     OPHYUNK1 = 1;
     OPHYUNK2 = 0xE3F;
-    OPHYCLK = SYNOPSYSOTG_CLOCK;
     ORSTCON = 1;  /* PHY: Assert Software Reset */
-    for (i = 0; i < 50; i++);
+    udelay(10);
     ORSTCON = 0;  /* PHY: Deassert Software Reset */
     OPHYUNK3 = 0x600;
+    OPHYCLK = SYNOPSYSOTG_CLOCK;
+    udelay(400);
 
     GRSTCTL = 1;  /* OTG: Assert Software Reset */
     while (GRSTCTL & 1);  /* Wait for OTG to ack reset */
@@ -395,9 +395,11 @@ void usb_drv_exit(void)
 {
     DCTL = 0x802;  /* Soft Disconnect */
 
-    ORSTCON = 1;  /* Put the PHY into reset (needed to get current down) */
-    PCGCCTL = 1;  /* Shut down PHY clock */
     OPHYPWR = 0xF;  /* PHY: Power down */
+    udelay(10);
+    ORSTCON = 7;  /* Put the PHY into reset (needed to get current down) */
+    udelay(10);
+    PCGCCTL = 1;  /* Shut down PHY clock */
     
 #if CONFIG_CPU==S5L8701
     PWRCON |= 0x4000;
