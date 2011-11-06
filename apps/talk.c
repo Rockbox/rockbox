@@ -778,7 +778,7 @@ void talk_buffer_steal(void)
 int talk_id(int32_t id, bool enqueue)
 {
     long clipsize;
-    size_t temp = talk_get_buffer();
+    int temp = talk_get_buffer();
     unsigned char* clipbuf;
     int32_t unit;
     int decimals;
@@ -792,7 +792,7 @@ int talk_id(int32_t id, bool enqueue)
 
     /* try to get audio buffer until talkbuf_init() is called */
     if (!voicebuf)
-        voicebuf = audio_get_buffer(true, &temp);
+        voicebuf = audio_get_buffer(true, (size_t*)&temp);
 
     if (p_voicefile == NULL && has_voicefile)
         load_voicefile(false, voicebuf, MIN(talk_get_buffer(),temp)); /* reload needed */

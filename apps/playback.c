@@ -854,7 +854,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
      * we're called another time. However this has another problem: id3->offset
      * gets zero since playback is stopped. Therefore, try to peek at the
      * queue_post from the last call to get the correct offset. This also
-     * lets us conviniently remove the queue event so Q_AUDIO_START is only
+     * lets us conviniently remove the queue event so Q_AUDIO_PLAY is only
      * processed once. */
     bool play_queued = queue_peek_ex(&audio_queue, &ev, QPEEK_REMOVE_EVENTS, filter_list);
 

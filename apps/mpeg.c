@@ -558,7 +558,7 @@ static struct buflib_callbacks ops = {
 static size_t audio_talkbuf_init(char *bufstart)
 {
     size_t ret = talkbuf_init(bufstart);
-    if (bufstart > (size_t)audiobuflen) /* does the voice even fit? */
+    if (ret > (size_t)audiobuflen) /* does the voice even fit? */
     {
         talk_buffer_steal();
         return 0;
