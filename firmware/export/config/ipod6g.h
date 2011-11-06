@@ -185,8 +185,8 @@
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION
 
-//#define ATA_HAVE_BBT
-//#define ATA_BBT_PAGES 3072
+#define ATA_HAVE_BBT
+#define ATA_BBT_PAGES 3520
 
 #define SECTOR_SIZE 4096
 
@@ -232,8 +232,7 @@
 //#define HAVE_USB_HID_MOUSE - broken?
 #define CONFIG_USBOTG USBOTG_S3C6400X
 #define USB_VENDOR_ID 0x05AC
-//TODO: This is still the Nano2G product ID. Figure out the real one.
-#define USB_PRODUCT_ID 0x1260
+#define USB_PRODUCT_ID 0x1261
 #define USB_NUM_ENDPOINTS 5
 #define USE_ROCKBOX_USB
 #define USB_DEVBSS_ATTR __attribute__((aligned(16)))
