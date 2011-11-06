@@ -318,7 +318,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
     return sb;
 }
 
-void usage(void)
+static void usage(void)
 {
     printf("Usage: elftosb [options | file]...\n");
     printf("Options:\n");
