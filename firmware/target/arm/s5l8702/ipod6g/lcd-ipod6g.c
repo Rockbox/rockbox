@@ -154,6 +154,8 @@ void lcd_init_device(void)
     semaphore_init(&lcd_wakeup, 1, 0);
     mutex_init(&lcd_mutex);
     lcd_type = (PDAT6 & 0x30) >> 4;
+    while (!(LCD_STATUS & 0x2));
+    LCD_CONFIG = 0x80100db0;
 }
 
 /*** Update functions ***/

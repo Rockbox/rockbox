@@ -562,6 +562,7 @@ struct dma_lli
 
 /////LCD/////
 #define LCD_BASE   (0x38300000)
+#define LCD_CONFIG (*((uint32_t volatile*)(0x38300000)))
 #define LCD_WCMD   (*((uint32_t volatile*)(0x38300004)))
 #define LCD_STATUS (*((uint32_t volatile*)(0x3830001c)))
 #define LCD_WDATA  (*((uint32_t volatile*)(0x38300040)))
