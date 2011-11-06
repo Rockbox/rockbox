@@ -113,8 +113,7 @@ struct queue_entry /* one entry of the internal queue */
 
 /***************** Globals *****************/
 
-#if (CONFIG_CODEC == SWCODEC && MEMORYSIZE <= 2) \
- || (CONFIG_STORAGE & STORAGE_MMC)
+#if (CONFIG_CODEC == SWCODEC && MEMORYSIZE <= 2) || defined(ONDIO_SERIES)
 /* On low memory swcodec targets the entire voice file wouldn't fit in memory
  * together with codecs, so we load clips each time they are accessed.
  * The Ondios have slow storage access and loading the entire voice file would

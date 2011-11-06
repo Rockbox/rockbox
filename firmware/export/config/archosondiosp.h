@@ -3,6 +3,8 @@
 
 #define MODEL_NAME   "Ondio SP"
 
+#define ONDIO_SERIES
+
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
 
