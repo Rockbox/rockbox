@@ -4352,10 +4352,10 @@
     *: "Sleep Timer"
   </source>
   <dest>
-    *: "Časovač usnutí"
+    *: "Časovač vypnutí"
   </dest>
   <voice>
-    *: "Časovač usnutí"
+    *: "Časovač vypnutí"
   </voice>
 </phrase>
 <phrase>
@@ -12382,15 +12382,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D vylepšení"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D vylepšení"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "TŘIDÉ vylepšení"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "TŘIDÉ vylepšení"
   </voice>
 </phrase>
 <phrase>
@@ -12728,5 +12728,95 @@
   </dest>
   <voice>
     *: "Uložit změny?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "Skrýt interni disk přes USB"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "Skrýt interni disk přes ÚESBÉ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Vyplnění řádky v seznamech"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Vyplnění řádky v seznamech"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automaticky"
+  </dest>
+  <voice>
+    *: "Automatycky"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Zrušit časovač vypnutí"
+  </dest>
+  <voice>
+    *: "Zrušit časovač vypnutí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Výchozí doba časovače vypnutí"
+  </dest>
+  <voice>
+    *: "Výchozí doba časovače vypnutí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Aktivovat časovač vypnutí při startu přehrávače"
+  </dest>
+  <voice>
+    *: "Aktivovat časovač vypnutí při startu přehrávače"
   </voice>
 </phrase>
