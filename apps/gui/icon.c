@@ -176,19 +176,19 @@ void screen_put_cursorxy(struct screen * display, int x, int y, bool on)
 
 static int buflib_move_callback(int handle, void* current, void* new)
 {
-    (void)current;
+    (void)handle;
     (void)new;
     int i;
     FOR_NB_SCREENS(j)
     {
         for (i=0; i<Iconset_Count; i++)
         {
-            if (iconsets[i][j].handle == handle)
+            struct iconset *set = &iconsets[i][j];
+            if (set->bmp.data == current)
             {
-                if (iconsets[i][j].handle_locked > 0)
+                if (set->handle_locked > 0)
                     return BUFLIB_CB_CANNOT_MOVE;
-                ptrdiff_t diff = new - current;
-                iconsets[i][j].bmp.data += diff;
+                set->bmp.data = new;
                 return BUFLIB_CB_OK;
             }
         }
@@ -223,17 +223,16 @@ static void load_icons(const char* filename, enum Iconset iconset,
             return;
         }
         lseek(fd, 0, SEEK_SET);
-        ic->handle_locked = 1;
         ic->bmp.data = core_get_data(ic->handle);
 
+        ic->handle_locked = 1;
         size_read = read_bmp_fd(fd, &ic->bmp, buf_size, bmpformat, NULL);
-        if (size_read <= 0)
-        {
-            core_free(ic->handle);
-            return;
-        }
         ic->handle_locked = 0;
-        ic->loaded = true;
+
+        if (size_read <= 0)
+            ic->handle = core_free(ic->handle);
+        else
+            ic->loaded = true;
     }
 }
 
@@ -244,13 +243,15 @@ void icons_init(void)
     {
         for (i=0; i<Iconset_Count; i++)
         {
-            if (iconsets[i][j].loaded && iconsets[i][j].handle > 0)
+            struct iconset* set = &iconsets[i][j];
+            if (set->loaded && set->handle > 0)
             {
-                core_free(iconsets[i][j].handle);
-                iconsets[i][j].loaded = false;
+                set->handle = core_free(set->handle);
+                set->loaded = false;
             }
         }
     }
+
     load_icons(global_settings.icon_file, Iconset_user, SCREEN_MAIN);
     
     if (global_settings.viewers_icon_file[0] &&
