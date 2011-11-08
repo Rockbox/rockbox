@@ -189,7 +189,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
                         enum screen_type screen)
 {
     int size_read;
-    int bmpformat = (FORMAT_NATIVE|FORMAT_DITHER);
+    int bmpformat = (FORMAT_NATIVE|FORMAT_DITHER|FORMAT_TRANSPARENT);
     struct iconset *ic = &iconsets[iconset][screen];
     int fd;
     
@@ -216,6 +216,9 @@ static void load_icons(const char* filename, enum Iconset iconset,
         ic->handle_locked = 1;
         size_read = read_bmp_fd(fd, &ic->bmp, buf_size, bmpformat, NULL);
         ic->handle_locked = 0;
+
+        /* free unused alpha channel, if any */
+        core_shrink(ic->handle, ic->bmp.data, size_read);
 
         if (size_read <= 0)
             ic->handle = core_free(ic->handle);

@@ -1577,6 +1577,8 @@ static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char*
     close(fd);
     if (ret > 0)
     {
+        /* free unused alpha channel, if any */
+        core_shrink(handle, core_get_data(handle), ret);
         return handle;
     }
     else
