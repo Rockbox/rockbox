@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 	// sanity check
 	if (uiSize > sizeof(aImage) - uiStart || uiSize < 40000)
 	{	
-		printf("Error: Impossible image size &d bytes.\n", uiSize);
+		printf("Error: Impossible image size %d bytes.\n", uiSize);
 		exit(3);
 	}
 
