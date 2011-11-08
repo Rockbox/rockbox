@@ -668,6 +668,8 @@ static void output_row_8_transposed(uint32_t row, void * row_in,
 #endif
 }
 
+/* read_image_file() is called without FORMAT_TRANSPARENT so
+ * it's safe to ignore alpha channel in the next two functions */
 static void output_row_32_transposed(uint32_t row, void * row_in,
                                        struct scaler_context *ctx)
 {
@@ -678,7 +680,7 @@ static void output_row_32_transposed(uint32_t row, void * row_in,
     for (; dest < end; dest += ctx->bm->height)
         *dest = SC_OUT(*qp++, ctx);
 #else
-    struct uint32_rgb *qp = (struct uint32_rgb*)row_in;
+    struct uint32_argb *qp = (struct uint32_argb*)row_in;
     int r, g, b;
     for (; dest < end; dest += ctx->bm->height)
     {
@@ -697,7 +699,7 @@ static void output_row_32_transposed_fromyuv(uint32_t row, void * row_in,
 {
     pix_t *dest = (pix_t*)ctx->bm->data + row;
     pix_t *end = dest + ctx->bm->height * ctx->bm->width;
-    struct uint32_rgb *qp = (struct uint32_rgb*)row_in;
+    struct uint32_argb *qp = (struct uint32_argb*)row_in;
     for (; dest < end; dest += ctx->bm->height)
     {
         unsigned r, g, b, y, u, v;
