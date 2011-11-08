@@ -113,10 +113,11 @@ struct img_part {
 /* intermediate type used by the scaler for color output. greyscale version
    uses uint32_t
 */
-struct uint32_rgb {
+struct uint32_argb {
     uint32_t r;
     uint32_t g;
     uint32_t b;
+    uint32_t a;
 };
 #endif
 
