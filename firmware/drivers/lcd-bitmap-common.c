@@ -513,11 +513,13 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
 void LCDFN(bmp_part)(const struct bitmap* bm, int src_x, int src_y,
                                 int x, int y, int width, int height)
 {
-    if (bm->format == FORMAT_MONO)
-        LCDFN(mono_bitmap_part)((FBFN(data)*)(bm->data),
+#if LCDM(DEPTH) > 1
+    if (bm->format != FORMAT_MONO)
+        LCDFN(bitmap_part)((FBFN(data)*)(bm->data),
             src_x, src_y, THIS_STRIDE(bm->width, bm->height), x, y, width, height);
     else
-        LCDFN(bitmap_part)((FBFN(data)*)(bm->data),
+#endif
+        LCDFN(mono_bitmap_part)(bm->data,
             src_x, src_y, THIS_STRIDE(bm->width, bm->height), x, y, width, height);
 }
 
