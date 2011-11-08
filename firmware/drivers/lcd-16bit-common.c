@@ -515,3 +515,21 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
 #endif
     } while (--row);
 }
+
+/* Draw a partial bitmap (mono or native) including alpha channel */
+void ICODE_ATTR lcd_bmp_part(const struct bitmap* bm, int src_x, int src_y,
+                                int x, int y, int width, int height)
+{
+    int bitmap_stride = STRIDE_MAIN(bm->width, bm->height);
+    if (bm->format == FORMAT_MONO)
+        lcd_mono_bitmap_part(bm->data, src_x, src_y, bitmap_stride, x, y, width, height);
+    else
+        lcd_bitmap_transparent_part((fb_data*)bm->data,
+            src_x, src_y, bitmap_stride, x, y, width, height);
+}
+
+/* Draw a native bitmap with alpha channel */
+void ICODE_ATTR lcd_bmp(const struct bitmap *bmp, int x, int y)
+{
+    lcd_bmp_part(bmp, 0, 0, x, y, bmp->width, bmp->height);
+}

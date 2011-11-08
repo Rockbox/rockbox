@@ -216,6 +216,8 @@ extern void lcd_bitmap_remote_transparent(const fb_remote_data *src, int x,
 #define lcd_remote_mono_bitmap lcd_remote_bitmap
 #define lcd_remote_mono_bitmap_part lcd_remote_bitmap_part
 #endif /* LCD_REMOTE_DEPTH */
-
+extern void lcd_remote_bmp_part(const struct bitmap* bm, int src_x, int src_y,
+                            int x, int y, int width, int height);
+extern void lcd_remote_bmp(const struct bitmap* bm, int x, int y);
 #endif
 #endif /* __LCD_REMOTE_H__ */

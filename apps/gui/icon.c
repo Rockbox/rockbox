@@ -109,14 +109,11 @@ void screen_put_icon_with_offset(struct screen * display,
 void screen_put_iconxy(struct screen * display,
                        int xpos, int ypos, enum themable_icons icon)
 {
-    const void *data;
     const int screen = display->screen_type;
     const int width = ICON_WIDTH(screen);
     const int height = ICON_HEIGHT(screen);
     const int is_rtl = lang_is_rtl();
-    int stride;
     const struct bitmap *iconset;
-    screen_bitmap_part_func *draw_func = NULL;
     
     if (icon == Icon_NOICON)
     {
@@ -145,9 +142,6 @@ void screen_put_iconxy(struct screen * display,
     {
         iconset = &inbuilt_iconset[screen];
     }
-    data = iconset->data;
-    stride = STRIDE(display->screen_type, iconset->width, iconset->height);
-
     /* add some left padding to the icons if they are on the edge */
     if (xpos == 0)
         xpos++;
@@ -155,14 +149,8 @@ void screen_put_iconxy(struct screen * display,
     if (is_rtl)
         xpos = display->getwidth() - xpos - width;
 
-#if (LCD_DEPTH == 16) || defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH == 16)
-    if (display->depth == 16)
-        draw_func   = display->transparent_bitmap_part;
-    else
-#endif
-        draw_func   = display->bitmap_part;
 
-    draw_func(data, 0, height * icon, stride, xpos, ypos, width, height);
+    display->bmp_part(iconset, 0, height * icon, xpos, ypos, width, height);
 }
 
 void screen_put_cursorxy(struct screen * display, int x, int y, bool on)

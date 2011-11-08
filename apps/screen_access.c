@@ -197,6 +197,8 @@ struct screen screens[NB_SCREENS] =
         .transparent_bitmap=(screen_bitmap_func*)&lcd_bitmap_transparent,
         .transparent_bitmap_part=(screen_bitmap_part_func*)&lcd_bitmap_transparent_part,
 #endif
+        .bmp = &lcd_bmp,
+        .bmp_part = &lcd_bmp_part,
 #if LCD_DEPTH > 1
 #if defined(HAVE_LCD_COLOR) && defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1
         .color_to_native=&lcd_color_to_native,
@@ -296,6 +298,8 @@ struct screen screens[NB_SCREENS] =
         .transparent_bitmap_part=(screen_bitmap_part_func*)&lcd_remote_bitmap_part,
         /* No colour remotes yet */
 #endif
+        .bmp = &lcd_remote_bmp,
+        .bmp_part = &lcd_remote_bmp_part,
 #if LCD_REMOTE_DEPTH > 1
 #if defined(HAVE_LCD_COLOR)
         .color_to_native=&lcd_remote_color_to_native,

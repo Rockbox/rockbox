@@ -501,3 +501,29 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
 {
     LCDFN(puts_scroll_style_xyoffset)(x, y, string, style, x_offset, 0);
 }
+
+#if !defined(HAVE_LCD_COLOR) || !defined(MAIN_LCD)
+/* see lcd-16bit-common.c for others */
+#ifdef MAIN_LCD
+#define THIS_STRIDE STRIDE_MAIN
+#else
+#define THIS_STRIDE STRIDE_REMOTE
+#endif
+
+void LCDFN(bmp_part)(const struct bitmap* bm, int src_x, int src_y,
+                                int x, int y, int width, int height)
+{
+    if (bm->format == FORMAT_MONO)
+        LCDFN(mono_bitmap_part)((FBFN(data)*)(bm->data),
+            src_x, src_y, THIS_STRIDE(bm->width, bm->height), x, y, width, height);
+    else
+        LCDFN(bitmap_part)((FBFN(data)*)(bm->data),
+            src_x, src_y, THIS_STRIDE(bm->width, bm->height), x, y, width, height);
+}
+
+void LCDFN(bmp)(const struct bitmap* bm, int x, int y)
+{
+    LCDFN(bmp_part)(bm, 0, 0, x, y, bm->width, bm->height);
+}
+
+#endif

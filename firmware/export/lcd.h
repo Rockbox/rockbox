@@ -543,6 +543,9 @@ extern void lcd_bitmap_transparent_part(const fb_data *src,
                                         int height);
 extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
                                    int width, int height);
+extern void lcd_bmp_part(const struct bitmap* bm, int src_x, int src_y,
+                            int x, int y, int width, int height);
+extern void lcd_bmp(const struct bitmap* bm, int x, int y);
 #else /* LCD_DEPTH == 1 */
 #define lcd_mono_bitmap lcd_bitmap
 #define lcd_mono_bitmap_part lcd_bitmap_part

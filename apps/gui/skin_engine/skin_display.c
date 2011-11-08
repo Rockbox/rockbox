@@ -248,22 +248,8 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     if (pb->backdrop)
     {
         struct gui_img *img = pb->backdrop;
-        char *img_data = core_get_data(img->buflib_handle);
-#if LCD_DEPTH > 1
-        if(img->bm.format == FORMAT_MONO) {
-#endif
-            display->mono_bitmap_part(img_data,
-                                      0, 0, img->bm.width,
-                                      x, y, width, height);
-#if LCD_DEPTH > 1
-        } else {
-            display->transparent_bitmap_part((fb_data *)img_data,
-                                             0, 0,
-                                             STRIDE(display->screen_type,
-                                             img->bm.width, img->bm.height),
-                                             x, y, width, height);
-        }
-#endif
+        img->bm.data = core_get_data(img->buflib_handle);
+        display->bmp_part(&img->bm, 0, 0, x, y, width, height);
         flags |= DONT_CLEAR_EXCESS;
     }
     
@@ -287,7 +273,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         int xoff = 0, yoff = 0;
         int w = width, h = height;
         struct gui_img *img = pb->slider;
-        char *img_data = core_get_data(img->buflib_handle);
+        img->bm.data = core_get_data(img->buflib_handle);
 
         if (flags&HORIZONTAL)
         {
@@ -305,21 +291,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
                 yoff = height - yoff;
             yoff -= h / 2;
         }
-#if LCD_DEPTH > 1
-        if(img->bm.format == FORMAT_MONO) {
-#endif
-            display->mono_bitmap_part(img_data,
-                                      0, 0, img->bm.width,
-                                      x + xoff, y + yoff, w, h);
-#if LCD_DEPTH > 1
-        } else {
-            display->transparent_bitmap_part((fb_data *)img_data,
-                                             0, 0,
-                                             STRIDE(display->screen_type,
-                                             img->bm.width, img->bm.height),
-                                             x + xoff, y + yoff, w, h);
-        }
-#endif
+        display->bmp_part(&img->bm, 0, 0, x + xoff, y + yoff, w, h);
     }
 
     if (pb->type == SKIN_TOKEN_PROGRESSBAR)
@@ -357,30 +329,14 @@ void clear_image_pos(struct gui_wps *gwps, struct gui_img *img)
 void wps_draw_image(struct gui_wps *gwps, struct gui_img *img, int subimage)
 {
     struct screen *display = gwps->display;
-    char *img_data = core_get_data(img->buflib_handle);
+    img->bm.data = core_get_data(img->buflib_handle);
     if(img->always_display)
         display->set_drawmode(DRMODE_FG);
     else
         display->set_drawmode(DRMODE_SOLID);
 
-#if LCD_DEPTH > 1
-    if(img->bm.format == FORMAT_MONO) {
-#endif
-        display->mono_bitmap_part(img_data,
-                                  0, img->subimage_height * subimage,
-                                  img->bm.width, img->x,
-                                  img->y, img->bm.width,
-                                  img->subimage_height);
-#if LCD_DEPTH > 1
-    } else {
-        display->transparent_bitmap_part((fb_data *)img_data,
-                                         0, img->subimage_height * subimage,
-                                         STRIDE(display->screen_type,
-                                            img->bm.width, img->bm.height),
-                                         img->x, img->y, img->bm.width,
-                                         img->subimage_height);
-    }
-#endif
+    display->bmp_part(&img->bm, 0, img->subimage_height * subimage,
+                      img->x, img->y, img->bm.width, img->subimage_height);
 }
 
 

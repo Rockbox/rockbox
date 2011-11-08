@@ -234,18 +234,7 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap *bm, int x,
     else if (bm->height < starty + height)
         height = bm->height - starty;
 
-#if LCD_DEPTH > 1
-    if (bm->format == FORMAT_MONO)
-#endif
-        screen->mono_bitmap_part(bm->data, startx, starty,
-                                 bm->width, x, y, width, height);
-#if LCD_DEPTH > 1
-    else
-        screen->transparent_bitmap_part((fb_data *)bm->data, startx, starty,
-                                        STRIDE(screen->screen_type, 
-                                            bm->width, bm->height), 
-                                        x, y, width, height);
-#endif
+    screen->bmp_part(bm, startx, starty, x, y, width, height);
 }
 
 void show_busy_slider(struct screen *s, int x, int y, int width, int height)
