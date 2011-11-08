@@ -494,9 +494,6 @@ int read_bmp_fd(int fd,
     defined(PLUGIN)
     bool dither = false;
 #endif
-#if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
-    defined(HAVE_BMP_SCALING) || defined(PLUGIN)
-    unsigned int resize = IMG_NORESIZE;
 
 #ifdef HAVE_REMOTE_LCD
     bool remote = false;
@@ -507,6 +504,10 @@ int read_bmp_fd(int fd,
 #endif
     }
 #endif /* HAVE_REMOTE_LCD */
+
+#if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
+    defined(HAVE_BMP_SCALING) || defined(PLUGIN)
+    unsigned int resize = IMG_NORESIZE;
 
     if (format & FORMAT_RESIZE) {
         resize = IMG_RESIZE;
