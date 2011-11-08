@@ -82,7 +82,7 @@ int screen_helper_getuifont(void)
 #ifdef HAVE_LCD_BITMAP
     return global_status.font_id[SCREEN_MAIN];
 #else
-    return FONT_SYSFIXED;
+    return -1;
 #endif
 }
 
