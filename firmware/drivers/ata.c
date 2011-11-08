@@ -861,7 +861,9 @@ void ata_spin(void)
 
 static void ata_thread(void)
 {
+#ifdef HAVE_ATA_POWER_OFF
     static long last_sleep = 0;
+#endif
     struct queue_event ev;
 #ifdef ALLOW_USB_SPINDOWN
     static bool usb_mode = false;
@@ -899,7 +901,9 @@ static void ata_thread(void)
                         }
                         mutex_lock(&ata_mtx);
                         ata_perform_sleep();
+#ifdef HAVE_ATA_POWER_OFF
                         last_sleep = current_tick;
+#endif
                         mutex_unlock(&ata_mtx);
                     }
                 }
