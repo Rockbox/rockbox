@@ -265,8 +265,8 @@ void gui_usb_screen_run(bool early_usb)
 #ifdef HAVE_LCD_BITMAP
         FOR_NB_SCREENS(i)
         {
-            font_unload(global_status.font_id[i]);
-            global_status.font_id[i] = -1;
+            font_unload(screens[i].getuifont());
+            screens[i].setuifont(FONT_SYSFIXED);
         }
         skin_unload_all();
 #endif

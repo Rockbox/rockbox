@@ -128,7 +128,7 @@ struct viewport *sb_skin_get_info_vp(enum screen_type screen)
     if (!vp)
         return NULL;
     if (vp->parsed_fontid == 1)
-        vp->vp.font = global_status.font_id[screen];
+        vp->vp.font = screens[screen].getuifont();
     return &vp->vp;
 }
 

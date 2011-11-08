@@ -424,13 +424,10 @@ static void ft_load_font(char *file)
     set_file(file, (char *)global_settings.font_file, MAX_FILENAME);
 #endif
     splash(0, ID2P(LANG_WAIT));
-    current_font_id = global_status.font_id[screen];
+    current_font_id = screens[screen].getuifont();
     if (current_font_id >= 0)
         font_unload(current_font_id);
-    current_font_id = font_load(file);
-    if(screen==SCREEN_MAIN)
-        font_set_ui(current_font_id);
-    global_status.font_id[screen] = current_font_id;
+    screens[screen].setuifont(font_load(file));
     viewportmanager_theme_changed(THEME_UI_VIEWPORT);
 }    
 #endif

@@ -55,7 +55,7 @@ enum {
 
 /* SYSFONT, FONT_UI, FONT_UI_REMOTE + MAXUSERFONTS fonts in skins */
 #define MAXFONTS (FONT_FIRSTUSERFONT + MAXUSERFONTS)
-#define FONT_UI MAXUSERFONTS
+#define FONT_UI MAXFONTS
 
 /*
  * .fnt loadable font file format definition
@@ -124,9 +124,6 @@ int font_glyphs_to_bufsize(const char *path, int glyphs);
 void font_unload(int font_id);
 void font_unload_all(void);
 void font_lock(int font_id, bool lock);
-/* set the default UI font */
-void font_set_ui(int font_id);
-int  font_get_ui(void);
 
 struct font* font_get(int font);
 

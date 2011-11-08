@@ -720,7 +720,7 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
                                 (touchscreen_get_mode() == TOUCHSCREEN_POINT));
 #endif
 
-    pm->curfont = pm->default_lines ? FONT_SYSFIXED : FONT_UI;
+    pm->curfont = pm->default_lines ? FONT_SYSFIXED : sc->getuifont();
     font = font_get(pm->curfont);
     pm->font_h = font->height;
 

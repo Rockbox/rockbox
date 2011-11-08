@@ -1435,7 +1435,7 @@ static void bubbles_drawboard(struct game_context* bb) {
 
     /* clear screen */
     rb->lcd_clear_display();
-    int font = rb->screens[SCREEN_MAIN]->getfont();
+    int font = rb->screens[SCREEN_MAIN]->getuifont();
     h = rb->font_get(font)->height + 1;
     /* draw background */
 #ifdef HAVE_LCD_COLOR

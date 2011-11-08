@@ -77,6 +77,24 @@ void screen_helper_setfont(int font)
 #endif
 }
 
+int screen_helper_getuifont(void)
+{
+#ifdef HAVE_LCD_BITMAP
+    return global_status.font_id[SCREEN_MAIN];
+#else
+    return FONT_SYSFIXED;
+#endif
+}
+
+void screen_helper_setuifont(int font)
+{
+#ifdef HAVE_LCD_BITMAP
+    global_status.font_id[SCREEN_MAIN] = font;
+#else
+    (void)font;
+#endif
+}
+
 #if NB_SCREENS == 2
 static int screen_helper_remote_getcharwidth(void)
 {
@@ -116,6 +134,23 @@ void screen_helper_remote_setfont(int font)
         font = global_status.font_id[SCREEN_REMOTE];
     lcd_remote_setfont(font);
 }
+
+int screen_helper_remote_getuifont(void)
+{
+#ifdef HAVE_LCD_BITMAP
+    return global_status.font_id[SCREEN_REMOTE];
+#else
+    return FONT_SYSFIXED;
+#endif
+}
+
+void screen_helper_remote_setuifont(int font)
+{
+#ifdef HAVE_LCD_BITMAP
+    global_status.font_id[SCREEN_REMOTE] = font;
+#endif
+}
+
 #endif
 
 struct screen screens[NB_SCREENS] =
@@ -147,7 +182,8 @@ struct screen screens[NB_SCREENS] =
         .getstringsize=&lcd_getstringsize,
 #ifdef HAVE_LCD_BITMAP
         .setfont=screen_helper_setfont,
-        .getfont=&lcd_getfont,
+        .getuifont=screen_helper_getuifont,
+        .setuifont=screen_helper_setuifont,
         .mono_bitmap=&lcd_mono_bitmap,
         .mono_bitmap_part=&lcd_mono_bitmap_part,
         .set_drawmode=&lcd_set_drawmode,
@@ -246,8 +282,9 @@ struct screen screens[NB_SCREENS] =
         .getheight=&lcd_remote_getheight,
         .getstringsize=&lcd_remote_getstringsize,
 #if 1 /* all remote LCDs are bitmapped so far */
-        .setfont=screen_helper_setfont,
-        .getfont=&lcd_remote_getfont,
+        .setfont=screen_helper_remote_setfont,
+        .getuifont=screen_helper_remote_getuifont,
+        .setuifont=screen_helper_remote_setuifont,
         .mono_bitmap=&lcd_remote_mono_bitmap,
         .mono_bitmap_part=&lcd_remote_mono_bitmap_part,
         .bitmap=(screen_bitmap_func*)&lcd_remote_bitmap,

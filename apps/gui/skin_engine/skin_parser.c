@@ -246,10 +246,12 @@ static int parse_statusbar_tags(struct skin_element* element,
             viewport_set_fullscreen(&default_vp->vp, curr_screen);
         }
 #ifdef HAVE_REMOTE_LCD
-        /* viewport_set_defaults() sets the font to FONT_UI+curr_screen.
-         * This parser requires font 1 to always be the UI font, 
-         * so force it back to FONT_UI and handle the screen number at the end */
-        default_vp->vp.font = FONT_UI;
+        /* This parser requires viewports which will use the settings font to
+         * have font == 1, but the above viewport_set() calls set font to
+         * the current real font id. So force 1 here it will be set correctly
+         * at the end
+         */
+        default_vp->vp.font = 1;
 #endif
     }
     return 0;
@@ -1645,7 +1647,7 @@ static bool skin_load_fonts(struct wps_data *data)
         font_id = skin_vp->parsed_fontid;
         if (font_id == 1)
         {   /* the usual case -> built-in fonts */
-            vp->font = global_status.font_id[curr_screen];
+            vp->font = screens[curr_screen].getuifont();
             continue;
         }
         else if (font_id <= 0)

@@ -876,37 +876,38 @@ void settings_apply(bool read_disk)
         /* fonts need to be loaded before the WPS */
         if (global_settings.font_file[0]
             && global_settings.font_file[0] != '-') {
-            const char* loaded_font = font_filename(global_status.font_id[SCREEN_MAIN]);
+            int font_ui = screens[SCREEN_MAIN].getuifont();
+            const char* loaded_font = font_filename(font_ui);
             
             snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.font_file);
             if (!loaded_font || strcmp(loaded_font, buf))
             {
                 CHART2(">font_load ", global_settings.font_file);
-                if (global_status.font_id[SCREEN_MAIN] >= 0)
-                    font_unload(global_status.font_id[SCREEN_MAIN]);
+                if (font_ui >= 0)
+                    font_unload(font_ui);
                 rc = font_load(buf);
-                font_set_ui(rc);
                 CHART2("<font_load ", global_settings.font_file);
-                global_status.font_id[SCREEN_MAIN] = rc;
-                lcd_setfont(rc);
+                screens[SCREEN_MAIN].setuifont(rc);
+                screens[SCREEN_MAIN].setfont(rc);
             }
         }
 #ifdef HAVE_REMOTE_LCD        
         if ( global_settings.remote_font_file[0]
             && global_settings.remote_font_file[0] != '-') {
-            const char* loaded_font = font_filename(global_status.font_id[SCREEN_REMOTE]);
+            int font_ui = screens[SCREEN_REMOTE].getuifont();
+            const char* loaded_font = font_filename(font_ui);
             snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.remote_font_file);
             if (!loaded_font || strcmp(loaded_font, buf))
             {
                 CHART2(">font_load_remoteui ", global_settings.remote_font_file);
-                if (global_status.font_id[SCREEN_REMOTE] >= 0)
-                    font_unload(global_status.font_id[SCREEN_REMOTE]);
+                if (font_ui >= 0)
+                    font_unload(font_ui);
                 rc = font_load(buf);
                 CHART2("<font_load_remoteui ", global_settings.remote_font_file);
-                global_status.font_id[SCREEN_REMOTE] = rc;
-                lcd_remote_setfont(rc);
+                screens[SCREEN_REMOTE].setuifont(rc);
+                screens[SCREEN_REMOTE].setfont(rc);
             }
         }
 #endif
@@ -1076,10 +1077,11 @@ void settings_reset(void)
 #ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
     {
-        if (global_status.font_id[i] > FONT_SYSFIXED)
+        if (screens[i].getuifont() > FONT_SYSFIXED)
         {
-            font_unload(global_status.font_id[i]);
-            global_status.font_id[i] = FONT_SYSFIXED;
+            font_unload(screens[i].getuifont());
+            screens[i].setuifont(FONT_SYSFIXED);
+            screens[i].setfont(FONT_SYSFIXED);
         }
     }
 #endif

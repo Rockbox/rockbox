@@ -71,7 +71,8 @@ struct screen
     int (*getstringsize)(const unsigned char *str, int *w, int *h);
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
     void (*setfont)(int newfont);
-    int (*getfont)(void);
+    int (*getuifont)(void);
+    void (*setuifont)(int newfont);
 
     void (*scroll_step)(int pixels);
     void (*puts_style_offset)(int x, int y, const unsigned char *str,

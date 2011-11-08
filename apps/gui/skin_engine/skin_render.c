@@ -658,7 +658,7 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
 
     /* fix font ID's */
     if (skin_viewport->parsed_fontid == 1)
-        skin_viewport->vp.font = global_status.font_id[display->screen_type];
+        skin_viewport->vp.font = display->getuifont();
 #endif
     
     while (line)

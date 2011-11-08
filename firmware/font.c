@@ -88,7 +88,6 @@ struct buflib_alloc_data {
 };
 static int buflib_allocations[MAXFONTS];
 
-static int font_ui = -1;
 static int cache_fd;
 static struct font* cache_pf;
 
@@ -560,7 +559,7 @@ int font_load_ex(const char *path, size_t buffer_size)
         
     lock_font_handle(handle, false);
     buflib_allocations[font_id] = handle;
-    //printf("%s -> [%d] -> %d\n", path, font_id, handle);
+    //printf("%s -> [%d] -> %d\n", path, font_id, *handle);
     return font_id; /* success!*/
 }
 int font_load(const char *path)
@@ -617,52 +616,28 @@ void font_unload_all(void)
 
 /*
  * Return a pointer to an incore font structure.
- * Return the requested font, font_ui, or sysfont
+ * If the requested font isn't loaded/compiled-in,
+ * decrement the font number and try again.
  */
-struct font* font_get(int font_id)
+struct font* font_get(int font)
 {
-    struct buflib_alloc_data *alloc;
-    struct font *pf;
-    int handle, id=-1;
-
-    if( font_id == FONT_UI )
-        id = font_ui;
-
-    if( font_id == FONT_SYSFIXED )
+    struct font* pf;
+    if (font == FONT_UI)
+        font = MAXFONTS-1;
+    if (font <= FONT_SYSFIXED)
         return &sysfont;
-    
-    if( id == -1 )
-        id = font_id;
-    
-    handle = buflib_allocations[id];
-    if( handle > 0 )
-    {
-        alloc =  core_get_data(buflib_allocations[id]);
-        pf=&alloc->font;
-        if( pf && pf->height )
-            return pf;
+
+    while (1) {
+        if (buflib_allocations[font] > 0)
+        {
+            struct buflib_alloc_data *alloc = core_get_data(buflib_allocations[font]);
+            pf = &alloc->font;
+            if (pf && pf->height)
+                return pf;
+        }
+        if (--font < 0)
+            return &sysfont;
     }
-    handle = buflib_allocations[font_ui];
-    if( handle > 0 )
-    {
-        alloc = core_get_data(buflib_allocations[font_ui]);
-        pf=&alloc->font;
-        if( pf && pf->height )
-            return pf;
-    }
-
-    return &sysfont;
-}
-
-void font_set_ui( int font_id )
-{
-    font_ui = font_id;
-    return;
-}
-
-int font_get_ui()
-{
-    return font_ui;
 }
 
 static int pf_to_handle(struct font* pf)
@@ -1003,18 +978,6 @@ struct font* font_get(int font)
     (void)font;
     return &sysfont;
 }
-
-void font_set_ui(int font_id)
-{
-    (void)font_id;
-    return;
-}
-
-int font_get_ui()
-{
-    return FONT_SYSFIXED;
-}
-
 
 /*
  * Returns width of character
