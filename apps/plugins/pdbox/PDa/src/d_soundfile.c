@@ -682,25 +682,27 @@ static int create_soundfile(t_canvas *canvas, const char *filename,
     else if (filetype == FORMAT_AIFF)
     {
     	long datasize = nframes * nchannels * bytespersamp;
-	long longtmp;
-	static unsigned char dogdoo[] =
-	    {0x40, 0x0e, 0xac, 0x44, 0, 0, 0, 0, 0, 0, 'S', 'S', 'N', 'D'};
+        long longtmp;
+        t_datachunk *aiffdc = (t_datachunk *)headerbuf + sizeof(t_aiff);
+        static unsigned char AIFF_splrate[] = {0x40, 0x0e, 0xac, 0x44, 0, 0, 0, 0, 0, 0};
+        static unsigned char datachunk_ID[] = {'S', 'S', 'N', 'D'};
     	if (strcmp(filenamebuf + strlen(filenamebuf)-4, ".aif") &&
-	    strcmp(filenamebuf + strlen(filenamebuf)-5, ".aiff"))
-    	    	strcat(filenamebuf, ".aif");
+            strcmp(filenamebuf + strlen(filenamebuf)-5, ".aiff"))
+    	    strcat(filenamebuf, ".aif");
     	strncpy(aiffhdr->a_fileid, "FORM", 4);
     	aiffhdr->a_chunksize = swap4(datasize + sizeof(*aiffhdr) + 4, swap);
     	strncpy(aiffhdr->a_aiffid, "AIFF", 4);
     	strncpy(aiffhdr->a_fmtid, "COMM", 4);
     	aiffhdr->a_fmtchunksize = swap4(18, swap);
     	aiffhdr->a_nchannels = swap2(nchannels, swap);
-	longtmp = swap4(nframes, swap);
-	memcpy(&aiffhdr->a_nframeshi, &longtmp, 4);
+        longtmp = swap4(nframes, swap);
+        memcpy(&aiffhdr->a_nframeshi, &longtmp, 4);
     	aiffhdr->a_bitspersamp = swap2(8 * bytespersamp, swap);
-    	memcpy(aiffhdr->a_samprate, dogdoo, sizeof(dogdoo));
-	longtmp = swap4(datasize, swap);
-	memcpy(aiffhdr->a_samprate + sizeof(dogdoo), &longtmp, 4);
-	headersize = AIFFPLUS;
+        memcpy(aiffhdr->a_samprate, AIFF_splrate, sizeof(AIFF_splrate));
+        memcpy(aiffdc->dc_id, datachunk_ID, sizeof(datachunk_ID));
+        longtmp = swap4(datasize, swap);
+        memcpy(&aiffdc->dc_size, &longtmp, 4);
+        headersize = AIFFPLUS;
     }
     else    /* WAVE format */
     {
