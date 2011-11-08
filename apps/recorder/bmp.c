@@ -173,6 +173,7 @@ static inline void set_rgb_union(struct uint8_rgb *dst, union rgb_union src)
     dst->red = src.red;
     dst->green = src.green;
     dst->blue = src.blue;
+    dst->alpha = 0xff;
 }
 
 struct bmp_args {
@@ -189,6 +190,9 @@ struct bmp_args {
     int cur_col;
     struct img_part part;
 #endif
+    /* as read_part_line() goes through the rows it'll set this to true
+     * if it finds transparency. Initialize to false before calling */
+    bool alpha_detected;
 };
 
 static unsigned int read_part_line(struct bmp_args *ba)
@@ -233,6 +237,7 @@ static unsigned int read_part_line(struct bmp_args *ba)
 #endif
         return 0;
     }
+
     while (ibuf < ba->buf + (BM_MAX_WIDTH << 2))
     {
         switch (depth)
@@ -274,6 +279,7 @@ static unsigned int read_part_line(struct bmp_args *ba)
             component = data & 0xf8;
             component |= component >> 5;
             buf->red = component;
+            buf->alpha = 0xff;
             buf++;
             ibuf += 2;
             break;
@@ -282,13 +288,12 @@ static unsigned int read_part_line(struct bmp_args *ba)
             buf->blue = *ibuf++;
             buf->green = *ibuf++;
             buf->red = *ibuf++;
-            if (depth == 32)
-                ibuf++;
+            buf->alpha = (depth == 32) ? *ibuf++ : 0xff;
+            if (buf->alpha != 0xff) ba->alpha_detected = true;
             buf++;
             break;
         }
     }
-
 #if !defined(HAVE_LCD_COLOR) && \
     ((LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) || \
     defined(PLUGIN))
@@ -422,41 +427,40 @@ void output_row_8_native(uint32_t row, void * row_in,
                 }
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-                /* M:Robe 500 */
-                (void) fb_width;
-                fb_data *dest = (fb_data *)ctx->bm->data + row;
+                /* iriver h300, colour iPods, X5 */
+                (void)fb_width;
+                fb_data *dest = STRIDE_MAIN((fb_data *)ctx->bm->data + fb_width * row,
+                                            (fb_data *)ctx->bm->data + row);
                 int delta = 127;
-                unsigned r, g, b;
+                unsigned r, g, b;                
+                /* setup alpha channel buffer */
+                unsigned char *bm_alpha = NULL;
+                if (ctx->bm->alpha_offset > 0)
+                    bm_alpha = ctx->bm->data + ctx->bm->alpha_offset;
+                if (bm_alpha)
+                    bm_alpha += ctx->bm->width*row/2;
+
                 for (col = 0; col < ctx->bm->width; col++) {
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
                     r = qp->red;
                     g = qp->green;
-                    b = (qp++)->blue;
+                    b = qp->blue;
                     r = (31 * r + (r >> 3) + delta) >> 8;
                     g = (63 * g + (g >> 2) + delta) >> 8;
                     b = (31 * b + (b >> 3) + delta) >> 8;
                     *dest = LCD_RGBPACK_LCD(r, g, b);
-                    dest += ctx->bm->height;
+                    dest += STRIDE_MAIN(1, ctx->bm->height);
+                    if (bm_alpha) {
+                        /* pack alpha channel for 2 pixels into 1 byte */
+                        unsigned alpha = 255-qp->alpha;
+                        if (col%2)
+                            *bm_alpha++ |= alpha&0xf0;
+                        else
+                            *bm_alpha = alpha>>4;
+                    }
+                    qp++;
                 }
-#else
-                /* iriver h300, colour iPods, X5 */
-                fb_data *dest = (fb_data *)ctx->bm->data + fb_width * row;
-                int delta = 127;
-                unsigned r, g, b;
-                for (col = 0; col < ctx->bm->width; col++) {
-                    if (ctx->dither)
-                        delta = DITHERXDY(col,dy);
-                    r = qp->red;
-                    g = qp->green;
-                    b = (qp++)->blue;
-                    r = (31 * r + (r >> 3) + delta) >> 8;
-                    g = (63 * g + (g >> 2) + delta) >> 8;
-                    b = (31 * b + (b >> 3) + delta) >> 8;
-                    *dest++ = LCD_RGBPACK_LCD(r, g, b);
-                }
-#endif
 #endif /* LCD_DEPTH */
 }
 #endif
@@ -480,6 +484,7 @@ int read_bmp_fd(int fd,
     int depth, numcolors, compression, totalsize;
     int ret;
     bool return_size = format & FORMAT_RETURN_SIZE;
+    bool read_alpha = format & FORMAT_TRANSPARENT;
 
     unsigned char *bitmap = bm->data;
     struct uint8_rgb palette[256];
@@ -608,8 +613,14 @@ int read_bmp_fd(int fd,
 
     if (cformat)
         totalsize = cformat->get_size(bm);
-    else
+    else {
         totalsize = BM_SIZE(bm->width,bm->height,format,remote);
+#ifdef HAVE_REMOTE_LCD
+        if (!remote)
+#endif
+            if (depth == 32 && read_alpha) /* account for possible 4bit alpha per pixel */
+                totalsize += bm->width * bm->height / 2;
+    }
 
     if(return_size)
     {
@@ -704,13 +715,21 @@ int read_bmp_fd(int fd,
 
     memset(bitmap, 0, totalsize);
 
+#ifdef HAVE_LCD_COLOR
+    if (read_alpha && depth == 32)
+        bm->alpha_offset = totalsize - (bm->width * bm->height / 2);
+    else
+        bm->alpha_offset = 0;
+#endif
+
     struct bmp_args ba = {
         .fd = fd, .padded_width = padded_width, .read_width = read_width,
         .width = src_dim.width, .depth = depth, .palette = palette,
 #if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
     defined(HAVE_BMP_SCALING) || defined(PLUGIN)
-        .cur_row = 0, .cur_col = 0, .part = {0,0}
+        .cur_row = 0, .cur_col = 0, .part = {0,0},
 #endif
+        .alpha_detected = false,
     };
 
 #if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
@@ -759,7 +778,6 @@ int read_bmp_fd(int fd,
             return -6;
     }
 #endif
-
     int row;
     /* loop to read rows and put them to buffer */
     for (row = rset.rowstart; row != rset.rowstop; row += rset.rowstep) {
@@ -858,5 +876,14 @@ int read_bmp_fd(int fd,
         }
 #endif
     }
+#ifdef HAVE_LCD_COLOR
+    if (!ba.alpha_detected)
+    {   /* if this has an alpha channel, totalsize accounts for it as well
+         * subtract if no actual alpha information was found */
+        if (bm->alpha_offset > 0)
+            totalsize -= bm->width*bm->height/2;
+        bm->alpha_offset = 0;
+    }
+#endif
     return totalsize; /* return the used buffer size. */
 }

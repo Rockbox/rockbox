@@ -229,7 +229,6 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
     lcd_mono_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
-/* draw alpha bitmap for anti-alias font */
 #define ALPHA_COLOR_FONT_DEPTH 2
 #define ALPHA_COLOR_LOOKUP_SHIFT (1 << ALPHA_COLOR_FONT_DEPTH)
 #define ALPHA_COLOR_LOOKUP_SIZE ((1 << ALPHA_COLOR_LOOKUP_SHIFT) - 1)
@@ -285,11 +284,17 @@ static inline unsigned blend_color(unsigned c, unsigned a)
     return blend_two_colors(c, current_vp->fg_pattern, a);
 }
 
-void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
-                                      int src_y, int stride, int x, int y,
-                                      int width, int height)
+/* Blend an image with an alpha channel
+ * if image is NULL, drawing will happen according to the drawmode
+ * src is the alpha channel (4bit per pixel) */
+static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
+                                      const unsigned char *src, int src_x,
+                                      int src_y, int x, int y,
+                                      int width, int height,
+                                      int stride_image, int stride_src)
 {
     fb_data *dst, *dst_row;
+    const fb_data *image_row;
     unsigned dmask = 0x00000000;
     int drmode = current_vp->drawmode;
     /* nothing to draw? */
@@ -356,13 +361,22 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
     {
         dmask = ~dmask;
     }
+    /* sourcing from an image ignore drawmode.
+     * Set to DRMODE_BG as we use its code path in the switch below */
+    if (image != NULL)
+    {
+        dmask = 0;
+        drmode = DRMODE_BG;
+    }
 
     dst_row = LCDADDR(x, y);
 
     int col, row = height;
     unsigned data, pixels;
-    unsigned skip_end = (stride - width);
-    unsigned skip_start = src_y * stride + src_x;
+    unsigned skip_end = (stride_src - width);
+    unsigned skip_start = src_y * stride_src + src_x;
+    unsigned skip_start_image = STRIDE_MAIN(src_y * stride_image + src_x,
+                                            src_x * stride_image + src_y);
 
 #ifdef ALPHA_BITMAP_READ_WORDS
     uint32_t *src_w = (uint32_t *)((uintptr_t)src & ~3);
@@ -379,6 +393,9 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
 #ifdef ALPHA_BITMAP_READ_WORDS
     pixels = 8 - pixels;
 #endif
+    if (image)
+        image += skip_start_image;
+    image_row = image;
 
     /* go through the rows and update each pixel */
     do
@@ -386,6 +403,12 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
         col = width;
         dst = dst_row;
         dst_row += ROW_INC;
+        if (image_row) {
+            image = image_row;
+            image_row += STRIDE_MAIN(stride_image,1);
+        }
+        else
+            image = dst;
 #ifdef ALPHA_BITMAP_READ_WORDS
 #define UPDATE_SRC_ALPHA    do { \
             if (--pixels) \
@@ -431,10 +454,11 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
                     uintptr_t bo = lcd_backdrop_offset;
                     do
                     {
-                        *dst = blend_two_colors(*dst, *(fb_data *)((uintptr_t)dst + bo),
-                                    data & ALPHA_COLOR_LOOKUP_SIZE );
+                        *dst = blend_two_colors(*(fb_data *)((uintptr_t)dst + bo),
+                                    *image, data & ALPHA_COLOR_LOOKUP_SIZE );
 
                         dst += COL_INC;
+                        image += STRIDE_MAIN(1, stride_image);
                         UPDATE_SRC_ALPHA;
                     }
                     while (--col);
@@ -443,9 +467,10 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
                 {
                     do
                     {
-                        *dst = blend_two_colors(*dst, current_vp->bg_pattern,
-                                    data & ALPHA_COLOR_LOOKUP_SIZE );
+                        *dst = blend_two_colors(current_vp->bg_pattern,
+                                    *image, data & ALPHA_COLOR_LOOKUP_SIZE );
                         dst += COL_INC;
+                        image += STRIDE_MAIN(1, stride_image);
                         UPDATE_SRC_ALPHA;
                     }
                     while (--col);
@@ -516,6 +541,15 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
     } while (--row);
 }
 
+
+/* draw alpha bitmap for anti-alias font */
+void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
+                                      int src_y, int stride, int x, int y,
+                                      int width, int height)
+{
+    lcd_alpha_bitmap_part_mix(NULL, src, src_x, src_y, x, y, width, height, 0, stride);
+}
+
 /* Draw a partial bitmap (mono or native) including alpha channel */
 void ICODE_ATTR lcd_bmp_part(const struct bitmap* bm, int src_x, int src_y,
                                 int x, int y, int width, int height)
@@ -523,6 +557,10 @@ void ICODE_ATTR lcd_bmp_part(const struct bitmap* bm, int src_x, int src_y,
     int bitmap_stride = STRIDE_MAIN(bm->width, bm->height);
     if (bm->format == FORMAT_MONO)
         lcd_mono_bitmap_part(bm->data, src_x, src_y, bitmap_stride, x, y, width, height);
+    else if (bm->alpha_offset > 0)
+        lcd_alpha_bitmap_part_mix((fb_data*)bm->data, bm->data+bm->alpha_offset,
+            src_x, src_y, x, y, width, height,
+            bitmap_stride, bm->width);
     else
         lcd_bitmap_transparent_part((fb_data*)bm->data,
             src_x, src_y, bitmap_stride, x, y, width, height);

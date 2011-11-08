@@ -468,6 +468,9 @@ struct bitmap {
     int format;
     unsigned char *maskdata;
 #endif
+#ifdef HAVE_LCD_COLOR
+    int alpha_offset; /* byte-offset of alpha channel in data */
+#endif
     unsigned char *data;
 };
 
