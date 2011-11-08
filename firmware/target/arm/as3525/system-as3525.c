@@ -224,6 +224,8 @@ void system_init(void)
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 #endif
 
+    CGU_PERI &= ~(1<<24);   /*disable built in boot rom clock*/
+
     /* bits 31:30 should be set to 0 in arm926-ejs */
     asm volatile(
         "mrc p15, 0, r0, c1, c0   \n"      /* control register */
