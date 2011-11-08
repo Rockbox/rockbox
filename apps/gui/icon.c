@@ -23,6 +23,7 @@
 #include <string.h>
 #include "inttypes.h"
 #include "config.h"
+#include "core_alloc.h"
 #include "icon.h"
 #include "screen_access.h"
 #include "icons.h"
@@ -39,15 +40,6 @@
 /* These are just the file names, the full path is snprint'ed when used */
 #define DEFAULT_VIEWER_BMP          "viewers"
 #define DEFAULT_REMOTE_VIEWER_BMP   "remote_viewers"
-
-/* These can be defined in config-<target>.h, if it is not provide defaults */
-#if !defined(MAX_ICON_HEIGHT)
-#define MAX_ICON_HEIGHT 24
-#endif
-
-#if !defined(MAX_ICON_WIDTH)
-#define MAX_ICON_WIDTH 24
-#endif
 
 /* We dont actually do anything with these pointers,
    but they need to be grouped like this to save code
@@ -68,23 +60,25 @@ static const struct bitmap inbuilt_iconset[NB_SCREENS] =
 #endif
 };
 
-#define IMG_BUFSIZE (MAX_ICON_HEIGHT * MAX_ICON_WIDTH * \
-                     Icon_Last_Themeable *LCD_DEPTH/8)
-static unsigned char icon_buffer[NB_SCREENS][IMG_BUFSIZE];
-static bool custom_icons_loaded[NB_SCREENS] = {false};
-static struct bitmap user_iconset[NB_SCREENS];
+enum Iconset {
+    Iconset_user,
+    Iconset_viewers,
+    Iconset_Count
+};
 
-static unsigned char viewer_icon_buffer[NB_SCREENS][IMG_BUFSIZE];
-static bool viewer_icons_loaded[NB_SCREENS] = {false};
-static struct bitmap viewer_iconset[NB_SCREENS];
+struct iconset {
+    struct bitmap bmp;
+    bool loaded;
+    int handle;
+    int handle_locked;
+} iconsets[Iconset_Count][NB_SCREENS];
 
-
-#define ICON_HEIGHT(screen) (!custom_icons_loaded[screen]?       \
-                             inbuilt_iconset : user_iconset)[screen].height \
+#define ICON_HEIGHT(screen) (!iconsets[Iconset_user][screen].loaded ?       \
+                             inbuilt_iconset[screen] : iconsets[Iconset_user][screen].bmp).height \
                             / Icon_Last_Themeable
 
-#define ICON_WIDTH(screen)  (!custom_icons_loaded[screen]?       \
-                             inbuilt_iconset : user_iconset)[screen].width
+#define ICON_WIDTH(screen)  (!iconsets[Iconset_user][screen].loaded ?       \
+                             inbuilt_iconset[screen] : iconsets[Iconset_user][screen].bmp).width
 
 /* x,y in letters, not pixles */
 void screen_put_icon(struct screen * display, 
@@ -133,9 +127,9 @@ void screen_put_iconxy(struct screen * display,
     }
     else if (icon >= Icon_Last_Themeable)
     {
-        iconset = &viewer_iconset[screen];
+        iconset = &iconsets[Iconset_viewers][screen].bmp;
         icon -= Icon_Last_Themeable;
-        if (!viewer_icons_loaded[screen] || 
+        if (!iconsets[Iconset_viewers][screen].loaded || 
            (global_status.viewer_icon_count * height > iconset->height) ||
            (icon * height + height > iconset->height))
         {
@@ -143,9 +137,9 @@ void screen_put_iconxy(struct screen * display,
             return;
         }
     }
-    else if (custom_icons_loaded[screen])
+    else if (iconsets[Iconset_user][screen].loaded)
     {
-        iconset = &user_iconset[screen];
+        iconset = &iconsets[Iconset_user][screen].bmp;
     }
     else
     {
@@ -180,95 +174,111 @@ void screen_put_cursorxy(struct screen * display, int x, int y, bool on)
 #endif
 }
 
-enum Iconset {
-    Iconset_Mainscreen,
-    Iconset_Mainscreen_viewers,
-#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-    Iconset_Remotescreen,
-    Iconset_Remotescreen_viewers,
-#endif
-};
+static int buflib_move_callback(int handle, void* current, void* new)
+{
+    (void)current;
+    (void)new;
+    int i;
+    FOR_NB_SCREENS(j)
+    {
+        for (i=0; i<Iconset_Count; i++)
+        {
+            if (iconsets[i][j].handle == handle)
+            {
+                if (iconsets[i][j].handle_locked > 0)
+                    return BUFLIB_CB_CANNOT_MOVE;
+                ptrdiff_t diff = new - current;
+                iconsets[i][j].bmp.data += diff;
+                return BUFLIB_CB_OK;
+            }
+        }
+    }
+    return BUFLIB_CB_OK;
+}
+static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL};
 
-static void load_icons(const char* filename, enum Iconset iconset)
+static void load_icons(const char* filename, enum Iconset iconset,
+                        enum screen_type screen)
 {
     int size_read;
-    bool *loaded_ok = NULL;
-    struct bitmap *bmp = NULL;
     int bmpformat = (FORMAT_NATIVE|FORMAT_DITHER);
+    struct iconset *ic = &iconsets[iconset][screen];
+    int fd;
     
-    switch (iconset)
-    {
-        case Iconset_Mainscreen:
-            loaded_ok = &custom_icons_loaded[SCREEN_MAIN];
-            bmp = &user_iconset[SCREEN_MAIN];
-            bmp->data = icon_buffer[SCREEN_MAIN];
-            break;
-        case Iconset_Mainscreen_viewers:
-            loaded_ok = &viewer_icons_loaded[SCREEN_MAIN];
-            bmp = &viewer_iconset[SCREEN_MAIN];
-            bmp->data = viewer_icon_buffer[SCREEN_MAIN];
-            break;
-#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-        case Iconset_Remotescreen:
-            loaded_ok = &custom_icons_loaded[SCREEN_REMOTE];
-            bmp = &user_iconset[SCREEN_REMOTE];
-            bmp->data = icon_buffer[SCREEN_REMOTE];
-            bmpformat |= FORMAT_REMOTE;
-            break;
-        case Iconset_Remotescreen_viewers:
-            loaded_ok = &viewer_icons_loaded[SCREEN_REMOTE];
-            bmp = &viewer_iconset[SCREEN_REMOTE];
-            bmp->data = viewer_icon_buffer[SCREEN_REMOTE];
-            bmpformat |= FORMAT_REMOTE;
-            break;
-#endif
-    }
-    
-    *loaded_ok = false;
+    ic->loaded = false;
     if (filename[0] && filename[0] != '-')
     {
         char path[MAX_PATH];
         
         snprintf(path, sizeof(path), ICON_DIR "/%s.bmp", filename);
-        size_read = read_bmp_file(path, bmp, IMG_BUFSIZE, bmpformat, NULL);
-        if (size_read > 0)
+        fd = open(path, O_RDONLY);
+        if (fd < 0)
+            return;
+        size_t buf_size = read_bmp_fd(fd, &ic->bmp, 0, 
+                                        bmpformat|FORMAT_RETURN_SIZE, NULL);
+        ic->handle = core_alloc_ex(filename, buf_size, &buflib_ops);
+        if (ic->handle < 0)
         {
-            *loaded_ok = true;
+            close(fd);
+            return;
         }
+        lseek(fd, 0, SEEK_SET);
+        ic->handle_locked = 1;
+        ic->bmp.data = core_get_data(ic->handle);
+
+        size_read = read_bmp_fd(fd, &ic->bmp, buf_size, bmpformat, NULL);
+        if (size_read <= 0)
+        {
+            core_free(ic->handle);
+            return;
+        }
+        ic->handle_locked = 0;
+        ic->loaded = true;
     }
 }
 
-
 void icons_init(void)
 {
-    load_icons(global_settings.icon_file, Iconset_Mainscreen);
+    int i;
+    FOR_NB_SCREENS(j)
+    {
+        for (i=0; i<Iconset_Count; i++)
+        {
+            if (iconsets[i][j].loaded && iconsets[i][j].handle > 0)
+            {
+                core_free(iconsets[i][j].handle);
+                iconsets[i][j].loaded = false;
+            }
+        }
+    }
+    load_icons(global_settings.icon_file, Iconset_user, SCREEN_MAIN);
     
     if (global_settings.viewers_icon_file[0] &&
         global_settings.viewers_icon_file[0] != '-')
     {
         load_icons(global_settings.viewers_icon_file,
-                   Iconset_Mainscreen_viewers);
+                   Iconset_viewers, SCREEN_MAIN);
         read_viewer_theme_file();
     }
     else
     {
-        load_icons(DEFAULT_VIEWER_BMP, Iconset_Mainscreen_viewers);
+        load_icons(DEFAULT_VIEWER_BMP, Iconset_viewers, SCREEN_MAIN);
     }
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
     load_icons(global_settings.remote_icon_file, 
-               Iconset_Remotescreen);
+               Iconset_user, SCREEN_REMOTE);
     
     if (global_settings.remote_viewers_icon_file[0] &&
         global_settings.remote_viewers_icon_file[0] != '-')
     {
         load_icons(global_settings.remote_viewers_icon_file,
-                   Iconset_Remotescreen_viewers);
+                   Iconset_viewers, SCREEN_REMOTE);
     }
     else
     {
         load_icons(DEFAULT_REMOTE_VIEWER_BMP,
-                   Iconset_Remotescreen_viewers);
+                   Iconset_viewers, SCREEN_REMOTE);
     }
 #endif
 }
