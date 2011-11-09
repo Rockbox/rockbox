@@ -2081,6 +2081,9 @@ int clip_jpeg_fd(int fd,
         resize = true;
     if (format & FORMAT_DITHER)
         dither = true;
+#ifdef HAVE_LCD_COLOR
+    bm->alpha_offset = 0; /* no alpha channel */
+#endif
     if (resize) {
         struct dim resize_dim = {
             .width = bm->width,
