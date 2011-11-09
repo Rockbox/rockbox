@@ -12750,3 +12750,76 @@
     *: "Speellijst catalogus map terugzetten"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Lijn spatiëring in lijsten"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Lijn spatiëring in lijsten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatisch"
+  </dest>
+  <voice>
+    *: "Automatisch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Annuleer slaap klok"
+  </dest>
+  <voice>
+    *: "Annuleer slaap klok"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Standaard slaap klok duur"
+  </dest>
+  <voice>
+    *: "Standaard slaap klok duur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Start slaap klok bij opstarten"
+  </dest>
+  <voice>
+    *: "Start slaap klok bij opstarten"
+  </voice>
+</phrase>
