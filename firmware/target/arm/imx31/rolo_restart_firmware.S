@@ -65,4 +65,4 @@ restart_copy_start:
     @ Branch to destination (should be address 0x00000000)
     bx      r1
 restart_copy_end:
-    .size   rolo_restart,.-rolo_restart
+    .size   rolo_restart_firmware,.-rolo_restart_firmware

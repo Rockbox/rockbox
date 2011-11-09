@@ -146,4 +146,4 @@ copy_n2e:
     bf      copy_n2e
     bt      top_n2e     ! always taken if the preceding bf isn't
 
-    .size ucl_nrv2e_decompress_8, .-ucl_nrv2e_decompress_8
+    .size _ucl_nrv2e_decompress_8, .-_ucl_nrv2e_decompress_8

@@ -132,6 +132,6 @@ __grey_line1:
 
     rts
     nop
-    .size   _grey_line1, . - _grey_line1
+    .size   __grey_line1, . - __grey_line1
 
 #endif
