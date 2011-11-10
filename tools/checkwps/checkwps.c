@@ -178,7 +178,9 @@ struct screen screens[NB_SCREENS] =
 #endif
         .getwidth = getwidth,
         .getheight = getheight,
+#ifdef HAVE_LCD_BITMAP
         .getuifont = getuifont,
+#endif
 #if LCD_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
@@ -191,7 +193,7 @@ struct screen screens[NB_SCREENS] =
         .lcdwidth=LCD_REMOTE_WIDTH,
         .lcdheight=LCD_REMOTE_HEIGHT,
         .depth=LCD_REMOTE_DEPTH,
-        .getuifont = getuifont;
+        .getuifont = getuifont,
         .is_color=false,/* No color remotes yet */
         .getwidth=remote_getwidth,
         .getheight=remote_getheight,
