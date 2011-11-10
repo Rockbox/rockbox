@@ -330,6 +330,7 @@ int TTSCarbon::convertAiffToWav(const char* aiff, const char* wav)
     if(fread(buf, 1, filestat.st_size, in) < filestat.st_size) {
         printf("could not read file: not enought bytes read\n");
         fclose(in);
+        free(buf);
         return -1;
     }
     fclose(in);
