@@ -153,6 +153,7 @@ struct system_status global_status;
 
 int getwidth(void) { return LCD_WIDTH; }
 int getheight(void) { return LCD_HEIGHT; }
+int getuifont(void) { return 0; }
 #ifdef HAVE_REMOTE_LCD
 int remote_getwidth(void) { return LCD_REMOTE_WIDTH; }
 int remote_getheight(void) { return LCD_REMOTE_HEIGHT; }
@@ -177,6 +178,7 @@ struct screen screens[NB_SCREENS] =
 #endif
         .getwidth = getwidth,
         .getheight = getheight,
+        .getuifont = getuifont,
 #if LCD_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
@@ -189,6 +191,7 @@ struct screen screens[NB_SCREENS] =
         .lcdwidth=LCD_REMOTE_WIDTH,
         .lcdheight=LCD_REMOTE_HEIGHT,
         .depth=LCD_REMOTE_DEPTH,
+        .getuifont = getuifont;
         .is_color=false,/* No color remotes yet */
         .getwidth=remote_getwidth,
         .getheight=remote_getheight,
