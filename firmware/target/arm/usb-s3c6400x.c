@@ -48,10 +48,18 @@ struct ep_type
 } ;
 
 static struct ep_type endpoints[USB_NUM_ENDPOINTS];
-static union
+
+/* USB control requests may be up to 64 bytes in size.
+   Even though we never use anything more than the 8 header bytes,
+   we are required to accept request packets of up to 64 bytes size.
+   Provide buffer space for these additional payload bytes so that
+   e.g. write descriptor requests (which are rejected by us, but the
+   payload is transferred anyway) do not cause memory corruption.
+   Fixes FS#12310. -- Michael Sparmann (theseven) */
+static struct
 {
-    unsigned char data[64];
-    struct usb_ctrlrequest req;
+    struct usb_ctrlrequest header; /* 8 bytes */
+    unsigned char payload[64 - sizeof(struct usb_ctrlrequest)];
 } ctrlreq USB_DEVBSS_ATTR;
 
 int usb_drv_port_speed(void)
