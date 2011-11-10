@@ -38,26 +38,27 @@ manual-prep: objdir-check rockbox.tex $(OBJDIR)/CREDITS.tex $(OBJDIR)/version.te
 
 $(OBJDIR)/$(MANFILE).tex:
 	@echo "creating $(notdir $@)"
-	$(SILENT)printf "\\\\newcommand{\\\\platform}{${MANUALDEV}}\n" > $(OBJDIR)/$(MANFILE).tex
-	$(SILENT)printf "\\\\newcommand{\\\\buildversion}{$(VERSION)}\n" >> $(OBJDIR)/$(MANFILE).tex
-	$(SILENT)printf "\\\\input{rockbox.tex}\n" >> $(OBJDIR)/$(MANFILE).tex
+	$(SILENT)printf "\\\\newcommand{\\\\platform}{${MANUALDEV}}\n" > $@
+	$(SILENT)printf "\\\\newcommand{\\\\buildversion}{$(VERSION)}\n" >> $@
+	$(SILENT)printf "\\\\input{rockbox.tex}\n" >> $@
 
 $(OBJDIR)/CREDITS.tex: $(DOCSDIR)/CREDITS
 	@echo "processing $(notdir $^)"
-	$(SILENT)perl credits.pl < $(DOCSDIR)/CREDITS  > $(OBJDIR)/CREDITS.tex
+	$(SILENT)perl credits.pl < $(DOCSDIR)/CREDITS  > $@
 
 $(OBJDIR)/version.tex:
 	@echo "creating $(notdir $@)"
-	$(SILENT)printf "%s%%" $(VERSION) > $(OBJDIR)/version.tex
+	$(SILENT)printf "%s%%" $(VERSION) > $@
 
 $(OBJDIR)/features.tex: $(ROOTDIR)/apps/features.txt
 	@echo "processing $(notdir $^)"
 	$(SILENT)mkdir -p `dirname $@`
-	$(SILENT)cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
-	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
-	grep -v "^\#" | grep -v "^$$" > $@; \
-	for f in `cat $(OBJDIR)/features`; do feat="$$feat\\n\\\\edef\\\\UseOption{\\\\UseOption,$$f}" ; done ; \
-	printf "$$feat" >$(OBJDIR)/features.tex
+	$(SILENT) for f in \
+	    $$(cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
+	       $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" \
+	       -imacros "button.h" - | grep -v "^\#" | grep -v "^$$"); \
+	    do feat="$$feat\\n\\\\edef\\\\UseOption{\\\\UseOption,$$f}"; done ; \
+	printf "$$feat" > $@
 
 manual-pdf: objdir-check features manual-prep rockbox.tex
 	$(SILENT)$(MAKE) -C $(OBJDIR) buildmanual
