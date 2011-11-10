@@ -164,39 +164,40 @@ static void setup_lcdif_clock(void)
 
 static uint32_t i80_read_register(uint32_t data_out)
 {
+    imx233_lcdif_wait_ready();
     /* lcd_enable is mapped to the RD pin of the controller */
     imx233_set_gpio_output(1, 21, true); /* lcd_cs */
     imx233_set_gpio_output(1, 19, true); /* lcd_rs */
     imx233_set_gpio_output(1, 23, true); /* lcd_enable */
     imx233_set_gpio_output(1, 20, true); /* lcd_wr */
     imx233_enable_gpio_output_mask(1, 0x3ffff, true); /* lcd_d{0-17} */
-    mdelay(2);
+    udelay(2);
     imx233_set_gpio_output(1, 19, false); /* lcd_rs */
-    mdelay(1);
+    udelay(1);
     imx233_set_gpio_output(1, 21, false); /* lcd_cs */
-    mdelay(1);
+    udelay(1);
     imx233_set_gpio_output(1, 20, false); /* lcd_wr */
-    mdelay(1);
+    udelay(1);
     imx233_set_gpio_output_mask(1, data_out & 0x3ffff, true); /* lcd_d{0-17} */
-    mdelay(1);
+    udelay(1);
     imx233_set_gpio_output(1, 20, true); /* lcd_wr */
-    mdelay(3);
+    udelay(3);
     imx233_enable_gpio_output_mask(1, 0x3ffff, false); /* lcd_d{0-17} */
-    mdelay(2);
+    udelay(2);
     imx233_set_gpio_output(1, 23, false); /* lcd_enable */
-    mdelay(1);
+    udelay(1);
     imx233_set_gpio_output(1, 19, true); /* lcd_rs */
-    mdelay(1);
+    udelay(1);
     imx233_set_gpio_output(1, 23, true); /* lcd_enable */
-    mdelay(3);
+    udelay(3);
     imx233_set_gpio_output(1, 23, false); /* lcd_enable */
-    mdelay(2);
+    udelay(2);
     uint32_t data_in = imx233_get_gpio_input_mask(1, 0x3ffff); /* lcd_d{0-17} */
-    mdelay(1);
+    udelay(1);
     imx233_set_gpio_output(1, 23, true); /* lcd_enable */
-    mdelay(1);
+    udelay(1);
     imx233_set_gpio_output(1, 21, true); /* lcd_cs */
-    mdelay(1);
+    udelay(1);
     return data_in;
 }
 
@@ -372,10 +373,10 @@ void lcd_init_device(void)
     for(int i = 0; i < 10; i++)
     {
         lcd_kind = lcd_read_reg(0);
+        mdelay(5);
         if(lcd_kind == LCD_KIND_7783 || lcd_kind == LCD_KIND_9325)
             break;
     }
-    mdelay(5);
     switch(lcd_kind)
     {
         case LCD_KIND_7783: lcd_init_seq_7783(); break;
