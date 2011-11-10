@@ -124,6 +124,7 @@ static struct lrc_info {
 } current;
 static char temp_buf[MAX(MAX_LINE_LEN,MAX_PATH)];
 #ifdef HAVE_LCD_BITMAP
+static int uifont = -1;
 static int font_ui_height = 1;
 static struct viewport vp_info[NB_SCREENS];
 #endif
@@ -441,7 +442,8 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
     struct lrc_word *lrc_word;
     int nlrcbrpos = 0, max_lrcbrpos;
 #ifdef HAVE_LCD_BITMAP
-    struct font* pf = rb->font_get(FONT_UI);
+    uifont = rb->screens[0]->getuifont();
+    struct font* pf = rb->font_get(uifont);
     unsigned short ch;
 #endif
     struct snap {
@@ -1651,7 +1653,7 @@ static void display_time(void)
                                vp_info[i].width, SYSFONT_HEIGHT-2,
                                current.length, 0, current.elapsed, HORIZONTAL);
         display->update_viewport_rect(0, y, vp_info[i].width, SYSFONT_HEIGHT*2);
-        display->setfont(FONT_UI);
+        display->setfont(uifont);
         display->set_viewport(NULL);
     }
 #else
@@ -2914,7 +2916,8 @@ enum plugin_status plugin_start(const void* parameter)
     load_or_save_settings(false);
 
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_getstringsize("O", NULL, &font_ui_height);
+    uifont = rb->screens[0]->getuifont();
+    font_ui_height = rb->font_get(uifont)->height;
 #endif
 
     lrc_buffer = rb->plugin_get_buffer(&lrc_buffer_size);
