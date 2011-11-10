@@ -56,7 +56,7 @@ $(OBJDIR)/features.tex: $(ROOTDIR)/apps/features.txt
 	$(SILENT)cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
 	grep -v "^\#" | grep -v "^$$" > $@; \
-	for f in `cat $(OBJDIR)/features`; do feat="$$feat\\n\\\\edef\\\\UseOption{\\\\UseOption,$$f}" ; done ; \
+	for f in `cat $(OBJDIR)/features.tex`; do feat="$$feat\\n\\\\edef\\\\UseOption{\\\\UseOption,$$f}" ; done ; \
 	printf "$$feat" >$(OBJDIR)/features.tex
 
 manual-pdf: objdir-check features manual-prep rockbox.tex
