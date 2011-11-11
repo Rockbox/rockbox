@@ -438,7 +438,7 @@ void output_row_8_native(uint32_t row, void * row_in,
                 if (ctx->bm->alpha_offset > 0)
                     bm_alpha = ctx->bm->data + ctx->bm->alpha_offset;
                 if (bm_alpha)
-                    bm_alpha += ctx->bm->width*row/2;
+                    bm_alpha += ALIGN_UP(ctx->bm->width, 2) * row/2;
 
                 for (col = 0; col < ctx->bm->width; col++) {
                     if (ctx->dither)
@@ -453,7 +453,7 @@ void output_row_8_native(uint32_t row, void * row_in,
                     dest += STRIDE_MAIN(1, ctx->bm->height);
                     if (bm_alpha) {
                         /* pack alpha channel for 2 pixels into 1 byte */
-                        unsigned alpha = 255-qp->alpha;
+                        unsigned alpha = qp->alpha;
                         if (col%2)
                             *bm_alpha++ |= alpha&0xf0;
                         else
@@ -612,6 +612,8 @@ int read_bmp_fd(int fd,
         rset.rowstop = -1;
     }
 
+    /* need even rows (see lcd-16bit-common.c for details) */
+    int alphasize = ALIGN_UP(bm->width, 2) * bm->height / 2;
     if (cformat)
         totalsize = cformat->get_size(bm);
     else {
@@ -620,7 +622,7 @@ int read_bmp_fd(int fd,
         if (!remote)
 #endif
             if (depth == 32 && read_alpha) /* account for possible 4bit alpha per pixel */
-                totalsize += bm->width * bm->height / 2;
+                totalsize += alphasize;
     }
 
     if(return_size)
@@ -718,7 +720,7 @@ int read_bmp_fd(int fd,
 
 #ifdef HAVE_LCD_COLOR
     if (read_alpha && depth == 32)
-        bm->alpha_offset = totalsize - (bm->width * bm->height / 2);
+        bm->alpha_offset = totalsize - alphasize;
     else
         bm->alpha_offset = 0;
 #endif
@@ -882,7 +884,7 @@ int read_bmp_fd(int fd,
     {   /* if this has an alpha channel, totalsize accounts for it as well
          * subtract if no actual alpha information was found */
         if (bm->alpha_offset > 0)
-            totalsize -= bm->width*bm->height/2;
+            totalsize -= alphasize;
         bm->alpha_offset = 0;
     }
 #endif

@@ -775,7 +775,7 @@ static void output_row_32_native(uint32_t row, void * row_in,
                 if (ctx->bm->alpha_offset > 0)
                     bm_alpha = ctx->bm->data + ctx->bm->alpha_offset;
                 if (bm_alpha)
-                    bm_alpha += ctx->bm->width*row/2;
+                    bm_alpha += ALIGN_UP(ctx->bm->width, 2)*row/2;
 
                 for (col = 0; col < ctx->bm->width; col++) {
                     if (ctx->dither)
@@ -791,7 +791,7 @@ static void output_row_32_native(uint32_t row, void * row_in,
                     dest += STRIDE_MAIN(1, ctx->bm->height);
                     if (bm_alpha) {
                         /* pack alpha channel for 2 pixels into 1 byte */
-                        unsigned alpha = 255-SC_OUT(q0.a, ctx);
+                        unsigned alpha = SC_OUT(q0.a, ctx);
                         if (col%2)
                             *bm_alpha++ |= alpha&0xf0;
                         else

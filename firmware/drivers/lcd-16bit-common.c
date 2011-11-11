@@ -229,6 +229,25 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
     lcd_mono_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
+
+/* About Rockbox' internal alpha channel format (for ALPHA_COLOR_FONT_DEPTH == 2)
+ *
+ * For each pixel, 4bit  of alpha information is stored in a byte-stream,
+ * so two pixels are packed into one byte.
+ * The lower nibble is the first pixel, the upper one the second. The stride is
+ * horizontal. E.g row0: pixel0: byte0[0:3], pixel1: byte0[4:7], pixel2: byte1[0:3],...
+ * The format is independant of the internal display orientation, as to
+ * support the same font files on
+ * The values go linear from 0 (fully transparent) to 15 (fully opaque).
+ *
+ * This might suggest that rows need to have an even number of pixels.
+ * However this is generally not the case. lcd_alpha_bitmap_part_mix() can deal
+ * with uneven colums (i.e. two rows can share one byte). And font files do
+ * exploit this.
+ * However, this is difficult to do for image files, especially bottom-up bitmaps,
+ * so lcd_bmp() do expect even rows.
+ */
+
 #define ALPHA_COLOR_FONT_DEPTH 2
 #define ALPHA_COLOR_LOOKUP_SHIFT (1 << ALPHA_COLOR_FONT_DEPTH)
 #define ALPHA_COLOR_LOOKUP_SIZE ((1 << ALPHA_COLOR_LOOKUP_SHIFT) - 1)
@@ -357,16 +376,15 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
         dmask = 0xffffffff;
         drmode &= DRMODE_SOLID; /* mask out inversevid */
     }
-    if (drmode == DRMODE_BG)
-    {
-        dmask = ~dmask;
-    }
     /* sourcing from an image ignore drawmode.
      * Set to DRMODE_BG as we use its code path in the switch below */
     if (image != NULL)
     {
-        dmask = 0;
         drmode = DRMODE_BG;
+    }
+    if (drmode == DRMODE_BG)
+    {
+        dmask = ~dmask;
     }
 
     dst_row = LCDADDR(x, y);
@@ -560,7 +578,7 @@ void ICODE_ATTR lcd_bmp_part(const struct bitmap* bm, int src_x, int src_y,
     else if (bm->alpha_offset > 0)
         lcd_alpha_bitmap_part_mix((fb_data*)bm->data, bm->data+bm->alpha_offset,
             src_x, src_y, x, y, width, height,
-            bitmap_stride, bm->width);
+            bitmap_stride, ALIGN_UP(bm->width, 2));
     else
         lcd_bitmap_transparent_part((fb_data*)bm->data,
             src_x, src_y, bitmap_stride, x, y, width, height);
