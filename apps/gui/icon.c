@@ -215,6 +215,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
 
         ic->handle_locked = 1;
         size_read = read_bmp_fd(fd, &ic->bmp, buf_size, bmpformat, NULL);
+        close(fd);
         ic->handle_locked = 0;
 
         /* free unused alpha channel, if any */
