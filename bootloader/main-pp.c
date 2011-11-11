@@ -327,7 +327,10 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     printf("mi4 size: %x", mi4header.mi4size);
 
     if ((mi4header.mi4size-MI4_HEADER_SIZE) > buffer_size)
+    {
+        close(fd);
         return EFILE_TOO_BIG;
+    }
 
     /* CRC32 */
     printf("CRC32: %x", mi4header.crc32);
@@ -342,7 +345,10 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
     rc = read(fd, buf, mi4header.mi4size-MI4_HEADER_SIZE);
     if(rc < (int)mi4header.mi4size-MI4_HEADER_SIZE)
+    {
+        close(fd);
         return EREAD_IMAGE_FAILED;
+    }
  
     /* Check CRC32 to see if we have a valid file */
     sum = chksum_crc32 (buf, mi4header.mi4size - MI4_HEADER_SIZE);
@@ -350,15 +356,21 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     printf("Calculated CRC32: %x", sum);
 
     if(sum != mi4header.crc32)
+    {
+        close(fd);
         return EBAD_CHKSUM;
-        
+    }
+
     if( (mi4header.plaintext + MI4_HEADER_SIZE) != mi4header.mi4size)
     {
         /* Load encrypted firmware */
         int key_index = tea_find_key(&mi4header, fd);
         
         if (key_index < 0)
+        {
+            close(fd);
             return EINVALID_FORMAT;
+        }
         
         /* Plaintext part is already loaded */
         buf += mi4header.plaintext;
@@ -373,10 +385,12 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
         /* Check decryption was successfull */
         if(le2int(&buf[mi4header.length-mi4header.plaintext-4]) != 0xaa55aa55)
         {
+            close(fd);
             return EREAD_IMAGE_FAILED;
         }
     }
 
+    close(fd);
     return EOK;
 }
 
