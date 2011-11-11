@@ -191,8 +191,11 @@ struct bmp_args {
     struct img_part part;
 #endif
     /* as read_part_line() goes through the rows it'll set this to true
-     * if it finds transparency. Initialize to false before calling */
-    bool alpha_detected;
+     * if it finds transparency. Initialize to 0 before calling */
+    int alpha_detected;
+    /* for checking transparency it checks the against the very first byte
+     * of the bitmap. Initalize to 0x80 before calling */
+    unsigned char first_alpha_byte;
 };
 
 static unsigned int read_part_line(struct bmp_args *ba)
@@ -237,6 +240,15 @@ static unsigned int read_part_line(struct bmp_args *ba)
 #endif
         return 0;
     }
+
+    /* detect if the image has useful alpha information.
+     * if all alpha bits are 0xff or 0x00 discard the information.
+     * if it has other bits, or is mixed with 0x00 and 0xff then interpret
+     * as alpha. assume no alpha until the opposite is proven. as mixed
+     * is alpha, compare to the first byte instead of 0xff and 0x00 separately
+     */
+    if (depth == 32 && ba->first_alpha_byte == 0x80)
+        ba->first_alpha_byte = ibuf[3] ? 0xff : 0x0;
 
     while (ibuf < ba->buf + (BM_MAX_WIDTH << 2))
     {
@@ -283,13 +295,19 @@ static unsigned int read_part_line(struct bmp_args *ba)
             buf++;
             ibuf += 2;
             break;
-          case 32:
           case 24:
             buf->blue = *ibuf++;
             buf->green = *ibuf++;
             buf->red = *ibuf++;
-            buf->alpha = (depth == 32) ? *ibuf++ : 0xff;
-            if (buf->alpha != 0xff) ba->alpha_detected = true;
+            buf->alpha = 0xff;
+            buf++;
+            break;
+          case 32:
+            buf->blue = *ibuf++;
+            buf->green = *ibuf++;
+            buf->red = *ibuf++;
+            buf->alpha = *ibuf++;
+            ba->alpha_detected |= (buf->alpha != ba->first_alpha_byte);
             buf++;
             break;
         }
@@ -732,7 +750,7 @@ int read_bmp_fd(int fd,
     defined(HAVE_BMP_SCALING) || defined(PLUGIN)
         .cur_row = 0, .cur_col = 0, .part = {0,0},
 #endif
-        .alpha_detected = false,
+        .alpha_detected = false, .first_alpha_byte = 0x80,
     };
 
 #if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
