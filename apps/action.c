@@ -149,6 +149,27 @@ static inline int get_next_context(const struct button_mapping *items, int i)
             CONTEXT_STD :
             items[i].action_code;
 }
+
+#if defined(HAVE_GUI_BOOST) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+/* Helper function which is called to boost / unboost CPU. This function
+ * avoids to increase boost_count with each call of gui_boost(). */
+static void gui_boost(bool want_to_boost)
+{
+    static bool boosted = false;
+    
+    if (want_to_boost && !boosted)
+    {
+        cpu_boost(true);
+        boosted = true;
+    }
+    else if (!want_to_boost && boosted)
+    {
+        cpu_boost(false);
+        boosted = false;
+    }
+}
+#endif
+
 /*
  * int get_action_worker(int context, struct button_mapping *user_mappings,
    int timeout)
@@ -182,6 +203,23 @@ static int get_action_worker(int context, int timeout,
         button = button_get(true);
     else
         button = button_get_w_tmo(timeout);
+
+#if defined(HAVE_GUI_BOOST) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    /* Boost the CPU in case of wheel scrolling activity in the defined contexts.
+     * Unboost the CPU after timeout. */
+    static long last_boost_tick;
+    if ((button&(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD)) && 
+        (context == CONTEXT_STD      || context == CONTEXT_LIST ||
+         context == CONTEXT_MAINMENU || context == CONTEXT_TREE))
+    {
+        last_boost_tick = current_tick;
+        gui_boost(true);
+    }
+    else if (TIME_AFTER(current_tick, last_boost_tick + HZ))
+    {
+        gui_boost(false);
+    }
+#endif
 
     /* Data from sys events can be pulled with button_get_data
      * multimedia button presses don't go through the action system */

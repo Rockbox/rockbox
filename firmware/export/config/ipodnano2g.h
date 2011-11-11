@@ -104,6 +104,9 @@
 
 #define CONFIG_KEYPAD IPOD_4G_PAD
 
+/* Define this to have CPU boosted while scrolling in the UI */
+#define HAVE_GUI_BOOST
+
 #define AB_REPEAT_ENABLE
 #define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 

@@ -78,6 +78,9 @@
 
 #define CONFIG_KEYPAD IPOD_4G_PAD
 
+/* Define this to have CPU boosted while scrolling in the UI */
+#define HAVE_GUI_BOOST
+
 #define HAVE_SCROLLWHEEL
 /* define to activate advanced wheel acceleration code */
 #define HAVE_WHEEL_ACCELERATION

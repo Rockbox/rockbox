@@ -66,6 +66,9 @@
 
 #define CONFIG_KEYPAD IPOD_4G_PAD
 
+/* Define this to have CPU boosted while scrolling in the UI */
+#define HAVE_GUI_BOOST
+
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 

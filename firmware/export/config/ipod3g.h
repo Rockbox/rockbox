@@ -79,6 +79,9 @@
 
 #define CONFIG_KEYPAD IPOD_3G_PAD
 
+/* Define this to have CPU boosted while scrolling in the UI */
+#define HAVE_GUI_BOOST
+
 /* define this if the unit uses a scrollwheel for navigation */
 #define HAVE_SCROLLWHEEL
 /* define to activate advanced wheel acceleration code */
