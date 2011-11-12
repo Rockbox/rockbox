@@ -335,6 +335,8 @@ static void lcd_setup_rect(int x, int x_end, int y, int y_end)
         lcd_write(0x35, x_end); /* MEM_X2 */
         lcd_write(0x36, y);     /* MEM_Y1 */
         lcd_write(0x37, y_end); /* MEM_Y2 */
+        
+        lcd_write_cmd(0x08);    /* DDRAM_DATA_ACCESS_PORT */
     }
     else {
         lcd_write_cmd(0x0A);
@@ -342,6 +344,8 @@ static void lcd_setup_rect(int x, int x_end, int y, int y_end)
         lcd_write_nibbles(x_end);
         lcd_write_nibbles(y);
         lcd_write_nibbles(y_end);
+        
+        lcd_write_cmd(0x0C);
     }
 }
 
@@ -396,6 +400,12 @@ void lcd_update_rect(int x, int y, int width, int height)
         return;
     }
     
+    /* align horizontal position to even for wisechip display */
+    if (lcd_type == 0) {
+        x = x & ~1;
+        x_end = (x_end + 1) & ~1;
+    }
+    
     /* correct rectangle (if necessary) */
     if (x < 0) {
         x = 0;
@@ -415,7 +425,6 @@ void lcd_update_rect(int x, int y, int width, int height)
     lcd_setup_rect(x, x_end - 1, y, y_end - 1);
 
     /* write to GRAM */
-    lcd_write_cmd((lcd_type == 0) ? 0x08 : 0x0C);   /* DDRAM_DATA_ACCESS_PORT */
     for (row = y; row < y_end; row++) {
         lcd_write_data(&lcd_framebuffer[row][x], width);
     }
