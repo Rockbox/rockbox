@@ -29,6 +29,7 @@
 #include "system.h"
 #include "tdspeed.h"
 #include "settings.h"
+#include "platform.h"
 
 #define assert(cond)
 
@@ -38,45 +39,8 @@
 
 #define FIXED_BUFSIZE 3072 /* 48KHz factor 3.0 */
 
-static int32_t** dsp_src;
-static int handles[4];
 static int32_t *overlap_buffer[2] = { NULL, NULL };
 static int32_t *outbuf[2] = { NULL, NULL };
-
-static int move_callback(int handle, void* current, void* new)
-{
-    /* TODO */
-    (void)handle;
-    if (dsp_src)
-    {
-        int ch = (current == outbuf[0]) ? 0 : 1;
-        dsp_src[ch] = outbuf[ch] = new;
-    }
-    return BUFLIB_CB_OK;
-}
-
-static struct buflib_callbacks ops = {
-    .move_callback = move_callback,
-    .shrink_callback = NULL,
-};
-
-static int ovl_move_callback(int handle, void* current, void* new)
-{
-    /* TODO */
-    (void)handle;
-    if (dsp_src)
-    {
-        int ch = (current == overlap_buffer[0]) ? 0 : 1;
-        overlap_buffer[ch] = new;
-    }
-    return BUFLIB_CB_OK;
-}
-
-static struct buflib_callbacks ovl_ops = {
-    .move_callback = ovl_move_callback,
-    .shrink_callback = NULL,
-};
-
 
 static struct tdspeed_state_s
 {
@@ -91,46 +55,47 @@ static struct tdspeed_state_s
     int32_t *ovl_buff[2];   /* overlap buffer */
 } tdspeed_state;
 
+static void move_callback(void* from, void* to)
+{
+    struct tdspeed_state_s *st = &tdspeed_state;
+    for (int i = 0; i < 2; i++) {
+        if (outbuf[i] == from) {
+            outbuf[i] = to;
+        }
+        if (overlap_buffer[i] == from) {
+            overlap_buffer[i] = to;
+        }
+        if (st->ovl_buff[i] == from) {
+            st->ovl_buff[i] = to;
+        }
+    }
+}
+
 void tdspeed_init(void)
 {
     if (!global_settings.timestretch_enabled)
         return;
 
     /* Allocate buffers */
-    if (overlap_buffer[0] == NULL)
-    {
-        handles[0] = core_alloc_ex("tdspeed ovl left", FIXED_BUFSIZE * sizeof(int32_t), &ovl_ops);
-        overlap_buffer[0] = core_get_data(handles[0]);
-    }
-    if (overlap_buffer[1] == NULL)
-    {
-        handles[1] = core_alloc_ex("tdspeed ovl right", FIXED_BUFSIZE * sizeof(int32_t), &ovl_ops);
-        overlap_buffer[1] = core_get_data(handles[1]);
-    }
-    if (outbuf[0] == NULL)
-    {
-        handles[2] = core_alloc_ex("tdspeed left", TDSPEED_OUTBUFSIZE * sizeof(int32_t), &ops);
-        outbuf[0] = core_get_data(handles[2]);
-    }
-    if (outbuf[1] == NULL)
-    {
-        handles[3] = core_alloc_ex("tdspeed right", TDSPEED_OUTBUFSIZE * sizeof(int32_t), &ops);
-        outbuf[1] = core_get_data(handles[3]);
+    for (int i = 0; i < 2; i++) {
+        if (overlap_buffer[i] == NULL) {
+            overlap_buffer[i] = rbcodec_alloc(FIXED_BUFSIZE * sizeof(int32_t),
+                                                  move_callback);
+        }
+        if (outbuf[i] == NULL) {
+            outbuf[i] = rbcodec_alloc(TDSPEED_OUTBUFSIZE * sizeof(int32_t),
+                                          move_callback);
+        }
     }
 }
 
 void tdspeed_finish(void)
 {
-    for(unsigned i = 0; i < ARRAYLEN(handles); i++)
-    {
-        if (handles[i] > 0)
-        {
-            core_free(handles[i]);
-            handles[i] = 0;
-        }
+    for (int i = 0; i < 2; i++) {
+        rbcodec_free(overlap_buffer[i]);
+        rbcodec_free(outbuf[i]);
+        overlap_buffer[i] = outbuf[i] = NULL;
     }
-    overlap_buffer[0] = overlap_buffer[1] = NULL;
-    outbuf[0]         = outbuf[1]         = NULL;
 }
 
 bool tdspeed_config(int samplerate, bool stereo, int32_t factor)
@@ -438,7 +403,6 @@ long tdspeed_est_input_size(long size)
 
 int tdspeed_doit(int32_t *src[], int count)
 {
-    dsp_src = src;
     count = tdspeed_apply( (int32_t *[2]) { outbuf[0], outbuf[1] },
                            src, count, 0, TDSPEED_OUTBUFSIZE);
 

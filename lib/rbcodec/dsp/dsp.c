@@ -171,7 +171,6 @@ static int treble;                                  /* A/V */
 /* Settings applicable to audio codec only */
 #ifdef HAVE_PITCHSCREEN
 static int32_t  pitch_ratio = PITCH_SPEED_100;
-static int  big_sample_locks;
 #endif
 static int  channels_mode;
        long dsp_sw_gain;
@@ -276,38 +275,17 @@ static void tdspeed_setup(struct dsp_config *dspc)
 }
 
 
-static int move_callback(int handle, void* current, void* new)
+static void move_callback(void *from, void *to)
 {
-    (void)handle;(void)current;
-
-    if ( big_sample_locks > 0 )
-        return BUFLIB_CB_CANNOT_MOVE;
-    
-    big_sample_buf = new;
-    
-    /* no allocation without timestretch enabled */
+    (void)from;
+    big_resample_buf = to;
+    /* allocation only exists with timestretch enabled */
     tdspeed_set_pointers( true );
-    return BUFLIB_CB_OK;
 }
-
-static void lock_sample_buf( bool lock )
-{
-    if ( lock )
-        big_sample_locks++;
-    else
-        big_sample_locks--;
-}
-
-static struct buflib_callbacks ops = {
-    .move_callback = move_callback,
-    .shrink_callback = NULL,
-};
-
 
 void dsp_timestretch_enable(bool enabled)
 {
     /* Hook to set up timestretch buffer on first call to settings_apply() */
-    static int handle = -1;
     if (enabled)
     {
         if (big_sample_buf)
@@ -315,17 +293,13 @@ void dsp_timestretch_enable(bool enabled)
 
         /* Set up timestretch buffers */
         big_sample_buf = &small_resample_buf[0];
-        handle = core_alloc_ex("resample buf",
-                               2 * BIG_RESAMPLE_BUF_COUNT * sizeof(int32_t),
-                               &ops);
-        big_sample_locks = 0;
-        enabled = handle >= 0;
+        big_resample_buf = rbcodec_alloc(
+                2 * BIG_RESAMPLE_BUF_COUNT * sizeof(int32_t), move_callback);
+        enabled = big_resample_buf != 0;
 
         if (enabled)
         {
             /* success, now setup tdspeed */
-            big_resample_buf = core_get_data(handle);
-
             tdspeed_init();
             tdspeed_setup(&AUDIO_DSP);
         }
@@ -335,12 +309,9 @@ void dsp_timestretch_enable(bool enabled)
     {
         dsp_set_timestretch(PITCH_SPEED_100);
         tdspeed_finish();
-
-        if (handle >= 0)
-            core_free(handle);
-
-        handle = -1;
+        rbcodec_free(big_resample_buf);
         big_sample_buf = NULL;
+        big_resample_buf = NULL;
     }
 }
 
@@ -758,12 +729,10 @@ static inline int resample(struct dsp_config *dsp, int count, int32_t *src[])
         resample_buf[0],
         resample_buf[1]
     };
-    lock_sample_buf( true );
     count = dsp->resample(count, &dsp->data, (const int32_t **)src, dst);
 
     src[0] = dst[0];
     src[1] = dst[dsp->data.num_channels - 1];
-    lock_sample_buf( false );
     return count;
 }
 
@@ -1249,7 +1218,6 @@ static void dsp_recalc_replaygain(void)
  */
 int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 {
-    static int32_t *tmp[2]; /* tdspeed_doit() needs it static */
     int written = 0;
 
 #if defined(CPU_COLDFIRE)
@@ -1266,6 +1234,7 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
        will be preloaded to be used for the call if not. */
     while (count > 0)
     {
+        int32_t *tmp[2];
         int samples = MIN(sample_buf_count, count);
         count -= samples;
 

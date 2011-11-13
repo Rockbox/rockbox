@@ -31,4 +31,7 @@
 #include "dsp-util.h"
 #define HAVE_CLIP_SAMPLE_16
 
+void *rbcodec_alloc(size_t size, void (*move)(void *from, void *to));
+void rbcodec_free(void *ptr);
+
 #endif
