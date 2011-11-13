@@ -37,6 +37,15 @@
 #define ROCKBOX_BIG_ENDIAN
 #endif
 
+/* rbcodec_alloc, rbcodec_free */
+static inline void *rbcodec_alloc(size_t size,
+                                  void (*move)(void *from, void *to)) {
+    return malloc(size);
+}
+static inline void rbcodec_free(void *ptr) {
+    free(ptr);
+}
+
 /* filesize */
 #include <sys/stat.h>
 static inline off_t filesize(int fd) {

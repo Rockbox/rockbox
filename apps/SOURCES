@@ -46,6 +46,7 @@ playlist.c
 playlist_catalog.c
 playlist_viewer.c
 plugin.c
+rbcodec_helpers.c
 root_menu.c
 screens.c
 settings.c
