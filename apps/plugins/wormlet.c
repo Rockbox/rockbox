@@ -338,7 +338,12 @@ CONFIG_KEYPAD == MROBE500_PAD
 #endif
 #endif
 
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+#if (LCD_WIDTH == 96) && (LCD_HEIGHT == 96)
+#define FOOD_SIZE 3
+#define ARGH_SIZE 4
+#define SPEED 14
+#define MAX_WORM_SEGMENTS 128
+#elif (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 #define FOOD_SIZE 3
 #define ARGH_SIZE 4
 #define SPEED 14
