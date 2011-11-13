@@ -983,6 +983,11 @@ Lyre prototype 1 */
 #define INCLUDE_TIMEOUT_API
 #endif /* HAVE_USB_CHARGING_ENABLE && HAVE_USBSTACK */
 
+#if defined(HAVE_GUI_BOOST) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+/* Timeout objects required if GUI boost is enabled */
+#define INCLUDE_TIMEOUT_API
+#endif /* HAVE_GUI_BOOST && HAVE_ADJUSTABLE_CPU_FREQ */
+
 #if defined(HAVE_USBSTACK) || (CONFIG_STORAGE & STORAGE_NAND)
 #define STORAGE_GET_INFO
 #endif
