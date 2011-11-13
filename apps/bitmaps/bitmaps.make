@@ -36,16 +36,16 @@ $(BMPHFILES): $(BMPOBJ)
 # pattern rules to create .c files from .bmp, one for each subdir:
 $(BUILDDIR)/apps/bitmaps/mono/%.c: $(ROOTDIR)/apps/bitmaps/mono/%.bmp $(TOOLSDIR)/bmp2rb
 	$(SILENT)mkdir -p $(dir $@) $(BMPINCDIR)
-	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_MONO) -h $(BMPINCDIR) $< > $@
+	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_MONO) -b -h $(BMPINCDIR) $< > $@
 
 $(BUILDDIR)/apps/bitmaps/native/%.c: $(ROOTDIR)/apps/bitmaps/native/%.bmp $(TOOLSDIR)/bmp2rb
 	$(SILENT)mkdir -p $(dir $@) $(BMPINCDIR)
-	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_NATIVE) -h $(BMPINCDIR) $< > $@
+	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_NATIVE) -b -h $(BMPINCDIR) $< > $@
 
 $(BUILDDIR)/apps/bitmaps/remote_mono/%.c: $(ROOTDIR)/apps/bitmaps/remote_mono/%.bmp $(TOOLSDIR)/bmp2rb
 	$(SILENT)mkdir -p $(dir $@) $(BMPINCDIR)
-	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_REMOTEMONO) -h $(BMPINCDIR) $< > $@
+	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_REMOTEMONO) -b -h $(BMPINCDIR) $< > $@
 
 $(BUILDDIR)/apps/bitmaps/remote_native/%.c: $(ROOTDIR)/apps/bitmaps/remote_native/%.bmp $(TOOLSDIR)/bmp2rb
 	$(SILENT)mkdir -p $(dir $@) $(BMPINCDIR)
-	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_REMOTENATIVE) -h $(BMPINCDIR) $< > $@
+	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_REMOTENATIVE) -b -h $(BMPINCDIR) $< > $@

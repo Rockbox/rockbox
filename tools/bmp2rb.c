@@ -453,19 +453,21 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
 void generate_c_source(char *id, char* header_dir, int width, int height,
                        const unsigned short *t_bitmap, int t_width,
-                       int t_height, int t_depth)
+                       int t_height, int t_depth, bool t_mono, bool create_bm)
 {
     FILE *f;
     FILE *fh;
     int i, a;
     char header_name[1024];
+    bool have_header = header_dir && header_dir[0];
+    create_bm = have_header && create_bm;
 
     if (!id || !id[0])
         id = "bitmap";
 
     f = stdout;
 
-    if (header_dir && header_dir[0])
+    if (have_header)
     {
         snprintf(header_name,sizeof(header_name),"%s/%s.h",header_dir,id);
         fh = fopen(header_name,"w+");
@@ -484,12 +486,21 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
         else
             fprintf(fh, "extern const unsigned short %s[];\n", id);
 
+        if (create_bm)
+        {
+            fprintf(f, "#include \"lcd.h\"\n");
+            fprintf(fh, "extern const struct bitmap bm_%s;\n", id);
+        }
         fclose(fh);
     } else {
         fprintf(f,
                 "#define BMPHEIGHT_%s %d\n"
                 "#define BMPWIDTH_%s %d\n",
                 id, height, id, width);
+    }
+
+    if (create_bm) {
+        fprintf(f, "#include \"%s\"\n", header_name);
     }
 
     if (t_depth <= 8)
@@ -511,7 +522,20 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
         fprintf(f, "\n");
     }
 
-    fprintf(f, "\n};\n");
+    fprintf(f, "\n};\n\n");
+
+    if (create_bm) {
+        char format_line[] = "    .format = FORMAT_NATIVE, \n";
+        fprintf(f, "const struct bitmap bm_%s = { \n"
+                   "    .width = BMPWIDTH_%s, \n"
+                   "    .height = BMPHEIGHT_%s, \n"
+                   "%s"
+                   "    .data = (unsigned char*)%s,\n"
+                   "};\n",
+                    id, id, id,
+                    t_mono ? "" : format_line,
+                    id);
+    }
 }
 
 void generate_raw_file(const unsigned short *t_bitmap, 
@@ -573,6 +597,7 @@ void print_usage(void)
            "\t-i <id>  Bitmap name (default is filename without extension)\n"
            "\t-h <dir> Create header file in <dir>/<id>.h\n"
            "\t-a       Show ascii picture of bitmap\n"
+           "\t-b       Create bitmap struct along with pixel array\n"
            "\t-r       Generate RAW file (little-endian)\n"
            "\t-f <n>   Generate destination format n, default = 0\n"
            "\t         0  Archos recorder, Ondio, Iriver H1x0 mono\n"
@@ -601,6 +626,7 @@ int main(int argc, char **argv)
     int width, height;
     int t_width, t_height, t_depth;
     bool raw = false;
+    bool create_bm = false;
 
 
     for (i = 1;i < argc;i++)
@@ -645,6 +671,10 @@ int main(int argc, char **argv)
 
               case 'a':   /* Ascii art */
                 ascii = true;
+                break;
+
+              case 'b':
+                create_bm = true;
                 break;
 
               case 'r':   /* Raw File */
@@ -724,7 +754,8 @@ int main(int argc, char **argv)
             generate_raw_file(t_bitmap, t_width, t_height, t_depth);
         else
             generate_c_source(id, header_dir, width, height, t_bitmap, 
-                              t_width, t_height, t_depth);
+                              t_width, t_height, t_depth,
+                              format <= 1, create_bm);
     }
 
     return 0;

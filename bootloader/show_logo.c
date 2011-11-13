@@ -46,9 +46,9 @@ void show_logo( void )
     /* The top 16 lines of the Sansa Clip screen are yellow, and the bottom 48 
        are blue, so we reverse the usual positioning */
     lcd_putsxy(TEXT_XPOS, 0, BOOT_VERSION);
-    lcd_bitmap(rockboxlogo, 0, 16, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+    lcd_bmp(&bm_rockboxlogo, 0, 16);
 #else
-    lcd_bitmap(rockboxlogo, 0, 10, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
+    lcd_bmp(&bm_rockboxlogo, 0, 10);
     lcd_putsxy(TEXT_XPOS, LCD_HEIGHT-SYSFONT_HEIGHT, BOOT_VERSION);
 #endif
 

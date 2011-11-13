@@ -44,19 +44,11 @@
 /* We dont actually do anything with these pointers,
    but they need to be grouped like this to save code
    so storing them as void* is ok. (stops compile warning) */
-static const struct bitmap inbuilt_iconset[NB_SCREENS] =
+static const struct bitmap *inbuilt_iconset[NB_SCREENS] =
 {
-    {
-        .width = BMPWIDTH_default_icons,
-        .height = BMPHEIGHT_default_icons,
-        .data = (unsigned char*)default_icons,
-    },
+    &bm_default_icons,
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-    {
-        .width = BMPWIDTH_remote_default_icons,
-        .height = BMPHEIGHT_remote_default_icons,
-        .data = (unsigned char*)remote_default_icons,
-    },
+    &bm_remote_default_icons,
 #endif
 };
 
@@ -74,11 +66,11 @@ struct iconset {
 } iconsets[Iconset_Count][NB_SCREENS];
 
 #define ICON_HEIGHT(screen) (!iconsets[Iconset_user][screen].loaded ?       \
-                             inbuilt_iconset[screen] : iconsets[Iconset_user][screen].bmp).height \
+                             (*(inbuilt_iconset[screen])) : iconsets[Iconset_user][screen].bmp).height \
                             / Icon_Last_Themeable
 
 #define ICON_WIDTH(screen)  (!iconsets[Iconset_user][screen].loaded ?       \
-                             inbuilt_iconset[screen] : iconsets[Iconset_user][screen].bmp).width
+                             (*(inbuilt_iconset[screen])) : iconsets[Iconset_user][screen].bmp).width
 
 /* x,y in letters, not pixles */
 void screen_put_icon(struct screen * display, 
@@ -140,7 +132,7 @@ void screen_put_iconxy(struct screen * display,
     }
     else
     {
-        iconset = &inbuilt_iconset[screen];
+        iconset = inbuilt_iconset[screen];
     }
     /* add some left padding to the icons if they are on the edge */
     if (xpos == 0)
