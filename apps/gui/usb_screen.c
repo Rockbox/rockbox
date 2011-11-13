@@ -184,12 +184,15 @@ static void usb_screen_fix_viewports(struct screen *screen,
 
 static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 {
+#ifdef LCD_BITMAP
     static const struct bitmap* logos[NB_SCREENS] = {
         &bm_usblogo,
-#ifdef HAVE_RE
+#ifdef HAVE_REMOTE_LCD
         &bm_remote_usblogo,
 #endif
     };
+#endif
+
     FOR_NB_SCREENS(i)
     {
         struct screen *screen = &screens[i];
@@ -224,7 +227,7 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
         }
         screen->set_viewport(parent);
 
-#else /* HAVE_LCD_BITMAP */
+#else /* !HAVE_LCD_BITMAP */
         screen->double_height(false);
         screen->puts_scroll(0, 0, "[USB Mode]");
         status_set_param(false);

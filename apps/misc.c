@@ -713,8 +713,7 @@ int show_logo( void )
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
-    lcd_remote_bitmap(remote_rockboxlogo, 0, 10, BMPWIDTH_remote_rockboxlogo,
-                      BMPHEIGHT_remote_rockboxlogo);
+    lcd_remote_bmp(&bm_remote_rockboxlogo, 0, 10);
     lcd_remote_setfont(FONT_SYSFIXED);
     lcd_remote_getstringsize((unsigned char *)"A", &font_w, &font_h);
     lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
