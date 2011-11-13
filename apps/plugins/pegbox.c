@@ -638,6 +638,10 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LEVEL_TEXT_X   25
 #define PEGS_TEXT_X    90
 #define TEXT_Y         0
+#elif LCD_WIDTH >= 96
+#define LEVEL_TEXT_X   25
+#define PEGS_TEXT_X    86
+#define TEXT_Y         22
 #endif /* LCD_WIDTH */
 
 #endif /* WIDE_LAYOUT */
@@ -843,7 +847,11 @@ static void pegbox_draw_board(struct game_context* pb)
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
+#if ((BOARD_HEIGHT + HEADER_HEIGHT + 2) <= LCD_HEIGHT)
     rb->lcd_fillrect(BOARD_X-1,BOARD_Y-1,BOARD_WIDTH+2,BOARD_HEIGHT+2);
+#else
+    rb->lcd_fillrect(BOARD_X,BOARD_Y,BOARD_WIDTH,BOARD_HEIGHT);
+#endif
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_set_background(TEXT_BG);
 #endif
