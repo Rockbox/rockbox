@@ -109,7 +109,7 @@
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING      1
+#define MIN_BRIGHTNESS_SETTING      0
 #define MAX_BRIGHTNESS_SETTING      80
 #define DEFAULT_BRIGHTNESS_SETTING  40
 
