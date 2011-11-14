@@ -54,6 +54,8 @@ void power_init(void)
 
 void power_off(void)
 {
+    /* wait one second, useful for the user to stop touching anything */
+    sleep(HZ / 2);
     /* power down */
     HW_POWER_RESET = HW_POWER_RESET__UNLOCK | HW_POWER_RESET__PWD;
     while(1);
