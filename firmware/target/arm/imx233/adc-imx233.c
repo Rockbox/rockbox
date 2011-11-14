@@ -35,13 +35,13 @@ void adc_init(void)
 {
     imx233_lradc_init();
     battery_chan = 7;
-    imx233_lradc_reserve_channel(7);
     vddio_chan = 6;
-    imx233_lradc_reserve_channel(6);
+    imx233_lradc_reserve_channel(battery_chan);
+    imx233_lradc_reserve_channel(vddio_chan);
     
-    pmos_chan = imx233_lradc_acquire_channel(0);
+    pmos_chan = imx233_lradc_acquire_channel(TIMEOUT_NOBLOCK);
     if(pmos_chan < 0) panicf("No LRADC channel for PMOS !");
-    nmos_chan = imx233_lradc_acquire_channel(0);
+    nmos_chan = imx233_lradc_acquire_channel(TIMEOUT_NOBLOCK);
     if(nmos_chan < 0) panicf("No LRADC channel for NMOS !");
 
     // setup them
