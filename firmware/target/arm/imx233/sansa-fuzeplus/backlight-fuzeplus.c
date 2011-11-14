@@ -28,6 +28,7 @@
 
 void _backlight_set_brightness(int brightness)
 {
+    brightness = 32 - (brightness * 32) / 100;
     imx233_set_gpio_output(1, 28, false);
     udelay(600);
     while(brightness-- > 0)
