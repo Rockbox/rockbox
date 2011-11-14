@@ -27,6 +27,7 @@
 #include "font.h"
 #include "adc.h"
 #include "adc-imx233.h"
+#include "powermgmt.h"
 
 static struct
 {
@@ -102,9 +103,11 @@ bool dbg_hw_info_adc(void)
         
         lcd_clear_display();
 
+        /* add battery readout in mV, this it is not the direct output of a channel */
+        lcd_putsf(0, 0, "Battery(mV) %d", battery_adc_voltage());
         for(unsigned i = 0; i < NUM_ADC_CHANNELS; i++)
         {
-            lcd_putsf(0, i, "%s %d", imx233_adc_channel_name[i],
+            lcd_putsf(0, i + 1, "%s %d", imx233_adc_channel_name[i],
                 adc_read(i));
         }
         
