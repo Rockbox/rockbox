@@ -67,6 +67,8 @@
 #define HW_POWER_STS__PSWITCH_BM    (3 << 20)
 
 #define HW_POWER_BATTMONITOR    (*(volatile uint32_t *)(HW_POWER_BASE + 0xe0))
+#define HW_POWER_BATTMONITOR__BATT_VAL_BP   16
+#define HW_POWER_BATTMONITOR__BATT_VAL_BM   (0x3ff << 16)
 
 #define HW_POWER_RESET          (*(volatile uint32_t *)(HW_POWER_BASE + 0x100))
 #define HW_POWER_RESET__UNLOCK  0x3E770000

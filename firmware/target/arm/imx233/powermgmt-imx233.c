@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "powermgmt.h"
-#include "adc-target.h"
+#include "power-imx233.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -49,7 +49,8 @@ const unsigned short percent_to_volt_charge[11] =
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return 4100;
+    /* battery value is in 8mV LSB */
+    return __XTRACT(HW_POWER_BATTMONITOR, BATT_VAL) * 8;
 }
 
 void powermgmt_init_target(void)
