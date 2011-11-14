@@ -29,7 +29,6 @@
 #define IMX233_ADC_BATTERY      -1 /* Battery voltage (mV) */
 #define IMX233_ADC_DIE_TEMP     -2 /* Die temperature (°C) */
 #define IMX233_ADC_VDDIO        -3 /* VddIO voltage (mV) */
-#define IMX233_ADC_5V           -4 /* Vdd5V voltage (mV) */
 
 /* Channel mapping */
 extern int imx233_adc_mapping[];

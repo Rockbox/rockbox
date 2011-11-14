@@ -59,6 +59,7 @@ void adc_init(void)
      * conversions per seconds */
     imx233_lradc_setup_delay(battery_delay_chan, 1 << battery_chan,
         1 << battery_delay_chan, 0, 200);
+    imx233_lradc_kick_delay(battery_delay_chan);
     /* enable automatic conversion, use Li-Ion type battery */
     imx233_lradc_setup_battery_conversion(true, HW_LRADC_CONVERSION__SCALE_FACTOR__LI_ION);
 }
@@ -86,12 +87,9 @@ unsigned short adc_read_virtual(int c)
     switch(c)
     {
         case IMX233_ADC_BATTERY:
-            return /*imx233_lradc_read_battery_voltage()*/adc_read_physical_ex(battery_chan);
+            return adc_read_physical_ex(battery_chan);
         case IMX233_ADC_VDDIO:
             return adc_read_physical_ex(vddio_chan);
-        case IMX233_ADC_5V:
-            /* channel 15 5V has a 4:1 built it divider */
-            return adc_read_physical(HW_LRADC_CHANNEL_5V) * 4;
         case IMX233_ADC_DIE_TEMP:
             // do kelvin to celsius conversion
             return imx233_lradc_sense_die_temperature(nmos_chan, pmos_chan) - 273;
