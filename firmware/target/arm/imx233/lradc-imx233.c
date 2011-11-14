@@ -177,12 +177,14 @@ int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
     return (diff * 1012) / 4000;
 }
 
-void imx233_lradc_setup_battery_conversion(bool automatic, int scale_factor)
+void imx233_lradc_setup_battery_conversion(bool automatic, unsigned long scale_factor)
 {
-    __REG_CLR(HW_LRADC_CONVERSION) = HW_LRADC_CONVERSION__AUTOMATIC |
-        HW_LRADC_CONVERSION__SCALE_FACTOR_BM;
-    __REG_SET(HW_LRADC_CONVERSION) = scale_factor |
-        automatic ? HW_LRADC_CONVERSION__AUTOMATIC : 0;
+    __REG_CLR(HW_LRADC_CONVERSION) = HW_LRADC_CONVERSION__SCALE_FACTOR_BM;
+    __REG_SET(HW_LRADC_CONVERSION) = scale_factor;
+    if(automatic)
+        __REG_SET(HW_LRADC_CONVERSION) = HW_LRADC_CONVERSION__AUTOMATIC;
+    else
+        __REG_CLR(HW_LRADC_CONVERSION) = HW_LRADC_CONVERSION__AUTOMATIC;
 }
 
 int imx233_lradc_read_battery_voltage(void)

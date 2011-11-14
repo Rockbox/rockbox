@@ -130,7 +130,7 @@ void imx233_lradc_release_delay(int dchan);
  * channels must already be configured as nmos and pmos */
 int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan);
 
-void imx233_lradc_setup_battery_conversion(bool automatic, int scale_factor);
+void imx233_lradc_setup_battery_conversion(bool automatic, unsigned long scale_factor);
 // read scaled voltage, only available after proper setup
 int imx233_lradc_read_battery_voltage(void);
 
