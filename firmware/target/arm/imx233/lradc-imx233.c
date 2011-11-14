@@ -22,13 +22,63 @@
 #include "system-target.h"
 #include "lradc-imx233.h"
 
-static struct semaphore free_bm_sema;
-static struct mutex free_bm_mutex;
-static unsigned free_bm;
+struct channel_arbiter_t
+{
+    struct semaphore sema;
+    struct mutex mutex;
+    unsigned free_bm;
+    int count;
+};
+
+static void arbiter_init(struct channel_arbiter_t *a, unsigned count)
+{
+    mutex_init(&a->mutex);
+    semaphore_init(&a->sema, count, count);
+    a->free_bm = (1 << count) - 1;
+    a->count = count;
+}
+
+// doesn't check in use !
+static void arbiter_reserve(struct channel_arbiter_t *a, unsigned channel)
+{
+    // assume semaphore has a free slot immediately
+    if(semaphore_wait(&a->sema, TIMEOUT_NOBLOCK) != OBJ_WAIT_SUCCEEDED)
+        panicf("arbiter_reserve failed on semaphore_wait !");
+    mutex_lock(&a->mutex);
+    a->free_bm &= ~(1 << channel);
+    mutex_unlock(&a->mutex);
+}
+
+static int arbiter_acquire(struct channel_arbiter_t *a, int timeout)
+{
+    int w = semaphore_wait(&a->sema, timeout);
+    if(w == OBJ_WAIT_TIMEDOUT)
+        return w;
+    mutex_lock(&a->mutex);
+    int chan = find_first_set_bit(a->free_bm);
+    if(chan >= a->count)
+        panicf("arbiter_acquire cannot find a free channel !");
+    a->free_bm &= ~(1 << chan);
+    mutex_unlock(&a->mutex);
+    return chan;
+}
+
+static void arbiter_release(struct channel_arbiter_t *a, int channel)
+{
+    mutex_lock(&a->mutex);
+    a->free_bm |= 1 << channel;
+    mutex_unlock(&a->mutex);
+    semaphore_release(&a->sema);
+}
+
+/* channels */
+struct channel_arbiter_t channel_arbiter;
+/* delay channels */
+struct channel_arbiter_t delay_arbiter;
 
 void imx233_lradc_setup_channel(int channel, bool div2, bool acc, int nr_samples, int src)
 {
-    __REG_CLR(HW_LRADC_CHx(channel)) =HW_LRADC_CHx__NUM_SAMPLES_BM | HW_LRADC_CHx__ACCUMULATE;
+    __REG_CLR(HW_LRADC_CHx(channel)) = HW_LRADC_CHx__NUM_SAMPLES_BM | HW_LRADC_CHx__ACCUMULATE;
     __REG_SET(HW_LRADC_CHx(channel)) = nr_samples << HW_LRADC_CHx__NUM_SAMPLES_BP |
         acc << HW_LRADC_CHx__ACCUMULATE;
     if(div2)
@@ -79,32 +129,32 @@ void imx233_lradc_clear_channel(int channel)
 
 int imx233_lradc_acquire_channel(int timeout)
 {
-    int w = semaphore_wait(&free_bm_sema, timeout);
-    if(w == OBJ_WAIT_TIMEDOUT)
-        return w;
-    mutex_lock(&free_bm_mutex);
-    int chan = find_first_set_bit(free_bm);
-    if(chan >= HW_LRADC_NUM_CHANNELS)
-        panicf("imx233_lradc_acquire_channel cannot find a free channel !");
-    free_bm &= ~(1 << chan);
-    mutex_unlock(&free_bm_mutex);
-    return chan;
+    return arbiter_acquire(&channel_arbiter, timeout);
 }
 
 void imx233_lradc_release_channel(int chan)
 {
-    mutex_lock(&free_bm_mutex);
-    free_bm |= 1 << chan;
-    mutex_unlock(&free_bm_mutex);
-    semaphore_release(&free_bm_sema);
+    return arbiter_release(&channel_arbiter, chan);
 }
 
 void imx233_lradc_reserve_channel(int channel)
 {
-    semaphore_wait(&free_bm_sema, TIMEOUT_NOBLOCK);
-    mutex_lock(&free_bm_mutex);
-    free_bm &= ~(1 << channel);
-    mutex_unlock(&free_bm_mutex);
+    return arbiter_reserve(&channel_arbiter, channel);
+}
+
+int imx233_lradc_acquire_delay(int timeout)
+{
+    return arbiter_acquire(&delay_arbiter, timeout);
+}
+
+void imx233_lradc_release_delay(int chan)
+{
+    return arbiter_release(&delay_arbiter, chan);
+}
+
+void imx233_lradc_reserve_delay(int channel)
+{
+    return arbiter_reserve(&delay_arbiter, channel);
 }
 
 int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
@@ -127,11 +177,23 @@ int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
     return (diff * 1012) / 4000;
 }
 
+void imx233_lradc_setup_battery_conversion(bool automatic, int scale_factor)
+{
+    __REG_CLR(HW_LRADC_CONVERSION) = HW_LRADC_CONVERSION__AUTOMATIC |
+        HW_LRADC_CONVERSION__SCALE_FACTOR_BM;
+    __REG_SET(HW_LRADC_CONVERSION) = scale_factor |
+        automatic ? HW_LRADC_CONVERSION__AUTOMATIC : 0;
+}
+
+int imx233_lradc_read_battery_voltage(void)
+{
+    return __XTRACT(HW_LRADC_CONVERSION, SCALED_BATT_VOLTAGE);
+}
+
 void imx233_lradc_init(void)
 {
-    mutex_init(&free_bm_mutex);
-    semaphore_init(&free_bm_sema, HW_LRADC_NUM_CHANNELS, HW_LRADC_NUM_CHANNELS);
-    free_bm = (1 << HW_LRADC_NUM_CHANNELS) - 1;
+    arbiter_init(&channel_arbiter, HW_LRADC_NUM_CHANNELS);
+    arbiter_init(&delay_arbiter, HW_LRADC_NUM_DELAYS);
     // enable block
     imx233_reset_block(&HW_LRADC_CTRL0);
     // disable ground ref

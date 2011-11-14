@@ -121,8 +121,17 @@ void imx233_lradc_release_channel(int chan);
 // doesn't check that channel is in use!
 void imx233_lradc_reserve_channel(int channel);
 
+int imx233_lradc_acquire_delay(int timeout);
+// doesn't check that delay channel is in use!
+void imx233_lradc_reserve_delay(int dchannel);
+void imx233_lradc_release_delay(int dchan);
+
 /* enable sensing and return temperature in kelvin,
  * channels must already be configured as nmos and pmos */
 int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan);
+
+void imx233_lradc_setup_battery_conversion(bool automatic, int scale_factor);
+// read scaled voltage, only available after proper setup
+int imx233_lradc_read_battery_voltage(void);
 
 #endif /* __lradc_imx233__ */
