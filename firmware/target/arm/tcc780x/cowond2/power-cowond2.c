@@ -51,6 +51,10 @@ void power_init(void)
         pmu = PCF50635;
 
         pcf50635_init();
+        
+        /* Clear pending interrupts from pcf50635 */
+        unsigned char data[5]; /* 0 = INT1, 1 = INT2, 2 = INT3, ... 4 = INT5 */
+        pcf50635_read_multiple(PCF5063X_REG_INT1, data, 5);
     }
     else
     {
@@ -64,11 +68,11 @@ void power_init(void)
         /* Clear pending interrupts */
         unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
         pcf50606_read_multiple(0x02, data, 3);
+    }
 
 #ifndef BOOTLOADER
         IEN |= EXT3_IRQ_MASK;   /* Unmask EXT3 */
 #endif
-    }
 }
 
 void power_off(void)
@@ -85,6 +89,8 @@ void power_off(void)
 #ifndef BOOTLOADER
 void EXT3(void)
 {
+    if (get_pmu_type() == PCF50606)
+    {
     unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
 
     /* Clear pending interrupts from pcf50606 */
@@ -103,6 +109,21 @@ void EXT3(void)
     {
         /* Touchscreen event, do something about it */
         touchscreen_handle_device_irq();
+    }
+    }
+    else
+    {
+        unsigned char data[5]; /* 0 = INT1, 1 = INT2, 2 = INT3, ... 4 = INT5 */
+
+        /* Clear pending interrupts from pcf50635 */
+        pcf50635_read_multiple(PCF5063X_REG_INT1, data, 5);
+
+        if (data[2] & PCF5063X_INT3_ONKEY1S)
+        {
+           
+            if (!charger_inserted())
+                sys_poweroff();
+        }
     }
 }
 #endif
@@ -126,7 +147,16 @@ unsigned int power_input_status(void)
     }
     else
     {
-        /* TODO: use adapter/usb connection state from PCF50635 driver */
+        /* pcf50635 power input status can be obtained from MBCS1 register */
+	
+	int mbcs1 = pcf50635_read(PCF5063X_REG_MBCS1); 
+        /* Check AC adapter presence*/
+        if (mbcs1 & PCF5063X_MBCS1_ADAPTPRES)
+            return POWER_INPUT_MAIN_CHARGER;
+        
+        /* Check USB presence */
+        if (mbcs1 & PCF5063X_MBCS1_USBPRES)
+            return POWER_INPUT_USB_CHARGER;
     }
     
     return POWER_INPUT_NONE;

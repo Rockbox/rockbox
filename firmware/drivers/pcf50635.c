@@ -102,9 +102,9 @@ void pcf50635_init(void)
         PCF5063X_REG_GPIO3CFG, 0x0,
         
         /* IRQ masks (OF values in brackets) */
-        PCF5063X_REG_INT1M,    0xff, /* (0x8a enable alarm, usbins, adpins) */
+        PCF5063X_REG_INT1M,    0xfa, /* (0x8a enable alarm, usbins, adpins) */
         PCF5063X_REG_INT2M,    0xff, /* (0xff all masked) */
-        PCF5063X_REG_INT3M,    0xff, /* (0x7f enable onkey1s) */
+        PCF5063X_REG_INT3M,    0x7f, /* (0x7f enable onkey1s) */
         PCF5063X_REG_INT4M,    0xff, /* (0xfd enable lowbat) */
         PCF5063X_REG_INT5M,    0xff, /* (0xff all masked) */
         
