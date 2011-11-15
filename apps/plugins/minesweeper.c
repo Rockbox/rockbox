@@ -523,7 +523,9 @@ static void minesweeper_init( void )
 
 /* put mines on the mine field */
 /* there is p% chance that a tile is a mine */
-/* if the tile has coordinates (x,y), then it can't be a mine */
+/* if the tile has coordinates (x,y), or is adjacent to those,
+ * then it can't be a mine because that would reduce the game
+ * from a logic game to a guessing game. */
 static void minesweeper_putmines( int p, int x, int y )
 {
     int i,j;
@@ -533,7 +535,8 @@ static void minesweeper_putmines( int p, int x, int y )
     {
         for( j = 0; j < width; j++ )
         {
-            if( rb->rand()%100 < p && !( y==i && x==j ) )
+            if( rb->rand()%100 < p
+                && !( i>=y-1 && i<=y+1 && j>=x-1 && j<=x+1 ) )
             {
                 minefield[i][j].mine = 1;
                 mine_num++;
