@@ -79,6 +79,7 @@
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #include "notification.h"
 #endif
+#include "shortcuts.h"
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
@@ -387,6 +388,7 @@ static void init(void)
     filetype_init();
     playlist_init();
     theme_init_buffer();
+    shortcuts_init();
 
 #if CONFIG_CODEC != SWCODEC
     mp3_init( global_settings.volume,
@@ -667,6 +669,7 @@ static void init(void)
     filetype_init();
     scrobbler_init();
     theme_init_buffer();
+    shortcuts_init();
 
 #if CONFIG_CODEC != SWCODEC
     /* No buffer allocation (see buffer.c) may take place after the call to

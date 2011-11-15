@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "lcd.h"
+#include "lang.h"
 #include "menu.h"
 #include "debug_menu.h"
 #include "kernel.h"
@@ -45,6 +46,7 @@
 #include "screens.h"
 #include "misc.h"
 #include "splash.h"
+#include "shortcuts.h"
 #include "dircache.h"
 #include "viewport.h"
 #ifdef HAVE_TAGCACHE
@@ -2120,14 +2122,22 @@ static const struct the_menu_item menuitems[] = {
     };
 static int menu_action_callback(int btn, struct gui_synclist *lists)
 {
+    int selection = gui_synclist_get_sel_pos(lists);
     if (btn == ACTION_STD_OK)
     {
         FOR_NB_SCREENS(i)
            viewportmanager_theme_enable(i, false, NULL);
-        menuitems[gui_synclist_get_sel_pos(lists)].function();
+        menuitems[selection].function();
         btn = ACTION_REDRAW;
         FOR_NB_SCREENS(i)
             viewportmanager_theme_undo(i, false);
+    }
+    else if (btn == ACTION_STD_CONTEXT)
+    {
+        MENUITEM_STRINGLIST(menu_items, "Debug Menu", NULL, ID2P(LANG_ADD_TO_FAVES));
+        if (do_menu(&menu_items, NULL, NULL, false) == 0)
+            shortcuts_add(SHORTCUT_DEBUGITEM, menuitems[selection].desc);
+        return ACTION_STD_CANCEL;
     }
     return btn;
 }
@@ -2148,3 +2158,22 @@ bool debug_menu(void)
     info.get_name = dbg_menu_getname;
     return simplelist_show_list(&info);
 }
+
+bool run_debug_screen(char* screen)
+{
+    unsigned i;
+    for (i=0; i<ARRAYLEN(menuitems); i++)
+    {
+        if (!strcmp(screen, menuitems[i].desc))
+        {
+            FOR_NB_SCREENS(j)
+               viewportmanager_theme_enable(j, false, NULL);
+            menuitems[i].function();
+            FOR_NB_SCREENS(j)
+                viewportmanager_theme_undo(j, false);
+            return true;
+        }
+    }
+    return false;
+}
+

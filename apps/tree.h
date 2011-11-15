@@ -36,7 +36,9 @@ struct entry {
 
 #define BROWSE_SELECTONLY       0x0001  /* exit on selecting a file */
 #define BROWSE_NO_CONTEXT_MENU  0x0002  /* disable context menu */
+#define BROWSE_RUNFILE          0x0004  /* do ft_open() on the file instead of browsing */
 #define BROWSE_SELECTED         0x0100  /* this bit is set if user selected item */
+
 
 struct tree_context;
 

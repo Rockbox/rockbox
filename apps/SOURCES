@@ -52,6 +52,7 @@ root_menu.c
 screens.c
 settings.c
 settings_list.c
+shortcuts.c
 status.c
 cuesheet.c
 talk.c

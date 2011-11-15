@@ -1,4 +1,5 @@
 /***************************************************************************
+ *
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -7,7 +8,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Heikki Hannikainen
+ * Copyright (C) 2011 Jonathan Gordon
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,15 +19,25 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _DEBUG_MENU_H
-#define _DEBUG_MENU_H
+#ifndef __SHORTCUTS_H__
+#define __SHORTCUTS_H__
+#include <stdbool.h>
+#include <stdlib.h>
+ 
+enum shortcut_type {
+    SHORTCUT_UNDEFINED = -1,
+    SHORTCUT_SETTING = 0,
+    SHORTCUT_FILE,
+    SHORTCUT_DEBUGITEM,
+    SHORTCUT_BROWSER,
+    SHORTCUT_PLAYLISTMENU,
+    SHORTCUT_SEPARATOR,
 
-bool debug_menu(void);
-bool run_debug_screen(char* screen);
+    SHORTCUT_TYPE_COUNT
+};
 
-#ifndef SIMULATOR
-extern bool dbg_ports(void);
-extern bool dbg_partitions(void);
-#endif
+void shortcuts_add(enum shortcut_type type, char* value);
+void shortcuts_init(void);
+int do_shortcut_menu(void*ignored);
 
 #endif

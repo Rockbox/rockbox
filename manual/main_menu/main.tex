@@ -265,3 +265,60 @@ pages of information.}
    quickscreen, then pressing up and down will cycle through this setting in
    opposite directions.
 }
+
+\section{\label{ref:MainMenuShortcuts}Shortcuts}
+
+This menu item is a container for user defined shortcuts to files, folders or
+settings. The following are valid shortcuts:
+\begin{itemize}
+  \item A file can be ``run'' (i.e. a music file played, plugin started or
+        a \fname{.cfg} loaded)
+  \item The file browser can be opened with the cursor positioned at
+        the specified file or folder
+  \item A file's or folder's ``Current Playlist'' context menu item can
+        be displayed
+  \item Most settings can be configured (any which can be added to the
+        \setting{Quick Screen})
+  \item Any debug menu item (useful for developers mostly)
+\end{itemize}
+
+\note{Shortcuts into the database are not possible}
+
+Shortcuts are loaded from the file \fname{/.rockbox/shortcuts.txt} which lists
+each item to be displayed. Each shortcut looks like the following:
+
+\begin{example}
+    [shortcut]
+    type: <specify the shortcut type/action>
+    data: <what the shortcut actually links to>
+    name: <what you want the shortcut to be displayed as>
+    icon: <number of the theme icon to use (see http://www.rockbox.org/wiki/CustomIcons)>
+\end{example}
+
+Only ``type'' and ``data'' are required (except if type is ``separator'' in which case
+``data'' is also not required).
+
+Available types are:
+\begin{description}
+\item[file] \config{data} is the filename to run
+\item[browse] \config{data} is the file or the folder to open the file browser at
+\item[playlist menu] \config{data} is the file or the folder to open the
+  ``Current Playlist'' context menu item on
+\item[setting] \config{data} is the config name of the setting you want to change
+\item[debug] \config{data} is the name of the debug menu item to display
+\item[separator] \config{data} is ignored; name can be used to display text,
+  or left blank to make the list more accessible with visual gaps
+\end{description}
+
+
+If the name/icon items are not specified a sensible default will be used.
+
+\note{For the ``browse'' type, if you want the file browser to start \emph{inside}
+a folder, make sure the data has the trailing slash (i.e \fname{/Music/} instead of
+\fname {/Music}). Without the trailing slash, it will cause the file broser to open
+with \fname{/Music} selected instead.}
+
+The file \fname{shortcuts.txt} can be edited with any text editor. Most items can
+also be added to it through their context menu item ``Add to shortcuts''.
+A reboot is needed for manual changes to \fname{shortcuts.txt} to be applied.
+

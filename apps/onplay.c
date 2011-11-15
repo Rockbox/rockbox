@@ -63,6 +63,7 @@
 #include "pitchscreen.h"
 #include "viewport.h"
 #include "filefuncs.h"
+#include "shortcuts.h"
 
 static int context;
 static char* selected_file = NULL;
@@ -382,10 +383,13 @@ static int treeplaylist_callback(int action,
     return action;
 }
 
-void onplay_show_playlist_menu(char* track_name)
+void onplay_show_playlist_menu(char* path)
 {
-    selected_file = track_name;
-    selected_file_attr = FILE_ATTR_AUDIO;
+    selected_file = path;
+    if (dir_exists(path))
+        selected_file_attr = ATTR_DIRECTORY;
+    else
+        selected_file_attr = filetype_get_attr(path);
     do_menu(&tree_playlist_menu, NULL, NULL, false);
 }
 
@@ -1032,8 +1036,13 @@ MENUITEM_FUNCTION(list_viewers_item, 0, ID2P(LANG_ONPLAY_OPEN_WITH),
 MENUITEM_FUNCTION(properties_item, MENU_FUNC_USEPARAM, ID2P(LANG_PROPERTIES),
                   onplay_load_plugin, (void *)"properties",
                   clipboard_callback, Icon_NOICON);
-MENUITEM_FUNCTION(add_to_faves_item, MENU_FUNC_USEPARAM, ID2P(LANG_ADD_TO_FAVES),
-                  onplay_load_plugin, (void *)"shortcuts_append",
+static bool onplay_add_to_shortcuts(void)
+{
+    shortcuts_add(SHORTCUT_BROWSER, selected_file);
+    return false;
+}
+MENUITEM_FUNCTION(add_to_faves_item, 0, ID2P(LANG_ADD_TO_FAVES),
+                  onplay_add_to_shortcuts, NULL,
                   clipboard_callback, Icon_NOICON);
 
 #if LCD_DEPTH > 1

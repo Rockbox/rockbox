@@ -26,6 +26,7 @@
 #include "icon.h"
 #include "icons.h"
 #include "root_menu.h" /* needed for MENU_* return codes */
+#include "settings_list.h"
 
 
 enum menu_item_type {
@@ -103,6 +104,8 @@ typedef int (*menu_callback_type)(int action,
                                   const struct menu_item_ex *this_item);
 void do_setting_from_menu(const struct menu_item_ex *temp,
                           struct viewport parent[NB_SCREENS]);
+void do_setting_screen(const struct settings_list *setting, const char * title,
+                        struct viewport parent[NB_SCREENS]);
 
 /* 
    int do_menu(const struct menu_item_ex *menu, int *start_selected)

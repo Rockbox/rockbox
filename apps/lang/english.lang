@@ -12903,3 +12903,17 @@
     *: "Cancel Sleep Timer"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Shortcuts"
+  </dest>
+  <voice>
+    *: "Shortcuts"
+  </voice>
+</phrase>

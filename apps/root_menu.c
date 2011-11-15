@@ -37,6 +37,7 @@
 #include "power.h"
 #include "talk.h"
 #include "audio.h"
+#include "shortcuts.h"
 
 #ifdef HAVE_HOTSWAP
 #include "storage.h"
@@ -415,11 +416,15 @@ static const struct root_items items[] = {
                                                         &playlist_options },
     [GO_TO_PLAYLIST_VIEWER] = { playlist_view, NULL, &playlist_options },
     [GO_TO_SYSTEM_SCREEN] = { miscscrn, &info_menu, &system_menu },
+    [GO_TO_SHORTCUTMENU] = { do_shortcut_menu, NULL, NULL },
     
 };
 static const int nb_items = sizeof(items)/sizeof(*items);
 
 static int item_callback(int action, const struct menu_item_ex *this_item) ;
+
+MENUITEM_RETURNVALUE(shortcut_menu, ID2P(LANG_SHORTCUTS), GO_TO_SHORTCUTMENU,
+                        NULL, Icon_Bookmark);
 
 MENUITEM_RETURNVALUE(file_browser, ID2P(LANG_DIR_BROWSER), GO_TO_FILEBROWSER,
                         NULL, Icon_file_view_menu);
@@ -492,6 +497,7 @@ MAKE_MENU(root_menu_, ID2P(LANG_ROCKBOX_TITLE),
 #if CONFIG_KEYPAD == PLAYER_PAD
             ,&do_shutdown_item
 #endif
+            ,&shortcut_menu
         );
 
 static int item_callback(int action, const struct menu_item_ex *this_item) 
