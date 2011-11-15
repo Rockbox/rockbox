@@ -269,17 +269,17 @@ pages of information.}
 \section{\label{ref:MainMenuShortcuts}Shortcuts}
 
 This menu item is a container for user defined shortcuts to files, folders or
-settings. The following are valid shortcuts:
+settings. With a shortcut,
 \begin{itemize}
   \item A file can be ``run'' (i.e. a music file played, plugin started or
         a \fname{.cfg} loaded)
   \item The file browser can be opened with the cursor positioned at
-        the specified file or folder
+        a specified file or folder
   \item A file's or folder's ``Current Playlist'' context menu item can
         be displayed
-  \item Most settings can be configured (any which can be added to the
+  \item A setting can be configured (any which can be added to the
         \setting{Quick Screen})
-  \item Any debug menu item (useful for developers mostly)
+  \item A debug menu item can be displayed (useful for developers mostly)
 \end{itemize}
 
 \note{Shortcuts into the database are not possible}
@@ -289,10 +289,10 @@ each item to be displayed. Each shortcut looks like the following:
 
 \begin{example}
     [shortcut]
-    type: <specify the shortcut type/action>
+    type: <shortcut type>
     data: <what the shortcut actually links to>
-    name: <what you want the shortcut to be displayed as>
-    icon: <number of the theme icon to use (see http://www.rockbox.org/wiki/CustomIcons)>
+    name: <what the shortcut should be displayed as>
+    icon: <number of the theme icon to use (see \wikilink{CustomIcons})>
 \end{example}
 
 Only ``type'' and ``data'' are required (except if type is ``separator'' in which case
@@ -300,18 +300,18 @@ Only ``type'' and ``data'' are required (except if type is ``separator'' in whic
 
 Available types are:
 \begin{description}
-\item[file] \config{data} is the filename to run
+\item[file] \config{data} is the name of the file to ``run''
 \item[browse] \config{data} is the file or the folder to open the file browser at
 \item[playlist menu] \config{data} is the file or the folder to open the
   ``Current Playlist'' context menu item on
 \item[setting] \config{data} is the config name of the setting you want to change
+  (see \reference{ref:config_file_options} for the list of the possible settings)
 \item[debug] \config{data} is the name of the debug menu item to display
-\item[separator] \config{data} is ignored; name can be used to display text,
+\item[separator] \config{data} is ignored; \config{name} can be used to display text,
   or left blank to make the list more accessible with visual gaps
 \end{description}
 
-
-If the name/icon items are not specified a sensible default will be used.
+If the name/icon items are not specified, a sensible default will be used.
 
 \note{For the ``browse'' type, if you want the file browser to start \emph{inside}
 a folder, make sure the data has the trailing slash (i.e \fname{/Music/} instead of
