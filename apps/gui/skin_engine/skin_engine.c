@@ -41,19 +41,10 @@
 static bool skins_initialising = true;
 
 /* App uses the host malloc to manage the buffer */
-#ifdef APPLICATION
-#define skin_buffer NULL
 void theme_init_buffer(void)
 {
     skins_initialising = false;
 }
-#else
-static char skin_buffer[SKIN_BUFFER_SIZE];
-void theme_init_buffer(void)
-{
-    skins_initialising = false;
-}
-#endif
 
 void skin_data_free_buflib_allocs(struct wps_data *wps_data);
 char* wps_default_skin(enum screen_type screen);
@@ -95,8 +86,20 @@ void gui_sync_skin_init(void)
             skins[j][i].gui_wps.display = &screens[i];
             memset(skins[j][i].gui_wps.data, 0, sizeof(struct wps_data));
             skins[j][i].data.wps_loaded = false;
+            skins[j][i].data.buflib_handle = -1;
+            skins[j][i].data.tree = -1;
+#ifdef HAVE_TOUCHSCREEN
+            skins[j][i].data.touchregions = -1;
+#endif
+#ifdef HAVE_SKIN_VARIABLES
+            skins[j][i].data.skinvars = -1;
+#endif
+#ifdef HAVE_LCD_BITMAP
+            skins[j][i].data.font_ids = -1;
+            skins[j][i].data.images = -1;
+#endif
 #ifdef HAVE_ALBUMART
-            skins[j][i].data.albumart = NULL;
+            skins[j][i].data.albumart = -1;
             skins[j][i].data.playback_aa_slot = -1;
 #endif
         }
@@ -112,8 +115,6 @@ void skin_unload_all(void)
         FOR_NB_SCREENS(i)
             skin_data_free_buflib_allocs(&skins[j][i].data);
     }
-
-    skin_buffer_init(skin_buffer, SKIN_BUFFER_SIZE);
 
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
@@ -245,7 +246,6 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
         cpu_boost(false);
         loading_a_sbs = false;
     }
-        
     return &skins[skin][screen].gui_wps;
 }
 

@@ -10883,16 +10883,16 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
 </phrase>
 <phrase>
   id: LANG_SKIN_RAM_USAGE
-  desc: how much RAM the skins are using
+  desc: deprecated
   user: core
   <source>
-    *: "Skin RAM usage:"
+    *: ""
   </source>
   <dest>
-    *: "Uso de RAM pola skin:"
+    *: ""
   </dest>
   <voice>
-    *: "Uso de RAM pola skin"
+    *: ""
   </voice>
 </phrase>
 <phrase>

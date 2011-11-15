@@ -175,22 +175,23 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     for (cur_line = 0; cur_line < display_lines; cur_line++)
     {
         struct skin_element* viewport;
-        struct skin_viewport* skin_viewport;
+        struct skin_viewport* skin_viewport = NULL;
         if (list_start_item+cur_line+1 > list->nb_items)
             break;
         current_drawing_line = list_start_item+cur_line;
         is_selected = list->show_selection_marker &&
                 list_start_item+cur_line == list->selected_item;
         
-        for (viewport = listcfg[screen]->data->tree;
+        for (viewport = SKINOFFSETTOPTR(get_skin_buffer(wps.data), listcfg[screen]->data->tree);
              viewport;
-             viewport = viewport->next)
+             viewport = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->next))
         {
             int origional_x, origional_y;
             int origional_w, origional_h;
+            char *viewport_label = SKINOFFSETTOPTR(get_skin_buffer(wps.data), skin_viewport->label);
             skin_viewport = (struct skin_viewport*)viewport->data;
-            if (viewport->children == 0 || !skin_viewport->label ||
-                (skin_viewport->label && strcmp(label, skin_viewport->label))
+            if (viewport->children == 0 || !viewport_label ||
+                (skin_viewport->label && strcmp(label, viewport_label))
                 )
                 continue;
             if (is_selected)
@@ -220,15 +221,17 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
             display->set_viewport(&skin_viewport->vp);
 #ifdef HAVE_LCD_BITMAP
             /* Set images to not to be displayed */
-            struct skin_token_list *imglist = wps.data->images;
+            struct skin_token_list *imglist = SKINOFFSETTOPTR(get_skin_buffer(wps.data), wps.data->images);
             while (imglist)
             {
-                struct gui_img *img = (struct gui_img *)imglist->token->value.data;
+                struct wps_token *token = SKINOFFSETTOPTR(get_skin_buffer(wps.data), imglist->token);
+                struct gui_img *img = SKINOFFSETTOPTR(get_skin_buffer(wps.data), token->value.data);
                 img->display = -1;
-                imglist = imglist->next;
+                imglist = SKINOFFSETTOPTR(get_skin_buffer(wps.data), imglist->next);
             }
 #endif
-            skin_render_viewport(viewport->children[0],
+            struct skin_element** children = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->children);
+            skin_render_viewport(children[0],
                                  &wps, skin_viewport, SKIN_REFRESH_ALL);
 #ifdef HAVE_LCD_BITMAP
             wps_display_images(&wps, &skin_viewport->vp);

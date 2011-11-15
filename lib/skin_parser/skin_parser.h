@@ -29,6 +29,25 @@ extern "C"
 #include <stdlib.h>
 #include <stdbool.h>
 
+#if defined(ROCKBOX) && !defined(__PCTOOL__)
+/* Use this type and macro to convert a pointer from the
+ * skin buffer to a useable pointer */
+typedef long skinoffset_t;
+#define SKINOFFSETTOPTR(base, offset) ((offset) < 0 ? NULL : ((void*)&base[offset]))
+#define PTRTOSKINOFFSET(base, pointer) ((pointer) ? ((void*)pointer-(void*)base) : -1)
+/* Use this macro when declaring a variable to self-document the code.
+ * type is the actual type being pointed to (i.e OFFSETTYPE(char*) foo )
+ * 
+ * WARNING: Don't use the PTRTOSKINOFFSET() around a function call as it wont
+ * do what you expect.
+ */
+#define OFFSETTYPE(type) skinoffset_t
+#else
+#define SKINOFFSETTOPTR(base, offset) offset
+#define PTRTOSKINOFFSET(base, pointer) pointer
+#define OFFSETTYPE(type) type
+#endif
+
 /********************************************************************
  ****** Data Structures *********************************************
  *******************************************************************/
@@ -78,8 +97,8 @@ struct skin_tag_parameter
     union
     {
         int number;
-        char* text;
-        struct skin_element* code;
+        OFFSETTYPE(char*) text;
+        OFFSETTYPE(struct skin_element*) code;
     } data;
 
     char type_code;
@@ -92,20 +111,20 @@ struct skin_tag_parameter
 struct skin_element
 {
     /* Link to the next element */
-    struct skin_element* next;
+    OFFSETTYPE(struct skin_element*) next;
     /* Pointer to an array of children */
-    struct skin_element** children;
+    OFFSETTYPE(struct skin_element**) children;
     /* Placeholder for element data
      * TEXT and COMMENT uses it for the text string
      * TAG, VIEWPORT, LINE, etc may use it for post parse extra storage
      */
-    void* data;
+    OFFSETTYPE(void*) data;
 
     /* The tag or conditional name */
     const struct tag_info *tag;
 
     /* Pointer to an array of parameters */
-    struct skin_tag_parameter* params;
+    OFFSETTYPE(struct skin_tag_parameter*) params;
 
     /* Number of elements in the children array */
     short children_count;
@@ -140,8 +159,8 @@ struct skin_element* skin_parse(const char* document);
 #endif
 /* Memory management functions */
 struct skin_element* skin_alloc_element(void);
-struct skin_element** skin_alloc_children(int count);
-struct skin_tag_parameter* skin_alloc_params(int count, bool use_shared_params);
+OFFSETTYPE(struct skin_element*)* skin_alloc_children(int count);
+struct skin_tag_parameter* skin_alloc_params(int count);
 char* skin_alloc_string(int length);
 
 void skin_free_tree(struct skin_element* root);

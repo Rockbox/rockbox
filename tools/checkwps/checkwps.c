@@ -37,6 +37,7 @@
 
 bool debug_wps = true;
 int wps_verbose_level = 0;
+char *skin_buffer;
 
 int errno;
 
@@ -252,8 +253,6 @@ int main(int argc, char **argv)
     struct wps_data wps={0};
     enum screen_type screen = SCREEN_MAIN;
     struct screen* wps_screen;
-    
-    char* buffer = NULL;
 
     /* No arguments -> print the help text
      * Also print the help text upon -h or --help */
@@ -278,14 +277,14 @@ int main(int argc, char **argv)
             wps_verbose_level++;
         }
     }
-    buffer = malloc(SKIN_BUFFER_SIZE);
-    if (!buffer)
+    skin_buffer = malloc(SKIN_BUFFER_SIZE);
+    if (!skin_buffer)
     {
         printf("mallloc fail!\n");
         return 1;
     }
 
-    skin_buffer_init(buffer, SKIN_BUFFER_SIZE);
+    skin_buffer_init(skin_buffer, SKIN_BUFFER_SIZE);
 
     /* Go through every skin that was thrown at us, error out at the first
      * flawed wps */
@@ -311,7 +310,7 @@ int main(int argc, char **argv)
 
         printf("WPS parsed OK\n\n");
         if (wps_verbose_level>2)
-            skin_debug_tree(wps.tree);
+            skin_debug_tree(SKINOFFSETTOPTR(skin_buffer, wps.tree));
         filearg++;
     }
     return 0;

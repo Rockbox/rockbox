@@ -47,54 +47,26 @@
 #ifdef ROCKBOX
 #include "config.h"
 #include "skin_debug.h"
-
-#ifdef APPLICATION
-#   define USE_HOST_MALLOC
-#else
-#   define USE_ROCKBOX_ALLOC
-#endif
-
-#endif
-
-#ifdef USE_ROCKBOX_ALLOC
 static size_t buf_size;
 static unsigned char *buffer_start = NULL;
 static unsigned char *buffer_front = NULL;
-#endif
 
-#ifdef USE_HOST_MALLOC
-
-struct malloc_object {
-    struct malloc_object *next;
-    char buf[0];
-};
-static struct malloc_object *malloced_head = NULL, *malloced_tail = NULL;
-
-static void skin_free_malloced(void)
+#ifndef __PCTOOL__
+long skin_buffer_to_offset(void *pointer)
 {
-    struct malloc_object *obj = malloced_head;
-    struct malloc_object *this;
-    while (obj)
-    {
-        this = obj;
-        obj = this->next;
-        free(this);
-    }
-    malloced_head = NULL;
-    malloced_tail = NULL;
+    return pointer == NULL ? -1 : (void*)pointer - (void*)buffer_start;
 }
 
+void* skin_buffer_from_offset(long offset)
+{
+    return offset < 0 ? NULL : buffer_start + offset;
+}
 #endif
 
 void skin_buffer_init(char* buffer, size_t size)
 {
-#ifdef USE_ROCKBOX_ALLOC
     buffer_start = buffer_front = buffer;
     buf_size = size;
-#elif defined(USE_HOST_MALLOC)
-    (void)buffer; (void)size;
-    skin_free_malloced();
-#endif
 }
 
 /* Allocate size bytes from the buffer */
@@ -108,8 +80,6 @@ void* skin_buffer_alloc(size_t size)
 {
     void *retval = NULL;
 #endif
-
-#ifdef USE_ROCKBOX_ALLOC
     /* 32-bit aligned */
     size = (size + 3) & ~3;
     if (size > skin_buffer_freespace())
@@ -119,25 +89,9 @@ void* skin_buffer_alloc(size_t size)
     }
     retval = buffer_front;
     buffer_front += size;
-#elif defined(USE_HOST_MALLOC)
-    size_t malloc_size = sizeof(struct malloc_object) + size;
-    struct malloc_object *obj = malloc(malloc_size);
-    retval = &obj->buf;
-    obj->next = NULL;
-    if (malloced_tail == NULL)
-        malloced_head = malloced_tail = obj;
-    else
-        malloced_tail->next = obj;
-    malloced_tail = obj;
-    
-#else
-    retval = malloc(size);
-#endif
     return retval;
 }
 
-
-#ifdef USE_ROCKBOX_ALLOC
 /* get the number of bytes currently being used */
 size_t skin_buffer_usage(void)
 {
@@ -147,16 +101,9 @@ size_t skin_buffer_freespace(void)
 {
     return buf_size - skin_buffer_usage();
 }
-
-static unsigned char *saved_buffer_pos = NULL;
-void skin_buffer_save_position(void)
+#else
+void* skin_buffer_alloc(size_t size)
 {
-    saved_buffer_pos = buffer_front;
-}
-    
-void skin_buffer_restore_position(void)
-{
-    if (saved_buffer_pos)
-        buffer_front = saved_buffer_pos;
+    return malloc(size);
 }
 #endif

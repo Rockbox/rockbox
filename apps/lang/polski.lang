@@ -11426,16 +11426,16 @@
 </phrase>
 <phrase>
   id: LANG_SKIN_RAM_USAGE
-  desc: how much RAM the skins are using
+  desc: deprecated
   user: core
   <source>
-    *: "Skin RAM usage:"
+    *: ""
   </source>
   <dest>
-    *: "Pamięć zajmowana przez styl:"
+    *: ""
   </dest>
   <voice>
-    *: "Pamięć zajmowana przez styl"
+    *: ""
   </voice>
 </phrase>
 <phrase>

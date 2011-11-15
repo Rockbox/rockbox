@@ -11509,16 +11509,16 @@
 </phrase>
 <phrase>
   id: LANG_SKIN_RAM_USAGE
-  desc: how much RAM the skins are using
+  desc: deprecated
   user: core
   <source>
-    *: "Skin RAM usage:"
+    *: ""
   </source>
   <dest>
-    *: "スキンのRAM使用量:"
+    *: ""
   </dest>
   <voice>
-    *: "スキンのRAM使用量"
+    *: ""
   </voice>
 </phrase>
 <phrase>
