@@ -2191,6 +2191,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         close(fd);
         if (start <= 0)
             return false;
+        start++;
         skin_buffer = &wps_buffer[start];
         buffersize -= start;
     }
