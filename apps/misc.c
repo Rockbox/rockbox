@@ -94,6 +94,10 @@
 #endif
 #endif
 
+#ifdef HAVE_HARDWARE_CLICK
+#include "piezo.h"
+#endif
+
 /* units used with output_dyn_value */
 const unsigned char * const byte_units[] =
 {
@@ -873,14 +877,32 @@ void system_sound_play(enum system_sound sound)
 void keyclick_click(int button)
 {
     /* Settings filters */
-    if (global_settings.keyclick &&
-        (global_settings.keyclick_repeats || !(button & BUTTON_REPEAT)))
+    if (
+#ifdef HAVE_HARDWARE_CLICK
+        (global_settings.keyclick || global_settings.keyclick_hardware)
+#else
+        global_settings.keyclick
+#endif
+        && (global_settings.keyclick_repeats || !(button & BUTTON_REPEAT)))
     {
         /* Button filters */
         if (button != BUTTON_NONE && !(button & BUTTON_REL)
             && !(button & (SYS_EVENT|BUTTON_MULTIMEDIA)) )
         {
+#ifdef HAVE_HARDWARE_CLICK
+            if (global_settings.keyclick)
+            {
+                system_sound_play(SOUND_KEYCLICK);
+            }
+            if (global_settings.keyclick_hardware)
+            {
+#if !defined(SIMULATOR)
+                piezo_button_beep(false, false);
+#endif
+            }
+#else
             system_sound_play(SOUND_KEYCLICK);
+#endif
         }
     }
 }

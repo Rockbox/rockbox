@@ -218,6 +218,8 @@
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION
 
+#define HAVE_HARDWARE_CLICK
+
 /* define this if the device has larger sectors when accessed via USB */
 /* (only relevant in disk.c, fat.c now always supports large virtual sectors) */
 #define MAX_LOG_SECTOR_SIZE 2048

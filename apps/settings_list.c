@@ -1757,12 +1757,23 @@ const struct settings_list settings[] = {
 #endif /* HAVE_WHEEL_ACCELERATION */
 #if CONFIG_CODEC == SWCODEC
     /* keyclick */
+#ifdef HAVE_HARDWARE_CLICK
+    CHOICE_SETTING(0, keyclick, LANG_KEYCLICK_SOFTWARE, 0,
+                   "keyclick", "off,weak,moderate,strong", NULL, 4,
+                   ID2P(LANG_OFF), ID2P(LANG_WEAK), ID2P(LANG_MODERATE),
+                   ID2P(LANG_STRONG)),
+    OFFON_SETTING(0, keyclick_repeats, LANG_KEYCLICK_REPEATS, false,
+                  "keyclick repeats", NULL),
+    OFFON_SETTING(0, keyclick_hardware, LANG_KEYCLICK_HARDWARE, false,
+        "hardware keyclick", NULL),
+#else
     CHOICE_SETTING(0, keyclick, LANG_KEYCLICK, 0,
                    "keyclick", "off,weak,moderate,strong", NULL, 4,
                    ID2P(LANG_OFF), ID2P(LANG_WEAK), ID2P(LANG_MODERATE),
                    ID2P(LANG_STRONG)),
     OFFON_SETTING(0, keyclick_repeats, LANG_KEYCLICK_REPEATS, false,
                   "keyclick repeats", NULL),
+#endif
 #endif /* CONFIG_CODEC == SWCODEC */
     TEXT_SETTING(0, playlist_catalog_dir, "playlist catalog directory",
                      PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL),

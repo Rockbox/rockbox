@@ -65,9 +65,17 @@
 #if CONFIG_CODEC == SWCODEC
 
 #ifdef HAVE_RECORDING
+#ifdef HAVE_HARDWARE_CLICK
+#define BASETHREADS  18
+#else
+#define BASETHREADS  17
+#endif
+#else
+#ifdef HAVE_HARDWARE_CLICK
 #define BASETHREADS  17
 #else
 #define BASETHREADS  16
+#endif
 #endif
 
 #else

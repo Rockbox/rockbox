@@ -1160,6 +1160,7 @@ target/arm/ata-pp5020.c
 target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
+target/arm/ipod/piezo.c
 target/arm/ipod/lcd-as-gray.S
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
@@ -1178,6 +1179,7 @@ target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
+target/arm/ipod/piezo.c
 target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/lcd-as-color-nano.S
 target/arm/ipod/power-ipod.c
@@ -1196,6 +1198,7 @@ target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
+target/arm/ipod/piezo.c
 target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/lcd-as-color-nano.S
 target/arm/ipod/power-ipod.c
@@ -1214,6 +1217,7 @@ target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
+target/arm/ipod/piezo.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/ipod/video/lcd-as-video.S
@@ -1268,6 +1272,7 @@ target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-mini1g.c
+target/arm/ipod/piezo.c
 target/arm/ipod/lcd-as-gray.S
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
@@ -1286,6 +1291,7 @@ target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c
+target/arm/ipod/piezo.c
 target/arm/ipod/lcd-as-gray.S
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
@@ -1639,6 +1645,7 @@ target/arm/s5l8700/pcm-s5l8700.c
 target/arm/s5l8700/wmcodec-s5l8700.c
 target/arm/s5l8700/ipodnano2g/audio-nano2g.c
 target/arm/s5l8700/ipodnano2g/adc-nano2g.c
+target/arm/s5l8700/ipodnano2g/piezo-nano2g.c
 #endif
 #endif
 #endif

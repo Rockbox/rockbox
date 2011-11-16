@@ -118,6 +118,10 @@
 #include "m5636.h"
 #endif
 
+#ifdef HAVE_HARDWARE_CLICK
+#include "piezo.h"
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #define MAIN_NORETURN_ATTR NORETURN_ATTR
 #else
@@ -505,6 +509,10 @@ static void init(void)
 
 #if CONFIG_TUNER
     radio_init();
+#endif
+
+#ifdef HAVE_HARDWARE_CLICK
+    piezo_init();
 #endif
 
     /* Keep the order of this 3 (viewportmanager handles statusbars)

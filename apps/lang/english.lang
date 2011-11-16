@@ -12917,3 +12917,37 @@
     *: "Shortcuts"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </voice>
+</phrase>

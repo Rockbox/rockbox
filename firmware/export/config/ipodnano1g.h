@@ -199,6 +199,8 @@
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION
 
+#define HAVE_HARDWARE_CLICK
+
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"

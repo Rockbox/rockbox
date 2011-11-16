@@ -835,6 +835,13 @@ struct user_settings
 #endif
     } hw_eq_bands[AUDIOHW_EQ_BAND_NUM];
 #endif /* AUDIOHW_HAVE_EQ */
+
+#ifdef HAVE_HARDWARE_CLICK
+#if CONFIG_CODEC == SWCODEC
+    bool keyclick_hardware; /* hardware piezo keyclick */
+#endif
+#endif
+
     char start_directory[MAX_PATHNAME+1];
 };
 

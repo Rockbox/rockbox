@@ -191,6 +191,8 @@
 /* Define this if you can read an absolute wheel position */
 #define HAVE_WHEEL_POSITION
 
+#define HAVE_HARDWARE_CLICK
+
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 

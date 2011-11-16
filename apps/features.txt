@@ -270,3 +270,7 @@ recording_digital
 #if MEMORYSIZE <= 2
 lowmem
 #endif
+
+#if defined(HAVE_HARDWARE_CLICK)
+hardware_click
+#endif
