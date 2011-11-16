@@ -29,7 +29,7 @@ STARTUP(target/arm/tms320dm320/crt0.o)
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 
-#define DRAMORIG        0x00900000
+#define DRAMORIG        CONFIG_SDRAM_START
 
 #define FLASHORIG       0x00100000
 #define FLASHSIZE       0x00800000

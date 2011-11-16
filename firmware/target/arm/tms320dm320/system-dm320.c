@@ -26,10 +26,15 @@
 #include "uart-target.h"
 #include "system-arm.h"
 #include "spi.h"
+#include "i2c.h"
 #ifdef CREATIVE_ZVx
 #include "dma-target.h"
-#else
+#endif
+#ifdef MROBE_500
 #include "usb-mr500.h"
+#endif
+#ifdef SANSA_CONNECT
+#include "avr-sansaconnect.h"
 #endif
 
 static unsigned short clock_arm_slow = 0xFFFF;
@@ -182,7 +187,12 @@ void system_exception_wait(void)
     IO_INTC_EINT0 = 0;
     IO_INTC_EINT1 = 0;
     IO_INTC_EINT2 = 0;
+#ifdef MROBE_500
     while ((IO_GIO_BITSET0&0x01) != 0); /* Wait for power button */
+#endif
+#ifdef SANSA_CONNECT
+    while (1); /* Holding power button for a while makes avr system reset */
+#endif
 }
 
 void system_init(void)
@@ -311,7 +321,7 @@ void system_init(void)
         clock_arm_slow = (0 << 8) | 3;
         clock_arm_fast = (1 << 8) | 1;
     }
-    
+
     /* M48XI disabled, USB buffer powerdown */
     IO_CLK_LPCTL1 = 0x11; /* I2C wodn't work with this disabled */
 
@@ -337,13 +347,21 @@ void system_init(void)
     uart_init();
     spi_init();
 
+#ifdef MROBE_500
     /* Initialization is done so shut the front LED off so that the battery
      * can charge.
      */
     IO_GIO_BITCLR2 = 0x0001;
-    
+#endif
+
 #ifdef CREATIVE_ZVx
     dma_init();
+#endif
+
+#ifdef SANSA_CONNECT
+    i2c_init();
+    avr_hid_init();
+    avr_hid_enable_charger();
 #endif
 }
 
@@ -388,4 +406,13 @@ void udelay(int usec) {
     }
 }
 
+#ifdef BOOTLOADER
+void system_prepare_fw_start(void)
+{
+    tick_stop();
+    IO_INTC_EINT0 = 0;
+    IO_INTC_EINT1 = 0;
+    IO_INTC_EINT2 = 0;
+}
+#endif
 

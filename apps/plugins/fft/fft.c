@@ -248,6 +248,15 @@ GREY_INFO_STRUCT
 #   define FFT_AMP_SCALE    BUTTON_PLAYPAUSE
 #   define FFT_QUIT         BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == SANSA_CONNECT_PAD)
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_ORIENTATION  BUTTON_SELECT
+#   define FFT_WINDOW       BUTTON_VOL_DOWN
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_QUIT         BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

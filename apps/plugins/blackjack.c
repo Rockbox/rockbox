@@ -166,7 +166,8 @@ enum {
 #define BJACK_RIGHT         BUTTON_RIGHT
 #define BJACK_LEFT          BUTTON_LEFT
 
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_CONNECT_PAD)
 #define BJACK_SELECT_NAME    "SELECT"
 #define BJACK_STAY_NAME     "RIGHT"
 #define BJACK_QUIT_NAME     "POWER"
@@ -1032,7 +1033,8 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
       (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+      (CONFIG_KEYPAD == SANSA_FUZE_PAD) || \
+      (CONFIG_KEYPAD == SANSA_CONNECT_PAD)
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - h-2, " >>|:     +1");
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 1, " |<<:     -1");
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + h, "SCROLL+: +10");

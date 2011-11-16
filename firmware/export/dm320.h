@@ -870,6 +870,8 @@ extern unsigned long _ttbstart;
 #define CLK_MOD2_TMR0                  (1 << 1)
 #define CLK_MOD2_WDT                   (1 << 0)
 
+#define CLK_SEL0_UART0                 (1 << 5)
+
 #define CLK_SEL1_OSD                   (1 << 12)
 #define CLK_SEL1_CCD                   (1 << 8)
 #define CLK_SEL1_VENCPLL               (1 << 4)
@@ -884,6 +886,55 @@ extern unsigned long _ttbstart;
 #define CLK_BYP_DSP                    (1 << 4)
 #define CLK_BYP_ARM                    (1 << 0)
 
+#define CLK_INV_MMC                    (1 << 0)
+#define CLK_INV_VENC                   (1 << 4)
+#define CLK_INV_CCD                    (1 << 8)
+#define CLK_INV_SIF0                   (1 << 12)
+#define CLK_INV_SIF1                   (1 << 13)
+
+#define MMC_CTRL_DATRST                (1 << 0)
+#define MMC_CTRL_CMDRST                (1 << 1)
+#define MMC_CTRL_WIDTH                 (1 << 2)
+#define MMC_CTRL_DMASZEN               (1 << 4)
+#define MMC_CTRL_TEST2                 (1 << 8)
+#define MMC_CTRL_PERMDR                (1 << 9)
+#define MMC_CTRL_PERMDX                (1 << 10)
+
+#define MMC_CMD_CMD_MASK               (0x3F)
+#define MMC_CMD_PPLEN                  (1 << 7)
+#define MMC_CMD_BSYEXP                 (1 << 8)
+#define MMC_CMD_RSPFMT_SHIFT           9
+#define MMC_CMD_RSPFMT_MASK            (3 << MMC_CMD_RSPFMT_SHIFT)
+#define MMC_CMD_WRITE                  (1 << 11)
+#define MMC_CMD_STREAM                 (1 << 12)
+#define MMC_CMD_DATA                   (1 << 13)
+#define MMC_CMD_INITCLK                (1 << 14)
+#define MMC_CMD_DCLR                   (1 << 15)
+
+#define MMC_ST0_DATDNE                 (1 << 0)
+#define MMC_ST0_BSYDNE                 (1 << 1)
+#define MMC_ST0_RSPDNE                 (1 << 2)
+#define MMC_ST0_DATA_TIMEOUT           (1 << 3)
+#define MMC_ST0_CMD_TIMEOUT            (1 << 4)
+#define MMC_ST0_WR_CRCERR              (1 << 5)
+#define MMC_ST0_RD_CRCERR              (1 << 6)
+#define MMC_ST0_RESP_CRCERR            (1 << 7)
+#define MMC_ST0_DMADNE                 (1 << 8)
+#define MMC_ST0_DXRDY                  (1 << 9)
+#define MMC_ST0_DRRDY                  (1 << 10)
+#define MMC_ST0_DAT3_EDGE              (1 << 11)
+
+#define MMC_ST1_BUSY                   (1 << 0)
+#define MMC_ST1_CLKSTP                 (1 << 1)
+#define MMC_ST1_DXEMPTY                (1 << 2)
+#define MMC_ST1_DXFULL                 (1 << 3)
+#define MMC_ST1_DAT3ST                 (1 << 4)
+
+#define MMC_DMAMODE_RD_WORDSWAP        (1 << 10)
+#define MMC_DMAMODE_WR_WORDSWAP        (1 << 11)
+#define MMC_DMAMODE_WRITE              (1 << 12)
+#define MMC_DMAMODE_ENABLE             (1 << 13)
+#define MMC_DMAMODE_TIMEOUTIRQ_EN      (1 << 14)
 /*
  *  IO_EINTx bits
  */

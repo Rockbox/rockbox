@@ -511,6 +511,21 @@
 #define BUTTON_SAVE          (BUTTON_SELECT|BUTTON_REPEAT)
 #define BUTTON_SAVE_NAME "SELECT LONG"
 
+#elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
+#define SOKOBAN_LEFT         BUTTON_LEFT
+#define SOKOBAN_RIGHT        BUTTON_RIGHT
+#define SOKOBAN_UP           BUTTON_UP
+#define SOKOBAN_DOWN         BUTTON_DOWN
+#define SOKOBAN_MENU         BUTTON_POWER
+#define SOKOBAN_UNDO         BUTTON_PREV
+#define SOKOBAN_REDO         BUTTON_NEXT
+#define SOKOBAN_LEVEL_DOWN   BUTTON_VOL_DOWN
+#define SOKOBAN_LEVEL_REPEAT (BUTTON_NEXT|BUTTON_PREV)
+#define SOKOBAN_LEVEL_UP     BUTTON_VOL_UP
+#define SOKOBAN_PAUSE        BUTTON_SELECT
+#define BUTTON_SAVE          (BUTTON_SELECT|BUTTON_REPEAT)
+#define BUTTON_SAVE_NAME "SELECT LONG"
+
 #else
 #error No keymap defined!
 #endif
@@ -1487,6 +1502,13 @@ static int sokoban_menu(void)
                 rb->lcd_putsxy(3, 36, "[PREV] Previous Level");
                 rb->lcd_putsxy(3, 46, "[PLAY] Restart Level");
                 rb->lcd_putsxy(3, 56, "[NEXT] Next Level");
+#elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
+                rb->lcd_putsxy(3,  6, "[POWER] Menu");
+                rb->lcd_putsxy(3, 16, "[PREV] Undo");
+                rb->lcd_putsxy(3, 26, "[NEXT] Redo");
+                rb->lcd_putsxy(3, 36, "[VOL-] Previous Level");
+                rb->lcd_putsxy(3, 46, "[NEXT+PREV] Restart Level");
+                rb->lcd_putsxy(3, 56, "[VOL+] Next Level");
 #endif
 
 #ifdef HAVE_TOUCHSCREEN

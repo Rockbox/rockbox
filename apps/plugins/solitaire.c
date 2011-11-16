@@ -526,6 +526,24 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_CUR2STACK      "DOUBLE SELECT"
 #   define HK_REM2STACK      "LEFT"
 
+#elif (CONFIG_KEYPAD == SANSA_CONNECT_PAD)
+#   define SOL_QUIT          BUTTON_POWER
+#   define SOL_UP            BUTTON_UP
+#   define SOL_DOWN          BUTTON_DOWN
+#   define SOL_LEFT          BUTTON_SCROLL_BACK
+#   define SOL_RIGHT         BUTTON_SCROLL_FWD
+#   define SOL_MOVE          BUTTON_SELECT
+#   define SOL_DRAW          BUTTON_VOL_UP
+#   define SOL_REM2CUR       BUTTON_LEFT
+#   define SOL_CUR2STACK_PRE BUTTON_VOL_DOWN
+#   define SOL_CUR2STACK     BUTTON_NEXT
+#   define SOL_REM2STACK     BUTTON_PREV
+#   define HK_MOVE           "SELECT"
+#   define HK_DRAW           "Vol+"
+#   define HK_REM2CUR        "LEFT"
+#   define HK_CUR2STACK      "NEXT"
+#   define HK_REM2STACK      "PREV"
+
 #else
 #error No keymap defined!
 #endif

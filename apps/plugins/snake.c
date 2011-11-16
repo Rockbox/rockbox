@@ -105,7 +105,8 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
     (CONFIG_KEYPAD == SANSA_C200_PAD) || \
     (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-    (CONFIG_KEYPAD == SANSA_M200_PAD)
+    (CONFIG_KEYPAD == SANSA_M200_PAD) || \
+    (CONFIG_KEYPAD == SANSA_CONNECT_PAD)
 #define SNAKE_QUIT BUTTON_POWER
 #define SNAKE_LEFT BUTTON_LEFT
 #define SNAKE_RIGHT BUTTON_RIGHT

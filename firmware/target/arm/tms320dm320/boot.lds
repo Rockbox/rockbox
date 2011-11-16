@@ -28,14 +28,27 @@ STARTUP(target/arm/tms320dm320/crt0.o)
 #define LCD_TTB_AREA    0x100000*((LCD_BUFFER_SIZE>>19)+1)
 
 /* Bootloader only uses/knows about the upper 32 M */
-#define DRAMORIG    0x02900000
+#define DRAMORIG    CONFIG_SDRAM_START+0x02000000
 #define DRAMSIZE    (MEMORYSIZE * 0x80000)
 
 #define IRAMORIG    0x00000000
 #define IRAMSIZE    0x4000
 
+#ifdef SANSA_CONNECT
+/* Offset in flash from beginning, we don't want overwrite OF bootloader
+   due to recovery mode and more importantly - hardware block protection.
+   This offset makes Rockbox bootloader a replacement for OF vmlinux.
+   In .srr file header add any valid memory address from following
+   <0x1000000; 0x1300180) u (0x131EAF4; 0x1420000) u (0x1440000; 0x5000000>
+   ensuring that complete bootloader fits in.
+   Entry point in .srr file should be 0x120010. */
+#define FLASHOFFSET 0x20010
+#else
+#define FLASHOFFSET 0
+#endif
+
 #define FLASHORIG   0x00100000
-#define FLASHSIZE   0x00800000
+#define FLASHSIZE   0x00800000-FLASHOFFSET
 
 PRO_STACK_SIZE =  0x2000;
 IRQ_STACK_SIZE =  0x400;
@@ -48,7 +61,7 @@ MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
-   FLASH : ORIGIN = FLASHORIG, LENGTH = FLASHSIZE
+   FLASH : ORIGIN = FLASHORIG+FLASHOFFSET, LENGTH = FLASHSIZE
 }
 
 SECTIONS

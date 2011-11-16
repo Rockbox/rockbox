@@ -120,7 +120,7 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAMSIZE 0
 
 #elif CONFIG_CPU==DM320
-#define DRAMORIG 0x00900000 + STUBOFFSET
+#define DRAMORIG CONFIG_SDRAM_START + STUBOFFSET
 #define IRAM DRAM
 /* The bit of IRAM that is available is used in the core */
 #define IRAMSIZE 0

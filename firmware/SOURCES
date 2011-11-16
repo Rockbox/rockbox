@@ -355,6 +355,8 @@ drivers/audio/uda1341.c
 drivers/audio/cs42l55.c
 #elif defined (HAVE_RK27XX_CODEC)
 drivers/audio/rk27xx_codec.c
+#elif defined(HAVE_AIC3X)
+drivers/audio/aic3x.c
 #elif defined (HAVE_DUMMY_CODEC)
 drivers/audio/dummy_codec.c
 #endif /* defined(HAVE_*) */
@@ -1064,6 +1066,9 @@ target/arm/bits-armv4.S
 target/arm/tms320dm320/debug-dm320.c
 target/arm/tms320dm320/dsp-dm320.c
 target/arm/tms320dm320/i2c-dm320.c
+#ifdef HAVE_SOFTWARE_I2C
+drivers/generic_i2c.c
+#endif
 target/arm/tms320dm320/kernel-dm320.c
 target/arm/tms320dm320/spi-dm320.c
 target/arm/tms320dm320/system-dm320.c
@@ -1111,6 +1116,24 @@ target/arm/tms320dm320/creative-zvm/powermgmt-creativezvm.c
 target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #endif /* SIMULATOR */
 #endif /* CREATIVE_ZVx */
+
+#ifdef SANSA_CONNECT
+#ifndef SIMULATOR
+target/arm/mmu-arm.S
+target/arm/lcd-as-memframe.S
+target/arm/tms320dm320/sdmmc-dm320.c
+target/arm/tms320dm320/sansa-connect/crt0-board.S
+target/arm/tms320dm320/sansa-connect/lcd-sansaconnect.c
+target/arm/tms320dm320/sansa-connect/adc-sansaconnect.c
+target/arm/tms320dm320/sansa-connect/power-sansaconnect.c
+target/arm/tms320dm320/sansa-connect/powermgmt-sansaconnect.c
+target/arm/tms320dm320/sansa-connect/usb-sansaconnect.c
+target/arm/tms320dm320/sansa-connect/avr-sansaconnect.c
+target/arm/tms320dm320/sansa-connect/backlight-sansaconnect.c
+target/arm/tms320dm320/sansa-connect/pcm-sansaconnect.c
+target/arm/tms320dm320/dma-dm320.c
+#endif /* SIMULATOR */
+#endif /* SANSA_CONNECT */
 
 #ifdef MROBE_100
 #ifndef SIMULATOR

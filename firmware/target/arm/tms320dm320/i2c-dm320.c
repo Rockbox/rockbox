@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
+ * Copyright (C) 2011 by Tomasz Moń
  * Copyright (C) 2008 by Maurus Cuelenaere
  *
  * DM320 I²C driver
@@ -24,11 +25,11 @@
 #include "thread.h"
 #include "i2c-dm320.h"
 
-#define I2C_SCS_COND_START  0x0001
-#define I2C_SCS_COND_STOP   0x0002
-#define I2C_SCS_XMIT        0x0004
+#ifdef HAVE_SOFTWARE_I2C
+#include "generic_i2c.h"
+#endif
 
-#define I2C_TX_ACK          (1 << 8)
+#ifndef HAVE_SOFTWARE_I2C
 
 static struct mutex i2c_mtx;
 
@@ -41,6 +42,12 @@ static inline void i2c_end(void)
 {
     mutex_unlock(&i2c_mtx);
 }
+
+#define I2C_SCS_COND_START  0x0001
+#define I2C_SCS_COND_STOP   0x0002
+#define I2C_SCS_XMIT        0x0004
+
+#define I2C_TX_ACK          (1 << 8)
 
 static inline bool i2c_getack(void)
 {
@@ -158,3 +165,126 @@ void i2c_init(void)
     IO_I2C_SCS &= ~0x8; //set clock to 100 kHz
     IO_INTC_EINT2 &= ~INTR_EINT2_I2C; // disable I²C interrupt
 }
+
+#else /* Software I2C implementation */
+
+#ifdef SANSA_CONNECT
+    /* SDA - GIO35 */
+    #define SDA_SET_REG IO_GIO_BITSET2
+    #define SDA_CLR_REG IO_GIO_BITCLR2
+    #define SOFTI2C_SDA (1 << 3)
+    /* SCL - GIO36 */
+    #define SCL_SET_REG IO_GIO_BITSET2
+    #define SCL_CLR_REG IO_GIO_BITCLR2
+    #define SOFTI2C_SCL (1 << 4)
+#else
+    #error Configure SDA and SCL lines
+#endif
+
+static int dm320_i2c_bus;
+
+static void dm320_scl_dir(bool out)
+{
+    if (out)
+    {
+        IO_GIO_DIR2 &= ~(SOFTI2C_SCL);
+    }
+    else
+    {
+        IO_GIO_DIR2 |= SOFTI2C_SCL;
+    }
+}
+
+static void dm320_sda_dir(bool out)
+{
+    if (out)
+    {
+        IO_GIO_DIR2 &= ~(SOFTI2C_SDA);
+    }
+    else
+    {
+        IO_GIO_DIR2 |= SOFTI2C_SDA;
+    }
+}
+
+static void dm320_scl_out(bool high)
+{
+    if (high)
+    {
+        SCL_SET_REG = SOFTI2C_SCL;
+    }
+    else
+    {
+        SCL_CLR_REG = SOFTI2C_SCL;
+    }
+}
+
+static void dm320_sda_out(bool high)
+{
+    if (high)
+    {
+        SDA_SET_REG = SOFTI2C_SDA;
+    }
+    else
+    {
+        SDA_CLR_REG = SOFTI2C_SDA;
+    }
+}
+
+static bool dm320_scl_in(void)
+{
+    return (SCL_SET_REG & SOFTI2C_SCL);
+}
+
+static bool dm320_sda_in(void)
+{
+    return (SDA_SET_REG & SOFTI2C_SDA);
+}
+
+/* simple delay */
+static void dm320_i2c_delay(int delay)
+{
+    udelay(delay);
+}
+
+/* interface towards the generic i2c driver */
+static const struct i2c_interface dm320_i2c_interface = {
+    .scl_dir = dm320_scl_dir,
+    .sda_dir = dm320_sda_dir,
+    .scl_out = dm320_scl_out,
+    .sda_out = dm320_sda_out,
+    .scl_in = dm320_scl_in,
+    .sda_in = dm320_sda_in,
+    .delay = dm320_i2c_delay,
+
+    /* uncalibrated */
+    .delay_hd_sta = 1,
+    .delay_hd_dat = 1,
+    .delay_su_dat = 1,
+    .delay_su_sto = 1,
+    .delay_su_sta = 1,
+    .delay_thigh = 1
+};
+
+void i2c_init(void)
+{
+#ifdef SANSA_CONNECT
+    IO_GIO_FSEL3 &= 0xFF0F; /* GIO35, GIO36 as normal GIO */
+    IO_GIO_INV2 &= ~(SOFTI2C_SDA | SOFTI2C_SCL); /* not inverted */
+#endif
+
+    /* generic_i2c takes care of setting direction */
+    dm320_i2c_bus = i2c_add_node(&dm320_i2c_interface);
+}
+
+int i2c_write(unsigned short address, const unsigned char* buf, int count)
+{
+    return i2c_write_data(dm320_i2c_bus, address, -1, buf, count);
+}
+
+int i2c_read(unsigned short address, unsigned char* buf, int count)
+{
+    return i2c_read_data(dm320_i2c_bus, address, -1, buf, count);
+}
+
+#endif

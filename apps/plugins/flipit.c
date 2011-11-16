@@ -368,6 +368,18 @@
 #define FLIPIT_STEP_BY_STEP (BUTTON_BACK|BUTTON_PLAYPAUSE)
 #define FLIPIT_TOGGLE       BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
+
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         BUTTON_POWER
+#define FLIPIT_SHUFFLE      BUTTON_VOL_UP
+#define FLIPIT_SOLVE        BUTTON_PREV
+#define FLIPIT_STEP_BY_STEP BUTTON_NEXT
+#define FLIPIT_TOGGLE       BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif
@@ -838,6 +850,12 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_putsxy(2, 28, "[MODE] shuffle");
     rb->lcd_putsxy(2, 38, "[MENU..] solution");
     rb->lcd_putsxy(2, 48, "[MENU] step by step");
+#elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
+    rb->lcd_putsxy(2, 8, "[POWER] to stop");
+    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
+    rb->lcd_putsxy(2, 28, "[VOL+] shuffle");
+    rb->lcd_putsxy(2, 38, "[PREV] solution");
+    rb->lcd_putsxy(2, 48, "[NEXT] step by step");
 #endif
 
 #ifdef HAVE_TOUCHSCREEN

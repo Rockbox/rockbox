@@ -330,6 +330,18 @@ static void setoptions (void)
         options.SELECT = (BUTTON_PLAYPAUSE | BUTTON_REPEAT);
         options.MENU   = (BUTTON_SELECT | BUTTON_REPEAT);
 
+#elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
+        options.UP     = BUTTON_UP;
+        options.DOWN   = BUTTON_DOWN;
+        options.LEFT   = BUTTON_LEFT;
+        options.RIGHT  = BUTTON_RIGHT;
+
+        options.A      = BUTTON_VOL_UP;
+        options.B      = BUTTON_VOL_DOWN;
+        options.START  = BUTTON_PREV;
+        options.SELECT = BUTTON_NEXT;
+        options.MENU   = BUTTON_SELECT;
+
 #else
 #error No Keymap Defined!
 #endif

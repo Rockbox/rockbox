@@ -212,6 +212,7 @@ bool dbg_hw_info(void)
         button = button_get(false);
         if(button & BUTTON_POWER)
             done = true;
+#if defined(CREATIVE_ZVx)
         else if(button & BUTTON_LEFT)
             lcd_set_direct_fb(false);
         else if(button & BUTTON_RIGHT)
@@ -221,6 +222,7 @@ bool dbg_hw_info(void)
         lcd_putsf(0, line++, " LCD direct FB access? %s", 
             (lcd_get_direct_fb() ? "yes" : "no"));
         line++;
+#endif
 #endif
         lcd_puts(0, line++, "[Rockbox info]");
         lcd_putsf(0, line++, "current tick: %08x Seconds running: %08d",

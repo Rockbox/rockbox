@@ -341,6 +341,8 @@ int main (int argc, char** argv)
             modelnum = 73;
         else if (!strcmp(&argv[1][5], "clzp")) /* Sansa Clip Zip */
             modelnum = 79;
+        else if (!strcmp(&argv[1][5], "conn")) /* Sansa Connect */
+            modelnum = 81;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

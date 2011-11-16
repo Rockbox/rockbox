@@ -37,13 +37,20 @@ void tick_start(unsigned int interval_in_ms)
 
     /* Setup the Divisor */
     IO_TIMER1_TMDIV = (TIMER_FREQ / (10*1000))*interval_in_ms - 1;
-    
+
     /* Turn Timer1 to Free Run mode */
     IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_FREE_RUN;
     
     /* Enable the interrupt */
     bitset16(&IO_INTC_EINT0, INTR_EINT0_TMR1);
 }
+
+#ifdef BOOTLOADER
+void tick_stop(void)
+{
+    bitclr16(&IO_CLK_MOD2, CLK_MOD2_TMR1); /* disable TIMER1 clock */
+}
+#endif
 
 void TIMER1(void) __attribute__ ((section(".icode")));
 void TIMER1(void)

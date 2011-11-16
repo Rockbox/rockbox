@@ -41,4 +41,9 @@ void udelay(int usec);
     true; }) /* handled here */
 #endif
 
+#ifdef BOOTLOADER
+void tick_stop(void);
+void system_prepare_fw_start(void);
+#endif
+
 #endif /* SYSTEM_TARGET_H */

@@ -142,6 +142,7 @@
 #define RK27XX_GENERIC_PAD 49
 #define HM60X_PAD          50
 #define HM801_PAD          51
+#define SANSA_CONNECT_PAD  52
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -229,6 +230,7 @@
 #define LCD_SPFD5420A 42 /* rk27xx */
 #define LCD_CLIPZIP   43 /* as used by the Sandisk Sansa Clip Zip */
 #define LCD_HX8340B   44 /* as used by the HiFiMAN HM-601/HM-602/HM-801 */
+#define LCD_CONNECT   45 /* as used by the Sandisk Sansa Connect */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -302,6 +304,7 @@ Lyre prototype 1 */
 #define RTC_D2       18 /* Either PCF50606 or PCF50635 */
 #define RTC_S35380A  19
 #define RTC_IMX233   20
+#define RTC_STM41T62 21 /* ST M41T62 */
 
 /* USB On-the-go */
 #define USBOTG_M66591   6591 /* M:Robe 500 */
@@ -314,6 +317,7 @@ Lyre prototype 1 */
 #define USBOTG_AS3525v2 3535 /* AMS AS3525v2 FIXME : same as S3C6400X */
 #define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701/S5L8702/S5L8720 */
 #define USBOTG_RK27XX   2700 /* Rockchip rk27xx */
+#define USBOTG_TNETV105 105  /* TI TNETV105 */
 
 /* Multiple cores */
 #define CPU 0
@@ -466,6 +470,8 @@ Lyre prototype 1 */
 #include "config/hifimanhm60x.h"
 #elif defined(HM801)
 #include "config/hifimanhm801.h"
+#elif defined(SANSA_CONNECT)
+#include "config/sansaconnect.h"
 #elif defined(SDLAPP)
 #include "config/sdlapp.h"
 #elif defined(ANDROID)
