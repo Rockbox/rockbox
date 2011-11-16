@@ -4,7 +4,7 @@
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 80
+#define MODEL_NUMBER 82
 
 #define MODEL_NAME   "HiFiMAN HM-801"
 

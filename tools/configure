@@ -3074,7 +3074,7 @@ fi
     ;;
 
    191|hifimanhm801)
-    target_id=80
+    target_id=82
     modelname="hifimanhm801"
     target="-DHM801"
     memory=16
