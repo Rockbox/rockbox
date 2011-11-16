@@ -195,9 +195,11 @@ void *skin_find_item(const char *label, enum skin_find_what what,
     while (list.linkedlist)
     {
         bool skip = false;
+#ifdef HAVE_LCD_BITMAP
         struct wps_token *token = NULL;
         if (!isvplist)
             token = SKINOFFSETTOPTR(skin_buffer, list.linkedlist->token);
+#endif
         switch (what)
         {
             case SKIN_FIND_UIVP:
