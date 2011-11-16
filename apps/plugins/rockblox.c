@@ -889,7 +889,6 @@ static void load_game(void)
             < (ssize_t)sizeof(struct _rockblox_status))
     {
         rb->splash(HZ/2, "Loading Rockblox resume info failed");
-        return;
     } else {
         resume = true;
     }
