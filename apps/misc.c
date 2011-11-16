@@ -872,10 +872,12 @@ void system_sound_play(enum system_sound sound)
                   params->amplitude * *params->setting);
     }
 }
-
+ 
 /* Produce keyclick based upon button and global settings */
 void keyclick_click(int button)
 {
+    static long last_button = BUTTON_NONE;
+    bool do_beep = false;
     /* Settings filters */
     if (
 #ifdef HAVE_HARDWARE_CLICK
@@ -883,27 +885,48 @@ void keyclick_click(int button)
 #else
         global_settings.keyclick
 #endif
-        && (global_settings.keyclick_repeats || !(button & BUTTON_REPEAT)))
+        )
     {
-        /* Button filters */
-        if (button != BUTTON_NONE && !(button & BUTTON_REL)
-            && !(button & (SYS_EVENT|BUTTON_MULTIMEDIA)) )
+        if (global_settings.keyclick_repeats || !(button & BUTTON_REPEAT))
         {
-#ifdef HAVE_HARDWARE_CLICK
-            if (global_settings.keyclick)
+            /* Button filters */
+            if (button != BUTTON_NONE && !(button & BUTTON_REL)
+                && !(button & (SYS_EVENT|BUTTON_MULTIMEDIA)) )
             {
-                system_sound_play(SOUND_KEYCLICK);
+                do_beep = true;
             }
-            if (global_settings.keyclick_hardware)
-            {
-#if !defined(SIMULATOR)
-                piezo_button_beep(false, false);
+        }
+        else if ((button & BUTTON_REPEAT) && (last_button == BUTTON_NONE))
+        {
+            do_beep = true;
+        }
+#ifdef HAVE_SCROLLWHEEL
+        else if (button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD))
+        {
+            do_beep  = true;
+        }
 #endif
-            }
-#else
+    }
+    if (button&BUTTON_REPEAT)
+        last_button = button;
+    else
+        last_button = BUTTON_NONE;
+    if (do_beep)
+    {
+#ifdef HAVE_HARDWARE_CLICK
+        if (global_settings.keyclick)
+        {
             system_sound_play(SOUND_KEYCLICK);
+        }
+        if (global_settings.keyclick_hardware)
+        {
+#if !defined(SIMULATOR)
+            piezo_button_beep(false, false);
 #endif
         }
+#else
+        system_sound_play(SOUND_KEYCLICK);
+#endif
     }
 }
 #endif /* CONFIG_CODEC == SWCODEC */
