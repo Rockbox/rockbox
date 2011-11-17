@@ -417,7 +417,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -1530,7 +1530,7 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: ""Tulum" način"
+    *: ""
   </dest>
   <voice>
     *: "Tulum način"
@@ -1682,7 +1682,6 @@
   </source>
   <dest>
     *: none
-    crossfade: "Način rada "Utišaj""
   </dest>
   <voice>
     *: none
@@ -1984,19 +1983,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Vrijeme za premotati"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Vrijeme za premotati"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2237,6 +2233,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Izgrađivanje baze podataka... %d pronađeno (OFF za povratak)"
@@ -2245,6 +2242,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Izgrađivanje baze podataka... %d pronađeno (LEFT za povratak)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Izgrađivanje baze podataka... %d pronađeno (PREV za povratak)"
     gogearsa9200: "Izgrađivanje baze podataka... %d pronađeno (REW za povratak)"
+    archosplayer: ""
   </dest>
   <voice>
     *: "pronađeni unosi za bazu podataka"
@@ -4407,7 +4405,6 @@
   </source>
   <dest>
     *: none
-    charging: "Način rada "Automobilski adapter""
   </dest>
   <voice>
     *: none
@@ -6460,7 +6457,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -7905,8 +7902,6 @@
     *: "Vrijeme"
   </voice>
 </phrase>
-/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
- * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -7982,10 +7977,6 @@
   </source>
   <dest>
     *: none
-    recording: "Disk je pun. Pritisnite "OFF" za nastavak."
-    iriverh100,iriverh120,iriverh300: "Disk je pun. Pritisnite "STOP" za nastavak."
-    iaudiom5,iaudiox5: "Disk je pun. Pritisnite "POWER" za nastavak."
-    sansae200*,sansac200*,vibe500: "Disk je pun. Pritisnite "PREV" za nastavak."
   </dest>
   <voice>
     *: none
@@ -8019,7 +8010,6 @@
   </source>
   <dest>
     *: none
-    soft_shutdown: "Pritisnite "OFF" za gašenje"
   </dest>
   <voice>
     *: none
@@ -9690,7 +9680,6 @@
   </source>
   <dest>
     *: none
-    swcodec: "Način "Uređivanje": %s %s"
   </dest>
   <voice>
     *: none
@@ -10420,15 +10409,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Odsijecanje basa"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Odsijecanje basa"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Odsijecanje basa"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Odsijecanje basa"
   </voice>
 </phrase>
 <phrase>
@@ -10437,15 +10426,15 @@
   user: core
   <source>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo: "Odsijecanje treblea"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Odsijecanje treblea"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Odsijecanje treblea"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Odsijecanje treblea"
   </voice>
 </phrase>
 <phrase>
@@ -11180,11 +11169,9 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Način rada "Ekran na dodir""
   </dest>
   <voice>
     *: none
-    touchscreen: "Način rada "Ekran na dodir""
   </voice>
 </phrase>
 <phrase>
@@ -11426,11 +11413,9 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Način "USB Keypad""
   </dest>
   <voice>
     *: none
-    usb_hid: "Način "USB Keypad""
   </voice>
 </phrase>
 <phrase>
@@ -12381,15 +12366,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D poboljšanje"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D poboljšanje"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D poboljšanje"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D poboljšanje"
   </voice>
 </phrase>
 <phrase>
@@ -12615,5 +12600,134 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Trenutni popis izvođenja"
+  </dest>
+  <voice>
+    *: "Trenutni popis izvođenja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Automatsko nastavljanje"
+  </dest>
+  <voice>
+    *: "Automatsko nastavljanje"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Nastavi na automatsku promjenu pjesme"
+  </dest>
+  <voice>
+    *: "Nastavi na automatsku promjenu pjesme"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "USB skrivanje unutrašnjeg uređaja"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "USB skrivanje unutrašnjeg uređaja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Postavi kao direktorij kataloga popisa izvođenja"
+  </dest>
+  <voice>
+    *: "Postavi kao direktorij kataloga popisa izvođenja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Spremiti promjene?"
+  </dest>
+  <voice>
+    *: "Spremiti promjene?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Premotaj natrag pri stanci"
+  </dest>
+  <voice>
+    *: "Premotaj natrag pri stanci"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Vrati uobičajeni direktorij kataloga popisa izvođenja"
+  </dest>
+  <voice>
+    *: "Vrati uobičajeni direktorij kataloga popisa izvođenja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Samo u prilagođenim direktorijima"
+  </dest>
+  <voice>
+    *: "Samo u prilagođenim direktorijima"
   </voice>
 </phrase>
