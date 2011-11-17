@@ -317,10 +317,7 @@ static void button_event(int key, bool pressed)
         if (!pressed)
         {
             usb_connected = !usb_connected;
-            if (usb_connected)
-                queue_post(&button_queue, SYS_USB_CONNECTED, 0);
-            else
-                queue_post(&button_queue, SYS_USB_DISCONNECTED, 0);
+            sim_trigger_usb(usb_connected);
         }
         return;
 

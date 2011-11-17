@@ -782,16 +782,14 @@ void usb_set_hid(bool enable)
 }
 #endif /* USB_ENABLE_HID */
 
-#else /* SIMULATOR || USB_NONE */
+#elif defined(USB_NONE)
+/* Dummy functions for USB_NONE  */
 
-#ifdef USB_NONE
 bool usb_inserted(void)
 {
     return false;
 }
-#endif /* USB_NONE */
 
-/* Dummy simulator functions */
 void usb_acknowledge(long id)
 {
     id = id;
@@ -814,5 +812,5 @@ void usb_wait_for_disconnect(struct event_queue *q)
 {
    (void)q;
 }
+#endif /* USB_NONE */
 
-#endif /* !USB_NONE && !SIMULATOR */

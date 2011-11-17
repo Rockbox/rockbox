@@ -190,9 +190,7 @@ static enum filling_state
     STATE_FINISHED, /* all remaining tracks are fully buffered */
     STATE_ENDING,   /* audio playback is ending */
     STATE_ENDED,    /* audio playback is done */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     STATE_USB,      /* USB mode, ignore most messages */
-#endif
 } filling = STATE_IDLE;
 
 /* Track info - holds information about each track in the buffer */
@@ -3129,7 +3127,6 @@ static void audio_thread(void)
             break;
 #endif /* AUDIO_HAVE_RECORDING */
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         case SYS_USB_CONNECTED:
             LOGFQUEUE("audio < SYS_USB_CONNECTED");
             audio_stop_playback();
@@ -3139,7 +3136,6 @@ static void audio_thread(void)
             filling = STATE_USB;
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             break;
-#endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) */
 
         case SYS_TIMEOUT:
             LOGFQUEUE_SYS_TIMEOUT("audio < SYS_TIMEOUT");

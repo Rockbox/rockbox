@@ -4705,13 +4705,11 @@ static void tagcache_thread(void)
             case SYS_POWEROFF:
                 break ;
                 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
             case SYS_USB_CONNECTED:
                 logf("USB: TagCache");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&tagcache_queue);
                 break ;
-#endif
         }
     }
 }

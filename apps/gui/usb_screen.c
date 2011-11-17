@@ -251,9 +251,7 @@ void gui_usb_screen_run(bool early_usb)
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
 
-#ifndef SIMULATOR
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
-#endif
 
 #ifdef USB_ENABLE_HID
     usb_hid = global_settings.usb_hid;
