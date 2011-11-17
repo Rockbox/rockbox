@@ -16,6 +16,8 @@
 #
 # Brazilian Portuguese language file, translated by:
 # - Adilson V. Xavier
+# - Kessia Pinheiro
+
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -417,7 +419,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -1984,19 +1986,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Duração de Rebobinagem"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Duração de Rebobinagem"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2237,6 +2236,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Construindo Base de Dados... %d encontrados (OFF para retornar)"
@@ -2245,6 +2245,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construindo Base de Dados... %d encontrados (LEFT para retornar)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Construindo Base de Dados... %d encontrados (PREV para retornar)"
     gogearsa9200: "Construindo Base de Dados... %d encontrados (REW para retornar)"
+    archosplayer: "Construindo BD %d encontrado"
   </dest>
   <voice>
     *: "entradas encontradas para a base de dados"
@@ -3976,7 +3977,7 @@
     rtc: "OFF = Revert"
     mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
@@ -3990,7 +3991,7 @@
     rtc: "OFF = Reverter"
     mrobe500: "POWER = Reverter"
     iriverh100,iriverh120,iriverh300: "STOP = Reverter"
-    ipod*,sansac200*: "MENU = Reverter"
+    ipod*,sansac200*,mpiohd300: "MENU = Reverter"
     iaudiox5,iaudiom5: "RECORD = Reverter"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Reverter"
     gigabeatfx: "POWER = Reverter"
@@ -4001,7 +4002,6 @@
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -6460,7 +6460,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -12379,15 +12379,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Realce 3D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Efeito 3D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Realce 3-D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Efeito 3D"
   </voice>
 </phrase>
 <phrase>
@@ -12540,5 +12540,280 @@
   </dest>
   <voice>
     *: "Tamanho do Arquivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Playlist Atual"
+  </dest>
+  <voice>
+    *: "Playlist Atual"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Resumo Automático"
+  </dest>
+  <voice>
+    *: "Resumo Automático"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Resumir na mudança automática de faixa"
+  </dest>
+  <voice>
+    *: "Resumir na mudança automática de faixa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "Ocultar Drive USB Interno"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "Ocultar Drive USB Interno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Definir como Diretório do Catálogo de Playlist"
+  </dest>
+  <voice>
+    *: "Definir como Diretório do Catálogo de Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Preenchimento de Linha das Listas"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Preenchimento de Linha das Listas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Salvar Mudanças?"
+  </dest>
+  <voice>
+    *: "Salvar Mudanças?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Voltar depois de Pausar"
+  </dest>
+  <voice>
+    *: "Voltar depois de Pausar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automático"
+  </dest>
+  <voice>
+    *: "Automático"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Cancelar Desligamento Automático"
+  </dest>
+  <voice>
+    *: "Cancelar Desligamento Automático"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Começar o Navegador de Arquivos na Raiz /"
+  </dest>
+  <voice>
+    *: "Começar o Navegador de Arquivos na Raiz /"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Força do Sinal:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Força do Sinal:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Tempo para o Desligamento Automático"
+  </dest>
+  <voice>
+    *: "Tempo para o Desligamento Automático"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Reiniciar o Diretório do Catálogo de Playlist"
+  </dest>
+  <voice>
+    *: "Reiniciar o Diretório do Catálogo de Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Iniciar o Desligamento Automático na Inicialização"
+  </dest>
+  <voice>
+    *: "Iniciar o Desligamento Automático na Inicialização"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Apenas em diretórios customizados"
+  </dest>
+  <voice>
+    *: "Apenas em diretórios customizados"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Iniciar Navegador de Arquivos Aqui"
+  </dest>
+  <voice>
+    *: "Iniciar Navegador de Arquivos Aqui"
   </voice>
 </phrase>
