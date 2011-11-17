@@ -1530,7 +1530,7 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: ""
+    *: ""Tulum" način"
   </dest>
   <voice>
     *: "Tulum način"
@@ -1682,6 +1682,7 @@
   </source>
   <dest>
     *: none
+    crossfade: "Način rada "Utišaj""
   </dest>
   <voice>
     *: none
@@ -2233,7 +2234,6 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
-    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Izgrađivanje baze podataka... %d pronađeno (OFF za povratak)"
@@ -2242,7 +2242,6 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Izgrađivanje baze podataka... %d pronađeno (LEFT za povratak)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Izgrađivanje baze podataka... %d pronađeno (PREV za povratak)"
     gogearsa9200: "Izgrađivanje baze podataka... %d pronađeno (REW za povratak)"
-    archosplayer: ""
   </dest>
   <voice>
     *: "pronađeni unosi za bazu podataka"
@@ -4405,6 +4404,7 @@
   </source>
   <dest>
     *: none
+    charging: "Način rada "Automobilski adapter""
   </dest>
   <voice>
     *: none
@@ -7977,6 +7977,10 @@
   </source>
   <dest>
     *: none
+    recording: "Disk je pun. Pritisnite OFF za nastavak."
+    iriverh100,iriverh120,iriverh300: "Disk je pun. Pritisnite STOP za nastavak."
+    iaudiom5,iaudiox5: "Disk je pun. Pritisnite POWER za nastavak."
+    sansae200*,sansac200*,vibe500: "Disk je pun. Pritisnite PREV za nastavak."
   </dest>
   <voice>
     *: none
@@ -8010,6 +8014,7 @@
   </source>
   <dest>
     *: none
+    soft_shutdown: "Pritisnite OFF za gašenje"
   </dest>
   <voice>
     *: none
@@ -9680,6 +9685,7 @@
   </source>
   <dest>
     *: none
+    swcodec: "Način "Uređivanje": %s %s"
   </dest>
   <voice>
     *: none
@@ -11169,9 +11175,11 @@
   </source>
   <dest>
     *: none
+    touchscreen: "Način rada "Ekran na dodir""
   </dest>
   <voice>
     *: none
+    touchscreen: "Način rada "Ekran na dodir""
   </voice>
 </phrase>
 <phrase>
@@ -11413,9 +11421,11 @@
   </source>
   <dest>
     *: none
+    usb_hid: "Način "USB Keypad""
   </dest>
   <voice>
     *: none
+    usb_hid: "Način "USB Keypad""
   </voice>
 </phrase>
 <phrase>
