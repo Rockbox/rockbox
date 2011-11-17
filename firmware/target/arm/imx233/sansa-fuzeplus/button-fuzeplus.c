@@ -30,7 +30,7 @@
 
 #ifndef BOOTLOADER
 
-void button_debug_screen(void)
+bool button_debug_screen(void)
 {
     char product_id[RMI_PRODUCT_ID_LEN];
     rmi_read(RMI_PRODUCT_ID, RMI_PRODUCT_ID_LEN, product_id);
@@ -63,9 +63,9 @@ void button_debug_screen(void)
     report_vp.height = zone_h;
     struct viewport gesture_vp;
     memset(&gesture_vp, 0, sizeof(gesture_vp));
-    gesture_vp.x = 0;
+    gesture_vp.x = LCD_WIDTH / 2;
     gesture_vp.y = zone_y - 80;
-    gesture_vp.width = LCD_WIDTH;
+    gesture_vp.width = LCD_WIDTH / 2;
     gesture_vp.height = 80;
     
     while(1)
@@ -165,6 +165,8 @@ void button_debug_screen(void)
         
         yield();
     }
+
+    return true;
 }
 
 struct button_area_t
@@ -295,7 +297,14 @@ void button_init_device(void)
     
     rmi_init(0x40);
 
-    rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 5);
+    char product_id[RMI_PRODUCT_ID_LEN];
+    rmi_read(RMI_PRODUCT_ID, RMI_PRODUCT_ID_LEN, product_id);
+    /* adjust sensitivity based on product ID like the OF */
+    if(product_id[1] > 2)
+        rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 0);
+    else
+        rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 13);
+    
     rmi_write_single(RMI_2D_GESTURE_SETTINGS,
         RMI_2D_GESTURE_PRESS_TIME_300MS |
         RMI_2D_GESTURE_FLICK_DIST_4MM << RMI_2D_GESTURE_FLICK_DIST_BP |

@@ -21,8 +21,9 @@
 
 #include "system.h"
 #include "debug-target.h"
+#include "button-target.h"
 
 bool dbg_hw_target_info(void)
 {
-    return false;
+    return button_debug_screen();
 }
