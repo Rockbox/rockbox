@@ -12341,15 +12341,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Vylepšenie"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Rozšírenie"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Vylepšenie"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3D rozšírenie"
   </voice>
 </phrase>
 <phrase>
@@ -12672,10 +12672,10 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalog dir
+  desc: used in the onplay menu to set a playlist catalogue dir
   user: core
   <source>
-    *: "Set As Playlist Catalog Directory"
+    *: "Set As Playlist Catalogue Directory"
   </source>
   <dest>
     *: "Nastaviť Ako Priečinok Katalógu Plejlistov"
@@ -12717,12 +12717,102 @@
   desc:
   user: core
   <source>
-    *: "Reset Playlist Catalog Directory"
+    *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
     *: "Resetovať Priečinok Katalógu Plejlistov"
   </dest>
   <voice>
     *: "Resetovať Priečinok Katalógu Plejlistov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "USB Skryť Interný Disk"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "USB Skryť Interný Disk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Zarovnanie Riadka v Zoznamoch"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Zarovnanie Riadka v Zoznamoch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automaticky"
+  </dest>
+  <voice>
+    *: "Automaticky"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Zrušiť Časovač Spánku"
+  </dest>
+  <voice>
+    *: "Zrušiť Časovač Spánku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Predvolené Trvanie Pre Časovač Spánku"
+  </dest>
+  <voice>
+    *: "Predvolené Trvanie Pre Časovač Spánku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Aktivovať Časovač Spánku Po Zapnutí"
+  </dest>
+  <voice>
+    *: "Aktivovať Časovač Spánku Po Zapnutí"
   </voice>
 </phrase>
