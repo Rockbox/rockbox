@@ -308,13 +308,13 @@ void gui_message_loop(void)
 static void button_event(int key, bool pressed)
 {
     int new_btn = 0;
-    static bool usb_connected = false;
     switch (key)
     {
 #ifdef SIMULATOR
     case USB_KEY:
         if (!pressed)
         {
+            static bool usb_connected = false;
             usb_connected = !usb_connected;
             sim_trigger_usb(usb_connected);
         }
