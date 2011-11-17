@@ -89,6 +89,7 @@
     #define BDEBUGF(...) do { } while(0)
 #endif
 
+#define IS_MOVABLE(a) (!a[2].ops || a[2].ops->move_callback)
 static union buflib_data* find_first_free(struct buflib_context *ctx);
 static union buflib_data* find_block_before(struct buflib_context *ctx,
                                             union buflib_data* block,
@@ -198,7 +199,7 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     char* new_start;
     union buflib_data *new_block, *tmp = block[1].handle;
     struct buflib_callbacks *ops = block[2].ops;
-    if (ops && !ops->move_callback)
+    if (!IS_MOVABLE(block))
         return false;
 
     int handle = ctx->handle_table - tmp;
@@ -312,8 +313,10 @@ buflib_compact_and_shrink(struct buflib_context *ctx, unsigned shrink_hints)
         result = buflib_compact(ctx);
     if (!result)
     {
-        union buflib_data* this;
-        for(this = ctx->buf_start; this < ctx->alloc_end; this += abs(this->val))
+        union buflib_data *this, *before;
+        for(this = ctx->buf_start, before = this;
+            this < ctx->alloc_end;
+            before = this, this += abs(this->val))
         {
             if (this->val > 0 && this[2].ops
                               && this[2].ops->shrink_callback)
@@ -322,6 +325,20 @@ buflib_compact_and_shrink(struct buflib_context *ctx, unsigned shrink_hints)
                 int handle = ctx->handle_table - this[1].handle;
                 char* data = this[1].handle->alloc;
                 bool last = (this+this->val) == ctx->alloc_end;
+                unsigned pos_hints = shrink_hints & BUFLIB_SHRINK_POS_MASK;
+                /* adjust what we ask for if there's free space in the front
+                 * this isn't too unlikely assuming this block is
+                 * shrinkable but not movable */
+                if (pos_hints == BUFLIB_SHRINK_POS_FRONT
+                    && before != this && before->val < 0)
+                {   
+                    size_t free_space = (-before->val) * sizeof(union buflib_data);
+                    size_t wanted = shrink_hints & BUFLIB_SHRINK_SIZE_MASK;
+                    if (wanted < free_space) /* no shrink needed? */
+                        continue;
+                    wanted -= free_space;
+                    shrink_hints = pos_hints | wanted;
+                }
                 ret = this[2].ops->shrink_callback(handle, shrink_hints,
                                             data, (char*)(this+this->val)-data);
                 result |= (ret == BUFLIB_CB_OK);
@@ -598,9 +615,8 @@ buflib_free(struct buflib_context *ctx, int handle_num)
     return 0; /* unconditionally */
 }
 
-/* Return the maximum allocatable memory in bytes */
-size_t
-buflib_available(struct buflib_context* ctx)
+static size_t
+free_space_at_end(struct buflib_context* ctx)
 {
     /* subtract 5 elements for
      * val, handle, name_len, ops and the handle table entry*/
@@ -611,6 +627,46 @@ buflib_available(struct buflib_context* ctx)
 
     if (diff > 0)
         return diff;
+    else
+        return 0;
+}
+
+/* Return the maximum allocatable memory in bytes */
+size_t
+buflib_available(struct buflib_context* ctx)
+{
+    union buflib_data *this;
+    size_t free_space = 0, max_free_space = 0;
+
+    /* make sure buffer is as contiguous as possible  */
+    if (!ctx->compact)
+        buflib_compact(ctx);
+
+    /* now look if there's free in holes */
+    for(this = find_first_free(ctx); this < ctx->alloc_end; this += abs(this->val))
+    {
+        if (this->val < 0)
+        {
+            free_space += -this->val;
+            continue;
+        }
+        /* an unmovable section resets the count as free space
+         * can't be contigous */
+        if (!IS_MOVABLE(this))
+        {
+            if (max_free_space < free_space)
+                max_free_space = free_space;
+            free_space = 0;
+        }
+    }
+
+    /* select the best */
+    max_free_space = MAX(max_free_space, free_space);
+    max_free_space *= sizeof(union buflib_data);
+    max_free_space = MAX(max_free_space, free_space_at_end(ctx));
+
+    if (max_free_space > 0)
+        return max_free_space;
     else
         return 0;
 }

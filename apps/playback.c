@@ -733,13 +733,24 @@ static void scratch_mem_init(void *mem)
 }
 
 static int audiobuf_handle;
+#define AUDIO_BUFFER_RESERVE (256*1024)
 static size_t filebuflen;
+
+
+size_t audio_buffer_size(void)
+{
+    if (audiobuf_handle > 0)
+        return filebuflen - AUDIO_BUFFER_RESERVE;
+    return 0;
+}
 
 size_t audio_buffer_available(void)
 {
-    if (audiobuf_handle > 0) /* if allocated return what we got */
-        return filebuflen;
-    return core_available();
+    size_t size = 0;
+    size_t core_size = core_available();
+    if (audiobuf_handle > 0) /* if allocated return what we can give */
+        size = filebuflen - AUDIO_BUFFER_RESERVE - 128;
+    return MAX(core_size, size);
 }
 
 /* Set up the audio buffer for playback
@@ -840,7 +851,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     size_t wanted_size = (hints & BUFLIB_SHRINK_SIZE_MASK);
     ssize_t size = (ssize_t)old_size - wanted_size;
     /* keep at least 256K for the buffering */
-    if ((size - extradata_size) < 256*1024)
+    if ((size - extradata_size) < AUDIO_BUFFER_RESERVE)
         return BUFLIB_CB_CANNOT_SHRINK;
 
 

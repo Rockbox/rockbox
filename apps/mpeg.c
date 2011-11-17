@@ -151,7 +151,7 @@ static bool paused;             /* playback is paused */
 static int audiobuf_handle;     /* handle to the audio buffer */
 static char* mpeg_audiobuf;     /* poiunter to the audio buffer */
 static long audiobuflen;        /* length of the audio buffer */
-
+#define AUDIO_BUFFER_RESERVE    (256*1024)
 #ifdef SIMULATOR
 static char mpeg_stack[DEFAULT_STACK_SIZE];
 static struct mp3entry taginfo;
@@ -515,9 +515,16 @@ static void audio_reset_buffer_noalloc(void* buf, size_t bufsize);
 /* Buffer must not move. */
 static int shrink_callback(int handle, unsigned hints, void* start, size_t old_size)
 {
-    long offset = audio_current_track()->offset;
-    bool playing = (audio_status() & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY;
+    ssize_t extradata_size = old_size - audiobuflen;
+    /* check what buflib requests */
+    size_t wanted_size = (hints & BUFLIB_SHRINK_SIZE_MASK);
+    ssize_t size = (ssize_t)old_size - wanted_size;
+    /* keep at least 256K for the buffering */
+    if ((size - extradata_size) < AUDIO_BUFFER_RESERVE)
+        return BUFLIB_CB_CANNOT_SHRINK;
     /* TODO: Do it without stopping playback, if possible */
+    bool playing = (audio_status() & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY;
+    long offset = audio_current_track()->offset;
     /* don't call audio_hard_stop() as it frees this handle */
     if (thread_self() == audio_thread_id)
     {   /* inline case MPEG_STOP (audio_stop()) response
@@ -528,9 +535,6 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
         audio_stop();
     talk_buffer_steal(); /* we obtain control over the buffer */
 
-    /* we should be free to change the buffer now */
-    size_t wanted_size = (hints & BUFLIB_SHRINK_SIZE_MASK);
-    ssize_t size = (ssize_t)old_size - wanted_size;
     switch (hints & BUFLIB_SHRINK_POS_MASK)
     {
         case BUFLIB_SHRINK_POS_BACK:
@@ -2742,11 +2746,20 @@ void audio_set_recording_options(struct audio_recording_options *options)
 #endif /* SIMULATOR */
 #endif /* CONFIG_CODEC == MAS3587F */
 
-size_t audio_buffer_available(void)
+size_t audio_buffer_size(void)
 {
     if (audiobuf_handle > 0)
         return audiobuflen;
-    return core_available();
+    return 0;
+}
+
+size_t audio_buffer_available(void)
+{
+    size_t size = 0;
+    size_t core_size = core_available();
+    if (audiobuf_handle > 0)
+        return audiobuflen - AUDIO_BUFFER_RESERVE - 128;
+    return MAX(core_size, size);
 }
 
 static void audio_reset_buffer_noalloc(void* buf, size_t bufsize)
