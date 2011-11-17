@@ -18,6 +18,7 @@
 # - ventsi84 at thecrayer.com
 # - Nicolay Jordanov
 # - Hristo Kovachev
+# - Vencislav Atanasov
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -11968,15 +11969,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D усилване"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3D ефект"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D усилване"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3D ефект"
   </voice>
 </phrase>
 <phrase>
@@ -12716,5 +12717,95 @@
   </dest>
   <voice>
     *: "Отваряй файловия браузър тук"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "Скрий вграденото USB устройство"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "Скрий вграденото USB устройство"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Допълване на реда в списъци"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Допълване на реда в списъци"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Автоматично"
+  </dest>
+  <voice>
+    *: "Автоматично"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Отмени таймер"
+  </dest>
+  <voice>
+    *: "Отмени таймер"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Време на таймера по подразбиране"
+  </dest>
+  <voice>
+    *: "Време на таймера по подразбиране"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Стартирай таймера при включване"
+  </dest>
+  <voice>
+    *: "Стартирай таймера при включване"
   </voice>
 </phrase>
