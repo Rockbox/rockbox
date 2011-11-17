@@ -733,10 +733,14 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
 {
     int a = lif->num_options;
     int b;
+    bool number_set = true;
     struct wps_token *liftoken = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), lif->token);
     const char* out_text = get_token_value(gwps, liftoken, offset, buf, buf_size, &a);            
     if (a == -1 && liftoken->type != SKIN_TOKEN_VOLUME)
+    {
         a = (out_text && *out_text) ? 1 : 0;
+        number_set = false;
+    }
     switch (lif->operand.type)
     {
         case STRING:
@@ -749,6 +753,9 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
             break;
         }
         case INTEGER:
+            if (!number_set && out_text && *out_text >= '0' && *out_text <= '9')
+                a = atoi(out_text);
+            /* fall through */
         case DECIMAL:
             b = lif->operand.data.number;
             break;
