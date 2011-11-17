@@ -8,6 +8,7 @@ sim_icons.c
 sim_tasks.c
 fmradio.c
 backlight-sim.c
+stubs.c
 #endif
 
 io.c
@@ -15,4 +16,3 @@ io.c
 #if !(CONFIG_PLATFORM & PLATFORM_MAEMO)
 powermgmt-sim.c
 #endif
-stubs.c
