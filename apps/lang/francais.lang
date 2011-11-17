@@ -31,6 +31,7 @@
 # - Nicolas Pennequin
 # - Clément Pit-Claudel 
 # - Michaël Burtin
+# - Olivier Kaloudoff
 #
 # Original comments below:
 #
@@ -445,7 +446,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -6487,7 +6488,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -12406,15 +12407,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Amélioration 3-D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Amélioration 3D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Amélioration 3-D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Amélioration 3D"
   </voice>
 </phrase>
 <phrase>
@@ -12685,7 +12686,6 @@
   </voice>
 </phrase>
 <phrase>
-<phrase>
   id: LANG_PAUSE_REWIND
   desc: Seconds to rewind when rewind on pause is enabled.
   user: core
@@ -12697,5 +12697,151 @@
   </dest>
   <voice>
     *: "Rembobiner lors de la mise en pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Liste de lecture courante"
+  </dest>
+  <voice>
+    *: "Liste de lecture courante"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "Disque Interne USB"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "Disque Interne USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Renseigner Répertoire des Catalogues de Listes de lecture"
+  </dest>
+  <voice>
+    *: "Renseigner Répertoire des Catalogues de Listes de lecture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Remplissage des listes"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Remplissage des listes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Enregistrer Changements?"
+  </dest>
+  <voice>
+    *: "Enregistrer Changements?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatique"
+  </dest>
+  <voice>
+    *: "Automatique"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Annuler Minuterie d'arrêt"
+  </dest>
+  <voice>
+    *: "Annuler Minuterie d'arrêt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Durée par défault Minuterie d'arrêt"
+  </dest>
+  <voice>
+    *: "Durée par défault Minuterie d'arrêt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "RAZ Répertoire des Catalogues de Listes de lecture"
+  </dest>
+  <voice>
+    *: "RAZ Répertoire des Catalogues de Listes de lecture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Lancer la Minuterie d'arrêt au Démarrage"
+  </dest>
+  <voice>
+    *: "Lancer la Minuterie d'arrêt au Démarrage"
   </voice>
 </phrase>
