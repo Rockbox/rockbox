@@ -1771,7 +1771,7 @@ static bool dbg_fm_radio(void)
 #endif /* CONFIG_TUNER */
 #endif /* !SIMULATOR */
 
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && !defined(APPLICATION)
 extern bool do_screendump_instead_of_usb;
 
 static bool dbg_screendump(void)
@@ -2057,7 +2057,9 @@ static const struct the_menu_item menuitems[] = {
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View battery", view_battery },
 #endif
+#ifndef APPLICATION
         { "Screendump", dbg_screendump },
+#endif
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View HW info", dbg_hw_info },

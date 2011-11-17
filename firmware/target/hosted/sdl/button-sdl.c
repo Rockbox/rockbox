@@ -309,10 +309,9 @@ static void button_event(int key, bool pressed)
 {
     int new_btn = 0;
     static bool usb_connected = false;
-    if (usb_connected && key != USB_KEY)
-        return;
     switch (key)
     {
+#ifdef SIMULATOR
     case USB_KEY:
         if (!pressed)
         {
@@ -320,7 +319,7 @@ static void button_event(int key, bool pressed)
             sim_trigger_usb(usb_connected);
         }
         return;
-
+#endif
 #if (CONFIG_PLATFORM & PLATFORM_PANDORA)
     case SDLK_LCTRL:
         /* Will post SDL_USEREVENT in shutdown_hw() if successful. */
@@ -372,6 +371,7 @@ static void button_event(int key, bool pressed)
             }
         break;
 #endif
+#ifndef APPLICATION
     case SDLK_KP0:
     case SDLK_F5:
         if(pressed)
@@ -380,6 +380,7 @@ static void button_event(int key, bool pressed)
             return;
         }
         break;
+#endif
 #ifdef HAVE_TOUCHSCREEN
     case SDLK_F4:
         if(pressed)

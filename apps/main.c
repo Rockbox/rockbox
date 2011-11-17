@@ -131,7 +131,9 @@
 #endif
 
 #if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
+#ifdef SIMULATOR
 #include "sim_tasks.h"
+#endif
 #include "system-sdl.h"
 #define HAVE_ARGV_MAIN
 /* Don't use SDL_main on windows -> no more stdio redirection */
@@ -360,7 +362,7 @@ static void init(void)
     button_init();
     powermgmt_init();
     backlight_init();
-#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
+#ifdef SIMULATOR
     sim_tasks_init();
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
