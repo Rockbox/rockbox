@@ -413,7 +413,6 @@ void radio_screen(void)
 
 #endif /* CONFIG_CODEC != SWCODEC */
 #endif /* ndef SIMULATOR */
-
     /* turn on radio */
 #if CONFIG_CODEC == SWCODEC
     /* This should be done before touching audio settings */
