@@ -325,7 +325,7 @@ struct wps_data
     OFFSETTYPE(int *) font_ids;
     int font_count;
 #endif
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
     int backdrop_id;
 #endif
 

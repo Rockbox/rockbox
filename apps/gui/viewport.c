@@ -117,7 +117,7 @@ static void toggle_theme(enum screen_type screen, bool force)
         bool first_boot = theme_stack_top[screen] == 0;
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
         skin_backdrop_show(sb_get_backdrop(screen));
 #endif
         if (LIKELY(after_boot[screen]) && (!was_enabled[screen] || force))

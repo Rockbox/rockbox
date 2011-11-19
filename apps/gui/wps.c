@@ -631,7 +631,7 @@ static void gwps_leave_wps(void)
     FOR_NB_SCREENS(i)
     {
         skin_get_gwps(WPS, i)->display->stop_scroll();
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
         skin_backdrop_show(sb_get_backdrop(i));
 #endif
         viewportmanager_theme_undo(i, skin_has_sbs(i, skin_get_gwps(WPS, i)->data));
@@ -678,7 +678,7 @@ static void gwps_enter_wps(void)
         }
 #endif
         /* make the backdrop actually take effect */
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
         skin_backdrop_show(gwps->data->backdrop_id);
 #endif
         display->clear_display();

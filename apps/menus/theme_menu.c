@@ -40,7 +40,7 @@
 #include "statusbar-skinned.h"
 #include "skin_engine/skin_engine.h"
 
-#if LCD_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
 /**
 * Menu to clear the backdrop image
  */
@@ -387,7 +387,7 @@ MAKE_MENU(theme_menu, ID2P(LANG_THEME_MENU),
             &browse_rsbs,
 #endif
             &show_icons,
-#if LCD_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
             &clear_main_bd,
 #endif
 #ifdef HAVE_LCD_BITMAP

@@ -133,11 +133,11 @@ void settings_apply_skins(void)
         FOR_NB_SCREENS(j)
             skin_get_gwps(i, j);
     }
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
     skin_backdrops_preload(); /* should maybe check the retval here... */
 #endif
     viewportmanager_theme_changed(THEME_STATUSBAR);
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
     FOR_NB_SCREENS(i)
         skin_backdrop_show(sb_get_backdrop(i));
 #endif

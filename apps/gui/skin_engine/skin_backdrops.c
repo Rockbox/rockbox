@@ -28,8 +28,7 @@
 #include "wps_internals.h"
 #include "skin_engine.h"
 
-#if !defined(__PCTOOL__) && \
-    ((LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)))
+#if !defined(__PCTOOL__) && defined(HAVE_BACKDROP_IMAGE)
 
 #define NB_BDROPS SKINNABLE_SCREENS_COUNT*NB_SCREENS
 static struct skin_backdrop {

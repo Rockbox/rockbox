@@ -655,6 +655,10 @@ Lyre prototype 1 */
 #define CONFIG_REMOTE_DEFAULT_ICON_WIDTH 6
 #endif
 
+#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#define HAVE_BACKDROP_IMAGE
+#endif
+
 #if (CONFIG_TUNER & (CONFIG_TUNER - 1)) != 0
 /* Multiple possible tuners */
 #define CONFIG_TUNER_MULTI

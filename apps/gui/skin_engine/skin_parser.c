@@ -1537,7 +1537,7 @@ static void skin_data_reset(struct wps_data *wps_data)
     wps_data->images = INVALID_OFFSET;
 #endif
     wps_data->tree = INVALID_OFFSET;
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
     if (wps_data->backdrop_id >= 0)
         skin_backdrop_unload(wps_data->backdrop_id);
     backdrop_filename = NULL;
@@ -2202,7 +2202,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     }
     skin_buffer = (void *)(((unsigned long)skin_buffer + 3) & ~3);
     buffersize -= 3;
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
     backdrop_filename = "-";
     wps_data->backdrop_id = -1;
 #endif

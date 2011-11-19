@@ -69,7 +69,7 @@ void fms_fix_displays(enum fms_exiting toggle_state)
         if (toggle_state == FMS_ENTER)
         {
             viewportmanager_theme_enable(i, skin_has_sbs(i, data), NULL);  
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
             skin_backdrop_show(data->backdrop_id);
 #endif
             screens[i].clear_display();
@@ -79,7 +79,7 @@ void fms_fix_displays(enum fms_exiting toggle_state)
         else
         {
             screens[i].stop_scroll();
-#if LCD_DEPTH > 1 || defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+#ifdef HAVE_BACKDROP_IMAGE
             skin_backdrop_show(sb_get_backdrop(i));
 #endif
             viewportmanager_theme_undo(i, skin_has_sbs(i, data));
