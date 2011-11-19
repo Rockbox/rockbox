@@ -400,10 +400,10 @@ void lcd_update_rect(int x, int y, int width, int height)
         return;
     }
     
-    /* align horizontal position to even for wisechip display */
+    /* update entire horizontal strip for display type 0 (wisechip) */
     if (lcd_type == 0) {
-        x = x & ~1;
-        x_end = (x_end + 1) & ~1;
+        x = 0;
+        x_end = 96;
     }
     
     /* correct rectangle (if necessary) */
