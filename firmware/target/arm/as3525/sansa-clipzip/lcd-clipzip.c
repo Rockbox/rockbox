@@ -38,7 +38,7 @@ static int lcd_hw_init(void)
 {
     /* configure SSP */
     bitset32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE);
-    SSP_CPSR = 8;           /* TODO: use AS3525_SSP_PRESCALER, OF uses 8 */
+    SSP_CPSR = 4;           /* TODO: use AS3525_SSP_PRESCALER, OF uses 8 */
     SSP_CR0 =   (0 << 8) |  /* SCR, serial clock rate divider = 1 */
                 (1 << 7) |  /* SPH, phase = 1 */
                 (1 << 6) |  /* SPO, polarity = 1 */
