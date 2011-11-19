@@ -136,9 +136,15 @@ This sub menu relates to limits in the Rockbox operating system.
     in steps of 1,000 (default is 10,000). Higher values will shorten the
     music buffer, so you should increase this setting \emph{only} if you
     have very large playlists.
+
+    \item [Glyphs To Cache.] This sets the default memory allocation size
+    for fonts in unique glyphs. This should be set to the number of unique
+    language glyphs and punctuation marks that are frequently displayed.
+    The default is 250.
   \end{description}
-  \note{You will need to restart your player for changes to these options
-        to take effect.}
+  \note{You will need to restart your player for changes to \setting{Max
+    Entries in File Browser} or \setting{Max Playlist Size} to take effect
+    while \setting{Glyphs To Cache} will affect the next font load.}
 % TODO: this needs to be rewritten in another style, it lets you mix sound from another source into the music
 \opt{player}{
   \subsection{Line In} This option activates the line-in port on \dap, which is

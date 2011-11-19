@@ -78,7 +78,6 @@
 
 #define WPS_ERROR_INVALID_PARAM         -1
 
-#define GLYPHS_TO_CACHE 256
 static char* skin_buffer = NULL;
 void skinparser_set_buffer(char* pointer)
 {
@@ -468,7 +467,7 @@ static int parse_font_load(struct skin_element *element,
     if(element->params_count > 2)
         glyphs = get_param(element, 2)->data.number;
     else
-        glyphs = GLYPHS_TO_CACHE;
+        glyphs = global_settings.glyphs;
     if (id < 2)
     {
         DEBUGF("font id must be >= 2\n");
@@ -1742,8 +1741,7 @@ static bool skin_load_fonts(struct wps_data *data)
             char path[MAX_PATH];
             snprintf(path, sizeof path, FONT_DIR "/%s", font->name);
 #ifndef __PCTOOL__
-            font->id = font_load_ex(path,
-                font_glyphs_to_bufsize(path, skinfonts[font_id-2].glyphs));
+            font->id = font_load_ex(path, 0, skinfonts[font_id-2].glyphs);
             
 #else
                 font->id = font_load(path);

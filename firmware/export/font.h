@@ -102,6 +102,7 @@ struct font {
     int          fd;              /* fd for the font file. >= 0 if cached */
     int          fd_width;        /* fd for the font file. >= 0 if cached */
     int          fd_offset;       /* fd for the font file. >= 0 if cached */    
+    int          handle;          /* core_allocator handle */
     unsigned char *buffer_start;    /* buffer to store the font in */       
     unsigned char *buffer_position; /* position in the buffer */    
     unsigned char *buffer_end;      /* end of the buffer */
@@ -119,8 +120,7 @@ struct font {
 void font_init(void) INIT_ATTR;
 const char* font_filename(int font_id);
 int font_load(const char *path);
-int font_load_ex(const char *path, size_t buffer_size);
-int font_glyphs_to_bufsize(const char *path, int glyphs);
+int font_load_ex(const char *path, size_t buffer_size, int glyphs);
 void font_unload(int font_id);
 void font_unload_all(void);
 void font_lock(int font_id, bool lock);

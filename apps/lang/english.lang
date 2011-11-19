@@ -12951,3 +12951,17 @@
     hardware_click: "Speaker Keyclick"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Glyphs To Cache"
+  </dest>
+  <voice>
+    *: "Glyphs To Cache"
+  </voice>
+</phrase>

@@ -672,6 +672,7 @@ struct user_settings
     unsigned char icon_file[MAX_FILENAME+1];
     unsigned char viewers_icon_file[MAX_FILENAME+1];
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
+    int glyphs;
 #ifdef HAVE_REMOTE_LCD
     unsigned char remote_font_file[MAX_FILENAME+1]; /* last font */
 #endif

@@ -886,7 +886,7 @@ void settings_apply(bool read_disk)
                 CHART2(">font_load ", global_settings.font_file);
                 if (font_ui >= 0)
                     font_unload(font_ui);
-                rc = font_load(buf);
+                rc = font_load_ex(buf, 0, global_settings.glyphs);
                 CHART2("<font_load ", global_settings.font_file);
                 screens[SCREEN_MAIN].setuifont(rc);
                 screens[SCREEN_MAIN].setfont(rc);
