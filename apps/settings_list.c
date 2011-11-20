@@ -1625,7 +1625,7 @@ const struct settings_list settings[] = {
 #ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(F_THEMESETTING, font_file, "font",
                      DEFAULT_FONTNAME, FONT_DIR "/", ".fnt"),
-    INT_SETTING(0, glyphs, LANG_GLYPHS, DEFAULT_GLYPHS,
+    INT_SETTING(0, glyphs_to_cache, LANG_GLYPHS, DEFAULT_GLYPHS,
                 "glyphs", UNIT_INT, MIN_GLYPHS, MAX_GLYPHS, 10,
                 NULL, NULL, NULL),
 #endif

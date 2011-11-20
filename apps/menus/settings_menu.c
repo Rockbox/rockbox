@@ -222,7 +222,7 @@ MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
 MENUITEM_SETTING(max_files_in_dir, &global_settings.max_files_in_dir, NULL);
 MENUITEM_SETTING(max_files_in_playlist, &global_settings.max_files_in_playlist, NULL);
 #ifdef HAVE_LCD_BITMAP
-MENUITEM_SETTING(default_glyphs, &global_settings.glyphs, NULL);
+MENUITEM_SETTING(default_glyphs, &global_settings.glyphs_to_cache, NULL);
 #endif
 MAKE_MENU(limits_menu, ID2P(LANG_LIMITS_MENU), 0, Icon_NOICON,
            &max_files_in_dir, &max_files_in_playlist

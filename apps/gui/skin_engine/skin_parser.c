@@ -467,7 +467,7 @@ static int parse_font_load(struct skin_element *element,
     if(element->params_count > 2)
         glyphs = get_param(element, 2)->data.number;
     else
-        glyphs = global_settings.glyphs;
+        glyphs = global_settings.glyphs_to_cache;
     if (id < 2)
     {
         DEBUGF("font id must be >= 2\n");
