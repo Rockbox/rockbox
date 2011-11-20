@@ -208,8 +208,8 @@ static int glyph_bytes( struct font *pf, int width )
 
 /* Load memory font */
 static struct font* font_load_in_memory(struct font* pf,
-                                        int32_t noffset,
-                                        int32_t nwidth )
+                                        int32_t nwidth,
+                                        int32_t noffset )
 {
     int i;
     /* variable font data*/
