@@ -33,7 +33,7 @@ void mmc_sleep(void);
 void mmc_sleepnow(void);
 bool mmc_disk_is_active(void);
 int mmc_soft_reset(void);
-int mmc_init(void);
+int mmc_init(void) STORAGE_INIT_ATTR;
 void mmc_close(void);
 int mmc_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
 int mmc_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);

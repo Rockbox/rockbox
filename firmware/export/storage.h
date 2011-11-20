@@ -214,7 +214,7 @@ void storage_sleep(void);
 void storage_sleepnow(void);
 bool storage_disk_is_active(void);
 int storage_soft_reset(void);
-int storage_init(void);
+int storage_init(void) STORAGE_INIT_ATTR;
 int storage_flush(void);
 void storage_spin(void);
 void storage_spindown(int seconds);

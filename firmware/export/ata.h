@@ -37,7 +37,7 @@ void ata_sleepnow(void);
  */
 bool ata_disk_is_active(void);
 int ata_soft_reset(void);
-int ata_init(void);
+int ata_init(void) STORAGE_INIT_ATTR;
 void ata_close(void);
 int ata_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
 int ata_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);

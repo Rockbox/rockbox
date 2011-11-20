@@ -32,7 +32,7 @@ void ramdisk_spindown(int seconds);
 void ramdisk_sleep(void);
 bool ramdisk_disk_is_active(void);
 int ramdisk_soft_reset(void);
-int ramdisk_init(void);
+int ramdisk_init(void) STORAGE_INIT_ATTR;
 void ramdisk_close(void);
 int ramdisk_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
 int ramdisk_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);

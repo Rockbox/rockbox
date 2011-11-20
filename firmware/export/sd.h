@@ -39,7 +39,7 @@ void sd_sleep(void);
 void sd_sleepnow(void);
 bool sd_disk_is_active(void);
 int  sd_soft_reset(void);
-int  sd_init(void);
+int  sd_init(void) STORAGE_INIT_ATTR;
 void sd_close(void);
 int  sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
 int  sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);

@@ -908,6 +908,16 @@ Lyre prototype 1 */
 #define INITDATA_ATTR
 #endif
 
+/* We need to call storage_init more than once only if USB storage mode is
+ * handled in hardware:
+ * Deinit storage -> let hardware handle USB mode -> storage_init() again
+ */
+#if defined(HAVE_USBSTACK) || defined(USB_NONE)
+#define STORAGE_INIT_ATTR INIT_ATTR
+#else
+#define STORAGE_INIT_ATTR
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(__APPLE__)
 #define DATA_ATTR       __attribute__ ((section("__DATA, .data")))
 #else

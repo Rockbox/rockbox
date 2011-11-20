@@ -33,7 +33,7 @@ void nand_sleep(void);
 void nand_sleepnow(void);
 bool nand_disk_is_active(void);
 int  nand_soft_reset(void);
-int  nand_init(void);
+int  nand_init(void) STORAGE_INIT_ATTR;
 void nand_close(void);
 int  nand_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
 int  nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
