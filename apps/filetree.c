@@ -427,7 +427,8 @@ static void ft_load_font(char *file)
     current_font_id = screens[screen].getuifont();
     if (current_font_id >= 0)
         font_unload(current_font_id);
-    screens[screen].setuifont(font_load(file));
+    screens[screen].setuifont(
+        font_load_ex(file,0,global_settings.glyphs_to_cache));
     viewportmanager_theme_changed(THEME_UI_VIEWPORT);
 }    
 #endif
