@@ -234,7 +234,7 @@ static inline void usb_slave_mode(bool on)
         cancel_cpu_boost();
     }
 }
-#else /* !USB_ROCKBOX_USB */
+#else /* !USE_ROCKBOX_USB */
 static inline void usb_slave_mode(bool on)
 {
     if(on)
