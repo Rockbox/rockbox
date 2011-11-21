@@ -40,20 +40,6 @@ enum skinnable_screens {
     SKINNABLE_SCREENS_COUNT
 };
 
-
-#ifdef HAVE_LCD_BITMAP
-
-#define SKIN_BUFFER_SIZE (WPS_MAX_TOKENS * \
-                         (sizeof(struct wps_token) + (sizeof(struct skin_element))))
-#endif
-
-#ifdef HAVE_LCD_CHARCELLS
-#define SKIN_BUFFER_SIZE (LCD_HEIGHT * LCD_WIDTH) * 64 + \
-                         (WPS_MAX_TOKENS * \
-                         (sizeof(struct wps_token) + (sizeof(struct skin_element))))
-#endif
-
-
 #ifdef HAVE_TOUCHSCREEN
 int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                          struct touchregion **retregion);

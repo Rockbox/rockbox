@@ -206,6 +206,7 @@ static char* get_skin_filename(char *buf, size_t buf_size,
     switch (skin)
     {
         case CUSTOM_STATUSBAR:
+#ifdef HAVE_LCD_BITMAP
 #if defined(HAVE_REMOTE_LCD) && NB_SCREENS > 1
             if (screen == SCREEN_REMOTE)
             {
@@ -218,6 +219,7 @@ static char* get_skin_filename(char *buf, size_t buf_size,
                 setting = global_settings.sbs_file;
                 ext = "sbs";
             }
+#endif
             break;
         case WPS:
 #if defined(HAVE_REMOTE_LCD) && NB_SCREENS > 1
