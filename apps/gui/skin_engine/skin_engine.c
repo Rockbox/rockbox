@@ -52,11 +52,12 @@ static struct gui_skin_helper {
     int (*preproccess)(enum screen_type screen, struct wps_data *data);
     int (*postproccess)(enum screen_type screen, struct wps_data *data);
     char* (*default_skin)(enum screen_type screen);
+    bool load_on_boot;
 } skin_helpers[SKINNABLE_SCREENS_COUNT] = {
-    [CUSTOM_STATUSBAR] = { sb_preproccess, sb_postproccess, sb_create_from_settings },
-    [WPS] = { NULL, NULL, wps_default_skin },
+    [CUSTOM_STATUSBAR] = { sb_preproccess, sb_postproccess, sb_create_from_settings, true },
+    [WPS] = { NULL, NULL, wps_default_skin, true },
 #if CONFIG_TUNER
-    [FM_SCREEN] = { NULL, NULL, default_radio_skin }
+    [FM_SCREEN] = { NULL, NULL, default_radio_skin, false }
 #endif
 };
 
@@ -155,14 +156,14 @@ void settings_apply_skins(void)
                 }
                 gui_skin_reset(&skins[i][j]);
                 skins[i][j].gui_wps.display = &screens[j];
-                skin_get_gwps(i, j);
+                if (skin_helpers[i].load_on_boot)
+                    skin_get_gwps(i, j);
             }
         }
     }
     first_run = false;
     viewportmanager_theme_changed(THEME_STATUSBAR);
 #ifdef HAVE_BACKDROP_IMAGE
-    skin_backdrops_preload(); /* should maybe check the retval here... */
     FOR_NB_SCREENS(i)
         skin_backdrop_show(sb_get_backdrop(i));
 #endif
@@ -191,6 +192,10 @@ void skin_load(enum skinnable_screens skin, enum screen_type screen,
     skins[skin][screen].needs_full_update = true;
     if (skin_helpers[skin].postproccess)
         skin_helpers[skin].postproccess(screen, &skins[skin][screen].data);
+#ifdef HAVE_BACKDROP_IMAGE
+    if (loaded)
+        skin_backdrops_preload();
+#endif
 }
 
 static char* get_skin_filename(char *buf, size_t buf_size,
