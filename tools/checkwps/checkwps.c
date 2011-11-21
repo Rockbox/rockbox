@@ -245,6 +245,9 @@ struct font* font_get(int font)
 }
 #endif
 
+/* This is no longer defined in ROCKBOX builds so just use a huge value */
+#define SKIN_BUFFER_SIZE (200*1024)
+
 int main(int argc, char **argv)
 {
     int res;
