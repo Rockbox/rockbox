@@ -203,7 +203,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 /* Default theme settings */
 #define DEFAULT_WPSNAME  "cabbiev2"
 #define DEFAULT_SBSNAME  "-"
-#define DEFAULT_FMS_NAME DEFAULT_WPSNAME
+#define DEFAULT_FMS_NAME "-"
 
 #ifdef HAVE_LCD_BITMAP
 

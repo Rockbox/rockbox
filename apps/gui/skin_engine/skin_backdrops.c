@@ -37,6 +37,7 @@ static struct skin_backdrop {
     enum screen_type screen;
     bool loaded;
     int buflib_handle;
+    int ref_count;
 } backdrops[NB_BDROPS];
 
 #define NB_BDROPS SKINNABLE_SCREENS_COUNT*NB_SCREENS
@@ -63,21 +64,21 @@ static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL};
 static bool first_go = true;
 void skin_backdrop_init(void)
 {
-    for (int i=0; i<NB_BDROPS; i++)
+    if (first_go)
     {
-        if (first_go)
+        for (int i=0; i<NB_BDROPS; i++)
+        {
             backdrops[i].buflib_handle = -1;
-        else
-            skin_backdrop_unload(i);
-        backdrops[i].name[0] = '\0';
-        backdrops[i].buffer = NULL;
-        backdrops[i].loaded = false;
-        
+            backdrops[i].name[0] = '\0';
+            backdrops[i].buffer = NULL;
+            backdrops[i].loaded = false;
+            backdrops[i].ref_count = 0;
+        }
+        FOR_NB_SCREENS(i)
+            current_lcd_backdrop[i] = -1;
+        handle_being_loaded = -1;
+        first_go = false;
     }
-    first_go = false;
-    FOR_NB_SCREENS(i)
-        current_lcd_backdrop[i] = -1;
-    handle_being_loaded = -1;
 }
 
 int skin_backdrop_assign(char* backdrop, char *bmpdir,
@@ -101,22 +102,26 @@ int skin_backdrop_assign(char* backdrop, char *bmpdir,
     for (i=0; i<NB_BDROPS; i++)
     {
         if (!backdrops[i].name[0] && free < 0)
-            free = i;
-        if (!strcmp(backdrops[i].name, filename) && backdrops[i].screen == screen)
         {
+            free = i;
+            break;
+        }
+        else if (!strcmp(backdrops[i].name, filename) && backdrops[i].screen == screen)
+        {
+            backdrops[i].ref_count++;
             break;
         }
     }
-    if (i < NB_BDROPS)
-        return i;
-    else if (free >= 0)
+    if (free >= 0)
     {
-        strlcpy(backdrops[free].name, filename,
-                sizeof (backdrops[free].name));
+        strlcpy(backdrops[free].name, filename, MAX_PATH);
         backdrops[free].buffer = NULL;
         backdrops[free].screen = screen;
+        backdrops[free].ref_count = 1;
         return free;
     }
+    else if (i < NB_BDROPS)
+        return i;
     return -1;
 }
 
@@ -188,10 +193,17 @@ void skin_backdrop_show(int backdrop_id)
 
 void skin_backdrop_unload(int backdrop_id)
 {
-    if (backdrops[backdrop_id].buflib_handle > 0)
-        core_free(backdrops[backdrop_id].buflib_handle);
-    backdrops[backdrop_id].buffer = NULL;
-    backdrops[backdrop_id].buflib_handle = -1;
+    backdrops[backdrop_id].ref_count--;
+    if (backdrops[backdrop_id].ref_count <= 0)
+    {
+        if (backdrops[backdrop_id].buflib_handle > 0)
+            core_free(backdrops[backdrop_id].buflib_handle);
+        backdrops[backdrop_id].buffer = NULL;
+        backdrops[backdrop_id].buflib_handle = -1;
+        backdrops[backdrop_id].loaded = false;
+        backdrops[backdrop_id].name[0] = '\0';
+        backdrops[backdrop_id].ref_count = 0;
+    }
 }
 
 void skin_backdrop_load_setting(void)

@@ -50,6 +50,7 @@ static int update_delay = DEFAULT_UPDATE_DELAY;
 static bool sbs_has_title[NB_SCREENS];
 static char* sbs_title[NB_SCREENS];
 static enum themable_icons sbs_icon[NB_SCREENS];
+static bool sbs_loaded[NB_SCREENS] = { false };
 
 bool sb_set_title_text(char* title, enum themable_icons icon, enum screen_type screen)
 {
@@ -76,6 +77,7 @@ enum themable_icons sb_get_icon(enum screen_type screen)
 int sb_preproccess(enum screen_type screen, struct wps_data *data)
 {
     (void)data;
+    sbs_loaded[screen] = false;
     sbs_has_title[screen] = false;
     viewportmanager_theme_enable(screen, false, NULL);
     return 1;
@@ -101,6 +103,7 @@ int sb_postproccess(enum screen_type screen, struct wps_data *data)
             vp->hidden_flags = VP_NEVER_VISIBLE;
         }
         sb_set_info_vp(screen, VP_DEFAULT_LABEL);
+        sbs_loaded[screen] = true;
     }
     viewportmanager_theme_undo(screen, false);
     return 1;
@@ -115,6 +118,8 @@ void sb_set_info_vp(enum screen_type screen, OFFSETTYPE(char*) label)
     
 struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 {
+    if (sbs_loaded[screen] == false)
+        return NULL;
     struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
     struct skin_viewport *vp = NULL;
     char *label;

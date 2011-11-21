@@ -1687,7 +1687,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
         list = SKINOFFSETTOPTR(skin_buffer, list->next);
     }
 
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+#ifdef HAVE_BACKDROP_IMAGE
     wps_data->backdrop_id = skin_backdrop_assign(backdrop_filename, bmpdir, curr_screen);
 #endif /* has backdrop support */
     return retval;
@@ -1986,7 +1986,7 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_FILE_DIRECTORY:
                     token->value.i = get_param(element, 0)->data.number;
                     break;
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+#ifdef HAVE_BACKDROP_IMAGE
                 case SKIN_TOKEN_VIEWPORT_FGCOLOUR:
                 case SKIN_TOKEN_VIEWPORT_BGCOLOUR:
                     function = parse_viewportcolour;
