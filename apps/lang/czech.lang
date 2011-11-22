@@ -12820,3 +12820,65 @@
     *: "Aktivovat časovač vypnutí při startu přehrávače"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Vyrovnávací paměť pro glyphy"
+  </dest>
+  <voice>
+    *: "Vyrovnávací paměť pro glyphy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Kliknutí přes reproduktor"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Kliknutí přes reproduktor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Kliknutí přes sluchátka"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Kliknutí přes sluchátka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Zástupci"
+  </dest>
+  <voice>
+    *: "Zástupci"
+  </voice>
+</phrase>
