@@ -12730,3 +12730,155 @@ desc: deprecated
     *: "Salva Modifiche?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "Nascondi Drive interno USB"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "Nascondi Drive interno USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Padding Linea in Elenchi"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Padding Linea in Elenchi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatico"
+  </dest>
+  <voice>
+    *: "Automatico"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Durata Default Tempo Spegnimento"
+  </dest>
+  <voice>
+    *: "Durata Default Tempo Spegnimento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Avvio Tempo Spegnimento All'accensione"
+  </dest>
+  <voice>
+    *: "Avvio Tempo Spegnimento All'accensione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Annulla Tempo Spegnimento"
+  </dest>
+  <voice>
+    *: "Annulla Tempo Spegnimento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Tasti Rapidi"
+  </dest>
+  <voice>
+    *: "Tasti Rapidi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Click Tasti Cuffia"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Click Tasti Cuffia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Click Tasti Altoparlante"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Click Tasti Altoparlante"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Glyphs Nella Cache"
+  </dest>
+  <voice>
+    *: "Glyphs Nella Cache"
+  </voice>
+</phrase>
