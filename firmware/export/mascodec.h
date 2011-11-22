@@ -21,14 +21,16 @@
 #ifndef _MASCODEC_H_
 #define _MASCODEC_H_
 
-int mas_default_read(unsigned short *buf);
+/* unused: int mas_default_read(unsigned short *buf); */
+#if CONFIG_CODEC == MAS3507D
 int mas_run(unsigned short address);
+#endif
 int mas_readmem(int bank, int addr, unsigned long* dest, int len);
 int mas_writemem(int bank, int addr, const unsigned long* src, int len);
 int mas_readreg(int reg);
 int mas_writereg(int reg, unsigned int val);
 void mas_reset(void);
-int mas_direct_config_read(unsigned char reg);
+/* unused: int mas_direct_config_read(unsigned char reg); */
 int mas_direct_config_write(unsigned char reg, unsigned int val);
 int mas_codec_writereg(int reg, unsigned int val);
 int mas_codec_readreg(int reg);

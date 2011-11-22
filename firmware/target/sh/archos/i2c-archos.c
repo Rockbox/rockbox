@@ -234,6 +234,7 @@ int i2c_write(int address, const unsigned char* buf, int count )
     return x;
 }
 
+#if 0 /* Currently unused, left for reference and future use */
 int i2c_read(int address, unsigned char* buf, int count )
 {
     int i,x=0;
@@ -250,3 +251,4 @@ int i2c_read(int address, unsigned char* buf, int count )
     i2c_stop();
     return x;
 }
+#endif

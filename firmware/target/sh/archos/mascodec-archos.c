@@ -30,6 +30,7 @@
 
 static int mas_devread(unsigned long *dest, int len);
 
+#if 0 /* Currently unused, left for reference and future use */
 int mas_default_read(unsigned short *buf)
 {
     unsigned char *dest = (unsigned char *)buf;
@@ -62,7 +63,9 @@ int mas_default_read(unsigned short *buf)
     i2c_end();
     return ret;
 }
+#endif
 
+#if CONFIG_CODEC == MAS3507D
 int mas_run(unsigned short address)
 {
     int ret = 0;
@@ -83,6 +86,7 @@ int mas_run(unsigned short address)
     i2c_end();
     return ret;
 }
+#endif
 
 /* note: 'len' is number of 32-bit words, not number of bytes! */
 int mas_readmem(int bank, int addr, unsigned long* dest, int len)
@@ -307,6 +311,7 @@ void mas_reset(void)
 }
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+#if 0 /* Currently unused, left for reference and future use */
 int mas_direct_config_read(unsigned char reg)
 {
     int ret = 0;
@@ -340,6 +345,7 @@ int mas_direct_config_read(unsigned char reg)
     i2c_end();
     return ret;
 }
+#endif
 
 int mas_direct_config_write(unsigned char reg, unsigned int val)
 {

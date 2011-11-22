@@ -39,15 +39,15 @@ void demand_irq_enable(bool on);
 #endif
 
 /* new functions, exported to plugin API */
+#if CONFIG_CODEC == MAS3587F
 void mp3_play_init(void);
+#endif
 void mp3_play_data(const unsigned char* start, int size,
     void (*get_more)(unsigned char** start, size_t* size) /* callback fn */
 );
 void mp3_play_pause(bool play);
 bool mp3_pause_done(void);
 void mp3_play_stop(void);
-long mp3_get_playtime(void);
-void mp3_reset_playtime(void);
 bool mp3_is_playing(void);
 unsigned char* mp3_get_pos(void);
 void mp3_shutdown(void);
