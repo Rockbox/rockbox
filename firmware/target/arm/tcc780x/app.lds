@@ -56,20 +56,12 @@ SECTIONS
         *(.rodata.str1.1)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
-
-        /* Pseudo-allocate the copies of the data sections */
-        _datacopy = .;
     } > DRAM
 
-    /* TRICK ALERT! For RAM execution, we put the .data section at the
-       same load address as the copy. Thus, we don't waste extra RAM
-       when we don't actually need the copy.  */
-    .data : AT ( _datacopy )
+    .data :
     {
-        _datastart = .;
         *(.data*)
         . = ALIGN(0x4);
-        _dataend  = .;
     } > DRAM
 
     /DISCARD/ :
