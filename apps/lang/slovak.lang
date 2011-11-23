@@ -12816,3 +12816,65 @@
     *: "Aktivovať Časovač Spánku Po Zapnutí"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Zapamätať Glyfy"
+  </dest>
+  <voice>
+    *: "Zapamätať Glyfy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Klik v Reproduktore"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Klik v Reproduktore"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Klik v Slúchadlách"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Klik v Slúchadlách"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Skratky"
+  </dest>
+  <voice>
+    *: "Skratky"
+  </voice>
+</phrase>
