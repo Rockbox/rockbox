@@ -150,26 +150,28 @@ static int move_callback(int handle, void* current, void* new)
     if (dont_move)
         return BUFLIB_CB_CANNOT_MOVE;
 
+#define UPDATE(x) if (x) { x = PTR_ADD(x, diff); }
     /* relocate the cache */
     ptrdiff_t diff = new - current;
     for(unsigned i = 0; i < entry_count; i++)
     {
-        if (dircache_root[i].d_name)
-            dircache_root[i].d_name += diff;
-        if (dircache_root[i].next_char)
-            dircache_root[i].next_char += diff;
-        if (dircache_root[i].up_char)
-            dircache_root[i].up_char += diff;
-        if (dircache_root[i].down_char)
-            dircache_root[i].down_char += diff;
+        UPDATE(dircache_root[i].d_name);
+        UPDATE(dircache_root[i].next_char);
+        UPDATE(dircache_root[i].up_char);
+        UPDATE(dircache_root[i].down_char);
     }
     dircache_root = new;
+    UPDATE(d_names_start);
+    UPDATE(d_names_end);
+    UPDATE(dot);
+    UPDATE(dotdot);
 
-    d_names_start += diff;
-    d_names_end += diff;
-    dot += diff;
-    dotdot += diff;
+    for(unsigned i = 0; i < MAX_OPEN_FILES; i++)
+        UPDATE(fd_bindings[i]);
 
+#ifdef HAVE_MULTIVOLUME
+    UPDATE(append_position);
+#endif
     return BUFLIB_CB_OK;
 }
 
