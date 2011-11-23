@@ -12723,11 +12723,11 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "Disque Interne USB"
+    multidrive_usb: "Cacher le disque USB interne"
   </dest>
   <voice>
     *: none
-    multidrive_usb: "Disque Interne USB"
+    multidrive_usb: "Cacher le disque USB interne"
   </voice>
 </phrase>
 <phrase>
@@ -12738,10 +12738,10 @@
     *: "Set As Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Renseigner Répertoire des Catalogues de Listes de lecture"
+    *: "Sélectionner comme répertoire des catalogues de listes de lecture"
   </dest>
   <voice>
-    *: "Renseigner Répertoire des Catalogues de Listes de lecture"
+    *: "Sélectionner comme répertoire des catalogues de listes de lecture"
   </voice>
 </phrase>
 <phrase>
@@ -12754,11 +12754,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Remplissage des listes"
+    touchscreen: "Remplissage vertical des lignes des listes"
   </dest>
   <voice>
     *: none
-    touchscreen: "Remplissage des listes"
+    touchscreen: "Remplissage vertical des lignes des listes"
   </voice>
 </phrase>
 <phrase>
@@ -12769,10 +12769,10 @@
     *: "Save Changes?"
   </source>
   <dest>
-    *: "Enregistrer Changements?"
+    *: "Enregistrer les changements ?"
   </dest>
   <voice>
-    *: "Enregistrer Changements?"
+    *: "Enregistrer les changements ?"
   </voice>
 </phrase>
 <phrase>
@@ -12797,10 +12797,10 @@
     *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Annuler Minuterie d'arrêt"
+    *: "Annuler la minuterie d'arrêt"
   </dest>
   <voice>
-    *: "Annuler Minuterie d'arrêt"
+    *: "Annuler la minuterie d'arrêt"
   </voice>
 </phrase>
 <phrase>
@@ -12811,10 +12811,10 @@
     *: "Default Sleep Timer Duration"
   </source>
   <dest>
-    *: "Durée par défault Minuterie d'arrêt"
+    *: "Durée par défault de la minuterie d'arrêt"
   </dest>
   <voice>
-    *: "Durée par défault Minuterie d'arrêt"
+    *: "Durée par défault de la minuterie d'arrêt"
   </voice>
 </phrase>
 <phrase>
@@ -12825,10 +12825,10 @@
     *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "RAZ Répertoire des Catalogues de Listes de lecture"
+    *: "RAZ du répertoire des catalogues de listes de lecture"
   </dest>
   <voice>
-    *: "RAZ Répertoire des Catalogues de Listes de lecture"
+    *: "RAZ du répertoire des catalogues de listes de lecture"
   </voice>
 </phrase>
 <phrase>
@@ -12839,9 +12839,9 @@
     *: "Start Sleep Timer On Boot"
   </source>
   <dest>
-    *: "Lancer la Minuterie d'arrêt au Démarrage"
+    *: "Lancer la minuterie d'arrêt au démarrage"
   </dest>
   <voice>
-    *: "Lancer la Minuterie d'arrêt au Démarrage"
+    *: "Lancer la minuterie d'arrêt au démarrage"
   </voice>
 </phrase>
