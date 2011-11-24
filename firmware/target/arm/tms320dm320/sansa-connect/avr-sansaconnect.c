@@ -297,6 +297,8 @@ void avr_hid_init(void)
     avr_hid_sync();
 }
 
+/* defined in powermgmt-sansaconnect.c */
+void set_battery_level(unsigned int level);
 
 static void avr_hid_get_state(void)
 {
@@ -308,6 +310,12 @@ static void avr_hid_get_state(void)
     static unsigned char cmd_empty[1] = {0xCC};
 
     spi_txrx(cmd, buf, sizeof(cmd));
+
+    /*
+     *  buf[8] contains some battery/charger related information (unknown)
+     *  buf[9] contains battery level in percents (0-100)
+     */
+    set_battery_level((unsigned int)buf[9]);
 
     spi_txrx(cmd_empty, NULL, 1); /* request interrupt on button press */
 

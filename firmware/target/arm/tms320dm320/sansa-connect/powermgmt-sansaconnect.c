@@ -24,9 +24,10 @@
 #include "powermgmt.h"
 #include "kernel.h"
 
-/* THIS CONTAINS CURRENTLY DUMMY CODE! */
+/* Use fake linear scale as AVR does the voltage to percentage conversion */
 
-static const unsigned short current_voltage = 3910;
+static unsigned int current_battery_level = 100;
+
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     0
@@ -40,17 +41,23 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 100, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1320 },
+    { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    100, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1320,
+    0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
 };
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return current_voltage;
+    return current_battery_level;
 }
+
+void set_battery_level(unsigned int level)
+{
+    current_battery_level = level;
+}
+
