@@ -82,12 +82,12 @@
 #
 # popup osd menu
 #
-%Vl(t,309,83,-,211,-)
-%xl(G,popup-800x480x16.bmp,15,20)
+%Vl(t,308,83,-,205,-)
+%xl(G,popup-800x480x16.bmp,0,0)
 %xd(G)
-%T(10,10,160,140,browse)
-%T(170,10,144,119,quickscreen)
-%T(288,10,123,146,contextmenu)
+%T( 30,30,160,146,browse)
+%T(190,30,114,146,quickscreen)
+%T(304,30,114,146,contextmenu)
 
 #
 # ff/rewind button
