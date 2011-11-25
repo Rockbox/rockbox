@@ -78,13 +78,14 @@ void font_cache_create(
  ************************************************************************/
 static int search(struct font_cache* fcache,
                   unsigned short char_code,
+                  int size,
                   int *p_insertion_point )
 {
     struct font_cache_entry *p;
     int left, right, mid=-1, c;
     left = 0;
-    right = fcache->_size - 1;
-
+    right = size;
+    
     /* go for a lucky guess */
     mid = char_code + 
         fcache->_prev_result - fcache->_prev_char_code;
@@ -115,6 +116,7 @@ static int search(struct font_cache* fcache,
     while (left <= right);
     
     /* not found */
+    p = lru_data(&fcache->_lru, fcache->_index[mid]);
     *p_insertion_point = mid;
     return 0;
 }
@@ -131,29 +133,45 @@ struct font_cache_entry* font_cache_get(
     int insertion_point;
     int index_to_replace;
     
-    if( search(fcache, char_code, &insertion_point))
+    /* check bounds */
+    p = lru_data(&fcache->_lru, fcache->_index[0]);
+    if( char_code < p->_char_code )
+        insertion_point = -1;
+    else
     {
-        short lru_handle = fcache->_index[insertion_point];
-        p = lru_data(&fcache->_lru, lru_handle);
-        if (p->_char_code == char_code)
+        p = lru_data(&fcache->_lru, fcache->_index[fcache->_capacity - 1]);
+        if( char_code > p->_char_code )
         {
-            lru_touch(&fcache->_lru, lru_handle);
-            return lru_data(&fcache->_lru, lru_handle);
+            insertion_point = fcache->_capacity - 1;
+        }
+        else
+        {
+            if( search(fcache, char_code, fcache->_size - 1, &insertion_point))
+            {
+                short lru_handle = fcache->_index[insertion_point];
+                p = lru_data(&fcache->_lru, lru_handle);
+                if (p->_char_code == char_code)
+                {
+                    lru_touch(&fcache->_lru, lru_handle);
+                    return lru_data(&fcache->_lru, lru_handle);
+                }
+            }
+            else
+            {
+                p = lru_data(&fcache->_lru, 
+                fcache->_index[insertion_point+1]);
+                if ( char_code > p->_char_code )
+                     insertion_point++;
+            }
         }
     }
-    else  /* not found */
-    {
-        p = lru_data(&fcache->_lru, 
-                     fcache->_index[insertion_point+1]);
-        if ( char_code > p->_char_code )
-            insertion_point++;
-    }
+    
+    /* not found */
 
     /* find index to replace */
     short lru_handle_to_replace = fcache->_lru._head;
     p = lru_data(&fcache->_lru, lru_handle_to_replace);
-    search(fcache, p->_char_code, &index_to_replace);
-        
+    search(fcache, p->_char_code, fcache->_size - 1, &index_to_replace);
     if (insertion_point < index_to_replace)
     {
         /* shift memory up */
