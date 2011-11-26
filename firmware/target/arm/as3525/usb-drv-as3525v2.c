@@ -87,8 +87,23 @@ enum ep0state
 /* endpoints[ep_num][DIR_IN/DIR_OUT] */
 static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS][2];
 /* setup packet for EP0 */
-static struct usb_ctrlrequest _ep0_setup_pkt __attribute__((aligned(32)));
-static struct usb_ctrlrequest *ep0_setup_pkt = AS3525_UNCACHED_ADDR(&_ep0_setup_pkt);
+
+/* USB control requests may be up to 64 bytes in size.
+   Even though we never use anything more than the 8 header bytes,
+   we are required to accept request packets of up to 64 bytes size.
+   Provide buffer space for these additional payload bytes so that
+   e.g. write descriptor requests (which are rejected by us, but the
+   payload is transferred anyway) do not cause memory corruption.
+   Fixes FS#12310. -- Michael Sparmann (theseven) */
+static struct
+{
+    union {
+        struct usb_ctrlrequest header; /* 8 bytes */
+        unsigned char payload[64];
+    };
+} _ep0_setup_pkt USB_DEVBSS_ATTR __attribute__((aligned(32)));
+
+static struct usb_ctrlrequest *ep0_setup_pkt = AS3525_UNCACHED_ADDR(&_ep0_setup_pkt.header);
 
 /* state of EP0 */
 static enum ep0state ep0_state;
