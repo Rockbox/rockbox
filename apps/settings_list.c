@@ -208,26 +208,57 @@ static const char graphic_numeric[] = "graphic,numeric";
 #ifdef HAVE_LCD_BITMAP
 
 #if LCD_HEIGHT <= 64
+  #define DEFAULT_FONT_HEIGHT 8
   #define DEFAULT_FONTNAME "08-Rockfont"
 #elif LCD_HEIGHT <= 80
+  #define DEFAULT_FONT_HEIGHT 11
   #define DEFAULT_FONTNAME "11-Sazanami-Mincho"
 #elif LCD_HEIGHT <= 220
-  #define DEFAULT_FONTNAME "12-Adobe-Helvetica"
+  #define DEFAULT_FONT_HEIGHT 12
 #elif LCD_HEIGHT <= 320
-  #define DEFAULT_FONTNAME "15-Adobe-Helvetica"
+  #define DEFAULT_FONT_HEIGHT 15
 #elif LCD_HEIGHT <= 400
-  #define DEFAULT_FONTNAME "16-Adobe-Helvetica"
-#elif LCD_HEIGHT <= 480 && !(CONFIG_PLATFORM & (PLATFORM_MAEMO|PLATFORM_PANDORA))
-  #define DEFAULT_FONTNAME "27-Adobe-Helvetica"
+  #define DEFAULT_FONT_HEIGHT 16
+#elif LCD_HEIGHT <= 480 && LCD_WIDTH < 800
+  #define DEFAULT_FONT_HEIGHT 27
 #else
-  #define DEFAULT_FONTNAME "35-Adobe-Helvetica"
+  #define DEFAULT_FONT_HEIGHT 35
 #endif
 #define DEFAULT_GLYPHS 250
 #define MIN_GLYPHS 50
 #define MAX_GLYPHS 65540
 
 #else
-  #define DEFAULT_FONTNAME ""
+  #define DEFAULT_FONT_HEIGHT 12
+#endif
+
+#ifndef DEFAULT_FONTNAME
+/* ugly expansion needed */
+#define _EXPAND2(x) #x
+#define _EXPAND(x) _EXPAND2(x)
+#define DEFAULT_FONTNAME _EXPAND(DEFAULT_FONT_HEIGHT) "-Adobe-Helvetica"
+#endif
+
+#ifdef HAVE_LCD_COLOR
+  #if DEFAULT_FONT_HEIGHT >= 31
+    #define DEFAULT_ICONSET "tango_icons.32x32"
+    #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.32x32"
+  #elif DEFAULT_FONT_HEIGHT >= 23
+    #define DEFAULT_ICONSET "tango_icons.24x24"
+    #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.24x24"
+  #elif DEFAULT_FONT_HEIGHT >= 15
+    #define DEFAULT_ICONSET "tango_icons.16x16"
+    #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.16x16"
+  #else
+    #define DEFAULT_ICONSET "tango_icons.12x12"
+    #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.12x12"
+  #endif
+#elif LCD_DEPTH <= 2 /* greyscale */
+  #define DEFAULT_ICONSET "tango_small_grey"
+  #define DEFAULT_VIEWERS_ICONSET "tango_small_viewers_mono"
+#else /* monochrome */
+  #define DEFAULT_ICONSET ""
+  #define DEFAULT_VIEWERS_ICONSET ""
 #endif
 
 #ifdef HAVE_REMOTE_LCD
@@ -237,17 +268,6 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_REMOTE_FONTNAME "-"
 #endif
 #endif /* HAVE_REMOTE_LCD */
-
-#ifdef HAVE_LCD_COLOR
-  #define DEFAULT_ICONSET "tango_small"
-  #define DEFAULT_VIEWERS_ICONSET "tango_small_viewers"
-#elif LCD_DEPTH >= 2
-  #define DEFAULT_ICONSET "tango_small_mono"
-  #define DEFAULT_VIEWERS_ICONSET "tango_small_viewers_mono"
-#else /* monochrome */
-  #define DEFAULT_ICONSET ""
-  #define DEFAULT_VIEWERS_ICONSET ""
-#endif
 
 #define DEFAULT_THEME_FOREGROUND LCD_RGBPACK(0xce, 0xcf, 0xce)
 #define DEFAULT_THEME_BACKGROUND LCD_RGBPACK(0x00, 0x00, 0x00)

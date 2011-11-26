@@ -102,38 +102,38 @@ selector type.160x128x2: bar (inverse)
 selector type.138x110x2: bar (inverse)
 
 #icons
-iconset.800x480x16: icons/tango_small.bmp
-iconset.480x800x16: icons/tango_small.bmp 
-iconset.320x480x16: icons/tango_small.bmp 
-iconset.320x240x16: icons/tango_small.bmp 
-iconset.128x128x16: icons/tango_small.bmp
-iconset.128x160x16: icons/tango_small.bmp
-iconset.132x80x16: icons/tango_small.bmp 
-iconset.138x110x2: icons/tango_small_mono.bmp
-iconset.160x128x16: icons/tango_small.bmp 
-iconset.160x128x2: icons/tango_small_mono.bmp
-iconset.176x132x16: icons/tango_small.bmp 
-iconset.176x220x16: icons/tango_small.bmp 
-iconset.220x176x16: icons/tango_small.bmp 
-iconset.240x320x16: icons/tango_small.bmp 
-iconset.240x400x16: icons/tango_small.bmp 
+iconset.800x480x16: icons/tango_icons.32x32.bmp
+iconset.480x800x16: icons/tango_icons.32x32.bmp
+iconset.320x480x16: icons/tango_icons.24x24.bmp
+iconset.320x240x16: icons/tango_icons.16x16.bmp
+iconset.128x128x16: icons/tango_icons.12x12.bmp
+iconset.128x160x16: icons/tango_icons.12x12.bmp
+iconset.132x80x16:  icons/tango_icons.12x12.bmp
+iconset.138x110x2:  icons/tango_small_mono.bmp
+iconset.160x128x16: icons/tango_icons.12x12.bmp
+iconset.160x128x2:  icons/tango_small_mono.bmp
+iconset.176x132x16: icons/tango_icons.12x12.bmp
+iconset.176x220x16: icons/tango_icons.12x12.bmp
+iconset.220x176x16: icons/tango_icons.12x12.bmp
+iconset.240x320x16: icons/tango_icons.16x16.bmp
+iconset.240x400x16: icons/tango_icons.16x16.bmp
 
 #viewer icons
-viewers iconset.800x480x16: icons/tango_small_viewers.bmp
-viewers iconset.480x800x16: icons/tango_small_viewers.bmp
-viewers iconset.320x480x16: icons/tango_small_viewers.bmp
-viewers iconset.320x240x16: icons/tango_small_viewers.bmp
-viewers iconset.128x128x16: icons/tango_small_viewers.bmp
-viewers iconset.128x160x16: icons/tango_small_viewers.bmp
-viewers iconset.132x80x16: icons/tango_small_viewers.bmp
-viewers iconset.138x110x2: icons/tango_small_viewers_mono.bmp
-viewers iconset.160x128x16: icons/tango_small_viewers.bmp
-viewers iconset.160x128x2: icons/tango_small_viewers_mono.bmp
-viewers iconset.176x132x16: icons/tango_small_viewers.bmp 
-viewers iconset.176x220x16: icons/tango_small_viewers.bmp 
-viewers iconset.220x176x16: icons/tango_small_viewers.bmp
-viewers iconset.240x320x16: icons/tango_small_viewers.bmp 
-viewers iconset.240x400x16: icons/tango_small_viewers.bmp 
+viewers iconset.800x480x16: icons/tango_icons_viewers.32x32.bmp
+viewers iconset.480x800x16: icons/tango_icons_viewers.32x32.bmp
+viewers iconset.320x480x16: icons/tango_icons_viewers.24x24.bmp
+viewers iconset.320x240x16: icons/tango_icons_viewers.16x16.bmp
+viewers iconset.128x128x16: icons/tango_icons_viewers.12x12.bmp
+viewers iconset.128x160x16: icons/tango_icons_viewers.12x12.bmp
+viewers iconset.132x80x16:  icons/tango_icons_viewers.12x12.bmp
+viewers iconset.138x110x2:  icons/tango_small_viewers_mono.bmp
+viewers iconset.160x128x16: icons/tango_icons_viewers.12x12.bmp
+viewers iconset.160x128x2:  icons/tango_small_viewers_mono.bmp
+viewers iconset.176x132x16: icons/tango_icons_viewers.12x12.bmp
+viewers iconset.176x220x16: icons/tango_icons_viewers.12x12.bmp
+viewers iconset.220x176x16: icons/tango_icons_viewers.12x12.bmp
+viewers iconset.240x320x16: icons/tango_icons_viewers.16x16.bmp
+viewers iconset.240x400x16: icons/tango_icons_viewers.16x16.bmp
 
 # Whether the WPS is designed to have the statusbar on or off
 Statusbar: top
