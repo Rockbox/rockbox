@@ -253,8 +253,8 @@ static const char graphic_numeric[] = "graphic,numeric";
     #define DEFAULT_ICONSET "tango_icons.12x12"
     #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.12x12"
   #endif
-#elif LCD_DEPTH <= 2 /* greyscale */
-  #define DEFAULT_ICONSET "tango_small_grey"
+#elif LCD_DEPTH > 1 /* greyscale */
+  #define DEFAULT_ICONSET "tango_small_mono"
   #define DEFAULT_VIEWERS_ICONSET "tango_small_viewers_mono"
 #else /* monochrome */
   #define DEFAULT_ICONSET ""
