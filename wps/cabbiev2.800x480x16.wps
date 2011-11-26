@@ -8,12 +8,10 @@
 %wd
 %X(wpsbackdrop-800x480x16.bmp)
 
-#%xl(A,lock-240x320x16.bmp,11,0,2)
-#%xl(B,battery-240x320x16.bmp,46,0,10)
-
 %Cl(0,0,225,225,c,c)
 
-%?C<%Vd(c)%?Tl(2.0)<%Vd(t)|%Vd(d)>|%Vd(a)%?Tl(2.0)<%Vd(t)|%Vd(b)>>
+%?C<%Vd(c)|%Vd(a)>
+%?vg(show_vol)<%?C<%Vd(d)|%Vd(b)>|%Vd(t)|%Vd(vol)>
 
 # track & next track info - no AA
 %Vl(a,0,79,-,225,-)
@@ -53,12 +51,11 @@
 %pb(25,0,750,-,pb-800x480x16.bmp)
 %T(25,0,750,50,progressbar)
 
-#%?mh<%xd(Aa)|%xd(Ab)>
-#%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
 # volume
-%xl(C,volume-800x480x16.bmp,340,78,10)
+%V(344,400,108,60,-)
+%xl(C,volume-800x480x16.bmp,10,0,10)
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
-%T(340,78,88,60,volume)
+%T(small_vol,0,0,108,60,none)
 
 # shuffle
 %V(468,415,92,43,-)
@@ -78,6 +75,15 @@
 %?Tp<%?mp<%xd(F, 1)|%xd(F, 3)|%xd(F, 2)|%xd(F, 4)|%xd(F, 5)||||>|%xd(F, %mp)>
 %T(0,0,70,70,play)
 %T(0,0,70,70,stop, repeat_press)
+
+#
+# volume slider
+#
+%Vl(vol,308,83,-,205,-)
+%xl(vol,volumebar-480x800x16.bmp,0,0)
+%xl(volbd,volumebar-backdrop-480x800x16.bmp,0,0)
+%pv(0,0,452,205,image,vol,backdrop,volbd)
+%T(0,0,452,205,volume)
 
 #
 # popup osd menu
@@ -100,3 +106,7 @@
 %T(0,0,70,75,prev)
 %T(80,0,70,75,ffwd, repeat_press)
 %T(80,0,70,75,next)
+
+# needs to be at the end since touch regions need to be declared
+# before %Tl can be used
+%?Tl(small_vol,2.0)<%vs(show_vol,set,3)|%?mv(2.0)<%vs(show_vol,set,3)|%?Tl<%vs(show_vol,set,2)|%vs(show_vol,set,1)>>>
