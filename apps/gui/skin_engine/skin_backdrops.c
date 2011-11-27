@@ -160,7 +160,11 @@ bool skin_backdrops_preload(void)
                              screens[screen].backdrop_load(filename, backdrops[i].buffer);
                     handle_being_loaded = -1;
                     if (!backdrops[i].loaded)
+                    {
+                        core_free(backdrops[i].buflib_handle);
                         retval = false;
+                        backdrops[i].buflib_handle = -1;
+                    }
                 }
                 else
                     retval = false;
