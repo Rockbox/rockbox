@@ -800,7 +800,7 @@ static void glyph_file_write(void* data)
 }
 
 /* save the char codes of the loaded glyphs to a file */
-void glyph_cache_save(int font_id)
+static void glyph_cache_save(int font_id)
 {
     int fd;
 
