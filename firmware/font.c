@@ -96,6 +96,8 @@ static int buflib_allocations[MAXFONTS];
 static int cache_fd;
 static struct font* cache_pf;
 
+static void glyph_cache_save(int font_id);
+
 static int buflibmove_callback(int handle, void* current, void* new)
 {
     (void)handle;
