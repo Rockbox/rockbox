@@ -161,7 +161,9 @@ static bool ata_led_on = false;
 #endif
 static bool spinup = false;
 static bool sleeping = true;
+#ifdef HAVE_ATA_POWER_OFF
 static bool poweroff = false;
+#endif
 static long sleep_timeout = 5*HZ;
 #ifdef HAVE_LBA48
 static bool lba48 = false; /* set for 48 bit addressing */
@@ -195,7 +197,9 @@ static int phys_sector_mult = 1;
 static int dma_mode = 0;
 #endif
 
+#ifdef HAVE_ATA_POWER_OFF
 static int ata_power_on(void);
+#endif
 static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
 static int set_features(void);
@@ -367,13 +371,16 @@ static int ata_transfer_sectors(unsigned long start,
     if ( sleeping ) {
         sleeping = false; /* set this now since it'll be on */
         spinup = true;
+#ifdef HAVE_ATA_POWER_OFF
         if (poweroff) {
             if (ata_power_on()) {
                 ret = -2;
                 goto error;
             }
         }
-        else {
+        else
+#endif
+        {
             if (perform_soft_reset()) {
                 ret = -2;
                 goto error;
@@ -462,7 +469,9 @@ static int ata_transfer_sectors(unsigned long start,
             if (spinup) {
                 spinup_time = current_tick - spinup_start;
                 spinup = false;
+#ifdef HAVE_ATA_POWER_OFF
                 poweroff = false;
+#endif
             }
         }
         else
@@ -491,7 +500,9 @@ static int ata_transfer_sectors(unsigned long start,
                 if (spinup) {
                     spinup_time = current_tick - spinup_start;
                     spinup = false;
+#ifdef HAVE_ATA_POWER_OFF
                     poweroff = false;
+#endif
                 }
 
                 /* read the status register exactly once per loop */
@@ -934,11 +945,14 @@ static void ata_thread(void)
                     ata_led(true);
                     sleeping = false; /* set this now since it'll be on */
 
+#ifdef HAVE_ATA_POWER_OFF
                     if (poweroff) {
                         ata_power_on();
                         poweroff = false;
                     }
-                    else {
+                    else
+#endif
+                    {
                         perform_soft_reset();
                     }
 
@@ -980,7 +994,11 @@ static void ata_thread(void)
 }
 
 /* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
+#ifdef HAVE_ATA_POWER_OFF
 static int ata_hard_reset(void)
+#else
+static int STORAGE_INIT_ATTR ata_hard_reset(void)
+#endif
 {
     int ret;
 
@@ -1056,6 +1074,7 @@ int ata_soft_reset(void)
     return ret;
 }
 
+#ifdef HAVE_ATA_POWER_OFF
 static int ata_power_on(void)
 {
     int rc;
@@ -1085,6 +1104,7 @@ static int ata_power_on(void)
 
     return 0;
 }
+#endif
 
 static int STORAGE_INIT_ATTR master_slave_detect(void)
 {
