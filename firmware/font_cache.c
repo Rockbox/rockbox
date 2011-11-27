@@ -116,7 +116,6 @@ static int search(struct font_cache* fcache,
     while (left <= right);
     
     /* not found */
-    p = lru_data(&fcache->_lru, fcache->_index[mid]);
     *p_insertion_point = mid;
     return 0;
 }
