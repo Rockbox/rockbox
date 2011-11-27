@@ -366,12 +366,13 @@ buflib_buffer_shift(struct buflib_context *ctx, int shift)
 {
     memmove(ctx->buf_start + shift, ctx->buf_start,
         (ctx->alloc_end - ctx->buf_start) * sizeof(union buflib_data));
+    ctx->buf_start += shift;
+    ctx->alloc_end += shift;
+    shift *= sizeof(union buflib_data);
     union buflib_data *handle;
     for (handle = ctx->last_handle; handle < ctx->handle_table; handle++)
         if (handle->alloc)
             handle->alloc += shift;
-    ctx->buf_start += shift;
-    ctx->alloc_end += shift;
 }
 
 /* Shift buffered items up by size bytes, or as many as possible if size == 0.
