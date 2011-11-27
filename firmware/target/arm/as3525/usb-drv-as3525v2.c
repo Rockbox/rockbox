@@ -95,13 +95,10 @@ static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS][2];
    e.g. write descriptor requests (which are rejected by us, but the
    payload is transferred anyway) do not cause memory corruption.
    Fixes FS#12310. -- Michael Sparmann (theseven) */
-static struct
-{
-    union {
-        struct usb_ctrlrequest header; /* 8 bytes */
-        unsigned char payload[64];
-    };
-} _ep0_setup_pkt USB_DEVBSS_ATTR __attribute__((aligned(32)));
+static union {
+    struct usb_ctrlrequest header; /* 8 bytes */
+    unsigned char payload[64];
+} _ep0_setup_pkt USB_DEVBSS_ATTR;
 
 static struct usb_ctrlrequest *ep0_setup_pkt = AS3525_UNCACHED_ADDR(&_ep0_setup_pkt.header);
 
