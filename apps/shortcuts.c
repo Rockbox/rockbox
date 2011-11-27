@@ -357,7 +357,8 @@ int do_shortcut_menu(void *ignored)
     simplelist_info_init(&list, P2STR(ID2P(LANG_SHORTCUTS)), shortcut_count, NULL);
     list.get_name = shortcut_menu_get_name;
     list.action_callback = shortcut_menu_get_action;
-    list.get_icon = shortcut_menu_get_icon;
+    if (global_settings.show_icons)
+        list.get_icon = shortcut_menu_get_icon;
     list.title_icon = Icon_Bookmark;
 
     push_current_activity(ACTIVITY_SHORTCUTSMENU);

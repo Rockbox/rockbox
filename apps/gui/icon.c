@@ -236,36 +236,39 @@ void icons_init(void)
         }
     }
 
-    load_icons(global_settings.icon_file, Iconset_user, SCREEN_MAIN);
-    
-    if (global_settings.viewers_icon_file[0] &&
-        global_settings.viewers_icon_file[0] != '-')
+    if (global_settings.show_icons)
     {
-        load_icons(global_settings.viewers_icon_file,
-                   Iconset_viewers, SCREEN_MAIN);
-        read_viewer_theme_file();
-    }
-    else
-    {
-        load_icons(DEFAULT_VIEWER_BMP, Iconset_viewers, SCREEN_MAIN);
-    }
+        load_icons(global_settings.icon_file, Iconset_user, SCREEN_MAIN);
+
+        if (global_settings.viewers_icon_file[0] &&
+            global_settings.viewers_icon_file[0] != '-')
+        {
+            load_icons(global_settings.viewers_icon_file,
+                    Iconset_viewers, SCREEN_MAIN);
+            read_viewer_theme_file();
+        }
+        else
+        {
+            load_icons(DEFAULT_VIEWER_BMP, Iconset_viewers, SCREEN_MAIN);
+        }
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-    load_icons(global_settings.remote_icon_file, 
-               Iconset_user, SCREEN_REMOTE);
-    
-    if (global_settings.remote_viewers_icon_file[0] &&
-        global_settings.remote_viewers_icon_file[0] != '-')
-    {
-        load_icons(global_settings.remote_viewers_icon_file,
-                   Iconset_viewers, SCREEN_REMOTE);
-    }
-    else
-    {
-        load_icons(DEFAULT_REMOTE_VIEWER_BMP,
-                   Iconset_viewers, SCREEN_REMOTE);
-    }
+        load_icons(global_settings.remote_icon_file, 
+                Iconset_user, SCREEN_REMOTE);
+        
+        if (global_settings.remote_viewers_icon_file[0] &&
+            global_settings.remote_viewers_icon_file[0] != '-')
+        {
+            load_icons(global_settings.remote_viewers_icon_file,
+                    Iconset_viewers, SCREEN_REMOTE);
+        }
+        else
+        {
+            load_icons(DEFAULT_REMOTE_VIEWER_BMP,
+                    Iconset_viewers, SCREEN_REMOTE);
+        }
 #endif
+    }
 }
 
 int get_icon_width(enum screen_type screen_type)

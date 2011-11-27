@@ -39,6 +39,7 @@
 #include "viewport.h"
 #include "statusbar-skinned.h"
 #include "skin_engine/skin_engine.h"
+#include "icons.h"
 
 #ifdef HAVE_BACKDROP_IMAGE
 /**
@@ -356,7 +357,25 @@ MENUITEM_FUNCTION(browse_rfms, MENU_FUNC_USEPARAM,
 #endif
 #endif
 
-MENUITEM_SETTING(show_icons, &global_settings.show_icons, NULL);
+
+static int showicons_callback(int action, const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    static bool old_icons;
+    switch (action)
+    {
+        case ACTION_ENTER_MENUITEM:
+            old_icons = global_settings.show_icons;
+            break;
+        case ACTION_EXIT_MENUITEM:
+            if (old_icons != global_settings.show_icons)
+                icons_init();
+            break;
+    }
+    return ACTION_REDRAW;
+}
+
+MENUITEM_SETTING(show_icons, &global_settings.show_icons, showicons_callback);
 MENUITEM_FUNCTION(browse_themes, MENU_FUNC_USEPARAM, 
         ID2P(LANG_CUSTOM_THEME), 
         browse_folder, (void*)&themes, NULL, Icon_Config);
