@@ -26,7 +26,7 @@
     .global    start
 start:
 
-/* PortalPlayer bootloader and startup code based on startup.s from the iPodLinux 
+/* PortalPlayer bootloader and startup code based on startup.s from the iPodLinux
  * loader
  *
  * Copyright (c) 2003, Daniel Palffy (dpalffy (at) rainstorm.org)
@@ -65,7 +65,7 @@ start:
     .equ    SLEEP,       0x80000000
     .equ    WAKE,        0x00000000
     .equ    CPUSLEEPING, 0x80000000
-    .equ    COPSLEEPING, 0x80000000    
+    .equ    COPSLEEPING, 0x80000000
     .equ    CACHE_CTRL,  0x6000c000
     .equ    MMAP_LOG,    0xf000f000 /* MMAP0 */
     .equ    MMAP_PHYS,   0xf000f004
@@ -90,7 +90,7 @@ start:
 pad_skip:
     /* Find out which processor we are - r0 should be preserved for the
      * duration of the init to avoid constant reloading of the processor ID.
-     * For each stage, CPU proceeds first, then COP. 
+     * For each stage, CPU proceeds first, then COP.
      */
     ldr    r0, =PROC_ID
     ldrb   r0, [r0]
@@ -109,10 +109,10 @@ pad_skip:
        and wait for the COP to finish. This ensures no threading activity
        starts until it is safe. */
     cmp    r0, #0x55
-    
+
     /* mask all interrupt sources before setting anything up */
     ldreq  r2, =CPU_ICLR
-    ldrne  r2, =COP_ICLR    
+    ldrne  r2, =COP_ICLR
     mvn    r1, #0
     str    r1, [r2]
 
@@ -175,7 +175,7 @@ pad_skip:
     ldr    r3, =MMAP_PHYS
     ldr    r2, =MMAP_MASK  /* ldr is more flexible */
     ldr    r1, =MMAP_LOG
-    mov    pc, #0x40000000 
+    mov    pc, #0x40000000
 
 remap_start:
     str    r2, [r1]
@@ -207,7 +207,7 @@ cpu_init:
     ldr    r3, [r4]
     tst    r3, #COPSLEEPING
     beq    1b
-    
+
     /* Vectors and IRAM copy is done first since they are reclaimed for
      * other uninitialized sections */
 
@@ -220,7 +220,7 @@ cpu_init:
     ldrhi  r5, [r4], #4
     strhi  r5, [r2], #4
     bhi    1b
-    
+
     /* Copy the IRAM */
     ldr    r2, =_iramcopy
     ldr    r3, =_iramstart
@@ -262,6 +262,9 @@ cpu_init:
     strhi  r4, [r2], #4
     bhi    1b
 
+    /* Load stack munge value */
+    ldr    r4, =0xdeadbeef
+
 #if NUM_CORES > 1
     /* Set up idle stack and munge it with 0xdeadbeef */
     ldr    r2, =cpu_idlestackbegin
@@ -272,10 +275,10 @@ cpu_init:
     bhi    1b
 #endif
 
-    /* Set up stack for IRQ mode */ 
+    /* Set up stack for IRQ mode */
     msr    cpsr_c, #0x92 /* IRQ disabled, FIQ enabled */
     ldr    sp, =irq_stack
-    /* Set up stack for FIQ mode */ 
+    /* Set up stack for FIQ mode */
     msr    cpsr_c, #0xd1 /* IRQ/FIQ disabled */
     ldr    sp, =fiq_stack
 
@@ -289,9 +292,6 @@ cpu_init:
 
     /* Switch to sys mode */
     msr    cpsr_c, #0xdf
-
-    /* Load stack munge value */    
-    ldr    r4, =0xdeadbeef
 
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr    r2, =stackbegin
@@ -349,7 +349,7 @@ cop_init:
     cmp    sp, r2
     strhi  r4, [r2], #4
     bhi    2b
-   
+
     /* Run cop_main() in apps/main.c */
     ldr    pc, =cop_main
 
@@ -367,7 +367,7 @@ cop_init:
     /* Exception vectors */
     .global vectors
 vectors:
-    .word  start 
+    .word  start
     .word  undef_instr_handler
     .word  software_int_handler
     .word  prefetch_abort_handler
@@ -403,13 +403,13 @@ prefetch_abort_handler:
     b      UIE
 
 data_abort_handler:
-    sub    r0, lr, #8 
+    sub    r0, lr, #8
     mov    r1, #2
     b      UIE
 
 /* Align stacks to cache line boundary */
     .balign 32
-    
+
 /* 256 words of IRQ stack */
     .space 256*4
 irq_stack:
