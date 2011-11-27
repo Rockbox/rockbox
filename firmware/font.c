@@ -127,7 +127,7 @@ static void lock_font_handle(int handle, bool lock)
 
 void font_lock(int font_id, bool lock)
 {
-    if( font_id == FONT_SYSFIXED )
+    if( font_id < 0 || font_id >= MAXFONTS )
         return;
     if( buflib_allocations[font_id] >= 0 )
         lock_font_handle(buflib_allocations[font_id], lock);
@@ -484,6 +484,8 @@ static int alloc_and_init(int font_idx, const char* name, size_t size)
 
 const char* font_filename(int font_id)
 {
+    if ( font_id < 0 || font_id >= MAXFONTS )
+        return NULL;
     int handle = buflib_allocations[font_id];
     if (handle > 0)
         return core_get_name(handle);
@@ -578,7 +580,7 @@ int font_load(const char *path)
 
 void font_unload(int font_id)
 {
-    if ( font_id == FONT_SYSFIXED )
+    if ( font_id < 0 || font_id >= MAXFONTS )
         return;
     int handle = buflib_allocations[font_id];
     if ( handle < 0 )
