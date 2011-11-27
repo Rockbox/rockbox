@@ -758,7 +758,7 @@ int ata_write_sectors(IF_MD2(int drive,)
 }
 #endif /* MAX_PHYS_SECTOR_SIZE */
 
-static int check_registers(void)
+static int STORAGE_INIT_ATTR check_registers(void)
 {
     int i;
     wait_for_bsy();
@@ -1086,7 +1086,7 @@ static int ata_power_on(void)
     return 0;
 }
 
-static int master_slave_detect(void)
+static int STORAGE_INIT_ATTR master_slave_detect(void)
 {
     /* master? */
     ATA_OUT8(ATA_SELECT, 0);
@@ -1107,7 +1107,7 @@ static int master_slave_detect(void)
     return 0;
 }
 
-static int identify(void)
+static int STORAGE_INIT_ATTR identify(void)
 {
     int i;
 
@@ -1261,7 +1261,7 @@ unsigned short* ata_get_identify(void)
     return identify_info;
 }
 
-static int init_and_check(bool hard_reset)
+static int STORAGE_INIT_ATTR init_and_check(bool hard_reset)
 {
     int rc;
 
@@ -1288,7 +1288,7 @@ static int init_and_check(bool hard_reset)
     return 0;
 }
 
-int ata_init(void)
+int STORAGE_INIT_ATTR ata_init(void)
 {
     int rc = 0;
     bool coldstart;
