@@ -268,6 +268,7 @@ bool settings_load_config(const char* file, bool apply)
     char* name;
     char* value;
     int i;
+    bool theme_changed = false;
     fd = open_utf8(file, O_RDONLY);
     if (fd < 0)
         return false;
@@ -275,13 +276,15 @@ bool settings_load_config(const char* file, bool apply)
     while (read_line(fd, line, sizeof line) > 0)
     {
         if (!settings_parseline(line, &name, &value))
-            continue;    
+            continue;
         for(i=0; i<nb_settings; i++)
         {
             if (settings[i].cfg_name == NULL)
                 continue;
             if (!strcasecmp(name,settings[i].cfg_name))
             {
+                if (settings[i].flags&F_THEMESETTING)
+                    theme_changed = true;
                 switch (settings[i].flags&F_T_MASK)
                 {
                     case F_T_CUSTOM:
@@ -363,7 +366,8 @@ bool settings_load_config(const char* file, bool apply)
     {
         settings_save();
         settings_apply(true);
-        settings_apply_skins();
+        if (theme_changed)
+            settings_apply_skins();
     }
     return true;
 }

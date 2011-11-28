@@ -139,29 +139,20 @@ void settings_apply_skins(void)
     {
         FOR_NB_SCREENS(j)
         {
-            bool load = false;
             get_skin_filename(filename, MAX_PATH, i,j);
 
-            if (filename[0] && (strcmp(filename, skins[i][j].filename) || skins[i][j].failsafe_loaded))
-                load = true;
-            else if (first_run || (!filename[0] && !skins[i][j].failsafe_loaded))
-                load = true;
-
-            if (load)
+            if (!first_run)
             {
-                if (!first_run)
-                {
-                    skin_data_free_buflib_allocs(&skins[i][j].data);
+                skin_data_free_buflib_allocs(&skins[i][j].data);
 #ifdef HAVE_BACKDROP_IMAGE
-                    if (skins[i][j].data.backdrop_id >= 0)
-                        skin_backdrop_unload(skins[i][j].data.backdrop_id);
+                if (skins[i][j].data.backdrop_id >= 0)
+                    skin_backdrop_unload(skins[i][j].data.backdrop_id);
 #endif
-                }
-                gui_skin_reset(&skins[i][j]);
-                skins[i][j].gui_wps.display = &screens[j];
-                if (skin_helpers[i].load_on_boot)
-                    skin_get_gwps(i, j);
             }
+            gui_skin_reset(&skins[i][j]);
+            skins[i][j].gui_wps.display = &screens[j];
+            if (skin_helpers[i].load_on_boot)
+                skin_get_gwps(i, j);
         }
     }
     first_run = false;
