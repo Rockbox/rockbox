@@ -43,6 +43,7 @@
 void skin_data_free_buflib_allocs(struct wps_data *wps_data);
 char* wps_default_skin(enum screen_type screen);
 char* default_radio_skin(enum screen_type screen);
+static bool skins_initialised = false;
 
 static char* get_skin_filename(char *buf, size_t buf_size,
                                enum skinnable_screens skin, enum screen_type screen);
@@ -131,6 +132,8 @@ void settings_apply_skins(void)
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
 #endif
+    skins_initialised = true;
+
     /* Make sure each skin is loaded */
     for (i=0; i<SKINNABLE_SCREENS_COUNT; i++)
     {
@@ -265,6 +268,9 @@ static char* get_skin_filename(char *buf, size_t buf_size,
 
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen)
 {
+    if (skin == CUSTOM_STATUSBAR && !skins_initialised)
+        return &skins[skin][screen].gui_wps;
+
     if (skins[skin][screen].data.wps_loaded == false)
     {
         char filename[MAX_PATH];
