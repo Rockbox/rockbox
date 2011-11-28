@@ -306,14 +306,20 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                     return "?";
                 return buf;
             case SKIN_TOKEN_TRACK_TIME_ELAPSED:
+                if (intval && limit == TOKEN_VALUE_ONLY)
+                    *intval = elapsed/1000;
                 format_time(buf, buf_size, elapsed);
                 return buf;
 
             case SKIN_TOKEN_TRACK_TIME_REMAINING:
+                if (intval && limit == TOKEN_VALUE_ONLY)
+                    *intval = (length - elapsed)/1000;
                 format_time(buf, buf_size, length - elapsed);
                 return buf;
 
             case SKIN_TOKEN_TRACK_LENGTH:
+                if (intval && limit == TOKEN_VALUE_ONLY)
+                    *intval = length/1000;
                 format_time(buf, buf_size, length);
                 return buf;
 
