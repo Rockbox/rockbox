@@ -359,6 +359,10 @@ void system_init(void)
 #endif
 
 #ifdef SANSA_CONNECT
+    /* keep WIFI CS low to save power */
+    IO_GIO_DIR0 &= ~(1 << 4);
+    IO_GIO_BITCLR0 = (1 << 4);
+
     i2c_init();
     avr_hid_init();
     avr_hid_enable_charger();

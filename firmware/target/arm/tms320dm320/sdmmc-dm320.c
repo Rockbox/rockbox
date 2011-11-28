@@ -27,6 +27,7 @@
 #include "panic.h"
 #include "kernel.h"
 #include "dma-target.h"
+#include "ata_idle_notify.h"
 
 //#define SD_DEBUG
 
@@ -576,8 +577,8 @@ static void sd_thread(void) NORETURN_ATTR;
 static void sd_thread(void)
 {
     struct queue_event ev;
+    bool idle_notified = false;
 
-    /* TODO */
     while (1)
     {
         queue_wait_w_tmo(&sd_queue, &ev, HZ);
@@ -627,6 +628,17 @@ static void sd_thread(void)
         }
             break;
 #endif
+        case SYS_TIMEOUT:
+            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
+            {
+                idle_notified = false;
+            }
+            else if (!idle_notified)
+            {
+                call_storage_idle_notifys(false);
+                idle_notified = true;
+            }
+            break;
         }        
     }
 }

@@ -28,11 +28,13 @@
 
 static unsigned int current_battery_level = 100;
 
+/* This specifies the battery level that writes are still safe */
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    0
+    1
 };
 
+/* Below this the player cannot be considered to operate reliably */
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     0
