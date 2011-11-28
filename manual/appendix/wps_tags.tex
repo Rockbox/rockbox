@@ -126,11 +126,13 @@ show the information for the next song to be played.
     \config{\%fc} & File Codec (e.g. ``MP3'' or ``FLAC'').
            This tag can also be used in a conditional tag:
            \config{\%?fc<mp1|mp2|mp3|aiff|wav|ogg|\newline
-           flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|nsf|\newline
-           speex|spc|ape|wma|mod|sap|unknown>}.
-                  The codec order is as follows: MP1, MP2, MP3, AIFF, WAV,
-           Ogg Vorbis (OGG), FLAC, MPC, AC3, WavPack (WV), ALAC, AAC,
-           Shorten (SHN), SID, ADX, NSF, Speex, SPC, APE, WMA, MOD, SAP.\\
+           flac|mpcsv7|a52|wavpack|alac|aac|shn|sid|adx|nsf|\newline
+           speex|spc|ape|wma|wmpapro|mod|sap|realaudiocook|\newline
+           realaudioaac|realaudioac3|realaudioatrac3|cmc|\newline
+           cm3|cmr|cms|dmc|dlt|mpt|mpd|rmt|tmc|tm8|tm2|\newline
+           omaatrac3|smaf|au|vox|wave64|tta|wmavoice|mpcsv8|\newline
+           aache|ay|gbs|hes|sgc|vgm|kss|unknown>}.
+                  The codec order is as shown above.\\
     \config{\%ff} & File Frequency (in Hz)\\
     \config{\%fk} & File Frequency (in kHz)\\
     \config{\%fm} & File Name\\
@@ -422,8 +424,9 @@ theme}. For this feature to work, there are a few requirements.
 
 \subsection{Limitations}
 
-Rockbox supports embedded album art only for formats that use ID3v2 tags, such
-as MP3. It additionally supports loading images located on the \disk{}.
+Rockbox supports embedded album art only for some specific formats, see
+\reference{ref:featureset_for_generic_metadata_tags} for full details. It additionally supports
+loading images located on the \disk{}.
 The image files must be in either BMP or JPEG format, while embedded album art
 is currently limited to JPEG. Rockbox does not support
 RLE-compressed BMP files, nor does it support progressive and multi-scan
