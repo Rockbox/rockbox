@@ -29,7 +29,6 @@
 #include "string-extra.h"
 #include "storage.h"
 #include "usb.h"
-#include "buffer.h"
 #include "general.h"
 #include "codec_thread.h"
 #include "audio.h"

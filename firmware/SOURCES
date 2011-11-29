@@ -1,7 +1,6 @@
 ata_idle_notify.c
 events.c
 backlight.c
-buffer.c
 buflib.c
 core_alloc.c
 general.c

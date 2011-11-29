@@ -1,21 +1,44 @@
 
+#include "config.h"
 #include <string.h>
+#include "system.h"
 #include "core_alloc.h"
 #include "buflib.h"
-#include "buffer.h"
 
 /* not static so it can be discovered by core_get_data() */
 struct buflib_context core_ctx;
+
+/* defined in linker script */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(IPOD_VIDEO) && !defined(BOOTLOADER)
+extern unsigned char *audiobufend_lds[];
+unsigned char *audiobufend;
+#else /* !IPOD_VIDEO */
+extern unsigned char audiobufend[];
+#endif
+/* defined in linker script */
+extern unsigned char audiobuffer[];
+#else /* PLATFORM_HOSTED */
+unsigned char audiobuffer[(MEMORYSIZE*1024-256)*1024];
+unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
+extern unsigned char *audiobufend;
+#endif
 
 /* debug test alloc */
 static int test_alloc;
 void core_allocator_init(void)
 {
-    buffer_init();
-    size_t size;
-    void *start = buffer_get_buffer(&size);
-    buflib_init(&core_ctx, start, size);
-    buffer_release_buffer(size);
+    unsigned char *start = ALIGN_UP(audiobuffer, sizeof(intptr_t));
+
+#if defined(IPOD_VIDEO) && !defined(BOOTLOADER) && !defined(SIMULATOR)
+    audiobufend=(unsigned char *)audiobufend_lds;
+    if(MEMORYSIZE==64 && probed_ramsize!=64)
+    {
+        audiobufend -= (32<<20);
+    }
+#endif
+
+    buflib_init(&core_ctx, start, audiobufend - start);
 
     test_alloc = core_alloc("test", 112);
 }

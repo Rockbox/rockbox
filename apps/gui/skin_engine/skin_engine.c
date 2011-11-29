@@ -30,7 +30,6 @@
 #include "settings.h"
 #include "wps.h"
 #include "file.h"
-#include "buffer.h"
 #if CONFIG_TUNER
 #include "radio.h"
 #endif

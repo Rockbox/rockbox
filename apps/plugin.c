@@ -27,7 +27,6 @@
 #include "lang.h"
 #include "led.h"
 #include "keyboard.h"
-#include "buffer.h"
 #include "backlight.h"
 #include "sound_menu.h"
 #include "mp3data.h"

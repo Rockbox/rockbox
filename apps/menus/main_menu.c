@@ -42,7 +42,6 @@
 #include "screens.h"
 #include "plugin.h"
 #include "talk.h"
-#include "buffer.h"
 #include "splash.h"
 #include "debug_menu.h"
 #include "version.h"

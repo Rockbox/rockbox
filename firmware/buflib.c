@@ -30,7 +30,6 @@
 #include "buflib.h"
 #include "string-extra.h" /* strlcpy() */
 #include "debug.h"
-#include "buffer.h"
 #include "system.h" /* for ALIGN_*() */
 
 /* The main goal of this design is fast fetching of the pointer for a handle.

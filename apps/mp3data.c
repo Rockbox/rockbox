@@ -38,7 +38,6 @@
 #include "logf.h"
 #include "mp3data.h"
 #include "file.h"
-#include "buffer.h"
 #include "system.h"
 
 //#define DEBUG_VERBOSE
