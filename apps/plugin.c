@@ -98,16 +98,6 @@ static off_t app_filesize(int fd)
 {
     return filesize(fd);
 }
-
-static int app_closedir(DIR *dirp)
-{
-    return closedir(dirp);
-}
-
-static struct dirent *app_readdir(DIR *dirp)
-{
-    return readdir(dirp);
-}
 #endif
 
 #if defined(HAVE_PLUGIN_CHECK_OPEN_CLOSE) && (MAX_OPEN_FILES>32)
@@ -385,11 +375,11 @@ static const struct plugin_api rockbox_api = {
     filetype_get_attr,
 
     /* dir */
-    (opendir_func)PREFIX(opendir),
-    (closedir_func)PREFIX(closedir),
-    (readdir_func)PREFIX(readdir),
-    PREFIX(mkdir),
-    PREFIX(rmdir),
+    (opendir_func)opendir,
+    (closedir_func)closedir,
+    (readdir_func)readdir,
+    mkdir,
+    rmdir,
     dir_exists,
     dir_get_info,
 
