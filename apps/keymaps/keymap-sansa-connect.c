@@ -65,10 +65,39 @@ static const struct button_mapping button_context_wps[]  = {
   {ACTION_WPS_ABSETB_NEXTDIR, BUTTON_POWER|BUTTON_LEFT,     BUTTON_POWER},
   {ACTION_WPS_ABRESET,    BUTTON_POWER|BUTTON_UP,           BUTTON_POWER},
   {ACTION_WPS_HOTKEY,     BUTTON_UP|BUTTON_REL,             BUTTON_UP},
-    LAST_ITEM_IN_LIST
+  LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
+static const struct button_mapping button_context_yesno[] = {
+  {ACTION_YESNO_ACCEPT,   BUTTON_SELECT,                    BUTTON_NONE},
+  LAST_ITEM_IN_LIST
+}; /* button_context_yesno */
 
+static const struct button_mapping button_context_keyboard[] = {
+  {ACTION_KBD_LEFT,       BUTTON_LEFT,                      BUTTON_NONE},
+  {ACTION_KBD_LEFT,       BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE},
+  {ACTION_KBD_RIGHT,      BUTTON_RIGHT,                     BUTTON_NONE},
+  {ACTION_KBD_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE},
+
+  {ACTION_KBD_CURSOR_LEFT,BUTTON_VOL_DOWN,                  BUTTON_NONE},
+  {ACTION_KBD_CURSOR_LEFT,BUTTON_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE},
+  {ACTION_KBD_CURSOR_RIGHT,BUTTON_VOL_UP,                   BUTTON_NONE},
+  {ACTION_KBD_CURSOR_RIGHT,BUTTON_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE},
+
+  {ACTION_KBD_UP,         BUTTON_SCROLL_BACK,               BUTTON_NONE},
+  {ACTION_KBD_UP,         BUTTON_SCROLL_BACK|BUTTON_REPEAT, BUTTON_NONE},
+  {ACTION_KBD_DOWN,       BUTTON_SCROLL_FWD,                BUTTON_NONE},
+  {ACTION_KBD_DOWN,       BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE},
+  {ACTION_KBD_PAGE_FLIP,  BUTTON_NEXT,                      BUTTON_NONE},
+  {ACTION_KBD_BACKSPACE,  BUTTON_PREV,                      BUTTON_NONE},
+  {ACTION_KBD_BACKSPACE,  BUTTON_PREV|BUTTON_REPEAT,        BUTTON_NONE},
+  {ACTION_KBD_SELECT,     BUTTON_SELECT,                    BUTTON_NONE},
+  {ACTION_KBD_DONE,       BUTTON_UP,                        BUTTON_NONE},
+  {ACTION_KBD_ABORT,      BUTTON_POWER,                     BUTTON_NONE},
+  {ACTION_KBD_MORSE_INPUT,BUTTON_DOWN|BUTTON_REL,           BUTTON_NONE},
+  {ACTION_KBD_MORSE_SELECT,BUTTON_SELECT|BUTTON_REL,        BUTTON_NONE},
+  LAST_ITEM_IN_LIST
+}; /* button_context_keyboard */
 
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 const struct button_mapping* get_context_mapping(int context)
@@ -79,6 +108,11 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_standard;
         case CONTEXT_WPS:
             return button_context_wps;
+        case CONTEXT_YESNOSCREEN:
+            return button_context_yesno;
+        case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
+            return button_context_keyboard;
             
         case CONTEXT_TREE:
         case CONTEXT_LIST:
@@ -88,6 +122,6 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS|CONTEXT_REMOTE:
         default:
             return button_context_standard;
-    } 
+    }
     return button_context_standard;
 }

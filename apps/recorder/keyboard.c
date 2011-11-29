@@ -66,7 +66,8 @@
     || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) \
     || (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD) \
     || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
-    || (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
+    || (CONFIG_KEYPAD == PBELL_VIBE500_PAD) \
+    || (CONFIG_KEYPAD == SANSA_CONNECT_PAD)
 /* certain key combos toggle input mode between keyboard input and Morse input */
 #define KBD_TOGGLE_INPUT
 #endif
