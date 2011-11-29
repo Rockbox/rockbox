@@ -142,13 +142,14 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
                         return false;
                     }
 
-                    /* Gather the album art format from the pseudo file name. */
+                    /* Gather the album art format from the pseudo file name's ending. */
+                    strcpy(name, name + strlen(name) - 4);
                     id3->albumart.type = AA_TYPE_UNKNOWN;
-                    if      (strcasecmp(name, "cover art (front).jpg") == 0)
+                    if      (strcasecmp(name, ".jpg") == 0)
                     {
                         id3->albumart.type = AA_TYPE_JPG;
                     }
-                    else if (strcasecmp(name, "cover art (front).png") == 0)
+                    else if (strcasecmp(name, ".png") == 0)
                     {
                         id3->albumart.type = AA_TYPE_PNG;
                     }
