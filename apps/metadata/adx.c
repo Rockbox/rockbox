@@ -73,7 +73,7 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
     id3->filesize = filesize(fd);
     
     /* get loop info */
-    if (!memcmp(buf+0x10,"\x01\xF4\x03\x00",4)) {
+    if (!memcmp(buf+0x10,"\x01\xF4\x03",3)) {
         /* Soul Calibur 2 style (type 03) */
         DEBUGF("get_adx_metadata: type 03 found\n");
         /* check if header is too small for loop data */
@@ -83,7 +83,7 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
             end_adr = get_long_be(&buf[0x28]);
             start_adr = get_long_be(&buf[0x1c])/32*channels*18+chanstart;
         }
-    } else if (!memcmp(buf+0x10,"\x01\xF4\x04\x00",4)) {
+    } else if (!memcmp(buf+0x10,"\x01\xF4\x04",3)) {
         /* Standard (type 04) */
         DEBUGF("get_adx_metadata: type 04 found\n");
         /* check if header is too small for loop data */
@@ -95,6 +95,12 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
         }
     } else {
         DEBUGF("get_adx_metadata: error, couldn't determine ADX type\n");
+        return false;
+    }
+    
+    /* is file using encryption */
+    if (buf[0x13]==0x08) {
+        DEBUGF("get_adx_metadata: error, encrypted ADX not supported\n");
         return false;
     }
     

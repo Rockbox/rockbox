@@ -149,7 +149,7 @@ enum codec_status codec_run(void)
     /* Get loop data */
     
     looping = 0; start_adr = 0; end_adr = 0;
-    if (!memcmp(buf+0x10,"\x01\xF4\x03\x00",4)) {
+    if (!memcmp(buf+0x10,"\x01\xF4\x03",3)) {
         /* Soul Calibur 2 style (type 03) */
         DEBUGF("ADX: type 03 found\n");
         /* check if header is too small for loop data */
@@ -171,7 +171,7 @@ enum codec_status codec_run(void)
               (buf[0x1f])
               )/32*channels*18+chanstart;
         }
-    } else if (!memcmp(buf+0x10,"\x01\xF4\x04\x00",4)) {
+    } else if (!memcmp(buf+0x10,"\x01\xF4\x04",3)) {
         /* Standard (type 04) */
         DEBUGF("ADX: type 04 found\n");
         /* check if header is too small for loop data */
@@ -195,6 +195,12 @@ enum codec_status codec_run(void)
     } else {
         DEBUGF("ADX: error, couldn't determine ADX type\n");
         return CODEC_ERROR;
+    }
+    
+    /* is file using encryption */
+    if (buf[0x13]==0x08) {
+        DEBUGF("ADX: error, encrypted ADX not supported\n");
+        return false;
     }
 
     if (looping) {
