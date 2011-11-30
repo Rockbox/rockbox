@@ -22,6 +22,7 @@
 #include "config.h"
 #include "system.h"
 #include "power.h"
+#include "string.h"
 #include "system-target.h"
 #include "usb-target.h"
 
@@ -69,4 +70,44 @@ unsigned int power_input_status(void)
 bool charging_state(void)
 {
     return false;
+}
+
+struct imx233_power_info_t imx233_power_get_info(unsigned flags)
+{
+    static int dcdc_freqsel[8] = {
+        [HW_POWER_MISC__FREQSEL__RES] = 0,
+        [HW_POWER_MISC__FREQSEL__20MHz] = 20000,
+        [HW_POWER_MISC__FREQSEL__24MHz] = 24000,
+        [HW_POWER_MISC__FREQSEL__19p2MHz] = 19200,
+        [HW_POWER_MISC__FREQSEL__14p4MHz] = 14200,
+        [HW_POWER_MISC__FREQSEL__18MHz] = 18000,
+        [HW_POWER_MISC__FREQSEL__21p6MHz] = 21600,
+        [HW_POWER_MISC__FREQSEL__17p28MHz] = 17280,
+    };
+    
+    struct imx233_power_info_t s;
+    memset(&s, 0, sizeof(s));
+    if(flags & POWER_INFO_VDDD)
+    {
+        s.vddd = HW_POWER_VDDDCTRL__TRG_MIN + HW_POWER_VDDDCTRL__TRG_STEP * __XTRACT(HW_POWER_VDDDCTRL, TRG);
+        s.vddd_linreg = HW_POWER_VDDDCTRL & HW_POWER_VDDDCTRL__ENABLE_LINREG;
+    }
+    if(flags & POWER_INFO_VDDA)
+    {
+        s.vdda = HW_POWER_VDDACTRL__TRG_MIN + HW_POWER_VDDACTRL__TRG_STEP * __XTRACT(HW_POWER_VDDACTRL, TRG);
+        s.vdda_linreg = HW_POWER_VDDACTRL & HW_POWER_VDDACTRL__ENABLE_LINREG;
+    }
+    if(flags & POWER_INFO_VDDIO)
+        s.vddio = HW_POWER_VDDIOCTRL__TRG_MIN + HW_POWER_VDDIOCTRL__TRG_STEP * __XTRACT(HW_POWER_VDDIOCTRL, TRG);
+    if(flags & POWER_INFO_VDDMEM)
+    {
+        s.vddmem = HW_POWER_VDDMEMCTRL__TRG_MIN + HW_POWER_VDDMEMCTRL__TRG_STEP * __XTRACT(HW_POWER_VDDMEMCTRL, TRG);
+        s.vddmem_linreg = HW_POWER_VDDMEMCTRL & HW_POWER_VDDMEMCTRL__ENABLE_LINREG;
+    }
+    if(flags & POWER_INFO_DCDC)
+    {
+        s.dcdc_sel_pllclk = HW_POWER_MISC & HW_POWER_MISC__SEL_PLLCLK;
+        s.dcdc_freqsel = dcdc_freqsel[__XTRACT(HW_POWER_MISC, FREQSEL)];
+    }
+    return s;
 }
