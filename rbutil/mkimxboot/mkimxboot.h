@@ -22,7 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
-#include "sb.h"
 
 enum imx_error_t
 {
