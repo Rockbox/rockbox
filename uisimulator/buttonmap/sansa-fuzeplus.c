@@ -49,7 +49,9 @@ int key_to_button(int keyboard_button)
         case SDLK_KP9:
             new_btn = BUTTON_PLAYPAUSE;
             break;
-        case SDLK_INSERT:
+        case SDLK_KP0:
+            new_btn = BUTTON_TWO_FINGERS;
+            break;
         case SDLK_KP7:
             new_btn = BUTTON_BACK;
             break;
@@ -66,23 +68,28 @@ int key_to_button(int keyboard_button)
             new_btn = BUTTON_VOL_DOWN;
             break;
         case SDLK_HOME:
-        case SDLK_KP1:
             new_btn = BUTTON_POWER;
+            break;
+        case SDLK_KP1:
+            new_btn = BUTTON_BOTTOMLEFT;
+            break;
+        case SDLK_KP3:
+            new_btn = BUTTON_BOTTOMRIGHT;
             break;
     }
     return new_btn;
 }
 
 struct button_map bm[] = {
-    { SDLK_KP8,          70, 265, 35, "Scroll Back" },
-    { SDLK_KP9,         141, 255, 31, "Play" },
-    { SDLK_KP_MULTIPLY, 228, 267, 18, "Home" },
+    { SDLK_KP8,          70, 265, 35, "Up" },
+    { SDLK_KP9,         141, 255, 31, "Play/Pause" },
     { SDLK_LEFT,         69, 329, 31, "Left" },
     { SDLK_SPACE,       141, 330, 20, "Select" },
     { SDLK_RIGHT,       214, 331, 23, "Right" },
-    { SDLK_KP3,         142, 406, 30, "Menu" },
-    { SDLK_DOWN,        221, 384, 24, "Scroll Fwd" },
-    { SDLK_KP_MINUS,    270, 299, 25, "Power" },
-    { SDLK_h,           269, 358, 26, "Hold" },
+    { SDLK_KP1,          69, 406, 30, "Bottom Left" },
+    { SDLK_KP3,         142, 406, 30, "Bottom Right" },
+    { SDLK_DOWN,        221, 384, 24, "Down" },
+    { SDLK_KP_MINUS,    270, 150, 25, "Volume -" },
+    { SDLK_KP_PLUS,     270, 180, 25, "Volume +" },
     { 0, 0, 0, 0, "None" }
 };

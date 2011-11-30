@@ -41,6 +41,7 @@ bool button_debug_screen(void)
     int sensor_resol = rmi_read_single(RMI_2D_SENSOR_RESOLUTION(0));
     int min_dist = rmi_read_single(RMI_2D_MIN_DIST);
     int gesture_settings = rmi_read_single(RMI_2D_GESTURE_SETTINGS);
+    int sensibility_counter = 0;
     union
     {
         unsigned char data;
@@ -157,10 +158,15 @@ bool button_debug_screen(void)
         if(btns & BUTTON_VOL_DOWN || btns & BUTTON_VOL_UP)
         {
             if(btns & BUTTON_VOL_UP)
-                sensitivity.value++;
+                sensibility_counter++;
             if(btns & BUTTON_VOL_DOWN)
-                sensitivity.value--;
-            rmi_write(RMI_2D_SENSITIVITY_ADJ, 1, &sensitivity.data);
+                sensibility_counter--;
+            if((sensibility_counter == -15) || (sensibility_counter == 15))
+            {
+                sensitivity.value += (sensibility_counter / 15);
+                sensibility_counter = 0;
+            }
+            rmi_write(RMI_2D_SENSITIVITY_ADJ, 1, &sensitivity.data); 
         }
         
         yield();
@@ -179,19 +185,23 @@ struct button_area_t
 
 static struct button_area_t button_areas[] =
 {
-    {1300, 600, 1700, 1100, BUTTON_SELECT},
-    {500, 600, 1100, 1100, BUTTON_LEFT},
-    {1900, 600, 2500, 1100, BUTTON_RIGHT},
-    {1300, 0, 1700, 400, BUTTON_DOWN},
-    {1300, 1300, 1700, 1800, BUTTON_UP},
-    {2500, 1600, 2900, 1800, BUTTON_PLAYPAUSE},
-    {300, 1600, 500, 1800, BUTTON_BACK},
+    {1003, 658, 2006, 1316, BUTTON_SELECT},
+    {0, 658, 1003, 1316, BUTTON_LEFT},
+    {2006, 658, 3009, 1316, BUTTON_RIGHT},
+    {1003, 0 , 2006, 658, BUTTON_DOWN},
+    {1003, 1316, 2006, 1974, BUTTON_UP},
+    {2006, 1316, 3009, 1974, BUTTON_PLAYPAUSE},
+    {0, 1316, 1003, 1974, BUTTON_BACK},
+    {0, 0 , 1003, 658, BUTTON_BOTTOMLEFT},
+    {2006, 0 , 3009, 658, BUTTON_BOTTOMRIGHT},
     {0, 0, 0, 0, 0},
 };
 
 #define RMI_INTERRUPT   1
 
 static int touchpad_btns = 0;
+static bool two_fingers_mode = 0; 
+static int button_delay = 0;
 static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
 static const char rmi_thread_name[] = "rmi";
 static struct event_queue rmi_queue;
@@ -255,10 +265,46 @@ static void rmi_thread(void)
         int absolute_y = u.s.absolute.y_msb << 8 | u.s.absolute.y_lsb;
         int nr_fingers = u.s.absolute.misc & 7;
 
-        if(nr_fingers == 0)
-            touchpad_btns = 0;
-        else
-            touchpad_btns = find_button(absolute_x, absolute_y);
+        /* Handle the single vs two fingers event considering the following issues:
+          - When they are two fingers on the touchpad the signal often 
+                 switch between 1 and 2 fingers. We use the bool 
+                 two_fingers_mode to "lock" the two fingers's signal
+                 as long as the user doesn't release the touchpad
+          - User can hit the device at first with only one finger while
+                 trying to do a double fingers's touch. In order to "smooth"
+                 the signal, we set a delay on single finger so that user as
+                 time to actually touch with 2 finger if he meant to.
+        */
+
+        switch(nr_fingers)
+        {
+            case 2:
+                /* enter two fingers mode */
+                two_fingers_mode = 1;
+                touchpad_btns = BUTTON_TWO_FINGERS;
+                break;
+            case 1:
+                /* Ignore any touch when in two fingers mode */
+                if (two_fingers_mode)
+                    touchpad_btns = BUTTON_TWO_FINGERS;
+                else
+                {
+                    if(button_delay > 2)
+                        touchpad_btns = find_button(absolute_x, absolute_y);
+                    else
+                        button_delay++;
+                }
+                break;
+            case 0:
+                /* reset two fingers mode and delay */
+                two_fingers_mode = 0;
+                button_delay = 0; 
+                touchpad_btns = 0;
+                break;
+            default:
+                break;
+        }  
+        
         /* enable interrupt */
         imx233_setup_pin_irq(0, 27, true, true, false, &rmi_attn_cb);
     }
@@ -299,11 +345,10 @@ void button_init_device(void)
 
     char product_id[RMI_PRODUCT_ID_LEN];
     rmi_read(RMI_PRODUCT_ID, RMI_PRODUCT_ID_LEN, product_id);
-    /* adjust sensitivity based on product ID like the OF */
-    if(product_id[1] > 2)
-        rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 0);
-    else
-        rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 13);
+    /* The OF adjust the sensitivity based on product_id[1] compared to 2.
+     * Since it doesn't to work great, just hardcode the sensitivity to
+     * some reasonable value for now. */
+    rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 13);
     
     rmi_write_single(RMI_2D_GESTURE_SETTINGS,
         RMI_2D_GESTURE_PRESS_TIME_300MS |
