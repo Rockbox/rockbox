@@ -277,12 +277,12 @@ void tv_set_layout(bool show_scrollbar)
     vertical_scrollbar.w = scrollbar_width;
     vertical_scrollbar.h = footer.y - vertical_scrollbar.y - scrollbar_height;
 
+    vp_info.font = preferences->font_id;
     vp_text = vp_info;
     vp_text.x += horizontal_scrollbar.x;
     vp_text.y += vertical_scrollbar.y;
     vp_text.width = horizontal_scrollbar.w;
     vp_text.height = vertical_scrollbar.h;
-    vp_text.font = preferences->font_id;
 #else
     (void) show_scrollbar;
 
