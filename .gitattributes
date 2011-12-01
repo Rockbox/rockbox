@@ -1,0 +1,16 @@
+*               text=auto
+*.bmp           binary
+*.cat           -text
+*.dll           binary
+*.fnt           binary
+*.icns          binary
+*.ico           binary
+*.inf           -text
+*.jpg           binary
+*.pdf           binary
+*.png           binary
+*.svg           binary
+*.sys           binary
+*.vcproj        -text
+*.wav           binary
+*.xcf           binary
