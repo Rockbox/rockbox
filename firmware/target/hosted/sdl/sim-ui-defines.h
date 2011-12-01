@@ -424,6 +424,13 @@
 #define UI_LCD_POSX                 64
 #define UI_LCD_POSY                 127
 
+#elif defined(SANSA_CONNECT)
+#define UI_TITLE                    "Sansa Connect"
+#define UI_WIDTH                    371 /* width of GUI window */
+#define UI_HEIGHT                   687 /* height of GUI window */
+#define UI_LCD_POSX                 68
+#define UI_LCD_POSY                 77
+
 #elif defined(APPLICATION)
 #define UI_TITLE                    "Rockbox"
 #define UI_LCD_POSX                 0

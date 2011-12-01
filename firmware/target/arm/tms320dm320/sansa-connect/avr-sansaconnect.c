@@ -254,7 +254,7 @@ static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
         if (buf_rx != NULL)
             buf_rx[i] = rxdata & 0xFF;
 
-        //udelay(100);
+        udelay(100);
     }
 
     select_hid(false);
