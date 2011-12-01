@@ -237,12 +237,25 @@ buflib_compact(struct buflib_context *ctx)
 {
     BDEBUGF("%s(): Compacting!\n", __func__);
     union buflib_data *block,
-                      *first_free = find_first_free(ctx);
+                      *hole = NULL;
     int shift = 0, len;
     /* Store the results of attempting to shrink the handle table */
     bool ret = handle_table_shrink(ctx);
-    for(block = first_free; block < ctx->alloc_end; block += len)
+    /* compaction has basically two modes of operation:
+     *  1) the buffer is nicely movable: In this mode, blocks can be simply
+     * moved towards the beginning. Free blocks add to a shift value,
+     * which is the amount to move.
+     *  2) the buffer contains unmovable blocks: unmovable blocks create
+     * holes and reset shift. Once a hole is found, we're trying to fill
+     * holes first, moving by shift is the fallback. As the shift is reset,
+     * this effectively splits the buffer into portions of movable blocks.
+     * This mode cannot be used if no holes are found yet as it only works
+     * when it moves blocks across the portions. On the other side,
+     * moving by shift only works within the same portion
+     * For simplicity only 1 hole at a time is considered */
+    for(block = find_first_free(ctx); block < ctx->alloc_end; block += len)
     {
+        bool movable = true; /* cache result to avoid 2nd call to move_block */
         len = block->val;
         /* This block is free, add its length to the shift value */
         if (len < 0)
@@ -252,42 +265,41 @@ buflib_compact(struct buflib_context *ctx)
             continue;
         }
         /* attempt to fill any hole */
-        if (-first_free->val >= block->val)
+        if (hole && -hole->val >= len)
         {
-            intptr_t size = -first_free->val;
-            union buflib_data* next_block = block + block->val;
-            if (move_block(ctx, block, first_free - block))
+            intptr_t hlen = -hole->val;
+            if ((movable = move_block(ctx, block, hole - block)))
             {
-                /* moving was successful. Move alloc_end down if necessary */
-                if (ctx->alloc_end == next_block)
-                    ctx->alloc_end = block;
-                /* Mark the block behind the just moved as free
-                 * be careful to not overwrite an existing block */
-                if (size != block->val)
+                ret = true;
+                /* Move was successful. The memory at block is now free */
+                block->val = -len;
+                /* add its length to shift */
+                shift += -len;
+                /* Reduce the size of the hole accordingly
+                 * but be careful to not overwrite an existing block */
+                if (hlen != len)
                 {
-                    first_free += block->val;
-                    first_free->val = block->val - size; /* negative */
+                    hole += len;
+                    hole->val = len - hlen; /* negative */
                 }
-                continue;
+                else /* hole closed */
+                    hole = NULL;
             }
         }
         /* attempt move the allocation by shift */
         if (shift)
         {
-            /* failing to move creates a hole,
-             * therefore mark this block as not allocated */
             union buflib_data* target_block = block + shift;
-            if (!move_block(ctx, block, shift))
+            if (!movable || !move_block(ctx, block, shift))
             {
-                target_block->val = shift; /* this is a hole */
+                /* free space before an unmovable block becomes a hole,
+                 * therefore mark this block free and track the hole */
+                target_block->val = shift;
+                hole = target_block;
                 shift = 0;
             }
             else
-            {   /* need to update the next free block, since the above hole
-                 * handling might make shift 0 before alloc_end is reached */
-                union buflib_data* new_free = target_block + target_block->val;
-                new_free->val = shift;
-            }
+                ret = true;
         }
     }
     /* Move the end-of-allocation mark, and return true if any new space has
