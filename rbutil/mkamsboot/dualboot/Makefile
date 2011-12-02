@@ -1,5 +1,5 @@
 CC=gcc
-CROSS_PREFIX=arm-elf
+CROSS_PREFIX?=arm-elf-eabi
 # Edit the following variables (plus copy/paste another set of rules) when
 # adding a new target.  mkamsboot.c also needs to be edited to refer to these
 # new images.
