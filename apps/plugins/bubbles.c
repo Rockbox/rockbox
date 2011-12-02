@@ -198,7 +198,7 @@ enum {
 #define MAX_FPS       30
 
 /* 7x7 bubbles (Sansa Clip/m200) */
-#elif (LCD_HEIGHT == 64 && LCD_WIDTH == 128)
+#elif (LCD_HEIGHT == 64 && LCD_WIDTH == 128) || (LCD_HEIGHT == 96 && LCD_WIDTH == 96)
 #define XOFS          33
 #define ROW_HEIGHT     5
 #define MAX_FPS       30

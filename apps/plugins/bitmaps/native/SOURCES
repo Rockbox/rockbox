@@ -76,7 +76,7 @@ brickmania_long_pads.132x80x16.bmp
 brickmania_powerups.132x80x16.bmp
 brickmania_break.132x80x16.bmp
 
-#elif LCD_WIDTH >= 128
+#elif LCD_WIDTH >= 96
 brickmania_ball.4x4x16.bmp
 brickmania_bricks.128x128x16.bmp
 brickmania_pads.132x80x16.bmp
@@ -84,6 +84,7 @@ brickmania_short_pads.132x80x16.bmp
 brickmania_long_pads.132x80x16.bmp
 brickmania_powerups.132x80x16.bmp
 brickmania_break.132x80x16.bmp
+
 #endif /* different colour displays */
 
 #elif LCD_DEPTH > 1
@@ -148,7 +149,7 @@ bubbles_background.128x128x16.bmp
 #elif (LCD_WIDTH >= 132) && (LCD_HEIGHT >= 80)
 bubbles_emblem.132x80x16.bmp
 bubbles_background.132x80x16.bmp
-#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96)
+#elif (LCD_WIDTH >= 96) && (LCD_HEIGHT >= 96)
 bubbles_emblem.132x80x16.bmp
 bubbles_background.128x96x16.bmp
 #endif
@@ -262,7 +263,7 @@ clock_segments.128x128x2.bmp
 clock_smallsegments.128x128x2.bmp
 clock_logo.128x128x2.bmp
 clock_messages.128x128x2.bmp
-#elif (LCD_WIDTH >= 112) && (LCD_HEIGHT >= 64) && (LCD_DEPTH >= 1)
+#elif (LCD_WIDTH >= 96) && (LCD_HEIGHT >= 64) && (LCD_DEPTH >= 1)
 clock_binary.112x64x1.bmp
 clock_digits.112x64x1.bmp
 clock_smalldigits.112x64x1.bmp
@@ -505,7 +506,7 @@ rockblox_background.128x160x16.bmp
 rockblox_background.128x128x16.bmp
 #elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80)
 rockblox_background.132x80x16.bmp
-#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96)
+#elif ((LCD_WIDTH == 128 && LCD_HEIGHT == 96) || (LCD_WIDTH == 96 && LCD_HEIGHT == 96))
 rockblox_background.128x96x2.bmp
 #endif
 #elif LCD_DEPTH == 2 /* greyscale versions */
@@ -647,7 +648,7 @@ solitaire_suitsi.26x132x16.bmp
 card_back.18x23x16.bmp
 card_deck.234x92x16.bmp
 solitaire_suitsi.18x92x16.bmp
-#elif LCD_WIDTH >= 128
+#elif LCD_WIDTH >= 96
 card_back.15x20x16.bmp
 card_deck.195x80x16.bmp
 solitaire_suitsi.15x80x16.bmp
@@ -729,7 +730,7 @@ sudoku_inverse.128x128x2.bmp
 sudoku_start.138x110x2.bmp
 sudoku_normal.138x110x2.bmp
 sudoku_inverse.138x110x2.bmp
-#elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80) && (LCD_DEPTH >= 16)
+#elif ((LCD_WIDTH == 132 && LCD_HEIGHT == 80) || (LCD_WIDTH == 96 && LCD_HEIGHT == 96)) && (LCD_DEPTH >= 16)
 sudoku_start.132x80x16.bmp
 sudoku_normal.132x80x16.bmp
 sudoku_inverse.132x80x16.bmp
@@ -898,6 +899,8 @@ pitch_notes.128x128x2.bmp
 pitch_notes.128x96x2.bmp
 #elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 64)
 pitch_notes.128x64x1.bmp
+#elif (LCD_WIDTH >= 96) && (LCD_HEIGHT >= 96)
+pitch_notes.132x80x16.bmp
 #else
 #error Pitch Detector: unsupported LCD
 #endif

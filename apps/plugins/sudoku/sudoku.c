@@ -99,7 +99,7 @@ static const char default_game[9][9] =
 
 #if LCD_HEIGHT <= LCD_WIDTH /* Horizontal layout, scratchpad at the left */
 
-#if (LCD_HEIGHT==64) && (LCD_WIDTH==112 || LCD_WIDTH==128)
+#if ((LCD_HEIGHT==64 && (LCD_WIDTH==112 || LCD_WIDTH==128)) || (LCD_HEIGHT == 96 && LCD_WIDTH == 96))
 /* Archos Recorders and Ondios - 112x64, 9 cells @ 8x6 with 10 border lines */
 #define SMALL_BOARD
 #define MARK_OFFS   1   /* Pixels between border and mark */

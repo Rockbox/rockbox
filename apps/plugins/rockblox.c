@@ -630,6 +630,19 @@
 #define LEVEL_X 78
 #define LINES_Y 51
 
+#elif LCD_WIDTH == 96 && LCD_HEIGHT == 96
+
+#define BLOCK_WIDTH 3
+#define BLOCK_HEIGHT 3
+#define BOARD_X 9
+#define BOARD_Y 3
+#define PREVIEW_X 59
+#define PREVIEW_Y 5
+#define LABEL_X 59
+#define SCORE_Y 32
+#define LEVEL_Y 13
+#define LEVEL_X 78
+#define LINES_Y 51
 #endif
 
 #ifndef LEVEL_X
