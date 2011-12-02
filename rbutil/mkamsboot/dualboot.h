@@ -9,4 +9,4 @@ extern unsigned char dualboot_fuze[176];
 extern unsigned char dualboot_clipv2[248];
 extern unsigned char dualboot_clipplus[340];
 extern unsigned char dualboot_fuzev2[332];
-extern unsigned char dualboot_clipzip[168];
+extern unsigned char dualboot_clipzip[232];

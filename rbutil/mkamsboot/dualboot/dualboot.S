@@ -182,6 +182,27 @@ uclcopy:
         cmp     r1, #0              @ test input from pins
         bne     boot_of             @ branch directly to OF if either pin high
 
+        ldr     r0, =GPIOC
+
+        ldr     r1, [r0, #0x400]
+        orr     r1, r1, #((1<<1)|(1<<2))    @ output
+        bic     r1, r1, #(1<<5)             @ input
+        str     r1, [r0, #0x400]
+
+        mov     r1, #0
+        str     r1, [r0, #4*(1<<1)] @ zero C1
+        mov     r1, #(1<<2)
+        str     r1, [r0, #4*(1<<2)] @ set C2
+
+        mov     r1, #50                     /* small delay */
+1:      subs    r1, r1, #1
+        bne     1b
+
+        ldr     r1, [r0, #4*(1<<5)] @ read C5 = left
+
+        cmp     r1, #0
+        bne     boot_of
+
 #elif defined(SANSA_C200V2)
 .set BUTTON_LEFT,      (1<< 2)
 .set BUTTON_DOWN,      (1<< 3)
