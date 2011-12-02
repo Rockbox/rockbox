@@ -760,7 +760,7 @@ static void led_resistance_calc(void)
 
         rb->lcd_update();
         
-        button_press = rb->button_get(true);
+        while ((button_press = rb->button_get(true)) & BUTTON_REL);
         switch(button_press) {
             case PLA_SELECT:
                 break;
