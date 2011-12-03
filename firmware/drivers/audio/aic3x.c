@@ -188,7 +188,7 @@ void audiohw_init(void)
     aic3x_write_reg(AIC3X_DAC_L1_MONO_LOP_M_VOL, 0x92);
     /* DAC_R1 routed to MONO_LOP/M, gain 0x2 (-1.0dB) */
     aic3x_write_reg(AIC3X_DAC_R1_MONO_LOP_M_VOL, 0x92);
-    
+
     /* MONO_LOP output level 6dB, not muted, fully powered up */
     aic3x_write_reg(AIC3X_MONO_LOP_M_LVL, 0x6b);
 

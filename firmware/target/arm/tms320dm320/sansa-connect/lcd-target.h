@@ -22,4 +22,6 @@
 #ifndef _LCD_TARGET_H_
 #define _LCD_TARGET_H_
 
+void lcd_awake(void);
+
 #endif
