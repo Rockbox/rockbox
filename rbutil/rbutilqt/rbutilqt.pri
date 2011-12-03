@@ -30,7 +30,6 @@ SOURCES += \
  base/autodetection.cpp \
  ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
- ../chinachippatcher/chinachip.c \
  themesinstallwindow.cpp \
  base/uninstall.cpp \
  uninstallwindow.cpp \
@@ -94,7 +93,6 @@ HEADERS += \
  ../ipodpatcher/parttypes.h \
  ../sansapatcher/sansapatcher.h \
  ../sansapatcher/sansaio.h \
- ../chinachippatcher/chinachip.h \
  irivertools/h100sums.h \
  irivertools/h120sums.h \
  irivertools/h300sums.h \
