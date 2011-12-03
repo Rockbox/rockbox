@@ -71,7 +71,7 @@ $(DEPFILE): $(SOURCES)
 -include $(DEPFILE)
 
 $(OUT)/librbspeex.a: $(OBJS) $(DEPFILE) $(OUT)/rbspeex.o 
-	@echo AR $(OUT)/librbspeex$(RBARCH).a
+	@echo AR $(notdir $@)
 	$(SILENT)$(AR) rucs $@ $+ > /dev/null 2>&1
 
 librbspeex$(RBARCH).a: $(OUT)/librbspeex.a
