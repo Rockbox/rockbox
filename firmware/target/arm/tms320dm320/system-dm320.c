@@ -344,7 +344,10 @@ void system_init(void)
     IO_TIMER2_TMMD = CONFIG_TIMER2_TMMD_STOP;
     IO_TIMER3_TMMD = CONFIG_TIMER3_TMMD_STOP;
 
+#ifndef SANSA_CONNECT
+    /* UART1 is not used on Sansa Connect - don't power it up */
     uart_init();
+#endif
     spi_init();
 
 #ifdef MROBE_500
@@ -359,9 +362,9 @@ void system_init(void)
 #endif
 
 #ifdef SANSA_CONNECT
-    /* keep WIFI CS low to save power */
-    IO_GIO_DIR0 &= ~(1 << 4);
-    IO_GIO_BITCLR0 = (1 << 4);
+    /* keep WIFI CS and reset high to save power */
+    IO_GIO_DIR0 &= ~((1 << 4) /* CS */ | (1 << 3) /* reset */);
+    IO_GIO_BITSET0 = (1 << 4) | (1 << 3);
 
     i2c_init();
     avr_hid_init();

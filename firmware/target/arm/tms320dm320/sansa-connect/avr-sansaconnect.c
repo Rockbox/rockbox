@@ -214,22 +214,6 @@ static void parse_button_state(unsigned char *buf)
 #endif
 }
 
-/* HID Slave Select - GIO14 */
-#define HID_SS (1<<14)
-
-static inline void select_hid(bool on)
-{
-    if (on == true)
-    {
-        /* SS is active low */
-        IO_GIO_BITCLR0 = HID_SS;
-    }
-    else
-    {
-        IO_GIO_BITSET0 = HID_SS;
-    }
-}
-
 static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
 {
     int i;
@@ -239,7 +223,6 @@ static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
 
     bitset16(&IO_CLK_MOD2, CLK_MOD2_SIF1);
     IO_SERIAL1_TX_ENABLE = 0x0001;
-    select_hid(true);
 
     for (i = 0; i<n; i++)
     {
@@ -254,10 +237,10 @@ static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
         if (buf_rx != NULL)
             buf_rx[i] = rxdata & 0xFF;
 
-        udelay(100);
+        /* seems to be unneccessary */
+        //udelay(100);
     }
 
-    select_hid(false);
     IO_SERIAL1_TX_ENABLE = 0;
     bitclr16(&IO_CLK_MOD2, CLK_MOD2_SIF1);
 
@@ -280,14 +263,16 @@ void avr_hid_init(void)
 {
     /*
        setup alternate GIO functions:
-       GIO29 - SIF1 Enable
+       GIO29 - SIF1 Enable (Directly connected to AVR's SS)
        GIO30 - SIF1 Clock
        GIO31 - SIF1 Data In
        GIO32 - SIF1 Data Out
     */
     IO_GIO_FSEL2 = (IO_GIO_FSEL2 & 0x00FF) | 0xAA00;
-
-    bitclr16(&IO_GIO_DIR0, HID_SS); /* set GIO14 as output */ 
+    /* GIO29, GIO30 - outputs, GIO31 - input */
+    IO_GIO_DIR1 = (IO_GIO_DIR1 & ~((1 << 13) | (1 << 14))) | (1 << 15);
+    /* GIO32 - output */
+    bitclr16(&IO_GIO_DIR2, (1 << 0));
 
     /* RATE = 219 (0xDB) -> 200 kHz */
     IO_SERIAL1_MODE = 0x6DB;

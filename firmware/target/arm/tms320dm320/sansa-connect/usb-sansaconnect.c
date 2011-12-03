@@ -40,6 +40,14 @@ int usb_detect(void)
 
 void usb_init_device(void)
 {
+    /* set TNETV USB nreset high */
+    IO_GIO_DIR0 &= ~(1 << 7);
+    IO_GIO_BITSET0 = (1 << 7);
+
+    /* set VLYNQ port functions */
+    IO_GIO_FSEL1 = 0xAAAA;
+    IO_GIO_FSEL2 = (IO_GIO_FSEL2 & 0xFFF0) | 0xA;
+
     return;
 }
 

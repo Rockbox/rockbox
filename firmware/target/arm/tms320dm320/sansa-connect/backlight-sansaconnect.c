@@ -53,6 +53,13 @@ static void _backlight_write_brightness(int brightness)
 
 void _backlight_on(void)
 {
+#ifdef HAVE_LCD_SLEEP
+    if (!lcd_active())
+    {
+        lcd_awake();
+        lcd_update();
+    }
+#endif
     /* set GIO34 as PWM1 */
     IO_GIO_FSEL3 = (IO_GIO_FSEL3 & 0xFFF3) | (1 << 2);
 
