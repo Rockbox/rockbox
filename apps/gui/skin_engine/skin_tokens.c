@@ -1557,7 +1557,7 @@ const char *get_token_value(struct gui_wps *gwps,
                 }
             }
             /* Special handlng for filenames because we dont want to show the prefix */
-            if ((s->flags&F_T_MASK) == F_T_UCHARPTR ||
+            if ((s->flags&F_T_MASK) == F_T_CHARPTR ||
                 (s->flags&F_T_MASK) == F_T_UCHARPTR)
             {
                 if (s->filename_setting->prefix)
