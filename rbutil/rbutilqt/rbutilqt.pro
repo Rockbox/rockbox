@@ -72,7 +72,7 @@ mac {
 # here. This assumes that QMAKE_CC will always be "gcc", maybe with a postfix.
 MYAR = $$replace(QMAKE_CC,gcc.*,ar)
 
-rbspeex.commands = @$(MAKE) -s \
+librbspeex.commands = @$(MAKE) -s \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/rbspeex \
         librbspeex$$RBLIBPOSTFIX \
         SYS_SPEEX=\"$$LIBSPEEX\" \
@@ -95,8 +95,11 @@ libmkmpioboot.commands = @$(MAKE) -s \
         APPVERSION=\"rbutil\" \
         libmkmpioboot$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
-QMAKE_EXTRA_TARGETS += rbspeex libucl libmkamsboot libmktccboot libmkmpioboot
-PRE_TARGETDEPS += rbspeex libucl libmkamsboot libmktccboot libmkmpioboot
+# Note: order is important for RBLIBS! The libs are appended to the linker
+# flags in this order, put libucl at the end.
+RBLIBS = librbspeex libmkamsboot libmktccboot libmkmpioboot libucl
+QMAKE_EXTRA_TARGETS += $$RBLIBS
+PRE_TARGETDEPS += $$RBLIBS
 
 # rule for creating ctags file
 tags.commands = ctags -R --c++-kinds=+p --fields=+iaS --extra=+q $(SOURCES)
@@ -118,7 +121,13 @@ INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher 
 
 DEPENDPATH = $$INCLUDEPATH
 
-LIBS += -L$$OUT_PWD -L$$MYBUILDDIR -lrbspeex -lmkamsboot -lmktccboot -lmkmpioboot -lucl
+LIBS += -L$$OUT_PWD -L$$MYBUILDDIR
+# append all RBLIBS to LIBS
+for(rblib, RBLIBS) {
+    LIBS += -l$$replace(rblib, lib,)
+}
+
+# on win32 libz is linked implicitly.
 !win32 {
     LIBS += -lz
 }
