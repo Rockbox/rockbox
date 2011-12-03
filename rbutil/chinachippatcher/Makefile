@@ -3,7 +3,7 @@ CC=gcc
 
 all: chinachip
 
-chinachip: chinachip.c
+chinachip: chinachip.c main.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
