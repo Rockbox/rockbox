@@ -382,8 +382,8 @@ static int mem_maxlen;
 
 static int mem_getbyte(int dummy, unsigned char *c)
 {
-    dummy = dummy;
-    
+    (void)dummy;
+
     *c = mem_buf[mem_pos++];
     if(mem_pos >= mem_buflen)
         mem_pos = 0;
