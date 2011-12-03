@@ -369,7 +369,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                                 int stride, int x, int y, int width,
                                 int height)
 {
-    fb_data *dst, *dst_end;
+    fb_data *dst;
 
     /******************** Image in viewport clipping **********************/
     /* nothing to draw? */
@@ -427,7 +427,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 
     src += stride * src_x + src_y; /* move starting point */
     dst = LCDADDR(x, y);
-    dst_end = dst + width * LCD_HEIGHT;
+    fb_data *dst_end = dst + width * LCD_HEIGHT;
 
     do
     {
@@ -436,12 +436,6 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
         dst += LCD_HEIGHT;
     }
     while (dst < dst_end);
-}
-
-/* Draw a full native bitmap */
-void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
-{
-    lcd_bitmap_part(src, 0, 0, STRIDE(SCREEN_MAIN, width, height), x, y, width, height);
 }
 
 /* Draw a partial native bitmap */
@@ -523,12 +517,4 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
         dst += LCD_HEIGHT;
     }
     while (dst < dst_end);
-}
-
-/* Draw a full native bitmap with a transparent color */
-void lcd_bitmap_transparent(const fb_data *src, int x, int y,
-                            int width, int height)
-{
-    lcd_bitmap_transparent_part(src, 0, 0, 
-                                STRIDE(SCREEN_MAIN, width, height), x, y, width, height);
 }

@@ -437,12 +437,6 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     while (--height > 0);
 }
 
-/* Draw a full native bitmap */
-void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
-{
-    lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
-}
-
 /* Draw a partial native bitmap with transparency and foreground colors */
 void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
                                             int src_y, int stride, int x,
@@ -560,11 +554,4 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     }
     while (--height > 0);
 #endif
-}
-
-/* Draw a full native bitmap with transparent and foreground colors */
-void lcd_bitmap_transparent(const fb_data *src, int x, int y,
-                            int width, int height)
-{
-    lcd_bitmap_transparent_part(src, 0, 0, width, x, y, width, height);
 }

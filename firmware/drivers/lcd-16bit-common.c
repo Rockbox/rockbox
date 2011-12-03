@@ -910,6 +910,19 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
     } while (--row);
 }
 
+/* Draw a full native bitmap */
+void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
+{
+    lcd_bitmap_part(src, 0, 0, STRIDE(SCREEN_MAIN, width, height), x, y, width, height);
+}
+
+/* Draw a full native bitmap with a transparent color */
+void lcd_bitmap_transparent(const fb_data *src, int x, int y,
+                            int width, int height)
+{
+    lcd_bitmap_transparent_part(src, 0, 0,
+                                STRIDE(SCREEN_MAIN, width, height), x, y, width, height);
+}
 
 /* draw alpha bitmap for anti-alias font */
 void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
