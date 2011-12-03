@@ -26,7 +26,7 @@
 #include "synaptics-mep.h"
 
 /*#define LOGF_ENABLE*/
-#include "logf.h"
+/*#include "logf.h"*/
 
 static int int_btn = BUTTON_NONE;
 #ifndef BOOTLOADER
@@ -77,6 +77,10 @@ void button_int(void)
             int_btn |= BUTTON_RIGHT;
         if (data[1] & 0x8)
             int_btn |= BUTTON_VIEW;
+    }
+    else if ((data[1] & MEP_GESTURE) && (data[3] >> 6) == 0) /* index = 0 */
+    {
+        int_btn |= BUTTON_TAP;
     }
     else if ((data[0] == MEP_ABSOLUTE_HEADER))
     {
