@@ -8,7 +8,6 @@
  * $Id$
  *
  * Copyright (C) 2005 by Dave Chapman
- * 
  * Copyright (C) 2009 by Karl Kurbjun
  *
  * Rockbox driver for 16-bit colour LCDs
@@ -39,228 +38,14 @@
 #include "bidi.h"
 #include "scroll_engine.h"
 
-enum fill_opt {
-    OPT_NONE = 0,
-    OPT_SET,
-    OPT_COPY
-};
-
-/*** globals ***/
-fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
-    IRAM_LCDFRAMEBUFFER CACHEALIGN_AT_LEAST_ATTR(16);
-
-
-static fb_data* lcd_backdrop = NULL;
-static long lcd_backdrop_offset IDATA_ATTR = 0;
-
-static struct viewport default_vp =
-{
-    .x        = 0,
-    .y        = 0,
-    .width    = LCD_WIDTH,
-    .height   = LCD_HEIGHT,
-    .font     = FONT_SYSFIXED,
-    .drawmode = DRMODE_SOLID,
-    .fg_pattern = LCD_DEFAULT_FG,
-    .bg_pattern = LCD_DEFAULT_BG,
-    .lss_pattern = LCD_DEFAULT_BG,
-    .lse_pattern = LCD_DEFAULT_BG,
-    .lst_pattern = LCD_DEFAULT_BG,
-};
-
-static struct viewport* current_vp IDATA_ATTR = &default_vp;
-
-/* LCD init */
-void lcd_init(void)
-{
-    lcd_clear_display();
-
-    /* Call device specific init */
-    lcd_init_device();
-    scroll_init();
-}
-/*** Viewports ***/
-
-void lcd_set_viewport(struct viewport* vp)
-{
-    if (vp == NULL)
-        current_vp = &default_vp;
-    else
-        current_vp = vp;
-        
-#if defined(SIMULATOR)
-    /* Force the viewport to be within bounds.  If this happens it should
-     *  be considered an error - the viewport will not draw as it might be
-     *  expected.
-     */
-    if((unsigned) current_vp->x > (unsigned) LCD_WIDTH 
-        || (unsigned) current_vp->y > (unsigned) LCD_HEIGHT 
-        || current_vp->x + current_vp->width > LCD_WIDTH
-        || current_vp->y + current_vp->height > LCD_HEIGHT)
-    {
-#if !defined(HAVE_VIEWPORT_CLIP)
-        DEBUGF("ERROR: "
-#else
-        DEBUGF("NOTE: "
-#endif
-            "set_viewport out of bounds: x: %d y: %d width: %d height:%d\n", 
-            current_vp->x, current_vp->y, 
-            current_vp->width, current_vp->height);
-    }
-    
-#endif
-}
-
-void lcd_update_viewport(void)
-{
-    lcd_update_rect(current_vp->x, current_vp->y,
-                    current_vp->width, current_vp->height);
-}
-
-void lcd_update_viewport_rect(int x, int y, int width, int height)
-{
-    lcd_update_rect(current_vp->x + x, current_vp->y + y, width, height);
-}
-
-/*** parameter handling ***/
-
-void lcd_set_drawmode(int mode)
-{
-    current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
-}
-
-int lcd_get_drawmode(void)
-{
-    return current_vp->drawmode;
-}
-
-void lcd_set_foreground(unsigned color)
-{
-    current_vp->fg_pattern = color;
-}
-
-unsigned lcd_get_foreground(void)
-{
-    return current_vp->fg_pattern;
-}
-
-void lcd_set_background(unsigned color)
-{
-    current_vp->bg_pattern = color;
-}
-
-unsigned lcd_get_background(void)
-{
-    return current_vp->bg_pattern;
-}
-
-void lcd_set_selector_start(unsigned color)
-{
-    current_vp->lss_pattern = color;
-}
-
-void lcd_set_selector_end(unsigned color)
-{
-    current_vp->lse_pattern = color;
-}
-
-void lcd_set_selector_text(unsigned color)
-{
-    current_vp->lst_pattern = color;
-}
-
-void lcd_set_drawinfo(int mode, unsigned fg_color, unsigned bg_color)
-{
-    lcd_set_drawmode(mode);
-    current_vp->fg_pattern = fg_color;
-    current_vp->bg_pattern = bg_color;
-}
-
-int lcd_getwidth(void)
-{
-    return current_vp->width;
-}
-
-int lcd_getheight(void)
-{
-    return current_vp->height;
-}
-
-void lcd_setfont(int newfont)
-{
-    current_vp->font = newfont;
-}
-
-int lcd_getfont(void)
-{
-    return current_vp->font;
-}
-
-int lcd_getstringsize(const unsigned char *str, int *w, int *h)
-{
-    return font_getstringsize(str, w, h, current_vp->font);
-}
-
-/*** low-level drawing functions ***/
+#define ROW_INC LCD_WIDTH
+#define COL_INC 1
 
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
-static void ICODE_ATTR setpixel(fb_data *address)
-{
-    *address = current_vp->fg_pattern;
-}
+#include "lcd-16bit-common.c"
 
-static void ICODE_ATTR clearpixel(fb_data *address)
-{
-    *address = current_vp->bg_pattern;
-}
-
-static void ICODE_ATTR clearimgpixel(fb_data *address)
-{
-    *address = *(fb_data *)((long)address + lcd_backdrop_offset);
-}
-
-static void ICODE_ATTR flippixel(fb_data *address)
-{
-    *address = ~(*address);
-}
-
-static void ICODE_ATTR nopixel(fb_data *address)
-{
-    (void)address;
-}
-
-lcd_fastpixelfunc_type* const lcd_fastpixelfuncs_bgcolor[8] = {
-    flippixel, nopixel, setpixel, setpixel,
-    nopixel, clearpixel, nopixel, clearpixel
-};
-
-lcd_fastpixelfunc_type* const lcd_fastpixelfuncs_backdrop[8] = {
-    flippixel, nopixel, setpixel, setpixel,
-    nopixel, clearimgpixel, nopixel, clearimgpixel
-};
-
-lcd_fastpixelfunc_type* const * lcd_fastpixelfuncs = lcd_fastpixelfuncs_bgcolor;
-
-void lcd_set_backdrop(fb_data* backdrop)
-{
-    lcd_backdrop = backdrop;
-    if (backdrop)
-    {
-        lcd_backdrop_offset = (long)backdrop - (long)&lcd_framebuffer[0][0];
-        lcd_fastpixelfuncs = lcd_fastpixelfuncs_backdrop;
-    }
-    else
-    {
-        lcd_backdrop_offset = 0;
-        lcd_fastpixelfuncs = lcd_fastpixelfuncs_bgcolor;
-    }
-}
-
-fb_data* lcd_get_backdrop(void)
-{
-    return lcd_backdrop;
-}
+#include "lcd-bitmap-common.c"
 
 /*** drawing functions ***/
 
@@ -311,120 +96,6 @@ void lcd_clear_viewport(void)
     else
     {
         lcd_scroll_stop(current_vp);
-    }
-}
-
-/* Clear the whole display */
-void lcd_clear_display(void)
-{
-    struct viewport* old_vp = current_vp;
-
-    current_vp = &default_vp;
-
-    lcd_clear_viewport();
-
-    current_vp = old_vp;
-}
-
-/* Set a single pixel */
-void lcd_drawpixel(int x, int y)
-{
-    if (   ((unsigned)x < (unsigned)current_vp->width) 
-        && ((unsigned)y < (unsigned)current_vp->height)
-#if defined(HAVE_VIEWPORT_CLIP)
-        && ((unsigned)x < (unsigned)LCD_WIDTH)
-        && ((unsigned)y < (unsigned)LCD_HEIGHT)
-#endif
-        )
-        lcd_fastpixelfuncs[current_vp->drawmode](LCDADDR(current_vp->x+x, current_vp->y+y));
-}
-
-/* Draw a line */
-void lcd_drawline(int x1, int y1, int x2, int y2)
-{
-    int numpixels;
-    int i;
-    int deltax, deltay;
-    int d, dinc1, dinc2;
-    int x, xinc1, xinc2;
-    int y, yinc1, yinc2;
-    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[current_vp->drawmode];
-
-    deltay = abs(y2 - y1);
-    if (deltay == 0)
-    {
-        /* DEBUGF("lcd_drawline() called for horizontal line - optimisation.\n"); */
-        lcd_hline(x1, x2, y1);
-        return;
-    }
-    deltax = abs(x2 - x1);
-    if (deltax == 0)
-    {
-        /* DEBUGF("lcd_drawline() called for vertical line - optimisation.\n"); */
-        lcd_vline(x1, y1, y2);
-        return;
-    }
-    xinc2 = 1;
-    yinc2 = 1;
-
-    if (deltax >= deltay)
-    {
-        numpixels = deltax;
-        d = 2 * deltay - deltax;
-        dinc1 = deltay * 2;
-        dinc2 = (deltay - deltax) * 2;
-        xinc1 = 1;
-        yinc1 = 0;
-    }
-    else
-    {
-        numpixels = deltay;
-        d = 2 * deltax - deltay;
-        dinc1 = deltax * 2;
-        dinc2 = (deltax - deltay) * 2;
-        xinc1 = 0;
-        yinc1 = 1;
-    }
-    numpixels++; /* include endpoints */
-
-    if (x1 > x2)
-    {
-        xinc1 = -xinc1;
-        xinc2 = -xinc2;
-    }
-
-    if (y1 > y2)
-    {
-        yinc1 = -yinc1;
-        yinc2 = -yinc2;
-    }
-
-    x = x1;
-    y = y1;
-
-    for (i = 0; i < numpixels; i++)
-    {
-        if (   ((unsigned)x < (unsigned)current_vp->width) 
-            && ((unsigned)y < (unsigned)current_vp->height)
-#if defined(HAVE_VIEWPORT_CLIP)
-            && ((unsigned)x < (unsigned)LCD_WIDTH)
-            && ((unsigned)y < (unsigned)LCD_HEIGHT)
-#endif
-            )
-            pfunc(LCDADDR(x + current_vp->x, y + current_vp->y));
-
-        if (d < 0)
-        {
-            d += dinc1;
-            x += xinc1;
-            y += yinc1;
-        }
-        else
-        {
-            d += dinc2;
-            x += xinc2;
-            y += yinc2;
-        }
     }
 }
 
@@ -579,21 +250,6 @@ void lcd_vline(int x, int y1, int y2)
         dst += LCD_WIDTH;
     }
     while (dst <= dst_end);
-}
-
-/* Draw a rectangular box */
-void lcd_drawrect(int x, int y, int width, int height)
-{
-    if ((width <= 0) || (height <= 0))
-        return;
-
-    int x2 = x + width - 1;
-    int y2 = y + height - 1;
-
-    lcd_vline(x, y, y2);
-    lcd_vline(x2, y, y2);
-    lcd_hline(x, x2, y);
-    lcd_hline(x, x2, y2);
 }
 
 /* Fill a rectangular area */
@@ -912,10 +568,3 @@ void lcd_bitmap_transparent(const fb_data *src, int x, int y,
 {
     lcd_bitmap_transparent_part(src, 0, 0, width, x, y, width, height);
 }
-
-#define ROW_INC LCD_WIDTH
-#define COL_INC 1
-
-#include "lcd-16bit-common.c"
-
-#include "lcd-bitmap-common.c"
