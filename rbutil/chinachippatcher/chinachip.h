@@ -26,11 +26,24 @@
 extern "C" {
 #endif
 
-int chinachip_patch(const char* firmware, const char* bootloader,
-                    const char* output, const char* ccpmp_backup,
-                    void (*info)(void*, char*, ...),
-                    void (*err)(void*, char*, ...),
-                    void* userdata);
+enum cc_error {
+    E_OK,
+    E_OPEN_FIRMWARE,
+    E_OPEN_BOOTLOADER,
+    E_MEMALLOC,
+    E_LOAD_FIRMWARE,
+    E_INVALID_FILE,
+    E_NO_CCPMP,
+    E_OPEN_BACKUP,
+    E_WRITE_BACKUP,
+    E_LOAD_BOOTLOADER,
+    E_GET_TIME,
+    E_OPEN_OUTFILE,
+    E_WRITE_OUTFILE,
+};
+
+enum cc_error chinachip_patch(const char* firmware, const char* bootloader,
+                    const char* output, const char* ccpmp_backup);
 
 #ifdef __cplusplus
 }

@@ -42,34 +42,6 @@ QString BootloaderInstallChinaChip::ofHint()
                "file.");
 }
 
-void BootloaderInstallChinaChip::logString(char* format, va_list args, int type)
-{
-    QString translation = QCoreApplication::translate("", format, NULL, QCoreApplication::UnicodeUTF8);
-
-    emit logItem(QString().vsprintf(translation.toLocal8Bit(), args), type);
-    QCoreApplication::processEvents();
-}
-
-static void info(void* userdata, char* format, ...)
-{
-    BootloaderInstallChinaChip* pThis = (BootloaderInstallChinaChip*) userdata;
-    va_list args;
-
-    va_start(args, format);
-    pThis->logString(format, args, LOGINFO);
-    va_end(args);
-}
-
-static void err(void* userdata, char* format, ...)
-{
-    BootloaderInstallChinaChip* pThis = (BootloaderInstallChinaChip*) userdata;
-    va_list args;
-
-    va_start(args, format);
-    pThis->logString(format, args, LOGERROR);
-    va_end(args);
-}
-
 bool BootloaderInstallChinaChip::install()
 {
     if(m_offile.isEmpty())
@@ -85,17 +57,62 @@ bool BootloaderInstallChinaChip::install()
 
 void BootloaderInstallChinaChip::installStage2()
 {
+    enum cc_error result;
+    bool error = true;
     m_tempfile.open();
     QString blfile = m_tempfile.fileName();
     m_tempfile.close();
 
     QString backupfile = QFileInfo(m_blfile).absoluteDir().absoluteFilePath("ccpmp.bin");
 
-    int ret = chinachip_patch(m_offile.toLocal8Bit(), blfile.toLocal8Bit(), m_blfile.toLocal8Bit(),
-                              backupfile.toLocal8Bit(), &info, &err, (void*)this);
-    qDebug() << "chinachip_patch" << ret;
+    result = chinachip_patch(m_offile.toLocal8Bit(), blfile.toLocal8Bit(),
+            m_blfile.toLocal8Bit(), backupfile.toLocal8Bit());
+    switch(result) {
+        case E_OK:
+            error = false;
+            break;
+        case E_OPEN_FIRMWARE:
+            emit logItem(tr("Could not open firmware file"), LOGERROR);
+            break;
+        case E_OPEN_BOOTLOADER:
+            emit logItem(tr("Could not open bootloader file"), LOGERROR);
+            break;
+        case E_MEMALLOC:
+            emit logItem(tr("Could not allocate memory"), LOGERROR);
+            break;
+        case E_LOAD_FIRMWARE:
+            emit logItem(tr("Could not load firmware file"), LOGERROR);
+            break;
+        case E_INVALID_FILE:
+            emit logItem(tr("File is not a valid ChinaChip firmware"), LOGERROR);
+            break;
+        case E_NO_CCPMP:
+            emit logItem(tr("Could not find ccpmp.bin in input file"), LOGERROR);
+            break;
+        case E_OPEN_BACKUP:
+            emit logItem(tr("Could not open backup file for ccpmp.bin"), LOGERROR);
+            break;
+        case E_WRITE_BACKUP:
+            emit logItem(tr("Could not write backup file for ccpmp.bin"), LOGERROR);
+            break;
+        case E_LOAD_BOOTLOADER:
+            emit logItem(tr("Could not load bootloader file"), LOGERROR);
+            break;
+        case E_GET_TIME:
+            emit logItem(tr("Could not get current time"), LOGERROR);
+            break;
+        case E_OPEN_OUTFILE:
+            emit logItem(tr("Could not open output file"), LOGERROR);
+            break;
+        case E_WRITE_OUTFILE:
+            emit logItem(tr("Could not write output file"), LOGERROR);
+            break;
+        default:
+            emit logItem(tr("Unexpected error from chinachippatcher"), LOGERROR);
+            break;
+    }
 
-    emit done(ret);
+    emit done(error);
 }
 
 bool BootloaderInstallChinaChip::uninstall()

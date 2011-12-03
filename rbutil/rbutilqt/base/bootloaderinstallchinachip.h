@@ -33,7 +33,6 @@ class BootloaderInstallChinaChip : public BootloaderInstallBase
         BootloaderInstallBase::BootloaderType installed(void);
         Capabilities capabilities(void);
         QString ofHint();
-        void logString(char* buffer, va_list args, int type);
 
     private slots:
         void installStage2(void);

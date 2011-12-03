@@ -25,24 +25,6 @@
 #define VERSION         "0.1"
 #define PRINT(fmt, ...) fprintf(stderr, fmt"\n", ##__VA_ARGS__)
 
-static void info(void* userdata, char* fmt, ...)
-{
-    (void)userdata;
-    va_list args;
-    va_start(args, fmt);
-    vfprintf(stderr, fmt, args);
-    va_end(args);
-}
-
-static void err(void* userdata, char* fmt, ...)
-{
-    (void)userdata;
-    va_list args;
-    va_start(args, fmt);
-    vfprintf(stderr, fmt, args);
-    va_end(args);
-}
-
 void usage(char* name)
 {
     PRINT("Usage:");
@@ -66,7 +48,6 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    return chinachip_patch(argv[1], argv[2], argv[3], argc > 4 ? argv[4] : NULL,
-                           &info, &err, NULL);
+    return chinachip_patch(argv[1], argv[2], argv[3], argc > 4 ? argv[4] : NULL);
 }
 
