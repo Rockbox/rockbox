@@ -28,6 +28,7 @@
 #define HW_CLKCTRL_BASE     0x80040000
 
 #define HW_CLKCTRL_PLLCTRL0 (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x0))
+#define HW_CLKCTRL_PLLCTRL0__POWER          (1 << 16)
 #define HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS    (1 << 18)
 #define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BP     20
 #define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BM     (3 << 20)
@@ -37,11 +38,19 @@
 #define HW_CLKCTRL_CPU      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x20))
 #define HW_CLKCTRL_CPU__DIV_CPU_BP  0
 #define HW_CLKCTRL_CPU__DIV_CPU_BM  0x3f
+#define HW_CLKCTRL_CPU__INTERRUPT_WAIT  (1 << 12)
+#define HW_CLKCTRL_CPU__DIV_XTAL_BP 16
+#define HW_CLKCTRL_CPU__DIV_XTAL_BM (0x3ff << 16)
+#define HW_CLKCTRL_CPU__DIV_XTAL_FRAC_EN    (1 << 26)
 #define HW_CLKCTRL_CPU__BUSY_REF_CPU    (1 << 28)
 
 #define HW_CLKCTRL_HBUS     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x30))
-#define HW_CLKCTRL_HBUS__DIV_BP     0
-#define HW_CLKCTRL_HBUS__DIV_BM     0x1f
+#define HW_CLKCTRL_HBUS__DIV_BP         0
+#define HW_CLKCTRL_HBUS__DIV_BM         0x1f
+#define HW_CLKCTRL_HBUS__DIV_FRAC_EN    (1 << 5)
+#define HW_CLKCTRL_HBUS__SLOW_DIV_BP    16
+#define HW_CLKCTRL_HBUS__SLOW_DIV_BM    (0x7 << 16)
+#define HW_CLKCTRL_HBUS__AUTO_SLOW_MODE (1 << 20)
 
 #define HW_CLKCTRL_XBUS     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x40))
 #define HW_CLKCTRL_XBUS__DIV_BP     0
@@ -54,14 +63,26 @@
 #define HW_CLKCTRL_XTAL__FILT_CLK24M_GATE   (1 << 30)
 
 #define HW_CLKCTRL_PIX      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x60))
+#define HW_CLKCTRL_PIX__DIV_BP  0
 #define HW_CLKCTRL_PIX__DIV_BM  0xfff
 
 #define HW_CLKCTRL_SSP      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x70))
+#define HW_CLKCTRL_SSP__DIV_BP  0
 #define HW_CLKCTRL_SSP__DIV_BM  0x1ff
+
+#define HW_CLKCTRL_EMI      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xa0))
+#define HW_CLKCTRL_EMI__DIV_EMI_BP  0
+#define HW_CLKCTRL_EMI__DIV_EMI_BM  0x3f
+#define HW_CLKCTRL_EMI__DIV_XTAL_BP 8
+#define HW_CLKCTRL_EMI__DIV_XTAL_BM (0xf << 8)
+#define HW_CLKCTRL_EMI__BUSY_REF_EMI    (1 << 28)
+#define HW_CLKCTRL_EMI__SYNC_MODE_EN    (1 << 30)
+#define HW_CLKCTRL_EMI__CLKGATE     (1 << 31)
 
 #define HW_CLKCTRL_CLKSEQ   (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x110))
 #define HW_CLKCTRL_CLKSEQ__BYPASS_PIX   (1 << 1)
 #define HW_CLKCTRL_CLKSEQ__BYPASS_SSP   (1 << 5)
+#define HW_CLKCTRL_CLKSEQ__BYPASS_EMI   (1 << 6)
 #define HW_CLKCTRL_CLKSEQ__BYPASS_CPU   (1 << 7)
 
 #define HW_CLKCTRL_FRAC     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xf0))
@@ -79,28 +100,70 @@
 
 enum imx233_clock_t
 {
-    CLK_PIX, /* div, frac */
-    CLK_SSP, /* div, frac */
-    CLK_IO, /* div */
-    CLK_CPU, /* div, frac */
-    CLK_AHB /* div */
+    CLK_PIX, /* freq, div, frac, bypass, enable */
+    CLK_SSP, /* freq, div, bypass, enable */
+    CLK_IO, /* freq, frac */
+    CLK_CPU, /* freq, div, frac, bypass */
+    CLK_HBUS, /* freq, div, frac */
+    CLK_PLL, /* freq */
+    CLK_XTAL, /* freq */
+    CLK_EMI, /* freq */
+    CLK_XBUS, /* freq, div */
 };
 
-enum imx233_xtal_clkt_t
+enum imx233_xtal_clk_t
 {
     XTAL_FILT = 1 << 30,
     XTAL_DRI = 1 << 28,
     XTAL_TIMROT = 1 << 26,
 };
 
+/* Auto-Slow monitoring */
+enum imx233_as_monitor_t
+{
+    AS_CPU_INSTR = 1 << 21, /* Monitor CPU instruction access to AHB */
+    AS_CPU_DATA = 1 << 22, /* Monitor CPU data access to AHB */
+    AS_TRAFFIC = 1 << 23, /* Monitor AHB master activity */
+    AS_TRAFFIC_JAM = 1 << 24, /* Monitor AHB masters (>=3) activity */
+    AS_APBXDMA = 1 << 25, /* Monitor APBX DMA activity */
+    AS_APBHDMA = 1 << 26, /* Monitor APBH DMA activity */
+    AS_PXP = 1 << 27, /* Monitor PXP activity */
+    AS_DCP = 1 << 28, /* Monitor DCP activity */
+};
+
+enum imx233_as_div_t
+{
+    AS_DIV_1 = 0,
+    AS_DIV_2 = 1,
+    AS_DIV_4 = 2,
+    AS_DIV_8 = 3,
+    AS_DIV_16 = 4,
+    AS_DIV_32 = 5
+};
+
 /* can use a mask of clocks */
-void imx233_enable_xtal_clock(enum imx233_xtal_clkt_t xtal_clk, bool enable);
+void imx233_enable_xtal_clock(enum imx233_xtal_clk_t xtal_clk, bool enable);
+bool imx233_is_xtal_clock_enable(enum imx233_xtal_clk_t clk);
 /* only use it for non-fractional clocks (ie not for IO) */
 void imx233_enable_clock(enum imx233_clock_t clk, bool enable);
+bool imx233_is_clock_enable(enum imx233_clock_t cl);
 void imx233_set_clock_divisor(enum imx233_clock_t clk, int div);
+int imx233_get_clock_divisor(enum imx233_clock_t clk);
 /* call with fracdiv=0 to disable it */
 void imx233_set_fractional_divisor(enum imx233_clock_t clk, int fracdiv);
+/* 0 means fractional dividor disable */
+int imx233_get_fractional_divisor(enum imx233_clock_t clk);
 void imx233_set_bypass_pll(enum imx233_clock_t clk, bool bypass);
+bool imx233_get_bypass_pll(enum imx233_clock_t clk);
 void imx233_enable_usb_pll(bool enable);
+bool imx233_is_usb_pll_enable(void);
+unsigned imx233_get_clock_freq(enum imx233_clock_t clk);
+
+void imx233_set_auto_slow_divisor(enum imx233_as_div_t div);
+enum imx233_as_div_t imx233_get_auto_slow_divisor(void);
+void imx233_enable_auto_slow(bool enable);
+bool imx233_is_auto_slow_enable(void);
+void imx233_enable_auto_slow_monitor(enum imx233_as_monitor_t monitor, bool enable);
+bool imx233_is_auto_slow_monitor_enable(enum imx233_as_monitor_t monitor);
 
 #endif /* CLKCTRL_IMX233_H */

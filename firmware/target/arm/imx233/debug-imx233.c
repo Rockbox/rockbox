@@ -28,7 +28,9 @@
 #include "adc.h"
 #include "adc-imx233.h"
 #include "power-imx233.h"
+#include "clkctrl-imx233.h"
 #include "powermgmt.h"
+#include "string.h"
 
 static struct
 {
@@ -88,7 +90,7 @@ bool dbg_hw_info_power(void)
     
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 25);
+        int button = get_action(CONTEXT_STD, HZ / 10);
         switch(button)
         {
             case ACTION_STD_NEXT:
@@ -151,9 +153,125 @@ bool dbg_hw_info_adc(void)
     }
 }
 
+static struct
+{
+    enum imx233_clock_t clk;
+    const char *name;
+    bool has_enable;
+    bool has_bypass;
+    bool has_idiv;
+    bool has_fdiv;
+    bool has_freq;
+} dbg_clk[] =
+{
+    { CLK_PLL, "pll", true, false, false, false, true},
+    { CLK_XTAL, "xtal", false, false, false, false, true},
+    { CLK_PIX, "pix", true, true, true, true, true },
+    { CLK_SSP, "ssp", true, true, true, false, true },
+    { CLK_IO,  "io",  false, false, false, true, true },
+    { CLK_CPU, "cpu", false, true, true, true, true },
+    { CLK_HBUS, "hbus", false, false, true, true, true },
+    { CLK_EMI, "emi", false, true, true, true, true },
+    { CLK_XBUS, "xbus", false, false, true, false, true }
+};
+
+static struct
+{
+    enum imx233_as_monitor_t monitor;
+    const char *name;
+} dbg_as_monitor[] =
+{
+    { AS_CPU_INSTR, "cpu inst" },
+    { AS_CPU_DATA, "cpu data" },
+    { AS_TRAFFIC, "traffic" },
+    { AS_TRAFFIC_JAM, "traffic jam" },
+    { AS_APBXDMA, "apbx" },
+    { AS_APBHDMA, "apbh" },
+    { AS_PXP, "pxp" },
+    { AS_DCP, "dcp" }
+};
+
+bool dbg_hw_info_clkctrl(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+    imx233_enable_auto_slow_monitor(AS_CPU_INSTR, true);
+    imx233_enable_auto_slow_monitor(AS_CPU_DATA, true);
+    imx233_enable_auto_slow_monitor(AS_TRAFFIC, true);
+    imx233_enable_auto_slow_monitor(AS_TRAFFIC_JAM, true);
+    imx233_enable_auto_slow_monitor(AS_APBXDMA, true);
+    imx233_enable_auto_slow_monitor(AS_APBHDMA, true);
+    
+    while(1)
+    {
+        int button = get_action(CONTEXT_STD, HZ / 10);
+        switch(button)
+        {
+            case ACTION_STD_NEXT:
+            case ACTION_STD_PREV:
+            case ACTION_STD_OK:
+            case ACTION_STD_MENU:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACTION_STD_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+        
+        lcd_clear_display();
+
+        /*               012345678901234567890123456789 */
+        lcd_putsf(0, 0, "name en by idiv fdiv frequency");
+        for(unsigned i = 0; i < ARRAYLEN(dbg_clk); i++)
+        {
+            #define c dbg_clk[i]
+            lcd_putsf(0, i + 1, "%4s", c.name);
+            if(c.has_enable)
+                lcd_putsf(5, i + 1, "%2d", imx233_is_clock_enable(c.clk));
+            if(c.has_bypass)
+                lcd_putsf(8, i + 1, "%2d", imx233_get_bypass_pll(c.clk));
+            if(c.has_idiv && imx233_get_clock_divisor(c.clk) != 0)
+                lcd_putsf(10, i + 1, "%4d", imx233_get_clock_divisor(c.clk));
+            if(c.has_fdiv && imx233_get_fractional_divisor(c.clk) != 0)
+                lcd_putsf(16, i + 1, "%4d", imx233_get_fractional_divisor(c.clk));
+            if(c.has_freq)
+                lcd_putsf(21, i + 1, "%9d", imx233_get_clock_freq(c.clk));
+            #undef c
+        }
+        int line = ARRAYLEN(dbg_clk) + 1;
+        lcd_putsf(0, line, "auto slow: %d", imx233_is_auto_slow_enable());
+        line++;
+        lcd_putsf(0, line, "as monitor: ");
+        int x_off = 12;
+        bool first = true;
+        unsigned line_w = lcd_getwidth() / font_get_width(font_get(lcd_getfont()), ' ');
+        for(unsigned i = 0; i < ARRAYLEN(dbg_as_monitor); i++)
+        {
+            if(!imx233_is_auto_slow_monitor_enable(dbg_as_monitor[i].monitor))
+                continue;
+            if(!first)
+            {
+                lcd_putsf(x_off, line, ", ");
+                x_off += 2;
+            }
+            first = false;
+            if((x_off + strlen(dbg_as_monitor[i].name)) > line_w)
+            {
+                x_off = 1;
+                line++;
+            }
+            lcd_putsf(x_off, line, "%s", dbg_as_monitor[i].name);
+            x_off += strlen(dbg_as_monitor[i].name);
+        }
+        line++;
+        
+        lcd_update();
+        yield();
+    }
+}
+
 bool dbg_hw_info(void)
 {
-    return dbg_hw_info_dma() && dbg_hw_info_adc() && dbg_hw_info_power() &&
+    return dbg_hw_info_clkctrl() && dbg_hw_info_dma() && dbg_hw_info_adc() && dbg_hw_info_power() &&
             dbg_hw_target_info();
 }
 
