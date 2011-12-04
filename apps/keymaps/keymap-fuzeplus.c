@@ -86,9 +86,9 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_CONTEXT,               BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_NONE },
 
     { ACTION_WPS_SKIPNEXT,              BUTTON_RIGHT|BUTTON_REL,           BUTTON_RIGHT },
-    { ACTION_WPS_SEEKFWD,               BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_RIGHT },
+    { ACTION_WPS_SEEKFWD,               BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_WPS_SKIPPREV,              BUTTON_LEFT|BUTTON_REL,            BUTTON_LEFT },
-    { ACTION_WPS_SEEKBACK,              BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_LEFT },
+    { ACTION_WPS_SEEKBACK,              BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_WPS_STOPSEEK,              BUTTON_LEFT|BUTTON_REL,            BUTTON_LEFT|BUTTON_REPEAT },
     { ACTION_WPS_STOPSEEK,              BUTTON_RIGHT|BUTTON_REL,           BUTTON_RIGHT|BUTTON_REPEAT },
 
