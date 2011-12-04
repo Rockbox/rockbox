@@ -1,0 +1,28 @@
+% Id: %
+\def\UseOption{clipzip}
+\edef\UseOption{\UseOption,SANSA_CLIP_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_CAR_ADAPTER_MODE}
+\edef\UseOption{\UseOption,sansaAMS}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+
+\newcommand{\playerman}{Sansa}
+\newcommand{\playertype}{Clip Zip}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\dapdisplaywidth}{96}
+\newcommand{\dapdisplayheight}{96}
+\newcommand{\dapdisplaydepth}{16}
+\newcommand{\specimg}{sansaclipzip}
+%used for specifying screenshot names common to a target "family"
+\newcommand{\seriesimg}{clip}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.sansa}}
+\newcommand{\firmwareextension}{\fname{sansa}}
+\newcommand{\screenshotsize}{3cm}
+\newcommand{\disk}{flash storage}
+
+% link external keymap file
+\input{platform/keymap-sansaclip.tex}
