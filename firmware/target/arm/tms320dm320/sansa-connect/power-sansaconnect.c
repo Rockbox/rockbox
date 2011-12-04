@@ -28,11 +28,35 @@
 #include "backlight.h"
 #include "backlight-target.h"
 #include "avr-sansaconnect.h"
-#include "tps65021.h"
+#include "i2c-dm320.h"
+#include "logf.h"
+
+/* (7-bit) address is 0x48, the LSB is read/write flag */
+#define TPS65021_ADDR (0x48 << 1)
+
+static void tps65021_write_reg(unsigned reg, unsigned value)
+{
+    unsigned char data[2];
+
+    data[0] = reg;
+    data[1] = value;
+
+    if (i2c_write(TPS65021_ADDR, data, 2) != 0)
+    {
+        logf("TPS65021 error reg=0x%x", reg);
+    }
+}
 
 void power_init(void)
 {
-    tps65021_init();
+    /* PWM mode */
+    tps65021_write_reg(0x04, 0xB2);
+ 
+    /* Set core voltage to 1.5V */
+    tps65021_write_reg(0x06, 0x1C);
+
+    /* Set LCM (LDO1) to 2.85V, Set CODEC and USB (LDO2) to 1.8V */
+    tps65021_write_reg(0x08, 0x36);
 }
 
 void power_off(void)

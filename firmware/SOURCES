@@ -1118,7 +1118,6 @@ target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 
 #ifdef SANSA_CONNECT
 #ifndef SIMULATOR
-drivers/tps65021.c
 target/arm/mmu-arm.S
 target/arm/lcd-as-memframe.S
 target/arm/tms320dm320/sdmmc-dm320.c
