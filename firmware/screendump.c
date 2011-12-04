@@ -283,7 +283,7 @@ static const unsigned char rbmpheader[] =
 void remote_screen_dump(void)
 {
     int fd, y;
-    char filename[MAX_PATH];
+    char filename[32];
 
     fb_remote_data *src;
 #if LCD_REMOTE_DEPTH == 1
