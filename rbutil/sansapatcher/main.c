@@ -31,6 +31,8 @@
 #include "sansapatcher.h"
 #include "sansaio.h"
 #include "parttypes.h"
+#include "bootimg_c200.h"
+#include "bootimg_e200.h"
 
 #define VERSION "0.8 with v6.0 bootloaders"
 
@@ -135,9 +137,10 @@ int main(int argc, char* argv[])
     int n;
     char* filename;
     int action = SHOW_INFO;
-    int type;
     struct sansa_t sansa;
     int res = 0;
+    unsigned char* buf = NULL;
+    unsigned int len;
 
     fprintf(stderr,"sansapatcher v" VERSION " - (C) Dave Chapman 2006-2007\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
@@ -213,7 +216,6 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i],"-a")==0) || 
                    (strcmp(argv[i],"--add-bootloader")==0)) {
             action = ADD_BOOTLOADER;
-            type = FILETYPE_MI4;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
@@ -286,8 +288,14 @@ int main(int argc, char* argv[])
                     if (sansa_reopen_rw(&sansa) < 0) {
                         res = 5;
                     }
-
-                    if (sansa_add_bootloader(&sansa, NULL, FILETYPE_INTERNAL)==0) {
+                    if (strcmp(sansa.targetname,"c200") == 0) {
+                        len = LEN_bootimg_c200;
+                        buf = bootimg_c200;
+                    } else {
+                        len = LEN_bootimg_e200;
+                        buf = bootimg_e200;
+                    }
+                    if (sansa_add_bootloader(&sansa, buf, len)==0) {
                         fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
                     } else {
                         fprintf(stderr,"[ERR]  --install failed.\n");
@@ -317,7 +325,15 @@ int main(int argc, char* argv[])
                 return 5;
             }
 
-            if (sansa_add_bootloader(&sansa, NULL, FILETYPE_INTERNAL)==0) {
+            if (strcmp(sansa.targetname,"c200") == 0) {
+                len = LEN_bootimg_c200;
+                buf = bootimg_c200;
+            } else {
+                len = LEN_bootimg_e200;
+                buf = bootimg_e200;
+            }
+
+            if (sansa_add_bootloader(&sansa, buf, len)==0) {
                 fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
             } else {
                 fprintf(stderr,"[ERR]  --install failed.\n");
@@ -327,10 +343,13 @@ int main(int argc, char* argv[])
                 return 5;
             }
 
-            if (sansa_add_bootloader(&sansa, filename, type)==0) {
-                fprintf(stderr,"[INFO] Bootloader %s written to device.\n",filename);
-            } else {
-                fprintf(stderr,"[ERR]  --add-bootloader failed.\n");
+            len = sansa_read_bootloader(&sansa, filename, &buf);
+            if (len > 0) {
+                if (sansa_add_bootloader(&sansa, buf, len)==0) {
+                    fprintf(stderr,"[INFO] Bootloader %s written to device.\n",filename);
+                } else {
+                    fprintf(stderr,"[ERR]  --add-bootloader failed.\n");
+                }
             }
         } else if (action==DELETE_BOOTLOADER) {
             if (sansa_reopen_rw(&sansa) < 0) {

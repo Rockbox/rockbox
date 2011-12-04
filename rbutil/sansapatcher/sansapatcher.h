@@ -34,14 +34,12 @@ extern int sansa_verbose;
 #define BUFFER_SIZE 8*1024*1024
 extern unsigned char* sansa_sectorbuf;
 
-#define FILETYPE_MI4 0
-#define FILETYPE_INTERNAL 1
-
 int sansa_read_partinfo(struct sansa_t* sansa, int silent);
 int is_sansa(struct sansa_t* sansa);
 int sansa_scan(struct sansa_t* sansa);
 int sansa_read_firmware(struct sansa_t* sansa, const char* filename);
-int sansa_add_bootloader(struct sansa_t* sansa, const char* filename, int type);
+unsigned int sansa_read_bootloader(struct sansa_t* sansa, const char* filename, unsigned char** bl_buffer);
+int sansa_add_bootloader(struct sansa_t* sansa, const unsigned char* buf, unsigned int len);
 int sansa_delete_bootloader(struct sansa_t* sansa);
 int sansa_update_of(struct sansa_t* sansa,const char* filename);
 int sansa_update_ppbl(struct sansa_t* sansa,const char* filename);

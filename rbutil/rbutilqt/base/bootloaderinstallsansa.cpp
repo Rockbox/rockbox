@@ -96,6 +96,8 @@ bool BootloaderInstallSansa::install(void)
 void BootloaderInstallSansa::installStage2(void)
 {
     struct sansa_t sansa;
+    unsigned char* buf = NULL;
+    unsigned int len;
 
     emit logItem(tr("Installing Rockbox bootloader"), LOGINFO);
     QCoreApplication::processEvents();
@@ -130,8 +132,8 @@ void BootloaderInstallSansa::installStage2(void)
         return;
     }
 
-    if(sansa_add_bootloader(&sansa, blfile.toLatin1().data(),
-            FILETYPE_MI4) == 0) {
+    len = sansa_read_bootloader(&sansa, blfile.toLatin1().data(), &buf);
+    if(sansa_add_bootloader(&sansa, buf, len) == 0) {
         emit logItem(tr("Successfully installed bootloader"), LOGOK);
         sansa_close(&sansa);
 #if defined(Q_OS_MACX)

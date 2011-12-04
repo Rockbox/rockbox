@@ -31,10 +31,6 @@
 #include "sansaio.h"
 #include "sansapatcher.h"
 
-#ifndef RBUTIL
-    #include "bootimg_c200.h"
-    #include "bootimg_e200.h"
-#endif
 /* The offset of the MI4 image header in the firmware partition */
 #define PPMI_OFFSET     0x80000
 #define NVPARAMS_OFFSET 0x780000
@@ -683,34 +679,55 @@ int sansa_read_firmware(struct sansa_t* sansa, const char* filename)
     return 0;
 }
 
+unsigned int sansa_read_bootloader(struct sansa_t* sansa, const char* filename, unsigned char** bl_buffer)
+{
+    /* Step 1 - read bootloader into RAM. */
+    int infile;
+    unsigned int n;
+    unsigned int len;
+    infile=open(filename,O_RDONLY|O_BINARY);
+    if (infile < 0) {
+        fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
+        return 0;
+    }
 
-int sansa_add_bootloader(struct sansa_t* sansa, const char* filename, int type)
+    len = filesize(infile);
+
+    unsigned char* b = malloc(len);
+    if (b == NULL) {
+        fprintf(stderr,"[ERR]  Could not allocate memory for bootloader\n");
+        close(infile);
+        return 0;
+    }
+
+    n = read(infile,b,len);
+    close(infile);
+    if (n < len) {
+        fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
+                ,len,n);
+        return 0;
+    }
+
+    if (memcmp(b+0x1f8,"RBBL",4)!=0) {
+        fprintf(stderr,"[ERR]  %s is not a Rockbox bootloader, aborting.\n",
+                filename);
+        return 0;
+    }
+    if (memcmp(b+0x1fc,sansa->targetname,4)!=0) {
+        fprintf(stderr,"[ERR]  %s is not a Rockbox bootloader for %s, aborting.\n",
+                filename, sansa->targetname);
+        return 0;
+    }
+    *bl_buffer = b;
+    return len;
+}
+
+int sansa_add_bootloader(struct sansa_t* sansa, const unsigned char* bootloader, const unsigned int bl_length)
 {
     int res;
-    int infile = -1;   /* Prevent an erroneous "may be used uninitialised" gcc warning */
-    int bl_length = 0; /* Keep gcc happy when building for rbutil */
     struct mi4header_t mi4header;
-    int n;
     int length;
-
-    if (type==FILETYPE_MI4) {
-        /* Step 1 - read bootloader into RAM. */
-        infile=open(filename,O_RDONLY|O_BINARY);
-        if (infile < 0) {
-            fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
-            return -1;
-        }
-
-        bl_length = filesize(infile);
-    } else {
-        #ifndef RBUTIL
-        if (strcmp(sansa->targetname,"c200") == 0) {
-            bl_length = LEN_bootimg_c200;
-        } else {
-            bl_length = LEN_bootimg_e200;
-        }
-        #endif
-    }
+    int n;
 
     /* Create PPMI header */
     memset(sansa_sectorbuf,0,0x200);
@@ -718,30 +735,8 @@ int sansa_add_bootloader(struct sansa_t* sansa, const char* filename, int type)
     int2le(bl_length,   sansa_sectorbuf+4);
     int2le(0x00020000,  sansa_sectorbuf+8);
 
-    if (type==FILETYPE_MI4) {
-        /* Read bootloader into sansa_sectorbuf+0x200 */
-        n = read(infile,sansa_sectorbuf+0x200,bl_length);
-        close(infile);
-        if (n < bl_length) {
-            fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
-                          ,bl_length,n);
-            return -1;
-        }
-
-        if (memcmp(sansa_sectorbuf+0x200+0x1f8,"RBBL",4)!=0) {
-            fprintf(stderr,"[ERR]  %s is not a Rockbox bootloader, aborting.\n",
-                           filename);
-            return -1;
-        }
-    } else {
-        #ifndef RBUTIL
-        if (strcmp(sansa->targetname,"c200") == 0) {
-            memcpy(sansa_sectorbuf+0x200,bootimg_c200,LEN_bootimg_c200);
-        } else {
-            memcpy(sansa_sectorbuf+0x200,bootimg_e200,LEN_bootimg_e200);
-        }
-        #endif
-    }
+    /* copy bootloader to sansa_sectorbuf+0x200 */
+    memcpy(sansa_sectorbuf+0x200,bootloader,bl_length);
 
     /* Load original firmware from Sansa to the space after the bootloader */
     res = load_original_firmware(sansa,sansa_sectorbuf+0x200+bl_length,&mi4header);
