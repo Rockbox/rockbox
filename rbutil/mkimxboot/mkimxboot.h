@@ -19,10 +19,16 @@
  *
  ****************************************************************************/
 
+#ifndef MKIMXBOOT_H
+#define MKIMXBOOT_H
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 enum imx_error_t
 {
     IMX_SUCCESS = 0,
@@ -52,3 +58,9 @@ struct imx_option_t
 
 enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     const char *outfile, struct imx_option_t opt);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
