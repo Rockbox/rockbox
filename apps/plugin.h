@@ -66,6 +66,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "filefuncs.h"
 #if (CONFIG_CODEC == SWCODEC)
 #include "pcm_mixer.h"
+#include "dsp-util.h"
 #include "dsp.h"
 #include "codecs.h"
 #include "playback.h"

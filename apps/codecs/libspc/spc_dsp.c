@@ -57,25 +57,7 @@ void DSP_write( struct Spc_Dsp* this, int i, int data )
     }
 }
 
-#if ARM_ARCH >= 6
-/* if ( n < -32768 ) out = -32768; */
-/* if ( n >  32767 ) out =  32767; */
-#define CLAMP16( n ) \
-    ({ \
-       asm ("ssat %0, #16, %1" \
-            : "=r" ( n ) : "r"( n ) ); \
-       n; \
-    })
-#else
-/* if ( n < -32768 ) out = -32768; */
-/* if ( n >  32767 ) out =  32767; */
-#define CLAMP16( n ) \
-({                              \
-    if ( (int16_t) n != n )     \
-        n = 0x7FFF ^ (n >> 31); \
-    n;                          \
-})
-#endif
+#define CLAMP16( n ) clip_sample_16( n )
 
 #if SPC_BRRCACHE
 static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,

@@ -95,13 +95,7 @@ static unsigned int idle_counter = 0;
 /** Generic mixing routines **/
 
 #ifndef MIXER_OPTIMIZED_MIX_SAMPLES
-/* Clip sample to signed 16 bit range */
-static FORCE_INLINE int32_t clip_sample_16(int32_t sample)
-{
-    if ((int16_t)sample != sample)
-        sample = 0x7fff ^ (sample >> 31);
-    return sample;
-}
+#include "dsp-util.h" /* for clip_sample_16 */
 
 /* Mix channels' samples and apply gain factors */
 static FORCE_INLINE void mix_samples(uint32_t *out,

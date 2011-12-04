@@ -43,6 +43,7 @@
 #include "pcm_record.h"
 #endif
 #include "dsp.h"
+#include "dsp-util.h"
 #endif
 
 #include "gcc_extensions.h"

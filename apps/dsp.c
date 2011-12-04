@@ -19,15 +19,12 @@
  *
  ****************************************************************************/
 #include "config.h"
-
-#include <stdbool.h>
-#include <inttypes.h>
-#include <string.h>
+#include "system.h"
 #include <sound.h>
 #include "dsp.h"
+#include "dsp-util.h"
 #include "eq.h"
 #include "kernel.h"
-#include "system.h"
 #include "settings.h"
 #include "replaygain.h"
 #include "tdspeed.h"
@@ -260,14 +257,6 @@ static int32_t release_gain IBSS_ATTR;     /* S7.24 format */
 #define UNITY (1L << 24)                   /* unity gain in S7.24 format */
 static void    compressor_process(int count, int32_t *buf[]);
 
-
-/* Clip sample to signed 16 bit range */
-static inline int32_t clip_sample_16(int32_t sample)
-{
-    if ((int16_t)sample != sample)
-        sample = 0x7fff ^ (sample >> 31);
-    return sample;
-}
 
 #ifdef HAVE_PITCHSCREEN
 int32_t sound_get_pitch(void)

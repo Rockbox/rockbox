@@ -27,6 +27,7 @@
 #include "pcm.h"
 #include "pcm_mixer.h"
 #include "pcmbuf.h"
+#include "dsp-util.h"
 #include "playback.h"
 #include "codec_thread.h"
 
@@ -826,14 +827,6 @@ static size_t crossfade_find_buftail(size_t buffer_rem, size_t buffer_need)
     }
 
     return buffer_rem;
-}
-
-/* Clip sample to signed 16 bit range */
-static FORCE_INLINE int32_t clip_sample_16(int32_t sample)
-{
-    if ((int16_t)sample != sample)
-        sample = 0x7fff ^ (sample >> 31);
-    return sample;
 }
 
 /* Returns the number of bytes _NOT_ mixed/faded */
