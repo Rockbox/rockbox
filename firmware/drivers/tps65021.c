@@ -7,7 +7,9 @@
  *                     \/            \/     \/    \/            \/
  * $Id: $
  *
- * Copyright (C) 2011 by Tomasz Moń
+ * Driver for TPS 65021 Power Management IC
+ *
+ * Copyright (c) 2011 Tomasz Moń
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,44 +20,45 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-#include "config.h"
-#include "cpu.h"
-#include <stdbool.h>
-#include "kernel.h"
 #include "system.h"
-#include "power.h"
-#include "backlight.h"
-#include "backlight-target.h"
-#include "avr-sansaconnect.h"
+#include "config.h"
+#if CONFIG_I2C == I2C_DM320
+#include "i2c-dm320.h"
+#endif
+#include "logf.h"
 #include "tps65021.h"
 
-void power_init(void)
-{
-    tps65021_init();
-}
+/* (7-bit) address is 0x48, the LSB is read/write flag */
+#define TPS65021_ADDR (0x48 << 1)
 
-void power_off(void)
+static void tps65021_write_reg(unsigned reg, unsigned value)
 {
-    avr_hid_reset_codec();
-    avr_hid_power_off();
-}
+    unsigned char data[2];
 
-#if CONFIG_CHARGING
-unsigned int power_input_status(void)
-{
-    return POWER_INPUT_NONE;
-}
+    data[0] = reg;
+    data[1] = value;
 
-/* Returns true if the unit is charging the batteries. */
-bool charging_state(void)
-{
-    return false;
-}
+#if CONFIG_I2C == I2C_DM320
+    if (i2c_write(TPS65021_ADDR, data, 2) != 0)
+#else
+    #warning Implement tps65021_write_reg()
 #endif
-
-void ide_power_enable(bool on)
-{
-  (void)on;
+    {
+       logf("TPS65021 error reg=0x%x", reg);
+       return;
+    }
 }
 
+void tps65021_init(void)
+{
+#ifdef SANSA_CONNECT
+    /* PWM mode */
+    tps65021_write_reg(0x04, 0xB2);
+
+    /* Set core voltage to 1.5V */
+    tps65021_write_reg(0x06, 0x1C);
+
+    /* Set LCM (LDO1) to 2.85V, Set CODEC and USB (LDO2) to 1.8V */
+    tps65021_write_reg(0x08, 0x36);
+#endif
+}
