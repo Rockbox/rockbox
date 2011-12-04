@@ -22,6 +22,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "mkimxboot.h"
 
 static void usage(void)
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
 
     if(argc == 1)
         usage();
-    
+
     while(1)
     {
         static struct option long_options[] =
