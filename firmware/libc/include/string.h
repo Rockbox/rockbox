@@ -61,20 +61,6 @@ const char  *_EXFUN(strsignal, (int __signo));
 int     _EXFUN(strtosigno, (const char *__name));
 #endif
 
-/* These function names are used on Windows and perhaps other systems.  */
-#ifndef strcmpi
-#define strcmpi strcasecmp
-#endif
-#ifndef stricmp
-#define stricmp strcasecmp
-#endif
-#ifndef strncmpi
-#define strncmpi strncasecmp
-#endif
-#ifndef strnicmp
-#define strnicmp strncasecmp
-#endif
-
 #endif /* ! __STRICT_ANSI__ */
 
 #ifdef __cplusplus
