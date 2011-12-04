@@ -419,7 +419,10 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -6461,7 +6464,10 @@ desc: deprecated
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -12381,8 +12387,12 @@ desc: deprecated
   desc: in sound_menu, amount of 3D enhancement effect
   user: core
   <source>
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: none
+###     gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
@@ -12730,3 +12740,97 @@ desc: deprecated
     *: "Salva Modifiche?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "Nascondi Drive interno USB"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "Nascondi Drive interno USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Padding Linea in Elenchi"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Padding Linea in Elenchi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatico"
+  </dest>
+  <voice>
+    *: "Automatico"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Durata Default Tempo Spegnimento"
+  </dest>
+  <voice>
+    *: "Durata Default Tempo Spegnimento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Avvio Tempo Spegnimento All'accensione"
+  </dest>
+  <voice>
+    *: "Avvio Tempo Spegnimento All'accensione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Annulla Tempo Spegnimento"
+  </dest>
+  <voice>
+    *: "Annulla Tempo Spegnimento"
+  </voice>
+</phrase>
+### LANG_SHORTCUTS: The phrase is not used. Skipped
+### LANG_KEYCLICK_SOFTWARE: The phrase is not used. Skipped
+### LANG_KEYCLICK_HARDWARE: The phrase is not used. Skipped
+### LANG_GLYPHS: The phrase is not used. Skipped

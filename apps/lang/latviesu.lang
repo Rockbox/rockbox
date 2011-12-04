@@ -12366,15 +12366,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Paplašinājums"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Paplašinājums"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "triis dimensiju paplashinaajums"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "triis dimensiju paplashinaajums"
   </voice>
 </phrase>
 <phrase>
@@ -12746,5 +12746,82 @@
   <voice>
     *: none
     histogram: "vizualizaacijas intervaals"
+  </voice>
+</phrase>
+### LANG_GLYPHS: The phrase is not used. Skipped
+### LANG_KEYCLICK_HARDWARE: The phrase is not used. Skipped
+### LANG_KEYCLICK_SOFTWARE: The phrase is not used. Skipped
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Līnijas Izplešana Sarakstos"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "liinijas izpleshana sarakstos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automātiski"
+  </dest>
+  <voice>
+    *: "automaatiski"
+  </voice>
+</phrase>
+### LANG_SHORTCUTS: The phrase is not used. Skipped
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Izslēgt Izslēgšanos"
+  </dest>
+  <voice>
+    *: "izsleegt izsleegshanos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Noklusētais Izslēgšanās Laiks"
+  </dest>
+  <voice>
+    *: "nokluseetais izsleegshanaas laiks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Sākt Izslēgšanas Laiku Ieslēdzot"
+  </dest>
+  <voice>
+    *: "saakt izsleegshanas laika atskaiti iesleedzot"
   </voice>
 </phrase>
