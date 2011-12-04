@@ -25,6 +25,7 @@
  *
  ****************************************************************************/
 
+#if defined(_WIN32)
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -199,3 +200,5 @@ int sansa_write(struct sansa_t* sansa, unsigned char* buf, int nbytes)
 
     return count;
 }
+#endif
+

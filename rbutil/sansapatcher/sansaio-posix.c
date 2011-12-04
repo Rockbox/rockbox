@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#if !defined(_WIN32) /* all non-Windows platforms supported are POSIX. */
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -142,3 +143,5 @@ int sansa_write(struct sansa_t* sansa, unsigned char* buf, int nbytes)
 {
     return write(sansa->dh, buf, nbytes);
 }
+#endif
+

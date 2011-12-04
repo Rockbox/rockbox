@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <unistd.h>
 
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(_WIN32)
 #include <windows.h>
 #define loff_t int64_t
 #else
@@ -38,6 +38,10 @@
 #define lseek64 lseek
 #endif
 
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 struct sansa_partinfo_t {
@@ -74,4 +78,7 @@ int sansa_read(struct sansa_t* sansa, unsigned char* buf, int nbytes);
 int sansa_write(struct sansa_t* sansa, unsigned char* buf, int nbytes);
 int sansa_alloc_buffer(unsigned char** sectorbuf, int bufsize);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
