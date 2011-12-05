@@ -22,6 +22,11 @@
 #ifndef PCM_INTERNAL_H
 #define PCM_INTERNAL_H
 
+/* Cheapo buffer align macro to align to the 16-16 PCM size */
+#define ALIGN_AUDIOBUF(start, size) \
+    ({ (start) = (void *)(((uintptr_t)(start) + 3) & ~3); \
+       (size) &= ~3; })
+
 struct pcm_peaks
 {
     long period;

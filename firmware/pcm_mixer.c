@@ -70,11 +70,6 @@ static struct mixer_channel * active_channels[PCM_MIXER_NUM_CHANNELS+1] IBSS_ATT
 #define MAX_IDLE_FRAMES     (NATIVE_FREQUENCY*3 / MIX_FRAME_SAMPLES)
 static unsigned int idle_counter = 0;
 
-/* Cheapo buffer align macro to align to the 16-16 PCM size */
-#define ALIGN_CHANNEL(start, size) \
-    ({ start = (void *)(((uintptr_t)start + 3) & ~3); \
-       size &= ~3; })
-
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 
 /* Include any implemented CPU-optimized mixdown routines */
@@ -244,7 +239,7 @@ fill_frame:
             if (chan->get_more)
             {
                 chan->get_more(&chan->start, &chan->size);
-                ALIGN_CHANNEL(chan->start, chan->size);
+                ALIGN_AUDIOBUF(chan->start, chan->size);
             }
 
             if (!(chan->start && chan->size))
@@ -368,7 +363,7 @@ static void mixer_channel_play_start(struct mixer_channel *chan,
 {
     pcm_play_unlock(); /* Allow playback while doing any callback */
 
-    ALIGN_CHANNEL(start, size);
+    ALIGN_AUDIOBUF(start, size);
 
     if (!(start && size))
     {
@@ -377,7 +372,7 @@ static void mixer_channel_play_start(struct mixer_channel *chan,
         if (get_more)
         {
             get_more(&start, &size);
-            ALIGN_CHANNEL(start, size);
+            ALIGN_AUDIOBUF(start, size);
         }
     }
 

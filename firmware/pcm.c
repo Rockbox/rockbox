@@ -260,8 +260,7 @@ bool pcm_is_initialized(void)
 /* Common code to pcm_play_data and pcm_play_pause */
 static void pcm_play_data_start(unsigned char *start, size_t size)
 {
-    start = (unsigned char *)(((uintptr_t)start + 3) & ~3);
-    size &= ~3;
+    ALIGN_AUDIOBUF(start, size);
 
     if (!(start && size))
     {
@@ -271,9 +270,7 @@ static void pcm_play_data_start(unsigned char *start, size_t size)
         {
             logf(" get_more");
             get_more(&start, &size);
-
-            start = (unsigned char *)(((uintptr_t)start + 3) & ~3);
-            size &= ~3;
+            ALIGN_AUDIOBUF(start, size);
         }
     }
 
@@ -319,8 +316,7 @@ void pcm_play_get_more_callback(void **start, size_t *size)
         /* Call registered callback */
         get_more((unsigned char **)start, size);
 
-        *start = (void *)(((uintptr_t)*start + 3) & ~3);
-        *size &= ~3;
+        ALIGN_AUDIOBUF(*start, *size);
 
         if (*start && *size)
             return;
@@ -557,9 +553,7 @@ void pcm_record_data(pcm_rec_callback_type more_ready,
 {
     logf("pcm_record_data");
 
-    /* 32-bit aligned and sized data only */
-    start = (void *)(((uintptr_t)start + 3) & ~3);
-    size &= ~3;
+    ALIGN_AUDIOBUF(start, size);
 
     if (!(start && size))
     {
@@ -611,8 +605,7 @@ void pcm_rec_more_ready_callback(int status, void **start, size_t *size)
     if (have_more && start)
     {
         have_more(status, start, size);
-        *start = (void *)(((uintptr_t)*start + 3) & ~3);
-        *size &= ~3;
+        ALIGN_AUDIOBUF(*start, *size);
 
         if (*start && *size)
         {
