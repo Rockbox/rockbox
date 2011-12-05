@@ -573,7 +573,7 @@ int filetype_list_viewers(const char* current_file)
     return simplelist_show_list(&info);
 }
 
-int filetype_load_plugin(const char* plugin, char* file)
+int filetype_load_plugin(const char* plugin, const char* file)
 {
     int i;
     char plugin_name[MAX_PATH];

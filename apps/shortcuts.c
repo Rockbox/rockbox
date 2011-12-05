@@ -42,10 +42,9 @@
 #include "onplay.h"
 
 
-
 #define MAX_SHORTCUT_NAME 32
 #define SHORTCUTS_FILENAME ROCKBOX_DIR "/shortcuts.txt"
-char *type_strings[SHORTCUT_TYPE_COUNT] = {
+static char * const type_strings[SHORTCUT_TYPE_COUNT] = {
     [SHORTCUT_SETTING] = "setting",
     [SHORTCUT_FILE] = "file",
     [SHORTCUT_DEBUGITEM] = "debug",
@@ -53,7 +52,6 @@ char *type_strings[SHORTCUT_TYPE_COUNT] = {
     [SHORTCUT_PLAYLISTMENU] = "playlist menu",
     [SHORTCUT_SEPARATOR] = "separator",
 };
-    
 
 struct shortcut {
     enum shortcut_type type;
@@ -124,7 +122,7 @@ static struct shortcut* get_shortcut(int index)
     return &h->shortcuts[handle_index];
 }
 
-bool verify_shortcut(struct shortcut* sc)
+static bool verify_shortcut(struct shortcut* sc)
 {
     switch (sc->type)
     {
@@ -152,7 +150,8 @@ static void init_shortcut(struct shortcut* sc)
     sc->name[0] = '\0';
     sc->u.path[0] = '\0';
     sc->icon = Icon_NOICON;
-}    
+}
+
 static int first_idx_to_writeback = -1;
 void shortcuts_ata_idle_callback(void* data)
 {
@@ -192,7 +191,8 @@ void shortcuts_ata_idle_callback(void* data)
     }    
     first_idx_to_writeback = -1;
 }
-void shortcuts_add(enum shortcut_type type, char* value)
+
+void shortcuts_add(enum shortcut_type type, const char* value)
 {
     struct shortcut* sc = get_shortcut(shortcut_count++);
     if (!sc)
@@ -275,6 +275,7 @@ int readline_cb(int n, char *buf, void *parameters)
     }
     return 0;
 }
+
 void shortcuts_init(void)
 {
     int fd;
@@ -296,8 +297,8 @@ void shortcuts_init(void)
         shortcut_count++;
 }
 
-const char * shortcut_menu_get_name(int selected_item, void * data,
-                                   char * buffer, size_t buffer_len)
+static const char * shortcut_menu_get_name(int selected_item, void * data,
+                                           char * buffer, size_t buffer_len)
 {
     (void)data;
     (void)buffer;
@@ -312,14 +313,15 @@ const char * shortcut_menu_get_name(int selected_item, void * data,
     return sc->name[0] ? sc->name : sc->u.path;
 }
 
-int shortcut_menu_get_action(int action, struct gui_synclist *lists)
+static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
 {
     (void)lists;
     if (action == ACTION_STD_OK)
         return ACTION_STD_CANCEL;
     return action;
 }
-enum themable_icons shortcut_menu_get_icon(int selected_item, void * data)
+
+static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data)
 {
     (void)data;
     struct shortcut *sc = get_shortcut(selected_item);

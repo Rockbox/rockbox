@@ -66,7 +66,7 @@
 #include "shortcuts.h"
 
 static int context;
-static char* selected_file = NULL;
+static const char* selected_file = NULL;
 static int selected_file_attr = 0;
 static int onplay_result = ONPLAY_OK;
 static char clipboard_selection[MAX_PATH];

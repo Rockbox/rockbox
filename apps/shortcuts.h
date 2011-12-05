@@ -36,7 +36,7 @@ enum shortcut_type {
     SHORTCUT_TYPE_COUNT
 };
 
-void shortcuts_add(enum shortcut_type type, char* value);
+void shortcuts_add(enum shortcut_type type, const char* value);
 void shortcuts_init(void);
 int do_shortcut_menu(void*ignored);
 
