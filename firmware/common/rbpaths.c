@@ -56,6 +56,7 @@ extern int sim_rename(const char* old, const char* new);
 extern DIR* sim_opendir(const char* name);
 extern int sim_mkdir(const char* name);
 extern int sim_rmdir(const char* name);
+const char *rbhome;
 #endif
 
 /* flags for get_user_file_path() */
@@ -74,13 +75,18 @@ void paths_init(void)
 #else
     char config_dir[MAX_PATH];
 
-    const char *home = getenv("HOME");
+    const char *home = getenv("RBROOT");
+    if (!home)
+    {
+        home = getenv("HOME");
+    }
     if (!home)
     {
       logf("HOME environment var not set. Can't write config");
       return;
     }
 
+    rbhome = home;
     snprintf(config_dir, sizeof(config_dir), "%s/.config", home);
     mkdir(config_dir);
     snprintf(config_dir, sizeof(config_dir), "%s/.config/rockbox.org", home);
@@ -120,7 +126,7 @@ static const char* _get_user_file_path(const char *path,
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
     if (snprintf(buf, bufsize, "/sdcard/rockbox/%s", pos)
 #else
-    if (snprintf(buf, bufsize, "%s/.config/rockbox.org/%s", getenv("HOME"), pos)
+    if (snprintf(buf, bufsize, "%s/.config/rockbox.org/%s", rbhome, pos)
 #endif
             >= (int)bufsize)
         return NULL;
