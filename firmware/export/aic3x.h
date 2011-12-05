@@ -30,6 +30,8 @@ extern int tenthdb2master(int db);
 /*** definitions ***/
 extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
 
+extern void aic3x_switch_output(bool stereo);
+
 /* Page 0 registers */
 #define AIC3X_PAGE_SELECT 0
 #define AIC3X_SOFT_RESET  1
@@ -42,9 +44,16 @@ extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
 #define AIC3X_DATA_REG_A  8
 #define AIC3X_DATA_REG_B  9
 #define AIC3X_DATA_REG_C  10
+#define AIC3X_OVERFLOW    11
+
+#define AIC3X_LINE1L_LEFTADC 19
+
+#define AIC3X_LINE1R_RIGHTADC 22
 
 #define AIC3X_DAC_POWER   37
 #define AIC3X_HIGH_POWER  38
+
+#define AIC3X_POWER_OUT   40
 
 #define AIC3X_POP_REDUCT  42
 #define AIC3X_LEFT_VOL    43
@@ -60,7 +69,9 @@ extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
 
 #define AIC3X_DAC_L1_MONO_LOP_M_VOL 75
 
-#define AIC3X_DAC_R1_MONO_LOP_M_VOL 76
+#define AIC3X_LINE2R_MONO_LOP_M_VOL 76
+#define AIC3X_PGA_R_MONO_LOP_M_VOL  77
+#define AIC3X_DAC_R1_MONO_LOP_M_VOL 78
 
 #define AIC3X_MONO_LOP_M_LVL 79
 

@@ -49,6 +49,9 @@ static void tps65021_write_reg(unsigned reg, unsigned value)
 
 void power_init(void)
 {
+    /* Enable LDO */
+    tps65021_write_reg(0x03, 0xFD);
+
     /* PWM mode */
     tps65021_write_reg(0x04, 0xB2);
  
@@ -61,6 +64,9 @@ void power_init(void)
 
 void power_off(void)
 {
+    /* Disable GIO0 and GIO2 interrupts */
+    IO_INTC_EINT1 &= ~(INTR_EINT1_EXT2 | INTR_EINT1_EXT0);
+
     avr_hid_reset_codec();
     avr_hid_power_off();
 }

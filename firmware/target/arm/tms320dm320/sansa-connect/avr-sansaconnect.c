@@ -29,6 +29,7 @@
 #include "button.h"
 #include "backlight.h"
 #include "powermgmt.h"
+#include "aic3x.h"
 
 //#define BUTTON_DEBUG
 
@@ -405,6 +406,26 @@ void GIO0(void)
     /* interrupt will be enabled back after button read */
     queue_post(&btn_queue, BTN_INTERRUPT, 0);
 }
+
+void GIO2(void) __attribute__ ((section(".icode")));
+void GIO2(void)
+{
+    /* Clear interrupt */
+    IO_INTC_IRQ1 = (1 << 7);
+    /* Disable interrupt */
+    IO_INTC_EINT1 &= ~INTR_EINT1_EXT2;
+
+    if (IO_GIO_BITSET0 & 0x04)
+    {
+        aic3x_switch_output(false);
+    }
+    else
+    {
+        aic3x_switch_output(true);
+    }
+
+    IO_INTC_EINT1 |= INTR_EINT1_EXT2;
+}
 #endif
 
 void button_init_device(void)
@@ -425,12 +446,13 @@ void button_init_device(void)
     avr_hid_get_state();
 
 #ifndef BOOTLOADER
-    IO_GIO_IRQPORT |= 0x01; /* Enable GIO0 external interrupt */
-    IO_GIO_INV0 &= ~0x01; /* Clear INV for GIO0 (falling edge detection) */
-    IO_GIO_IRQEDGE &= ~0x01; /* Set edge detection (falling) */
+    IO_GIO_IRQPORT |= 0x05; /* Enable GIO0/GIO2 external interrupt */
+    IO_GIO_INV0 &= ~0x05; /* Clear INV for GIO0/GIO2 */
+    /* falling edge detection on GIO0, any edge on GIO2 */
+    IO_GIO_IRQEDGE = (IO_GIO_IRQEDGE & ~0x01) | 0x04;
 
-    /* Enable GIO0 interrupt */
-    IO_INTC_EINT1 |= INTR_EINT1_EXT0;
+    /* Enable GIO0 and GIO2 interrupts */
+    IO_INTC_EINT1 |= INTR_EINT1_EXT0 | INTR_EINT1_EXT2;
 #endif
 }
 
