@@ -44,7 +44,7 @@
 
 #define MAX_SHORTCUT_NAME 32
 #define SHORTCUTS_FILENAME ROCKBOX_DIR "/shortcuts.txt"
-static char * const type_strings[SHORTCUT_TYPE_COUNT] = {
+static const char * const type_strings[SHORTCUT_TYPE_COUNT] = {
     [SHORTCUT_SETTING] = "setting",
     [SHORTCUT_FILE] = "file",
     [SHORTCUT_DEBUGITEM] = "debug",
@@ -167,7 +167,7 @@ void shortcuts_ata_idle_callback(void* data)
     while (current_idx < shortcut_count)
     {
         struct shortcut* sc = get_shortcut(current_idx++);
-        char *type;
+        const char *type;
         int len;
         if (!sc)
             break;
