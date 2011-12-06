@@ -688,7 +688,7 @@ static void gwps_enter_wps(void)
 #ifdef HAVE_TOUCHSCREEN
     gwps = skin_get_gwps(WPS, SCREEN_MAIN);
     skin_disarm_touchregions(gwps->data);
-    if (!gwps->data->touchregions)
+    if (gwps->data->touchregions < 0)
         touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
     /* force statusbar/skin update since we just cleared the whole screen */
