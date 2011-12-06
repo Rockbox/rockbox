@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include "config.h"
 #include "system.h"
+#include "powermgmt.h"
+#include "power.h"
 #include "action.h"
 #include "ata_idle_notify.h"
 #include "debug_menu.h"
@@ -40,6 +42,7 @@
 #include "filetypes.h"
 #include "shortcuts.h"
 #include "onplay.h"
+#include "screens.h"
 
 
 #define MAX_SHORTCUT_NAME 32
