@@ -815,11 +815,6 @@ static void glyph_cache_save(int font_id)
     struct font *pf = pf_from_handle(handle);
     if(pf && pf->fd >= 0)
     {
-        /* FIXME: This sleep should not be necessary but without it   *
-         * unloading multiple fonts and saving glyphcache files       *
-         * quickly in succession creates multiple glyphcache files    *
-         * with the same name.                                        */
-        sleep(HZ/10);
         char filename[MAX_PATH];
         font_path_to_glyph_path(font_filename(font_id), filename);
         fd = open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666);

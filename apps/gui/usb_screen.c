@@ -251,8 +251,6 @@ void gui_usb_screen_run(bool early_usb)
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
 
-    usb_acknowledge(SYS_USB_CONNECTED_ACK);
-
 #ifdef USB_ENABLE_HID
     usb_hid = global_settings.usb_hid;
     usb_keypad_mode = global_settings.usb_keypad_mode;
@@ -283,6 +281,8 @@ void gui_usb_screen_run(bool early_usb)
         usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
 #endif
     }
+
+    usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
     while (1)
     {
