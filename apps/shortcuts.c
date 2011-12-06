@@ -51,6 +51,7 @@ static const char * const type_strings[SHORTCUT_TYPE_COUNT] = {
     [SHORTCUT_BROWSER] = "browse",
     [SHORTCUT_PLAYLISTMENU] = "playlist menu",
     [SHORTCUT_SEPARATOR] = "separator",
+    [SHORTCUT_SHUTDOWN] = "shutdown",
 };
 
 struct shortcut {
@@ -138,6 +139,7 @@ static bool verify_shortcut(struct shortcut* sc)
             return sc->u.setting != NULL;
         case SHORTCUT_DEBUGITEM:
         case SHORTCUT_SEPARATOR:
+        case SHORTCUT_SHUTDOWN:
         default:
             break;
     }
@@ -258,6 +260,7 @@ int readline_cb(int n, char *buf, void *parameters)
                     sc->u.setting = find_setting_by_cfgname(value, NULL);
                     break;
                 case SHORTCUT_SEPARATOR:
+                case SHORTCUT_SHUTDOWN:
                     break;
             }
         }
@@ -310,6 +313,11 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
         return sc->name[0] ? sc->name : P2STR(ID2P(sc->u.setting->lang_id));
     else if (sc->type == SHORTCUT_SEPARATOR)
         return sc->name;
+    else if (sc->type == SHORTCUT_SHUTDOWN && sc->name[0] == '\0')
+    {
+        /* No translation support as only soft_shutdown has LANG_SHUTDOWN defined */
+        return type_strings[SHORTCUT_SHUTDOWN];
+    }
     return sc->name[0] ? sc->name : sc->u.path;
 }
 
@@ -341,6 +349,8 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
                 return Icon_Menu_functioncall;
             case SHORTCUT_PLAYLISTMENU:
                 return Icon_Playlist;
+            case SHORTCUT_SHUTDOWN:
+                return Icon_System_menu;
             default:
                 break;
         }
@@ -412,6 +422,14 @@ int do_shortcut_menu(void *ignored)
                     break;
                 case SHORTCUT_DEBUGITEM:
                     run_debug_screen(sc->u.path);
+                    break;
+                case SHORTCUT_SHUTDOWN:
+#if CONFIG_CHARGING
+                    if (charger_inserted())
+                        charging_splash();
+                    else
+#endif
+                        sys_poweroff();
                     break;
                 case SHORTCUT_UNDEFINED:
                 default:

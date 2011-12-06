@@ -280,6 +280,7 @@ settings. With a shortcut,
   \item A setting can be configured (any which can be added to the
         \setting{Quick Screen})
   \item A debug menu item can be displayed (useful for developers mostly)
+  \item A shortcut to shutdown the player
 \end{itemize}
 
 \note{Shortcuts into the database are not possible}
@@ -309,6 +310,8 @@ Available types are:
 \item[debug] \config{data} is the name of the debug menu item to display
 \item[separator] \config{data} is ignored; \config{name} can be used to display text,
   or left blank to make the list more accessible with visual gaps
+\item[shutdown] \config{data} is ignored; \config{name} can be used to display text,
+  Causes the player to turn off.
 \end{description}
 
 If the name/icon items are not specified, a sensible default will be used.
