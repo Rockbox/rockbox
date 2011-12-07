@@ -165,6 +165,7 @@ win32 {
     # use MinGW's implementation of stdio functions for extended format string
     # support.
     DEFINES += __USE_MINGW_ANSI_STDIO=1
+    DEFINES += _CRT_SECURE_NO_WARNINGS
     LIBS += -lsetupapi -lnetapi32
 }
 win32:static {
