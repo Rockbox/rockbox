@@ -25,6 +25,8 @@
  *
  ****************************************************************************/
 
+#if defined(_WIN32)
+
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -200,4 +202,6 @@ ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 
     return count;
 }
+
+#endif
 

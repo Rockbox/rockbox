@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#if !defined(_WIN32) /* all non-Windows platforms are considered POSIX. */
 
 #include <stdio.h>
 #include <unistd.h>
@@ -387,4 +388,6 @@ ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
 {
     return write(ipod->dh, buf, nbytes);
 }
+
+#endif
 

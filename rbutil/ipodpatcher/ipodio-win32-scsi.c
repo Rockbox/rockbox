@@ -49,6 +49,7 @@
  *
  ****************************************************************************/
 
+#if defined(_WIN32)
 #include <windows.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -119,3 +120,5 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
         return -1;
     }
 }
+#endif
+
