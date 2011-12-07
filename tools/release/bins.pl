@@ -117,13 +117,13 @@ sub buildit {
     `make VERSION=$version`;
 
     print "Run 'make zip'\n" if($verbose);
-    `make zip`;
+    `make zip VERSION=$version`;
 
     print "Run 'make mapzip'\n" if($verbose);
-    `make mapzip`;
+    `make mapzip VERSION=$version`;
 
     print "Run 'make elfzip'\n" if($verbose);
-    `make elfzip`;
+    `make elfzip VERSION=$version`;
 }
 
 sub buildfonts {
