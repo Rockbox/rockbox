@@ -65,10 +65,10 @@ sub buildit {
     `$c`;
 
     print "Run 'make'\n" if($verbose);
-    `make manual 2>/dev/null`;
+    `make manual VERSION=$version 2>/dev/null`;
 
     print "Run 'make manual-zip'\n" if($verbose);
-    `make manual-zip 2>/dev/null`;
+    `make manual-zip VERSION=$version 2>/dev/null`;
 }
 
 # run make in tools first to make sure they're up-to-date
