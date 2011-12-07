@@ -1,3 +1,8 @@
+
+ifndef V
+SILENT = @
+endif
+
 CFLAGS=-Wall -W -D_LARGEFILE64_SOURCE
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
@@ -19,7 +24,8 @@ WINDRES = $(CROSS)windres
 all: bin2c
 
 bin2c: bin2c.c
-	$(NATIVECC) $(CFLAGS) -o bin2c bin2c.c
+	@echo CC $<
+	$(SILENT)$(NATIVECC) $(CFLAGS) -o bin2c bin2c.c
 
 clean:
 	$(RM) bin2c bin2c.exe
