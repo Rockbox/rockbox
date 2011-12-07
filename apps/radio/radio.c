@@ -761,6 +761,8 @@ void radio_screen(void)
 #endif
                 FOR_NB_SCREENS(i)
                     skin_update(FM_SCREEN, i, update_type);
+                if (update_type == (int)SKIN_REFRESH_ALL)
+                    skin_request_full_update(CUSTOM_STATUSBAR);
             }
         }
         update_type = 0;
