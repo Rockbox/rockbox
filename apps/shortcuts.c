@@ -270,15 +270,13 @@ int readline_cb(int n, char *buf, void *parameters)
                     break;
                 case SHORTCUT_TIME:
 #if CONFIG_RTC
+                    sc->u.timedata.talktime = false;
                     if (!strcasecmp(value, "talk"))
                         sc->u.timedata.talktime = true;
                     else
 #endif
                     if (!strncasecmp(value, "sleep ", strlen("sleep ")))
-                    {
-                        sc->u.timedata.talktime = false;
                         sc->u.timedata.sleep_timeout = atoi(&value[strlen("sleep ")]);
-                    }
                     else
                         sc->type = SHORTCUT_UNDEFINED; /* error */
                     break;
