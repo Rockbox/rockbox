@@ -43,8 +43,13 @@ static size_t dma_rem_size;     /* Remaining size - in 4*32 bits */
 static size_t play_sub_size;    /* size of current subtransfer */
 static void dma_callback(void);
 static int locked = 0;
-static bool is_playing = false;
+static bool volatile is_playing = false;
 static bool play_callback_pending = false;
+
+#ifdef HAVE_RECORDING
+/* Stopping playback gates clock if not recording */
+static bool volatile is_recording = false;
+#endif
 
 /* Mask the DMA interrupt */
 void pcm_play_lock(void)
@@ -116,26 +121,27 @@ static void dma_callback(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
+    is_playing = true;
+
     dma_start_addr = (void*)addr;
     dma_start_size = size;
     dma_sub_addr = dma_start_addr;
     dma_rem_size = size;
 
-    bitset32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
-    CGU_AUDIO |= (1<<11);
-
     dma_retain();
-
-    is_playing = true;
 
     /* force writeback */
     clean_dcache_range(dma_start_addr, dma_start_size);
+
+    bitset32(&CGU_AUDIO, (1<<11));
+
     play_start_pcm();
 }
 
 void pcm_play_dma_stop(void)
 {
     is_playing = false;
+
     dma_disable_channel(1);
 
     /* Ensure byte counts read back 0 */
@@ -146,8 +152,10 @@ void pcm_play_dma_stop(void)
 
     dma_release();
 
-    bitclr32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
-    CGU_AUDIO &= ~(1<<11);
+#ifdef HAVE_RECORDING
+    if (!is_recording)
+        bitclr32(&CGU_AUDIO, (1<<11));
+#endif
 
     play_callback_pending = false;
 }
@@ -175,10 +183,10 @@ void pcm_play_dma_pause(bool pause)
 void pcm_play_dma_init(void)
 {
     bitset32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
-
-    I2SOUT_CONTROL = (1<<6)|(1<<3)  /* enable dma, stereo */;
+    I2SOUT_CONTROL = (1<<6) | (1<<3);  /* enable dma, stereo */
 
     audiohw_preinit();
+    pcm_dma_apply_settings();
 }
 
 void pcm_play_dma_postinit(void)
@@ -209,14 +217,15 @@ static inline unsigned char mclk_divider(void)
 
 void pcm_dma_apply_settings(void)
 {
-    int cgu_audio = CGU_AUDIO;              /* read register */
-    cgu_audio &= ~(3 << 0);                 /* clear i2sout MCLK_SEL */
-    cgu_audio |=  (AS3525_MCLK_SEL << 0);   /* set i2sout MCLK_SEL */
-    cgu_audio &= ~(0x1ff << 2);             /* clear i2sout divider */
-    cgu_audio |= mclk_divider() << 2;       /* set new i2sout divider */
-    cgu_audio &= ~(1 << 23);                /* clear I2SI_MCLK_EN */
-    cgu_audio &= ~(1 << 24);                /* clear I2SI_MCLK2PAD_EN */
-    CGU_AUDIO = cgu_audio;                  /* write back register */
+    bitmod32(&CGU_AUDIO,
+             (0<<24) |               /* I2SI_MCLK2PAD_EN = disabled */
+             (0<<23) |               /* I2SI_MCLK_EN = disabled */
+             (0<<14) |               /* I2SI_MCLK_DIV_SEL = unused */
+             (0<<12) |               /* I2SI_MCLK_SEL = clk_main */
+                                     /* I2SO_MCLK_EN = unchanged */
+             (mclk_divider() << 2) | /* I2SO_MCLK_DIV_SEL */
+             (AS3525_MCLK_SEL << 0), /* I2SO_MCLK_SEL */
+             0x01fff7ff);
 }
 
 size_t pcm_get_bytes_waiting(void)
@@ -258,220 +267,158 @@ void * pcm_dma_addr(void *addr)
 #ifdef HAVE_RECORDING
 
 static int rec_locked = 0;
-static bool is_recording = false;
-static bool rec_callback_pending = false;
-static void *rec_dma_start_addr;
-static size_t rec_dma_size, rec_dma_transfer_size;
-static void rec_dma_callback(void);
-#if CONFIG_CPU == AS3525
-/* points to the samples which need to be duplicated into the right channel */
-static int16_t *mono_samples;
-#endif
-
+static uint32_t *rec_dma_addr;
+static size_t rec_dma_size;
 
 void pcm_rec_lock(void)
 {
-    ++rec_locked;
+    int oldlevel = disable_irq_save();
+
+    if (++rec_locked == 1)
+    {
+        bitset32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE);
+        VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
+        I2SIN_MASK = 0; /* disables all interrupts */
+    }
+
+    restore_irq(oldlevel);
 }
 
 
 void pcm_rec_unlock(void)
 {
-    if(--rec_locked == 0 && is_recording)
+    int oldlevel = disable_irq_save();
+
+    if (--rec_locked == 0 && is_recording)
     {
-        int old = disable_irq_save();
-        if(rec_callback_pending)
-        {
-            rec_callback_pending = false;
-            rec_dma_callback();
-        }
-        restore_irq(old);
+        VIC_INT_ENABLE = INTERRUPT_I2SIN;
+        I2SIN_MASK = (1<<2); /* I2SIN_MASK_POAF */
     }
+
+    restore_irq(oldlevel);
 }
 
 
-static void rec_dma_start(void)
+void INT_I2SIN(void)
 {
-    rec_dma_transfer_size = rec_dma_size;
-
-    /* We are limited to 8188 DMA transfers, and the recording core asks for
-     * 8192 bytes. Avoid splitting 8192 bytes transfers in 8188 + 4 */
-    if(rec_dma_transfer_size > 4096)
-        rec_dma_transfer_size = 4096;
-
-    dma_enable_channel(1, (void*)I2SIN_DATA, rec_dma_start_addr, DMA_PERI_I2SIN,
-                DMAC_FLOWCTRL_DMAC_PERI_TO_MEM, false, true,
-                rec_dma_transfer_size >> 2, DMA_S4, rec_dma_callback);
-}
-
-
 #if CONFIG_CPU == AS3525
-/* if needed, duplicate samples of the working channel until the given bound */
-static inline void mono2stereo(int16_t *end)
-{
-    if(audio_channels != 1) /* only for microphone */
-        return;
-#if 0
-    /* load pointer in a register and avoid updating it in each loop */
-    register int16_t *samples = mono_samples;
+    if (audio_channels == 1)
+    {
+        /* RX is left-channel-only mono */
+        while (rec_dma_size > 0)
+        {
+            if (I2SIN_RAW_STATUS & (1<<5))
+                return; /* empty */
 
-    do {
-        int16_t left = *samples++;  // load 1 sample of the left-channel
-        *samples++ = left;          // copy it in the right-channel
-    } while(samples != end);
+            /* Discard every other sample since ADC clock is 1/2 LRCK */
+            uint32_t value = *I2SIN_DATA;
+            *I2SIN_DATA;
 
-    mono_samples = samples; /* update pointer */
-#else
-    /* gcc doesn't use pre indexing : let's save 1 cycle */
-    int16_t left;
-    asm (
-        "1: ldrh %0, [%1], #2   \n" // load 1 sample of the left-channel
-        "   strh %0, [%1], #2   \n" // copy it in the right-channel
-        "   cmp %1, %2          \n" // are we finished?
-        "   bne  1b             \n"
-        : "=&r"(left), "+r"(mono_samples)
-        : "r"(end)
-        : "memory"
-    );
-#endif /* C / ASM */
-}
+            /* Data is in left channel only - copy to right channel
+               14-bit => 16-bit samples */
+            value = (uint16_t)(value << 2) | (value << 18);
+
+            if (audio_output_source != AUDIO_SRC_PLAYBACK && !is_playing)
+            {
+                /* In this case, loopback is manual so that both output
+                   channels have audio */
+                if (I2SOUT_RAW_STATUS & (1<<5))
+                {
+                    /* Sync output fifo so it goes empty not before input is
+                       filled */
+                    for (unsigned i = 0; i < 4; i++)
+                        *I2SOUT_DATA = 0;
+                }
+
+                *I2SOUT_DATA = value;
+                *I2SOUT_DATA = value;
+            }
+
+            *rec_dma_addr++ = value;
+            rec_dma_size -= 4;
+        }
+    }
+    else
 #endif /* CONFIG_CPU == AS3525 */
-
-#if CONFIG_CPU == AS3525v2
-/* scale microphone audio by 2 bits due to 14 bit ADC */
-static inline void scalevolume(int16_t *end, int size)
-{
-    if(audio_channels != 1) /* only for microphone */
-        return;
-
-    /* load pointer in a register and avoid updating it in each loop */
-    register int16_t *samples = end;
-
-    do {
-        *samples++ <<=2;  
-
-    } while(samples != end+size);
-
-}
-#endif /* CONFIG_CPU == AS3525v2 */
-
-static void rec_dma_callback(void)
-{
-    if(rec_dma_transfer_size)
     {
-
-#if CONFIG_CPU == AS3525v2
-        scalevolume(AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr), rec_dma_transfer_size);
-#endif
-        rec_dma_size -= rec_dma_transfer_size;
-        rec_dma_start_addr += rec_dma_transfer_size;
-
-        /* don't act like we just transferred data when we are called from
-         * pcm_rec_unlock() */
-        rec_dma_transfer_size = 0;
-
-#if CONFIG_CPU == AS3525
-        /* the 2nd channel is silent when recording microphone on as3525v1 */
-        mono2stereo(AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr));
-#endif
-
-        if(locked)
+        /* RX is stereo */
+        while (rec_dma_size > 0)
         {
-            rec_callback_pending = is_recording;
-            return;
+            if (I2SIN_RAW_STATUS & (1<<5))
+                return; /* empty */
+
+            /* Discard every other sample since ADC clock is 1/2 LRCK */
+            uint32_t value = *I2SIN_DATA;
+            *I2SIN_DATA;
+
+            /* Loopback is in I2S hardware */
+
+            /* 14-bit => 16-bit samples */
+            *rec_dma_addr++ = (value << 2) & ~0x00030000;
+            rec_dma_size -= 4;
         }
     }
 
-    if(!rec_dma_size)
-    {
-        pcm_rec_more_ready_callback(0, &rec_dma_start_addr,
-                                    &rec_dma_size);
-
-        if(rec_dma_size == 0)
-            return;
-
-        dump_dcache_range(rec_dma_start_addr, rec_dma_size);
-#if CONFIG_CPU == AS3525
-        mono_samples = AS3525_UNCACHED_ADDR((int16_t*)rec_dma_start_addr);
-#endif
-    }
-
-    rec_dma_start();
+    pcm_rec_more_ready_callback(0, (void *)&rec_dma_addr, &rec_dma_size);
 }
+
 
 void pcm_rec_dma_stop(void)
 {
     is_recording = false;
-    dma_disable_channel(1);
-    dma_release();
+
+    VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
+    I2SIN_MASK = 0; /* disables all interrupts */
+
+    rec_dma_addr = NULL;
     rec_dma_size = 0;
 
-    I2SIN_CONTROL &= ~(1<<11); /* disable dma */
+    if (!is_playing)
+        bitclr32(&CGU_AUDIO, (1<<11));
 
-    CGU_AUDIO &= ~(1<<11);
-    bitclr32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE |
-                        CGU_I2SOUT_APB_CLOCK_ENABLE);
-
-    rec_callback_pending = false;
+    bitclr32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE);
 }
 
 
 void pcm_rec_dma_start(void *addr, size_t size)
 {
-    dump_dcache_range(addr, size);
-    rec_dma_start_addr = addr;
-#if CONFIG_CPU == AS3525
-    mono_samples = AS3525_UNCACHED_ADDR(addr);
-#endif
-    rec_dma_size = size;
-
-    dma_retain();
-
-    bitset32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE |
-                        CGU_I2SOUT_APB_CLOCK_ENABLE);
-    CGU_AUDIO |= (1<<11);
-
-    I2SIN_CONTROL |= (1<<11)|(1<<5); /* enable dma, 14bits samples */
-
     is_recording = true;
 
-    rec_dma_start();
+    bitset32(&CGU_AUDIO, (1<<11));
+
+    rec_dma_addr = addr;
+    rec_dma_size = size;
+
+    /* ensure empty FIFO */
+    while (!(I2SIN_RAW_STATUS & (1<<5)))
+        *I2SIN_DATA;
+
+    I2SIN_CLEAR = (1<<6) | (1<<0); /* push error, pop error */
 }
 
 
 void pcm_rec_dma_close(void)
 {
+    bitset32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE);
+    pcm_rec_dma_stop();
 }
 
 
 void pcm_rec_dma_init(void)
 {
-    /* i2c clk src = I2SOUTIF, sdata src = AFE,
-     * data valid at positive edge of SCLK */
-    I2SIN_CONTROL = (1<<2);
+    bitset32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE);
+
     I2SIN_MASK = 0; /* disables all interrupts */
+
+    /* 14 bits samples, i2c clk src = I2SOUTIF, sdata src = AFE,
+     * data valid at positive edge of SCLK */
+    I2SIN_CONTROL = (1<<5) | (1<<2);
 }
 
 
 const void * pcm_rec_dma_get_peak_buffer(void)
 {
-#if CONFIG_CPU == AS3525
-    /*
-     * We need to prevent the DMA callback from kicking in while we are
-     * faking the right channel with data from left channel.
-     */
-
-    int old = disable_irq_save();
-    int16_t *addr = AS3525_UNCACHED_ADDR((int16_t *)DMAC_CH_DST_ADDR(1));
-    mono2stereo(addr);
-    restore_irq(old);
-
-    return addr;
-
-#else
-    /* Microphone recording is stereo on as3525v2 */
-    return AS3525_UNCACHED_ADDR((int16_t *)DMAC_CH_DST_ADDR(1));
-#endif
+    return rec_dma_addr;
 }
 
 #endif /* HAVE_RECORDING */

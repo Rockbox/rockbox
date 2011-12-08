@@ -1078,7 +1078,7 @@ static void record_and_get_pitch(void)
         }
     }
     rb->pcm_close_recording();
-    rb->pcm_set_frequency(REC_SAMPR_DEFAULT | SAMPR_TYPE_REC);
+    rb->pcm_set_frequency(HW_SAMPR_RESET | SAMPR_TYPE_REC);
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     rb->cancel_cpu_boost();
 #endif

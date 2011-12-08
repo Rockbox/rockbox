@@ -24,16 +24,33 @@
 #include "audio.h"
 #include "audiohw.h"
 #include "sound.h"
+#include "general.h"
 
 int audio_channels = 2;
+
+#if CONFIG_CPU == AS3525
+int audio_output_source = AUDIO_SRC_PLAYBACK;
+#endif
 
 void audio_set_output_source(int source)
 {
     bitset32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
-    if (source == AUDIO_SRC_PLAYBACK)
-        I2SOUT_CONTROL &= ~(1<<5);
+
+    if ((unsigned)source >= AUDIO_NUM_SOURCES)
+        source = AUDIO_SRC_PLAYBACK;
+
+    bool loopback = source != AUDIO_SRC_PLAYBACK;
+
+#if CONFIG_CPU == AS3525
+    loopback = loopback && audio_channels > 1;
+
+    audio_output_source = source;
+#endif
+
+    if (loopback)
+        I2SOUT_CONTROL |= (1<<5);  /* loopback from i2sin fifo */
     else
-        I2SOUT_CONTROL |= 1<<5; /* source = loopback from i2sin fifo */
+        I2SOUT_CONTROL &= ~(1<<5); /* normal i2sout */
 }
 
 void audio_input_mux(int source, unsigned flags)
@@ -108,4 +125,33 @@ void audio_input_mux(int source, unsigned flags)
     }
 
     last_source = source;
+
+#if CONFIG_CPU == AS3525
+    /* Sync on behalf of change in number of channels */
+    audio_set_output_source(audio_output_source);
+#endif
 }
+
+#ifdef CONFIG_SAMPR_TYPES
+unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
+                                   unsigned int type)
+{
+#ifdef HAVE_RECORDING
+    if (samplerate != HW_SAMPR_RESET && type == SAMPR_TYPE_REC)
+    {
+        /* Check if the samplerate is in the list of recordable rates.
+         * Fail to default if not */
+        int index = round_value_to_list32(samplerate, rec_freq_sampr,
+                                          REC_NUM_FREQ, false);
+        if (samplerate != rec_freq_sampr[index])
+            samplerate = REC_SAMPR_DEFAULT;
+
+        samplerate *= 2; /* Recording rates are 1/2 the codec clock */
+    }
+#endif /* HAVE_RECORDING */
+
+    return samplerate;
+    (void)type;
+}
+#endif /* CONFIG_SAMPR_TYPES */
+

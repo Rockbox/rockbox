@@ -290,7 +290,7 @@ static void pcm_rec_have_more(int status, void **start, size_t *size)
 static void reset_hardware(void)
 {
     /* reset pcm to defaults */
-    pcm_set_frequency(REC_SAMPR_DEFAULT | SAMPR_TYPE_REC);
+    pcm_set_frequency(HW_SAMPR_RESET | SAMPR_TYPE_REC);
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
     pcm_apply_settings();
 }

@@ -305,6 +305,8 @@ enum rec_freq_indexes
 #define REC_SAMPR_DEFAULT SAMPR_44
 #endif
 
+#define HW_SAMPR_RESET  0
+
 #define REC_FREQ_CFG_VAL_LIST  &REC_HAVE_96_(",96") REC_HAVE_88_(",88") \
                                 REC_HAVE_64_(",64") REC_HAVE_48_(",48") \
                                 REC_HAVE_44_(",44") REC_HAVE_32_(",32") \
@@ -324,7 +326,8 @@ extern const unsigned long rec_freq_sampr[REC_NUM_FREQ];
 #define SAMPR_TYPE_REC  (0x01 << 24)
 #endif
 
-unsigned int pcm_sampr_type_rec_to_play(unsigned int samplerate);
+unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
+                                   unsigned int type);
 
 #else /* ndef CONFIG_SAMPR_TYPES */
 

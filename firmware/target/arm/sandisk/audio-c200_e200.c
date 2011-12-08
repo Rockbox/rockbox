@@ -186,16 +186,25 @@ void audiohw_set_sampr_dividers(int fsel)
     IISDIV = (IISDIV & ~0xc000003f) | regvals[fsel].iisdiv;
 }
 
-#ifdef HAVE_RECORDING
-unsigned int pcm_sampr_type_rec_to_play(unsigned int samplerate)
+#ifdef CONFIG_SAMPR_TYPES
+unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
+                                   unsigned int type)
 {
-    /* Check if the samplerate is in the list of recordable rates.
-     * Fail to default if not */
-    int index = round_value_to_list32(samplerate, rec_freq_sampr,
-                                      REC_NUM_FREQ, false);
-    if (samplerate != rec_freq_sampr[index])
-        return HW_SAMPR_DEFAULT;
+#ifdef HAVE_RECORDING
+    if (samplerate != HW_SAMPR_RESET && type == SAMPR_TYPE_REC)
+    {
+        /* Check if the samplerate is in the list of recordable rates.
+         * Fail to default if not */
+        int index = round_value_to_list32(samplerate, rec_freq_sampr,
+                                          REC_NUM_FREQ, false);
+        if (samplerate != rec_freq_sampr[index])
+            samplerate = REC_SAMPR_DEFAULT;
 
-    return samplerate * 2; /* Recording rates are 1/2 the codec clock */
+        samplerate *= 2; /* Recording rates are 1/2 the codec clock */
+    }
+#endif /* HAVE_RECORDING */
+
+    return samplerate;
+    (void)type;
 }
-#endif
+#endif /* CONFIG_SAMPR_TYPES */

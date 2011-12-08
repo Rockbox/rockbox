@@ -393,21 +393,14 @@ void pcm_set_frequency(unsigned int samplerate)
     int index;
 
 #ifdef CONFIG_SAMPR_TYPES
-#ifdef HAVE_RECORDING
     unsigned int type = samplerate & SAMPR_TYPE_MASK;
-#endif
     samplerate &= ~SAMPR_TYPE_MASK;
 
-#ifdef HAVE_RECORDING
-#if SAMPR_TYPE_REC != 0
     /* For now, supported targets have direct conversion when configured with
      * CONFIG_SAMPR_TYPES.
      * Some hypothetical target with independent rates would need slightly
      * different handling throughout this source. */
-    if (type == SAMPR_TYPE_REC)
-        samplerate = pcm_sampr_type_rec_to_play(samplerate);
-#endif
-#endif /* HAVE_RECORDING */
+    samplerate = pcm_sampr_to_hw_sampr(samplerate, type);
 #endif /* CONFIG_SAMPR_TYPES */
 
     index = round_value_to_list32(samplerate, hw_freq_sampr,
