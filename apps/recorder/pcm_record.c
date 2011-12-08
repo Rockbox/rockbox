@@ -1759,9 +1759,11 @@ unsigned char * enc_get_pcm_data(size_t size)
                    pcm_buffer, pcm_rd_pos);
         }
 
-        if (avail >= (sample_rate << 2))
+        if (avail >= (sample_rate << 2) ||
+            avail >= 3*(PCM_NUM_CHUNKS*PCM_CHUNK_SIZE) / 4)
         {
-            /* Filling up - boost codec */
+            /* Filling up - 1s data available or more or 3/4 full or more -
+               boost codec */
             trigger_cpu_boost();
         }
 
