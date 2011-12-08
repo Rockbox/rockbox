@@ -26,7 +26,7 @@
 #include "system.h"
 #include "power.h"
 #include "panic.h"
-#include "ata-target.h"
+#include "ata-driver.h"
 #include "dm320.h"
 #include "ata.h"
 #include "string.h"

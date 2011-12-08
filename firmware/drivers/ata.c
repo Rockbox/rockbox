@@ -32,7 +32,7 @@
 #include "power.h"
 #include "string.h"
 #include "ata_idle_notify.h"
-#include "ata-target.h"
+#include "ata-driver.h"
 #include "ata-defines.h"
 #include "storage.h"
 
@@ -240,8 +240,6 @@ STATICIRAM ICODE_ATTR int wait_for_rdy(void)
     return 0; /* timeout */
 }
 #else
-extern int ata_wait_for_bsy(void);
-extern int ata_wait_for_rdy(void);
 #define wait_for_bsy    ata_wait_for_bsy
 #define wait_for_rdy    ata_wait_for_rdy
 #endif
@@ -1265,7 +1263,7 @@ static int set_features(void)
         }
     }
 
-#ifdef ATA_SET_DEVICE_FEATURES
+#ifdef ATA_SET_PIO_TIMING
     ata_set_pio_timings(pio_mode);
 #endif
 

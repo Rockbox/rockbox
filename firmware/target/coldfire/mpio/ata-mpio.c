@@ -25,7 +25,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
-#include "ata-target.h"
+#include "ata-driver.h"
 
 void ata_reset(void)
 {

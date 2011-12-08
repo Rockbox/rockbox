@@ -36,11 +36,5 @@
 #define ATA_SELECT      (*((volatile unsigned short*)(ATA_IOBASE + 0x2c)))
 #define ATA_COMMAND     (*((volatile unsigned short*)(ATA_IOBASE + 0x2e)))
 
-void ata_reset(void);
-void ata_enable(bool on);
-void ata_device_init(void);
-bool ata_is_coldstart(void);
 
-void copy_read_sectors(unsigned char* buf, int wordcount);
-void copy_write_sectors(const unsigned char* buf, int wordcount);
 #endif

@@ -19,6 +19,9 @@
  *
  ****************************************************************************/
 
+#ifndef ATA_TARGET_H
+#define ATA_TARGET_H
+
 /* Plain C read & write loops */
 
 #define ATA_IOBASE      0x02400000
@@ -33,7 +36,4 @@
 #define ATA_CONTROL     (*((volatile unsigned char*)(ATA_IOBASE + 0x340)))
 #define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x380)))
 
-void ata_reset(void);
-void ata_enable(bool on);
-bool ata_is_coldstart(void);
-void ata_device_init(void);
+#endif /* ATA_TARGET_H */

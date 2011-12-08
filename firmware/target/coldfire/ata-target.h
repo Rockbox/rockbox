@@ -42,11 +42,5 @@
 #define ATA_IN8(reg) ((reg) >> 8)
 #define ATA_IN16(reg) (swap16(reg))
 
-void ata_reset(void);
-void ata_enable(bool on);
-void ata_device_init(void);
-bool ata_is_coldstart(void);
 
-void copy_read_sectors(unsigned char* buf, int wordcount);
-void copy_write_sectors(const unsigned char* buf, int wordcount);
 #endif

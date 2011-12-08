@@ -25,9 +25,8 @@
 #include "system.h"
 #include "power.h"
 #include "panic.h"
-#include "ata.h"
+#include "ata-driver.h"
 #include "ata-defines.h"
-#include "ata-target.h"
 #include "ccm-imx31.h"
 #ifdef HAVE_ATA_DMA
 #include "sdma-imx31.h"

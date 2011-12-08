@@ -19,6 +19,11 @@
  *
  ****************************************************************************/
 
+#ifndef ATA_TARGET_H
+#define ATA_TARGET_H
+
+#include "config.h"
+
 #ifdef CPU_PP
 
 #ifdef HAVE_BOOTLOADER_USB_MODE
@@ -49,16 +54,10 @@
 /* asm optimized reading and writing */
 #define ATA_OPTIMIZED_READING
 #define ATA_OPTIMIZED_WRITING
-void copy_read_sectors(unsigned char* buf, int wordcount);
-void copy_write_sectors(const unsigned char* buf, int wordcount);
 
 #endif /* CONFIG_CPU */
 
 #endif
-
-void ata_reset(void);
-bool ata_is_coldstart(void);
-void ata_device_init(void);
 
 #ifdef HAVE_ATA_DMA
 
@@ -88,8 +87,6 @@ void ata_device_init(void);
 #define ATA_MAX_UDMA 1
 #endif
 
-void ata_dma_set_mode(unsigned char mode);
-bool ata_dma_setup(void *addr, unsigned long bytes, bool write);
-bool ata_dma_finish(void);
-
 #endif /* HAVE_ATA_DMA */
+
+#endif /* ATA_TARGET_H */

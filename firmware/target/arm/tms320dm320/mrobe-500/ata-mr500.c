@@ -27,8 +27,7 @@
 #include "power.h"
 #include "panic.h"
 #include "pcf50606.h"
-#include "ata.h"
-#include "ata-target.h"
+#include "ata-driver.h"
 #include "backlight-target.h"
 
 /* ARESET on C7C68300 and RESET on ATA interface (Active Low) */

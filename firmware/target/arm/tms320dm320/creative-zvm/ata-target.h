@@ -32,8 +32,6 @@
 #define copy_read_sectors dma_ata_read
 #define copy_write_sectors dma_ata_write
 */
-void copy_read_sectors(const unsigned char* buf, int wordcount);
-void copy_write_sectors(const unsigned char* buf, int wordcount);
 
 /* Nasty hack, but Creative is nasty... */
 #define ata_read_sectors _ata_read_sectors
@@ -53,10 +51,6 @@ extern int _ata_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
 #define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE+0xE)))
 #define ATA_CONTROL     (*((volatile unsigned char*)(ATA_IOBASE+0x800C)))
 
-void ata_reset(void);
-void ata_device_init(void);
-bool ata_is_coldstart(void);
-void ide_power_enable(bool on);
 #ifdef BOOTLOADER
 int load_minifs_file(char* filename, unsigned char* location);
 #endif

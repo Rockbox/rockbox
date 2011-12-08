@@ -21,6 +21,8 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
+#include "config.h"
+
 #ifdef BOOTLOADER
 #define ATA_DRIVER_CLOSE
 #endif
@@ -46,12 +48,8 @@
 #define ATA_COMMAND     ATA_DRIVE_COMMAND
 #define ATA_CONTROL     ATA_DRIVE_CONTROL
 
-void ata_reset(void);
-void ata_device_init(void);
-bool ata_is_coldstart(void);
 
-#define ATA_SET_DEVICE_FEATURES
-void ata_set_pio_timings(int mode);
+#define ATA_SET_PIO_TIMING
 
 #define ATA_TARGET_POLLING
 

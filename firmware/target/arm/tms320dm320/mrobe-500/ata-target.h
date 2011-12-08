@@ -31,8 +31,6 @@
 #define ATA_OPTIMIZED_READING
 #define ATA_OPTIMIZED_WRITING
 
-void copy_read_sectors(const unsigned char* buf, int wordcount);
-void copy_write_sectors(const unsigned char* buf, int wordcount);
 #endif
 
 #define ATA_IOBASE      0x50000000
@@ -49,8 +47,5 @@ void copy_write_sectors(const unsigned char* buf, int wordcount);
 #define ATA_COMMAND     (*((volatile unsigned char*)(REGISTER_OFFSET + (0x07 << IDE_SHIFT))))
 #define ATA_CONTROL     (*((volatile unsigned char*)(CONTROL_OFFSET  + (0x06 << IDE_SHIFT))))
 
-void ata_reset(void);
-void ata_device_init(void);
-bool ata_is_coldstart(void);
 
 #endif

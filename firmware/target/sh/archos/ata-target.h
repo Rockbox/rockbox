@@ -41,11 +41,5 @@
 
 extern volatile unsigned char* ata_control;
 
-void ata_reset(void);
-void ata_enable(bool on);
-void ata_device_init(void);
-bool ata_is_coldstart(void);
 
-void copy_read_sectors(unsigned char* buf, int wordcount);
-void copy_write_sectors(const unsigned char* buf, int wordcount);
 #endif

@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include "kernel.h"
 #include "system.h"
-#include "ata-target.h"
+#include "ata-driver.h"
 #include "hwcompat.h"
 
 #define ATA_CONTROL1    ((volatile unsigned char*)0x06200206)

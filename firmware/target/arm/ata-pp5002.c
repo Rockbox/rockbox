@@ -23,8 +23,7 @@
 
 #include <stdbool.h>
 #include "system.h"
-#include "ata.h"
-#include "ata-target.h"
+#include "ata-driver.h"
 
 void ata_reset() 
 {

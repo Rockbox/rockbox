@@ -30,7 +30,6 @@
 #define PREFER_C_WRITING
 #if !defined(BOOTLOADER)
 #define ATA_OPTIMIZED_READING
-void copy_read_sectors(unsigned char* buf, int wordcount);
 #endif
 
 #define ATA_IOBASE      0x18000000
@@ -44,8 +43,5 @@ void copy_read_sectors(unsigned char* buf, int wordcount);
 #define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x0E)))
 #define ATA_CONTROL     (*((volatile unsigned char*)(0x20000000 + 0x1C)))
 
-void ata_reset(void);
-void ata_device_init(void);
-bool ata_is_coldstart(void);
 
 #endif
