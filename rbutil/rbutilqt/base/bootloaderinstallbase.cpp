@@ -139,7 +139,7 @@ void BootloaderInstallBase::downloadBlFinish(bool error)
 
 void BootloaderInstallBase::installBlfile(void)
 {
-    qDebug() << "[BootloaderInstallBase]" << __func__;
+    qDebug() << "[BootloaderInstallBase] installBlFile(void)";
 }
 
 

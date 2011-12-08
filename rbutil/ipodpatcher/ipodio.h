@@ -23,9 +23,14 @@
 #define __IPODIO_H
 
 #include <stdint.h>
+#if !defined(_WIN32)
 #include <unistd.h>
+#elif defined(_MSC_VER)
+/* MSVC uses a different name for ssize_t */
+#define ssize_t SSIZE_T
+#endif
 
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(_WIN32)
 #include <windows.h>
 #else
 #define HANDLE int

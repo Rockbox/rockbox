@@ -23,7 +23,9 @@
 #define __SANSAIO_H
 
 #include <stdint.h>
-#include <unistd.h>
+#if !defined(_MSC_VER)
+#include <unistd.h> /* not available on MSVC */
+#endif
 
 #if defined(__WIN32__) || defined(_WIN32)
 #include <windows.h>
