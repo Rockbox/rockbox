@@ -281,6 +281,8 @@ settings. With a shortcut,
         \setting{Quick Screen})
   \item A debug menu item can be displayed (useful for developers mostly)
   \item The \dap{} can be turned off
+  \item A shortcut to have the time spoken
+  \item A shortcut to confgure the sleep timer
 \end{itemize}
 
 \note{Shortcuts into the database are not possible}
@@ -311,6 +313,9 @@ Available types are:
 \item[separator] \config{data} is ignored; \config{name} can be used to display text,
   or left blank to make the list more accessible with visual gaps
 \item[shutdown] \config{data} is ignored; \config{name} can be used to display text
+\item[time] \config{data} needs to be either ``talk`` to talk the time, or ``sleep X``
+  where X is the number of minutes to run the sleep timer for (0 to disable). \config{name}
+  is required for this shortcut type.
 \end{description}
 
 If the name/icon items are not specified, a sensible default will be used.

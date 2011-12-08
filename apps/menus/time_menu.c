@@ -139,7 +139,7 @@ MENUITEM_FUNCTION(alarm_wake_up_screen, 0, ID2P(LANG_ALARM_WAKEUP_SCREEN),
 MENUITEM_SETTING(sleeptimer_on_startup,
                  &global_settings.sleeptimer_on_startup, NULL);
 
-static void talk_timedate(void)
+void talk_timedate(void)
 {
     struct tm *tm = get_time();
     if (!global_settings.talk_menu)

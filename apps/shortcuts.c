@@ -55,6 +55,7 @@ static const char * const type_strings[SHORTCUT_TYPE_COUNT] = {
     [SHORTCUT_PLAYLISTMENU] = "playlist menu",
     [SHORTCUT_SEPARATOR] = "separator",
     [SHORTCUT_SHUTDOWN] = "shutdown",
+    [SHORTCUT_TIME] = "time",
 };
 
 struct shortcut {
@@ -64,6 +65,12 @@ struct shortcut {
     union {
         char path[MAX_PATH];
         const struct settings_list *setting;
+        struct {
+#if CONFIG_RTC
+            bool talktime;
+#endif
+            int sleep_timeout;
+        } timedata;
     } u;
 };
 #define SHORTCUTS_PER_HANDLE 32
@@ -135,11 +142,11 @@ static bool verify_shortcut(struct shortcut* sc)
         case SHORTCUT_BROWSER:
         case SHORTCUT_FILE:
         case SHORTCUT_PLAYLISTMENU:
-            if (sc->u.path[0] == '\0')
-                return false;
-            break;
+            return sc->u.path[0] != '0';
         case SHORTCUT_SETTING:
             return sc->u.setting != NULL;
+        case SHORTCUT_TIME:
+            return sc->name[0] != '0';
         case SHORTCUT_DEBUGITEM:
         case SHORTCUT_SEPARATOR:
         case SHORTCUT_SHUTDOWN:
@@ -193,7 +200,7 @@ void shortcuts_ata_idle_callback(void* data)
          */
          reset_shortcuts();
          shortcuts_init();
-    }    
+    }
     first_idx_to_writeback = -1;
 }
 
@@ -212,7 +219,6 @@ void shortcuts_add(enum shortcut_type type, const char* value)
         first_idx_to_writeback = shortcut_count - 1;
     register_storage_idle_func(shortcuts_ata_idle_callback);
 }
-        
 
 int readline_cb(int n, char *buf, void *parameters)
 {
@@ -261,6 +267,20 @@ int readline_cb(int n, char *buf, void *parameters)
                     break;
                 case SHORTCUT_SETTING:
                     sc->u.setting = find_setting_by_cfgname(value, NULL);
+                    break;
+                case SHORTCUT_TIME:
+#if CONFIG_RTC
+                    if (!strcasecmp(value, "talk"))
+                        sc->u.timedata.talktime = true;
+                    else
+#endif
+                    if (!strncasecmp(value, "sleep ", strlen("sleep ")))
+                    {
+                        sc->u.timedata.talktime = false;
+                        sc->u.timedata.sleep_timeout = atoi(&value[strlen("sleep ")]);
+                    }
+                    else
+                        sc->type = SHORTCUT_UNDEFINED; /* error */
                     break;
                 case SHORTCUT_SEPARATOR:
                 case SHORTCUT_SHUTDOWN:
@@ -314,7 +334,7 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
         return "";
     if (sc->type == SHORTCUT_SETTING)
         return sc->name[0] ? sc->name : P2STR(ID2P(sc->u.setting->lang_id));
-    else if (sc->type == SHORTCUT_SEPARATOR)
+    else if (sc->type == SHORTCUT_SEPARATOR || sc->type == SHORTCUT_TIME)
         return sc->name;
     else if (sc->type == SHORTCUT_SHUTDOWN && sc->name[0] == '\0')
     {
@@ -354,12 +374,18 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
                 return Icon_Playlist;
             case SHORTCUT_SHUTDOWN:
                 return Icon_System_menu;
+            case SHORTCUT_TIME:
+                return Icon_Menu_functioncall;
             default:
                 break;
         }
     }
     return sc->icon;
 }
+
+void talk_timedate(void);
+const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
+                                  int value, const char* unit);
 
 int do_shortcut_menu(void *ignored)
 {
@@ -377,7 +403,7 @@ int do_shortcut_menu(void *ignored)
     list.title_icon = Icon_Bookmark;
 
     push_current_activity(ACTIVITY_SHORTCUTSMENU);
-    
+
     while (done == GO_TO_PREVIOUS)
     {
         if (simplelist_show_list(&list))
@@ -433,6 +459,20 @@ int do_shortcut_menu(void *ignored)
                     else
 #endif
                         sys_poweroff();
+                    break;
+                case SHORTCUT_TIME:
+#if CONFIG_RTC
+                    if (sc->u.timedata.talktime)
+                        talk_timedate();
+                    else
+#endif
+                    {
+                        char timer_buf[10];
+                        set_sleep_timer(sc->u.timedata.sleep_timeout * 60);
+                        splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER), 
+                                sleep_timer_formatter(timer_buf, sizeof(timer_buf),
+                                                      sc->u.timedata.sleep_timeout, NULL));
+                    }
                     break;
                 case SHORTCUT_UNDEFINED:
                 default:
