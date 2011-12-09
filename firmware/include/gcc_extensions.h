@@ -57,4 +57,13 @@
 #define FORCE_INLINE inline
 #endif
 
+
+/* Version information from http://ohse.de/uwe/articles/gcc-attributes.html */
+#if defined(__GNUC__) && (__GNUC__ >= 4 || \
+                    (__GNUC__ >= 3 && __GNUC_MINOR__ >= 1))
+#define USED_ATTR __attribute__((used))
+#else
+#define USED_ATTR
+#endif
+
 #endif /* _GCC_EXTENSIONS_H_ */

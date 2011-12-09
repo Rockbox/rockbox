@@ -21,12 +21,14 @@
  *
  ****************************************************************************/
 
+#include "gcc_extensions.h"
+
 /*---------------------------------------------------------------------------
  * Start the thread running and terminate it if it returns
  *---------------------------------------------------------------------------
  */
 void start_thread(void); /* Provide C access to ASM label */
-static void __attribute__((used)) __start_thread(void)
+static void USED_ATTR __start_thread(void)
 {
     /* a0=macsr, a1=context */
     asm volatile (

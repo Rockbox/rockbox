@@ -23,6 +23,7 @@
 #include "panic.h"
 #include "mmu-arm.h"
 #include "cpu.h"
+#include "gcc_extensions.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -60,7 +61,7 @@ default_interrupt(SPI1);
 default_interrupt(RTC);
 default_interrupt(ADC);
 
-static void (* const irqvector[32])(void) __attribute__((__used__)) =
+static void (* const irqvector[32])(void) USED_ATTR =
 {
     EINT0, EINT1, EINT2, EINT3,
     EINT4_7, EINT8_23, CAM, nBATT_FLT, TICK, WDT_AC97,

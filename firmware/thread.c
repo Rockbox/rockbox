@@ -30,6 +30,8 @@
 #ifdef RB_PROFILE
 #include <profile.h>
 #endif
+#include "gcc_extensions.h"
+
 /****************************************************************************
  *                              ATTENTION!!                                 *
  *    See notes below on implementing processor-specific portions!          *
@@ -163,7 +165,7 @@ static inline void load_context(const void* addr)
 
 #if NUM_CORES > 1
 static void thread_final_exit_do(struct thread_entry *current)
-    __attribute__((noinline, noreturn, used));
+    __attribute__((noinline, noreturn)) USED_ATTR;
 #else
 static inline void thread_final_exit(struct thread_entry *current)
     __attribute__((always_inline, noreturn));

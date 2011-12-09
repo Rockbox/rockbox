@@ -23,11 +23,13 @@
  ****************************************************************************/
 
 #include <system.h>
+#include "gcc_extensions.h"
+
 /*---------------------------------------------------------------------------
  * Start the thread running and terminate it if it returns
  *---------------------------------------------------------------------------
  */
-static void __attribute__((naked,used)) start_thread(void)
+static void __attribute__((naked)) USED_ATTR start_thread(void)
 {
     /* r0 = context */
     asm volatile (

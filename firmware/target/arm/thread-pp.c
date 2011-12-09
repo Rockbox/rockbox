@@ -21,6 +21,8 @@
  *
  ****************************************************************************/
 
+#include "gcc_extensions.h"
+
 #if defined(MAX_PHYS_SECTOR_SIZE) && MEMORYSIZE == 64
 /* Support a special workaround object for large-sector disks */
 #define IF_NO_SKIP_YIELD(...) __VA_ARGS__
@@ -546,7 +548,7 @@ void core_wake(unsigned int othercore)
 #endif /* CPU_PPxxxx */
 
 /* Keep constant pool in range of inline ASM */
-static void __attribute__((naked, used)) dump_ltorg(void)
+static void __attribute__((naked)) USED_ATTR dump_ltorg(void)
 {
     asm volatile (".ltorg");
 }

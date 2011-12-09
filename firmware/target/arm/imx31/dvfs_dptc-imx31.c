@@ -29,6 +29,7 @@
 #include "avic-imx31.h"
 #include "dvfs_dptc-imx31.h"
 #include "dvfs_dptc_tables-target.h"
+#include "gcc_extensions.h"
 
 /* Most of the code in here is based upon the Linux BSP provided by Freescale
  * Copyright 2004-2008 Freescale Semiconductor, Inc. All Rights Reserved. */
@@ -181,7 +182,7 @@ static void set_current_dvfs_level(unsigned int level)
 }
 
 /* DVFS Interrupt handler */
-static void __attribute__((used)) dvfs_int(void)
+static void USED_ATTR dvfs_int(void)
 {
     unsigned long pmcr0 = CCM_PMCR0;
     unsigned long fsvai = pmcr0 & CCM_PMCR0_FSVAI;
