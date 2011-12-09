@@ -28,9 +28,13 @@
 #if CONFIG_CPU == PP5002
 /* There's far less time to do mixing because HW FIFOs are short */
 #define MIX_FRAME_SAMPLES 64
-#else
+#elif (CONFIG_PLATFORM & PLATFORM_MAEMO5)
+/* Maemo 5 needs 2048 samples for decent performance.
+   Otherwise the locking overhead inside gstreamer costs too much */
+#define MIX_FRAME_SAMPLES 2048
 /* Assume HW DMA engine is available or sufficient latency exists in the
    PCM pathway */
+#else
 #define MIX_FRAME_SAMPLES 256
 #endif
 
