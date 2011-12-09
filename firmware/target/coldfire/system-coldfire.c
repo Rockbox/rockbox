@@ -171,7 +171,7 @@ default_interrupt (ADC);  /* A/D converter */
 #endif
 
 static void system_display_exception_info(unsigned long format,
-    unsigned long pc) __attribute__ ((noreturn)) USED_ATTR;
+    unsigned long pc) NORETURN_ATTR USED_ATTR;
 static void system_display_exception_info(unsigned long format,
                                           unsigned long pc)
 {

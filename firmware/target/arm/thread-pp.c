@@ -211,7 +211,7 @@ static void INIT_ATTR core_thread_init(unsigned int core)
  * to use a stack from an unloaded module until another thread runs on it.
  *---------------------------------------------------------------------------
  */
-static inline void __attribute__((noreturn,always_inline))
+static inline void NORETURN_ATTR __attribute__((always_inline))
     thread_final_exit(struct thread_entry *current)
 {
     asm volatile (

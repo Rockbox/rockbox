@@ -165,10 +165,10 @@ static inline void load_context(const void* addr)
 
 #if NUM_CORES > 1
 static void thread_final_exit_do(struct thread_entry *current)
-    __attribute__((noinline, noreturn)) USED_ATTR;
+    __attribute__((noinline)) NORETURN_ATTR USED_ATTR;
 #else
 static inline void thread_final_exit(struct thread_entry *current)
-    __attribute__((always_inline, noreturn));
+    __attribute__((always_inline)) NORETURN_ATTR;
 #endif
 
 void switch_thread(void)
