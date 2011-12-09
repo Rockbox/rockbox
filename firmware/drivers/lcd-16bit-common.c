@@ -978,15 +978,24 @@ static inline int clamp(int val, int min, int max)
     return val;
 }
 
-__attribute__((weak)) void lcd_yuv_set_options(unsigned options)
+#ifndef _WIN32
+/*
+ * weak attribute doesn't work for win32 as of gcc 4.6.2 and binutils 2.21.52
+ * When building win32 simulators, we won't be using an optimized version of
+ * lcd_blit_yuv(), so just don't use the weak attribute.
+ */
+__attribute__((weak))
+#endif
+void lcd_yuv_set_options(unsigned options)
 {
     (void)options;
 }
 
-/* Draw a partial YUV colour bitmap - similiar behavior to lcd_blit_yuv
-   in the core */
-
-__attribute__((weak)) void lcd_blit_yuv(unsigned char * const src[3],
+/* Draw a partial YUV colour bitmap */
+#ifndef _WIN32
+__attribute__((weak))
+#endif
+void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
