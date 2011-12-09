@@ -33,6 +33,7 @@
 #include "playback.h"
 #include "kernel.h"
 
+#include <pthread.h>
 #include <SDL.h>
 #include <glib.h>
 #include <gst/gst.h>
@@ -92,14 +93,33 @@ GMainLoop *pcm_loop = NULL;
 static __u8* pcm_data = NULL;
 static size_t pcm_data_size = 0;
 
+static int audio_locked = 0;
+static pthread_mutex_t audio_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int inside_feed_data = 0;
+
+/*
+ * mutex lock/unlock wrappers neatness' sake
+ */
+static inline void lock_audio(void)
+{
+    pthread_mutex_lock(&audio_lock_mutex);
+}
+
+static inline void unlock_audio(void)
+{
+    pthread_mutex_unlock(&audio_lock_mutex);
+}
 
 void pcm_play_lock(void)
 {
+    if (++audio_locked == 1)
+        lock_audio();
 }
 
 void pcm_play_unlock(void)
 {
+    if (--audio_locked == 0)
+        unlock_audio();
 }
 
 void pcm_dma_apply_settings(void)
@@ -163,6 +183,8 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
     (void)size_hint;
     (void)unused;
 
+    lock_audio();
+
     /* Make sure we don't trigger a gst_element_set_state() call
        from inside gstreamer's stream thread as it will deadlock */
     inside_feed_data = 1;
@@ -191,6 +213,8 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
     }
 
     inside_feed_data = 0;
+
+    unlock_audio();
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
@@ -395,6 +419,8 @@ void pcm_shutdown_gstreamer(void)
 
     g_main_loop_quit(pcm_loop);
     g_main_loop_unref (pcm_loop);
+
+    pthread_mutex_destroy(&audio_lock_mutex);
 }
 
 void pcm_play_dma_postinit(void)
