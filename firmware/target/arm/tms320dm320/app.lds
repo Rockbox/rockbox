@@ -69,6 +69,7 @@ SECTIONS
     {
         . = ALIGN(0x4);
         loadaddress = .;
+        _loadaddress = .;
         *(.init)
     } > DRAM
 
@@ -129,6 +130,7 @@ SECTIONS
         *(.bss*)
         *(COMMON)
        	_bss_end = .;
+       	_end = .;
     } > DRAM
 
     .ibss (NOLOAD) :
