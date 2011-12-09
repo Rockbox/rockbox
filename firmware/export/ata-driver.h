@@ -26,15 +26,19 @@
 #include "ata-target.h" /* for other target-specific defines */
 
  /* Returns true if the interface hasn't been initialised yet */
-bool ata_is_coldstart(void);
+bool ata_is_coldstart(void) STORAGE_INIT_ATTR;
 /* Initializes the interface */
-void ata_device_init(void);
+void ata_device_init(void) STORAGE_INIT_ATTR;
 /* ata_enable(true) is used after ata_device_init() to enable the interface
  * ata_enable(false) is used to disable the interface so 
  * an ATA to USB bridge chip can use it instead.*/
 void ata_enable(bool on);
 /* ATA hard reset: pulse the RESET pin */
+#ifdef HAVE_ATA_POWER_OFF
 void ata_reset(void);
+#else
+void ata_reset(void) STORAGE_INIT_ATTR;
+#endif
 
 /* Optional optimized target-specific PIO transfer */
 #ifdef ATA_OPTIMIZED_READING
