@@ -633,7 +633,7 @@ pandoracc () {
  thread_support="HAVE_SIGALTSTACK_THREADS"
 
  # Include path
- GCCOPTS="-I$PNDSDK/arm-angstrom-linux-gnueabi/usr/include"
+ GCCOPTS="$GCCOPTS -I$PNDSDK/arm-angstrom-linux-gnueabi/usr/include"
 
  # Set up compiler
  gccchoice="4.3.3"
