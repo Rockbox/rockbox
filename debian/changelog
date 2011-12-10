@@ -1,3 +1,12 @@
+rockbox (2011-12-10maemo1) unstable; urgency=low
+
+  * Update to rockbox 3.10 code base (r31165)
+  * Patch: Added software mixer performance fix on N900
+  * Patch: Added pcm locking code on N900
+  * Patch: Assembler optimized software mixing (FS #12421)
+
+ -- Thomas Jarosch <tomj@simonv.com>  Sat, 10 Dec 2011 19:00:00 +0100
+
 rockbox (2011-06-28maemo1) unstable; urgency=low
 
   * Update to rockbox 3.9 code base
