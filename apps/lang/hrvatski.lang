@@ -1530,7 +1530,7 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: ""Tulum" način"
+    *: ""
   </dest>
   <voice>
     *: "Tulum način"
@@ -1682,7 +1682,6 @@
   </source>
   <dest>
     *: none
-    crossfade: "Način rada "Utišaj""
   </dest>
   <voice>
     *: none
@@ -2234,6 +2233,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Izgrađivanje baze podataka... %d pronađeno (OFF za povratak)"
@@ -2242,6 +2242,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Izgrađivanje baze podataka... %d pronađeno (LEFT za povratak)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Izgrađivanje baze podataka... %d pronađeno (PREV za povratak)"
     gogearsa9200: "Izgrađivanje baze podataka... %d pronađeno (REW za povratak)"
+    archosplayer: "Izgrađivanje DB %d pronađeno"
   </dest>
   <voice>
     *: "pronađeni unosi za bazu podataka"
@@ -4404,7 +4405,6 @@
   </source>
   <dest>
     *: none
-    charging: "Način rada "Automobilski adapter""
   </dest>
   <voice>
     *: none
@@ -9685,7 +9685,6 @@
   </source>
   <dest>
     *: none
-    swcodec: "Način "Uređivanje": %s %s"
   </dest>
   <voice>
     *: none
@@ -11175,11 +11174,9 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Način rada "Ekran na dodir""
   </dest>
   <voice>
     *: none
-    touchscreen: "Način rada "Ekran na dodir""
   </voice>
 </phrase>
 <phrase>
@@ -11421,11 +11418,9 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Način "USB Keypad""
   </dest>
   <voice>
     *: none
-    usb_hid: "Način "USB Keypad""
   </voice>
 </phrase>
 <phrase>
@@ -12739,5 +12734,140 @@
   </dest>
   <voice>
     *: "Samo u prilagođenim direktorijima"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Glifovi u privremenu memoriju"
+  </dest>
+  <voice>
+    *: "Glifovi u privremenu memoriju"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Klik tipke zvučnika"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Klik tipke zvučnika"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Klik tipke slušalica"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Klik tipke slušalica"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Razmaci između redaka u popisima"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Razmaci između redaka u popisima"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatsko"
+  </dest>
+  <voice>
+    *: "Automatsko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Prečaci"
+  </dest>
+  <voice>
+    *: "Prečaci"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Otkaži tajmer spavanja"
+  </dest>
+  <voice>
+    *: "Otkaži tajmer spavanja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Uobičajeno trajanje tajmera spavanja"
+  </dest>
+  <voice>
+    *: "Uobičajeno trajanje tajmera spavanja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Pokreni tajmer spavanja pri paljenju "
+  </dest>
+  <voice>
+    *: "Pokreni tajmer spavanja pri paljenju "
   </voice>
 </phrase>
