@@ -23,7 +23,6 @@
  ****************************************************************************/
 
 #include <system.h>
-#include "gcc_extensions.h"
 
 /*---------------------------------------------------------------------------
  * Start the thread running and terminate it if it returns
