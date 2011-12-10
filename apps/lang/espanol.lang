@@ -6774,7 +6774,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -8463,6 +8463,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Construyendo base de datos... %d encontrados (OFF para volver)"
@@ -8471,9 +8472,10 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construyendo base de datos... %d encontrados (LEFT para volver)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Construyendo base de datos... %d encontrados (PREV para volver)"
     gogearsa9200: "Construyendo base de datos... %d encontrados (REW para volver)"
+    archosplayer: "Construyendo BD %d encontrados"
   </dest>
   <voice>
-    *: "elementos encontrados para la base de datos"
+    *: "Construyendo base de datos... %d encontrados"
   </voice>
 </phrase>
 <phrase>
@@ -10238,7 +10240,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -12255,15 +12257,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Realce 3D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Realce 3D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Realce 3 D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Realce 3 D"
   </voice>
 </phrase>
 <phrase>
@@ -12667,5 +12669,151 @@
   </dest>
   <voice>
     *: "Rebobinado al entrar en pausa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Lista de reproducción actual"
+  </dest>
+  <voice>
+    *: "Lista de reproducción actual"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "USB oculta el disco interno"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "USB oculta el disco interno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Fijar como directorio de catálogos de listas"
+  </dest>
+  <voice>
+    *: "Fijar como directorio de catálogos de listas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Relleno de líneas en listas"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Relleno de líneas en listas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "¿Guardar cambios?"
+  </dest>
+  <voice>
+    *: "¿Guardar cambios?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automático"
+  </dest>
+  <voice>
+    *: "Automático"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Cancelar temporizador de apagado"
+  </dest>
+  <voice>
+    *: "Cancelar temporizador de apagado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Duración predeterminada del temporizador de apagado"
+  </dest>
+  <voice>
+    *: "Duración predeterminada del temporizador de apagado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Reiniciar el directorio de catálogos de listas"
+  </dest>
+  <voice>
+    *: "Reiniciar el directorio de catálogos de listas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Iniciar temporizador de apagado al arrancar"
+  </dest>
+  <voice>
+    *: "Iniciar temporizador de apagado al arrancar"
   </voice>
 </phrase>
