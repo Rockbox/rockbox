@@ -224,7 +224,7 @@ void system_init(void)
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 #endif
 
-    CGU_PERI &= ~(1<<24);   /*disable built in boot rom clock*/
+    CGU_PERI &= ~CGU_ROM_ENABLE;   /*disable built in boot rom clock*/
 
     /* bits 31:30 should be set to 0 in arm926-ejs */
     asm volatile(
@@ -315,6 +315,9 @@ void system_reboot(void)
     _backlight_off();
 
     disable_irq();
+
+    /* re-enable internal ROM */
+    CGU_PERI |= CGU_ROM_ENABLE;
 
     /* use watchdog to reset */
     CGU_PERI |= (CGU_WDOCNT_CLOCK_ENABLE | CGU_WDOIF_CLOCK_ENABLE);

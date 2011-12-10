@@ -223,6 +223,7 @@ CE lines
 /* --- are disabled after reset --- */
 #define CGU_EXTMEM_CLOCK_ENABLE              ( 1 << 27 ) /* external memory */
 #define CGU_EXTMEMIF_CLOCK_ENABLE            ( 1 << 26 ) /* ext mem AHB IF */
+#define CGU_ROM_ENABLE                       ( 1 << 24 ) /* internal ROM */
 #define CGU_DMA_CLOCK_ENABLE                 ( 1 << 22 ) /* dma */
 #define CGU_USB_CLOCK_ENABLE                 ( 1 << 21 ) /* usb */
 #define CGU_I2SOUT_APB_CLOCK_ENABLE          ( 1 << 20 ) /* i2sout */
