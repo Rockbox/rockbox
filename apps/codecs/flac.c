@@ -27,6 +27,7 @@ CODEC_HEADER
 /* The output buffers containing the decoded samples (channels 0 and 1) */
 static int32_t decoded0[MAX_BLOCKSIZE] IBSS_ATTR_FLAC_DECODED0;
 static int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR;
+static int32_t dummydec[MAX_BLOCKSIZE];
 
 #define MAX_SUPPORTED_SEEKTABLE_SIZE 5000
 
@@ -80,11 +81,26 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     uint16_t blocksize;
     int endofmetadata=0;
     uint32_t blocklength;
+    int ch;
 
     ci->memset(fc,0,sizeof(FLACContext));
     nseekpoints=0;
 
     fc->sample_skip = 0;
+    
+    /* Reset sample buffers */
+    memset(decoded0, 0, sizeof(decoded0));
+    memset(decoded1, 0, sizeof(decoded1));
+    memset(dummydec, 0, sizeof(dummydec));
+    
+    /* Set sample buffers in decoder structure */
+    fc->decoded[0] = decoded0;
+    fc->decoded[1] = decoded1;
+    for (ch=2; ch<MAX_CHANNELS; ++ch)
+    {
+        /* Only channel 0 and 1 are used, the other are decoded to scratch */
+        fc->decoded[ch] = dummydec;
+    }
 
     /* Skip any foreign tags at start of file */
     ci->seek_buffer(first_frame_offset);
@@ -231,7 +247,7 @@ static bool frame_sync(FLACContext* fc) {
     /* Decode the frame to verify the frame crc and
      * fill fc with its metadata.
      */
-    if(flac_decode_frame(fc, decoded0, decoded1,
+    if(flac_decode_frame(fc, 
        bit_buffer, buff_size, ci->yield) < 0) {
         return false;
     }
@@ -485,7 +501,7 @@ enum codec_status codec_run(void)
             ci->seek_complete();
         }
 
-        if((res=flac_decode_frame(&fc,decoded0,decoded1,buf,
+        if((res=flac_decode_frame(&fc,buf,
                              bytesleft,ci->yield)) < 0) {
              LOGF("FLAC: Frame %d, error %d\n",frame,res);
              return CODEC_ERROR;
@@ -494,7 +510,7 @@ enum codec_status codec_run(void)
         frame++;
 
         ci->yield();
-        ci->pcmbuf_insert(&decoded0[fc.sample_skip], &decoded1[fc.sample_skip],
+        ci->pcmbuf_insert(&fc.decoded[0][fc.sample_skip], &fc.decoded[1][fc.sample_skip],
                           fc.blocksize - fc.sample_skip);
         
         fc.sample_skip = 0;

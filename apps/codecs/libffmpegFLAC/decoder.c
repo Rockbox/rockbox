@@ -381,17 +381,13 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
 }
 
 static int decode_frame(FLACContext *s,
-                        int32_t* decoded0,
-                        int32_t* decoded1,
                         void (*yield)(void)) ICODE_ATTR_FLAC;
 static int decode_frame(FLACContext *s,
-                        int32_t* decoded0,
-                        int32_t* decoded1,
                         void (*yield)(void))
 {
     int blocksize_code, sample_rate_code, sample_size_code, assignment, crc8;
     int decorrelation, bps, blocksize, samplerate;
-    int res;
+    int res, ch;
     
     blocksize_code = get_bits(&s->gb, 4);
 
@@ -477,16 +473,10 @@ static int decode_frame(FLACContext *s,
     s->bps          = bps;
     s->decorrelation= decorrelation;
 
-    yield();
-    /* subframes */
-    if ((res=decode_subframe(s, 0, decoded0)) < 0)
-        return res-100;
-
-    yield();
-
-    if (s->channels==2) {
-      if ((res=decode_subframe(s, 1, decoded1)) < 0)
-          return res-200;
+    for (ch=0; ch<s->channels; ++ch) {
+        yield();
+        if ((res=decode_subframe(s, ch, s->decoded[ch])) < 0)
+            return res-100;
     }
     
     yield();
@@ -499,8 +489,6 @@ static int decode_frame(FLACContext *s,
 }
 
 int flac_decode_frame(FLACContext *s,
-                             int32_t* decoded0,
-                             int32_t* decoded1,
                              uint8_t *buf, int buf_size,
                              void (*yield)(void))
 {
@@ -516,68 +504,36 @@ int flac_decode_frame(FLACContext *s,
         return -41;
     }
 
-    if ((framesize=decode_frame(s,decoded0,decoded1,yield)) < 0){
+    if ((framesize=decode_frame(s,yield)) < 0){
        s->bitstream_size=0;
        s->bitstream_index=0;
        return framesize;
     }
 
     yield();
+    
+#define DECORRELATE(left, right)\
+             for (i = 0; i < s->blocksize; i++) {\
+                int a = s->decoded[0][i];\
+                int b = s->decoded[1][i];\
+                s->decoded[0][i] = (left)  << scale;\
+                s->decoded[1][i] = (right) << scale;\
+             }\
 
     scale=FLAC_OUTPUT_DEPTH-s->bps;
     switch(s->decorrelation)
     {
         case INDEPENDENT:
-            if (s->channels==1) {;
-                for (i = 0; i < s->blocksize; i++)
-                {
-                    decoded0[i] = decoded0[i] << scale;
-                }
-            } else {
-                for (i = 0; i < s->blocksize; i++)
-                {
-                    decoded0[i] = decoded0[i] << scale;
-                    decoded1[i] = decoded1[i] << scale;
-                }
-            }
+            DECORRELATE(a, b) /* Always decorrelate exactly the two supported channels. */
             break;
         case LEFT_SIDE:
-            //assert(s->channels == 2);
-            for (i = 0; i < s->blocksize; i++)
-            {
-                decoded1[i] = (decoded0[i] - decoded1[i]) << scale;
-                decoded0[i] = decoded0[i] << scale;
-            }
+            DECORRELATE(a, a-b)
             break;
         case RIGHT_SIDE:
-            //assert(s->channels == 2);
-            for (i = 0; i < s->blocksize; i++)
-            {
-                decoded0[i] = (decoded0[i] + decoded1[i]) << scale;
-                decoded1[i] = decoded1[i] << scale;
-            }
+            DECORRELATE(a+b, a)
             break;
         case MID_SIDE:
-            //assert(s->channels == 2);
-            for (i = 0; i < s->blocksize; i++)
-            {
-                int mid, side;
-                mid = decoded0[i];
-                side = decoded1[i];
-
-#if 1 //needs to be checked but IMHO it should be binary identical
-                mid -= side>>1;
-                decoded0[i] = (mid + side) << scale;
-                decoded1[i] = mid << scale;
-#else
-                
-                mid <<= 1;
-                if (side & 1)
-                    mid++;
-                decoded0[i] = ((mid + side) >> 1) << scale;
-                decoded1[i] = ((mid - side) >> 1) << scale;
-#endif
-            }
+            DECORRELATE( (a-=b>>1) + b, a)
             break;
     }
 
