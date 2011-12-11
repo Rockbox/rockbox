@@ -1108,9 +1108,6 @@ bool recording_screen(bool no_source)
     audiohw_enable_speaker(false);
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-    audio_close_recording();
-#endif
     audio_init_recording();
     sound_set_volume(global_settings.volume);
 
