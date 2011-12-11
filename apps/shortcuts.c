@@ -43,6 +43,7 @@
 #include "shortcuts.h"
 #include "onplay.h"
 #include "screens.h"
+#include "talk.h"
 
 
 #define MAX_SHORTCUT_NAME 32
@@ -61,6 +62,7 @@ static const char * const type_strings[SHORTCUT_TYPE_COUNT] = {
 struct shortcut {
     enum shortcut_type type;
     char name[MAX_SHORTCUT_NAME];
+    char talk_clip[MAX_PATH];
     int icon;
     union {
         char path[MAX_PATH];
@@ -161,6 +163,7 @@ static void init_shortcut(struct shortcut* sc)
     sc->type = SHORTCUT_UNDEFINED;
     sc->name[0] = '\0';
     sc->u.path[0] = '\0';
+    sc->talk_clip[0] = '\0';
     sc->icon = Icon_NOICON;
 }
 
@@ -296,6 +299,10 @@ int readline_cb(int n, char *buf, void *parameters)
                 sc->icon = atoi(value);
             }
         }
+        else if (!strcmp(name, "talkclip"))
+        {
+            strlcpy(sc->talk_clip, value, MAX_PATH);
+        }
     }
     return 0;
 }
@@ -381,6 +388,15 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
     return sc->icon;
 }
 
+int shortcut_menu_speak_item(int selected_item, void * data)
+{
+    (void)data;
+    struct shortcut *sc = get_shortcut(selected_item);
+    if (sc && sc->talk_clip[0])
+        talk_file(NULL, NULL, sc->talk_clip, NULL, NULL, false);
+    return 0;
+}
+
 void talk_timedate(void);
 const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
                                   int value, const char* unit);
@@ -399,6 +415,8 @@ int do_shortcut_menu(void *ignored)
     if (global_settings.show_icons)
         list.get_icon = shortcut_menu_get_icon;
     list.title_icon = Icon_Bookmark;
+    if (global_settings.talk_menu)
+        list.get_talk = shortcut_menu_speak_item;
 
     push_current_activity(ACTIVITY_SHORTCUTSMENU);
 
