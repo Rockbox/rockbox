@@ -208,10 +208,13 @@ static void rda5802_set_frequency(int freq)
 {
     int i;
     uint16_t readchan;
+    static const int spacings[] = {100000, 200000, 50000, 50000};
+    static const int bandstart[] = {87000000, 76000000, 76000000, 65000000};
 
-    /* check BAND and spacings */
-    int start = CHANNEL_BANDr(cache[CHANNEL]) & 1 ? 76000000 : 87000000;
-    int chan = (freq - start) / 50000;
+    /* calculate channel number */
+    int start = bandstart[CHANNEL_BANDr(cache[CHANNEL])];
+    int space = spacings[CHANNEL_SPACEr(cache[CHANNEL])];
+    int chan = (freq - start) / space;
 
     for (i = 0; i < 5; i++) {
         /* tune and wait a bit */
@@ -247,14 +250,16 @@ static int rda5802_tuned(void)
 static void rda5802_set_region(int region)
 {
     const struct fm_region_data *rd = &fm_region_data[region];
+
     int band = (rd->freq_min == 76000000) ?
                CHANNEL_BAND_760_900 : CHANNEL_BAND_870_1080;
     int deemphasis = (rd->deemphasis == 50) ? SYSCONFIG1_DE : 0;
+    int space = (rd->freq_step == 50000) ?
+                CHANNEL_SPACE_50KHZ : CHANNEL_SPACE_100KHZ;
 
-    uint16_t bandspacing = CHANNEL_BANDw(band) |
-                           CHANNEL_SPACEw(CHANNEL_SPACE_50KHZ);
     rda5802_write_masked(SYSCONFIG1, deemphasis, SYSCONFIG1_DE);
-    rda5802_write_masked(CHANNEL, bandspacing, CHANNEL_BAND | CHANNEL_SPACE);
+    rda5802_write_masked(CHANNEL, CHANNEL_BANDw(band), CHANNEL_BAND);
+    rda5802_write_masked(CHANNEL, CHANNEL_SPACEw(space), CHANNEL_SPACE);
     rda5802_write_cache();
 }
 
