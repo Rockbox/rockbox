@@ -625,15 +625,10 @@ static mpc_status mpc_demux_decode_inner(mpc_demux * d, mpc_frame_info * i)
 }
 
 mpc_status mpc_demux_decode(mpc_demux * d, mpc_frame_info * i) {
-	for(;;) {
-		// mpc_demux_decode_inner may return 0 samples and require repeated calls after a seek. Loop over until we have data to return.
 		mpc_status s = mpc_demux_decode_inner(d, i);
 		if (MPC_IS_FAILURE(s))
 			i->bits = -1; // we pretend it's end of file
-
-		if (MPC_IS_FAILURE(s) || i->samples > 0)
-			return s;
-	}
+        return s;
 }
 
 /* rockbox: not used
