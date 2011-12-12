@@ -665,7 +665,7 @@ static int sd_select_bank(signed char bank)
         dma_retain();
         /* we don't use the uncached buffer here, because we need the
          * physical memory address for DMA transfers */
-        dma_enable_channel(0, AS3525_PHYSICAL_ADDR(&aligned_buffer[0]),
+        dma_enable_channel(1, AS3525_PHYSICAL_ADDR(&aligned_buffer[0]),
             MCI_FIFO(INTERNAL_AS3525), DMA_PERI_SD,
             DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
 
@@ -809,7 +809,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 
         if(write)
         {
-            dma_enable_channel(0, dma_buf, MCI_FIFO(drive),
+            dma_enable_channel(1, dma_buf, MCI_FIFO(drive),
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
 
@@ -823,7 +823,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
 #endif
         }
         else
-            dma_enable_channel(0, MCI_FIFO(drive), dma_buf,
+            dma_enable_channel(1, MCI_FIFO(drive), dma_buf,
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
@@ -846,7 +846,7 @@ static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
          * dma channel here, otherwise there are still 4 words in the fifo
          * and the retried write will get corrupted.
          */
-        dma_disable_channel(0);
+        dma_disable_channel(1);
 
         last_disk_activity = current_tick;
 

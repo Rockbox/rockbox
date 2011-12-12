@@ -81,7 +81,7 @@ static void play_start_pcm(void)
 
     play_sub_size = size;
 
-    dma_enable_channel(1, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
+    dma_enable_channel(0, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
                 DMAC_FLOWCTRL_DMAC_MEM_TO_PERI, true, false, size >> 2,
                 DMA_S1, dma_callback);
 }
@@ -142,10 +142,10 @@ void pcm_play_dma_stop(void)
 {
     is_playing = false;
 
-    dma_disable_channel(1);
+    dma_disable_channel(0);
 
     /* Ensure byte counts read back 0 */
-    DMAC_CH_SRC_ADDR(1) = 0;
+    DMAC_CH_SRC_ADDR(0) = 0;
     dma_start_addr = NULL;
     dma_start_size = 0;
     dma_rem_size = 0;
@@ -166,7 +166,7 @@ void pcm_play_dma_pause(bool pause)
 
     if(pause)
     {
-        dma_pause_channel(1);
+        dma_pause_channel(0);
 
         /* if producer's buffer finished, upper layer starts anew */
         if (dma_rem_size == 0)
@@ -175,7 +175,7 @@ void pcm_play_dma_pause(bool pause)
     else
     {
         if (play_sub_size != 0)
-            dma_resume_channel(1);
+            dma_resume_channel(0);
         /* else unlock calls the callback if sub buffers remain */
     }
 }
@@ -231,7 +231,7 @@ void pcm_dma_apply_settings(void)
 size_t pcm_get_bytes_waiting(void)
 {
     int oldstatus = disable_irq_save();
-    size_t addr = DMAC_CH_SRC_ADDR(1);
+    size_t addr = DMAC_CH_SRC_ADDR(0);
     size_t start_addr = (size_t)dma_start_addr;
     size_t start_size = dma_start_size;
     restore_interrupt(oldstatus);
@@ -242,7 +242,7 @@ size_t pcm_get_bytes_waiting(void)
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     int oldstatus = disable_irq_save();
-    size_t addr = DMAC_CH_SRC_ADDR(1);
+    size_t addr = DMAC_CH_SRC_ADDR(0);
     size_t start_addr = (size_t)dma_start_addr;
     size_t start_size = dma_start_size;
     restore_interrupt(oldstatus);
@@ -269,6 +269,7 @@ void * pcm_dma_addr(void *addr)
 static int rec_locked = 0;
 static uint32_t *rec_dma_addr;
 static size_t rec_dma_size;
+static int keep_sample = 0; /* In nonzero, keep the sample; else, discard it */
 
 void pcm_rec_lock(void)
 {
@@ -310,32 +311,36 @@ void INT_I2SIN(void)
             if (I2SIN_RAW_STATUS & (1<<5))
                 return; /* empty */
 
-            /* Discard every other sample since ADC clock is 1/2 LRCK */
             uint32_t value = *I2SIN_DATA;
-            *I2SIN_DATA;
 
-            /* Data is in left channel only - copy to right channel
-               14-bit => 16-bit samples */
-            value = (uint16_t)(value << 2) | (value << 18);
+            /* Discard every other sample since ADC clock is 1/2 LRCK */
+            keep_sample ^= 1;
 
-            if (audio_output_source != AUDIO_SRC_PLAYBACK && !is_playing)
+            if (keep_sample)
             {
-                /* In this case, loopback is manual so that both output
-                   channels have audio */
-                if (I2SOUT_RAW_STATUS & (1<<5))
+                /* Data is in left channel only - copy to right channel
+                   14-bit => 16-bit samples */
+                value = (uint16_t)(value << 2) | (value << 18);
+
+                if (audio_output_source != AUDIO_SRC_PLAYBACK && !is_playing)
                 {
-                    /* Sync output fifo so it goes empty not before input is
-                       filled */
-                    for (unsigned i = 0; i < 4; i++)
-                        *I2SOUT_DATA = 0;
+                    /* In this case, loopback is manual so that both output
+                       channels have audio */
+                    if (I2SOUT_RAW_STATUS & (1<<5))
+                    {
+                        /* Sync output fifo so it goes empty not before input is
+                           filled */
+                        for (unsigned i = 0; i < 4; i++)
+                            *I2SOUT_DATA = 0;
+                    }
+
+                    *I2SOUT_DATA = value;
+                    *I2SOUT_DATA = value;
                 }
 
-                *I2SOUT_DATA = value;
-                *I2SOUT_DATA = value;
+                *rec_dma_addr++ = value;
+                rec_dma_size -= 4;
             }
-
-            *rec_dma_addr++ = value;
-            rec_dma_size -= 4;
         }
     }
     else
@@ -347,15 +352,19 @@ void INT_I2SIN(void)
             if (I2SIN_RAW_STATUS & (1<<5))
                 return; /* empty */
 
-            /* Discard every other sample since ADC clock is 1/2 LRCK */
             uint32_t value = *I2SIN_DATA;
-            *I2SIN_DATA;
 
-            /* Loopback is in I2S hardware */
+            /* Discard every other sample since ADC clock is 1/2 LRCK */
+            keep_sample ^= 1;
 
-            /* 14-bit => 16-bit samples */
-            *rec_dma_addr++ = (value << 2) & ~0x00030000;
-            rec_dma_size -= 4;
+            if (keep_sample)
+            {
+                /* Loopback is in I2S hardware */
+
+                /* 14-bit => 16-bit samples */
+                *rec_dma_addr++ = (value << 2) & ~0x00030000;
+                rec_dma_size -= 4;
+            }
         }
     }
 
@@ -388,6 +397,8 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     rec_dma_addr = addr;
     rec_dma_size = size;
+
+    keep_sample = 0;
 
     /* ensure empty FIFO */
     while (!(I2SIN_RAW_STATUS & (1<<5)))

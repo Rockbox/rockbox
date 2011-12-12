@@ -890,10 +890,10 @@ sd_transfer_retry_with_reinit:
             arg *= SD_BLOCK_SIZE;
 
         if(write)
-            dma_enable_channel(0, dma_buf, MCI_FIFO, DMA_PERI_SD,
+            dma_enable_channel(1, dma_buf, MCI_FIFO, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
         else
-            dma_enable_channel(0, MCI_FIFO, dma_buf, DMA_PERI_SD,
+            dma_enable_channel(1, MCI_FIFO, dma_buf, DMA_PERI_SD,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
         if(!send_cmd(drive, cmd, arg, MCI_RESP, &response))

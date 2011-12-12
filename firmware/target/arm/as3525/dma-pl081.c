@@ -137,7 +137,7 @@ void INT_DMAC(void)
 {
     unsigned int channel;
 
-    /* SD channel is serviced first */
+    /* Lowest channel index is serviced first */
     for(channel = 0; channel < 2; channel++)
         if(DMAC_INT_STATUS & (1<<channel))
         {

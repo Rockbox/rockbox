@@ -107,15 +107,15 @@ static void UIRQ(void)
 static const struct { int source; void (*isr) (void); } vec_int_srcs[] =
 {
     /* Highest priority at the top of the list */
-    { INT_SRC_DMAC, INT_DMAC },
+#ifdef HAVE_RECORDING
+    { INT_SRC_I2SIN, INT_I2SIN }, /* For recording */
+#endif
+    { INT_SRC_DMAC, INT_DMAC }, /* Playback follows recording */
     { INT_SRC_NAND, INT_NAND },
 #if (defined HAVE_MULTIDRIVE  && CONFIG_CPU == AS3525)
     { INT_SRC_MCI0, INT_MCI0 },
 #endif
     { INT_SRC_USB, INT_USB, },
-#ifdef HAVE_RECORDING
-    { INT_SRC_I2SIN, INT_I2SIN, },
-#endif
     { INT_SRC_TIMER1, INT_TIMER1 },
     { INT_SRC_TIMER2, INT_TIMER2 },
     { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
