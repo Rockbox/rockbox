@@ -763,10 +763,6 @@ Please configure TTS engine.</source>
         <translation>Невозможно озвучить введённый текст.</translation>
     </message>
     <message>
-        <source>Could not voice test string.</source>
-        <translation>Невозможно озвучить введённый текст.</translation>
-    </message>
-    <message>
         <source>Showing disabled targets</source>
         <translation>Отображение отображение неподдерживаемых устройств</translation>
     </message>
