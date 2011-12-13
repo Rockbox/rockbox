@@ -326,11 +326,12 @@
 
 /** Device IN Endpoint Common Interrupt Mask Register */
 #define DIEPMSK     (*((uint32_t volatile*)(OTGBASE + 0x810)))
-/* the following apply to DIEPMSK and DIEPINT */
-#define DIEPINT_xfercompl       (1 << 0) /** Transfer complete */
-#define DIEPINT_epdisabled      (1 << 1) /** Endpoint disabled */
-#define DIEPINT_ahberr          (1 << 2) /** AHB error */
+/* the following apply to DEPMSK and DEPINT */
+#define DEPINT_xfercompl       (1 << 0) /** Transfer complete */
+#define DEPINT_epdisabled      (1 << 1) /** Endpoint disabled */
+#define DEPINT_ahberr          (1 << 2) /** AHB error */
 #define DIEPINT_timeout         (1 << 3) /** Timeout handshake (non-iso TX) */
+#define DOEPINT_setup           (1 << 3) /** Setup Phase Done (control EPs)*/
 #define DIEPINT_intktxfemp      (1 << 4) /** IN token received with tx fifo empty */
 #define DIEPINT_intknepmis      (1 << 5) /** IN token received with ep mismatch */
 #define DIEPINT_inepnakeff      (1 << 6) /** IN endpoint NAK effective */
@@ -339,11 +340,6 @@
 
 /** Device OUT Endpoint Common Interrupt Mask Register */
 #define DOEPMSK     (*((uint32_t volatile*)(OTGBASE + 0x814)))
-/* the following apply to DOEPMSK and DOEPINT */
-#define DOEPINT_xfercompl       (1 << 0) /** Transfer complete */
-#define DOEPINT_epdisabled      (1 << 1) /** Endpoint disabled */
-#define DOEPINT_ahberr          (1 << 2) /** AHB error */
-#define DOEPINT_setup           (1 << 3) /** Setup Phase Done (control EPs)*/
 
 /** Device All Endpoints Interrupt Register */
 #define DAINT       (*((uint32_t volatile*)(OTGBASE + 0x818)))

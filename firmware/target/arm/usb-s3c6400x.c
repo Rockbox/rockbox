@@ -155,8 +155,8 @@ static void usb_reset(void)
 
     DCFG = DCFG_nzstsouthshk;  /* Address 0 */
     DCTL = DCTL_pwronprgdone;  /* Soft Reconnect */
-    DIEPMSK = DIEPINT_timeout | DIEPINT_ahberr | DIEPINT_xfercompl;
-    DOEPMSK = DIEPINT_timeout | DIEPINT_ahberr | DIEPINT_xfercompl;
+    DIEPMSK = DIEPINT_timeout | DEPINT_ahberr | DEPINT_xfercompl;
+    DOEPMSK = DOEPINT_setup | DEPINT_ahberr | DEPINT_xfercompl;
     DAINTMSK = 0xFFFFFFFF;  /* Enable interrupts on all endpoints */
     GINTMSK = GINTMSK_outepintr | GINTMSK_inepintr | GINTMSK_usbreset | GINTMSK_enumdone;
 
@@ -172,7 +172,7 @@ static void handle_ep_int(int out)
         if (!epints)
             continue;
 
-        if (epints & DIEPINT_xfercompl)
+        if (epints & DEPINT_xfercompl)
         {
             invalidate_dcache();
             int bytes = endpoints[ep].size - (DEPTSIZ(ep, out) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
@@ -185,7 +185,7 @@ static void handle_ep_int(int out)
                 semaphore_release(&endpoints[ep].complete);
             }
         }
-        if (epints & DIEPINT_ahberr)
+        if (epints & DEPINT_ahberr)
             panicf("USB: AHB error on EP%d (dir %d)", ep, out);
         if (epints & DIEPINT_timeout)
         {
@@ -200,7 +200,7 @@ static void handle_ep_int(int out)
                 }
             }
             else
-            {   /* SETUP phase done */
+            {   /* DOEPINT_setup */
                 invalidate_dcache();
                 if (ep == 0)
                 {
