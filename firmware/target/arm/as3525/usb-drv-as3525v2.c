@@ -38,14 +38,9 @@
 
 /* Number of IN/OUT endpoints */
 #define NUM_IN_EP           3
-#define NUM_OUT_EP          2
 
-/* List of IN enpoints */
-#define IN_EP_LIST          0, 3, 5
-#define OUT_EP_LIST         2, 4
-
-static const uint8_t in_ep_list[NUM_IN_EP + 1] = {0, IN_EP_LIST};
-static const uint8_t out_ep_list[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
+static const uint8_t in_ep_list[NUM_IN_EP + 1] = {0, 3, 5};
+static const uint8_t out_ep_list[] = {0, 2, 4};
 
 /* iterate through each in/out ep except EP0
  * 'i' is the counter, 'ep' is the actual value */
@@ -54,16 +49,16 @@ static const uint8_t out_ep_list[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
         i < (sizeof(list)/sizeof(*list)); \
         i++, ep = list[i])
 
-#define FOR_EACH_IN_EP_EX(include_ep0, i, ep) \
-    FOR_EACH_EP(in_ep_list, (include_ep0) ? 0 : 1, i, ep)
+#define FOR_EACH_IN_EP(include_ep0, i, ep) \
+    FOR_EACH_EP(in_ep_list, !include_ep0, i, ep)
 
-#define FOR_EACH_OUT_EP_EX(include_ep0, i, ep) \
-    FOR_EACH_EP(out_ep_list, (include_ep0) ? 0 : 1, i, ep)
+#define FOR_EACH_OUT_EP(include_ep0, i, ep) \
+    FOR_EACH_EP(out_ep_list, !include_ep0, i, ep)
 
-#define FOR_EACH_IN_EP(i, ep)           FOR_EACH_IN_EP_EX (false, i, ep)
-#define FOR_EACH_IN_EP_AND_EP0(i, ep)   FOR_EACH_IN_EP_EX (true,  i, ep)
-#define FOR_EACH_OUT_EP(i, ep)          FOR_EACH_OUT_EP_EX(false, i, ep)
-#define FOR_EACH_OUT_EP_AND_EP0(i, ep)  FOR_EACH_OUT_EP_EX(true,  i, ep)
+#define FOR_EACH_IN_EP(i, ep)           FOR_EACH_IN_EP(false, i, ep)
+#define FOR_EACH_IN_EP_AND_EP0(i, ep)   FOR_EACH_IN_EP(true,  i, ep)
+#define FOR_EACH_OUT_EP(i, ep)          FOR_EACH_OUT_EP(false, i, ep)
+#define FOR_EACH_OUT_EP_AND_EP0(i, ep)  FOR_EACH_OUT_EP(true,  i, ep)
 
 /* store per endpoint, per direction, information */
 struct usb_endpoint
@@ -328,7 +323,7 @@ static void reset_endpoints(void)
     /* Setup next chain for IN eps */
     FOR_EACH_IN_EP_AND_EP0(i, ep)
     {
-        int next_ep = in_ep_list[(i + 1) % (NUM_IN_EP + 1)];
+        int next_ep = in_ep_list[(i + 1) % sizeof(in_ep_list)];
         DEPCTL(ep, false) = (DEPCTL(ep, false) & ~bitm(DEPCTL, nextep)) | (next_ep << DEPCTL_nextep_bitp);
     }
 }
