@@ -227,9 +227,9 @@ static void show_lib(size_t off)
 	color(BLUE);
 	printf("\tBASE 0x%.8x (code + 0x%x) END 0x%.8x : SIZE 0x%.8x\n",start, 0x18 + i*4, stop, stop - start);
 
-	char name[12+1];
+	char name[12+sizeof(".bin")];
 	memcpy(name,&buf[off+get32le(off)],12);
-	name[12] = '\0';
+	strcpy(&name[12], ".bin");
 
 	FILE *out = fopen(name,"w");
 	if(!out)
