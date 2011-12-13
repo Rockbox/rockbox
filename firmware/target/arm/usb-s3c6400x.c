@@ -78,32 +78,28 @@ static void reset_endpoints(int reinit)
         endpoints[i].done = true;
         semaphore_release(&endpoints[i].complete);
     }
-    DIEPCTL(0) = 0x8800;  /* EP0 IN ACTIVE NEXT=1 */
-    DOEPCTL(0) = 0x8000;  /* EP0 OUT ACTIVE */
-    DOEPTSIZ(0) = 0x20080040;  /* EP0 OUT Transfer Size:
-                                64 Bytes, 1 Packet, 1 Setup Packet */
+
+    DIEPCTL(0) = DEPCTL_usbactep | (1 << DEPCTL_nextep_bitp);
+    DOEPCTL(0) = DEPCTL_usbactep;
+    DOEPTSIZ(0) = (1 << DEPTSIZ_pkcnt_bitp) | (1 << DEPTSIZ0_supcnt_bitp) | 64;
+
     DOEPDMA(0) = &ctrlreq;
-    DOEPCTL(0) |= 0x84000000;  /* EP0 OUT ENABLE CLEARNAK */
+    DOEPCTL(0) |= DEPCTL_epena | DEPCTL_cnak;
     if (reinit)
     {
         /* The size is getting set to zero, because we don't know
            whether we are Full Speed or High Speed at this stage */
-        /* EP1 IN INACTIVE DATA0 SIZE=0 NEXT=3 */
-        DIEPCTL(1) = 0x10001800;
-        /* EP2 OUT INACTIVE DATA0 SIZE=0 */
-        DOEPCTL(2) = 0x10000000;
-        /* EP3 IN INACTIVE DATA0 SIZE=0 NEXT=0 */
-        DIEPCTL(3) = 0x10000000;
-        /* EP4 OUT INACTIVE DATA0 SIZE=0 */
-        DOEPCTL(4) = 0x10000000;
+        DIEPCTL(1) = DEPCTL_setd0pid | (3 << DEPCTL_nextep_bitp);
+        DOEPCTL(2) = DEPCTL_setd0pid;
+        DIEPCTL(3) = DEPCTL_setd0pid | (0 << DEPCTL_nextep_bitp);
+        DOEPCTL(4) = DEPCTL_setd0pid;
     }
     else
     {
-        /* INACTIVE DATA0 */
-        DIEPCTL(1) = (DIEPCTL(1) & ~0x00008000) | 0x10000000;
-        DOEPCTL(2) = (DOEPCTL(2) & ~0x00008000) | 0x10000000;
-        DIEPCTL(3) = (DIEPCTL(3) & ~0x00008000) | 0x10000000;
-        DOEPCTL(4) = (DOEPCTL(4) & ~0x00008000) | 0x10000000;
+        DIEPCTL(1) = (DIEPCTL(1) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
+        DOEPCTL(2) = (DOEPCTL(2) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
+        DIEPCTL(3) = (DIEPCTL(3) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
+        DOEPCTL(4) = (DOEPCTL(4) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
     }
     DAINTMSK = 0xFFFFFFFF;  /* Enable interrupts on all EPs */
 }
@@ -122,9 +118,10 @@ int usb_drv_request_endpoint(int type, int dir)
         {
             endpoints[ep].active = true;
             ret = ep | dir;
-            uint32_t newbits = (type << 18) | 0x10000000;
-            if (dir) DIEPCTL(ep) = (DIEPCTL(ep) & ~0x000C0000) | newbits;
-            else DOEPCTL(ep) = (DOEPCTL(ep) & ~0x000C0000) | newbits;
+            uint32_t newbits = (type << DEPCTL_eptype_bitp) | DEPCTL_epena;
+            uint32_t mask = DEPCTL_eptype_bits << DEPCTL_eptype_bitp;
+            if (dir) DIEPCTL(ep) = (DIEPCTL(ep) & ~mask) | newbits;
+            else DOEPCTL(ep) = (DOEPCTL(ep) & ~mask) | newbits;
             break;
         }
         ep += 2;
@@ -144,7 +141,7 @@ void usb_drv_release_endpoint(int ep)
 
 static void usb_reset(void)
 {
-    DCTL = 0x802;  /* Soft Disconnect */
+    DCTL = DCTL_pwronprgdone | DCTL_sftdiscon;
 
     OPHYPWR = 0;  /* PHY: Power up */
     udelay(10);
@@ -157,21 +154,22 @@ static void usb_reset(void)
     OPHYCLK = SYNOPSYSOTG_CLOCK;
     udelay(400);
 
-    GRSTCTL = 1;  /* OTG: Assert Software Reset */
-    while (GRSTCTL & 1);  /* Wait for OTG to ack reset */
-    while (!(GRSTCTL & 0x80000000));  /* Wait for OTG AHB master idle */
+    GRSTCTL = GRSTCTL_csftrst;  /* OTG: Assert Software Reset */
+    while (GRSTCTL & GRSTCTL_csftrst);  /* Wait for OTG to ack reset */
+    while (!(GRSTCTL & GRSTCTL_ahbidle));  /* Wait for OTG AHB master idle */
 
-    GRXFSIZ = 512;  /* RX FIFO: 512 bytes */
-    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(512); /* Non-periodic TX FIFO: 512 bytes */
+    GRXFSIZ = 512;
+    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(512);
+
     GAHBCFG = SYNOPSYSOTG_AHBCFG;
-    GUSBCFG = 0x1408;  /* OTG: 16bit PHY and some reserved bits */
+    GUSBCFG = (1 << 12) | (1 << 10) | GUSBCFG_phy_if; /* OTG: 16bit PHY and some reserved bits */
 
-    DCFG = 4;  /* Address 0 */
-    DCTL = 0x800;  /* Soft Reconnect */
-    DIEPMSK = 0x0D;  /* IN EP interrupt mask */
-    DOEPMSK = 0x0D;  /* IN EP interrupt mask */
+    DCFG = DCFG_nzstsouthshk;  /* Address 0 */
+    DCTL = DCTL_pwronprgdone;  /* Soft Reconnect */
+    DIEPMSK = DIEPINT_timeout | DIEPINT_ahberr | DIEPINT_xfercompl;
+    DOEPMSK = DIEPINT_timeout | DIEPINT_ahberr | DIEPINT_xfercompl;
     DAINTMSK = 0xFFFFFFFF;  /* Enable interrupts on all endpoints */
-    GINTMSK = 0xC3000;  /* Interrupt mask: IN event, OUT event, bus reset */
+    GINTMSK = GINTMSK_outepintr | GINTMSK_inepintr | GINTMSK_usbreset | GINTMSK_enumdone;
 
     reset_endpoints(1);
 }
@@ -182,28 +180,28 @@ void INT_USB_FUNC(void)
     int i;
     uint32_t ints = GINTSTS;
     uint32_t epints;
-    if (ints & 0x1000)  /* bus reset */
+    if (ints & GINTMSK_usbreset)
     {
-        DCFG = 4;  /* Address 0 */
+        DCFG = DCFG_nzstsouthshk;  /* Address 0 */
         reset_endpoints(1);
         usb_core_bus_reset();
     }
 
-    if (ints & 0x2000)  /* enumeration done, we now know the speed */
+    if (ints & GINTMSK_enumdone)  /* enumeration done, we now know the speed */
     {
         /* Set up the maximum packet sizes accordingly */
-        uint32_t maxpacket = usb_drv_port_speed() ? 512 : 64;
-        DIEPCTL(1) = (DIEPCTL(1) & ~0x000003FF) | maxpacket;
-        DOEPCTL(2) = (DOEPCTL(2) & ~0x000003FF) | maxpacket;
-        DIEPCTL(3) = (DIEPCTL(3) & ~0x000003FF) | maxpacket;
-        DOEPCTL(4) = (DOEPCTL(4) & ~0x000003FF) | maxpacket;
+        uint32_t maxpacket = (usb_drv_port_speed() ? 512 : 64) << DEPCTL_mps_bitp;
+        DIEPCTL(1) = (DIEPCTL(1) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
+        DOEPCTL(2) = (DOEPCTL(2) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
+        DIEPCTL(3) = (DIEPCTL(3) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
+        DOEPCTL(4) = (DOEPCTL(4) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
     }
 
-    if (ints & 0x40000)  /* IN EP event */
+    if (ints & GINTMSK_inepintr)
         for (i = 0; i < 4; i += i + 1)  // 0, 1, 3
             if ((epints = DIEPINT(i)))
             {
-                if (epints & 1)  /* Transfer completed */
+                if (epints & DIEPINT_xfercompl)
                 {
                     invalidate_dcache();
                     int bytes = endpoints[i].size - (DIEPTSIZ(i) & 0x3FFFF);
@@ -216,9 +214,9 @@ void INT_USB_FUNC(void)
                         semaphore_release(&endpoints[i].complete);
                     }
                 }
-                if (epints & 4)  /* AHB error */
+                if (epints & DIEPINT_ahberr)
                     panicf("USB: AHB error on IN EP%d", i);
-                if (epints & 8)  /* Timeout */
+                if (epints & DIEPINT_timeout)
                 {
                     if (endpoints[i].busy)
                     {
@@ -231,14 +229,14 @@ void INT_USB_FUNC(void)
                 DIEPINT(i) = epints;
             }
 
-    if (ints & 0x80000)  /* OUT EP event */
+    if (ints & GINTMSK_outepintr)
         for (i = 0; i < USB_NUM_ENDPOINTS; i += 2)
             if ((epints = DOEPINT(i)))
             {
-                if (epints & 1)  /* Transfer completed */
+                if (epints & DIEPINT_xfercompl)
                 {
                     invalidate_dcache();
-                    int bytes = endpoints[i].size - (DOEPTSIZ(i) & 0x3FFFF);
+                    int bytes = endpoints[i].size - (DOEPTSIZ(i) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
                     if (endpoints[i].busy)
                     {
                         endpoints[i].busy = false;
@@ -248,9 +246,9 @@ void INT_USB_FUNC(void)
                         semaphore_release(&endpoints[i].complete);
                     }
                 }
-                if (epints & 4)  /* AHB error */
+                if (epints & DIEPINT_ahberr)
                     panicf("USB: AHB error on OUT EP%d", i);
-                if (epints & 8)  /* SETUP phase done */
+                if (epints & DIEPINT_timeout)  /* SETUP phase done */
                 {
                     invalidate_dcache();
                     if (i == 0)
@@ -260,18 +258,18 @@ void INT_USB_FUNC(void)
                             /* Already set the new address here,
                                before passing the packet to the core.
                                See below (usb_drv_set_address) for details. */
-                            DCFG = (DCFG & ~0x7F0) | (ctrlreq.header.wValue << 4);
+                            DCFG = (DCFG & ~(DCFG_devadr_bits << DCFG_devadr_bitp)) | (ctrlreq.header.wValue << DCFG_devadr_bitp);
                         }
                         usb_core_control_request(&ctrlreq.header);
                     }
                     else panicf("USB: SETUP done on OUT EP%d!?", i);
                 }
                 /* Make sure EP0 OUT is set up to accept the next request */
-                if (!i)
+                if (i == 0)
                 {
-                    DOEPTSIZ(0) = 0x20080040;
+                    DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bitp) | (1 << DEPTSIZ0_pkcnt_bitp) | 64;
                     DOEPDMA(0) = &ctrlreq;
-                    DOEPCTL(0) |= 0x84000000;
+                    DOEPCTL(0) |= DEPCTL_epena | DEPCTL_cnak;
                 }
                 DOEPINT(i) = epints;
             }
@@ -292,43 +290,43 @@ static void ep_send(int ep, const void *ptr, int length)
 {
     endpoints[ep].busy = true;
     endpoints[ep].size = length;
-    DIEPCTL(ep) |= 0x8000;  /* EPx OUT ACTIVE */
+    DIEPCTL(ep) |= DEPCTL_usbactep;
     int blocksize = usb_drv_port_speed() ? 512 : 64;
     int packets = (length + blocksize - 1) / blocksize;
     if (!length)
     {
-        DIEPTSIZ(ep) = 1 << 19;  /* one empty packet */
+        DIEPTSIZ(ep) = 1 << DEPTSIZ0_pkcnt_bitp;  /* one empty packet */
         DIEPDMA(ep) = NULL;
     }
     else
     {
-        DIEPTSIZ(ep) = length | (packets << 19);
+        DIEPTSIZ(ep) = length | (packets << DEPTSIZ0_pkcnt_bitp);
         DIEPDMA(ep) = ptr;
     }
     clean_dcache();
-    DIEPCTL(ep) |= 0x84000000;  /* EPx OUT ENABLE CLEARNAK */
+    DIEPCTL(ep) |= DEPCTL_epena | DEPCTL_cnak;
 }
 
 static void ep_recv(int ep, void *ptr, int length)
 {
     endpoints[ep].busy = true;
     endpoints[ep].size = length;
-    DOEPCTL(ep) &= ~0x20000;  /* EPx UNSTALL */
-    DOEPCTL(ep) |= 0x8000;  /* EPx OUT ACTIVE */
+    DOEPCTL(ep) &= ~DEPCTL_naksts;
+    DOEPCTL(ep) |= DEPCTL_usbactep;
     int blocksize = usb_drv_port_speed() ? 512 : 64;
     int packets = (length + blocksize - 1) / blocksize;
     if (!length)
     {
-        DOEPTSIZ(ep) = 1 << 19;  /* one empty packet */
+        DOEPTSIZ(ep) = 1 << DEPTSIZ0_pkcnt_bitp;  /* one empty packet */
         DOEPDMA(ep) = NULL;
     }
     else
     {
-        DOEPTSIZ(ep) = length | (packets << 19);
+        DOEPTSIZ(ep) = length | (packets << DEPTSIZ0_pkcnt_bitp);
         DOEPDMA(ep) = ptr;
     }
     clean_dcache();
-    DOEPCTL(ep) |= 0x84000000;  /* EPx OUT ENABLE CLEARNAK */
+    DOEPCTL(ep) |= DEPCTL_epena | DEPCTL_cnak;
 }
 
 int usb_drv_send(int endpoint, void *ptr, int length)
@@ -367,21 +365,21 @@ void usb_drv_set_test_mode(int mode)
 
 bool usb_drv_stalled(int endpoint, bool in)
 {
-    if (in) return DIEPCTL(endpoint) & 0x00200000 ? true : false;
-    else return DOEPCTL(endpoint) & 0x00200000 ? true : false;
+    if (in) return DIEPCTL(endpoint) & DEPCTL_naksts;
+    else    return DOEPCTL(endpoint) & DEPCTL_naksts;
 }
 
 void usb_drv_stall(int endpoint, bool stall, bool in)
 {
     if (in)
     {
-        if (stall) DIEPCTL(endpoint) |= 0x00200000;
-        else DIEPCTL(endpoint) &= ~0x00200000;
+        if (stall) DIEPCTL(endpoint) |= DEPCTL_naksts;
+        else       DIEPCTL(endpoint) &= ~DEPCTL_naksts;
     }
     else
     {
-        if (stall) DOEPCTL(endpoint) |= 0x00200000;
-        else DOEPCTL(endpoint) &= ~0x00200000;
+        if (stall) DOEPCTL(endpoint) |= DEPCTL_naksts;
+        else       DOEPCTL(endpoint) &= ~DEPCTL_naksts;
     }
 }
 
@@ -405,7 +403,7 @@ void usb_drv_init(void)
 
 void usb_drv_exit(void)
 {
-    DCTL = 0x802;  /* Soft Disconnect */
+    DCTL = DCTL_pwronprgdone | DCTL_sftdiscon;
 
     OPHYPWR = 0xF;  /* PHY: Power down */
     udelay(10);
@@ -465,7 +463,7 @@ int usb_detect(void)
 #else
 void usb_init_device(void)
 {
-    DCTL = 0x802;  /* Soft Disconnect */
+    DCTL = DCTL_pwronprgdone | DCTL_sftdiscon;
 
     ORSTCON = 1;  /* Put the PHY into reset (needed to get current down) */
     PCGCCTL = 1;  /* Shut down PHY clock */
