@@ -49,16 +49,16 @@ static const uint8_t out_ep_list[] = {0, 2, 4};
         i < (sizeof(list)/sizeof(*list)); \
         i++, ep = list[i])
 
-#define FOR_EACH_IN_EP(include_ep0, i, ep) \
+#define FOR_EACH_IN_EP_EX(include_ep0, i, ep) \
     FOR_EACH_EP(in_ep_list, !include_ep0, i, ep)
 
-#define FOR_EACH_OUT_EP(include_ep0, i, ep) \
+#define FOR_EACH_OUT_EP_EX(include_ep0, i, ep) \
     FOR_EACH_EP(out_ep_list, !include_ep0, i, ep)
 
-#define FOR_EACH_IN_EP(i, ep)           FOR_EACH_IN_EP(false, i, ep)
-#define FOR_EACH_IN_EP_AND_EP0(i, ep)   FOR_EACH_IN_EP(true,  i, ep)
-#define FOR_EACH_OUT_EP(i, ep)          FOR_EACH_OUT_EP(false, i, ep)
-#define FOR_EACH_OUT_EP_AND_EP0(i, ep)  FOR_EACH_OUT_EP(true,  i, ep)
+#define FOR_EACH_IN_EP(i, ep)           FOR_EACH_IN_EP_EX(false, i, ep)
+#define FOR_EACH_IN_EP_AND_EP0(i, ep)   FOR_EACH_IN_EP_EX(true,  i, ep)
+#define FOR_EACH_OUT_EP(i, ep)          FOR_EACH_OUT_EP_EX(false, i, ep)
+#define FOR_EACH_OUT_EP_AND_EP0(i, ep)  FOR_EACH_OUT_EP_EX(true,  i, ep)
 
 /* store per endpoint, per direction, information */
 struct usb_endpoint
