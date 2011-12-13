@@ -85,7 +85,7 @@
 
 void imx233_lcdif_enable_bus_master(bool enable);
 void imx233_lcdif_enable(bool enable);
-void imx233_lcdif_reset(void);
+void imx233_lcdif_reset(void);// reset lcdif block
 void imx233_lcdif_set_timings(unsigned data_setup, unsigned data_hold,
     unsigned cmd_setup, unsigned cmd_hold);
 void imx233_lcdif_set_lcd_databus_width(unsigned width);

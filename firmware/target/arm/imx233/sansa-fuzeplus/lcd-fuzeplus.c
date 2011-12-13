@@ -247,12 +247,6 @@ static void lcd_send_sequence(struct lcd_sequence_entry_t *seq, unsigned count)
 
 static void lcd_init_seq_7783(void)
 {
-    __REG_SET(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
-    mdelay(50);
-    __REG_CLR(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
-    mdelay(10);
-    __REG_SET(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
-
     _begin_seq()
     _mdelay(200)
     _lcd_write_reg(1, 0x100)
@@ -377,6 +371,13 @@ void lcd_init_device(void)
         if(lcd_kind == LCD_KIND_7783 || lcd_kind == LCD_KIND_9325)
             break;
     }
+    // reset device
+    __REG_SET(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
+    mdelay(50);
+    __REG_CLR(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
+    mdelay(10);
+    __REG_SET(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
+
     switch(lcd_kind)
     {
         case LCD_KIND_7783: lcd_init_seq_7783(); break;
