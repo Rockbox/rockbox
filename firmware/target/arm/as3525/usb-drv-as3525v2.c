@@ -36,10 +36,7 @@
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
-/* Number of IN/OUT endpoints */
-#define NUM_IN_EP           3
-
-static const uint8_t in_ep_list[NUM_IN_EP + 1] = {0, 3, 5};
+static const uint8_t in_ep_list[] = {0, 3, 5};
 static const uint8_t out_ep_list[] = {0, 2, 4};
 
 /* iterate through each in/out ep except EP0
