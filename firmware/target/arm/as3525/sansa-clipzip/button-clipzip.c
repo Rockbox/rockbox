@@ -21,97 +21,64 @@
  ****************************************************************************/
 
 #include "config.h"
-
 #include "button-target.h"
 #include "as3525v2.h"
+#include "system.h"
 #include "kernel.h"
-#include "system-target.h"
 
 static int keyscan(void)
 {
-    static int buttons = 0;
-    static int row = 1;
+    static int buttons, row;
+    static const int matrix[2][3] = {
+        { BUTTON_RIGHT, BUTTON_SELECT, BUTTON_UP },
+        { BUTTON_HOME,  BUTTON_DOWN,   BUTTON_LEFT },
+    };
 
-    switch (row) {
-    
-    case 1:
-        /* read row 1 */
-        buttons &= ~(BUTTON_RIGHT | BUTTON_SELECT | BUTTON_UP);
-        if (GPIOC_PIN(3)) {
-            buttons |= BUTTON_RIGHT;
-        }
-        if (GPIOC_PIN(4)) {
-            buttons |= BUTTON_SELECT;
-        }
-        if (GPIOC_PIN(5)) {
-            buttons |= BUTTON_UP;
-        }
-        
-        /* prepare row 2 */
-        GPIOC_PIN(1) = 0;
-        GPIOC_PIN(2) = (1 << 2);
-        row = 2;
-        break;
-        
-    case 2:
-        /* read row 2 */
-        buttons &= ~(BUTTON_HOME | BUTTON_DOWN | BUTTON_LEFT);
-        if (GPIOC_PIN(3)) {
-            buttons |= BUTTON_HOME;
-        }
-        if (GPIOC_PIN(4)) {
-            buttons |= BUTTON_DOWN;
-        }
-        if (GPIOC_PIN(5)) {
-            buttons |= BUTTON_LEFT;
-        }
-    
-        /* prepare row 1 */
-        GPIOC_PIN(1) = (1 << 1);
-        GPIOC_PIN(2) = 0;
-        row = 1;
-        break;
+    for (int i = 0; i < 3; i++)
+        if (GPIOC_PIN(3 + i))
+            buttons |=  matrix[row][i];
+        else
+            buttons &= ~matrix[row][i];
 
-    default:
-        row = 1;
-        break;
-    }
-    
+    /* prepare next row */
+    GPIOC_PIN(1) = row << 1;
+    row ^= 1;
+    GPIOC_PIN(2) = row << 2;
+
+    /* delay a bit if interrupts are disabled, to be sure next row will read */
+    if (!irq_enabled())
+        for (volatile int i = 0; i < 0x500; i++) ;
+
     return buttons;
 }
 
 void button_init_device(void)
 {
     /* GPIO A6, A7 and D6 are direct button inputs */
-    GPIOA_DIR &= ~(1 << 6);
-    GPIOA_DIR &= ~(1 << 7);
+    GPIOA_DIR &= ~(1 << 6 | 1<< 7);
     GPIOD_DIR &= ~(1 << 6);
-    
+
     /* GPIO C1, C2, C3, C4, C5 are used in a column/row key scan matrix */
     GPIOC_DIR |= ((1 << 1) | (1 << 2));
     GPIOC_DIR &= ~((1 << 3) | (1 << 4) | (1 << 5));
+
+    /* initial reading */
+    button_read_device();
+    sleep(1);
+    button_read_device();
+    sleep(1);
 }
 
 int button_read_device(void)
 {
     int buttons = 0;
 
-    /* power */
-    if (GPIOD_PIN(6)) {
+    if (GPIOD_PIN(6))
         buttons |= BUTTON_POWER;
-    }
-
-    /* volume */
-    if (GPIOA_PIN(6)) {
+    if (GPIOA_PIN(6))
         buttons |= BUTTON_VOL_DOWN;
-    }
-    if (GPIOA_PIN(7)) {
+    if (GPIOA_PIN(7))
         buttons |= BUTTON_VOL_UP;
-    }
-    
-    /* keyscan buttons */
-    buttons |= keyscan();
 
-    return buttons;
+    return buttons | keyscan();
 }
-

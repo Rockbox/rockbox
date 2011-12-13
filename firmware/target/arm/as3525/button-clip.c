@@ -27,14 +27,37 @@
 #include "backlight.h"
 #endif
 
+#if   defined(SANSA_CLIP)
+# define OUT_PIN GPIOC_PIN
+# define OUT_DIR GPIOC_DIR
+# define OUT_INITIAL 0
+# define IN_PIN  GPIOB_PIN
+# define IN_DIR  GPIOB_DIR
+#elif defined(SANSA_CLIPV2)
+# define OUT_PIN GPIOD_PIN
+# define OUT_DIR GPIOD_DIR
+# define OUT_INITIAL 1
+# define IN_PIN  GPIOD_PIN
+# define IN_DIR  GPIOD_DIR
+#endif
+
+static const int rows[3] = {
+#if   defined(SANSA_CLIP)
+    4, 5, 6
+#elif defined(SANSA_CLIPV2)
+    5, 6, 4
+#endif
+};
+
 void button_init_device(void)
 {
     GPIOA_DIR &= ~((1<<7) | (1<<3));
-    GPIOD_DIR &= ~((1<<2) | (1<<1) | (1<<0));
-    GPIOD_PIN(3) = 1<<3;
-    GPIOD_PIN(4) = 1<<4;
-    GPIOD_PIN(5) = 1<<5;
-    GPIOD_DIR |= ((1<<5) | (1<<4) | (1<<3));
+    IN_DIR &= ~((1<<2) | (1<<1) | (1<<0));
+
+    for (int i = 0; i < 3; i++) {
+        OUT_PIN(rows[i]) = OUT_INITIAL << rows[i];
+        OUT_DIR |= 1 << rows[i];
+    }
 
     /* get initial readings */
     button_read_device();
@@ -44,9 +67,8 @@ void button_init_device(void)
 
 int button_read_device(void)
 {
-    static int row = 0;
-    static int buttons = 0;
-    static unsigned power_counter = 0;
+    static int row, buttons;
+    static unsigned power_counter;
 
     if(button_hold())
     {
@@ -66,84 +88,47 @@ int button_read_device(void)
     else
         buttons &= ~BUTTON_POWER;
 
-    /* This is a keypad using D3-D5 as columns and D0-D2 as rows */
-    switch (row) {
+    static const int matrix [3][3] = {
+        { 0 /*unused*/, BUTTON_VOL_UP,   BUTTON_UP },
+        { BUTTON_LEFT,  BUTTON_SELECT,   BUTTON_RIGHT },
+        { BUTTON_DOWN,  BUTTON_VOL_DOWN, BUTTON_HOME },
+    };
 
-    case 0:
-        buttons &= ~(BUTTON_VOL_UP | BUTTON_UP);
+    for (int i = 0; i<3; i++)
+        if (IN_PIN(i))
+            buttons |=  matrix[row][i];
+        else
+            buttons &= ~matrix[row][i];
 
-        (void)GPIOD_PIN(0); /* D3D0 is unused */
-
-        if (!GPIOD_PIN(1))
-            buttons |= BUTTON_VOL_UP;
-
-        if (!GPIOD_PIN(2))
-            buttons |= BUTTON_UP;
-
-        GPIOD_PIN(3) = 1<<3;
-        GPIOD_PIN(4) = 0x00;
-        row++;
-        break;
-
-    case 1:
-        buttons &= ~(BUTTON_LEFT | BUTTON_SELECT | BUTTON_RIGHT);
-
-        if (!GPIOD_PIN(0))
-            buttons |= BUTTON_LEFT;
-
-        if (!GPIOD_PIN(1))
-            buttons |= BUTTON_SELECT;
-
-        if (!GPIOD_PIN(2))
-            buttons |= BUTTON_RIGHT;
-
-        GPIOD_PIN(4) = 1<<4;
-        GPIOD_PIN(5) = 0x00;
-        row++;
-        break;
-
-    case 2:
-        buttons &= ~(BUTTON_DOWN | BUTTON_VOL_DOWN | BUTTON_HOME);
-
-        if (!GPIOD_PIN(0))
-            buttons |= BUTTON_DOWN;
-
-        if (!GPIOD_PIN(1))
-            buttons |= BUTTON_VOL_DOWN;
-
-        if (!GPIOD_PIN(2))
-            buttons |= BUTTON_HOME;
-
-        GPIOD_PIN(5) = 1<<5;
-        GPIOD_PIN(3) = 0x00;
-
-    default:
-        row = 0;
-        break;
-    }
+    /* prepare next row */
+    OUT_PIN(rows[row]) = 0 << rows[row];
+    row++;
+    row %= 3;
+    OUT_PIN(rows[row]) = 1 << rows[row];
 
     return buttons;
 }
 
 bool button_hold(void)
 {
-#ifndef BOOTLOADER
-    static bool hold_button_old = false;
-#endif
-
+#ifdef SANSA_CLIPV2
     GPIOA_DIR |= 1<<7;
     GPIOA_PIN(7) = 1<<7;
 
     int delay = 50;
     while(delay--)
         asm("nop");
+#endif
 
     bool hold_button = (GPIOA_PIN(3) != 0);
 
+#ifdef SANSA_CLIPV2
     GPIOA_PIN(7) = 0;
     GPIOA_DIR &= ~(1<<7);
+#endif
 
 #ifndef BOOTLOADER
+    static bool hold_button_old = false;
     /* light handling */
     if (hold_button != hold_button_old)
     {
