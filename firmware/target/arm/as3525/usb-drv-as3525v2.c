@@ -748,7 +748,7 @@ int usb_drv_request_endpoint(int type, int dir)
     unsigned long mask = ~(bitm(DEPCTL, eptype) | bitm(DEPCTL, mps));
 
     if(dir == USB_DIR_IN) DIEPCTL(ep) = (DIEPCTL(ep) & mask) | data;
-    else DOEPCTL(ep) = (DOEPCTL(ep) & mask) | data;
+    else                  DOEPCTL(ep) = (DOEPCTL(ep) & mask) | data;
 
     return ret;
 }
@@ -774,9 +774,9 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     /* disable interrupts to avoid any race */
     int oldlevel = disable_irq_save();
     
-    volatile uint32_t *epctl = dir_in ? &DIEPCTL(ep) : &DOEPCTL(ep);
-    volatile uint32_t *eptsiz = dir_in ? &DIEPTSIZ(ep) : &DOEPTSIZ(ep);
-    const void * volatile * epdma = dir_in ? &DIEPDMA(ep) : &DOEPDMA(ep);
+    volatile uint32_t *epctl =      dir_in ? &DIEPCTL(ep)  : &DOEPCTL(ep);
+    volatile uint32_t *eptsiz =     dir_in ? &DIEPTSIZ(ep) : &DOEPTSIZ(ep);
+    const void * volatile * epdma = dir_in ? &DIEPDMA(ep)  : &DOEPDMA(ep);
     struct usb_endpoint *endpoint = &endpoints[ep][dir_in];
     #define DEPCTL  *epctl
     #define DEPTSIZ *eptsiz
