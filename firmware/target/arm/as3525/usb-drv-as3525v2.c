@@ -806,7 +806,7 @@ int usb_drv_send(int ep, void *ptr, int len)
     usb_drv_transfer(ep, ptr, len, true, true);
     struct usb_endpoint *endpoint = &endpoints[ep][1];
     semaphore_wait(&endpoint->complete, TIMEOUT_BLOCK);
-    return endpoints->status;
+    return endpoint->status;
 }
 
 int usb_drv_send_nonblocking(int ep, void *ptr, int len)
