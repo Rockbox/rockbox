@@ -78,32 +78,32 @@ static void reset_endpoints(int reinit)
         endpoints[i].done = true;
         semaphore_release(&endpoints[i].complete);
     }
-    DIEPCTL0 = 0x8800;  /* EP0 IN ACTIVE NEXT=1 */
-    DOEPCTL0 = 0x8000;  /* EP0 OUT ACTIVE */
-    DOEPTSIZ0 = 0x20080040;  /* EP0 OUT Transfer Size:
+    DIEPCTL(0) = 0x8800;  /* EP0 IN ACTIVE NEXT=1 */
+    DOEPCTL(0) = 0x8000;  /* EP0 OUT ACTIVE */
+    DOEPTSIZ(0) = 0x20080040;  /* EP0 OUT Transfer Size:
                                 64 Bytes, 1 Packet, 1 Setup Packet */
-    DOEPDMA0 = &ctrlreq;
-    DOEPCTL0 |= 0x84000000;  /* EP0 OUT ENABLE CLEARNAK */
+    DOEPDMA(0) = &ctrlreq;
+    DOEPCTL(0) |= 0x84000000;  /* EP0 OUT ENABLE CLEARNAK */
     if (reinit)
     {
         /* The size is getting set to zero, because we don't know
            whether we are Full Speed or High Speed at this stage */
         /* EP1 IN INACTIVE DATA0 SIZE=0 NEXT=3 */
-        DIEPCTL1 = 0x10001800;
+        DIEPCTL(1) = 0x10001800;
         /* EP2 OUT INACTIVE DATA0 SIZE=0 */
-        DOEPCTL2 = 0x10000000;
+        DOEPCTL(2) = 0x10000000;
         /* EP3 IN INACTIVE DATA0 SIZE=0 NEXT=0 */
-        DIEPCTL3 = 0x10000000;
+        DIEPCTL(3) = 0x10000000;
         /* EP4 OUT INACTIVE DATA0 SIZE=0 */
-        DOEPCTL4 = 0x10000000;
+        DOEPCTL(4) = 0x10000000;
     }
     else
     {
         /* INACTIVE DATA0 */
-        DIEPCTL1 = (DIEPCTL1 & ~0x00008000) | 0x10000000;
-        DOEPCTL2 = (DOEPCTL2 & ~0x00008000) | 0x10000000;
-        DIEPCTL3 = (DIEPCTL3 & ~0x00008000) | 0x10000000;
-        DOEPCTL4 = (DOEPCTL4 & ~0x00008000) | 0x10000000;
+        DIEPCTL(1) = (DIEPCTL(1) & ~0x00008000) | 0x10000000;
+        DOEPCTL(2) = (DOEPCTL(2) & ~0x00008000) | 0x10000000;
+        DIEPCTL(3) = (DIEPCTL(3) & ~0x00008000) | 0x10000000;
+        DOEPCTL(4) = (DOEPCTL(4) & ~0x00008000) | 0x10000000;
     }
     DAINTMSK = 0xFFFFFFFF;  /* Enable interrupts on all EPs */
 }
@@ -161,8 +161,8 @@ static void usb_reset(void)
     while (GRSTCTL & 1);  /* Wait for OTG to ack reset */
     while (!(GRSTCTL & 0x80000000));  /* Wait for OTG AHB master idle */
 
-    GRXFSIZ = 0x00000200;  /* RX FIFO: 512 bytes */
-    GNPTXFSIZ = 0x02000200;  /* Non-periodic TX FIFO: 512 bytes */
+    GRXFSIZ = 512;  /* RX FIFO: 512 bytes */
+    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(512); /* Non-periodic TX FIFO: 512 bytes */
     GAHBCFG = SYNOPSYSOTG_AHBCFG;
     GUSBCFG = 0x1408;  /* OTG: 16bit PHY and some reserved bits */
 
@@ -193,10 +193,10 @@ void INT_USB_FUNC(void)
     {
         /* Set up the maximum packet sizes accordingly */
         uint32_t maxpacket = usb_drv_port_speed() ? 512 : 64;
-        DIEPCTL1 = (DIEPCTL1 & ~0x000003FF) | maxpacket;
-        DOEPCTL2 = (DOEPCTL2 & ~0x000003FF) | maxpacket;
-        DIEPCTL3 = (DIEPCTL3 & ~0x000003FF) | maxpacket;
-        DOEPCTL4 = (DOEPCTL4 & ~0x000003FF) | maxpacket;
+        DIEPCTL(1) = (DIEPCTL(1) & ~0x000003FF) | maxpacket;
+        DOEPCTL(2) = (DOEPCTL(2) & ~0x000003FF) | maxpacket;
+        DIEPCTL(3) = (DIEPCTL(3) & ~0x000003FF) | maxpacket;
+        DOEPCTL(4) = (DOEPCTL(4) & ~0x000003FF) | maxpacket;
     }
 
     if (ints & 0x40000)  /* IN EP event */
@@ -269,9 +269,9 @@ void INT_USB_FUNC(void)
                 /* Make sure EP0 OUT is set up to accept the next request */
                 if (!i)
                 {
-                    DOEPTSIZ0 = 0x20080040;
-                    DOEPDMA0 = &ctrlreq;
-                    DOEPCTL0 |= 0x84000000;
+                    DOEPTSIZ(0) = 0x20080040;
+                    DOEPDMA(0) = &ctrlreq;
+                    DOEPCTL(0) |= 0x84000000;
                 }
                 DOEPINT(i) = epints;
             }

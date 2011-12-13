@@ -61,6 +61,7 @@
 
 /* AHB */
 #define USB_BASE             0xC6000000
+#define OTGBASE              USB_BASE
 #define VIC_BASE             0xC6010000
 #define DMAC_BASE            0xC6020000
 #define MPMC_BASE            0xC6030000

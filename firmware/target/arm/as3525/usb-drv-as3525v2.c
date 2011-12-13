@@ -36,6 +36,14 @@
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
+/* Number of IN/OUT endpoints */
+#define NUM_IN_EP           3
+#define NUM_OUT_EP          2
+
+/* List of IN enpoints */
+#define IN_EP_LIST          0, 3, 5
+#define OUT_EP_LIST         2, 4
+
 static const uint8_t in_ep_list[NUM_IN_EP + 1] = {0, IN_EP_LIST};
 static const uint8_t out_ep_list[NUM_OUT_EP + 1] = {0, OUT_EP_LIST};
 
@@ -216,7 +224,7 @@ static void prepare_setup_ep0(void)
 {
     logf("usb-drv: prepare EP0");
     /* setup DMA */
-    DOEPDMA(0) = (unsigned long)AS3525_PHYSICAL_ADDR(&_ep0_setup_pkt);
+    DOEPDMA(0) = (void*)AS3525_PHYSICAL_ADDR(&_ep0_setup_pkt);
 
     /* Setup EP0 OUT with the following parameters:
      * packet count = 1
@@ -408,7 +416,7 @@ static void core_dev_init(void)
 
     /* Setup FIFOs */
     GRXFSIZ = 512;
-    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(512, 512);
+    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(512);
 
     /* Setup interrupt masks for endpoints */
     /* Setup interrupt masks */
@@ -766,9 +774,9 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
     /* disable interrupts to avoid any race */
     int oldlevel = disable_irq_save();
     
-    volatile unsigned long *epctl = dir_in ? &DIEPCTL(ep) : &DOEPCTL(ep);
-    volatile unsigned long *eptsiz = dir_in ? &DIEPTSIZ(ep) : &DOEPTSIZ(ep);
-    volatile unsigned long *epdma = dir_in ? &DIEPDMA(ep) : &DOEPDMA(ep);
+    volatile uint32_t *epctl = dir_in ? &DIEPCTL(ep) : &DOEPCTL(ep);
+    volatile uint32_t *eptsiz = dir_in ? &DIEPTSIZ(ep) : &DOEPTSIZ(ep);
+    const void * volatile * epdma = dir_in ? &DIEPDMA(ep) : &DOEPDMA(ep);
     struct usb_endpoint *endpoint = &endpoints[ep][dir_in];
     #define DEPCTL  *epctl
     #define DEPTSIZ *eptsiz
@@ -790,12 +798,12 @@ static int usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool blocki
 
     if(len == 0)
     {
-        DEPDMA = 0x10000000;
+        DEPDMA = (void*)0x10000000;
         DEPTSIZ = 1 << DEPTSIZ_pkcnt_bitp;
     }
     else
     {
-        DEPDMA = (unsigned long)AS3525_PHYSICAL_ADDR(ptr);
+        DEPDMA = (void*)AS3525_PHYSICAL_ADDR(ptr);
         DEPTSIZ = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
         if(dir_in)
             clean_dcache_range(ptr, len);
