@@ -163,12 +163,74 @@ static void usb_reset(void)
     reset_endpoints(1);
 }
 
+static void handle_ep_int(int out)
+{
+    static const uint8_t eps[2][3] = { /* IN */ {0, 1, 3}, /* OUT */ {0, 2, 4}};
+    for (int i = 0, ep = eps[!!out][i]; i < 3; ep = eps[!!out][i])
+    {
+        uint32_t epints = DEPINT(ep, out);
+        if (!epints)
+            continue;
+
+        if (epints & DIEPINT_xfercompl)
+        {
+            invalidate_dcache();
+            int bytes = endpoints[ep].size - (DEPTSIZ(ep, out) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
+            if (endpoints[ep].busy)
+            {
+                endpoints[ep].busy = false;
+                endpoints[ep].rc = 0;
+                endpoints[ep].done = true;
+                usb_core_transfer_complete(ep, out ? USB_DIR_OUT : USB_DIR_IN, 0, bytes);
+                semaphore_release(&endpoints[ep].complete);
+            }
+        }
+        if (epints & DIEPINT_ahberr)
+            panicf("USB: AHB error on EP%d (dir %d)", ep, out);
+        if (epints & DIEPINT_timeout)
+        {
+            if (!out)
+            {
+                if (endpoints[i].busy)
+                {
+                    endpoints[i].busy = false;
+                    endpoints[i].rc = 1;
+                    endpoints[i].done = true;
+                    semaphore_release(&endpoints[i].complete);
+                }
+            }
+            else
+            {   /* SETUP phase done */
+                invalidate_dcache();
+                if (ep == 0)
+                {
+                    if (ctrlreq.header.bRequest == 5)
+                    {
+                        /* Already set the new address here,
+                           before passing the packet to the core.
+                           See below (usb_drv_set_address) for details. */
+                        DCFG = (DCFG & ~(DCFG_devadr_bits << DCFG_devadr_bitp)) | (ctrlreq.header.wValue << DCFG_devadr_bitp);
+                    }
+                    usb_core_control_request(&ctrlreq.header);
+                }
+                else panicf("USB: SETUP done on OUT EP%d!?", ep);
+            }
+        }
+        /* Make sure EP0 OUT is set up to accept the next request */
+        if (out && ep == 0)
+        {
+            DEPTSIZ(0, true) = (1 << DEPTSIZ0_supcnt_bitp) | (1 << DEPTSIZ0_pkcnt_bitp) | 64;
+            DEPDMA(0, true) = &ctrlreq;
+            DEPCTL(0, true) |= DEPCTL_epena | DEPCTL_cnak;
+        }
+        DEPINT(ep, true) = epints;
+    }
+}
+
 /* IRQ handler */
 void INT_USB_FUNC(void)
 {
-    int i;
     uint32_t ints = GINTSTS;
-    uint32_t epints;
     if (ints & GINTMSK_usbreset)
     {
         DCFG = DCFG_nzstsouthshk;  /* Address 0 */
@@ -187,81 +249,10 @@ void INT_USB_FUNC(void)
     }
 
     if (ints & GINTMSK_inepintr)
-        for (i = 0; i < 4; i += i + 1)  // 0, 1, 3
-            if ((epints = DEPINT(i, false)))
-            {
-                if (epints & DIEPINT_xfercompl)
-                {
-                    invalidate_dcache();
-                    int bytes = endpoints[i].size - (DEPTSIZ(i, false) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
-                    if (endpoints[i].busy)
-                    {
-                        endpoints[i].busy = false;
-                        endpoints[i].rc = 0;
-                        endpoints[i].done = true;
-                        usb_core_transfer_complete(i, USB_DIR_IN, 0, bytes);
-                        semaphore_release(&endpoints[i].complete);
-                    }
-                }
-                if (epints & DIEPINT_ahberr)
-                    panicf("USB: AHB error on IN EP%d", i);
-                if (epints & DIEPINT_timeout)
-                {
-                    if (endpoints[i].busy)
-                    {
-                        endpoints[i].busy = false;
-                        endpoints[i].rc = 1;
-                        endpoints[i].done = true;
-                        semaphore_release(&endpoints[i].complete);
-                    }
-                }
-                DEPINT(i, false) = epints;
-            }
+        handle_ep_int(false);
 
     if (ints & GINTMSK_outepintr)
-        for (i = 0; i < USB_NUM_ENDPOINTS; i += 2)
-            if ((epints = DEPINT(i, true)))
-            {
-                if (epints & DIEPINT_xfercompl)
-                {
-                    invalidate_dcache();
-                    int bytes = endpoints[i].size - (DEPTSIZ(i, true) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
-                    if (endpoints[i].busy)
-                    {
-                        endpoints[i].busy = false;
-                        endpoints[i].rc = 0;
-                        endpoints[i].done = true;
-                        usb_core_transfer_complete(i, USB_DIR_OUT, 0, bytes);
-                        semaphore_release(&endpoints[i].complete);
-                    }
-                }
-                if (epints & DIEPINT_ahberr)
-                    panicf("USB: AHB error on OUT EP%d", i);
-                if (epints & DIEPINT_timeout)  /* SETUP phase done */
-                {
-                    invalidate_dcache();
-                    if (i == 0)
-                    {
-                        if (ctrlreq.header.bRequest == 5)
-                        {
-                            /* Already set the new address here,
-                               before passing the packet to the core.
-                               See below (usb_drv_set_address) for details. */
-                            DCFG = (DCFG & ~(DCFG_devadr_bits << DCFG_devadr_bitp)) | (ctrlreq.header.wValue << DCFG_devadr_bitp);
-                        }
-                        usb_core_control_request(&ctrlreq.header);
-                    }
-                    else panicf("USB: SETUP done on OUT EP%d!?", i);
-                }
-                /* Make sure EP0 OUT is set up to accept the next request */
-                if (i == 0)
-                {
-                    DEPTSIZ(0, true) = (1 << DEPTSIZ0_supcnt_bitp) | (1 << DEPTSIZ0_pkcnt_bitp) | 64;
-                    DEPDMA(0, true) = &ctrlreq;
-                    DEPCTL(0, true) |= DEPCTL_epena | DEPCTL_cnak;
-                }
-                DEPINT(i, true) = epints;
-            }
+        handle_ep_int(true);
 
     GINTSTS = ints;
 }
@@ -275,54 +266,29 @@ void usb_drv_set_address(int address)
        into the USB core, which will then call this dummy function. */
 }
 
-static void ep_send(int ep, const void *ptr, int length)
+static void ep_transfer(int ep, void *ptr, int length, int out)
 {
     endpoints[ep].busy = true;
     endpoints[ep].size = length;
-    DEPCTL(ep, false) |= DEPCTL_usbactep;
+    if (out)
+        DEPCTL(ep, out) &= ~DEPCTL_naksts;
+    DEPCTL(ep, out) |= DEPCTL_usbactep;
     int blocksize = usb_drv_port_speed() ? 512 : 64;
     int packets = (length + blocksize - 1) / blocksize;
-    if (!length)
-    {
-        DEPTSIZ(ep, false) = 1 << DEPTSIZ0_pkcnt_bitp;  /* one empty packet */
-        DEPDMA(ep, false) = NULL;
-    }
-    else
-    {
-        DEPTSIZ(ep, false) = length | (packets << DEPTSIZ0_pkcnt_bitp);
-        DEPDMA(ep, false) = ptr;
-    }
-    clean_dcache();
-    DEPCTL(ep, false) |= DEPCTL_epena | DEPCTL_cnak;
-}
+    if (packets == 0)
+        packets = 1;
 
-static void ep_recv(int ep, void *ptr, int length)
-{
-    endpoints[ep].busy = true;
-    endpoints[ep].size = length;
-    DEPCTL(ep, true) &= ~DEPCTL_naksts;
-    DEPCTL(ep, true) |= DEPCTL_usbactep;
-    int blocksize = usb_drv_port_speed() ? 512 : 64;
-    int packets = (length + blocksize - 1) / blocksize;
-    if (!length)
-    {
-        DEPTSIZ(ep, true) = 1 << DEPTSIZ0_pkcnt_bitp;  /* one empty packet */
-        DEPDMA(ep, true) = NULL;
-    }
-    else
-    {
-        DEPTSIZ(ep, true) = length | (packets << DEPTSIZ0_pkcnt_bitp);
-        DEPDMA(ep, true) = ptr;
-    }
+    DEPTSIZ(ep, out) = length | (packets << DEPTSIZ0_pkcnt_bitp);
+    DEPDMA(ep, out) = length ? ptr : NULL;
     clean_dcache();
-    DEPCTL(ep, true) |= DEPCTL_epena | DEPCTL_cnak;
+    DEPCTL(ep, out) |= DEPCTL_epena | DEPCTL_cnak;
 }
 
 int usb_drv_send(int endpoint, void *ptr, int length)
 {
-    endpoint &= 0x7f;
+    endpoint = EP_NUM(endpoint);
     endpoints[endpoint].done = false;
-    ep_send(endpoint, ptr, length);
+    ep_transfer(endpoint, ptr, length, false);
     while (!endpoints[endpoint].done && endpoints[endpoint].busy)
         semaphore_wait(&endpoints[endpoint].complete, TIMEOUT_BLOCK);
     return endpoints[endpoint].rc;
@@ -330,13 +296,13 @@ int usb_drv_send(int endpoint, void *ptr, int length)
 
 int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
 {
-    ep_send(endpoint & 0x7f, ptr, length);
+    ep_transfer(EP_NUM(endpoint), ptr, length, false);
     return 0;
 }
 
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
-    ep_recv(endpoint & 0x7f, ptr, length);
+    ep_transfer(EP_NUM(endpoint), ptr, length, true);
     return 0;
 }
 
@@ -404,8 +370,7 @@ void usb_drv_exit(void)
 
 void usb_init_device(void)
 {
-    unsigned int i;
-    for (i = 0; i < sizeof(endpoints)/sizeof(struct ep_type); i++)
+    for (unsigned i = 0; i < sizeof(endpoints)/sizeof(struct ep_type); i++)
         semaphore_init(&endpoints[i].complete, 1, 0);
 
     /* Power up the core clocks to allow writing

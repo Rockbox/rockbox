@@ -792,11 +792,7 @@ static void usb_drv_transfer(int ep, void *ptr, int len, bool dir_in, bool block
 
     DEPCTL(ep, !dir_in) |= DEPCTL_epena | DEPCTL_cnak;
 
-    /* restore interrupts */
     restore_irq(oldlevel);
-
-    if(blocking)
-        semaphore_wait(&endpoint->complete, TIMEOUT_BLOCK);
 }
 
 int usb_drv_recv(int ep, void *ptr, int len)
@@ -808,7 +804,9 @@ int usb_drv_recv(int ep, void *ptr, int len)
 int usb_drv_send(int ep, void *ptr, int len)
 {
     usb_drv_transfer(ep, ptr, len, true, true);
-    return endpoints[EP_NUM(ep)][1].status;
+    struct usb_endpoint *endpoint = &endpoints[ep][1];
+    semaphore_wait(&endpoint->complete, TIMEOUT_BLOCK);
+    return endpoints->status;
 }
 
 int usb_drv_send_nonblocking(int ep, void *ptr, int len)
