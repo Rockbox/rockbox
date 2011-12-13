@@ -89,7 +89,6 @@ static enum ep0state ep0_state;
 
 void usb_attach(void)
 {
-    logf("%s", __func__);
     /* Nothing to do */
 }
 
@@ -108,68 +107,13 @@ static void flush_tx_fifos(void)
 
 static void prepare_setup_ep0(void)
 {
-    logf("%s", __func__);
-    /* setup DMA */
     DEPDMA(0, true) = (void*)AS3525_PHYSICAL_ADDR(&_ep0_setup_pkt);
-
-    /* Setup EP0 OUT with the following parameters:
-     * packet count = 1
-     * setup packet count = 1
-     * transfer size = 8 (setup packet)
-     */
     DEPTSIZ(0, true) = (1 << DEPTSIZ0_supcnt_bitp)
                 | (1 << DEPTSIZ0_pkcnt_bitp)
                 | 8;
-
-    /* Enable endpoint, clear nak */
-    ep0_state = EP0_WAIT_SETUP;
     DEPCTL(0, true) |= DEPCTL_epena | DEPCTL_cnak;
-}
 
-static void handle_ep0_complete(bool is_ack)
-{
-    switch(ep0_state)
-    {
-        case EP0_WAIT_SETUP:
-            panicf("usb-drv: EP0 completion while waiting for SETUP");
-        case EP0_WAIT_ACK:
-            if(is_ack)
-                /* everything is done, prepare next setup */
-                prepare_setup_ep0();
-            else
-                panicf("usb-drv: EP0 data completion while waiting for ACK");
-            break;
-        case EP0_WAIT_DATA:
-            if(is_ack)
-                panicf("usb-drv: EP0 ACK while waiting for data completion");
-            else
-                /* everything is done, prepare next setup */
-                prepare_setup_ep0();
-            break;
-        case EP0_WAIT_DATA_ACK:
-            ep0_state = is_ack ? EP0_WAIT_DATA : EP0_WAIT_ACK;
-            break;
-        default:
-            panicf("usb-drv: invalid EP0 state");
-    }
-    logf("usb-drv: EP0 state updated to %d", ep0_state);
-}
-
-static void handle_ep0_setup(void)
-{
-    if(ep0_state != EP0_WAIT_SETUP)
-    {
-        logf("usb-drv: EP0 SETUP while in state %d", ep0_state);
-        return;
-    }
-    /* determine is there is a data phase */
-    if(ep0_setup_pkt->wLength == 0)
-        /* no: wait for ack */
-        ep0_state = EP0_WAIT_ACK;
-    else
-        /* yes: wait ack and data */
-        ep0_state = EP0_WAIT_DATA_ACK;
-    logf("usb-drv: EP0 state updated to %d", ep0_state);
+    ep0_state = EP0_WAIT_SETUP;
 }
 
 static void reset_endpoints(void)
@@ -200,11 +144,12 @@ static void reset_endpoints(void)
         int next_ep = in_ep_list[(i + 1) % sizeof(in_ep_list)];
         DEPCTL(ep, false) = (DEPCTL(ep, false) & ~bitm(DEPCTL, nextep)) | (next_ep << DEPCTL_nextep_bitp);
     }
+
+    prepare_setup_ep0();
 }
 
 static void cancel_all_transfers(bool cancel_ep0)
 {
-    logf("%s", __func__);
     int flags = disable_irq_save();
 
     for (int dir = 0; dir < 2; dir++)
@@ -244,11 +189,10 @@ void usb_drv_init(void)
     GRXFSIZ = 512;
     GNPTXFSIZ = MAKE_FIFOSIZE_DATA(512);
 
-    /* fixme: the current code is for internal DMA only, the clip+ architecture
-     *        define the internal DMA model */
-    /* Set burstlen and enable DMA*/
+    /* FIXME: the current code is for internal DMA only, the clip+ architecture
+     *        defines the internal DMA model */
     GAHBCFG = (GAHBCFG_INT_DMA_BURST_INCR << GAHBCFG_hburstlen_bitp)
-                | GAHBCFG_dma_enable;
+                | GAHBCFG_dma_enable | GAHBCFG_glblintrmsk;
 
     /* Select UTMI+ 16 */
     GUSBCFG = GUSBCFG_force_device_mode | GUSBCFG_phy_if | 7 << GUSBCFG_toutcal_bitp;
@@ -291,26 +235,17 @@ void usb_drv_init(void)
 
     reset_endpoints();
 
-    prepare_setup_ep0();
-
     GINTMSK = GINTMSK_usbreset
             | GINTMSK_enumdone
             | GINTMSK_inepintr
             | GINTMSK_outepintr
-            | GINTMSK_disconnect
-            | GINTMSK_usbsuspend
-            | GINTMSK_wkupintr
-            | GINTMSK_otgintr;
+            | GINTMSK_disconnect;
 
     VIC_INT_ENABLE = INTERRUPT_USB;
-    GAHBCFG |= GAHBCFG_glblintrmsk;
 }
 
 void usb_drv_exit(void)
 {
-    logf("%s", __func__);
-
-    GAHBCFG &= ~GAHBCFG_glblintrmsk;
     VIC_INT_EN_CLEAR = INTERRUPT_USB;
 
     DCTL = DCTL_pwronprgdone | DCTL_sftdiscon;
@@ -335,9 +270,25 @@ static void handle_ep_int(int ep, bool out)
             /* works even for EP0 */
             int size = (DEPTSIZ(ep, out) & DEPTSIZ_xfersize_bits);
             int transfered = endpoint->len - size;
-            /* handle EP0 state if necessary, this is a ack if length is 0 */
             if(ep == 0)
-                handle_ep0_complete(endpoint->len == 0);
+            {
+                bool is_ack = endpoint->len == 0;
+                switch(ep0_state)
+                {
+                case EP0_WAIT_SETUP:
+                    panicf("usb-drv: EP0 completion while waiting for SETUP");
+                case EP0_WAIT_DATA_ACK:
+                    ep0_state = is_ack ? EP0_WAIT_DATA : EP0_WAIT_ACK;
+                    break;
+                case EP0_WAIT_ACK:
+                case EP0_WAIT_DATA:
+                    if((!is_ack && ep0_state == EP0_WAIT_ACK) || (is_ack && ep0_state == EP0_WAIT_DATA))
+                        panicf("usb-drv: bad EP0 state");
+
+                    prepare_setup_ep0();
+                    break;
+                }
+            }
             if (!out)
                 endpoint->len = size;
             usb_core_transfer_complete(ep, out ? USB_DIR_OUT : USB_DIR_IN, 0, transfered);
@@ -371,81 +322,63 @@ static void handle_ep_int(int ep, bool out)
         }
         else
         {
-            /* handle EP0 state */
-            handle_ep0_setup();
+            if(ep0_state == EP0_WAIT_SETUP)
+            {
+                bool data_phase = ep0_setup_pkt->wLength != 0;
+                ep0_state = data_phase ? EP0_WAIT_DATA_ACK : EP0_WAIT_ACK;
+            }
+
             logf("  rt=%x r=%x", ep0_setup_pkt->bRequestType, ep0_setup_pkt->bRequest);
-            /* handle set address */
+
             if(ep0_setup_pkt->bRequestType == USB_TYPE_STANDARD &&
                     ep0_setup_pkt->bRequest == USB_REQ_SET_ADDRESS)
             {
-                /* Set address now */
+                /* Set address */
                 DCFG = (DCFG & ~bitm(DCFG, devadr)) | (ep0_setup_pkt->wValue << DCFG_devadr_bitp);
             }
             usb_core_control_request(ep0_setup_pkt);
         }
     }
 
-    /* clear interrupts */
     DEPINT(ep, out) = sts;
 }
 
-static void handle_ep_ints(void)
-{
-    logf("usb-drv: ep int");
-
-    unsigned long daint = DAINT;
-
-    for (int i = 0; i < USB_NUM_ENDPOINTS; i++)
-    {
-        if (daint & DAINT_IN_EP(i))
-            handle_ep_int(i, false);
-        if (daint & DAINT_OUT_EP(i))
-            handle_ep_int(i, true);
-    }
-
-    /* write back to clear status */
-    DAINT = daint;
-}
-
-/* interrupt service routine */
 void INT_USB(void)
 {
     /* some bits in GINTSTS can be set even though we didn't enable the interrupt source
      * so AND it with the actual mask */
     unsigned long sts = GINTSTS & GINTMSK;
+    logf("usb-drv: INT 0x%lx", sts);
 
     if(sts & GINTMSK_usbreset)
     {
-        logf("usb-drv: bus reset");
-
-        /* Clear the Remote Wakeup Signalling */
         DCTL &= ~DCTL_rmtwkupsig;
 
         flush_tx_fifos();
 
-        /* Flush the Learning Queue */
         GRSTCTL = GRSTCTL_intknqflsh;
 
-        /* Reset Device Address */
         DCFG &= ~bitm(DCFG, devadr);
 
         reset_endpoints();
-        prepare_setup_ep0();
 
         usb_core_bus_reset();
     }
 
-    if(sts & GINTMSK_enumdone)
-        logf("usb-drv: enum done: speed %cS", usb_drv_port_speed() ? 'H' : 'F');
-
-    if(sts & GINTMSK_otgintr)
-    {
-        logf("usb-drv: otg int");
-        GOTGINT = 0xffffffff;
-    }
-
     if(sts & (GINTMSK_outepintr | GINTMSK_inepintr))
-        handle_ep_ints();
+    {
+        unsigned long daint = DAINT;
+
+        for (int i = 0; i < USB_NUM_ENDPOINTS; i++)
+        {
+            if (daint & DAINT_IN_EP(i))
+                handle_ep_int(i, false);
+            if (daint & DAINT_OUT_EP(i))
+                handle_ep_int(i, true);
+        }
+
+        DAINT = daint;
+    }
 
     if(sts & GINTMSK_disconnect)
         cancel_all_transfers(true);
@@ -484,8 +417,6 @@ static unsigned long usb_drv_mps_by_type(int type)
 
 int usb_drv_request_endpoint(int type, int dir)
 {
-    logf("usb-drv: request endpoint (type=%d,dir=%s)", type, dir == USB_DIR_IN ? "IN" : "OUT");
-
     for (unsigned i = 1; i < sizeof((dir == USB_DIR_IN) ? in_ep_list : out_ep_list); i++)
     {
         int ep = ((dir == USB_DIR_IN) ? in_ep_list : out_ep_list)[i];
@@ -499,13 +430,11 @@ int usb_drv_request_endpoint(int type, int dir)
         return ep | dir;
     }
 
-    logf("usb-drv: request failed");
     return -1;
 }
 
 void usb_drv_release_endpoint(int ep)
 {
-    logf("usb-drv: release EP%d %s", EP_NUM(ep), EP_DIR(ep) == USB_DIR_IN ? "IN" : "OUT");
     endpoints[EP_NUM(ep)][EP_DIR(ep)].active = false;
 }
 
@@ -516,10 +445,9 @@ void usb_drv_cancel_all_transfers()
 
 static void usb_drv_transfer(int ep, void *ptr, int len, bool dir_in)
 {
-    ep = EP_NUM(ep);
     struct usb_endpoint *endpoint = &endpoints[ep][dir_in];
 
-    logf("usb-drv: xfer EP%d, len=%d, dir_in=%d, busy=%d", ep, len, dir_in, endpoint->busy);
+    logf("%s(%d, %d, %d) busy=%d", __func__, ep, len, dir_in, endpoint->busy);
 
     /* disable interrupts to avoid any race */
     int oldlevel = disable_irq_save();
@@ -554,12 +482,13 @@ static void usb_drv_transfer(int ep, void *ptr, int len, bool dir_in)
 
 int usb_drv_recv(int ep, void *ptr, int len)
 {
-    usb_drv_transfer(ep, ptr, len, false);
+    usb_drv_transfer(EP_NUM(ep), ptr, len, false);
     return 0;
 }
 
 int usb_drv_send(int ep, void *ptr, int len)
 {
+    ep = EP_NUM(ep);
     struct usb_endpoint *endpoint = &endpoints[ep][1];
     endpoint->done = false;
     usb_drv_transfer(ep, ptr, len, true);
@@ -570,7 +499,7 @@ int usb_drv_send(int ep, void *ptr, int len)
 
 int usb_drv_send_nonblocking(int ep, void *ptr, int len)
 {
-    usb_drv_transfer(ep, ptr, len, true);
+    usb_drv_transfer(EP_NUM(ep), ptr, len, true);
     return 0;
 }
 
@@ -589,7 +518,6 @@ void usb_drv_set_address(int address)
 
 void usb_drv_stall(int ep, bool stall, bool in)
 {
-    logf("usb-drv: %sstall EP%d %s", stall ? "" : "un", ep, in ? "IN" : "OUT");
     if (stall)
         DEPCTL(ep, !in) |=  DEPCTL_stall;
     else
