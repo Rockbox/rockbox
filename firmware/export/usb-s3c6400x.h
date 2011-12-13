@@ -384,10 +384,8 @@
 /** Device IN Token Queue Read Register 4 (RO) */
 #define DTKNQR4     (*((uint32_t volatile*)(OTGBASE + 0x834)))
 
-/* Device Logical IN Endpoint-Specific Registers */
-#define DIEPCTL(x)  (*((uint32_t volatile*)(OTGBASE + 0x900 + 0x20 * (x))))
-/* Device Logical OUT Endpoint-Specific Registers */
-#define DOEPCTL(x)  (*((uint32_t volatile*)(OTGBASE + 0xB00 + 0x20 * (x))))
+/* Device Logical Endpoint-Specific Registers */
+#define DEPCTL(x, out)  (*((uint32_t volatile*)(OTGBASE + 0x900 + ((!!out) * 0x200) + 0x20 * (x))))
 /** Maximum Packet Size
  * IN/OUT EPn
  * IN/OUT EP0 - 2 bits
@@ -462,10 +460,8 @@
 #define DEPCTL_epdis            (1 << 30) /** Endpoint disable */
 #define DEPCTL_epena            (1 << 31) /** Endpoint enable */
 
-/** Device IN Endpoint (ep) Transfer Size Register */
-#define DIEPTSIZ(x) (*((uint32_t volatile*)(OTGBASE + 0x910 + 0x20 * (x))))
-/** Device OUT Endpoint (ep) Transfer Size Register */
-#define DOEPTSIZ(x) (*((uint32_t volatile*)(OTGBASE + 0xB10 + 0x20 * (x))))
+/** Device Endpoint (ep) Transfer Size Register */
+#define DEPTSIZ(x, out) (*((uint32_t volatile*)(OTGBASE + 0x910 + (0x200 * (!!out)) + 0x20 * (x))))
 /* valid for any D{I,O}EPTSIZi with 1<=i<=15, NOT for i=0 ! */
 #define DEPTSIZ_xfersize_bitp   0 /** Transfer Size */
 #define DEPTSIZ_xfersize_bits   0x7ffff
@@ -483,12 +479,10 @@
 
 
 /** Device Endpoint (ep) Control Register */
-#define DIEPINT(x)  (*((uint32_t volatile*)(OTGBASE + 0x908 + 0x20 * (x))))
-#define DOEPINT(x)  (*((uint32_t volatile*)(OTGBASE + 0xB08 + 0x20 * (x))))
+#define DEPINT(x,out)  (*((uint32_t volatile*)(OTGBASE + 0x908 + (0x200 * (!!out)) + 0x20 * (x))))
 
 /** Device Endpoint (ep) DMA Address Register */
-#define DIEPDMA(x)  (*((const void* volatile*)(OTGBASE + 0x914 + 0x20 * (x))))
-#define DOEPDMA(x)  (*((const void* volatile*)(OTGBASE + 0xB14 + 0x20 * (x))))
+#define DEPDMA(x,out)  (*((const void* volatile*)(OTGBASE + 0x914 + (0x200 * (!!out)) + 0x20 * (x))))
 
 /* Power and Clock Gating Register */
 #define PCGCCTL     (*((uint32_t volatile*)(OTGBASE + 0xE00)))

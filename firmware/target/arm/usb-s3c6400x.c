@@ -79,62 +79,51 @@ static void reset_endpoints(int reinit)
         semaphore_release(&endpoints[i].complete);
     }
 
-    DIEPCTL(0) = DEPCTL_usbactep | (1 << DEPCTL_nextep_bitp);
-    DOEPCTL(0) = DEPCTL_usbactep;
-    DOEPTSIZ(0) = (1 << DEPTSIZ_pkcnt_bitp) | (1 << DEPTSIZ0_supcnt_bitp) | 64;
+    DEPCTL(0, false) = DEPCTL_usbactep | (1 << DEPCTL_nextep_bitp);
+    DEPCTL(0, true) = DEPCTL_usbactep;
+    DEPTSIZ(0, true) = (1 << DEPTSIZ_pkcnt_bitp) | (1 << DEPTSIZ0_supcnt_bitp) | 64;
 
-    DOEPDMA(0) = &ctrlreq;
-    DOEPCTL(0) |= DEPCTL_epena | DEPCTL_cnak;
+    DEPDMA(0, true) = &ctrlreq;
+    DEPCTL(0, true) |= DEPCTL_epena | DEPCTL_cnak;
     if (reinit)
     {
         /* The size is getting set to zero, because we don't know
            whether we are Full Speed or High Speed at this stage */
-        DIEPCTL(1) = DEPCTL_setd0pid | (3 << DEPCTL_nextep_bitp);
-        DOEPCTL(2) = DEPCTL_setd0pid;
-        DIEPCTL(3) = DEPCTL_setd0pid | (0 << DEPCTL_nextep_bitp);
-        DOEPCTL(4) = DEPCTL_setd0pid;
+        DEPCTL(1, false) = DEPCTL_setd0pid | (3 << DEPCTL_nextep_bitp);
+        DEPCTL(2, true) = DEPCTL_setd0pid;
+        DEPCTL(3, false) = DEPCTL_setd0pid | (0 << DEPCTL_nextep_bitp);
+        DEPCTL(4, true) = DEPCTL_setd0pid;
     }
     else
     {
-        DIEPCTL(1) = (DIEPCTL(1) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
-        DOEPCTL(2) = (DOEPCTL(2) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
-        DIEPCTL(3) = (DIEPCTL(3) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
-        DOEPCTL(4) = (DOEPCTL(4) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
+        DEPCTL(1, false) = (DEPCTL(1, false) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
+        DEPCTL(2, true) = (DEPCTL(2, true) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
+        DEPCTL(3, false) = (DEPCTL(3, false) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
+        DEPCTL(4, true) = (DEPCTL(4, true) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
     }
     DAINTMSK = 0xFFFFFFFF;  /* Enable interrupts on all EPs */
 }
 
 int usb_drv_request_endpoint(int type, int dir)
 {
-    size_t ep;
-    int ret = -1;
-
-    if (dir == USB_DIR_IN) ep = 1;
-    else ep = 2;
-
-    while (ep < USB_NUM_ENDPOINTS)
-    {
+    for(size_t ep = (dir == USB_DIR_IN) ? 1 : 2; ep < USB_NUM_ENDPOINTS; ep += 2)
         if (!endpoints[ep].active)
         {
             endpoints[ep].active = true;
-            ret = ep | dir;
-            uint32_t newbits = (type << DEPCTL_eptype_bitp) | DEPCTL_epena;
-            uint32_t mask = DEPCTL_eptype_bits << DEPCTL_eptype_bitp;
-            if (dir) DIEPCTL(ep) = (DIEPCTL(ep) & ~mask) | newbits;
-            else DOEPCTL(ep) = (DOEPCTL(ep) & ~mask) | newbits;
-            break;
+            DEPCTL(ep, !dir) = (DEPCTL(ep, !dir) & ~(DEPCTL_eptype_bits << DEPCTL_eptype_bitp)) |
+                (type << DEPCTL_eptype_bitp) | DEPCTL_epena;
+            return ep | dir;
         }
-        ep += 2;
-    }
 
-    return ret;
+    return -1;
 }
 
 void usb_drv_release_endpoint(int ep)
 {
     ep = ep & 0x7f;
 
-    if (ep < 1 || ep > USB_NUM_ENDPOINTS) return;
+    if (ep < 1 || ep > USB_NUM_ENDPOINTS)
+        return;
 
     endpoints[ep].active = false;
 }
@@ -191,20 +180,20 @@ void INT_USB_FUNC(void)
     {
         /* Set up the maximum packet sizes accordingly */
         uint32_t maxpacket = (usb_drv_port_speed() ? 512 : 64) << DEPCTL_mps_bitp;
-        DIEPCTL(1) = (DIEPCTL(1) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
-        DOEPCTL(2) = (DOEPCTL(2) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
-        DIEPCTL(3) = (DIEPCTL(3) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
-        DOEPCTL(4) = (DOEPCTL(4) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
+        DEPCTL(1, false) = (DEPCTL(1, false) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
+        DEPCTL(2, true) = (DEPCTL(2, true) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
+        DEPCTL(3, false) = (DEPCTL(3, false) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
+        DEPCTL(4, true) = (DEPCTL(4, true) & ~(DEPCTL_mps_bits << DEPCTL_mps_bitp)) | maxpacket;
     }
 
     if (ints & GINTMSK_inepintr)
         for (i = 0; i < 4; i += i + 1)  // 0, 1, 3
-            if ((epints = DIEPINT(i)))
+            if ((epints = DEPINT(i, false)))
             {
                 if (epints & DIEPINT_xfercompl)
                 {
                     invalidate_dcache();
-                    int bytes = endpoints[i].size - (DIEPTSIZ(i) & 0x3FFFF);
+                    int bytes = endpoints[i].size - (DEPTSIZ(i, false) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
                     if (endpoints[i].busy)
                     {
                         endpoints[i].busy = false;
@@ -226,17 +215,17 @@ void INT_USB_FUNC(void)
                         semaphore_release(&endpoints[i].complete);
                     }
                 }
-                DIEPINT(i) = epints;
+                DEPINT(i, false) = epints;
             }
 
     if (ints & GINTMSK_outepintr)
         for (i = 0; i < USB_NUM_ENDPOINTS; i += 2)
-            if ((epints = DOEPINT(i)))
+            if ((epints = DEPINT(i, true)))
             {
                 if (epints & DIEPINT_xfercompl)
                 {
                     invalidate_dcache();
-                    int bytes = endpoints[i].size - (DOEPTSIZ(i) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
+                    int bytes = endpoints[i].size - (DEPTSIZ(i, true) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
                     if (endpoints[i].busy)
                     {
                         endpoints[i].busy = false;
@@ -267,11 +256,11 @@ void INT_USB_FUNC(void)
                 /* Make sure EP0 OUT is set up to accept the next request */
                 if (i == 0)
                 {
-                    DOEPTSIZ(0) = (1 << DEPTSIZ0_supcnt_bitp) | (1 << DEPTSIZ0_pkcnt_bitp) | 64;
-                    DOEPDMA(0) = &ctrlreq;
-                    DOEPCTL(0) |= DEPCTL_epena | DEPCTL_cnak;
+                    DEPTSIZ(0, true) = (1 << DEPTSIZ0_supcnt_bitp) | (1 << DEPTSIZ0_pkcnt_bitp) | 64;
+                    DEPDMA(0, true) = &ctrlreq;
+                    DEPCTL(0, true) |= DEPCTL_epena | DEPCTL_cnak;
                 }
-                DOEPINT(i) = epints;
+                DEPINT(i, true) = epints;
             }
 
     GINTSTS = ints;
@@ -290,43 +279,43 @@ static void ep_send(int ep, const void *ptr, int length)
 {
     endpoints[ep].busy = true;
     endpoints[ep].size = length;
-    DIEPCTL(ep) |= DEPCTL_usbactep;
+    DEPCTL(ep, false) |= DEPCTL_usbactep;
     int blocksize = usb_drv_port_speed() ? 512 : 64;
     int packets = (length + blocksize - 1) / blocksize;
     if (!length)
     {
-        DIEPTSIZ(ep) = 1 << DEPTSIZ0_pkcnt_bitp;  /* one empty packet */
-        DIEPDMA(ep) = NULL;
+        DEPTSIZ(ep, false) = 1 << DEPTSIZ0_pkcnt_bitp;  /* one empty packet */
+        DEPDMA(ep, false) = NULL;
     }
     else
     {
-        DIEPTSIZ(ep) = length | (packets << DEPTSIZ0_pkcnt_bitp);
-        DIEPDMA(ep) = ptr;
+        DEPTSIZ(ep, false) = length | (packets << DEPTSIZ0_pkcnt_bitp);
+        DEPDMA(ep, false) = ptr;
     }
     clean_dcache();
-    DIEPCTL(ep) |= DEPCTL_epena | DEPCTL_cnak;
+    DEPCTL(ep, false) |= DEPCTL_epena | DEPCTL_cnak;
 }
 
 static void ep_recv(int ep, void *ptr, int length)
 {
     endpoints[ep].busy = true;
     endpoints[ep].size = length;
-    DOEPCTL(ep) &= ~DEPCTL_naksts;
-    DOEPCTL(ep) |= DEPCTL_usbactep;
+    DEPCTL(ep, true) &= ~DEPCTL_naksts;
+    DEPCTL(ep, true) |= DEPCTL_usbactep;
     int blocksize = usb_drv_port_speed() ? 512 : 64;
     int packets = (length + blocksize - 1) / blocksize;
     if (!length)
     {
-        DOEPTSIZ(ep) = 1 << DEPTSIZ0_pkcnt_bitp;  /* one empty packet */
-        DOEPDMA(ep) = NULL;
+        DEPTSIZ(ep, true) = 1 << DEPTSIZ0_pkcnt_bitp;  /* one empty packet */
+        DEPDMA(ep, true) = NULL;
     }
     else
     {
-        DOEPTSIZ(ep) = length | (packets << DEPTSIZ0_pkcnt_bitp);
-        DOEPDMA(ep) = ptr;
+        DEPTSIZ(ep, true) = length | (packets << DEPTSIZ0_pkcnt_bitp);
+        DEPDMA(ep, true) = ptr;
     }
     clean_dcache();
-    DOEPCTL(ep) |= DEPCTL_epena | DEPCTL_cnak;
+    DEPCTL(ep, true) |= DEPCTL_epena | DEPCTL_cnak;
 }
 
 int usb_drv_send(int endpoint, void *ptr, int length)
@@ -365,22 +354,15 @@ void usb_drv_set_test_mode(int mode)
 
 bool usb_drv_stalled(int endpoint, bool in)
 {
-    if (in) return DIEPCTL(endpoint) & DEPCTL_naksts;
-    else    return DOEPCTL(endpoint) & DEPCTL_naksts;
+    return DEPCTL(endpoint, !in) & DEPCTL_naksts;
 }
 
 void usb_drv_stall(int endpoint, bool stall, bool in)
 {
-    if (in)
-    {
-        if (stall) DIEPCTL(endpoint) |= DEPCTL_naksts;
-        else       DIEPCTL(endpoint) &= ~DEPCTL_naksts;
-    }
+    if (stall)
+        DEPCTL(endpoint, !in) |= DEPCTL_naksts;
     else
-    {
-        if (stall) DOEPCTL(endpoint) |= DEPCTL_naksts;
-        else       DOEPCTL(endpoint) &= ~DEPCTL_naksts;
-    }
+        DEPCTL(endpoint, !in) &= ~DEPCTL_naksts;
 }
 
 void usb_drv_init(void)
