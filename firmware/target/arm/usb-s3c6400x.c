@@ -166,8 +166,9 @@ static void usb_reset(void)
 static void handle_ep_int(int out)
 {
     static const uint8_t eps[2][3] = { /* IN */ {0, 1, 3}, /* OUT */ {0, 2, 4}};
-    for (int i = 0, ep = eps[!!out][i]; i < 3; ep = eps[!!out][i])
+    for (int i = 0; i < 3; i++)
     {
+        int ep = eps[!!out][i];
         uint32_t epints = DEPINT(ep, out);
         if (!epints)
             continue;
