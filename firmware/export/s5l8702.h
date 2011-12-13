@@ -120,7 +120,7 @@
 #define OTGBASE 0x38400000
 #define PHYBASE 0x3C400000
 #define SYNOPSYSOTG_CLOCK 0
-#define SYNOPSYSOTG_AHBCFG 0x2B
+#define SYNOPSYSOTG_AHBCFG (GAHBCFG_dma_enable | (GAHBCFG_INT_DMA_BURST_INCR8 << GAHBCFG_hburstlen_bitp) | GAHBCFG_glblintrmsk)
 
 
 /////I2C/////
