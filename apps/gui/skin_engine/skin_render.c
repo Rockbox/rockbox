@@ -733,15 +733,10 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
         /* only update if the line needs to be, and there is something to write */
         if (refresh_type && needs_update)
         {
-            if (info.line_scrolls)
-            {
-                /* if the line is a scrolling one we don't want to update
-                   too often, so that it has the time to scroll */
-                if ((refresh_type & SKIN_REFRESH_SCROLL) || info.force_redraw)
-                    write_line(display, align, info.line_number, true, info.text_style);
-            }
-            else
-                write_line(display, align, info.line_number, false, info.text_style);
+            if (!info.force_redraw)
+                display->scroll_stop_line(&skin_viewport->vp, info.line_number);
+            write_line(display, align, info.line_number,
+                    info.line_scrolls, info.text_style);
         }
         if (!info.no_line_break)
             info.line_number++;
@@ -907,15 +902,10 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
         /* only update if the line needs to be, and there is something to write */
         if (refresh_type && needs_update)
         {
-            if (info.line_scrolls)
-            {
-                /* if the line is a scrolling one we don't want to update
-                   too often, so that it has the time to scroll */
-                if ((refresh_type & SKIN_REFRESH_SCROLL) || info.force_redraw)
-                    write_line(display, align, info.line_number, true, info.text_style);
-            }
-            else
-                write_line(display, align, info.line_number, false, info.text_style);
+            if (!info.force_redraw)
+                display->scroll_stop_line(&skin_viewport->vp, info.line_number);
+            write_line(display, align, info.line_number,
+                    info.line_scrolls, info.text_style);
         }
         info.line_number++;
         info.offset++;

@@ -365,6 +365,20 @@ void LCDFN(puts_offset)(int x, int y, const unsigned char *str, int offset)
 
 /*** scrolling ***/
 
+static struct scrollinfo* find_scrolling_line(int line)
+{
+    struct scrollinfo* s = NULL;
+    int i;
+
+    for(i=0; i<LCDFN(scroll_info).lines; i++)
+    {
+        s = &LCDFN(scroll_info).scroll[i];
+        if (s->y == line && s->vp == current_vp)
+            return s;
+    }
+    return NULL;
+}
+
 void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string,
                                      int style, int x_offset, int y_offset)
 {
@@ -372,32 +386,47 @@ void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string
     char *end;
     int w, h;
     int len;
+    bool restart = false;
+    int space_width;
 
-    if ((unsigned)y >= (unsigned)current_vp->height)
+    if (!string || ((unsigned)y >= (unsigned)current_vp->height))
         return;
 
-    /* remove any previously scrolling line at the same location */
-    LCDFN(scroll_stop_line)(current_vp, y);
+    s = find_scrolling_line(y);
+    if (!s)
+        restart = true;
 
-    if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES)) return;
-    if (!string)
-        return;
-    LCDFN(puts_style_xyoffset)(x, y, string, style, x_offset, y_offset);
+    if (restart)
+    {
+        /* remove any previously scrolling line at the same location */
+        LCDFN(scroll_stop_line)(current_vp, y);
+
+        if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES)) return;
+        LCDFN(puts_style_xyoffset)(x, y, string, style, x_offset, y_offset);
+    }
 
     LCDFN(getstringsize)(string, &w, &h);
 
     if (current_vp->width - x * 8 >= w)
         return;
 
-    /* prepare scroll line */
-    s = &LCDFN(scroll_info).scroll[LCDFN(scroll_info).lines];
-    s->start_tick = current_tick + LCDFN(scroll_info).delay;
-    s->style = style;
-
+    if (restart)
+    {
+        /* prepare scroll line */
+        s = &LCDFN(scroll_info).scroll[LCDFN(scroll_info).lines];
+        s->start_tick = current_tick + LCDFN(scroll_info).delay;
+    }
     strlcpy(s->line, string, sizeof s->line);
+    space_width = LCDFN(getstringsize)(" ", NULL, NULL);
 
     /* get width */
-    s->width = LCDFN(getstringsize)(s->line, &w, &h);
+    LCDFN(getstringsize)(s->line, &w, &h);
+    if (!restart && s->width > w)
+    {
+        if (s->startx > w)
+            s->startx = w;
+    }
+    s->width = w;
 
     /* scroll bidirectional or forward only depending on the string
        width */
@@ -411,7 +440,7 @@ void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string
     if (!s->bidir) { /* add spaces if scrolling in the round */
         strlcat(s->line, "   ", sizeof s->line);
         /* get new width incl. spaces */
-        s->width = LCDFN(getstringsize)(s->line, &w, &h);
+        s->width += space_width * 3;
     }
 
     end = strchr(s->line, '\0');
@@ -420,12 +449,16 @@ void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string
 
     s->vp = current_vp;
     s->y = y;
-    s->offset = x_offset;
-    s->startx = x * LCDFN(getstringsize)(" ", NULL, NULL);
+    if (restart)
+    {
+        s->offset = x_offset;
+        s->startx = x * space_width;
+        s->backward = false;
+    }
     s->y_offset = y_offset;
-    s->backward = false;
 
-    LCDFN(scroll_info).lines++;
+    if (restart)
+        LCDFN(scroll_info).lines++;
 }
 
 void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
