@@ -73,29 +73,35 @@ mac {
 MYAR = $$replace(QMAKE_CC,gcc.*,ar)
 
 librbspeex.commands = @$(MAKE) -s \
+        BUILD_DIR=$$MYBUILDDIR/rbspeex/ \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/rbspeex \
         librbspeex$$RBLIBPOSTFIX \
         SYS_SPEEX=\"$$LIBSPEEX\" \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libucl.commands = @$(MAKE) -s \
+        BUILD_DIR=$$MYBUILDDIR/ucl/ \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/ucl/src \
         libucl$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libmkamsboot.commands = @$(MAKE) -s \
+        BUILD_DIR=$$MYBUILDDIR/mkamsboot/ \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkamsboot \
         APPVERSION=\"rbutil\" \
         libmkamsboot$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libmktccboot.commands = @$(MAKE) -s \
+        BUILD_DIR=$$MYBUILDDIR/mktccboot/ \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mktccboot \
         libmktccboot$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libmkmpioboot.commands = @$(MAKE) -s \
+        BUILD_DIR=$$MYBUILDDIR/mkmpioboot/ \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkmpioboot \
         APPVERSION=\"rbutil\" \
         libmkmpioboot$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libchinachip.commands = @$(MAKE) -s \
+        BUILD_DIR=$$MYBUILDDIR/chinachip/ \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/chinachippatcher \
         APPVERSION=\"rbutil\" \
         libchinachip$$RBLIBPOSTFIX \
