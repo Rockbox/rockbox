@@ -125,7 +125,3 @@ int fms_do_button_loop(bool update_screen)
     return button;
 }
 
-struct gui_wps *fms_get(enum screen_type screen)
-{
-    return skin_get_gwps(FM_SCREEN, screen);
-}

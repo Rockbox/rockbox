@@ -1309,11 +1309,6 @@ static bool check_all_headers(void)
     return true;
 }
 
-bool tagcache_is_busy(void)
-{
-    return read_lock || write_lock;
-}
-
 bool tagcache_search(struct tagcache_search *tcs, int tag)
 {
     struct tagcache_header tag_hdr;
@@ -3303,16 +3298,6 @@ void tagcache_update_numeric(int idx_id, int tag, long data)
 }
 #endif /* !__PCTOOL__ */
 
-long tagcache_get_serial(void)
-{
-    return current_tcmh.serial;
-}
-
-long tagcache_get_commitid(void)
-{
-    return current_tcmh.commitid;
-}
-
 static bool write_tag(int fd, const char *tagstr, const char *datastr)
 {
     char buf[512];
@@ -4793,13 +4778,6 @@ void tagcache_stop_scan(void)
 {
     queue_post(&tagcache_queue, Q_STOP_SCAN, 0);
 }
-
-#ifdef HAVE_TC_RAMCACHE
-bool tagcache_is_ramcache(void)
-{
-    return tc_stat.ramcache;
-}
-#endif
 
 #endif /* !__PCTOOL__ */
 

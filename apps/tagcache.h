@@ -214,7 +214,6 @@ bool tagcache_is_numeric_tag(int type);
 bool tagcache_find_index(struct tagcache_search *tcs, const char *filename);
 bool tagcache_check_clauses(struct tagcache_search *tcs,
                             struct tagcache_search_clause **clause, int count);
-bool tagcache_is_busy(void);
 bool tagcache_search(struct tagcache_search *tcs, int tag);
 void tagcache_search_set_uniqbuf(struct tagcache_search *tcs,
                                  void *buffer, long length);
@@ -228,7 +227,6 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
 void tagcache_search_finish(struct tagcache_search *tcs);
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);
 long tagcache_increase_serial(void);
-long tagcache_get_serial(void);
 bool tagcache_import_changelog(void);
 bool tagcache_create_changelog(struct tagcache_search *tcs);
 void tagcache_update_numeric(int idx_id, int tag, long data);
@@ -244,7 +242,6 @@ void tagcache_screensync_event(void);
 void tagcache_screensync_enable(bool state);
 
 #ifdef HAVE_TC_RAMCACHE
-bool tagcache_is_ramcache(void);
 #ifdef HAVE_DIRCACHE
 bool tagcache_fill_tags(struct mp3entry *id3, const char *filename);
 #endif

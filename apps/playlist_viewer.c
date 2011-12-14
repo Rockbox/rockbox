@@ -126,7 +126,6 @@ static void format_line(const struct playlist_entry* track, char* str,
 
 static bool update_playlist(bool force);
 static int  onplay_menu(int index);
-static int save_playlist_func(void);
 
 static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
                                  int names_buffer_size)
@@ -437,9 +436,6 @@ static bool update_playlist(bool force)
     return true;
 }
 
-MENUITEM_FUNCTION(save_playlist_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
-                  save_playlist_func, 0, NULL, Icon_NOICON);
-
 /* Menu of playlist commands.  Invoked via ON+PLAY on main viewer screen.
    Returns -1 if USB attached, 0 if no playlist change, and 1 if playlist
    changed. */
@@ -519,13 +515,6 @@ static int onplay_menu(int index)
         }
     }
     return ret;
-}
-
-/* Save playlist to disk */
-static int save_playlist_func(void)
-{
-    save_playlist_screen(viewer.playlist);
-    return 0;
 }
 
 /* View current playlist */

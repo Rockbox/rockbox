@@ -364,24 +364,6 @@ static bool check_disk_present(IF_MD_NONVOID(int volume))
 #endif
 }
 
-void usb_storage_try_release_storage(void)
-{
-    /* Check if there is a connected drive left. If not,
-       release excusive access */
-    bool canrelease=true;
-    int i;
-    for(i=0;i<storage_num_drives();i++) {
-        if(!ejected[i] && locked[i]) {
-            canrelease=false;
-            break;
-        }
-    }
-    if(canrelease) {
-        logf("scsi release ata");
-        usb_release_exclusive_storage();
-    }
-}
-
 #ifdef HAVE_HOTSWAP
 void usb_storage_notify_hotswap(int volume,bool inserted)
 {

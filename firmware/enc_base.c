@@ -25,6 +25,7 @@
 
 /** mp3_enc.codec **/
 
+#if 0 /* Currently unused, left for reference and future use */
 /* These are in descending order rather than in MPEG frequency index
    order */
 const unsigned long mp3_enc_sampr[MP3_ENC_NUM_SAMPR] =
@@ -35,6 +36,7 @@ const unsigned long mp3_enc_sampr[MP3_ENC_NUM_SAMPR] =
     12000, 11025,  8000, /* MPEG 2.5 */
 #endif
 };
+#endif
 
 /* All bitrates used in the MPA L3 standard */
 const unsigned long mp3_enc_bitr[MP3_ENC_NUM_BITR] =

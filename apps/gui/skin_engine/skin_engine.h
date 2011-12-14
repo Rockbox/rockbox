@@ -57,9 +57,6 @@ void skin_update(enum skinnable_screens skin, enum screen_type screen,
 bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
                     const char *buf, bool isfile);
 
-/* call this in statusbar toggle handlers if needed */
-void skin_statusbar_changed(struct gui_wps*);
-
 bool skin_has_sbs(enum screen_type screen, struct wps_data *data);
 
 

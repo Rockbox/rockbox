@@ -250,6 +250,7 @@ const int rec_format_afmt[REC_NUM_FORMATS] =
     [REC_FORMAT_PCM_WAV] = AFMT_PCM_WAV,
 };
 
+#if 0 /* Currently unused, left for reference and future use */
 /* get AFMT_* corresponding REC_FORMAT_* */
 const int afmt_rec_format[AFMT_NUM_CODECS] =
 {
@@ -261,6 +262,7 @@ const int afmt_rec_format[AFMT_NUM_CODECS] =
     [AFMT_WAVPACK] = REC_FORMAT_WAVPACK,
     [AFMT_PCM_WAV] = REC_FORMAT_PCM_WAV,
 };
+#endif
 #endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
 
 #if CONFIG_CODEC == SWCODEC

@@ -778,13 +778,6 @@ bool list_do_action(int context, int timeout,
     return gui_synclist_do_button(lists, action, wrap);
 }
 
-bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,
-                                   enum screen_type screen, int item)
-{
-    int nb_lines = list_get_nb_lines(lists, screen);
-    return (unsigned)(item - lists->start_item[screen]) < (unsigned) nb_lines;
-}
-
 /* Simple use list implementation */
 static int simplelist_line_count = 0;
 static char simplelist_text[SIMPLELIST_MAX_LINES][SIMPLELIST_MAX_LINELENGTH];

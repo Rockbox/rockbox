@@ -126,20 +126,3 @@ const unsigned char bitmap_icon_disk[12] =
     {0x00,0x00,0x00,0x1c,0x2e,0x4f,0x77,0x79,0x3a,0x1c,0x00,0x00};
 #endif
 
-/*
- * Print play mode to status bar
- */
-void statusbar_icon_play_mode(int mode)
-{
-    lcd_mono_bitmap(bitmap_icons_7x8[mode], ICON_PLAY_MODE_X_POS,
-                    STATUSBAR_Y_POS, ICON_PLAY_MODE_WIDTH, STATUSBAR_HEIGHT);
-}
-
-/*
- * Print shuffle mode to status bar
- */
-void statusbar_icon_shuffle(void)
-{
-    lcd_mono_bitmap(bitmap_icons_7x8[Icon_Shuffle], ICON_SHUFFLE_X_POS,
-                    STATUSBAR_Y_POS, ICON_SHUFFLE_WIDTH, STATUSBAR_HEIGHT);
-}

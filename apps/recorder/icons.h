@@ -128,20 +128,6 @@ extern const unsigned char bitmap_icon_disk[];
 #define ICON_DISK_X_POS       STATUSBAR_WIDTH-ICON_DISK_WIDTH
 #define TIME_X_END            STATUSBAR_WIDTH-1
 
-extern void statusbar_wipe(void);
-extern void statusbar_icon_battery(int percent);
-extern bool statusbar_icon_volume(int percent);
-extern void statusbar_icon_play_state(int state);
-extern void statusbar_icon_play_mode(int mode);
-extern void statusbar_icon_shuffle(void);
-extern void statusbar_icon_lock(void);
-#if CONFIG_RTC
-extern void statusbar_time(int hour, int minute);
-#endif
-#if (CONFIG_LED == LED_VIRTUAL)
-extern void statusbar_led(void);
-#endif
-
 #endif /* End HAVE_LCD_BITMAP */
 #endif /* PLUGIN */
 #endif /*  _ICONS_H_ */

@@ -3625,12 +3625,6 @@ bool audio_restore_playback(int type)
     }
 }
 
-/* Has the playback buffer been completely claimed? */
-bool audio_buffer_state_trashed(void)
-{
-    return buffer_state == AUDIOBUF_STATE_TRASHED;
-}
-
 
 /** --- Miscellaneous public interfaces --- **/
 

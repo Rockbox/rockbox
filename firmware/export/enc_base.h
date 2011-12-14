@@ -97,7 +97,9 @@ struct aiff_enc_config
 /* This number is count of full encoder set */
 #define MP3_ENC_NUM_SAMPR       6
 
+#if 0
 extern const unsigned long mp3_enc_sampr[MP3_ENC_NUM_SAMPR];
+#endif
 extern const unsigned long mp3_enc_bitr[MP3_ENC_NUM_BITR];
 
 struct mp3_enc_config

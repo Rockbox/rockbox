@@ -95,39 +95,6 @@ void skin_update(enum skinnable_screens skin, enum screen_type screen,
 
 #ifdef HAVE_LCD_BITMAP
 
-void skin_statusbar_changed(struct gui_wps *skin)
-{
-    if (!skin)
-        return;
-    struct wps_data *data = skin->data;
-    const struct screen *display = skin->display;
-    const int   screen = display->screen_type;
-    struct skin_viewport *svp = skin_find_item(VP_DEFAULT_LABEL_STRING, SKIN_FIND_VP, data);
-
-    struct viewport *vp = &svp->vp;
-    viewport_set_defaults(vp, screen);
-
-    if (data->wps_sb_tag)
-    {   /* fix up the default viewport */
-        if (data->show_sb_on_wps)
-        {
-            if (statusbar_position(screen) != STATUSBAR_OFF)
-                return;     /* vp is fixed already */
-
-            vp->y       = STATUSBAR_HEIGHT;
-            vp->height  = display->lcdheight - STATUSBAR_HEIGHT;
-        }
-        else
-        {
-            if (statusbar_position(screen) == STATUSBAR_OFF)
-                return;     /* vp is fixed already */
-            vp->y       = vp->x = 0;
-            vp->height  = display->lcdheight;
-            vp->width   = display->lcdwidth;
-        }
-    }
-}
-
 void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
 {
     struct screen *display = gwps->display;

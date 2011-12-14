@@ -149,7 +149,7 @@ enum rec_format_indexes
 /* get REC_FORMAT_* corresponding AFMT_* */
 extern const int rec_format_afmt[REC_NUM_FORMATS];
 /* get AFMT_* corresponding REC_FORMAT_* */
-extern const int afmt_rec_format[AFMT_NUM_CODECS];
+/* unused: extern const int afmt_rec_format[AFMT_NUM_CODECS]; */
 
 #define AFMT_ENTRY(label, root_fname, enc_root_fname, func, ext_list) \
     { label, root_fname, enc_root_fname, func, ext_list }
