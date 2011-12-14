@@ -600,7 +600,7 @@ static void sd_thread(void)
         case SYS_HOTSWAP_INSERTED:
         case SYS_HOTSWAP_EXTRACTED:
         {
-            int microsd_init = 1;
+            int changed = 1;
             fat_lock();          /* lock-out FAT activity first -
                                     prevent deadlocking via disk_mount that
                                     would cause a reverse-order attempt with
@@ -620,18 +620,14 @@ static void sd_thread(void)
             if (ev.id == SYS_HOTSWAP_INSERTED)
             {
                 sd_enable(true);
-                microsd_init = sd_init_card(SD_SLOT_AS3525);
-                if (microsd_init < 0) /* initialisation failed */
-                    panicf("microSD init failed : %d", microsd_init);
-
-                microsd_init = disk_mount(SD_SLOT_AS3525); /* 0 if fail */
+                changed = (sd_init_card(SD_SLOT_AS3525) == 0) && disk_mount(SD_SLOT_AS3525); /* 0 if fail */
             }
 
             /*
              * Mount succeeded, or this was an EXTRACTED event,
              * in both cases notify the system about the changed filesystems
              */
-            if (microsd_init)
+            if (changed)
                 queue_broadcast(SYS_FS_CHANGED, 0);
 
             sd_enable(false);
