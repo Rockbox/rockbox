@@ -23,7 +23,7 @@
 
 
 static int removed = 0; /* number of items removed */
-static bool abort;
+static bool user_abort;
 
 struct tidy_type {
     char filestring[64];
@@ -223,7 +223,7 @@ static enum plugin_status tidy_clean(char *path, int *path_length, bool rmdir)
         if (button == ACTION_STD_CANCEL)
         {
             rb->closedir(dir);
-            abort = true;
+            user_abort = true;
             return PLUGIN_OK;
         }
         if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
@@ -288,7 +288,7 @@ static enum plugin_status tidy_do(void)
     if (status == PLUGIN_OK)
     {
         rb->lcd_clear_display();
-        if (abort)
+        if (user_abort)
         {
             rb->splash(HZ, "User aborted");
             rb->lcd_clear_display();
@@ -361,7 +361,7 @@ static void tidy_lcd_menu(void)
         switch(rb->do_menu(&menu, &selection, NULL, false))
         {
         default:
-            abort = true;
+            user_abort = true;
         case 0:
             return; /* start cleaning */
 
@@ -409,5 +409,5 @@ enum plugin_status plugin_start(const void* parameter)
     if (tidy_loaded_and_changed)
         save_config();
 
-    return abort ? PLUGIN_OK : tidy_do();
+    return user_abort ? PLUGIN_OK : tidy_do();
 }
