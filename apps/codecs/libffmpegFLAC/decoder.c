@@ -488,9 +488,87 @@ static int decode_frame(FLACContext *s,
     return 0;
 }
 
+static int flac_downmix(FLACContext *s)
+{
+    int32_t *FL, *FR, *FC, *SB, *RL, *RR;
+    int32_t *outL = s->decoded[0];
+    int32_t *outR = s->decoded[1];
+    int i, scale=FLAC_OUTPUT_DEPTH-s->bps;
+
+    switch(s->channels)
+    {
+        case 3: /* 3.0 channel order: FL FR FC */
+            FL = s->decoded[0];
+            FR = s->decoded[1];
+            FC = s->decoded[2];
+            /* LF = 0.66 LF + 0.33 FC
+               LR = 0.66 LR + 0.33 FC */
+            for (i=0; i<s->blocksize; ++i) {
+                int32_t a = *(FL)*2 + *(FC);
+                int32_t b = *(FR)*2 + *(FC);
+                *outL++ = ((a + (a<<2))>>4) << scale; /* 1/3 ~= 5>>4 */
+                *outR++ = ((b + (b<<2))>>4) << scale; /* 1/3 ~= 5>>4 */
+                FL++; FR++; FC++;
+            }
+            break;
+        case 4: /* 4.0 channel order: FL FR RL RR */
+            FL = s->decoded[0];
+            FR = s->decoded[1];
+            RL = s->decoded[2];
+            RR = s->decoded[3];
+            /* LF = 0.50 LF + 0.50 RL + 0.00 RR
+               LR = 0.50 LR + 0.00 RL + 0.50 RR */
+            for (i=0; i<s->blocksize; ++i) {
+                int32_t a = *(FL) + *(RL);
+                int32_t b = *(FR) + *(RR);
+                *outL++ = (a>>1) << scale;
+                *outR++ = (b>>1) << scale;
+                FL++; FR++; RL++; RR++;
+            }
+            break;
+        case 5: /* 5.0 channel order: FL FR FC RL RR */
+            FL = s->decoded[0];
+            FR = s->decoded[1];
+            FC = s->decoded[2];
+            RL = s->decoded[3];
+            RR = s->decoded[4];
+            /* LF = 0.40 LF + 0.20 FC + 0.40 RL + 0.00 RR
+               LR = 0.40 LR + 0.20 FC + 0.00 RL + 0.40 RR */
+            for (i=0; i<s->blocksize; ++i) {
+                int32_t a = *(FL)*2 + *(FC) + *(RL)*2;
+                int32_t b = *(FR)*2 + *(FC) + *(RR)*2;
+                *outL++ = ((a + (a<<1))>>4) << scale; /* 3>>4 ~= 1/5 */
+                *outR++ = ((b + (b<<1))>>4) << scale; /* 3>>4 ~= 1/5 */
+                FL++; FR++; FC++; RL++; RR++;
+            }
+            break;
+        case 6: /* 5.1 channel order: FL FR FC SUB RL RR */
+            FL = s->decoded[0];
+            FR = s->decoded[1];
+            FC = s->decoded[2];
+            SB = s->decoded[3];
+            RL = s->decoded[4];
+            RR = s->decoded[5];
+            /* LF = 0.33 LF + 0.16 SUB + 0.16 FC + 0.33 RL + 0.00 RR
+               LR = 0.33 LR + 0.16 SUB + 0.16 FC + 0.00 RL + 0.33 RR */
+            for (i=0; i<s->blocksize; ++i) {
+                int32_t a = *(FL)*2 + *(SB) + *(FC) + *(RL)*2;
+                int32_t b = *(FR)*2 + *(SB) + *(FC) + *(RR)*2;
+                *outL++ = ((a + (a<<2))>>5) << scale; /* 5>>5 ~= 1/6 */
+                *outR++ = ((b + (b<<2))>>5) << scale; /* 5>>5 ~= 1/6 */
+                FL++; FR++; SB++; FC++; RL++; RR++;
+            }
+            break;
+        default: /* 1.0 and 2.0 do not need downmix, other formats unknown. */
+            return -501;
+            break;
+    }
+    return 0;
+}
+
 int flac_decode_frame(FLACContext *s,
-                             uint8_t *buf, int buf_size,
-                             void (*yield)(void))
+                      uint8_t *buf, int buf_size,
+                      void (*yield)(void))
 {
     int tmp;
     int i;
@@ -514,8 +592,8 @@ int flac_decode_frame(FLACContext *s,
     
 #define DECORRELATE(left, right)\
              for (i = 0; i < s->blocksize; i++) {\
-                int a = s->decoded[0][i];\
-                int b = s->decoded[1][i];\
+                int32_t a = s->decoded[0][i];\
+                int32_t b = s->decoded[1][i];\
                 s->decoded[0][i] = (left)  << scale;\
                 s->decoded[1][i] = (right) << scale;\
              }\
@@ -524,7 +602,12 @@ int flac_decode_frame(FLACContext *s,
     switch(s->decorrelation)
     {
         case INDEPENDENT:
-            DECORRELATE(a, b) /* Always decorrelate exactly the two supported channels. */
+            if (s->channels <= 2) {
+                DECORRELATE(a, b) /* Always decorrelate exactly the two supported channels. */
+            } else {
+                if ((tmp=flac_downmix(s)) != 0)
+                    return tmp;
+            }
             break;
         case LEFT_SIDE:
             DECORRELATE(a, a-b)

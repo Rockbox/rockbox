@@ -27,7 +27,7 @@ CODEC_HEADER
 /* The output buffers containing the decoded samples (channels 0 and 1) */
 static int32_t decoded0[MAX_BLOCKSIZE] IBSS_ATTR_FLAC_DECODED0;
 static int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR;
-static int32_t dummydec[MAX_BLOCKSIZE];
+static int32_t dummydec[4][MAX_BLOCKSIZE];
 
 #define MAX_SUPPORTED_SEEKTABLE_SIZE 5000
 
@@ -98,8 +98,7 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     fc->decoded[1] = decoded1;
     for (ch=2; ch<MAX_CHANNELS; ++ch)
     {
-        /* Only channel 0 and 1 are used, the other are decoded to scratch */
-        fc->decoded[ch] = dummydec;
+        fc->decoded[ch] = dummydec[ch-2];
     }
 
     /* Skip any foreign tags at start of file */
