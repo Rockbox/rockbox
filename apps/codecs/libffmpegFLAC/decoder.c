@@ -530,7 +530,7 @@ int flac_decode_frame(FLACContext *s,
             DECORRELATE(a, a-b)
             break;
         case RIGHT_SIDE:
-            DECORRELATE(a+b, a)
+            DECORRELATE(a+b, b)
             break;
         case MID_SIDE:
             DECORRELATE( (a-=b>>1) + b, a)
