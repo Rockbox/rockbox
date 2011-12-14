@@ -1018,12 +1018,12 @@ void sd_enable(bool on)
         bitclr32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
     }
 }
+#endif /* BOOTLOADER */
 
 tCardInfo *card_get_info_target(int card_no)
 {
     return &card_info[card_no];
 }
-#endif /* BOOTLOADER */
 
 #ifdef HAVE_HOTSWAP
 bool sd_removable(IF_MD_NONVOID(int drive))
