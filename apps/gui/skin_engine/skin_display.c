@@ -431,12 +431,13 @@ void write_line(struct screen *display, struct align_pos *format_align,
 #ifndef HAVE_LCD_BITMAP
     (void)style;
 #endif
-    int left_width = 0, left_xpos;
+    int left_width = 0;
     int center_width = 0, center_xpos;
     int right_width = 0,  right_xpos;
     int space_width;
     int string_height;
     int scroll_width;
+    int viewport_width = display->getwidth();
 
     /* calculate different string sizes and positions */
     display->getstringsize((unsigned char *)" ", &space_width, &string_height);
@@ -455,11 +456,10 @@ void write_line(struct screen *display, struct align_pos *format_align,
                                 &center_width, &string_height);
     }
 
-    left_xpos = 0;
-    right_xpos = (display->getwidth() - right_width);
-    center_xpos = (display->getwidth() + left_xpos - center_width) / 2;
+    right_xpos = (viewport_width - right_width);
+    center_xpos = (viewport_width - center_width) / 2;
 
-    scroll_width = display->getwidth() - left_xpos;
+    scroll_width = viewport_width;
 
     /* Checks for overlapping strings.
         If needed the overlapping strings will be merged, separated by a
@@ -468,7 +468,7 @@ void write_line(struct screen *display, struct align_pos *format_align,
     /* CASE 1: left and centered string overlap */
     /* there is a left string, need to merge left and center */
     if ((left_width != 0 && center_width != 0) &&
-        (left_xpos + left_width + space_width > center_xpos)) {
+        (left_width + space_width > center_xpos)) {
         /* replace the former separator '\0' of left and
             center string with a space */
         *(--format_align->center) = ' ';
@@ -479,7 +479,7 @@ void write_line(struct screen *display, struct align_pos *format_align,
     }
     /* there is no left string, move center to left */
     if ((left_width == 0 && center_width != 0) &&
-        (left_xpos + left_width > center_xpos)) {
+        (left_width > center_xpos)) {
         /* move the center string to the left string */
         format_align->left = format_align->center;
         /* calculate the new width and position of the string */
@@ -499,7 +499,7 @@ void write_line(struct screen *display, struct align_pos *format_align,
         format_align->right = format_align->center;
         /* calculate the new width and position of the merged string */
         right_width = center_width + space_width + right_width;
-        right_xpos = (display->getwidth() - right_width);
+        right_xpos = (viewport_width - right_width);
         /* there is no centered string anymore */
         center_width = 0;
     }
@@ -510,7 +510,7 @@ void write_line(struct screen *display, struct align_pos *format_align,
         format_align->right = format_align->center;
         /* calculate the new width and position of the string */
         right_width = center_width;
-        right_xpos = (display->getwidth() - right_width);
+        right_xpos = (viewport_width - right_width);
         /* there is no centered string anymore */
         center_width = 0;
     }
@@ -520,7 +520,7 @@ void write_line(struct screen *display, struct align_pos *format_align,
         was one or it has been merged in case 1 or 2 */
     /* there is a left string, need to merge left and right */
     if ((left_width != 0 && center_width == 0 && right_width != 0) &&
-        (left_xpos + left_width + space_width > right_xpos)) {
+        (left_width + space_width > right_xpos)) {
         /* replace the former separator '\0' of left and
             right string with a space */
         *(--format_align->right) = ' ';
@@ -557,7 +557,7 @@ void write_line(struct screen *display, struct align_pos *format_align,
 #ifdef HAVE_LCD_BITMAP
         /* clear the line first */
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        display->fillrect(left_xpos, line*string_height, display->getwidth(), string_height);
+        display->fillrect(0, line*string_height, viewport_width, string_height);
         display->set_drawmode(DRMODE_SOLID);
 #endif
 
@@ -565,27 +565,29 @@ void write_line(struct screen *display, struct align_pos *format_align,
         which will reset the scroller for that line */
         display->puts_scroll(0, line, (unsigned char *)"");
 #ifdef HAVE_LCD_BITMAP
+        style |= STYLE_XY_PIXELS;
+        line *= string_height;
         /* print aligned strings */
         if (left_width != 0)
         {
-            display->puts_style_xyoffset(left_xpos/space_width, line,
+            display->puts_style_xyoffset(0, line,
                             (unsigned char *)format_align->left, style, 0, 0);
 
         }
         if (center_width != 0)
         {
-            display->puts_style_xyoffset(center_xpos/space_width, line,
+            display->puts_style_xyoffset((viewport_width-center_width)/2, line,
                             (unsigned char *)format_align->center, style, 0, 0);
         }
         if (right_width != 0)
         {
-            display->puts_style_xyoffset(right_xpos/space_width, line,
+            display->puts_style_xyoffset(viewport_width-right_width, line,
                             (unsigned char *)format_align->right, style, 0, 0);
         }
 #else
         if (left_width != 0)
         {
-            display->putsxy(left_xpos, line,
+            display->putsxy(0, line,
                     (unsigned char *)format_align->left);
         }
         if (center_width != 0)

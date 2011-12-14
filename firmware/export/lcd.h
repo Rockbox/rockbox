@@ -125,6 +125,11 @@ enum screen_type {
 #define STYLE_COLORBAR   0x40000000
 #define STYLE_GRADIENT   0x80000000
 #define STYLE_MODE_MASK  0xF0000000
+/* HACK: This isnt really a style, We need to be able to tell some of
+ * the lcd API that we want to draw text to a specific pixel instead
+ * of a char. Remove this hack when the whole LCD api goes to fully
+ * pixel based positioning - jdgordon */
+#define STYLE_XY_PIXELS  0x00010000
 #define STYLE_COLOR_MASK 0x0000FFFF
 #ifdef HAVE_LCD_COLOR
 #define STYLE_CURLN_MASK 0x0000FF00

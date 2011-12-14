@@ -318,8 +318,16 @@ void LCDFN(puts_style_xyoffset)(int x, int y, const unsigned char *str,
         return;
 
     h = current_vp->line_height ?: (int)font_get(current_vp->font)->height;
-    xpos = x * LCDFN(getstringsize)(" ", NULL, NULL);
-    ypos = y * h + y_offset;
+    if ((style&STYLE_XY_PIXELS) == 0)
+    {
+        xpos = x * LCDFN(getstringsize)(" ", NULL, NULL);
+        ypos = y * h + y_offset;
+    }
+    else
+    {
+        xpos = x;
+        ypos = y + y_offset;
+    }
     LCDFN(putsxyofs_style)(xpos, ypos, str, style, h, x_offset);
 }
 
