@@ -92,19 +92,6 @@ void usb_attach(void)
     /* Nothing to do */
 }
 
-static void flush_tx_fifos(void)
-{
-    unsigned int i = 0;
-
-    GRSTCTL = (0x10 << GRSTCTL_txfnum_bitp) | GRSTCTL_txfflsh_flush;
-    while(GRSTCTL & GRSTCTL_txfflsh_flush)
-        if (i++ >= 0x300)
-            panicf("usb-drv: hang of flush tx fifos");
-
-    /* wait 3 phy clocks */
-    udelay(1);
-}
-
 static void prepare_setup_ep0(void)
 {
     DEPDMA(0, true) = (void*)AS3525_PHYSICAL_ADDR(&_ep0_setup_pkt);
@@ -122,10 +109,12 @@ static void reset_endpoints(void)
         for (unsigned i = 0; i < sizeof((dir == DIR_IN) ? in_ep_list : out_ep_list); i++)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
-            endpoints[ep][dir == DIR_OUT].active = false;
-            endpoints[ep][dir == DIR_OUT].busy = false;
-            endpoints[ep][dir == DIR_OUT].status = -1;
-            endpoints[ep][dir == DIR_OUT].done = false;
+            endpoints[ep][dir == DIR_OUT] = (struct usb_endpoint) {
+                .active = false,
+                .busy   = false,
+                .status = -1,
+                .done   = false,
+            };
             semaphore_release(&endpoints[ep][dir == DIR_OUT].complete);
 
             if (i != 0)
@@ -135,7 +124,6 @@ static void reset_endpoints(void)
             else
                 DEPCTL(0, dir == DIR_OUT)  = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
         }
-
 
     /* Setup next chain for IN eps */
     for (unsigned i = 0; i < sizeof(in_ep_list); i++)
@@ -156,9 +144,11 @@ static void cancel_all_transfers(bool cancel_ep0)
         for (unsigned i = !!cancel_ep0; i < sizeof((dir == DIR_IN) ? in_ep_list : out_ep_list); i++)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
-            endpoints[ep][dir == DIR_OUT].status = -1;
-            endpoints[ep][dir == DIR_OUT].busy = false;
-            endpoints[ep][dir == DIR_OUT].done = false;
+            endpoints[ep][dir == DIR_OUT] = (struct usb_endpoint) {
+                .status = -1,
+                .busy   = false,
+                .done   = false,
+            };
             semaphore_release(&endpoints[ep][dir == DIR_OUT].complete);
             DEPCTL(ep, dir) = (DEPCTL(ep, dir) & ~DEPCTL_usbactep) | DEPCTL_snak;
         }
@@ -259,6 +249,7 @@ static void handle_ep_int(int ep, bool out)
 {
     struct usb_endpoint *endpoint = &endpoints[ep][out ? DIR_OUT : DIR_IN];
     unsigned long sts = DEPINT(ep, out);
+    logf("%s(%d %s): sts = 0x%lx", __func__, ep, out?"OUT":"IN", sts);
     if(sts & DEPINT_ahberr)
         panicf("usb-drv: ahb error on EP%d %s", ep, out ? "OUT" : "IN");
     if(sts & DEPINT_xfercompl)
@@ -296,23 +287,12 @@ static void handle_ep_int(int ep, bool out)
             semaphore_release(&endpoint->complete);
         }
     }
+
     if(!out && (sts & DIEPINT_timeout))
-    {
         panicf("usb-drv: timeout on EP%d IN", ep);
-        if(endpoint->busy)
-        {
-            endpoint->busy = false;
-            endpoint->status = -1;
-            /* for safety, act as if no bytes as been transfered */
-            endpoint->len = 0;
-            usb_core_transfer_complete(ep, USB_DIR_IN, 1, 0);
-            endpoint->done = true;
-            semaphore_release(&endpoint->complete);
-        }
-    }
+
     if(out && (sts & DOEPINT_setup))
     {
-        logf("usb-drv: setup on EP%d OUT", ep);
         if(ep != 0)
             panicf("usb-drv: setup not on EP0, this is impossible");
         if((DEPTSIZ(ep, true) & DEPTSIZ_xfersize_bits) != 0)
@@ -352,16 +332,8 @@ void INT_USB(void)
 
     if(sts & GINTMSK_usbreset)
     {
-        DCTL &= ~DCTL_rmtwkupsig;
-
-        flush_tx_fifos();
-
-        GRSTCTL = GRSTCTL_intknqflsh;
-
-        DCFG &= ~bitm(DCFG, devadr);
-
+        DCFG &= ~bitm(DCFG, devadr); /* Address 0 */
         reset_endpoints();
-
         usb_core_bus_reset();
     }
 
@@ -445,16 +417,14 @@ void usb_drv_cancel_all_transfers()
 
 static void usb_drv_transfer(int ep, void *ptr, int len, bool dir_in)
 {
-    struct usb_endpoint *endpoint = &endpoints[ep][dir_in];
-
-    logf("%s(%d, %d, %d) busy=%d", __func__, ep, len, dir_in, endpoint->busy);
-
     /* disable interrupts to avoid any race */
     int oldlevel = disable_irq_save();
-    
-    endpoint->busy = true;
-    endpoint->len = len;
-    endpoint->status = -1;
+
+    endpoints[ep][dir_in] = (struct usb_endpoint) {
+        .busy   = true,
+        .len    = len,
+        .status = -1,
+    };
 
     DEPCTL(ep, !dir_in) = (DEPCTL(ep, !dir_in) & ~DEPCTL_stall) | DEPCTL_usbactep;
 
