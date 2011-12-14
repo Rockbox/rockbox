@@ -63,10 +63,8 @@ static void usb_mode(void)
                 (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
     lcd_update();
 
-    usb_enable(true);
     while(usb_detect() == USB_INSERTED)
         sleep(HZ);
-    usb_enable(false);
 
     reset_screen();
     lcd_update();

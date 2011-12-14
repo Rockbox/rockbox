@@ -135,6 +135,11 @@ static inline bool usb_do_screendump(void)
 
 
 #ifdef HAVE_USBSTACK
+/* Enable / disable USB when the stack is enabled - otherwise a noop */
+static inline void usb_stack_enable(bool enable)
+{
+    usb_enable(enable);
+}
 
 #ifdef HAVE_HOTSWAP
 static inline void usb_handle_hotswap(long id)
@@ -222,7 +227,6 @@ static inline void usb_slave_mode(bool on)
     }
     else /* usb_state == USB_INSERTED (only!) */
     {
-        usb_enable(false);
 #ifdef HAVE_PRIORITY_SCHEDULING
         thread_set_priority(thread_self(), PRIORITY_SYSTEM);
 #endif
@@ -253,6 +257,11 @@ void usb_signal_transfer_completion(
 }
 
 #else  /* !HAVE_USBSTACK */
+
+static inline void usb_stack_enable(bool enable)
+{
+    (void)enable;
+}
 
 #ifdef HAVE_HOTSWAP
 static inline void usb_handle_hotswap(long id)
@@ -403,6 +412,7 @@ static void usb_thread(void)
                 break;
 
             usb_state = USB_POWERED;
+            usb_stack_enable(true);
 #endif /* USB_DETECT_BY_CORE */
 
             if(usb_power_button())
@@ -467,19 +477,18 @@ static void usb_thread(void)
                 break;
 
             usb_state = USB_POWERED;
-            usb_enable(true);
+            usb_stack_enable(true);
             break;
             /* USB_POWERED: */
 
         case USB_UNPOWERED:
-            if(usb_state == USB_POWERED)
-                usb_enable(false);
-            /* Fall-through - other legal states can be USB_INSERTED or
-               USB_SCREENDUMP */
 #endif /* USB_DETECT_BY_CORE */
         case USB_EXTRACTED:
             if(usb_state == USB_EXTRACTED)
                 break;
+
+            if(usb_state == USB_POWERED || usb_state == USB_INSERTED)
+                usb_stack_enable(false);
 
             /* Only disable the USB slave mode if we really have enabled
                it. Some expected acks may not have been received. */
