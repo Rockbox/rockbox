@@ -30,13 +30,13 @@
 #if   defined(SANSA_CLIP)
 # define OUT_PIN GPIOC_PIN
 # define OUT_DIR GPIOC_DIR
-# define OUT_INITIAL 0
+# define INITIAL 0
 # define IN_PIN  GPIOB_PIN
 # define IN_DIR  GPIOB_DIR
 #elif defined(SANSA_CLIPV2)
 # define OUT_PIN GPIOD_PIN
 # define OUT_DIR GPIOD_DIR
-# define OUT_INITIAL 1
+# define INITIAL 1
 # define IN_PIN  GPIOD_PIN
 # define IN_DIR  GPIOD_DIR
 #endif
@@ -45,7 +45,7 @@ static const int rows[3] = {
 #if   defined(SANSA_CLIP)
     4, 5, 6
 #elif defined(SANSA_CLIPV2)
-    5, 6, 4
+    3, 4, 5
 #endif
 };
 
@@ -55,7 +55,7 @@ void button_init_device(void)
     IN_DIR &= ~((1<<2) | (1<<1) | (1<<0));
 
     for (int i = 0; i < 3; i++) {
-        OUT_PIN(rows[i]) = OUT_INITIAL << rows[i];
+        OUT_PIN(rows[i]) = INITIAL << rows[i];
         OUT_DIR |= 1 << rows[i];
     }
 
@@ -95,16 +95,16 @@ int button_read_device(void)
     };
 
     for (int i = 0; i<3; i++)
-        if (IN_PIN(i))
+        if (IN_PIN(i) ^ (INITIAL << i))
             buttons |=  matrix[row][i];
         else
             buttons &= ~matrix[row][i];
 
     /* prepare next row */
-    OUT_PIN(rows[row]) = 0 << rows[row];
+    OUT_PIN(rows[row]) = INITIAL << rows[row];
     row++;
     row %= 3;
-    OUT_PIN(rows[row]) = 1 << rows[row];
+    OUT_PIN(rows[row]) = (!INITIAL) << rows[row];
 
     return buttons;
 }
