@@ -92,6 +92,7 @@ libmkamsboot.commands = @$(MAKE) -s \
 libmktccboot.commands = @$(MAKE) -s \
         BUILD_DIR=$$MYBUILDDIR/mktccboot/ \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mktccboot \
+        APPVERSION=\"rbutil\" \
         libmktccboot$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libmkmpioboot.commands = @$(MAKE) -s \
