@@ -58,19 +58,13 @@ all: $(BINARY)
 OBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(notdir $(SOURCES))))
 LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(notdir $(LIBSOURCES))))
 
-$(OBJDIR)%.o: %.c
-	@echo CC $<
-	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c -o $@ $<
+# additional link dependencies for the standalone executable
+# extra dependencies: libucl
+LIBUCL = libucl$(RBARCH).a
+$(LIBUCL): $(OBJDIR)$(LIBUCL)
 
-lib$(OUTPUT)$(RBARCH).a: $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
-lib$(OUTPUT)$(RBARCH): $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
-
-$(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
-	@echo AR $(notdir $@)
-	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(AR) rucs $@ $^
-
+$(OBJDIR)$(LIBUCL):
+	$(SILENT)$(MAKE) -C $(TOP)/../tools/ucl/src TARGET_DIR=$(OBJDIR) $@
 
 # building the standalone executable
 $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
@@ -78,6 +72,21 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 #	$(SILENT)mkdir -p $(dir $@)
 # EXTRADEPS need to be built into OBJDIR.
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -o $(BINARY) $(OBJS) $(addprefix $(OBJDIR),$(EXTRADEPS)) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
+
+# common rules
+$(OBJDIR)%.o: %.c
+	@echo CC $<
+	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c -o $@ $<
+
+# lib rules
+lib$(OUTPUT)$(RBARCH).a: $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
+lib$(OUTPUT)$(RBARCH): $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
+
+$(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
+	@echo AR $(notdir $@)
+	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(AR) rucs $@ $^
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
