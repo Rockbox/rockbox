@@ -36,7 +36,7 @@
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
-static const uint8_t in_ep_list[] = {0, 3, 5};
+static const uint8_t in_ep_list[] = {0, 1, 3}; // FIXME : EP5 ?
 static const uint8_t out_ep_list[] = {0, 2, 4};
 
 /* store per endpoint, per direction, information */
@@ -103,34 +103,39 @@ static void prepare_setup_ep0(void)
     ep0_state = EP0_WAIT_SETUP;
 }
 
+static size_t num_eps(bool out)
+{
+    return out ? sizeof(out_ep_list) : sizeof(in_ep_list);
+}
+
 static void reset_endpoints(void)
 {
     for (int dir = 0; dir < 2; dir++)
-        for (unsigned i = 0; i < sizeof((dir == DIR_IN) ? in_ep_list : out_ep_list); i++)
+    {
+        bool out = dir == DIR_OUT;
+        for (unsigned i = 0; i < num_eps(dir == DIR_OUT); i++)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
-            endpoints[ep][dir == DIR_OUT] = (struct usb_endpoint) {
+            endpoints[ep][out] = (struct usb_endpoint) {
                 .active = false,
                 .busy   = false,
                 .status = -1,
                 .done   = false,
             };
-            semaphore_release(&endpoints[ep][dir == DIR_OUT].complete);
+            semaphore_release(&endpoints[ep][out].complete);
 
             if (i != 0)
-                DEPCTL(ep, dir == DIR_OUT) = (DEPCTL(ep, dir == DIR_OUT) & DEPCTL_epena)
-                    ? DEPCTL_snak
-                    : 0;
-            else
-                DEPCTL(0, dir == DIR_OUT)  = (DEPCTL_MPS_64 << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
+                DEPCTL(ep, out) = DEPCTL_setd0pid;
         }
+        DEPCTL(0, out) = /*(DEPCTL_MPS_64 << DEPCTL_mps_bitp) | */ DEPCTL_usbactep;
+    }
 
     /* Setup next chain for IN eps */
-    for (unsigned i = 0; i < sizeof(in_ep_list); i++)
+    for (unsigned i = 0; i < num_eps(false); i++)
     {
         int ep = in_ep_list[i];
-        int next_ep = in_ep_list[(i + 1) % sizeof(in_ep_list)];
-        DEPCTL(ep, false) = (DEPCTL(ep, false) & ~bitm(DEPCTL, nextep)) | (next_ep << DEPCTL_nextep_bitp);
+        int next_ep = in_ep_list[(i + 1) % num_eps(false)];
+        DEPCTL(ep, false) |= next_ep << DEPCTL_nextep_bitp;
     }
 
     prepare_setup_ep0();
@@ -141,7 +146,7 @@ static void cancel_all_transfers(bool cancel_ep0)
     int flags = disable_irq_save();
 
     for (int dir = 0; dir < 2; dir++)
-        for (unsigned i = !!cancel_ep0; i < sizeof((dir == DIR_IN) ? in_ep_list : out_ep_list); i++)
+        for (unsigned i = !!cancel_ep0; i < num_eps(dir == DIR_OUT); i++)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
             endpoints[ep][dir == DIR_OUT] = (struct usb_endpoint) {
@@ -150,7 +155,7 @@ static void cancel_all_transfers(bool cancel_ep0)
                 .done   = false,
             };
             semaphore_release(&endpoints[ep][dir == DIR_OUT].complete);
-            DEPCTL(ep, dir) = (DEPCTL(ep, dir) & ~DEPCTL_usbactep) | DEPCTL_snak;
+            DEPCTL(ep, dir) = (DEPCTL(ep, dir) & ~DEPCTL_usbactep);
         }
 
     restore_irq(flags);
@@ -210,7 +215,7 @@ void usb_drv_init(void)
         panicf("usb-drv: wrong endpoint number");
 
     for (int dir = 0; dir < 2; dir++)
-        for (unsigned i = 0; i < sizeof((dir == DIR_IN) ? in_ep_list : out_ep_list); i++)
+        for (unsigned i = 0; i < num_eps(dir == DIR_OUT); i++)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
             int type = (GHWCFG1 >> GHWCFG1_epdir_bitp(ep)) & GHWCFG1_epdir_bits;
@@ -337,6 +342,22 @@ void INT_USB(void)
         usb_core_bus_reset();
     }
 
+    if(sts & GINTMSK_enumdone)  /* enumeration done, we now know the speed */
+    {
+        /* Set up the maximum packet sizes accordingly */
+        uint32_t maxpacket = (usb_drv_port_speed() ? 512 : 64) << DEPCTL_mps_bitp;
+        for (int dir = 0; dir < 2; dir++)
+        {
+            bool out = dir == DIR_OUT;
+            for (unsigned i = 1; i < num_eps(out); i++)
+            {
+                int ep = (out ? out_ep_list : in_ep_list)[i];
+                DEPCTL(ep, out) &= ~(DEPCTL_mps_bits << DEPCTL_mps_bitp);
+                DEPCTL(ep, out) |= maxpacket;
+            }
+        }
+    }
+
     if(sts & (GINTMSK_outepintr | GINTMSK_inepintr))
     {
         unsigned long daint = DAINT;
@@ -375,30 +396,18 @@ int usb_drv_port_speed(void)
     return speed[enumspd & 3];
 }
 
-static unsigned long usb_drv_mps_by_type(int type)
-{
-    static const uint16_t mps[4][2] = {
-        /*         type                 fs      hs   */
-        [USB_ENDPOINT_XFER_CONTROL] = { 64,     64   },
-        [USB_ENDPOINT_XFER_ISOC]    = { 1023,   1024 },
-        [USB_ENDPOINT_XFER_BULK]    = { 64,     512  },
-        [USB_ENDPOINT_XFER_INT]     = { 64,     1024 },
-    };
-    return mps[type & 3][usb_drv_port_speed() & 1];
-}
-
 int usb_drv_request_endpoint(int type, int dir)
 {
-    for (unsigned i = 1; i < sizeof((dir == USB_DIR_IN) ? in_ep_list : out_ep_list); i++)
+    bool out = dir == USB_DIR_OUT;
+    for (unsigned i = 1; i < num_eps(out); i++)
     {
-        int ep = ((dir == USB_DIR_IN) ? in_ep_list : out_ep_list)[i];
-        bool *active = &endpoints[ep][(dir == USB_DIR_IN) ? DIR_IN : DIR_OUT].active;
+        int ep = (out ? out_ep_list : in_ep_list)[i];
+        bool *active = &endpoints[ep][out ? DIR_OUT : DIR_IN].active;
         if(*active)
             continue;
         *active = true;
-        DEPCTL(ep, dir != USB_DIR_IN) = (DEPCTL(ep, dir != USB_DIR_IN) & ~(bitm(DEPCTL, eptype) | bitm(DEPCTL, mps)))
-            | DEPCTL_setd0pid | (type << DEPCTL_eptype_bitp)
-            | (usb_drv_mps_by_type(type) << DEPCTL_mps_bitp) | DEPCTL_usbactep | DEPCTL_snak;
+        DEPCTL(ep, out) = (DEPCTL(ep, out) & ~(DEPCTL_eptype_bits << DEPCTL_eptype_bitp))
+            | DEPCTL_setd0pid | (type << DEPCTL_eptype_bitp) | DEPCTL_usbactep;
         return ep | dir;
     }
 
@@ -415,44 +424,45 @@ void usb_drv_cancel_all_transfers()
     cancel_all_transfers(false);
 }
 
-static void usb_drv_transfer(int ep, void *ptr, int len, bool dir_in)
+static void usb_drv_transfer(int ep, void *ptr, int len, bool out)
 {
     /* disable interrupts to avoid any race */
     int oldlevel = disable_irq_save();
 
-    endpoints[ep][dir_in] = (struct usb_endpoint) {
+    endpoints[ep][out ? DIR_OUT : DIR_IN] = (struct usb_endpoint) {
         .busy   = true,
         .len    = len,
         .status = -1,
     };
 
-    DEPCTL(ep, !dir_in) = (DEPCTL(ep, !dir_in) & ~DEPCTL_stall) | DEPCTL_usbactep;
+    if (out)
+        DEPCTL(ep, out) &= ~DEPCTL_naksts;
+    DEPCTL(ep, out) |= DEPCTL_usbactep;
 
-    int type = (DEPCTL(ep, !dir_in) >> DEPCTL_eptype_bitp) & DEPCTL_eptype_bits;
-    int mps = usb_drv_mps_by_type(type);
+    int mps = usb_drv_port_speed() ? 512 : 64;
     int nb_packets = (len + mps - 1) / mps;
     if (nb_packets == 0)
         nb_packets = 1;
 
-    DEPDMA(ep, !dir_in) = len
+    DEPDMA(ep, out) = len
         ? (void*)AS3525_PHYSICAL_ADDR(ptr)
         : (void*)0x10000000;
-    DEPTSIZ(ep, !dir_in) = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
-    if(dir_in)
-        clean_dcache_range(ptr, len);
-    else
+    DEPTSIZ(ep, out) = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
+    if(out)
         dump_dcache_range(ptr, len);
+    else
+        clean_dcache_range(ptr, len);
 
-    logf("pkt=%d dma=%lx", nb_packets, DEPDMA(ep, !dir_in));
+    logf("pkt=%d dma=%lx", nb_packets, DEPDMA(ep, out));
 
-    DEPCTL(ep, !dir_in) |= DEPCTL_epena | DEPCTL_cnak;
+    DEPCTL(ep, out) |= DEPCTL_epena | DEPCTL_cnak;
 
     restore_irq(oldlevel);
 }
 
 int usb_drv_recv(int ep, void *ptr, int len)
 {
-    usb_drv_transfer(EP_NUM(ep), ptr, len, false);
+    usb_drv_transfer(EP_NUM(ep), ptr, len, true);
     return 0;
 }
 
@@ -461,7 +471,7 @@ int usb_drv_send(int ep, void *ptr, int len)
     ep = EP_NUM(ep);
     struct usb_endpoint *endpoint = &endpoints[ep][1];
     endpoint->done = false;
-    usb_drv_transfer(ep, ptr, len, true);
+    usb_drv_transfer(ep, ptr, len, false);
     while (endpoint->busy && !endpoint->done)
         semaphore_wait(&endpoint->complete, TIMEOUT_BLOCK);
     return endpoint->status;
@@ -469,7 +479,7 @@ int usb_drv_send(int ep, void *ptr, int len)
 
 int usb_drv_send_nonblocking(int ep, void *ptr, int len)
 {
-    usb_drv_transfer(EP_NUM(ep), ptr, len, true);
+    usb_drv_transfer(EP_NUM(ep), ptr, len, false);
     return 0;
 }
 
