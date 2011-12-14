@@ -163,7 +163,7 @@ static void usb_reset(void)
     reset_endpoints(1);
 }
 
-static void handle_ep_int(int out)
+static void handle_ep_int(bool out)
 {
     static const uint8_t eps[2][3] = { /* IN */ {0, 1, 3}, /* OUT */ {0, 2, 4}};
     for (int i = 0; i < 3; i++)
@@ -186,37 +186,36 @@ static void handle_ep_int(int out)
                 semaphore_release(&endpoints[ep].complete);
             }
         }
+
         if (epints & DEPINT_ahberr)
             panicf("USB: AHB error on EP%d (dir %d)", ep, out);
-        if (epints & DIEPINT_timeout)
+
+        if (!out && (epints & DIEPINT_timeout))
         {
-            if (!out)
+            if (endpoints[ep].busy)
             {
-                if (endpoints[ep].busy)
-                {
-                    endpoints[ep].busy = false;
-                    endpoints[ep].rc = 1;
-                    endpoints[ep].done = true;
-                    semaphore_release(&endpoints[ep].complete);
-                }
-            }
-            else
-            {   /* DOEPINT_setup */
-                invalidate_dcache();
-                if (ep == 0)
-                {
-                    if (ctrlreq.header.bRequest == 5)
-                    {
-                        /* Already set the new address here,
-                           before passing the packet to the core.
-                           See below (usb_drv_set_address) for details. */
-                        DCFG = (DCFG & ~(DCFG_devadr_bits << DCFG_devadr_bitp)) | (ctrlreq.header.wValue << DCFG_devadr_bitp);
-                    }
-                    usb_core_control_request(&ctrlreq.header);
-                }
-                else panicf("USB: SETUP done on OUT EP%d!?", ep);
+                endpoints[ep].busy = false;
+                endpoints[ep].rc = 1;
+                endpoints[ep].done = true;
+                semaphore_release(&endpoints[ep].complete);
             }
         }
+
+        if (out && (epints & DOEPINT_setup))
+        {
+            invalidate_dcache();
+            if (ep != 0)
+                panicf("USB: SETUP done on OUT EP%d!?", ep);
+
+            /* Set the new address here, before passing the packet to the core.
+               See usb_drv_set_address() for details. */
+            if (ctrlreq.header.bRequest == USB_REQ_SET_ADDRESS)
+                DCFG = (DCFG & ~(DCFG_devadr_bits << DCFG_devadr_bitp))
+                             | (ctrlreq.header.wValue << DCFG_devadr_bitp);
+
+            usb_core_control_request(&ctrlreq.header);
+        }
+
         /* Make sure EP0 OUT is set up to accept the next request */
         if (out && ep == 0)
         {
