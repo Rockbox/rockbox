@@ -192,12 +192,12 @@ static void handle_ep_int(int out)
         {
             if (!out)
             {
-                if (endpoints[i].busy)
+                if (endpoints[ep].busy)
                 {
-                    endpoints[i].busy = false;
-                    endpoints[i].rc = 1;
-                    endpoints[i].done = true;
-                    semaphore_release(&endpoints[i].complete);
+                    endpoints[ep].busy = false;
+                    endpoints[ep].rc = 1;
+                    endpoints[ep].done = true;
+                    semaphore_release(&endpoints[ep].complete);
                 }
             }
             else
