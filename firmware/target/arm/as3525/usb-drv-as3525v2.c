@@ -247,13 +247,15 @@ void usb_drv_exit(void)
 
 static void handle_ep_int(int ep, bool out)
 {
-    struct usb_endpoint *endpoint = &endpoints[ep][out ? DIR_OUT : DIR_IN];
     unsigned long sts = DEPINT(ep, out);
     logf("%s(%d %s): sts = 0x%lx", __func__, ep, out?"OUT":"IN", sts);
+
     if(sts & DEPINT_ahberr)
         panicf("usb-drv: ahb error on EP%d %s", ep, out ? "OUT" : "IN");
+
     if(sts & DEPINT_xfercompl)
     {
+        struct usb_endpoint *endpoint = &endpoints[ep][out ? DIR_OUT : DIR_IN];
         if(endpoint->busy)
         {
             endpoint->busy = false;
@@ -311,11 +313,9 @@ static void handle_ep_int(int ep, bool out)
             logf("  rt=%x r=%x", ep0_setup_pkt->bRequestType, ep0_setup_pkt->bRequest);
 
             if(ep0_setup_pkt->bRequestType == USB_TYPE_STANDARD &&
-                    ep0_setup_pkt->bRequest == USB_REQ_SET_ADDRESS)
-            {
-                /* Set address */
+               ep0_setup_pkt->bRequest     == USB_REQ_SET_ADDRESS)
                 DCFG = (DCFG & ~bitm(DCFG, devadr)) | (ep0_setup_pkt->wValue << DCFG_devadr_bitp);
-            }
+
             usb_core_control_request(ep0_setup_pkt);
         }
     }
