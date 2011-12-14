@@ -106,11 +106,12 @@ static void reset_endpoints(int reinit)
 
 int usb_drv_request_endpoint(int type, int dir)
 {
-    for(size_t ep = (dir == USB_DIR_IN) ? 1 : 2; ep < USB_NUM_ENDPOINTS; ep += 2)
+    bool out = dir == USB_DIR_OUT;
+    for(size_t ep = out ? 2 : 1; ep < USB_NUM_ENDPOINTS; ep += 2)
         if (!endpoints[ep].active)
         {
             endpoints[ep].active = true;
-            DEPCTL(ep, !dir) = (DEPCTL(ep, !dir) & ~(DEPCTL_eptype_bits << DEPCTL_eptype_bitp)) |
+            DEPCTL(ep, out) = (DEPCTL(ep, out) & ~(DEPCTL_eptype_bits << DEPCTL_eptype_bitp)) |
                 (type << DEPCTL_eptype_bitp) | DEPCTL_epena;
             return ep | dir;
         }
