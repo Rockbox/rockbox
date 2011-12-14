@@ -33,12 +33,12 @@ libucl$(RBARCH).a: $(TARGET_DIR)libucl$(RBARCH).a
 
 $(TARGET_DIR)libucl$(RBARCH).a: $(OBJS)
 	@echo AR $(notdir $@)
-	$(SILENT)$(AR) rucs $@ $(OBJS) >/dev/null 2>&1
+	$(SILENT)$(CROSS)$(AR) rucs $@ $(OBJS) >/dev/null 2>&1
 
 $(OBJDIR)/%.o: %.c
 	@echo CC $<
 	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c $< -o $@
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
