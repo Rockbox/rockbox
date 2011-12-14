@@ -8,98 +8,26 @@
 #
 
 # We use the Telechips code available in the Rockbox tools/ directory
-TOOLSDIR=../../tools
+TOOLSDIR = ../../tools/
 CFLAGS := -O -g -W -Wall -Wshadow -pedantic -I$(TOOLSDIR)
 
-ifndef V
-SILENT = @
-endif
+OUTPUT = mktccboot
 
-ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
-OUTPUT=mktccboot.exe
-CFLAGS+=-mno-cygwin
-else
-ifeq ($(findstring MINGW,$(shell uname)),MINGW)
-OUTPUT=mktccboot.exe
-else
-ifeq ($(findstring mingw,$(CC)),mingw)
-OUTPUT=mktccboot.exe
-else
-OUTPUT=mktccboot
-endif
-endif
-endif
-
-ifdef RBARCH
-CFLAGS += -arch $(RBARCH)
-endif
-
-TARGET_DIR ?= $(shell pwd)/
-OBJDIR = $(TARGET_DIR)build$(RBARCH)
-
-all: $(OUTPUT)
 
 # inputs
-LIBSOURCES := mktccboot.c $(TOOLSDIR)/telechips.o
+LIBSOURCES := mktccboot.c $(TOOLSDIR)telechips.c
 SOURCES := $(LIBSOURCES) main.c
-OBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR)/,$(notdir $(SOURCES))))
-LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR)/,$(notdir $(LIBSOURCES))))
 EXTRADEPS :=
 
+include ../libtools.make
+
 # rule for sources from tools dir
-$(OBJDIR)/%.o: $(TOOLSDIR)/%.c
+# Rules go _after_ including mkboot.make to have OBJDIR set up correctly.
+# Paths are assumed to end with a /
+telechips.o: $(OBJDIR)telechips.o
+$(OBJDIR)%.o: $(TOOLSDIR)%.c
 	@echo CC $<
 	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
-
-$(OBJDIR)/%.o: %.c
-	@echo CC $<
-	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(CC) $(CFLAGS) -c -o $@ $<
-
-libmktccboot$(RBARCH).a: $(TARGET_DIR)libmktccboot$(RBARCH).a
-
-$(TARGET_DIR)libmktccboot$(RBARCH).a: $(LIBOBJS)
-	@echo AR $(notdir $@)
-	$(SILENT)$(AR) rucs $@ $^
-
-# building the standalone executable
-$(OUTPUT): $(OBJS) $(EXTRADEPS)
-	@echo LD $@
-	$(SILENT)$(CC) $(CFLAGS) -o$(OUTPUT) $(OBJS) $(EXTRADEPS)
-
-# some trickery to build ppc and i386 from a single call
-ifeq ($(RBARCH),)
-$(TARGET_DIR)libmktccbooti386.a:
-	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) libmktccbooti386.a
-
-$(TARGET_DIR)libmktccbootppc.a:
-	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libmktccbootppc.a
-endif
-
-libmktccboot-universal: $(TARGET_DIR)libmktccbooti386.a $(TARGET_DIR)libmktccbootppc.a
-	@echo lipo $(TARGET_DIR)libmktccboot.a
-	$(SILENT) rm -f $(TARGET_DIR)libmktccboot.a
-	$(SILENT)lipo -create $(TARGET_DIR)libmktccbootppc.a $(TARGET_DIR)libmktccbooti386.a -output $(TARGET_DIR)libmktccboot.a
-
-clean:
-	rm -f $(OUTPUT) $(TARGET_DIR)libmktccboot*.a mktccboot.dmg
-	rm -rf $(OBJDIR)
-
-mktccboot-i386:
-	$(MAKE) RBARCH=i386
-	mv mktccboot mktccboot-i386
-
-mktccboot-ppc:
-	make RBARCH=ppc
-	mv mktccboot mktccboot-ppc
-
-mktccboot-mac: mktccboot-i386 mktccboot-ppc
-	$(SILENT)lipo -create mktccboot-ppc mktccboot-i386 -output mktccboot-mac
-
-mktccboot.dmg: mktccboot-mac
-	mkdir -p mktccboot-dmg
-	cp -p mktccboot-mac mktccboot-dmg
-	hdiutil create -srcfolder mktccboot-dmg mktccboot.dmg
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c -o $@ $<
 
 
