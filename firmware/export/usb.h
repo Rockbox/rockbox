@@ -30,15 +30,16 @@
 #endif
 
 /* Messages from usb_tick and thread states */
-enum {
+enum
+{
+#ifdef HAVE_LCD_BITMAP
+    USB_SCREENDUMP = -1,     /* State */
+#endif
     USB_EXTRACTED = 0,       /* Event+State */
     USB_INSERTED,            /* Event+State */
-    USB_POWERED,             /* Event+State - transitional indicator if no power */
+    USB_POWERED,             /* State - transitional indicator if no power */
 #ifdef USB_DETECT_BY_CORE
-    USB_UNPOWERED,           /* Event */
-#endif
-#ifdef HAVE_LCD_BITMAP
-    USB_SCREENDUMP,          /* State */
+    USB_HOSTED,              /* Event - host presence was detected */
 #endif
 #if (CONFIG_STORAGE & STORAGE_MMC)
     USB_REENABLE,            /* Event */
@@ -57,6 +58,7 @@ enum {
     USB_HANDLED,             /* Bootloader status code */
 #endif
 };
+
 #ifdef HAVE_USB_POWER
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define USBPOWER_BUTTON BUTTON_F1

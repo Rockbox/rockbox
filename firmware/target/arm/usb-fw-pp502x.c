@@ -212,7 +212,7 @@ static int usb_status = USB_EXTRACTED;
 
 static int usb_timeout_event(struct timeout *tmo)
 {
-    usb_status_event(tmo->data == USB_GPIO_VAL ? USB_POWERED : USB_UNPOWERED);
+    usb_status_event(tmo->data == USB_GPIO_VAL ? USB_INSERTED : USB_EXTRACTED);
     return 0;
 }
 
@@ -231,7 +231,7 @@ void usb_drv_usb_detect_event(void)
 {
     /* Filter for invalid bus reset when unplugging by checking the pin state. */
     if(usb_plugged()) {
-        usb_status_event(USB_INSERTED);
+        usb_status_event(USB_HOSTED);
     }
 }
 #endif /* USB_STATUS_BY_EVENT */

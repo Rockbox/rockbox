@@ -66,7 +66,7 @@ void usb_connect_event(void)
     usb_status = status;
     /* Notify power that USB charging is potentially available */
     charger_usb_detect_event(status);
-    usb_status_event((status == USB_INSERTED) ? USB_POWERED : USB_UNPOWERED);
+    usb_status_event(status);
 }
 
 int usb_detect(void)
@@ -138,11 +138,11 @@ void usb_drv_int_enable(bool enable)
     }
 }
 
-/* Called during the bus reset interrupt when in detect mode */
+/* Called during the setup packet request by the host */
 void usb_drv_usb_detect_event(void)
 {
     if (usb_drv_powered())
-        usb_status_event(USB_INSERTED);
+        usb_status_event(USB_HOSTED);
 }
 
 /* Called when reading the MBR */

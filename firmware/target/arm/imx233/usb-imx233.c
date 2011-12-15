@@ -33,17 +33,17 @@
 
 void usb_insert_int(void)
 {
-    usb_status_event(USB_POWERED);
+    usb_status_event(USB_INSERTED);
 }
 
 void usb_remove_int(void)
 {
-    usb_status_event(USB_UNPOWERED);
+    usb_status_event(USB_EXTRACTED);
 }
 
 void usb_drv_usb_detect_event()
 {
-    usb_status_event(USB_INSERTED);
+    usb_status_event(USB_HOSTED);
 }
 
 void usb_attach(void)
