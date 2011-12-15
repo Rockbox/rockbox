@@ -460,7 +460,6 @@ target/arm/imx233/clkctrl-imx233.c
 target/arm/imx233/system-imx233.c
 target/arm/imx233/timrot-imx233.c
 target/arm/imx233/kernel-imx233.c
-target/arm/imx233/kernel-imx233.c
 target/arm/imx233/sd-imx233.c
 target/arm/imx233/mmc-imx233.c
 target/arm/imx233/ssp-imx233.c
