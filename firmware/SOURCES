@@ -370,51 +370,6 @@ target/hosted/sdl/pcm-sdl.c
 #endif /* CONFIG_CODEC == SWCODEC */
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER) */
 
-/* target code */
-#if !defined(SIMULATOR)
-
-/* USB Stack */
-#ifdef HAVE_USBSTACK
-usbstack/usb_core.c
-#ifdef USB_ENABLE_STORAGE
-usbstack/usb_storage.c
-#endif
-#ifdef USB_ENABLE_SERIAL
-usbstack/usb_serial.c
-#endif
-#ifdef USB_ENABLE_CHARGING_ONLY
-usbstack/usb_charging_only.c
-#endif
-#ifdef USB_ENABLE_HID
-usbstack/usb_hid.c
-#endif
-#if CONFIG_USBOTG == USBOTG_M66591
-drivers/m66591.c
-#elif CONFIG_USBOTG == USBOTG_ARC
-target/arm/usb-drv-arc.c
-#elif CONFIG_USBOTG == USBOTG_AS3525
-target/arm/as3525/usb-drv-as3525.c
-#elif CONFIG_USBOTG == USBOTG_AS3525v2
-target/arm/as3525/usb-drv-as3525v2.c
-#elif CONFIG_USBOTG == USBOTG_ISP1583
-drivers/isp1583.c
-#elif CONFIG_USBOTG == USBOTG_RK27XX
-target/arm/rk27xx/usb-drv-rk27xx.c
-#endif
-#else /* !defined(HAVE_USBSTACK) */
-#if CONFIG_USBOTG == USBOTG_ISP1362	 
-drivers/isp1362.c
-#elif CONFIG_USBOTG == USBOTG_M5636	 
-drivers/m5636.c
-#endif
-#endif /* !defined(HAVE_USBSTACK) */
-
-/* Other Random Hardware */
-#ifdef HAVE_TSC2100
-drivers/tsc2100.c
-drivers/audio/tsc2100.c
-#endif
-
 /* CPU Specific - By class then particular chip if applicable */
 #if defined(CPU_SH)
 
@@ -629,6 +584,52 @@ drivers/i2c.c
 #endif /* PLATFORM_NATIVE */
 
 #endif /* defined(CPU_*) */
+
+#if !defined(SIMULATOR)
+
+/* target code */
+
+/* USB Stack */
+#ifdef HAVE_USBSTACK
+usbstack/usb_core.c
+#ifdef USB_ENABLE_STORAGE
+usbstack/usb_storage.c
+#endif
+#ifdef USB_ENABLE_SERIAL
+usbstack/usb_serial.c
+#endif
+#ifdef USB_ENABLE_CHARGING_ONLY
+usbstack/usb_charging_only.c
+#endif
+#ifdef USB_ENABLE_HID
+usbstack/usb_hid.c
+#endif
+#if CONFIG_USBOTG == USBOTG_M66591
+drivers/m66591.c
+#elif CONFIG_USBOTG == USBOTG_ARC
+target/arm/usb-drv-arc.c
+#elif CONFIG_USBOTG == USBOTG_AS3525
+target/arm/as3525/usb-drv-as3525.c
+#elif CONFIG_USBOTG == USBOTG_AS3525v2
+target/arm/as3525/usb-drv-as3525v2.c
+#elif CONFIG_USBOTG == USBOTG_ISP1583
+drivers/isp1583.c
+#elif CONFIG_USBOTG == USBOTG_RK27XX
+target/arm/rk27xx/usb-drv-rk27xx.c
+#endif
+#else /* !defined(HAVE_USBSTACK) */
+#if CONFIG_USBOTG == USBOTG_ISP1362	 
+drivers/isp1362.c
+#elif CONFIG_USBOTG == USBOTG_M5636	 
+drivers/m5636.c
+#endif
+#endif /* !defined(HAVE_USBSTACK) */
+
+/* Other Random Hardware */
+#ifdef HAVE_TSC2100
+drivers/tsc2100.c
+drivers/audio/tsc2100.c
+#endif
 
 #ifdef ARCHOS_PLAYER
 target/sh/archos/ata-archos.c
@@ -1833,4 +1834,4 @@ drivers/audio/android.c
 thread.c
 #endif
 
-#endif /* ! SIMULATOR */
+#endif /* defined(SIMULATOR) */
