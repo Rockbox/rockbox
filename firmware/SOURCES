@@ -905,13 +905,20 @@ libc/sscanf.c
 #endif /* STUB */
 #endif /* IRIVER_IFP7XX_SERIES */
 
-#ifdef IRIVER_H300_SERIES
-target/coldfire/pcf50606-coldfire.c
+#if defined(IRIVER_H300_SERIES) || defined(IRIVER_H100_SERIES)
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
 target/coldfire/iriver/lcd-remote-as-iriver.S
 target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/fmradio_i2c-iriver.c
+#ifndef BOOTLOADER
+target/coldfire/iriver/audio-iriver.c
+target/coldfire/iriver/udacodec-iriver.c
+#endif
+#endif /* IRIVER_H300_SERIES || IRIVER_H100_SERIES */
+
+#ifdef IRIVER_H300_SERIES
+target/coldfire/pcf50606-coldfire.c
 target/coldfire/iriver/h300/sw_i2c-h300.c
 target/coldfire/iriver/h300/adc-h300.c
 target/coldfire/iriver/h300/backlight-h300.c
@@ -922,20 +929,11 @@ target/coldfire/iriver/h300/lcd-h300.c
 target/coldfire/iriver/h300/power-h300.c
 target/coldfire/iriver/h300/powermgmt-h300.c
 target/coldfire/iriver/h300/usb-h300.c
-#ifndef BOOTLOADER
-target/coldfire/iriver/audio-iriver.c
-target/coldfire/iriver/udacodec-iriver.c
-#endif
 #endif /* IRIVER_H300_SERIES */
 
 #ifdef IRIVER_H100_SERIES
 drivers/sw_i2c.c
 target/coldfire/uart-coldfire.c
-target/coldfire/iriver/ata-iriver.c
-target/coldfire/iriver/lcd-remote-iriver.c
-target/coldfire/iriver/lcd-remote-as-iriver.S
-target/coldfire/iriver/system-iriver.c
-target/coldfire/iriver/fmradio_i2c-iriver.c
 target/coldfire/iriver/h100/adc-h100.c
 target/coldfire/iriver/h100/backlight-h100.c
 target/coldfire/iriver/h100/button-h100.c
@@ -944,14 +942,12 @@ target/coldfire/iriver/h100/lcd-h100.c
 target/coldfire/iriver/h100/power-h100.c
 target/coldfire/iriver/h100/powermgmt-h100.c
 #ifndef BOOTLOADER
-target/coldfire/iriver/audio-iriver.c
-target/coldfire/iriver/udacodec-iriver.c
 target/coldfire/iriver/h100/spdif-h100.c
 #endif
 target/coldfire/iriver/h100/usb-h100.c
 #endif /* IRIVER_H100_SERIES */
 
-#ifdef IRIVER_H10
+#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -959,25 +955,18 @@ target/arm/i2s-pp.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/fmradio_i2c-h10.c
-target/arm/iriver/h10/lcd-h10_20gb.c
-target/arm/iriver/h10/lcd-as-h10.S
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/powermgmt-h10.c
 target/arm/usb-fw-pp502x.c
+#endif /* IRIVER_H10 || IRIVER_H10_5GB */
+
+#ifdef IRIVER_H10
+target/arm/iriver/h10/lcd-h10_20gb.c
+target/arm/iriver/h10/lcd-as-h10.S
 #endif /* IRIVER_H10 */
 
 #ifdef IRIVER_H10_5GB
-target/arm/ata-as-arm.S
-target/arm/ata-pp5020.c
-target/arm/wmcodec-pp.c
-target/arm/i2s-pp.c
-target/arm/iriver/h10/backlight-h10.c
-target/arm/iriver/h10/button-h10.c
-target/arm/iriver/h10/fmradio_i2c-h10.c
 target/arm/iriver/h10/lcd-h10_5gb.c
-target/arm/iriver/h10/power-h10.c
-target/arm/iriver/h10/powermgmt-h10.c
-target/arm/usb-fw-pp502x.c
 #endif /* IRIVER_H10_5GB */
 
 #ifdef GIGABEAT_F
