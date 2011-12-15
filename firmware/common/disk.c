@@ -183,7 +183,9 @@ int disk_mount(int drive)
 
     volume = get_free_volume();
     pinfo = disk_init(IF_MD(drive));
+#ifdef MAX_LOG_SECTOR_SIZE
     disk_sector_multiplier[drive] = 1;
+#endif
 
     if (pinfo == NULL)
     {
