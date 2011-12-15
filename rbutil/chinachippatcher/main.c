@@ -22,7 +22,9 @@
 #include <stdarg.h>
 #include "chinachip.h"
 
+#ifndef VERSION /* allow setting version from outside for svn builds */
 #define VERSION         "0.1"
+#endif
 #define PRINT(fmt, ...) fprintf(stderr, fmt"\n", ##__VA_ARGS__)
 
 void usage(char* name)
@@ -31,16 +33,16 @@ void usage(char* name)
     PRINT(" %s <firmware> <bootloader> <firmware_output> [backup]", name);
     PRINT("\nExample:");
     PRINT(" %s VX747.HXF bootloader.bin output.HXF ccpmp.bak", name);
-    PRINT(" This will copy ccpmp.bin in VX747.HXF as ccpmp.old and replace it"
-          " with bootloader.bin, the output will get written to output.HXF."
-          " The old ccpmp.bin will get written to ccpmp.bak.");
+    PRINT(" This will copy ccpmp.bin in VX747.HXF as ccpmp.old and replace it\n"
+          " with bootloader.bin, the output will get written to output.HXF.\n"
+          " The old ccpmp.bin will get written to ccpmp.bak.\n");
 }
 
 int main(int argc, char* argv[])
 {
     PRINT("ChinaChipPatcher v" VERSION " - (C) Maurus Cuelenaere 2009");
     PRINT("This is free software; see the source for copying conditions. There is NO");
-    PRINT("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
+    PRINT("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
 
     if(argc < 4)
     {
