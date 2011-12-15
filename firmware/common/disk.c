@@ -61,8 +61,17 @@ static int vol_drive[NUM_VOLUMES]; /* mounted to which drive (-1 if none) */
 static struct mutex disk_mutex;
 
 #ifdef MAX_LOG_SECTOR_SIZE
-int disk_sector_multiplier = 1;
+static int disk_sector_multiplier[NUM_DRIVES] = {1};
 #endif
+
+int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
+{
+    #ifdef HAVE_MULTIDRIVE
+    return disk_sector_multiplier[drive];
+    #else
+    return disk_sector_multiplier[0];
+    #endif
+}
 
 struct partinfo* disk_init(IF_MD_NONVOID(int drive))
 {
@@ -174,6 +183,7 @@ int disk_mount(int drive)
 
     volume = get_free_volume();
     pinfo = disk_init(IF_MD(drive));
+    disk_sector_multiplier[drive] = 1;
 
     if (pinfo == NULL)
     {
@@ -206,7 +216,7 @@ int disk_mount(int drive)
                 vol_drive[volume] = drive; /* remember the drive for this volume */
                 volume = get_free_volume(); /* prepare next entry */
                 if (drive == 0)
-                    disk_sector_multiplier = j;
+                    disk_sector_multiplier[drive] = j;
                 break;
             }
         }
@@ -226,7 +236,7 @@ int disk_mount(int drive)
         if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) 0))
         {
 #ifdef MAX_LOG_SECTOR_SIZE
-            disk_sector_multiplier = fat_get_bytes_per_sector(IF_MV(volume))/SECTOR_SIZE;
+            disk_sector_multiplier[drive] = fat_get_bytes_per_sector(IF_MV(volume))/SECTOR_SIZE;
 #endif
             mounted = 1;
             vol_drive[volume] = drive; /* remember the drive for this volume */

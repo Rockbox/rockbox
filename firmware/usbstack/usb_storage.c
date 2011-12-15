@@ -787,7 +787,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         lun_present = false;
 
 #ifdef MAX_LOG_SECTOR_SIZE
-    block_size_mult = disk_sector_multiplier;
+    block_size_mult = disk_get_sector_multiplier(lun);
 #endif
 
     cur_cmd.tag = cbw->tag;

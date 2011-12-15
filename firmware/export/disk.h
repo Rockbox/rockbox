@@ -46,7 +46,7 @@ int disk_unmount(int drive);
 
 /* The number of 512-byte sectors in a "logical" sector. Needed for ipod 5.5G */
 #ifdef MAX_LOG_SECTOR_SIZE
-extern int disk_sector_multiplier;
+int disk_get_sector_multiplier(IF_MD_NONVOID(int drive));
 #endif
 
 #endif
