@@ -1356,7 +1356,7 @@ fi
    0|archosplayer)
     target_id=1
     modelname="archosplayer"
-    target="-DARCHOS_PLAYER"
+    target="ARCHOS_PLAYER"
     shcc
     tool="$rootdir/tools/scramble"
     output="archos.mod"
@@ -1382,7 +1382,7 @@ fi
    1|archosrecorder)
     target_id=2
     modelname="archosrecorder"
-    target="-DARCHOS_RECORDER"
+    target="ARCHOS_RECORDER"
     shcc
     tool="$rootdir/tools/scramble"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1404,7 +1404,7 @@ fi
    2|archosfmrecorder)
     target_id=3
     modelname="archosfmrecorder"
-    target="-DARCHOS_FMRECORDER"
+    target="ARCHOS_FMRECORDER"
     shcc
     tool="$rootdir/tools/scramble -fm"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1426,7 +1426,7 @@ fi
    3|archosrecorderv2)
     target_id=4
     modelname="archosrecorderv2"
-    target="-DARCHOS_RECORDERV2"
+    target="ARCHOS_RECORDERV2"
     shcc
     tool="$rootdir/tools/scramble -v2"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1448,7 +1448,7 @@ fi
    4|archosondiosp)
     target_id=7
     modelname="archosondiosp"
-    target="-DARCHOS_ONDIOSP"
+    target="ARCHOS_ONDIOSP"
     shcc
     tool="$rootdir/tools/scramble -osp"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1470,7 +1470,7 @@ fi
    5|archosondiofm)
     target_id=8
     modelname="archosondiofm"
-    target="-DARCHOS_ONDIOFM"
+    target="ARCHOS_ONDIOFM"
     shcc
     tool="$rootdir/tools/scramble -ofm"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1490,7 +1490,7 @@ fi
    6|archosav300)
     target_id=38
     modelname="archosav300"
-    target="-DARCHOS_AV300"
+    target="ARCHOS_AV300"
     memory=16 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -mm=C"
@@ -1512,7 +1512,7 @@ fi
   10|iriverh120)
     target_id=9
     modelname="iriverh120"
-    target="-DIRIVER_H120"
+    target="IRIVER_H120"
     memory=32 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=h120"
@@ -1537,7 +1537,7 @@ fi
    11|iriverh300)
     target_id=10
     modelname="iriverh300"
-    target="-DIRIVER_H300"
+    target="IRIVER_H300"
     memory=32 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=h300"
@@ -1560,7 +1560,7 @@ fi
    12|iriverh100)
     target_id=11
     modelname="iriverh100"
-    target="-DIRIVER_H100"
+    target="IRIVER_H100"
     memory=16 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=h100"
@@ -1585,7 +1585,7 @@ fi
    13|iriverifp7xx)
     target_id=19
     modelname="iriverifp7xx"
-    target="-DIRIVER_IFP7XX"
+    target="IRIVER_IFP7XX"
     memory=1
     arm7tdmicc short
     tool="cp"
@@ -1606,7 +1606,7 @@ fi
    14|iriverh10)
     target_id=22
     modelname="iriverh10"
-    target="-DIRIVER_H10"
+    target="IRIVER_H10"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBOS"
@@ -1630,7 +1630,7 @@ fi
    15|iriverh10_5gb)
     target_id=24
     modelname="iriverh10_5gb"
-    target="-DIRIVER_H10_5GB"
+    target="IRIVER_H10_5GB"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBOS"
@@ -1654,7 +1654,7 @@ fi
    20|ipodcolor)
     target_id=13
     modelname="ipodcolor"
-    target="-DIPOD_COLOR"
+    target="IPOD_COLOR"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ipco"
@@ -1677,7 +1677,7 @@ fi
    21|ipodnano1g)
     target_id=14
     modelname="ipodnano1g"
-    target="-DIPOD_NANO"
+    target="IPOD_NANO"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=nano"
@@ -1700,7 +1700,7 @@ fi
    22|ipodvideo)
     target_id=15
     modelname="ipodvideo"
-    target="-DIPOD_VIDEO"
+    target="IPOD_VIDEO"
     memory=64 # always. This is reduced at runtime if needed
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ipvd"
@@ -1723,7 +1723,7 @@ fi
    23|ipod3g)
     target_id=16
     modelname="ipod3g"
-    target="-DIPOD_3G"
+    target="IPOD_3G"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ip3g"
@@ -1746,7 +1746,7 @@ fi
    24|ipod4g)
     target_id=17
     modelname="ipod4g"
-    target="-DIPOD_4G"
+    target="IPOD_4G"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ip4g"
@@ -1769,7 +1769,7 @@ fi
    25|ipodmini1g)
     target_id=18
     modelname="ipodmini1g"
-    target="-DIPOD_MINI"
+    target="IPOD_MINI"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=mini"
@@ -1792,7 +1792,7 @@ fi
    26|ipodmini2g)
     target_id=21
     modelname="ipodmini2g"
-    target="-DIPOD_MINI2G"
+    target="IPOD_MINI2G"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=mn2g"
@@ -1815,7 +1815,7 @@ fi
    27|ipod1g2g)
     target_id=29
     modelname="ipod1g2g"
-    target="-DIPOD_1G2G"
+    target="IPOD_1G2G"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=1g2g"
@@ -1838,7 +1838,7 @@ fi
    28|ipodnano2g)
     target_id=62
     modelname="ipodnano2g"
-    target="-DIPOD_NANO2G"
+    target="IPOD_NANO2G"
     memory=32 # always
     arm940tcc
     tool="$rootdir/tools/scramble -add=nn2g"
@@ -1861,7 +1861,7 @@ fi
    29|ipod6g)
     target_id=71
     modelname="ipod6g"
-    target="-DIPOD_6G"
+    target="IPOD_6G"
     memory=64 # always
     arm926ejscc
     tool="$rootdir/tools/scramble -add=ip6g"
@@ -1884,7 +1884,7 @@ fi
    30|iaudiox5)
     target_id=12
     modelname="iaudiox5"
-    target="-DIAUDIO_X5"
+    target="IAUDIO_X5"
     memory=16 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=iax5"
@@ -1910,7 +1910,7 @@ fi
    31|iaudiom5)
     target_id=28
     modelname="iaudiom5"
-    target="-DIAUDIO_M5"
+    target="IAUDIO_M5"
     memory=16 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=iam5"
@@ -1936,7 +1936,7 @@ fi
    32|iaudio7)
     target_id=32
     modelname="iaudio7"
-    target="-DIAUDIO_7"
+    target="IAUDIO_7"
     memory=16 # always
     arm946cc
     tool="$rootdir/tools/scramble -add=i7"
@@ -1960,7 +1960,7 @@ fi
     33|cowond2)
     target_id=34
     modelname="cowond2"
-    target="-DCOWON_D2"
+    target="COWON_D2"
     memory=32
     arm926ejscc
     tool="$rootdir/tools/scramble -add=d2"
@@ -1982,7 +1982,7 @@ fi
    34|iaudiom3)
     target_id=37
     modelname="iaudiom3"
-    target="-DIAUDIO_M3"
+    target="IAUDIO_M3"
     memory=16 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=iam3"
@@ -2006,7 +2006,7 @@ fi
    40|gigabeatfx)
     target_id=20
     modelname="gigabeatfx"
-    target="-DGIGABEAT_F"
+    target="GIGABEAT_F"
     memory=32 # always
     arm9tdmicc
     tool="$rootdir/tools/scramble -add=giga"
@@ -2028,7 +2028,7 @@ fi
     41|gigabeats)
     target_id=26
     modelname="gigabeats"
-    target="-DGIGABEAT_S"
+    target="GIGABEAT_S"
     memory=64
     arm1136jfscc
     tool="$rootdir/tools/scramble -add=gigs"
@@ -2050,7 +2050,7 @@ fi
     70|mrobe500)
     target_id=36
     modelname="mrobe500"
-    target="-DMROBE_500"
+    target="MROBE_500"
     memory=64 # always
     arm926ejscc
     tool="$rootdir/tools/scramble -add=m500"
@@ -2074,7 +2074,7 @@ fi
    71|mrobe100)
     target_id=33
     modelname="mrobe100"
-    target="-DMROBE_100"
+    target="MROBE_100"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBOS"
@@ -2100,7 +2100,7 @@ fi
    80|logikdax)
     target_id=31
     modelname="logikdax"
-    target="-DLOGIK_DAX"
+    target="LOGIK_DAX"
     memory=2 # always
     arm946cc
     tool="$rootdir/tools/scramble -add=ldax"
@@ -2124,7 +2124,7 @@ fi
     90|zenvisionm30gb)
     target_id=35
     modelname="zenvisionm30gb"
-    target="-DCREATIVE_ZVM"
+    target="CREATIVE_ZVM"
     memory=64
     arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -2147,7 +2147,7 @@ fi
     91|zenvisionm60gb)
     target_id=40
     modelname="zenvisionm60gb"
-    target="-DCREATIVE_ZVM60GB"
+    target="CREATIVE_ZVM60GB"
     memory=64
     arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -2170,7 +2170,7 @@ fi
     92|zenvision)
     target_id=39
     modelname="zenvision"
-    target="-DCREATIVE_ZV"
+    target="CREATIVE_ZV"
     memory=64
     arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -2193,7 +2193,7 @@ fi
    50|sansae200)
     target_id=23
     modelname="sansae200"
-    target="-DSANSA_E200"
+    target="SANSA_E200"
     memory=32 # supposedly
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=e200 -type=RBOS"
@@ -2220,7 +2220,7 @@ fi
     # makes the bootloader output file name in all lower case.
     target_id=27
     modelname="sansae200r"
-    target="-DSANSA_E200"
+    target="SANSA_E200"
     memory=32 # supposedly
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=e20r -type=RBOS"
@@ -2244,7 +2244,7 @@ fi
    52|sansac200)
     target_id=30
     modelname="sansac200"
-    target="-DSANSA_C200"
+    target="SANSA_C200"
     memory=32 # supposedly
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBOS"
@@ -2268,7 +2268,7 @@ fi
    53|sansam200)
     target_id=48
     modelname="sansam200"
-    target="-DSANSA_M200"
+    target="SANSA_M200"
     memory=1 # always
     arm946cc
     tool="$rootdir/tools/scramble -add=m200"
@@ -2292,7 +2292,7 @@ fi
    54|sansac100)
     target_id=42 
     modelname="sansac100" 
-    target="-DSANSA_C100"     
+    target="SANSA_C100"     
     memory=2
     arm946cc
     tool="$rootdir/tools/scramble -add=c100"
@@ -2316,7 +2316,7 @@ fi
    55|sansaclip)
     target_id=50
     modelname="sansaclip"
-    target="-DSANSA_CLIP"
+    target="SANSA_CLIP"
     memory=2
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
@@ -2339,7 +2339,7 @@ fi
    56|sansae200v2)
     target_id=51
     modelname="sansae200v2"
-    target="-DSANSA_E200V2"
+    target="SANSA_E200V2"
     memory=8
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -2360,7 +2360,7 @@ fi
    57|sansam200v4)
     target_id=52
     modelname="sansam200v4"
-    target="-DSANSA_M200V4"
+    target="SANSA_M200V4"
     memory=2
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
@@ -2383,7 +2383,7 @@ fi
    58|sansafuze)
     target_id=53
     modelname="sansafuze"
-    target="-DSANSA_FUZE"
+    target="SANSA_FUZE"
     memory=8
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -2404,7 +2404,7 @@ fi
    59|sansac200v2)
     target_id=55
     modelname="sansac200v2"
-    target="-DSANSA_C200V2"
+    target="SANSA_C200V2"
     memory=2 # as per OF diagnosis mode
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -2429,7 +2429,7 @@ fi
    60|sansaclipv2)
     target_id=60
     modelname="sansaclipv2"
-    target="-DSANSA_CLIPV2"
+    target="SANSA_CLIPV2"
     memory=8
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
@@ -2451,7 +2451,7 @@ fi
     exit 1
     target_id=63
     modelname="sansaview"
-    target="-DSANSA_VIEW"
+    target="SANSA_VIEW"
     memory=32
     arm1176jzscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -2473,7 +2473,7 @@ fi
    62|sansaclipplus)
     target_id=66
     modelname="sansaclipplus"
-    target="-DSANSA_CLIPPLUS"
+    target="SANSA_CLIPPLUS"
     memory=8
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
@@ -2493,7 +2493,7 @@ fi
    63|sansafuzev2)
     target_id=68
     modelname="sansafuzev2"
-    target="-DSANSA_FUZEV2"
+    target="SANSA_FUZEV2"
     memory=8 # not sure
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
@@ -2513,7 +2513,7 @@ fi
     64|sansafuzeplus)
     target_id=80
     modelname="sansafuzeplus"
-    target="-DSANSA_FUZEPLUS"
+    target="SANSA_FUZEPLUS"
     memory=64
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -2533,7 +2533,7 @@ fi
    65|sansaclipzip)
     target_id=68
     modelname="sansaclipzip"
-    target="-DSANSA_CLIPZIP"
+    target="SANSA_CLIPZIP"
     memory=8 # not sure
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -2553,7 +2553,7 @@ fi
    66|sansaconnect)
     target_id=81
     modelname="sansaconnect"
-    target="-DSANSA_CONNECT"
+    target="SANSA_CONNECT"
     memory=64
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -2572,7 +2572,7 @@ fi
    150|tatungtpj1022)
     target_id=25
     modelname="tatungtpj1022"
-    target="-DTATUNG_TPJ1022"
+    target="TATUNG_TPJ1022"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -add tpj2"
@@ -2596,7 +2596,7 @@ fi
    100|gogearsa9200)
     target_id=41
     modelname="gogearsa9200"
-    target="-DPHILIPS_SA9200"
+    target="PHILIPS_SA9200"
     memory=32 # supposedly
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=9200 -type=RBOS"
@@ -2620,7 +2620,7 @@ fi
    101|gogearhdd1630)
     target_id=43
     modelname="gogearhdd1630"
-    target="-DPHILIPS_HDD1630"
+    target="PHILIPS_HDD1630"
     memory=32 # supposedly
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=1630 -type=RBOS"
@@ -2644,7 +2644,7 @@ fi
    102|gogearhdd6330)
     target_id=65
     modelname="gogearhdd6330"
-    target="-DPHILIPS_HDD6330"
+    target="PHILIPS_HDD6330"
     memory=64 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=6330 -type=RBOS"
@@ -2668,7 +2668,7 @@ fi
    110|meizum6sl)
     target_id=49
     modelname="meizum6sl"
-    target="-DMEIZU_M6SL"
+    target="MEIZU_M6SL"
     memory=16 # always
     arm940tbecc
     tool="cp"
@@ -2690,7 +2690,7 @@ fi
    111|meizum6sp)
     target_id=46
     modelname="meizum6sp"
-    target="-DMEIZU_M6SP"
+    target="MEIZU_M6SP"
     memory=16 # always
     arm940tbecc
     tool="cp"
@@ -2712,7 +2712,7 @@ fi
    112|meizum3)
     target_id=47
     modelname="meizum3"
-    target="-DMEIZU_M3"
+    target="MEIZU_M3"
     memory=16 # always
     arm940tbecc
     tool="cp"
@@ -2734,7 +2734,7 @@ fi
     120|ondavx747)
     target_id=45
     modelname="ondavx747"
-    target="-DONDA_VX747"
+    target="ONDA_VX747"
     memory=16
     mipselcc
     tool="$rootdir/tools/scramble -add=x747"
@@ -2756,7 +2756,7 @@ fi
     121|ondavx767)
     target_id=64
     modelname="ondavx767"
-    target="-DONDA_VX767"
+    target="ONDA_VX767"
     memory=16 #FIXME
     mipselcc
     tool="cp"
@@ -2778,7 +2778,7 @@ fi
     122|ondavx747p)
     target_id=54
     modelname="ondavx747p"
-    target="-DONDA_VX747P"
+    target="ONDA_VX747P"
     memory=16
     mipselcc
     tool="$rootdir/tools/scramble -add=747p"
@@ -2800,7 +2800,7 @@ fi
     123|ondavx777)
     target_id=61
     modelname="ondavx777"
-    target="-DONDA_VX777"
+    target="ONDA_VX777"
     memory=16
     mipselcc
     tool="$rootdir/tools/scramble -add=x777"
@@ -2822,7 +2822,7 @@ fi
     130|lyreproto1)
     target_id=56
     modelname="lyreproto1"
-    target="-DLYRE_PROTO1"
+    target="LYRE_PROTO1"
     memory=64
     arm926ejscc
     tool="cp"
@@ -2844,7 +2844,7 @@ fi
    131|mini2440)
     target_id=99
     modelname="mini2440"
-    target="-DMINI2440"
+    target="MINI2440"
     memory=64
     arm9tdmicc
     tool="$rootdir/tools/scramble -add=m244"
@@ -2866,7 +2866,7 @@ fi
    140|samsungyh820)
     target_id=57
     modelname="samsungyh820"
-    target="-DSAMSUNG_YH820"
+    target="SAMSUNG_YH820"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v2 -model=y820 -type=RBOS"
@@ -2890,7 +2890,7 @@ fi
    141|samsungyh920)
     target_id=58
     modelname="samsungyh920"
-    target="-DSAMSUNG_YH920"
+    target="SAMSUNG_YH920"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v2 -model=y920 -type=RBOS"
@@ -2914,7 +2914,7 @@ fi
    142|samsungyh925)
     target_id=59
     modelname="samsungyh925"
-    target="-DSAMSUNG_YH925"
+    target="SAMSUNG_YH925"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v2 -model=y925 -type=RBOS"
@@ -2938,7 +2938,7 @@ fi
    143|samsungyps3)
     target_id=72
     modelname="samsungyps3"
-    target="-DSAMSUNG_YPS3"
+    target="SAMSUNG_YPS3"
     memory=16 # always
     arm940tbecc
     tool="cp"
@@ -2960,7 +2960,7 @@ fi
    160|vibe500)
     target_id=67
     modelname="vibe500"
-    target="-DPBELL_VIBE500"
+    target="PBELL_VIBE500"
     memory=32 # always
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=v500 -type=RBOS"
@@ -2984,7 +2984,7 @@ fi
    170|mpiohd200)
     target_id=69
     modelname="mpiohd200"
-    target="-DMPIO_HD200"
+    target="MPIO_HD200"
     memory=16 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=hd20"
@@ -3007,7 +3007,7 @@ fi
    171|mpiohd300)
     target_id=70
     modelname="mpiohd300"
-    target="-DMPIO_HD300"
+    target="MPIO_HD300"
     memory=16 # always
     coldfirecc
     tool="$rootdir/tools/scramble -add=hd30"
@@ -3030,7 +3030,7 @@ fi
    180|rk27generic)
     target_id=78
     modelname="rk27generic"
-    target="-DRK27_GENERIC"
+    target="RK27_GENERIC"
     memory=16 # always
     arm7ejscc
     tool="$rootdir/tools/scramble -add=rk27"
@@ -3053,7 +3053,7 @@ fi
    190|hifimanhm60x)
     target_id=79
     modelname="hifimanhm60x"
-    target="-DHM60X"
+    target="HM60X"
     memory=16
     arm7ejscc
     tool="$rootdir/tools/scramble -add=rk27"
@@ -3076,7 +3076,7 @@ fi
    191|hifimanhm801)
     target_id=82
     modelname="hifimanhm801"
-    target="-DHM801"
+    target="HM801"
     memory=16
     arm7ejscc
     tool="$rootdir/tools/scramble -add=rk27"
@@ -3100,7 +3100,7 @@ fi
     application="yes"
     target_id=73
     modelname="sdlapp"
-    target="-DSDLAPP"
+    target="SDLAPP"
     app_set_paths
     app_set_lcd_size
     memory=8
@@ -3125,7 +3125,7 @@ fi
     application="yes"
     target_id=74
     modelname="android"
-    target="-DANDROID"
+    target="ANDROID"
     app_type="android"
     app_set_lcd_size
     sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
@@ -3154,7 +3154,7 @@ fi
     target_id=75
     modelname="nokian8xx"
     app_type="sdl-app"
-    target="-DNOKIAN8XX"
+    target="NOKIAN8XX"
     sharedir="/opt/rockbox/share/rockbox"
     bindir="/opt/rockbox/bin"
     libdir="/opt/rockbox/lib"
@@ -3181,7 +3181,7 @@ fi
     target_id=76
     modelname="nokian900"
     app_type="sdl-app"
-    target="-DNOKIAN900"
+    target="NOKIAN900"
     sharedir="/opt/rockbox/share/rockbox"
     bindir="/opt/rockbox/bin"
     libdir="/opt/rockbox/lib"
@@ -3208,7 +3208,7 @@ fi
     target_id=77
     modelname="pandora"
     app_type="sdl-app"
-    target="-DPANDORA"
+    target="PANDORA"
     sharedir="rockbox/share/rockbox"
     bindir="rockbox/bin"
     libdir="rockbox/lib"
@@ -3714,7 +3714,7 @@ export MODELNAME=${modelname}
 export ARCHOSROM=${archosrom}
 export FLASHFILE=${flash}
 export TARGET_ID=${target_id}
-export TARGET=${target}
+export TARGET=-D${target}
 export CPU=${t_cpu}
 export MANUFACTURER=${t_manufacturer}
 export OBJDIR=${pwd}
