@@ -224,7 +224,7 @@ static void handle_ep_int(bool out)
             DEPDMA(0, true) = &ctrlreq;
             DEPCTL(0, true) |= DEPCTL_epena | DEPCTL_cnak;
         }
-        DEPINT(ep, true) = epints;
+        DEPINT(ep, out) = epints;
     }
 }
 
