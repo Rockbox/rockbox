@@ -115,7 +115,7 @@ struct ascodec_request {
 
 static struct mutex as_mtx;
 
-static int ascodec_enrd0_shadow = 0;
+static unsigned long ascodec_enrd0_shadow = 0;
 
 static unsigned char *req_data_ptr = NULL;
 static struct ascodec_request *req_head = NULL;
@@ -160,8 +160,8 @@ static void ascodec_finish_req(struct ascodec_request *req)
      */
     while (i2c_busy());
 
-    /* disable clock - already in IRQ context */
-    CGU_PERI &= ~CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
+    /* disable clock */
+    bitclr32(&CGU_PERI, CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE);
 
     req->status = 1;
 
@@ -434,6 +434,41 @@ int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
     return i;
 }
 
+#if CONFIG_CPU == AS3525v2
+void ascodec_write_pmu(unsigned int index, unsigned int subreg,
+                       unsigned int value)
+{
+    struct ascodec_request reqs[2];
+
+    int oldstatus = disable_irq_save();
+    /* we submit consecutive requests to make sure no operations happen on the
+     * i2c bus between selecting the sub register and writing to it */
+    ascodec_async_write(AS3543_PMU_ENABLE, 8 | subreg, &reqs[0]);
+    ascodec_async_write(index, value, &reqs[1]);
+    restore_irq(oldstatus);
+
+    /* Wait for second request to finish */
+    ascodec_wait(&reqs[1]);
+}
+
+int ascodec_read_pmu(unsigned int index, unsigned int subreg)
+{
+    struct ascodec_request reqs[2];
+
+    int oldstatus = disable_irq_save();
+    /* we submit consecutive requests to make sure no operations happen on the
+     * i2c bus between selecting the sub register and reading it */
+    ascodec_async_write(AS3543_PMU_ENABLE, subreg, &reqs[0]);
+    ascodec_async_read(index, 1, &reqs[1], NULL);
+    restore_irq(oldstatus);
+
+    /* Wait for second request to finish */
+    ascodec_wait(&reqs[1]);
+
+    return reqs[1].data[0];
+}
+#endif /* CONFIG_CPU == AS3525v2 */
+
 static void ascodec_read_cb(unsigned const char *data, unsigned int len)
 {
     if (UNLIKELY(len != 3)) /* some error happened? */
@@ -492,7 +527,7 @@ void ascodec_wait_adc_finished(void)
 bool ascodec_endofch(void)
 {
     bool ret = ascodec_enrd0_shadow & CHG_ENDOFCH;
-    ascodec_enrd0_shadow &= ~CHG_ENDOFCH; // clear interrupt
+    bitclr32(&ascodec_enrd0_shadow, CHG_ENDOFCH); /* clear interrupt */
     return ret;
 }
 

@@ -67,27 +67,9 @@ bool ascodec_endofch(void);
 bool ascodec_chg_status(void);
 
 #if CONFIG_CPU == AS3525v2
-static inline void ascodec_write_pmu(unsigned int index, unsigned int subreg,
-                                     unsigned int value)
-{
-    /* we disable interrupts to make sure no operation happen on the i2c bus
-     * between selecting the sub register and writing to it */
-    int oldstatus = disable_irq_save();
-    ascodec_write(AS3543_PMU_ENABLE, 8|subreg);
-    ascodec_write(index, value);
-    restore_irq(oldstatus);
-}
-
-static inline int ascodec_read_pmu(unsigned int index, unsigned int subreg)
-{
-    /* we disable interrupts to make sure no operation happen on the i2c bus
-     * between selecting the sub register and reading it */
-    int oldstatus = disable_irq_save();
-    ascodec_write(AS3543_PMU_ENABLE, subreg);
-    int ret = ascodec_read(index);
-    restore_irq(oldstatus);
-    return ret;
-}
+void ascodec_write_pmu(unsigned int index, unsigned int subreg,
+                       unsigned int value);
+int ascodec_read_pmu(unsigned int index, unsigned int subreg);
 #endif /* CONFIG_CPU == AS3525v2 */
 
 static inline void ascodec_write_charger(int value)
