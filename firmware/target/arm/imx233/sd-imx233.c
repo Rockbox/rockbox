@@ -372,9 +372,6 @@ static int transfer_sectors(IF_MD2(int drive,) unsigned long start, int count, v
         ret = -23;
     Lend:
     mutex_unlock(&sd_mutex);
-    if(ret != 0)
-        panicf("transfer_sectors(%d,%d,%d,%d,%d,%d)", drive, start, count, read,
-            old_start, old_count);
     return ret;
 }
 

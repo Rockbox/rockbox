@@ -206,7 +206,7 @@ static int transfer_sectors(IF_MD2(int drive,) unsigned long start, int count, v
     start += mmc_window_start;
     if((start + count) > mmc_window_end)
         return -201;
-    /* get mutex (needed because we done multiple commands for count > 0 */
+    /* get mutex (needed because we do multiple commands for count > 0) */
     mutex_lock(&mmc_mutex);
     int ret = 0;
     uint32_t resp;

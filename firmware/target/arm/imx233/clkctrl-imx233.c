@@ -266,7 +266,7 @@ unsigned imx233_get_clock_freq(enum imx233_clock_t clk)
     {
         case CLK_PLL: /* PLL: 480MHz when enable */
             return imx233_is_clock_enable(CLK_PLL) ? 480000 : 0;
-        case CLK_XTAL: /* crytsal: 24MHz */
+        case CLK_XTAL: /* crystal: 24MHz */
             return 24000;
         case CLK_CPU:
         {
