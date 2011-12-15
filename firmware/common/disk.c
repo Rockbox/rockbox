@@ -62,7 +62,6 @@ static struct mutex disk_mutex;
 
 #ifdef MAX_LOG_SECTOR_SIZE
 static int disk_sector_multiplier[NUM_DRIVES] = {1};
-#endif
 
 int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
 {
@@ -72,6 +71,7 @@ int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
     return disk_sector_multiplier[0];
     #endif
 }
+#endif
 
 struct partinfo* disk_init(IF_MD_NONVOID(int drive))
 {
