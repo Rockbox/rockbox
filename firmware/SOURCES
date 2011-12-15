@@ -735,6 +735,18 @@ target/arm/tcc77x/debug-tcc77x.c
 # endif /* !BOOTLOADER */
 #endif /* CPU_TCC77X */
 
+#if CONFIG_CPU == S5L8700 || CONFIG_CPU == S5L8701
+target/arm/s5l8700/kernel-s5l8700.c
+target/arm/s5l8700/system-s5l8700.c
+target/arm/s5l8700/dma-s5l8700.c
+# ifndef BOOTLOADER
+target/arm/s5l8700/wmcodec-s5l8700.c
+target/arm/s5l8700/timer-s5l8700.c
+target/arm/s5l8700/pcm-s5l8700.c
+target/arm/s5l8700/debug-s5l8700.c
+# endif
+#endif /* S5L8700 || S5L8701 */
+
 #if CONFIG_CPU == S3C2440
 target/arm/s3c2440/debug-s3c2440.c
 target/arm/s3c2440/kernel-s3c2440.c
@@ -1456,33 +1468,25 @@ drivers/qt1106.c
 #ifdef MEIZU_M6SP
 target/arm/s5l8700/backlight-meizu.c
 target/arm/s5l8700/power-meizu.c
-target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/meizu-m6sp/button-m6sp.c
 target/arm/s5l8700/meizu-m6sp/lcd-m6sp.c
 #ifndef BOOTLOADER
 drivers/generic_i2c.c
 drivers/rtc/rtc_s35390a.c
 target/arm/s5l8700/audio-meizu.c
-target/arm/s5l8700/debug-s5l8700.c
-target/arm/s5l8700/dma-s5l8700.c
 target/arm/s5l8700/ftl-meizu.c
 target/arm/s5l8700/nand-meizu.c
 target/arm/s5l8700/fmradio-i2c-meizu.c
-target/arm/s5l8700/pcm-s5l8700.c
 target/arm/s5l8700/powermgmt-meizu.c
 target/arm/s5l8700/usb-s5l8700.c
-target/arm/s5l8700/wmcodec-s5l8700.c
 #endif /* BOOTLOADER */
 #endif /* MEIZU_M6SP */
 
 #ifdef MEIZU_M3
 target/arm/s5l8700/backlight-meizu.c
-target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/meizu-m3/lcd-m3.c
 drivers/qt1106.c
 #ifndef BOOTLOADER
-target/arm/s5l8700/dma-s5l8700.c
-target/arm/s5l8700/pcm-s5l8700.c
 target/arm/s5l8700/udacodec-meizu.c
 #endif /* BOOTLOADER */
 #endif /* MEIZU_M3 */
@@ -1490,9 +1494,6 @@ target/arm/s5l8700/udacodec-meizu.c
 #ifdef IPOD_NANO2G
 target/arm/ipod/button-clickwheel.c
 target/arm/s5l8700/postmortemstub.S
-target/arm/s5l8700/kernel-s5l8700.c
-target/arm/s5l8700/dma-s5l8700.c
-target/arm/s5l8700/system-s5l8700.c
 target/arm/s5l8700/ipodnano2g/backlight-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-asm-nano2g.S
@@ -1503,10 +1504,6 @@ target/arm/s5l8700/ipodnano2g/nand-nano2g.c
 target/arm/s5l8700/ipodnano2g/pmu-nano2g.c
 target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
 #ifndef BOOTLOADER
-target/arm/s5l8700/timer-s5l8700.c
-target/arm/s5l8700/debug-s5l8700.c
-target/arm/s5l8700/pcm-s5l8700.c
-target/arm/s5l8700/wmcodec-s5l8700.c
 target/arm/s5l8700/ipodnano2g/audio-nano2g.c
 target/arm/s5l8700/ipodnano2g/piezo-nano2g.c
 #endif
@@ -1657,10 +1654,6 @@ target/arm/samsung/yh925/powermgmt-yh925.c
 #endif /* SAMSUNG_YH925 */
 
 #ifdef SAMSUNG_YPS3
-target/arm/s5l8700/i2c-s5l8700.c
-target/arm/s5l8700/kernel-s5l8700.c
-target/arm/s5l8700/timer-s5l8700.c
-target/arm/s5l8700/wmcodec-s5l8700.c
 target/arm/s5l8700/yps3/button-yps3.c
 target/arm/s5l8700/yps3/lcd-yps3.c
 target/arm/s5l8700/yps3/fmradio-i2c-yps3.c
