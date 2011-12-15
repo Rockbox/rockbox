@@ -370,8 +370,10 @@ target/hosted/sdl/pcm-sdl.c
 #endif /* CONFIG_CODEC == SWCODEC */
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER) */
 
-/* USB Stack */
+/* target code */
 #if !defined(SIMULATOR)
+
+/* USB Stack */
 #ifdef HAVE_USBSTACK
 usbstack/usb_core.c
 #ifdef USB_ENABLE_STORAGE
@@ -406,20 +408,16 @@ drivers/isp1362.c
 drivers/m5636.c
 #endif
 #endif /* !defined(HAVE_USBSTACK) */
-#endif /* !defined(SIMULATOR) */
 
 /* Other Random Hardware */
 #ifdef HAVE_TSC2100
-#if !defined(SIMULATOR)
 drivers/tsc2100.c
 drivers/audio/tsc2100.c
-#endif /* !SIMULATOR */
 #endif
 
 /* CPU Specific - By class then particular chip if applicable */
 #if defined(CPU_SH)
 
-#ifndef SIMULATOR
 target/sh/adc-sh.c
 target/sh/bitswap.S
 target/sh/crt0.S
@@ -432,11 +430,9 @@ target/sh/system-sh.c
 target/sh/archos/descramble.S
 target/sh/archos/i2c-archos.c
 target/sh/debug-sh.c
-#endif /* SIMULATOR */
 
 #elif defined(CPU_COLDFIRE)
 
-#ifndef SIMULATOR
 target/coldfire/crt0.S
 #ifdef HAVE_PRIORITY_SCHEDULING
 common/ffs.c
@@ -460,14 +456,13 @@ target/coldfire/debug-coldfire.c
 #if CONFIG_I2C == I2C_COLDFIRE
 target/coldfire/i2c-coldfire.c
 #endif /* CONFIG_I2C == I2C_COLDFIRE */
-#endif /* SIMULATOR */
 
 #elif defined(CPU_PP) || defined(CPU_ARM)
 /* CPU_PP => CPU_ARM, CPU_ARM !=> CPU_PP */
 target/arm/support-arm.S
 target/arm/memcpy-arm.S
 target/arm/memmove-arm.S
-#ifndef SIMULATOR
+
 target/arm/memset-arm.S
 target/arm/memset16-arm.S
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -611,7 +606,6 @@ target/arm/rk27xx/crt0.S
 #elif defined(CPU_ARM)
 target/arm/crt0.S
 #endif /* defined(CPU_*) */
-#endif /* SIMULATOR */
 
 #elif defined(CPU_MIPS)
 common/memset16.c
@@ -637,7 +631,6 @@ drivers/i2c.c
 #endif /* defined(CPU_*) */
 
 #ifdef ARCHOS_PLAYER
-#ifndef SIMULATOR
 target/sh/archos/ata-archos.c
 target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
@@ -651,11 +644,9 @@ target/sh/archos/player/powermgmt-player.c
 target/sh/archos/player/usb-player.c
 target/sh/archos/mascodec-archos.c
 target/sh/archos/audio-archos.c
-#endif /* SIMULATOR */
 #endif /* ARCHOS_PLAYER */
 
 #ifdef ARCHOS_RECORDER
-#ifndef SIMULATOR
 target/sh/archos/ata-archos.c
 target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
@@ -668,11 +659,9 @@ target/sh/archos/recorder/powermgmt-recorder.c
 target/sh/archos/recorder/usb-recorder.c
 target/sh/archos/mascodec-archos.c
 target/sh/archos/audio-archos.c
-#endif /* SIMULATOR */
 #endif /* ARCHOS_RECORDER */
 
 #if defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
-#ifndef SIMULATOR
 target/sh/archos/ata-archos.c
 target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
@@ -684,11 +673,9 @@ target/sh/archos/fm_v2/powermgmt-fm_v2.c
 target/sh/archos/fm_v2/usb-fm_v2.c
 target/sh/archos/mascodec-archos.c
 target/sh/archos/audio-archos.c
-#endif /* SIMULATOR */
 #endif /* ARCHOS_FMRECORDER || ARCHOS_RECORDERV2 */
 
 #if defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
-#ifndef SIMULATOR
 target/sh/archos/timer-archos.c
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
@@ -702,11 +689,9 @@ target/sh/archos/audio-archos.c
 #if (CONFIG_TUNER & TEA5767)
 target/sh/archos/ondio/fmradio_i2c-ondio.c
 #endif
-#endif /* SIMULATOR */
 #endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
 
 #ifdef SANSA_E200
-#ifndef SIMULATOR
 target/arm/adc-as3514.c
 target/arm/ascodec-pp.c
 target/arm/ata-sd-pp.c
@@ -722,11 +707,9 @@ target/arm/sandisk/sansa-e200/powermgmt-e200.c
 #ifndef BOOTLOADER
 target/arm/sandisk/audio-c200_e200.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* SANSA_E200 */
 
 #ifdef SANSA_C200
-#ifndef SIMULATOR
 target/arm/adc-as3514.c
 target/arm/ascodec-pp.c
 target/arm/ata-sd-pp.c
@@ -742,11 +725,9 @@ target/arm/sandisk/sansa-c200/powermgmt-c200.c
 #ifndef BOOTLOADER
 target/arm/sandisk/audio-c200_e200.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* SANSA_C200 */
 
 #ifdef SANSA_VIEW
-#ifndef SIMULATOR
 /* target/arm/ascodec-pp.c */
 target/arm/ata-sd-pp.c
 target/arm/lcd-as-memframe.S
@@ -761,11 +742,9 @@ target/arm/sandisk/sansa-view/powermgmt-view.c
 #ifndef BOOTLOADER
 /* target/arm/sandisk/audio-view.c */
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* SANSA_VIEW */
 
 #ifdef PHILIPS_SA9200
-#ifndef SIMULATOR
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
 #endif /* BOOTLOADER */
@@ -781,11 +760,9 @@ target/arm/philips/sa9200/lcd-sa9200.c
 target/arm/philips/sa9200/lcd-as-sa9200.S
 target/arm/philips/sa9200/power-sa9200.c
 target/arm/philips/sa9200/powermgmt-sa9200.c
-#endif /* SIMULATOR */
 #endif /* PHILIPS_SA9200 */
 
 #ifdef PHILIPS_HDD1630
-#ifndef SIMULATOR
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
 #endif /* BOOTLOADER */
@@ -802,11 +779,9 @@ target/arm/philips/hdd1630/lcd-hdd1630.c
 target/arm/philips/hdd1630/lcd-as-hdd1630.S
 target/arm/philips/hdd1630/powermgmt-hdd1630.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* PHILIPS_HDD1630 */
 
 #ifdef PHILIPS_HDD6330
-#ifndef SIMULATOR
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
 #endif /* BOOTLOADER */
@@ -823,11 +798,9 @@ target/arm/philips/hdd6330/lcd-hdd6330.c
 target/arm/philips/hdd6330/lcd-as-hdd6330.S
 target/arm/philips/hdd6330/powermgmt-hdd6330.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* PHILIPS_HDD6330 */
 
 #ifdef IAUDIO_X5
-#ifndef SIMULATOR
 target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iaudio/adc-iaudio.c
@@ -849,11 +822,9 @@ target/coldfire/iaudio/x5/m5636-x5.c
 #ifndef BOOTLOADER
 target/coldfire/iaudio/audio-iaudio.c
 #endif
-#endif /* SIMULATOR */
 #endif /* IAUDIO_X5 */
 
 #ifdef IAUDIO_M5
-#ifndef SIMULATOR
 target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iaudio/adc-iaudio.c
@@ -875,11 +846,9 @@ target/coldfire/iaudio/usb-iaudio.c
 #ifndef BOOTLOADER
 target/coldfire/iaudio/audio-iaudio.c
 #endif
-#endif /* SIMULATOR */
 #endif /* IAUDIO_M5 */
 
 #ifdef IAUDIO_M3
-#ifndef SIMULATOR
 target/coldfire/ata-as-coldfire.S
 target/coldfire/iaudio/fmradio_i2c-iaudio.c
 target/coldfire/iaudio/m3/adc-m3.c
@@ -895,7 +864,6 @@ target/coldfire/iaudio/m3/usb-m3.c
 #ifndef BOOTLOADER
 target/coldfire/iaudio/audio-iaudio.c
 #endif
-#endif /* SIMULATOR */
 #endif /* IAUDIO_M3 */
 
 #ifdef IRIVER_IFP7XX_SERIES
@@ -906,7 +874,6 @@ libc/sscanf.c
 #endif /* IRIVER_IFP7XX_SERIES */
 
 #ifdef IRIVER_H300_SERIES
-#ifndef SIMULATOR
 target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iriver/ata-iriver.c
@@ -928,11 +895,9 @@ target/coldfire/iriver/h300/usb-h300.c
 target/coldfire/iriver/audio-iriver.c
 target/coldfire/iriver/udacodec-iriver.c
 #endif
-#endif /* SIMULATOR */
 #endif /* IRIVER_H300_SERIES */
 
 #ifdef IRIVER_H100_SERIES
-#ifndef SIMULATOR
 drivers/sw_i2c.c
 target/coldfire/ata-as-coldfire.S
 target/coldfire/uart-coldfire.c
@@ -954,11 +919,9 @@ target/coldfire/iriver/udacodec-iriver.c
 target/coldfire/iriver/h100/spdif-h100.c
 #endif
 target/coldfire/iriver/h100/usb-h100.c
-#endif /* SIMULATOR */
 #endif /* IRIVER_H100_SERIES */
 
 #ifdef IRIVER_H10
-#ifndef SIMULATOR
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -972,11 +935,9 @@ target/arm/iriver/h10/lcd-as-h10.S
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/powermgmt-h10.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* IRIVER_H10 */
 
 #ifdef IRIVER_H10_5GB
-#ifndef SIMULATOR
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -989,11 +950,9 @@ target/arm/iriver/h10/lcd-h10_5gb.c
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/powermgmt-h10.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* IRIVER_H10_5GB */
 
 #ifdef GIGABEAT_F
-#ifndef SIMULATOR
 target/arm/bits-armv4.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
@@ -1015,11 +974,9 @@ target/arm/s3c2440/gigabeat-fx/powermgmt-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 #endif
-#endif /* SIMULATOR */
 #endif /* GIGABEAT_F */
 
 #ifdef GIGABEAT_S
-#ifndef SIMULATOR
 target/arm/bits-armv6.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-armv6.S
@@ -1057,7 +1014,6 @@ target/arm/imx31/gigabeat-s/headphone-gigabeat-s.c
 target/arm/imx31/gigabeat-s/pcm-gigabeat-s.c
 target/arm/imx31/gigabeat-s/timer-gigabeat-s.c
 #endif
-#endif /* SIMULATOR */
 #endif /* GIGABEAT_S */
 
 #if CONFIG_CPU == DM320
@@ -1076,7 +1032,6 @@ target/arm/tms320dm320/uart-dm320.c
 #endif /* CONFIG_CPU == DM320 */
 
 #ifdef MROBE_500
-#ifndef SIMULATOR
 target/arm/ata-as-arm.S
 #if !defined(LCD_USE_DMA)
 target/arm/lcd-as-memframe.S
@@ -1096,11 +1051,9 @@ target/arm/tms320dm320/mrobe-500/pcm-mr500.c
 target/arm/tms320dm320/mrobe-500/powermgmt-mr500.c
 target/arm/tms320dm320/mrobe-500/power-mr500.c
 target/arm/tms320dm320/mrobe-500/usb-mr500.c
-#endif /* SIMULATOR */
 #endif /* MROBE_500 */
 
 #ifdef CREATIVE_ZVx
-#ifndef SIMULATOR
 target/arm/ata-as-arm.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
@@ -1113,11 +1066,9 @@ target/arm/tms320dm320/creative-zvm/pic-creativezvm.c
 target/arm/tms320dm320/creative-zvm/power-creativezvm.c
 target/arm/tms320dm320/creative-zvm/powermgmt-creativezvm.c
 target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
-#endif /* SIMULATOR */
 #endif /* CREATIVE_ZVx */
 
 #ifdef SANSA_CONNECT
-#ifndef SIMULATOR
 target/arm/mmu-arm.S
 target/arm/lcd-as-memframe.S
 target/arm/tms320dm320/sdmmc-dm320.c
@@ -1131,11 +1082,9 @@ target/arm/tms320dm320/sansa-connect/avr-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/backlight-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/pcm-sansaconnect.c
 target/arm/tms320dm320/dma-dm320.c
-#endif /* SIMULATOR */
 #endif /* SANSA_CONNECT */
 
 #ifdef MROBE_100
-#ifndef SIMULATOR
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
 target/arm/olympus/mrobe-100/lcd-remote-mr100.c
@@ -1153,11 +1102,9 @@ target/arm/olympus/mrobe-100/lcd-as-mr100.S
 target/arm/olympus/mrobe-100/power-mr100.c
 target/arm/olympus/mrobe-100/powermgmt-mr100.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* MROBE_100 */
 
 #ifdef TATUNG_TPJ1022
-#ifndef SIMULATOR
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -1169,11 +1116,9 @@ target/arm/tatung/tpj1022/lcd-tpj1022.c
 target/arm/tatung/tpj1022/power-tpj1022.c
 target/arm/tatung/tpj1022/powermgmt-tpj1022.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* TATUNG_TPJ1022 */
 
 #ifdef IPOD_4G
-#ifndef SIMULATOR
 drivers/pcf50605.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -1188,11 +1133,9 @@ target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* IPOD_4G */
 
 #ifdef IPOD_COLOR
-#ifndef SIMULATOR
 drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
@@ -1207,11 +1150,9 @@ target/arm/ipod/lcd-as-color-nano.S
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* IPOD_COLOR */
 
 #ifdef IPOD_NANO
-#ifndef SIMULATOR
 drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
@@ -1226,11 +1167,9 @@ target/arm/ipod/lcd-as-color-nano.S
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* IPOD_NANO */
 
 #ifdef IPOD_VIDEO
-#ifndef SIMULATOR
 drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
@@ -1248,11 +1187,9 @@ target/arm/ipod/video/lcd-video.c
 target/arm/ipod/video/battery-video.c
 #endif /* BOOTLOADER */
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* IPOD_VIDEO */
 
 #ifdef IPOD_3G
-#ifndef SIMULATOR
 drivers/pcf50605.c
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
@@ -1265,11 +1202,9 @@ target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp5002.c
-#endif /* SIMULATOR */
 #endif /* IPOD_3G */
 
 #ifdef IPOD_1G2G
-#ifndef SIMULATOR
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -1281,11 +1216,9 @@ target/arm/ipod/lcd-as-gray.S
 target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/usb-fw-pp5002.c
-#endif /* SIMULATOR */
 #endif /* IPOD_1G2G */
 
 #ifdef IPOD_MINI
-#ifndef SIMULATOR
 drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
@@ -1300,11 +1233,9 @@ target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* IPOD_MINI */
 
 #ifdef IPOD_MINI2G
-#ifndef SIMULATOR
 drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
@@ -1319,11 +1250,9 @@ target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif /* IPOD_MINI2G */
 
 #ifdef IRIVER_IFP7XX
-#ifndef SIMULATOR
 target/arm/pnx0101/iriver-ifp7xx/adc-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/backlight-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/button-ifp7xx.c
@@ -1334,11 +1263,9 @@ target/arm/pnx0101/iriver-ifp7xx/usb-ifp7xx.c
 #ifndef BOOTLOADER
 target/arm/pnx0101/pcm-pnx0101.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* IRIVER_IFP7XX */
 
 #ifdef LOGIK_DAX
-#ifndef SIMULATOR
 drivers/nand_id.c
 target/arm/lcd-ssd1815.c
 target/arm/tcc77x/adc-tcc77x.c
@@ -1355,11 +1282,9 @@ target/arm/tcc77x/debug-tcc77x.c
 target/arm/pcm-telechips.c
 target/arm/tcc77x/logikdax/audio-logikdax.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* LOGIK_DAX */
 
 #ifdef SANSA_M200
-#ifndef SIMULATOR
 drivers/nand_id.c
 target/arm/lcd-ssd1815.c
 target/arm/tcc77x/adc-tcc77x.c
@@ -1376,11 +1301,9 @@ target/arm/tcc77x/debug-tcc77x.c
 target/arm/pcm-telechips.c
 target/arm/tcc77x/m200/audio-m200.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* SANSA_M200 */
 
 #ifdef SANSA_C100
-#ifndef SIMULATOR
 drivers/nand_id.c
 target/arm/usb-tcc.c
 target/arm/tcc77x/system-tcc77x.c
@@ -1396,11 +1319,9 @@ target/arm/tcc77x/debug-tcc77x.c
 target/arm/pcm-telechips.c
 target/arm/tcc77x/c100/audio-c100.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* SANSA_C100 */
 
 #ifdef SANSA_CLIPPLUS
-#ifndef SIMULATOR
 target/arm/as3525/lcd-ssd1303.c
 target/arm/as3525/sansa-clipplus/lcd-clip-plus.c
 target/arm/as3525/sansa-clipplus/button-clip.c
@@ -1411,11 +1332,9 @@ target/arm/as3525/sansa-clipplus/powermgmt-clipplus.c
 target/arm/as3525/sansa-clipplus/lcd-as-clip-plus.S
 target/arm/as3525/tuner-as3525v2.c
 #endif /* !BOOTLOADER */
-#endif /* !SIMULATOR */
 #endif /* SANSA_CLIPPLUS */
 
 #ifdef SANSA_CLIPV2
-#ifndef SIMULATOR
 target/arm/as3525/lcd-ssd1303.c
 target/arm/as3525/sansa-clipv2/lcd-clipv2.c
 target/arm/as3525/button-clip.c
@@ -1425,11 +1344,9 @@ target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clipv2/powermgmt-clipv2.c
 target/arm/as3525/sansa-clipv2/lcd-as-clipv2.S
 #endif /* !BOOTLOADER */
-#endif /* !SIMULATOR */
 #endif /* SANSA_CLIPV2 */
 
 #ifdef SANSA_CLIP
-#ifndef SIMULATOR
 target/arm/as3525/lcd-ssd1303.c
 target/arm/as3525/sansa-clip/lcd-clip.c
 target/arm/as3525/button-clip.c
@@ -1438,11 +1355,9 @@ target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clip/powermgmt-clip.c
 target/arm/as3525/sansa-clip/lcd-as-clip.S
 #endif /* !BOOTLOADER */
-#endif /* !SIMULATOR */
 #endif /* SANSA_CLIP */
 
 #ifdef SANSA_E200V2
-#ifndef SIMULATOR
 target/arm/as3525/sansa-e200v2/lcd-e200v2.c
 target/arm/as3525/button-e200v2-fuze.c
 target/arm/as3525/backlight-e200v2-fuze.c
@@ -1452,11 +1367,9 @@ target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-e200v2/powermgmt-e200v2.c
 target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
-#endif /* !SIMULATOR */
 #endif /* SANSA_E200V2 */
 
 #ifdef SANSA_C200V2
-#ifndef SIMULATOR
 target/arm/lcd-c200_c200v2.c
 target/arm/as3525/sansa-c200v2/button-c200v2.c
 target/arm/as3525/sansa-c200v2/backlight-c200v2.c
@@ -1465,21 +1378,17 @@ target/arm/as3525/dbop-as3525.c
 target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-c200v2/powermgmt-c200v2.c
 #endif /* !BOOTLOADER */
-#endif /* !SIMULATOR */
 #endif /* SANSA_E200V2 */
 
 #ifdef SANSA_M200V4
-#ifndef SIMULATOR
 target/arm/lcd-ssd1815.c
 target/arm/as3525/sansa-m200v4/button-m200v4.c
 #ifndef BOOTLOADER
 target/arm/as3525/sansa-m200v4/powermgmt-m200v4.c
 #endif /* !BOOTLOADER */
-#endif /* !SIMULATOR */
 #endif /* SANSA_M200V4 */
 
 #ifdef SANSA_FUZE
-#ifndef SIMULATOR
 target/arm/as3525/button-e200v2-fuze.c
 target/arm/as3525/lcd-fuze.c
 target/arm/as3525/sansa-fuze/lcd-fuzev1.c
@@ -1490,11 +1399,9 @@ target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-fuze/powermgmt-fuze.c
 target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
-#endif /* !SIMULATOR */
 #endif /* SANSA_FUZE */
 
 #ifdef SANSA_FUZEV2
-#ifndef SIMULATOR
 target/arm/as3525/tuner-as3525v2.c
 target/arm/as3525/lcd-fuze.c
 target/arm/as3525/sansa-fuzev2/lcd-fuzev2.c
@@ -1506,11 +1413,9 @@ target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-fuzev2/powermgmt-fuzev2.c
 target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
-#endif /* !SIMULATOR */
 #endif /* SANSA_FUZEV2 */
 
 #ifdef SANSA_FUZEPLUS
-#ifndef SIMULATOR
 drivers/synaptics-rmi.c
 drivers/generic_i2c.c
 target/arm/lcd-as-memframe.S
@@ -1524,11 +1429,9 @@ target/arm/imx233/sansa-fuzeplus/adc-fuzeplus.c
 #ifndef BOOTLOADER
 target/arm/imx233/sansa-fuzeplus/audio-fuzeplus.c
 #endif
-#endif /* SIMULATOR */
 #endif
 
 #ifdef SANSA_CLIPZIP
-#ifndef SIMULATOR
 target/arm/as3525/sansa-clipzip/lcd-clipzip.c
 target/arm/as3525/sansa-clipzip/button-clipzip.c
 target/arm/as3525/sansa-clipzip/backlight-clipzip.c
@@ -1536,11 +1439,9 @@ target/arm/as3525/sansa-clipzip/backlight-clipzip.c
 target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clipzip/powermgmt-clipzip.c
 #endif /* !BOOTLOADER */
-#endif /* !SIMULATOR */
 #endif /* SANSA_CLIPZIP */
 
 #ifdef IAUDIO_7
-#ifndef SIMULATOR
 drivers/nand_id.c
 drivers/pcf50606.c
 target/arm/usb-tcc.c
@@ -1559,11 +1460,9 @@ target/arm/pcm-telechips.c
 target/arm/tcc77x/debug-tcc77x.c
 target/arm/tcc77x/iaudio7/audio-iaudio7.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* IAUDIO_7 */
 
 #ifdef COWON_D2
-#ifndef SIMULATOR
 drivers/nand_id.c
 drivers/pcf50606.c
 drivers/pcf50635.c
@@ -1588,7 +1487,6 @@ target/arm/tcc780x/debug-tcc780x.c
 target/arm/pcm-telechips.c
 target/arm/tcc780x/cowond2/audio-cowond2.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* COWON_D2 */
 
 #ifdef CPU_S5L870X
@@ -1598,10 +1496,6 @@ target/arm/mmu-arm.S
 #ifdef MEIZU_M6SL
 target/arm/s5l8700/meizu-m6sl/lcd-m6sl.c
 drivers/qt1106.c
-#ifndef SIMULATOR
-#ifndef BOOTLOADER
-#endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* MEIZU_M6SL */
 
 #ifdef MEIZU_M6SP
@@ -1610,7 +1504,6 @@ target/arm/s5l8700/power-meizu.c
 target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/meizu-m6sp/button-m6sp.c
 target/arm/s5l8700/meizu-m6sp/lcd-m6sp.c
-#ifndef SIMULATOR
 #ifndef BOOTLOADER
 drivers/generic_i2c.c
 drivers/rtc/rtc_s35390a.c
@@ -1626,7 +1519,6 @@ target/arm/s5l8700/powermgmt-meizu.c
 target/arm/s5l8700/usb-s5l8700.c
 target/arm/s5l8700/wmcodec-s5l8700.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* MEIZU_M6SP */
 
 #ifdef MEIZU_M3
@@ -1634,17 +1526,14 @@ target/arm/s5l8700/backlight-meizu.c
 target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/meizu-m3/lcd-m3.c
 drivers/qt1106.c
-#ifndef SIMULATOR
 #ifndef BOOTLOADER
 target/arm/s5l8700/dma-s5l8700.c
 target/arm/s5l8700/pcm-s5l8700.c
 target/arm/s5l8700/udacodec-meizu.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif /* MEIZU_M3 */
 
 #ifdef IPOD_NANO2G
-#ifndef SIMULATOR
 target/arm/ipod/button-clickwheel.c
 target/arm/s5l8700/postmortemstub.S
 target/arm/s5l8700/kernel-s5l8700.c
@@ -1670,10 +1559,8 @@ target/arm/s5l8700/ipodnano2g/adc-nano2g.c
 target/arm/s5l8700/ipodnano2g/piezo-nano2g.c
 #endif
 #endif
-#endif
 
 #ifdef IPOD_6G
-#ifndef SIMULATOR
 target/arm/ipod/button-clickwheel.c
 target/arm/s5l8702/ipod6g/storage_ata-ipod6g.c
 target/arm/s5l8702/ipod6g/cscodec-ipod6g.c
@@ -1698,9 +1585,7 @@ target/arm/s5l8702/ipod6g/audio-ipod6g.c
 target/arm/s5l8702/ipod6g/adc-ipod6g.c
 #endif
 #endif
-#endif
 
-#ifndef SIMULATOR
 #if CONFIG_CPU == RK27XX
 target/arm/rk27xx/kernel-rk27xx.c
 target/arm/rk27xx/system-rk27xx.c
@@ -1724,9 +1609,7 @@ target/arm/rk27xx/rk27generic/powermgmt-rk27generic.c
 target/arm/rk27xx/rk27generic/power-rk27generic.c
 target/arm/rk27xx/rk27generic/lcd-rk27generic.c
 #endif
-#endif
 
-#ifndef SIMULATOR
 #if CONFIG_CPU == JZ4732
 target/mips/ingenic_jz47xx/ata-nand-jz4740.c
 target/mips/ingenic_jz47xx/ata-sd-jz4740.c
@@ -1772,10 +1655,8 @@ target/arm/at91sam/lyre_proto1/lcd-lyre_proto1.c
 target/arm/at91sam/lyre_proto1/system-lyre_proto1.c
 target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
 #endif
-#endif /* SIMULATOR */
 
 #if defined(MINI2440)
-#ifndef SIMULATOR
 target/arm/bits-armv4.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
@@ -1798,11 +1679,9 @@ target/arm/s3c2440/mini2440/powermgmt-mini2440.c
 target/arm/s3c2440/mini2440/pcm-mini2440.c
 target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
 #endif
-#endif /* SIMULATOR */
 #endif /* MINI2440 */
 
 #ifdef SAMSUNG_YH820
-#ifndef SIMULATOR
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/adc-pp5020.c
@@ -1815,11 +1694,9 @@ target/arm/samsung/yh820/backlight-yh820.c
 target/arm/samsung/yh820/lcd-yh820.c
 target/arm/samsung/yh820/lcd-as-yh820.S
 target/arm/samsung/yh820/powermgmt-yh820.c
-#endif /* SIMULATOR */
 #endif /* SAMSUNG_YH820 */
 
 #ifdef SAMSUNG_YH920
-#ifndef SIMULATOR
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/adc-pp5020.c
@@ -1832,11 +1709,9 @@ target/arm/samsung/yh920/backlight-yh920.c
 target/arm/samsung/yh920/lcd-yh920.c
 target/arm/samsung/yh920/lcd-as-yh920.S
 target/arm/samsung/yh920/powermgmt-yh920.c
-#endif /* SIMULATOR */
 #endif /* SAMSUNG_YH920 */
 
 #ifdef SAMSUNG_YH925
-#ifndef SIMULATOR
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/adc-pp5020.c
@@ -1849,7 +1724,6 @@ target/arm/samsung/yh925/backlight-yh925.c
 target/arm/samsung/yh925/lcd-yh925.c
 target/arm/samsung/yh925/lcd-as-yh925.S
 target/arm/samsung/yh925/powermgmt-yh925.c
-#endif /* SIMULATOR */
 #endif /* SAMSUNG_YH925 */
 
 #ifdef SAMSUNG_YPS3
@@ -1870,7 +1744,6 @@ target/arm/s5l8700/yps3/power-yps3.c
 #endif /* SAMSUNG_YPS3 */
 
 #ifdef PBELL_VIBE500
-#ifndef SIMULATOR
 drivers/synaptics-mep.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
@@ -1884,11 +1757,9 @@ target/arm/pbell/vibe500/backlight-vibe500.c
 target/arm/pbell/vibe500/lcd-as-vibe500.S
 target/arm/pbell/vibe500/powermgmt-vibe500.c
 target/arm/usb-fw-pp502x.c
-#endif /* SIMULATOR */
 #endif
 
 #ifdef MPIO_HD200
-#ifndef SIMULATOR
 /* TODO: currently including all files */
 target/coldfire/ata-as-coldfire.S
 target/coldfire/mpio/system-mpio.c
@@ -1906,11 +1777,9 @@ target/coldfire/mpio/audio-mpio.c
 target/coldfire/wmcodec-coldfire.c
 target/coldfire/mpio/fmradio_i2c-mpio.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
 #endif
 
 #ifdef MPIO_HD300
-#ifndef SIMULATOR
 /* TODO: currently including all files */
 target/coldfire/ata-as-coldfire.S
 target/coldfire/mpio/system-mpio.c
@@ -1928,7 +1797,20 @@ target/coldfire/mpio/audio-mpio.c
 target/coldfire/wmcodec-coldfire.c
 target/coldfire/mpio/fmradio_i2c-mpio.c
 #endif /* BOOTLOADER */
-#endif /* SIMULATOR */
+#endif
+
+#if defined(HM60X)
+target/arm/rk27xx/hm60x/button-hm60x.c
+target/arm/rk27xx/hm60x/powermgmt-hm60x.c
+target/arm/rk27xx/hm60x/power-hm60x.c
+target/arm/rk27xx/lcd-hifiman.c
+#endif
+
+#if defined(HM801)
+target/arm/rk27xx/hm801/button-hm801.c
+target/arm/rk27xx/hm801/powermgmt-hm801.c
+target/arm/rk27xx/hm801/power-hm801.c
+target/arm/rk27xx/lcd-hifiman.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
@@ -1951,20 +1833,4 @@ drivers/audio/android.c
 thread.c
 #endif
 
-#ifndef SIMULATOR
-#if defined(HM60X)
-target/arm/rk27xx/hm60x/button-hm60x.c
-target/arm/rk27xx/hm60x/powermgmt-hm60x.c
-target/arm/rk27xx/hm60x/power-hm60x.c
-target/arm/rk27xx/lcd-hifiman.c
-#endif
-#endif
-
-#ifndef SIMULATOR
-#if defined(HM801)
-target/arm/rk27xx/hm801/button-hm801.c
-target/arm/rk27xx/hm801/powermgmt-hm801.c
-target/arm/rk27xx/hm801/power-hm801.c
-target/arm/rk27xx/lcd-hifiman.c
-#endif
-#endif
+#endif /* ! SIMULATOR */
