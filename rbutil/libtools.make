@@ -71,7 +71,9 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo LD $@
 #	$(SILENT)mkdir -p $(dir $@)
 # EXTRADEPS need to be built into OBJDIR.
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -o $(BINARY) $(OBJS) $(addprefix $(OBJDIR),$(EXTRADEPS)) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -o $(BINARY) \
+	    $(OBJS) $(addprefix $(OBJDIR),$(EXTRADEPS)) \
+	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 
 # common rules
 $(OBJDIR)%.o: %.c
@@ -83,7 +85,8 @@ $(OBJDIR)%.o: %.c
 lib$(OUTPUT)$(RBARCH).a: $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
 lib$(OUTPUT)$(RBARCH): $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
 
-$(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
+$(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) \
+				      $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo AR $(notdir $@)
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(AR) rucs $@ $^
@@ -97,10 +100,13 @@ $(TARGET_DIR)lib$(OUTPUT)ppc.a:
 	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) lib$(OUTPUT)ppc.a
 endif
 
-lib$(OUTPUT)-universal: $(TARGET_DIR)lib$(OUTPUT)i386.a $(TARGET_DIR)lib$(OUTPUT)ppc.a
+lib$(OUTPUT)-universal: $(TARGET_DIR)lib$(OUTPUT)i386.a \
+			$(TARGET_DIR)lib$(OUTPUT)ppc.a
 	@echo lipo $(TARGET_DIR)libmkamsboot.a
 	$(SILENT) rm -f $(TARGET_DIR)libmkamsboot.a
-	$(SILENT)lipo -create $(TARGET_DIR)lib$(OUTPUT)i386.a $(TARGET_DIR)lib$(OUTPUT)ppc.a -output $(TARGET_DIR)lib$(OUTPUT).a
+	$(SILENT)lipo -create $(TARGET_DIR)lib$(OUTPUT)i386.a \
+			      $(TARGET_DIR)lib$(OUTPUT)ppc.a \
+			      -output $(TARGET_DIR)lib$(OUTPUT).a
 
 clean:
 	rm -f $(OBJS) $(OUTPUT) $(TARGET_DIR)lib$(OUTPUT)*.a $(OUTPUT).dmg
