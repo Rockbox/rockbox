@@ -112,7 +112,7 @@ int usb_drv_request_endpoint(int type, int dir)
         {
             endpoints[ep].active = true;
             DEPCTL(ep, out) = (DEPCTL(ep, out) & ~(DEPCTL_eptype_bits << DEPCTL_eptype_bitp)) |
-                (type << DEPCTL_eptype_bitp) | DEPCTL_epena;
+                (type << DEPCTL_eptype_bitp) | DEPCTL_setd0pid;
             return ep | dir;
         }
 
