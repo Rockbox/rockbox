@@ -1120,6 +1120,7 @@ target/arm/usb-fw-pp502x.c
 #endif /* TATUNG_TPJ1022 */
 
 #ifdef IPOD_4G
+drivers/pcf50605.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
 target/arm/ata-as-arm.S
@@ -1136,6 +1137,7 @@ target/arm/usb-fw-pp502x.c
 #endif /* IPOD_4G */
 
 #ifdef IPOD_COLOR
+drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -1152,6 +1154,7 @@ target/arm/usb-fw-pp502x.c
 #endif /* IPOD_COLOR */
 
 #ifdef IPOD_NANO
+drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -1168,6 +1171,7 @@ target/arm/usb-fw-pp502x.c
 #endif /* IPOD_NANO */
 
 #ifdef IPOD_VIDEO
+drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -1187,6 +1191,7 @@ target/arm/usb-fw-pp502x.c
 #endif /* IPOD_VIDEO */
 
 #ifdef IPOD_3G
+drivers/pcf50605.c
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -1215,6 +1220,7 @@ target/arm/usb-fw-pp5002.c
 #endif /* IPOD_1G2G */
 
 #ifdef IPOD_MINI
+drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -1231,6 +1237,7 @@ target/arm/usb-fw-pp502x.c
 #endif /* IPOD_MINI */
 
 #ifdef IPOD_MINI2G
+drivers/pcf50605.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -1437,6 +1444,7 @@ target/arm/as3525/sansa-clipzip/powermgmt-clipzip.c
 
 #ifdef IAUDIO_7
 drivers/nand_id.c
+drivers/pcf50606.c
 target/arm/usb-tcc.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
