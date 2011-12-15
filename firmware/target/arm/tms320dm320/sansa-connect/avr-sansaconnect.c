@@ -228,7 +228,9 @@ static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
     for (i = 0; i<n; i++)
     {
         IO_SERIAL1_TX_DATA = buf_tx[i];
-        udelay(100);
+
+        /* a short wait for AVR to process data */
+        sleep(HZ/1000);
 
         do
         {
@@ -248,7 +250,7 @@ static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
     mutex_unlock(&avr_mtx);
 }
 
-static void avr_hid_sync(void)
+void avr_hid_sync(void)
 {
     int i;
     unsigned char prg[4] = {CMD_SYNC, CMD_VER, CMD_FILL, CMD_CLOSE};
@@ -279,8 +281,6 @@ void avr_hid_init(void)
     IO_SERIAL1_MODE = 0x6DB;
 
     mutex_init(&avr_mtx);
-
-    avr_hid_sync();
 }
 
 /* defined in powermgmt-sansaconnect.c */

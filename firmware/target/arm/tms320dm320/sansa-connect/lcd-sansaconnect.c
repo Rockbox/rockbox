@@ -133,6 +133,7 @@ void lcd_init_device(void)
     /* Copy Rockbox frame buffer to the second framebuffer */
     lcd_update();
 
+    avr_hid_sync();
     avr_hid_lcm_power_on();
 
     /* set framebuffer address - OF sets RAM start address to 0x1000000 */

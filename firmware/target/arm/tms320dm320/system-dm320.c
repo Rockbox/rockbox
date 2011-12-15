@@ -310,6 +310,11 @@ void system_init(void)
     else
 #endif
     {
+#ifdef SANSA_CONNECT
+        /* Setting AHB divisor to 0 causes MMC/SD interface to lock */
+        clock_arm_slow = (1 << 8) | 3;
+        clock_arm_fast = (1 << 8) | 1;
+#else
         /* Set the slow and fast clock speeds used for boosting
          * Slow Setup:
          *  ARM div  = 4    ( 87.5 MHz )
@@ -320,6 +325,7 @@ void system_init(void)
          */
         clock_arm_slow = (0 << 8) | 3;
         clock_arm_fast = (1 << 8) | 1;
+#endif
     }
 
     /* M48XI disabled, USB buffer powerdown */
@@ -368,7 +374,6 @@ void system_init(void)
 
     i2c_init();
     avr_hid_init();
-    avr_hid_enable_charger();
 #endif
 }
 

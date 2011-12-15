@@ -60,6 +60,9 @@ void power_init(void)
 
     /* Set LCM (LDO1) to 2.85V, Set CODEC and USB (LDO2) to 1.8V */
     tps65021_write_reg(0x08, 0x36);
+
+    /* Enable internal charger */
+    avr_hid_enable_charger();
 }
 
 void power_off(void)

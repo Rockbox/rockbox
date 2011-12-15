@@ -24,6 +24,7 @@
 
 #include "config.h"
 
+void avr_hid_sync(void);
 void avr_hid_init(void);
 
 void avr_hid_enable_charger(void);
