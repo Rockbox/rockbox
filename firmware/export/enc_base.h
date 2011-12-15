@@ -162,6 +162,7 @@ struct encoder_config
 
 /* Header at the beginning of every encoder chunk */
 #ifdef DEBUG
+#define H_TO_BE32 htobe32
 #define ENC_CHUNK_MAGIC H_TO_BE32(('P' << 24) | ('T' << 16) | ('Y' << 8) | 'R')
 #endif
 struct enc_chunk_hdr
