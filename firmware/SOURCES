@@ -426,6 +426,11 @@ target/arm/memset16-arm.S
 
 # if ARM_ARCH < 6
 target/arm/bits-armv4.S
+#  if CONFIG_CPU == IMX233 || CONFIG_CPU == DM320 \
+   || CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2 \
+   || defined(CPU_S5L870x)
+target/arm/mmu-arm.S
+#  endif
 # endif
 
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -470,7 +475,6 @@ target/arm/pnx0101/timer-pnx0101.c
 #endif
 
 #if CONFIG_CPU == IMX233
-target/arm/mmu-arm.S
 target/arm/imx233/lcdif-imx233.c
 target/arm/imx233/clkctrl-imx233.c
 target/arm/imx233/system-imx233.c
@@ -520,7 +524,6 @@ target/arm/as3525/power-as3525.c
 target/arm/as3525/usb-as3525.c
 target/arm/as3525/dma-pl081.c
 target/arm/as3525/ascodec-as3525.c
-target/arm/mmu-arm.S
 #ifndef BOOTLOADER
 drivers/generic_i2c.c
 target/arm/as3525/audio-as3525.c
@@ -1007,7 +1010,6 @@ target/arm/iriver/h10/lcd-h10_5gb.c
 #ifdef GIGABEAT_F
 drivers/lcd-memframe.c
 target/arm/lcd-as-memframe.S
-target/arm/mmu-arm.S
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/button-meg-fx.c
@@ -1079,7 +1081,6 @@ target/arm/tms320dm320/uart-dm320.c
 #if !defined(LCD_USE_DMA)
 target/arm/lcd-as-memframe.S
 #endif
-target/arm/mmu-arm.S
 target/arm/tms320dm320/mrobe-500/crt0-board.S
 target/arm/tms320dm320/mrobe-500/adc-mr500.c
 target/arm/tms320dm320/mrobe-500/ata-mr500.c
@@ -1098,7 +1099,6 @@ target/arm/tms320dm320/mrobe-500/usb-mr500.c
 
 #ifdef CREATIVE_ZVx
 target/arm/lcd-as-memframe.S
-target/arm/mmu-arm.S
 target/arm/tms320dm320/creative-zvm/adc-creativezvm.c
 target/arm/tms320dm320/creative-zvm/ata-creativezvm.c
 target/arm/tms320dm320/creative-zvm/dma-creativezvm.c
@@ -1111,7 +1111,6 @@ target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #endif /* CREATIVE_ZVx */
 
 #ifdef SANSA_CONNECT
-target/arm/mmu-arm.S
 target/arm/lcd-as-memframe.S
 target/arm/tms320dm320/sdmmc-dm320.c
 target/arm/tms320dm320/sansa-connect/crt0-board.S
@@ -1403,7 +1402,6 @@ target/arm/tcc780x/cowond2/power-cowond2.c
 target/arm/tcc780x/cowond2/powermgmt-cowond2.c
 target/arm/tcc780x/cowond2/backlight-cowond2.c
 target/arm/usb-tcc.c
-target/arm/mmu-arm.S
 #ifndef BOOTLOADER
 target/arm/tcc780x/timer-tcc780x.c
 target/arm/wmcodec-telechips.c
@@ -1412,10 +1410,6 @@ target/arm/pcm-telechips.c
 target/arm/tcc780x/cowond2/audio-cowond2.c
 #endif /* BOOTLOADER */
 #endif /* COWON_D2 */
-
-#ifdef CPU_S5L870X
-target/arm/mmu-arm.S
-#endif
 
 #ifdef MEIZU_M6SL
 target/arm/s5l8700/meizu-m6sl/lcd-m6sl.c
@@ -1564,7 +1558,6 @@ target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
 #if defined(MINI2440)
 drivers/lcd-memframe.c
 target/arm/lcd-as-memframe.S
-target/arm/mmu-arm.S
 target/arm/s3c2440/dma-s3c2440.c
 target/arm/s3c2440/sd-s3c2440.c
 target/arm/s3c2440/uart-s3c2440.c
