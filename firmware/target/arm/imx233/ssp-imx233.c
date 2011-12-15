@@ -38,7 +38,8 @@ struct ssp_dma_command_t
     uint32_t cmd1;
 };
 
-static int ssp_in_use = 0;
+static bool ssp_in_use[2];
+static int ssp_nr_in_use = 0;
 static struct mutex ssp_mutex[2];
 static struct semaphore ssp_sema[2];
 static struct ssp_dma_command_t ssp_dma_cmd[2];
@@ -82,7 +83,7 @@ void imx233_ssp_init(void)
     __REG_SET(HW_SSP_CTRL0(1)) = __BLOCK_CLKGATE;
     __REG_SET(HW_SSP_CTRL0(2)) = __BLOCK_CLKGATE;
 
-    ssp_in_use = 0;
+    ssp_nr_in_use = 0;
     semaphore_init(&ssp_sema[0], 1, 0);
     semaphore_init(&ssp_sema[1], 1, 0);
     mutex_init(&ssp_mutex[0]);
@@ -92,12 +93,15 @@ void imx233_ssp_init(void)
 
 void imx233_ssp_start(int ssp)
 {
+    if(ssp_in_use[ssp - 1])
+        return;
+    ssp_in_use[ssp - 1] = true;
     /* Gate block */
     imx233_reset_block(&HW_SSP_CTRL0(ssp));
     /* Gate dma channel */
     imx233_dma_clkgate_channel(APB_SSP(ssp), true);
     /* If first block to start, start SSP clock */
-    if(ssp_in_use == 0)
+    if(ssp_nr_in_use == 0)
     {
         /** 2.3.1: the clk_ssp maximum frequency is 102.858 MHz */
         /* fracdiv = 18 => clk_io = pll = 480Mhz
@@ -108,18 +112,21 @@ void imx233_ssp_start(int ssp)
         imx233_set_bypass_pll(CLK_SSP, false); /* use IO */
         imx233_enable_clock(CLK_SSP, true);
     }
-    ssp_in_use++;
+    ssp_nr_in_use++;
 }
 
 void imx233_ssp_stop(int ssp)
 {
+    if(!ssp_in_use[ssp - 1])
+        return;
+    ssp_in_use[ssp - 1] = false;
     /* Gate off */
     __REG_SET(HW_SSP_CTRL0(ssp)) = __BLOCK_CLKGATE;
     /* Gate off dma */
     imx233_dma_clkgate_channel(APB_SSP(ssp), false);
     /* If last block to stop, stop SSP clock */
-    ssp_in_use--;
-    if(ssp_in_use == 0)
+    ssp_nr_in_use--;
+    if(ssp_nr_in_use == 0)
     {
         imx233_enable_clock(CLK_SSP, false);
         imx233_set_fractional_divisor(CLK_IO, 0);
@@ -136,24 +143,6 @@ void imx233_ssp_set_timings(int ssp, int divide, int rate, int timeout)
     HW_SSP_TIMING(ssp) = divide << HW_SSP_TIMING__CLOCK_DIVIDE_BP | rate |
         timeout << HW_SSP_TIMING__CLOCK_TIMEOUT_BP;
 }
-
-#if 0
-static void setup_ssp_sd_pins(int ssp)
-{
-    imx233_set_pin_function(1, 29, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(1, 29, true);
-    imx233_set_gpio_output(1, 29, false);
-
-    if(ssp == 1)
-    {
-        
-    }
-    else
-    {
-        
-    }
-}
-#endif
 
 void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     unsigned drive_strength, bool use_alt)
@@ -352,7 +341,7 @@ static void detect_irq(int bank, int pin)
         timeout_register(&ssp2_detect_oneshot, ssp2_detect_oneshot_callback, (3*HZ/10), 0);
 }
 
-void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn)
+void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn, bool first_time)
 {
     int bank = ssp == 1 ? 2 : 0;
     int pin = ssp == 1 ? 1 : 19;
@@ -362,6 +351,8 @@ void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn)
         imx233_set_pin_function(bank, pin, PINCTRL_FUNCTION_GPIO);
         imx233_enable_gpio_output(bank, pin, false);
     }
+    if(first_time && imx233_ssp_sdmmc_detect(ssp))
+        detect_irq(bank, pin);
     imx233_setup_pin_irq(bank, pin, enable, true, !imx233_ssp_sdmmc_detect(ssp), detect_irq);
 }
 

@@ -102,6 +102,9 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
+/* Some Sansa Fuzes seem to be FAT16 formatted */
+#define HAVE_FAT16SUPPORT
+
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x100000
 
