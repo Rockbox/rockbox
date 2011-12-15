@@ -411,6 +411,9 @@ target/coldfire/debug-coldfire.c
 #if CONFIG_I2C == I2C_COLDFIRE
 target/coldfire/i2c-coldfire.c
 #endif /* CONFIG_I2C == I2C_COLDFIRE */
+#if CONFIG_STORAGE & STORAGE_ATA
+target/coldfire/ata-as-coldfire.S
+#endif
 
 #elif defined(CPU_PP) || defined(CPU_ARM)
 /* CPU_PP => CPU_ARM, CPU_ARM !=> CPU_PP */
@@ -848,7 +851,6 @@ target/arm/usb-fw-pp502x.c
 #endif /* PHILIPS_HDD6330 */
 
 #ifdef IAUDIO_X5
-target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iaudio/adc-iaudio.c
 target/coldfire/iaudio/ata-iaudio.c
@@ -872,7 +874,6 @@ target/coldfire/iaudio/audio-iaudio.c
 #endif /* IAUDIO_X5 */
 
 #ifdef IAUDIO_M5
-target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iaudio/adc-iaudio.c
 target/coldfire/iaudio/ata-iaudio.c
@@ -896,7 +897,6 @@ target/coldfire/iaudio/audio-iaudio.c
 #endif /* IAUDIO_M5 */
 
 #ifdef IAUDIO_M3
-target/coldfire/ata-as-coldfire.S
 target/coldfire/iaudio/fmradio_i2c-iaudio.c
 target/coldfire/iaudio/m3/adc-m3.c
 target/coldfire/iaudio/m3/ata-m3.c
@@ -921,7 +921,6 @@ libc/sscanf.c
 #endif /* IRIVER_IFP7XX_SERIES */
 
 #ifdef IRIVER_H300_SERIES
-target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
@@ -946,7 +945,6 @@ target/coldfire/iriver/udacodec-iriver.c
 
 #ifdef IRIVER_H100_SERIES
 drivers/sw_i2c.c
-target/coldfire/ata-as-coldfire.S
 target/coldfire/uart-coldfire.c
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
@@ -1750,8 +1748,6 @@ target/arm/usb-fw-pp502x.c
 #endif
 
 #if defined(MPIO_HD200) || defined(MPIO_HD300)
-/* TODO: currently including all files */
-target/coldfire/ata-as-coldfire.S
 target/coldfire/mpio/system-mpio.c
 target/coldfire/mpio/power-mpio.c
 target/coldfire/mpio/backlight-mpio.c
