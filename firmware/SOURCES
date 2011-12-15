@@ -704,10 +704,6 @@ target/arm/tcc77x/adc-tcc77x.c
 
 #endif /* CONFIG_I2C */
 
-#ifdef HAVE_WM8750
-target/coldfire/wmcodec-coldfire.c
-#endif
-
 #ifdef CPU_SH
 target/sh/archos/mascodec-archos.c
 target/sh/archos/audio-archos.c
@@ -1748,6 +1744,7 @@ target/arm/usb-fw-pp502x.c
 #endif
 
 #if defined(MPIO_HD200) || defined(MPIO_HD300)
+target/coldfire/wmcodec-coldfire.c
 target/coldfire/mpio/system-mpio.c
 target/coldfire/mpio/power-mpio.c
 target/coldfire/mpio/backlight-mpio.c
