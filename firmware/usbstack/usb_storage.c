@@ -778,7 +778,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 #endif
 
 #ifdef HAVE_HOTSWAP
-    if(storage_removable(lun) && !storage_present(lun)) {
+    if(storage_removable(lun) && !storage_present(IF_MD(lun))) {
         ejected[lun] = true;
     }
 #endif

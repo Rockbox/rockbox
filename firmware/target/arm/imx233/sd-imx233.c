@@ -322,8 +322,6 @@ static int transfer_sectors(IF_MD2(int drive,) unsigned long start, int count, v
     IF_MD((void) drive);
     int ret = 0;
     uint32_t resp;
-    unsigned long old_start = start;
-    int old_count = count;
 
     last_disk_activity = current_tick;
 
