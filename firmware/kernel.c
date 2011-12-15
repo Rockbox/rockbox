@@ -224,6 +224,17 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
 /****************************************************************************
  * Thread stuff
  ****************************************************************************/
+
+/* Suspends a thread's execution for at least the specified number of ticks.
+ * May result in CPU core entering wait-for-interrupt mode if no other thread
+ * may be scheduled.
+ *
+ * NOTE: sleep(0) sleeps until the end of the current tick
+ *       sleep(n) that doesn't result in rescheduling:
+ *                      n <= ticks suspended < n + 1
+ *       n to n+1 is a lower bound. Other factors may affect the actual time
+ *       a thread is suspended before it runs again.
+ */
 unsigned sleep(unsigned ticks)
 {
     /* In certain situations, certain bootloaders in particular, a normal
@@ -237,6 +248,9 @@ unsigned sleep(unsigned ticks)
     return 0;
 }
 
+/* Elects another thread to run or, if no other thread may be made ready to
+ * run, immediately returns control back to the calling thread.
+ */
 void yield(void)
 {
     /* In certain situations, certain bootloaders in particular, a normal
