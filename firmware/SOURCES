@@ -701,54 +701,47 @@ target/arm/tcc77x/adc-tcc77x.c
 
 #endif /* CONFIG_I2C */
 
-#ifdef ARCHOS_PLAYER
-target/sh/archos/ata-archos.c
+#ifdef CPU_SH
+target/sh/archos/mascodec-archos.c
+target/sh/archos/audio-archos.c
 target/sh/archos/timer-archos.c
+# if CONFIG_STORAGE & STORAGE_ATA
+target/sh/archos/ata-archos.c
 target/sh/archos/ata-as-archos.S
+# endif
+# ifdef HAVE_SERIAL
 target/sh/archos/uart-archos.c
+# endif
+#endif
+
+#ifdef ARCHOS_PLAYER
 target/sh/archos/player/button-player.c
 target/sh/archos/player/hwcompat-player.c
 target/sh/archos/player/power-player.c
 target/sh/archos/player/powermgmt-player.c
 target/sh/archos/player/usb-player.c
-target/sh/archos/mascodec-archos.c
-target/sh/archos/audio-archos.c
 #endif /* ARCHOS_PLAYER */
 
 #ifdef ARCHOS_RECORDER
-target/sh/archos/ata-archos.c
-target/sh/archos/timer-archos.c
-target/sh/archos/ata-as-archos.S
-target/sh/archos/uart-archos.c
 target/sh/archos/recorder/button-recorder.c
 target/sh/archos/recorder/power-recorder.c
 target/sh/archos/recorder/powermgmt-recorder.c
 target/sh/archos/recorder/usb-recorder.c
-target/sh/archos/mascodec-archos.c
-target/sh/archos/audio-archos.c
 #endif /* ARCHOS_RECORDER */
 
 #if defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
-target/sh/archos/ata-archos.c
-target/sh/archos/timer-archos.c
-target/sh/archos/ata-as-archos.S
 target/sh/archos/fm_v2/button-fm_v2.c
 target/sh/archos/fm_v2/power-fm_v2.c
 target/sh/archos/fm_v2/powermgmt-fm_v2.c
 target/sh/archos/fm_v2/usb-fm_v2.c
-target/sh/archos/mascodec-archos.c
-target/sh/archos/audio-archos.c
 #endif /* ARCHOS_FMRECORDER || ARCHOS_RECORDERV2 */
 
 #if defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
-target/sh/archos/timer-archos.c
 target/sh/archos/ondio/button-ondio.c
 target/sh/archos/ondio/power-ondio.c
 target/sh/archos/ondio/powermgmt-ondio.c
 target/sh/archos/ondio/usb-ondio.c
 target/sh/archos/ondio/ata_mmc.c
-target/sh/archos/mascodec-archos.c
-target/sh/archos/audio-archos.c
 #if (CONFIG_TUNER & TEA5767)
 target/sh/archos/ondio/fmradio_i2c-ondio.c
 #endif
