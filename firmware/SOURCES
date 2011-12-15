@@ -424,6 +424,10 @@ target/arm/memmove-arm.S
 target/arm/memset-arm.S
 target/arm/memset16-arm.S
 
+# if ARM_ARCH < 6
+target/arm/bits-armv4.S
+# endif
+
 #ifdef HAVE_PRIORITY_SCHEDULING
 target/arm/ffs-arm.S
 #endif
@@ -499,7 +503,6 @@ target/arm/imx233/timer-imx233.c
 #endif /* IMX233 */
 
 #if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2
-target/arm/bits-armv4.S
 target/arm/as3525/system-as3525.c
 target/arm/as3525/memory-init.S
 target/arm/as3525/kernel-as3525.c
@@ -1003,7 +1006,6 @@ target/arm/iriver/h10/lcd-h10_5gb.c
 
 #ifdef GIGABEAT_F
 drivers/lcd-memframe.c
-target/arm/bits-armv4.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
@@ -1060,7 +1062,6 @@ target/arm/imx31/gigabeat-s/timer-gigabeat-s.c
 #endif /* GIGABEAT_S */
 
 #if CONFIG_CPU == DM320
-target/arm/bits-armv4.S
 target/arm/tms320dm320/debug-dm320.c
 target/arm/tms320dm320/dsp-dm320.c
 target/arm/tms320dm320/i2c-dm320.c
@@ -1562,7 +1563,6 @@ target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
 
 #if defined(MINI2440)
 drivers/lcd-memframe.c
-target/arm/bits-armv4.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
 target/arm/s3c2440/dma-s3c2440.c
