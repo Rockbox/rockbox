@@ -1764,7 +1764,7 @@ target/coldfire/mpio/fmradio_i2c-mpio.c
 #endif /* BOOTLOADER */
 #endif
 
-#ifdef MPIO_HD300
+#ifdef MPIO_HD200
 target/coldfire/mpio/hd200/button-hd200.c
 target/coldfire/mpio/hd200/lcd-hd200.c
 target/coldfire/mpio/hd200/lcd-as-hd200.S
