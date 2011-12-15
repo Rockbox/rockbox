@@ -506,7 +506,6 @@ target/arm/as3525/ascodec-as3525.c
 target/arm/mmu-arm.S
 #ifndef BOOTLOADER
 drivers/generic_i2c.c
-target/arm/adc-as3514.c
 target/arm/as3525/audio-as3525.c
 target/arm/as3525/debug-as3525.c
 #if CONFIG_TUNER
@@ -661,6 +660,12 @@ drivers/tsc2100.c
 drivers/audio/tsc2100.c
 #endif
 
+#ifdef HAVE_AS3514
+# if !defined(BOOTLOADER) || defined(CPU_PP)
+target/arm/adc-as3514.c
+# endif
+#endif
+
 #ifdef ARCHOS_PLAYER
 target/sh/archos/ata-archos.c
 target/sh/archos/timer-archos.c
@@ -715,7 +720,6 @@ target/sh/archos/ondio/fmradio_i2c-ondio.c
 #endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
 
 #ifdef SANSA_E200
-target/arm/adc-as3514.c
 target/arm/ascodec-pp.c
 target/arm/ata-sd-pp.c
 target/arm/lcd-as-memframe.S
@@ -733,7 +737,6 @@ target/arm/sandisk/audio-c200_e200.c
 #endif /* SANSA_E200 */
 
 #ifdef SANSA_C200
-target/arm/adc-as3514.c
 target/arm/ascodec-pp.c
 target/arm/ata-sd-pp.c
 target/arm/i2s-pp.c
@@ -770,7 +773,6 @@ target/arm/sandisk/sansa-view/powermgmt-view.c
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
 #endif /* BOOTLOADER */
-target/arm/adc-as3514.c
 target/arm/ascodec-pp.c
 target/arm/ata-sd-pp.c
 target/arm/i2s-pp.c
