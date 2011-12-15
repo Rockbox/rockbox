@@ -44,6 +44,7 @@ static void fill_default_tm(struct tm *tm)
 }
 #endif /* !CONFIG_RTC */
 
+#if CONFIG_RTC
 bool valid_time(const struct tm *tm)
 {
     if (tm->tm_hour < 0 || tm->tm_hour > 23 ||
@@ -57,6 +58,7 @@ bool valid_time(const struct tm *tm)
     else
         return true;
 }
+#endif /* CONFIG_RTC */
 
 struct tm *get_time(void)
 {
@@ -103,6 +105,7 @@ int set_time(const struct tm *tm)
 #endif /* RTC */
 }
 
+#if CONFIG_RTC
 void set_day_of_week(struct tm *tm)
 {
     int y=tm->tm_year+1900;
@@ -113,4 +116,5 @@ void set_day_of_week(struct tm *tm)
     if(m == 0 || m == 1) y--;
     tm->tm_wday = (d + mo[m] + y + y/4 - y/100 + y/400) % 7;
 }
+#endif /* CONFIG_RTC */
 
