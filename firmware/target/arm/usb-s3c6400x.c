@@ -321,15 +321,15 @@ void usb_drv_set_test_mode(int mode)
 
 bool usb_drv_stalled(int endpoint, bool in)
 {
-    return DEPCTL(endpoint, !in) & DEPCTL_naksts;
+    return DEPCTL(endpoint, !in) & DEPCTL_stall;
 }
 
 void usb_drv_stall(int endpoint, bool stall, bool in)
 {
     if (stall)
-        DEPCTL(endpoint, !in) |= DEPCTL_naksts;
+        DEPCTL(endpoint, !in) |= DEPCTL_stall;
     else
-        DEPCTL(endpoint, !in) &= ~DEPCTL_naksts;
+        DEPCTL(endpoint, !in) &= ~DEPCTL_stall;
 }
 
 void usb_drv_init(void)
