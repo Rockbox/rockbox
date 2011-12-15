@@ -1068,6 +1068,7 @@ static int calculate_step_count(const struct playlist_info *playlist, int steps)
     return steps;
 }
 
+#if CONFIG_CODEC == SWCODEC
 /* Marks the index of the track to be skipped that is "steps" away from
  * current playing track.
  */
@@ -1089,6 +1090,7 @@ void playlist_skip_entry(struct playlist_info *playlist, int steps)
 
     playlist->indices[index] |= PLAYLIST_SKIPPED;
 }
+#endif /* CONFIG_CODEC == SWCODEC */
 
 /*
  * returns the index of the track that is "steps" away from current playing
@@ -2638,6 +2640,7 @@ int playlist_next(int steps)
     return index;
 }
 
+#if CONFIG_CODEC == SWCODEC
 /* try playing next or previous folder */
 bool playlist_next_dir(int direction)
 {
@@ -2647,6 +2650,7 @@ bool playlist_next_dir(int direction)
 
     return create_and_play_dir(direction, false) >= 0;
 }
+#endif /* CONFIG_CODEC == SWCODEC */
 
 /* Get resume info for current playing song.  If return value is -1 then
    settings shouldn't be saved. */

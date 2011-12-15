@@ -92,6 +92,9 @@ static const char* const genres[] = {
     "Synthpop"
 };
 
+#if CONFIG_CODEC != SWCODEC
+static
+#endif
 char* id3_get_num_genre(unsigned int genre_num)
 {
     if (genre_num < ARRAYLEN(genres))

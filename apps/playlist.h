@@ -134,7 +134,9 @@ void playlist_start(int start_index, int offset);
 bool playlist_check(int steps);
 const char *playlist_peek(int steps, char* buf, size_t buf_size);
 int playlist_next(int steps);
+#if CONFIG_CODEC == SWCODEC
 bool playlist_next_dir(int direction);
+#endif
 int playlist_get_resume_info(int *resume_index);
 int playlist_update_resume_info(const struct mp3entry* id3);
 int playlist_get_display_index(void);
@@ -158,7 +160,9 @@ int playlist_insert_directory(struct playlist_info* playlist,
                               bool recurse);
 int playlist_insert_playlist(struct playlist_info* playlist, const char *filename,
                              int position, bool queue);
+#if CONFIG_CODEC == SWCODEC
 void playlist_skip_entry(struct playlist_info *playlist, int steps);
+#endif
 int playlist_delete(struct playlist_info* playlist, int index);
 int playlist_move(struct playlist_info* playlist, int index, int new_index);
 int playlist_randomise(struct playlist_info* playlist, unsigned int seed,

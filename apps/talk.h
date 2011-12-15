@@ -90,9 +90,11 @@ int talk_file(const char *root, const char *dir, const char *file,
 /* play file's thumbnail or spell name */
 int talk_file_or_spell(const char *dirname, const char* filename,
                        const long *prefix_ids, bool enqueue);
+#if CONFIG_CODEC == SWCODEC
 /* play dir's thumbnail or spell name */
 int talk_dir_or_spell(const char* filename,
                       const long *prefix_ids, bool enqueue);
+#endif
 int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
 int talk_value_decimal(long n, int unit, int decimals, bool enqueue);
