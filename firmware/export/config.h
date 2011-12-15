@@ -231,6 +231,7 @@
 #define LCD_CLIPZIP   43 /* as used by the Sandisk Sansa Clip Zip */
 #define LCD_HX8340B   44 /* as used by the HiFiMAN HM-601/HM-602/HM-801 */
 #define LCD_CONNECT   45 /* as used by the Sandisk Sansa Connect */
+#define LCD_GIGABEATS 46
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1

@@ -612,7 +612,7 @@ target/arm/as3525/lcd-fuze.c
 target/arm/ipod/lcd-color_nano.c
 #elif CONFIG_LCD == LCD_IPODMINI || CONFIG_LCD == LCD_IPOD2BPP
 target/arm/ipod/lcd-gray.c
-#elif defined(GIGABEAT_S) /* FIXME: LCD_GIGABEAT */
+#elif CONFIG_LCD == LCD_GIGABEATS
 target/arm/imx31/gigabeat-s/lcd-gigabeat-s.c
 #elif CONFIG_LCD == LCD_GIGABEAT
 target/arm/s3c2440/lcd-s3c2440.c

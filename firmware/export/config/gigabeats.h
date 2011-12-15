@@ -230,7 +230,7 @@
 /* Define this to add support for ATA DMA */
 #define HAVE_ATA_DMA
 
-#define CONFIG_LCD LCD_GIGABEAT
+#define CONFIG_LCD LCD_GIGABEATS
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
