@@ -21,18 +21,21 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include <stdint.h>
 #include "tuner.h"
 
-/* return the detected tuner type */
+#ifdef CONFIG_TUNER_MULTI
 int tuner_detect_type(void)
 {
+#if (CONFIG_TUNER & SI4700)
     if (si4700_detect()) {
         return SI4700;
     }
+#endif
+#if (CONFIG_TUNER & RDA5802)
     if (rda5802_detect()) {
         return RDA5802;
     }
-    return RDA5802;
+#endif
+    return RDA5082; /* returning 0 freezes the player : FS#11791 */
 }
-
+#endif
