@@ -27,6 +27,7 @@
 #include "lcd.h"
 #include "lcd-target.h"
 
+extern bool lcd_active(void);
 extern void lcd_set_active(bool active);
 
 /* Power and display status */

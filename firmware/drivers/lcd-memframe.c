@@ -28,7 +28,11 @@
 
 /*** Misc. functions ***/
 
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 static bool lcd_on SHAREDBSS_ATTR = false; /* Is the display turned on? */
+#else
+static bool lcd_on SHAREDBSS_ATTR = true; /* Is the display turned on? */
+#endif
 
 bool lcd_active(void)
 {
