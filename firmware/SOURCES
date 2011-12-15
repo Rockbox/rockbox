@@ -661,8 +661,14 @@ drivers/audio/tsc2100.c
 #endif
 
 #ifdef HAVE_AS3514
+# ifdef CPU_PP
+target/arm/ascodec-pp.c
+# endif
 # if !defined(BOOTLOADER) || defined(CPU_PP)
 target/arm/adc-as3514.c
+#  ifndef SANSA_M200V4
+target/arm/powermgmt-ascodec.c
+#  endif
 # endif
 #endif
 
@@ -749,10 +755,8 @@ target/sh/archos/ondio/fmradio_i2c-ondio.c
 #endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
 
 #ifdef SANSA_E200
-target/arm/ascodec-pp.c
 target/arm/ata-sd-pp.c
 target/arm/lcd-as-memframe.S
-target/arm/powermgmt-ascodec.c
 target/arm/i2s-pp.c
 target/arm/usb-fw-pp502x.c
 target/arm/sandisk/backlight-c200_e200.c
@@ -766,10 +770,8 @@ target/arm/sandisk/audio-c200_e200.c
 #endif /* SANSA_E200 */
 
 #ifdef SANSA_C200
-target/arm/ascodec-pp.c
 target/arm/ata-sd-pp.c
 target/arm/i2s-pp.c
-target/arm/powermgmt-ascodec.c
 target/arm/usb-fw-pp502x.c
 target/arm/sandisk/backlight-c200_e200.c
 target/arm/sandisk/power-c200_e200.c
@@ -782,7 +784,6 @@ target/arm/sandisk/audio-c200_e200.c
 #endif /* SANSA_C200 */
 
 #ifdef SANSA_VIEW
-/* target/arm/ascodec-pp.c */
 target/arm/ata-sd-pp.c
 target/arm/lcd-as-memframe.S
 target/arm/i2s-pp.c
@@ -802,10 +803,8 @@ target/arm/sandisk/sansa-view/powermgmt-view.c
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
 #endif /* BOOTLOADER */
-target/arm/ascodec-pp.c
 target/arm/ata-sd-pp.c
 target/arm/i2s-pp.c
-target/arm/powermgmt-ascodec.c
 target/arm/usb-fw-pp502x.c
 target/arm/philips/sa9200/backlight-sa9200.c
 target/arm/philips/sa9200/button-sa9200.c
@@ -1350,7 +1349,6 @@ target/arm/as3525/sansa-clipplus/lcd-clip-plus.c
 target/arm/as3525/sansa-clipplus/button-clip.c
 target/arm/as3525/sansa-clipplus/backlight-clip.c
 #ifndef BOOTLOADER
-target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clipplus/powermgmt-clipplus.c
 target/arm/as3525/sansa-clipplus/lcd-as-clip-plus.S
 #endif /* !BOOTLOADER */
@@ -1361,7 +1359,6 @@ target/arm/as3525/sansa-clipv2/lcd-clipv2.c
 target/arm/as3525/button-clip.c
 target/arm/as3525/sansa-clipv2/backlight-clipv2.c
 #ifndef BOOTLOADER
-target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clipv2/powermgmt-clipv2.c
 target/arm/as3525/sansa-clipv2/lcd-as-clipv2.S
 #endif /* !BOOTLOADER */
@@ -1371,7 +1368,6 @@ target/arm/as3525/sansa-clipv2/lcd-as-clipv2.S
 target/arm/as3525/sansa-clip/lcd-clip.c
 target/arm/as3525/button-clip.c
 #ifndef BOOTLOADER
-target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clip/powermgmt-clip.c
 target/arm/as3525/sansa-clip/lcd-as-clip.S
 #endif /* !BOOTLOADER */
@@ -1383,7 +1379,6 @@ target/arm/as3525/button-e200v2-fuze.c
 target/arm/as3525/backlight-e200v2-fuze.c
 target/arm/as3525/dbop-as3525.c
 #ifndef BOOTLOADER
-target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-e200v2/powermgmt-e200v2.c
 target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
@@ -1394,7 +1389,6 @@ target/arm/as3525/sansa-c200v2/button-c200v2.c
 target/arm/as3525/sansa-c200v2/backlight-c200v2.c
 target/arm/as3525/dbop-as3525.c
 #ifndef BOOTLOADER
-target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-c200v2/powermgmt-c200v2.c
 #endif /* !BOOTLOADER */
 #endif /* SANSA_E200V2 */
@@ -1412,7 +1406,6 @@ target/arm/as3525/sansa-fuze/lcd-fuzev1.c
 target/arm/as3525/backlight-e200v2-fuze.c
 target/arm/as3525/dbop-as3525.c
 #ifndef BOOTLOADER
-target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-fuze/powermgmt-fuze.c
 target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
@@ -1424,7 +1417,6 @@ target/arm/as3525/sansa-fuzev2/backlight-fuzev2.c
 target/arm/as3525/sansa-fuzev2/button-fuzev2.c
 target/arm/as3525/dbop-as3525.c
 #ifndef BOOTLOADER
-target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-fuzev2/powermgmt-fuzev2.c
 target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
@@ -1451,7 +1443,6 @@ target/arm/as3525/sansa-clipzip/lcd-clipzip.c
 target/arm/as3525/sansa-clipzip/button-clipzip.c
 target/arm/as3525/sansa-clipzip/backlight-clipzip.c
 #ifndef BOOTLOADER
-target/arm/powermgmt-ascodec.c
 target/arm/as3525/sansa-clipzip/powermgmt-clipzip.c
 #endif /* !BOOTLOADER */
 #endif /* SANSA_CLIPZIP */
