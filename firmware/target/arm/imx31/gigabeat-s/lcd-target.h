@@ -21,8 +21,6 @@
 #ifndef LCD_TARGET_H
 #define LCD_TARGET_H
 
-#if 0
-void lcd_enable(bool state);
-#endif
+#define LCD_FRAMEBUF_ADDR(col, row) ((fb_data *)FRAME + (row)*LCD_WIDTH + (col))
 
 #endif /* LCD_TARGET_H */

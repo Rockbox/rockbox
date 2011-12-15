@@ -18,8 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef LCD_TARGET_H
+#define LCD_TARGET_H
 
-extern void lcd_enable(bool state);
+#define LCD_FRAMEBUF_ADDR(col, row) ((fb_data *)FRAME + (row)*LCD_WIDTH + (col))
 
 /* Config values for LCDCON1 */
 /* ENVID = 0, BPPMODE = 16 bpp, PNRMODE = TFT, MMODE = Each Frame, CLKVAL = 8 */
@@ -43,3 +45,5 @@ extern void lcd_enable(bool state);
 /* Config values for LCDCON4 */
 /* HSPW = 7 */
 #define LCD_HSYNC_LEN 7
+
+#endif /* LCD_TARGET_H */

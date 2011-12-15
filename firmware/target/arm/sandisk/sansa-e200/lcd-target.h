@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 by Bob Cousins, Lyre Project
+ * Copyright (C) 2011 Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,27 +21,8 @@
 #ifndef LCD_TARGET_H
 #define LCD_TARGET_H
 
-#define LCD_FRAMEBUF_ADDR(col, row) ((fb_data *)FRAME + (row)*LCD_WIDTH + (col))
+extern fb_data lcd_driver_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
 
-/* Setup for Mini2440, 3.5" TFT LCD Touchscreen */
-
-/* Config values for LCDCON1 */
-#define LCD_CLKVAL  4
-#define LCD_MMODE   0
-#define LCD_PNRMODE 3
-#define LCD_BPPMODE 12
-#define LCD_ENVID   1
-
-/* Config values for LCDCON2 */
-#define LCD_UPPER_MARGIN 1
-#define LCD_LOWER_MARGIN 4
-#define LCD_VSYNC_LEN    1
-
-/* Config values for LCDCON3 */
-#define LCD_RIGHT_MARGIN 0
-#define LCD_LEFT_MARGIN  25
-
-/* Config values for LCDCON4 */
-#define LCD_HSYNC_LEN 4
+#define LCD_FRAMEBUF_ADDR(col, row) (&lcd_driver_framebuffer[row][col])
 
 #endif /* LCD_TARGET_H */
