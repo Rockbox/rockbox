@@ -1626,7 +1626,7 @@ target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
 #endif
 #endif /* MINI2440 */
 
-#ifdef SAMSUNG_YH820
+#if defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/i2s-pp.c
@@ -1634,6 +1634,9 @@ target/arm/usb-fw-pp502x.c
 target/arm/samsung/akcodec-yh82x_yh92x.c
 target/arm/samsung/button-yh82x_yh92x.c
 target/arm/samsung/power-yh82x_yh92x.c
+#endif /* SAMSUNG_YH820 ||  SAMSUNG_YH920 || SAMSUNG_YH925 */
+
+#ifdef SAMSUNG_YH820
 target/arm/samsung/yh820/backlight-yh820.c
 target/arm/samsung/yh820/lcd-yh820.c
 target/arm/samsung/yh820/lcd-as-yh820.S
@@ -1641,13 +1644,6 @@ target/arm/samsung/yh820/powermgmt-yh820.c
 #endif /* SAMSUNG_YH820 */
 
 #ifdef SAMSUNG_YH920
-target/arm/ata-as-arm.S
-target/arm/ata-pp5020.c
-target/arm/i2s-pp.c
-target/arm/usb-fw-pp502x.c
-target/arm/samsung/akcodec-yh82x_yh92x.c
-target/arm/samsung/button-yh82x_yh92x.c
-target/arm/samsung/power-yh82x_yh92x.c
 target/arm/samsung/yh920/backlight-yh920.c
 target/arm/samsung/yh920/lcd-yh920.c
 target/arm/samsung/yh920/lcd-as-yh920.S
@@ -1655,13 +1651,6 @@ target/arm/samsung/yh920/powermgmt-yh920.c
 #endif /* SAMSUNG_YH920 */
 
 #ifdef SAMSUNG_YH925
-target/arm/ata-as-arm.S
-target/arm/ata-pp5020.c
-target/arm/i2s-pp.c
-target/arm/usb-fw-pp502x.c
-target/arm/samsung/akcodec-yh82x_yh92x.c
-target/arm/samsung/button-yh82x_yh92x.c
-target/arm/samsung/power-yh82x_yh92x.c
 target/arm/samsung/yh925/backlight-yh925.c
 target/arm/samsung/yh925/lcd-yh925.c
 target/arm/samsung/yh925/lcd-as-yh925.S
