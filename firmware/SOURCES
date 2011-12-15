@@ -666,6 +666,35 @@ target/arm/adc-as3514.c
 # endif
 #endif
 
+#if CONFIG_I2C == I2C_PP5020
+# ifdef IPOD_ARCH
+target/arm/ipod/adc-ipod-pcf.c
+# else
+target/arm/adc-pp5020.c
+# endif /* IPOD_ARCH */
+
+#elif CONFIG_I2C == I2C_PP5002
+# ifdef IPOD_1G2G
+target/arm/ipod/1g2g/adc-ipod-1g2g.c
+# else
+target/arm/ipod/adc-ipod-pcf.c
+# endif /* IPOD_1G2G */
+
+#elif CONFIG_I2C == I2C_S3C2440
+target/arm/s3c2440/adc-s3c2440.c
+
+#elif CONFIG_I2C == I2C_S5L8700
+# ifdef IPOD_NANO2G
+target/arm/s5l8700/ipodnano2g/adc-nano2g.c
+# else
+target/arm/s5l8700/adc-s5l8700.c
+# endif
+
+#elif CONFIG_I2C == I2C_TCC77X
+target/arm/tcc77x/adc-tcc77x.c
+
+#endif /* CONFIG_I2C */
+
 #ifdef ARCHOS_PLAYER
 target/sh/archos/ata-archos.c
 target/sh/archos/timer-archos.c
@@ -794,7 +823,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/adc-pp5020.c
 target/arm/philips/power-hdd.c
 target/arm/philips/fmradio_i2c-hdd.c
 target/arm/philips/hdd1630/backlight-hdd1630.c
@@ -813,7 +841,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/adc-pp5020.c
 target/arm/philips/power-hdd.c
 target/arm/philips/fmradio_i2c-hdd.c
 target/arm/philips/hdd6330/backlight-hdd6330.c
@@ -950,7 +977,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/adc-pp5020.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/fmradio_i2c-h10.c
@@ -966,7 +992,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/adc-pp5020.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/fmradio_i2c-h10.c
@@ -980,7 +1005,6 @@ target/arm/usb-fw-pp502x.c
 target/arm/bits-armv4.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.S
-target/arm/s3c2440/adc-s3c2440.c
 target/arm/s3c2440/debug-s3c2440.c
 target/arm/s3c2440/kernel-s3c2440.c
 target/arm/s3c2440/system-s3c2440.c
@@ -1116,7 +1140,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/adc-pp5020.c
 target/arm/olympus/mrobe-100/backlight-mr100.c
 target/arm/olympus/mrobe-100/button-mr100.c
 target/arm/olympus/mrobe-100/lcd-mr100.c
@@ -1131,7 +1154,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/adc-pp5020.c
 target/arm/tatung/tpj1022/backlight-tpj1022.c
 target/arm/tatung/tpj1022/button-tpj1022.c
 target/arm/tatung/tpj1022/lcd-tpj1022.c
@@ -1146,7 +1168,6 @@ target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
-target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/piezo.c
@@ -1162,7 +1183,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/piezo.c
@@ -1178,7 +1198,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/piezo.c
@@ -1194,7 +1213,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/piezo.c
@@ -1213,7 +1231,6 @@ drivers/pcf50605.c
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-as-gray.S
@@ -1226,7 +1243,6 @@ target/arm/usb-fw-pp5002.c
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/1g2g/adc-ipod-1g2g.c
 target/arm/ipod/1g2g/backlight-1g2g.c
 target/arm/ipod/1g2g/powermgmt-1g2g.c
 target/arm/ipod/button-1g-3g.c
@@ -1241,7 +1257,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-mini1g.c
 target/arm/ipod/piezo.c
@@ -1257,7 +1272,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/piezo.c
@@ -1282,7 +1296,6 @@ target/arm/pnx0101/pcm-pnx0101.c
 
 #ifdef LOGIK_DAX
 drivers/nand_id.c
-target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/powermgmt-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
@@ -1300,7 +1313,6 @@ target/arm/tcc77x/logikdax/audio-logikdax.c
 
 #ifdef SANSA_M200
 drivers/nand_id.c
-target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/powermgmt-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
@@ -1322,7 +1334,6 @@ target/arm/usb-tcc.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
-target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/powermgmt-tcc77x.c
 target/arm/tcc77x/c100/lcd-S6B33B2.c
 target/arm/tcc77x/c100/button-c100.c
@@ -1452,7 +1463,6 @@ target/arm/usb-tcc.c
 target/arm/tcc77x/system-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/timer-tcc77x.c
-target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/iaudio7/lcd-iaudio7.c
 target/arm/tcc77x/iaudio7/power-iaudio7.c
 target/arm/tcc77x/iaudio7/powermgmt-iaudio7.c
@@ -1511,7 +1521,6 @@ target/arm/s5l8700/meizu-m6sp/lcd-m6sp.c
 #ifndef BOOTLOADER
 drivers/generic_i2c.c
 drivers/rtc/rtc_s35390a.c
-target/arm/s5l8700/adc-s5l8700.c
 target/arm/s5l8700/audio-meizu.c
 target/arm/s5l8700/debug-s5l8700.c
 target/arm/s5l8700/dma-s5l8700.c
@@ -1559,7 +1568,6 @@ target/arm/s5l8700/debug-s5l8700.c
 target/arm/s5l8700/pcm-s5l8700.c
 target/arm/s5l8700/wmcodec-s5l8700.c
 target/arm/s5l8700/ipodnano2g/audio-nano2g.c
-target/arm/s5l8700/ipodnano2g/adc-nano2g.c
 target/arm/s5l8700/ipodnano2g/piezo-nano2g.c
 #endif
 #endif
@@ -1670,7 +1678,6 @@ target/arm/s3c2440/kernel-s3c2440.c
 target/arm/s3c2440/sd-s3c2440.c
 target/arm/s3c2440/system-s3c2440.c
 target/arm/s3c2440/uart-s3c2440.c
-target/arm/s3c2440/adc-s3c2440.c
 target/arm/s3c2440/i2c-s3c2440.c
 target/arm/s3c2440/mini2440/backlight-mini2440.c
 target/arm/s3c2440/mini2440/button-mini2440.c
@@ -1687,7 +1694,6 @@ target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
 #ifdef SAMSUNG_YH820
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
-target/arm/adc-pp5020.c
 target/arm/i2s-pp.c
 target/arm/usb-fw-pp502x.c
 target/arm/samsung/akcodec-yh82x_yh92x.c
@@ -1702,7 +1708,6 @@ target/arm/samsung/yh820/powermgmt-yh820.c
 #ifdef SAMSUNG_YH920
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
-target/arm/adc-pp5020.c
 target/arm/i2s-pp.c
 target/arm/usb-fw-pp502x.c
 target/arm/samsung/akcodec-yh82x_yh92x.c
@@ -1717,7 +1722,6 @@ target/arm/samsung/yh920/powermgmt-yh920.c
 #ifdef SAMSUNG_YH925
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
-target/arm/adc-pp5020.c
 target/arm/i2s-pp.c
 target/arm/usb-fw-pp502x.c
 target/arm/samsung/akcodec-yh82x_yh92x.c
@@ -1730,7 +1734,6 @@ target/arm/samsung/yh925/powermgmt-yh925.c
 #endif /* SAMSUNG_YH925 */
 
 #ifdef SAMSUNG_YPS3
-target/arm/s5l8700/adc-s5l8700.c
 target/arm/s5l8700/i2c-s5l8700.c
 target/arm/s5l8700/kernel-s5l8700.c
 target/arm/s5l8700/timer-s5l8700.c
@@ -1749,7 +1752,6 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/adc-pp5020.c
 target/arm/pbell/vibe500/lcd-vibe500.c
 target/arm/pbell/vibe500/button-vibe500.c
 target/arm/pbell/vibe500/power-vibe500.c
