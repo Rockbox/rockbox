@@ -701,6 +701,10 @@ target/arm/tcc77x/adc-tcc77x.c
 
 #endif /* CONFIG_I2C */
 
+#ifdef HAVE_WM8750
+target/coldfire/wmcodec-coldfire.c
+#endif
+
 #ifdef CPU_SH
 target/sh/archos/mascodec-archos.c
 target/sh/archos/audio-archos.c
@@ -1745,7 +1749,7 @@ target/arm/pbell/vibe500/powermgmt-vibe500.c
 target/arm/usb-fw-pp502x.c
 #endif
 
-#ifdef MPIO_HD200
+#if defined(MPIO_HD200) || defined(MPIO_HD300)
 /* TODO: currently including all files */
 target/coldfire/ata-as-coldfire.S
 target/coldfire/mpio/system-mpio.c
@@ -1754,35 +1758,24 @@ target/coldfire/mpio/backlight-mpio.c
 target/coldfire/mpio/usb-mpio.c
 target/coldfire/mpio/ata-mpio.c
 target/coldfire/mpio/adc-mpio.c
-target/coldfire/mpio/hd200/button-hd200.c
-target/coldfire/mpio/hd200/lcd-hd200.c
-target/coldfire/mpio/hd200/lcd-as-hd200.S
-target/coldfire/mpio/hd200/powermgmt-hd200.c
 #ifndef BOOTLOADER
 target/coldfire/mpio/audio-mpio.c
-target/coldfire/wmcodec-coldfire.c
 target/coldfire/mpio/fmradio_i2c-mpio.c
 #endif /* BOOTLOADER */
 #endif
 
 #ifdef MPIO_HD300
-/* TODO: currently including all files */
-target/coldfire/ata-as-coldfire.S
-target/coldfire/mpio/system-mpio.c
-target/coldfire/mpio/power-mpio.c
-target/coldfire/mpio/backlight-mpio.c
-target/coldfire/mpio/usb-mpio.c
-target/coldfire/mpio/ata-mpio.c
-target/coldfire/mpio/adc-mpio.c
+target/coldfire/mpio/hd200/button-hd200.c
+target/coldfire/mpio/hd200/lcd-hd200.c
+target/coldfire/mpio/hd200/lcd-as-hd200.S
+target/coldfire/mpio/hd200/powermgmt-hd200.c
+#endif
+
+#ifdef MPIO_HD300
 target/coldfire/mpio/hd300/button-hd300.c
 target/coldfire/mpio/hd300/lcd-hd300.c
 target/coldfire/mpio/hd300/lcd-as-hd300.S
 target/coldfire/mpio/hd300/powermgmt-hd300.c
-#ifndef BOOTLOADER
-target/coldfire/mpio/audio-mpio.c
-target/coldfire/wmcodec-coldfire.c
-target/coldfire/mpio/fmradio_i2c-mpio.c
-#endif /* BOOTLOADER */
 #endif
 
 #if defined(HM60X)
