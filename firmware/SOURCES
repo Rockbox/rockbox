@@ -590,6 +590,35 @@ drivers/i2c.c
 
 /* target code */
 
+/* LCD driver */
+#if   CONFIG_LCD == LCD_SSD1303
+target/arm/as3525/lcd-ssd1303.c
+#elif CONFIG_LCD == LCD_SSD1801
+target/sh/archos/player/lcd-as-player.S
+target/sh/archos/player/lcd-player.c
+#elif CONFIG_LCD == LCD_SSD1815
+# if CONFIG_CPU == SH7034
+target/sh/archos/lcd-archos-bitmap.c
+target/sh/archos/lcd-as-archos-bitmap.S
+# else
+target/arm/lcd-ssd1815.c
+# endif
+#elif CONFIG_LCD == LCD_HX8340B
+target/arm/rk27xx/lcd-hifiman.c
+#elif CONFIG_LCD == LCD_C200
+target/arm/lcd-c200_c200v2.c
+#elif CONFIG_LCD == LCD_FUZE
+target/arm/as3525/lcd-fuze.c
+#elif CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO
+target/arm/ipod/lcd-color_nano.c
+#elif CONFIG_LCD == LCD_IPODMINI || CONFIG_LCD == LCD_IPOD2BPP
+target/arm/ipod/lcd-gray.c
+#elif defined(GIGABEAT_S) /* FIXME: LCD_GIGABEAT */
+target/arm/imx31/gigabeat-s/lcd-gigabeat-s.c
+#elif CONFIG_LCD == LCD_GIGABEAT
+target/arm/s3c2440/lcd-s3c2440.c
+#endif
+
 /* USB Stack */
 #ifdef HAVE_USBSTACK
 usbstack/usb_core.c
@@ -639,8 +668,6 @@ target/sh/archos/ata-as-archos.S
 target/sh/archos/uart-archos.c
 target/sh/archos/player/button-player.c
 target/sh/archos/player/hwcompat-player.c
-target/sh/archos/player/lcd-as-player.S
-target/sh/archos/player/lcd-player.c
 target/sh/archos/player/power-player.c
 target/sh/archos/player/powermgmt-player.c
 target/sh/archos/player/usb-player.c
@@ -653,8 +680,6 @@ target/sh/archos/ata-archos.c
 target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
 target/sh/archos/uart-archos.c
-target/sh/archos/lcd-archos-bitmap.c
-target/sh/archos/lcd-as-archos-bitmap.S   
 target/sh/archos/recorder/button-recorder.c
 target/sh/archos/recorder/power-recorder.c
 target/sh/archos/recorder/powermgmt-recorder.c
@@ -667,8 +692,6 @@ target/sh/archos/audio-archos.c
 target/sh/archos/ata-archos.c
 target/sh/archos/timer-archos.c
 target/sh/archos/ata-as-archos.S
-target/sh/archos/lcd-archos-bitmap.c
-target/sh/archos/lcd-as-archos-bitmap.S
 target/sh/archos/fm_v2/button-fm_v2.c
 target/sh/archos/fm_v2/power-fm_v2.c
 target/sh/archos/fm_v2/powermgmt-fm_v2.c
@@ -679,8 +702,6 @@ target/sh/archos/audio-archos.c
 
 #if defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
 target/sh/archos/timer-archos.c
-target/sh/archos/lcd-archos-bitmap.c
-target/sh/archos/lcd-as-archos-bitmap.S
 target/sh/archos/ondio/button-ondio.c
 target/sh/archos/ondio/power-ondio.c
 target/sh/archos/ondio/powermgmt-ondio.c
@@ -720,7 +741,6 @@ target/arm/powermgmt-ascodec.c
 target/arm/usb-fw-pp502x.c
 target/arm/sandisk/backlight-c200_e200.c
 target/arm/sandisk/power-c200_e200.c
-target/arm/lcd-c200_c200v2.c
 target/arm/sandisk/sansa-c200/lcd-as-c200.S
 target/arm/sandisk/sansa-c200/button-c200.c
 target/arm/sandisk/sansa-c200/powermgmt-c200.c
@@ -961,7 +981,6 @@ target/arm/mmu-arm.S
 target/arm/s3c2440/adc-s3c2440.c
 target/arm/s3c2440/debug-s3c2440.c
 target/arm/s3c2440/kernel-s3c2440.c
-target/arm/s3c2440/lcd-s3c2440.c
 target/arm/s3c2440/system-s3c2440.c
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c
@@ -1002,7 +1021,6 @@ target/arm/imx31/gigabeat-s/button-gigabeat-s.c
 target/arm/imx31/gigabeat-s/gpio-gigabeat-s.c
 target/arm/imx31/gigabeat-s/kernel-gigabeat-s.c
 target/arm/imx31/gigabeat-s/i2s-gigabeat-s.c
-target/arm/imx31/gigabeat-s/lcd-gigabeat-s.c
 target/arm/imx31/gigabeat-s/mc13783-gigabeat-s.c
 target/arm/imx31/gigabeat-s/power-gigabeat-s.c
 target/arm/imx31/gigabeat-s/powermgmt-gigabeat-s.c
@@ -1131,7 +1149,6 @@ target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/piezo.c
 target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
@@ -1147,7 +1164,6 @@ target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/piezo.c
-target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/lcd-as-color-nano.S
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
@@ -1164,7 +1180,6 @@ target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/piezo.c
-target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/lcd-as-color-nano.S
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
@@ -1200,7 +1215,6 @@ target/arm/ipod/adc-ipod-pcf.c
 target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp5002.c
@@ -1215,7 +1229,6 @@ target/arm/ipod/1g2g/backlight-1g2g.c
 target/arm/ipod/1g2g/powermgmt-1g2g.c
 target/arm/ipod/button-1g-3g.c
 target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/usb-fw-pp5002.c
 #endif /* IPOD_1G2G */
@@ -1231,7 +1244,6 @@ target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-mini1g.c
 target/arm/ipod/piezo.c
 target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
@@ -1248,7 +1260,6 @@ target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/piezo.c
 target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/lcd-gray.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/usb-fw-pp502x.c
@@ -1269,7 +1280,6 @@ target/arm/pnx0101/pcm-pnx0101.c
 
 #ifdef LOGIK_DAX
 drivers/nand_id.c
-target/arm/lcd-ssd1815.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/powermgmt-tcc77x.c
@@ -1288,7 +1298,6 @@ target/arm/tcc77x/logikdax/audio-logikdax.c
 
 #ifdef SANSA_M200
 drivers/nand_id.c
-target/arm/lcd-ssd1815.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/powermgmt-tcc77x.c
@@ -1324,7 +1333,6 @@ target/arm/tcc77x/c100/audio-c100.c
 #endif /* SANSA_C100 */
 
 #ifdef SANSA_CLIPPLUS
-target/arm/as3525/lcd-ssd1303.c
 target/arm/as3525/sansa-clipplus/lcd-clip-plus.c
 target/arm/as3525/sansa-clipplus/button-clip.c
 target/arm/as3525/sansa-clipplus/backlight-clip.c
@@ -1336,7 +1344,6 @@ target/arm/as3525/sansa-clipplus/lcd-as-clip-plus.S
 #endif /* SANSA_CLIPPLUS */
 
 #ifdef SANSA_CLIPV2
-target/arm/as3525/lcd-ssd1303.c
 target/arm/as3525/sansa-clipv2/lcd-clipv2.c
 target/arm/as3525/button-clip.c
 target/arm/as3525/sansa-clipv2/backlight-clipv2.c
@@ -1348,7 +1355,6 @@ target/arm/as3525/sansa-clipv2/lcd-as-clipv2.S
 #endif /* SANSA_CLIPV2 */
 
 #ifdef SANSA_CLIP
-target/arm/as3525/lcd-ssd1303.c
 target/arm/as3525/sansa-clip/lcd-clip.c
 target/arm/as3525/button-clip.c
 #ifndef BOOTLOADER
@@ -1371,7 +1377,6 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* SANSA_E200V2 */
 
 #ifdef SANSA_C200V2
-target/arm/lcd-c200_c200v2.c
 target/arm/as3525/sansa-c200v2/button-c200v2.c
 target/arm/as3525/sansa-c200v2/backlight-c200v2.c
 target/arm/as3525/dbop-as3525.c
@@ -1382,7 +1387,6 @@ target/arm/as3525/sansa-c200v2/powermgmt-c200v2.c
 #endif /* SANSA_E200V2 */
 
 #ifdef SANSA_M200V4
-target/arm/lcd-ssd1815.c
 target/arm/as3525/sansa-m200v4/button-m200v4.c
 #ifndef BOOTLOADER
 target/arm/as3525/sansa-m200v4/powermgmt-m200v4.c
@@ -1391,7 +1395,6 @@ target/arm/as3525/sansa-m200v4/powermgmt-m200v4.c
 
 #ifdef SANSA_FUZE
 target/arm/as3525/button-e200v2-fuze.c
-target/arm/as3525/lcd-fuze.c
 target/arm/as3525/sansa-fuze/lcd-fuzev1.c
 target/arm/as3525/backlight-e200v2-fuze.c
 target/arm/as3525/dbop-as3525.c
@@ -1403,7 +1406,6 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* SANSA_FUZE */
 
 #ifdef SANSA_FUZEV2
-target/arm/as3525/lcd-fuze.c
 target/arm/as3525/sansa-fuzev2/lcd-fuzev2.c
 target/arm/as3525/sansa-fuzev2/backlight-fuzev2.c
 target/arm/as3525/sansa-fuzev2/button-fuzev2.c
@@ -1663,7 +1665,6 @@ target/arm/mmu-arm.S
 target/arm/s3c2440/debug-s3c2440.c
 target/arm/s3c2440/dma-s3c2440.c
 target/arm/s3c2440/kernel-s3c2440.c
-target/arm/s3c2440/lcd-s3c2440.c
 target/arm/s3c2440/sd-s3c2440.c
 target/arm/s3c2440/system-s3c2440.c
 target/arm/s3c2440/uart-s3c2440.c
@@ -1800,14 +1801,12 @@ target/coldfire/mpio/fmradio_i2c-mpio.c
 target/arm/rk27xx/hm60x/button-hm60x.c
 target/arm/rk27xx/hm60x/powermgmt-hm60x.c
 target/arm/rk27xx/hm60x/power-hm60x.c
-target/arm/rk27xx/lcd-hifiman.c
 #endif
 
 #if defined(HM801)
 target/arm/rk27xx/hm801/button-hm801.c
 target/arm/rk27xx/hm801/powermgmt-hm801.c
 target/arm/rk27xx/hm801/power-hm801.c
-target/arm/rk27xx/lcd-hifiman.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
