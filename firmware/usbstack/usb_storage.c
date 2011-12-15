@@ -778,7 +778,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 #endif
 
 #ifdef HAVE_HOTSWAP
-    if(storage_removable(lun) && !storage_present(IF_MD(lun))) {
+    if(storage_removable(lun) && !storage_present(lun)) {
         ejected[lun] = true;
     }
 #endif
@@ -787,7 +787,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         lun_present = false;
 
 #ifdef MAX_LOG_SECTOR_SIZE
-    block_size_mult = disk_get_sector_multiplier(lun);
+    block_size_mult = disk_get_sector_multiplier(IF_MD(lun));
 #endif
 
     cur_cmd.tag = cbw->tag;
