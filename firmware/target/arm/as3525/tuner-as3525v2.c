@@ -36,6 +36,6 @@ int tuner_detect_type(void)
         return RDA5802;
     }
 #endif
-    return RDA5082; /* returning 0 freezes the player : FS#11791 */
+    return RDA5802; /* returning 0 freezes the player : FS#11791 */
 }
 #endif
