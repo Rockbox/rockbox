@@ -454,6 +454,7 @@ void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string
         s->offset = x_offset;
         s->startx = x * space_width;
         s->backward = false;
+        s->style = style;
     }
     s->y_offset = y_offset;
 
