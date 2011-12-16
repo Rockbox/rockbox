@@ -28,7 +28,6 @@ SOURCES += \
  base/talkfile.cpp \
  base/talkgenerator.cpp \
  base/autodetection.cpp \
- ../ipodpatcher/ipodpatcher.c \
  ../sansapatcher/sansapatcher.c \
  themesinstallwindow.cpp \
  base/uninstall.cpp \
@@ -88,9 +87,6 @@ HEADERS += \
  base/autodetection.h \
  base/progressloggerinterface.h \
  progressloggergui.h \
- ../ipodpatcher/ipodpatcher.h \
- ../ipodpatcher/ipodio.h \
- ../ipodpatcher/parttypes.h \
  ../sansapatcher/sansapatcher.h \
  ../sansapatcher/sansaio.h \
  irivertools/h100sums.h \
@@ -182,8 +178,6 @@ RESOURCES += $$_PRO_FILE_PWD_/rbutilqt.qrc
 }
 # windows specific files
 win32 {
-    SOURCES +=  ../ipodpatcher/ipodio-win32.c
-    SOURCES +=  ../ipodpatcher/ipodio-win32-scsi.c
     SOURCES +=  ../sansapatcher/sansaio-win32.c
     RC_FILE = rbutilqt.rc
     RESOURCES += $$_PRO_FILE_PWD_/rbutilqt-win.qrc
@@ -191,7 +185,6 @@ win32 {
 
 # unix specific files
 unix {
-    SOURCES +=  ../ipodpatcher/ipodio-posix.c
     SOURCES +=  ../sansapatcher/sansaio-posix.c
 }
 
