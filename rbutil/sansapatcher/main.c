@@ -31,10 +31,14 @@
 #include "sansapatcher.h"
 #include "sansaio.h"
 #include "parttypes.h"
+#ifdef WITH_BOOTOBJS
 #include "bootimg_c200.h"
 #include "bootimg_e200.h"
+#endif
 
+#ifndef VERSION
 #define VERSION "0.8 with v6.0 bootloaders"
+#endif
 
 enum {
    NONE,
@@ -200,7 +204,9 @@ int main(int argc, char* argv[])
         i = 1;
     }
 
+#ifdef WITH_BOOTOBJS
     action = INTERACTIVE;
+#endif
 
     while (i < argc) {
         if ((strcmp(argv[i],"-l")==0) || (strcmp(argv[i],"--list")==0)) {
@@ -279,6 +285,7 @@ int main(int argc, char* argv[])
     } else {
         if (action==LIST_IMAGES) {
             sansa_list_images(&sansa);
+#ifdef WITH_BOOTOBJS
         } else if (action==INTERACTIVE) {
 
             printf("Enter i to install the Rockbox bootloader, u to uninstall\n or c to cancel and do nothing (i/u/c) :");
@@ -314,12 +321,14 @@ int main(int argc, char* argv[])
                     }
                 }
             }
+#endif
         } else if (action==READ_FIRMWARE) {
             if (sansa_read_firmware(&sansa, filename)==0) {
                 fprintf(stderr,"[INFO] Firmware read to file %s.\n",filename);
             } else {
                 fprintf(stderr,"[ERR]  --read-firmware failed.\n");
             }
+#ifdef WITH_BOOTOBJS
         } else if (action==INSTALL) {
             if (sansa_reopen_rw(&sansa) < 0) {
                 return 5;
@@ -338,6 +347,7 @@ int main(int argc, char* argv[])
             } else {
                 fprintf(stderr,"[ERR]  --install failed.\n");
             }
+#endif
         } else if (action==ADD_BOOTLOADER) {
             if (sansa_reopen_rw(&sansa) < 0) {
                 return 5;

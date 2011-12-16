@@ -11,7 +11,6 @@ CFLAGS += -Wall -W -D_LARGEFILE64_SOURCE
 OUTPUT = sansapatcher
 
 # inputs
-BOOTSRC = bootimg_c200.c bootimg_e200.c
 LIBSOURCES := sansapatcher.c sansaio-posix.c sansaio-win32.c
 SOURCES := $(LIBSOURCES) main.c
 # additional link dependencies for the standalone executable
@@ -25,6 +24,7 @@ BOOTOBJS=1
 endif
 
 ifdef WITH_BOOTOBJS
+BOOTSRC = bootimg_c200.c bootimg_e200.c
 SOURCES += $(BOOTSRC)
 CFLAGS += -DWITH_BOOTOBJS
 endif
@@ -37,6 +37,7 @@ ifeq ($(findstring exe,$(BINARY)),exe)
 $(BINARY): $(OBJDIR)sansapatcher-rc.o
 endif
 
+$(OBJDIR)main.o: $(BOOTSRC)
 $(OBJDIR)sansapatcher-rc.o: sansapatcher.rc sansapatcher.manifest
 	$(WINDRES) -i sansapatcher.rc -o sansapatcher-rc.o
 
@@ -47,5 +48,6 @@ bootimg_c200.c: firmware.mi4 ../tools/bin2c
 bootimg_e200.c: PP5022.mi4 ../tools/bin2c
 	@echo BIN2C $<
 	$(SILENT)../tools/bin2c PP5022.mi4 bootimg_e200
+
 ../tools/bin2c:
 	$(SILENT)make -C ../tools bin2c
