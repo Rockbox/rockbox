@@ -98,6 +98,16 @@ lib$(OUTPUT)$(RBARCH): $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
 
 $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) \
 				      $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
+# rules to build a DLL. Only works for W32 as target (i.e. MinGW toolchain)
+dll: $(OUTPUT).dll
+$(OUTPUT).dll: $(TARGET_DIR)$(OUTPUT).dll
+$(TARGET_DIR)$(OUTPUT).dll: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
+	@echo DLL $(notdir $@)
+	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -shared -o $@ $^ \
+		    -Wl,--output-def,$(TARGET_DIR)$(OUTPUT).def
+
+$(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo AR $(notdir $@)
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(AR) rucs $@ $^

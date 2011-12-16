@@ -22,3 +22,10 @@ include ../libtools.make
 $(OBJDIR)mkamsboot.o: dualboot.h dualboot.c mkamsboot.c mkamsboot.h
 $(OBJDIR)main.o: dualboot.h dualboot.c main.c mkamsboot.h
 
+
+$(TARGET_DIR)$(OUTPUT).dll: EXTRALIBOBJS += $(TARGET_DIR)ucl.dll
+$(TARGET_DIR)$(OUTPUT).dll: $(TARGET_DIR)ucl.dll
+$(TARGET_DIR)ucl.dll:
+	$(SILENT)$(MAKE) -C ../../tools/ucl/src/ \
+	    BUILD_DIR=$(BUILD_DIR) CC=$(CC) CROSS=$(CROSS) \
+	    TARGET_DIR=$(TARGET_DIR)/ ucl.dll
