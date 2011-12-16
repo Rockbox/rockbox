@@ -70,6 +70,12 @@ $(DEPFILE): $(SOURCES)
 
 -include $(DEPFILE)
 
+dll: rbspeex.dll
+rbspeex.dll: $(OUT)/rbspeex.dll
+$(OUT)/rbspeex.dll: $(OBJS) $(OUT)/rbspeex.o
+	@echo DLL $(notdir $@)
+	$(SILENT)$(CC) $(CFLAGS) -shared -o $@ $^ -Wl,--output-def,$(OUT)/rbspeex.def
+
 $(OUT)/librbspeex.a: $(OBJS) $(DEPFILE) $(OUT)/rbspeex.o 
 	@echo AR $(notdir $@)
 	$(SILENT)$(AR) rucs $@ $+ > /dev/null 2>&1

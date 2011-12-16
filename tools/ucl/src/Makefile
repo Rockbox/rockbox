@@ -31,6 +31,13 @@ OBJS =  $(addprefix $(OBJDIR)/,$(SOURCES:%.c=%.o))
 
 libucl$(RBARCH).a: $(TARGET_DIR)libucl$(RBARCH).a
 
+dll: ucl.dll
+ucl.dll: $(TARGET_DIR)ucl.dll
+$(TARGET_DIR)ucl.dll: $(OBJS)
+	@echo DLL $(notdir $@)
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -shared -o $@ $^ \
+		    -Wl,--output-def,$(TARGET_DIR)ucl.def
+
 $(TARGET_DIR)libucl$(RBARCH).a: $(OBJS)
 	@echo AR $(notdir $@)
 	$(SILENT)$(CROSS)$(AR) rucs $@ $(OBJS) >/dev/null 2>&1
