@@ -29,7 +29,7 @@ endif
 
 ifeq ($(findstring Darwin,$(shell uname)),Darwin)
 # additional frameworks to link on on OS X
-CFLAGS += -framework CoreFoundation -framework IOKit
+LDOPTS += -framework CoreFoundation -framework IOKit
 endif
 
 LIBSOURCES = ipodpatcher.c fat32format.c arc4.c \

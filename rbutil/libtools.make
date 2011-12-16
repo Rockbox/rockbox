@@ -82,7 +82,7 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo LD $@
 #	$(SILENT)mkdir -p $(dir $@)
 # EXTRADEPS need to be built into OBJDIR.
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -o $(BINARY) \
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(LDOPTS) -o $(BINARY) \
 	    $(OBJS) $(addprefix $(OBJDIR),$(EXTRADEPS)) \
 	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 
