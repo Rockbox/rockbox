@@ -1209,24 +1209,21 @@ target/arm/ipod/lcd-as-gray.S
 target/arm/ipod/power-ipod.c
 #endif /* IPOD_1G2G */
 
-#ifdef IPOD_MINI
+#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
 drivers/pcf50605.c
 target/arm/ipod/backlight-mini1g_mini2g.c
-target/arm/ipod/button-mini1g.c
 target/arm/ipod/piezo.c
 target/arm/ipod/lcd-as-gray.S
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
+#endif
+
+#ifdef IPOD_MINI
+target/arm/ipod/button-mini1g.c
 #endif /* IPOD_MINI */
 
 #ifdef IPOD_MINI2G
-drivers/pcf50605.c
-target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c
-target/arm/ipod/piezo.c
-target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/power-ipod.c
-target/arm/ipod/powermgmt-ipod-pcf.c
 #endif /* IPOD_MINI2G */
 
 #ifdef IRIVER_IFP7XX
