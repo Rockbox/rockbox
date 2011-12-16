@@ -442,15 +442,6 @@ enum {
 };
 
 extern bool lcd_active(void);
-
-/* Set the active flag - to be called by target drivers only! */
-extern void lcd_set_active(bool active);
-#else
-/* NULL versions for no sleeping */
-static inline bool lcd_active(void)
-    { return true; }
-static inline void lcd_set_active(bool active)
-    { (void)active; }
 #endif
 
 #ifdef HAVE_LCD_SHUTDOWN
