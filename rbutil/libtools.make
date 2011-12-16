@@ -27,7 +27,7 @@ ifndef APPVERSION
 APPVERSION=$(shell $(TOP)/../tools/version.sh ../)
 endif
 CFLAGS += -DVERSION=\"$(APPVERSION)\"
-TARGET_DIR ?= $(shell pwd)/
+TARGET_DIR = $(shell pwd)/
 
 BINARY = $(OUTPUT)
 # when building a Windows binary add the correct file suffix
@@ -113,8 +113,8 @@ endif
 
 lib$(OUTPUT)-universal: $(TARGET_DIR)lib$(OUTPUT)i386.a \
 			$(TARGET_DIR)lib$(OUTPUT)ppc.a
-	@echo lipo $(TARGET_DIR)libmkamsboot.a
-	$(SILENT) rm -f $(TARGET_DIR)libmkamsboot.a
+	@echo LIPO $(notdir $(TARGET_DIR)lib$(OUTPUT).a)
+	$(SILENT) rm -f $(TARGET_DIR)lib$(OUTPUT).a
 	$(SILENT)lipo -create $(TARGET_DIR)lib$(OUTPUT)i386.a \
 			      $(TARGET_DIR)lib$(OUTPUT)ppc.a \
 			      -output $(TARGET_DIR)lib$(OUTPUT).a
