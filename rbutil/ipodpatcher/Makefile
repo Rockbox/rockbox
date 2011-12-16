@@ -1,6 +1,13 @@
-CFLAGS=-Wall -W
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
 
-BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini1g.h ipodmini2g.h ipodnano1g.h ipodvideo.h
+CFLAGS += -Wall -W
 
 # Build with "make BOOTOBJS=1" to build with embedded bootloaders and the 
 # --install option and interactive mode.  You need the full set of Rockbox 
@@ -9,76 +16,34 @@ BOOT_H = ipod1g2g.h ipod3g.h ipod4g.h ipodcolor.h ipodmini1g.h ipodmini2g.h ipod
 
 # Releases of ipodpatcher are created with "make RELEASE=1".  This
 # enables BOOTOBJS and uses the VERSION string defined in main.c
-
-ifndef V
-SILENT = @
-endif
-
 ifdef RELEASE
-CFLAGS+=-DRELEASE
+CFLAGS += -DRELEASE
 BOOTOBJS=1
 endif
 
 ifdef BOOTOBJS
-BOOTSRC = ipod1g2g.c ipod3g.c ipod4g.c ipodcolor.c ipodmini1g.c ipodmini2g.c ipodnano1g.c ipodvideo.c ipodnano2g.c
+BOOTSRC = ipod1g2g.c ipod3g.c ipod4g.c ipodcolor.c ipodmini1g.c \
+	  ipodmini2g.c ipodnano1g.c ipodvideo.c ipodnano2g.c
 CFLAGS += -DWITH_BOOTOBJS
 endif
 
-ifndef VERSION
-VERSION=$(shell ../../tools/version.sh)
-endif
-
-CFLAGS+=-DVERSION=\"$(VERSION)\"
-
-ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
-OUTPUT=ipodpatcher.exe
-CROSS=
-CFLAGS+=-mno-cygwin
-else 
-ifeq ($(findstring MINGW,$(shell uname)),MINGW)
-OUTPUT=ipodpatcher.exe
-CROSS=
-else
-OUTPUT=ipodpatcher
-CROSS=i586-mingw32msvc-
-endif
-endif
 ifeq ($(findstring Darwin,$(shell uname)),Darwin)
-# building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
-# might need adjustment for older Xcode.
-NATIVECC ?= gcc-4.0
-CFLAGS+=-framework CoreFoundation -framework IOKit -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
+# additional frameworks to link on on OS X
+CFLAGS += -framework CoreFoundation -framework IOKit
 endif
 
-NATIVECC ?= gcc
-CC = $(CROSS)gcc
-WINDRES = $(CROSS)windres
+LIBSOURCES = ipodpatcher.c fat32format.c arc4.c \
+	     ipodio-posix.c ipodio-win32-scsi.c ipodio-win32.c
+SOURCES = main.c $(BOOTSRC) $(LIBSOURCES)
+ipodpatcher: SOURCES+= ipodio-posix.c
+ipodpatcher.exe: SOURCES+= ipodpatcher-rc.o
 
-SRC = main.c ipodpatcher.c fat32format.c arc4.c
-
+OUTPUT = ipodpatcher
 all: $(OUTPUT)
+include ../libtools.make
 
-ipodpatcher: $(SRC) ipodio-posix.c $(BOOTSRC)
-	$(NATIVECC) $(CFLAGS) -o ipodpatcher $(SRC) ipodio-posix.c $(BOOTSRC)
-	strip ipodpatcher
-
-ipodpatcher.exe: $(SRC) ipodio-win32.c ipodio-win32-scsi.c ipodpatcher-rc.o $(BOOTSRC)
-	$(CC) $(CFLAGS) -o ipodpatcher.exe $(SRC) ipodio-win32.c ipodio-win32-scsi.c ipodpatcher-rc.o $(BOOTSRC)
-	$(CROSS)strip ipodpatcher.exe
-
-ipodpatcher-rc.o: ipodpatcher.rc ipodpatcher.manifest
-	$(WINDRES) -i ipodpatcher.rc -o ipodpatcher-rc.o
-
-ipodpatcher-mac: ipodpatcher-i386 ipodpatcher-ppc
-	lipo -create ipodpatcher-ppc ipodpatcher-i386 -output ipodpatcher-mac
-
-ipodpatcher-i386: $(SRC) ipodio-posix.c $(BOOTSRC)
-	$(NATIVECC) -arch i386 $(CFLAGS) -o ipodpatcher-i386 $(SRC) ipodio-posix.c $(BOOTSRC)
-	strip ipodpatcher-i386
-
-ipodpatcher-ppc: $(SRC) ipodio-posix.c $(BOOTSRC)
-	$(NATIVECC) -arch ppc $(CFLAGS) -o ipodpatcher-ppc $(SRC) ipodio-posix.c $(BOOTSRC)
-	strip ipodpatcher-ppc
+$(OBJDIR)ipodpatcher-rc.o: ipodpatcher.rc ipodpatcher.manifest
+	$(CROSS)$(WINDRES) -i ipodpatcher.rc -o ipodpatcher-rc.o
 
 ipod2c: ipod2c.c
 	$(NATIVECC) $(CFLAGS) -o ipod2c ipod2c.c
@@ -91,5 +56,3 @@ ipod2c: ipod2c.c
 	@echo IPOD2C $<
 	$(SILENT)./ipod2c $< $*
 
-clean:
-	rm -f ipodpatcher.exe ipodpatcher-rc.o ipodpatcher-mac ipodpatcher-i386 ipodpatcher-ppc ipodpatcher ipod2c *~ $(BOOTSRC) $(BOOT_H)
