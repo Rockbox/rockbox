@@ -2172,7 +2172,7 @@ struct mp3entry* audio_current_track(void)
             checked_for_cuesheet = true; /* only check once per track */
             struct cuesheet_file cue_file;
 
-            if (look_for_cuesheet_file(id3, &cue_file)) &&
+            if (look_for_cuesheet_file(id3, &cue_file) &&
                 parse_cuesheet(&cue_file, curr_cuesheet))
             {
                 id3->cuesheet = curr_cuesheet;
