@@ -7,7 +7,7 @@
 # $Id$
 #
 
-CFLAGS += -Wall -W
+CFLAGS += -Wall -W -D__USE_MINGW_ANSI_STDIO=1
 
 # Build with "make BOOTOBJS=1" to build with embedded bootloaders and the 
 # --install option and interactive mode.  You need the full set of Rockbox 
