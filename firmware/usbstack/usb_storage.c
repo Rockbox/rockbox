@@ -31,7 +31,9 @@
 /* Needed to get at the audio buffer */
 #include "audio.h"
 #include "usb_storage.h"
+#if CONFIG_RTC
 #include "timefuncs.h"
+#endif
 
 /* For sector filter macro definitions */
 #include "usb-target.h"
@@ -299,7 +301,9 @@ static void send_command_result(void *data,int size);
 static void send_command_failed_result(void);
 static void send_block_data(void *data,int size);
 static void receive_block_data(void *data,int size);
+#if CONFIG_RTC
 static void receive_time(void);
+#endif
 static void fill_inquiry(IF_MD_NONVOID(int lun));
 static void send_and_read_next(void);
 static bool ejected[NUM_DRIVES];
@@ -322,11 +326,14 @@ static enum {
     SENDING_RESULT,
     SENDING_FAILED_RESULT,
     RECEIVING_BLOCKS,
+#if CONFIG_RTC
     RECEIVING_TIME,
+#endif
     WAITING_FOR_CSW_COMPLETION_OR_COMMAND,
     WAITING_FOR_CSW_COMPLETION
 } state = WAITING_FOR_COMMAND;
 
+#if CONFIG_RTC
 static void yearday_to_daymonth(int yd, int y, int *d, int *m)
 {
     static const char tnl[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -351,6 +358,7 @@ static void yearday_to_daymonth(int yd, int y, int *d, int *m)
     *d = yd+1;
     *m = i;
 }
+#endif /* CONFIG_RTC */
 
 static bool check_disk_present(IF_MD_NONVOID(int volume))
 {
@@ -491,7 +499,9 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 {
     (void)ep;
     struct command_block_wrapper* cbw = (void*)cbw_buffer;
+#if CONFIG_RTC
     struct tm tm;
+#endif
 
     logf("transfer result for ep %d/%d %X %d", ep,dir,status, length);
     switch(state) {
@@ -654,6 +664,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 cur_sense_data.ascq=0;
             }
             break;
+#if CONFIG_RTC
         case RECEIVING_TIME:
             tm.tm_year=(tb.transfer_buffer[0]<<8)+tb.transfer_buffer[1] - 1900;
             tm.tm_yday=(tb.transfer_buffer[2]<<8)+tb.transfer_buffer[3];
@@ -665,6 +676,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             set_time(&tm);
             send_csw(UMS_STATUS_GOOD);
             break;
+#endif /* CONFIG_RTC */
     }
 }
 
@@ -1131,6 +1143,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             }
             break;
 
+#if CONFIG_RTC
         case SCSI_WRITE_BUFFER:
             if(cbw->command_block[1]==1 /* mode = vendor specific */
             && cbw->command_block[2]==0 /* buffer id = 0 */
@@ -1148,6 +1161,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             && cbw->command_block[9]==0)
             receive_time();
             break;
+#endif /* CONFIG_RTC */
 
         default:
             logf("scsi unknown cmd %x",cbw->command_block[0x0]);
@@ -1177,11 +1191,14 @@ static void send_command_failed_result(void)
     state = SENDING_FAILED_RESULT;
 }
 
+#if CONFIG_RTC
 static void receive_time(void)
 {
     usb_drv_recv(ep_out, tb.transfer_buffer, 12);
     state = RECEIVING_TIME;
 }
+#endif /* CONFIG_RTC */
+
 static void receive_block_data(void *data,int size)
 {
     usb_drv_recv(ep_out, data, size);
