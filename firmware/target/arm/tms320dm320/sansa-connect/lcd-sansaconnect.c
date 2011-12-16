@@ -89,13 +89,11 @@ void lcd_init_device(void)
     /* Disable Video Encoder clock */
     bitclr16(&IO_CLK_MOD1, CLK_MOD1_VENC);
 
-    /* configure GIO39, GIO34 and GIO33 as outputs */
-    IO_GIO_DIR2 &= ~((1 << 7) /* GIO39 */ | (1 << 2) /* GIO34 */ |
-                     (1 << 1) /* GIO33 */);
+    /* configure GIO39, GIO34 as outputs */
+    IO_GIO_DIR2 &= ~((1 << 7) /* GIO39 */ | (1 << 2) /* GIO34 */);
     
     IO_GIO_FSEL3 = (IO_GIO_FSEL3 & ~(0x300F)) |
                    (0x1000) /* GIO39 - FIELD_VENC */ |
-                   (0x3)    /* GIO33 - CLKOUT1B (bootloader does this) */ |
                    (0x4);   /* GIO34 - PWM1 (brightness control) */
 
     /* OSD Clock = VENC Clock /2,

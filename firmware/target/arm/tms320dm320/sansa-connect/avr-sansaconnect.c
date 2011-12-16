@@ -230,7 +230,7 @@ static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
         IO_SERIAL1_TX_DATA = buf_tx[i];
 
         /* a short wait for AVR to process data */
-        sleep(HZ/1000);
+        sleep(0);
 
         do
         {
@@ -407,13 +407,9 @@ void GIO0(void)
     queue_post(&btn_queue, BTN_INTERRUPT, 0);
 }
 
-void GIO2(void) __attribute__ ((section(".icode")));
-void GIO2(void)
+static int headphones_inserted_callback(struct timeout *tmo)
 {
-    /* Clear interrupt */
-    IO_INTC_IRQ1 = (1 << 7);
-    /* Disable interrupt */
-    IO_INTC_EINT1 &= ~INTR_EINT1_EXT2;
+    (void)tmo;
 
     if (IO_GIO_BITSET0 & 0x04)
     {
@@ -424,7 +420,19 @@ void GIO2(void)
         aic3x_switch_output(true);
     }
 
-    IO_INTC_EINT1 |= INTR_EINT1_EXT2;
+    return 0;
+}
+
+void GIO2(void) __attribute__ ((section(".icode")));
+void GIO2(void)
+{
+    static struct timeout headphones_oneshot;
+
+    /* Clear interrupt */
+    IO_INTC_IRQ1 = (1 << 7);
+
+    timeout_register(&headphones_oneshot, headphones_inserted_callback,
+                     HZ/2, 0);
 }
 #endif
 
