@@ -28,7 +28,6 @@ SOURCES += \
  base/talkfile.cpp \
  base/talkgenerator.cpp \
  base/autodetection.cpp \
- ../sansapatcher/sansapatcher.c \
  themesinstallwindow.cpp \
  base/uninstall.cpp \
  uninstallwindow.cpp \
@@ -87,8 +86,6 @@ HEADERS += \
  base/autodetection.h \
  base/progressloggerinterface.h \
  progressloggergui.h \
- ../sansapatcher/sansapatcher.h \
- ../sansapatcher/sansaio.h \
  irivertools/h100sums.h \
  irivertools/h120sums.h \
  irivertools/h300sums.h \
@@ -178,14 +175,8 @@ RESOURCES += $$_PRO_FILE_PWD_/rbutilqt.qrc
 }
 # windows specific files
 win32 {
-    SOURCES +=  ../sansapatcher/sansaio-win32.c
     RC_FILE = rbutilqt.rc
     RESOURCES += $$_PRO_FILE_PWD_/rbutilqt-win.qrc
-}
-
-# unix specific files
-unix {
-    SOURCES +=  ../sansapatcher/sansaio-posix.c
 }
 
 # mac specific files

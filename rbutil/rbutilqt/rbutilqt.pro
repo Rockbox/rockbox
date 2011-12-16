@@ -89,6 +89,12 @@ libipodpatcher.commands = @$(MAKE) -s \
         APPVERSION=\"rbutil\" \
         libipodpatcher$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
+libsansapatcher.commands = @$(MAKE) -s \
+        BUILD_DIR=$$MYBUILDDIR/sansapatcher/ \
+        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/sansapatcher \
+        APPVERSION=\"rbutil\" \
+        libsansapatcher$$RBLIBPOSTFIX \
+        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 libmkamsboot.commands = @$(MAKE) -s \
         BUILD_DIR=$$MYBUILDDIR/mkamsboot/ \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkamsboot \
@@ -115,7 +121,7 @@ libchinachip.commands = @$(MAKE) -s \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
-RBLIBS = librbspeex libipodpatcher libmkamsboot libmktccboot \
+RBLIBS = librbspeex libipodpatcher libsansapatcher libmkamsboot libmktccboot \
          libmkmpioboot libchinachip libucl
 QMAKE_EXTRA_TARGETS += $$RBLIBS
 PRE_TARGETDEPS += $$RBLIBS
