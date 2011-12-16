@@ -51,11 +51,18 @@ struct cuesheet {
     struct cue_track_info *curr_track;
 };
 
-/* looks if there is a cuesheet file that has a name matching "trackpath" */
-bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path);
+struct cuesheet_file {
+    char path[MAX_PATH];
+    int size;
+    off_t pos;
+    enum character_encoding encoding;
+};
 
-/* parse cuesheet "file" and store the information in "cue" */
-bool parse_cuesheet(char *file, struct cuesheet *cue);
+/* looks if there is a cuesheet file with a name matching path of "track_id3" */
+bool look_for_cuesheet_file(struct mp3entry *track_id3, struct cuesheet_file *cue_file);
+
+/* parse cuesheet_file "cue_file" and store the information in "cue" */
+bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue);
 
 /* reads a cuesheet to find the audio track associated to it */
 bool get_trackname_from_cuesheet(char *filename, char *buf);

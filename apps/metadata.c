@@ -438,6 +438,10 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     /* Take our best guess at the codec type based on file extension */
     id3->codectype = probe_file_format(trackname);
 
+    /* default values for embedded cuesheets */
+    id3->embed_cuesheet.present = false;
+    id3->embed_cuesheet.pos = 0;
+
     entry = &audio_formats[id3->codectype];
 
     /* Load codec specific track tag information and confirm the codec type. */

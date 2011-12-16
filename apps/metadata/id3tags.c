@@ -995,6 +995,40 @@ void setid3v2title(int fd, struct mp3entry *entry)
                     if(bytesread >= buffersize - bufferpos)
                         bytesread = buffersize - bufferpos - 1;
 
+                    if ( /* Is it an embedded cuesheet? */
+                       (tr->tag_length == 4 && !memcmp(header, "TXXX", 4)) &&
+                       (bytesread >= 14 && !strncmp(utf8buf, "CUESHEET", 8))
+                    ) {
+                        unsigned char char_enc = 0;
+                        /* 0CUESHEET0 = 10 bytes */
+                        unsigned char cuesheet_offset = 10;
+                        switch (tag[0]) {
+                            case 0x00:
+                                char_enc = CHAR_ENC_ISO_8859_1;
+                                break;
+                            case 0x01:
+                                char_enc = CHAR_ENC_UTF_16_LE;
+                                cuesheet_offset += cuesheet_offset+1;
+                                break;
+                            case 0x02:
+                                char_enc = CHAR_ENC_UTF_16_BE;
+                                cuesheet_offset += cuesheet_offset+1;
+                                break;
+                            case 0x03:
+                                char_enc = CHAR_ENC_UTF_8;
+                                break;
+                        }
+                        if (char_enc > 0) {
+                            entry->embed_cuesheet.present = true;
+                            entry->embed_cuesheet.pos = lseek(fd, 0, SEEK_CUR)
+                                - framelen + cuesheet_offset;
+                            entry->embed_cuesheet.size = totframelen
+                                - cuesheet_offset;
+                            entry->embed_cuesheet.encoding = char_enc;
+                        }
+                        break;
+                    }
+
                     for (j = 0; j < bytesread; j++)
                         tag[j] = utf8buf[j];
 

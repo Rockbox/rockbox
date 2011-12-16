@@ -217,6 +217,21 @@ struct mp3_albumart {
 };
 #endif
 
+enum character_encoding {
+    CHAR_ENC_ISO_8859_1 = 1,
+    CHAR_ENC_UTF_8,
+    CHAR_ENC_UTF_16_LE,
+    CHAR_ENC_UTF_16_BE,
+};
+
+/* cache embedded cuesheet details */
+struct embed_cuesheet {
+    bool present;
+    int size;
+    off_t pos;
+    enum character_encoding encoding;
+};
+
 struct mp3entry {
     char path[MAX_PATH];
     char* title;
@@ -307,6 +322,7 @@ struct mp3entry {
 #endif
 
     /* Cuesheet support */
+    struct embed_cuesheet embed_cuesheet;
     struct cuesheet *cuesheet;
 
     /* Musicbrainz Track ID */

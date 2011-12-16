@@ -1485,12 +1485,12 @@ static bool audio_load_cuesheet(struct track_info *info,
         /* If error other than a full buffer, then mark it "unsupported" to
            avoid reloading attempt */
         int hid = ERR_UNSUPPORTED_TYPE;
-        char cuepath[MAX_PATH];
+        struct cuesheet_file cue_file;
 
 #ifdef HAVE_IO_PRIORITY
         buf_back_off_storage(true);
 #endif
-        if (look_for_cuesheet_file(track_id3->path, cuepath))
+        if (look_for_cuesheet_file(track_id3, &cue_file))
         {
             hid = bufalloc(NULL, sizeof (struct cuesheet), TYPE_CUESHEET);
 
@@ -1499,7 +1499,7 @@ static bool audio_load_cuesheet(struct track_info *info,
                 void *cuesheet = NULL;
                 bufgetdata(hid, sizeof (struct cuesheet), &cuesheet);
 
-                if (parse_cuesheet(cuepath, (struct cuesheet *)cuesheet))
+                if (parse_cuesheet(&cue_file, (struct cuesheet *)cuesheet))
                 {
                     /* Indicate cuesheet is present (while track remains
                        buffered) */

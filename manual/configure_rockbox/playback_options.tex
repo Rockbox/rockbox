@@ -269,9 +269,13 @@ you to configure settings related to audio playback.
   effect.
 
   Cuesheet files should have the same file name as the audio file they
-  reference, except with the extension \fname{.cue}. This file can either reside in
-  the same directory as the audio file (checked first), or within the
+  reference, except with the extension \fname{.cue}. This file can either
+  reside in the same directory as the audio file (checked first), or within the
   \fname{.rockbox/cue} directory.
+  
+  The contents of a cuesheet file can also be embedded within the metadata of
+  an audio file. There is currently support for the FLAC tag/ Vorbis comment
+  \emph{CUESHEET} or the ID3v2 \emph{TXXX CUESHEET} tag.
   
 \section{Skip Length}\index{Skip Length}
   Designed to speed up navigation when listening to long audio tracks,

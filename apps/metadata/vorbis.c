@@ -341,15 +341,29 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
         }
 
         len -= read_len;
+        read_len = file_read_string(&file, id3->path, sizeof(id3->path), -1, len);
 
-        if (file_read_string(&file, id3->path, sizeof(id3->path), -1, len) < 0)
+        if (read_len < 0)
         {
             return 0;
         }
 
         logf("Vorbis comment %d: %s=%s", i, name, id3->path);
-        len = parse_tag(name, id3->path, id3, buf, buf_remaining, 
-            TAGTYPE_VORBIS);
+
+        /* Is it an embedded cuesheet? */
+        if (!strcasecmp(name, "CUESHEET"))
+        {
+            id3->embed_cuesheet.present = true;
+            id3->embed_cuesheet.pos = lseek(file.fd, 0, SEEK_CUR) - read_len;
+            id3->embed_cuesheet.size = len;
+            id3->embed_cuesheet.encoding = CHAR_ENC_UTF_8;
+        }
+        else
+        {
+            len = parse_tag(name, id3->path, id3, buf, buf_remaining,
+                TAGTYPE_VORBIS);
+        }
+
         buf += len;
         buf_remaining -= len;
     }
