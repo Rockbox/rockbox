@@ -113,16 +113,16 @@ libmkmpioboot.commands = @$(MAKE) -s \
         APPVERSION=\"rbutil\" \
         libmkmpioboot$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
-libchinachip.commands = @$(MAKE) -s \
-        BUILD_DIR=$$MYBUILDDIR/chinachip/ \
+libchinachippatcher.commands = @$(MAKE) -s \
+        BUILD_DIR=$$MYBUILDDIR/chinachippatcher/ \
         TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/chinachippatcher \
         APPVERSION=\"rbutil\" \
-        libchinachip$$RBLIBPOSTFIX \
+        libchinachippatcher$$RBLIBPOSTFIX \
         CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
 RBLIBS = librbspeex libipodpatcher libsansapatcher libmkamsboot libmktccboot \
-         libmkmpioboot libchinachip libucl
+         libmkmpioboot libchinachippatcher libucl
 QMAKE_EXTRA_TARGETS += $$RBLIBS
 PRE_TARGETDEPS += $$RBLIBS
 

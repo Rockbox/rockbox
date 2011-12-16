@@ -9,7 +9,7 @@
 CFLAGS = -g -Wall
 CC = gcc
 
-OUTPUT = chinachip
+OUTPUT = chinachippatcher
 
 LIBSOURCES = chinachip.c
 SOURCES = $(LIBSOURCES) main.c
