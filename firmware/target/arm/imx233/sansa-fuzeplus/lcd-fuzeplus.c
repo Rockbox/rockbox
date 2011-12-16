@@ -29,17 +29,13 @@
 #include "pinctrl-imx233.h"
 #include "logf.h"
 
+extern bool lcd_on; /* lcd-memframe.c */
+
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
    allows a full-width rectangle to be copied more efficiently. */
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
-
-static unsigned lcd_yuv_options = 0;
-
-#ifdef HAVE_LCD_ENABLE
-static bool lcd_on = true;
-#endif
 
 static enum lcd_kind_t
 {
@@ -386,6 +382,8 @@ void lcd_init_device(void)
             lcd_kind = LCD_KIND_7783;
             lcd_init_seq_7783(); break;
     }
+
+    lcd_on = true;
 }
 
 #ifdef HAVE_LCD_ENABLE
@@ -469,6 +467,7 @@ void lcd_enable(bool enable)
 {
     if(lcd_on == enable)
         return;
+
     lcd_on = enable;
     
     if(enable)
@@ -481,11 +480,6 @@ void lcd_enable(bool enable)
     }
     if(!enable)
         common_lcd_enable(false);
-}
-
-bool lcd_active(void)
-{
-    return lcd_on;
 }
 #endif
 
@@ -519,75 +513,4 @@ void lcd_update_rect(int x, int y, int width, int height)
     (void) width;
     (void) height;
     lcd_update();
-}
-
-void lcd_yuv_set_options(unsigned options)
-{
-    lcd_yuv_options = options;
-}
-
-/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
-extern void lcd_write_yuv420_lines(fb_data *dst,
-                                   unsigned char const * const src[3],
-                                   int width,
-                                   int stride);
-extern void lcd_write_yuv420_lines_odither(fb_data *dst,
-                                           unsigned char const * const src[3],
-                                           int width,
-                                           int stride,
-                                           int x_screen, /* To align dither pattern */
-                                           int y_screen);
-/* Performance function to blit a YUV bitmap directly to the LCD */
-/* So the LCD_WIDTH is now the height */
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    /* Caches for chroma data so it only need be recaculated every other
-       line */
-    unsigned char const * yuv_src[3];
-    off_t z;
-
-#ifdef HAVE_LCD_ENABLE
-    if (!lcd_on)
-        return;
-#endif
-
-    /* Sorry, but width and height must be >= 2 or else */
-    width &= ~1;
-    height >>= 1;
-
-    y = LCD_WIDTH - 1 - y;
-    fb_data *dst = (fb_data*)FRAME + x * LCD_WIDTH + y;
-
-    z = stride*src_y;
-    yuv_src[0] = src[0] + z + src_x;
-    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
-    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-
-    if (lcd_yuv_options & LCD_YUV_DITHER)
-    {
-        do
-        {
-            lcd_write_yuv420_lines_odither(dst, yuv_src, width, stride, y, x);
-            yuv_src[0] += stride << 1; /* Skip down two luma lines */
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-            dst -= 2;
-            y -= 2;
-        }
-        while (--height > 0);
-    }
-    else
-    {
-        do
-        {
-            lcd_write_yuv420_lines(dst, yuv_src, width, stride);
-            yuv_src[0] += stride << 1; /* Skip down two luma lines */
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-            dst -= 2;
-        }
-        while (--height > 0);
-    }
 }

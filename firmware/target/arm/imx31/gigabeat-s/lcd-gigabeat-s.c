@@ -29,10 +29,9 @@
 #include "spi-imx31.h"
 #include "mc13783.h"
 
-extern void lcd_set_active(bool active);
-
 #define MAIN_LCD_IDMAC_CHANNEL 14
 
+extern bool lcd_on; /* lcd-memframe.c */
 static bool lcd_powered = true;
 
 /* Settings shadow regs */
@@ -171,6 +170,8 @@ void INIT_ATTR lcd_init_device(void)
     IPU_IPU_IMA_ADDR = ((0x1 << 16) | (MAIN_LCD_IDMAC_CHANNEL << 4)) + (1 << 3);
     IPU_IPU_IMA_DATA = FRAME_PHYS_ADDR;
 
+    lcd_on = true;
+
     lcd_enable_interface(true);
     lcd_sync_settings();
 }
@@ -188,7 +189,7 @@ void lcd_sleep(void)
 
 void lcd_enable(bool state)
 {
-    if (state == lcd_active())
+    if (state == lcd_on)
         return;
 
     if (state)
@@ -198,13 +199,13 @@ void lcd_enable(bool state)
         IPU_IDMAC_CHA_EN |= 1ul << MAIN_LCD_IDMAC_CHANNEL;
         lcd_sync_settings();
         sleep(HZ/50);
-        lcd_set_active(true);
+        lcd_on = true;
         lcd_update();
         send_event(LCD_EVENT_ACTIVATION, NULL);
     }
     else
     {
-        lcd_set_active(false);
+        lcd_on = false;
     }
 }
 
@@ -213,7 +214,7 @@ void lcd_set_contrast(int val)
 {
     reg0x0b = val & 0x3f;
 
-    if (!lcd_active())
+    if (!lcd_on)
         return;
 
     lcd_write_reg(0x0b, reg0x0b);
@@ -230,7 +231,7 @@ void lcd_set_invert_display(bool yesno)
 {
     reg0x27 = yesno ? 0x10 : 0x00;
 
-    if (!lcd_active())
+    if (!lcd_on)
         return;
 
     lcd_write_reg(0x27, reg0x27);
@@ -242,7 +243,7 @@ void lcd_set_flip(bool yesno)
 {
     reg0x06 = yesno ? 0x02 : 0x04;
 
-    if (!lcd_active())
+    if (!lcd_on)
         return;
 
     lcd_write_reg(0x06, reg0x06);

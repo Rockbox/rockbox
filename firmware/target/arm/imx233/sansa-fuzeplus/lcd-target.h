@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (c) 2011 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,21 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #ifndef LCD_TARGET_H
 #define LCD_TARGET_H
 
-void lcd_set_direct_fb(bool yes);
-bool lcd_get_direct_fb(void);
+#define LCD_FRAMEBUF_ADDR(col, row) ((fb_data *)FRAME + (row)*LCD_WIDTH + (col))
 
-/* Direct FB access disables regular updates */
-#define lcd_write_enabled() \
-    ({ lcd_on && !lcd_get_direct_fb(); })
-
-/* Very strange functions */
+/* Not really optimized, but are unusual */
 #define LCD_OPTIMIZED_UPDATE
 #define LCD_OPTIMIZED_UPDATE_RECT
-
-#define LCD_FRAMEBUF_ADDR(col, row) ((fb_data *)FRAME + (row)*LCD_WIDTH + (col))
 
 #endif /* LCD_TARGET_H */

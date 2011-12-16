@@ -20,20 +20,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <sys/types.h> /* off_t */
 #include "config.h"
 #include "system.h"
 #include "lcd.h"
 #include "lcd-target.h"
 
 /*** Misc. functions ***/
+bool lcd_on SHAREDBSS_ATTR = false;
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-static bool lcd_on SHAREDBSS_ATTR = false; /* Is the display turned on? */
-#else
-static bool lcd_on SHAREDBSS_ATTR = true; /* Is the display turned on? */
-#endif
-
 bool lcd_active(void)
 {
     return lcd_on;
@@ -45,6 +40,15 @@ void lcd_set_active(bool active)
     lcd_on = active;
 }
 
+#else
+#define lcd_on true
+#endif
+
+#ifndef lcd_write_enabled
+#define lcd_write_enabled() lcd_on
+#endif
+
+
 /*** Blitting functions ***/
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
@@ -53,23 +57,27 @@ void lcd_set_active(bool active)
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
 
+#ifndef LCD_OPTIMIZED_UPDATE
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
 {
-    if (!lcd_on)
+    if (!lcd_write_enabled())
         return;
 
     /* Copy the Rockbox framebuffer to the second framebuffer */
     lcd_copy_buffer_rect(LCD_FRAMEBUF_ADDR(0, 0), &lcd_framebuffer[0][0],
                          LCD_WIDTH*LCD_HEIGHT, 1);
 }
+#endif /* LCD_OPTIMIZED_UPDATE */
 
+#ifndef LCD_OPTIMIZED_UPDATE_RECT
+/* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
     fb_data *dst, *src;
 
-    if (!lcd_on)
+    if (!lcd_write_enabled())
         return;
 
     if (x + width > LCD_WIDTH)
@@ -101,6 +109,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
     }
 }
+#endif /* LCD_OPTIMIZED_UPDATE_RECT */
 
 
 /*** YUV functions ***/
@@ -124,27 +133,50 @@ void lcd_yuv_set_options(unsigned options)
     lcd_yuv_options = options;
 }
 
-/* Performance function to blit a YUV bitmap directly to the LCD */
-/* For the e200 - show it rotated */
-/* So the LCD_WIDTH is now the height */
+#ifndef LCD_OPTIMIZED_BLIT_YUV
+/* Performance function to blit a YUV bitmap directly to the LCD
+ * src_x, src_y, width and height should be even and within the LCD's
+ * boundaries.
+ *
+ * For portrait LCDs, show it rotated counterclockwise by 90 degrees
+ */
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    unsigned char const * yuv_src[3];
-    off_t z;
+    /* Macrofy the bits that change between orientations */
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
+    #define LCD_FRAMEBUF_ADDR_ORIENTED(col, row) \
+        LCD_FRAMEBUF_ADDR(row, col)
+    #define lcd_write_yuv420_lines_odither_oriented(dst, src, w, s, col, row) \
+        lcd_write_yuv420_lines_odither(dst, src, w, s, row, col)
+    #define YUV_NEXTLINE() dst -= 2
+    #define YUV_DITHER_NEXTLINE() dst -= 2, y -= 2
+#else
+    #define LCD_FRAMEBUF_ADDR_ORIENTED(col, row) \
+        LCD_FRAMEBUF_ADDR(col, row)
+    #define lcd_write_yuv420_lines_odither_oriented(dst, src, w, s, col, row) \
+        lcd_write_yuv420_lines_odither(dst, src, w, s, col, row)
+    #define YUV_NEXTLINE() dst += 2*LCD_FBWIDTH
+    #define YUV_DITHER_NEXTLINE() dst += 2*LCD_FBWIDTH, y += 2
+#endif
 
-    if (!lcd_on)
+    if (!lcd_write_enabled())
         return;
 
     /* Sorry, but width and height must be >= 2 or else */
     width &= ~1;
     height >>= 1;
 
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
+    /* Adjust portrait coordinates to make (0, 0) the upper right corner */
     y = LCD_WIDTH - 1 - y;
-    fb_data *dst = LCD_FRAMEBUF_ADDR(y, x);
+#endif
 
-    z = stride*src_y;
+    fb_data *dst = LCD_FRAMEBUF_ADDR_ORIENTED(x, y);
+    int z = stride*src_y;
+
+    unsigned char const * yuv_src[3];
     yuv_src[0] = src[0] + z + src_x;
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
@@ -153,12 +185,12 @@ void lcd_blit_yuv(unsigned char * const src[3],
     {
         do
         {
-            lcd_write_yuv420_lines_odither(dst, yuv_src, width, stride, y, x);
+            lcd_write_yuv420_lines_odither_oriented(dst, yuv_src, width,
+                                                    stride, x, y);
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
             yuv_src[2] += stride >> 1;
-            dst -= 2;
-            y -= 2;
+            YUV_DITHER_NEXTLINE();
         }
         while (--height > 0);
     }
@@ -170,8 +202,9 @@ void lcd_blit_yuv(unsigned char * const src[3],
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
             yuv_src[2] += stride >> 1;
-            dst -= 2;
+            YUV_NEXTLINE();
         }
         while (--height > 0);
     }
 }
+#endif /* LCD_OPTIMIZED_BLIT_YUV */

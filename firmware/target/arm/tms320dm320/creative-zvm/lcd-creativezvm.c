@@ -33,7 +33,7 @@
 #include "ltv350qv.h"
 
 /* Power and display status */
-static bool display_on = false; /* Is the display turned on? */
+extern bool lcd_on;  /* lcd-memframe.c */
 static bool direct_fb_access = false; /* Does the DM320 has direct access to the FB? */
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
@@ -189,7 +189,7 @@ static void lcd_display_on(bool reset)
         IO_VID_ENC_VMOD |= VENC_VMOD_VENC;
     }
     /* tell that we're on now */
-    display_on = true;
+    lcd_on = true;
 }
 
 #ifdef HAVE_LCD_ENABLE
@@ -224,14 +224,14 @@ static void lcd_display_off(void)
     
     enable_venc(false);
     
-    display_on = false;
+    lcd_on = false;
 }
 
 void lcd_enable(bool on)
 {
 /* Disabled until properly working */
 return;
-    if (on == display_on)
+    if (on == lcd_on)
         return;
 
     if (on)
@@ -244,13 +244,6 @@ return;
     {
         lcd_display_off();  /* Turn off display */
     }
-}
-#endif
-
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-bool lcd_active(void)
-{
-    return display_on;
 }
 #endif
 
@@ -323,7 +316,7 @@ void lcd_init_device(void)
         DM320_REG(0x0864) = 0; /* ???? */
     }
     else
-        display_on = true;
+        lcd_on = true;
 
     /* Based on lcd-mr500.c from Catalin Patulea */
     /* Clear the Frame */
@@ -369,7 +362,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     register fb_data *dst, *src;
 
-    if (!display_on || direct_fb_access)
+    if (!lcd_on || direct_fb_access)
         return;
 
     if (x + width > LCD_WIDTH)
@@ -424,7 +417,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
 {
-    if (!display_on || direct_fb_access)
+    if (!lcd_on || direct_fb_access)
         return;
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
@@ -433,50 +426,3 @@ void lcd_update(void)
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 }
-
-/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
-extern void lcd_write_yuv420_lines(fb_data *dst,
-unsigned char chroma_buf[LCD_HEIGHT/2*3],
-unsigned char const * const src[3],
-int width,
-int stride);
-/* Performance function to blit a YUV bitmap directly to the LCD */
-/* For the Gigabeat - show it rotated */
-/* So the LCD_WIDTH is now the height */
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    /* Caches for chroma data so it only need be recalculated every other
-       line */
-    unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 480 bytes */
-    unsigned char const * yuv_src[3];
-    off_t z;
-
-    if (!display_on || direct_fb_access)
-        return;
-
-    /* Sorry, but width and height must be >= 2 or else */
-    width &= ~1;
-    height >>= 1;
-
-    fb_data *dst = (fb_data*)FRAME + x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
-
-    z = stride*src_y;
-    yuv_src[0] = src[0] + z + src_x;
-    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
-    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-
-    do
-    {
-        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
-        stride);
-
-        yuv_src[0] += stride << 1; /* Skip down two luma lines */
-        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-        yuv_src[2] += stride >> 1;
-        dst -= 2;
-    }
-    while (--height > 0);
-}
-

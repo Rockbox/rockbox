@@ -27,11 +27,9 @@
 #include "lcd.h"
 #include "lcd-target.h"
 
-extern bool lcd_active(void);
-extern void lcd_set_active(bool active);
-
 /* Power and display status */
-static bool power_on   = false; /* Is the power turned on?   */
+extern bool lcd_on;  /* lcd-memframe.c */
+static bool power_on = false; /* Is the power turned on? */
 
 /* Reverse Flag */
 #define R_DISP_CONTROL_NORMAL 0x0004
@@ -309,7 +307,7 @@ static void lcd_display_on(void)
     lcd_send_msg(0x70, R_RAM_WRITE_DATA);
 
     /* tell that we're on now */
-    lcd_set_active(true);
+    lcd_on = true;
 }
 
 
@@ -318,7 +316,7 @@ static void lcd_display_on(void)
 static void lcd_display_off(void)
 {
     /* block drawing operations and changing of first */
-    lcd_set_active(false);
+    lcd_on = false;
 
     /* NO2-0=01, SDT1-0=00, EQ1-0=00, DIV1-0=00, RTN3-0=0000 */
     lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x4000);
@@ -422,7 +420,7 @@ void lcd_init_device(void)
     LCD_FB_BASE_REG = (long)lcd_driver_framebuffer;
 
     power_on = true;
-    lcd_set_active(true);
+    lcd_on = true;
 
     lcd_set_invert_display(false);
     lcd_set_flip(false);
@@ -434,7 +432,7 @@ void lcd_init_device(void)
 #if defined(HAVE_LCD_ENABLE)
 void lcd_enable(bool on)
 {
-    if (on == lcd_active())
+    if (on == lcd_on)
         return;
 
     if (on)
@@ -465,9 +463,8 @@ void lcd_sleep(void)
     if (power_on)
     {
         /* Turn off display */
-        if (lcd_active())
+        if (lcd_on)
             lcd_display_off();
-
         power_on = false;
     }
 
@@ -499,7 +496,7 @@ void lcd_set_invert_display(bool yesno)
     r_disp_control_rev = yesno ? R_DISP_CONTROL_REV :
                                  R_DISP_CONTROL_NORMAL;
 
-    if (lcd_active())
+    if (lcd_on)
     {
         /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, CL=0,
            DTE=1, REV=x, D1-0=11 */

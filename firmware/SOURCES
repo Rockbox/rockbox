@@ -856,7 +856,6 @@ target/arm/sandisk/sansa-c200/powermgmt-c200.c
 #endif /* SANSA_C200 */
 
 #ifdef SANSA_VIEW
-target/arm/lcd-as-memframe.S
 target/arm/sandisk/sansa-view/backlight-view.c
 target/arm/sandisk/sansa-view/adc-view.c
 target/arm/sandisk/sansa-view/power-view.c
@@ -1113,6 +1112,7 @@ target/arm/tms320dm320/mrobe-500/usb-mr500.c
 #endif /* MROBE_500 */
 
 #ifdef CREATIVE_ZVx
+drivers/lcd-memframe.c
 target/arm/lcd-as-memframe.S
 target/arm/tms320dm320/creative-zvm/adc-creativezvm.c
 target/arm/tms320dm320/creative-zvm/ata-creativezvm.c
@@ -1126,6 +1126,7 @@ target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #endif /* CREATIVE_ZVx */
 
 #ifdef SANSA_CONNECT
+drivers/lcd-memframe.c
 target/arm/lcd-as-memframe.S
 target/arm/tms320dm320/sdmmc-dm320.c
 target/arm/tms320dm320/sansa-connect/crt0-board.S
@@ -1332,6 +1333,7 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* SANSA_FUZEV2 */
 
 #ifdef SANSA_FUZEPLUS
+drivers/lcd-memframe.c
 drivers/synaptics-rmi.c
 drivers/generic_i2c.c
 target/arm/lcd-as-memframe.S
@@ -1370,6 +1372,7 @@ target/arm/tcc77x/iaudio7/audio-iaudio7.c
 #endif /* IAUDIO_7 */
 
 #ifdef COWON_D2
+drivers/lcd-memframe.c
 drivers/nand_id.c
 drivers/pcf50606.c
 drivers/pcf50635.c

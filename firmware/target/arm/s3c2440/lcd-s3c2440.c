@@ -24,8 +24,7 @@
 #include "lcd.h"
 #include "lcd-target.h"
 
-extern bool lcd_active(void);
-extern void lcd_set_active(bool active);
+extern bool lcd_on; /* lcd-memframe.c */
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 static bool lcd_powered = true;
@@ -242,6 +241,8 @@ void lcd_init_device(void)
 #else
     LCD_CTRL_clock(true);
 #endif
+
+    lcd_on = true;
 }
 
 #if defined(HAVE_LCD_SLEEP)
@@ -262,9 +263,7 @@ void lcd_sleep(void)
     if (lcd_powered)
     {
         /* "not powered" implies "disabled" */
-        if (!lcd_active())
-            lcd_enable(false);
-
+        lcd_enable(false);
         LCD_SPI_powerdown();
     }
 }
@@ -284,7 +283,7 @@ static void LCD_SPI_powerup(void)
 
 void lcd_enable(bool state)
 {
-    if (state == lcd_active())
+    if (state == lcd_on)
         return;
 
     if(state)
@@ -298,20 +297,21 @@ void lcd_enable(bool state)
             sleep(HZ/5);
         }
 
-        lcd_set_active(true);
+        lcd_on = true;
         lcd_update();
         send_event(LCD_EVENT_ACTIVATION, NULL);
     }
     else
     {
-        lcd_set_active(false);
+        lcd_on = false;
     }
 }
 #endif
 
 #ifdef GIGABEAT_F
-void lcd_set_flip(bool yesno) {
-    if (!lcd_active())
+void lcd_set_flip(bool yesno)
+{
+    if (!lcd_on)
         return;
 
     LCD_SPI_start();
@@ -331,8 +331,9 @@ int lcd_default_contrast(void)
     return DEFAULT_CONTRAST_SETTING;
 }
 
-void lcd_set_contrast(int val) {
-    if (!lcd_active())
+void lcd_set_contrast(int val)
+{
+    if (!lcd_on)
         return;
 
     LCD_SPI_start();
@@ -340,8 +341,9 @@ void lcd_set_contrast(int val) {
     LCD_SPI_stop();
 }
 
-void lcd_set_invert_display(bool yesno) {
-    if (!lcd_active())
+void lcd_set_invert_display(bool yesno)
+{
+    if (!lcd_on)
         return;
 
     LCD_SPI_start();
