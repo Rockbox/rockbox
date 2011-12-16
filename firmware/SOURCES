@@ -451,6 +451,20 @@ target/arm/ata-as-arm.S
 # endif
 #endif
 
+#if defined(CPU_PP) && defined(IPOD_ARCH)
+target/arm/ipod/power-ipod.c
+# if LCD_DEPTH == 2
+target/arm/ipod/lcd-as-gray.S
+# endif
+# ifndef IPOD_1G2G
+#  ifndef IPOD_3G
+target/arm/ipod/piezo.c
+#  endif /* IPOD_3G */
+drivers/pcf50605.c
+target/arm/ipod/powermgmt-ipod-pcf.c
+# endif /* IPOD_1G2G */
+#endif /* CPU_PP && IPOD_ARCH */
+
 #if CONFIG_I2C == I2C_PP5024 || CONFIG_I2C == I2C_PP5020 || CONFIG_I2C == I2C_PP5002
 target/arm/i2c-pp.c
 #elif CONFIG_I2C == I2C_PNX0101
@@ -1149,42 +1163,25 @@ target/arm/tatung/tpj1022/powermgmt-tpj1022.c
 #endif /* TATUNG_TPJ1022 */
 
 #ifdef IPOD_4G
-drivers/pcf50605.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
-target/arm/ipod/piezo.c
-target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/power-ipod.c
-target/arm/ipod/powermgmt-ipod-pcf.c
 #endif /* IPOD_4G */
 
 #ifdef IPOD_COLOR
-drivers/pcf50605.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
-target/arm/ipod/piezo.c
 target/arm/ipod/lcd-as-color-nano.S
-target/arm/ipod/power-ipod.c
-target/arm/ipod/powermgmt-ipod-pcf.c
 #endif /* IPOD_COLOR */
 
 #ifdef IPOD_NANO
-drivers/pcf50605.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
-target/arm/ipod/piezo.c
 target/arm/ipod/lcd-as-color-nano.S
-target/arm/ipod/power-ipod.c
-target/arm/ipod/powermgmt-ipod-pcf.c
 #endif /* IPOD_NANO */
 
 #ifdef IPOD_VIDEO
-drivers/pcf50605.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
-target/arm/ipod/piezo.c
-target/arm/ipod/power-ipod.c
-target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/ipod/video/lcd-as-video.S
 target/arm/ipod/video/lcd-video.c
 #ifndef BOOTLOADER
@@ -1193,29 +1190,18 @@ target/arm/ipod/video/battery-video.c
 #endif /* IPOD_VIDEO */
 
 #ifdef IPOD_3G
-drivers/pcf50605.c
 target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/button-1g-3g.c
-target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/power-ipod.c
-target/arm/ipod/powermgmt-ipod-pcf.c
 #endif /* IPOD_3G */
 
 #ifdef IPOD_1G2G
 target/arm/ipod/1g2g/backlight-1g2g.c
 target/arm/ipod/1g2g/powermgmt-1g2g.c
 target/arm/ipod/button-1g-3g.c
-target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/power-ipod.c
 #endif /* IPOD_1G2G */
 
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
-drivers/pcf50605.c
 target/arm/ipod/backlight-mini1g_mini2g.c
-target/arm/ipod/piezo.c
-target/arm/ipod/lcd-as-gray.S
-target/arm/ipod/power-ipod.c
-target/arm/ipod/powermgmt-ipod-pcf.c
 #endif
 
 #ifdef IPOD_MINI
