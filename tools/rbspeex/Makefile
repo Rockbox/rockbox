@@ -70,30 +70,33 @@ $(DEPFILE): $(SOURCES)
 
 -include $(DEPFILE)
 
-dll: rbspeex.dll
-rbspeex.dll: $(OUT)/rbspeex.dll
-$(OUT)/rbspeex.dll: $(OBJS) $(OUT)/rbspeex.o
+dll: $(TARGET_DIR)rbspeex.dll
+	
+$(TARGET_DIR)rbspeex.dll: $(OBJS) $(OUT)/rbspeex.o
 	@echo DLL $(notdir $@)
-	$(SILENT)$(CC) $(CFLAGS) -shared -o $@ $^ -Wl,--output-def,$(OUT)/rbspeex.def
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -shared -o $@ $^ \
+		    -Wl,--output-def,$(TARGET_DIR)rbspeex.def
 
 $(OUT)/librbspeex.a: $(OBJS) $(DEPFILE) $(OUT)/rbspeex.o 
 	@echo AR $(notdir $@)
-	$(SILENT)$(AR) rucs $@ $+ > /dev/null 2>&1
+	$(SILENT)$(CROSS)$(AR) rucs $@ $+ > /dev/null 2>&1
 
 librbspeex$(RBARCH).a: $(OUT)/librbspeex.a
 	$(SILENT)cp $(OUT)/librbspeex.a $(TARGET_DIR)librbspeex$(RBARCH).a
 
 ../rbspeexenc: $(OBJS) $(OUT)/rbspeexenc.o librbspeex$(RBARCH).a
 	@echo Linking ../rbspeexenc
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc $(OUT)/rbspeexenc.o $(LIBS) -lm $(TARGET_DIR)librbspeex$(RBARCH).a
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -o ../rbspeexenc $(OUT)/rbspeexenc.o \
+		    $(LIBS) -lm $(TARGET_DIR)librbspeex$(RBARCH).a
 
 ../rbspeexdec: $(OBJS) librbspeex$(RBARCH).a $(OUT)/rbspeexdec.o 
 	@echo Linking ../rbspeexdec
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec $(OUT)/rbspeexdec.o $(LIBS) -lm $(TARGET_DIR)librbspeex$(RBARCH).a
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -o ../rbspeexdec $(OUT)/rbspeexdec.o \
+		    $(LIBS) -lm $(TARGET_DIR)librbspeex$(RBARCH).a
 
 %.o:
 	@echo CC $<
-	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c $< -o $@
 
 # some trickery to build ppc and i386 from a single call
 ifeq ($(RBARCH),)
@@ -107,7 +110,8 @@ endif
 librbspeex-universal: librbspeexi386.a librbspeexppc.a
 	@echo lipo librbspeex.a
 	$(SILENT) rm -f $(TARGET_DIR)librbspeex.a
-	$(SILENT)lipo -create $(TARGET_DIR)librbspeexppc.a $(TARGET_DIR)librbspeexi386.a -output $(TARGET_DIR)librbspeex.a
+	$(SILENT)lipo -create $(TARGET_DIR)librbspeexppc.a \
+	    $(TARGET_DIR)librbspeexi386.a -output $(TARGET_DIR)librbspeex.a
 
 clean:
 	rm -f $(OBJS) $(TARGET_DIR)librbspeex* ../rbspeexenc ../rbspeexdec $(TARGET_DIR)dep-speex
