@@ -302,6 +302,9 @@ drivers/tuner/ipod_remote_tuner.c
 #if (CONFIG_TUNER & RDA5802)
 drivers/tuner/rda5802.c
 #endif /* (CONFIG_TUNER & RDA5802) */
+#if defined(HAVE_RDS_CAP)
+drivers/rds.c
+#endif /* HAVE_RDS_CAP */
 #endif /* PLATFORM_NATIVE */
 #endif /* CONFIG_TUNER */
 #endif /* BOOTLOADER */

@@ -39,5 +39,12 @@ const struct gpio_event gpio1_events[] =
         .mask     = 1 << MC13783_GPIO_LINE,
         .sense    = GPIO_SENSE_HIGH_LEVEL,
         .callback = mc13783_event,
-    }
+    },
+    /* Generates a 5ms low pulse on the line - detect the falling edge */
+    [SI4700_STC_RDS_EVENT_ID] =
+    {
+        .mask     = 1 << SI4700_GPIO_STC_RDS_LINE,
+        .sense    = GPIO_SENSE_FALLING,
+        .callback = si4700_stc_rds_event,
+    },
 };

@@ -1735,6 +1735,15 @@ static int radio_callback(int btn, struct gui_synclist *lists)
             simplelist_addline(SIMPLELIST_ADD_LINE,"%02X: %04X %04X %04X %04X",
                 i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
         }
+#ifdef HAVE_RDS_CAP
+        simplelist_addline(SIMPLELIST_ADD_LINE, "");
+        simplelist_addline(SIMPLELIST_ADD_LINE, "RDS Info:");
+        simplelist_addline(SIMPLELIST_ADD_LINE,
+                           si4700_get_rds_info(RADIO_RDS_NAME));
+
+        simplelist_addline(SIMPLELIST_ADD_LINE,
+                           si4700_get_rds_info(RADIO_RDS_TEXT));
+#endif
     }
 #endif /* SI4700 */
 #if (CONFIG_TUNER & RDA5802)

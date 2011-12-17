@@ -27,10 +27,14 @@
     I2C with a couple of GPIO pins.
  */
 
+#include "config.h"
 #include "as3525.h"
 #include "system.h"
+#include "tuner.h"
 #include "generic_i2c.h"
 #include "fmradio_i2c.h"
+#include "thread.h"
+#include "rds.h"
 
 #if     defined(SANSA_CLIP) || defined(SANSA_C200V2)
 #define I2C_SCL_GPIO(x) GPIOB_PIN(x)
@@ -179,3 +183,58 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 #endif
     return ret;
 }
+
+#ifdef HAVE_RDS_CAP
+/* Low-level RDS Support */
+static struct semaphore rds_sema;
+static uint32_t rds_stack[DEFAULT_STACK_SIZE/sizeof(uint32_t)];
+
+/* RDS GPIO interrupt handler */
+void tuner_isr(void)
+{
+    /* read and clear the interrupt */
+    if (GPIOA_MIS & (1<<4)) {
+        semaphore_release(&rds_sema);
+    }
+    GPIOA_IC = (1<<4);
+}
+
+/* Captures RDS data and processes it */
+static void NORETURN_ATTR rds_thread(void)
+{
+    uint16_t rds_data[4];
+
+    while (true) {
+        semaphore_wait(&rds_sema, TIMEOUT_BLOCK);
+        if (si4700_rds_read_raw(rds_data) && rds_process(rds_data)) {
+            si4700_rds_set_event();
+        }
+    }
+}
+
+/* Called with on=true after full radio power up, and with on=false before
+   powering down */
+void si4700_rds_powerup(bool on)
+{
+    GPIOA_IE &= ~(1<<4);    /* disable GPIO interrupt */
+
+    if (on) {
+        GPIOA_DIR &= ~(1<<4);   /* input */
+        GPIOA_IS &= ~(1<<4);    /* edge detect */
+        GPIOA_IBE &= ~(1<<4);   /* only one edge */
+        GPIOA_IEV &= ~(1<<4);   /* falling edge */
+        GPIOA_IC = (1<<4);      /* clear any pending interrupt */
+        GPIOA_IE |= (1<<4);     /* enable GPIO interrupt */
+    }
+}
+
+/* One-time RDS init at startup */
+void si4700_rds_init(void)
+{
+    semaphore_init(&rds_sema, 1, 0);
+    rds_init();
+    create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
+                  IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
+}
+#endif /* HAVE_RDS_CAP */
+

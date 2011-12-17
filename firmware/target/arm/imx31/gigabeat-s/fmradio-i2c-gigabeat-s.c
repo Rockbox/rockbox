@@ -23,8 +23,12 @@
 #include "system.h"
 #include "mc13783.h"
 #include "iomuxc-imx31.h"
+#include "gpio-imx31.h"
 #include "i2c-imx31.h"
 #include "fmradio_i2c.h"
+#include "thread.h"
+#include "rds.h"
+#include "tuner.h"
 
 static struct i2c_node si4700_i2c_node =
 {
@@ -117,7 +121,57 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
     return 0;
 }
 
-int si4700_st(void)
+bool si4700_st(void)
 {
     return (GPIO1_DR & (1 << 28)) >> 28;
+}
+
+
+/* Low-level RDS Support */
+static struct semaphore rds_sema;
+static uint32_t rds_stack[DEFAULT_STACK_SIZE/sizeof(uint32_t)];
+
+/* RDS GPIO interrupt handler */
+void si4700_stc_rds_event(void)
+{
+    /* read and clear the interrupt */
+    SI4700_GPIO_STC_RDS_ISR = (1ul << SI4700_GPIO_STC_RDS_LINE);
+    semaphore_release(&rds_sema);
+}
+
+/* Called with on=true after full radio power up, and with on=false before
+   powering down */
+void si4700_rds_powerup(bool on)
+{
+    gpio_disable_event(SI4700_STC_RDS_EVENT_ID);
+
+    if (on)
+    {
+        SI4700_GPIO_STC_RDS_ISR = (1ul << SI4700_GPIO_STC_RDS_LINE);
+        gpio_enable_event(SI4700_STC_RDS_EVENT_ID);
+    }
+}
+
+/* Captures RDS data and processes it */
+/* Use of a thread here is likely temporary */
+static void NORETURN_ATTR rds_thread(void)
+{
+    uint16_t rds_data[4];
+
+    while (1)
+    {
+        semaphore_wait(&rds_sema, TIMEOUT_BLOCK);
+
+        if (si4700_rds_read_raw(rds_data) && rds_process(rds_data))
+            si4700_rds_set_event();
+    }
+}
+
+/* One-time RDS init at startup */
+void si4700_rds_init(void)
+{
+    semaphore_init(&rds_sema, 1, 0);
+    rds_init();
+    create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
+                  IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));    
 }

@@ -29,21 +29,15 @@
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
+#include "rds.h"
 
-/* some models use the internal 32 kHz oscillator which needs special attention
-   during initialisation, power-up and power-down.
-*/
 #if defined(SANSA_CLIP) || defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
-#define USE_INTERNAL_OSCILLATOR
+/* some models use the internal 32 kHz oscillator which needs special attention
+   during initialisation, power-up and power-down. */
+#define SI4700_USE_INTERNAL_OSCILLATOR
 #elif defined(TOSHIBA_GIGABEAT_S)
-#define SI4700_GPIO_SETUP (SYSCONFIG1_GPIO1_HI_Z | \
-                           SYSCONFIG1_GPIO2_HI_Z | \
-                           SYSCONFIG1_GPIO3_MO_ST_I)
-extern int si4700_st(void);
-#endif
-
-#ifndef SI4700_GPIO_SETUP
-#define SI4700_GPIO_SETUP 0
+/* gigabeat S uses the GPIO for stereo/mono detection */
+#define SI4700_USE_MO_ST_I
 #endif
 
 #define SEEK_THRESHOLD 0x16
@@ -81,7 +75,8 @@ extern int si4700_st(void);
 
 /* CHIPID (0x1) */
 
-#if 0 /* Informational */
+#if 0
+/* Informational */
 /* Si4700/01 */
 #define CHIPID_REV          (0x3f << 10)
 #define CHIPID_DEV          (0x1 << 9)
@@ -98,7 +93,10 @@ extern int si4700_st(void);
     /* 1000 before PU = Si4703 */
     /* 1001 after PU = Si4703 */
 #define CHIPID_FIRMWARE     (0x3f << 0)
-#endif /* 0 */
+#endif
+
+/* Indicates Si4701/2/3 after powerup */
+#define CHIPID_DEV_0        (0x1 << 9)
 
 /* POWERCFG (0x2) */
 #define POWERCFG_DSMUTE     (0x1 << 15)
@@ -214,6 +212,10 @@ extern int si4700_st(void);
 
 static bool tuner_present = false;
 static uint16_t cache[16];
+static struct mutex fmr_mutex SHAREDBSS_ATTR;
+#ifdef HAVE_RDS_CAP
+static int rds_event = 0;
+#endif
 
 /* reads <len> registers from radio at offset 0x0A into cache */
 static void si4700_read(int len)
@@ -277,19 +279,26 @@ static void si4700_write_clear(int reg, uint16_t mask)
     si4700_write_reg(reg, cache[reg] & ~mask);
 }
 
-#if (SI4700_GPIO_SETUP & SYSCONFIG1_GPIO3) != SYSCONFIG1_GPIO3_MO_ST_I
+#ifndef SI4700_USE_MO_ST_I
 /* Poll i2c for the stereo status */
-static inline int si4700_st(void)
+bool si4700_st(void)
 {
     return (si4700_read_reg(STATUSRSSI) & STATUSRSSI_ST) >> 8;
 }
-#endif
+#endif /* ndef SI4700_USE_MO_ST_I */
 
 static void si4700_sleep(int snooze)
 {
     if (snooze)
     {
         /** power down **/
+#ifdef HAVE_RDS_CAP        
+        if (cache[CHIPID] & CHIPID_DEV_0) {
+            si4700_rds_powerup(false);
+            si4700_write_clear(SYSCONFIG1, SYSCONFIG1_RDS | SYSCONFIG1_RDSIEN);
+        }
+#endif
+
         /* ENABLE high, DISABLE high */
         si4700_write_set(POWERCFG,
                          POWERCFG_DISABLE | POWERCFG_ENABLE);
@@ -307,9 +316,8 @@ static void si4700_sleep(int snooze)
         /* init register cache */
         si4700_read(16);
 
-#if SI4700_GPIO_SETUP != 0
-        si4700_write_masked(SYSCONFIG1, SI4700_GPIO_SETUP, 
-                            SYSCONFIG1_GPIO1 | SYSCONFIG1_GPIO2 |
+#ifdef SI4700_USE_MO_ST_I
+        si4700_write_masked(SYSCONFIG1, SYSCONFIG1_GPIO3_MO_ST_I,
                             SYSCONFIG1_GPIO3);
 #endif
         /* set mono->stereo switching RSSI range to lowest setting */
@@ -320,33 +328,43 @@ static void si4700_sleep(int snooze)
                             SYSCONFIG2_SKEETHw(SEEK_THRESHOLD) |
                             SYSCONFIG2_VOLUMEw(0xF),
                             SYSCONFIG2_VOLUME | SYSCONFIG2_SEEKTH);
+
+#ifdef HAVE_RDS_CAP
+        /* enable RDS and RDS interrupt if supported (bit 9 of CHIPID) */
+        if (cache[CHIPID] & CHIPID_DEV_0) {
+            /* Is Si4701/2/3 - Enable RDS and interrupt */
+            si4700_write_set(SYSCONFIG1, SYSCONFIG1_RDS | SYSCONFIG1_RDSIEN);
+            si4700_write_masked(SYSCONFIG1, SYSCONFIG1_GPIO2_STC_RDS_I,
+                                            SYSCONFIG1_GPIO2);
+            si4700_rds_powerup(true);
+        }
+#endif
     }
 }
 
 bool si4700_detect(void)
 {
-    bool detected;
-
-    tuner_power(true);
-    detected = (si4700_read_reg(DEVICEID) == 0x1242);
-    tuner_power(false);
-
-    return detected;
+    if (!tuner_present) {
+        tuner_power(true);
+        tuner_present = (si4700_read_reg(DEVICEID) == 0x1242);
+        tuner_power(false);
+    }
+    return tuner_present;
 }
 
 void si4700_init(void)
 {
     /* check device id */
     if (si4700_detect()) {
-        tuner_present = true;
-
+        mutex_init(&fmr_mutex);
+        
         tuner_power(true);
 
         /* read all registers */
         si4700_read(16);
         si4700_sleep(0);
 
-#ifdef USE_INTERNAL_OSCILLATOR
+#ifdef SI4700_USE_INTERNAL_OSCILLATOR
         /* Enable the internal oscillator
           (Si4702-16 needs this register to be initialised to 0x100) */
         si4700_write_set(TEST1, TEST1_XOSCEN | 0x100);
@@ -355,6 +373,10 @@ void si4700_init(void)
 
         si4700_sleep(1);
         tuner_power(false);
+
+#ifdef HAVE_RDS_CAP
+        si4700_rds_init();
+#endif
     }
 }
 
@@ -421,6 +443,10 @@ static void si4700_set_region(int region)
 /* tuner abstraction layer: set something to the tuner */
 int si4700_set(int setting, int value)
 {
+    int val = 1;
+
+    mutex_lock(&fmr_mutex);
+
     switch(setting)
     {
         case RADIO_SLEEP:
@@ -430,12 +456,19 @@ int si4700_set(int setting, int value)
             break;
 
         case RADIO_FREQUENCY:
+#ifdef HAVE_RDS_CAP
+            rds_reset();
+#endif
             si4700_set_frequency(value);
             break;
 
         case RADIO_SCAN_FREQUENCY:
+#ifdef HAVE_RDS_CAP
+            rds_reset();
+#endif
             si4700_set_frequency(value);
-            return si4700_tuned();
+            val = si4700_tuned();
+            break;
 
         case RADIO_MUTE:
             si4700_write_masked(POWERCFG, value ? 0 : POWERCFG_DMUTE,
@@ -452,16 +485,21 @@ int si4700_set(int setting, int value)
             break;
 
         default:
-            return -1;
+            val = -1;
+            break;
     }
 
-    return 1;
+    mutex_unlock(&fmr_mutex);
+
+    return val;
 }
 
 /* tuner abstraction layer: read something from the tuner */
 int si4700_get(int setting)
 {
     int val = -1; /* default for unsupported query */
+
+    mutex_lock(&fmr_mutex);
 
     switch(setting)
     {
@@ -488,7 +526,16 @@ int si4700_get(int setting)
         case RADIO_RSSI_MAX:
             val = RSSI_MAX;
             break;
+
+#ifdef HAVE_RDS_CAP
+        case RADIO_EVENT:
+            val = rds_event;
+            rds_event = 0;
+            break;
+#endif
     }
+
+    mutex_unlock(&fmr_mutex);
 
     return val;
 }
@@ -497,10 +544,61 @@ void si4700_dbg_info(struct si4700_dbg_info *nfo)
 {
     memset(nfo->regs, 0, sizeof (nfo->regs));
 
+    mutex_lock(&fmr_mutex);
+
     if (tuner_powered())
     {
         si4700_read(16);
         memcpy(nfo->regs, cache, sizeof (nfo->regs));
     }
+
+    mutex_unlock(&fmr_mutex);
 }
+
+#ifdef HAVE_RDS_CAP
+/* Read raw RDS info for processing */
+bool si4700_rds_read_raw(uint16_t data[4])
+{
+    bool retval = false;
+
+    mutex_lock(&fmr_mutex);
+
+    if (tuner_powered())
+    {
+        si4700_read_reg(RDSD);
+        memcpy(data, &cache[RDSA], 4 * sizeof (uint16_t));
+        retval = true;
+    }
+
+    mutex_unlock(&fmr_mutex);
+
+    return retval;   
+}
+
+/* Set the event flag */
+void si4700_rds_set_event(void)
+{
+    mutex_lock(&fmr_mutex);
+    rds_event = 1;
+    mutex_unlock(&fmr_mutex);
+}
+
+char * si4700_get_rds_info(int setting)
+{
+    char *text = NULL;
+    
+    switch(setting)
+    {
+        case RADIO_RDS_NAME:
+            text = rds_get_ps();
+            break;
+
+        case RADIO_RDS_TEXT:
+            text = rds_get_rt();
+            break;
+    }
+
+    return text;
+}
+#endif /* HAVE_RDS_CAP */
 

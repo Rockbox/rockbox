@@ -89,6 +89,8 @@
 /* Define this if you have a SI4700 fm radio tuner */
 #define CONFIG_TUNER SI4700
 
+#define HAVE_RDS_CAP
+
 /* Define this if you have the WM8978 audio codec */
 #define HAVE_WM8978
 
@@ -161,7 +163,7 @@
 #define GPIO_EVENT_MASK (USE_GPIO1_EVENTS)
 
 /* Define this if target has an additional number of threads specific to it */
-#define TARGET_EXTRA_THREADS 2
+#define TARGET_EXTRA_THREADS 3
 
 /* Type of mobile power - check this out */
 #define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */

@@ -155,6 +155,10 @@ void INT_GPIOA(void)
     void button_gpioa_isr(void);
     button_gpioa_isr();
 #endif
+#ifdef HAVE_RDS_CAP
+    void tuner_isr(void);
+    tuner_isr();
+#endif
 }
 
 void irq_handler(void)

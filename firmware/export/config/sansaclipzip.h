@@ -34,6 +34,8 @@
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
 
+#define HAVE_RDS_CAP
+
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
 /* define this if you have a colour LCD */
@@ -137,6 +139,9 @@
 
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
 #define CONFIG_STORAGE STORAGE_SD
+
+/* Define this if target has an additional number of threads specific to it */
+#define TARGET_EXTRA_THREADS 1  /* RDS thread */
 
 #define BATTERY_CAPACITY_DEFAULT 300    /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 300        /* min. capacity selectable */

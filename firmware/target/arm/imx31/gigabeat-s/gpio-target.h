@@ -29,6 +29,12 @@
 #define MC13783_GPIO_ISR    GPIO1_ISR
 #define MC13783_GPIO_LINE   31
 
+/* SI4700 GPIO STC/RDS pin info for this target */
+#define SI4700_GPIO_STC_RDS_IMR     GPIO1_IMR
+#define SI4700_GPIO_STC_RDS_NUM     GPIO1_NUM
+#define SI4700_GPIO_STC_RDS_ISR     GPIO1_ISR
+#define SI4700_GPIO_STC_RDS_LINE    27
+
 #define GPIO1_INT_PRIO      INT_PRIO_DEFAULT
 
 /* Declare event indexes in priority order in a packed array */
@@ -36,7 +42,8 @@ enum gpio_event_ids
 {
     /* GPIO1 event IDs */
     MC13783_EVENT_ID = GPIO1_EVENT_FIRST,
-    GPIO1_NUM_EVENTS = 1,
+    SI4700_STC_RDS_EVENT_ID,
+    GPIO1_NUM_EVENTS = 2,
     /* GPIO2 event IDs */
     /* none defined */
     /* GPIO3 event IDs */
@@ -44,5 +51,6 @@ enum gpio_event_ids
 };
 
 void mc13783_event(void);
+void si4700_stc_rds_event(void);
 
 #endif /* GPIO_TARGET_H */
