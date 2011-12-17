@@ -192,14 +192,14 @@ struct master_header {
 };
 
 /* For the endianess correction */
-static const char *tagfile_entry_ec   = "ll";
+static const char * const tagfile_entry_ec   = "ll";
 /**
  Note: This should be (1 + TAG_COUNT) amount of l's.
  */
-static const char *index_entry_ec     = "llllllllllllllllllllll";
+static const char * const index_entry_ec     = "llllllllllllllllllllll";
 
-static const char *tagcache_header_ec = "lll";
-static const char *master_header_ec   = "llllll";
+static const char * const tagcache_header_ec = "lll";
+static const char * const master_header_ec   = "llllll";
 
 static struct master_header current_tcmh;
 

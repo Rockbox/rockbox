@@ -62,7 +62,8 @@ enum {
 #define WAVE_CHUNKNAME_LENGTH 4
 #define WAVE_CHUNKSIZE_LENGTH 4
 
-static const unsigned char *wave_chunklist = "RIFF"
+static const unsigned char * const wave_chunklist 
+                                           = "RIFF"
                                              "WAVE"
                                              "fmt "
                                              "fact"
@@ -73,7 +74,7 @@ static const unsigned char *wave_chunklist = "RIFF"
 #define WAVE64_CHUNKNAME_LENGTH 16
 #define WAVE64_CHUNKSIZE_LENGTH 8
 
-static const unsigned char *wave64_chunklist
+static const unsigned char * const wave64_chunklist
                  = "riff\x2e\x91\xcf\x11\xa5\xd6\x28\xdb\x04\xc1\x00\x00"
                    "wave\xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"
                    "fmt \xf3\xac\xd3\x11\x8c\xd1\x00\xc0\x4f\x8e\xdb\x8a"

@@ -31,7 +31,7 @@ extern struct spi_node mc13783_spi;
 
 /* PMIC event service data */
 static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
-static const char *mc13783_thread_name = "pmic";
+static const char * const mc13783_thread_name = "pmic";
 static struct semaphore mc13783_svc_wake;
 
 /* Synchronous thread communication objects */

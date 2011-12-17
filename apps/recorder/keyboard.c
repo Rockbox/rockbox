@@ -130,7 +130,7 @@ static bool kbd_loaded = false;
 
 #ifdef HAVE_MORSE_INPUT
 /* FIXME: We should put this to a configuration file. */
-static const char *morse_alphabets =
+static const char * const morse_alphabets =
     "abcdefghijklmnopqrstuvwxyz1234567890,.?-@ ";
 static const unsigned char morse_codes[] = {
     0x05,0x18,0x1a,0x0c,0x02,0x12,0x0e,0x10,0x04,0x17,0x0d,0x14,0x07,
