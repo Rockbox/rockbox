@@ -603,8 +603,9 @@ static void init_ci(void)
     ci.profile_func_exit = rb->profile_func_exit;
 #endif
 
-    ci.cpucache_invalidate = rb->cpucache_invalidate;
-    ci.cpucache_flush = rb->cpucache_flush;
+    ci.commit_dcache = rb->commit_dcache;
+    ci.commit_discard_dcache = rb->commit_discard_dcache;
+    ci.commit_discard_idcache = rb->commit_discard_idcache;
 
 #if NUM_CORES > 1
     ci.create_thread = rb->create_thread;
