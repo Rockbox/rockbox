@@ -51,7 +51,6 @@ SECTIONS
         _loadaddress = .;
         _textstart = .;
         *(.init.text)
-        *(.text)
         *(.text*)
         *(.glue_7)
         *(.glue_7t)
@@ -78,9 +77,9 @@ SECTIONS
     .iram :
     {
         _iramstart = .;
-        *(.icode)
-        *(.irodata)
-        *(.idata)
+        *(.icode*)
+        *(.irodata*)
+        *(.idata*)
         . = ALIGN(0x4);
         _iramend = .;
     } > IRAM AT> DRAM
@@ -90,7 +89,7 @@ SECTIONS
     {
         _iedata = .;
         *(.qharray)
-        *(.ibss)
+        *(.ibss*)
         . = ALIGN(0x4);
         _iend = .;
     } > IRAM

@@ -23,7 +23,7 @@ SECTIONS
     *(.glue_7)
     *(.glue_7t)
     *(.text*)
-    *(.icode)
+    *(.icode*)
   } > IRAM
 
   .data : {

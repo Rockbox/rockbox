@@ -56,9 +56,9 @@ SECTIONS
 
   .data : {
     _datastart = . ;
-    *(.irodata)
-    *(.icode)
-    *(.idata)
+    *(.irodata*)
+    *(.icode*)
+    *(.idata*)
     *(.data*)
     *(.ncdata*);
     . = ALIGN(0x4);
@@ -85,7 +85,7 @@ SECTIONS
   .bss (NOLOAD) : {
      _edata = .;
      *(.bss*);
-     *(.ibss);
+     *(.ibss*);
      *(.ncbss*);
      *(COMMON);
     . = ALIGN(0x4);
