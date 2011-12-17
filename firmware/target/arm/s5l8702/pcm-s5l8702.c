@@ -72,7 +72,7 @@ void INT_DMAC0C0(void)
     {
         pcm_lli->nextlli = NULL;
         pcm_lli->control = 0x75249000;
-        clean_dcache();
+        commit_dcache();
         return;
     }
     uint32_t lastsize = MIN(PCM_WATERMARK * 4, pcm_remaining / 2 + 1) & ~1;
@@ -107,7 +107,7 @@ void INT_DMAC0C0(void)
     lastlli->nextlli = last ? NULL : pcm_lli;
     lastlli->control = (last ? 0xf5249000 : 0x75249000) | (lastsize / 2);
     dataptr += lastsize;
-    clean_dcache();
+    commit_dcache();
     if (!(DMAC0C0CONFIG & 1) && (pcm_lli[0].control & 0xfff))
     {
         DMAC0C0LLI = pcm_lli[0];

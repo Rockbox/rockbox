@@ -333,7 +333,7 @@ static int ceata_read_multiple_register(uint32_t addr, void* dest, uint32_t size
     SDCI_DMACOUNT = 1;
     SDCI_DMAADDR = dest;
     SDCI_DCTRL = SDCI_DCTRL_TXFIFORST | SDCI_DCTRL_RXFIFORST;
-    invalidate_dcache();
+    commit_discard_dcache();
     PASS_RC(mmc_send_command(SDCI_CMD_CMD_NUM(MMC_CMD_CEATA_RW_MULTIPLE_REG)
                            | SDCI_CMD_CMD_TYPE_ADTC | SDCI_CMD_RES_TYPE_R1
                            | SDCI_CMD_RES_SIZE_48 | SDCI_CMD_NCR_NID_NCR,
@@ -477,7 +477,7 @@ static int ceata_rw_multiple_block(bool write, void* buf, uint32_t count, long t
     SDCI_DMAADDR = buf;
     SDCI_DMACOUNT = count;
     SDCI_DCTRL = SDCI_DCTRL_TXFIFORST | SDCI_DCTRL_RXFIFORST;
-    invalidate_dcache();
+    commit_discard_dcache();
     PASS_RC(mmc_send_command(SDCI_CMD_CMD_NUM(MMC_CMD_CEATA_RW_MULTIPLE_BLOCK)
                            | SDCI_CMD_CMD_TYPE_ADTC | cmdtype | responsetype
                            | SDCI_CMD_RES_SIZE_48 | SDCI_CMD_NCR_NID_NCR,
@@ -883,8 +883,8 @@ int ata_rw_sectors_internal(uint64_t sector, uint32_t count, void* buffer, bool 
     if (sector + count > ata_total_sectors) RET_ERR(0);
     if (!ata_powered) ata_power_up();
     ata_set_active();
-    if (ata_dma && write) clean_dcache();
-    else if (ata_dma) invalidate_dcache();
+    if (ata_dma && write) commit_dcache();
+    else if (ata_dma) commit_discard_dcache();
     if (!ceata) ATA_COMMAND = BIT(1);
     while (count)
     {

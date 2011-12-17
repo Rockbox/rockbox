@@ -232,7 +232,7 @@ static void displaylcd_dma(int pixels)
                      | (last ? 0x80000000 : 0) | 0x4000000;
         data += 0x1ffe;
     }
-    clean_dcache();
+    commit_dcache();
     DMAC0C4CONFIG = 0x88c1;
     mutex_unlock(&lcd_mutex);
 }

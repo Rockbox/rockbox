@@ -127,7 +127,7 @@ void INT_DMA(void)
             DMATCNT0 = nextsize / 2 - 1;
             nextsize = 0;
         }
-        clean_dcache();
+        commit_dcache();
         DMACOM0 = 4;
         DMACOM0 = 7;
 

@@ -158,7 +158,7 @@ void main(void)
     }
 
     kernel_entry = (void*) loadbuffer;
-    cpucache_invalidate();
+    commit_discard_idcache();
     printf("Executing");
     kernel_entry();
     printf("ERR: Failed to boot");

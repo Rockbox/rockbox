@@ -230,7 +230,7 @@ static void nand_transfer_data_start(uint32_t bank, uint32_t direction,
         DMACOM3 = DMACOM_CLEARBOTHDONE;
     DMABASE3 = (uint32_t)buffer;
     DMATCNT3 = (size >> 4) - 1;
-    clean_dcache();
+    commit_dcache();
     DMACOM3 = 4;
 }
 
@@ -239,7 +239,7 @@ static uint32_t nand_transfer_data_collect(uint32_t direction)
     long timeout = current_tick + HZ / 50;
     while ((DMAALLST & DMAALLST_DMABUSY3))
         if (nand_timeout(timeout)) return 1;
-    if (!direction) invalidate_dcache();
+    if (!direction) commit_discard_dcache();
     if (nand_wait_addrdone()) return 1;
     if (!direction) FMCTRL1 = FMCTRL1_CLEARRFIFO | FMCTRL1_CLEARWFIFO;
     else FMCTRL1 = FMCTRL1_CLEARRFIFO;
@@ -263,7 +263,7 @@ static void ecc_start(uint32_t size, void* databuffer, void* sparebuffer,
     ECC_UNK1 = size;
     ECC_DATA_PTR = (uint32_t)databuffer;
     ECC_SPARE_PTR = (uint32_t)sparebuffer;
-    clean_dcache();
+    commit_dcache();
     ECC_CTRL = type;
 }
 
@@ -272,7 +272,7 @@ static uint32_t ecc_collect(void)
     long timeout = current_tick + HZ / 50;
     while (!(SRCPND & INTMSK_ECC))
         if (nand_timeout(timeout)) return ecc_unlock(1);
-    invalidate_dcache();
+    commit_discard_dcache();
     ECC_INT_CLR = 1;
     SRCPND = INTMSK_ECC;
     return ecc_unlock(ECC_RESULT);

@@ -176,7 +176,7 @@ static void handle_ep_int(bool out)
 
         if (epints & DEPINT_xfercompl)
         {
-            invalidate_dcache();
+            commit_discard_dcache();
             int bytes = endpoints[ep].size - (DEPTSIZ(ep, out) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
             if (endpoints[ep].busy)
             {
@@ -204,7 +204,7 @@ static void handle_ep_int(bool out)
 
         if (out && (epints & DOEPINT_setup))
         {
-            invalidate_dcache();
+            commit_discard_dcache();
             if (ep != 0)
                 panicf("USB: SETUP done on OUT EP%d!?", ep);
 
@@ -281,7 +281,7 @@ static void ep_transfer(int ep, void *ptr, int length, int out)
 
     DEPTSIZ(ep, out) = length | (packets << DEPTSIZ0_pkcnt_bitp);
     DEPDMA(ep, out) = length ? ptr : NULL;
-    clean_dcache();
+    commit_dcache();
     DEPCTL(ep, out) |= DEPCTL_epena | DEPCTL_cnak;
 }
 
