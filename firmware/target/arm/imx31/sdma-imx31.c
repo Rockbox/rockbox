@@ -382,7 +382,7 @@ static bool setup_channel(struct channel_control_block *ccb_p)
     }
 
     /* Send channel context to SDMA core */
-    clean_dcache_range(&context_buffer, sizeof (context_buffer));
+    commit_dcache_range(&context_buffer, sizeof (context_buffer));
     sdma_write_words((unsigned long *)&context_buffer,
                      CHANNEL_CONTEXT_ADDR(channel),
                      sizeof (context_buffer)/4);

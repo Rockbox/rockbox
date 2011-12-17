@@ -37,4 +37,8 @@ void __icache_invalidate_all(void);
 void __flush_dcache_line(unsigned long addr);
 void dma_cache_wback_inv(unsigned long addr, unsigned long size);
 
+#define commit_discard_idcache  __icache_invalidate_all
+#define commit_discard_dcache   __dcache_invalidate_all
+#define commit_dcache           __dcache_writeback_all
+
 #endif /* __MMU_MIPS_INCLUDE_H */

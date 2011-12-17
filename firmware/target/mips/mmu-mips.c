@@ -169,12 +169,6 @@ void __icache_invalidate_all(void)
         : "r" (i));
 }
 
-void cpucache_commit_discard(void)
-{
-    __icache_invalidate_all();
-}
-void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")));
-
 void __dcache_invalidate_all(void)
 {
     unsigned int i;

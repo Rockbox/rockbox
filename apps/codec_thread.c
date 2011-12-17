@@ -550,9 +550,9 @@ static void do_callback(void (* callback)(void))
 
     if (callback)
     {
-        cpucache_commit_discard();
+        commit_discard_idcache();
         callback();
-        cpucache_commit();
+        commit_dcache();
     }
 }
 

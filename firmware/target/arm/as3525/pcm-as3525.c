@@ -109,7 +109,7 @@ static void dma_callback(void)
         dma_rem_size = dma_start_size;
 
         /* force writeback */
-        clean_dcache_range(dma_start_addr, dma_start_size);
+        commit_dcache_range(dma_start_addr, dma_start_size);
         play_start_pcm();
         pcm_play_dma_started_callback();
     }
@@ -131,7 +131,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     dma_retain();
 
     /* force writeback */
-    clean_dcache_range(dma_start_addr, dma_start_size);
+    commit_dcache_range(dma_start_addr, dma_start_size);
 
     bitset32(&CGU_AUDIO, (1<<11));
 

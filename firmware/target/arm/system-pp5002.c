@@ -54,15 +54,8 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
 
 #endif
 
-/* TODO: The following two function have been lifted straight from IPL, and
-   hence have a lot of numeric addresses used straight. I'd like to use
-   #defines for these, but don't know what most of them are for or even what
-   they should be named. Because of this I also have no way of knowing how
-   to extend the funtions to do alternate cache configurations and/or
-   some other CPU frequency scaling. */
-
 #ifndef BOOTLOADER
-void ICODE_ATTR __attribute__((naked)) cpucache_commit(void)
+void ICODE_ATTR __attribute__((naked)) commit_dcache(void)
 {
     asm volatile(
         "mov    r0, #0xf0000000 \n"
@@ -76,9 +69,8 @@ void ICODE_ATTR __attribute__((naked)) cpucache_commit(void)
         "bx     lr              \n"
     );
 }
-void cpucache_flush(void) __attribute__((alias("cpucache_commit")));
 
-void ICODE_ATTR  __attribute__((naked)) cpucache_commit_discard(void)
+void ICODE_ATTR  __attribute__((naked)) commit_discard_idcache(void)
 {
     asm volatile(
         "mov    r0, #0xf0000000 \n"
@@ -94,7 +86,8 @@ void ICODE_ATTR  __attribute__((naked)) cpucache_commit_discard(void)
         "bx     lr              \n"
     );
 }
-void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")));
+
+void commit_discard_dcache(void) __attribute__((alias("commit_discard_idcache")));
 
 static void ipod_init_cache(void)
 {

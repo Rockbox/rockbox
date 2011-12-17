@@ -214,7 +214,7 @@ static inline void NORETURN_ATTR __attribute__((always_inline))
 {
     asm volatile (
         "cmp    %1, #0               \n" /* CPU? */
-        "ldrne  r0, =cpucache_flush  \n" /* No? write back data */
+        "ldrne  r0, =commit_dcache   \n" /* No? write back data */
         "movne  lr, pc               \n"
         "bxne   r0                   \n"
         "mov    r0, %0               \n" /* copy thread parameter */
@@ -244,7 +244,7 @@ static inline void NORETURN_ATTR __attribute__((always_inline))
 static void core_switch_blk_op(unsigned int core, struct thread_entry *thread)
 {
     /* Flush our data to ram */
-    cpucache_flush();
+    commit_dcache();
     /* Stash thread in r4 slot */
     thread->context.r[0] = (uint32_t)thread;
     /* Stash restart address in r5 slot */
@@ -285,7 +285,7 @@ static void __attribute__((naked))
         "ldr    sp, [r0, #32]            \n" /* Reload original sp from context structure */
         "mov    r1, #0                   \n" /* Clear start address */
         "str    r1, [r0, #40]            \n"
-        "ldr    r0, =cpucache_invalidate \n" /* Invalidate new core's cache */
+        "ldr    r0, =commit_discard_idcache \n" /* Invalidate new core's cache */
         "mov    lr, pc                   \n"
         "bx     r0                       \n"
         "ldmfd  sp!, { r4-r11, pc }      \n" /* Restore non-volatile context to new core and return */

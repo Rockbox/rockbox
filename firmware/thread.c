@@ -1613,7 +1613,7 @@ unsigned int create_thread(void (*function)(void),
     /* Writeback stack munging or anything else before starting */
     if (core != CURRENT_CORE)
     {
-        cpucache_flush();
+        commit_discard_idcache();
     }
 #endif
 

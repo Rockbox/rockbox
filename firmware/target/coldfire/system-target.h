@@ -194,10 +194,6 @@ static inline uint32_t swap_odd_even32_hw(uint32_t value)
     return value;
 }
 
-#define HAVE_CPUCACHE_COMMIT_DISCARD
-/* deprecated alias */
-#define HAVE_CPUCACHE_INVALIDATE
-
 #define DEFAULT_PLLCR_AUDIO_BITS 0x10400000
 void coldfire_set_pllcr_audio_bits(long bits);
 
@@ -222,5 +218,9 @@ extern void cf_set_cpu_frequency(long frequency);
 /* 124.1856 MHz */
 #define CPUFREQ_MAX_MULT     11
 #define CPUFREQ_MAX          (CPUFREQ_MAX_MULT * CPU_FREQ)
+
+void commit_discard_idcache(void);
+static inline void commit_discard_dcache(void) {}
+static inline void commit_dcache(void) {}
 
 #endif /* SYSTEM_TARGET_H */

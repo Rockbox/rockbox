@@ -209,7 +209,7 @@ static void disable_all_interrupts(void)
     GPIOL_INT_EN        = 0;
 }
 
-void ICODE_ATTR cpucache_commit(void)
+void ICODE_ATTR commit_dcache(void)
 {
     if (CACHE_CTL & CACHE_CTL_ENABLE)
     {
@@ -218,9 +218,8 @@ void ICODE_ATTR cpucache_commit(void)
         nop; nop; nop; nop;
     }
 }
-void cpucache_flush(void) __attribute__((alias("cpucache_commit")));
 
-void ICODE_ATTR cpucache_commit_discard(void)
+void ICODE_ATTR commit_discard_idcache(void)
 {
     if (CACHE_CTL & CACHE_CTL_ENABLE)
     {
@@ -229,7 +228,8 @@ void ICODE_ATTR cpucache_commit_discard(void)
         nop; nop; nop; nop;
     }
 }
-void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")));
+
+void commit_discard_dcache(void) __attribute__((alias("commit_discard_idcache")));
 
 static void init_cache(void)
 {

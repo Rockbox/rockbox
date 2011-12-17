@@ -53,42 +53,24 @@ void map_section(unsigned int pa, unsigned int va, int mb, int flags);
 
 /* Commits entire DCache */
 void commit_dcache(void);
-/* deprecated alias */
-void clean_dcache(void);
 
 /* Commit and discard entire DCache, will do writeback */
 void commit_discard_dcache(void);
-/* deprecated alias */
-void invalidate_dcache(void);
 
 /* Write DCache back to RAM for the given range and remove cache lines
  * from DCache afterwards */
 void commit_discard_dcache_range(const void *base, unsigned int size);
-/* deprecated alias */
-void invalidate_dcache_range(const void *base, unsigned int size);
 
 /* Write DCache back to RAM for the given range */
 void commit_dcache_range(const void *base, unsigned int size);
-/* deprecated alias */
-void clean_dcache_range(const void *base, unsigned int size);
 
 /*
  * Remove cache lines for the given range from DCache
  * will *NOT* do write back except for buffer edges not on a line boundary
  */
 void discard_dcache_range(const void *base, unsigned int size);
-/* deprecated alias */
-void dump_dcache_range(const void *base, unsigned int size);
 
 /* Discards the entire ICache, and commit+discards the entire DCache */
 void commit_discard_idcache(void);
-/* deprecated alias */
-void invalidate_idcache(void);
-
-#define HAVE_CPUCACHE_COMMIT_DISCARD
-#define HAVE_CPUCACHE_COMMIT
-/* deprecated alias */
-#define HAVE_CPUCACHE_INVALIDATE
-#define HAVE_CPUCACHE_FLUSH
 
 #endif /* MMU_ARM_H */

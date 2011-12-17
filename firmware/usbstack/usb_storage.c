@@ -474,7 +474,7 @@ void usb_storage_init_connection(void)
     cbw_buffer = (void *)((unsigned int)(audio_buffer+31) & 0xffffffe0);
 #endif
     tb.transfer_buffer = cbw_buffer + MAX_CBW_SIZE;
-    cpucache_invalidate();
+    commit_discard_dcache();
 #ifdef USB_USE_RAMDISK
     ramdisk_buffer = tb.transfer_buffer + ALLOCATE_BUFFER_SIZE;
 #endif

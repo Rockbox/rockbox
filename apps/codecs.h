@@ -75,7 +75,7 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 43
+#define CODEC_API_VERSION 44
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -169,8 +169,8 @@ struct codec_api {
     void (*semaphore_release)(struct semaphore *s);
 #endif /* NUM_CORES */
 
-    void (*cpucache_flush)(void);
-    void (*cpucache_invalidate)(void);
+    void (*commit_dcache)(void);
+    void (*commit_discard_dcache)(void);
 
     /* strings and memory */
     char* (*strcpy)(char *dst, const char *src);
@@ -223,6 +223,7 @@ struct codec_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    void (*commit_discard_idcache)(void);
 };
 
 /* codec header */

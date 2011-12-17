@@ -46,7 +46,6 @@ void * lc_open(const char *filename, unsigned char *buf, size_t buf_size)
     /* Make sure COP cache is flushed and invalidated before loading */
     {
         int my_core = switch_core(CURRENT_CORE ^ 1);
-        cpucache_commit_discard();
         switch_core(my_core);
     }
 #endif
@@ -89,7 +88,7 @@ void * lc_open(const char *filename, unsigned char *buf, size_t buf_size)
     }
 
     /* commit dcache and discard icache */
-    cpucache_commit_discard();
+    commit_discard_idcache();
     /* return a pointer the header, reused by lc_get_header() */
     return hdr.load_addr;
 

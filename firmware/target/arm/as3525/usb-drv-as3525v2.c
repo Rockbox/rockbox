@@ -449,9 +449,9 @@ static void usb_drv_transfer(int ep, void *ptr, int len, bool out)
         : (void*)0x10000000;
     DEPTSIZ(ep, out) = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
     if(out)
-        dump_dcache_range(ptr, len);
+        discard_dcache_range(ptr, len);
     else
-        clean_dcache_range(ptr, len);
+        commit_dcache_range(ptr, len);
 
     logf("pkt=%d dma=%lx", nb_packets, DEPDMA(ep, out));
 

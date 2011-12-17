@@ -180,7 +180,7 @@ void DSPHINT(void)
         {
             unsigned long sdem_addr=(unsigned long)start - CONFIG_SDRAM_START;
             /* Flush any pending cache writes */
-            clean_dcache_range(start, size);
+            commit_dcache_range(start, size);
 
             /* set the new DMA values */
             DSP_(_sdem_addrl) = sdem_addr & 0xffff;

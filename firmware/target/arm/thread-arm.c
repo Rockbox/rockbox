@@ -34,7 +34,7 @@ static void __attribute__((naked)) USED_ATTR start_thread(void)
         "mov    r1, #0                   \n" /* Mark thread as running */
         "str    r1, [r0, #40]            \n"
 #if NUM_CORES > 1
-        "ldr    r0, =cpucache_invalidate \n" /* Invalidate this core's cache. */
+        "ldr    r0, =commit_discard_idcache \n" /* Invalidate this core's cache. */
         "mov    lr, pc                   \n" /* This could be the first entry into */
         "bx     r0                       \n" /* plugin or codec code for this core. */
 #endif

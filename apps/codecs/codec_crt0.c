@@ -45,7 +45,7 @@ enum codec_status codec_start(enum codec_entry_call_reason reason)
             ci->memcpy(iramstart, iramcopy, iram_size);
             ci->memset(iedata, 0, ibss_size);
             /* make the icache (if it exists) up to date with the new code */
-            ci->cpucache_invalidate();
+            ci->commit_discard_idcache();
             /* barrier to prevent reordering iram copy and BSS clearing,
              * because the BSS segment alias the IRAM copy.
              */
@@ -56,7 +56,7 @@ enum codec_status codec_start(enum codec_entry_call_reason reason)
         /* Some parts of bss may be used via a no-cache alias (at least
          * portalplayer has this). If we don't clear the cache, those aliases
          * may read garbage */
-        ci->cpucache_invalidate();
+        ci->commit_dcache();
     }
 #endif /* CONFIG_PLATFORM */
 

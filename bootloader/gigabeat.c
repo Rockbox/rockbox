@@ -195,7 +195,7 @@ void main(void)
     printf("Loading firmware");
 
     /* Flush out anything pending first */
-    cpucache_invalidate();
+    commit_discard_idcache();
 
     loadbuffer = (unsigned char*) 0x31000000;
     buffer_size = (unsigned char*)0x31400000 - loadbuffer;
@@ -209,7 +209,7 @@ void main(void)
 
     if (rc == EOK)
     {
-        cpucache_invalidate();
+        commit_discard_idcache();
         kernel_entry = (void*) loadbuffer;
         rc = kernel_entry();
     }

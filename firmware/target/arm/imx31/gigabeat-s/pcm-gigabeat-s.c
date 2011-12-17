@@ -99,7 +99,7 @@ static void play_dma_callback(void)
         return;
 
      /* Flush any pending cache writes */
-    clean_dcache_range(start, size);
+    commit_dcache_range(start, size);
     dma_play_bd.buf_addr = (void *)addr_virt_to_phys((unsigned long)start);
     dma_play_bd.mode.count = size;
     dma_play_bd.mode.command = TRANSFER_16BIT;
@@ -202,7 +202,7 @@ static void play_stop_pcm(void)
         unsigned long dsa = 0;
         dma_play_bd.buf_addr = NULL;
         dma_play_bd.mode.count = 0;
-        clean_dcache_range(&dsa, sizeof(dsa));
+        discard_dcache_range(&dsa, sizeof(dsa));
         sdma_write_words(&dsa, CHANNEL_CONTEXT_ADDR(DMA_PLAY_CH_NUM)+0x0b, 1);
     }
 
@@ -221,7 +221,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     if (!sdma_channel_reset(DMA_PLAY_CH_NUM))
         return;
 
-    clean_dcache_range(addr, size);
+    commit_dcache_range(addr, size);
     dma_play_bd.buf_addr =
         (void *)addr_virt_to_phys((unsigned long)(void *)addr);
     dma_play_bd.mode.count = size;
@@ -353,7 +353,7 @@ static void rec_dma_callback(void)
         return;
 
     /* Invalidate - buffer must be coherent */
-    dump_dcache_range(start, size);
+    discard_dcache_range(start, size);
 
     start = (void *)addr_virt_to_phys((unsigned long)start);
 
@@ -412,7 +412,7 @@ void pcm_rec_dma_stop(void)
         unsigned long pda = 0;
         dma_rec_bd.buf_addr = NULL;
         dma_rec_bd.mode.count = 0;
-        clean_dcache_range(&pda, sizeof(pda));
+        discard_dcache_range(&pda, sizeof(pda));
         sdma_write_words(&pda, CHANNEL_CONTEXT_ADDR(DMA_REC_CH_NUM)+0x0a, 1);
     }
 
@@ -428,7 +428,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
         return;
     
     /* Invalidate - buffer must be coherent */
-    dump_dcache_range(addr, size);
+    discard_dcache_range(addr, size);
 
     addr = (void *)addr_virt_to_phys((unsigned long)addr);
     dma_rec_bd.buf_addr = addr;

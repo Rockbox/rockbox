@@ -76,10 +76,8 @@ enum plugin_status plugin__start(const void *param)
         rb->audio_stop();
         rb->memcpy(iramstart, iramcopy, iram_size);
         rb->memset(iedata, 0, ibss_size);
-#ifdef HAVE_CPUCACHE_INVALIDATE
         /* make the icache (if it exists) up to date with the new code */
-        rb->cpucache_invalidate();
-#endif /* HAVE_CPUCACHE_INVALIDATE */
+        rb->commit_discard_idcache();
 
         /* barrier to prevent reordering iram copy and BSS clearing,
          * because the BSS segment alias the IRAM copy.
@@ -91,12 +89,10 @@ enum plugin_status plugin__start(const void *param)
     /* zero out the bss section */
     rb->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
 
-#ifdef HAVE_CPUCACHE_INVALIDATE
     /* Some parts of bss may be used via a no-cache alias (at least
      * portalplayer has this). If we don't clear the cache, those aliases
      * may read garbage */
-    rb->cpucache_invalidate();
-#endif /* HAVE_CPUCACHE_INVALIDATE */
+    rb->commit_dcache();
 #endif
 
     /* we come back here if exit() was called or the plugin returned normally */

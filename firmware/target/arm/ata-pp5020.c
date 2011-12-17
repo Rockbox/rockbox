@@ -181,11 +181,11 @@ bool ata_dma_setup(void *addr, unsigned long bytes, bool write) {
 
     if (write) {
         /* If unflushed, old data may be written to disk */
-        cpucache_flush();
+        commit_dcache();
     }
     else {
         /* Invalidate cache because new data may be present in RAM */
-        cpucache_invalidate();
+        commit_discard_dcache();
     }
 
     /* Clear pending interrupts so ata_dma_finish() can wait for an

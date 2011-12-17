@@ -57,4 +57,8 @@ extern bool showremote;
 extern int display_zoom;
 extern long start_tick;
 
+static inline void commit_dcache(void) {}
+static inline void commit_discard_dcache(void) {}
+static inline void commit_discard_idcache(void) {}
+
 #endif /* _SYSTEM_SDL_H_ */

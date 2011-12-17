@@ -475,7 +475,7 @@ bool ata_dma_setup(void *addr, unsigned long bytes, bool write)
         if (LIKELY(buf != addr))
         {
             /* addr is virtual */
-            clean_dcache_range(addr, bytes);
+            commit_dcache_range(addr, bytes);
         }
 
         /* Setup ATA controller for DMA transmit */
@@ -495,7 +495,7 @@ bool ata_dma_setup(void *addr, unsigned long bytes, bool write)
         if (LIKELY(buf != addr))
         {
             /* addr is virtual */
-            dump_dcache_range(addr, bytes);
+            discard_dcache_range(addr, bytes);
 
             if ((unsigned long)addr & 31)
             {

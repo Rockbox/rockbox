@@ -121,7 +121,8 @@ void copy_read_sectors(unsigned char* buf, int wordcount)
     /* Activate the channel */
     DMASKTRIG0 = 0x2;
 
-    invalidate_dcache_range((void *)buf, wordcount*2);
+    /* Dump cache for the buffer  */
+    discard_dcache_range((void *)buf, wordcount*2);
 
     /* Start DMA */
     DMASKTRIG0 |= 0x1;
@@ -129,6 +130,5 @@ void copy_read_sectors(unsigned char* buf, int wordcount)
     /* Wait for transfer to complete */
     while((DSTAT0 & 0x000fffff))
         yield();
-    /* Dump cache for the buffer  */
 }
 #endif

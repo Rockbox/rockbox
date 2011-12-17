@@ -324,7 +324,7 @@ static void NORETURN_ATTR handle_firmware_load(void)
 
     if (rc == EOK)
     {
-        cpucache_commit_discard();
+        commit_discard_idcache();
         asm volatile ("bx %0": : "r"(start_addr));
     }
 

@@ -301,7 +301,7 @@ remap_end:
 #endif
 
     /* Make memory coherent for devices */
-    bl      cpucache_commit_discard
+    bl      commit_discard_idcache
 
     bl      main
 

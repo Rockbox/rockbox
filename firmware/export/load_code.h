@@ -35,7 +35,7 @@ static inline void *lc_open_from_mem(void* addr, size_t blob_size)
 {
     (void)blob_size;
     /* commit dcache and discard icache */
-    cpucache_invalidate();
+    commit_discard_idcache();
     return addr;
 }
 static inline void *lc_get_header(void *handle) { return handle; }

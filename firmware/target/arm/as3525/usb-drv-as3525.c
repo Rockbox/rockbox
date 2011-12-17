@@ -432,7 +432,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
     endpoints[ep][1].rc  = -1;
 
     /* remove data buffer from cache */
-    invalidate_dcache_range(ptr, len);
+    discard_dcache_range(ptr, len);
 
     /* DMA setup */
     uc_desc->status    = USB_DMA_DESC_BS_HST_RDY |
@@ -509,7 +509,7 @@ static void ep_send(int ep, void *ptr, int len)
         USB_IEP_CTRL(ep) |= USB_EP_CTRL_FLUSH;
 
     /* Make sure data is committed to memory */
-    clean_dcache_range(ptr, len);
+    commit_dcache_range(ptr, len);
 
     logf("xx%s\n", make_hex(ptr, len));
 
@@ -625,7 +625,7 @@ static void handle_out_ep(int ep)
              /*
               * If parts of the just dmaed range are in cache, dump them now.
               */
-             dump_dcache_range(uc_desc->data_ptr, dma_len);
+             discard_dcache_range(uc_desc->data_ptr, dma_len);
         } else{
              logf("EP%d OUT token, st:%08x frm:%x (no data)\n", ep,
                  dma_sts & 0xf8000000, (dma_sts >> 16) & 0x7ff);

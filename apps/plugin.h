@@ -148,7 +148,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 214
+#define PLUGIN_API_VERSION 215
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -513,8 +513,8 @@ struct plugin_api {
     void (*cancel_cpu_boost)(void);
 #endif
 
-    void (*cpucache_flush)(void);
-    void (*cpucache_invalidate)(void);
+    void (*commit_dcache)(void);
+    void (*commit_discard_dcache)(void);
 
     /* load code api for overlay */
     void* (*lc_open)(const char *filename, unsigned char *buf, size_t buf_size);
@@ -948,7 +948,8 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    
+
+    void (*commit_discard_idcache)(void);
 };
 
 /* plugin header */

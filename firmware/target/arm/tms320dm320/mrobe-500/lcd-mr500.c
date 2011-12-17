@@ -318,7 +318,7 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
     dst     =   (char *)FRAME + (y * LCD_HEIGHT + x) * pix_width;
                     
     /* Flush the area that is being copied from. */
-    clean_dcache_range(src, (stride*pix_width*width));
+    commit_dcache_range(src, (stride*pix_width*width));
     
     /* Addresses are relative to start of SDRAM */
     src     -=  CONFIG_SDRAM_START;
@@ -393,9 +393,9 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
                 * pix_width;
     
     /* Flush the area that is being copied from. */
-    clean_dcache();
+    commit_dcache();
     
-//    clean_dcache_range(src, (stride*pix_width*width));
+//    commit_dcache_range(src, (stride*pix_width*width));
     
     /* Addresses are relative to start of SDRAM */
     src     -=  CONFIG_SDRAM_START;

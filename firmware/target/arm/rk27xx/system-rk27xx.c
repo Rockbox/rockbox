@@ -163,7 +163,7 @@ void udelay(unsigned usecs)
     );
 }
 
-void cpucache_commit_discard(void)
+void commit_discard_idcache(void)
 {
     /* invalidate cache way 0 */
     CACHEOP = 0x02;
@@ -177,8 +177,6 @@ void cpucache_commit_discard(void)
     /* wait for invalidate process to complete */
     while (CACHEOP & 0x03);   
 }
-
-void cpucache_invalidate(void) __attribute__((alias("cpucache_commit_discard")));
 
 void commit_discard_dcache_range (const void *base, unsigned int size)
 {
@@ -196,4 +194,5 @@ void commit_discard_dcache_range (const void *base, unsigned int size)
     }
 }
 
-void clean_dcache_range(const void *base, unsigned int size) __attribute__((alias("commit_discard_dcache_range")));
+void commit_dcache_range(const void *base, unsigned int size)
+    __attribute__((alias("commit_discard_dcache_range")));

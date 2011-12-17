@@ -133,4 +133,8 @@ extern const unsigned bit_n_table[32];
     : bit_n_table[n] \
 )
 
+static inline void commit_dcache(void) {}
+static inline void commit_discard_dcache(void) {}
+static inline void commit_discard_idcache(void) {}
+
 #endif /* SYSTEM_TARGET_H */
