@@ -176,7 +176,11 @@ static void compute_sb_offsets(struct sb_file_t *sb)
 
 static uint64_t generate_timestamp()
 {
-    struct tm tm_base = {0, 0, 0, 1, 0, 100, 0, 0, 1, 0, NULL}; /* 2000/1/1 0:00:00 */
+    struct tm tm_base;
+    memset(&tm_base, 0, sizeof(tm_base));
+    /* 2000/1/1 0:00:00 */
+    tm_base.tm_mday = 1;
+    tm_base.tm_year = 100;
     time_t t = time(NULL) - mktime(&tm_base);
     return (uint64_t)t * 1000000L;
 }
@@ -711,7 +715,11 @@ struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
     
     uint64_t micros = sb_header->timestamp;
     time_t seconds = (micros / (uint64_t)1000000L);
-    struct tm tm_base = {0, 0, 0, 1, 0, 100, 0, 0, 1, 0, NULL}; /* 2000/1/1 0:00:00 */
+    struct tm tm_base;
+    memset(&tm_base, 0, sizeof(tm_base));
+    /* 2000/1/1 0:00:00 */
+    tm_base.tm_mday = 1;
+    tm_base.tm_year = 100;
     seconds += mktime(&tm_base);
     struct tm *time = gmtime(&seconds);
     printf(GREEN, "  Creation date/time = ");
