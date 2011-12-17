@@ -22,7 +22,7 @@
 /***************************************************************************
  * void bitmod32(volatile uint32_t *addr, uint32_t bits, uint32_t mask)
  */
-    .section    .text, "ax", %progbits
+    .section    .text.bitmod32, "ax", %progbits
     .align      2
     .global     bitmod32
     .type       bitmod32, %function
@@ -41,7 +41,7 @@ bitmod32:
 /***************************************************************************
  * void bitset32(volatile uint32_t *addr, uint32_t mask)
  */
-    .section    .text, "ax", %progbits
+    .section    .text.bitset32, "ax", %progbits
     .align      2
     .global     bitset32
     .type       bitset32, %function
@@ -59,7 +59,7 @@ bitset32:
 /***************************************************************************
  * void bitclr32(volatile uint32_t *addr, uint32_t mask)
  */
-     .section    .text, "ax", %progbits
+     .section    .text.bitclr32, "ax", %progbits
      .align      2
      .global     bitclr32
      .type       bitclr32, %function

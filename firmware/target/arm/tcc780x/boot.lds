@@ -27,16 +27,15 @@ SECTIONS
 {
     .text : {
         *(.init.text)
-        *(.text)
         *(.text*)
         *(.glue_7)
         *(.glue_7t)
    } > DRAM
 
     .data : {
-        *(.icode)
-        *(.irodata)
-        *(.idata)
+        *(.icode*)
+        *(.irodata*)
+        *(.idata*)
         *(.data*)
         *(.rodata.*)
         . = ALIGN(0x4);
@@ -55,7 +54,7 @@ SECTIONS
     .bss (NOLOAD) : {
          _edata = .;
          *(.bss*);
-         *(.ibss);
+         *(.ibss*);
          *(COMMON)
          _end = .;
      } > DRAM

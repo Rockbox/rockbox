@@ -51,10 +51,7 @@ SECTIONS
 
     .rodata :
     {
-        *(.rodata)  /* problems without this, dunno why */
         *(.rodata*)
-        *(.rodata.str1.1)
-        *(.rodata.str1.4)
         . = ALIGN(0x4);
     } > DRAM
 
@@ -97,9 +94,9 @@ SECTIONS
     .iram :
     {
         _iramstart = .;
-        *(.irodata)
-        *(.idata)
-        *(.icode)
+        *(.irodata*)
+        *(.idata*)
+        *(.icode*)
         . = ALIGN(0x4);
         _iramend = .;
     } > SRAM AT> DRAM
@@ -109,7 +106,7 @@ SECTIONS
     .ibss (NOLOAD) :
     {
         _iedata = .;
-        *(.ibss)
+        *(.ibss*)
         . = ALIGN(0x4);
         _iend = .;
     } > SRAM

@@ -22,7 +22,7 @@
 /***************************************************************************
  * void bitmod32(volatile uint32_t *addr, uint32_t bits, uint32_t mask)
  */
-    .section    .text, "ax", %progbits
+    .section    .text.bitmod32, "ax", %progbits
     .align      2
     .global     bitmod32
     .type       bitmod32, %function
@@ -42,7 +42,7 @@ bitmod32:
 /***************************************************************************
  * void bitset32(volatile uint32_t *addr, uint32_t mask)
  */
-    .section    .text, "ax", %progbits
+    .section    .text.bitset32, "ax", %progbits
     .align      2
     .global     bitset32
     .type       bitset32, %function
@@ -61,7 +61,7 @@ bitset32:
 /***************************************************************************
  * void bitclr32(volatile uint32_t *addr, uint32_t mask)
  */
-     .section    .text, "ax", %progbits
+     .section    .text.bitclr32, "ax", %progbits
      .align      2
      .global     bitclr32
      .type       bitclr32, %function
@@ -79,7 +79,7 @@ bitclr32:
 /***************************************************************************
  * void bitmod16(volatile uint16_t *addr, uint16_t bits, uint16_t mask)
  */
-    .section    .text, "ax", %progbits
+    .section    .text.bitmod16, "ax", %progbits
     .align      2
     .global     bitmod16
     .type       bitmod16, %function
@@ -99,7 +99,7 @@ bitmod16:
 /***************************************************************************
  * void bitset16(volatile uint16_t *addr, uint16_t mask)
  */
-    .section    .text, "ax", %progbits
+    .section    .text.bitset16, "ax", %progbits
     .align      2
     .global     bitset16
     .type       bitset16, %function
@@ -118,7 +118,7 @@ bitset16:
 /***************************************************************************
  * void bitclr16(volatile uint16_t *addr, uint16_t mask)
  */
-     .section    .text, "ax", %progbits
+     .section    .text.bitclr16, "ax", %progbits
      .align      2
      .global     bitclr16
      .type       bitclr16, %function

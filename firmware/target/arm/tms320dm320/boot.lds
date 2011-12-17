@@ -136,9 +136,9 @@ SECTIONS
     {
         . = ALIGN(0x4);
         _iramstart = .;
-        *(.icode)
-        *(.irodata)
-        *(.idata)
+        *(.icode*)
+        *(.irodata*)
+        *(.idata*)
         _iramend = .;
     } > IRAM AT> FLASH
 
@@ -148,7 +148,7 @@ SECTIONS
     {
         . = ALIGN(0x4);
         _ibss_start = .;
-        *(.ibss)
+        *(.ibss*)
         _ibss_end = .;
     } > IRAM
 

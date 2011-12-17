@@ -51,10 +51,7 @@ SECTIONS
 
     .rodata :
     {
-        *(.rodata)  /* problems without this, dunno why */
         *(.rodata*)
-        *(.rodata.str1.1)
-        *(.rodata.str1.4)
         . = ALIGN(0x4);
     } > DRAM
 
@@ -95,7 +92,7 @@ SECTIONS
     {
         _iedata = .;
         *(.qharray)
-        *(.ibss)
+        *(.ibss*)
         . = ALIGN(0x4);
         _iend = .;
     } > IRAM
@@ -103,9 +100,9 @@ SECTIONS
     .iram _iend :
     {
         _iramstart = .;
-        *(.icode)
-        *(.irodata)
-        *(.idata)
+        *(.icode*)
+        *(.irodata*)
+        *(.idata*)
         . = ALIGN(0x4);
         _iramend = .;
     } > IRAM AT> DRAM

@@ -30,7 +30,7 @@ SECTIONS
     {
         *(.init.text)
         *(.text*)
-	*(.icode)
+	*(.icode*)
         *(.glue_7)
         *(.glue_7t)
         . = ALIGN(0x4);
@@ -38,21 +38,17 @@ SECTIONS
 
     .rodata :
     {
-        *(.rodata)  /* problems without this, dunno why */
         *(.rodata*)
-        *(.rodata.str1.1)
-        *(.rodata.str1.4)
+        *(.irodata*)
         . = ALIGN(0x4);
-
         /* Pseudo-allocate the copies of the data sections */
         _datacopy = .;
     } > DRAM
 
     .data :
     {
-        *(.irodata)
-        *(.idata)
         *(.data*)
+        *(.idata*)
         _dataend = . ;
     } > DRAM
 
@@ -93,7 +89,7 @@ SECTIONS
     {
          _edata = .;
          *(.bss*);
-         *(.ibss);
+         *(.ibss*);
          *(COMMON)
          . = ALIGN(0x4);
     } > DRAM

@@ -28,7 +28,7 @@
  * void lcd_copy_buffer_rect(fb_data *dst, fb_data *src, int width,
  *                           int height);
  */
-     .section    .icode, "ax", %progbits
+     .section    .icode.lcd_copy_buffer_rect, "ax", %progbits
      .align      2
      .global     lcd_copy_buffer_rect
      .type       lcd_copy_buffer_rect, %function
@@ -55,7 +55,7 @@ lcd_copy_buffer_rect:                   @
                                         @ align (rw)
     and     r14, r14, #0xe              @ r14 = 0 (16), 2, 4, 6, 8, 10, 12, 14
     add     pc, pc, r14, lsl #3         @ branch to 32-byte align
-    nop                                 @ 
+    nop                                 @
     b       30f                         @ rw % 16 = 0 or 1? use octword loop
     nop                                 @
     nop                                 @
@@ -93,7 +93,7 @@ lcd_copy_buffer_rect:                   @
     ldmia   r1!, { r6-r12, r14 }        @
     subs    r2, r2, #16                 @
     stmia   r0!, { r6-r12, r14 }        @
-    bgt     30b @ octword loop          @ 
+    bgt     30b @ octword loop          @
 40: @ finish line                       @
     ldreqh  r6, [r1], #2                @ finish last halfword if eq ...
     add     r1, r1, r4, lsl #1          @
@@ -123,7 +123,7 @@ lcd_copy_buffer_rect:                   @
  * 1 3 + > down
  * 2 4 \/ left
  */
-    .section    .icode, "ax", %progbits
+    .section    .icode.lcd_write_yuv420_lines, "ax", %progbits
     .align      2
     .global     lcd_write_yuv420_lines
     .type       lcd_write_yuv420_lines, %function
@@ -376,7 +376,7 @@ lcd_write_yuv420_lines:
  * 4 2 5 3 | 3 7 2 6 | 3 5 7 1 2 4 6 0 col2  \/
  * 0 6 1 7   5 1 4 0
  */
-    .section    .icode, "ax", %progbits
+    .section    .icode.lcd_write_yuv420_lines_odither, "ax", %progbits
     .align      2
     .global     lcd_write_yuv420_lines_odither
     .type       lcd_write_yuv420_lines_odither, %function
@@ -410,7 +410,7 @@ lcd_write_yuv420_lines_odither:
     add         r12, r7, r7, asl #2     @
     add         r12, r12, r12, asl #4   @
     add         r7, r12, r7, asl #6     @
-                                        @    
+                                        @
     sub         r8, r8, #128            @ Cb -= 128
     sub         r9, r9, #128            @ Cr -= 128
                                         @

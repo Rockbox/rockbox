@@ -52,9 +52,9 @@ SECTIONS
         _iramstart = .; // always 0
         *(.vectors)
         KEEP(*(.vectors));// otherwise there are no references to it and the linker strip it
-        *(.icode)
-        *(.irodata)
-        *(.idata)
+        *(.icode*)
+        *(.irodata*)
+        *(.idata*)
         . = ALIGN(0x4);
         _iramend = .;
     } > IRAM AT> DRAM
@@ -65,7 +65,7 @@ SECTIONS
     {
         _iedata = .;
         *(.qharray)
-        *(.ibss)
+        *(.ibss*)
         . = ALIGN(0x4);
         _iend = .;
     } > IRAM

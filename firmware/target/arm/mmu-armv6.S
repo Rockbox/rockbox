@@ -32,7 +32,7 @@
  * from DCache afterwards
  * void commit_discard_dcache_range(const void *base, unsigned int size);
  */
-    .section   .text, "ax", %progbits
+    .section   .text.commit_discard_dcache_range, "ax", %progbits
     .align      2
     .global     commit_discard_dcache_range
     .type       commit_discard_dcache_range, %function
@@ -56,7 +56,7 @@ invalidate_dcache_range:
  * Write DCache back to RAM for the given range
  * void commit_dcache_range(const void *base, unsigned int size);
  */
-    .section   .text, "ax", %progbits
+    .section   .text.commit_dcache_range, "ax", %progbits
     .align      2
     .global     commit_dcache_range
     .type       commit_dcache_range, %function
@@ -79,7 +79,7 @@ clean_dcache_range:
  * will *NOT* do write back except for buffer edges not on a line boundary
  * void discard_dcache_range(const void *base, unsigned int size);
  */
-    .section   .text, "ax", %progbits
+    .section   .text.discard_dcache_range, "ax", %progbits
     .align      2
     .global     discard_dcache_range
     .type       discard_dcache_range, %function
@@ -90,7 +90,7 @@ discard_dcache_range:
 dump_dcache_range:
     add     r1, r0, r1              @ size -> end
     cmp     r1, r0                  @ end <= start?
-    bxls    lr                      @ 
+    bxls    lr                      @
     tst     r0, #31                 @ Check first line for bits set
     bicne   r0, r0, #31             @ Clear low five bits (down)
     mcrne   p15, 0, r0, c7, c14, 1  @ Clean and invalidate line by MVA
@@ -114,7 +114,7 @@ dump_dcache_range:
  * Write entire DCache back to RAM
  * void commit_dcache(void);
  */
-    .section   .text, "ax", %progbits
+    .section   .text.commit_dcache, "ax", %progbits
     .align      2
     .global     commit_dcache
     .type       commit_dcache, %function
@@ -136,7 +136,7 @@ cpucache_flush:
  * Clean and invalidate entire DCache, will do writeback
  * void commit_discard_dcache(void);
  */
-    .section   .icode, "ax", %progbits
+    .section   .icode.commit_discard_dcache, "ax", %progbits
     .align      2
     .global     commit_discard_dcache
     .type       commit_discard_dcache, %function
@@ -149,13 +149,13 @@ invalidate_dcache:
     mcr     p15, 0, r0, c7, c10, 4  @ Data synchronization barrier
     bx      lr                      @
     .size   commit_discard_dcache, .-commit_discard_dcache
-    
+
 
 /*
  * Discards the entire ICache, and commit+discards the entire DCache
  * void cpucache_commit_discard(void);
  */
-    .section   .icode, "ax", %progbits
+    .section   .icode.cpucache_commit_discard, "ax", %progbits
     .align      2
     .global     cpucache_commit_discard
     .type       cpucache_commit_discard, %function

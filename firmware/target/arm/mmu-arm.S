@@ -85,7 +85,7 @@
 /*
  * void ttb_init(void);
  */
-    .section    .text, "ax", %progbits
+    .section    .text.ttb_init, "ax", %progbits
     .align      2
     .global     ttb_init
     .type       ttb_init, %function
@@ -100,7 +100,7 @@ ttb_init:
 /*
  * void map_section(unsigned int pa, unsigned int va, int mb, int flags);
  */
-    .section    .text, "ax", %progbits
+    .section    .text.map_section, "ax", %progbits
     .align      2
     .global     map_section
     .type       map_section, %function
@@ -148,7 +148,7 @@ map_section:
 /*
  * void enable_mmu(void);
  */
-    .section    .text, "ax", %progbits
+    .section    .text.enable_mmu, "ax", %progbits
     .align      2
     .global     enable_mmu
     .type       enable_mmu, %function
@@ -180,7 +180,7 @@ enable_mmu:
  * from DCache afterwards
  * void commit_discard_dcache_range(const void *base, unsigned int size);
  */
-    .section   .text, "ax", %progbits
+    .section   .text.commit_discard_dcache_range, "ax", %progbits
     .align      2
     .global     commit_discard_dcache_range
     .type       commit_discard_dcache_range, %function
@@ -228,7 +228,7 @@ invalidate_dcache_range:
  * Write DCache back to RAM for the given range
  * void commit_dcache_range(const void *base, unsigned int size);
  */
-    .section   .text, "ax", %progbits
+    .section   .text.commit_dcache_range, "ax", %progbits
     .align      2
     .global     commit_dcache_range
     .type       commit_dcache_range, %function
@@ -277,7 +277,7 @@ clean_dcache_range:
  * will *NOT* do write back except for buffer edges not on a line boundary
  * void discard_dcache_range(const void *base, unsigned int size);
  */
-    .section   .text, "ax", %progbits
+    .section   .text.discard_dcache_range, "ax", %progbits
     .align      2
     .global     discard_dcache_range
     .type       discard_dcache_range, %function
@@ -335,7 +335,7 @@ dump_dcache_range:
  * Write entire DCache back to RAM
  * void commit_dcache(void);
  */
-    .section   .text, "ax", %progbits
+    .section   .text.commit_dcache, "ax", %progbits
     .align      2
     .global     commit_dcache
     .type       commit_dcache, %function
@@ -372,7 +372,7 @@ cpucache_flush:
  * Commit and discard entire DCache, will do writeback
  * void commit_discard_dcache(void);
  */
-    .section   .icode, "ax", %progbits
+    .section   .icode.commit_discard_dcache, "ax", %progbits
     .align      2
     .global     commit_discard_dcache
     .type       commit_discard_dcache, %function
@@ -405,7 +405,7 @@ invalidate_dcache:
  * Discards the entire ICache, and commit+discards the entire DCache
  * void commit_discard_idcache(void);
  */
-    .section   .icode, "ax", %progbits
+    .section   .icode.commit_discard_idcache, "ax", %progbits
     .align      2
     .global     commit_discard_idcache
     .type       commit_discard_idcache, %function
