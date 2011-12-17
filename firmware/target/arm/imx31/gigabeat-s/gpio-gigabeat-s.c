@@ -40,6 +40,7 @@ const struct gpio_event gpio1_events[] =
         .sense    = GPIO_SENSE_HIGH_LEVEL,
         .callback = mc13783_event,
     },
+#ifndef BOOTLOADER
     /* Generates a 5ms low pulse on the line - detect the falling edge */
     [SI4700_STC_RDS_EVENT_ID] =
     {
@@ -47,4 +48,5 @@ const struct gpio_event gpio1_events[] =
         .sense    = GPIO_SENSE_FALLING,
         .callback = si4700_stc_rds_event,
     },
+#endif
 };
