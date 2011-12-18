@@ -84,7 +84,7 @@ SECTIONS
         KEEP(*(.resetvectors));
         KEEP(*(.vectors));
         . = ALIGN(0x200);
-        *(.data)
+        *(.data*)
         . = ALIGN(0x4);
         _dataend = .;        
         . = ALIGN(0x10);  /* Maintain proper alignment for .text section */
@@ -101,13 +101,13 @@ SECTIONS
     .text LOADADDR(.data) + SIZEOF(.data) :
     {
         *(.init.text)
-        *(.text)
+        *(.text*)
         . = ALIGN(0x4);
     } > FLASH
 
     .rodata :
     {
-        *(.rodata)
+        *(.rodata*)
         *(.rodata.str1.1)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
