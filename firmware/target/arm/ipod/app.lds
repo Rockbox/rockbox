@@ -84,7 +84,7 @@ SECTIONS
     .vectors 0x0 :
     {
         _vectorsstart = .;
-        *(.vectors);
+        KEEP(*(.vectors));
         _vectorsend = .;
     } AT> DRAM
 

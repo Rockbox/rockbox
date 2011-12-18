@@ -4,7 +4,7 @@ SECTIONS
 {
     .text 0x09010000 :
     {
-	*(.vectors)
+	KEEP(*(.vectors))
         . = ALIGN(0x200);
         *(.init.text)
     }

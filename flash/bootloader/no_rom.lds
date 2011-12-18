@@ -13,7 +13,7 @@ SECTIONS
 {
 	.vectors :
 	{
-		*(.vectors)
+		KEEP(*(.vectors))
 		. = ALIGN(0x200);
 	} > FLASH
 

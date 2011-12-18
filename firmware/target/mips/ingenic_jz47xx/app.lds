@@ -55,14 +55,14 @@ SECTIONS
     .iram IRAMORIG: AT (_edata)
     {
         _iramstart = .;
-        *(.vectors.1);
+        KEEP(*(.vectors.1));
         . = 0x100;
-        *(.vectors.2);
+        KEEP(*(.vectors.2));
         . = 0x180;
-        *(.vectors.3);
+        KEEP(*(.vectors.3));
         . = 0x200;
-        *(.vectors.4);
-        *(.vectors);
+        KEEP(*(.vectors.4));
+        KEEP(*(.vectors));
 
         *(.icode);
         *(.irodata);

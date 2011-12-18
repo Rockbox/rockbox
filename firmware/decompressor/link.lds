@@ -17,7 +17,7 @@ SECTIONS
     {
         _loadaddress = .;
         _dramend = . + DRAMSIZE;
-        *(.vectors)
+        KEEP(*(.vectors))
         . = ALIGN(0x200);
     } > DRAM
 

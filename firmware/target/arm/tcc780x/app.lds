@@ -69,7 +69,7 @@ SECTIONS
     .vectors ITCMORIG :
     {
         _vectorsstart = .;
-        *(.vectors);
+        KEEP(*(.vectors));
         _vectorsend = .;
     } > ITCM AT> DRAM
 

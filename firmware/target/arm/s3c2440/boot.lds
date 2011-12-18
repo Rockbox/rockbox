@@ -23,7 +23,7 @@ SECTIONS
     .vectors DRAMORIG :
     {
         _vectorstart = .;
-        *(.vectors*);
+        KEEP(*(.vectors*));
         *(.init.text)
         . = ALIGN(0x4);
     } > DRAM

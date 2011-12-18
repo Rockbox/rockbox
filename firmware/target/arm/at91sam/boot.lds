@@ -29,7 +29,7 @@ SECTIONS
     .vectors 0 : AT (DRAMORIG + DRAMSIZE - 1M)
     {
         _start_vectors_section = .;
-        *(.vectors)
+        KEEP(*(.vectors))
         *(.glue_7)
         *(.glue_7t)
         . = ALIGN(4);

@@ -77,7 +77,7 @@ SECTIONS
     {
         . = ALIGN(0x4);
         _vectorsstart = .;
-        *(.vectors);
+        KEEP(*(.vectors));
         _vectorsend = .;
     } > ITCM AT> DRAM
 

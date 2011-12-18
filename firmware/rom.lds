@@ -81,8 +81,8 @@ SECTIONS
         loadaddress = .;
         _loadaddress = .;
         _datastart = .;
-        *(.resetvectors);
-        *(.vectors);
+        KEEP(*(.resetvectors));
+        KEEP(*(.vectors));
         . = ALIGN(0x200);
         *(.data)
         . = ALIGN(0x4);

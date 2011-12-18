@@ -73,7 +73,7 @@ SECTIONS
     .vectors 0x0 :
     {
         _vectorsstart = .;
-        *(.vectors);
+        KEEP(*(.vectors));
         _vectorsend = .;
         *(.dmabuf)
     } >IRAM0 AT> DRAM
