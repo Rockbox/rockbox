@@ -1007,14 +1007,17 @@ void setid3v2title(int fd, struct mp3entry *entry)
                                 char_enc = CHAR_ENC_ISO_8859_1;
                                 break;
                             case 0x01:
-                                char_enc = CHAR_ENC_UTF_16_LE;
-                                /* \1 + \xff\xfe + C\0U\0E\0S\0H\0E\0E\0T\0\0\0 = 21 */
+                                if (memcmp(tag, "\1\xfe\xff", 3))
+                                    char_enc = CHAR_ENC_UTF_16_BE;
+                                else if (memcmp(tag, "\1\xff\xfe", 3))
+                                    char_enc = CHAR_ENC_UTF_16_LE;
+                                /* \1 + BOM(2) + C0U0E0S0H0E0E0T000 = 21 */
                                 cuesheet_offset = 21;
                                 break;
                             case 0x02:
                                 char_enc = CHAR_ENC_UTF_16_BE;
-                                /* \2 + \xfe\xff + \0C\0U\0E\0S\0H\0E\0E\0T\0\0 = 21 */
-                                cuesheet_offset = 21;
+                                /* \2 + 0C0U0E0S0H0E0E0T00 = 19 */
+                                cuesheet_offset = 19;
                                 break;
                             case 0x03:
                                 char_enc = CHAR_ENC_UTF_8;
