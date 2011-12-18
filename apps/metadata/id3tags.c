@@ -1000,7 +1000,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
                        (bytesread >= 14 && !strncmp(utf8buf, "CUESHEET", 8))
                     ) {
                         unsigned char char_enc = 0;
-                        /* 0CUESHEET0 = 10 bytes */
+                        /* [enc type]+"CUESHEET\0" = 10 */
                         unsigned char cuesheet_offset = 10;
                         switch (tag[0]) {
                             case 0x00:
@@ -1008,11 +1008,13 @@ void setid3v2title(int fd, struct mp3entry *entry)
                                 break;
                             case 0x01:
                                 char_enc = CHAR_ENC_UTF_16_LE;
-                                cuesheet_offset += cuesheet_offset+1;
+                                /* \1 + \xff\xfe + C\0U\0E\0S\0H\0E\0E\0T\0\0\0 = 21 */
+                                cuesheet_offset = 21;
                                 break;
                             case 0x02:
                                 char_enc = CHAR_ENC_UTF_16_BE;
-                                cuesheet_offset += cuesheet_offset+1;
+                                /* \2 + \xfe\xff + \0C\0U\0E\0S\0H\0E\0E\0T\0\0 = 21 */
+                                cuesheet_offset = 21;
                                 break;
                             case 0x03:
                                 char_enc = CHAR_ENC_UTF_8;
