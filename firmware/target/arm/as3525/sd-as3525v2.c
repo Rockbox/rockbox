@@ -978,17 +978,7 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
 int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
                      const void* buf)
 {
-#if defined(BOOTLOADER) /* we don't need write support in bootloader */
-#ifdef HAVE_MULTIDRIVE
-    (void) drive;
-#endif
-    (void) start;
-    (void) count;
-    (void) buf;
-    return -1;
-#else
     return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
-#endif /* defined(BOOTLOADER) */
 }
 
 #ifndef BOOTLOADER
