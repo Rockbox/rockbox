@@ -34,10 +34,6 @@ static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
 static const char * const mc13783_thread_name = "pmic";
 static struct semaphore mc13783_svc_wake;
 
-/* Synchronous thread communication objects */
-static struct mutex mc13783_spi_mutex;
-static struct semaphore mc13783_spi_complete;
-
 /* Tracking for which interrupts are enabled */
 static uint32_t pmic_int_enabled[2] =
     { 0x00000000, 0x00000000 };
@@ -50,32 +46,27 @@ static const unsigned char pmic_ints_regs[2] =
 
 static volatile unsigned int mc13783_thread_id = 0;
 
-static void mc13783_xfer_complete_cb(struct spi_transfer_desc *trans);
-
-/* Transfer descriptor for synchronous reads and writes */
-static struct spi_transfer_desc mc13783_transfer =
+/* Extend the basic SPI transfer descriptor with our own fields */
+struct mc13783_transfer_desc
 {
-    .node = &mc13783_spi,
-    .txbuf = NULL,
-    .rxbuf = NULL,
-    .count = 0,
-    .callback = mc13783_xfer_complete_cb,
-    .next = NULL,
+    struct spi_transfer_desc xfer;
+    union
+    {
+        struct semaphore sema;
+        uint32_t data;
+    };
 };
 
 /* Called when a transfer is finished and data is ready/written */
 static void mc13783_xfer_complete_cb(struct spi_transfer_desc *xfer)
 {
-    if (xfer->count != 0)
-        return;
-
-    semaphore_release(&mc13783_spi_complete);
+    semaphore_release(&((struct mc13783_transfer_desc *)xfer)->sema);
 }
 
-static inline bool wait_for_transfer_complete(void)
+static inline bool wait_for_transfer_complete(struct mc13783_transfer_desc *xfer)
 {
-    return semaphore_wait(&mc13783_spi_complete, HZ*2)
-            == OBJ_WAIT_SUCCEEDED && mc13783_transfer.count == 0;
+    return semaphore_wait(&xfer->sema, TIMEOUT_BLOCK)
+            == OBJ_WAIT_SUCCEEDED && xfer->xfer.count == 0;
 }
 
 static void mc13783_interrupt_thread(void)
@@ -114,15 +105,14 @@ static void mc13783_interrupt_thread(void)
         /* .count is surely expected to be > 0 */
         do
         {
-            enum mc13783_event_sets set = event->set;
+            unsigned int set = event->int_id / MC13783_INT_ID_SET_DIV;
             uint32_t pnd = pending[set];
-            uint32_t mask = event->mask;
+            uint32_t mask = 1 << (event->int_id & MC13783_INT_ID_NUM_MASK);
 
             if (pnd & mask)
             {
                 event->callback();
-                pnd &= ~mask;
-                pending[set] = pnd;
+                pending[set] = pnd & ~mask;
             }
 
             if ((pending[0] | pending[1]) == 0)
@@ -147,9 +137,6 @@ void INIT_ATTR mc13783_init(void)
 {
     /* Serial interface must have been initialized first! */
     semaphore_init(&mc13783_svc_wake, 1, 0);
-    mutex_init(&mc13783_spi_mutex);
-
-    semaphore_init(&mc13783_spi_complete, 1, 0);
 
     /* Enable the PMIC SPI module */
     spi_enable_module(&mc13783_spi);
@@ -183,15 +170,11 @@ void mc13783_close(void)
 bool mc13783_enable_event(enum mc13783_event_ids id)
 {
     const struct mc13783_event * const event = &mc13783_events[id];
-    int set = event->set;
-    uint32_t mask = event->mask;
-
-    mutex_lock(&mc13783_spi_mutex);
+    unsigned int set = event->int_id / MC13783_INT_ID_SET_DIV;
+    uint32_t mask = 1 << (event->int_id & MC13783_INT_ID_NUM_MASK);
 
     pmic_int_enabled[set] |= mask;
     mc13783_clear(pmic_intm_regs[set], mask);
-
-    mutex_unlock(&mc13783_spi_mutex);
 
     return true;
 }
@@ -199,189 +182,157 @@ bool mc13783_enable_event(enum mc13783_event_ids id)
 void mc13783_disable_event(enum mc13783_event_ids id)
 {
     const struct mc13783_event * const event = &mc13783_events[id];
-    int set = event->set;
-    uint32_t mask = event->mask;
-
-    mutex_lock(&mc13783_spi_mutex);
+    unsigned int set = event->int_id / MC13783_INT_ID_SET_DIV;
+    uint32_t mask = 1 << (event->int_id & MC13783_INT_ID_NUM_MASK);
 
     pmic_int_enabled[set] &= ~mask;
     mc13783_set(pmic_intm_regs[set], mask);
+}
 
-    mutex_unlock(&mc13783_spi_mutex);
+static inline bool mc13783_transfer(struct spi_transfer_desc *xfer,
+                                    uint32_t *txbuf,
+                                    uint32_t *rxbuf,
+                                    int count,
+                                    spi_transfer_cb_fn_type callback)
+{
+    xfer->node = &mc13783_spi;
+    xfer->txbuf = txbuf;
+    xfer->rxbuf = rxbuf;
+    xfer->count = count;
+    xfer->callback = callback;
+    xfer->next = NULL;
+
+    return spi_transfer(xfer);
 }
 
 uint32_t mc13783_set(unsigned address, uint32_t bits)
 {
-    uint32_t data;
-
-    mutex_lock(&mc13783_spi_mutex);
-
-    data = mc13783_read(address);
-
-    if (data != MC13783_DATA_ERROR)
-        mc13783_write(address, data | bits);
-
-    mutex_unlock(&mc13783_spi_mutex);
-
-    return data;
+    return mc13783_write_masked(address, bits, bits);
 }
 
 uint32_t mc13783_clear(unsigned address, uint32_t bits)
 {
-    uint32_t data;
-
-    mutex_lock(&mc13783_spi_mutex);
-
-    data = mc13783_read(address);
-
-    if (data != MC13783_DATA_ERROR)
-        mc13783_write(address, data & ~bits);
-
-    mutex_unlock(&mc13783_spi_mutex);
-
-    return data;
+    return mc13783_write_masked(address, 0, bits);
 }
 
-int mc13783_write(unsigned address, uint32_t data)
+/* Called when the first transfer of mc13783_write_masked is complete */
+static void mc13783_write_masked_cb(struct spi_transfer_desc *xfer)
 {
-    uint32_t packet;
-    int i;
-
-    if (address >= MC13783_NUM_REGS)
-        return -1;
-
-    packet = (1 << 31) | (address << 25) | (data & 0xffffff);
-
-    mutex_lock(&mc13783_spi_mutex);
-
-    mc13783_transfer.txbuf = &packet;
-    mc13783_transfer.rxbuf = NULL;
-    mc13783_transfer.count = 1;
-
-    i = -1;
-
-    if (spi_transfer(&mc13783_transfer) && wait_for_transfer_complete())
-        i = 1 - mc13783_transfer.count;
-
-    mutex_unlock(&mc13783_spi_mutex);
-
-    return i;
+    struct mc13783_transfer_desc *desc = (struct mc13783_transfer_desc *)xfer;
+    uint32_t *packets = desc->xfer.rxbuf; /* Will have been advanced by 1 */
+    packets[0] |= packets[-1] & ~desc->data;
 }
 
 uint32_t mc13783_write_masked(unsigned address, uint32_t data, uint32_t mask)
 {
-    uint32_t old;
+    if (address >= MC13783_NUM_REGS)
+        return MC13783_DATA_ERROR;
 
-    mutex_lock(&mc13783_spi_mutex);
+    mask &= 0xffffff;
 
-    old = mc13783_read(address);
-
-    if (old != MC13783_DATA_ERROR)
+    uint32_t packets[2] =
     {
-        data = (old & ~mask) | (data & mask);
+        address << 25,
+        (1 << 31) | (address << 25) | (data & mask)
+    };
 
-        if (mc13783_write(address, data) != 1)
-            old = MC13783_DATA_ERROR;
-    }
+    struct mc13783_transfer_desc xfers[2];
+    xfers[0].data = mask;
+    semaphore_init(&xfers[1].sema, 1, 0);
 
-    mutex_unlock(&mc13783_spi_mutex);
+    unsigned long cpsr = disable_irq_save();
 
-    return old;
+    /* Queue up two transfers in a row */
+    bool ok = mc13783_transfer(&xfers[0].xfer, &packets[0], &packets[0], 1,
+                               mc13783_write_masked_cb) &&
+              mc13783_transfer(&xfers[1].xfer, &packets[1], NULL, 1,
+                               mc13783_xfer_complete_cb);
+
+    restore_irq(cpsr);
+
+    if (ok && wait_for_transfer_complete(&xfers[1]))
+        return packets[0];
+
+    return MC13783_DATA_ERROR;
 }
 
 uint32_t mc13783_read(unsigned address)
 {
-    uint32_t packet;
-
     if (address >= MC13783_NUM_REGS)
         return MC13783_DATA_ERROR;
 
-    packet = address << 25;
+    uint32_t packet = address << 25;
 
-    mutex_lock(&mc13783_spi_mutex);
+    struct mc13783_transfer_desc xfer;
+    semaphore_init(&xfer.sema, 1, 0);
 
-    mc13783_transfer.txbuf = &packet;
-    mc13783_transfer.rxbuf = &packet;
-    mc13783_transfer.count = 1;
+    if (mc13783_transfer(&xfer.xfer, &packet, &packet, 1,
+                         mc13783_xfer_complete_cb) &&
+        wait_for_transfer_complete(&xfer))
+    {
+        return packet;
+    }
 
-    if (!spi_transfer(&mc13783_transfer) || !wait_for_transfer_complete())
-        packet = MC13783_DATA_ERROR;
+    return MC13783_DATA_ERROR;
+}
 
-    mutex_unlock(&mc13783_spi_mutex);
+int mc13783_write(unsigned address, uint32_t data)
+{
+    if (address >= MC13783_NUM_REGS)
+        return -1;
 
-    return packet;
+    uint32_t packet = (1 << 31) | (address << 25) | (data & 0xffffff);
+
+    struct mc13783_transfer_desc xfer;
+    semaphore_init(&xfer.sema, 1, 0);
+
+    if (mc13783_transfer(&xfer.xfer, &packet, NULL, 1,
+                         mc13783_xfer_complete_cb) &&
+        wait_for_transfer_complete(&xfer))
+    {
+        return 1 - xfer.xfer.count;
+    }
+
+    return -1;
 }
 
 int mc13783_read_regs(const unsigned char *regs, uint32_t *buffer,
                       int count)
 {
-    int i;
+    struct mc13783_transfer_desc xfer;
+    semaphore_init(&xfer.sema, 1, 0);
 
-    for (i = 0; i < count; i++)
+    if (mc13783_read_async(&xfer.xfer, regs, buffer, count,
+                           mc13783_xfer_complete_cb) &&
+        wait_for_transfer_complete(&xfer))
     {
-        unsigned reg = regs[i];
-
-        if (reg >= MC13783_NUM_REGS)
-            return -1;
-
-        buffer[i] = reg << 25;
+        return count - xfer.xfer.count;
     }
 
-    mutex_lock(&mc13783_spi_mutex);
-
-    mc13783_transfer.txbuf = buffer;
-    mc13783_transfer.rxbuf = buffer;
-    mc13783_transfer.count = count;
-
-    i = -1;
-
-    if (spi_transfer(&mc13783_transfer) && wait_for_transfer_complete())
-        i = count - mc13783_transfer.count;
-
-    mutex_unlock(&mc13783_spi_mutex);
-
-    return i;
+    return -1;
 }
 
 int mc13783_write_regs(const unsigned char *regs, uint32_t *buffer,
                        int count)
 {
-    int i;
+    struct mc13783_transfer_desc xfer;
+    semaphore_init(&xfer.sema, 1, 0);
 
-    for (i = 0; i < count; i++)
+    if (mc13783_write_async(&xfer.xfer, regs, buffer, count,
+                            mc13783_xfer_complete_cb) &&
+        wait_for_transfer_complete(&xfer))
     {
-        unsigned reg = regs[i];
-
-        if (reg >= MC13783_NUM_REGS)
-            return -1;
-
-        buffer[i] = (1 << 31) | (reg << 25) | (buffer[i] & 0xffffff);
+        return count - xfer.xfer.count;
     }
 
-    mutex_lock(&mc13783_spi_mutex);
-
-    mc13783_transfer.txbuf = buffer;
-    mc13783_transfer.rxbuf = NULL;
-    mc13783_transfer.count = count;
-
-    i = -1;
-
-    if (spi_transfer(&mc13783_transfer) && wait_for_transfer_complete())
-        i = count - mc13783_transfer.count;
-
-    mutex_unlock(&mc13783_spi_mutex);
-
-    return i;
+    return -1;
 }
 
-#if 0 /* Not needed right now */
 bool mc13783_read_async(struct spi_transfer_desc *xfer,
                         const unsigned char *regs, uint32_t *buffer,
                         int count, spi_transfer_cb_fn_type callback)
 {
-    int i;
-
-    for (i = 0; i < count; i++)
+    for (int i = 0; i < count; i++)
     {
         unsigned reg = regs[i];
 
@@ -391,24 +342,14 @@ bool mc13783_read_async(struct spi_transfer_desc *xfer,
         buffer[i] = reg << 25;
     }
 
-    xfer->node  = &mc13783_spi;
-    xfer->txbuf = buffer;
-    xfer->rxbuf = buffer;
-    xfer->count = count;
-    xfer->callback = callback;
-    xfer->next = NULL;
-
-    return spi_transfer(xfer);
+    return mc13783_transfer(xfer, buffer, buffer, count, callback);
 }
-#endif
 
 bool mc13783_write_async(struct spi_transfer_desc *xfer,
                          const unsigned char *regs, uint32_t *buffer,
                          int count, spi_transfer_cb_fn_type callback)
 {
-    int i;
-
-    for (i = 0; i < count; i++)
+    for (int i = 0; i < count; i++)
     {
         unsigned reg = regs[i];
 
@@ -418,12 +359,5 @@ bool mc13783_write_async(struct spi_transfer_desc *xfer,
         buffer[i] = (1 << 31) | (reg << 25) | (buffer[i] & 0xffffff);
     }
 
-    xfer->node  = &mc13783_spi;
-    xfer->txbuf = buffer;
-    xfer->rxbuf = NULL;
-    xfer->count = count;
-    xfer->callback = callback;
-    xfer->next = NULL;
-
-    return spi_transfer(xfer);
+    return mc13783_transfer(xfer, buffer, NULL, count, callback);
 }

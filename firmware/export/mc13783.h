@@ -1281,17 +1281,59 @@ bool mc13783_write_async(struct spi_transfer_desc *xfer,
 
 #define MC13783_DATA_ERROR UINT32_MAX
 
-/* Statically-registered event enable/disable */
-enum mc13783_event_sets
+/* Statically-registered interrupt enable/disable */
+enum mc13783_int_ids
 {
-    MC13783_EVENT_SET0 = 0, /* *STATUS0/MASK0/SENSE0 */
-    MC13783_EVENT_SET1 = 1, /* *STATUS1/MASK1/SENSE1 */
+    /* *STATUS0/MASK0/SENSE0 */
+    MC13783_INT_ID_ADCDONE    =  0,
+    MC13783_INT_ID_ADCBISDONE =  1,
+    MC13783_INT_ID_TS         =  2,
+    MC13783_INT_ID_WHIGH      =  3,
+    MC13783_INT_ID_WLOW       =  4,
+    MC13783_INT_ID_CHGDET     =  6,
+    MC13783_INT_ID_CHGOV      =  7,
+    MC13783_INT_ID_CHGREV     =  8,
+    MC13783_INT_ID_CHGSHORT   =  9,
+    MC13783_INT_ID_CCCV       = 10,
+    MC13783_INT_ID_CHGCURR    = 11,
+    MC13783_INT_ID_BPONI      = 12,
+    MC13783_INT_ID_LOBATL     = 13,
+    MC13783_INT_ID_LOBATH     = 14,
+    MC13783_INT_ID_UDP        = 15,
+    MC13783_INT_ID_USB        = 16,
+    MC13783_INT_ID_IDFLOAT    = 19,
+    MC13783_INT_ID_SE1        = 21,
+    MC13783_INT_ID_CKDET      = 22,
+    MC13783_INT_ID_UDM        = 23,
+     /* *STATUS1/MASK1/SENSE1 */
+    MC13783_INT_ID_1HZ        =  0 + 0x20,
+    MC13783_INT_ID_TODA       =  1 + 0x20,
+    MC13783_INT_ID_ONOFD1     =  3 + 0x20,  /* ON1B */
+    MC13783_INT_ID_ONOFD2     =  4 + 0x20,  /* ON2B */
+    MC13783_INT_ID_ONOFD3     =  5 + 0x20,  /* ON3B */
+    MC13783_INT_ID_SYSRST     =  6 + 0x20,
+    MC13783_INT_ID_RTCRST     =  7 + 0x20,
+    MC13783_INT_ID_PCI        =  8 + 0x20,
+    MC13783_INT_ID_WARM       =  9 + 0x20,
+    MC13783_INT_ID_MEMHLD     = 10 + 0x20,
+    MC13783_INT_ID_PWRRDY     = 11 + 0x20,
+    MC13783_INT_ID_THWARNL    = 12 + 0x20,
+    MC13783_INT_ID_THWARNH    = 13 + 0x20,
+    MC13783_INT_ID_CLK        = 14 + 0x20,
+    MC13783_INT_ID_SEMAF      = 15 + 0x20,
+    MC13783_INT_ID_MC2B       = 17 + 0x20,
+    MC13783_INT_ID_HSDET      = 18 + 0x20,
+    MC13783_INT_ID_HSL        = 19 + 0x20,
+    MC13783_INT_ID_ALSPTH     = 20 + 0x20,
+    MC13783_INT_ID_AHSSHORT   = 21 + 0x20,
 };
+
+#define MC13783_INT_ID_SET_DIV    (0x20)
+#define MC13783_INT_ID_NUM_MASK   (0x1f)
 
 struct mc13783_event
 {
-    enum mc13783_event_sets set : 8;
-    uint32_t mask               : 24;
+    enum mc13783_int_ids int_id;
     void (*callback)(void);
 };
 

@@ -170,7 +170,10 @@ static bool start_transfer(struct spi_module_desc * const desc,
     unsigned long intreg;
 
     if (!spi_set_context(desc, xfer))
+    {
+        xfer->count = -1;
         return false;
+    }
 
     base[CONREG] |= CSPI_CONREG_EN; /* Enable module */
 
@@ -249,8 +252,18 @@ static void spi_interrupt(enum spi_module_number spi)
     if (xfer->count > 0)
     {
         /* Data to transmit - fill TXFIFO or write until exhausted. */
-        if (tx_fill_fifo(desc, base, xfer) != 0)
-            return;
+        int remaining = tx_fill_fifo(desc, base, xfer);
+
+        /* If transfer completed because TXFIFO ran out of data, resume it or
+           else it will not finish. */
+        if (!(base[CONREG] & CSPI_CONREG_XCH))
+        {
+            base[STATREG] = CSPI_STATREG_TC;
+            base[CONREG] |= CSPI_CONREG_XCH;
+        }
+
+        if (remaining > 0)
+            return; /* Still more after this */
 
         /* Out of data - stop TX interrupts, enable TC interrupt. */
         intreg &= ~CSPI_INTREG_THEN;
@@ -263,7 +276,6 @@ static void spi_interrupt(enum spi_module_number spi)
         /* Outbound transfer is complete. */
         intreg &= ~CSPI_INTREG_TCEN;
         base[INTREG] = intreg;
-        base[STATREG] = CSPI_STATREG_TC; /* Ack 'complete' */
     }
 
     if (intreg != 0)
@@ -276,8 +288,6 @@ static void spi_interrupt(enum spi_module_number spi)
         spi_transfer_cb_fn_type callback = xfer->callback;
         xfer->next = NULL;
 
-        base[CONREG] &= ~CSPI_CONREG_EN; /* Disable module */
-
         if (next == xfer)
         {
             /* Last job on queue */
@@ -287,6 +297,8 @@ static void spi_interrupt(enum spi_module_number spi)
                 callback(xfer);
 
             /* Callback may have restarted transfers. */
+            if (desc->head == NULL)
+                base[CONREG] &= ~CSPI_CONREG_EN; /* Disable module */
         }
         else
         {
@@ -299,7 +311,6 @@ static void spi_interrupt(enum spi_module_number spi)
             if (!start_transfer(desc, next))
             {
                 xfer = next;
-                xfer->count = -1;
                 continue; /* Failed: try next */
             }
         }
@@ -415,10 +426,6 @@ bool spi_transfer(struct spi_transfer_desc *xfer)
             desc->head = xfer;
             desc->tail = xfer;
             xfer->next = xfer; /* First, self-reference terminate */
-        }
-        else
-        {
-            xfer->count = -1; /* Signal error */
         }
     }
     else
