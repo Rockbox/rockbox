@@ -261,7 +261,7 @@ echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
 echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
 echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "separate multiple targets with spaces"
-echo "(Example: \"s m e\" will build sh, m68k and arm)"
+echo "(Example: \"s m a\" will build sh, m68k and arm)"
 echo ""
 
 selarch=`input`
