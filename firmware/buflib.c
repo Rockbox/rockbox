@@ -284,6 +284,7 @@ buflib_compact(struct buflib_context *ctx)
                 }
                 else /* hole closed */
                     hole = NULL;
+                continue;
             }
         }
         /* attempt move the allocation by shift */
