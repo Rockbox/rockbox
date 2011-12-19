@@ -61,7 +61,7 @@ static int vol_drive[NUM_VOLUMES]; /* mounted to which drive (-1 if none) */
 static struct mutex disk_mutex;
 
 #ifdef MAX_LOG_SECTOR_SIZE
-static int disk_sector_multiplier[NUM_DRIVES] = {1};
+static int disk_sector_multiplier[NUM_DRIVES] = {[0 ... NUM_DRIVES-1] = 1};
 
 int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
 {
@@ -217,8 +217,7 @@ int disk_mount(int drive)
                 mounted++;
                 vol_drive[volume] = drive; /* remember the drive for this volume */
                 volume = get_free_volume(); /* prepare next entry */
-                if (drive == 0)
-                    disk_sector_multiplier[drive] = j;
+                disk_sector_multiplier[drive] = j;
                 break;
             }
         }
