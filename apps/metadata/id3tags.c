@@ -1007,9 +1007,10 @@ void setid3v2title(int fd, struct mp3entry *entry)
                                 char_enc = CHAR_ENC_ISO_8859_1;
                                 break;
                             case 0x01:
-                                if (!memcmp(tag, "\1\xfe\xff", 3))
+                                tag++;
+                                if (!memcmp(tag, "\xfe\xff", 2))
                                     char_enc = CHAR_ENC_UTF_16_BE;
-                                else if (!memcmp(tag, "\1\xff\xfe", 3))
+                                else if (!memcmp(tag, "\xff\xfe", 2))
                                     char_enc = CHAR_ENC_UTF_16_LE;
                                 /* \1 + BOM(2) + C0U0E0S0H0E0E0T000 = 21 */
                                 cuesheet_offset = 21;
