@@ -7,23 +7,26 @@
 # $Id$
 #
 
+PACKAGE=org.rockbox
+PACKAGE_PATH=org/rockbox
+BINLIB_DIR=$(BUILDDIR)/libs/armeabi
+ANDROID_DIR=$(ROOTDIR)/android
+
 # this is a glibc compatibility hack to provide a get_nprocs() replacement.
 # The NDK ships cpu-features.c which has a compatible function android_getCpuCount()
-CPUFEAT = $(ANDROID_NDK_PATH)/sources/android/cpufeatures
+CPUFEAT = $(ANDROID_DIR)/cpufeatures
+CPUFEAT_BUILD = $(subst $(ANDROID_DIR),$(BUILDDIR),$(CPUFEAT))
 INCLUDES += -I$(CPUFEAT)
 OTHER_SRC += $(CPUFEAT)/cpu-features.c
-$(BUILDDIR)/cpu-features.o: $(CPUFEAT)/cpu-features.c
-	$(call PRINTS,CC $(subst $(ANDROID_NDK_PATH)/,,$<))$(CC) -o $@ -c $^ \
-	$(GCCOPTS) -Wno-unused
+CLEANOBJS += $(CPUFEAT_BUILD)/cpu-features.o
+$(CPUFEAT_BUILD)/cpu-features.o: $(CPUFEAT)/cpu-features.c
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -o $@ -c $^ $(GCCOPTS) -Wno-unused
 
 .SECONDEXPANSION: # $$(JAVA_OBJ) is not populated until after this
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 .PHONY: apk classes clean dex dirs libs jar
 
-PACKAGE=org.rockbox
-PACKAGE_PATH=org/rockbox
-ANDROID_DIR=$(ROOTDIR)/android
-BINLIB_DIR=$(BUILDDIR)/libs/armeabi
 
 java2class = $(addsuffix .class,$(basename $(subst $(ANDROID_DIR),$(BUILDDIR),$(1))))
 
@@ -66,6 +69,7 @@ DIRS		:= $(subst ___,bin,$(_DIRS))
 DIRS		+= $(subst ___,gen,$(_DIRS))
 DIRS		+= $(subst ___,data,$(_DIRS))
 DIRS		+= $(BUILDDIR)/libs/armeabi
+DIRS		+= $(CPUFEAT_BUILD)
 
 RES		:= $(wildcard $(ANDROID_DIR)/res/*/*)
 
@@ -110,7 +114,7 @@ dex: $(DEX)
 classes: $(R_OBJ) $(JAVA_OBJ)
 
 
-$(BUILDDIR)/$(BINARY): $$(OBJ) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB) $(BUILDDIR)/cpu-features.o
+$(BUILDDIR)/$(BINARY): $$(OBJ) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB) $(CPUFEAT_BUILD)/cpu-features.o
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS)
 
 $(BINLIB_DIR)/$(BINARY): $(BUILDDIR)/$(BINARY)
