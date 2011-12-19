@@ -228,7 +228,7 @@ static bool scale_h_area(void *out_line_ptr,
             MAC_OUT(rgbvalacc.r, 0);
             MAC_OUT(rgbvalacc.g, 1);
             MAC_OUT(rgbvalacc.b, 2);
-            MAC_OUT(rgbvalacc.b, 3);
+            MAC_OUT(rgbvalacc.a, 3);
 #else
 /* generic C math */
             /* add saved partial pixel from start of area */
