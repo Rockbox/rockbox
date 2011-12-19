@@ -7,12 +7,18 @@
 # $Id$
 #
 
+# this is a glibc compatibility hack to provide a get_nprocs() replacement.
+# The NDK ships cpu-features.c which has a compatible function android_getCpuCount()
+CPUFEAT = /home/kugel/share/android-ndk-r6/sources/android/cpufeatures
+INCLUDES += -I$(CPUFEAT)
+OTHER_SRC += $(CPUFEAT)/cpu-features.c
+$(BUILDDIR)/cpu-features.o: $(CPUFEAT)/cpu-features.c
+	$(call PRINTS,CC $(subst $(ANDROID_NDK_PATH)/,,$<))$(CC) -o $@ -c $^ \
+	$(GCCOPTS) -Wno-unused
+
 .SECONDEXPANSION: # $$(JAVA_OBJ) is not populated until after this
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 .PHONY: apk classes clean dex dirs libs jar
-
-$(BUILDDIR)/$(BINARY): $$(OBJ) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB)
-	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS)
 
 PACKAGE=org.rockbox
 PACKAGE_PATH=org/rockbox
@@ -102,6 +108,10 @@ $(DEX): $(JAR)
 dex: $(DEX)
 
 classes: $(R_OBJ) $(JAVA_OBJ)
+
+
+$(BUILDDIR)/$(BINARY): $$(OBJ) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB) $(BUILDDIR)/cpu-features.o
+	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS)
 
 $(BINLIB_DIR)/$(BINARY): $(BUILDDIR)/$(BINARY)
 	$(call PRINTS,CP $(BINARY))cp $^ $@

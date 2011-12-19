@@ -232,6 +232,108 @@ static bool dbg_os(void)
     return simplelist_show_list(&info);
 }
 
+#ifdef __linux__
+#include "cpuinfo-linux.h"
+
+#define MAX_STATES 16
+static struct time_state states[MAX_STATES];
+
+static const char* get_cpuinfo(int selected_item, void *data,
+                                   char *buffer, size_t buffer_len)
+{
+    (void)data;(void)buffer_len;
+    const char* text;
+    long time, diff;
+    struct cpuusage us;
+    static struct cpuusage last_us;
+    int state_count = *(int*)data;
+
+    if (cpuusage_linux(&us) != 0)
+        return NULL;
+
+    switch(selected_item)
+    {
+        case 0:
+            diff = abs(last_us.usage - us.usage);
+            sprintf(buffer, "Usage: %ld.%02ld%% (%c %ld.%02ld)",
+                                    us.usage/100, us.usage%100,
+                                    (us.usage >= last_us.usage) ? '+':'-',
+                                    diff/100, diff%100);
+            last_us.usage = us.usage;
+            return buffer;
+        case 1:
+            text = "User";
+            time = us.utime;
+            diff = us.utime - last_us.utime;
+            last_us.utime = us.utime;
+            break;
+        case 2:
+            text = "Sys";
+            time = us.stime;
+            diff = us.stime - last_us.stime;
+            last_us.stime = us.stime;
+            break;
+        case 3:
+            text = "Real";
+            time = us.rtime;
+            diff = us.rtime - last_us.rtime;
+            last_us.rtime = us.rtime;
+            break;
+        case 4:
+            return "*** Per CPU freq stats ***";
+        default:
+        {
+            int cpu = (selected_item - 5) / (state_count + 1);
+            int cpu_line = (selected_item - 5) % (state_count + 1);
+            int freq1 = cpufrequency_linux(cpu);
+            int freq2 = scalingfrequency_linux(cpu);
+            if (cpu_line == 0)
+            {
+                sprintf(buffer, " CPU%d: Cur/Scal freq: %d/%d MHz", cpu,
+                                freq1 > 0 ? freq1/1000 : -1,
+                                freq2 > 0 ? freq2/1000 : -1);
+            }
+            else
+            {
+                cpustatetimes_linux(cpu, states, ARRAYLEN(states));
+                snprintf(buffer, buffer_len, "   %ld %ld",
+                            states[cpu_line-1].frequency,
+                            states[cpu_line-1].time);
+            }
+            return buffer;
+        }
+    }
+    sprintf(buffer, "%s: %ld.%02lds (+ %ld.%02ld)", text,
+                    time / us.hz, time % us.hz,
+                    diff / us.hz, diff % us.hz);
+    return buffer;
+}
+
+static int cpuinfo_cb(int action, struct gui_synclist *lists)
+{
+    (void)lists;
+    if (action == ACTION_NONE)
+        action = ACTION_REDRAW;
+    return action;
+}
+
+static bool dbg_cpuinfo(void)
+{
+    struct simplelist_info info;
+    int cpu_count = MAX(cpucount_linux(), 1);
+    int state_count = cpustatetimes_linux(0, states, ARRAYLEN(states));
+    printf("%s(): %d %d\n", __func__, cpu_count, state_count);
+    simplelist_info_init(&info, "CPU info:", 5 + cpu_count*(state_count+1), &state_count);
+    info.get_name = get_cpuinfo;
+    info.action_callback = cpuinfo_cb;
+    info.timeout = HZ;
+    info.hide_selection = true;
+    info.scroll_all = true;
+    return simplelist_show_list(&info);
+}
+
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 #if CONFIG_CODEC != SWCODEC
 #ifndef SIMULATOR
@@ -2062,6 +2164,9 @@ static const struct the_menu_item menuitems[] = {
         { "Catch mem accesses", dbg_set_memory_guard },
 #endif
         { "View OS stacks", dbg_os },
+#ifdef __linux__
+        { "View CPU stats", dbg_cpuinfo },
+#endif
 #ifdef HAVE_LCD_BITMAP
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View battery", view_battery },
@@ -2187,4 +2292,3 @@ bool run_debug_screen(char* screen)
     }
     return false;
 }
-

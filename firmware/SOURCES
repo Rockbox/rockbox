@@ -7,6 +7,12 @@ general.c
 load_code.c
 powermgmt.c
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+
+#ifdef __linux__
+#undef linux
+target/hosted/cpuinfo-linux.c
+#endif
+
 target/hosted/powermgmt.c
 target/hosted/rtc.c
 #endif
