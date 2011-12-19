@@ -21,6 +21,8 @@
 #ifndef VOICE_THREAD_H
 #define VOICE_THREAD_H
 
+#include "config.h"
+
 void mp3_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, size_t* size));
 void mp3_play_stop(void);
@@ -30,7 +32,7 @@ bool mp3_is_playing(void);
 void voice_wait(void);
 void voice_stop(void);
 
-void voice_thread_init(void);
+void voice_thread_init(void) INIT_ATTR;
 #ifdef HAVE_PRIORITY_SCHEDULING
 void voice_thread_set_priority(int priority);
 #endif

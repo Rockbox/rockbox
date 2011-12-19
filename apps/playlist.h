@@ -23,6 +23,7 @@
 #define __PLAYLIST_H__
 
 #include <stdbool.h>
+#include "config.h"
 #include "file.h"
 #include "kernel.h"
 #include "metadata.h"

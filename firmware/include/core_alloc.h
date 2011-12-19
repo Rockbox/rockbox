@@ -3,12 +3,13 @@
 #define __CORE_ALLOC_H__
 #include <string.h>
 #include <stdbool.h>
+#include "config.h"
 #include "buflib.h"
 
 /* All functions below are wrappers for functions in buflib.h, except
  * they have a predefined context
  */
-void core_allocator_init(void);
+void core_allocator_init(void) INIT_ATTR;
 int core_alloc(const char* name, size_t size);
 int core_alloc_ex(const char* name, size_t size, struct buflib_callbacks *ops);
 int core_alloc_maximum(const char* name, size_t *size, struct buflib_callbacks *ops);

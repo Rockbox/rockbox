@@ -193,7 +193,7 @@ enum {  ALARM_START_WPS = 0,
 #define SETTINGS_RTC (BIT_N(0)) /* only the settings from the RTC nonvolatile RAM */
 #define SETTINGS_HD  (BIT_N(1)) /* only the settings from the disk sector */
 #define SETTINGS_ALL (SETTINGS_RTC|SETTINGS_HD) /* both */
-void settings_load(int which);
+void settings_load(int which) INIT_ATTR;
 bool settings_load_config(const char* file, bool apply);
 
 void status_save(void);

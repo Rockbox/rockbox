@@ -22,6 +22,8 @@
 #ifndef PCM_RECORD_H
 #define PCM_RECORD_H
 
+#include "config.h"
+
 /** Warnings **/
 /* pcm (dma) buffer has overflowed */
 #define PCMREC_W_PCM_BUFFER_OVF         0x00000001
@@ -49,7 +51,7 @@ void pcm_rec_error_clear(void);
    results for consistency with the hardware codec version */
 unsigned long pcm_rec_status(void);
 unsigned long pcm_rec_get_warnings(void);
-void pcm_rec_init(void);
+void pcm_rec_init(void) INIT_ATTR;
 int  pcm_rec_current_bitrate(void);
 int  pcm_rec_encoder_afmt(void); /* AFMT_* value, AFMT_UNKNOWN if none */
 int  pcm_rec_rec_format(void);   /* Format index or -1 otherwise */

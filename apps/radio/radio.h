@@ -21,6 +21,7 @@
 #ifndef RADIO_H
 #define RADIO_H
 
+#include "config.h"
 #ifndef FMRADIO_H
 #include "fmradio.h"
 #endif

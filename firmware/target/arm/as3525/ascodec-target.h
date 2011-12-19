@@ -27,6 +27,7 @@
 
 #ifndef SIMULATOR
 
+#include "config.h"
 #include "as3514.h"
 #include "kernel.h"       /* for struct semaphore */
 #include "clock-target.h" /* for AS3525_I2C_PRESCALER */

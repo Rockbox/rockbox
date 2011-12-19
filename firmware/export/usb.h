@@ -21,6 +21,7 @@
 #ifndef _USB_H_
 #define _USB_H_
 
+#include "config.h"
 #include "kernel.h"
 #include "button.h"
 
@@ -103,7 +104,7 @@ struct usb_transfer_completion_event_data
 void usb_init(void) INIT_ATTR;
 void usb_enable(bool on);
 void usb_attach(void);
-void usb_start_monitoring(void);
+void usb_start_monitoring(void) INIT_ATTR;
 void usb_close(void);
 void usb_acknowledge(long id);
 void usb_wait_for_disconnect(struct event_queue *q);

@@ -22,6 +22,7 @@
 #ifndef _GUI_STATUSBAR_H_
 #define _GUI_STATUSBAR_H_
 
+#include "config.h"
 #include "status.h"
 #include "screen_access.h"
 #include "events.h"

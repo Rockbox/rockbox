@@ -21,6 +21,8 @@
 #ifndef _POWER_H_
 #define _POWER_H_
 
+#include "config.h"
+
 #if CONFIG_CHARGING
 enum power_input_flags {
     /* No external power source? Default. */

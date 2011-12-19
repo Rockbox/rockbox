@@ -21,6 +21,7 @@
 #ifndef _DISK_H_
 #define _DISK_H_
 
+#include "config.h"
 #include "mv.h" /* for volume definitions */
 
 struct partinfo {
@@ -38,7 +39,7 @@ struct partinfo {
 struct partinfo* disk_init(IF_MD_NONVOID(int drive));
 struct partinfo* disk_partinfo(int partition);
 
-void disk_init_subsystem(void); /* Initialises mutexes */
+void disk_init_subsystem(void) INIT_ATTR; /* Initialises mutexes */
 int disk_mount_all(void); /* returns the # of successful mounts */
 int disk_mount(int drive);
 int disk_unmount_all(void);

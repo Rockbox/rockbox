@@ -25,6 +25,7 @@
 #ifndef __SCROLL_ENGINE_H__
 #define __SCROLL_ENGINE_H__
 
+#include "config.h"
 #include <lcd.h>
 #include "file.h"
 

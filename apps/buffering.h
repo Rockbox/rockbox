@@ -24,6 +24,7 @@
 
 #include <sys/types.h>
 #include <stdbool.h>
+#include "config.h"
 #include "appevents.h"
 
 
@@ -47,7 +48,7 @@ enum data_type {
 
 
 /* Initialise the buffering subsystem */
-void buffering_init(void);
+void buffering_init(void) INIT_ATTR;
 
 /* Reset the buffering system */
 bool buffering_reset(char *buf, size_t buflen);

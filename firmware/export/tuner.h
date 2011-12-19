@@ -22,6 +22,7 @@
 #ifndef __TUNER_H__
 #define __TUNER_H__
 
+#include "config.h"
 #include "hwcompat.h"
 
 /** Settings to the tuner layer **/

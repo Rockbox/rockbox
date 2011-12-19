@@ -22,6 +22,7 @@
 #define _FILEHANDLE_H_
 
 #include <stdbool.h>
+#include "config.h"
 #include <tree.h>
 
 /* using attribute bits not used by FAT (FAT uses lower 7) */
@@ -54,7 +55,7 @@ struct filetype {
     enum themable_icons icon;
     int voiceclip;
 };
-void tree_get_filetypes(const struct filetype**, int*);
+void tree_get_filetypes(const struct filetype**, int*) INIT_ATTR;
 
 /* init the filetypes structs.
    uses audio buffer for storage, so call early in init... */

@@ -21,6 +21,7 @@
 #ifndef _WPS_H_
 #define _WPS_H_
 #include <stdbool.h>
+#include "config.h"
 #include "screen_access.h"
  
 long gui_wps_show(void);

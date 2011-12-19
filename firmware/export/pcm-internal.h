@@ -22,6 +22,8 @@
 #ifndef PCM_INTERNAL_H
 #define PCM_INTERNAL_H
 
+#include "config.h"
+
 /* Cheapo buffer align macro to align to the 16-16 PCM size */
 #define ALIGN_AUDIOBUF(start, size) \
     ({ (start) = (void *)(((uintptr_t)(start) + 3) & ~3); \

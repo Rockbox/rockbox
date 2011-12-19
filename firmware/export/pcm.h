@@ -22,6 +22,7 @@
 #define PCM_PLAYBACK_H
 
 #include <string.h> /* size_t */
+#include "config.h"
 
 #define DMA_REC_ERROR_DMA       (-1)
 #ifdef HAVE_SPDIF_REC

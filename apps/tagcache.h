@@ -22,6 +22,7 @@
 #ifndef _TAGCACHE_H
 #define _TAGCACHE_H
 
+#include "config.h"
 #include "system.h"
 #include "metadata.h"
 

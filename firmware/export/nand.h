@@ -23,6 +23,7 @@
 #define __NAND_H__
 
 #include <stdbool.h>
+#include "config.h"
 #include "mv.h" /* for HAVE_MULTIDRIVE or not */
 
 struct storage_info;

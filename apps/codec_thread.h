@@ -23,12 +23,13 @@
 #define _CODEC_THREAD_H
 
 #include <stdbool.h>
+#include "config.h"
 
 /* codec identity */
 const char *get_codec_filename(int cod_spec);
 
 /* codec thread */
-void codec_thread_init(void);
+void codec_thread_init(void) INIT_ATTR;
 
 /* Audio MUST be stopped before requesting callback! */
 void codec_thread_do_callback(void (*fn)(void),

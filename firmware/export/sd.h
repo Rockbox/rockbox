@@ -23,6 +23,7 @@
 #define __SD_H__
 
 #include <stdbool.h>
+#include "config.h"
 #include "mv.h" /* for HAVE_MULTIDRIVE or not */
 
 #ifdef HAVE_BOOTLOADER_USB_MODE

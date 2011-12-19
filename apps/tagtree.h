@@ -22,6 +22,7 @@
 #ifndef _TAGTREE_H
 #define _TAGTREE_H
 
+#include "config.h"
 #include "tagcache.h"
 #include "tree.h"
 

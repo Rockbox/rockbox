@@ -63,7 +63,7 @@ bool settings_parseline(char* line, char** name, char** value);
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter);
 long default_event_handler(long event);
 bool list_stop_handler(void);
-void car_adapter_mode_init(void);
+void car_adapter_mode_init(void) INIT_ATTR;
 extern int show_logo(void);
 
 int open_utf8(const char* pathname, int flags);
