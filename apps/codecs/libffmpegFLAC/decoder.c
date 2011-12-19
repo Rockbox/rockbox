@@ -488,6 +488,7 @@ static int decode_frame(FLACContext *s,
     return 0;
 }
 
+static int flac_downmix(FLACContext *s) ICODE_ATTR_FLAC;
 static int flac_downmix(FLACContext *s)
 {
     int32_t *FL, *FR, *FC, *SB, *RL, *RR;

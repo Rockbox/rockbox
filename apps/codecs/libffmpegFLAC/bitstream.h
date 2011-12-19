@@ -19,12 +19,26 @@
   #define ICODE_ATTR
 #endif
 
-#ifndef ICODE_ATTR_FLAC
+#if (CONFIG_CPU == MCF5250) || (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
 #define ICODE_ATTR_FLAC ICODE_ATTR
-#endif
+#define IBSS_ATTR_FLAC  IBSS_ATTR
+/* Enough IRAM to move additional data to it. */
+#define IBSS_ATTR_FLAC_LARGE_IRAM   IBSS_ATTR
+#define IBSS_ATTR_FLAC_XLARGE_IRAM
 
-#ifndef IBSS_ATTR_FLAC_DECODED0
-#define IBSS_ATTR_FLAC_DECODED0 IBSS_ATTR
+#elif defined(CPU_S5L870X)
+#define ICODE_ATTR_FLAC ICODE_ATTR
+#define IBSS_ATTR_FLAC  IBSS_ATTR
+/* Enough IRAM to move even more additional data to it. */
+#define IBSS_ATTR_FLAC_LARGE_IRAM   IBSS_ATTR
+#define IBSS_ATTR_FLAC_XLARGE_IRAM  IBSS_ATTR
+
+#else
+#define ICODE_ATTR_FLAC ICODE_ATTR
+#define IBSS_ATTR_FLAC  IBSS_ATTR
+/* Not enough IRAM available. */
+#define IBSS_ATTR_FLAC_LARGE_IRAM
+#define IBSS_ATTR_FLAC_XLARGE_IRAM
 #endif
 
 /* Endian conversion routines for standalone compilation */

@@ -24,10 +24,15 @@
 
 CODEC_HEADER
 
+static FLACContext fc IBSS_ATTR_FLAC;
+
 /* The output buffers containing the decoded samples (channels 0 and 1) */
-static int32_t decoded0[MAX_BLOCKSIZE] IBSS_ATTR_FLAC_DECODED0;
-static int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR;
-static int32_t dummydec[4][MAX_BLOCKSIZE];
+static int32_t decoded0[MAX_BLOCKSIZE] IBSS_ATTR_FLAC;
+static int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR_FLAC;
+static int32_t decoded2[MAX_BLOCKSIZE] IBSS_ATTR_FLAC_LARGE_IRAM;
+static int32_t decoded3[MAX_BLOCKSIZE] IBSS_ATTR_FLAC_LARGE_IRAM;
+static int32_t decoded4[MAX_BLOCKSIZE] IBSS_ATTR_FLAC_XLARGE_IRAM;
+static int32_t decoded5[MAX_BLOCKSIZE] IBSS_ATTR_FLAC_XLARGE_IRAM;
 
 #define MAX_SUPPORTED_SEEKTABLE_SIZE 5000
 
@@ -81,7 +86,6 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     uint16_t blocksize;
     int endofmetadata=0;
     uint32_t blocklength;
-    int ch;
 
     ci->memset(fc,0,sizeof(FLACContext));
     nseekpoints=0;
@@ -91,15 +95,19 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     /* Reset sample buffers */
     memset(decoded0, 0, sizeof(decoded0));
     memset(decoded1, 0, sizeof(decoded1));
-    memset(dummydec, 0, sizeof(dummydec));
+    memset(decoded2, 0, sizeof(decoded2));
+    memset(decoded3, 0, sizeof(decoded3));
+    memset(decoded4, 0, sizeof(decoded4));
+    memset(decoded5, 0, sizeof(decoded5));
     
     /* Set sample buffers in decoder structure */
     fc->decoded[0] = decoded0;
     fc->decoded[1] = decoded1;
-    for (ch=2; ch<MAX_CHANNELS; ++ch)
-    {
-        fc->decoded[ch] = dummydec[ch-2];
-    }
+    fc->decoded[2] = decoded2;
+    fc->decoded[3] = decoded3;
+    fc->decoded[4] = decoded4;
+    fc->decoded[5] = decoded5;
+
 
     /* Skip any foreign tags at start of file */
     ci->seek_buffer(first_frame_offset);
@@ -447,7 +455,6 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 enum codec_status codec_run(void)
 {
     int8_t *buf;
-    FLACContext fc;
     uint32_t samplesdone;
     uint32_t elapsedtime;
     size_t bytesleft;
