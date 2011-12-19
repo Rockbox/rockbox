@@ -75,6 +75,8 @@
 /* DM320 */
 ioport unsigned short port280;
 #define CP_INTC       port280
+ioport unsigned short port281;
+#define CP_CLKC       port281
 ioport unsigned short port8000;
 #define SDEM_ADDRL    port8000
 ioport unsigned short port8001;

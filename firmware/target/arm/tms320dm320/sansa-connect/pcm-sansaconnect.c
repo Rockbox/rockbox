@@ -79,9 +79,6 @@ void pcm_play_dma_init(void)
     /* Enable the HPIB clock */
     bitset16(&IO_CLK_MOD0, (CLK_MOD0_HPIB | CLK_MOD0_DSP));
 
-    /* Enable IMGBUF clock */
-    bitset16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
-
     dma_channel = dma_request_channel(DMA_PERIPHERAL_DSP,
                                       DMA_MODE_1_BURST);
 

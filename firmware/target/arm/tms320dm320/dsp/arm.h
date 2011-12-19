@@ -28,8 +28,6 @@ extern volatile struct ipc_message status;
 
 void debugf(const char *fmt, ...);
 
-inline void int_arm(void) {
-    CP_INTC = 1 << 3;
-}
+void int_arm(void);
 
 #endif

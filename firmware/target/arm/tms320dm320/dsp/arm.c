@@ -95,3 +95,19 @@ void debugf(const char *fmt, ...) {
     acked = 2;
 }
 #endif
+
+void int_arm(void)
+{
+    /*
+     * ImageBuffer clock enable in ARM's MOD1 is ORed with clock enable
+     * bit in CP_CLKC
+     */
+
+    /* Enable Image Buffer clock */
+    CP_CLKC |= 1 << 0;
+    /* Send interrupt to ARM */
+    CP_INTC = 1 << 3;
+    /* Disable Image Buffer clock */
+    CP_CLKC &= ~(1 << 0);
+}
+
