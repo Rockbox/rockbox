@@ -153,6 +153,130 @@ void lcd_init_device(void)
     lcd_on = true;
 }
 
+#ifdef LCD_USE_DMA
+static void dma_lcd_copy_buffer_rect(int x, int y, int width, int height)
+{
+    char *dst, *src;
+
+    /* Image buffer A is 4KW, every pixel is one Word */
+    /* lines is maximum number of lines we can transfer in single run */
+    int lines = 4096/width;
+    if (lines > height)
+        lines = height;
+
+    /* Set source and destination addresses */
+    dst = (char*)(FRAME + LCD_WIDTH*y + x);
+    src = (char*)(&lcd_framebuffer[y][x]);
+ 
+    /* Flush cache to memory */
+    commit_dcache();
+
+    /* Addresses are relative to start of SDRAM */
+    src -= CONFIG_SDRAM_START;
+    dst -= CONFIG_SDRAM_START;
+    
+    /* Enable Image Buffer clock */
+    bitset16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
+
+    /* Use Image Buffer A for DMA */
+    COP_BUF_MUX0 = (COP_BUF_MUX0 & 0xFFF0) | 0x0003;
+
+    /* Setup buffer offsets and transfer width/height */
+    COP_BUF_LOFST = width;
+    COP_DMA_XNUM  = width;
+    COP_DMA_YNUM  = lines;
+
+    /* DMA: No byte SWAP, no transformation, data bus shift down 0 bit */
+    COP_IMG_MODE &= 0xC0;
+
+    /* Set the start address of buffer */
+    COP_BUF_ADDR = 0x0000;
+    
+    /* Setup SDRAM stride */
+    COP_SDEM_LOFST = LCD_WIDTH;
+
+    do {
+        int addr;
+
+        addr = (int)src;
+        addr >>= 1; /* Addresses are in 16-bit words */
+        
+        /* Setup the registers to initiate the read from SDRAM */
+        COP_SDEM_ADDRH = addr >> 16;
+        COP_SDEM_ADDRL = addr & 0xFFFF;
+        
+        /* Set direction and start */
+        COP_DMA_CTRL = 0x0001;
+        COP_DMA_CTRL |= 0x0002;
+
+        /* Wait for read to finish */
+        while (COP_DMA_CTRL & 0x02) {};
+        
+        addr = (int)dst;
+        addr >>= 1;
+        
+        COP_SDEM_ADDRH = addr >> 16;
+        COP_SDEM_ADDRL = addr & 0xFFFF;
+        
+        /* Set direction and start transfer */
+        COP_DMA_CTRL = 0x0000;
+        COP_DMA_CTRL |= 0x0002;
+        
+        /* Wait for the transfer to complete */
+        while (COP_DMA_CTRL & 0x02) {};
+
+        /* Decrease height, update pointers */
+        src += (LCD_WIDTH << 1)*lines;
+        dst += (LCD_WIDTH << 1)*lines;
+
+        height -= lines;
+        if (height < lines)
+        {
+            lines = height;
+            COP_DMA_YNUM = height;
+        }
+    } while (height > 0);
+
+    /* Disable Image Buffer clock */
+    bitclr16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
+}
+
+/* Update a fraction of the display. */
+void lcd_update_rect(int x, int y, int width, int height)
+        __attribute__ ((section(".icode")));
+void lcd_update_rect(int x, int y, int width, int height)
+{
+    if (!lcd_on)
+        return;
+
+    if ((width | height) < 0)
+        return; /* Nothing left to do */
+
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x; /* Clip right */
+    if (x < 0)
+        width += x, x = 0; /* Clip left */
+
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y; /* Clip bottom */
+    if (y < 0)
+        height += y, y = 0; /* Clip top */
+
+    dma_lcd_copy_buffer_rect(x, y, width, height);
+}
+
+/* Update the display.
+   This must be called after all other LCD functions that change the display. */
+void lcd_update(void) __attribute__ ((section(".icode")));
+void lcd_update(void)
+{
+    if (!lcd_on)
+        return;
+
+    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+}
+#endif
+
 void lcd_set_contrast(int val) {
   (void) val;
   // TODO:

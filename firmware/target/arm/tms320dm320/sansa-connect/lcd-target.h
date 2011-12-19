@@ -24,6 +24,14 @@
 
 #define LCD_FRAMEBUF_ADDR(col, row) ((fb_data *)FRAME + (row)*LCD_WIDTH + (col))
 
+/* Comment this to remove Image Buffer DMA usage */
+#define LCD_USE_DMA
+
+#ifdef LCD_USE_DMA
+#define LCD_OPTIMIZED_UPDATE
+#define LCD_OPTIMIZED_UPDATE_RECT
+#endif
+
 void lcd_awake(void);
 
 #endif /* LCD_TARGET_H */
