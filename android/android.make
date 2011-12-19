@@ -9,7 +9,7 @@
 
 # this is a glibc compatibility hack to provide a get_nprocs() replacement.
 # The NDK ships cpu-features.c which has a compatible function android_getCpuCount()
-CPUFEAT = /home/kugel/share/android-ndk-r6/sources/android/cpufeatures
+CPUFEAT = $(ANDROID_NDK_PATH)/sources/android/cpufeatures
 INCLUDES += -I$(CPUFEAT)
 OTHER_SRC += $(CPUFEAT)/cpu-features.c
 $(BUILDDIR)/cpu-features.o: $(CPUFEAT)/cpu-features.c
