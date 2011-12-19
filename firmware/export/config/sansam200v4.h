@@ -155,16 +155,6 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-#define IBSS_ATTR_VOICE_STACK
-#define ICODE_ATTR_TREMOR_NOT_MDCT
-#define ICODE_ATTR_TREMOR_MDCT
-#define ICODE_ATTR_FLAC
-#define IBSS_ATTR_FLAC_DECODED0
-#define ICONST_ATTR_MPA_HUFFMAN
-#define IBSS_ATTR_MPC_SAMPLE_BUF
-#define ICODE_ATTR_ALAC
-#define IBSS_ATTR_SHORTEN_DECODED0
-
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
 /* Define this if a programmable hotkey is mapped */
