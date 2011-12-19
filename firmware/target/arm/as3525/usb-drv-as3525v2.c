@@ -116,13 +116,12 @@ static void reset_endpoints(void)
         for (unsigned i = 0; i < num_eps(dir == DIR_OUT); i++)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
-            endpoints[ep][out] = (struct usb_endpoint) {
-                .active = false,
-                .busy   = false,
-                .status = -1,
-                .done   = false,
-            };
-            semaphore_release(&endpoints[ep][out].complete);
+            struct usb_endpoint *endpoint = &endpoints[ep][out];
+            endpoint->active = false;
+            endpoint->busy   = false;
+            endpoint->status = -1;
+            endpoint->done   = false;
+            semaphore_release(&endpoint->complete);
 
             if (i != 0)
                 DEPCTL(ep, out) = DEPCTL_setd0pid;
@@ -149,12 +148,11 @@ static void cancel_all_transfers(bool cancel_ep0)
         for (unsigned i = !!cancel_ep0; i < num_eps(dir == DIR_OUT); i++)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
-            endpoints[ep][dir == DIR_OUT] = (struct usb_endpoint) {
-                .status = -1,
-                .busy   = false,
-                .done   = false,
-            };
-            semaphore_release(&endpoints[ep][dir == DIR_OUT].complete);
+            struct usb_endpoint *endpoint = &endpoints[ep][dir == DIR_OUT];
+            endpoint->status = -1;
+            endpoint->busy   = false;
+            endpoint->done   = false;
+            semaphore_release(&endpoint->complete);
             DEPCTL(ep, dir) = (DEPCTL(ep, dir) & ~DEPCTL_usbactep);
         }
 
@@ -429,11 +427,10 @@ static void usb_drv_transfer(int ep, void *ptr, int len, bool out)
     /* disable interrupts to avoid any race */
     int oldlevel = disable_irq_save();
 
-    endpoints[ep][out ? DIR_OUT : DIR_IN] = (struct usb_endpoint) {
-        .busy   = true,
-        .len    = len,
-        .status = -1,
-    };
+    struct usb_endpoint *endpoint = &endpoints[ep][out ? DIR_OUT : DIR_IN];
+    endpoint->busy   = true;
+    endpoint->len    = len;
+    endpoint->status = -1;
 
     if (out)
         DEPCTL(ep, out) &= ~DEPCTL_naksts;
