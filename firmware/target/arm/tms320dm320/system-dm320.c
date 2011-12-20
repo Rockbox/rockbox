@@ -412,14 +412,38 @@ void set_cpu_frequency(long frequency)
 }
 #endif
 
-/* This function is pretty crude.  It is not acurate to a usec, but errors on
- *  longer.
- */
 void udelay(int usec) {
-    volatile int temp=usec*(175000/200);
-    
-    while(temp) {
-        temp--;
+    unsigned short count = IO_TIMER1_TMCNT;
+    unsigned short stop;
+    unsigned short tmp = IO_TIMER1_TMDIV;
+    int prev_tick = current_tick;
+
+    /*
+     * On Sansa Connect tick timer counts from 0 to 26999
+     * in this case stop will overflow only if usec > 10000
+     * such long delays shouldn't be blocking (use sleep() instead)
+     */
+    stop = count + usec*((tmp+1)/10000);
+    stop += (unsigned short)(((unsigned long)(usec)*((tmp%10000)+1))/10000);
+
+    /* stop values over tmdiv won't ever be reached */
+    if (stop > tmp)
+    {
+        stop -= tmp;
+    }
+
+    if (stop < count)
+    {
+        /* udelay will end after counter reset (tick) */
+        while ((((tmp = IO_TIMER1_TMCNT) < stop) &&
+               (current_tick != prev_tick)) ||
+               (current_tick == prev_tick)); /* ensure new tick */
+    }
+    else
+    {
+        /* udelay will end before counter reset (tick) */
+        while (((tmp = IO_TIMER1_TMCNT) < stop) &&
+                (current_tick == prev_tick));
     }
 }
 
