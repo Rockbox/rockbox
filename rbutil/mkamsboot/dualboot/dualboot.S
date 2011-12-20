@@ -89,15 +89,6 @@ uclcopy:
         orr     r1, r1, #(1<<16)
         str     r1, [r0]
 
-
-#ifdef SANSA_CLIPV2 /* TODO : remove this check when we'll have an USB driver */
-        ldr     r0, =GPIOA
-        mov     r1, #0
-        str     r1, [r0, #0x400]
-        ldr     r1, [r0, #(4*(1<<6))]
-        cmp     r1, #0
-        bne     boot_of
-#endif
         /* Here are model specific tests for dual boot (test left button) */
 
 #ifdef SANSA_CLIP
@@ -272,75 +263,6 @@ uclcopy:
 #else
         #error No target-specific key check defined!
 #endif
-
-#if defined(SANSA_CLIPPLUS) || defined(SANSA_FUZEV2)
-        /* Check for USB after buttons because I trust more the GPIO code than
-         * the i2c code.
-         * Also it seems we need to wait a bit before detecting USB connection
-         * on those models, but not on c200v2
-         */
-
-
-        ldr     r0, =CGU_PROC
-        mov     r1, #0
-        str     r1, [r0]    @ fclk = 24MHz
-
-        ldr     r0, =CGU_PERI
-        ldr     r1, [r0]
-        /* enable i2c audio master clock */
-        orr     r1, r1, #(1<<17)
-        /* pclk = fclk = 24MHz */
-        bic     r1, r1, #0x7f
-        str     r1, [r0]
-
-        ldr     r0, =I2C_BASE
-        /* disable i2c interrupts */
-        mov     r1, #0
-        str     r1, [r0, #I2C_IMR]
-        /* setup prescaler */
-        mov     r1, #I2C_PRESCALER_LOW
-        str     r1, [r0, #I2C_CPSR0]
-        mov     r1, #I2C_PRESCALER_HIGH
-        str     r1, [r0, #I2C_CPSR1]
-        /* setup i2c slave address */
-        mov     r1, #(AS3514_I2C_ADDR << 1)
-        str     r1, [r0, #I2C_SLAD0]
-        mov     r2, #0x51
-        str     r2, [r0, #I2C_CNTRL]
-
-        /* wait for not busy */
-1:
-        ldr     r1, [r0, #I2C_SR]
-        tst     r1, #1
-        bne 1b
-
-        /* wait a bit (~100ms) else detection fails */
-        mov     r1, #0x80000
-1:      subs    r1, r1, #1
-        bne 1b
-
-        /* start read of irq_enrd0 */
-        mov     r1, #AS3514_IRQ_ENRD0
-        str     r1, [r0, #I2C_SADDR]
-        orr     r2, r2, #(1 << 1)
-        str     r2, [r0, #I2C_CNTRL]
-        mov     r1, #1
-        str     r1, [r0, #I2C_DACNT]
-
-        /* wait for transfer to finish */
-1:
-        ldr     r1, [r0, #I2C_DACNT]
-        cmp     r1, #0
-        bne     1b
-
-        /* load result and test USB_STATUS bit */
-        ldr     r1, [r0, #I2C_DATA]
-        tst     r1, #(1 << 3)
-        bne     boot_of
-
-
-#endif
-
 
         /* The dualboot button was not held, so we boot rockbox */
         ldr     r0, ucl_rb_end      /* Address of compressed image */
