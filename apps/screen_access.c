@@ -77,7 +77,7 @@ void screen_helper_setfont(int font)
 #endif
 }
 
-int screen_helper_getuifont(void)
+static int screen_helper_getuifont(void)
 {
 #ifdef HAVE_LCD_BITMAP
     return global_status.font_id[SCREEN_MAIN];
@@ -86,7 +86,7 @@ int screen_helper_getuifont(void)
 #endif
 }
 
-void screen_helper_setuifont(int font)
+static void screen_helper_setuifont(int font)
 {
 #ifdef HAVE_LCD_BITMAP
     global_status.font_id[SCREEN_MAIN] = font;

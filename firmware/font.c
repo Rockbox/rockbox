@@ -348,7 +348,7 @@ const char* font_filename(int font_id)
     return NULL;
 }
 
-size_t font_glyphs_to_bufsize(struct font *pf, int glyphs)
+static size_t font_glyphs_to_bufsize(struct font *pf, int glyphs)
 {
     size_t bufsize;
 

@@ -378,8 +378,6 @@ static int load_bmarks(void* param)
     return GO_TO_PREVIOUS;
 }
 
-int time_screen(void* ignored);     
-
 /* These are all static const'd from apps/menus/ *.c
    so little hack so we can use them */
 extern struct menu_item_ex 

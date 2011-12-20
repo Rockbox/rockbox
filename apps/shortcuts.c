@@ -168,7 +168,7 @@ static void init_shortcut(struct shortcut* sc)
 }
 
 static int first_idx_to_writeback = -1;
-void shortcuts_ata_idle_callback(void* data)
+static void shortcuts_ata_idle_callback(void* data)
 {
     (void)data;
     int fd;
@@ -223,7 +223,7 @@ void shortcuts_add(enum shortcut_type type, const char* value)
     register_storage_idle_func(shortcuts_ata_idle_callback);
 }
 
-int readline_cb(int n, char *buf, void *parameters)
+static int readline_cb(int n, char *buf, void *parameters)
 {
     (void)n;
     (void)parameters;
@@ -388,7 +388,7 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
     return sc->icon;
 }
 
-int shortcut_menu_speak_item(int selected_item, void * data)
+static int shortcut_menu_speak_item(int selected_item, void * data)
 {
     (void)data;
     struct shortcut *sc = get_shortcut(selected_item);

@@ -73,7 +73,7 @@ static struct gui_skin {
 } skins[SKINNABLE_SCREENS_COUNT][NB_SCREENS];
 
 
-void gui_skin_reset(struct gui_skin *skin)
+static void gui_skin_reset(struct gui_skin *skin)
 {
     skin->filename[0] = '\0';
     skin->buffer_start = NULL;
