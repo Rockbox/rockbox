@@ -12816,3 +12816,65 @@
     *: "Start Sleep Timer On Boot"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Glyphs To Cache"
+  </dest>
+  <voice>
+    *: "Glyphs To Cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Shortcuts"
+  </dest>
+  <voice>
+    *: "Shortcuts"
+  </voice>
+</phrase>
