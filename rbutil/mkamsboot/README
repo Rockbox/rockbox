@@ -25,6 +25,7 @@ Supported models
 Sansa Clip  :   firmware version starting with "01."
 Sansa Clip+ :   firmware version starting with "01."
 Sansa Clipv2:   firmware version starting with "02."
+Sansa ClipZip:  firmware version starting with "01."
 Sansa Fuze  :   firmware version starting with "01."
 Sansa Fuzev2:   firmware version starting with "02."
 Sansa E200v2:   firmware version starting with "03."
@@ -40,6 +41,7 @@ For the firmware upgrade to happen, the firmware has to be named specially:
 clip v2 :   m30pa.bin
 clip    :   m300a.bin
 clip+   :   clppa.bin
+clip zip:   clpza.bin
 fuze    :   fuzea.bin
 fuzev2  :   fuzpa.bin
 e200v2  :   e200pa.bin
@@ -57,9 +59,7 @@ firmware and the new (rockbox) firmware.
 
   To boot into the Original Firmware, you need to press the Left key.
   ***Note : on the Clip+ you can alternatively press the Home key.
-
-  The Fuzev2, Clipv2 and Clip+ will boot into the Original Firmware as well if it is powered up by
-inserting an usb cable.
+  ***Note : on the Clip Zip you can alternatively press the Vol- key.
 
 Hacking
 -------
