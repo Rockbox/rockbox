@@ -229,8 +229,8 @@ static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
     {
         IO_SERIAL1_TX_DATA = buf_tx[i];
 
-        /* a short wait for AVR to process data */
-        sleep(0);
+        /* 100 us wait for AVR */
+        udelay(100);
 
         do
         {
@@ -240,8 +240,8 @@ static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
         if (buf_rx != NULL)
             buf_rx[i] = rxdata & 0xFF;
 
-        /* seems to be unneccessary */
-        //udelay(100);
+        /* 100 us wait to give AVR time to process data */
+        udelay(100);
     }
 
     IO_SERIAL1_TX_ENABLE = 0;

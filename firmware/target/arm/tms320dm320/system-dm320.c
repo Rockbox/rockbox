@@ -426,7 +426,7 @@ void udelay(int usec) {
     stop = count + usec*((tmp+1)/10000);
     stop += (unsigned short)(((unsigned long)(usec)*((tmp%10000)+1))/10000);
 
-    /* stop values over tmdiv won't ever be reached */
+    /* stop values over TMDIV won't ever be reached */
     if (stop > tmp)
     {
         stop -= tmp;
@@ -435,15 +435,13 @@ void udelay(int usec) {
     if (stop < count)
     {
         /* udelay will end after counter reset (tick) */
-        while ((((tmp = IO_TIMER1_TMCNT) < stop) &&
-               (current_tick != prev_tick)) ||
+        while (((IO_TIMER1_TMCNT < stop) && (current_tick != prev_tick)) ||
                (current_tick == prev_tick)); /* ensure new tick */
     }
     else
     {
         /* udelay will end before counter reset (tick) */
-        while (((tmp = IO_TIMER1_TMCNT) < stop) &&
-                (current_tick == prev_tick));
+        while ((IO_TIMER1_TMCNT < stop) && (current_tick == prev_tick));
     }
 }
 
