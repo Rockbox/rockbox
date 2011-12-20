@@ -374,6 +374,11 @@ void system_init(void)
 
     i2c_init();
     avr_hid_init();
+
+#ifndef BOOTLOADER
+    /* Disable External Memory interface (used for accessing NOR flash) */
+    bitclr16(&IO_CLK_MOD0, CLK_MOD0_EMIF);
+#endif
 #endif
 }
 
