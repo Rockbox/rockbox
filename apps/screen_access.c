@@ -77,23 +77,17 @@ void screen_helper_setfont(int font)
 #endif
 }
 
+#ifdef HAVE_LCD_BITMAP
 static int screen_helper_getuifont(void)
 {
-#ifdef HAVE_LCD_BITMAP
     return global_status.font_id[SCREEN_MAIN];
-#else
-    return -1;
-#endif
 }
 
 static void screen_helper_setuifont(int font)
 {
-#ifdef HAVE_LCD_BITMAP
     global_status.font_id[SCREEN_MAIN] = font;
-#else
-    (void)font;
-#endif
 }
+#endif
 
 #if NB_SCREENS == 2
 static int screen_helper_remote_getcharwidth(void)
