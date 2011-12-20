@@ -225,7 +225,7 @@ enum character_encoding {
 };
 
 /* cache embedded cuesheet details */
-struct embed_cuesheet {
+struct embedded_cuesheet {
     bool present;
     int size;
     off_t pos;
@@ -322,7 +322,7 @@ struct mp3entry {
 #endif
 
     /* Cuesheet support */
-    struct embed_cuesheet embed_cuesheet;
+    struct embedded_cuesheet embed_cuesheet;
     struct cuesheet *cuesheet;
 
     /* Musicbrainz Track ID */
