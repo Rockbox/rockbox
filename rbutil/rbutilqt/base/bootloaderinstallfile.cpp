@@ -18,7 +18,6 @@
 
 #include <QtCore>
 #include <QtDebug>
-#include <QtDebug>
 #include "bootloaderinstallfile.h"
 #include "utils.h"
 
