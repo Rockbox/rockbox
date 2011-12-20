@@ -381,13 +381,15 @@ static void change_recording_gain(bool increment, bool left, bool right)
 #if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
     HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
     HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
-        if (left) global_settings.rec_left_gain += factor;
-        if (right) global_settings.rec_right_gain += factor;
+        if (left) global_settings.rec_left_gain +=
+                      factor * sound_steps(SOUND_LEFT_GAIN);
+        if (right) global_settings.rec_right_gain +=
+                       factor * sound_steps(SOUND_RIGHT_GAIN);
         break;
 #endif /* LINE, FMRADIO */
 #if defined(HAVE_MIC_REC)
     case AUDIO_SRC_MIC:
-         global_settings.rec_mic_gain += factor;
+         global_settings.rec_mic_gain += factor * sound_steps(SOUND_MIC_GAIN);
 #endif
     }
 }
@@ -494,7 +496,7 @@ static void auto_gain_control(int *peak_l, int *peak_r, int *balance)
                             (global_settings.rec_agc_cliptime + 1);
         if (agc_left  > AGC_HIGH) {
             agc_droptime++;
-            agc_risetime=0;
+            agc_risetime = 0;
             if (agc_left > AGC_PEAK)
                 agc_droptime += 2;
         }
