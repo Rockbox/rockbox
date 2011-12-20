@@ -66,6 +66,13 @@ bool list_stop_handler(void);
 void car_adapter_mode_init(void) INIT_ATTR;
 extern int show_logo(void);
 
+/* Unicode byte order mark sequences and lengths */
+#define BOM_UTF_8 "\xef\xbb\xbf"
+#define BOM_UTF_8_SIZE 3
+#define BOM_UTF_16_LE "\xff\xfe"
+#define BOM_UTF_16_BE "\xfe\xff"
+#define BOM_UTF_16_SIZE 2
+
 int open_utf8(const char* pathname, int flags);
 
 #ifdef BOOTFILE

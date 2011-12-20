@@ -49,6 +49,7 @@
 #include "metadata_common.h"
 #endif
 #include "metadata_parsers.h"
+#include "misc.h"
 
 static unsigned long unsync(unsigned long b0,
                             unsigned long b1,
@@ -1008,10 +1009,13 @@ void setid3v2title(int fd, struct mp3entry *entry)
                                 break;
                             case 0x01:
                                 tag++;
-                                if (!memcmp(tag, "\xfe\xff", 2))
+                                if (!memcmp(tag,
+                                   BOM_UTF_16_BE, BOM_UTF_16_SIZE)) {
                                     char_enc = CHAR_ENC_UTF_16_BE;
-                                else if (!memcmp(tag, "\xff\xfe", 2))
+                                } else if (!memcmp(tag,
+                                          BOM_UTF_16_LE, BOM_UTF_16_SIZE)) {
                                     char_enc = CHAR_ENC_UTF_16_LE;
+                                }
                                 /* \1 + BOM(2) + C0U0E0S0H0E0E0T000 = 21 */
                                 cuesheet_offset = 21;
                                 break;

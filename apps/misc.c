@@ -1011,13 +1011,11 @@ void format_time(char* buf, int buf_size, long t)
  *  If the file is opened for writing and O_TRUNC is set, write a BOM to
  *  the opened file and leave the file pointer set after the BOM.
  */
-#define BOM "\xef\xbb\xbf"
-#define BOM_SIZE 3
 
 int open_utf8(const char* pathname, int flags)
 {
     int fd;
-    unsigned char bom[BOM_SIZE];
+    unsigned char bom[BOM_UTF_8_SIZE];
 
     fd = open(pathname, flags, 0666);
     if(fd < 0)
@@ -1025,13 +1023,13 @@ int open_utf8(const char* pathname, int flags)
 
     if(flags & (O_TRUNC | O_WRONLY))
     {
-        write(fd, BOM, BOM_SIZE);
+        write(fd, BOM_UTF_8, BOM_UTF_8_SIZE);
     }
     else
     {
-        read(fd, bom, BOM_SIZE);
+        read(fd, bom, BOM_UTF_8_SIZE);
         /* check for BOM */
-        if(memcmp(bom, BOM, BOM_SIZE))
+        if(memcmp(bom, BOM_UTF_8, BOM_UTF_8_SIZE))
             lseek(fd, 0, SEEK_SET);
     }
     return fd;
