@@ -58,7 +58,7 @@ enum Iconset {
     Iconset_Count
 };
 
-struct iconset {
+static struct iconset {
     struct bitmap bmp;
     bool loaded;
     int handle;
