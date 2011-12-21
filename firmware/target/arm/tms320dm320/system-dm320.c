@@ -413,13 +413,35 @@ void set_cpu_frequency(long frequency)
 #endif
 
 /*
- * Waits for specified amount of microseconds
+ * Waits for specified amount of microseconds (or longer, but NEVER less)
+ *
+ * Maximum supported usec value is 10000, use sleep() for longer delays.
  */
 void udelay(int usec) {
+    /*
+     * count and prev_tick must be initialized as soon as posible (right
+     * after function entry)
+     *
+     * count must be initialized before prev_count
+     */
     unsigned short count = IO_TIMER1_TMCNT;
+    long prev_tick = current_tick;
+
+    /* initialization time/sequence of these values is not critical */
     unsigned short stop;
     unsigned short tmp = IO_TIMER1_TMDIV;
-    int prev_tick = current_tick;
+
+    if (!irq_enabled())
+    {
+        /*
+         * Interrupts are disabled
+         *
+         * Clear TIMER1 interrupt to prevent returning from this fuction
+         * before specified amount of time has passed
+         * In worst case this makes udelay() take one tick longer
+         */
+        IO_INTC_IRQ0 = INTR_IRQ0_TMR1;
+    }
 
     /*
      * On Sansa Connect tick timer counts from 0 to 26999
@@ -450,13 +472,14 @@ void udelay(int usec) {
         /* udelay will end after counter reset (tick) */
         while ((IO_TIMER1_TMCNT < stop) ||
                ((current_tick == prev_tick) /* ensure new tick */ &&
-                (IO_INTC_IRQ0 & (1 << 1)))); /* prevent lock */
+                (IO_INTC_IRQ0 & INTR_IRQ0_TMR1))); /* prevent lock */
     }
     else
     {
         /* udelay will end before counter reset (tick) */
         while ((IO_TIMER1_TMCNT < stop) &&
-            ((current_tick == prev_tick) && (IO_INTC_IRQ0 & (1 << 1))));
+            ((current_tick == prev_tick) &&
+             (IO_INTC_IRQ0 & INTR_IRQ0_TMR1)));
     }
 }
 
