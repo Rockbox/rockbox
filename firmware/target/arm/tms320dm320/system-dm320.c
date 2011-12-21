@@ -412,6 +412,9 @@ void set_cpu_frequency(long frequency)
 }
 #endif
 
+/*
+ * Waits for specified amount of microseconds
+ */
 void udelay(int usec) {
     unsigned short count = IO_TIMER1_TMCNT;
     unsigned short stop;
@@ -432,16 +435,28 @@ void udelay(int usec) {
         stop -= tmp;
     }
 
+    /*
+     * Status in IO_INTC_IRQ0 is changed even when interrupts are
+     * masked. If IRQ_TIMER1 bit in IO_INTC_IRQ0 is set to 0, then
+     * there is pending current_tick update.
+     *
+     * Relaying solely on current_tick value when interrupts are disabled
+     * can lead to lockup.
+     * Interrupt status bit check below is used to prevent this lockup.
+     */
+ 
     if (stop < count)
     {
         /* udelay will end after counter reset (tick) */
         while ((IO_TIMER1_TMCNT < stop) ||
-               (current_tick == prev_tick)); /* ensure new tick */
+               ((current_tick == prev_tick) /* ensure new tick */ &&
+                (IO_INTC_IRQ0 & IRQ_TIMER1))); /* prevent lock */
     }
     else
     {
         /* udelay will end before counter reset (tick) */
-        while ((IO_TIMER1_TMCNT < stop) && (current_tick == prev_tick));
+        while ((IO_TIMER1_TMCNT < stop) &&
+            ((current_tick == prev_tick) && (IO_INTC_IRQ0 & IRQ_TIMER1)));
     }
 }
 
