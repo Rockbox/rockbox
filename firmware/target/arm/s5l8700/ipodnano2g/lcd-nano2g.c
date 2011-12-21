@@ -211,7 +211,7 @@ bool lcd_active(void)
 
 #ifdef HAVE_LCD_SLEEP
 
-void lcd_wakeup(void)
+static void lcd_wakeup(void)
 {
     unsigned short *lcd_init_sequence;
     unsigned int lcd_init_sequence_length;

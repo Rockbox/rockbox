@@ -33,7 +33,7 @@ static int int_btn = BUTTON_NONE;
  * Generate a click sound from the player (not in headphones yet)
  * TODO: integrate this with the "key click" option
  */
-void button_click(void)
+static void button_click(void)
 {
     GPO32_ENABLE |= 0x2000;
     GPO32_VAL |= 0x2000;

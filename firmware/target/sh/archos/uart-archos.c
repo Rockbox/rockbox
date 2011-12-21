@@ -65,7 +65,7 @@ int tx_rdy(void)
     return 1;
 }
 
-int rx_rdy(void)
+static int rx_rdy(void)
 {
     if(SSR1 & SCI_RDRF)
         return 1;
@@ -79,7 +79,7 @@ void tx_writec(unsigned char c)
     (void)c;
 }
 
-unsigned char rx_readc(void)
+static unsigned char rx_readc(void)
 {
     char tmp;
     /* Read byte and clear the Rx Full bit */

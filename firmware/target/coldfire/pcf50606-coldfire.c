@@ -299,6 +299,9 @@ inline bool pcf50606_i2c_getack(void)
     return ret;
 }
 
+#if !defined(IRIVER_H300_SERIES)
+static
+#endif
 void pcf50606_i2c_outb(unsigned char byte)
 {
 #ifdef USE_ASM
@@ -370,6 +373,9 @@ void pcf50606_i2c_outb(unsigned char byte)
 #endif
 }
 
+#if !defined(IRIVER_H300_SERIES)
+static
+#endif
 unsigned char pcf50606_i2c_inb(bool ack)
 {
     unsigned char byte = 0;

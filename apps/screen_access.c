@@ -129,7 +129,7 @@ void screen_helper_remote_setfont(int font)
     lcd_remote_setfont(font);
 }
 
-int screen_helper_remote_getuifont(void)
+static int screen_helper_remote_getuifont(void)
 {
 #ifdef HAVE_LCD_BITMAP
     return global_status.font_id[SCREEN_REMOTE];
@@ -138,7 +138,7 @@ int screen_helper_remote_getuifont(void)
 #endif
 }
 
-void screen_helper_remote_setuifont(int font)
+static void screen_helper_remote_setuifont(int font)
 {
 #ifdef HAVE_LCD_BITMAP
     global_status.font_id[SCREEN_REMOTE] = font;

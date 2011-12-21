@@ -233,7 +233,7 @@ static void remote_dev_enable(bool enable)
     }
 }
 
-void remote_update_lcd(void)
+static void remote_update_lcd(void)
 {
     int x, y, draw_now;
     unsigned char data[RC_WIDTH + 7];

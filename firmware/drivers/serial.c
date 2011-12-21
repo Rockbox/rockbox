@@ -99,7 +99,7 @@ int tx_rdy(void)
         return 0;
 }
 
-int rx_rdy(void)
+static int rx_rdy(void)
 {
     if((SER0_LSR & 0x1))
         return 1;
@@ -112,7 +112,7 @@ void tx_writec(unsigned char c)
     SER0_THR =(int) c;
 }
 
-unsigned char rx_readc(void)
+static unsigned char rx_readc(void)
 {
     return (SER0_RBR & 0xFF);
 }
