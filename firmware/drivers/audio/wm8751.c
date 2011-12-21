@@ -30,6 +30,7 @@
 #include "audio.h"
 #include "audiohw.h"
 #include "system.h"
+#include "sound.h"
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},

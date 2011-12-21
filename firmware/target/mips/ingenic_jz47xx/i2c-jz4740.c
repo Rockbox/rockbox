@@ -24,6 +24,7 @@
 #include "system.h"
 #include "jz4740.h"
 #include "logf.h"
+#include "i2c.h"
 
 /*
  * Jz4740 I2C routines.

@@ -19,6 +19,8 @@
  *
  ****************************************************************************/
 
+#include "lcd.h"
+
 /* Update the display.
    This must be called after all other LCD functions that change the display */
 void lcd_update(void)

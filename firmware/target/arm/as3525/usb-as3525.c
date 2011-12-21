@@ -27,6 +27,7 @@
 #include "usb-target.h"
 #include "power.h"
 #include "as3525.h"
+#include "usb_drv.h"
 
 static int usb_status = USB_EXTRACTED;
 

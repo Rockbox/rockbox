@@ -26,6 +26,7 @@
 #include "panic.h"
 #include "system.h"
 #include "kernel.h"
+#include "power.h"
 
 #define EXTENDED_EXCEPTION_DESC 0
 #if EXTENDED_EXCEPTION_DESC

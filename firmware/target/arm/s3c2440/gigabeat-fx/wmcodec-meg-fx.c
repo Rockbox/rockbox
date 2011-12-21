@@ -34,6 +34,7 @@
 #include "wmcodec.h"
 
 #ifdef HAVE_HARDWARE_BEEP
+#include "misc.h"
 static void beep_stop(void);
 #endif
 

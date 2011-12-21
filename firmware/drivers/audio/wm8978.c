@@ -27,6 +27,7 @@
 #include "audio.h"
 /*#define LOGF_ENABLE*/
 #include "logf.h"
+#include "sound.h"
 
 /* TODO: Define/refine an API for special hardware steps outside the
  * main codec driver such as special GPIO handling. */

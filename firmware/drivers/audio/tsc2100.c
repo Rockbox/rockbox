@@ -26,6 +26,7 @@
 #include "audio.h"
 
 #include "audiohw.h"
+#include "sound.h"
 #include "tsc2100.h"
 
 const struct sound_settings_info audiohw_settings[] = {
