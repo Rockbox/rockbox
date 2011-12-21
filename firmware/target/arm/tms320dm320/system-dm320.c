@@ -437,7 +437,7 @@ void udelay(int usec) {
 
     /*
      * Status in IO_INTC_IRQ0 is changed even when interrupts are
-     * masked. If IRQ_TIMER1 bit in IO_INTC_IRQ0 is set to 0, then
+     * masked. If bit 1 in IO_INTC_IRQ0 is set to 0, then
      * there is pending current_tick update.
      *
      * Relaying solely on current_tick value when interrupts are disabled
@@ -450,13 +450,13 @@ void udelay(int usec) {
         /* udelay will end after counter reset (tick) */
         while ((IO_TIMER1_TMCNT < stop) ||
                ((current_tick == prev_tick) /* ensure new tick */ &&
-                (IO_INTC_IRQ0 & IRQ_TIMER1))); /* prevent lock */
+                (IO_INTC_IRQ0 & (1 << 1)))); /* prevent lock */
     }
     else
     {
         /* udelay will end before counter reset (tick) */
         while ((IO_TIMER1_TMCNT < stop) &&
-            ((current_tick == prev_tick) && (IO_INTC_IRQ0 & IRQ_TIMER1)));
+            ((current_tick == prev_tick) && (IO_INTC_IRQ0 & (1 << 1))));
     }
 }
 
