@@ -144,8 +144,11 @@ static int ogg_stream_discard_packet(OggVorbis_File *vf,ogg_page *og,
   }
   if (ret < 0)
     return -1;
-  if (vf->os.body_fill < og->body_len)
-    if(_os_body_expand(&vf->os, og->body_len))
+  /* We might be pretending to have filled in more of the buffer than there is
+     actual space, in this case the body storage must be expanded before we
+     start writing to it */
+  if (vf->os.body_fill < og->body_len || vf->os.body_storage < vf->os.body_fill)
+    if(_os_body_expand(&vf->os, vf->os.body_fill - vf->os.body_storage + og->body_len))
       return -1;
   memcpy(vf->os.body_data+vf->os.body_fill-og->body_len, og->body, og->body_len);
   return 1;
