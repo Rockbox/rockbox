@@ -100,7 +100,8 @@ void lcd_init_device(void)
     bitset16(&IO_CLK_MOD1, CLK_MOD1_OSD);
 
     /* magic values based on OF bootloader initialization */
-    IO_VID_ENC_VMOD = 0x2010;
+    /* Set DAC to powerdown mode (bit 2 to 1 in VMOD) */
+    IO_VID_ENC_VMOD = 0x2014; /* OF sets 0x2010 */
     IO_VID_ENC_VDPRO = 0x80;
     IO_VID_ENC_HSPLS = 0x4;
     IO_VID_ENC_HINT = 0x4B0;
@@ -117,7 +118,7 @@ void lcd_init_device(void)
     IO_VID_ENC_VDCTL = 0x6000;
     IO_VID_ENC_SYNCTL = 0x2;
     IO_VID_ENC_LCDOUT = 0x101;
-    IO_VID_ENC_VMOD = 0x2011;
+    IO_VID_ENC_VMOD = 0x2015; /* OF sets 0x2011 */
 
     /* Copy Rockbox frame buffer to the second framebuffer */
     lcd_update();
@@ -148,7 +149,7 @@ void lcd_init_device(void)
     bitset16(&IO_CLK_MOD1, CLK_MOD1_VENC | CLK_MOD1_OSD);
 
     /* Enable Video Encoder - RGB666, custom timing */
-    IO_VID_ENC_VMOD = 0x2011;
+    IO_VID_ENC_VMOD = 0x2015;
     avr_hid_lcm_wake();
     lcd_on = true;
 }
