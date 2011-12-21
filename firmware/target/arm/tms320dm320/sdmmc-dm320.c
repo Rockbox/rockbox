@@ -348,6 +348,9 @@ static int sd_init_card(const int card_no)
     bitclr16(&IO_MMC_CONTROL, MMC_CTRL_WIDTH);
     sd_set_clock_rate(INITIAL_CLK);
 
+    /* Prevent dead lock */
+    udelay(100);
+
     ret = sd_command(SD_GO_IDLE_STATE, 0, MMC_CMD_INITCLK, NULL);
 
     if (ret < 0)
@@ -423,6 +426,9 @@ static int sd_init_card(const int card_no)
     sd_parse_csd(currcard);
 
     sd_set_clock_rate(currcard->speed);
+
+    /* Prevent dead lock */
+    udelay(100);
 
     ret = sd_command(SD_SELECT_CARD, currcard->rca,
                      SDHC_RESP_FMT_1, NULL);
@@ -893,7 +899,7 @@ int sd_init(void)
 
     /* mmc module clock: 75 Mhz (AHB) / 2 = ~37.5 Mhz
      * (Frequencies above are taken from Sansa Connect's OF source code) */
-    IO_CLK_DIV3 = (IO_CLK_DIV3 & 0xFF00) | 0x02; /* OF uses 1 */
+    IO_CLK_DIV3 = (IO_CLK_DIV3 & 0xFF00) | 0x01;
 
     bitset16(&IO_CLK_MOD2, CLK_MOD2_MMC);
 
@@ -932,8 +938,8 @@ int sd_init(void)
 
     sd_select_device(1);
 
-    /* Enable Memory Card CLK */
-    bitset16(&IO_MMC_MEM_CLK_CONTROL, (1 << 8));
+    /* Disable Memory Card CLK - it is enabled on demand by TMS320DM320 */
+    bitclr16(&IO_MMC_MEM_CLK_CONTROL, (1 << 8));
 
     queue_init(&sd_queue, true);
     sd_thread_id = create_thread(sd_thread, sd_stack, sizeof(sd_stack),

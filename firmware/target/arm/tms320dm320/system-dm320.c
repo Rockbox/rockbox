@@ -435,7 +435,7 @@ void udelay(int usec) {
     if (stop < count)
     {
         /* udelay will end after counter reset (tick) */
-        while (((IO_TIMER1_TMCNT < stop) && (current_tick != prev_tick)) ||
+        while ((IO_TIMER1_TMCNT < stop) ||
                (current_tick == prev_tick)); /* ensure new tick */
     }
     else
