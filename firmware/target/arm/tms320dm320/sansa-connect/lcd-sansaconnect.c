@@ -96,8 +96,8 @@ void lcd_init_device(void)
        OF bootloader sets division to 8, vmlinux sets it to 11 */
     IO_CLK_DIV3 = (IO_CLK_DIV3 & ~(0x1F00)) | 0xB00;
 
-    /* Enable DAC and OSD clocks */
-    bitset16(&IO_CLK_MOD1, CLK_MOD1_DAC | CLK_MOD1_OSD);
+    /* Enable OSD clock */
+    bitset16(&IO_CLK_MOD1, CLK_MOD1_OSD);
 
     /* magic values based on OF bootloader initialization */
     IO_VID_ENC_VMOD = 0x2010;
@@ -144,8 +144,8 @@ void lcd_init_device(void)
 
     IO_OSD_OSDWINMD1 = 0; /* disable OSD window 1 */
 
-    /* Enable DAC, Video Encoder and OSD clocks */
-    bitset16(&IO_CLK_MOD1, CLK_MOD1_DAC | CLK_MOD1_VENC | CLK_MOD1_OSD);
+    /* Enable Video Encoder and OSD clocks */
+    bitset16(&IO_CLK_MOD1, CLK_MOD1_VENC | CLK_MOD1_OSD);
 
     /* Enable Video Encoder - RGB666, custom timing */
     IO_VID_ENC_VMOD = 0x2011;
