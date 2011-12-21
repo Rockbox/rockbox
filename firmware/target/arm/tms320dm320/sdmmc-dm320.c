@@ -348,7 +348,7 @@ static int sd_init_card(const int card_no)
     bitclr16(&IO_MMC_CONTROL, MMC_CTRL_WIDTH);
     sd_set_clock_rate(INITIAL_CLK);
 
-    /* Prevent dead lock */
+    /* Prevent controller lock */
     udelay(100);
 
     ret = sd_command(SD_GO_IDLE_STATE, 0, MMC_CMD_INITCLK, NULL);
@@ -427,7 +427,7 @@ static int sd_init_card(const int card_no)
 
     sd_set_clock_rate(currcard->speed);
 
-    /* Prevent dead lock */
+    /* Prevent controller lock */
     udelay(100);
 
     ret = sd_command(SD_SELECT_CARD, currcard->rca,
