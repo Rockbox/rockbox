@@ -29,10 +29,11 @@ void main(void) {
     TCR = 1 << 4; /* Stop the timer. */
     IMR = 0xffff; /* Unmask all interrupts. */
     IFR = IFR; /* Clear all pending interrupts. */
+    PMST |= 1 << 2; /* Turn CLOCKOUT off to save power */
     asm("   rsbx INTM"); /* Globally enable interrupts. */
-    
+
     audiohw_init();
-    
+
     dma_init();
 
 #if defined(HAVE_DEBUG)
