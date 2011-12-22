@@ -36,7 +36,7 @@
 #include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
-static const uint8_t in_ep_list[] = {0, 1, 3}; // FIXME : EP5 ?
+static const uint8_t in_ep_list[] = {0, 1, 3, 5};
 static const uint8_t out_ep_list[] = {0, 2, 4};
 
 /* store per endpoint, per direction, information */
