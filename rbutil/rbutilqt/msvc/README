@@ -1,0 +1,97 @@
+Rockbox Utility with Visual Studio
+==================================
+
+This document describes how to build Rockbox Utility using Visual Studio.
+
+*Note*: building with Visual Studio is only useful for debugging / development.
+Since several parts used by Rockbox Utility can't be compiled using Visual
+Studio at all using DLLs is required. For distributing we want a statically
+linked binary, which does not work this way. Building with MinGW is much easier
+in general, since using VS requires the use of MinGW as well.
+
+All of the steps described below are to be performed in the folder this file is
+located in on a command prompt (cmd.exe on Windows). All paths stated are the
+default paths on an english Windows XP setup. You might need to adjust them to
+your system.
+
+Steps
+-----
+Building with VS requires several steps:
+1. Prepare your build environment
+2. Build DLLs using MinGW for the parts that cannot be compiled with VS and
+   create LIB files from the DLLs. This requires using tools from VS.
+3. Create a VS project file
+4. Build the remaining code using VS.
+
+Preparing the build environment
+-------------------------------
+The DLLs can be cross compiled on Linux. Everything else has to be done on
+Windows. If you decide to cross compile, you need to install:
+- Linux
+  - MinGW toolchain
+- Windows
+  - MinGW with (at least) the mingw32-make package.
+  - Visual Studio 2008 (other versions might work but are not tested. Express
+    version is sufficient).
+  - Windows Platform SDK (in case you're using the Express version of VS,
+    otherwise this is included in VS)
+  - Qt SDK for VS.
+
+If you decide to not cross compile the DLLs you need to install additionally to
+the programs listed above on Windows:
+- MinGW with the following packages (and their dependencies):
+  - mingw32-gcc
+  - mingw32-make
+  - msys-coreutils
+  - msys-sed
+  - msys-bash
+  - msys-grep
+
+On Windows, open a command prompt and set up your path:
+
+  set PATH=c:\MinGW\bin;c:\MinGW\msys\1.0\bin;%PATH%
+  c:\Program Files\Microsoft Visual Studio 9\Common7\Tools\vsvars.bat
+
+
+Building DLLs and LIBs
+----------------------
+On Linux, run
+
+  make CROSS=i686-pc-mingw32-
+
+Adjust the CROSS variable to the prefix of your cross compiler. This will
+create the DLL files only. Copy the resulting DLL and DEF files to the Windows
+machine, then proceed with the Windows instructions below. The Makefile will
+not remake the DLLs if they are already present.
+
+On Windows, run
+
+  mingw32-make
+
+This will build the DLL files (if missing) and create LIB files from them.
+
+
+Create a VS project file
+------------------------
+To create a project file for VS, run
+
+  c:\QtSDK\Desktop\Qt\4.7.4\msvc2008\bin\qmake.exe -tp vc
+
+This creates a file RockboxUtility.vcproj.
+
+
+Build using VS
+--------------
+Open the generated project file and build as usual with VS.
+
+
+LICENSE INFORMATION
+===================
+This folder contains additional files necessary for building.
+
+- stdbool.h: taken form clang 2.8
+- stdint.h, inttypes.h: taken from the msinttypes project
+  (http://code.google.com/p/msinttypes) r26.
+
+See the source files for detailed license information.
+
