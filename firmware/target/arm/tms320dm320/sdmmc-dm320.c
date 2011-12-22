@@ -68,7 +68,7 @@
 #define EC_CRC_ERROR             15
 #define NUM_EC                   16
 
-#define MIN_YIELD_PERIOD        1000
+#define MIN_YIELD_PERIOD        5
 #define UNALIGNED_NUM_SECTORS   10
 #define MAX_TRANSFER_ERRORS     10
 
@@ -899,7 +899,7 @@ int sd_init(void)
 
     /* mmc module clock: 75 Mhz (AHB) / 2 = ~37.5 Mhz
      * (Frequencies above are taken from Sansa Connect's OF source code) */
-    IO_CLK_DIV3 = (IO_CLK_DIV3 & 0xFF00) | 0x01;
+    IO_CLK_DIV3 = (IO_CLK_DIV3 & 0xFF00) | 0x02; /* OF uses 1 */
 
     bitset16(&IO_CLK_MOD2, CLK_MOD2_MMC);
 
