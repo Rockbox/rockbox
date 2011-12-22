@@ -121,7 +121,7 @@ static int sd_wait_for_tran_state(void)
     
     while (1)
     {
-        while(!send_cmd(SD_SEND_STATUS, card_info.rca, SSP_SHORT_RESP, &response) && cmd_retry > 0)
+        while(!send_cmd(SD_SEND_STATUS, card_info.rca, MCI_RESP, &response) && cmd_retry > 0)
             cmd_retry--;
 
         if(cmd_retry <= 0)
@@ -335,7 +335,7 @@ static int transfer_sectors(IF_MD2(int drive,) unsigned long start, int count, v
             goto Lend;
     }
     
-    if(!send_cmd(SD_SELECT_CARD, card_info.rca, SSP_NO_RESP, NULL))
+    if(!send_cmd(SD_SELECT_CARD, card_info.rca, MCI_NO_RESP, NULL))
     {
         ret = -20;
         goto Lend;
@@ -354,7 +354,7 @@ static int transfer_sectors(IF_MD2(int drive,) unsigned long start, int count, v
             bank_start, SSP_SHORT_RESP, buf, this_count, false, read, &resp);
         if(ret != SSP_SUCCESS)
             break;
-        if(!send_cmd(SD_STOP_TRANSMISSION, 0, SSP_SHORT_RESP|MCI_BUSY, &resp))
+        if(!send_cmd(SD_STOP_TRANSMISSION, 0, MCI_RESP|MCI_BUSY, &resp))
         {
             ret = -15;
             break;
@@ -366,7 +366,7 @@ static int transfer_sectors(IF_MD2(int drive,) unsigned long start, int count, v
 
     Ldeselect:
     /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
-    if(!send_cmd(SD_DESELECT_CARD, 0, SSP_NO_RESP, NULL))
+    if(!send_cmd(SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
         ret = -23;
     Lend:
     mutex_unlock(&sd_mutex);
