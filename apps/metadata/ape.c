@@ -159,7 +159,7 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
                     {
                         id3->albumart.pos  = lseek(fd, 0, SEEK_CUR);
                         id3->albumart.size = item.length - r;
-                        id3->embed_albumart = true;
+                        id3->has_embedded_albumart = true;
                     }
                     
                     /* Seek back to this APE items begin. */

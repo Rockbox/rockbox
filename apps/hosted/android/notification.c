@@ -68,7 +68,7 @@ static void track_changed_callback(void *param)
         album = e->NewStringUTF(env_ptr, id3->album ?: "");
 
         albumart = NULL;
-        if (id3->embed_albumart && id3->albumart.type == AA_TYPE_JPG)
+        if (id3->has_embedded_albumart && id3->albumart.type == AA_TYPE_JPG)
         {   /* extract albumart to a temporary file using mmap() */
             snprintf(buf, sizeof(buf), "/sdcard/rockbox/.temp_albumart_%d.jpg",
                      thread_self());

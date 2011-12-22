@@ -1559,7 +1559,7 @@ static bool audio_load_albumart(struct track_info *info,
 #endif
 
         /* We can only decode jpeg for embedded AA */
-        if (track_id3->embed_albumart && track_id3->albumart.type == AA_TYPE_JPG)
+        if (track_id3->has_embedded_albumart && track_id3->albumart.type == AA_TYPE_JPG)
         {
             user_data.embedded_albumart = &track_id3->albumart;
             hid = bufopen(track_id3->path, 0, TYPE_BITMAP, &user_data);

@@ -487,7 +487,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 {
                     id3->albumart.pos  = pos;
                     id3->albumart.size = size - 16;
-                    id3->embed_albumart = true;
+                    id3->has_embedded_albumart = true;
                 }
             }
             break;

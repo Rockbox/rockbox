@@ -317,7 +317,7 @@ struct mp3entry {
 #endif
 
 #ifdef HAVE_ALBUMART
-    bool embed_albumart;
+    bool has_embedded_albumart;
     struct mp3_albumart albumart;
 #endif
 

@@ -301,7 +301,7 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
 /* parse embed albumart */
 static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
 {
-    entry->embed_albumart = false;
+    entry->has_embedded_albumart = false;
 
     /* we currently don't support unsynchronizing albumart */
     if (entry->albumart.type == AA_TYPE_UNSYNC)
@@ -347,7 +347,7 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
         /* fixup offset&size for image data */
         entry->albumart.pos  += tag - start;
         entry->albumart.size -= tag - start;
-        entry->embed_albumart = true;
+        entry->has_embedded_albumart = true;
     }
     /* return bufferpos as we didn't store anything in id3v2buf */
     return bufferpos;
@@ -1075,7 +1075,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
 
 #ifdef HAVE_ALBUMART
                 /* albumart */
-                if ((!entry->embed_albumart) &&
+                if ((!entry->has_embedded_albumart) &&
                     ((tr->tag_length == 4 && !memcmp( header, "APIC", 4)) ||
                      (tr->tag_length == 3 && !memcmp( header, "PIC" , 3))))
                 {

@@ -503,7 +503,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 if (id3->albumart.type != AA_TYPE_UNKNOWN) {
                                     id3->albumart.pos  = lseek(fd, 0, SEEK_CUR);
                                     id3->albumart.size = datalength;
-                                    id3->embed_albumart = true;
+                                    id3->has_embedded_albumart = true;
                                 }
                             }
                             
