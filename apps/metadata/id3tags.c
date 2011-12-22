@@ -1029,12 +1029,12 @@ void setid3v2title(int fd, struct mp3entry *entry)
                                 break;
                         }
                         if (char_enc > 0) {
-                            entry->embed_cuesheet.present = true;
-                            entry->embed_cuesheet.pos = lseek(fd, 0, SEEK_CUR)
+                            entry->has_embedded_cuesheet = true;
+                            entry->embedded_cuesheet.pos = lseek(fd, 0, SEEK_CUR)
                                 - framelen + cuesheet_offset;
-                            entry->embed_cuesheet.size = totframelen
+                            entry->embedded_cuesheet.size = totframelen
                                 - cuesheet_offset;
-                            entry->embed_cuesheet.encoding = char_enc;
+                            entry->embedded_cuesheet.encoding = char_enc;
                         }
                         break;
                     }

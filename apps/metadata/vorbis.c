@@ -353,10 +353,10 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
         /* Is it an embedded cuesheet? */
         if (!strcasecmp(name, "CUESHEET"))
         {
-            id3->embed_cuesheet.present = true;
-            id3->embed_cuesheet.pos = lseek(file.fd, 0, SEEK_CUR) - read_len;
-            id3->embed_cuesheet.size = len;
-            id3->embed_cuesheet.encoding = CHAR_ENC_UTF_8;
+            id3->has_embedded_cuesheet = true;
+            id3->embedded_cuesheet.pos = lseek(file.fd, 0, SEEK_CUR) - read_len;
+            id3->embedded_cuesheet.size = len;
+            id3->embedded_cuesheet.encoding = CHAR_ENC_UTF_8;
         }
         else
         {

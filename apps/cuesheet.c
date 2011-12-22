@@ -49,11 +49,11 @@ bool look_for_cuesheet_file(struct mp3entry *track_id3, struct cuesheet_file *cu
     char cuepath[MAX_PATH];
     char *dot, *slash;
 
-    if (track_id3->embed_cuesheet.present)
+    if (track_id3->has_embedded_cuesheet)
     {
-        cue_file->pos = track_id3->embed_cuesheet.pos;
-        cue_file->size = track_id3->embed_cuesheet.size;
-        cue_file->encoding = track_id3->embed_cuesheet.encoding;
+        cue_file->pos = track_id3->embedded_cuesheet.pos;
+        cue_file->size = track_id3->embedded_cuesheet.size;
+        cue_file->encoding = track_id3->embedded_cuesheet.encoding;
         strlcpy(cue_file->path, track_id3->path, MAX_PATH);
         return true;
     }

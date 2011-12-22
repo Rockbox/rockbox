@@ -322,7 +322,8 @@ struct mp3entry {
 #endif
 
     /* Cuesheet support */
-    struct embedded_cuesheet embed_cuesheet;
+    bool has_embedded_cuesheet;
+    struct embedded_cuesheet embedded_cuesheet;
     struct cuesheet *cuesheet;
 
     /* Musicbrainz Track ID */

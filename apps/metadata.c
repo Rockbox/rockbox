@@ -439,8 +439,8 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     id3->codectype = probe_file_format(trackname);
 
     /* default values for embedded cuesheets */
-    id3->embed_cuesheet.present = false;
-    id3->embed_cuesheet.pos = 0;
+    id3->has_embedded_cuesheet = false;
+    id3->embedded_cuesheet.pos = 0;
 
     entry = &audio_formats[id3->codectype];
 
