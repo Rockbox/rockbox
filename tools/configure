@@ -148,7 +148,7 @@ findtool(){
 # sdl as requested
 findsdl(){
   # sdl-config might (not) be prefixed for cross compiles so try both.
-  files="sdl-config:${CROSS}sdl-config"
+  files="${CROSS_COMPILE}sdl-config:sdl-config"
   winbuild="$1"
 
   IFS=":"
@@ -234,11 +234,18 @@ simcc () {
  SHARED_CFLAGS="-fPIC -fvisibility=hidden"
 
  if [ "$win32crosscompile" = "yes" ]; then
+   # We are crosscompiling
+   # add cross-compiler option(s)
    LDOPTS="$LDOPTS -mconsole"
    output="$output.exe"
    winbuild="yes"
-   CROSS=${CROSS:-"i586-mingw32msvc-"}
+   CROSS_COMPILE=${CROSS_COMPILE:-"i586-mingw32msvc-"}
    SHARED_CFLAGS=''
+   prefixtools "$CROSS_COMPILE"
+   fibers=`check_fiber`
+   endian="little" # windows is little endian
+   echo "Enabling MMX support"
+   GCCOPTS="$GCCOPTS -mmmx"
  else
  case $uname in
    CYGWIN*)
@@ -294,7 +301,14 @@ simcc () {
  esac
  fi
 
- [ "$winbuild" != "yes" ] && GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
+ if [ "$winbuild" != "yes" ]; then
+   GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
+   if [ "`uname -m`" = "i686" ]; then
+     echo "Enabling MMX support"
+     GCCOPTS="$GCCOPTS -mmmx"
+   fi
+ fi
+
  sdl=`findsdl $winbuild`
 
  if [ -n `echo $app_type | grep "sdl"` ]; then
@@ -312,67 +326,50 @@ simcc () {
  
 
  GCCOPTS="$GCCOPTS -I\$(SIMDIR)"
+ # x86_64 supports MMX by default
 
- if test "X$win32crosscompile" != "Xyes"; then
-   if test "`uname -m`" = "i686"; then
-     echo "Enabling MMX support"
-     GCCOPTS="$GCCOPTS -mmmx"
-   fi
-   # x86_64 supports MMX by default
-
-   id=$$
-   cat >$tmpdir/conftest-$id.c <<EOF
+  if [ "$endian" = "" ]; then
+    id=$$
+    cat >$tmpdir/conftest-$id.c <<EOF
 #include <stdio.h>
 int main(int argc, char **argv)
 {
-  int var=0;
-  char *varp = (char *)&var;
-  *varp=1;
+int var=0;
+char *varp = (char *)&var;
+*varp=1;
 
-  printf("%d\n", var);
-  return 0;
+printf("%d\n", var);
+return 0;
 }
 EOF
+    $CC -o $tmpdir/conftest-$id $tmpdir/conftest-$id.c 2>/dev/null
+    # when cross compiling, the endianess cannot be detected because the above program doesn't run
+    # on the local machine. assume little endian but print a warning
+    endian=`$tmpdir/conftest-$id 2> /dev/null`
+    if [ "$endian" != "" ] && [ $endian -gt "1" ]; then
+      # big endian
+      endian="big"
+    else
+      # little endian
+      endian="little"
+    fi
+  fi
 
-   $CC -o $tmpdir/conftest-$id $tmpdir/conftest-$id.c 2>/dev/null
-
-   # when cross compiling, the endianess cannot be detected because the above program doesn't run
-   # on the local machine. assume little endian but print a warning
-   endian=`$tmpdir/conftest-$id 2> /dev/null`
-   if [ "$endian" != "" ] && [ $endian -gt "1" ]; then
-     # big endian
-     endian="big"
-   else
-     # little endian
-     endian="little"
-   fi
-
-   if [ "$CROSS_COMPILE" != "" ]; then
-     echo "WARNING: Cross Compiling, cannot detect endianess. Assuming little endian!"
-   fi
-
-   if [ "$app_type" = "sdl-sim" ]; then
-     echo "Simulator environment deemed $endian endian"
-   elif [ "$app_type" = "sdl-app" ]; then
-     echo "Application environment deemed $endian endian"
-   elif [ "$app_type" = "checkwps" ]; then
-     echo "CheckWPS environment deemed $endian endian"
-   fi
-
-   # use wildcard here to make it work even if it was named *.exe like
-   # on cygwin
-   rm -f $tmpdir/conftest-$id*
- else
-   # We are crosscompiling
-   # add cross-compiler option(s)
-   prefixtools $CROSS
-   LDOPTS="$LDOPTS -mconsole"
-   fibers=`check_fiber`
-   output="rockboxui.exe"
-   endian="little" # windows is little endian
-   echo "Enabling MMX support"
-   GCCOPTS="$GCCOPTS -mmmx"
+ if [ "$CROSS_COMPILE" != "" ]; then
+   echo "WARNING: Cross Compiling, cannot detect endianess. Assuming $endian endian!"
  fi
+
+ if [ "$app_type" = "sdl-sim" ]; then
+   echo "Simulator environment deemed $endian endian"
+ elif [ "$app_type" = "sdl-app" ]; then
+   echo "Application environment deemed $endian endian"
+ elif [ "$app_type" = "checkwps" ]; then
+   echo "CheckWPS environment deemed $endian endian"
+ fi
+
+ # use wildcard here to make it work even if it was named *.exe like
+ # on cygwin
+ rm -f $tmpdir/conftest-$id*
 
  thread_support=
  if [ -z "$ARG_THREAD_SUPPORT" ] || [ "$ARG_THREAD_SUPPORT" = "0" ]; then
@@ -3514,9 +3511,6 @@ else
  case $prefix in
    ""|"$CROSS_COMPILE")
      # simulator
-   ;;
-   ${CROSS})
-     # cross-compile for win32
    ;;
    *)
    # Verify that the cross-compiler is of a recommended version!
