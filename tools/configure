@@ -223,6 +223,7 @@ simcc () {
  LDOPTS='-lm' # button-sdl.c uses sqrt()
  sigaltstack=""
  fibers=""
+ endian="" # endianess of the dap doesnt matter here
 
  # default output binary name, don't override app_get_platform()
  if [ "$app_type" != "sdl-app" ]; then
