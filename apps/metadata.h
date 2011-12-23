@@ -226,7 +226,6 @@ enum character_encoding {
 
 /* cache embedded cuesheet details */
 struct embedded_cuesheet {
-    bool present;
     int size;
     off_t pos;
     enum character_encoding encoding;
