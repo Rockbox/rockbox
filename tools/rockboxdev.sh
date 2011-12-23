@@ -273,7 +273,7 @@ build_ctng() {
     cat "$dlwhere/ct-ng-config" | sed -e "s,\(CT_PREFIX_DIR=\).*,\1$prefix," > $ctng_config
     cd $builddir/build-$ctng_target
 
-    #~ $ctng "build"
+    $ctng "build"
 
     # install extras
     if test -e "$dlwhere/$extra"; then
