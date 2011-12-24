@@ -29,7 +29,7 @@
 #include "adc-imx233.h"
 #include "power-imx233.h"
 #include "clkctrl-imx233.h"
-#include "powermgmt.h"
+#include "powermgmt-imx233.h"
 #include "string.h"
 
 static struct
@@ -107,11 +107,22 @@ bool dbg_hw_info_power(void)
         lcd_clear_display();
 
         struct imx233_power_info_t info = imx233_power_get_info(POWER_INFO_ALL);
-        lcd_putsf(0, 0, "VDDD: %d mV    linreg: %d", info.vddd, info.vddd_linreg);
-        lcd_putsf(0, 1, "VDDA: %d mV    linreg: %d", info.vdda, info.vdda_linreg);
-        lcd_putsf(0, 2, "VDDIO: %d mV", info.vddio);
+        lcd_putsf(0, 0, "VDDD: %d mV  linreg: %d  offset: %d", info.vddd, info.vddd_linreg,
+            info.vddd_linreg_offset);
+        lcd_putsf(0, 1, "VDDA: %d mV  linreg: %d  offset: %d", info.vdda, info.vdda_linreg,
+            info.vdda_linreg_offset);
+        lcd_putsf(0, 2, "VDDIO: %d mV offset: %d", info.vddio, info.vddio_linreg_offset);
         lcd_putsf(0, 3, "VDDMEM: %d mV  linreg: %d", info.vddmem, info.vddmem_linreg);
         lcd_putsf(0, 4, "DC-DC: pll: %d   freq: %d", info.dcdc_sel_pllclk, info.dcdc_freqsel);
+        lcd_putsf(0, 5, "charge: %d mA  stop: %d mA", info.charge_current, info.stop_current);
+        lcd_putsf(0, 6, "charging: %d  bat_adj: %d", info.charging, info.batt_adj);
+        lcd_putsf(0, 7, "4.2: en: %d  dcdc: %d", info._4p2_enable, info._4p2_dcdc);
+        lcd_putsf(0, 8, "4.2: cmptrip: %d dropout: %d", info._4p2_cmptrip, info._4p2_dropout);
+        lcd_putsf(0, 9, "5V: pwd_4.2_charge: %d", info._5v_pwd_charge_4p2);
+        lcd_putsf(0, 10, "5V: chargelim: %d mA", info._5v_charge_4p2_limit);
+        lcd_putsf(0, 11, "5V: dcdc: %d  xfer: %d", info._5v_enable_dcdc, info._5v_dcdc_xfer);
+        lcd_putsf(0, 12, "5V: thr: %d mV use: %d cmps: %d", info._5v_vbusvalid_thr,
+            info._5v_vbusvalid_detect, info._5v_vbus_cmps);
         
         lcd_update();
         yield();
@@ -194,12 +205,6 @@ static struct
 bool dbg_hw_info_clkctrl(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-    imx233_enable_auto_slow_monitor(AS_CPU_INSTR, true);
-    imx233_enable_auto_slow_monitor(AS_CPU_DATA, true);
-    imx233_enable_auto_slow_monitor(AS_TRAFFIC, true);
-    imx233_enable_auto_slow_monitor(AS_TRAFFIC_JAM, true);
-    imx233_enable_auto_slow_monitor(AS_APBXDMA, true);
-    imx233_enable_auto_slow_monitor(AS_APBHDMA, true);
     
     while(1)
     {
@@ -269,10 +274,49 @@ bool dbg_hw_info_clkctrl(void)
     }
 }
 
+bool dbg_hw_info_powermgmt(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+    
+    while(1)
+    {
+        int button = get_action(CONTEXT_STD, HZ / 10);
+        switch(button)
+        {
+            case ACTION_STD_NEXT:
+            case ACTION_STD_PREV:
+            case ACTION_STD_OK:
+            case ACTION_STD_MENU:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACTION_STD_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+        
+        lcd_clear_display();
+        struct imx233_powermgmt_info_t info = imx233_powermgmt_get_info();
+        
+        lcd_putsf(0, 0, "state: %s",
+            info.state == CHARGE_STATE_DISABLED ? "disabled" :
+            info.state == CHARGE_STATE_ERROR ? "error" :
+            info.state == DISCHARGING ? "discharging" :
+            info.state == TRICKLE ? "trickle" :
+            info.state == TOPOFF ? "topoff" :
+            info.state == CHARGING ? "charging" : "<unknown>");
+        lcd_putsf(0, 1, "charging tmo: %d", info.charging_timeout);
+        lcd_putsf(0, 2, "topoff tmo: %d", info.topoff_timeout);
+        lcd_putsf(0, 3, "4p2ilimit tmo: %d", info.incr_4p2_ilimit_timeout);
+        
+        lcd_update();
+        yield();
+    }
+}
+
 bool dbg_hw_info(void)
 {
-    return dbg_hw_info_clkctrl() && dbg_hw_info_dma() && dbg_hw_info_adc() && dbg_hw_info_power() &&
-            dbg_hw_target_info();
+    return dbg_hw_info_clkctrl() && dbg_hw_info_dma() && dbg_hw_info_adc() &&
+        dbg_hw_info_power() && dbg_hw_info_powermgmt() && dbg_hw_target_info();
 }
 
 bool dbg_ports(void)

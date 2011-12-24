@@ -26,6 +26,43 @@
 #include "system-target.h"
 #include "usb-target.h"
 
+struct current_step_bit_t
+{
+    unsigned current;
+    uint32_t bit;
+};
+
+/* in decreasing order */
+static struct current_step_bit_t g_charger_current_bits[] =
+{
+    { 400, HW_POWER_CHARGE__BATTCHRG_I__400mA },
+    { 200, HW_POWER_CHARGE__BATTCHRG_I__200mA },
+    { 100, HW_POWER_CHARGE__BATTCHRG_I__100mA },
+    { 50, HW_POWER_CHARGE__BATTCHRG_I__50mA },
+    { 20, HW_POWER_CHARGE__BATTCHRG_I__20mA },
+    { 10, HW_POWER_CHARGE__BATTCHRG_I__10mA }
+};
+
+/* in decreasing order */
+static struct current_step_bit_t g_charger_stop_current_bits[] =
+{
+    { 100, HW_POWER_CHARGE__STOP_ILIMIT__100mA },
+    { 50, HW_POWER_CHARGE__STOP_ILIMIT__50mA },
+    { 20, HW_POWER_CHARGE__STOP_ILIMIT__20mA },
+    { 10, HW_POWER_CHARGE__STOP_ILIMIT__10mA }
+};
+
+/* in decreasing order */
+static struct current_step_bit_t g_4p2_charge_limit_bits[] =
+{
+    { 400, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__400mA },
+    { 200, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__200mA },
+    { 100, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__100mA },
+    { 50, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__50mA },
+    { 20, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__20mA },
+    { 10, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__10mA }
+};
+
 void INT_VDD5V(void)
 {
     if(HW_POWER_CTRL & HW_POWER_CTRL__VBUSVALID_IRQ)
@@ -43,6 +80,12 @@ void INT_VDD5V(void)
 
 void power_init(void)
 {
+    /* setup vbusvalid parameters: set threshold to 4v and power up comparators */
+    __REG_CLR(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__VBUSVALID_TRSH_BM;
+    __REG_SET(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__VBUSVALID_TRSH_4V |
+        HW_POWER_5VCTRL__PWRUP_VBUS_CMPS;
+    /* enable vbusvalid detection method for the dcdc (improves efficiency) */
+    __REG_SET(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__VBUSVALID_5VDETECT;
     /* clear vbusvalid irq and set correct polarity */
     __REG_CLR(HW_POWER_CTRL) = HW_POWER_CTRL__VBUSVALID_IRQ;
     if(HW_POWER_STS & HW_POWER_STS__VBUSVALID)
@@ -51,6 +94,11 @@ void power_init(void)
         __REG_SET(HW_POWER_CTRL) = HW_POWER_CTRL__POLARITY_VBUSVALID;
     __REG_SET(HW_POWER_CTRL) = HW_POWER_CTRL__ENIRQ_VBUS_VALID;
     imx233_enable_interrupt(INT_SRC_VDD5V, true);
+    /* setup linear regulator offsets to 25 mV below to prevent contention between
+     * linear regulators and DCDC */
+    __FIELD_SET(HW_POWER_VDDDCTRL, LINREG_OFFSET, 2);
+    __FIELD_SET(HW_POWER_VDDACTRL, LINREG_OFFSET, 2);
+    __FIELD_SET(HW_POWER_VDDIOCTRL, LINREG_OFFSET, 2);
 }
 
 void power_off(void)
@@ -64,12 +112,42 @@ void power_off(void)
 
 unsigned int power_input_status(void)
 {
-    return POWER_INPUT_NONE;
+    return usb_plugged() ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 bool charging_state(void)
 {
-    return false;
+    return HW_POWER_STS & HW_POWER_STS__CHRGSTS;
+}
+
+void imx233_power_set_charge_current(unsigned current)
+{
+    __REG_CLR(HW_POWER_CHARGE) = HW_POWER_CHARGE__BATTCHRG_I_BM;
+    /* find closest current LOWER THAN OR EQUAL TO the expected current */
+    for(unsigned i = 0; i < ARRAYLEN(g_charger_current_bits); i++)
+        if(current >= g_charger_current_bits[i].current)
+        {
+            current -= g_charger_current_bits[i].current;
+            __REG_SET(HW_POWER_CHARGE) = g_charger_current_bits[i].bit;
+        }
+}
+
+void imx233_power_set_stop_current(unsigned current)
+{
+    __REG_CLR(HW_POWER_CHARGE) = HW_POWER_CHARGE__STOP_ILIMIT_BM;
+    /* find closest current GREATHER THAN OR EQUAL TO the expected current */
+    unsigned sum = 0;
+    for(unsigned i = 0; i < ARRAYLEN(g_charger_stop_current_bits); i++)
+        sum += g_charger_stop_current_bits[i].current;
+    for(unsigned i = 0; i < ARRAYLEN(g_charger_stop_current_bits); i++)
+    {
+        sum -= g_charger_stop_current_bits[i].current;
+        if(current > sum)
+        {
+            current -= g_charger_stop_current_bits[i].current;
+            __REG_SET(HW_POWER_CHARGE) = g_charger_stop_current_bits[i].bit;
+        }
+    }
 }
 
 struct imx233_power_info_t imx233_power_get_info(unsigned flags)
@@ -91,14 +169,22 @@ struct imx233_power_info_t imx233_power_get_info(unsigned flags)
     {
         s.vddd = HW_POWER_VDDDCTRL__TRG_MIN + HW_POWER_VDDDCTRL__TRG_STEP * __XTRACT(HW_POWER_VDDDCTRL, TRG);
         s.vddd_linreg = HW_POWER_VDDDCTRL & HW_POWER_VDDDCTRL__ENABLE_LINREG;
+        s.vddd_linreg_offset = __XTRACT(HW_POWER_VDDDCTRL, LINREG_OFFSET) == 0 ? 0 :
+            __XTRACT(HW_POWER_VDDDCTRL, LINREG_OFFSET) == 1 ? 25 : -25;
     }
     if(flags & POWER_INFO_VDDA)
     {
         s.vdda = HW_POWER_VDDACTRL__TRG_MIN + HW_POWER_VDDACTRL__TRG_STEP * __XTRACT(HW_POWER_VDDACTRL, TRG);
         s.vdda_linreg = HW_POWER_VDDACTRL & HW_POWER_VDDACTRL__ENABLE_LINREG;
+        s.vdda_linreg_offset = __XTRACT(HW_POWER_VDDACTRL, LINREG_OFFSET) == 0 ? 0 :
+            __XTRACT(HW_POWER_VDDACTRL, LINREG_OFFSET) == 1 ? 25 : -25;
     }
     if(flags & POWER_INFO_VDDIO)
+    {
         s.vddio = HW_POWER_VDDIOCTRL__TRG_MIN + HW_POWER_VDDIOCTRL__TRG_STEP * __XTRACT(HW_POWER_VDDIOCTRL, TRG);
+        s.vddio_linreg_offset = __XTRACT(HW_POWER_VDDIOCTRL, LINREG_OFFSET) == 0 ? 0 :
+            __XTRACT(HW_POWER_VDDIOCTRL, LINREG_OFFSET) == 1 ? 25 : -25;
+    }
     if(flags & POWER_INFO_VDDMEM)
     {
         s.vddmem = HW_POWER_VDDMEMCTRL__TRG_MIN + HW_POWER_VDDMEMCTRL__TRG_STEP * __XTRACT(HW_POWER_VDDMEMCTRL, TRG);
@@ -108,6 +194,39 @@ struct imx233_power_info_t imx233_power_get_info(unsigned flags)
     {
         s.dcdc_sel_pllclk = HW_POWER_MISC & HW_POWER_MISC__SEL_PLLCLK;
         s.dcdc_freqsel = dcdc_freqsel[__XTRACT(HW_POWER_MISC, FREQSEL)];
+    }
+    if(flags & POWER_INFO_CHARGE)
+    {
+        for(unsigned i = 0; i < ARRAYLEN(g_charger_current_bits); i++)
+            if(HW_POWER_CHARGE & g_charger_current_bits[i].bit)
+                s.charge_current += g_charger_current_bits[i].current;
+        for(unsigned i = 0; i < ARRAYLEN(g_charger_stop_current_bits); i++)
+            if(HW_POWER_CHARGE & g_charger_stop_current_bits[i].bit)
+                s.stop_current += g_charger_stop_current_bits[i].current;
+        s.charging = HW_POWER_STS & HW_POWER_STS__CHRGSTS;
+        s.batt_adj = HW_POWER_BATTMONITOR & HW_POWER_BATTMONITOR__ENBATADJ;
+    }
+    if(flags & POWER_INFO_4P2)
+    {
+        s._4p2_enable = HW_POWER_DCDC4P2 & HW_POWER_DCDC4P2__ENABLE_4P2;
+        s._4p2_dcdc = HW_POWER_DCDC4P2 & HW_POWER_DCDC4P2__ENABLE_DCDC;
+        s._4p2_cmptrip = __XTRACT(HW_POWER_DCDC4P2, CMPTRIP);
+        s._4p2_dropout = __XTRACT(HW_POWER_DCDC4P2, DROPOUT_CTRL);
+    }
+    if(flags & POWER_INFO_5V)
+    {
+        s._5v_pwd_charge_4p2 = HW_POWER_5VCTRL & HW_POWER_5VCTRL__PWD_CHARGE_4P2;
+        s._5v_dcdc_xfer = HW_POWER_5VCTRL & HW_POWER_5VCTRL__DCDC_XFER;
+        s._5v_enable_dcdc = HW_POWER_5VCTRL & HW_POWER_5VCTRL__ENABLE_DCDC;
+        for(unsigned i = 0; i < ARRAYLEN(g_4p2_charge_limit_bits); i++)
+            if(HW_POWER_5VCTRL & g_4p2_charge_limit_bits[i].bit)
+                s._5v_charge_4p2_limit += g_4p2_charge_limit_bits[i].current;
+        s._5v_vbusvalid_detect = HW_POWER_5VCTRL & HW_POWER_5VCTRL__VBUSVALID_5VDETECT;
+        s._5v_vbus_cmps = HW_POWER_5VCTRL & HW_POWER_5VCTRL__PWRUP_VBUS_CMPS;
+        s._5v_vbusvalid_thr =
+            __XTRACT(HW_POWER_5VCTRL, VBUSVALID_TRSH) == 0 ?
+                2900
+                : 3900 + __XTRACT(HW_POWER_5VCTRL, VBUSVALID_TRSH) * 100;
     }
     return s;
 }

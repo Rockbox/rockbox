@@ -1382,6 +1382,7 @@ target/arm/imx233/sansa-fuzeplus/power-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/adc-fuzeplus.c
 #ifndef BOOTLOADER
 target/arm/imx233/sansa-fuzeplus/audio-fuzeplus.c
+target/arm/imx233/sansa-fuzeplus/powermgmt-fuzeplus.c
 #endif
 #endif
 

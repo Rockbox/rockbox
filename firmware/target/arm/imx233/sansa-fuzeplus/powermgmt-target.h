@@ -22,9 +22,27 @@
 #define POWERMGMT_TARGET_H
 
 #include "config.h"
+#include "powermgmt-imx233.h"
 
-void powermgmt_init_target(void);
-void charging_algorithm_step(void);
-void charging_algorithm_close(void);
+/* Fuze+ OF settings:
+ * - current ramp slope: 50 mA/s
+ * - conditioning threshold voltage: 3 V
+ * - conditioning max voltage: 3.1 V
+ * - conditioning current: 60 mA
+ * - conditioning timeout: 1 h
+ * - charging voltage: 4.2 V
+ * - charging current: 200 mA
+ * - charging threshold current: 30 mA
+ * - charging timeout: 4 h
+ * - top off period: 30 min
+ * - high die temperature: 71 °C
+ * - low die temperature: 56 °C
+ * - safe temperature current: 30 mA
+ */
+
+#define IMX233_CHARGE_CURRENT   200
+#define IMX233_STOP_CURRENT     30
+#define IMX233_TOPOFF_TIMEOUT   (30 * 60 * HZ)
+#define IMX233_CHARGING_TIMEOUT (4 * 3600 * HZ)
 
 #endif /*  POWERMGMT_TARGET_H */

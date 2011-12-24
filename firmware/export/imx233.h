@@ -90,5 +90,6 @@
 
 #define __XTRACT(reg, field)    ((reg & reg##__##field##_BM) >> reg##__##field##_BP)
 #define __XTRACT_EX(val, field)    (((val) & field##_BM) >> field##_BP)
+#define __FIELD_SET(reg, field, val) reg = (reg & ~reg##__##field##_BM) | (val << reg##__##field##_BP)
 
 #endif /* __IMX233_H__ */
