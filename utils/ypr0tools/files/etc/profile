@@ -46,6 +46,9 @@ else
     MAINFILE="/usr/local/bin/r0"
 fi
 
+# Parameters for r0
+MAINFILE_ARGV="Application AppMain"
+
 # source the rockbox loader script
 SOURCE="/mnt/media0/.rockbox/rockbox.sh"
 [ -f $SOURCE ] && . $SOURCE
@@ -55,10 +58,11 @@ SOURCE="/mnt/media0/rc.user"
 [ -f $SOURCE ] && . $SOURCE
 
 # finally call the entry point
+# $MAINFILE_REDIRECT can be specified to do e.g. > /dev/null
 if [ -e $MAINFILE ]
 then
     chmod 777 $MAINFILE
-    $MAINFILE Application AppMain
+    sh -c "$MAINFILE $MAINFILE_ARGV $MAINFILE_REDIRECT"
     rm -f /mnt/media1/r0_media0
     sync
 #	sleep 5

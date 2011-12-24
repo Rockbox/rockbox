@@ -45,3 +45,5 @@ mount --bind /mnt/media0/.rockbox /.rockbox
 mount --bind /mnt/media0/Playlists /Playlists
 
 MAINFILE="/mnt/media0/.rockbox/rockbox"
+MAINFILE_ARGV=''
+MAINFILE_REDIRECT='>/dev/null 2>&1'
