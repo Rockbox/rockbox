@@ -258,12 +258,12 @@ static const struct i2c_interface dm320_i2c_interface = {
     .delay = dm320_i2c_delay,
 
     /* uncalibrated */
-    .delay_hd_sta = 1,
-    .delay_hd_dat = 1,
-    .delay_su_dat = 1,
-    .delay_su_sto = 1,
-    .delay_su_sta = 1,
-    .delay_thigh = 1
+    .delay_hd_sta = 2,
+    .delay_hd_dat = 2,
+    .delay_su_dat = 2,
+    .delay_su_sto = 2,
+    .delay_su_sta = 2,
+    .delay_thigh = 2
 };
 
 void i2c_init(void)
