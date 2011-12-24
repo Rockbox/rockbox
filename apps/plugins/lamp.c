@@ -57,7 +57,8 @@
 #   define LAMP_UP         BUTTON_UP
 #   define LAMP_DOWN       BUTTON_DOWN
 
-#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD) || \
+      (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
 #   define LAMP_LEFT       BUTTON_LEFT
 #   define LAMP_RIGHT      BUTTON_RIGHT
 #   define LAMP_UP         BUTTON_UP

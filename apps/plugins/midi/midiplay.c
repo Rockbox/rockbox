@@ -233,6 +233,14 @@
 #define BTN_DOWN         BUTTON_DOWN
 #define BTN_PLAY         BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
+#define BTN_QUIT         BUTTON_BACK
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+#define BTN_PLAY         BUTTON_USER
+
 #else
 #error No keymap defined!
 #endif

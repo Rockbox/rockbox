@@ -74,7 +74,7 @@ typedef struct {
 
 
 #if defined(APPLICATION)
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(SAMSUNG_YPR0)
 #include "dir-target.h"
 #endif
 # undef opendir_uncached

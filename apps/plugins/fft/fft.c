@@ -257,6 +257,15 @@ GREY_INFO_STRUCT
 #   define FFT_FREQ_SCALE   BUTTON_DOWN
 #   define FFT_QUIT         BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_ORIENTATION  BUTTON_USER
+#   define FFT_WINDOW       BUTTON_MENU
+#   define FFT_AMP_SCALE    BUTTON_SELECT
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_QUIT         BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif

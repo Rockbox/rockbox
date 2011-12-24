@@ -422,6 +422,16 @@
 #define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
 #define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
+#define CB_SELECT  BUTTON_SELECT
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_LEFT
+#define CB_RIGHT   BUTTON_RIGHT
+#define CB_PLAY    BUTTON_USER
+#define CB_LEVEL   BUTTON_BACK
+#define CB_MENU    BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

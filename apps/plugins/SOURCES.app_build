@@ -1,3 +1,7 @@
+#ifndef HAVE_TOUCHSCREEN
+/* In devices running RockBox as an application, but having a keypad */
+#include "SOURCES"
+#else
 /* plugins common to all models */
 credits.c
 properties.c
@@ -39,3 +43,5 @@ test_sampr.c
 #endif
 test_viewports.c
 #endif /* HAVE_TEST_PLUGINS */
+
+#endif /* HAVE_TOUCHSCREEN */

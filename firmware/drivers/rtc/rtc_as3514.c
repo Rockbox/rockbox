@@ -141,11 +141,11 @@ void rtc_alarm_poweroff(void)
         seconds = 24*3600;
 
     seconds -= tm.tm_sec;
-
+#ifndef SAMSUNG_YPR0
     /* disable MCLK, it is a wakeup source and prevents proper shutdown */
     CGU_AUDIO = (2 << 0) | (1 << 11);
     CGU_PLLBSUP = (1 << 2) | (1 << 3);
-
+#endif
     /* write wakeup register */
     alarm.seconds = seconds;
     alarm.enabled = true;

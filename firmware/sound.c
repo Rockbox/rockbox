@@ -235,7 +235,8 @@ static void set_prescaled_volume(void)
     dsp_callback(DSP_CALLBACK_SET_SW_VOLUME, 0);
 #endif
 
-#ifndef HAVE_SDL_AUDIO
+/* ypr0 with sdl has separate volume controls */
+#if !defined(HAVE_SDL_AUDIO) || defined(SAMSUNG_YPR0)
 #if CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
@@ -670,7 +671,7 @@ void sound_set(int setting, int value)
   && !defined (HAVE_WM8711) && !defined (HAVE_WM8721) \
   && !defined (HAVE_WM8731) && !defined (HAVE_WM8978) \
   && !defined (HAVE_WM8750) && !defined (HAVE_WM8751) \
-  && !defined(HAVE_AK4537)) || (CONFIG_PLATFORM & PLATFORM_HOSTED)
+  && !defined(HAVE_AK4537)) || defined(SIMULATOR)
 int sound_val2phys(int setting, int value)
 {
 #if CONFIG_CODEC == MAS3587F

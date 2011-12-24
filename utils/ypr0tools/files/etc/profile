@@ -1,0 +1,66 @@
+export PS1='\u@\h \w$ '
+export PS2='> '
+export PS3='? '
+export PS4='[$LINENO]+'
+
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+export LD_LIBRARY_PATH=/mnt/media1/Lib:/mnt/media1/Lib/ExtraLib:/usr/lib
+export FSL_OMX_COMPONENT_REGISTRY="/Sysdata/OpenMaxIL/ComponentRegistry.txt"
+export FSL_OMX_MAX_INDEX_SIZE=1048576
+export MALLOC_CHECK_=0
+
+ulimit -s unlimited
+hwclock -s
+
+alias ls='ls --color=auto'
+alias ll='ls -l --color=auto'
+
+# Start with lorenzo92's safe mode
+SCRIPT="/etc/mods/safe_mode.sh"
+if [ -f $SCRIPT ]
+then
+    /bin/sh $SCRIPT
+    # it returns 1 if usb was connected
+    if [ "$?" = "1" ]
+    then
+        sync
+        sleep 1
+        reboot
+    fi
+fi
+
+if [ -e "/mnt/media1/r0" ]
+then
+    MAINFILE="/mnt/media1/r0"
+elif [ -f "/mnt/media0/r0" ]
+then
+    # copy to media1 since USB wouldn't work
+    cp /mnt/media0/r0 /mnt/media1/r0_media0
+    if [ "$?" = "0" ]
+    then # perhaps cp failed due to insufficient storage or so
+        MAINFILE="/mnt/media1/r0_media0"
+    else
+        MAINFILE="/usr/local/bin/r0"
+    fi
+else
+    MAINFILE="/usr/local/bin/r0"
+fi
+
+# source the rockbox loader script
+SOURCE="/mnt/media0/.rockbox/rockbox.sh"
+[ -f $SOURCE ] && . $SOURCE
+
+# source user script if available
+SOURCE="/mnt/media0/rc.user"
+[ -f $SOURCE ] && . $SOURCE
+
+# finally call the entry point
+if [ -e $MAINFILE ]
+then
+    chmod 777 $MAINFILE
+    $MAINFILE Application AppMain
+    rm -f /mnt/media1/r0_media0
+    sync
+#	sleep 5
+    reboot
+fi

@@ -466,6 +466,22 @@ enum {
 #define BJACK_RIGHT         BUTTON_RIGHT
 #define BJACK_LEFT          BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
+#define BJACK_SELECT_NAME   "SELECT"
+#define BJACK_STAY_NAME     "MENU"
+#define BJACK_QUIT_NAME     "BACK"
+#define BJACK_DOUBLE_NAME   "USER"
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_BACK
+#define BJACK_MAX           (BUTTON_LEFT|BUTTON_UP)
+#define BJACK_MIN           (BUTTON_RIGHT|BUTTON_DOWN)
+#define BJACK_STAY          BUTTON_MENU
+#define BJACK_DOUBLEDOWN    BUTTON_USER
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
+
 #else
 #error No keymap defined!
 #endif

@@ -26,7 +26,7 @@
 #include "string.h"
 #include "file.h"
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 long cpu_frequency SHAREDBSS_ATTR = CPU_FREQ;
 #endif
 

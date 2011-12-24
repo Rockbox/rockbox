@@ -1,4 +1,11 @@
-/* For all targets with a bitmap display */
+#ifndef HAVE_TOUCHSCREEN
+/* This is for devices having a keypad, running RockBox as an application */
+#include "SUBDIRS"
+
+#else
+/* For all targets with a bitmap display and a touchscreen
+ * In fact, most of the plugins aren't supposed to be used on a touch(mouse) device
+ */
 #ifdef HAVE_LCD_BITMAP
 
 #ifdef HAVE_TAGCACHE
@@ -15,3 +22,4 @@ mikmod
 #endif
 
 #endif /* CONFIG_CODEC == SWCODEC */
+#endif /* HAVE_TOUCHSCREEN */

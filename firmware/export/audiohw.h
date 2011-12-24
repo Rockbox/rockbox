@@ -79,7 +79,7 @@
 #elif defined(HAVE_DUMMY_CODEC)
 #include "dummy_codec.h"
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#if (CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO|PLATFORM_PANDORA|PLATFORM_SDL))
 /* #include <SDL_audio.h> gives errors in other code areas,
  * we don't really need it here, so don't. but it should maybe be fixed */
 #ifndef SIMULATOR /* simulator gets values from the target .h files */

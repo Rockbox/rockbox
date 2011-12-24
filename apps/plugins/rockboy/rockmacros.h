@@ -23,8 +23,6 @@
 
 #include "plugin.h"
 
-#include "autoconf.h"
-
 #define malloc(a) my_malloc(a)
 void *my_malloc(size_t size);
 

@@ -201,7 +201,7 @@ sub make_install {
     @files = readdir(DIR);
     closedir(DIR);
 
-    foreach my $file (grep (/[a-zA-Z]+\.(txt|config|ignnore)/,@files)) {
+    foreach my $file (grep (/[a-zA-Z]+\.(txt|config|ignore|sh)/,@files)) {
         glob_install("$src/$file", "$userdir/");
     }
     return 1;
@@ -423,6 +423,11 @@ sub buildzip {
     # create the file so the database does not try indexing a folder
     open(IGNORE, ">$temp_dir/database.ignore")  || die "can't open database.ignore";
     close(IGNORE);
+
+    # the samsung ypr0 has a loader script that's needed in the zip
+    if ($modelname =~ /samsungypr0/) {
+        glob_copy("$ROOT/utils/ypr0tools/rockbox.sh", "$temp_dir/");
+    }
     
     glob_mkdir("$temp_dir/langs");
     glob_mkdir("$temp_dir/rocks");

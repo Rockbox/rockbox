@@ -28,4 +28,8 @@
 #include "ascodec-target.h"
 #endif
 
+#ifdef SAMSUNG_YPR0
+#include "ascodec-target.h"
+#endif
+
 #endif

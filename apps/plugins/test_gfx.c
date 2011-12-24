@@ -402,7 +402,7 @@ static void time_text(void) /* tests mono_bitmap performance */
 /* plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-#ifndef SIMULATOR
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     int cpu_freq;
 #endif
 
@@ -447,7 +447,7 @@ enum plugin_status plugin_start(const void* parameter)
                 6*4*DURATION/HZ);
     init_rand_table();
 
-#ifndef SIMULATOR
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
 #endif
 
@@ -458,7 +458,7 @@ enum plugin_status plugin_start(const void* parameter)
     time_fillrect();
     time_text();
 
-#ifndef SIMULATOR
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     if (*rb->cpu_frequency != cpu_freq)
         rb->fdprintf(log_fd, "\nCPU: %s\n", "clock changed!");
     else

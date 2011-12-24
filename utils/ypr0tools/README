@@ -1,0 +1,12 @@
+
+To generate a firmware, run (paths may differ):
+
+$ make
+$ ./unpack-firmware.sh R0.ROM /tmp/romfiles
+$ sudo ./patch-firmware.sh files /tmp/romfiles # needs sudo
+$ ./pack-firmware.sh R0.ROM /tmp/romfiles
+
+After that, R0.ROM is patched and can load Rockbox.
+
+rockbox.sh is a script to put into rockbox.zip. It's a small loader script
+that sets stuff up.

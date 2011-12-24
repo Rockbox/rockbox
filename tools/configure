@@ -647,6 +647,26 @@ pandoracc () {
  GCCOPTS="$GCCOPTS -ffast-math -fsingle-precision-constant"
 }
 
+ypr0cc () {
+
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
+ GCCOPTIMIZE=''
+ LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
+ GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
+ SHARED_LDFLAG="-shared"
+ SHARED_CFLAGS=''
+ endian="little"
+ thread_support="HAVE_SIGALTSTACK_THREADS"
+ app_type="ypr0"
+
+ # Include path
+ GCCOPTS="$GCCOPTS  -D_GNU_SOURCE=1 -U_FORTIFY_SOURCE -D_REENTRANT"
+
+ # Set up compiler
+ gccchoice="4.4.6"
+ prefixtools "arm-ypr0-linux-gnueabi-"
+}
+
 androidcc () {
     if [ -z "$ANDROID_SDK_PATH" ]; then
         echo "ERROR: You need the Android SDK installed and have the ANDROID_SDK_PATH"
@@ -1290,7 +1310,7 @@ cat <<EOF
  202) Nokia N8xx                                 131) Mini2440
  203) Nokia N900          ==ROCKCHIP==           ==HiFiMAN==
  204) Pandora             180) rk27xx generic    190) HM-60x
-                                                 191) HM-801
+ 205) Samsung YP-R0                              191) HM-801
 
 EOF
 
@@ -3228,6 +3248,30 @@ fi
     t_model="app"
     ;;
 
+   205|samsungypr0)
+    application="yes"
+    target_id=78
+    modelname="samsungypr0"
+    target="SAMSUNG_YPR0"
+    app_set_lcd_size 240 320
+    memory=32
+    uname=`uname`
+    ypr0cc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="ypr0"
+    t_model="app"
+    ;;
+
    *)
     echo "Please select a supported target platform!"
     exit 7
@@ -3473,7 +3517,7 @@ gccver=`$CC -dumpversion`;
 if [ $uname = "Darwin" ]; then
  ldver=`$LD -v 2>&1 | sed -e 's/[^0-9.-]//g'`
 else
- ldver=`$LD --version | head -n 1 | sed -e 's/[^0-9.]//g'`
+ ldver=`$LD --version | head -n 1 | sed -e 's/\ /\n/g' | tail -n 1`
 fi
 
 if [ -z "$gccver" ]; then

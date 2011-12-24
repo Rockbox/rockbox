@@ -121,6 +121,8 @@ void* plugin_get_buffer(size_t *buffer_size);
 /* on some platforms strcmp() seems to be a tricky define which
  * breaks if we write down strcmp's prototype */
 #undef strcmp
+#undef strncmp
+#undef strchr
 
 #ifdef PLUGIN
 

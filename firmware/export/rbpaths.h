@@ -44,7 +44,7 @@
 #define ROCKBOX_DIR_LEN (sizeof(ROCKBOX_DIR)-1)
 #endif /* def __PCTOOL__ */
 
-#ifndef APPLICATION
+#if !defined(APPLICATION) || defined(SAMSUNG_YPR0)
 
 /* make sure both are the same for native builds */
 #undef ROCKBOX_LIBRARY_PATH
@@ -57,6 +57,7 @@
 #define PLAYLIST_CATALOG_DEFAULT_DIR "/Playlists"
 
 #define paths_init()
+
 #else /* application */
 
 #define PLUGIN_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/rocks"
@@ -80,7 +81,7 @@ extern void paths_init(void);
 #define PLUGIN_DEMOS_DIR    PLUGIN_DIR "/demos"
 #define VIEWERS_DIR         PLUGIN_DIR "/viewers"
 
-#ifdef APPLICATION
+#if defined(APPLICATION) && !defined(SAMSUNG_YPR0)
 #define PLUGIN_DATA_DIR          "/.rockbox/rocks.data"
 #define PLUGIN_GAMES_DATA_DIR    PLUGIN_DATA_DIR
 #define PLUGIN_APPS_DATA_DIR     PLUGIN_DATA_DIR

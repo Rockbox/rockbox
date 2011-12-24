@@ -89,7 +89,9 @@ float rb_atan(float);
 float rb_atan2(float, float);
 float rb_sinh(float);
 float rb_tan(float);
-#ifndef SIMULATOR
+//#ifndef SIMULATOR
+/*FIXME: is it a correct replacement??? */
+#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
 typedef struct
 {
     int quot;
@@ -163,9 +165,12 @@ void pd_init(void);
 #define atoi rb->atoi
 #define write rb->write
 
+#undef strncat
 #define strncat rb_strncat
 
-#ifndef SIMULATOR
+//#ifndef SIMULATOR
+/*FIXME: is it a correct replacement??? */
+#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
 #define floor rb_floor
 #define atof rb_atof
 #define atol rb_atol
@@ -186,6 +191,7 @@ void pd_init(void);
 #endif
 
 #define ftoan rb_ftoan
+#undef strtok_r
 #define strtok_r rb->strtok_r
 #define strstr rb->strcasestr
 
@@ -282,6 +288,15 @@ enum pd_key_id
     #define PDPOD_WHEELLEFT (BUTTON_SCROLL_BACK)
     #define PDPOD_WHEELRIGHT (BUTTON_SCROLL_FWD)
     #define PDPOD_ACTION (BUTTON_SELECT)
+#elif (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
+    #define PDPOD_QUIT      BUTTON_BACK
+    #define PDPOD_PLAY      BUTTON_USER
+    #define PDPOD_PREVIOUS  BUTTON_LEFT
+    #define PDPOD_NEXT      BUTTON_RIGHT
+    #define PDPOD_MENU      BUTTON_MENU
+    #define PDPOD_WHEELLEFT BUTTON_UP
+    #define PDPOD_WHEELRIGHT BUTTON_DOWN
+    #define PDPOD_ACTION    BUTTON_SELECT
 #else
     #warning "No keys defined for this architecture!"
 #endif

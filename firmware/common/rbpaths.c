@@ -23,6 +23,7 @@
 #include <stdio.h> /* snprintf */
 #include <stdlib.h>
 #include <stdarg.h>
+#include "config.h"
 #include "rbpaths.h"
 #include "file.h" /* MAX_PATH */
 #include "logf.h"
@@ -38,11 +39,17 @@
 #undef mkdir
 #undef rmdir
 
+
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #include "dir-target.h"
 #define opendir opendir_android
 #define mkdir   mkdir_android
 #define rmdir   rmdir_android
+#elif defined(SAMSUNG_YPR0)
+#include "dir-target.h"
+#define opendir opendir_ypr0
+#define mkdir   mkdir_ypr0
+#define rmdir   rmdir_ypr0
 #elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 #define open    sim_open
 #define remove  sim_remove
@@ -58,6 +65,8 @@ extern int sim_mkdir(const char* name);
 extern int sim_rmdir(const char* name);
 const char *rbhome;
 #endif
+
+#if !defined(SAMSUNG_YPR0)
 
 /* flags for get_user_file_path() */
 /* whether you need write access to that file/dir, especially true
@@ -238,3 +247,28 @@ int app_rmdir(const char* name)
     }
     return rmdir(fname);
 }
+
+#else
+
+int app_open(const char *name, int o, ...)
+{
+    if (o & O_CREAT)
+    {
+        int ret;
+        va_list ap;
+        va_start(ap, o);
+        ret = open(name, o, va_arg(ap, mode_t));
+        va_end(ap);
+        return ret;
+    }
+    return open(name, o);
+}
+
+int app_creat(const char* name, mode_t mode) { return creat(name, mode); }
+int app_remove(const char *name) { return remove(name); }
+int app_rename(const char *old, const char *new) { return rename(old,new); }
+DIR *app_opendir(const char *name) { return opendir(name); }
+int app_mkdir(const char* name) { return mkdir(name); }
+int app_rmdir(const char* name) { return rmdir(name); }
+
+#endif

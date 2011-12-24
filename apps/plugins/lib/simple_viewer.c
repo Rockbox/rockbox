@@ -25,6 +25,7 @@
 #include "simple_viewer.h"
 #include <ctype.h>
 
+
 struct view_info {
 #ifdef HAVE_LCD_BITMAP
     struct font* pf;

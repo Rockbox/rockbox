@@ -116,7 +116,8 @@ const struct button_mapping pla_main_ctx[] =
     || (CONFIG_KEYPAD == SANSA_FUZE_PAD) \
     || (CONFIG_KEYPAD == SAMSUNG_YH_PAD) \
     || (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD) \
-    || (CONFIG_KEYPAD == SANSA_CONNECT_PAD))
+    || (CONFIG_KEYPAD == SANSA_CONNECT_PAD) \
+    || (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD))
     { PLA_UP,               BUTTON_UP,                          BUTTON_NONE },
     { PLA_DOWN,             BUTTON_DOWN,                        BUTTON_NONE },
     { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
@@ -278,7 +279,8 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
-#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+#elif  (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
+    || (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
     {PLA_CANCEL,            BUTTON_BACK,                        BUTTON_NONE},
     {PLA_EXIT,              BUTTON_MENU,                        BUTTON_NONE},
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},

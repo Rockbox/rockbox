@@ -143,6 +143,7 @@
 #define HM60X_PAD          50
 #define HM801_PAD          51
 #define SANSA_CONNECT_PAD  52
+#define SAMSUNG_YPR0_PAD   53
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -232,6 +233,7 @@
 #define LCD_HX8340B   44 /* as used by the HiFiMAN HM-601/HM-602/HM-801 */
 #define LCD_CONNECT   45 /* as used by the Sandisk Sansa Connect */
 #define LCD_GIGABEATS 46
+#define LCD_YPR0      47
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -483,6 +485,8 @@ Lyre prototype 1 */
 #include "config/nokian900.h"
 #elif defined(PANDORA)
 #include "config/pandora.h"
+#elif defined(SAMSUNG_YPR0)
+#include "config/ypr0.h"
 #else
 /* no known platform */
 #endif
@@ -580,6 +584,10 @@ Lyre prototype 1 */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_NO_FADING
 #endif
 
+#ifndef CONFIG_I2C
+#define CONFIG_I2C I2C_NONE
+#endif
+
 #ifndef CONFIG_TUNER
 #define CONFIG_TUNER 0
 #endif
@@ -598,6 +606,14 @@ Lyre prototype 1 */
 
 #ifndef CONFIG_RTC
 #define CONFIG_RTC 0
+#endif
+
+#ifndef BATTERY_TYPES_COUNT
+#define BATTERY_TYPES_COUNT 0
+#endif
+
+#ifndef BATTERY_CAPACITY_INC
+#define BATTERY_CAPACITY_INC 0
 #endif
 
 #ifndef CONFIG_ORIENTATION

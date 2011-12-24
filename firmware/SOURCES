@@ -14,7 +14,9 @@ target/hosted/cpuinfo-linux.c
 #endif
 
 target/hosted/powermgmt.c
+#ifndef SAMSUNG_YPR0 /* uses as3514 rtc */
 target/hosted/rtc.c
+#endif
 #endif
 system.c
 usb.c
@@ -60,6 +62,26 @@ target/hosted/sdl/key_to_touch-sdl.c
 #ifdef APPLICATION
 target/hosted/sdl/app/button-application.c
 #endif
+#endif
+
+#ifdef SAMSUNG_YPR0
+#if (CONFIG_RTC == RTC_AS3514)
+drivers/rtc/rtc_as3514.c
+#else
+target/hosted/rtc.c
+#endif
+target/hosted/ypr0/button-ypr0.c
+target/hosted/ypr0/kernel-ypr0.c
+target/hosted/ypr0/lcd-ypr0.c
+target/hosted/ypr0/system-ypr0.c
+target/hosted/ypr0/fs-ypr0.c
+target/hosted/ypr0/lc-ypr0.c
+thread.c
+#ifdef HAVE_BACKLIGHT
+target/hosted/ypr0/backlight-ypr0.c
+#endif
+target/hosted/ypr0/ascodec-ypr0.c
+target/hosted/ypr0/powermgmt-ypr0.c
 #endif
 
 /* Maemo specific files */
@@ -368,6 +390,10 @@ drivers/audio/aic3x.c
 #elif defined (HAVE_DUMMY_CODEC)
 drivers/audio/dummy_codec.c
 #endif /* defined(HAVE_*) */
+#else /* PLATFORM_HOSTED */
+#if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
+drivers/audio/as3514.c
+target/hosted/pcm-alsa.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
 #if CONFIG_CODEC == SWCODEC
@@ -377,6 +403,7 @@ target/hosted/maemo/pcm-gstreamer.c
 target/hosted/sdl/pcm-sdl.c
 #endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
 #endif /* CONFIG_CODEC == SWCODEC */
+#endif
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER) */
 
 /* CPU Specific - By class then particular chip if applicable */
@@ -722,7 +749,7 @@ target/arm/ascodec-pp.c
 # endif
 # if !defined(BOOTLOADER) || defined(CPU_PP)
 target/arm/adc-as3514.c
-#  ifndef SANSA_M200V4
+#  if !defined(SANSA_M200V4) && !defined(SAMSUNG_YPR0)
 target/arm/powermgmt-ascodec.c
 #  endif
 # endif
