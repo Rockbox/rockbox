@@ -26,9 +26,11 @@
 #include "string.h"
 #include "file.h"
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-long cpu_frequency SHAREDBSS_ATTR = CPU_FREQ;
+#ifndef CPU_FREQ
+#define CPU_FREQ (-1)
 #endif
+
+long cpu_frequency SHAREDBSS_ATTR = CPU_FREQ;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static int boost_counter SHAREDBSS_ATTR = 0;

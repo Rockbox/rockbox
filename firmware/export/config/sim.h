@@ -14,8 +14,6 @@
 
 #undef FLASH_SIZE
 
-#undef CPU_FREQ
-
 #undef HAVE_ATA_POWER_OFF
 
 #undef CONFIG_LCD
