@@ -486,7 +486,7 @@ Lyre prototype 1 */
 #elif defined(PANDORA)
 #include "config/pandora.h"
 #elif defined(SAMSUNG_YPR0)
-#include "config/ypr0.h"
+#include "config/samsungypr0.h"
 #else
 /* no known platform */
 #endif
