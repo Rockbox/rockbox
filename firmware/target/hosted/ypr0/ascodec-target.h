@@ -29,24 +29,12 @@
 #include "adc.h"
 #include "ascodec.h"
 
-/* ioctl parameter struct */
-
-struct codec_req_struct {
-/* This works for every kind of afe.ko module requests */
-            unsigned char reg; /* Main register address */
-            unsigned char subreg; /* Set this only if you are reading/writing a PMU register*/
-            unsigned char value; /* To be read if reading a register; to be set if writing to a register */
-};
-
 int ascodec_init(void);
 void ascodec_close(void);
 int ascodec_write(unsigned int reg, unsigned int value);
 int ascodec_read(unsigned int reg);
 void ascodec_write_pmu(unsigned int index, unsigned int subreg, unsigned int value);
 int ascodec_read_pmu(unsigned int index, unsigned int subreg);
-void ascodec_set(unsigned int reg, unsigned int bits);
-void ascodec_clear(unsigned int reg, unsigned int bits);
-void ascodec_write_masked(unsigned int reg, unsigned int bits, unsigned int mask);
 int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data);
 unsigned short adc_read(int channel);
 void ascodec_lock(void);

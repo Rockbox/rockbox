@@ -78,13 +78,12 @@ const struct sound_settings_info audiohw_settings[] = {
 #endif
 };
 
-#ifndef SAMSUNG_YPR0
 /* Shadow registers */
 static uint8_t as3514_regs[AS3514_NUM_AUDIO_REGS]; /* 8-bit registers */
 
 /*
  * little helper method to set register values.
- * With the help of as3514_regs, we minimize i2c
+ * With the help of as3514_regs, we minimize i2c/syscall
  * traffic.
  */
 static void as3514_write(unsigned int reg, unsigned int value)
@@ -111,29 +110,7 @@ static void as3514_write_masked(unsigned int reg, unsigned int bits,
 {
     as3514_write(reg, (as3514_regs[reg] & ~mask) | (bits & mask));
 }
-#else
-static void as3514_write(unsigned int reg, unsigned int value)
-{
-    ascodec_write(reg, value);
-}
 
-/* Helpers to set/clear bits */
-static void as3514_set(unsigned int reg, unsigned int bits)
-{
-    ascodec_write(reg, ascodec_read(reg) | bits);
-}
-
-static void as3514_clear(unsigned int reg, unsigned int bits)
-{
-    ascodec_write(reg, ascodec_read(reg) & ~bits);
-}
-
-static void as3514_write_masked(unsigned int reg, unsigned int bits,
-                                unsigned int mask)
-{
-    ascodec_write(reg, (ascodec_read(reg) & ~mask) | (bits & mask));
-}
-#endif
 /* convert tenth of dB volume to master volume register value */
 int tenthdb2master(int db)
 {
@@ -168,11 +145,8 @@ int sound_val2phys(int setting, int value)
  */
 void audiohw_preinit(void)
 {
-
-#ifndef SAMSUNG_YPR0
     /* read all reg values */
     ascodec_readbytes(0x0, AS3514_NUM_AUDIO_REGS, as3514_regs);
-#endif
 
 #ifdef HAVE_AS3543
 

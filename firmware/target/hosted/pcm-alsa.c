@@ -50,6 +50,7 @@
 #include "pcm-internal.h"
 #include "pcm_mixer.h"
 #include "pcm_sampr.h"
+#include "audiohw.h"
 
 #include <pthread.h>
 #include <signal.h>
@@ -320,7 +321,7 @@ void cleanup(void)
 void pcm_play_dma_init(void)
 {
     int err;
-
+    audiohw_preinit();
 
     if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
     {
@@ -343,6 +344,8 @@ void pcm_play_dma_init(void)
         exit(EXIT_FAILURE);
     }
 
+    pcm_dma_apply_settings();
+
 #ifdef USE_ASYNC_CALLBACK
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
@@ -351,7 +354,6 @@ void pcm_play_dma_init(void)
 #else
     tick_add_task(pcm_tick);
 #endif
-
 
     atexit(cleanup);
     return;
@@ -469,6 +471,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 
 void pcm_play_dma_postinit(void)
 {
+    audiohw_postinit();
 }
 
 
