@@ -207,7 +207,7 @@ build() {
     case $toolname in
         ctng) # ct-ng doesnt support out-of-tree build and the src folder is named differently
             toolname="crosstool-ng"
-            cp -r ../$toolname-$version/{*,.version}  .
+            cp -r ../$toolname-$version/* ../$toolname-$version/.version .
             ./configure --prefix=$prefix $configure_params
         ;;
         *)
