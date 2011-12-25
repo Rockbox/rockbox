@@ -12340,19 +12340,17 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "efect 3-D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D îmbunătățire"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "efect 3-D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D îmbunătățire"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_RESET_START_DIR
   desc: reset the browser start directory
@@ -12808,5 +12806,157 @@
   </dest>
   <voice>
     *: "Resetare dosar pentru catalog liste redare"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Glife în cache"
+  </dest>
+  <voice>
+    *: "Glife în cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "USB - ascunde memoria internă"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "USB - ascunde memoria internă"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Clic tastă difuzor"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Clic tastă difuzor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Clic tastă căști"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Clic tastă căști"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Umplere linie în liste"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Umplere linie în liste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automat"
+  </dest>
+  <voice>
+    *: "Automat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Scurtături"
+  </dest>
+  <voice>
+    *: "Scurtături"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Anulare temporizator repaus"
+  </dest>
+  <voice>
+    *: "Anulare temporizator repaus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Temporizare repaus implicită"
+  </dest>
+  <voice>
+    *: "Temporizare repaus implicită"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Lansare temporizator repaus la pornire"
+  </dest>
+  <voice>
+    *: "Lansare temporizator repaus la pornire"
   </voice>
 </phrase>
