@@ -59,9 +59,6 @@
 #define PLUGIN_DIR          ROCKBOX_DIR "/rocks"
 #define CODECS_DIR          ROCKBOX_DIR "/codecs"
 
-#define REC_BASE_DIR        HOME_DIR
-#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "/Playlists"
-
 #define paths_init()
 
 #else /* APPLICATION */
@@ -76,12 +73,12 @@
 #define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/codecs"
 #endif
 
-#define REC_BASE_DIR        HOME_DIR
-#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "Playlists"
-
 extern void paths_init(void);
 
 #endif /* !APPLICATION || SAMSUNG_YPR0 */
+
+#define REC_BASE_DIR        HOME_DIR
+#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "/Playlists"
 
 #define LANG_DIR            ROCKBOX_DIR "/langs"
 
