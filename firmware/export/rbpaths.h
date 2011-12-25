@@ -46,6 +46,12 @@
 
 #if !defined(APPLICATION) || defined(SAMSUNG_YPR0)
 
+#ifdef SAMSUNG_YPR0
+#define HOME_DIR "/mnt/media0"
+#else
+#define HOME_DIR "/." /* dot to avoid "//XX", /./X is valid */
+#endif
+
 /* make sure both are the same for native builds */
 #undef ROCKBOX_LIBRARY_PATH
 #define ROCKBOX_LIBRARY_PATH ROCKBOX_DIR
@@ -53,12 +59,15 @@
 #define PLUGIN_DIR          ROCKBOX_DIR "/rocks"
 #define CODECS_DIR          ROCKBOX_DIR "/codecs"
 
-#define REC_BASE_DIR        "/"
-#define PLAYLIST_CATALOG_DEFAULT_DIR "/Playlists"
+#define REC_BASE_DIR        HOME_DIR
+#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "/Playlists"
 
 #define paths_init()
 
-#else /* application */
+#else /* APPLICATION */
+
+#define HOME_DIR "<HOME>" /* replaced at runtime */
+#define HOME_DIR_LEN (sizeof(HOME_DIR)-1)
 
 #define PLUGIN_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/rocks"
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
@@ -67,12 +76,12 @@
 #define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/codecs"
 #endif
 
-#define REC_BASE_DIR        ROCKBOX_DIR  "/"
-#define PLAYLIST_CATALOG_DEFAULT_DIR ROCKBOX_DIR "/Playlists"
+#define REC_BASE_DIR        HOME_DIR
+#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "Playlists"
 
 extern void paths_init(void);
 
-#endif /* APPLICATION */
+#endif /* !APPLICATION || SAMSUNG_YPR0 */
 
 #define LANG_DIR            ROCKBOX_DIR "/langs"
 
@@ -82,7 +91,7 @@ extern void paths_init(void);
 #define VIEWERS_DIR         PLUGIN_DIR "/viewers"
 
 #if defined(APPLICATION) && !defined(SAMSUNG_YPR0)
-#define PLUGIN_DATA_DIR          "/.rockbox/rocks.data"
+#define PLUGIN_DATA_DIR          ROCKBOX_DIR "/rocks.data"
 #define PLUGIN_GAMES_DATA_DIR    PLUGIN_DATA_DIR
 #define PLUGIN_APPS_DATA_DIR     PLUGIN_DATA_DIR
 #define PLUGIN_DEMOS_DATA_DIR    PLUGIN_DATA_DIR

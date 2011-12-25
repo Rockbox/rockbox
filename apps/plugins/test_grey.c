@@ -247,7 +247,7 @@ enum plugin_status plugin_start(const void* parameter)
             case GREY_OK:
 
                 /* dump result in form suitable for lcdlinear[] */
-                rb->create_numbered_filename(filename, "/", "test_grey_",
+                rb->create_numbered_filename(filename, HOME_DIR, "test_grey_",
                                              ".txt", 2 IF_CNFN_NUM_(, NULL));
                 fd = rb->open(filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
                 if (fd >= 0)

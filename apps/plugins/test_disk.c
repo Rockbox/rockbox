@@ -24,7 +24,7 @@
 
 
 
-#define TESTBASEDIR "/__TEST__"
+#define TESTBASEDIR HOME_DIR "/__TEST__"
 #define TEST_FILE   TESTBASEDIR "/test_disk.tmp"
 #define FRND_SEED   0x78C3     /* arbirary */
 
@@ -83,7 +83,7 @@ static bool log_init(void)
     rb->lcd_clear_display();
     rb->lcd_update();
     
-    rb->create_numbered_filename(logfilename, "/", "test_disk_log_", ".txt",
+    rb->create_numbered_filename(logfilename, HOME_DIR, "test_disk_log_", ".txt",
                                  2 IF_CNFN_NUM_(, NULL));
     log_fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC, 0666);
     return log_fd >= 0;

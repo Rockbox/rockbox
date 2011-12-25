@@ -45,6 +45,7 @@
 #define opendir opendir_android
 #define mkdir   mkdir_android
 #define rmdir   rmdir_android
+static const char rbhome[] = "/sdcard";
 #elif defined(SAMSUNG_YPR0)
 #include "dir-target.h"
 #define opendir opendir_ypr0
@@ -159,19 +160,34 @@ static const char* _get_user_file_path(const char *path,
     return ret;
 }
 
+
+static const char* handle_special_dirs(const char* dir, unsigned flags,
+                                char *buf, const size_t bufsize)
+{
+    if (!strncmp(HOME_DIR, dir, HOME_DIR_LEN))
+    {
+        const char *p = dir + HOME_DIR_LEN;
+        while (*p == '/') p++;
+        snprintf(buf, bufsize, "%s/%s", rbhome, p);
+        return buf;
+    }
+    else if (!strncmp(ROCKBOX_DIR, dir, ROCKBOX_DIR_LEN))
+        return _get_user_file_path(dir, flags, buf, bufsize);
+
+    return dir;
+}
+
 int app_open(const char *name, int o, ...)
 {
     char realpath[MAX_PATH];
     va_list ap;
     int fd;
+    int flags = IS_FILE;
+    if (o & (O_CREAT|O_RDWR|O_TRUNC|O_WRONLY))
+        flags |= NEED_WRITE;
     
-    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
-    {
-        int flags = IS_FILE;
-        if (o & (O_CREAT|O_RDWR|O_TRUNC|O_WRONLY))
-            flags |= NEED_WRITE;
-        name = _get_user_file_path(name, flags, realpath, sizeof(realpath));
-    }
+    name = handle_special_dirs(name, flags, realpath, sizeof(realpath));
+
     va_start(ap, o);
     fd = open(name, o, va_arg(ap, unsigned int));
     va_end(ap);
@@ -187,11 +203,7 @@ int app_creat(const char* name, mode_t mode)
 int app_remove(const char *name)
 {
     char realpath[MAX_PATH];
-    const char *fname = name;
-    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
-    {
-        fname = _get_user_file_path(name, NEED_WRITE, realpath, sizeof(realpath));
-    }
+    const char *fname = handle_special_dirs(name, NEED_WRITE, realpath, sizeof(realpath));
 
     return remove(fname);
 }
@@ -199,18 +211,10 @@ int app_remove(const char *name)
 int app_rename(const char *old, const char *new)
 {
     char realpath_old[MAX_PATH], realpath_new[MAX_PATH];
+    const char *final_old, *final_new;
 
-    const char *final_old = old;
-    if (!strncmp(ROCKBOX_DIR, old, ROCKBOX_DIR_LEN))
-    {
-        final_old = _get_user_file_path(old, NEED_WRITE, realpath_old, sizeof(realpath_old));
-    }
-
-    const char *final_new = new;
-    if (!strncmp(ROCKBOX_DIR, new, ROCKBOX_DIR_LEN))
-    {
-        final_new = _get_user_file_path(new, NEED_WRITE, realpath_new, sizeof(realpath_new));
-    }
+    final_old = handle_special_dirs(old, NEED_WRITE, realpath_old, sizeof(realpath_old));
+    final_new = handle_special_dirs(new, NEED_WRITE, realpath_new, sizeof(realpath_new));
 
     return rename(final_old, final_new);
 }
@@ -218,33 +222,21 @@ int app_rename(const char *old, const char *new)
 DIR *app_opendir(const char *name)
 {
     char realpath[MAX_PATH];
-    const char *fname = name;
-    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
-    {
-        fname = _get_user_file_path(name, 0, realpath, sizeof(realpath));
-    }
+    const char *fname = handle_special_dirs(name, 0, realpath, sizeof(realpath));
     return opendir(fname);
 }
 
 int app_mkdir(const char* name)
 {
     char realpath[MAX_PATH];
-    const char *fname = name;
-    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
-    {
-        fname = _get_user_file_path(name, NEED_WRITE, realpath, sizeof(realpath));
-    }
+    const char *fname = handle_special_dirs(name, NEED_WRITE, realpath, sizeof(realpath));
     return mkdir(fname);
 }
 
 int app_rmdir(const char* name)
 {
     char realpath[MAX_PATH];
-    const char *fname = name;
-    if (!strncmp(ROCKBOX_DIR, name, ROCKBOX_DIR_LEN))
-    {
-        fname = _get_user_file_path(name, NEED_WRITE, realpath, sizeof(realpath));
-    }
+    const char *fname = handle_special_dirs(name, NEED_WRITE, realpath, sizeof(realpath));
     return rmdir(fname);
 }
 

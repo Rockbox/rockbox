@@ -24,7 +24,7 @@
 #include "plugin.h"
 
 
-#define BATTERY_LOG "/battery_bench.txt"
+#define BATTERY_LOG  HOME_DIR"/battery_bench.txt"
 #define BUF_SIZE 16000
 
 #define EV_EXIT 1337

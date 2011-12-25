@@ -46,7 +46,7 @@ static int log_init(void)
     char logfilename[MAX_PATH];
     int fd;
 
-    rb->create_numbered_filename(logfilename, "/", "test_gfx_log_", ".txt",
+    rb->create_numbered_filename(logfilename, HOME_DIR, "test_gfx_log_", ".txt",
                                  2 IF_CNFN_NUM_(, NULL));
     fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC, 0666);
     return fd;
