@@ -104,13 +104,14 @@ int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
 {
     int i, val, ret = 0;
 
-    for (i = index; i < (int)len; i++) {
-        val = ascodec_read(i);
+    for (i = 0; i < (int)len; i++)
+    {
+        val = ascodec_read(i + index);
         if (val >= 0) data[i] = val;
         else ret = -1;
     }
 
-    return ret ?: i; /* i means success */
+    return (ret ?: (int)len);
 }
 
 /*
@@ -144,7 +145,8 @@ unsigned short adc_read(int channel)
     unsigned char buf[2];
 
     /* Read data */
-    ascodec_readbytes(AS3514_ADC_0, sizeof(buf), buf);
+    if (ascodec_readbytes(AS3514_ADC_0, 2, buf) < 0)
+        return 0;
 
     /* decode to 10-bit and return */
     return (((buf[0] & 0x3) << 8) | buf[1]);
