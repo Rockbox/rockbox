@@ -284,14 +284,9 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 #if CONFIG_CPU == AS3525v2 
 #define MIXER_MAX_VOLUME 0x1b
 #else /* lets leave the AS3514 alone until its better tested*/
-#ifdef SAMSUNG_YPR0
-#define MIXER_MAX_VOLUME 0x1a
-#else
 #define MIXER_MAX_VOLUME 0x16
 #endif
-#endif
 
-#ifndef SAMSUNG_YPR0
     if (vol_r <= MIXER_MAX_VOLUME) {
         mix_r = vol_r;
         hph_r = 0;
@@ -307,16 +302,6 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
         mix_l = MIXER_MAX_VOLUME;
         hph_l = vol_l - MIXER_MAX_VOLUME;
     }    
-#else
-/* Okay. This is shit coded indeed. It is just a test.
-    Some considerations: Samsung keeps DAC constantly to 0x1a volume. It modifies only the headphone amp volume
-*/
-
-    mix_r = 0x1a;
-    mix_l = 0x1a;
-    hph_l = vol_l;
-    hph_r = vol_r;
-#endif
 
     as3514_write_masked(AS3514_DAC_R, mix_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_DAC_L, mix_l, AS3514_VOL_MASK);

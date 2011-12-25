@@ -131,13 +131,8 @@ extern void audiohw_set_sampr_dividers(int fsel);
 /* Headphone volume goes from -81.0 ... +6dB */
 #define VOLUME_MIN -810
 #else
-#ifdef SAMSUNG_YPR0
-/* Headphone volume goes from -40.5 ... +6dB */
-#define VOLUME_MIN -405
-#else
 /* Headphone volume goes from -73.5 ... +6dB */
 #define VOLUME_MIN -735
-#endif
 #endif
 #define VOLUME_MAX   60
 
