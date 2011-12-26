@@ -798,7 +798,7 @@ struct user_settings
     int compressor_release_time;
 #endif
 
-    int sleeptimer_duration;
+    int sleeptimer_duration; /* In minutes; 0=off */
     bool sleeptimer_on_startup;
     bool keypress_restarts_sleeptimer;
 
