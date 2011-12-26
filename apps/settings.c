@@ -844,6 +844,8 @@ void settings_apply(bool read_disk)
     dac_line_in(global_settings.line_in);
 #endif
     set_poweroff_timeout(global_settings.poweroff);
+    if (global_settings.sleeptimer_on_startup)
+        set_sleep_timer(global_settings.sleeptimer_duration * 60);
     set_keypress_restarts_sleep_timer(
         global_settings.keypress_restarts_sleeptimer);
 
