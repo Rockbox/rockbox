@@ -1,27 +1,5 @@
 % $Id$ %
 \section{\label{ref:SystemOptions}System}
-\subsection{Start Screen}
-    Set the screen that Rockbox will start in. The default is the main menu but
-    the following options are available: % almost all items in the main menu with a few exceptions
-    \begin{description}
-        \item[Previous Screen.] Start Rockbox in the same screen as when it was shut off.
-        \item[Main Menu.] Show the main menu.
-        \item[Files.] Display the file browser, starting in the root directory of your \dap.
-        \item[Database.] Show the default database view.
-        \item[Resume Playback.] Go to the WPS and and resume playback from where it was
-            before turning off (if there is a playlist to resume).
-        \item[Settings.] Display the main settings menu.
-        \opt{recording}{%
-            \item[Recording.] Start the \dap{} in the recording screen
-                (recording does not start automatically).
-        }
-        \opt{radio}{%
-            \item[FM Radio.] Go to the radio screen and start playing.
-        }
-        \item[Recent Bookmarks.] Show the list of recent bookmarks as
-            described in \reference{ref:Bookmarkconfigactual}. Bookmarking needs
-            to be enabled.
-    \end{description}
 
 \nopt{sansa}%will probably be there on Sansas one day -  exclude it the simple way without specific option
 {\nopt{sansaAMS}{
@@ -112,15 +90,6 @@
   \end{description}
 } % \opt{dircache,HAVE_DISK_STORAGE}
 
-\subsection{Idle Poweroff}
-Rockbox can be configured to turn off power after the unit has been idle for a
-defined number of minutes. The \dap{} is idle when playback is stopped or
-paused. It is not idle while the USB or charger is connected
-\opt{recording}{, or while recording}. 
-Settings are either \setting{Off} or 1 to 10 minutes in 1 minute steps. Then 
-15, 30, 45 or 60 minutes are available.
-
-
 \subsection{Limits}
 This sub menu relates to limits in the Rockbox operating system.
   \begin{description}
@@ -167,7 +136,8 @@ This sub menu relates to limits in the Rockbox operating system.
   is turned off. If the \setting{Car Adapter Mode} is set to \setting{On},
   Rockbox will pause playback when the external power off condition is
   detected. Rockbox will then shutdown the \dap{} after the length of time set
-  in the \setting{Idle Poweroff} setting (see above).
+  in the \setting{Idle Poweroff} setting
+  (see \reference{ref:IdlePoweroffSetting}).
   If power to the DC in jack is turned back on before the \emph{Idle Poweroff}
   function has shut the \dap{} off, playback will be resumed 5 seconds after
   the power is applied. This delay is to allow for the time while the car

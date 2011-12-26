@@ -12965,3 +12965,17 @@
     *: "Glyphs To Cache"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Startup/Shutdown"
+  </dest>
+  <voice>
+    *: "Startup/Shutdown"
+  </voice>
+</phrase>

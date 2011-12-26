@@ -28,10 +28,8 @@
 #include "lang.h"
 #include "action.h"
 #include "settings.h"
-#include "powermgmt.h"
 #include "menu.h"
 #include "misc.h"
-#include "exported_menus.h"
 #include "keyboard.h"
 #include "talk.h"
 #include "time.h"
@@ -136,8 +134,6 @@ MENUITEM_FUNCTION(alarm_wake_up_screen, 0, ID2P(LANG_ALARM_WAKEUP_SCREEN),
 #endif /* CONFIG_TUNER || defined(HAVE_RECORDING) */
 
 #endif /* HAVE_RTC_ALARM */
-MENUITEM_SETTING(sleeptimer_on_startup,
-                 &global_settings.sleeptimer_on_startup, NULL);
 
 void talk_timedate(void)
 {
@@ -237,14 +233,14 @@ static int time_menu_callback(int action,
 
 
 MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), time_menu_callback, Icon_NOICON,
-          &time_set, &sleep_timer_call,
+          &time_set,
 #ifdef HAVE_RTC_ALARM
           &alarm_screen_call,
 #if defined(HAVE_RECORDING) || CONFIG_TUNER
           &alarm_wake_up_screen,
 #endif
 #endif
-          &sleeptimer_on_startup, &timeformat);
+          &timeformat);
 
 int time_screen(void* ignored)
 {

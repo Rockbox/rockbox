@@ -374,96 +374,10 @@ static bool show_info(void)
 MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
                    (menu_function)show_info, NULL, NULL, Icon_NOICON);
 
-
-/* sleep Menu */
-const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
-                                         int value, const char* unit)
-{
-    (void) unit;
-    int minutes, hours;
-
-    if (value) {
-        hours = value / 60;
-        minutes = value - (hours * 60);
-        snprintf(buffer, buffer_size, "%d:%02d", hours, minutes);
-        return buffer;
-    } else {
-        return str(LANG_OFF);
-    }
-}
-
-static void sleep_timer_set(int minutes)
-{
-    if (minutes)
-        global_settings.sleeptimer_duration = minutes;
-    set_sleep_timer(minutes * 60);
-}
-
-static int sleep_timer(void)
-{
-    int minutes = global_settings.sleeptimer_duration;
-    if (get_sleep_timer())
-        sleep_timer_set(0);
-    else
-        set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
-                   &sleep_timer_set, 5, 0, 300, sleep_timer_formatter); 
-    return 0;
-}
-
-static int seconds_to_min(int secs)
-{
-    return (secs + 10) / 60;  /* round up for 50+ seconds */
-}
-
-static char* sleep_timer_getname(int selected_item, void * data, char *buffer)
-{
-    (void)selected_item;
-    (void)data;
-    int sec = get_sleep_timer();
-    char timer_buf[10];
-    /* we have no sprintf, so MAX_PATH is a guess */
-    if (sec > 0)
-    {   /* show cancel and countdown if running */
-        snprintf(buffer, MAX_PATH, "%s (%s)", str(LANG_SLEEP_TIMER_CANCEL_CURRENT),
-                sleep_timer_formatter(timer_buf, sizeof(timer_buf), seconds_to_min(sec), NULL));
-    }
-    else
-        snprintf(buffer, MAX_PATH, "%s", str(LANG_SLEEP_TIMER));
-
-    return buffer;
-}
-
-static int sleep_timer_voice(int selected_item, void*data)
-{
-    (void)selected_item;
-    (void)data;
-    int seconds = get_sleep_timer();
-    if (seconds > 0)
-    {
-        long talk_ids[] = {
-            LANG_SLEEP_TIMER_CANCEL_CURRENT,
-            VOICE_PAUSE,
-            seconds_to_min(seconds) | UNIT_MIN << UNIT_SHIFT,
-            TALK_FINAL_ID
-        };
-        talk_idarray(talk_ids, true);
-    }
-    else
-        talk_id(LANG_SLEEP_TIMER, true);
-    return 0;
-}
-
 #if CONFIG_RTC
 int time_screen(void* ignored);
 MENUITEM_FUNCTION(timedate_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_TIME_MENU),
                     time_screen, NULL,  NULL, Icon_Menu_setting );
-#endif
-MENUITEM_FUNCTION_DYNTEXT(sleep_timer_call, 0, sleep_timer, NULL, sleep_timer_getname,
-                          sleep_timer_voice, NULL, NULL, Icon_Menu_setting);
-                           /* make it look like a setting to the user */
-#if CONFIG_RTC == 0
-MENUITEM_SETTING(sleeptimer_on_startup,
-                 &global_settings.sleeptimer_on_startup, NULL);
 #endif
 
 MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_CREDITS),
@@ -511,8 +425,6 @@ MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), mainmenu_callback,
 #endif
 #if CONFIG_RTC
         &timedate_item,
-#else
-        &sleep_timer_call, &sleeptimer_on_startup,
 #endif
         &manage_settings,
         );
