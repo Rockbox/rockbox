@@ -40,7 +40,7 @@ char str_duration[32];
 int num_properties;
 
 static const char human_size_prefix[4] = { '\0', 'K', 'M', 'G' };
-static unsigned human_size_log(long long size)
+static unsigned human_size_log(unsigned long long size)
 {
     const size_t n = sizeof(human_size_prefix)/sizeof(human_size_prefix[0]);
 
@@ -76,9 +76,9 @@ static bool file_properties(char* selected_file)
                 rb->snprintf(str_dirname, sizeof str_dirname, "Path: %s", tstr);
                 rb->snprintf(str_filename, sizeof str_filename, "Name: %s",
                              selected_file+dirlen);
-                log = human_size_log(info.size);
-                rb->snprintf(str_size, sizeof str_size, "Size: %ld %cB",
-                             info.size >> (log*10), human_size_prefix[log]);
+                log = human_size_log((unsigned long)info.size);
+                rb->snprintf(str_size, sizeof str_size, "Size: %lu %cB",
+                             ((unsigned long)info.size) >> (log*10), human_size_prefix[log]);
                 rb->snprintf(str_date, sizeof str_date, "Date: %04d/%02d/%02d",
                     ((info.wrtdate >> 9 ) & 0x7F) + 1980, /* year    */
                     ((info.wrtdate >> 5 ) & 0x0F),        /* month   */
@@ -138,7 +138,7 @@ typedef struct {
     int len;
     unsigned int dc;
     unsigned int fc;
-    long long bc;
+    unsigned long long bc;
 } DPS;
 
 static bool _dir_properties(DPS* dps)
@@ -184,7 +184,7 @@ static bool _dir_properties(DPS* dps)
                 rb->lcd_putsf(0,3,"Directories: %d", dps->dc);
                 rb->lcd_putsf(0,4,"Files: %d", dps->fc);
                 log = human_size_log(dps->bc);
-                rb->lcd_putsf(0,5,"Size: %ld %cB", (long) (dps->bc >> (10*log)),
+                rb->lcd_putsf(0,5,"Size: %lu %cB", (unsigned long)(dps->bc >> (10*log)),
                                                 human_size_prefix[log]);
                 rb->lcd_update();
             }
