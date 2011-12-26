@@ -1808,6 +1808,8 @@ const struct settings_list settings[] = {
                 UNIT_MIN, 5, 300, 5, sleeptimer_formatter, NULL, NULL),
     OFFON_SETTING(0, sleeptimer_on_startup, LANG_SLEEP_TIMER_ON_POWER_UP, false,
                   "sleeptimer on startup", NULL),
+    OFFON_SETTING(0, keypress_restarts_sleeptimer, LANG_KEYPRESS_RESTARTS_SLEEP_TIMER, false,
+                  "keypress restarts sleeptimer", set_keypress_restarts_sleep_timer),
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     CHOICE_SETTING(0, touchpad_sensitivity, LANG_TOUCHPAD_SENSITIVITY, 0,
                    "touchpad sensitivity", "normal,high", touchpad_set_sensitivity, 2,

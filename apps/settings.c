@@ -844,6 +844,8 @@ void settings_apply(bool read_disk)
     dac_line_in(global_settings.line_in);
 #endif
     set_poweroff_timeout(global_settings.poweroff);
+    set_keypress_restarts_sleep_timer(
+        global_settings.keypress_restarts_sleeptimer);
 
 #if defined(BATTERY_CAPACITY_INC) && BATTERY_CAPACITY_INC > 0
     /* only call if it's really exchangable */

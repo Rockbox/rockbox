@@ -12979,3 +12979,17 @@
     *: "Startup/Shutdown"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Restart Sleep Timer On Keypress"
+  </dest>
+  <voice>
+    *: "Restart Sleep Timer On Keypress"
+  </voice>
+</phrase>

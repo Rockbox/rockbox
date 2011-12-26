@@ -800,6 +800,7 @@ struct user_settings
 
     int sleeptimer_duration;
     bool sleeptimer_on_startup;
+    bool keypress_restarts_sleeptimer;
 
 #ifdef HAVE_MORSE_INPUT
     bool morse_input; /* text input method setting */

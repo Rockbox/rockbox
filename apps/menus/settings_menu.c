@@ -439,13 +439,16 @@ MENUITEM_FUNCTION_DYNTEXT(sleep_timer_call, 0, sleep_timer, NULL,
                           /* make it look like a setting to the user */
 MENUITEM_SETTING(sleeptimer_on_startup,
                  &global_settings.sleeptimer_on_startup, NULL);
+MENUITEM_SETTING(keypress_restarts_sleeptimer,
+                 &global_settings.keypress_restarts_sleeptimer, NULL);
 
 MAKE_MENU(startup_shutdown_menu, ID2P(LANG_STARTUP_SHUTDOWN),
           0, Icon_System_menu,
             &start_screen,
             &poweroff,
             &sleep_timer_call,
-            &sleeptimer_on_startup
+            &sleeptimer_on_startup,
+            &keypress_restarts_sleeptimer
          );
 
 /*    STARTUP/SHUTDOWN MENU      */

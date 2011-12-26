@@ -64,6 +64,10 @@ void send_battery_level_event(void);
 
 static bool sleeptimer_active = false;
 static long sleeptimer_endtick;
+/* Whether an active sleep timer should be restarted when a key is pressed */
+static bool sleeptimer_key_restarts = false;
+/* The number of seconds the sleep timer was last set to */
+static unsigned int sleeptimer_duration = 0;
 
 #if CONFIG_CHARGING
 /* State of the charger input as seen by the power thread */
@@ -707,6 +711,8 @@ void set_poweroff_timeout(int timeout)
 void reset_poweroff_timer(void)
 {
     last_event_tick = current_tick;
+    if (sleeptimer_active && sleeptimer_key_restarts)
+        set_sleep_timer(sleeptimer_duration);
 }
 
 void sys_poweroff(void)
@@ -777,6 +783,7 @@ void set_sleep_timer(int seconds)
         sleeptimer_active  = false;
         sleeptimer_endtick = 0;
     }
+    sleeptimer_duration = seconds;
 }
 
 int get_sleep_timer(void)
@@ -785,6 +792,11 @@ int get_sleep_timer(void)
         return (sleeptimer_endtick - current_tick) / HZ;
     else
         return 0;
+}
+
+void set_keypress_restarts_sleep_timer(bool enable)
+{
+    sleeptimer_key_restarts = enable;
 }
 
 static void handle_sleep_timer(void)
