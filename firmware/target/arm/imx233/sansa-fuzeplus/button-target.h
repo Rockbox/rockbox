@@ -42,13 +42,12 @@ bool button_debug_screen(void);
 #define BUTTON_BACK                 0x00000200
 #define BUTTON_BOTTOMLEFT           0x00000400
 #define BUTTON_BOTTOMRIGHT          0x00000800
-/* Touch the touchpad with two fingers */
-#define BUTTON_TWO_FINGERS         0x000001000
+
 
 #define BUTTON_MAIN (BUTTON_VOL_UP|BUTTON_VOL_DOWN|BUTTON_POWER|BUTTON_LEFT| \
                      BUTTON_UP|BUTTON_RIGHT|BUTTON_DOWN|BUTTON_SELECT| \
                      BUTTON_PLAYPAUSE|BUTTON_BACK| \
-                     BUTTON_TWO_FINGERS|BUTTON_BOTTOMRIGHT|BUTTON_BOTTOMLEFT)
+                     BUTTON_BOTTOMRIGHT|BUTTON_BOTTOMLEFT)
 
 #define BUTTON_REMOTE 0
 

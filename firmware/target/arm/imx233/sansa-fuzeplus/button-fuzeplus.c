@@ -200,8 +200,6 @@ static struct button_area_t button_areas[] =
 #define RMI_INTERRUPT   1
 
 static int touchpad_btns = 0;
-static bool two_fingers_mode = 0; 
-static int button_delay = 0;
 static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
 static const char rmi_thread_name[] = "rmi";
 static struct event_queue rmi_queue;
@@ -265,45 +263,11 @@ static void rmi_thread(void)
         int absolute_y = u.s.absolute.y_msb << 8 | u.s.absolute.y_lsb;
         int nr_fingers = u.s.absolute.misc & 7;
 
-        /* Handle the single vs two fingers event considering the following issues:
-          - When they are two fingers on the touchpad the signal often 
-                 switch between 1 and 2 fingers. We use the bool 
-                 two_fingers_mode to "lock" the two fingers's signal
-                 as long as the user doesn't release the touchpad
-          - User can hit the device at first with only one finger while
-                 trying to do a double fingers's touch. In order to "smooth"
-                 the signal, we set a delay on single finger so that user as
-                 time to actually touch with 2 finger if he meant to.
-        */
 
-        switch(nr_fingers)
-        {
-            case 2:
-                /* enter two fingers mode */
-                two_fingers_mode = 1;
-                touchpad_btns = BUTTON_TWO_FINGERS;
-                break;
-            case 1:
-                /* Ignore any touch when in two fingers mode */
-                if (two_fingers_mode)
-                    touchpad_btns = BUTTON_TWO_FINGERS;
-                else
-                {
-                    if(button_delay > 2)
-                        touchpad_btns = find_button(absolute_x, absolute_y);
-                    else
-                        button_delay++;
-                }
-                break;
-            case 0:
-                /* reset two fingers mode and delay */
-                two_fingers_mode = 0;
-                button_delay = 0; 
-                touchpad_btns = 0;
-                break;
-            default:
-                break;
-        }  
+        if(nr_fingers == 1)
+            touchpad_btns = find_button(absolute_x, absolute_y);
+        else
+            touchpad_btns = 0;
         
         /* enable interrupt */
         imx233_setup_pin_irq(0, 27, true, true, false, &rmi_attn_cb);

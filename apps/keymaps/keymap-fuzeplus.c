@@ -39,7 +39,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_NEXTREPEAT,            BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
 
     { ACTION_STD_CONTEXT,               BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_SELECT },
-    { ACTION_STD_CANCEL,                BUTTON_BACK|BUTTON_REL,            BUTTON_BACK },
+    { ACTION_STD_CANCEL,                BUTTON_BACK,                       BUTTON_NONE },
     { ACTION_STD_CANCEL,                BUTTON_LEFT,                       BUTTON_NONE },
 
 
@@ -57,7 +57,6 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_TREE_STOP,                 BUTTON_PLAYPAUSE|BUTTON_REPEAT,    BUTTON_NONE },
 
     { ACTION_STD_KEYLOCK,               BUTTON_POWER,                      BUTTON_NONE },
-    { ACTION_STD_KEYLOCK,               BUTTON_TWO_FINGERS|BUTTON_REL,     BUTTON_TWO_FINGERS|BUTTON_REPEAT },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -69,9 +68,9 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGUP,             BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_BOTTOMLEFT },
     { ACTION_LISTTREE_PGDOWN,           BUTTON_BOTTOMRIGHT,                BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,           BUTTON_BOTTOMRIGHT|BUTTON_REPEAT,  BUTTON_BOTTOMRIGHT },
-#ifdef HAVE_HOTKEY
+/*#ifdef HAVE_HOTKEY on some gesture later?
     { ACTION_TREE_HOTKEY,               BUTTON_BACK|BUTTON_REL,            BUTTON_BACK|BUTTON_REPEAT },
-#endif
+#endif*/
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
@@ -80,7 +79,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,                  BUTTON_PLAYPAUSE|BUTTON_REL,       BUTTON_PLAYPAUSE },
     { ACTION_WPS_STOP,                  BUTTON_PLAYPAUSE|BUTTON_REPEAT,    BUTTON_NONE },
 
-    { ACTION_WPS_MENU,                  BUTTON_BACK|BUTTON_REL,            BUTTON_BACK },
+    { ACTION_WPS_MENU,                  BUTTON_BACK,                       BUTTON_NONE },
 
     { ACTION_WPS_BROWSE,                BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
     { ACTION_WPS_CONTEXT,               BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_NONE },
@@ -102,7 +101,6 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLUP,                 BUTTON_UP,                         BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,               BUTTON_DOWN,                       BUTTON_NONE },
 
-    { ACTION_WPS_REC,                   BUTTON_BACK|BUTTON_REPEAT,         BUTTON_BACK },
     { ACTION_WPS_PITCHSCREEN,           BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_BOTTOMLEFT },
     { ACTION_WPS_QUICKSCREEN,           BUTTON_BOTTOMLEFT|BUTTON_REL,      BUTTON_BOTTOMLEFT },
     { ACTION_WPS_ID3SCREEN,             BUTTON_BOTTOMRIGHT|BUTTON_REPEAT,  BUTTON_BOTTOMRIGHT },
