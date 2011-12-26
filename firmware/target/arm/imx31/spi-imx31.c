@@ -55,7 +55,7 @@ static struct spi_module_desc
     const struct spi_node *last_node;    /* Last node used for module */
     void (* const handler)(void);        /* Interrupt handler */
     int rxcount;                         /* Independent copy of txcount */
-    int8_t enab;                         /* Enable count */
+    int8_t enable;                       /* Enable count */
     int8_t byte_size;                    /* Size of transfers in bytes */
     const int8_t cg;                     /* Clock-gating value */
     const int8_t ints;                   /* AVIC vector number */
@@ -102,7 +102,7 @@ static bool spi_set_context(struct spi_module_desc *desc,
     const struct spi_node * const node = xfer->node; 
     volatile unsigned long * const base = desc->base;
 
-    if (desc->enab == 0)
+    if (desc->enable == 0)
         return false;
 
     if (node == desc->last_node)
@@ -354,43 +354,42 @@ void INIT_ATTR spi_init(void)
     }
 }
 
-/* Enable the specified module for the node */
-void spi_enable_module(const struct spi_node *node)
+/* Enable or disable the specified module for the node */
+void spi_enable_module(const struct spi_node *node, bool enable)
 {
     struct spi_module_desc * const desc = &spi_descs[node->num];
 
-    if (++desc->enab == 1)
+    if (enable)
     {
-        /* Enable clock-gating register */
-        ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
-        /* Reset */
-        spi_reset(desc);
-        desc->last_node = NULL;
-        /* Enable interrupt at controller level */
-        avic_enable_int(desc->ints, INT_TYPE_IRQ, INT_PRIO_DEFAULT,
-                        desc->handler);
+        if (++desc->enable == 1)
+        {
+            /* Enable clock-gating register */
+            ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
+            /* Reset */
+            spi_reset(desc);
+            desc->last_node = NULL;
+            /* Enable interrupt at controller level */
+            avic_enable_int(desc->ints, INT_TYPE_IRQ, INT_PRIO_DEFAULT,
+                            desc->handler);
+        }
     }
-}
-
-/* Disable the specified module for the node */
-void spi_disable_module(const struct spi_node *node)
-{
-    struct spi_module_desc * const desc = &spi_descs[node->num];
-
-    if (desc->enab > 0 && --desc->enab == 0)
+    else
     {
-        /* Last enable for this module */
-        /* Wait for outstanding transactions */
-        while (*(void ** volatile)&desc->head != NULL);
+        if (desc->enable > 0 && --desc->enable == 0)
+        {
+            /* Last enable for this module */
+            /* Wait for outstanding transactions */
+            while (*(void ** volatile)&desc->head != NULL);
 
-        /* Disable interrupt at controller level */
-        avic_disable_int(desc->ints);
+            /* Disable interrupt at controller level */
+            avic_disable_int(desc->ints);
 
-        /* Disable interface */
-        desc->base[CONREG] &= ~CSPI_CONREG_EN;
+            /* Disable interface */
+            desc->base[CONREG] &= ~CSPI_CONREG_EN;
 
-        /* Disable interface clock */
-        ccm_module_clock_gating(desc->cg, CGM_OFF);
+            /* Disable interface clock */
+            ccm_module_clock_gating(desc->cg, CGM_OFF);
+        }
     }
 }
 

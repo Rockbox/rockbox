@@ -74,11 +74,8 @@ struct spi_transfer_desc
 /* One-time init of SPI driver */
 void spi_init(void);
 
-/* Enable the specified module for the node */
-void spi_enable_module(const struct spi_node *node);
-
-/* Disabled the specified module for the node */
-void spi_disable_module(const struct spi_node *node);
+/* Enable or disable the specified module for the node */
+void spi_enable_module(const struct spi_node *node, bool enable);
 
 /* Send and/or receive data on the specified node (asychronous) */
 bool spi_transfer(struct spi_transfer_desc *xfer);

@@ -139,7 +139,7 @@ void INIT_ATTR mc13783_init(void)
     semaphore_init(&mc13783_svc_wake, 1, 0);
 
     /* Enable the PMIC SPI module */
-    spi_enable_module(&mc13783_spi);
+    spi_enable_module(&mc13783_spi, true);
 
     /* Mask any PMIC interrupts for now - modules will enable them as
      * required */
@@ -164,7 +164,7 @@ void mc13783_close(void)
     mc13783_thread_id = 0;
     semaphore_release(&mc13783_svc_wake);
     thread_wait(thread_id);
-    spi_disable_module(&mc13783_spi);
+    spi_enable_module(&mc13783_spi, false);
 }
 
 bool mc13783_enable_event(enum mc13783_event_ids id)
