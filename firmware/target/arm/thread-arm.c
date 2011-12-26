@@ -109,7 +109,7 @@ static inline void core_sleep(void)
 }
 #else
 /* Skip this if special code is required and implemented */
-#if !(defined(CPU_PP)) && CONFIG_CPU != RK27XX
+#if !(defined(CPU_PP)) && CONFIG_CPU != RK27XX && CONFIG_CPU != IMX233
 static inline void core_sleep(void)
 {
     /* TODO: core_sleep not implemented, battery life will be decreased */

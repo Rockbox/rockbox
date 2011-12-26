@@ -26,6 +26,7 @@
 #include "panic.h"
 
 #include "clock-target.h" /* CPUFREQ_* are defined here */
+#include "clkctrl-imx233.h"
 #include "power-imx233.h"
 
 /* Digital control */

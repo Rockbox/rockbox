@@ -98,6 +98,17 @@
 #define HW_CLKCTRL_RESET_CHIP   0x2
 #define HW_CLKCTRL_RESET_DIG    0x1
 
+static inline void core_sleep(void)
+{
+    __REG_SET(HW_CLKCTRL_CPU) = HW_CLKCTRL_CPU__INTERRUPT_WAIT;
+    asm volatile (
+        "mcr p15, 0, %0, c7, c0, 4 \n" /* Wait for interrupt */
+        "nop\n" /* Datasheet unclear: "The lr sent to handler points here after RTI"*/
+        : : "r"(0)
+    );
+    enable_irq();
+}
+
 enum imx233_clock_t
 {
     CLK_PIX, /* freq, div, frac, bypass, enable */
