@@ -116,7 +116,7 @@ static void lcd_write_reg(unsigned reg, unsigned val)
 
 static void lcd_enable_interface(bool enable)
 {
-    spi_enable_module(&lcd_spi_node, enable);
+    spi_enable_node(&lcd_spi_node, enable);
 }
 
 static void lcd_set_power(bool powered)

@@ -354,8 +354,8 @@ void INIT_ATTR spi_init(void)
     }
 }
 
-/* Enable or disable the specified module for the node */
-void spi_enable_module(const struct spi_node *node, bool enable)
+/* Enable or disable the node - modules will be switch on/off accordingly. */
+void spi_enable_node(const struct spi_node *node, bool enable)
 {
     struct spi_module_desc * const desc = &spi_descs[node->num];
 
