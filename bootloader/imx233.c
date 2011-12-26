@@ -37,6 +37,7 @@
 #include "power.h"
 #include "system-target.h"
 #include "fmradio_i2c.h"
+#include "version.h"
 
 #include "usb.h"
 #include "usb-target.h"
@@ -124,6 +125,7 @@ void main(uint32_t arg, uint32_t addr)
     button_init();
 
     //button_debug_screen();
+    printf("Boot version: %s", RBVERSION);
     printf("arg=%x addr=%x", arg, addr);
 
 #ifdef SANSA_FUZEPLUS
