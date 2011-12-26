@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
+ * Copyright (C) 2011 by Tomasz Moń
  * Copyright (C) 2007 by Karl Kurbjun
  *
  * This program is free software; you can redistribute it and/or
@@ -311,7 +312,7 @@ void system_init(void)
 #endif
     {
 #ifdef SANSA_CONNECT
-        /* Setting AHB divisor to 0 causes MMC/SD interface to lock */
+        /* Setting AHB divisor to 0 increases power consumption */
         clock_arm_slow = (1 << 8) | 3;
         clock_arm_fast = (1 << 8) | 1;
 #else
@@ -379,6 +380,16 @@ void system_init(void)
     /* Disable External Memory interface (used for accessing NOR flash) */
     bitclr16(&IO_CLK_MOD0, CLK_MOD0_EMIF);
 #endif
+
+    /* Unknown GIOs - set them to save power */
+    /* GIO40 - output 0
+     * GIO28 - output 0
+     */
+    IO_GIO_DIR2 &= ~(1 << 8);
+    IO_GIO_BITCLR2 = (1 << 8);
+
+    IO_GIO_DIR1 &= ~(1 << 12);
+    IO_GIO_BITCLR1 = (1 << 12);
 #endif
 }
 

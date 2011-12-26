@@ -121,7 +121,9 @@ _clock_setup:
     /* IO_CLK_DIV1: Accelerator, SDRAM */
     mwh 0x3088C, 0x0102
 
-    /* IO_CLK_DIV2: DSP, MS Clock */
+    /* IO_CLK_DIV2: DSP, MS Clock
+     * OF must be booted with this value
+     */
     mwhm 0x3088E, 0x0200
 
     # PLLA &= ~0x1000 (BIC #0x1000)
