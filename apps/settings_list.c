@@ -572,13 +572,6 @@ static void tsc_set_default(void* setting, void* defaultval)
     memcpy(setting, defaultval, sizeof(struct touchscreen_parameter));
 }
 #endif
-static const char* sleeptimer_formatter(char* buffer, size_t buffer_size,
-                                         int value, const char* unit)
-{
-    (void) unit;
-    snprintf(buffer, buffer_size, "%d:%02d", value / 60, value % 60);
-    return buffer;
-}
 #ifdef HAVE_HOTKEY
 static const char* hotkey_formatter(char* buffer, size_t buffer_size, int value,
                               const char* unit)
@@ -1805,7 +1798,7 @@ const struct settings_list settings[] = {
                      PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL),
     INT_SETTING(0, sleeptimer_duration, LANG_SLEEP_TIMER_DURATION, 30,
                 "sleeptimer duration",
-                UNIT_MIN, 5, 300, 5, sleeptimer_formatter, NULL, NULL),
+                UNIT_MIN, 5, 300, 5, NULL, NULL, NULL),
     OFFON_SETTING(0, sleeptimer_on_startup, LANG_SLEEP_TIMER_ON_POWER_UP, false,
                   "sleeptimer on startup", NULL),
     OFFON_SETTING(0, keypress_restarts_sleeptimer, LANG_KEYPRESS_RESTARTS_SLEEP_TIMER, false,
