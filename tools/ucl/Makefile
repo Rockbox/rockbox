@@ -6,12 +6,12 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-CFLAGS = -O2 -Iinclude
+CFLAGS+ = -O2 -Iinclude
 
 TARGET = ../uclpack
 
 $(TARGET): uclpack.o src/libucl.a
-	$(CC) uclpack.o src/libucl.a -o $(TARGET)
+	$(CC) $(CFLAGS) uclpack.o src/libucl.a -o $(TARGET)
 
 uclpack.o: uclpack.c
 

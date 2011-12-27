@@ -6,7 +6,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-CFLAGS = -I../include
+CFLAGS += -I../include
 
 ifndef V
 SILENT = @
