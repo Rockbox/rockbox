@@ -9,6 +9,7 @@
 #include "rtc-gb.h"
 #include "mem.h"
 #include "sound.h"
+#include "save.h"
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
 #define LIL(x) (x)

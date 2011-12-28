@@ -7,6 +7,7 @@
 #include "rtc-gb.h"
 #include "save.h"
 #include "sound.h"
+#include "loader.h"
 
 /* From http://www.semis.demon.co.uk/Gameboy/Gbspec.txt (4/17/2007)
  * Cartridge type:

@@ -1112,7 +1112,7 @@ void thread(void)
 }
 
 /* callback to end the TSR plugin, called before a new one gets loaded */
-bool exit_tsr(bool reenter)
+static bool exit_tsr(bool reenter)
 {
     if (reenter)
         return false; /* dont let it start again */

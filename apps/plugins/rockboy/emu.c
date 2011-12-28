@@ -8,6 +8,7 @@
 #include "sound.h"
 #include "rtc-gb.h"
 #include "pcm.h"
+#include "emu.h"
 
 /*
  * emu_reset is called to initialize the state of the emulated

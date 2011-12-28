@@ -144,7 +144,7 @@ INLINE unsigned range_limit(int value)
 * Perform dequantization and inverse DCT on one block of coefficients,
 * producing a reduced-size 1x1 output block.
 */
-void idct1x1(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
+static void idct1x1(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 {
     (void)skip_line; /* unused */
     *p_byte = range_limit(inptr[0] * quantptr[0] >> 3);
@@ -156,7 +156,7 @@ void idct1x1(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 * Perform dequantization and inverse DCT on one block of coefficients,
 * producing a reduced-size 2x2 output block.
 */
-void idct2x2(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
+static void idct2x2(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 {
     int tmp0, tmp1, tmp2, tmp3, tmp4, tmp5;
     unsigned char* outptr;
@@ -198,7 +198,7 @@ void idct2x2(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 * Perform dequantization and inverse DCT on one block of coefficients,
 * producing a reduced-size 4x4 output block.
 */
-void idct4x4(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
+static void idct4x4(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 {
     int tmp0, tmp2, tmp10, tmp12;
     int z1, z2, z3;
@@ -282,7 +282,7 @@ void idct4x4(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 /*
 * Perform dequantization and inverse DCT on one block of coefficients.
 */
-void idct8x8(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
+static void idct8x8(unsigned char* p_byte, int* inptr, int* quantptr, int skip_line)
 {
     long tmp0, tmp1, tmp2, tmp3;
     long tmp10, tmp11, tmp12, tmp13;
@@ -794,7 +794,7 @@ void default_huff_tbl(struct jpeg* p_jpeg)
 }
 
 /* Compute the derived values for a Huffman table */
-void fix_huff_tbl(int* htbl, struct derived_tbl* dtbl)
+static void fix_huff_tbl(int* htbl, struct derived_tbl* dtbl)
 {
     int p, i, l, si;
     int lookbits, ctr;
@@ -1081,7 +1081,7 @@ INLINE void drop_bits(struct bitstream* pb, int nbits)
 }
 
 /* re-synchronize to entropy data (skip restart marker) */
-void search_restart(struct bitstream* pb)
+static void search_restart(struct bitstream* pb)
 {
     pb->next_input_byte--; /* we may have overread it, taking 2 bytes */
     /* search for a non-byte-padding marker, has to be RSTm or EOS */
@@ -1245,6 +1245,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
     else return -1; /* not supported */
 
     /* init bitstream, fake a restart to make it start */
+    bs.get_buffer = 0;
     bs.next_input_byte = p_jpeg->p_entropy_data;
     bs.bits_left = 0;
     bs.input_end = p_jpeg->p_entropy_end;

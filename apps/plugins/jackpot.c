@@ -93,14 +93,14 @@ struct jackpot
 };
 
 #ifdef HAVE_LCD_CHARCELLS
-void patterns_init(struct screen* display)
+static void patterns_init(struct screen* display)
 {
     int i;
     for(i=0;i<NB_SLOTS;i++)
         char_patterns[i]=display->get_locked_pattern();
 }
 
-void patterns_deinit(struct screen* display)
+static void patterns_deinit(struct screen* display)
 {
     /* Restore the old pattern */
     int i;

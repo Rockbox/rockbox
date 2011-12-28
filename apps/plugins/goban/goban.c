@@ -745,7 +745,7 @@ do_main_menu (void)
     return false;
 }
 
-void
+static void
 zoom_preview (int current)
 {
     set_zoom_display (current);

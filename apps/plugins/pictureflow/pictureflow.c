@@ -808,7 +808,7 @@ static void update_scroll_lines(void)
 }
 
 /* Create the lookup table with the scaling values for the reflections */
-void init_reflect_table(void)
+static void init_reflect_table(void)
 {
     int i;
     for (i = 0; i < REFLECT_HEIGHT; i++)
@@ -821,7 +821,7 @@ void init_reflect_table(void)
   Create an index of all albums from the database.
   Also store the album names so we can access them later.
  */
-int create_album_index(void)
+static int create_album_index(void)
 {
     album = ((struct album_data *)(buf_size + (char *) buf)) - 1;
     rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
@@ -860,7 +860,7 @@ int create_album_index(void)
 /**
  Return a pointer to the album name of the given slide_index
  */
-char* get_album_name(const int slide_index)
+static char* get_album_name(const int slide_index)
 {
     return album_names + album[slide_index].name_idx;
 }
@@ -869,14 +869,14 @@ char* get_album_name(const int slide_index)
  Return a pointer to the track name of the active album
  create_track_index has to be called first.
  */
-char* get_track_name(const int track_index)
+static char* get_track_name(const int track_index)
 {
     if ( track_index < track_count )
         return track_names + tracks[track_index].name_idx;
     return 0;
 }
 #if PF_PLAYBACK_CAPABLE
-char* get_track_filename(const int track_index)
+static char* get_track_filename(const int track_index)
 {
     if ( track_index < track_count )
         return track_names + tracks[track_index].filename_idx;
@@ -884,7 +884,7 @@ char* get_track_filename(const int track_index)
 }
 #endif
 
-int get_wps_current_index(void)
+static int get_wps_current_index(void)
 {
     struct mp3entry *id3 = rb->audio_current_track();
     if(id3 && id3->album) {
@@ -901,7 +901,7 @@ int get_wps_current_index(void)
 /**
   Compare two unsigned ints passed via pointers.
  */
-int compare_tracks (const void *a_v, const void *b_v)
+static int compare_tracks (const void *a_v, const void *b_v)
 {
     uint32_t a = ((struct track_data *)a_v)->sort;
     uint32_t b = ((struct track_data *)b_v)->sort;
@@ -911,7 +911,7 @@ int compare_tracks (const void *a_v, const void *b_v)
 /**
   Create the track index of the given slide_index.
  */
-void create_track_index(const int slide_index)
+static void create_track_index(const int slide_index)
 {
     if ( slide_index == track_index )
         return;
@@ -1022,7 +1022,7 @@ fail:
   The algorithm looks for the first track of the given album uses
   find_albumart to find the filename.
  */
-bool get_albumart_for_index_from_db(const int slide_index, char *buf,
+static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
                                     int buflen)
 {
     if ( slide_index == -1 )
@@ -1069,7 +1069,7 @@ bool get_albumart_for_index_from_db(const int slide_index, char *buf,
 /**
   Draw the PictureFlow logo
  */
-void draw_splashscreen(void)
+static void draw_splashscreen(void)
 {
     unsigned char * buf_tmp = buf;
     size_t buf_tmp_size = buf_size;
@@ -1116,7 +1116,7 @@ void draw_splashscreen(void)
 /**
   Draw a simple progress bar
  */
-void draw_progressbar(int step)
+static void draw_progressbar(int step)
 {
     int txt_w, txt_h;
     const int bar_height = 22;
@@ -1149,7 +1149,7 @@ void draw_progressbar(int step)
 /* Calculate modified FNV hash of string 
  * has good avalanche behaviour and uniform distribution
  * see http://home.comcast.net/~bretm/hash/ */
-unsigned int mfnv(char *str)
+static unsigned int mfnv(char *str)
 {
     const unsigned int p = 16777619;
     unsigned int hash = 0x811C9DC5; // 2166136261;
@@ -1167,7 +1167,7 @@ unsigned int mfnv(char *str)
 /**
  Save the given bitmap as filename in the pfraw format
  */
-bool save_pfraw(char* filename, struct bitmap *bm)
+static bool save_pfraw(char* filename, struct bitmap *bm)
 {
     struct pfraw_header bmph;
     bmph.width = bm->width;
@@ -1190,7 +1190,7 @@ bool save_pfraw(char* filename, struct bitmap *bm)
  Precomupte the album art images and store them in CACHE_PREFIX.
  Use the "?" bitmap if image is not found.
  */
-bool create_albumart_cache(void)
+static bool create_albumart_cache(void)
 {
     int ret;
 
@@ -1254,7 +1254,7 @@ bool create_albumart_cache(void)
   Create the "?" slide, that is shown while loading
   or when no cover was found.
  */
-int create_empty_slide(bool force)
+static int create_empty_slide(bool force)
 {
     if ( force || ! rb->file_exists( EMPTY_SLIDE ) )  {
         struct bitmap input_bmp;
@@ -1278,7 +1278,7 @@ int create_empty_slide(bool force)
 /**
  Thread used for loading and preparing bitmaps in the background
  */
-void thread(void)
+static void thread(void)
 {
     long sleep_time = 5 * HZ;
     struct queue_event ev;
@@ -1306,7 +1306,7 @@ void thread(void)
 /**
  End the thread by posting the EV_EXIT event
  */
-void end_pf_thread(void)
+static void end_pf_thread(void)
 {
     if ( thread_is_running ) {
         rb->queue_post(&thread_q, EV_EXIT, 0);
@@ -1321,7 +1321,7 @@ void end_pf_thread(void)
 /**
  Create the thread an setup the event queue
  */
-bool create_pf_thread(void)
+static bool create_pf_thread(void)
 {
     /* put the thread's queue in the bcast list */
     rb->queue_init(&thread_q, true);
@@ -1507,7 +1507,7 @@ static bool free_slide_prio(int prio)
 /**
  Read the pfraw image given as filename and return the hid of the buffer
  */
-int read_pfraw(char* filename, int prio)
+static int read_pfraw(char* filename, int prio)
 {
     struct pfraw_header bmph;
     int fh = rb->open(filename, O_RDONLY);
@@ -1727,7 +1727,7 @@ static inline struct dim *surface(const int slide_index)
 /**
  adjust slides so that they are in "steady state" position
  */
-void reset_slides(void)
+static void reset_slides(void)
 {
     center_slide.angle = 0;
     center_slide.cx = 0;
@@ -1768,7 +1768,7 @@ void reset_slides(void)
  *                                    z
  * TODO: support moving the side slides toward or away from the camera
  */
-void recalc_offsets(void)
+static void recalc_offsets(void)
 {
     PFreal xs = PFREAL_HALF - DISPLAY_WIDTH * PFREAL_HALF;
     PFreal zo;
@@ -1844,7 +1844,7 @@ static inline unsigned fade_color(pix_t c, unsigned a)
  * optimized by saving the numerator and denominator of the fraction, which can
  * then be incremented by (z + zo) and sin(r) respectively.
  */
-void render_slide(struct slide_data *slide, const int alpha)
+static void render_slide(struct slide_data *slide, const int alpha)
 {
     struct dim *bmp = surface(slide->slide_index);
     if (!bmp) {
@@ -1989,7 +1989,7 @@ static inline void set_current_slide(const int slide_index)
 /**
   Start the animation for changing slides
  */
-void start_animation(void)
+static void start_animation(void)
 {
     step = (target < center_slide.slide_index) ? -1 : 1;
     pf_state = pf_scrolling;
@@ -1998,7 +1998,7 @@ void start_animation(void)
 /**
   Go to the previous slide
  */
-void show_previous_slide(void)
+static void show_previous_slide(void)
 {
     if (step == 0) {
         if (center_index > 0) {
@@ -2017,7 +2017,7 @@ void show_previous_slide(void)
 /**
   Go to the next slide
  */
-void show_next_slide(void)
+static void show_next_slide(void)
 {
     if (step == 0) {
         if (center_index < number_of_slides - 1) {
@@ -2036,7 +2036,7 @@ void show_next_slide(void)
 /**
   Render the slides. Updates only the offscreen buffer.
 */
-void render_all_slides(void)
+static void render_all_slides(void)
 {
     mylcd_set_background(G_BRIGHT(0));
     /* TODO: Optimizes this by e.g. invalidating rects */
@@ -2091,7 +2091,7 @@ void render_all_slides(void)
 /**
   Updates the animation effect. Call this periodically from a timer.
 */
-void update_scroll_animation(void)
+static void update_scroll_animation(void)
 {
     if (step == 0)
         return;
@@ -2193,7 +2193,7 @@ void update_scroll_animation(void)
 /**
   Cleanup the plugin
 */
-void cleanup(void)
+static void cleanup(void)
 {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
@@ -2210,7 +2210,7 @@ void cleanup(void)
 /**
   Shows the settings menu
  */
-int settings_menu(void)
+static int settings_menu(void)
 {
     int selection = 0;
     bool old_val;
@@ -2320,7 +2320,7 @@ enum {
     PF_MENU_QUIT,
 };
 
-int main_menu(void)
+static int main_menu(void)
 {
     int selection = 0;
     int result;
@@ -2371,7 +2371,7 @@ int main_menu(void)
 /**
    Animation step for zooming into the current cover
  */
-void update_cover_in_animation(void)
+static void update_cover_in_animation(void)
 {
     cover_animation_keyframe++;
     if( cover_animation_keyframe < 20 ) {
@@ -2391,7 +2391,7 @@ void update_cover_in_animation(void)
 /**
    Animation step for zooming out the current cover
  */
-void update_cover_out_animation(void)
+static void update_cover_out_animation(void)
 {
     cover_animation_keyframe++;
     if( cover_animation_keyframe <= 15 ) {
@@ -2481,7 +2481,7 @@ void reset_track_list(void)
 /**
   Display the list of tracks
  */
-void show_track_list(void)
+static void show_track_list(void)
 {
     mylcd_clear_display();
     if ( center_slide.slide_index != track_index ) {
@@ -2518,7 +2518,7 @@ void show_track_list(void)
     }
 }
 
-void select_next_track(void)
+static void select_next_track(void)
 {
     if (  selected_track < track_count - 1 ) {
         selected_track++;
@@ -2527,7 +2527,7 @@ void select_next_track(void)
     }
 }
 
-void select_prev_track(void)
+static void select_prev_track(void)
 {
     if (selected_track > 0 ) {
         if (selected_track==start_index_track_list) start_index_track_list--;
@@ -2539,7 +2539,7 @@ void select_prev_track(void)
 /*
  * Puts the current tracklist into a newly created playlist and starts playling
  */
-void start_playback(bool append)
+static void start_playback(bool append)
 {
     static int old_playlist = -1, old_shuffle = 0;
     int count = 0;
@@ -2584,7 +2584,7 @@ play:
 /**
    Draw the current album name
  */
-void draw_album_text(void)
+static void draw_album_text(void)
 {
     if (show_album_name == ALBUM_NAME_HIDE)
         return;
@@ -2633,7 +2633,7 @@ void draw_album_text(void)
 /**
   Display an error message and wait for input.
 */
-void error_wait(const char *message)
+static void error_wait(const char *message)
 {
     rb->splashf(0, "%s. Press any button to continue.", message);
     while (rb->get_action(CONTEXT_STD, 1) == ACTION_NONE)
@@ -2645,7 +2645,7 @@ void error_wait(const char *message)
   Main function that also contain the main plasma
   algorithm.
  */
-int main(void)
+static int main(void)
 {
     int ret;
 

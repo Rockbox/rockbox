@@ -383,7 +383,7 @@ static void LodePNG_InfoPng_init(LodePNG_InfoPng* info)
 #endif
 }
 
-void LodePNG_InfoPng_cleanup(LodePNG_InfoPng* info)
+static void LodePNG_InfoPng_cleanup(LodePNG_InfoPng* info)
 {
     LodePNG_InfoColor_cleanup(&info->color);
 }

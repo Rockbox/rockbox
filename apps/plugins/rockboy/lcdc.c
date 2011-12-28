@@ -6,6 +6,7 @@
 #include "regs.h"
 #include "lcd-gb.h"
 #include "fb.h"
+#include "lcdc.h"
 
 
 #define C (cpu.lcdc)

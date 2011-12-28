@@ -683,7 +683,7 @@ int bpm_step_counter = 0;
 #define MET_IS_PLAYING rb->mp3_is_playing()
 #define MET_PLAY_STOP rb->mp3_play_stop()
 
-void callback(unsigned char** start, size_t* size)
+static void callback(unsigned char** start, size_t* size)
 {
     (void)start; /* unused parameter, avoid warning */
     *size = 0; /* end of data */
@@ -691,7 +691,7 @@ void callback(unsigned char** start, size_t* size)
     rb->led(0);
 }
 
-void play_tock(void)
+static void play_tock(void)
 {
     sound_active = true;
     rb->led(1);
