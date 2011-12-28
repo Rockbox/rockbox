@@ -20,7 +20,6 @@
  ****************************************************************************/
 #include "config.h"
 
-#ifdef USB_ENABLE_HID
 #include "action.h"
 #include "lang.h"
 #include "misc.h"
@@ -223,5 +222,3 @@ int keypad_mode_name_get(void)
 {
     return hid_key_mappings[usb_keypad_mode]->lang_name;
 }
-
-#endif
