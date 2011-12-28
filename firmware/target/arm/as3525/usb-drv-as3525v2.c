@@ -433,7 +433,7 @@ static void usb_drv_transfer(int ep, void *ptr, int len, bool out)
     endpoint->status = -1;
 
     if (out)
-        DEPCTL(ep, out) &= ~DEPCTL_naksts;
+        DEPCTL(ep, out) &= ~DEPCTL_stall;
     DEPCTL(ep, out) |= DEPCTL_usbactep;
 
     int mps = usb_drv_port_speed() ? 512 : 64;
