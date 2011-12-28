@@ -272,7 +272,7 @@ static void ep_transfer(int ep, void *ptr, int length, int out)
     endpoints[ep].busy = true;
     endpoints[ep].size = length;
     if (out)
-        DEPCTL(ep, out) &= ~DEPCTL_naksts;
+        DEPCTL(ep, out) &= ~DEPCTL_stall;
     DEPCTL(ep, out) |= DEPCTL_usbactep;
     int blocksize = usb_drv_port_speed() ? 512 : 64;
     int packets = (length + blocksize - 1) / blocksize;
