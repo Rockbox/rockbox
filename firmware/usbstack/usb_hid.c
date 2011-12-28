@@ -252,17 +252,16 @@ static unsigned char buf_dump_ar[BUF_DUMP_NUM_LINES][BUF_DUMP_LINE_SIZE + 1]
 
 void buf_dump(unsigned char *buf, size_t size, char *msg)
 {
-    size_t i;
-    int line;
     static const char v[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'A', 'B', 'C', 'D', 'E', 'F' };
 
-    for (i = 0, line = 0; i < size; line++)
+    size_t i = 0;
+    for (int line = 0; i < size; line++)
     {
-        int j, i0 = i;
+        int i0 = i;
         char *b = buf_dump_ar[line];
 
-        for (j = 0; j < BUF_DUMP_ITEMS_IN_LINE && i < size; j++, i++)
+        for (int j = 0; j < BUF_DUMP_ITEMS_IN_LINE && i < size; j++, i++)
         {
             *b++ = v[buf[i] >> 4];
             *b++ = v[buf[i] & 0xF];
@@ -555,32 +554,30 @@ static size_t descriptor_report_get(unsigned char *dest)
     return (size_t)(report - dest);
 }
 
-static void descriptor_hid_get(unsigned char **dest)
+static void descriptor_hid_get(unsigned char *dest)
 {
-    hid_descriptor.wDescriptorLength0 =
-        (uint16_t)descriptor_report_get(report_descriptor);
+    hid_descriptor.wDescriptorLength0= descriptor_report_get(report_descriptor);
 
     logf("hid: desc len %u", hid_descriptor.wDescriptorLength0);
     buf_dump(report_descriptor, hid_descriptor.wDescriptorLength0, "desc");
 
-    PACK_DATA(*dest, hid_descriptor);
+    PACK_DATA(dest, hid_descriptor);
 }
 
 int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
 {
+    (void)max_packet_size;
+
     unsigned char *orig_dest = dest;
 
     logf("hid: config desc.");
-
-    /* Ignore given max_packet_size */
-    (void)max_packet_size;
 
     /* Interface descriptor */
     interface_descriptor.bInterfaceNumber = usb_interface;
     PACK_DATA(dest, interface_descriptor);
 
     /* HID descriptor */
-    descriptor_hid_get(&dest);
+    descriptor_hid_get(dest);
 
     /* Endpoint descriptor */
     endpoint_descriptor.wMaxPacketSize = 8;
@@ -602,11 +599,9 @@ void usb_hid_init_connection(void)
 /* called by usb_core_init() */
 void usb_hid_init(void)
 {
-    int i;
-
     logf("hid: init");
 
-    for (i = 0; i < HID_NUM_BUFFERS; i++)
+    for (int i = 0; i < HID_NUM_BUFFERS; i++)
         send_buffer_len[i] = 0;
 
     cur_buf_prepare = 0;
@@ -627,26 +622,15 @@ void usb_hid_disconnect(void)
 void usb_hid_transfer_complete(int ep, int dir, int status, int length)
 {
     (void)ep;
-    (void)dir;
-    (void)status;
     (void)length;
 
     logf("HID: transfer complete: %d %d %d %d",ep,dir,status,length);
-    switch (dir)
+    if (dir == USB_DIR_IN && !status)
     {
-        case USB_DIR_OUT:
-            break;
-        case USB_DIR_IN:
-        {
-            if (status)
-                break;
-
-            send_buffer_len[cur_buf_send] = 0;
-            HID_BUF_INC(cur_buf_send);
-            currently_sending = false;
-            usb_hid_try_send_drv();
-            break;
-        }
+        send_buffer_len[cur_buf_send] = 0;
+        HID_BUF_INC(cur_buf_send);
+        currently_sending = false;
+        usb_hid_try_send_drv();
     }
 }
 
@@ -660,32 +644,27 @@ static int usb_hid_set_report(struct usb_ctrlrequest *req)
     static unsigned char buf[SET_REPORT_BUF_LEN] USB_DEVBSS_ATTR
         __attribute__((aligned(32)));
     int length;
-    int rc = 0;
 
     if ((req->wValue >> 8) != REPORT_TYPE_OUTPUT)
     {
         logf("Unsopported report type");
-        rc = 1;
-        goto Exit;
+        return 1;
     }
     if ((req->wValue & 0xff) != REPORT_ID_KEYBOARD)
     {
         logf("Wrong report id");
-        rc = 2;
-        goto Exit;
+        return 2;
     }
     if (req->wIndex != (uint16_t)usb_interface)
     {
         logf("Wrong interface");
-        rc = 3;
-        goto Exit;
+        return 3;
     }
     length = req->wLength;
     if (length != SET_REPORT_BUF_LEN)
     {
         logf("Wrong length");
-        rc = 4;
-        goto Exit;
+        return 4;
     }
 
     memset(buf, 0, length);
@@ -706,83 +685,64 @@ static int usb_hid_set_report(struct usb_ctrlrequest *req)
 
     /* Defining other LEDs and setting them from the USB host (OS) can be used
      * to send messages to the DAP */
-
-Exit:
-    return rc;
+    return 0;
 }
 
 /* called by usb_core_control_request() */
 bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
 {
-    bool handled = false;
-
     switch (req->bRequestType & USB_TYPE_MASK)
     {
-        case USB_TYPE_STANDARD:
+    case USB_TYPE_STANDARD:
+    {
+        unsigned char *orig_dest = dest;
+        uint8_t type = req->wValue >> 8;
+        size_t len;
+        logf("hid: type %d %s", type, (type == USB_DT_HID) ? "hid" :
+                        ((type == USB_DT_REPORT) ? "report" : ""));
+        switch (type)
         {
-            unsigned char *orig_dest = dest;
-
-            switch (req->wValue>>8) /* type */
-            {
-                case USB_DT_HID:
-                {
-                    logf("hid: type hid");
-                    descriptor_hid_get(&dest);
-                    break;
-                }
-                case USB_DT_REPORT:
-                {
-                    int len;
-
-                    logf("hid: type report");
-
-                    len = descriptor_report_get(report_descriptor);
-                    memcpy(dest, &report_descriptor, len);
-                    dest += len;
-                    break;
-                }
-                default:
-                    logf("hid: unsup. std. req");
-                    break;
-            }
-            if (dest != orig_dest)
-            {
-                usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
-                usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest);
-                handled = true;
-            }
+        case USB_DT_HID:
+            descriptor_hid_get(dest);
+            break;
+        case USB_DT_REPORT:
+            len = descriptor_report_get(report_descriptor);
+            memcpy(dest, &report_descriptor, len);
+            dest += len;
             break;
         }
 
-        case USB_TYPE_CLASS:
+        if (dest != orig_dest)
         {
-            switch (req->bRequest)
-            {
-                case USB_HID_SET_IDLE:
-                    logf("hid: set idle");
-                    usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
-                    handled = true;
-                    break;
-                case USB_HID_SET_REPORT:
-                    logf("hid: set report");
-                    if (!usb_hid_set_report(req))
-                    {
-                        usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
-                        handled = true;
-                    }
-                    break;
-                default:
-                    logf("%d: unsup. cls. req", req->bRequest);
-                    break;
-            }
-            break;
+            usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
+            usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest);
+            return true;
         }
-
-        case USB_TYPE_VENDOR:
-            logf("hid: unsup. ven. req");
-            break;
+        break;
     }
-    return handled;
+
+    case USB_TYPE_CLASS:
+    {
+        logf("req %d %s", req->bRequest, 
+            (req->bRequest == USB_HID_SET_IDLE) ? "set idle" :
+            ((req->bRequest == USB_HID_SET_REPORT) ? "set report" : ""));
+        switch (req->bRequest)
+        {
+        case USB_HID_SET_REPORT:
+            if (usb_hid_set_report(req))
+                break;
+        case USB_HID_SET_IDLE:
+            usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
+            return true;
+        }
+        break;
+    }
+
+    case USB_TYPE_VENDOR:
+        logf("hid: unsup. ven. req");
+        break;
+    }
+    return false;
 }
 
 static void usb_hid_try_send_drv(void)
@@ -803,10 +763,7 @@ static void usb_hid_try_send_drv(void)
     rc = usb_drv_send_nonblocking(ep_in, send_buffer[cur_buf_send], length);
     currently_sending = true;
     if (rc)
-    {
         send_buffer_len[cur_buf_send] = 0;
-        return;
-    }
 }
 
 static void usb_hid_queue(unsigned char *data, int length)
@@ -829,19 +786,19 @@ static void usb_hid_queue(unsigned char *data, int length)
 
 void usb_hid_send(usage_page_t usage_page, int id)
 {
-    uint8_t report_id, length;
+    uint8_t length;
     static unsigned char buf[HID_BUF_SIZE_CMD] USB_DEVBSS_ATTR
         __attribute__((aligned(32)));
     usb_hid_report_t *report = NULL;
 
-    for (report_id = 1; report_id < REPORT_ID_COUNT; report_id++)
-    {
+    for (uint8_t report_id = 1; report_id < REPORT_ID_COUNT; report_id++)
         if (usb_hid_reports[report_id].usage_page == usage_page)
         {
             report = &usb_hid_reports[report_id];
+            buf[0] = report_id;
             break;
         }
-    }
+
     if (!report)
     {
         logf("Unsupported usage_page");
@@ -849,7 +806,6 @@ void usb_hid_send(usage_page_t usage_page, int id)
     }
 
     logf("Sending cmd 0x%x", id);
-    buf[0] = report_id;
     length = report->buf_set(&buf[1], id) + 1;
     logf("length %u", length);
 
@@ -863,8 +819,7 @@ void usb_hid_send(usage_page_t usage_page, int id)
     if (report->is_key_released)
     {
         /* Key released */
-        memset(buf, 0, length);
-        buf[0] = report_id;
+        memset(&buf[1], 0, length-1);
 
         buf_dump(buf, length, "key release");
         usb_hid_queue(buf, length);
