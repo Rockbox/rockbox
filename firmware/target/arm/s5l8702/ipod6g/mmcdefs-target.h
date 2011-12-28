@@ -64,11 +64,6 @@
 }
 
 #define TIMEOUT_EXPIRED(a,b)    TIME_AFTER(USEC_TIMER,a + b)
-#define udelay(duration)                                   \
-{                                                          \
-    long timestamp = USEC_TIMER;                           \
-    while (!TIMEOUT_EXPIRED(timestamp, (long)(duration))); \
-}
 
 
 #define MMC_CMD_GO_IDLE_STATE 0

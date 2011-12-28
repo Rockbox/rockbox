@@ -32,6 +32,8 @@
 #include "s5l8702.h"
 #include "led.h"
 #include "ata_idle_notify.h"
+#include "fat.h"
+#include "splash.h"
 
 
 #ifndef ATA_RETRIES
@@ -49,6 +51,7 @@
 static uint8_t ceata_taskfile[16] __attribute__((aligned(16)));
 static uint16_t ata_identify_data[0x100] __attribute__((aligned(16)));
 static bool ceata;
+static bool ata_swap;
 static bool ata_lba48;
 static bool ata_dma;
 static uint64_t ata_total_sectors;
@@ -512,15 +515,14 @@ static int ata_identify(uint16_t* buf)
     }
     else
     {
+        uint32_t old = ATA_CFG;
+        ATA_CFG |= BIT(6);
         PASS_RC(ata_wait_for_not_bsy(10000000), 1, 0);
         ata_write_cbr(&ATA_PIO_DVR, 0);
         ata_write_cbr(&ATA_PIO_CSD, 0xec);
         PASS_RC(ata_wait_for_start_of_transfer(10000000), 1, 1);
-        for (i = 0; i < 0x100; i++)
-        {
-            uint16_t word = ata_read_cbr(&ATA_PIO_DTR);
-            buf[i] = (word >> 8) | (word << 8);
-        }
+        for (i = 0; i < 0x100; i++) buf[i] = ata_read_cbr(&ATA_PIO_DTR);
+        ATA_CFG = old;
     }
     return 0;
 }
@@ -586,6 +588,7 @@ static int ata_power_up(void)
         sleep(HZ / 5);
         ATA_PIO_TIME = 0x191f7;
         ATA_PIO_LHR = 0;
+        if (!ata_swap) ATA_CFG = BIT(6);
         while (!(ATA_PIO_READY & BIT(1))) yield();
         PASS_RC(ata_identify(ata_identify_data), 2, 0);
         uint32_t piotime = 0x11f3;
@@ -1095,12 +1098,35 @@ int ata_init(void)
         PCON(9) = 0x44444444;
         PCON(10) = (PCON(10) & ~0xffff) | 0x4444;
     }
+    ata_swap = false;
     ata_powered = false;
     ata_total_sectors = 0;
     ata_power_up();
 #ifdef ATA_HAVE_BBT
     ata_bbt_reload();
 #endif
+    
+    /* HDD data endianness check:
+         During the transition period Rockbox needs to detect the HDD data
+         endianness automatically and support both. We're now using the correct
+         endianness by default and only switching back to swapped bytes if we
+         find a reversed MBR signature.
+         To make this warning go away, update your emCORE version. The HDD will
+         be reformatted with the correct endianness during the process.
+         Once most users have switched over, this code may be removed again.
+         -- Michael Sparmann (theseven), 2011-10-22 */
+    if (!ceata)
+    {
+        unsigned char* sector = fat_get_sector_buffer();
+        ata_rw_sectors(0, 1, sector, false);
+        if (sector[510] == 0xaa && sector[511] == 0x55)
+        {
+            ata_swap = true;
+            splashf(5000, "Wrong HDD endianness, please update your emCORE version!");
+        }
+        fat_release_sector_buffer();
+    }
+    
     create_thread(ata_thread, ata_stack,
                     sizeof(ata_stack), 0, "ATA idle monitor"
                     IF_PRIO(, PRIORITY_USER_INTERFACE)
