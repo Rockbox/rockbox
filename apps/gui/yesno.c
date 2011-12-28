@@ -169,6 +169,9 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
         screens[i].stop_scroll();
         gui_yesno_draw(&(yn[i]));
     }
+    /* make sure to eat any extranous keypresses */
+    while (get_action(CONTEXT_STD+99, TIMEOUT_NOBLOCK))
+        action_wait_for_release();
     while (result==-1)
     {
         /* Repeat the question every 5secs (more or less) */
