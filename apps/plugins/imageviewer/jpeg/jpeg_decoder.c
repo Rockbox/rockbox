@@ -1423,6 +1423,7 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[1], int downscale,
     else return -1; /* not supported */
 
     /* init bitstream, fake a restart to make it start */
+    bs.get_buffer = 0;
     bs.next_input_byte = p_jpeg->p_entropy_data;
     bs.bits_left = 0;
     bs.input_end = p_jpeg->p_entropy_end;

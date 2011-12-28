@@ -2645,7 +2645,7 @@ static void error_wait(const char *message)
   Main function that also contain the main plasma
   algorithm.
  */
-static int main(void)
+static int pictureflow_main(void)
 {
     int ret;
 
@@ -2963,7 +2963,7 @@ enum plugin_status plugin_start(const void *parameter)
     buf = (void*)(grey_buf_used + (char*)buf);
 #endif
 
-    ret = main();
+    ret = pictureflow_main();
     if ( ret == PLUGIN_OK || ret == PLUGIN_GOTO_WPS) {
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
