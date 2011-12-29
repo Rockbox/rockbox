@@ -46,14 +46,11 @@ static __attribute__((interrupt("IRQ"))) void I2C3_HANDLER(void);
 static struct i2c_module_descriptor
 {
     volatile unsigned short * const base; /* Module base address */
+    struct i2c_transfer_desc *head;       /* Running job */
+    struct i2c_transfer_desc *tail;       /* Most recent job added */
     void (* const handler)(void);         /* Module interrupt handler */
-    struct mutex m;                       /* Node mutual-exclusion */
-    struct semaphore complete;            /* I2C completion signal */
-    unsigned char *addr_data;             /* Additional addressing data */
-    int addr_count;                       /* Addressing byte count */
-    unsigned char *data;                  /* TX/RX buffer (actual data) */
-    int data_count;                       /* TX/RX byte count */
-    unsigned char addr;                   /* Address + r/w bit */
+    unsigned char addr;                   /* Composite address value */
+    unsigned char busy;                   /* Have buffers been modified? */
     uint8_t enable;                       /* Enable count */
     const uint8_t cg;                     /* Clock gating index */
     const uint8_t ints;                   /* Module interrupt number */
@@ -85,226 +82,308 @@ static struct i2c_module_descriptor
 #endif
 };
 
-static void i2c_interrupt(enum i2c_module_number i2c)
+
+/* Actually begin the session at the queue head */
+static bool start_transfer(struct i2c_module_descriptor * const desc,
+                           struct i2c_transfer_desc * const xfer)
 {
-    struct i2c_module_descriptor * const desc = &i2c_descs[i2c];
     volatile unsigned short * const base = desc->base;
-    unsigned short i2sr = base[I2SR];
+
+    /* If interface isn't enabled or buffers have been used, the transfer
+       cannot be started/restarted. */
+    if (desc->enable == 0 || desc->busy != 0)
+        return false;
+
+    /* Set speed */
+    base[IFDR] = xfer->node->ifdr;
+
+    /* Clear status */
+    base[I2SR] = 0;
+
+    /* Enable module, enable Interrupt, master transmitter */
+    unsigned short i2cr = I2C_I2CR_IEN | I2C_I2CR_IIEN | I2C_I2CR_MTX;
+
+    unsigned char addr = xfer->node->addr & 0xfe;
+
+    if (xfer->rxcount > 0)
+    {
+        addr |= 0x01; /* Slave address/rd */
+
+        if (xfer->rxcount < 2)
+        {
+            /* Receiving less than two bytes - disable ACK generation */
+            i2cr |= I2C_I2CR_TXAK;
+        }
+    }
+
+    /* Remember composite address - contains info concerning RX or TX */
+    desc->addr = addr;
+
+    /* Set config, generate START. */
+    base[I2CR] = i2cr | I2C_I2CR_MSTA;
+
+    /* Address slave (first byte sent) and begin session. */
+    base[I2DR] = addr;
+
+    return true;
+}
+
+static void i2c_interrupt(struct i2c_module_descriptor * const desc)
+{
+    volatile unsigned short * const base = desc->base;
+    unsigned short const i2sr = base[I2SR];
+    struct i2c_transfer_desc *xfer = desc->head;
 
     base[I2SR] = 0; /* Clear IIF */
 
-    if (desc->addr_count >= 0)
+    if (i2sr & I2C_I2SR_IAL)
     {
-        /* ADDR cycle - either done or more to send */
+        /* Bus arbitration was lost - retry current transfer until it succeeds */
+        /* Best guess as to why: at high CPU speeds, voltage hasn't had time to
+         * stabilize to register STOP if a new transfer is started very soon
+         * after a previous one has completed. AFAICT, this might happen once at
+         * most on a transfer. Switching to repeated START could be a better way
+         * to handle the cases where multiple transfers are already queued. */
+        if (start_transfer(desc, xfer))
+            return;
+
+        /* Restart failed - STOP */
+        base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
+    }
+    else if (xfer->txcount >= 0 && (base[I2CR] & I2C_I2CR_MTX))
+    {
+        /* ADDR cycle or TX */
         if ((i2sr & I2C_I2SR_RXAK) != 0)
         {
-            goto i2c_stop; /* problem */
+            /* NACK */
         }
-
-        if (--desc->addr_count < 0)
+        else if (xfer->txcount > 0)
         {
-            /* Switching to data cycle */
-            if (desc->addr & 0x1)
-            {
-                base[I2CR] &= ~I2C_I2CR_MTX; /* Switch to RX mode */
-                base[I2DR];                  /* Dummy read */
-                return;
-            }
-            /* else remaining data is TX - handle below */
-            goto i2c_transmit;
-        }
-        else
-        {
-            base[I2DR] = *desc->addr_data++; /* Send next addressing byte */
+            desc->busy = 1;
+            base[I2DR] = *xfer->txdata++; /* Send next TX byte */
+            xfer->txcount--;
             return;
         }
-    }
-
-    if (base[I2CR] & I2C_I2CR_MTX)
-    {
-        /* Transmitting data */
-        if ((i2sr & I2C_I2SR_RXAK) == 0)
+        else if (desc->addr & 0x01)
         {
-i2c_transmit:
-            if (desc->data_count > 0)
-            {
-                /* More bytes to send, got ACK from previous byte */
-                base[I2DR] = *desc->data++;
-                desc->data_count--;
-                return;
-            }
+            /* ADDR cycle is complete */
+            base[I2CR] &= ~I2C_I2CR_MTX; /* Switch to RX mode */
+            base[I2DR];                  /* Dummy read */
+            return;
         }
-        /* else done or no ACK received */
+
+        /* Transfer complete or NACK - STOP */
+        base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
     }
-    else
+    else if (xfer->rxcount > 0)
     {
-        /* Receiving data */
-        if (--desc->data_count > 0)
+        /* RX */
+        desc->busy = 1;
+
+        if (--xfer->rxcount > 0)
         {
-            if (desc->data_count == 1)
+            if (xfer->rxcount == 1)
             {
                 /* 2nd to Last byte - NACK */
                 base[I2CR] |= I2C_I2CR_TXAK;
             }
 
-            *desc->data++ = base[I2DR]; /* Read data from I2DR and store */
+            *xfer->rxdata++ = base[I2DR]; /* Read data from I2DR and store */
             return;
+        }
+
+        /* Generate STOP signal before reading final byte */
+        base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
+        *xfer->rxdata++ = base[I2DR]; /* Read data from I2DR and store */
+    }
+
+    /* Start next transfer, if any */
+    for (;;)
+    {
+        struct i2c_transfer_desc *next = xfer->next;
+        i2c_transfer_cb_fn_type callback = xfer->callback;
+        xfer->next = NULL;
+
+        if (next == xfer)
+        {
+            /* Last job on queue */
+            desc->head = NULL;
+
+            if (callback != NULL)
+                callback(xfer);
+
+            /* Callback may have restarted transfers. */
         }
         else
         {
-            /* Generate STOP signal before reading data */
-            base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
-            *desc->data++ = base[I2DR]; /* Read data from I2DR and store */
-            goto i2c_done;
-        }
-    }
+            /* Queue next job */
+            desc->head = next;
 
-i2c_stop:
-    /* Generate STOP signal */
-    base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
-i2c_done:
-    /* Signal thread we're done */
-    semaphore_release(&desc->complete);
+            if (callback != NULL)
+                callback(xfer);
+
+            desc->busy = 0;
+            if (!start_transfer(desc, next))
+            {
+                xfer = next;
+                continue;
+            }
+        }
+
+        break;
+    }
 }
 
 #if (I2C_MODULE_MASK & USE_I2C1_MODULE)
 static __attribute__((interrupt("IRQ"))) void I2C1_HANDLER(void)
 {
-    i2c_interrupt(I2C1_NUM);
+    i2c_interrupt(&i2c_descs[I2C1_NUM]);
 }
 #endif
 #if (I2C_MODULE_MASK & USE_I2C2_MODULE)
 static __attribute__((interrupt("IRQ"))) void I2C2_HANDLER(void)
 {
-    i2c_interrupt(I2C2_NUM);
+    i2c_interrupt(&i2c_descs[I2C2_NUM]);
 }
 #endif
 #if (I2C_MODULE_MASK & USE_I2C3_MODULE)
 static __attribute__((interrupt("IRQ"))) void I2C3_HANDLER(void)
 {
-    i2c_interrupt(I2C3_NUM);
+    i2c_interrupt(&i2c_descs[I2C3_NUM]);
 }
 #endif
 
-static int i2c_transfer(struct i2c_node * const node,
-                        struct i2c_module_descriptor *const desc)
+/* Send and/or receive data on the specified node asynchronously */
+bool i2c_transfer(struct i2c_transfer_desc *xfer)
 {
-    volatile unsigned short * const base = desc->base;
-    int count = desc->data_count;
-    uint16_t i2cr;
-
-    /* Make sure bus is idle. */
-    while (base[I2SR] & I2C_I2SR_IBB);
-
-    /* Set speed */
-    base[IFDR] = node->ifdr;
-
-    /* Enable module */
-    base[I2CR] = I2C_I2CR_IEN;
-
-    /* Enable Interrupt, Master */
-    i2cr = I2C_I2CR_IEN | I2C_I2CR_IIEN | I2C_I2CR_MTX;
-
-    if ((desc->addr & 0x1) && desc->data_count < 2)
+    if (xfer == NULL || xfer->next != NULL || xfer->node == NULL ||
+        xfer->rxcount < 0 || xfer->txcount < 0 ||
+        (xfer->rxcount <= 0 && xfer->txcount <= 0))
     {
-        /* Receiving less than two bytes - disable ACK generation */
-        i2cr |= I2C_I2CR_TXAK;
+        /* Can't pass a busy descriptor, requires a node, < 0 sizes
+           or all-0 sizes not permitted. */
+        return false;
     }
 
-    /* Set config */
-    base[I2CR] = i2cr;
+    bool retval = true;
+    struct i2c_module_descriptor * const desc = &i2c_descs[xfer->node->num];
+    unsigned long cpsr = disable_irq_save();
 
-    /* Generate START */
-    base[I2CR] = i2cr | I2C_I2CR_MSTA;
-
-    /* Address slave (first byte sent) and begin session. */
-    base[I2DR] = desc->addr;
-
-    /* Wait for transfer to complete */
-    if (semaphore_wait(&desc->complete, HZ) == OBJ_WAIT_SUCCEEDED)
+    if (desc->head == NULL)
     {
-        count -= desc->data_count;
+        /* No transfers in progress; start interface. */
+        desc->busy = 0;
+        retval = start_transfer(desc, xfer);
+
+        if (retval)
+        {
+            /* Start ok: actually put it in the queue. */
+            desc->head = xfer;
+            desc->tail = xfer;
+            xfer->next = xfer; /* First, self-reference terminate */
+        }
     }
     else
     {
-        /* Generate STOP if timeout */
-        base[I2CR] &= ~(I2C_I2CR_MSTA | I2C_I2CR_IIEN);
-        count = -1;
+        /* Already running: simply add to end and the final INT on the
+         * running transfer will pick it up. */
+        desc->tail->next = xfer; /* Add to tail */
+        desc->tail       = xfer; /* New tail */
+        xfer->next       = xfer; /* Self-reference terminate */
     }
 
-    desc->addr_count = 0;
+    restore_irq(cpsr);
 
-    return count;
+    return retval;
 }
 
-int i2c_read(struct i2c_node *node, int reg,
-             unsigned char *data, int data_count)
+/** Synchronous transfers support **/
+static void i2c_sync_xfer_complete_cb(struct i2c_transfer_desc *xfer)
 {
-    struct i2c_module_descriptor *const desc = &i2c_descs[node->num];
-    unsigned char ad[1];
+    semaphore_release(&((struct i2c_sync_transfer_desc *)xfer)->sema);
+}
 
-    mutex_lock(&desc->m);
+static inline bool i2c_sync_wait_for_xfer_complete(struct i2c_sync_transfer_desc *xfer)
+{
+    return semaphore_wait(&xfer->sema, TIMEOUT_BLOCK) == OBJ_WAIT_SUCCEEDED;
+}
 
-    desc->addr = (node->addr & 0xfe) | 0x1;  /* Slave address/rd */
+int i2c_read(struct i2c_node *node, int addr, unsigned char *data,
+             int data_count)
+{
+    struct i2c_sync_transfer_desc xfer;
 
-    if (reg >= 0)
+    xfer.xfer.node = node;
+
+    unsigned char ad;
+
+    if (addr >= 0)
     {
         /* Sub-address */
-        desc->addr_count = 1;
-        desc->addr_data = ad;
-        ad[0] = reg;
+        ad = addr;
+        xfer.xfer.txdata = &ad;
+        xfer.xfer.txcount = 1;
     }
-    /* else raw read from slave */
-
-    desc->data = data;
-    desc->data_count = data_count;
-
-    data_count = i2c_transfer(node, desc);
-
-    mutex_unlock(&desc->m);
-
-    return data_count;
-}
-
-int i2c_write(struct i2c_node *node, const unsigned char *data, int data_count)
-{
-    struct i2c_module_descriptor *const desc = &i2c_descs[node->num];
-
-    mutex_lock(&desc->m);
-
-    desc->addr = node->addr & 0xfe; /* Slave address/wr */
-    desc->data = (unsigned char *)data;
-    desc->data_count = data_count;
-
-    data_count = i2c_transfer(node, desc);
-
-    mutex_unlock(&desc->m);
-
-    return data_count;
-}
-
-void i2c_init(void)
-{
-    int i;
-
-    /* Do one-time inits for each module that will be used - leave
-     * module disabled and unclocked until something wants it */
-    for (i = 0; i < I2C_NUM_I2C; i++)
+    else
     {
-        struct i2c_module_descriptor *const desc = &i2c_descs[i];
+        /* Raw read from slave */
+        xfer.xfer.txcount = 0;
+    }
+
+    xfer.xfer.rxdata = data;
+    xfer.xfer.rxcount = data_count;
+    xfer.xfer.callback = i2c_sync_xfer_complete_cb;
+    xfer.xfer.next = NULL;
+
+    semaphore_init(&xfer.sema, 1, 0);
+
+    if (i2c_transfer(&xfer.xfer) && i2c_sync_wait_for_xfer_complete(&xfer))
+    {
+        return data_count - xfer.xfer.rxcount;
+    }
+
+    return -1;
+}
+
+int i2c_write(struct i2c_node *node, const unsigned char *data,
+              int data_count)
+{
+    struct i2c_sync_transfer_desc xfer;
+
+    xfer.xfer.node = node;
+    xfer.xfer.txdata = data;
+    xfer.xfer.txcount = data_count;
+    xfer.xfer.rxcount = 0;
+    xfer.xfer.callback = i2c_sync_xfer_complete_cb;
+    xfer.xfer.next = NULL;
+
+    semaphore_init(&xfer.sema, 1, 0);
+
+    if (i2c_transfer(&xfer.xfer) && i2c_sync_wait_for_xfer_complete(&xfer))
+    {
+        return data_count - xfer.xfer.txcount;
+    }
+
+    return -1;
+}
+
+void INIT_ATTR i2c_init(void)
+{
+    /* Do one-time inits for each module that will be used - leave
+     * module disabled and unclocked until something wants it. */
+    for (int i = 0; i < I2C_NUM_I2C; i++)
+    {
+        struct i2c_module_descriptor * const desc = &i2c_descs[i];
         ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
-        mutex_init(&desc->m);
-        semaphore_init(&desc->complete, 1, 0);
         desc->base[I2CR] = 0;
         ccm_module_clock_gating(desc->cg, CGM_OFF);
     }
 }
 
+/* Enable or disable the node - modules will be switched on/off accordingly. */
 void i2c_enable_node(struct i2c_node *node, bool enable)
 {
-    struct i2c_module_descriptor *const desc = &i2c_descs[node->num];
-
-    mutex_lock(&desc->m);
+    struct i2c_module_descriptor * const desc = &i2c_descs[node->num];
 
     if (enable)
     {
@@ -312,6 +391,8 @@ void i2c_enable_node(struct i2c_node *node, bool enable)
         {
             /* First enable */
             ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
+            desc->base[I2CR] = I2C_I2CR_IEN;
+            desc->base[I2SR] = 0;
             avic_enable_int(desc->ints, INT_TYPE_IRQ, INT_PRIO_DEFAULT,
                             desc->handler);
         }
@@ -321,24 +402,16 @@ void i2c_enable_node(struct i2c_node *node, bool enable)
         if (desc->enable > 0 && --desc->enable == 0)
         {
             /* Last enable */
-            while (desc->base[I2SR] & I2C_I2SR_IBB); /* Wait for STOP */
+
+            /* Wait for last tranfer */
+            while (*(void ** volatile)&desc->head != NULL);
+
+            /* Wait for STOP */
+            while (desc->base[I2SR] & I2C_I2SR_IBB);
+
             desc->base[I2CR] &= ~I2C_I2CR_IEN;
             avic_disable_int(desc->ints);
             ccm_module_clock_gating(desc->cg, CGM_OFF);
         }
     }
-
-    mutex_unlock(&desc->m);
-}
-
-void i2c_lock_node(struct i2c_node *node)
-{
-    struct i2c_module_descriptor *const desc = &i2c_descs[node->num];
-    mutex_lock(&desc->m);
-}
-
-void i2c_unlock_node(struct i2c_node *node)
-{
-    struct i2c_module_descriptor *const desc = &i2c_descs[node->num];
-    mutex_unlock(&desc->m);
 }

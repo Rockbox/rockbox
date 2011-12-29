@@ -50,15 +50,46 @@ struct i2c_node
     unsigned char addr;         /* Slave address on module */
 };
 
+struct i2c_transfer_desc;
+
+typedef void (*i2c_transfer_cb_fn_type)(struct i2c_transfer_desc *);
+
+/* Basic transfer descriptor for normal asynchronous read/write */
+struct i2c_transfer_desc
+{
+    struct i2c_node     *node;
+    const unsigned char *txdata;
+    int                  txcount;
+    unsigned char       *rxdata;
+    int                  rxcount;
+    i2c_transfer_cb_fn_type callback;
+    struct i2c_transfer_desc *next;
+};
+
+/* Extended transfer descriptor for synchronous read/write that handles
+   thread wait and wakeup */
+struct i2c_sync_transfer_desc
+{
+    struct i2c_transfer_desc xfer;
+    struct semaphore sema;
+};
+
+/* One-time init of i2c driver */
 void i2c_init(void);
-/* Enable or disable the node - modules will be switch on/off accordingly. */
+
+/* Enable or disable the node - modules will be switched on/off accordingly. */
 void i2c_enable_node(struct i2c_node *node, bool enable);
-/* If addr < 0, then raw read */
-int i2c_read(struct i2c_node *node, int addr, unsigned char *data, int count);
-int i2c_write(struct i2c_node *node, const unsigned char *data, int count);
-/* Gain mutually-exclusive access to the node and module to perform multiple
- * operations atomically */
-void i2c_lock_node(struct i2c_node *node);
-void i2c_unlock_node(struct i2c_node *node);
+
+/* Send and/or receive data on the specified node asynchronously */
+bool i2c_transfer(struct i2c_transfer_desc *xfer);
+
+/* Read bytes from a device on the I2C bus, with optional sub-addressing
+ * If addr < 0, then raw read without sub-addressing */
+int i2c_read(struct i2c_node *node, int addr, unsigned char *data,
+             int data_count);
+
+/* Write bytes to a device on the I2C bus */
+int i2c_write(struct i2c_node *node, const unsigned char *data,
+              int data_count);
 
 #endif /* I2C_IMX31_H */
