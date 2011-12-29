@@ -90,7 +90,7 @@
 #define CONFIG_TUNER SI4700
 
 #define HAVE_RDS_CAP
-#define SI4700_RDS_ASYNC
+#define RDS_ISR_PROCESSING
 
 /* Define this if you have the WM8978 audio codec */
 #define HAVE_WM8978

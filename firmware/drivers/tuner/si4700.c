@@ -21,9 +21,8 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include <stdbool.h>
+#include "system.h"
 #include <string.h>
-#include <stdlib.h>
 #include "kernel.h"
 #include "power.h"
 #include "tuner.h" /* tuner abstraction interface */
@@ -529,9 +528,17 @@ int si4700_get(int setting)
 
 #ifdef HAVE_RDS_CAP
         case RADIO_EVENT:
+        {
+        #ifdef RDS_ISR_PROCESSING
+            int oldlevel = disable_irq_save();
+        #endif
             val = rds_event;
             rds_event = 0;
+        #ifdef RDS_ISR_PROCESSING
+            restore_irq(oldlevel);
+        #endif
             break;
+            }
 #endif
     }
 
@@ -557,8 +564,8 @@ void si4700_dbg_info(struct si4700_dbg_info *nfo)
 
 #ifdef HAVE_RDS_CAP
 
-#ifdef SI4700_RDS_ASYNC
-/* Read raw RDS info for processing - asynchronously */
+#ifdef RDS_ISR_PROCESSING
+/* Read raw RDS info for processing - in ISR */
 
 /* Assumes regbuf is 32 bytes */
 void si4700_rds_read_raw_async(void)
@@ -583,7 +590,7 @@ void si4700_rds_set_event(void)
     rds_event = 1;
 }
 
-#else
+#else /* ndef RDS_ISR_PROCESSING */
 /* Read raw RDS info for processing */
 bool si4700_rds_read_raw(uint16_t data[4])
 {
@@ -610,7 +617,7 @@ void si4700_rds_set_event(void)
     rds_event = 1;
     mutex_unlock(&fmr_mutex);
 }
-#endif /* SI4700_RDS_ASYNC */
+#endif /* RDS_ISR_PROCESSING */
 
 char * si4700_get_rds_info(int setting)
 {

@@ -36,7 +36,7 @@ static char rt_copy[65];
 static int rt_segment;
 static int rt_abflag;
 
-#ifdef SI4700_RDS_ASYNC
+#ifdef RDS_ISR_PROCESSING
 /* Functions are called in ISR context */
 #define rds_disable_irq_save() disable_irq_save()
 #define rds_restore_irq(old) restore_irq(old)
@@ -57,12 +57,12 @@ static inline char * get_rt(void)
     rds_restore_irq(oldlevel);
     return rt_out;
 }
-#else /* ndef SI4700_RDS_ASYNC */
+#else /* ndef RDS_ISR_PROCESSING */
 #define rds_disable_irq_save() 0
 #define rds_restore_irq(old) ((void)(old))
 static inline char * get_ps(void) { return ps_copy; }
 static inline char * get_rt(void) { return rt_copy; }
-#endif /* SI4700_RDS_ASYNC */
+#endif /* RDS_ISR_PROCESSING */
 
 /* resets the rds parser */
 void rds_reset(void)

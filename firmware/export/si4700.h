@@ -46,16 +46,16 @@ bool si4700_st(void);
 void si4700_rds_init(void);
 /* Radio is fully powered up or about to be powered down */
 void si4700_rds_powerup(bool on);
-#ifdef SI4700_RDS_ASYNC
+#ifdef RDS_ISR_PROCESSING
 /* Read raw RDS info for processing - asynchronously */
-void si4700_read_raw_async(int count);
+void si4700_read_raw_async(int count); /* implemented by target */
 void si4700_rds_read_raw_async(void);
 void si4700_rds_read_raw_async_complete(unsigned char *regbuf,
                                         uint16_t data[4]);
-#else
+#else /* ndef RDS_ISR_PROCESSING */
 /* Read raw RDS info for processing */
 bool si4700_rds_read_raw(uint16_t data[4]);
-#endif
+#endif /* RDS_ISR_PROCESSING */
 /* Obtain specified string */
 char* si4700_get_rds_info(int setting);
 /* Set the event flag */
