@@ -121,6 +121,7 @@ static bool spi_set_context(struct spi_module_desc *desc,
     /* Keep reserved and start bits cleared. Keep enabled bit. */
     base[CONREG] =
         (node->conreg & ~(0xfcc8e000 | CSPI_CONREG_XCH | CSPI_CONREG_SMC));
+
     return true;
 }
 
@@ -166,18 +167,19 @@ static int tx_fill_fifo(struct spi_module_desc * const desc,
 static bool start_transfer(struct spi_module_desc * const desc,
                            struct spi_transfer_desc * const xfer)
 {
-    volatile unsigned long * const base = desc->base;
-    unsigned long intreg;
-
     if (!spi_set_context(desc, xfer))
     {
         xfer->count = -1;
         return false;
     }
 
+    volatile unsigned long * const base = desc->base;
+
     base[CONREG] |= CSPI_CONREG_EN; /* Enable module */
 
     desc->rxcount = xfer->count;
+
+    unsigned long intreg;
 
     intreg = (xfer->count < 8) ?
         CSPI_INTREG_TCEN : /* Trans. complete: TX will run out in prefill */
@@ -197,9 +199,8 @@ static bool start_transfer(struct spi_module_desc * const desc,
 }
 
 /* Common code for interrupt handlers */
-static void spi_interrupt(enum spi_module_number spi)
+static void spi_interrupt(struct spi_module_desc * const desc)
 {
-    struct spi_module_desc *desc = &spi_descs[spi];
     volatile unsigned long * const base = desc->base;
     unsigned long intreg = base[INTREG];
     struct spi_transfer_desc *xfer = desc->head;
@@ -323,29 +324,28 @@ static void spi_interrupt(enum spi_module_number spi)
 #if (SPI_MODULE_MASK & USE_CSPI1_MODULE)
 static __attribute__((interrupt("IRQ"))) void CSPI1_HANDLER(void)
 {
-    spi_interrupt(CSPI1_NUM);
+    spi_interrupt(&spi_descs[CSPI1_NUM]);
 }
 #endif
 
 #if (SPI_MODULE_MASK & USE_CSPI2_MODULE)
 static __attribute__((interrupt("IRQ"))) void CSPI2_HANDLER(void)
 {
-    spi_interrupt(CSPI2_NUM);
+    spi_interrupt(&spi_descs[CSPI2_NUM]);
 }
 #endif
 
 #if (SPI_MODULE_MASK & USE_CSPI3_MODULE)
 static __attribute__((interrupt("IRQ"))) void CSPI3_HANDLER(void)
 {
-    spi_interrupt(CSPI3_NUM);
+    spi_interrupt(&spi_descs[CSPI3_NUM]);
 }
 #endif
 
 /* Initialize the SPI driver */
 void INIT_ATTR spi_init(void)
 {
-    unsigned i;
-    for (i = 0; i < SPI_NUM_CSPI; i++)
+    for (int i = 0; i < SPI_NUM_CSPI; i++)
     {
         struct spi_module_desc * const desc = &spi_descs[i];
         ccm_module_clock_gating(desc->cg, CGM_ON_RUN_WAIT);
@@ -396,10 +396,6 @@ void spi_enable_node(const struct spi_node *node, bool enable)
 /* Send and/or receive data on the specified node */
 bool spi_transfer(struct spi_transfer_desc *xfer)
 {
-    bool retval;
-    struct spi_module_desc * desc;
-    int oldlevel;
-
     if (xfer->count == 0)
         return true;  /* No data? No problem. */
 
@@ -410,9 +406,9 @@ bool spi_transfer(struct spi_transfer_desc *xfer)
         return false;
     }
 
-    oldlevel = disable_irq_save();
-
-    desc = &spi_descs[xfer->node->num];
+    bool retval = true;
+    unsigned long cpsr = disable_irq_save();
+    struct spi_module_desc * const desc = &spi_descs[xfer->node->num];
 
     if (desc->head == NULL)
     {
@@ -434,10 +430,9 @@ bool spi_transfer(struct spi_transfer_desc *xfer)
         desc->tail->next = xfer; /* Add to tail */
         desc->tail       = xfer; /* New tail */
         xfer->next       = xfer; /* Self-reference terminate */
-        retval = true;
     }
 
-    restore_irq(oldlevel);
+    restore_irq(cpsr);
 
     return retval;
 }
