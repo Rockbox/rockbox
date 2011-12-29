@@ -554,14 +554,14 @@ static size_t descriptor_report_get(unsigned char *dest)
     return (size_t)(report - dest);
 }
 
-static void descriptor_hid_get(unsigned char *dest)
+static void descriptor_hid_get(unsigned char **dest)
 {
     hid_descriptor.wDescriptorLength0= descriptor_report_get(report_descriptor);
 
     logf("hid: desc len %u", hid_descriptor.wDescriptorLength0);
     buf_dump(report_descriptor, hid_descriptor.wDescriptorLength0, "desc");
 
-    PACK_DATA(dest, hid_descriptor);
+    PACK_DATA(*dest, hid_descriptor);
 }
 
 int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
@@ -577,7 +577,7 @@ int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
     PACK_DATA(dest, interface_descriptor);
 
     /* HID descriptor */
-    descriptor_hid_get(dest);
+    descriptor_hid_get(&dest);
 
     /* Endpoint descriptor */
     endpoint_descriptor.wMaxPacketSize = 8;
@@ -703,7 +703,7 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
         switch (type)
         {
         case USB_DT_HID:
-            descriptor_hid_get(dest);
+            descriptor_hid_get(&dest);
             break;
         case USB_DT_REPORT:
             len = descriptor_report_get(report_descriptor);
