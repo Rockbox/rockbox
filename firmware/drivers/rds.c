@@ -36,14 +36,46 @@ static char rt_copy[65];
 static int rt_segment;
 static int rt_abflag;
 
+#ifdef SI4700_RDS_ASYNC
+/* Functions are called in ISR context */
+#define rds_disable_irq_save() disable_irq_save()
+#define rds_restore_irq(old) restore_irq(old)
+/* Need triple buffer so string isn't clobbered while caller is using it */
+static inline char * get_ps(void)
+{
+    static char ps_out[9];
+    int oldlevel = rds_disable_irq_save();
+    strcpy(ps_out, ps_copy);
+    rds_restore_irq(oldlevel);
+    return ps_out;
+}
+static inline char * get_rt(void)
+{
+    static char rt_out[65];
+    int oldlevel = rds_disable_irq_save();
+    strcpy(rt_out, rt_copy);
+    rds_restore_irq(oldlevel);
+    return rt_out;
+}
+#else /* ndef SI4700_RDS_ASYNC */
+#define rds_disable_irq_save() 0
+#define rds_restore_irq(old) ((void)(old))
+static inline char * get_ps(void) { return ps_copy; }
+static inline char * get_rt(void) { return rt_copy; }
+#endif /* SI4700_RDS_ASYNC */
+
 /* resets the rds parser */
 void rds_reset(void)
 {
+    int oldlevel = rds_disable_irq_save();
+
     ps_copy[0] = '\0';
     ps_segment = 0;
     rt_copy[0] = '\0';
     rt_segment = 0;
     pi = 0;
+
+    rds_restore_irq(oldlevel);
 }
 
 /* initialises the rds parser */
@@ -172,6 +204,9 @@ bool rds_process(uint16_t data[4])
     return false;
 }
 
+/* TODO: The caller really should provide the buffer in order to regulate
+   access */
+
 /* returns the programme identification code */
 uint16_t rds_get_pi(void)
 {
@@ -181,12 +216,12 @@ uint16_t rds_get_pi(void)
 /* returns the most recent valid programme service name */
 char* rds_get_ps(void)
 {
-    return ps_copy;
+    return get_ps();
 }
 
 /* returns the most recent valid RadioText message */
 char* rds_get_rt(void)
 {
-    return rt_copy;
+    return get_rt();
 }
 

@@ -128,15 +128,52 @@ bool si4700_st(void)
 
 
 /* Low-level RDS Support */
-static struct semaphore rds_sema;
-static uint32_t rds_stack[DEFAULT_STACK_SIZE/sizeof(uint32_t)];
 
-/* RDS GPIO interrupt handler */
+/* Transfer descriptor for RDS async operations */
+struct si4700_i2c_transfer_desc
+{
+    struct i2c_transfer_desc xfer;
+    unsigned char regbuf[32];
+} si4700_xfer =
+{
+    .xfer = { .node = &si4700_i2c_node }
+};
+
+static void si4700_rds_read_raw_callback(struct i2c_transfer_desc *xfer)
+{
+    struct si4700_i2c_transfer_desc *xf =
+        (struct si4700_i2c_transfer_desc *)xfer;
+
+    if (xfer->rxcount != 0)
+        return; /* Read didn't finish */
+
+    uint16_t rds_data[4];
+
+    si4700_rds_read_raw_async_complete(xf->regbuf, rds_data);
+
+    if (rds_process(rds_data))
+        si4700_rds_set_event();
+}
+
+/* Callback from si4700_rds_read_raw to execute the read */
+void si4700_read_raw_async(int count)
+{
+    si4700_xfer.xfer.txdata = NULL;
+    si4700_xfer.xfer.txcount = 0;
+    si4700_xfer.xfer.rxdata = si4700_xfer.regbuf;
+    si4700_xfer.xfer.rxcount = count;
+    si4700_xfer.xfer.callback = si4700_rds_read_raw_callback;
+    si4700_xfer.xfer.next = NULL;
+
+    i2c_transfer(&si4700_xfer.xfer);
+}
+
+/* RDS GPIO interrupt handler - start RDS data read */
 void si4700_stc_rds_event(void)
 {
     /* read and clear the interrupt */
     SI4700_GPIO_STC_RDS_ISR = (1ul << SI4700_GPIO_STC_RDS_LINE);
-    semaphore_release(&rds_sema);
+    si4700_rds_read_raw_async(); 
 }
 
 /* Called with on=true after full radio power up, and with on=false before
@@ -152,26 +189,8 @@ void si4700_rds_powerup(bool on)
     }
 }
 
-/* Captures RDS data and processes it */
-/* Use of a thread here is likely temporary */
-static void NORETURN_ATTR rds_thread(void)
-{
-    uint16_t rds_data[4];
-
-    while (1)
-    {
-        semaphore_wait(&rds_sema, TIMEOUT_BLOCK);
-
-        if (si4700_rds_read_raw(rds_data) && rds_process(rds_data))
-            si4700_rds_set_event();
-    }
-}
-
 /* One-time RDS init at startup */
 void si4700_rds_init(void)
 {
-    semaphore_init(&rds_sema, 1, 0);
     rds_init();
-    create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
-                  IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));    
 }

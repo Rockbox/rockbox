@@ -556,6 +556,34 @@ void si4700_dbg_info(struct si4700_dbg_info *nfo)
 }
 
 #ifdef HAVE_RDS_CAP
+
+#ifdef SI4700_RDS_ASYNC
+/* Read raw RDS info for processing - asynchronously */
+
+/* Assumes regbuf is 32 bytes */
+void si4700_rds_read_raw_async(void)
+{
+    si4700_read_raw_async((RDSD - STATUSRSSI + 1) * 2);
+}
+
+void si4700_rds_read_raw_async_complete(unsigned char *regbuf,
+                                        uint16_t data[4])
+{
+    const int index = (RDSA - STATUSRSSI) * 2;
+
+    for (int i = 0; i < 4; i++) {
+        data[i] = regbuf[index] << 8 | regbuf[index + 1];
+        regbuf += 2;
+    }
+}
+
+/* Set the event flag */
+void si4700_rds_set_event(void)
+{
+    rds_event = 1;
+}
+
+#else
 /* Read raw RDS info for processing */
 bool si4700_rds_read_raw(uint16_t data[4])
 {
@@ -582,6 +610,7 @@ void si4700_rds_set_event(void)
     rds_event = 1;
     mutex_unlock(&fmr_mutex);
 }
+#endif /* SI4700_RDS_ASYNC */
 
 char * si4700_get_rds_info(int setting)
 {
