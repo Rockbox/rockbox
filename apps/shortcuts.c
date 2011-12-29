@@ -478,9 +478,10 @@ int do_shortcut_menu(void *ignored)
                     break;
                 case SHORTCUT_TIME:
 #if CONFIG_RTC
-                    if (sc->u.timedata.talktime)
+                  if (sc->u.timedata.talktime) {
                         talk_timedate();
-                    else
+                        talk_force_enqueue_next();
+                  } else
 #endif
                     {
                         char timer_buf[10];
