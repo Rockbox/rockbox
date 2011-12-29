@@ -85,10 +85,10 @@ struct usb_class_driver {
 #endif
 };
 
-#define PACK_DATA(dest, data) \
-    do { \
-        memcpy(dest, &(data), sizeof(data)); \
-        dest += sizeof(data); \
-    } while (0)
-
+#define PACK_DATA(dest, data) pack_data(dest, &(data), sizeof(data))
+static inline void pack_data(uint8_t **dest, const void *data, size_t size)
+{
+    memcpy(*dest, data, size);
+    *dest += size;
+}
 #endif

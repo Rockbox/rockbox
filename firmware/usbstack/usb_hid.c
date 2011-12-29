@@ -561,7 +561,7 @@ static void descriptor_hid_get(unsigned char **dest)
     logf("hid: desc len %u", hid_descriptor.wDescriptorLength0);
     buf_dump(report_descriptor, hid_descriptor.wDescriptorLength0, "desc");
 
-    PACK_DATA(*dest, hid_descriptor);
+    PACK_DATA(dest, hid_descriptor);
 }
 
 int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
@@ -574,7 +574,7 @@ int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
 
     /* Interface descriptor */
     interface_descriptor.bInterfaceNumber = usb_interface;
-    PACK_DATA(dest, interface_descriptor);
+    PACK_DATA(&dest, interface_descriptor);
 
     /* HID descriptor */
     descriptor_hid_get(&dest);
@@ -583,7 +583,7 @@ int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
     endpoint_descriptor.wMaxPacketSize = 8;
     endpoint_descriptor.bInterval = 8;
     endpoint_descriptor.bEndpointAddress = ep_in;
-    PACK_DATA(dest, endpoint_descriptor);
+    PACK_DATA(&dest, endpoint_descriptor);
 
     return (int)(dest - orig_dest);
 }
