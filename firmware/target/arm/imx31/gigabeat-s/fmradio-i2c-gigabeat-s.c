@@ -130,7 +130,7 @@ bool si4700_st(void)
 /* Low-level RDS Support */
 
 /* Transfer descriptor for RDS async operations */
-struct si4700_i2c_transfer_desc
+static struct si4700_i2c_transfer_desc
 {
     struct i2c_transfer_desc xfer;
     unsigned char regbuf[32];
