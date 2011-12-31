@@ -59,6 +59,10 @@
 #include "dsp.h"
 #endif
 
+#if defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
+#include "adc.h"
+#endif
+
 #if (CONFIG_STORAGE & STORAGE_MMC) && (defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM))
 int mmc_remove_request(void)
 {
@@ -94,14 +98,17 @@ static void charging_display_info(bool animate)
     static unsigned phase = 3;
     unsigned i;
 
-#ifdef NEED_ATA_POWER_BATT_MEASURE
-    if (ide_powered()) /* FM and V2 can only measure when ATA power is on */
-#endif
+#if !defined(NEED_ATA_POWER_BATT_MEASURE)
     {
         int battv = battery_voltage();
         lcd_putsf(0, 7, "  Batt: %d.%02dV %d%%  ", battv / 1000,
                  (battv % 1000) / 10, battery_level());
     }
+#elif defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
+    /* IDE power is normally off here, so display input current instead */
+    lcd_putsf(7, 7, "%dmA  ", 
+              (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 10000);
+#endif
 
 #ifdef ARCHOS_RECORDER
     lcd_puts(0, 2, "Charge mode:");
@@ -263,7 +270,8 @@ int charging_screen(void)
             rc = 2;
         else if (usb_detect() == USB_INSERTED)
             rc = 3;
-        else if (!charger_inserted())
+        /* do not depend on power management thread here */
+        else if (!(power_input_status() & POWER_INPUT_MAIN_CHARGER))
             rc = 1;
     } while (!rc);
 

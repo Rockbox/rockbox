@@ -506,7 +506,12 @@ static void init(void)
 
     button_init();
 
+    /* Don't initialize power management here if it could incorrectly
+     * measure battery voltage, and it's not needed for charging. */
+#if !defined(NEED_ATA_POWER_BATT_MEASURE) || \
+    (CONFIG_CHARGING > CHARGING_MONITOR)
     powermgmt_init();
+#endif
 
 #if CONFIG_TUNER
     radio_init();
@@ -567,6 +572,12 @@ static void init(void)
         panicf("ata: %d", rc);
     }
 
+#if defined(NEED_ATA_POWER_BATT_MEASURE) && \
+    (CONFIG_CHARGING <= CHARGING_MONITOR)
+    /* After storage_init(), ATA power must be on, so battery voltage
+     * can be measured. Initialize power management if it was delayed. */
+    powermgmt_init();
+#endif
 #ifdef HAVE_EEPROM_SETTINGS
     CHART(">eeprom_settings_init");
     eeprom_settings_init();
