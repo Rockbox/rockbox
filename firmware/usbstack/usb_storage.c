@@ -67,7 +67,7 @@
 #ifdef USB_READ_BUFFER_SIZE
 #define READ_BUFFER_SIZE USB_READ_BUFFER_SIZE
 #else
-#if CONFIG_CPU == AS3525
+#if CONFIG_USBOTG == USBOTG_AS3525
 /* We'd need to implement multidescriptor dma for sizes >65535 */
 #define READ_BUFFER_SIZE (1024*63)
 #else
@@ -81,7 +81,7 @@
 #define WRITE_BUFFER_SIZE USB_WRITE_BUFFER_SIZE
 #else
 #if (CONFIG_STORAGE & STORAGE_SD)
-#if CONFIG_CPU == AS3525
+#if CONFIG_USBOTG == USBOTG_AS3525
 /* We'd need to implement multidescriptor dma for sizes >65535 */
 #define WRITE_BUFFER_SIZE (1024*63)
 #else
