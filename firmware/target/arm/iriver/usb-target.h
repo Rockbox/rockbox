@@ -28,6 +28,4 @@
 #define USB_DRIVER_CLOSE
 #endif
 
-bool usb_plugged(void); /* Returns instantaneous state - always */
-
 #endif

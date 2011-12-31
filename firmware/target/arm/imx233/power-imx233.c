@@ -112,7 +112,8 @@ void power_off(void)
 
 unsigned int power_input_status(void)
 {
-    return usb_plugged() ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
+    return (usb_detect == USB_INSERTED)
+        ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
 bool charging_state(void)

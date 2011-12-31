@@ -21,7 +21,7 @@
 
 #include "powermgmt.h"
 #include "power-imx233.h"
-#include "usb-target.h"
+#include "usb.h"
 #include "string.h"
 //#define LOGF_ENABLE
 #include "logf.h"
@@ -60,7 +60,7 @@ void powermgmt_init_target(void)
 
 void charging_algorithm_step(void)
 {
-    bool is_5v_present = usb_plugged();
+    bool is_5v_present = usb_detect() == USB_INSERTED;
 
     /* initial state & 5v -> battery transition */
     if(!is_5v_present && charge_state != DISCHARGING)

@@ -73,6 +73,4 @@ int usb_detect(void)
 
     return USB_EXTRACTED;
 }
-
-/* No different for now */
 bool usb_plugged(void) __attribute__((alias("usb_detect")));

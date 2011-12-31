@@ -23,7 +23,6 @@
 
 void usb_insert_int(void);
 void firewire_insert_int(void);
-bool usb_plugged(void); /* Returns instantaneous state - always */
 
 #ifdef HAVE_BOOTLOADER_USB_MODE
 #define USB_DRIVER_CLOSE

@@ -110,7 +110,7 @@ static void handle_usb(int connect_timeout)
             break;
         }
 
-        if (!usb_plugged())
+        if (usb_detect() == USB_EXTRACTED)
             break; /* Cable pulled */
     }
 
@@ -377,7 +377,7 @@ void main(void)
 
     /* Do USB first since a tar or binary could be added to the MTP directory
      * at the time and we can untar or move after unplugging. */
-    if (usb_plugged())
+    if (usb_detect() == USB_INSERTED)
         handle_usb(HZ*2);
 
     handle_untar();

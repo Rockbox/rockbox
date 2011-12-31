@@ -54,15 +54,11 @@ static void enable_transceiver(bool enable)
     }
 }
 
-/* Read the immediate state of the cable from the PMIC */
-bool usb_plugged(void)
-{
-    return mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_USB4V4S;
-}
-
 void usb_connect_event(void)
 {
-    int status = usb_plugged() ? USB_INSERTED : USB_EXTRACTED;
+    /* Read the immediate state of the cable from the PMIC */
+    int status = (mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_USB4V4S)
+        ? USB_INSERTED : USB_EXTRACTED;
     usb_status = status;
     /* Notify power that USB charging is potentially available */
     charger_usb_detect_event(status);

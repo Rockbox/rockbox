@@ -26,8 +26,6 @@
 #endif
 
 void usb_connect_event(void);
-/* Read the immediate state of the cable from the PMIC */
-bool usb_plugged(void);
 
 /** Sector read/write filters **/
 

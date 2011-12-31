@@ -24,6 +24,7 @@
 
 #include "config.h"
 #include "system-arm.h"
+#include <stdbool.h>
 
 #ifdef CPU_PP
 /* TODO: This header is actually portalplayer specific, and should be
@@ -50,6 +51,7 @@
 #define outw(a,b) (*(volatile unsigned short *) (b) = (a))
 
 void usb_pin_init(void);
+bool usb_plugged(void);
 
 static inline void udelay(unsigned usecs)
 {

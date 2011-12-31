@@ -73,7 +73,7 @@ static void usb_mode(int connect_timeout)
             break;
         }
 
-        if(!usb_plugged())
+        if(usb_detect() == USB_EXTRACTED)
             break; /* Cable pulled */
     }
 
@@ -149,7 +149,7 @@ void main(uint32_t arg, uint32_t addr)
     if((ret = disk_mount_all()) <= 0)
         error(EDISK, ret, false);
 
-    if(usb_plugged())
+    if(usb_detect() == USB_INSERTED)
         usb_mode(HZ);
 
     printf("Loading firmware");

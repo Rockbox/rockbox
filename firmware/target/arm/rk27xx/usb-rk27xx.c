@@ -45,11 +45,6 @@ void usb_attach(void)
     usb_enable(true);
 }
 
-bool usb_plugged(void)
-{
-    return true;
-}
-
 void usb_enable(bool on)
 {
     if(on)
