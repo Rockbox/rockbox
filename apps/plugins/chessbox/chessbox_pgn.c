@@ -37,7 +37,7 @@ size_t bufleft;
 /* simple function to "allocate" memory in pluginbuffer.
  * (borrowed from dict.c)
  */
-void *pl_malloc(size_t size)
+static void *pl_malloc(size_t size)
 {
     void *ptr;
     ptr = bufptr;
@@ -55,12 +55,12 @@ void *pl_malloc(size_t size)
 }
 
 /* init function for pl_malloc() */
-void pl_malloc_init(void)
+static void pl_malloc_init(void)
 {
     bufptr = rb->plugin_get_buffer(&bufleft);
 }
 
-void process_tag(struct pgn_game_node* game, char* buffer){
+static void process_tag(struct pgn_game_node* game, char* buffer){
     char tag_type[20];
     char tag_value[255];
     short pos=0, pos2=0;
@@ -95,7 +95,7 @@ void process_tag(struct pgn_game_node* game, char* buffer){
     }
 }
 
-unsigned short get_next_token(const char* line_buffer, unsigned short initial_pos,
+static unsigned short get_next_token(const char* line_buffer, unsigned short initial_pos,
                               char* token_buffer){
     unsigned short pos, token_pos=0;
     for (pos = initial_pos;line_buffer[pos] == ' ' || line_buffer[pos] == '.';pos++);
@@ -112,7 +112,7 @@ unsigned short get_next_token(const char* line_buffer, unsigned short initial_po
     return pos;
 }
 
-unsigned short piece_from_pgn(char pgn_piece){
+static unsigned short piece_from_pgn(char pgn_piece){
     switch (pgn_piece){
         case 'R':
             return rook;
@@ -128,7 +128,7 @@ unsigned short piece_from_pgn(char pgn_piece){
     return no_piece;
 }
 
-char pgn_from_piece(unsigned short piece, unsigned short color){
+static char pgn_from_piece(unsigned short piece, unsigned short color){
     char pgn_piece = ' ';
     switch (piece){
         case pawn:
@@ -159,7 +159,7 @@ char pgn_from_piece(unsigned short piece, unsigned short color){
     return pgn_piece;
 }
 
-void pgn_to_coords(struct pgn_ply_node* ply){
+static void pgn_to_coords(struct pgn_ply_node* ply){
     unsigned short str_length = rb->strlen(ply->pgn_text);
     char str[10];
     rb->strcpy(str,ply->pgn_text);
@@ -354,7 +354,7 @@ void pgn_to_coords(struct pgn_ply_node* ply){
     color[locn[ply->row_from][ply->column_from]] = neutral;
 }
 
-void coords_to_pgn(struct pgn_ply_node* ply){
+static void coords_to_pgn(struct pgn_ply_node* ply){
     int pos = 0,i,j;
     unsigned short moving_piece = board[locn[ply->row_from][ply->column_from]];
     char unambiguous_position;
@@ -545,7 +545,7 @@ static const char* get_game_text(int selected_item, void *data,
     return buffer;
 }
 
-void write_pgn_token(int fhandler, char *buffer, size_t *line_length){
+static void write_pgn_token(int fhandler, char *buffer, size_t *line_length){
     if (*line_length + rb->strlen(buffer) + 1 > 80){
         rb->fdprintf(fhandler,"\n");
         *line_length = 0;

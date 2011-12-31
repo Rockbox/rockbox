@@ -94,7 +94,7 @@ const char *level_string[] = { "Level 1: 60 moves / 5 min" ,
 int wt_command = COMMAND_NOP;
 
 /* ---- Get the board column and row (e2 f.e.) for a physical x y ---- */
-void xy2cr ( short x, short y, short *c, short *r ) {
+static void xy2cr ( short x, short y, short *c, short *r ) {
     if (computer == black ) {
         *c = x ;
         *r = y ;
@@ -105,7 +105,7 @@ void xy2cr ( short x, short y, short *c, short *r ) {
 }
 
 /* ---- get physical x y for a board column and row (e2 f.e.) ---- */
-void cr2xy ( short c, short r, short *x, short *y ) {
+static void cr2xy ( short c, short r, short *x, short *y ) {
     if ( computer == black ) {
         *x = c ;
         *y = r ;
@@ -174,7 +174,7 @@ static void cb_drawboard (void) {
 }
 
 /* ---- Switch mark on board ---- */
-void cb_switch ( short x , short y ) {
+static void cb_switch ( short x , short y ) {
     rb->lcd_set_drawmode ( DRMODE_COMPLEMENT );
     rb->lcd_drawrect ( XOFS + x*TILE_WIDTH + 1 ,
                        YOFS + ( 7 - y )*TILE_HEIGHT +1 ,
@@ -184,7 +184,7 @@ void cb_switch ( short x , short y ) {
 }
 
 /* ---- callback for capturing interaction while thinking ---- */
-void cb_wt_callback ( void ) {
+static void cb_wt_callback ( void ) {
     int button = BUTTON_NONE;
     
     wt_command = COMMAND_NOP;
@@ -208,7 +208,7 @@ void cb_wt_callback ( void ) {
 }
 
 /* ---- set playing parameters depending on level ---- */
-void cb_setlevel ( int lev ) {
+static void cb_setlevel ( int lev ) {
     Level = (lev > 7) ? 7 : ( (lev < 1) ? 1 : lev ) ;
     switch (Level) {
         case 1 :
@@ -257,7 +257,7 @@ void cb_setlevel ( int lev ) {
 }
 
 /* ---- increase playing level ---- */
-void cb_levelup ( void ) {
+static void cb_levelup ( void ) {
     if ( Level == 7 )
         cb_setlevel ( 1 );
     else
@@ -266,7 +266,7 @@ void cb_levelup ( void ) {
 };
 
 /* ---- Save current position ---- */
-void cb_saveposition ( void ) {
+static void cb_saveposition ( void ) {
     int fd;
     short sq,i,c;
     unsigned short temp;
@@ -319,7 +319,7 @@ void cb_saveposition ( void ) {
 }
 
 /* ---- Restore saved position ---- */
-void cb_restoreposition ( void ) {
+static void cb_restoreposition ( void ) {
     int fd;
     short sq;
     unsigned short m;
@@ -419,7 +419,7 @@ static int cb_menu_viewer(void)
 }
 
 /* ---- get a command in game mode ---- */
-struct cb_command cb_get_viewer_command (void) {
+static struct cb_command cb_get_viewer_command (void) {
     int button;
     struct cb_command result = { 0, {0,0,0,0,0}, 0 };
     
@@ -447,7 +447,7 @@ struct cb_command cb_get_viewer_command (void) {
 }
 
 /* ---- viewer main loop ---- */
-void cb_start_viewer(char* filename){
+static void cb_start_viewer(char* filename){
     struct pgn_game_node *first_game, *selected_game;
     struct pgn_ply_node *curr_ply;
     bool exit_game = false;
@@ -638,7 +638,7 @@ static int cb_menu(void)
 }
 
 /* ---- get a command in game mode ---- */
-struct cb_command cb_getcommand (void) {
+static struct cb_command cb_getcommand (void) {
     static short x = 4 , y = 3 ;
     short c , r , l;
     int button;
@@ -773,7 +773,7 @@ struct cb_command cb_getcommand (void) {
 }
 
 /* ---- game main loop ---- */
-void cb_play_game(void) {
+static void cb_play_game(void) {
     struct cb_command command;
     struct pgn_game_node *game;
     char move_buffer[20];

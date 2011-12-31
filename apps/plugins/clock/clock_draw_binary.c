@@ -25,7 +25,7 @@
 
 const struct picture* binary_skin[]={binary,digits,segments};
 
-void print_binary(char* buffer, int number, int nb_bits){
+static void print_binary(char* buffer, int number, int nb_bits){
     int i;
     int mask=1;
     buffer[nb_bits]='\0';

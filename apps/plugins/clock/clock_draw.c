@@ -26,7 +26,7 @@
 #include "clock_draw_binary.h"
 #include "clock_settings.h"
 
-void black_background(struct screen* display){
+static void black_background(struct screen* display){
 #if (LCD_DEPTH > 1) || (defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH > 1))
     if(display->depth>1){
         display->set_background(LCD_BLACK);
@@ -39,7 +39,7 @@ void black_background(struct screen* display){
     }
 }
 
-void white_background(struct screen* display){
+static void white_background(struct screen* display){
 #if (LCD_DEPTH > 1) || (defined(LCD_REMOTE_DEPTH) && (LCD_REMOTE_DEPTH > 1))
     if(display->depth>1){
 #if defined(HAVE_LCD_COLOR)
@@ -53,18 +53,18 @@ void white_background(struct screen* display){
     display->clear_display();
 }
 
-bool skin_require_black_background(int mode, int skin){
+static bool skin_require_black_background(int mode, int skin){
     return((mode==BINARY && skin==2) || (mode==DIGITAL && skin==1 ));
 }
 
-void skin_set_background(struct screen* display, int mode, int skin){
+static void skin_set_background(struct screen* display, int mode, int skin){
     if(skin_require_black_background(mode, skin) )
         black_background(display);
     else
         white_background(display);
 }
 
-void skin_restore_background(struct screen* display, int mode, int skin){
+static void skin_restore_background(struct screen* display, int mode, int skin){
     if(skin_require_black_background(mode, skin) )
         white_background(display);
 }

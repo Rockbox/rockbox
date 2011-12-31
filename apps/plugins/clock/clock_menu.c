@@ -22,6 +22,7 @@
 #include "clock.h"
 #include "clock_bitmaps.h"
 #include "clock_settings.h"
+#include "clock_menu.h"
 #include "lib/playback_control.h"
 
 /* Option structs (possible selections per each option) */
@@ -57,7 +58,7 @@ static const struct opt_items hour_format_text[] = {
  * Select a mode, returs true when the mode has been selected
  * (we go back to clock display then)
  **************/
-bool menu_mode_selector(void){
+static bool menu_mode_selector(void){
     MENUITEM_STRINGLIST(menu,"Mode Selector",NULL, "Analog",
                         "Digital", "Binary");
     if(rb->do_menu(&menu, &clock_settings.mode, NULL, false) >=0)
@@ -68,7 +69,7 @@ bool menu_mode_selector(void){
 /**********************
  * Analog settings menu
  *********************/
-void menu_analog_settings(void)
+static void menu_analog_settings(void)
 {
     int selection=0, result=0;
 
@@ -99,7 +100,7 @@ void menu_analog_settings(void)
 /***********************
  * Digital settings menu
  **********************/
-void menu_digital_settings(void){
+static void menu_digital_settings(void){
     int selection=0, result=0;
 
     MENUITEM_STRINGLIST(menu,"Digital Mode Settings",NULL,"Show Seconds",
@@ -125,7 +126,7 @@ void menu_digital_settings(void){
 /***********************************************************
  * Confirm resetting of settings, used in general_settings()
  **********************************************************/
-void confirm_reset(void){
+static void confirm_reset(void){
     int result=0;
 
     rb->set_option("Reset all settings?", &result, INT, noyes_text, 2, NULL);
@@ -141,7 +142,7 @@ void confirm_reset(void){
 /************************************
  * General settings. Reset, save, etc
  ***********************************/
-void menu_general_settings(void){
+static void menu_general_settings(void){
     int selection=0, result=0;
 
     MENUITEM_STRINGLIST(menu,"General Settings",NULL,

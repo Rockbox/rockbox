@@ -37,7 +37,7 @@
 #define SECOND_ANGLE(second) (6 * (second))
 
 /* Note that the given angle's origin is midday and not 3 o'clock */
-void polar_to_cartesian(int a, int r, int* x, int* y)
+static void polar_to_cartesian(int a, int r, int* x, int* y)
 {
 #if CONFIG_LCD == LCD_SSD1815
     /* Correct non-square pixel aspect of archos recorder LCD */
@@ -48,7 +48,7 @@ void polar_to_cartesian(int a, int r, int* x, int* y)
     *y = (fp14_sin(a-90) * r) >> 14;
 }
 
-void polar_to_cartesian_screen_centered(struct screen * display, 
+static void polar_to_cartesian_screen_centered(struct screen * display, 
                                         int a, int r, int* x, int* y)
 {
     polar_to_cartesian(a, r, x, y);
@@ -56,7 +56,7 @@ void polar_to_cartesian_screen_centered(struct screen * display,
     *y+=display->getheight()/2;
 }
 
-void angle_to_square(int square_width, int square_height,
+static void angle_to_square(int square_width, int square_height,
                      int a, int* x, int* y)
 {
     a = (a+360-90)%360;
@@ -82,7 +82,7 @@ void angle_to_square(int square_width, int square_height,
     }
 }
 
-void angle_to_square_screen_centered(struct screen * display,
+static void angle_to_square_screen_centered(struct screen * display,
                      int square_width, int square_height,
                      int a, int* x, int* y)
 {
@@ -91,7 +91,7 @@ void angle_to_square_screen_centered(struct screen * display,
     *y+=display->getheight()/2;
 }
 
-void draw_hand(struct screen* display, int angle,
+static void draw_hand(struct screen* display, int angle,
                int radius, int thickness, bool round)
 {
     int x1, y1; /* the longest */
@@ -115,7 +115,7 @@ void draw_hand(struct screen* display, int angle,
     rb->lcd_drawline(x1, y1, x3, y3);
 }
 
-void draw_hands(struct screen* display, int hour, int minute, int second,
+static void draw_hands(struct screen* display, int hour, int minute, int second,
                 int thickness, bool round, bool draw_seconds)
 {
     if(draw_seconds){
@@ -128,7 +128,7 @@ void draw_hands(struct screen* display, int hour, int minute, int second,
               ANALOG_HOUR_RADIUS(display, round), thickness+2, round);
 }
 
-void draw_counter(struct screen* display, struct counter* counter)
+static void draw_counter(struct screen* display, struct counter* counter)
 {
     char buffer[10];
     int second_str_w, hour_str_w, str_h;
@@ -150,7 +150,7 @@ void draw_counter(struct screen* display, struct counter* counter)
                 display->getheight()-str_h);
 }
 
-void draw_date(struct screen* display, struct time* time, int date_format)
+static void draw_date(struct screen* display, struct time* time, int date_format)
 {
     char buffer[10];
     int year_str_w, monthday_str_w, str_h;
@@ -176,7 +176,7 @@ void draw_date(struct screen* display, struct time* time, int date_format)
                 display->getheight()-monthday_line*str_h);
 }
 
-void draw_border(struct screen* display, int skin)
+static void draw_border(struct screen* display, int skin)
 {
     /* Draws square dots every 5 minutes */
     int i;
@@ -197,7 +197,7 @@ void draw_border(struct screen* display, int skin)
     }
 }
 
-void draw_hour(struct screen* display, struct time* time,
+static void draw_hour(struct screen* display, struct time* time,
                bool show_seconds, int skin)
 {
     int hour=time->hour;
@@ -220,7 +220,7 @@ void draw_hour(struct screen* display, struct time* time,
                0, skin, show_seconds);
 }
 
-void draw_center_cover(struct screen* display)
+static void draw_center_cover(struct screen* display)
 {
     display->hline((display->getwidth()/2)-1,
                    (display->getwidth()/2)+1, (display->getheight()/2)+3);

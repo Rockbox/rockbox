@@ -7,7 +7,7 @@ void counter_init(struct counter* counter){
     counter->paused=true;
 }
 
-int counter_get_ticks_since_last_pause(struct counter* counter){
+static int counter_get_ticks_since_last_pause(struct counter* counter){
     if(!counter->paused)
         return(*rb->current_tick - counter->ticks_at_last_unpause);
     return(0);

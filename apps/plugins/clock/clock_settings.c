@@ -51,7 +51,7 @@ struct clock_settings clock_settings;
  * we can know at saving time if changes have been made */
 struct clock_settings hdd_clock_settings;
 
-bool settings_needs_saving(struct clock_settings* settings){
+static bool settings_needs_saving(struct clock_settings* settings){
     return(rb->memcmp(settings, &hdd_clock_settings, sizeof(*settings)));
 }
 
@@ -99,8 +99,8 @@ void clock_settings_skin_previous(struct clock_settings* settings){
         settings->skin[settings->mode]=max_skin[settings->mode]-1;
 }
 
-enum settings_file_status clock_settings_load(struct clock_settings* settings,
-                                              char* filename){
+static enum settings_file_status clock_settings_load(
+        struct clock_settings* settings,char* filename){
     int fd = rb->open(filename, O_RDONLY);
     if(fd >= 0){ /* does file exist? */
         /* basic consistency check */
@@ -117,8 +117,8 @@ enum settings_file_status clock_settings_load(struct clock_settings* settings,
     return(ERRLOAD);
 }
 
-enum settings_file_status clock_settings_save(struct clock_settings* settings,
-                                              char* filename){
+static enum settings_file_status clock_settings_save(
+        struct clock_settings* settings, char* filename){
     int fd = rb->creat(filename, 0666);
     if(fd >= 0){ /* does file exist? */
         rb->write (fd, settings, sizeof(*settings));
@@ -128,7 +128,7 @@ enum settings_file_status clock_settings_save(struct clock_settings* settings,
     return(ERRSAVE);
 }
 
-void draw_logo(struct screen* display){
+static void draw_logo(struct screen* display){
 #ifdef HAVE_LCD_COLOR
     if(display->is_color){
         display->set_foreground(LCD_BLACK);
@@ -141,7 +141,7 @@ void draw_logo(struct screen* display){
     picture_draw(display, logo, 0, 0);
 }
 
-void draw_message(struct screen* display, int msg, int y){
+static void draw_message(struct screen* display, int msg, int y){
     const struct picture* message = &(messages[display->screen_type]);
     display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     display->fillrect(0, display->getheight()-message->slide_height,

@@ -57,7 +57,7 @@ const struct button_mapping* plugin_contexts[]={
 /**************************
  * Cleanup on plugin return
  *************************/
-void cleanup(void)
+static void cleanup(void)
 {
     clock_draw_restore_colors();
     if(clock_settings.general.save_settings == 1)
@@ -68,7 +68,7 @@ void cleanup(void)
 }
 
 /* puts the current time into the time struct */
-void clock_update_time( struct time* time){
+static void clock_update_time( struct time* time){
     struct tm* current_time = rb->get_time();
     time->hour = current_time->tm_hour;
     time->minute = current_time->tm_min;
