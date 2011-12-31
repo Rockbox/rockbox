@@ -885,7 +885,7 @@ void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
             completion_event->data = 0;
             completion_event->status = status;
             completion_event->length = length;
-            /* All other endoints. Let the thread deal with it */
+            /* All other endpoints. Let the thread deal with it */
             usb_signal_transfer_completion(completion_event);
             break;
     }
