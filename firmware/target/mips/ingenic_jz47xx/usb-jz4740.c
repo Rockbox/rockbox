@@ -577,19 +577,29 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
     }
 }
 
-bool usb_drv_connected(void)
-{
-    return USB_DRV_CONNECTED();
-}
+#define GPIO_UDC_DETE      (32 * 3 + 28) /* A18 = ADP_CHK */
+#define IRQ_GPIO_UDC_DETE  (IRQ_GPIO_0 + GPIO_UDC_DETE)
+#ifndef ONDA_VX767
+# define USB_GPIO_IRQ GPIO124
+#endif
 
 int usb_detect(void)
 {
-    return usb_drv_connected() ? USB_INSERTED : USB_EXTRACTED;
+    return (__gpio_get_pin(GPIO_UDC_DETE) == 1)
+        ? USB_INSERTED : USB_EXTRACTED;
 }
 
 void usb_init_device(void)
 {
-    unsigned int i;
+#ifdef ONDA_VX767
+    REG_GPIO_PXFUNS(3) = 0x10000000;
+    REG_GPIO_PXSELS(3) = 0x10000000;
+    REG_GPIO_PXPES(3)  = 0x10000000;
+    __gpio_as_input(GPIO_UDC_DETE);
+#else
+    REG_GPIO_PXPES(3)  = 0x10000000;
+    __gpio_as_irq_rise_edge(GPIO_UDC_DETE);
+#endif
 
     USB_INIT_GPIO();
 #ifdef USB_GPIO_IRQ
@@ -597,7 +607,7 @@ void usb_init_device(void)
 #endif
     system_enable_irq(IRQ_UDC);
 
-    for(i=0; i<TOTAL_EP(); i++)
+    for(unsigned i=0; i<TOTAL_EP(); i++)
         semaphore_init(&endpoints[i].complete, 1, 0);
 }
 
