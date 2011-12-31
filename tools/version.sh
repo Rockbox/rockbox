@@ -44,7 +44,7 @@ gitversion() {
 	mod=""
 	# Is this a git-svn commit?
 	if ! git log -1 --pretty=format:"%b" | grep -q "git-svn-id: svn" ; then
-	    version="$version+$head"
+	    version="$head"
 	fi
 	# Are there uncommitted changes?
 	export GIT_WORK_TREE="$1"
