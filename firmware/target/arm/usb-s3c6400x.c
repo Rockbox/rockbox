@@ -31,7 +31,6 @@
 
 #include "usb-s3c6400x.h"
 
-#ifdef HAVE_USBSTACK
 #include "usb_ch9.h"
 #include "usb_core.h"
 #include <inttypes.h>
@@ -334,6 +333,9 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
 
 void usb_drv_init(void)
 {
+    for (unsigned i = 0; i < sizeof(endpoints)/sizeof(struct ep_type); i++)
+        semaphore_init(&endpoints[i].complete, 1, 0);
+
     /* Enable USB clock */
 #if CONFIG_CPU==S5L8701
     PWRCON &= ~0x4000;
@@ -369,47 +371,7 @@ void usb_drv_exit(void)
 #endif
 }
 
-void usb_init_device(void)
-{
-    for (unsigned i = 0; i < sizeof(endpoints)/sizeof(struct ep_type); i++)
-        semaphore_init(&endpoints[i].complete, 1, 0);
-
-    /* Power up the core clocks to allow writing
-       to some registers needed to power it down */
-    PCGCCTL = 0;
-#if CONFIG_CPU==S5L8701
-    PWRCON &= ~0x4000;
-    PWRCONEXT &= ~0x800;
-    INTMSK |= INTMSK_USB_OTG;
-#elif CONFIG_CPU==S5L8702
-    PWRCON(0) &= ~0x4;
-    PWRCON(1) &= ~0x8;
-    VIC0INTENABLE |= 1 << 19;
-#endif
-
-    usb_drv_exit();
-}
-
 void usb_attach(void)
 {
     usb_enable(true);
 }
-
-#else
-void usb_init_device(void)
-{
-    DCTL = DCTL_pwronprgdone | DCTL_sftdiscon;
-
-    ORSTCON = 1;  /* Put the PHY into reset (needed to get current down) */
-    PCGCCTL = 1;  /* Shut down PHY clock */
-    OPHYPWR = 0xF;  /* PHY: Power down */
-    
-#if CONFIG_CPU==S5L8701
-    PWRCON |= 0x4000;
-    PWRCONEXT |= 0x800;
-#elif CONFIG_CPU==S5L8702
-    PWRCON(0) |= 0x4;
-    PWRCON(1) |= 0x8;
-#endif
-}
-#endif
