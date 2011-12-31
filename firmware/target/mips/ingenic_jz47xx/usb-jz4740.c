@@ -600,7 +600,6 @@ void usb_init_device(void)
     __gpio_as_irq_rise_edge(GPIO_UDC_DETE);
 #endif
 
-    USB_INIT_GPIO();
 #ifdef USB_GPIO_IRQ
     system_enable_irq(IRQ_GPIO_UDC_DETE);
 #endif
