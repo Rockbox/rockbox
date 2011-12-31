@@ -85,4 +85,19 @@ struct ARM_REGS {
 
 void dumpregs(void);
 
+void usb_connect_event(void);
+
+/** Sector read/write filters **/
+
+/* Filter some things in the MBR - see usb-gigabeat-s.c */
+void usb_fix_mbr(unsigned char *mbr);
+#define USBSTOR_READ_SECTORS_FILTER() \
+    ({ if (cur_cmd.sector == 0) \
+            usb_fix_mbr(cur_cmd.data[cur_cmd.data_select]); \
+    0; })
+
+/* Disallow MBR writes entirely since it was "fixed" in usb_fix_mbr */
+#define USBSTOR_WRITE_SECTORS_FILTER() \
+    ({ cur_cmd.sector != 0 ? 0 : -1; })
+
 #endif /* SYSTEM_TARGET_H */
