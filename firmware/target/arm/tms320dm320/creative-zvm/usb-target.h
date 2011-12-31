@@ -73,7 +73,4 @@
 
 #define USE_IRAM
 
-#include <stdbool.h>
-bool usb_drv_connected(void);
-
 #endif
