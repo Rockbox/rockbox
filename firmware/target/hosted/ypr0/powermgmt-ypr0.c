@@ -28,7 +28,7 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3500
+    3470
 };
 
 /* the OF shuts down at this voltage */
@@ -41,7 +41,7 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* FIXME: This is guessed. Make proper curve using battery_bench */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3450, 3692, 3740, 3772, 3798, 3828, 3876, 3943, 4013, 4094, 4194 }
+    { 3450, 3502, 3550, 3587, 3623, 3669, 3742, 3836, 3926, 4026, 4200 }
 };
 
 #if CONFIG_CHARGING
@@ -49,7 +49,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 /* FIXME: This is guessed. Make proper curve using battery_bench */
 const unsigned short const percent_to_volt_charge[11] =
 {
-    3600, 3802, 3856, 3888, 3905, 3931, 3973, 4025, 4084, 4161, 4219
+      3450, 3670, 3721, 3751, 3782, 3821, 3876, 3941, 4034, 4125, 4200
 };
 
 unsigned int power_input_status(void)
@@ -77,11 +77,7 @@ unsigned int battery_adc_voltage(void)
 
 bool charging_state(void)
 {
-    /* cannot make this static (initializer not constant error), but gcc
-     * seems to calculate at compile time anyway */
-    const unsigned short charged_thres =
-        ((percent_to_volt_charge[9] + percent_to_volt_charge[10]) / 2);
-
+    const unsigned short charged_thres = 4170;
     bool ret = (power_input_status() == POWER_INPUT_MAIN_CHARGER);
     /* dont indicate for > ~95% */
     return ret && (battery_adc_voltage() <= charged_thres);
