@@ -52,6 +52,8 @@
 
 void usb_pin_init(void);
 bool usb_plugged(void);
+void firewire_insert_int(void);
+void usb_insert_int(void);
 
 static inline void udelay(unsigned usecs)
 {

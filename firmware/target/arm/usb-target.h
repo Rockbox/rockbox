@@ -21,9 +21,6 @@
 #ifndef USB_TARGET_H
 #define USB_TARGET_H
 
-void usb_insert_int(void);
-void firewire_insert_int(void);
-
 #ifdef HAVE_BOOTLOADER_USB_MODE
 #define USB_DRIVER_CLOSE
 #endif

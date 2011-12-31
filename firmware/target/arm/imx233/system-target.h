@@ -114,4 +114,7 @@ static inline void mdelay(unsigned msecs)
     udelay(1000 * msecs);
 }
 
+void usb_insert_int(void);
+void usb_remove_int(void);
+
 #endif /* SYSTEM_TARGET_H */

@@ -27,7 +27,4 @@
 #define USB_DRIVER_CLOSE
 #endif
 
-void usb_insert_int(void);
-void usb_remove_int(void);
-
 #endif /* USB_TARGET_H */
