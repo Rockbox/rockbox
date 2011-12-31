@@ -23,6 +23,7 @@
 #include "system.h"
 #include "power.h"
 #include "string.h"
+#include "usb.h"
 #include "system-target.h"
 
 struct current_step_bit_t
@@ -111,7 +112,7 @@ void power_off(void)
 
 unsigned int power_input_status(void)
 {
-    return (usb_detect == USB_INSERTED)
+    return (usb_detect() == USB_INSERTED)
         ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
 }
 
