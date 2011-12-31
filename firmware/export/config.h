@@ -1062,7 +1062,7 @@ Lyre prototype 1 */
 #if defined(HAVE_BOOTLOADER_USB_MODE) || \
      defined(CREATIVE_ZVx) || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
      CONFIG_USBOTG == USBOTG_JZ4740 || CONFIG_USBOTG == USBOTG_AS3525 || \
-     CONFIG_USBOTG == USBOTG_S3C6400x
+     CONFIG_USBOTG == USBOTG_S3C6400X
 #define USB_ENABLE_STORAGE
 #endif
 
