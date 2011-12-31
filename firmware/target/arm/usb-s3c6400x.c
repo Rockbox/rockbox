@@ -390,22 +390,9 @@ void usb_init_device(void)
     usb_drv_exit();
 }
 
-void usb_enable(bool on)
-{
-    if (on) usb_core_init();
-    else usb_core_exit();
-}
-
 void usb_attach(void)
 {
     usb_enable(true);
-}
-
-int usb_detect(void)
-{
-    if (charger_inserted())
-        return USB_INSERTED;
-    return USB_EXTRACTED;
 }
 
 #else
@@ -424,16 +411,5 @@ void usb_init_device(void)
     PWRCON(0) |= 0x4;
     PWRCON(1) |= 0x8;
 #endif
-}
-
-void usb_enable(bool on)
-{
-    (void)on;
-}
-
-/* Always return false for now */
-int usb_detect(void)
-{
-    return USB_EXTRACTED;
 }
 #endif
