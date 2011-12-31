@@ -39,17 +39,6 @@
 static const uint8_t in_ep_list[] = {0, 1, 3, 5};
 static const uint8_t out_ep_list[] = {0, 2, 4};
 
-/* store per endpoint, per direction, information */
-struct ep_type
-{
-    unsigned int size; /* length of the data buffer */
-    struct semaphore complete; /* wait object */
-    int8_t status; /* completion status (0 for success) */
-    bool active; /* true is endpoint has been requested (true for EP0) */
-    bool done; /* transfer completed */
-    bool busy; /* true is a transfer is pending */
-};
-
 /* state of EP0 (to correctly schedule setup packet enqueing) */
 enum ep0state
 {
@@ -423,7 +412,7 @@ void usb_drv_cancel_all_transfers()
     cancel_all_transfers(false);
 }
 
-static void usb_drv_transfer(int ep, void *ptr, int len, bool out)
+static void ep_transfer(int ep, void *ptr, int len, bool out)
 {
     /* disable interrupts to avoid any race */
     int oldlevel = disable_irq_save();
@@ -458,51 +447,20 @@ static void usb_drv_transfer(int ep, void *ptr, int len, bool out)
     restore_irq(oldlevel);
 }
 
-int usb_drv_recv(int ep, void *ptr, int len)
-{
-    usb_drv_transfer(EP_NUM(ep), ptr, len, true);
-    return 0;
-}
-
 int usb_drv_send(int ep, void *ptr, int len)
 {
     ep = EP_NUM(ep);
     struct ep_type *endpoint = &endpoints[ep][1];
     endpoint->done = false;
-    usb_drv_transfer(ep, ptr, len, false);
+    ep_transfer(ep, ptr, len, false);
     while (endpoint->busy && !endpoint->done)
         semaphore_wait(&endpoint->complete, TIMEOUT_BLOCK);
     return endpoint->status;
 }
-
-int usb_drv_send_nonblocking(int ep, void *ptr, int len)
-{
-    usb_drv_transfer(EP_NUM(ep), ptr, len, false);
-    return 0;
-}
-
 
 void usb_drv_set_test_mode(int mode)
 {
     /* there is a perfect matching between usb test mode code
      * and the register field value */
     DCTL = (DCTL & ~bitm(DCTL, tstctl)) | (mode << DCTL_tstctl_bitp);
-}
-
-void usb_drv_set_address(int address)
-{
-    (void) address;
-}
-
-void usb_drv_stall(int ep, bool stall, bool in)
-{
-    if (stall)
-        DEPCTL(ep, !in) |=  DEPCTL_stall;
-    else
-        DEPCTL(ep, !in) &= ~DEPCTL_stall;
-}
-
-bool usb_drv_stalled(int ep, bool in)
-{
-    return DEPCTL(ep, !in) & DEPCTL_stall;
 }

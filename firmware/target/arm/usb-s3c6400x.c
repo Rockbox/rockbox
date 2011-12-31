@@ -35,19 +35,55 @@
 #include <inttypes.h>
 #include "power.h"
 
+/* store per endpoint, per direction, information */
+struct ep_type
+{
+    unsigned int size; /* length of the data buffer */
+    struct semaphore complete; /* wait object */
+    int8_t status; /* completion status (0 for success) */
+    bool active; /* true is endpoint has been requested (true for EP0) */
+    bool done; /* transfer completed */
+    bool busy; /* true is a transfer is pending */
+};
+
+bool usb_drv_stalled(int endpoint, bool in)
+{
+    return DEPCTL(endpoint, !in) & DEPCTL_stall;
+}
+
+void usb_drv_stall(int endpoint, bool stall, bool in)
+{
+    if (stall)
+        DEPCTL(endpoint, !in) |= DEPCTL_stall;
+    else
+        DEPCTL(endpoint, !in) &= ~DEPCTL_stall;
+}
+
+void usb_drv_set_address(int address)
+{
+    (void)address;
+    /* Ignored intentionally, because the controller requires us to set the
+       new address before sending the response for some reason. So we'll
+       already set it when the control request arrives, before passing that
+       into the USB core, which will then call this dummy function. */
+}
+
+static void ep_transfer(int ep, void *ptr, int length, bool out);
+int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
+{
+    ep_transfer(EP_NUM(endpoint), ptr, length, false);
+    return 0;
+}
+
+int usb_drv_recv(int endpoint, void* ptr, int length)
+{
+    ep_transfer(EP_NUM(endpoint), ptr, length, true);
+    return 0;
+}
+
 #if CONFIG_CPU == AS3525v2 /* FIXME FIXME FIXME */
 # include "as3525/usb-drv-as3525v2.c"
 #else
-
-struct ep_type
-{
-    bool active;
-    bool busy;
-    bool done;
-    int rc;
-    int size;
-    struct semaphore complete;
-} ;
 
 static struct ep_type endpoints[USB_NUM_ENDPOINTS];
 
@@ -58,10 +94,10 @@ static struct ep_type endpoints[USB_NUM_ENDPOINTS];
    e.g. write descriptor requests (which are rejected by us, but the
    payload is transferred anyway) do not cause memory corruption.
    Fixes FS#12310. -- Michael Sparmann (theseven) */
-static struct
+static union
 {
     struct usb_ctrlrequest header; /* 8 bytes */
-    unsigned char payload[64 - sizeof(struct usb_ctrlrequest)];
+    unsigned char payload[64];
 } ctrlreq USB_DEVBSS_ATTR;
 
 int usb_drv_port_speed(void)
@@ -76,7 +112,7 @@ static void reset_endpoints(int reinit)
     {
         if (reinit) endpoints[i].active = false;
         endpoints[i].busy = false;
-        endpoints[i].rc = -1;
+        endpoints[i].status = -1;
         endpoints[i].done = true;
         semaphore_release(&endpoints[i].complete);
     }
@@ -184,7 +220,7 @@ static void handle_ep_int(bool out)
             if (endpoints[ep].busy)
             {
                 endpoints[ep].busy = false;
-                endpoints[ep].rc = 0;
+                endpoints[ep].status = 0;
                 endpoints[ep].done = true;
                 usb_core_transfer_complete(ep, out ? USB_DIR_OUT : USB_DIR_IN, 0, bytes);
                 semaphore_release(&endpoints[ep].complete);
@@ -199,7 +235,7 @@ static void handle_ep_int(bool out)
             if (endpoints[ep].busy)
             {
                 endpoints[ep].busy = false;
-                endpoints[ep].rc = 1;
+                endpoints[ep].status = 1;
                 endpoints[ep].done = true;
                 semaphore_release(&endpoints[ep].complete);
             }
@@ -261,16 +297,7 @@ void INT_USB_FUNC(void)
     GINTSTS = ints;
 }
 
-void usb_drv_set_address(int address)
-{
-    (void)address;
-    /* Ignored intentionally, because the controller requires us to set the
-       new address before sending the response for some reason. So we'll
-       already set it when the control request arrives, before passing that
-       into the USB core, which will then call this dummy function. */
-}
-
-static void ep_transfer(int ep, void *ptr, int length, int out)
+static void ep_transfer(int ep, void *ptr, int length, bool out)
 {
     endpoints[ep].busy = true;
     endpoints[ep].size = length;
@@ -294,19 +321,7 @@ int usb_drv_send(int endpoint, void *ptr, int length)
     ep_transfer(endpoint, ptr, length, false);
     while (!endpoints[endpoint].done && endpoints[endpoint].busy)
         semaphore_wait(&endpoints[endpoint].complete, TIMEOUT_BLOCK);
-    return endpoints[endpoint].rc;
-}
-
-int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
-{
-    ep_transfer(EP_NUM(endpoint), ptr, length, false);
-    return 0;
-}
-
-int usb_drv_recv(int endpoint, void* ptr, int length)
-{
-    ep_transfer(EP_NUM(endpoint), ptr, length, true);
-    return 0;
+    return endpoints[endpoint].status;
 }
 
 void usb_drv_cancel_all_transfers(void)
@@ -319,19 +334,6 @@ void usb_drv_cancel_all_transfers(void)
 void usb_drv_set_test_mode(int mode)
 {
     (void)mode;
-}
-
-bool usb_drv_stalled(int endpoint, bool in)
-{
-    return DEPCTL(endpoint, !in) & DEPCTL_stall;
-}
-
-void usb_drv_stall(int endpoint, bool stall, bool in)
-{
-    if (stall)
-        DEPCTL(endpoint, !in) |= DEPCTL_stall;
-    else
-        DEPCTL(endpoint, !in) &= ~DEPCTL_stall;
 }
 
 void usb_drv_init(void)
