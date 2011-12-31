@@ -71,7 +71,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
 
         #define storage_enable(on)
         #define storage_sleepnow()
-        #define storage_disk_is_active()
+        #define storage_disk_is_active() 0
         #define storage_soft_reset()
         #define storage_init()
         #define storage_close()

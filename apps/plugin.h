@@ -794,7 +794,7 @@ struct plugin_api {
     int (*battery_level)(void);
     bool (*battery_level_safe)(void);
     int (*battery_time)(void);
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
     unsigned int (*battery_voltage)(void);
 #endif
 #if CONFIG_CHARGING

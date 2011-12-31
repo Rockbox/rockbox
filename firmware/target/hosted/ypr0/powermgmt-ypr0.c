@@ -17,117 +17,72 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "system.h"
-#include <time.h>
+#include <sys/ioctl.h>
 #include "kernel.h"
 #include "powermgmt.h"
+#include "power.h"
+#include "file.h"
 #include "ascodec-target.h"
-#include "stdio.h"
+#include "as3514.h"
+#include "sc900776.h"
 
-#if 0 /*still unused*/
-/* The battery manufacturer's website shows discharge curves down to 3.0V,
-   so 'dangerous' and 'shutoff' levels of 3.4V and 3.3V should be safe.
- */
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3550
+    3500
 };
 
+/* the OF shuts down at this voltage */
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3450
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
+/* FIXME: This is guessed. Make proper curve using battery_bench */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3300, 3692, 3740, 3772, 3798, 3828, 3876, 3943, 4013, 4094, 4194 }
+    { 3450, 3692, 3740, 3772, 3798, 3828, 3876, 3943, 4013, 4094, 4194 }
 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-const unsigned short percent_to_volt_charge[11] =
+/* FIXME: This is guessed. Make proper curve using battery_bench */
+const unsigned short const percent_to_volt_charge[11] =
 {
-    3417, 3802, 3856, 3888, 3905, 3931, 3973, 4025, 4084, 4161, 4219
+    3600, 3802, 3856, 3888, 3905, 3931, 3973, 4025, 4084, 4161, 4219
 };
-#endif /* CONFIG_CHARGING */
-#endif
 
-#define BATT_MINMVOLT   3450      /* minimum millivolts of battery */
-#define BATT_MAXMVOLT   4150      /* maximum millivolts of battery */
-#define BATT_MAXRUNTIME (10 * 60) /* maximum runtime with full battery in
-                                     minutes */
-
-extern void send_battery_level_event(void);
-extern int last_sent_battery_level;
-extern int battery_percent;
-
-static unsigned int battery_millivolts = BATT_MAXMVOLT;
-/* estimated remaining time in minutes */
-static int powermgmt_est_runningtime_min = BATT_MAXRUNTIME;
-
-static void battery_status_update(void)
+unsigned int power_input_status(void)
 {
-    static time_t last_change = 0;
-    time_t now;
-
-    time(&now);
-
-    if (last_change < now) {
-        last_change = now;
-
-        battery_percent = 100 * (battery_millivolts - BATT_MINMVOLT) /
-                            (BATT_MAXMVOLT - BATT_MINMVOLT);
-
-        powermgmt_est_runningtime_min =
-            battery_percent * BATT_MAXRUNTIME / 100;
+    unsigned status = POWER_INPUT_NONE;
+    int fd = open("/dev/minivet", O_RDONLY);
+    if (fd >= 0)
+    {
+        if (ioctl(fd, IOCTL_MINIVET_DET_VBUS, NULL) > 0)
+            status = POWER_INPUT_MAIN_CHARGER;
+        close(fd);
     }
-
-    send_battery_level_event();
+    return status;
 }
 
-void battery_read_info(int *voltage, int *level)
+#endif /* CONFIG_CHARGING */
+
+
+/* Returns battery voltage from ADC [millivolts],
+ * adc returns voltage in 5mV steps */
+unsigned int battery_adc_voltage(void)
 {
-    battery_status_update();
-
-    if (voltage)
-        *voltage = battery_millivolts;
-
-    if (level)
-        *level = battery_percent;
+    return adc_read(3) * 5;
 }
 
-unsigned int battery_voltage(void)
+bool charging_state(void)
 {
-    battery_status_update();
-    return battery_millivolts;
-}
+    /* cannot make this static (initializer not constant error), but gcc
+     * seems to calculate at compile time anyway */
+    const unsigned short charged_thres =
+        ((percent_to_volt_charge[9] + percent_to_volt_charge[10]) / 2);
 
-int battery_level(void)
-{
-    battery_status_update();
-    return battery_percent;
+    bool ret = (power_input_status() == POWER_INPUT_MAIN_CHARGER);
+    /* dont indicate for > ~95% */
+    return ret && (battery_adc_voltage() <= charged_thres);
 }
-
-int battery_time(void)
-{
-    battery_status_update();
-    return powermgmt_est_runningtime_min;
-}
-
-bool battery_level_safe(void)
-{
-    return battery_level() >= 10;
-}
-
-void set_battery_capacity(int capacity)
-{
-  (void)capacity;
-}
-
-#if BATTERY_TYPES_COUNT > 1
-void set_battery_type(int type)
-{
-    (void)type;
-}
-#endif

@@ -78,7 +78,7 @@ extern unsigned int power_thread_inputs;
 /* Start up power management thread */
 void powermgmt_init(void) INIT_ATTR;
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
 
 /* Generic current values that are intentionally meaningless - config header
  * should define proper numbers.*/

@@ -58,7 +58,6 @@
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #include "disk.h"
 #include "adc.h"
-#include "power.h"
 #include "usb.h"
 #include "rtc.h"
 #include "storage.h"
@@ -75,6 +74,7 @@
 #include "radio.h"
 #endif
 #endif
+#include "power.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "scrollbar.h"
@@ -900,7 +900,7 @@ static bool tsc2100_debug(void)
     return simplelist_show_list(&info);
 }
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
 #ifdef HAVE_LCD_BITMAP
 /*
  * view_battery() shows a automatically scaled graph of the battery voltage
@@ -2168,7 +2168,7 @@ static const struct the_menu_item menuitems[] = {
         { "View CPU stats", dbg_cpuinfo },
 #endif
 #ifdef HAVE_LCD_BITMAP
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
         { "View battery", view_battery },
 #endif
 #ifndef APPLICATION

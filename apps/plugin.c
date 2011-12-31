@@ -664,7 +664,7 @@ static const struct plugin_api rockbox_api = {
     battery_level,
     battery_level_safe,
     battery_time,
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
     battery_voltage,
 #endif
 #if CONFIG_CHARGING

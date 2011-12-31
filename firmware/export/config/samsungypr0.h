@@ -21,7 +21,7 @@
 #define USB_NONE
 
 /* Hardware controlled charging with monitoring */
-//#define CONFIG_CHARGING CHARGING_MONITOR
+#define CONFIG_CHARGING CHARGING_MONITOR
 
 /* There is only USB charging */
 //#define HAVE_USB_POWER
@@ -127,16 +127,16 @@
 
 /* Define current usage levels. */
 /* TODO: to be filled with correct values after implementing power management */
-#define CURRENT_NORMAL     88 /* 18 hours from a 1600 mAh battery */
-#define CURRENT_BACKLIGHT  30 /* TBD */
-#define CURRENT_RECORD     0  /* no recording yet */
+//#define CURRENT_NORMAL     88 /* 18 hours from a 1600 mAh battery */
+//#define CURRENT_BACKLIGHT  30 /* TBD */
+//#define CURRENT_RECORD     0  /* no recording yet */
 
 /* TODO: We need to do battery handling */
-//#define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
-//#define BATTERY_CAPACITY_MIN 600  /* min. capacity selectable */
-//#define BATTERY_CAPACITY_MAX 700 /* max. capacity selectable */
-//#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-//#define BATTERY_TYPES_COUNT  1    /* only one type */
+#define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 600  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 600 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 0   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
 
 /* TODO: We possibly can only watch linux charging */
 //#define CONFIG_CHARGING CHARGING_TARGET

@@ -32,16 +32,11 @@
 
 #include "ascodec-target.h"
 
-void sim_do_exit(void)
-{
-    exit(EXIT_SUCCESS);
-}
-
-void shutdown_hw(void)
+void power_off(void)
 {
     /* Something that we need to do before exit on our platform YPR0 */
     ascodec_close();
-    sim_do_exit();
+    exit(EXIT_SUCCESS);
 }
 
 uintptr_t *stackbegin;
@@ -62,7 +57,7 @@ void system_init(void)
 
 void system_reboot(void)
 {
-    sim_do_exit();
+    power_off();
 }
 
 void system_exception_wait(void)
