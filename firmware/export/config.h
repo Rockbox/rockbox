@@ -773,6 +773,7 @@ Lyre prototype 1 */
 #define USB_DETECT_BY_CORE
 #if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_ARC
 #define INCLUDE_TIMEOUT_API
+#define USB_DRIVER_CLOSE
 #endif
 #endif
 
