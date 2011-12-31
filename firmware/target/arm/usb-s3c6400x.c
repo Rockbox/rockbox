@@ -35,6 +35,10 @@
 #include <inttypes.h>
 #include "power.h"
 
+#if CONFIG_CPU == AS3525v2 /* FIXME FIXME FIXME */
+# include "as3525/usb-drv-as3525v2.c"
+#else
+
 struct ep_type
 {
     bool active;
@@ -374,3 +378,4 @@ void usb_attach(void)
 {
     usb_enable(true);
 }
+#endif // CONFIG_CPU == AS3525v2 /* FIXME FIXME FIXME */

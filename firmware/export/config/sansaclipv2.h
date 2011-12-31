@@ -178,7 +178,7 @@
 #define CONFIG_LCD LCD_SSD1303
 
 /* USB On-the-go */
-#define CONFIG_USBOTG USBOTG_AS3525v2
+#define CONFIG_USBOTG USBOTG_S3C6400X
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK

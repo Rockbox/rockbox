@@ -317,7 +317,6 @@ Lyre prototype 1 */
 #define USBOTG_ARC      5020 /* PortalPlayer 502x and IMX233 */
 #define USBOTG_JZ4740   4740 /* Ingenic Jz4740/Jz4732 */
 #define USBOTG_AS3525   3525 /* AMS AS3525 */
-#define USBOTG_AS3525v2 3535 /* AMS AS3525v2 FIXME : same as S3C6400X */
 #define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701/S5L8702/S5L8720 */
 #define USBOTG_RK27XX   2700 /* Rockchip rk27xx */
 #define USBOTG_TNETV105 105  /* TI TNETV105 */
@@ -803,7 +802,7 @@ Lyre prototype 1 */
 #elif CONFIG_USBOTG == USBOTG_AS3525
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_CORE
-#elif CONFIG_USBOTG == USBOTG_AS3525v2
+#elif CONFIG_USBOTG == USBOTG_S3C6400X /* FIXME */ && CONFIG_CPU == AS3525v2
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_CORE
 #elif CONFIG_USBOTG == USBOTG_RK27XX
@@ -1046,7 +1045,7 @@ Lyre prototype 1 */
 #define USB_HAS_INTERRUPT
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
 #define USB_HAS_BULK
-#elif CONFIG_USBOTG == USBOTG_S3C6400X || CONFIG_USBOTG == USBOTG_AS3525v2
+#elif CONFIG_USBOTG == USBOTG_S3C6400X
 #define USB_HAS_BULK
 //#define USB_HAS_INTERRUPT -- seems to be broken
 #endif /* CONFIG_USBOTG */
@@ -1061,10 +1060,9 @@ Lyre prototype 1 */
 
 /* enable usb storage for targets that do bootloader usb */
 #if defined(HAVE_BOOTLOADER_USB_MODE) || \
-    ((defined(CREATIVE_ZVx) || \
-     defined(CPU_TCC77X) || defined(CPU_TCC780X))) || \
-     (CONFIG_USBOTG == USBOTG_JZ4740) || defined(IPOD_NANO2G) || \
-     CONFIG_USBOTG == USBOTG_AS3525 || CONFIG_USBOTG == USBOTG_AS3525v2
+     defined(CREATIVE_ZVx) || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
+     CONFIG_USBOTG == USBOTG_JZ4740 || CONFIG_USBOTG == USBOTG_AS3525 || \
+     CONFIG_USBOTG == USBOTG_S3C6400x
 #define USB_ENABLE_STORAGE
 #endif
 
