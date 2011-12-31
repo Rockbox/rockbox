@@ -85,21 +85,22 @@ static void reset_endpoints(int reinit)
 
     DEPDMA(0, true) = &ctrlreq;
     DEPCTL(0, true) |= DEPCTL_epena | DEPCTL_cnak;
+    /* HACK: Enable all endpoints here, because we have no other chance to do it */
     if (reinit)
     {
         /* The size is getting set to zero, because we don't know
            whether we are Full Speed or High Speed at this stage */
-        DEPCTL(1, false) = DEPCTL_setd0pid | (3 << DEPCTL_nextep_bitp);
-        DEPCTL(2, true) = DEPCTL_setd0pid;
-        DEPCTL(3, false) = DEPCTL_setd0pid | (0 << DEPCTL_nextep_bitp);
-        DEPCTL(4, true) = DEPCTL_setd0pid;
+        DEPCTL(1, false) = DEPCTL_usbactep | DEPCTL_setd0pid | (3 << DEPCTL_nextep_bitp);
+        DEPCTL(2, true) = DEPCTL_usbactep | DEPCTL_setd0pid;
+        DEPCTL(3, false) = DEPCTL_usbactep | DEPCTL_setd0pid | (0 << DEPCTL_nextep_bitp);
+        DEPCTL(4, true) = DEPCTL_usbactep | DEPCTL_setd0pid;
     }
     else
     {
-        DEPCTL(1, false) = (DEPCTL(1, false) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
-        DEPCTL(2, true) = (DEPCTL(2, true) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
-        DEPCTL(3, false) = (DEPCTL(3, false) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
-        DEPCTL(4, true) = (DEPCTL(4, true) & ~DEPCTL_usbactep) | DEPCTL_setd0pid;
+        DEPCTL(1, false) = DEPCTL(1, false) | DEPCTL_usbactep | DEPCTL_setd0pid;
+        DEPCTL(2, true) = DEPCTL(2, true) | DEPCTL_usbactep | DEPCTL_setd0pid;
+        DEPCTL(3, false) = DEPCTL(3, false) | DEPCTL_usbactep | DEPCTL_setd0pid;
+        DEPCTL(4, true) = DEPCTL(4, true) | DEPCTL_usbactep | DEPCTL_setd0pid;
     }
     DAINTMSK = 0xFFFFFFFF;  /* Enable interrupts on all EPs */
 }
@@ -112,7 +113,7 @@ int usb_drv_request_endpoint(int type, int dir)
         {
             endpoints[ep].active = true;
             DEPCTL(ep, out) = (DEPCTL(ep, out) & ~(DEPCTL_eptype_bits << DEPCTL_eptype_bitp)) |
-                (type << DEPCTL_eptype_bitp) | DEPCTL_setd0pid;
+                (type << DEPCTL_eptype_bitp);
             return ep | dir;
         }
 
@@ -273,7 +274,6 @@ static void ep_transfer(int ep, void *ptr, int length, int out)
     endpoints[ep].size = length;
     if (out)
         DEPCTL(ep, out) &= ~DEPCTL_stall;
-    DEPCTL(ep, out) |= DEPCTL_usbactep;
     int blocksize = usb_drv_port_speed() ? 512 : 64;
     int packets = (length + blocksize - 1) / blocksize;
     if (packets == 0)
