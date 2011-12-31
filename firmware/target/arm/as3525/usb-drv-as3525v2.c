@@ -239,9 +239,10 @@ void usb_drv_init(void)
 
 void usb_drv_exit(void)
 {
+    DCTL = DCTL_pwronprgdone | DCTL_sftdiscon;
+
     VIC_INT_EN_CLEAR = INTERRUPT_USB;
 
-    DCTL = DCTL_pwronprgdone | DCTL_sftdiscon;
     sleep(HZ/20);
 
     CGU_USB = 0;
