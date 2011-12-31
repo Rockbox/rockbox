@@ -151,4 +151,8 @@ void usb_set_hid(bool enable);
 void usb_set_skip_first_drive(bool skip);
 #endif
 
+#if !defined(SIMULATOR) && !defined(USB_NONE)
+void usb_init_device(void);
+#endif
+
 #endif

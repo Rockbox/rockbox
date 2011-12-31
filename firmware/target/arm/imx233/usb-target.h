@@ -27,7 +27,6 @@
 #define USB_DRIVER_CLOSE
 #endif
 
-void usb_init_device(void);
 int usb_detect(void);
 void usb_insert_int(void);
 void usb_remove_int(void);

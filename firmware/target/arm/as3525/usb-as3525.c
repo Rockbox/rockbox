@@ -79,3 +79,7 @@ int usb_detect(void)
 {
     return usb_status;
 }
+
+void usb_init_device(void)
+{
+}

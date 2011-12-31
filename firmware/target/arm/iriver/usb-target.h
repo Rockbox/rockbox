@@ -28,7 +28,6 @@
 #define USB_DRIVER_CLOSE
 #endif
 
-bool usb_init_device(void);
 void usb_pin_init(void); /* Init the GPIO input only */
 bool usb_plugged(void); /* Returns instantaneous state - always */
 

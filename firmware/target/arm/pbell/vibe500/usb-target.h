@@ -24,7 +24,6 @@
 #ifndef USB_TARGET_H
 #define USB_TARGET_H
 
-bool usb_init_device(void);
 void usb_pin_init(void); /* Init the GPIO input only */
 
 #endif

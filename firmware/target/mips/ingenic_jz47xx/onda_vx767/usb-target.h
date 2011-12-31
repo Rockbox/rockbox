@@ -38,7 +38,6 @@
 #define USB_DRV_CONNECTED()    (__gpio_get_pin(GPIO_UDC_DETE) == 1)
 
 int usb_detect(void);
-void usb_init_device(void);
 bool usb_drv_connected(void);
 
 #endif

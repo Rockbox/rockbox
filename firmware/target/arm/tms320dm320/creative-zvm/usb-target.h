@@ -75,7 +75,6 @@
 
 #include <stdbool.h>
 int usb_detect(void);
-void usb_init_device(void);
 bool usb_drv_connected(void);
 
 #endif

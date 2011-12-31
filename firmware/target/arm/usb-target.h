@@ -21,7 +21,6 @@
 #ifndef USB_TARGET_H
 #define USB_TARGET_H
 
-void usb_init_device(void);
 void usb_insert_int(void);
 void firewire_insert_int(void);
 void usb_pin_init(void); /* Init the GPIO input only */

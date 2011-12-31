@@ -40,7 +40,6 @@
 #define USB_STATUS_BY_EVENT
 
 int usb_detect(void);
-void usb_init_device(void);
 bool usb_drv_connected(void);
 
 #endif
