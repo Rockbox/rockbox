@@ -26,6 +26,8 @@
 # - Anton Veretenenko
 # - Simon Zhukovsky
 # - Desu Rozen
+# - James Hunt
+
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -1408,10 +1410,10 @@
     *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Собирать данные о треках"
+    *: "Собирать данные о прослушивании"
   </dest>
   <voice>
-    *: "Собирать данные о треках"
+    *: "Собирать данные о прослушивании"
   </voice>
 </phrase>
 <phrase>
@@ -1576,10 +1578,10 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Показать иконки"
+    *: "Показывать иконки"
   </dest>
   <voice>
-    *: "Показать иконки"
+    *: "Показывать иконки"
   </voice>
 </phrase>
 <phrase>
@@ -1607,10 +1609,10 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "Выбор файлов .wps"
+    *: "Экран воспроизведения"
   </dest>
   <voice>
-    *: "Выбор файлов .wps"
+    *: "Экран воспроизведения"
   </voice>
 </phrase>
 <phrase>
@@ -1964,11 +1966,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Время и Дата"
+    rtc: "Время и дата"
   </dest>
   <voice>
     *: none
-    rtc: "Время и Дата"
+    rtc: "Время и дата"
   </voice>
 </phrase>
 <phrase>
@@ -2072,10 +2074,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Создавать закладку на Паузе"
+    *: "Создавать закладку на паузе"
   </dest>
   <voice>
-    *: "Создавать закладку на Паузе"
+    *: "Создавать закладку на паузе"
   </voice>
 </phrase>
 <phrase>
@@ -3047,11 +3049,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Прокрутка экрана"
+    lcd_bitmap: "Прокручивать за границы экрана"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Прокрутка экрана"
+    lcd_bitmap: "Прокручивать за границы экрана"
   </voice>
 </phrase>
 <phrase>
@@ -6916,10 +6918,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Показать индексы"
+    *: "Показывать порядковый номер"
   </dest>
   <voice>
-    *: "Показать индексы"
+    *: "Показывать порядковый номер"
   </voice>
 </phrase>
 <phrase>
@@ -6930,10 +6932,10 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Экран песен"
+    *: "Показывать названия песен"
   </dest>
   <voice>
-    *: "Экран песен"
+    *: "Показывать названия песен"
   </voice>
 </phrase>
 <phrase>
@@ -7897,11 +7899,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Установить Время/Дату"
+    rtc: "Установить время/дату"
   </dest>
   <voice>
     *: none
-    rtc: "Установить Время/Дату"
+    rtc: "Установить время/дату"
   </voice>
 </phrase>
 <phrase>
@@ -8278,7 +8280,7 @@
     *: "Просмотреть файл .cue"
   </dest>
   <voice>
-    *: ""
+    *: "Просмотреть файл .cue"
   </voice>
 </phrase>
 <phrase>
@@ -8600,11 +8602,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Экран будильника"
+    alarm: "Действие будильника"
   </dest>
   <voice>
     *: none
-    alarm: "Экран будильника"
+    alarm: "Действие будильника"
   </voice>
 </phrase>
 <phrase>
@@ -8617,11 +8619,11 @@
   </source>
   <dest>
     *: none
-    recording: "Очистить папку записи"
+    recording: "Сбросить папку записи"
   </dest>
   <voice>
     *: none
-    recording: "Очистить папку записи"
+    recording: "Сбросить папку записи"
   </voice>
 </phrase>
 <phrase>
@@ -9500,10 +9502,10 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Предыдущий экран"
+    *: "Последнее использованное"
   </dest>
   <voice>
-    *: "Предыдущий экран"
+    *: "Последнее использованное"
   </voice>
 </phrase>
 <phrase>
@@ -9697,10 +9699,10 @@
     *: "Start Screen"
   </source>
   <dest>
-    *: "Главное меню"
+    *: "Показывать при запуске"
   </dest>
   <voice>
-    *: "Главное меню"
+    *: "Показывать при запуске"
   </voice>
 </phrase>
 <phrase>
@@ -10510,11 +10512,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Повтор Сигнала"
+    swcodec: "Повтор сигнала"
   </dest>
   <voice>
     *: none
-    swcodec: "Повтор Сигнала"
+    swcodec: "Повтор сигнала"
   </voice>
 </phrase>
 <phrase>
@@ -11264,10 +11266,10 @@
     *: "Queue Last Shuffled"
   </source>
   <dest>
-    *: "Queue Last Shuffled"
+    *: "В конец очереди и перемешать"
   </dest>
   <voice>
-    *: "Queue Last Shuffled"
+    *: "В конец очереди и перемешать"
   </voice>
 </phrase>
 <phrase>
@@ -11679,11 +11681,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Top Quickscreen Item"
+    quickscreen: "Установить как верхнюю кнопку на быстром экране"
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Top Quickscreen Item"
+    quickscreen: "Установить как верхнюю кнопку на быстром экране"
   </voice>
 </phrase>
 <phrase>
@@ -12749,10 +12751,10 @@
     *: "Rewind on Pause"
   </source>
   <dest>
-    *: "Перемотка назад на Паузе"
+    *: "Перемотка назад на паузе"
   </dest>
   <voice>
-    *: "Перемотка назад на Паузе"
+    *: "Перемотка назад на паузе"
   </voice>
 </phrase>
 <phrase>
@@ -12791,10 +12793,10 @@
     *: "Default Sleep Timer Duration"
   </source>
   <dest>
-    *: "Продолжительность таймера сна по-умолчанию"
+    *: "Продолжительность таймера сна по умолчанию"
   </dest>
   <voice>
-    *: "Продолжительность таймера сна по-умолчанию"
+    *: "Продолжительность таймера сна по умолчанию"
   </voice>
 </phrase>
 <phrase>
@@ -12823,5 +12825,95 @@
   </dest>
   <voice>
     *: "Запускать таймер сна при загрузке"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Кешировать глифов"
+  </dest>
+  <voice>
+    *: "Кешировать глифов"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Сигнал через динамик при нажатии клавиш"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Сигнал через динамик при нажатии клавиш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Сигнал через наушники при нажатии клавиш"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Сигнал через наушники при нажатии клавиш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Ярлыки"
+  </dest>
+  <voice>
+    *: "Ярлыки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Запуск/выключение"
+  </dest>
+  <voice>
+    *: "Запуск/выключение"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Перезапускать таймер сна при нажатии клавиш"
+  </dest>
+  <voice>
+    *: "Перезапускать таймер сна при нажатии клавиш"
   </voice>
 </phrase>
