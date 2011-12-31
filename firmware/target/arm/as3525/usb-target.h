@@ -21,7 +21,6 @@
 #ifndef USB_TARGET_H
 #define USB_TARGET_H
 
-int usb_detect(void);
 void usb_insert_int(void);
 void usb_remove_int(void);
 

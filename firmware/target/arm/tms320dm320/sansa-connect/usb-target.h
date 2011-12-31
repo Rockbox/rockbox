@@ -25,7 +25,6 @@
 #include "dm320.h"
 
 #include <stdbool.h>
-int usb_detect(void);
 bool usb_drv_connected(void);
 
 #endif

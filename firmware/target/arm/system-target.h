@@ -49,6 +49,8 @@
 #define inw(a) (*(volatile unsigned short *) (a))
 #define outw(a,b) (*(volatile unsigned short *) (b) = (a))
 
+void usb_pin_init(void);
+
 static inline void udelay(unsigned usecs)
 {
     unsigned stop = USEC_TIMER + usecs;
