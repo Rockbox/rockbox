@@ -54,6 +54,15 @@ struct usb_endpoint
 static unsigned char setup_pkt_buf[8];
 static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS];
 
+#if 0
+#define ZVM_SPECIFIC                asm volatile( \
+                                                 "LDR     R12, =0x50FFC000\n" \
+                                                 "LDRH    R12, [R12]\n"  \
+                                                 : : : "r12");
+#else
+#define ZVM_SPECIFIC
+#endif
+
 static bool high_speed_mode = false;
 
 static inline void or_int_value(volatile unsigned short *a, volatile unsigned short *b, unsigned long r, unsigned long value)

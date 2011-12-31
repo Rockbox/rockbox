@@ -21,40 +21,46 @@
 #ifndef ISP1583_H
 #define ISP1583_H
 
-#include "usb-target.h"
+#include "dm320.h"
 
-#ifndef ISP1583_H_OVERRIDE
-/* Initialization registers */
-#define ISP1583_INIT_ADDRESS        (*((volatile unsigned char*)(ISP1583_IOBASE+0x0)))
-#define ISP1583_INIT_MODE           (*((volatile unsigned short*)(ISP1583_IOBASE+0xC)))
-#define ISP1583_INIT_INTCONF        (*((volatile unsigned char*)(ISP1583_IOBASE+0x10)))
-#define ISP1583_INIT_OTG            (*((volatile unsigned char*)(ISP1583_IOBASE+0x12)))
-#define ISP1583_INIT_INTEN_A        (*((volatile unsigned long*)(ISP1583_IOBASE+0x14)))
-#define ISP1583_INIT_INTEN_B
-#define ISP1583_INIT_INTEN_READ     ISP1583_INIT_INTEN_A
-/* Data Flow registers */
-#define ISP1583_DFLOW_EPINDEX       (*((volatile unsigned char*)(ISP1583_IOBASE+0xC2)))
-#define ISP1583_DFLOW_CTRLFUN       (*((volatile unsigned char*)(ISP1583_IOBASE+0x28)))
-#define ISP1583_DFLOW_DATA          (*((volatile unsigned short*)(ISP1583_IOBASE+0x20)))
-#define ISP1583_DFLOW_BUFLEN        (*((volatile unsigned short*)(ISP1583_IOBASE+0x1C)))
-#define ISP1583_DFLOW_BUFSTAT       (*((volatile unsigned char*)(ISP1583_IOBASE+0x1E)))
-#define ISP1583_DFLOW_MAXPKSZ       (*((volatile unsigned short*)(ISP1583_IOBASE+0x04)))
-#define ISP1583_DFLOW_EPTYPE        (*((volatile unsigned short*)(ISP1583_IOBASE+0x08)))
+/* General purpose memory region #2 */
+#define ISP1583_IOBASE              0x60FFC000
+
+#define ISP1583_INIT_ADDRESS        (*((volatile unsigned char*)(ISP1583_IOBASE+0x0))) //char
+#define ISP1583_INIT_MODE           (*((volatile unsigned short*)(ISP1583_IOBASE+0xC*2)))
+#define ISP1583_INIT_INTCONF        (*((volatile unsigned char*)(ISP1583_IOBASE+0x10*2))) //char
+#define ISP1583_INIT_OTG            (*((volatile unsigned char*)(ISP1583_IOBASE+0x12*2))) //char
+#define ISP1583_INIT_INTEN_A        (*((volatile unsigned short*)(ISP1583_IOBASE+0x14*2)))
+#define ISP1583_INIT_INTEN_B        (*((volatile unsigned short*)(ISP1583_IOBASE+0x14*2+4)))
+#define ISP1583_INIT_INTEN_READ     (unsigned long)( (ISP1583_INIT_INTEN_A & 0xFFFF) | ((ISP1583_INIT_INTEN_B & 0xFFFF) << 16) )
+/* Data flow registers */
+#define ISP1583_DFLOW_EPINDEX       (*((volatile unsigned char*)(ISP1583_IOBASE+0xC2*2))) //char
+#define ISP1583_DFLOW_CTRLFUN       (*((volatile unsigned char*)(ISP1583_IOBASE+0x28*2))) //char
+#define ISP1583_DFLOW_DATA          (*((volatile unsigned short*)(ISP1583_IOBASE+0x20*2)))
+#define ISP1583_DFLOW_BUFLEN        (*((volatile unsigned short*)(ISP1583_IOBASE+0x1C*2)))
+#define ISP1583_DFLOW_BUFSTAT       (*((volatile unsigned char*)(ISP1583_IOBASE+0x1E*2))) //char
+#define ISP1583_DFLOW_MAXPKSZ       (*((volatile unsigned short*)(ISP1583_IOBASE+0x04*2)))
+#define ISP1583_DFLOW_EPTYPE        (*((volatile unsigned short*)(ISP1583_IOBASE+0x08*2)))
 /* DMA registers */
-#define ISP1583_DMA_ENDPOINT        (*((volatile unsigned char*)(ISP1583_IOBASE+0x58)))
+#define ISP1583_DMA_ENDPOINT        (*((volatile unsigned char*)(ISP1583_IOBASE+0x58*2)))
 /* General registers */
-#define ISP1583_GEN_INT_A           (*((volatile unsigned long*)(ISP1583_IOBASE+0x18)))
-#define ISP1583_GEN_INT_B
-#define ISP1583_GEN_INT_READ        ISP1583_GEN_INT_A
-#define ISP1583_GEN_CHIPID          (*((volatile unsigned long*)(ISP1583_IOBASE+0x70))) /* Size=3 bytes */
-#define ISP1583_GEN_FRAMEN0         (*((volatile unsigned short*)(ISP1583_IOBASE+0x74)))
-#define ISP1583_GEN_SCRATCH         (*((volatile unsigned short*)(ISP1583_IOBASE+0x78)))
-#define ISP1583_GEN_UNLCKDEV        (*((volatile unsigned short*)(ISP1583_IOBASE+0x7C)))
-#define ISP1583_GEN_TSTMOD          (*((volatile unsigned char*)(ISP1583_IOBASE+0x84)))
+#define ISP1583_GEN_INT_A           (*((volatile unsigned short*)(ISP1583_IOBASE+0x18*2)))
+#define ISP1583_GEN_INT_B           (*((volatile unsigned short*)(ISP1583_IOBASE+0x18*2+4)))
+#define ISP1583_GEN_INT_READ        (unsigned long)( (ISP1583_GEN_INT_A & 0xFFFF) | ((ISP1583_GEN_INT_B & 0xFFFF) << 16))
+#define ISP1583_GEN_CHIPID_A        (*((volatile unsigned short*)(ISP1583_IOBASE+0x70*2)))
+#define ISP1583_GEN_CHIPID_B        (*((volatile unsigned char*)(ISP1583_IOBASE+0x70*2+4))) //char
+#define ISP1583_GEN_CHIPID          (unsigned long)( (ISP1583_GEN_CHIPID_A & 0xFFFF) | ((ISP1583_GEN_CHIPID_B & 0xFFFF) << 16) )
+#define ISP1583_GEN_FRAMEN0         (*((volatile unsigned short*)(ISP1583_IOBASE+0x74*2)))
+#define ISP1583_GEN_SCRATCH         (*((volatile unsigned short*)(ISP1583_IOBASE+0x78*2)))
+#define ISP1583_GEN_UNLCKDEV        (*((volatile unsigned short*)(ISP1583_IOBASE+0x7C*2)))
+#define ISP1583_GEN_TSTMOD          (*((volatile unsigned char*)(ISP1583_IOBASE+0x84*2))) //char
 
-#define set_int_value(a,b,value)    (a) = (value);
-#endif
-
+#define EN_INT_CPU_TARGET           IO_INTC_EINT1 |= INTR_EINT1_EXT7
+#define DIS_INT_CPU_TARGET          IO_INTC_EINT1 &= ~INTR_EINT1_EXT7
+#define INT_CONF_TARGET             0
+//#define INT_CONF_TARGET             2
+#define set_int_value(a,b,value)    a = value & 0xFFFF; \
+                                    b = value >> 16;
 #define ISP1583_UNLOCK_CODE         ((unsigned short)0xAA37)
 
 /* Initialization registers' bits */
@@ -170,11 +176,7 @@
 #define STANDARD_INTEN              ( INIT_INTEN_IEBRST | INIT_INTEN_IEHS_STA | INT_IESUSP | INT_IERESM | INIT_INTEN_IEVBUS | INIT_INTEN_IEP0SETUP | INIT_INTEN_IEP0RX | INIT_INTEN_IEP0TX )
 #define STANDARD_INIT_MODE          ( INIT_MODE_CLKAON | INIT_MODE_GLINTENA )
 
-#ifdef USE_IRAM
- #define IRAM_ATTR __attribute__ ((section(".icode")))
-#else
- #define IRAM_ATTR
-#endif
+#define IRAM_ATTR __attribute__ ((section(".icode")))
 
 #include "usb_drv.h"
 
