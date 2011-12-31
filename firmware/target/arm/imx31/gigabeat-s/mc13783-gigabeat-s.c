@@ -27,7 +27,6 @@
 #include "mc13783-target.h"
 #include "adc-target.h"
 #include "button-target.h"
-#include "usb-target.h"
 #include "power-gigabeat-s.h"
 #include "powermgmt-target.h"
 

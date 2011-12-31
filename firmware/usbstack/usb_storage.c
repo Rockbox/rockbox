@@ -35,9 +35,6 @@
 #include "timefuncs.h"
 #endif
 
-/* For sector filter macro definitions */
-#include "usb-target.h"
-
 #ifdef USB_USE_RAMDISK
 #define RAMDISK_SIZE 2048
 #endif

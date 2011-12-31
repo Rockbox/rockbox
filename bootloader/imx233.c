@@ -40,7 +40,6 @@
 #include "version.h"
 
 #include "usb.h"
-#include "usb-target.h"
 
 extern char loadaddress[];
 extern char loadaddressend[];

@@ -23,7 +23,6 @@
 #include "system.h"
 #include "kernel.h"
 #include "usb.h"
-#include "usb-target.h"
 #include "usb_drv.h"
 #include "usb_core.h"
 #include "isp1583.h"

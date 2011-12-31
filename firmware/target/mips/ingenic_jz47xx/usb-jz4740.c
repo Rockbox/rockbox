@@ -26,7 +26,6 @@
 #include "usb_ch9.h"
 #include "usb_drv.h"
 #include "usb_core.h"
-#include "usb-target.h"
 #include "jz4740.h"
 #include "thread.h"
 

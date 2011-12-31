@@ -24,7 +24,6 @@
 #include "power.h"
 #include "string.h"
 #include "system-target.h"
-#include "usb-target.h"
 
 struct current_step_bit_t
 {

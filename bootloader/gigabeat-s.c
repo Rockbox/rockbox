@@ -36,7 +36,6 @@
 #include "button.h"
 #include "font.h"
 #include "lcd.h"
-#include "usb-target.h"
 #include "version.h"
 
 /* Show the Rockbox logo - in show_logo.c */

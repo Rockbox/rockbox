@@ -22,7 +22,6 @@
 #include "system.h"
 #include "usb.h"
 #include "usb_drv.h"
-#include "usb-target.h"
 #include "as3525.h"
 #include "clock-target.h"
 #include "ascodec.h"

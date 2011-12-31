@@ -27,7 +27,6 @@
 #include "adc.h"
 #include "powermgmt.h"
 #include "power.h"
-#include "usb-target.h"
 #include "usb.h"
 
 /*===========================================================================

@@ -24,7 +24,6 @@
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #endif
-#include "usb-target.h"
 #include "power.h"
 #include "as3525.h"
 #include "usb_drv.h"

@@ -50,7 +50,6 @@
 #include "system.h"
 #include "as3525.h"
 #include "i2c.h"
-#include "usb-target.h"
 
 #define I2C2_DATA       *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x00))
 #define I2C2_SLAD0      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x04))

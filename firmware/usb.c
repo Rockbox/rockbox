@@ -34,7 +34,6 @@
 #include "disk.h"
 #include "panic.h"
 #include "lcd.h"
-#include "usb-target.h"
 #include "usb.h"
 #include "button.h"
 #include "string.h"

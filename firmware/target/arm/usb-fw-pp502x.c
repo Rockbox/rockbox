@@ -25,7 +25,6 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
-#include "usb-target.h"
 #include "usb.h"
 #include "button.h"
 #include "ata.h"

@@ -27,7 +27,6 @@
 #include "sd-pp-target.h"
 #endif
 #include "button-target.h"
-#include "usb-target.h"
 #include "usb_drv.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote-target.h"

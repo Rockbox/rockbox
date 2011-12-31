@@ -48,7 +48,6 @@
 #if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
 #include "usb_drv.h"
 #endif
-#include "usb-target.h"
 #if defined(SAMSUNG_YH925)
 /* this function (in lcd-yh925.c) resets the screen orientation for the OF
  * for use with dualbooting */

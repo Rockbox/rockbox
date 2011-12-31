@@ -21,7 +21,6 @@
 
 #include "config.h"
 #include "usb.h"
-#include "usb-target.h"
 #include "usb_drv.h"
 
 #include "cpu.h"

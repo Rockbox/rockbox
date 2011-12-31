@@ -25,7 +25,6 @@
 #include "usb.h"
 #include "usb_drv.h"
 #include "usb_core.h"
-#include "usb-target.h"
 #include "system.h"
 #include "system-target.h"
 #include "clkctrl-imx233.h"

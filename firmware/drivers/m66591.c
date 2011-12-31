@@ -34,7 +34,6 @@
 #include "cpu.h"
 #include "ata.h"
 #include "usb.h"
-#include "usb-target.h"
 #include "m66591.h"
 
 /*******************************************************************************

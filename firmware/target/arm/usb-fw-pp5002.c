@@ -25,7 +25,6 @@
 #include "string.h"
 #include "system.h"
 #include "usb.h"
-#include "usb-target.h"
 
 void usb_pin_init(void)
 {
