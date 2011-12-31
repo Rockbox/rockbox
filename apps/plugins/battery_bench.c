@@ -414,7 +414,9 @@ static void thread(void)
             bat[buf_idx].flags = charge_state();
 #endif
             buf_idx++;
+#if USING_STORAGE_CALLBACK
             rb->register_storage_idle_func(flush_buffer);
+#endif
         }
         
         /* What to do when the measurement buffer is full:
@@ -454,8 +456,12 @@ static void thread(void)
         }
     }
 
+#if USING_STORAGE_CALLBACK
     /* unregister flush callback and flush to disk */
     rb->unregister_storage_idle_func(flush_buffer, true);
+#else
+    flush_buffer(NULL);
+#endif
     
     /* log end of bench and exit reason */
     fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND, 0666);

@@ -1,4 +1,7 @@
 /* plugins common to all models */
+#ifndef SIMULATOR
+battery_bench.c
+#endif
 chessclock.c
 credits.c
 cube.c
@@ -115,8 +118,6 @@ iriver_flash.c
 #if (CONFIG_CPU == SH7034)
 rockbox_flash.c
 #endif /* CONFIG_CPU */
-
-battery_bench.c
 
 #if defined(IPOD_NANO2G)
 crypt_firmware.c
