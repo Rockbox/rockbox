@@ -1977,6 +1977,7 @@ void playlist_init(void)
     handle = core_alloc_ex("playlist buf",
                                 playlist->buffer_size, &ops);
     playlist->buffer = core_get_data(handle);
+    playlist->buffer_handle = handle;
     playlist->control_mutex = &current_playlist_mutex;
 
     empty_playlist(playlist, true);
@@ -3392,9 +3393,6 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     char tmp_buf[MAX_PATH+1];
     int result = 0;
     bool overwrite_current = false;
-    int old_handle = -1;
-    char* old_buffer = NULL;
-    size_t old_buffer_size = 0;
 
     if (!playlist)
         playlist = &current_playlist;
@@ -3407,6 +3405,10 @@ int playlist_save(struct playlist_info* playlist, char *filename)
                           strlen(filename)+1, getcwd(NULL, -1)) < 0)
         return -1;
 
+    /* can ignore volatile here, because core_get_data() is called later */
+    char* old_buffer = (char*)playlist->buffer;
+    size_t old_buffer_size = playlist->buffer_size;
+
     if (!strncmp(playlist->filename, path, strlen(path)))
     {
         /* Attempting to overwrite current playlist file.*/
@@ -3415,10 +3417,6 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         {
             /* not enough buffer space to store updated indices */
             /* Try to get a buffer */
-            old_handle = playlist->buffer_handle;
-            /* can ignore volatile here, because core_get_data() is called later */
-            old_buffer = (char*)playlist->buffer;
-            old_buffer_size = playlist->buffer_size;
             playlist->buffer = plugin_get_buffer((size_t*)&playlist->buffer_size);
             if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
             {
@@ -3548,8 +3546,8 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     cpu_boost(false);
 
 reset_old_buffer:
-    if (old_handle > 0)
-        old_buffer = core_get_data(old_handle);
+    if (playlist->buffer_handle > 0)
+        old_buffer = core_get_data(playlist->buffer_handle);
     playlist->buffer = old_buffer;
     playlist->buffer_size = old_buffer_size;
 
