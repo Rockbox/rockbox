@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2009 by Michael Sparmann
+ * Copyright © 2010 Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -81,6 +82,30 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     return 0;
 }
 
+int usb_drv_port_speed(void)
+{
+    static const uint8_t speed[4] = {
+        [DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ] = 1,
+        [DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ] = 0,
+        [DSTS_ENUMSPD_FS_PHY_48MHZ]          = 0,
+        [DSTS_ENUMSPD_LS_PHY_6MHZ]           = 0,
+    };
+
+    unsigned enumspd = extract(DSTS, enumspd);
+
+    if(enumspd == DSTS_ENUMSPD_LS_PHY_6MHZ)
+        panicf("usb-drv: LS is not supported");
+
+    return speed[enumspd & 3];
+}
+
+void usb_drv_set_test_mode(int mode)
+{
+    /* there is a perfect matching between usb test mode code
+     * and the register field value */
+    DCTL = (DCTL & ~bitm(DCTL, tstctl)) | (mode << DCTL_tstctl_bitp);
+}
+
 #if CONFIG_CPU == AS3525v2 /* FIXME FIXME FIXME */
 # include "as3525/usb-drv-as3525v2.c"
 #else
@@ -99,11 +124,6 @@ static union
     struct usb_ctrlrequest header; /* 8 bytes */
     unsigned char payload[64];
 } ctrlreq USB_DEVBSS_ATTR;
-
-int usb_drv_port_speed(void)
-{
-    return (DSTS & 2) == 0 ? 1 : 0;
-}
 
 static void reset_endpoints(int reinit)
 {
@@ -329,11 +349,6 @@ void usb_drv_cancel_all_transfers(void)
     int flags = disable_irq_save();
     reset_endpoints(0);
     restore_irq(flags);
-}
-
-void usb_drv_set_test_mode(int mode)
-{
-    (void)mode;
 }
 
 void usb_drv_init(void)

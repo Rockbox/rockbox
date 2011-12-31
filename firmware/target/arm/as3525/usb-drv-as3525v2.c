@@ -366,23 +366,6 @@ void INT_USB(void)
     GINTSTS = sts;
 }
 
-int usb_drv_port_speed(void)
-{
-    static const uint8_t speed[4] = {
-        [DSTS_ENUMSPD_HS_PHY_30MHZ_OR_60MHZ] = 1,
-        [DSTS_ENUMSPD_FS_PHY_30MHZ_OR_60MHZ] = 0,
-        [DSTS_ENUMSPD_FS_PHY_48MHZ]          = 0,
-        [DSTS_ENUMSPD_LS_PHY_6MHZ]           = 0,
-    };
-
-    unsigned enumspd = extract(DSTS, enumspd);
-
-    if(enumspd == DSTS_ENUMSPD_LS_PHY_6MHZ)
-        panicf("usb-drv: LS is not supported");
-
-    return speed[enumspd & 3];
-}
-
 int usb_drv_request_endpoint(int type, int dir)
 {
     bool out = dir == USB_DIR_OUT;
@@ -455,11 +438,4 @@ int usb_drv_send(int ep, void *ptr, int len)
     while (endpoint->busy && !endpoint->done)
         semaphore_wait(&endpoint->complete, TIMEOUT_BLOCK);
     return endpoint->status;
-}
-
-void usb_drv_set_test_mode(int mode)
-{
-    /* there is a perfect matching between usb test mode code
-     * and the register field value */
-    DCTL = (DCTL & ~bitm(DCTL, tstctl)) | (mode << DCTL_tstctl_bitp);
 }
