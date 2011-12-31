@@ -40,9 +40,9 @@ static const uint8_t in_ep_list[] = {0, 1, 3, 5};
 static const uint8_t out_ep_list[] = {0, 2, 4};
 
 /* store per endpoint, per direction, information */
-struct usb_endpoint
+struct ep_type
 {
-    unsigned int len; /* length of the data buffer */
+    unsigned int size; /* length of the data buffer */
     struct semaphore complete; /* wait object */
     int8_t status; /* completion status (0 for success) */
     bool active; /* true is endpoint has been requested (true for EP0) */
@@ -67,7 +67,7 @@ enum ep0state
 };
 
 /* endpoints[ep_num][DIR_IN/DIR_OUT] */
-static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS][2];
+static struct ep_type endpoints[USB_NUM_ENDPOINTS][2];
 /* setup packet for EP0 */
 
 /* USB control requests may be up to 64 bytes in size.
@@ -116,7 +116,7 @@ static void reset_endpoints(void)
         for (unsigned i = 0; i < num_eps(dir == DIR_OUT); i++)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
-            struct usb_endpoint *endpoint = &endpoints[ep][out];
+            struct ep_type *endpoint = &endpoints[ep][out];
             endpoint->active = false;
             endpoint->busy   = false;
             endpoint->status = -1;
@@ -148,7 +148,7 @@ static void cancel_all_transfers(bool cancel_ep0)
         for (unsigned i = !!cancel_ep0; i < num_eps(dir == DIR_OUT); i++)
         {
             int ep = ((dir == DIR_IN) ? in_ep_list : out_ep_list)[i];
-            struct usb_endpoint *endpoint = &endpoints[ep][dir == DIR_OUT];
+            struct ep_type *endpoint = &endpoints[ep][dir == DIR_OUT];
             endpoint->status = -1;
             endpoint->busy   = false;
             endpoint->done   = false;
@@ -259,17 +259,17 @@ static void handle_ep_int(int ep, bool out)
 
     if(sts & DEPINT_xfercompl)
     {
-        struct usb_endpoint *endpoint = &endpoints[ep][out ? DIR_OUT : DIR_IN];
+        struct ep_type *endpoint = &endpoints[ep][out ? DIR_OUT : DIR_IN];
         if(endpoint->busy)
         {
             endpoint->busy = false;
             endpoint->status = 0;
             /* works even for EP0 */
             int size = (DEPTSIZ(ep, out) & DEPTSIZ_xfersize_bits);
-            int transfered = endpoint->len - size;
+            int transfered = endpoint->size - size;
             if(ep == 0)
             {
-                bool is_ack = endpoint->len == 0;
+                bool is_ack = endpoint->size == 0;
                 switch(ep0_state)
                 {
                 case EP0_WAIT_SETUP:
@@ -287,7 +287,7 @@ static void handle_ep_int(int ep, bool out)
                 }
             }
             if (!out)
-                endpoint->len = size;
+                endpoint->size = size;
             usb_core_transfer_complete(ep, out ? USB_DIR_OUT : USB_DIR_IN, 0, transfered);
             endpoint->done = true;
             semaphore_release(&endpoint->complete);
@@ -428,9 +428,9 @@ static void usb_drv_transfer(int ep, void *ptr, int len, bool out)
     /* disable interrupts to avoid any race */
     int oldlevel = disable_irq_save();
 
-    struct usb_endpoint *endpoint = &endpoints[ep][out ? DIR_OUT : DIR_IN];
+    struct ep_type *endpoint = &endpoints[ep][out ? DIR_OUT : DIR_IN];
     endpoint->busy   = true;
-    endpoint->len    = len;
+    endpoint->size   = len;
     endpoint->status = -1;
 
     if (out)
@@ -467,7 +467,7 @@ int usb_drv_recv(int ep, void *ptr, int len)
 int usb_drv_send(int ep, void *ptr, int len)
 {
     ep = EP_NUM(ep);
-    struct usb_endpoint *endpoint = &endpoints[ep][1];
+    struct ep_type *endpoint = &endpoints[ep][1];
     endpoint->done = false;
     usb_drv_transfer(ep, ptr, len, false);
     while (endpoint->busy && !endpoint->done)
