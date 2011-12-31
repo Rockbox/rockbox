@@ -480,6 +480,14 @@
 /** Device Endpoint (ep) DMA Address Register */
 #define DEPDMA(x,out)  (*((const void* volatile*)(OTGBASE + 0x914 + (0x200 * (!!out)) + 0x20 * (x))))
 
+#if 0 /* Those are present in as3525v2, not s5l870x */
+/** Device IN Endpoint (ep) Transmit FIFO Status Register */
+#define DTXFSTS(ep) (*((const void* volatile*)(OTGBASE + 0x918 + 0x20 * (x))))
+
+/** Device OUT Endpoint (ep) Frame number Register */
+#define DOEPFN(ep)  (*((const void* volatile*)(OTGBASE + 0xB04 + 0x20 * (x))))
+#endif
+
 /* Power and Clock Gating Register */
 #define PCGCCTL     (*((uint32_t volatile*)(OTGBASE + 0xE00)))
 

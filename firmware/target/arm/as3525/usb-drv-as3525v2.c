@@ -33,7 +33,6 @@
 #include "system.h"
 //#define LOGF_ENABLE
 #include "logf.h"
-#include "usb-drv-as3525v2.h"
 #include "usb_core.h"
 
 static const uint8_t in_ep_list[] = {0, 1, 3, 5};
