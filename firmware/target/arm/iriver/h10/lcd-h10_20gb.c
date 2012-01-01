@@ -230,8 +230,8 @@ static void lcd_power_on(void)
     sleep(HZ/25);
 
     /* Instructions for other mode settings (in register order). */
-    /* SM=0, GS=x, SS=0, NL4-0=10011 (G1-G160)*/
-    lcd_write_reg(R_DRV_OUTPUT_CONTROL, y_offset ? 0x0013 : 0x0113); /* different to X5 */
+    /* SM=0, GS=x, SS=x, NL4-0=10011 (G1-G160)*/
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, y_offset ? 0x0213 : 0x0113); /* different to X5 */
     /* FLD1-0=01 (1 field), B/C=1, EOR=1 (C-pat), NW5-0=000000 (1 row) */
     lcd_write_reg(R_DRV_AC_CONTROL, 0x0700);
     /* DIT=0, BGR=1, HWM=0, I/D1-0=10, AM=1, LG2-0=000 */
@@ -241,7 +241,7 @@ static void lcd_power_on(void)
     /* NO1-0=01, SDT1-0=00, EQ1-0=00, DIV1-0=00, RTN3-00000 */
     lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x4000);
     /* SCN4-0=000x0 (G1/G160) */
-/*    lcd_write_reg(R_GATE_SCAN_START_POS, y_offset ? 0x0000 : 0x0002); */
+    lcd_write_reg(R_GATE_SCAN_START_POS, y_offset ? 0x0002 : 0x0000);
     /* VL7-0=0x00 */
     lcd_write_reg(R_VERT_SCROLL_CONTROL, 0x0000);
     /* SE17-10(End)=0x9f (159), SS17-10(Start)=0x00 */
