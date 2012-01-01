@@ -85,6 +85,7 @@ struct ARM_REGS {
 
 void dumpregs(void);
 
+bool usb_plugged(void);
 void usb_connect_event(void);
 
 /** Sector read/write filters **/
