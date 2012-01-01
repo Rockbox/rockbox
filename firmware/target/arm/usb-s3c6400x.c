@@ -481,16 +481,13 @@ static void ep_transfer(int ep, void *ptr, int len, bool out)
 
     if (out)
         DEPCTL(ep, out) &= ~DEPCTL_stall;
-    DEPCTL(ep, out) |= DEPCTL_usbactep;
 
     int mps = usb_drv_port_speed() ? 512 : 64;
     int nb_packets = (len + mps - 1) / mps;
     if (nb_packets == 0)
         nb_packets = 1;
 
-    DEPDMA(ep, out) = len
-        ? (void*)AS3525_PHYSICAL_ADDR(ptr)
-        : (void*)0x10000000;
+    DEPDMA(ep, out) = len ? (void*)AS3525_PHYSICAL_ADDR(ptr) : NULL;
     DEPTSIZ(ep, out) = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
     if(out)
         discard_dcache_range(ptr, len);
@@ -498,6 +495,8 @@ static void ep_transfer(int ep, void *ptr, int len, bool out)
         commit_dcache_range(ptr, len);
 
     logf("pkt=%d dma=%lx", nb_packets, DEPDMA(ep, out));
+
+//    if (!out) while (((GNPTXSTS & 0xffff) << 2) < MIN(mps, length));
 
     DEPCTL(ep, out) |= DEPCTL_epena | DEPCTL_cnak;
 
@@ -530,6 +529,9 @@ static union
     struct usb_ctrlrequest header; /* 8 bytes */
     unsigned char payload[64];
 } ctrlreq USB_DEVBSS_ATTR;
+
+static volatile bool inflight = false;
+static volatile bool plugged = false;
 
 static void reset_endpoints(int reinit)
 {
@@ -567,6 +569,7 @@ static void reset_endpoints(int reinit)
         DEPCTL(4, true) = DEPCTL(4, true) | DEPCTL_usbactep | DEPCTL_setd0pid;
     }
     DAINTMSK = 0xFFFFFFFF;  /* Enable interrupts on all EPs */
+    inflight = false;
 }
 
 int usb_drv_request_endpoint(int type, int dir)
@@ -613,8 +616,8 @@ static void usb_reset(void)
     while (GRSTCTL & GRSTCTL_csftrst);  /* Wait for OTG to ack reset */
     while (!(GRSTCTL & GRSTCTL_ahbidle));  /* Wait for OTG AHB master idle */
 
-    GRXFSIZ = 512;
-    GNPTXFSIZ = MAKE_FIFOSIZE_DATA(512);
+    GRXFSIZ = 1024;
+    GNPTXFSIZ = (256 << 16) | 1024;
 
     GAHBCFG = SYNOPSYSOTG_AHBCFG;
     GUSBCFG = (1 << 12) | (1 << 10) | GUSBCFG_phy_if; /* OTG: 16bit PHY and some reserved bits */
@@ -641,6 +644,7 @@ static void handle_ep_int(bool out)
 
         if (epints & DEPINT_xfercompl)
         {
+            if (!out) inflight = false;
             commit_discard_dcache();
             int bytes = endpoints[ep].size - (DEPTSIZ(ep, out) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
             if (endpoints[ep].busy)
@@ -723,21 +727,36 @@ void INT_USB_FUNC(void)
     GINTSTS = ints;
 }
 
-static void ep_transfer(int ep, void *ptr, int length, bool out)
+static void ep_transfer(int ep, void *ptr, int len, bool out)
 {
-    endpoints[ep].busy = true;
-    endpoints[ep].size = length;
-    if (out)
-        DEPCTL(ep, out) &= ~DEPCTL_stall;
-    int blocksize = usb_drv_port_speed() ? 512 : 64;
-    int packets = (length + blocksize - 1) / blocksize;
-    if (packets == 0)
-        packets = 1;
+    while (!out && inflight && plugged);
+    if (!plugged) return;
 
-    DEPTSIZ(ep, out) = length | (packets << DEPTSIZ0_pkcnt_bitp);
-    DEPDMA(ep, out) = length ? ptr : NULL;
-    commit_dcache();
+    /* disable interrupts to avoid any race */
+    int oldlevel = disable_irq_save();
+    if (!out) inflight = true;
+    endpoints[ep].busy = true;
+    endpoints[ep].size = len;
+
+    if (out) DEPCTL(ep, out) &= ~DEPCTL_stall;
+
+
+    int mps = usb_drv_port_speed() ? 512 : 64;
+    int nb_packets = (len + mps - 1) / mps;
+    if (nb_packets == 0)
+        nb_packets = 1;
+
+    DEPDMA(ep, out) = len ? ptr : NULL;
+    DEPTSIZ(ep, out) = (nb_packets << DEPTSIZ_pkcnt_bitp) | len;
+
+    if(out) discard_dcache_range(ptr, len);
+    else commit_dcache_range(ptr, len);
+
+    logf("pkt=%d dma=%lx", nb_packets, DEPDMA(ep, out));
+
     DEPCTL(ep, out) |= DEPCTL_epena | DEPCTL_cnak;
+
+    restore_irq(oldlevel);
 }
 
 int usb_drv_send(int endpoint, void *ptr, int length)
@@ -775,11 +794,13 @@ void usb_drv_init(void)
     PCGCCTL = 0;
 
     /* reset the beast */
+    plugged = true;
     usb_reset();
 }
 
 void usb_drv_exit(void)
 {
+    plugged = false;
     DCTL = DCTL_pwronprgdone | DCTL_sftdiscon;
 
     OPHYPWR = 0xF;  /* PHY: Power down */

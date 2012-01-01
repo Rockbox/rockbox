@@ -189,7 +189,7 @@
 #define HAVE_WHEEL_POSITION
 
 #define ATA_HAVE_BBT
-#define ATA_BBT_PAGES 3520
+#define ATA_BBT_PAGES 4096
 
 #define SECTOR_SIZE 4096
 
@@ -232,7 +232,7 @@
 
 /* USB defines */
 #define HAVE_USBSTACK
-//#define HAVE_USB_HID_MOUSE - broken?
+#define HAVE_USB_HID_MOUSE
 #define CONFIG_USBOTG USBOTG_S3C6400X
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1261
