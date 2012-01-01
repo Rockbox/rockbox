@@ -144,11 +144,11 @@ static bool verify_shortcut(struct shortcut* sc)
         case SHORTCUT_BROWSER:
         case SHORTCUT_FILE:
         case SHORTCUT_PLAYLISTMENU:
-            return sc->u.path[0] != '0';
+            return sc->u.path[0] != '\0';
         case SHORTCUT_SETTING:
             return sc->u.setting != NULL;
         case SHORTCUT_TIME:
-            return sc->name[0] != '0';
+            return sc->name[0] != '\0';
         case SHORTCUT_DEBUGITEM:
         case SHORTCUT_SEPARATOR:
         case SHORTCUT_SHUTDOWN:
