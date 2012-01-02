@@ -25,11 +25,17 @@ unix:!mac:!noccache {
 }
 
 MYBUILDDIR = $$OUT_PWD/build/
+MYLIBBUILDDIR = $$MYBUILDDIR/libs/
 OBJECTS_DIR = $$MYBUILDDIR/o
 UI_DIR = $$MYBUILDDIR/ui
 MOC_DIR = $$MYBUILDDIR/moc
 RCC_DIR = $$MYBUILDDIR/rcc
 
+!silent {
+    ADDENV = "V=1"
+} else {
+    ADDENV = "@"
+}
 
 # check version of Qt installation
 VER = $$find(QT_VERSION, ^4\\.[5-9]+.*)
@@ -72,53 +78,53 @@ mac {
 # here. This assumes that QMAKE_CC will always be "gcc", maybe with a postfix.
 MYAR = $$replace(QMAKE_CC,gcc.*,ar)
 
-librbspeex.commands = @$(MAKE) -s \
-        BUILD_DIR=$$MYBUILDDIR/rbspeex/ \
-        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/rbspeex \
-        librbspeex$$RBLIBPOSTFIX \
+librbspeex.commands = $$ADDENV \
+        BUILD_DIR=$$MYLIBBUILDDIR/rbspeex/ \
+        TARGET_DIR=$$MYLIBBUILDDIR \
         SYS_SPEEX=\"$$LIBSPEEX\" \
-        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
-libucl.commands = @$(MAKE) -s \
-        BUILD_DIR=$$MYBUILDDIR/ucl/ \
-        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/tools/ucl/src \
-        libucl$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
-libipodpatcher.commands = @$(MAKE) -s \
-        BUILD_DIR=$$MYBUILDDIR/ipodpatcher/ \
-        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/ipodpatcher \
+        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
+        $(MAKE) -C $$RBBASE_DIR/tools/rbspeex librbspeex$$RBLIBPOSTFIX
+libucl.commands = $$ADDENV \
+        BUILD_DIR=$$MYLIBBUILDDIR/ucl/ \
+        TARGET_DIR=$$MYLIBBUILDDIR \
+        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
+        $(MAKE) -C $$RBBASE_DIR/tools/ucl/src libucl$$RBLIBPOSTFIX
+libipodpatcher.commands = $$ADDENV \
+        BUILD_DIR=$$MYLIBBUILDDIR/ipodpatcher/ \
+        TARGET_DIR=$$MYLIBBUILDDIR \
         APPVERSION=\"rbutil\" \
-        libipodpatcher$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
-libsansapatcher.commands = @$(MAKE) -s \
-        BUILD_DIR=$$MYBUILDDIR/sansapatcher/ \
-        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/sansapatcher \
+        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
+        $(MAKE) -C $$RBBASE_DIR/rbutil/ipodpatcher libipodpatcher$$RBLIBPOSTFIX
+libsansapatcher.commands = $$ADDENV \
+        BUILD_DIR=$$MYLIBBUILDDIR/sansapatcher/ \
+        TARGET_DIR=$$MYLIBBUILDDIR \
         APPVERSION=\"rbutil\" \
-        libsansapatcher$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
-libmkamsboot.commands = @$(MAKE) -s \
-        BUILD_DIR=$$MYBUILDDIR/mkamsboot/ \
-        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkamsboot \
+        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
+        $(MAKE) -C $$RBBASE_DIR/rbutil/sansapatcher libsansapatcher$$RBLIBPOSTFIX
+libmkamsboot.commands = $$ADDENV \
+        BUILD_DIR=$$MYLIBBUILDDIR/mkamsboot/ \
+        TARGET_DIR=$$MYLIBBUILDDIR \
         APPVERSION=\"rbutil\" \
-        libmkamsboot$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
-libmktccboot.commands = @$(MAKE) -s \
-        BUILD_DIR=$$MYBUILDDIR/mktccboot/ \
-        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mktccboot \
+        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
+        $(MAKE) -C $$RBBASE_DIR/rbutil/mkamsboot libmkamsboot$$RBLIBPOSTFIX
+libmktccboot.commands = $$ADDENV \
+        BUILD_DIR=$$MYLIBBUILDDIR/mktccboot/ \
+        TARGET_DIR=$$MYLIBBUILDDIR \
         APPVERSION=\"rbutil\" \
-        libmktccboot$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
-libmkmpioboot.commands = @$(MAKE) -s \
-        BUILD_DIR=$$MYBUILDDIR/mkmpioboot/ \
-        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/mkmpioboot \
+        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
+        $(MAKE) -C $$RBBASE_DIR/rbutil/mktccboot libmktccboot$$RBLIBPOSTFIX
+libmkmpioboot.commands = $$ADDENV \
+        BUILD_DIR=$$MYLIBBUILDDIR/mkmpioboot/ \
+        TARGET_DIR=$$MYLIBBUILDDIR \
         APPVERSION=\"rbutil\" \
-        libmkmpioboot$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
-libchinachippatcher.commands = @$(MAKE) -s \
-        BUILD_DIR=$$MYBUILDDIR/chinachippatcher/ \
-        TARGET_DIR=$$MYBUILDDIR -C $$RBBASE_DIR/rbutil/chinachippatcher \
+        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
+        $(MAKE) -C $$RBBASE_DIR/rbutil/mkmpioboot libmkmpioboot$$RBLIBPOSTFIX
+libchinachippatcher.commands = $$ADDENV \
+        BUILD_DIR=$$MYLIBBUILDDIR/chinachippatcher/ \
+        TARGET_DIR=$$MYLIBBUILDDIR \
         APPVERSION=\"rbutil\" \
-        libchinachippatcher$$RBLIBPOSTFIX \
-        CC=\"$$QMAKE_CC $$MACHINEFLAGS\" AR=\"$$MYAR\"
+        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
+        $(MAKE) -C $$RBBASE_DIR/rbutil/chinachippatcher libchinachippatcher$$RBLIBPOSTFIX
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
 RBLIBS = librbspeex libipodpatcher libsansapatcher libmkamsboot libmktccboot \
@@ -146,7 +152,7 @@ INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher 
 
 DEPENDPATH = $$INCLUDEPATH
 
-LIBS += -L$$OUT_PWD -L$$MYBUILDDIR
+LIBS += -L$$OUT_PWD -L$$MYLIBBUILDDIR
 # append all RBLIBS to LIBS
 for(rblib, RBLIBS) {
     LIBS += -l$$replace(rblib, lib,)
