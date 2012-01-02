@@ -45,11 +45,13 @@ endif
 NATIVECC = gcc
 CC ?= gcc
 ifeq ($(findstring Darwin,$(shell uname)),Darwin)
+ifneq ($(findstring mingw,$(CROSS)$(CC)),mingw)
 # building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
 # might need adjustment for older Xcode.
 CC ?= gcc-4.0
 CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 NATIVECC ?= gcc-4.0
+endif
 endif
 WINDRES = windres
 

@@ -7,7 +7,6 @@
 # $Id$
 #
 CFLAGS = -g -Wall
-CC = gcc
 
 OUTPUT = chinachippatcher
 
