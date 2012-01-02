@@ -59,14 +59,21 @@ bool usb_plugged(void)
     return mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_USB4V4S;
 }
 
-void usb_connect_event(void)
+/* Helper to update the USB cable status */
+static void update_usb_status(bool sense)
 {
-    /* Read the immediate state of the cable from the PMIC */
-    int status = usb_plugged() ? USB_INSERTED : USB_EXTRACTED;
+    int status = sense ? USB_INSERTED : USB_EXTRACTED;
     usb_status = status;
     /* Notify power that USB charging is potentially available */
     charger_usb_detect_event(status);
     usb_status_event(status);
+}
+
+/* Detect presence of USB bus - called from PMIC ISR */
+void usb_connect_event(void)
+{
+    /* Read the associated sense value */
+    update_usb_status(mc13783_event_sense(MC13783_USB_EVENT));
 }
 
 int usb_detect(void)
@@ -80,10 +87,10 @@ void usb_init_device(void)
     usb_drv_startup();
 
     /* Initially poll */
-    usb_connect_event();
+    update_usb_status(usb_plugged());
 
     /* Enable PMIC event */
-    mc13783_enable_event(MC13783_USB_EVENT);
+    mc13783_enable_event(MC13783_USB_EVENT, true);
 }
 
 void usb_enable(bool on)

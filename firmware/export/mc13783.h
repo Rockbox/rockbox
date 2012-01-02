@@ -1333,7 +1333,8 @@ enum mc13783_int_ids
 
 struct mc13783_event
 {
-    enum mc13783_int_ids int_id;
+    enum mc13783_int_ids int_id : 8;
+    uint32_t sense : 24;
     void (*callback)(void);
 };
 
@@ -1343,7 +1344,9 @@ struct mc13783_event_list
     const struct mc13783_event *events;
 };
 
-bool mc13783_enable_event(enum mc13783_event_ids event);
-void mc13783_disable_event(enum mc13783_event_ids event);
+void mc13783_enable_event(enum mc13783_event_ids id, bool enable);
+
+/* Read the sense bit if one exists - valid only within event handlers */
+uint32_t mc13783_event_sense(enum mc13783_event_ids id);
 
 #endif /* _MC13783_H_ */

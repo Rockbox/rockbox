@@ -110,7 +110,7 @@ bool adc_enable_channel(int channel, bool enable)
                 != MC13783_DATA_ERROR;
 }
 
-/* Called by mc13783 interrupt thread when conversion is complete */
+/* ADC conversion complete event - called from PMIC ISR */
 void adc_done(void)
 {
     semaphore_release(&adc_done_signal);
@@ -132,5 +132,5 @@ void adc_init(void)
 
     /* Enable ADCDONE event */
     mc13783_write(MC13783_INTERRUPT_STATUS0, MC13783_ADCDONEI);
-    mc13783_enable_event(MC13783_ADCDONE_EVENT);
+    mc13783_enable_event(MC13783_ADCDONE_EVENT, true);
 }

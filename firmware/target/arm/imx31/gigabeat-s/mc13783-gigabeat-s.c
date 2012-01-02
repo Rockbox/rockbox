@@ -55,28 +55,33 @@ const struct mc13783_event mc13783_events[MC13783_NUM_EVENTS] =
 {
     [MC13783_ADCDONE_EVENT] = /* ADC conversion complete */
     {
-        .int_id = MC13783_INT_ID_ADCDONE,
+        .int_id   = MC13783_INT_ID_ADCDONE,
+        .sense    = 0,
         .callback = adc_done,
     },
     [MC13783_ONOFD1_EVENT] = /* Power button */
     {
-        .int_id = MC13783_INT_ID_ONOFD1,
+        .int_id   = MC13783_INT_ID_ONOFD1,
+        .sense    = MC13783_ONOFD1S,
         .callback = button_power_event,
     },
     [MC13783_SE1_EVENT] = /* Main charger detection */
     {
-        .int_id = MC13783_INT_ID_SE1,
+        .int_id   = MC13783_INT_ID_SE1,
+        .sense    = MC13783_SE1S,
         .callback = charger_main_detect_event,
     },
     [MC13783_USB_EVENT] = /* USB insertion/USB charger detection */
     {
-        .int_id = MC13783_INT_ID_USB,
+        .int_id   = MC13783_INT_ID_USB,
+        .sense    = MC13783_USB4V4S,
         .callback = usb_connect_event,
     },
 #ifdef HAVE_HEADPHONE_DETECTION
     [MC13783_ONOFD2_EVENT] = /* Headphone jack */
     {
-        .int_id = MC13783_INT_ID_ONOFD2,
+        .int_id   = MC13783_INT_ID_ONOFD2,
+        .sense    = 0,
         .callback = headphone_detect_event,
     },
 #endif

@@ -171,7 +171,7 @@ static void headphone_thread(void)
     }
 }
 
-/* This is called from the mc13783 interrupt thread */
+/* HP plugged/unplugged event - called from PMIC ISR */
 void headphone_detect_event(void)
 {
     /* Trigger the thread immediately. */
@@ -197,5 +197,5 @@ void INIT_ATTR headphone_init(void)
 
     /* Initially poll and then enable PMIC event */
     headphone_detect_event();
-    mc13783_enable_event(MC13783_ONOFD2_EVENT);
+    mc13783_enable_event(MC13783_ONOFD2_EVENT, true);
 }

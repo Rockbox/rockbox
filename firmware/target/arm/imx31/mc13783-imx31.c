@@ -26,26 +26,6 @@
 #include "debug.h"
 #include "kernel.h"
 
-extern const struct mc13783_event mc13783_events[MC13783_NUM_EVENTS];
-extern struct spi_node mc13783_spi;
-
-/* PMIC event service data */
-static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
-static const char * const mc13783_thread_name = "pmic";
-static struct semaphore mc13783_svc_wake;
-
-/* Tracking for which interrupts are enabled */
-static uint32_t pmic_int_enabled[2] =
-    { 0x00000000, 0x00000000 };
-
-static const unsigned char pmic_intm_regs[2] =
-    { MC13783_INTERRUPT_MASK0, MC13783_INTERRUPT_MASK1 };
-
-static const unsigned char pmic_ints_regs[2] =
-    { MC13783_INTERRUPT_STATUS0, MC13783_INTERRUPT_STATUS1 };
-
-static volatile unsigned int mc13783_thread_id = 0;
-
 /* Extend the basic SPI transfer descriptor with our own fields */
 struct mc13783_transfer_desc
 {
@@ -57,137 +37,15 @@ struct mc13783_transfer_desc
     };
 };
 
-/* Called when a transfer is finished and data is ready/written */
-static void mc13783_xfer_complete_cb(struct spi_transfer_desc *xfer)
-{
-    semaphore_release(&((struct mc13783_transfer_desc *)xfer)->sema);
-}
+extern const struct mc13783_event mc13783_events[MC13783_NUM_EVENTS];
+extern struct spi_node mc13783_spi;
 
-static inline bool wait_for_transfer_complete(struct mc13783_transfer_desc *xfer)
-{
-    return semaphore_wait(&xfer->sema, TIMEOUT_BLOCK)
-            == OBJ_WAIT_SUCCEEDED && xfer->xfer.count == 0;
-}
-
-static void mc13783_interrupt_thread(void)
-{
-    uint32_t pending[2];
-
-    /* Enable mc13783 GPIO event */
-    gpio_enable_event(MC13783_EVENT_ID);
-
-    while (1)
-    {
-        const struct mc13783_event *event, *event_last;
-
-        semaphore_wait(&mc13783_svc_wake, TIMEOUT_BLOCK);
-
-        if (mc13783_thread_id == 0)
-            break;
-
-        mc13783_read_regs(pmic_ints_regs, pending, 2);
-
-        /* Only clear interrupts being dispatched */
-        pending[0] &= pmic_int_enabled[0];
-        pending[1] &= pmic_int_enabled[1];
-
-        mc13783_write_regs(pmic_ints_regs, pending, 2);
-
-        /* Whatever is going to be serviced in this loop has been
-         * acknowledged. Reenable interrupt and if anything was still
-         * pending or became pending again, another signal will be
-         * generated. */
-        bitset32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
-
-        event = mc13783_events;
-        event_last = event + MC13783_NUM_EVENTS;
-
-        /* .count is surely expected to be > 0 */
-        do
-        {
-            unsigned int set = event->int_id / MC13783_INT_ID_SET_DIV;
-            uint32_t pnd = pending[set];
-            uint32_t mask = 1 << (event->int_id & MC13783_INT_ID_NUM_MASK);
-
-            if (pnd & mask)
-            {
-                event->callback();
-                pending[set] = pnd & ~mask;
-            }
-
-            if ((pending[0] | pending[1]) == 0)
-                break; /* Terminate early if nothing more to service */
-        }
-        while (++event < event_last);
-    }
-
-    gpio_disable_event(MC13783_EVENT_ID);
-}
-
-/* GPIO interrupt handler for mc13783 */
-void mc13783_event(void)
-{
-    /* Mask the interrupt (unmasked when PMIC thread services it). */
-    bitclr32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
-    MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
-    semaphore_release(&mc13783_svc_wake);
-}
-
-void INIT_ATTR mc13783_init(void)
-{
-    /* Serial interface must have been initialized first! */
-    semaphore_init(&mc13783_svc_wake, 1, 0);
-
-    /* Enable the PMIC SPI module */
-    spi_enable_node(&mc13783_spi, true);
-
-    /* Mask any PMIC interrupts for now - modules will enable them as
-     * required */
-    mc13783_write(MC13783_INTERRUPT_MASK0, 0xffffff);
-    mc13783_write(MC13783_INTERRUPT_MASK1, 0xffffff);
-
-    MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
-
-    mc13783_thread_id =
-        create_thread(mc13783_interrupt_thread,
-            mc13783_thread_stack, sizeof(mc13783_thread_stack), 0,
-            mc13783_thread_name IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
-}
-
-void mc13783_close(void)
-{
-    unsigned int thread_id = mc13783_thread_id;
-
-    if (thread_id == 0)
-        return;
-
-    mc13783_thread_id = 0;
-    semaphore_release(&mc13783_svc_wake);
-    thread_wait(thread_id);
-    spi_enable_node(&mc13783_spi, false);
-}
-
-bool mc13783_enable_event(enum mc13783_event_ids id)
-{
-    const struct mc13783_event * const event = &mc13783_events[id];
-    unsigned int set = event->int_id / MC13783_INT_ID_SET_DIV;
-    uint32_t mask = 1 << (event->int_id & MC13783_INT_ID_NUM_MASK);
-
-    pmic_int_enabled[set] |= mask;
-    mc13783_clear(pmic_intm_regs[set], mask);
-
-    return true;
-}
-
-void mc13783_disable_event(enum mc13783_event_ids id)
-{
-    const struct mc13783_event * const event = &mc13783_events[id];
-    unsigned int set = event->int_id / MC13783_INT_ID_SET_DIV;
-    uint32_t mask = 1 << (event->int_id & MC13783_INT_ID_NUM_MASK);
-
-    pmic_int_enabled[set] &= ~mask;
-    mc13783_set(pmic_intm_regs[set], mask);
-}
+static uint32_t pmic_int_enb[2]; /* Enabled ints */
+static uint32_t pmic_int_sense_enb[2]; /* Enabled sense reading */
+static uint32_t int_pnd_buf[2];  /* Pending ints */
+static uint32_t int_data_buf[4]; /* ISR data buffer */
+static struct spi_transfer_desc int_xfers[2]; /* ISR transfer descriptor */
+static bool restore_event = true;
 
 static inline bool mc13783_transfer(struct spi_transfer_desc *xfer,
                                     uint32_t *txbuf,
@@ -203,6 +61,146 @@ static inline bool mc13783_transfer(struct spi_transfer_desc *xfer,
     xfer->next = NULL;
 
     return spi_transfer(xfer);
+}
+
+/* Called when a transfer is finished and data is ready/written */
+static void mc13783_xfer_complete_cb(struct spi_transfer_desc *xfer)
+{
+    semaphore_release(&((struct mc13783_transfer_desc *)xfer)->sema);
+}
+
+static inline bool wait_for_transfer_complete(struct mc13783_transfer_desc *xfer)
+{
+    return semaphore_wait(&xfer->sema, TIMEOUT_BLOCK)
+            == OBJ_WAIT_SUCCEEDED && xfer->xfer.count == 0;
+}
+
+/* Efficient interrupt status and acking */
+static void mc13783_int_svc_complete_callback(struct spi_transfer_desc *xfer)
+{
+    /* Restore PMIC interrupt events */
+    if (restore_event)
+        bitset32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
+
+    /* Call handlers */
+    for (
+        const struct mc13783_event *event = mc13783_events;
+        int_pnd_buf[0] | int_pnd_buf[1];
+        event++
+    )
+    {
+        unsigned int set = event->int_id / MC13783_INT_ID_SET_DIV;
+        uint32_t pnd = int_pnd_buf[set];
+        uint32_t mask = 1 << (event->int_id & MC13783_INT_ID_NUM_MASK);
+
+        if (pnd & mask)
+        {
+            event->callback();
+            int_pnd_buf[set] = pnd & ~mask;
+        }
+    }
+
+    (void)xfer;
+}
+
+static void mc13783_int_svc_callback(struct spi_transfer_desc *xfer)
+{
+    /* Only clear interrupts with handlers */
+    int_pnd_buf[0] &= pmic_int_enb[0];
+    int_pnd_buf[1] &= pmic_int_enb[1];
+
+    /* Only read sense if enabled interrupts have them enabled */
+    if ((int_pnd_buf[0] & pmic_int_sense_enb[0]) ||
+        (int_pnd_buf[1] & pmic_int_sense_enb[1]))
+    {
+        int_data_buf[2] = MC13783_INTERRUPT_SENSE0 << 25;
+        int_data_buf[3] = MC13783_INTERRUPT_SENSE1 << 25;
+        int_xfers[1].rxbuf = int_data_buf;
+        int_xfers[1].count = 4;
+    }
+
+    /* Setup the write packets with status(es) to clear */
+    int_data_buf[0] = (1 << 31) | (MC13783_INTERRUPT_STATUS0 << 25)
+                        | int_pnd_buf[0];
+    int_data_buf[1] = (1 << 31) | (MC13783_INTERRUPT_STATUS1 << 25)
+                        | int_pnd_buf[1];
+    (void)xfer;
+}
+
+/* GPIO interrupt handler for mc13783 */
+void mc13783_event(void)
+{
+    /* Mask the interrupt (unmasked after final read services it). */
+    bitclr32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
+    MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
+
+    /* Setup the read packets */
+    int_pnd_buf[0] = MC13783_INTERRUPT_STATUS0 << 25;
+    int_pnd_buf[1] = MC13783_INTERRUPT_STATUS1 << 25;
+
+    unsigned long cpsr = disable_irq_save();
+
+    /* Do these without intervening transfers */
+    if (mc13783_transfer(&int_xfers[0], int_pnd_buf, int_pnd_buf, 2,
+                         mc13783_int_svc_callback))
+    {
+        /* Start this provisionally and fill-in actual values during the
+           first transfer's callback - set whatever could be known */
+        mc13783_transfer(&int_xfers[1], int_data_buf, NULL, 2,
+                         mc13783_int_svc_complete_callback);
+    }
+
+    restore_irq(cpsr);
+}
+
+void INIT_ATTR mc13783_init(void)
+{
+    /* Serial interface must have been initialized first! */
+
+    /* Enable the PMIC SPI module */
+    spi_enable_node(&mc13783_spi, true);
+
+    /* Mask any PMIC interrupts for now - modules will enable them as
+     * required */
+    mc13783_write(MC13783_INTERRUPT_MASK0, 0xffffff);
+    mc13783_write(MC13783_INTERRUPT_MASK1, 0xffffff);
+
+    MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
+    gpio_enable_event(MC13783_EVENT_ID);
+}
+
+void mc13783_close(void)
+{
+    gpio_disable_event(MC13783_EVENT_ID);
+    spi_enable_node(&mc13783_spi, false);
+}
+
+void mc13783_enable_event(enum mc13783_event_ids id, bool enable)
+{
+    static const unsigned char pmic_intm_regs[2] =
+        { MC13783_INTERRUPT_MASK0, MC13783_INTERRUPT_MASK1 };
+
+    const struct mc13783_event * const event = &mc13783_events[id];
+    unsigned int set = event->int_id / MC13783_INT_ID_SET_DIV;
+    uint32_t mask = 1 << (event->int_id & MC13783_INT_ID_NUM_MASK);
+
+    /* Mask GPIO while changing bits around */
+    restore_event = false;
+    bitclr32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
+    mc13783_write_masked(pmic_intm_regs[set],
+                         enable ? 0 : mask, mask);
+    bitmod32(&pmic_int_enb[set], enable ? mask : 0, mask);
+    bitmod32(&pmic_int_sense_enb[set], enable ? event->sense : 0,
+             event->sense);
+    restore_event = true;
+    bitset32(&MC13783_GPIO_IMR, 1ul << MC13783_GPIO_LINE);
+}
+
+uint32_t mc13783_event_sense(enum mc13783_event_ids id)
+{
+    const struct mc13783_event * const event = &mc13783_events[id];
+    unsigned int set = event->int_id / MC13783_INT_ID_SET_DIV;
+    return int_data_buf[2 + set] & event->sense;
 }
 
 uint32_t mc13783_set(unsigned address, uint32_t bits)

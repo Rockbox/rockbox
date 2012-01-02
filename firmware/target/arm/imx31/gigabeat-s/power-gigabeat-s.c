@@ -33,7 +33,7 @@
 #include "fmradio_i2c.h"
 #endif
 
-static unsigned int power_status = POWER_INPUT_NONE;
+static unsigned long power_status = POWER_INPUT_NONE;
 
 /* Detect which power sources are present. */
 unsigned int power_input_status(void)
@@ -58,24 +58,28 @@ void usb_charging_maxcurrent_change(int maxcurrent)
     /* Nothing to do */
 }
 
-/* Detect changes in presence of the AC adaptor. */
-void charger_main_detect_event(void)
+/* Helper to update the charger status */
+static void update_main_charger(bool present)
 {
-    if (mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_SE1S)
-        power_status |= POWER_INPUT_MAIN_CHARGER;
-    else
-        power_status &= ~POWER_INPUT_MAIN_CHARGER;
+    bitmod32(&power_status, present ? POWER_INPUT_MAIN_CHARGER : 0,
+             POWER_INPUT_MAIN_CHARGER);
 }
 
-/* Detect changes in USB bus power. Called from usb connect event handler. */
+/* Detect changes in presence of the AC adaptor. Called from PMIC ISR. */
+void charger_main_detect_event(void)
+{
+    update_main_charger(mc13783_event_sense(MC13783_INT_ID_SE1)
+                            & MC13783_SE1S);
+}
+
+/* Detect changes in USB bus power. Called from usb connect event ISR. */
 void charger_usb_detect_event(int status)
 {
     /* USB plugged does not imply charging is possible or even
      * powering the device to maintain the battery. */
-    if (status == USB_INSERTED)
-        power_status |= POWER_INPUT_USB_CHARGER;
-    else
-        power_status &= ~POWER_INPUT_USB_CHARGER;
+    bitmod32(&power_status,
+             status == USB_INSERTED ? POWER_INPUT_USB_CHARGER : 0,
+             POWER_INPUT_USB_CHARGER);
 }
 
 /* charging_state is implemented in powermgmt-imx31.c */
@@ -152,8 +156,9 @@ void power_init(void)
 #endif
 
     /* Poll initial state */
-    charger_main_detect_event();
+    update_main_charger(mc13783_read(MC13783_INTERRUPT_SENSE0)
+                            & MC13783_SE1S);
 
     /* Enable detect event */
-    mc13783_enable_event(MC13783_SE1_EVENT);
+    mc13783_enable_event(MC13783_SE1_EVENT, true);
 }

@@ -35,7 +35,7 @@
 static bool initialized     = false;
 #endif
 
-static int  ext_btn         = BUTTON_NONE; /* Buttons not on KPP */
+static unsigned long ext_btn = BUTTON_NONE; /* Buttons not on KPP */
 static bool hold_button     = false;
 #ifndef BOOTLOADER
 static bool hold_button_old = false;
@@ -150,24 +150,16 @@ int button_read_device(void)
 #endif
 }
 
-/* This is called from the mc13783 interrupt thread */
+/* Helper to update the power button status */
+static void power_button_update(bool pressed)
+{
+    bitmod32(&ext_btn, pressed ? BUTTON_POWER : 0, BUTTON_POWER);
+}
+
+/* Power button event - called from PMIC ISR */
 void button_power_event(void)
 {
-    bool pressed =
-        (mc13783_read(MC13783_INTERRUPT_SENSE1) & MC13783_ONOFD1S) == 0;
-
-    int oldlevel = disable_irq_save();
-
-    if (pressed)
-    {
-        ext_btn |= BUTTON_POWER;
-    }
-    else
-    {
-        ext_btn &= ~BUTTON_POWER;
-    }
-
-    restore_irq(oldlevel);
+    power_button_update(!mc13783_event_sense(MC13783_ONOFD1_EVENT));
 }
 
 void button_init_device(void)
@@ -203,8 +195,9 @@ void button_init_device(void)
      * 6. Set the KDIE control bit bit. */
     KPP_KPSR = KPP_KPSR_KRSS | KPP_KPSR_KDSC | KPP_KPSR_KPKD;
 
-    button_power_event();
-    mc13783_enable_event(MC13783_ONOFD1_EVENT);
+    power_button_update(!(mc13783_read(MC13783_INTERRUPT_SENSE1)
+                            & MC13783_ONOFD1S));
+    mc13783_enable_event(MC13783_ONOFD1_EVENT, true);
 
 #ifdef HAVE_HEADPHONE_DETECTION
     headphone_init();
@@ -220,7 +213,7 @@ void button_close_device(void)
     /* Assumes HP detection is not available */
     initialized = false;
 
-    mc13783_disable_event(MC13783_ONOFD1_EVENT);
+    mc13783_enable_event(MC13783_ONOFD1_EVENT, true);
     ext_btn = BUTTON_NONE;
 }
 #endif /* BUTTON_DRIVER_CLOSE */
