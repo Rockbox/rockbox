@@ -7,7 +7,7 @@
 
 TARGET_DIR ?= $(shell pwd)/
 # We use the UCL code available in the Rockbox tools/ directory
-CFLAGS = -I../../tools/ucl/include -Wall
+CFLAGS += -I../../tools/ucl/include -Wall
 
 OUTPUT = mkmpioboot
 

@@ -9,7 +9,7 @@
 
 # We use the Telechips code available in the Rockbox tools/ directory
 TOOLSDIR = ../../tools/
-CFLAGS := -O -g -W -Wall -Wshadow -pedantic -I$(TOOLSDIR)
+CFLAGS += -O -g -W -Wall -Wshadow -pedantic -I$(TOOLSDIR)
 
 OUTPUT = mktccboot
 

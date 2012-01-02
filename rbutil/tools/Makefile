@@ -3,7 +3,7 @@ ifndef V
 SILENT = @
 endif
 
-CFLAGS=-Wall -W -D_LARGEFILE64_SOURCE
+CFLAGS += -Wall -W -D_LARGEFILE64_SOURCE
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 CROSS=

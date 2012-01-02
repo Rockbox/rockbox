@@ -16,7 +16,7 @@ SPEEXSRC = ../../apps/codecs/libspeex
 INCLUDES = -I $(SPEEXSRC)
 SPEEXOPTS = -DHAVE_CONFIG_H -DROCKBOX_VOICE_ENCODER
 
-CFLAGS = $(SPEEXOPTS) $(INCLUDES) -O3 -fomit-frame-pointer -Wno-unused-parameter
+CFLAGS += $(SPEEXOPTS) $(INCLUDES) -O3 -fomit-frame-pointer -Wno-unused-parameter
 
 #build standalone win32 executables on cygwin
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
