@@ -81,7 +81,6 @@ void pcm_play_unlock(void)
 
 void pcm_play_dma_stop(void)
 {
-    
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
@@ -164,7 +163,7 @@ void pcm_rec_dma_stop(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+const void *pcm_rec_dma_get_peak_buffer(void)
 {
     return NULL;
 }
