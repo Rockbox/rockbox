@@ -23,11 +23,9 @@ endif
 TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 
 # overwrite for releases
-ifndef APPVERSION
-APPVERSION=$(shell $(TOP)/../tools/version.sh ../)
-endif
+APPVERSION ?= $(shell $(TOP)/../tools/version.sh ../)
 CFLAGS += -DVERSION=\"$(APPVERSION)\"
-TARGET_DIR = $(shell pwd)/
+TARGET_DIR ?= $(shell pwd)/
 
 BINARY = $(OUTPUT)
 # when building a Windows binary add the correct file suffix
@@ -45,19 +43,17 @@ endif
 endif
 
 NATIVECC = gcc
-CC = gcc
+CC ?= gcc
 ifeq ($(findstring Darwin,$(shell uname)),Darwin)
 # building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
 # might need adjustment for older Xcode.
-CC = gcc-4.0
+CC ?= gcc-4.0
 CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
-NATIVECC = gcc-4.0
+NATIVECC ?= gcc-4.0
 endif
 WINDRES = windres
 
-ifndef BUILD_DIR
-BUILD_DIR = $(TARGET_DIR)build
-endif
+BUILD_DIR ?= $(TARGET_DIR)build
 OBJDIR = $(abspath $(BUILD_DIR)/$(RBARCH))/
 
 ifdef RBARCH
