@@ -20,9 +20,6 @@
 /*TODO: implement USB data transfer management -> see safe mode script and think a way to implemtent it in the code */
 #define USB_NONE
 
-/* Hardware controlled charging with monitoring */
-#define CONFIG_CHARGING CHARGING_MONITOR
-
 /* There is only USB charging */
 //#define HAVE_USB_POWER
 
@@ -135,9 +132,8 @@
 #define CURRENT_NORMAL     24 /* ~25h, on 600mAh that's about 24mA */
 #define CURRENT_BACKLIGHT  62 /* ~6,5h -> 92mA. Minus 24mA normal that gives us 68mA */
 
-/* TODO: We possibly can only watch linux charging */
-//#define CONFIG_CHARGING CHARGING_TARGET
-//#define HAVE_RESET_BATTERY_FILTER
+/* Linux controlls charging, we can monitor */
+#define CONFIG_CHARGING CHARGING_MONITOR
 
 /* same dimensions as gigabeats */
 #define CONFIG_LCD LCD_YPR0
