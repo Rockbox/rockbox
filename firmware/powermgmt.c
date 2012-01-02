@@ -855,7 +855,7 @@ void handle_auto_poweroff(void)
         last_event_tick = current_tick;
     }
 
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
     if (!shutdown_timeout && query_force_shutdown()) {
         backlight_on();
         sys_poweroff();
