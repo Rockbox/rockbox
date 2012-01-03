@@ -1338,12 +1338,6 @@ struct mc13783_event
     void (*callback)(void);
 };
 
-struct mc13783_event_list
-{
-    unsigned count;
-    const struct mc13783_event *events;
-};
-
 void mc13783_enable_event(enum mc13783_event_ids id, bool enable);
 
 /* Read the sense bit if one exists - valid only within event handlers */

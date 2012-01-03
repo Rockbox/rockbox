@@ -213,7 +213,7 @@ void button_close_device(void)
     /* Assumes HP detection is not available */
     initialized = false;
 
-    mc13783_enable_event(MC13783_ONOFD1_EVENT, true);
+    mc13783_enable_event(MC13783_ONOFD1_EVENT, false);
     ext_btn = BUTTON_NONE;
 }
 #endif /* BUTTON_DRIVER_CLOSE */
