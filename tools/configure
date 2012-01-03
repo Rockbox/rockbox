@@ -217,7 +217,12 @@ simcc () {
 
  app_type=$1
  winbuild=""
- GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef// -e s/-O//`
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+ if [ "$app_type" != "sdl-app" ]; then
+     # Disable optimizations for non-app builds
+     GCCOPTS=`echo $GCCOPTS | sed -e s/-O//`
+ fi
+
  GCCOPTS="$GCCOPTS -fno-builtin -g"
  GCCOPTIMIZE=''
  LDOPTS='-lm' # button-sdl.c uses sqrt()
