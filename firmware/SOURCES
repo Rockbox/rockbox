@@ -82,6 +82,7 @@ target/hosted/ypr0/backlight-ypr0.c
 #endif
 target/hosted/ypr0/ascodec-ypr0.c
 target/hosted/ypr0/powermgmt-ypr0.c
+target/hosted/ypr0/gpio_ypr0.c
 #endif
 
 /* Maemo specific files */

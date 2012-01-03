@@ -28,6 +28,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "button-target.h"
+#include <gpio_ypr0.h> /* For headphones sense */
 
 /* R0 physical key codes */
 enum ypr0_buttons {
@@ -45,6 +46,7 @@ enum ypr0_buttons {
 
 
 static int r0_btn_fd = 0;
+
 /* Samsung keypad driver doesn't allow multiple key combinations :( */
 static enum ypr0_buttons r0_read_key(void)
 {
@@ -82,6 +84,11 @@ int button_read_device(void)
     return key_to_button(r0_read_key());
 }
 
+bool headphones_inserted(void)
+{
+    /* GPIO low - 0 - means headphones inserted */
+    return !gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_HEADPHONE_SENSE, 0, 0);
+}
 
 /* Open the keypad device: it is offered by r0Btn.ko module */
 void button_init_device(void)
@@ -89,6 +96,10 @@ void button_init_device(void)
     r0_btn_fd = open("/dev/r0Btn", O_RDONLY);
     if (r0_btn_fd < 0)
         printf("/dev/r0Btn open error!");
+
+    /* Setup GPIO pin for headphone sense, copied from OF */
+    gpio_control(DEV_CTRL_GPIO_SET_MUX, GPIO_HEADPHONE_SENSE, CONFIG_SION, PAD_CTL_47K_PU);
+    gpio_control(DEV_CTRL_GPIO_SET_INPUT, GPIO_HEADPHONE_SENSE, CONFIG_SION, PAD_CTL_47K_PU);
 }
 
 #ifdef BUTTON_DRIVER_CLOSE
@@ -99,5 +110,7 @@ void button_close_device(void)
         close(r0_btn_fd);
         printf("/dev/r0Btn closed!");
     }
+    /* Don't know the precise meaning, but it's done as in the OF, so copied there */
+    gpio_control(DEV_CTRL_GPIO_UNSET_MUX, GPIO_HEADPHONE_SENSE, CONFIG_SION, 0);
 }
 #endif /* BUTTON_DRIVER_CLOSE */

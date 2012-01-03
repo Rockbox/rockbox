@@ -119,8 +119,8 @@
 /* #define CONFIG_TUNER SI4700 */
 /* #define HAVE_TUNER_PWR_CTRL*/
 
-/*TODO: In R0 there is an interrupt for this (figure out ioctls)*/
-/* #define HAVE_HEADPHONE_DETECTION */
+/* We have a GPIO that detects it */
+#define HAVE_HEADPHONE_DETECTION
 
 #define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 600  /* min. capacity selectable */

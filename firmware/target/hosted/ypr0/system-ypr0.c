@@ -31,11 +31,13 @@
 #endif
 
 #include "ascodec-target.h"
+#include "gpio_ypr0.h"
 
 void power_off(void)
 {
     /* Something that we need to do before exit on our platform YPR0 */
     ascodec_close();
+    gpio_close();
     exit(EXIT_SUCCESS);
 }
 
@@ -52,6 +54,7 @@ void system_init(void)
 #endif
     /* Here begins our platform specific initilization for various things */
     ascodec_init();
+    gpio_init();
 }
 
 

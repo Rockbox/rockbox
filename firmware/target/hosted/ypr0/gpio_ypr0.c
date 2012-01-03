@@ -5,9 +5,11 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: ascodec-target.h 26116 2010-05-17 20:53:25Z funman $
  *
- * Copyright (C) 2011 by Lorenzo Miori
+ * Module wrapper for GPIO, using /dev/r0GPIO (r0Gpio.ko) of Samsung YP-R0
+ *
+ * Copyright (c) 2011 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,37 +21,34 @@
  *
  ****************************************************************************/
 
-#ifndef _BUTTON_TARGET_H_
-#define _BUTTON_TARGET_H_
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <gpio_ypr0.h> /* includes r0GPIOioctl.h */
+#include <sys/ioctl.h>
 
-#include <stdbool.h>
-#include "config.h"
+static int r0_gpio_dev = 0;
 
-bool headphones_inserted(void);
+void gpio_init(void)
+{
+    r0_gpio_dev = open("/dev/r0GPIO", O_RDONLY);
+    if (r0_gpio_dev < 0)
+        printf("/dev/r0GPIO open error!");
+}
 
-void button_init_device(void);
-void button_close_device(void);
-int button_read_device(void);
+void gpio_close(void)
+{
+    if (r0_gpio_dev < 0)
+        close(r0_gpio_dev);
+}
 
-/* Logical buttons key codes */
-#define BUTTON_UP           0x00000001
-#define BUTTON_DOWN         0x00000002
-#define BUTTON_LEFT         0x00000004
-#define BUTTON_RIGHT        0x00000008
-#define BUTTON_USER         0x00000010
-#define BUTTON_MENU         0x00000020
-#define BUTTON_BACK         0x00000040
-#define BUTTON_POWER        0x00000080
-#define BUTTON_SELECT       0x00000100
+int gpio_control_struct(int request, R0GPIOInfo r)
+{
+    return ioctl(r0_gpio_dev, request, &r);
+}
 
-#define BUTTON_MAIN         0x1FF /* all buttons */
-
-/* No remote */
-#define BUTTON_REMOTE 0
-
-/* Software power-off */
-#define POWEROFF_BUTTON BUTTON_POWER
-/* About 3 seconds */
-#define POWEROFF_COUNT 10
-
-#endif /* _BUTTON_TARGET_H_ */
+int gpio_control(int request, int num, int mode, int val)
+{
+    R0GPIOInfo r = { .num = num, .mode = mode, .val = val, };
+    return ioctl(r0_gpio_dev, request, &r);
+}
