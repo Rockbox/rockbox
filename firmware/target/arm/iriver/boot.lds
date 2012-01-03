@@ -1,2 +1,2 @@
 #include "config.h"
-#include "../boot-pp502x-bl-usb.lds"
+#include "../pp/boot-pp502x-bl-usb.lds"

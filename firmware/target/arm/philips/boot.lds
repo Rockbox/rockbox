@@ -2,7 +2,7 @@
 
 /* Can't link all Philips ARM devices the same way at this time */
 #ifdef HAVE_BOOTLOADER_USB_MODE
-#include "../boot-pp502x-bl-usb.lds"
+#include "../pp/boot-pp502x-bl-usb.lds"
 #else /* !HAVE_BOOTLOADER_USB_MODE */
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
