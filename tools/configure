@@ -1641,6 +1641,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="iriver"
     t_model="h10"
     ;;
@@ -1665,6 +1666,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="iriver"
     t_model="h10"
     ;;
@@ -1688,6 +1690,7 @@ fi
     toolset=$ipodbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="ipod"
     t_model="color"
     ;;
@@ -1711,6 +1714,7 @@ fi
     toolset=$ipodbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="ipod"
     t_model="nano"
     ;;
@@ -1734,6 +1738,7 @@ fi
     toolset=$ipodbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="ipod"
     t_model="video"
     ;;
@@ -1757,6 +1762,7 @@ fi
     toolset=$ipodbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="ipod"
     t_model="3g"
     ;;
@@ -1780,6 +1786,7 @@ fi
     toolset=$ipodbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="ipod"
     t_model="4g"
     ;;
@@ -1803,6 +1810,7 @@ fi
     toolset=$ipodbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="ipod"
     t_model="mini"
     ;;
@@ -1826,6 +1834,7 @@ fi
     toolset=$ipodbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="ipod"
     t_model="mini2g"
     ;;
@@ -1849,6 +1858,7 @@ fi
     toolset=$ipodbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="ipod"
     t_model="1g2g"
     ;;
@@ -2111,6 +2121,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="olympus"
     t_model="mrobe-100"
     ;;
@@ -2228,6 +2239,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="sandisk"
     t_model="sansa-e200"
     ;;
@@ -2255,6 +2267,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="sandisk"
     t_model="sansa-e200"
     ;;
@@ -2279,6 +2292,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="sandisk"
     t_model="sansa-c200"
     ;;
@@ -2484,6 +2498,7 @@ fi
     # this particular target.
     toolset=$scramblebitmaptools
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="sandisk"
     t_model="sansa-view"
     ;;
@@ -2528,7 +2543,7 @@ fi
     arm926ejscc
     ;;
 
-    64|sansafuzeplus)
+   64|sansafuzeplus)
     target_id=80
     modelname="sansafuzeplus"
     target="SANSA_FUZEPLUS"
@@ -2587,6 +2602,7 @@ fi
     t_model="sansa-connect"
     arm926ejscc
     ;;
+
    150|tatungtpj1022)
     target_id=25
     modelname="tatungtpj1022"
@@ -2607,6 +2623,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="tatung"
     t_model="tpj1022"
     ;;
@@ -2631,6 +2648,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="philips"
     t_model="sa9200"
     ;;
@@ -2655,6 +2673,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="philips"
     t_model="hdd1630"
     ;;
@@ -2679,6 +2698,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="philips"
     t_model="hdd6330"
     ;;
@@ -2901,6 +2921,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="samsung"
     t_model="yh820"
     ;;
@@ -2925,6 +2946,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="samsung"
     t_model="yh920"
     ;;
@@ -2949,6 +2971,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="samsung"
     t_model="yh925"
     ;;
@@ -2995,6 +3018,7 @@ fi
     toolset=$scramblebitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
+    t_soc="pp"
     t_manufacturer="pbell"
     t_model="vibe500"
     ;;
@@ -3707,6 +3731,7 @@ if test -n "$t_cpu"; then
   fi
 
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
+  test -n "$t_soc" && TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_soc"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"
   GCCOPTS="$GCCOPTS"
 fi
