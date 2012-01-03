@@ -2,7 +2,7 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
-STARTUP(target/arm/crt0-pp502x-bl-usb.o)
+STARTUP(target/arm/pp/crt0-pp502x-bl-usb.o)
 
 #define DRAMORIG        0x01000000 /* Load at 16 MB */
 #define DRAMSIZE        0x00100000 /* 1MB for bootloader */
