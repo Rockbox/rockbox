@@ -27,9 +27,6 @@ $(CPUFEAT_BUILD)/cpu-features.o: $(CPUFEAT)/cpu-features.c
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 .PHONY: apk classes clean dex dirs libs jar
 
-
-java2class = $(addsuffix .class,$(basename $(subst $(ANDROID_DIR),$(BUILDDIR),$(1))))
-
 # API version
 ANDROID_PLATFORM_VERSION=11
 ANDROID_PLATFORM=$(ANDROID_SDK_PATH)/platforms/android-$(ANDROID_PLATFORM_VERSION)
@@ -42,21 +39,27 @@ ZIPALIGN=$(ANDROID_SDK_PATH)/tools/zipalign
 KEYSTORE=$(HOME)/.android/debug.keystore
 ADB=$(ANDROID_SDK_PATH)/platform-tools/adb
 
+CLASSPATH   := $(BUILDDIR)/bin/classes
+
 MANIFEST	:= $(BUILDDIR)/bin/AndroidManifest.xml
 MANIFEST_SRC	:= $(ANDROID_DIR)/AndroidManifest.xml
 
 R_JAVA		:= $(BUILDDIR)/gen/$(PACKAGE_PATH)/R.java
-R_OBJ		:= $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class
+R_OBJ		:= $(CLASSPATH)/$(PACKAGE_PATH)/R.class
 
 JAVA_SRC	:= $(wildcard $(ANDROID_DIR)/src/$(PACKAGE_PATH)/*.java)
 JAVA_SRC	+= $(wildcard $(ANDROID_DIR)/src/$(PACKAGE_PATH)/Helper/*.java)
 JAVA_SRC	+= $(wildcard $(ANDROID_DIR)/src/$(PACKAGE_PATH)/widgets/*.java)
 JAVA_SRC	+= $(wildcard $(ANDROID_DIR)/src/$(PACKAGE_PATH)/monitors/*.java)
-JAVA_OBJ	:= $(call java2class,$(subst $(ANDROID)/src/$(PACKAGE_PATH),$(ANDROID)/bin/$(PACKAGE_PATH),$(JAVA_SRC)))
+
+java2class = $(addsuffix .class,$(basename $(subst $(ANDROID_DIR)/src,$(CLASSPATH),$(1))))
+
+JAVA_OBJ	:= $(call java2class,$(JAVA_SRC))
 
 
 LIBS		:= $(BINLIB_DIR)/$(BINARY) $(BINLIB_DIR)/libmisc.so
 LIBS 		+= $(addprefix $(BINLIB_DIR)/lib,$(patsubst %.codec,%.so,$(notdir $(CODECS))))
+
 TEMP_APK	:= $(BUILDDIR)/bin/_rockbox.apk
 TEMP_APK2	:= $(BUILDDIR)/bin/__rockbox.apk
 DEX		:= $(BUILDDIR)/bin/classes.dex
@@ -65,17 +68,17 @@ AP_		:= $(BUILDDIR)/bin/resources.ap_
 APK		:= $(BUILDDIR)/rockbox.apk
 
 _DIRS		:= $(BUILDDIR)/___/$(PACKAGE_PATH)
-DIRS		:= $(subst ___,bin,$(_DIRS))
 DIRS		+= $(subst ___,gen,$(_DIRS))
 DIRS		+= $(subst ___,data,$(_DIRS))
 DIRS		+= $(BUILDDIR)/libs/armeabi
 DIRS		+= $(CPUFEAT_BUILD)
+DIRS		+= $(CLASSPATH)
 
 RES		:= $(wildcard $(ANDROID_DIR)/res/*/*)
 
 CLEANOBJS += bin gen libs data
 
-JAVAC_OPTS += -implicit:none -classpath $(ANDROID_PLATFORM)/android.jar:$(BUILDDIR)/bin
+JAVAC_OPTS += -implicit:none -classpath $(ANDROID_PLATFORM)/android.jar:$(CLASSPATH)
 
 .PHONY:
 $(MANIFEST): $(MANIFEST_SRC) $(DIRS)
@@ -86,21 +89,18 @@ $(R_JAVA) $(AP_): $(MANIFEST) $(RES) | $(DIRS)
 		-J $(BUILDDIR)/gen -M $(MANIFEST) -S $(ANDROID_DIR)/res \
 		-I $(ANDROID_PLATFORM)/android.jar -F $(AP_)
 
-$(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class: $(R_JAVA)
+$(CLASSPATH)/$(PACKAGE_PATH)/R.class: $(R_JAVA)
 	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$<))javac -d $(BUILDDIR)/bin \
-		$(JAVAC_OPTS) \
-		-sourcepath $(ANDROID_DIR)/gen $<
+		$(JAVAC_OPTS) -sourcepath $(ANDROID_DIR)/gen $<
 
-$(BUILDDIR)/bin/$(PACKAGE_PATH)/%.class: $(ANDROID_DIR)/src/$(PACKAGE_PATH)/%.java $(BUILDDIR)/bin/$(PACKAGE_PATH)/R.class
-	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$<))javac -d $(BUILDDIR)/bin \
-		$(JAVAC_OPTS) \
-		-sourcepath $(ANDROID_DIR)/src $<
+$(CLASSPATH)/$(PACKAGE_PATH)/%.class: $(ANDROID_DIR)/src/$(PACKAGE_PATH)/%.java $(CLASSPATH)/$(PACKAGE_PATH)/R.class
+	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$<))javac -d $(CLASSPATH) \
+		$(JAVAC_OPTS) -sourcepath $(ANDROID_DIR)/src $<
 
 $(JAR): $(JAVA_SRC) $(R_JAVA)
-	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$?))javac -d $(BUILDDIR)/bin \
-		$(JAVAC_OPTS) \
-		-sourcepath $(ANDROID_DIR)/src:$(ANDROID_DIR)/gen $?
-	$(call PRINTS,JAR $(subst $(BUILDDIR)/,,$@))jar cf $(JAR) -C $(BUILDDIR)/bin org
+	$(call PRINTS,JAVAC $(subst $(ROOTDIR)/,,$?))javac -d $(CLASSPATH) \
+		$(JAVAC_OPTS) -sourcepath $(ANDROID_DIR)/src:$(ANDROID_DIR)/gen $?
+	$(call PRINTS,JAR $(subst $(BUILDDIR)/,,$@))jar cf $(JAR) -C $(CLASSPATH) org
 
 jar: $(JAR)
 
@@ -127,7 +127,7 @@ $(BINLIB_DIR)/libmisc.so: $(BUILDDIR)/rockbox.zip
 $(BINLIB_DIR)/lib%.so: $(BUILDDIR)/apps/codecs/%.codec
 	$(call PRINTS,CP $(@F))cp $^ $@
 
-libs: $(LIBS)
+libs: $(DIRS) $(LIBS)
 
 $(TEMP_APK): $(AP_) $(LIBS) $(DEX) | $(DIRS)
 	$(call PRINTS,APK $(subst $(BUILDDIR)/,,$@))$(APKBUILDER) $@ \
