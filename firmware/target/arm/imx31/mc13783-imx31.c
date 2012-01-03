@@ -45,7 +45,8 @@ static uint32_t pmic_int_sense_enb[2]; /* Enabled sense reading */
 static uint32_t int_pnd_buf[2];  /* Pending ints */
 static uint32_t int_data_buf[4]; /* ISR data buffer */
 static struct spi_transfer_desc int_xfers[2]; /* ISR transfer descriptor */
-static bool restore_event = true;
+static bool restore_event = true; /* Protect SPI callback from unmasking GPIO
+                                     interrupt (lockout) */
 
 static inline bool mc13783_transfer(struct spi_transfer_desc *xfer,
                                     uint32_t *txbuf,
@@ -171,6 +172,7 @@ void INIT_ATTR mc13783_init(void)
 
 void mc13783_close(void)
 {
+    restore_event = false;
     gpio_disable_event(MC13783_EVENT_ID);
     spi_enable_node(&mc13783_spi, false);
 }
