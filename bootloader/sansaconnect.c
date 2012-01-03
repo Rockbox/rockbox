@@ -22,7 +22,6 @@
 #include "kernel.h"
 #include "thread.h"
 #include "storage.h"
-#include "ata-target.h"
 #include "disk.h"
 #include "font.h"
 #include "backlight.h"
