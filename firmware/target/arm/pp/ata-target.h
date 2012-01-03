@@ -24,8 +24,6 @@
 
 #include "config.h"
 
-#ifdef CPU_PP
-
 #ifdef HAVE_BOOTLOADER_USB_MODE
 #define ATA_DRIVER_CLOSE
 #endif
@@ -56,8 +54,6 @@
 #define ATA_OPTIMIZED_WRITING
 
 #endif /* CONFIG_CPU */
-
-#endif
 
 #ifdef HAVE_ATA_DMA
 

@@ -21,12 +21,8 @@
 #ifndef ATA_SD_TARGET_H
 #define ATA_SD_TARGET_H
 
-#ifdef CPU_PP   /* PortalPlayer specific functions */
-
 #ifdef HAVE_HOTSWAP
 void       microsd_int(void);
-#endif
-
 #endif
 
 #endif

@@ -26,9 +26,7 @@
 #include "system-arm.h"
 #include <stdbool.h>
 
-#ifdef CPU_PP
-/* TODO: This header is actually portalplayer specific, and should be
- * moved into an appropriate subdir (or even split in 2). */
+/* TODO: This header could be split in 2 */
 
 #if CONFIG_CPU == PP5002
 #define CPUFREQ_SLEEP      32768
@@ -200,7 +198,5 @@ void system_prepare_fw_start(void);
 #endif /* HAVE_BOOTLOADER_USB_MODE */
 
 #endif /* BOOTLOADER */
-
-#endif /* CPU_PP */
 
 #endif /* SYSTEM_TARGET_H */

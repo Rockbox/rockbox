@@ -27,10 +27,6 @@
 
 #include "config.h"
 
-#ifdef CPU_PP
-/* TODO: This header is actually portalplayer specific, and should be
- * moved into an appropriate subdir  */
-
 #include "as3514.h"
 #include "i2c-pp.h"
 
@@ -97,7 +93,5 @@ static inline int ascodec_read_charger(void)
 }
 
 extern void ascodec_suppressor_on(bool on);
-
-#endif /* CPU_PP */
 
 #endif /* !_ASCODEC_TARGET_H */
