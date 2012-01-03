@@ -107,6 +107,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
         RegCloseKey(hk);
     }
 #endif
+    updateSettings();
     downloadInfo();
 
     m_gotInfo = false;
@@ -242,7 +243,7 @@ void RbUtilQt::downloadDone(bool error)
     buildInfo.open();
     ServerInfo::readBuildInfo(buildInfo.fileName());
     buildInfo.close();
-    
+
     // start bleeding info download
     bleeding = new HttpGet(this);
     connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
@@ -271,11 +272,11 @@ void RbUtilQt::downloadBleedingDone(bool error)
         bleedingInfo.open();
         ServerInfo::readBleedingInfo(bleedingInfo.fileName());
         bleedingInfo.close();
-      
+
         ui.statusbar->showMessage(tr("Download build information finished."), 5000);
         updateSettings();
         m_gotInfo = true;
-        
+
         //start check for updates
         checkUpdate();
     }
@@ -345,7 +346,7 @@ void RbUtilQt::updateSettings()
     HttpGet::setGlobalProxy(proxy());
     HttpGet::setGlobalCache(RbSettings::value(RbSettings::CachePath).toString());
     HttpGet::setGlobalDumbCache(RbSettings::value(RbSettings::CacheOffline).toBool());
-    
+
      if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
         QApplication::processEvents();
         QMessageBox::information(this, tr("New installation"),
