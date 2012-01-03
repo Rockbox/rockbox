@@ -110,7 +110,7 @@ void check_battery(void)
 {
     int battery_voltage, batt_int, batt_frac;
     
-    battery_voltage = battery_adc_voltage();
+    battery_voltage = _battery_voltage();
     batt_int = battery_voltage / 1000;
     batt_frac = (battery_voltage % 1000) / 10;
 

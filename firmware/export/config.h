@@ -184,6 +184,15 @@
                             * charging or specific programming is required to
                             * use the charging hardware. */
 
+/* CONFIG_BATTERY_MEASURE bits */
+#define VOLTAGE_MEASURE     1 /* Target can report battery voltage
+                               * Usually native ports */
+#define PERCENTAGE_MEASURE  2 /* Target can report remaining capacity in %
+                               * Usually application/hosted ports */
+#define TIME_MEASURE        4 /* Target can report remaining time estimation
+                                 Usually application ports, and only
+                                 if the estimation is better that ours
+                                 (which it probably is) */
 /* CONFIG_LCD */
 #define LCD_SSD1815   1 /* as used by Archos Recorders and Ondios */
 #define LCD_SSD1801   2 /* as used by Archos Player/Studio */
@@ -603,12 +612,21 @@ Lyre prototype 1 */
 #define CONFIG_CHARGING 0
 #endif
 
+#ifndef CONFIG_BATTERY_MEASURE
+#define CONFIG_BATTERY_MEASURE 0
+#define NO_LOW_BATTERY_SHUTDOWN
+#endif
+
 #ifndef CONFIG_RTC
 #define CONFIG_RTC 0
 #endif
 
 #ifndef BATTERY_TYPES_COUNT
 #define BATTERY_TYPES_COUNT 0
+#endif
+
+#ifndef BATTERY_CAPACITY_DEFAULT
+#define BATTERY_CAPACITY_DEFAULT 0
 #endif
 
 #ifndef BATTERY_CAPACITY_INC

@@ -45,7 +45,7 @@ void system_reboot(void) { }
 
 /* this is used to return from the entry point of the native library. */
 static jmp_buf poweroff_buf;
-void shutdown_hw(void)
+void power_off(void)
 {
     longjmp(poweroff_buf, 1);
 }

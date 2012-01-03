@@ -24,24 +24,25 @@
 #include <time.h>
 #include "kernel.h"
 #include "powermgmt.h"
+#include "power.h"
 
-#define BATT_MINMVOLT   2500      /* minimum millivolts of battery */
-#define BATT_MAXMVOLT   4500      /* maximum millivolts of battery */
+#define BATT_MINMVOLT   3300      /* minimum millivolts of battery */
+#define BATT_MAXMVOLT   4300      /* maximum millivolts of battery */
 #define BATT_MAXRUNTIME (10 * 60) /* maximum runtime with full battery in
                                      minutes */
 
 extern void send_battery_level_event(void);
 extern int last_sent_battery_level;
 extern int battery_percent;
+static bool charging = false;
 
 static unsigned int battery_millivolts = BATT_MAXMVOLT;
-/* estimated remaining time in minutes */
-static int powermgmt_est_runningtime_min = BATT_MAXRUNTIME;
+
+void powermgmt_init_target(void) {}
 
 static void battery_status_update(void)
 {
     static time_t last_change = 0;
-    static bool charging = false;
     time_t now;
 
     time(&now);
@@ -76,57 +77,34 @@ static void battery_status_update(void)
 
         battery_percent = 100 * (battery_millivolts - BATT_MINMVOLT) /
                             (BATT_MAXMVOLT - BATT_MINMVOLT);
-
-        powermgmt_est_runningtime_min =
-            battery_percent * BATT_MAXRUNTIME / 100;
     }
-
-    send_battery_level_event();
 }
 
-void battery_read_info(int *voltage, int *level)
-{
-    battery_status_update();
+const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] = { 3200 };
+const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] = { 3200 };
 
-    if (voltage)
-        *voltage = battery_millivolts;
+/* make the simulated curve nicely linear */
+const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+{ { 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300 } };
+const unsigned short percent_to_volt_charge[11] =
+{ 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300  };
 
-    if (level)
-        *level = battery_percent;
-}
 
-unsigned int battery_voltage(void)
+int _battery_voltage(void)
 {
     battery_status_update();
     return battery_millivolts;
 }
 
-int battery_level(void)
+#if CONFIG_CHARGING
+unsigned int power_input_status(void)
 {
-    battery_status_update();
-    return battery_percent;
+    return charging ? POWER_INPUT_NONE : POWER_INPUT_MAIN;
 }
 
-int battery_time(void)
+bool charging_state(void)
 {
-    battery_status_update();
-    return powermgmt_est_runningtime_min;
-}
-
-bool battery_level_safe(void)
-{
-    return battery_level() >= 10;
-}
-
-void set_battery_capacity(int capacity)
-{
-  (void)capacity;
-}
-
-#if BATTERY_TYPES_COUNT > 1
-void set_battery_type(int type)
-{
-    (void)type;
+    return charging;
 }
 #endif
 

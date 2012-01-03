@@ -70,7 +70,7 @@ unsigned int power_input_status(void)
 
 /* Returns battery voltage from ADC [millivolts],
  * adc returns voltage in 5mV steps */
-unsigned int battery_adc_voltage(void)
+int _battery_voltage(void)
 {
     return adc_read(3) * 5;
 }
@@ -80,5 +80,5 @@ bool charging_state(void)
     const unsigned short charged_thres = 4170;
     bool ret = (power_input_status() == POWER_INPUT_MAIN_CHARGER);
     /* dont indicate for > ~95% */
-    return ret && (battery_adc_voltage() <= charged_thres);
+    return ret && (_battery_voltage() <= charged_thres);
 }

@@ -80,11 +80,6 @@
 
 #define HAVE_SW_TONE_CONTROLS 
 
-/* Define current usage levels. */
-#define CURRENT_NORMAL     88 /* 18 hours from a 1600 mAh battery */  
-#define CURRENT_BACKLIGHT  30 /* TBD */ 
-#define CURRENT_RECORD     0  /* no recording yet */ 
-
 /* Define this to the CPU frequency */
 /*
 #define CPU_FREQ 48000000

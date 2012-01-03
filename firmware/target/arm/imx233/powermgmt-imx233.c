@@ -38,7 +38,7 @@ static int timeout_topping_off; /* timeout before stopping charging after toppin
 static int timeout_4p2_ilimit_increase; /* timeout before increasing 4p2 ilimit */
 
 /* Returns battery voltage from ADC [millivolts] */
-unsigned int battery_adc_voltage(void)
+int _battery_voltage(void)
 {
     /* battery value is in 8mV LSB */
     return __XTRACT(HW_POWER_BATTMONITOR, BATT_VAL) * 8;

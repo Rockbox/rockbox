@@ -358,7 +358,7 @@ void main(void)
     printf("Version " RBVERSION);
 
     adc_init();
-    batt = battery_adc_voltage();
+    batt = _battery_voltage();
     printf("Battery: %d.%03d V", batt / 1000, batt % 1000);
     check_battery_safe();
 

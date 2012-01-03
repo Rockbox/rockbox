@@ -196,7 +196,7 @@ static int sdl_event_thread(void * param)
     return 0;
 }
 
-void shutdown_hw(void)
+void power_off(void)
 {
     /* Shut down SDL event loop */
     SDL_Event event;

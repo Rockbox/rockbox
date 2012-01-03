@@ -277,6 +277,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 
         if (batt_safe)
         {
+            int level;
 #ifdef HAVE_TAGCACHE
             if (!tagcache_prepare_shutdown())
             {
@@ -285,7 +286,8 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
                 return false;
             }
 #endif
-            if (battery_level() > 10)
+            level = battery_level();
+            if (level > 10 || level < 0)
                 splash(0, str(LANG_SHUTTINGDOWN));
             else
             {

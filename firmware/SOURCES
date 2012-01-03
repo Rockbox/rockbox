@@ -14,7 +14,6 @@ target/hosted/cpuinfo-linux.c
 #endif
 
 #ifndef SAMSUNG_YPR0 /* uses as3514 rtc */
-target/hosted/powermgmt.c
 target/hosted/rtc.c
 #endif
 #endif

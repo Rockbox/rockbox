@@ -317,32 +317,6 @@ bool usb_charging_enable(bool on)
 }
 #endif
 
-#if CONFIG_CHARGING
-bool charger_inserted(void)
-{
-    return false;
-}
-
-bool power_input_present(void)
-{
-    return false;
-}
-
-unsigned int power_input_status(void)
-{
-#ifdef HAVE_BATTERY_SWITCH
-    return POWER_INPUT_BATTERY;
-#else
-    return POWER_INPUT_NONE;
-#endif
-}
-
-bool charging_state(void)
-{
-    return false;
-}
-#endif /* CONFIG_CHARGING */
-
 #ifndef USB_NONE
 bool usb_inserted(void)
 {

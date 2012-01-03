@@ -91,6 +91,8 @@
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
+#define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
+
 #define CURRENT_NORMAL    145  /* usual current in mA */
 #define CURRENT_RECORD     35  /* additional recording current */
 #define CURRENT_USB       500 /* usual current in mA in USB mode */

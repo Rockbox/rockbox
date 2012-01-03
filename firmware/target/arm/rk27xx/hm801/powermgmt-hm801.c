@@ -54,7 +54,7 @@ const unsigned short percent_to_volt_charge[11] =
     /* TODO: simple uncalibrated curve */
     { 425, 430, 440, 450, 460, 470,  480, 490, 500, 510, 520  };
 
-unsigned int battery_adc_voltage(void)
+int _battery_voltage(void)
 {
     return adc_read(ADC_BATTERY);
 }

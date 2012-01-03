@@ -9,10 +9,7 @@ sim_tasks.c
 fmradio.c
 backlight-sim.c
 stubs.c
+powermgmt-sim.c
 #endif
 
 io.c
-/* this is still needed for application since it has some stubs */
-#if !(CONFIG_PLATFORM & PLATFORM_MAEMO)
-powermgmt-sim.c
-#endif

@@ -74,12 +74,11 @@
 #define HAVE_SDL
 #define HAVE_SDL_AUDIO
 
-#define HAVE_SW_TONE_CONTROLS 
+#define HAVE_SW_TONE_CONTROLS
 
-/* Define current usage levels. */
-#define CURRENT_NORMAL     88 /* 18 hours from a 1600 mAh battery */  
-#define CURRENT_BACKLIGHT  30 /* TBD */ 
-#define CURRENT_RECORD     0  /* no recording yet */ 
+/* can provide both remaining percentage and time information */
+#define CONFIG_BATTERY_MEASURE (PERCENTAGE_MEASURE|TIME_MEASURE)
+#define NO_LOW_BATTERY_SHUTDOWN
 
 /* Define this to the CPU frequency */
 /*

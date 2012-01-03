@@ -197,6 +197,8 @@
 #define BATTERY_CAPACITY_INC 100         /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
+#define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
+
 /* define current usage levels */
 #define CURRENT_NORMAL     85 /* Measured */
 #define CURRENT_BACKLIGHT  200 /* Over 200 mA total measured when on */

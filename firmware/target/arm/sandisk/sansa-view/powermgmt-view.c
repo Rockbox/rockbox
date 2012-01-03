@@ -23,7 +23,7 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-unsigned int battery_adc_voltage(void)
+int _battery_voltage(void)
 {
     return 0;
 }

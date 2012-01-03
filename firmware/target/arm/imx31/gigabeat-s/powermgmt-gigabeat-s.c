@@ -53,7 +53,7 @@ const unsigned short percent_to_volt_charge[11] =
 };
 
 /* Returns battery voltage from ADC [millivolts] */
-unsigned int battery_adc_voltage(void)
+int _battery_voltage(void)
 {
     /* ADC reading 0-1023 = 2400mV-4700mV */
     return ((adc_read(ADC_BATTERY) * 2303) >> 10) + 2400;
@@ -249,7 +249,7 @@ static int stat_battery_reading(int type)
         switch (type)
         {
         case ADC_BATTERY:
-            reading = battery_adc_voltage();
+            reading = _battery_voltage();
             break;
 
         case ADC_CHARGER_CURRENT:
@@ -780,7 +780,7 @@ static void charger_control(void)
         /* Battery voltage may have dropped and a charge cycle should
          * start again. Debounced. */
         if (autorecharge_counter < 0 &&
-            battery_adc_voltage() < BATT_FULL_VOLTAGE)
+            _battery_voltage() < BATT_FULL_VOLTAGE)
         {
             /* Try starting a cycle now if battery isn't already topped
              * off to allow user to ensure the battery is full. */

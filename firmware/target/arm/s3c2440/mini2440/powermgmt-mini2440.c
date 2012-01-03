@@ -52,7 +52,7 @@ const unsigned short percent_to_volt_charge[11] =
 
 /* Returns battery voltage from ADC [millivolts] */
 /* full-scale (2^10) in millivolt */
-unsigned int battery_adc_voltage(void)
+int _battery_voltage(void)
 {
     /* Since we have no battery, return a fully charged value */
     return 4000 * 1024 / 1000;

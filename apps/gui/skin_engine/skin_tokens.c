@@ -1068,9 +1068,13 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_BATTERY_VOLTS:
         {
-            unsigned int v = battery_voltage();
-            snprintf(buf, buf_size, "%d.%02d", v / 1000, (v % 1000) / 10);
-            return buf;
+            int v = battery_voltage();
+            if (v >= 0) {
+                snprintf(buf, buf_size, "%d.%02d", v / 1000, (v % 1000) / 10);
+                return buf;
+            } else {
+                return "?";
+            }
         }
 
         case SKIN_TOKEN_BATTERY_TIME:

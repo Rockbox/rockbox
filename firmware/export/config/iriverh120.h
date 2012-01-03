@@ -135,6 +135,8 @@
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
+#define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
+
 /* Hardware controlled charging */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 

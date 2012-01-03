@@ -119,6 +119,8 @@
 #define CODEC_SRCTRL_88200HZ (0x1E << 1)
 
 #define BATTERY_TYPES_COUNT 1
+
+#define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 #define BATTERY_CAPACITY_DEFAULT  1200  /* this is wild guess */
 #define BATTERY_CAPACITY_MIN      800  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX     2500  /* max. capacity selectable */

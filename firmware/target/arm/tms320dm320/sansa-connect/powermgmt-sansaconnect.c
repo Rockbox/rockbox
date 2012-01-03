@@ -53,7 +53,7 @@ const unsigned short percent_to_volt_charge[11] =
 };
 
 /* Returns battery voltage from ADC [millivolts] */
-unsigned int battery_adc_voltage(void)
+int _battery_voltage(void)
 {
     return current_battery_level;
 }

@@ -86,7 +86,14 @@ void handle_auto_poweroff(void);
 static int poweroff_timeout = 0;
 static long last_event_tick = 0;
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
+#if (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) == PERCENTAGE_MEASURE
+int _battery_voltage(void) { return -1; }
+
+const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
+const unsigned short percent_to_volt_charge[11];
+
+#elif (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE) == VOLTAGE_MEASURE
+int _battery_level(void) { return -1; }
 /*
  * Average battery voltage and charger voltage, filtered via a digital
  * exponential filter (aka. exponential moving average, scaled):
@@ -95,9 +102,21 @@ static long last_event_tick = 0;
 static unsigned int avgbat;
 /* filtered battery voltage, millivolts */
 static unsigned int battery_millivolts;
+#elif (CONFIG_BATTERY_MEASURE == 0)
+int _battery_voltage(void) { return -1; }
+int _battery_level(void) { return -1; }
+
+const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
+const unsigned short percent_to_volt_charge[11];
+#endif
+
+#if !(CONFIG_BATTERY_MEASURE & TIME_MEASURE)
+static int powermgmt_est_runningtime_min;
+int _battery_time(void) { return powermgmt_est_runningtime_min; }
+#endif
+
 /* default value, mAh */
 static int battery_capacity = BATTERY_CAPACITY_DEFAULT;
-
 
 #if BATTERY_TYPES_COUNT > 1
 static int battery_type = 0;
@@ -115,7 +134,6 @@ static char power_stack[DEFAULT_STACK_SIZE/2 + POWERMGMT_DEBUG_STACK];
 #endif
 static const char power_thread_name[] = "power";
 
-static int powermgmt_est_runningtime_min = -1;
 
 static int voltage_to_battery_level(int battery_millivolts);
 static void battery_status_update(void);
@@ -126,13 +144,18 @@ static int runcurrent(void);
 
 void battery_read_info(int *voltage, int *level)
 {
-    int millivolts = battery_adc_voltage();
+    int millivolts = _battery_voltage();
+    int percent;
 
     if (voltage)
         *voltage = millivolts;
 
-    if (level)
-        *level = voltage_to_battery_level(millivolts);
+    if (level)  {
+        percent = voltage_to_battery_level(millivolts);
+        if (percent < 0)
+            percent = _battery_level();
+        *level = percent;
+    }
 }
 
 #if BATTERY_TYPES_COUNT > 1
@@ -148,6 +171,7 @@ void set_battery_type(int type)
 }
 #endif
 
+#ifdef BATTERY_CAPACITY_MIN
 void set_battery_capacity(int capacity)
 {
     if (capacity > BATTERY_CAPACITY_MAX)
@@ -159,6 +183,7 @@ void set_battery_capacity(int capacity)
 
     battery_status_update(); /* recalculate the battery status */
 }
+#endif
 
 int get_battery_capacity(void)
 {
@@ -167,7 +192,16 @@ int get_battery_capacity(void)
 
 int battery_time(void)
 {
-    return powermgmt_est_runningtime_min;
+#if ((CONFIG_BATTERY_MEASURE & TIME_MEASURE) == 0)
+
+#ifndef CURRENT_NORMAL /* no estimation without current */
+    return -1;
+#endif
+    if (battery_capacity <= 0) /* nor without capacity */
+        return -1;
+
+#endif
+    return _battery_time();
 }
 
 /* Returns battery level in percent */
@@ -180,17 +214,13 @@ int battery_level(void)
     return battery_percent;
 }
 
-/* Returns filtered battery voltage [millivolts] */
-unsigned int battery_voltage(void)
-{
-    return battery_millivolts;
-}
-
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void)
 {
 #if defined(NO_LOW_BATTERY_SHUTDOWN)
     return true;
+#elif (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
+    return (battery_percent > 0);
 #elif defined(HAVE_BATTERY_SWITCH)
     /* Cannot rely upon the battery reading to be valid and the
      * device could be powered externally. */
@@ -228,6 +258,9 @@ static int voltage_to_battery_level(int battery_millivolts)
 {
     int level;
 
+    if (battery_millivolts < 0)
+        return -1;
+
 #if CONFIG_CHARGING >= CHARGING_MONITOR
     if (charging_state()) {
         /* battery level is defined to be < 100% until charging is finished */
@@ -249,7 +282,8 @@ static int voltage_to_battery_level(int battery_millivolts)
 
 static void battery_status_update(void)
 {
-    int level = voltage_to_battery_level(battery_millivolts);
+    int millivolt, level;
+    battery_read_info(&millivolt, &level);
 
 #ifdef CURRENT_NORMAL  /*don't try to estimate run or charge
                         time without normal current defined*/
@@ -264,7 +298,8 @@ static void battery_status_update(void)
 #endif
 
     /* discharging: remaining running time */
-    if (battery_millivolts > percent_to_volt_discharge[0][0]) {
+    if (level > 0 && (millivolt > percent_to_volt_discharge[battery_type][0]
+        || millivolt < 0)) {
         /* linear extrapolation */
         powermgmt_est_runningtime_min = (level + battery_percent)*60
                 * battery_capacity / 200 / runcurrent();
@@ -272,8 +307,6 @@ static void battery_status_update(void)
     if (0 > powermgmt_est_runningtime_min) {
         powermgmt_est_runningtime_min = 0;
     }
-#else
-    powermgmt_est_runningtime_min=-1;
 #endif
 
     battery_percent = level;
@@ -348,6 +381,8 @@ bool query_force_shutdown(void)
 {
 #if defined(NO_LOW_BATTERY_SHUTDOWN)
     return false;
+#elif CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
+    return battery_percent == 0;
 #elif defined(HAVE_BATTERY_SWITCH)
     /* Cannot rely upon the battery reading to be valid and the
      * device could be powered externally. */
@@ -490,6 +525,101 @@ static inline bool detect_charger(unsigned int pwr)
 }
 #endif /* CONFIG_CHARGING */
 
+
+#if CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE
+/* Returns filtered battery voltage [millivolts] */
+int battery_voltage(void)
+{
+    return battery_millivolts;
+}
+
+static void average_init(void)
+{
+    /* initialize the voltages for the exponential filter */
+    avgbat = _battery_voltage() + 15;
+
+#ifdef HAVE_DISK_STORAGE /* this adjustment is only needed for HD based */
+    /* The battery voltage is usually a little lower directly after
+       turning on, because the disk was used heavily. Raise it by 5% */
+#if CONFIG_CHARGING
+    if (!charger_inserted()) /* only if charger not connected */
+#endif
+    {
+        avgbat += (percent_to_volt_discharge[battery_type][6] -
+                   percent_to_volt_discharge[battery_type][5]) / 2;
+    }
+#endif /* HAVE_DISK_STORAGE */
+
+    avgbat = avgbat * BATT_AVE_SAMPLES;
+    battery_millivolts = power_history[0] = avgbat / BATT_AVE_SAMPLES;
+}
+
+static void average_step(void)
+{
+    avgbat += _battery_voltage() - avgbat / BATT_AVE_SAMPLES;
+    /*
+     * battery_millivolts is the millivolt-scaled filtered battery value.
+     */
+    battery_millivolts = avgbat / BATT_AVE_SAMPLES;
+}
+
+static void average_step_low(void)
+{
+    battery_millivolts = (_battery_voltage() + battery_millivolts + 1) / 2;
+    avgbat += battery_millivolts - avgbat / BATT_AVE_SAMPLES;
+}
+
+static void init_battery_percent(void)
+{
+#if CONFIG_CHARGING
+    if (charger_inserted()) {
+        battery_percent = voltage_to_percent(battery_millivolts,
+                            percent_to_volt_charge);
+    }
+    else
+#endif
+    {
+        battery_percent = voltage_to_percent(battery_millivolts,
+                            percent_to_volt_discharge[battery_type]);
+        battery_percent += battery_percent < 100;
+    }
+
+}
+
+static int power_hist_item(void)
+{
+    return battery_millivolts;
+}
+#define power_history_unit() battery_millivolts
+
+#else
+int battery_voltage(void)
+{
+    return -1;
+}
+
+static void average_init(void) {}
+static void average_step(void) {}
+static void average_step_low(void) {}
+static void init_battery_percent(void)
+{
+    battery_percent = _battery_level();
+}
+
+static int power_hist_item(void)
+{
+    return battery_percent;
+}
+#endif
+
+static void collect_power_history(void)
+{
+    /* rotate the power history */
+    memmove(&power_history[1], &power_history[0],
+            sizeof(power_history) - sizeof(power_history[0]));
+    power_history[0] = power_hist_item();
+}
+
 /*
  * Monitor the presence of a charger and perform critical frequent steps
  * such as running the battery voltage filter.
@@ -519,32 +649,22 @@ static inline void power_thread_step(void)
             || charger_input_state == CHARGER
 #endif
     ) {
-        avgbat += battery_adc_voltage() - avgbat / BATT_AVE_SAMPLES;
-        /*
-         * battery_millivolts is the millivolt-scaled filtered battery value.
-         */
-        battery_millivolts = avgbat / BATT_AVE_SAMPLES;
-
+        average_step();
         /* update battery status every time an update is available */
         battery_status_update();
     }
     else if (battery_percent < 8) {
+        average_step_low();
+        /* update battery status every time an update is available */
+        battery_status_update();
+        
         /*
          * If battery is low, observe voltage during disk activity.
          * Shut down if voltage drops below shutoff level and we are not
          * using NiMH or Alkaline batteries.
          */
-        battery_millivolts = (battery_adc_voltage() +
-                              battery_millivolts + 1) / 2;
-
-        /* update battery status every time an update is available */
-        battery_status_update();
-
         if (!shutdown_timeout && query_force_shutdown()) {
             sys_poweroff();
-        }
-        else {
-            avgbat += battery_millivolts - avgbat / BATT_AVE_SAMPLES;
         }
     }
 } /* power_thread_step */
@@ -555,7 +675,7 @@ static void power_thread(void)
 
     /* Delay reading the first battery level */
 #ifdef MROBE_100
-    while (battery_adc_voltage() > 4200) /* gives false readings initially */
+    while (_battery_voltage() > 4200) /* gives false readings initially */
 #endif
     {
         sleep(HZ/100);
@@ -566,38 +686,13 @@ static void power_thread(void)
     power_thread_inputs = power_input_status();
 #endif
 
-    /* initialize the voltages for the exponential filter */
-    avgbat = battery_adc_voltage() + 15;
-
-#ifdef HAVE_DISK_STORAGE /* this adjustment is only needed for HD based */
-    /* The battery voltage is usually a little lower directly after
-       turning on, because the disk was used heavily. Raise it by 5% */
-#if CONFIG_CHARGING
-    if (!charger_inserted()) /* only if charger not connected */
-#endif
-    {
-        avgbat += (percent_to_volt_discharge[battery_type][6] -
-                   percent_to_volt_discharge[battery_type][5]) / 2;
-    }
-#endif /* HAVE_DISK_STORAGE */
-
-    avgbat = avgbat * BATT_AVE_SAMPLES;
-    battery_millivolts = avgbat / BATT_AVE_SAMPLES;
-    power_history[0] = battery_millivolts;
-
-#if CONFIG_CHARGING
-    if (charger_inserted()) {
-        battery_percent = voltage_to_percent(battery_millivolts,
-                            percent_to_volt_charge);
-    }
-    else
-#endif
-    {
-        battery_percent = voltage_to_percent(battery_millivolts,
-                            percent_to_volt_discharge[battery_type]);
-        battery_percent += battery_percent < 100;
-    }
-
+    /* initialize voltage averaging (if available) */
+    average_init();
+    /* get initial battery level value (in %) */
+    init_battery_percent();
+    /* get some initial data for the power curve */
+    collect_power_history();
+    /* call target specific init now */
     powermgmt_init_target();
 
     next_power_hist = current_tick + HZ*60;
@@ -609,7 +704,7 @@ static void power_thread(void)
 #ifdef HAVE_BATTERY_SWITCH
         if ((pwr ^ power_thread_inputs) & POWER_INPUT_BATTERY) {
             sleep(HZ/10);
-            reset_battery_filter(battery_adc_voltage());
+            reset_battery_filter(_battery_voltage());
         }
 #endif
         power_thread_inputs = pwr;
@@ -627,21 +722,15 @@ static void power_thread(void)
         /* Perform target tasks */
         charging_algorithm_step();
 
-        if (TIME_BEFORE(current_tick, next_power_hist))
-            continue;
-
-        /* increment to ensure there is a record for every minute
-         * rather than go forward from the current tick */
-        next_power_hist += HZ*60;
-
-        /* rotate the power history */
-        memmove(&power_history[1], &power_history[0],
-                sizeof(power_history) - sizeof(power_history[0]));
-
-        /* insert new value at the start, in millivolts 8-) */
-        power_history[0] = battery_millivolts;
-
+        /* check if some idle or sleep timer wears off */
         handle_auto_poweroff();
+
+        if (TIME_AFTER(current_tick, next_power_hist)) {
+            /* increment to ensure there is a record for every minute
+             * rather than go forward from the current tick */
+            next_power_hist += HZ*60;
+            collect_power_history();
+        }
     }
 } /* power_thread */
 
@@ -701,7 +790,6 @@ void shutdown_hw(void)
     sleep(HZ/4);
     power_off();
 }
-#endif /* PLATFORM_NATIVE */
 
 void set_poweroff_timeout(int timeout)
 {
@@ -855,12 +943,10 @@ void handle_auto_poweroff(void)
         last_event_tick = current_tick;
     }
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
     if (!shutdown_timeout && query_force_shutdown()) {
         backlight_on();
         sys_poweroff();
     }
-#endif
 
     if (timeout &&
 #if CONFIG_TUNER

@@ -219,7 +219,11 @@ MAKE_MENU(bars_menu, ID2P(LANG_BARS_MENU), 0, Icon_NOICON,
 #if CONFIG_KEYPAD == RECORDER_PAD
           &buttonbar,
 #endif
-          &volume_type, &battery_display);
+          &volume_type
+#if (CONFIG_BATTERY_MEASURE != 0)
+          , &battery_display
+#endif
+          );
 #endif /* HAVE_LCD_BITMAP */
 
 /*                                  */

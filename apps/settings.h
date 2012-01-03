@@ -638,7 +638,7 @@ struct user_settings
 
     /* power settings */
     int poweroff;   /* idle power off timer */
-#ifdef BATTERY_CAPACITY_DEFAULT
+#if BATTERY_CAPACITY_DEFAULT > 0
     int battery_capacity; /* in mAh */
 #endif
 

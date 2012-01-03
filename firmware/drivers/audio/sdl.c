@@ -167,6 +167,9 @@ void audiohw_set_eq_band_width(unsigned int band, int value)
 void audiohw_set_depth_3d(int value)
     { (void)value; }
 #endif
+
+void audiohw_close(void) {}
+
 #ifdef CONFIG_SAMPR_TYPES
 unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
                                    unsigned int type)

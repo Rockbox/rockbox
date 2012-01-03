@@ -84,6 +84,8 @@
 #define BATTERY_CAPACITY_INC 100         /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
+#define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
+
 #define CONFIG_CPU AT91SAM9260
 
 /* Define this to the CPU frequency */

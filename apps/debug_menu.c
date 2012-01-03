@@ -900,8 +900,7 @@ static bool tsc2100_debug(void)
     return simplelist_show_list(&info);
 }
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
-#ifdef HAVE_LCD_BITMAP
+#if (CONFIG_BATTERY_MEASURE != 0) && defined(HAVE_LCD_BITMAP) && !defined(SIMULATOR)
 /*
  * view_battery() shows a automatically scaled graph of the battery voltage
  * over time. Usable for estimating battery life / charging rate.
@@ -909,13 +908,14 @@ static bool tsc2100_debug(void)
  */
 
 #define BAT_LAST_VAL  MIN(LCD_WIDTH, POWER_HISTORY_LEN)
-#define BAT_YSPACE    (LCD_HEIGHT - 20)
+#define BAT_TSPACE    20
+#define BAT_YSPACE    (LCD_HEIGHT - BAT_TSPACE)
 
 
 static bool view_battery(void)
 {
     int view = 0;
-    int i, x, y, y1, y2, grid, graph;
+    int i, x, y, z, y1, y2, grid, graph;
     unsigned short maxv, minv;
 
     lcd_setfont(FONT_SYSFIXED);
@@ -934,19 +934,28 @@ static bool view_battery(void)
                     if (power_history[i] < minv)
                         minv = power_history[i];
                 }
-                
+                /* print header */
+#if (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)
                 /* adjust grid scale */ 
                 if ((maxv - minv) > 50)
                     grid = 50;
                 else
                     grid = 5;
-                
-                /* print header */                
+
                 lcd_putsf(0, 0, "battery %d.%03dV", power_history[0] / 1000,
                          power_history[0] % 1000);
                 lcd_putsf(0, 1, "%d.%03d-%d.%03dV (%2dmV)",
                           minv / 1000, minv % 1000, maxv / 1000, maxv % 1000,
                           grid);
+#elif (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
+                /* adjust grid scale */ 
+                if ((maxv - minv) > 10)
+                    grid = 10;
+                else
+                    grid = 1;
+                lcd_putsf(0, 0, "battery %d%%", power_history[0]);
+                lcd_putsf(0, 1, "%d%%-%d%% (%d %%)", minv, maxv, grid);
+#endif
                 
                 i = 1;
                 while ((y = (minv - (minv % grid)+i*grid)) < maxv)
@@ -971,11 +980,11 @@ static bool view_battery(void)
                     {
                         y1 = (power_history[i] - minv) * BAT_YSPACE / 
                             (maxv - minv);
-                        y1 = MIN(MAX(LCD_HEIGHT-1 - y1, 20), 
+                        y1 = MIN(MAX(LCD_HEIGHT-1 - y1, BAT_TSPACE), 
                                  LCD_HEIGHT-1);
                         y2 = (power_history[i-1] - minv) * BAT_YSPACE /
                             (maxv - minv);
-                        y2 = MIN(MAX(LCD_HEIGHT-1 - y2, 20),
+                        y2 = MIN(MAX(LCD_HEIGHT-1 - y2, BAT_TSPACE),
                                  LCD_HEIGHT-1);
 
                         lcd_set_drawmode(DRMODE_SOLID);
@@ -999,10 +1008,13 @@ static bool view_battery(void)
                 lcd_putsf(0, 0, "Pwr status: %s",
                          charging_state() ? "charging" : "discharging");
 #else 
-                lcd_puts(0, 0, "Power status:");
+                lcd_puts(0, 0, "Power status: unknown");
 #endif
-                battery_read_info(&y, NULL);
-                lcd_putsf(0, 1, "Battery: %d.%03d V", y / 1000, y % 1000);
+                battery_read_info(&y, &z);
+                if (y > 0)
+                    lcd_putsf(0, 1, "Battery: %d.%03d V (%d %%)", y / 1000, y % 1000, z);
+                else if (z > 0)
+                    lcd_putsf(0, 1, "Battery: %d %%", z);
 #ifdef ADC_EXT_POWER
                 y = (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 1000;
                 lcd_putsf(0, 2, "External: %d.%03d V", y / 1000, y % 1000);
@@ -1169,16 +1181,23 @@ static bool view_battery(void)
 #endif /* target type */
 #endif /* CONFIG_CHARGING */
                 break;
-
             case 2: /* voltage deltas: */
+#if (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)
                 lcd_puts(0, 0, "Voltage deltas:");
-
-                for (i = 0; i <= 6; i++) {
+                for (i = 0; i < POWER_HISTORY_LEN-1; i++) {
                     y = power_history[i] - power_history[i+1];
-                    lcd_putsf(0, i+1, "-%d min: %s%d.%03d V", i,
-                             (y < 0) ? "-" : "", ((y < 0) ? y * -1 : y) / 1000,
+                    lcd_putsf(0, i+1, "-%d min: %c%d.%03d V", i,
+                             (y < 0) ? '-' : ' ', ((y < 0) ? y * -1 : y) / 1000,
                              ((y < 0) ? y * -1 : y ) % 1000);
                 }
+#elif (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
+                lcd_puts(0, 0, "Percentage deltas:");
+                for (i = 0; i < POWER_HISTORY_LEN-1; i++) {
+                    y = power_history[i] - power_history[i+1];
+                    lcd_putsf(0, i+1, "-%d min: %c%d%%", i,
+                             (y < 0) ? '-' : ' ', ((y < 0) ? y * -1 : y));
+                }
+#endif
                 break;
 
             case 3: /* remaining time estimation: */
@@ -1195,13 +1214,19 @@ static bool view_battery(void)
                 lcd_putsf(0, 4, "Trickle sec: %d/60", trickle_sec);
 #endif /* ARCHOS_RECORDER */
 
+#if (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)
                 lcd_putsf(0, 5, "Last PwrHist: %d.%03dV",
                     power_history[0] / 1000,
                     power_history[0] % 1000);
+#endif
 
                 lcd_putsf(0, 6, "battery level: %d%%", battery_level());
 
-                lcd_putsf(0, 7, "Est. remain: %d m", battery_time());
+                int time_left = battery_time();
+                if (time_left >= 0)
+                    lcd_putsf(0, 7, "Est. remain: %d m", time_left);
+                else
+                    lcd_puts(0, 7, "Estimation n/a");
                 break;
         }
 
@@ -1228,8 +1253,7 @@ static bool view_battery(void)
     return false;
 }
 
-#endif /* HAVE_LCD_BITMAP */
-#endif
+#endif /* (CONFIG_BATTERY_MEASURE != 0) && HAVE_LCD_BITMAP */
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
@@ -2168,7 +2192,7 @@ static const struct the_menu_item menuitems[] = {
         { "View CPU stats", dbg_cpuinfo },
 #endif
 #ifdef HAVE_LCD_BITMAP
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
+#if (CONFIG_BATTERY_MEASURE != 0) && !defined(SIMULATOR)
         { "View battery", view_battery },
 #endif
 #ifndef APPLICATION

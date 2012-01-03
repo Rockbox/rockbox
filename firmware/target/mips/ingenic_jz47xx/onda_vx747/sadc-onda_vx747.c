@@ -102,7 +102,7 @@ const unsigned short percent_to_volt_charge[11] =
 #define BATTERY_SCALE_FACTOR 7500
 
 /* Returns battery voltage from ADC [millivolts] */
-unsigned int battery_adc_voltage(void)
+int _battery_voltage(void)
 {
     unsigned int dummy, bat_val;
 

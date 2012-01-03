@@ -838,7 +838,7 @@ const struct settings_list settings[] = {
                   NULL, NULL, NULL),
 /* use this setting for user code even if there's no exchangable battery
  * support enabled */
-#ifdef BATTERY_CAPACITY_DEFAULT
+#if BATTERY_CAPACITY_DEFAULT > 0
 /* define min/max/inc for this file if there's only one battery */
 #ifndef BATTERY_CAPACITY_MIN
 #define BATTERY_CAPACITY_MIN BATTERY_CAPACITY_DEFAULT

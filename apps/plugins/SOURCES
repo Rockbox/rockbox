@@ -1,5 +1,5 @@
 /* plugins common to all models */
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && (CONFIG_BATTERY_MEASURE != 0)
 battery_bench.c
 #endif
 chessclock.c

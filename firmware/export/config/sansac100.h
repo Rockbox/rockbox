@@ -92,6 +92,8 @@
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
+#define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
+
 /* define this if the unit should not shut down on low battery. */
 #define NO_LOW_BATTERY_SHUTDOWN
 

@@ -23,7 +23,6 @@
 
 #include "config.h"
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0) || defined(SIMULATOR)
 #if CONFIG_CHARGING
 enum power_input_flags {
     /* No external power source? Default. */
@@ -99,8 +98,6 @@ bool spdif_powered(void);
 #if CONFIG_TUNER
 bool tuner_power(bool status);
 bool tuner_powered(void);
-#endif
-
 #endif
 
 #endif /* _POWER_H_ */

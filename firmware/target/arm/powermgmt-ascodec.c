@@ -67,7 +67,7 @@ static unsigned int batt_threshold = 0;
 /* full-scale ADC readout (2^10) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */
-unsigned int battery_adc_voltage(void)
+int _battery_voltage(void)
 {
     return (adc_read(ADC_BATTERY) * 5125 + 512) >> 10;
 }
@@ -85,7 +85,7 @@ static void battery_voltage_sync(void)
     unsigned int mv;
 
     for (i = 0, mv = 0; i < 5; i++)
-        mv += battery_adc_voltage();
+        mv += _battery_voltage();
 
     reset_battery_filter(mv / 5);
 }

@@ -119,3 +119,9 @@ bool lcd_active(void)
     return retval;
 }
 #endif
+
+#ifdef HAVE_LCD_SHUTDOWN
+void lcd_shutdown(void)
+{
+}
+#endif

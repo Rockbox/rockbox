@@ -163,40 +163,14 @@ int maemo_thread_func (void *wait_for_osso_startup)
     return 0;
 }
 
-/** Rockbox battery related functions */
-void battery_status_update(void)
-{
-    battery_percent = maemo_battery_level;
-    send_battery_level_event();
-}
-
-/* Returns true if any power input is connected - charging-capable
- * or not. */
-bool power_input_present(void)
-{
-    return false;
-}
-
-unsigned battery_voltage(void)
-{
-    return 0;
-}
-
 /* Returns battery level in percent */
-int battery_level(void)
+int _battery_level(void)
 {
-    battery_status_update();
     return maemo_battery_level;
 }
 
 /* Return remaining battery time in minutes */
-int battery_time(void)
+int _battery_time(void)
 {
-    battery_status_update();
     return maemo_remaining_time_sec / 60;
-}
-
-bool battery_level_safe(void)
-{
-    return battery_level() >= 5;
 }

@@ -78,8 +78,6 @@ extern unsigned int power_thread_inputs;
 /* Start up power management thread */
 void powermgmt_init(void) INIT_ATTR;
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)
-
 /* Generic current values that are intentionally meaningless - config header
  * should define proper numbers.*/
  
@@ -130,13 +128,18 @@ extern const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
 extern const unsigned short percent_to_volt_charge[11];
 #endif
 
-#endif /* PLATFORM_NATIVE */
-
-/* Returns battery statust */
+/* Returns battery status, filtered for runtime estimation */
 int battery_level(void); /* percent */
 int battery_time(void); /* minutes */
-unsigned int battery_adc_voltage(void); /* voltage from ADC in millivolts */
-unsigned int battery_voltage(void); /* filtered batt. voltage in millivolts */
+int battery_voltage(void); /* filtered batt. voltage in millivolts */
+
+/* Implemented by the target, unfiltered */
+int _battery_level(void); /* percent */
+int _battery_time(void); /* minutes */
+int _battery_voltage(void); /* voltage in millivolts */
+#if CONFIG_CHARGING >= CHARGING_TARGET
+void powermgmt_init_target(void);
+#endif
 
 #ifdef HAVE_BATTERY_SWITCH
 unsigned int input_millivolts(void); /* voltage that device is running from */

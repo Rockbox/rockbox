@@ -59,3 +59,5 @@ void audiohw_set_balance(int balance)
 {
     (void)balance;
 }
+
+void audiohw_close(void) {}

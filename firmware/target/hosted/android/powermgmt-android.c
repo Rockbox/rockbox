@@ -28,10 +28,10 @@ extern JNIEnv *env_ptr;
 extern jclass  RockboxService_class;
 extern jobject RockboxService_instance;
 
-static jfieldID _battery_level;
+static jfieldID __battery_level;
 static jobject BatteryMonitor_instance;
 
-void powermgmt_init_target(void)
+static void new_battery_monitor(void)
 {
     JNIEnv e = *env_ptr;
     jclass class = e->FindClass(env_ptr, "org/rockbox/monitors/BatteryMonitor");
@@ -43,29 +43,15 @@ void powermgmt_init_target(void)
                                             RockboxService_instance);
 
     /* cache the battery level field id */
-    _battery_level = (*env_ptr)->GetFieldID(env_ptr,
+    __battery_level = (*env_ptr)->GetFieldID(env_ptr,
                                             class,
                                             "mBattLevel", "I");
 }
 
-int battery_level(void)
+int _battery_level(void)
 {
-    return (*env_ptr)->GetIntField(env_ptr, BatteryMonitor_instance, _battery_level);
+    if (!BatteryMonitor_instance)
+        new_battery_monitor();
+    return (*env_ptr)->GetIntField(env_ptr, BatteryMonitor_instance, __battery_level);
 }
 
-int battery_time(void)
-{   /* cannot calculate yet */
-    return 0;
-}
-
-/* should always be safe on android targets, the host shuts us down before */
-bool battery_level_safe(void)
-{
-    return true;
-}
-
-/* TODO */
-unsigned battery_voltage(void)
-{
-    return 0;
-}

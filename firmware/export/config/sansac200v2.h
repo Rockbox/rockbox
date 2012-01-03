@@ -138,6 +138,8 @@
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
+#define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
+
 /* Charging implemented in a target-specific algorithm */
 #define CONFIG_CHARGING CHARGING_TARGET
 

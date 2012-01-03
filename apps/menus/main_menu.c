@@ -210,7 +210,7 @@ static const char* info_getname(int selected_item, void *data,
                 snprintf(buffer, buffer_len, str(LANG_BATTERY_TIME),
                          battery_level(), battery_time() / 60, battery_time() % 60);
             else
-                return "(n/a)";
+                return "Battery n/a"; /* translating worth it? */
             break;
         case INFO_DISK1: /* disk usage 1 */
 #ifdef HAVE_MULTIVOLUME
@@ -289,9 +289,11 @@ static int info_speak_item(int selected_item, void * data)
 #endif /* CONFIG_CHARGING = */
             if (battery_level() >= 0)
             {
+                int time_left = battery_time();
                 talk_id(LANG_BATTERY_TIME, false);
                 talk_value(battery_level(), UNIT_PERCENT, true);
-                talk_value(battery_time() *60, UNIT_TIME, true);
+                if (time_left >= 0)
+                    talk_value(time_left * 60, UNIT_TIME, true);
             }
             else talk_id(VOICE_BLANK, false);
             break;
