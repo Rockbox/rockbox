@@ -34,8 +34,6 @@ static struct i2c_node si4700_i2c_node =
 {
     .num  = I2C2_NUM,
     .ifdr = I2C_IFDR_DIV192, /* 66MHz/.4MHz = 165, closest = 192 = 343750Hz */
-                             /* Just hard-code for now - scaling may require 
-                              * updating */
     .addr = (0x20),
 };
 

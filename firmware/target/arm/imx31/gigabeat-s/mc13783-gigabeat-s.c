@@ -32,11 +32,9 @@
 
 /* Gigabeat S mc13783 serial interface node. */
 
-/* This is all based on communicating with the MC13783 PMU which is on 
- * CSPI2 with the chip select at 0. The LCD controller resides on
- * CSPI3 cs1, but we have no idea how to communicate to it */
 struct spi_node mc13783_spi =
 {
+    /* Based upon original firmware settings */
     CSPI2_NUM,                     /* CSPI module 2 */
     CSPI_CONREG_CHIP_SELECT_SS0 |  /* Chip select 0 */
     CSPI_CONREG_DRCTL_DONT_CARE |  /* Don't care about CSPI_RDY */
