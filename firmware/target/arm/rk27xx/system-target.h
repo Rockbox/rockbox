@@ -40,15 +40,13 @@ static inline void core_sleep(void)
     /* SCU_CPUPD = 0xdeedbabe; */
 }
 
-#define HAVE_CPUCACHE_COMMIT_DISCARD
-/* deprecated alias */
-#define HAVE_CPUCACHE_INVALIDATE
-
 /* Write DCache back to RAM for the given range and remove cache lines
  * from DCache afterwards */
 void commit_discard_dcache_range(const void *base, unsigned int size);
-/* deprecated alias */
-void invalidate_dcache_range(const void *base, unsigned int size);
+
+static inline void commit_dcache(void) {}
+void commit_discard_dcache(void);
+void commit_discard_idcache(void);
 
 #define CPUFREQ_NORMAL 200000000
 #define CPUFREQ_MAX    200000000

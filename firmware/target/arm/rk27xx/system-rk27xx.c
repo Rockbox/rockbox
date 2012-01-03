@@ -177,6 +177,7 @@ void commit_discard_idcache(void)
     /* wait for invalidate process to complete */
     while (CACHEOP & 0x03);   
 }
+void commit_discard_dcache (void) __attribute__((alias("commit_discard_idcache")));
 
 void commit_discard_dcache_range (const void *base, unsigned int size)
 {
@@ -193,6 +194,3 @@ void commit_discard_dcache_range (const void *base, unsigned int size)
         opcode += 32;
     }
 }
-
-void commit_dcache_range(const void *base, unsigned int size)
-    __attribute__((alias("commit_discard_dcache_range")));
