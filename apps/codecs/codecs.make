@@ -206,8 +206,10 @@ $(CODECDIR)/%.codec: $(CODECDIR)/%.o $(LIBSETJMP)
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(CODECLDFLAGS)
-ifdef APP_TYPE
-	$(SILENT)cp $(CODECDIR)/$*.elf $@
+ifndef APP_TYPE
+	$(SILENT)$(OC) -O binary $(CODECDIR)/$*.elf $@ # objcopy native
+else ifeq (,$(findstring sdl-sim,$(APP_TYPE)))
+	$(SILENT)$(OC) -S -x $(CODECDIR)/$*.elf $@	   # objcopy hosted
 else
-	$(SILENT)$(OC) -O binary $(CODECDIR)/$*.elf $@
+	$(SILENT)cp $(CODECDIR)/$*.elf $@			   # no objcopy, keep debug symbols
 endif
