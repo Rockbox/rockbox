@@ -3,7 +3,7 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
-STARTUP(target/arm/crt0-pp-bl.o)
+STARTUP(target/arm/pp/crt0-pp-bl.o)
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 
