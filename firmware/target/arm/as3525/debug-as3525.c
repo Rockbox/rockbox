@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include <stdbool.h>
-#include <debug-target.h>
 #include "button.h"
 #include "lcd.h"
 #include "font.h"
@@ -30,6 +29,8 @@
 #include "ascodec-target.h"
 #include "adc.h"
 #include "storage.h"
+
+#define DEBUG_CANCEL BUTTON_LEFT
 
 #define ON "Enabled"
 #define OFF "Disabled"
