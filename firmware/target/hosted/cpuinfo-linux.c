@@ -146,7 +146,7 @@ int cpufrequency_linux(int cpu)
     cpu_dev = open(path, O_RDONLY);
     if (cpu_dev < 0)
         return -1;
-    if (read(cpu_dev, temp, sizeof(tmp)) >= 0)
+    if (read(cpu_dev, temp, sizeof(temp)) >= 0)
         ret = atoi(temp);
     close(cpu_dev);
     return ret;
@@ -161,7 +161,7 @@ int scalingfrequency_linux(int cpu)
     cpu_dev = open(path, O_RDONLY);
     if (cpu_dev < 0)
         return -1;
-    if (read(cpu_dev, temp, sizeof(tmp)) >= 0)
+    if (read(cpu_dev, temp, sizeof(temp)) >= 0)
         ret = atoi(temp);
     close(cpu_dev);
     return ret;
