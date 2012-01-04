@@ -386,4 +386,8 @@ static inline uint32_t swaw32_hw(uint32_t value)
  * break strict aliasing rules' B.S. */
 #define PUN_PTR(type, p) ((type)(intptr_t)(p))
 
+#ifndef SIMULATOR
+bool dbg_ports(void);
+#endif
+
 #endif /* __SYSTEM_H__ */

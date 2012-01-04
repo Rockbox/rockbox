@@ -24,8 +24,4 @@
 bool debug_menu(void);
 bool run_debug_screen(char* screen);
 
-#ifndef SIMULATOR
-extern bool dbg_ports(void);
-#endif
-
 #endif
