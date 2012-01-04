@@ -38,7 +38,6 @@ uintptr_t *stackend;
 
 extern int main(void);
 extern void telephony_init_device(void);
-extern void pcm_shutdown(void);
 
 void system_exception_wait(void) { }
 void system_reboot(void) { }
@@ -93,8 +92,6 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
 
         main();
     }
-
-    pcm_shutdown();
     /* simply return here. this will allow the VM to clean up objects and do
      * garbage collection */
 }
