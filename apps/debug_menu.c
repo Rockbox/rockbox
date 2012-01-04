@@ -785,7 +785,7 @@ static bool dbg_pcf(void)
         lcd_putsf(0, line++, "D3REGC: %02x", pcf50605_read(0x26));
         lcd_putsf(0, line++, "LPREG1: %02x", pcf50605_read(0x27));
         lcd_update();
-        if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
+        if (action_userabort(HZ/10))
         {
             lcd_setfont(FONT_UI);
             return false;
