@@ -2048,7 +2048,7 @@ static bool dbg_scrollwheel(void)
 
         /* show effective accelerated scrollspeed */
         lcd_putsf(0, 6, "accel. speed: %4d",
-                button_apply_acceleration( (1<<31)|(1<<24)|wheel_velocity);
+                button_apply_acceleration((1<<31)|(1<<24)|wheel_velocity) );
 
         lcd_update();
     }
