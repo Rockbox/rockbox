@@ -141,13 +141,13 @@ int cpufrequency_linux(int cpu)
 {
     char path[64];
     char temp[10];
-    int cpu_dev, ret;
+    int cpu_dev, ret = -1;
     snprintf(path, sizeof(path), "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_cur_freq", cpu);
     cpu_dev = open(path, O_RDONLY);
     if (cpu_dev < 0)
         return -1;
-    read(cpu_dev, temp, 10);
-    ret = atoi(temp);
+    if (read(cpu_dev, temp, sizeof(tmp)) >= 0)
+        ret = atoi(temp);
     close(cpu_dev);
     return ret;
 }
@@ -156,13 +156,13 @@ int scalingfrequency_linux(int cpu)
 {
     char path[64];
     char temp[10];
-    int cpu_dev, ret;
+    int cpu_dev, ret = -1;
     snprintf(path, sizeof(path), "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", cpu);
     cpu_dev = open(path, O_RDONLY);
     if (cpu_dev < 0)
         return -1;
-    read(cpu_dev, temp, 10);
-    ret = atoi(temp);
+    if (read(cpu_dev, temp, sizeof(tmp)) >= 0)
+        ret = atoi(temp);
     close(cpu_dev);
     return ret;
 }
