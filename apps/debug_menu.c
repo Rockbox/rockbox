@@ -1531,7 +1531,6 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 #else /* No SD, MMC or ATA */
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
-    (void)btn;
     (void)lists;
     struct storage_info info;
     storage_get_info(0,&info);
@@ -1587,7 +1586,7 @@ static bool dbg_disk_info(void)
 #ifdef HAVE_DIRCACHE
 static int dircache_callback(int btn, struct gui_synclist *lists)
 {
-    (void)btn; (void)lists;
+    (void)lists;
     simplelist_set_line_count(0);
     simplelist_addline(SIMPLELIST_ADD_LINE, "Cache initialized: %s",
              dircache_is_enabled() ? "Yes" : "No");
@@ -1756,9 +1755,7 @@ static bool dbg_save_roms(void)
 #elif defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD)
 static bool dbg_save_roms(void)
 {
-    int fd;
-
-    fd = creat("/internal_rom_000000-0FFFFF.bin", 0666);
+    int fd = creat("/internal_rom_000000-0FFFFF.bin", 0666);
     if(fd >= 0)
     {
         write(fd, (void *)0x20000000, FLASH_SIZE);
@@ -1770,9 +1767,7 @@ static bool dbg_save_roms(void)
 #elif CONFIG_CPU == IMX31L
 static bool dbg_save_roms(void)
 {
-    int fd;
-
-    fd = creat("/flash_rom_A0000000-A01FFFFF.bin", 0666);
+    int fd = creat("/flash_rom_A0000000-A01FFFFF.bin", 0666);
     if (fd >= 0)
     {
         write(fd, (void*)0xa0000000, FLASH_SIZE);
@@ -1784,9 +1779,7 @@ static bool dbg_save_roms(void)
 #elif defined(CPU_TCC780X)
 static bool dbg_save_roms(void)
 {
-    int fd;
-
-    fd = creat("/eeprom_E0000000-E0001FFF.bin", 0666);
+    int fd = creat("/eeprom_E0000000-E0001FFF.bin", 0666);
     if (fd >= 0)
     {
         write(fd, (void*)0xe0000000, 0x2000);
@@ -1854,10 +1847,9 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     IF_TUNER_TYPE(SI4700)
     {
         struct si4700_dbg_info nfo;
-        int i;
         si4700_dbg_info(&nfo);
         simplelist_addline(SIMPLELIST_ADD_LINE, "SI4700 regs:");
-        for (i = 0; i < 16; i += 4) {
+        for (int i = 0; i < 16; i += 4) {
             simplelist_addline(SIMPLELIST_ADD_LINE,"%02X: %04X %04X %04X %04X",
                 i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
         }
@@ -1876,10 +1868,9 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     IF_TUNER_TYPE(RDA5802)
     {
         struct rda5802_dbg_info nfo;
-        int i;
         rda5802_dbg_info(&nfo);
         simplelist_addline(SIMPLELIST_ADD_LINE, "RDA5802 regs:");
-        for (i = 0; i < 16; i += 4) {
+        for (int i = 0; i < 16; i += 4) {
             simplelist_addline(SIMPLELIST_ADD_LINE,"%02X: %04X %04X %04X %04X",
                 i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
         }
@@ -1912,8 +1903,7 @@ extern bool do_screendump_instead_of_usb;
 static bool dbg_screendump(void)
 {
     do_screendump_instead_of_usb = !do_screendump_instead_of_usb;
-    splashf(HZ, "Screendump %s",
-                 do_screendump_instead_of_usb?"enabled":"disabled");
+    splashf(HZ, "Screendump %sabled", do_screendump_instead_of_usb?"en":"dis");
     return false;
 }
 #endif /* HAVE_LCD_BITMAP */
@@ -1923,8 +1913,7 @@ extern bool write_metadata_log;
 static bool dbg_metadatalog(void)
 {
     write_metadata_log = !write_metadata_log;
-    splashf(HZ, "Metadata log %s",
-                 write_metadata_log?"enabled":"disabled");
+    splashf(HZ, "Metadata log %sabled", write_metadata_log ? "en" : "dis");
     return false;
 }
 
@@ -1948,23 +1937,18 @@ static bool dbg_set_memory_guard(void)
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
 static bool dbg_write_eeprom(void)
 {
-    int fd;
-    int rc;
-    int old_irq_level;
-    char buf[EEPROM_SIZE];
-    int err;
-
-    fd = open("/internal_eeprom.bin", O_RDONLY);
+    int fd = open("/internal_eeprom.bin", O_RDONLY);
 
     if (fd >= 0)
     {
-        rc = read(fd, buf, EEPROM_SIZE);
+        char buf[EEPROM_SIZE];
+        int rc = read(fd, buf, EEPROM_SIZE);
 
         if(rc == EEPROM_SIZE)
         {
-            old_irq_level = disable_irq_save();
+            int old_irq_level = disable_irq_save();
 
-            err = eeprom_24cxx_write(0, buf, sizeof buf);
+            int err = eeprom_24cxx_write(0, buf, sizeof buf);
             if (err)
                 splashf(HZ*3, "Eeprom write failure (%d)", err);
             else
@@ -1989,17 +1973,14 @@ static bool dbg_write_eeprom(void)
 #ifdef CPU_BOOST_LOGGING
 static bool cpu_boost_log(void)
 {
-    int i = 0,j=0;
     int count = cpu_boost_log_getcount();
-    int lines = LCD_HEIGHT/SYSFONT_HEIGHT;
-    char *str;
+    char *str = cpu_boost_log_getlog_first();
     bool done;
     lcd_setfont(FONT_SYSFIXED);
-    str = cpu_boost_log_getlog_first();
-    while (i < count)
+    for (int i = 0; i < count ;)
     {
         lcd_clear_display();
-        for(j=0; j<lines; j++,i++)
+        for(int j=0; j<LCD_HEIGHT/SYSFONT_HEIGHT; j++,i++)
         {
             if (!str)
                 str = cpu_boost_log_getlog_next();
@@ -2048,8 +2029,6 @@ extern unsigned int wheel_velocity;
 
 static bool dbg_scrollwheel(void)
 {
-    unsigned int speed;
-
     lcd_setfont(FONT_SYSFIXED);
 
     while (1)
@@ -2068,8 +2047,8 @@ static bool dbg_scrollwheel(void)
         lcd_putsf(0, 5, "velo [deg/s]: %4d", (int)wheel_velocity);
 
         /* show effective accelerated scrollspeed */
-        speed = button_apply_acceleration( (1<<31)|(1<<24)|wheel_velocity);
-        lcd_putsf(0, 6, "accel. speed: %4d", speed);
+        lcd_putsf(0, 6, "accel. speed: %4d",
+                button_apply_acceleration( (1<<31)|(1<<24)|wheel_velocity);
 
         lcd_update();
     }
@@ -2078,25 +2057,18 @@ static bool dbg_scrollwheel(void)
 }
 #endif
 
-#if defined (HAVE_USBSTACK)
-
+#ifdef HAVE_USBSTACK
 #if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
-static bool toggle_usb_core_driver(int driver, char *msg)
+static bool toggle_usb_serial(void)
 {
-    bool enabled = !usb_core_driver_enabled(driver);
+    bool enabled = !usb_core_driver_enabled(USB_DRIVER_SERIAL);
 
-    usb_core_enable_driver(driver,enabled);
-    splashf(HZ, "%s %s", msg, enabled?"enabled":"disabled");
+    usb_core_enable_driver(USB_DRIVER_SERIAL, enabled);
+    splashf(HZ, "USB Serial %sabled", enabled ? "en" : "dis");
 
     return false;
 }
-
-static bool toggle_usb_serial(void)
-{
-    return toggle_usb_core_driver(USB_DRIVER_SERIAL,"USB Serial");
-}
 #endif
-
 #endif
 
 #if CONFIG_USBOTG == USBOTG_ISP1583
@@ -2153,11 +2125,10 @@ static bool dbg_pic(void)
 
 
 /****** The menu *********/
-struct the_menu_item {
+static const struct {
     unsigned char *desc; /* string or ID */
     bool (*function) (void); /* return true if USB was connected */
-};
-static const struct the_menu_item menuitems[] = {
+} menuitems[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
     (defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD)) || \
     CONFIG_CPU == IMX31L || defined(CPU_TCC780X)
@@ -2259,7 +2230,8 @@ static const struct the_menu_item menuitems[] = {
      && !defined(IPOD_MINI) && !defined(SIMULATOR))
         {"Debug scrollwheel", dbg_scrollwheel },
 #endif
-    };
+};
+
 static int menu_action_callback(int btn, struct gui_synclist *lists)
 {
     int selection = gui_synclist_get_sel_pos(lists);
@@ -2282,7 +2254,7 @@ static int menu_action_callback(int btn, struct gui_synclist *lists)
     return btn;
 }
 
-static const char* dbg_menu_getname(int item, void * data,
+static const char* menu_get_name(int item, void * data,
                                     char *buffer, size_t buffer_len)
 {
     (void)data; (void)buffer; (void)buffer_len;
@@ -2295,15 +2267,13 @@ bool debug_menu(void)
 
     simplelist_info_init(&info, "Debug Menu", ARRAYLEN(menuitems), NULL);
     info.action_callback = menu_action_callback;
-    info.get_name = dbg_menu_getname;
+    info.get_name        = menu_get_name;
     return simplelist_show_list(&info);
 }
 
 bool run_debug_screen(char* screen)
 {
-    unsigned i;
-    for (i=0; i<ARRAYLEN(menuitems); i++)
-    {
+    for (unsigned i=0; i<ARRAYLEN(menuitems); i++)
         if (!strcmp(screen, menuitems[i].desc))
         {
             FOR_NB_SCREENS(j)
@@ -2313,6 +2283,6 @@ bool run_debug_screen(char* screen)
                 viewportmanager_theme_undo(j, false);
             return true;
         }
-    }
+
     return false;
 }
