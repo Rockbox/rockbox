@@ -305,12 +305,3 @@ static inline void load_context(const void* addr)
     }
     swap_context(target_context, r->uc);
 }
-
-/*
- * play nice with the host and sleep while waiting for the tick */
-extern void wait_for_interrupt(void);
-static inline void core_sleep(void)
-{
-    enable_irq();
-    wait_for_interrupt();
-}

@@ -18,11 +18,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __SYSTEM_TARGET_H__
-#define __SYSTEM_TARGET_H__
 
-#include "kernel-unix.h"
-#include "system-hosted.h"
+#ifndef __SYSTEM_HOSTED_H__
+#define __SYSTEM_HOSTED_H__
 
-#define NEED_GENERIC_BYTESWAPS
-#endif /* __SYSTEM_TARGET_H__ */
+#include "system.h"
+
+static inline void commit_dcache(void) {}
+static inline void commit_discard_dcache(void) {}
+static inline void commit_discard_idcache(void) {}
+
+static inline void core_sleep(void)
+{
+    enable_irq();
+    wait_for_interrupt();
+}
+
+#endif

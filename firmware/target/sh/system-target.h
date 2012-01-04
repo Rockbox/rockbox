@@ -137,4 +137,18 @@ static inline void commit_dcache(void) {}
 static inline void commit_discard_dcache(void) {}
 static inline void commit_discard_idcache(void) {}
 
+/*---------------------------------------------------------------------------
+ * Put core in a power-saving state.
+ *---------------------------------------------------------------------------
+ */
+static inline void core_sleep(void)
+{
+    asm volatile (
+        "and.b  #0x7f, @(r0, gbr) \n" /* Clear SBY (bit 7) in SBYCR */
+        "mov    #0, r1            \n" /* Enable interrupts */
+        "ldc    r1, sr            \n" /* Following instruction cannot be interrupted */
+        "sleep                    \n" /* Execute standby */
+        : : "z"(&SBYCR-GBR) : "r1");
+}
+
 #endif /* SYSTEM_TARGET_H */

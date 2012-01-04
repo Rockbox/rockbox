@@ -8,7 +8,6 @@
  * $Id$
  *
  * Copyright (C) 2005 by Thom Johansen
- * Copyright (C) 2010 by Thomas Martitz (Android-suitable core_sleep())
  *
  * Generic ARM threading support
  *
@@ -22,8 +21,6 @@
  *
  ****************************************************************************/
 
-#include <system.h>
-
 /*---------------------------------------------------------------------------
  * Start the thread running and terminate it if it returns
  *---------------------------------------------------------------------------
@@ -36,10 +33,18 @@ static void __attribute__((naked)) USED_ATTR start_thread(void)
         "ldr    r4, [r0, #40]            \n" /* start in r4 since it's non-volatile */
         "mov    r1, #0                   \n" /* Mark thread as running */
         "str    r1, [r0, #40]            \n"
+#if NUM_CORES > 1
+        "ldr    r0, =commit_discard_idcache \n" /* Invalidate this core's cache. */
+        "mov    lr, pc                   \n" /* This could be the first entry into */
+        "bx     r0                       \n" /* plugin or codec code for this core. */
+#endif
         "mov    lr, pc                   \n" /* Call thread function */
         "bx     r4                       \n"
     ); /* No clobber list - new thread doesn't care */
     thread_exit();
+#if 0
+    asm volatile (".ltorg"); /* Dump constant pool */
+#endif
 }
 
 /* For startup, place context pointer in r4 slot, start_thread pointer in r5
@@ -74,26 +79,16 @@ static inline void load_context(const void* addr)
         "cmp     r0, #0                 \n" /* Check for NULL */
 
         /* If not already running, jump to start */
+#if ARM_ARCH == 4 && defined(USE_THUMB)
+        "ldmneia %0, { r0, r12 }        \n"
+        "bxne    r12                    \n"
+#else
         "ldmneia %0, { r0, pc }         \n"
+#endif
+
         "ldmia   %0, { r4-r11, sp, lr } \n" /* Load regs r4 to r14 from context */
         : : "r" (addr) : "r0" /* only! */
     );
-}
-
-/*
- * this core sleep suspends the OS thread rockbox runs under, which greatly
- * reduces cpu usage (~100% to <10%)
- *
- * it returns when when the tick timer is called, other interrupt-like
- * events occur
- *
- * wait_for_interrupt is implemented in kernel-<platform>.c
- **/
-
-static inline void core_sleep(void)
-{
-    enable_irq();
-    wait_for_interrupt();
 }
 
 

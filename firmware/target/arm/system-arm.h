@@ -347,4 +347,31 @@ static inline uint32_t swaw32_hw(uint32_t value)
 
 }
 
+#if defined(CPU_TCC780X) || defined(CPU_TCC77X) /* Single core only for now */ \
+|| CONFIG_CPU == IMX31L || CONFIG_CPU == DM320 || CONFIG_CPU == AS3525 \
+|| CONFIG_CPU == S3C2440 || CONFIG_CPU == S5L8701 || CONFIG_CPU == AS3525v2 \
+|| CONFIG_CPU == S5L8702
+/* Use the generic ARMv4/v5/v6 wait for IRQ */
+static inline void core_sleep(void)
+{
+    asm volatile (
+        "mcr p15, 0, %0, c7, c0, 4 \n" /* Wait for interrupt */
+#if CONFIG_CPU == IMX31L
+        "nop\n nop\n nop\n nop\n nop\n" /* Clean out the pipes */
+#endif
+        : : "r"(0)
+    );
+    enable_irq();
+}
+#else
+/* Skip this if special code is required and implemented */
+#if !(defined(CPU_PP)) && CONFIG_CPU != RK27XX && CONFIG_CPU != IMX233
+static inline void core_sleep(void)
+{
+    /* TODO: core_sleep not implemented, battery life will be decreased */
+    enable_irq();
+}
+#endif /* CPU_PP */
+#endif
+
 #endif /* SYSTEM_ARM_H */

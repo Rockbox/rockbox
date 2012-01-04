@@ -23,10 +23,7 @@
 #define __SYSTEM_TARGET_H__
 
 #include "kernel-unix.h"
-
-static inline void commit_dcache(void) {}
-static inline void commit_discard_dcache(void) {}
-static inline void commit_discard_idcache(void) {}
+#include "system-hosted.h"
 
  /* don't pull in jni.h for every user of this file, it should be only needed
   * within the target tree (if at all)

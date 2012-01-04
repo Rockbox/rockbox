@@ -223,4 +223,14 @@ void commit_discard_idcache(void);
 static inline void commit_discard_dcache(void) {}
 static inline void commit_dcache(void) {}
 
+/*---------------------------------------------------------------------------
+ * Put core in a power-saving state if waking list wasn't repopulated.
+ *---------------------------------------------------------------------------
+ */
+static inline void core_sleep(void)
+{
+    /* Supervisor mode, interrupts enabled upon wakeup */
+    asm volatile ("stop #0x2000");
+};
+
 #endif /* SYSTEM_TARGET_H */

@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #ifndef THREAD_H
 #define THREAD_H
 
@@ -93,66 +94,8 @@
  * maybe more expensive C lib functions?
  *
  * simulator (possibly) doesn't simulate stack usage anyway but well ... */
-#ifdef HAVE_SIGALTSTACK_THREADS
-#include <signal.h>
-/* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
-#define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x3000) /* Bytes */
-#elif (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(HAVE_WIN32_FIBER_THREADS)
-#define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
-#else /* native threads, sdl threads */
-#define DEFAULT_STACK_SIZE 0x400 /* Bytes */
-#endif
 
-
-#if defined(ASSEMBLER_THREADS)
-/* Need to keep structures inside the header file because debug_menu
- * needs them. */
-#ifdef CPU_COLDFIRE
-struct regs
-{
-    uint32_t macsr; /*     0 - EMAC status register */
-    uint32_t d[6];  /*  4-24 - d2-d7 */
-    uint32_t a[5];  /* 28-44 - a2-a6 */
-    uint32_t sp;    /*    48 - Stack pointer (a7) */
-    uint32_t start; /*    52 - Thread start address, or NULL when started */
-};
-#elif CONFIG_CPU == SH7034
-struct regs
-{
-    uint32_t r[7];  /*  0-24 - Registers r8 thru r14 */
-    uint32_t sp;    /*    28 - Stack pointer (r15) */
-    uint32_t pr;    /*    32 - Procedure register */
-    uint32_t start; /*    36 - Thread start address, or NULL when started */
-};
-#elif defined(CPU_ARM)
-struct regs
-{
-    uint32_t r[8];  /*  0-28 - Registers r4-r11 */
-    uint32_t sp;    /*    32 - Stack pointer (r13) */
-    uint32_t lr;    /*    36 - r14 (lr) */
-    uint32_t start; /*    40 - Thread start address, or NULL when started */
-};
-
-#elif defined(CPU_MIPS)
-struct regs
-{
-    uint32_t r[9];  /* 0-32 - Registers s0-s7, fp */
-    uint32_t sp;    /*   36 - Stack pointer */
-    uint32_t ra;    /*   40 - Return address */
-    uint32_t start; /*   44 - Thread start address, or NULL when started */
-};
-#endif /* CONFIG_CPU */
-#elif (CONFIG_PLATFORM & PLATFORM_HOSTED) || defined(__PCTOOL__)
-#ifndef HAVE_SDL_THREADS
-struct regs
-{
-    void (*start)(void); /* thread's entry point, or NULL when started */
-    void* uc;            /* host thread handle */
-    uintptr_t sp;        /* Stack pointer, unused */
-    size_t stack_size;   /* stack size, not always used */
-    uintptr_t stack;     /* pointer to start of the stack buffer */
-};
-#else /* SDL threads */
+#ifdef HAVE_SDL_THREADS
 struct regs
 {
     void *t;             /* OS thread */
@@ -160,8 +103,11 @@ struct regs
     void *s;             /* Semaphore for blocking and wakeup */
     void (*start)(void); /* Start function */
 };
-#endif
-#endif /* PLATFORM_NATIVE */
+
+#define DEFAULT_STACK_SIZE 0x100 /* tiny, ignored anyway */
+#else
+#include "asm/thread.h"
+#endif /* HAVE_SDL_THREADS */
 
 #ifdef CPU_PP
 #ifdef HAVE_CORELOCK_OBJECT

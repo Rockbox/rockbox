@@ -178,25 +178,12 @@ void switch_thread(void)
  * Processor/OS-specific section - include necessary core support
  */
 
-#if defined(HAVE_WIN32_FIBER_THREADS)
-#include "thread-win32.c"
-#elif defined(HAVE_SIGALTSTACK_THREADS)
-#include "thread-unix.c"
-#elif defined(CPU_ARM)
-#include "thread-arm.c"
+
+#include "asm/thread.c"
+
 #if defined (CPU_PP)
 #include "thread-pp.c"
 #endif /* CPU_PP */
-#elif defined(CPU_COLDFIRE)
-#include "thread-coldfire.c"
-#elif CONFIG_CPU == SH7034
-#include "thread-sh.c"
-#elif defined(CPU_MIPS) && CPU_MIPS == 32
-#include "thread-mips32.c"
-#else
-/* Wouldn't compile anyway */
-#error Processor not implemented.
-#endif /* CONFIG_CPU == */
 
 #ifndef IF_NO_SKIP_YIELD
 #define IF_NO_SKIP_YIELD(...)

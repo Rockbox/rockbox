@@ -41,6 +41,8 @@ int set_irq_level(int level);
 #define restore_irq(level) \
     ((void)set_irq_level(level))
 
+#include "system-hosted.h"
+
 void sim_enter_irq_handler(void);
 void sim_exit_irq_handler(void);
 void sim_kernel_shutdown(void);
@@ -48,17 +50,10 @@ void sys_poweroff(void);
 void sys_handle_argv(int argc, char *argv[]);
 void gui_message_loop(void);
 void sim_do_exit(void) NORETURN_ATTR;
-#ifndef HAVE_SDL_THREADS
-void wait_for_interrupt(void);
-#endif
 
 extern bool background;  /* True if the background image is enabled */
 extern bool showremote;
 extern int display_zoom;
 extern long start_tick;
-
-static inline void commit_dcache(void) {}
-static inline void commit_discard_dcache(void) {}
-static inline void commit_discard_idcache(void) {}
 
 #endif /* _SYSTEM_SDL_H_ */

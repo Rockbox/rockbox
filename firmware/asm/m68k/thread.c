@@ -87,16 +87,6 @@ static inline void load_context(const void* addr)
 }
 
 /*---------------------------------------------------------------------------
- * Put core in a power-saving state if waking list wasn't repopulated.
- *---------------------------------------------------------------------------
- */
-static inline void core_sleep(void)
-{
-    /* Supervisor mode, interrupts enabled upon wakeup */
-    asm volatile ("stop #0x2000");
-};
-
-/*---------------------------------------------------------------------------
  * Call this from asm to make sure the sp is pointing to the
  * correct place before the context is saved.
  *---------------------------------------------------------------------------

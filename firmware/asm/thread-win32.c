@@ -74,12 +74,3 @@ static inline void load_context(const void* addr)
     }
     SwitchToFiber(context->uc);
 }
-
-/*
- * play nice with the host and sleep while waiting for the tick */
-static inline void core_sleep(void)
-{
-    enable_irq();
-    wait_for_interrupt();
-}
-

@@ -109,25 +109,3 @@ static inline void load_context(const void* addr)
     );
 }
 
-/*---------------------------------------------------------------------------
- * Put core in a power-saving state.
- *---------------------------------------------------------------------------
- */
-static inline void core_sleep(void)
-{
-#if CONFIG_CPU == JZ4732
-    __cpm_idle_mode();
-#endif
-    asm volatile(".set   mips32r2           \n"
-                 "mfc0   $8, $12            \n" /* mfc t0, $12 */
-                 "move   $9, $8             \n" /* move t1, t0 */
-                 "la     $10, 0x8000000     \n" /* la t2, 0x8000000 */
-                 "or     $8, $8, $10        \n" /* Enable reduced power mode */
-                 "mtc0   $8, $12            \n" /* mtc t0, $12 */
-                 "wait                      \n"
-                 "mtc0   $9, $12            \n" /* mtc t1, $12 */
-                 ".set   mips0              \n"
-                 ::: "t0", "t1", "t2"
-                 );
-    enable_irq();
-}
