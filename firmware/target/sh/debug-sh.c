@@ -30,8 +30,13 @@
 #include "adc.h"
 #include "hwcompat.h"    /* ROM_VERSION */
 #include "crc32.h"      
-#include "debug-target.h"
 
+#if CONFIG_KEYPAD == RECORDER_PAD
+#   define DEBUG_CANCEL  BUTTON_OFF
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#   define DEBUG_CANCEL  BUTTON_MENU
+#endif
 
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
@@ -276,4 +281,3 @@ bool dbg_hw_info(void)
 #endif
     return false;
 }
-
