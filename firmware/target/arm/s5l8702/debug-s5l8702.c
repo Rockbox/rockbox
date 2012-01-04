@@ -23,7 +23,6 @@
 #include "system.h"
 #include "config.h"
 #include "kernel.h"
-#include "debug-target.h"
 #include "button.h"
 #include "lcd.h"
 #include "font.h"
@@ -31,6 +30,8 @@
 #include "power.h"
 #include "pmu-target.h"
 #include "pcm-target.h"
+
+#define DEBUG_CANCEL BUTTON_MENU
 
 /*  Skeleton for adding target specific debug info to the debug menu
  */
