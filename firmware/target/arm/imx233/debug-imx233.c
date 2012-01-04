@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "system.h"
-#include "debug-target.h"
 #include "dma-imx233.h"
 #include "action.h"
 #include "lcd.h"

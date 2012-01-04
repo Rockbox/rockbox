@@ -117,4 +117,6 @@ static inline void mdelay(unsigned msecs)
 void usb_insert_int(void);
 void usb_remove_int(void);
 
+bool dbg_hw_target_info(void);
+
 #endif /* SYSTEM_TARGET_H */
