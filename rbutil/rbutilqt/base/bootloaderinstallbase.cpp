@@ -29,6 +29,7 @@
 #include "bootloaderinstallams.h"
 #include "bootloaderinstalltcc.h"
 #include "bootloaderinstallmpio.h"
+#include "bootloaderinstallimx.h"
 #include "utils.h"
 
 #if defined(Q_OS_MACX)
@@ -66,6 +67,9 @@ BootloaderInstallBase* BootloaderInstallBase::createBootloaderInstaller(QObject*
     }
     else if(type == "mpio") {
         return new BootloaderInstallMpio(parent);
+    }
+    else if(type == "imx") {
+        return new BootloaderInstallImx(parent);
     }
     else {
         return NULL;
@@ -205,6 +209,10 @@ QString BootloaderInstallBase::postinstallHints(QString model)
 
     msg += "<ol>";
     msg += tr("<li>Safely remove your player.</li>");
+    if(model == "sansafuzeplus") {
+        msg += tr("<li>Remove any previously inserted microSD card</li>");
+        hint = true;
+    }
     if(model == "h100" || model == "h120" || model == "h300" ||
        model == "ondavx747") {
         hint = true;
@@ -215,6 +223,16 @@ QString BootloaderInstallBase::postinstallHints(QString model)
                 "critical process that must not be interrupted. <b>Make sure the "
                 "player is charged before starting the firmware update "
                 "process.</b></li>"
+                "<li>After the firmware has been updated reboot your player.</li>");
+    }
+    if(model == "sansafuzeplus") {
+        hint = true;
+        msg += tr("<li>Disconnect your player. The player will reboot and "
+                "perform an update of the original firmware. "
+                "Please refer to your players manual on details.<br/>"
+                "<b>Important:</b> updating the firmware is a "
+                "critical process that must not be interrupted. <b>Make sure the "
+                "player is charged before disconnecting the player.</b></li>"
                 "<li>After the firmware has been updated reboot your player.</li>");
     }
     if(model == "iaudiox5" || model == "iaudiom5"

@@ -125,10 +125,16 @@ libchinachippatcher.commands = $$ADDENV \
         APPVERSION=\"rbutil\" \
         CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
         $(MAKE) -C $$RBBASE_DIR/rbutil/chinachippatcher libchinachippatcher$$RBLIBPOSTFIX
+libmkimxboot.commands = $$ADDENV \
+        BUILD_DIR=$$MYLIBBUILDDIR/mkimxboot/ \
+        TARGET_DIR=$$MYLIBBUILDDIR \
+        APPVERSION=\"rbutil\" \
+        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
+        $(MAKE) -C $$RBBASE_DIR/rbutil/mkimxboot libmkimxboot$$RBLIBPOSTFIX
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
 RBLIBS = librbspeex libipodpatcher libsansapatcher libmkamsboot libmktccboot \
-         libmkmpioboot libchinachippatcher libucl
+         libmkmpioboot libchinachippatcher libmkimxboot libucl
 QMAKE_EXTRA_TARGETS += $$RBLIBS
 PRE_TARGETDEPS += $$RBLIBS
 
