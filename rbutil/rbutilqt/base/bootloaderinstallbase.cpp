@@ -211,7 +211,10 @@ QString BootloaderInstallBase::postinstallHints(QString model)
         msg += tr("<li>Reboot your player into the original firmware.</li>"
                 "<li>Perform a firmware upgrade using the update functionality "
                 "of the original firmware. Please refer to your player's manual "
-                "on details.</li>"
+                "on details.<br/><b>Important:</b> updating the firmware is a "
+                "critical process that must not be interrupted. <b>Make sure the "
+                "player is charged before starting the firmware update "
+                "process.</b></li>"
                 "<li>After the firmware has been updated reboot your player.</li>");
     }
     if(model == "iaudiox5" || model == "iaudiom5"
