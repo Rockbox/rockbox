@@ -63,7 +63,9 @@ bool do_screendump_instead_of_usb = false;
 
 /* We assume that the USB cable is extracted */
 static int usb_state = USB_EXTRACTED;
-
+static bool usb_host_present = false;
+static int usb_num_acks_to_expect = 0;
+static long usb_last_broadcast_tick = 0;
 #if (CONFIG_STORAGE & STORAGE_MMC) && defined(USB_FULL_INIT) && !defined(HAVE_USBSTACK)
 static int usb_mmc_countdown = 0;
 #endif
@@ -109,21 +111,20 @@ static void try_reboot(void)
 #endif /* USB_FIRWIRE_HANDLING || (HAVE_USBSTACK && !USE_ROCKBOX_USB) */
 
 /* Screen dump */
+#ifdef HAVE_LCD_BITMAP
 static inline bool usb_do_screendump(void)
 {
-#ifdef HAVE_LCD_BITMAP
     if(do_screendump_instead_of_usb)
     {
-        usb_state = USB_SCREENDUMP;
         screen_dump();
 #ifdef HAVE_REMOTE_LCD
         remote_screen_dump();
 #endif /* HAVE_REMOTE_LCD */
         return true;
     }
-#endif /* HAVE_LCD_BITMAP */
     return false;
 }
+#endif /* HAVE_LCD_BITMAP */
 
 /* Power (charging-only) button */
 static inline bool usb_power_button(void)
@@ -356,13 +357,69 @@ static inline void usb_slave_mode(bool on)
 }
 #endif /* HAVE_USBSTACK */
 
+static void usb_set_host_present(bool present)
+{
+    if(usb_host_present == present)
+        return;
+
+    usb_host_present = present;
+
+    if(!usb_host_present)
+    {
+        usb_configure_drivers(USB_EXTRACTED);
+        return;
+    }
+
+    if(usb_power_button())
+    {
+        /* Only charging is desired */
+        usb_configure_drivers(USB_POWERED);
+        return;
+    }
+
+    if(!usb_configure_drivers(USB_INSERTED))
+        return; /* Exclusive storage access not required */
+
+    /* Tell all threads that they have to back off the storage.
+       We subtract one for our own thread. Expect an ACK for every
+       listener for each broadcast they received. If it has been too
+       long, the user might have entered a screen that didn't ACK
+       when inserting the cable, such as a debugging screen. In that
+       case, reset the count or else USB would be locked out until
+       rebooting because it most likely won't ever come. Simply
+       resetting to the most recent broadcast count is racy. */
+    if(TIME_AFTER(current_tick, usb_last_broadcast_tick + HZ*5))
+    {
+        usb_num_acks_to_expect = 0;
+        usb_last_broadcast_tick = current_tick;
+    }
+
+    usb_num_acks_to_expect += queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
+    DEBUGF("usb: waiting for %d acks...\n", num_acks_to_expect);
+}
+
+static bool usb_handle_connected_ack(void)
+{
+    if(usb_num_acks_to_expect > 0 && --usb_num_acks_to_expect == 0)
+    {
+        DEBUGF("usb: all threads have acknowledged the connect.\n");
+        if(usb_host_present)
+        {
+            usb_slave_mode(true);
+            return true;
+        }
+    }
+    else
+    {
+        DEBUGF("usb: got ack, %d to go...\n", num_acks_to_expect);
+    }
+
+    return false;
+}
 
 /*--- General driver code ---*/
 static void NORETURN_ATTR usb_thread(void)
 {
-    int num_acks_to_expect = 0;
-    long last_broadcast_tick = current_tick;
-    bool host_detected = false;
     struct queue_event ev;
 
     while(1)
@@ -378,6 +435,10 @@ static void NORETURN_ATTR usb_thread(void)
             if(usb_state <= USB_EXTRACTED)
                 break;
 
+#ifdef USB_DETECT_BY_REQUEST
+            usb_set_host_present(true);
+#endif
+
             usb_core_handle_transfer_completion(
                 (struct usb_transfer_completion_event_data*)ev.data);
             break;
@@ -387,72 +448,26 @@ static void NORETURN_ATTR usb_thread(void)
             if(usb_state != USB_EXTRACTED)
                 break;
 
+#ifdef HAVE_LCD_BITMAP
             if(usb_do_screendump())
+            {
+                usb_state = USB_SCREENDUMP;
                 break;
+            }
+#endif
 
             usb_state = USB_POWERED;
             usb_stack_enable(true);
 
-#ifdef USB_DETECT_BY_CORE
-            /* Wait for USB core to detect the host */
+#ifndef USB_DETECT_BY_REQUEST
+            usb_set_host_present(true);
+#endif
             break;
-
-        case USB_HOSTED:
-            if(usb_state != USB_POWERED)
-                break;
-#endif /* USB_DETECT_BY_CORE */
-
-            if(host_detected)
-                break;
-
-            host_detected = true;
-
-            if(usb_power_button())
-            {
-                /* Only charging is desired */
-                usb_configure_drivers(USB_POWERED);
-                break;
-            }
-
-            if(!usb_configure_drivers(USB_INSERTED))
-                break; /* Exclusive storage access not required */
-
-            /* Tell all threads that they have to back off the storage.
-               We subtract one for our own thread. Expect an ACK for every
-               listener for each broadcast they received. If it has been too
-               long, the user might have entered a screen that didn't ACK
-               when inserting the cable, such as a debugging screen. In that
-               case, reset the count or else USB would be locked out until
-               rebooting because it most likely won't ever come. Simply
-               resetting to the most recent broadcast count is racy. */
-            if(TIME_AFTER(current_tick, last_broadcast_tick + HZ*5))
-            {
-                num_acks_to_expect = 0;
-                last_broadcast_tick = current_tick;
-            }
-
-            num_acks_to_expect += queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
-            DEBUGF("usb: waiting for %d acks...\n", num_acks_to_expect);
-
-            /* Leave the state as USB_POWERED until the expected number of
-               ACKS are received. */
-            break;
-            /* USB_INSERTED: or USB_HOSTED: */
+            /* USB_INSERTED */
 
         case SYS_USB_CONNECTED_ACK:
-            if(num_acks_to_expect > 0 && --num_acks_to_expect == 0)
-            {
-                DEBUGF("usb: all threads have acknowledged the connect.\n");
-                if(host_detected)
-                {
-                    usb_slave_mode(true);
-                    usb_state = USB_INSERTED;
-                }
-            }
-            else
-            {
-                DEBUGF("usb: got ack, %d to go...\n", num_acks_to_expect);
-            }
+            if(usb_handle_connected_ack())
+                usb_state = USB_INSERTED;
             break;
             /* SYS_USB_CONNECTED_ACK */
 
@@ -470,13 +485,7 @@ static void NORETURN_ATTR usb_thread(void)
 
             usb_state = USB_EXTRACTED;
 
-            if(host_detected)
-            {
-                /* Ok to broadcast disconnect now */
-                usb_configure_drivers(USB_EXTRACTED);
-                host_detected = false;
-            }
-
+            usb_set_host_present(false);
             break;
             /* USB_EXTRACTED: */
 
@@ -530,8 +539,7 @@ void usb_status_event(int current_status)
 {
     /* Caller isn't expected to filter for changes in status.
      * current_status:
-     *   all:                USB_INSERTED, USB_EXTRACTED
-     *   USB_DETECT_BY_CORE: USB_HOSTED (from core)
+     *   USB_INSERTED, USB_EXTRACTED
      */
     if(usb_monitor_enabled)
     {
@@ -552,10 +560,6 @@ void usb_start_monitoring(void)
     /* An event may have been missed because it was sent before monitoring
      * was enabled due to the connector already having been inserted before
      * before or during boot. */
-#ifdef USB_DETECT_BY_CORE
-    /* Filter the status - USB_HOSTED may happen later */
-    status = (status == USB_INSERTED) ? : USB_EXTRACTED;
-#endif
     usb_status_event(status);
 
 #ifdef USB_FIREWIRE_HANDLING

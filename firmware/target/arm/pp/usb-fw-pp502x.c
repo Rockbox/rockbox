@@ -224,15 +224,6 @@ void usb_insert_int(void)
     USB_GPIO_INT_CLR = USB_GPIO_MASK;
     timeout_register(&usb_oneshot, usb_timeout_event, HZ/5, val);
 }
-
-/* USB_DETECT_BY_CORE: Called when device descriptor is requested */
-void usb_drv_usb_detect_event(void)
-{
-    /* Filter for invalid bus reset when unplugging by checking the pin state. */
-    if(usb_plugged()) {
-        usb_status_event(USB_HOSTED);
-    }
-}
 #endif /* USB_STATUS_BY_EVENT */
 
 #ifdef HAVE_BOOTLOADER_USB_MODE

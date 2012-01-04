@@ -30,11 +30,6 @@
 
 int usb_status = USB_EXTRACTED;
 
-void usb_drv_usb_detect_event()
-{
-    usb_status_event(USB_INSERTED);
-}
-
 void usb_init_device(void)
 {
 }

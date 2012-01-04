@@ -39,9 +39,6 @@ enum
     USB_EXTRACTED = 0,       /* Event+State */
     USB_INSERTED,            /* Event+State */
     USB_POWERED,             /* State - transitional indicator if no power */
-#ifdef USB_DETECT_BY_CORE
-    USB_HOSTED,              /* Event - host presence was detected */
-#endif
 #if (CONFIG_STORAGE & STORAGE_MMC)
     USB_REENABLE,            /* Event */
 #endif

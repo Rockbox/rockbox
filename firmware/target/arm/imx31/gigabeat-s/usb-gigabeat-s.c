@@ -145,13 +145,6 @@ void usb_drv_int_enable(bool enable)
     }
 }
 
-/* Called during the setup packet request by the host */
-void usb_drv_usb_detect_event(void)
-{
-    if (usb_drv_powered())
-        usb_status_event(USB_HOSTED);
-}
-
 /* Called when reading the MBR */
 void usb_fix_mbr(unsigned char *mbr)
 {

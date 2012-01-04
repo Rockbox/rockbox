@@ -58,22 +58,6 @@ void usb_remove_int(void)
 #endif
 }
 
-void usb_drv_usb_detect_event(void)
-{
-#if (CONFIG_CPU != AS3525v2 || defined(USE_ROCKBOX_USB)) \
-    && defined (USB_STATUS_BY_EVENT)
-/* Rebooting on USB plug can crash these players in a state where
- * hardware power off (pressing the power button) doesn't work anymore
- * TODO: Implement USB in rockbox for these players */
-    int oldstatus = disable_irq_save(); /* May come via USB thread */
-
-    if (usb_status == USB_INSERTED)
-        usb_status_event(USB_HOSTED);
-
-    restore_irq(oldstatus);
-#endif
-}
-
 int usb_detect(void)
 {
     return usb_status;
