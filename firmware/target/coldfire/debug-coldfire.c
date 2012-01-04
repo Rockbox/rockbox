@@ -27,12 +27,25 @@
 #include "button.h"
 #include "powermgmt.h"
 #include "adc.h"
-#include "debug-target.h"
 #include "lcd-remote.h"
 #ifdef IAUDIO_X5
 #include "ds2411.h"
 #endif
 
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+   (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#   define DEBUG_CANCEL  BUTTON_OFF
+
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
+#   define DEBUG_CANCEL  BUTTON_REC
+
+#elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
+#   define DEBUG_CANCEL  BUTTON_RC_REC
+
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD) || \
+    (CONFIG_KEYPAD == MPIO_HD300_PAD)
+#   define DEBUG_CANCEL  BUTTON_REC
+#endif
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
    (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
