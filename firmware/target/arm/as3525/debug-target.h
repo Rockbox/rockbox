@@ -21,8 +21,6 @@
 
 #ifndef _DEBUG_TARGET_H_
 #define _DEBUG_TARGET_H_
-#include <stdbool.h>
 
 #define DEBUG_CANCEL BUTTON_LEFT
-bool dbg_hw_info(void);
 #endif

@@ -22,15 +22,11 @@
 #ifndef _DEBUG_TARGET_H_
 #define _DEBUG_TARGET_H_
 
-#include <stdbool.h>
-
 #ifdef RK27_GENERIC
 #define DEBUG_CANCEL BUTTON_VOL
 #elif defined(HM60X) || defined(HM801)
 #define DEBUG_CANCEL BUTTON_LEFT
 #endif
-
-bool dbg_hw_info(void);
 
 #endif /* _DEBUG_TARGET_H_ */
 

@@ -32,4 +32,3 @@
     (CONFIG_KEYPAD == MPIO_HD300_PAD)
 #   define DEBUG_CANCEL  BUTTON_REC
 #endif
-bool dbg_hw_info(void);

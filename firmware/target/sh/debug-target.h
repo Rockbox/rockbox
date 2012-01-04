@@ -24,4 +24,3 @@
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #   define DEBUG_CANCEL  BUTTON_MENU
 #endif
-bool dbg_hw_info(void);
