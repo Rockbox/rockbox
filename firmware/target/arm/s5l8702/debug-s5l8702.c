@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include <stdbool.h>
+#include "system.h"
 #include "config.h"
 #include "kernel.h"
 #include "debug-target.h"

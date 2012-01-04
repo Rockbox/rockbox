@@ -44,5 +44,4 @@
 #elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
 #   define DEBUG_CANCEL  BUTTON_CANCEL
 #endif
-bool dbg_ports(void);
 bool dbg_hw_info(void);

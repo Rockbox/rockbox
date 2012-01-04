@@ -21,4 +21,3 @@
 #if CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #   define DEBUG_CANCEL  BUTTON_PLAY
 #endif /* key definitions */
-bool dbg_ports(void);

@@ -21,6 +21,7 @@
 
 #include <stdbool.h>
 #include "config.h"
+#include "system.h"
 #include "kernel.h"
 #include "debug-target.h"
 #include "button.h"
