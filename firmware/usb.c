@@ -63,9 +63,6 @@ bool do_screendump_instead_of_usb = false;
 
 /* We assume that the USB cable is extracted */
 static int usb_state = USB_EXTRACTED;
-static bool usb_host_present = false;
-static int usb_num_acks_to_expect = 0;
-static long usb_last_broadcast_tick = 0;
 #if (CONFIG_STORAGE & STORAGE_MMC) && defined(USB_FULL_INIT) && !defined(HAVE_USBSTACK)
 static int usb_mmc_countdown = 0;
 #endif
@@ -84,6 +81,9 @@ static bool usb_hid = true;
 #endif
 
 #ifdef USB_FULL_INIT
+static bool usb_host_present = false;
+static int usb_num_acks_to_expect = 0;
+static long usb_last_broadcast_tick = 0;
 
 #if defined(USB_FIREWIRE_HANDLING) \
     || (defined(HAVE_USBSTACK) && !defined(USE_ROCKBOX_USB))
