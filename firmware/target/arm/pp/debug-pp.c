@@ -29,8 +29,33 @@
 #include "adc.h"
 #include "iap.h"
 #include "hwcompat.h"
-#include "debug-target.h"
 
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD)
+#   define DEBUG_CANCEL  BUTTON_MENU
+
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#   define DEBUG_CANCEL  BUTTON_REW
+
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#   define DEBUG_CANCEL  BUTTON_MENU
+
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_C200_PAD) || \
+      (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD)
+#   define DEBUG_CANCEL  BUTTON_LEFT
+
+#elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) || \
+      (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)
+#   define DEBUG_CANCEL  BUTTON_POWER
+
+#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#   define DEBUG_CANCEL  BUTTON_PLAY
+
+#elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
+#   define DEBUG_CANCEL  BUTTON_CANCEL
+#endif
 static int perfcheck(void)
 {
     int result;
