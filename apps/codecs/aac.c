@@ -266,7 +266,8 @@ enum codec_status codec_run(void)
                               framelength);
             sound_samples_done += framelength;
             /* Update the elapsed-time indicator */
-            elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
+            elapsed_time = ((uint64_t) sound_samples_done * 1000) /
+                ci->id3->frequency;
             ci->set_elapsed(elapsed_time);
         }
 
