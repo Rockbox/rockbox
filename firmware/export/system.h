@@ -389,5 +389,8 @@ static inline uint32_t swaw32_hw(uint32_t value)
 #ifndef SIMULATOR
 bool dbg_ports(void);
 #endif
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+bool dbg_hw_info(void);
+#endif
 
 #endif /* __SYSTEM_H__ */
