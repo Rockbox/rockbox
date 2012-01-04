@@ -216,7 +216,7 @@ static bool main_charger_connected(void)
 /* Return the voltage level which should automatically trigger
  * another recharge cycle based upon which power source is available.
  * Assumes at least one is. */
-static unsigned int auto_recharge_voltage(void)
+static int auto_recharge_voltage(void)
 {
     if (main_charger_connected())
         return BATT_VAUTO_RECHARGE;
