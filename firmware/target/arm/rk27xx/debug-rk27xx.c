@@ -23,12 +23,17 @@
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
-#include "debug-target.h"
 #include "button.h"
 #include "lcd.h"
 #include "adc.h"
 #include "font.h"
 #include "storage.h"
+
+#ifdef RK27_GENERIC
+#define DEBUG_CANCEL BUTTON_VOL
+#elif defined(HM60X) || defined(HM801)
+#define DEBUG_CANCEL BUTTON_LEFT
+#endif
 
 /*  Skeleton for adding target specific debug info to the debug menu
  */
