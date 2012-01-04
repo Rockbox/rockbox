@@ -583,7 +583,7 @@ static const char* dbg_partitions_getname(int selected_item, void *data,
     return buffer;
 }
 
-bool dbg_partitions(void)
+static bool dbg_partitions(void)
 {
     struct simplelist_info info;
     simplelist_info_init(&info, "Partition Info", 4, NULL);
