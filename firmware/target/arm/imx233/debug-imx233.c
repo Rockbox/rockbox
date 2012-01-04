@@ -33,6 +33,8 @@
 #include "rtc-imx233.h"
 #include "string.h"
 
+#define DEBUG_CANCEL  BUTTON_BACK
+
 static struct
 {
     const char *name;

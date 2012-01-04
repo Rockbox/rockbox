@@ -21,8 +21,6 @@
 #ifndef DEBUG_TARGET_H
 #define DEBUG_TARGET_H
 
-#define DEBUG_CANCEL  BUTTON_BACK
-
 bool dbg_hw_target_info(void);
 
 #endif /* DEBUG_TARGET_H */
