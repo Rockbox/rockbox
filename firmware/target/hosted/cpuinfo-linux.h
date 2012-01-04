@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2011 Thomas Martitz
@@ -23,6 +23,8 @@
 #ifndef __CPUINFO_LINUX_H__
 #define __CPUINFO_LINUX_H__
 
+#include <stdbool.h>
+
 struct cpuusage {
     long usage; /* in hundredth percent */
     long utime; /* in clock ticks */
@@ -37,8 +39,7 @@ struct time_state {
 };
 
 int cpuusage_linux(struct cpuusage* u);
-int cpufrequency_linux(int cpu);
-int scalingfrequency_linux(int cpu);
+int frequency_linux(int cpu, bool scaling);
 int cpustatetimes_linux(int cpu, struct time_state* data, int max_elements);
 int cpucount_linux(void);
 

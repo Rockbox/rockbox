@@ -285,8 +285,8 @@ static const char* get_cpuinfo(int selected_item, void *data,
         {
             int cpu = (selected_item - 5) / (state_count + 1);
             int cpu_line = (selected_item - 5) % (state_count + 1);
-            int freq1 = cpufrequency_linux(cpu);
-            int freq2 = scalingfrequency_linux(cpu);
+            int freq1 = frequency_linux(cpu, false);
+            int freq2 = frequency_linux(cpu, true);
             if (cpu_line == 0)
             {
                 sprintf(buffer, " CPU%d: Cur/Scal freq: %d/%d MHz", cpu,

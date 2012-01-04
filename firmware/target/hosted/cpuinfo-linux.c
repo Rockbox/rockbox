@@ -3,7 +3,7 @@
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/ 
  * $Id$
  *
@@ -137,27 +137,14 @@ int cpucount_linux(void)
     return get_nprocs();
 }
 
-int cpufrequency_linux(int cpu)
+int frequency_linux(int cpu, bool scaling)
 {
     char path[64];
     char temp[10];
     int cpu_dev, ret = -1;
-    snprintf(path, sizeof(path), "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_cur_freq", cpu);
-    cpu_dev = open(path, O_RDONLY);
-    if (cpu_dev < 0)
-        return -1;
-    if (read(cpu_dev, temp, sizeof(temp)) >= 0)
-        ret = atoi(temp);
-    close(cpu_dev);
-    return ret;
-}
-
-int scalingfrequency_linux(int cpu)
-{
-    char path[64];
-    char temp[10];
-    int cpu_dev, ret = -1;
-    snprintf(path, sizeof(path), "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", cpu);
+    snprintf(path, sizeof(path),
+        "/sys/devices/system/cpu/cpu%d/cpufreq/%s_cur_freq",
+        cpu, scaling ? "scaling" : "cpuinfo");
     cpu_dev = open(path, O_RDONLY);
     if (cpu_dev < 0)
         return -1;
