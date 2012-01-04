@@ -31,6 +31,8 @@
 #include "dvfs_dptc-imx31.h"
 #include <stdio.h>
 
+#define DEBUG_CANCEL  BUTTON_BACK
+
 bool dbg_hw_info(void)
 {
     int line;
