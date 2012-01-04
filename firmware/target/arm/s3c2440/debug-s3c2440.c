@@ -27,7 +27,12 @@
 #include "button.h"
 #include "lcd.h"
 #include "font.h"
-#include "debug-target.h"
+
+#ifdef GIGABEAT_F
+#define DEBUG_CANCEL  BUTTON_POWER
+#elif defined(MINI2440)
+#define DEBUG_CANCEL  BUTTON_MENU
+#endif
 
 bool dbg_hw_info(void)
 {
