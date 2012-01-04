@@ -42,13 +42,10 @@ void powermgmt_init_target(void) {}
 
 static void battery_status_update(void)
 {
-    static time_t last_change = 0;
-    time_t now;
+    static long last_tick = 0;
 
-    time(&now);
-
-    if (last_change < now) {
-        last_change = now;
+    if (TIME_AFTER(current_tick, (last_tick+HZ))) {
+        last_tick = current_tick;
 
         /* change the values: */
         if (charging) {
@@ -119,5 +116,23 @@ void accessory_supply_set(bool enable)
 void lineout_set(bool enable)
 {
     (void)enable;
+}
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+bool remote_detect(void)
+{
+    return true;
+}
+#endif
+
+#ifdef HAVE_BATTERY_SWITCH
+unsigned int input_millivolts(void)
+{
+    if ((power_input_status() & POWER_INPUT_BATTERY) == 0) {
+        /* Just return a safe value if battery isn't connected */
+        return 4050;
+    }
+    return battery_voltage();;
 }
 #endif

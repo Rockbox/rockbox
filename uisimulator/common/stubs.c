@@ -99,6 +99,10 @@ void mp3_play_data(const unsigned char* start, int size,
     (void)start; (void)size; (void)get_more;
 }
 
+void mp3_shutdown(void)
+{
+}
+
 /* firmware/drivers/audio/mas35xx.c */
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void audiohw_set_loudness(int value)
