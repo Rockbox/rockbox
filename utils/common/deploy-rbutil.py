@@ -25,6 +25,7 @@ deploy.svnpaths = \
            [ "rbutil/",
              "tools/ucl",
              "tools/rbspeex",
+             "utils/imxtools",
              "apps/codecs/libspeex",
              "docs/COPYING",
              "docs/gpl-2.0.html",
