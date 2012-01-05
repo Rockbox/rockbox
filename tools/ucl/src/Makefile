@@ -16,6 +16,20 @@ ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 endif
 
+# OS X specifics. Needs to consider cross compiling for Windows.
+ifeq ($(findstring Darwin,$(shell uname)),Darwin)
+ifneq ($(findstring mingw,$(CROSS)$(CC)),mingw)
+# when building libs for OS X build for both i386 and ppc at the same time.
+# This creates fat objects, and ar can only create the archive but not operate
+# on it. As a result the ar call must NOT use the u (update) flag.
+CFLAGS += -arch ppc -arch i386
+# building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
+# might need adjustment for older Xcode.
+CC ?= gcc-4.0
+CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
+NATIVECC ?= gcc-4.0
+endif
+endif
 
 TARGET_DIR ?= $(shell pwd)
 OBJDIR = $(TARGET_DIR)build$(RBARCH)
@@ -40,26 +54,13 @@ $(TARGET_DIR)ucl.dll: $(OBJS)
 
 $(TARGET_DIR)libucl$(RBARCH).a: $(OBJS)
 	@echo AR $(notdir $@)
-	$(SILENT)$(CROSS)$(AR) rucs $@ $(OBJS) >/dev/null 2>&1
+	$(SILENT)rm -f $@
+	$(SILENT)$(CROSS)$(AR) rcs $@ $(OBJS) >/dev/null 2>&1
 
 $(OBJDIR)/%.o: %.c
 	@echo CC $<
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c $< -o $@
-
-# some trickery to build ppc and i386 from a single call
-ifeq ($(RBARCH),)
-$(TARGET_DIR)libucli386.a:
-	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) libucli386.a
-
-$(TARGET_DIR)libuclppc.a:
-	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) libuclppc.a
-endif
-
-libucl-universal: $(TARGET_DIR)libucli386.a $(TARGET_DIR)libuclppc.a
-	@echo lipo $(TARGET_DIR)libucl.a
-	$(SILENT) rm -f $(TARGET_DIR)libucl.a
-	$(SILENT)lipo -create $(TARGET_DIR)libuclppc.a $(TARGET_DIR)libucli386.a -output $(TARGET_DIR)libucl.a
 
 clean:
 	rm -f $(TARGET_DIR)libucl*.a
