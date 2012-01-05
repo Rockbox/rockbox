@@ -31,8 +31,6 @@
 #define BATT_MAXRUNTIME (10 * 60) /* maximum runtime with full battery in
                                      minutes */
 
-extern void send_battery_level_event(void);
-extern int last_sent_battery_level;
 extern int battery_percent;
 static bool charging = false;
 
@@ -50,18 +48,20 @@ static void battery_status_update(void)
         /* change the values: */
         if (charging) {
             if (battery_millivolts >= BATT_MAXMVOLT) {
+#if CONFIG_CHARGING
                 /* Pretend the charger was disconnected */
+                charger_input_state = CHARGER_UNPLUGGED;
+#endif
                 charging = false;
-                queue_broadcast(SYS_CHARGER_DISCONNECTED, 0);
-                last_sent_battery_level = 100;
             }
         }
         else {
             if (battery_millivolts <= BATT_MINMVOLT) {
+#if CONFIG_CHARGING
                 /* Pretend the charger was connected */
+                charger_input_state = CHARGER_PLUGGED;
+#endif
                 charging = true;
-                queue_broadcast(SYS_CHARGER_CONNECTED, 0);
-                last_sent_battery_level = 0;
             }
         }
 
@@ -96,7 +96,7 @@ int _battery_voltage(void)
 #if CONFIG_CHARGING
 unsigned int power_input_status(void)
 {
-    return charging ? POWER_INPUT_NONE : POWER_INPUT_MAIN;
+    return charging ? POWER_INPUT_CHARGER : POWER_INPUT_NONE;
 }
 
 bool charging_state(void)
