@@ -42,10 +42,15 @@ endif
 endif
 endif
 
-NATIVECC = gcc
+NATIVECC ?= gcc
 CC ?= gcc
+# OS X specifics. Needs to consider cross compiling for Windows.
 ifeq ($(findstring Darwin,$(shell uname)),Darwin)
 ifneq ($(findstring mingw,$(CROSS)$(CC)),mingw)
+# when building libs for OS X build for both i386 and ppc at the same time.
+# This creates fat objects, and ar can only create the archive but not operate
+# on it. As a result the ar call must NOT use the u (update) flag.
+CFLAGS += -arch ppc -arch i386
 # building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
 # might need adjustment for older Xcode.
 CC ?= gcc-4.0
@@ -105,27 +110,11 @@ $(TARGET_DIR)$(OUTPUT).dll: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -shared -o $@ $^ \
 		    -Wl,--output-def,$(TARGET_DIR)$(OUTPUT).def
 
+# create lib file from objects
 $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo AR $(notdir $@)
 	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(AR) rucs $@ $^
-
-# some trickery to build ppc and i386 from a single call
-ifeq ($(RBARCH),)
-$(TARGET_DIR)lib$(OUTPUT)i386.a:
-	make RBARCH=i386 TARGET_DIR=$(TARGET_DIR) lib$(OUTPUT)i386.a
-
-$(TARGET_DIR)lib$(OUTPUT)ppc.a:
-	make RBARCH=ppc TARGET_DIR=$(TARGET_DIR) lib$(OUTPUT)ppc.a
-endif
-
-lib$(OUTPUT)-universal: $(TARGET_DIR)lib$(OUTPUT)i386.a \
-			$(TARGET_DIR)lib$(OUTPUT)ppc.a
-	@echo LIPO $(notdir $(TARGET_DIR)lib$(OUTPUT).a)
-	$(SILENT) rm -f $(TARGET_DIR)lib$(OUTPUT).a
-	$(SILENT)lipo -create $(TARGET_DIR)lib$(OUTPUT)i386.a \
-			      $(TARGET_DIR)lib$(OUTPUT)ppc.a \
-			      -output $(TARGET_DIR)lib$(OUTPUT).a
+	$(SILENT)$(AR) rcs $@ $^
 
 clean:
 	rm -f $(OBJS) $(OUTPUT) $(TARGET_DIR)lib$(OUTPUT)*.a $(OUTPUT).dmg
