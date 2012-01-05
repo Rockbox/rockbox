@@ -606,6 +606,7 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
 #define ALPHA_COLOR_PIXEL_PER_WORD (32 >> ALPHA_COLOR_FONT_DEPTH)
 #ifdef CPU_ARM
 #define BLEND_INIT do {} while (0)
+#define BLEND_FINISH do {} while(0)
 #define BLEND_START(acc, color, alpha) \
     asm volatile("mul %0, %1, %2" : "=&r" (acc) : "r" (color), "r" (alpha))
 #define BLEND_CONT(acc, color, alpha) \
@@ -613,13 +614,18 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
 #define BLEND_OUT(acc) do {} while (0)
 #elif defined(CPU_COLDFIRE)
 #define ALPHA_BITMAP_READ_WORDS
-#define BLEND_INIT coldfire_set_macsr(EMAC_UNSIGNED)
+#define BLEND_INIT \
+    unsigned long _macsr = coldfire_get_macsr(); \
+    coldfire_set_macsr(EMAC_UNSIGNED)
+#define BLEND_FINISH \
+    coldfire_set_macsr(_macsr)
 #define BLEND_START(acc, color, alpha) \
     asm volatile("mac.l %0, %1, %%acc0" :: "%d" (color), "d" (alpha))
 #define BLEND_CONT BLEND_START
 #define BLEND_OUT(acc) asm volatile("movclr.l %%acc0, %0" : "=d" (acc))
 #else
 #define BLEND_INIT do {} while (0)
+#define BLEND_FINISH do {} while(0)
 #define BLEND_START(acc, color, alpha) ((acc) = (color) * (alpha))
 #define BLEND_CONT(acc, color, alpha) ((acc) += (color) * (alpha))
 #define BLEND_OUT(acc) do {} while (0)
@@ -701,7 +707,10 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
     /* nothing to draw? */
     if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
+    {
+        BLEND_FINISH;
         return;
+    }
 
     /* clip image in viewport in screen */
     if (x < 0)
@@ -908,6 +917,8 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
         }
 #endif
     } while (--row);
+
+    BLEND_FINISH;
 }
 
 /* Draw a full native bitmap */
