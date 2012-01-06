@@ -121,20 +121,8 @@ clean:
 	rm -rf $(OUTPUT)-* i386 ppc $(OBJDIR)
 
 # OS X specifics
-$(OUTPUT)-i386:
-	$(MAKE) RBARCH=i386
-	mv $(OUTPUT) $@
-
-$(OUTPUT)-ppc:
-	$(MAKE) RBARCH=ppc
-	mv $(OUTPUT) $@
-
-$(OUTPUT)-mac: $(OUTPUT)-i386 $(OUTPUT)-ppc
-	@echo LIPO $@
-	$(SILENT)lipo -create $(OUTPUT)-ppc $(OUTPUT)-i386 -output $@
-
-$(OUTPUT).dmg: $(OUTPUT)-mac
+$(OUTPUT).dmg: $(OUTPUT)
 	@echo DMG $@
 	$(SILENT)mkdir -p $(OUTPUT)-dmg
-	$(SILENT)cp -p $(OUTPUT)-mac $(OUTPUT)-dmg
+	$(SILENT)cp -p $(OUTPUT) $(OUTPUT)-dmg
 	$(SILENT)hdiutil create -srcfolder $(OUTPUT)-dmg $@
