@@ -34,7 +34,7 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
     ui.recursive->setChecked(true);
     ui.GenerateOnlyNew->setChecked(true);
     ui.StripExtensions->setChecked(true);
-    
+
     updateSettings();
 }
 
@@ -62,28 +62,28 @@ void InstallTalkWindow::browseFolder()
 void InstallTalkWindow::change()
 {
     Config *cw = new Config(this,4);
-   
+
     // make sure the current selected folder doesn't get lost on settings
     // changes. If the current selection is invalid don't accept it so
-    // it gets reset to the old value after closing the settings dialog. 
+    // it gets reset to the old value after closing the settings dialog.
     QString folderToTalk = ui.lineTalkFolder->text();
     if(QFileInfo(folderToTalk).isDir())
         RbSettings::setValue(RbSettings::LastTalkedFolder, folderToTalk);
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
-    
+
     cw->show();
 }
 
 void InstallTalkWindow::accept()
 {
     logger = new ProgressLoggerGui(this);
-    
+
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
     logger->show();
-    
+
 
     QString folderToTalk = ui.lineTalkFolder->text();
-     
+
     if(!QFileInfo(folderToTalk).isDir())
     {
         logger->addItem(tr("The Folder to Talk is wrong!"),LOGERROR);
@@ -97,19 +97,19 @@ void InstallTalkWindow::accept()
 
     talkcreator->setDir(QDir(folderToTalk));
     talkcreator->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
-    
+
     talkcreator->setGenerateOnlyNew(ui.GenerateOnlyNew->isChecked());
     talkcreator->setRecursive(ui.recursive->isChecked());
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
     talkcreator->setTalkFolders(ui.talkFolders->isChecked());
     talkcreator->setTalkFiles(ui.talkFiles->isChecked());
     talkcreator->setIgnoreFiles(ui.ignoreFiles->text().split(",",QString::SkipEmptyParts));
-    
+
     connect(talkcreator, SIGNAL(done(bool)), logger, SLOT(setFinished()));
     connect(talkcreator, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
     connect(talkcreator, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
     connect(logger,SIGNAL(aborted()),talkcreator,SLOT(abort()));
-    
+
     talkcreator->createTalkFiles();
 }
 
@@ -124,13 +124,13 @@ void InstallTalkWindow::updateSettings(void)
     else
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
             .arg("Invalid TTS configuration!"));
-    
+
     QString encoder = SystemInfo::value(SystemInfo::CurEncoder).toString();
-    EncBase* enc = EncBase::getEncoder(this,encoder);
+    EncoderBase* enc = EncoderBase::getEncoder(this,encoder);
     if(enc != NULL) {
         if(enc->configOk())
             ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
-                .arg(EncBase::getEncoderName(encoder)));
+                .arg(EncoderBase::getEncoderName(encoder)));
         else
             ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
                 .arg("Invalid encoder configuration!"));

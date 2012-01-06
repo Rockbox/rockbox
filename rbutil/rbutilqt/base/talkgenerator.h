@@ -25,7 +25,7 @@
 #include <QtCore>
 #include "progressloggerinterface.h"
 
-#include "encoders.h"
+#include "encoderbase.h"
 #include "ttsbase.h"
 
 //! \brief Talk generator, generates .wav and .talk files out of a list.
@@ -57,9 +57,9 @@ public:
        * for error checking */
       struct
       {
-        EncBase* encoder;
+        EncoderBase* encoder;
         TTSBase* tts;
-        TalkGenerator* generator; 
+        TalkGenerator* generator;
         int wavtrim;
       } refs;
     };
@@ -92,7 +92,7 @@ private:
     static void ttsEntryPoint(TalkEntry& entry);
 
     TTSBase* m_tts;
-    EncBase* m_enc;
+    EncoderBase* m_enc;
 
     bool m_ttsWarnings;
     bool m_userAborted;

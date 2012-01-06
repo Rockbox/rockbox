@@ -33,7 +33,9 @@ SOURCES += \
  uninstallwindow.cpp \
  base/utils.cpp \
  preview.cpp \
- base/encoders.cpp \
+ base/encoderbase.cpp \
+ base/encoderrbspeex.cpp \
+ base/encoderexe.cpp \
  encttscfggui.cpp \
  base/encttssettings.cpp \
  base/ttsbase.cpp \
@@ -95,7 +97,9 @@ HEADERS += \
  uninstallwindow.h \
  base/utils.h \
  preview.h \
- base/encoders.h \
+ base/encoderbase.h \
+ base/encoderrbspeex.h \
+ base/encoderexe.h \
  encttscfggui.h \
  base/encttssettings.h \
  base/ttsbase.h \

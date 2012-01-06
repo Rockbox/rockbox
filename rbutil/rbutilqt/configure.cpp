@@ -22,7 +22,7 @@
 #include "configure.h"
 #include "autodetection.h"
 #include "ui_configurefrm.h"
-#include "encoders.h"
+#include "encoderbase.h"
 #include "ttsbase.h"
 #include "system.h"
 #include "encttscfggui.h"
@@ -39,6 +39,8 @@
 #include <windows.h>
 #endif
 #include "rbutilqt.h"
+
+#include "systrace.h"
 
 #define DEFAULT_LANG "English (en)"
 #define DEFAULT_LANG_CODE "en"
@@ -436,10 +438,10 @@ void Config::updateEncState()
     QString devname = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
     QString encoder = SystemInfo::platformValue(devname,
                         SystemInfo::CurEncoder).toString();
-    ui.encoderName->setText(EncBase::getEncoderName(SystemInfo::platformValue(devname,
+    ui.encoderName->setText(EncoderBase::getEncoderName(SystemInfo::platformValue(devname,
                         SystemInfo::CurEncoder).toString()));
 
-    EncBase* enc = EncBase::getEncoder(this,encoder);
+    EncoderBase* enc = EncoderBase::getEncoder(this,encoder);
 
     if(enc->configOk())
     {
@@ -893,13 +895,13 @@ void Config::configEnc()
     QString devname = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
     QString encoder = SystemInfo::platformValue(devname,
                     SystemInfo::CurEncoder).toString();
-    ui.encoderName->setText(EncBase::getEncoderName(SystemInfo::platformValue(devname,
+    ui.encoderName->setText(EncoderBase::getEncoderName(SystemInfo::platformValue(devname,
                     SystemInfo::CurEncoder).toString()));
 
 
-    EncBase* enc = EncBase::getEncoder(this,encoder);
+    EncoderBase* enc = EncoderBase::getEncoder(this,encoder);
 
-    EncTtsCfgGui gui(this,enc,EncBase::getEncoderName(encoder));
+    EncTtsCfgGui gui(this,enc,EncoderBase::getEncoderName(encoder));
     gui.exec();
 
     updateEncState();

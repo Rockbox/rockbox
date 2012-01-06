@@ -17,21 +17,21 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef ENCODERS_H
 #define ENCODERS_H
- 
+
 #include <QtCore>
- 
+
 #include "encttssettings.h"
 #include "rbspeex.h"
 
 
-class EncBase : public EncTtsSettingInterface
+class EncoderBase : public EncTtsSettingInterface
 {
     Q_OBJECT
     public:
-        EncBase(QObject *parent );
+        EncoderBase(QObject *parent );
 
         //! Child class should encode a wav file 
         virtual bool encode(QString input,QString output) =0;
@@ -39,18 +39,18 @@ class EncBase : public EncTtsSettingInterface
         virtual bool start()=0;
         //! Child class should stop
         virtual bool stop()=0;
-        
+
         // settings
         //! Child class should return true when configuration is ok
         virtual bool configOk()=0;
-         //! Child class should fill in the setttingsList
+        //! Child class should fill in the setttingsList
         virtual void generateSettings() = 0;
         //! Chlid class should commit the from SettingsList to permanent storage
         virtual void saveSettings() = 0;
-     
+
         // static functions
         static QString getEncoderName(QString name);
-        static EncBase* getEncoder(QObject* parent,QString name);
+        static EncoderBase* getEncoder(QObject* parent,QString name);
         static QStringList getEncoderList(void);
 
     private:
@@ -60,68 +60,5 @@ class EncBase : public EncTtsSettingInterface
         static QMap<QString,QString> encoderList;
 };
 
-
-class EncExes : public EncBase
-{
-    enum ESettings
-    {
-        eEXEPATH,
-        eEXEOPTIONS
-    };
-    
-    Q_OBJECT
-public:
-    EncExes(QString name,QObject *parent = NULL);
-    bool encode(QString input,QString output);
-    bool start();
-    bool stop() {return true;}
-    
-    // setting
-    bool configOk();
-    void generateSettings();
-    void saveSettings();
-
-private:
-    QString m_name;
-    QString m_EncExec;
-    QString m_EncOpts;
-    QMap<QString,QString> m_TemplateMap;
-    QString m_EncTemplate;
-};
-
-class EncRbSpeex : public EncBase 
-{
-    enum ESettings
-    {
-        eVOLUME,
-        eQUALITY,
-        eCOMPLEXITY,
-        eNARROWBAND
-    };
-    
-    Q_OBJECT
-public:
-    EncRbSpeex(QObject *parent = NULL);
-    bool encode(QString input,QString output);
-    bool start();
-    bool stop() {return true;}
-    
-    // for settings view
-    bool configOk();
-    void generateSettings();
-    void saveSettings();
-    
-private:
-    float quality;
-    float volume;
-    int complexity;
-    bool narrowband;
-    
-    float defaultQuality;
-    float defaultVolume;
-    int defaultComplexity;
-    bool defaultBand;
-};
-
- 
 #endif
+

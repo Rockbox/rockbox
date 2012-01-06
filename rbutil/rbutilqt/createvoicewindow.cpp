@@ -99,14 +99,14 @@ void CreateVoiceWindow::updateSettings(void)
     else
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
             .arg("Invalid TTS configuration!"));
-    
+
     QString encoder = SystemInfo::value(SystemInfo::CurEncoder).toString();
     // only proceed if encoder setting is set
-    EncBase* enc = EncBase::getEncoder(this,encoder);
+    EncoderBase* enc = EncoderBase::getEncoder(this,encoder);
     if(enc != NULL) {
         if(enc->configOk())
             ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
-                .arg(EncBase::getEncoderName(encoder)));
+                .arg(EncoderBase::getEncoderName(encoder)));
         else
             ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
                 .arg("Invalid encoder configuration!"));

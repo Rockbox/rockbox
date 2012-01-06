@@ -16,145 +16,16 @@
  *
  ****************************************************************************/
 
-#include "encoders.h"
-#include "utils.h"
+#include <QtCore>
+#include "encoderrbspeex.h"
 #include "rbsettings.h"
 
-/*********************************************************************
-* Encoder Base
-**********************************************************************/
-QMap<QString,QString> EncBase::encoderList;
-
-EncBase::EncBase(QObject *parent): EncTtsSettingInterface(parent)
+EncoderRbSpeex::EncoderRbSpeex(QObject *parent) : EncoderBase(parent)
 {
 
 }
 
-// initialize list of encoders
-void EncBase::initEncodernamesList()
-{
-    encoderList["rbspeex"] = "Rockbox Speex Encoder";
-    encoderList["lame"] = "Lame Mp3 Encoder";
-}
-
-
-// get nice name for a specific encoder
-QString EncBase::getEncoderName(QString encoder)
-{
-    if(encoderList.isEmpty())
-        initEncodernamesList();
-    return encoderList.value(encoder);
-}
-
-
-// get a specific encoder object
-EncBase* EncBase::getEncoder(QObject* parent,QString encoder)
-{
-    EncBase* enc;
-    if(encoder == "lame")
-    {
-        enc = new EncExes(encoder,parent);
-        return enc;
-    }
-    else  // rbspeex is default
-    {
-        enc = new EncRbSpeex(parent);
-        return enc;
-    }
-}
-
-
-QStringList EncBase::getEncoderList()
-{
-    if(encoderList.isEmpty())
-        initEncodernamesList();
-    return encoderList.keys();
-}
-
-
-/*********************************************************************
-*  GEneral Exe Encoder
-**********************************************************************/
-EncExes::EncExes(QString name,QObject *parent) : EncBase(parent)
-{
-    m_name = name;
-
-    m_TemplateMap["lame"] = "\"%exe\" %options \"%input\" \"%output\"";
-
-}
-
-
-
-void EncExes::generateSettings()
-{
-    QString exepath =RbSettings::subValue(m_name,RbSettings::EncoderPath).toString();
-    if(exepath == "") exepath = Utils::findExecutable(m_name);
-
-    insertSetting(eEXEPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,
-            tr("Path to Encoder:"),exepath,EncTtsSetting::eBROWSEBTN));
-    insertSetting(eEXEOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,
-            tr("Encoder options:"),RbSettings::subValue(m_name,RbSettings::EncoderOptions)));
-}
-
-void EncExes::saveSettings()
-{
-    RbSettings::setSubValue(m_name,RbSettings::EncoderPath,getSetting(eEXEPATH)->current().toString());
-    RbSettings::setSubValue(m_name,RbSettings::EncoderOptions,getSetting(eEXEOPTIONS)->current().toString());
-    RbSettings::sync();
-}
-
-bool EncExes::start()
-{
-    m_EncExec = RbSettings::subValue(m_name, RbSettings::EncoderPath).toString();
-    m_EncOpts = RbSettings::subValue(m_name, RbSettings::EncoderOptions).toString();
-
-    m_EncTemplate = m_TemplateMap.value(m_name);
-
-    QFileInfo enc(m_EncExec);
-    if(enc.exists())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool EncExes::encode(QString input,QString output)
-{
-    //qDebug() << "encoding..";
-    QString execstring = m_EncTemplate;
-
-    execstring.replace("%exe",m_EncExec);
-    execstring.replace("%options",m_EncOpts);
-    execstring.replace("%input",input);
-    execstring.replace("%output",output);
-    qDebug() << "[EncExes] cmd: " << execstring;
-    int result = QProcess::execute(execstring);
-    return (result == 0) ? true : false;
-}
-
-
-bool EncExes::configOk()
-{
-    QString path = RbSettings::subValue(m_name, RbSettings::EncoderPath).toString();
-
-    if (QFileInfo(path).exists())
-        return true;
-
-    return false;
-}
-
-/*********************************************************************
-*  RB SPEEX ENCODER
-**********************************************************************/
-EncRbSpeex::EncRbSpeex(QObject *parent) : EncBase(parent)
-{
-
-}
-
-void EncRbSpeex::generateSettings()
+void EncoderRbSpeex::generateSettings()
 {
     insertSetting(eVOLUME,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,
         tr("Volume:"),RbSettings::subValue("rbspeex",RbSettings::EncoderVolume),1.0,10.0));
@@ -166,7 +37,7 @@ void EncRbSpeex::generateSettings()
         tr("Use Narrowband:"),RbSettings::subValue("rbspeex",RbSettings::EncoderNarrowBand)));
 }
 
-void EncRbSpeex::saveSettings()
+void EncoderRbSpeex::saveSettings()
 {
     //save settings in user config
     RbSettings::setSubValue("rbspeex",RbSettings::EncoderVolume,
@@ -181,7 +52,7 @@ void EncRbSpeex::saveSettings()
     RbSettings::sync();
 }
 
-bool EncRbSpeex::start()
+bool EncoderRbSpeex::start()
 {
 
     // try to get config from settings
@@ -194,7 +65,7 @@ bool EncRbSpeex::start()
     return true;
 }
 
-bool EncRbSpeex::encode(QString input,QString output)
+bool EncoderRbSpeex::encode(QString input,QString output)
 {
     qDebug() << "[RbSpeex] Encoding " << input << " to "<< output;
     char errstr[512];
@@ -224,7 +95,7 @@ bool EncRbSpeex::encode(QString input,QString output)
     return true;
 }
 
-bool EncRbSpeex::configOk()
+bool EncoderRbSpeex::configOk()
 {
     bool result=true;
     // check config
