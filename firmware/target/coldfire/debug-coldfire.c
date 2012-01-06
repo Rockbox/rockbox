@@ -220,6 +220,8 @@ bool dbg_hw_info(void)
     }
 #endif
 
+    lcd_update();
+
     /* wait for exit */
     while (button_get_w_tmo(HZ/10) != (DEBUG_CANCEL|BUTTON_REL));
 
