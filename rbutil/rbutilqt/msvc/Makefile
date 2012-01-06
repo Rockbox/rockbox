@@ -35,7 +35,7 @@ ucl.dll:
 	    CROSS=$(CROSS) CC=$(CC) APPVERSION=dll dll
 rbspeex.dll:
 	$(SILENT)$(MAKE) -C ../../../tools/rbspeex \
-	    TARGET_DIR=$(PWD)/ OUT=$(PWD)/build-dll/$(basename $@) \
+	    TARGET_DIR=$(PWD)/ BUILD_DIR=$(PWD)/build-dll/$(basename $@) \
 	    CROSS=$(CROSS) CC=$(CC) STATIC=1 APPVERSION=dll dll
 
 %.dll:

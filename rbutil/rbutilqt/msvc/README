@@ -75,7 +75,7 @@ Create a VS project file
 ------------------------
 To create a project file for VS, run
 
-  c:\QtSDK\Desktop\Qt\4.7.4\msvc2008\bin\qmake.exe -tp vc
+  c:\QtSDK\Desktop\Qt\4.7.4\msvc2008\bin\qmake.exe -tp vc ..
 
 This creates a file RockboxUtility.vcproj.
 
