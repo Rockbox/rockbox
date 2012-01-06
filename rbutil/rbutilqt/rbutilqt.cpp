@@ -107,7 +107,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
         RegCloseKey(hk);
     }
 #endif
-    updateSettings();
+    updateDevice();
     downloadInfo();
 
     m_gotInfo = false;
@@ -347,7 +347,7 @@ void RbUtilQt::updateSettings()
     HttpGet::setGlobalCache(RbSettings::value(RbSettings::CachePath).toString());
     HttpGet::setGlobalDumbCache(RbSettings::value(RbSettings::CacheOffline).toBool());
 
-     if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
+    if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
         QApplication::processEvents();
         QMessageBox::information(this, tr("New installation"),
             tr("This is a new installation of Rockbox Utility, or a new version. "
@@ -362,7 +362,7 @@ void RbUtilQt::updateSettings()
                 "to a changed device path. The configuration dialog will "
                 "now open to allow you to correct the problem."));
         configDialog();
-    }    
+    }
 }
 
 
