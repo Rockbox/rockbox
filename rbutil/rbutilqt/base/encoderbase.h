@@ -43,9 +43,9 @@ class EncoderBase : public EncTtsSettingInterface
         // settings
         //! Child class should return true when configuration is ok
         virtual bool configOk()=0;
-        //! Child class should fill in the setttingsList
+        //! Child class should fill in settingsList
         virtual void generateSettings() = 0;
-        //! Chlid class should commit the from SettingsList to permanent storage
+        //! Child class should commit from SettingsList to permanent storage
         virtual void saveSettings() = 0;
 
         // static functions
