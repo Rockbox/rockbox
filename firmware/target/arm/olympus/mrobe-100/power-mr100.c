@@ -27,7 +27,7 @@
 #include "power.h"
 #include "logf.h"
 #include "usb.h"
-#include "lcd-remote-target.h"
+#include "lcd-remote.h"
 
 void power_init(void)
 {

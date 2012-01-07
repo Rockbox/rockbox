@@ -26,7 +26,7 @@
 #include "synaptics-mep.h"
 
 #ifdef HAVE_REMOTE_LCD
-#include "lcd-remote-target.h"
+#include "lcd-remote.h"
 static bool remote_hold = false;
 static bool headphones_status = true;
 #endif

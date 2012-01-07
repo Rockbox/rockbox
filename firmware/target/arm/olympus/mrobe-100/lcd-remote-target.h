@@ -25,12 +25,8 @@ bool remote_detect(void);    /* returns detection status */
 
 void lcd_remote_backlight(bool on);
 
-void lcd_remote_init_device(void);
-void lcd_remote_on(void);
-void lcd_remote_off(void);
 bool lcd_remote_read_device(unsigned char *data);
 
-extern bool remote_initialized;
 extern unsigned int rc_status;
 extern unsigned char rc_buf[5];
 #endif

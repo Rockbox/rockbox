@@ -24,13 +24,8 @@
 #define REMOTE_INIT_LCD   1
 #define REMOTE_DEINIT_LCD 2
 
-void lcd_remote_init_device(void);
 bool remote_detect(void);
 void lcd_remote_powersave(bool on);
-void lcd_remote_on(void);
-void lcd_remote_off(void);
 void lcd_remote_poweroff(void); /* for when remote is plugged during shutdown*/
-
-extern bool remote_initialized;
 
 #endif

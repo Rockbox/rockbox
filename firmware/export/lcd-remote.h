@@ -112,6 +112,11 @@ extern unsigned lcd_remote_color_to_native(unsigned color);
 /* The actual framebuffer */
 extern fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_FBHEIGHT][LCD_REMOTE_FBWIDTH];
 
+void lcd_remote_init_device(void);
+void lcd_remote_on(void);
+void lcd_remote_off(void);
+
+extern bool remote_initialized;
 
 extern void lcd_remote_init(void);
 extern int  lcd_remote_default_contrast(void);
