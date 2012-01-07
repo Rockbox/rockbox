@@ -29,6 +29,4 @@ void lcd_remote_emireduce(bool state);
 #endif
 void lcd_remote_powersave(bool on);
 
-bool remote_detect(void);
-
 #endif

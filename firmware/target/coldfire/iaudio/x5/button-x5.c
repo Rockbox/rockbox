@@ -23,7 +23,7 @@
 #include "button.h"
 #include "backlight.h"
 #include "adc.h"
-#include "lcd-remote-target.h"
+#include "lcd-remote.h"
 
 /* have buttons scan by default */
 static bool button_scan_on     = true;

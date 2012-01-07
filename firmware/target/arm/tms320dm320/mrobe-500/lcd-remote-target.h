@@ -26,8 +26,6 @@
 
 void lcd_remote_powersave(bool on);
 
-bool remote_detect(void);
-
 #ifndef SIMULATOR
 void _remote_backlight_on(void);
 void _remote_backlight_off(void);
