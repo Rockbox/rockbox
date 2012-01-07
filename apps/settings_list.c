@@ -38,7 +38,9 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "kernel.h"
+#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
+#endif
 #include "list.h"
 #include "rbunicode.h"
 #ifdef HAVE_LCD_BITMAP
