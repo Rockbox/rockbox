@@ -100,10 +100,6 @@
 #error "Charger settings not defined!"
 #endif
 
-void powermgmt_init_target(void);
-void charging_algorithm_step(void);
-void charging_algorithm_close(void);
-
 /* We want to be able to reset the averaging filter */
 #define HAVE_RESET_BATTERY_FILTER
 

@@ -65,6 +65,10 @@ int _battery_voltage(void)
     return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
 }
 
+void powermgmt_init_target(void)
+{
+}
+
 /** Charger control **/
 #ifdef CHARGING_DEBUG_FILE
 #include "file.h"
@@ -483,12 +487,12 @@ void charging_algorithm_step(void)
     charger_enable(trickle_sec > 0);
 }
 
-#ifdef CHARGING_DEBUG_FILE
 void charging_algorithm_close(void)
 {
+#ifdef CHARGING_DEBUG_FILE
     debug_file_close();
-}
 #endif /* CHARGING_DEBUG_FILE */
+}
 
 /* Returns true if the unit is charging the batteries. */
 bool charging_state(void)

@@ -139,6 +139,8 @@ int _battery_time(void); /* minutes */
 int _battery_voltage(void); /* voltage in millivolts */
 #if CONFIG_CHARGING >= CHARGING_TARGET
 void powermgmt_init_target(void);
+void charging_algorithm_close(void);
+void charging_algorithm_step(void);
 #endif
 
 #ifdef HAVE_BATTERY_SWITCH

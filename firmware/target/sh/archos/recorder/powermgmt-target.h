@@ -86,18 +86,4 @@ bool charger_enabled(void);
 /* Battery filter lengths in samples */
 #define BATT_AVE_SAMPLES 32
 
-/* No init to do */
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
-static inline void powermgmt_init_target(void) {}
-#endif
-void charging_algorithm_step(void);
-
-#ifdef CHARGING_DEBUG_FILE
-/* Need to flush and close debug file */
-void charging_algorithm_close(void);
-#else
-/* No poweroff operation to do */
-static inline void charging_algorithm_close(void) {}
-#endif
-
 #endif /* POWERMGMT_TARGET_H */

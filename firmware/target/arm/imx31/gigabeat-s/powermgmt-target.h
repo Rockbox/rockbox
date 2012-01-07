@@ -107,10 +107,6 @@
 #define BATT_AVE_SAMPLES            128
 #define ICHARGER_AVE_SAMPLES        32
 
-void powermgmt_init_target(void);
-void charging_algorithm_step(void);
-void charging_algorithm_close(void);
-
 /* Provide filtered charge current */
 int battery_charge_current(void);
 
