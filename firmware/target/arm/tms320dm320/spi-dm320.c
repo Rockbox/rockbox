@@ -43,9 +43,12 @@ struct SPI_info {
     bool clk_invert;
 };
 
-static const struct SPI_info spi_targets[] =
+static const struct SPI_info spi_targets[SPI_MAX_TARGETS] =
 {
-#ifndef CREATIVE_ZVx
+#if defined(CREATIVE_ZVx)
+    [SPI_target_LTV250QV] =  { &IO_GIO_BITCLR2, &IO_GIO_BITSET2, 
+        GIO_LCD_ENABLE, true, 0x07},
+#elif defined(MROBE_500)
     [SPI_target_TSC2100]   = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, 
         GIO_TS_ENABLE, 0x260D, true},
     /* RTC seems to have timing problems if the CLK idles low */
@@ -54,9 +57,6 @@ static const struct SPI_info spi_targets[] =
     /* This appears to work properly idling low, idling high is very glitchy */
     [SPI_target_BACKLIGHT] = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, 
         GIO_BL_ENABLE, 0x2656, false},
-#else
-    [SPI_target_LTV250QV] =  { &IO_GIO_BITCLR2, &IO_GIO_BITSET2, 
-        GIO_LCD_ENABLE, true, 0x07},
 #endif
 };
 

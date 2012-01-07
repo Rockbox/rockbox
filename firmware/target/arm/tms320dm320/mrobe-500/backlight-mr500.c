@@ -26,7 +26,7 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "power.h"
-#include "spi-target.h"
+#include "spi.h"
 #include "lcd-target.h"
 
 short read_brightness = 0x0;

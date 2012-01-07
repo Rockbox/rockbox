@@ -26,7 +26,6 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "power.h"
-#include "spi-target.h"
 #include "lcd-target.h"
 
 static void _backlight_write_brightness(int brightness)

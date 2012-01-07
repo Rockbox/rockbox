@@ -20,6 +20,15 @@
  ****************************************************************************/
 #ifndef __SPI_H__
 #define __SPI_H__
-#include "spi-target.h"
+
+#include <inttypes.h>
+#include <stdbool.h>
+#include "spi-target.h" /* for SPI_target */
+
+void spi_init(void);
+int spi_block_transfer(enum SPI_target target,
+                       const uint8_t *tx_bytes, unsigned int tx_size,
+                             uint8_t *rx_bytes, unsigned int rx_size);
+
 
 #endif

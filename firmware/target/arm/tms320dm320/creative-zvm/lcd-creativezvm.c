@@ -28,7 +28,6 @@
 #include "string-extra.h" /* memset16() */
 #include "cpu.h"
 #include "spi.h"
-#include "spi-target.h"
 #include "lcd-target.h"
 #include "ltv350qv.h"
 
