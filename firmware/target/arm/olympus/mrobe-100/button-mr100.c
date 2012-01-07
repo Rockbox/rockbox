@@ -27,6 +27,7 @@
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
+#include "lcd-remote-target.h"
 static bool remote_hold = false;
 static bool headphones_status = true;
 #endif

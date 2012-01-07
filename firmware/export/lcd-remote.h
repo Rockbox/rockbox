@@ -29,10 +29,6 @@
 
 #ifdef HAVE_REMOTE_LCD /* Not for the players with *only* a remote LCD (m3) */
 
-#ifndef __PCTOOL__
-#include "lcd-remote-target.h"
-#endif
-
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 #define REMOTETYPE_UNPLUGGED 0
 #define REMOTETYPE_H100_LCD 1
@@ -155,6 +151,10 @@ extern lcd_remote_blockfunc_type* const lcd_remote_blockfuncs[8];
 #endif
 
 #endif /* HAVE_LCD_REMOTE */
+
+#ifdef HAVE_REMOTE_LCD_TICKING
+void lcd_remote_emireduce(bool state);
+#endif
 
 void lcd_remote_init_device(void);
 void lcd_remote_on(void);

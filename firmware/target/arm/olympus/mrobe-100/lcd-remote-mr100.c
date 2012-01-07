@@ -24,6 +24,7 @@
 #include "thread.h"
 #include "system.h"
 #include "lcd-remote.h"
+#include "lcd-remote-target.h"
 #include "button.h"
 #include "button-target.h"
 

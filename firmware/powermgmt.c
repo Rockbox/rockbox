@@ -50,9 +50,6 @@
 #include <time.h>
 #endif
 
-#if (defined(IAUDIO_X5) || defined(IAUDIO_M5)) && !defined (SIMULATOR)
-#include "lcd-remote-target.h"
-#endif
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)) \
     && !defined (SIMULATOR)
 #include "pcf50606.h"

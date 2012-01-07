@@ -28,9 +28,6 @@
 #endif
 #include "button-target.h"
 #include "usb_drv.h"
-#ifdef HAVE_REMOTE_LCD
-#include "lcd-remote-target.h"
-#endif
 
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 extern void TIMER1(void);
