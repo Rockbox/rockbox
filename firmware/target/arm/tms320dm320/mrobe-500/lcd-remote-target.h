@@ -22,10 +22,6 @@
 #define LCD_REMOTE_TARGET_H
 
 void lcd_remote_powersave(bool on);
-
 void lcd_remote_sleep(void);
-
-int remote_read_device(void);
-bool remote_button_hold(void);
 
 #endif

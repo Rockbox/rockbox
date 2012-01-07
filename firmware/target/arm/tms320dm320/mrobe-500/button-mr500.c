@@ -108,6 +108,52 @@ inline bool button_hold(void)
     return hold_button;
 }
 
+#ifdef HAVE_REMOTE_LCD
+static bool remote_hold_button;
+static int remote_read_buttons(void)
+{
+    static char read_buffer[5];
+    int read_button = BUTTON_NONE;
+    
+    static int oldbutton=BUTTON_NONE;
+    
+    /* Handle remote buttons */
+    if(uart1_gets_queue(read_buffer, 5)>=0)
+    {
+        int button_location;
+        
+        for(button_location=0;button_location<4;button_location++)
+        {
+            if((read_buffer[button_location]&0xF0)==0xF0 
+                && (read_buffer[button_location+1]&0xF0)!=0xF0)
+                break;
+        }
+        
+        if(button_location==4)
+            button_location=0;
+        
+        button_location++;
+            
+        read_button |= read_buffer[button_location];
+        
+        /* Find the hold status location */
+        if(button_location==4)
+            button_location=0;
+        else
+            button_location++;
+            
+        remote_hold_button=((read_buffer[button_location]&0x80)?true:false);
+        
+        uart1_clear_queue();
+        oldbutton=read_button;
+    }
+    else
+        read_button=oldbutton;
+        
+    return read_button;
+}
+#endif
+
 /* Since this is a touchscreen, the expectation in higher levels is that the
  *  previous touch location is maintained when a release occurs.  This is
  *  intended to mimic a mouse or other similar pointing device.
@@ -137,8 +183,8 @@ int button_read_device(int *data)
 
 #if defined(HAVE_REMOTE_LCD)
     /* Read data from the remote */
-    button_read |= remote_read_device();
-    hold_button=remote_button_hold();
+    button_read |= remote_read_buttons();
+    hold_button=remote_hold_button;
 #endif
     
     /* Take care of hold notifications */
