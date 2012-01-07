@@ -33,59 +33,8 @@
 #include "screendump.h"
 #include "lcd.h"
 
-/* eqivalent to fb + y*width + x */
-#define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
-
 static int dev_fd = 0;
-static fb_data *dev_fb = 0;
-
-void lcd_update(void)
-{
-    /* update the entire display */
-    memcpy(dev_fb, lcd_framebuffer, sizeof(lcd_framebuffer));
-}
-
-/* Copy Rockbox frame buffer to the mmapped lcd device */
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) ||
-            (y >= LCD_HEIGHT) || (x + width <= 0) || (y + height <= 0))
-        return;
-
-    /* do the necessary clipping */
-    if (x < 0)
-    {   /* clip left */
-        width += x;
-        x = 0;
-    }
-    if (y < 0)
-    {   /* clip top */
-        height += y;
-        y = 0;
-    }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x; /* clip right */
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y; /* clip bottom */
-
-    fb_data* src  = LCDADDR(x, y);
-    fb_data* dst = dev_fb + y*LCD_WIDTH + x;
-
-    if (LCD_WIDTH == width)
-    {   /* optimized full-width update */
-        memcpy(dst, src, width * height * sizeof(fb_data));
-    }
-    else
-    {   /* row by row */
-        do
-        {
-            memcpy(dst, src, width * sizeof(fb_data));
-            src += LCD_WIDTH;
-            dst += LCD_WIDTH;
-        } while(--height > 0);
-    }
-}
+fb_data *dev_fb = 0;
 
 void lcd_shutdown(void)
 {
