@@ -419,10 +419,6 @@ target/sh/debug-sh.c
 #elif defined(CPU_COLDFIRE)
 
 target/coldfire/crt0.S
-#ifdef HAVE_PRIORITY_SCHEDULING
-common/ffs.c
-target/coldfire/ffs-coldfire.S
-#endif
 target/coldfire/kernel-coldfire.c
 target/coldfire/system-coldfire.c
 target/coldfire/timer-coldfire.c
@@ -449,10 +445,6 @@ target/arm/bits-armv4.S
 target/arm/mmu-arm.S
 #  endif
 # endif
-
-#ifdef HAVE_PRIORITY_SCHEDULING
-target/arm/ffs-arm.S
-#endif
 
 #if CONFIG_PLATFORM & PLATFORM_NATIVE
 target/arm/system-arm.c
@@ -626,7 +618,6 @@ target/arm/crt0.S
 #endif /* defined(CPU_*) */
 
 #elif defined(CPU_MIPS)
-target/mips/ffs-mips.S
 target/mips/mmu-mips.c
 #if CONFIG_CPU==JZ4732
 target/mips/ingenic_jz47xx/crt0.S
@@ -634,9 +625,6 @@ target/mips/ingenic_jz47xx/crt0.S
 
 #else
 
-#ifdef HAVE_PRIORITY_SCHEDULING
-common/ffs.c
-#endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 crt0.S
 drivers/i2c.c

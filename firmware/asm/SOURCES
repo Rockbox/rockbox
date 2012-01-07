@@ -1,3 +1,4 @@
+ffs.c
 memset16.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HAVE_ROCKBOX_C_LIBRARY)
 memcpy.c
