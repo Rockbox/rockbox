@@ -27,7 +27,7 @@
 #include "gpio-imx31.h"
 #include "mmu-imx31.h"
 #include "system-target.h"
-#include "powermgmt-target.h"
+#include "powermgmt.h"
 #include "lcd.h"
 #include "serial-imx31.h"
 #include "debug.h"
