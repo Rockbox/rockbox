@@ -2,8 +2,6 @@
  * This config file is for the Samsung YH-925
  */
 
-#define TARGET_TREE /* this target is using the target tree system */
-
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 59
 #define MODEL_NAME   "Samsung YH-925"

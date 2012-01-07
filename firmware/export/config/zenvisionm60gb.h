@@ -22,7 +22,6 @@
 /*
  * This config file is for the Creative Zen Vision:M 60GB
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 #define CONFIG_SDRAM_START 0x00900000
 

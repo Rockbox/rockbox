@@ -2,8 +2,6 @@
  * This config file is for the iriver H10 20Gb
  */
 
-#define TARGET_TREE /* this target is using the target tree system */
-
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 13
 #define MODEL_NAME   "iriver H10 20GB"

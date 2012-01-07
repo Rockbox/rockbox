@@ -2,8 +2,6 @@
  * This config file is for the Olympus m:robe MR-100
  */
  
-#define TARGET_TREE
-
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 23
 #define MODEL_NAME   "Olympus m:robe MR-100"

@@ -1,7 +1,6 @@
 /*
  * This config file is for HiFiMAN HM-60x reference design
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 82

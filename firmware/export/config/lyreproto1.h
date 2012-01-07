@@ -22,7 +22,6 @@
 /*
  * This config file is for the Lyre prototype 1.
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 #define CONFIG_SDRAM_START 0x20000000
 

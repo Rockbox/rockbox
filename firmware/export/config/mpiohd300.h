@@ -1,7 +1,6 @@
 /*
  * This config file is for MPIO HD200
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 70

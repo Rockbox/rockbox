@@ -2,8 +2,6 @@
  * This config file is for toshiba Gigabeat S
  */
 
-#define TARGET_TREE /* this target is using the target tree system */
-
 #define TOSHIBA_GIGABEAT_S 1
 
 #define MODEL_NAME "Toshiba Gigabeat S"

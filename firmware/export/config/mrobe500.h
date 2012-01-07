@@ -22,7 +22,6 @@
 /*
  * This config file is for the M:Robe 500i
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 /* This is the absolute address on the bus */
 #define CONFIG_SDRAM_START 0x00900000

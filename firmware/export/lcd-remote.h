@@ -29,7 +29,7 @@
 
 #ifdef HAVE_REMOTE_LCD
 
-#if defined(TARGET_TREE) && !defined(__PCTOOL__)
+#ifndef __PCTOOL__
 #include "lcd-remote-target.h"
 #endif
 

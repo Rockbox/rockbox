@@ -2,8 +2,6 @@
  * This config file is for the Tatung Elio TPJ-1022
  */
 
-#define TARGET_TREE /* this target is using the target tree system */
-
 #define MODEL_NAME "Tatung Elio TPJ-1022"
 
 /* For Rolo and boot loader */

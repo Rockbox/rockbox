@@ -2,8 +2,6 @@
  * This config file is for the Philips GoGear HDD16x0/HDD18x0
  */
 
-#define TARGET_TREE /* this target is using the target tree system */
-
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 31
 #define MODEL_NAME   "Philips GoGear HDD16x0"

@@ -1,7 +1,6 @@
 /*
  * This config file is for iPod 6G / Classic
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 #define IPOD_ARCH 1
 

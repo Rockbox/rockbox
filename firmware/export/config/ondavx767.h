@@ -22,7 +22,6 @@
 /*
  * This config file is for the Onda VX747
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 #define CONFIG_SDRAM_START 0x80004000
 

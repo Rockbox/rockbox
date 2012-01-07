@@ -1,7 +1,6 @@
 /*
  * This config file is for the Sansa C100 series
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 #define MODEL_NAME "Sandisk Sansa c100 series"
 

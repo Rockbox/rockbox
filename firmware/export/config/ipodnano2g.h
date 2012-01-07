@@ -1,7 +1,6 @@
 /*
  * This config file is for iPod Nano 2nd Generation
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 #define IPOD_ARCH 1
 

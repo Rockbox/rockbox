@@ -1,7 +1,6 @@
 /*
  * This config file is for Rockbox as an application on Android
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 /* We don't run on hardware directly */
 #define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_ANDROID)

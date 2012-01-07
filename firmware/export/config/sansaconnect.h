@@ -21,7 +21,6 @@
 /*
  * This config file is for the Sansa Connect
  */
-#define TARGET_TREE /* this target is using the target tree system */
 
 /* This is the absolute address on the bus set by OF bootloader */
 #define CONFIG_SDRAM_START 0x01000000

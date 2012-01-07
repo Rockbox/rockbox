@@ -1,7 +1,6 @@
 /*
  * This config file is for iriver iFP-799
  */
-#define TARGET_TREE
 
 #define IRIVER_IFP7XX_SERIES 1
 

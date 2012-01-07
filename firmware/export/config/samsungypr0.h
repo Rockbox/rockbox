@@ -3,8 +3,6 @@
  * The target name for ifdefs is: SAMSUNG_YPR0; or CONFIG_PLATFORM & PLAFTORM_YPR0
  */
 
-#define TARGET_TREE /* this target is using the target tree system */
-
 /* We don't run on hardware directly */
 /* YP-R0 need it too of course */
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)

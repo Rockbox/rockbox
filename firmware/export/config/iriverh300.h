@@ -1,4 +1,3 @@
-#define TARGET_TREE /* this target is using the target tree system */
 /*
  * This config file is for iriver H320, H340
  */
