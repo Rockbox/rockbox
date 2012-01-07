@@ -12,6 +12,8 @@ ifndef APP_TYPE
 INCLUDES += -I$(FIRMDIR)/libc/include
 endif
 
+include $(FIRMDIR)/asm/asm.make
+
 FIRMLIB_SRC += $(call preprocess, $(FIRMDIR)/SOURCES)
 FIRMLIB_OBJ := $(call c2obj, $(FIRMLIB_SRC))
 ifeq (,$(findstring -DARCHOS_PLAYER,$(TARGET)))

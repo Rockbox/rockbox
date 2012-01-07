@@ -49,6 +49,7 @@ input() {
 prefixtools () {
  prefix="$1"
  CC=${prefix}gcc
+ CPP=${prefix}cpp
  WINDRES=${prefix}windres
  DLLTOOL=${prefix}dlltool
  DLLWRAP=${prefix}dllwrap
@@ -671,6 +672,7 @@ ypr0cc () {
  endian="little"
  thread_support="HAVE_SIGALTSTACK_THREADS"
  app_type="ypr0"
+ arch="unknown"
 
  # Include path
  GCCOPTS="$GCCOPTS  -D_GNU_SOURCE=1 -U_FORTIFY_SOURCE -D_REENTRANT"
@@ -3639,6 +3641,7 @@ fi
 HOSTCC=`findtool gcc --lit`
 HOSTAR=`findtool ar --lit`
 CC=`findtool ${CC} --lit`
+CPP=`findtool ${CPP} --lit`
 LD=`findtool ${AR} --lit`
 AR=`findtool ${AR} --lit`
 AS=`findtool ${AS} --lit`
@@ -3647,6 +3650,32 @@ WINDRES=`findtool ${WINDRES} --lit`
 DLLTOOL=`findtool ${DLLTOOL} --lit`
 DLLWRAP=`findtool ${DLLWRAP} --lit`
 RANLIB=`findtool ${RANLIB} --lit`
+
+
+if [ -z "$arch" ]; then
+    cpp_defines=$(echo "" | $CPP -dD)
+    if [ -n "$(echo $cpp_defines | grep -w __sh__)" ]; then
+        arch="sh"
+    elif [ -n "$(echo $cpp_defines | grep -w __m68k__)" ]; then
+        arch="m68k"
+    elif [ -n "$(echo $cpp_defines | grep -w __arm__)" ]; then
+        arch="arm"
+    elif [ -n "$(echo $cpp_defines | grep -w __mips__)" ]; then
+        arch="mips"
+    elif [ -n "$(echo $cpp_defines | grep -w _X86_)" ]; then
+        arch="x86"
+    elif [ -n "$(echo $cpp_defines | grep -w __x86_64__)" ]; then
+        arch="amd64"
+    else
+        arch="unknown"
+        echo "Warning: Could not determine target arch"
+    fi
+    if [ "$arch" != "unknown" ]; then
+        echo "Automatically selected arch: $arch"
+    fi;
+else
+    echo "Manually selected arch: $arch"
+fi
 
 if test -n "$ccache"; then
   CC="$ccache $CC"
@@ -3718,11 +3747,11 @@ EOF
 if test -n "$t_cpu"; then
   TARGET_INC="-I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer/$t_model"
 
-  if [ "$t_cpu" = "hosted" ] && [ "$t_manufacturer" = "maemo" ]; then
+  if [ "$application" = "yes" ] && [ "$t_manufacturer" = "maemo" ]; then
     # Maemo needs the SDL port, too
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/app"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
-  elif [ "$t_cpu" = "hosted" ] && [ "$t_manufacturer" = "pandora" ]; then
+  elif [ "$application" = "yes" ] && [ "$t_manufacturer" = "pandora" ]; then
     # Pandora needs the SDL port, too
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl/app"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
@@ -3780,6 +3809,7 @@ export ARCHOSROM=${archosrom}
 export FLASHFILE=${flash}
 export TARGET_ID=${target_id}
 export TARGET=-D${target}
+export ARCH=${arch}
 export CPU=${t_cpu}
 export MANUFACTURER=${t_manufacturer}
 export OBJDIR=${pwd}
@@ -3801,6 +3831,7 @@ export EXTRA_DEFINES=${extradefines}
 export HOSTCC=${HOSTCC}
 export HOSTAR=${HOSTAR}
 export CC=${CC}
+export CPP=${CPP}
 export LD=${LD}
 export AR=${AR}
 export AS=${AS}
