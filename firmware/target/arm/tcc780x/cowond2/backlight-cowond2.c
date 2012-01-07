@@ -24,7 +24,7 @@
 #include "pcf50606.h"
 #include "pcf50635.h"
 #include "tcc780x.h"
-#include "power-target.h"
+#include "pmu-target.h"
 
 int _backlight_init(void)
 {

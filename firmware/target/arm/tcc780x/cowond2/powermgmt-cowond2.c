@@ -23,7 +23,7 @@
 #include "adc.h"
 #include "powermgmt.h"
 #include "kernel.h"
-#include "power-target.h"
+#include "pmu-target.h"
 #include "pcf50606.h"
 #include "pcf50635.h"
 

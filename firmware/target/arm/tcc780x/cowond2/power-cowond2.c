@@ -29,7 +29,7 @@
 #include "tuner.h"
 #include "backlight-target.h"
 #include "powermgmt.h"
-#include "power-target.h"
+#include "pmu-target.h"
 
 static enum pmu_type pmu;
 

@@ -22,7 +22,7 @@
 #include "system.h"
 #include "pcf50606.h"
 #include "pcf50635.h"
-#include "power-target.h"
+#include "pmu-target.h"
 
 void rtc_init(void)
 {
