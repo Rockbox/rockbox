@@ -395,7 +395,7 @@ static void usb_set_host_present(bool present)
     }
 
     usb_num_acks_to_expect += queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
-    DEBUGF("usb: waiting for %d acks...\n", num_acks_to_expect);
+    DEBUGF("usb: waiting for %d acks...\n", usb_num_acks_to_expect);
 }
 
 static bool usb_handle_connected_ack(void)
