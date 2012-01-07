@@ -116,24 +116,12 @@ libc/ctype.c
 libc/memchr.c
 libc/memcmp.c
 
-#if !defined(CPU_SH) && !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
-#if !defined(CPU_MIPS)
-libc/memcpy.c
-libc/memset.c
-#endif /* CPU_MIPS */
-libc/memmove.c
-#endif /* CPU_* */
-
 libc/qsort.c
 libc/random.c
 libc/strcat.c
 libc/strchr.c
 libc/strcmp.c
 libc/strcpy.c
-
-#if !defined(CPU_SH) && !defined(CPU_COLDFIRE)
-libc/strlen.c
-#endif
 
 libc/strncmp.c
 libc/strrchr.c
@@ -422,10 +410,6 @@ target/sh/adc-sh.c
 target/sh/bitswap.S
 target/sh/crt0.S
 target/sh/kernel-sh.c
-target/sh/memcpy-sh.S
-target/sh/memmove-sh.S
-target/sh/memset-sh.S
-target/sh/strlen-sh.S
 target/sh/system-sh.c
 target/sh/archos/descramble.S
 target/sh/archos/i2c-archos.c
@@ -437,14 +421,6 @@ target/coldfire/crt0.S
 #ifdef HAVE_PRIORITY_SCHEDULING
 common/ffs.c
 target/coldfire/ffs-coldfire.S
-#endif
-target/coldfire/memcpy-coldfire.S
-target/coldfire/memmove-coldfire.S
-target/coldfire/memset-coldfire.S
-target/coldfire/strlen-coldfire.S
-#if defined(HAVE_LCD_COLOR) || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED) \
- || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
-target/coldfire/memset16-coldfire.S
 #endif
 target/coldfire/kernel-coldfire.c
 target/coldfire/system-coldfire.c
@@ -462,11 +438,6 @@ target/coldfire/ata-as-coldfire.S
 
 #elif defined(CPU_PP) || defined(CPU_ARM)
 /* CPU_PP => CPU_ARM, CPU_ARM !=> CPU_PP */
-target/arm/memcpy-arm.S
-target/arm/memmove-arm.S
-
-target/arm/memset-arm.S
-target/arm/memset16-arm.S
 
 # if ARM_ARCH < 6
 target/arm/bits-armv4.S
@@ -654,10 +625,7 @@ target/arm/crt0.S
 #endif /* defined(CPU_*) */
 
 #elif defined(CPU_MIPS)
-common/memset16.c
 target/mips/ffs-mips.S
-target/mips/memcpy-mips.S
-target/mips/memset-mips.S
 target/mips/mmu-mips.c
 #if CONFIG_CPU==JZ4732
 target/mips/ingenic_jz47xx/crt0.S
@@ -668,7 +636,6 @@ target/mips/ingenic_jz47xx/crt0.S
 #ifdef HAVE_PRIORITY_SCHEDULING
 common/ffs.c
 #endif
-common/memset16.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 crt0.S
 drivers/i2c.c
