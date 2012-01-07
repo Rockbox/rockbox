@@ -411,7 +411,7 @@ static bool usb_handle_connected_ack(void)
     }
     else
     {
-        DEBUGF("usb: got ack, %d to go...\n", num_acks_to_expect);
+        DEBUGF("usb: got ack, %d to go...\n", usb_num_acks_to_expect);
     }
 
     return false;
