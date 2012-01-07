@@ -28,8 +28,6 @@
 void lcd_remote_emireduce(bool state);
 #endif
 void lcd_remote_powersave(bool on);
-void lcd_remote_set_invert_display(bool yesno);
-void lcd_remote_set_flip(bool yesno);
 
 bool remote_detect(void);
 void lcd_remote_init_device(void);

@@ -23,8 +23,6 @@
 
 bool remote_detect(void);    /* returns detection status */
 
-void lcd_remote_set_invert_display(bool yesno);
-void lcd_remote_set_flip(bool yesno);
 void lcd_remote_backlight(bool on);
 
 void lcd_remote_init_device(void);
