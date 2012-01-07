@@ -39,11 +39,5 @@ void _buttonlight_set_brightness(int val);
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 #endif /* HAVE_BUTTON_LIGHT */
 
-#ifdef HAVE_REMOTE_LCD
-void _remote_backlight_on(void);
-void _remote_backlight_off(void);
-#endif /* HAVE_REMOTE_LCD */
-
-
 #endif /* BACKLIGHT_SIM_H */
 

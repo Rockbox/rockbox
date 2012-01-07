@@ -21,9 +21,6 @@
 #ifndef LCD_REMOTE_TARGET_H
 #define LCD_REMOTE_TARGET_H
 
-#define REMOTE_INIT_LCD   1
-#define REMOTE_DEINIT_LCD 2
-
 #ifdef HAVE_REMOTE_LCD_TICKING
 void lcd_remote_emireduce(bool state);
 #endif

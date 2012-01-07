@@ -21,9 +21,6 @@
 #ifndef LCD_REMOTE_TARGET_H
 #define LCD_REMOTE_TARGET_H
 
-#define REMOTE_INIT_LCD   1
-#define REMOTE_DEINIT_LCD 2
-
 void lcd_remote_powersave(bool on);
 void lcd_remote_poweroff(void); /* for when remote is plugged during shutdown*/
 

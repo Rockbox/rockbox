@@ -21,8 +21,6 @@
 #ifndef LCD_REMOTE_TARGET_H
 #define LCD_REMOTE_TARGET_H
 
-void lcd_remote_backlight(bool on);
-
 bool lcd_remote_read_device(unsigned char *data);
 
 extern unsigned int rc_status;

@@ -486,16 +486,6 @@ void lcd_remote_set_contrast(int val)
     rc_status |= RC_UPDATE_CONTROLLER;
 }
 
-void lcd_remote_backlight(bool on)
-{
-    if (on)
-        rc_status |= RC_BACKLIGHT_ON;
-    else
-        rc_status &= ~RC_BACKLIGHT_ON;
-
-    rc_status |= RC_UPDATE_CONTROLLER;
-}
-
 void lcd_remote_off(void)
 {
     /* should only be used to power off at shutdown */
@@ -559,4 +549,16 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
     (void)height;
 
     rc_status |= RC_UPDATE_LCD;
+}
+
+void _remote_backlight_on(void)
+{
+    rc_status |= RC_BACKLIGHT_ON;
+    rc_status |= RC_UPDATE_CONTROLLER;
+}
+
+void _remote_backlight_off(void)
+{
+    rc_status &= ~RC_BACKLIGHT_ON;
+    rc_status |= RC_UPDATE_CONTROLLER;
 }
