@@ -21,7 +21,9 @@
 
 #include "config.h"
 #include "lcd.h"
+#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
+#endif
 #include "thread.h"
 #include "kernel.h"
 #include "button.h"
