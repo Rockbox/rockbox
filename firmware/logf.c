@@ -32,7 +32,9 @@
 #include "config.h"
 #include "system.h"
 #include "font.h"
+#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
+#endif
 #include "logf.h"
 #include "serial.h"
 #include "format.h"
