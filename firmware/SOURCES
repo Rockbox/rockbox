@@ -854,7 +854,6 @@ target/arm/sandisk/audio-c200_e200.c
 
 #ifdef SANSA_E200
 drivers/lcd-memframe.c
-target/arm/lcd-as-memframe.S
 target/arm/sandisk/sansa-e200/lcd-e200.c
 target/arm/sandisk/sansa-e200/button-e200.c
 target/arm/sandisk/sansa-e200/powermgmt-e200.c
@@ -1034,7 +1033,6 @@ target/arm/iriver/h10/lcd-h10_5gb.c
 
 #ifdef GIGABEAT_F
 drivers/lcd-memframe.c
-target/arm/lcd-as-memframe.S
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/button-meg-fx.c
@@ -1051,7 +1049,6 @@ target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 #ifdef GIGABEAT_S
 drivers/lcd-memframe.c
 target/arm/bits-armv6.S
-target/arm/lcd-as-memframe.S
 target/arm/mmu-armv6.S
 target/arm/imx31/ata-imx31.c
 target/arm/imx31/avic-imx31.c
@@ -1103,9 +1100,6 @@ target/arm/tms320dm320/uart-dm320.c
 #endif /* CONFIG_CPU == DM320 */
 
 #ifdef MROBE_500
-#if !defined(LCD_USE_DMA)
-target/arm/lcd-as-memframe.S
-#endif
 target/arm/tms320dm320/mrobe-500/crt0-board.S
 target/arm/tms320dm320/mrobe-500/adc-mr500.c
 target/arm/tms320dm320/mrobe-500/ata-mr500.c
@@ -1124,7 +1118,6 @@ target/arm/tms320dm320/mrobe-500/usb-mr500.c
 
 #ifdef CREATIVE_ZVx
 drivers/lcd-memframe.c
-target/arm/lcd-as-memframe.S
 target/arm/tms320dm320/creative-zvm/adc-creativezvm.c
 target/arm/tms320dm320/creative-zvm/ata-creativezvm.c
 target/arm/tms320dm320/creative-zvm/dma-creativezvm.c
@@ -1138,7 +1131,6 @@ target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 
 #ifdef SANSA_CONNECT
 drivers/lcd-memframe.c
-target/arm/lcd-as-memframe.S
 target/arm/tms320dm320/sdmmc-dm320.c
 target/arm/tms320dm320/sansa-connect/crt0-board.S
 target/arm/tms320dm320/sansa-connect/lcd-sansaconnect.c
@@ -1347,7 +1339,6 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 drivers/lcd-memframe.c
 drivers/synaptics-rmi.c
 drivers/generic_i2c.c
-target/arm/lcd-as-memframe.S
 target/arm/imx233/sansa-fuzeplus/fmradio-i2c-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/backlight-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
@@ -1389,7 +1380,6 @@ drivers/nand_id.c
 drivers/pcf50606.c
 drivers/pcf50635.c
 drivers/tsc200x.c
-target/arm/lcd-as-memframe.S
 target/arm/tcc780x/adc-tcc780x.c
 target/arm/tcc780x/system-tcc780x.c
 target/arm/tcc780x/kernel-tcc780x.c
@@ -1558,7 +1548,6 @@ target/arm/at91sam/lyre_proto1/timer-lyre_proto1.c
 
 #if defined(MINI2440)
 drivers/lcd-memframe.c
-target/arm/lcd-as-memframe.S
 target/arm/s3c2440/dma-s3c2440.c
 target/arm/s3c2440/sd-s3c2440.c
 target/arm/s3c2440/uart-s3c2440.c
