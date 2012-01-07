@@ -22,7 +22,6 @@
 #include "config.h"
 #include "jz4740.h"
 #include "nand.h"
-//#include "ata-nand-target.h" /* TODO */
 #include "nand_id.h"
 #include "system.h"
 #include "panic.h"
