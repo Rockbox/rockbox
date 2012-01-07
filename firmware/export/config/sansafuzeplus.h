@@ -133,6 +133,9 @@
 #define NUM_DRIVES 2
 #define HAVE_HOTSWAP
 
+/* Extra threads: touchpad */
+#define TARGET_EXTRA_THREADS 1
+
 /* todo */
 #define BATTERY_CAPACITY_DEFAULT 550    /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 550        /* min. capacity selectable */
