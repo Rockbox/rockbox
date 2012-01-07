@@ -52,7 +52,9 @@
 #ifdef HAVE_TAGCACHE
 #include "tagcache.h"
 #endif
+#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
+#endif
 #include "crc32.h"
 #include "logf.h"
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)

@@ -33,7 +33,9 @@
 #ifndef __PCTOOL__
 #include "lang.h"
 #include "dir.h"
+#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
+#endif
 #include "timefuncs.h"
 #include "screens.h"
 #include "usb_screen.h"

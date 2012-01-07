@@ -22,7 +22,9 @@
 #include <stdlib.h>
 #include "config.h"
 #include "lcd.h"
+#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
+#endif
 #include "font.h"
 #include "viewport.h"
 #include "screen_access.h"

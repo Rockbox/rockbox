@@ -32,7 +32,9 @@
 #include "list.h"
 #include "color_picker.h"
 #include "lcd.h"
+#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
+#endif
 #include "backdrop.h"
 #include "exported_menus.h"
 #include "appevents.h"

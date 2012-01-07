@@ -22,7 +22,9 @@
 #include <stdio.h>
 #include "config.h"
 #include <lcd.h>
+#ifdef HAVE_REMOTE_LCD
 #include <lcd-remote.h>
+#endif
 #include <scroll_engine.h>
 #include <font.h>
 #include <button.h>
@@ -356,7 +358,7 @@ struct screen screens[NB_SCREENS] =
         .has_buttonbar=false,
 #endif
     }
-#endif /* HAVE_REMOTE_LCD */
+#endif /* NB_SCREENS == 2 */
 };
 
 #ifdef HAVE_LCD_BITMAP
