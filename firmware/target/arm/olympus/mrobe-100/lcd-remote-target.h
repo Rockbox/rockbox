@@ -30,8 +30,6 @@ void lcd_remote_backlight(bool on);
 void lcd_remote_init_device(void);
 void lcd_remote_on(void);
 void lcd_remote_off(void);
-void lcd_remote_update(void);
-void lcd_remote_update_rect(int, int, int, int);
 bool lcd_remote_read_device(unsigned char *data);
 
 extern bool remote_initialized;
