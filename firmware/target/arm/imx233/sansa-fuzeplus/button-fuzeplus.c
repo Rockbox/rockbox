@@ -349,12 +349,26 @@ int button_read_device(void)
      * events as well as recovery mode. Since the power button is the power button
      * and the volume up button is recovery, it is not possible to know whether
      * power button is down when volume up is down (except if there is another
-     * method but volume up and power don't seem to be wired to GPIO pins). */
+     * method but volume up and power don't seem to be wired to GPIO pins). 
+     * As a probable consequence of that, it has been reported that pressing 
+     * volume up sometimes return BUTTON_POWER instead of BUTTON_VOL_UP. The
+     * following volume_power_lock prevent BUTTON_POWER to happen if volume up
+     * has been send since a very short time. */
+    static int volume_power_lock = 0;
+    if(volume_power_lock > 0)
+        volume_power_lock--;
     switch(__XTRACT(HW_POWER_STS, PSWITCH))
     {
-        case 1: res |= BUTTON_POWER; break;
-        case 3: res |= BUTTON_VOL_UP; break;
-        default: break;
+        case 1: 
+            if(volume_power_lock == 0)
+                res |= BUTTON_POWER;
+            break;
+        case 3:
+            res |= BUTTON_VOL_UP;
+            volume_power_lock = 5;
+            break;
+        default: 
+            break;
     }
     return res | touchpad_read_device();
 }
