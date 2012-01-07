@@ -67,6 +67,7 @@ int lcd_remote_default_contrast(void)
     return DEFAULT_REMOTE_CONTRAST_SETTING;
 }
 
+#if 0 // FIXME
 void lcd_remote_powersave(bool on)
 {
     if(remote_initialized) {
@@ -76,6 +77,7 @@ void lcd_remote_powersave(bool on)
             lcd_remote_write_command(LCD_SET_POWER_SAVE | 1);
     }
 }
+#endif
 
 void lcd_remote_set_contrast(int val)
 {

@@ -21,7 +21,6 @@
 #ifndef LCD_REMOTE_TARGET_H
 #define LCD_REMOTE_TARGET_H
 
-void lcd_remote_powersave(bool on);
 void lcd_remote_sleep(void);
 
 #endif

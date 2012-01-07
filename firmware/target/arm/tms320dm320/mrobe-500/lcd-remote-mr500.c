@@ -62,6 +62,7 @@ void lcd_remote_sleep(void)
     remote_state_control_next=REMOTE_CONTROL_SLEEP;
 }
 
+#if 0 // FIXME
 void lcd_remote_powersave(bool on)
 {
     if(on)
@@ -75,6 +76,7 @@ void lcd_remote_powersave(bool on)
         remote_state_control_next=REMOTE_CONTROL_POWER;
     }
 }
+#endif
 
 void lcd_remote_set_contrast(int val)
 {

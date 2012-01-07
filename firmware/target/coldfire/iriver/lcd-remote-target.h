@@ -24,6 +24,5 @@
 #ifdef HAVE_REMOTE_LCD_TICKING
 void lcd_remote_emireduce(bool state);
 #endif
-void lcd_remote_powersave(bool on);
 
 #endif

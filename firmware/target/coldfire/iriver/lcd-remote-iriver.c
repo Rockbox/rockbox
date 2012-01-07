@@ -90,6 +90,7 @@ void lcd_remote_emireduce(bool state)
 }
 #endif
 
+#if 0 // FIXME
 void lcd_remote_powersave(bool on)
 {
     if (remote_initialized)
@@ -98,6 +99,7 @@ void lcd_remote_powersave(bool on)
         lcd_remote_write_command(LCD_REMOTE_CNTL_ENTIRE_ON_OFF | (on ? 1 : 0));
     }
 }
+#endif
 
 void lcd_remote_set_contrast(int val)
 {
