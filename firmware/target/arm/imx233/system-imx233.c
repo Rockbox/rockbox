@@ -32,7 +32,7 @@
 #include "i2c-imx233.h"
 #include "lcd.h"
 #include "backlight-target.h"
-#include "button-target.h"
+#include "button.h"
 
 #define default_interrupt(name) \
     extern __attribute__((weak, alias("UIRQ"))) void name(void)

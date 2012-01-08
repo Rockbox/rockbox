@@ -37,6 +37,10 @@
  ON/OFF: AN3, low active (assigned as OFF)
 */
 
+void button_init_device(void)
+{
+}
+
 int button_read_device(void)
 {
     int btn = BUTTON_NONE;

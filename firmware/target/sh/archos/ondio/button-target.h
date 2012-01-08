@@ -22,8 +22,6 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#define button_init_device()
-
 #define BUTTON_OFF          0x00000001
 #define BUTTON_MENU         0x00000002
 

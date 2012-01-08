@@ -25,7 +25,7 @@
 #include "timer.h"
 
 #if INCREASED_SCROLLWHEEL_POLLING
-#include "button-target.h"
+#include "button.h"
 /* The scrollwheel is polled every 5 ms (the tick tasks only every 10) */
 static int poll_scrollwheel = 0;
 
