@@ -24,7 +24,6 @@
 #include <QtCore>
 
 #include "encttssettings.h"
-#include "rbspeex.h"
 
 
 class EncoderBase : public EncTtsSettingInterface

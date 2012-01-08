@@ -19,6 +19,7 @@
 #include <QtCore>
 #include "encoderrbspeex.h"
 #include "rbsettings.h"
+#include "rbspeex.h"
 
 EncoderRbSpeex::EncoderRbSpeex(QObject *parent) : EncoderBase(parent)
 {
