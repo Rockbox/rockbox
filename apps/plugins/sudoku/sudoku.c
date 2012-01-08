@@ -284,7 +284,7 @@ static unsigned int cellypos[9]={
 #define BLOCK        3
 #define SIZE         (BLOCK*BLOCK)
 
-void sudoku_solve(struct sudoku_state_t* state)
+static void sudoku_solve(struct sudoku_state_t* state)
 {
     bool ret = sudoku_solve_board(state);
 
@@ -317,7 +317,7 @@ static void restore_state(struct sudoku_state_t *state)
 #endif
 }
 
-void default_state(struct sudoku_state_t* state)
+static void default_state(struct sudoku_state_t* state)
 {
     int r,c;
 
@@ -340,7 +340,7 @@ void default_state(struct sudoku_state_t* state)
     state->editmode=0;
 }
 
-void clear_state(struct sudoku_state_t* state)
+static void clear_state(struct sudoku_state_t* state)
 {
     int r,c;
 
@@ -361,7 +361,7 @@ void clear_state(struct sudoku_state_t* state)
 }
 
 /* Check the status of the board, assuming a change at the cursor location */
-bool check_status(struct sudoku_state_t* state)
+static bool check_status(struct sudoku_state_t* state)
 {
     int check[9];
     int r,c;
@@ -422,7 +422,7 @@ bool check_status(struct sudoku_state_t* state)
 /* Load game - only ".ss" is officially supported, but any sensible
    text representation (one line per row) may load.
 */
-bool load_sudoku(struct sudoku_state_t* state, char* filename)
+static bool load_sudoku(struct sudoku_state_t* state, char* filename)
 {
     int fd;
     size_t n;
@@ -520,7 +520,7 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
     return(true);
 }
 
-bool save_sudoku(struct sudoku_state_t* state)
+static bool save_sudoku(struct sudoku_state_t* state)
 {
     int fd;
     int r,c;
@@ -583,7 +583,7 @@ bool save_sudoku(struct sudoku_state_t* state)
     }
 }
 
-void clear_board(struct sudoku_state_t* state)
+static void clear_board(struct sudoku_state_t* state)
 {
     int r,c;
 
@@ -596,7 +596,7 @@ void clear_board(struct sudoku_state_t* state)
     state->y=0;
 }
 
-void update_cell(struct sudoku_state_t* state, int r, int c)
+static void update_cell(struct sudoku_state_t* state, int r, int c)
 {
     /* We have four types of cell:
        1) User-entered number
@@ -630,7 +630,7 @@ void update_cell(struct sudoku_state_t* state, int r, int c)
 }
 
 
-void display_board(struct sudoku_state_t* state) 
+static void display_board(struct sudoku_state_t* state) 
 {
     int r,c;
 #ifdef SUDOKU_BUTTON_POSSIBLE
@@ -823,7 +823,7 @@ void display_board(struct sudoku_state_t* state)
     rb->lcd_update();
 }
 
-bool sudoku_generate(struct sudoku_state_t* state)
+static bool sudoku_generate(struct sudoku_state_t* state)
 {
     char* difficulty;
     char str[80];
@@ -902,7 +902,7 @@ enum {
     SM_QUIT,
 };
 
-int sudoku_menu(struct sudoku_state_t* state)
+static int sudoku_menu(struct sudoku_state_t* state)
 {
     int result;
 
@@ -972,7 +972,7 @@ int sudoku_menu(struct sudoku_state_t* state)
 }
 
 /* Menu used when user is in edit mode - i.e. creating a new game manually */
-int sudoku_edit_menu(struct sudoku_state_t* state)
+static int sudoku_edit_menu(struct sudoku_state_t* state)
 {
     int result;
 
@@ -1001,7 +1001,7 @@ int sudoku_edit_menu(struct sudoku_state_t* state)
     return result;
 }
 
-void move_cursor(struct sudoku_state_t* state, int newx, int newy)
+static void move_cursor(struct sudoku_state_t* state, int newx, int newy)
 {
     int oldx, oldy;
 

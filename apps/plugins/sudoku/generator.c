@@ -34,6 +34,7 @@
 
 #include "sudoku.h"
 #include "templates.h"
+#include "generator.h"
 
 #define assert(x)
 
@@ -618,6 +619,7 @@ allmoves( void )
 }
 
 /* Helper: sort based on index */
+#if 0 /* unused function */
 static
 int
 cmpindex( const void * a, const void * b )
@@ -629,7 +631,7 @@ cmpindex( const void * a, const void * b )
  * 'easy' moves first, and if none are possible, then try for more
  * cryptic moves.
  */
-int
+static int
 findhints( void )
 {
     int i, n, mutated = 0;
@@ -695,6 +697,7 @@ findhints( void )
 
     return n;
 }
+#endif /* unused function */
 
 /* Deterministic solver; return 0 on success, else -1 on error.
  */
