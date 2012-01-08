@@ -27,6 +27,10 @@
 
 #include "wavtrim.h"
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
+
 /* place a 32 bit value into memory, little endian */
 void Write32(unsigned char* pByte, unsigned long value)
 {
