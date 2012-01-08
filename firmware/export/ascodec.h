@@ -59,6 +59,4 @@ void ascodec_write_pmu(unsigned int index, unsigned int subreg,
 int ascodec_read_pmu(unsigned int index, unsigned int subreg);
 #endif
 
-void ascodec_suppressor_on(bool on); /* PP-only */
-
 #endif
