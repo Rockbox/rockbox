@@ -195,8 +195,8 @@ void tuner_isr(void)
     /* read and clear the interrupt */
     if (GPIOA_MIS & (1<<4)) {
         semaphore_release(&rds_sema);
+        GPIOA_IC = (1<<4);
     }
-    GPIOA_IC = (1<<4);
 }
 
 /* Captures RDS data and processes it */

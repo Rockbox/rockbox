@@ -51,7 +51,7 @@
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
 static void UIRQ (void) __attribute__((interrupt ("IRQ")));
-void irq_handler(void) __attribute__((interrupt ("IRQ")));
+void irq_handler(void) __attribute__((naked, interrupt ("IRQ")));
 void fiq_handler(void) __attribute__((interrupt ("FIQ")));
 
 default_interrupt(INT_WATCHDOG);
@@ -121,6 +121,11 @@ static void UIRQ(void)
 static const struct { int source; void (*isr) (void); } vec_int_srcs[] =
 {
     /* Highest priority at the top of the list */
+#if defined(HAVE_HOTSWAP) || defined(HAVE_RDS_CAP) || \
+    (defined(SANSA_FUZEV2) && !INCREASED_SCROLLWHEEL_POLLING)
+    /* If GPIOA ISR is interrupted, things seem to go wonky ?? */
+    { INT_SRC_GPIOA, INT_GPIOA },
+#endif
 #ifdef HAVE_RECORDING
     { INT_SRC_I2SIN, INT_I2SIN }, /* For recording */
 #endif
@@ -134,29 +139,26 @@ static const struct { int source; void (*isr) (void); } vec_int_srcs[] =
     { INT_SRC_TIMER2, INT_TIMER2 },
     { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
     { INT_SRC_AUDIO, INT_AUDIO },
-#if defined(HAVE_HOTSWAP) || \
-    (defined(SANSA_FUZEV2) && !INCREASED_SCROLLWHEEL_POLLING)
-    { INT_SRC_GPIOA, INT_GPIOA, },
-#endif
     /* Lowest priority at the end of the list */
 };
 
 static void setup_vic(void)
 {
-    const unsigned int n = sizeof(vec_int_srcs)/sizeof(vec_int_srcs[0]);
-    unsigned int i;
-
     CGU_PERI |= CGU_VIC_CLOCK_ENABLE; /* enable VIC */
     VIC_INT_EN_CLEAR = 0xffffffff; /* disable all interrupt lines */
     VIC_INT_SELECT = 0; /* only IRQ, no FIQ */
 
     *VIC_DEF_VECT_ADDR = UIRQ;
 
-    for(i = 0; i < n; i++)
+    for(unsigned int i = 0; i < ARRAYLEN(vec_int_srcs); i++)
     {
         VIC_VECT_ADDRS[i] = vec_int_srcs[i].isr;
         VIC_VECT_CNTLS[i] = (1<<5) | vec_int_srcs[i].source;
     }
+
+    /* Reset priority hardware */
+    for(unsigned int i = 0; i < 32; i++)
+        *VIC_VECT_ADDR = 0;
 }
 
 void INT_GPIOA(void)
@@ -177,8 +179,36 @@ void INT_GPIOA(void)
 
 void irq_handler(void)
 {
-    (*VIC_VECT_ADDR)(); /* call the isr */
-    *VIC_VECT_ADDR = (void*)VIC_VECT_ADDR; /* any write will ack the irq */
+    /* Worst-case IRQ stack usage with 10 vectors:
+     * 10*4*10 = 400 bytes (100 words)
+     *
+     * No SVC stack is used by pro/epi-logue code
+     */
+    asm volatile (
+        "sub    lr, lr, #4               \n" /* Create return address */
+        "stmfd  sp!, { r0-r5, r12, lr }  \n" /* Save what gets clobbered */
+        "ldr    r0, =0xc6010030          \n" /* Obtain VIC address (before SPSR read!) */
+        "ldr    r12, [r0]                \n" /* Load Vector */
+        "mrs    r1, spsr                 \n" /* Save SPSR_irq */
+        "stmfd  sp!, { r0-r1 }           \n" /* Must have something bet. mrs and msr */
+        "msr    cpsr_c, #0x13            \n" /* Switch to SVC mode, enable IRQ */
+        "and    r4, sp, #4               \n" /* Align SVC stack to 8 bytes, save */
+        "sub    sp, sp, r4               \n"
+        "mov    r5, lr                   \n" /* Save lr_SVC */
+#if ARM_ARCH >= 5
+        "blx    r12                      \n" /* Call handler */
+#else
+        "mov    lr, pc                   \n"
+        "bx     r12                      \n"
+#endif
+        "add    sp, sp, r4               \n" /* Undo alignment fudge */
+        "mov    lr, r5                   \n" /* Restore lr_SVC */
+        "msr    cpsr_c, #0x92            \n" /* Mask IRQ, return to IRQ mode */
+        "ldmfd  sp!, { r0-r1 }           \n" /* Pop VIC address, SPSR_irq */
+        "str    r0, [r0]                 \n" /* Ack end of ISR to VIC  */
+        "msr    spsr_cxsf, r1            \n" /* Restore SPSR_irq */
+        "ldmfd  sp!, { r0-r5, r12, pc }^ \n" /* Restore regs, and RFE */
+    );
 }
 
 void fiq_handler(void)

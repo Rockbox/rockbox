@@ -76,6 +76,9 @@ void __div0(void);
 #define ints_enabled_checkval(val) \
     (((val) & IRQ_FIQ_STATUS) == 0)
 
+/* We run in SYS mode */
+#define is_thread_context() \
+    (get_processor_mode() == 0x1f)
 
 /* Core-level interrupt masking */
 
@@ -107,6 +110,13 @@ static inline bool interrupt_enabled(int status)
     unsigned long cpsr;
     asm ("mrs %0, cpsr" : "=r"(cpsr));
     return (cpsr & status) == 0;
+}
+
+static inline unsigned long get_processor_mode(void)
+{
+    unsigned long cpsr;
+    asm ("mrs %0, cpsr" : "=r"(cpsr));
+    return cpsr & 0x1f;
 }
 
 /* ARM_ARCH version section for architecture*/

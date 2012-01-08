@@ -100,17 +100,23 @@ newstart:
     strhi   r4, [r2], #4
     bhi     1b
 
-    /* Set up stack for IRQ mode */ 
+    /* Set up stack for IRQ mode */
     msr     cpsr_c, #0xd2
     ldr     sp, =irq_stack
 
-    /* Set up stack for FIQ mode */ 
+    msr     cpsr_c, #0xd3
+#if CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2
+    /* Let abort and undefined modes use irq stack */
+    /* svc stack is for interrupt processing */
+    ldr     sp, =svc_stack
+#else
+    /* Let svc, abort and undefined modes use irq stack */
+    ldr     sp, =irq_stack
+
+    /* Set up stack for FIQ mode */
     msr     cpsr_c, #0xd1
     ldr     sp, =fiq_stack
-
-    /* Let svc, abort and undefined modes use irq stack */
-    msr     cpsr_c, #0xd3
-    ldr     sp, =irq_stack
+#endif
     msr     cpsr_c, #0xd7
     ldr     sp, =irq_stack
     msr     cpsr_c, #0xdb
@@ -159,15 +165,20 @@ prefetch_abort_handler:
     b      UIE
 
 data_abort_handler:
-    sub    r0, lr, #8 
+    sub    r0, lr, #8
     mov    r1, #2
     b      UIE
+
+/* Cache-align interrupt stacks */
+.balign    32
 
 /* 256 words of IRQ stack */
     .space 256*4
 irq_stack:
 
-/* 256 words of FIQ stack */
+/* 256 words of FIQ/SVC stack */
     .space 256*4
 fiq_stack:
+svc_stack:
+
 end:

@@ -178,10 +178,12 @@ static int sd1_oneshot_callback(struct timeout *tmo)
 void sd_gpioa_isr(void)
 {
     static struct timeout sd1_oneshot;
+
     if (GPIOA_MIS & EXT_SD_BITS)
+    {
         timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
-    /* acknowledge interrupt */
-    GPIOA_IC = EXT_SD_BITS;
+        GPIOA_IC = EXT_SD_BITS; /* acknowledge interrupt */
+    }
 }
 #endif  /* HAVE_HOTSWAP */
 

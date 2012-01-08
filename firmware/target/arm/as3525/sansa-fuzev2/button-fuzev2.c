@@ -30,6 +30,7 @@ static bool hold_button = false;
 
 #ifdef HAVE_SCROLLWHEEL
 #define SCROLLWHEEL_BITS        (1<<7|1<<6)
+#define SCROLLWHEEL_BITS_POS    6
                                                       /* TIMER units */
 #define TIMER_TICK              (KERNEL_TIMER_FREQ/HZ)/* how long a tick lasts */
 #define TIMER_MS                (TIMER_TICK/(1000/HZ))/* how long a ms lasts */
@@ -78,10 +79,17 @@ static void scrollwheel(unsigned int wheel_value)
 
     unsigned int btn = BUTTON_NONE;
 
-    if (old_wheel_value == wheel_tbl[0][wheel_value])
+    if (hold_button)
+    {
+    }
+    else if (old_wheel_value == wheel_tbl[0][wheel_value])
+    {
         btn = BUTTON_SCROLL_FWD;
+    }
     else if (old_wheel_value == wheel_tbl[1][wheel_value])
+    {
         btn = BUTTON_SCROLL_BACK;
+    }
 
     if (btn == BUTTON_NONE)
     {
@@ -200,11 +208,13 @@ void button_gpioa_isr(void)
 {
 #if defined(HAVE_SCROLLWHEEL)
     /* scroll wheel handling */
-    if (GPIOA_MIS & SCROLLWHEEL_BITS)
-        scrollwheel(GPIOA_PIN_MASK(0xc0) >> 6);
+    unsigned long bits = GPIOA_MIS & SCROLLWHEEL_BITS;
 
-    /* ack interrupt */
-    GPIOA_IC = SCROLLWHEEL_BITS;
+    if (bits)
+    {
+        scrollwheel(GPIOA_PIN_MASK(SCROLLWHEEL_BITS) >> SCROLLWHEEL_BITS_POS);
+        GPIOA_IC = bits; /* ack interrupt */
+    }
 #endif
 }
 
@@ -225,8 +235,10 @@ int button_read_device(void)
     int delay = 30;
     while(delay--) nop;
 
+    disable_irq();
+
     bool ccu_io_bit12 = CCU_IO & (1<<12);
-    bitclr32(&CCU_IO, 1<<12);
+    CCU_IO &= ~(1<<12);
 
     /* B1 is shared with FM i2c */
     bool gpiob_pin0_dir = GPIOB_DIR & (1<<1);
@@ -256,7 +268,9 @@ int button_read_device(void)
         GPIOB_DIR |= 1<<1;
 
     if(ccu_io_bit12)
-        bitset32(&CCU_IO, 1<<12);
+        CCU_IO |= (1<<12);
+
+    enable_irq();
 
 #ifdef HAS_BUTTON_HOLD
 #ifndef BOOTLOADER
@@ -265,12 +279,6 @@ int button_read_device(void)
     {
         hold_button = hold;
         backlight_hold_changed(hold);
-        /* mask scrollwheel irq so we don't need to check for
-         * the hold button in the isr */
-        if (hold)
-            GPIOA_IE &= ~SCROLLWHEEL_BITS;
-        else
-            GPIOA_IE |= SCROLLWHEEL_BITS;
     }
 #else
     hold_button = hold;

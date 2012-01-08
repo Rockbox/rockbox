@@ -1195,9 +1195,7 @@ int semaphore_wait(struct semaphore *s, int timeout)
  * in 'semaphore_init'. */
 void semaphore_release(struct semaphore *s)
 {
-#if defined(HAVE_PRIORITY_SCHEDULING) && defined(irq_enabled_checkval)
     unsigned int result = THREAD_NONE;
-#endif
     int oldlevel;
 
     oldlevel = disable_irq_save();
@@ -1209,11 +1207,7 @@ void semaphore_release(struct semaphore *s)
         KERNEL_ASSERT(s->count == 0,
             "semaphore_release->threads queued but count=%d!\n", s->count);
         s->queue->retval = OBJ_WAIT_SUCCEEDED; /* indicate explicit wake */
-#if defined(HAVE_PRIORITY_SCHEDULING) && defined(irq_enabled_checkval)
         result = wakeup_thread(&s->queue);
-#else
-        wakeup_thread(&s->queue);
-#endif
     }
     else
     {
@@ -1228,11 +1222,11 @@ void semaphore_release(struct semaphore *s)
     corelock_unlock(&s->cl);
     restore_irq(oldlevel);
 
-#if defined(HAVE_PRIORITY_SCHEDULING) && defined(irq_enabled_checkval)
-    /* No thread switch if IRQ disabled - it's probably called via ISR.
-     * switch_thread would as well enable them anyway. */
-    if((result & THREAD_SWITCH) && irq_enabled_checkval(oldlevel))
+#if defined(HAVE_PRIORITY_SCHEDULING) && defined(is_thread_context)
+    /* No thread switch if not thread context */
+    if((result & THREAD_SWITCH) && is_thread_context())
         switch_thread();
 #endif
+    (void)result;
 }
 #endif /* HAVE_SEMAPHORE_OBJECTS */
