@@ -21,6 +21,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
+#include <stdbool.h>
 bool button_debug_screen(void);
 
 /* Main unit's buttons */
