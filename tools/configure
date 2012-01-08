@@ -29,7 +29,16 @@ thread_support="ASSEMBLER_THREADS"
 app_lcd_width=
 app_lcd_height=
 app_lcd_orientation=
-cmdline="$@"
+
+# Properly retain command line arguments containing spaces
+cmdline=
+for arg in "$@"; do
+  case "$arg" in
+    *\ *) cmdline="$cmdline \"$arg\"";;
+    *)    cmdline="$cmdline $arg";;
+  esac
+done
+
 #
 # Begin Function Definitions
 #
@@ -878,7 +887,7 @@ voiceconfig () {
         DEFAULT_TTS="flite"
         DEFAULT_TTS_OPTS=$FLITE_OPTS
         DEFAULT_NOISEFLOOR="500"
-        DEFAULT_CHOICE="L"
+        DEFAULT_CHOICE="l"
     fi
     if [ -n "`findtool espeak`" ]; then
         ESPEAK="(e)Speak "
@@ -910,7 +919,7 @@ voiceconfig () {
         DEFAULT_TTS="festival"
         DEFAULT_TTS_OPTS=$FESTIVAL_OPTS
         DEFAULT_NOISEFLOOR="500"
-        DEFAULT_CHOICE="F"
+        DEFAULT_CHOICE="f"
     fi
     if [ -n "`findtool swift`" ]; then
         SWIFT="S(w)ift "
@@ -927,7 +936,7 @@ voiceconfig () {
         DEFAULT_TTS="sapi"
         DEFAULT_TTS_OPTS=$SAPI_OPTS
         DEFAULT_NOISEFLOOR="500"
-        DEFAULT_CHOICE="S"
+        DEFAULT_CHOICE="s"
     fi
 
     if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$SWIFT" ]; then
@@ -940,8 +949,9 @@ voiceconfig () {
     else
         echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI}${SWIFT}(${DEFAULT_CHOICE})?"
         option=`input`
+        if [ -z "$option" ]; then option=${DEFAULT_CHOICE}; fi
+        advopts="$advopts --tts=$option"
     fi
-    advopts="$advopts --tts=$option"
     case "$option" in
         [Ll])
         TTS_ENGINE="flite"
@@ -1008,7 +1018,6 @@ voiceconfig () {
     # Read custom tts options from command line
     if [ "$ARG_TTSOPTS" ]; then
         TTS_OPTS="$ARG_TTSOPTS"
-        advopts="$advopts --ttsopts='$TTS_OPTS'"
         echo "$TTS_ENGINE options set to $TTS_OPTS"
     fi
 
@@ -1031,7 +1040,6 @@ voiceconfig () {
     # Read custom encoder options from command line
     if [ "$ARG_ENCOPTS" ]; then
         ENC_OPTS="$ARG_ENCOPTS"
-        advopts="$advopts --encopts='$ENC_OPTS'"
         echo "$ENCODER options set to $ENC_OPTS"
     fi
 
@@ -1061,8 +1069,8 @@ picklang() {
             num=`expr $num + 1`
         done
         pick=`input`
+        advopts="$advopts --language=$pick"
     fi
-    advopts="$advopts --language=$pick"
 }
 
 whichlang() {
