@@ -29,6 +29,8 @@ void adc_init(void) INIT_ATTR;
 
 #ifndef NEED_ADC_CLOSE
 #define adc_close()
+#else
+void adc_close(void);
 #endif
 
 #endif /* _ADC_H_ */
