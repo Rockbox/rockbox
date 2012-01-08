@@ -22,7 +22,6 @@
 #include "powermgmt.h"
 #include "power.h"
 #include "file.h"
-#include "ascodec-target.h"
 #include "as3514.h"
 #include "sc900776.h"
 

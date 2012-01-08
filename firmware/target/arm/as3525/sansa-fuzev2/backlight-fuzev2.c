@@ -23,7 +23,7 @@
 #include "system.h"
 #include "lcd.h"
 #include "backlight.h"
-#include "ascodec-target.h"
+#include "ascodec.h"
 #include "as3514.h"
 
 void _backlight_set_brightness(int brightness)

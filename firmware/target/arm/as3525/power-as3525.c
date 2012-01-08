@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include <stdbool.h>
 #include "config.h"
-#include "ascodec-target.h"
+#include "ascodec.h"
 #include "as3514.h"
 #include "power.h"
 

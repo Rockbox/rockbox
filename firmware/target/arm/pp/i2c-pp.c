@@ -33,8 +33,9 @@
 #include "system.h"
 #include "i2c.h"
 #include "i2c-pp.h"
+#ifdef HAVE_AS3514
 #include "ascodec.h"
-#include "as3514.h"
+#endif
 
 #define I2C_CTRL    (*(volatile unsigned char*)(I2C_BASE+0x00))
 #define I2C_ADDR    (*(volatile unsigned char*)(I2C_BASE+0x04))

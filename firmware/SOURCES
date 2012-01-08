@@ -64,6 +64,7 @@ target/hosted/sdl/app/button-application.c
 #endif
 
 #ifdef SAMSUNG_YPR0
+target/arm/adc-as3514.c
 #if (CONFIG_RTC == RTC_AS3514)
 drivers/rtc/rtc_as3514.c
 #else

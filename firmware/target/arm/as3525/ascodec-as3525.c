@@ -44,7 +44,7 @@
     interrupt bit 7 is raised and DACNT is not decremented after the transfer.
  */
 
-#include "ascodec-target.h"
+#include "ascodec.h"
 #include "clock-target.h"
 #include "kernel.h"
 #include "system.h"
@@ -533,6 +533,29 @@ bool ascodec_endofch(void)
 bool ascodec_chg_status(void)
 {
     return ascodec_enrd0_shadow & CHG_STATUS;
+}
+
+void ascodec_monitor_endofch(void)
+{
+    /* already enabled */
+}
+
+void ascodec_write_charger(int value)
+{
+#if CONFIG_CPU == AS3525
+    ascodec_write(AS3514_CHARGER, value);
+#else
+    ascodec_write_pmu(AS3543_CHARGER, 1, value);
+#endif
+}
+
+int ascodec_read_charger(void)
+{
+#if CONFIG_CPU == AS3525
+    return ascodec_read(AS3514_CHARGER);
+#else
+    return ascodec_read_pmu(AS3543_CHARGER, 1);
+#endif
 }
 #endif /* CONFIG_CHARGING */
 

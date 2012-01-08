@@ -108,11 +108,8 @@
 #include "debug-target.h"
 #endif
 
-#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200) \
-      || (CONFIG_CPU == AS3525 && defined(CONFIG_CHARGING)) \
-      || CONFIG_CPU == AS3525v2
+#if defined(HAVE_AS3514) && defined(CONFIG_CHARGING)
 #include "ascodec.h"
-#include "as3514.h"
 #endif
 
 #ifdef IPOD_NANO2G
@@ -1129,8 +1126,7 @@ static bool view_battery(void)
                     lcd_puts(0, line++, "T Battery: ?");
                 }
                     
-#elif defined(SANSA_E200) || defined(SANSA_C200) || CONFIG_CPU == AS3525 || \
-      CONFIG_CPU == AS3525v2
+#if defined(HAVE_AS3514) && defined(CONFIG_CHARGING)
                 static const char * const chrgstate_strings[] =
                 {
                     [CHARGE_STATE_DISABLED - CHARGE_STATE_DISABLED]= "Disabled",

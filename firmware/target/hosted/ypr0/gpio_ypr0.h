@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: ascodec-target.h 26116 2010-05-17 20:53:25Z funman $
  *
  * Module wrapper for GPIO, using /dev/r0GPIO (r0Gpio.ko) of Samsung YP-R0
  *

@@ -26,7 +26,8 @@
 
 #include "audiohw.h"
 #include "i2s.h"
-#include "ascodec-target.h"
+#include "i2c-pp.h"
+#include "ascodec.h"
 
 /*
  * Initialise the PP I2C and I2S.
@@ -65,18 +66,64 @@ void audiohw_init(void)
     audiohw_preinit();
 }
 
-void ascodec_suppressor_on(bool on)
+int ascodec_write(unsigned int reg, unsigned int value)
 {
-    /* CHECK: Good for c200 too? */
-#ifdef SANSA_E200
-    if (on) {
-        /* Set pop prevention */
-        GPIO_SET_BITWISE(GPIOG_OUTPUT_VAL, 0x08);
-    } else {
-        /* Release pop prevention */
-        GPIO_CLEAR_BITWISE(GPIOG_OUTPUT_VAL, 0x08);
-    }
-#else
-    (void)on;
-#endif
-} 
+    return pp_i2c_send(AS3514_I2C_ADDR, reg, value);
+}
+
+int ascodec_read(unsigned int reg)
+{
+    return i2c_readbyte(AS3514_I2C_ADDR, reg);
+}
+
+int ascodec_readbytes(unsigned int addr, unsigned int len, unsigned char *data)
+{
+    return i2c_readbytes(AS3514_I2C_ADDR, addr, len, data);
+}
+
+void ascodec_lock(void)
+{
+    i2c_lock();
+}
+
+void ascodec_unlock(void) 
+{
+    i2c_unlock();
+}
+
+bool ascodec_chg_status(void)
+{
+    return ascodec_read(AS3514_IRQ_ENRD0) & CHG_STATUS;
+}
+
+bool ascodec_endofch(void)
+{
+    return ascodec_read(AS3514_IRQ_ENRD0) & CHG_ENDOFCH;
+}
+
+void ascodec_monitor_endofch(void)
+{
+    ascodec_write(AS3514_IRQ_ENRD0, IRQ_ENDOFCH);
+}
+
+void ascodec_write_charger(int value)
+{
+    ascodec_write(AS3514_CHARGER, value);
+}
+
+int ascodec_read_charger(void)
+{
+    return ascodec_read(AS3514_CHARGER);
+}
+
+void ascodec_wait_adc_finished(void)
+{
+    /*
+     * FIXME: not implemented
+     *
+     * If irqs are not available on the target platform,
+     * this should be most likely implemented by polling
+     * AS3514_IRQ_ENRD2 in the same way powermgmt-ascodec.c
+     * is polling IRQ_ENDOFCH.
+     */
+}

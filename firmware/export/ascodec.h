@@ -23,13 +23,42 @@
 #define _ASCODEC_H
 
 #include "config.h"
+#include <stdbool.h>
 
-#ifdef HAVE_AS3514
-#include "ascodec-target.h"
+#include "as3514.h"
+
+#ifndef HAVE_AS3514
+# error Only for AS3514!
 #endif
 
-#ifdef SAMSUNG_YPR0
-#include "ascodec-target.h"
+void ascodec_init(void) INIT_ATTR;
+void ascodec_close(void);
+
+void ascodec_lock(void);
+void ascodec_unlock(void);
+
+int ascodec_write(unsigned int index, unsigned int value);
+
+int ascodec_read(unsigned int index);
+
+int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data);
+
+void ascodec_wait_adc_finished(void);
+
+#ifdef CONFIG_CHARGING
+bool ascodec_endofch(void);
+bool ascodec_chg_status(void);
+void ascodec_monitor_endofch(void);
+void ascodec_write_charger(int value);
+int ascodec_read_charger(void);
 #endif
+
+#ifdef HAVE_AS3543
+void ascodec_write_pmu(unsigned int index, unsigned int subreg,
+                       unsigned int value);
+int ascodec_read_pmu(unsigned int index, unsigned int subreg);
+#endif
+
+void ascodec_suppressor_on(bool on); /* PP-only */
 
 #endif

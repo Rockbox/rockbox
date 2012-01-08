@@ -26,7 +26,7 @@
 #include "system.h"
 #include "cpu.h"
 #include "pl180.h"
-#include "ascodec-target.h"
+#include "ascodec.h"
 #include "adc.h"
 #include "storage.h"
 

@@ -252,8 +252,9 @@ void audiohw_postinit(void)
     /* wait until outputs have stabilized */
     sleep(HZ/4);
 
-#ifdef CPU_PP
-    ascodec_suppressor_on(false);
+#ifdef SANSA_E200 /* check C200 */
+    /* Release pop prevention */
+    GPIO_CLEAR_BITWISE(GPIOG_OUTPUT_VAL, 0x08);
 #endif
 
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
@@ -334,8 +335,9 @@ void audiohw_close(void)
     /* mute headphones */
     audiohw_mute(true);
 
-#ifdef CPU_PP
-    ascodec_suppressor_on(true);
+#ifdef SANSA_E200 /* check C200 */
+    /* Set pop prevention */
+    GPIO_SET_BITWISE(GPIOG_OUTPUT_VAL, 0x08);
 #endif
 
     /* turn on common */

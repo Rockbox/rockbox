@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: ascodec-target.h 26116 2010-05-17 20:53:25Z funman $
  *
  * Module wrapper for AS3543 audio codec, using /dev/afe (afe.ko) of Samsung YP-R0
  *
@@ -28,7 +27,7 @@
 #include "sys/ioctl.h"
 #include "stdlib.h"
 
-#include "ascodec-target.h"
+#include "ascodec.h"
 
 int afe_dev = -1;
 
@@ -134,24 +133,32 @@ void ascodec_unlock(void)
 {
 }
 
-/* Read 10-bit channel data */
-unsigned short adc_read(int channel)
+bool ascodec_chg_status(void)
 {
-    if ((unsigned)channel >= NUM_ADC_CHANNELS)
-        return 0;
+    return ascodec_read(AS3514_IRQ_ENRD0) & CHG_STATUS;
+}   
 
-    /* Select channel */
-    ascodec_write(AS3514_ADC_0, (channel << 4));
-    unsigned char buf[2];
-
-    /* Read data */
-    if (ascodec_readbytes(AS3514_ADC_0, 2, buf) < 0)
-        return 0;
-
-    /* decode to 10-bit and return */
-    return (((buf[0] & 0x3) << 8) | buf[1]);
+bool ascodec_endofch(void)
+{
+    return ascodec_read(AS3514_IRQ_ENRD0) & CHG_ENDOFCH;
 }
 
-void adc_init(void)
+void ascodec_monitor_endofch(void)
+{
+    ascodec_write(AS3514_IRQ_ENRD0, IRQ_ENDOFCH);
+}
+
+
+void ascodec_write_charger(int value)
+{
+    ascodec_write_pmu(AS3543_CHARGER, 1, value);
+}
+
+int ascodec_read_charger(void)
+{
+    return ascodec_read_pmu(AS3543_CHARGER, 1);
+}
+
+void ascodec_wait_adc_finished(void)
 {
 }

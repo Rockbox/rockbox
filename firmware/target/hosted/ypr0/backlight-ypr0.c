@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: backlight-gigabeat-s.c 25800 2010-05-04 10:07:53Z jethead71 $
  *
  * Copyright (C) 2011 by Lorenzo Miori
  *
@@ -24,7 +23,7 @@
 #include "backlight-target.h"
 #include "lcd.h"
 #include "as3514.h"
-#include "ascodec-target.h"
+#include "ascodec.h"
 #include <fcntl.h>
 #include "unistd.h"
 

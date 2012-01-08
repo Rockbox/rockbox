@@ -22,7 +22,7 @@
 #include "backlight-target.h"
 #include "lcd.h"
 #include "as3525v2.h"
-#include "ascodec-target.h"
+#include "ascodec.h"
 
 void _backlight_on(void)
 {

@@ -24,7 +24,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
-#include "ascodec-target.h"
+#include "ascodec.h"
 #include "adc.h"
 #include "dma-target.h"
 #include "clock-target.h"
@@ -32,6 +32,20 @@
 #include "button.h"
 #include "backlight-target.h"
 #include "lcd.h"
+
+/*  Charge Pump and Power management Settings  */
+#define AS314_CP_DCDC3_SETTING    \
+               ((0<<7) |  /* CP_SW  Auto-Switch Margin 0=200/300 1=150/255 */  \
+                (0<<6) |  /* CP_on  0=Normal op 1=Chg Pump Always On  */       \
+                (0<<5) |  /* LREG_CPnot  Always write 0 */                     \
+                (0<<3) |  /* DCDC3p  BVDD setting 3.6/3.2/3.1/3.0  */          \
+                (1<<2) |  /* LREG_off 1=Auto mode switching 0=Length Reg only*/\
+                (0<<0) )  /* CVDDp  Core Voltage Setting 1.2/1.15/1.10/1.05*/
+
+#define CVDD_1_20          0
+#define CVDD_1_15          1
+#define CVDD_1_10          2
+#define CVDD_1_05          3
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
