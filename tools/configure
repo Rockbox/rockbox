@@ -720,9 +720,6 @@ whichadvanced () {
     printf "Enter your developer options (press only enter when done)\n\
 (D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile,\n\
 (T)est plugins, S(m)all C lib:"
-    if [ "$memory" = "2" ]; then
-      printf ", (8)MB MOD"
-    fi
     if [ "$modelname" = "archosplayer" ]; then
       printf ", Use (A)TA poweroff"
     fi
@@ -788,12 +785,6 @@ whichadvanced () {
       [Vv])
         echo "Voice build selected"
         voice="yes"
-        ;;
-      8)
-        if [ "$memory" = "2" ]; then
-          memory="8"
-          echo "Memory size selected: 8MB"
-        fi
         ;;
       [Aa])
         if [ "$modelname" = "archosplayer" ]; then
@@ -1183,7 +1174,7 @@ ARG_ARM_EABI=
 ARG_ARM_THUMB=
 ARG_PREFIX="$PREFIX"
 ARG_THREAD_SUPPORT=
-err=
+err=            
 for arg in "$@"; do
 	case "$arg" in
 		--ccache)     ARG_CCACHE=1;;
