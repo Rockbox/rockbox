@@ -22,10 +22,6 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include "config.h"
-
-#define BUTTON_REMOTE 0
-
 /* these definitions match the avr hid reply */
 #define BUTTON_LEFT     (1 << 2)
 #define BUTTON_UP       (1 << 3)
@@ -43,8 +39,6 @@
 #define BUTTON_SCROLL_FWD  (1 << 7)
 #define BUTTON_SCROLL_BACK (1 << 8)
 
-
-#define BUTTON_REMOTE       0
 #define BUTTON_MAIN (BUTTON_LEFT | BUTTON_UP | BUTTON_RIGHT | BUTTON_DOWN |\
                      BUTTON_SELECT | BUTTON_VOL_UP | BUTTON_VOL_DOWN |\
                      BUTTON_NEXT | BUTTON_PREV | BUTTON_POWER |\
@@ -54,11 +48,5 @@
 #define POWEROFF_COUNT      5
 
 #define HAS_BUTTON_HOLD
-
-void button_init_device(void);
-int button_read_device(void);
-bool button_hold(void);
-
-int get_debug_info(int choice);
 
 #endif /* _BUTTON_TARGET_H_ */

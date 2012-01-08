@@ -22,16 +22,11 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
 #include "config.h"
 
 #define MEP_BUTTON_HEADER   0x1a
 #define MEP_BUTTON_ID       0x09
 #define MEP_ABSOLUTE_HEADER 0x0b
-
-bool button_hold(void);
-void button_init_device(void);
-int  button_read_device(void);
 
 #ifndef BOOTLOADER
 void button_int(void);
@@ -60,7 +55,6 @@ void button_int(void);
 
 #ifdef HAVE_REMOTE_LCD
 void headphones_int(void);
-bool remote_button_hold(void);
 
 /* Remote control's buttons */
 #define BUTTON_RC_PLAY      0x00010000
@@ -77,8 +71,6 @@ bool remote_button_hold(void);
 
 #define HAS_REMOTE_BUTTON_HOLD
 #define RC_POWEROFF_BUTTON  BUTTON_RC_PLAY
-#else
-#define BUTTON_REMOTE 0
 #endif /* HAVE_REMOTE_LCD */
 
 #endif /* _BUTTON_TARGET_H_ */

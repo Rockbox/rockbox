@@ -22,11 +22,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define button_init_device()
-int button_read_device(void);
 
 #define BUTTON_OFF          0x00000001
 #define BUTTON_MENU         0x00000002
@@ -38,8 +34,6 @@ int button_read_device(void);
 
 #define BUTTON_MAIN (BUTTON_OFF|BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT\
                 |BUTTON_UP|BUTTON_DOWN)
-
-#define BUTTON_REMOTE 0
 
 #define POWEROFF_BUTTON BUTTON_OFF
 #define POWEROFF_COUNT 10

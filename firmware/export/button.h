@@ -28,7 +28,25 @@
 #include "button-target.h"
 #endif
 
+#ifndef BUTTON_REMOTE
+# define BUTTON_REMOTE 0
+#endif
+
 extern struct event_queue button_queue;
+
+void button_init_device(void);
+#ifdef HAVE_BUTTON_DATA
+int button_read_device(int *);
+#else
+int button_read_device(void);
+#endif
+
+#ifdef HAS_BUTTON_HOLD
+bool button_hold(void);
+#endif
+#ifdef HAS_REMOTE_BUTTON_HOLD 
+bool remote_button_hold(void);
+#endif
 
 void button_init (void) INIT_ATTR;
 void button_close(void);

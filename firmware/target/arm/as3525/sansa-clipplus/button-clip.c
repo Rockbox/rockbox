@@ -19,7 +19,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "button-target.h"
+#include "button.h"
 #include "as3525v2.h"
 #include "kernel.h"
 

@@ -21,14 +21,9 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
 #include "config.h"
 
 #define HAS_BUTTON_HOLD
-
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(void);
 
 void ipod_mini_button_int(void);
 void ipod_3g_button_int(void);
@@ -63,8 +58,6 @@ void ipod_4g_button_int(void);
 #define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_STOP\
                 |BUTTON_RC_LEFT|BUTTON_RC_RIGHT\
                 |BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN)
-#else
-#define BUTTON_REMOTE 0
 #endif
 
 /* This is for later

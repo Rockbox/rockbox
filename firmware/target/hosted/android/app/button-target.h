@@ -23,11 +23,7 @@
 #define _BUTTON_TARGET_H_
 
 #include <stdbool.h>
-#include "config.h"
 
-#undef button_init_device
-void button_init_device(void);
-int button_read_device(int *data);
 unsigned multimedia_to_button(int keyboard_key);
 unsigned dpad_to_button(int keyboard_key);
 void android_ignore_back_button(bool yes);
@@ -61,8 +57,5 @@ void android_ignore_back_button(bool yes);
 #define BUTTON_BOTTOMRIGHT  0x00100000
 
 #define BUTTON_FORCE_REDRAW 0x00200000
-
-/* No remote */
-#define BUTTON_REMOTE 0
                 
 #endif /* _BUTTON_TARGET_H_ */

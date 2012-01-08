@@ -21,11 +21,6 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
-void button_init_device(void);
-int button_read_device(void);
 bool button_debug_screen(void);
 
 /* Main unit's buttons */
@@ -48,8 +43,6 @@ bool button_debug_screen(void);
                      BUTTON_UP|BUTTON_RIGHT|BUTTON_DOWN|BUTTON_SELECT| \
                      BUTTON_PLAYPAUSE|BUTTON_BACK| \
                      BUTTON_BOTTOMRIGHT|BUTTON_BOTTOMLEFT)
-
-#define BUTTON_REMOTE 0
 
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER

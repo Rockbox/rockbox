@@ -21,7 +21,7 @@
  *
  ****************************************************************************/
 #include "system.h"
-#include "button-target.h"
+#include "button.h"
 #include "as3525v2.h"
 #ifndef BOOTLOADER
 #include "backlight.h"

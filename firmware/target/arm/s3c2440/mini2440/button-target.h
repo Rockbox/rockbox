@@ -21,13 +21,6 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
-
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(int*);
 void touchpad_set_sensitivity(int level);
 
 /* Mini2440 specific button codes */
@@ -75,8 +68,6 @@ void touchpad_set_sensitivity(int level);
 #define BUTTON_MAIN (BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT  | \
                      BUTTON_UP  |BUTTON_DOWN|BUTTON_SELECT | \
                      BUTTON_A   |BUTTON_POWER )
-
-#define BUTTON_REMOTE       0
 
 #define POWEROFF_BUTTON     BUTTON_MENU
 #define POWEROFF_COUNT      10

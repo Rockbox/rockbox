@@ -22,13 +22,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define HAS_SERIAL_REMOTE
-
-void button_init_device(void);
-int button_read_device(void);
 
         /* Main unit's buttons */
 #define BUTTON_ON           0x00000001

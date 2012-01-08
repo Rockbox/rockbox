@@ -22,9 +22,6 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define BUTTON_SELECT       0x00000001
 #define BUTTON_MENU         0x00000002
 #define BUTTON_PLAY         0x00000004
@@ -38,11 +35,5 @@
 #define BUTTON_MAIN         (BUTTON_UP|BUTTON_DOWN|BUTTON_RIGHT|BUTTON_LEFT \
                             |BUTTON_SELECT|BUTTON_MENU|BUTTON_PLAY \
                             |BUTTON_STOP)
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(void);
-
-/* No Remote control */
-#define BUTTON_REMOTE 0
 
 #endif /* _BUTTON_TARGET_H_ */

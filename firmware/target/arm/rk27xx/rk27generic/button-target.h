@@ -21,12 +21,6 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
-void button_init_device(void);
-int button_read_device(void);
-
 /* Main unit's buttons */
 /* values assigned corespond to GPIOs numbers */
 #define BUTTON_PLAY         0x00000002
@@ -39,8 +33,6 @@ int button_read_device(void);
 #define BUTTON_LEFT BUTTON_REW
 #define BUTTON_RIGHT BUTTON_FF
 #define BUTTON_ON BUTTON_PLAY
-
-#define BUTTON_REMOTE       0
 
 #define BUTTON_MAIN (BUTTON_PLAY|BUTTON_REW|BUTTON_FF|\
                      BUTTON_VOL|BUTTON_M)

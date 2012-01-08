@@ -21,14 +21,7 @@
 #ifndef _IAUDIO7_BUTTON_TARGET_H_
 #define _IAUDIO7_BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define HAS_BUTTON_HOLD
-
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(void);
 
 /* Main unit's buttons */
 #define BUTTON_POWER      0x00000001
@@ -46,9 +39,6 @@ int button_read_device(void);
 #define BUTTON_MAIN (BUTTON_POWER|BUTTON_VOLUP|BUTTON_VOLDOWN|  \
                      BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT|      \
                      BUTTON_PLAY|BUTTON_STOP)
-
-/* No remote */
-#define BUTTON_REMOTE 0
 
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER

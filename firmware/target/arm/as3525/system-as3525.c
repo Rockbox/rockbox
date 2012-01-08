@@ -29,7 +29,7 @@
 #include "dma-target.h"
 #include "clock-target.h"
 #include "fmradio_i2c.h"
-#include "button-target.h"
+#include "button.h"
 #include "backlight-target.h"
 #include "lcd.h"
 

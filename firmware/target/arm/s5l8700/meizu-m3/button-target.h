@@ -21,13 +21,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-
 #define HAS_BUTTON_HOLD
-
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(void);
 
 /* Meizu M3 specific button codes */
 #define BUTTON_PREVNEXT     0x00000001
@@ -39,8 +33,6 @@ int button_read_device(void);
 #define BUTTON_RIGHT        0
 
 #define BUTTON_MAIN (BUTTON_PREVNEXT|BUTTON_MENU|BUTTON_PLAY)
-
-#define BUTTON_REMOTE       0
 
 #define POWEROFF_BUTTON BUTTON_PLAY
 #define POWEROFF_COUNT 10

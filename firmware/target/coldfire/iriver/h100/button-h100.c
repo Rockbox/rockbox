@@ -39,7 +39,7 @@ bool button_hold(void)
     return (GPIO1_READ & 0x00000002)?true:false;
 }
 
-bool remote_button_hold_only(void)
+static bool remote_button_hold_only(void)
 {        
     if(remote_type() == REMOTETYPE_H300_NONLCD)
         return adc_scan(ADC_REMOTE)<0x0d; /* hold should be 0x00 */

@@ -47,8 +47,6 @@
 #define BUTTON_VOL_DOWN     (1 << 14)
 #endif
 
-#define BUTTON_REMOTE       0
-
 #ifndef CREATIVE_ZV
 #define BUTTON_MAIN         ( BUTTON_BACK | BUTTON_MENU | BUTTON_LEFT   | BUTTON_RIGHT \
                             | BUTTON_UP   | BUTTON_DOWN | BUTTON_SELECT | BUTTON_POWER \
@@ -65,12 +63,6 @@
 
 #define HAS_BUTTON_HOLD
 
-void button_init_device(void);
-int button_read_device(void);
-bool headphones_inserted(void);
-bool button_hold(void);
 bool button_usb_connected(void);
-
-int get_debug_info(int choice);
 
 #endif /* _BUTTON_TARGET_H_ */

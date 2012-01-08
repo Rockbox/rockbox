@@ -22,14 +22,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
-bool headphones_inserted(void);
-
-void button_init_device(void);
 void button_close_device(void);
-int button_read_device(void);
 
 /* Logical buttons key codes */
 #define BUTTON_UP           0x00000001
@@ -43,9 +36,6 @@ int button_read_device(void);
 #define BUTTON_SELECT       0x00000100
 
 #define BUTTON_MAIN         0x1FF /* all buttons */
-
-/* No remote */
-#define BUTTON_REMOTE 0
 
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER

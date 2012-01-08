@@ -22,14 +22,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define HAS_BUTTON_HOLD
-
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(void);
 
 /* Button codes for Samsung YH-820, 920, 925 */
 
@@ -45,9 +38,6 @@ int button_read_device(void);
 #define BUTTON_REC          0x00000080
 
 #define BUTTON_MAIN         0x000000ff
-
-/* No Remote control */
-#define BUTTON_REMOTE 0
 
 #define POWEROFF_BUTTON BUTTON_PLAY
 #define POWEROFF_COUNT  15

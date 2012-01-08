@@ -27,9 +27,6 @@
 #define HAS_BUTTON_HOLD
 #endif
 
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(int *data);
 void button_set_touch_available(void);
 
 /* Main unit's buttons */
@@ -71,9 +68,6 @@ void button_set_touch_available(void);
                      BUTTON_MIDRIGHT | BUTTON_BOTTOMLEFT | BUTTON_BOTTOMMIDDLE | \
                      BUTTON_BOTTOMRIGHT)
 #endif
-
-/* No remote */
-#define BUTTON_REMOTE   0
 
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER

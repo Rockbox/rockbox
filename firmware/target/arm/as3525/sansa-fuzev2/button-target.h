@@ -22,14 +22,8 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define HAS_BUTTON_HOLD
 
-void button_init_device(void);
-bool button_hold(void);
-int button_read_device(void);
 /* Sandisk Sansa Fuze button codes */
 
 /* Main unit's buttons - mapped for optimal reading */
@@ -51,9 +45,6 @@ int button_read_device(void);
                             |BUTTON_SELECT|BUTTON_UP|BUTTON_POWER \
                             |BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD \
                             |BUTTON_HOLD)
-
-/* No Remote control */
-#define BUTTON_REMOTE 0
 
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 10

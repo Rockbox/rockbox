@@ -24,17 +24,12 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
 #include "config.h"
+#include <stdbool.h>
 
 #define HAS_BUTTON_HOLD
 #define HAS_REMOTE_BUTTON_HOLD
 
-bool button_hold(void);
-bool remote_button_hold(void);
-bool remote_button_hold_only(void);
-void button_init_device(void);
-int button_read_device(void);
 #ifdef IRIVER_H300_SERIES
 void button_enable_scan(bool enable);
 bool button_scan_enabled(void);

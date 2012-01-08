@@ -21,16 +21,9 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define HAS_BUTTON_HOLD
 #define HAS_REMOTE_BUTTON_HOLD
 
-bool button_hold(void);
-bool remote_button_hold(void);
-void button_init_device(void);
-int button_read_device(void);
 void button_enable_scan(bool enable);
 bool button_scan_enabled(void);
 

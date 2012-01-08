@@ -22,14 +22,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define HAS_BUTTON_HOLD
-
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(int *data);
 
 /* Main unit's buttons */
 #define BUTTON_POWER      0x00000001
@@ -55,9 +48,6 @@ int button_read_device(int *data);
 #define BUTTON_BOTTOMRIGHT  0x00001000
 
 #define BUTTON_MAIN 0x1FFF
-
-/* No remote */
-#define BUTTON_REMOTE 0
 
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER

@@ -24,11 +24,6 @@
 
 #define HAS_BUTTON_HOLD
 
-#define button_init_device()
-
-bool button_hold(void);
-int button_read_device(void);
-
 /* Main unit's buttons */
 
 #define BUTTON_VOL_DOWN     0x00000001
@@ -49,9 +44,6 @@ int button_read_device(void);
 #define BUTTON_LEFT         0x00000800
 
 #define BUTTON_MAIN         0x00000FFF
-
-/* No Remote control */
-#define BUTTON_REMOTE 0
 
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 10

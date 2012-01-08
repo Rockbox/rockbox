@@ -24,14 +24,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define HAS_BUTTON_HOLD
-
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(void);
 
 /* iriver IFP7XX specific button codes */
 
@@ -49,8 +42,6 @@ int button_read_device(void);
 #define BUTTON_MAIN (BUTTON_PLAY|BUTTON_SELECT\
                 |BUTTON_LEFT|BUTTON_RIGHT|BUTTON_UP|BUTTON_DOWN\
                 |BUTTON_MODE|BUTTON_EQ)
-
-#define BUTTON_REMOTE 0
 
 #define POWEROFF_BUTTON BUTTON_PLAY
 #define POWEROFF_COUNT 40

@@ -22,13 +22,9 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include "config.h"
+#include <stdbool.h>
 
 #define HAS_BUTTON_HOLD
-
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(int *data);
 
 /* This is called from the tsc2100 interupt handler in adc-mr500.c */
 void touch_read_coord(void);

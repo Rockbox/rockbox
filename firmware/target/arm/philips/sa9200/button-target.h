@@ -22,18 +22,12 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
-#include "config.h"
-
 #define MEP_BUTTON_HEADER   0x1a
 #define MEP_BUTTON_ID       0x09
 #define MEP_ABSOLUTE_HEADER 0x0b
 
 #define HAS_BUTTON_HOLD
 
-bool button_hold(void);
-void button_init_device(void);
-int button_read_device(void);
 void button_int(void);
 
 /* Main unit's buttons */
@@ -50,9 +44,6 @@ void button_int(void);
 #define BUTTON_VOL_DOWN     0x00000400
 
 #define BUTTON_MAIN         0x00000fff
-
-/* No Remote control */
-#define BUTTON_REMOTE 0
 
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 10
