@@ -23,7 +23,6 @@
 #include "config.h"
 #include "system.h"
 #include "button.h"
-#include "button.h"
 #include "backlight.h"
 #include "dbop-as3525.h"
 
