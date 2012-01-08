@@ -35,6 +35,7 @@ SOURCES += \
  preview.cpp \
  base/encoderbase.cpp \
  base/encoderrbspeex.cpp \
+ base/encoderlame.cpp \
  base/encoderexe.cpp \
  encttscfggui.cpp \
  base/encttssettings.cpp \
@@ -99,6 +100,7 @@ HEADERS += \
  preview.h \
  base/encoderbase.h \
  base/encoderrbspeex.h \
+ base/encoderlame.h \
  base/encoderexe.h \
  encttscfggui.h \
  base/encttssettings.h \
@@ -139,6 +141,7 @@ HEADERS += \
  quazip/unzip.h \
  quazip/zip.h \
  base/ziputil.h \
+ lame/lame.h \
  comboboxviewdelegate.h \
 
 

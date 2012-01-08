@@ -254,7 +254,7 @@ void VoiceFileCreator::cleanup()
         QCoreApplication::processEvents();
     }
     emit logItem(tr("Finished"),LOGINFO);
-  
+
     return;
 }
 
