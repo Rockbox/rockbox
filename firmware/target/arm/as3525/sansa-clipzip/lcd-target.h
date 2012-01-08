@@ -19,9 +19,6 @@
  *
  ****************************************************************************/
 
-#include <stdint.h>
-#include "config.h"
-
 /* target-specific OLED brightness function */
 void oled_brightness(int brightness);
 

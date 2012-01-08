@@ -21,14 +21,8 @@
 #ifndef LCD_TARGET_H
 #define LCD_TARGET_H
 
-#include <stdbool.h>
-
-void lcd_enable(bool state);
-bool lcd_active(void);
-void lcd_init_device(void);
 void lcd_clock_enable(void);
 void lcd_clock_disable(void);
-
 
 void lcd_init_controller(void);
 void lcd_set_target(int x, int y, int width, int height);
