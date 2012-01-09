@@ -49,9 +49,6 @@ int key_to_button(int keyboard_button)
         case SDLK_KP9:
             new_btn = BUTTON_PLAYPAUSE;
             break;
-        case SDLK_KP0:
-            new_btn = BUTTON_TWO_FINGERS;
-            break;
         case SDLK_KP7:
             new_btn = BUTTON_BACK;
             break;
