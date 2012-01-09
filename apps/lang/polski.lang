@@ -12075,15 +12075,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Dźwięk 3-D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Efekt 3D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Dźwięk 3-D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Efekt 3D"
   </voice>
 </phrase>
 <phrase>
@@ -12697,16 +12697,16 @@
 </phrase>
 <phrase>
   id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalog dir
+  desc: used in the onplay menu to set a playlist catalogue dir
   user: core
   <source>
-    *: "Set As Playlist Catalog Directory"
+    *: "Set As Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Ustaw Jako Ścieżkę Katalogu List odtwarzania"
+    *: "Ustaw jako katalog listy odtwarzania"
   </dest>
   <voice>
-    *: "Ustaw Jako Ścieżkę Katalogu List odtwarzania"
+    *: "Ustaw jako katalog listy odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -12728,12 +12728,192 @@
   desc:
   user: core
   <source>
-    *: "Reset Playlist Catalog Directory"
+    *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Usuń Ścieżkę Katalogu List odtwarzania"
+    *: "Resetuj katalog listy odtwarzania"
   </dest>
   <voice>
-    *: "Usuń Ścieżkę Katalogu List odtwarzania"
+    *: "Resetuj katalog listy odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Kopiuj tekst do Schowka"
+  </dest>
+  <voice>
+    *: "Kopiuj tekst do schowka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "Ukryj wewnętrzny dysk USB"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "Ukryj wewnętrzny dysk USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Dźwięk klawiszy (głośnik)"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Dźwięk klawiszy (głośnik)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Dźwięk klawiszy (słuchawki)"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Dźwięk klawiszy (słuchawki)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatycznie"
+  </dest>
+  <voice>
+    *: "Automatycznie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Skróty"
+  </dest>
+  <voice>
+    *: "Skróty"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Anuluj budzik"
+  </dest>
+  <voice>
+    *: "Anuluj budzik"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Włącz/Wyłącz"
+  </dest>
+  <voice>
+    *: "Włącz/Wyłącz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Resetuj budzik po naciśnięciu klawisza"
+  </dest>
+  <voice>
+    *: "Resetuj budzik po naciśnięciu klawisza"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Domyślna pora alarmu"
+  </dest>
+  <voice>
+    *: "Domyślna pora alarmu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Ustaw alarm przy włączeniu"
+  </dest>
+  <voice>
+    *: "Ustaw alarm przy włączeniu"
   </voice>
 </phrase>
