@@ -13,6 +13,7 @@
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2
 #define HAVE_HOTSWAP
+#define HAVE_RDS_CAP
 #endif
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
@@ -32,8 +33,6 @@
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
-
-#define HAVE_RDS_CAP
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -123,7 +122,6 @@
 #define PLUGIN_BUFFER_SIZE 0x80000
 
 #define AB_REPEAT_ENABLE
-
 /* FM Tuner */
 #define CONFIG_TUNER SI4700 /* in fact SI4702 */
 //#define HAVE_TUNER_PWR_CTRL
