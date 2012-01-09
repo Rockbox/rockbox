@@ -967,7 +967,7 @@ const struct settings_list settings[] = {
 #endif
 #endif /* HAVE_BACKLIGHT */
     INT_SETTING(F_PADTITLE, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",
-                UNIT_INT, 0, 15, 1, NULL, NULL, lcd_scroll_speed),
+                UNIT_INT, 0, 17, 1, NULL, NULL, lcd_scroll_speed),
     INT_SETTING(F_PADTITLE, scroll_delay, LANG_SCROLL_DELAY, 1000,
                 "scroll delay", UNIT_MS, 0, 2500, 100, NULL,
                 NULL, lcd_scroll_delay),
@@ -975,7 +975,7 @@ const struct settings_list settings[] = {
                 UNIT_PERCENT, 0, 200, 25, NULL, NULL, lcd_bidir_scroll),
 #ifdef HAVE_REMOTE_LCD
     INT_SETTING(0, remote_scroll_speed, LANG_SCROLL_SPEED, 9,
-                "remote scroll speed", UNIT_INT, 0,15, 1,
+                "remote scroll speed", UNIT_INT, 0,17, 1,
                 NULL, NULL, lcd_remote_scroll_speed),
     INT_SETTING(0, remote_scroll_step, LANG_SCROLL_STEP, 6,
                 "remote scroll step", UNIT_PIXEL, 1, LCD_REMOTE_WIDTH, 1, NULL,
