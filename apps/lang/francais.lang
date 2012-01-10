@@ -12845,3 +12845,51 @@
     *: "Lancer la minuterie d'arrêt au démarrage"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Clics audibles sans écouteurs"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Clics audibles sans écouteurs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Clics dans les écouteurs"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Clics dans les écouteurs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Raccourcis"
+  </dest>
+  <voice>
+    *: "Raccourcis"
+  </voice>
+</phrase>
