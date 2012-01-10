@@ -436,7 +436,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -6463,7 +6463,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -12311,15 +12311,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Raumklangverbesserung"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Raumklangverbesserung"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "Raumklangverbesserung"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Raumklangverbesserung"
   </voice>
 </phrase>
 <phrase>
@@ -12689,5 +12689,241 @@
   </dest>
   <voice>
     *: "Zurückspulen bei Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Aktuelle Wiedergabeliste"
+  </dest>
+  <voice>
+    *: "Aktuelle Wiedergabeliste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Symbole im Zwischenspeicher"
+  </dest>
+  <voice>
+    *: "Symbole im Zwischenspeicher"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "Internes Laufwerk bei USB verstecken"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "Internes Laufwerk bei USB verstecken"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Tastentöne über Lautsprecher"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Tastentöne über Lautsprecher"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Tastentöne über Kopfhörer"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Tastentöne über Kopfhörer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Als Wiedergabelistenverzeichnis festlegen"
+  </dest>
+  <voice>
+    *: "Als Wiedergabelistenverzeichnis festlegen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Zeilen in Listen auffüllen"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Zeilen in Listen auffüllen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Änderungen speichern?"
+  </dest>
+  <voice>
+    *: "Änderungen speichern?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatik"
+  </dest>
+  <voice>
+    *: "Automatik"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Verknüpfungen"
+  </dest>
+  <voice>
+    *: "Verknüpfungen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Einschlafzeit löschen"
+  </dest>
+  <voice>
+    *: "Einschlafzeit löschen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Ein-/Ausschalten"
+  </dest>
+  <voice>
+    *: "Ein- und Ausschalten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Einschlafzeit bei Tastendruck zurücksetzen"
+  </dest>
+  <voice>
+    *: "Einschlafzeit bei Tastendruck zurücksetzen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Standard Einschlafzeit"
+  </dest>
+  <voice>
+    *: "Standard Einschlafzeit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Wiedergabelistenverzeichnis zurücksetzen"
+  </dest>
+  <voice>
+    *: "Wiedergabelistenverzeichnis zurücksetzen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Einschlafzeit beim Einschalten aktivieren"
+  </dest>
+  <voice>
+    *: "Einschlafzeit beim Einschalten aktivieren"
   </voice>
 </phrase>
