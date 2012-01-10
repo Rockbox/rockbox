@@ -12878,3 +12878,31 @@
     *: "Skratky"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Spúšťanie / Vypínanie"
+  </dest>
+  <voice>
+    *: "Spúšťanie / Vypínanie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Stlačenie Tlačidla Reštartuje Časovač Spánku"
+  </dest>
+  <voice>
+    *: "Stlačenie Tlačidla Reštartuje Časovač Spánku"
+  </voice>
+</phrase>
