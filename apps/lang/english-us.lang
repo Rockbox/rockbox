@@ -12878,3 +12878,31 @@
     *: "Shortcuts"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Startup/Shutdown"
+  </dest>
+  <voice>
+    *: "Startup/Shutdown"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Restart Sleep Timer On Keypress"
+  </dest>
+  <voice>
+    *: "Restart Sleep Timer On Keypress"
+  </voice>
+</phrase>
