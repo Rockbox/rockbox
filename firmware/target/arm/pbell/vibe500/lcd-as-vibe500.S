@@ -26,7 +26,7 @@
 #include "cpu.h"
 
 /****************************************************************************
- * void lcd_write_yuv_420_lines(unsigned char const * const src[3],
+ * void lcd_write_yuv420_lines(unsigned char const * const src[3],
  *                              int width,
  *                              int stride);
  *
@@ -249,7 +249,7 @@ lcd_write_yuv420_lines:
 
 
 /****************************************************************************
- * void lcd_write_yuv_420_lines_odither(unsigned char const * const src[3],
+ * void lcd_write_yuv420_lines_odither(unsigned char const * const src[3],
  *                                      int width,
  *                                      int stride,
  *                                      int x_screen,

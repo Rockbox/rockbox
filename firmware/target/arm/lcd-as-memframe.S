@@ -106,7 +106,7 @@ lcd_copy_buffer_rect:                   @
     .size   lcd_copy_buffer_rect, .-lcd_copy_buffer_rect
 
 /****************************************************************************
- * void lcd_write_yuv_420_lines(fb_data *dst,
+ * void lcd_write_yuv420_lines(fb_data *dst,
  *                              unsigned char const * const src[3],
  *                              int width,
  *                              int stride);
@@ -350,7 +350,7 @@ lcd_write_yuv420_lines:
 
 
 /****************************************************************************
- * void lcd_write_yuv_420_lines_odither(fb_data *dst,
+ * void lcd_write_yuv420_lines_odither(fb_data *dst,
  *                                      unsigned char const * const src[3],
  *                                      int width,
  *                                      int stride,
