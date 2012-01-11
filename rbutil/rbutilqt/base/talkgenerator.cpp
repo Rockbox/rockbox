@@ -286,8 +286,9 @@ void TalkGenerator::encProgress(int value)
 
 void TalkGenerator::encFailEntry(const TalkEntry& entry)
 {
-    emit logItem(tr("Encoding of %1 failed").arg(entry.wavfilename), LOGERROR);
-    abort();      
+    emit logItem(tr("Encoding of %1 failed").arg(
+        QFileInfo(entry.wavfilename).baseName()), LOGERROR);
+    abort();
 }
 
 //! \brief slot, which is connected to the abort of the Logger. Sets a flag, so Creating Talkfiles ends at the next possible position

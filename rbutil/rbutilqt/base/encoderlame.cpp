@@ -84,7 +84,7 @@ bool EncoderLame::start()
 
 bool EncoderLame::encode(QString input,QString output)
 {
-    qDebug() << "[EncoderLame] Encoding" << input;
+    qDebug() << "[EncoderLame] Encoding" << QDir::cleanPath(input);
     if(!m_symbolsResolved) {
         qDebug() << "[EncoderLame] Symbols not successfully resolved, cannot run!";
         return false;
@@ -113,11 +113,14 @@ bool EncoderLame::encode(QString input,QString output)
     m_lame_set_scale(gfp, 1.0);                 // scale input volume
     m_lame_set_mode(gfp, MONO);                 // mono output mode
     m_lame_set_VBR(gfp, vbr_default);           // enable default VBR mode
-    m_lame_set_VBR_quality(gfp, 9.999);         // VBR quality
+    m_lame_set_VBR_quality(gfp, 9.999f);        // VBR quality
     m_lame_set_VBR_max_bitrate_kbps(gfp, 64);   // maximum bitrate 64kbps
     m_lame_set_bWriteVbrTag(gfp, 0);            // disable LAME tag.
 
-    fin.open(QIODevice::ReadOnly);
+    if(!fin.open(QIODevice::ReadOnly)) {
+        qDebug() << "[EncoderLame] Could not open input file" << input;
+            return false;
+    }
 
     // read RIFF header
     fin.read((char*)header, 12);

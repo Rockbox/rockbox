@@ -103,7 +103,7 @@ bool TTSSapi::start(QString *errStr)
     QFileInfo tts(m_TTSexec);
     if(!tts.exists())
     {
-        *errStr = tr("Could not copy the Sapi-script");
+        *errStr = tr("Could not copy the SAPI script");
         return false;
     }
     // create the voice process
@@ -117,14 +117,15 @@ bool TTSSapi::start(QString *errStr)
     if(m_sapi4)
         execstring.append(" /sapi4 ");
 
-    qDebug() << "init" << execstring;
+    qDebug() << "[TTSSapi] Start:" << execstring;
     voicescript = new QProcess(NULL);
     //connect(voicescript,SIGNAL(readyReadStandardError()),this,SLOT(error()));
-
     voicescript->start(execstring);
+    qDebug() << "[TTSSapi] wait for process";
     if(!voicescript->waitForStarted())
     {
-        *errStr = tr("Could not start the Sapi-script");
+        *errStr = tr("Could not start SAPI process");
+        qDebug() << "[TTSSapi] starting process timed out!";
         return false;
     }
 
@@ -181,12 +182,14 @@ QStringList TTSSapi::getVoiceList(QString language)
     if(RbSettings::value(RbSettings::TtsUseSapi4).toBool())
         execstring.append(" /sapi4 ");
 
-    qDebug() << "init" << execstring;
+    qDebug() << "[TTSSapi] Start:" << execstring;
     voicescript = new QProcess(NULL);
     voicescript->start(execstring);
-    qDebug() << "wait for started";
-    if(!voicescript->waitForStarted())
+    qDebug() << "[TTSSapi] wait for process";
+    if(!voicescript->waitForStarted()) {
+        qDebug() << "[TTSSapi] process startup timed out!";
         return result;
+    }
     voicescript->closeWriteChannel();
     voicescript->waitForReadyRead();
 
