@@ -576,6 +576,25 @@ static void gui_synclist_scroll_left(struct gui_synclist * lists)
 }
 #endif /* HAVE_LCD_BITMAP */
 
+#if CONFIG_CODEC == SWCODEC
+bool gui_synclist_keyclick_callback(int action, void* data)
+{
+    struct gui_synclist *lists = (struct gui_synclist *)data;
+
+    /* block the beep if we are at the end of the list and we are not wrapping.
+     * CAVEAT: mosts lists don't set limit_scroll untill it sees a repeat
+     * press at the end of the list so this can cause an extra beep.
+     */
+    if (lists->limit_scroll == false)
+        return true;
+    if (lists->selected_item == 0)
+        return (action != ACTION_STD_PREV && action != ACTION_STD_PREVREPEAT);
+    if (lists->selected_item == lists->nb_items - lists->selected_size)
+        return (action != ACTION_STD_NEXT && action != ACTION_STD_NEXTREPEAT);
+
+    return action != ACTION_NONE;
+}
+#endif
 
 bool gui_synclist_do_button(struct gui_synclist * lists,
                             int *actionptr, enum list_wrap wrap)
@@ -774,6 +793,9 @@ bool list_do_action(int context, int timeout,
    do_button, and places the action from get_action in *action. */
 {
     timeout = list_do_action_timeout(lists, timeout);
+#if CONFIG_CODEC == SWCODEC
+    keyclick_set_callback(gui_synclist_keyclick_callback, lists);
+#endif
     *action = get_action(context, timeout);
     return gui_synclist_do_button(lists, action, wrap);
 }

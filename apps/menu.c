@@ -381,6 +381,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             gui_buttonbar_draw(&buttonbar);
 #endif
         }
+#if CONFIG_CODEC == SWCODEC
+        keyclick_set_callback(gui_synclist_keyclick_callback, &lists);
+#endif
         action = get_action(CONTEXT_MAINMENU,
                             list_do_action_timeout(&lists, HZ));
 

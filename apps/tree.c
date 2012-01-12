@@ -652,6 +652,9 @@ static int dirbrowse(void)
         if (tc.dirlevel < 0)
             tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
 
+#if CONFIG_CODEC == SWCODEC
+        keyclick_set_callback(gui_synclist_keyclick_callback, &tree_lists);
+#endif
         button = get_action(CONTEXT_TREE,
                             list_do_action_timeout(&tree_lists, HZ/2));
 #ifdef HAVE_LCD_BITMAP

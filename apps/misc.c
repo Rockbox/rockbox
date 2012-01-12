@@ -876,12 +876,23 @@ void system_sound_play(enum system_sound sound)
                   params->amplitude * *params->setting);
     }
 }
- 
-/* Produce keyclick based upon button and global settings */
-void keyclick_click(int button)
+
+static keyclick_callback keyclick_current_callback = NULL;
+static void* keyclick_data = NULL;
+void keyclick_set_callback(keyclick_callback cb, void* data)
 {
+    keyclick_current_callback = cb;
+    keyclick_data = data;
+}
+
+/* Produce keyclick based upon button and global settings */
+void keyclick_click(int action)
+{
+    int button;
     static long last_button = BUTTON_NONE;
     bool do_beep = false;
+
+    get_action_statuscode(&button);
     /* Settings filters */
     if (
 #ifdef HAVE_HARDWARE_CLICK
@@ -915,6 +926,11 @@ void keyclick_click(int button)
         last_button = button;
     else
         last_button = BUTTON_NONE;
+
+    if (do_beep && keyclick_current_callback)
+        do_beep = keyclick_current_callback(action, keyclick_data);
+    keyclick_current_callback = NULL;
+
     if (do_beep)
     {
 #ifdef HAVE_HARDWARE_CLICK

@@ -144,8 +144,10 @@ enum system_sound
 /* Play a standard sound */
 void system_sound_play(enum system_sound sound);
 
+typedef bool (*keyclick_callback)(int action, void* data);
+void keyclick_set_callback(keyclick_callback cb, void* data);
 /* Produce keyclick based upon button and global settings */
-void keyclick_click(int button);
+void keyclick_click(int action);
 #endif /* CONFIG_CODEC == SWCODEC */
 
 void push_current_activity(enum current_activity screen);

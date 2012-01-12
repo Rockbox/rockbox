@@ -246,12 +246,6 @@ static int get_action_worker(int context, int timeout,
         return ACTION_NONE;
     }
         
-
-#if CONFIG_CODEC == SWCODEC
-    /* Produce keyclick */
-    keyclick_click(button);
-#endif
-
     if ((context != last_context) && ((last_button & BUTTON_REL) == 0)
 #ifdef HAVE_SCROLLWHEEL
         /* Scrollwheel doesn't generate release events  */
@@ -371,6 +365,12 @@ static int get_action_worker(int context, int timeout,
     last_action = ret;
     last_data   = button_get_data();
     last_action_tick = current_tick;
+
+#if CONFIG_CODEC == SWCODEC
+    /* Produce keyclick */
+    keyclick_click(ret);
+#endif
+
     return ret;
 }
 
