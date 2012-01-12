@@ -27,8 +27,6 @@
 extern "C" {
 #endif
 
-unsigned int get_long_le(unsigned char *p);
-bool get_wave_metadata(FILE *fd, int *numchan, int *bps, int *sr, int *numsamples);
 bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
                  bool narrowband, float volume, char *errstr, size_t errlen);
 

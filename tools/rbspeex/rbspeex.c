@@ -25,7 +25,10 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "rbspeex.h" 
+#include "rbspeex.h"
+
+static unsigned int get_long_le(unsigned char *p);
+static bool get_wave_metadata(FILE *fd, int *numchan, int *bps, int *sr, int *numsamples);
 
 /* Read an unaligned 32-bit little endian long from buffer. */
 unsigned int get_long_le(unsigned char *p)
