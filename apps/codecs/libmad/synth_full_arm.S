@@ -27,21 +27,21 @@
     .global synth_full_odd_sbsample
     .global synth_full_even_sbsample
 
-    ;; r0 = pcm
+    /*
+    ;; r0 = pcm (pushed on the stack to free a register)
     ;; r1 = fo
     ;; r2 = fe
     ;; r3 = D0ptr
     ;; r4 = D1ptr    
 
-  /*;; r5 = loop counter
+    ;; r5 = loop counter
     ;; r6,r7 accumulator1
-    ;; r8,r9 accumulator2 */
+    ;; r8,r9 accumulator2
+    */
      
 synth_full_odd_sbsample:
-    stmdb   sp!, {r4-r11, lr}
-    ldr     r4, [sp, #36]
-    ldr     r5, =synth_full_sp
-    str     sp, [r5]
+    stmdb   sp!, {r0, r4-r11, lr}
+    ldr     r4, [sp, #40]
     mov     r5, #15
     add     r2, r2, #32
 .l:
@@ -49,85 +49,87 @@ synth_full_odd_sbsample:
     add     r3, r3, #128
     add     r4, r4, #128
     ldr     r7, [r3, #4]
-    ldmia   r1!, {r10, r11, r12, lr}
+    ldmia   r1!, {r0, r10, r11, lr}
     ldr     r9, [r4, #120]
-    smull   r6, r7, r10, r7
-    ldr     sp, [r3, #60]
-    smull   r8, r9, r10, r9
-    ldr     r10, [r3, #52]
-    smlal   r6, r7, r11, sp
-    ldr     sp, [r3, #44]
-    smlal   r6, r7, r12, r10
-    ldr     r10, [r4, #64]
-    smlal   r6, r7, lr, sp
-    ldr     sp, [r4, #72]
-    smlal   r8, r9, r11, r10
-    ldr     r10, [r4, #80]
-    smlal   r8, r9, r12, sp
-    smlal   r8, r9, lr, r10
-    ldr     r10, [r3, #36]   
+    smull   r6, r7, r0, r7
+    ldr     r12, [r3, #60]
+    smull   r8, r9, r0, r9
+    ldr     r0, [r3, #52]
+    smlal   r6, r7, r10, r12
+    ldr     r12, [r3, #44]
+    smlal   r6, r7, r11, r0
+    ldr     r0, [r4, #64]
+    smlal   r6, r7, lr, r12
+    ldr     r12, [r4, #72]
+    smlal   r8, r9, r10, r0
+    ldr     r0, [r4, #80]
+    smlal   r8, r9, r11, r12
+    smlal   r8, r9, lr, r0
+    ldr     r0, [r3, #36]   
     
-    ldmia   r1!, {r11, r12, sp, lr}
-    smlal   r6, r7, r11, r10
+    ldmia   r1!, {r10, r11, r12, lr}
+    smlal   r6, r7, r10, r0
 
-    ldr     r10, [r4, #88]  /*;;1 cycle stall on arm9, but we free up r11*/
-    smlal   r8, r9, r11, r10
+    ldr     r0, [r4, #88]  /*;;1 cycle stall on arm9, but we free up r10*/
+    smlal   r8, r9, r10, r0
     
-    ldr     r10, [r3, #28]
-    ldr     r11, [r3, #20]
+    ldr     r0, [r3, #28]
+    ldr     r10, [r3, #20]
+    smlal   r6, r7, r11, r0
+    ldr     r0, [r3, #12]
     smlal   r6, r7, r12, r10
-    ldr     r10, [r3, #12]
-    smlal   r6, r7, sp, r11
-    ldr     r11, [r4, #96]
-    smlal   r6, r7, lr, r10
-    ldr     r10, [r4, #104]
-    smlal   r8, r9, r12, r11
-    ldr     r11, [r4, #112]    
-    smlal   r8, r9, sp, r10
-    smlal   r8, r9, lr, r11
+    ldr     r10, [r4, #96]
+    smlal   r6, r7, lr, r0
+    ldr     r0, [r4, #104]
+    smlal   r8, r9, r11, r10
+    ldr     r10, [r4, #112]    
+    smlal   r8, r9, r12, r0
+    smlal   r8, r9, lr, r10
     
     rsbs    r6, r6, #0
     rsc     r7, r7, #0
     
     /* ;; PROD_A and even half of SB_SAMPLE*/
-    ldr     r10, [r3, #0]
-    ldmia   r2!, {r11, r12, sp, lr}
+    ldr     r0, [r3, #0]
+    ldmia   r2!, {r10, r11, r12, lr}
+    smlal   r6, r7, r10, r0
+    
+    ldr     r0, [r4, #60]  /*;;1 cycle stall on arm9, but we free up r10*/
+    smlal   r8, r9, r10, r0    
+    ldr     r10, [r3, #56]
+    ldr     r0, [r3, #48]
     smlal   r6, r7, r11, r10
-    
-    ldr     r10, [r4, #60]  /*;;1 cycle stall on arm9, but we free up r11*/
-    smlal   r8, r9, r11, r10    
-    ldr     r11, [r3, #56]
-    ldr     r10, [r3, #48]
-    smlal   r6, r7, r12, r11
-    ldr     r11, [r3, #40]
-    smlal   r6, r7, sp, r10
-    ldr     r10, [r4, #68]
-    smlal   r6, r7, lr, r11
-    ldr     r11, [r4, #76]
-    smlal   r8, r9, r12, r10
-    ldr     r10, [r4, #84]    
-    smlal   r8, r9, sp, r11
-    smlal   r8, r9, lr, r10
-    
-    ldr     r10, [r3, #32]
-    ldmia   r2!, {r11, r12, sp, lr}
-    smlal   r6, r7, r11, r10
-
-    ldr     r10, [r4, #92]  /*;;1 cycle stall on arm9, but we free up r11*/
-    smlal   r8, r9, r11, r10
-    
-    ldr     r10, [r3, #24]
-    ldr     r11, [r3, #16]
-    smlal   r6, r7, r12, r10
-    ldr     r10, [r3, #8]
-    smlal   r6, r7, sp, r11
-    ldr     r11, [r4, #100]
+    ldr     r10, [r3, #40]
+    smlal   r6, r7, r12, r0
+    ldr     r0, [r4, #68]
     smlal   r6, r7, lr, r10
-    ldr     r10, [r4, #108]
-    smlal   r8, r9, r12, r11
-    ldr     r11, [r4, #116]
-    smlal   r8, r9, sp, r10
-    smlal   r8, r9, lr, r11
+    ldr     r10, [r4, #76]
+    smlal   r8, r9, r11, r0
+    ldr     r0, [r4, #84]    
+    smlal   r8, r9, r12, r10
+    smlal   r8, r9, lr, r0
+    
+    ldr     r0, [r3, #32]
+    ldmia   r2!, {r10, r11, r12, lr}
+    smlal   r6, r7, r10, r0
+
+    ldr     r0, [r4, #92]  /*;;1 cycle stall on arm9, but we free up r10*/
+    smlal   r8, r9, r10, r0
+    
+    ldr     r0, [r3, #24]
+    ldr     r10, [r3, #16]
+    smlal   r6, r7, r11, r0
+    ldr     r0, [r3, #8]
+    smlal   r6, r7, r12, r10
+    ldr     r10, [r4, #100]
+    smlal   r6, r7, lr, r0
+    ldr     r0, [r4, #108]
+    smlal   r8, r9, r11, r10
+    ldr     r10, [r4, #116]
+    smlal   r8, r9, r12, r0
+    smlal   r8, r9, lr, r10
+
+    ldr     r0, [sp]
 
     movs    r6, r6, lsr #16
     adc     r6, r6, r7, lsl #16
@@ -140,15 +142,11 @@ synth_full_odd_sbsample:
     subs    r5, r5, #1
     bne     .l
 
-    ldr     r5, =synth_full_sp
-    ldr     sp, [r5]
-    ldmpc   regs=r4-r11
+    ldmpc   regs="r0,r4-r11"
 
 synth_full_even_sbsample:
-    stmdb   sp!, {r4-r11, lr}
-    ldr     r4, [sp, #36]
-    ldr     r5, =synth_full_sp
-    str     sp, [r5]
+    stmdb   sp!, {r0, r4-r11, lr}
+    ldr     r4, [sp, #40]
     mov     r5, #15
     add     r2, r2, #32
 .l2:
@@ -156,84 +154,86 @@ synth_full_even_sbsample:
     add     r3, r3, #128
     add     r4, r4, #128
     ldr     r7, [r3, #0]
-    ldmia   r1!, {r10, r11, r12, lr}
+    ldmia   r1!, {r0, r10, r11, lr}
     ldr     r9, [r4, #60]
-    smull   r6, r7, r10, r7
-    ldr     sp, [r3, #56]
-    smull   r8, r9, r10, r9
-    ldr     r10, [r3, #48]
-    smlal   r6, r7, r11, sp
-    ldr     sp, [r3, #40]
-    smlal   r6, r7, r12, r10
-    ldr     r10, [r4, #68]
-    smlal   r6, r7, lr, sp
+    smull   r6, r7, r0, r7
+    ldr     r12, [r3, #56]
+    smull   r8, r9, r0, r9
+    ldr     r0, [r3, #48]
+    smlal   r6, r7, r10, r12
+    ldr     r12, [r3, #40]
+    smlal   r6, r7, r11, r0
+    ldr     r0, [r4, #68]
+    smlal   r6, r7, lr, r12
 
-    ldr     sp, [r4, #76]
-    smlal   r8, r9, r11, r10
-    ldr     r10, [r4, #84]
-    smlal   r8, r9, r12, sp
-    smlal   r8, r9, lr, r10
+    ldr     r12, [r4, #76]
+    smlal   r8, r9, r10, r0
+    ldr     r0, [r4, #84]
+    smlal   r8, r9, r11, r12
+    smlal   r8, r9, lr, r0
     
-    ldr     r10, [r3, #32]
-    ldmia   r1!, {r11, r12, sp, lr}
+    ldr     r0, [r3, #32]
+    ldmia   r1!, {r10, r11, r12, lr}
 
-    smlal   r6, r7, r11, r10
-    ldr     r10, [r4, #92]  
-    smlal   r8, r9, r11, r10
-    ldr     r10, [r3, #24]
-    ldr     r11, [r3, #16]
+    smlal   r6, r7, r10, r0
+    ldr     r0, [r4, #92]  
+    smlal   r8, r9, r10, r0
+    ldr     r0, [r3, #24]
+    ldr     r10, [r3, #16]
+    smlal   r6, r7, r11, r0
+    ldr     r0, [r3, #8]
     smlal   r6, r7, r12, r10
-    ldr     r10, [r3, #8]
-    smlal   r6, r7, sp, r11
-    ldr     r11, [r4, #100]
-    smlal   r6, r7, lr, r10
-    ldr     r10, [r4, #108]
-    smlal   r8, r9, r12, r11
-    ldr     r11, [r4, #116]
-    smlal   r8, r9, sp, r10
-    smlal   r8, r9, lr, r11
+    ldr     r10, [r4, #100]
+    smlal   r6, r7, lr, r0
+    ldr     r0, [r4, #108]
+    smlal   r8, r9, r11, r10
+    ldr     r10, [r4, #116]
+    smlal   r8, r9, r12, r0
+    smlal   r8, r9, lr, r10
     
     rsbs    r6, r6, #0
     rsc     r7, r7, #0
 
-    ldr     r10, [r3, #4]
-    ldmia   r2!, {r11, r12, sp, lr}
-    smlal   r6, r7, r11, r10
-    ldr     r10, [r4, #120] /*;;1 cycle stall on arm9, but we free up r11*/
-    smlal   r8, r9, r11, r10
-    ldr     r10, [r3, #60]
-    ldr     r11, [r3, #52]
+    ldr     r0, [r3, #4]
+    ldmia   r2!, {r10, r11, r12, lr}
+    smlal   r6, r7, r10, r0
+    ldr     r0, [r4, #120] /*;;1 cycle stall on arm9, but we free up r10*/
+    smlal   r8, r9, r10, r0
+    ldr     r0, [r3, #60]
+    ldr     r10, [r3, #52]
+    smlal   r6, r7, r11, r0
+    ldr     r0, [r3, #44]    
     smlal   r6, r7, r12, r10
-    ldr     r10, [r3, #44]    
-    smlal   r6, r7, sp, r11
-    ldr     r11, [r4, #64]
-    smlal   r6, r7, lr, r10
+    ldr     r10, [r4, #64]
+    smlal   r6, r7, lr, r0
 
-    ldr     r10, [r4, #72]
-    smlal   r8, r9, r12, r11
-    ldr     r11, [r4, #80]
-    smlal   r8, r9, sp, r10
-
-    smlal   r8, r9, lr, r11
-
-    ldr     r10, [r3, #36]
-    ldmia   r2!, {r11, r12, sp, lr}
-    smlal   r6, r7, r11, r10
-    ldr     r10, [r4, #88]  /*;;1 cycle stall on arm9, but we free up r11*/    
+    ldr     r0, [r4, #72]
     smlal   r8, r9, r11, r10
+    ldr     r10, [r4, #80]
+    smlal   r8, r9, r12, r0
+
+    smlal   r8, r9, lr, r10
+
+    ldr     r0, [r3, #36]
+    ldmia   r2!, {r10, r11, r12, lr}
+    smlal   r6, r7, r10, r0
+    ldr     r0, [r4, #88]  /*;;1 cycle stall on arm9, but we free up r10*/    
+    smlal   r8, r9, r10, r0
     
-    ldr     r10, [r3, #28]
-    ldr     r11, [r3, #20]
+    ldr     r0, [r3, #28]
+    ldr     r10, [r3, #20]
+    smlal   r6, r7, r11, r0
+    ldr     r0, [r3, #12]
     smlal   r6, r7, r12, r10
-    ldr     r10, [r3, #12]
-    smlal   r6, r7, sp, r11
-    ldr     r11, [r4, #96]
-    smlal   r6, r7, lr, r10
-    ldr     r10, [r4, #104]
-    smlal   r8, r9, r12, r11
-    ldr     r11, [r4, #112]
-    smlal   r8, r9, sp, r10
-    smlal   r8, r9, lr, r11
+    ldr     r10, [r4, #96]
+    smlal   r6, r7, lr, r0
+    ldr     r0, [r4, #104]
+    smlal   r8, r9, r11, r10
+    ldr     r10, [r4, #112]
+    smlal   r8, r9, r12, r0
+    smlal   r8, r9, lr, r10
+
+    ldr     r0, [sp]
 
     movs    r6, r6, lsr #16
     adc     r6, r6, r7, lsl #16
@@ -246,9 +246,7 @@ synth_full_even_sbsample:
     subs    r5, r5, #1
     bne     .l2
 
-    ldr     r5, =synth_full_sp
-    ldr     sp, [r5]
-    ldmpc   regs=r4-r11
+    ldmpc   regs="r0,r4-r11"
 
     .global III_aliasreduce
 
@@ -340,7 +338,3 @@ III_overlap:
     ldmia r0!, {r4, r5, r6, r7, r12, lr}
     stmia r1!, {r4, r5, r6, r7, r12, lr}
     ldmpc regs=r4-r7
-
-    .section    IBSS_SECTION_MPA_ARM,"aw",%nobits
-synth_full_sp:
-    .space 4
