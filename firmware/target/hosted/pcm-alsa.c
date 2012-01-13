@@ -27,6 +27,11 @@
  * This driver uses the so-called unsafe async callback method and hardcoded device
  * names. It fails when the audio device is busy by other apps.
  *
+ * To make the async callback safer, an alternative stack is installed, since
+ * it's run from a signal hanlder (which otherwise uses the user stack). If
+ * tick tasks are run from a signal handler too, please install
+ * an alternative stack for it too.
+ *
  * TODO: Rewrite this to do it properly with multithreading
  *
  * Alternatively, a version using polling in a tick task is provided. While
@@ -76,6 +81,7 @@ static size_t       pcm_size = 0;
 #ifdef USE_ASYNC_CALLBACK
 static snd_async_handler_t *ahandler;
 static pthread_mutex_t pcm_mtx;
+static char signal_stack[SIGSTKSZ];
 #else
 static int recursion;
 #endif
@@ -271,10 +277,35 @@ static int async_rw(snd_pcm_t *handle)
     short *samples;
 
 #ifdef USE_ASYNC_CALLBACK
+    /* assign alternative stack for the signal handlers */
+    stack_t ss = {
+        .ss_sp = signal_stack,
+        .ss_size = sizeof(signal_stack),
+        .ss_flags = 0
+    };
+    struct sigaction sa;
+
+    err = sigaltstack(&ss, NULL);
+    if (err < 0)
+    {
+        DEBUGF("Unable to install alternative signal stack: %s", strerror(err));
+        return err;
+    }
+    
     err = snd_async_add_pcm_handler(&ahandler, handle, async_callback, NULL);
     if (err < 0)
     {
         DEBUGF("Unable to register async handler: %s\n", snd_strerror(err));
+        return err;
+    }
+
+    /* only modify the stack the handler runs on */
+    sigaction(SIGIO, NULL, &sa);
+    sa.sa_flags |= SA_ONSTACK;
+    err = sigaction(SIGIO, &sa, NULL);
+    if (err < 0)
+    {
+        DEBUGF("Unable to install alternative signal stack: %s", strerror(err));
         return err;
     }
 #endif
