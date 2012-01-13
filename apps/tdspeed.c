@@ -202,8 +202,8 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
 /* data_len in samples */
 {
     struct tdspeed_state_s *st = &tdspeed_state;
-    int32_t *curr, *prev, *dest[2], *d;
-    int32_t i, j, next_frame, prev_frame, shift, src_frame_sz;
+    int32_t *dest[2];
+    int32_t next_frame, prev_frame, src_frame_sz;
     bool stereo = buf_in[0] != buf_in[1];
 
     assert(stereo == st->stereo);
@@ -259,7 +259,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         }
 
         assert(have + copy <= FIXED_BUFSIZE);
-        i = tdspeed_apply(buf_out, st->ovl_buff, have+copy, -1, out_size);
+        int i = tdspeed_apply(buf_out, st->ovl_buff, have+copy, -1, out_size);
 
         dest[0] = buf_out[0] + i;
         dest[1] = buf_out[1] + i;
@@ -287,11 +287,11 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
     while (data_len - next_frame >= src_frame_sz)
     {
         /* find frame overlap by autocorelation */
-        int32_t const INC1 = 8;
-        int32_t const INC2 = 32;
+        int const INC1 = 8;
+        int const INC2 = 32;
 
         int64_t min_delta = ~(1ll << 63);  /* most positive */
-        shift = 0;
+        int shift = 0;
 
         /* Power of 2 of a 28bit number requires 56bits, can accumulate
            256times in a 64bit variable. */
@@ -299,17 +299,17 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         assert(next_frame + st->shift_max - 1 + st->dst_step - 1 < data_len);
         assert(prev_frame + st->dst_step - 1 < data_len);
 
-        for (i = 0; i < st->shift_max; i += INC1)
+        for (int i = 0; i < st->shift_max; i += INC1)
         {
             int64_t delta = 0;
 
-            curr = buf_in[0] + next_frame + i;
-            prev = buf_in[0] + prev_frame;
+            int32_t *curr = buf_in[0] + next_frame + i;
+            int32_t *prev = buf_in[0] + prev_frame;
 
-            for (j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
+            for (int j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
             {
                 int32_t diff = *curr - *prev;
-                delta += (int64_t)diff * diff;
+                delta += abs(diff);
 
                 if (delta >= min_delta)
                     goto skip;
@@ -320,10 +320,10 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
                 curr = buf_in[1] + next_frame + i;
                 prev = buf_in[1] + prev_frame;
 
-                for (j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
+                for (int j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
                 {
                     int32_t diff = *curr - *prev;
-                    delta += (int64_t)diff * diff;
+                    delta += abs(diff);
 
                     if (delta >= min_delta)
                         goto skip;
@@ -336,16 +336,16 @@ skip:;
         }
 
         /* overlap fading-out previous frame with fading-in current frame */
-        curr = buf_in[0] + next_frame + shift;
-        prev = buf_in[0] + prev_frame;
+        int32_t *curr = buf_in[0] + next_frame + shift;
+        int32_t *prev = buf_in[0] + prev_frame;
 
-        d = dest[0];
+        int32_t *d = dest[0];
 
         assert(next_frame + shift + st->dst_step - 1 < data_len);
         assert(prev_frame + st->dst_step - 1 < data_len);
         assert(dest[0] - buf_out[0] + st->dst_step - 1 < out_size);
 
-        for (i = 0, j = st->dst_step; j; i++, j--)
+        for (int i = 0, j = st->dst_step; j; i++, j--)
         {
             *d++ = (*curr++ * (int64_t)i +
                     *prev++ * (int64_t)j) >> st->dst_order;
@@ -360,7 +360,7 @@ skip:;
 
             d = dest[1];
 
-            for (i = 0, j = st->dst_step; j; i++, j--)
+            for (int i = 0, j = st->dst_step; j; i++, j--)
             {
                 assert(d < buf_out[1] + out_size);
 
@@ -388,7 +388,7 @@ skip:;
     else if (last != 0)
     {
         /* last call: purge all remaining data to output buffer */
-        i = data_len - prev_frame;
+        int i = data_len - prev_frame;
 
         assert(dest[0] + i <= buf_out[0] + out_size);
         memcpy(dest[0], buf_in[0] + prev_frame, i * sizeof(int32_t));
@@ -406,7 +406,7 @@ skip:;
     {
         /* preserve remaining data + needed overlap data for next call */
         st->ovl_shift = next_frame - prev_frame;
-        i = (st->ovl_shift < 0) ? next_frame : prev_frame;
+        int i = (st->ovl_shift < 0) ? next_frame : prev_frame;
         st->ovl_size = data_len - i;
 
         assert(st->ovl_size <= FIXED_BUFSIZE);
