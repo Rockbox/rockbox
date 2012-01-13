@@ -290,7 +290,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         int const INC1 = 8;
         int const INC2 = 32;
 
-        int64_t min_delta = ~(1ll << 63);  /* most positive */
+        int64_t min_delta = INT64_MAX;  /* most positive */
         int shift = 0;
 
         /* Power of 2 of a 28bit number requires 56bits, can accumulate
