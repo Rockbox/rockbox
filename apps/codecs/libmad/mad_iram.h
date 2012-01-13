@@ -29,6 +29,12 @@
 
 #include "config.h"
 
+#if (CONFIG_PLATFORM&PLATFORM_HOSTED)
+#define ICODE_SECTION_MPA_ARM .text
+#define IBSS_SECTION_MPA_ARM .bss
+#define ICODE_ATTR_MPA_SYNTH
+#define ICONST_ATTR_MPA_HUFFMAN
+#else
 /* Code performs slower in IRAM on PP502x and there is no space in
    mpegplayer on the PP5002.  S3C2440 doesn't have any IRAM available for
    codecs */
@@ -44,6 +50,8 @@
 
 #ifndef ICONST_ATTR_MPA_HUFFMAN
 #define ICONST_ATTR_MPA_HUFFMAN ICONST_ATTR
+#endif
+
 #endif
 
 #endif /* MAD_IRAM_H */
