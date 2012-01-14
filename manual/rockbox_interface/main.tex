@@ -3,22 +3,36 @@
 \section{Basic Overview}
 \subsection{The \daps{} controls}
 
-\begin{center}
 % include the front image. Using \specimg makes this fairly easy,
 % but requires to use the exact value of \specimg in the filename!
 % The extension is selected in the preamble, so no further \ifpdfoutput
 % is necessary.
-\IfFileExists{rockbox_interface/images/\specimg-front}
-    {\includegraphics[height=8cm,width=10cm,keepaspectratio=true]{rockbox_interface/images/\specimg-front}}%
-    {\typeout{Missing image: (\specimg)}%
-     \color{red}{\textbf{WARNING!} Image not found}}%
-\opt{iaudiom3,iriverh100}{% replace with HAVEREMOTEKEYMAP when all images exist or change specimg
-  \end{center}
+%
+% The check looks for a png file -- we use png for the HTML manual, so that
+% format needs to be present. It can also be used for the pdf manual, but
+% usually we provide a pdf version of the file for that. Picking the correct
+% one is done by LaTeX automatically, but for checking the filename we need to
+% specify the extension.
+\begin{center}
+\IfFileExists{rockbox_interface/images/\specimg-front.png}
+   {\includegraphics[height=8cm,width=10cm,keepaspectratio=true]%
+    {rockbox_interface/images/\specimg-front}
+   }
+   {\color{red}{\textbf{WARNING!} Image not found}%
+    \typeout{Warning: missing front image}
+   }
+\end{center}
+\opt{remote}{
   % spacing between the two pictures, could possibly be improved
   \begin{center}
-    \includegraphics[height=5.6cm,width=10cm,keepaspectratio=true]{rockbox_interface/images/\specimg-remote}
+  \IfFileExists{rockbox_interface/images/\specimg-remote.png}
+    {\includegraphics[height=5.6cm,width=10cm,keepaspectratio=true]{rockbox_interface/images/\specimg-remote}
+    }
+    {\color{red}{\textbf{WARNING!} Image not found}%
+     \typeout{Warning: missing remote image}
+    }
+  \end{center}
 }
-\end{center}
 
 Throughout this manual, the buttons on the \dap{} are labelled according to the
 picture above.
