@@ -2710,8 +2710,8 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>&amp;OK</translation>
     </message>
     <message utf8="true">
-        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2011 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href="http://tango.freedesktop.org/"&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href="http://www.rockbox.org"&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
-        <translation>Мастер установки и администратирования Rockbox, микропрограмма с открытым исходным кодом для цифровых аудиоплееров.&lt;br/&gt;© 2005 - 2011 Команда Rockbox.&lt;br/&gt;Раздаётся по лицензии GNU General Public License v2.&lt;br/&gt;Используются иконки из &lt;a href="http://tango.freedesktop.org/"&gt;проэкта Tango&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href="http://www.rockbox.org"&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2012 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href="http://tango.freedesktop.org/"&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href="http://www.rockbox.org"&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
+        <translation>Мастер установки и администратирования Rockbox, микропрограмма с открытым исходным кодом для цифровых аудиоплееров.&lt;br/&gt;© 2005 - 2012 Команда Rockbox.&lt;br/&gt;Раздаётся по лицензии GNU General Public License v2.&lt;br/&gt;Используются иконки из &lt;a href="http://tango.freedesktop.org/"&gt;проэкта Tango&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href="http://www.rockbox.org"&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <source>&amp;Speex License</source>
