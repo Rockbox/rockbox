@@ -51,46 +51,42 @@ lcd_copy_buffer_rect:                   @
     ble     40f @ finish line           @ next line if lt or finish
                                         @ trailing halfword if eq
 20: @ rem copy                          @
-    add     r14, r2, #1                 @ get remaining width mod 16 after word
+    sub     r14, r2, #1                 @ wrap remaining width mod 16 after word
                                         @ align (rw)
-    and     r14, r14, #0xe              @ r14 = 0 (16), 2, 4, 6, 8, 10, 12, 14
+    and     r14, r14, #0xe              @ r14 = 14, 0, 2, 4, 6, 8, 10, 12
     add     pc, pc, r14, lsl #3         @ branch to 32-byte align
     nop                                 @
-    b       30f                         @ rw % 16 = 0 or 1? use octword loop
-    nop                                 @
-    nop                                 @
-    nop                                 @
-    ldr     r6, [r1], #4                @ rw % 16 = 2 or 3
+    ldr     r6, [r1], #4                @ rw % 16 = 2 or 3 (0)
     subs    r2, r2, #2                  @
     str     r6, [r0], #4                @
     b       25f @ copy up done          @
-    ldmia   r1!, { r6-r7 }              @ rw % 16 = 4 or 5
+    ldmia   r1!, { r6-r7 }              @ rw % 16 = 4 or 5 (2)
     subs    r2, r2, #4                  @
     stmia   r0!, { r6-r7 }              @
     b       25f @ copy up done          @
-    ldmia   r1!, { r6-r8 }              @ rw % 16 = 6 or 7
+    ldmia   r1!, { r6-r8 }              @ rw % 16 = 6 or 7 (4)
     subs    r2, r2, #6                  @
     stmia   r0!, { r6-r8 }              @
     b       25f @ copy up done          @
-    ldmia   r1!, { r6-r9 }              @ rw % 16 = 8 or 9
+    ldmia   r1!, { r6-r9 }              @ rw % 16 = 8 or 9 (6)
     subs    r2, r2, #8                  @
     stmia   r0!, { r6-r9 }              @
     b       25f @ copy up done          @
-    ldmia   r1!, { r6-r10 }             @ rw % 16 = 10 or 11
+    ldmia   r1!, { r6-r10 }             @ rw % 16 = 10 or 11 (8)
     subs    r2, r2, #10                 @
     stmia   r0!, { r6-r10 }             @
     b       25f @ copy up done          @
-    ldmia   r1!, { r6-r11 }             @ rw % 16 = 12 or 13
+    ldmia   r1!, { r6-r11 }             @ rw % 16 = 12 or 13 (10)
     subs    r2, r2, #12                 @
     stmia   r0!, { r6-r11 }             @
     b       25f @ copy up done          @
-    ldmia   r1!, { r6-r12 }             @ rw % 16 = 14 or 15
+    ldmia   r1!, { r6-r12 }             @ rw % 16 = 14 or 15 (12)
     subs    r2, r2, #14                 @
     stmia   r0!, { r6-r12 }             @
 25: @ copy up done                      @
-    ble     40f @ finish line           @ no 32-byte segments remaining?
-30: @ octword loop                      @ copy 16 pixels per loop
-    ldmia   r1!, { r6-r12, r14 }        @
+    ble     40f @ finish line           @
+30: @ octword loop                      @ rw % 16 = 0 or 1 (14)
+    ldmia   r1!, { r6-r12, r14 }        @ copy 16 pixels per loop
     subs    r2, r2, #16                 @
     stmia   r0!, { r6-r12, r14 }        @
     bgt     30b @ octword loop          @
@@ -102,8 +98,8 @@ lcd_copy_buffer_rect:                   @
     subs    r3, r3, #1                  @ next line
     bgt     10b @ copy line             @
     ldmpc   regs=r4-r11                 @ restore regs and return
-    .ltorg                              @ dump constant pool
     .size   lcd_copy_buffer_rect, .-lcd_copy_buffer_rect
+
 
 /****************************************************************************
  * void lcd_write_yuv420_lines(fb_data *dst,
