@@ -36,6 +36,7 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
+#include "action.h"
 #include "timefuncs.h"
 #include "screens.h"
 #include "usb_screen.h"
