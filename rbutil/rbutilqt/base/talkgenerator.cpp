@@ -21,16 +21,16 @@
 #include "systeminfo.h"
 #include "wavtrim.h"
 
-TalkGenerator::TalkGenerator(QObject* parent): QObject(parent), encFutureWatcher(this), ttsFutureWatcher(this)
+TalkGenerator::TalkGenerator(QObject* parent): QObject(parent)
 {
-    m_userAborted = false;
-    m_lang = "";
+
 }
 
 //! \brief Creates Talkfiles.
 //!
 TalkGenerator::Status TalkGenerator::process(QList<TalkEntry>* list,int wavtrimth)
 {
+    m_abort = false;
     QString errStr;
     bool warnings = false;
 
@@ -103,122 +103,81 @@ TalkGenerator::Status TalkGenerator::process(QList<TalkEntry>* list,int wavtrimt
 //!
 TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtrimth)
 {
-    emit logProgress(0, list->size());
+    int progressMax = list->size();
+    int m_progress = 0;
+    emit logProgress(m_progress,progressMax);
 
+    QStringList errors;
     QStringList duplicates;
 
-    m_ttsWarnings = false;
+    bool warnings = false;
     for(int i=0; i < list->size(); i++)
     {
-        (*list)[i].refs.tts = m_tts;
-        (*list)[i].refs.wavtrim = wavtrimth;
-        (*list)[i].refs.generator = this;
-        // enable voice corrections only if a language is set.
-        if(!m_lang.isEmpty()) {
-            QString s = (*list)[i].toSpeak;
-            (*list)[i].toSpeak = correctString(s);
+        if(m_abort)
+        {
+            emit logItem(tr("Voicing aborted"), LOGERROR);
+            return eERROR;
         }
 
-        // skip duplicated wav entries
+        // skip duplicated wav entrys
         if(!duplicates.contains(list->at(i).wavfilename))
             duplicates.append(list->at(i).wavfilename);
         else
         {
-            qDebug() << "[TalkGen] duplicate skipped";
+            qDebug() << "[TalkGenerator] duplicate skipped";
             (*list)[i].voiced = true;
+            emit logProgress(++m_progress,progressMax);
             continue;
         }
-    }
 
-    /* If the engine can't be parallelized, we use only 1 thread */
-    // NOTE: setting the number of maximum threads to use to 1 doesn't seem to
-    // work as expected -- it causes sporadically output files missing (see
-    // FS#11994). As a stop-gap solution use a separate implementation in that
-    // case for running the TTS.
-    if((m_tts->capabilities() & TTSBase::RunInParallel) != 0)
-    {
-        int maxThreadCount = QThreadPool::globalInstance()->maxThreadCount();
-        qDebug() << "[TalkGenerator] Maximum number of threads used:"
-            << QThreadPool::globalInstance()->maxThreadCount();
-
-        connect(&ttsFutureWatcher, SIGNAL(progressValueChanged(int)),
-                this, SLOT(ttsProgress(int)));
-        ttsFutureWatcher.setFuture(QtConcurrent::map(*list, &TalkGenerator::ttsEntryPoint));
-
-        /* We use this loop as an equivalent to ttsFutureWatcher.waitForFinished() 
-         * since the latter blocks all events */
-        while(ttsFutureWatcher.isRunning())
-            QCoreApplication::processEvents();
-
-        /* Restore global settings, if we changed them */
-        if ((m_tts->capabilities() & TTSBase::RunInParallel) == 0)
-            QThreadPool::globalInstance()->setMaxThreadCount(maxThreadCount);
-
-        if(ttsFutureWatcher.isCanceled())
-            return eERROR;
-        else if(m_ttsWarnings)
-            return eWARNING;
-        else
-            return eOK;
-    }
-    else {
-        qDebug() << "[TalkGenerator] Using single thread TTS workaround";
-        int items = list->size();
-        for(int i = 0; i < items; i++) {
-            if(m_userAborted) {
-                emit logItem(tr("Voicing aborted"), LOGERROR);
-                return eERROR;
-            }
-            TalkEntry entry = list->at(i);
-            TalkGenerator::ttsEntryPoint(entry);
-            (*list)[i] = entry;
-            emit logProgress(i, items);
-        }
-        return m_ttsWarnings ? eWARNING : eOK;
-    }
-}
-
-void TalkGenerator::ttsEntryPoint(TalkEntry& entry)
-{
-    if (!entry.voiced && !entry.toSpeak.isEmpty())
-    {
-        QString error;
-        qDebug() << "[TalkGen] voicing: " << entry.toSpeak << "to" << entry.wavfilename;
-        TTSStatus status = entry.refs.tts->voice(entry.toSpeak,entry.wavfilename, &error);
-        if (status == Warning || status == FatalError)
+        // skip already voiced entrys
+        if(list->at(i).voiced == true)
         {
-            entry.refs.generator->ttsFailEntry(entry, status, error);
-            return;
+            emit logProgress(++m_progress,progressMax);
+            continue;
         }
-        if (entry.refs.wavtrim != -1)
+        // skip entry whith empty text
+        if(list->at(i).toSpeak == "")
+        {
+            emit logProgress(++m_progress,progressMax);
+            continue;
+        }
+
+        // voice entry
+        QString error;
+        qDebug() << "[TalkGenerator] voicing: " << list->at(i).toSpeak << "to" << list->at(i).wavfilename;
+        TTSStatus status = m_tts->voice(list->at(i).toSpeak,list->at(i).wavfilename, &error);
+        if(status == Warning)
+        {
+            warnings = true;
+            emit logItem(tr("Voicing of %1 failed: %2").arg(list->at(i).toSpeak).arg(error),
+                    LOGWARNING);
+        }
+        else if (status == FatalError)
+        {
+            emit logItem(tr("Voicing of %1 failed: %2").arg(list->at(i).toSpeak).arg(error),
+                    LOGERROR);
+            return eERROR;
+        }
+        else
+           (*list)[i].voiced = true;
+
+        //wavetrim if needed
+        if(wavtrimth != -1)
         {
             char buffer[255];
-            wavtrim(entry.wavfilename.toLocal8Bit().data(), entry.refs.wavtrim, buffer, 255);
+            wavtrim(list->at(i).wavfilename.toLocal8Bit().data(),wavtrimth,buffer,255);
         }
-        entry.voiced = true;
+
+        emit logProgress(++m_progress,progressMax);
+        QCoreApplication::processEvents();
     }
+    if(warnings)
+        return eWARNING;
+    else
+        return eOK;
 }
 
-void TalkGenerator::ttsFailEntry(const TalkEntry& entry, TTSStatus status, QString error)
-{
-    if(status == Warning)
-    {
-        m_ttsWarnings = true;
-        emit logItem(tr("Voicing of %1 failed: %2").arg(entry.toSpeak).arg(error),
-                    LOGWARNING);
-    }
-    else if (status == FatalError)
-    {
-        emit logItem(tr("Voicing of %1 failed: %2").arg(entry.toSpeak).arg(error),
-                    LOGERROR);
-        abort();
-    }
-}
-
-void TalkGenerator::ttsProgress(int value)
-{
-    emit logProgress(value,ttsFutureWatcher.progressMaximum());
-}
 
 //! \brief Encodes a List of strings
 //!
@@ -226,86 +185,58 @@ TalkGenerator::Status TalkGenerator::encodeList(QList<TalkEntry>* list)
 {
     QStringList duplicates;
 
-    int itemsCount = list->size();
-    emit logProgress(0, itemsCount);
+    int progressMax = list->size();
+    int m_progress = 0;
+    emit logProgress(m_progress,progressMax);
 
-    /* Do some preprocessing and remove entries that have not been voiced. */
-    for (int idx=0; idx < itemsCount; idx++)
+    for(int i=0; i < list->size(); i++)
     {
-        if(list->at(idx).voiced == false)
+        if(m_abort)
         {
-            qDebug() << "[TalkGen] unvoiced entry" << list->at(idx).toSpeak <<"detected";
-            list->removeAt(idx);
-            itemsCount--;
-            idx--;
+            emit logItem(tr("Encoding aborted"), LOGERROR);
+            return eERROR;
+        }
+
+         //skip non-voiced entrys
+        if(list->at(i).voiced == false)
+        {
+            qDebug() << "non voiced entry" << list->at(i).toSpeak <<"detected";
+            emit logProgress(++m_progress,progressMax);
             continue;
         }
-        if(duplicates.contains(list->at(idx).talkfilename))
+        //skip duplicates
+         if(!duplicates.contains(list->at(i).talkfilename))
+            duplicates.append(list->at(i).talkfilename);
+        else
         {
-            (*list)[idx].encoded = true; /* make sure we skip this entry */
+            qDebug() << "[TalkGenerator] duplicate skipped";
+            (*list)[i].encoded = true;
+            emit logProgress(++m_progress,progressMax);
             continue;
         }
-        duplicates.append(list->at(idx).talkfilename);
-        (*list)[idx].refs.encoder = m_enc;
-        (*list)[idx].refs.generator = this; /* not really needed, unless we end up 
-                                               voicing and encoding with two different
-                                               TalkGenerators.*/
+
+        //encode entry
+        qDebug() << "[TalkGenerator] encoding " << list->at(i).wavfilename
+                 << "to" << list->at(i).talkfilename;
+        if(!m_enc->encode(list->at(i).wavfilename,list->at(i).talkfilename))
+        {
+            emit logItem(tr("Encoding of %1 failed").arg(
+                QFileInfo(list->at(i).wavfilename).baseName()), LOGERROR);
+            return eERROR;
+        }
+        (*list)[i].encoded = true;
+        emit logProgress(++m_progress,progressMax);
+        QCoreApplication::processEvents();
     }
-
-    connect(&encFutureWatcher, SIGNAL(progressValueChanged(int)),
-            this, SLOT(encProgress(int)));
-    encFutureWatcher.setFuture(QtConcurrent::map(*list, &TalkGenerator::encEntryPoint));
-
-    /* We use this loop as an equivalent to encFutureWatcher.waitForFinished() 
-     * since the latter blocks all events */
-    while (encFutureWatcher.isRunning())
-        QCoreApplication::processEvents(QEventLoop::AllEvents);
-
-    if (encFutureWatcher.isCanceled())
-        return eERROR;
-    else
-        return eOK;
+    return eOK;
 }
 
-void TalkGenerator::encEntryPoint(TalkEntry& entry)
-{
-    if(!entry.encoded)
-    {
-        bool res = entry.refs.encoder->encode(entry.wavfilename, entry.talkfilename);
-        entry.encoded = res;
-        if (!entry.encoded)
-            entry.refs.generator->encFailEntry(entry);
-        }
-    return;
-}
-
-void TalkGenerator::encProgress(int value)
-{
-    emit logProgress(value, encFutureWatcher.progressMaximum());
-}
-
-void TalkGenerator::encFailEntry(const TalkEntry& entry)
-{
-    emit logItem(tr("Encoding of %1 failed").arg(
-        QFileInfo(entry.wavfilename).baseName()), LOGERROR);
-    abort();
-}
-
-//! \brief slot, which is connected to the abort of the Logger. Sets a flag, so Creating Talkfiles ends at the next possible position
+//! \brief slot, which is connected to the abort of the Logger.
+//Sets a flag, so Creating Talkfiles ends at the next possible position
 //!
 void TalkGenerator::abort()
 {
-    if (ttsFutureWatcher.isRunning())
-    {
-        ttsFutureWatcher.cancel();
-        emit logItem(tr("Voicing aborted"), LOGERROR);
-    }
-    if (encFutureWatcher.isRunning())
-    {
-        encFutureWatcher.cancel();
-        emit logItem(tr("Encoding aborted"), LOGERROR);
-    }
-    m_userAborted = true;
+    m_abort = true;
 }
 
 QString TalkGenerator::correctString(QString s)
@@ -325,8 +256,8 @@ QString TalkGenerator::correctString(QString s)
         qDebug() << "[VoiceFileCreator] corrected string" << s << "to" << corrected;
 
     return corrected;
+    m_abort = true;
 }
-
 
 void TalkGenerator::setLang(QString name)
 {
