@@ -28,7 +28,8 @@
 
 void power_off(void)
 {
-
+    GPIO_PCCON &= ~(1<<0);
+    while(1);
 }
 
 void power_init(void)
