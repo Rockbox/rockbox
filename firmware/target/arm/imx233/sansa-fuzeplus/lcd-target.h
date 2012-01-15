@@ -21,7 +21,7 @@
 #ifndef LCD_TARGET_H
 #define LCD_TARGET_H
 
-#define LCD_FRAMEBUF_ADDR(col, row) ((fb_data *)FRAME + (row)*LCD_WIDTH + (col))
+#define LCD_FRAMEBUF_ADDR(col, row) ((fb_data *)lcd_framebuffer + (row)*LCD_WIDTH + (col))
 
 /* Not really optimized, but are unusual */
 #define LCD_OPTIMIZED_UPDATE
