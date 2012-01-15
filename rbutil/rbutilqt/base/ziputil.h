@@ -31,9 +31,9 @@ class ZipUtil : public QObject
     public:
         ZipUtil(QObject* parent);
         ~ZipUtil();
-        bool open(QString& zipfile, QuaZip::Mode mode);
+        bool open(QString& zipfile, QuaZip::Mode mode = QuaZip::mdUnzip);
         bool close(void);
-        bool extractArchive(QString& dest);
+        bool extractArchive(QString& dest, QString file = "");
         bool appendDirToArchive(QString& source, QString& basedir);
         bool appendFileToArchive(QString& file, QString& basedir);
         qint64 totalUncompressedSize(unsigned int clustersize = 0);

@@ -60,8 +60,7 @@ class BootloaderInstallBase : public QObject
             { m_blurl = u; }
         void setLogfile(QString f)
             { m_logfile = f; }
-        void setOfFile(QString f)
-            {m_offile = f;}
+        bool setOfFile(QString of, QStringList blfile);
 
         //! returns a port Install Hint or empty if there is none
         //! static and in the base class, so the installer classes dont need to
@@ -90,6 +89,7 @@ class BootloaderInstallBase : public QObject
         QString m_logfile;     //! file for installation log
         QUrl m_blurl;          //! bootloader download URL
         QTemporaryFile m_tempfile; //! temporary file for download
+        QTemporaryFile m_tempof;   //! temporary file for OF extracted from archive
         QDateTime m_blversion; //! download timestamp used for version information
         QString m_offile;      //! path to the offile
 #if defined(Q_OS_MACX)

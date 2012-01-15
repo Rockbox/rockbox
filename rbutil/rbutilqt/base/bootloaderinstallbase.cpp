@@ -31,6 +31,7 @@
 #include "bootloaderinstallmpio.h"
 #include "bootloaderinstallimx.h"
 #include "utils.h"
+#include "ziputil.h"
 
 #if defined(Q_OS_MACX)
 #include <sys/param.h>
@@ -320,3 +321,43 @@ void BootloaderInstallBase::setBlFile(QStringList sl)
     }
 }
 
+bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
+{
+    bool found = false;
+    ZipUtil z(this);
+    // check if the file set is in zip format
+    if(z.open(of)) {
+        emit logItem(tr("Zip file format detected"), LOGINFO);
+        QStringList contents = z.files();
+        qDebug() << "[BootloaderInstallBase] archive contains:" << contents;
+        for(int i = 0; i < blfile.size(); ++i) {
+            // strip any path, we don't know the structure in the zip
+            QString f = QFileInfo(blfile.at(i)).fileName();
+            qDebug() << "[BootloaderInstallBase] searching archive for" << f;
+            int index = contents.indexOf(f); // FIXME: support files in folders
+            if(index >= 0) {
+                found = true;
+                emit logItem(tr("Extracting firmware %1 from archive")
+                             .arg(f), LOGINFO);
+                // store in class temporary file
+                m_tempof.open();
+                m_offile = m_tempof.fileName();
+                m_tempof.close();
+                if(!z.extractArchive(m_offile, contents.at(index))) {
+                    emit logItem(tr("Error extracting firmware from archive"), LOGERROR);
+                    found = false;
+                    break;
+                }
+            }
+        }
+        if(!found) {
+            emit logItem(tr("Could not find firmware in archive"), LOGERROR);
+        }
+
+    }
+    else {
+        m_offile = of;
+        found = true;
+    }
+    return found;
+}

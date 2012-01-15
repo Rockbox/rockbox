@@ -708,7 +708,14 @@ void RbUtilQt::installBootloader()
         logger->setFinished();
         return;
     }
-   
+
+    // the bootloader install class does NOT use any GUI stuff.
+    // All messages are passed via signals.
+    connect(bl, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(bl, SIGNAL(done(bool)), this, SLOT(installBootloaderPost(bool)));
+    connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+
     // set bootloader filename. Do this now as installed() needs it.
     QStringList blfile = SystemInfo::value(SystemInfo::CurBootloaderFile).toStringList();
     QStringList blfilepath;
@@ -788,15 +795,13 @@ void RbUtilQt::installBootloader()
             m_error = true;
             return;
         }
-        bl->setOfFile(offile);
+        if(!bl->setOfFile(offile, blfile)) {
+            logger->addItem(tr("Error reading firmware file"), LOGERROR);
+            logger->setFinished();
+            m_error = true;
+            return;
+        }
     }
-
-    // the bootloader install class does NOT use any GUI stuff.
-    // All messages are passed via signals.
-    connect(bl, SIGNAL(done(bool)), logger, SLOT(setFinished()));
-    connect(bl, SIGNAL(done(bool)), this, SLOT(installBootloaderPost(bool)));
-    connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
-    connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
 
     // start install.
     if(!backupDestination.isEmpty()) {

@@ -70,10 +70,13 @@ bool ZipUtil::close(void)
 
 
 //! @brief extract currently opened archive
-//! @brief dest path to extract archive to
+//! @brief dest path to extract archive to, can be filename when extracting a
+//!             single file.
+//! @brief file file to extract from archive, full archive if empty.
 //! @return true on success, false otherwise
-bool ZipUtil::extractArchive(QString& dest)
+bool ZipUtil::extractArchive(QString& dest, QString file)
 {
+    qDebug() << "[ZipUtil] extractArchive" << dest << file;
     bool result = true;
     if(!m_zip) {
         return false;
@@ -81,6 +84,16 @@ bool ZipUtil::extractArchive(QString& dest)
     QuaZipFile *currentFile = new QuaZipFile(m_zip);
     int entries = m_zip->getEntriesCount();
     int current = 0;
+    // construct the filename when extracting a single file from an archive.
+    // if the given destination is a full path use it as output name,
+    // otherwise use it as path to place the file as named in the archive.
+    QString singleoutfile;
+    if(!file.isEmpty() && QFileInfo(dest).isDir()) {
+        singleoutfile = dest + "/" + file;
+    }
+    else if(!file.isEmpty()){
+        singleoutfile = dest;
+    }
     for(bool more = m_zip->goToFirstFile(); more; more = m_zip->goToNextFile())
     {
         ++current;
@@ -88,7 +101,16 @@ bool ZipUtil::extractArchive(QString& dest)
         if(m_zip->getCurrentFileName().split("/").last() == "")
             continue;
 
-        QString outfilename = dest + "/" + m_zip->getCurrentFileName();
+        QString outfilename;
+        if(!singleoutfile.isEmpty()
+                && QFileInfo(m_zip->getCurrentFileName()).fileName() == file) {
+            outfilename = singleoutfile;
+        }
+        else if(singleoutfile.isEmpty()) {
+            outfilename = dest + "/" + m_zip->getCurrentFileName();
+        }
+        if(outfilename.isEmpty())
+            continue;
         QFile outputFile(outfilename);
         // make sure the output path exists
         if(!QDir().mkpath(QFileInfo(outfilename).absolutePath())) {
