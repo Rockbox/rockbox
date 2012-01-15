@@ -187,7 +187,7 @@ void VoiceFileCreator::downloadDone(bool error)
         connect(&generator,SIGNAL(logProgress(int,int)),this,SIGNAL(logProgress(int,int)));
         connect(this,SIGNAL(aborted()),&generator,SLOT(abort()));
     
-        if(generator.process(&m_talkList) == TalkGenerator::eERROR)
+        if(generator.process(&m_talkList, m_wavtrimThreshold) == TalkGenerator::eERROR)
         {
             cleanup();
             emit logProgress(0,1);

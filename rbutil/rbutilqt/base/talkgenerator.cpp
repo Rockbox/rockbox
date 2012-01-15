@@ -145,7 +145,8 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
 
         // voice entry
         QString error;
-        qDebug() << "[TalkGenerator] voicing: " << list->at(i).toSpeak << "to" << list->at(i).wavfilename;
+        qDebug() << "[TalkGenerator] voicing: " << list->at(i).toSpeak
+                 << "to" << list->at(i).wavfilename;
         TTSStatus status = m_tts->voice(list->at(i).toSpeak,list->at(i).wavfilename, &error);
         if(status == Warning)
         {
@@ -162,11 +163,17 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
         else
            (*list)[i].voiced = true;
 
-        //wavetrim if needed
+        // wavtrim if needed
         if(wavtrimth != -1)
         {
             char buffer[255];
-            wavtrim(list->at(i).wavfilename.toLocal8Bit().data(),wavtrimth,buffer,255);
+            if(wavtrim(list->at(i).wavfilename.toLocal8Bit().data(),
+                       wavtrimth, buffer, 255))
+            {
+                qDebug() << "[TalkGenerator] wavtrim returned error on"
+                         << list->at(i).wavfilename;
+                return eERROR;
+            }
         }
 
         emit logProgress(++m_progress,progressMax);
