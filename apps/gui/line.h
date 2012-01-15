@@ -35,6 +35,9 @@ struct line_desc {
      * from the font. The text will be centered if the height is larger,
      * but the decorations will span the entire height */
     int height;
+    /* height of the line separator (in pixels). 0 to disable drawing
+     * of the separator */
+    int8_t separator_height;
     /* multiline support: For some decorations (e.g. gradient) to work
      * across multiple lines (e.g. to draw a line selector across 2 lines)
      * the line index and line count must be known. For normal, single
@@ -49,7 +52,7 @@ struct line_desc {
 
 /* default initializer, can be used for static initialitation also.
  * This initializer will result in single lines without style that don't scroll */
-#define LINE_DESC_DEFINIT { .style = STYLE_DEFAULT, .height = -1, .line = 0, .nlines = 1, .scroll = false }
+#define LINE_DESC_DEFINIT { .style = STYLE_DEFAULT, .height = -1, .separator_height = 0, .line = 0, .nlines = 1, .scroll = false }
 
 /**
  * Print a line at a given pixel postion, using decoration information from

@@ -216,6 +216,22 @@ static void style_line(struct screen *display,
     int style = line->style;
     int width = display->getwidth();
     int height = line->height == -1 ? display->getcharheight() : line->height;
+    int bar_height = height;
+
+    /* mask out gradient and colorbar styles for non-color displays */
+    if (display->depth < 16 && (style & (STYLE_COLORBAR|STYLE_GRADIENT)))
+    {
+        style &= ~(STYLE_COLORBAR|STYLE_GRADIENT);
+        style |= STYLE_INVERT;
+    }
+    if (line->separator_height > 0 && (line->line == line->nlines-1))
+    {
+        display->set_drawmode(DRMODE_FG);
+        display->set_foreground(global_settings.list_separator_color);
+        display->fillrect(x, y + height - line->separator_height, width, line->separator_height);
+        bar_height -= line->separator_height;
+        display->set_foreground(global_settings.fg_color);
+    }
 
 #if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
     if (style & STYLE_COLORED)
@@ -225,15 +241,7 @@ static void style_line(struct screen *display,
         else
             display->set_foreground(style & STYLE_COLOR_MASK);
     }
-#endif
-
-    /* mask out gradient and colorbar styles for non-color displays */
-    if (display->depth < 16 && (style & (STYLE_COLORBAR|STYLE_GRADIENT)))
-    {
-        style &= ~(STYLE_COLORBAR|STYLE_GRADIENT);
-        style |= STYLE_INVERT;
-    }
-    
+#endif    
     switch (style & STYLE_MODE_MASK)
     {
         case STYLE_NONE:
@@ -241,7 +249,7 @@ static void style_line(struct screen *display,
 #if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
         case STYLE_GRADIENT:
             display->set_drawmode(DRMODE_FG);
-            display->gradient_fillrect_part(x, y, width, height,
+            display->gradient_fillrect_part(x, y, width, bar_height,
                                             global_settings.lss_color,
                                             global_settings.lse_color,
                                             height*line->nlines,
@@ -251,18 +259,18 @@ static void style_line(struct screen *display,
         case STYLE_COLORBAR:
             display->set_drawmode(DRMODE_FG);
             display->set_foreground(global_settings.lss_color);
-            display->fillrect(x, y, width - x, height);
+            display->fillrect(x, y, width - x, bar_height);
             display->set_foreground(global_settings.lst_color);
             break;
 #endif
         case STYLE_INVERT:
             display->set_drawmode(DRMODE_SOLID);
-            display->fillrect(x, y, width - x, height);
+            display->fillrect(x, y, width - x, bar_height);
             display->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
             break;
         default:
             display->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
-            display->fillrect(x, y, width - x, height);
+            display->fillrect(x, y, width - x, bar_height);
             display->set_drawmode(DRMODE_SOLID);
             break;
     }
