@@ -30,6 +30,7 @@
 #include "dma-imx233.h"
 #include "ssp-imx233.h"
 #include "i2c-imx233.h"
+#include "dcp-imx233.h"
 #include "lcd.h"
 #include "backlight-target.h"
 #include "button.h"
@@ -68,6 +69,7 @@ default_interrupt(INT_LRADC_CH6);
 default_interrupt(INT_LRADC_CH7);
 default_interrupt(INT_DAC_DMA);
 default_interrupt(INT_DAC_ERROR);
+default_interrupt(INT_DCP);
 
 typedef void (*isr_t)(void);
 
@@ -100,6 +102,7 @@ static isr_t isr_table[INT_SRC_NR_SOURCES] =
     [INT_SRC_LRADC_CHx(7)] = INT_LRADC_CH7,
     [INT_SRC_DAC_DMA] = INT_DAC_DMA,
     [INT_SRC_DAC_ERROR] = INT_DAC_ERROR,
+    [INT_SRC_DCP] = INT_DCP,
 };
 
 static void UIRQ(void)
@@ -205,6 +208,7 @@ void system_init(void)
     imx233_timrot_init();
     imx233_dma_init();
     imx233_ssp_init();
+    imx233_dcp_init();
 }
 
 bool imx233_us_elapsed(uint32_t ref, unsigned us_delay)

@@ -21,60 +21,12 @@
 #include "system.h"
 #include "system-target.h"
 #include "lradc-imx233.h"
-
-struct channel_arbiter_t
-{
-    struct semaphore sema;
-    struct mutex mutex;
-    unsigned free_bm;
-    int count;
-};
-
-static void arbiter_init(struct channel_arbiter_t *a, unsigned count)
-{
-    mutex_init(&a->mutex);
-    semaphore_init(&a->sema, count, count);
-    a->free_bm = (1 << count) - 1;
-    a->count = count;
-}
-
-// doesn't check in use !
-static void arbiter_reserve(struct channel_arbiter_t *a, unsigned channel)
-{
-    // assume semaphore has a free slot immediately
-    if(semaphore_wait(&a->sema, TIMEOUT_NOBLOCK) != OBJ_WAIT_SUCCEEDED)
-        panicf("arbiter_reserve failed on semaphore_wait !");
-    mutex_lock(&a->mutex);
-    a->free_bm &= ~(1 << channel);
-    mutex_unlock(&a->mutex);
-}
-
-static int arbiter_acquire(struct channel_arbiter_t *a, int timeout)
-{
-    int w = semaphore_wait(&a->sema, timeout);
-    if(w == OBJ_WAIT_TIMEDOUT)
-        return w;
-    mutex_lock(&a->mutex);
-    int chan = find_first_set_bit(a->free_bm);
-    if(chan >= a->count)
-        panicf("arbiter_acquire cannot find a free channel !");
-    a->free_bm &= ~(1 << chan);
-    mutex_unlock(&a->mutex);
-    return chan;
-}
-
-static void arbiter_release(struct channel_arbiter_t *a, int channel)
-{
-    mutex_lock(&a->mutex);
-    a->free_bm |= 1 << channel;
-    mutex_unlock(&a->mutex);
-    semaphore_release(&a->sema);
-}
+#include "kernel-imx233.h"
 
 /* channels */
-struct channel_arbiter_t channel_arbiter;
+static struct channel_arbiter_t channel_arbiter;
 /* delay channels */
-struct channel_arbiter_t delay_arbiter;
+static struct channel_arbiter_t delay_arbiter;
 
 void imx233_lradc_setup_channel(int channel, bool div2, bool acc, int nr_samples, int src)
 {

@@ -34,6 +34,8 @@
 #define HW_DIGCTL_CTRL          (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0))
 #define HW_DIGCTL_CTRL__USB_CLKGATE (1 << 2)
 
+#define HW_DIGCTL_HCLKCOUNT     (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0x20))
+
 #define HW_DIGCTL_MICROSECONDS  (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xC0))
 
 /* USB Phy */
@@ -80,6 +82,7 @@
 #define INT_SRC_LRADC_CHx(x)    (37 + (x))
 #define INT_SRC_LCDIF_DMA   45
 #define INT_SRC_LCDIF_ERROR 46
+#define INT_SRC_DCP         54
 #define INT_SRC_NR_SOURCES  66
 
 /**
