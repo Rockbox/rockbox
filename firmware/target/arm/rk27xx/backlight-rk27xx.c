@@ -24,6 +24,7 @@
 #include "backlight.h"
 #include "backlight-target.h"
 #include "system.h"
+#include "lcd.h"
 
 static int brightness = DEFAULT_BRIGHTNESS_SETTING;
 
@@ -76,6 +77,9 @@ bool _backlight_init(void)
 
 void _backlight_on(void)
 {
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true);
+#endif
     /* enable PWM clock */
     SCU_CLKCFG &= ~(1<<29);
 
@@ -96,6 +100,9 @@ void _backlight_off(void)
 
     /* disable PWM clock */
     SCU_CLKCFG |= (1<<29);
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(false);
+#endif
 }
 
 void _backlight_set_brightness(int val)

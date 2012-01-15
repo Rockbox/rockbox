@@ -27,12 +27,7 @@
 #include "cpu.h"
 #include "lcdif-rk27xx.h"
 
-
-/* TODO */
-static void lcd_sleep(unsigned int sleep)
-{
-     (void)sleep;
-}
+static bool display_on = false;
 
 void lcd_display_init()
 {
@@ -110,9 +105,47 @@ void lcd_display_init()
         for(y=0; y<LCD_HEIGHT; y++)
             lcd_data(0x00);
 
-    lcd_sleep(0);
+    display_on = true;
 }
 
+void lcd_enable (bool on)
+{
+    if (on)
+    {
+        lcd_write_reg(0x18, 0x44);
+        lcd_write_reg(0x21, 0x01);
+        lcd_write_reg(0x01, 0x00);
+        lcd_write_reg(0x1C, 0x03);
+        lcd_write_reg(0x19, 0x06);
+        udelay(5);
+        lcd_write_reg(0x26, 0x84);
+        udelay(40);
+        lcd_write_reg(0x26, 0xB8);
+        udelay(40);
+        lcd_write_reg(0x26, 0xBC);
+    }
+    else
+    {
+        lcd_write_reg(0x26, 0xB8);
+        udelay(40);
+        lcd_write_reg(0x19, 0x01);
+        udelay(40);
+        lcd_write_reg(0x26, 0xA4);
+        udelay(40);
+        lcd_write_reg(0x26, 0x84);
+        udelay(40);
+        lcd_write_reg(0x1C, 0x00);
+        lcd_write_reg(0x01, 0x02);
+        lcd_write_reg(0x21, 0x00);
+    }
+    display_on = on;
+
+}
+
+bool lcd_active()
+{
+    return display_on;
+}
 
 
 void lcd_update_rect(int x, int y, int width, int height)

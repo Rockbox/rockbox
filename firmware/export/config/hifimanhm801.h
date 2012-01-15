@@ -72,7 +72,7 @@
 /* #define HAVE_LCD_SHUTDOWN */
 
 /* Define this if your LCD can be enabled/disabled */
-/* #define HAVE_LCD_ENABLE */
+#define HAVE_LCD_ENABLE
 
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
