@@ -1,6 +1,7 @@
 # /
 /build*
 /output
+*.exe
 
 # /rbutil/
 /rbutil/Makefile
@@ -70,7 +71,6 @@
 # /utils/MTP/beastpatcher/
 /utils/MTP/beastpatcher/bootimg.*
 /utils/MTP/beastpatcher/beastpatcher
-/utils/MTP/beastpatcher/beastpatcher.exe
 /utils/MTP/beastpatcher/bin2c*
 
 # /utils/MTP/beastpatcher/vs2005/
@@ -88,13 +88,6 @@
 /utils/jz4740_tools/HXFsplit
 /utils/jz4740_tools/HXFmerge
 /utils/jz4740_tools/IHFSsplit
-/utils/jz4740_tools/HXFreplace.exe
-/utils/jz4740_tools/HXF2IHFS.exe
-/utils/jz4740_tools/usbtool.exe
-/utils/jz4740_tools/DLanalyser.exe
-/utils/jz4740_tools/HXFsplit.exe
-/utils/jz4740_tools/HXFmerge.exe
-/utils/jz4740_tools/IHFSsplit.exe
 /utils/jz4740_tools/jz_xloader.*
 /utils/jz4740_tools/bin2c
 
@@ -105,7 +98,6 @@
 /utils/themeeditor/Makefile*
 /utils/themeeditor/object_script*
 /utils/themeeditor/rbthemeeditor
-/utils/themeeditor/*.exe
 
 # /utils/zenutils/
 /utils/zenutils/build
