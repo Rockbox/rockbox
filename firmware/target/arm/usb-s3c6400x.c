@@ -515,7 +515,7 @@ int usb_drv_send(int ep, void *ptr, int len)
 }
 #else
 
-static struct ep_type endpoints[USB_NUM_ENDPOINTS];
+static struct ep_type endpoints[USB_NUM_ENDPOINTS][2];
 
 /* USB control requests may be up to 64 bytes in size.
    Even though we never use anything more than the 8 header bytes,
@@ -535,15 +535,15 @@ static volatile bool plugged = false;
 
 static void reset_endpoints(int reinit)
 {
-    unsigned int i;
-    for (i = 0; i < sizeof(endpoints)/sizeof(struct ep_type); i++)
-    {
-        if (reinit) endpoints[i].active = false;
-        endpoints[i].busy = false;
-        endpoints[i].status = -1;
-        endpoints[i].done = true;
-        semaphore_release(&endpoints[i].complete);
-    }
+    for (unsigned i = 0; i < sizeof(endpoints)/(2*sizeof(struct ep_type)); i++)
+        for (unsigned dir = 0; dir < 2; dir++)
+        {
+            if (reinit) endpoints[i][dir].active = false;
+            endpoints[i][dir].busy = false;
+            endpoints[i][dir].status = -1;
+            endpoints[i][dir].done = true;
+            semaphore_release(&endpoints[i][dir].complete);
+        }
 
     DEPCTL(0, false) = DEPCTL_usbactep | (1 << DEPCTL_nextep_bitp);
     DEPCTL(0, true) = DEPCTL_usbactep;
@@ -575,26 +575,28 @@ static void reset_endpoints(int reinit)
 int usb_drv_request_endpoint(int type, int dir)
 {
     bool out = dir == USB_DIR_OUT;
-    for(size_t ep = out ? 2 : 1; ep < USB_NUM_ENDPOINTS; ep += 2)
-        if (!endpoints[ep].active)
+    for(size_t ep = out ? 2 : 1; ep < USB_NUM_ENDPOINTS; ep += 2) {
+        if (!endpoints[ep][out ? DIR_OUT : DIR_IN].active)
         {
-            endpoints[ep].active = true;
+            endpoints[ep][out ? DIR_OUT : DIR_IN].active = true;
             DEPCTL(ep, out) = (DEPCTL(ep, out) & ~(DEPCTL_eptype_bits << DEPCTL_eptype_bitp)) |
                 (type << DEPCTL_eptype_bitp);
             return ep | dir;
         }
+    }
 
     return -1;
 }
 
 void usb_drv_release_endpoint(int ep)
 {
+    bool out = !(ep & USB_DIR_IN);
     ep = ep & 0x7f;
 
     if (ep < 1 || ep > USB_NUM_ENDPOINTS)
         return;
 
-    endpoints[ep].active = false;
+    endpoints[ep][out ? DIR_OUT : DIR_IN].active = false;
 }
 
 static void usb_reset(void)
@@ -646,14 +648,14 @@ static void handle_ep_int(bool out)
         {
             if (!out) inflight = false;
             commit_discard_dcache();
-            int bytes = endpoints[ep].size - (DEPTSIZ(ep, out) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
-            if (endpoints[ep].busy)
+            int bytes = endpoints[ep][out ? DIR_OUT : DIR_IN].size - (DEPTSIZ(ep, out) & (DEPTSIZ_xfersize_bits < DEPTSIZ_xfersize_bitp));
+            if (endpoints[ep][out ? DIR_OUT : DIR_IN].busy)
             {
-                endpoints[ep].busy = false;
-                endpoints[ep].status = 0;
-                endpoints[ep].done = true;
+                endpoints[ep][out ? DIR_OUT : DIR_IN].busy = false;
+                endpoints[ep][out ? DIR_OUT : DIR_IN].status = 0;
+                endpoints[ep][out ? DIR_OUT : DIR_IN].done = true;
                 usb_core_transfer_complete(ep, out ? USB_DIR_OUT : USB_DIR_IN, 0, bytes);
-                semaphore_release(&endpoints[ep].complete);
+                semaphore_release(&endpoints[ep][out ? DIR_OUT : DIR_IN].complete);
             }
         }
 
@@ -662,12 +664,12 @@ static void handle_ep_int(bool out)
 
         if (!out && (epints & DIEPINT_timeout))
         {
-            if (endpoints[ep].busy)
+            if (endpoints[ep][out ? DIR_OUT : DIR_IN].busy)
             {
-                endpoints[ep].busy = false;
-                endpoints[ep].status = 1;
-                endpoints[ep].done = true;
-                semaphore_release(&endpoints[ep].complete);
+                endpoints[ep][out ? DIR_OUT : DIR_IN].busy = false;
+                endpoints[ep][out ? DIR_OUT : DIR_IN].status = 1;
+                endpoints[ep][out ? DIR_OUT : DIR_IN].done = true;
+                semaphore_release(&endpoints[ep][out ? DIR_OUT : DIR_IN].complete);
             }
         }
 
@@ -735,8 +737,8 @@ static void ep_transfer(int ep, void *ptr, int len, bool out)
     /* disable interrupts to avoid any race */
     int oldlevel = disable_irq_save();
     if (!out) inflight = true;
-    endpoints[ep].busy = true;
-    endpoints[ep].size = len;
+    endpoints[ep][out ? DIR_OUT : DIR_IN].busy = true;
+    endpoints[ep][out ? DIR_OUT : DIR_IN].size = len;
 
     if (out) DEPCTL(ep, out) &= ~DEPCTL_stall;
 
@@ -762,11 +764,11 @@ static void ep_transfer(int ep, void *ptr, int len, bool out)
 int usb_drv_send(int endpoint, void *ptr, int length)
 {
     endpoint = EP_NUM(endpoint);
-    endpoints[endpoint].done = false;
+    endpoints[endpoint][1].done = false;
     ep_transfer(endpoint, ptr, length, false);
-    while (!endpoints[endpoint].done && endpoints[endpoint].busy)
-        semaphore_wait(&endpoints[endpoint].complete, TIMEOUT_BLOCK);
-    return endpoints[endpoint].status;
+    while (!endpoints[endpoint][1].done && endpoints[endpoint][1].busy)
+        semaphore_wait(&endpoints[endpoint][1].complete, TIMEOUT_BLOCK);
+    return endpoints[endpoint][1].status;
 }
 
 void usb_drv_cancel_all_transfers(void)
@@ -778,8 +780,9 @@ void usb_drv_cancel_all_transfers(void)
 
 void usb_drv_init(void)
 {
-    for (unsigned i = 0; i < sizeof(endpoints)/sizeof(struct ep_type); i++)
-        semaphore_init(&endpoints[i].complete, 1, 0);
+    for (unsigned i = 0; i < sizeof(endpoints)/(2*sizeof(struct ep_type)); i++)
+        for (unsigned dir = 0; dir < 2; dir++)
+            semaphore_init(&endpoints[i][dir].complete, 1, 0);
 
     /* Enable USB clock */
 #if CONFIG_CPU==S5L8701
