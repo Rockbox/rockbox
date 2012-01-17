@@ -83,8 +83,13 @@ TTSStatus TTSExes::voice(QString text,QString wavfile, QString *errStr)
     execstring.replace("%options",m_TTSOpts);
     execstring.replace("%wavfile",wavfile);
     execstring.replace("%text",text);
-    //qDebug() << "voicing" << execstring;
+
     QProcess::execute(execstring);
+
+    if(!QFileInfo(wavfile).isFile()) {
+        qDebug() << "[TTSExes] output file does not exist:" << wavfile;
+        return FatalError;
+    }
     return NoError;
 
 }
