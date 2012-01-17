@@ -234,7 +234,7 @@ TTSStatus TTSSapi::voice(QString text,QString wavfile, QString *errStr)
         QCoreApplication::processEvents();
 
     if(!QFileInfo(wavfile).isFile()) {
-        qDebug() << "[TTSExes] output file does not exist:" << wavfile;
+        qDebug() << "[TTSSapi] output file does not exist:" << wavfile;
         return FatalError;
     }
     return NoError;
