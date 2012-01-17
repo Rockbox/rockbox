@@ -186,7 +186,7 @@ $(CODECDIR)/%.o: $(ROOTDIR)/apps/codecs/%.S
 		-I$(dir $<) $(CODECFLAGS) $(ASMFLAGS) -c $< -o $@
 
 ifdef APP_TYPE
- CODECLDFLAGS = $(SHARED_LDFLAG) # <-- from Makefile
+ CODECLDFLAGS = $(SHARED_LDFLAG) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
  CODECFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
 else
  CODECLDFLAGS = -T$(CODECLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map

@@ -31,7 +31,8 @@ $(SIMLIB): $$(SIMOBJ) $(UIBMP)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(SIMLIB) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB)
-	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(SIMLIB) $(LDOPTS) $(GLOBAL_LDOPTS)
+	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(SIMLIB) $(LDOPTS) $(GLOBAL_LDOPTS) \
+	-Wl,-Map,$(BUILDDIR)/rockbox.map
 
 $(BUILDDIR)/uisimulator/%.o: $(ROOTDIR)/uisimulator/%.c
 	$(SILENT)mkdir -p $(dir $@)

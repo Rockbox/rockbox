@@ -32,7 +32,7 @@ ifndef APP_TYPE
     IMGDEC_OUTLDS = $(IMGVBUILDDIR)/%.link
     IMGDEC_OVLFLAGS = -T$(IMGVBUILDDIR)/$*.link -Wl,--gc-sections -Wl,-Map,$(IMGVBUILDDIR)/$*.map
 else
-    IMGDEC_OVLFLAGS = $(PLUGINLDFLAGS)
+    IMGDEC_OVLFLAGS = $(PLUGINLDFLAGS) -Wl,-Map,$(IMGVBUILDDIR)/$*.map
 endif
 
 $(IMGVBUILDDIR)/%.ovl: $(IMGDEC_OUTLDS)
