@@ -49,7 +49,7 @@
 #ifdef SAMSUNG_YPR0
 #define HOME_DIR "/mnt/media0"
 #else
-#define HOME_DIR "/." /* dot to avoid "//XX", /./X is valid */
+#define HOME_DIR "/"
 #endif
 
 /* make sure both are the same for native builds */
