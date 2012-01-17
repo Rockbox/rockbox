@@ -50,10 +50,9 @@ struct codec_req_struct {
 #define IOCTL_SUBREG_READ       0x80034103
 
 
-int ascodec_init(void)
+void ascodec_init(void)
 {
     afe_dev = open("/dev/afe", O_RDWR);
-    return afe_dev;
 }
 
 void ascodec_close(void)

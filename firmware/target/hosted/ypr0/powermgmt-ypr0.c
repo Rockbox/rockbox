@@ -22,7 +22,7 @@
 #include "powermgmt.h"
 #include "power.h"
 #include "file.h"
-#include "as3514.h"
+#include "adc.h"
 #include "sc900776.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
