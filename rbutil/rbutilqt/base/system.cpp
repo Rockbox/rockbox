@@ -76,34 +76,34 @@
 #if defined(Q_OS_WIN32)
 enum System::userlevel System::userPermissions(void)
 {
-    LPUSER_INFO_1 buf;
-    NET_API_STATUS napistatus;
+    LPUSER_INFO_1 buf = NULL;
     wchar_t userbuf[UNLEN];
     DWORD usersize = UNLEN;
     BOOL status;
-    enum userlevel result;
+    enum userlevel result = ERR;
 
     status = GetUserNameW(userbuf, &usersize);
     if(!status)
         return ERR;
 
-    napistatus = NetUserGetInfo(NULL, userbuf, (DWORD)1, (LPBYTE*)&buf);
-
-    switch(buf->usri1_priv) {
-        case USER_PRIV_GUEST:
-            result = GUEST;
-            break;
-        case USER_PRIV_USER:
-            result = USER;
-            break;
-        case USER_PRIV_ADMIN:
-            result = ADMIN;
-            break;
-        default:
-            result = ERR;
-            break;
+    if(NetUserGetInfo(NULL, userbuf, (DWORD)1, (LPBYTE*)&buf) == NERR_Success) {
+        switch(buf->usri1_priv) {
+            case USER_PRIV_GUEST:
+                result = GUEST;
+                break;
+            case USER_PRIV_USER:
+                result = USER;
+                break;
+            case USER_PRIV_ADMIN:
+                result = ADMIN;
+                break;
+            default:
+                result = ERR;
+                break;
+        }
     }
-    NetApiBufferFree(buf);
+    if(buf != NULL)
+        NetApiBufferFree(buf);
 
     return result;
 }
@@ -142,9 +142,9 @@ QString System::userName(void)
 #if defined(Q_OS_WIN32)
     wchar_t userbuf[UNLEN];
     DWORD usersize = UNLEN;
-    BOOL status;
 
-    status = GetUserNameW(userbuf, &usersize);
+    if(GetUserNameW(userbuf, &usersize) == 0)
+        return QString();
 
     return QString::fromWCharArray(userbuf);
 #endif
@@ -246,11 +246,15 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
 #if defined(Q_OS_LINUX)
 #if defined(LIBUSB1)
     libusb_device **devs;
-    int res;
-    ssize_t count;
-    res = libusb_init(NULL);
+    if(libusb_init(NULL) != 0) {
+        qDebug() << "[System] Initializing libusb-1 failed.";
+        return usbids;
+    }
 
-    count = libusb_get_device_list(NULL, &devs);
+    if(libusb_get_device_list(NULL, &devs) < 1) {
+        qDebug() << "[System] Error getting device list.";
+        return usbids;
+    }
     libusb_device *dev;
     int i = 0;
     while((dev = devs[i++]) != NULL) {
