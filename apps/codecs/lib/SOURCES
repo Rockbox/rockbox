@@ -7,10 +7,6 @@ mdct_lookup.c
 fft-ffmpeg.c
 mdct.c
 
-#ifdef CPU_ARM
-../../../firmware/target/arm/support-arm.S
-#endif
-
 #elif (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(__APPLE__)
 osx.dummy.c
 #endif

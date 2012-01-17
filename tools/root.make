@@ -70,9 +70,12 @@ ifeq (,$(findstring checkwps,$(APPSDIR)))
   endif
 endif
 
-#included before codecs.make and plugins.make so they see $(LIBSETJMP)
+#included before codecs.make and plugins.make so they see them)
 ifndef APP_TYPE
   include $(ROOTDIR)/lib/libsetjmp/libsetjmp.make
+  ifeq (arm,$(ARCH))
+    include $(ROOTDIR)/lib/arm_support/arm_support.make
+  endif
 endif
 
 ifneq (,$(findstring bootloader,$(APPSDIR)))
@@ -176,6 +179,13 @@ LINKRAM := $(BUILDDIR)/ram.link
 ROMLDS := $(FIRMDIR)/rom.lds
 LINKROM := $(BUILDDIR)/rom.link
 
+ifeq (arm,$(ARCH))
+  LIBARMSUPPORT_LINK := -larm_support
+else
+  LIBARMSUPPORT_LINK :=
+endif
+
+
 
 $(LINKRAM): $(RAMLDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
@@ -185,19 +195,21 @@ $(LINKROM): $(ROMLDS)
 	$(call PRINTS,PP $(@F))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
-$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LINKRAM)
+$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(LINKRAM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
-		-L$(BUILDDIR)/lib -lskin_parser \
+		-L$(BUILDDIR)/lib -lskin_parser $(LIBARMSUPPORT_LINK) \
 		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
 		-lgcc $(BOOTBOXLDOPTS) $(GLOBAL_LDOPTS) \
 		-T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
 
-$(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LINKROM)
+$(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
-		$(VOICESPEEXLIB) $(FIRMLIB) -lgcc $(GLOBAL_LDOPTS) \
-		-L$(BUILDDIR)/lib -lskin_parser \
-        -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
+		-L$(BUILDDIR)/firmware -lfirmware \
+		-L$(BUILDDIR)/lib -lskin_parser $(LIBARMSUPPORT_LINK) \
+		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
+		-lgcc $(GLOBAL_LDOPTS) \
+        -T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
 
 $(BUILDDIR)/rockbox.bin : $(BUILDDIR)/rockbox.elf
 	$(call PRINTS,OC $(@F))$(OC) $(if $(filter yes, $(USE_ELF)), -S -x, -O binary) $< $@

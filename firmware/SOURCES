@@ -454,7 +454,6 @@ target/coldfire/ata-as-coldfire.S
 
 #elif defined(CPU_PP) || defined(CPU_ARM)
 /* CPU_PP => CPU_ARM, CPU_ARM !=> CPU_PP */
-target/arm/support-arm.S
 target/arm/memcpy-arm.S
 target/arm/memmove-arm.S
 
