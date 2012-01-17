@@ -206,11 +206,9 @@ qmf_synth:
 
     sub     r0, r8, r5              @ r0 = &xx1[N2]
     sub     r1, r9, r5              @ r1 = &xx2[N2]
-    str     r4, [sp, #-4]           @ Stack N
+    str     r4, [sp, #-4]!          @ Stack N
     mov     r4, r5
-    str     r4, [sp, #-8]           @ Stack M
-    @ sp doesn't point to the end of the stack frame from here on, but we're not
-    @ calling anything so it shouldn't matter
+    str     r4, [sp, #-4]!          @ Stack M
     @ Main loop, register usage:
     @ r0 = xx1, r1 = xx2, r2 = a, r3 = y, r4 = M, r5 = x10, r6 = x11, r7 = x20
     @ r8 = x21, r9 = [a1, a0], r10 = acc0, r11 = acc1, r12 = acc2, r14 = acc3
@@ -251,7 +249,7 @@ qmf_synth:
     subs    r4, r4, #4
     bne     1b
 
-    ldr     r4, [sp, #-8]           @ r4 = M
+    ldr     r4, [sp]                @ r4 = M
     sub     r2, r2, r4, lsl #1      @ r2 = &a[0]
     sub     r0, r0, r4              @ r0 = &xx1[N2 - 2 - i]
     sub     r1, r1, r4              @ r1 = &xx2[N2 - 2 - i]
@@ -281,13 +279,14 @@ qmf_synth:
     strh    r11, [r3], #2
     strh    r12, [r3], #2
     strh    r14, [r3], #2
-    ldr     r10, [sp, #-4]          @ Load N
+    ldr     r10, [sp, #4]           @ Load N
     subs    r10, r10, #4            @ Are we done?
-    strne   r10, [sp, #-4]
-    bne     0b
+    strne   r10, [sp, #4]           @ no ->
+    bne     0b                      @   do outer loop
 
     @ Copy start of xx1 and xx2 back to alternate mem1 and mem2 entries
     @ r0 and r1 are &xx1[0] and &xx2[0] at this point
+    add     sp, sp, #8
     ldmia   sp, { r5-r6, sp }       @ Fetch &mem1[1], &mem2[1], restore sp
 0:
     ldr     r7, [r0], #4
