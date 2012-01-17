@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (c) 2002 Daniel Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,38 +18,48 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef DEBUG_H
-#define DEBUG_H
 
-#include "config.h"
-#include "gcc_extensions.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 
-extern void debug_init(void);
-extern void debugf(const char* fmt,...) ATTRIBUTE_PRINTF(1, 2);
-extern void ldebugf(const char* file, int line, const char *fmt, ...)
-                    ATTRIBUTE_PRINTF(3, 4);
+#ifdef WIN32
+static unsigned old_cp;
 
-#ifndef CODEC  
+void debug_exit(void)
+{
+    /* Reset console output codepage */
+    SetConsoleOutputCP(old_cp);
+}
 
-#if defined(SIMULATOR) && !defined(__PCTOOL__) \
-    || (defined(APPLICATION) && defined(DEBUG))
-#define DEBUGF  debugf
-#define LDEBUGF(...) ldebugf(__FILE__, __LINE__, __VA_ARGS__)
-#elif defined(DEBUG) /* DEBUG on native targets */
-
-#ifdef HAVE_GDB_API
-void breakpoint(void);
+void debug_init(void)
+{
+    old_cp = GetConsoleOutputCP();
+    /* Set console output codepage to UTF8. Only works
+     * correctly when the console uses a truetype font. */
+    SetConsoleOutputCP(65001);
+    atexit(debug_exit);
+}
+#else
+void debug_init(void)
+{
+    /* nothing to be done */
+}
 #endif
 
-#define DEBUGF  debugf
-#define LDEBUGF debugf
+void debugf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start( ap, fmt );
+    vfprintf( stderr, fmt, ap );
+    va_end( ap );
+}
 
-#else /* !DEBUG */
-
-#define DEBUGF(...) do { } while(0)
-#define LDEBUGF(...) do { } while(0)
-
-#endif /* SIMULATOR && !__PCTOOL__ || APPLICATION && DEBUG */
-
-#endif /* CODEC */
-#endif
+void ldebugf(const char* file, int line, const char *fmt, ...)
+{
+    va_list ap;
+    va_start( ap, fmt );
+    fprintf( stderr, "%s:%d ", file, line );
+    vfprintf( stderr, fmt, ap );
+    va_end( ap );
+}

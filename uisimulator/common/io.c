@@ -608,46 +608,6 @@ void lc_close(void *handle)
 }
 
 #endif /* __PCTOOL__ */
-#ifdef WIN32
-static unsigned old_cp;
-
-void debug_exit(void)
-{
-    /* Reset console output codepage */
-    SetConsoleOutputCP(old_cp);
-}
-
-void debug_init(void)
-{
-    old_cp = GetConsoleOutputCP();
-    /* Set console output codepage to UTF8. Only works
-     * correctly when the console uses a truetype font. */
-    SetConsoleOutputCP(65001);
-    atexit(debug_exit);
-}
-#else
-void debug_init(void)
-{
-    /* nothing to be done */
-}
-#endif
-
-void debugf(const char *fmt, ...)
-{
-    va_list ap;
-    va_start( ap, fmt );
-    vfprintf( stderr, fmt, ap );
-    va_end( ap );
-}
-
-void ldebugf(const char* file, int line, const char *fmt, ...)
-{
-    va_list ap;
-    va_start( ap, fmt );
-    fprintf( stderr, "%s:%d ", file, line );
-    vfprintf( stderr, fmt, ap );
-    va_end( ap );
-}
 
 /* rockbox off_t may be different from system off_t */
 int sim_ftruncate(int fd, long length)
