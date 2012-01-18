@@ -433,7 +433,7 @@ target/coldfire/i2c-coldfire.c
 target/coldfire/ata-as-coldfire.S
 #endif
 
-#elif defined(CPU_PP) || defined(CPU_ARM)
+#elif defined(CPU_PP) || (defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE)
 /* CPU_PP => CPU_ARM, CPU_ARM !=> CPU_PP */
 
 # if ARM_ARCH < 6
@@ -445,10 +445,7 @@ target/arm/bits-armv4.S
 target/arm/mmu-arm.S
 #  endif
 # endif
-
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
 target/arm/system-arm.c
-#endif
 
 #if CONFIG_STORAGE & STORAGE_ATA
 # ifdef CPU_PP502x
