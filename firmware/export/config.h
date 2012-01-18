@@ -563,7 +563,7 @@ Lyre prototype 1 */
 #define CPU_ARM
 #define ARM_ARCH 7 /* ARMv7 */
 
-#elif (CONFIG_CPU == IMX31L) \
+#elif (CONFIG_CPU == IMX31L) || defined(SAMSUNG_YPR0) \
   || ((CONFIG_PLATFORM & PLATFORM_MAEMO4) && defined(MAEMO_ARM_BUILD))
 #define CPU_ARM
 #define ARM_ARCH 6 /* ARMv6 */

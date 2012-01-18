@@ -672,7 +672,6 @@ ypr0cc () {
  endian="little"
  thread_support="HAVE_SIGALTSTACK_THREADS"
  app_type="ypr0"
- arch="unknown"
 
  # Include path
  GCCOPTS="$GCCOPTS  -D_GNU_SOURCE=1 -U_FORTIFY_SOURCE -D_REENTRANT"
