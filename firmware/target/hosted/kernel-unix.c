@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 
+#include <stdlib.h>
 #include <time.h>
 #include <signal.h>
 #include <errno.h>
@@ -63,10 +64,13 @@ void interrupt(void)
 
 /*
  * setup a hrtimer to send a signal to our process every tick
+ *
+ * WARNING for Android: JNI calls are not permitted from tick tasks, as the
+ * underlying thread is not attached to the Java VM
+ *
+ * Can be possibly be attached if it really needs to be. but let's
+ * keep this leightweight
  */
-union sigval tick_arg = {
-    .sival_int = 0,
-};
 
 void tick_start(unsigned int interval_in_ms)
 {
@@ -126,13 +130,13 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     if (timer_prio >= 0 && global_unreg_callback)
         global_unreg_callback();
 
-    /* initializing in the declaration causes some weird warnings */
     memset(&sigev, 0, sizeof(sigevent_t));
     sigev.sigev_notify = SIGEV_THREAD,
     sigev.sigev_notify_function = timer_cb;
 
-    ts.it_value.tv_sec = ts.it_interval.tv_sec = in_us / 1000000;
-    ts.it_value.tv_nsec = ts.it_interval.tv_nsec = (in_us%1000000)*1000;
+    div_t q = div(in_us, 1000000);
+    ts.it_value.tv_sec = ts.it_interval.tv_sec = q.quot;
+    ts.it_value.tv_nsec = ts.it_interval.tv_nsec = q.rem*1000;
 
     /* add the timer */
     ret |= timer_create(CLOCK_REALTIME, &sigev, &timer_tid);
@@ -149,8 +153,9 @@ bool timer_set_period(long cycles)
 {
     struct itimerspec ts;
     long in_us = cycles_to_microseconds(cycles);
-    ts.it_value.tv_sec = ts.it_interval.tv_sec = in_us / 1000000;
-    ts.it_value.tv_nsec = ts.it_interval.tv_nsec = (in_us%1000000)*1000;
+    div_t q = div(in_us, 1000000);
+    ts.it_value.tv_sec = ts.it_interval.tv_sec = q.quot;
+    ts.it_value.tv_nsec = ts.it_interval.tv_nsec = q.rem*1000;
 
     return timer_settime(timer_tid, 0, &ts, NULL) == 0;
 }

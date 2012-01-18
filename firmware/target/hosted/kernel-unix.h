@@ -19,25 +19,16 @@
  *
  ****************************************************************************/
 
-#ifndef __SYSTEM_TARGET_H__
-#define __SYSTEM_TARGET_H__
+#ifndef __KERNEL_UNIX_H__
+#define __KERNEL_UNIX_H__
 
-#include "kernel-unix.h"
+/* interrupt emulation incomplete, doesn't seem needed so far */
+#define disable_irq()
+#define enable_irq()
+#define disable_irq_save() 0
+#define restore_irq(level) (void)level
 
-static inline void commit_dcache(void) {}
-static inline void commit_discard_dcache(void) {}
-static inline void commit_discard_idcache(void) {}
+void wait_for_interrupt(void);
+void interrupt(void);
 
- /* don't pull in jni.h for every user of this file, it should be only needed
-  * within the target tree (if at all)
-  * define this before #including system.h or system-target.h */
-#ifdef _SYSTEM_WITH_JNI
-#include <jni.h>
-/*
- * discover the JNIEnv for this the calling thread in case it's not known */
-extern JNIEnv* getJavaEnvironment(void);
-#endif /* _SYSTEM_WITH_JNI */
-
-#endif /* __SYSTEM_TARGET_H__ */
-
-#define NEED_GENERIC_BYTESWAPS
+#endif /* __KERNEL_UNIX_H__ */

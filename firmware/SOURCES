@@ -1,3 +1,6 @@
+#undef unix /* causes problems with some files */
+#undef linux
+
 ata_idle_notify.c
 events.c
 backlight.c
@@ -9,7 +12,6 @@ powermgmt.c
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 
 #ifdef __linux__
-#undef linux
 target/hosted/cpuinfo-linux.c
 #endif
 
@@ -75,8 +77,8 @@ drivers/rtc/rtc_as3514.c
 #else
 target/hosted/rtc.c
 #endif
+target/hosted/kernel-unix.c
 target/hosted/ypr0/button-ypr0.c
-target/hosted/ypr0/kernel-ypr0.c
 target/hosted/ypr0/lcd-ypr0.c
 target/hosted/ypr0/system-ypr0.c
 target/hosted/ypr0/fs-ypr0.c
@@ -1690,6 +1692,7 @@ target/arm/rk27xx/hm801/power-hm801.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+target/hosted/kernel-unix.c
 target/hosted/android/fs-android.c
 target/hosted/android/lcd-android.c
 target/hosted/android/lc-android.c
@@ -1697,7 +1700,6 @@ target/hosted/android/button-android.c
 #ifdef DEBUG
 target/hosted/android/debug-android.c
 #endif
-target/hosted/android/kernel-android.c
 target/hosted/android/pcm-android.c
 target/hosted/android/powermgmt-android.c
 target/hosted/android/system-android.c
