@@ -92,7 +92,8 @@ enum {
     ACTION_REDRAW, /* returned if keys are locked and we splash()'ed */
     ACTION_TOUCHSCREEN,
     ACTION_TOUCHSCREEN_MODE, /* toggle the touchscreen mode */
-    
+    ACTION_TOUCHSCREEN_IGNORE, /* used for the 'none' action in skins */
+
     /* standard actions, use these first */
     ACTION_STD_PREV, 
     ACTION_STD_PREVREPEAT,
