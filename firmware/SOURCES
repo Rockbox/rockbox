@@ -78,10 +78,10 @@ drivers/rtc/rtc_as3514.c
 target/hosted/rtc.c
 #endif
 target/hosted/kernel-unix.c
+target/hosted/filesystem-unix.c
 target/hosted/ypr0/button-ypr0.c
 target/hosted/ypr0/lcd-ypr0.c
 target/hosted/ypr0/system-ypr0.c
-target/hosted/ypr0/fs-ypr0.c
 target/hosted/ypr0/lc-ypr0.c
 thread.c
 #ifdef HAVE_BACKLIGHT
@@ -1693,7 +1693,7 @@ target/arm/rk27xx/hm801/power-hm801.c
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 target/hosted/kernel-unix.c
-target/hosted/android/fs-android.c
+target/hosted/filesystem-unix.c
 target/hosted/android/lcd-android.c
 target/hosted/android/lc-android.c
 target/hosted/android/button-android.c

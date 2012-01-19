@@ -40,17 +40,13 @@
 #undef rmdir
 
 
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(SAMSUNG_YPR0)
+#include "dir-target.h"
+#define opendir _opendir
+#define mkdir   _mkdir
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
-#include "dir-target.h"
-#define opendir opendir_android
-#define mkdir   mkdir_android
-#define rmdir   rmdir_android
 static const char rbhome[] = "/sdcard";
-#elif defined(SAMSUNG_YPR0)
-#include "dir-target.h"
-#define opendir opendir_ypr0
-#define mkdir   mkdir_ypr0
-#define rmdir   rmdir_ypr0
+#endif
 #elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 #define open    sim_open
 #define remove  sim_remove

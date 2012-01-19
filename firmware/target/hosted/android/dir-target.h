@@ -32,16 +32,9 @@
 #define mkdir_uncached _mkdir
 #define rmdir_uncached rmdir
 
-#define dirent_android dirent
-#define DIR_android DIR
-#define opendir_android _opendir
-#define readdir_android _readdir
-#define closedir_android _closedir
-#define mkdir_android _mkdir
-#define rmdir_android rmdir
-
 extern DIR* _opendir(const char* name);
 extern int  _mkdir(const char* name);
+extern int  rmdir(const char* name);
 extern int  _closedir(DIR* dir);
 extern struct dirent *_readdir(DIR* dir);
 extern void fat_size(unsigned long *size, unsigned long *free);

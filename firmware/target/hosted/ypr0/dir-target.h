@@ -35,16 +35,9 @@ extern int rmdir(const char* name);
 #define mkdir_uncached _mkdir
 #define rmdir_uncached rmdir
 
-#define dirent_ypr0 dirent
-#define DIR_ypr0 DIR
-#define opendir_ypr0 _opendir
-#define readdir_ypr0 _readdir
-#define closedir_ypr0 _closedir
-#define mkdir_ypr0 _mkdir
-#define rmdir_ypr0 rmdir
-
 extern DIR* _opendir(const char* name);
 extern int  _mkdir(const char* name);
+extern int  _rmdir(const char* name);
 extern int  _closedir(DIR* dir);
 extern struct dirent *_readdir(DIR* dir);
 extern void fat_size(unsigned long *size, unsigned long *free);
