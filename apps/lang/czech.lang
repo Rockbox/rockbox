@@ -12882,3 +12882,31 @@
     *: "Zástupci"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Spouštění / vypínání"
+  </dest>
+  <voice>
+    *: "Spouštění a vypínání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Stisk klávesy restartuje časovač vypnutí"
+  </dest>
+  <voice>
+    *: "Stisk klávesy restartuje časovač vypnutí"
+  </voice>
+</phrase>
