@@ -19,7 +19,8 @@ target/hosted/cpuinfo-linux.c
 target/hosted/rtc.c
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID) == 0
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID) == 0 && \
+    (defined(DEBUG) || defined(SIMULATOR)) /* sim should define DEBUG instead */
 target/hosted/debug-hosted.c
 #endif
 
@@ -79,10 +80,10 @@ target/hosted/rtc.c
 #endif
 target/hosted/kernel-unix.c
 target/hosted/filesystem-unix.c
+target/hosted/lc-unix.c
 target/hosted/ypr0/button-ypr0.c
 target/hosted/ypr0/lcd-ypr0.c
 target/hosted/ypr0/system-ypr0.c
-target/hosted/ypr0/lc-ypr0.c
 thread.c
 #ifdef HAVE_BACKLIGHT
 target/hosted/ypr0/backlight-ypr0.c
@@ -1694,8 +1695,8 @@ target/arm/rk27xx/hm801/power-hm801.c
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 target/hosted/kernel-unix.c
 target/hosted/filesystem-unix.c
+target/hosted/lc-unix.c
 target/hosted/android/lcd-android.c
-target/hosted/android/lc-android.c
 target/hosted/android/button-android.c
 #ifdef DEBUG
 target/hosted/android/debug-android.c

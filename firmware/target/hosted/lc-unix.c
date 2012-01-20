@@ -22,7 +22,10 @@
 #include <string.h> /* size_t */
 #include "load_code.h"
 
-/* the load_code wrappers simply wrap, nothing to do */
+/* unix specific because WIN32 wants UCS instead of UTF-8, so filenames
+ * need to be converted */
+
+/* plain wrappers , nothing to do */
 void *lc_open(const char *filename, unsigned char *buf, size_t buf_size)
 {
     return _lc_open(filename, buf, buf_size);
