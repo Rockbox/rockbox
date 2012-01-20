@@ -10161,7 +10161,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "celá"
+    rtc: "nula nula"
   </voice>
 </phrase>
 <phrase>
@@ -12789,7 +12789,7 @@
     *: "Zrušit časovač vypnutí"
   </dest>
   <voice>
-    *: "Zrušit časovač vypnutí"
+    *: "Zrušit časovač vypnutí, zbývá"
   </voice>
 </phrase>
 <phrase>
