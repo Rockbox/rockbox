@@ -58,6 +58,9 @@
     on commit */
 #define CROSSFADE_BUFSIZE    8192u
 
+/* Return data level in 1/4-second increments */
+#define DATA_LEVEL(quarter_secs) (NATIVE_FREQUENCY * (quarter_secs))
+
 /* Number of bytes played per second:
    (sample rate * 2 channels * 2 bytes/sample) */
 #define BYTERATE            (NATIVE_FREQUENCY * 4)
@@ -66,9 +69,13 @@
 /* Keep watermark high for large memory target - at least (2s) */
 #define PCMBUF_WATERMARK    (BYTERATE * 2)
 #define MIN_BUFFER_SIZE     (BYTERATE * 3)
+/* 1 seconds of buffer is low data */
+#define LOW_DATA            DATA_LEVEL(4)
 #else
 #define PCMBUF_WATERMARK    (BYTERATE / 4)  /* 0.25 seconds */
 #define MIN_BUFFER_SIZE     (BYTERATE * 1)
+/* under watermark is low data */
+#define LOW_DATA            pcmbuf_watermark
 #endif
 
 /* Describes each audio packet - keep it small since there are many of them */
@@ -95,9 +102,10 @@ static size_t chunk_ridx;
 static size_t chunk_widx;
 
 static size_t pcmbuf_bytes_waiting;
-
-static size_t pcmbuf_watermark;
 static struct chunkdesc *current_desc;
+
+/* Only written if HAVE_CROSSFADE */
+static size_t pcmbuf_watermark = PCMBUF_WATERMARK;
 
 static bool low_latency_mode = false;
 
@@ -160,10 +168,6 @@ static void pcmbuf_finish_crossfade_enable(void);
 static int codec_thread_priority = PRIORITY_PLAYBACK;
 #endif
 
-/* Helpful macros for use in conditionals this assumes some of the above
- * static variable names */
-#define DATA_LEVEL(quarter_secs) (NATIVE_FREQUENCY * (quarter_secs))
-
 /* Callbacks into playback.c */
 extern void audio_pcmbuf_position_callback(unsigned long elapsed,
                                            off_t offset, unsigned int key);
@@ -185,6 +189,12 @@ static size_t pcmbuf_unplayed_bytes(void)
         widx += pcmbuf_size;
 
     return widx - ridx;
+}
+
+/* Returns TRUE if amount of data is under the target fill size */
+static bool pcmbuf_data_critical(void)
+{
+    return pcmbuf_unplayed_bytes() < LOW_DATA;
 }
 
 /* Return the next PCM chunk in the PCM buffer given a byte index into it */
@@ -418,15 +428,8 @@ void * pcmbuf_request_buffer(int *count)
         trigger_cpu_boost();
 
         /* If pre-buffered to the watermark, start playback */
-#if MEMORYSIZE > 2
-        if (remaining > DATA_LEVEL(4))
-#else
-        if (remaining > pcmbuf_watermark)
-#endif
-        {
-            if (audio_pcmbuf_may_play())
-                pcmbuf_play_start();
-        }
+        if (!pcmbuf_data_critical() && audio_pcmbuf_may_play())
+            pcmbuf_play_start();
     }
 
     void *buf =
@@ -520,8 +523,6 @@ size_t pcmbuf_init(unsigned char *bufend)
     }
 
     pcmbuf_finish_crossfade_enable();
-#else  /* !HAVE_CROSSFADE */
-    pcmbuf_watermark = PCMBUF_WATERMARK;
 #endif /* HAVE_CROSSFADE */
 
     init_buffer_state();
@@ -1283,13 +1284,7 @@ bool pcmbuf_is_lowdata(void)
     if (status != CHANNEL_PLAYING || pcmbuf_is_crossfade_active())
         return false;
 
-#if MEMORYSIZE > 2
-    /* 1 seconds of buffer is low data */
-    return pcmbuf_unplayed_bytes() < DATA_LEVEL(4);
-#else
-    /* under watermark is low data */
-    return pcmbuf_unplayed_bytes() < pcmbuf_watermark;
-#endif
+    return pcmbuf_data_critical();
 }
 
 void pcmbuf_set_low_latency(bool state)
