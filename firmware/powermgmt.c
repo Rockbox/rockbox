@@ -281,8 +281,11 @@ static int voltage_to_battery_level(int battery_millivolts)
 
 static void battery_status_update(void)
 {
-    int millivolt, level;
-    battery_read_info(&millivolt, &level);
+    int millivolt = battery_voltage();
+    int level = _battery_level();
+
+    if (level < 0)
+        level = voltage_to_battery_level(millivolt);
 
 #ifdef CURRENT_NORMAL  /*don't try to estimate run or charge
                         time without normal current defined*/
