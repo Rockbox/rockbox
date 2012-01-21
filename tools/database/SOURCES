@@ -13,6 +13,7 @@ database.c
 ../../firmware/common/strcasestr.c
 ../../firmware/common/structec.c
 ../../firmware/common/unicode.c
+../../firmware/target/hosted/debug-hosted.c
 ../../firmware/logf.c
 ../../uisimulator/common/io.c
 #if CONFIG_CODEC != SWCODEC
