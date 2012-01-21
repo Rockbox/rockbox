@@ -52,6 +52,7 @@
 #define HW_CLKCTRL_HBUS__SLOW_DIV_BM    (0x7 << 16)
 #define HW_CLKCTRL_HBUS__AUTO_SLOW_MODE (1 << 20)
 
+/* warning: this register doesn't have a CLR/SET variant ! */
 #define HW_CLKCTRL_XBUS     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x40))
 #define HW_CLKCTRL_XBUS__DIV_BP     0
 #define HW_CLKCTRL_XBUS__DIV_BM     0x3ff
@@ -62,14 +63,17 @@
 #define HW_CLKCTRL_XTAL__DRI_CLK24M_GATE    (1 << 28)
 #define HW_CLKCTRL_XTAL__FILT_CLK24M_GATE   (1 << 30)
 
+/* warning: this register doesn't have a CLR/SET variant ! */
 #define HW_CLKCTRL_PIX      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x60))
 #define HW_CLKCTRL_PIX__DIV_BP  0
 #define HW_CLKCTRL_PIX__DIV_BM  0xfff
 
+/* warning: this register doesn't have a CLR/SET variant ! */
 #define HW_CLKCTRL_SSP      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x70))
 #define HW_CLKCTRL_SSP__DIV_BP  0
 #define HW_CLKCTRL_SSP__DIV_BM  0x1ff
 
+/* warning: this register doesn't have a CLR/SET variant ! */
 #define HW_CLKCTRL_EMI      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xa0))
 #define HW_CLKCTRL_EMI__DIV_EMI_BP  0
 #define HW_CLKCTRL_EMI__DIV_EMI_BM  0x3f
@@ -94,6 +98,7 @@
 #define HW_CLKCTRL_FRAC_XX__XX_STABLE   (1 << 6)
 #define HW_CLKCTRL_FRAC_XX__CLKGATEXX   (1 << 7)
 
+/* warning: this register doesn't have a CLR/SET variant ! */
 #define HW_CLKCTRL_RESET    (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x120))
 #define HW_CLKCTRL_RESET_CHIP   0x2
 #define HW_CLKCTRL_RESET_DIG    0x1

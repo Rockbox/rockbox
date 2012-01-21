@@ -76,16 +76,17 @@ bool imx233_is_clock_enable(enum imx233_clock_t clk)
 
 void imx233_set_clock_divisor(enum imx233_clock_t clk, int div)
 {
+    /* warning: some registers like HW_CLKCTRL_PIX don't have a CLR/SET variant ! */
     switch(clk)
     {
         case CLK_PIX:
-            __REG_CLR(HW_CLKCTRL_PIX) = HW_CLKCTRL_PIX__DIV_BM;
-            __REG_SET(HW_CLKCTRL_PIX) = div;
+            HW_CLKCTRL_PIX &= ~HW_CLKCTRL_PIX__DIV_BM;
+            HW_CLKCTRL_PIX |= div;
             while(HW_CLKCTRL_PIX & __CLK_BUSY);
             break;
         case CLK_SSP:
-            __REG_CLR(HW_CLKCTRL_SSP) = HW_CLKCTRL_SSP__DIV_BM;
-            __REG_SET(HW_CLKCTRL_SSP) = div;
+            HW_CLKCTRL_SSP &= ~HW_CLKCTRL_SSP__DIV_BM;
+            HW_CLKCTRL_SSP |= div;
             while(HW_CLKCTRL_SSP & __CLK_BUSY);
             break;
         case CLK_CPU:
@@ -94,8 +95,8 @@ void imx233_set_clock_divisor(enum imx233_clock_t clk, int div)
             while(HW_CLKCTRL_CPU & HW_CLKCTRL_CPU__BUSY_REF_CPU);
             break;
         case CLK_EMI:
-            __REG_CLR(HW_CLKCTRL_EMI) = HW_CLKCTRL_EMI__DIV_EMI_BM;
-            __REG_SET(HW_CLKCTRL_EMI) = div;
+            HW_CLKCTRL_EMI &= ~HW_CLKCTRL_EMI__DIV_EMI_BM;
+            HW_CLKCTRL_EMI |= div;
             while(HW_CLKCTRL_EMI & HW_CLKCTRL_EMI__BUSY_REF_EMI);
             break;
         case CLK_HBUS:
@@ -104,8 +105,8 @@ void imx233_set_clock_divisor(enum imx233_clock_t clk, int div)
             while(HW_CLKCTRL_HBUS & __CLK_BUSY);
             break;
         case CLK_XBUS:
-            __REG_CLR(HW_CLKCTRL_XBUS) = HW_CLKCTRL_XBUS__DIV_BM;
-            __REG_SET(HW_CLKCTRL_XBUS) = div;
+            HW_CLKCTRL_XBUS &= ~HW_CLKCTRL_XBUS__DIV_BM;
+            HW_CLKCTRL_XBUS |= div;
             while(HW_CLKCTRL_XBUS & __CLK_BUSY);
             break;
         default: return;
