@@ -1,7 +1,37 @@
 # /
 /build*
+/sim*
 /output
+*.elf
 *.exe
+
+# android: java build system
+/android/bin
+/android/data
+/android/gen
+/android/libs
+/android/local.properties
+
+# android: our build system
+/android/autoconf.h
+/android/Makefile
+/android/make.dep
+/android/apps
+/android/bitmaps
+/android/pluginbitmaps
+/android/firmware
+/android/lang
+/android/lib
+/android/librockbox.so
+/android/rockbox.*
+/android/rockbox-info.txt
+/android/sysfont.c
+/android/sysfont.h
+/android/version.h
+/android/credits.raw
+
+# android: eclipse stuff
+/android/.settings
 
 # /rbutil/
 /rbutil/Makefile
