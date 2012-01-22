@@ -587,8 +587,8 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
  * so two pixels are packed into one byte.
  * The lower nibble is the first pixel, the upper one the second. The stride is
  * horizontal. E.g row0: pixel0: byte0[0:3], pixel1: byte0[4:7], pixel2: byte1[0:3],...
- * The format is independant of the internal display orientation, as to
- * support the same font files on
+ * The format is independant of the internal display orientation and color
+ * representation, as to support the same font files on all displays.
  * The values go linear from 0 (fully transparent) to 15 (fully opaque).
  *
  * This might suggest that rows need to have an even number of pixels.
