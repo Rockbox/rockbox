@@ -41,6 +41,12 @@ int set_irq_level(int level);
 #define restore_irq(level) \
     ((void)set_irq_level(level))
 
+#ifndef HAVE_SDL_THREADS
+void wait_for_interrupt(void);
+#else
+#define wait_for_interrupt()
+#endif
+
 #include "system-hosted.h"
 
 void sim_enter_irq_handler(void);
