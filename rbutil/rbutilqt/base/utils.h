@@ -49,6 +49,7 @@ public:
     static QStringList mountpoints(void);
     static QString resolveDevicename(QString path);
     static QString resolveMountPoint(QString device);
+    static QStringList findRunningProcess(QStringList names);
 };
 
 #endif

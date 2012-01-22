@@ -170,6 +170,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 #else
     connect(ui.actionInstall_Rockbox_Utility_on_player, SIGNAL(triggered()), this, SLOT(installPortable()));
 #endif
+    Utils::findRunningProcess(QStringList("iTunes"));
 
 }
 
