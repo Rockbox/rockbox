@@ -37,6 +37,14 @@
 #include "string-extra.h"
 #include "gcc_extensions.h"
 
+
+
+/* on some platforms strcmp() seems to be a tricky define which
+ * breaks if we write down strcmp's prototype */
+#undef strcmp
+#undef strncmp
+#undef strchr
+
 char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);
 
@@ -118,12 +126,6 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "usbstack/usb_hid_usage_tables.h"
 #endif
 
-
-/* on some platforms strcmp() seems to be a tricky define which
- * breaks if we write down strcmp's prototype */
-#undef strcmp
-#undef strncmp
-#undef strchr
 
 #ifdef PLUGIN
 

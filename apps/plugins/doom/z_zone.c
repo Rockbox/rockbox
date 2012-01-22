@@ -248,7 +248,7 @@ void Z_Init(void)
 
    zonebase_size=size;
 
-   printf("Z_Init: Allocated %uldKb zone memory\n", (long unsigned)(size >> 10));
+   printf("Z_Init: Allocated %luKb zone memory\n", (long unsigned)(size >> 10));
 
    // Align on cache boundary
 

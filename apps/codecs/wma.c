@@ -46,7 +46,7 @@ enum codec_status codec_run(void)
     asf_waveformatex_t wfx;
     size_t resume_offset;
     int i;
-    int wmares;
+    int wmares = 0;
     int res = 0;
     uint8_t* audiobuf;
     int audiobufsize;
