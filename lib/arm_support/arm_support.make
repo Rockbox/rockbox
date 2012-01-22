@@ -12,6 +12,8 @@ ARMSUPPORT_OBJ := $(call c2obj, $(ARMSUPPORT_SRC))
 
 OTHER_SRC += $(ARMSUPPORT_SRC)
 
+LIBARMSUPPORT := $(BUILDDIR)/lib/libarm_support.a
+
 $(LIBARMSUPPORT): $(ARMSUPPORT_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
