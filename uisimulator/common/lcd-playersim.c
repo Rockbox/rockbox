@@ -41,15 +41,15 @@ static int double_height = 1;
 
 void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
 {
-    int row, col;
+    int row = 0, col = 0; /* shut up gcc */
     int y = (ICON_HEIGHT+(CHAR_HEIGHT*2+2)*CHAR_PIXEL) * icon_line;
 
     y += BORDER_MARGIN;
     x += BORDER_MARGIN;
 
-    for (row = 0; icon[row]; row++)
+    for (; icon[row]; row++)
     {
-        for (col = 0; icon[row][col]; col++)
+        for (; icon[row][col]; col++)
         {
             switch (icon[row][col])
             {
