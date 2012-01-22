@@ -683,7 +683,7 @@ static int create_soundfile(t_canvas *canvas, const char *filename,
     {
     	long datasize = nframes * nchannels * bytespersamp;
         long longtmp;
-        t_datachunk *aiffdc = (t_datachunk *)headerbuf + sizeof(t_aiff);
+        t_datachunk *aiffdc = (t_datachunk *)(headerbuf + sizeof(t_aiff));
         static unsigned char AIFF_splrate[] = {0x40, 0x0e, 0xac, 0x44, 0, 0, 0, 0, 0, 0};
         static unsigned char datachunk_ID[] = {'S', 'S', 'N', 'D'};
     	if (strcmp(filenamebuf + strlen(filenamebuf)-4, ".aif") &&
