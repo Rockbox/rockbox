@@ -192,7 +192,7 @@ int storage_write_sectors(IF_MV2(int drive,)
             fclose(f);
         }
     }
-    return 1;
+    return 0;
 }
 
 int storage_read_sectors(IF_MV2(int drive,)
@@ -202,6 +202,7 @@ int storage_read_sectors(IF_MV2(int drive,)
 {
     IF_MV((void)drive;)
     int i;
+    size_t ret;
 
     for (i=0; i<count; i++ ) {
         FILE* f;
@@ -211,11 +212,13 @@ int storage_read_sectors(IF_MV2(int drive,)
         sprintf(name,"sector%lX.bin",start+i);
         f=fopen(name,"rb");
         if (f) {
-            (void)fread(buf,512,1,f);
+            ret = fread(buf,512,1,f);
             fclose(f);
+            if (ret != 512)
+                return -1;
         }
     }
-    return 1;
+    return 0;
 }
 
 void storage_spin(void)
