@@ -46,7 +46,7 @@ void sim_thread(void)
 {
     struct queue_event ev;
     long last_broadcast_tick = current_tick;
-    int num_acks_to_expect;
+    int num_acks_to_expect = 0;
     
     while (1)
     {
