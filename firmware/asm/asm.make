@@ -19,7 +19,7 @@ ASM_SRC := $(wildcard $(ASM_C_SRC))
 ASM_SRC += $(wildcard $(ASM_S_SRC))
 
 # GEN_SRC now contains a .c for each file in ASM_DUMMY_SRC that's not in ASM_SRC
-# I.e. fallback to a generic C source if no correspinding file in $ARCH is found
+# I.e. fallback to a generic C source if no corresponding file in $ARCH is found
 GEN_SRC := $(filter-out $(notdir $(ASM_SRC:.S=.c)),$(ASM_DUMMY_SRC))
 GEN_SRC := $(addprefix $(FIRMDIR)/asm/,$(GEN_SRC))
 
