@@ -91,7 +91,7 @@ static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
     unsigned int rrate;
     int err;
     snd_pcm_hw_params_t *params;
-    snd_pcm_hw_params_alloca(&params);
+    snd_pcm_hw_params_malloc(&params);
 
 
     /* choose all parameters */
@@ -99,28 +99,28 @@ static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
     if (err < 0)
     {
         printf("Broken configuration for playback: no configurations available: %s\n", snd_strerror(err));
-        return err;
+        goto error;
     }
     /* set the interleaved read/write format */
     err = snd_pcm_hw_params_set_access(handle, params, access_);
     if (err < 0)
     {
         printf("Access type not available for playback: %s\n", snd_strerror(err));
-        return err;
+        goto error;
     }
     /* set the sample format */
     err = snd_pcm_hw_params_set_format(handle, params, format);
     if (err < 0)
     {
         printf("Sample format not available for playback: %s\n", snd_strerror(err));
-        return err;
+        goto error;
     }
     /* set the count of channels */
     err = snd_pcm_hw_params_set_channels(handle, params, channels);
     if (err < 0)
     {
         printf("Channels count (%i) not available for playbacks: %s\n", channels, snd_strerror(err));
-        return err;
+        goto error;
     }
     /* set the stream rate */
     rrate = sample_rate;
@@ -128,28 +128,29 @@ static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
     if (err < 0)
     {
         printf("Rate %iHz not available for playback: %s\n", rate, snd_strerror(err));
-        return err;
+        goto error;
     }
     if (rrate != sample_rate)
     {
         printf("Rate doesn't match (requested %iHz, get %iHz)\n", sample_rate, err);
-        return -EINVAL;
+        err = -EINVAL;
+        goto error;
     }
 
     /* set the buffer size */
     err = snd_pcm_hw_params_set_buffer_size_near(handle, params, &buffer_size);
     if (err < 0)
     {
-        printf("Unable to set buffer size %i for playback: %s\n", buffer_size, snd_strerror(err));
-        return err;
+        printf("Unable to set buffer size %ld for playback: %s\n", buffer_size, snd_strerror(err));
+        goto error;
     }
 
     /* set the period size */
     err = snd_pcm_hw_params_set_period_size_near (handle, params, &period_size, NULL);
     if (err < 0)
     {
-        printf("Unable to set period size %i for playback: %s\n", period_size, snd_strerror(err));
-        return err;
+        printf("Unable to set period size %ld for playback: %s\n", period_size, snd_strerror(err));
+        goto error;
     }
     if (!frames)
         frames = malloc(period_size * channels * sizeof(short));
@@ -159,9 +160,13 @@ static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
     if (err < 0)
     {
         printf("Unable to set hw params for playback: %s\n", snd_strerror(err));
-        return err;
+        goto error;
     }
-    return 0;
+
+    err = 0; /* success */
+error:
+    snd_pcm_hw_params_free(params);
+    return err;
 }
 
 /* Set sw params: playback start threshold and low buffer watermark */
@@ -170,37 +175,41 @@ static int set_swparams(snd_pcm_t *handle)
     int err;
 
     snd_pcm_sw_params_t *swparams;
-    snd_pcm_sw_params_alloca(&swparams);
+    snd_pcm_sw_params_malloc(&swparams);
 
     /* get the current swparams */
     err = snd_pcm_sw_params_current(handle, swparams);
     if (err < 0)
     {
         printf("Unable to determine current swparams for playback: %s\n", snd_strerror(err));
-        return err;
+        goto error;
     }
     /* start the transfer when the buffer is haalmost full */
     err = snd_pcm_sw_params_set_start_threshold(handle, swparams, buffer_size / 2);
     if (err < 0)
     {
         printf("Unable to set start threshold mode for playback: %s\n", snd_strerror(err));
-        return err;
+        goto error;
     }
     /* allow the transfer when at least period_size samples can be processed */
     err = snd_pcm_sw_params_set_avail_min(handle, swparams, period_size);
     if (err < 0)
     {
         printf("Unable to set avail min for playback: %s\n", snd_strerror(err));
-        return err;
+        goto error;
     }
     /* write the parameters to the playback device */
     err = snd_pcm_sw_params(handle, swparams);
     if (err < 0)
     {
         printf("Unable to set sw params for playback: %s\n", snd_strerror(err));
-        return err;
+        goto error;
     }
-    return 0;
+
+    err = 0; /* success */
+error:
+    snd_pcm_sw_params_free(swparams);
+    return err;
 }
 
 /* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() */
