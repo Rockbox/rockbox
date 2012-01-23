@@ -99,7 +99,7 @@ void touchbutton_draw(struct touchbutton *data, int num_buttons) {
 
             /* Set line_height to height, then it'll center for us */
             data[i].vp.line_height = data[i].vp.height;
-            data[i].vp.flags |= VP_FLAG_ALIGN_RIGHT;
+            data[i].vp.flags |= VP_FLAG_ALIGN_CENTER;
             
             /* If the width offset was 0, use a scrolling puts, else center and
              *  print the title.
