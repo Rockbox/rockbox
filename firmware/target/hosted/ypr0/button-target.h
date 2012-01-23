@@ -35,7 +35,7 @@ void button_close_device(void);
 #define BUTTON_POWER        0x00000080
 #define BUTTON_SELECT       0x00000100
 
-#define BUTTON_MAIN         0x1FF /* all buttons */
+#define BUTTON_MAIN         (BUTTON_UP|BUTTON_DOWN|BUTTON_LEFT|BUTTON_RIGHT|BUTTON_USER|BUTTON_MENU|BUTTON_BACK|BUTTON_POWER|BUTTON_SELECT) /* all buttons */
 
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER
