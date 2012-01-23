@@ -4,6 +4,7 @@
 /output
 *.elf
 *.exe
+*.so
 
 # android: java build system
 /android/bin
@@ -22,7 +23,6 @@
 /android/firmware
 /android/lang
 /android/lib
-/android/librockbox.so
 /android/rockbox.*
 /android/rockbox-info.txt
 /android/sysfont.c
