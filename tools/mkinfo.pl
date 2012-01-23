@@ -5,7 +5,6 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$
 #
 # Purpose: extract and gather info from a build and put that in a standard
 # way in the output file. Meant to be put in rockbox zip package to help and
