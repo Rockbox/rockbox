@@ -64,6 +64,9 @@
 #include "viewport.h"
 #include "filefuncs.h"
 #include "shortcuts.h"
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+#include "loopback.h"
+#endif
 
 static int context;
 static const char* selected_file = NULL;
@@ -1031,6 +1034,16 @@ static bool onplay_load_plugin(void *param)
     return false;
 }
 
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+static bool onplay_loopback(void *param)
+{
+    (void)param;
+    int res=loopback_set_file(selected_file);
+    splashf(HZ/2,"%s %smounted",selected_file,res==0?"":"not ");
+    return false;
+}
+#endif
+
 MENUITEM_FUNCTION(list_viewers_item, 0, ID2P(LANG_ONPLAY_OPEN_WITH),
                   list_viewers, NULL, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(properties_item, MENU_FUNC_USEPARAM, ID2P(LANG_PROPERTIES),
@@ -1044,6 +1057,12 @@ static bool onplay_add_to_shortcuts(void)
 MENUITEM_FUNCTION(add_to_faves_item, 0, ID2P(LANG_ADD_TO_FAVES),
                   onplay_add_to_shortcuts, NULL,
                   clipboard_callback, Icon_NOICON);
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+MENUITEM_FUNCTION(loopback_item, MENU_FUNC_USEPARAM, ID2P(LANG_LOOPBACK),
+                  onplay_loopback, NULL,
+                  clipboard_callback, Icon_NOICON);
+#endif
 
 #if LCD_DEPTH > 1
 static bool set_backdrop(void)
@@ -1124,6 +1143,9 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                     this_item == &clipboard_cut_item ||
                     this_item == &clipboard_copy_item ||
                     this_item == &properties_item ||
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+                    this_item == &loopback_item ||
+#endif
                     this_item == &add_to_faves_item)
                 {
                     return action;
@@ -1199,6 +1221,9 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            &set_recdir_item,
 #endif
            &set_startdir_item, &add_to_faves_item,
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+           &loopback_item,
+#endif
          );
 static int onplaymenu_callback(int action,const struct menu_item_ex *this_item)
 {

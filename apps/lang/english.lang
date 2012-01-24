@@ -7735,6 +7735,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_LOOPBACK
+  desc:
+  user: core
+  <source>
+    *: "Loopback mount"
+  </source>
+  <dest>
+    *: "Loopback mount"
+  </dest>
+  <voice>
+    *: "Loopback mount"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PITCH
   desc: "pitch" in the pitch screen
   user: core

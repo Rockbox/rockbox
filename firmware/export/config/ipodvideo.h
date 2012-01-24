@@ -10,7 +10,13 @@
 #define MODEL_NUMBER 5
 
 /* define this if you use an ATA controller */
-#define CONFIG_STORAGE STORAGE_ATA
+#define CONFIG_STORAGE (STORAGE_ATA|STORAGE_LOOPBACK)
+#define HAVE_MULTIDRIVE
+#define HAVE_MULTIVOLUME
+#define HAVE_HOTSWAP
+#define NUM_DRIVES 2
+#define HAVE_FAT16SUPPORT
+
 
 /* define this if the ATA controller and method of USB access support LBA48 */
 #define HAVE_LBA48

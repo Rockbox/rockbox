@@ -120,6 +120,11 @@ int storage_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
     case STORAGE_RAMDISK:
         return ramdisk_read_sectors(IF_MD2(ldrive,) start,count,buf);
 #endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    case STORAGE_LOOPBACK:
+        return loopback_read_sectors(IF_MD2(ldrive,) start,count,buf);
+#endif
     }
     
     return -1;
@@ -165,6 +170,11 @@ int storage_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     case STORAGE_RAMDISK:
         return ramdisk_write_sectors(IF_MD2(ldrive,)start,count,buf);
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    case STORAGE_LOOPBACK:
+        return loopback_write_sectors(IF_MD2(ldrive,)start,count,buf);
 #endif
     }
     
@@ -251,6 +261,17 @@ int storage_init(void)
     }
 #endif
 
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    if ((rc=loopback_init())) return rc;
+    
+    int loopback_drives = loopback_num_drives(num_drives);
+    for (i=0; i<loopback_drives; i++)
+    {
+        storage_drivers[num_drives++] =
+            (STORAGE_LOOPBACK<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
+    }
+#endif
+
     return 0;
 }
 
@@ -276,6 +297,10 @@ void storage_enable(bool on)
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     ramdisk_enable(on);
 #endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    loopback_enable(on);
+#endif
 }
 
 void storage_sleep(void)
@@ -298,6 +323,10 @@ void storage_sleep(void)
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     ramdisk_sleep();
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    loopback_sleep();
 #endif
 }
 
@@ -322,6 +351,10 @@ void storage_sleepnow(void)
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     ramdisk_sleepnow();
 #endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    loopback_sleepnow();
+#endif
 }
 
 bool storage_disk_is_active(void)
@@ -344,6 +377,10 @@ bool storage_disk_is_active(void)
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     if (ramdisk_disk_is_active()) return true;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    if (loopback_disk_is_active()) return true;
 #endif
 
     return false;
@@ -371,6 +408,10 @@ int storage_soft_reset(void)
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     if ((rc=ramdisk_soft_reset())) return rc;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    if ((rc=loopback_soft_reset())) return rc;
 #endif
 
     return rc;
@@ -426,6 +467,10 @@ void storage_spin(void)
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     ramdisk_spin();
 #endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    loopback_spin();
+#endif
 }
 
 void storage_spindown(int seconds)
@@ -448,6 +493,10 @@ void storage_spindown(int seconds)
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     ramdisk_spindown(seconds);
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    loopback_spindown(seconds);
 #endif
 }
 
@@ -472,6 +521,10 @@ void storage_set_led_enabled(bool enabled)
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     ramdisk_set_led_enabled(enabled);
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    loopback_set_led_enabled(enabled);
 #endif
 }
 #endif /* CONFIG_LED == LED_REAL */
@@ -506,6 +559,11 @@ long storage_last_disk_activity(void)
     if (t>max) max=t;
 #endif
 
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    t=loopback_last_disk_activity();
+    if (t>max) max=t;
+#endif
+
     return max;
 }
 
@@ -536,6 +594,11 @@ int storage_spinup_time(void)
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     t=ramdisk_spinup_time();
+    if (t>max) max=t;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    t=loopback_spinup_time();
     if (t>max) max=t;
 #endif
 
@@ -574,6 +637,11 @@ void storage_get_info(int drive, struct storage_info *info)
     case STORAGE_RAMDISK:
         return ramdisk_get_info(ldrive,info);
 #endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    case STORAGE_LOOPBACK:
+        return loopback_get_info(ldrive,info);
+#endif
     }
 }
 #endif /* STORAGE_GET_INFO */
@@ -583,6 +651,7 @@ bool storage_removable(int drive)
 {
     int driver=(storage_drivers[drive] & DRIVER_MASK)>>DRIVER_OFFSET;
     int ldrive=(storage_drivers[drive] & DRIVE_MASK)>>DRIVE_OFFSET;
+    (void)ldrive;
     
     switch(driver)
     {
@@ -609,6 +678,11 @@ bool storage_removable(int drive)
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     case STORAGE_RAMDISK:
         return false;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    case STORAGE_LOOPBACK:
+        return true;
 #endif
 
     default:
@@ -646,6 +720,11 @@ bool storage_present(int drive)
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     case STORAGE_RAMDISK:
         return true;
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+    case STORAGE_LOOPBACK:
+        return loopback_present(ldrive);
 #endif
 
     default:
