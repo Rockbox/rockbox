@@ -1,5 +1,3 @@
-$Id$
-
                __________               __   ___.
      Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
      Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -55,7 +53,7 @@ Braces for function declarations are put in a new line under the name, as in:
   }
 
 Always indent your code with four spaces. Don't use TAB characters, as that
-will mess up code display in CVS, printing, and a zillion other places.
+will mess up code display, printing, and a zillion other places.
 
 Keep lines below 80 columns length. Use whitespace and newlines to make the
 code easy to browse/read.
@@ -67,16 +65,18 @@ Use "unix style" line feeds: "LF" only. Do not use "CR+LF".
 Use UTF-8 character set, but try to refrain from using any non-ascii
 letters as they will only appear weird in some camps no matter what.
 
-Patches
+Contributing code
 -------
-Create a patch using 'svn diff > mychanges.patch
-Trim your patches so they only contain relevant changes.
+We have a public code review system based on git, which is also how you can
+check out the latest version of the Rockbox sources.
+See http://www.rockbox.org/wiki/UsingGit for details on how to setup your
+environment and how to upload a change you have made for review.
 
-Submit your patch to the project via our patch tracker:
-http://www.rockbox.org/tracker/index.php?type=4
+We'd prefer that you don't submit patches to the bug tracker any more,
+as it's much harder to read and discuss them there.
 
 Credits
 -------
 We believe in crediting all contributors by name. Before committing a patch to
-SVN, we ask that you give us your full real name (no pseudonyms or nicknames)
+Git, we ask that you give us your full real name (no pseudonyms or nicknames)
 for adding to the credits list.
