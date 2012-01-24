@@ -28,17 +28,11 @@
 
 volatile unsigned short adc_data[NUM_ADC_CHANNELS] IBSS_ATTR;
 
-/* Reading takes 4096 adclk ticks
- * 1) tick task is created that enables ADC interrupt
- * 2) On interrupt single channel is readed and
- *    ADC is prepared for next channel
- * 3) When all 4 channels are scanned ADC interrupt is disabled
- */
-
 void ADC(void) __attribute__ ((interrupt_handler,section(".icode")));
 void ADC(void)
 {
     static unsigned char channel IBSS_ATTR;
+
     /* read current value */
     adc_data[(channel&0x03)] = ADVALUE;
 
@@ -48,27 +42,16 @@ void ADC(void)
      * ADCONFIG is 16bit wide so we have to shift data by 16bits left
      * thats why we shift <<24 instead of <<8
      */
-
     channel++;
 
     and_l(~(0x03<<24),&ADCONFIG);
     or_l( (((channel&0x03) << 8 )|(1<<7))<<16, &ADCONFIG);
-    
-    if ( (channel & 0x03) == 0 )
-        /* disable ADC interrupt */
-        and_l((~(1<<6))<<16,&ADCONFIG);
 }
 
 unsigned short adc_scan(int channel)
 {
     /* maybe we can drop &0x03 part */
     return adc_data[(channel&0x03)];
-}
-
-void adc_tick(void)
-{
-    /* enable ADC interrupt */
-    or_l( ((1<<6))<<16, &ADCONFIG);
 }
 
 void adc_init(void)
@@ -79,19 +62,16 @@ void adc_init(void)
     /* ADOUT_SEL = 01
      * SOURCE SELECT = 000
      * CLEAR INTERRUPT FLAG
-     * ENABLE INTERRUPT = 0
+     * ENABLE INTERRUPT = 1
      * ADOUT_DRIVE = 00
-     * ADCLK_SEL = 011 (busclk/8)
+     * ADCLK_SEL = 011 (busclk/64)
      */
 
-    ADCONFIG = (1<<10)|(1<<8)|(1<<7)|0x03;
+    ADCONFIG = (1<<10)|(1<<7)|(1<<6)|0x06;
 
     /* ADC interrupt level 4.0 */
     or_l((4<<28), &INTPRI8);
 
-    /* create tick task which enables ADC interrupt */
-    tick_add_task(adc_tick);
-
     /* let the interrupt handler fill readout array */
-    sleep(2);
+    sleep(HZ/10);
 }

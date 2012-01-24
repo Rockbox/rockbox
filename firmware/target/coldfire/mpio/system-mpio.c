@@ -80,8 +80,8 @@ void cf_set_cpu_frequency(long frequency)
                     /* BUFEN2 enable on /CS2 | CS2Post 1 clock| CS2Pre 3 clocks*/
         IDECONFIG2 = (1<<18)|(1<<16)|(1<<8)|(1<<0); /* TA /CS2 enable + CS2wait */
 
-        and_l(~(0x07<<16), &ADCONFIG);
-        or_l((0x05)<<16, &ADCONFIG); /* adclk = busclk/32 */
+        and_l(~(0x0f<<16), &ADCONFIG);
+        or_l((0x08)<<16, &ADCONFIG); /* adclk = busclk/256 */
         break;
 
     case CPUFREQ_NORMAL:
@@ -100,8 +100,8 @@ void cf_set_cpu_frequency(long frequency)
         IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
         IDECONFIG2 = (1<<18)|(1<<16);
 
-        and_l(~(0x07<<16), &ADCONFIG);
-        or_l((0x03)<<16, &ADCONFIG); /* adclk = busclk/8 */
+        and_l(~(0x0f<<16), &ADCONFIG);
+        or_l((0x06)<<16, &ADCONFIG); /* adclk = busclk/64 */
         break;
 
     default:
@@ -118,8 +118,8 @@ void cf_set_cpu_frequency(long frequency)
         IDECONFIG1 = (1<<28)|(1<<20)|(1<<18)|(1<<13)|(1<<10);
         IDECONFIG2 = (1<<18)|(1<<16);
 
-        and_l(~(0x07<<16), &ADCONFIG);
-        or_l((0x01)<<16, &ADCONFIG); /* adclk = busclk/2 */
+        and_l(~(0x0f<<16), &ADCONFIG);
+        or_l((0x04)<<16, &ADCONFIG); /* adclk = busclk/16 */
         break;
     }
 }
