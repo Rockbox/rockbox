@@ -42,9 +42,11 @@
 #elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
 #   define DEBUG_CANCEL  BUTTON_RC_REC
 
-#elif (CONFIG_KEYPAD == MPIO_HD200_PAD) || \
-    (CONFIG_KEYPAD == MPIO_HD300_PAD)
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
 #   define DEBUG_CANCEL  BUTTON_REC
+
+#elif (CONFIG_KEYPAD == MPIO_HD300_PAD)
+#   define DEBUG_CANCEL BUTTON_MENU
 #endif
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
