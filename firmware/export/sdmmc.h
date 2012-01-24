@@ -57,7 +57,8 @@ typedef struct
 tCardInfo *card_get_info_target(int card_no);
 void sd_parse_csd(tCardInfo *card);
 
-#else /* STORAGE_MMC */
+#elif (CONFIG_STORAGE & STORAGE_MMC)
+#define card_enable_monitoring card_enable_monitoring_target
 
 #include "ata_mmc.h"
 #define card_get_info          mmc_card_info

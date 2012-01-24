@@ -41,6 +41,9 @@
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
 #include "ramdisk.h"
 #endif
+#if (CONFIG_STORAGE & STORAGE_LOOPBACK)
+#include "loopback.h"
+#endif
 
 struct storage_info
 {
@@ -201,6 +204,32 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
         #ifdef HAVE_HOTSWAP
             #define storage_removable(drive) ramdisk_removable(IF_MD(drive))
             #define storage_present(drive) ramdisk_present(IF_MD(drive))
+        #endif
+    #elif (CONFIG_STORAGE & STORAGE_LOOPBACK)
+        #define STORAGE_FUNCTION(NAME) (loopback_## NAME)
+        #define storage_spindown loopback_spindown
+        #define storage_sleep loopback_sleep
+        #define storage_spin loopback_spin
+
+        #define storage_enable(on) loopback_enable(on)
+        #define storage_sleepnow() loopback_sleepnow()
+        #define storage_disk_is_active() loopback_disk_is_active()
+        #define storage_soft_reset() loopback_soft_reset()
+        #define storage_init() loopback_init()
+        #define storage_close() loopback_close()
+        #ifdef HAVE_STORAGE_FLUSH
+            #define storage_flush() (void)0
+        #endif
+        #define storage_last_disk_activity() loopback_last_disk_activity()
+        #define storage_spinup_time() loopback_spinup_time()
+        #define storage_get_identify() loopback_get_identify()
+
+        #ifdef STORAGE_GET_INFO
+            #define storage_get_info(drive, info) loopback_get_info(IF_MD2(drive,) info)
+        #endif
+        #ifdef HAVE_HOTSWAP
+            #define storage_removable(drive) loopback_removable(IF_MD(drive))
+            #define storage_present(drive) loopback_present(IF_MD(drive))
         #endif
     #else
         //#error No storage driver!
