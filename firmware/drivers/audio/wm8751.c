@@ -40,10 +40,15 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
 #ifdef HAVE_RECORDING
-    /* -17.25dB to 30.0dB in 0.75dB increments 64 steps*/
-    [SOUND_LEFT_GAIN]     = {"dB", 2,  75, -1725, 3000, 0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 2,  75, -1725, 3000, 0},
-    [SOUND_MIC_GAIN]      = {"dB", 2,  75, -1725, 3000, 3000},
+    /* PGA -17.25dB to 30.0dB in 0.75dB increments 64 steps
+     * digital gain 0dB to 30.0dB in 0.5dB increments
+     * we use 0.75dB fake steps through whole range
+     *
+     * This combined gives -17.25 to 60.0dB 
+     */
+    [SOUND_LEFT_GAIN]     = {"dB", 2,  75, -1725, 6000, 0},
+    [SOUND_RIGHT_GAIN]    = {"dB", 2,  75, -1725, 6000, 0},
+    [SOUND_MIC_GAIN]      = {"dB", 2,  75, -1725, 6000, 3000},
 #endif
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     [SOUND_BASS_CUTOFF]   = {"Hz", 0, 70, 130, 200, 200},
@@ -181,13 +186,6 @@ void audiohw_set_treble_cutoff(int val)
 }
 #endif
 
-#ifdef HAVE_RECORDING
-static int recvol2hw(int value)
-{
-    /* -1725 to 3000 => 0 ... 23 ... 63 */
-    return ((4 * value) / 300) + 23;
-}
-#endif
 
 int sound_val2phys(int setting, int value)
 {
@@ -667,17 +665,59 @@ void audiohw_set_recsrc(int source, bool recording)
     } /* switch(source) */
 }
 
-/* Setup PGA gain */
+static int digital_gain2hw(int value)
+{
+    /* -9700 to 3000 => 0 ... 195 ... 255 */
+    return (2 * value) / 100 + 195;
+}
+
+static int pga_gain2hw(int value)
+{
+    /* -1725 to 3000 => 0 ... 23 ... 63 */
+    return ((4 * value) / 300) + 23;
+}
+
 void audiohw_set_recvol(int vol_l, int vol_r, int type)
 {
-    wmcodec_set_reg(LINVOL, LINVOL_LIZC | LINVOL_LINVOL(recvol2hw(vol_l)));
+    int d_vol_l = 0;
+    int d_vol_r = 0;
+
+    if (vol_l > 3000)
+    {
+        d_vol_l = vol_l - 3000;
+        vol_l = 3000;
+    }
+
+    if (vol_r > 3000)
+    {
+        d_vol_r = vol_r - 3000;
+        vol_r = 3000;
+    }
+
+    /* PGA left gain */
+    wmcodec_set_reg(LINVOL, LINVOL_LIZC | LINVOL_LINVOL(pga_gain2hw(vol_l)));
+
+    /* digital left gain set */
+    wmcodec_set_reg(LADCVOL, digital_gain2hw(d_vol_l));
 
     if (type == AUDIO_GAIN_MIC)
+    {
+        /* PGA right gain = PGA left gain*/
         wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RIZC |
-                                RINVOL_RINVOL(recvol2hw(vol_l)));
+                                RINVOL_RINVOL(pga_gain2hw(vol_l)));
+
+        /* digital right gain = digital left gain*/
+        wmcodec_set_reg(RADCVOL, RADCVOL_RAVU | digital_gain2hw(d_vol_l));
+    }
     else
+    {
+        /* PGA right gain */
         wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RIZC |
-                                RINVOL_RINVOL(recvol2hw(vol_r)));
+                                RINVOL_RINVOL(pga_gain2hw(vol_r)));
+
+        /* digital right gain */
+        wmcodec_set_reg(RADCVOL, RADCVOL_RAVU | digital_gain2hw(d_vol_r));
+    }
 }
 #endif /* HAVE_RECORDING */
 #endif /* HAVE_WM8750 */
