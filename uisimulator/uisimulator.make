@@ -30,7 +30,7 @@ $(SIMLIB): $$(SIMOBJ) $(UIBMP)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-$(BUILDDIR)/$(BINARY): $$(OBJ) $(SIMLIB) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB)
+$(BUILDDIR)/$(BINARY): $$(OBJ) $(SIMLIB) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB) $(UNWARMINDER)
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(SIMLIB) $(LDOPTS) $(GLOBAL_LDOPTS) \
 	-Wl,-Map,$(BUILDDIR)/rockbox.map
 

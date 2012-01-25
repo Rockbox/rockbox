@@ -114,7 +114,7 @@ dex: $(DEX)
 classes: $(R_OBJ) $(JAVA_OBJ)
 
 
-$(BUILDDIR)/$(BINARY): $$(OBJ) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB) $(CPUFEAT_BUILD)/cpu-features.o
+$(BUILDDIR)/$(BINARY): $$(OBJ) $(VOICESPEEXLIB) $(FIRMLIB) $(SKINLIB) $(UNWARMINDER) $(CPUFEAT_BUILD)/cpu-features.o
 	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(LDOPTS) $(GLOBAL_LDOPTS) -Wl,-Map,$(BUILDDIR)/rockbox.map
 	$(call PRINTS,OC $(@F))$(OC) -S -x $@
 

@@ -25,6 +25,9 @@
 #include "font.h"
 #include "gcc_extensions.h"
 
+#include <get_sp.h>
+#include <backtrace.h>
+
 static const char* const uiename[] = {
     "Undefined instruction",
     "Prefetch abort",
@@ -38,6 +41,12 @@ static const char* const uiename[] = {
  */
 void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
 {
+    /* safe guard variable - we call backtrace() only on first
+     * UIE call. This prevent endless loop if backtrace() touches
+     * memory regions which cause abort
+     */
+    static bool triggered = false;
+
 #if LCD_DEPTH > 1
     lcd_set_backdrop(NULL);
     lcd_set_drawmode(DRMODE_SOLID);
@@ -49,9 +58,7 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     lcd_setfont(FONT_SYSFIXED);
     lcd_set_viewport(NULL);
     lcd_clear_display();
-    lcd_puts(0, line++, uiename[num]);
-    lcd_putsf(0, line++, "at %08x" IF_COP(" (%d)"), pc
-             IF_COP(, CURRENT_CORE));
+    lcd_putsf(0, line++, "%s at %08x" IF_COP(" (%d)"), uiename[num], pc IF_COP(, CURRENT_CORE));
 
 #if !defined(CPU_ARM7TDMI) && (CONFIG_CPU != RK27XX) /* arm7tdmi has no MPU/MMU */
     if(num == 1 || num == 2) /* prefetch / data abort */
@@ -87,6 +94,12 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
         }
     }   /* num == 1 || num == 2 // prefetch/data abort */
 #endif /* !defined(CPU_ARM7TDMI */
+
+    if (!triggered)
+    {
+        triggered = true;
+        backtrace(pc, __get_sp(), &line);
+    }
 
     lcd_update();
 

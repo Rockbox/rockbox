@@ -78,6 +78,10 @@ ifndef APP_TYPE
   endif
 endif
 
+ifeq (arm,$(ARCH))
+    include $(ROOTDIR)/lib/unwarminder/unwarminder.make
+endif
+
 ifneq (,$(findstring bootloader,$(APPSDIR)))
   include $(APPSDIR)/bootloader.make
 else ifneq (,$(findstring bootbox,$(APPSDIR)))
@@ -170,6 +174,12 @@ ifeq (,$(findstring bootloader,$(APPSDIR)))
 
 OBJ += $(LANG_O)
 
+ifeq (arm,$(ARCH))
+  UNWARMINDER_LINK := -lunwarminder
+else
+  UNWARMINDER_LINK :=
+endif
+
 ifndef APP_TYPE
 
 ## target build
@@ -185,8 +195,6 @@ else
   LIBARMSUPPORT_LINK :=
 endif
 
-
-
 $(LINKRAM): $(RAMLDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
@@ -195,21 +203,21 @@ $(LINKROM): $(ROMLDS)
 	$(call PRINTS,PP $(@F))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
-$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(LINKRAM)
+$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(UNWARMINDER) $$(LINKRAM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(BUILDDIR)/lib -lskin_parser $(LIBARMSUPPORT_LINK) \
-		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
-		-lgcc $(BOOTBOXLDOPTS) $(GLOBAL_LDOPTS) \
-		-T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
+		$(UNWARMINDER_LINK) -L$(BUILDDIR)/apps/codecs \
+		$(VOICESPEEXLIB:lib%.a=-l%) -lgcc $(BOOTBOXLDOPTS) \
+		$(GLOBAL_LDOPTS) -T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
 
-$(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(LINKROM)
+$(BUILDDIR)/rombox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(LIBARMSUPPORT) $$(UNWARMINDER) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(BUILDDIR)/lib -lskin_parser $(LIBARMSUPPORT_LINK) \
-		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
-		-lgcc $(GLOBAL_LDOPTS) \
-        -T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
+                $(UNWARMINDER_LINK) -L$(BUILDDIR)/apps/codecs \
+		$(VOICESPEEXLIB:lib%.a=-l%) -lgcc $(GLOBAL_LDOPTS) \
+        	-T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
 
 $(BUILDDIR)/rockbox.bin : $(BUILDDIR)/rockbox.elf
 	$(call PRINTS,OC $(@F))$(OC) $(if $(filter yes, $(USE_ELF)), -S -x, -O binary) $< $@
