@@ -12794,11 +12794,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Zeilen in Listen auffüllen"
+    touchscreen: "Zeilenabstand in Listen"
   </dest>
   <voice>
     *: none
-    touchscreen: "Zeilen in Listen auffüllen"
+    touchscreen: "Zeilenabstand in Listen"
   </voice>
 </phrase>
 <phrase>
@@ -12823,10 +12823,10 @@
     *: "Automatic"
   </source>
   <dest>
-    *: "Automatik"
+    *: "Automatisch"
   </dest>
   <voice>
-    *: "Automatik"
+    *: "Automatisch"
   </voice>
 </phrase>
 <phrase>
@@ -12851,10 +12851,10 @@
     *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Einschlafzeit löschen"
+    *: "Einschlaftimer abbrechen"
   </dest>
   <voice>
-    *: "Einschlafzeit löschen"
+    *: "Einschlafzeit abbrechen"
   </voice>
 </phrase>
 <phrase>
@@ -12879,7 +12879,7 @@
     *: "Restart Sleep Timer On Keypress"
   </source>
   <dest>
-    *: "Einschlafzeit bei Tastendruck zurücksetzen"
+    *: "Einschlaftimer bei Tastendruck zurücksetzen"
   </dest>
   <voice>
     *: "Einschlafzeit bei Tastendruck zurücksetzen"
@@ -12893,7 +12893,7 @@
     *: "Default Sleep Timer Duration"
   </source>
   <dest>
-    *: "Standard Einschlafzeit"
+    *: "Standard Einschlaftimer"
   </dest>
   <voice>
     *: "Standard Einschlafzeit"
@@ -12921,9 +12921,9 @@
     *: "Start Sleep Timer On Boot"
   </source>
   <dest>
-    *: "Einschlafzeit beim Einschalten aktivieren"
+    *: "Einschlaftimer automatisch starten"
   </dest>
   <voice>
-    *: "Einschlafzeit beim Einschalten aktivieren"
+    *: "Einschlafzeit automatisch starten"
   </voice>
 </phrase>
