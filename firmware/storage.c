@@ -588,7 +588,7 @@ bool storage_removable(int drive)
     {
 #if (CONFIG_STORAGE & STORAGE_ATA)
     case STORAGE_ATA:
-        return ata_removable(ldrive);
+        return false;
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
@@ -625,7 +625,7 @@ bool storage_present(int drive)
     {
 #if (CONFIG_STORAGE & STORAGE_ATA)
     case STORAGE_ATA:
-        return ata_present(ldrive);
+        return true;
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
