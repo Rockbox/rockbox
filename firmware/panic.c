@@ -31,14 +31,42 @@
 #include "power.h"
 #include "system.h"
 
+#if defined(CPU_ARM)
+#include "gcc_extensions.h"
+#include <backtrace.h>
+#endif
+
 static char panic_buf[128];
 #define LINECHARS (LCD_WIDTH/SYSFONT_WIDTH) - 2
+
+#if defined(CPU_ARM)
+void panicf_f( const char *fmt, ...);
+
+/* we wrap panicf() here with naked function to catch SP value */
+void panicf( const char *fmt, ...)
+{
+    (void)fmt;
+    asm volatile ("mov r4, sp \n"
+                  "b panicf_f \n"
+                 );
+}
 
 /*
  * "Dude. This is pretty fucked-up, right here." 
  */
+void panicf_f( const char *fmt, ...)
+{
+    int sp;
+
+    asm volatile ("mov %[SP],r4 \n"
+                  : [SP] "=r" (sp)
+                 );
+
+    int pc = (int)__builtin_return_address(0);
+#else
 void panicf( const char *fmt, ...)
 {
+#endif
     va_list ap;
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -82,6 +110,10 @@ void panicf( const char *fmt, ...)
             panic_buf[i+LINECHARS] = c;
         }
     }
+
+#if defined(CPU_ARM)
+    backtrace(pc, sp, &y);
+#endif
 #else
     /* no LCD */
 #endif

@@ -25,6 +25,9 @@
 #include "font.h"
 #include "gcc_extensions.h"
 
+#include <get_sp.h>
+#include <backtrace.h>
+
 static const char* const uiename[] = {
     "Undefined instruction",
     "Prefetch abort",
@@ -49,9 +52,7 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     lcd_setfont(FONT_SYSFIXED);
     lcd_set_viewport(NULL);
     lcd_clear_display();
-    lcd_puts(0, line++, uiename[num]);
-    lcd_putsf(0, line++, "at %08x" IF_COP(" (%d)"), pc
-             IF_COP(, CURRENT_CORE));
+    lcd_putsf(0, line++, "%s at %08x" IF_COP(" (%d)"), uiename[num], pc IF_COP(, CURRENT_CORE));
 
 #if !defined(CPU_ARM7TDMI) && (CONFIG_CPU != RK27XX) /* arm7tdmi has no MPU/MMU */
     if(num == 1 || num == 2) /* prefetch / data abort */
@@ -88,6 +89,7 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     }   /* num == 1 || num == 2 // prefetch/data abort */
 #endif /* !defined(CPU_ARM7TDMI */
 
+    backtrace(pc, __get_sp(), &line);
     lcd_update();
 
     disable_interrupt(IRQ_FIQ_STATUS);

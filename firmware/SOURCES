@@ -433,7 +433,7 @@ target/coldfire/i2c-coldfire.c
 target/coldfire/ata-as-coldfire.S
 #endif
 
-#elif defined(CPU_PP) || (defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE)
+#elif defined(CPU_PP) || (defined(CPU_ARM) && (CONFIG_PLATFORM & PLATFORM_NATIVE))
 /* CPU_PP => CPU_ARM, CPU_ARM !=> CPU_PP */
 
 # if ARM_ARCH < 6
