@@ -121,8 +121,14 @@ int _battery_voltage(void)
 #if CONFIG_CHARGING
 unsigned int power_input_status(void)
 {
-    return charger_input_state >= CHARGER_PLUGGED
+    unsigned int status = charger_input_state >= CHARGER_PLUGGED
             ? POWER_INPUT_CHARGER : POWER_INPUT_NONE;
+
+#ifdef HAVE_BATTERY_SWITCH
+    status |= POWER_INPUT_BATTERY;
+#endif
+
+    return status;
 }
 
 bool charging_state(void)
