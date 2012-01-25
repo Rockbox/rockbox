@@ -475,14 +475,9 @@ void patch_firmware(
 
     /* Insert vectors, they won't overwrite the OF version string */
 
-    /* Reset vector: branch 0x200 bytes away, to our dualboot code */
-    static const uint8_t b_0x200[4] = { 0x7e, 0x00, 0x00, 0xea }; // b 0x200
-    memcpy(buf + 0x400, b_0x200, sizeof(b_0x200));
-
-    /* Other vectors: infinite loops */
-    static const uint8_t b_1b[4]    = { 0xfe, 0xff, 0xff, 0xea }; // 1: b 1b
-    for (i=1; i < 8; i++)
-        memcpy(buf + 0x400 + 4*i, b_1b, sizeof(b_1b));
+    /* Vectors: branch 0x200 bytes away, to our dualboot code */
+    for (i=0; i < 8; i++)
+        put_uint32le(buf + 0x400 + 4*i, 0xe3a0fc02); // mov pc, #0x200
 
     /* We are filling the firmware buffer backwards from the end */
     p = buf + 0x400 + firmware_size;
