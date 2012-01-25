@@ -29,9 +29,16 @@
 #include "powermgmt.h"
 
 #define SLIDER_BASE_SENSITIVITY 8
+#define SLIDER_REL_TIMEOUT HZ/2
 
 /* GPI7 H-L, GPI6 H-L, GPI7 L-H, GPI6 L-H */
 #define SLIDER_GPIO_MASK ((1<<15)|(1<<14)|(1<<7)|(1<<6))
+
+static volatile struct scroll_state_t {
+    signed char dir;
+    long timeout;
+    bool rel;
+} scroll;
 
 static inline void disable_scrollstrip_interrupts(void)
 {
@@ -89,10 +96,20 @@ void scrollstrip_isr(void)
 
     scroll_dir = scroll_state[prev_scroll_lines][new_scroll_lines];
     prev_scroll_lines = new_scroll_lines;
-    
+
+    /* catch sequence error */
+    if (scroll_dir == BUTTON_NONE)
+        return;
+
+    /* direction reversal */
     if (direction != scroll_dir)
     {
-        /* direction reversal */
+        /* post release event to the button queue */
+        if (queue_empty(&button_queue))
+            queue_post(&button_queue, direction|BUTTON_REL, 0);
+
+        scroll.rel = true;
+
         direction = scroll_dir;
         count = 0;
         ack_scrollstrip_interrupt();
@@ -120,6 +137,10 @@ void scrollstrip_isr(void)
     /* post scrollstrip event to the button queue */
     if (queue_empty(&button_queue))
         queue_post(&button_queue, scroll_dir, 0);
+
+    scroll.dir = scroll_dir;
+    scroll.timeout = current_tick + SLIDER_REL_TIMEOUT;
+    scroll.rel = false;
 
     ack_scrollstrip_interrupt();
     enable_scrollstrip_interrupts();
@@ -234,6 +255,16 @@ int button_read_device(void)
            btn |= BUTTON_MENU;
 
     } /* !button_hold() */
+
+    if (!scroll.rel)
+        if (TIME_AFTER(current_tick, scroll.timeout))
+        {
+            if (queue_empty(&button_queue))
+            {
+                queue_post(&button_queue, scroll.dir|BUTTON_REL, 0);
+                scroll.rel = true;
+            }
+        }
 
     return btn;
 }
