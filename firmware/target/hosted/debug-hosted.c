@@ -24,6 +24,7 @@
 #include <string.h>
 
 #ifdef WIN32
+#include <windows.h>
 static unsigned old_cp;
 
 void debug_exit(void)
