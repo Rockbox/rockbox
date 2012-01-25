@@ -379,6 +379,7 @@ font: 08-Schumacher-Clean.fnt
 foreground color: 000000
 background color: B6C6E5
 selector type: bar (inverse)
+backdrop: -
 STOP
 ;
     close(FOO);
