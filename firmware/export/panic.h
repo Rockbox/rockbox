@@ -22,8 +22,12 @@
 #ifndef __PANIC_H__
 #define __PANIC_H__
 
+#include "config.h"
 #include "gcc_extensions.h"
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CPU_ARM)
+void panicf( const char *fmt, ... ) __attribute__ ((naked));
+#else
 void panicf( const char *fmt, ... ) ATTRIBUTE_PRINTF(1, 2);
-
+#endif
 #endif /* __PANIC_H__ */

@@ -447,6 +447,15 @@ target/arm/mmu-arm.S
 # endif
 target/arm/system-arm.c
 
+/* arm stack unwinder */
+target/arm/unwarminder/client.c
+target/arm/unwarminder/get_sp.c
+target/arm/unwarminder/unwarm_arm.c
+target/arm/unwarminder/unwarm.c
+target/arm/unwarminder/unwarminder.c
+target/arm/unwarminder/unwarmmem.c
+target/arm/unwarminder/unwarm_thumb.c
+
 #if CONFIG_STORAGE & STORAGE_ATA
 # ifdef CPU_PP502x
 target/arm/pp/ata-pp5020.c
