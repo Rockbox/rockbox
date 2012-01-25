@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAABn////w\u003d",
+        "filename": "firmware/export/loopback.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2012-01-25T00:48:34Z",
+      "side": 1,
+      "message": "Looks like the contents of this file was duplicated.\nAlso, no \"#endif /* __LOOPBACK_H__ */\".",
+      "revId": "9a230522a03789acee1ec9fe74a19fc39a5c8481",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn////s\u003d",
+        "filename": "firmware/storage.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2012-01-25T00:48:34Z",
+      "side": 1,
+      "message": "Is this change related to loopback?",
+      "revId": "9a230522a03789acee1ec9fe74a19fc39a5c8481",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn////o\u003d",
+        "filename": "firmware/storage.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2012-01-25T00:48:34Z",
+      "side": 1,
+      "message": "Same here",
+      "revId": "9a230522a03789acee1ec9fe74a19fc39a5c8481",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
