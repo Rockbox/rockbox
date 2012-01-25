@@ -1041,44 +1041,59 @@ draw_hoshi (unsigned short pos)
 static void
 draw_all_hoshi (void)
 {
-    if (board_width != board_height)
+    if (board_width != board_height ||
+        board_width <= 2 ||
+        board_width == 4 ||
+        board_width == 6)
     {
         return;
     }
 
-    if (board_width == 19)
+    if (board_width == 3)
     {
-        draw_hoshi (POS (3, 3));
-        draw_hoshi (POS (3, 9));
-        draw_hoshi (POS (3, 15));
-
-        draw_hoshi (POS (9, 3));
-        draw_hoshi (POS (9, 9));
-        draw_hoshi (POS (9, 15));
-
-        draw_hoshi (POS (15, 3));
-        draw_hoshi (POS (15, 9));
-        draw_hoshi (POS (15, 15));
+        draw_hoshi (POS (1, 1));
+        return;
     }
-    else if (board_width == 9)
+
+    if (board_width == 5)
     {
+        draw_hoshi (POS (1, 1));
+        draw_hoshi (POS (1, 3));
         draw_hoshi (POS (2, 2));
-        draw_hoshi (POS (2, 6));
-
-        draw_hoshi (POS (4, 4));
-
-        draw_hoshi (POS (6, 2));
-        draw_hoshi (POS (6, 6));
-    }
-    else if (board_width == 13)
-    {
+        draw_hoshi (POS (3, 1));
         draw_hoshi (POS (3, 3));
-        draw_hoshi (POS (3, 9));
+        return;
+    }
 
-        draw_hoshi (POS (6, 6));
+    /* special case boards taken care of, handle the general case
+     *
+     * Note: board_width == board_height here (or we bailed out) so the two
+     * are interchangeable */
+    int low_edge = (board_width < 12) ? 2 : 3;
+    int high_edge = board_width - low_edge - 1;
+    int mid = board_width / 2;
 
-        draw_hoshi (POS (9, 3));
-        draw_hoshi (POS (9, 9));
+    /* corner hoshi, for big enough boards */
+    if (board_width > 7)
+    {
+        draw_hoshi (POS (low_edge, low_edge));
+        draw_hoshi (POS (low_edge, high_edge));
+        draw_hoshi (POS (high_edge, low_edge));
+        draw_hoshi (POS (high_edge, high_edge));
+    }
 
+    /* side hoshi, for big enough boards (only makes sense on odd) */
+    if (board_width > 12 && board_width % 2 == 1)
+    {
+        draw_hoshi (POS (low_edge, mid));
+        draw_hoshi (POS (mid, low_edge));
+        draw_hoshi (POS (high_edge, mid));
+        draw_hoshi (POS (mid, high_edge));
+    }
+
+    /* center hoshi */
+    if (board_width % 2 == 1)
+    {
+        draw_hoshi (POS (mid, mid));
     }
 }
