@@ -21,6 +21,8 @@
 #include "plugin.h"
 #include "lib/helper.h"
 #include "lib/grey.h"
+#include "lib/pluginlib_touchscreen.h"
+#include "lib/pluginlib_exit.h"
 
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -39,6 +41,8 @@
 #define FPS_QUIT (BUTTON_M|BUTTON_REPEAT)
 #elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
 #define FPS_QUIT BUTTON_BACK
+#elif defined(HAVE_TOUCHSCREEN)
+#define FPS_QUIT (BUTTON_BOTTOMMIDDLE|BUTTON_REL)
 #elif defined(BUTTON_OFF)
 #define FPS_QUIT BUTTON_OFF
 #else
@@ -356,6 +360,47 @@ static void time_greyscale(void)
 }
 #endif
 
+static struct touchbutton button[] = {
+    {
+        .action = ACTION_STD_OK,
+        .title = "OK",
+        /* viewport runtime initialized, rest false/NULL */
+    }
+};
+
+void plugin_quit(void)
+{
+#ifdef HAVE_TOUCHSCREEN
+    struct viewport *vp = &button[0].vp;
+    struct screen *lcd = rb->screens[SCREEN_MAIN];
+    rb->viewport_set_defaults(vp, SCREEN_MAIN);
+    const int border = 10;
+    const int height = 50;
+
+    lcd->set_viewport(vp);
+    /* button matches the bottom center in the grid */
+    vp->x = lcd->lcdwidth/3;
+    vp->width = lcd->lcdwidth/3;
+    vp->height = height;
+    vp->y = lcd->lcdheight - height - border;
+
+    touchbutton_draw(button, ARRAYLEN(button));
+    lcd->update_viewport();
+    if (rb->touchscreen_get_mode() == TOUCHSCREEN_POINT)
+    {
+        while(touchbutton_get(button, ARRAYLEN(button)) != ACTION_STD_OK);
+    }
+    else
+#endif
+        while (1)
+        {
+            int btn = rb->button_get(true);
+            exit_on_usb(btn);
+            if (btn == FPS_QUIT)
+                break;
+        }
+}
+
 /* plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -367,6 +412,10 @@ enum plugin_status plugin_start(const void* parameter)
     /* standard stuff */
     (void)parameter;
     
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+#endif
+
     log_init();
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
@@ -396,7 +445,7 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_use_settings();
 
     /* wait until user closes plugin */
-    while (rb->button_get(true) != FPS_QUIT);
+    plugin_quit();
 
     return PLUGIN_OK;
 }

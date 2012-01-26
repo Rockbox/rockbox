@@ -19,6 +19,8 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/pluginlib_touchscreen.h"
+#include "lib/pluginlib_exit.h"
 
 /* All swcodec targets have BUTTON_SELECT apart from the H10 and M3 */
 
@@ -42,7 +44,7 @@
 #elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
 #define TESTCODEC_EXITBUTTON BUTTON_BACK
 #elif defined(HAVE_TOUCHSCREEN)
-#define TESTCODEC_EXITBUTTON BUTTON_TOPLEFT
+#define TESTCODEC_EXITBUTTON (BUTTON_BOTTOMMIDDLE|BUTTON_REL)
 #else
 #define TESTCODEC_EXITBUTTON BUTTON_SELECT
 #endif
@@ -807,6 +809,54 @@ exit:
     return res;
 }
 
+#ifdef HAVE_TOUCHSCREEN
+void cleanup(void)
+{
+    rb->screens[0]->set_viewport(NULL);
+}
+#endif
+
+
+static struct touchbutton button[] = {
+    {
+        .action = ACTION_STD_OK,
+        .title = "OK",
+        /* viewport runtime initialized, rest false/NULL */
+    }
+};
+
+void plugin_quit(void)
+{
+    int btn;
+#ifdef HAVE_TOUCHSCREEN
+    struct viewport *vp = &button[0].vp;
+    struct screen *lcd = rb->screens[SCREEN_MAIN];
+    rb->viewport_set_defaults(vp, SCREEN_MAIN);
+    const int border = 10;
+    const int height = 50;
+
+    lcd->set_viewport(vp);
+    /* button matches the bottom center in the grid */
+    vp->x = lcd->lcdwidth/3;
+    vp->width = lcd->lcdwidth/3;
+    vp->height = height;
+    vp->y = lcd->lcdheight - height - border;
+
+    touchbutton_draw(button, ARRAYLEN(button));
+    lcd->update_viewport();
+    if (rb->touchscreen_get_mode() == TOUCHSCREEN_POINT)
+    {
+        while (codec_action != CODEC_ACTION_HALT &&
+               touchbutton_get(button, ARRAYLEN(button)) != ACTION_STD_OK);
+    }
+    else
+#endif
+        do {
+            btn = rb->button_get(true);
+            exit_on_usb(btn);
+        } while (codec_action != CODEC_ACTION_HALT && btn != TESTCODEC_EXITBUTTON);
+}
+
 /* plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -838,6 +888,10 @@ enum plugin_status plugin_start(const void* parameter)
 
     rb->lcd_clear_display();
     rb->lcd_update();
+
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+#endif
 
     enum
     {
@@ -980,10 +1034,8 @@ menu:
             close_wav();
             log_text("Wrote /test.wav",true);
         }
-
-        while (codec_action != CODEC_ACTION_HALT &&
-               rb->button_get(true) != TESTCODEC_EXITBUTTON);
     }
+    plugin_quit();
 
     #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         if(boost)
