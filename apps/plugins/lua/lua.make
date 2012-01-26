@@ -33,7 +33,7 @@ endif
 $(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/rocklib_aux.o
 
 $(LUA_BUILDDIR)/actions.lua: $(LUA_OBJ) $(LUA_SRCDIR)/action_helper.pl
-	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E $(APPSDIR)/action.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
+	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E $(APPSDIR)/plugins/lib/pluginlib_actions.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
 
 $(LUA_BUILDDIR)/buttons.lua: $(LUA_OBJ) $(LUA_SRCDIR)/button_helper.pl
 	$(SILENT)$(CC) $(INCLUDES) -dM -E -include button-target.h - < /dev/null | $(LUA_SRCDIR)/button_helper.pl | $(HOSTCC) -fno-builtin $(INCLUDES) -x c -o $(LUA_BUILDDIR)/button_helper -

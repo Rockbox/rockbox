@@ -28,6 +28,12 @@ while(my $line = <STDIN>)
         $actions[$i] = sprintf("\t%s = %d,\n", $1, $i);
         $i++;
     }
+    elsif($line =~ /^\s*(PLA_[^\s]+)(\s*=.*)?,\s*$/)
+    {
+        # PLA_* begins at LAST_ACTION_PLACEHOLDER+1, thus i+1
+        $actions[$i] = sprintf("\t%s = %d,\n", $1, $i+1);
+        $i++;
+    }
     elsif($line =~ /^\s*(CONTEXT_[^\s]+)(\s*=.*)?,\s*$/)
     {
         $contexts[$j] = sprintf("\t%s = %d,\n", $1, $j);

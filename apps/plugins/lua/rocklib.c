@@ -28,6 +28,7 @@
 #include "lauxlib.h"
 #include "rocklib.h"
 #include "lib/helper.h"
+#include "lib/pluginlib_actions.h"
 
 /*
  * http://www.lua.org/manual/5.1/manual.html#lua_CFunction
@@ -613,6 +614,24 @@ RB_WRAP(backlight_brightness_set)
 SIMPLE_VOID_WRAPPER(backlight_brightness_use_setting);
 #endif
 
+RB_WRAP(get_plugin_action)
+{
+    static const struct button_mapping *m1[] = { pla_main_ctx };
+    int timeout = luaL_checkint(L, 1);
+    int btn;
+#ifdef HAVE_REMOTE_LCD
+    static const struct button_mapping *m2[] = { pla_main_ctx, pla_remote_ctx };
+    bool with_remote = luaL_optint(L, 2, 0);
+    if (with_remote)
+        btn = pluginlib_getaction(timeout, m2, 2);
+    else
+#endif
+        btn = pluginlib_getaction(timeout, m1, 1);
+
+    lua_pushinteger(L, btn);
+    return 1;
+}
+
 #define R(NAME) {#NAME, rock_##NAME}
 static const luaL_Reg rocklib[] =
 {
@@ -670,6 +689,7 @@ static const luaL_Reg rocklib[] =
     R(backlight_brightness_set),
     R(backlight_brightness_use_setting),
 #endif
+    R(get_plugin_action),
 
     {"new_image", rli_new},
 
