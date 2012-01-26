@@ -22,6 +22,7 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
         ,GIGABEAT_S_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD%
         ,SANSA_CLIP_PAD}
         {\ButtonLeft{} / \ButtonRight}
+    \opt{MPIO_HD300_PAD}{\ButtonRew / \ButtonFF / \ButtonScrollUp / \ButtonScrollDown}
     \opt{COWON_D2_PAD}{\TouchTopMiddle{} / \TouchBottomMiddle{} / \TouchMidLeft{} / \TouchMidRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Direction keys\\
@@ -35,6 +36,7 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolUp}
     \opt{COWON_D2_PAD}{\ButtonPlus}
     \opt{PBELL_VIBE500_PAD}{\ButtonPower}
+    \opt{MPIO_HD300_PAD}{\ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
     & A button\\
     %
@@ -47,6 +49,7 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
     \opt{IRIVER_H10_PAD}{\ButtonFF}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolDown}
     \opt{COWON_D2_PAD}{\ButtonMinus}
+    \opt{MPIO_HD300_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{& }
     & B button\\
     %
@@ -61,6 +64,7 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}
     \opt{COWON_D2_PAD}{\TouchTopRight}
+    \opt{MPIO_HD300_PAD}{Long \ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Start\\
     %
@@ -73,13 +77,14 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
         \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
         \opt{COWON_D2_PAD}{\TouchCenter}
         \opt{PBELL_VIBE500_PAD}{\ButtonUp}
+        \opt{MPIO_HD300_PAD}{\ButtonEnter}
                \opt{HAVEREMOTEKEYMAP}{& }
         & Select\\
         %
     }
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,iaudiom5}{
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,iaudiom5,MPIO_HD300_PAD}{
         \opt{RECORDER_PAD}{\ButtonOn}
-        \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD}{\ButtonHold{} switch}
+        \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD,MPIO_HD300_PAD}{\ButtonHold{} switch}
               \opt{HAVEREMOTEKEYMAP}{& }
         & Cycle display scaling modes\\
     %  defined for the Recorders and targets with 160x128x2 displays (H100, M5)
@@ -89,7 +94,8 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
     \opt{IPOD_4G_PAD}{\ButtonHold{} switch}
     \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%
     ,IRIVER_H10_PAD,SANSA_CLIP_PAD}{\ButtonPower}
-    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,COWON_D2_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
+    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,COWON_D2_PAD,PBELL_VIBE500_PAD%
+        ,MPIO_HD300_PAD}{\ButtonMenu}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Open Rockboy menu\\
 \end{btnmap}

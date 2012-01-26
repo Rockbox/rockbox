@@ -2,9 +2,11 @@
 \subsection{Logo}
 Demo showing the Rockbox logo bouncing around the screen.
 \begin{btnmap}
-    \nopt{touchscreen,IAUDIO_M3_PAD,MPIO_HD200_PAD}{\ButtonRight\ / \ButtonLeft}%
-    \opt{MPIO_HD200_PAD}{FIXME}
-    \opt{touchscreen}{\TouchMidRight\ / \TouchMidLeft}
+    \nopt{touchscreen,IAUDIO_M3_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD}%
+         {\ButtonRight / \ButtonLeft}%
+    \opt{MPIO_HD200_PAD}{\ButtonVolUp / \ButtonVolDown}
+    \opt{MPIO_HD300_PAD}{\ButtonFF / \ButtonRew}
+    \opt{touchscreen}{\TouchMidRight / \TouchMidLeft}
         &
     \opt{HAVEREMOTEKEYMAP}{
         \opt{IRIVER_RC_H100_PAD}{\ButtonRCRew\ / \ButtonRCFF}
@@ -13,11 +15,12 @@ Demo showing the Rockbox logo bouncing around the screen.
         \\
 
     \nopt{PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,touchscreen%
-        ,IAUDIO_M3_PAD,MPIO_HD200_PAD}{\ButtonUp\ / \ButtonDown}%
+         ,IAUDIO_M3_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD}%
+         {\ButtonUp\ / \ButtonDown}%
     \opt{PLAYER_PAD}{\ButtonOn+\ButtonRight\ / \ButtonOn+\ButtonLeft}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd\ / \ButtonScrollBack}
-    \opt{IRIVER_H10_PAD}{\ButtonScrollUp\ / \ButtonScrollDown}
-    \opt{MPIO_HD200_PAD}{FIXME / FIXME}
+    \opt{IRIVER_H10_PAD,MPIO_HD300_PAD}{\ButtonScrollUp\ / \ButtonScrollDown}
+    \opt{MPIO_HD200_PAD}{\ButtonFF / \ButtonRew}
     \opt{touchscreen}{\TouchBottomMiddle\ / \TouchTopMiddle}
         &
     \opt{HAVEREMOTEKEYMAP}{
@@ -34,7 +37,8 @@ Demo showing the Rockbox logo bouncing around the screen.
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec}
-    \opt{MPIO_HD200_PAD}{FIXME}
+    \opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}
+    \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
         &
     \opt{HAVEREMOTEKEYMAP}{
         \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}

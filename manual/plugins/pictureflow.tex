@@ -24,7 +24,7 @@ aware:
 
 \subsubsection{Keys}
     \begin{btnmap}
-        \opt{scrollwheel,IRIVER_H10_PAD,PBELL_VIBE500_PAD}{
+        \opt{scrollwheel,IRIVER_H10_PAD,PBELL_VIBE500_PAD,MPIO_HD300_PAD}{
             \ActionStdPrev{} / \ActionStdNext
                 &
             \opt{HAVEREMOTEKEYMAP}{
@@ -34,7 +34,7 @@ aware:
         }
         
         % only scroll wheel and `strip' targets use the same action in album and track list
-        \nopt{scrollwheel,IRIVER_H10_PAD,PBELL_VIBE500_PAD}{%
+        \nopt{scrollwheel,IRIVER_H10_PAD,PBELL_VIBE500_PAD,MPIO_HD300_PAD}{%
             % currently the M3 does not use buttons of the main unit which has no display
             \nopt{IAUDIO_M3_PAD,MPIO_HD200_PAD,touchscreen}{\ButtonLeft{} / \ButtonRight}
             \opt{MPIO_HD200_PAD}{FIXME}
@@ -58,14 +58,16 @@ aware:
         }
 
         \nopt{IAUDIO_M3_PAD}{%
-            \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD,touchscreen,PBELL_VIBE500_PAD,SANSA_FUZE_PAD,MPIO_HD200_PAD}
+            \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD,touchscreen,PBELL_VIBE500_PAD%
+                 ,SANSA_FUZE_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD}
                  {\ButtonSelect}
             \opt{ONDIO_PAD}{\ButtonUp} 
             \opt{IRIVER_H10_PAD,PBELL_VIBE500_PAD}{\ButtonRight} 
             \opt{RECORDER_PAD}{\ButtonOn} 
             \opt{touchscreen}{\TouchCenter}
             \opt{SANSA_FUZE_PAD}{\ButtonRight}
-            \opt{MPIO_HD200_PAD}{FIXME}
+            \opt{MPIO_HD200_PAD}{\ButtonFunc}
+            \opt{MPIO_HD300_PAD}{\ButtonEnter}
         }
             &
         \opt{HAVEREMOTEKEYMAP}{
@@ -84,8 +86,9 @@ aware:
                 \\
         }
         
-        \nopt{IAUDIO_M3_PAD,MPIO_HD200_PAD,touchscreen}{\ButtonLeft}
-        \opt{MPIO_HD200_PAD}{FIXME}
+        \nopt{IAUDIO_M3_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen}{\ButtonLeft}
+        \opt{MPIO_HD200_PAD}{\ButtonRec}
+        \opt{MPIO_HD300_PAD}{\ButtonMenu}
         \opt{touchscreen}{
             \opt{COWON_D2_PAD}{\ButtonPower{} or}
             \TouchBottomRight}
@@ -113,6 +116,7 @@ aware:
             \opt{SANSA_FUZE_PAD}{Long \ButtonHome} 
             \opt{PBELL_VIBE500_PAD}{\ButtonRec}
             \opt{MPIO_HD200_PAD}{FIXME}
+            \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
             \opt{touchscreen}{
                 \opt{COWON_D2_PAD}{Long \ButtonPower{} or}
                 \TouchBottomRight{} (in album view)}

@@ -7,19 +7,26 @@
 
 
 \begin{enumerate}
-   \item Download official Rockbox bootloader for MPIO HD200 from
-   \url {http://download.rockbox.org/bootloader/mpio/hd200}
+   \item Download official Rockbox bootloader for MPIO \playertype{} from
+   \opt{mpiohd200}{
+       \url {http://download.rockbox.org/bootloader/mpio/hd200}}%
+   \opt{mpiohd300}{
+       \url {http://download.rockbox.org/bootloader/mpio/hd300}}
    and save it to your desktop. The archive contains three files: bootloader.mpio, 
    bootloader.map and rockbox-info.txt. The first file is actual bootloader, two
    others can be used for debugging and are irrelevant for end user.
    \item Download mkmpioboot utility from \url{http://download.rockbox.org/bootloader/mpio/mkmpioboot}
    \item Process previously downloaded official firmware to include rockbox bootloader.
    Open terminal window and type the following command:
-     \begin{code}
+     \begin{code}[firstline=\opt{mpiohd200}{1}\opt{mpiohd300}{2},
+                  lastline=\opt{mpiohd200}{1}\opt{mpiohd300}{2}]
        mkmpioboot HD200_UPG.SYS bootloader.mpio HD200_UPG.rb
+       mkmpioboot HD300_UPG.SYS bootloader.mpio HD300_UPG.rb
      \end{code}
-   \item Copy \fname{HD200\_UPG.rb} to the SYSTEM folder of your \dap{} and rename back to
-   \fname{HD200\_UPG.SYS}
+   \item Copy \opt{mpiohd200}{\fname{HD200\_UPG.rb}}%
+              \opt{mpiohd300}{\fname{HD300\_UPG.rb}} 
+   to the SYSTEM folder of your \dap{} and rename back to
+   \opt{mpiohd200}{\fname{HD200\_UPG.SYS}}\opt{mpiohd300}{\fname{HD300\_UPG.SYS}}
    \item Safe eject your \dap{}
    \item Connect Wall charger and turn on the device. This should trigger firmware
    upgrade process which will install rockbox bootloader to the flash memory of the

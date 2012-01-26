@@ -359,7 +359,7 @@ filesystem.\\*
   files using \fname{unzip}.
 }
 
-\opt{mpiohd200}{
+\opt{mpiohd200,mpiohd300}{
   Rockbox Utility will ask you for a compatible copy of the original
   firmware. This is because for legal reasons we cannot distribute
   the bootloader directly. Instead, we have to patch the MPIO firmware
@@ -367,9 +367,11 @@ filesystem.\\*
 
   Download a supported version of the MPIO firmware for your 
   \playername{} from the MPIO website, links can be found on 
-  \wikilink{MPIOHD200Port}.
+  \opt{mpiohd200}{\wikilink{MPIOHD200Port}}%
+  \opt{mpiohd300}{\wikilink{MPIOHD300Port}}.
 
-  \warn{The only tested version of the original firmware is 1.30.05
+  \warn{The only tested version of the original firmware is
+  \opt{mpiohd200}{1.30.05}\opt{mpiohd300}{1.30.06}
   and as such is the only supported version}
 
   If the file that you downloaded is a \fname{.zip} file, use an unzip
@@ -488,7 +490,7 @@ structure that Rockbox needs.\\}
     \nopt{gigabeats}{%
     \subsubsection{Installing the bootloader}
         \opt{iriverh100,iriverh300}{\input{getting_started/iriver_install.tex}}
-        \opt{mpiohd200}{\input{getting_started/mpio_install.tex}}
+        \opt{mpiohd200,mpiohd300}{\input{getting_started/mpio_install.tex}}
         \opt{ipod}{\input{getting_started/ipod_install.tex}}
         \opt{iaudio}{\input{getting_started/iaudio_install.tex}}
         \opt{iriverh10,iriverh10_5gb}{\input{getting_started/h10_install.tex}}

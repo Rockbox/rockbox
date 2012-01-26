@@ -53,8 +53,9 @@ Game controls:}
 
 \nopt{RECORDER_PAD}{
     \begin{btnmap}
-        \nopt{MPIO_HD200_PAD,touchscreen}{\ButtonLeft}
-        \opt{MPIO_HD200_PAD}{FIXME}
+        \nopt{MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen}{\ButtonLeft}
+        \opt{MPIO_HD200_PAD}{\ButtonVolDown}
+        \opt{MPIO_HD300_PAD}{\ButtonRew}
         \opt{touchscreen}{\TouchMidLeft}
             &
         \opt{HAVEREMOTEKEYMAP}{
@@ -62,8 +63,9 @@ Game controls:}
         Turn left
         \\
         
-        \nopt{MPIO_HD200_PAD,touchscreen}{\ButtonRight}
-        \opt{MPIO_HD200_PAD}{FIXME}
+        \nopt{MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen}{\ButtonRight}
+        \opt{MPIO_HD200_PAD}{\ButtonVolUp}
+        \opt{MPIO_HD300_PAD}{\ButtonFF}
         \opt{touchscreen}{\TouchMidRight}
             &
         \opt{HAVEREMOTEKEYMAP}{
@@ -72,10 +74,11 @@ Game controls:}
         \\
         
         \nopt{IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,MPIO_HD200_PAD%
-            ,touchscreen}{\ButtonUp}
+            ,MPIO_HD300_PAD,touchscreen}{\ButtonUp}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
         \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
-        \opt{MPIO_HD200_PAD}{FIXME}
+        \opt{MPIO_HD200_PAD}{\ButtonRew}
+        \opt{MPIO_HD300_PAD}{\ButtonScrollUp}
         \opt{touchscreen}{\TouchTopMiddle}
             &
         \opt{HAVEREMOTEKEYMAP}{
@@ -84,10 +87,11 @@ Game controls:}
         \\
         
         \nopt{IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,MPIO_HD200_PAD%
-            ,touchscreen}{\ButtonDown}
+            ,MPIO_HD300_PAD,touchscreen}{\ButtonDown}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}
         \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
-        \opt{MPIO_HD200_PAD}{FIXME}
+        \opt{MPIO_HD200_PAD}{\ButtonFF}
+        \opt{MPIO_HD300_PAD}{\ButtonScrollDown}
         \opt{touchscreen}{\TouchBottomMiddle}
             &
         \opt{HAVEREMOTEKEYMAP}{
@@ -131,11 +135,11 @@ The game is over when all worms are dead. The longest worm wins the
 game. 
 \item [Pause the game.]
 Press
-\opt{RECORDER_PAD,IAUDIO_X5_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}%
+\opt{RECORDER_PAD,IAUDIO_X5_PAD,PBELL_VIBE500_PAD,MPIO_HD200_PAD%
+    ,MPIO_HD300_PAD}{\ButtonPlay}%
 \opt{ONDIO_PAD}{\ButtonMenu}%
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD%
   ,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
-\opt{MPIO_HD200_PAD}{FIXME}
 \opt{COWON_D2_PAD}{\TouchCenter}
 to pause the game. Press it again to resume the game.
 
@@ -149,7 +153,8 @@ There are two ways to stop a running game.
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}%
 \opt{PBELL_VIBE500_PAD}{\ButtonRec}%
-\opt{MPIO_HD200_PAD}{FIXME}%
+\opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}%
+\opt{MPIO_HD300_PAD}{Long \ButtonMenu}%
 \opt{GIGABEAT_S_PAD}{\ButtonBack}.
 The game will stop immediately and you will return to the game menu. 
 \item If you want to stop the game and still see the screen hit 
@@ -160,7 +165,8 @@ The game will stop immediately and you will return to the game menu.
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
 \opt{GIGABEAT_PAD}{\ButtonA}%
 \opt{PBELL_VIBE500_PAD}{\ButtonCancel}%
-\opt{MPIO_HD200_PAD}{FIXME}%
+\opt{MPIO_HD200_PAD}{Long \ButtonFunc}%
+\opt{MPIO_HD300_PAD}{Long \ButtonPlay}%
 \opt{GIGABEAT_S_PAD}{\ButtonMenu}.
 This freezes the game. If you hit
 \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
@@ -170,7 +176,8 @@ This freezes the game. If you hit
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
 \opt{GIGABEAT_PAD}{\ButtonA}%
 \opt{PBELL_VIBE500_PAD}{\ButtonCancel}%
-\opt{MPIO_HD200_PAD}{FIXME}%
+\opt{MPIO_HD200_PAD}{Long \ButtonFunc}%
+\opt{MPIO_HD300_PAD}{Long \ButtonPlay}%
 \opt{GIGABEAT_S_PAD}{\ButtonMenu}
 button again a new game starts with the same configuration. To return to the
 games menu you can hit
@@ -179,7 +186,8 @@ games menu you can hit
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{PBELL_VIBE500_PAD}{\ButtonRec}%
-\opt{MPIO_HD200_PAD}{FIXME}%
+\opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}%
+\opt{MPIO_HD300_PAD}{Long \ButtonMenu}%
 \opt{GIGABEAT_S_PAD}{\ButtonBack}. A stopped game can not be resumed. 
 \end{itemize}
 \end{description}

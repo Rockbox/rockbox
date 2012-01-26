@@ -26,6 +26,7 @@ information about the level format, see
     {\ButtonLeft, \ButtonRight}
 \opt{COWON_D2_PAD}
     {\TouchTopMiddle, \TouchBottomMiddle, \TouchMidLeft, \TouchMidRight}
+\opt{MPIO_HD300_PAD}{\ButtonScrollUp, \ButtonScrollDown, \ButtonRew, \ButtonFF}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move the ``sokoban'' up, down, left, or right\\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
@@ -33,6 +34,7 @@ information about the level format, see
 \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}
+\opt{MPIO_HD300_PAD}{Long \ButtonMenu}
 \opt{PBELL_VIBE500_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{&
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
@@ -50,6 +52,7 @@ information about the level format, see
     \opt{GIGABEAT_S_PAD}{\ButtonPrev}
     \opt{COWON_D2_PAD}{\ButtonMinus}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonLeft}
+    \opt{MPIO_HD300_PAD}{\ButtonPlay + \ButtonRew}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Back to previous level \\
 }
@@ -64,6 +67,7 @@ information about the level format, see
     \opt{GIGABEAT_S_PAD}{\ButtonPlay}
     \opt{COWON_D2_PAD}{\TouchTopRight}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonCancel}
+    \opt{MPIO_HD300_PAD}{\ButtonPlay + \ButtonEnter}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Restart level \\
 }
@@ -79,6 +83,7 @@ information about the level format, see
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}
     \opt{COWON_D2_PAD}{\ButtonPlus}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonRight}
+    \opt{MPIO_HD300_PAD}{\ButtonPlay + \ButtonFF}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Go to next level \\
 }
@@ -90,6 +95,7 @@ information about the level format, see
 \opt{GIGABEAT_S_PAD}{\ButtonVolUp}
 \opt{COWON_D2_PAD}{\TouchTopRight}
 \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
+\opt{MPIO_HD300_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Undo last movement \\
 
@@ -105,12 +111,14 @@ information about the level format, see
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonLeft}
 \opt{COWON_D2_PAD}{\TouchBottomLeft}
 \opt{PBELL_VIBE500_PAD}{\ButtonOK}
+\opt{MPIO_HD300_PAD}{\ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Redo previously undone move \\
 \hline
 \multicolumn{2}{c}{\textbf{Solution playback}} \\
 \hline
-\opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+\opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
+    ,MPIO_HD300_PAD}{\ButtonPlay}
 \opt{ONDIO_PAD}{\ButtonMenu}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
@@ -123,7 +131,7 @@ information about the level format, see
     ,SANSA_FUZE_PAD,SANSA_C200_PAD}
     {\ButtonUp/\ButtonDown}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu/\ButtonPlay}
-\opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown}
+\opt{IRIVER_H10_PAD,MPIO_HD300_PAD}{\ButtonScrollUp/\ButtonScrollDown}
 \opt{COWON_D2_PAD}{\TouchTopMiddle/\TouchBottomMiddle}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Increase/decrease playback speed \\
@@ -132,6 +140,7 @@ information about the level format, see
     ,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}
     {\ButtonLeft/\ButtonRight}
 \opt{COWON_D2_PAD}{\TouchMidLeft/\TouchMidRight}
+\opt{MPIO_HD300_PAD}{\ButtonRew/\ButtonFF}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Go backward/forward (while paused) \\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
@@ -139,6 +148,7 @@ information about the level format, see
 \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}
+\opt{MPIO_HD300_PAD}{Long \ButtonMenu}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Quit \\
 \end{btnmap}
