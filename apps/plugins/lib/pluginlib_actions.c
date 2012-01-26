@@ -339,7 +339,13 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
     {PLA_SELECT,            BUTTON_MINUS,                       BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_MINUS|BUTTON_REL,            BUTTON_MINUS},
-    {PLA_SELECT_REPEAT,     BUTTON_MINUS|BUTTON_MINUS,          BUTTON_NONE},
+    {PLA_SELECT_REPEAT,     BUTTON_MINUS|BUTTON_REPEAT,         BUTTON_NONE},
+#elif (CONFIG_KEYPAD == ANDROID_PAD)
+    {PLA_CANCEL,            BUTTON_BACK|BUTTON_REL,             BUTTON_BACK},
+    {PLA_EXIT,              BUTTON_BACK|BUTTON_REPEAT,          BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_MENU,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_MENU|BUTTON_REL,             BUTTON_MENU},
+    {PLA_SELECT_REPEAT,     BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
     {PLA_CANCEL,            BUTTON_RC_REC|BUTTON_REL,           BUTTON_RC_REC},
     {PLA_EXIT,              BUTTON_RC_REC|BUTTON_REPEAT,        BUTTON_NONE},
