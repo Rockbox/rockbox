@@ -338,6 +338,13 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int ret = 0;
     bool redraw_lists;
     int old_audio_status = audio_status();
+
+#ifdef HAVE_TOUCHSCREEN
+    /* plugins possibly have grid mode active. force global settings in lists */
+    enum touchscreen_mode tsm = touchscreen_get_mode();
+    touchscreen_set_mode(global_settings.touch_mode);
+#endif
+
     FOR_NB_SCREENS(i)
         viewportmanager_theme_enable(i, !hide_theme, NULL);
 
@@ -697,7 +704,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         *start_selected = get_menu_selection(
                             gui_synclist_get_sel_pos(&lists), menu);
     }
+
     FOR_NB_SCREENS(i)
         viewportmanager_theme_undo(i, false);
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(tsm);
+#endif
+
     return ret;
 }
