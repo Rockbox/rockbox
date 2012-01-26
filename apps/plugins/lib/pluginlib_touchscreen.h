@@ -40,8 +40,13 @@ struct touchbutton {
     fb_data *pixmap;        /* Currently unused, but will allow for a graphic */
 };
 
-/* Get: tests for a button press and returns action. */
-int touchbutton_get(struct touchbutton *data, int button, int num_buttons);
+/* Check: tests if the result of button_get() beloned to a touch button */
+int touchbutton_check_button(int button, struct touchbutton *data, int num_buttons);
+/* Wait: Wait for input and return the corresponding action */
+int touchbutton_get(struct touchbutton *data, int num_buttons);
+/* Wait with timeout */
+int touchbutton_get_w_tmo(int timeout, struct touchbutton *data, int num_buttons);
+
 /* Draw: Draws all visible buttons */
 void touchbutton_draw(struct touchbutton *data, int num_buttons);
 

@@ -688,7 +688,7 @@ enum plugin_status plugin_start(const void *parameter) {
         
         /* The touchscreen buttons can act as true buttons so OR them in */
 #ifdef HAVE_TOUCHSCREEN
-        button |= touchbutton_get(reversi_buttons, button, TOUCHBUTTON_COUNT);
+        button |= touchbutton_check_button(button, reversi_buttons, TOUCHBUTTON_COUNT);
 #endif
 
         /* All of these button presses wait for the release event */

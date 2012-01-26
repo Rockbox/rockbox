@@ -23,28 +23,31 @@
 #include "plugin.h"
 
 #include "pluginlib_touchscreen.h"
+#include "pluginlib_exit.h"
 
 /*******************************************************************************
  * Touchbutton functions: These functions allow the plugin to specify a button
  *  location that, in turn gets mapped to a button press return value.
  ******************************************************************************/
  
-/* touchbutton_get:
+/* touchbutton_check_button:
  *  This function checks the touchbutton structure passed to it for hits.  When
- *  one is found it returns action.
+ *  one is found it returns action. It doesn't block because it doesn't actually
+ *  call button_get. You need to call it before and pass its result.
  *  inputs:
  *      struct touchbutton *data: This is intended to be an array of
  *          touchbuttons of size num_buttons.  Each element in the array defines
  *          one button.
  *      int button: This is the button return value from a button_get() call.
- *          It is used to determine REPEAT/RELEASE events.
+ *          It is used to determine REPEAT/RELEASE events. This way
+ *          this function can be mixed with other buttons
  *      int num_buttons: This tells touchbutton_get how many elements are in
  *          data.
  *  return:
  *      If a touch occured over one of the defined buttons, return action, else
  *          return 0.
  */
-int touchbutton_get(struct touchbutton *data, int button, int num_buttons) {
+int touchbutton_check_button(int button, struct touchbutton *data, int num_buttons) {
     short x,y;
     
     /* Get the x/y location of the button press, this is set by button_get when
@@ -69,6 +72,46 @@ int touchbutton_get(struct touchbutton *data, int button, int num_buttons) {
         }
     }
     return 0;
+}
+
+/* touchbutton_get_w_tmo:
+ *  This function checks the touchbutton structure passed to it for hits.  When
+ *  one is found it returns the corresponding action.
+ *  inputs:
+ *      struct touchbutton *data: This is intended to be an array of
+ *          touchbuttons of size num_buttons.  Each element in the array defines
+ *          one button.
+ *      int tmo: Timeout when waiting for input.
+ *      int num_buttons: This tells touchbutton_get how many elements are in
+ *          data.
+ *  return:
+ *      If a touch occured over one of the defined buttons, return action, else
+ *          return 0.
+ */
+int touchbutton_get_w_tmo(int tmo, struct touchbutton *data, int num_buttons)
+{
+    int btn = rb->button_get_w_tmo(tmo);
+    int result = touchbutton_check_button(btn, data, num_buttons);
+    exit_on_usb(result);
+    return result;
+}
+
+/* touchbutton_get:
+ *  This function checks the touchbutton structure passed to it for hits.  When
+ *  one is found it returns the corresponding action.
+ *  inputs:
+ *      struct touchbutton *data: This is intended to be an array of
+ *          touchbuttons of size num_buttons.  Each element in the array defines
+ *          one button.
+ *      int num_buttons: This tells touchbutton_get how many elements are in
+ *          data.
+ *  return:
+ *      If a touch occured over one of the defined buttons, return action, else
+ *          return 0.
+ */
+int touchbutton_get(struct touchbutton *data, int num_buttons)
+{
+    return touchbutton_get_w_tmo(TIMEOUT_BLOCK, data, num_buttons);
 }
 
 /* touchbutton_draw: 
