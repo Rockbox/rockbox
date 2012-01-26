@@ -180,7 +180,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ACTION BUTTON_SELECT
 #define ACTIONTEXT "SELECT"
 
-#else
+#elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!
 #endif
 

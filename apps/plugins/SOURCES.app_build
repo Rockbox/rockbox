@@ -3,6 +3,7 @@
 #include "SOURCES"
 #else
 /* plugins common to all models */
+chopper.c
 credits.c
 properties.c
 random_folder_advance_config.c

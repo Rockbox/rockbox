@@ -8,6 +8,10 @@
  */
 #ifdef HAVE_LCD_BITMAP
 
+#if CONFIG_CODEC == SWCODEC && PLUGIN_BUFFER_SIZE > 0x20000
+fft
+#endif
+
 #ifdef HAVE_TAGCACHE
 pictureflow
 #endif

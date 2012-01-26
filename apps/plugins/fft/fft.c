@@ -266,7 +266,7 @@ GREY_INFO_STRUCT
 #   define FFT_FREQ_SCALE   BUTTON_DOWN
 #   define FFT_QUIT         BUTTON_BACK
 
-#else
+#elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!
 #endif
 
