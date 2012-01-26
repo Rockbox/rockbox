@@ -326,6 +326,7 @@ static const struct plugin_api rockbox_api = {
 #endif
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode,
+    touchscreen_get_mode,
 #endif
     
 #ifdef HAVE_BUTTON_LIGHT

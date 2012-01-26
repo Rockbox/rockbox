@@ -425,6 +425,11 @@ RB_WRAP(touchscreen_set_mode)
     rb->touchscreen_set_mode(mode);
     return 0;
 }
+RB_WRAP(touchscreen_get_mode)
+{
+    lua_pushinteger(L, rb->touchscreen_get_mode());
+    return 1;
+}
 #endif
 
 RB_WRAP(font_getstringsize)
@@ -638,6 +643,7 @@ static const luaL_Reg rocklib[] =
 #ifdef HAVE_TOUCHSCREEN
     R(action_get_touchscreen_press),
     R(touchscreen_set_mode),
+    R(touchscreen_get_mode),
 #endif
     R(kbd_input),
 

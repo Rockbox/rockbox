@@ -413,6 +413,7 @@ struct plugin_api {
 #endif
 #ifdef HAVE_TOUCHSCREEN
     void (*touchscreen_set_mode)(enum touchscreen_mode);
+    enum touchscreen_mode (*touchscreen_get_mode)(void);
 #endif
 #ifdef HAVE_BUTTON_LIGHT
     void (*buttonlight_set_timeout)(int value);
