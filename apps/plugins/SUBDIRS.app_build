@@ -6,6 +6,7 @@
 /* For all targets with a bitmap display and a touchscreen
  * In fact, most of the plugins aren't supposed to be used on a touch(mouse) device
  */
+lua
 #ifdef HAVE_LCD_BITMAP
 
 #if CONFIG_CODEC == SWCODEC && PLUGIN_BUFFER_SIZE > 0x20000

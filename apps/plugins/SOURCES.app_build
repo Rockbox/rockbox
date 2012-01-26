@@ -11,6 +11,10 @@ search.c
 sort.c
 theme_remove.c
 vbrfix.c
+#if PLUGIN_BUFFER_SIZE >= 0x80000
+boomshine.lua
+#endif
+
 
 #ifdef HAVE_TEST_PLUGINS /* enable in advanced build options */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

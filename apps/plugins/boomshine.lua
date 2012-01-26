@@ -148,15 +148,15 @@ function Cursor:do_action(action)
     if action == rb.actions.ACTION_TOUCHSCREEN and HAS_TOUCHSCREEN then
         _, self.x, self.y = rb.action_get_touchscreen_press()
         return true
-    elseif action == rb.actions.ACTION_KBD_SELECT then
+    elseif action == rb.actions.PLA_SELECT then
         return true
-    elseif (action == rb.actions.ACTION_KBD_RIGHT) then
+    elseif (action == rb.actions.PLA_RIGHT) then
         self.x = self.x + self.size
-    elseif (action == rb.actions.ACTION_KBD_LEFT) then
+    elseif (action == rb.actions.PLA_LEFT) then
         self.x = self.x - self.size
-    elseif (action == rb.actions.ACTION_KBD_UP) then
+    elseif (action == rb.actions.PLA_UP) then
         self.y = self.y - self.size
-    elseif (action == rb.actions.ACTION_KBD_DOWN) then
+    elseif (action == rb.actions.PLA_DOWN) then
         self.y = self.y + self.size
     end
 
@@ -233,8 +233,8 @@ function start_round(level, goal, nrBalls, total)
         end
 
         -- Check for actions
-        local action = rb.get_action(rb.contexts.CONTEXT_KEYBOARD, 0)
-        if(action == rb.actions.ACTION_KBD_ABORT) then
+        local action = rb.get_plugin_action(0)
+        if action == rb.actions.PLA_EXIT or action == rb.actions.PLA_CANCEL then
             exit = true
             break
         end
