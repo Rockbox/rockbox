@@ -61,6 +61,7 @@ find_first_set_bit:
     | the top 24 bits of d0 are 0 so just load the value over it
     move.b  (%a0, %d1.l), %d0    |
     rts                          |
+    .size   find_first_set_bit, .-find_first_set_bit
 
     .section .irodata
 L_ffs_table:
@@ -74,5 +75,4 @@ L_ffs_table:
     .byte    9,  0,  0, 24,  0,  0, 20, 26  | 40-47
     .byte   30,  0,  0,  0,  0, 23,  0, 19  | 48-55
     .byte   29,  0, 22, 18, 28, 17, 16,  0  | 56-63
-
-    .size   find_first_set_bit, .-find_first_set_bit
+    .size    L_ffs_table, .-L_ffs_table
