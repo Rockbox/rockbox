@@ -19,6 +19,15 @@
  *
  ****************************************************************************/
 #include "config.h"
+
+#ifdef HAVE_SIGALTSTACK_THREADS
+/*
+ * The sp check in glibc __longjmp_chk() will cause
+ * a fatal error when switching threads via longjmp().
+ */
+#undef _FORTIFY_SOURCE
+#endif
+
 #include <stdbool.h>
 #include <stdio.h>
 #include "thread.h"
