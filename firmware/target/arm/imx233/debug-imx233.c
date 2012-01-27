@@ -378,14 +378,14 @@ bool dbg_hw_info_dcp(void)
             info.gather_writes, info.otp_key_ready, info.ch0_merged);
         lcd_putsf(0, 4, "ctx switching: %d caching: %d", info.context_switching,
             info.context_caching);
-        lcd_putsf(0, 5, "ch  irq ien en rdy pri sem cmdptr");
+        lcd_putsf(0, 5, "ch  irq ien en rdy pri sem cmdptr     a");
         int nr = HW_DCP_NUM_CHANNELS;
         for(int i = 0; i < nr; i++)
         {
-            lcd_putsf(0, 6 + i, "%d    %d   %d   %d  %d   %d   %d  0x%08lx",
+            lcd_putsf(0, 6 + i, "%d    %d   %d   %d  %d   %d   %d  0x%08lx %d",
                 i, info.channel[i].irq, info.channel[i].irq_en, info.channel[i].enable,
                 info.channel[i].ready, info.channel[i].high_priority,
-                info.channel[i].sema, info.channel[i].cmdptr);
+                info.channel[i].sema, info.channel[i].cmdptr, info.channel[i].acquired);
         }
         lcd_putsf(0, 6 + nr, "csc  %d   %d   %d      %d",
                   info.csc.irq, info.csc.irq_en, info.csc.enable, info.csc.priority);

@@ -41,5 +41,6 @@ void arbiter_reserve(struct channel_arbiter_t *a, unsigned channel);
 /* return channel on success and OBJ_WAIT_TIMEOUT on failure */
 int arbiter_acquire(struct channel_arbiter_t *a, int timeout);
 void arbiter_release(struct channel_arbiter_t *a, int channel);
+bool arbiter_acquired(struct channel_arbiter_t *a, int channel);
 
 #endif /* __KERNEL_IMX233__ */

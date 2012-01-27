@@ -71,6 +71,11 @@ int arbiter_acquire(struct channel_arbiter_t *a, int timeout)
     return chan;
 }
 
+bool arbiter_acquired(struct channel_arbiter_t *a, int channel)
+{
+    return !(a->free_bm & (1 << channel));
+}
+
 void arbiter_release(struct channel_arbiter_t *a, int channel)
 {
     mutex_lock(&a->mutex);
