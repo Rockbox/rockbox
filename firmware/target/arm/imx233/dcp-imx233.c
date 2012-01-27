@@ -111,44 +111,98 @@ static enum imx233_dcp_error_t get_error_status(int ch)
     }
 }
 
-enum imx233_dcp_error_t imx233_dcp_memcpy_ex(int ch, void *src, void *dst, size_t len)
+static enum imx233_dcp_error_t imx233_dcp_job(int ch)
 {
+    /* if IRQs are not enabled, don't enable channel interrupt and do some polling */
+    bool irq_enabled = irq_enabled();
     /* enable channel, clear interrupt, enable interrupt */
     imx233_enable_interrupt(INT_SRC_DCP, true);
-    __REG_SET(HW_DCP_CTRL) = HW_DCP_CTRL__CHANNEL_INTERRUPT_ENABLE(ch);
+    if(irq_enabled)
+        __REG_SET(HW_DCP_CTRL) = HW_DCP_CTRL__CHANNEL_INTERRUPT_ENABLE(ch);
     __REG_CLR(HW_DCP_STAT) = HW_DCP_STAT__IRQ(ch);
     __REG_SET(HW_DCP_CHANNELCTRL) = HW_DCP_CHANNELCTRL__ENABLE_CHANNEL(ch);
 
-    /* prepare packet */
-    channel_packet[ch].next = 0;
-    channel_packet[ch].ctrl0 = HW_DCP_CTRL0__INTERRUPT_ENABLE |
-        HW_DCP_CTRL0__ENABLE_MEMCOPY | HW_DCP_CTRL0__DECR_SEMAPHORE;
-    channel_packet[ch].ctrl1 = 0;
-    channel_packet[ch].src = (uint32_t)PHYSICAL_ADDR(src);
-    channel_packet[ch].dst = (uint32_t)PHYSICAL_ADDR(dst);
-    channel_packet[ch].size = len;
-    channel_packet[ch].payload = 0;
-    channel_packet[ch].status = 0;
-
-    /* write-back src, discard dst, write-back packet */
-    commit_discard_dcache_range(src, len);
-    discard_dcache_range(dst, len);
+    /* write back packet */
     commit_discard_dcache_range(&channel_packet[ch], sizeof(struct imx233_dcp_packet_t));
     /* write 1 to semaphore to run job */
     HW_DCP_CHxCMDPTR(ch) = (uint32_t)PHYSICAL_ADDR(&channel_packet[ch]);
     HW_DCP_CHxSEMA(ch) = 1;
     /* wait completion */
-    semaphore_wait(&channel_sema[ch], TIMEOUT_BLOCK);
+    if(irq_enabled)
+        semaphore_wait(&channel_sema[ch], TIMEOUT_BLOCK);
+    else
+        while(__XTRACT_EX(HW_DCP_CHxSEMA(ch), HW_DCP_CHxSEMA__VALUE))
+            udelay(10);
+    /* disable channel and interrupt */
+    __REG_CLR(HW_DCP_CTRL) = HW_DCP_CTRL__CHANNEL_INTERRUPT_ENABLE(ch);
+    __REG_CLR(HW_DCP_CHANNELCTRL) = HW_DCP_CHANNELCTRL__ENABLE_CHANNEL(ch);
     /* read status */
     return get_error_status(ch);
 }
 
-enum imx233_dcp_error_t imx233_dcp_memcpy(void *src, void *dst, size_t len, int tmo)
+
+enum imx233_dcp_error_t imx233_dcp_memcpy_ex(int ch, bool fill, const void *src, void *dst, size_t len)
+{
+    /* prepare packet */
+    channel_packet[ch].next = 0;
+    channel_packet[ch].ctrl0 = HW_DCP_CTRL0__INTERRUPT_ENABLE |
+        HW_DCP_CTRL0__ENABLE_MEMCOPY | HW_DCP_CTRL0__DECR_SEMAPHORE |
+        (fill ? HW_DCP_CTRL0__CONSTANT_FILL : 0);
+    channel_packet[ch].ctrl1 = 0;
+    channel_packet[ch].src = (uint32_t)(fill ? src : PHYSICAL_ADDR(src));
+    channel_packet[ch].dst = (uint32_t)PHYSICAL_ADDR(dst);
+    channel_packet[ch].size = len;
+    channel_packet[ch].payload = 0;
+    channel_packet[ch].status = 0;
+
+    /* write-back src if not filling, discard dst */
+    if(!fill)
+        commit_discard_dcache_range(src, len);
+    discard_dcache_range(dst, len);
+
+    /* do the job */
+    return imx233_dcp_job(ch);
+}
+
+enum imx233_dcp_error_t imx233_dcp_memcpy(bool fill, const void *src, void *dst, size_t len, int tmo)
 {
     int chan = imx233_dcp_acquire_channel(tmo);
     if(chan == OBJ_WAIT_TIMEDOUT)
         return DCP_TIMEOUT;
-    enum imx233_dcp_error_t err = imx233_dcp_memcpy_ex(chan, src, dst, len);
+    enum imx233_dcp_error_t err = imx233_dcp_memcpy_ex(chan, fill, src, dst, len);
+    imx233_dcp_release_channel(chan);
+    return err;
+}
+
+enum imx233_dcp_error_t imx233_dcp_blit_ex(int ch, bool fill, const void *src, size_t w, size_t h, void *dst, size_t out_w)
+{
+    /* prepare packet */
+    channel_packet[ch].next = 0;
+    channel_packet[ch].ctrl0 = HW_DCP_CTRL0__INTERRUPT_ENABLE |
+    HW_DCP_CTRL0__ENABLE_MEMCOPY | HW_DCP_CTRL0__DECR_SEMAPHORE |
+    HW_DCP_CTRL0__ENABLE_BLIT |
+    (fill ? HW_DCP_CTRL0__CONSTANT_FILL : 0);
+    channel_packet[ch].ctrl1 = out_w;
+    channel_packet[ch].src = (uint32_t)(fill ? src : PHYSICAL_ADDR(src));
+    channel_packet[ch].dst = (uint32_t)PHYSICAL_ADDR(dst);
+    channel_packet[ch].size = w | h << HW_DCP_SIZE__NUMBER_LINES_BP;
+    channel_packet[ch].payload = 0;
+    channel_packet[ch].status = 0;
+    
+    /* we have a problem here to discard the output buffer since it's not contiguous
+     * so only commit the source */
+    if(!fill)
+        commit_discard_dcache_range(src, w * h);
+    /* do the job */
+    return imx233_dcp_job(ch);
+}
+
+enum imx233_dcp_error_t imx233_dcp_blit(bool fill, const void *src, size_t w, size_t h, void *dst, size_t out_w, int tmo)
+{
+    int chan = imx233_dcp_acquire_channel(tmo);
+    if(chan == OBJ_WAIT_TIMEDOUT)
+        return DCP_TIMEOUT;
+    enum imx233_dcp_error_t err = imx233_dcp_blit_ex(chan, fill, src, w, h, dst, out_w);
     imx233_dcp_release_channel(chan);
     return err;
 }
@@ -185,6 +239,7 @@ struct imx233_dcp_info_t imx233_dcp_get_info(unsigned flags)
             info.channel[i].enable = HW_DCP_CHANNELCTRL & HW_DCP_CHANNELCTRL__ENABLE_CHANNEL(i);
             info.channel[i].sema = __XTRACT_EX(HW_DCP_CHxSEMA(i), HW_DCP_CHxSEMA__VALUE);
             info.channel[i].cmdptr = HW_DCP_CHxCMDPTR(i);
+            info.channel[i].acquired = arbiter_acquired(&channel_arbiter, i);
         }
     }
     if(flags & DCP_INFO_CSC)

@@ -295,6 +295,7 @@ struct imx233_dcp_channel_info_t
     bool ready;
     int sema;
     uint32_t cmdptr;
+    bool acquired;
 };
 
 struct imx233_dcp_csc_info_t
@@ -355,8 +356,11 @@ void imx233_dcp_release_channel(int chan);
 // doesn't check that channel is in use!
 void imx233_dcp_reserve_channel(int channel);
 
-enum imx233_dcp_error_t imx233_dcp_memcpy_ex(int channel, void *src, void *dst, size_t len);
-enum imx233_dcp_error_t imx233_dcp_memcpy(void *src, void *dst, size_t len, int tmo);
+enum imx233_dcp_error_t imx233_dcp_memcpy_ex(int channel, bool fill, const void *src, void *dst, size_t len);
+enum imx233_dcp_error_t imx233_dcp_memcpy(bool fill, const void *src, void *dst, size_t len, int tmo);
+
+enum imx233_dcp_error_t imx233_dcp_blit_ex(int channel, bool fill, const void *src, size_t w, size_t h, void *dst, size_t out_w);
+enum imx233_dcp_error_t imx233_dcp_blit(bool fill, const void *src, size_t w, size_t h, void *dst, size_t out_w, int tmo);
 
 struct imx233_dcp_info_t imx233_dcp_get_info(unsigned flags);
 
