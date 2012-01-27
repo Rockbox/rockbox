@@ -1322,7 +1322,6 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* SANSA_FUZEV2 */
 
 #ifdef SANSA_FUZEPLUS
-drivers/lcd-memframe.c
 drivers/synaptics-rmi.c
 drivers/generic_i2c.c
 target/arm/imx233/sansa-fuzeplus/fmradio-i2c-fuzeplus.c
