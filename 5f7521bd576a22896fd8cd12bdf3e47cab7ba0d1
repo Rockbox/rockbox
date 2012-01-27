@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAABn///+w\u003d",
+        "filename": "firmware/drivers/loopback.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-01-27T07:23:03Z",
+      "side": 1,
+      "message": "This should probably ensure that the return value equals the requested number of bytes. Same for write() below.",
+      "revId": "5f7521bd576a22896fd8cd12bdf3e47cab7ba0d1",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///+o\u003d",
+        "filename": "firmware/drivers/loopback.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-01-27T07:23:03Z",
+      "side": 1,
+      "message": "Something is wrong with writes. When I tried to copy a file into the loopback FAT-32 volume I got \"Stkov main (0)\" twice, leaving the fat copies different from each other and making mounts crash until I fixed the filesystem via fsck.vfat. One time, the copy didn\u0027t cause a crash and main stack use was only 73%, but I didn\u0027t see any files in the volume afterwards. Everything including the newly copied file was fine after a restart. I was able to save a playlist without any problems.",
+      "revId": "5f7521bd576a22896fd8cd12bdf3e47cab7ba0d1",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///+s\u003d",
+        "filename": "firmware/drivers/loopback.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-01-27T07:23:03Z",
+      "side": 1,
+      "message": "It seems loopback_fd should be closed here.",
+      "revId": "5f7521bd576a22896fd8cd12bdf3e47cab7ba0d1",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAABn////I\u003d",
         "filename": "firmware/export/loopback.h",
         "patchSetId": 2
@@ -13,6 +64,23 @@
       "writtenOn": "2012-01-25T20:25:27Z",
       "side": 1,
       "message": "The code below is not in the __LOOPBACK_H__ #ifdef, is that intended?",
+      "revId": "5f7521bd576a22896fd8cd12bdf3e47cab7ba0d1",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///+0\u003d",
+        "filename": "firmware/export/storage.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-01-27T07:23:03Z",
+      "side": 1,
+      "message": "When native, there would have to be another storage driver providing a place to put the file, and therefore CONFIG_STORAGE_MULTI. I\u0027d love to be able to use loopback in the sim, for working on changes which currently can\u0027t be tested in the sim. That would require other changes because the sim and RaaA change things at a higher level, but this is certainly moving in the right direction.",
       "revId": "5f7521bd576a22896fd8cd12bdf3e47cab7ba0d1",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
