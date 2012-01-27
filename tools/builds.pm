@@ -263,7 +263,8 @@ $releasenotes="/wiki/ReleaseNotes310";
     },
     'sansafuzeplus' => {
         name => 'SanDisk Sansa Fuze+',
-        status => 2
+        status => 2,
+        icon => 'sansafuzeplus',
     },
     'sansam200' => {
         name => 'SanDisk Sansa m200',
