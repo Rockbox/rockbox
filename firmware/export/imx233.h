@@ -47,7 +47,9 @@
 #define NOCACHE_BASE        (UNCACHED_DRAM_ADDR - CACHED_DRAM_ADDR)
 
 #define PHYSICAL_ADDR(a) \
-    ((typeof(a))((uintptr_t)(a) >= CACHED_DRAM_ADDR ? \
+    ((typeof(a))((uintptr_t)(a) >= BUFFERED_DRAM_ADDR ? \
+        ((uintptr_t)(a) - BUFFERED_DRAM_ADDR + UNCACHED_DRAM_ADDR) \
+        :(uintptr_t)(a) >= CACHED_DRAM_ADDR ? \
         ((uintptr_t)(a) - CACHED_DRAM_ADDR + UNCACHED_DRAM_ADDR) \
         :(uintptr_t)(a)))
 #define UNCACHED_ADDR(a) PHYSICAL_ADDR(a)
