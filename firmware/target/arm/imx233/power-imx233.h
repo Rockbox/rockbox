@@ -52,6 +52,8 @@
 #define HW_POWER_5VCTRL__PWD_CHARGE_4P2     (1 << 20)
 
 #define HW_POWER_MINPWR         (*(volatile uint32_t *)(HW_POWER_BASE + 0x20))
+#define HW_POWER_MINPWR__HALF_FETS  (1 << 5)
+#define HW_POWER_MINPWR__DOUBLE_FETS    (1 << 6)
 
 #define HW_POWER_CHARGE         (*(volatile uint32_t *)(HW_POWER_BASE + 0x30))
 #define HW_POWER_CHARGE__BATTCHRG_I_BP  0
@@ -129,6 +131,27 @@
 #define HW_POWER_MISC__FREQSEL__21p6MHz     6
 #define HW_POWER_MISC__FREQSEL__17p28MHz    7
 
+#define HW_POWER_LOOPCTRL       (*(volatile uint32_t *)(HW_POWER_BASE + 0xb0))
+#define HW_POWER_LOOPCTRL__DC_C_BP  0
+#define HW_POWER_LOOPCTRL__DC_C_BM  0x3
+#define HW_POWER_LOOPCTRL__DC_R_BP  4
+#define HW_POWER_LOOPCTRL__DC_R_BM  0xf0
+#define HW_POWER_LOOPCTRL__DC_FF_BP 8
+#define HW_POWER_LOOPCTRL__DC_FF_BM (0x7 << 8)
+#define HW_POWER_LOOPCTRL__EN_RCSCALE_BP    12
+#define HW_POWER_LOOPCTRL__EN_RCSCALE_BM    (0x3 << 12)
+#define HW_POWER_LOOPCTRL__EN_RCSCALE__DISABLED 0
+#define HW_POWER_LOOPCTRL__EN_RCSCALE__2X       1
+#define HW_POWER_LOOPCTRL__EN_RCSCALE__4X       2
+#define HW_POWER_LOOPCTRL__EN_RCSCALE__8X       3
+#define HW_POWER_LOOPCTRL__RCSCALE_THRESH   (1 << 14)
+#define HW_POWER_LOOPCTRL__DF_HYST_THRESH   (1 << 15)
+#define HW_POWER_LOOPCTRL__CM_HYST_THRESH   (1 << 16)
+#define HW_POWER_LOOPCTRL__EN_DF_HYST       (1 << 17)
+#define HW_POWER_LOOPCTRL__EN_CM_HYST       (1 << 18)
+#define HW_POWER_LOOPCTRL__HYST_SIGN        (1 << 19)
+#define HW_POWER_LOOPCTRL__TOGGLE_DIF       (1 << 20)
+
 #define HW_POWER_STS            (*(volatile uint32_t *)(HW_POWER_BASE + 0xc0))
 #define HW_POWER_STS__VBUSVALID     (1 << 1)
 #define HW_POWER_STS__CHRGSTS       (1 << 11)
@@ -147,6 +170,17 @@
 void imx233_power_set_charge_current(unsigned current); /* in mA */
 void imx233_power_set_stop_current(unsigned current); /* in mA */
 void imx233_power_enable_batadj(bool enable);
+
+static inline void imx233_power_set_dcdc_freq(bool pll, unsigned freq)
+{
+    HW_POWER_MISC &= ~(HW_POWER_MISC__SEL_PLLCLK | HW_POWER_MISC__FREQSEL_BM);
+    /* WARNING: HW_POWER_MISC does have a SET/CLR variant ! */
+    if(pll)
+    {
+        HW_POWER_MISC |= freq << HW_POWER_MISC__FREQSEL_BP;
+        HW_POWER_MISC |= HW_POWER_MISC__SEL_PLLCLK;
+    }
+}
 
 struct imx233_power_info_t
 {

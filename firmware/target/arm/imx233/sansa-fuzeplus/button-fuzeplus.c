@@ -27,6 +27,7 @@
 #include "lcd.h"
 #include "string.h"
 #include "usb.h"
+#include "power-imx233.h"
 
 #ifndef BOOTLOADER
 

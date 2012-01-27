@@ -28,7 +28,7 @@
 #include "system.h"
 #include "system-target.h"
 #include "clkctrl-imx233.h"
-
+#include "power-imx233.h"
 
 void usb_insert_int(void)
 {

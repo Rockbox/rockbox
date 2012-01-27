@@ -25,13 +25,31 @@
 #include "audioout-imx233.h"
 #include "audioin-imx233.h"
 
+static int input_source = AUDIO_SRC_PLAYBACK;
+static unsigned input_flags = 0;
+static int output_source = AUDIO_SRC_PLAYBACK;
+
+static void select_audio_path(void)
+{
+    if(input_source == AUDIO_SRC_PLAYBACK)
+        imx233_audiout_select_hp_input(false);
+    else
+        imx233_audiout_select_hp_input(true);
+}
+
 void audio_input_mux(int source, unsigned flags)
 {
     (void) source;
     (void) flags;
+    input_source = source;
+    input_flags = flags;
+    select_audio_path();
 }
-
+  
 void audio_set_output_source(int source)
 {
     (void) source;
+    output_source = source;
+    select_audio_path();
 }
+

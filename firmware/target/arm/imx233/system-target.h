@@ -24,10 +24,8 @@
 #include "system-arm.h"
 #include "mmu-arm.h"
 #include "panic.h"
-
-#include "clock-target.h" /* CPUFREQ_* are defined here */
 #include "clkctrl-imx233.h"
-#include "power-imx233.h"
+#include "clock-target.h" /* CPUFREQ_* are defined here */
 
 /* Digital control */
 #define HW_DIGCTL_BASE          0x8001C000

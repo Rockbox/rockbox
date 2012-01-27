@@ -25,6 +25,7 @@
 #include "string.h"
 #include "usb.h"
 #include "system-target.h"
+#include "power-imx233.h"
 
 struct current_step_bit_t
 {
@@ -99,6 +100,10 @@ void power_init(void)
     __FIELD_SET(HW_POWER_VDDDCTRL, LINREG_OFFSET, 2);
     __FIELD_SET(HW_POWER_VDDACTRL, LINREG_OFFSET, 2);
     __FIELD_SET(HW_POWER_VDDIOCTRL, LINREG_OFFSET, 2);
+    /* enable a few bits controlling the DC-DC as recommended by Freescale */
+    __REG_SET(HW_POWER_LOOPCTRL) = HW_POWER_LOOPCTRL__TOGGLE_DIF |
+        HW_POWER_LOOPCTRL__EN_CM_HYST;
+    __FIELD_SET(HW_POWER_LOOPCTRL, EN_RCSCALE, HW_POWER_LOOPCTRL__EN_RCSCALE__2X);
 }
 
 void power_off(void)

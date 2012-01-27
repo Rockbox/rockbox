@@ -24,6 +24,7 @@
 #include "tuner.h"
 #include "fmradio_i2c.h"
 #include "pinctrl-imx233.h"
+#include "power-imx233.h"
 
 static bool tuner_enable = false;
 
@@ -37,6 +38,7 @@ bool tuner_power(bool enable)
         imx233_enable_gpio_output(0, 29, enable);
         imx233_set_gpio_output(0, 29, enable);
         tuner_enable = enable;
+        //imx233_power_set_dcdc_freq(enable, HW_POWER_MISC__FREQSEL__24MHz);
     }
     return tuner_enable;
 }
