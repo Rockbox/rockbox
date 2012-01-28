@@ -814,7 +814,6 @@ void cleanup(void)
 {
     rb->screens[0]->set_viewport(NULL);
 }
-#endif
 
 
 static struct touchbutton button[] = {
@@ -824,6 +823,7 @@ static struct touchbutton button[] = {
         /* viewport runtime initialized, rest false/NULL */
     }
 };
+#endif
 
 void plugin_quit(void)
 {
