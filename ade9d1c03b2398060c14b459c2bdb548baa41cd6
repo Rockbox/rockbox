@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAABn///98\u003d",
+        "filename": "apps/plugins/brickmania.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2394,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-01-28T20:19:23Z",
+      "side": 1,
+      "message": "Resume was already set to false near the start of brickmania_game_loop(), after brickmania_menu(). I don\u0027t see how it could be true here, so setting it to false seems unnecessary.",
+      "revId": "ade9d1c03b2398060c14b459c2bdb548baa41cd6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///94\u003d",
+        "filename": "apps/plugins/brickmania.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2395,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-01-28T20:19:23Z",
+      "side": 1,
+      "message": "The resume file was already deleted in brickmania_menu() if the user resumed. It could only remain if the user started a new game. It doesn\u0027t seem logical to delete the resume file for an old game when you lose a new game. Perhaps it would be best to move this whole if clause to replace the \"resume_file \u003d false;\" near the start of brickmania_game_loop(). The resume file deletion in the menu could then be removed.",
+      "revId": "ade9d1c03b2398060c14b459c2bdb548baa41cd6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
