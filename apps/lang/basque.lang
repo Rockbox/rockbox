@@ -7761,7 +7761,7 @@
     archosplayer: "Zerrenda Amaiera"
   </dest>
   <voice>
-    *: " Zerrenda Amaiera
+    *: " Zerrenda Amaiera"
   </voice>
 </phrase>
 <phrase>
@@ -7904,8 +7904,6 @@
     *: "Denbora"
   </voice>
 </phrase>
-/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
- * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -12380,15 +12378,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Indartzea"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Indartzea"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Indartzea"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Indartzea"
   </voice>
 </phrase>
 <phrase>
@@ -12743,5 +12741,168 @@
   <voice>
     *: none
     multidrive_usb: "USB Gorde Barne Unitatea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Glifoa Katxera"
+  </dest>
+  <voice>
+    *: "Glifoa Katxera"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Bozgorailu Keyclicka"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Bozgorailu Keyclicka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Kasko Keyclicka"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Kasko Keyclicka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Zerrendetan Ilara Espazioa"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Zerrendetan Ilara Espazioa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Automatikoa"
+  </dest>
+  <voice>
+    *: "Automatikoa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Estekak"
+  </dest>
+  <voice>
+    *: "Estekak"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Lotarako Denbora Ezeztatu"
+  </dest>
+  <voice>
+    *: "Lotarako Denbora Ezeztatu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Abiarazte/Itzaltzea"
+  </dest>
+  <voice>
+    *: "Abiarazte/Itzaltzea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Lotarako Denbora Berrasi Botoiak Sakatzean"
+  </dest>
+  <voice>
+    *: "Lotarako Denbora Berrasi Botoiak Sakatzean"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes (unused in UI)
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Berezko Lotarako Denbora Iraupena"
+  </dest>
+  <voice>
+    *: "Berezko Lotarako Denbora Iraupena"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Abiaraztean Hasi Lotarako Denbora"
+  </dest>
+  <voice>
+    *: "Abiaraztean Hasi Lotarako Denbora"
   </voice>
 </phrase>
