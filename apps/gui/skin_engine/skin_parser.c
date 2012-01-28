@@ -1244,7 +1244,6 @@ static const struct touchaction touchactions[] = {
     /* generic actions, convert to screen actions on use */
     {"none", ACTION_TOUCHSCREEN_IGNORE},{"lock", ACTION_TOUCH_SOFTLOCK },
     {"prev", ACTION_STD_PREV },         {"next", ACTION_STD_NEXT },
-    {"rwd", ACTION_STD_PREVREPEAT },    {"ffwd", ACTION_STD_NEXTREPEAT },
     {"hotkey", ACTION_STD_HOTKEY},      {"select", ACTION_STD_OK },
     {"menu", ACTION_STD_MENU },         {"cancel", ACTION_STD_CANCEL },
     {"contextmenu", ACTION_STD_CONTEXT},{"quickscreen", ACTION_STD_QUICKSCREEN },
@@ -1260,6 +1259,7 @@ static const struct touchaction touchactions[] = {
     {"setting_set", ACTION_SETTINGS_SET}, 
 
     /* WPS specific actions */
+    {"rwd", ACTION_WPS_SEEKBACK },      {"ffwd", ACTION_WPS_SEEKFWD },
     {"wps_prev", ACTION_WPS_SKIPPREV }, {"wps_next", ACTION_WPS_SKIPNEXT },
     {"browse", ACTION_WPS_BROWSE },
     {"play", ACTION_WPS_PLAY },         {"stop", ACTION_WPS_STOP },
