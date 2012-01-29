@@ -25,7 +25,7 @@
 require "actions"
 require "buttons"
 
-STOPWATCH_FILE = "/.rockbox/rocks/apps/stopwatch.dat"
+STOPWATCH_FILE = rb.PLUGIN_APPS_DATA_DIR .. "/stopwatch.dat"
 
 
 local LapsView = {

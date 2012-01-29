@@ -699,7 +699,8 @@ static const luaL_Reg rocklib[] =
 extern const luaL_Reg rocklib_aux[];
 
 
-#define RB_CONSTANT(x) lua_pushinteger(L, x); lua_setfield(L, -2, #x);
+#define RB_CONSTANT(x)        lua_pushinteger(L, x); lua_setfield(L, -2, #x);
+#define RB_STRING_CONSTANT(x) lua_pushstring(L, x); lua_setfield(L, -2, #x);
 /*
  ** Open Rockbox library
  */
@@ -726,6 +727,15 @@ LUALIB_API int luaopen_rock(lua_State *L)
 #ifdef HAVE_REMOTE_LCD
     RB_CONSTANT(SCREEN_REMOTE);
 #endif
+
+    /* some useful paths constants */
+    RB_STRING_CONSTANT(ROCKBOX_DIR);
+    RB_STRING_CONSTANT(HOME_DIR);
+    RB_STRING_CONSTANT(PLUGIN_DIR);
+    RB_STRING_CONSTANT(PLUGIN_APPS_DATA_DIR);
+    RB_STRING_CONSTANT(PLUGIN_GAMES_DATA_DIR);
+    RB_STRING_CONSTANT(PLUGIN_DATA_DIR);
+    RB_STRING_CONSTANT(VIEWERS_DATA_DIR);
 
     rli_init(L);
 
