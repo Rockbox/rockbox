@@ -20,9 +20,9 @@
 #define ZIPUTIL_H
 
 #include <QtCore>
-#include "quazip.h"
-#include "quazipfile.h"
-#include "quazipfileinfo.h"
+#include "quazip/quazip.h"
+#include "quazip/quazipfile.h"
+#include "quazip/quazipfileinfo.h"
 
 class ZipUtil : public QObject
 {
