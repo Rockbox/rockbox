@@ -167,14 +167,14 @@ static bool game_finished;
 #define B_QUIT_H    (LCD_HEIGHT/4)
 #else
 /* Define Menu button x, y, width, height */
-#define B_MENU_X    (LCD_WIDTH/2)
+#define B_MENU_X    (LCD_WIDTH/2 - XOFS)
 #define B_MENU_Y    (CELL_HEIGHT*BOARD_SIZE+YOFS*2)
-#define B_MENU_W    (LCD_WIDTH/4)
+#define B_MENU_W    (LCD_WIDTH/4 - XOFS)
 #define B_MENU_H    (2*CELL_HEIGHT)
 /* Define Quit Button x, y, width, height */
-#define B_QUIT_X    (LCD_WIDTH-LCD_WIDTH/4)
+#define B_QUIT_X    (B_MENU_X + B_MENU_W + 1)
 #define B_QUIT_Y    (CELL_HEIGHT*BOARD_SIZE+YOFS*2)
-#define B_QUIT_W    (LCD_WIDTH/4)
+#define B_QUIT_W    (LCD_WIDTH/4 - XOFS)
 #define B_QUIT_H    (2*CELL_HEIGHT)
 #endif
 
@@ -316,22 +316,16 @@ static void reversi_gui_display_board(void) {
     y = LEGEND_Y(0);
     reversi_gui_draw_cell(x, y+(LEGEND_Y(1)-LEGEND_Y(0))/2-CELL_WIDTH/2, BLACK);
     rb->snprintf(buf, sizeof(buf), "%01d", c);
+
+    rb->viewport_set_defaults(&tempvp, SCREEN_MAIN);
     
     tempvp.x=x+CELL_WIDTH+2;
     tempvp.y=y;
     tempvp.width=LCD_WIDTH-tempvp.x;
     tempvp.height=LEGEND_Y(1);
-    
-    tempvp.font=FONT_UI; 
-    tempvp.drawmode=STYLE_DEFAULT;
 #if LCD_DEPTH > 1
-    tempvp.fg_pattern=0;
-    tempvp.bg_pattern=0xFFFF;
-#ifdef HAVE_LCD_COLOR
-    tempvp.lss_pattern=0;
-    tempvp.lse_pattern=0;
-    tempvp.lst_pattern=0;
-#endif
+    tempvp.fg_pattern = LCD_BLACK;
+    tempvp.bg_pattern = LCD_WHITE;
 #endif
 
     rb->screens[SCREEN_MAIN]->set_viewport(&tempvp);

@@ -13,6 +13,8 @@ lua
 fft
 #endif
 
+reversi
+
 #ifdef HAVE_TAGCACHE
 pictureflow
 #endif
