@@ -28,14 +28,15 @@ EncoderRbSpeex::EncoderRbSpeex(QObject *parent) : EncoderBase(parent)
 
 void EncoderRbSpeex::generateSettings()
 {
-    insertSetting(eVOLUME,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,
-        tr("Volume:"),RbSettings::subValue("rbspeex",RbSettings::EncoderVolume),1.0,10.0));
-    insertSetting(eQUALITY,new EncTtsSetting(this,EncTtsSetting::eDOUBLE,
-        tr("Quality:"),RbSettings::subValue("rbspeex",RbSettings::EncoderQuality),0,10.0));
-    insertSetting(eCOMPLEXITY,new EncTtsSetting(this,EncTtsSetting::eINT,
-        tr("Complexity:"),RbSettings::subValue("rbspeex",RbSettings::EncoderComplexity),0,10));
-    insertSetting(eNARROWBAND,new EncTtsSetting(this,EncTtsSetting::eBOOL,
-        tr("Use Narrowband:"),RbSettings::subValue("rbspeex",RbSettings::EncoderNarrowBand)));
+    loadSettings();
+    insertSetting(eVOLUME, new EncTtsSetting(this, EncTtsSetting::eDOUBLE,
+        tr("Volume:"), volume, 1.0, 10.0));
+    insertSetting(eQUALITY, new EncTtsSetting(this, EncTtsSetting::eDOUBLE,
+        tr("Quality:"), quality, 0, 10.0));
+    insertSetting(eCOMPLEXITY, new EncTtsSetting(this, EncTtsSetting::eINT,
+        tr("Complexity:"), complexity, 0, 10));
+    insertSetting(eNARROWBAND,new EncTtsSetting(this, EncTtsSetting::eBOOL,
+        tr("Use Narrowband:"), narrowband));
 }
 
 void EncoderRbSpeex::saveSettings()
@@ -53,16 +54,25 @@ void EncoderRbSpeex::saveSettings()
     RbSettings::sync();
 }
 
-bool EncoderRbSpeex::start()
-{
 
+void EncoderRbSpeex::loadSettings(void)
+{
     // try to get config from settings
     quality = RbSettings::subValue("rbspeex", RbSettings::EncoderQuality).toDouble();
+    if(quality < 0) {
+        quality = 8.0;
+    }
     complexity = RbSettings::subValue("rbspeex", RbSettings::EncoderComplexity).toInt();
     volume = RbSettings::subValue("rbspeex", RbSettings::EncoderVolume).toDouble();
     narrowband = RbSettings::subValue("rbspeex", RbSettings::EncoderNarrowBand).toBool();
+}
 
 
+bool EncoderRbSpeex::start()
+{
+
+    // make sure configuration parameters are set.
+    loadSettings();
     return true;
 }
 
@@ -98,18 +108,11 @@ bool EncoderRbSpeex::encode(QString input,QString output)
 
 bool EncoderRbSpeex::configOk()
 {
-    bool result=true;
-    // check config
-
-    if(RbSettings::subValue("rbspeex", RbSettings::EncoderVolume).toDouble() <= 0)
-        result =false;
-
-    if(RbSettings::subValue("rbspeex", RbSettings::EncoderQuality).toDouble() <= 0)
-        result =false;
-
-    if(RbSettings::subValue("rbspeex", RbSettings::EncoderComplexity).toInt() <= 0)
-        result =false;
-
-    return result;
+    // check config. Make sure current settings are loaded.
+    loadSettings();
+    if(volume <= 0 || quality <= 0 || complexity <= 0)
+        return false;
+    else
+        return true;
 }
 

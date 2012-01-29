@@ -64,7 +64,7 @@ const static struct {
     { RbSettings::WavtrimThreshold,     "wavtrimthreshold",     "500"},
     { RbSettings::TtsSpeed,             ":tts:/speed",          "175" },
     { RbSettings::EncoderComplexity,    ":encoder:/complexity", "10" },
-    { RbSettings::EncoderQuality,       ":encoder:/quality",    "8.0" },
+    { RbSettings::EncoderQuality,       ":encoder:/quality",    "-1.0" },
     { RbSettings::EncoderVolume,        ":encoder:/volume",     "1.0" },
 };
 

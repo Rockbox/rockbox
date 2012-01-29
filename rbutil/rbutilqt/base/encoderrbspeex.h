@@ -45,6 +45,7 @@ class EncoderRbSpeex : public EncoderBase
         void saveSettings();
 
     private:
+        void loadSettings(void);
         float quality;
         float volume;
         int complexity;
