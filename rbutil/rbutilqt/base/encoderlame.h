@@ -27,10 +27,9 @@ class EncoderLame : public EncoderBase
 {
     enum ESettings
     {
-        eVOLUME,
-        eQUALITY,
-        eCOMPLEXITY,
-        eNARROWBAND
+        LAMEVERSION,
+        VOLUME,
+        QUALITY,
     };
 
     Q_OBJECT

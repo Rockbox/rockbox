@@ -59,11 +59,23 @@ void EncoderLame::generateSettings()
     // no settings for now.
     // show lame version.
     if(m_symbolsResolved) {
-        insertSetting(eVOLUME, new EncTtsSetting(this, EncTtsSetting::eREADONLYSTRING,
+        double quality = RbSettings::subValue("lame",
+                    RbSettings::EncoderQuality).toDouble();
+        // default quality is 0.999.
+        if(quality < 0) {
+            quality = 0.99;
+        }
+        insertSetting(LAMEVERSION, new EncTtsSetting(this, EncTtsSetting::eREADONLYSTRING,
                     tr("LAME"), QString(m_get_lame_short_version())));
+        insertSetting(VOLUME, new EncTtsSetting(this, EncTtsSetting::eDOUBLE,
+                    tr("Volume"),
+                    RbSettings::subValue("lame", RbSettings::EncoderVolume).toDouble(),
+                    0.0, 1.0));
+        insertSetting(QUALITY, new EncTtsSetting(this, EncTtsSetting::eDOUBLE,
+                    tr("Quality"), quality, 0.0, 1.0));
     }
     else {
-        insertSetting(eVOLUME, new EncTtsSetting(this, EncTtsSetting::eREADONLYSTRING,
+        insertSetting(LAMEVERSION, new EncTtsSetting(this, EncTtsSetting::eREADONLYSTRING,
                     tr("LAME"), tr("Could not find libmp3lame!")));
     }
 }
@@ -71,6 +83,10 @@ void EncoderLame::generateSettings()
 void EncoderLame::saveSettings()
 {
     // no user settings right now.
+    RbSettings::setSubValue("lame", RbSettings::EncoderVolume,
+            getSetting(VOLUME)->current().toDouble());
+    RbSettings::setSubValue("lame", RbSettings::EncoderQuality,
+            getSetting(QUALITY)->current().toDouble());
 }
 
 bool EncoderLame::start()
@@ -110,10 +126,14 @@ bool EncoderLame::encode(QString input,QString output)
 
     gfp = m_lame_init();
     m_lame_set_out_samplerate(gfp, 12000);      // resample to 12kHz
-    m_lame_set_scale(gfp, 1.0);                 // scale input volume
+    // scale input volume
+    m_lame_set_scale(gfp,
+            RbSettings::subValue("lame", RbSettings::EncoderVolume).toDouble());
     m_lame_set_mode(gfp, MONO);                 // mono output mode
     m_lame_set_VBR(gfp, vbr_default);           // enable default VBR mode
-    m_lame_set_VBR_quality(gfp, 9.999f);        // VBR quality
+    // VBR quality
+    m_lame_set_VBR_quality(gfp,
+            RbSettings::subValue("lame", RbSettings::EncoderQuality).toDouble());
     m_lame_set_VBR_max_bitrate_kbps(gfp, 64);   // maximum bitrate 64kbps
     m_lame_set_bWriteVbrTag(gfp, 0);            // disable LAME tag.
 
