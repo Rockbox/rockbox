@@ -454,12 +454,11 @@ bool dbg_ports(void)
             lcd_putsf(0, line++, "GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
             lcd_putsf(0, line++, "GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
             lcd_putsf(0, line++, "GPIOD: %2x DIR: %2x", GPIOD_DATA, GPIOD_DIR);
+            lcd_putsf(0, line++, "CCU_IO:%8x", CCU_IO);
 #ifdef DEBUG_DBOP
-            line++;
             lcd_puts(0, line++, "[DBOP_DIN]");
             lcd_putsf(0, line++, "DBOP_DIN: %4x", dbop_debug());
 #endif
-            line++;
             lcd_puts(0, line++, "[CP15]");
             lcd_putsf(0, line++, "CP15: 0x%8x", read_cp15());
             lcd_update();
