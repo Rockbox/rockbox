@@ -46,6 +46,7 @@ class TTSExes : public TTSBase
         bool configOk();
 
     private:
+        void loadSettings(void);
         QString m_name;
         QString m_TTSexec;
         QString m_TTSOpts;

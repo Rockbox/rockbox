@@ -37,13 +37,11 @@ TTSBase::Capabilities TTSExes::capabilities()
 
 void TTSExes::generateSettings()
 {
-    QString exepath =RbSettings::subValue(m_name,RbSettings::TtsPath).toString();
-    if(exepath == "") exepath = Utils::findExecutable(m_name);
-
-    insertSetting(eEXEPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,
-        tr("Path to TTS engine:"),exepath,EncTtsSetting::eBROWSEBTN));
-    insertSetting(eOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,
-        tr("TTS engine options:"),RbSettings::subValue(m_name,RbSettings::TtsOptions)));
+    loadSettings();
+    insertSetting(eEXEPATH, new EncTtsSetting(this, EncTtsSetting::eSTRING,
+        tr("Path to TTS engine:"), m_TTSexec, EncTtsSetting::eBROWSEBTN));
+    insertSetting(eOPTIONS, new EncTtsSetting(this, EncTtsSetting::eSTRING,
+        tr("TTS engine options:"), m_TTSOpts));
 }
 
 void TTSExes::saveSettings()
@@ -55,11 +53,18 @@ void TTSExes::saveSettings()
     RbSettings::sync();
 }
 
-bool TTSExes::start(QString *errStr)
+
+void TTSExes::loadSettings(void)
 {
     m_TTSexec = RbSettings::subValue(m_name,RbSettings::TtsPath).toString();
+    if(m_TTSexec.isEmpty()) m_TTSexec = Utils::findExecutable(m_name);
     m_TTSOpts = RbSettings::subValue(m_name,RbSettings::TtsOptions).toString();
+}
 
+
+bool TTSExes::start(QString *errStr)
+{
+    loadSettings();
     m_TTSTemplate = m_TemplateMap.value(m_name);
 
     QFileInfo tts(m_TTSexec);
@@ -96,10 +101,10 @@ TTSStatus TTSExes::voice(QString text,QString wavfile, QString *errStr)
 
 bool TTSExes::configOk()
 {
-    QString path = RbSettings::subValue(m_name,RbSettings::TtsPath).toString();
-
-    if (QFileInfo(path).exists())
+    loadSettings();
+    if (QFileInfo(m_TTSexec).exists())
         return true;
-
-    return false;
+    else
+        return false;
 }
+
