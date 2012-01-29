@@ -358,6 +358,7 @@ static void time_greyscale(void)
             log_text("CPU load err (boost?)");
     }
 }
+#endif
 
 static struct touchbutton button[] = {
     {
@@ -366,7 +367,6 @@ static struct touchbutton button[] = {
         /* viewport runtime initialized, rest false/NULL */
     }
 };
-#endif
 
 void plugin_quit(void)
 {
