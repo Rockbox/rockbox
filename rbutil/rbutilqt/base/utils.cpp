@@ -272,7 +272,7 @@ QString Utils::findExecutable(QString name)
     QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
 #endif
     qDebug() << "[Utils] system path:" << path;
-    for(int i = 0; i < path.size(); i++) 
+    for(int i = 0; i < path.size(); i++)
     {
         QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + name;
 #if defined(Q_OS_WIN)
@@ -280,12 +280,13 @@ QString Utils::findExecutable(QString name)
         QStringList ex = executable.split("\"", QString::SkipEmptyParts);
         executable = ex.join("");
 #endif
-        qDebug() << "[Utils] executable:" << executable;
         if(QFileInfo(executable).isExecutable())
         {
+            qDebug() << "[Utils] findExecutable: found" << executable;
             return QDir::toNativeSeparators(executable);
         }
     }
+    qDebug() << "[Utils] findExecutable: could not find" << name;
     return "";
 }
 
