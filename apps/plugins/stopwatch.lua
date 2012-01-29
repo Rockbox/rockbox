@@ -180,7 +180,7 @@ function Button:new(o)
 
     if o.label then
         local _, w, h = rb.font_getstringsize(o.label, LapsView.vp.font)
-        o.width = 5 * w / 4
+        o.width = math.max(5 * w / 4,o.width)
         o.height = 3 * h / 2
     end
 
@@ -244,46 +244,36 @@ end
 
 function arrangeButtons(btns)
     local totalWidth, totalHeight, maxWidth, maxHeight, vp = 0, 0, 0, 0
+    local width, row = 0, 0
+    local items, num_rows
+
+    for i, btn in pairs(btns) do
+        maxHeight  = math.max(maxHeight, btn.height)
+        totalWidth = totalWidth + btn.width
+        items = i
+    end
+
     for _, btn in pairs(btns) do
-        totalWidth  = totalWidth  + btn.width
-        totalHeight = totalHeight + btn.height
-        maxHeight = math.max(maxHeight, btn.height)
-        maxWidth  = math.max(maxWidth, btn.width)
+        btn.height = maxHeight
     end
 
-    if totalWidth <= rb.LCD_WIDTH then
-        local temp = 0
-        for _, btn in pairs(btns) do
-            btn.y = rb.LCD_HEIGHT - maxHeight
-            btn.x = temp
+    num_rows = totalWidth / rb.LCD_WIDTH
 
-            temp = temp + btn.width
+    for _, btn in pairs(btns) do
+        btn.x = width
+        btn.y = rb.LCD_HEIGHT - ((num_rows - row) * maxHeight)
+        width = width + btn.width
+        if (width > rb.LCD_WIDTH - 5) then -- 5 is rounding margin
+            width = 0
+            row = row+1 
         end
-
-        vp = {
-               x = 0,
-               y = 0,
-               width = rb.LCD_WIDTH,
-               height = rb.LCD_HEIGHT - maxHeight
-             }
-    elseif totalHeight <= rb.LCD_HEIGHT then
-        local temp = 0
-        for _, btn in pairs(btns) do
-            btn.x = rb.LCD_WIDTH - maxWidth
-            btn.y = temp
-
-            temp = temp + btn.height
-        end
-
-        vp = {
-              x = 0,
-              y = 0,
-              width = rb.LCD_WIDTH - maxWidth,
-              height = rb.LCD_HEIGHT
-             }
-    else
-        error("Can't arrange the buttons according to your screen's resolution!")
     end
+    vp = {
+           x = 0,
+           y = 0,
+           width = rb.LCD_WIDTH,
+           height = rb.LCD_HEIGHT - num_rows*maxHeight - 2
+         }
 
     for k, v in pairs(vp) do
         LapsView.vp[k] = v
@@ -294,12 +284,14 @@ rb.touchscreen_set_mode(rb.TOUCHSCREEN_POINT)
 
 LapsView:init()
 
+local third = rb.LCD_WIDTH/3
+
 local btns = {
-                Button:new({name = "startTimer", label = "Start"}),
-                Button:new({name = "stopTimer", label = "Stop"}),
-                Button:new({name = "newLap", label = "New Lap"}),
-                Button:new({name = "resetTimer", label = "Reset"}),
-                Button:new({name = "exitApp", label = "Quit"})
+                Button:new({name = "startTimer", label = "Start",   width = third}),
+                Button:new({name = "stopTimer",  label = "Stop",    width = third}),
+                Button:new({name = "resetTimer", label = "Reset",   width = rb.LCD_WIDTH-third*2}), -- correct rounding error
+                Button:new({name = "newLap",     label = "New Lap", width = third*2}),
+                Button:new({name = "exitApp",    label = "Quit",    width = rb.LCD_WIDTH-third*2})  -- correct rounding error
              }
 
 arrangeButtons(btns)
