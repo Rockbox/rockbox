@@ -29,6 +29,7 @@
 .set CGU_PROC,  0xC80F0010
 .set CGU_PERI,  0xC80F0014
 .set CGU_DBOP,  0xC80F0038
+.set CCU_IO,    0xC810000C
 .set DBOP,      0xC8120000
 .set I2C_BASE,  0xC8070000
 .set I2C_DATA,  0x00
@@ -110,6 +111,11 @@ uclcopy:
 #elif defined(SANSA_CLIPV2)
 .set row, (1<<4) /* enable output on D4 */
 .set col, (1<<0) /* read keyscan column D0 */
+
+        ldr     r0, =CCU_IO
+        ldr     r1, [r0]
+        bic     r1, r1, #(3<<2) @ XPD works as general purpose IO
+        str     r1, [r0]
 
         ldr     r0, =GPIOD
         mov     r1, #((1<<5)|(1<<4)|(1<<3)) /* all rows as output */

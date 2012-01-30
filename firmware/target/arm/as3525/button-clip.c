@@ -52,6 +52,7 @@ static const int rows[3] = {
 void button_init_device(void)
 {
     GPIOA_DIR &= ~((1<<7) | (1<<3));
+    CCU_IO &= ~(3<<2);
     IN_DIR &= ~((1<<2) | (1<<1) | (1<<0));
 
     for (int i = 0; i < 3; i++) {
