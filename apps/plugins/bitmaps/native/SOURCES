@@ -648,10 +648,14 @@ solitaire_suitsi.26x132x16.bmp
 card_back.18x23x16.bmp
 card_deck.234x92x16.bmp
 solitaire_suitsi.18x92x16.bmp
-#elif LCD_WIDTH >= 96
+#elif LCD_WIDTH >= 128
 card_back.15x20x16.bmp
 card_deck.195x80x16.bmp
 solitaire_suitsi.15x80x16.bmp
+#elif LCD_WIDTH >= 96
+card_back.11x15x16.bmp
+card_deck.143x60x16.bmp
+solitaire_suitsi.11x60x16.bmp
 #endif
 #elif LCD_DEPTH > 1 /* greyscale */
 #if LCD_WIDTH >= 160
