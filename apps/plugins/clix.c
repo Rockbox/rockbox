@@ -654,11 +654,6 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                              "Playback Control",
                              "Quit");
 
-#ifdef HAVE_TOUCHSCREEN
-    /* Entering Menu, set the touchscreen to the global setting */
-    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
-#endif
-
     while (!leave_menu) {
 
         switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
@@ -692,11 +687,6 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
                 break;
         }
     }
-
-#ifdef HAVE_TOUCHSCREEN
-    /* Leaving the menu, set back to pointer mode */
-    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
-#endif
 
     return ret;
 }
@@ -792,7 +782,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
                     if(x < BOARD_WIDTH && y < BOARD_HEIGHT
                        && state->board[XYPOS(x, y)] != CC_BLACK)
                     {
-                        if(state->x == x && state->y == y)
+                        if(state->x == x && state->y == y && button & BUTTON_REL)
                             button = CLIX_BUTTON_CLICK;
                         else
                         {
