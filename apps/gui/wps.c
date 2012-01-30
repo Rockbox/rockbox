@@ -546,9 +546,19 @@ static void next_track(void)
 static void play_hop(int direction)
 {
     struct wps_state *state = skin_get_global_state();
+    struct cuesheet *cue = state->id3->cuesheet;
     long step = global_settings.skip_length*1000;
     long elapsed = state->id3->elapsed;
     long remaining = state->id3->length - elapsed;
+
+    /* if cuesheet is active, then we want the current tracks end instead of
+     * the total end */
+    if (cue && (cue->curr_track_idx+1 < cue->track_count))
+    {
+        int next = cue->curr_track_idx+1;
+        struct cue_track_info *t = &cue->tracks[next];
+        remaining = t->offset - elapsed;
+    }
 
     if (step < 0)
     {
