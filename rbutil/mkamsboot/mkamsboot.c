@@ -474,15 +474,15 @@ void patch_firmware(
     memcpy(buf + 0x600, ams_identity[model].bootloader, ams_identity[model].bootloader_size);
 
     /* Insert vectors, they won't overwrite the OF version string */
-
-    /* Reset vector: branch 0x200 bytes away, to our dualboot code */
-    static const uint8_t b_0x200[4] = { 0x7e, 0x00, 0x00, 0xea }; // b 0x200
-    memcpy(buf + 0x400, b_0x200, sizeof(b_0x200));
-
-    /* Other vectors: infinite loops */
-    static const uint8_t b_1b[4]    = { 0xfe, 0xff, 0xff, 0xea }; // 1: b 1b
-    for (i=1; i < 8; i++)
-        memcpy(buf + 0x400 + 4*i, b_1b, sizeof(b_1b));
+    static const uint32_t goto_start    = 0xe3a0fc02; // mov pc, #0x200
+    static const uint32_t infinite_loop = 0xeafffffe; // 1: b 1b
+    /* ALL vectors: infinite loop */
+    for (i=0; i < 8; i++)
+        put_uint32le(buf + 0x400 + 4*i, infinite_loop);
+    /* Now change only the interesting vectors */
+    /* Reset/SWI vectors: branch to our dualboot code at 0x200 */
+    put_uint32le(buf + 0x400 + 4*0, goto_start); // Reset
+    put_uint32le(buf + 0x400 + 4*2, goto_start); // SWI
 
     /* We are filling the firmware buffer backwards from the end */
     p = buf + 0x400 + firmware_size;
