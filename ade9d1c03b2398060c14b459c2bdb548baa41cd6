@@ -51,6 +51,24 @@
       "revId": "ade9d1c03b2398060c14b459c2bdb548baa41cd6",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///9w\u003d",
+        "filename": "apps/plugins/brickmania.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2395,
+      "author": {
+        "id": 1000072
+      },
+      "writtenOn": "2012-01-31T12:47:21Z",
+      "side": 1,
+      "message": "I wasn\u0027t trying to delete the resume file for an old game - at the time of writing of this patch, I frequently resumed into already lost games. According to git, nothing has changed since then in brickmanias code.",
+      "parentUuid": "AAAABn///94\u003d",
+      "revId": "ade9d1c03b2398060c14b459c2bdb548baa41cd6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
