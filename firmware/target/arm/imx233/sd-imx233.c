@@ -69,9 +69,6 @@ void sd_power(bool on)
     imx233_set_gpio_output(0, 8, !on);
     /* disable pull ups when not needed to save power */
     imx233_ssp_setup_ssp1_sd_mmc_pins(on, 4, PINCTRL_DRIVE_4mA, false);
-    /* It also setups pin B1P30, unknown purpose */
-    imx233_set_pin_function(1, 30, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(1, 30, false);
     #endif
 }
 
