@@ -31,6 +31,7 @@
 #include "powermgmt-imx233.h"
 #include "rtc-imx233.h"
 #include "dcp-imx233.h"
+#include "pinctrl-imx233.h"
 #include "string.h"
 
 #define DEBUG_CANCEL  BUTTON_BACK
@@ -394,11 +395,39 @@ bool dbg_hw_info_dcp(void)
     }
 }
 
+bool dbg_hw_info_pinctrl(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        int button = get_action(CONTEXT_STD, HZ / 10);
+        switch(button)
+        {
+            case ACTION_STD_NEXT:
+            case ACTION_STD_PREV:
+            case ACTION_STD_OK:
+            case ACTION_STD_MENU:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACTION_STD_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        for(int i = 0; i < 4; i++)
+            lcd_putsf(0, i, "DIN%d = 0x%08x", i, imx233_get_gpio_input_mask(i, 0xffffffff));
+        lcd_update();
+        yield();
+    }
+}
+
 bool dbg_hw_info(void)
 {
     return dbg_hw_info_clkctrl() && dbg_hw_info_dma() && dbg_hw_info_adc() &&
         dbg_hw_info_power() && dbg_hw_info_powermgmt() && dbg_hw_info_rtc() &&
-        dbg_hw_info_dcp() && dbg_hw_target_info();
+        dbg_hw_info_dcp() && dbg_hw_info_pinctrl() && dbg_hw_target_info();
 }
 
 bool dbg_ports(void)
