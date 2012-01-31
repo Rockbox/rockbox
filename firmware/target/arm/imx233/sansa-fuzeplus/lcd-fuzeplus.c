@@ -501,6 +501,12 @@ void lcd_update_rect(int x, int y, int w, int h)
     if(!lcd_on)
         return;
     #endif
+    /* make sure the rectangle is included in the screen */
+    x = MIN(x, LCD_WIDTH);
+    y = MIN(y, LCD_HEIGHT);
+    w = MIN(w, LCD_WIDTH - x);
+    h = MIN(h, LCD_HEIGHT - y);
+
     imx233_lcdif_wait_ready();
     lcd_write_reg(0x50, x);
     lcd_write_reg(0x51, x + w - 1);
