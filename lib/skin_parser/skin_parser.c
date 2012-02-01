@@ -314,6 +314,9 @@ static struct skin_element* skin_parse_line_optional(const char** document,
         return NULL;
     retval->type = LINE;
     retval->line = skin_line;
+    while (*cursor == '\t')
+        cursor++;
+
     if(*cursor != '\0' && *cursor != '\n' && *cursor != MULTILINESYM
        && !(conditional && (*cursor == ARGLISTSEPARATESYM
                             || *cursor == ARGLISTCLOSESYM
@@ -426,6 +429,8 @@ static struct skin_element* skin_parse_sublines_optional(const char** document,
     retval->type = LINE_ALTERNATOR;
     retval->next = skin_buffer_to_offset(NULL);
     retval->line = skin_line;
+    while (*cursor == '\t')
+        cursor++;
 
     /* First we count the sublines */
     while(*cursor != '\0' && *cursor != '\n'
