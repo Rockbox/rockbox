@@ -30,7 +30,8 @@
 #include "fmradio_i2c.h" /* physical interface driver */
 #include "rds.h"
 
-#if defined(SANSA_CLIP) || defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2)
+#if defined(SANSA_CLIP) || defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2) \
+    || defined(SANSA_FUZEPLUS)
 /* some models use the internal 32 kHz oscillator which needs special attention
    during initialisation, power-up and power-down. */
 #define SI4700_USE_INTERNAL_OSCILLATOR

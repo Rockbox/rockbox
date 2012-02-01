@@ -26,6 +26,7 @@
 #include "usb.h"
 #include "system-target.h"
 #include "power-imx233.h"
+#include "pinctrl-imx233.h"
 
 struct current_step_bit_t
 {
@@ -110,6 +111,12 @@ void power_off(void)
 {
     /* wait a bit, useful for the user to stop touching anything */
     sleep(HZ / 2);
+#ifdef SANSA_FUZEPLUS
+    /* This pin seems to be important to shutdown the hardware properly */
+    imx233_set_pin_function(0, 9, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(0, 9, true);
+    imx233_set_gpio_output(0, 9, true);
+#endif
     /* power down */
     HW_POWER_RESET = HW_POWER_RESET__UNLOCK | HW_POWER_RESET__PWD;
     while(1);
