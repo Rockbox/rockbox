@@ -961,7 +961,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
         return 0;
     }
     bookmark = cursor;
-    while(*cursor != ENUMLISTCLOSESYM && *cursor != '\n' && *cursor != '\0')
+    while(*cursor != ENUMLISTCLOSESYM && *cursor != '\0')
     {
         if(*cursor == COMMENTSYM)
         {
@@ -969,6 +969,8 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
         }
         else if(*cursor == ENUMLISTOPENSYM)
         {
+            if (*cursor == '\n')
+                cursor++;
             skip_enumlist(&cursor);
         }
         else if(*cursor == TAGSYM)
@@ -982,6 +984,8 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
         {
             children++;
             cursor++;
+            if (*cursor == '\n')
+                cursor++;
 #ifdef ROCKBOX
             if (false_branch == NULL && !feature_available)
             {
@@ -1038,6 +1042,11 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
 
         for(i = 0; i < children; i++)
         {
+            if (*cursor == '\n')
+            {
+                skin_line++;
+                cursor++;
+            }
             children_array[i] = skin_buffer_to_offset(skin_parse_code_as_arg(&cursor));
             if (children_array[i] < 0)
                 return 0;
