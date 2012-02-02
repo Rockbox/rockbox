@@ -513,35 +513,31 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
 {
     const char* cursor = *document + 1;
     const char* bookmark;
+    char *open_square_bracket = NULL;
 
-    char tag_name[3];
+    char tag_name[MAX_TAG_LENGTH];
     char* tag_args;
     const struct tag_info *tag;
     struct skin_tag_parameter* params = NULL;
 
     int num_args = 1;
     int i;
-    int star = 0; /* Flag for the all-or-none option */
+    int qmark = 0; /* Flag for the all-or-none option */
 
     int optional = 0;
 
     /* Checking the tag name */
-    tag_name[0] = cursor[0];
-    tag_name[1] = cursor[1];
-    tag_name[2] = '\0';
+    for (i=0; cursor[i] && i<MAX_TAG_LENGTH; i++)
+        tag_name[i] = cursor[i];
 
     /* First we check the two characters after the '%', then a single char */
-    tag = find_tag(tag_name);
-
-    if(!tag)
+    tag = NULL;
+    i = MAX_TAG_LENGTH;
+    while (!tag && i > 1)
     {
-        tag_name[1] = '\0';
+        tag_name[i-1] = '\0';
         tag = find_tag(tag_name);
-        cursor++;
-    }
-    else
-    {
-        cursor += 2;
+        i--;
     }
 
     if(!tag)
@@ -549,6 +545,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         skin_error(ILLEGAL_TAG, cursor);
         return 0;
     }
+    cursor += i;
 
     /* Copying basic tag info */
     if(element->type != CONDITIONAL && element->type != VIEWPORT)
@@ -558,16 +555,16 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     element->line = skin_line;
 
     /* Checking for the * flag */
-    if(tag_args[0] == '*')
+    if(tag_args[0] == '?')
     {
-        star = 1;
+        qmark = 1;
         tag_args++;
     }
 
     /* If this tag has no arguments, we can bail out now */
     if(strlen(tag_args) == 0
        || (tag_args[0] == '|' && *cursor != ARGLISTOPENSYM)
-       || (star && *cursor != ARGLISTOPENSYM))
+       || (qmark && *cursor != ARGLISTOPENSYM))
     {
         
 #ifdef ROCKBOX
@@ -663,6 +660,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             bool canbedefault = false;
             bool haspercent = false, number = true, hasdecimal = false;
             char temp_params[8];
+            open_square_bracket = tag_args;
             tag_args++;
             while (*tag_args != ']')
             {
@@ -681,7 +679,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
                                     (cursor[j] == '-'));
                 j++;
             }
-            type_code = '*';
+            type_code = '?';
             if (canbedefault && *cursor == DEFAULTSYM && !isdigit(cursor[1]))
             {
                 type_code = 'i';
@@ -704,7 +702,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             {
                 type_code = 's';
             }
-            if (type_code == '*')
+            if (type_code == '?')
             {
                 skin_error(INSUFFICIENT_ARGS, cursor);
                 return 0;
@@ -768,8 +766,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             params[i].type = DECIMAL;
             params[i].data.number = val;
         }
-        else if(tolower(type_code) == 'n' ||
-                tolower(type_code) == 's' || tolower(type_code) == 'f')
+        else if(tolower(type_code) == 's' || tolower(type_code) == 'f')
         {
             /* Scanning a string argument */
             params[i].type = STRING;
@@ -813,7 +810,17 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             cursor++;
         }
 
-        if (*tag_args != 'N')
+        if (*(tag_args + 1) == '*')
+        {
+            if (i+1 == num_args)
+                tag_args += 2;
+            else if (open_square_bracket)
+            {
+                tag_args = open_square_bracket;
+                open_square_bracket = NULL;
+            }
+        }
+        else
             tag_args++;
 
         /* Checking for the optional bar */
