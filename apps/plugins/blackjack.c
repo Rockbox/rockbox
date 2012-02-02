@@ -1050,7 +1050,8 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
       (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
       (CONFIG_KEYPAD == SANSA_E200_PAD) || \
       (CONFIG_KEYPAD == SANSA_FUZE_PAD) || \
-      (CONFIG_KEYPAD == SANSA_CONNECT_PAD)
+      (CONFIG_KEYPAD == SANSA_CONNECT_PAD) || \
+      (CONFIG_KEYPAD == MPIO_HD300_PAD)
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - h-2, " >>|:     +1");
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 1, " |<<:     -1");
     rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + h, "SCROLL+: +10");
