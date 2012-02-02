@@ -312,11 +312,11 @@ static void setoptions (void)
         options.LEFT   = BUTTON_REW;
         options.RIGHT  = BUTTON_FF;
 
-        options.A      = BUTTON_MENU;
-        options.B      = BUTTON_ENTER;
-        options.START  = BUTTON_PLAY;
-        options.SELECT = (BUTTON_ENTER | BUTTON_REPEAT);
-        options.MENU   = (BUTTON_MENU | BUTTON_REPEAT);
+        options.A      = BUTTON_PLAY;
+        options.B      = BUTTON_REC;
+        options.START  = (BUTTON_PLAY | BUTTON_REPEAT);
+        options.SELECT = BUTTON_ENTER;
+        options.MENU   = BUTTON_MENU;
 
 #elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
         options.UP     = BUTTON_UP;

@@ -203,14 +203,14 @@
 
 #elif CONFIG_KEYPAD == MPIO_HD200_PAD
 #define BTN_QUIT         (BUTTON_REC | BUTTON_PLAY)
-#define BTN_RIGHT        BUTTON_VOL_DOWN
-#define BTN_LEFT         BUTTON_VOL_UP
-#define BTN_UP           BUTTON_REW
-#define BTN_DOWN         BUTTON_FF
+#define BTN_RIGHT        BUTTON_FF
+#define BTN_LEFT         BUTTON_REW
+#define BTN_UP           BUTTON_VOL_UP
+#define BTN_DOWN         BUTTON_VOL_DOWN
 #define BTN_PLAY         BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define BTN_QUIT         (BUTTON_REC | BUTTON_REPEAT)
+#define BTN_QUIT         (BUTTON_MENU | BUTTON_REPEAT)
 #define BTN_RIGHT        BUTTON_FF
 #define BTN_LEFT         BUTTON_REW
 #define BTN_UP           BUTTON_UP

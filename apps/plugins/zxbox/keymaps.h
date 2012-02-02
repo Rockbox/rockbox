@@ -211,7 +211,7 @@
 
 #elif CONFIG_KEYPAD == MPIO_HD300_PAD
 
-#define ZX_MENU         (BUTTON_REC|BUTTON_REPEAT)
+#define ZX_MENU         (BUTTON_MENU|BUTTON_REPEAT)
 #define ZX_UP           BUTTON_UP
 #define ZX_DOWN         BUTTON_DOWN
 #define ZX_SELECT       BUTTON_ENTER

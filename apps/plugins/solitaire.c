@@ -490,21 +490,21 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_REM2STACK    "PLAY...."
 
 #elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#   define SOL_QUIT         BUTTON_REC
+#   define SOL_QUIT         (BUTTON_MENU | BUTTON_REPEAT)
 #   define SOL_UP           BUTTON_UP
 #   define SOL_DOWN         BUTTON_DOWN
-#   define SOL_LEFT         BUTTON_MENU
-#   define SOL_RIGHT        BUTTON_ENTER
-#   define SOL_MOVE_PRE     BUTTON_REW
-#   define SOL_MOVE         BUTTON_FF
-#   define SOL_DRAW         (BUTTON_ENTER | BUTTON_PLAY)
-#   define SOL_REM2CUR      (BUTTON_MENU | BUTTON_REPEAT)
-#   define SOL_CUR2STACK    BUTTON_PLAY
+#   define SOL_LEFT         BUTTON_REW
+#   define SOL_RIGHT        BUTTON_FF
+#   define SOL_MOVE_PRE     BUTTON_ENTER
+#   define SOL_MOVE         (BUTTON_ENTER | BUTTON_REL)
+#   define SOL_DRAW         BUTTON_MENU
+#   define SOL_REM2CUR      (BUTTON_PLAY | BUTTON_REL)
+#   define SOL_CUR2STACK    BUTTON_REC
 #   define SOL_REM2STACK    (BUTTON_PLAY | BUTTON_REPEAT)
-#   define HK_MOVE         "FF"
-#   define HK_DRAW         "ENTER + PLAY"
-#   define HK_REM2CUR      "EMNU.."
-#   define HK_CUR2STACK    "PLAY"
+#   define HK_MOVE         "ENTER"
+#   define HK_DRAW         "MENU"
+#   define HK_REM2CUR      "PLAY"
+#   define HK_CUR2STACK    "ENTER..."
 #   define HK_REM2STACK    "PLAY...."
 
 #elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD

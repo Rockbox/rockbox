@@ -300,7 +300,7 @@
 #define CUBE_HIGHSPEED     BUTTON_FUNC
 
 #elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define CUBE_QUIT          BUTTON_REC
+#define CUBE_QUIT          (BUTTON_MENU | BUTTON_REPEAT)
 #define CUBE_NEXT          BUTTON_FF
 #define CUBE_PREV          BUTTON_REW
 #define CUBE_INC           BUTTON_UP

@@ -339,20 +339,24 @@
 #define  GBN_BUTTON_DOWN               BUTTON_FF
 #define  GBN_BUTTON_LEFT               BUTTON_VOL_DOWN
 #define  GBN_BUTTON_RIGHT              BUTTON_VOL_UP
-#define  GBN_BUTTON_RETREAT            BUTTON_REC
-#define  GBN_BUTTON_ADVANCE            BUTTON_PLAY
-#define  GBN_BUTTON_PLAY               BUTTON_FUNC | BUTTON_REL
-#define  GBN_BUTTON_MENU               BUTTON_FUNC | BUTTON_REPEAT
+#define  GBN_BUTTON_RETREAT            (BUTTON_REC | BUTTON_REW)
+#define  GBN_BUTTON_ADVANCE            (BUTTON_REC | BUTTON_FF)
+#define  GBN_BUTTON_PLAY               (BUTTON_FUNC | BUTTON_REL)
+#define  GBN_BUTTON_MENU               BUTTON_PLAY
+#define  GBN_BUTTON_CONTEXT            (BUTTON_FUNC | BUTTON_REPEATE)
+#define  GBN_BUTTON_NEXT_VAR           BUTTON_REC
 
 #elif (CONFIG_KEYPAD == MPIO_HD300_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
 #define  GBN_BUTTON_DOWN               BUTTON_DOWN
 #define  GBN_BUTTON_LEFT               BUTTON_REW
 #define  GBN_BUTTON_RIGHT              BUTTON_FF
-#define  GBN_BUTTON_RETREAT            BUTTON_REC
-#define  GBN_BUTTON_ADVANCE            BUTTON_PLAY
-#define  GBN_BUTTON_PLAY               BUTTON_ENTER
+#define  GBN_BUTTON_RETREAT            (BUTTON_REC | BUTTON_REW)
+#define  GBN_BUTTON_ADVANCE            (BUTTON_REC | BUTTON_FF)
+#define  GBN_BUTTON_PLAY               (BUTTON_ENTER | BUTTON_REL)
+#define  GBN_BUTTON_CONTEXT            (BUTTON_ENTER | BUTTON_REPEAT)
 #define  GBN_BUTTON_MENU               BUTTON_MENU
+#define  GBN_BUTTON_NEXT_VAR           BUTTON_REC
 
 #elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
