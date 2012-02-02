@@ -565,6 +565,10 @@ Example: \config{\%ax\%V(\dots)}
       \config{operand}: either a second tag, a number, or text.\newline
       \config{[option count]}: optional parameter used to select which parameter
         of a tag to use when the tag has multiple options, e.g. \%?pv<a|b|c|d>\\
+\config{\%and(tag1, tag2, ..., tagN)}\newline
+    & Logical ``and'' operator. Will be evaluate to true if all the tag parameters are true.\\
+\config{\%or(tag1, tag2, ..., tagN)}\newline
+    & Logical ``or'' operator. Will be evaluate to true if any of the tag parameters are true.\\
 \end{tagmap}
 
 Examples of the \%if tag:\\

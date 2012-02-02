@@ -739,6 +739,16 @@ static int parse_setting_and_lang(struct skin_element *element,
     token->value.i = i;
     return 0;
 }
+
+static int parse_logical_andor(struct skin_element *element,
+                             struct wps_token *token,
+                             struct wps_data *wps_data)
+{
+    (void)wps_data;
+    token->value.data = PTRTOSKINOFFSET(skin_buffer, element);
+    return 0;
+}
+
 static int parse_logical_if(struct skin_element *element,
                              struct wps_token *token,
                              struct wps_data *wps_data)
@@ -1945,6 +1955,10 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     break;
                 case SKIN_TOKEN_LOGICAL_IF:
                     function = parse_logical_if;
+                    break;
+                case SKIN_TOKEN_LOGICAL_AND:
+                case SKIN_TOKEN_LOGICAL_OR:
+                    function = parse_logical_andor;
                     break;
                 case SKIN_TOKEN_SUBSTRING:
                     function = parse_substring_tag;

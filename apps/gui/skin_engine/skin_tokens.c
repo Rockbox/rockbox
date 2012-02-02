@@ -887,6 +887,32 @@ const char *get_token_value(struct gui_wps *gwps,
             return get_lif_token_value(gwps, lif, offset, buf, buf_size);
         }
         break;
+        case SKIN_TOKEN_LOGICAL_AND:
+        case SKIN_TOKEN_LOGICAL_OR:
+        {
+            int i = 0, truecount = 0;
+            char *skinbuffer = get_skin_buffer(data);
+            struct skin_element *element =
+                    SKINOFFSETTOPTR(skinbuffer, token->value.data);
+            struct skin_tag_parameter* params =
+                    SKINOFFSETTOPTR(skinbuffer, element->params);
+            struct skin_tag_parameter* thistag;
+            for (i=0; i<element->params_count; i++)
+            {
+                thistag = &params[i];
+                struct skin_element *tokenelement =
+                        SKINOFFSETTOPTR(skinbuffer, thistag->data.code);
+                out_text  =  get_token_value(gwps,
+                        SKINOFFSETTOPTR(skinbuffer, tokenelement->data),
+                        offset, buf, buf_size, intval);
+                if (out_text && *out_text)
+                    truecount++;
+                else if (token->type == SKIN_TOKEN_LOGICAL_AND)
+                    return NULL;
+            }
+            return truecount ? "true" : NULL;
+        }
+        break;
         case SKIN_TOKEN_SUBSTRING:
         {
             struct substring *ss = SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
