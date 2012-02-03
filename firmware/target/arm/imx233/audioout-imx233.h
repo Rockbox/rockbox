@@ -112,11 +112,10 @@ void imx233_audioout_preinit(void);
 void imx233_audioout_postinit(void);
 void imx233_audioout_close(void);
 /* volume in half dB */
-void imx233_audioout_set_dac_vol(int vol_l, int vol_r);
 void imx233_audioout_set_hp_vol(int vol_l, int vol_r);
 /* frequency index, NOT the frequency itself */
 void imx233_audioout_set_freq(int fsel);
 /* select between DAC and Line1 */
-void imx233_audiout_select_hp_input(bool line1);
+void imx233_audioout_select_hp_input(bool line1);
 
 #endif /* __audioout_imx233__ */

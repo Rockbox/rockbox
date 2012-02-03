@@ -32,9 +32,9 @@ static int output_source = AUDIO_SRC_PLAYBACK;
 static void select_audio_path(void)
 {
     if(input_source == AUDIO_SRC_PLAYBACK)
-        imx233_audiout_select_hp_input(false);
+        imx233_audioout_select_hp_input(false);
     else
-        imx233_audiout_select_hp_input(true);
+        imx233_audioout_select_hp_input(true);
 }
 
 void audio_input_mux(int source, unsigned flags)

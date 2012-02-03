@@ -69,9 +69,7 @@ void audiohw_close(void)
 
 void audiohw_set_headphone_vol(int vol_l, int vol_r)
 {
-    /* Use playback volume if <0 and headphone volume if >0 */
-    imx233_audioout_set_dac_vol(MIN(0, vol_l), MIN(0, vol_r));
-    imx233_audioout_set_hp_vol(MAX(0, vol_l), MAX(0, vol_r));
+    imx233_audioout_set_hp_vol(vol_l, vol_r);
 }
 
 void audiohw_set_frequency(int fsel)

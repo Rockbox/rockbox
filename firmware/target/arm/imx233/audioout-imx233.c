@@ -23,6 +23,8 @@
 #include "rtc-imx233.h"
 #include "pcm_sampr.h"
 
+static int hp_vol_l, hp_vol_r;
+
 void imx233_audioout_preinit(void)
 {
     /* Enable AUDIOOUT block */
@@ -78,8 +80,10 @@ void imx233_audioout_close(void)
     /* will also gate off the module */
     __REG_CLR(HW_AUDIOOUT_CTRL) = HW_AUDIOOUT_CTRL__RUN;
 }
-/* volume in half dB */
-void imx233_audioout_set_dac_vol(int vol_l, int vol_r)
+
+/* volume in half dB
+ * don't check input values */
+static void set_dac_vol(int vol_l, int vol_r)
 {
     /* minimum is -100dB and max is 0dB */
     vol_l = MAX(-200, MIN(vol_l, 0));
@@ -92,14 +96,16 @@ void imx233_audioout_set_dac_vol(int vol_l, int vol_r)
         HW_AUDIOOUT_DACVOLUME__EN_ZCD;
 }
 
-void imx233_audioout_set_hp_vol(int vol_l, int vol_r)
+/* volume in half dB
+ * don't check input values */
+static void set_hp_vol(int vol_l, int vol_r)
 {
     uint32_t select = (HW_AUDIOOUT_HPVOL & HW_AUDIOOUT_HPVOL__SELECT);
     /* minimum is -57.5dB and max is 6dB in DAC mode
      * and -51.5dB / 12dB in Line1 mode */
     int min = select ? -103 : -115;
     int max = select ? 24 : 12;
-    
+
     vol_l = MAX(min, MIN(vol_l, max));
     vol_r = MAX(min, MIN(vol_r, max));
     /* unmute, enable zero cross and set volume. Keep select value. */
@@ -108,6 +114,30 @@ void imx233_audioout_set_hp_vol(int vol_l, int vol_r)
         (max - vol_r) << HW_AUDIOOUT_HPVOL__VOL_RIGHT_BP |
         select |
         HW_AUDIOOUT_HPVOL__EN_MSTR_ZCD;
+}
+
+static void apply_volume(void)
+{
+    /* Two cases: line1 and dac */
+    if(HW_AUDIOOUT_HPVOL & HW_AUDIOOUT_HPVOL__SELECT)
+    {
+        /* In line1 mode, the HP is the only way to adjust the volume */
+        set_hp_vol(hp_vol_l, hp_vol_r);
+    }
+    else
+    {
+        /* In DAC mode we can use both the HP and the DAC volume.
+         * Use the DAC for volume <0 and HP for volume >0 */
+        set_dac_vol(MIN(0, hp_vol_l), MIN(0, hp_vol_r));
+        set_hp_vol(MAX(0, hp_vol_l), MAX(0, hp_vol_r));
+    }
+}
+
+void imx233_audioout_set_hp_vol(int vol_l, int vol_r)
+{
+    hp_vol_l = vol_l;
+    hp_vol_r = vol_r;
+    apply_volume();
 }
 
 void imx233_audioout_set_freq(int fsel)
@@ -170,10 +200,12 @@ void imx233_audioout_set_freq(int fsel)
 }
 
 /* select between DAC and Line1 */
-void imx233_audiout_select_hp_input(bool line1)
+void imx233_audioout_select_hp_input(bool line1)
 {
     if(line1)
         __REG_SET(HW_AUDIOOUT_HPVOL) = HW_AUDIOOUT_HPVOL__SELECT;
     else
         __REG_CLR(HW_AUDIOOUT_HPVOL) = HW_AUDIOOUT_HPVOL__SELECT;
+    /* reapply volume setting */
+    apply_volume();
 }
