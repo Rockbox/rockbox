@@ -35,7 +35,8 @@ int find_first_set_bit(uint32_t val)
     if (val == 0)
         return 32;
 
-    /* __builtin_ffs(l(l)): Returns one plus the index of the least significant
-       1-bit of x, or if x is zero, returns zero. */
-    return __builtin_ffs(val) - 1;
+    /* __builtin_ctz[l[l]]: Returns the number of trailing 0-bits in x,
+     * starting at the least significant bit position. If x is 0, the result
+     * is undefined. */
+    return __builtin_ctz(val);
 }
