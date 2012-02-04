@@ -609,6 +609,9 @@ static void DoUserDialog(char* filename)
     }
 
     bl_version = BootloaderVersion();
+    /* Upgrade currently not recommended for FM and V2
+       recorder due to bugs in V3 BootBox. (FS#12426) */
+#if !defined(ARCHOS_FMRECORDER) && !defined(ARCHOS_RECORDERV2)
     if (bl_version < LATEST_BOOTLOADER_VERSION)
     {
         rb->lcd_putsf(0, 0, "Bootloader V%d", bl_version);
@@ -616,9 +619,8 @@ static void DoUserDialog(char* filename)
         rb->lcd_puts(0, 2, "using the latest  ");
         rb->lcd_puts(0, 3, "bootloader.       ");
         rb->lcd_puts(0, 4, "A full reflash is ");
-        rb->lcd_puts(0, 5, "recommended, but  ");
-        rb->lcd_puts(0, 6, "not required.     ");
-        rb->lcd_puts(0, 7, "Press " KEYNAME1 " to ignore");
+        rb->lcd_puts(0, 5, "recommended.      ");
+        rb->lcd_puts(0, 6, "Press " KEYNAME1 " to ignore");
         rb->lcd_update();
 
         if (WaitForButton() != KEY1)
@@ -627,6 +629,7 @@ static void DoUserDialog(char* filename)
         }
         rb->lcd_clear_display();
     }
+#endif
     
     rb->lcd_puts(0, show_greet ? 0 : 3, "Checking...");
     rb->lcd_update();
@@ -665,6 +668,10 @@ static void DoUserDialog(char* filename)
     case eTooBig:
             rb->lcd_puts(0, 1, "File too big,");
             rb->lcd_puts(0, 2, "won't fit in chip.");
+            if (bl_version < LATEST_BOOTLOADER_VERSION)
+            {
+                rb->lcd_puts(0, 3, "Upgrade bootloader");
+            }
             break;
     case eTooSmall:
             rb->lcd_puts(0, 1, "File too small.");
@@ -679,8 +686,10 @@ static void DoUserDialog(char* filename)
             rb->lcd_puts(0, 3, " too small?");
             break;
     case eBadRomLink:
-            rb->lcd_puts(0, 1, "RomBox mismatch.");
-            rb->lcd_puts(0, 2, "Wrong ROM position");
+            rb->lcd_puts(0, 1, "Bootloader not");
+            rb->lcd_puts(0, 2, "compatible with");
+            rb->lcd_puts(0, 3, "RomBox. Start");
+            rb->lcd_puts(0, 4, "address mismatch.");
             break;
     default:
             rb->lcd_puts(0, 1, "Check failed.");
@@ -840,7 +849,14 @@ static void DoUserDialog(char* filename)
             rb->lcd_puts_scroll(0, 1, "File not found.");
             break;
     case eTooBig:
-            rb->lcd_puts_scroll(0, 1, "File too big.");
+            if (bl_version < LATEST_BOOTLOADER_VERSION)
+            {
+                rb->lcd_puts_scroll(0, 1, "File too big, upgrade bootloader.");
+            }
+            else
+            {
+                rb->lcd_puts_scroll(0, 1, "File too big.");
+            }
             break;
     case eTooSmall:
             rb->lcd_puts_scroll(0, 1, "File too small. Incomplete?");
@@ -852,7 +868,7 @@ static void DoUserDialog(char* filename)
             rb->lcd_puts_scroll(0, 1, "File invalid. Blocksize too small?");
             break;
     case eBadRomLink:
-            rb->lcd_puts_scroll(0, 1, "RomBox mismatch.");
+            rb->lcd_puts_scroll(0, 1, "Bootloader not compatible with RomBox.");
             break;
     default:
             rb->lcd_puts_scroll(0, 1, "Check failed.");
