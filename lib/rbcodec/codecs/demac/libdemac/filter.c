@@ -22,9 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 */
 
-#include <string.h>
-#include <inttypes.h>
-
 #include "demac.h"
 #include "filter.h"
 #include "demac_config.h"

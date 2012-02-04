@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "rbcodecconfig.h"
 
 #if defined(CPU_S5L870X)
     /* Moving this asm routine to iram is (little) faster on S5L870x. */

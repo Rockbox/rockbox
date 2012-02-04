@@ -1,7 +1,7 @@
 #ifndef RM_BYTESTREAM_H
 #define RM_BYTESTREAM_H
 
-#include <inttypes.h>
+#include "platform.h"
 
 static inline void advance_buffer(uint8_t **buf, int val)
 {

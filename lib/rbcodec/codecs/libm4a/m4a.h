@@ -22,8 +22,7 @@
 #ifndef _M4A_H
 #define _M4A_H
 
-#include <codecs.h>
-#include <inttypes.h>
+#include "codecs.h"
 
 /* AAC codecdata appears to always be less than 8 bytes - see
    AudioSpecificConfig2 in libfaad/mp4.c

@@ -23,9 +23,6 @@
 
 #include "config-a52.h"
 
-#include <string.h>
-#include <inttypes.h>
-
 #include "a52.h"
 #include "a52_internal.h"
 

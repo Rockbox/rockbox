@@ -52,9 +52,6 @@
 /*#define USE_SBRK        (0) */
 /*#define USE_MMAP        (0) */
 
-#include <stdio.h>
-#include <string.h>
-
 #ifndef TLSF_USE_LOCKS
 #define TLSF_USE_LOCKS  (0)
 #endif
@@ -104,7 +101,12 @@
 #include <sys/mman.h>
 #endif
 
+#ifdef CODEC
+#include "platform.h"
+#else
 #include "config.h"
+#endif
+
 #include "tlsf.h"
 
 #if !defined(__GNUC__)

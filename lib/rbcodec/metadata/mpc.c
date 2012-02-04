@@ -20,14 +20,10 @@
  *
  ****************************************************************************/
 
-#include <string.h>
-#include <stdio.h>
-#include <inttypes.h>
 #include "platform.h"
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "logf.h"
 #include "replaygain.h"
 #include "fixedpoint.h"
 

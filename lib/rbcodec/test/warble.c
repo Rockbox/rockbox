@@ -31,12 +31,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "buffering.h" /* TYPE_PACKET_AUDIO */
 #include "codecs.h"
-#include "core_alloc.h" /* core_allocator_init */
 #include "dsp.h"
 #include "metadata.h"
-#include "settings.h"
 #include "tdspeed.h"
 #include "platform.h"
 

@@ -8,7 +8,6 @@
   *    heavily rewritten to fit openMSX structure
   */
 
-#include <math.h>
 #include "emu8950.h"
 
 #ifdef _MSC_VER

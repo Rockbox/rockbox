@@ -29,12 +29,8 @@
  *
  */
 
-#include <string.h>
-#include <inttypes.h>
-#include <stdlib.h>
-
+#include "platform.h"
 #include "codeclib.h"
-
 #include "m4a.h"
 
 #undef DEBUGF

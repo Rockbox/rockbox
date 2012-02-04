@@ -26,7 +26,6 @@
  * fixed point data types and constants
  */
 
-#include <inttypes.h>
 typedef int32_t FIXP;           /* Fixed point variable type */
 typedef uint16_t FIXPU;         /* Fixed point fraction 0<=x<1 */
 

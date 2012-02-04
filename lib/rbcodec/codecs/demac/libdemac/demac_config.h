@@ -28,13 +28,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 /* Build-time choices for libdemac.
  * Note that this file is included by both .c and .S files. */
 
-#ifdef ROCKBOX
+#if 1
 
-#include "config.h"
+#include "rbcodecconfig.h"
 
 #ifndef __ASSEMBLER__
 #include "codeclib.h"
-#include <codecs.h>
+#include "codecs.h"
 #endif
 
 #define APE_OUTPUT_DEPTH 29
@@ -85,7 +85,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #define IBSS_ATTR_DEMAC_INSANEBUF IBSS_ATTR
 #endif
 
-#else /* !ROCKBOX */
+#else /* !1 */
 
 #define APE_OUTPUT_DEPTH (ape_ctx->bps)
 
@@ -106,7 +106,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #define UNLIKELY(x) (x)
 #endif
 
-#endif /* !ROCKBOX */
+#endif /* !1 */
 
 /* Defaults */
 
@@ -134,7 +134,6 @@ unsigned udiv32_arm(unsigned a, unsigned b);
 #define UDIV32(a, b) (a / b)
 #endif
 
-#include <inttypes.h>
 #if FILTER_BITS == 32
 typedef int32_t filter_int;
 #elif FILTER_BITS == 16

@@ -23,7 +23,6 @@ extern "C"
 {
 #endif /* __cplusplus */
 
-#include <stdio.h>
 #include "ivorbiscodec.h"
 
 

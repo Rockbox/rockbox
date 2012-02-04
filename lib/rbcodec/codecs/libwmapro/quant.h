@@ -1,8 +1,6 @@
 #ifndef _QUANT_H_
 #define _QUANT_H_
 
-#include <inttypes.h>
-
 /* This table contains unscaled integer casts of the floating point inverse
  * quantization factors used by wma pro. The formula for calculating the 
  * floating point value is :

@@ -18,13 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- #include "config.h"
+#include "rbcodecconfig.h"
 
 /****************************************************************************
  *  void channels_process_sound_chan_mono(int count, int32_t *buf[])
  */
-
-#include "config.h"
 
     .section .icode, "ax", %progbits
     .align  2

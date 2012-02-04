@@ -22,7 +22,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <inttypes.h>
 #include "codeclib.h"
 #include "asf.h"
 

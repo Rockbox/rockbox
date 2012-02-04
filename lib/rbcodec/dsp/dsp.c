@@ -18,22 +18,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
+#include "platform.h"
 #include "dsp.h"
 #include "eq.h"
 #include "compressor.h"
-#include "kernel.h"
-#include "settings.h"
 #include "replaygain.h"
 #include "tdspeed.h"
-#include "core_alloc.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
-#include "platform.h"
-
-/* Define LOGF_ENABLE to enable logf output in this file */
-/*#define LOGF_ENABLE*/
-#include "logf.h"
 
 /* 16-bit samples are scaled based on these constants. The shift should be
  * no more than 15.
@@ -96,7 +88,7 @@ struct eq_state
 
 /* Include header with defines which functions are implemented in assembly
    code for the target */
-#include <dsp_asm.h>
+#include "dsp_asm.h"
 
 /* Typedefs keep things much neater in this case */
 typedef void (*sample_input_fn_type)(int count, const char *src[],

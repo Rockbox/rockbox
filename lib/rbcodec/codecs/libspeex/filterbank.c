@@ -37,7 +37,6 @@
 
 #include "filterbank.h"
 #include "arch.h"
-#include <math.h>
 #include "math_approx.h"
 #include "os_support.h"
       

@@ -20,8 +20,7 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#include <codecs/libmad/mad.h>
-#include <inttypes.h>
+#include "codecs/libmad/mad.h"
 
 CODEC_HEADER
 

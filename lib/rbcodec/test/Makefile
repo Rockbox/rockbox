@@ -11,10 +11,6 @@ APP_TYPE = sdl-sim
 SOFTWARECODECS = yes
 
 INCLUDES = -I$(shell pwd)
-INCLUDES += -I$(ROOTDIR)/../../apps -I$(ROOTDIR)/../../apps/gui
-INCLUDES += -I$(ROOTDIR)/../../firmware/export -I$(ROOTDIR)/../../firmware/include \
-			-I$(ROOTDIR)/../../firmware/target/hosted \
-			-I$(ROOTDIR)/../../firmware/target/hosted/sdl
 
 CFLAGS = $(INCLUDES)
 CFLAGS += -O0 -ggdb -DDEBUG -DSIMULATOR -DLOGF_ENABLE -Wall -Wno-pointer-sign

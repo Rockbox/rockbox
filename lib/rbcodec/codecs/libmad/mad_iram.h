@@ -27,7 +27,7 @@
 #ifndef _LIBMAD_IRAM_H
 #define _LIBMAD_IRAM_H
 
-#include "config.h"
+#include "rbcodecconfig.h"
 
 #if (CONFIG_PLATFORM&PLATFORM_HOSTED)
 #define ICODE_SECTION_MPA_ARM .text

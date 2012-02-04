@@ -32,7 +32,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "config.h"
+#include "rbcodecconfig.h"
 #if CONFIG_CPU == PP5002
     .section .icode,"ax",%progbits
 #else

@@ -31,8 +31,6 @@
  * by data starting with the 0xFFF8 marker.
  */
 
-#include <inttypes.h>
-#include <stdbool.h>
 #ifndef BUILD_STANDALONE
 #include "codeclib.h"
 #endif

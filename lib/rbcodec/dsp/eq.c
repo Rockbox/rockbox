@@ -19,8 +19,7 @@
  *
  ****************************************************************************/
 
-#include <inttypes.h>
-#include "config.h"
+#include "platform.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
 #include "eq.h"

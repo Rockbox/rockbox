@@ -16,9 +16,6 @@
  ********************************************************************/
 
 #include "config-tremor.h"
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 #include "ogg.h"
 #include "ivorbiscodec.h"
 #include "codeclib.h"
@@ -27,7 +24,7 @@
 #include "window.h"
 #include "registry.h"
 #include "misc.h"
-#include <codecs/lib/codeclib.h>
+#include "codecs/lib/codeclib.h"
 
 /* simplistic, wasteful way of doing this (unique lookup for each
    mode/submapping); there should be a central repository for

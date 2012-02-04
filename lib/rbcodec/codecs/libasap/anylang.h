@@ -37,8 +37,7 @@
 #else
 
 #define C
-#include <string.h>
-
+#include "platform.h"
 #define PRIVATE                 static
 #define FUNC(type, name, pars)  type name pars
 #define P(type, name)           type name

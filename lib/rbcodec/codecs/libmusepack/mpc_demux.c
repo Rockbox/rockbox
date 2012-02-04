@@ -32,8 +32,6 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <math.h>
-#include <string.h>
 #include "streaminfo.h"
 #include "mpcdec.h"
 #include "internal.h"
@@ -41,7 +39,7 @@
 #include "huffman.h"
 #include "mpc_bits_reader.h"
 
-#include <codeclib.h>
+#include "codeclib.h"
 
 /// maximum number of seek points in the table. The distance between points will
 /// be adapted so this value is never exceeded.

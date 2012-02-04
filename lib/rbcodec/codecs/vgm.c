@@ -2,7 +2,7 @@
 /* Ripped off from Game_Music_Emu 0.5.2. http://www.slack.net/~ant/ */
 /* Inflate code taken from WikiViewer plugin by Adam Gashlin */
 
-#include <codecs/lib/codeclib.h>
+#include "codecs/lib/codeclib.h"
 
 #include "libgme/blargg_endian.h"
 #include "libgme/vgm_emu.h" 

@@ -21,9 +21,7 @@
 #ifndef CODEC_LIBPCM_ADPCM_SEEK_H
 #define CODEC_LIBPCM_ADPCM_SEEK_H
 
-#include <stdbool.h>
-#include <inttypes.h>
-#include <string.h>
+#include "platform.h"
 
 struct adpcm_data {
     int16_t  pcmdata[2];

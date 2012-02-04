@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "rbcodecconfig.h"
 /*
  * static void 
  * mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data, 

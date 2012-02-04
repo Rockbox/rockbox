@@ -16,8 +16,6 @@
 
 #include "wavpack.h"
 
-#include <string.h>
-
 ////////////////////////// Bitstream functions ////////////////////////////////
 
 // Open the specified BitStream and associate with the specified buffer.

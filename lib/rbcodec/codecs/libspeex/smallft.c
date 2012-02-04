@@ -32,7 +32,6 @@
 #include "config-speex.h"
 #endif
 
-#include <math.h>
 #include "smallft.h"
 #include "arch.h"
 #include "os_support.h"

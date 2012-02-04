@@ -3,7 +3,7 @@
 
 #define GME_NSF_TYPE
 
-#include <codecs/lib/codeclib.h>
+#include "codecs/lib/codeclib.h"
 #include "libgme/nsf_emu.h" 
 
 CODEC_HEADER

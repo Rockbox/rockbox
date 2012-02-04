@@ -1,5 +1,4 @@
 #include "wmaprodec.h"
-#include <inttypes.h>
   
 /* Tables for fixed-point trig tables for windowing and mdct */
 

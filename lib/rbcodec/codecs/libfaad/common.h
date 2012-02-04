@@ -211,7 +211,7 @@ typedef float float32_t;
 
 #else
 
-#include <stdio.h>
+#include "platform.h"
 #ifdef HAVE_SYS_TYPES_H
 # include "inttypes.h"
 #endif

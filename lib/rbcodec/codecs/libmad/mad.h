@@ -20,8 +20,6 @@
  * so by contacting: Underbit Technologies, Inc. <info@underbit.com>
  */
 
-#include <inttypes.h>
-
 #define FPM_DEFAULT
 
 #include "fixed.h"

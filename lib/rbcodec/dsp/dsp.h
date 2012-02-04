@@ -22,8 +22,6 @@
 #ifndef _DSP_H
 #define _DSP_H
 
-#include <stdlib.h>
-#include <stdbool.h>
 #include "rbcodecconfig.h"
 
 #define NATIVE_FREQUENCY       44100

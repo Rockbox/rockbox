@@ -16,8 +16,6 @@
  ********************************************************************/
 
 #include "config-tremor.h"
-#include <math.h>
-#include <string.h>
 #include "ogg.h"
 #include "os.h"
 #include "misc.h"

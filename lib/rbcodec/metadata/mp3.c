@@ -28,16 +28,7 @@
  /* tagResolver and associated code copyright 2003 Thomas Paul Diffenbach
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "string-extra.h"
-#include "config.h"
-#include "file.h"
-#include "logf.h"
 #include "platform.h"
-
 #include "metadata.h"
 #include "mp3data.h"
 #include "metadata_common.h"

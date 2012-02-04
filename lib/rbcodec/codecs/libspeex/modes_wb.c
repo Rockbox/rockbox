@@ -44,9 +44,6 @@
 #include "nb_celp.h"
 #include "vbr.h"
 #include "arch.h"
-#ifndef FIXED_POINT
-#include <math.h>
-#endif
 #include "os_support.h"
 
 

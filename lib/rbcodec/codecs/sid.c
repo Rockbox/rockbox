@@ -59,9 +59,8 @@
 
 #define USE_FILTER
 
-#include "debug.h"
+#include "platform.h"
 #include "codeclib.h"
-#include <inttypes.h>
 
 CODEC_HEADER
 

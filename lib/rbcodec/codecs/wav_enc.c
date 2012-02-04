@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 
-#include <inttypes.h>
 #include "codeclib.h"
 
 CODEC_ENC_HEADER

@@ -32,8 +32,6 @@
 
 #ifdef SBR_DEC
 
-#include <stdlib.h>
-
 #include "sbr_syntax.h"
 #include "sbr_fbt.h"
 

@@ -39,7 +39,6 @@
 #include "mpcdec_math.h"
 #include "decoder.h"
 #include "internal.h"
-#include <string.h>
 
 /* C O N S T A N T S */
 // Bits per sample for chosen quantizer

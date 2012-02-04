@@ -35,8 +35,6 @@
 #include "common.h"
 #include "structs.h"
 
-#include <string.h>
-#include <stdlib.h>
 #include "specrec.h"
 #include "filtbank.h"
 #include "syntax.h"

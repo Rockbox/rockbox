@@ -1,15 +1,7 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <inttypes.h>
 #include "platform.h"
-
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "rbunicode.h"
-#include "string-extra.h"
 
 /* NOTE: This file was modified to work properly with the new nsf codec based
     on Game_Music_Emu */

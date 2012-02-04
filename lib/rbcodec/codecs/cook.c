@@ -19,11 +19,8 @@
  *
  ****************************************************************************/
 
-#include <string.h>
-
-#include "logf.h"
+#include "platform.h"
 #include "codeclib.h"
-#include "inttypes.h"
 #include "libcook/cook.h"
 
 CODEC_HEADER

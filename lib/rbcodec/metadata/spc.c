@@ -18,18 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <inttypes.h>
 #include "platform.h"
-
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "debug.h"
-#include "rbunicode.h"
 
 bool get_spc_metadata(int fd, struct mp3entry* id3)
 {

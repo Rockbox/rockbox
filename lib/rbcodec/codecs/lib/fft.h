@@ -19,7 +19,7 @@
 #ifndef CODECLIB_FFT_H_INCLUDED
 #define CODECLIB_FFT_H_INCLUDED
  
-#include <inttypes.h>
+#include "platform.h"
 typedef int32_t fixed32; 
 typedef int64_t fixed64;
 

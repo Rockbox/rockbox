@@ -29,6 +29,7 @@
  */
 
 //#include "avcodec.h"
+#include "codeclib.h"
 #include "ffmpeg_get_bits.h"
 #include "ffmpeg_put_bits.h"
 #include "ffmpeg_intreadwrite.h"

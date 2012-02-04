@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#include <codecs/libffmpegFLAC/decoder.h>
+#include "codecs/libffmpegFLAC/decoder.h"
 
 CODEC_HEADER
 

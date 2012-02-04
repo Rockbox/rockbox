@@ -25,8 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #ifndef _APE_ENTROPY_H
 #define _APE_ENTROPY_H
 
-#include <inttypes.h>
-
 void init_entropy_decoder(struct ape_ctx_t* ape_ctx,
                           unsigned char* inbuffer, int* firstbyte,
                           int* bytesconsumed);

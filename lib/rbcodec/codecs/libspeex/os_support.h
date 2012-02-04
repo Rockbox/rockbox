@@ -37,10 +37,6 @@
 #include "config-speex.h"
 #include "rockbox.h"
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 /** Speex wrapper for calloc. To do your own dynamic allocation, all you need to do is replace this function, speex_realloc and speex_free 
     NOTE: speex_alloc needs to CLEAR THE MEMORY */
 #ifndef OVERRIDE_SPEEX_ALLOC

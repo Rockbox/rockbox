@@ -1,8 +1,6 @@
 #ifndef KISS_FFT_H
 #define KISS_FFT_H
 
-#include <stdlib.h>
-#include <math.h>
 #include "arch.h"
 
 #ifdef __cplusplus

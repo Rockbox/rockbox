@@ -27,15 +27,6 @@
 
 #include "common.h"
 #include "structs.h"
-
-#include <stdlib.h>
-#include <string.h>
-#ifdef _WIN32_WCE
-#define assert(x)
-#else
-#include <assert.h>
-#endif
-
 #include "filtbank.h"
 #include "decoder.h"
 #include "syntax.h"

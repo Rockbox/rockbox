@@ -21,13 +21,8 @@
 #include "platform.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
-#include "settings.h"
 #include "dsp.h"
 #include "compressor.h"
-
-/* Define LOGF_ENABLE to enable logf output in this file */
-/*#define LOGF_ENABLE*/
-#include "logf.h"
 
 static int32_t comp_rel_slope IBSS_ATTR;   /* S7.24 format */
 static int32_t comp_makeup_gain IBSS_ATTR; /* S7.24 format */

@@ -22,8 +22,6 @@
 # ifndef LIBMAD_FIXED_H
 # define LIBMAD_FIXED_H
 
-#include <inttypes.h>
-
 typedef   int32_t mad_fixed_t;
 
 typedef   int32_t mad_fixed64hi_t;

@@ -21,9 +21,6 @@
 #ifndef CODEC_LIBPCM_IMA_ADPCM_COMMON_H
 #define CODEC_LIBPCM_IMA_ADPCM_COMMON_H
 
-#include <stdbool.h>
-#include <inttypes.h>
-
 #define IMA_ADPCM_INC_DEPTH (PCM_OUTPUT_DEPTH - 16)
 
 void init_ima_adpcm_decoder(int bit, const int *index_table);

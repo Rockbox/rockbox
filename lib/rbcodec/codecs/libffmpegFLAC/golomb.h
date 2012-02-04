@@ -19,7 +19,6 @@
  *
  */
 
-#include <limits.h>
 #include "codeclib.h"
 
 /**

@@ -27,10 +27,6 @@
 
 #include "common.h"
 #include "structs.h"
-
-#include <stdlib.h>
-#include <string.h>
-
 #include "specrec.h"
 #include "huffman.h"
 

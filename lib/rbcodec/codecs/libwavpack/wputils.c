@@ -17,8 +17,6 @@
 
 #include "wavpack.h"
 
-#include <string.h>
-
 static void strcpy_loc (char *dst, char *src) { while ((*dst++ = *src++) != 0); }
 
 ///////////////////////////// local table storage ////////////////////////////

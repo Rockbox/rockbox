@@ -1,8 +1,6 @@
 #ifndef _WMAPRO_MATH_H_
 #define _WMAPRO_MATH_H_
 
-#include <inttypes.h>
-
 /* rockbox: not used
 #define fixtof16(x)       (float)((float)(x) / (float)(1 << 16))
 #define fixtof31(x)       (float)((float)(x) / (float)(1 << 31))

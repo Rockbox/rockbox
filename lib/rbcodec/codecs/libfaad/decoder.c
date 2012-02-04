@@ -28,9 +28,6 @@
 #include "common.h"
 #include "structs.h"
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "decoder.h"
 #include "mp4.h"
 #include "syntax.h"

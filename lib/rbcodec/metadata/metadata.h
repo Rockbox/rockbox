@@ -22,7 +22,6 @@
 #ifndef _METADATA_H
 #define _METADATA_H
 
-#include "config.h"
 #include "rbcodecconfig.h"
 
 

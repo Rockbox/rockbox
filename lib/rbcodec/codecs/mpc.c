@@ -20,8 +20,8 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#include <codecs/libmusepack/mpcdec.h>
-#include <codecs/libmusepack/internal.h>
+#include "codecs/libmusepack/mpcdec.h"
+#include "codecs/libmusepack/internal.h"
 
 CODEC_HEADER
 

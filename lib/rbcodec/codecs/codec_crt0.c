@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "platform.h"
 #include "codecs.h"
 
 struct codec_api *ci DATA_ATTR;

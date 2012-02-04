@@ -25,10 +25,6 @@
 ** $Id$
 **/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 #include "common.h"
 
 #ifdef DRM

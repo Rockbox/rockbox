@@ -37,12 +37,7 @@
 #endif
  
 #include "fft.h"
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-#include <inttypes.h>
-#include <time.h>
-#include <codecs/lib/codeclib.h>
+#include "codecs/lib/codeclib.h"
 
 #include "codeclib_misc.h"
 #include "mdct_lookup.h"

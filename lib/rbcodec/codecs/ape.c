@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#include <codecs/demac/libdemac/demac.h>
+#include "codecs/demac/libdemac/demac.h"
 
 CODEC_HEADER
 

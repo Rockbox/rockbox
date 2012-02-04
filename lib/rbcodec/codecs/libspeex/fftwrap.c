@@ -83,7 +83,6 @@ static void renorm_range(spx_word16_t *in, spx_word16_t *out, int shift, int len
 #ifdef USE_SMALLFT
 
 #include "smallft.h"
-#include <math.h>
 
 void *spx_fft_init(int size)
 {

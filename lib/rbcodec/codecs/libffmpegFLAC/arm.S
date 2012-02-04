@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "rbcodecconfig.h"
 
 /* The following is an assembler optimised version of the LPC filtering
    routines needed for FLAC decoding. It is optimised for use with ARM 

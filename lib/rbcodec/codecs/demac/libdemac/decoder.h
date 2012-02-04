@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #ifndef _APE_DECODER_H
 #define _APE_DECODER_H
 
-#include <inttypes.h>
 #include "parser.h"
 
 void init_frame_decoder(struct ape_ctx_t* ape_ctx,

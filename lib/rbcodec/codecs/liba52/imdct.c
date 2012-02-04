@@ -26,8 +26,6 @@
 
 #include "config-a52.h"
 
-#include <math.h>
-#include <stdio.h>
 #ifdef LIBA52_DJBFFT
 #include <fftc4.h>
 #include <fftc8.h>
@@ -35,7 +33,6 @@
 #ifndef M_PI
 #define M_PI 3.1415926535897932384626433832795029
 #endif
-#include <inttypes.h>
 
 #include "a52.h"
 #include "a52_internal.h"

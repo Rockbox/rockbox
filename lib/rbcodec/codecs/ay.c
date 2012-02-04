@@ -1,7 +1,7 @@
 
 /* Ripped off from Game_Music_Emu 0.5.2. http://www.slack.net/~ant/ */
 
-#include <codecs/lib/codeclib.h>
+#include "codecs/lib/codeclib.h"
 #include "libgme/ay_emu.h" 
 
 CODEC_HEADER

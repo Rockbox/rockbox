@@ -28,9 +28,6 @@
 #ifndef AVCODEC_WMAPRODATA_H
 #define AVCODEC_WMAPRODATA_H
 
-#include <stddef.h>
-#include <stdint.h>
-
 /* rockbox: not used
 const int32_t fixed_sin64[33] = {
     0x00000000, 0xF9B82685, 0xF3742CA3, 0xED37EF92, 0xE70747C5, 0xE0E60686, 

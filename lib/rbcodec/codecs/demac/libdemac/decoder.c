@@ -22,9 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 */
 
-#include <inttypes.h>
-#include <string.h>
-
 #include "demac.h"
 #include "predictor.h"
 #include "entropy.h"

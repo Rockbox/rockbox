@@ -20,7 +20,7 @@
 #ifndef _WMADEC_H
 #define _WMADEC_H
 
-#include <codecs/libasf/asf.h>
+#include "codecs/libasf/asf.h"
 #include "ffmpeg_get_bits.h"
 #include "types.h"
 
