@@ -24,8 +24,8 @@
 /* We don't want all this stuff if we're building encoder */
 #ifndef ROCKBOX_VOICE_ENCODER
 
+#include "platform.h"
 #include "codeclib.h"
-#include "debug.h"
 
 #if !defined(ROCKBOX_VOICE_CODEC)
 

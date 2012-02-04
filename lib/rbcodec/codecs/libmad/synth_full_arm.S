@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "rbcodecconfig.h"
 #include "mad_iram.h"
 
     .section    ICODE_SECTION_MPA_ARM,"ax",%progbits

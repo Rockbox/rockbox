@@ -32,9 +32,6 @@
 #include "common.h"
 #include "structs.h"
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "decoder.h"
 #include "syntax.h"
 #include "specrec.h"

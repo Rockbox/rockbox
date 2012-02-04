@@ -18,17 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <inttypes.h>
 #include "platform.h"
-
 #include "metadata.h"
-#include <string-extra.h>
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "rbunicode.h"
 
 #define MODULEHEADERSIZE 0x438
 

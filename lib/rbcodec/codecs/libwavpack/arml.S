@@ -38,7 +38,7 @@
  * instruction.
  */
 
-#include "config.h"
+#include "rbcodecconfig.h"
 
         .text
         .align

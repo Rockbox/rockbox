@@ -18,7 +18,6 @@
 #ifndef _CODECLIB_MISC_H_
 #define _CODECLIB_MISC_H_
 
-#include <stdint.h>
 #include "asm_arm.h"
 #include "asm_mcf5249.h"
 

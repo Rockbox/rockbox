@@ -30,15 +30,8 @@
   * than a total of 28MB
   *************/
 
-#include "debug.h"
+#include "platform.h"
 #include "codeclib.h"
-#include <inttypes.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-
 
 CODEC_HEADER
 

@@ -22,9 +22,9 @@
  * WMA compatible decoder.
  */
 
-#include <codecs.h>
-#include <codecs/lib/codeclib.h>
-#include <codecs/libasf/asf.h>
+#include "codecs.h"
+#include "codecs/lib/codeclib.h"
+#include "codecs/libasf/asf.h"
 #include "wmadec.h"
 #include "wmafixed.h"
 #include "wmadata.h"

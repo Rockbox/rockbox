@@ -27,9 +27,6 @@
 
 #include "common.h"
 #include "structs.h"
-
-#include <stdlib.h>
-#include <string.h>
 #include "bits.h"
 
 /* Need to be large enough to fit the largest compressed sample in a file.

@@ -21,7 +21,6 @@
  ********************************************************************/
 
 //#include "config-tremor.h"
-#include <string.h>
 #include "speex/ogg.h"
 #include "arch.h"
 

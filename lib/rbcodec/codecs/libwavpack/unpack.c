@@ -15,9 +15,6 @@
 
 #include "wavpack.h"
 
-#include <stdlib.h>
-#include <string.h>
-
 static void strcpy_loc (char *dst, char *src) { while ((*dst++ = *src++) != 0); }
 
 #define LOSSY_MUTE

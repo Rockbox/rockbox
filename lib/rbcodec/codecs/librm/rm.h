@@ -21,8 +21,6 @@
 #ifndef _RM_H
 #define _RM_H
 
-#include <stdio.h>
-#include <inttypes.h>
 #include "bytestream.h"
 
 #define MAX_EXTRADATA_SIZE 16

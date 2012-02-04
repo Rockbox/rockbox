@@ -1,7 +1,7 @@
 #ifndef _ASF_H
 #define _ASF_H
 
-#include <inttypes.h>
+#include "platform.h"
 
 /* ASF codec IDs */
 #define ASF_CODEC_ID_WMAV1      0x160

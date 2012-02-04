@@ -21,10 +21,6 @@
 #ifndef CODEC_LIBPCM_PCM_COMMON_H
 #define CODEC_LIBPCM_PCM_COMMON_H
 
-#include <stdbool.h>
-#include <inttypes.h>
-#include <string.h>
-
 /* decoded pcm sample depth (sample 28bit + sign 1bit) */
 #define PCM_OUTPUT_DEPTH 29
 

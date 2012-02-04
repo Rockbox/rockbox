@@ -25,8 +25,6 @@
      
 # include "global.h"
 
-# include <string.h>
-
 # ifdef HAVE_ASSERT_H
 #  include <assert.h>
 # endif

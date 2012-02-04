@@ -1,7 +1,6 @@
 // Game_Music_Emu 0.5.2. http://www.slack.net/~ant/
 
 #include "hes_apu.h"
-#include <string.h>
 
 /* Copyright (C) 2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser

@@ -18,16 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <inttypes.h>
-#include <stdio.h>
 #include "platform.h"
-
-#include "string-extra.h"
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "rbunicode.h"
-#include "logf.h"
 
 static const int basebits[4] = { 4, 8, 12, 16 };
 

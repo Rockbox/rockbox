@@ -16,8 +16,6 @@
  ********************************************************************/
 
 #include "config-tremor.h"
-#include <string.h>
-#include <math.h>
 #include "ogg.h"
 #include "ivorbiscodec.h"
 #include "codec_internal.h"

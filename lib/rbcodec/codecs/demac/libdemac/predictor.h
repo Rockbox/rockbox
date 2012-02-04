@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #ifndef _APE_PREDICTOR_H
 #define _APE_PREDICTOR_H
 
-#include <inttypes.h>
 #include "parser.h"
 #include "filter.h"
 

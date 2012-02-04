@@ -18,8 +18,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdlib.h>
-#include <inttypes.h>
 
 /* Macros for converting between various fixed-point representations and floating point. */
 #define ONE_16 (1L << 16)

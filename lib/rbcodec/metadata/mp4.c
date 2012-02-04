@@ -18,18 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <inttypes.h>
 #include "platform.h"
 
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "logf.h"
-#include "debug.h"
 #include "replaygain.h"
 
 #ifdef DEBUGF

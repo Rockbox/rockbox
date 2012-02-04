@@ -74,8 +74,6 @@ static void speex_free (void *ptr) {free(ptr);}
 #include "os_support.h"
 #endif /* OUTSIDE_SPEEX */
 
-#include <math.h>
-
 #ifndef M_PI
 #define M_PI 3.14159263
 #endif

@@ -19,8 +19,8 @@
  *
  ****************************************************************************/
 
-#include <codecs.h>
-#include <inttypes.h>
+#include "platform.h"
+#include "codecs.h"
 #include "m4a.h"
 
 /* Implementation of the stream.h functions used by libalac */

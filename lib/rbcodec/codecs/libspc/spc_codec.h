@@ -33,7 +33,6 @@
 #ifndef NDEBUG
 #define NDEBUG
 #endif
-#include <assert.h>
 
 /** Basic configuration options **/
 

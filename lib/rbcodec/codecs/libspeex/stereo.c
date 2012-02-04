@@ -37,9 +37,6 @@
 #include "speex/speex_callbacks.h"
 #include "math_approx.h"
 #include "vq.h"
-#ifndef FIXED_POINT
-#include <math.h>
-#endif
 #include "os_support.h"
 
 typedef struct RealSpeexStereoState {

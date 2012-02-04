@@ -35,8 +35,7 @@
 /// \file synth_filter.c
 /// Synthesis functions.
 /// \todo document me
-#include <string.h>
-#include <codecs.h>
+#include "codecs.h"
 #include "mpcdec.h"
 #include "decoder.h"
 #include "mpcdec_math.h"

@@ -1,7 +1,6 @@
 
 #define MEMPOOL_MAX 10
-#include <inttypes.h>
-#include <stdlib.h>
+#include "platform.h"
 
 int wpw_init_mempool(unsigned char mempool);
 int wpw_init_mempool_pdm(unsigned char mempool,

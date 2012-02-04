@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "rbcodecconfig.h"
 
     .section .text, "ax", %progbits
 

@@ -34,8 +34,7 @@
 /// \file mpc_decoder.c
 /// Core decoding routines and logic.
 
-#include <string.h>
-#include <codecs.h>
+#include "codecs.h"
 #include "mpcdec.h"
 #include "minimax.h"
 #include "decoder.h"

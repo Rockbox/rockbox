@@ -26,8 +26,6 @@
 #define MPEG_VERSION2   1
 #define MPEG_VERSION2_5 2
 
-#include <string.h> /* size_t */
-
 struct mp3info {
     /* Standard MP3 frame header fields */
     int version;

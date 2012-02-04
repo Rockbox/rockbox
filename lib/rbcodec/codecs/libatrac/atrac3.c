@@ -32,10 +32,6 @@
  * bytes provided in the containers above.
  */
 
-#include <math.h>
-#include <stddef.h>
-#include <stdio.h>
-
 #include "atrac3.h"
 #include "atrac3data.h"
 #include "atrac3data_fixed.h"

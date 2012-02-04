@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #ifndef _APE_PARSER_H
 #define _APE_PARSER_H
 
-#include <inttypes.h>
 #include "demac_config.h"
 
 /* The earliest and latest file formats supported by this library */

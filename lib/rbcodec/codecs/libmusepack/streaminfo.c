@@ -34,10 +34,8 @@
 /// \file streaminfo.c
 /// Implementation of streaminfo reading functions.
 
-#include <math.h>
 #include "mpcdec.h"
 #include "streaminfo.h"
-#include <stdio.h>
 #include "internal.h"
 #include "huffman.h"
 #include "mpc_bits_reader.h"

@@ -37,8 +37,7 @@
 #pragma once
 #endif
 
-#include <stdlib.h>
-#include <inttypes.h>
+#include "platform.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -30,8 +30,6 @@
 
 #ifdef SBR_DEC
 
-#include <stdlib.h>
-
 #include "sbr_syntax.h"
 #include "sbr_e_nf.h"
 

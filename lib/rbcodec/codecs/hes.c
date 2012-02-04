@@ -1,6 +1,5 @@
 /* Ripped off from Game_Music_Emu 0.5.2. http://www.slack.net/~ant/ */
 
-#include <string.h>
 #include "codeclib.h"
 #include "libgme/hes_emu.h"
  

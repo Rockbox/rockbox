@@ -19,7 +19,6 @@
 
 #ifndef INFLATE_H
 #define INFLATE_H
-#include <inttypes.h>
 
 #if defined(ROCKBOX)
 #include "codeclib.h"

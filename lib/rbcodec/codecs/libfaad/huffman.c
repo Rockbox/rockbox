@@ -28,7 +28,6 @@
 #include "common.h"
 #include "structs.h"
 
-#include <stdlib.h>
 #ifdef ANALYSIS
 #include <stdio.h>
 #endif

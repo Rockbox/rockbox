@@ -14,8 +14,6 @@
 
 #include "wavpack.h"
 
-#include <string.h>
-
 // This flag provides faster encoding speed at the expense of more code. The
 // improvement applies to 16-bit stereo lossless only.
 

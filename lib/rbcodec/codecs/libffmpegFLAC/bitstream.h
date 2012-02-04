@@ -6,7 +6,6 @@
 #ifndef BITSTREAM_H
 #define BITSTREAM_H
 
-#include <inttypes.h>
 #include "ffmpeg_get_bits.h"
 
 #ifndef BUILD_STANDALONE

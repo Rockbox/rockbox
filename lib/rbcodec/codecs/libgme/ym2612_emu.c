@@ -2,12 +2,6 @@
 
 // Based on Gens 2.10 ym2612.c
 
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-#include <stdio.h>
-#include <math.h>
-
 #include "ym2612_emu.h"
 
 /* Copyright (C) 2002 Stéphane Dallongeville (gens AT consolemul.com) */

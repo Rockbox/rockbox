@@ -59,7 +59,6 @@
 #include "config-speex.h"
 #endif
 
-#include <math.h>
 #include "speex/speex_preprocess.h"
 #include "speex/speex_echo.h"
 #include "arch.h"

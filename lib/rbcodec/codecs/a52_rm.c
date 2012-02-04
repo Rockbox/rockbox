@@ -20,10 +20,9 @@
  ****************************************************************************/
 
 #include "codeclib.h"
-#include <codecs/librm/rm.h>
-#include <inttypes.h>  /* Needed by a52.h */
-#include <codecs/liba52/config-a52.h>
-#include <codecs/liba52/a52.h>
+#include "codecs/librm/rm.h"
+#include "codecs/liba52/config-a52.h"
+#include "codecs/liba52/a52.h"
 
 CODEC_HEADER
 

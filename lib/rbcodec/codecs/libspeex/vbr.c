@@ -37,7 +37,6 @@
 #endif
 
 #include "vbr.h"
-#include <math.h>
 
 
 #define sqr(x) ((x)*(x))

@@ -19,10 +19,7 @@
  *
  ****************************************************************************/
 
-#include <limits.h>
 #include "codeclib.h"
-#include "inttypes.h"
-#include "math.h"
 #include "lib/fixedpoint.h"
 
 CODEC_HEADER

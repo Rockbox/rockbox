@@ -18,10 +18,6 @@ RBCODEC_CFLAGS += -D_FILE_H_ -DLOGF_H -DDEBUG_H -D_KERNEL_H_ # will be removed l
 SRC = $(ROOTDIR)/lib/rbcodec/test/warble.c
 
 INCLUDES += -I$(ROOTDIR)/lib/rbcodec/test
-INCLUDES += -I$(ROOTDIR)/apps -I$(ROOTDIR)/apps/gui
-INCLUDES += -I$(ROOTDIR)/firmware/export -I$(ROOTDIR)/firmware/include \
-			-I$(ROOTDIR)/firmware/target/hosted \
-			-I$(ROOTDIR)/firmware/target/hosted/sdl
 
 GCCOPTS+=-D__PCTOOL__ -DRBCODEC_NOT_ROCKBOX -DDEBUG -g -std=gnu99 `$(SDLCONFIG) --cflags` -DCODECDIR="\"$(CODECDIR)\""
 

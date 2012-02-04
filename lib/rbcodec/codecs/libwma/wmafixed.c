@@ -20,7 +20,7 @@
 
 #include "wmadec.h"
 #include "wmafixed.h"
-#include <codecs.h>
+#include "codecs.h"
 
 fixed64 IntTo64(int x){
     fixed64 res = 0;

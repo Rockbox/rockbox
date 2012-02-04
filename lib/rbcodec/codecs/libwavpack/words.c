@@ -25,8 +25,6 @@
 
 #include "wavpack.h"
 
-#include <string.h>
-
 //////////////////////////////// local macros /////////////////////////////////
 
 #define LIMIT_ONES 16   // maximum consecutive 1s sent for "div" data

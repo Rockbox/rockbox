@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "rbcodecconfig.h"
 
 /* uncomment this to make filtering calculate lower bits after shifting.
  * without this, "shift" of the lower bits will be lost here.

@@ -19,20 +19,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <inttypes.h>
 #include "platform.h"
-
 #include "metadata.h"
 #include "replaygain.h"
-#include "debug.h"
-#include "rbunicode.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include <codecs/libasf/asf.h>
+#include "codecs/libasf/asf.h"
 
 /* TODO: Just read the GUIDs into a 16-byte array, and use memcmp to compare */
 struct guid_s {

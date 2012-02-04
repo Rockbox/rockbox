@@ -12,8 +12,6 @@
 
 #include "wavpack.h"
 
-#include <string.h>
-
 int read_metadata_buff (WavpackContext *wpc, WavpackMetadata *wpmd)
 {
     uint32_t bytes_to_read;

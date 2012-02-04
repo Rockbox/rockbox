@@ -31,7 +31,6 @@
 
 #ifdef LTP_DEC
 
-#include <stdlib.h>
 #include "syntax.h"
 #include "lt_predict.h"
 #include "filtbank.h"

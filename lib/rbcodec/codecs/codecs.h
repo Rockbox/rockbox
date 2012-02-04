@@ -29,20 +29,17 @@
 
 #include "rbcodecconfig.h"
 #include "metadata.h"
-#include "audio.h"
 #ifdef RB_PROFILE
 #include "profile.h"
 #include "thread.h"
 #endif
 #if (CONFIG_CODEC == SWCODEC)
 #ifdef HAVE_RECORDING
+#include "audio.h"
 #include "pcm_record.h"
 #endif
 #include "dsp.h"
 #endif
-
-#include "gcc_extensions.h"
-#include "load_code.h"
 
 #ifdef CODEC
 #if defined(DEBUG) || defined(SIMULATOR)

@@ -39,7 +39,6 @@
 #endif
 
 #include "mpc_types.h"
-#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {

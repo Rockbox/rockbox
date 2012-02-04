@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-#include <config.h>
+#include "platform.h"
 
 #ifndef _DSP_ASM_H
 #define _DSP_ASM_H

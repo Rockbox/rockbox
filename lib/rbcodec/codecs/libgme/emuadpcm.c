@@ -8,8 +8,6 @@
   *    heavily rewritten to fit openMSX structure
   */
 
-#include <string.h>
-
 #include "emuadpcm.h"
 #include "emu8950.h"
 

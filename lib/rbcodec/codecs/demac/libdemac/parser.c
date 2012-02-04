@@ -22,17 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 */
 
-#include <inttypes.h>
-#include <string.h>
-#ifndef ROCKBOX
-#include <stdio.h>
-#include <stdlib.h>
-#include "inttypes.h"
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#endif
-
 #include "parser.h"
 
 #ifdef APE_MAX

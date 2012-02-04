@@ -18,17 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include "string-extra.h"
 #include "platform.h"
-
-#include "debug.h"
-#include "logf.h"
-#include "cuesheet.h"
 #include "metadata.h"
-
 #include "metadata_parsers.h"
 
 #if CONFIG_CODEC == SWCODEC

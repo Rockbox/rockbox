@@ -18,17 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <inttypes.h>
 #include "platform.h"
-
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
-#include "logf.h"
 
 #define ID_UNIQUE               0x3f
 #define ID_LARGE                0x80

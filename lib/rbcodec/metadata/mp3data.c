@@ -29,16 +29,8 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <limits.h>
-#include "debug.h"
-#include "logf.h"
-#include "mp3data.h"
-#include "file.h"
 #include "platform.h"
+#include "mp3data.h"
 
 //#define DEBUG_VERBOSE
 

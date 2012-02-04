@@ -28,8 +28,6 @@
 #include "common.h"
 #include "structs.h"
 
-#include <stdlib.h>
-
 #include "bits.h"
 #include "mp4.h"
 #include "syntax.h"

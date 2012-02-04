@@ -33,10 +33,12 @@
 #define NDEBUG 1
 
 // Use standard config.h if present
-#define HAVE_CONFIG_H 1
+// #define HAVE_CONFIG_H 1
 
-#ifdef HAVE_CONFIG_H
-	#include "config.h"
-#endif
+// #ifdef HAVE_CONFIG_H
+// 	#include "config.h"
+// #endif
+
+#include "platform.h"
 
 #endif

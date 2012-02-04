@@ -19,7 +19,6 @@
 #ifndef AVUTIL_INTREADWRITE_H
 #define AVUTIL_INTREADWRITE_H
 
-#include <stdint.h>
 /*
  * Arch-specific headers can provide any combination of
  * AV_[RW][BLN](16|24|32|64) and AV_(COPY|SWAP|ZERO)(64|128) macros.

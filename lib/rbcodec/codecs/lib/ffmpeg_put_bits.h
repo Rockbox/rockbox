@@ -26,8 +26,6 @@
 #ifndef AVCODEC_PUT_BITS_H
 #define AVCODEC_PUT_BITS_H
 
-#include <stdint.h>
-#include <stdlib.h>
 #include "ffmpeg_bswap.h"
 #include "ffmpeg_intreadwrite.h"
 

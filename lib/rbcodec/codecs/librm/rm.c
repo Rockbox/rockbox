@@ -19,8 +19,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <string.h>
 
 #include "rm.h"
 #ifdef ROCKBOX

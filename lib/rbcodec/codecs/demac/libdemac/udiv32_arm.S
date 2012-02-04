@@ -28,7 +28,7 @@
  *
  ****************************************************************************/
 
-#include "config.h"
+#include "demac_config.h"
 /* On targets with codec iram, a header file will be generated after an initial
    link of the APE codec, stating the amount of IRAM remaining for use by the
    reciprocal lookup table. */

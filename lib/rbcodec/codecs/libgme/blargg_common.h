@@ -109,7 +109,7 @@ arithmetic on smaller types. */
 
 // ROCKBOX: If defined, use <codeclib.h> for int_8_t etc
 #if defined (ROCKBOX)
-	#include <codecs/lib/codeclib.h>
+	#include "codecs/lib/codeclib.h"
 // HAVE_STDINT_H: If defined, use <stdint.h> for int8_t etc.
 #elif defined (HAVE_STDINT_H)
 	#include <stdint.h>

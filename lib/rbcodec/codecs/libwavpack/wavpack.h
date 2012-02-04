@@ -10,7 +10,6 @@
 #ifdef CODEC
 #include "codeclib.h"
 #endif
-#include <inttypes.h>
 
 // This header file contains all the definitions required by WavPack.
 
@@ -19,8 +18,6 @@ typedef unsigned short  ushort;
 #if 0 // unused and causing compiler errrors
 typedef unsigned int    uint;
 #endif
-
-#include <stdio.h>
 
 #define FALSE 0
 #define TRUE 1

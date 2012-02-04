@@ -28,20 +28,8 @@
  /* tagResolver and associated code copyright 2003 Thomas Paul Diffenbach
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <ctype.h>
-#include "string-extra.h"
-#include "config.h"
-#include "file.h"
-#include "logf.h"
-#include "replaygain.h"
-#include "rbunicode.h"
 #include "platform.h"
+#include "replaygain.h"
 
 #include "metadata.h"
 #include "mp3data.h"
