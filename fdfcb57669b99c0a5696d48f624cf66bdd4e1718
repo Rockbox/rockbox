@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAABn///7A\u003d",
+        "filename": "apps/radio/radio.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-02-05T17:53:18Z",
+      "side": 1,
+      "message": "This change alters behaviour here. Previously, it only caused the tuner to enter low power mode. Now it also results the tuner driver calling tuner_power(false). That will decrease power consumption while the radio is paused, but it may also cause some settings to be forgotten. In radio_start(), RADIO_REGION and RADIO_FORCE_MONO are only set if radio_status \u003d\u003d FMRADIO_OFF.\n\nThe tuner drivers could be changed to not call tuner_power(false) when the argument is 2, or the pause state could be eliminated in radio.c. I\u0027m not sure if having a separate pause state on the hardware level is beneficial. The additional initialization after FMRADIO_OFF should take virtually no time from a user perspective. The only disadvantage I can think of is that switching tuner power might cause a click or pop sound.",
+      "revId": "fdfcb57669b99c0a5696d48f624cf66bdd4e1718",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///68\u003d",
+        "filename": "firmware/drivers/tuner/ipod_remote_tuner.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-02-05T17:53:18Z",
+      "side": 1,
+      "message": "It is possible to remove tuner_power(), calls to tuner_power() and the powered static variable at the top. It doesn\u0027t actually do anything to the hardware and it is only called from this file.",
+      "revId": "fdfcb57669b99c0a5696d48f624cf66bdd4e1718",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///60\u003d",
+        "filename": "firmware/drivers/tuner/lv24020lp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 743,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-02-05T17:53:18Z",
+      "side": 1,
+      "message": "if sleep is true, then tuner_power(false) should be called. Nothing needs to be done here before the call, but the call itself is definitely necessary.",
+      "revId": "fdfcb57669b99c0a5696d48f624cf66bdd4e1718",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///7M\u003d",
+        "filename": "firmware/drivers/tuner/si4700.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-02-05T17:53:18Z",
+      "side": 1,
+      "message": "In si4700_detect(), tuner_power() could be used instead of si4700_sleep(), like before. There is just a need to temporarily turn on power so a register can be checked to see if the tuner is present. Why do all the initialization, especially considering that it\u0027s not even known if the tuner is present?",
+      "revId": "fdfcb57669b99c0a5696d48f624cf66bdd4e1718",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
