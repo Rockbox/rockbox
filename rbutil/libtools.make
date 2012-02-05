@@ -38,6 +38,7 @@ BINARY = $(OUTPUT).exe
 else
 ifeq ($(findstring mingw,$(CROSS)$(CC)),mingw)
 BINARY = $(OUTPUT).exe
+CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
 endif
 endif
 endif
