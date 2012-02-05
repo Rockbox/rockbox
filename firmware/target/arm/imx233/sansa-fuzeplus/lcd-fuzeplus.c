@@ -385,7 +385,9 @@ void lcd_init_device(void)
             lcd_init_seq_7783(); break;
     }
 
+#ifdef HAVE_LCD_ENABLE
     lcd_on = true;
+#endif
 }
 
 #ifdef HAVE_LCD_ENABLE
