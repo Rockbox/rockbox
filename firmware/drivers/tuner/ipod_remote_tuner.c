@@ -99,6 +99,7 @@ static void rmt_tuner_sleep(int state)
         tuner_frequency = 0;
         radio_tuned = false;
         
+        tuner_power(true);
         /* tuner HW on */
         const unsigned char data[] = {0x07, 0x05, 0x01};
         iap_send_pkt(data, sizeof(data));
@@ -124,6 +125,8 @@ static void rmt_tuner_sleep(int state)
         /* stop tuner HW */
         const unsigned char data2[] = {0x07, 0x05, 0x00};
         iap_send_pkt(data2, sizeof(data2));
+
+        tuner_power(false);
     }
 }
 

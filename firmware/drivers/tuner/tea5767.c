@@ -106,7 +106,11 @@ int tea5767_set(int setting, int value)
             return -1;
     }
 
+    if(setting == RADIO_SLEEP && !value)
+        tuner_power(true); /* wakeup */
     fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+    if(setting == RADIO_SLEEP && value)
+        tuner_power(false); /* sleep */
     return 1;
 }
 

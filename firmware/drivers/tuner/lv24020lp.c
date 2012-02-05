@@ -747,6 +747,7 @@ static void set_sleep(bool sleep)
         (TUNER_PRESENT | TUNER_POWERED))
         return;
 
+    tuner_power(true);
     enable_afc(false);
 
     /* 2. Calibrate the IF frequency at 110 kHz: */
