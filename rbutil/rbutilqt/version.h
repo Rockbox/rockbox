@@ -26,8 +26,9 @@
 // rebuilds because of issues like dependency problems or library updates).
 // Usually empty.
 #define BUILDID ""
-#define VERSION "1.2.11" BUILDID
-#define PUREVERSION "SVN $Revision$"
+#define VERSION "1.2.12" BUILDID
+// PUREVERSION should identify the build uniquely. Use version string for now.
+#define PUREVERSION VERSION
 
-#define FULLVERSION VERSION" ("PUREVERSION"), built "__DATE__" "__TIME__
+#define FULLVERSION VERSION", built "__DATE__" "__TIME__
 
