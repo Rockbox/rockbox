@@ -115,7 +115,7 @@ def get_object(repo, blob, destfile):
         return False
     if not os.path.exists(os.path.dirname(destfile)):
         os.makedirs(os.path.dirname(destfile))
-    f = open(destfile, 'w')
+    f = open(destfile, 'wb')
     for line in cmdout[0]:
         f.write(line)
     f.close()
