@@ -1609,7 +1609,7 @@ unsigned int create_thread(void (*function)(void),
     /* Writeback stack munging or anything else before starting */
     if (core != CURRENT_CORE)
     {
-        commit_discard_idcache();
+        commit_dcache();
     }
 #endif
 

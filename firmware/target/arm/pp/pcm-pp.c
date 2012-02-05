@@ -158,7 +158,7 @@ void ICODE_ATTR __attribute__((interrupt("FIQ"))) fiq_playback(void)
         if (dma_play_data.addr < UNCACHED_BASE_ADDR) {
             /* Flush any pending cache writes */
             dma_play_data.addr = UNCACHED_ADDR(dma_play_data.addr);
-            commit_discard_idcache();
+            commit_dcache();
         }
     }
 }
@@ -444,7 +444,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     if ((unsigned long)addr < UNCACHED_BASE_ADDR) {
         /* Flush any pending cache writes */
         addr = UNCACHED_ADDR(addr);
-        commit_discard_idcache();
+        commit_dcache();
     }
 
     dma_play_data.addr = (unsigned long)addr;
