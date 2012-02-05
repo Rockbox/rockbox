@@ -31,8 +31,6 @@
 #include "settings.h"
 #include "power.h"
 
-static bool powered = false;
-
 static unsigned char tuner_param = 0x00, old_tuner_param = 0xFF;
 /* temp var for tests to avoid looping execution in submenus settings*/
 static int mono_mode = -1, old_region = -1;
@@ -150,7 +148,6 @@ static void rmt_tuner_scan(int param)
     iap_send_pkt(data1, sizeof(data1));
 }
 
-#if 0   /* function is not used */
 static void rmt_tuner_mute(int value)
 {
     /* mute flag off (play) */
@@ -162,7 +159,6 @@ static void rmt_tuner_mute(int value)
     }
     iap_send_pkt(data, sizeof(data));
 }
-#endif
 
 static void rmt_tuner_region(int region)
 {
@@ -362,7 +358,7 @@ int ipod_rmt_tuner_set(int setting, int value)
         case RADIO_MUTE:
         {
             /* mute flag sent to accessory */
-            /* rmt_tuner_mute(value); */
+            rmt_tuner_mute(value);
             break;
         }
 
@@ -452,11 +448,4 @@ char* ipod_get_rds_info(int setting)
             break;
     }
     return text;
-}
-
-bool tuner_power(bool status)
-{
-    bool oldstatus = powered;
-    powered = status;
-    return oldstatus;
 }
