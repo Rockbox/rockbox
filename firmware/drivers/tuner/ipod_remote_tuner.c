@@ -31,8 +31,6 @@
 #include "settings.h"
 #include "power.h"
 
-static bool powered = false;
-
 static unsigned char tuner_param = 0x00, old_tuner_param = 0xFF;
 /* temp var for tests to avoid looping execution in submenus settings*/
 static int mono_mode = -1, old_region = -1;
@@ -452,11 +450,4 @@ char* ipod_get_rds_info(int setting)
             break;
     }
     return text;
-}
-
-bool tuner_power(bool status)
-{
-    bool oldstatus = powered;
-    powered = status;
-    return oldstatus;
 }

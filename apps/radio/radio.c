@@ -192,9 +192,6 @@ void radio_start(void)
     /* clear flag before any yielding */
     radio_status &= ~FMRADIO_START_PAUSED;
 
-    if(radio_status == FMRADIO_OFF)
-        tuner_power(true);
-
     curr_freq = global_status.last_frequency * fmr->freq_step + fmr->freq_min;
 
     tuner_set(RADIO_SLEEP, 0); /* wake up the tuner */
@@ -258,7 +255,6 @@ static void radio_off(void)
     tuner_set(RADIO_MUTE, 1);
     tuner_set(RADIO_SLEEP, 1); /* low power mode, if available */
     radio_status = FMRADIO_OFF;
-    tuner_power(false); /* status update, power off if avail. */
 }
 
 void radio_stop(void)

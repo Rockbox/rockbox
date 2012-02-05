@@ -304,9 +304,20 @@ static void si4700_sleep(int snooze)
                          POWERCFG_DISABLE | POWERCFG_ENABLE);
         /* Bits self-clear once placed in powerdown. */
         cache[POWERCFG] &= ~(POWERCFG_DISABLE | POWERCFG_ENABLE);
+
+        tuner_power(false);
     }
     else
     {
+        tuner_power(true);
+        /* read all registers */
+        si4700_read(16);
+#ifdef SI4700_USE_INTERNAL_OSCILLATOR
+        /* Enable the internal oscillator
+          (Si4702-16 needs this register to be initialised to 0x100) */
+        si4700_write_set(TEST1, TEST1_XOSCEN | 0x100);
+        sleep(HZ/2);
+#endif
         /** power up **/
         /* ENABLE high, DISABLE low */
         si4700_write_masked(POWERCFG, POWERCFG_ENABLE,
@@ -354,26 +365,9 @@ bool si4700_detect(void)
 
 void si4700_init(void)
 {
+    mutex_init(&fmr_mutex);
     /* check device id */
     if (si4700_detect()) {
-        mutex_init(&fmr_mutex);
-        
-        tuner_power(true);
-
-        /* read all registers */
-        si4700_read(16);
-        si4700_sleep(0);
-
-#ifdef SI4700_USE_INTERNAL_OSCILLATOR
-        /* Enable the internal oscillator
-          (Si4702-16 needs this register to be initialised to 0x100) */
-        si4700_write_set(TEST1, TEST1_XOSCEN | 0x100);
-        sleep(HZ/2);
-#endif
-
-        si4700_sleep(1);
-        tuner_power(false);
-
 #ifdef HAVE_RDS_CAP
         si4700_rds_init();
 #endif
@@ -445,6 +439,9 @@ int si4700_set(int setting, int value)
 {
     int val = 1;
 
+    if(!tuner_powered() && setting != RADIO_SLEEP)
+        return -1;
+
     mutex_lock(&fmr_mutex);
 
     switch(setting)
@@ -483,7 +480,7 @@ int si4700_set(int setting, int value)
             si4700_write_masked(POWERCFG, value ? POWERCFG_MONO : 0,
                                 POWERCFG_MONO);
             break;
-
+            
         default:
             val = -1;
             break;
@@ -499,12 +496,15 @@ int si4700_get(int setting)
 {
     int val = -1; /* default for unsupported query */
 
+    if(!tuner_powered() && setting != RADIO_PRESENT)
+        return -1;
+
     mutex_lock(&fmr_mutex);
 
     switch(setting)
     {
         case RADIO_PRESENT:
-            val = tuner_present ? 1 : 0;
+            val = tuner_present;
             break;
 
         case RADIO_TUNED:
@@ -526,7 +526,7 @@ int si4700_get(int setting)
         case RADIO_RSSI_MAX:
             val = RSSI_MAX;
             break;
-
+            
 #ifdef HAVE_RDS_CAP
         case RADIO_EVENT:
         {
