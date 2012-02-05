@@ -66,6 +66,8 @@
 #define INT_SRC_VDD5V       3
 #define INT_SRC_DAC_DMA     5
 #define INT_SRC_DAC_ERROR   6
+#define INT_SRC_ADC_DMA     7
+#define INT_SRC_ADC_ERROR   8
 #define INT_SRC_USB_CTRL    11
 #define INT_SRC_SSP1_DMA    14
 #define INT_SRC_SSP1_ERROR  15

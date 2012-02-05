@@ -131,6 +131,10 @@ const void *pcm_play_dma_get_peak_buffer(int *count)
     return (void *)info.bar;
 }
 
+/*
+ * Recording
+ */
+
 void pcm_rec_lock(void)
 {
 }

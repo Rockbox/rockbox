@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "cpu.h"
+#include "system.h"
 
 #define HW_AUDIOIN_BASE         0x8004c000 
 
@@ -69,7 +70,7 @@
 #define HW_AUDIOIN_ADCDEBUG     (*(volatile uint32_t *)(HW_AUDIOIN_BASE + 0x40))
 #define HW_AUDIOIN_ADCDEBUG__FIFO_STATUS    1
 
-#define HW_AUDIOIN_ADCVOL       (*(volatile uint32_t *)(HW_AUDIOOUT_BASE + 0x50))
+#define HW_AUDIOIN_ADCVOL       (*(volatile uint32_t *)(HW_AUDIOIN_BASE + 0x50))
 #define HW_AUDIOIN_ADCVOL__GAIN_RIGHT_BP    0 
 #define HW_AUDIOIN_ADCVOL__GAIN_RIGHT_BM    (0xf << 0)
 #define HW_AUDIOIN_ADCVOL__SELECT_RIGHT_BP  4
@@ -82,7 +83,7 @@
 #define HW_AUDIOIN_ADCVOL__EN_ADC_ZCD       (1 << 25)
 #define HW_AUDIOIN_ADCVOL__VOLUME_UPDATE_PENDING    (1 << 28)
 
-#define HW_AUDIOIN_MICLINE      (*(volatile uint32_t *)(HW_AUDIOOUT_BASE + 0x60))
+#define HW_AUDIOIN_MICLINE      (*(volatile uint32_t *)(HW_AUDIOIN_BASE + 0x60))
 #define HW_AUDIOIN_MICLINE__MIC_GAIN_BP 0
 #define HW_AUDIOIN_MICLINE__MIC_GAIN_BM 0x3
 #define HW_AUDIOIN_MICLINE__MIC_CHOPCLK_BP  4
@@ -95,7 +96,7 @@
 #define HW_AUDIOIN_MICLINE__DIVIDE_LINE2    (1 << 28)
 #define HW_AUDIOIN_MICLINE__DIVIDE_LINE1    (1 << 29)
 
-#define HW_AUDIOIN_ANACLKCTRL   (*(volatile uint32_t *)(HW_AUDIOOUT_BASE + 0x70))
+#define HW_AUDIOIN_ANACLKCTRL   (*(volatile uint32_t *)(HW_AUDIOIN_BASE + 0x70))
 #define HW_AUDIOIN_ANACLKCTRL__ADCDIV_BP    0
 #define HW_AUDIOIN_ANACLKCTRL__ADCDIV_BM    (0x7 << 0)
 #define HW_AUDIOIN_ANACLKCTRL__ADCCLK_SHIFT_BP  4
@@ -105,7 +106,7 @@
 #define HW_AUDIOIN_ANACLKCTRL__DITHER_OFF       (1 << 10)
 #define HW_AUDIOIN_ANACLKCTRL__CLKGATE          (1 << 31)
 
-#define HW_AUDIOIN_DATA         (*(volatile uint32_t *)(HW_AUDIOOUT_BASE + 0x80))
+#define HW_AUDIOIN_DATA         (*(volatile uint32_t *)(HW_AUDIOIN_BASE + 0x80))
 
 void imx233_audioin_preinit(void);
 void imx233_audioin_postinit(void);

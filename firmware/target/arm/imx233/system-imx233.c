@@ -69,6 +69,8 @@ default_interrupt(INT_LRADC_CH6);
 default_interrupt(INT_LRADC_CH7);
 default_interrupt(INT_DAC_DMA);
 default_interrupt(INT_DAC_ERROR);
+default_interrupt(INT_ADC_DMA);
+default_interrupt(INT_ADC_ERROR);
 default_interrupt(INT_DCP);
 
 typedef void (*isr_t)(void);
@@ -102,6 +104,8 @@ static isr_t isr_table[INT_SRC_NR_SOURCES] =
     [INT_SRC_LRADC_CHx(7)] = INT_LRADC_CH7,
     [INT_SRC_DAC_DMA] = INT_DAC_DMA,
     [INT_SRC_DAC_ERROR] = INT_DAC_ERROR,
+    [INT_SRC_ADC_DMA] = INT_ADC_DMA,
+    [INT_SRC_ADC_ERROR] = INT_ADC_ERROR,
     [INT_SRC_DCP] = INT_DCP,
 };
 
