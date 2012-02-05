@@ -6,7 +6,7 @@
 #                     \/            \/     \/    \/            \/
 
 TARGET_DIR ?= $(shell pwd)/
-CFLAGS += -Wall -W -D_LARGEFILE64_SOURCE -D__USE_MINGW_ANSI_STDIO=1
+CFLAGS += -Wall -W -D_LARGEFILE64_SOURCE
 
 OUTPUT = sansapatcher
 

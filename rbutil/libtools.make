@@ -27,6 +27,9 @@ APPVERSION ?= $(shell $(TOP)/../tools/version.sh ../)
 CFLAGS += -DVERSION=\"$(APPVERSION)\"
 TARGET_DIR ?= $(shell pwd)/
 
+# use POSIX/C99 printf on windows
+CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
+
 BINARY = $(OUTPUT)
 # when building a Windows binary add the correct file suffix
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
