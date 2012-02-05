@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAABn///6Y\u003d",
+        "filename": "apps/plugins/CATEGORIES",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2012-02-05T18:32:28Z",
+      "side": 1,
+      "message": "This is actually silently ignored because tools/buildzip.pl first processes apps/plugins/viewers.config and moves those plugins to the the location specified there. The rocklife line in viewers.config needs to be changed.",
+      "revId": "783ecb5c64ccd5e6b881d55ac80f11e2d5338946",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
