@@ -177,9 +177,12 @@ static void rda5802_sleep(int snooze)
         rda5802_write_clear(POWERCFG, POWERCFG_ENABLE);
     }
     else {
+        tuner_power(true);
         rda5802_write_set(POWERCFG, POWERCFG_ENABLE);
     }
     rda5802_write_cache();
+    if(snooze)
+        tuner_power(false);
 }
 
 bool rda5802_detect(void)

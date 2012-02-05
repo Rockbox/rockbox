@@ -61,8 +61,10 @@ int tea5760_set(int setting, int value)
             if (value) {
                 /* sleep / standby mode */
                 tea5760_set_clear(3, (1<<6), 0);
+                tuner_power(false);
             }
             else {
+                tuner_power(true);
                 /* active mode */
                 tea5760_set_clear(3, (1<<6), 1);
                 /* disable hard mute */

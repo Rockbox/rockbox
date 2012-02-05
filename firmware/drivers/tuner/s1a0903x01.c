@@ -47,12 +47,16 @@ int s1a0903x01_set(int setting, int value)
     {
         case RADIO_SLEEP:
             if (!value)
-            {   /* wakeup: just unit */
+            {
+                tuner_power(true);
+                /* wakeup: just unit */
                 fm_in1 = DEFAULT_IN1;
                 fm_in2 = DEFAULT_IN2;
                 fmradio_set(1, fm_in1);
                 fmradio_set(2, fm_in2);
             }
+            else
+                tuner_power(false);
             /* else we have no sleep mode? */
             break;
 
