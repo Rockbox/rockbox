@@ -38,6 +38,8 @@ bool tuner_power(bool enable)
         imx233_enable_gpio_output(0, 29, enable);
         imx233_set_gpio_output(0, 29, enable);
         tuner_enable = enable;
+        /* give time to power up */
+        udelay(5);
         //imx233_power_set_dcdc_freq(enable, HW_POWER_MISC__FREQSEL__24MHz);
     }
     return tuner_enable;
