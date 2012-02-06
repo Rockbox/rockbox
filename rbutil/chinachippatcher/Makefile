@@ -6,7 +6,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-CFLAGS = -g -Wall
+CFLAGS += -g -Wall
 
 OUTPUT = chinachippatcher
 
