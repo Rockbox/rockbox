@@ -25,10 +25,9 @@
   #include "m68k/pcm-mixer.c"
 #else
 
-/* generic pcm-mixer.c */
 #include "dsp-util.h" /* for clip_sample_16 */
 /* Mix channels' samples and apply gain factors */
-static FORCE_INLINE void mix_samples(uint32_t *out,
+static FORCE_INLINE void mix_samples(uint16_t *out,
                                      int16_t *src0,
                                      int32_t src0_amp,
                                      int16_t *src1,
@@ -42,9 +41,10 @@ static FORCE_INLINE void mix_samples(uint32_t *out,
         {
             int32_t l = *src0++ + *src1++;
             int32_t h = *src0++ + *src1++;
-            *out++ = (uint16_t)clip_sample_16(l) | (clip_sample_16(h) << 16);
+            *out++ = clip_sample_16(l);
+            *out++ = clip_sample_16(h);
         }
-        while ((size -= 4) > 0);
+        while ((size -= 2*sizeof(int16_t)) > 0);
     }
     else if (src0_amp != MIX_AMP_UNITY && src1_amp != MIX_AMP_UNITY)
     {
@@ -53,9 +53,10 @@ static FORCE_INLINE void mix_samples(uint32_t *out,
         {
             int32_t l = (*src0++ * src0_amp >> 16) + (*src1++ * src1_amp >> 16);
             int32_t h = (*src0++ * src0_amp >> 16) + (*src1++ * src1_amp >> 16);
-            *out++ = (uint16_t)clip_sample_16(l) | (clip_sample_16(h) << 16);
+            *out++ = clip_sample_16(l);
+            *out++ = clip_sample_16(h);
         }
-        while ((size -= 4) > 0);
+        while ((size -= 2*sizeof(int16_t)) > 0);
     }
     else
     {
@@ -74,9 +75,10 @@ static FORCE_INLINE void mix_samples(uint32_t *out,
         {
             int32_t l = *src0++ + (*src1++ * src1_amp >> 16);
             int32_t h = *src0++ + (*src1++ * src1_amp >> 16);
-            *out++ = (uint16_t)clip_sample_16(l) | (clip_sample_16(h) << 16);
+            *out++ = clip_sample_16(l);
+            *out++ = clip_sample_16(h);
         }
-        while ((size -= 4) > 0);
+        while ((size -= 2*sizeof(int16_t)) > 0);
     }
 }
 
@@ -97,12 +99,13 @@ static FORCE_INLINE void write_samples(uint32_t *out,
         do
         {
             int32_t l = *src++ * amp >> 16;
-            int32_t h = *src++ * amp & 0xffff0000;
-            *out++ = (uint16_t)l | h;
+            int32_t h = *src++ * amp >> 16;
+            *out++ = l;
+            *out++ = h;
         }
-        while ((size -= 4) > 0);
+        while ((size -= 2*sizeof(int16_t)) > 0);
     }     
 }
 
 
-#endif
+#endif /* CPU_* */
