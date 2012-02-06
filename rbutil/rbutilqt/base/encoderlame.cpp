@@ -82,11 +82,12 @@ void EncoderLame::generateSettings()
 
 void EncoderLame::saveSettings()
 {
-    // no user settings right now.
-    RbSettings::setSubValue("lame", RbSettings::EncoderVolume,
-            getSetting(VOLUME)->current().toDouble());
-    RbSettings::setSubValue("lame", RbSettings::EncoderQuality,
-            getSetting(QUALITY)->current().toDouble());
+    if(m_symbolsResolved) {
+        RbSettings::setSubValue("lame", RbSettings::EncoderVolume,
+                getSetting(VOLUME)->current().toDouble());
+        RbSettings::setSubValue("lame", RbSettings::EncoderQuality,
+                getSetting(QUALITY)->current().toDouble());
+    }
 }
 
 bool EncoderLame::start()
