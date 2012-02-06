@@ -27,7 +27,7 @@
 
 #include "dsp-util.h" /* for clip_sample_16 */
 /* Mix channels' samples and apply gain factors */
-static FORCE_INLINE void mix_samples(uint16_t *out,
+static FORCE_INLINE void mix_samples(int16_t *out,
                                      int16_t *src0,
                                      int32_t src0_amp,
                                      int16_t *src1,
@@ -83,7 +83,7 @@ static FORCE_INLINE void mix_samples(uint16_t *out,
 }
 
 /* Write channel's samples and apply gain factor */
-static FORCE_INLINE void write_samples(uint32_t *out,
+static FORCE_INLINE void write_samples(int16_t *out,
                                        int16_t *src,
                                        int32_t amp,
                                        size_t size)
