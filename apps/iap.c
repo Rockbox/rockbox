@@ -47,6 +47,42 @@
 #include "filetree.h"
 #include "dir.h"
 
+/*
+ * This macro is meant to be used inside an IAP mode message handler.
+ * It is passed the expected minimum length of the message buffer.
+ * If the buffer does not have the required lenght a General Lingo ACK
+ * packet with a Bad Parameter error is generated.
+ *
+ * Do not use for Extended Interface Lingo (0x04)!
+ */
+#define CHECKLEN(x) do { \
+        if (len < x) { \
+            cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM); \
+            return; \
+        }} while(0)
+
+#define MS_PER_HZ (1000/HZ)
+/* IAP specifies a timeout of 25ms for traffic from a device to the iPod.
+ * Depending on HZ this cannot be accurately measured. Find out the next
+ * best thing.
+ */
+#define IAP_PKT_TIMEOUT ((25+MS_PER_HZ-1)/MS_PER_HZ)
+
+#define IAP_ACK_OK          (0x00)  /* Success */
+#define IAP_ACK_UNKNOWN_DB  (0x01)  /* Unknown Database Category */
+#define IAP_ACK_CMD_FAILED  (0x02)  /* Command failed */
+#define IAP_ACK_NO_RESOURCE (0x03)  /* Out of resources */
+#define IAP_ACK_BAD_PARAM   (0x04)  /* Bad parameter */
+#define IAP_ACK_UNKNOWN_ID  (0x05)  /* Unknown ID */
+#define IAP_ACK_PENDING     (0x06)  /* Command pending */
+#define IAP_ACK_NO_AUTHEN   (0x07)  /* Not authenticated */
+#define IAP_ACK_BAD_AUTHEN  (0x08)  /* Bad authentication version */
+/* 0x09 reserved */
+#define IAP_ACK_CERT_INVAL  (0x0A)  /* Certificate invalid */
+#define IAP_ACK_CERT_PERM   (0x0B)  /* Certificate permissions invalid */
+/* 0x0C-0x10 reserved */
+#define IAP_ACK_RES_INVAL   (0x11)  /* Invalid accessory resistor value */
+
 static volatile int iap_pollspeed = 0;
 static volatile bool iap_remotetick = true;
 static bool iap_setupflag = false, iap_updateflag = false;
@@ -57,6 +93,7 @@ static int iap_repeatbtn = 0;
 static bool iap_btnrepeat = false, iap_btnshuffle = false;
 
 static unsigned char serbuf[RX_BUFLEN];
+static volatile bool serbuf_lock = false;
 
 static unsigned char response[TX_BUFLEN];
 
@@ -82,6 +119,34 @@ static struct state_t {
 } frame_state = {
     .state = ST_SYNC
 };
+
+/* States of the extended command support */
+enum interface_state {
+    IST_STANDARD,    /* General state, support lingo 0x00 commands */
+    IST_EXTENDED,   /* Extended Interface lingo (0x04) negotiated */
+};
+static enum interface_state interface_state = IST_STANDARD;
+
+/* The versions of the various lingos we support. A major version
+ * of 0 means unsupported
+ */
+static unsigned char lingo_versions[32][2] = {
+    {1, 0},     /* General lingo, 0x00 */
+    {0, 0},     /* Microphone lingo, 0x01, unsupported */
+    {0, 0},     /* Simple remote lingo, 0x02, unsupported */
+    {0, 0},     /* Display remote lingo, 0x03, unsupported */
+    {1, 0},     /* Extended Interface lingo, 0x04 */
+    {}          /* All others are unsupported */
+};
+#define LINGO_SUPPORTED(x) (LINGO_MAJOR(x&0x1f) > 0)
+#define LINGO_MAJOR(x) (lingo_versions[x&0x1f][0])
+#define LINGO_MINOR(x) (lingo_versions[x&0x1f][1])
+
+/* The list of lingoes an attached device has negotiated using
+ * Identify or IdentifyDeviceLingoes
+ */
+static uint32_t device_lingoes = 0;
+#define DEVICE_LINGO_SUPPORTED(x) (device_lingoes & BIT_N(x&0x1f))
 
 static void put_u32(unsigned char *buf, uint32_t data)
 {
@@ -189,6 +254,17 @@ void iap_send_pkt(const unsigned char * data, int len)
 bool iap_getc(unsigned char x)
 {
     struct state_t *s = &frame_state;
+    static long pkt_timeout;
+
+    /* Check the time since the last packet arrived. */
+    if ((s->state != ST_SYNC) && TIME_AFTER(current_tick, pkt_timeout)) {
+        /* Packet timeouts only make sense while not waiting for the
+         * sync byte */
+         serbuf_lock = false;
+         s->state = ST_SYNC;
+         return iap_getc(x);
+    }
+
     
     /* run state machine to detect and extract a valid frame */
     switch (s->state) {
@@ -207,6 +283,13 @@ bool iap_getc(unsigned char x)
         }
         break;
     case ST_LEN:
+        /* try to get a lock on serbuf */
+        if (serbuf_lock) {
+            s->state = ST_SYNC;
+            break;
+        }
+        serbuf_lock = true;
+    
         s->check = x;
         s->count = 0;
         s->payload = serbuf;
@@ -229,6 +312,7 @@ bool iap_getc(unsigned char x)
         s->len += x;
         if ((s->len == 0) || (s->len > RX_BUFLEN)) {
             /* invalid length */
+            serbuf_lock = false;
             s->state = ST_SYNC;
             return iap_getc(x);
         } else {
@@ -249,11 +333,14 @@ bool iap_getc(unsigned char x)
             queue_post(&button_queue, SYS_IAP_HANDLEPKT, 0);
         }
         s->state = ST_SYNC;
+        serbuf_lock = false;
         break;
     default:
         panicf("Unhandled iap state %d", (int) s->state);
         break;
     }
+
+    pkt_timeout = current_tick + IAP_PKT_TIMEOUT;
     
     /* return true while still hunting for the sync and start-of-frame byte */
     return (s->state == ST_SYNC) || (s->state == ST_SOF);
@@ -292,69 +379,344 @@ static void iap_set_remote_volume(void)
     iap_send_pkt(data, sizeof(data));
 }
 
-static void cmd_ok_mode0(unsigned char cmd)
+/* Change the current interface state.
+ * On a change from IST_EXTENDED to IST_STANDARD, or from IST_STANDARD
+ * to IST_EXTENDED, pause playback, if playing
+ */
+static void interface_state_change(enum interface_state new)
 {
-    unsigned char data[] = {0x00, 0x02, 0x00, 0x00};
-    data[3] = cmd;  /* respond with cmd */
+    if (((interface_state == IST_EXTENDED) && (new == IST_STANDARD)) ||
+        ((interface_state == IST_STANDARD) && (new == IST_EXTENDED))) {
+        if (audio_status() == AUDIO_STATUS_PLAY)
+        {
+            iap_remotebtn |= BUTTON_RC_PLAY;
+            iap_repeatbtn = 2;
+            iap_remotetick = false;
+            iap_changedctr = 1;
+        }
+    }
+
+    interface_state = new;
+}
+
+static void cmd_ack_mode0(unsigned char cmd, unsigned char status)
+{
+    unsigned char data[] = {0x00, 0x02, status, cmd};
     iap_send_pkt(data, sizeof(data));
 }
 
+static void cmd_ok_mode0(unsigned char cmd)
+{
+    cmd_ack_mode0(cmd, IAP_ACK_OK);
+}
+
+static void cmd_pending_mode0(unsigned char cmd, uint32_t msdelay) {
+    unsigned char data[] = {0x00, 0x02, 0x06, cmd, 0x00, 0x00, 0x00, 0x00};
+
+    put_u32(&data[4], msdelay);
+    iap_send_pkt(data, sizeof(data));
+}
+
+
 static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
 {
-    (void)len;    /* len currently unused */
-    
     unsigned int cmd = buf[1];
+
+    /* We expect at least two bytes in the buffer, one for the
+     * lingo, one for the command
+     */
+    CHECKLEN(2);
+
     switch (cmd) {
-        /* Identify */
+        /* RequestIdentify (0x00)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* Identify (0x01)
+         * This command is deprecated.
+         *
+         * It is used by a device to inform the iPod of the devices
+         * presence and of the lingo the device supports.
+         *
+         * Also, it is used to negotiate power for RF transmitters
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x01
+         * 0x02: Lingo supported by the device
+         *
+         * Some RF transmitters use an extended version of this
+         * command:
+         *
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x01
+         * 0x02: Lingo supported by the device, always 0x05 (RF Transmitter)
+         * 0x03: Reserved, always 0x00
+         * 0x04: Number of valid bits in the following fields
+         * 0x05-N: Datafields holding the number of bits specified in 0x04
+         *
+         * Returns: (none)
+         */
         case 0x01:
         {
-            /* FM transmitter sends this: */
-            /* FF 55 06 00 01 05 00 02 01 F1 (mode switch) */
-            if(buf[2] == 0x05)
-            {
-                sleep(HZ/3);
-                /* RF Transmitter: Begin transmission */
-                unsigned char data[] = {0x05, 0x02};
-                iap_send_pkt(data, sizeof(data));
+            unsigned char lingo = buf[2];
+
+            /* This is sufficient even for Lingo 0x05, as we are
+             * not actually reading from the extended bits for now
+             */
+            CHECKLEN(3);
+
+            /* Issuing this command exits any extended interface states */
+            interface_state_change(IST_STANDARD);
+            
+            switch (lingo) {
+                case 0x04:
+                {
+                    /* A single lingo device negotiating the
+                     * extended interface lingo. This causes an interface
+                     * state change.
+                     */
+                    interface_state_change(IST_EXTENDED);
+                    break;
+                }
+
+                case 0x05: 
+                {
+                    /* FM transmitter sends this: */
+                    /* FF 55 06 00 01 05 00 02 01 F1 (mode switch) */
+                    sleep(HZ/3);
+                    /* RF Transmitter: Begin transmission */
+                    unsigned char data[] = {0x05, 0x02};
+                    iap_send_pkt(data, sizeof(data));
+                    break;
+                }
             }
-            /* FM remote sends this: */
-            /* FF 55 03 00 01 02 FA (1st thing sent) */
-            else if (buf[2] == 0x02)
-            {
-                /* useful only for apple firmware */
+
+            if (lingo < 32) {
+                device_lingoes = BIT_N(lingo);
+            } else {
+                device_lingoes = 0;
             }
             break;
         }
+
+        /* ACK (0x02)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* RequestRemoteUIMode (0x03)
+         *
+         * Request the current Extended Interface Mode state
+         * This command may be used only if the accessory requests Lingo 0x04
+         * during its identification process.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x03
+         *
+         * Returns on success:
+         * ReturnRemoteUIMode
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x04
+         * 0x02: Current Extended Interface Mode (zero: false, non-zero: true)
+         *
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAM
+         */
+        case 0x03:
+        {
+            unsigned char data[] = {0x00, 0x04, 0x00};
+
+            if (!DEVICE_LINGO_SUPPORTED(0x04)) {
+                cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+
+            if (interface_state == IST_EXTENDED) {
+                data[2] = 0x01;
+            }
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* ReturnRemoteUIMode (0x04)
+         *
+         * Sent from the iPod to the device
+         */
     
-        /* EnterRemoteUIMode, FM transmitter sends FF 55 02 00 05 F9 */
+        /* EnterRemoteUIMode (0x05)
+         *
+         * Request Extended Interface Mode
+         * This command may be used only if the accessory requests Lingo 0x04
+         * during its identification process.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x05
+         *
+         * Returns on success:
+         * IAP_ACK_PENDING
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAM
+         */
         case 0x05:
         {
-            /* ACK Pending (3000 ms) */
-            unsigned char data[] = {0x00, 0x02, 0x06,
-                                    0x05, 0x00, 0x00, 0x0B, 0xB8};
-            iap_send_pkt(data, sizeof(data));
+            if (!DEVICE_LINGO_SUPPORTED(0x04)) {
+                cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+
+            cmd_pending_mode0(cmd, 1000);
+            interface_state_change(IST_EXTENDED);
             cmd_ok_mode0(cmd);
             break;
         }
 
-        /* ExitRemoteUIMode */
+        /* ExitRemoteUIMode (0x06)
+         *
+         * Leave Extended Interface Mode
+         * This command may be used only if the accessory requests Lingo 0x04
+         * during its identification process.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x06
+         *
+         * Returns on success:
+         * IAP_ACK_PENDING
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAM
+         */
         case 0x06:
         {
-            audio_stop();
+            if (!DEVICE_LINGO_SUPPORTED(0x04)) {
+                cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+
+            cmd_pending_mode0(cmd, 1000);
+            interface_state_change(IST_STANDARD);
             cmd_ok_mode0(cmd);
             break;
         }
 
-        /* RequestiPodSoftwareVersion, Ipod FM remote sends FF 55 02 00 09 F5 */
+        /* RequestiPodName (0x07)
+         *
+         * Retrieves the name of the iPod
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x07
+         *
+         * Returns:
+         * ReturniPodName
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x08
+         * 0x02-0xNN: iPod name as NULL-terminated UTF8 string
+         */
+        case 0x07:
+        {
+            unsigned char data[] = {0x00, 0x08, 'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
+
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* ReturniPodName (0x08)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* RequestiPodSoftwareVersion (0x09)
+         *
+         * Returns the major, minor and revision numbers of the iPod
+         * software version. This not any Lingo protocol version.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x09
+         *
+         * Returns:
+         * ReturniPodSoftwareVersion
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x0A
+         * 0x02: iPod major software version
+         * 0x03: iPod minor software version
+         * 0x04: iPod revision software version
+         */
         case 0x09:
         {
-            /* ReturniPodSoftwareVersion, ipod5G firmware version */
+            /* ipod5G firmware version */
             unsigned char data[] = {0x00, 0x0A, 0x01, 0x02, 0x01};
+
             iap_send_pkt(data, sizeof(data));
             break;
         } 
 
-        /* RequestiPodModelNum */
+        /* ReturniPodSoftwareVersion (0x0A)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* RequestiPodSerialNum (0x0B)
+         *
+         * Returns the iPod serial number
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x0B
+         *
+         * Returns:
+         * ReturniPodSerialNumber
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x0C
+         * 0x02-0xNN: Serial number as NULL-terminated UTF8 string
+         */
+        case 0x0B:
+        {
+            unsigned char data[] = {0x00, 0x0C, '0', '1', '2', '3', '4', '5', '6', '7', '8', 0x00};
+
+            iap_send_pkt(data, sizeof(data));
+            break;
+        }
+
+        /* ReturniPodSerialNum (0x0C)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* RequestiPodModelNum (0x0D)
+         *
+         * Returns the model number as a 32bit unsigned integer and
+         * as a string.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x0D
+         *
+         * Returns:
+         * ReturniPodModelNum
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x0E
+         * 0x02-0x05: Model number as 32bit integer
+         * 0x06-0xNN: Model number as NULL-terminated UTF8 string
+         */
         case 0x0D:
         {
             /* ipod is supposed to work only with 5G and nano 2G */
@@ -363,31 +725,120 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
             /* ReturniPodModelNum */
             unsigned char data[] = {0x00, 0x0E, 0x00, 0x0B, 0x00, 0x10,
                                 'R', 'O', 'C', 'K', 'B', 'O', 'X', 0x00};
+
             iap_send_pkt(data, sizeof(data));
             break;
         }
 
-        /* RequestLingoProtocolVersion */
+        /* ReturniPodSerialNum (0x0C)
+         *
+         * Sent from the iPod to the device
+         */
+
+        /* RequestLingoProtocolVersion
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x0F
+         * 0x02: Lingo for which to request version information
+         *
+         * Returns on success:
+         * ReturnLingoProtocolVersion
+         *
+         * Packet format (offset in data[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x10
+         * 0x02: Lingo for which version information is returned
+         * 0x03: Major protocol version for the given lingo
+         * 0x04: Minor protocol version for the given lingo
+         * 
+         * Returns on failure:
+         * IAP_ACK_BAD_PARAM
+         */
         case 0x0F:
         {
             /* ReturnLingoProtocolVersion */
-            unsigned char data[] = {0x00, 0x10, 0x00, 0x01, 0x05};
-            data[2] = buf[2];
-            iap_send_pkt(data, sizeof(data));
+            unsigned char data[] = {0x00, 0x10, 0x00, 0x00, 0x00};
+            unsigned char lingo = buf[2];
+
+            CHECKLEN(3);
+
+            /* Supported lingos and versions are read from the lingo_versions
+             * array
+             */
+            if (LINGO_SUPPORTED(lingo)) {
+                data[2] = lingo;
+                data[3] = LINGO_MAJOR(lingo);
+                data[4] = LINGO_MINOR(lingo);
+                iap_send_pkt(data, sizeof(data));
+            } else {
+                cmd_ack_mode0(cmd, IAP_ACK_BAD_PARAM);
+            }
             break;
         }
 
-        /* IdentifyDeviceLingoes */
+        /* IdentifyDeviceLingoes
+         *
+         * Used by a device to inform the iPod of the devices
+         * presence and of the lingoes the device supports.
+         *
+         * Packet format (offset in buf[]: Description)
+         * 0x00: Lingo ID: General Lingo, always 0x00
+         * 0x01: Command, always 0x13
+         * 0x02-0x05: Device lingoes spoken
+         * 0x06-0x09: Device options
+         * 0x0A-0x0D: Device ID. Only important for authentication
+         *
+         * Returns on success:
+         * IAP_ACK_OK
+         *
+         * Returns on failure:
+         * IAP_CMD_FAILED
+         */
         case 0x13:
         {
-            cmd_ok_mode0(cmd);
-
             uint32_t lingoes = get_u32(&buf[2]);
+            bool seen_unsupported = false;
+            unsigned char i;
 
-            if (lingoes == 0x35)
-            /* FM transmitter sends this: */
-            /* FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??)*/
+            CHECKLEN(14);
+
+            /* Issuing this command exits any extended interface states */
+            interface_state_change(IST_STANDARD);
+
+            /* Loop through the lingoes advertised by the device.
+             * If it tries to use a lingo we do not support, return
+             * a Command Failed ACK.
+             */
+            for(i=0; i<32; i++) {
+                if (lingoes & BIT_N(i)) {
+                    /* Bit set by device */
+                    if (!LINGO_SUPPORTED(i)) {
+                        seen_unsupported = true;
+                    }
+                }
+            }
+
+            /* Bit 0 _must_ be set by the device */
+            if (!(lingoes & 1)) {
+                seen_unsupported = true;
+            }
+
+            device_lingoes = 0;
+            if (seen_unsupported) {
+                cmd_ack_mode0(cmd, IAP_ACK_CMD_FAILED);
+            } else {
+                cmd_ok_mode0(cmd);
+                device_lingoes = lingoes;
+            }
+
+#if 0
+            /* Bit 5: RF Transmitter lingo */
+            if (lingoes & (1 << 5))
             {
+                /* FM transmitter sends this: */
+                /* FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??)*/
+
                 /* GetAccessoryInfo */
                 unsigned char data2[] = {0x00, 0x27, 0x00};
                 iap_send_pkt(data2, sizeof(data2));
@@ -395,16 +846,18 @@ static void iap_handlepkt_mode0(unsigned int len, const unsigned char *buf)
                 unsigned char data3[] = {0x05, 0x02};
                 iap_send_pkt(data3, sizeof(data3));
             }
-            else
+
+            /* Bit 7: RF Tuner lingo */
+            if (lingoes & (1 << 7))
             {
                 /* ipod fm remote sends this: */ 
                 /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 */
-                if (lingoes & (1 << 7)) /* bit 7 = RF tuner lingo */
-                    radio_present = 1;
+                radio_present = 1;
                 /* GetDevAuthenticationInfo */    
                 unsigned char data4[] = {0x00, 0x14};
                 iap_send_pkt(data4, sizeof(data4));
             }
+#endif
             break;
         }
 
@@ -1083,6 +1536,12 @@ void iap_handlepkt(void)
     case 4: iap_handlepkt_mode4(s->len, s->payload); break;
     case 7: iap_handlepkt_mode7(s->len, s->payload); break;
     }
+    
+    /* release the lock on serbuf */
+    serbuf_lock = false;
+
+    /* poke the poweroff timer */
+    reset_poweroff_timer();
 }
 
 int remote_control_rx(void)
