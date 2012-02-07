@@ -378,7 +378,7 @@ sub _h_00_0027 {
         "Maximum payload size")[$acctype], $acctype);
     if ($acctype == 0x02) {
         my ($modelid, $maj, $min, $rev);
-        
+
         ($modelid, $maj, $min, $rev) = unpack("xNCCC", $data);
         printf(" Model ID:             0x%04x\n", $modelid);
         printf(" iPod Firmware:        %d.%d.%d\n", $maj, $min, $rev);
@@ -543,7 +543,7 @@ sub _h_00_0038 {
     my $transid;
 
     $transid = unpack("n", $data);
-    
+
     printf("StartIDPS (0x00, 0x38) D->I\n");
     printf(" TransID:          %d\n", $transid);
 
@@ -557,7 +557,7 @@ sub _h_00_003b {
     my ($transid, $status);
 
     ($transid, $status) = unpack("nC", $data);
-    
+
     printf("EndIDPS (0x00, 0x3B) D->I\n");
     printf(" TransID:          %d\n", $transid);
     printf(" Action:           %s (%d)\n", (

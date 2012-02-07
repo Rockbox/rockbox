@@ -90,7 +90,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
     {
         /* ACK (0x00)
          *
-         * Sent from the iPod to the device 
+         * Sent from the iPod to the device
          */
 
         /* GetCurrentEQProfileIndex (0x01)
@@ -122,7 +122,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
          *
          * Sent from the iPod to the device
          */
-        
+
         /* SetCurrentEQProfileIndex (0x03)
          *
          * Set the active equalizer profile
@@ -848,7 +848,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                 case 0x09:
                 {
                     CHECKLEN(9);
-                    
+
                     cmd_ack(cmd, IAP_ACK_CMD_FAILED);
                     break;
                 }
@@ -859,7 +859,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                 case 0x0A:
                 {
                     CHECKLEN(7);
-                    
+
                     cmd_ack(cmd, IAP_ACK_CMD_FAILED);
                     break;
                 }
@@ -870,7 +870,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                 case 0x0B:
                 {
                     CHECKLEN(5);
-                    
+
                     cmd_ack(cmd, IAP_ACK_CMD_FAILED);
                     break;
                 }
@@ -881,7 +881,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                 case 0x0D:
                 {
                     CHECKLEN(5);
-                    
+
                     cmd_ack(cmd, IAP_ACK_CMD_FAILED);
                     break;
                 }
@@ -892,7 +892,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                 case 0x0E:
                 {
                     CHECKLEN(4);
-                    
+
                     cmd_ack(cmd, IAP_ACK_CMD_FAILED);
                     break;
                 }
@@ -1112,7 +1112,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                 {
                     /* Chapter length, set at 0 (no chapters) */
                     IAP_TX_PUT_U32(0x00);
-                    
+
                     /* Chapter name, empty */
                     IAP_TX_PUT_STRING("");
 
@@ -1222,7 +1222,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
 
             break;
         }
-        
+
         /* RetIndexedPlayingTrackInfo (0x13)
          *
          * Sent from the iPod to the device
@@ -1249,7 +1249,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
         case 0x14:
         {
             CHECKAUTH;
-            
+
             IAP_TX_INIT(0x03, 0x15);
             IAP_TX_PUT_U32(playlist_amount());
 
@@ -1367,7 +1367,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
         case 0x1A:
         {
             IAP_TX_INIT(0x03, 0x1B);
-            
+
             iap_fill_power_state();
             iap_send_tx();
             break;
@@ -1434,7 +1434,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
         {
             CHECKAUTH;
             CHECKLEN(4);
-            
+
             /* Sound check is not supported right now
              * TODO: Fix
              */
@@ -1490,7 +1490,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
             iap_send_tx();
             break;
         }
-        
+
         /* The default response is IAP_ACK_BAD_PARAM */
         default:
         {

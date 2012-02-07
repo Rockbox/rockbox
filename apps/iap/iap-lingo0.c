@@ -101,7 +101,7 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
          * 0x05-N: Datafields holding the number of bits specified in 0x04
          *
          * Returns: (none)
-         * 
+         *
          * TODO:
          * BeginHighPower/EndHighPower should be send in the periodic handler,
          * depending on the current play status
@@ -132,7 +132,7 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
                     break;
                 }
 
-                case 0x05: 
+                case 0x05:
                 {
                     /* FM transmitter sends this: */
                     /* FF 55 06 00 01 05 00 02 01 F1 (mode switch) */
@@ -209,7 +209,7 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
          *
          * Sent from the iPod to the device
          */
-    
+
         /* EnterRemoteUIMode (0x05)
          *
          * Request Extended Interface Mode
@@ -328,7 +328,7 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
 
             iap_send_tx();
             break;
-        } 
+        }
 
         /* ReturniPodSoftwareVersion (0x0A)
          *
@@ -414,7 +414,7 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
          * 0x02: Lingo for which version information is returned
          * 0x03: Major protocol version for the given lingo
          * 0x04: Minor protocol version for the given lingo
-         * 
+         *
          * Returns on failure:
          * IAP_ACK_BAD_PARAM
          */
@@ -550,10 +550,10 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
             /* Bit 7: RF Tuner lingo */
             if (lingoes & (1 << 7))
             {
-                /* ipod fm remote sends this: */ 
+                /* ipod fm remote sends this: */
                 /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 */
                 radio_present = 1;
-                /* GetDevAuthenticationInfo */    
+                /* GetDevAuthenticationInfo */
                 unsigned char data4[] = {0x00, 0x14};
                 iap_send_pkt(data4, sizeof(data4));
             }
@@ -1020,7 +1020,7 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
 
             break;
         }
-        
+
         /* The default response is IAP_ACK_BAD_PARAM */
         default:
         {

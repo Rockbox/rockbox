@@ -75,7 +75,7 @@ static void get_playlist_name(unsigned char *dest,
     {
         /*Increment only if there is a playlist extension*/
         if ((extension=strrchr(playlist_file->d_name, '.')) != NULL){
-            if ((strcmp(extension, ".m3u") == 0 || 
+            if ((strcmp(extension, ".m3u") == 0 ||
                 strcmp(extension, ".m3u8") == 0))
                 nbr++;
         }
@@ -115,7 +115,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
         /* SetAudioBookSpeed */
         case 0x000B:
         {
@@ -123,7 +123,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             cmd_ok(cmd);
             break;
         }
-        
+
         /* RequestProtocolVersion (0x0012)
          *
          * This command is deprecated.
@@ -208,7 +208,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             /* ReturnNumberCategorizedDBRecords */
             unsigned char data[] = {0x04, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00};
             unsigned long num = 0;
-            
+
             DIR* dp;
             unsigned long nbr_total_playlists = 0;
             struct dirent* playlist_file = NULL;
@@ -223,7 +223,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                     /*Increment only if there is a playlist extension*/
                         if ((extension=strrchr(playlist_file->d_name, '.'))
                         != NULL) {
-                            if ((strcmp(extension, ".m3u") == 0 || 
+                            if ((strcmp(extension, ".m3u") == 0 ||
                                 strcmp(extension, ".m3u8") == 0))
                                 nbr_total_playlists++;
                         }
@@ -240,15 +240,15 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
         /* RetrieveCategorizedDatabaseRecords */
         case 0x001A:
         {
             /* ReturnCategorizedDatabaseRecord */
-            unsigned char data[7 + MAX_PATH] = 
+            unsigned char data[7 + MAX_PATH] =
                             {0x04, 0x00, 0x1B, 0x00, 0x00, 0x00, 0x00,
                              'R', 'O', 'C', 'K', 'B', 'O', 'X', '\0'};
-            
+
             unsigned long item_offset = get_u32(&buf[4]);
 
             get_playlist_name(data + 7, item_offset, MAX_PATH);
@@ -260,12 +260,12 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             iap_send_pkt(data, 7 + strlen(data+7) + 1);
             break;
         }
-        
+
         /* GetPlayStatus */
         case 0x001C:
         {
             /* ReturnPlayStatus */
-            unsigned char data[] = {0x04, 0x00, 0x1D, 0x00, 0x00, 0x00, 
+            unsigned char data[] = {0x04, 0x00, 0x1D, 0x00, 0x00, 0x00,
                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
             struct mp3entry *id3 = audio_current_track();
             unsigned long time_total = id3->length;
@@ -276,11 +276,11 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             if (status == AUDIO_STATUS_PLAY)
                 data[11] = 0x01; /* play */
             else if (status & AUDIO_STATUS_PAUSE)
-                data[11] = 0x02; /* pause */ 
+                data[11] = 0x02; /* pause */
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
         /* GetCurrentPlayingTrackIndex */
         case 0x001E:
         {
@@ -294,7 +294,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
         /* GetIndexedPlayingTrackTitle */
         case 0x0020:
         /* GetIndexedPlayingTrackArtistName */
@@ -307,7 +307,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             int fd;
             size_t len;
             long tracknum = get_u32(&buf[3]);
-            
+
             data[2] = cmd + 1;
             memcpy(&id3, audio_current_track(), sizeof(id3));
             tracknum += playlist_get_first_index(NULL);
@@ -344,7 +344,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             }
             break;
         }
-        
+
         /* SetPlayStatusChangeNotification */
         case 0x0026:
         {
@@ -353,7 +353,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             cmd_ok(cmd);
             break;
         }
-        
+
         /* PlayCurrentSelection */
         case 0x0028:
         {
@@ -362,7 +362,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                 case 0x01:
                 {/*Playlist*/
                     unsigned long item_offset = get_u32(&cur_dbrecord[1]);
-                    
+
                     unsigned char selected_playlist
                     [sizeof(global_settings.playlist_catalog_dir)
                     + 1
@@ -384,7 +384,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             cmd_ok(cmd);
             break;
         }
-        
+
         /* PlayControl */
         case 0x0029:
         {
@@ -420,7 +420,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             cmd_ok(cmd);
             break;
         }
-        
+
         /* GetShuffle */
         case 0x002C:
         {
@@ -430,7 +430,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
         /* SetShuffle */
         case 0x002E:
         {
@@ -453,7 +453,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             cmd_ok(cmd);
             break;
         }
-        
+
         /* GetRepeat */
         case 0x002F:
         {
@@ -468,7 +468,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
         /* SetRepeat */
         case 0x0031:
         {
@@ -491,7 +491,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             cmd_ok(cmd);
             break;
         }
-        
+
         /* GetMonoDisplayImageLimits */
         case 0x0033:
         {
@@ -503,7 +503,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
         /* GetNumPlayingTracks */
         case 0x0035:
         {
@@ -514,23 +514,23 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
         /* SetCurrentPlayingTrack */
         case 0x0037:
         {
             int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
             long tracknum = get_u32(&buf[3]);
-            
+
             audio_pause();
             audio_skip(tracknum - playlist_next(0));
             if (!paused)
                 audio_resume();
-            
+
             /* respond with cmd ok packet */
             cmd_ok(cmd);
             break;
         }
-        
+
         default:
         {
             /* The default response is IAP_ACK_BAD_PARAM */

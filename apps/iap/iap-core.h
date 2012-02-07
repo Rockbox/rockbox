@@ -156,7 +156,7 @@ extern unsigned char* iap_txnext;
  * it might be too late at that point. See the current size of TX_BUFLEN
  */
 
-/* Initialize the TX buffer with a lingo and command ID. This will reset the 
+/* Initialize the TX buffer with a lingo and command ID. This will reset the
  * data pointer, effectively invalidating unsent information in the TX buffer.
  * There are two versions of this, one for 1 byte command IDs (all Lingoes except
  * 0x04) and one for two byte command IDs (Lingo 0x04)
@@ -188,7 +188,7 @@ extern unsigned char* iap_txnext;
         iap_txnext += 4; \
         } while (0)
 
-/* Put an arbitrary amount of data (identified by a char pointer and 
+/* Put an arbitrary amount of data (identified by a char pointer and
  * a length) into the TX buffer
  */
 #define IAP_TX_PUT_DATA(data, len) do { \

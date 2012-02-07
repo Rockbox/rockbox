@@ -44,7 +44,7 @@ sub baudrate {
         $self->{-error} = "Invalid baudrate";
         return undef;
     }
-    
+
     $self->{-baudrate} = $baudrate;
     if (defined($self->{-serial})) {
         $self->{-serial}->baudrate($baudrate);

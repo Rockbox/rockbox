@@ -90,7 +90,7 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
         {
             iap_remotebtn = BUTTON_NONE;
             iap_timeoutbtn = 0;
-            
+
             if(buf[2] != 0)
             {
                 if(buf[2] & 1)
@@ -263,7 +263,7 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
             cmd_ok(cmd);
             break;
         }
-        
+
         /* The default response is IAP_ACK_BAD_PARAM */
         default:
         {

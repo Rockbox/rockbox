@@ -69,7 +69,7 @@
 #define IAP_EV_TICK         (1)     /* The regular task timeout */
 #define IAP_EV_MSG_RCVD     (2)     /* A complete message has been received from the device */
 #define IAP_EV_MALLOC       (3)     /* Allocate memory for the RX/TX buffers */
-        
+
 static bool iap_started = false;
 static bool iap_setupflag = false, iap_running = false;
 /* This is set to true if a SYS_POWEROFF message is received,
@@ -484,7 +484,7 @@ void iap_send_pkt(const unsigned char * data, const int len)
     iap_txnext = iap_txpayload;
     IAP_TX_PUT_DATA(data, len);
     iap_send_tx();
-}    
+}
 
 bool iap_getc(const unsigned char x)
 {
@@ -502,7 +502,7 @@ bool iap_getc(const unsigned char x)
          return iap_getc(x);
     }
 
-    
+
     /* run state machine to detect and extract a valid frame */
     switch (s->state) {
     case ST_SYNC:
@@ -592,7 +592,7 @@ bool iap_getc(const unsigned char x)
     }
 
     pkt_timeout = current_tick + IAP_PKT_TIMEOUT;
-    
+
     /* return true while still hunting for the sync and start-of-frame byte */
     return (s->state == ST_SYNC) || (s->state == ST_SOF);
 }
@@ -805,9 +805,9 @@ void iap_periodic(void)
     if (count < 5) return;
 
     count = 0;
-    
+
     /* RemoteEventNotification */
-    
+
     /* Track position (ms)  or Track position (s) */
     if (device.notifications & (BIT_N(0) | BIT_N(15)))
     {
@@ -1111,13 +1111,13 @@ static void iap_handlepkt_mode7(const unsigned int len, const unsigned char *buf
         case 0x02:
         {
             /* do nothing */
-            
+
             /* GetAccessoryInfo */
             unsigned char data[] = {0x00, 0x27, 0x00};
             iap_send_pkt(data, sizeof(data));
             break;
         }
-        
+
         /* RetTunerFreq */
         case 0x0A:
             /* fall through */
@@ -1127,7 +1127,7 @@ static void iap_handlepkt_mode7(const unsigned int len, const unsigned char *buf
             rmt_tuner_freq(len, buf);
             break;
         }
-        
+
         /* RdsReadyNotify, RDS station name 0x21 1E 00 + ASCII text*/
         case 0x21:
         {
