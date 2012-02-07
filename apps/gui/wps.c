@@ -429,10 +429,10 @@ bool ffwd_rew(int button)
 #ifdef HAVE_TOUCHSCREEN
             if (button == ACTION_TOUCHSCREEN)
                 button = skintouch_to_wps(skin_get_gwps(WPS, SCREEN_MAIN)->data);
+#endif
             if (button != ACTION_WPS_SEEKFWD &&
                 button != ACTION_WPS_SEEKBACK)
                 button = ACTION_WPS_STOPSEEK;
-#endif
         }
     }
     return usb;
