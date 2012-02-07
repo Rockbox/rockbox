@@ -168,6 +168,8 @@ enum codec_status codec_run(void)
     ci->memset(&pkt,0,sizeof(RMPacket));
     init_rm(&rmctx);
 
+    samplesdone = 0;
+
     /* check for a mid-track resume and force a seek time accordingly */
     if(resume_offset > rmctx.data_offset + DATA_HEADER_SIZE) {
         resume_offset -= rmctx.data_offset + DATA_HEADER_SIZE;

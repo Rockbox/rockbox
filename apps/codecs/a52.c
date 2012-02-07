@@ -148,6 +148,8 @@ enum codec_status codec_run(void)
     /* Intialise the A52 decoder and check for success */
     state = a52_init(0);
 
+    samplesdone = 0;
+
     /* The main decoding loop */
     if (ci->id3->offset) {
         if (ci->seek_buffer(ci->id3->offset)) {
