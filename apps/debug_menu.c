@@ -1875,7 +1875,12 @@ static int radio_callback(int btn, struct gui_synclist *lists)
                            rds_get_pi(), rds_get_ps());
         simplelist_addline(SIMPLELIST_ADD_LINE, "RT:%s",
                            rds_get_rt());
-        simplelist_addline(SIMPLELIST_ADD_LINE, "CT:%d", rds_get_ct());
+        time_t seconds = rds_get_ct();
+        struct tm* time = gmtime(&seconds);
+        simplelist_addline(SIMPLELIST_ADD_LINE,
+            "CT:%4d-%02d-%02d %02d:%02d",
+            time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+            time->tm_hour, time->tm_min, time->tm_sec);
 #endif
     return ACTION_REDRAW;
 }
