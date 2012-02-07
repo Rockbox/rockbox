@@ -1871,11 +1871,11 @@ static int radio_callback(int btn, struct gui_synclist *lists)
 #endif /* RDA55802 */
 
 #ifdef HAVE_RDS_CAP
-        simplelist_addline(SIMPLELIST_ADD_LINE, "RDS Info:");
         simplelist_addline(SIMPLELIST_ADD_LINE, "PI:%04X PS:'%8s'",
                            rds_get_pi(), rds_get_ps());
         simplelist_addline(SIMPLELIST_ADD_LINE, "RT:%s",
                            rds_get_rt());
+        simplelist_addline(SIMPLELIST_ADD_LINE, "CT:%d", rds_get_ct());
 #endif
     return ACTION_REDRAW;
 }

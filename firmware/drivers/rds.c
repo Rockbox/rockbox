@@ -23,6 +23,7 @@
 #include <string.h>
 #include <strlcpy.h>
 #include "rds.h"
+#include "time.h"
 
 /* programme identification */
 static uint16_t pi_code;
@@ -36,6 +37,8 @@ static char rt_data[65];
 static char rt_copy[65];
 static int rt_segment;
 static int rt_abflag;
+/* date/time */
+static time_t ct_data;
 
 #ifdef RDS_ISR_PROCESSING
 /* Functions are called in ISR context */
@@ -76,6 +79,7 @@ void rds_reset(void)
     ps_segment = 0;
     rt_copy[0] = '\0';
     rt_segment = 0;
+    ct_data = 0;
 
     rds_restore_irq(oldlevel);
 }
@@ -177,6 +181,40 @@ static bool handle_group2(uint16_t data[4])
     return false;
 }
 
+/* handles a group 4a packet (clock-time) */
+static bool handle_group4a(uint16_t data[4])
+{
+    int daycode = ((data[1] << 15) & 0x18000) |
+                  ((data[2] >> 1) & 0x07FFF);
+    int hour = ((data[2] << 4) & 0x10) |
+               ((data[3] >> 12) & 0x0F);
+    int minute = ((data[3] >> 6) & 0x3F);
+    int offset_sig = (data[3] >> 5) & 1;
+    int offset_abs = data[3] & 0x1F;
+
+    if (daycode < 55927) {
+        /* invalid date, before 2012-01-01 */
+        return false;
+    }
+    if ((hour >= 24) || (minute >= 60)) {
+        /* invalid time */
+        return false;
+    }
+    if (offset_abs > 24) {
+        /* invalid local time offset */
+        return false;
+    }
+
+    /* convert modified julian day + time to UTC */
+    time_t seconds = (daycode - 40587) * 86400;
+    seconds += hour * 3600;
+    seconds += minute * 60;
+    seconds += ((offset_sig == 0) ? offset_abs : -offset_abs) * 1800;
+    ct_data = seconds;
+
+    return true;
+}
+
 /* processes one rds packet, returns true if a new message was received */
 bool rds_process(uint16_t data[4])
 {
@@ -200,6 +238,9 @@ bool rds_process(uint16_t data[4])
     case 4: /* group 2A: radio text */
     case 5: /* group 2B: radio text */
         return handle_group2(data);
+
+    case 8: /* group 4A: clock-time */
+        return handle_group4a(data);
     
     default:
         break;
@@ -227,5 +268,11 @@ char* rds_get_ps(void)
 char* rds_get_rt(void)
 {
     return get_rt();
+}
+
+/* returns the most recent valid clock-time value (or 0 if invalid) */
+time_t rds_get_ct(void)
+{
+    return ct_data;
 }
 

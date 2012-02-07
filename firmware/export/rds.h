@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include <stdint.h>
 #include <stdbool.h>
+#include "time.h"
 
 void rds_init(void);
 
@@ -29,5 +30,6 @@ bool rds_process(uint16_t data[4]);
 uint16_t rds_get_pi(void);
 char* rds_get_ps(void);
 char* rds_get_rt(void);
+time_t rds_get_ct(void);
 
 
