@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAABn///40\u003d",
+        "filename": "firmware/export/panic.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2012-02-08T13:15:55Z",
+      "side": 1,
+      "message": "Should probably still also have ATTRIBUTE_PRINTF to get the format string checking done by the compiler.",
+      "revId": "64536b3873a28fb324d488f9a7c8e097f4598d14",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///4k\u003d",
+        "filename": "firmware/target/arm/unwarminder/client.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2012-02-08T13:15:55Z",
+      "side": 1,
+      "message": "I would do the real printing from in here, not just when UNW_DEBUG is defined. Doing it all at once at the end means if the unwinder crashes the system, you don\u0027t get any output.",
+      "revId": "64536b3873a28fb324d488f9a7c8e097f4598d14",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///4g\u003d",
+        "filename": "firmware/target/arm/unwarminder/client.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2012-02-08T13:15:55Z",
+      "side": 1,
+      "message": "I forget what the logic is for having this code be inlined; can the logic be explained here in a comment? :)",
+      "revId": "64536b3873a28fb324d488f9a7c8e097f4598d14",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///4c\u003d",
+        "filename": "firmware/target/arm/unwarminder/get_sp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2012-02-08T13:15:55Z",
+      "side": 1,
+      "message": "This seems like it would be less fragile if it was implemented entirely in assembly (as a naked function with no C statements in it, if you still want to do it in a .c file). This avoids any theoretical possibility that the compiler might touch sp in the preamble, and in my opinion is simpler to read :)",
+      "revId": "64536b3873a28fb324d488f9a7c8e097f4598d14",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///4s\u003d",
+        "filename": "firmware/target/arm/unwarminder/unwarm.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2012-02-08T13:15:55Z",
+      "side": 1,
+      "message": "Make this 61 or 67 (prime). Also, would be nice to have the original values in here, with a comment explaining that they have been changed for rockbox.",
+      "revId": "64536b3873a28fb324d488f9a7c8e097f4598d14",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
