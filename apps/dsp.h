@@ -57,6 +57,44 @@ enum
     DSP_CROSSFEED
 };
 
+
+/****************************************************************************
+ * NOTE: Any assembly routines that use these structures must be updated
+ * if current data members are moved or changed.
+ */
+struct resample_data
+{
+    uint32_t delta;                     /* 00h */
+    uint32_t phase;                     /* 04h */
+    int32_t last_sample[2];             /* 08h */
+                                        /* 10h */
+};
+
+/* This is for passing needed data to external dsp routines. If another
+ * dsp parameter needs to be passed, add to the end of the structure
+ * and remove from dsp_config.
+ * If another function type becomes assembly/external and requires dsp
+ * config info, add a pointer paramter of type "struct dsp_data *".
+ * If removing something from other than the end, reserve the spot or
+ * else update every implementation for every target.
+ * Be sure to add the offset of the new member for easy viewing as well. :)
+ * It is the first member of dsp_config and all members can be accessesed
+ * through the main aggregate but this is intended to make a safe haven
+ * for these items whereas the c part can be rearranged at will. dsp_data
+ * could even moved within dsp_config without disurbing the order.
+ */
+struct dsp_data
+{
+    int output_scale;                   /* 00h */
+    int num_channels;                   /* 04h */
+    struct resample_data resample_data; /* 08h */
+    int32_t clip_min;                   /* 18h */
+    int32_t clip_max;                   /* 1ch */
+    int32_t gain;                       /* 20h - Note that this is in S8.23 format. */
+    int frac_bits;                      /* 24h */
+                                        /* 28h */
+};
+
 struct dsp_config;
 
 int dsp_process(struct dsp_config *dsp, char *dest,

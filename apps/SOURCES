@@ -169,6 +169,7 @@ codec_thread.c
 playback.c
 codecs.c
 dsp.c
+compressor.c
 #ifndef HAVE_HARDWARE_BEEP
 beep.c
 #endif
