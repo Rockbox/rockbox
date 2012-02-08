@@ -36,7 +36,6 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
  - only targets which can set brightness
     LAMP_UP / LAMP_DOWN:    change the brightness
 */
-#if defined(HAVE_LCD_COLOR) || defined(HAVE_BACKLIGHT_BRIGHTNESS)
 
 /* we use PLA */
 #ifdef HAVE_SCROLLWHEEL
@@ -55,9 +54,6 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 #   define LAMP_DOWN_REPEAT       PLA_DOWN_REPEAT
 #endif/* HAVE_SCROLLWHEEL */
 
-#else
-#   error Missing key definitions for this keypad
-#endif /* HAVE_LCD_COLOR || HAVE_BACKLIGHT_BRIGHTNESS */
 
 #define LAMP_EXIT        PLA_EXIT
 #define LAMP_EXIT2       PLA_CANCEL
