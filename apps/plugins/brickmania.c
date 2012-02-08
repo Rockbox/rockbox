@@ -1597,13 +1597,6 @@ static int brickmania_game_loop(void)
                 rb->lcd_putsxy(LCD_WIDTH/2-2, INT3(STRINGPOS_FLIP), s);
             }
 
-            /* write life num */
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-    #define LIFE_STR "L:%d"
-#else
-    #define LIFE_STR "Life: %d"
-#endif
-            rb->lcd_putsxyf(0, 0, LIFE_STR, life);
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
             rb->snprintf(s, sizeof(s), "L%d", level+1);
@@ -1618,6 +1611,16 @@ static int brickmania_game_loop(void)
             rb->snprintf(s, sizeof(s), "%d", vscore);
             rb->lcd_getstringsize(s, &sw, NULL);
             rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
+
+            /* write life num */
+            rb->snprintf(s, sizeof(s), "Life: %d", life);
+
+            /* hijack i - it's reset to 0 in 17 lines */
+            i = sw;
+            rb->lcd_getstringsize(s, &sw, NULL);
+            if (sw >= (LCD_WIDTH/2-i/2))
+                rb->snprintf(s, sizeof(s), "L: %d", life);
+            rb->lcd_putsxy(0, 0, s);
 
             /* continue game */
             if (game_state == ST_PAUSE)
