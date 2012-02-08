@@ -39,12 +39,10 @@ void *memdup(const void *p, size_t len)
 
 void generate_random_data(void *buf, size_t sz)
 {
-    FILE *rand_fd = fopen("/dev/urandom", "rb");
-    if(rand_fd == NULL)
-        bugp("failed to open /dev/urandom");
-    if(fread(buf, 1, sz, rand_fd) != sz)
-        bugp("failed to read /dev/urandom");
-    fclose(rand_fd);
+    int i = 0;
+    unsigned char* p = (unsigned char*)buf;
+    while(i++ < sz)
+        *p++ = rand();
 }
 
 void *xmalloc(size_t s)
