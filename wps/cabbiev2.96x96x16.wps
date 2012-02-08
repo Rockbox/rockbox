@@ -1,0 +1,75 @@
+# Cabbie 2.0 default
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+# Derived from "cabbie" (C) Yohann Misquitta
+#
+# Disable Status Bar
+%wd
+#
+# Load Backdrop
+%X(wpsbackdrop-96x96x16.bmp)
+#
+# Preload Images
+%xl(A,lock-96x96x16.bmp,0,0,2)
+%xl(B,battery-96x96x16.bmp,0,0,10)
+%xl(C,volume-96x96x16.bmp,0,0,10)
+%xl(D,shuffle-96x96x16.bmp,0,0)
+%xl(E,repeat-96x96x16.bmp,0,0,4)
+%xl(F,playmode-96x96x16.bmp,0,0,5)
+#
+# Album Art/Info Viewport Conditional
+%?C<%Vd(a)|%Vd(b)>
+#
+# Progress Bar
+%V(2,65,92,5,-)
+%pb(0,0,92,5,pb-96x96x16.bmp)
+#
+# Hold
+%V(2,85,13,10,-)
+%?mh<%xd(Aa)|%xd(Ab)>
+#
+# Battery
+%V(17,85,19,10,-)
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+#
+# Volume
+%V(39,85,14,10,-)
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)>
+#
+# Shuffle
+%V(55,85,20,10,-)
+%?ps<%xd(D)>
+#
+# Repeat
+%V(73,85,8,10,-)
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+#
+# Playmode
+%V(84,85,11,10,-)
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+#
+# Next Track Info
+%V(2,56,92,8,1)
+%s%ac%Sx(Next:) %?It<%It|%Fn>
+#
+# Time Elapsed/Remaining
+%V(2,73,92,8,1)
+%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+#
+# Track Info - Album Art
+%ax%Vl(a,51,12,-,34,1)
+%s%al%?it<%it|%fn>
+%s%al%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%al%?iy<%iy>
+#
+# Track Info - No Album Art
+%Vl(b,0,12,-,34,1)
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%ac%?iy<%iy>
+#
+# Album Art
+%ax%Vl(a,4,10,45,45,-)
+%Cl(0,0,45,45,c,c)
+%Cd
