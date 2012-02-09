@@ -477,26 +477,118 @@ static int do_shutdown(void)
 MENUITEM_FUNCTION(do_shutdown_item, 0, ID2P(LANG_SHUTDOWN),
                   do_shutdown, NULL, NULL, Icon_NOICON);
 #endif
-MAKE_MENU(root_menu_, ID2P(LANG_ROCKBOX_TITLE),
-            item_callback, Icon_Rockbox,
-            &bookmarks, &file_browser, 
+
+struct menu_item_ex root_menu_;
+static struct menu_callback_with_desc root_menu_desc = {
+        item_callback, ID2P(LANG_ROCKBOX_TITLE), Icon_Rockbox };
+struct menu_table {
+    char *string;
+    const struct menu_item_ex *item;
+};
+static struct menu_table menu_table[] = {
+    /* Order here represents the default ordering */
+    { "bookmarks", &bookmarks },
+    { "files", &file_browser },
 #ifdef HAVE_TAGCACHE
-            &db_browser,
+    { "database", &db_browser },
 #endif
-            &wps_item, &menu_, 
+    { "wps", &wps_item },
+    { "settings", &menu_ }, 
 #ifdef HAVE_RECORDING
-            &rec, 
+    { "recording", &rec }, 
 #endif
 #if CONFIG_TUNER
-            &fm,
+    { "radio", &fm },
 #endif
-            &playlists, &rocks_browser,  &system_menu_
-
+    { "playlists", &playlists },
+    { "plugins", &rocks_browser },
+    { "system_menu", &system_menu_ },
 #if CONFIG_KEYPAD == PLAYER_PAD
-            ,&do_shutdown_item
+    { "shutdown", &do_shutdown_item },
 #endif
-            ,&shortcut_menu
-        );
+    { "shortcuts", &shortcut_menu },
+};
+#define MAX_MENU_ITEMS (sizeof(menu_table) / sizeof(struct menu_table))
+static struct menu_item_ex *root_menu__[MAX_MENU_ITEMS];
+
+void root_menu_load_from_cfg(void* setting, char *value)
+{
+    char *next = value, *start;
+    unsigned int menu_item_count = 0, i;
+    bool main_menu_added = false;
+
+    root_menu_.flags = MENU_HAS_DESC | MT_MENU;
+    root_menu_.submenus = (const struct menu_item_ex **)&root_menu__;
+    root_menu_.callback_and_desc = &root_menu_desc;
+
+    while (next && menu_item_count < MAX_MENU_ITEMS)
+    {
+        start = next;
+        next = strchr(next, ',');
+        if (next)
+        {
+            *next = '\0';
+            next++;
+        }
+        for (i=0; i<MAX_MENU_ITEMS; i++)
+        {
+            if (*start && !strcmp(start, menu_table[i].string))
+            {
+                root_menu__[menu_item_count++] = (struct menu_item_ex *)menu_table[i].item;
+                if (menu_table[i].item == &menu_)
+                    main_menu_added = true;
+                break;
+            }
+        }
+    }
+    if (!main_menu_added)
+        root_menu__[menu_item_count++] = (struct menu_item_ex *)&menu_;
+    root_menu_.flags |= MENU_ITEM_COUNT(menu_item_count);
+    *(int*)setting = 1;
+}
+
+char* root_menu_write_to_cfg(void* setting, char*buf, int buf_len)
+{
+    (void)setting;
+    unsigned i, written, j;
+    for (i = 0; i < MENU_GET_COUNT(root_menu_.flags); i++)
+    {
+        for (j=0; j<MAX_MENU_ITEMS; j++)
+        {
+            if (menu_table[j].item == root_menu__[i])
+            {
+                written = snprintf(buf, buf_len, "%s,", menu_table[j].string);
+                buf_len -= written;
+                buf += written;
+                break;
+            }
+        }
+    }
+    return buf;
+}
+
+void root_menu_set_default(void* setting, void* defaultval)
+{
+    unsigned i;
+    (void)defaultval;
+
+    root_menu_.flags = MENU_HAS_DESC | MT_MENU;
+    root_menu_.submenus = (const struct menu_item_ex **)&root_menu__;
+    root_menu_.callback_and_desc = &root_menu_desc;
+
+    for (i=0; i<MAX_MENU_ITEMS; i++)
+    {
+        root_menu__[i] = (struct menu_item_ex *)menu_table[i].item;
+    }
+    root_menu_.flags |= MENU_ITEM_COUNT(MAX_MENU_ITEMS);
+    *(int*)setting = 0;
+}
+     
+bool root_menu_is_changed(void* setting, void* defaultval)
+{
+    (void)defaultval;
+    return *(int*)setting != 0;
+}
 
 static int item_callback(int action, const struct menu_item_ex *this_item) 
 {
