@@ -844,6 +844,8 @@ struct user_settings
 #endif
 
     char start_directory[MAX_PATHNAME+1];
+    /* status setting for the root menu customisability. 0 = default, 1 = loaded from cfg */
+    int root_menu;
 };
 
 /** global variables **/
