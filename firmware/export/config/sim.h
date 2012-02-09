@@ -42,6 +42,13 @@
 #define CONFIG_CHARGING CHARGING_MONITOR
 #endif
 
+/*
+ * Effectively disable battery smoothing, our simulated charge/ discharge
+ * cycle is way too fast for it otherwise
+ */
+#undef BATT_AVE_SAMPLES
+#define BATT_AVE_SAMPLES 1
+
 #undef CONFIG_USBOTG
 
 #undef USB_HANDLED_BY_OF
