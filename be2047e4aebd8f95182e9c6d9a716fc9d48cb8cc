@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAABn///3o\u003d",
+        "filename": "apps/plugins/stats.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-09T15:40:25Z",
+      "side": 1,
+      "message": "This can\u0027t work. You cannot retrieve PLA buttons via button_get().",
+      "revId": "be2047e4aebd8f95182e9c6d9a716fc9d48cb8cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAABn///3k\u003d",
+        "filename": "manual/plugins/stats.tex",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-09T15:40:25Z",
+      "side": 1,
+      "message": "This can now be a single line I think. I recognize the diff is smaller with this, but I would prefer if you joined the lines too.",
+      "revId": "be2047e4aebd8f95182e9c6d9a716fc9d48cb8cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
