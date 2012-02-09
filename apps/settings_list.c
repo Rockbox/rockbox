@@ -1921,6 +1921,10 @@ const struct settings_list settings[] = {
                 "resume rewind", UNIT_SEC, 0, 60, 5,
                 NULL, NULL, NULL),
 #endif
+   CUSTOM_SETTING(0, root_menu, LANG_ROOT_MENU_ORDER,
+                  NULL, "root_menu_order",
+                  root_menu_load_from_cfg, root_menu_write_to_cfg,
+                  root_menu_is_changed, root_menu_set_default),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
