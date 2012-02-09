@@ -19,105 +19,19 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-
+#include "lib/pluginlib_actions.h"
 
 
 static int files, dirs, audiofiles, m3ufiles, imagefiles, videofiles, largestdir;
 static int lasttick;
 static bool cancel;
 
-#if CONFIG_KEYPAD == PLAYER_PAD 
-#define STATS_STOP BUTTON_STOP
 
-#elif (CONFIG_KEYPAD == RECORDER_PAD) \
-   || (CONFIG_KEYPAD == ONDIO_PAD) \
-   || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
-#define STATS_STOP BUTTON_OFF
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-   || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define STATS_STOP BUTTON_OFF
-#define STATS_STOP_REMOTE BUTTON_RC_STOP
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define STATS_STOP BUTTON_MENU
-
-#elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
-#define STATS_STOP BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-#define STATS_STOP BUTTON_POWER
-#define STATS_STOP_REMOTE BUTTON_RC_PLAY
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define STATS_STOP BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-(CONFIG_KEYPAD == SANSA_C200_PAD) || \
-(CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-(CONFIG_KEYPAD == SANSA_M200_PAD) || \
-(CONFIG_KEYPAD == SANSA_CONNECT_PAD)
-#define STATS_STOP BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#define STATS_STOP BUTTON_HOME
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define STATS_STOP BUTTON_POWER
-
-#elif CONFIG_KEYPAD == MROBE500_PAD
-#define STATS_STOP BUTTON_POWER
-#define STATS_STOP_REMOTE BUTTON_RC_DOWN
-
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD || \
-      CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
-#define STATS_STOP BUTTON_BACK
-
-#elif CONFIG_KEYPAD == MROBE100_PAD
-#define STATS_STOP BUTTON_POWER
-#define STATS_STOP_REMOTE BUTTON_RC_DOWN
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define STATS_STOP BUTTON_REC
-#define STATS_STOP_REMOTE BUTTON_RC_REC
-
-#elif CONFIG_KEYPAD == COWON_D2_PAD
-#define STATS_STOP BUTTON_POWER
-
-#elif CONFIG_KEYPAD == IAUDIO67_PAD
-#define STATS_STOP BUTTON_POWER
-
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define STATS_STOP BUTTON_BACK
-
-#elif (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) || \
-(CONFIG_KEYPAD == PHILIPS_HDD6330_PAD) || \
-(CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
-#define STATS_STOP BUTTON_POWER
-
-#elif CONFIG_KEYPAD == ONDAVX747_PAD
-#define STATS_STOP BUTTON_POWER
-#elif CONFIG_KEYPAD == ONDAVX777_PAD
-#define STATS_STOP BUTTON_POWER
-
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-#define STATS_STOP BUTTON_REC
-
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define STATS_STOP BUTTON_REC
-
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define STATS_STOP BUTTON_REC
-
-#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
-#define STATS_STOP BUTTON_BACK
-
-#else
-#error No keymap defined!
-#endif
+/* we use PLA */
+#define STATS_STOP PLA_EXIT
+#define STATS_STOP2 PLA_CANCEL
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 /* we don't have yet a filetype attribute for image files */
 static const char *image_exts[] = {"bmp","jpg","jpe","jpeg","png","ppm"};
@@ -240,12 +154,9 @@ static void traversedir(char* location, char* name)
             if (*rb->current_tick - lasttick > (HZ/2)) {
                 update_screen();
                 lasttick = *rb->current_tick;
-                button = rb->button_get(false);
-                if (button == STATS_STOP
-#ifdef HAVE_REMOTE_LCD
-                    || button == STATS_STOP_REMOTE
-#endif
-                    ) {
+                button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
+                if (button == STATS_STOP) {
                     cancel = true;
                     break;
                 }
@@ -292,12 +203,12 @@ enum plugin_status plugin_start(const void* parameter)
     rb->splash(HZ, "Done");
     update_screen();
     while (1) {
-        button = rb->button_get(true);
+
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
         switch (button) {
-#ifdef HAVE_REMOTE_LCD
-            case STATS_STOP_REMOTE:
-#endif
             case STATS_STOP:
+            case STATS_STOP2:
                 return PLUGIN_OK;
                 break;
             default:
