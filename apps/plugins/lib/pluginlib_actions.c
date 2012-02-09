@@ -397,7 +397,7 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT_REPEAT,     BUTTON_FUNC|BUTTON_REPEAT,          BUTTON_NONE},
 #elif (CONFIG_KEYPAD == MPIO_HD300_PAD)                                      
     {PLA_CANCEL,            BUTTON_MENU,                        BUTTON_NONE},
-    {PLA_EXIT,              BUTTON_MENU|BUTTON_REPEAT,           BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
     {PLA_SELECT,            BUTTON_ENTER,                       BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_ENTER|BUTTON_REL,            BUTTON_ENTER},
     {PLA_SELECT_REPEAT,     BUTTON_ENTER|BUTTON_REPEAT,         BUTTON_NONE},
@@ -409,7 +409,7 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
 #elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)                                      
     {PLA_CANCEL,            BUTTON_BACK,                        BUTTON_NONE},
-    {PLA_EXIT,              BUTTON_BACK|BUTTON_REPEAT,          BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
