@@ -12993,3 +12993,17 @@
     *: "Restart Sleep Timer On Keypress"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ROOT_MENU_ORDER
+  desc:
+  user: core
+  <source>
+    *: "Root Menu Order"
+  </source>
+  <dest>
+    *: "Root Menu Order"
+  </dest>
+  <voice>
+    *: "Root Menu Order"
+  </voice>
+</phrase>
