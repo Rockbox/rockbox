@@ -844,6 +844,7 @@ struct user_settings
 #endif
 
     char start_directory[MAX_PATHNAME+1];
+    int root_menu;
 };
 
 /** global variables **/
