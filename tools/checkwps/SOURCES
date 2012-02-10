@@ -6,6 +6,10 @@
 ../../firmware/common/strlcpy.c
 checkwps.c
 
+#ifdef APPLICATION
+../../firmware/common/rbpaths.c
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 ../../apps/recorder/bmp.c
 #endif

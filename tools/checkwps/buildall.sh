@@ -44,7 +44,7 @@ awk -f $rootdir/parse_configure.awk $rootdir/../configure | (
     while read target model
     do
         make -j $jobs clean
-        $toolsdir/configure --target=$model --type=C --ram=32 # 32 should always give default RAM
+        $toolsdir/configure --target=$model --type=C --ram=32 --lcdwidth=100 --lcdheight=100 # 32 should always give default RAM, assume 100x100 for RaaA for now
         make -j $jobs
         mv checkwps.$model $outdir
     done

@@ -5,7 +5,7 @@ BEGIN { FS="[|)]" }
 }
 
 /^[ \t]*target="[^"]+"$/ {
-    match($0, "-D[^\"]+")
-    target=substr($0, RSTART+2, RLENGTH-2)
+    match($0, "=\".+\"")
+    target=substr($0, RSTART+2, RLENGTH-3)
     print target, model
 }

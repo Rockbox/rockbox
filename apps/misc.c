@@ -29,8 +29,8 @@
 #include "system.h"
 #include "lcd.h"
 #include "file.h"
-#include "filefuncs.h"
 #ifndef __PCTOOL__
+#include "filefuncs.h"
 #include "lang.h"
 #include "dir.h"
 #ifdef HAVE_REMOTE_LCD

@@ -63,7 +63,7 @@ extern int sim_rmdir(const char* name);
 const char *rbhome;
 #endif
 
-#if !defined(SAMSUNG_YPR0)
+#if !defined(SAMSUNG_YPR0) && !defined(__PCTOOL__)
 
 /* flags for get_user_file_path() */
 /* whether you need write access to that file/dir, especially true
@@ -255,7 +255,7 @@ int app_open(const char *name, int o, ...)
 int app_creat(const char* name, mode_t mode) { return creat(name, mode); }
 int app_remove(const char *name) { return remove(name); }
 int app_rename(const char *old, const char *new) { return rename(old,new); }
-DIR *app_opendir(const char *name) { return opendir(name); }
+DIR *app_opendir(const char *name) { return (DIR*)opendir(name); } /* cast to remove warning in checkwps */
 int app_mkdir(const char* name) { return mkdir(name); }
 int app_rmdir(const char* name) { return rmdir(name); }
 
