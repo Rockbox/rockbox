@@ -1458,6 +1458,7 @@ target/arm/s5l8702/debug-s5l8702.c
 target/arm/s5l8702/pcm-s5l8702.c
 target/arm/s5l8702/ipod6g/audio-ipod6g.c
 target/arm/s5l8702/ipod6g/adc-ipod6g.c
+target/arm/s5l8702/ipod6g/piezo-ipod6g.c
 #endif
 #endif
 

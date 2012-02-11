@@ -204,6 +204,8 @@
 /* and doesn't handle them in the drive firmware */
 //#define MAX_PHYS_SECTOR_SIZE 4096
 
+#define HAVE_HARDWARE_CLICK
+
 /* Define this if you have adjustable CPU frequency */
 //#define HAVE_ADJUSTABLE_CPU_FREQ
 
