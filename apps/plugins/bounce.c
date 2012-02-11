@@ -21,7 +21,7 @@
 #include "plugin.h"
 #include "time.h"
 #include "lib/fixedpoint.h"
-
+#include "lib/pluginlib_actions.h"
 
 
 #define SS_TITLE       "Bouncer"
@@ -30,238 +30,30 @@
 #define XSPEED 3
 #define YADD -4
 
-/* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
-#define BOUNCE_MODE (BUTTON_ON | BUTTON_REL)
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
-#define BOUNCE_MODE (BUTTON_ON | BUTTON_REL)
+/* We set button maping with PLA */
+#define BOUNCE_UP             PLA_UP
+#define BOUNCE_UP_REPEAT      PLA_UP_REPEAT
+#define BOUNCE_DOWN           PLA_DOWN
+#define BOUNCE_DOWN_REPEAT    PLA_DOWN_REPEAT
 
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
-#define BOUNCE_MODE (BUTTON_MENU | BUTTON_REL)
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
-#define BOUNCE_MODE (BUTTON_SELECT | BUTTON_REL)
-
-#define BOUNCE_RC_QUIT (BUTTON_RC_STOP | BUTTON_REL)
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_SCROLL_BACK
-#define BOUNCE_DOWN BUTTON_SCROLL_FWD
-#define BOUNCE_QUIT (BUTTON_MENU | BUTTON_REL)
-#define BOUNCE_MODE (BUTTON_SELECT | BUTTON_REL)
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_A
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_SCROLL_BACK
-#define BOUNCE_DOWN BUTTON_SCROLL_FWD
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_SELECT
-
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_SCROLL_BACK
-#define BOUNCE_DOWN BUTTON_SCROLL_FWD
-#define BOUNCE_QUIT (BUTTON_HOME|BUTTON_REPEAT)
-#define BOUNCE_MODE BUTTON_SELECT
-
-#elif CONFIG_KEYPAD == SANSA_C200_PAD || \
-      CONFIG_KEYPAD == SANSA_CLIP_PAD || \
-      CONFIG_KEYPAD == SANSA_M200_PAD || \
-      CONFIG_KEYPAD == SANSA_CONNECT_PAD
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_SELECT
-
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_SCROLL_UP
-#define BOUNCE_DOWN BUTTON_SCROLL_DOWN
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
-   || (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_BACK
-#define BOUNCE_MODE BUTTON_MENU
-
-#elif (CONFIG_KEYPAD == MROBE100_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_DISPLAY
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define BOUNCE_LEFT BUTTON_RC_REW
-#define BOUNCE_RIGHT BUTTON_RC_FF
-#define BOUNCE_UP   BUTTON_RC_VOL_UP
-#define BOUNCE_DOWN BUTTON_RC_VOL_DOWN
-#define BOUNCE_QUIT BUTTON_RC_REC
-#define BOUNCE_MODE BUTTON_RC_MODE
-
-#elif (CONFIG_KEYPAD == COWON_D2_PAD)
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_MENU
-
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_BACK
-#define BOUNCE_MODE BUTTON_MENU
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_MENU
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
-#define BOUNCE_LEFT BUTTON_PREV
-#define BOUNCE_RIGHT BUTTON_NEXT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_MENU
-
-#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
-#define BOUNCE_LEFT BUTTON_PREV
-#define BOUNCE_RIGHT BUTTON_NEXT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_MENU
-
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_MENU
-
-#elif (CONFIG_KEYPAD == ONDAVX777_PAD)
-#define BOUNCE_QUIT BUTTON_POWER
-
-#elif CONFIG_KEYPAD == MROBE500_PAD
-#define BOUNCE_QUIT BUTTON_POWER
-
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define BOUNCE_LEFT  BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP    BUTTON_UP
-#define BOUNCE_DOWN  BUTTON_DOWN
-#define BOUNCE_QUIT  BUTTON_FFWD
-#define BOUNCE_MODE  BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-#define BOUNCE_LEFT  BUTTON_PREV
-#define BOUNCE_RIGHT BUTTON_NEXT
-#define BOUNCE_UP    BUTTON_UP
-#define BOUNCE_DOWN  BUTTON_DOWN
-#define BOUNCE_QUIT  BUTTON_REC
-#define BOUNCE_MODE  BUTTON_MENU
-
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define BOUNCE_LEFT BUTTON_VOL_DOWN
-#define BOUNCE_RIGHT BUTTON_VOL_UP
-#define BOUNCE_UP   BUTTON_REW
-#define BOUNCE_DOWN BUTTON_FF
-#define BOUNCE_QUIT (BUTTON_REC | BUTTON_PLAY)
-#define BOUNCE_MODE BUTTON_FUNC
-
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define BOUNCE_LEFT BUTTON_REW
-#define BOUNCE_RIGHT BUTTON_FF
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT (BUTTON_MENU | BUTTON_REPEAT)
-#define BOUNCE_MODE BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
-#define BOUNCE_QUIT BUTTON_POWER
-#define BOUNCE_MODE BUTTON_PLAYPAUSE
-
+#ifdef HAVE_SCROLLWHEEL
+#define BOUNCE_LEFT           PLA_SCROLL_BACK
+#define BOUNCE_LEFT_REPEAT    PLA_SCROLL_BACK_REPEAT
+#define BOUNCE_RIGHT          PLA_SCROLL_FWD
+#define BOUNCE_RIGHT_REPEAT   PLA_SCROLL_FWD_REPEAT
 #else
-#error No keymap defined!
+#define BOUNCE_LEFT           PLA_LEFT
+#define BOUNCE_LEFT_REPEAT    PLA_LEFT_REPEAT
+#define BOUNCE_RIGHT          PLA_RIGHT
+#define BOUNCE_RIGHT_REPEAT   PLA_RIGHT_REPEAT
 #endif
 
-#ifdef HAVE_TOUCHSCREEN
-#ifndef BOUNCE_LEFT
-#define BOUNCE_LEFT BUTTON_MIDLEFT
-#endif
-#ifndef BOUNCE_RIGHT
-#define BOUNCE_RIGHT BUTTON_MIDRIGHT
-#endif
-#ifndef BOUNCE_UP
-#define BOUNCE_UP   BUTTON_TOPMIDDLE
-#endif
-#ifndef BOUNCE_DOWN
-#define BOUNCE_DOWN BUTTON_BOTTOMMIDDLE
-#endif
-#ifndef BOUNCE_QUIT
-#define BOUNCE_QUIT BUTTON_TOPLEFT
-#endif
-#ifndef BOUNCE_MODE
-#define BOUNCE_MODE BUTTON_CENTER
-#endif
-#endif
+#define BOUNCE_QUIT           PLA_EXIT
+#define BOUNCE_QUIT2          PLA_CANCEL
+#define BOUNCE_MODE           PLA_SELECT
 
 #define LETTER_WIDTH  11
 #define LETTER_HEIGHT 16
@@ -542,13 +334,12 @@ static int scrollit(void)
     rb->lcd_clear_display();
     while(1)
     {
-        b = rb->button_get_w_tmo(HZ/10);
+        b = pluginlib_getaction(HZ/10, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
         switch(b)
         {
-#ifdef BOUNCE_RC_QUIT
-            case BOUNCE_RC_QUIT :
-#endif
             case BOUNCE_QUIT :
+            case BOUNCE_QUIT2 :
                 return 0;
             case BOUNCE_MODE :
                 return 1;
@@ -612,8 +403,9 @@ static int loopit(void)
     rb->lcd_clear_display();
     while(1)
     {
-        b = rb->button_get_w_tmo(HZ/10);
-        if ( b == BOUNCE_QUIT )
+        b = pluginlib_getaction(HZ/10, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
+        if (( b == BOUNCE_QUIT ) || ( b == BOUNCE_QUIT2 ))
             return 0;
 
         if ( b == BOUNCE_MODE )
@@ -635,20 +427,20 @@ static int loopit(void)
         if(timeout) {
             switch(b) {
                 case BOUNCE_LEFT:
-                case BOUNCE_LEFT|BUTTON_REPEAT:
+                case BOUNCE_LEFT_REPEAT:
                   values[show].num--;
                   break;
                 case BOUNCE_RIGHT:
-                case BOUNCE_RIGHT|BUTTON_REPEAT:
+                case BOUNCE_RIGHT_REPEAT:
                   values[show].num++;
                   break;
                 case BOUNCE_UP:
-                case BOUNCE_UP|BUTTON_REPEAT:
+                case BOUNCE_UP_REPEAT:
                   if(++show == NUM_LAST)
                       show=0;
                   break;
                 case BOUNCE_DOWN:
-                case BOUNCE_DOWN|BUTTON_REPEAT:
+                case BOUNCE_DOWN_REPEAT:
                   if(--show < 0)
                       show=NUM_LAST-1;
                   break;

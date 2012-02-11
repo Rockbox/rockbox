@@ -6,48 +6,23 @@ In \setting{Scroll mode} the bouncing text is replaced by a different one
 scrolling from right to left.
 
 \begin{btnmap}
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-    ,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
-    {\ButtonUp\ /\ \ButtonDown}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}%
-    {\ButtonScrollBack\ /\ \ButtonScrollFwd}
-\opt{IRIVER_H10_PAD,MPIO_HD300_PAD}{\ButtonScrollDown\ /\ \ButtonScrollUp}
-\opt{COWON_D2_PAD}{\TouchBottomMiddle{} / \TouchTopMiddle}
-\opt{MPIO_HD200_PAD}{\ButtonRew / \ButtonFF}
+    \PluginUp / \PluginDown
+        \opt{HAVEREMOTEKEYMAP}{& }
+    & Moves to next/previous option\\
+    \nopt{scrollwheel} {
+       \PluginRight{} / \PluginLeft
+    }
+    \opt{scrollwheel} {
+       \PluginScrollFwd{} / \PluginScrollBack
+    }
        \opt{HAVEREMOTEKEYMAP}{& }
-& Moves to next/previous option\\
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-    ,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_4G_PAD%
-    ,IPOD_3G_PAD,SANSA_E200_PAD,IRIVER_H10_PAD,SANSA_FUZE_PAD,PBELL_VIBE500_PAD}
-    {\ButtonRight{} / \ButtonLeft}
-\opt{COWON_D2_PAD}{\TouchMidRight{} / \TouchMidLeft}
-\opt{MPIO_HD200_PAD}{\ButtonVolDown / \ButtonVolUp}
-\opt{MPIO_HD300_PAD}{\ButtonRew / \ButtonFF}
+    & Increases/decreases option value\\
+    \PluginSelect
        \opt{HAVEREMOTEKEYMAP}{& }
-& Increases/decreases option value\\
-\opt{RECORDER_PAD}{\ButtonOn}
-\opt{ONDIO_PAD}{\ButtonMenu}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD%
-    ,SANSA_C200_PAD,SANSA_FUZE_PAD}
-    {\ButtonSelect}
-\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,MPIO_HD300_PAD}{\ButtonPlay}
-\opt{GIGABEAT_PAD}{\ButtonA}
-\opt{GIGABEAT_S_PAD,COWON_D2_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
-\opt{MROBE100_PAD}{\ButtonDisplay}
-\opt{MPIO_HD200_PAD}{\ButtonFunc}
+    & Toggles Scroll mode\\
+    \PluginCancel{} or \PluginExit
        \opt{HAVEREMOTEKEYMAP}{& }
-& Toggles Scroll mode\\
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-    ,COWON_D2_PAD}{\ButtonPower}
-\opt{SANSA_FUZE_PAD}{Long \ButtonHome}
-\opt{GIGABEAT_S_PAD}{\ButtonBack}
-\opt{PBELL_VIBE500_PAD}{\ButtonRec}
-\opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}
-\opt{MPIO_HD300_PAD}{Long \ButtonMenu}
-       \opt{HAVEREMOTEKEYMAP}{& }
-& Exits bounce demo\\
+    & Exits bounce demo\\
 \end{btnmap}
 
 Available options are:
