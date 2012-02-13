@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3////M\u003d",
+        "filename": "apps/root_menu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-02-13T21:01:04Z",
+      "side": 1,
+      "message": "We usually put #defines at the start of the file, don\u0027t we?",
+      "revId": "f3a87cd18dab47176073af85084372038ba43c96",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3////U\u003d",
+        "filename": "apps/root_menu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-02-13T21:01:04Z",
+      "side": 1,
+      "message": "why don\u0027t you use introduced MAX_MENU_ITEMS?",
+      "revId": "f3a87cd18dab47176073af85084372038ba43c96",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3////Q\u003d",
+        "filename": "apps/root_menu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-02-13T21:01:04Z",
+      "side": 1,
+      "message": "see above",
+      "revId": "f3a87cd18dab47176073af85084372038ba43c96",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
