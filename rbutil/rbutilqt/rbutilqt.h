@@ -40,6 +40,7 @@ class RbUtilQt : public QMainWindow
     public:
         RbUtilQt(QWidget *parent = 0);
         static QList<QTranslator*> translators;
+        static bool chkConfig(QWidget *parent = 0);
 
     private:
         Ui::RbUtilQtFrm ui;
@@ -58,7 +59,6 @@ class RbUtilQt : public QMainWindow
         ProgressLoggerGui *logger;
         ZipInstaller *installer;
         QUrl proxy(void);
-        bool chkConfig(bool);
 
         volatile bool m_installed;
         volatile bool m_error;
