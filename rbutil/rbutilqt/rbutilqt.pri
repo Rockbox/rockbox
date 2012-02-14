@@ -17,6 +17,7 @@
 
 # common files
 SOURCES += \
+ gui/manualwidget.cpp \
  rbutilqt.cpp \
  main.cpp \
  installwindow.cpp \
@@ -78,6 +79,7 @@ SOURCES += \
 
 
 HEADERS += \
+ gui/manualwidget.h \
  rbutilqt.h \
  installwindow.h \
  base/httpget.h \
@@ -146,6 +148,7 @@ HEADERS += \
 
 
 FORMS += \
+ gui/manualwidgetfrm.ui \
  rbutilqtfrm.ui \
  aboutbox.ui \
  installwindowfrm.ui \
