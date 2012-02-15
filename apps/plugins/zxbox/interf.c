@@ -19,6 +19,7 @@
  */
 
 #include "zxconfig.h"
+#include "zxmisc.h"
 #include "interf.h"
 
 #include <stdio.h>

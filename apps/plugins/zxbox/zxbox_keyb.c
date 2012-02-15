@@ -1,4 +1,5 @@
 #include "zxconfig.h"
+#include "zxbox_keyb.h"
 
 //#define ZX_WRITE_OUT_TEXT
 

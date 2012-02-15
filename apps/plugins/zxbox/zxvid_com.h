@@ -7,6 +7,7 @@
 #endif
 
 #include "spscr_p.h"
+#include "spscr.h"
 #include "spmain.h"
 #include "spperif.h"
 

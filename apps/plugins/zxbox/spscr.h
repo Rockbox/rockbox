@@ -23,7 +23,6 @@
 
 #include "z80_type.h"
 
-extern int scrmul;
 extern volatile int screen_visible;
 
 extern void init_spect_scr(void);

@@ -189,7 +189,7 @@ void autoclose_sound(void)
   }
 #endif
 }
-void get_more(unsigned char** start, size_t* size)
+static void get_more(unsigned char** start, size_t* size)
 {
     doneplay = 1;
     rb->pcm_play_stop();
@@ -199,7 +199,7 @@ void get_more(unsigned char** start, size_t* size)
 
 /* sp_sound_buf is Unsigned 8 bit, Rate 8000 Hz, Mono */
 
-void write_buf(void){
+static void write_buf(void){
     int i,j;
 
     /* still not sure what is the best way to do this */

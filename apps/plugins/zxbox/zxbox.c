@@ -21,6 +21,7 @@
 
 #include "zxconfig.h"
 #include "spkey_p.h"
+#include "spkey.h"
 
 spkeyboard kb_mkey;
 bool exit_requested=false;
@@ -28,7 +29,6 @@ bool clear_kbd=0;
 extern bool zxbox_menu(void);
 
 /* DUMMIES ... to clean */
-unsigned int scrmul=0;
 int privatemap;
 int use_shm = 0;
 int small_screen,pause_on_iconify;
