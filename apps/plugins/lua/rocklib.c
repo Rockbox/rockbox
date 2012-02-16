@@ -593,6 +593,59 @@ RB_WRAP(do_menu)
     return 1;
 }
 
+RB_WRAP(playlist_sync)
+{
+    /* just pass NULL to work with the current playlist */
+    rb->playlist_sync(NULL);
+    return 1;
+}
+
+RB_WRAP(playlist_remove_all_tracks)
+{
+    /* just pass NULL to work with the current playlist */
+    int result = rb->playlist_remove_all_tracks(NULL);
+    lua_pushinteger(L, result);
+    return 1;
+}
+
+RB_WRAP(playlist_insert_track)
+{
+    const char *filename;
+    int position, queue, sync;
+
+    /* for now don't take a playlist_info pointer, but just pass NULL to use
+	   the current playlist. If this changes later, all the other
+	   parameters can be shifted back. */
+    filename = luaL_checkstring(L, 1); /* only required parameter */
+    position = luaL_optint(L, 2, PLAYLIST_INSERT);
+    queue = lua_toboolean(L, 3); /* default to false */
+    sync = lua_toboolean(L, 4); /* default to false */
+
+    int result = rb->playlist_insert_track(NULL, filename, position,
+        queue, sync);
+
+    lua_pushinteger(L, result);
+    return 1;
+}
+
+RB_WRAP(playlist_insert_directory)
+{
+    const char* dirname;
+    int position, queue, recurse;
+
+    /* just like in playlist_insert_track, only works with current playlist. */
+    dirname = luaL_checkstring(L, 1); /* only required parameter */
+    position = luaL_optint(L, 2, PLAYLIST_INSERT);
+    queue = lua_toboolean(L, 3); /* default to false */
+    recurse = lua_toboolean(L, 4); /* default to false */
+
+    int result = rb->playlist_insert_directory(NULL, dirname, position,
+        queue, recurse);
+
+    lua_pushinteger(L, result);
+    return 1;
+}
+
 SIMPLE_VOID_WRAPPER(backlight_force_on);
 SIMPLE_VOID_WRAPPER(backlight_use_settings);
 #ifdef HAVE_REMOTE_LCD
@@ -672,6 +725,10 @@ static const luaL_Reg rocklib[] =
     R(clear_viewport),
     R(current_path),
     R(gui_syncyesno_run),
+    R(playlist_sync),
+    R(playlist_remove_all_tracks),
+    R(playlist_insert_track),
+    R(playlist_insert_directory),
     R(do_menu),
 
     /* Backlight helper */
@@ -717,6 +774,14 @@ LUALIB_API int luaopen_rock(lua_State *L)
 
     RB_CONSTANT(FONT_SYSFIXED);
     RB_CONSTANT(FONT_UI);
+
+    RB_CONSTANT(PLAYLIST_PREPEND);
+    RB_CONSTANT(PLAYLIST_INSERT);
+    RB_CONSTANT(PLAYLIST_INSERT_LAST);
+    RB_CONSTANT(PLAYLIST_INSERT_FIRST);
+    RB_CONSTANT(PLAYLIST_INSERT_SHUFFLED);
+    RB_CONSTANT(PLAYLIST_REPLACE);
+    RB_CONSTANT(PLAYLIST_INSERT_LAST_SHUFFLED);
 
 #ifdef HAVE_TOUCHSCREEN
     RB_CONSTANT(TOUCHSCREEN_POINT);
