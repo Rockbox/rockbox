@@ -25,7 +25,8 @@
 #include "rds.h"
 
 /* programme identification */
-static uint16_t pi;
+static uint16_t pi_code;
+static uint16_t pi_last;
 /* program service name */
 static char ps_data[9];
 static char ps_copy[9];
@@ -69,11 +70,12 @@ void rds_reset(void)
 {
     int oldlevel = rds_disable_irq_save();
 
+    pi_code = 0;
+    pi_last = 0;
     ps_copy[0] = '\0';
     ps_segment = 0;
     rt_copy[0] = '\0';
     rt_segment = 0;
-    pi = 0;
 
     rds_restore_irq(oldlevel);
 }
@@ -180,10 +182,12 @@ bool rds_process(uint16_t data[4])
 {
     int group;
 
-    /* get programme identification */
-    if (pi == 0) {
-        pi = data[0];
+    /* process programme identification (PI) code */
+    uint16_t pi = data[0];
+    if (pi == pi_last) {
+        pi_code = pi;
     }
+    pi_last = pi;
     
     /* handle rds data based on group */
     group = (data[1] >> 11) & 0x1F;
@@ -210,7 +214,7 @@ bool rds_process(uint16_t data[4])
 /* returns the programme identification code */
 uint16_t rds_get_pi(void)
 {
-    return pi;
+    return pi_code;
 }
 
 /* returns the most recent valid programme service name */
