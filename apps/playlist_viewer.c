@@ -50,58 +50,6 @@
 #include "playlist_menu.h"
 #include "yesno.h"
 
-/* Maximum number of tracks we can have loaded at one time */
-#define MAX_PLAYLIST_ENTRIES 200
-
-/* The number of items between the selected one and the end/start of
- * the buffer under which the buffer must reload */
-#define MIN_BUFFER_MARGIN (screens[0].getnblines()+1)
-
-/* Information about a specific track */
-struct playlist_entry {
-    char *name;                 /* Formatted track name                     */
-    int index;                  /* Playlist index                           */
-    int display_index;          /* Display index                            */
-    bool queued;                /* Is track queued?                         */
-    bool skipped;               /* Is track marked as bad?                  */
-};
-
-enum direction
-{
-    FORWARD,
-    BACKWARD
-};
-
-struct playlist_buffer
-{
-    char *name_buffer;        /* Buffer used to store track names */
-    int buffer_size;          /* Size of name buffer */
-
-    int first_index;          /* Real index of first track loaded inside
-                                 the buffer */
-
-    enum direction direction; /* Direction of the buffer (if the buffer
-                                 was loaded BACKWARD, the last track in
-                                 the buffer has a real index < to the
-                                 real index of the the first track)*/
-
-    struct playlist_entry tracks[MAX_PLAYLIST_ENTRIES];
-    int num_loaded;           /* Number of track entries loaded in buffer */
-};
-
-/* Global playlist viewer settings */
-struct playlist_viewer {
-    struct playlist_info* playlist; /* playlist being viewed                 */
-    int num_tracks;             /* Number of tracks in playlist              */
-    int current_playing_track;  /* Index of current playing track            */
-    int selected_track;         /* The selected track, relative (first is 0) */
-    int moving_track;           /* The track to move, relative (first is 0)
-                                   or -1 if nothing is currently being moved */
-    int moving_playlist_index;  /* Playlist-relative index (as opposed to 
-                                   viewer-relative index) of moving track    */
-    struct playlist_buffer buffer;
-};
-
 static struct playlist_viewer  viewer;
 
 /* Used when viewing playlists on disk */
@@ -619,9 +567,24 @@ static int playlist_callback_voice(int selected_item, void *data)
     return 0;
 }
 
+enum playlist_viewer_callback_value playlist_viewer_default_callback(struct playlist_viewer* viewer) {
+    return PLAYLIST_VIEWER_ACTION_CONTINUE;
+}
+
+enum playlist_viewer_result playlist_viewer_ex(const char* filename) {
+    return playlist_viewer_ex_ex(filename, &playlist_viewer_default_callback,
+                                 &playlist_viewer_default_callback,
+                                 &playlist_viewer_default_callback,
+                                 &playlist_viewer_default_callback);
+}
+
 /* Main viewer function.  Filename identifies playlist to be viewed.  If NULL,
    view current playlist. */
-enum playlist_viewer_result playlist_viewer_ex(const char* filename)
+enum playlist_viewer_result playlist_viewer_ex_ex(const char* filename,
+                                      pl_viewer_callback cancel_callback,
+                                      pl_viewer_callback ok_callback,
+                                      pl_viewer_callback std_context_callback,
+                                      pl_viewer_callback std_menu_callback)
 {
     enum playlist_viewer_result ret = PLAYLIST_VIEWER_OK;
     bool exit = false;        /* exit viewer */
@@ -688,6 +651,20 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
             case ACTION_TREE_WPS:
             case ACTION_STD_CANCEL:
             {
+                int callback_result = cancel_callback(&viewer);
+                switch (callback_result) {
+                    case PLAYLIST_VIEWER_ACTION_DO_NOTHING:
+                        break;
+                    case PLAYLIST_VIEWER_ACTION_EXIT:
+                        exit = true;
+                        ret = PLAYLIST_VIEWER_CANCEL;
+                        goto exit;
+                    case PLAYLIST_VIEWER_ACTION_CONTINUE:
+                        goto std_cancel_execution;
+                    default:
+                        break;
+                }
+std_cancel_execution:
                 if (viewer.moving_track >= 0)
                 {
                     viewer.selected_track = viewer.moving_track;
@@ -705,6 +682,20 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
             }
             case ACTION_STD_OK:
             {
+                int callback_result = ok_callback(&viewer);
+                switch (callback_result) {
+                    case PLAYLIST_VIEWER_ACTION_DO_NOTHING:
+                        break;
+                    case PLAYLIST_VIEWER_ACTION_EXIT:
+                        exit = true;
+                        ret = PLAYLIST_VIEWER_OK;
+                        goto exit;
+                    case PLAYLIST_VIEWER_ACTION_CONTINUE:
+                        goto std_ok_execution;
+                    default:
+                        break;
+                }
+std_ok_execution: ;
                 struct playlist_entry * current_track =
                             playlist_buffer_get_track(&viewer.buffer,
                                                       viewer.selected_track);
@@ -760,6 +751,20 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
             }
             case ACTION_STD_CONTEXT:
             {
+                int callback_result = std_context_callback(&viewer);
+                switch (callback_result) {
+                    case PLAYLIST_VIEWER_ACTION_DO_NOTHING:
+                        break;
+                    case PLAYLIST_VIEWER_ACTION_EXIT:
+                        exit = true;
+                        ret = PLAYLIST_VIEWER_USB;
+                        goto exit;
+                    case PLAYLIST_VIEWER_ACTION_CONTINUE:
+                        goto std_context_execution;
+                    default:
+                        break;
+                }
+std_context_execution: ;
                 /* ON+PLAY menu */
                 int ret_val;
 
@@ -785,8 +790,24 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                 break;
             }
             case ACTION_STD_MENU:
+            {
+                int callback_result = std_menu_callback(&viewer);
+                switch (callback_result) {
+                    case PLAYLIST_VIEWER_ACTION_DO_NOTHING:
+                        break;
+                    case PLAYLIST_VIEWER_ACTION_EXIT:
+                        exit = true;
+                        ret = PLAYLIST_VIEWER_MAINMENU;
+                        goto exit;
+                    case PLAYLIST_VIEWER_ACTION_CONTINUE:
+                        goto std_menu_execution;
+                    default:
+                        break;
+                }
+std_menu_execution: ;
                 ret = PLAYLIST_VIEWER_MAINMENU;
                 goto exit;
+            }
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                 {

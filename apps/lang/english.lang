@@ -6956,6 +6956,62 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_INSERT_BEFORE
+  desc: in onplay menu.  Insert before a track in the playlist
+  user: core
+  <source>
+    *: "Insert Before..."
+  </source>
+  <dest>
+    *: "Insert Before..."
+  </dest>
+  <voice>
+    *: "Insert Before..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_AFTER
+  desc: in onplay menu.  Insert after a track in the playlist
+  user: core
+  <source>
+    *: "Insert After..."
+  </source>
+  <dest>
+    *: "Insert After..."
+  </dest>
+  <voice>
+    *: "Insert After..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_BEFORE
+  desc: in onplay menu.  Insert before a track in the playlist
+  user: core
+  <source>
+    *: "Queue Before..."
+  </source>
+  <dest>
+    *: "Queue Before..."
+  </dest>
+  <voice>
+    *: "Queue Before..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_AFTER
+  desc: in onplay menu.  Insert after a track in the playlist
+  user: core
+  <source>
+    *: "Queue After..."
+  </source>
+  <dest>
+    *: "Queue After..."
+  </dest>
+  <voice>
+    *: "Queue After..."
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PLAYLIST_INSERT_COUNT
   desc: splash number of tracks inserted
   user: core

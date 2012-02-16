@@ -251,6 +251,41 @@ static int playlist_queue_func(void *param)
     return 0;
 }
 
+int viewer_selected_track_index = -1;
+
+enum playlist_viewer_callback_value viewer_ok_callback(struct playlist_viewer* viewer)
+{
+    viewer_selected_track_index = viewer->selected_track;
+    return PLAYLIST_VIEWER_ACTION_EXIT;
+}
+
+static int playlist_add_in_position_func(void *param, bool queue)
+{
+    playlist_viewer_ex_ex(NULL, &playlist_viewer_default_callback,
+                                &viewer_ok_callback,
+                                &playlist_viewer_default_callback,
+                                &playlist_viewer_default_callback);
+    if ((intptr_t)param == PLAYLIST_INSERT_AFTER)
+    {
+        add_to_playlist(viewer_selected_track_index + 1, queue);
+    }
+    else
+    {
+        add_to_playlist(viewer_selected_track_index, queue);
+    }
+    return 0;
+}
+
+static int playlist_insert_in_position_func(void *param)
+{
+    return playlist_add_in_position_func(param, false);
+}
+
+static int playlist_queue_in_position_func(void *param)
+{
+    return playlist_add_in_position_func(param, true);
+}
+
 static int treeplaylist_wplayback_callback(int action,
                                         const struct menu_item_ex* this_item)
 {
@@ -288,6 +323,12 @@ MENUITEM_FUNCTION(i_last_shuf_pl_item, MENU_FUNC_USEPARAM,
                   ID2P(LANG_INSERT_LAST_SHUFFLED), playlist_insert_func,
                   (intptr_t*)PLAYLIST_INSERT_LAST_SHUFFLED,
                   treeplaylist_callback, Icon_Playlist);
+MENUITEM_FUNCTION(i_after_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_AFTER),
+                  playlist_insert_in_position_func, (intptr_t*)PLAYLIST_INSERT_AFTER,
+                  treeplaylist_callback, Icon_Playlist);
+MENUITEM_FUNCTION(i_before_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_BEFORE),
+                  playlist_insert_in_position_func, (intptr_t*)PLAYLIST_INSERT_BEFORE,
+                  treeplaylist_callback, Icon_Playlist);
 /* queue items */
 MENUITEM_FUNCTION(q_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT,
@@ -305,6 +346,12 @@ MENUITEM_FUNCTION(q_shuf_pl_item, MENU_FUNC_USEPARAM,
 MENUITEM_FUNCTION(q_last_shuf_pl_item, MENU_FUNC_USEPARAM,
                   ID2P(LANG_QUEUE_LAST_SHUFFLED), playlist_queue_func,
                   (intptr_t*)PLAYLIST_INSERT_LAST_SHUFFLED,
+                  treeplaylist_callback, Icon_Playlist);
+MENUITEM_FUNCTION(q_after_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_AFTER),
+                  playlist_queue_in_position_func, (intptr_t*)PLAYLIST_INSERT_AFTER,
+                  treeplaylist_callback, Icon_Playlist);
+MENUITEM_FUNCTION(q_before_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_BEFORE),
+                  playlist_queue_in_position_func, (intptr_t*)PLAYLIST_INSERT_BEFORE,
                   treeplaylist_callback, Icon_Playlist);
 /* replace playlist */
 MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_REPLACE),
@@ -325,10 +372,12 @@ MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
                  /* insert */
                  &i_pl_item, &i_first_pl_item, &i_last_pl_item,
                  &i_shuf_pl_item, &i_last_shuf_pl_item,
+                 &i_after_pl_item, &i_before_pl_item,
                  /* queue */
                  
                  &q_pl_item, &q_first_pl_item, &q_last_pl_item,
                  &q_shuf_pl_item, &q_last_shuf_pl_item,
+                 &q_after_pl_item, &q_before_pl_item,
                  
                  /* replace */
                  &replace_pl_item
@@ -376,6 +425,14 @@ static int treeplaylist_callback(int action,
                 {
                     return action;
                 }
+            }
+            else if ((this_item == &i_after_pl_item ||
+                      this_item == &i_before_pl_item ||
+                      this_item == &q_after_pl_item ||
+                      this_item == &q_before_pl_item) &&
+            		 playlist_amount() > 0)
+            {
+            	return action;
             }
             return ACTION_EXIT_MENUITEM;
             break;
