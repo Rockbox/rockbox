@@ -256,25 +256,30 @@ static void mixer_start_pcm(void)
     pcm_play_data(mixer_pcm_callback, start, MIX_FRAME_SIZE);
 }
 
-/* Initialize the channel and start it if it has data */
-static void mixer_channel_play_start(struct mixer_channel *chan,
-                                     pcm_play_callback_type get_more,
-                                     unsigned char *start, size_t size)
+/** Public interfaces **/
+
+/* Start playback on a channel */
+void mixer_channel_play_data(enum pcm_mixer_channel channel,
+                             pcm_play_callback_type get_more,
+                             unsigned char *start, size_t size)
 {
-    pcm_play_unlock(); /* Allow playback while doing any callback */
+    struct mixer_channel *chan = &channels[channel];
 
     ALIGN_AUDIOBUF(start, size);
 
-    if (!(start && size))
+    if (!(start && size) && get_more)
     {
         /* Initial buffer not passed - call the callback now */
+        pcm_play_lock();
+        mixer_deactivate_channel(chan); /* Protect chan struct if active */
+        pcm_play_unlock(); /* Allow playback while doing callback */
+
         size = 0;
-        if (get_more)
-        {
-            get_more(&start, &size);
-            ALIGN_AUDIOBUF(start, size);
-        }
+        get_more(&start, &size);
+        ALIGN_AUDIOBUF(start, size);
     }
+
+    pcm_play_lock();
 
     if (start && size)
     {
@@ -285,31 +290,15 @@ static void mixer_channel_play_start(struct mixer_channel *chan,
         chan->last_size = 0;
         chan->get_more = get_more;
 
-        pcm_play_lock();
         mixer_activate_channel(chan);
         mixer_start_pcm();
     }
     else
     {
         /* Never had anything - stop it now */
-        pcm_play_lock();
         channel_stopped(chan);
     }
-}
 
-
-/** Public interfaces **/
-
-/* Start playback on a channel */
-void mixer_channel_play_data(enum pcm_mixer_channel channel,
-                             pcm_play_callback_type get_more,
-                             unsigned char *start, size_t size)
-{
-    struct mixer_channel *chan = &channels[channel];
-
-    pcm_play_lock();
-    mixer_deactivate_channel(chan);
-    mixer_channel_play_start(chan, get_more, start, size);
     pcm_play_unlock();
 }
 
