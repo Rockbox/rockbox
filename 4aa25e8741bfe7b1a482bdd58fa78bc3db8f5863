@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///+Y\u003d",
+        "filename": "apps/plugins/rockblox1d.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-17T09:57:40Z",
+      "side": 1,
+      "message": "Don\u0027t introduce lines with trailing spaces please.",
+      "revId": "4aa25e8741bfe7b1a482bdd58fa78bc3db8f5863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///+c\u003d",
+        "filename": "manual/plugins/rockblox1d.tex",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-17T09:57:40Z",
+      "side": 1,
+      "message": "Please swap these two. On some targets EXIT is implemented on long press of the CANCEL button. \"Long Power or Power\" looks a bit awkward.",
+      "revId": "4aa25e8741bfe7b1a482bdd58fa78bc3db8f5863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
