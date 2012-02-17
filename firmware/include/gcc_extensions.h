@@ -66,4 +66,11 @@
 #define USED_ATTR
 #endif
 
+#if defined(__GNUC__) && (__GNUC__ >= 3)
+#define UNUSED_ATTR __attribute__((unused))
+#else
+#define UNUSED_ATTR
+#endif
+
+
 #endif /* _GCC_EXTENSIONS_H_ */

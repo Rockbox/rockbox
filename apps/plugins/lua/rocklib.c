@@ -185,7 +185,7 @@ static inline void rli_init(lua_State *L)
  * -----------------------------
  */
 
-#define RB_WRAP(M) static int rock_##M(lua_State *L)
+#define RB_WRAP(M) static int rock_##M(lua_State UNUSED_ATTR *L)
 #define SIMPLE_VOID_WRAPPER(func) RB_WRAP(func) { (void)L; func(); return 0; }
 
 /* Helper function for opt_viewport */
