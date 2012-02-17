@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///+I\u003d",
+        "filename": "apps/plugins/bounce.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-17T11:43:32Z",
+      "side": 1,
+      "message": "scrollwheel targets use it for UP/DOWN. This behavior should be retained.",
+      "revId": "b12ff3bbcef390e1ca4fdefc4100dccbc24b81ec",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///+E\u003d",
+        "filename": "manual/plugins/bounce.tex",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-17T11:43:32Z",
+      "side": 1,
+      "message": "Swap exit and cancel (like in the other pla tickets please).",
+      "revId": "b12ff3bbcef390e1ca4fdefc4100dccbc24b81ec",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
