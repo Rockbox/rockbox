@@ -53,6 +53,7 @@
 #include "splash.h"
 #include "general.h"
 #include "rbpaths.h"
+#include "platform.h"
 
 #if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 #define PREFIX(_x_) sim_ ## _x_

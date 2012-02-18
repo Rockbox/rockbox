@@ -65,6 +65,18 @@ static inline off_t filesize(int fd) {
                   } while (0)
 #endif
 
+#include "codecs.h"
+struct rbcodec_codec_header {
+    enum codec_status(*entry_point)(enum codec_entry_call_reason reason);
+    enum codec_status(*run_proc)(void);
+    struct codec_api **api;
+};
+
+#define CODEC_HEADER \
+        const struct rbcodec_codec_header __header \
+        __attribute__((visibility("default"))) = { \
+        codec_start, codec_run, &ci };
+
 /* Character encoding conversion */
 typedef enum {
     ENCODING_NONE,
