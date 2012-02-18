@@ -26,71 +26,22 @@
 #include "pcm_mixer.h"
 #include "misc.h"
 
-static int32_t beep_phase;      /* Phase of square wave generator */
+/** Beep generation, CPU optimized **/
+#include "../firmware/asm/beep.c"
+
+static uint32_t beep_phase;     /* Phase of square wave generator */
 static uint32_t beep_step;      /* Step of square wave generator on each sample */
+#ifdef BEEP_GENERIC
+static int16_t  beep_amplitude; /* Amplitude of square wave generator */
+#else
+/* Optimized routines do XOR with phase sign bit in both channels at once */
 static uint32_t beep_amplitude; /* Amplitude of square wave generator */
+#endif
 static int beep_count;          /* Number of samples remaining to generate */
 
 /* Reserve enough static space for keyclick to fit */
 #define BEEP_BUF_COUNT (NATIVE_FREQUENCY / 1000 * KEYCLICK_DURATION)
-static uint32_t beep_buf[BEEP_BUF_COUNT] IBSS_ATTR;
-
-/* Actually output samples into beep_buf */
-#if defined(CPU_ARM)
-static FORCE_INLINE void beep_generate(int count)
-{
-    uint32_t *out = beep_buf;
-    uint32_t s;
-
-    asm volatile (
-    "1:                            \n"
-        "eor   %3, %5, %1, asr #31 \n"
-        "subs  %2, %2, #1          \n"
-        "str   %3, [%0], #4        \n"
-        "add   %1, %1, %4          \n"
-        "bgt   1b                  \n"
-        : "+r"(out), "+r"(beep_phase), "+r"(count),
-          "=&r"(s)
-        : "r"(beep_step), "r"(beep_amplitude));
-}
-#elif defined (CPU_COLDFIRE)
-static FORCE_INLINE void beep_generate(int count)
-{
-    uint32_t *out = beep_buf;
-    uint32_t s;
-
-    asm volatile (
-    "1:                   \n"
-        "move.l %1, %3    \n"
-        "add.l  %4, %1    \n"
-        "add.l  %3, %3    \n"
-        "subx.l %3, %3    \n"
-        "eor.l  %5, %3    \n"
-        "move.l %3, (%0)+ \n"
-        "subq.l #1, %2    \n"
-        "bgt.b  1b        \n"
-        : "+a"(out), "+d"(beep_phase), "+d"(count),
-          "=&d"(s)
-        : "r"(beep_step), "d"(beep_amplitude));
-}
-#else
-static FORCE_INLINE void beep_generate(int count)
-{
-    uint32_t *out = beep_buf;
-    uint32_t amplitude = beep_amplitude;
-    uint32_t step = beep_step;
-    int32_t phase = beep_phase;
-
-    do
-    {
-        *out++ = (phase >> 31) ^ amplitude;
-        phase += step;
-    }
-    while (--count > 0);
-
-    beep_phase = phase;
-}
-#endif
+static int16_t beep_buf[BEEP_BUF_COUNT*2] IBSS_ATTR __attribute__((aligned(4)));
 
 /* Callback to generate the beep frames - also don't want inlining of
    call below in beep_play */
@@ -104,8 +55,9 @@ beep_get_more(unsigned char **start, size_t *size)
         count = MIN(count, BEEP_BUF_COUNT);
         beep_count -= count;
         *start = (unsigned char *)beep_buf;
-        *size = count * sizeof(uint32_t);
-        beep_generate(count);
+        *size = count * 2 * sizeof (int16_t);
+        beep_generate((void *)beep_buf, count, &beep_phase,
+                      beep_step, beep_amplitude);
     }
 }
 
@@ -126,7 +78,13 @@ void beep_play(unsigned int frequency, unsigned int duration,
     beep_phase = 0;
     beep_step = 0xffffffffu / NATIVE_FREQUENCY * frequency;
     beep_count = NATIVE_FREQUENCY / 1000 * duration;
+
+#ifdef BEEP_GENERIC
+    beep_amplitude = amplitude;
+#else
+    /* Optimized routines do XOR with phase sign bit in both channels at once */
     beep_amplitude = amplitude | (amplitude << 16); /* Word:|AMP16|AMP16| */
+#endif
 
     /* If it fits - avoid cb overhead */
     unsigned char *start;
