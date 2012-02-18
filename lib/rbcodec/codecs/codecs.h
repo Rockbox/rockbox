@@ -221,49 +221,6 @@ struct codec_api {
     void (*commit_discard_idcache)(void);
 };
 
-/* codec header */
-struct codec_header {
-    struct lc_header lc_hdr; /* must be first */
-    enum codec_status(*entry_point)(enum codec_entry_call_reason reason);
-    enum codec_status(*run_proc)(void);
-    struct codec_api **api;
-};
-
-#ifdef CODEC
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-/* plugin_* is correct, codecs use the plugin linker script */
-extern unsigned char plugin_start_addr[];
-extern unsigned char plugin_end_addr[];
-/* decoders */
-#define CODEC_HEADER \
-        const struct codec_header __header \
-        __attribute__ ((section (".header")))= { \
-        { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, codec_start, \
-        codec_run, &ci };
-/* encoders */
-#define CODEC_ENC_HEADER \
-        const struct codec_header __header \
-        __attribute__ ((section (".header")))= { \
-        { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, codec_start, \
-        codec_run, &ci };
-
-#else /* def SIMULATOR */
-/* decoders */
-#define CODEC_HEADER \
-        const struct codec_header __header \
-        __attribute__((visibility("default"))) = { \
-        { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
-        codec_start, codec_run, &ci };
-/* encoders */
-#define CODEC_ENC_HEADER \
-        const struct codec_header __header = { \
-        { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
-        codec_start, codec_run, &ci };
-#endif /* SIMULATOR */
-#endif /* CODEC */
-
 /* create full codec path from root filenames in audio_formats[]
    assumes buffer size is MAX_PATH */
 void codec_get_full_path(char *path, const char *codec_root_fn);

@@ -739,20 +739,8 @@ static void decode_file(const char *input_fn)
         fprintf(stderr, "error: dlopen failed: %s\n", dlerror());
         exit(1);
     }
-    struct codec_header *c_hdr = NULL;
+    struct rbcodec_codec_header *c_hdr = NULL;
     c_hdr = dlsym(dlcodec, "__header");
-    if (c_hdr->lc_hdr.magic != CODEC_MAGIC) {
-        fprintf(stderr, "error: %s invalid: incorrect magic\n", str);
-        exit(1);
-    }
-    if (c_hdr->lc_hdr.target_id != TARGET_ID) {
-        fprintf(stderr, "error: %s invalid: incorrect target id\n", str);
-        exit(1);
-    }
-    if (c_hdr->lc_hdr.api_version != CODEC_API_VERSION) {
-        fprintf(stderr, "error: %s invalid: incorrect API version\n", str);
-        exit(1);
-    }
 
     /* Run the codec */
     *c_hdr->api = &ci;
