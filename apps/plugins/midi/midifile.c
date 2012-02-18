@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "midiutil.h"
+#include "midifile.h"
 
 struct Track * readTrack(int file);
 int readID(int file);
@@ -125,7 +126,7 @@ struct MIDIfile * loadFile(const char * filename)
 
 int rStatus = 0;
 /* Returns 0 if done, 1 if keep going */
-int readEvent(int file, void * dest)
+static int readEvent(int file, void * dest)
 {
     struct Event dummy;
     struct Event * ev = (struct Event *) dest;

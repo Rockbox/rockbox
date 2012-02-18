@@ -23,7 +23,7 @@
 #include "midiutil.h"
 #include "synth.h"
 
-void readTextBlock(int file, char * buf)
+static void readTextBlock(int file, char * buf)
 {
     char c = 0;
     do

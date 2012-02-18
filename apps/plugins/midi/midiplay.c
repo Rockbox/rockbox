@@ -319,7 +319,7 @@ static inline void synthbuf(void)
     samples_in_buf = BUF_SIZE-i;
 }
 
-void get_more(unsigned char** start, size_t* size)
+static void get_more(unsigned char** start, size_t* size)
 {
 #ifndef SYNC
     if(lastswap != swap)

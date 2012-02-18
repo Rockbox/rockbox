@@ -37,7 +37,7 @@ struct GPatch * drumSet[128];
 
 struct SynthObject voices[MAX_VOICES] IBSS_ATTR;
 
-void *alloc(int size)
+static void *alloc(int size)
 {
     static char *offset = NULL;
     static size_t totalSize = 0;

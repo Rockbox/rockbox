@@ -22,7 +22,6 @@
 int tick(void);
 
 /* used by beatbox */
-void pressNote(int ch, int note, int vol);
 void rewindFile(void);
 
 void seekForward(int nSec);

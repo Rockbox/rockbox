@@ -37,12 +37,12 @@ const uint32_t gustable[]=
   4186073, 4434930, 4698645, 4978041, 5274051, 5587663, 5919922, 6271939, 6644889, 7040015, 7458636, 7902150
 };
 
-unsigned int readWord(int file)
+static unsigned int readWord(int file)
 {
     return (readChar(file)<<0) | (readChar(file)<<8); // | (readChar(file)<<8) | (readChar(file)<<0);
 }
 
-unsigned int readDWord(int file)
+static unsigned int readDWord(int file)
 {
     return (readChar(file)<<0) | (readChar(file)<<8) | (readChar(file)<<16) | (readChar(file)<<24);
 }
@@ -50,7 +50,7 @@ unsigned int readDWord(int file)
 int curr_waveform;
 struct GWaveform waveforms[256] IBSS_ATTR;
 
-struct GWaveform * loadWaveform(int file)
+static struct GWaveform * loadWaveform(int file)
 {
     struct GWaveform * wav = &waveforms[curr_waveform++];
     rb->memset(wav, 0, sizeof(struct GWaveform));
@@ -137,7 +137,7 @@ struct GWaveform * loadWaveform(int file)
     return wav;
 }
 
-int selectWaveform(struct GPatch * pat, int midiNote)
+static int selectWaveform(struct GPatch * pat, int midiNote)
 {
     /* We divide by 100 here because everyone's freq formula is slightly different */
     unsigned int tabFreq = gustable[midiNote]/100; /* Comparison */

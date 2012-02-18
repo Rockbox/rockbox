@@ -22,6 +22,7 @@
 #include "midiutil.h"
 #include "guspat.h"
 #include "synth.h"
+#include "sequencer.h"
 
 long tempo = 375000;
 
