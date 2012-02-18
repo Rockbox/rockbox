@@ -65,7 +65,7 @@ PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS)
 $(ROCKS1): $(BUILDDIR)/%.rock: $(BUILDDIR)/%.o
 
 # dependency for all plugins
-$(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB) $(PLUGIN_CRT0) $(LIBSETJMP) $(LIBARMSUPPORT)
+$(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(LIBARMSUPPORT) $(PLUGINLIB) $(PLUGINBITMAPLIB) $(PLUGIN_CRT0) $(LIBSETJMP)
 
 $(PLUGINLIB): $(PLUGINLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
@@ -129,7 +129,7 @@ endif
 $(BUILDDIR)/apps/plugins/%.lua: $(ROOTDIR)/apps/plugins/%.lua
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $(BUILDDIR)/apps/plugins/
 
-$(BUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(OVERLAYREF_LDS) $(PLUGINLIB) $(PLUGINBITMAPLIB) $(LIBSETJMP) $(LIBARMSUPPORT) $(PLUGIN_CRT0)
+$(BUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(OVERLAYREF_LDS) $(LIBARMSUPPORT) $(PLUGINLIB) $(PLUGINBITMAPLIB) $(LIBSETJMP) $(PLUGIN_CRT0)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o /dev/null \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
