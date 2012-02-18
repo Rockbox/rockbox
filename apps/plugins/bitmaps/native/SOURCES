@@ -263,6 +263,14 @@ clock_segments.128x128x2.bmp
 clock_smallsegments.128x128x2.bmp
 clock_logo.128x128x2.bmp
 clock_messages.128x128x2.bmp
+#elif (LCD_WIDTH >= 96) && (LCD_HEIGHT >= 96) && (LCD_DEPTH >= 16)
+clock_binary.96x96x16.bmp
+clock_digits.132x80x16.bmp
+clock_smalldigits.128x128x16.bmp
+clock_segments.132x80x16.bmp
+clock_smallsegments.128x128x16.bmp
+clock_logo.96x96x16.bmp
+clock_messages.96x96x16.bmp
 #elif (LCD_WIDTH >= 96) && (LCD_HEIGHT >= 64) && (LCD_DEPTH >= 1)
 clock_binary.112x64x1.bmp
 clock_digits.112x64x1.bmp
