@@ -2,6 +2,8 @@
 #ifndef BLARGG_SOURCE_H
 #define BLARGG_SOURCE_H
 
+#include "platform.h"
+
 // If debugging is enabled and expr is false, abort program. Meant for checking
 // caller-supplied parameters and operations that are outside the control of the
 // module. A failed requirement indicates a bug outside the module.

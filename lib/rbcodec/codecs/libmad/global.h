@@ -61,6 +61,8 @@
 #  define USE_ASYNC
 # endif
 
+#define HAVE_ASSERT_H
+
 # if !defined(HAVE_ASSERT_H)
 #  if defined(NDEBUG)
 #   define assert(x)    /* nothing */

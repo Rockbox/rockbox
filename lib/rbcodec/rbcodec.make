@@ -5,6 +5,24 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 
+ifndef PRINTS
+  PRINTS=$(SILENT)$(call info,$(1))
+endif
+ifndef preprocess
+  preprocess = $(shell $(CC) $(PPCFLAGS) $(RBCODEC_CFLAGS) $(2) -E -P -x c -imacros rbcodecconfig.h $(1) | \
+		grep -v '^\#' | grep -v "^ *$$" | \
+		sed -e 's:^..*:$(dir $(1))&:')
+endif
+ifndef c2obj
+  c2obj = $(addsuffix .o,$(basename $(subst $(RBCODEC_DIR),$(RBCODEC_BLD),$(1))))
+endif
+ifndef MEMORYSIZE
+  MEMORYSIZE = 128
+endif
+ifndef CPU
+  CPU =
+endif
+
 RBCODEC_LIB = $(RBCODEC_BLD)/librbcodec.a
 RBCODEC_SRC := $(call preprocess, $(RBCODEC_DIR)/SOURCES, $(RBCODEC_CFLAGS) \
 	-imacros rbcodecconfig.h)

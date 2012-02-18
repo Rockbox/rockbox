@@ -52,6 +52,7 @@
 
 #define EA3_HEADER_SIZE 96
 
+#undef DEBUGF
 #if 0
 #define DEBUGF printf
 #else

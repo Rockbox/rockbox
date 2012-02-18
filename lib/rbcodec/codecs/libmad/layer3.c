@@ -921,6 +921,7 @@ mad_fixed_t III_requantize(unsigned int value, signed int exp)
   return frac ? mad_f_mul(requantized, root_table[3 + frac]) : requantized;
 }
 
+#undef MASK
 /* we must take care that sz >= bits and sz < sizeof(long) lest bits == 0 */
 # if defined(CPU_ARM)
 # define MASK(cache, sz, bits) \

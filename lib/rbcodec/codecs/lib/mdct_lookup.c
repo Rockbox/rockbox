@@ -21,12 +21,7 @@
  *
  ****************************************************************************/
 
-#ifdef ROCKBOX
-#include <codecs/lib/codeclib.h>
-#else
-#include <stdlib.h>
-#include <stdint.h>
-#endif /* ROCKBOX */
+#include "codecs/lib/codeclib.h"
 
 /* {sin(2*i*PI/4096, cos(2*i*PI/4096)}, with i = 0 to 512 */
 const int32_t sincos_lookup0[1026] ICONST_ATTR = {

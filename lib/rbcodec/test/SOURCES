@@ -1,6 +1,0 @@
-warble.c
-../../../firmware/buflib.c
-../../../firmware/core_alloc.c
-../../../firmware/common/unicode.c
-../../../firmware/common/structec.c
-../../../uisimulator/common/io.c

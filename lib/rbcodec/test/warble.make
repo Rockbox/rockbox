@@ -15,7 +15,7 @@ RBCODEC_BLD = $(BUILDDIR)/lib/rbcodec
 FLAGS=-g -D__PCTOOL__ $(TARGET) -Wall
 RBCODEC_CFLAGS += -D_FILE_H_ -DLOGF_H -DDEBUG_H -D_KERNEL_H_ # will be removed later
 
-SRC= $(call preprocess, $(ROOTDIR)/lib/rbcodec/test/SOURCES)
+SRC = $(ROOTDIR)/lib/rbcodec/test/warble.c
 
 INCLUDES += -I$(ROOTDIR)/lib/rbcodec/test
 INCLUDES += -I$(ROOTDIR)/apps -I$(ROOTDIR)/apps/gui
