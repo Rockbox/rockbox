@@ -1525,8 +1525,8 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     </message>
     <message>
         <location filename="../installwindow.cpp" line="276"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation type="unfinished">Dit is de meest recente Rockbox build. Een huidige build zal upgedatet worden elke keer een verandering is gemaakt. Laatste versie is  r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation type="unfinished">Dit is de meest recente Rockbox build. Een huidige build zal upgedatet worden elke keer een verandering is gemaakt. Laatste versie is  %1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="282"/>
@@ -1550,8 +1550,8 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     </message>
     <message>
         <location filename="../installwindow.cpp" line="312"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="unfinished">&lt;b&gt;Pas op:&lt;/b&gt; gearchiveerde versie is r%1(%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation type="unfinished">&lt;b&gt;Pas op:&lt;/b&gt; gearchiveerde versie is %1(%2).</translation>
     </message>
 </context>
 <context>

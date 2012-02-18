@@ -1549,8 +1549,8 @@ Prosím nastavte TTS engine.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation type="unfinished">Toto je aktuální build Rockboxu. Aktuální build se aktualizuje při každé změně. Nejnovější verze je r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation type="unfinished">Toto je aktuální build Rockboxu. Aktuální build se aktualizuje při každé změně. Nejnovější verze je %1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="283"/>
@@ -1574,8 +1574,8 @@ Prosím nastavte TTS engine.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="313"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="unfinished">&lt;b&gt;Poznámka:&lt;/b&gt; archivovaná verze je r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation type="unfinished">&lt;b&gt;Poznámka:&lt;/b&gt; archivovaná verze je %1 (%2).</translation>
     </message>
 </context>
 <context>

@@ -275,7 +275,7 @@ void InstallWindow::setDetailsCurrent(bool show)
     if(show) {
         ui.labelDetails->setText(tr("This is the absolute up to the minute "
                 "Rockbox built. A current build will get updated every time "
-                "a change is made. Latest version is r%1 (%2).")
+                "a change is made. Latest version is %1 (%2).")
                 .arg(ServerInfo::value(ServerInfo::BleedingRevision).toString(),
                     ServerInfo::value(ServerInfo::BleedingDate).toString()));
         if(ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
@@ -309,7 +309,7 @@ void InstallWindow::setDetailsArchived(bool show)
         "from the current development source code. This generally has more "
         "features than the last stable release but may be much less stable. "
         "Features may change regularly."));
-        ui.labelNote->setText(tr("<b>Note:</b> archived version is r%1 (%2).")
+        ui.labelNote->setText(tr("<b>Note:</b> archived version is %1 (%2).")
             .arg(ServerInfo::value(ServerInfo::DailyRevision).toString(),
                 ServerInfo::value(ServerInfo::DailyDate).toString()));
     }

@@ -1554,8 +1554,8 @@ TTSエンジンの設定を行って下さい。</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>これは、最新版のRockboxです。最新版は毎日更新されます。現在のバージョンは、r%1 (%2) です。</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation>これは、最新版のRockboxです。最新版は毎日更新されます。現在のバージョンは、%1 (%2) です。</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="283"/>
@@ -1579,8 +1579,8 @@ TTSエンジンの設定を行って下さい。</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="313"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation>&lt;b&gt;注意:&lt;/b&gt; 保存されているバージョンは、r%1 (%2) です。</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation>&lt;b&gt;注意:&lt;/b&gt; 保存されているバージョンは、%1 (%2) です。</translation>
     </message>
 </context>
 <context>

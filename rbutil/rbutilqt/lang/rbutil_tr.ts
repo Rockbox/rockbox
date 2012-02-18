@@ -1539,8 +1539,8 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation type="unfinished">En g�ncel Rockbox insasidir. Mevcut insa bir degisiklik yapildiginda g�ncellenir. Son s�r�m r%1 (%2) dir.</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation type="unfinished">En g�ncel Rockbox insasidir. Mevcut insa bir degisiklik yapildiginda g�ncellenir. Son s�r�m %1 (%2) dir.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="283"/>
@@ -1564,8 +1564,8 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="313"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="unfinished">&lt;b&gt;Not:&lt;/b&gt; arsivlenen s�r�m r%1 (%2) dir.</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation type="unfinished">&lt;b&gt;Not:&lt;/b&gt; arsivlenen s�r�m %1 (%2) dir.</translation>
     </message>
 </context>
 <context>

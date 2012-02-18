@@ -1523,8 +1523,8 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="276"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>Dies ist das aktuellste Rockbox build. Es wird bei jeder Änderung aktualisiert. Letzte Version ist r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation>Dies ist das aktuellste Rockbox build. Es wird bei jeder Änderung aktualisiert. Letzte Version ist %1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="282"/>
@@ -1548,8 +1548,8 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="312"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Archivierte Version ist r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Archivierte Version ist %1 (%2).</translation>
     </message>
 </context>
 <context>

@@ -1242,8 +1242,8 @@ You need to change your player to MSC mode for installation. </source>
         <translation>Selecione Nome do Arquivo da Cópia de Segurança</translation>
     </message>
     <message>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>Esta é a compilação do Rockbox mais recente. Uma compilação atual será atualizada toda vez que um mudança é efetuada. A versão mais recente é r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation>Esta é a compilação do Rockbox mais recente. Uma compilação atual será atualizada toda vez que um mudança é efetuada. A versão mais recente é %1 (%2).</translation>
     </message>
     <message>
         <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
@@ -1262,8 +1262,8 @@ You need to change your player to MSC mode for installation. </source>
         <translation>Estas são construidas automaticamente todos os dias a partir do código fonte de desenvolvimento atual. Esta, geralmente, tem mais funcionalidades do que a última versão estável mas pode ser bem menos estável. Funcionalidades podem mudar com frequência.</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation>&lt;b&gt;Nota:&lt;/b&gt; a versão arquivada é r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation>&lt;b&gt;Nota:&lt;/b&gt; a versão arquivada é %1 (%2).</translation>
     </message>
     <message>
         <source>Backup finished.</source>

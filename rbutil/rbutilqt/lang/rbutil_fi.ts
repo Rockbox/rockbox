@@ -1539,7 +1539,7 @@ Valitse laite ja liitospiste käsin.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1564,8 +1564,8 @@ Valitse laite ja liitospiste käsin.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="313"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="unfinished">&lt;b&gt;Huomaa:&lt;/b&gt;arkistoitu versio on r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation type="unfinished">&lt;b&gt;Huomaa:&lt;/b&gt;arkistoitu versio on %1 (%2).</translation>
     </message>
 </context>
 <context>

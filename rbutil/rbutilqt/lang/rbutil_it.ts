@@ -1541,8 +1541,8 @@ Select your device and Mountpoint manually.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation type="unfinished">Questa è la più aggiornata versione di test di Rockbox. Una nuova versione viene rilasciata ogni volta che viene effettuato un cambiamento. L&apos;ultima versione è r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation type="unfinished">Questa è la più aggiornata versione di test di Rockbox. Una nuova versione viene rilasciata ogni volta che viene effettuato un cambiamento. L&apos;ultima versione è %1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="283"/>
@@ -1566,8 +1566,8 @@ Select your device and Mountpoint manually.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="313"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="unfinished">&lt;b&gt;Nota:&lt;/b&gt;versione dell&apos;archivio è r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation type="unfinished">&lt;b&gt;Nota:&lt;/b&gt;versione dell&apos;archivio è %1 (%2).</translation>
     </message>
 </context>
 <context>

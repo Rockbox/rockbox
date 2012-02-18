@@ -1554,8 +1554,8 @@ Select your device and Mountpoint manually.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>זוהי הגירסה העדכנית ביותר בהחלט של רוקבוקס. הגירסה הנוכחית מתעדכנת בכל פעם ששינוי נעשה. הגירסה האחרונה היא r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation>זוהי הגירסה העדכנית ביותר בהחלט של רוקבוקס. הגירסה הנוכחית מתעדכנת בכל פעם ששינוי נעשה. הגירסה האחרונה היא %1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="283"/>
@@ -1579,8 +1579,8 @@ Select your device and Mountpoint manually.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="313"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation>&lt;b&gt;שים לב:&lt;/b&gt; גירסת הארכיב היא r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation>&lt;b&gt;שים לב:&lt;/b&gt; גירסת הארכיב היא %1 (%2).</translation>
     </message>
 </context>
 <context>

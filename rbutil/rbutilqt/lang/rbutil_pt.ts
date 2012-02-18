@@ -1544,8 +1544,8 @@ Seleccione um dispositivo e um ponto de montagem manualmente.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation type="unfinished">Esta é compilação do Rockbox actualizada ao minuto. Uma compilação actual será actualizada sempre que houver uma mudança. Última versão é r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation type="unfinished">Esta é compilação do Rockbox actualizada ao minuto. Uma compilação actual será actualizada sempre que houver uma mudança. Última versão é %1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="283"/>
@@ -1569,8 +1569,8 @@ Seleccione um dispositivo e um ponto de montagem manualmente.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="313"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="unfinished">&lt;b&gt;Nota:&lt;/b&gt; versão arquivada é r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation type="unfinished">&lt;b&gt;Nota:&lt;/b&gt; versão arquivada é %1 (%2).</translation>
     </message>
 </context>
 <context>

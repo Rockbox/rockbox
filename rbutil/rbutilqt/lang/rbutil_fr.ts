@@ -1558,8 +1558,8 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>C&apos;est la version la plus récente possible. Elle est mise à jour à chaque fois qu&apos;un changement est fait. La version actuelle est r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation>C&apos;est la version la plus récente possible. Elle est mise à jour à chaque fois qu&apos;un changement est fait. La version actuelle est %1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="283"/>
@@ -1583,8 +1583,8 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     </message>
     <message>
         <location filename="../installwindow.cpp" line="313"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation>&lt;b&gt;Remarque :&lt;/b&gt; la version archivée est r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation>&lt;b&gt;Remarque :&lt;/b&gt; la version archivée est %1 (%2).</translation>
     </message>
 </context>
 <context>

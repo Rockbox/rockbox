@@ -1212,8 +1212,8 @@ You need to change your player to MSC mode for installation. </source>
         <translation>Выберите имя файла резервной копии</translation>
     </message>
     <message>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation>Это самая-самая последняя сборка Rockbox, она обновляется после каждого изменения в исходном коде. Текущая версия: r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation>Это самая-самая последняя сборка Rockbox, она обновляется после каждого изменения в исходном коде. Текущая версия: %1 (%2).</translation>
     </message>
     <message>
         <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
@@ -1232,8 +1232,8 @@ You need to change your player to MSC mode for installation. </source>
         <translation>Они автоматически собраны каждый день из текущего исходного кода. В них обычно больше возможностей, чем в последней официальной версии, но они могут работать нестабильно. Возможности могут регулярно изменяться.</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation>&lt;b&gt;Примечание :&lt;/b&gt; текущая версия в архиве: r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation>&lt;b&gt;Примечание :&lt;/b&gt; текущая версия в архиве: %1 (%2).</translation>
     </message>
     <message>
         <source>Backup finished.</source>

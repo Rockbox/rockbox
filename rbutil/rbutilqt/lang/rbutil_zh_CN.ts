@@ -1539,8 +1539,8 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="277"/>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
-        <translation type="unfinished">这是最新的Rockbox版本. 每一个更改后这版本就会更新. 最新的版本是 r%1 (%2).</translation>
+        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
+        <translation type="unfinished">这是最新的Rockbox版本. 每一个更改后这版本就会更新. 最新的版本是 %1 (%2).</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="283"/>
@@ -1564,8 +1564,8 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="313"/>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
-        <translation type="unfinished">&lt;b&gt;注意:&lt;/b&gt; 存档的版本是 r%1 (%2).</translation>
+        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
+        <translation type="unfinished">&lt;b&gt;注意:&lt;/b&gt; 存档的版本是 %1 (%2).</translation>
     </message>
 </context>
 <context>
