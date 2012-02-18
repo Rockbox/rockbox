@@ -6,6 +6,7 @@
 #define HAVE_SW_TONE_CONTROLS
 #define NUM_CORES 1
 #define RBCODEC_ENABLE_CHANNEL_MODES
+#define MEMORYSIZE 128
 
 #ifndef __ASSEMBLER__
 

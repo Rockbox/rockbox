@@ -15,6 +15,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #include "blargg_source.h"
 
+#ifndef CHAR_BIT
+#define CHAR_BIT 8
+#endif
+
 // Emulation inaccuracies:
 // * Noise isn't run when not in use
 // * Changes to envelope and noise periods are delayed until next reload

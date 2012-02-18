@@ -27,6 +27,10 @@
 
 CODEC_HEADER
 
+#ifndef M_SQRT2
+#define M_SQRT2 1.41421356237309504880
+#endif
+
 /* Maximum number of bytes to process in one iteration */
 #define WAV_CHUNK_SIZE (1024*2)
 

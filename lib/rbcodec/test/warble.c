@@ -40,37 +40,6 @@
 #include "tdspeed.h"
 #include "platform.h"
 
-/***************** EXPORTED *****************/
-
-struct user_settings global_settings;
-volatile long current_tick = 0;
-
-int set_irq_level(int level)
-{
-    return 0;
-}
-
-void mutex_init(struct mutex *m)
-{
-}
-
-void mutex_lock(struct mutex *m)
-{
-}
-
-void mutex_unlock(struct mutex *m)
-{
-}
-
-#undef debugf
-void debugf(const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-}
-
 /***************** INTERNAL *****************/
 
 static enum { MODE_PLAY, MODE_WRITE } mode;
@@ -698,8 +667,6 @@ static void print_mp3entry(const struct mp3entry *id3, FILE *f)
 static void decode_file(const char *input_fn)
 {
     /* Set up global settings */
-    memset(&global_settings, 0, sizeof(global_settings));
-    global_settings.timestretch_enabled = true;
     dsp_timestretch_enable(true);
     tdspeed_init();
 
@@ -815,7 +782,6 @@ int main(int argc, char **argv)
         }
     }
 
-    core_allocator_init();
     if (argc == optind + 2) {
         write_init(argv[optind + 1]);
     } else if (argc == optind + 1) {

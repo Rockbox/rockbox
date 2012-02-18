@@ -32,10 +32,6 @@
  * Licensed under GPLv2 or later, see file LICENSE in this tarball for details.
  */
 
-#include <inttypes.h>
-#ifndef NULL
-#define NULL 0
-#endif
 #define ENABLE_DESKTOP 0
 #define USE_DESKTOP(...)
 #include "mallocer.h"

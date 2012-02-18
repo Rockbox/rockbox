@@ -179,10 +179,18 @@ struct codec_api {
     void *(*memchr)(const void *s1, int c, size_t n);
 
 #if defined(DEBUG) || defined(SIMULATOR)
-    void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
+    void (*debugf)(const char *fmt, ...)
+#ifdef ATTRIBUTE_PRINTF
+        ATTRIBUTE_PRINTF(1, 2)
+#endif
+        ;
 #endif
 #ifdef ROCKBOX_HAS_LOGF
-    void (*logf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
+    void (*logf)(const char *fmt, ...)
+#ifdef ATTRIBUTE_PRINTF
+        ATTRIBUTE_PRINTF(1, 2)
+#endif
+        ;
 #endif
 
     /* Tremor requires qsort */

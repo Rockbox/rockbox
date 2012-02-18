@@ -327,7 +327,7 @@ int32_t dsp_get_timestretch()
 
 bool dsp_timestretch_available()
 {
-    return (global_settings.timestretch_enabled && big_sample_buf);
+    return (big_sample_buf != 0);
 }
 #endif /* HAVE_PITCHSCREEN */
 

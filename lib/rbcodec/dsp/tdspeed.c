@@ -30,6 +30,7 @@
 #include "settings.h"
 #include "platform.h"
 
+#undef assert
 #define assert(cond)
 
 #define MIN_RATE 8000
@@ -72,9 +73,6 @@ static void move_callback(void* from, void* to)
 
 void tdspeed_init(void)
 {
-    if (!global_settings.timestretch_enabled)
-        return;
-
     /* Allocate buffers */
     for (int i = 0; i < 2; i++) {
         if (overlap_buffer[i] == NULL) {

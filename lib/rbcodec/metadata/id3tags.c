@@ -49,7 +49,10 @@
 #include "metadata_common.h"
 #endif
 #include "metadata_parsers.h"
-#include "misc.h"
+
+#define BOM_UTF_16_LE "\xff\xfe"
+#define BOM_UTF_16_BE "\xfe\xff"
+#define BOM_UTF_16_SIZE 2
 
 static unsigned long unsync(unsigned long b0,
                             unsigned long b1,

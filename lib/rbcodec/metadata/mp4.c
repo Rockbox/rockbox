@@ -25,7 +25,6 @@
 #include <inttypes.h>
 #include "platform.h"
 
-#include "errno.h"
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
@@ -78,6 +77,8 @@
 #define MP4_trkn FOURCC('t', 'r', 'k', 'n')
 #define MP4_udta FOURCC('u', 'd', 't', 'a')
 #define MP4_extra FOURCC('-', '-', '-', '-')
+
+static int errno = 0;
 
 /* Read the tag data from an MP4 file, storing up to buffer_size bytes in
  * buffer.
@@ -157,7 +158,7 @@ static unsigned int read_mp4_atom(int fd, uint32_t* size,
         /* FAT32 doesn't support files this big, so something seems to 
          * be wrong. (64-bit sizes should only be used when required.)
          */
-        errno = EFBIG;
+        errno = 1;
         *type = 0;
         return 0;
     }
