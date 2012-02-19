@@ -188,8 +188,14 @@ int storage_write_sectors(IF_MV2(int drive,)
         sprintf(name,"sector%lX.bin",start+i);
         f=fopen(name,"wb");
         if (f) {
-            (void)fwrite(buf,512,1,f);
+            if(fwrite(buf,512,1,f) != 1) {
+                fclose(f);
+                return -1;
+            }
             fclose(f);
+        }
+        else {
+            return -1;
         }
     }
     return 0;
@@ -214,7 +220,7 @@ int storage_read_sectors(IF_MV2(int drive,)
         if (f) {
             ret = fread(buf,512,1,f);
             fclose(f);
-            if (ret != 512)
+            if (ret != 1)
                 return -1;
         }
     }
