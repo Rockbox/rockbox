@@ -33,6 +33,7 @@
 #include "progressloggergui.h"
 #include "bootloaderinstallbase.h"
 #include "manualwidget.h"
+#include "infowidget.h"
 
 class RbUtilQt : public QMainWindow
 {
@@ -45,6 +46,7 @@ class RbUtilQt : public QMainWindow
 
     private:
         ManualWidget *manual;
+        InfoWidget *info;
         Ui::RbUtilQtFrm ui;
 
         void changeEvent(QEvent *e);
@@ -111,7 +113,6 @@ class RbUtilQt : public QMainWindow
         void uninstall(void);
         void uninstallBootloader(void);
         void installPortable(void);
-        void updateInfo(void);
         void updateTabs(int);
 
         void checkUpdate(void);
