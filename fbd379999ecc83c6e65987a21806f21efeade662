@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///9U\u003d",
+        "filename": "manual/plugins/stats.tex",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-19T00:05:13Z",
+      "side": 1,
+      "message": "This change removes whitespaces where newlines are escaped with the % char (it becomes \"andexit\" and \"hasfinished\"). Remove the % char at the end of the lines, they\u0027re not needed in normal sentences.",
+      "revId": "fbd379999ecc83c6e65987a21806f21efeade662",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
