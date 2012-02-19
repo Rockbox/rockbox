@@ -45,10 +45,14 @@ void TestRockboxInfo::testVersion()
 
     const struct testvector testdata[] =
     {
-        { "Version: r29629-110321",  "29629",    "r29629-110321",    "" },
-        { "Version: r29629M-110321", "29629M",   "r29629M-110321",   "" },
-        { "Version: 3.10",           "",         "3.10",             "3.10" },
-        { "Version:\t3.10",          "",         "3.10",             "3.10" },
+        { "Version: r29629-110321",   "29629",    "r29629-110321",   "" },
+        { "Version: r29629M-110321",  "29629M",   "r29629M-110321",  "" },
+        { "Version: 3.10",            "",         "3.10",            "3.10" },
+        { "Version:\t3.10",           "",         "3.10",            "3.10" },
+        { "#Version: r29629-110321",  "",         "",                "" },
+        { "Version: e5b1b0f-120218",  "e5b1b0f",  "e5b1b0f-120218",  "" },
+        { "Version: e5b1b0fM-120218", "e5b1b0fM", "e5b1b0fM-120218", "" },
+        { "#Version: e5b1b0f-120218", "",         "",                "" },
     };
 
 
@@ -70,7 +74,7 @@ void TestRockboxInfo::testVersion()
 
 void TestRockboxInfo::testTarget()
 {
-    unsigned int i, j;
+    int i, j;
     QStringList targets;
     targets << "sansae200" << "gigabeats" << "iriverh100" << "unknown";
     QStringList prefix;
@@ -94,7 +98,7 @@ void TestRockboxInfo::testTarget()
 
 void TestRockboxInfo::testMemory()
 {
-    unsigned int i, j;
+    int i, j;
     QStringList memsizes;
     memsizes << "8" << "16" << "32" << "64";
     QStringList prefix;
@@ -118,7 +122,7 @@ void TestRockboxInfo::testMemory()
 
 void TestRockboxInfo::testFeatures()
 {
-    unsigned int i, j;
+    int i, j;
     QStringList features;
     features << "backlight_brightness:button_light:dircache:flash_storage"
              << "pitchscreen:multivolume:multidrive_usb:quickscreen";

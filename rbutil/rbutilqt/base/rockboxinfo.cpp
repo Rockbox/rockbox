@@ -33,38 +33,40 @@ RockboxInfo::RockboxInfo(QString mountpoint, QString fname)
         return;
 
     // read file contents
+    QRegExp hash("^Version:\\s+(r?)([0-9a-fM]+)");
+    QRegExp version("^Version:\\s+(\\S.*)");
+    QRegExp release("^Version:\\s+([0-9\\.]+)");
+    QRegExp target("^Target:\\s+(\\S.*)");
+    QRegExp features("^Features:\\s+(\\S.*)");
+    QRegExp targetid("^Target id:\\s+(\\S.*)");
+    QRegExp memory("^Memory:\\s+(\\S.*)");
     while (!file.atEnd())
     {
-        QString line = file.readLine();
+        QString line = file.readLine().trimmed();
 
-        if(line.contains("Version:"))
-        {
-            m_version = line.remove("Version:").trimmed();
-            if(m_version.startsWith("r")) {
-                m_revision = m_version;
-                m_revision.remove("r").replace(QRegExp("-.+$"), "");
-                m_release = "";
-            }
-            else {
-                m_release = m_version;
-                m_revision = "";
-            }
+        if(version.indexIn(line) >= 0) {
+            m_version = version.cap(1);
         }
-        else if(line.contains("Target: "))
-        {
-            m_target = line.remove("Target: ").trimmed();
+        if(release.indexIn(line) >= 0) {
+            m_release = release.cap(1);
         }
-        else if(line.contains("Features:"))
-        {
-            m_features = line.remove("Features:").trimmed();
+        if(hash.indexIn(line) >= 0) {
+            // git hashes are usually at least 7 characters.
+            // svn revisions are expected to be at least 4 digits.
+            if(hash.cap(2).size() > 3)
+                m_revision = hash.cap(2);
         }
-        else if(line.contains("Target id:"))
-        {
-            m_targetid = line.remove("Target id:").trimmed();
+        else if(target.indexIn(line) >= 0) {
+            m_target = target.cap(1);
         }
-        else if(line.contains("Memory:"))
-        {
-            m_ram = line.remove("Memory:").trimmed().toInt();
+        else if(features.indexIn(line) >= 0) {
+            m_features = features.cap(1);
+        }
+        else if(targetid.indexIn(line) >= 0) {
+            m_targetid = targetid.cap(1);
+        }
+        else if(memory.indexIn(line) >= 0) {
+            m_ram = memory.cap(1).toInt();
         }
     }
 
