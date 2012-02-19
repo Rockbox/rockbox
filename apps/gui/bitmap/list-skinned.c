@@ -43,7 +43,7 @@
 #include "appevents.h"
 
 static struct listitem_viewport_cfg *listcfg[NB_SCREENS] = {NULL};
-struct gui_synclist *current_list;
+static struct gui_synclist *current_list;
 
 void skinlist_set_cfg(enum screen_type screen,
                       struct listitem_viewport_cfg *cfg)
