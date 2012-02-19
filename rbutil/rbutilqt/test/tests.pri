@@ -18,8 +18,8 @@
 
 CONFIG += qtestlib
 DEPENDPATH += .
-OBJECTS_DIR = build
-UI_DIR = build
-MOC_DIR = build
-RCC_DIR = build
+OBJECTS_DIR = build/$$TARGET
+UI_DIR = build/$$TARGET
+MOC_DIR = build/$$TARGET
+RCC_DIR = build/$$TARGET
 
