@@ -46,7 +46,7 @@ int convxdigit(char digit, byte *val);
 void print_hex(byte *data, int len, bool newline);
 void add_keys(key_array_t ka, int kac);
 bool parse_key(char **str, struct crypto_key_t *key);
-void add_keys_from_file(const char *key_file);
+bool add_keys_from_file(const char *key_file);
 void print_key(struct crypto_key_t *key, bool newline);
 void clear_keys();
 

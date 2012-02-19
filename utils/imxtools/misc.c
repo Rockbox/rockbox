@@ -157,18 +157,27 @@ void clear_keys()
     g_key_array = NULL;
 }
 
-void add_keys_from_file(const char *key_file)
+bool add_keys_from_file(const char *key_file)
 {
     int size;
     FILE *fd = fopen(key_file, "r");
     if(fd == NULL)
-        bug("opening key file failed");
+    {
+        if(g_debug)
+            perror("cannot open key file");
+        return false;
+    }
     fseek(fd, 0, SEEK_END);
     size = ftell(fd);
     fseek(fd, 0, SEEK_SET);
     char *buf = xmalloc(size + 1);
     if(fread(buf, 1, size, fd) != (size_t)size)
-        bug("reading key file");
+    {
+        if(g_debug)
+            perror("Cannot read key file");
+        fclose(fd);
+        return false;
+    }
     buf[size] = 0;
     fclose(fd);
 
@@ -180,7 +189,11 @@ void add_keys_from_file(const char *key_file)
         struct crypto_key_t k;
         /* parse key */
         if(!parse_key(&p, &k))
-            bug("invalid key file");
+        {
+            if(g_debug)
+                printf("invalid key file\n");
+            return false;
+        }
         if(g_debug)
         {
             printf("Add key: ");
@@ -189,7 +202,11 @@ void add_keys_from_file(const char *key_file)
         add_keys(&k, 1);
         /* request at least one space character before next key, or end of file */
         if(*p != 0 && !isspace(*p))
-            bug("invalid key file");
+        {
+            if(g_debug)
+                printf("invalid key file\n");
+            return false;
+        }
         /* skip whitespace */
         while(isspace(*p))
             p++;
@@ -197,6 +214,7 @@ void add_keys_from_file(const char *key_file)
             break;
     }
     free(buf);
+    return true;
 }
 
 void print_hex(byte *data, int len, bool newline)

@@ -380,7 +380,8 @@ int main(int argc, char **argv)
                 break;
             case 'k':
             {
-                add_keys_from_file(optarg);
+                if(!add_keys_from_file(optarg))
+                    bug("Cannot keys from %s\n", optarg);
                 break;
             }
             case 'z':

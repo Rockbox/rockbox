@@ -460,13 +460,21 @@ struct cmd_file_t *db_parse_file(const char *file)
     size_t size;
     FILE *f = fopen(file, "r");
     if(f == NULL)
-        bugp("Cannot open file '%s'", file);
+    {
+        if(g_debug)
+            perror("Cannot open db file");
+        return NULL;
+    }
     fseek(f, 0, SEEK_END);
     size = ftell(f);
     fseek(f, 0, SEEK_SET);
     char *buf = xmalloc(size);
     if(fread(buf, size, 1, f) != 1)
-        bugp("Cannot read file '%s'", file);
+    {
+        if(g_debug)
+            perror("Cannot read db file");
+        return NULL;
+    }
     fclose(f);
 
     if(g_debug)

@@ -122,7 +122,10 @@ static void compute_sb_offsets(struct sb_file_t *sb)
                 sec->sec_size += ROUND_UP(inst->size, BLOCK_SIZE) / BLOCK_SIZE;
             }
             else
-                bug("die on inst %d\n", inst->inst);
+            {
+                if(g_debug)
+                    printf("die on inst %d\n", inst->inst);
+            }
         }
         /* we need to make sure next section starts on the right alignment.
          * Since each section starts with a boot tag, we thus need to ensure
@@ -299,7 +302,8 @@ void produce_sb_instruction(struct sb_inst_t *inst,
         case SB_INST_NOP:
             break;
         default:
-            bug("die\n");
+            if(g_debug)
+                printf("die on invalid inst %d\n", inst->inst);
     }
     cmd->hdr.checksum = instruction_checksum(&cmd->hdr);
 }
@@ -438,7 +442,11 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename)
     write(final_sig, 32);
 
     if(buf_p - buf != sb_hdr.image_size * BLOCK_SIZE)
-        bug("SB image buffer was not entirely filled !");
+    {
+        if(g_debug)
+            printf("SB image buffer was not entirely filled !");
+        return SB_ERROR;
+    }
     
     FILE *fd = fopen(filename, "wb");
     if(fd == NULL)
@@ -833,7 +841,7 @@ struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
             struct crypto_key_t k;
             char *env = getenv("SB_REAL_KEY");
             if(!parse_key(&env, &k) || *env)
-                bug("Invalid SB_REAL_KEY\n");
+                fatal(SB_ERROR, "Invalid SB_REAL_KEY\n");
             memcpy(real_key, k.u.key, 16);
         }
 
