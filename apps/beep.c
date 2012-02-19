@@ -27,7 +27,7 @@
 #include "misc.h"
 
 /** Beep generation, CPU optimized **/
-#include "../firmware/asm/beep.c"
+#include "asm/beep.c"
 
 static uint32_t beep_phase;     /* Phase of square wave generator */
 static uint32_t beep_step;      /* Step of square wave generator on each sample */

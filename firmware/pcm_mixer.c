@@ -271,7 +271,9 @@ void mixer_channel_play_data(enum pcm_mixer_channel channel,
     {
         /* Initial buffer not passed - call the callback now */
         pcm_play_lock();
-        mixer_deactivate_channel(chan); /* Protect chan struct if active */
+        mixer_deactivate_channel(chan); /* Protect chan struct if active;
+                                           may also be same callback which
+                                           must not be reentered */
         pcm_play_unlock(); /* Allow playback while doing callback */
 
         size = 0;
