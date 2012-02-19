@@ -231,7 +231,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
             }
 #endif
             struct skin_element** children = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->children);
-            skin_render_viewport(children[0],
+            skin_render_viewport(SKINOFFSETTOPTR(get_skin_buffer(wps.data), (intptr_t)children[0]),
                                  &wps, skin_viewport, SKIN_REFRESH_ALL);
 #ifdef HAVE_LCD_BITMAP
             wps_display_images(&wps, &skin_viewport->vp);
