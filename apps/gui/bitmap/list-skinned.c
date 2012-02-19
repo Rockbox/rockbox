@@ -188,8 +188,8 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
         {
             int origional_x, origional_y;
             int origional_w, origional_h;
+            skin_viewport = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->data);
             char *viewport_label = SKINOFFSETTOPTR(get_skin_buffer(wps.data), skin_viewport->label);
-            skin_viewport = (struct skin_viewport*)viewport->data;
             if (viewport->children == 0 || !viewport_label ||
                 (skin_viewport->label && strcmp(label, viewport_label))
                 )
