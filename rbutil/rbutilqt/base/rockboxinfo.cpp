@@ -21,10 +21,10 @@
 #include <QtCore>
 #include <QDebug>
 
-RockboxInfo::RockboxInfo(QString mountpoint)
+RockboxInfo::RockboxInfo(QString mountpoint, QString fname)
 {
-    qDebug() << "[RockboxInfo] trying to find rockbox-info at" << mountpoint;
-    QFile file(mountpoint + "/.rockbox/rockbox-info.txt");
+    qDebug() << "[RockboxInfo] Getting version info from rockbox-info.txt";
+    QFile file(mountpoint + "/" + fname);
     m_success = false;
     if(!file.exists())
         return;

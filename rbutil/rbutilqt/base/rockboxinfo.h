@@ -27,7 +27,7 @@
 class RockboxInfo
 {
 public:
-    RockboxInfo(QString mountpoint);
+    RockboxInfo(QString mountpoint, QString fname = "/.rockbox/rockbox-info.txt");
 
     QString version() {return m_version;}
     QString features(){return m_features;}
