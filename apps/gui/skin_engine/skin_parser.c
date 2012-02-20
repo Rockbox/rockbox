@@ -1179,7 +1179,10 @@ static int parse_skinvar(  struct skin_element *element,
             if (!data)
                 return WPS_ERROR_INVALID_PARAM;
             data->var = PTRTOSKINOFFSET(skin_buffer, var);
-            data->newval = get_param(element, 2)->data.number;
+            if (!isdefault(get_param(element, 2)))
+                data->newval = get_param(element, 2)->data.number;
+            else if (strcmp(get_param_text(element, 1), "touch"))
+                return WPS_ERROR_INVALID_PARAM;
             data->max = 0;
             if (!strcmp(get_param_text(element, 1), "set"))
                 data->direct = true;
@@ -1191,6 +1194,11 @@ static int parse_skinvar(  struct skin_element *element,
             {
                 data->direct = false;
                 data->newval *= -1;
+            }
+            else if (!strcmp(get_param_text(element, 1), "touch"))
+            {
+                data->direct = false;
+                data->newval = 0;
             }
             if (element->params_count > 3)
                 data->max = get_param(element, 3)->data.number;
