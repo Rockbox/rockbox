@@ -34,8 +34,8 @@ size_t pcmbuf_init(unsigned char *bufend);
 void pcmbuf_play_start(void);
 void pcmbuf_play_stop(void);
 void pcmbuf_pause(bool pause);
-void pcmbuf_monitor_track_change(bool monitor);
-void pcmbuf_sync_position_update(void);
+
+/* Track change */
 
 /* Track change origin type */
 enum pcm_track_change_type
@@ -45,6 +45,7 @@ enum pcm_track_change_type
     TRACK_CHANGE_AUTO,         /* Automatic change (from codec) */
     TRACK_CHANGE_END_OF_DATA,  /* Expect no more data (from codec) */
 };
+void pcmbuf_monitor_track_change(bool monitor);
 void pcmbuf_start_track_change(enum pcm_track_change_type type);
 
 /* Crossfade */
@@ -62,22 +63,23 @@ static FORCE_INLINE bool pcmbuf_is_same_size(void)
     { return true; }
 #endif
 
-/* Voice */
-void *pcmbuf_request_voice_buffer(int *count);
-void pcmbuf_write_voice_complete(int count);
-
 /* Debug menu, other metrics */
 size_t pcmbuf_free(void);
 size_t pcmbuf_get_bufsize(void);
-int pcmbuf_descs(void);
 int pcmbuf_used_descs(void);
-unsigned int pcmbuf_get_position_key(void);
+int pcmbuf_descs(void);
 
-/* Misc */
+/* Fading and channel volume control */
 void pcmbuf_fade(bool fade, bool in);
 bool pcmbuf_fading(void);
 void pcmbuf_soft_mode(bool shhh);
+
+/* Time and position */
+unsigned int pcmbuf_get_position_key(void);
+void pcmbuf_sync_position_update(void);
+
+/* Misc */
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_set_low_latency(bool state);
 
-#endif
+#endif /* PCMBUF_H */

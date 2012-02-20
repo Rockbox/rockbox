@@ -1275,6 +1275,23 @@ void pcmbuf_soft_mode(bool shhh)
 }
 
 
+/** Time and position */
+
+/* Return the current position key value */
+unsigned int pcmbuf_get_position_key(void)
+{
+    return position_key;
+}
+
+/* Set position updates to be synchronous and immediate in addition to during
+   PCM frames - cancelled upon first codec insert or upon stopping */
+void pcmbuf_sync_position_update(void)
+{
+    pcmbuf_sync_position = true;
+}
+
+
+
 /** Misc */
 
 bool pcmbuf_is_lowdata(void)
@@ -1290,17 +1307,4 @@ bool pcmbuf_is_lowdata(void)
 void pcmbuf_set_low_latency(bool state)
 {
     low_latency_mode = state;
-}
-
-/* Return the current position key value */
-unsigned int pcmbuf_get_position_key(void)
-{
-    return position_key;
-}
-
-/* Set position updates to be synchronous and immediate in addition to during
-   PCM frames - cancelled upon first codec insert or upon stopping */
-void pcmbuf_sync_position_update(void)
-{
-    pcmbuf_sync_position = true;
 }
