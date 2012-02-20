@@ -274,7 +274,6 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #endif /* HAVE_LCD_BITMAP */
 #ifdef HAVE_SKIN_VARIABLES
         case SKIN_TOKEN_VAR_SET:
-            if (do_refresh)
             {
                 struct skin_var_changer *data = SKINOFFSETTOPTR(skin_buffer, token->value.data);
                 struct skin_var *var = SKINOFFSETTOPTR(skin_buffer, data->var);
