@@ -54,6 +54,7 @@
 #include <tlhelp32.h>
 #endif
 #if defined(Q_OS_MACX)
+#include <Carbon/Carbon.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
 #include <IOKit/IOKitLib.h>
@@ -643,10 +644,36 @@ QStringList Utils::findRunningProcess(QStringList names)
         }
     } while(result);
     CloseHandle(hdl);
-    qDebug() << processlist;
 #endif
 #if defined(Q_OS_MACX)
+    ProcessSerialNumber psn = { 0, kNoProcess };
+    OSErr err;
+    do {
+        pid_t pid;
+        err = GetNextProcess(&psn);
+        err = GetProcessPID(&psn, &pid);
+        if(err == noErr) {
+            char buf[32] = {0};
+            ProcessInfoRec info;
+            memset(&info, 0, sizeof(ProcessInfoRec));
+            info.processName = (unsigned char*)buf;
+            info.processInfoLength = sizeof(ProcessInfoRec);
+            err = GetProcessInformation(&psn, &info);
+            if(err == noErr) {
+                // some processes start with nonprintable characters. Skip those.
+                int i;
+                for(i = 0; i < 32; i++) {
+                    if(isprint(buf[i])) break;
+                }
+                // avoid adding duplicates.
+                QString process = QString::fromUtf8(&buf[i]);
+                if(!processlist.contains(process)) {
+                    processlist.append(process);
+                }
 
+            }
+        }
+    } while(err == noErr);
 #endif
     // check for given names in list of processes
     for(int i = 0; i < names.size(); ++i) {
