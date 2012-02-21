@@ -36,11 +36,12 @@ these markers:
       \emph{+ } & There are nodes after the current node in the SGF tree. \\
       \emph{* } & There are sibling variations which can be navigated to using the %
       \emph{Next Variation} menu option of the \emph{Context Menu}%
-      \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,%
+      \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,%
          RECORDER_PAD,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,%
-         IRIVER_H300_PAD,PBELL_VIBE500_PAD,MPIO_HD200_PAD}{ or the %
+         IRIVER_H300_PAD,PBELL_VIBE500_PAD,MPIO_HD200_PAD,SANSA_FUZEPLUS_PAD}{ or the %
+         \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomRight}%
          \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}%
-         \opt{SANSA_FUZE_PAD,SANSA_CLIP_PAD}{\ButtonHome}%
+         \opt{SANSA_CLIP_PAD}{\ButtonHome}%
          \opt{RECORDER_PAD}{\ButtonOn}%
          \opt{MROBE100_PAD}{\ButtonPower}%
          \opt{GIGABEAT_PAD}{\ButtonA}%
@@ -133,6 +134,7 @@ these markers:
             \opt{IRIVER_H10_PAD}{\ButtonFF}%
             \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
             \opt{MROBE100_PAD}{\ButtonMenu}%
+            \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}%
             \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
             \opt{RECORDER_PAD}{\ButtonFOne}
             \opt{touchscreen}{\TouchBottomLeft}
@@ -149,7 +151,7 @@ these markers:
                 ,GIGABEAT_S_PAD}{\ButtonVolUp}%
             \opt{IRIVER_H10_PAD}{\ButtonRew}%
             \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
-            \opt{MROBE100_PAD}{\ButtonPlay}%
+            \opt{MROBE100_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}%
             \opt{IAUDIO_X5_PAD}{\ButtonRec}%
             \opt{RECORDER_PAD}{\ButtonFThree}
             \opt{touchscreen}{\TouchBottomRight}
@@ -163,7 +165,8 @@ these markers:
         }
         
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,SANSA_M200_PAD%
-            ,SANSA_C200_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD}{\ButtonPower}%
+            ,SANSA_C200_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD,SANSA_FUZEPLUS_PAD%
+            }{\ButtonPower}%
         \opt{MROBE100_PAD}{\ButtonDisplay}%
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{Long \ButtonSelect}%
         \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD,MPIO_HD300_PAD}%
@@ -182,12 +185,13 @@ these markers:
 %        \nopt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,ONDIO_PAD,RECORDER_PAD}{%
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
             ,IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
-            ,MPIO_HD200_PAD,PBELL_VIBE500_PAD,touchscreen}{% 
+            ,MPIO_HD200_PAD,PBELL_VIBE500_PAD,touchscreen,SANSA_FUZEPLUS_PAD}{% 
             \nopt{IRIVER_H10_PAD,touchscreen,PBELL_VIBE500_PAD,%
-                MPIO_HD200_PAD,MPIO_HD300_PAD}{Long \ButtonSelect}%
+                MPIO_HD200_PAD,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD}{Long \ButtonSelect}%
             \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
             \opt{touchscreen}{Long \TouchCenter}
             \opt{PBELL_VIBE500_PAD}{\ButtonOK}
+            \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomLeft}
             \opt{MPIO_HD200_PAD}{Long \ButtonFunc}
             \opt{MPIO_HD300_PAD}{Long \ButtonEnter}
                 &
@@ -199,7 +203,7 @@ these markers:
         
         \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,RECORDER_PAD,MROBE100_PAD%
             ,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_CLIP_PAD%
-            ,PBELL_VIBE500_PAD,MPIO_HD200_PAD,touchscreen}{%
+            ,PBELL_VIBE500_PAD,MPIO_HD200_PAD,touchscreen,SANSA_FUZEPLUS_PAD}{%
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
                 ,MPIO_HD200_PAD,MPIO_HD300_PAD}{\ButtonRec}%
             \opt{SANSA_FUZE_PAD,SANSA_CLIP_PAD}{\ButtonHome}%
@@ -209,6 +213,7 @@ these markers:
             \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
             \opt{touchscreen}{\TouchTopRight}%
             \opt{PBELL_VIBE500_PAD}{\ButtonCancel}%
+            \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomRight}%
                 &
             \opt{HAVEREMOTEKEYMAP}{
                 &}

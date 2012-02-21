@@ -11,7 +11,7 @@ by using \emph{Open with} from the \emph{Context Menu}
 \begin{btnmap}
     \opt{PLAYER_PAD}{\ButtonLeft}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-        ,SANSA_E200_PAD,SANSA_FUZE_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonUp}
+        ,SANSA_E200_PAD,SANSA_FUZE_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_FUZEPLUS_PAD}{\ButtonUp}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
     \opt{IRIVER_H10_PAD,MPIO_HD300_PAD}{\ButtonScrollUp}
     \opt{SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonVolUp}
@@ -27,7 +27,7 @@ by using \emph{Open with} from the \emph{Context Menu}
 
     \opt{PLAYER_PAD}{\ButtonRight}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-        ,SANSA_E200_PAD,SANSA_FUZE_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonDown}
+        ,SANSA_E200_PAD,SANSA_FUZE_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_FUZEPLUS_PAD}{\ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
     \opt{IRIVER_H10_PAD,MPIO_HD300_PAD}{\ButtonScrollDown}
     \opt{SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonVolDown}
@@ -69,47 +69,51 @@ by using \emph{Open with} from the \emph{Context Menu}
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
         ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD%
-        ,GIGABEAT_PAD,PBELL_VIBE500_PAD}{%
+        ,GIGABEAT_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonUp}
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollBack}
         \opt{SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonUp}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonUp}
+        \opt{SANSA_FUZEPLUS_PAD}{\ButtonVolUp}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One line up\\
     }
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
         ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD%
-        ,GIGABEAT_PAD,PBELL_VIBE500_PAD}{%
+        ,GIGABEAT_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonDown}
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd}
         \opt{SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonDown}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonDown}
+        \opt{SANSA_FUZEPLUS_PAD}{\ButtonVolDown}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One line down\\
     }
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,%
-        GIGABEAT_S_PAD}{
+        GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD}{
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonLeft}
         \opt{GIGABEAT_S_PAD}{\ButtonLeft}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonLeft}
+        \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomLeft}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One column left\\
     }
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,%
-        GIGABEAT_S_PAD}{
+        GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD}{
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRight}
         \opt{GIGABEAT_S_PAD}{\ButtonRight}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonRight}
+        \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomRight}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One column right\\
     }
 
     \opt{RECORDER_PAD,PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD%
         ,IRIVER_H10_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD%
-        ,MPIO_HD200_PAD,MPIO_HD300_PAD}{\ButtonPlay}
+        ,MPIO_HD200_PAD,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
     \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{GIGABEAT_PAD}{\ButtonA}
@@ -131,6 +135,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
+    \opt{SANSA_FUZEPLUS_PAD}{Long \ButtonSelect}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonDown+\ButtonSelect}
     \opt{COWON_D2_PAD}{\ButtonMenu+\ButtonPlus}
     \opt{SANSA_FUZE_PAD}{\ButtonUp+\ButtonSelect}
@@ -149,6 +154,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
     \opt{IAUDIO_X5_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_E200_PAD}{\ButtonSelect}
     \opt{SANSA_FUZE_PAD}{Long \ButtonSelect}
+    \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{COWON_D2_PAD}{\ButtonMenu{} / }%
     \opt{MPIO_HD200_PAD}{\ButtonFunc}
@@ -162,7 +168,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
-        ,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
+        ,GIGABEAT_PAD,MROBE100_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
     \opt{COWON_D2_PAD}{\ButtonPower{} / }%
