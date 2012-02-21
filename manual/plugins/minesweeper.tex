@@ -14,7 +14,7 @@ the location of a mine, it can be tagged to avoid accidentally
   \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu{} / \ButtonPlay{} / \ButtonLeft{} / \ButtonRight}
   \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
       ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
-      ,MROBE100_PAD,PBELL_VIBE500_PAD}
+      ,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
       {\ButtonUp{} / \ButtonDown{} / \ButtonLeft{} / \ButtonRight}
   \opt{IRIVER_H10_PAD}
       {\ButtonScrollUp{} / \ButtonScrollDown{} / \ButtonLeft{} / \ButtonRight}
@@ -24,14 +24,16 @@ the location of a mine, it can be tagged to avoid accidentally
        \opt{HAVEREMOTEKEYMAP}{& }
   & Move the cursor across the minefield \\
   %
-  \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack
+  \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZEPLUS_PAD}{
+     \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
+     \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomLeft / \ButtonBottomRight}
        \opt{HAVEREMOTEKEYMAP}{& }
   & Scroll through the entire minefield \\}%
   %
   \opt{RECORDER_PAD}{\ButtonFOne/\ButtonOn}
   \opt{ONDIO_PAD}{\ButtonMenu}
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn{} / \ButtonRec}
-  \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect}
+  \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_FUZEPLUS_PAD}{\ButtonSelect}
   \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}
   \opt{SANSA_E200_PAD}{\ButtonRec}
   \opt{SANSA_FUZE_PAD}{\ButtonScrollFwd}
@@ -52,7 +54,7 @@ the location of a mine, it can be tagged to avoid accidentally
   \opt{SANSA_C200_PAD}{Long \ButtonSelect{} / \ButtonVolUp}
   \opt{COWON_D2_PAD}{\TouchBottomLeft}
   \opt{PBELL_VIBE500_PAD}{\ButtonOK}
-  \opt{MPIO_HD300_PAD}{\ButtonPlay}
+  \opt{MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
   & Reveal the contents of the current square \\
   %
@@ -64,6 +66,7 @@ the location of a mine, it can be tagged to avoid accidentally
   \opt{SANSA_E200_PAD}{Long \ButtonRec}
   \opt{SANSA_FUZE_PAD}{\ButtonScrollBack}
   \opt{IRIVER_H10_PAD}{\ButtonRew+\ButtonPlay}
+  \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}
   \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
   \opt{COWON_D2_PAD}{\TouchBottomRight}
   \opt{MPIO_HD300_PAD}{\ButtonMenu}
@@ -72,7 +75,7 @@ the location of a mine, it can be tagged to avoid accidentally
   %
   \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
   \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-      ,MROBE100_PAD,COWON_D2_PAD}{\ButtonPower}
+      ,MROBE100_PAD,COWON_D2_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPower}
   \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
   \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
   \opt{GIGABEAT_S_PAD}{\ButtonBack}
