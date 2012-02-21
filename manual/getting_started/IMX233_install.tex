@@ -1,0 +1,77 @@
+% $Id: %
+
+In order to install the bootloader, you will need to download the following
+files:
+
+\begin{itemize}
+  \item An original firmware (OF) from \playerman's website:
+    \opt{fuzeplus}{
+      \url{http://forums.sandisk.com/t5/Fuze/bd-p/Fuzeplus}}
+
+  \item The bootloader:
+    \opt{fuzeplus}{\download{bootloader/sandisk-sansa/fuzeplus/bootloader-fuzeplus.sansa}}
+
+  \item The version of mkimxboot for your operating system from Rockbox's server:
+    \download{bootloader/sandisk-sansa/mkimxboot/}
+\end{itemize}
+
+\subsection{Bootloader installation from Windows}
+
+\begin{enumerate}
+
+\item Create a folder called ``rbinstall'' on your desktop, and then extract
+  the OF, the bootloader and mkimxboot into it.
+
+\item Open a new command prompt, and navigate to the ``rbinstall'' folder.
+
+\item Run mkimxboot.exe, passing according to the following syntax the name
+  of the OF and bootloader files that you downloaded, in addition to a name for
+  the output file and the option argument for dualboot.
+
+  % The following arguments to the code environment select the correct line out
+  % of the code block. This is necessary as using \opt{} in the code block would
+  % create unwanted empty lines.
+  \begin{code}[firstline=\opt{fuzeplus}{1},%
+               lastline=\opt{fuzeplus}{1}]
+    mkimxboot.exe -i firmware.sb -b bootloader-fuzeplus.sansa -o patched.sb -t dualboot
+  \end{code}
+
+  If mkimxboot.exe does not report success, then retry or abort.
+
+  \item Copy the output file (``patched.sb'' in the example given above) to the
+    root of the device and rename it to the same name as the OF file you downloaded earlier
+    \opt{fuzeplus}{(``firmware.sb''}  above).
+
+\end{enumerate}
+
+Please now go to \reference{ref:finish_install} to complete the installation procedure.
+
+\subsection{Bootloader installation from Mac OS X and Linux}
+
+\begin{enumerate}
+
+\item Create a folder called ``rbinstall'' in your home directory, and then
+  extract the OF, the bootloader and mkimxboot into it.
+
+\item Open a new terminal, and navigate to the ``rbinstall'' folder.
+
+\item Run mkimxboot, passing the name of the OF and bootloader files that you
+  downloaded, in addition to a name for the output file and the option argument
+  for dualboot.
+
+% See above for the code environment arguments explanation.
+  \begin{code}[firstline=\opt{fuzeplus}{1},%
+               lastline=\opt{fuzeplus}{1}]
+    ./mkimxboot -i firmware.sb -b bootloader-fuzeplus.sansa -o patched.sb -t dualboot
+
+  \end{code}
+
+  If mkimxboot does not report success, then retry or abort.
+
+\item Copy the output file (``patched.sb'' in the example given above) to the
+  root of the device and rename it to the same name as the OF file you downloaded earlier
+  \opt{fuzeplus}{(``firmware.sb''}  above).
+\end{enumerate}
+
+Please now go to \reference{ref:finish_install} to complete the installation procedure.
+
