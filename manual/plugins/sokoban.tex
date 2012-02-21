@@ -16,13 +16,14 @@ information about the level format, see
 \hline
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
     ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD%
-    ,SANSA_FUZE_PAD,SANSA_C200_PAD,PBELL_VIBE500_PAD}
+    ,SANSA_FUZE_PAD,SANSA_C200_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
     {\ButtonUp, \ButtonDown, }%
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu, \ButtonPlay, }%
 \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown, }%
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
     ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD%
-    ,SANSA_FUZE_PAD,SANSA_C200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD}
+    ,SANSA_FUZE_PAD,SANSA_C200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD%
+    ,SANSA_FUZEPLUS_PAD}
     {\ButtonLeft, \ButtonRight}
 \opt{COWON_D2_PAD}
     {\TouchTopMiddle, \TouchBottomMiddle, \TouchMidLeft, \TouchMidRight}
@@ -31,7 +32,8 @@ information about the level format, see
     & Move the ``sokoban'' up, down, left, or right\\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
-\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
+\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
+    ,SANSA_FUZEPLUS_PAD}{\ButtonPower}
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}
 \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
@@ -46,7 +48,7 @@ information about the level format, see
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonLeft}
     \opt{IRIVER_H10_PAD}{\ButtonPlay+\ButtonScrollDown}
-    \opt{GIGABEAT_PAD,SANSA_C200_PAD}{\ButtonVolDown}
+    \opt{GIGABEAT_PAD,SANSA_C200_PAD,SANSA_FUZEPLUS_PAD}{\ButtonVolDown}
     \opt{MROBE10_PAD}{\ButtonDisplay}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonSelect+\ButtonDown}
     \opt{GIGABEAT_S_PAD}{\ButtonPrev}
@@ -68,6 +70,7 @@ information about the level format, see
     \opt{COWON_D2_PAD}{\TouchTopRight}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonCancel}
     \opt{MPIO_HD300_PAD}{\ButtonPlay + \ButtonEnter}
+    \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Restart level \\
 }
@@ -77,7 +80,7 @@ information about the level format, see
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonUp}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonRight}
     \opt{IRIVER_H10_PAD}{\ButtonPlay+\ButtonScrollUp}
-    \opt{GIGABEAT_PAD,SANSA_C200_PAD}{\ButtonVolUp}
+    \opt{GIGABEAT_PAD,SANSA_C200_PAD,SANSA_FUZEPLUS_PAD}{\ButtonVolUp}
     \opt{GIGABEAT_S_PAD}{\ButtonNext}
     \opt{MROBE100_PAD}{\ButtonPlay}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}
@@ -90,10 +93,12 @@ information about the level format, see
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD}{\ButtonOn}
 \opt{ONDIO_PAD}{\ButtonMenu}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{\ButtonSelect}
+\opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,MROBE100_PAD%
+     ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}{\ButtonSelect}
 \opt{IRIVER_H10_PAD}{\ButtonRew}
 \opt{GIGABEAT_S_PAD}{\ButtonVolUp}
 \opt{COWON_D2_PAD}{\TouchTopRight}
+\opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomLeft}
 \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
 \opt{MPIO_HD300_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -110,6 +115,7 @@ information about the level format, see
 \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonLeft}
 \opt{COWON_D2_PAD}{\TouchBottomLeft}
+\opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomRight}
 \opt{PBELL_VIBE500_PAD}{\ButtonOK}
 \opt{MPIO_HD300_PAD}{\ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -118,7 +124,7 @@ information about the level format, see
 \multicolumn{2}{c}{\textbf{Solution playback}} \\
 \hline
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
-    ,MPIO_HD300_PAD}{\ButtonPlay}
+    ,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}
 \opt{ONDIO_PAD}{\ButtonMenu}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
@@ -128,7 +134,7 @@ information about the level format, see
     & Pause/resume \\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
     ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD%
-    ,SANSA_FUZE_PAD,SANSA_C200_PAD}
+    ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_FUZEPLUS_PAD}
     {\ButtonUp/\ButtonDown}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu/\ButtonPlay}
 \opt{IRIVER_H10_PAD,MPIO_HD300_PAD}{\ButtonScrollUp/\ButtonScrollDown}
@@ -137,7 +143,8 @@ information about the level format, see
     & Increase/decrease playback speed \\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,ONDIO_PAD%
     ,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD%
-    ,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD}
+    ,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%
+    ,SANSA_FUZEPLUS_PAD}
     {\ButtonLeft/\ButtonRight}
 \opt{COWON_D2_PAD}{\TouchMidLeft/\TouchMidRight}
 \opt{MPIO_HD300_PAD}{\ButtonRew/\ButtonFF}
@@ -145,7 +152,8 @@ information about the level format, see
     & Go backward/forward (while paused) \\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
-\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
+\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
+    ,SANSA_FUZEPLUS_PAD}{\ButtonPower}
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}
 \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
