@@ -543,6 +543,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
           {Long \ButtonOn}%
       \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,ONDA_VX777_PAD%
           ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS,PBELL_VIBE500_PAD%
+          ,SANSA_FUZEPLUS_PAD%
           }{\ButtonPower}%
       \opt{COWON_D2_PAD} {\ButtonPower{}, then \ButtonHold}%
       \opt{ONDA_VX777_PAD} {\ButtonPower{}}%
@@ -562,7 +563,8 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
       \opt{PLAYER_PAD}{From the Main Menu, select \textbf{Shutdown}}%
       \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
           ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS,COWON_D2_PAD%
-          ,PBELL_VIBE500_PAD,ONDA_VX777_PAD}{Long \ButtonPower}%
+          ,PBELL_VIBE500_PAD,ONDA_VX777_PAD,SANSA_FUZEPLUS_PAD%
+          }{Long \ButtonPower}%
           &
       \opt{HAVEREMOTEKEYMAP}{ 
           \opt{IRIVER_RC_H100_PAD}{Long \ButtonRCStop}%
@@ -639,7 +641,20 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
     when the \dap{} is turned off, press and hold the \ButtonRec{} button,
     and then press the \ButtonOn{} button.
     }
+  \opt{fuzeplus}
+    {
+    Rockbox has a dual-boot feature. To boot into the original firmware,
+    when the \dap{} is turned off, press and hold the \ButtonVolDown{} button,
+    and then press and hold the \ButtonPower{} button while keeping the
+    \ButtonVolDown{} button pressed. After 5 to 10 seconds the original
+    firmware should boot.
 
+    It is also possible to connect your \dap{} to your computer using the
+    original firmware. To do so you may press and hold the \ButtonVolDown{}
+    button and connect your device to the computer while keeping the
+    \ButtonVolDown{} button pressed. After 5 to 10 seconds the original
+    firmware should boot into USB mode.
+    }
   \opt{mpiohd200,mpiohd300}
     {
     Rockbox has a dual-boot feature. To boot into the original firmware,

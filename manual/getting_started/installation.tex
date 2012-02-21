@@ -100,7 +100,7 @@ follow the instructions at
 \end{description}
 }
 
-\opt{sansaAMS}{
+\opt{sansaAMS,fuzeplus}{
 \begin{description}  
   \item[DRM capability.] It is possible that installation of the bootloader
   may lead to you \emph{permanently} losing the ability to playback files
@@ -147,12 +147,15 @@ follow the instructions at
     is intended to be used for USB OTG connections only (digital cameras, memory
     sticks, etc.).
   }
-  \opt{sansa,e200v2,clipv1,clipv2}{
+  \opt{sansa,e200v2,clipv1,clipv2,fuzeplus}{
     \note{The following steps require you to change the setting in
     \setting{Settings $\rightarrow$ USB Mode} to \setting{MSC} from within the
     original firmware.}
 
-    \nopt{sansaAMS}{\warn{Never extract files to your \dap{} while it is in recovery mode.}}
+    \nopt{sansaAMS,fuzeplus}{
+        \warn{Never extract files to your \dap{} while it
+        is in recovery mode.}
+    }
   }
 
   \opt{fuze,fuzev2,clipplus}{
@@ -384,6 +387,21 @@ filesystem.\\*
   files using \fname{unzip}.
 }
 
+\opt{fuzeplus}{
+  Rockbox Utility will ask you for a compatible copy of the original
+  firmware. This is because for legal reasons we cannot distribute
+  the bootloader directly. Instead, we have to patch the \playerman{}
+  firmware with the Rockbox bootloader.
+
+  Download a supported version of the \playerman{} firmware for your
+  \playername{} from the \playerman{} website, links can be found on
+  \wikilink{SansaFuzePlusPort}.
+  \note{Although the only tested version of the original firmware is 02.38.6,
+    Rockbox Utility should be able to patch any newer version.}
+  \note{If the file that you downloaded is a \fname{.zip} file, use an unzip
+    utility like mentioned in the prerequisites section to extract the
+    \fname{firmware.sb} from the \fname{.zip} file to your desktop.}
+}
 \subsubsection{Choosing a Rockbox version}\label{sec:choosing_version}
 
 There are three different versions of Rockbox available from the
@@ -450,14 +468,14 @@ data partition.}}
 correct version for your \dap{}.}}
 
 \item Connect your \dap{} to the computer via USB 
-  \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500}{ in MSC mode }
+  \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500,fuzeplus}{ in MSC mode }
   \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }as described in
   the manual that came with your \dap{}.
 
 \item Take the \fname{.zip} file that you downloaded and use
  the ``Extract all'' command of your unzip program to extract 
- the files onto%
- \opt{gigabeats}{the main data partition of }
+ the files onto
+ \opt{gigabeats,fuzeplus}{the main data partition of }
  \opt{cowond2}{either an SD card or the internal memory of }
  \opt{ondavx777}{the MicroSD of }
  your \dap{}.
@@ -501,6 +519,7 @@ structure that Rockbox needs.\\}
         \opt{cowond2}{\input{getting_started/cowond2_install.tex}}
         \opt{vibe500}{\input{getting_started/vibe500_install.tex}}
         \opt{ondavx777}{\input{getting_started/ondavx777_install.tex}}
+        \opt{IMX233}{\input{getting_started/IMX233_install.tex}}
     }
 }
 
@@ -561,6 +580,24 @@ structure that Rockbox needs.\\}
   firmware update is complete the player will turn itself off. (The update
   firmware process usually takes a minute or so.). You are now ready to go.
 \end{itemize}
+}
+\opt{fuzeplus}{
+  \warn{Before proceeding further, make sure that your player's battery is enough charged.
+    Interrupting the next step due to a power failure most likely
+    will brick your \dap{}.
+  }
+  \note{If you are updating/reinstalling the bootloader on a previouslsy
+    rockbox installed bootloader you will need to boot into the original
+    firmware in order to perform the following step. See \reference{ref:Dualboot}
+    for details on how to do so
+  }
+  Update your \daps{} firmware with the patched bootloader. To do this,
+  safely eject /unmount your \dap{}. The update process should start
+  immediatly. The \playerman{} will display an animation indicating that the
+  firmware update is in progress with words: ``Updating Fuze+''.
+  Do \emph{not} interrupt this process. When the firmware update is complete the
+  player will restart (The update firmware process usually takes one to several
+  minutes.). You are now ready to go.
 }
 \opt{mpiohd200}{
   \begin{itemize}
@@ -664,7 +701,7 @@ The new build will be installed over your current build.\\
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
-\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,archos,mrobe100,gigabeats}{
+\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,archos,mrobe100,gigabeats,fuzeplus}{
   \note{The Rockbox bootloader allows you to choose between Rockbox and 
   the original firmware. (See \reference{ref:Dualboot} for more information.)}
 }
@@ -676,7 +713,7 @@ You can uninstall Rockbox automatically by using Rockbox Utility. If you
 installed Rockbox manually you can still use Rockbox Utility for uninstallation
 but will not be able to do this selectively.
 
-\opt{iriverh100,iriverh300}{\note{Rockbox Utility cannot uninstall the bootloader due to
+\opt{iriverh100,iriverh300,fuzeplus}{\note{Rockbox Utility cannot uninstall the bootloader due to
 the fact that it requires a flashing procedure. To uninstall the bootloader
 completely follow the manual uninstallation instructions below.}}
 
@@ -755,9 +792,9 @@ completely follow the manual uninstallation instructions below.}}
     }
 }
 
-    \opt{sansaAMS}{
+    \opt{sansaAMS,fuzeplus}{
       Copy an unmodified original firmware to your player, and then reboot into 
-      the Sandisk firmware.  
+      the Sandisk firmware. See \reference{ref:Dualboot} for more information.
 }
 
 \opt{mpiohd200}{
@@ -805,6 +842,15 @@ completely follow the manual uninstallation instructions below.}}
   please ensure that you are either logged in as an administrator (Windows), or
   you have root rights (Linux)}
 
+\opt{fuzeplus}{
+  \item[Immediately loading original firmware.]
+  If the original firmware is immediately loaded without going into updating
+  the firmware, then the Rockbox bootloader has not been correctly installed.
+  The original firmware will only perform the update if the filename is
+  correct, including case. Make sure that the patched Sansa firmware is called
+  \fname{firmware.sb} and present in the root directory of your player.
+}
+
 \opt{iriverh100,iriverh300}{
   \item[Immediately loading original firmware.]
   If the original firmware is immediately
@@ -847,7 +893,7 @@ then you can try generating \fname{rockbox.tar} instead of
 \begin{code}
     make tar
 \end{code}
-and copying it to the data partition.  During the next boot, the bootloader
+and copying it to the data partition. During the next boot, the bootloader
 will extract it.
 \end{itemize}
 }

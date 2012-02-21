@@ -111,6 +111,7 @@ your WPS (While Playing Screen).
           \opt{PLAYER_PAD}{\ButtonMenu+\ButtonStop}
           \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
           \opt{SANSA_CLIP_PAD}{\ButtonHome+\ButtonSelect}
+          \opt{SANSA_FUZEPLUS_PAD}{\ButtonPower}
           & Key lock (software hold switch) on/off.\\
       }%
       %These actions need definitions for the other targets
@@ -125,7 +126,7 @@ your WPS (While Playing Screen).
       % on the 'pitchscreen' feature since some players have the feature but do
       % not have the button to go from the WPS to the pitch screen.
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
-	           ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+	           ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZEPLUS_PAD}{%
         \ActionWpsPitchScreen
         \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsPitchScreen}
           & Show \setting{Pitch Screen} (see \reference{sec:pitchscreen}).\\%
@@ -136,7 +137,7 @@ your WPS (While Playing Screen).
           & Show current \setting{Playlist}.\\%
       }%
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
-          ,SANSA_E200_PAD,SANSA_C200_PAD}{%
+          ,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZEPLUS_PAD}{%
         \ActionWpsIdThreeScreen 
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCWpsIdThreeScreen}
           & Enter \setting{ID3 Viewer}.\\%
@@ -271,7 +272,7 @@ all the identity information about the current track. This info is known as
 meta data and is stored in audio file formats to keep information on artist,
 album etc. To access this screen, %
 \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,%
-      SANSA_C200_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}{
+      SANSA_C200_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_FUZEPLUS_PAD}{
   press \ActionWpsIdThreeScreen. }%
 \opt{PLAYER_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IAUDIO_M3_PAD,%
       GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_CLIP_PAD,PBELL_VIBE500_PAD,%
