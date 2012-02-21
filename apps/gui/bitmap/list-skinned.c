@@ -67,7 +67,7 @@ static int current_drawing_line;
 static int offset_to_item(int offset, bool wrap)
 {
     int item = current_drawing_line + offset;
-    if (!current_list)
+    if (!current_list || current_list->nb_items == 0)
         return -1;
     if (item < 0)
     {
