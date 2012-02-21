@@ -831,8 +831,9 @@ static size_t crossfade_find_buftail(size_t buffer_rem, size_t buffer_need)
 }
 
 /* Returns the number of bytes _NOT_ mixed/faded */
-static int crossfade_mix_fade(int factor, size_t size, void *buf, size_t *out_index,
-                              unsigned long elapsed, off_t offset)
+static size_t crossfade_mix_fade(int factor, size_t size, void *buf,
+                                 size_t *out_index, unsigned long elapsed,
+                                 off_t offset)
 {
     if (size == 0)
         return 0;
