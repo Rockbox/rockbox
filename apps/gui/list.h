@@ -180,7 +180,7 @@ extern bool gui_synclist_do_button(struct gui_synclist * lists,
 #if defined(HAVE_LCD_BITMAP) && !defined(PLUGIN)
 struct listitem_viewport_cfg {
     struct wps_data *data;
-    char*   label;
+    OFFSETTYPE(char *)   label;
     int     width;
     int     height;
     int     xmargin;

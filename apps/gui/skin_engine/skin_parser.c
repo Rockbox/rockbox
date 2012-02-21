@@ -577,7 +577,7 @@ static int parse_listitemviewport(struct skin_element *element,
         return -1;
     cfg->data = wps_data;
     cfg->tile = false;
-    cfg->label = get_param_text(element, 0);
+    cfg->label = PTRTOSKINOFFSET(skin_buffer, get_param_text(element, 0));
     cfg->width = -1;
     cfg->height = -1;
     if (!isdefault(get_param(element, 1)))

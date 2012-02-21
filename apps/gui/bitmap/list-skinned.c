@@ -165,7 +165,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     wps.display = display;
     wps.data = listcfg[screen]->data;
     display_lines = skinlist_get_line_count(screen, list);
-    label = listcfg[screen]->label;
+    label = (char *)SKINOFFSETTOPTR(get_skin_buffer(wps.data), listcfg[screen]->label);
     display->set_viewport(parent);
     display->clear_viewport();
     current_item = list->selected_item;
