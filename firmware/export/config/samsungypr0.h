@@ -49,16 +49,9 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-/* LCD dimensions
- *
- * overriden by configure for application builds */
-#ifndef LCD_WIDTH
+/* LCD dimensions */
 #define LCD_WIDTH  240
-#endif
-
-#ifndef LCD_HEIGHT
 #define LCD_HEIGHT 320
-#endif
 
 #define LCD_DEPTH  16
 /* Check that but should not matter */

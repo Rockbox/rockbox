@@ -3284,7 +3284,6 @@ fi
     target_id=78
     modelname="samsungypr0"
     target="SAMSUNG_YPR0"
-    app_set_lcd_size 240 320
     memory=32
     uname=`uname`
     ypr0cc
