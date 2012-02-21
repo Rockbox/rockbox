@@ -165,9 +165,8 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         break;
 #ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_LIST_ITEM_CFG:
-            if (do_refresh)
-                skinlist_set_cfg(gwps->display->screen_type, 
-                                    SKINOFFSETTOPTR(skin_buffer, token->value.data));
+            skinlist_set_cfg(gwps->display->screen_type,
+                                SKINOFFSETTOPTR(skin_buffer, token->value.data));
             break;
         case SKIN_TOKEN_UIVIEWPORT_ENABLE:
             sb_set_info_vp(gwps->display->screen_type, token->value.data);
