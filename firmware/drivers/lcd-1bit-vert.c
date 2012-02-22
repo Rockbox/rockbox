@@ -39,12 +39,13 @@
 #define FBFN(fn)  fb_ ## fn
 #define LCDM(ma) LCD_ ## ma
 #define LCDNAME "lcd_"
+#define LCDFB(x,y) LCD_ADDR(x, y)
 #define MAIN_LCD
 #endif
 
 /*** globals ***/
-
-FBFN(data) LCDFN(framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)] IRAM_LCDFRAMEBUFFER;
+FBFN(data) LCDFN(static_framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)] IRAM_LCDFRAMEBUFFER;
+FBFN(data) *LCDFN(framebuffer) = &LCDFN(static_framebuffer)[0][0];
 
 static struct viewport default_vp =
 {
@@ -152,17 +153,17 @@ int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
 
 static void setpixel(int x, int y)
 {
-    LCDFN(framebuffer)[y>>3][x] |= BIT_N(y & 7);
+    *LCDFB(x,y>>3) |= BIT_N(y & 7);
 }
 
 static void clearpixel(int x, int y)
 {
-    LCDFN(framebuffer)[y>>3][x] &= ~BIT_N(y & 7);
+    *LCDFB(x,y>>3) &= ~BIT_N(y & 7);
 }
 
 static void flippixel(int x, int y)
 {
-    LCDFN(framebuffer)[y>>3][x] ^= BIT_N(y & 7);
+    *LCDFB(x,y>>3) ^= BIT_N(y & 7);
 }
 
 static void nopixel(int x, int y)
@@ -242,7 +243,7 @@ void LCDFN(clear_display)(void)
 {
     unsigned bits = (current_vp->drawmode & DRMODE_INVERSEVID) ? 0xFFu : 0;
 
-    memset(LCDFN(framebuffer), bits, sizeof LCDFN(framebuffer));
+    memset(LCDFN(framebuffer), bits, sizeof LCDFN(static_framebuffer));
     LCDFN(scroll_info).lines = 0;
 }
 
@@ -422,7 +423,7 @@ void LCDFN(hline)(int x1, int x2, int y)
     width = x2 - x1 + 1;
 
     bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
-    dst   = &LCDFN(framebuffer)[y>>3][x1];
+    dst   = LCDFB(x1,y>>3);
     mask  = BIT_N(y & 7);
 
     dst_end = dst + width;
@@ -478,7 +479,7 @@ void LCDFN(vline)(int x, int y1, int y2)
 #endif
 
     bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
-    dst   = &LCDFN(framebuffer)[y1>>3][x];
+    dst   = LCDFB(x,y1>>3);
     ny    = y2 - (y1 & ~7);
     mask  = 0xFFu << (y1 & 7);
     mask_bottom = 0xFFu >> (~ny & 7);
@@ -583,7 +584,7 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
         }
     }
     bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
-    dst   = &LCDFN(framebuffer)[y>>3][x];
+    dst   = LCDFB(x,y>>3);
     ny    = height - 1 + (y & 7);
     mask  = 0xFFu << (y & 7);
     mask_bottom = 0xFFu >> (~ny & 7);
@@ -696,7 +697,7 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     src    += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     y      -= src_y;
-    dst    = &LCDFN(framebuffer)[y>>3][x];
+    dst    = LCDFB(x,y>>3);
     shift  = y & 7;
     ny     = height - 1 + shift + src_y;
 
