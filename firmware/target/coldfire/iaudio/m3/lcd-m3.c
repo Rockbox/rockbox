@@ -295,7 +295,7 @@ void lcd_update_rect(int x, int y, int width, int height)
             lcd_write_command(LCD_SET_PAGE | ((y > 5 ? y + 2 : y) & 0xf));
             lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
 
-            lcd_write_data(&lcd_framebuffer[y][x], width);
+            lcd_write_data(LCD_ADDR(x,y), width);
         } 
     }
 }
