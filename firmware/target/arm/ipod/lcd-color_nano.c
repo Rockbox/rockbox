@@ -280,7 +280,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_setup_drawing_region(x, y, width, height);
 
-    addr = (unsigned long*)&lcd_framebuffer[y][x];
+    addr = (unsigned long*)FBADDR(x, y);
 
     while (height > 0) {
         int r, h, pixels_to_write;

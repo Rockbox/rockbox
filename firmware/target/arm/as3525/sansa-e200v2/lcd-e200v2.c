@@ -488,7 +488,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     lcd_window(x, y, x+width-1, y+height-1);
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    ptr = &lcd_framebuffer[y][x];
+    ptr = FBADDR(x,y);
 
     do
     {

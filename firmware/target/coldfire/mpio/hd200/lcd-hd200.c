@@ -187,7 +187,7 @@ void DMA3(void)
         lcd_write_command_e(LCD_SET_COLUMN | ((column >> 4) & 0xf), 
                             column & 0x0f);
 
-        SAR3 = (unsigned long)&lcd_framebuffer[page][column];
+        SAR3 = (unsigned long)FBADDR(column,page);
         BCR3 = dma_len;
         DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
              | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
@@ -261,7 +261,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     dma_count = ymax - y + 1;
 
     /* Initialize DMA transfer */
-    SAR3 = (unsigned long)&lcd_framebuffer[page][column];
+    SAR3 = (unsigned long)FBADDR(column,page);
     BCR3 = dma_len;
     DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
          | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)

@@ -327,7 +327,7 @@ void lcd_update_rect(int x0, int y0, int width, int height)
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
 
-    addr = (unsigned long*)&lcd_framebuffer[y0][x0];
+    addr = (unsigned long*)FBADDR(x0,y0);
 
     while (height > 0) {
         int c, r;

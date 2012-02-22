@@ -295,7 +295,7 @@ void lcd_update(void)
         LCD_WCMD = 0;
         LCD_WCMD = 0x22;
     }
-    for(p=&lcd_framebuffer[0][0], i=0;i<LCD_WIDTH*LCD_FBHEIGHT;++i, ++p) {
+    for(p=FBADDR(0,0), i=0;i<LCD_WIDTH*LCD_FBHEIGHT;++i, ++p) {
         while (LCD_STATUS & STAT_FULL);
         LCD_WDATA = RGB_UNPACK_RED(*p);
         while (LCD_STATUS & STAT_FULL);

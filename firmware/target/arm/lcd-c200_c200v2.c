@@ -395,7 +395,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 
-    addr = &lcd_framebuffer[y][x];
+    addr = FBADDR(x,y);
 
     if (width <= 1) {
         /* The X end address must be larger than the X start address, so we

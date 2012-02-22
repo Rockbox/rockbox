@@ -191,7 +191,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     for (py=y; py<pymax; py++)
     {
         for (px=x; px<pxmax; px++)
-            LCD_DATA = lcd_pixel_transform(lcd_framebuffer[py][px]);
+            LCD_DATA = lcd_pixel_transform(FBADDR(px,py));
     }
 }
 

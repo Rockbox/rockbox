@@ -447,13 +447,13 @@ void lcd_update_rect(int x, int y, int width, int height)
         if (width == LCD_WIDTH)
         {
             dma_count = 1;
-            SAR3 = (unsigned long)lcd_framebuffer[y];
+            SAR3 = (unsigned long)FBADDR(0, y);
             BCR3 = (LCD_WIDTH*sizeof(fb_data)) * height;
         }
         else
         {
             dma_count = height;
-            SAR3 = dma_addr = (unsigned long)&lcd_framebuffer[y][x];
+            SAR3 = dma_addr = (unsigned long)FBADDR(x,y);
             BCR3 = dma_len  = width * sizeof(fb_data);
         }
         DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)

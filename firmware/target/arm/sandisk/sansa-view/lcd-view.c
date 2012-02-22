@@ -363,7 +363,7 @@ void lcd_update(void)
 {
     const fb_data *addr;
 
-    addr = &lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
+    addr = FBADDR(LCD_WIDTH,LCD_HEIGHT);
 
     lcd_write_reg(0x20, 0x0);
     lcd_write_reg(0x21, 0x0);

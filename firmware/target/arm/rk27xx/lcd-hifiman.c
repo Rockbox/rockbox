@@ -162,7 +162,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     for (px=x; px<pxmax; px++)
 	for (py=y; py<pymax; py++)
-            lcd_data(lcd_framebuffer[py][px]);
+            lcd_data(FBADDR(px, py));
 }
 
 /* Blit a YUV bitmap directly to the LCD */

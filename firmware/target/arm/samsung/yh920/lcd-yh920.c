@@ -259,7 +259,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_reg(LCD_CNTL_PAGE, y);
         lcd_write_reg(LCD_CNTL_COLUMN, x);
 
-        addr = &lcd_framebuffer[y][x];
+        addr = FBADDR(x,y);
 
         lcd_send_cmd(LCD_CNTL_DATA_WRITE);
         lcd_write_data(addr, width);

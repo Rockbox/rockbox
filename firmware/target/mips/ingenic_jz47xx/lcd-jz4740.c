@@ -101,7 +101,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     dma_enable();
     
     REG_DMAC_DCCSR(DMA_LCD_CHANNEL) = DMAC_DCCSR_NDES;
-    REG_DMAC_DSAR(DMA_LCD_CHANNEL)  = PHYSADDR((unsigned long)&lcd_framebuffer[y][x]);
+    REG_DMAC_DSAR(DMA_LCD_CHANNEL)  = PHYSADDR((unsigned long)FBADDR(x,y));
     REG_DMAC_DRSR(DMA_LCD_CHANNEL)  = DMAC_DRSR_RS_SLCD;
     REG_DMAC_DTAR(DMA_LCD_CHANNEL)  = PHYSADDR(SLCD_FIFO);
     REG_DMAC_DTCR(DMA_LCD_CHANNEL)  = (width * height) >> 3;
@@ -195,7 +195,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     IPU_SET_Y_ADDR(PHYSADDR((unsigned long)yuv_src[0]));
     IPU_SET_U_ADDR(PHYSADDR((unsigned long)yuv_src[1]));
     IPU_SET_V_ADDR(PHYSADDR((unsigned long)yuv_src[2]));
-    IPU_SET_OUT_ADDR(PHYSADDR((unsigned long)&lcd_framebuffer[x][y]));
+    IPU_SET_OUT_ADDR(PHYSADDR((unsigned long)FBADDR(y,x)));
     
     IPU_SET_OUT_FM(height, width);
     IPU_SET_OUT_STRIDE(height);

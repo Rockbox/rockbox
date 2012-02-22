@@ -428,7 +428,7 @@ void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int pixels = width * height;
-    fb_data* p = &lcd_framebuffer[y][x];
+    fb_data* p = FBADDR(x,y);
     uint16_t* out = lcd_dblbuf[0];
     
 #ifdef HAVE_LCD_SLEEP

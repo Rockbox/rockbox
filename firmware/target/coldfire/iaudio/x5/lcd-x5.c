@@ -530,7 +530,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_begin_write_gram();
 
-    ptr = (unsigned short *)&lcd_framebuffer[y][x];
+    ptr = (unsigned short *)FBADDR(x,y);
 
     do
     {

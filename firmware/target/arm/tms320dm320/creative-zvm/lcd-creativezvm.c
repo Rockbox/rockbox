@@ -380,7 +380,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
-    src = &lcd_framebuffer[y][x];
+    src = FBADDR(x,y);
 
     /* Copy part of the Rockbox framebuffer to the second framebuffer */
     if (width < LCD_WIDTH)
@@ -394,7 +394,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
     }
 #else
-    src = &lcd_framebuffer[y][x];
+    src = FBADDR(x,y);
     
     register int xc, yc;
     register fb_data *start=FRAME + LCD_HEIGHT*(LCD_WIDTH-x-1) + y + 1;
@@ -419,7 +419,7 @@ void lcd_update(void)
     if (!lcd_on || direct_fb_access)
         return;
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
+    lcd_copy_buffer_rect((fb_data *)FRAME, FBADDR(0,0),
                          LCD_WIDTH*LCD_HEIGHT, 1);
 #else
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);

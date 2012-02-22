@@ -373,7 +373,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 
-    addr = &lcd_framebuffer[y][x];
+    addr = FBADDR(x,y);
 
     lcd_send_cmd(CASET);
     lcd_send_data(x);

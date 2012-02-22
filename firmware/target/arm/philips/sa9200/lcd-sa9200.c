@@ -495,8 +495,8 @@ void lcd_update(void)
     if (!display_on)
         return;
 
-    addr = &lcd_framebuffer[0][0];
-    end = &lcd_framebuffer[LCD_HEIGHT - 1][LCD_WIDTH];
+    addr = FBADDR(0,0);
+    end = FBADDR(LCD_WIDTH,LCD_HEIGHT - 1);
 
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (LCD_WIDTH - 1) << 8);
     lcd_write_reg(R_VERT_RAM_ADDR_POS, (LCD_HEIGHT - 1) << 8);
@@ -533,7 +533,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height <= 0)
         return; /* Nothing left to do. */
 
-    addr = &lcd_framebuffer[y][x];
+    addr = FBADDR(x,y);
 
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
     lcd_write_reg(R_VERT_RAM_ADDR_POS, ((y + height - 1) << 8) | y);

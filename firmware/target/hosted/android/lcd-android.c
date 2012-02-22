@@ -75,7 +75,7 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
 
     /* Create native_buffer */
     jobject buffer = (*env)->NewDirectByteBuffer(env, lcd_framebuffer,
-                                               (jlong) sizeof(lcd_framebuffer));
+                                               (jlong) FRAMEBUFFER_SIZE);
 
     /* we need to setup parts for the java object every time */
     (*env)->CallVoidMethod(env, fb_instance, java_lcd_init,
@@ -206,10 +206,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     linecounter = height >> 1;
 
 #if LCD_WIDTH >= LCD_HEIGHT
-    dst     = &lcd_framebuffer[y][x];
+    dst     = FBADDR(x,y);
     row_end = dst + width;
 #else
-    dst     = &lcd_framebuffer[x][LCD_WIDTH - y - 1];
+    dst     = FBADDR(LCD_WIDTH - y - 1,x);
     row_end = dst + LCD_WIDTH * width;
 #endif
 

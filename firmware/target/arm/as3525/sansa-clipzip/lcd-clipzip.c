@@ -426,7 +426,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     /* write to GRAM */
     for (row = y; row < y_end; row++) {
-        lcd_write_data(&lcd_framebuffer[row][x], width);
+        lcd_write_data(FBADDR(x,row), width);
     }
 }
 

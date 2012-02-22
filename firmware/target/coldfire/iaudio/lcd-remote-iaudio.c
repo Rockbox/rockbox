@@ -228,7 +228,7 @@ void lcd_remote_update(void)
                have to update one page at a time. */
             lcd_remote_write_command(LCD_SET_PAGE | (y > 5 ? y + 2 : y));
             lcd_remote_write_command_ex(LCD_SET_COLUMN | 0, 0);
-            lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
+            lcd_remote_write_data(FBREMOTEADDR(0, y), LCD_REMOTE_WIDTH);
         }
     }
 }
@@ -260,7 +260,7 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
             lcd_remote_write_command_ex(LCD_SET_COLUMN | ((x >> 4) & 0xf),
                                         x & 0xf);
 
-            lcd_remote_write_data(&lcd_remote_framebuffer[y][x], width);
+            lcd_remote_write_data(FBREMOTEADDR(x,y), width);
         }
     }
 }

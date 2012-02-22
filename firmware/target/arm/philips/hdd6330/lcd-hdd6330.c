@@ -285,7 +285,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_send_reg(LCD_REG_WRITE_DATA_2_GRAM);
 
-    addr = (unsigned long*)&lcd_framebuffer[y][x];
+    addr = (unsigned long*)FBADDR(x,y);
 
     while (height > 0)
     {
