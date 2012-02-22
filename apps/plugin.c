@@ -159,7 +159,7 @@ static const struct plugin_api rockbox_api = {
     lcd_icon,
     lcd_double_height,
 #else
-    &lcd_framebuffer[0][0],
+    &lcd_static_framebuffer[0][0],
     lcd_update_rect,
     lcd_set_drawmode,
     lcd_get_drawmode,

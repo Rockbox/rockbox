@@ -206,10 +206,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     linecounter = height >> 1;
 
 #if LCD_WIDTH >= LCD_HEIGHT
-    dst     = &lcd_framebuffer[y][x];
+    dst     = LCD_ADDR(x,y);
     row_end = dst + width;
 #else
-    dst     = &lcd_framebuffer[x][LCD_WIDTH - y - 1];
+    dst     = LCD_ADDR(LCD_WIDTH - y - 1,x);
     row_end = dst + LCD_WIDTH * width;
 #endif
 

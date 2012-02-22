@@ -271,6 +271,6 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_command(cmd1);
         lcd_write_command(cmd2);
 
-        lcd_write_data (&lcd_framebuffer[y][x], width);
+        lcd_write_data (LCD_ADDR(x,y), width);
     }
 }

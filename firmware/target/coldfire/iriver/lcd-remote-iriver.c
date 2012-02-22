@@ -346,6 +346,6 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
         lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | y);
         lcd_remote_write_command(LCD_REMOTE_CNTL_HIGHCOL | (((x+xoffset) >> 4) & 0xf));
         lcd_remote_write_command(LCD_REMOTE_CNTL_LOWCOL | ((x+xoffset) & 0xf));
-        lcd_remote_write_data(&lcd_remote_framebuffer[y][x], width);
+        lcd_remote_write_data(LCD_REMOTE_ADDR(x,y), width);
     }
 }

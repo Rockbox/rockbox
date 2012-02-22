@@ -214,7 +214,7 @@ void screen_dump(void)
 #endif
 #elif LCD_DEPTH == 16
             dst_end = dst + LCD_WIDTH;
-            src = lcd_framebuffer[y];
+            src = LCD_ADDR(0,y);
             
             do
             {

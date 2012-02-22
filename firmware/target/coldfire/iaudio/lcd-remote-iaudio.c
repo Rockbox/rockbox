@@ -260,7 +260,7 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
             lcd_remote_write_command_ex(LCD_SET_COLUMN | ((x >> 4) & 0xf),
                                         x & 0xf);
 
-            lcd_remote_write_data(&lcd_remote_framebuffer[y][x], width);
+            lcd_remote_write_data(LCD_REMOTE_ADDR(x,y), width);
         }
     }
 }

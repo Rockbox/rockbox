@@ -196,7 +196,7 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 static void setpixel(int x, int y)
 {
     unsigned mask = pixmask[y & 3];
-    fb_data *address = &lcd_framebuffer[y>>2][x];
+    fb_data *address = LCD_ADDR(x,y>>2);
     unsigned data = *address;
 
     *address = data ^ ((data ^ fg_pattern) & mask);
@@ -205,7 +205,7 @@ static void setpixel(int x, int y)
 static void clearpixel(int x, int y)
 {
     unsigned mask = pixmask[y & 3];
-    fb_data *address = &lcd_framebuffer[y>>2][x];
+    fb_data *address = LCD_ADDR(x,y>>2);
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask);
@@ -214,7 +214,7 @@ static void clearpixel(int x, int y)
 static void clearimgpixel(int x, int y)
 {
     unsigned mask = pixmask[y & 3];
-    fb_data *address = &lcd_framebuffer[y>>2][x];
+    fb_data *address = LCD_ADDR(x,y>>2);
     unsigned data = *address;
 
     *address = data ^ ((data ^ *(address + lcd_backdrop_offset)) & mask);
@@ -223,7 +223,7 @@ static void clearimgpixel(int x, int y)
 static void flippixel(int x, int y)
 {
     unsigned mask = pixmask[y & 3];
-    fb_data *address = &lcd_framebuffer[y>>2][x];
+    fb_data *address = LCD_ADDR(x,y>>2);
 
     *address ^= mask;
 }
@@ -589,7 +589,7 @@ void lcd_hline(int x1, int x2, int y)
     width = x2 - x1 + 1;
 
     bfunc = lcd_blockfuncs[current_vp->drawmode];
-    dst   = &lcd_framebuffer[y>>2][x1];
+    dst   = LCD_ADDR(x1,y>>2);
     mask  = pixmask[y & 3];
 
     dst_end = dst + width;
@@ -645,7 +645,7 @@ void lcd_vline(int x, int y1, int y2)
 #endif
 
     bfunc = lcd_blockfuncs[current_vp->drawmode];
-    dst   = &lcd_framebuffer[y1>>2][x];
+    dst   = LCD_ADDR(x,y1>>2);
     ny    = y2 - (y1 & ~3);
     mask  = 0xFFu << (2 * (y1 & 3));
     mask_bottom = 0xFFu >> (2 * (~ny & 3));
@@ -751,7 +751,7 @@ void lcd_fillrect(int x, int y, int width, int height)
         }
     }
     bfunc = lcd_blockfuncs[current_vp->drawmode];
-    dst   = &lcd_framebuffer[y>>2][x];
+    dst   = LCD_ADDR(x,y>>2);
     ny    = height - 1 + (y & 3);
     mask  = 0xFFu << (2 * (y & 3));
     mask_bottom = 0xFFu >> (2 * (~ny & 3));
@@ -863,7 +863,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     src    += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     y      -= src_y;
-    dst    = &lcd_framebuffer[y>>2][x];
+    dst    = LCD_ADDR(x,y>>2);
     shift  = y & 3;
     ny     = height - 1 + shift + src_y;
     mask   = 0xFFFFu << (2 * (shift + src_y));
@@ -1060,7 +1060,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     src   += stride * (src_y >> 2) + src_x; /* move starting point */
     src_y &= 3;
     y     -= src_y;
-    dst    = &lcd_framebuffer[y>>2][x];
+    dst    = LCD_ADDR(x,y>>2);
     shift  = y & 3;
     ny     = height - 1 + shift + src_y;
 

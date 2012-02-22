@@ -219,6 +219,6 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_command (LCD_CNTL_HIGHCOL | (((x+4) >> 4) & 0xf));
         lcd_write_command (LCD_CNTL_LOWCOL | ((x+4) & 0xf));
 
-        lcd_write_data (&lcd_framebuffer[y][x], width);
+        lcd_write_data (LCD_ADDR(x,y), width);
     }
 }
