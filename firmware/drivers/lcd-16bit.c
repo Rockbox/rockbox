@@ -41,7 +41,7 @@
 #define ROW_INC LCD_WIDTH
 #define COL_INC 1
 
-#define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
+#define LCDADDR(x, y) (LCD_ADDR(x,y))
 
 #include "lcd-16bit-common.c"
 
