@@ -35,9 +35,9 @@ enum fill_opt {
 };
 
 /*** globals ***/
-fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
+fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
     IRAM_LCDFRAMEBUFFER CACHEALIGN_AT_LEAST_ATTR(16);
-
+fb_data *lcd_framebuffer = &lcd_static_framebuffer[0][0];
 
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
@@ -234,7 +234,7 @@ void lcd_set_backdrop(fb_data* backdrop)
     lcd_backdrop = backdrop;
     if (backdrop)
     {
-        lcd_backdrop_offset = (long)backdrop - (long)&lcd_framebuffer[0][0];
+        lcd_backdrop_offset = (long)backdrop - (long)lcd_framebuffer;
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_backdrop;
     }
     else
@@ -1020,10 +1020,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     linecounter = height >> 1;
 
 #if LCD_WIDTH >= LCD_HEIGHT
-    dst     = &lcd_framebuffer[y][x];
+    dst     = LCDADDR(x, y);
     row_end = dst + width;
 #else
-    dst     = &lcd_framebuffer[x][LCD_WIDTH - y - 1];
+    dst     = LCDADDR(LCD_WIDTH - y - 1, x);
     row_end = dst + LCD_WIDTH * width;
 #endif
 
