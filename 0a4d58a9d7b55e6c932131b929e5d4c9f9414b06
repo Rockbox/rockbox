@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///7A\u003d",
+        "filename": "firmware/drivers/lcd-16bit-common.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1026,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-02-22T18:42:37Z",
+      "side": 1,
+      "message": "Is this correct?",
+      "revId": "0a4d58a9d7b55e6c932131b929e5d4c9f9414b06",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///68\u003d",
+        "filename": "firmware/target/hosted/sdl/lcd-bitmap.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-02-22T18:42:37Z",
+      "side": 1,
+      "message": "Is this correct? If it is why ifdefing?",
+      "revId": "0a4d58a9d7b55e6c932131b929e5d4c9f9414b06",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
