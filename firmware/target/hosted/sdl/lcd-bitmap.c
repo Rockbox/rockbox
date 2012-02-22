@@ -92,29 +92,25 @@ static unsigned long get_lcd_pixel(int x, int y)
 {
 #if LCD_DEPTH == 1
 #ifdef HAVE_NEGATIVE_LCD
-    return (lcd_framebuffer[y/8][x] & (1 << (y & 7))) ? (NUM_SHADES-1) : 0;
+    return (*FBADDR(x, y/8) & (1 << (y & 7))) ? (NUM_SHADES-1) : 0;
 #else
-    return (lcd_framebuffer[y/8][x] & (1 << (y & 7))) ? 0 : (NUM_SHADES-1);
+    return (*FBADDR(x, y/8) & (1 << (y & 7))) ? 0 : (NUM_SHADES-1);
 #endif
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    return colorindex[(lcd_framebuffer[y][x/4] >> (2 * (~x & 3))) & 3];
+    return colorindex[(*FBADDR(x/4, y) >> (2 * (~x & 3))) & 3];
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
-    return colorindex[(lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3];
+    return colorindex[(*FBADDR(x, y/4) >> (2 * (y & 3))) & 3];
 #elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
-    unsigned bits = (lcd_framebuffer[y/8][x] >> (y & 7)) & 0x0101;
+    unsigned bits = (*FBADDR(x, y/8) >> (y & 7)) & 0x0101;
     return colorindex[(bits | (bits >> 7)) & 3];
 #endif
 #elif LCD_DEPTH == 16
 #if LCD_PIXELFORMAT == RGB565SWAPPED
-    unsigned bits = lcd_framebuffer[y][x];
+    unsigned bits = *FBADDR(x, y);
     return (bits >> 8) | (bits << 8);
 #else
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-    return *(&lcd_framebuffer[0][0]+LCD_HEIGHT*x+y);
-#else
-    return lcd_framebuffer[y][x];
-#endif
+    return *FBADDR(x, y);
 #endif
 #endif
 }

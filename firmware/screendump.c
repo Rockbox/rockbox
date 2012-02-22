@@ -154,7 +154,7 @@ void screen_dump(void)
 
 #if LCD_DEPTH == 1
             dst_end = dst + LCD_WIDTH/2;
-            src = lcd_framebuffer[y >> 3];
+            src = FBADDR(0, y >> 3);
             mask = BIT_N(y & 7);
 
             do
@@ -173,7 +173,7 @@ void screen_dump(void)
             dst_end = dst + LCD_WIDTH/2;
 
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-            src = lcd_framebuffer[y];
+            src = FBADDR(0, y);
 
             do
             {
@@ -185,7 +185,7 @@ void screen_dump(void)
             while (dst < dst_end);
 
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
-            src = lcd_framebuffer[y >> 2];
+            src = FBADDR(0, y >> 2);
             shift = 2 * (y & 3);
 
             do
@@ -197,7 +197,7 @@ void screen_dump(void)
             while (dst < dst_end);
 
 #elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
-            src = lcd_framebuffer[y >> 3];
+            src = FBADDR(0, y >> 3);
             shift = y & 7;
 
             do
@@ -214,7 +214,7 @@ void screen_dump(void)
 #endif
 #elif LCD_DEPTH == 16
             dst_end = dst + LCD_WIDTH;
-            src = lcd_framebuffer[y];
+            src = FBADDR(0, y);
             
             do
             {
@@ -318,7 +318,7 @@ void remote_screen_dump(void)
 
 #if LCD_REMOTE_DEPTH == 1
         dst_end = dst + LCD_REMOTE_WIDTH/2;
-        src = lcd_remote_framebuffer[y >> 3];
+        src = FBREMOTEADDR(0, y >> 3);
         mask = BIT_N(y & 7);
 
         do
@@ -333,7 +333,7 @@ void remote_screen_dump(void)
         dst_end = dst + LCD_REMOTE_WIDTH/2;
 
 #if LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED
-        src = lcd_remote_framebuffer[y >> 3];
+        src = FBREMOTEADDR(0, (y >> 3));
         shift = y & 7;
 
         do

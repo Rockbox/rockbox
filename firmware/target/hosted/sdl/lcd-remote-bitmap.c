@@ -50,10 +50,10 @@ static const unsigned char colorindex[4] = {128, 85, 43, 0};
 static unsigned long get_lcd_remote_pixel(int x, int y)
 {
 #if LCD_REMOTE_DEPTH == 1
-    return lcd_remote_framebuffer[y/8][x] & (1 << (y & 7)) ? 0 : (NUM_SHADES-1);
+    return *FBREMOTEADDR(x, y/8) & (1 << (y & 7)) ? 0 : (NUM_SHADES-1);
 #elif LCD_REMOTE_DEPTH == 2
 #if LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED
-    unsigned bits = (lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 0x0101;
+    unsigned bits = (*FBREMOTEADDR(x, y/8) >> (y & 7)) & 0x0101;
     return colorindex[(bits | (bits >> 7)) & 3];
 #endif
 #endif

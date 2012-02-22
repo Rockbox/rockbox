@@ -40,13 +40,17 @@
 #define LCDFN(fn) lcd_ ## fn
 #define FBFN(fn)  fb_ ## fn
 #define LCDM(ma)  LCD_ ## ma
+#define FBSIZE FRAMEBUFFER_SIZE
 #define LCDNAME "lcd_"
+#define LCDFB(x,y) FBADDR(x, y)
 #define MAIN_LCD
 #endif
 
 /*** globals ***/
 
-FBFN(data) LCDFN(framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)] IRAM_LCDFRAMEBUFFER;
+FBFN(data) LCDFN(static_framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)] IRAM_LCDFRAMEBUFFER;
+FBFN(data) *LCDFN(framebuffer) = &LCDFN(static_framebuffer)[0][0];
+
 
 static const FBFN(data) patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
 
@@ -214,7 +218,7 @@ int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
 static void setpixel(int x, int y)
 {
     unsigned mask = 0x0101 << (y & 7);
-    FBFN(data) *address = &LCDFN(framebuffer)[y>>3][x];
+    FBFN(data) *address = LCDFB(x,y>>3);
     unsigned data = *address;
 
     *address = data ^ ((data ^ fg_pattern) & mask);
@@ -223,7 +227,7 @@ static void setpixel(int x, int y)
 static void clearpixel(int x, int y)
 {
     unsigned mask = 0x0101 << (y & 7);
-    FBFN(data) *address = &LCDFN(framebuffer)[y>>3][x];
+    FBFN(data) *address = LCDFB(x,y>>3);
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask);
@@ -232,7 +236,7 @@ static void clearpixel(int x, int y)
 static void clearimgpixel(int x, int y)
 {
     unsigned mask = 0x0101 << (y & 7);
-    FBFN(data) *address = &LCDFN(framebuffer)[y>>3][x];
+    FBFN(data) *address = LCDFB(x,y>>3);
     unsigned data = *address;
 
     *address = data ^ ((data ^ *(FBFN(data) *)((long)address
@@ -242,7 +246,7 @@ static void clearimgpixel(int x, int y)
 static void flippixel(int x, int y)
 {
     unsigned mask = 0x0101 << (y & 7);
-    FBFN(data) *address = &LCDFN(framebuffer)[y>>3][x];
+    FBFN(data) *address = LCDFB(x,y>>3);
 
     *address ^= mask;
 }
@@ -420,15 +424,15 @@ void LCDFN(clear_display)(void)
     if (default_vp.drawmode & DRMODE_INVERSEVID)
     {
         memset(LCDFN(framebuffer), patterns[default_vp.fg_pattern & 3],
-               sizeof LCDFN(framebuffer));
+               FBSIZE);
     }
     else
     {
         if (backdrop)
-            memcpy(LCDFN(framebuffer), backdrop, sizeof LCDFN(framebuffer));
+            memcpy(LCDFN(framebuffer), backdrop, FBSIZE);
         else
             memset(LCDFN(framebuffer), patterns[default_vp.bg_pattern & 3],
-                   sizeof LCDFN(framebuffer));
+                   FBSIZE);
     }
 
     LCDFN(scroll_info).lines = 0;
@@ -611,7 +615,7 @@ void LCDFN(hline)(int x1, int x2, int y)
     width = x2 - x1 + 1;
 
     bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
-    dst   = &LCDFN(framebuffer)[y>>3][x1];
+    dst   = LCDFB(x1,y>>3);
     mask  = 0x0101 << (y & 7);
 
     dst_end = dst + width;
@@ -667,7 +671,7 @@ void LCDFN(vline)(int x, int y1, int y2)
 #endif
 
     bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
-    dst   = &LCDFN(framebuffer)[y1>>3][x];
+    dst   = LCDFB(x,y1>>3);
     ny    = y2 - (y1 & ~7);
     mask  = (0xFFu << (y1 & 7)) & 0xFFu;
     mask |= mask << 8;
@@ -776,7 +780,7 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
         }
     }
     bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
-    dst   = &LCDFN(framebuffer)[y>>3][x];
+    dst   = LCDFB(x,y>>3);
     ny    = height - 1 + (y & 7);
     mask  = (0xFFu << (y & 7)) & 0xFFu;
     mask |= mask << 8;
@@ -890,7 +894,7 @@ void ICODE_ATTR LCDFN(mono_bitmap_part)(const unsigned char *src, int src_x,
     src    += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     y      -= src_y;
-    dst    = &LCDFN(framebuffer)[y>>3][x];
+    dst    = LCDFB(x,y>>3);
     shift  = y & 7;
     ny     = height - 1 + shift + src_y;
 
@@ -1058,7 +1062,7 @@ void ICODE_ATTR LCDFN(bitmap_part)(const FBFN(data) *src, int src_x,
     src   += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y &= 7;
     y     -= src_y;
-    dst    = &LCDFN(framebuffer)[y>>3][x];
+    dst    = LCDFB(x,y>>3);
     shift  = y & 7;
     ny     = height - 1 + shift + src_y;
 

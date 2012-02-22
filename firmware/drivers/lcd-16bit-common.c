@@ -35,9 +35,9 @@ enum fill_opt {
 };
 
 /*** globals ***/
-fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
+fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
     IRAM_LCDFRAMEBUFFER CACHEALIGN_AT_LEAST_ATTR(16);
-
+fb_data *lcd_framebuffer = &lcd_static_framebuffer[0][0];
 
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
@@ -234,7 +234,7 @@ void lcd_set_backdrop(fb_data* backdrop)
     lcd_backdrop = backdrop;
     if (backdrop)
     {
-        lcd_backdrop_offset = (long)backdrop - (long)&lcd_framebuffer[0][0];
+        lcd_backdrop_offset = (long)backdrop - (long)lcd_framebuffer;
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_backdrop;
     }
     else
@@ -271,7 +271,7 @@ void lcd_drawpixel(int x, int y)
         && ((unsigned)y < (unsigned)LCD_HEIGHT)
 #endif
         )
-        lcd_fastpixelfuncs[current_vp->drawmode](LCDADDR(current_vp->x+x, current_vp->y+y));
+        lcd_fastpixelfuncs[current_vp->drawmode](FBADDR(current_vp->x+x, current_vp->y+y));
 }
 
 /* Draw a line */
@@ -346,7 +346,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
             && ((unsigned)y < (unsigned)LCD_HEIGHT)
 #endif
             )
-            pfunc(LCDADDR(x + current_vp->x, y + current_vp->y));
+            pfunc(FBADDR(x + current_vp->x, y + current_vp->y));
 
         if (d < 0)
         {
@@ -459,7 +459,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     src += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     src_end = src + width;
-    dst_col = LCDADDR(x, y);
+    dst_col = FBADDR(x, y);
 
 
     if (drmode & DRMODE_INVERSEVID)
@@ -747,7 +747,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
         dmask = ~dmask;
     }
 
-    dst_row = LCDADDR(x, y);
+    dst_row = FBADDR(x, y);
 
     int col, row = height;
     unsigned data, pixels;
@@ -1020,10 +1020,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     linecounter = height >> 1;
 
 #if LCD_WIDTH >= LCD_HEIGHT
-    dst     = &lcd_framebuffer[y][x];
+    dst     = FBADDR(x, y);
     row_end = dst + width;
 #else
-    dst     = &lcd_framebuffer[x][LCD_WIDTH - y - 1];
+    dst     = FBADDR(LCD_WIDTH - y - 1, x);
     row_end = dst + LCD_WIDTH * width;
 #endif
 

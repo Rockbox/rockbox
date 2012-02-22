@@ -167,7 +167,7 @@ static void dma_lcd_copy_buffer_rect(int x, int y, int width, int height)
 
     /* Set source and destination addresses */
     dst = (char*)(FRAME + LCD_WIDTH*y + x);
-    src = (char*)(&lcd_framebuffer[y][x]);
+    src = (char*)(FBADDR(x,y));
  
     /* Flush cache to memory */
     commit_dcache();

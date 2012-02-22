@@ -340,10 +340,10 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
         if (pix_offset == -2)
-            lcd_write_data_shifted(&lcd_framebuffer[y][2*x], width);
+            lcd_write_data_shifted(FBADDR(2*x, y), width);
         else
 #endif
-            lcd_write_data(&lcd_framebuffer[y][2*x], width);
+            lcd_write_data(FBADDR(2*x, y), width);
     }
 }
 

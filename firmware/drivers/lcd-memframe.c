@@ -66,7 +66,7 @@ void lcd_update(void)
         return;
 
     /* Copy the Rockbox framebuffer to the second framebuffer */
-    lcd_copy_buffer_rect(LCD_FRAMEBUF_ADDR(0, 0), &lcd_framebuffer[0][0],
+    lcd_copy_buffer_rect(LCD_FRAMEBUF_ADDR(0, 0), FBADDR(0,0),
                          LCD_WIDTH*LCD_HEIGHT, 1);
 }
 #endif /* LCD_OPTIMIZED_UPDATE */
@@ -95,7 +95,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         return; /* nothing left to do */
 
     dst = LCD_FRAMEBUF_ADDR(x, y);
-    src = &lcd_framebuffer[y][x];
+    src = FBADDR(x,y);
 
     /* Copy part of the Rockbox framebuffer to the second framebuffer */
     if (width < LCD_WIDTH)

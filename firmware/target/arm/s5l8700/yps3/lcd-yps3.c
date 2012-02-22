@@ -306,7 +306,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_set_position1(x, y);
     
         for (h = 0; h < height; h++) {
-            p = &lcd_framebuffer[y][0];
+            p = FBADDR(0,y);
             for (w = 0; w < LCD_WIDTH; w++) {
                 while (LCD_STATUS & 0x10);
                 LCD_WDATA = *p++;
@@ -319,7 +319,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_set_position2(x, y);
     
         for (h = 0; h < height; h++) {
-            p = &lcd_framebuffer[y][x];
+            p = FBADDR(x,y);
             for (w = 0; w < width; w++) {
                 while (LCD_STATUS & 0x10);
                 LCD_WDATA = *p++;

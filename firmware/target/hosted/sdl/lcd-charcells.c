@@ -59,7 +59,7 @@ SDL_Color lcd_color_bright  = {RED_CMP(LCD_BRIGHTCOLOR),
 
 static unsigned long get_lcd_pixel(int x, int y)
 {
-    return sim_lcd_framebuffer[y][x];
+    return sim_FBADDR(x,y);
 }
 
 void sim_lcd_update_rect(int x_start, int y_start, int width, int height)

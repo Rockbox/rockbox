@@ -438,8 +438,8 @@ void lcd_init_device(void)
     lcd_controller_init();
 
     /* set framebuffer addresses */
-    fb = (uint32_t) &lcd_framebuffer[0][0];
-    fb_end = (uint32_t) &lcd_framebuffer[LCD_HEIGHT][0];
+    fb = (uint32_t) FBADDR(0,0);
+    fb_end = (uint32_t) FBADDR(0,LCD_HEIGHT);
     window = 2 * LCD_WIDTH;
 
     LCDB1SADDR1 = fb;

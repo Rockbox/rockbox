@@ -533,12 +533,12 @@ void lcd_update_rect(int x, int y, int w, int h)
      */
     if(w == LCD_WIDTH)
     {
-        memcpy((void *)FRAME, &lcd_framebuffer[y][x], w * h * sizeof(fb_data));
+        memcpy((void *)FRAME, FBADDR(x,y), w * h * sizeof(fb_data));
     }
     else
     {
         for(int i = 0; i < h; i++)
-            memcpy((fb_data *)FRAME + i * w, &lcd_framebuffer[y + i][x], w * sizeof(fb_data));
+            memcpy((fb_data *)FRAME + i * w, FBADDR(x,y + i), w * sizeof(fb_data));
     }
     /* WARNING The LCDIF has a limitation on the vertical count ! In 16-bit packed mode
      * (which we used, ie 16-bit per pixel, 2 pixels per 32-bit words), the v_count
@@ -599,10 +599,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     linecounter = height >> 1;
     
     #if LCD_WIDTH >= LCD_HEIGHT
-    dst     = &lcd_framebuffer[y][x];
+    dst     = FBADDR(x,y);
     row_end = dst + width;
     #else
-    dst     = &lcd_framebuffer[x][LCD_WIDTH - y - 1];
+    dst     = FBADDR(LCD_WIDTH - y - 1,x);
     row_end = dst + LCD_WIDTH * width;
     #endif
     

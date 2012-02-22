@@ -41,10 +41,7 @@
 #define ROW_INC LCD_WIDTH
 #define COL_INC 1
 
-#define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
-
 #include "lcd-16bit-common.c"
-
 #include "lcd-bitmap-common.c"
 
 /*** drawing functions ***/
@@ -54,7 +51,7 @@ void lcd_clear_viewport(void)
 {
     fb_data *dst, *dst_end;
 
-    dst = LCDADDR(current_vp->x, current_vp->y);
+    dst = FBADDR(current_vp->x, current_vp->y);
     dst_end = dst + current_vp->height * LCD_WIDTH;
 
     if (current_vp->drawmode & DRMODE_INVERSEVID)
@@ -173,7 +170,7 @@ void lcd_hline(int x1, int x2, int y)
     if (fillopt == OPT_NONE && current_vp->drawmode != DRMODE_COMPLEMENT)
         return;
 
-    dst = LCDADDR(x1, y);
+    dst = FBADDR(x1, y);
 
     switch (fillopt)
     {
@@ -241,7 +238,7 @@ void lcd_vline(int x, int y1, int y2)
         y2 = LCD_HEIGHT-1;
 #endif
 
-    dst = LCDADDR(x , y1);
+    dst = FBADDR(x , y1);
     dst_end = dst + (y2 - y1) * LCD_WIDTH;
 
     do
@@ -333,7 +330,7 @@ void lcd_fillrect(int x, int y, int width, int height)
     if (fillopt == OPT_NONE && current_vp->drawmode != DRMODE_COMPLEMENT)
         return;
 
-    dst = LCDADDR(x, y);
+    dst = FBADDR(x, y);
     dst_end = dst + height * LCD_WIDTH;
 
     do
@@ -426,7 +423,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 #endif
     
     src += stride * src_y + src_x; /* move starting point */
-    dst = LCDADDR(x, y);
+    dst = FBADDR(x, y);
 
     do
     {
@@ -500,7 +497,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
 #endif
 
     src += stride * src_y + src_x; /* move starting point */
-    dst = LCDADDR(x, y);
+    dst = FBADDR(x, y);
 
 #ifdef CPU_ARM
     {

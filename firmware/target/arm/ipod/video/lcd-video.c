@@ -410,7 +410,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     /* Prevent the tick from triggering BCM updates while we're writing. */
     lcd_block_tick();
 
-    addr = &lcd_framebuffer[y][x];
+    addr = FBADDR(x, y);
     bcmaddr = BCMA_CMDPARAM + (LCD_WIDTH*2) * y + (x << 1);
 
     if (width == LCD_WIDTH)

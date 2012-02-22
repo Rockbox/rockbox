@@ -500,12 +500,12 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (width < LCD_WIDTH)
     {
         /* Not full width - do line-by-line */
-        lcd_copy_buffer_rect(dst, &lcd_framebuffer[y][x], width, height);
+        lcd_copy_buffer_rect(dst, FBADDR(x,y), width, height);
     }
     else
     {
         /* Full width - copy as one line */
-        lcd_copy_buffer_rect(dst, &lcd_framebuffer[y][x], LCD_WIDTH*height, 1);
+        lcd_copy_buffer_rect(dst, FBADDR(x,y), LCD_WIDTH*height, 1);
     }
 #endif
 
@@ -519,7 +519,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 #else
     fb_data *src;
     fb_data *dst;
-    src     =  &lcd_framebuffer[0][0] + (x*LCD_HEIGHT + y);
+    src     =  FBADDR(0,0) + (x*LCD_HEIGHT + y);
     dst     =  FRAME + (LCD_HEIGHT*(LCD_WIDTH-1) - x * LCD_HEIGHT + y);
 
     while(width > 0) {
@@ -532,7 +532,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 #else
     register fb_data *dst, *src;
-    src = &lcd_framebuffer[y][x];
+    src = FBADDR(x,y);
 
     dst=FRAME + (LCD_NATIVE_WIDTH*(LCD_NATIVE_HEIGHT-1)) 
         - LCD_NATIVE_WIDTH*x + y ;

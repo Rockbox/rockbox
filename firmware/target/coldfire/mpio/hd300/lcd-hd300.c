@@ -211,7 +211,7 @@ void lcd_update(void)
     lcd_write_command(LCD_CNTL_DATA_WRITE);
 
     /* Copy display bitmap to hardware */
-    lcd_write_data (&lcd_framebuffer[0][0], LCD_WIDTH*LCD_FBHEIGHT);
+    lcd_write_data (FBADDR(0,0), LCD_WIDTH*LCD_FBHEIGHT);
 }
 
 /* Update a fraction of the display. */
@@ -238,6 +238,6 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_command_ex(LCD_CNTL_COLUMN, x, -1);
 
         lcd_write_command(LCD_CNTL_DATA_WRITE);
-        lcd_write_data (&lcd_framebuffer[y][x], width);
+        lcd_write_data (FBADDR(x,y), width);
     }
 }

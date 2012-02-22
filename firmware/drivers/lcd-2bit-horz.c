@@ -39,7 +39,8 @@
 
 /*** globals ***/
 
-unsigned char lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IRAM_LCDFRAMEBUFFER;
+unsigned char lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IRAM_LCDFRAMEBUFFER;
+unsigned char *lcd_framebuffer = &lcd_static_framebuffer[0][0];
 
 static const unsigned char pixmask[4] ICONST_ATTR = {
     0xC0, 0x30, 0x0C, 0x03
@@ -193,7 +194,7 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 static void setpixel(int x, int y)
 {
     unsigned mask = pixmask[x & 3];
-    fb_data *address = &lcd_framebuffer[y][x>>2];
+    fb_data *address = FBADDR(x>>2,y);
     unsigned data = *address;
 
     *address = data ^ ((data ^ fg_pattern) & mask);
@@ -202,7 +203,7 @@ static void setpixel(int x, int y)
 static void clearpixel(int x, int y)
 {
     unsigned mask = pixmask[x & 3];
-    fb_data *address = &lcd_framebuffer[y][x>>2];
+    fb_data *address = FBADDR(x>>2,y);
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask);
@@ -211,7 +212,7 @@ static void clearpixel(int x, int y)
 static void clearimgpixel(int x, int y)
 {
     unsigned mask = pixmask[x & 3];
-    fb_data *address = &lcd_framebuffer[y][x>>2];
+    fb_data *address = FBADDR(x>>2,y);
     unsigned data = *address;
 
     *address = data ^ ((data ^ *(address + lcd_backdrop_offset)) & mask);
@@ -220,7 +221,7 @@ static void clearimgpixel(int x, int y)
 static void flippixel(int x, int y)
 {
     unsigned mask =  pixmask[x & 3];
-    fb_data *address = &lcd_framebuffer[y][x>>2];
+    fb_data *address = FBADDR(x>>2,y);
     
     *address ^= mask;
 }
@@ -396,14 +397,14 @@ void lcd_clear_display(void)
 {
     if (current_vp->drawmode & DRMODE_INVERSEVID)
     {
-        memset(lcd_framebuffer, fg_pattern, sizeof lcd_framebuffer);
+        memset(lcd_framebuffer, fg_pattern, FRAMEBUFFER_SIZE);
     }
     else
     {
         if (lcd_backdrop)
-            memcpy(lcd_framebuffer, lcd_backdrop, sizeof lcd_framebuffer);
+            memcpy(lcd_framebuffer, lcd_backdrop, FRAMEBUFFER_SIZE);
         else
-            memset(lcd_framebuffer, bg_pattern, sizeof lcd_framebuffer);
+            memset(lcd_framebuffer, bg_pattern, FRAMEBUFFER_SIZE);
     }
 
     lcd_scroll_info.lines = 0;
@@ -583,7 +584,7 @@ void lcd_hline(int x1, int x2, int y)
 #endif
 
     bfunc = lcd_blockfuncs[current_vp->drawmode];
-    dst   = &lcd_framebuffer[y][x1>>2];
+    dst   = FBADDR(x1>>2,y);
     nx    = x2 - (x1 & ~3);
     mask  = 0xFFu >> (2 * (x1 & 3));
     mask_right = 0xFFu << (2 * (~nx & 3));
@@ -644,7 +645,7 @@ void lcd_vline(int x, int y1, int y2)
 #endif
         
     bfunc = lcd_blockfuncs[current_vp->drawmode];
-    dst   = &lcd_framebuffer[y1][x>>2];
+    dst   = FBADDR(x>>2,y1);
     mask  = pixmask[x & 3];
     
     dst_end = dst + (y2 - y1) * LCD_FBWIDTH;
@@ -729,7 +730,7 @@ void lcd_fillrect(int x, int y, int width, int height)
 #endif
 
     bfunc = lcd_blockfuncs[current_vp->drawmode];
-    dst   = &lcd_framebuffer[y][x>>2];
+    dst   = FBADDR(x>>2,y);
     nx    = width - 1 + (x & 3);
     mask  = 0xFFu >> (2 * (x & 3));
     mask_right = 0xFFu << (2 * (~nx & 3));
@@ -836,7 +837,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     src_y  &= 7;
     src_end = src + width;
     
-    dst = &lcd_framebuffer[y][x >> 2];
+    dst = FBADDR(x >> 2,y);
     dst_end = dst + height * LCD_FBWIDTH;
     dst_mask = pixmask[x & 3];
 
@@ -1050,7 +1051,7 @@ void ICODE_ATTR lcd_bitmap_part(const unsigned char *src, int src_x,
     src   += stride * src_y + (src_x >> 2); /* move starting point */
     src_x &= 3;
     x     -= src_x;
-    dst   = &lcd_framebuffer[y][x>>2];
+    dst   = FBADDR(x>>2,y);
     shift = x & 3;
     nx    = width - 1 + shift + src_x;
 
