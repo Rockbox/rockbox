@@ -227,11 +227,8 @@ TTSStatus TTSSapi::voice(QString text,QString wavfile, QString *errStr)
     *voicestream << query;
     *voicestream << "SYNC\tbla\r\n";
     voicestream->flush();
-    char temp[20];
-    
-    //we use this, because waitForReadyRead doesnt work from a different thread
-    while( voicescript->readLine(temp,20) == 0)
-        QCoreApplication::processEvents();
+    // do NOT poll the output with readLine(), this causes sync issues!
+    voicescript->waitForReadyRead();
 
     if(!QFileInfo(wavfile).isFile()) {
         qDebug() << "[TTSSapi] output file does not exist:" << wavfile;
