@@ -252,7 +252,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 
-    addr = &lcd_framebuffer[y][x];
+    addr = LCD_ADDR(x,y);
 
     if (width <= 1) {                    
         lcd_send_command(R_ENTRY_MODE);  /* The X end address must be larger */

@@ -26,7 +26,9 @@
 /* Compile 2 bit vertical interleaved LCD driver for remote LCD */
 #define LCDFN(fn) lcd_remote_ ## fn
 #define FBFN(fn)  fb_remote_ ## fn
+#define FBSIZE FRAMEBUFFER_REMOTE_SIZE
 #define LCDM(ma) LCD_REMOTE_ ## ma
+#define LCDFB(x,y) LCD_REMOTE_ADDR(x, y)
 #define LCDNAME "lcd_remote_"
 
 #include "lcd-2bit-vi.c"
