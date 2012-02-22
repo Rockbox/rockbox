@@ -39,7 +39,7 @@ fb_data *dev_fb = 0;
 void lcd_shutdown(void)
 {
     printf("FB closed.");
-    munmap(dev_fb, sizeof(lcd_framebuffer));
+    munmap(dev_fb, FRAMEBUFFER_SIZE);
     close(dev_fd);
 }
 
@@ -80,7 +80,7 @@ void lcd_init_device(void)
 
     /* Figure out the size of the screen in bytes */
     screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
-    if (screensize != sizeof(lcd_framebuffer))
+    if (screensize != FRAMEBUFFER_SIZE)
     {
         exit(4);
         perror("Display and framebuffer mismatch!\n");
