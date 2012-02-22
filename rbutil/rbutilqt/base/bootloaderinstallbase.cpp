@@ -209,10 +209,8 @@ QString BootloaderInstallBase::postinstallHints(QString model)
             "following steps manually:");
 
     msg += "<ol>";
-    msg += tr("<li>Safely remove your player.</li>");
-    if(model == "sansafuzeplus") {
-        msg += tr("<li>Remove any previously inserted microSD card</li>");
-        hint = true;
+    if(model != "sansafuzeplus") {
+        msg += tr("<li>Safely remove your player.</li>");
     }
     if(model == "h100" || model == "h120" || model == "h300" ||
        model == "ondavx747") {
@@ -228,6 +226,7 @@ QString BootloaderInstallBase::postinstallHints(QString model)
     }
     if(model == "sansafuzeplus") {
         hint = true;
+        msg += tr("<li>Remove any previously inserted microSD card</li>");
         msg += tr("<li>Disconnect your player. The player will reboot and "
                 "perform an update of the original firmware. "
                 "Please refer to your players manual on details.<br/>"
