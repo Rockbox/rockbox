@@ -212,7 +212,7 @@ QString BootloaderInstallBase::postinstallHints(QString model)
     if(model != "sansafuzeplus") {
         msg += tr("<li>Safely remove your player.</li>");
     }
-    if(model == "h100" || model == "h120" || model == "h300" ||
+    if(model == "iriverh100" || model == "iriverh120" || model == "iriverh300" ||
        model == "ondavx747") {
         hint = true;
         msg += tr("<li>Reboot your player into the original firmware.</li>"
