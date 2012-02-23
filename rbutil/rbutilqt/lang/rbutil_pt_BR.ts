@@ -36,8 +36,8 @@
         <translation>Para desinstalar, faça uma atualização normal com um firmware original não modificado</translation>
     </message>
     <message>
-        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>A instalação do inicializador requer que você forneça um arquivo de firmware do firmware original (arquivo bin). Você precisa baixar esse arquivo manualmente, devido a motivos legais. Por favor, consulte o &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; e a página wiki do &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; para saber como obter este arquivo.&lt;br/&gt;Pressione Ok para continuar e procure em seu computador pelo arquivo de firmware.</translation>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -91,10 +91,6 @@
         <translation>&lt;li&gt;Remova seu reprodutor de forma segura.&lt;/li&gt;</translation>
     </message>
     <message>
-        <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Reinicie seu reprodutor no firmware original.&lt;/li&gt;&lt;li&gt;Atualize o firmware usando as funcionalidades de atualização do firmware original. Por favor, consulte o manual do seu reprodutor para mais detalhes.&lt;/li&gt;&lt;li&gt;Após o firmware ter sido atualizado, reinicie seu reprodutor.&lt;/li&gt;</translation>
-    </message>
-    <message>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
         <translation>&lt;li&gt;Desligue o reprodutor&lt;/li&gt;&lt;li&gt;Insira o carregador&lt;/li&gt;</translation>
     </message>
@@ -118,6 +114,34 @@
         <source>Timeout on remount</source>
         <translation>Tempo de espera ao remontar</translation>
     </message>
+    <message>
+        <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Remove any previously inserted microSD card&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Disconnect your player. The player will reboot and perform an update of the original firmware. Please refer to your players manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before disconnecting the player.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zip file format detected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extracting firmware %1 from archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error extracting firmware from archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find firmware in archive</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BootloaderInstallChinaChip</name>
@@ -128,6 +152,58 @@
     <message>
         <source>Downloading bootloader file</source>
         <translation>Transferindo arquivo do inicializador</translation>
+    </message>
+    <message>
+        <source>Could not open firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open bootloader file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not allocate memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not load firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File is not a valid ChinaChip firmware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find ccpmp.bin in input file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open backup file for ccpmp.bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not write backup file for ccpmp.bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not load bootloader file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not get current time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not write output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unexpected error from chinachippatcher</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -298,6 +374,45 @@
     <message>
         <source>Uninstallation not possible, only installation info removed</source>
         <translation>A desistalação não é possível, apenas a remoção de informação de instalação</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallImx</name>
+    <message>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read original firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading bootloader file</source>
+        <translation type="unfinished">Transferindo arquivo do inicializador</translation>
+    </message>
+    <message>
+        <source>Patching file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Patching the original firmware failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Succesfully patched firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bootloader successful installed</source>
+        <translation type="unfinished">Inicializador instalado com sucesso</translation>
+    </message>
+    <message>
+        <source>Patched bootloader could not be installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -631,37 +746,10 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     </message>
 </context>
 <context>
-    <name>BrowseDirtreeFrm</name>
-    <message>
-        <source>Find Directory</source>
-        <translation>Encontrar Diretório</translation>
-    </message>
-    <message>
-        <source>Browse to the destination folder</source>
-        <translation>Navegar na pasta destino</translation>
-    </message>
-    <message>
-        <source>&amp;Ok</source>
-        <translation>&amp;Ok</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;Cancelar</translation>
-    </message>
-</context>
-<context>
     <name>Config</name>
     <message>
         <source>The following errors occurred:</source>
         <translation>Os seguintes erros ocorreram:</translation>
-    </message>
-    <message>
-        <source>Language changed</source>
-        <translation>Idioma modificado</translation>
-    </message>
-    <message>
-        <source>You need to restart the application for the changed language to take effect.</source>
-        <translation>Você precisa reiniciar a aplicação para que a mudança de idioma tenha efeito.</translation>
     </message>
     <message>
         <source>No mountpoint given</source>
@@ -706,10 +794,6 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <source>Configuration INVALID</source>
         <translation>Configuração INVÁLIDA</translation>
-    </message>
-    <message>
-        <source>Select your device</source>
-        <translation>Selecione seu dispositivo</translation>
     </message>
     <message>
         <source>Fatal error</source>
@@ -997,6 +1081,14 @@ You need to change your player to MSC mode for installation. </source>
         <source>Show disabled targets</source>
         <translation>Mostrar alvos desabilitados</translation>
     </message>
+    <message>
+        <source>&amp;Refresh</source>
+        <translation type="unfinished">&amp;Atualizar</translation>
+    </message>
+    <message>
+        <source>&amp;Use string corrections for TTS</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Configure</name>
@@ -1061,36 +1153,6 @@ You need to change your player to MSC mode for installation. </source>
     </message>
 </context>
 <context>
-    <name>EncExes</name>
-    <message>
-        <source>Path to Encoder:</source>
-        <translation>Caminho para o Codificador:</translation>
-    </message>
-    <message>
-        <source>Encoder options:</source>
-        <translation>Opções do codificador:</translation>
-    </message>
-</context>
-<context>
-    <name>EncRbSpeex</name>
-    <message>
-        <source>Volume:</source>
-        <translation>Volume:</translation>
-    </message>
-    <message>
-        <source>Quality:</source>
-        <translation>Qualidade:</translation>
-    </message>
-    <message>
-        <source>Complexity:</source>
-        <translation>Complexidade:</translation>
-    </message>
-    <message>
-        <source>Use Narrowband:</source>
-        <translation>Usar Banda Extreita:</translation>
-    </message>
-</context>
-<context>
     <name>EncTtsCfgGui</name>
     <message>
         <source></source>
@@ -1119,6 +1181,81 @@ You need to change your player to MSC mode for installation. </source>
     <message>
         <source>Select executable</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EncoderExe</name>
+    <message>
+        <source>Path to Encoder:</source>
+        <translation type="unfinished">Caminho para o Codificador:</translation>
+    </message>
+    <message>
+        <source>Encoder options:</source>
+        <translation type="unfinished">Opções do codificador:</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderLame</name>
+    <message>
+        <source>LAME</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find libmp3lame!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EncoderRbSpeex</name>
+    <message>
+        <source>Volume:</source>
+        <translation type="unfinished">Volume:</translation>
+    </message>
+    <message>
+        <source>Quality:</source>
+        <translation type="unfinished">Qualidade:</translation>
+    </message>
+    <message>
+        <source>Complexity:</source>
+        <translation type="unfinished">Complexidade:</translation>
+    </message>
+    <message>
+        <source>Use Narrowband:</source>
+        <translation type="unfinished">Usar Banda Extreita:</translation>
+    </message>
+</context>
+<context>
+    <name>InfoWidget</name>
+    <message>
+        <source>File</source>
+        <translation type="unfinished">Arquivo</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished">Versão</translation>
+    </message>
+</context>
+<context>
+    <name>InfoWidgetFrm</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
+        <translation type="unfinished">Pacotes instalados atualmente.&lt;br/&gt;&lt;b&gt;Nota:&lt;/b&gt; se você instalou pacotes manualmente, isto pode não estar correto!</translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished">1</translation>
     </message>
 </context>
 <context>
@@ -1342,6 +1479,68 @@ You need to change your player to MSC mode for installation. </source>
     </message>
 </context>
 <context>
+    <name>ManualWidget</name>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
+        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Manual PDF&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
+        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Manual HTML (abre em um navegador)&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Select a device for a link to the correct manual</source>
+        <translation type="unfinished">Selecione um dispositivo para uma ligação ao manual correto</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
+        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Visão Geral do Manual&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Confirm download</source>
+        <translation type="unfinished">Confirmar transferência</translation>
+    </message>
+    <message>
+        <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
+        <translation type="unfinished">Você realmente quer transferir o manual? O manual será salvo na pasta raiz do reprodutor.</translation>
+    </message>
+</context>
+<context>
+    <name>ManualWidgetFrm</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Read the manual</source>
+        <translation type="unfinished">Ler o manual</translation>
+    </message>
+    <message>
+        <source>PDF manual</source>
+        <translation type="unfinished">Manual PDF</translation>
+    </message>
+    <message>
+        <source>HTML manual</source>
+        <translation type="unfinished">Manual HTML</translation>
+    </message>
+    <message>
+        <source>Download the manual</source>
+        <translation type="unfinished">Transferência do manual</translation>
+    </message>
+    <message>
+        <source>&amp;PDF version</source>
+        <translation type="unfinished">Versão &amp;PDF</translation>
+    </message>
+    <message>
+        <source>&amp;HTML version (zip file)</source>
+        <translation type="unfinished">Versão &amp;HTML (arquivo zip)</translation>
+    </message>
+    <message>
+        <source>Down&amp;load</source>
+        <translation type="unfinished">Trans&amp;ferência</translation>
+    </message>
+</context>
+<context>
     <name>PreviewFrm</name>
     <message>
         <source>Preview</source>
@@ -1386,7 +1585,9 @@ You need to change your player to MSC mode for installation. </source>
     <name>QObject</name>
     <message>
         <source>LTR</source>
-        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
+        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.
+----------
+This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
         <translation>LTR</translation>
     </message>
     <message>
@@ -1407,14 +1608,6 @@ You need to change your player to MSC mode for installation. </source>
 </context>
 <context>
     <name>RbUtilQt</name>
-    <message>
-        <source>File</source>
-        <translation>Arquivo</translation>
-    </message>
-    <message>
-        <source>Version</source>
-        <translation>Versão</translation>
-    </message>
     <message>
         <source>Network error</source>
         <translation>Erro de rede</translation>
@@ -1438,22 +1631,6 @@ You need to change your player to MSC mode for installation. </source>
     <message>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; à&lt;b&gt;%3&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Manual PDF&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Manual HTML (abre em um navegador)&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <source>Select a device for a link to the correct manual</source>
-        <translation>Selecione um dispositivo para uma ligação ao manual correto</translation>
-    </message>
-    <message>
-        <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Visão Geral do Manual&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Confirm Installation</source>
@@ -1606,14 +1783,6 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
         <translation>Você realmente quer desinstalar o Inicializador?</translation>
     </message>
     <message>
-        <source>Confirm download</source>
-        <translation>Confirmar transferência</translation>
-    </message>
-    <message>
-        <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
-        <translation>Você realmente quer transferir o manual? O manual será salvo na pasta raiz do reprodutor.</translation>
-    </message>
-    <message>
         <source>Confirm installation</source>
         <translation>Confirmar Instalação</translation>
     </message>
@@ -1714,6 +1883,10 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
     <message>
         <source>Beginning Backup...</source>
         <translation type="unfinished">Iniciando Cópia de Segurança...</translation>
+    </message>
+    <message>
+        <source>Error reading firmware file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1877,44 +2050,8 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <translation>Visualizar e transferir o manual</translation>
     </message>
     <message>
-        <source>Read the manual</source>
-        <translation>Ler o manual</translation>
-    </message>
-    <message>
-        <source>PDF manual</source>
-        <translation>Manual PDF</translation>
-    </message>
-    <message>
-        <source>HTML manual</source>
-        <translation>Manual HTML</translation>
-    </message>
-    <message>
-        <source>Download the manual</source>
-        <translation>Transferência do manual</translation>
-    </message>
-    <message>
-        <source>&amp;PDF version</source>
-        <translation>Versão &amp;PDF</translation>
-    </message>
-    <message>
-        <source>&amp;HTML version (zip file)</source>
-        <translation>Versão &amp;HTML (arquivo zip)</translation>
-    </message>
-    <message>
-        <source>Down&amp;load</source>
-        <translation>Trans&amp;ferência</translation>
-    </message>
-    <message>
         <source>Inf&amp;o</source>
         <translation>Inf&amp;ormação</translation>
-    </message>
-    <message>
-        <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
-        <translation>Pacotes instalados atualmente.&lt;br/&gt;&lt;b&gt;Nota:&lt;/b&gt; se você instalou pacotes manualmente, isto pode não estar correto!</translation>
-    </message>
-    <message>
-        <source>1</source>
-        <translation>1</translation>
     </message>
     <message>
         <source>&amp;File</source>
@@ -2125,8 +2262,28 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <translation>Sistema de arquivos</translation>
     </message>
     <message>
-        <source>%1, %2 MiB available</source>
-        <translation>%1, %2 MiB disponível</translation>
+        <source>Mountpoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cluster Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;%1&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td&gt;%2 GiB&lt;/td&gt;&lt;td&gt;%3 GiB&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2274,12 +2431,12 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <translation>Opções:</translation>
     </message>
     <message>
-        <source>Could not copy the Sapi-script</source>
-        <translation>Não foi possível copiar o script Sapi</translation>
+        <source>Could not copy the SAPI script</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not start the Sapi-script</source>
-        <translation>Não foi possível iniciar o script Sapi</translation>
+        <source>Could not start SAPI process</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2550,14 +2707,12 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
 É necessário privilégios de administrator.&lt;/li&gt;</translation>
     </message>
     <message>
-        <source>&lt;li&gt;Target mismatch detected.
-Installed target: %1, selected target: %2.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Detectada diferenças de alvos.
-Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
-    </message>
-    <message>
         <source>Problem detected:</source>
         <translation>Problema detectado:</translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Target mismatch detected.&lt;br/&gt;Installed target: %1&lt;br/&gt;Selected target: %2.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2722,6 +2877,10 @@ Alvo instalado: %1, alvo selecionado: %2.&lt;/li&gt;</translation>
     <message utf8="true">
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2012 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
         <translation>Utilitário instalador e de manutenção para o firmware de código aberto de reprodutores digitais de música Rockbox.&lt;br/&gt;© 2005 - 2012 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <source>&amp;Speex License</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

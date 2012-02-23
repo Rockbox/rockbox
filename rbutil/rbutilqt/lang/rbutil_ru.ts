@@ -87,10 +87,6 @@
         <translation>&lt;li&gt;Отключить плеер от компьютера с использованием безопасного извлечения.&lt;/li&gt;</translation>
     </message>
     <message>
-        <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Перезагрузить ваш плеер на фирменную прошивку.&lt;/li&gt;&lt;li&gt;Обновить прошивку с помощью функции обновления. Дополнительную информацию вы найдёте в руководстве по эксплуатации Вашего плеера.&lt;/li&gt;&lt;li&gt;После обновления прошивки, перезагрузите Ваш плеер.&lt;/li&gt;</translation>
-    </message>
-    <message>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
         <translation>&lt;li&gt;Выключить плеер&lt;/li&gt;&lt;li&gt;Подключить зарядное устройство&lt;/li&gt;</translation>
     </message>
@@ -118,6 +114,34 @@
         <source>Timeout on remount</source>
         <translation>Таймаут ожидания для монтирования</translation>
     </message>
+    <message>
+        <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Remove any previously inserted microSD card&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Disconnect your player. The player will reboot and perform an update of the original firmware. Please refer to your players manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before disconnecting the player.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zip file format detected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extracting firmware %1 from archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error extracting firmware from archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find firmware in archive</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BootloaderInstallChinaChip</name>
@@ -128,6 +152,58 @@
     <message>
         <source>Downloading bootloader file</source>
         <translation>Скачивается файл загрузчика</translation>
+    </message>
+    <message>
+        <source>Could not open firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open bootloader file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not allocate memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not load firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File is not a valid ChinaChip firmware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find ccpmp.bin in input file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open backup file for ccpmp.bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not write backup file for ccpmp.bin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not load bootloader file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not get current time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not write output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unexpected error from chinachippatcher</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -298,6 +374,45 @@
     <message>
         <source>Uninstallation not possible, only installation info removed</source>
         <translation>Полное удаление невозможно, удалена только информация об установке</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallImx</name>
+    <message>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read original firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading bootloader file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Patching file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Patching the original firmware failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Succesfully patched firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bootloader successful installed</source>
+        <translation type="unfinished">Загрузчик успешно установлен</translation>
+    </message>
+    <message>
+        <source>Patched bootloader could not be installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -800,6 +915,11 @@ You need to change your player to MSC mode for installation. </source>
         <source>Until you change this installation will fail!</source>
         <translation>Пока вы это не измените, установка не пройдёт успешно!</translation>
     </message>
+    <message>
+        <source>Could not voice test string.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConfigForm</name>
@@ -1035,36 +1155,6 @@ You need to change your player to MSC mode for installation. </source>
     </message>
 </context>
 <context>
-    <name>EncExes</name>
-    <message>
-        <source>Path to Encoder:</source>
-        <translation>Путь к кодировщику:</translation>
-    </message>
-    <message>
-        <source>Encoder options:</source>
-        <translation>Настройки кодировщика:</translation>
-    </message>
-</context>
-<context>
-    <name>EncRbSpeex</name>
-    <message>
-        <source>Volume:</source>
-        <translation>Громкость:</translation>
-    </message>
-    <message>
-        <source>Quality:</source>
-        <translation>Качество:</translation>
-    </message>
-    <message>
-        <source>Complexity:</source>
-        <translation>Сложность:</translation>
-    </message>
-    <message>
-        <source>Use Narrowband:</source>
-        <translation>Узкополосный:</translation>
-    </message>
-</context>
-<context>
     <name>EncTtsCfgGui</name>
     <message>
         <source>Waiting for engine...</source>
@@ -1089,6 +1179,81 @@ You need to change your player to MSC mode for installation. </source>
     <message>
         <source>Select executable</source>
         <translation>Выбрать исполняемый файл</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderExe</name>
+    <message>
+        <source>Path to Encoder:</source>
+        <translation type="unfinished">Путь к кодировщику:</translation>
+    </message>
+    <message>
+        <source>Encoder options:</source>
+        <translation type="unfinished">Настройки кодировщика:</translation>
+    </message>
+</context>
+<context>
+    <name>EncoderLame</name>
+    <message>
+        <source>LAME</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find libmp3lame!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EncoderRbSpeex</name>
+    <message>
+        <source>Volume:</source>
+        <translation type="unfinished">Громкость:</translation>
+    </message>
+    <message>
+        <source>Quality:</source>
+        <translation type="unfinished">Качество:</translation>
+    </message>
+    <message>
+        <source>Complexity:</source>
+        <translation type="unfinished">Сложность:</translation>
+    </message>
+    <message>
+        <source>Use Narrowband:</source>
+        <translation type="unfinished">Узкополосный:</translation>
+    </message>
+</context>
+<context>
+    <name>InfoWidget</name>
+    <message>
+        <source>File</source>
+        <translation type="unfinished">Файл</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished">Версия</translation>
+    </message>
+</context>
+<context>
+    <name>InfoWidgetFrm</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
+        <translation type="unfinished">Установленные пакеты.&lt;br/&gt;&lt;b&gt;Примечание:&lt;/b&gt;Если вы установили некоторые пакеты вручную, могут возниктуть несоответствия!</translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished">1</translation>
     </message>
 </context>
 <context>
@@ -1312,6 +1477,68 @@ You need to change your player to MSC mode for installation. </source>
     </message>
 </context>
 <context>
+    <name>ManualWidget</name>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
+        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Руководство по эксплуатации в PDF&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
+        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Руководство по эксплуатации в HTML (открывается в обозревателе)&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Select a device for a link to the correct manual</source>
+        <translation type="unfinished">Выберите устройство, чтобы получить ссылку на соответствующее руководство по эксплуатации</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
+        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Обзор руководства по эксплуатации&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Confirm download</source>
+        <translation type="unfinished">Потвердите скачивание</translation>
+    </message>
+    <message>
+        <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
+        <translation type="unfinished">Вы действительно хотите скачать руководство по эксплуатации? Оно будет записано в коренную папку Вашего плеера.</translation>
+    </message>
+</context>
+<context>
+    <name>ManualWidgetFrm</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Read the manual</source>
+        <translation type="unfinished">Читать руководство по эксплуатации</translation>
+    </message>
+    <message>
+        <source>PDF manual</source>
+        <translation type="unfinished">Руководство по эксплуатации в PDF</translation>
+    </message>
+    <message>
+        <source>HTML manual</source>
+        <translation type="unfinished">Руководство по эксплуатации в HTML</translation>
+    </message>
+    <message>
+        <source>Download the manual</source>
+        <translation type="unfinished">Скачать руководство по эксплуатации</translation>
+    </message>
+    <message>
+        <source>&amp;PDF version</source>
+        <translation type="unfinished">Версия &amp;PDF</translation>
+    </message>
+    <message>
+        <source>&amp;HTML version (zip file)</source>
+        <translation type="unfinished">Версия &amp;HTML (.zip файл)</translation>
+    </message>
+    <message>
+        <source>Down&amp;load</source>
+        <translation type="unfinished">С&amp;качать</translation>
+    </message>
+</context>
+<context>
     <name>PreviewFrm</name>
     <message>
         <source>Preview</source>
@@ -1380,32 +1607,8 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
 <context>
     <name>RbUtilQt</name>
     <message>
-        <source>File</source>
-        <translation>Файл</translation>
-    </message>
-    <message>
-        <source>Version</source>
-        <translation>Версия</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; на &lt;b&gt;%3&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Руководство по эксплуатации в PDF&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Руководство по эксплуатации в HTML (открывается в обозревателе)&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <source>Select a device for a link to the correct manual</source>
-        <translation>Выберите устройство, чтобы получить ссылку на соответствующее руководство по эксплуатации</translation>
-    </message>
-    <message>
-        <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Обзор руководства по эксплуатации&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Confirm Installation</source>
@@ -1438,14 +1641,6 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Вы действительно хотите удалить загрузчик?</translation>
-    </message>
-    <message>
-        <source>Confirm download</source>
-        <translation>Потвердите скачивание</translation>
-    </message>
-    <message>
-        <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
-        <translation>Вы действительно хотите скачать руководство по эксплуатации? Оно будет записано в коренную папку Вашего плеера.</translation>
     </message>
     <message>
         <source>Confirm installation</source>
@@ -1687,6 +1882,10 @@ Network error: %1. Please check your network and proxy settings.</source>
         <source>Beginning Backup...</source>
         <translation>Начинаю создание резервной копии...</translation>
     </message>
+    <message>
+        <source>Error reading firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQtFrm</name>
@@ -1787,40 +1986,8 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation>Смотреть и/или загрузить руководство по эксплуатации</translation>
     </message>
     <message>
-        <source>Read the manual</source>
-        <translation>Читать руководство по эксплуатации</translation>
-    </message>
-    <message>
-        <source>PDF manual</source>
-        <translation>Руководство по эксплуатации в PDF</translation>
-    </message>
-    <message>
-        <source>HTML manual</source>
-        <translation>Руководство по эксплуатации в HTML</translation>
-    </message>
-    <message>
-        <source>Download the manual</source>
-        <translation>Скачать руководство по эксплуатации</translation>
-    </message>
-    <message>
-        <source>&amp;PDF version</source>
-        <translation>Версия &amp;PDF</translation>
-    </message>
-    <message>
-        <source>&amp;HTML version (zip file)</source>
-        <translation>Версия &amp;HTML (.zip файл)</translation>
-    </message>
-    <message>
-        <source>Down&amp;load</source>
-        <translation>С&amp;качать</translation>
-    </message>
-    <message>
         <source>Inf&amp;o</source>
         <translation>&amp;Информация</translation>
-    </message>
-    <message>
-        <source>1</source>
-        <translation>1</translation>
     </message>
     <message>
         <source>&amp;File</source>
@@ -1929,10 +2096,6 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <source>&lt;b&gt;Uninstall Rockbox from your audio player.&lt;/b&gt;&lt;br/&gt;This will leave the bootloader in place (you need to remove it manually).</source>
         <translation>&lt;b&gt;Удалить Rockbox с Вашего плеера.&lt;/b&gt;&lt;br/&gt;Это оставит загрузчик установленным (его нужно будет удалить вручную).</translation>
-    </message>
-    <message>
-        <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
-        <translation>Установленные пакеты.&lt;br/&gt;&lt;b&gt;Примечание:&lt;/b&gt;Если вы установили некоторые пакеты вручную, могут возниктуть несоответствия!</translation>
     </message>
     <message>
         <source>Install &amp;Bootloader</source>
@@ -2249,14 +2412,6 @@ Network error: %1. Please check your network and proxy settings.</source>
 <context>
     <name>TTSSapi</name>
     <message>
-        <source>Could not copy the Sapi-script</source>
-        <translation>Не могу скопировать сценарий Sapi</translation>
-    </message>
-    <message>
-        <source>Could not start the Sapi-script</source>
-        <translation>Не могу запустить сценарий Sapi</translation>
-    </message>
-    <message>
         <source>Language:</source>
         <translation>Язык:</translation>
     </message>
@@ -2271,6 +2426,14 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <source>Options:</source>
         <translation>Настройки:</translation>
+    </message>
+    <message>
+        <source>Could not copy the SAPI script</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start SAPI process</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
