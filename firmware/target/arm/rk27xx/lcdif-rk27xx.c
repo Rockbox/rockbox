@@ -122,13 +122,16 @@ static void lcdctrl_init(void)
     LCDC_INTR_MASK = INTR_MASK_LINE; /* INTR_MASK_EVENLINE; */
 }
 
-/* configure pins to drive lcd in 18bit mode */
+/* configure pins to drive lcd in 18bit mode (16bit mode for HiFiMAN's) */
 static void iomux_lcd(void)
 {
     unsigned long muxa;
 
     muxa = SCU_IOMUXA_CON & ~(IOMUX_LCD_VSYNC|IOMUX_LCD_DEN|0xff);
+
+#if !defined(HM801) && !defined(HM60x)
     muxa |= IOMUX_LCD_D18|IOMUX_LCD_D20|IOMUX_LCD_D22|IOMUX_LCD_D17|IOMUX_LCD_D16;
+#endif
 
     SCU_IOMUXA_CON = muxa;
     SCU_IOMUXB_CON |= IOMUX_LCD_D815;
