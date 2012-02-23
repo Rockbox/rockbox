@@ -215,16 +215,14 @@ void pcm_play_dma_pause(bool pause)
 
 void fiq_handler(void)
 {
-    static void *start;
+    static const void *start;
     static size_t size;
 
     /* clear any pending interrupt */
     SRCPND = DMA2_MASK;
 
     /* Buffer empty.  Try to get more. */
-    pcm_play_get_more_callback(&start, &size);
-
-    if (size == 0)
+    if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
         return;
 
     /* Flush any pending cache writes */
@@ -237,7 +235,7 @@ void fiq_handler(void)
     /* Re-Activate the channel */
     DMASKTRIG2 = 0x2;
 
-    pcm_play_dma_started_callback();
+    pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 }
 
 size_t pcm_get_bytes_waiting(void)

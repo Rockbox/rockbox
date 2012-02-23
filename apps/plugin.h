@@ -153,12 +153,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 216
+#define PLUGIN_API_VERSION 217
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 216
+#define PLUGIN_MIN_API_VERSION 217
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -651,7 +651,8 @@ struct plugin_api {
     const unsigned long *hw_freq_sampr;
     void (*pcm_apply_settings)(void);
     void (*pcm_play_data)(pcm_play_callback_type get_more,
-            unsigned char* start, size_t size);
+                          pcm_status_callback_type status_cb,
+                          const void *start, size_t size);
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
@@ -669,6 +670,7 @@ struct plugin_api {
     void (*pcm_init_recording)(void);
     void (*pcm_close_recording)(void);
     void (*pcm_record_data)(pcm_rec_callback_type more_ready,
+                            pcm_status_callback_type status_cb,
                             void *start, size_t size);
     void (*pcm_stop_recording)(void);
     void (*pcm_calculate_rec_peaks)(int *left, int *right);
@@ -689,12 +691,13 @@ struct plugin_api {
     int (*dsp_output_count)(struct dsp_config *dsp, int count);
 
     enum channel_status (*mixer_channel_status)(enum pcm_mixer_channel channel);
-    void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel, int *count);
+    const void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel,
+                                             int *count);
     void (*mixer_channel_calculate_peaks)(enum pcm_mixer_channel channel,
                                           int *left, int *right);
     void (*mixer_channel_play_data)(enum pcm_mixer_channel channel,
                                     pcm_play_callback_type get_more,
-                                    unsigned char *start, size_t size);
+                                    const void *start, size_t size);
     void (*mixer_channel_play_pause)(enum pcm_mixer_channel channel, bool play);
     void (*mixer_channel_stop)(enum pcm_mixer_channel channel);
     void (*mixer_channel_set_amplitude)(enum pcm_mixer_channel channel,

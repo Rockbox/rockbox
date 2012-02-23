@@ -56,7 +56,7 @@ static int sim_volume = 0;
 #if CONFIG_CODEC == SWCODEC
 static int cvt_status = -1;
 
-static Uint8* pcm_data;
+static const Uint8* pcm_data;
 static size_t pcm_data_size;
 static size_t pcm_sample_bytes;
 static size_t pcm_channel_bytes;
@@ -109,7 +109,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 {
     pcm_dma_apply_settings_nolock();
 
-    pcm_data = (Uint8 *) addr;
+    pcm_data = addr;
     pcm_data_size = size;
 
     SDL_PauseAudio(0);
@@ -245,48 +245,48 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 
     /* Audio card wants more? Get some more then. */
     while (len > 0) {
-        new_buffer = true;
-        pcm_play_get_more_callback((void **)&pcm_data, &pcm_data_size);
-    start:
-        if (pcm_data_size != 0) {
-            udata->num_in  = pcm_data_size / pcm_sample_bytes;
-            udata->num_out = len / pcm_sample_bytes;
+        new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
+                        (const void **)&pcm_data, &pcm_data_size);
 
-            write_to_soundcard(udata);
-
-            udata->num_in  *= pcm_sample_bytes;
-            udata->num_out *= pcm_sample_bytes;
-
-
-            if (new_buffer)
-            {
-                new_buffer = false;
-                pcm_play_dma_started_callback();
-
-                if ((size_t)len > udata->num_out)
-                {
-                    int delay = pcm_data_size*250 / pcm_sampr - 1;
-                
-                    if (delay > 0)
-                    {
-                        SDL_UnlockMutex(audio_lock);
-                        SDL_Delay(delay);
-                        SDL_LockMutex(audio_lock);
-
-                        if (!pcm_is_playing())
-                            break;
-                    }
-                }
-            }
-
-            pcm_data      += udata->num_in;
-            pcm_data_size -= udata->num_in;
-            udata->stream += udata->num_out;
-            len           -= udata->num_out;
-        } else {
+        if (!new_buffer) {
             DEBUGF("sdl_audio_callback: No Data.\n");
             break;
         }
+
+    start:
+        udata->num_in  = pcm_data_size / pcm_sample_bytes;
+        udata->num_out = len / pcm_sample_bytes;
+
+        write_to_soundcard(udata);
+
+        udata->num_in  *= pcm_sample_bytes;
+        udata->num_out *= pcm_sample_bytes;
+
+        if (new_buffer)
+        {
+            new_buffer = false;
+            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+
+            if ((size_t)len > udata->num_out)
+            {
+                int delay = pcm_data_size*250 / pcm_sampr - 1;
+
+                if (delay > 0)
+                {
+                    SDL_UnlockMutex(audio_lock);
+                    SDL_Delay(delay);
+                    SDL_LockMutex(audio_lock);
+
+                    if (!pcm_is_playing())
+                        break;
+                }
+            }
+        }
+
+        pcm_data      += udata->num_in;
+        pcm_data_size -= udata->num_in;
+        udata->stream += udata->num_out;
+        len           -= udata->num_out;
     }
 
     SDL_UnlockMutex(audio_lock);

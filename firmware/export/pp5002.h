@@ -43,7 +43,9 @@
 #define IISCONFIG        (*(volatile unsigned long *)(0xc0002500))
 #define IISFIFO_CFG      (*(volatile unsigned long *)(0xc000251c))
 #define IISFIFO_WR       (*(volatile unsigned long *)(0xc0002540))
+#define IISFIFO_WRH      (*(volatile unsigned short *)(0xc0002540))
 #define IISFIFO_RD       (*(volatile unsigned long *)(0xc0002580))
+#define IISFIFO_RDH      (*(volatile unsigned short *)(0xc0002540))
 
 /**
  * IISCONFIG bits:
