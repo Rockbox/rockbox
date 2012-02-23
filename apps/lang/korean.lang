@@ -9379,15 +9379,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "터치패드 감도"
+    gigabeatfx,sansafuzeplus: "터치패드 감도"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "터치패드 감도"
+    gigabeatfx,sansafuzeplus: "터치패드 감도"
   </voice>
 </phrase>
 <phrase>
