@@ -6,7 +6,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="32"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished">Die Bootloader-Installation erfordert eine Firmware-Datei der Originalfirmware (bin-Datei). Die Firmware-Datei wird angepasst und auf dem Gerät mit dem Rockbox-Bootloader installiert. Aus rechtlichen Gründen muss diese Datei separat heruntergeladen werden. Diese Datei ist im &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa-Forum&lt;/a&gt; zu finden sowie im &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;Handbuch&lt;/a&gt; und auf der &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; Wiki-Seite beschrieben.&lt;br/&gt;OK um fortzufahren und die Datei auf dem Computer auszuwählen.</translation>
+        <translation type="unfinished">Die Bootloader-Installation erfordert eine Datei der Originalfirmware (bin-Datei). Die Firmware-Datei wird angepasst und auf dem Gerät mit dem Rockbox-Bootloader installiert. Aus rechtlichen Gründen muss diese Datei separat heruntergeladen werden. Diese Datei ist im &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa-Forum&lt;/a&gt; zu finden sowie im &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;Handbuch&lt;/a&gt; und auf der &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; Wiki-Seite beschrieben.&lt;br/&gt;OK um fortzufahren und die Datei auf dem Computer auszuwählen.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="55"/>
@@ -110,37 +110,37 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="218"/>
         <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;li&gt;Gerät mit der Original-Firmware starten.&lt;/li&gt;&lt;li&gt;EinFirmware-Update mit der Update-Funktion der Original-Firmware entsprechend der Anleitung des Geräts durchführen.&lt;/li&gt;&lt;b&gt;Wichtig:&lt;/b&gt;Das Firmware-Update ist ein kritischer Prozess der nicht unterbrochen werden darf. &lt;b&gt;Bitte darauf achten dass der Akku vor dem Starten des Updates geladen ist.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;Nach Abschluß des Updates das Gerät neu starten.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="229"/>
         <source>&lt;li&gt;Remove any previously inserted microSD card&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;li&gt;Eine eventuell eingelegte microSD-Karte entfernen&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="230"/>
         <source>&lt;li&gt;Disconnect your player. The player will reboot and perform an update of the original firmware. Please refer to your players manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before disconnecting the player.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;li&gt;Das Gerät entfernen. Es wird einen Neustart und ein Update der Original-Firmware durchführen. Für Details bitte das Handbuch des Gerätes beachten.&lt;br/&gt;&lt;b&gt;Wichtig:&lt;/b&gt;Das Firmware-Update ist ein kritischer Prozess der nicht unterbrochen werden darf. &lt;b&gt;Unbedingt vor dem Trennen darauf achten dass das Gerät aufgeladen ist.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;Nach Abschluß des Updates das Gerät neu starten.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="329"/>
         <source>Zip file format detected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zip-Format erkannt</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="339"/>
         <source>Extracting firmware %1 from archive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Entpacke Firmware %1 aus Archiv</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="346"/>
         <source>Error extracting firmware from archive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler beim Extrahieren der Firmwaredatei</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="353"/>
         <source>Could not find firmware in archive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Firmware nicht im Archiv finden</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="241"/>
@@ -193,67 +193,67 @@
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="75"/>
         <source>Could not open firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Firmware-Datei nicht öffnen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="78"/>
         <source>Could not open bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Bootloader-Datei nicht öffnen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="81"/>
         <source>Could not allocate memory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Speicher nicht allokieren</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="84"/>
         <source>Could not load firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Firmware-Datei nicht laden</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="87"/>
         <source>File is not a valid ChinaChip firmware</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Datei ist keine gültige ChinaChip-Firmware</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="90"/>
         <source>Could not find ccpmp.bin in input file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte ccpmp.bin in Eingabedatei nicht finden</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="93"/>
         <source>Could not open backup file for ccpmp.bin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Backup-Date für ccpmp.bin nicht öffnen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="96"/>
         <source>Could not write backup file for ccpmp.bin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Backup-Datei für ccpmp.bin nicht schreiben</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="99"/>
         <source>Could not load bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Bootloader-Datei nicht laden</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="102"/>
         <source>Could not get current time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte aktuelle Zeit nicht lesen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="105"/>
         <source>Could not open output file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Ausgabedatei nicht öffnen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="108"/>
         <source>Could not write output file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Ausgabedatei nicht schreiben</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="111"/>
         <source>Unexpected error from chinachippatcher</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unerwarteter Fehler von chinachippatcher</translation>
     </message>
 </context>
 <context>
@@ -472,12 +472,12 @@
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="69"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Die Bootloader-Installation erfordert eine Datei der Originalfirmware (firmware.sb-Datei). Die Firmware-Datei wird angepasst und auf dem Gerät mit dem Rockbox-Bootloader installiert. Aus rechtlichen Gründen muss diese Datei separat heruntergeladen werden. Diese Datei ist im &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa-Forum&lt;/a&gt; zu finden und auf der &lt;a href=&apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; Wiki-Seite beschrieben.&lt;br/&gt;OK um fortzufahren und die Datei auf dem Computer auszuwählen.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="91"/>
         <source>Could not read original firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte Original-Firmware-Datei nicht lesen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="97"/>
@@ -487,17 +487,17 @@
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="107"/>
         <source>Patching file...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Patche Firmware ...</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="134"/>
         <source>Patching the original firmware failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifizieren der Firmware-Datei fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="140"/>
         <source>Succesfully patched firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Firmware-Datei erfolgreich modifiziert</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="155"/>
@@ -507,12 +507,12 @@
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="161"/>
         <source>Patched bootloader could not be installed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifizierter Bootloader konnte nicht installiert werden</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="172"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zum deinstallieren ein Upgrade mit einer unveränderten Originalfirmware-Datei durchführen.</translation>
     </message>
 </context>
 <context>
@@ -1491,22 +1491,22 @@ Please configure TTS engine.</source>
         <location filename="../base/encoderlame.cpp" line="69"/>
         <location filename="../base/encoderlame.cpp" line="79"/>
         <source>LAME</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LAME</translation>
     </message>
     <message>
         <location filename="../base/encoderlame.cpp" line="71"/>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lautstärke</translation>
     </message>
     <message>
         <location filename="../base/encoderlame.cpp" line="75"/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Qualität</translation>
     </message>
     <message>
         <location filename="../base/encoderlame.cpp" line="79"/>
         <source>Could not find libmp3lame!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte libmp3lame nicht finden!</translation>
     </message>
 </context>
 <context>
@@ -2295,7 +2295,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../rbutilqt.cpp" line="771"/>
         <source>Error reading firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fehler beim Lesen der Firmware-Datei</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="781"/>
@@ -3032,12 +3032,12 @@ This will install Rockbox %1. To install the most recent development build avail
     <message>
         <location filename="../base/ttssapi.cpp" line="106"/>
         <source>Could not copy the SAPI script</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte SAPI-Skript nicht kopieren</translation>
     </message>
     <message>
         <location filename="../base/ttssapi.cpp" line="127"/>
         <source>Could not start SAPI process</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Konnte SAPI-Prozess nicht starten</translation>
     </message>
 </context>
 <context>
