@@ -176,6 +176,18 @@ bool button_debug_screen(void)
     return true;
 }
 
+void touchpad_set_sensitivity(int level);
+{
+    union
+    {
+        unsigned char data;
+        signed char value;
+    }sensitivity;
+    rmi_read(RMI_2D_SENSITIVITY_ADJ, 1, &sensitivity.data);
+    sensitivity.value = level;
+    rmi_write(RMI_2D_SENSITIVITY_ADJ, 1, &sensitivity.data);
+}
+
 struct button_area_t
 {
     /* define a rectangle region */
@@ -313,7 +325,7 @@ void button_init_device(void)
     /* The OF adjust the sensitivity based on product_id[1] compared to 2.
      * Since it doesn't to work great, just hardcode the sensitivity to
      * some reasonable value for now. */
-    rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 13);
+/*    rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 13); */
     
     rmi_write_single(RMI_2D_GESTURE_SETTINGS,
         RMI_2D_GESTURE_PRESS_TIME_300MS |
