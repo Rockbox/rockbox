@@ -41,7 +41,8 @@
  *      pcm_play_lock
  *      pcm_play_unlock
  *   Semi-private -
- *      pcm_play_get_more_callback
+ *      pcm_play_dma_complete_callback
+ *      pcm_play_dma_status_callback
  *      pcm_play_dma_init
  *      pcm_play_dma_postinit
  *      pcm_play_dma_start
@@ -66,7 +67,8 @@
  *      pcm_rec_lock
  *      pcm_rec_unlock
  *   Semi-private -
- *      pcm_rec_more_ready_callback
+ *      pcm_rec_dma_complete_callback
+ *      pcm_rec_dma_status_callback
  *      pcm_rec_dma_init
  *      pcm_rec_dma_close
  *      pcm_rec_dma_start
@@ -83,9 +85,12 @@
 /* 'true' when all stages of pcm initialization have completed */
 static bool pcm_is_ready = false;
 
-/* the registered callback function to ask for more mp3 data */
-static pcm_play_callback_type pcm_callback_for_more SHAREDBSS_ATTR = NULL;
-void (* pcm_play_dma_started)(void) SHAREDBSS_ATTR = NULL;
+/* The registered callback function to ask for more mp3 data */
+static volatile pcm_play_callback_type
+    pcm_callback_for_more SHAREDBSS_ATTR = NULL;
+/* The registered callback function to inform of DMA status */
+volatile pcm_status_callback_type
+    pcm_play_status_callback SHAREDBSS_ATTR = NULL;
 /* PCM playback state */
 volatile bool pcm_playing SHAREDBSS_ATTR = false;
 /* PCM paused state. paused implies playing */
@@ -104,7 +109,7 @@ static struct pcm_peaks global_peaks;
 static void pcm_play_stopped(void)
 {
     pcm_callback_for_more = NULL;
-    pcm_play_dma_started = NULL;
+    pcm_play_status_callback = NULL;
     pcm_paused = false;
     pcm_playing = false;
 }
@@ -258,27 +263,29 @@ bool pcm_is_initialized(void)
 }
 
 /* Common code to pcm_play_data and pcm_play_pause */
-static void pcm_play_data_start(unsigned char *start, size_t size)
+static void pcm_play_data_start(const void *addr, size_t size)
 {
-    ALIGN_AUDIOBUF(start, size);
+    ALIGN_AUDIOBUF(addr, size);
 
-    if (!(start && size))
+    if (!(addr && size))
     {
         pcm_play_callback_type get_more = pcm_callback_for_more;
+        addr = NULL;
         size = 0;
+
         if (get_more)
         {
             logf(" get_more");
-            get_more(&start, &size);
-            ALIGN_AUDIOBUF(start, size);
+            get_more(&addr, &size);
+            ALIGN_AUDIOBUF(addr, size);
         }
     }
 
-    if (start && size)
+    if (addr && size)
     {
         logf(" pcm_play_dma_start");
         pcm_apply_settings();
-        pcm_play_dma_start(start, size);
+        pcm_play_dma_start(addr, size);
         pcm_playing = true;
         pcm_paused = false;
         return;
@@ -291,13 +298,15 @@ static void pcm_play_data_start(unsigned char *start, size_t size)
 }
 
 void pcm_play_data(pcm_play_callback_type get_more,
-                   unsigned char *start, size_t size)
+                   pcm_status_callback_type status_cb,
+                   const void *start, size_t size)
 {
     logf("pcm_play_data");
 
     pcm_play_lock();
 
     pcm_callback_for_more = get_more;
+    pcm_play_status_callback = status_cb;
 
     logf(" pcm_play_data_start");
     pcm_play_data_start(start, size);
@@ -305,26 +314,33 @@ void pcm_play_data(pcm_play_callback_type get_more,
     pcm_play_unlock();
 }
 
-void pcm_play_get_more_callback(void **start, size_t *size)
+bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
+                                    const void **addr, size_t *size)
 {
+    /* Check status callback first if error */
+    if (status < PCM_DMAST_OK)
+        status = pcm_play_dma_status_callback(status);
+
     pcm_play_callback_type get_more = pcm_callback_for_more;
 
-    *size = 0;
-
-    if (get_more && start)
+    if (get_more && status >= PCM_DMAST_OK)
     {
-        /* Call registered callback */
-        get_more((unsigned char **)start, size);
+        *addr = NULL;
+        *size = 0;
 
-        ALIGN_AUDIOBUF(*start, *size);
+        /* Call registered callback to obtain next buffer */
+        get_more(addr, size);
+        ALIGN_AUDIOBUF(*addr, *size);
 
-        if (*start && *size)
-            return;
+        if (*addr && *size)
+            return true;
     } 
 
     /* Error, callback missing or no more DMA to do */
     pcm_play_dma_stop();
     pcm_play_stopped();
+
+    return false;
 }
 
 void pcm_play_pause(bool play)
@@ -428,12 +444,6 @@ void pcm_apply_settings(void)
     }
 }
 
-/* register callback to buffer more data */
-void pcm_play_set_dma_started_callback(void (* callback)(void))
-{
-    pcm_play_dma_started = callback;
-}
-
 #ifdef HAVE_RECORDING
 /** Low level pcm recording apis **/
 
@@ -442,6 +452,8 @@ static const void * volatile pcm_rec_peak_addr SHAREDBSS_ATTR = NULL;
 /* the registered callback function for when more data is available */
 static volatile pcm_rec_callback_type
     pcm_callback_more_ready SHAREDBSS_ATTR = NULL;
+volatile pcm_status_callback_type
+    pcm_rec_status_callback SHAREDBSS_ATTR = NULL;
 /* DMA transfer in is currently active */
 volatile bool pcm_recording SHAREDBSS_ATTR = false;
 
@@ -450,6 +462,7 @@ static void pcm_recording_stopped(void)
 {
     pcm_recording = false;
     pcm_callback_more_ready = NULL;
+    pcm_rec_status_callback = NULL;
 }
 
 /**
@@ -542,13 +555,14 @@ void pcm_close_recording(void)
 }
 
 void pcm_record_data(pcm_rec_callback_type more_ready,
-                     void *start, size_t size)
+                     pcm_status_callback_type status_cb,
+                     void *addr, size_t size)
 {
     logf("pcm_record_data");
 
-    ALIGN_AUDIOBUF(start, size);
+    ALIGN_AUDIOBUF(addr, size);
 
-    if (!(start && size))
+    if (!(addr && size))
     {
         logf(" no buffer");
         return;
@@ -557,17 +571,14 @@ void pcm_record_data(pcm_rec_callback_type more_ready,
     pcm_rec_lock();
 
     pcm_callback_more_ready = more_ready;
+    pcm_rec_status_callback = status_cb;
 
-#ifdef HAVE_PCM_REC_DMA_ADDRESS
     /* Need a physical DMA address translation, if not already physical. */
-    pcm_rec_peak_addr = pcm_dma_addr(start);
-#else
-    pcm_rec_peak_addr = start;
-#endif
+    pcm_rec_peak_addr = pcm_rec_dma_addr(addr);
 
     logf(" pcm_rec_dma_start");
     pcm_apply_settings();
-    pcm_rec_dma_start(start, size);
+    pcm_rec_dma_start(addr, size);
     pcm_recording = true;
 
     pcm_rec_unlock();
@@ -589,33 +600,35 @@ void pcm_stop_recording(void)
     pcm_rec_unlock();
 } /* pcm_stop_recording */
 
-void pcm_rec_more_ready_callback(int status, void **start, size_t *size)
+bool pcm_rec_dma_complete_callback(enum pcm_dma_status status,
+                                   void **addr, size_t *size)
 {
+     /* Check status callback first if error */
+    if (status < PCM_DMAST_OK)
+        status = pcm_rec_dma_status_callback(status);
+
     pcm_rec_callback_type have_more = pcm_callback_more_ready;
 
-    *size = 0;
-
-    if (have_more && start)
+    if (have_more && status >= PCM_DMAST_OK)
     {
-        have_more(status, start, size);
-        ALIGN_AUDIOBUF(*start, *size);
+        /* Call registered callback to obtain next buffer */
+        have_more(addr, size);
+        ALIGN_AUDIOBUF(*addr, *size);
 
-        if (*start && *size)
+        if (*addr && *size)
         {
-        #ifdef HAVE_PCM_REC_DMA_ADDRESS
             /* Need a physical DMA address translation, if not already
              * physical. */
-            pcm_rec_peak_addr = pcm_dma_addr(*start);
-        #else
-            pcm_rec_peak_addr = *start;
-        #endif
-            return;
+            pcm_rec_peak_addr = pcm_rec_dma_addr(*addr);
+            return true;
         }
     }
 
     /* Error, callback missing or no more DMA to do */
     pcm_rec_dma_stop();
     pcm_recording_stopped();
+
+    return false;
 }
 
 #endif /* HAVE_RECORDING */

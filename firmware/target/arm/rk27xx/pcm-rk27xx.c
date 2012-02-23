@@ -273,15 +273,13 @@ size_t pcm_get_bytes_waiting(void)
 /* audio DMA ISR called when chunk from callers buffer has been transfered */
 void INT_HDMA(void)
 {
-    void *start;
+    const void *start;
     size_t size;
 
-    pcm_play_get_more_callback(&start, &size);
-
-    if (size != 0)
+    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
     {
         hdma_i2s_transfer(start, size);
-        pcm_play_dma_started_callback();
+        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     }
 }
 

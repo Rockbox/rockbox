@@ -46,7 +46,7 @@ static int16_t beep_buf[BEEP_BUF_COUNT*2] IBSS_ATTR __attribute__((aligned(4)));
 /* Callback to generate the beep frames - also don't want inlining of
    call below in beep_play */
 static void __attribute__((noinline))
-beep_get_more(unsigned char **start, size_t *size)
+beep_get_more(const void **start, size_t *size)
 {
     int count = beep_count;
 
@@ -87,7 +87,7 @@ void beep_play(unsigned int frequency, unsigned int duration,
 #endif
 
     /* If it fits - avoid cb overhead */
-    unsigned char *start;
+    const void *start;
     size_t size;
 
     /* Generate first frame here */

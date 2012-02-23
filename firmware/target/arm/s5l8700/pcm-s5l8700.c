@@ -116,9 +116,10 @@ void INT_DMA(void)
         {
             if (!nextsize)
             {
-                pcm_play_get_more_callback((void**)&nextbuf, &nextsize);
-                if (!nextsize) break;
-                new_buffer = true;
+                new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
+                                (const void**)&nextbuf, &nextsize);
+                if (!new_buffer)
+                    break;
             }
             queuedsize = MIN(sizeof(dblbuf), nextsize / 2);
             nextsize -= queuedsize;
@@ -133,7 +134,7 @@ void INT_DMA(void)
 
         if (new_buffer)
         {
-            pcm_play_dma_started_callback();
+            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
             new_buffer = false;
         }
     }

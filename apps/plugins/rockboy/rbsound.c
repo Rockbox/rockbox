@@ -16,10 +16,10 @@ static unsigned short *buf=0, *hwbuf=0;
 
 static bool newly_started;
 
-static void get_more(unsigned char** start, size_t* size)
+static void get_more(const void** start, size_t* size)
 {
     memcpy(hwbuf, &buf[pcm.len*doneplay], BUF_SIZE*sizeof(short));
-    *start = (unsigned char*)(hwbuf);
+    *start = hwbuf;
     *size = BUF_SIZE*sizeof(short);
     doneplay=1;
 }
@@ -76,7 +76,7 @@ int rockboy_pcm_submit(void)
 
     if(newly_started)
     {
-        rb->pcm_play_data(&get_more,NULL,0);
+        rb->pcm_play_data(&get_more, NULL, NULL,0);
         newly_started = false;
     }
 

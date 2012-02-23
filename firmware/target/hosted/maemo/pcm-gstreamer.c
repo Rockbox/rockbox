@@ -189,9 +189,8 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
        from inside gstreamer's stream thread as it will deadlock */
     inside_feed_data = 1;
 
-    pcm_play_get_more_callback((void **)&pcm_data, &pcm_data_size);
-
-    if (pcm_data_size != 0)
+    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, (const void **)&pcm_data,
+                                       &pcm_data_size))
     {
         GstBuffer *buffer = gst_buffer_new ();
         GstFlowReturn ret;
@@ -205,7 +204,7 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
         if (ret != 0)
             DEBUGF("push-buffer error result: %d\n", ret);
 
-        pcm_play_dma_started_callback();
+        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     } else
     {
         DEBUGF("feed_data: No Data.\n");

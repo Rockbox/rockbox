@@ -33,7 +33,7 @@
 /* This is global to save some latency when pcm_play_dma_get_peak_buffer is 
  *  called.
  */
-static void *start;
+static const void *start;
 
 void pcm_play_dma_postinit(void)
 {
@@ -164,9 +164,7 @@ void DSPHINT(void)
         
     case MSG_REFILL:
         /* Buffer empty.  Try to get more. */
-        pcm_play_get_more_callback(&start, &size);
-
-        if (size != 0)
+        if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
         {
             unsigned long sdem_addr=(unsigned long)start - CONFIG_SDRAM_START;
             /* Flush any pending cache writes */
@@ -180,7 +178,7 @@ void DSPHINT(void)
             DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
                 (unsigned long)start, (unsigned long)sdem_addr);
 
-            pcm_play_dma_started_callback();
+            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
         }
         
         break;

@@ -257,20 +257,9 @@ enum
 /*******************************************************************/
     
 /* Callback for when more data is ready - called in interrupt context */
-static void pcm_rec_have_more(int status, void **start, size_t *size)
+static void pcm_rec_have_more(void **start, size_t *size)
 {
-    if (status < 0)
-    {
-        /* some error condition */
-        if (status == DMA_REC_ERROR_DMA)
-        {
-            /* Flush recorded data to disk and stop recording */
-            queue_post(&pcmrec_queue, PCMREC_STOP, 0);
-            return;
-        }
-        /* else try again next transmission - frame is invalid */
-    }
-    else if (!dma_lock)
+    if (!dma_lock)
     {
         /* advance write position */
         int next_pos = (dma_wr_pos + PCM_CHUNK_SIZE) & PCM_CHUNK_MASK;
@@ -286,6 +275,23 @@ static void pcm_rec_have_more(int status, void **start, size_t *size)
     *start = GET_PCM_CHUNK(dma_wr_pos);
     *size = PCM_CHUNK_SIZE;
 } /* pcm_rec_have_more */
+
+static enum pcm_dma_status pcm_rec_status_callback(enum pcm_dma_status status)
+{
+    if (status < PCM_DMAST_OK)
+    {
+        /* some error condition */
+        if (status == PCM_DMAST_ERR_DMA)
+        {
+            /* Flush recorded data to disk and stop recording */
+            queue_post(&pcmrec_queue, PCMREC_STOP, 0);
+            return status;
+        }
+        /* else try again next transmission - frame is invalid */
+    }
+
+    return PCM_DMAST_OK;
+} /* pcm_rec_status_callback */
 
 static void reset_hardware(void)
 {
@@ -1239,8 +1245,8 @@ static void pcmrec_set_recording_options(
     {
         /* start DMA transfer */
         dma_lock = pre_record_ticks == 0;
-        pcm_record_data(pcm_rec_have_more, GET_PCM_CHUNK(dma_wr_pos),
-                        PCM_CHUNK_SIZE);
+        pcm_record_data(pcm_rec_have_more, pcm_rec_status_callback,
+                        GET_PCM_CHUNK(dma_wr_pos), PCM_CHUNK_SIZE);
     }
     else
     {

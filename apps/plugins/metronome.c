@@ -721,7 +721,7 @@ static void prepare_tock(void)
 
 static void play_tock(void)
 {
-    rb->pcm_play_data(NULL,(unsigned char *)sndbuf,sizeof(sndbuf));
+    rb->pcm_play_data(NULL, NULL, sndbuf, sizeof(sndbuf));
 }
 
 #endif /* CONFIG_CODEC != SWCODEC */

@@ -694,7 +694,7 @@ void pcmbuf_start_track_change(enum pcm_track_change_type type)
 /** Playback */
 
 /* PCM driver callback */
-static void pcmbuf_pcm_callback(unsigned char **start, size_t *size)
+static void pcmbuf_pcm_callback(const void **start, size_t *size)
 {
     /*- Process the chunk that just finished -*/
     size_t index = chunk_ridx;

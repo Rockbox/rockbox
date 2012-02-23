@@ -319,7 +319,7 @@ static inline void synthbuf(void)
     samples_in_buf = BUF_SIZE-i;
 }
 
-static void get_more(unsigned char** start, size_t* size)
+static void get_more(const void** start, size_t* size)
 {
 #ifndef SYNC
     if(lastswap != swap)
@@ -333,10 +333,10 @@ static void get_more(unsigned char** start, size_t* size)
 
     *size = samples_in_buf*sizeof(int32_t);
 #ifndef SYNC
-    *start = (unsigned char*)((swap ? gmbuf : gmbuf + BUF_SIZE));
+    *start = swap ? gmbuf : gmbuf + BUF_SIZE;
     swap = !swap;
 #else
-    *start = (unsigned char*)(gmbuf);
+    *start = gmbuf;
 #endif
 }
 
@@ -396,7 +396,7 @@ static int midimain(const void * filename)
     samples_this_second = 0;
 
     synthbuf();
-    rb->pcm_play_data(&get_more, NULL, 0);
+    rb->pcm_play_data(&get_more, NULL, NULL, 0);
 
     while (!quit)
     {
@@ -445,7 +445,7 @@ static int midimain(const void * filename)
                 seekBackward(5);
                 midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, 0);
+                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
                 break;
             }
 
@@ -455,7 +455,7 @@ static int midimain(const void * filename)
                 seekForward(5);
                 midi_debug("Skip to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, 0);
+                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
                 break;
             }
 
@@ -470,7 +470,7 @@ static int midimain(const void * filename)
                 {
                     midi_debug("Playing from %d:%02d\n", playing_time/60, playing_time%60);
                     is_playing = true;
-                    rb->pcm_play_data(&get_more, NULL, 0);
+                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
                 }
                 break;
             }

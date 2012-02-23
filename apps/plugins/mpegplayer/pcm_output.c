@@ -85,7 +85,7 @@ static inline ssize_t pcm_output_bytes_free(void)
 }
 
 /* Audio DMA handler */
-static void get_more(unsigned char **start, size_t *size)
+static void get_more(const void **start, size_t *size)
 {
     ssize_t sz;
 

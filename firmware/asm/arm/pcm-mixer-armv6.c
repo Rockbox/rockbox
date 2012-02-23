@@ -23,9 +23,9 @@
 
 /* Mix channels' samples and apply gain factors */
 static FORCE_INLINE void mix_samples(void *out,
-                                     void *src0,
+                                     const void *src0,
                                      int32_t src0_amp,
-                                     void *src1,
+                                     const void *src1,
                                      int32_t src1_amp,
                                      size_t size)
 {
@@ -71,7 +71,7 @@ static FORCE_INLINE void mix_samples(void *out,
 
 /* Write channel's samples and apply gain factor */
 static FORCE_INLINE void write_samples(void *out,
-                                       void *src,
+                                       const void *src,
                                        int32_t amp,
                                        size_t size)
 {

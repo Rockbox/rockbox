@@ -28,7 +28,7 @@
 short __attribute__((section(".dmabuf"))) dma_buf_left[DMA_BUF_SAMPLES];
 short __attribute__((section(".dmabuf"))) dma_buf_right[DMA_BUF_SAMPLES];
 
-unsigned short* p IBSS_ATTR;
+const int16_t* p IBSS_ATTR;
 size_t p_size IBSS_ATTR;
 
 void pcm_play_lock(void)
@@ -41,7 +41,7 @@ void pcm_play_unlock(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    p = (unsigned short*)addr;
+    p = addr;
     p_size = size;
 }
 
@@ -69,7 +69,7 @@ static inline void fill_dma_buf(int offset)
         do
         {
             int count;
-            unsigned short *tmp_p;
+            const int16_t *tmp_p;
             count = MIN(p_size / 4, (size_t)(lend - l));
             tmp_p = p;
             p_size -= count * 4;
@@ -109,16 +109,14 @@ static inline void fill_dma_buf(int offset)
             if (new_buffer)
             {
                 new_buffer = false;
-                pcm_play_dma_started_callback();
+                pcm_play_dma_status_callback(PCM_DMAST_STARTED);
             }
 
             if (l >= lend)
                 return;
 
-            pcm_play_get_more_callback((void**)&p, &p_size);
-
-            if (p_size)
-                new_buffer = true;
+            new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
+                                                        &p, &p_size);
         }
         while (p_size);
     }
