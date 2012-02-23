@@ -90,13 +90,13 @@ static int16_t ICODE_ATTR fsin(uint32_t phase)
 }
 
 /* ISR handler to get next block of data */
-static void get_more(unsigned char **start, size_t *size)
+static void get_more(const void **start, size_t *size)
 {
     /* Free previous buffer */
     output_head += output_step;
     output_step = 0;
 
-    *start = (unsigned char *)output_buf[output_head & OUTPUT_CHUNK_MASK];
+    *start = output_buf[output_head & OUTPUT_CHUNK_MASK];
     *size  = OUTPUT_CHUNK_SIZE;
 
     /* Keep repeating previous if source runs low */
@@ -236,7 +236,7 @@ static void play_tone(bool volume_set)
                                       IF_PRIO(, PRIORITY_PLAYBACK)
                                       IF_COP(, CPU));
 
-    rb->pcm_play_data(get_more, NULL, 0);
+    rb->pcm_play_data(get_more, NULL, NULL, 0);
 
 #ifndef HAVE_VOLUME_IN_LIST
     if (volume_set)

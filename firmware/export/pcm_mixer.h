@@ -86,7 +86,7 @@ enum channel_status
 /* Start playback on a channel */
 void mixer_channel_play_data(enum pcm_mixer_channel channel,
                              pcm_play_callback_type get_more,
-                             unsigned char *start, size_t size);
+                             const void *start, size_t size);
 
 /* Pause or resume a channel (when started) */
 void mixer_channel_play_pause(enum pcm_mixer_channel channel, bool play);
@@ -105,7 +105,7 @@ enum channel_status mixer_channel_status(enum pcm_mixer_channel channel);
 size_t mixer_channel_get_bytes_waiting(enum pcm_mixer_channel channel);
 
 /* Return pointer to channel's playing audio data and the size remaining */
-void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count);
+const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count);
 
 /* Calculate peak values for channel */
 void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
