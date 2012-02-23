@@ -294,8 +294,6 @@ void DMA0(void) __attribute__ ((interrupt_handler, section(".icode")));
 void DMA0(void)
 {
     unsigned long res = DSR0;
-    void *start;
-    size_t size;
 
     and_l(~(DMA_EEXT | DMA_INT), &DCR0); /* per request and int OFF */
     DSR0 = 1; /* Clear interrupt and errors */
@@ -311,17 +309,18 @@ void DMA0(void)
 #endif
     }
 
-    /* Force stop on error */
-    pcm_play_get_more_callback((res & 0x70) ? NULL : &start, &size);
+    const void *addr;
+    size_t size;
 
-    if (size != 0)
+    if (pcm_play_dma_complete_callback((res & 0x70) ?
+                                       PCM_DMAST_ERR_DMA : PCM_DMAST_OK,
+                                       &addr, &size))
     {
-        SAR0 = (unsigned long)start;     /* Source address */
-        BCR0 = size;                     /* Bytes to transfer */
+        SAR0 = (unsigned long)addr;      /* Source address */
+        BCR0 = (unsigned long)size;      /* Bytes to transfer */
         or_l(DMA_EEXT | DMA_INT, &DCR0); /* per request and int ON */
 
-        /* Call buffer callback */
-        pcm_play_dma_started_callback();
+        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     }
     /* else inished playing */
 } /* DMA0 */
@@ -368,7 +367,7 @@ void pcm_rec_unlock(void)
 
 void pcm_rec_dma_start(void *addr, size_t size)
 {
-    /* stop any DMA in progress */
+    /* Stop any DMA in progress */
     pcm_rec_dma_stop();
 
     and_l(~PDIR2_FIFO_RESET, &DATAINCONTROL);
@@ -430,16 +429,14 @@ void DMA1(void) __attribute__ ((interrupt_handler, section(".icode")));
 void DMA1(void)
 {
     unsigned long res = DSR1;
-    int status = 0;
-    void *start;
-    size_t size;
+    enum pcm_dma_status status = PCM_DMAST_OK;
 
     and_l(~(DMA_EEXT | DMA_INT), &DCR1); /* per request and int OFF */
     DSR1 = 1;                            /* Clear interrupt and errors */
 
     if (res & 0x70)
     {
-        status = DMA_REC_ERROR_DMA;
+        status = PCM_DMAST_ERR_DMA;
         logf("DMA1 err: %02x", res);
 #if 0
         logf("  SAR1: %08x", SAR1);
@@ -456,19 +453,22 @@ void DMA1(void)
          * Ignore valnogood since several sources don't set it properly. */
         /* clear: ebu1cnew, symbolerr, parityerr */
         INTERRUPTCLEAR = (1 << 25) | (1 << 23) | (1 << 22);
-        status = DMA_REC_ERROR_SPDIF;
+        status = PCM_DMAST_ERR_SPDIF;
         logf("spdif err");
     }
 #endif
 
     /* Inform PCM we have more data (or error) */
-    pcm_rec_more_ready_callback(status, &start, &size);
+    void *addr;
+    size_t size;
 
-    if (size != 0)
+    if (pcm_rec_dma_complete_callback(status, &addr, &size))
     {
-        DAR1 = (unsigned long)start;     /* Destination address */
+        DAR1 = (unsigned long)addr;      /* Destination address */
         BCR1 = (unsigned long)size;      /* Bytes to transfer */
         or_l(DMA_EEXT | DMA_INT, &DCR1); /* per request and int ON */
+
+        pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
     }
 } /* DMA1 */
 

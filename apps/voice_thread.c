@@ -116,9 +116,12 @@ enum voice_thread_messages
 /* Structure to store clip data callback info */
 struct voice_info
 {
-    pcm_play_callback_type get_more; /* Callback to get more clips */
-    unsigned char *start;            /* Start of clip */
-    size_t size;                     /* Size of clip */
+    /* Callback to get more clips */
+    void (*get_more)(unsigned char** start, size_t* size);
+    /* Start of clip */
+    unsigned char *start;
+    /* Size of clip */
+    size_t size;
 };
 
 /* Private thread data for its current state that must be passed to its
@@ -148,14 +151,14 @@ static inline int voice_unplayed_frames(void)
 }
 
 /* Mixer channel callback */
-static void voice_pcm_callback(unsigned char **start, size_t *size)
+static void voice_pcm_callback(const void **start, size_t *size)
 {
     if (voice_unplayed_frames() == 0)
         return; /* Done! */
 
     unsigned int i = ++cur_buf_out % VOICE_FRAMES;
 
-    *start = (unsigned char *)voicebuf[i];
+    *start = voicebuf[i];
     *size = voicebuf_sizes[i];
 }
 
@@ -167,7 +170,7 @@ static void voice_start_playback(void)
 
     unsigned int i = cur_buf_out % VOICE_FRAMES;
     mixer_channel_play_data(PCM_MIXER_CHAN_VOICE, voice_pcm_callback,
-                            (unsigned char *)voicebuf[i], voicebuf_sizes[i]);
+                            voicebuf[i], voicebuf_sizes[i]);
 }
 
 /* Stop the voice channel */
@@ -198,7 +201,7 @@ static void voice_buf_commit(size_t size)
 
 /* Stop any current clip and start playing a new one */
 void mp3_play_data(const unsigned char* start, int size,
-                   pcm_play_callback_type get_more)
+                   void (*get_more)(unsigned char** start, size_t* size))
 {
     if (get_more != NULL && start != NULL && (ssize_t)size > 0)
     {

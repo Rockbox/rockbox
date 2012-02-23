@@ -24,17 +24,23 @@
 #include <string.h> /* size_t */
 #include "config.h"
 
-#define DMA_REC_ERROR_DMA       (-1)
+enum pcm_dma_status
+{
 #ifdef HAVE_SPDIF_REC
-#define DMA_REC_ERROR_SPDIF     (-2)
+    PCM_DMAST_ERR_SPDIF = -2,
 #endif
+    PCM_DMAST_ERR_DMA   = -1,
+    PCM_DMAST_OK        =  0,
+    PCM_DMAST_STARTED   =  1,
+};
 
 /** RAW PCM routines used with playback and recording **/
 
-/* Typedef for registered callbacks */
-typedef void (*pcm_play_callback_type)(unsigned char **start,
-                                       size_t *size);
-typedef void (*pcm_rec_callback_type)(int status, void **start, size_t *size);
+/* Typedef for registered data callback */
+typedef void (*pcm_play_callback_type)(const void **start, size_t *size);
+
+/* Typedef for registered status callback */
+typedef enum pcm_dma_status (*pcm_status_callback_type)(enum pcm_dma_status status);
 
 /* set the pcm frequency - use values in hw_sampr_list 
  * when CONFIG_SAMPR_TYPES is #defined, or-in SAMPR_TYPE_* fields with
@@ -62,7 +68,8 @@ bool pcm_is_initialized(void);
 
 /* This is for playing "raw" PCM data */
 void pcm_play_data(pcm_play_callback_type get_more,
-                   unsigned char* start, size_t size);
+                   pcm_status_callback_type status_cb,
+                   const void *start, size_t size);
 
 void pcm_calculate_peaks(int *left, int *right);
 const void* pcm_get_peak_buffer(int* count);
@@ -73,11 +80,12 @@ void pcm_play_pause(bool play);
 bool pcm_is_paused(void);
 bool pcm_is_playing(void);
 
-void pcm_play_set_dma_started_callback(void (* callback)(void));
-
 #ifdef HAVE_RECORDING
 
 /** RAW PCM recording routines **/
+
+/* Typedef for registered data callback */
+typedef void (*pcm_rec_callback_type)(void **start, size_t *size);
 
 /* Reenterable locks for locking and unlocking the recording interrupt */
 void pcm_rec_lock(void);
@@ -90,6 +98,7 @@ void pcm_close_recording(void);
 
 /* Start recording "raw" PCM data */
 void pcm_record_data(pcm_rec_callback_type more_ready,
+                     pcm_status_callback_type status_cb,
                      void *start, size_t size);
 
 /* Stop tranferring data into supplied buffer */
@@ -97,10 +106,6 @@ void pcm_stop_recording(void);
 
 /* Is pcm currently recording? */
 bool pcm_is_recording(void);
-
-/* Called by bottom layer ISR when transfer is complete. Returns non-zero
- * size if successful. Setting start to NULL forces stop. */
-void pcm_rec_more_ready_callback(int status, void **start, size_t *size);
 
 void pcm_calculate_rec_peaks(int *left, int *right);
 

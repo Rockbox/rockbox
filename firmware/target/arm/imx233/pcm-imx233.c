@@ -49,15 +49,13 @@ static void play(const void *addr, size_t size)
 
 void INT_DAC_DMA(void)
 {
-    void *start;
+    const void *start;
     size_t size;
 
-    pcm_play_get_more_callback(&start, &size);
-
-    if(size != 0)
+    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
     {
         play(start, size);
-        pcm_play_dma_started_callback();
+        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     }
 
     imx233_dma_clear_channel_interrupt(APB_AUDIO_DAC);
@@ -65,6 +63,7 @@ void INT_DAC_DMA(void)
 
 void INT_DAC_ERROR(void)
 {
+    /* TODO: Inform of error through pcm_play_dma_complete_callback */
 }
 
 void pcm_play_lock(void)

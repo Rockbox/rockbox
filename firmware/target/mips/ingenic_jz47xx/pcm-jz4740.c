@@ -63,7 +63,7 @@ void pcm_dma_apply_settings(void)
     audiohw_set_frequency(pcm_sampr);
 }
 
-static void* playback_address;
+static const void* playback_address;
 static inline void set_dma(const void *addr, size_t size)
 {
     int burst_size;
@@ -96,21 +96,19 @@ static inline void set_dma(const void *addr, size_t size)
     REG_DMAC_DRSR(DMA_AIC_TX_CHANNEL)  = DMAC_DRSR_RS_AICOUT;
     REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  = (DMAC_DCMD_SAI | DMAC_DCMD_SWDH_32 | burst_size | DMAC_DCMD_DWDH_16 | DMAC_DCMD_TIE);
 
-    playback_address = (void*)addr;
+    playback_address = addr;
 }
 
 static inline void play_dma_callback(void)
 {
-    void *start;
+    const void *start;
     size_t size;
 
-    pcm_play_get_more_callback(&start, &size);
-
-    if (size != 0)
+    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
     {
         set_dma(start, size);
         REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
-        pcm_play_dma_started_callback();
+        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     }
 }
 

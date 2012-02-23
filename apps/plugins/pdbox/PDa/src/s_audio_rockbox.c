@@ -26,7 +26,7 @@
 #include "s_stuff.h"
 
 /* Declare functions that go to IRAM. */
-void pdbox_get_more(unsigned char** start, size_t* size) ICODE_ATTR;
+void pdbox_get_more(const void** start, size_t* size) ICODE_ATTR;
 int rockbox_send_dacs(void) ICODE_ATTR;
 
 /* Extern variables. */
@@ -90,12 +90,12 @@ void rockbox_close_audio(void)
 }
 
 /* Rockbox audio callback. */
-void pdbox_get_more(unsigned char** start, size_t* size)
+void pdbox_get_more(const void** start, size_t* size)
 {
     if(outbuf_fill > 0)
     {
         /* Store output data address and size. */
-        *start = (unsigned char*) outbuf[outbuf_tail].data;
+        *start = outbuf[outbuf_tail].data;
         *size = sizeof(outbuf[outbuf_tail].data);
 
         /* Free this part of output buffer. */
@@ -116,8 +116,6 @@ void pdbox_get_more(unsigned char** start, size_t* size)
         playing = false;
 
         /* Nothing to play. */
-        *start = NULL;
-        *size = 0;
     }
 }
 
@@ -185,7 +183,7 @@ int rockbox_send_dacs(void)
     if(!playing && outbuf_fill > 0)
     {
         /* Start playing. */
-        rb->pcm_play_data(pdbox_get_more, NULL, 0);
+        rb->pcm_play_data(pdbox_get_more, NULL, NULL, 0);
 
         /* Set status flag. */
         playing = true;

@@ -36,9 +36,9 @@
                                       * and the number of 32bits words has to
                                       * fit in 11 bits of DMA register */
 
-static void *dma_start_addr;    /* Pointer to callback buffer */
+static const void *dma_start_addr;    /* Pointer to callback buffer */
 static size_t dma_start_size;   /* Size of callback buffer */
-static void *dma_sub_addr;      /* Pointer to sub buffer */
+static const void *dma_sub_addr;      /* Pointer to sub buffer */
 static size_t dma_rem_size;     /* Remaining size - in 4*32 bits */
 static size_t play_sub_size;    /* size of current subtransfer */
 static void dma_callback(void);
@@ -100,9 +100,8 @@ static void dma_callback(void)
 
     if(!dma_rem_size)
     {
-        pcm_play_get_more_callback(&dma_start_addr, &dma_start_size);
-
-        if (!dma_start_size)
+        if(!pcm_play_dma_complete_callback(PCM_DMAST_OK, &dma_start_addr,
+                                           &dma_start_size))
             return;
 
         dma_sub_addr = dma_start_addr;
@@ -111,7 +110,7 @@ static void dma_callback(void)
         /* force writeback */
         commit_dcache_range(dma_start_addr, dma_start_size);
         play_start_pcm();
-        pcm_play_dma_started_callback();
+        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     }
     else
     {
@@ -123,7 +122,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 {
     is_playing = true;
 
-    dma_start_addr = (void*)addr;
+    dma_start_addr = addr;
     dma_start_size = size;
     dma_sub_addr = dma_start_addr;
     dma_rem_size = size;
@@ -368,7 +367,12 @@ void INT_I2SIN(void)
         }
     }
 
-    pcm_rec_more_ready_callback(0, (void *)&rec_dma_addr, &rec_dma_size);
+    /* Inform middle layer */
+    if (pcm_rec_dma_complete_callback(PCM_DMAST_OK, (void **)&rec_dma_addr,
+                                      &rec_dma_size))
+    {
+        pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
+    }
 }
 
 
