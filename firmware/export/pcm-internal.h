@@ -41,23 +41,27 @@ void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
 
 /** The following are for internal use between pcm.c and target-
     specific portion **/
-
-/* Called by the bottom layer ISR when more data is needed. Returns non-
- * zero size if more data is to be played. Setting start to NULL
- * forces stop. */
-void pcm_play_get_more_callback(void **start, size_t *size);
-
-/* Called by the bottom layer ISR after next transfer has begun in order
-   to fill more data for next "get more" callback to implement double-buffered
-   callbacks - except for a couple ASM handlers, help drivers to implement
-   this functionality with minimal overhead */
-static FORCE_INLINE void pcm_play_dma_started_callback(void)
+static FORCE_INLINE enum pcm_dma_status pcm_call_status_cb(
+    pcm_status_callback_type callback, enum pcm_dma_status status)
 {
-    extern void (* pcm_play_dma_started)(void);
-    void (* callback)(void) = pcm_play_dma_started;
-    if (callback)
-        callback();
+    if (!callback)
+        return status;
+
+    return callback(status);
 }
+
+static FORCE_INLINE enum pcm_dma_status
+pcm_play_dma_status_callback(enum pcm_dma_status status)
+{
+    extern enum pcm_dma_status
+        (* volatile pcm_play_status_callback)(enum pcm_dma_status);
+    return pcm_call_status_cb(pcm_play_status_callback, status);
+}
+
+/* Called by the bottom layer ISR when more data is needed. Returns true
+ * if a new buffer is available, false otherwise. */
+bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
+                                    const void **addr, size_t *size);
 
 extern unsigned long pcm_curr_sampr;
 extern unsigned long pcm_sampr;
@@ -90,9 +94,28 @@ extern volatile bool pcm_recording;
 void pcm_rec_dma_init(void);
 void pcm_rec_dma_close(void);
 void pcm_rec_dma_start(void *addr, size_t size);
-void pcm_rec_dma_record_more(void *start, size_t size);
 void pcm_rec_dma_stop(void);
 const void * pcm_rec_dma_get_peak_buffer(void);
+
+static FORCE_INLINE enum pcm_dma_status
+pcm_rec_dma_status_callback(enum pcm_dma_status status)
+{
+    extern enum pcm_dma_status
+        (* volatile pcm_rec_status_callback)(enum pcm_dma_status);
+    return pcm_call_status_cb(pcm_rec_status_callback, status);
+}
+
+
+/* Called by the bottom layer ISR when more data is needed. Returns true
+ * if a new buffer is available, false otherwise. */
+bool pcm_rec_dma_complete_callback(enum pcm_dma_status status,
+                                   void **addr, size_t *size);
+
+#ifdef HAVE_PCM_REC_DMA_ADDRESS
+#define pcm_rec_dma_addr(addr) pcm_dma_addr(addr)
+#else
+#define pcm_rec_dma_addr(addr) addr
+#endif
 
 #endif /* HAVE_RECORDING */
 

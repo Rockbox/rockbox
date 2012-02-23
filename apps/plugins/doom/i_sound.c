@@ -457,11 +457,11 @@ void I_UpdateSound( void )
 //  only output be done asynchronous?
 //
 
-void get_more(unsigned char** start, size_t* size)
+void get_more(const void** start, size_t* size)
 {
    I_UpdateSound(); // Force sound update
 
-   *start = (unsigned char*)(mixbuffer);
+   *start = mixbuffer;
    *size = SAMPLECOUNT*2*sizeof(short);
 }
 
@@ -471,7 +471,7 @@ void I_SubmitSound(void)
    if (!enable_sound)
       return;
 
-   rb->pcm_play_data(&get_more, NULL, 0);
+   rb->pcm_play_data(&get_more, NULL, NULL, 0);
 }
 
 void I_ShutdownSound(void)

@@ -28,9 +28,9 @@
 #include "dsp-util.h" /* for clip_sample_16 */
 /* Mix channels' samples and apply gain factors */
 static FORCE_INLINE void mix_samples(int16_t *out,
-                                     int16_t *src0,
+                                     const int16_t *src0,
                                      int32_t src0_amp,
-                                     int16_t *src1,
+                                     const int16_t *src1,
                                      int32_t src1_amp,
                                      size_t size)
 {
@@ -64,7 +64,7 @@ static FORCE_INLINE void mix_samples(int16_t *out,
         if (src0_amp != MIX_AMP_UNITY)
         {
             /* Keep unity in src0, amp0 */
-            int16_t *src_tmp = src0;
+            const int16_t *src_tmp = src0;
             src0 = src1;
             src1 = src_tmp;
             src1_amp = src0_amp;
@@ -84,7 +84,7 @@ static FORCE_INLINE void mix_samples(int16_t *out,
 
 /* Write channel's samples and apply gain factor */
 static FORCE_INLINE void write_samples(int16_t *out,
-                                       int16_t *src,
+                                       const int16_t *src,
                                        int32_t amp,
                                        size_t size)
 {

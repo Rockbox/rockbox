@@ -286,7 +286,7 @@ static int16_t raw_buf[NBSAMPLES] IBSS_ATTR;
 /*
     Audio callback
  */
-static void get_more(unsigned char **start, size_t *size)
+static void get_more(const void **start, size_t *size)
 {
     int32_t *out, *outend;
     int16_t *raw;
@@ -306,7 +306,7 @@ static void get_more(unsigned char **start, size_t *size)
     }
     while (out < outend);
 
-    *start = (unsigned char *)sound_buf;
+    *start = sound_buf;
     *size = NBSAMPLES*sizeof(sound_buf[0]); 
 }
 
@@ -339,7 +339,7 @@ static void start_sound(void)
     wsg3_set_sampling_rate(rb->hw_freq_sampr[sr_index]);
 
     rb->pcm_set_frequency(rb->hw_freq_sampr[sr_index]);
-    rb->pcm_play_data(get_more, NULL, 0);
+    rb->pcm_play_data(get_more, NULL, NULL, 0);
 
     sound_playing = true;
 }

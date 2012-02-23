@@ -1186,8 +1186,8 @@ static inline bool fft_init_fft_lib(void)
 static inline bool fft_get_fft(void)
 {
     int count;
-    int16_t *value =
-        (int16_t *) rb->mixer_channel_get_buffer(PCM_MIXER_CHAN_PLAYBACK, &count);
+    const int16_t *value =
+        rb->mixer_channel_get_buffer(PCM_MIXER_CHAN_PLAYBACK, &count);
     /* This block can introduce discontinuities in our data. Meaning, the
      * FFT will not be done a continuous segment of the signal. Which can
      * be bad. Or not.

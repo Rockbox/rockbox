@@ -65,7 +65,7 @@ void INT_DMAC0C0(void)
     DMAC0INTTCCLR = 1;
     if (!pcm_remaining)
     {
-        pcm_play_get_more_callback((void**)&dataptr, &pcm_remaining);
+        pcm_play_dma_complete_callback((const void**)&dataptr, &pcm_remaining);
         pcm_chunksize = pcm_remaining;
     }
     if (!pcm_remaining)
@@ -115,7 +115,7 @@ void INT_DMAC0C0(void)
     }
     else DMAC0C0NEXTLLI = pcm_lli;
 
-    pcm_play_dma_started_callback();
+    pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 }
 
 void pcm_play_dma_start(const void* addr, size_t size)
