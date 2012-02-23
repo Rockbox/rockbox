@@ -68,6 +68,14 @@
 #define HAVE_LCD_INVERT
 */
 
+/* this is for touchpad */
+#define HAVE_TOUCHPAD
+#define HAVE_TOUCHPAD_SENSITIVITY_SETTING
+#define HAVE_TOUCHPAD_SENSITIVITY_SETTING_ANALOG
+#define DEFAULT_SENSITIVITY_SETTING  10
+#define MIN_SENSITIVITY_SETTING      -5
+#define MAX_SENSITIVITY_SETTING      20
+
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_IMX233
 
