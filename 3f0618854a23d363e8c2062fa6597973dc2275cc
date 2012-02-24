@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAB3///4o\u003d",
+        "filename": "apps/plugin.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-24T13:39:49Z",
+      "side": 1,
+      "message": "Why not use use \u0026LCD_ADDR(0,0) here?",
+      "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///4k\u003d",
+        "filename": "apps/plugin.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-24T13:39:49Z",
+      "side": 1,
+      "message": "See above (same for remote).",
+      "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///4w\u003d",
         "filename": "firmware/export/lcd.h",
         "patchSetId": 5
@@ -30,6 +64,23 @@
       "writtenOn": "2012-02-23T15:17:45Z",
       "side": 1,
       "message": "should be lcd_data(LCD_ADDR(px, py));",
+      "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///4g\u003d",
+        "filename": "firmware/target/hosted/sdl/lcd-bitmap.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-24T13:39:49Z",
+      "side": 1,
+      "message": "I suppose you can just remove the whole #ifdef here (assuming it\u0027s correct for VERTICAL_STRIDE, the simulator should expose problems though).",
       "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
