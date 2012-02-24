@@ -34,8 +34,8 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
  ***/
 
 /* We use PLA */
-#define BTN_MENU           PLA_EXIT
-#define BTN_MENU2          PLA_CANCEL
+#define BTN_EXIT           PLA_EXIT
+#define BTN_MENU           PLA_CANCEL
 #define BTN_FIRE           PLA_SELECT
 #define BTN_FIRE_REPEAT    PLA_SELECT_REPEAT
 
@@ -506,8 +506,11 @@ enum plugin_status plugin_start(const void* parameter)
 
         switch(button)
         {
+            case BTN_EXIT: /* exit directly */
+                quit_plugin = true;
+                break;
+
             case BTN_MENU: /* back to config menu */
-            case BTN_MENU2:
                 fireworks_menu();
                 break;
 
