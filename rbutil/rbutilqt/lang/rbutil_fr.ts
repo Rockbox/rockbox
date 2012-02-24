@@ -4,6 +4,10 @@
 <context>
     <name>BootloaderInstallAms</name>
     <message>
+        <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="obsolete">L&apos;installation du bootloader nécessite que vous fournissiez le firmware original (fichier bin). Vous devez télécharger ce fichier par vous-même pour des raisons légales. Veuillez consulter le &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Forums Sansa&lt;/a&gt;, le &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manuel&lt;/a&gt;, ou encore la page wiki &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt;, pour savoir comment obtenir ce fichier. Appuyez sur Ok pour continuer et sélectionner le fichier du firmware.</translation>
+    </message>
+    <message>
         <location filename="../base/bootloaderinstallams.cpp" line="32"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation type="unfinished"></translation>
@@ -22,7 +26,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="124"/>
         <source>No room to insert bootloader, try another firmware version</source>
-        <translation>Il n&apos;y a pas assez d&apos;espace pour insérer le bootloader, veuillez essayer avec une autre version du firmware</translation>
+        <translation type="unfinished">Il n&apos;y a pas assez d&apos;espace pour insérer le bootloader, veuillez essayer une autre version du firmware</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="134"/>
@@ -143,6 +147,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
+        <translation type="obsolete">&lt;li&gt;Redémarrez votre lecteur audio en mode firmware original.&lt;/li&gt;&lt;li&gt;Faites une mise à jour de celui-ci. Veuillez vous référer au manuel de votre lecteur audio pour plus d&apos;informations.&lt;/li&gt;&lt;li&gt;Une fois le firmware mis à jour, redémarrez votre lecteur audio.&lt;/li&gt;</translation>
+    </message>
+    <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="241"/>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
         <translation>&lt;li&gt;Éteignez votre lecteur audio&lt;/li&gt;&lt;li&gt;Insérer le chargeur&lt;/li&gt;</translation>
@@ -150,18 +158,17 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="246"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
-        <translation>Débranchez de l&apos;USB et du courant&lt;/li&gt;&lt;li&gt;Maintenez &lt;i&gt;Bouton d&apos;alimentation&lt;/i&gt; pour éteindre le lecteur&lt;/li&gt;&lt;li&gt;Basculez l&apos;interrupteur&lt;/li&gt;&lt;li&gt;Maintenez &lt;i&gt;Bouton d&apos;alimentation&lt;/i&gt; pour démarrer avec Rockbox&lt;/li&gt;</translation>
+        <translation type="unfinished">Débranchez le cable USB et celui d&apos;alimentation&lt;/li&gt;&lt;li&gt;Maintenez le &lt;i&gt;Bouton d&apos;alimentation&lt;/i&gt; pressé pour éteindre le lecteur&lt;/li&gt;&lt;li&gt;Basculez l&apos;interrupteur&lt;/li&gt;&lt;li&gt;Maintenez le &lt;i&gt;Bouton d&apos;alimentation&lt;/i&gt; pressé pour démarrer Rockbox&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="252"/>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Remarque:&lt;/b&gt; Vous pouvez commencer par installer d&apos;autres parties de Rockbox, mais n&apos;oubliez pas que les étapes suivantes sont &lt;b&gt;nécessaire&lt;/b&gt; pour finir l&apos;inbstallation !&lt;/p&gt;</translation>
+        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Remarque:&lt;/b&gt; Vous pouvez commencer par installer d&apos;autres parties de Rockbox, mais n&apos;oubliez pas que les étapes suivantes sont &lt;b&gt;nécessaire&lt;/b&gt; pour finir l&apos;installation !&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="266"/>
         <source>Waiting for system to remount player</source>
-        <translatorcomment>Pas super mais je ne vois pas comment traduire çà</translatorcomment>
-        <translation>En attente du système pour qu&apos;il remonte le périphérique audio</translation>
+        <translation type="unfinished">Attend que le système ait remonté le périphérique audio</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="296"/>
@@ -184,7 +191,7 @@
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (HXF file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>L&apos;installation du bootloader nécessite que vous fournissiez un fichier contenant le firmware original (fichier HXF). Vous devez télécharger ce fichier par vous-même pour des raisons légales. Veuillez vous référer au &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manuel&lt;/a&gt; et à la page wiki &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; pour obtenir ce fichier.&lt;br/&gt;Appuyez sur Ok pour continuer et parcourir les fichiers sur votre ordinateur pour indiquer le fichier du firmware.</translation>
+        <translation type="unfinished">L&apos;installation du bootloader nécessite que vous fournissiez un fichier contenant le firmware original (fichier HXF). Vous devez télécharger ce fichier par vous-même pour des raisons légales. Veuillez consulter le &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manuel&lt;/a&gt; ou la page wiki &lt;a href=&apos;http://www.rockbox.org/wiki/OndaVX747#Download_and_extract_a_recent_ve&apos;&gt;OndaVX747&lt;/a&gt; pour savoir comment obtenir ce fichier.&lt;br/&gt;Appuyez sur Ok pour continuer et parcourir les fichiers de votre ordinateur pour selectionner le fichier du firmware.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallchinachip.cpp" line="50"/>
@@ -272,7 +279,7 @@
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="74"/>
         <source>Error accessing output folder</source>
-        <translation>Erreur lors de l&apos;accès au dossier de sortie</translation>
+        <translation type="unfinished">Erreur lors de l&apos;accès au dossier de sortie</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallfile.cpp" line="87"/>
@@ -932,7 +939,34 @@ Veuillez vous référer à http://www.rockbox.org/wiki/SansaE200Install
     </message>
 </context>
 <context>
+    <name>BrowseDirtreeFrm</name>
+    <message>
+        <source>Find Directory</source>
+        <translation type="obsolete">Ouverture du répertoire</translation>
+    </message>
+    <message>
+        <source>Browse to the destination folder</source>
+        <translation type="obsolete">Indiquez le répertoire de destination</translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation type="obsolete">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="obsolete">&amp;Annuler</translation>
+    </message>
+</context>
+<context>
     <name>Config</name>
+    <message>
+        <source>Language changed</source>
+        <translation type="obsolete">Changement de langue</translation>
+    </message>
+    <message>
+        <source>You need to restart the application for the changed language to take effect.</source>
+        <translation type="obsolete">Vous devez redémarrer l&apos;application pour que le changement de langue prenne effet.</translation>
+    </message>
     <message>
         <location filename="../configure.cpp" line="310"/>
         <source>Showing disabled targets</source>
@@ -971,12 +1005,14 @@ Rockbox ne peut fonctionner que sur un Ipod utilisant le système de fichier FAT
         <location filename="../configure.cpp" line="743"/>
         <source>%1 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pour effectuer l&apos;installation, il est nécessaire de mettre votre lecteur audio en mode MSC </translatorcomment>
+        <translation type="unfinished">%1 est en mode MTP!
+Pour effectuer l&apos;installation, il est nécessaire de mettre votre lecteur audio en mode MSC.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="748"/>
         <source>Until you change this installation will fail!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cette installation échouera tant que vous n&apos;aurez pas modifié cela!</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="755"/>
@@ -1079,6 +1115,10 @@ Veuillez configurer le moteur TTS.</translation>
         <source>Could not voice test string.
 </source>
         <translation>Impossible de synthétiser la phrase de test.</translation>
+    </message>
+    <message>
+        <source>Select your device</source>
+        <translation type="obsolete">Sélectionnez votre périphérique</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="750"/>
@@ -1193,7 +1233,7 @@ Veuillez configurer le moteur TTS.</translation>
     <message>
         <location filename="../configurefrm.ui" line="136"/>
         <source>&amp;Proxy</source>
-        <translation>&amp;Proxy</translation>
+        <translation type="unfinished">P&amp;roxy</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="142"/>
@@ -1341,7 +1381,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../configurefrm.ui" line="152"/>
         <source>Use S&amp;ystem values</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utiliser les &amp;valeurs système</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="420"/>
@@ -1442,6 +1482,36 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
         <location filename="../createvoicewindow.cpp" line="115"/>
         <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Encodeur sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>EncExes</name>
+    <message>
+        <source>Path to Encoder:</source>
+        <translation type="obsolete">Chemin vers le moteur d&apos;encodage:</translation>
+    </message>
+    <message>
+        <source>Encoder options:</source>
+        <translation type="obsolete">Options du moteur d&apos;encodage:</translation>
+    </message>
+</context>
+<context>
+    <name>EncRbSpeex</name>
+    <message>
+        <source>Volume:</source>
+        <translation type="obsolete">Volume:</translation>
+    </message>
+    <message>
+        <source>Quality:</source>
+        <translation type="obsolete">Qualité:</translation>
+    </message>
+    <message>
+        <source>Complexity:</source>
+        <translation type="obsolete">Complexité:</translation>
+    </message>
+    <message>
+        <source>Use Narrowband:</source>
+        <translation type="obsolete">Utiliser le bas débit:</translation>
     </message>
 </context>
 <context>
@@ -1713,7 +1783,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../installwindow.cpp" line="209"/>
         <source>Backup finished.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sauvegarde terminée.</translation>
     </message>
     <message>
         <location filename="../installwindow.cpp" line="212"/>
@@ -1984,12 +2054,13 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../base/system.cpp" line="384"/>
         <source>(unknown vendor name) </source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Je suppose que le nom du vendeur est l&apos;équivalent de la marque... nom du vendeur serait bizarre...</translatorcomment>
+        <translation type="unfinished">Marque du produit inconnue</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="402"/>
         <source>(unknown product name)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nom du produit inconnu</translation>
     </message>
 </context>
 <context>
@@ -1997,11 +2068,19 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../quazip/quazipfile.cpp" line="141"/>
         <source>ZIP/UNZIP API error %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erreur de l&apos;API ZIP/UNZIP : %1</translation>
     </message>
 </context>
 <context>
     <name>RbUtilQt</name>
+    <message>
+        <source>File</source>
+        <translation type="obsolete">Fichier</translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="obsolete">Version</translation>
+    </message>
     <message>
         <location filename="../rbutilqt.cpp" line="227"/>
         <location filename="../rbutilqt.cpp" line="260"/>
@@ -2023,6 +2102,22 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
         <location filename="../rbutilqt.cpp" line="411"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; sur &lt;b&gt;%3&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
+        <translation type="obsolete">&lt;a href=&apos;%1&apos;&gt;Manuel PDF&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
+        <translation type="obsolete">&lt;a href=&apos;%1&apos;&gt;Manuel HTML (ouvre un navigateur)&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <source>Select a device for a link to the correct manual</source>
+        <translation type="obsolete">Sélectionnez un périphérique pour obtenir un lien vers le manuel approprié</translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
+        <translation type="obsolete">&lt;a href=&apos;%1&apos;&gt;Tous les manuels&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="426"/>
@@ -2105,6 +2200,14 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
         <location filename="../rbutilqt.cpp" line="1072"/>
         <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
         <translation>L&apos;utilitaire Rockbox ne peut pas désinstaller le bootloader. Essayez de faire une mise à jour normale du firmware pour supprimer le bootloader.</translation>
+    </message>
+    <message>
+        <source>Confirm download</source>
+        <translation type="obsolete">Confirmation du téléchargement</translation>
+    </message>
+    <message>
+        <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
+        <translation type="obsolete">Etes-vous sûr de vouloir télécharger le manuel ? Il sera sauvegardé dans le dossier racine de votre lecteur audio.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="1091"/>
@@ -2491,9 +2594,41 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
         <translation>Voir et télécharger le manuel</translation>
     </message>
     <message>
+        <source>Read the manual</source>
+        <translation type="obsolete">Lire le manuel</translation>
+    </message>
+    <message>
+        <source>PDF manual</source>
+        <translation type="obsolete">Manuel PDF</translation>
+    </message>
+    <message>
+        <source>HTML manual</source>
+        <translation type="obsolete">Manuel HTML</translation>
+    </message>
+    <message>
+        <source>Download the manual</source>
+        <translation type="obsolete">Télécharger le manuel</translation>
+    </message>
+    <message>
+        <source>&amp;PDF version</source>
+        <translation type="obsolete">Version &amp;PDF</translation>
+    </message>
+    <message>
+        <source>&amp;HTML version (zip file)</source>
+        <translation type="obsolete">Version &amp;HTML (fichier zip)</translation>
+    </message>
+    <message>
+        <source>Down&amp;load</source>
+        <translation type="obsolete">Télé&amp;charger</translation>
+    </message>
+    <message>
         <location filename="../rbutilqtfrm.ui" line="656"/>
         <source>Inf&amp;o</source>
         <translation>Inf&amp;o</translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="obsolete">1</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="674"/>
@@ -2651,6 +2786,10 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
         <location filename="../rbutilqtfrm.ui" line="605"/>
         <source>&lt;b&gt;Uninstall Rockbox from your audio player.&lt;/b&gt;&lt;br/&gt;This will leave the bootloader in place (you need to remove it manually).</source>
         <translation>&lt;b&gt;Désinstaller Rockbox de votre lecteur audio&lt;/b&gt;&lt;br/&gt;Ceci laissera le bootloader (vous devrez le supprimer manuellement).</translation>
+    </message>
+    <message>
+        <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
+        <translation type="obsolete">Paquets actuellement installés.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt;Si vous avez installé manuellement des paquets, ceci ne sera peut-être pas correct !</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="817"/>
@@ -2860,6 +2999,10 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
         <source>&lt;tr&gt;&lt;td&gt;%1&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td&gt;%2 GiB&lt;/td&gt;&lt;td&gt;%3 GiB&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1, %2 MiB available</source>
+        <translation type="obsolete">%1, %2 Mo disponibles</translation>
+    </message>
 </context>
 <context>
     <name>SysinfoFrm</name>
@@ -2913,32 +3056,32 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../base/ttsbase.cpp" line="39"/>
         <source>Espeak TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Synthèse vocale basée sur Espeak</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="40"/>
         <source>Flite TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Synthèse vocale basée sur Flite</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="41"/>
         <source>Swift TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Synthèse vocale basée sur Swift</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="43"/>
         <source>SAPI TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Synthèse vocale basée sur SAPI</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="46"/>
         <source>Festival TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Synthèse vocale basée sur Festival</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="49"/>
         <source>OS X System Engine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Synthèse vocale basée sur le système OS X</translation>
     </message>
 </context>
 <context>
@@ -2956,7 +3099,7 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
     <message>
         <location filename="../base/ttscarbon.cpp" line="151"/>
         <source>Pitch (0 for default):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hauteur de ton  (0 est la valeur par defaut) :</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="221"/>
@@ -3017,6 +3160,14 @@ Ceci installera Rockbox %1. Pour installer la version en cours de développement
 </context>
 <context>
     <name>TTSSapi</name>
+    <message>
+        <source>Could not copy the Sapi-script</source>
+        <translation type="obsolete">Impossible de copier le script Sapi</translation>
+    </message>
+    <message>
+        <source>Could not start the Sapi-script</source>
+        <translation type="obsolete">Impossible de démarrer le script Sapi</translation>
+    </message>
     <message>
         <location filename="../base/ttssapi.cpp" line="43"/>
         <source>Language:</source>
@@ -3383,6 +3534,12 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>&lt;li&gt;Target mismatch detected.
+Installed target: %1, selected target: %2.&lt;/li&gt;</source>
+        <translation type="obsolete">&lt;li&gt;Incohérence de cibles d&apos;installation détectée.
+Cible détectée: %1, cible sélectionnée: %2.&lt;/li&gt;</translation>
+    </message>
+    <message>
         <location filename="../base/utils.cpp" line="328"/>
         <source>Problem detected:</source>
         <translation>Problème détecté:</translation>
@@ -3516,7 +3673,7 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/zipinstaller.cpp" line="151"/>
         <source>Extraction failed!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">L&apos;extraction a échoué !</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="160"/>
@@ -3544,17 +3701,17 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/ziputil.cpp" line="118"/>
         <source>Creating output path failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La création du chemin d&apos;installation a échoué</translation>
     </message>
     <message>
         <location filename="../base/ziputil.cpp" line="125"/>
         <source>Creating output file failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">la création du fichier à installer a échoué</translation>
     </message>
     <message>
         <location filename="../base/ziputil.cpp" line="134"/>
         <source>Error during Zip operation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erreur lors de l&apos;utilisation de Zip</translation>
     </message>
 </context>
 <context>
