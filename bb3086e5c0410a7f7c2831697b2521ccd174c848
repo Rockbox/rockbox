@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///5I\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2012-02-24T09:22:26Z",
+      "side": 1,
+      "message": "I would prefer to not quote source code to back up your claim that something is missing -- everyone interested can simply look it up in the source code. IMO mentioning the affected files should be completely sufficient, so the commit message could be shortened to something like\n\n\u003d\u003d\u003d\u003d\u003d\u003d\n\nBubbles manual missing one exit link\n\nbubbles.c defines two exit links (PLA_EXIT and PLA_CANCEL). However, the manual only mentiones the PLA_CANCEL button. Add the missing one.\n\n\u003d\u003d\u003d\u003d\u003d\u003d\n\nIn general you shouldn\u0027t be too verbose in commit messages (though I also have a tedency for being pretty verbose), especially don\u0027t state the obvious and don\u0027t repeat things that are easily to be looked up.",
+      "revId": "bb3086e5c0410a7f7c2831697b2521ccd174c848",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///5M\u003d",
+        "filename": "manual/plugins/bubbles.tex",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2012-02-24T09:22:26Z",
+      "side": 1,
+      "message": "As far as I can see this change has already been introduced with gerrit#119.",
+      "revId": "bb3086e5c0410a7f7c2831697b2521ccd174c848",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
