@@ -1,88 +1,66 @@
 % $Id$ %
-\subsection{Calculator}
-\screenshot{plugins/images/ss-calculator}{Calculator}{img:calculator}
+\subsection{Calendar}
+\screenshot{plugins/images/ss-calendar}{Calendar}{img:calendar}
+This is a small and simple calendar application with memo saving function.
+Dots indicate dates with memos. The available memo types are: one off,
+yearly, monthly, and weekly memos.
 
-This is a simple scientific calculator for use on the \dap. It works like a
-standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle between
- other available math functions.
+You can select what day is first day of week by the setting \setting{First Day of Week} in the menu.
 
 \begin{btnmap}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD%
-      ,IPOD_3G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-      ,GIGABEAT_S_PAD,MROBE100_PAD,IRIVER_H10_PAD,SANSA_FUZE_PAD,PBELL_VIBE500_PAD}
-      {\ButtonLeft{} / \ButtonRight{} /}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-      ,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
-      ,SANSA_FUZE_PAD,PBELL_VIBE500_PAD}
-      {\ButtonUp{} / \ButtonDown}
-    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{/}
-    \opt{scrollwheel}{\ButtonScrollFwd{} / \ButtonScrollBack}
-    \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
-    \opt{MPIO_HD300_PAD}{\ButtonRew / \ButtonFF / \ButtonScrollUp / \ButtonScrollDown}
-    \opt{MPIO_HD200_PAD}{\ButtonRew / \ButtonFF}
-    \opt{COWON_D2_PAD}{\TouchMidLeft{} / \TouchMidRight / \TouchTopMiddle / \TouchBottomMiddle}
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+        ,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,IPOD_4G_PAD%
+        ,IPOD_3G_PAD,SANSA_E200_PAD,IRIVER_H10_PAD,SANSA_FUZE_PAD,PBELL_VIBE500_PAD
+        ,SANSA_FUZEPLUS_PAD}
+        {\ButtonLeft{} / \ButtonRight{} /}
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_C200_PAD%
+        ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
+        {\ButtonUp{} / \ButtonDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD}
+        {\ButtonScrollFwd{} / \ButtonScrollBack}
+    \opt{IRIVER_H10_PAD,MPIO_HD300_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
+    \opt{COWON_D2_PAD}{\TouchMidLeft{} / \TouchMidRight{} / \TouchTopMiddle{} / \TouchBottomMiddle}
        \opt{HAVEREMOTEKEYMAP}{& }
-    & Move around the keypad\\
+    & Move the selector\\
     %
     \opt{RECORDER_PAD}{\ButtonPlay}
-    \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD%
-        ,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
-        ,SANSA_FUZE_PAD}
+        ,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD%
+        ,SANSA_FUZE_PAD,SANSA_FUZEPLUS_PAD}
         {\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
-    \opt{COWON_D2_PAD}{\TouchCenter}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK}
-    \opt{MPIO_HD200_PAD}{\ButtonFunc}
     \opt{MPIO_HD300_PAD}{\ButtonEnter}
        \opt{HAVEREMOTEKEYMAP}{& }
-    & Select a button\\
+    & Show memos for the selected day\\
     %
-    \nopt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{
-        \opt{RECORDER_PAD}{\ButtonFOne}
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
-            ,SANSA_C200_PAD,MPIO_HD200_PAD}{\ButtonRec}
-        \opt{SANSA_FUZE_PAD}{\ButtonHome}
-        \opt{IRIVER_H10_PAD}{\ButtonRew}
-        \opt{GIGABEAT_PAD}{\ButtonA}
-        \opt{GIGABEAT_S_PAD}{\ButtonPlay}
-        \opt{MROBE100_PAD}{\ButtonDisplay}
-        \opt{COWON_D2_PAD,MPIO_HD300_PAD}{\ButtonMenu}
-        \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
-       \opt{HAVEREMOTEKEYMAP}{& }
-        & Delete last entered digit or clear after calculation\\
-        %
-    }
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
-        \opt{RECORDER_PAD}{\ButtonFTwo}
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-       \opt{HAVEREMOTEKEYMAP}{& }
-        & Cycle through the 4 basic operators\\
-        %
-    }
-    \opt{RECORDER_PAD}{\ButtonFThree}
-    \opt{ONDIO_PAD}{Long \ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD
-        ,PBELL_VIBE500_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD}
-        {\ButtonPlay}
-    \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD}{Long \ButtonSelect}
-    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonMenu}
-    \opt{COWON_D2_PAD}{\TouchBottomRight}
-       \opt{HAVEREMOTEKEYMAP}{& }
-    & Calculate\\
+    \opt{MPIO_HD300_PAD}{\ButtonRew / \ButtonFF
+    & Previous / Next week\\}
     %
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
-        ,MROBE100_PAD,COWON_D2_PAD}{\ButtonPower}
-    \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
+    \opt{RECORDER_PAD}{\ButtonOn{} + \ButtonUp{} / \ButtonDown}
+    \opt{MROBE100_PAD}{\ButtonMenu{} + \ButtonUp{} / \ButtonDown}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode{} / \ButtonRec}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonPlay{} / \ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec{} / \ButtonPlay}
+    \opt{GIGABEAT_PAD,SANSA_C200_PAD}{\ButtonVolUp{} / \ButtonVolDown}
+    \opt{GIGABEAT_S_PAD}{\ButtonNext{} / \ButtonPrev}
+    \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonUp{} / \ButtonDown}
+    \opt{IRIVER_H10_PAD}{\ButtonFF{} / \ButtonRew}
+    \opt{COWON_D2_PAD}{\TouchBottomLeft{} / \TouchBottomRight}
+    \opt{PBELL_VIBE500_PAD}{\ButtonMenu{} / \ButtonPlay}
+    \opt{MPIO_HD300_PAD}{\ButtonRec{} / \ButtonPlay}
+    \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack{} / \ButtonPlay}
+       \opt{HAVEREMOTEKEYMAP}{& }
+    & Previous / Next month\\
+    %
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu{} + \ButtonSelect}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
+    \opt{COWON_D2_PAD}{\ButtonPower}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec}
-    \opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}
     \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
-       \opt{HAVEREMOTEKEYMAP}{&
-          \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
-       }
+       \opt{HAVEREMOTEKEYMAP}{& }
     & Quit\\
 \end{btnmap}
