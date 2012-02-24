@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAB3///4w\u003d",
+        "filename": "firmware/export/lcd.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-02-24T13:29:54Z",
+      "side": 1,
+      "message": "Perhaps lcd_static_framebuffer[] shouldn\u0027t be exposed, and provide a function to get its size (will be needed anyway for dynamic lcd size). I\u0027m imagining:\nFB_SIZE() (gets the size, can be a compile time constant/macro on native targets)\nFB_ADDR(x,y) (like that name more that LCD_ADDR :p)",
+      "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///5k\u003d",
         "filename": "firmware/target/arm/rk27xx/lcd-hifiman.c",
         "patchSetId": 5
