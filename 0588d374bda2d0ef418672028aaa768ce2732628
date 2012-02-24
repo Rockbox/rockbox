@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///4U\u003d",
+        "filename": "apps/settings.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 847,
+      "author": {
+        "id": 1000045
+      },
+      "writtenOn": "2012-02-24T19:54:01Z",
+      "side": 1,
+      "message": "What\u0027s this? What are the possible values and where are they used?",
+      "revId": "0588d374bda2d0ef418672028aaa768ce2732628",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
