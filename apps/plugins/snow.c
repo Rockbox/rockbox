@@ -21,8 +21,7 @@
 #include "plugin.h"
 #include "lib/playergfx.h"
 #include "lib/mylcd.h"
-
-
+#include "lib/pluginlib_actions.h"
 
 #ifdef HAVE_LCD_BITMAP
 #define NUM_PARTICLES (LCD_WIDTH * LCD_HEIGHT / 72)
@@ -34,70 +33,11 @@
 #define SNOW_WIDTH 20
 #endif
 
-/* variable button definitions */
-#if CONFIG_KEYPAD == PLAYER_PAD
-#define SNOW_QUIT BUTTON_STOP
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define SNOW_QUIT BUTTON_MENU
-
-#elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
-#define SNOW_QUIT BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-(CONFIG_KEYPAD == SANSA_C200_PAD) ||  \
-(CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-(CONFIG_KEYPAD == SANSA_M200_PAD) || \
-(CONFIG_KEYPAD == MROBE500_PAD) || \
-(CONFIG_KEYPAD == IRIVER_H10_PAD) || \
-(CONFIG_KEYPAD == MROBE100_PAD) || \
-(CONFIG_KEYPAD == COWON_D2_PAD) || \
-(CONFIG_KEYPAD == IAUDIO67_PAD) || \
-(CONFIG_KEYPAD == ONDAVX747_PAD) || \
-(CONFIG_KEYPAD == ONDAVX777_PAD) || \
-(CONFIG_KEYPAD == GIGABEAT_PAD) || \
-(CONFIG_KEYPAD == IAUDIO_X5M5_PAD) || \
-(CONFIG_KEYPAD == SANSA_CONNECT_PAD)
-#define SNOW_QUIT BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#define SNOW_QUIT (BUTTON_HOME|BUTTON_REPEAT)
-
-#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD) || \
-(CONFIG_KEYPAD == CREATIVEZVM_PAD) || \
-(CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
-#define SNOW_QUIT BUTTON_BACK
-
-#elif (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) || \
-(CONFIG_KEYPAD == PHILIPS_HDD6330_PAD) || \
-(CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
-#define SNOW_QUIT BUTTON_POWER
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define SNOW_QUIT BUTTON_REC
-#define SNOW_RC_QUIT BUTTON_RC_REC
-
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-#define SNOW_QUIT BUTTON_REC
-
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define SNOW_QUIT (BUTTON_REC|BUTTON_PLAY)
-
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define SNOW_QUIT (BUTTON_REC|BUTTON_REPEAT)
-
-#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
-#define SNOW_QUIT BUTTON_POWER
-
-#else
-#define SNOW_QUIT BUTTON_OFF
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define SNOW_RC_QUIT BUTTON_RC_STOP
-#endif
-#endif
+/* PLA definitions */
+#define SNOW_QUIT    PLA_EXIT
+#define SNOW_QUIT2   PLA_CANCEL
 
 static short particles[NUM_PARTICLES][2];
 
@@ -240,13 +180,11 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
         rb->sleep(HZ/20);
         
-        button = rb->button_get(false);
+                /*We get button from PLA this way */
+        button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
 
-        if (button == SNOW_QUIT
-#ifdef SNOW_RC_QUIT
-        || button == SNOW_RC_QUIT
-#endif
-        )
+        if ((button == SNOW_QUIT) || (button == SNOW_QUIT2))
         {
 #ifdef HAVE_LCD_CHARCELLS
             pgfx_release();
