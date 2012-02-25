@@ -200,8 +200,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
              viewport;
              viewport = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->next))
         {
-            int origional_x, origional_y;
-            int origional_w, origional_h;
+            int original_x, original_y;
             skin_viewport = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->data);
             char *viewport_label = SKINOFFSETTOPTR(get_skin_buffer(wps.data), skin_viewport->label);
             if (viewport->children == 0 || !viewport_label ||
@@ -213,24 +212,22 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
                 memcpy(&listcfg[screen]->selected_item_vp, skin_viewport, sizeof(struct skin_viewport));
                 skin_viewport = &listcfg[screen]->selected_item_vp;
             }
-            origional_x = skin_viewport->vp.x;
-            origional_y = skin_viewport->vp.y;
-            origional_w = skin_viewport->vp.width;
-            origional_h = skin_viewport->vp.height;
+            original_x = skin_viewport->vp.x;
+            original_y = skin_viewport->vp.y;
             if (listcfg[screen]->tile)
             {
                 int cols = (parent->width / listcfg[screen]->width);
                 current_column = (cur_line)%cols;
                 current_row = (cur_line)/cols;
                 
-                skin_viewport->vp.x = parent->x + listcfg[screen]->width*current_column + origional_x;
-                skin_viewport->vp.y = parent->y + listcfg[screen]->height*current_row + origional_y;
+                skin_viewport->vp.x = parent->x + listcfg[screen]->width*current_column + original_x;
+                skin_viewport->vp.y = parent->y + listcfg[screen]->height*current_row + original_y;
             }
             else
             {
                 current_row = cur_line;
-                skin_viewport->vp.x = parent->x + origional_x;
-                skin_viewport->vp.y = parent->y + origional_y +
+                skin_viewport->vp.x = parent->x + original_x;
+                skin_viewport->vp.y = parent->y + original_y +
                                    (listcfg[screen]->height*cur_line);
             }
             display->set_viewport(&skin_viewport->vp);
@@ -255,10 +252,8 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
             if (!is_selected)
             {
                 display->scroll_stop(&skin_viewport->vp);
-                skin_viewport->vp.x = origional_x;
-                skin_viewport->vp.y = origional_y;
-                skin_viewport->vp.width = origional_w;
-                skin_viewport->vp.height = origional_h;
+                skin_viewport->vp.x = original_x;
+                skin_viewport->vp.y = original_y;
             }
         }
     }
