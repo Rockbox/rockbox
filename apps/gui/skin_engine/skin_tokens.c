@@ -942,6 +942,10 @@ const char *get_token_value(struct gui_wps *gwps,
                     buf = &buf[start_byte];
 
                 buf[byte_len] = '\0';
+                if (ss->expect_number &&
+                    intval && (buf[0] >= '0' && buf[0] <= '9'))
+                    *intval = atoi(buf) + 1; /* so 0 is the first item */
+                    
                 return buf;
             }
             return NULL;

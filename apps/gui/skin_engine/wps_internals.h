@@ -286,6 +286,7 @@ struct logical_if {
 struct substring {
     int start;
     int length;
+    bool expect_number;
     OFFSETTYPE(struct wps_token *) token;
 };
 

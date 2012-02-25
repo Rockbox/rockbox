@@ -740,6 +740,20 @@ a horizontal progressbar which doesn't fill and draws the image
   fits inside the specified width and height.}
 
 \section{Other Tags}
+
+\begin{tagmap}
+  \config{\%ss(start, length, tag [,number]} & Get a substring from another tag.\\
+\end{tagmap}
+    Use this tag to get a substring from another tag.
+\begin{description}
+    \item[start] -- first character to take (0 being the start of the string)
+    \item[length] -- length of the substring to return (- for the rest of the string)
+    \item[tag] -- tag to get
+    \item[number] -- OPTIONAL. if this is present it will assume the
+            substring is a number so it can be used with conditionals. (i.e \config{\%cM}).
+            0 is the first conditional option
+\end{description}
+    
 \begin{tagmap}
   \config{\%(}           & The character `('\\
   \config{\%)}           & The character `)'\\

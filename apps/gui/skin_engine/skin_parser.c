@@ -824,6 +824,10 @@ static int parse_substring_tag(struct skin_element* element,
     else
         ss->length = get_param(element, 1)->data.number;
     ss->token = get_param_code(element, 2)->data;
+    if (element->params_count > 3)
+        ss->expect_number = !strcmp(get_param_text(element, 3), "number");
+    else
+        ss->expect_number = false;
     token->value.data = PTRTOSKINOFFSET(skin_buffer, ss);
     return 0;
 }
