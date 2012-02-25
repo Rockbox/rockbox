@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///3w\u003d",
+        "filename": "apps/plugin.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-02-25T10:46:31Z",
+      "side": 1,
+      "message": "I don\u0027t tihnk that will actually compile. I changed this line to the stati cbuffer to make it just work, need to decide the proper way to deal with the framebuffer in plugins (I suspect we\u0027ll want something more like rb-\u003eget_framebuffer()",
+      "parentUuid": "AAAAB3///4o\u003d",
+      "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///4k\u003d",
         "filename": "apps/plugin.c",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2012-02-24T13:39:49Z",
       "side": 1,
       "message": "See above (same for remote).",
+      "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///3s\u003d",
+        "filename": "apps/plugin.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-02-25T10:46:31Z",
+      "side": 1,
+      "message": "See above",
+      "parentUuid": "AAAAB3///4k\u003d",
       "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///3o\u003d",
+        "filename": "firmware/export/lcd.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-02-25T10:46:31Z",
+      "side": 1,
+      "message": "perhaps. FB_SIZE() does need to be done though.",
+      "parentUuid": "AAAAB3///4w\u003d",
+      "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///5k\u003d",
         "filename": "firmware/target/arm/rk27xx/lcd-hifiman.c",
         "patchSetId": 5
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///3k\u003d",
+        "filename": "firmware/target/arm/rk27xx/lcd-hifiman.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-02-25T10:46:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAB3///5k\u003d",
+      "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///4g\u003d",
         "filename": "firmware/target/hosted/sdl/lcd-bitmap.c",
         "patchSetId": 5
@@ -81,6 +153,24 @@
       "writtenOn": "2012-02-24T13:39:49Z",
       "side": 1,
       "message": "I suppose you can just remove the whole #ifdef here (assuming it\u0027s correct for VERTICAL_STRIDE, the simulator should expose problems though).",
+      "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///30\u003d",
+        "filename": "firmware/target/hosted/sdl/lcd-bitmap.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-02-25T10:46:31Z",
+      "side": 1,
+      "message": "yeah, line 114 looks wrong.",
+      "parentUuid": "AAAAB3///4g\u003d",
       "revId": "3f0618854a23d363e8c2062fa6597973dc2275cc",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
