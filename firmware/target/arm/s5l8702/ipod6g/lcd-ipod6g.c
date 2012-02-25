@@ -63,7 +63,7 @@ static bool lcd_ispowered;
 
 /* powersave sequences */
 
-unsigned short lcd_sleep_sequence_01[] =
+static const unsigned short lcd_sleep_sequence_01[] =
 {
     CMD16,  0x028,  /* Display Off */
     SLEEP,  0x005,  /* 50 ms */
@@ -72,7 +72,7 @@ unsigned short lcd_sleep_sequence_01[] =
     END
 };
 
-unsigned short lcd_deep_stby_sequence_23[] =
+static const unsigned short lcd_deep_stby_sequence_23[] =
 {
     /* Display Off */
     REG15,  0x007,  0x0172,
@@ -96,7 +96,7 @@ unsigned short lcd_deep_stby_sequence_23[] =
 #ifdef HAVE_LCD_SLEEP
 /* init sequences */
 
-unsigned short lcd_init_sequence_01[] =
+static const unsigned short lcd_init_sequence_01[] =
 {
     CMD16,  0x011,  /* Sleep Out Mode */
     SLEEP,  0x006,  /* 60 ms */
@@ -104,7 +104,7 @@ unsigned short lcd_init_sequence_01[] =
     END
 };
 
-unsigned short lcd_init_sequence_23[] =
+static const unsigned short lcd_init_sequence_23[] =
 {
     /* Display settings */
     REG15,  0x008,  0x0808,
@@ -220,7 +220,7 @@ static inline void s5l_lcd_write_data(unsigned short data)
     LCD_WDATA = data;
 }
 
-static void lcd_run_sequence(unsigned short *seq)
+static void lcd_run_sequence(const unsigned short *seq)
 {
     unsigned short tmp;
 
