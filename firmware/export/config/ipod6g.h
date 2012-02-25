@@ -93,8 +93,8 @@
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
 #ifndef BOOTLOADER
-//TODO: #define HAVE_LCD_SLEEP
-//TODO: #define HAVE_LCD_SLEEP_SETTING
+#define HAVE_LCD_SLEEP
+#define HAVE_LCD_SLEEP_SETTING
 #endif
 
 #define CONFIG_KEYPAD IPOD_4G_PAD

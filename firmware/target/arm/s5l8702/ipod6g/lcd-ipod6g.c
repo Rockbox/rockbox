@@ -53,15 +53,159 @@ static struct dma_lli lcd_lli[(LCD_WIDTH * LCD_HEIGHT - 1) / 0xfff] CACHEALIGN_A
 static struct semaphore lcd_wakeup;
 static struct mutex lcd_mutex;
 static uint16_t lcd_dblbuf[LCD_HEIGHT][LCD_WIDTH];
+static bool lcd_ispowered;
 
+#define SLEEP       0
+#define CMD16       1
+#define DATA16      2
+#define REG15       3
+#define END         0xff
 
-static inline void s5l_lcd_write_cmd_data(int cmd, int data)
+/* powersave sequences */
+
+unsigned short lcd_sleep_sequence_01[] =
+{
+    CMD16,  0x028,  /* Display Off */
+    SLEEP,  0x005,  /* 50 ms */
+    CMD16,  0x010,  /* Sleep In Mode */
+    SLEEP,  0x005,  /* 50 ms */
+    END
+};
+
+unsigned short lcd_deep_stby_sequence_23[] =
+{
+    /* Display Off */
+    REG15,  0x007,  0x0172,
+    REG15,  0x030,  0x03ff,
+    SLEEP,  0x00a,
+    REG15,  0x007,  0x0120,
+    REG15,  0x030,  0x0000,
+    REG15,  0x100,  0x0780,
+    REG15,  0x007,  0x0000,
+    REG15,  0x101,  0x0260,
+    REG15,  0x102,  0x00a9,
+    SLEEP,  0x003,
+    REG15,  0x100,  0x0700,
+
+    /* Deep Standby Mode */
+    REG15,  0x100,  0x0704,
+    SLEEP,  0x005,
+    END
+};
+
+#ifdef HAVE_LCD_SLEEP
+/* init sequences */
+
+unsigned short lcd_init_sequence_01[] =
+{
+    CMD16,  0x011,  /* Sleep Out Mode */
+    SLEEP,  0x006,  /* 60 ms */
+    CMD16,  0x029,  /* Display On */
+    END
+};
+
+unsigned short lcd_init_sequence_23[] =
+{
+    /* Display settings */
+    REG15,  0x008,  0x0808,
+    REG15,  0x010,  0x0013,
+    REG15,  0x011,  0x0300,
+    REG15,  0x012,  0x0101,
+    REG15,  0x013,  0x0a03,
+    REG15,  0x014,  0x0a0e,
+    REG15,  0x015,  0x0a19,
+    REG15,  0x016,  0x2402,
+    REG15,  0x018,  0x0001,
+    REG15,  0x090,  0x0021,
+
+    /* Gamma settings */
+    REG15,  0x300,  0x0307,
+    REG15,  0x301,  0x0003,
+    REG15,  0x302,  0x0402,
+    REG15,  0x303,  0x0303,
+    REG15,  0x304,  0x0300,
+    REG15,  0x305,  0x0407,
+    REG15,  0x306,  0x1c04,
+    REG15,  0x307,  0x0307,
+    REG15,  0x308,  0x0003,
+    REG15,  0x309,  0x0402,
+    REG15,  0x30a,  0x0303,
+    REG15,  0x30b,  0x0300,
+    REG15,  0x30c,  0x0407,
+    REG15,  0x30d,  0x1c04,
+
+    REG15,  0x310,  0x0707,
+    REG15,  0x311,  0x0407,
+    REG15,  0x312,  0x0306,
+    REG15,  0x313,  0x0303,
+    REG15,  0x314,  0x0300,
+    REG15,  0x315,  0x0407,
+    REG15,  0x316,  0x1c01,
+    REG15,  0x317,  0x0707,
+    REG15,  0x318,  0x0407,
+    REG15,  0x319,  0x0306,
+    REG15,  0x31a,  0x0303,
+    REG15,  0x31b,  0x0300,
+    REG15,  0x31c,  0x0407,
+    REG15,  0x31d,  0x1c01,
+
+    REG15,  0x320,  0x0206,
+    REG15,  0x321,  0x0102,
+    REG15,  0x322,  0x0404,
+    REG15,  0x323,  0x0303,
+    REG15,  0x324,  0x0300,
+    REG15,  0x325,  0x0407,
+    REG15,  0x326,  0x1c1f,
+    REG15,  0x327,  0x0206,
+    REG15,  0x328,  0x0102,
+    REG15,  0x329,  0x0404,
+    REG15,  0x32a,  0x0303,
+    REG15,  0x32b,  0x0300,
+    REG15,  0x32c,  0x0407,
+    REG15,  0x32d,  0x1c1f,
+
+    /* GRAM and Base Imagen settings (ili9326ds) */
+    REG15,  0x400,  0x001d,
+    REG15,  0x401,  0x0001,
+    REG15,  0x205,  0x0060,
+
+    /* Power settings */
+    REG15,  0x007,  0x0001,
+    REG15,  0x031,  0x0071,
+    REG15,  0x110,  0x0001,
+    REG15,  0x100,  0x17b0,
+    REG15,  0x101,  0x0220,
+    REG15,  0x102,  0x00bd,
+    REG15,  0x103,  0x1500,
+    REG15,  0x105,  0x0103,
+    REG15,  0x106,  0x0105,
+
+    /* Display On */
+    REG15,  0x007,  0x0021,
+    REG15,  0x001,  0x0110,
+    REG15,  0x003,  0x0230,
+    REG15,  0x002,  0x0500,
+    REG15,  0x007,  0x0031,
+    REG15,  0x030,  0x0007,
+    SLEEP,  0x003,
+    REG15,  0x030,  0x03ff,
+    SLEEP,  0x006,
+    REG15,  0x007,  0x0072,
+    SLEEP,  0x00f,
+    REG15,  0x007,  0x0173,
+    END
+};
+#endif
+
+static inline void s5l_lcd_write_reg(int cmd, unsigned int data)
 {
     while (LCD_STATUS & 0x10);
     LCD_WCMD = cmd;
 
     while (LCD_STATUS & 0x10);
-    LCD_WDATA = (data & 0xff) | ((data & 0x7f00) << 1);
+    /* 16-bit/1-transfer data format (ili9320ds s7.2.2) */
+    LCD_WDATA = (data & 0x78ff) |
+                ((data & 0x0300) << 1) | ((data & 0x0400) << 5);
 }
 
 static inline void s5l_lcd_write_cmd(unsigned short cmd)
@@ -74,6 +218,32 @@ static inline void s5l_lcd_write_data(unsigned short data)
 {
     while (LCD_STATUS & 0x10);
     LCD_WDATA = data;
+}
+
+static void lcd_run_sequence(unsigned short *seq)
+{
+    unsigned short tmp;
+
+    while (1) switch (*seq++)
+    {
+        case SLEEP:
+            sleep(*seq++);
+            break;
+        case CMD16:
+            s5l_lcd_write_cmd(*seq++);
+            break;
+        case DATA16:
+            s5l_lcd_write_data(*seq++);
+            break;
+        case REG15:
+            tmp = *seq++;   /* avoid compiler warning */
+            s5l_lcd_write_reg(tmp, *seq++);
+            break;
+        case END:
+        default:
+            /* bye */
+            return;
+     }
 }
 
 /*** hardware configuration ***/
@@ -100,50 +270,57 @@ void lcd_set_flip(bool yesno)
 
 bool lcd_active(void)
 {
-    return true;
+    return lcd_ispowered;
 }
 
 void lcd_shutdown(void)
 {
-    mutex_lock(&lcd_mutex);
     pmu_write(0x2b, 0);  /* Kill the backlight, instantly. */
     pmu_write(0x29, 0);
 
-    if (lcd_type & 2)
-    {
-        s5l_lcd_write_cmd_data(0x7, 0x172);
-        s5l_lcd_write_cmd_data(0x30, 0x3ff);
-        sleep(HZ / 10);
-        s5l_lcd_write_cmd_data(0x7, 0x120);
-        s5l_lcd_write_cmd_data(0x30, 0x0);
-        s5l_lcd_write_cmd_data(0x100, 0x780);
-        s5l_lcd_write_cmd_data(0x7, 0x0);
-        s5l_lcd_write_cmd_data(0x101, 0x260);
-        s5l_lcd_write_cmd_data(0x102, 0xa9);
-        sleep(HZ / 30);
-        s5l_lcd_write_cmd_data(0x100, 0x700);
-        s5l_lcd_write_cmd_data(0x100, 0x704);
-    }
-    else if (lcd_type == 1)
-    {
-        s5l_lcd_write_cmd(0x28);
-        s5l_lcd_write_cmd(0x10);
-        sleep(HZ / 10);
-    }
-    else
-    {
-        s5l_lcd_write_cmd(0x28);
-        sleep(HZ / 20);
-        s5l_lcd_write_cmd(0x10);
-        sleep(HZ / 20);
-    }
+    lcd_sleep();
+}
+
+void lcd_sleep(void)
+{
+    mutex_lock(&lcd_mutex);
+
+    lcd_run_sequence((lcd_type & 2) ? lcd_deep_stby_sequence_23
+                                    : lcd_sleep_sequence_01);
+
+    /* mask lcd controller clock gate */
+    PWRCON(0) |= (1 << 1);
+
+    lcd_ispowered = false;
+
     mutex_unlock(&lcd_mutex);
 }
 
 #ifdef HAVE_LCD_SLEEP
-void lcd_sleep(void)
+void lcd_awake(void)
 {
-    lcd_shutdown();
+    mutex_lock(&lcd_mutex);
+
+    /* unmask lcd controller clock gate */
+    PWRCON(0) &= ~(1 << 1);
+
+    if (lcd_type & 2) {
+        /* release from deep standby mode (ili9320ds s12.3) */
+        for (int i = 0; i < 6; i++) {
+            s5l_lcd_write_cmd(0x000);
+            udelay(1000);
+        }
+
+        lcd_run_sequence(lcd_init_sequence_23);
+    }
+    else
+        lcd_run_sequence(lcd_init_sequence_01);
+
+    lcd_ispowered = true;
+
+    mutex_unlock(&lcd_mutex);
+
+    send_event(LCD_EVENT_ACTIVATION, NULL);
 }
 #endif
 
@@ -156,6 +333,8 @@ void lcd_init_device(void)
     lcd_type = (PDAT6 & 0x30) >> 4;
     while (!(LCD_STATUS & 0x2));
     LCD_CONFIG = 0x80100db0;
+
+    lcd_ispowered = true;
 }
 
 /*** Update functions ***/
@@ -190,13 +369,13 @@ static void displaylcd_setup(int x, int y, int width, int height)
     int ye = (y + height) - 1;          /* max vert */
 
     if (lcd_type & 2) {
-        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_START_POS, x);
-        s5l_lcd_write_cmd_data(R_HORIZ_ADDR_END_POS,   xe);
-        s5l_lcd_write_cmd_data(R_VERT_ADDR_START_POS,  y);
-        s5l_lcd_write_cmd_data(R_VERT_ADDR_END_POS,    ye);
+        s5l_lcd_write_reg(R_HORIZ_ADDR_START_POS, x);
+        s5l_lcd_write_reg(R_HORIZ_ADDR_END_POS,   xe);
+        s5l_lcd_write_reg(R_VERT_ADDR_START_POS,  y);
+        s5l_lcd_write_reg(R_VERT_ADDR_END_POS,    ye);
 
-        s5l_lcd_write_cmd_data(R_HORIZ_GRAM_ADDR_SET,  x);
-        s5l_lcd_write_cmd_data(R_VERT_GRAM_ADDR_SET,   y);
+        s5l_lcd_write_reg(R_HORIZ_GRAM_ADDR_SET,  x);
+        s5l_lcd_write_reg(R_VERT_GRAM_ADDR_SET,   y);
 
         s5l_lcd_write_cmd(R_WRITE_DATA_TO_GRAM);
     } else {
@@ -252,6 +431,10 @@ void lcd_update_rect(int x, int y, int width, int height)
     fb_data* p = &lcd_framebuffer[y][x];
     uint16_t* out = lcd_dblbuf[0];
     
+#ifdef HAVE_LCD_SLEEP
+    if (!lcd_active()) return;
+#endif
+
     displaylcd_setup(x, y, width, height);
 
     /* Copy display bitmap to hardware */
@@ -287,6 +470,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     unsigned int z;
     unsigned char const * yuv_src[3];
     
+#ifdef HAVE_LCD_SLEEP
+    if (!lcd_active()) return;
+#endif
+
     width = (width + 1) & ~1;       /* ensure width is even */
 
     int pixels = width * height;

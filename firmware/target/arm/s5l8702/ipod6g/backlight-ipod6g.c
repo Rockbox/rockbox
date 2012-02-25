@@ -44,7 +44,7 @@ void _backlight_on(void)
     {
         lcd_awake();
         lcd_update();
-        sleep(HZ/8);
+        sleep(HZ/20);
     }
 #endif
     pmu_write(0x29, 1);
@@ -57,9 +57,11 @@ void _backlight_off(void)
 
 bool _backlight_init(void)
 {
-    pmu_write(0x2a, 6);
-    pmu_write(0x28, 0x20);
-    pmu_write(0x2b, 20);
+    /* LEDCTL: overvoltage protection enabled, OCP limit is 500mA */
+    pmu_write(0x2a, 0x05);
+
+    pmu_write(0x2b, 0x14);  /* T_dimstep = 16 * value / 32768 */
+    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
 
     _backlight_on();
 
