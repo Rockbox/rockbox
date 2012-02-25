@@ -20,8 +20,15 @@
  **************************************************************************/
 #include "plugin.h"
 #include "lib/playergfx.h"
+#include "lib/pluginlib_actions.h"
 
-
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[]
+                     = { pla_main_ctx,
+#ifdef HAVE_REMOTE_LCD
+                         pla_remote_ctx,
+#endif
+                        };
 
 #ifdef HAVE_LCD_BITMAP
 #define DISPLAY_WIDTH LCD_WIDTH
@@ -57,223 +64,17 @@ const unsigned char rockbox16x7[] = {
 };
 #endif /* !LCD_BITMAP */
 
-/* variable button definitions */
-#if CONFIG_KEYPAD == PLAYER_PAD
-#define LP_QUIT BUTTON_STOP
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y (BUTTON_ON | BUTTON_LEFT)
-#define LP_INC_Y (BUTTON_ON | BUTTON_RIGHT)
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define LP_QUIT BUTTON_MENU
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_SCROLL_BACK
-#define LP_INC_Y BUTTON_SCROLL_FWD
-
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define LP_QUIT BUTTON_PLAY
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_C200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-      (CONFIG_KEYPAD == SANSA_M200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_CONNECT_PAD)
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#define LP_QUIT (BUTTON_HOME|BUTTON_REPEAT)
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_SCROLL_DOWN
-#define LP_INC_Y BUTTON_SCROLL_UP
-
-#elif CONFIG_KEYPAD == MROBE500_PAD
-#define LP_QUIT BUTTON_POWER
-
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD || \
-      CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
-#define LP_QUIT BUTTON_BACK
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == MROBE100_PAD
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define LP_QUIT BUTTON_RC_REC
-#define LP_DEC_X BUTTON_RC_REW
-#define LP_INC_X BUTTON_RC_FF
-#define LP_DEC_Y BUTTON_RC_VOL_DOWN
-#define LP_INC_Y BUTTON_RC_VOL_UP
-
-#elif CONFIG_KEYPAD == COWON_D2_PAD
-#define LP_QUIT BUTTON_POWER
-
-#elif CONFIG_KEYPAD == IAUDIO67_PAD
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_PLAY
-#define LP_INC_Y BUTTON_STOP
-
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define LP_QUIT BUTTON_BACK
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_PREV
-#define LP_INC_X BUTTON_NEXT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == ONDAVX747_PAD
-#define LP_QUIT BUTTON_POWER
-#elif CONFIG_KEYPAD == ONDAVX777_PAD
-#define LP_QUIT BUTTON_POWER
-
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define LP_QUIT  BUTTON_PLAY
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-#define LP_QUIT  BUTTON_REC
-#define LP_DEC_X BUTTON_PREV
-#define LP_INC_X BUTTON_NEXT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define LP_QUIT  (BUTTON_REC|BUTTON_PLAY)
-#define LP_DEC_X BUTTON_VOL_DOWN
-#define LP_INC_X BUTTON_VOL_UP
-#define LP_DEC_Y BUTTON_REW
-#define LP_INC_Y BUTTON_FF
-
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define LP_QUIT  (BUTTON_MENU|BUTTON_REPEAT)
-#define LP_DEC_X BUTTON_REW
-#define LP_INC_X BUTTON_FF
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
-#define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-
-#else
-#define LP_QUIT BUTTON_OFF
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
-#endif
-
-#ifdef CONFIG_REMOTE_KEYPAD
-#if (CONFIG_REMOTE_KEYPAD == H100_REMOTE) || \
-    (CONFIG_REMOTE_KEYPAD == H300_REMOTE)
-#define LP_R_QUIT BUTTON_RC_STOP
-#define LP_R_DEC_X BUTTON_RC_REW
-#define LP_R_INC_X BUTTON_RC_FF
-#define LP_R_DEC_Y BUTTON_RC_SOURCE
-#define LP_R_INC_Y BUTTON_RC_BITRATE
-
-#elif CONFIG_REMOTE_KEYPAD == IAUDIO_REMOTE
-#define LP_R_QUIT BUTTON_RC_REC
-#define LP_R_DEC_X BUTTON_RC_REW
-#define LP_R_INC_X BUTTON_RC_FF
-#define LP_R_DEC_Y BUTTON_RC_VOL_DOWN
-#define LP_R_INC_Y BUTTON_RC_VOL_UP
-
-#elif (CONFIG_REMOTE_KEYPAD == MROBE_REMOTE)
-#define LP_R_QUIT BUTTON_RC_HEART
-#define LP_R_DEC_X BUTTON_RC_REW
-#define LP_R_INC_X BUTTON_RC_FF
-#define LP_R_DEC_Y BUTTON_RC_DOWN
-#define LP_R_INC_Y BUTTON_RC_PLAY
-#endif
-
-#endif /* CONFIG_REMOTE_KEYPAD */
-
-#ifdef HAVE_TOUCHSCREEN
-#ifndef LP_QUIT
-#define LP_QUIT  BUTTON_TOPLEFT
-#endif
-#ifndef LP_DEC_X
-#define LP_DEC_X BUTTON_MIDLEFT
-#endif
-#ifndef LP_INC_X
-#define LP_INC_X BUTTON_MIDRIGHT
-#endif
-#ifndef LP_DEC_Y
-#define LP_DEC_Y BUTTON_TOPMIDDLE
-#endif
-#ifndef LP_INC_Y
-#define LP_INC_Y BUTTON_BOTTOMMIDDLE
-#endif
-#endif
+/* We use PLA */
+#define LP_QUIT              PLA_EXIT
+#define LP_QUIT2             PLA_CANCEL
+#define LP_DEC_X             PLA_LEFT
+#define LP_DEC_X_REPEAT      PLA_LEFT_REPEAT
+#define LP_INC_X             PLA_RIGHT
+#define LP_INC_X_REPEAT      PLA_RIGHT_REPEAT
+#define LP_DEC_Y             PLA_DOWN
+#define LP_DEC_Y_REPEAT      PLA_DOWN_REPEAT
+#define LP_INC_Y             PLA_UP
+#define LP_INC_Y_REPEAT      PLA_UP_REPEAT
 
 enum plugin_status plugin_start(const void* parameter) {
     int button;
@@ -350,41 +151,36 @@ enum plugin_status plugin_start(const void* parameter) {
         pgfx_update();
 #endif
         rb->sleep(HZ/timer);
-        
-        button = rb->button_get(false);
+
+
+
+        /*We get button from PLA this way */
+        button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
+
         switch (button) {
             case LP_QUIT:
-#ifdef CONFIG_REMOTE_KEYPAD
-            case LP_R_QUIT:
-#endif
+            case LP_QUIT2:
 #ifdef HAVE_LCD_CHARCELLS
                 pgfx_release();
 #endif
                 return PLUGIN_OK;
             case LP_DEC_X:
-#ifdef CONFIG_REMOTE_KEYPAD
-            case LP_R_DEC_X:
-#endif
+            case LP_DEC_X_REPEAT:
                 if (dx)
                     dx += (dx < 0) ? 1 : -1;
                 break;
             case LP_INC_X:
-#ifdef CONFIG_REMOTE_KEYPAD
-            case LP_R_INC_X:
-#endif
+            case LP_INC_X_REPEAT:
                 dx += (dx < 0) ? -1 : 1;
                 break;
             case LP_DEC_Y:
-#ifdef CONFIG_REMOTE_KEYPAD
-            case LP_R_DEC_Y:
-#endif
+            case LP_DEC_Y_REPEAT:
                 if (dy)
                     dy += (dy < 0) ? 1 : -1;
                 break;
             case LP_INC_Y:
-#ifdef CONFIG_REMOTE_KEYPAD
-            case LP_R_INC_Y:
-#endif
+            case LP_INC_Y_REPEAT:
                 dy += (dy < 0) ? -1 : 1;
                 break;
                 
