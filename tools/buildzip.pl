@@ -585,6 +585,8 @@ STOP
         copy("$ROOT/apps/plugins/sokoban.levels", "$temp_dir/rocks/games/sokoban.levels"); # sokoban levels
         copy("$ROOT/apps/plugins/snake2.levels", "$temp_dir/rocks/games/snake2.levels"); # snake2 levels
         copy("$ROOT/apps/plugins/rockbox-fonts.config", "$temp_dir/rocks/viewers/");
+        copy("$ROOT/apps/plugins/bitmaps/native/picross_numbers.bmp",
+             "$temp_dir/rocks/games/picross_numbers.bmp");
     }
 
     if(-e "$temp_dir/rocks/demos/pictureflow.rock") {

@@ -146,6 +146,7 @@ metronome.c
 /* Lua needs at least 160 KB to work in */
 #if PLUGIN_BUFFER_SIZE >= 0x80000
 boomshine.lua
+picross.lua
 #endif
 
 rockblox1d.c
