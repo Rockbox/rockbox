@@ -71,7 +71,7 @@ void INT_DMAC0C0(void)
     if (!pcm_remaining)
     {
         pcm_lli->nextlli = NULL;
-        pcm_lli->control = 0x75249000;
+        pcm_lli->control = 0x7524a000;
         commit_dcache();
         return;
     }
@@ -92,7 +92,7 @@ void INT_DMAC0C0(void)
         pcm_lli[i].srcaddr = (void*)dataptr;
         pcm_lli[i].dstaddr = (void*)((int)&I2STXDB0);
         pcm_lli[i].nextlli = chunksize ? &pcm_lli[i + 1] : lastlli;
-        pcm_lli[i].control = (chunksize ? 0x75249000 : 0xf5249000) | (thislli / 2);
+        pcm_lli[i].control = (chunksize ? 0x7524a000 : 0xf524a000) | (thislli / 2);
         dataptr += thislli;
         i++;
     }
@@ -105,7 +105,7 @@ void INT_DMAC0C0(void)
     else lastlli->srcaddr = dataptr;
     lastlli->dstaddr = (void*)((int)&I2STXDB0);
     lastlli->nextlli = last ? NULL : pcm_lli;
-    lastlli->control = (last ? 0xf5249000 : 0x75249000) | (lastsize / 2);
+    lastlli->control = (last ? 0xf524a000 : 0x7524a000) | (lastsize / 2);
     dataptr += lastsize;
     commit_dcache();
     if (!(DMAC0C0CONFIG & 1) && (pcm_lli[0].control & 0xfff))
@@ -123,7 +123,6 @@ void pcm_play_dma_start(const void* addr, size_t size)
     dataptr = (const unsigned char*)addr;
     pcm_remaining = size;
     I2STXCOM = 0xe;
-    DMAC0CONFIG |= 4;
     INT_DMAC0C0();
 }
 
@@ -145,7 +144,7 @@ void pcm_play_dma_init(void)
     PWRCON(0) &= ~(1 << 4);
     PWRCON(1) &= ~(1 << 7);
     I2S40 = 0x110;
-    I2STXCON = 0xb100059;
+    I2STXCON = 0xb100019;
     I2SCLKCON = 1;
     VIC0INTENABLE = 1 << IRQ_DMAC0;
 
