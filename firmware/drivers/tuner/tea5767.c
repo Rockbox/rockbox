@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "kernel.h"
+#include "power.h"
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
