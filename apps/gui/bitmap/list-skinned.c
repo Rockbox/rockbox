@@ -45,6 +45,9 @@
 static struct listitem_viewport_cfg *listcfg[NB_SCREENS] = {NULL};
 static struct gui_synclist *current_list;
 
+static int current_row;
+static int current_column;
+
 void skinlist_set_cfg(enum screen_type screen,
                       struct listitem_viewport_cfg *cfg)
 {
@@ -87,6 +90,17 @@ int skinlist_get_item_number()
 {
     return current_drawing_line;
 }
+
+int skinlist_get_item_row()
+{
+    return current_row;
+}
+
+int skinlist_get_item_column()
+{
+    return current_column;
+}
+
 
 const char* skinlist_get_item_text(int offset, bool wrap, char* buf, size_t buf_size)
 {
@@ -181,7 +195,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
         current_drawing_line = list_start_item+cur_line;
         is_selected = list->show_selection_marker &&
                 list_start_item+cur_line == list->selected_item;
-        
+
         for (viewport = SKINOFFSETTOPTR(get_skin_buffer(wps.data), listcfg[screen]->data->tree);
              viewport;
              viewport = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->next))
@@ -206,14 +220,15 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
             if (listcfg[screen]->tile)
             {
                 int cols = (parent->width / listcfg[screen]->width);
-                int col = (cur_line)%cols;
-                int row = (cur_line)/cols;
+                current_column = (cur_line)%cols;
+                current_row = (cur_line)/cols;
                 
-                skin_viewport->vp.x = parent->x + listcfg[screen]->width*col + origional_x;
-                skin_viewport->vp.y = parent->y + listcfg[screen]->height*row + origional_y;
+                skin_viewport->vp.x = parent->x + listcfg[screen]->width*current_column + origional_x;
+                skin_viewport->vp.y = parent->y + listcfg[screen]->height*current_row + origional_y;
             }
             else
             {
+                current_row = cur_line;
                 skin_viewport->vp.x = parent->x + origional_x;
                 skin_viewport->vp.y = parent->y + origional_y +
                                    (listcfg[screen]->height*cur_line);
