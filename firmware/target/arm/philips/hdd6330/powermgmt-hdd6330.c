@@ -24,11 +24,6 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-#define SMLAL(lo, hi, x, y)              \
-    asm volatile ("smlal %0, %1, %2, %3" \
-     : "+r" (lo), "+r" (hi)              \
-     : "%r" (x), "r" (y))
-
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     3550
@@ -53,20 +48,11 @@ const unsigned short percent_to_volt_charge[11] =
 };
 #endif /* CONFIG_CHARGING */
 
-#define BATTERY_SCALE_FACTOR 4200
+#define BATTERY_SCALE_FACTOR 4536
 /* full-scale ADC readout (2^10) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */
 int _battery_voltage(void)
 {
-    /* return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10; */
-
-    /* This may be overly complicated (pulled from the OF) */
-    int lo = 0;
-    int val = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR;
-
-    SMLAL(lo, val, 0x8a42f871, val);
-    val>>= 9;
-    val -= (val >> 31);
-    return val;
+    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
 }
