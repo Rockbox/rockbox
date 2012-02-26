@@ -76,6 +76,7 @@ systemdlls = ['advapi32.dll',
 
 gitrepo = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
+
 # == Functions ==
 def usage(myself):
     print "Usage: %s [options]" % myself
@@ -621,7 +622,7 @@ def deploy():
                 sys.exit(1)
         dllfiles = finddlls(sourcefolder + "/" + progexe[platform], \
                             [os.path.dirname(qm)], cross)
-        if dllfiles.count > 0:
+        if len(dllfiles) > 0:
             progfiles.extend(dllfiles)
         archive = zipball(progfiles, ver, sourcefolder, platform)
         # only when running native right now.
@@ -632,8 +633,16 @@ def deploy():
     elif platform == "darwin":
         archive = macdeploy(ver, sourcefolder, platform)
     else:
-        if os.uname()[4].endswith("64"):
-            ver += "-64bit"
+        if platform == "linux2":
+            for p in progfiles:
+                prog = sourcefolder + "/" + p
+                output = subprocess.Popen(["file", prog],
+                        stdout=subprocess.PIPE)
+                res = output.communicate()
+                if re.findall("ELF 64-bit", res[0]):
+                    ver += "-64bit"
+                    break
+
         archive = tarball(progfiles, ver, sourcefolder)
 
     # remove temporary files
