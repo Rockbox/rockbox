@@ -517,6 +517,11 @@ void root_menu_load_from_cfg(void* setting, char *value)
     unsigned int menu_item_count = 0, i;
     bool main_menu_added = false;
 
+    if (*value == '-')
+    {
+        root_menu_set_default(setting, NULL);
+        return;
+    }
     root_menu_.flags = MENU_HAS_DESC | MT_MENU;
     root_menu_.submenus = (const struct menu_item_ex **)&root_menu__;
     root_menu_.callback_and_desc = &root_menu_desc;
