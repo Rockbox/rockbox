@@ -685,6 +685,66 @@ RB_WRAP(get_plugin_action)
     return 1;
 }
 
+static DIR* lua_active_dir = NULL;
+
+RB_WRAP(opendir)
+{
+    const char* dirname;
+    
+    dirname = luaL_checkstring(L, 1); /* only parameter */
+    
+    if(lua_active_dir){
+        rb->closedir(lua_active_dir);
+        lua_active_dir = NULL;
+    }
+    
+    lua_active_dir = rb->opendir(dirname);
+    
+    if(lua_active_dir){
+        lua_pushinteger(L, 1);
+    } else{
+        /* failed */
+        lua_pushnil(L);
+    }
+    
+    return 1;
+}
+
+RB_WRAP(readdir)
+{
+    struct dirent *entry;
+    
+    if(lua_active_dir){
+        entry = rb->readdir(lua_active_dir);
+        if(entry){
+            lua_pushstring(L, entry->d_name);
+        } else{
+            /* no more entries */
+            lua_pushnil(L);
+        }
+    } else{
+        /* directory not opened */
+        lua_pushnil(L);
+    }
+    
+    return 1;
+}
+
+RB_WRAP(closedir)
+{
+    if(lua_active_dir){
+        rb->closedir(lua_active_dir);
+        lua_active_dir = NULL;
+        
+        lua_pushinteger(L, 1);
+    } else{
+        /* directory not opened */
+        lua_pushnil(L);
+    }
+    
+    return 1;
+}
+
 #define R(NAME) {#NAME, rock_##NAME}
 static const luaL_Reg rocklib[] =
 {
@@ -747,6 +807,11 @@ static const luaL_Reg rocklib[] =
     R(backlight_brightness_use_setting),
 #endif
     R(get_plugin_action),
+    
+    /* dir */
+    R(opendir),
+    R(readdir),
+    R(closedir),
 
     {"new_image", rli_new},
 
