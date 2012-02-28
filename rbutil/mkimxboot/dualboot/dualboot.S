@@ -23,7 +23,6 @@
 .global start
 @ int start(uint32_t arg, uint32_t *result_id)
 start:
-    stmfd   sp!, {r4-r6,lr}
 #if defined(SANSA_FUZEPLUS)
     /* If volume down key is hold, return so that the OF can boot */
     ldr     r2, =0x80018610 @ HW_PINCTRL_DIN1
@@ -32,6 +31,7 @@ start:
     moveq   r0, #0 @ return 0, continue boot
     bxeq    lr
     /* otherwise monitor the power button for a short time */
+    stmfd   sp!, {r4-r6,lr}
     ldr     r2, =550000 @ loop count
     ldr     r4, =0 @ number of times PSWITCH was 1
 pswitch_monitor_loop:
