@@ -1923,7 +1923,7 @@ const struct settings_list settings[] = {
 #endif
    CUSTOM_SETTING(0, root_menu,
                   LANG_ROCKBOX_TITLE, /* lang string here is never actually used */
-                  NULL, "root_menu_order",
+                  NULL, "root menu order",
                   root_menu_load_from_cfg, root_menu_write_to_cfg,
                   root_menu_is_changed, root_menu_set_default),
 };
