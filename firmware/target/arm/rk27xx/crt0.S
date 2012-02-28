@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: crt0.S 18776 2008-10-11 18:32:17Z gevaerts $
  *
  * Copyright (C) 2008 by Marcoen Hirschberg
  * Copyright (C) 2008 by Denes Balatoni
@@ -24,26 +23,50 @@
 #include "config.h"
 #include "cpu.h"
 
-    .section .intvect,"ax",%progbits
-    .global    start
-    .global    _newstart
-    /* Exception vectors */
-start:
-    b _newstart
-    ldr pc, =undef_instr_handler
-    ldr pc, =software_int_handler
-    ldr pc, =prefetch_abort_handler
-    ldr pc, =data_abort_handler
-    ldr pc, =reserved_handler
-    ldr pc, =irq_handler
-    ldr pc, =fiq_handler
-    .ltorg
-_newstart:
-    ldr pc, =newstart2
-    .section .init.text,"ax",%progbits
-newstart2:
-    msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
+    .global start
+    .global entry_point
 
+    /* Exception vectors */
+    .section .intvect,"ax",%progbits
+    ldr     pc, =start
+    ldr     pc, =undef_instr_handler
+    ldr     pc, =software_int_handler
+    ldr     pc, =prefetch_abort_handler
+    ldr     pc, =data_abort_handler
+    ldr     pc, =reserved_handler
+    ldr     pc, =irq_handler
+    ldr     pc, =fiq_handler
+    .ltorg
+
+    .text
+start:
+    msr     cpsr_c, #0xd3      /* enter supervisor mode, disable IRQ/FIQ */
+
+#ifdef BOOTLOADER
+    sub     r4, pc, #12         /* copy running address, accomodate
+                                 * for prefetch (-8) and msr instr (-4)
+                                 */
+
+    ldr     r0, =0xefff0000    /* cache controler base address */
+    ldrh    r1, [r0]
+    strh    r1, [r0]           /* global cache disable */
+
+    ldr     r2, =_relocstart
+    ldr     r3, =_relocend
+
+    cmp     r2, r4
+    beq     entry_point        /* skip copying if we are in place already */
+1:
+    cmp     r3, r2
+    ldrhi   r1, [r4], #4
+    strhi   r1, [r2], #4
+    bhi     1b
+
+entry_point_jmp:
+    ldr     pc, =entry_point
+#endif
+
+entry_point:
     mov     r0, #0x18000000
     add     r0, r0, #0x1c000
 
@@ -135,26 +158,14 @@ newstart2:
     strhi   r4, [r2], #4
     bhi     1b
 
-#ifndef BOOTLOADER
-    /* Copy icode and data to ram */
-    ldr     r2, =_iramstart
-    ldr     r3, =_iramend
-    ldr     r4, =_iramcopy
-1:
-    cmp     r3, r2
-    ldrhi   r1, [r4], #4
-    strhi   r1, [r2], #4
-    bhi     1b
-    
-    /* Initialise ibss section to zero */
-    ldr     r2, =_iedata
-    ldr     r3, =_iend
+    /* Initialise bss, ibss section to zero */
+    ldr     r2, =_edata
+    ldr     r3, =_end
     mov     r4, #0
 1:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     1b
-#endif
 
     /* Set up stack for IRQ mode */ 
     msr     cpsr_c, #0xd2
@@ -184,11 +195,7 @@ newstart2:
     strhi   r3, [r2], #4
     bhi     1b
 
-
     bl      main
-
-    .text
-/*    .global UIE*/
 
 /* All illegal exceptions call into UIE with exception address as first
  * parameter. This is calculated differently depending on which exception

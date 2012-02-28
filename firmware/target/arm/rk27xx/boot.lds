@@ -9,8 +9,8 @@ OUTPUT_FORMAT(elf32-bigarm)
 OUTPUT_ARCH(arm)
 STARTUP(target/arm/rk27xx/crt0.o)
 
-#define DRAMORIG 0x60000000
-#define DRAMSIZE (MEMORYSIZE * 0x100000)
+#define DRAMORIG 0x60700000
+#define DRAMSIZE (MEMORYSIZE * 0x100000 - 0x700000)
 
 #define IRAMORIG 0x00000000
 #define IRAMSIZE 4K
@@ -23,35 +23,39 @@ MEMORY
 
 SECTIONS
 {
-  .intvect : {
-    _intvectstart = . ;
-    *(.intvect)
-    _intvectend = _newstart ;  
-  } > IRAM AT > DRAM
-  _intvectcopy = LOADADDR(.intvect) ;
+  .relocstart (NOLOAD) : {
+    _relocstart = .;
+  } > DRAM
 
   .text : {
     *(.init.text)
     *(.text*)
+    *(.icode*)
     *(.glue_7*)
+  } > DRAM 
+
+  .intvect : {
+    _intvectstart = . ;
+    KEEP(*(.intvect))
+    _intvectend = . ;  
+  } > IRAM AT > DRAM
+  _intvectcopy = LOADADDR(.intvect) ;
+
+  .rodata : {
+    *(.rodata*)
+    *(.irodata*)
+    . = ALIGN(0x4);
   } > DRAM
 
   .data : {
-    *(.rodata*)
     *(.data*)
-    *(.ncdata*);
+    *(.idata*)
     . = ALIGN(0x4);
   } > DRAM
 
-  .idata : {
-    _datastart = . ;
-    *(.irodata)
-    *(.icode)
-    *(.idata)
-    . = ALIGN(0x4);
-    _dataend = . ;
-   } > DRAM
-   _datacopy = LOADADDR(.idata) ;
+  .relocend (NOLOAD) : {
+    _relocend = .;
+  } > DRAM
 
   .stack (NOLOAD) :
   {
@@ -73,7 +77,6 @@ SECTIONS
      _edata = .;
      *(.bss*);
      *(.ibss);
-     *(.ncbss*);
      *(COMMON);
     . = ALIGN(0x4);
      _end = .;

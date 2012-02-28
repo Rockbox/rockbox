@@ -37,42 +37,28 @@ SECTIONS
 
   .intvect : {
     _intvectstart = . ;
-    *(.intvect)
-    _intvectend = _newstart ;  
+    KEEP(*(.intvect))
+    _intvectend = . ;  
   } > IRAM AT > DRAM
-  _intvectcopy = LOADADDR(.intvect) ;
+  _intvectcopy = LOADADDR(.intvect);
 
   .text : {
     *(.init.text)
     *(.text*)
+    *(.icode*)
     *(.glue_7*)
   } > DRAM
 
-  .data : {
+  .rodata : {
     *(.rodata*)
-    *(.data*)
-    *(.ncdata*);
+    *(.irodata*)
     . = ALIGN(0x4);
   } > DRAM
 
-  .iram :
-  {
-      _iramstart = .;
-      *(.icode)
-      *(.irodata)
-      *(.idata)
-      . = ALIGN(0x4);
-      _iramend = .;
-  } > DRAM
-  _iramcopy = LOADADDR(.iram) ;
-
-  .ibss (NOLOAD) :
-  {
-      _iedata = .;
-      *(.qharray)
-      *(.ibss)
-      . = ALIGN(0x4);
-      _iend = .;
+  .data : {
+    *(.data*)
+    *(.idata*)
+    . = ALIGN(0x4);
   } > DRAM
 
   .stack (NOLOAD) :
@@ -95,7 +81,6 @@ SECTIONS
      _edata = .;
      *(.bss*);
      *(.ibss);
-     *(.ncbss*);
      *(COMMON);
     . = ALIGN(0x4);
      _end = .;
