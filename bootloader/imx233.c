@@ -35,6 +35,7 @@
 #include "disk.h"
 #include "panic.h"
 #include "power.h"
+#include "power-imx233.h"
 #include "system-target.h"
 #include "fmradio_i2c.h"
 #include "version.h"
@@ -126,6 +127,7 @@ void main(uint32_t arg, uint32_t addr)
     //button_debug_screen();
     printf("Boot version: %s", RBVERSION);
     printf("arg=%x addr=%x", arg, addr);
+    printf("power up source: %x", __XTRACT(HW_POWER_STS, PWRUP_SOURCE));
 
 #ifdef SANSA_FUZEPLUS
     extern void imx233_mmc_disable_window(void);

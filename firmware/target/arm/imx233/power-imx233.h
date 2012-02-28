@@ -157,6 +157,8 @@
 #define HW_POWER_STS__CHRGSTS       (1 << 11)
 #define HW_POWER_STS__PSWITCH_BP    20
 #define HW_POWER_STS__PSWITCH_BM    (3 << 20)
+#define HW_POWER_STS__PWRUP_SOURCE_BP   24
+#define HW_POWER_STS__PWRUP_SOURCE_BM   (0x3f << 24)
 
 #define HW_POWER_BATTMONITOR    (*(volatile uint32_t *)(HW_POWER_BASE + 0xe0))
 #define HW_POWER_BATTMONITOR__ENBATADJ      (1 << 10)
