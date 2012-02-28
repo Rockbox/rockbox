@@ -204,6 +204,18 @@ int app_remove(const char *name)
     return remove(fname);
 }
 
+int file_hidedir(const char *name, bool hide)
+{
+    /* How/what should I implement hiding/unhiding dir on app? */
+    return -1;
+}
+
+int file_hide(const char *name, bool hide)
+{
+    /* How/what should I implement hiding/unhiding file on app? */
+    return -1;
+}
+
 int app_rename(const char *old, const char *new)
 {
     char realpath_old[MAX_PATH], realpath_new[MAX_PATH];

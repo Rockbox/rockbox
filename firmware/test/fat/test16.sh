@@ -90,6 +90,36 @@ runtests() {
     try chkfile /cpa.rock
     try chkfile /bpa.rock
 
+    echo ---Test: hide/unhide some files/dirs
+    try mkfile /fpa.rock 0
+    try hide /fpa.rock
+    check
+    try chkfile /fpa.rock
+    try unhide /fpa.rock
+    check
+    try chkfile /fpa.rock
+
+    try mkdir "/dirdir"
+    try hide /dirdir
+    check
+    try unhide /dirdir
+    check
+
+    echo ---Test: hide longname files/dirs
+    try mkfile /fpa.monkey.me.now 40
+    try hide /fpa.monkey.me.now
+    check
+    try chkfile /fpa.monkey.me.now
+    try unhide /fpa.monkey.me.now
+    check
+    try chkfile /fpa.monkey.me.now
+
+    try mkdir "/really long file name dir"
+    try hide "/really long file name dir"
+    check
+    try unhide "/really long file name dir"
+    check
+
     LOOP=25
     SIZE=700
 

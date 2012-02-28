@@ -127,6 +127,8 @@ extern int fat_rename(struct fat_file* file,
                       struct fat_dir* dir,
                       const unsigned char* newname,
                       long size, int attr);
+/* update fat attribute */
+extern int fat_attr(struct fat_file* file, long size, int attr);
 
 extern int fat_opendir(IF_MV2(int volume,)
                        struct fat_dir *ent, unsigned long startcluster,
