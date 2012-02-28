@@ -52,6 +52,7 @@
 #include "radio.h"
 #endif
 #include "wps.h"
+#include "logf.h"
 
 static int compare_sort_dir; /* qsort key for sorting directories */
 
@@ -322,6 +323,32 @@ int ft_load(struct tree_context* c, const char* tempdir)
             (info.attribute & ATTR_HIDDEN))) {
             continue;
         }
+
+#ifdef HAVE_DIRCACHE
+        /* Hide empty directories */
+        /* XXX:Empty directories are displayed until dircache is initialized */
+        if ((info.attribute & ATTR_DIRECTORY) && (
+            (*c->dirfilter != SHOW_ALL) &&
+             (info.attribute & ATTR_DIR_EMPTY)))
+        {
+            logf("filetree: %s", entry->d_name);
+            continue;
+        }
+
+        /* filter out non-visible directories */
+        /* XXX:filter out directories are displayed until dircache is initialized */
+        if (dircache_is_enabled() &&
+            (info.attribute & ATTR_DIRECTORY) && (
+             (*c->dirfilter == SHOW_PLAYLIST &&
+              (!((info.attribute & ATTR_DIR_MASK) & ATTR_DIR_M3U))) ||
+             ((*c->dirfilter == SHOW_MUSIC &&
+              (!((info.attribute & ATTR_DIR_MASK) & (ATTR_DIR_AUDIO | ATTR_DIR_M3U))))) ||
+             ((*c->dirfilter == SHOW_SUPPORTED &&
+              (!((info.attribute & ATTR_DIR_MASK) & ATTR_DIR_SUPPORTED))))))
+        {
+            continue;
+        }
+#endif /* HAVE_DIRCACHE */
 
         dptr->attr = info.attribute;
 

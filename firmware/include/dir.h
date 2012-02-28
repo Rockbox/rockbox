@@ -50,6 +50,12 @@
 #define ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
 #define ATTR_LINK        0x80
 
+#define ATTR_DIR_EMPTY     0x10000
+#define ATTR_DIR_AUDIO     0x20000
+#define ATTR_DIR_M3U       0x40000
+#define ATTR_DIR_SUPPORTED 0x80000
+#define ATTR_DIR_MASK      0xE0000
+
 #ifdef HAVE_DIRCACHE
 # include "dircache.h"
 # define DIR DIR_CACHED

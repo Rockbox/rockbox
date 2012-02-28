@@ -384,6 +384,7 @@ static void init(void)
     settings_reset();
     settings_load(SETTINGS_ALL);
     settings_apply(true);
+    filetype_init();
     init_dircache(true);
     init_dircache(false);
 #ifdef HAVE_TAGCACHE
@@ -391,7 +392,6 @@ static void init(void)
 #endif
     sleep(HZ/2);
     tree_mem_init();
-    filetype_init();
     playlist_init();
     shortcuts_init();
 
@@ -665,6 +665,7 @@ static void init(void)
     CHART(">settings_apply(true)");
     settings_apply(true);        
     CHART("<settings_apply(true)");
+    filetype_init();
     CHART(">init_dircache(false)");
     init_dircache(false);
     CHART("<init_dircache(false)");
@@ -686,7 +687,6 @@ static void init(void)
 #endif
     playlist_init();
     tree_mem_init();
-    filetype_init();
     scrobbler_init();
     shortcuts_init();
 

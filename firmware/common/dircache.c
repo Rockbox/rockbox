@@ -47,6 +47,7 @@
 #include "timefuncs.h"
 #endif
 #include "rbpaths.h"
+#include "filetypes.h"
 
 
 /* Queue commands. */
@@ -365,14 +366,40 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     
     /* second pass: recurse ! */
     ce = first_ce;
+    int fc = 0; /* file counter */
+    int attr = 0;
     
     while(rc >= 0 && ce)
     {
         if(ce->d_name != NULL && ce->down != NULL && strcmp(ce->d_name, ".")
                 && strcmp(ce->d_name, ".."))
             rc = sab_process_dir(ce->startcluster, ce->down);
+
+        if (!(ce->info.attribute & ATTR_HIDDEN)) {
+            if (ce->info.attribute & ATTR_DIRECTORY) {
+                if (strcmp(ce->d_name, ".") && strcmp(ce->d_name, "..") &&
+                    !(ce->info.attribute & ATTR_DIR_EMPTY))
+                    fc++;
+                attr |= ATTR_DIR_MASK & ce->info.attribute;
+            } else {
+                fc++;
+                int fattr = filetype_get_attr((char *)ce->d_name);
+                if (fattr == FILE_ATTR_AUDIO)
+                    attr |= ATTR_DIR_AUDIO;
+                if (fattr == FILE_ATTR_M3U)
+                    attr |= ATTR_DIR_M3U;
+                if (filetype_supported(fattr))
+                    attr |= ATTR_DIR_SUPPORTED;
+            }
+        }
         
         ce = ce->next;
+    }
+
+    if (first_ce->up) {
+        if (!fc)
+            first_ce->up->info.attribute |= ATTR_DIR_EMPTY;
+        first_ce->up->info.attribute |= attr;
     }
     
     return rc;
@@ -417,6 +444,8 @@ static int sab_process_dir(struct dircache_entry *ce)
 {
     struct dirent_uncached *entry;
     struct dircache_entry *first_ce = ce;
+    int fc = 0; /* file counter */
+    int attr = 0;
     DIR_UNCACHED *dir = opendir_uncached(sab_path);
     if(dir == NULL)
     {
@@ -460,6 +489,22 @@ static int sab_process_dir(struct dircache_entry *ce)
                 closedir_uncached(dir);
                 return rc;
             }
+            if (!(ce->info.attribute & ATTR_HIDDEN)) {
+                if (!(ce->info.attribute & ATTR_DIR_EMPTY))
+                    fc++;
+                attr |= ATTR_DIR_MASK & ce->info.attribute;
+            }
+        } else {
+            if (!(ce->info.attribute & ATTR_HIDDEN)) {
+                fc++;
+                int fattr = filetype_get_attr((char *)ce->d_name);
+                if (fattr == FILE_ATTR_AUDIO)
+                    attr |= ATTR_DIR_AUDIO;
+                if (fattr == FILE_ATTR_M3U)
+                    attr |= ATTR_DIR_M3U;
+                if (filetype_supported(fattr))
+                    attr |= ATTR_DIR_SUPPORTED;
+            }
         }
         
         ce = dircache_gen_next(ce);
@@ -474,6 +519,12 @@ static int sab_process_dir(struct dircache_entry *ce)
                 return -1;
             yield();
         }
+    }
+
+    if (first_ce->up) {
+        if (!fc)
+            first_ce->up->info.attribute |= ATTR_DIR_EMPTY;
+        first_ce->up->info.attribute |= attr;
     }
     
     /* add "." and ".." */
