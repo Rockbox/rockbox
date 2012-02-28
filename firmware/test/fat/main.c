@@ -550,6 +550,8 @@ int dbg_cmd(int argc, char *argv[])
                " append <file>\n"
                " test <file>\n"
                " ren <file> <newname>\n"
+               " hide <file>\n"
+               " unhide <file>\n"
             );
         return -1;
     }
@@ -665,6 +667,18 @@ int dbg_cmd(int argc, char *argv[])
     {
         if (arg1 && arg2)
             return rename(arg1, arg2);
+    }
+
+    if (!strcasecmp(cmd, "hide"))
+    {
+        if (arg1)
+            return file_hide(arg1, true);
+    }
+
+    if (!strcasecmp(cmd, "unhide"))
+    {
+        if (arg1)
+            return file_hide(arg1, false);
     }
 
     return 0;
