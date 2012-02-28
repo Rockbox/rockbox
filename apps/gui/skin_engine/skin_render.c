@@ -385,22 +385,27 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                             skin_viewport->hidden_flags |= VP_DRAW_WASHIDDEN;
                         else
                         {
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                             if (skin_viewport->output_to_backdrop_buffer)
                             {
                                 void *backdrop = skin_backdrop_get_buffer(data->backdrop_id);
                                 gwps->display->set_framebuffer(backdrop);
                                 skin_backdrop_show(-1);
                             }
+#endif
                             gwps->display->set_viewport(&skin_viewport->vp);
                             gwps->display->clear_viewport();
                             gwps->display->scroll_stop(&skin_viewport->vp);
                             gwps->display->set_viewport(&info->skin_vp->vp);
                             skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
+
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                             if (skin_viewport->output_to_backdrop_buffer)
                             {
                                 gwps->display->set_framebuffer(NULL);
                                 skin_backdrop_show(data->backdrop_id);
                             }
+#endif
                         }
                     }
                 }
@@ -844,7 +849,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
                                  skin_viewport, vp_refresh_mode);
         refresh_mode = old_refresh_mode;
     }
-#ifdef HAVE_LCD_BITMAP
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     display->set_framebuffer(NULL);
     skin_backdrop_show(data->backdrop_id);
 #endif
