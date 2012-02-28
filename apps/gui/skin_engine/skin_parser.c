@@ -387,19 +387,30 @@ static int parse_image_load(struct skin_element *element,
 {
     const char* filename;
     const char* id;
-    int x,y;
+    int x = 0,y = 0, subimages = 1;
     struct gui_img *img;
 
-    /* format: %x(n,filename.bmp,x,y)
-       or %xl(n,filename.bmp,x,y)
-       or %xl(n,filename.bmp,x,y,num_subimages)
+    /* format: %x(n,filename.bmp[,x,y])
+       or %xl(n,filename.bmp[,x,y])
+       or %xl(n,filename.bmp[,x,y,num_subimages])
     */
 
     id = get_param_text(element, 0);
     filename = get_param_text(element, 1);
-    x = get_param(element, 2)->data.number;
-    y = get_param(element, 3)->data.number;
-
+    /* x,y,num_subimages handling:
+     * If all 3 are left out use sane defaults.
+     * If there are 2 params it must be x,y
+     * if there is only 1 param it must be the num_subimages
+     */
+    if (element->params_count == 3)
+        subimages = get_param(element, 2)->data.number;
+    else if (element->params_count > 3)
+    {
+        x = get_param(element, 2)->data.number;
+        y = get_param(element, 3)->data.number;
+        if (element->params_count == 5)
+            subimages = get_param(element, 4)->data.number;
+    }
     /* check the image number and load state */
     if(skin_find_item(id, SKIN_FIND_IMAGE, wps_data))
     {
@@ -414,7 +425,7 @@ static int parse_image_load(struct skin_element *element,
     img->label = PTRTOSKINOFFSET(skin_buffer, (void*)id);
     img->x = x;
     img->y = y;
-    img->num_subimages = 1;
+    img->num_subimages = subimages;
     img->display = -1;
     img->using_preloaded_icons = false;
     img->buflib_handle = -1;
@@ -423,15 +434,7 @@ static int parse_image_load(struct skin_element *element,
     img->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
 
     if (token->type == SKIN_TOKEN_IMAGE_DISPLAY)
-    {
         token->value.data = PTRTOSKINOFFSET(skin_buffer, img);
-    }
-    else if (element->params_count == 5)
-    {
-        img->num_subimages = get_param(element, 4)->data.number;
-        if (img->num_subimages <= 0)
-            return WPS_ERROR_INVALID_PARAM;
-    }
 
     if (!strcmp(img->bm.data, "__list_icons__"))
     {

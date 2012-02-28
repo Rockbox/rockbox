@@ -176,9 +176,9 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_DISABLE_THEME,         "wd", "", 0|NOBREAK },
     { SKIN_TOKEN_DRAW_INBUILTBAR,       "wi", "", SKIN_REFRESH_STATIC|NOBREAK },
     
-    { SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SFII|I", 0|NOBREAK },
+    { SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SF|III", 0|NOBREAK },
     { SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY, "xd", "S|[IT]I", 0 },
-    { SKIN_TOKEN_IMAGE_DISPLAY,         "x", "SFII", SKIN_REFRESH_STATIC|NOBREAK },
+    { SKIN_TOKEN_IMAGE_DISPLAY,         "x", "SF|II", SKIN_REFRESH_STATIC|NOBREAK },
     
     { SKIN_TOKEN_LOAD_FONT,             "Fl" , "IF|I", 0|NOBREAK },
     { SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "IIII|ss", 0|NOBREAK },

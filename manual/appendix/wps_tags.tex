@@ -369,19 +369,19 @@ Examples:
         & Load and set a backdrop image for the WPS.
           This image must be exactly the same size as your LCD.\\
     }%
-    \config{\%x(n,filename,x,y)}
+    \config{\%x(n,filename[,x,y])}
         & Load and display an image\newline
           \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\newline
           \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\newline
-          \config{x}: x coordinate\newline
-          \config{y}: y coordinate.\\
-    \config{\%xl(n,filename,x,y,\tabnlindent[nimages])}
+          \config{x}: x coordinate (defaults to 0 if both x and y are not specified)\newline
+          \config{y}: y coordinate. (defaults to 0 if both x and y are not specified)\\
+    \config{\%xl(n,filename,[x,y],\tabnlindent[nimages])}
         & Preload an image for later display (useful for when your images are displayed conditionally).\newline
           \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\newline
           \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\newline
             If the filename is ``\_\_list\_icons\_\_'' the list icon bitmap will be used instead\newline
-          \config{x}: x coordinate\newline
-          \config{y}: y coordinate\newline
+          \config{x}: x coordinate (defaults to 0 if both x and y are not specified)\newline
+          \config{y}: y coordinate. (defaults to 0 if both x and y are not specified)\\
           \config{nimages}: (optional) number of sub-images (tiled vertically, of the same height)
           contained in the bitmap. Default is 1.\\
     \config{\%xd(n[i] [,tag] [,offset])} & Display a preloaded image.
