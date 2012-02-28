@@ -80,34 +80,22 @@ void imx233_set_clock_divisor(enum imx233_clock_t clk, int div)
     switch(clk)
     {
         case CLK_PIX:
-            HW_CLKCTRL_PIX &= ~HW_CLKCTRL_PIX__DIV_BM;
-            HW_CLKCTRL_PIX |= div;
-            while(HW_CLKCTRL_PIX & __CLK_BUSY);
+            __FIELD_SET(HW_CLKCTRL_PIX, DIV, div);
             break;
         case CLK_SSP:
-            HW_CLKCTRL_SSP &= ~HW_CLKCTRL_SSP__DIV_BM;
-            HW_CLKCTRL_SSP |= div;
-            while(HW_CLKCTRL_SSP & __CLK_BUSY);
+            __FIELD_SET(HW_CLKCTRL_SSP, DIV, div);
             break;
         case CLK_CPU:
-            __REG_CLR(HW_CLKCTRL_CPU) = HW_CLKCTRL_CPU__DIV_CPU_BM;
-            __REG_SET(HW_CLKCTRL_CPU) = div;
-            while(HW_CLKCTRL_CPU & HW_CLKCTRL_CPU__BUSY_REF_CPU);
+            __FIELD_SET(HW_CLKCTRL_CPU, DIV_CPU, div);
             break;
         case CLK_EMI:
-            HW_CLKCTRL_EMI &= ~HW_CLKCTRL_EMI__DIV_EMI_BM;
-            HW_CLKCTRL_EMI |= div;
-            while(HW_CLKCTRL_EMI & HW_CLKCTRL_EMI__BUSY_REF_EMI);
+            __FIELD_SET(HW_CLKCTRL_EMI, DIV_EMI, div);
             break;
         case CLK_HBUS:
-            __REG_CLR(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__DIV_BM | HW_CLKCTRL_HBUS__DIV_FRAC_EN;
-            __REG_SET(HW_CLKCTRL_HBUS) = div;
-            while(HW_CLKCTRL_HBUS & __CLK_BUSY);
+            __FIELD_SET(HW_CLKCTRL_HBUS, DIV, div);
             break;
         case CLK_XBUS:
-            HW_CLKCTRL_XBUS &= ~HW_CLKCTRL_XBUS__DIV_BM;
-            HW_CLKCTRL_XBUS |= div;
-            while(HW_CLKCTRL_XBUS & __CLK_BUSY);
+            __FIELD_SET(HW_CLKCTRL_XBUS, DIV, div);
             break;
         default: return;
     }
@@ -138,8 +126,8 @@ void imx233_set_fractional_divisor(enum imx233_clock_t clk, int fracdiv)
     switch(clk)
     {
         case CLK_HBUS:
-            __REG_CLR(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__DIV_BM;
-            __REG_SET(HW_CLKCTRL_HBUS) = fracdiv | HW_CLKCTRL_HBUS__DIV_FRAC_EN;
+            __FIELD_SET(HW_CLKCTRL_HBUS, DIV, fracdiv);
+            __REG_SET(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__DIV_FRAC_EN;
             return;
         case CLK_PIX: REG = &HW_CLKCTRL_FRAC_PIX; break;
         case CLK_IO: REG = &HW_CLKCTRL_FRAC_IO; break;
