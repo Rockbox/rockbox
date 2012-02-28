@@ -29,7 +29,7 @@
 
 static bool display_on = false;
 
-void lcd_display_init()
+static void lcd_display_init(void)
 {
     unsigned int x, y;
 
@@ -106,6 +106,12 @@ void lcd_display_init()
             lcd_data(0x00);
 
     display_on = true;
+}
+
+void lcd_init_device(void)
+{
+    lcdif_init(LCDIF_16BIT);
+    lcd_display_init();
 }
 
 void lcd_enable (bool on)
