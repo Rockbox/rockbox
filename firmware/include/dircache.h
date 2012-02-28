@@ -91,6 +91,7 @@ void dircache_update_filetime(int fd);
 void dircache_mkdir(const char *path);
 void dircache_rmdir(const char *path);
 void dircache_remove(const char *name);
+void dircache_hide(const char *name, bool do_hide);
 void dircache_rename(const char *oldpath, const char *newpath);
 void dircache_add_file(const char *path, long startcluster);
 

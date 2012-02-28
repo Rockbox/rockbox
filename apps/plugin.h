@@ -951,6 +951,9 @@ struct plugin_api {
 
     const char *rbversion;
 
+    int (*hide)(const char *name, bool do_hide);
+    int (*hidedir)(const char *name, bool do_hide);
+
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };
