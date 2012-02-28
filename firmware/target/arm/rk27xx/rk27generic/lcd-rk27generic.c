@@ -71,7 +71,7 @@ static void lcd_sleep(bool sleep)
     lcd_cmd(GRAM_WRITE);
 }
 
-void lcd_display_init()
+static void lcd_display_init(void)
 {
     unsigned int x, y;
 
@@ -171,6 +171,12 @@ void lcd_display_init()
             lcd_data(0x000000);
 
     lcd_sleep(false);
+}
+
+void lcd_init_device(void)
+{
+    lcdif_init(LCDIF_18BIT);
+    lcd_display_init();
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
