@@ -123,27 +123,26 @@ static void lcdctrl_init(void)
 }
 
 /* configure pins to drive lcd in 18bit mode (16bit mode for HiFiMAN's) */
-static void iomux_lcd(void)
+static void iomux_lcd(enum lcdif_mode_t mode)
 {
     unsigned long muxa;
 
     muxa = SCU_IOMUXA_CON & ~(IOMUX_LCD_VSYNC|IOMUX_LCD_DEN|0xff);
 
-#if !defined(HM801) && !defined(HM60x)
-    muxa |= IOMUX_LCD_D18|IOMUX_LCD_D20|IOMUX_LCD_D22|IOMUX_LCD_D17|IOMUX_LCD_D16;
-#endif
+    if (mode == LCDIF_18BIT)
+    {
+        muxa |= IOMUX_LCD_D18|IOMUX_LCD_D20|IOMUX_LCD_D22|IOMUX_LCD_D17|IOMUX_LCD_D16;
+    }
 
     SCU_IOMUXA_CON = muxa;
     SCU_IOMUXB_CON |= IOMUX_LCD_D815;
 }
 
-void lcd_init_device()
+void lcdif_init(enum lcdif_mode_t mode)
 {
-    iomux_lcd();       /* setup pins for 16bit lcd interface */
+    iomux_lcd(mode);   /* setup pins for lcd interface */
     lcdctrl_init();    /* basic lcdc module configuration */
-
     lcdctrl_bypass(1); /* run in bypass mode - all writes goes directly to lcd controller */
-    lcd_display_init();
 }
 
 /* This is ugly hack. We drive lcd in bypass mode
