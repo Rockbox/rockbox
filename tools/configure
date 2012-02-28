@@ -3082,11 +3082,11 @@ fi
     target="RK27_GENERIC"
     memory=16 # always
     arm7ejscc
-    tool="$rootdir/tools/scramble -add=rk27"
+    tool="$rootdir/tools/scramble -rkw -modelnum=73"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.rk27"
-    bootoutput="bootloader.rk27"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
     appextra="recorder:gui:radio"
     plugins="yes"
     swcodec="yes"
@@ -3105,11 +3105,11 @@ fi
     target="HM60X"
     memory=16
     arm7ejscc
-    tool="$rootdir/tools/scramble -add=rk27"
+    tool="$rootdir/tools/scramble -rkw -modelnum=79"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.rk27"
-    bootoutput="bootloader.rk27"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins="yes"
     swcodec="yes"
@@ -3128,11 +3128,11 @@ fi
     target="HM801"
     memory=16
     arm7ejscc
-    tool="$rootdir/tools/scramble -add=rk27"
+    tool="$rootdir/tools/scramble -rkw -modelnum=82"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.rk27"
-    bootoutput="bootloader.rk27"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins="yes"
     swcodec="yes"

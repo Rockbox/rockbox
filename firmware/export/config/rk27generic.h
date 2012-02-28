@@ -3,7 +3,7 @@
  */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 78
+#define MODEL_NUMBER 73
 
 #define MODEL_NAME   "Rockchip 27xx generic"
 
@@ -185,6 +185,7 @@
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
-#define BOOTFILE_EXT "rk27"
+#define RKW_FORMAT
+#define BOOTFILE_EXT "rkw"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
