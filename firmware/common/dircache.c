@@ -1441,6 +1441,34 @@ void dircache_remove(const char *name)
     entry->d_name = NULL;
 }
 
+/* Hide / Unhide a file from cache */
+void dircache_hide(const char *name, bool do_hide)
+{
+    struct dircache_entry *entry;
+    int attr;
+
+    if (block_until_ready())
+        return ;
+
+    logf("%shide: %s", do_hide ? "" : "un", name);
+
+    entry = dircache_get_entry(name, false);
+
+    if (entry == NULL)
+    {
+        logf("not found!");
+        dircache_initialized = false;
+        return ;
+    }
+
+    attr = entry->info.attribute;
+
+    if (do_hide)
+        entry->info.attribute = attr |  ATTR_HIDDEN;
+    else
+        entry->info.attribute = attr & ~ATTR_HIDDEN;
+}
+
 void dircache_rename(const char *oldpath, const char *newpath)
 { /* Test ok. */
     struct dircache_entry *entry, *newentry;

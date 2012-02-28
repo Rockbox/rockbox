@@ -60,7 +60,8 @@ int file_creat(const char *pathname)
     return open(pathname, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 }
 
-static int open_internal(const char* pathname, int flags, bool use_cache)
+static int open_internal_part(const char* pathname, int flags, bool use_cache,
+                              bool is_file)
 {
     DIR_UNCACHED* dir;
     struct dirent_uncached* entry;
@@ -204,7 +205,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
             return -7;
         }
     } else {
-        if(file->write && (file->attr & FAT_ATTR_DIRECTORY)) {
+        if(is_file && file->write && (file->attr & FAT_ATTR_DIRECTORY)) {
             errno = EISDIR;
             file->busy = false;
             closedir_uncached(dir);
@@ -228,6 +229,11 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
 #endif
 
     return fd;
+}
+
+static int open_internal(const char* pathname, int flags, bool use_cache)
+{
+    return open_internal_part(pathname, flags, use_cache, true);
 }
 
 int file_open(const char* pathname, int flags)
@@ -833,4 +839,52 @@ int release_files(int volume)
         }
     }
     return closed; /* return how many we did */
+}
+
+/* hide / unhide selected file / directory */
+static int hide_file_dir_part(const char* name, bool do_hide, bool is_file)
+{
+    int rc;
+    struct filedesc* file;
+
+    /* Can't use dircache now, because we need to access the fat structures. */
+    int fd = open_internal_part(name, O_RDONLY, false, is_file);
+    if (fd < 0) {
+        if (is_file && (errno == EISDIR))
+            return hidedir(name, do_hide);
+        else
+            return fd * 10 - 1;
+    }
+
+    file = &openfiles[fd];
+    LDEBUGF("hide: file->attr=%x\n", file->attr);
+    if (do_hide)
+        file->attr |=  FAT_ATTR_HIDDEN;
+    else
+        file->attr &= ~FAT_ATTR_HIDDEN;
+    LDEBUGF("hide: file->attr=%x\n", file->attr);
+
+    fat_attr(&file->fatfile, file->size, file->attr);
+
+    rc = close(fd);
+    if (rc < 0)
+        return rc * 10 - 2;
+
+#ifdef HAVE_DIRCACHE
+    dircache_hide(name, do_hide);
+#endif
+
+    return 0;
+}
+
+/* hide / unhide selected directory */
+int hidedir(const char* name, bool do_hide)
+{
+    return hide_file_dir_part(name, do_hide, false);
+}
+
+/* hide / unhide selected file / directory */
+int hide(const char* name, bool do_hide)
+{
+    return hide_file_dir_part(name, do_hide, true);
 }
