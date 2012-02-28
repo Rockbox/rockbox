@@ -834,3 +834,132 @@ int release_files(int volume)
     }
     return closed; /* return how many we did */
 }
+
+int hidedir(const char* pathname, bool do_hide)
+{
+    DIR_UNCACHED *dir;
+    struct dirent_uncached* entry;
+    int attr;
+#ifdef HAVE_DIRCACHE
+    bool update = false;
+#endif
+    int pathnamesize = strlen(pathname) + 1;
+    char pathnamecopy[pathnamesize];
+    char *name;
+    struct fat_file file;
+
+    LDEBUGF("hidedir:%s, %d\n", pathname, do_hide);
+
+    if (pathname[0] != '/') {
+        return -5;
+    }
+
+    strlcpy(pathnamecopy, pathname, pathnamesize);
+
+    /* locate filename */
+    name = strrchr(pathnamecopy+1,'/');
+    if (name) {
+        *name = 0;
+        dir = opendir_uncached(pathnamecopy);
+        *name = '/';
+        name++;
+    }
+    else {
+        dir = opendir_uncached("/");
+        name = pathnamecopy+1;
+    }
+    if (!dir) {
+        return -6;
+    }
+
+    if(name[0] == 0) {
+        DEBUGF("Empty file name\n");
+        closedir_uncached(dir);
+        return -7;
+    }
+
+    /* scan dir for name */
+    while ((entry = readdir_uncached(dir))) {
+        if ( !strcasecmp(name, entry->d_name) ) {
+            fat_open(IF_MV2(dir->fatdir.file.volume,)
+                     entry->startcluster,
+                     &file,
+                     &(dir->fatdir));
+            attr = entry->info.attribute;
+            break;
+        }
+    }
+    if (!entry) {
+        LDEBUGF("Didn't find file %s\n",name);
+        closedir_uncached(dir);
+        return -8;
+    }
+
+    LDEBUGF("%s, attr=%x\n", entry->d_name, attr);
+
+    if (( do_hide && !(attr & FAT_ATTR_HIDDEN)) ||
+        (!do_hide &&  (attr & FAT_ATTR_HIDDEN))) {
+        if (do_hide)
+            attr |=  FAT_ATTR_HIDDEN;
+        else
+            attr &= ~FAT_ATTR_HIDDEN;
+        LDEBUGF("hide_dir: attr=%x\n", attr);
+#ifdef HAVE_DIRCACHE
+        update = true;
+#endif
+        fat_attr(&file, entry->info.size, attr);
+    }
+
+    closedir_uncached(dir);
+
+#ifdef HAVE_DIRCACHE
+    if (update)
+        dircache_hide(pathname, do_hide);
+#endif
+
+    return 0;
+}
+
+/* hide / unhide selected file / directory */
+int hide(const char* name, bool do_hide)
+{
+    int rc;
+    struct filedesc* file;
+#ifdef HAVE_DIRCACHE
+    bool update = false;
+#endif
+    /* Can't use dircache now, because we need to access the fat structures. */
+    int fd = open_internal(name, O_WRONLY, false);
+    if ( fd < 0 ) {
+        if (errno == EISDIR) {
+            return hidedir(name, do_hide);
+        } else {
+            return fd * 10 - 1;
+        }
+    }
+
+    file = &openfiles[fd];
+    LDEBUGF("hide: file->attr=%x\n", file->attr);
+    if (( do_hide && !(file->attr & FAT_ATTR_HIDDEN)) ||
+        (!do_hide &&  (file->attr & FAT_ATTR_HIDDEN))) {
+        if (do_hide)
+            file->attr |=  FAT_ATTR_HIDDEN;
+        else
+            file->attr &= ~FAT_ATTR_HIDDEN;
+        LDEBUGF("hide: file->attr=%x\n", file->attr);
+#ifdef HAVE_DIRCACHE
+        update = true;
+#endif
+    }
+
+    rc = close(fd);
+    if (rc<0)
+        return rc * 10 - 2;
+
+#ifdef HAVE_DIRCACHE
+    if (update)
+        dircache_hide(name, do_hide);
+#endif
+
+    return 0;
+}

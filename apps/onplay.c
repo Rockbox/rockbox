@@ -604,6 +604,30 @@ static bool rename_file(void)
     return false;
 }
 
+static bool hide_file_dir(void *param)
+{
+    int ret;
+    int lang_id;
+    bool hiding = (bool)(intptr_t)param;
+
+    if (hiding)
+        lang_id = LANG_HIDING;
+    else
+        lang_id = LANG_UNHIDING;
+
+    splash(0, str(lang_id));
+
+     if (selected_file_attr & ATTR_DIRECTORY)
+         ret = hidedir(selected_file, hiding);
+     else
+         ret = hide(selected_file, hiding);
+
+    if (!ret)
+        onplay_result = ONPLAY_RELOAD_DIR;
+
+    return (ret == 0);
+}
+
 static bool create_dir(void)
 {
     char dirname[MAX_PATH];
@@ -1013,6 +1037,10 @@ MENUITEM_FUNCTION(delete_dir_item, 0, ID2P(LANG_DELETE_DIR),
                   delete_file_dir, NULL, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(create_dir_item, 0, ID2P(LANG_CREATE_DIR),
                   create_dir, NULL, clipboard_callback, Icon_NOICON);
+MENUITEM_FUNCTION(hide_file_item, MENU_FUNC_USEPARAM, ID2P(LANG_HIDE),
+                  hide_file_dir, (void *)true,  clipboard_callback, Icon_NOICON);
+MENUITEM_FUNCTION(unhide_file_item, MENU_FUNC_USEPARAM, ID2P(LANG_UNHIDE),
+                  hide_file_dir, (void *)false, clipboard_callback, Icon_NOICON);
 
 /* other items */
 static bool list_viewers(void)
@@ -1089,7 +1117,9 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
             if ((selected_file_attr & FAT_ATTR_VOLUME) &&
                 (this_item == &rename_file_item ||
                  this_item == &delete_dir_item ||
-                 this_item == &clipboard_cut_item) )
+                 this_item == &clipboard_cut_item ||
+                 this_item == &hide_file_item ||
+                 this_item == &unhide_file_item) )
                 return ACTION_EXIT_MENUITEM;
             /* no rename+delete for volumes */
             if ((selected_file_attr & ATTR_VOLUME) &&
@@ -1119,6 +1149,22 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
             }
             else if (selected_file)
             {
+                /* only for hidden / unhidden */
+                if (!(selected_file_attr & ATTR_HIDDEN))
+                {
+                    if (this_item == &hide_file_item)
+                    {
+                        return action;
+                    }
+                }
+                else
+                {
+                    if (this_item == &unhide_file_item)
+                    {
+                        return action;
+                    }
+                }
+
                 /* requires an actual file */
                 if (this_item == &rename_file_item ||
                     this_item == &clipboard_cut_item ||
@@ -1189,7 +1235,8 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            onplaymenu_callback, Icon_file_view_menu,
            &tree_playlist_menu, &cat_playlist_menu,
-           &rename_file_item, &clipboard_cut_item, &clipboard_copy_item,
+           &rename_file_item, &hide_file_item, &unhide_file_item,
+           &clipboard_cut_item, &clipboard_copy_item,
            &clipboard_paste_item, &delete_file_item, &delete_dir_item,
 #if LCD_DEPTH > 1
            &set_backdrop_item,

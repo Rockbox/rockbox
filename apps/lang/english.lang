@@ -12993,3 +12993,59 @@
     *: "Restart Sleep Timer On Keypress"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_HIDE
+  desc: in playlist viewer on+play menu
+  user: core
+  <source>
+    *: "Hide"
+  </source>
+  <dest>
+    *: "Hide"
+  </dest>
+  <voice>
+    *: "Hide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNHIDE
+  desc: in playlist viewer on+play menu
+  user: core
+  <source>
+    *: "Unhide"
+  </source>
+  <dest>
+    *: "Unhide"
+  </dest>
+  <voice>
+    *: "Unhide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDING
+  desc: in playlist viewer on+play menu
+  user: core
+  <source>
+    *: "Hiding..."
+  </source>
+  <dest>
+    *: "Hiding..."
+  </dest>
+  <voice>
+    *: "Hiding..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNHIDING
+  desc: in playlist viewer on+play menu
+  user: core
+  <source>
+    *: "Unhiding..."
+  </source>
+  <dest>
+    *: "Unhiding..."
+  </dest>
+  <voice>
+    *: "Unhiding..."
+  </voice>
+</phrase>
