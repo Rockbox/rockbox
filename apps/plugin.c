@@ -792,6 +792,9 @@ static const struct plugin_api rockbox_api = {
 
     rbversion,
 
+    PREFIX(file_hide),
+    PREFIX(file_hidedir),
+
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };
