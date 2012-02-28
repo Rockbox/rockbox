@@ -13,7 +13,9 @@ $(TOOLSDIR)/scramble: $(TOOLSDIR)/scramble.c $(TOOLSDIR)/iriver.c \
 		$(TOOLSDIR)/mi4.c $(TOOLSDIR)/gigabeat.c \
 		$(TOOLSDIR)/gigabeats.c $(TOOLSDIR)/telechips.c \
 		$(TOOLSDIR)/iaudio_bl_flash.c \
-		$(TOOLSDIR)/creative.c $(TOOLSDIR)/hmac-sha1.c
+		$(TOOLSDIR)/creative.c $(TOOLSDIR)/hmac-sha1.c \
+		$(TOOLSDIR)/rkw.c
+
 $(TOOLSDIR)/rdf2binary:	$(TOOLSDIR)/rdf2binary.c
 $(TOOLSDIR)/convbdf: $(TOOLSDIR)/convbdf.c
 $(TOOLSDIR)/codepages: $(TOOLSDIR)/codepages.c $(TOOLSDIR)/codepage_tables.c

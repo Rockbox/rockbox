@@ -30,6 +30,7 @@
 #include "telechips.h"
 #include "creative.h"
 #include "iaudio_bl_flash.h"
+#include "rkw.h"
 
 static int iaudio_encode(char *iname, char *oname, char *idstring);
 static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc);
@@ -119,11 +120,12 @@ void usage(void)
            "\t        -type=XXXX    where XXXX is a string indicating the \n"
            "\t                      type of binary, eg. RBOS, RBBL\n"
            "\t-tcc=X  Telechips generic firmware format (X values: sum, crc)\n"
+           "\t-rkw Rockchip RKW format\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
-           "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n"
-           "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
-    printf("\t                   9200, 1630, 6330, ldax, m200, c100, clip, e2v2,\n"
+           "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n");
+    printf("\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n"
+           "\t                   9200, 1630, 6330, ldax, m200, c100, clip, e2v2,\n"
            "\t                   m2v4, fuze, c2v2, clv2, y820, y920, y925, x747,\n"
            "\t                   747p, x777, nn2g, m244, cli+, fuz2, hd20, hd30,\n"
            "\t                   ip6g, rk27, clzp)\n");
@@ -148,7 +150,7 @@ int main (int argc, char** argv)
     unsigned long modelnum;
     char modelname[5];
     int model_id;
-    enum { none, scramble, xor, tcc_sum, tcc_crc, add } method = scramble;
+    enum { none, scramble, xor, tcc_sum, tcc_crc, rkw, add } method = scramble;
     bool creative_enable_ciff;
 
     model_id = ARCHOS_PLAYER;
@@ -221,6 +223,24 @@ int main (int argc, char** argv)
             fprintf(stderr, "unsupported TCC method: %s\n", &argv[1][5]);
             return 2;
         }
+    }
+    else if(!strncmp(argv[1], "-rkw", 4)) {
+        iname = argv[3];
+        oname = argv[4];
+        modelnum = 0;
+
+        if(!strncmp(argv[2], "-modelnum=", 10)) {
+            modelnum = atoi(&argv[2][10]);
+        }
+
+        if (!modelnum)
+        {
+            modelnum = 73; /* rk27generic */
+            fprintf(stderr, "modelnum not supplied."
+                            " using default value for rk27generic target\n");
+        }
+
+        return (rkw_encode(iname, oname, modelnum) != 0) ? -1 : 0;
     }
     else if(!strncmp(argv[1], "-add=", 5)) {
         iname = argv[2];
@@ -337,8 +357,6 @@ int main (int argc, char** argv)
             modelnum = 71;
         else if (!strcmp(&argv[1][5], "fuz+")) /* Sansa Fuze+ */
             modelnum = 72;
-        else if (!strcmp(&argv[1][5], "rk27")) /* rockchip 27xx generic */
-            modelnum = 73;
         else if (!strcmp(&argv[1][5], "clzp")) /* Sansa Clip Zip */
             modelnum = 79;
         else if (!strcmp(&argv[1][5], "conn")) /* Sansa Connect */
