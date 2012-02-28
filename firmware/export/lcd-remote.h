@@ -132,6 +132,7 @@ void lcd_remote_init(void);
 void lcd_remote_write_command(int cmd);
 void lcd_remote_write_command_ex(int cmd, int data);
 void lcd_remote_write_data(const fb_remote_data *data, int count);
+extern void lcd_remote_set_framebuffer(fb_remote_data *fb);
 
 extern void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x,
                                    int src_y, int stride, int x, int y,

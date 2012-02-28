@@ -95,6 +95,10 @@ int skin_backdrop_assign(char* backdrop, char *bmpdir,
         filename[2] = '\0'; /* we check this later to see if we actually have an
                                image to load. != '\0' means display the image */
     }
+    else if (!strcmp(backdrop, BACKDROP_BUFFERNAME))
+    {
+        strcpy(filename, backdrop);
+    }
     else
     {
         get_image_filename(backdrop, bmpdir, filename, sizeof(filename));
@@ -156,15 +160,20 @@ bool skin_backdrops_preload(void)
                 {
                     backdrops[i].buffer = core_get_data(backdrops[i].buflib_handle);
                     handle_being_loaded = backdrops[i].buflib_handle;
-                    backdrops[i].loaded =
-                             screens[screen].backdrop_load(filename, backdrops[i].buffer);
-                    handle_being_loaded = -1;
-                    if (!backdrops[i].loaded)
+                    if (strcmp(filename, BACKDROP_BUFFERNAME))
                     {
-                        core_free(backdrops[i].buflib_handle);
-                        backdrops[i].buflib_handle = -1;
-                        retval = false;
+                        backdrops[i].loaded =
+                                screens[screen].backdrop_load(filename, backdrops[i].buffer);
+                        handle_being_loaded = -1;
+                        if (!backdrops[i].loaded)
+                        {
+                            core_free(backdrops[i].buflib_handle);
+                            backdrops[i].buflib_handle = -1;
+                            retval = false;
+                        }
                     }
+                    else
+                        backdrops[i].loaded = true;
                 }
                 else
                     retval = false;
@@ -176,10 +185,21 @@ bool skin_backdrops_preload(void)
     return retval;
 }
 
+void* skin_backdrop_get_buffer(int backdrop_id)
+{
+    if (backdrop_id < 0)
+        return NULL;
+    return backdrops[backdrop_id].buffer;
+}
+
 void skin_backdrop_show(int backdrop_id)
 {
     if (backdrop_id < 0)
+    {
+        screens[0].backdrop_show(NULL);
+        current_lcd_backdrop[0] = -1;
         return;
+    }
     enum screen_type screen = backdrops[backdrop_id].screen;
     if ((backdrops[backdrop_id].loaded == false) ||
         (backdrops[backdrop_id].name[0] == '-' &&

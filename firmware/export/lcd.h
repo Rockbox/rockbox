@@ -529,6 +529,7 @@ extern void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
 extern void lcd_bitmap(const fb_data *src, int x, int y, int width,
                        int height);
+extern void lcd_set_framebuffer(fb_data *fb);
 
 extern void lcd_scroll_step(int pixels);
 

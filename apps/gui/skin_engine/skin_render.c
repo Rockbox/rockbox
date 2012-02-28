@@ -385,11 +385,22 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                             skin_viewport->hidden_flags |= VP_DRAW_WASHIDDEN;
                         else
                         {
+                            if (skin_viewport->output_to_backdrop_buffer)
+                            {
+                                void *backdrop = skin_backdrop_get_buffer(data->backdrop_id);
+                                gwps->display->set_framebuffer(backdrop);
+                                skin_backdrop_show(-1);
+                            }
                             gwps->display->set_viewport(&skin_viewport->vp);
                             gwps->display->clear_viewport();
                             gwps->display->scroll_stop(&skin_viewport->vp);
                             gwps->display->set_viewport(&info->skin_vp->vp);
                             skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
+                            if (skin_viewport->output_to_backdrop_buffer)
+                            {
+                                gwps->display->set_framebuffer(NULL);
+                                skin_backdrop_show(data->backdrop_id);
+                            }
                         }
                     }
                 }
@@ -767,6 +778,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
             data->wps_progress_pat[i] = display->get_locked_pattern();
     }
 #endif
+
     viewport = SKINOFFSETTOPTR(skin_buffer, data->tree);
     skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);
     label = SKINOFFSETTOPTR(skin_buffer, skin_viewport->label);
@@ -786,6 +798,16 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
         skin_viewport->vp.fg_pattern = skin_viewport->start_fgcolour;
         skin_viewport->vp.bg_pattern = skin_viewport->start_bgcolour;
+        if (skin_viewport->output_to_backdrop_buffer)
+        {
+            display->set_framebuffer(skin_backdrop_get_buffer(data->backdrop_id));
+            skin_backdrop_show(-1);
+        }
+        else
+        {
+            display->set_framebuffer(NULL);
+            skin_backdrop_show(data->backdrop_id);
+        }
 #endif
 #ifdef HAVE_LCD_COLOR
         skin_viewport->vp.lss_pattern = skin_viewport->start_gradient.start;
@@ -822,7 +844,10 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
                                  skin_viewport, vp_refresh_mode);
         refresh_mode = old_refresh_mode;
     }
-    
+#ifdef HAVE_LCD_BITMAP
+    display->set_framebuffer(NULL);
+    skin_backdrop_show(data->backdrop_id);
+#endif
     /* Restore the default viewport */
     display->set_viewport(NULL);
     display->update();

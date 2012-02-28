@@ -1832,6 +1832,7 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     viewport_set_defaults(&skin_vp->vp, curr_screen);
     
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+    skin_vp->output_to_backdrop_buffer = false;
     skin_vp->start_fgcolour = skin_vp->vp.fg_pattern;
     skin_vp->start_bgcolour = skin_vp->vp.bg_pattern;
 #endif
@@ -2022,6 +2023,11 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     break;
                 case SKIN_TOKEN_VIEWPORT_TEXTSTYLE:
                     function = parse_viewporttextstyle;
+                    break;
+                case SKIN_TOKEN_VIEWPORT_DRAWONBG:
+                    curr_vp->output_to_backdrop_buffer = true;
+                    backdrop_filename = BACKDROP_BUFFERNAME;
+                    wps_data->use_extra_framebuffer = true;
                     break;
 #endif
 #ifdef HAVE_LCD_COLOR

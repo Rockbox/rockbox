@@ -81,6 +81,14 @@ static void lcd_gradient_rect(int x1, int x2, int y, unsigned h,
 }
 #endif
 
+void LCDFN(set_framebuffer)(FBFN(data) *fb)
+{
+    if (fb)
+        LCDFN(framebuffer) = fb;
+    else
+        LCDFN(framebuffer) = &LCDFN(static_framebuffer)[0][0];
+}
+
 /*
  * draws the borders of the current viewport
  **/

@@ -160,6 +160,9 @@ struct screen
     bool (*backdrop_load)(const char *filename, char* backdrop_buffer);
     void (*backdrop_show)(char* backdrop_buffer);
 #endif
+#if defined(HAVE_LCD_BITMAP)
+    void (*set_framebuffer)(void *framebuffer);
+#endif
 };
 
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)
