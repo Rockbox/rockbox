@@ -152,6 +152,7 @@ int dircache_get_entry_id(const char *filename);
 void dircache_add_file(const char *name, long startcluster);
 void dircache_remove(const char *name);
 void dircache_rename(const char *oldname, const char *newname);
+void dircache_hide(const char *name, bool do_hide);
 #endif
 
 
@@ -509,6 +510,15 @@ int sim_rename(const char *oldname, const char *newname)
     strncpy(sim_old, get_sim_pathname(oldname), MAX_PATH);
     strncpy(sim_new, get_sim_pathname(newname), MAX_PATH);
     return RENAME(sim_old, sim_new);
+}
+
+int sim_hide(const char *name, bool do_hide)
+{
+    /* XXX */
+#ifdef HAVE_DIRCACHE
+    dircache_hide(name, do_hide);
+#endif
+    return 0;
 }
 
 /* rockbox off_t may be different from system off_t */

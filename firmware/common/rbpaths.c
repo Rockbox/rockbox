@@ -204,6 +204,12 @@ int app_remove(const char *name)
     return remove(fname);
 }
 
+int app_hide(const char *name, bool hide)
+{
+    /* XXX */
+    return -1;
+}
+
 int app_rename(const char *old, const char *new)
 {
     char realpath_old[MAX_PATH], realpath_new[MAX_PATH];

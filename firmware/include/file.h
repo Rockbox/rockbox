@@ -30,6 +30,7 @@
 /* this has SEEK_SET et al */
 #include <stdio.h>
 #endif
+#include <stdbool.h>
 
 
 #undef MAX_PATH /* this avoids problems when building simulator */
@@ -42,6 +43,8 @@
 #   define creat(x,m)      app_creat(x, m)
 #   define remove(x)       app_remove(x)
 #   define rename(x,y)     app_rename(x,y)
+#   define hide(x,y)       app_hide(x,y)
+#   define hidedir(x,y)    app_hide(x,y)
 extern int app_open(const char *name, int o, ...);
 extern int app_creat(const char *name, mode_t mode);
 extern int app_remove(const char* pathname);
@@ -60,6 +63,8 @@ extern int app_rename(const char* path, const char* newname);
 #   define creat(x,m) sim_creat(x,m)
 #   define remove(x) sim_remove(x)
 #   define rename(x,y) sim_rename(x,y)
+#   define hide(x,y) sim_hide(x,y)
+#   define hidedir(x,y) sim_hide(x,y)
 #   define filesize(x) sim_filesize(x)
 #   define fsync(x) sim_fsync(x)
 #   define ftruncate(x,y) sim_ftruncate(x,y)
@@ -101,6 +106,8 @@ extern int rename(const char* path, const char* newname);
 extern int ftruncate(int fd, off_t length);
 extern off_t filesize(int fd);
 extern int release_files(int volume);
+extern int hide(const char* pathname, bool do_hide);
+extern int hidedir(const char* pathname, bool do_hide);
 int fdprintf (int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 #endif /* !CODEC && !PLUGIN */
 #endif

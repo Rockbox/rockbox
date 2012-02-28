@@ -23,6 +23,8 @@
 
 
 bool its_a_dir = false;
+int attr = 0;
+char str_attr[32];
 
 char str_filename[MAX_PATH];
 char str_dirname[MAX_PATH];
@@ -86,8 +88,10 @@ static bool file_properties(char* selected_file)
                 rb->snprintf(str_time, sizeof str_time, "Time: %02d:%02d",
                     ((info.wrttime >> 11) & 0x1F),        /* hour    */
                     ((info.wrttime >> 5 ) & 0x3F));       /* minutes */
+                rb->snprintf(str_attr, sizeof str_attr, "Attr: [%s]Read-only  [%s]Hidden",
+                    (attr&ATTR_READ_ONLY)?"+":" ", (attr&ATTR_HIDDEN)?"+":" ");
 
-                num_properties = 5;
+                num_properties = 6;
 
 #if (CONFIG_CODEC == SWCODEC)
                 int fd = rb->open(selected_file, O_RDONLY);
@@ -233,7 +237,9 @@ static bool dir_properties(char* selected_file)
     log = human_size_log(dps.bc);
     rb->snprintf(str_size, sizeof str_size, "Size: %ld %cB",
                  (long) (dps.bc >> (log*10)), human_size_prefix[log]);
-    num_properties = 4;
+    rb->snprintf(str_attr, sizeof str_attr, "Attr: [%s]Read-only  [%s]Hidden",
+                 (attr&ATTR_READ_ONLY)?"+":" ", (attr&ATTR_HIDDEN)?"+":" ");
+    num_properties = 5;
     return true;
 }
 
@@ -258,18 +264,21 @@ static const char * get_props(int selected_item, void* data,
             rb->strlcpy(buffer, its_a_dir ? str_size : str_date, buffer_len);
             break;
         case 4:
-            rb->strlcpy(buffer, its_a_dir ? "" : str_time, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? str_attr : str_time, buffer_len);
             break;
         case 5:
-            rb->strlcpy(buffer, its_a_dir ? "" : str_artist, buffer_len);
+            rb->strlcpy(buffer, str_attr, buffer_len);
             break;
         case 6:
-            rb->strlcpy(buffer, its_a_dir ? "" : str_title, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? "" : str_artist, buffer_len);
             break;
         case 7:
-            rb->strlcpy(buffer, its_a_dir ? "" : str_album, buffer_len);
+            rb->strlcpy(buffer, its_a_dir ? "" : str_title, buffer_len);
             break;
         case 8:
+            rb->strlcpy(buffer, its_a_dir ? "" : str_album, buffer_len);
+            break;
+        case 9:
             rb->strlcpy(buffer, its_a_dir ? "" : str_duration, buffer_len);
             break;
         default:
@@ -307,6 +316,7 @@ enum plugin_status plugin_start(const void* parameter)
             {
                 struct dirinfo info = rb->dir_get_info(dir, entry);
                 its_a_dir = info.attribute & ATTR_DIRECTORY ? true : false;
+                attr = info.attribute;
                 found = true;
                 break;
             }
