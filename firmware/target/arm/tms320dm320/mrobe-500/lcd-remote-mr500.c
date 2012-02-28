@@ -246,7 +246,7 @@ static void remote_tick(void)
         for(i=7; i<remote_payload_size; i++)
         {
             remote_payload[i]=
-                FBREMOTEADDR(i+remote_draw_x-7, remote_payload[4]>>3);
+                *FBREMOTEADDR(i+remote_draw_x-7, remote_payload[4]>>3);
         }
     }
     

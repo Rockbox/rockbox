@@ -255,7 +255,7 @@ static void remote_update_lcd(void)
         data[6] = (y + 1) << 3;     /* y2    */
 
         for (x = 0; x < RC_WIDTH; x++)
-            data[x + 7] = FBREMOTEADDR(x,y);
+            data[x + 7] = *FBREMOTEADDR(x,y);
 
         remote_tx(data, RC_WIDTH + 7);
 
