@@ -30,8 +30,16 @@ start:
     tst     r2, #0x40000000 @ bit 30, active low
     moveq   r0, #0 @ return 0, continue boot
     bxeq    lr
-    /* otherwise monitor the power button for a short time */
+    /* save registers for the ROM */
     stmfd   sp!, {r4-r6,lr}
+    /* if the power source was 5v (ie usb), bypass the power button delay */
+    ldr     r2, =0x800440c0 @ HW_POWER_STS
+    ldr     r2, [r2]
+    mov     r2, r2, lsl#2
+    mov     r2, r2, lsr#26 @ extract PWRUP_SOURCE
+    tst     r2, #0x20 @ bit 5: five volts
+    bne     boot_rockbox
+    /* otherwise monitor the power button for a short time */
     ldr     r2, =550000 @ loop count
     ldr     r4, =0 @ number of times PSWITCH was 1
 pswitch_monitor_loop:
@@ -48,6 +56,7 @@ pswitch_monitor_loop:
     cmp     r4, r2
     bcc     power_down
     /* jump to section given as argument */
+boot_rockbox:
     str     r0, [r1]
     mov     r0, #1
     ldmfd   sp!, {r4-r6,pc}
