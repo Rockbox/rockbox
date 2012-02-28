@@ -11,12 +11,11 @@
 %xl(D,shuffle-128x64x1.bmp,0,1)
 %xl(E,repeat-128x64x1.bmp,0,0,4)
 %xl(F,playmode-128x64x1.bmp,0,0,5)
-%x(a,pbbackground-128x64x1.bmp,1,0)
 %xl(b,bar-128x64x1.bmp,2,0)
 #
 # Progress Bar
 %V(0,0,128,6,1)
-#%xd(a)
+%x(a,pbbackground-128x64x1.bmp,1,0)
 %pb(2,1,123,4,pb-128x64x1.bmp)
 #
 # Separator Bar

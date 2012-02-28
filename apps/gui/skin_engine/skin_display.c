@@ -298,10 +298,7 @@ void wps_draw_image(struct gui_wps *gwps, struct gui_img *img, int subimage)
 {
     struct screen *display = gwps->display;
     img->bm.data = core_get_data(img->buflib_handle);
-    if(img->always_display)
-        display->set_drawmode(DRMODE_FG);
-    else
-        display->set_drawmode(DRMODE_SOLID);
+    display->set_drawmode(DRMODE_SOLID);
 
     display->bmp_part(&img->bm, 0, img->subimage_height * subimage,
                       img->x, img->y, img->bm.width, img->subimage_height);
@@ -330,10 +327,6 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
             if (img->display >= 0)
             {
                 wps_draw_image(gwps, img, img->display);
-            }
-            else if (img->always_display && SKINOFFSETTOPTR(get_skin_buffer(data), img->vp) == vp)
-            {
-                wps_draw_image(gwps, img, 0);
             }
         }
         list = SKINOFFSETTOPTR(get_skin_buffer(data), list->next);

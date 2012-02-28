@@ -80,7 +80,6 @@ struct gui_img {
     int buflib_handle;
     OFFSETTYPE(char*) label;
     bool loaded;            /* load state */
-    bool always_display;    /* not using the preload/display mechanism */
     int display;
     bool using_preloaded_icons; /* using the icon system instead of a bmp */
 };

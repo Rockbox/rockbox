@@ -415,7 +415,6 @@ static int parse_image_load(struct skin_element *element,
     img->x = x;
     img->y = y;
     img->num_subimages = 1;
-    img->always_display = false;
     img->display = -1;
     img->using_preloaded_icons = false;
     img->buflib_handle = -1;
@@ -425,7 +424,7 @@ static int parse_image_load(struct skin_element *element,
 
     if (token->type == SKIN_TOKEN_IMAGE_DISPLAY)
     {
-        img->always_display = true;
+        token->value.data = PTRTOSKINOFFSET(skin_buffer, img);
     }
     else if (element->params_count == 5)
     {
@@ -1000,7 +999,6 @@ static int parse_progressbar_tag(struct skin_element* element,
             img->x = 0;
             img->y = 0;
             img->num_subimages = 1;
-            img->always_display = false;
             img->display = -1;
             img->using_preloaded_icons = false;
             img->buflib_handle = -1;

@@ -198,6 +198,13 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #endif
         break;
 #ifdef HAVE_LCD_BITMAP
+        case SKIN_TOKEN_IMAGE_DISPLAY:
+        {
+            struct gui_img *img = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+            if (img && img->loaded && do_refresh)
+                img->display = 0;
+        }
+        break;
         case SKIN_TOKEN_IMAGE_DISPLAY_LISTICON:
         case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
         {
