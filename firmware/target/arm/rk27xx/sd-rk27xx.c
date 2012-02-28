@@ -402,6 +402,7 @@ static void init_controller(void)
     SCU_IOMUXA_CON |= IOMUX_SD;
 
     /* enable and unmask SD interrupts in interrupt controller */
+    SCU_CLKCFG &= ~(1<<22);
     INTC_IMR |= (1<<10);
     INTC_IECR |= (1<<10);
 
