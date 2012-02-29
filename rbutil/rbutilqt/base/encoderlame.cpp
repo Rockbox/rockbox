@@ -181,7 +181,7 @@ bool EncoderLame::encode(QString input,QString output)
                 channels = buf[2] | buf[3]<<8;
                 samplerate = buf[4] | buf[5]<<8 | buf[6]<<16 | buf[7]<<24;
                 samplesize = buf[14] | buf[15]<<8;
-                delete buf;
+                delete[] buf;
             }
         }
         // read data
@@ -252,8 +252,8 @@ bool EncoderLame::encode(QString input,QString output)
     else {
         qDebug() << "[EncoderLame] Unknown samplesize:" << samplesize;
         fin.close();
-        delete mp3buf;
-        delete wavbuf;
+        delete[] mp3buf;
+        delete[] wavbuf;
         return false;
     }
 #else
@@ -270,8 +270,8 @@ bool EncoderLame::encode(QString input,QString output)
     if(fout.write((char*)mp3buf, ret) != (unsigned int)ret) {
         qDebug() << "[EncoderLame] Writing mp3 data failed!" << ret;
         fout.close();
-        delete mp3buf;
-        delete wavbuf;
+        delete[] mp3buf;
+        delete[] wavbuf;
         return false;
     }
     // flush remaining data
@@ -279,15 +279,15 @@ bool EncoderLame::encode(QString input,QString output)
     if(fout.write((char*)mp3buf, ret) != (unsigned int)ret) {
         qDebug() << "[EncoderLame] Writing final mp3 data failed!";
         fout.close();
-        delete mp3buf;
-        delete wavbuf;
+        delete[] mp3buf;
+        delete[] wavbuf;
         return false;
     }
     // shut down encoder and clean up.
     m_lame_close(gfp);
     fout.close();
-    delete mp3buf;
-    delete wavbuf;
+    delete[] mp3buf;
+    delete[] wavbuf;
 
     return true;
 }
