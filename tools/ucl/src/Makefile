@@ -31,7 +31,7 @@ NATIVECC ?= gcc-4.0
 endif
 endif
 
-TARGET_DIR ?= $(shell pwd)
+TARGET_DIR ?= $(shell pwd)/
 OBJDIR = $(TARGET_DIR)build$(RBARCH)
 
 SOURCES = alloc.c io.c n2b_99.c n2b_d.c n2b_ds.c n2b_to.c n2d_99.c	\

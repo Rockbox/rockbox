@@ -6,7 +6,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-CFLAGS+ = -O2 -Iinclude
+CFLAGS+= -O2 -Iinclude
 
 TARGET = ../uclpack
 
