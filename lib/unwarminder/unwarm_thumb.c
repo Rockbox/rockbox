@@ -396,7 +396,7 @@ UnwResult UnwStartThumb(UnwState * const state)
                 case 12: /* ORR */
                 case 13: /* MUL */
                 case 14: /* BIC */
-                    if(M_IsOriginValid(state->regData[rs].o) && M_IsOriginValid(state->regData[rs].o))
+                    if(M_IsOriginValid(state->regData[rd].o) && M_IsOriginValid(state->regData[rs].o))
                     {
                         state->regData[rd].o = state->regData[rs].o;
                         state->regData[rd].o |= REG_VAL_ARITHMETIC;
