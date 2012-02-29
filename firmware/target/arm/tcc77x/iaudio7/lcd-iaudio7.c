@@ -211,7 +211,7 @@ void lcd_update_rect(int sx, int sy, int width, int height)
             fb_data c;
             unsigned long color;
 
-            c = FBADDR(x,y);
+            c = *FBADDR(x,y);
             color =
                 ((c & 0x1f) << 1) | ((c & 0x7e0) << 1) | ((c & 0xf800) <<
                                                           2);
