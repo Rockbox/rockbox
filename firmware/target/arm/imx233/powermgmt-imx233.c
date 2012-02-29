@@ -136,7 +136,7 @@ void charging_algorithm_step(void)
         logf("pwrmgmt: charging finished");
         logf("pwrmgmt: topoff -> disabled");
         /* stop charging */
-        __REG_SET(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__PWD_CHARGE_4P2;
+        __REG_SET(HW_POWER_CHARGE) = HW_POWER_CHARGE__PWD_BATTCHRG;
         charge_state = CHARGE_STATE_DISABLED;
     }
 }
