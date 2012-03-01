@@ -12809,3 +12809,93 @@
     *: "Стартирай таймера при включване"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Кратки пътища"
+  </dest>
+  <voice>
+    *: "Кратки пътища"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Цъкане на бутоните при включени слушалки"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Цъкане на бутоните при включени слушалки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Цъкане на бутоните при включен говорител"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Цъкане на бутоните при включен говорител"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Кеширане на глифове"
+  </dest>
+  <voice>
+    *: "Кеширане на глифове"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Включване и изключване"
+  </dest>
+  <voice>
+    *: "Включване и изключване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Рестартирай таймера при натискане на бутон"
+  </dest>
+  <voice>
+    *: "Рестартирай таймера при натискане на бутон"
+  </voice>
+</phrase>
