@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///zs\u003d",
+        "filename": "firmware/common/dircache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1446,
+      "author": {
+        "id": 1000077
+      },
+      "writtenOn": "2012-03-01T18:30:04Z",
+      "side": 1,
+      "message": "Sorry, it\u0027s just copy-paste garbage.",
+      "parentUuid": "AAAAB3///z0\u003d",
+      "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///0Q\u003d",
         "filename": "firmware/common/dircache.c",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2012-03-01T13:21:14Z",
       "side": 1,
       "message": "Why the first if ? Just always set or unset ATTR_HIDDEN; this lazy update is useless.",
+      "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///zo\u003d",
+        "filename": "firmware/common/dircache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1466,
+      "author": {
+        "id": 1000077
+      },
+      "writtenOn": "2012-03-01T18:30:04Z",
+      "side": 1,
+      "message": "I\u0027ll fix it.",
+      "parentUuid": "AAAAB3///0Q\u003d",
       "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///zk\u003d",
+        "filename": "firmware/common/file.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 838,
+      "author": {
+        "id": 1000077
+      },
+      "writtenOn": "2012-03-01T18:30:04Z",
+      "side": 1,
+      "message": "That\u0027s right. I\u0027ll simplify the code.",
+      "parentUuid": "AAAAB3///0M\u003d",
+      "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///z8\u003d",
         "filename": "firmware/common/file.c",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2012-03-01T13:21:14Z",
       "side": 1,
       "message": "See other comment about this.",
+      "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///zc\u003d",
+        "filename": "firmware/common/file.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 844,
+      "author": {
+        "id": 1000077
+      },
+      "writtenOn": "2012-03-01T18:30:04Z",
+      "side": 1,
+      "message": "I\u0027ll fix it.",
+      "parentUuid": "AAAAB3///z8\u003d",
       "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///zY\u003d",
+        "filename": "firmware/common/file.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 900,
+      "author": {
+        "id": 1000077
+      },
+      "writtenOn": "2012-03-01T18:30:04Z",
+      "side": 1,
+      "message": "I\u0027ll fix it.",
+      "parentUuid": "AAAAB3///0I\u003d",
+      "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///0A\u003d",
         "filename": "firmware/common/file.c",
         "patchSetId": 1
@@ -98,6 +188,24 @@
       "writtenOn": "2012-03-01T13:21:14Z",
       "side": 1,
       "message": "Don\u0027t do this lazy update, dircache updates are far less cheaper than actual disk updates anyway.",
+      "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///zU\u003d",
+        "filename": "firmware/common/file.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 929,
+      "author": {
+        "id": 1000077
+      },
+      "writtenOn": "2012-03-01T18:30:04Z",
+      "side": 1,
+      "message": "I\u0027ll fix it.",
+      "parentUuid": "AAAAB3///0A\u003d",
       "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///zQ\u003d",
+        "filename": "firmware/common/file.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 943,
+      "author": {
+        "id": 1000077
+      },
+      "writtenOn": "2012-03-01T18:30:04Z",
+      "side": 1,
+      "message": "I\u0027ll fix it.",
+      "parentUuid": "AAAAB3///0E\u003d",
+      "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///z4\u003d",
         "filename": "firmware/common/rbpaths.c",
         "patchSetId": 1
@@ -132,6 +258,24 @@
       "writtenOn": "2012-03-01T13:21:14Z",
       "side": 1,
       "message": "Perhaps return nonzero ? It\u0027s actually more an error than a sucess ?!",
+      "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///zg\u003d",
+        "filename": "firmware/common/rbpaths.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1000077
+      },
+      "writtenOn": "2012-03-01T18:30:04Z",
+      "side": 1,
+      "message": "Hmm, it\u0027s may be an error.",
+      "parentUuid": "AAAAB3///z4\u003d",
       "revId": "95fdca0913525caf8f2048d0acf15e35bec1ec09",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
