@@ -57,6 +57,8 @@ void skinlist_set_cfg(enum screen_type screen,
             screens[screen].scroll_stop(&listcfg[screen]->selected_item_vp.vp);
         listcfg[screen] = cfg;
         current_list = NULL;
+        current_column = -1;
+        current_row = -1;
     }
 }
 
@@ -225,6 +227,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
             }
             else
             {
+                current_column = 1;
                 current_row = cur_line;
                 skin_viewport->vp.x = parent->x + original_x;
                 skin_viewport->vp.y = parent->y + original_y +
@@ -257,6 +260,8 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
             }
         }
     }
+    current_column = -1;
+    current_row = -1;
     display->set_viewport(parent);
     display->update_viewport();
     current_drawing_line = list->selected_item;
