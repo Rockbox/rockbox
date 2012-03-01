@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///zA\u003d",
+        "filename": "firmware/common/file.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 852,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2012-03-01T18:43:35Z",
+      "side": 1,
+      "message": "Comment on the style: try to follow the one used by the file: no {} for single line if and for multiline, I think this file puts { } on new lines.",
+      "revId": "e18d1793d749b51b8ccad0afe97615b1af60b5e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///y8\u003d",
+        "filename": "firmware/common/file.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 885,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2012-03-01T18:43:35Z",
+      "side": 1,
+      "message": "Same style comment.",
+      "revId": "e18d1793d749b51b8ccad0afe97615b1af60b5e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
