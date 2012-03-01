@@ -363,10 +363,12 @@
 #define  GBN_BUTTON_DOWN               BUTTON_DOWN
 #define  GBN_BUTTON_LEFT               BUTTON_LEFT
 #define  GBN_BUTTON_RIGHT              BUTTON_RIGHT
+#define  GBN_BUTTON_MENU               BUTTON_POWER
+#define  GBN_BUTTON_PLAY               BUTTON_SELECT
 #define  GBN_BUTTON_RETREAT            BUTTON_BACK
 #define  GBN_BUTTON_ADVANCE            BUTTON_PLAYPAUSE
-#define  GBN_BUTTON_PLAY               BUTTON_SELECT
-#define  GBN_BUTTON_MENU               BUTTON_POWER
+#define  GBN_BUTTON_CONTEXT            BUTTON_BOTTOMLEFT
+#define  GBN_BUTTON_NEXT_VAR           BUTTON_BOTTOMRIGHT
 
 #elif (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
