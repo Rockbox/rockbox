@@ -9122,7 +9122,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -9831,7 +9831,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -12291,15 +12291,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3D音场"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3D音场"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "三D音场"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "三D音场"
   </voice>
 </phrase>
 <phrase>
@@ -12674,3 +12674,119 @@
     histogram: "直方图区间"
   </voice>
 </phrase>
++<phrase>
++  id: LANG_CURRENT_PLAYLIST
++  desc: Used when you need to say playlist, also voiced
++  user: core
++  <source>
++    *: "Current Playlist"
++  </source>
++  <dest>
++    *: "当前播放列表"
++  </dest>
++  <voice>
++    *: "当前播放列表"
++  </voice>
++</phrase>
++<phrase>
++  id: LANG_USB_SKIP_FIRST_DRIVE
++  desc: in settings_menu
++  user: core
++  <source>
++    *: none
++    multidrive_usb: "USB Hide Internal Drive"
++  </source>
++  <dest>
++    *: none
++    multidrive_usb: "USB连接时隐藏内部存储器"
++  </dest>
++  <voice>
++    *: none
++    multidrive_usb: "USB连接时隐藏内部存储器"
++  </voice>
++</phrase>
++<phrase>
++  id: LANG_SET_AS_PLAYLISTCAT_DIR
++  desc: used in the onplay menu to set a playlist catalogue dir
++  user: core
++  <source>
++    *: "Set As Playlist Catalogue Directory"
++  </source>
++  <dest>
++    *: "设置为播放列表目录 目录"
++  </dest>
++  <voice>
++    *: "设置为播放列表目录 目录"
++  </voice>
++</phrase>
++<phrase>
++  id: LANG_SAVE_CHANGES
++  desc: When you try to exit screens to confirm save
++  user: core
++  <source>
++    *: "Save Changes?"
++  </source>
++  <dest>
++    *: "保存更改?"
++  </dest>
++  <voice>
++    *: "保存更改?"
++  </voice>
++</phrase>
++<phrase>
++  id: LANG_AUTOMATIC
++  desc: generic automatic
++  user: core
++  <source>
++    *: "Automatic"
++  </source>
++  <dest>
++    *: "自动"
++  </dest>
++  <voice>
++    *: "自动"
++  </voice>
++</phrase>
++<phrase>
++  id: LANG_SHORTCUTS
++  desc: Title in the shortcuts menu
++  user: core
++  <source>
++    *: "Shortcuts"
++  </source>
++  <dest>
++    *: "快捷方式"
++  </dest>
++  <voice>
++    *: "快捷方式"
++  </voice>
++</phrase>
++<phrase>
++  id: LANG_STARTUP_SHUTDOWN
++  desc: in the general settings menu
++  user: core
++  <source>
++    *: "Startup/Shutdown"
++  </source>
++  <dest>
++    *: "启动/关闭"
++  </dest>
++  <voice>
++    *: "启动/关闭"
++  </voice>
++</phrase>
++<phrase>
++  id: LANG_RESET_PLAYLISTCAT_DIR
++  desc:
++  user: core
++  <source>
++    *: "Reset Playlist Catalogue Directory"
++  </source>
++  <dest>
++    *: "重置播放列表目录目录"
++  </dest>
++  <voice>
++    *: "重置播放列表目录目录"
++  </voice>
++</phrase>
++<phrase>
