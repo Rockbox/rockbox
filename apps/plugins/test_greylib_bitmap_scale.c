@@ -22,23 +22,11 @@
 #include "plugin.h"
 #include "lib/grey.h"
 #include "lib/pluginlib_bmp.h"
-
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define GBS_QUIT BUTTON_MENU
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define GBS_QUIT BUTTON_RC_REC
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define GBS_QUIT BUTTON_PLAY
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define GBS_QUIT (BUTTON_REC|BUTTON_PLAY)
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define GBS_QUIT (BUTTON_REC|BUTTON_REPEAT)
-#elif defined(BUTTON_OFF)
-#define GBS_QUIT BUTTON_OFF
-#else
-#define GBS_QUIT BUTTON_POWER
-#endif
+#include "lib/pluginlib_actions.h"
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
+#define GBS_QUIT      PLA_EXIT
+#define GBS_QUIT2     PLA_CANCEL
 
 #if LCD_DEPTH == 1
 #define BMP_LOAD read_bmp_file
@@ -63,6 +51,7 @@ enum plugin_status plugin_start(const void* parameter)
         .data = grey_bm_buf
     };
     int ret, x, y;
+    int button = 0;
 
     if(!parameter) return PLUGIN_ERROR;
 
@@ -92,7 +81,11 @@ enum plugin_status plugin_start(const void* parameter)
     grey_show(true);
 
     /* wait until user closes plugin */
-    while (rb->button_get(true) != GBS_QUIT);
+    while ((button != GBS_QUIT) && (button != GBS_QUIT2))
+    {
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                                                    ARRAYLEN(plugin_contexts));
+    }
 
     grey_release();
     

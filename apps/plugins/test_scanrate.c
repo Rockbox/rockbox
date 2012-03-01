@@ -20,68 +20,28 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "lib/pluginlib_actions.h"
 
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) \
- || (CONFIG_KEYPAD == IRIVER_H100_PAD)
-#define SCANRATE_DONE    BUTTON_OFF
-#define SCANRATE_FASTINC BUTTON_UP
-#define SCANRATE_FASTDEC BUTTON_DOWN
-#define SCANRATE_INC     BUTTON_RIGHT
-#define SCANRATE_DEC     BUTTON_LEFT
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
+#define SCANRATE_QUIT            PLA_EXIT
+#define SCANRATE_QUIT2           PLA_CANCEL
+#define SCANRATE_FASTINC         PLA_UP
+#define SCANRATE_FASTINC_REPEAT  PLA_UP_REPEAT
+#define SCANRATE_FASTDEC         PLA_DOWN
+#define SCANRATE_FASTDEC_REPEAT  PLA_DOWN_REPEAT
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) \
- || (CONFIG_KEYPAD == MROBE100_PAD) \
- || (CONFIG_KEYPAD == SANSA_CLIP_PAD)
-#define SCANRATE_DONE    BUTTON_POWER
-#define SCANRATE_FASTINC BUTTON_UP
-#define SCANRATE_FASTDEC BUTTON_DOWN
-#define SCANRATE_INC     BUTTON_RIGHT
-#define SCANRATE_DEC     BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
-#define SCANRATE_DONE    (BUTTON_HOME|BUTTON_REPEAT)
-#define SCANRATE_FASTINC BUTTON_UP
-#define SCANRATE_FASTDEC BUTTON_DOWN
-#define SCANRATE_INC     BUTTON_RIGHT
-#define SCANRATE_DEC     BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define SCANRATE_DONE    BUTTON_RC_REC
-#define SCANRATE_FASTINC BUTTON_RC_VOL_UP
-#define SCANRATE_FASTDEC BUTTON_RC_VOL_DOWN
-#define SCANRATE_INC     BUTTON_RC_FF
-#define SCANRATE_DEC     BUTTON_RC_REW
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
-   || (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define SCANRATE_DONE    BUTTON_MENU
-#define SCANRATE_FASTINC BUTTON_SCROLL_FWD
-#define SCANRATE_FASTDEC BUTTON_SCROLL_BACK
-#define SCANRATE_INC     BUTTON_RIGHT
-#define SCANRATE_DEC     BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define SCANRATE_DONE    BUTTON_PLAY
-#define SCANRATE_FASTINC BUTTON_FFWD
-#define SCANRATE_FASTDEC BUTTON_REW
-#define SCANRATE_INC     BUTTON_UP
-#define SCANRATE_DEC     BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define SCANRATE_DONE    BUTTON_PLAY
-#define SCANRATE_FASTINC BUTTON_FF
-#define SCANRATE_FASTDEC BUTTON_REW
-#define SCANRATE_INC     BUTTON_VOL_UP
-#define SCANRATE_DEC     BUTTON_VOL_DOWN
-
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define SCANRATE_DONE    BUTTON_PLAY
-#define SCANRATE_FASTINC BUTTON_UP
-#define SCANRATE_FASTDEC BUTTON_DOWN
-#define SCANRATE_INC     BUTTON_FF
-#define SCANRATE_DEC     BUTTON_REW
-
-#endif
+#ifdef HAVE_SCROLLWHEEL
+#define SCANRATE_INC             PLA_SCROLL_FWD
+#define SCANRATE_INC_REPEAT      PLA_SCROLL_FWD_REPEAT
+#define SCANRATE_DEC             PLA_SCROLL_BACK
+#define SCANRATE_DEC_REPEAT      PLA_SCROLL_BACK_REPEAT
+#else
+#define SCANRATE_INC             PLA_RIGHT
+#define SCANRATE_INC_REPEAT      PLA_RIGHT_REPEAT
+#define SCANRATE_DEC             PLA_LEFT
+#define SCANRATE_DEC_REPEAT      PLA_LEFT_REPEAT
+#endif /*HAVE_SCROLLWHEEL*/
 
 /* Default refresh rates in 1/10 Hz */
 #if defined ARCHOS_RECORDER   || defined ARCHOS_FMRECORDER  \
@@ -199,34 +159,36 @@ int plugin_main(void)
             need_refresh = true;
             change = false;
         }
-        button = rb->button_get(true);
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                          ARRAYLEN(plugin_contexts));
         switch (button)
         {
           case SCANRATE_FASTINC:
-          case SCANRATE_FASTINC|BUTTON_REPEAT:
+          case SCANRATE_FASTINC_REPEAT:
             scan_rate += 10;
             change = true;
             break;
 
           case SCANRATE_FASTDEC:
-          case SCANRATE_FASTDEC|BUTTON_REPEAT:
+          case SCANRATE_FASTDEC_REPEAT:
             scan_rate -= 10;
             change = true;
             break;
 
           case SCANRATE_INC:
-          case SCANRATE_INC|BUTTON_REPEAT:
+          case SCANRATE_INC_REPEAT:
             scan_rate++;
             change = true;
             break;
 
           case SCANRATE_DEC:
-          case SCANRATE_DEC|BUTTON_REPEAT:
+          case SCANRATE_DEC_REPEAT:
             scan_rate--;
             change = true;
             break;
 
-          case SCANRATE_DONE:
+          case SCANRATE_QUIT:
+          case SCANRATE_QUIT2:
             done = true;
             break;
         }

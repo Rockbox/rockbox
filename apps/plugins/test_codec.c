@@ -21,33 +21,14 @@
 #include "plugin.h"
 #include "lib/pluginlib_touchscreen.h"
 #include "lib/pluginlib_exit.h"
+#include "lib/pluginlib_actions.h"
 
-/* All swcodec targets have BUTTON_SELECT apart from the H10 and M3 */
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
-#if CONFIG_KEYPAD == IRIVER_H10_PAD
-#define TESTCODEC_EXITBUTTON BUTTON_RIGHT
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define TESTCODEC_EXITBUTTON BUTTON_RC_PLAY
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define TESTCODEC_EXITBUTTON BUTTON_PLAY
-#elif CONFIG_KEYPAD == COWON_D2_PAD || CONFIG_KEYPAD == ONDAVX747_PAD \
-   || CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
-#define TESTCODEC_EXITBUTTON BUTTON_POWER
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-#define TESTCODEC_EXITBUTTON BUTTON_REC
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define TESTCODEC_EXITBUTTON (BUTTON_REC | BUTTON_PLAY)
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define TESTCODEC_EXITBUTTON (BUTTON_REC | BUTTON_REPEAT)
-#elif CONFIG_KEYPAD == RK27XX_GENERIC_PAD
-#define TESTCODEC_EXITBUTTON (BUTTON_M | BUTTON_REPEAT)
-#elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
-#define TESTCODEC_EXITBUTTON BUTTON_BACK
-#elif defined(HAVE_TOUCHSCREEN)
-#define TESTCODEC_EXITBUTTON (BUTTON_BOTTOMMIDDLE|BUTTON_REL)
-#else
-#define TESTCODEC_EXITBUTTON BUTTON_SELECT
-#endif
+#define TESTCODEC_EXITBUTTON  PLA_EXIT
+#define TESTCODEC_EXITBUTTON2 PLA_CANCEL
+
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static unsigned int boost =1;
@@ -734,7 +715,9 @@ static enum plugin_status test_track(const char* filename)
     /* Wait for codec thread to die */
     while (codec_playing)
     {
-        if (rb->button_get_w_tmo(HZ) == TESTCODEC_EXITBUTTON)
+        int button = pluginlib_getaction(HZ, plugin_contexts,
+                          ARRAYLEN(plugin_contexts));
+        if ((button == TESTCODEC_EXITBUTTON) || (button == TESTCODEC_EXITBUTTON2))
         {
             codec_action = CODEC_ACTION_HALT;
             break;
@@ -848,9 +831,12 @@ void plugin_quit(void)
     else
 #endif
         do {
-            btn = rb->button_get(true);
+            btn = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                          ARRAYLEN(plugin_contexts));
             exit_on_usb(btn);
-        } while (codec_action != CODEC_ACTION_HALT && btn != TESTCODEC_EXITBUTTON);
+        } while ((codec_action != CODEC_ACTION_HALT)
+                       && (btn != TESTCODEC_EXITBUTTON)
+                       && (btn != TESTCODEC_EXITBUTTON2));
 }
 
 /* plugin entry point */
