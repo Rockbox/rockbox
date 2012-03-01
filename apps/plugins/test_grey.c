@@ -21,87 +21,27 @@
 #include "plugin.h"
 #include "lib/grey.h"
 #include "lib/helper.h"
+#include "lib/pluginlib_actions.h"
 
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
-
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
- || (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define GREY_QUIT BUTTON_MENU
-#define GREY_OK   BUTTON_SELECT
-#define GREY_PREV BUTTON_LEFT
-#define GREY_NEXT BUTTON_RIGHT
-#define GREY_UP   BUTTON_SCROLL_FWD
-#define GREY_DOWN BUTTON_SCROLL_BACK
-
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
-#define GREY_QUIT BUTTON_OFF
-#define GREY_OK   BUTTON_SELECT
-#define GREY_PREV BUTTON_LEFT
-#define GREY_NEXT BUTTON_RIGHT
-#define GREY_UP   BUTTON_UP
-#define GREY_DOWN BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#define GREY_QUIT BUTTON_OFF
-#define GREY_OK   BUTTON_PLAY
-#define GREY_PREV BUTTON_LEFT
-#define GREY_NEXT BUTTON_RIGHT
-#define GREY_UP   BUTTON_UP
-#define GREY_DOWN BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define GREY_QUIT BUTTON_OFF
-#define GREY_OK   BUTTON_MENU
-#define GREY_PREV BUTTON_LEFT
-#define GREY_NEXT BUTTON_RIGHT
-#define GREY_UP   BUTTON_UP
-#define GREY_DOWN BUTTON_DOWN
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) \
-   || (CONFIG_KEYPAD == MROBE100_PAD) \
-   || (CONFIG_KEYPAD == SANSA_CLIP_PAD)
-#define GREY_QUIT BUTTON_POWER
-#define GREY_OK   BUTTON_SELECT
-#define GREY_PREV BUTTON_LEFT
-#define GREY_NEXT BUTTON_RIGHT
-#define GREY_UP   BUTTON_UP
-#define GREY_DOWN BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define GREY_QUIT BUTTON_RC_REC
-#define GREY_OK   BUTTON_RC_PLAY
-#define GREY_PREV BUTTON_RC_REW
-#define GREY_NEXT BUTTON_RC_FF
-#define GREY_UP   BUTTON_RC_VOL_UP
-#define GREY_DOWN BUTTON_RC_VOL_DOWN
-
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define GREY_QUIT BUTTON_REC
-#define GREY_OK   BUTTON_PLAY
-#define GREY_PREV BUTTON_LEFT
-#define GREY_NEXT BUTTON_RIGHT
-#define GREY_UP   BUTTON_UP
-#define GREY_DOWN BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define GREY_QUIT (BUTTON_REC|BUTTON_PLAY)
-#define GREY_OK   BUTTON_PLAY
-#define GREY_PREV BUTTON_REW
-#define GREY_NEXT BUTTON_FF
-#define GREY_UP   BUTTON_VOL_UP
-#define GREY_DOWN BUTTON_VOL_DOWN
-
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define GREY_QUIT (BUTTON_REC|BUTTON_REPEAT)
-#define GREY_OK   BUTTON_PLAY
-#define GREY_PREV BUTTON_REW
-#define GREY_NEXT BUTTON_FF
-#define GREY_UP   BUTTON_UP
-#define GREY_DOWN BUTTON_DOWN
-
+#define GREY_QUIT           PLA_EXIT
+#define GREY_QUIT2          PLA_CANCEL
+#define GREY_OK             PLA_SELECT
+#define GREY_PREV           PLA_LEFT
+#define GREY_NEXT           PLA_RIGHT
+#ifdef HAVE_SCROLLWHEEL
+#define GREY_UP             PLA_SCROLL_FWD
+#define GREY_UP_REPEAT      PLA_SCROLL_FWD_REPEAT
+#define GREY_DOWN           PLA_SCROLL_BACK
+#define GREY_DOWN_REPEAT    PLA_SCROLL_BACK_REPEAT
 #else
-#error unsupported keypad
-#endif
+#define GREY_UP             PLA_UP
+#define GREY_UP_REPEAT      PLA_UP_REPEAT
+#define GREY_DOWN           PLA_DOWN
+#define GREY_DOWN_REPEAT    PLA_DOWN_REPEAT
+#endif /*HAVE_SCROLLWHEEL*/
 
 #define BLOCK_WIDTH  (LCD_WIDTH/8)
 #define BLOCK_HEIGHT (LCD_HEIGHT/8)
@@ -207,7 +147,8 @@ enum plugin_status plugin_start(const void* parameter)
         fill_rastered(1, 1, 2, 2, cur_step - 1);
         grey_update();
 
-        button = rb->button_get(true);
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                          ARRAYLEN(plugin_contexts));
         switch (button)
         {
             case GREY_PREV:
@@ -221,7 +162,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 
             case GREY_UP:
-            case GREY_UP|BUTTON_REPEAT:
+            case GREY_UP_REPEAT:
                 l = lcd_levels[cur_step];
                 if (l < 255)
                 {
@@ -233,7 +174,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 
             case GREY_DOWN:
-            case GREY_DOWN|BUTTON_REPEAT:
+            case GREY_DOWN_REPEAT:
                 l = lcd_levels[cur_step];
                 if (l > 0)
                 {
@@ -273,6 +214,7 @@ enum plugin_status plugin_start(const void* parameter)
                 /* fall through */
 
             case GREY_QUIT:
+            case GREY_QUIT2:
                 done = true;
                 break;
         }
