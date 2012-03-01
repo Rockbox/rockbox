@@ -23,31 +23,14 @@
 #include "lib/grey.h"
 #include "lib/pluginlib_touchscreen.h"
 #include "lib/pluginlib_exit.h"
+#include "lib/pluginlib_actions.h"
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define FPS_QUIT BUTTON_MENU
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define FPS_QUIT BUTTON_RC_REC
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
-#define FPS_QUIT BUTTON_PLAY
-#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
-#define FPS_QUIT (BUTTON_HOME|BUTTON_REPEAT)
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define FPS_QUIT (BUTTON_REC|BUTTON_PLAY)
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define FPS_QUIT (BUTTON_REC|BUTTON_REPEAT)
-#elif CONFIG_KEYPAD == RK27XX_GENERIC_PAD
-#define FPS_QUIT (BUTTON_M|BUTTON_REPEAT)
-#elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
-#define FPS_QUIT BUTTON_BACK
-#elif defined(HAVE_TOUCHSCREEN)
-#define FPS_QUIT (BUTTON_BOTTOMMIDDLE|BUTTON_REL)
-#elif defined(BUTTON_OFF)
-#define FPS_QUIT BUTTON_OFF
-#else
-#define FPS_QUIT BUTTON_POWER
-#endif
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
+
+
+#define FPS_QUIT   PLA_EXIT
+#define FPS_QUIT2  PLA_CANCEL
 
 #define DURATION (2*HZ) /* longer duration gives more precise results */
 
@@ -391,9 +374,10 @@ void plugin_quit(void)
 #endif
         while (1)
         {
-            int btn = rb->button_get(true);
+            int btn = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                                                   ARRAYLEN(plugin_contexts));
             exit_on_usb(btn);
-            if (btn == FPS_QUIT)
+            if ((btn == FPS_QUIT) || (btn == FPS_QUIT2))
                 break;
         }
 }
