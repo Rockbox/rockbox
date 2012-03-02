@@ -151,7 +151,7 @@ bubbles_emblem.132x80x16.bmp
 bubbles_background.132x80x16.bmp
 #elif (LCD_WIDTH >= 96) && (LCD_HEIGHT >= 96)
 bubbles_emblem.132x80x16.bmp
-bubbles_background.128x96x16.bmp
+bubbles_background.96x96x16.bmp
 #endif
 #elif LCD_DEPTH <= 2 /* greyscale, mono */
 #if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)

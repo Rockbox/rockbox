@@ -198,7 +198,7 @@ enum {
 #define MAX_FPS       30
 
 /* 7x7 bubbles (Sansa Clip/m200) */
-#elif (LCD_HEIGHT == 64 && LCD_WIDTH == 128) || (LCD_HEIGHT == 96 && LCD_WIDTH == 96)
+#elif (LCD_HEIGHT == 64 && LCD_WIDTH == 128)
 #define XOFS          33
 #define ROW_HEIGHT     5
 #define MAX_FPS       30
@@ -208,6 +208,23 @@ enum {
 #define XOFS          33
 #define ROW_HEIGHT     5
 #define MAX_FPS       20
+
+/* 7x7 bubbles (Sansa Clip Zip)  */
+#elif (LCD_HEIGHT == 96 && LCD_WIDTH == 96)
+#define XOFS          33
+#define ROW_HEIGHT     5
+#define MAX_FPS       30
+
+/* custom text positioning */
+#define LEVEL_TXT_X      1
+#define LEVEL_TXT_WIDTH 31
+#define LEVEL_TXT_Y      4
+#define SCORE_TXT_X      1
+#define SCORE_TXT_WIDTH 31
+#define SCORE_TXT_Y     31
+#define NEXT_BB_X        1
+#define NEXT_BB_WIDTH   31
+#define NEXT_BB_Y       72
 
 #else
     #error BUBBLES: Unsupported LCD type
@@ -1570,7 +1587,12 @@ static void bubbles_drawboard(struct game_context* bb) {
 
     if(bb->elapsedshot >= (MAX_SHOTTIME*7)/10) {
         rb->lcd_getstringsize(hurry, &w1, &h);
-        rb->lcd_putsxy(LCD_WIDTH/2-w1/2, LCD_HEIGHT/2-h/2, hurry);
+        /* screen is too small for the message to be centered (Clip Zip) */
+        #if (LCD_WIDTH <= 96)
+            rb->lcd_putsxy(LCD_WIDTH/2-w1/2+LCD_WIDTH/6, LCD_HEIGHT/2-h/2, hurry);
+        #else
+            rb->lcd_putsxy(LCD_WIDTH/2-w1/2, LCD_HEIGHT/2-h/2, hurry);
+        #endif
     }
 }
 
