@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///ws\u003d",
+        "filename": "apps/plugins/snow.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-02T19:45:01Z",
+      "side": 1,
+      "message": "this fits on one line.",
+      "revId": "f340a7408673e61e9322476300ee6b9e0176e1db",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
