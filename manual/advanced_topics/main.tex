@@ -6,26 +6,34 @@
 \subsection{\label{ref:CustomisingTheMainMenu}Customising The Main Menu}
 
 It is possible to customise the main menu, i.e. to reorder or to hide some
-of its items. To accomplish this, the file \fname{/.rockbox/config.cfg} must
-be edited (presumably on the computer while the \dap{} is connected to it
-via USB). There, the line starting with \config{root~menu~order:} must
-be edited (or created if it is not present yet).
-
-The line should look like \config{root~menu~order:items}, where ``items''
-is a comma separated list (no spaces around the commas!) of the following
-words: \config{bookmarks}, \config{files}, \opt{database}{\config{database}, }%
+of its items (only the main menu can be customised, submenus can not).
+To accomplish this, load a \fname{.cfg} file (as described in
+\reference{ref:manage_settings}) containing the following line:
+\config{root~menu~order:items}, where ``items'' is a comma separated list
+(no spaces around the commas!) of the following
+words: \config{bookmarks}, \config{files}, \opt{tagcache}{\config{database}, }%
 \config{wps}, \config{settings}, \opt{recording}{\config{recording}, }%
 \opt{radio}{\config{radio}, }\config{playlists}, \config{plugins},
 \config{system\_menu}, \opt{PLAYER_PAD}{\config{shutdown}, }\config{shortcuts}.
 Each of the words, if it occurs in the list, activates the appropriate item
 in the main menu. The order of the items is given by the order of the words
 in the list. The items whose words do not occur in the list will be hidden,
-with one exception: the menu item ``Settings'' will be shown even if its word
-is not in the list (it is added as the last item then).
+with one exception: the menu item \setting{Settings} will be shown even if
+its word is not in the list (it is added as the last item then).
 
-Use the line \config{root~menu~order:-} to reset the menu order
+The following configuration example will change the main menu so that it will
+contain only the items for the file browser, for resuming the playback, and
+for changing the settings (the latter will be added automatically).
+\begin{example}
+    \config{root menu order:files,wps}
+\end{example}
 
-Only the main menu can be customised this way, submenus can not.
+
+To reset the menu items to the default, use \config{root~menu~order:-} (i.e.
+use a hyphen instead of ``items'').
+
+This configuration entry can only be created and edited with a text editor. It is
+not possible to change this setting via the settings menu.
 
 \opt{lcd_bitmap}{
 \subsection{\label{ref:GettingExtras}Getting Extras}
