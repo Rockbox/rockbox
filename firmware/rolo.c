@@ -45,6 +45,10 @@
 #define FIRMWARE_OFFSET_FILE_DATA    0x200
 #endif
 
+#ifdef RKW_FORMAT
+#include "rkw.h"
+#endif
+
 #if !defined(IRIVER_IFP7XX_SERIES)
 /* FIX: this doesn't work on iFP */
 
@@ -113,11 +117,12 @@ static void rolo_error(const char *text)
     lcd_stop_scroll();
 }
 
-#if CONFIG_CPU == SH7034 || CONFIG_CPU == IMX31L
+#if CONFIG_CPU == SH7034 || CONFIG_CPU == IMX31L || CONFIG_CPU == RK27XX
 /* these are in assembler file "descramble.S" for SH7034 */
 extern unsigned short descramble(const unsigned char* source,
                                  unsigned char* dest, int length);
 /* this is in firmware/target/arm/imx31/rolo_restart.c for IMX31 */
+/* this is in firmware/target/arm/rk27xx/rolo_restart.c for rk27xx */
 extern void rolo_restart(const unsigned char* source, unsigned char* dest,
                          int length);
 #else
@@ -197,10 +202,67 @@ extern unsigned long loadaddress;
 
 /***************************************************************************
  *
- * Name: rolo_load_app(char *filename,int scrambled)
+ * Name: rolo_load(const char *filename)
  * Filename must be a fully defined filename including the path and extension
  *
  ***************************************************************************/
+#ifdef RKW_FORMAT
+int rolo_load(const char* filename)
+{
+    unsigned char* ramstart = (void*)&loadaddress;
+    unsigned char* filebuf;
+    size_t filebuf_size;
+    int errno, length;
+
+    lcd_clear_display();
+    lcd_puts(0, 0, "ROLO...");
+    lcd_puts(0, 1, "Loading");
+    lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_clear_display();
+    lcd_remote_puts(0, 0, "ROLO...");
+    lcd_remote_puts(0, 1, "Loading");
+    lcd_remote_update();
+#endif
+
+    audio_stop();
+
+    /* get the system buffer. release only in case of error, otherwise
+     * we don't return anyway */
+    rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
+    filebuf = core_get_data(rolo_handle);
+
+    errno = load_rkw(filebuf, filename, filebuf_size);
+    if (errno < 0)
+    {
+        rolo_error(rkw_strerror(errno));
+        return -1;
+    }
+    else
+        length = errno;
+
+#ifdef HAVE_STORAGE_FLUSH
+    lcd_puts(0, 1, "Flushing storage buffers");
+    lcd_update();
+    storage_flush();
+#endif
+
+    lcd_puts(0, 1, "Executing");
+    lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_puts(0, 1, "Executing");
+    lcd_remote_update();
+#endif
+    adc_close();
+
+    disable_interrupt(IRQ_FIQ_STATUS);
+
+    rolo_restart(filebuf, ramstart, length);
+
+    /* never reached */
+    return 0;
+}
+#else
 int rolo_load(const char* filename)
 {
     int fd;
@@ -395,6 +457,7 @@ int rolo_load(const char* filename)
     return 0; /* this is never reached */
     (void)checksum; (void)file_checksum;
 }
+#endif /* ifdef RKW_FORMAT */
 #else  /* !defined(IRIVER_IFP7XX_SERIES) */
 int rolo_load(const char* filename)
 {
