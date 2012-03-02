@@ -1468,7 +1468,6 @@ target/arm/s5l8702/ipod6g/piezo-ipod6g.c
 #if CONFIG_CPU == RK27XX
 target/arm/rk27xx/kernel-rk27xx.c
 target/arm/rk27xx/system-rk27xx.c
-target/arm/rk27xx/timer-rk27xx.c
 target/arm/rk27xx/backlight-rk27xx.c
 target/arm/rk27xx/adc-rk27xx.c
 target/arm/rk27xx/sd-rk27xx.c
@@ -1478,6 +1477,8 @@ target/arm/rk27xx/usb-rk27xx.c
 target/arm/rk27xx/lcdif-rk27xx.c
 target/arm/rk27xx/rkw-loader.c
 #ifndef BOOTLOADER
+target/arm/rk27xx/timer-rk27xx.c
+target/arm/rk27xx/rolo_restart.S
 target/arm/rk27xx/pcm-rk27xx.c
 target/arm/rk27xx/debug-rk27xx.c
 #endif
