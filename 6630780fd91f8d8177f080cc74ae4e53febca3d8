@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAB3///vM\u003d",
+        "filename": "apps/plugins/bubbles.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1000093
+      },
+      "writtenOn": "2012-03-02T23:31:48Z",
+      "side": 1,
+      "message": "I ordered it by descending LCD_WIDTH; for example the iPods don\u0027t seem to be grouped.",
+      "parentUuid": "AAAAB3///vc\u003d",
+      "revId": "6630780fd91f8d8177f080cc74ae4e53febca3d8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///vU\u003d",
         "filename": "apps/plugins/bubbles.c",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2012-03-02T22:47:01Z",
       "side": 1,
       "message": "The condition should probably be LCD_WIDTH \u003c\u003d 96",
+      "revId": "6630780fd91f8d8177f080cc74ae4e53febca3d8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///vI\u003d",
+        "filename": "apps/plugins/bubbles.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1591,
+      "author": {
+        "id": 1000093
+      },
+      "writtenOn": "2012-03-02T23:31:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAAB3///vU\u003d",
       "revId": "6630780fd91f8d8177f080cc74ae4e53febca3d8",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
