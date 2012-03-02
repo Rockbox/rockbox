@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///xQ\u003d",
+        "filename": "apps/plugins/test_codec.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 719,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-02T19:38:17Z",
+      "side": 1,
+      "message": "Fix that whitespace error please.",
+      "revId": "eed97d40d69e146e4e85f6479b6cd992ac3af5e2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///w0\u003d",
+        "filename": "apps/plugins/test_greylib_bitmap_scale.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-02T19:38:17Z",
+      "side": 1,
+      "message": "white space error",
+      "revId": "eed97d40d69e146e4e85f6479b6cd992ac3af5e2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
