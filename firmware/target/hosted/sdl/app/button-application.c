@@ -46,6 +46,9 @@ int key_to_button(int keyboard_key)
         case SDLK_KP9:
             new_btn = BUTTON_TOPRIGHT;
             break;
+#if (CONFIG_PLATFORM & PLATFORM_PANDORA)
+        case SDLK_RSHIFT:
+#endif
         case SDLK_KP4:
         case SDLK_LEFT:
             new_btn = BUTTON_MIDLEFT;
@@ -57,6 +60,9 @@ int key_to_button(int keyboard_key)
         case SDLK_KP5:
             new_btn = BUTTON_CENTER;
             break;
+#if (CONFIG_PLATFORM & PLATFORM_PANDORA)
+        case SDLK_RCTRL:
+#endif
         case SDLK_KP6:
         case SDLK_RIGHT:
             new_btn = BUTTON_MIDRIGHT;
