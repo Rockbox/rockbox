@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///x4\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-02T16:04:18Z",
+      "side": 1,
+      "message": "Like int gerrit#130, I think the commit message can be improved.",
+      "revId": "b0a25b19316b4b7aaed342ea6cdcb95418080c7d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///yA\u003d",
+        "filename": "apps/plugins/matrix.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-02T16:04:18Z",
+      "side": 1,
+      "message": "HAVE_SCROLLWHEEL targets use scroll wheel to increase/decrease animation speed. I think that should be retained.",
+      "revId": "b0a25b19316b4b7aaed342ea6cdcb95418080c7d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///x8\u003d",
+        "filename": "apps/plugins/matrix.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-02T16:04:18Z",
+      "side": 1,
+      "message": "The old button_get() call used the \u0027frozen\u0027 variable timeout, but you changed it to a constant value. Is that right?",
+      "revId": "b0a25b19316b4b7aaed342ea6cdcb95418080c7d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
