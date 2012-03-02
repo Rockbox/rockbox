@@ -1921,7 +1921,7 @@ const struct settings_list settings[] = {
                 "resume rewind", UNIT_SEC, 0, 60, 5,
                 NULL, NULL, NULL),
 #endif
-   CUSTOM_SETTING(0, root_menu,
+   CUSTOM_SETTING(0, root_menu_customized,
                   LANG_ROCKBOX_TITLE, /* lang string here is never actually used */
                   NULL, "root menu order",
                   root_menu_load_from_cfg, root_menu_write_to_cfg,
