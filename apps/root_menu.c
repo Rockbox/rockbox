@@ -549,7 +549,7 @@ void root_menu_load_from_cfg(void* setting, char *value)
     if (!main_menu_added)
         root_menu__[menu_item_count++] = (struct menu_item_ex *)&menu_;
     root_menu_.flags |= MENU_ITEM_COUNT(menu_item_count);
-    *(int*)setting = 1;
+    *(bool*)setting = true;
 }
 
 char* root_menu_write_to_cfg(void* setting, char*buf, int buf_len)
@@ -586,13 +586,13 @@ void root_menu_set_default(void* setting, void* defaultval)
         root_menu__[i] = (struct menu_item_ex *)menu_table[i].item;
     }
     root_menu_.flags |= MENU_ITEM_COUNT(MAX_MENU_ITEMS);
-    *(int*)setting = 0;
+    *(bool*)setting = false;
 }
      
 bool root_menu_is_changed(void* setting, void* defaultval)
 {
     (void)defaultval;
-    return *(int*)setting != 0;
+    return *(bool*)setting;
 }
 
 static int item_callback(int action, const struct menu_item_ex *this_item) 
