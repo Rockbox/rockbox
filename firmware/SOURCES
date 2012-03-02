@@ -137,6 +137,9 @@ common/crc32.c
 #ifdef MI4_FORMAT
 common/crc32-mi4.c
 #endif
+#ifdef RKW_FORMAT
+common/crc32-rkw.c
+#endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 common/dir_uncached.c
 common/file.c
@@ -1473,6 +1476,7 @@ target/arm/rk27xx/ftl-rk27xx.c
 target/arm/rk27xx/nand-rk27xx.c
 target/arm/rk27xx/usb-rk27xx.c
 target/arm/rk27xx/lcdif-rk27xx.c
+target/arm/rk27xx/rkw-loader.c
 #ifndef BOOTLOADER
 target/arm/rk27xx/pcm-rk27xx.c
 target/arm/rk27xx/debug-rk27xx.c
