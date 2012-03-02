@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///u0\u003d",
+        "filename": "apps/plugins/bubbles.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1592,
+      "author": {
+        "id": 1000093
+      },
+      "writtenOn": "2012-03-02T23:57:57Z",
+      "side": 1,
+      "message": "Now the message is going to be in the middle even for smaller screens.",
+      "revId": "ecb1804c68f35c11623fd3f0fd3698fa6a0d3ebc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
