@@ -1287,7 +1287,10 @@ static const struct touchaction touchactions[] = {
     {"browse", ACTION_WPS_BROWSE },
     {"play", ACTION_WPS_PLAY },         {"stop", ACTION_WPS_STOP },
     {"shuffle", ACTION_TOUCH_SHUFFLE }, {"repmode", ACTION_TOUCH_REPMODE },
-    {"pitch", ACTION_WPS_PITCHSCREEN},  {"playlist", ACTION_WPS_VIEW_PLAYLIST }, 
+    {"pitch", ACTION_WPS_PITCHSCREEN},  {"trackinfo", ACTION_WPS_ID3SCREEN },
+    {"playlist", ACTION_WPS_VIEW_PLAYLIST },
+    {"listbookmarks", ACTION_WPS_LIST_BOOKMARKS },
+    {"createbookmark", ACTION_WPS_CREATE_BOOKMARK },
 
 #if CONFIG_TUNER    
     /* FM screen actions */
