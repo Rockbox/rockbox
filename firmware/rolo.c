@@ -46,7 +46,7 @@
 #endif
 
 #ifdef RKW_FORMAT
-#include "rkw.h"
+#include "rkw-loader.h"
 #endif
 
 #if !defined(IRIVER_IFP7XX_SERIES)

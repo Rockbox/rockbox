@@ -17,7 +17,7 @@
 #include "string.h"
 #include "file.h"
 #include "crc32-rkw.h"
-#include "rkw.h"
+#include "rkw-loader.h"
 
 #define DRAM_ORIG 0x60000000
 #define LOAD_SIZE 0x700000
