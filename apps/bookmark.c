@@ -125,6 +125,9 @@ bool bookmark_create_menu(void)
 /* ----------------------------------------------------------------------- */
 bool bookmark_load_menu(void)
 {
+    bool ret = false;
+
+    push_current_activity(ACTIVITY_BOOKMARKSLIST);
     if (is_bookmarkable_state())
     {
         char* name = playlist_get_name(NULL, global_temp_buffer,
@@ -135,12 +138,13 @@ bool bookmark_load_menu(void)
             
             if (bookmark != NULL)
             {
-                return play_bookmark(bookmark);
+                ret = play_bookmark(bookmark);
             }
         }
     }
 
-    return false;
+    pop_current_activity();
+    return ret;
 }
 
 /* ----------------------------------------------------------------------- */
