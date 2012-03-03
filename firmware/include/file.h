@@ -37,7 +37,7 @@
 #define MAX_OPEN_FILES 11
 
 #if !defined(PLUGIN) && !defined(CODEC)
-#if defined(APPLICATION)
+#if defined(APPLICATION) && !defined(__PCTOOL__)
 #   define open(x, ...)    app_open(x, __VA_ARGS__)
 #   define creat(x,m)      app_creat(x, m)
 #   define remove(x)       app_remove(x)
