@@ -148,7 +148,7 @@ void system_sound_play(enum system_sound sound);
 typedef bool (*keyclick_callback)(int action, void* data);
 void keyclick_set_callback(keyclick_callback cb, void* data);
 /* Produce keyclick based upon button and global settings */
-void keyclick_click(int context, int action);
+void keyclick_click(bool rawbutton, int action);
 #endif /* CONFIG_CODEC == SWCODEC */
 
 void push_current_activity(enum current_activity screen);

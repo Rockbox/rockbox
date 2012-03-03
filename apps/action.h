@@ -42,11 +42,6 @@
 #define ALLOW_SOFTLOCK 0
 #endif
 
-#define CONTEXT_RAWBUTTON 0x04000000 /* For passing raw button code to
-                                        functions that normally take
-                                        action codes
-                                        (ie. keyclick_click) */
-
 enum {
     CONTEXT_STD = 0,
     /* These CONTEXT_ values were here before me,

@@ -705,7 +705,7 @@ struct plugin_api {
     size_t (*mixer_channel_get_bytes_waiting)(enum pcm_mixer_channel channel);
 
     void (*system_sound_play)(enum system_sound sound);
-    void (*keyclick_click)(int context, int action);
+    void (*keyclick_click)(bool rawbutton, int action);
 #endif /* CONFIG_CODEC == SWCODC */
 
     /* playback control */

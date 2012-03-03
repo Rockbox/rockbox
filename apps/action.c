@@ -368,7 +368,7 @@ static int get_action_worker(int context, int timeout,
 
 #if CONFIG_CODEC == SWCODEC
     /* Produce keyclick */
-    keyclick_click(0, ret);
+    keyclick_click(false, ret);
 #endif
 
     return ret;

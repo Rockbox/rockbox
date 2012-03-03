@@ -887,13 +887,13 @@ void keyclick_set_callback(keyclick_callback cb, void* data)
 }
 
 /* Produce keyclick based upon button and global settings */
-void keyclick_click(int context, int action)
+void keyclick_click(bool rawbutton, int action)
 {
     int button = action;
     static long last_button = BUTTON_NONE;
     bool do_beep = false;
 
-    if (!(context & CONTEXT_RAWBUTTON))
+    if (!rawbutton)
         get_action_statuscode(&button);
 
     /* Settings filters */
