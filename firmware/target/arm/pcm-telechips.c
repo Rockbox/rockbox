@@ -53,7 +53,7 @@ struct dma_data
 struct dma_data dma_play_data SHAREDBSS_ATTR =
 {
     /* Initialize to a locked, stopped state */
-    .p = NULL,
+    { .p = NULL },
     .size = 0,
 #if NUM_CORES > 1
     .core = 0x00,

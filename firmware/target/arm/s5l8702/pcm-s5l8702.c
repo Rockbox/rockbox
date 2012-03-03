@@ -65,7 +65,8 @@ void INT_DMAC0C0(void)
     DMAC0INTTCCLR = 1;
     if (!pcm_remaining)
     {
-        pcm_play_dma_complete_callback((const void**)&dataptr, &pcm_remaining);
+        pcm_play_dma_complete_callback(PCM_DMAST_OK, (const void**)&dataptr,
+                                       &pcm_remaining);
         pcm_chunksize = pcm_remaining;
     }
     if (!pcm_remaining)
