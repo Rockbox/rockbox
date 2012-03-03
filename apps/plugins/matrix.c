@@ -255,16 +255,8 @@ enum plugin_status plugin_start(const void* parameter) {
             rb->sleep(sleep);
         }
 
-        if(frozen)
-        {
-        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
-                               ARRAYLEN(plugin_contexts));
-        }
-        else
-        {
-        button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
-                               ARRAYLEN(plugin_contexts));
-        }
+        button = pluginlib_getaction(frozen ? TIMEOUT_BLOCK : TIMEOUT_NOBLOCK,
+                        plugin_contexts, ARRAYLEN(plugin_contexts));
 
         switch(button) {
             case MATRIX_PAUSE:
