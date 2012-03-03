@@ -73,7 +73,7 @@ typedef struct {
 #endif
 
 
-#if defined(APPLICATION)
+#if defined(APPLICATION) && !defined(__PCTOOL__)
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(SAMSUNG_YPR0)
 #include "dir-target.h"
 #endif
