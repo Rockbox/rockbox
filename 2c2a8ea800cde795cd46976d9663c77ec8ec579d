@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///s8\u003d",
+        "filename": "apps/plugins/test_greylib_bitmap_scale.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-03T11:42:53Z",
+      "side": 1,
+      "message": "You don\u0027t use GBS_QUIT. Either do that or remove the #define lines",
+      "revId": "2c2a8ea800cde795cd46976d9663c77ec8ec579d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///tA\u003d",
+        "filename": "apps/plugins/test_greylib_bitmap_scale.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-03T11:42:53Z",
+      "side": 1,
+      "message": "(PLA_QUIT || PLA_QUIT2) doesnt work here. Need to check against PLA_QUIT and PLA_QUIT2 separately.",
+      "revId": "2c2a8ea800cde795cd46976d9663c77ec8ec579d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
