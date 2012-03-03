@@ -357,7 +357,7 @@ static const struct plugin_api rockbox_api = {
     PREFIX(remove),
     PREFIX(rename),
     PREFIX(ftruncate),
-    PREFIX(filesize),
+    filesize,
     fdprintf,
     read_line,
     settings_parseline,
