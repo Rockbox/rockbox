@@ -7,7 +7,7 @@
 # $Id: checkwps.make 22680 2009-09-11 17:58:17Z gevaerts $
 #
 
-DBDEFINES=-g -DDEBUG -D__PCTOOL__ -DSIMULATOR
+DBDEFINES=-g -DDEBUG -D__PCTOOL__
 CFLAGS+=$(DBDEFINES)
 
 createsrc = $(shell cat $(1) > $(3); echo "\#if CONFIG_CODEC == SWCODEC" >> $(3); \

@@ -517,7 +517,7 @@ long sim_lseek(int fildes, long offset, int whence)
     return lseek(fildes, offset, whence);
 }
 
-long sim_filesize(int fd)
+long filesize(int fd)
 {
 #ifdef WIN32
     return _filelength(fd);
