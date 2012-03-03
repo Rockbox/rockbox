@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///uk\u003d",
+        "filename": "manual/plugins/mosaic.tex",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-03T02:13:39Z",
+      "side": 1,
+      "message": "This looks like a left-over from the renaming. Shouldn\u0027t it be ss-mosaic instead?",
+      "revId": "04868ed2055958117b64a8b6f5e7230175435595",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
