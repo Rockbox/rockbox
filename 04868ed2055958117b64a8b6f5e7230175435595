@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAAB3///to\u003d",
+        "filename": "manual/plugins/main.tex",
+        "patchSetId": 6
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-03T09:38:32Z",
+      "side": 1,
+      "message": "another left-over",
+      "revId": "04868ed2055958117b64a8b6f5e7230175435595",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAB3///uk\u003d",
         "filename": "manual/plugins/mosaic.tex",
         "patchSetId": 6
