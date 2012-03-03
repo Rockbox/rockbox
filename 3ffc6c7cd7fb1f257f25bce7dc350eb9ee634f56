@@ -123,6 +123,24 @@
       "revId": "3ffc6c7cd7fb1f257f25bce7dc350eb9ee634f56",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///qM\u003d",
+        "filename": "apps/gui/wps.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1055,
+      "author": {
+        "id": 1000094
+      },
+      "writtenOn": "2012-03-03T21:03:55Z",
+      "side": 1,
+      "message": "I don\u0027t really understand the usb connect case (is this where they go into charging or storage mode? I\u0027ve only ever used rockbox on the Recorder and now on SDL and Android) but it looks like bookmark_create_menu() could fail for a variety of reasons like no song playing, ...\n\nIn any case I guess I will leave this commit as is and create a new one for the bookmark_create_menu() changes.",
+      "parentUuid": "AAAAB3///qY\u003d",
+      "revId": "3ffc6c7cd7fb1f257f25bce7dc350eb9ee634f56",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
