@@ -141,6 +141,24 @@
       "revId": "3ffc6c7cd7fb1f257f25bce7dc350eb9ee634f56",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///ps\u003d",
+        "filename": "apps/gui/wps.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1055,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-03T21:20:24Z",
+      "side": 1,
+      "message": "USB happens on native targets of course. playback must stop, this is enforced in playback.c or so. The UI must leave the wps which cannot as no music is playing. could return an int if it needs to seperate USB and other failure.",
+      "parentUuid": "AAAAB3///qM\u003d",
+      "revId": "3ffc6c7cd7fb1f257f25bce7dc350eb9ee634f56",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
