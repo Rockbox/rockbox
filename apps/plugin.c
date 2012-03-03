@@ -93,11 +93,6 @@ static int app_ftruncate(int fd, off_t length)
 {
     return ftruncate(fd,length);
 }
-
-static off_t app_filesize(int fd)
-{
-    return filesize(fd);
-}
 #endif
 
 #if defined(HAVE_PLUGIN_CHECK_OPEN_CLOSE) && (MAX_OPEN_FILES>32)
