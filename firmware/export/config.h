@@ -499,6 +499,11 @@ Lyre prototype 1 */
 /* no known platform */
 #endif
 
+#ifdef __PCTOOL__
+#undef CONFIG_CPU
+#define CONFIG_CPU 0
+#endif
+
 #ifdef APPLICATION
 #define CONFIG_CPU 0
 #define CONFIG_STORAGE 0
