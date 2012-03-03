@@ -523,6 +523,8 @@ Lyre prototype 1 */
 
 /* setup CPU-specific defines */
 
+#ifndef __PCTOOL__
+
 /* define for all cpus from SH family */
 #if (CONFIG_CPU == SH7034)
 #define CPU_SH
@@ -589,6 +591,8 @@ Lyre prototype 1 */
 #if (CONFIG_CPU == JZ4732)
 #define CPU_MIPS 32
 #endif
+
+#endif /*__PCTOOL__*/
 
 /* now set any CONFIG_ defines correctly if they are not used,
    No need to do this on CONFIG_'s which are compulsory (e.g CONFIG_CODEC ) */
