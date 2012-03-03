@@ -9,7 +9,7 @@
 struct buflib_context core_ctx;
 
 /* defined in linker script */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(__PCTOOL__)
 #if defined(IPOD_VIDEO) && !defined(BOOTLOADER)
 extern unsigned char *audiobufend_lds[];
 unsigned char *audiobufend;

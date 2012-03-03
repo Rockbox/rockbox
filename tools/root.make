@@ -87,11 +87,13 @@ ifneq (,$(findstring bootloader,$(APPSDIR)))
 else ifneq (,$(findstring bootbox,$(APPSDIR)))
   BOOTBOXLDOPTS = -Wl,--gc-sections
   include $(APPSDIR)/bootbox.make
-else ifneq (,$(findstring checkwps,$(APPSDIR)))
+else ifneq (,$(findstring checkwps,$(APP_TYPE)))
   include $(APPSDIR)/checkwps.make
   include $(ROOTDIR)/lib/skin_parser/skin_parser.make
-else ifneq (,$(findstring database,$(APPSDIR)))
+else ifneq (,$(findstring database,$(APP_TYPE)))
   include $(APPSDIR)/database.make
+else ifneq (,$(findstring warble,$(APP_TYPE)))
+  include $(ROOTDIR)/lib/rbcodec/test/warble.make
 else
   include $(APPSDIR)/apps.make
   include $(APPSDIR)/lang/lang.make

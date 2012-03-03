@@ -192,6 +192,7 @@ enum {
 #include "system-sdl.h"
 #define NEED_GENERIC_BYTESWAPS
 #elif defined(__PCTOOL__)
+#include "system-sdl.h"
 #define NEED_GENERIC_BYTESWAPS
 #endif
 #include "bitswap.h"

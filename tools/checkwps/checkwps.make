@@ -15,6 +15,8 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/apps/gui/skin_engine \
            -I$(ROOTDIR)/firmware/export \
            -I$(ROOTDIR)/firmware/include \
+           -I$(ROOTDIR)/firmware/target/hosted \
+           -I$(ROOTDIR)/firmware/target/hosted/sdl \
            -I$(ROOTDIR)/apps \
            -I$(ROOTDIR)/apps/recorder \
            -I$(ROOTDIR)/apps/radio \

@@ -358,9 +358,11 @@ static void perform_config(void)
             codec_action_param = atoi(val);
         } else if (!strncmp(name, "tempo=", 6)) {
             dsp_set_timestretch(atof(val) * PITCH_SPEED_100);
+#ifdef HAVE_SW_VOLUME_CONTROL
         } else if (!strncmp(name, "vol=", 4)) {
             global_settings.volume = atoi(val);
             dsp_callback(DSP_CALLBACK_SET_SW_VOLUME, 0);
+#endif
         } else {
             fprintf(stderr, "error: unrecognized config \"%.*s\"\n",
                     (int)(eq - name), name);
@@ -775,7 +777,9 @@ static void print_help(const char *progname)
                     "  rate=<n>      Multiply rate by <n> [1.0]\n"
                     "  seek=<n>      Seek <n> ms into the file\n"
                     "  tempo=<n>     Timestretch by <n> [1.0]\n"
+#ifdef HAVE_SW_VOLUME_CONTROL
                     "  vol=<n>       Set volume to <n> dB [0]\n"
+#endif
                     "  wait=<n>      Don't apply remaining configuration until\n"
                     "                <n> total samples have output\n"
                     "\n"
