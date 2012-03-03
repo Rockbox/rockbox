@@ -1042,6 +1042,21 @@ long gui_wps_show(void)
                 exit = true;
                 break;
 
+            case ACTION_WPS_LIST_BOOKMARKS:
+                gwps_leave_wps();
+                bookmark_load_menu();
+                restore = true;
+                break;
+
+            case ACTION_WPS_CREATE_BOOKMARK:
+                gwps_leave_wps();
+                if (bookmark_create_menu())
+                {
+                    return GO_TO_ROOT;
+                }
+                restore = true;
+                break;
+
             case ACTION_WPS_ID3SCREEN:
             {
                 gwps_leave_wps();
