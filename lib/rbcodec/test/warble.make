@@ -8,8 +8,6 @@
 #
 
 
-include $(ROOTDIR)/tools/functions.make
-include $(ROOTDIR)/apps/codecs/codecs.make
 
 FLAGS=-g -D__PCTOOL__ $(TARGET) -Wall
 
@@ -29,6 +27,9 @@ LIBS += -ldl
 endif
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
+
+include $(ROOTDIR)/tools/functions.make
+include $(ROOTDIR)/apps/codecs/codecs.make
 
 $(BUILDDIR)/$(BINARY): $(CODECS)
 
