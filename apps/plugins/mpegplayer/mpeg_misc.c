@@ -216,7 +216,7 @@ int mpeg_button_get(int timeout)
                 rb->button_get_w_tmo(timeout);
 
     /* Produce keyclick */
-    rb->keyclick_click(button);
+    rb->keyclick_click(CONTEXT_RAWBUTTON, button);
 
     return mpeg_sysevent_callback(button, NULL);
 }
