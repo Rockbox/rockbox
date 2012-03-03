@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///sU\u003d",
+        "filename": "apps/plugins/properties.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-03T12:29:38Z",
+      "side": 1,
+      "message": "I suggest using %c, \u0027+\u0027 and \u0027 \u0027 instead.",
+      "revId": "1caf3f41233a824cfe1a6c1bc7aeda2cdf85b33c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
