@@ -761,6 +761,11 @@ Lyre prototype 1 */
 #undef HAVE_ADJUSTABLE_CPU_FREQ
 #endif
 
+#if defined(__PCTOOL__) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+/* PCTOOLs don't use CPU frequency adjustment */
+#undef HAVE_ADJUSTABLE_CPU_FREQ
+#endif
+
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if (MEMORYSIZE >= 8) && !defined(BOOTLOADER) && !defined(__PCTOOL__) \
