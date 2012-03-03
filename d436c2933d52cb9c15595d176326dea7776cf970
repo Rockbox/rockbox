@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAB3///tw\u003d",
+        "filename": "apps/plugins/matrix.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-03T09:36:36Z",
+      "side": 1,
+      "message": "You\u0027ve got that backwards. Now scrolling forward decreases animation speed.",
+      "revId": "d436c2933d52cb9c15595d176326dea7776cf970",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAB3///t0\u003d",
+        "filename": "apps/plugins/matrix.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-03-03T09:36:36Z",
+      "side": 1,
+      "message": "Still not right. The previous call was button_get(), i.e. it blocks if frozen is true, otherwise it doesn\u0027t block. You now use frozen as a timeout which can\u0027t be right.",
+      "revId": "d436c2933d52cb9c15595d176326dea7776cf970",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
