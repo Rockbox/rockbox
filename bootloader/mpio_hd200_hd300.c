@@ -43,6 +43,8 @@
 #include "file.h"
 
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "version.h"
 
 #include <stdarg.h>
@@ -199,21 +201,13 @@ static void rb_boot(void)
 
     rc = storage_init();
     if(rc)
-    {
-        printf("ATA error: %d", rc);
-        sleep(HZ*5);
-        return;
-    }
+        error(EATA, rc, true);
 
     disk_init();
 
     rc = disk_mount_all();
     if (rc<=0)
-    {
-        printf("No partition found");
-        sleep(HZ*5);
-        return;
-    }
+        error(EDISK, rc, true);
 
     printf("Loading firmware");
 
@@ -221,13 +215,7 @@ static void rb_boot(void)
                        BOOTFILE, MAX_LOADSIZE);
 
     if (rc < EOK)
-    {
-        printf("Error!");
-        printf("Can't load " BOOTFILE ": ");
-        printf("Result: %s", strerror(rc));
-        sleep(HZ*5);
-        return;
-    }
+        error(EBOOTFILE, rc, true);
 
     cpu_boost(false);
     start_rockbox();

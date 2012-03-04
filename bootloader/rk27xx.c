@@ -18,6 +18,7 @@
 #include "file.h"
 #include "crc32-rkw.h"
 #include "rkw-loader.h"
+#include "loader_strerror.h"
 
 #define DRAM_ORIG 0x60000000
 #define LOAD_SIZE 0x700000
@@ -82,18 +83,8 @@ void main(void)
     printf("Loading: %s", filename);
 
     ret = load_rkw(loadbuffer, filename, LOAD_SIZE);
-    if (ret < 0)
-    {
-        printf(rkw_strerror(ret));
-        lcd_update();
-        sleep(5*HZ);
-        power_off();
-    }
-    else
-    {
-        printf(rkw_strerror(0));
-        sleep(HZ);
-    }
+    if (ret < EOK)
+        error(EBOOTFILE, ret, true);
 
     kernel_entry = (void*) loadbuffer;
     commit_discard_idcache();
