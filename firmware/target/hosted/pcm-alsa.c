@@ -75,7 +75,7 @@ static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
 static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
 static short *frames;
 
-static const char  *pcm_data = 0;
+static const void  *pcm_data = 0;
 static size_t       pcm_size = 0;
 
 #ifdef USE_ASYNC_CALLBACK
@@ -223,8 +223,8 @@ static bool fill_frames(void)
         if (!pcm_size)
         {
             new_buffer = true;
-            if (!pcm_play_dma_complete_callback(PCM_DMAST_OK,
-                    (const void **)&pcm_data, &pcm_size))
+            if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data,
+                                                &pcm_size))
             {
                 return false;
             }

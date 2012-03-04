@@ -56,7 +56,7 @@ static int sim_volume = 0;
 #if CONFIG_CODEC == SWCODEC
 static int cvt_status = -1;
 
-static const Uint8* pcm_data;
+static const void *pcm_data;
 static size_t pcm_data_size;
 static size_t pcm_sample_bytes;
 static size_t pcm_channel_bytes;
@@ -245,8 +245,8 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 
     /* Audio card wants more? Get some more then. */
     while (len > 0) {
-        new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
-                        (const void **)&pcm_data, &pcm_data_size);
+        new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data,
+                                                    &pcm_data_size);
 
         if (!new_buffer) {
             DEBUGF("sdl_audio_callback: No Data.\n");

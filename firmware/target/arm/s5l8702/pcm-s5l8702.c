@@ -38,7 +38,7 @@ static unsigned char dblbuf[2][PCM_WATERMARK * 4];
 static int active_dblbuf;
 struct dma_lli pcm_lli[PCM_LLICOUNT] __attribute__((aligned(16)));
 static struct dma_lli* lastlli;
-static const unsigned char* dataptr;
+static const void* dataptr;
 size_t pcm_remaining;
 size_t pcm_chunksize;
 
@@ -65,8 +65,7 @@ void INT_DMAC0C0(void)
     DMAC0INTTCCLR = 1;
     if (!pcm_remaining)
     {
-        pcm_play_dma_complete_callback(PCM_DMAST_OK, (const void**)&dataptr,
-                                       &pcm_remaining);
+        pcm_play_dma_complete_callback(PCM_DMAST_OK, &dataptr, &pcm_remaining);
         pcm_chunksize = pcm_remaining;
     }
     if (!pcm_remaining)
@@ -121,7 +120,7 @@ void INT_DMAC0C0(void)
 
 void pcm_play_dma_start(const void* addr, size_t size)
 {
-    dataptr = (const unsigned char*)addr;
+    dataptr = addr;
     pcm_remaining = size;
     I2STXCOM = 0xe;
     INT_DMAC0C0();
