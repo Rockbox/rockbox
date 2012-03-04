@@ -39,7 +39,7 @@
 #define BATT_FULL_VOLTAGE   4160
 #define BATT_VAUTO_RECHARGE 4100
 #define BATT_CHG_V          CHG_V_4_20V
-#define BATT_CHG_I          CHG_I_150MA
+#define BATT_CHG_I          CHG_I_140MA
 #define CHARGER_TOTAL_TIMER (4*3600*2)  /* about 1.5 * capacity / current */
 
 #elif defined(SANSA_CLIPV2)
@@ -48,7 +48,7 @@
 #define BATT_FULL_VOLTAGE   4200
 #define BATT_VAUTO_RECHARGE 4100
 #define BATT_CHG_V          CHG_V_4_20V
-#define BATT_CHG_I          CHG_I_150MA
+#define BATT_CHG_I          CHG_I_140MA
 #define CHARGER_TOTAL_TIMER (4*3600*2)  /* about 1.5 * capacity / current */
 
 #elif defined(SANSA_E200V2)
@@ -75,7 +75,7 @@
 #define BATT_FULL_VOLTAGE   4200
 #define BATT_VAUTO_RECHARGE 4100
 #define BATT_CHG_V          CHG_V_4_20V
-#define BATT_CHG_I          CHG_I_200MA
+#define BATT_CHG_I          CHG_I_210MA
 #define CHARGER_TOTAL_TIMER (4*3600*2)
 
 #elif defined(SANSA_CLIPZIP)
@@ -84,7 +84,7 @@
 #define BATT_FULL_VOLTAGE   4160
 #define BATT_VAUTO_RECHARGE 4100
 #define BATT_CHG_V          CHG_V_4_20V
-#define BATT_CHG_I          CHG_I_150MA
+#define BATT_CHG_I          CHG_I_140MA
 #define CHARGER_TOTAL_TIMER (4*3600*2)  /* about 1.5 * capacity / current */
 
 #elif defined(SANSA_C200V2)

@@ -93,7 +93,7 @@ static void battery_voltage_sync(void)
 /* Disable charger and minimize all settings. Reset timers, etc. */
 static void disable_charger(void)
 {
-    ascodec_write_charger(TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
+    ascodec_write_charger(TMPSUP_OFF | CHG_OFF);
 
     if (charge_state > DISCHARGING)
         charge_state = DISCHARGING; /* Not an error state already */
@@ -126,7 +126,7 @@ void powermgmt_init_target(void)
 {
     /* Everything CHARGER, OFF! */
     ascodec_monitor_endofch();
-    ascodec_write_charger(TMPSUP_OFF | CHG_I_50MA | CHG_V_3_90V | CHG_OFF);
+    ascodec_write_charger(TMPSUP_OFF | CHG_OFF);
 }
 
 static inline void charger_plugged(void)
