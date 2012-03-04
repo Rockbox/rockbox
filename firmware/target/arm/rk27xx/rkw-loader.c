@@ -19,7 +19,7 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "rkw.h"
+#include "rkw-loader.h"
 #include "crc32-rkw.h"
 #include "file.h"
 #include "panic.h"
