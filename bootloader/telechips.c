@@ -43,6 +43,8 @@
 #include "power.h"
 #include "file.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "version.h"
 
 /* Show the Rockbox logo - in show_logo.c */
@@ -170,11 +172,11 @@ void* main(void)
 
     rc = load_firmware(loadbuffer, BOOTFILE, MAX_LOAD_SIZE);
 
-    if (rc < 0)
+    if (rc <= EFILE_EMPTY)
     {
         error(EBOOTFILE,rc, true);
     }
-    else if (rc == EOK)
+    else
     {
         int(*kernel_entry)(void) = (void *) loadbuffer;
 

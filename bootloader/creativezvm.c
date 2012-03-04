@@ -28,6 +28,8 @@
 #include "backlight.h"
 #include "button.h"
 #include "common.h"
+#include "loader_strerror.h"
+#include "rb-loader.h"
 #include "usb.h"
 #include "version.h"
 
@@ -104,15 +106,12 @@ void main(void)
         buffer_size = (unsigned char*)0x01900000 - loadbuffer;
 
         ret = load_firmware(loadbuffer, BOOTFILE, buffer_size);
-        if(ret < 0)
+        if(ret <= EFILE_EMPTY)
             error(EBOOTFILE, ret, true);
-        
-        else if(ret == EOK)
-        {
-            kernel_entry = (void*) loadbuffer;
-            ret = kernel_entry();
-            printf("FAILED!");
-        }
+
+        kernel_entry = (void*) loadbuffer;
+        ret = kernel_entry();
+        printf("FAILED!");
     }
     
     storage_sleepnow();

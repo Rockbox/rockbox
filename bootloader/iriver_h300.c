@@ -45,6 +45,8 @@
 #include "file.h"
 #include "pcf50606.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "rbunicode.h"
 #include "isp1362.h"
 #include "version.h"
@@ -361,10 +363,10 @@ void main(void)
 
     printf("Loading firmware");
     i = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
-    if(i < 0)
-        printf("Error: %s", strerror(i));
+    if(i <= EFILE_EMPTY)
+        printf("Error: %s", loader_strerror(i));
 
-    if (i == EOK)
+    if (i > 0)
         start_firmware();
 
     if (!detect_original_firmware())

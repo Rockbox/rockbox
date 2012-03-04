@@ -20,6 +20,7 @@
 #include "rkw-loader.h"
 #include "version.h"
 #include "i2c-rk27xx.h"
+#include "loader_strerror.h"
 
 /* beginning of DRAM */
 #define DRAM_ORIG 0x60000000
@@ -161,11 +162,10 @@ void main(void)
     printf("Loading: %s", filename);
 
     ret = load_rkw(loadbuffer, filename, LOAD_SIZE);
-    if (ret < 0)
+
+    if (ret <= EFILE_EMPTY)
     {
-        printf(rkw_strerror(ret));
-        lcd_update();
-        sleep(5*HZ);
+        error(EBOOTFILE, ret, false);
 
         /* if we boot rockbox we shutdown on error
          * if we boot OF we fall back to rkusb mode on error
@@ -186,7 +186,7 @@ void main(void)
     else
     {
         /* print 'Loading OK' */
-        printf(rkw_strerror(0));
+        printf("Loading OK");
         sleep(HZ);
     }
 

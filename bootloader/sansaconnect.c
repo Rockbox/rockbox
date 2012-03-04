@@ -27,6 +27,7 @@
 #include "backlight.h"
 #include "button.h"
 #include "common.h"
+#include "rb-loader.h"
 #include "version.h"
 #include "uart-target.h"
 #include "power.h"
@@ -115,11 +116,11 @@ void main(void)
 
     ret = load_firmware(loadbuffer, BOOTFILE, buffer_size);
 
-    if(ret < 0)
+    if(ret <= EFILE_EMPTY)
     {
         error(EBOOTFILE, ret, true);
     }
-    else if(ret == EOK)
+    else
     {
         system_prepare_fw_start();
 

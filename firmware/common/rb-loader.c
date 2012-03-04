@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Copyright (C) 2012 Marcin Bukat
+ * Copyright (C) 2005 by Linus Nielsen Feltzing
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,26 +20,26 @@
 
 #include <stdio.h>
 #include "config.h"
-#include "loader_strerror.h"
-#include "rkw-loader.h"
-#include "crc32-rkw.h"
+#include "system.h"
 #include "file.h"
-#include "panic.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 
-/* loosely based on load_firmware()
- * on success we return size of loaded image
+/* Load firmware image in a format created by add method of tools/scramble
+ * on success we return size loaded image
  * on error we return negative value which can be deciphered by means
- * of rkw_strerror() function
+ * of strerror() function
  */
-int load_rkw(unsigned char* buf, const char* firmware, int buffer_size)
+int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
 {
     char filename[MAX_PATH];
     int fd;
     int rc;
     int len;
-    int ret;
-    uint32_t crc, fw_crc;
-    struct rkw_header_t rkw_info;
+    int ret = 0;
+    unsigned long chksum;
+    unsigned long sum;
+    int i;
 
     /* only filename passed */
     if (firmware[0] != '/')
@@ -66,82 +66,48 @@ int load_rkw(unsigned char* buf, const char* firmware, int buffer_size)
             return EFILE_NOT_FOUND;
     }
 
-    rc = read(fd, &rkw_info, sizeof(rkw_info));
-    if (rc < (int)sizeof(rkw_info))
-    {
-        ret = EREAD_HEADER_FAILED;
-        goto end;
-    }
+    len = filesize(fd) - 8;
 
-    /* check if RKW is valid */
-    if (rkw_info.magic_number != RKLD_MAGIC)
-    {
-        ret = EINVALID_FORMAT;
-        goto end;
-    }
-
-    /* check header crc if present */
-    if (rkw_info.load_options & RKW_HEADER_CRC)
-    {
-        crc = crc32_rkw((uint8_t *)&rkw_info, sizeof(rkw_info)-sizeof(uint32_t));
-        if (rkw_info.crc != crc)
-        {
-            ret = EBAD_HEADER_CHKSUM;
-            goto end;
-        }
-    }
-
-    /* check image size */
-    len = rkw_info.load_limit - rkw_info.load_address;
     if (len > buffer_size)
     {
         ret = EFILE_TOO_BIG;
         goto end;
     }
 
-    /* check load address - we support loading only at 0x60000000 */
-    if (rkw_info.load_address != 0x60000000)
+    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
+
+    rc = read(fd, &chksum, 4);
+    chksum = betoh32(chksum); /* Rockbox checksums are big-endian */
+    if(rc < 4)
     {
-        ret = EINVALID_LOAD_ADDR;
+        ret = EREAD_CHKSUM_FAILED;
         goto end;
     }
 
-    /* rockbox extension - we use one of reserved fields to store
-     * model number information. This prevents from loading
-     * rockbox RKW for different player.
-     */
-    if (rkw_info.reserved0 != 0 && rkw_info.reserved0 != MODEL_NUMBER)
-    {
-        ret = EBAD_MODEL;
-        goto end;
-    }
+    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
-    /* skip header */
-    lseek(fd, sizeof(rkw_info), SEEK_SET);
-
-    /* load image into buffer */
     rc = read(fd, buf, len);
-
     if(rc < len)
     {
         ret = EREAD_IMAGE_FAILED;
         goto end;
     }
 
-    if (rkw_info.load_options & RKW_IMAGE_CRC)
+    sum = MODEL_NUMBER;
+
+    for(i = 0;i < len;i++)
     {
-        rc = read(fd, &fw_crc, sizeof(uint32_t));
+        sum += buf[i];
+    }
 
-        crc = crc32_rkw((uint8_t *)buf, len);
-
-        if (fw_crc != crc)
-        {
-            ret = EBAD_CHKSUM;
-            goto end;
-        }
+    if(sum != chksum)
+    {
+        ret = EBAD_CHKSUM;
+        goto end;
     }
 
     ret = len;
+
 end:
     close(fd);
     return ret;

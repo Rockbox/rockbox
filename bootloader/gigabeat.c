@@ -41,6 +41,8 @@
 #include "power.h"
 #include "file.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "rbunicode.h"
 #include "usb.h"
 #include "mmu-arm.h"
@@ -201,18 +203,15 @@ void main(void)
     buffer_size = (unsigned char*)0x31400000 - loadbuffer;
 
     rc = load_firmware(loadbuffer, BOOTFILE, buffer_size);
-    if(rc < 0)
+    if(rc <= EFILE_EMPTY)
         error(EBOOTFILE, rc, true);
 
     storage_close();
     system_prepare_fw_start();
 
-    if (rc == EOK)
-    {
-        commit_discard_idcache();
-        kernel_entry = (void*) loadbuffer;
-        rc = kernel_entry();
-    }
+    commit_discard_idcache();
+    kernel_entry = (void*) loadbuffer;
+    rc = kernel_entry();
 
 #if 0
     /* Halt */

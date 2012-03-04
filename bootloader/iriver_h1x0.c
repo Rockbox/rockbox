@@ -46,6 +46,8 @@
 #include "eeprom_settings.h"
 #include "rbunicode.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "version.h"
 
 #include <stdarg.h>
@@ -608,9 +610,9 @@ void main(void)
     printf("Loading firmware");
     i = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
     if(i < 0)
-        printf("Error: %s", strerror(i));
+        printf("Error: %s", loader_strerror(i));
 
-    if (i == EOK)
+    if (i > 0)
         start_firmware();
 
     if (!detect_original_firmware())

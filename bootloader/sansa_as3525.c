@@ -35,6 +35,8 @@
 #include "backlight.h"
 #include "button-target.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "storage.h"
 #include "disk.h"
 #include "panic.h"
@@ -147,7 +149,7 @@ void main(void)
     loadbuffer = (unsigned char*)DRAM_ORIG; /* DRAM */
     buffer_size = (int)(loadbuffer + (DRAM_SIZE) - TTB_SIZE);
 
-    while((ret = load_firmware(loadbuffer, BOOTFILE, buffer_size)) < 0)
+    while((ret = load_firmware(loadbuffer, BOOTFILE, buffer_size)) <= EFILE_EMPTY)
     {
 #ifdef USE_ROCKBOX_USB
         error(EBOOTFILE, ret, false);

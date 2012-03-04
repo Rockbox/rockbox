@@ -43,6 +43,8 @@
 #include "powermgmt.h"
 #include "file.h"
 #include "version.h"
+#include "loader_strerror.h"
+#include "rb-loader.h"
 
 
 #include "pcf50606.h"
@@ -129,7 +131,6 @@ int initial_gpio_read;
 
 void main(void)
 {
-    int i;
     int rc;
     bool rc_on_button = false;
     bool on_button = false;
@@ -194,35 +195,22 @@ void main(void)
     
     rc = storage_init();
     if(rc)
-    {
-        printf("ATA error: %d", rc);
-        sleep(HZ*5);
-        power_off();
-    }
+        error(EATA, rc, true);
 
     disk_init();
 
     rc = disk_mount_all();
     if (rc<=0)
-    {
-        printf("No partition found");
-        sleep(HZ*5);
-        power_off();
-    }
+        error(EDISK, rc, true);
 
     printf("Loading firmware");
-    i = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
-    printf("Result: %s", strerror(i));
 
-    if (i < EOK) {
-        printf("Error!");
-        printf("Can't load " BOOTFILE ": ");
-        printf(strerror(rc));
-        sleep(HZ*3);
-        power_off();
-    } else {
-        start_firmware();
-    }
+    rc = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
+
+    if (rc <= EFILE_EMPTY)
+        error(EBOOTFILE, rc, true);
+
+    start_firmware();
 }
 
 /* These functions are present in the firmware library, but we reimplement

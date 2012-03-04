@@ -35,6 +35,9 @@ load_code.c
 #ifdef RB_PROFILE
 profile.c
 #endif /* RB_PROFILE */
+#if !defined(RKW_FORMAT) && !defined(MI4_FORMAT) && defined(MODEL_NUMBER)
+common/rb-loader.c
+#endif
 #if !defined(BOOTLOADER) || defined(CPU_SH)
 rolo.c
 #endif /* !defined(BOOTLOADER) || defined(CPU_SH) */
@@ -139,6 +142,9 @@ libc/gmtime.c
 common/version.c
 common/config.c
 common/crc32.c
+#ifdef MODEL_NUMBER
+common/loader_strerror.c
+#endif
 #ifdef MI4_FORMAT
 common/crc32-mi4.c
 #endif
@@ -594,6 +600,7 @@ target/arm/as3525/pcm-as3525.c
 target/arm/pp/i2s-pp.c
 target/arm/pp/kernel-pp.c
 target/arm/pp/timer-pp.c
+target/arm/pp/mi4-loader.c
 # if CONFIG_STORAGE & STORAGE_SD
 target/arm/pp/ata-sd-pp.c
 # endif

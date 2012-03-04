@@ -42,6 +42,8 @@
 #include "power.h"
 #include "file.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "hwcompat.h"
 #include "usb.h"
 #include "version.h"
@@ -376,7 +378,7 @@ void* main(void)
     
         rc=load_firmware(loadbuffer, "apple_os.ipod", MAX_LOADSIZE);
     
-        if (rc == EOK) {
+        if (rc > 0) {
             printf("apple_os.ipod loaded.");
             return (void*)DRAM_START;
         } else if (rc == EFILE_NOT_FOUND) {
@@ -387,10 +389,10 @@ void* main(void)
                 /* We have a copy of the retailos in RAM, lets just run it. */
                 return (void*)DRAM_START;
             }
-        } else if (rc < EFILE_NOT_FOUND) {
+        } else {
             printf("Error!");
             printf("Can't load apple_os.ipod:");
-            printf(strerror(rc));
+            printf(loader_strerror(rc));
         }
         
         /* Everything failed - just loop forever */
@@ -399,17 +401,17 @@ void* main(void)
     } else if (btn==BUTTON_PLAY) {
         printf("Loading Linux...");
         rc=load_raw_firmware(loadbuffer, "/linux.bin", MAX_LOADSIZE);
-        if (rc < EOK) {
+        if (rc <= EFILE_EMPTY) {
             printf("Error!");
             printf("Can't load linux.bin:");
-            printf(strerror(rc));
+            printf(loader_strerror(rc));
         } else {
             return (void*)DRAM_START;
         }
     } else {
         printf("Loading Rockbox...");
         rc=load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
-        if (rc == EOK) {
+        if (rc > 0) {
             printf("Rockbox loaded.");
             return (void*)DRAM_START;
         } else if (rc == EFILE_NOT_FOUND) {
@@ -424,7 +426,7 @@ void* main(void)
 
         printf("Error!");
         printf("Can't load " BOOTFILE ": ");
-        printf(strerror(rc));
+        printf(loader_strerror(rc));
     }
     
     /* If we get to here, then we haven't been able to load any firmware */

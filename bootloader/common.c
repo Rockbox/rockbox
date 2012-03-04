@@ -35,6 +35,14 @@
 #include "string.h"
 #include "usb.h"
 #include "file.h"
+#include "loader_strerror.h"
+#if defined(MI4_FORMAT)
+#include "mi4-loader.h"
+#elif defined(RKW_FORMAT)
+#include "rkw-loader.h"
+#else
+#include "rb-loader.h"
+#endif
 
 /* TODO: Other bootloaders need to be adjusted to set this variable to true
    on a button press - currently only the ipod, H10, Vibe 500 and Sansa versions do. */
@@ -94,31 +102,6 @@ int printf(const char *format, ...)
     return len;
 }
 
-char *strerror(int error)
-{
-    switch(error)
-    {
-    case EOK:
-        return "OK";
-    case EFILE_NOT_FOUND:
-        return "File not found";
-    case EREAD_CHKSUM_FAILED:
-        return "Read failed (chksum)";
-    case EREAD_MODEL_FAILED:
-        return "Read failed (model)";
-    case EREAD_IMAGE_FAILED:
-        return "Read failed (image)";
-    case EBAD_CHKSUM:
-        return "Bad checksum";
-    case EFILE_TOO_BIG:
-        return "File too big";
-    case EINVALID_FORMAT:
-        return "Invalid file format";
-    default:
-        return "Unknown";
-    }
-}
-
 void error(int errortype, int error, bool shutdown)
 {
     switch(errortype)
@@ -132,83 +115,15 @@ void error(int errortype, int error, bool shutdown)
         break;
 
     case EBOOTFILE:
-        printf(strerror(error));
+        printf(loader_strerror(error));
         break;
     }
 
     lcd_update();
     sleep(5*HZ);
+
     if(shutdown)
         power_off();
-}
-
-/* Load firmware image in a format created by tools/scramble */
-int load_firmware(unsigned char* buf, char* firmware, int buffer_size)
-{
-    int fd;
-    int rc;
-    int len;
-    unsigned long chksum;
-    char model[5];
-    unsigned long sum;
-    int i;
-    char filename[MAX_PATH];
-
-    snprintf(filename,sizeof(filename), BOOTDIR "/%s",firmware);
-    fd = open(filename, O_RDONLY);
-    if(fd < 0)
-    {
-        snprintf(filename,sizeof(filename),"/%s",firmware);
-        fd = open(filename, O_RDONLY);
-        if(fd < 0)
-            return EFILE_NOT_FOUND;
-    }
-
-    len = filesize(fd) - 8;
-
-    printf("Length: %x", len);
-
-    if (len > buffer_size)
-        return EFILE_TOO_BIG;
-
-    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
-
-    rc = read(fd, &chksum, 4);
-    chksum=betoh32(chksum); /* Rockbox checksums are big-endian */
-    if(rc < 4)
-        return EREAD_CHKSUM_FAILED;
-
-    printf("Checksum: %x", chksum);
-
-    rc = read(fd, model, 4);
-    if(rc < 4)
-        return EREAD_MODEL_FAILED;
-
-    model[4] = '\0';
-
-    printf("Model name: %s", model);
-    printf("Loading %s", firmware);
-
-    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
-
-    rc = read(fd, buf, len);
-    if(rc < len)
-        return EREAD_IMAGE_FAILED;
-
-    close(fd);
-
-    sum = MODEL_NUMBER;
-
-    for(i = 0;i < len;i++) {
-        sum += buf[i];
-    }
-
-    printf("Sum: %x", sum);
-
-    if(sum != chksum)
-        return EBAD_CHKSUM;
-
-    return EOK;
 }
 
 /* Load raw binary image. */
