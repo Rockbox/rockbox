@@ -26,6 +26,9 @@
 
 #include <stdbool.h>
 
+/* callback fn */
+typedef void (*mp3_play_callback_t)(const void **start, size_t* size);
+
 /* functions formerly in mpeg.c */
 void mp3_init(int volume, int bass, int treble, int balance, int loudness,
               int avc, int channel_config, int stereo_width,
@@ -42,9 +45,8 @@ void demand_irq_enable(bool on);
 #if CONFIG_CODEC == MAS3587F
 void mp3_play_init(void);
 #endif
-void mp3_play_data(const unsigned char* start, int size,
-    void (*get_more)(unsigned char** start, size_t* size) /* callback fn */
-);
+void mp3_play_data(const void* start, size_t size,
+                   mp3_play_callback_t get_more);
 void mp3_play_pause(bool play);
 bool mp3_pause_done(void);
 void mp3_play_stop(void);

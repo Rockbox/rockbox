@@ -53,7 +53,7 @@ static bool paused; /* playback is paused */
 static bool playing; /* We are playing an MP3 stream */
 
 /* the registered callback function to ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, size_t*);
+static mp3_play_callback_t callback_for_more;
 
 /* list of tracks in memory */
 #define MAX_ID3_TAGS (1<<4) /* Must be power of 2 */
@@ -156,7 +156,7 @@ static void play_tick(void)
 void DEI3(void) __attribute__((interrupt_handler));
 void DEI3(void)
 {
-    unsigned char* start;
+    const void* start;
     size_t size = 0;
 
     if (callback_for_more != NULL)
@@ -469,9 +469,8 @@ void mp3_play_init(void)
 }
 #endif
 
-void mp3_play_data(const unsigned char* start, int size,
-    void (*get_more)(unsigned char** start, size_t* size) /* callback fn */
-)
+void mp3_play_data(const void* start, size_t size,
+                   mp3_play_callback_t get_more)
 {
     /* init DMA */
     DAR3 = 0x5FFFEC3;

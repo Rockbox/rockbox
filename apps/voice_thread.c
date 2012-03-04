@@ -117,9 +117,9 @@ enum voice_thread_messages
 struct voice_info
 {
     /* Callback to get more clips */
-    void (*get_more)(unsigned char** start, size_t* size);
+    mp3_play_callback_t get_more;
     /* Start of clip */
-    unsigned char *start;
+    const void *start;
     /* Size of clip */
     size_t size;
 };
@@ -200,15 +200,15 @@ static void voice_buf_commit(size_t size)
 }
 
 /* Stop any current clip and start playing a new one */
-void mp3_play_data(const unsigned char* start, int size,
-                   void (*get_more)(unsigned char** start, size_t* size))
+void mp3_play_data(const void *start, size_t size,
+                   mp3_play_callback_t get_more)
 {
-    if (get_more != NULL && start != NULL && (ssize_t)size > 0)
+    if (get_more != NULL && start != NULL && size > 0)
     {
         struct voice_info voice_clip =
         {
             .get_more = get_more,
-            .start    = (unsigned char *)start,
+            .start    = start,
             .size     = size,
         };
 
@@ -312,7 +312,8 @@ static enum voice_state voice_message(struct voice_thread_data *td)
         td->st = speex_decoder_init(&speex_wb_mode);
 
         /* Make bit buffer use our own buffer */
-        speex_bits_set_bit_buffer(&td->bits, td->vi.start, td->vi.size);
+        speex_bits_set_bit_buffer(&td->bits, (void *)td->vi.start,
+                                  td->vi.size);
         speex_decoder_ctl(td->st, SPEEX_GET_LOOKAHEAD, &td->lookahead);
 
         return VOICE_STATE_DECODE;
@@ -361,10 +362,11 @@ static enum voice_state voice_decode(struct voice_thread_data *td)
         if (td->vi.get_more != NULL)
             td->vi.get_more(&td->vi.start, &td->vi.size);
 
-        if (td->vi.start != NULL && (ssize_t)td->vi.size > 0)
+        if (td->vi.start != NULL && td->vi.size > 0)
         {
             /* Make bit buffer use our own buffer */
-            speex_bits_set_bit_buffer(&td->bits, td->vi.start, td->vi.size);
+            speex_bits_set_bit_buffer(&td->bits, (void *)td->vi.start,
+                                      td->vi.size);
             /* Don't skip any samples when we're stringing clips together */
             td->lookahead = 0;
         }

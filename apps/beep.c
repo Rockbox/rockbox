@@ -54,7 +54,7 @@ beep_get_more(const void **start, size_t *size)
     {
         count = MIN(count, BEEP_BUF_COUNT);
         beep_count -= count;
-        *start = (unsigned char *)beep_buf;
+        *start = beep_buf;
         *size = count * 2 * sizeof (int16_t);
         beep_generate((void *)beep_buf, count, &beep_phase,
                       beep_step, beep_amplitude);

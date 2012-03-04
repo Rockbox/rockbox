@@ -401,8 +401,8 @@ load_err:
 }
 
 
-/* called in ISR context if mp3 data got consumed */
-static void mp3_callback(unsigned char** start, size_t* size)
+/* called in ISR context (on HWCODEC) if mp3 data got consumed */
+static void mp3_callback(const void** start, size_t* size)
 {
     queue[queue_read].len -= sent; /* we completed this */
     queue[queue_read].buf += sent;

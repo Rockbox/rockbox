@@ -448,7 +448,7 @@ static void timer4_isr(void)
 
 
 /* ISR function to get more mp3 data */
-static void GetMoreMp3(unsigned char** start, size_t* size)
+static void GetMoreMp3(const void** start, size_t* size)
 {
     int available;
     int advance;

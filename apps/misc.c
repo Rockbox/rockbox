@@ -42,7 +42,6 @@
 #include "usb_screen.h"
 #include "talk.h"
 #include "audio.h"
-#include "mp3_playback.h"
 #include "settings.h"
 #include "storage.h"
 #include "ata_idle_notify.h"
@@ -88,6 +87,8 @@
 #include "playback.h"
 #if CONFIG_CODEC == SWCODEC
 #include "voice_thread.h"
+#else
+#include "mp3_playback.h"
 #endif
 
 #ifdef BOOTFILE

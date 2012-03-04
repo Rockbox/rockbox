@@ -36,6 +36,8 @@
 static bool storage_spinning = false;
 
 #if CONFIG_CODEC != SWCODEC
+#include "mp3_playback.h"
+
 void audio_set_buffer_margin(int seconds)
 {
      (void)seconds;
@@ -92,9 +94,8 @@ unsigned char* mp3_get_pos(void)
     return NULL;
 }
 
-void mp3_play_data(const unsigned char* start, int size,
-    void (*get_more)(unsigned char** start, size_t* size) /* callback fn */
-)
+void mp3_play_data(const void* start, size_t size,
+                   mp3_play_callback_t get_more)
 {
     (void)start; (void)size; (void)get_more;
 }

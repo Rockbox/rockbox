@@ -23,8 +23,10 @@
 
 #include "config.h"
 
-void mp3_play_data(const unsigned char* start, int size,
-                   void (*get_more)(unsigned char** start, size_t* size));
+typedef void (*mp3_play_callback_t)(const void **start, size_t *size);
+
+void mp3_play_data(const void *start, size_t size,
+                   mp3_play_callback_t get_more);
 void mp3_play_stop(void);
 void mp3_play_pause(bool play);
 bool mp3_is_playing(void);

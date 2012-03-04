@@ -1268,7 +1268,7 @@ static unsigned char beep[]={255,
 111,181,184,144, 17,148, 21,101,166,227,100, 86, 85, 85, 85}; 
 
 /* callback to request more mp3 data */
-static void callback(unsigned char** start, size_t* size)
+static void callback(const void** start, size_t* size)
 {
     *start = beep; /* give it the same frame again */
     *size = sizeof(beep);

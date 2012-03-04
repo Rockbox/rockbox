@@ -637,8 +637,8 @@ struct plugin_api {
                                          unsigned int band_setting);
 #endif /* AUDIOHW_HAVE_EQ */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    void (*mp3_play_data)(const unsigned char* start, int size,
-                          void (*get_more)(unsigned char** start, size_t* size));
+    void (*mp3_play_data)(const void* start, size_t size,
+                          mp3_play_callback_t get_more);
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
