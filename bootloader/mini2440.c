@@ -39,6 +39,8 @@
 #include "power.h"
 #include "file.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "sd.h"
 #include "backlight-target.h"
 #include "lcd-target.h"
@@ -97,26 +99,23 @@ int main(void)
     printf("Loading firmware");
 
     /* Flush out anything pending first */
-    cpucache_invalidate();
+    commit_discard_idcache();
 
     loadbuffer = (unsigned char*) 0x31000000;
     buffer_size = (unsigned char*)0x31400000 - loadbuffer;
 
     rc = load_firmware(loadbuffer, BOOTFILE, buffer_size);
-    if(rc < 0)
+    if(rc <= 0)
         error(EBOOTFILE, rc, true);
-    
+
     printf("Loaded firmware %d\n", rc);
     
 /*    storage_close(); */
     system_prepare_fw_start();
 
-    if (rc == EOK)
-    {
-        cpucache_invalidate();
-        kernel_entry = (void*) loadbuffer;
-        rc = kernel_entry();
-    }
+    commit_discard_idcache();
+    kernel_entry = (void*) loadbuffer;
+    rc = kernel_entry();
         
     /* end stop - should not get here */
     led_flash(LED_ALL, LED_NONE);

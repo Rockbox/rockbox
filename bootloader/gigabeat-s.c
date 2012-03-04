@@ -30,6 +30,8 @@
 #include "dir.h"
 #include "disk.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "power.h"
 #include "backlight.h"
 #include "usb.h"
@@ -296,7 +298,7 @@ static void NORETURN_ATTR handle_firmware_load(void)
 {
     int rc = load_firmware(load_buf, BOOTFILE, load_buf_size);
 
-    if(rc < 0)
+    if(rc <= EFILE_EMPTY)
         error(EBOOTFILE, rc, true);
 
     /* Pause to look at messages */
@@ -321,11 +323,8 @@ static void NORETURN_ATTR handle_firmware_load(void)
     storage_close();
     system_prepare_fw_start();
 
-    if (rc == EOK)
-    {
-        commit_discard_idcache();
-        asm volatile ("bx %0": : "r"(start_addr));
-    }
+    commit_discard_idcache();
+    asm volatile ("bx %0": : "r"(start_addr));
 
     /* Halt */
     while (1)
