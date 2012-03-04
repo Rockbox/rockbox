@@ -31,6 +31,8 @@
 #include "backlight.h"
 #include "button-target.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "storage.h"
 #include "disk.h"
 #include "panic.h"
@@ -178,7 +180,7 @@ void main(uint32_t arg, uint32_t addr)
     loadbuffer = (unsigned char*)loadaddress;
     buffer_size = (int)(loadaddressend - loadaddress);
 
-    while((ret = load_firmware(loadbuffer, BOOTFILE, buffer_size)) < 0)
+    while((ret = load_firmware(loadbuffer, BOOTFILE, buffer_size)) < EOK)
     {
         error(EBOOTFILE, ret, true);
     }
