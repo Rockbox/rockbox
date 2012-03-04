@@ -78,7 +78,7 @@ const struct button_mapping pla_remote_ctx[] =
 #endif /* HAVE_REMOTE_LCD */
 
 /* these were taken from the bubbles plugin, so may need tweaking */
-const struct button_mapping pla_main_ctx[] = 
+const struct button_mapping pla_main_ctx[] =
 {
     /* Touchscreens */
 #ifdef HAVE_TOUCHSCREEN
@@ -255,6 +255,10 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE },
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
+    {PLA_VOLUP,             BUTTON_SCROLL_FWD,                  BUTTON_NONE },
+    {PLA_VOLDOWN,           BUTTON_SCROLL_BACK,                 BUTTON_NONE },
+    {PLA_VOLUP_REPEAT,      BUTTON_SCROLL_FWD|BUTTON_REPEAT,    BUTTON_NONE },
+    {PLA_VOLDOWN_REPEAT,    BUTTON_SCROLL_BACK|BUTTON_REPEAT,   BUTTON_NONE },
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
     {PLA_CANCEL,            BUTTON_REC,                         BUTTON_NONE },
     {PLA_CANCEL,            BUTTON_RC_REC|BUTTON_REL,           BUTTON_RC_REC},
@@ -267,13 +271,31 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
     {PLA_SELECT_REPEAT,     BUTTON_RC_MODE|BUTTON_REPEAT,       BUTTON_NONE },
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD \
-    || CONFIG_KEYPAD == SANSA_E200_PAD \
     || CONFIG_KEYPAD == SANSA_C200_PAD \
     || CONFIG_KEYPAD == SANSA_CLIP_PAD \
     || CONFIG_KEYPAD == SANSA_M200_PAD \
-    || CONFIG_KEYPAD == MROBE100_PAD \
     || CONFIG_KEYPAD == PHILIPS_HDD1630_PAD \
     || CONFIG_KEYPAD == SANSA_CONNECT_PAD)
+    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_VOL_UP,                      BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
+    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_SCROLL_FWD,                  BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_SCROLL_BACK,                 BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_SCROLL_FWD|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_SCROLL_BACK|BUTTON_REPEAT,   BUTTON_NONE},
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
     {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
     {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
@@ -286,6 +308,10 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_VOL_UP,                      BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
 #elif (CONFIG_KEYPAD == RECORDER_PAD)
     {PLA_CANCEL,            BUTTON_ON,                          BUTTON_NONE},
     {PLA_EXIT,              BUTTON_OFF,                         BUTTON_NONE},
@@ -310,12 +336,20 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_ON,                          BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_ON|BUTTON_REL,               BUTTON_ON},
     {PLA_SELECT_REPEAT,     BUTTON_ON|BUTTON_REPEAT,            BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_MENU|BUTTON_RIGHT,           BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_MENU|BUTTON_LEFT,            BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_MENU|BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_MENU|BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
     {PLA_CANCEL,            BUTTON_HOME|BUTTON_REL,             BUTTON_HOME},
     {PLA_EXIT,              BUTTON_HOME|BUTTON_REPEAT,          BUTTON_NONE},
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_SCROLL_FWD,                  BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_SCROLL_BACK,                 BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_SCROLL_FWD|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_SCROLL_BACK|BUTTON_REPEAT,   BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
     {PLA_CANCEL,            BUTTON_REW,                         BUTTON_NONE},
     {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
@@ -334,6 +368,10 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_RC_HEART,                    BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_RC_HEART|BUTTON_REL,         BUTTON_RC_HEART},
     {PLA_SELECT_REPEAT,     BUTTON_RC_HEART|BUTTON_REPEAT,      BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_RC_VOL_UP,                   BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_RC_VOL_DOWN,                 BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE},
 #elif (CONFIG_KEYPAD == COWON_D2_PAD)
     {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
     {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
@@ -346,12 +384,20 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_MENU,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_MENU|BUTTON_REL,             BUTTON_MENU},
     {PLA_SELECT_REPEAT,     BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_VOL_UP,                      BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
     {PLA_CANCEL,            BUTTON_RC_REC|BUTTON_REL,           BUTTON_RC_REC},
     {PLA_EXIT,              BUTTON_RC_REC|BUTTON_REPEAT,        BUTTON_NONE},
     {PLA_SELECT,            BUTTON_RC_MODE,                     BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_RC_MODE|BUTTON_REL,          BUTTON_RC_MODE},
     {PLA_SELECT_REPEAT,     BUTTON_RC_MODE|BUTTON_REPEAT,       BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_VOL_UP,                      BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
 #elif (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD) \
     || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
     {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
@@ -359,18 +405,30 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_VOL_UP,                      BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IAUDIO67_PAD)
     {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
     {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT           BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_VOLUP,                       BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_VOLDOWN,                     BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_VOLUP|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_VOLDOWN|BUTTON_REPEAT,       BUTTON_NONE},
 #elif (CONFIG_KEYPAD == CREATIVEZVM_PAD)
     {PLA_CANCEL,            BUTTON_BACK|BUTTON_REL,             BUTTON_BACK},
     {PLA_EXIT,              BUTTON_BACK|BUTTON_REPEAT,          BUTTON_NONE},
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_UP,                          BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_DOWN,                        BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_UP|BUTTON_REPEAT,            BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_DOWN|BUTTON_REPEAT,          BUTTON_NONE},
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD)
     {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
     {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
@@ -389,30 +447,38 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_OK,                          BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_OK|BUTTON_REL,               BUTTON_OK  },
     {PLA_SELECT_REPEAT,     BUTTON_OK|BUTTON_REPEAT,            BUTTON_NONE},
-#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)                                      
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
     {PLA_CANCEL,            BUTTON_REC,                         BUTTON_NONE},
     {PLA_EXIT,              (BUTTON_REC|BUTTON_PLAY),           BUTTON_NONE},
     {PLA_SELECT,            BUTTON_FUNC,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_FUNC|BUTTON_REL,             BUTTON_FUNC},
     {PLA_SELECT_REPEAT,     BUTTON_FUNC|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == MPIO_HD300_PAD)                                      
+#elif (CONFIG_KEYPAD == MPIO_HD300_PAD)
     {PLA_CANCEL,            BUTTON_MENU,                        BUTTON_NONE},
     {PLA_EXIT,              BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
     {PLA_SELECT,            BUTTON_ENTER,                       BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_ENTER|BUTTON_REL,            BUTTON_ENTER},
     {PLA_SELECT_REPEAT,     BUTTON_ENTER|BUTTON_REPEAT,         BUTTON_NONE},
-#elif (CONFIG_KEYPAD == RK27XX_GENERIC_PAD)                                      
+#elif (CONFIG_KEYPAD == RK27XX_GENERIC_PAD)
     {PLA_CANCEL,            BUTTON_M,                           BUTTON_NONE},
     {PLA_EXIT,              BUTTON_M|BUTTON_REPEAT,             BUTTON_NONE},
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)                                      
+    {PLA_VOLUP,             BUTTON_FF|BUTTON_VOL,                BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_REW|BUTTON_VOL,               BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_FF|BUTTON_VOL|BUTTON_REPEAT,  BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_REW|BUTTON_VOL|BUTTON_REPEAT, BUTTON_NONE},
+#elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
     {PLA_CANCEL,            BUTTON_BACK,                        BUTTON_NONE},
     {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLUP,             BUTTON_VOL_UP,                      BUTTON_NONE},
+    {PLA_VOLDOWN,           BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    {PLA_VOLUP_REPEAT,      BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_VOLDOWN_REPEAT,    BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
 #else
 #   ifndef HAVE_TOUCHSCREEN
 #       error pluginlib_actions: No actions defined
@@ -423,7 +489,7 @@ const struct button_mapping pla_main_ctx[] =
 
 static struct button_mapping **plugin_context_order;
 static int plugin_context_count = 0;
-static int last_context = 0; /* index into plugin_context_order 
+static int last_context = 0; /* index into plugin_context_order
                                 of the last context returned */
 
 static const struct button_mapping* get_context_map(int context)

@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-/* Button Code Definitions for the Onda VX747 target */
+/* Button Code Definitions for the Onda VX777 target */
 /* NB: Up/Down/Left/Right are not physical buttons - touchscreen emulation */
 
 #include <stdio.h>
