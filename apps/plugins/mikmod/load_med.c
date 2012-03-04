@@ -159,7 +159,7 @@ static CHAR MED_Version[] = "OctaMED (MMDx)";
 
 /*========== Loader code */
 
-int MED_Test(void)
+static int MED_Test(void)
 {
 	UBYTE id[4];
 
@@ -170,7 +170,7 @@ int MED_Test(void)
 	return 0;
 }
 
-int MED_Init(void)
+static int MED_Init(void)
 {
 	if (!(me = (MEDEXP *)MikMod_malloc(sizeof(MEDEXP))))
 		return 0;
@@ -181,7 +181,7 @@ int MED_Init(void)
 	return 1;
 }
 
-void MED_Cleanup(void)
+static void MED_Cleanup(void)
 {
 	MikMod_free(me);
 	MikMod_free(mh);
@@ -426,7 +426,7 @@ static int LoadMMD1Patterns(void)
 	return 1;
 }
 
-int MED_Load(int curious)
+static int MED_Load(int curious)
 {
 	int t;
 	ULONG sa[64];
@@ -680,7 +680,7 @@ int MED_Load(int curious)
 	return 1;
 }
 
-CHAR *MED_LoadTitle(void)
+static CHAR *MED_LoadTitle(void)
 {
 	ULONG posit, namelen;
 	CHAR *name, *retvalue = NULL;

@@ -74,7 +74,7 @@ static OKTNOTE *okttrk = NULL;
 
 /*========== Loader code */
 
-int OKT_Test(void)
+static int OKT_Test(void)
 {
 	CHAR id[8];
 
@@ -322,7 +322,7 @@ static void OKT_doSBOD(int insnum)
 	of.samples[insnum].seekpos = _mm_ftell(modreader);
 }
 
-int OKT_Load(int curious)
+static int OKT_Load(int curious)
 {
 	UBYTE id[4];
 	ULONG len;
@@ -440,7 +440,7 @@ int OKT_Load(int curious)
 	return 1;
 }
 
-CHAR *OKT_LoadTitle(void)
+static CHAR *OKT_LoadTitle(void)
 {
 	return StrDup("");
 }

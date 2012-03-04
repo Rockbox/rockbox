@@ -192,7 +192,7 @@ typedef union GT_CHUNK
 	ENDC_CHUNK endc;
 } GT_CHUNK;
 
-GT_CHUNK *loadChunk(void)
+static GT_CHUNK *loadChunk(void)
 {	
 	GT_CHUNK *new_chunk = MikMod_malloc(sizeof(GT_CHUNK));
 
@@ -312,12 +312,12 @@ GT_CHUNK *loadChunk(void)
 	return NULL; // unknown chunk
 }
 
-int GT2_Init(void)
+static int GT2_Init(void)
 {
 	return 1;
 }
 
-int GT2_Test(void)
+static int GT2_Test(void)
 {
 	UBYTE magic[3];
 	_mm_fseek(modreader, 0, SEEK_SET);
@@ -329,7 +329,7 @@ int GT2_Test(void)
 	return 0;
 }
 
-int GT2_Load(int curious)
+static int GT2_Load(int curious)
 {
 	GT_CHUNK *tmp;
     (void)curious;
@@ -344,11 +344,11 @@ int GT2_Load(int curious)
 	return 0;
 }
 
-void GT2_Cleanup(void)
+static void GT2_Cleanup(void)
 {
 }
 
-CHAR *GT2_LoadTitle(void)
+static CHAR *GT2_LoadTitle(void)
 {
 	CHAR title[33];
 	_mm_fseek(modreader, 8, SEEK_SET);

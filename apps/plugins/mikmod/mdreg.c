@@ -32,7 +32,7 @@
 
 #include "mikmod_internals.h"
 
-void _mm_registeralldrivers(void)
+static void _mm_registeralldrivers(void)
 {
 #if 0
 

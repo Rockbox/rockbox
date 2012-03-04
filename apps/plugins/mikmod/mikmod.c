@@ -151,7 +151,7 @@ static int compare(const void* p1, const void* p2)
 }
 */
 
-bool mod_ext(const char ext[])
+static bool mod_ext(const char ext[])
 {
     if(!ext)
         return false;
@@ -181,7 +181,7 @@ bool mod_ext(const char ext[])
 }
 
 /*Read directory contents for scrolling. */
-void get_mod_list(void)
+static void get_mod_list(void)
 {
     struct tree_context *tree = rb->tree_get_context();
     struct entry *dircache = rb->tree_get_entries(tree);
@@ -211,7 +211,7 @@ void get_mod_list(void)
     }
 }
 
-int change_filename(int direct)
+static int change_filename(int direct)
 {
     bool file_erased = (file_pt[curfile] == NULL);
     direction = direct;
@@ -268,7 +268,7 @@ static inline void synthbuf(void)
     VC_WriteBytes(outptr, BUF_SIZE);
 }
 
-void get_more(const void** start, size_t* size)
+static void get_more(const void** start, size_t* size)
 {
 #ifndef SYNC
     if (lastswap != swap)
@@ -289,7 +289,7 @@ void get_more(const void** start, size_t* size)
 #endif
 }
 
-void showinfo(void)
+static void showinfo(void)
 {
     char statustext[LINE_LENGTH];
 
@@ -347,7 +347,7 @@ void showinfo(void)
     rb->lcd_update();
 }
 
-void showsamples(void)
+static void showsamples(void)
 {
     int i;
     char statustext[LINE_LENGTH];
@@ -366,7 +366,7 @@ void showsamples(void)
     screenupdated = true;
 }
 
-void showinstruments(void)
+static void showinstruments(void)
 {
     int i;
     char statustext[LINE_LENGTH];
@@ -385,7 +385,7 @@ void showinstruments(void)
     screenupdated = true;
 }
 
-void showcomments(void)
+static void showcomments(void)
 {
     int i, j=0, k=0, l;
     char statustext[LINE_LENGTH];
@@ -424,7 +424,7 @@ void showcomments(void)
     screenupdated = true;
 }
 
-void changedisplay(void)
+static void changedisplay(void)
 {
     display = (display+1) % 4;
 
@@ -493,7 +493,7 @@ static struct configdata config[] =
     { TYPE_BOOL, 0, 1, { .bool_p = &settings.boost }, "CPU Boost", NULL},
 };
 
-void applysettings(void)
+static void applysettings(void)
 {
     md_pansep = settings.pansep;
     md_reverb = settings.reverb;
@@ -521,7 +521,7 @@ void applysettings(void)
 /**
   Shows the settings menu
  */
-int settings_menu(void)
+static int settings_menu(void)
 {
     int selection = 0;
 
@@ -581,7 +581,7 @@ int settings_menu(void)
 /**
   Show the main menu
  */
-int main_menu(void)
+static int main_menu(void)
 {
     int selection = 0;
     int result;
@@ -614,7 +614,7 @@ int main_menu(void)
 
 #ifdef USETHREADS
 /* double buffering thread */
-void thread(void)
+static void thread(void)
 {
     struct queue_event ev;
 
@@ -630,13 +630,13 @@ void thread(void)
 }
 #endif
 
-void mm_errorhandler(void)
+static void mm_errorhandler(void)
 {
     rb->splashf(HZ, "%s", MikMod_strerror(MikMod_errno));
     quit = true;
 }
 
-int playfile(char* filename)
+static int playfile(char* filename)
 {
     int vol = 0;
     int button;

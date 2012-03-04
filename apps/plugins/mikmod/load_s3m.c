@@ -117,7 +117,7 @@ static int numeric[NUMTRACKERS]={14,14,16,16};
 
 /*========== Loader code */
 
-int S3M_Test(void)
+static int S3M_Test(void)
 {
 	UBYTE id[4];
 
@@ -127,7 +127,7 @@ int S3M_Test(void)
 	return 0;
 }
 
-int S3M_Init(void)
+static int S3M_Init(void)
 {
 	if(!(s3mbuf=(S3MNOTE*)MikMod_malloc(32*64*sizeof(S3MNOTE)))) return 0;
 	if(!(mh=(S3MHEADER*)MikMod_malloc(sizeof(S3MHEADER)))) return 0;
@@ -137,7 +137,7 @@ int S3M_Init(void)
 	return 1;
 }
 
-void S3M_Cleanup(void)
+static void S3M_Cleanup(void)
 {
 	MikMod_free(s3mbuf);
 	MikMod_free(paraptr);
@@ -250,7 +250,7 @@ static UBYTE* S3M_ConvertTrack(S3MNOTE* tr)
 	return UniDup();
 }
 
-int S3M_Load(int curious)
+static int S3M_Load(int curious)
 {
 	int t,u,track = 0;
 	SAMPLE *q;
@@ -444,7 +444,7 @@ int S3M_Load(int curious)
 	return 1;
 }
 
-CHAR *S3M_LoadTitle(void)
+static CHAR *S3M_LoadTitle(void)
 {
 	CHAR s[28];
 

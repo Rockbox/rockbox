@@ -88,7 +88,7 @@ static	CHAR* S69_Version[]={
 
 /*========== Loader code */
 
-int S69_Test(void)
+static int S69_Test(void)
 {
 	UBYTE buf[0x80];
 
@@ -122,7 +122,7 @@ int S69_Test(void)
 	return 1;
 }
 
-int S69_Init(void)
+static int S69_Init(void)
 {
 	if(!(s69pat=(S69NOTE *)MikMod_malloc(64*8*sizeof(S69NOTE)))) return 0;
 	if(!(mh=(S69HEADER *)MikMod_malloc(sizeof(S69HEADER)))) return 0;
@@ -130,7 +130,7 @@ int S69_Init(void)
 	return 1;
 }
 
-void S69_Cleanup(void)
+static void S69_Cleanup(void)
 {
 	MikMod_free(s69pat);
 	MikMod_free(mh);
@@ -245,7 +245,7 @@ static int S69_LoadPatterns(void)
 	return 1;
 }
 
-int S69_Load(int curious)
+static int S69_Load(int curious)
 {
 	int i;
 	SAMPLE *current;
@@ -343,7 +343,7 @@ int S69_Load(int curious)
 	return 1;
 }
 
-CHAR *S69_LoadTitle(void)
+static CHAR *S69_LoadTitle(void)
 {
 	CHAR s[36];
 

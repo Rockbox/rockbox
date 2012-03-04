@@ -125,7 +125,7 @@ static	IMFHEADER *mh=NULL;
 
 /*========== Loader code */
 
-int IMF_Test(void)
+static int IMF_Test(void)
 {
 	UBYTE id[4];
 
@@ -135,7 +135,7 @@ int IMF_Test(void)
 	return 0;
 }
 
-int IMF_Init(void)
+static int IMF_Init(void)
 {
 	if(!(imfpat=(IMFNOTE*)MikMod_malloc(32*256*sizeof(IMFNOTE)))) return 0;
 	if(!(mh=(IMFHEADER*)MikMod_malloc(sizeof(IMFHEADER)))) return 0;
@@ -143,7 +143,7 @@ int IMF_Init(void)
 	return 1;
 }
 
-void IMF_Cleanup(void)
+static void IMF_Cleanup(void)
 {
 	FreeLinear();
 
@@ -377,7 +377,7 @@ static UBYTE* IMF_ConvertTrack(IMFNOTE* tr,UWORD rows)
 	return UniDup();
 }
 
-int IMF_Load(int curious)
+static int IMF_Load(int curious)
 {
 #define IMF_SMPINCR 64
 	int t,u,track=0,oldnumsmp;
@@ -713,7 +713,7 @@ int IMF_Load(int curious)
 	return 1;
 }
 
-CHAR *IMF_LoadTitle(void)
+static CHAR *IMF_LoadTitle(void)
 {
 	CHAR s[31];
 

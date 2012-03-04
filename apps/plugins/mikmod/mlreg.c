@@ -32,7 +32,7 @@
 
 #include "mikmod_internals.h"
 
-void MikMod_RegisterAllLoaders_internal(void)
+static void MikMod_RegisterAllLoaders_internal(void)
 {
 	_mm_registerloader(&load_669);
 	_mm_registerloader(&load_amf);

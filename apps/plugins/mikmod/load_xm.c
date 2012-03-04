@@ -136,7 +136,7 @@ static	XMWAVHEADER *wh=NULL,*s=NULL;
 
 /*========== Loader code */
 
-int XM_Test(void)
+static int XM_Test(void)
 {
 	UBYTE id[38];
 
@@ -146,13 +146,13 @@ int XM_Test(void)
 	return 0;
 }
 
-int XM_Init(void)
+static int XM_Init(void)
 {
 	if(!(mh=(XMHEADER *)MikMod_malloc(sizeof(XMHEADER)))) return 0;
 	return 1;
 }
 
-void XM_Cleanup(void)
+static void XM_Cleanup(void)
 {
 	MikMod_free(mh);
 }
@@ -657,7 +657,7 @@ static int LoadInstruments(void)
 	return 1;
 }
 
-int XM_Load(int curious)
+static int XM_Load(int curious)
 {
 	INSTRUMENT *d;
 	SAMPLE *q;
@@ -804,7 +804,7 @@ int XM_Load(int curious)
 	return 1;
 }
 
-CHAR *XM_LoadTitle(void)
+static CHAR *XM_LoadTitle(void)
 {
 	CHAR s[21];
 

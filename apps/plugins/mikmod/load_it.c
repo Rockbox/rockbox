@@ -181,7 +181,7 @@ static UBYTE portatable[10]= {0,1,4,8,16,32,64,96,128,255};
 
 /*========== Loader code */
 
-int IT_Test(void)
+static int IT_Test(void)
 {
 	UBYTE id[4];
 
@@ -190,7 +190,7 @@ int IT_Test(void)
 	return 0;
 }
 
-int IT_Init(void)
+static int IT_Init(void)
 {
 	if(!(mh=(ITHEADER*)MikMod_malloc(sizeof(ITHEADER)))) return 0;
 	if(!(poslookup=(UBYTE*)MikMod_malloc(256*sizeof(UBYTE)))) return 0;
@@ -201,7 +201,7 @@ int IT_Init(void)
 	return 1;
 }
 
-void IT_Cleanup(void)
+static void IT_Cleanup(void)
 {
 	FreeLinear();
 
@@ -441,7 +441,7 @@ static void IT_LoadMidiConfiguration(MREADER* modreader)
 	}
 }
 
-int IT_Load(int curious)
+static int IT_Load(int curious)
 {
 	int t,u,lp;
 	INSTRUMENT *d;
@@ -985,7 +985,7 @@ int IT_Load(int curious)
 	return 1;
 }
 
-CHAR *IT_LoadTitle(void)
+static CHAR *IT_LoadTitle(void)
 {
 	CHAR s[26];
 

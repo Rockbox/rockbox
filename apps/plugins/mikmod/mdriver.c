@@ -765,7 +765,7 @@ MIKMODAPI int MikMod_Active(void)
    criticals).
 
    Returns the voice that the sound is being played on.                       */
-SBYTE Sample_Play_internal(SAMPLE *s,ULONG start,UBYTE flags)
+static SBYTE Sample_Play_internal(SAMPLE *s,ULONG start,UBYTE flags)
 {
 	int orig=sfxpool;/* for cases where all channels are critical */
 	int c;
