@@ -19,7 +19,7 @@ INCLUDES += -I$(ROOTDIR)/firmware/export -I$(ROOTDIR)/firmware/include \
 			-I$(ROOTDIR)/firmware/target/hosted \
 			-I$(ROOTDIR)/firmware/target/hosted/sdl
 
-GCCOPTS+=-D__PCTOOL__ -g -std=gnu99 `$(SDLCONFIG) --cflags` -DCODECDIR="\"$(CODECDIR)\""
+GCCOPTS+=-D__PCTOOL__ -DDEBUG -g -std=gnu99 `$(SDLCONFIG) --cflags` -DCODECDIR="\"$(CODECDIR)\""
 
 LIBS=`$(SDLCONFIG) --libs` -lc
 ifneq ($(findstring MINGW,$(shell uname)),MINGW)
