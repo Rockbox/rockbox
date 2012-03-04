@@ -29,6 +29,8 @@
 #include "system.h"
 #include "button.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "storage.h"
 #include "disk.h"
 #include "string.h"
@@ -148,7 +150,7 @@ static int boot_rockbox(void)
 
     printf("Loading firmware...");
     rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
-    if(rc < 0)
+    if(rc < EOK)
         return rc;
     else
     {
@@ -304,7 +306,7 @@ int main(void)
         rc = boot_rockbox();
 
     if(rc < 0)
-        printf("Error: %s", strerror(rc));
+        printf("Error: %s", loader_strerror(rc));
 
     /* Halt */
     while (1)
