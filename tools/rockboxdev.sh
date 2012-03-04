@@ -357,6 +357,10 @@ do
     echo ""
     case $arch in
         [Ss])
+            # For binutils 2.16.1 builtin rules conflict on some systems with a
+            # default rule for Objective C. Disable the builtin make rules. See
+            # http://sourceware.org/ml/binutils/2005-12/msg00259.html
+            export MAKEFLAGS="-r $MAKEFLAGS"
             build "binutils" "sh-elf" "2.16.1" "" "--disable-werror"
             build "gcc" "sh-elf" "4.0.3" "gcc-4.0.3-rockbox-1.diff"
             ;;
