@@ -37,16 +37,17 @@
 #include "storage.h"
 #include "rolo.h"
 
-#ifdef MI4_FORMAT
+#include "loader_strerror.h"
+#if defined(MI4_FORMAT)
 #include "crc32-mi4.h"
-#undef FIRMWARE_OFFSET_FILE_CRC
-#undef FIRMWARE_OFFSET_FILE_DATA
-#define FIRMWARE_OFFSET_FILE_CRC     0xC
-#define FIRMWARE_OFFSET_FILE_DATA    0x200
-#endif
-
-#ifdef RKW_FORMAT
+#include "mi4-loader.h"
+#define LOAD_FIRMWARE(a,b,c) load_mi4(a,b,c)
+#elif defined(RKW_FORMAT)
 #include "rkw-loader.h"
+#define LOAD_FIRMWARE(a,b,c) load_rkw(a,b,c)
+#else
+#include "rb-loader.h"
+#define LOAD_FIRMWARE(a,b,c) load_firmware(a,b,c)
 #endif
 
 #if !defined(IRIVER_IFP7XX_SERIES)
@@ -206,7 +207,7 @@ extern unsigned long loadaddress;
  * Filename must be a fully defined filename including the path and extension
  *
  ***************************************************************************/
-#ifdef RKW_FORMAT
+#if defined(CPU_COLDFIRE) || defined(CPU_ARM) || defined(CPU_MIPS)
 int rolo_load(const char* filename)
 {
     unsigned char* ramstart = (void*)&loadaddress;
@@ -232,14 +233,25 @@ int rolo_load(const char* filename)
     rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
     filebuf = core_get_data(rolo_handle);
 
-    errno = load_rkw(filebuf, filename, filebuf_size);
-    if (errno < 0)
+    errno = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
+
+    if (errno <= 0)
     {
-        rolo_error(rkw_strerror(errno));
+        rolo_error(loader_strerror(errno));
         return -1;
     }
     else
         length = errno;
+
+#if defined(CPU_PP) && NUM_CORES > 1
+    lcd_puts(0, 2, "Waiting for coprocessor...");
+    lcd_update();
+    rolo_restart_cop();
+    /* Wait for COP to be in safe code */
+    while(cpu_reply != 1);
+    lcd_puts(0, 2, "                          ");
+    lcd_update();
+#endif
 
 #ifdef HAVE_STORAGE_FLUSH
     lcd_puts(0, 1, "Flushing storage buffers");
@@ -255,27 +267,29 @@ int rolo_load(const char* filename)
 #endif
     adc_close();
 
+#if CONFIG_CPU != IMX31L /* We're not finished yet */
+#ifdef CPU_ARM
+    /* Should do these together since some ARM version should never have
+     * FIQ disabled and not IRQ (imx31 errata). */
     disable_interrupt(IRQ_FIQ_STATUS);
+#else
+    /* Some targets have a higher disable level than HIGEST_IRQ_LEVEL */
+    set_irq_level(DISABLE_INTERRUPTS);
+#endif
+#endif /* CONFIG_CPU == IMX31L */
 
     rolo_restart(filebuf, ramstart, length);
 
     /* never reached */
     return 0;
 }
-#else
+#else /* defined(CPU_SH) */
 int rolo_load(const char* filename)
 {
     int fd;
     long length;
-#if defined(CPU_COLDFIRE) || defined(CPU_ARM) || defined(CPU_MIPS)
-#if !defined(MI4_FORMAT)
-    int i;
-#endif
-    unsigned long checksum,file_checksum;
-#else
     long file_length;
     unsigned short checksum,file_checksum;
-#endif
     unsigned char* ramstart = (void*)&loadaddress;
     unsigned char* filebuf;
     size_t filebuf_size;
@@ -306,87 +320,6 @@ int rolo_load(const char* filename)
     rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
     filebuf = core_get_data(rolo_handle);
 
-#if CONFIG_CPU != SH7034
-    /* Read and save checksum */
-    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
-    if (read(fd, &file_checksum, 4) != 4) {
-        rolo_error("Error Reading checksum");
-        return -1;
-    }
-
-#if !defined(MI4_FORMAT)
-    /* Rockbox checksums are big-endian */
-    file_checksum = betoh32(file_checksum);
-#endif
-
-#if defined(CPU_PP) && NUM_CORES > 1
-    lcd_puts(0, 2, "Waiting for coprocessor...");
-    lcd_update();
-    rolo_restart_cop();
-    /* Wait for COP to be in safe code */
-    while(cpu_reply != 1);
-    lcd_puts(0, 2, "                          ");
-    lcd_update();
-#endif
-
-    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
-
-    /* this shouldn't happen, but well */
-    if ((long)filebuf_size < length)
-    {
-        rolo_error("File too big");
-        return -1;
-    }
-
-    if (read(fd, filebuf, length) != length) {
-        rolo_error("Error Reading File");
-        return -1;
-    }
-
-#ifdef MI4_FORMAT
-    /* Check CRC32 to see if we have a valid file */
-    chksum_crc32gentab();
-    checksum = chksum_crc32 (filebuf, length);
-#else
-    checksum = MODEL_NUMBER;
-
-    for(i = 0;i < length;i++) {
-        checksum += filebuf[i];
-    }
-#endif
-
-    /* Verify checksum against file header */
-    if (checksum != file_checksum) {
-        rolo_error("Checksum Error");
-        return -1;
-    }
-
-#ifdef HAVE_STORAGE_FLUSH
-    lcd_puts(0, 1, "Flushing storage buffers");
-    lcd_update();
-    storage_flush();
-#endif
-
-    lcd_puts(0, 1, "Executing");
-    lcd_update();
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_puts(0, 1, "Executing");
-    lcd_remote_update();
-#endif
-    adc_close();
-
-#if CONFIG_CPU != IMX31L /* We're not finished yet */
-#ifdef CPU_ARM
-    /* Should do these together since some ARM version should never have
-     * FIQ disabled and not IRQ (imx31 errata). */
-    disable_interrupt(IRQ_FIQ_STATUS);
-#else
-    /* Some targets have a higher disable level than HIGEST_IRQ_LEVEL */
-    set_irq_level(DISABLE_INTERRUPTS);
-#endif
-#endif /* CONFIG_CPU == IMX31L */
-
-#else /* CONFIG_CPU == SH7034 */
     /* Read file length from header and compare to real file length */
     lseek(fd, FIRMWARE_OFFSET_FILE_LENGTH, SEEK_SET);
     if(read(fd, &file_length, 4) != 4) {
@@ -451,13 +384,12 @@ int rolo_load(const char* filename)
     defined(ARCHOS_FMRECORDER)
     PAIOR = 0x0FA0;
 #endif
-#endif
     rolo_restart(filebuf, ramstart, length);
 
     return 0; /* this is never reached */
     (void)checksum; (void)file_checksum;
 }
-#endif /* ifdef RKW_FORMAT */
+#endif /*  */
 #else  /* !defined(IRIVER_IFP7XX_SERIES) */
 int rolo_load(const char* filename)
 {
