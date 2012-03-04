@@ -44,6 +44,8 @@
 #include "power.h"
 #include "file.h"
 #include "common.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 #include "version.h"
 
 /* Safety measure - maximum allowed firmware image size. 
@@ -238,10 +240,10 @@ void main(void)
         printf("Loading Rockbox...");
         rc=load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
 
-        if (rc != EOK) {
+        if (rc <= EFILE_EMPTY) {
             printf("Error!");
             printf("Can't load " BOOTFILE ": ");
-            printf(strerror(rc));
+            printf(loader_strerror(rc));
             fatal_error();
         }
 
