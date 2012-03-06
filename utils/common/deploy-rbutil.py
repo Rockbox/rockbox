@@ -57,7 +57,7 @@ deploy.progexe = {
 }
 deploy.regreplace = {
     "rbutil/rbutilqt/version.h"  : [["\$Rev\$", "%REVISION%"],
-                                    ["(^#define BUILDID).*", "\\1 \"-%BUILDID%\""]],
+                                    ["(^#define BUILDID).*", "\\1 \"%BUILDID%\""]],
     "rbutil/rbutilqt/Info.plist" : [["\$Rev\$", "%REVISION%"]],
 }
 # OS X 10.6 defaults to gcc 4.2. Building universal binaries that are

@@ -569,10 +569,13 @@ def deploy():
                     # replacements made on the replacement string:
                     # %REVISION% is replaced with the revision number
                     replacement = re.sub("%REVISION%", str(revision), r[1])
-                    # %BUILD% is replace with buildid as passed on the command line
+                    newline = re.sub(r[0], replacement, newline)
+                    # %BUILD% is replaced with buildid as passed on the command line
                     if buildid != None:
-                        replacement = re.sub("%BUILDID%", str(buildid), replacement)
-                        newline = re.sub(r[0], replacement, newline)
+                        replacement = re.sub("%BUILDID%", "-" + str(buildid), replacement)
+                    else:
+                        replacement = re.sub("%BUILDID%", "", replacement)
+                    newline = re.sub(r[0], replacement, newline)
                 outfile.write(newline)
             outfile.close()
 
