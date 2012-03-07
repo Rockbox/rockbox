@@ -36,6 +36,7 @@
 /* Ensure TEXT_XPOS is >= 0 */
 #define TEXT_WIDTH ((sizeof(BOOT_VERSION)-1)*SYSFONT_WIDTH)
 #define TEXT_XPOS ((TEXT_WIDTH > LCD_WIDTH) ? 0 : ((LCD_WIDTH - TEXT_WIDTH) / 2))
+#define LOGO_XPOS ((LCD_WIDTH - BMPWIDTH_rockboxlogo) / 2)
 
 void show_logo( void )
 {
@@ -46,9 +47,9 @@ void show_logo( void )
     /* The top 16 lines of the Sansa Clip screen are yellow, and the bottom 48 
        are blue, so we reverse the usual positioning */
     lcd_putsxy(TEXT_XPOS, 0, BOOT_VERSION);
-    lcd_bmp(&bm_rockboxlogo, 0, 16);
+    lcd_bmp(&bm_rockboxlogo, LOGO_XPOS, 16);
 #else
-    lcd_bmp(&bm_rockboxlogo, 0, 10);
+    lcd_bmp(&bm_rockboxlogo, LOGO_XPOS, 10);
     lcd_putsxy(TEXT_XPOS, LCD_HEIGHT-SYSFONT_HEIGHT, BOOT_VERSION);
 #endif
 
