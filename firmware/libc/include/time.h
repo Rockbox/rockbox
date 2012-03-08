@@ -34,6 +34,8 @@ typedef long time_t;
 #define _TIME_T_DECLARED
 time_t time(time_t *t);
 struct tm *localtime(const time_t *timep);
+struct tm *gmtime(const time_t *timep);
+struct tm *gmtime_r(const time_t *timep, struct tm *result);
 time_t mktime(struct tm *t);
 
 #endif /* SIMULATOR */
