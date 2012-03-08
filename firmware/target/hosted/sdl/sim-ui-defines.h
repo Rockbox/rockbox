@@ -289,10 +289,10 @@
 
 #elif defined(SANSA_FUZEPLUS)
 #define UI_TITLE                    "Sansa Fuze+"
-#define UI_WIDTH                    323 /* width of GUI window */
-#define UI_HEIGHT                   595 /* height of GUI window */
-#define UI_LCD_POSX                 44 /* x position of lcd */
-#define UI_LCD_POSY                 47 /* y position of lcd */
+#define UI_WIDTH                    322 /* width of GUI window */
+#define UI_HEIGHT                   609 /* height of GUI window */
+#define UI_LCD_POSX                 43 /* x position of lcd */
+#define UI_LCD_POSY                 62 /* y position of lcd */
 
 
 #elif defined(SANSA_FUZE) || defined(SANSA_FUZEV2)
