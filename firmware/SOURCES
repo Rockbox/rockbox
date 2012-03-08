@@ -128,6 +128,7 @@ libc/strncmp.c
 libc/strrchr.c
 libc/strstr.c
 libc/mktime.c
+libc/gmtime.c
 #endif /* CONFIG_PLATFORM || HAVE_ROCKBOX_C_LIBRARY */
 
 /* Common */
