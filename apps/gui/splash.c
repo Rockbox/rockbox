@@ -195,6 +195,9 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     screen->update_viewport();
 end:
     screen->set_viewport(NULL);
+
+    extern void play_dukes(void);
+    play_dukes();
 }
 
 void splashf(int ticks, const char *fmt, ...)

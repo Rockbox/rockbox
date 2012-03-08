@@ -135,6 +135,16 @@ enum current_activity {
 void beep_play(unsigned int frequency, unsigned int duration,
                unsigned int amplitude);
 
+struct beep_params
+{
+    unsigned int frequency; /* Frequency in 16.16 fixed point */
+    unsigned int duration;  /* Duration in microseconds */
+    unsigned int amplitude; /* 15-bit amplitude */
+    /* For "rest" of a given duration, set frequency and/or amplitude to 0 */
+};
+
+void beep_play_melody(const struct beep_params *params, unsigned int count);
+
 enum system_sound
 {
     SOUND_KEYCLICK = 0,

@@ -851,13 +851,13 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
 /* Play a standard sound */
 void system_sound_play(enum system_sound sound)
 {
-    static const struct beep_params
+    static const struct bparms
     {
         int *setting;
         unsigned short frequency;
         unsigned short duration;
         unsigned short amplitude;
-    } beep_params[] =
+    } bparms[] =
     {
         [SOUND_KEYCLICK] =
         { &global_settings.keyclick,
@@ -870,13 +870,38 @@ void system_sound_play(enum system_sound sound)
           1000, 100, 1500 },
     };
 
-    const struct beep_params *params = &beep_params[sound];
+    const struct bparms *params = &bparms[sound];
 
     if (*params->setting)
     {
         beep_play(params->frequency, params->duration,
                   params->amplitude * *params->setting);
     }
+}
+
+void play_dukes(void)
+{
+    static const struct beep_params dixie[] =
+    {
+        /* 120 BPM */
+        { 51379626, 125000, 2048 }, /* G5 - 1/16 */
+        { 43204943, 125000, 2048 }, /* E5 - 1/16 */
+        { 34291786, 250000, 2048 }, /* C5 - 1/8  */
+        { 34291786, 250000, 2048 }, /* C5 - 1/8  */
+        { 34291786, 125000, 2048 }, /* C5 - 1/16 */
+        { 38491228, 125000, 2048 }, /* D5 - 1/16 */
+        { 43204943, 125000, 2048 }, /* E5 - 1/16 */
+        { 45774043, 125000, 2048 }, /* F5 - 1/16 */
+        { 51379626, 218750, 2048 }, /* G5 - 1/8  */
+        {        0,  31250,    0 }, /* xx        */
+        { 51379626, 218750, 2048 }, /* G5 - 1/8  */
+        {        0,  31250,    0 }, /* xx        */
+        { 51379626, 218750, 2048 }, /* G5 - 1/8  */
+        {        0,  31250,    0 }, /* xx        */
+        { 43204943, 125000, 2048 }, /* E5 - 1/16 */
+    };
+
+    beep_play_melody(dixie, ARRAYLEN(dixie));
 }
 
 static keyclick_callback keyclick_current_callback = NULL;

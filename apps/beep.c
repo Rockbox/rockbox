@@ -39,27 +39,71 @@ static uint32_t beep_amplitude; /* Amplitude of square wave generator */
 #endif
 static int beep_count;          /* Number of samples remaining to generate */
 
+static const struct beep_params *melody_note = NULL;
+static int melody_count = 0;
+
 /* Reserve enough static space for keyclick to fit */
-#define BEEP_BUF_COUNT (NATIVE_FREQUENCY / 1000 * KEYCLICK_DURATION)
+#define BEEP_BUF_COUNT (NATIVE_FREQUENCY * (int64_t)KEYCLICK_DURATION / 1000)
 static int16_t beep_buf[BEEP_BUF_COUNT*2] IBSS_ATTR __attribute__((aligned(4)));
+
+static void beep_set_params(unsigned int frequency, unsigned int duration,
+                            unsigned int amplitude)
+{
+    /* Setup the parameters for the square wave generator */
+    beep_phase = 0;
+
+    if (frequency == 0 || amplitude == 0)
+    {
+        /* Generating musical rest */
+        frequency = amplitude = 0;
+    }
+
+    beep_step = (0x100000000ull * frequency / NATIVE_FREQUENCY) >> 16;
+    beep_count = NATIVE_FREQUENCY * (uint64_t)duration / 1000000;
+
+#ifdef BEEP_GENERIC
+    beep_amplitude = amplitude;
+#else
+    /* Optimized routines do XOR with phase sign bit in both channels at once */
+    beep_amplitude = amplitude | (amplitude << 16); /* Word:|AMP16|AMP16| */
+#endif
+}
 
 /* Callback to generate the beep frames - also don't want inlining of
    call below in beep_play */
 static void __attribute__((noinline))
 beep_get_more(const void **start, size_t *size)
 {
-    int count = beep_count;
-
-    if (count > 0)
+    while (1)
     {
-        count = MIN(count, BEEP_BUF_COUNT);
-        beep_count -= count;
-        *start = beep_buf;
-        *size = count * 2 * sizeof (int16_t);
-        beep_generate((void *)beep_buf, count, &beep_phase,
-                      beep_step, beep_amplitude);
+        int count = beep_count;
+
+        if (LIKELY(count > 0))
+        {
+            count = MIN(count, BEEP_BUF_COUNT);
+            beep_count -= count;
+            *start = beep_buf;
+            *size = count * 2 * sizeof (int16_t);
+            beep_generate((void *)beep_buf, count, &beep_phase,
+                          beep_step, beep_amplitude);
+            return;
+        }
+
+        if (melody_note == NULL)
+            return;
+
+        if (--melody_count == 0)
+        {
+            melody_note = NULL;
+            return;
+        }
+
+        /* Get next note to play */
+        const struct beep_params *note = ++melody_note;
+        beep_set_params(note->frequency, note->duration, note->amplitude);
     }
 }
+
 
 /* Generates a constant square wave sound with a given frequency in Hertz for
    a duration in milliseconds */
@@ -68,23 +112,16 @@ void beep_play(unsigned int frequency, unsigned int duration,
 {
     mixer_channel_stop(PCM_MIXER_CHAN_BEEP);
 
+    melody_note = NULL;
+    melody_count = 0;    
+
     if (frequency == 0 || duration == 0 || amplitude == 0)
         return;
 
     if (amplitude > INT16_MAX)
         amplitude = INT16_MAX;
 
-    /* Setup the parameters for the square wave generator */
-    beep_phase = 0;
-    beep_step = 0xffffffffu / NATIVE_FREQUENCY * frequency;
-    beep_count = NATIVE_FREQUENCY / 1000 * duration;
-
-#ifdef BEEP_GENERIC
-    beep_amplitude = amplitude;
-#else
-    /* Optimized routines do XOR with phase sign bit in both channels at once */
-    beep_amplitude = amplitude | (amplitude << 16); /* Word:|AMP16|AMP16| */
-#endif
+    beep_set_params(frequency << 16, duration*1000, amplitude);
 
     /* If it fits - avoid cb overhead */
     const void *start;
@@ -97,4 +134,20 @@ void beep_play(unsigned int frequency, unsigned int duration,
     mixer_channel_play_data(PCM_MIXER_CHAN_BEEP,
                             beep_count ? beep_get_more : NULL,
                             start, size);
+}
+
+void beep_play_melody(const struct beep_params *params, unsigned int count)
+{
+    mixer_channel_stop(PCM_MIXER_CHAN_BEEP);
+
+    if (!(params && count > 0))
+        return;
+
+    melody_note = params;
+    melody_count = count;
+
+    beep_set_params(params->frequency, params->duration, params->amplitude);
+
+    mixer_channel_set_amplitude(PCM_MIXER_CHAN_BEEP, MIX_AMP_UNITY);
+    mixer_channel_play_data(PCM_MIXER_CHAN_BEEP, beep_get_more, NULL, 0);
 }
