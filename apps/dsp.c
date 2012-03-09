@@ -953,17 +953,13 @@ void dsp_set_eq_precut(int precut)
  */
 void dsp_set_eq_coefs(int band)
 {
-    const int *setting;
-    long gain;
-    unsigned long cutoff, q;
-
     /* Adjust setting pointer to the band we actually want to change */
-    setting = &global_settings.eq_band0_cutoff + (band * 3);
+    struct eq_band_setting *setting = &global_settings.eq_band_settings[band];
 
     /* Convert user settings to format required by coef generator functions */
-    cutoff = 0xffffffff / NATIVE_FREQUENCY * (*setting++);
-    q = *setting++;
-    gain = *setting++;
+    unsigned long cutoff = 0xffffffff / NATIVE_FREQUENCY * setting->cutoff;
+    unsigned long q = setting->q;
+    int gain = setting->gain;
 
     if (q == 0)
         q = 1;

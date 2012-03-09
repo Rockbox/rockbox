@@ -97,23 +97,38 @@ static int eq_setting_callback(int action, const struct menu_item_ex *this_item)
 MENUITEM_SETTING(eq_enable, &global_settings.eq_enabled, eq_setting_callback);
 MENUITEM_SETTING(eq_precut, &global_settings.eq_precut, eq_setting_callback);
 
-MENUITEM_SETTING(cutoff_0, &global_settings.eq_band0_cutoff, eq_setting_callback);
-MENUITEM_SETTING(cutoff_1, &global_settings.eq_band1_cutoff, eq_setting_callback);
-MENUITEM_SETTING(cutoff_2, &global_settings.eq_band2_cutoff, eq_setting_callback);
-MENUITEM_SETTING(cutoff_3, &global_settings.eq_band3_cutoff, eq_setting_callback);
-MENUITEM_SETTING(cutoff_4, &global_settings.eq_band4_cutoff, eq_setting_callback);
+MENUITEM_SETTING(cutoff_0, &global_settings.eq_band_settings[0].cutoff,
+                 eq_setting_callback);
+MENUITEM_SETTING(cutoff_1, &global_settings.eq_band_settings[1].cutoff,
+                 eq_setting_callback);
+MENUITEM_SETTING(cutoff_2, &global_settings.eq_band_settings[2].cutoff,
+                 eq_setting_callback);
+MENUITEM_SETTING(cutoff_3, &global_settings.eq_band_settings[3].cutoff,
+                 eq_setting_callback);
+MENUITEM_SETTING(cutoff_4, &global_settings.eq_band_settings[4].cutoff,
+                 eq_setting_callback);
 
-MENUITEM_SETTING(q_0, &global_settings.eq_band0_q, eq_setting_callback);
-MENUITEM_SETTING(q_1, &global_settings.eq_band1_q, eq_setting_callback);
-MENUITEM_SETTING(q_2, &global_settings.eq_band2_q, eq_setting_callback);
-MENUITEM_SETTING(q_3, &global_settings.eq_band3_q, eq_setting_callback);
-MENUITEM_SETTING(q_4, &global_settings.eq_band4_q, eq_setting_callback);
+MENUITEM_SETTING(q_0, &global_settings.eq_band_settings[0].q,
+                 eq_setting_callback);
+MENUITEM_SETTING(q_1, &global_settings.eq_band_settings[1].q,
+                 eq_setting_callback);
+MENUITEM_SETTING(q_2, &global_settings.eq_band_settings[2].q,
+                 eq_setting_callback);
+MENUITEM_SETTING(q_3, &global_settings.eq_band_settings[3].q,
+                 eq_setting_callback);
+MENUITEM_SETTING(q_4, &global_settings.eq_band_settings[4].q,
+                 eq_setting_callback);
 
-MENUITEM_SETTING(gain_0, &global_settings.eq_band0_gain, eq_setting_callback);
-MENUITEM_SETTING(gain_1, &global_settings.eq_band1_gain, eq_setting_callback);
-MENUITEM_SETTING(gain_2, &global_settings.eq_band2_gain, eq_setting_callback);
-MENUITEM_SETTING(gain_3, &global_settings.eq_band3_gain, eq_setting_callback);
-MENUITEM_SETTING(gain_4, &global_settings.eq_band4_gain, eq_setting_callback);
+MENUITEM_SETTING(gain_0, &global_settings.eq_band_settings[0].gain,
+                 eq_setting_callback);
+MENUITEM_SETTING(gain_1, &global_settings.eq_band_settings[1].gain,
+                 eq_setting_callback);
+MENUITEM_SETTING(gain_2, &global_settings.eq_band_settings[2].gain,
+                 eq_setting_callback);
+MENUITEM_SETTING(gain_3, &global_settings.eq_band_settings[3].gain,
+                 eq_setting_callback);
+MENUITEM_SETTING(gain_4, &global_settings.eq_band_settings[4].gain,
+                 eq_setting_callback);
 
 static char* gainitem_get_name(int selected_item, void * data, char *buffer)
 {
@@ -145,23 +160,28 @@ static int do_option(void * param)
 MENUITEM_FUNCTION_DYNTEXT(gain_item_0, MENU_FUNC_USEPARAM,
                           do_option, (void*)&gain_0, 
                           gainitem_get_name, gainitem_speak_item,
-                          &global_settings.eq_band0_cutoff, NULL, Icon_NOICON);
+                          &global_settings.eq_band_settings[0].cutoff,
+                          NULL, Icon_NOICON);
 MENUITEM_FUNCTION_DYNTEXT(gain_item_1, MENU_FUNC_USEPARAM,
                           do_option, (void*)&gain_1,
                           gainitem_get_name, gainitem_speak_item,
-                          &global_settings.eq_band1_cutoff, NULL, Icon_NOICON);
+                          &global_settings.eq_band_settings[1].cutoff,
+                          NULL, Icon_NOICON);
 MENUITEM_FUNCTION_DYNTEXT(gain_item_2, MENU_FUNC_USEPARAM,
                           do_option, (void*)&gain_2,
                           gainitem_get_name, gainitem_speak_item,
-                          &global_settings.eq_band2_cutoff, NULL, Icon_NOICON);
+                          &global_settings.eq_band_settings[2].cutoff,
+                          NULL, Icon_NOICON);
 MENUITEM_FUNCTION_DYNTEXT(gain_item_3, MENU_FUNC_USEPARAM,
                           do_option, (void*)&gain_3,
                           gainitem_get_name, gainitem_speak_item,
-                          &global_settings.eq_band3_cutoff, NULL, Icon_NOICON);
+                          &global_settings.eq_band_settings[3].cutoff,
+                          NULL, Icon_NOICON);
 MENUITEM_FUNCTION_DYNTEXT(gain_item_4, MENU_FUNC_USEPARAM,
                           do_option, (void*)&gain_4,
                           gainitem_get_name, gainitem_speak_item,
-                          &global_settings.eq_band4_cutoff, NULL, Icon_NOICON);
+                          &global_settings.eq_band_settings[4].cutoff,
+                          NULL, Icon_NOICON);
                                     
 MAKE_MENU(gain_menu, ID2P(LANG_EQUALIZER_GAIN), NULL, Icon_NOICON, &gain_item_0, 
             &gain_item_1, &gain_item_2, &gain_item_3, &gain_item_4);
@@ -349,15 +369,15 @@ static void draw_eq_sliders(struct screen * screen, int x, int y,
                             int nb_eq_sliders, int start_item,
                             int current_band, enum eq_slider_mode mode)
 {
-    int i, gain, q, cutoff;
     int height = y;
-    int *setting = &global_settings.eq_band0_cutoff;
 
-    start_item = MIN(start_item, 5-nb_eq_sliders);
-    for (i=0; i<5; i++) {
-        cutoff = *setting++;
-        q = *setting++;
-        gain = *setting++;
+    start_item = MIN(start_item, 5 - nb_eq_sliders);
+
+    for (int i = 0; i < 5; i++) {
+        struct eq_band_setting *setting = &global_settings.eq_band_settings[i];
+        int cutoff = setting->cutoff;
+        int q      = setting->q;
+        int gain   = setting->gain;
 
         if (i == start_item + nb_eq_sliders)
             break;
@@ -370,6 +390,7 @@ static void draw_eq_sliders(struct screen * screen, int x, int y,
             height++;
         }
     }
+
     if (nb_eq_sliders != 5)
         gui_scrollbar_draw(screen, 0, y, SCROLLBAR_SIZE - 1,
                            screen->lcdheight - y, 5,
@@ -429,8 +450,7 @@ bool eq_menu_graphical(void)
             /* Set pointer to the band data currently editable */
             if (mode == GAIN) {
                 /* gain */
-                setting = &global_settings.eq_band0_gain;
-                setting += current_band * 3;
+                setting = &global_settings.eq_band_settings[current_band].gain;
 
                 step = EQ_GAIN_STEP;
                 fast_step = EQ_GAIN_FAST_STEP;
@@ -443,8 +463,7 @@ bool eq_menu_graphical(void)
                 screens[i].putsxy(0, 0, buf);
             } else if (mode == CUTOFF) {
                 /* cutoff */
-                setting = &global_settings.eq_band0_cutoff;
-                setting += current_band * 3;
+                setting = &global_settings.eq_band_settings[current_band].cutoff;
 
                 step = EQ_CUTOFF_STEP;
                 fast_step = EQ_CUTOFF_FAST_STEP;
@@ -457,8 +476,7 @@ bool eq_menu_graphical(void)
                 screens[i].putsxy(0, 0, buf);
             } else {
                 /* Q */
-                setting = &global_settings.eq_band0_q;
-                setting += current_band * 3;
+                setting = &global_settings.eq_band_settings[current_band].q;
 
                 step = EQ_Q_STEP;
                 fast_step = EQ_Q_FAST_STEP;
