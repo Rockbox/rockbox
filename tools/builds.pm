@@ -304,7 +304,7 @@ $releasenotes="/wiki/ReleaseNotes310";
     },
     'mpiohd300' => {
         name => 'MPIO HD300',
-        status => 2,
+        status => 3,
     },
 );
 
