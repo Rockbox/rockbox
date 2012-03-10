@@ -109,3 +109,7 @@ static FORCE_INLINE void write_samples(int16_t *out,
 
 
 #endif /* CPU_* */
+
+#ifndef restore_emac_context
+#define restore_emac_context() do{}while(0)
+#endif

@@ -232,6 +232,8 @@ fill_frame:
         *downmix_buf[downmix_index] = downmix_index ? 0x7fff7fff : 0x80008000;
 #endif
 
+    restore_emac_context();
+
     return PCM_DMAST_OK;
 }
 
