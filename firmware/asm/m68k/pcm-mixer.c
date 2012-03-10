@@ -23,36 +23,50 @@
 #define MIXER_OPTIMIZED_WRITE_SAMPLES
 static struct emac_context
 {
+    unsigned long saved;
     unsigned long r[4];
 } emac_context IBSS_ATTR;
 
 /* Save emac context affected in ISR */
 static FORCE_INLINE void save_emac_context(void)
 {
-    asm volatile (
-        "move.l   %%macsr, %%d0             \n"
-        "move.l   %%accext01, %%d1          \n"
-        "movclr.l %%acc0, %%a0              \n"
-        "movclr.l %%acc1, %%a1              \n"
-        "movem.l  %%d0-%%d1/%%a0-%%a1, (%0) \n"
-        :
-        : "a"(&emac_context)
-        : "d0", "d1", "a0", "a1");
+    /* Save only if not already saved */
+    if (emac_context.saved == 0)
+    {
+        emac_context.saved = 1;
+        asm volatile (
+            "move.l   %%macsr, %%d0             \n"
+            "move.l   %%accext01, %%d1          \n"
+            "movclr.l %%acc0, %%a0              \n"
+            "movclr.l %%acc1, %%a1              \n"
+            "movem.l  %%d0-%%d1/%%a0-%%a1, (%0) \n"
+            "move.l   %1, %%macsr               \n"
+            :
+            : "a"(&emac_context.r), "i"(EMAC_ROUND | EMAC_SATURATE)
+            : "d0", "d1", "a0", "a1");
+    }
 }
 
 /* Restore emac context affected in ISR */
 static FORCE_INLINE void restore_emac_context(void)
 {
-    asm volatile (
-        "movem.l (%0), %%d0-%%d1/%%a0-%%a1  \n"
-        "move.l  %%a1, %%acc1               \n"
-        "move.l  %%a0, %%acc0               \n"
-        "move.l  %%d1, %%accext01           \n"
-        "move.l  %%d0, %%macsr              \n"
-        :
-        : "a"(&emac_context)
-        : "d0", "d1", "a0", "a1");
+    /* Restore only if saved */
+    if (UNLIKELY(emac_context.saved != 0))
+    {
+        asm volatile (
+           "movem.l (%0), %%d0-%%d1/%%a0-%%a1  \n"
+           "move.l  %%a1, %%acc1               \n"
+           "move.l  %%a0, %%acc0               \n"
+           "move.l  %%d1, %%accext01           \n"
+           "move.l  %%d0, %%macsr              \n"
+           :
+           : "a"(&emac_context.r)
+           : "d0", "d1", "a0", "a1");
+        emac_context.saved = 0;
+    }
 }
+
+#define mixer_buffer_callback_exit() restore_emac_context()
 
 /* Mix channels' samples and apply gain factors */
 static FORCE_INLINE void mix_samples(void *out,
@@ -64,7 +78,6 @@ static FORCE_INLINE void mix_samples(void *out,
 {
     uint32_t s0, s1, s2, s3;
     save_emac_context();
-    coldfire_set_macsr(EMAC_ROUND | EMAC_SATURATE);
 
     asm volatile (
         "move.l     (%1)+, %5                 \n"
@@ -88,8 +101,6 @@ static FORCE_INLINE void mix_samples(void *out,
           "=&a"(s0), "=&d"(s1), "=&d"(s2), "=&d"(s3)
         : "r"(src0_amp), "r"(src1_amp), "d"(16)
     );
-
-    restore_emac_context();
 }
 
 /* Write channel's samples and apply gain factor */
@@ -108,7 +119,6 @@ static FORCE_INLINE void write_samples(void *out,
         /* Channel needs amplitude cut */
         uint32_t s0, s1, s2, s3;
         save_emac_context();
-        coldfire_set_macsr(EMAC_ROUND | EMAC_SATURATE);
 
         asm volatile (
             "move.l     (%1)+, %4                 \n"
@@ -128,7 +138,5 @@ static FORCE_INLINE void write_samples(void *out,
               "=&a"(s0), "=&d"(s1), "=&d"(s2), "=&d"(s3)
             : "r"(amp), "d"(16)
         );
-
-        restore_emac_context();
     }     
 }
