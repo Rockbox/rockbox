@@ -109,3 +109,7 @@ static FORCE_INLINE void write_samples(int16_t *out,
 
 
 #endif /* CPU_* */
+
+#ifndef mixer_buffer_callback_exit
+#define mixer_buffer_callback_exit() do{}while(0)
+#endif

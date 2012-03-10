@@ -216,6 +216,9 @@ fill_frame:
             mixsize = MIX_FRAME_SIZE - next_size;
             goto fill_frame;
         }
+
+        /* Certain SoC's have to do cleanup */
+        mixer_buffer_callback_exit();
     }
     else if (idle_counter++ < MAX_IDLE_FRAMES)
     {
