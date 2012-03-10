@@ -232,6 +232,9 @@ fill_frame:
         *downmix_buf[downmix_index] = downmix_index ? 0x7fff7fff : 0x80008000;
 #endif
 
+    /* Certain SoC's have to do cleanup */
+    mixer_buffer_callback_exit();
+
     return PCM_DMAST_OK;
 }
 
