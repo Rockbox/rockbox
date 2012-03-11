@@ -53,7 +53,7 @@ struct tm *gmtime_r(const time_t *timep, struct tm *tm)
     int year, i, mday, hour, min;
 
     /* weekday */
-    tm->tm_wday = ((seconds % WEEK_SECONDS) / DAY_SECONDS + 4) % 7;
+    tm->tm_wday = (seconds / DAY_SECONDS + 4) % 7;
 
     /* Year */
     year = 1970;
