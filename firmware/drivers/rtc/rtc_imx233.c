@@ -19,34 +19,14 @@
  *
  ****************************************************************************/
 
+#include "config.h"
+#include "time.h"
 #include "system.h"
 #include "rtc.h"
 #include "timefuncs.h"
 #include "rtc-imx233.h"
 
-#if defined(SANSA_FUZEPLUS)
-#define SECS_ADJUST 315532800   /* seconds between 1970-1-1 and 1980-1-1 */
-#else
-#define SECS_ADJUST 0
-#endif
-
-#define MINUTE_SECONDS      60
-#define HOUR_SECONDS        3600
-#define DAY_SECONDS         86400
-#define WEEK_SECONDS        604800
-#define YEAR_SECONDS        31536000
-#define LEAP_YEAR_SECONDS   31622400
-
-/* Days in each month */
-static unsigned int days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-static inline bool is_leapyear(int year)
-{
-    if( ((year%4)==0) && (((year%100)!=0) || ((year%400)==0)) )
-        return true;
-    else
-        return false;
-}
+#define YEAR1980    315532800   /* 1980/1/1 00:00:00 in UTC */
 
 void rtc_init(void)
 {
@@ -55,7 +35,7 @@ void rtc_init(void)
 
 int rtc_read_datetime(struct tm *tm)
 {
-    uint32_t seconds = imx233_rtc_read_seconds() - SECS_ADJUST;
+    uint32_t seconds = imx233_rtc_read_seconds();
     #ifdef SANSA_FUZEPLUS
     /* The OF uses PERSISTENT2 register to keep the adjustment and only changes
      * SECONDS if necessary. */
@@ -63,100 +43,19 @@ int rtc_read_datetime(struct tm *tm)
     #else
     /* The Freescale recommended way of keeping time is the number of seconds
      * since 00:00 1/1/1980 */
+    seconds += YEAR1980;
     #endif
 
-    /* Convert seconds since 00:00 1/1/xxxx (xxxx=year) */
-
-    /* weekday */
-    tm->tm_wday = ((seconds % WEEK_SECONDS) / DAY_SECONDS + 2) % 7;
-
-    /* Year */
-    int year = 1980;
-    while(seconds >= LEAP_YEAR_SECONDS)
-    {
-        if(is_leapyear(year))
-            seconds -= LEAP_YEAR_SECONDS;
-        else
-            seconds -= YEAR_SECONDS;
-
-        year++;
-    }
-
-    if(is_leapyear(year))
-        days_in_month[1] = 29;
-    else
-    {
-        days_in_month[1] = 28;
-        if(seconds>YEAR_SECONDS)
-        {
-            year++;
-            seconds -= YEAR_SECONDS;
-        }
-    }
-    tm->tm_year = year % 100 + 100;
-
-    /* Month */
-    for(int i = 0; i < 12; i++)
-    {
-        if(seconds < days_in_month[i] * DAY_SECONDS)
-        {
-            tm->tm_mon = i;
-            break;
-        }
-
-        seconds -= days_in_month[i] * DAY_SECONDS;
-    }
-
-    /* Month Day */
-    int mday = seconds / DAY_SECONDS;
-    seconds -= mday * DAY_SECONDS;
-    tm->tm_mday = mday + 1; /* 1 ... 31 */
-
-    /* Hour */
-    int hour = seconds / HOUR_SECONDS;
-    seconds -= hour*HOUR_SECONDS;
-    tm->tm_hour = hour;
-
-    /* Minute */
-    int min = seconds / MINUTE_SECONDS;
-    seconds -= min*MINUTE_SECONDS;
-    tm->tm_min = min;
-
-    /* Second */
-    tm->tm_sec = seconds;
+    gmtime_r(&seconds, tm);
 
     return 0;
 }
 
 int rtc_write_datetime(const struct tm *tm)
 {
-    int i, year;
-    unsigned int year_days = 0;
-    unsigned int month_days = 0;
-    unsigned int seconds = 0;
+    uint32_t seconds;
 
-    year = 2000 + tm->tm_year - 100;
-
-    if(is_leapyear(year))
-        days_in_month[1] = 29;
-    else
-        days_in_month[1] = 28;
-
-    /* Number of days in months gone by this year*/
-    for(i = 0; i < tm->tm_mon; i++)
-        month_days += days_in_month[i];
-
-    /* Number of days in years gone by since 1-Jan-1980 */
-    year_days = 365*(tm->tm_year-100+20) + (tm->tm_year-100-1)/4 + 6;
-
-    /* Convert to seconds since 1-Jan-1980 */
-    seconds = tm->tm_sec
-            + tm->tm_min*MINUTE_SECONDS
-            + tm->tm_hour*HOUR_SECONDS
-            + (tm->tm_mday-1)*DAY_SECONDS
-            + month_days*DAY_SECONDS
-            + year_days*DAY_SECONDS;
-    seconds += SECS_ADJUST;
+    seconds = mktime((struct tm *)tm);
 
     #ifdef SANSA_FUZEPLUS
     /* The OF uses PERSISTENT2 register to keep the adjustment and only changes
@@ -168,8 +67,9 @@ int rtc_write_datetime(const struct tm *tm)
     #else
     /* The Freescale recommended way of keeping time is the number of seconds
      * since 00:00 1/1/1980 */
-    imx233_rtc_write_seconds(seconds);
+    imx233_rtc_write_seconds(seconds - YEAR1980);
     #endif
+
     return 0;
 }
 
