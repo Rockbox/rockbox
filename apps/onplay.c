@@ -91,7 +91,8 @@ static int bookmark_menu_callback(int action,
                                   const struct menu_item_ex *this_item);
 MENUITEM_FUNCTION(bookmark_create_menu_item, 0,
                   ID2P(LANG_BOOKMARK_MENU_CREATE),
-                  bookmark_create_menu, NULL, NULL, Icon_Bookmark);
+                  bookmark_create_menu, NULL,
+                  bookmark_menu_callback, Icon_Bookmark);
 MENUITEM_FUNCTION(bookmark_load_menu_item, 0,
                   ID2P(LANG_BOOKMARK_MENU_LIST),
                   bookmark_load_menu, NULL,
@@ -105,13 +106,20 @@ static int bookmark_menu_callback(int action,
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
-            if (this_item == &bookmark_load_menu_item)
+            /* hide create bookmark option if bookmarking isn't currently possible (no track playing, queued tracks...) */
+            if (this_item == &bookmark_create_menu_item)
+            {
+                if (!bookmark_is_bookmarkable_state())
+                    return ACTION_EXIT_MENUITEM;
+            }
+            /* hide loading bookmarks menu if no bookmarks exist */
+            else if (this_item == &bookmark_load_menu_item)
             {
                 if (!bookmark_exists())
                     return ACTION_EXIT_MENUITEM;
             }
-            /* hide the bookmark menu if there is no playback */
-            else if ((audio_status() & AUDIO_STATUS_PLAY) == 0)
+            /* hide the bookmark menu if bookmarks can't be loaded or created */
+            else if (!bookmark_is_bookmarkable_state() && !bookmark_exists())
                 return ACTION_EXIT_MENUITEM;
             break;
 #ifdef HAVE_LCD_CHARCELLS
