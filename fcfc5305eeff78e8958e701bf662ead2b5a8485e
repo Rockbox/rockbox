@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAACH///+g\u003d",
+        "filename": "apps/bookmark.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1000094
+      },
+      "writtenOn": "2012-03-11T08:20:14Z",
+      "side": 1,
+      "message": "I changed this function from always returning false to returning true on success to be consistent with the other bookmarking functions.  It doesn\u0027t seem like the return value is checked in any of the current code so this should be ok.  It is passed to a MENUITEM_FUNCTION() call in onplay.c but the return value is ignored.",
+      "revId": "fcfc5305eeff78e8958e701bf662ead2b5a8485e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///+U\u003d",
+        "filename": "apps/bookmark.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1139,
+      "author": {
+        "id": 1000094
+      },
+      "writtenOn": "2012-03-11T08:20:14Z",
+      "side": 1,
+      "message": "I don\u0027t understand what case is being checked for on this line?",
+      "revId": "fcfc5305eeff78e8958e701bf662ead2b5a8485e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///+o\u003d",
+        "filename": "apps/onplay.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1000094
+      },
+      "writtenOn": "2012-03-11T08:20:14Z",
+      "side": 1,
+      "message": "Allow the hiding of the \u0027Create Bookmark\u0027 selection.",
+      "revId": "fcfc5305eeff78e8958e701bf662ead2b5a8485e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///+s\u003d",
+        "filename": "apps/onplay.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1000094
+      },
+      "writtenOn": "2012-03-11T08:20:14Z",
+      "side": 1,
+      "message": "PLEASE CHECK THE FOLLOWING LINES\nI don\u0027t understand what the rest of the cases do here so I tried to leave them logically the same to the way they were before my changes (only applying to the bookmark_menu and bookmark_load_menu).",
+      "revId": "fcfc5305eeff78e8958e701bf662ead2b5a8485e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
