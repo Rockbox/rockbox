@@ -22,6 +22,7 @@
  *
  ****************************************************************************/
 #include <stdbool.h>
+#include <stdint.h>
 #include "time.h"
 
 #define MINUTE_SECONDS      60
@@ -32,7 +33,7 @@
 #define LEAP_YEAR_SECONDS   31622400
 
 /* Days in each month */
-static int days_in_month[] =
+static uint8_t days_in_month[] =
     {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 static inline bool is_leapyear(int year)
