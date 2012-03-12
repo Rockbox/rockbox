@@ -77,7 +77,7 @@ struct tm *gmtime_r(const time_t *timep, struct tm *tm)
             seconds -= YEAR_SECONDS;
         }
     }
-    tm->tm_year = year%100 + 100;
+    tm->tm_year = year - 1900;
 
     /* Month */
     for (i = 0; i < 12; i++)
