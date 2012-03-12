@@ -35,7 +35,7 @@ RockboxInfo::RockboxInfo(QString mountpoint, QString fname)
     // read file contents
     QRegExp hash("^Version:\\s+(r?)([0-9a-fM]+)");
     QRegExp version("^Version:\\s+(\\S.*)");
-    QRegExp release("^Version:\\s+([0-9\\.]+)");
+    QRegExp release("^Version:\\s+([0-9\\.]+)\\s*$");
     QRegExp target("^Target:\\s+(\\S.*)");
     QRegExp features("^Features:\\s+(\\S.*)");
     QRegExp targetid("^Target id:\\s+(\\S.*)");

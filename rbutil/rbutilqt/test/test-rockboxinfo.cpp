@@ -54,6 +54,7 @@ void TestRockboxInfo::testVersion()
         { "Version: e5b1b0f-120218",  "e5b1b0f",  "e5b1b0f-120218",  "" },
         { "Version: e5b1b0fM-120218", "e5b1b0fM", "e5b1b0fM-120218", "" },
         { "#Version: e5b1b0f-120218", "",         "",                "" },
+        { "Version: 3448f5b-120310",  "3448f5b",  "3448f5b-120310",  "" },
     };
 
 
