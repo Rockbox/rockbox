@@ -45,6 +45,7 @@ void TestRockboxInfo::testVersion()
 
     const struct testvector testdata[] =
     {
+        /* Input string               revision    full version       release version */
         { "Version: r29629-110321",   "29629",    "r29629-110321",   "" },
         { "Version: r29629M-110321",  "29629M",   "r29629M-110321",  "" },
         { "Version: 3.10",            "",         "3.10",            "3.10" },
@@ -68,6 +69,7 @@ void TestRockboxInfo::testVersion()
         RockboxInfo info("", filename);
         QCOMPARE(info.version(), QString(testdata[i].versionstring));
         QCOMPARE(info.revision(), QString(testdata[i].revisionstring));
+        QCOMPARE(info.release(), QString(testdata[i].releasestring));
     }
 }
 
