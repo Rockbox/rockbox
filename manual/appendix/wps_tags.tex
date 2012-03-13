@@ -275,7 +275,7 @@ Example: \config{\%?mp<Stop|Play|Pause|Ffwd|Rew|Rec|Rec pause|FM|FM pause>}
 
 \section{Current Screen}
   \begin{tagmap}
-    \config{\%cs} & The current screen, 1-18, in the order shown below\\
+    \config{\%cs} & The current screen, 1-20, in the order shown below\\
   \end{tagmap}
 
 \begin{table}
@@ -300,6 +300,7 @@ Example: \config{\%?mp<Stop|Play|Pause|Ffwd|Rew|Rec|Rec pause|FM|FM pause>}
     17 & Time and Date Screen \\
     18 & Bookmark browser \\
     19 & Shortcuts menu \\
+    20 & Track Info screen \\
   \end{rbtabular}
 \end{table}
 
@@ -649,6 +650,7 @@ display cycling round the defined sublines. See
   Possible actions are:
 
   \begin{description}
+    \item[none] -- Do nothing.
     \item[play] -- Play/pause playback.
     \item[stop] -- Stop playback and exit the WPS.
     \item[prev] -- Previous track/item.
@@ -665,8 +667,10 @@ display cycling round the defined sublines. See
     \item[volup] -- Increase the volume by one step.
     \item[mute] -- Un/Mute playback.
     \item[createbookmark] -- Create a bookmark in the currently-playing track.
+    \item[hotkey] -- Performs the action assigned to the hotkey (see Hotkeys section).
     \item[menu] -- Go to the main menu.
     \item[browse] -- Go back to the file browser or database.
+    \item[resumeplayback] -- Go back to the last music screen (WPS or radio screen).
     \item[quickscreen] -- Go to the quickscreen.
     \item[contextmenu] -- Open the context menu.
     \item[playlist] -- Go to the playlist viewer.
@@ -674,17 +678,21 @@ display cycling round the defined sublines. See
     \item[trackinfo] -- Open the track info viewer.
     \item[pitch] -- Open the pitchscreen.
     \item[setting\_inc] -- Increment the subsequently specified setting (e.g
-      \config{\%T(0,0, setting\_inc, volume)} increases the volume by one step).
+      \config{\%T(0,0,32,32, setting\_inc, volume)} increases the volume by one step).
     \item[setting\_dec] -- Decrement the subsequently specified setting (e.g
-      \config{\%T(0,0, setting\_dec, volume)} decreases the volume by one step).
+      \config{\%T(0,0,32,32, setting\_dec, volume)} decreases the volume by one step).
+    \item[setting\_set] -- Set the subsequently specified setting to a specific value (e.g
+      \config{\%T(0,0,32,32, setting\_set, volume, 0)} sets the volume to 0).
+    \item[lock] -- Soft locks the touchscreen.  All touch areas are disabled except for
+        areas with the lock action or ones that have the allow_while_locked option (see below).
   \end{description}
   Any (or muliple) of the following options can be used after the action is specified
   \subsection{Options}
   \begin{description}
-    \item[repeat_press] -- This region will trigger mulitple times when held (i.e for seeking)
-    \item[long_press] -- This region will trigger once after it is held for a long press
-    \item[reverse_bar] -- Reverse the bars touch direction (i.e seek right to left)
-    \item[allow_while_locked] -- Allows the region to be pressable when the 
+    \item[repeat\_press] -- This area will trigger mulitple times when held (i.e for seeking)
+    \item[long\_press] -- This area will trigger once after it is held for a long press
+    \item[reverse\_bar] -- Reverse the bars touch direction (i.e seek right to left)
+    \item[allow\_while\_locked] -- Allows the area to be pressable when the
         skin is locked by the lock touch action
   \end{description}
 
