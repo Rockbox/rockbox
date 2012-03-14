@@ -327,6 +327,13 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
     do_setting_screen(setting, title, parent);
 }
 
+static struct gui_synclist *current_lists;
+void menu_uiviewport_update_callback(void *data)
+{
+    (void)data;
+    gui_synclist_draw(current_lists);
+}
+
 /* display a menu */
 int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             struct viewport parent[NB_SCREENS], bool hide_theme)
@@ -345,6 +352,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     touchscreen_set_mode(global_settings.touch_mode);
 #endif
 
+    current_lists = &lists;
     FOR_NB_SCREENS(i)
         viewportmanager_theme_enable(i, !hide_theme, NULL);
 
@@ -391,9 +399,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 #if CONFIG_CODEC == SWCODEC
         keyclick_set_callback(gui_synclist_keyclick_callback, &lists);
 #endif
+        add_event(GUI_EVENT_NEED_UI_UPDATE, false,
+                menu_uiviewport_update_callback);
         action = get_action(CONTEXT_MAINMENU,
                             list_do_action_timeout(&lists, HZ));
-
+        remove_event(GUI_EVENT_NEED_UI_UPDATE, menu_uiviewport_update_callback);
         /* query audio status to see if it changed */
         new_audio_status = audio_status();
         if (old_audio_status != new_audio_status)
