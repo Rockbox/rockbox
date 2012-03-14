@@ -596,6 +596,13 @@ bool gui_synclist_keyclick_callback(int action, void* data)
 }
 #endif
 
+static struct gui_synclist *current_lists;
+void _lists_uiviewport_update_callback(void *data)
+{
+    (void)data;
+    gui_synclist_draw(current_lists);
+}
+
 bool gui_synclist_do_button(struct gui_synclist * lists,
                             int *actionptr, enum list_wrap wrap)
 {
@@ -609,6 +616,8 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 #else
     static int next_item_modifier = 1;
     static int last_accel_tick = 0;
+    
+    remove_event(GUI_EVENT_NEED_UI_UPDATE, _lists_uiviewport_update_callback);
 
     if (action != ACTION_TOUCHSCREEN)
     {
@@ -772,6 +781,9 @@ int list_do_action_timeout(struct gui_synclist *lists, int timeout)
 /* Returns the lowest of timeout or the delay until a postponed
    scheduled announcement is due (if any). */
 {
+    current_lists = lists;
+    add_event(GUI_EVENT_NEED_UI_UPDATE, false,
+            _lists_uiviewport_update_callback);
     if(lists->scheduled_talk_tick)
     {
         long delay = lists->scheduled_talk_tick -current_tick +1;

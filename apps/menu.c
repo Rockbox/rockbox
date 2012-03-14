@@ -393,7 +393,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 #endif
         action = get_action(CONTEXT_MAINMENU,
                             list_do_action_timeout(&lists, HZ));
-
         /* query audio status to see if it changed */
         new_audio_status = audio_status();
         if (old_audio_status != new_audio_status)
