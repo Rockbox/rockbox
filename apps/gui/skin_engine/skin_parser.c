@@ -33,6 +33,7 @@
 #include "viewport.h"
 
 #include "skin_buffer.h"
+#include "skin_debug.h"
 #include "skin_parser.h"
 #include "tag_table.h"
 
@@ -2242,6 +2243,10 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     struct skin_element *tree = skin_parse(wps_buffer, skin_element_callback, wps_data);
     wps_data->tree = PTRTOSKINOFFSET(skin_buffer, tree);
     if (!SKINOFFSETTOPTR(skin_buffer, wps_data->tree)) {
+#ifdef DEBUG_SKIN_ENGINE
+        if (isfile && debug_wps)
+            skin_error_format_message();
+#endif
         skin_data_reset(wps_data);
         return false;
     }
@@ -2295,10 +2300,6 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     }
 #else
     wps_data->wps_loaded = wps_data->tree >= 0;
-#endif
-#ifdef DEBUG_SKIN_ENGINE
- //   if (isfile && debug_wps)
- //       debug_skin_usage();
 #endif
     return true;
 }

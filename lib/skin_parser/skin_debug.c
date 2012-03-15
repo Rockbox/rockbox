@@ -283,7 +283,7 @@ void skin_debug_params(int count, struct skin_tag_parameter params[])
     }
 }
 
-void skin_debug_indent()
+void skin_debug_indent(void)
 {
     int i;
     for(i = 0; i < debug_indent_level; i++)
@@ -293,7 +293,7 @@ void skin_debug_indent()
 #endif
 
 #define MIN(a,b) ((a<b)?(a):(b))
-void skin_error_format_message()
+void skin_error_format_message(void)
 {
     int i;
     char text[128];

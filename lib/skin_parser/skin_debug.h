@@ -28,7 +28,7 @@ extern "C"
 {
 #endif
 
-#if !defined(ROCKBOX) || defined(__PCTOOL__)
+#if !defined(ROCKBOX) || defined(__PCTOOL__) || defined(SIMULATOR)
 #define SKINPARSER_DEBUG
 #endif
 
@@ -41,7 +41,7 @@ int skin_error_col(void);
 char* skin_error_message(void);
 void skin_clear_errors(void);
 void skin_debug_tree(struct skin_element* root);
-void skin_error_format_message();
+void skin_error_format_message(void);
 
 /* Auxiliary debug functions */
 void skin_debug_params(int count, struct skin_tag_parameter params[]);
