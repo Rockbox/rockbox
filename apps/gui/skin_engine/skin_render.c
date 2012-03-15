@@ -191,11 +191,15 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                 else
 #endif
                 {
+#if LCD_DEPTH > 1
                     unsigned backup = vp->fg_pattern;
                     vp->fg_pattern = rect->start_colour;
+#endif
                     gwps->display->fillrect(rect->x, rect->y, rect->width,
                             rect->height);
+#if LCD_DEPTH > 1
                     vp->fg_pattern = backup;
+#endif
                 }
             }
             break;

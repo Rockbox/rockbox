@@ -2058,6 +2058,8 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     sb_skin_has_title(curr_screen);
 #endif
                     break;
+#endif
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                 case SKIN_TOKEN_DRAWRECTANGLE:
                     function = parse_drawrectangle;
                     break;
