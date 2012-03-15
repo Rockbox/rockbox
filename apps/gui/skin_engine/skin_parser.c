@@ -1995,6 +1995,8 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
         skin_vp->vp.x = param->data.number;
         if (param->data.number < 0)
             skin_vp->vp.x += display->lcdwidth;
+        else if (param->type == PERCENT)
+            skin_vp->vp.x = param->data.number * display->lcdwidth / 1000;
     }
     param++;
     /* y */
@@ -2003,6 +2005,8 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
         skin_vp->vp.y = param->data.number;
         if (param->data.number < 0)
             skin_vp->vp.y += display->lcdheight;
+        else if (param->type == PERCENT)
+            skin_vp->vp.y = param->data.number * display->lcdheight / 1000;
     }
     param++;
     /* width */
@@ -2011,6 +2015,8 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
         skin_vp->vp.width = param->data.number;
         if (param->data.number < 0)
             skin_vp->vp.width = (skin_vp->vp.width + display->lcdwidth) - skin_vp->vp.x;
+        else if (param->type == PERCENT)
+            skin_vp->vp.width = param->data.number * display->lcdwidth / 1000;
     }
     else
     {
@@ -2023,6 +2029,8 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
         skin_vp->vp.height = param->data.number;
         if (param->data.number < 0)
             skin_vp->vp.height = (skin_vp->vp.height + display->lcdheight) - skin_vp->vp.y;
+        else if (param->type == PERCENT)
+            skin_vp->vp.height = param->data.number * display->lcdheight / 1000;
     }
     else
     {

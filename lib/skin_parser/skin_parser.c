@@ -568,7 +568,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     while(*cursor != '\n' && *cursor != '\0' && *cursor != ARGLISTCLOSESYM)
     {
         /* Skipping over escaped characters */
-        if(*cursor == TAGSYM)
+        if(*cursor == TAGSYM && *(cursor+1) != ARGLISTSEPARATESYM)
         {
             skip_tag(&cursor);
         }
@@ -625,7 +625,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
              * default > decimal/integer > single tag/code > string
              */
             int j=0;
-            bool canbedefault = false;
+            bool canbedefault = false, last_char_is_percent = false;
             bool haspercent = false, number = true, hasdecimal = false;
             char temp_params[8];
             open_square_bracket = tag_args;
@@ -644,9 +644,11 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
                 hasdecimal = hasdecimal || (cursor[j] == '.');
                 number = number && (isdigit(cursor[j]) || 
                                     (cursor[j] == '.') ||
-                                    (cursor[j] == '-'));
+                                    (cursor[j] == '-') ||
+                                    (cursor[j] == '%'));
                 j++;
             }
+            last_char_is_percent = cursor[j-1] == '%';
             type_code = '?';
             if (canbedefault && *cursor == DEFAULTSYM && !isdigit(cursor[1]))
             {
@@ -655,6 +657,10 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             else if (number && hasdecimal && strchr(temp_params, 'd'))
             {
                 type_code = 'd';
+            }
+            else if (number && last_char_is_percent && strchr(temp_params, 'p'))
+            {
+                type_code = 'p';
             }
             else if (number && 
                      (strchr(temp_params, 'i') || strchr(temp_params, 'd')))
@@ -707,7 +713,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             params[i].type = INTEGER;
             params[i].data.number = scan_int(&cursor);
         }
-        else if(tolower(type_code) == 'd')
+        else if(tolower(type_code) == 'd' || tolower(type_code) == 'p')
         {
             int val = 0;
             bool have_point = false;
@@ -731,7 +737,13 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             }
             if (have_tenth == false)
                 val *= 10;
-            params[i].type = DECIMAL;
+            if (tolower(type_code) == 'd')
+                params[i].type = DECIMAL;
+            else
+            {
+                params[i].type = PERCENT;
+                cursor++; /* skip trailing % sign */
+            }
             params[i].data.number = val;
         }
         else if(tolower(type_code) == 's' || tolower(type_code) == 'f')

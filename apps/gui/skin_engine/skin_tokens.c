@@ -761,6 +761,7 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
             if (!number_set && out_text && *out_text >= '0' && *out_text <= '9')
                 a = atoi(out_text);
             /* fall through */
+        case PERCENT:
         case DECIMAL:
             b = lif->operand.data.number;
             break;
