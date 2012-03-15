@@ -27,6 +27,7 @@ int imx233_adc_mapping[] =
     [ADC_DIE_TEMP] = IMX233_ADC_DIE_TEMP,
     [ADC_VDDIO] = IMX233_ADC_VDDIO,
     [ADC_5V] = HW_LRADC_CHANNEL_5V,
+    [ADC_CH2] = HW_LRADC_CHANNEL(2),
 };
 
 const char *imx233_adc_channel_name[] =
@@ -35,4 +36,5 @@ const char *imx233_adc_channel_name[] =
     "Die temperature(°C)",
     "VddIO",
     "Vdd5V",
+    "Channel 2",
 };

@@ -21,11 +21,12 @@
 #ifndef _ADC_TARGET_H_
 #define _ADC_TARGET_H_
 
-#define NUM_ADC_CHANNELS    4
+#define NUM_ADC_CHANNELS    5
 
 #define ADC_BATTERY         0
 #define ADC_DIE_TEMP        1
 #define ADC_VDDIO           2
 #define ADC_5V              3
+#define ADC_CH2             4
 
 #endif
