@@ -41,14 +41,18 @@
 #endif
 
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
-void lcd_gradient_fillrect(int x1, int x2, int y1, int y2,
+void lcd_gradient_fillrect(int x, int y, int width, int height,
         unsigned start_rgb, unsigned end_rgb)
 {
     int old_pattern = current_vp->fg_pattern;
     int step_mul, i;
-    if (y2 - y1 == 0) return;
+    int x1, x2;
+    x1 = x;
+    x2 = x + width;
+    
+    if (height == 0) return;
 
-    step_mul = (1 << 16) / (y2 - y1);
+    step_mul = (1 << 16) / height;
     int h_r = RGB_UNPACK_RED(start_rgb);
     int h_g = RGB_UNPACK_GREEN(start_rgb);
     int h_b = RGB_UNPACK_BLUE(start_rgb);
@@ -59,7 +63,7 @@ void lcd_gradient_fillrect(int x1, int x2, int y1, int y2,
     h_g = (h_g << 16) + (1 << 15);
     h_b = (h_b << 16) + (1 << 15);
 
-    for(i = y1; i < y2; i++) {
+    for(i = y; i < y + height; i++) {
         current_vp->fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
         lcd_hline(x1, x2, i);
         h_r -= rstep;
@@ -108,7 +112,7 @@ static void lcd_do_gradient_line(int x1, int x2, int y, unsigned h,
     h_g -= h * gstep;
     h_b -= h * bstep;
     end_rgb = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
-    lcd_gradient_fillrect(x1, x2, y, y + h, start_rgb, end_rgb);
+    lcd_gradient_fillrect(x1, y, x2 - x1, h, start_rgb, end_rgb);
 }
 
 #endif

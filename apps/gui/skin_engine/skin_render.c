@@ -176,8 +176,29 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             if (do_refresh)
                 draw_peakmeters(gwps, info->line_number, vp);
             break;
+        case SKIN_TOKEN_DRAWRECTANGLE:
+            if (do_refresh)
+            {
+                struct draw_rectangle *rect =
+                        SKINOFFSETTOPTR(skin_buffer, token->value.data);
+#ifdef HAVE_LCD_COLOR
+                if (rect->start_colour != rect->end_colour &&
+                        gwps->display->screen_type == SCREEN_MAIN)
+                {
+                    gwps->display->gradient_fillrect(rect->x, rect->y, rect->width,
+                            rect->height, rect->start_colour, rect->end_colour);
+                }
+                else
 #endif
-#ifdef HAVE_LCD_BITMAP
+                {
+                    unsigned backup = vp->fg_pattern;
+                    vp->fg_pattern = rect->start_colour;
+                    gwps->display->fillrect(rect->x, rect->y, rect->width,
+                            rect->height);
+                    vp->fg_pattern = backup;
+                }
+            }
+            break;
         case SKIN_TOKEN_PEAKMETER_LEFTBAR:
         case SKIN_TOKEN_PEAKMETER_RIGHTBAR:
             data->peak_meter_enabled = true;

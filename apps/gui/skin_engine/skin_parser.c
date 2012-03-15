@@ -638,6 +638,51 @@ static int parse_viewporttextstyle(struct skin_element *element,
     return 0;
 }
 
+static int parse_drawrectangle( struct skin_element *element,
+                                struct wps_token *token,
+                                struct wps_data *wps_data)
+{
+    (void)wps_data;
+    struct draw_rectangle *rect =
+            (struct draw_rectangle *)skin_buffer_alloc(sizeof(struct draw_rectangle));
+
+    if (!rect)
+        return -1;
+
+    rect->x = get_param(element, 0)->data.number;
+    rect->y = get_param(element, 1)->data.number;
+
+    if (isdefault(get_param(element, 2)))
+        rect->width = curr_vp->vp.width - rect->x;
+    else
+        rect->width = get_param(element, 2)->data.number;
+        
+    if (isdefault(get_param(element, 3)))
+        rect->height = curr_vp->vp.height - rect->y;
+    else
+        rect->height = get_param(element, 3)->data.number;
+
+    rect->start_colour = curr_vp->vp.fg_pattern;
+    rect->end_colour = curr_vp->vp.fg_pattern;
+
+    if (element->params_count > 4)
+    {
+        if (!parse_color(curr_screen, get_param_text(element, 4),
+                    &rect->start_colour))
+            return -1;
+        rect->end_colour = rect->start_colour;
+    }
+    if (element->params_count > 5)
+    {
+        if (!parse_color(curr_screen, get_param_text(element, 5),
+                    &rect->end_colour))
+            return -1;
+    }
+    token->value.data = PTRTOSKINOFFSET(skin_buffer, rect);
+
+    return 0;
+}
+        
 static int parse_viewportcolour(struct skin_element *element,
                                 struct wps_token *token,
                                 struct wps_data *wps_data)
@@ -2012,6 +2057,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
 #ifndef __PCTOOL__
                     sb_skin_has_title(curr_screen);
 #endif
+                    break;
+                case SKIN_TOKEN_DRAWRECTANGLE:
+                    function = parse_drawrectangle;
                     break;
 #endif
                 case SKIN_TOKEN_FILE_DIRECTORY:

@@ -113,6 +113,15 @@ struct progressbar {
     bool horizontal;
     OFFSETTYPE(struct gui_img *) backdrop;
 };
+
+struct draw_rectangle {
+    int x;
+    int y;
+    int width;
+    int height;
+    unsigned start_colour;
+    unsigned end_colour;
+};
 #endif
 
 

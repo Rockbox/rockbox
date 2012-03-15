@@ -244,6 +244,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_VAR_TIMEOUT,           "vl",   "S|D", SKIN_REFRESH_DYNAMIC },
 
     { SKIN_TOKEN_SUBSTRING,             "ss",   "IiT|s", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_DRAWRECTANGLE,         "dr",   "IIii|ss", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_UNKNOWN,                ""   , "", 0 }
     /* Keep this here to mark the end of the table */
 };

@@ -264,6 +264,9 @@ struct screen screens[NB_SCREENS] =
 #endif
 #if defined(HAVE_LCD_BITMAP)
         .set_framebuffer = (void*)lcd_set_framebuffer,
+#if defined(HAVE_LCD_COLOR)    
+        .gradient_fillrect = lcd_gradient_fillrect,
+#endif
 #endif
     },
 #if NB_SCREENS == 2
