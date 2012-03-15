@@ -206,9 +206,9 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP, "Vg" , "SS|s", SKIN_REFRESH_STATIC|NOBREAK },
     { SKIN_TOKEN_VIEWPORT_DRAWONBG,       "VB" , "", SKIN_REFRESH_STATIC|NOBREAK },
     
-    { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "SIIiii", 0 },
-    { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "sIIiii", 0 },
-    { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "IIiii", 0 },
+    { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "S[IP][IP][ip][ip]i", 0 },
+    { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "s[IP][IP][ip][ip]i", 0 },
+    { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "[IP][IP][ip][ip]i", 0 },
     
     { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f", SKIN_REFRESH_STATIC|NOBREAK },
     /* This uses the bar tag params also but the first item can be a string
