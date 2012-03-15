@@ -889,9 +889,9 @@ void set_keypress_restarts_sleep_timer(bool enable)
     sleeptimer_key_restarts = enable;
 }
 
+#ifndef BOOTLOADER
 static void handle_sleep_timer(void)
 {
-#ifndef BOOTLOADER
     if (!sleeptimer_active)
       return;
 
@@ -912,8 +912,8 @@ static void handle_sleep_timer(void)
             sys_poweroff();
         }
     }
-#endif /* BOOTLOADER */
 }
+#endif /* BOOTLOADER */
 
 /*
  * We shut off in the following cases:
@@ -929,6 +929,7 @@ static void handle_sleep_timer(void)
  */
 void handle_auto_poweroff(void)
 {
+#ifndef BOOTLOADER
     long timeout = poweroff_timeout*60*HZ;
     int audio_stat = audio_status();
     long tick = current_tick;
@@ -968,4 +969,5 @@ void handle_auto_poweroff(void)
         }
     } else
         handle_sleep_timer();
+#endif
 }

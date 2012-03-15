@@ -39,6 +39,7 @@
 #include "system-target.h"
 #include "fmradio_i2c.h"
 #include "version.h"
+#include "powermgmt.h"
 
 #include "usb.h"
 
@@ -81,6 +82,8 @@ static void usb_mode(int connect_timeout)
     {
         /* Got the message - wait for disconnect */
         printf("Bootloader USB mode");
+        /* Enable power management to charge */
+        powermgmt_init();
 
         usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
@@ -89,6 +92,16 @@ static void usb_mode(int connect_timeout)
             button = button_get_w_tmo(HZ/2);
             if(button == SYS_USB_DISCONNECTED)
                 break;
+            struct imx233_powermgmt_info_t info = imx233_powermgmt_get_info();
+            lcd_putsf(0, 7, "Charging status: %s",
+                info.state == CHARGE_STATE_DISABLED ? "disabled" :
+                info.state == CHARGE_STATE_ERROR ? "error" :
+                info.state == DISCHARGING ? "discharging" :
+                info.state == TRICKLE ? "trickle" :
+                info.state == TOPOFF ? "topoff" :
+                info.state == CHARGING ? "charging" : "<unknown>");
+            lcd_putsf(0, 8, "Battery: %d%%", battery_level());
+            lcd_update();
         }
     }
 
