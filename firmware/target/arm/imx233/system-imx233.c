@@ -34,6 +34,7 @@
 #include "lcd.h"
 #include "backlight-target.h"
 #include "button.h"
+#include "fmradio_i2c.h"
 
 #define default_interrupt(name) \
     extern __attribute__((weak, alias("UIRQ"))) void name(void)
@@ -213,6 +214,10 @@ void system_init(void)
     imx233_dma_init();
     imx233_ssp_init();
     imx233_dcp_init();
+    imx233_i2c_init();
+#if defined(SANSA_FUZEPLUS) && !defined(BOOTLOADER)
+    fmradio_i2c_init();
+#endif
 }
 
 bool imx233_us_elapsed(uint32_t ref, unsigned us_delay)

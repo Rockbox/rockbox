@@ -27,6 +27,7 @@
 #include "system-target.h"
 #include "power-imx233.h"
 #include "pinctrl-imx233.h"
+#include "fmradio_i2c.h"
 
 struct current_step_bit_t
 {

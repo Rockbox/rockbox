@@ -53,7 +53,7 @@ void INT_I2C_DMA(void)
     semaphore_release(&i2c_sema);
 }
 
-void i2c_init(void)
+void imx233_i2c_init(void)
 {
     imx233_reset_block(&HW_I2C_CTRL0);
     /* setup pins (must be done when shutdown) */
@@ -145,6 +145,10 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
     __REG_SET(HW_I2C_CTRL0) = __BLOCK_CLKGATE;
     mutex_unlock(&i2c_mutex);
     return ret;
+}
+
+void i2c_init(void)
+{
 }
 
 int i2c_write(int device, const unsigned char* buf, int count)

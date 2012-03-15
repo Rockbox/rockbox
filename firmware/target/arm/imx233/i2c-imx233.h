@@ -126,7 +126,7 @@ enum imx233_i2c_error_t
     I2C_SLAVE_NAK = -5
 };
 
-void i2c_init(void);
+void imx233_i2c_init(void);
 /* start building a transfer, will acquire an exclusive lock */
 void imx233_i2c_begin(void);
 /* add stage */
