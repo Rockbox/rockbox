@@ -1,6 +1,6 @@
 skin_buffer.c
 skin_parser.c
-#if !defined(ROCKBOX) || defined(__PCTOOL__)
+#if !defined(ROCKBOX) || defined(__PCTOOL__) || defined(SIMULATOR)
 skin_debug.c
 #endif
 skin_scan.c
