@@ -304,6 +304,9 @@ enum skin_token_type {
  *             D - Required decimal 
  *             d - Nullable decimal
  *                  Decimals are stored as (whole*10)+part
+ *             P - Required percentage
+ *             p - Nullable percentage
+ *                  Percentages pestored as permilles (percent*10 + part)
  *             S - Required string
  *             s - Nullable string
  *             F - Required file name

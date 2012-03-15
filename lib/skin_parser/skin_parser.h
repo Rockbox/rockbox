@@ -89,6 +89,7 @@ struct skin_tag_parameter
     {
         INTEGER,
         DECIMAL, /* stored in data.number as (whole*10)+part */
+        PERCENT, /* stored in data.number as (whole*10)+part */
         STRING,
         CODE,
         DEFAULT
