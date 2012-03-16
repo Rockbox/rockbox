@@ -19,6 +19,7 @@
 SOURCES += \
  gui/manualwidget.cpp \
  gui/infowidget.cpp \
+ gui/changelogwidget.cpp \
  rbutilqt.cpp \
  main.cpp \
  installwindow.cpp \
@@ -83,6 +84,7 @@ SOURCES += \
 HEADERS += \
  gui/manualwidget.h \
  gui/infowidget.h \
+ gui/changelogwidget.h \
  rbutilqt.h \
  installwindow.h \
  base/httpget.h \
@@ -154,6 +156,7 @@ HEADERS += \
 FORMS += \
  gui/manualwidgetfrm.ui \
  gui/infowidgetfrm.ui \
+ gui/changelogwidgetfrm.ui \
  rbutilqtfrm.ui \
  aboutbox.ui \
  installwindowfrm.ui \

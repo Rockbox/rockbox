@@ -26,7 +26,6 @@
 #include <QTemporaryFile>
 #include <QList>
 #include <QTranslator>
-
 #include "ui_rbutilqtfrm.h"
 #include "httpget.h"
 #include "zipinstaller.h"
@@ -34,6 +33,7 @@
 #include "bootloaderinstallbase.h"
 #include "manualwidget.h"
 #include "infowidget.h"
+#include "changelogwidget.h"
 
 class RbUtilQt : public QMainWindow
 {
@@ -47,6 +47,7 @@ class RbUtilQt : public QMainWindow
     private:
         ManualWidget *manual;
         InfoWidget *info;
+        ChangelogWidget *changelog;
         Ui::RbUtilQtFrm ui;
 
         void changeEvent(QEvent *e);

@@ -1,0 +1,40 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ *   Copyright (C) 2012 by Jean-Louis Biasini
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#ifndef CHANGELOG_H
+#define CHANGELOG_H
+
+#include <QtGui>
+#include "ui_changelogfrm.h"
+
+class ChangelogWidget : public QWidget
+{
+    Q_OBJECT
+    public:
+        ChangelogWidget(QWidget *parent = 0);
+
+    public slots:
+        void setShowChangelog(bool);
+    signals:
+        void changelogClosed(void);
+    private:
+        Ui::ChangelogWidgetFrm ui;
+};
+
+#endif
+
