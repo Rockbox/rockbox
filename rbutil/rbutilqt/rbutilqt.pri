@@ -165,7 +165,8 @@ FORMS += \
  previewfrm.ui \
  createvoicefrm.ui \
  sysinfofrm.ui \
- systracefrm.ui
+ systracefrm.ui \
+ changelog.ui
 
 
 TRANSLATIONS += \

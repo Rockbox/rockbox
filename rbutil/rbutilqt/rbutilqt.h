@@ -26,7 +26,7 @@
 #include <QTemporaryFile>
 #include <QList>
 #include <QTranslator>
-
+#include "ui_changelog.h"
 #include "ui_rbutilqtfrm.h"
 #include "httpget.h"
 #include "zipinstaller.h"

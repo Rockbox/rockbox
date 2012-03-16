@@ -22,6 +22,7 @@
 #include "rbutilqt.h"
 #include "ui_rbutilqtfrm.h"
 #include "ui_aboutbox.h"
+#include "ui_changelog.h"
 #include "configure.h"
 #include "installwindow.h"
 #include "installtalkwindow.h"
@@ -353,12 +354,30 @@ void RbUtilQt::updateSettings()
     HttpGet::setGlobalDumbCache(RbSettings::value(RbSettings::CacheOffline).toBool());
 
     if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
-        QApplication::processEvents();
-        QMessageBox::information(this, tr("New installation"),
-            tr("This is a new installation of Rockbox Utility, or a new version. "
-                "The configuration dialog will now open to allow you to setup the program, "
-                " or review your settings."));
-        configDialog();
+        qDebug() << "[RbUtil] new version detected";
+        if(RbSettings::subValue("changelog_Hint", RbSettings::ChangelogHintOnBoot) == "false")
+            qDebug() << "[RbUtil] changelog menu desactivate";
+        else {
+            QApplication::processEvents();
+            QDialog *window = new QDialog(this);
+            Ui::changelog changelogObj;
+            changelogObj.setupUi(window);
+            changelogObj.changelogLabelText1->setText("This is a new installation \
+            of Rockbox Utility, or a new version.\r Read this changelog to learn \
+            about new features and bugs fixes (this changelog is also available under \
+            Help > About.):");
+            changelogObj.changelogLabelText2->setText("The configuration dialog \
+            will now open to allow you to setup the program,  or review your \
+            settings.");
+            changelogObj.alwaysShowBox->setText("Always show when starting from a new version");
+            window->setLayoutDirection(Qt::LeftToRight);
+            window->setModal(true);
+            window->show();
+            /* checkbox choose if we display the changelog screen on startup through rbsettings enum ChangelogHintOnBoot */
+            connect(changelogObj.alwaysShowBox, SIGNAL(clicked(bool)), this, SLOT(RbSettings::setSubValue("changelog_Hint", RbSettings::ChangelogHintOnBoot, bool)));
+            /* we start the configure Dialog when the user press the button Ok */
+            connect(changelogObj.okButton, SIGNAL(clicked()), this, SLOT(configDialog()));
+        }
     }
     else if(chkConfig(0)) {
         QApplication::processEvents();
