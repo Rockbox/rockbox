@@ -148,7 +148,7 @@ void dma_enable_channel(int channel, struct dma_request *request)
     dma_state [channel].callback = request->callback;
             
     /* Activate the channel */
-    invalidate_dcache_range((void *)request->dest_addr, request->count * 4);
+    commit_discard_dcache_range((void *)request->dest_addr, request->count * 4);
     
     dma_state [channel].status |= STATUS_CHANNEL_ACTIVE;
     regs->dmasktrig = DMASKTRIG_ON;
