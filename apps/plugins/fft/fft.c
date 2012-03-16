@@ -28,287 +28,21 @@
 #include "lib/grey.h"
 #endif
 #include "lib/mylcd.h"
+#include "lib/pluginlib_actions.h"
 
-
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
+#define FFT_PREV_GRAPH   PLA_LEFT
+#define FFT_NEXT_GRAPH   PLA_RIGHT
+#define FFT_ORIENTATION  PLA_CANCEL
+#define FFT_WINDOW       PLA_SELECT
+#define FFT_AMP_SCALE    PLA_UP
+#define FFT_FREQ_SCALE   PLA_DOWN
+#define FFT_QUIT         PLA_EXIT
 
 #ifndef HAVE_LCD_COLOR
 GREY_INFO_STRUCT
 #endif
-
-#if CONFIG_KEYPAD == ARCHOS_AV300_PAD
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_F3
-#   define FFT_WINDOW       BUTTON_F1
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_QUIT         BUTTON_OFF
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_REC
-#   define FFT_WINDOW       BUTTON_SELECT
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_OFF
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#   define MINESWP_SCROLLWHEEL
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  (BUTTON_SELECT | BUTTON_LEFT)
-#   define FFT_WINDOW       (BUTTON_SELECT | BUTTON_RIGHT)
-#   define FFT_AMP_SCALE    BUTTON_MENU
-#   define FFT_FREQ_SCALE   BUTTON_PLAY
-#   define FFT_QUIT         (BUTTON_SELECT | BUTTON_MENU)
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW       BUTTON_PLAY
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW       BUTTON_A
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW       BUTTON_REC
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  (BUTTON_SELECT | BUTTON_LEFT)
-#   define FFT_WINDOW       (BUTTON_SELECT | BUTTON_RIGHT)
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT     (BUTTON_HOME|BUTTON_REPEAT)
-
-#elif (CONFIG_KEYPAD == SANSA_C200_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_UP
-#   define FFT_WINDOW       BUTTON_REC
-#   define FFT_AMP_SCALE    BUTTON_SELECT
-#   define FFT_QUIT         BUTTON_POWER
-#elif (CONFIG_KEYPAD == SANSA_M200_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_UP
-#   define FFT_WINDOW       BUTTON_DOWN
-#   define FFT_AMP_SCALE    BUTTON_SELECT
-#   define FFT_QUIT         BUTTON_POWER
-#elif (CONFIG_KEYPAD == SANSA_CLIP_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_UP
-#   define FFT_WINDOW       BUTTON_HOME
-#   define FFT_AMP_SCALE    BUTTON_SELECT
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_FF
-#   define FFT_WINDOW       BUTTON_SCROLL_UP
-#   define FFT_AMP_SCALE    BUTTON_REW
-#   define FFT_FREQ_SCALE   BUTTON_PLAY
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_MENU
-#   define FFT_WINDOW       BUTTON_PREV
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_BACK
-
-#elif (CONFIG_KEYPAD == MROBE100_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_PLAY
-#   define FFT_WINDOW       BUTTON_SELECT
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#   define FFT_PREV_GRAPH   BUTTON_RC_REW
-#   define FFT_NEXT_GRAPH   BUTTON_RC_FF
-#   define FFT_ORIENTATION  BUTTON_RC_MODE
-#   define FFT_WINDOW       BUTTON_RC_PLAY
-#   define FFT_AMP_SCALE    BUTTON_RC_VOL_UP
-#   define FFT_QUIT         BUTTON_RC_REC
-
-#elif (CONFIG_KEYPAD == COWON_D2_PAD)
-#   define FFT_QUIT         BUTTON_POWER
-#   define FFT_PREV_GRAPH   BUTTON_PLUS
-#   define FFT_NEXT_GRAPH   BUTTON_MINUS
-
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_MENU
-#   define FFT_WINDOW       BUTTON_SELECT
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_BACK
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW       BUTTON_MENU
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
-#   define FFT_PREV_GRAPH   BUTTON_PREV
-#   define FFT_NEXT_GRAPH   BUTTON_NEXT
-#   define FFT_ORIENTATION  BUTTON_PLAY
-#   define FFT_WINDOW       BUTTON_MENU
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
-#   define FFT_PREV_GRAPH   BUTTON_PREV
-#   define FFT_NEXT_GRAPH   BUTTON_NEXT
-#   define FFT_ORIENTATION  BUTTON_PLAY
-#   define FFT_WINDOW       BUTTON_MENU
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_UP
-#   define FFT_WINDOW       BUTTON_DOWN
-#   define FFT_AMP_SCALE    BUTTON_FFWD
-#   define FFT_QUIT         BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == MROBE500_PAD)
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == ONDAVX777_PAD)
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_PREV
-#   define FFT_NEXT_GRAPH   BUTTON_NEXT
-#   define FFT_ORIENTATION  BUTTON_MENU
-#   define FFT_WINDOW       BUTTON_OK
-#   define FFT_AMP_SCALE    BUTTON_PLAY
-#   define FFT_QUIT         BUTTON_REC
-
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#   define FFT_PREV_GRAPH   BUTTON_REW
-#   define FFT_NEXT_GRAPH   BUTTON_FF
-#   define FFT_ORIENTATION  BUTTON_REC
-#   define FFT_WINDOW       BUTTON_FUNC
-#   define FFT_AMP_SCALE    BUTTON_PLAY
-#   define FFT_QUIT        (BUTTON_REC | BUTTON_PLAY)
-
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#   define FFT_PREV_GRAPH   BUTTON_REW
-#   define FFT_NEXT_GRAPH   BUTTON_FF
-#   define FFT_ORIENTATION  BUTTON_REC
-#   define FFT_WINDOW       BUTTON_ENTER
-#   define FFT_AMP_SCALE    BUTTON_PLAY
-#   define FFT_QUIT        (BUTTON_REC | BUTTON_REPEAT)
-
-#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_PLAYPAUSE
-#   define FFT_WINDOW       BUTTON_SELECT
-#   define FFT_AMP_SCALE    BUTTON_BOTTOMLEFT
-#   define FFT_FREQ_SCALE   BUTTON_BOTTOMRIGHT
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SANSA_CONNECT_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW       BUTTON_VOL_DOWN
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_ORIENTATION  BUTTON_USER
-#   define FFT_WINDOW       BUTTON_MENU
-#   define FFT_AMP_SCALE    BUTTON_SELECT
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_QUIT         BUTTON_BACK
-
-#elif (CONFIG_KEYPAD == HM60X_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW       (BUTTON_POWER|BUTTON_SELECT)
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == HM801_PAD)
-#   define FFT_PREV_GRAPH   BUTTON_LEFT
-#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
-#   define FFT_AMP_SCALE    BUTTON_UP
-#   define FFT_FREQ_SCALE   BUTTON_DOWN
-#   define FFT_ORIENTATION  BUTTON_SELECT
-#   define FFT_WINDOW       BUTTON_PLAY
-#   define FFT_QUIT         BUTTON_POWER
-
-#elif !defined(HAVE_TOUCHSCREEN)
-#error No keymap defined!
-#endif
-
-#ifdef HAVE_TOUCHSCREEN
-#ifndef FFT_PREV_GRAPH
-#   define FFT_PREV_GRAPH   BUTTON_MIDLEFT
-#endif
-#ifndef FFT_NEXT_GRAPH
-#   define FFT_NEXT_GRAPH   BUTTON_MIDRIGHT
-#endif
-#ifndef FFT_ORIENTATION
-#   define FFT_ORIENTATION  BUTTON_CENTER
-#endif
-#ifndef FFT_WINDOW
-#   define FFT_WINDOW       BUTTON_TOPLEFT
-#endif
-#ifndef FFT_AMP_SCALE
-#   define FFT_AMP_SCALE    BUTTON_TOPRIGHT
-#endif
-#ifndef FFT_QUIT
-#   define FFT_QUIT         BUTTON_BOTTOMLEFT
-#endif
-#endif /* HAVE_TOUCHSCREEN */
 
 #ifdef HAVE_LCD_COLOR
 #include "pluginbitmaps/fft_colors.h"
@@ -1413,7 +1147,7 @@ enum plugin_status plugin_start(const void* parameter)
         int button;
 
         while (!fft_have_fft())
-		{
+	{
             int timeout;
 
             if(!is_playing())
@@ -1440,12 +1174,13 @@ enum plugin_status plugin_start(const void* parameter)
              * but watching for buttons. Music might not be playing or things
              * just aren't going well for picking up buffers so keys are
              * scanned to avoid lockup.  */
-             button = rb->button_get_w_tmo(timeout);
+             button = pluginlib_getaction(timeout, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
              if (button != BUTTON_NONE)
                  goto read_button;
-		}
+        }
 
-	    draw(NULL);
+	draw(NULL);
 
         fft_free_fft_output(); /* COP only */
 
@@ -1460,8 +1195,9 @@ enum plugin_status plugin_start(const void* parameter)
             tick = 0;
         }
 
-		button = rb->button_get_w_tmo(tick);
-    read_button:
+        button = pluginlib_getaction(tick, plugin_contexts,
+                               ARRAYLEN(plugin_contexts));
+        read_button:
         switch (button)
         {
             case FFT_QUIT:
