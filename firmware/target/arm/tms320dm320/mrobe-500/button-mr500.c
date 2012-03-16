@@ -163,8 +163,9 @@ int button_read_device(int *data)
     static int old_data = 0;
     int button_read = BUTTON_NONE;
     short touch_x, touch_y, touch_z1, touch_z2;
+#ifndef BOOTLOADER
     static bool hold_button_old = false;
-    
+#endif
     *data = old_data;
 
     /* Handle touchscreen */
