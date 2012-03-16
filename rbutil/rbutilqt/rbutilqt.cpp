@@ -308,6 +308,12 @@ void RbUtilQt::about()
     about.browserSpeexLicense->insertHtml("<pre>" + s.readAll() + "</pre>");
     about.browserSpeexLicense->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
 
+    QFile rbutilchangelog("CHANGELOG");
+    rbutilchangelog.open(QIODevice::ReadOnly);
+    QTextStream rbUc(&rbutilchangelog);
+    about.browserRockboxUtilityChangelog->insertHtml("<pre>" + rbUc.readAll() + "</pre>");
+    about.browserRockboxUtilityChangelog->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
+
     QFile credits(":/docs/CREDITS");
     credits.open(QIODevice::ReadOnly);
     QTextStream r(&credits);

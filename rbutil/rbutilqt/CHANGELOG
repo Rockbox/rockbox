@@ -1,0 +1,226 @@
+Change Log
+
+Bug fixes are marked with a √ Improvements are marked with a ↑
+
+    1.2.13 (bugfix release) - released 2012-03-06
+        √    (w32) Fix bootloader installation for Fuze+ "crashing".
+        √    (all) Fix crash when dismissing the encoder properties with "Ok" when libmp3lame is not found.
+        √    (all) Fix wrong URLs when downloading the manual (FS#12587, regression from FS#12346).
+        √    (all) Handle git version information of an installed build correctly via rockbox-info.txt. Fixes font pack download failing.
+        √    (w32) Fix syncronisation problem with SAPI voice generation causing voicefile generation to fail (FS#12595). 
+
+    1.2.12 (bugfix release) - released 2012-02-06
+        ↑    (all) support for mkimxboot bootloader installation (used by Fuze+)
+        ↑    (all) Support enabled for:
+            Fuze+
+            Clip Zip 
+        ↑    (all) recognize Ipod Nano 6G as unsupported device
+        ↑   (w32, linux) use libmp3lame for encoding voice clips for Archos devices. Huge speedup on Windows, small speedup on Linux (currently not enabled for OS X)
+        ↑    (all) support reading original firmware files in zip format.
+        ↑    (all) Boot Rockbox on USB insert rather then the Sandisk firmware on ClipV2, FuzeV2, Clip+, and Clip Zip.
+        √    (all) Includes mkamsboot 1.6 to fix installing on some hardware variants of the Clip V2.
+        √    (all) wavtrim (silence threshold) setting value was ignored when creating voicefiles.
+        √    (all) remove multithreading support for voicefile / talkfile generation to fix generation problems (FS#12106). Note: this intentionally slows down generation! 
+
+    1.2.11 (bugfix release) - released 2011-11-06
+        √    (all) Proxy username / password caused problems when containing colon and at signs (FS#12166)
+        √    (all) Gigabeat F/X bootloader uninstallation stopped with an error saying it's not supported.
+        √    (all) Manual URL was wrong in some cases (FS#12346).
+        ↑    (all) Support Newer Sandisk Clip+ firmware.
+        ↑    (all) Mountpoint selection has been reworked and now shows more information.
+        ↑    (all) support for voicefile string corrections (like voice.pl does). This is currently limited to a fixed list of corrections and voicefile creation and can be disabled in the TTS configuration.
+        ↑    (all) changing the application language doesn't require a restart anymore.
+        (w32) improve window icon for high resolutions (large icons in Vista / W7 taskbar)
+        ↑    (all) add support for
+            GoGear SA9200 (currently disabled)
+            Sansa Fuze+ (currently disabled)
+            Sansa Clip Zip (currently disabled) 
+
+    1.2.10 (bugfix release) - released 2011-05-08
+        √    (w32) use different build setup to work around NVDA, probably other screen readers, not speaking the UI anymore (FS#12089)
+        ↑    (all) Add slovak to languages (FS#10904)
+        ↑    (all) Support an optional build ID in version handling. 
+
+    1.2.9 (bugfix release) - released 2011-04-30
+        √    (all) fix Sansa c200v2 not showing up in the device selection dialog
+        √    (OS X) fix a crash on proxy detection (FS#11654).
+        √    (all) fix encoding issue in System Log.
+        √    (all) replace OSDaB zip with QuaZip. Fixes zip file created with recent tools not extracting properly without notice (iLike theme is known to be affected).
+        √    (w32) workaround for sporadic failures when creating voicefile on Windows with SAPI voices.
+        √    (w32) correct the default speed value for SAPI TTS to be unusable
+        ↑    (all) improve automatic language preselection (in case no language has been set explicitly) in voice file creation dialog
+        ↑    (all) improve feedback during TTS test
+        ↑    (all) add latvian to languages for voicefile creation
+        ↑    (all) show item for detected player in bold in the configuration dialog
+        ↑    (all) add support for
+            Philips GoGear HDD16x0, HDD18x0, and HDD63x0 series
+            MPIO HD300 (currently disabled) 
+
+    1.2.8 (bugfix release) - released 2010-09-23
+        √    (all) fix regression in Rockbox Utility version check (appearing on 64bit Linux) (FS#11439)
+        ↑    (all) merge Ipod Video 64MB and 32MB builds.
+        (OS X) Use IOKit for USB enumeration instead of libusb
+        (OS X) Add option to build Intel only binaries (default is still fat binaries)
+        ↑    (all) Add support for some Fuze V2 and Clip+ hardware revisions that could not be patched due to changed firmware format 
+
+    1.2.7 (bugfix release) - released 2010-06-22
+        √    (all) fix proxy support getting initialized too late, resulting in error messages on startup (FS#11163).
+        √    (all) Distinguish between release and daily build when installing voice file and fonts. Fixed file mismatches (FS#11362).
+        √    (linux) Fix a crash on USB detection (FS#11420).
+        ↑    (all) Multicore support for TTS and encoders (FS#11160)
+        ↑    (all) improve detection of new RockboxUtility version (false positive was showing up on Mac only).
+        ↑    (all) handle Rockbox install versions when installing themes. Fixes incompatible themes getting installed after the recent theme syntax change.
+        ↑    (all) new targets support
+            Sansa Fuze v2
+            MPIO HD200 (FS#11242) (disabled) 
+
+    1.2.6 (bugfix release) - released 2010-04-10
+        √    (all) fix bootloader installation problem for H10 (might occur on m:robe 100 too; FS#11086).
+        √    (all) fix manual download links for H10.
+        √    (OSX) fix voice and talk file creation on PPC
+        ↑    (OSX) support for Speech Synthesis Manager
+        ↑    (OSX) support system proxy values retrieval
+        ↑    (all) rename the binary from "rbutilqt" to "RockboxUtility".
+        ↑    (linux) replace bitmap icon with svg version (FS#11094).
+        ↑    (all) new targets
+            sansa clip+
+            clipv2
+            Packard Bell Vibe500
+            Toshiba Gigabeat S (disabled) 
+
+    1.2.5 (bugfix release) - released 2010-02-12
+        √    (w32) ipod bootloader install was broken
+        √    (OSX) released binary was wrongly built.
+        ↑    (all) allow showing disabled targets in configuration dialog 
+
+    1.2.4 (bugfix release) - released 2010-02-03
+        ↑    (all) Support for 2nd generation Ipod Nano
+        ↑    (all) Support for Cowon D2 (FS#10728) (currently disabled)
+        √    (all) The language selected for talkfile creation overwrote the system language
+        ↑    (all) Change layout direction according to language
+        ↑    (all) Detect Ipod 64MB
+        √    (OSX) Fix WinPod? misdetected as MacPod? on OS X (FS#9833).
+        √    (OSX) Fix bootloader installation for Sansa players.
+        √    (OSX) Wait for the system to remount the player after bootloader installation. Fixes small / complete installation writing data to the wrong location (FS#10100). 
+
+    1.2.3 (bugfix release) - released 2009-09-20
+        √    (all) Talkfile window: don't overwrite the current selected path with the previous value when changing settings from the dialog directly (FS#10409).
+        ↑    (all) (preliminary) support for Samsung YH-820, YH-920 and YH-925 (FS#10373). (currently disabled)
+        ↑    (all) (preliminary) support for Sansa AMS models (e200v2, fuze, m200v4, clip). (FS#10185). (m200v4 and clip currently disabled)
+        ↑    (all) (preliminary) support for ChinaChip models (Onda VX747(+), VX777). (FS#10456).(currently disabled)
+        ↑    (all) log internal state add possibility to save it upon error from the log window, and (regardless of an error occured) view and save it from the menu.
+        √    (all) don't internally select a player model if an unsupported player is detected.
+        √    (all) Festival TTS handling was broken in version 1.2.2
+        ↑    (all) new option to ignore specific files for .talkfile generation
+        √    (all) Rockbox Utility didn't properly follow redirects on the server
+        ↑    (all) Add check for new Rockbox Utility version at startup
+        √    (all) update several URLs to match the new locations after the server move.
+        √    (all) Rockbox Utillity could not generate voice files for releases. 
+
+    1.2.2 (bugfix release) - released 2009-06-17
+        ↑    (all) UI for Encoder and TTS settings was reworked (FS#10070).
+        ↑    (all) Bootloader installation now respects the selected mountpoint when installing the bootloader on ipod and sansa players (FS#10096).
+        √    (all) fix a segfault on exit when bootloader installation was called multiple times (only ipod / sansa bootloader)
+        √    (all) fix proxy support not working properly with theme installation (and probably other dialogs)
+        √    (all) fix various broken links (most notably manual and voice file download), resulting in a "HTTP 404" error. 
+
+    1.2.1 (bugfix release) - released 2009-04-26
+        √    (all) Theme installation doesn't find themes, because the theme site changed
+        √    (all) For some targets (iriver h10 5gb, ipod mini) the target mismatch detection doesn't work correctly (FS#10055).
+        √    (all) installing the bootloader on Sansa players could result in a wrong bootloader installed if the selected device didn't match the physically present one (i.e. e200 bootloader installed on c200).
+        √    (all) zip files created by info-zip 3.0 not extracted properly, no error indication.
+        ↑    (linux) The Festival TTS is now supported under Linux (FS#9983). 
+
+    1.2 (themes.rockbox.org ready) - released 2009-03-23
+        √    (w32) selecting a cache path was limited to drives (FS#10013).
+        √    (all) themes dialog doesn't show any themes even if there are themes available ( Note: the themes site isn't up yet).
+        √    (all) improved error reporting on theme preview download. 
+
+    1.1 (no more hardcoded release) - released 2009-03-06
+        ↑    (all) Rockbox Utility now retrieves information about the latest Rockbox release from the download server.
+        √    (all) The configuration is now checked in the configuration dialog before accepting it to prevent wrong configurations getting saved (FS#9944).
+        √    (linux) try to detect if Rockbox Utility is run using sudo and make sure the configuration file (on the PC) is saved with proper permissions.
+        √    (w32) "No Sansa found" error when trying to install the bootloader for e200 / c200 (FS#9729). 
+
+    m1.0.9 (bugfix release) - released 2009-01-06
+        √    (all) Gigabeat F/X bootloader installation put the bootloader file in the wrong place (FS#9766) 
+
+    m1.0.8 ("Rockbox 3.1" release) - released 2008-12-23 with Rockbox 3.1
+        ↑    rbutil now checks if the disk space is sufficient before extracting zip files (fixes FS#9417).
+        ↑    bootloader installation has been reworked completely, improving the messages during bootloader install and adding more hints (i.e. where to find required files etc.)
+        installation dialog now remembers the last build selection
+        quick start defaults to the latest release instead of the most recent build.
+        √    support for Rockbox 3.1
+        √    (w32) sapi voice engine support was broken. (Updated binaries available as m1.0.7b) 
+
+    m1.0.7 (bugfix and "3.0 ready" release) - released 2008-09-26
+        ↑    if no language has been selected by the configuration the system language is used (given that a translation in the system language is available)
+        ↑    support for sansa c200 with original firmware version 01.01.07
+        ↑    rbutil now transmits its own User-Agent string for http requests.
+        ↑    replaced "Install All" button in theme installation by a notice how to install multiple themes.
+        √    Bootloader installation for iaudios could fail if there is no FIRMWARE directory
+        √    update for Rockbox 3.0 release 
+
+    m1.0.6 (bugfix release) - released 2008-07-06
+        ↑    Rbutil now asks if it should backup before updating to a new Build.
+        ↑    improved download caching
+        ↑    new System Info dialog (About / System Info). Shows user priviledge level on W32, so check this if you have issues installing the bootloader on your Ipod / Sansa.
+        ↑    the encoder is now automatically choosen depending on the selected player.
+        ↑    (w32) improved mountpoint detection for Sansa / Ipod.
+        √    (w32) using autodetection resulted in "no Sansa found" errors. 
+
+    m1.0.5 (bugfix release) - released 2008-04-21
+        √    (linux, os x) H10, Iaudio, Gigabeat and m:robe bootloader installation can fail on case-sensitive systems
+        √    (regression) System proxy setting isn't honored in some places.
+        √    Themes button created a segfault when offline mode was enabled.
+        √    mountpoint detection on Gigabeat was non-functional.
+        √    downloading didn't work if URI contained special characters (happened with a space in DockPod Aqua theme file)
+        ↑    enhanced mountpoint detection for Ipods. Should work always if OF specific folders are present.
+        ↑    m:robe 100 support.
+        ↑    iaudio m3 support.
+        ↑    detect unsupported player variants (e200v2 / c200v2 / Ipod Nano 2G / 3G) and inform the user that Rockbox will not run.
+        ↑    extracting the downloaded archives previously didn't show any progress (most notably on players with slow hard discs like m:robe) 
+
+    m1.0.4 (bugfix release) - released 2008-02-19
+        √    Complete Installation still seems buggy. Please use the install options from the second tab, until it's fixed.
+        √    The URL to the voice file was wrong for a few targets.
+        √    (w32 / vista) bootloader installation doesn't work due to UAC issues on windows vista, you need to use the manual bootloader installation for now.
+        ↑    Voice file creation is now possible with rbutil.
+        ↑    Support rbspeex as encoder for .Talk files. Its now builtin.
+        ↑    (w32) Sapi_voice script is now built in.
+        ↑    (w32) "system proxy" now also honors the ProxyEnable value (i.e. if you entered a proxy value in IE's settings dialog but disabled them rbutil also won't use them. Automatic proxy settings are still unsupported). 
+
+    m1.0.3 (bugfix release) - released 2007-11-13.
+        √    Talkfile creation puts the _dirname.talk file in the wrong place.
+        √    complete Installation failed with "unsupported install method".
+        √    (w32) Sansa bootloader installation didn't work 
+
+    m1.0.2 (bugfix release) - released 2007-10-18.
+        ↑    Enhanced device detection code, utilizing the USB IDs.
+        ↑    Two new translations (Chinese traditional and simplified.
+        ↑    Support for the sansa c200.
+        ↑    On Windows using the proxy settings set in IE5 is supported.
+        ↑    The new "Actions" menu should make it easier to operate using the keyboard or screenreaders.
+        √    uninstalling the bootloader doesn't honor the proxy setting
+        √    Iaudio M5 was listed as color target
+        √    add Sandisk C200 configuration and detection
+        √    installation tasks don't check for a valid configuration but fail instead.
+        √    small / complete installation tries to install the bootloader even for targets that don't require one; similar applies to doom.
+        √    downloading PDF manual crashes installer 
+
+    m1.0.1 (bugfix release) - released 2007-09-03.
+        ↑    Enhanced device detection code. (Note: The user configuration file changed slightly. If you used Rockbox Utility before your user configuration is expected to be missing upon the first launch.)
+        √    when you use the autodetection button, a device was found by the detection and there wasn't anything selected previously the program segfaults.
+        √    the ipodvideo64mb build was missing. ipodpatcher cant detect it, select it by hand.
+        √    rbutil doesnt detect and install the iaudio X5V build correctly
+        √    when detecting a device only the selected tree was collapsed.
+        √    the install log window doesn't update between download started and unzip finished.
+        √    entering the talk file window with invalid settings result in a crash. Strangely doesn't happen in all cases.
+        √    (linux only) when autodetecting an Ipod there was a possiblity to detect the wrong mountpoint if other partitions (IPL) are present and mounted
+        √    (w32 only) the menu bar shows up slightly delayed (looks like this was related to my Qt installation and not a bug itself)
+        √    (w32 only) if you close the program while it tries downloading build information (from the main screen) you'll get a crash upon exit 
+
+    m1.0 (Milestone 1) - released 2007-08-29.
+        ↑    All functionality that was present in the old version has been ported, plus some minor enhancements. 
+
+
