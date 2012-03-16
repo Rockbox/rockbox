@@ -40,6 +40,7 @@
 #include "ziputil.h"
 #include "manualwidget.h"
 #include "infowidget.h"
+#include "changelogwidget.h"
 
 #include "progressloggerinterface.h"
 
@@ -353,12 +354,21 @@ void RbUtilQt::updateSettings()
     HttpGet::setGlobalDumbCache(RbSettings::value(RbSettings::CacheOffline).toBool());
 
     if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
-        QApplication::processEvents();
-        QMessageBox::information(this, tr("New installation"),
-            tr("This is a new installation of Rockbox Utility, or a new version. "
-                "The configuration dialog will now open to allow you to setup the program, "
-                " or review your settings."));
-        configDialog();
+        qDebug() << "[RbUtil] new version detected";
+        QVariant showChangelogCurrent;
+        showChangelogCurrent = RbSettings::subValue("show_changelog", RbSettings::ShowChangelog);
+        qDebug() << showChangelogCurrent;
+        if(showChangelogCurrent == "show_changelog" "") {
+            RbSettings::setSubValue("show_changelog", RbSettings::ShowChangelog, "true");
+        }
+        if(showChangelogCurrent == "false") {
+            qDebug() << "[RbUtil] changelog menu desactivated";
+        }
+        else {
+        /* Launch changelog menu */
+        changelog = new ChangelogWidget(this);
+        connect(changelog, SIGNAL(changelogClosed()), this, SLOT(configDialog()));
+        }
     }
     else if(chkConfig(0)) {
         QApplication::processEvents();
