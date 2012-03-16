@@ -106,9 +106,13 @@
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
 #endif
-
-
 
 #define FRACTSIZE 10
 
@@ -216,10 +220,13 @@ int quit=0;
 #define BEATBOX_RIGHT   BUTTON_RIGHT
 #define BEATBOX_SELECT  BUTTON_SELECT
 
-
+#if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+#define BEATBOX_PLAY BUTTON_PLAYPAUSE
+#define BEATBOX_STOP BUTTON_BACK
+#else
 #define BEATBOX_PLAY BUTTON_ON
 #define BEATBOX_STOP BUTTON_OFF
-
+#endif
 
 #define VAL_NONE    0
 #define VAL_ENABLED 1

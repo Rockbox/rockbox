@@ -74,7 +74,8 @@ mikmod
 #if defined(IRIVER_H300_SERIES) || defined(IRIVER_H100_SERIES) || \
     (CONFIG_KEYPAD == SANSA_FUZE_PAD) || (CONFIG_KEYPAD == SANSA_E200_PAD) || \
     (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD || CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD || CONFIG_KEYPAD == SAMSUNG_YPR0_PAD) || \
+    (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
 /* PDBox is confirmed to run on these player models. */
 pdbox
 #endif
