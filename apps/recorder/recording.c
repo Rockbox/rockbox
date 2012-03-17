@@ -879,7 +879,7 @@ static const char* reclist_get_name(int selected_item, void * data,
 #ifdef HAVE_AGC
     char buf3[32];
 #endif
-    data = data; /* not used */
+    (void)data; /* not used */
     if(selected_item >= ITEM_COUNT)
         return "";
 
