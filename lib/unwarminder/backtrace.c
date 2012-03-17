@@ -23,6 +23,8 @@
  ***************************************************************************/
 
 #include "backtrace.h"
+#include "symbols.h"
+#include "safe_read.h"
 
 /***************************************************************************
  * Prototypes
@@ -76,9 +78,10 @@ static Boolean CliReport(void *data, Int32 address)
     unsigned *line = (unsigned *)data;
 
 
-    lcd_putsf(0, (*line)++, "    %c: 0x%08x",
+    lcd_putsf(0, (*line)++, "    %c: 0x%08x %s",
               (address & 0x1) ? 'T' : 'A',
-              address & (~0x1));
+              address & (~0x1),
+              sym_get_function_name(address));
     lcd_update();
 
     return TRUE;
@@ -86,20 +89,17 @@ static Boolean CliReport(void *data, Int32 address)
 
 static Boolean CliReadW(const Int32 a, Int32 *v)
 {
-    *v = *(Int32 *)a;
-    return TRUE;
+    return safe_read32((uint32_t *)a, (uint32_t *)v);
 }
 
 static Boolean CliReadH(const Int32 a, Int16 *v)
 {
-    *v = *(Int16 *)a;
-    return TRUE;
+    return safe_read16((void *)a, (uint16_t *)v);
 }
 
 static Boolean CliReadB(const Int32 a, Int8 *v)
 {
-    *v = *(Int8 *)a;
-    return TRUE;
+    return safe_read8((void *)a, (uint8_t *)v);
 }
 
 Boolean CliInvalidateW(const Int32 a)

@@ -282,35 +282,6 @@ vectors_end:
 
     .text
 
-/* All illegal exceptions call into UIE with exception address as first
-   parameter. This is calculated differently depending on which exception
-   we're in. Second parameter is exception number, used for a string lookup
-   in UIE.
- */
-undef_instr_handler:
-    sub    r0, lr, #4
-    mov    r1, #0
-    b      UIE
-
-/* We run sys mode most of the time, and should never see a software
-   exception being thrown. Make it illegal and call UIE.
- */
-software_int_handler:
-reserved_handler:
-    sub    r0, lr, #4
-    mov    r1, #4
-    b      UIE
-
-prefetch_abort_handler:
-    sub    r0, lr, #4
-    mov    r1, #1
-    b      UIE
-
-data_abort_handler:
-    sub    r0, lr, #8
-    mov    r1, #2
-    b      UIE
-
 #ifdef BOOTLOADER
 fiq_handler:
     subs    pc, lr, #4

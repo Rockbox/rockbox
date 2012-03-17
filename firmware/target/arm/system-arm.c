@@ -36,6 +36,56 @@ static const char* const uiename[] = {
     "SWI"
 };
 
+void __attribute__((weak,naked)) data_abort_handler(void)
+{
+    asm volatile(
+        "sub    r0, lr, #8  \n"
+        "mov    r1, #2      \n"
+        "b      UIE         \n"
+        );
+}
+
+void __attribute__((weak,naked)) software_int_handler(void)
+{
+    asm volatile(
+        "sub    r0, lr, #4  \n"
+        "mov    r1, #4      \n"
+        "b      UIE         \n"
+        );
+}
+
+void __attribute__((weak,naked)) reserved_handler(void)
+{
+    asm volatile(
+        "sub    r0, lr, #4  \n"
+        "mov    r1, #4      \n"
+        "b      UIE         \n"
+        );
+}
+
+void __attribute__((weak,naked)) prefetch_abort_handler(void)
+{
+    asm volatile(
+        "sub    r0, lr, #4  \n"
+        "mov    r1, #1      \n"
+        "b      UIE         \n"
+        );
+}
+
+void __attribute__((weak,naked)) undef_instr_handler(void)
+{
+    asm volatile(
+        "sub    r0, lr, #4    \n"
+#ifdef USE_THUMB
+        "mrs    r1, spsr      \n"
+        "tst    r1, #(1 << 5) \n" // T bit set ?
+        "subne  r0, lr, #2    \n" // if yes, offset to THUMB instruction
+#endif
+        "mov    r1, #0        \n"
+        "b      UIE           \n"
+        );
+}
+
 /* Unexpected Interrupt or Exception handler. Currently only deals with
    exceptions, but will deal with interrupts later.
  */
