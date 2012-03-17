@@ -12703,10 +12703,10 @@
     *: "Set As Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Ustaw jako katalog listy odtwarzania"
+    *: "Ustaw jako katalog list odtwarzania"
   </dest>
   <voice>
-    *: "Ustaw jako katalog listy odtwarzania"
+    *: "Ustaw jako katalog list odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -12731,10 +12731,10 @@
     *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Resetuj katalog listy odtwarzania"
+    *: "Zresetuj katalog list odtwarzania"
   </dest>
   <voice>
-    *: "Resetuj katalog listy odtwarzania"
+    *: "Zresetuj katalog list odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -12745,10 +12745,10 @@
     *: "Glyphs To Cache"
   </source>
   <dest>
-    *: "Kopiuj tekst do Schowka"
+    *: "Rozmiar bufora znaków"
   </dest>
   <voice>
-    *: "Kopiuj tekst do schowka"
+    *: "Rozmiar bufora znaków"
   </voice>
 </phrase>
 <phrase>
@@ -12778,11 +12778,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Dźwięk klawiszy (głośnik)"
+    hardware_click: "Dźwięk przycisków (głośnik)"
   </dest>
   <voice>
     *: none
-    hardware_click: "Dźwięk klawiszy (głośnik)"
+    hardware_click: "Dźwięk przycisków (głośnik)"
   </voice>
 </phrase>
 <phrase>
@@ -12795,11 +12795,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Dźwięk klawiszy (słuchawki)"
+    hardware_click: "Dźwięk przycisków (słuchawki)"
   </dest>
   <voice>
     *: none
-    hardware_click: "Dźwięk klawiszy (słuchawki)"
+    hardware_click: "Dźwięk przycisków (słuchawki)"
   </voice>
 </phrase>
 <phrase>
@@ -12812,11 +12812,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Line Padding in Lists"
+    touchscreen: "Odstępy międzyliniowe w listach"
   </dest>
   <voice>
     *: none
-    touchscreen: "Line Padding in Lists"
+    touchscreen: "Odstępy międzyliniowe w listach"
   </voice>
 </phrase>
 <phrase>
@@ -12827,10 +12827,10 @@
     *: "Automatic"
   </source>
   <dest>
-    *: "Automatycznie"
+    *: "Automatyczny"
   </dest>
   <voice>
-    *: "Automatycznie"
+    *: "Automatyczny"
   </voice>
 </phrase>
 <phrase>
@@ -12855,10 +12855,10 @@
     *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Anuluj budzik"
+    *: "Anuluj usypianie"
   </dest>
   <voice>
-    *: "Anuluj budzik"
+    *: "Anuluj usypianie"
   </voice>
 </phrase>
 <phrase>
@@ -12869,10 +12869,10 @@
     *: "Startup/Shutdown"
   </source>
   <dest>
-    *: "Włącz/Wyłącz"
+    *: "Włączanie/Wyłączanie"
   </dest>
   <voice>
-    *: "Włącz/Wyłącz"
+    *: "Włączanie/Wyłączanie"
   </voice>
 </phrase>
 <phrase>
@@ -12883,10 +12883,10 @@
     *: "Restart Sleep Timer On Keypress"
   </source>
   <dest>
-    *: "Resetuj budzik po naciśnięciu klawisza"
+    *: "Zresetuj usypiacz przy naciśnięciu przycisku"
   </dest>
   <voice>
-    *: "Resetuj budzik po naciśnięciu klawisza"
+    *: "Zresetuj usypiacz przy naciśnięciu przycisku"
   </voice>
 </phrase>
 <phrase>
@@ -12897,10 +12897,10 @@
     *: "Default Sleep Timer Duration"
   </source>
   <dest>
-    *: "Domyślna pora alarmu"
+    *: "Domyślny czas usypiacza"
   </dest>
   <voice>
-    *: "Domyślna pora alarmu"
+    *: "Domyślny czas usypiacza"
   </voice>
 </phrase>
 <phrase>
@@ -12911,9 +12911,9 @@
     *: "Start Sleep Timer On Boot"
   </source>
   <dest>
-    *: "Ustaw alarm przy włączeniu"
+    *: "Uruchom usypiacz przy włączeniu"
   </dest>
   <voice>
-    *: "Ustaw alarm przy włączeniu"
+    *: "Uruchom usypiacz przy włączeniu"
   </voice>
 </phrase>
