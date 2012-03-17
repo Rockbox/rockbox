@@ -26,7 +26,8 @@ int imx233_adc_mapping[] =
     [ADC_BATTERY] = IMX233_ADC_BATTERY,
     [ADC_DIE_TEMP] = IMX233_ADC_DIE_TEMP,
     [ADC_VDDIO] = IMX233_ADC_VDDIO,
-    [ADC_5V] = HW_LRADC_CHANNEL_5V,
+    [ADC_5V] = IMX233_ADC_VDD5V,
+    [ADC_BATT_TEMP] = IMX233_ADC_BATT_TEMP,
     [ADC_CH2] = HW_LRADC_CHANNEL(2),
 };
 
@@ -34,7 +35,8 @@ const char *imx233_adc_channel_name[] =
 {
     "Battery(raw)",
     "Die temperature(°C)",
-    "VddIO",
-    "Vdd5V",
+    "VddIO(mV)",
+    "Vdd5V(mV)",
+    "Battery temperature(raw)",
     "Channel 2",
 };

@@ -43,8 +43,14 @@
 #define HW_LRADC_CTRL2__TEMP_ISRC1_BM           0xf0
 #define HW_LRADC_CTRL2__TEMP_ISRC0_BP           0
 #define HW_LRADC_CTRL2__TEMP_ISRC0_BM           0xf
+#define HW_LRADC_CTRL2__TEMP_ISRCx_BP(x)        (4 * (x))
+#define HW_LRADC_CTRL2__TEMP_ISRCx_BM(x)        (0xf << (4 * (x)))
+#define HW_LRADC_CTRL2__TEMP_ISRC__0uA          0
+#define HW_LRADC_CTRL2__TEMP_ISRC__20uA         1
+#define HW_LRADC_CTRL2__TEMP_ISRC__300uA        15
 #define HW_LRADC_CTRL2__TEMP_SENSOR_IENABLE0    (1 << 8)
 #define HW_LRADC_CTRL2__TEMP_SENSOR_IENABLE1    (1 << 9)
+#define HW_LRADC_CTRL2__TEMP_SENSOR_IENABLEx(x) (1 << (8 + (x)))
 #define HW_LRADC_CTRL2__TEMPSENSE_PWD           (1 << 15)
 #define HW_LRADC_CTRL2__DIVIDE_BY_TWO(x)        (1 << ((x) + 24))
 
@@ -59,7 +65,7 @@
 #define HW_LRADC_STATUS     (*(volatile uint32_t *)(HW_LRADC_BASE + 0x40))
 
 #define HW_LRADC_CHx(x)     (*(volatile uint32_t *)(HW_LRADC_BASE + 0x50 + (x) * 0x10))
-#define HW_LRADC_CHx__NUM_SAMPLES_BM    (0xf << 24)
+#define HW_LRADC_CHx__NUM_SAMPLES_BM    (0x1f << 24)
 #define HW_LRADC_CHx__NUM_SAMPLES_BP    24
 #define HW_LRADC_CHx__ACCUMULATE        29
 #define HW_LRADC_CHx__VALUE_BM          0x3ffff
@@ -127,8 +133,11 @@ void imx233_lradc_reserve_delay(int dchannel);
 void imx233_lradc_release_delay(int dchan);
 
 /* enable sensing and return temperature in kelvin,
- * channels must already be configured as nmos and pmos */
+ * channels needs not to be configured */
 int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan);
+/* return *raw* external temperature, might need some transformation
+ * channel needs not to be configured */
+int imx233_lradc_sense_ext_temperature(int chan, int sensor);
 
 void imx233_lradc_setup_battery_conversion(bool automatic, unsigned long scale_factor);
 // read scaled voltage, only available after proper setup

@@ -25,46 +25,11 @@
 #include "system.h"
 #include "adc-imx233.h"
 
-/* dedicate two channels to temperature sensing
- * dedicate channel 7 to battery
- * and channel 6 to vddio */
-static int pmos_chan, nmos_chan;
-static int battery_chan, vddio_chan;
-static int battery_delay_chan;
-
 void adc_init(void)
 {
-    imx233_lradc_init();
-    /* reserve channels 6 for vddio and 7 for battery (special for conversion) */
-    battery_chan = 7;
-    vddio_chan = 6;
-    imx233_lradc_reserve_channel(battery_chan);
-    imx233_lradc_reserve_channel(vddio_chan);
-    /* reserve any channels for PMOS and NMOS */
-    pmos_chan = imx233_lradc_acquire_channel(TIMEOUT_NOBLOCK);
-    if(pmos_chan < 0) panicf("No LRADC channel for PMOS !");
-    nmos_chan = imx233_lradc_acquire_channel(TIMEOUT_NOBLOCK);
-    if(nmos_chan < 0) panicf("No LRADC channel for NMOS !");
-
-    /* setup them for the simplest use: no accumulation, no division*/
-    imx233_lradc_setup_channel(battery_chan, false, false, 0, HW_LRADC_CHANNEL_BATTERY);
-    imx233_lradc_setup_channel(vddio_chan, false, false, 0, HW_LRADC_CHANNEL_VDDIO);
-    imx233_lradc_setup_channel(nmos_chan, false, false, 0, HW_LRADC_CHANNEL_NMOS_THIN);
-    imx233_lradc_setup_channel(pmos_chan, false, false, 0, HW_LRADC_CHANNEL_PMOS_THIN);
-    /* setup delay channel for battery for automatic reading and scaling */
-    battery_delay_chan = 0;
-    imx233_lradc_reserve_delay(battery_delay_chan);
-    /* setup delay to trigger battery channel and retrigger itself.
-     * The counter runs at 2KHz so a delay of 200 will trigger 10
-     * conversions per seconds */
-    imx233_lradc_setup_delay(battery_delay_chan, 1 << battery_chan,
-        1 << battery_delay_chan, 0, 200);
-    imx233_lradc_kick_delay(battery_delay_chan);
-    /* enable automatic conversion, use Li-Ion type battery */
-    imx233_lradc_setup_battery_conversion(true, HW_LRADC_CONVERSION__SCALE_FACTOR__LI_ION);
 }
 
-int adc_read_physical_ex(int virt)
+static short adc_read_physical_ex(int virt)
 {
     imx233_lradc_clear_channel(virt);
     imx233_lradc_kick_channel(virt);
@@ -72,27 +37,51 @@ int adc_read_physical_ex(int virt)
     return imx233_lradc_read_channel(virt);
 }
 
-int adc_read_physical(int src)
+static short adc_read_physical(int src, bool div2)
 {
     int virt = imx233_lradc_acquire_channel(TIMEOUT_BLOCK);
     // divide by two for wider ranger
-    imx233_lradc_setup_channel(virt, true, false, 0, src);
+    imx233_lradc_setup_channel(virt, div2, false, 0, src);
     int val = adc_read_physical_ex(virt);
     imx233_lradc_release_channel(virt);
     return val;
 }
 
-unsigned short adc_read_virtual(int c)
+static short adc_read_virtual(int c)
 {
     switch(c)
     {
         case IMX233_ADC_BATTERY:
-            return adc_read_physical_ex(battery_chan);
+            return imx233_lradc_read_battery_voltage();
         case IMX233_ADC_VDDIO:
-            return adc_read_physical_ex(vddio_chan);
+            /* VddIO pin has a builtin 2:1 divide */
+            return adc_read_physical(HW_LRADC_CHANNEL_VDDIO, false);
+        case IMX233_ADC_VDD5V:
+            /* Vdd5V pin has a builtin 4:1 divide */
+            return adc_read_physical(HW_LRADC_CHANNEL_5V, false) * 2;
         case IMX233_ADC_DIE_TEMP:
-            // do kelvin to celsius conversion
-            return imx233_lradc_sense_die_temperature(nmos_chan, pmos_chan) - 273;
+        {
+            // don't block on second channel otherwise we might deadlock !
+            int nmos_chan = imx233_lradc_acquire_channel(TIMEOUT_BLOCK);
+            int pmos_chan = imx233_lradc_acquire_channel(TIMEOUT_NOBLOCK);
+            int val = 0;
+            if(pmos_chan >= 0)
+            {
+                val = imx233_lradc_sense_die_temperature(nmos_chan, pmos_chan) - 273;
+                imx233_lradc_release_channel(pmos_chan);
+            }
+            imx233_lradc_release_channel(nmos_chan);
+            return val;
+        }
+#ifdef IMX233_ADC_BATT_TEMP_SENSOR
+        case IMX233_ADC_BATT_TEMP:
+        {
+            int virt = imx233_lradc_acquire_channel(TIMEOUT_BLOCK);
+            int val = imx233_lradc_sense_ext_temperature(virt, IMX233_ADC_BATT_TEMP_SENSOR);
+            imx233_lradc_release_channel(virt);
+            return val;
+        }
+#endif
         default:
             return 0;
     }
@@ -104,5 +93,5 @@ unsigned short adc_read(int channel)
     if(c < 0)
         return adc_read_virtual(c);
     else
-        return adc_read_physical(c);
+        return adc_read_physical(c, true);
 }
