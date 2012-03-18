@@ -14,9 +14,10 @@ SIMFLAGS += $(INCLUDES) $(DEFINES) -DHAVE_CONFIG_H $(GCCOPTS)
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
 
-$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(UNWARMINDER)
+$(BUILDDIR)/rockbox.elf : $$(OBJ) $$(RBCODEC_LIB) $$(FIRMLIB) $$(VOICESPEEXLIB) $$(SKINLIB) $$(UNWARMINDER)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
+                $(RBCODEC_LIB) \
 		-L$(BUILDDIR)/apps/codecs $(VOICESPEEXLIB:lib%.a=-l%) \
 		-L$(BUILDDIR)/lib -lskin_parser \
 		$(LDOPTS) $(GLOBAL_LDOPTS) -Wl,-Map,$(BUILDDIR)/rockbox.map
