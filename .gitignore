@@ -69,7 +69,6 @@
 /tools/player_unifont
 /tools/uclpack
 /tools/ipod_fw
-/tools/checkwps
 /tools/wavtrim
 /tools/voicefont
 /tools/rbspeexenc
@@ -79,9 +78,6 @@
 /tools/mkzenboot
 /tools/iaudio_bl_flash.c
 /tools/iaudio_bl_flash.h
-
-# /tools/checkwps/
-/tools/checkwps/checkwps.*
 
 # /tools/database/
 /tools/database/database
