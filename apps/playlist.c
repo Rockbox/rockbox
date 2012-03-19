@@ -175,7 +175,7 @@ static int compare(const void* p1, const void* p2);
 static int get_filename(struct playlist_info* playlist, int index, int seek,
                         bool control_file, char *buf, int buf_length);
 static int get_next_directory(char *dir);
-static int get_next_dir(char *dir, bool is_forward, bool recursion);
+static int get_next_dir(char *dir, bool is_forward);
 static int get_previous_directory(char *dir);
 static int check_subdir_for_music(char *dir, const char *subdir, bool recurse);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
@@ -608,31 +608,32 @@ static int create_and_play_dir(int direction, bool play_last)
     else
       res = get_previous_directory(dir);
 
-    if (!res)
+    if (res < 0)
+        /* return the error encountered */
+        return res;
+
+    if (playlist_create(dir, NULL) != -1)
     {
-        if (playlist_create(dir, NULL) != -1)
-        {
-            ft_build_playlist(tree_get_context(), 0);
+        ft_build_playlist(tree_get_context(), 0);
 
-            if (global_settings.playlist_shuffle)
-                 playlist_shuffle(current_tick, -1);
+        if (global_settings.playlist_shuffle)
+             playlist_shuffle(current_tick, -1);
 
-            if (play_last && direction <= 0)
-                index = current_playlist.amount - 1;
-            else
-                index = 0;
+        if (play_last && direction <= 0)
+            index = current_playlist.amount - 1;
+        else
+            index = 0;
 
 #if (CONFIG_CODEC == SWCODEC)
-            current_playlist.started = true;
+        current_playlist.started = true;
 #else
-            playlist_start(index, 0);
+        playlist_start(index, 0);
 #endif
-        }
-
-        /* we've overwritten the dircache when getting the next/previous dir,
-           so the tree browser context will need to be reloaded */
-        reload_directory();
     }
+
+    /* we've overwritten the dircache when getting the next/previous dir,
+       so the tree browser context will need to be reloaded */
+    reload_directory();
 
     return index;
 }
@@ -1435,18 +1436,18 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
 }
 
 static int get_next_directory(char *dir){
-  return get_next_dir(dir,true,false);
+    return get_next_dir(dir, true);
 }
 
 static int get_previous_directory(char *dir){
-  return get_next_dir(dir,false,false);
+    return get_next_dir(dir, false);
 }
 
 /*
  * search through all the directories (starting with the current) to find
  * one that has tracks to play
  */
-static int get_next_dir(char *dir, bool is_forward, bool recursion)
+static int get_next_dir(char *dir, bool is_forward)
 {
     struct playlist_info* playlist = &current_playlist;
     int result = -1;
@@ -1454,6 +1455,27 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
     bool exit = false;
     struct tree_context* tc = tree_get_context();
     int saved_dirfilter = *(tc->dirfilter);
+    unsigned int base_len;
+
+    if (global_settings.constrain_next_folder)
+    {
+        /* constrain results to directories below user's start directory */
+        strcpy(dir, global_settings.start_directory);
+        base_len = strlen(dir);
+
+        /* strip any trailing slash from base directory */
+        if (base_len > 0 && dir[base_len - 1] == '/')
+        {
+            base_len--;
+            dir[base_len] = '\0';
+        }
+    }
+    else
+    {
+        /* start from root directory */
+        dir[0] = '\0';
+        base_len = 0;
+    }
 
     /* process random folder advance */
     if (global_settings.next_folder == FOLDER_ADVANCE_RANDOM)
@@ -1461,43 +1483,46 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
         int fd = open(ROCKBOX_DIR "/folder_advance_list.dat", O_RDONLY);
         if (fd >= 0)
         {
-            char buffer[MAX_PATH];
             int folder_count = 0;
-            srand(current_tick);
-            *(tc->dirfilter) = SHOW_MUSIC;
-            tc->sort_dir = global_settings.sort_dir;
             read(fd,&folder_count,sizeof(int));
-            if (!folder_count)
-                exit = true;
-            while (!exit)
-            {
-                int i = rand()%folder_count;
-                lseek(fd,sizeof(int) + (MAX_PATH*i),SEEK_SET);
-                read(fd,buffer,MAX_PATH);
-                if (check_subdir_for_music(buffer, "", false) ==0)
-                    exit = true;
-            }
             if (folder_count)
-                strcpy(dir,buffer);
-            close(fd);
-            *(tc->dirfilter) = saved_dirfilter;
-            tc->sort_dir = global_settings.sort_dir;
-            reload_directory();
-            return 0;
+            {
+                char buffer[MAX_PATH];
+                /* give up looking for a directory after we've had four
+                   times as many tries as there are directories. */
+                unsigned long allowed_tries = folder_count * 4;
+                int i;
+                srand(current_tick);
+                *(tc->dirfilter) = SHOW_MUSIC;
+                tc->sort_dir = global_settings.sort_dir;
+                while (!exit && allowed_tries--)
+                {
+                    i = rand() % folder_count;
+                    lseek(fd, sizeof(int) + (MAX_PATH * i), SEEK_SET);
+                    read(fd, buffer, MAX_PATH);
+                    /* is the current dir within our base dir and has music? */
+                    if ((base_len == 0 || !strncmp(buffer, dir, base_len))
+                        && check_subdir_for_music(buffer, "", false) == 0)
+                            exit = true;
+                }
+                close(fd);
+                *(tc->dirfilter) = saved_dirfilter;
+                tc->sort_dir = global_settings.sort_dir;
+                reload_directory();
+                if (exit)
+                {
+                    strcpy(dir,buffer);
+                    return 0;
+                }
+            }
+            else
+                close(fd);
         }
     }
 
-    /* not random folder advance (or random folder advance unavailable) */
-    if (recursion)
-    {
-       /* start with root */
-       dir[0] = '\0';
-    }
-    else
-    {
-        /* start with current directory */
+    /* if the current file is within our base dir, use its dir instead */
+    if (base_len == 0 || !strncmp(playlist->filename, dir, base_len))
         strlcpy(dir, playlist->filename, playlist->dirlen);
-    }
 
     /* use the tree browser dircache to load files */
     *(tc->dirfilter) = SHOW_ALL;
@@ -1546,7 +1571,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
                 exit = true;
                 break;
             }
-            
+
             if (files[i].attr & ATTR_DIRECTORY)
             {
                 if (!start_dir)
@@ -1566,27 +1591,36 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
 
         if (!exit)
         {
-            /* move down to parent directory.  current directory name is
-               stored as the starting point for the search in parent */
-            start_dir = strrchr(dir, '/');
-            if (start_dir)
+            /* we've already descended to the base dir with nothing found,
+               check whether that contains music */
+            if (strlen(dir) <= base_len)
             {
-                *start_dir = '\0';
-                start_dir++;
+                result = check_subdir_for_music(dir, "", true);
+                if (result == -1)
+                    /* there's no music files in the base directory,
+                       treat as a fatal error */
+                    result = -2;
+                break;
             }
             else
-                break;
+            {
+                /* move down to parent directory.  current directory name is
+                   stored as the starting point for the search in parent */
+                start_dir = strrchr(dir, '/');
+                if (start_dir)
+                {
+                    *start_dir = '\0';
+                    start_dir++;
+                }
+                else
+                    break;
+            }
         }
     }
 
     /* restore dirfilter */
     *(tc->dirfilter) = saved_dirfilter;
     tc->sort_dir = global_settings.sort_dir;
-
-    /* special case if nothing found: try start searching again from root */
-    if (result == -1 && !recursion){
-        result = get_next_dir(dir, is_forward, true);
-    }
 
     return result;
 }
@@ -1606,7 +1640,12 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
     bool has_subdir = false;
     struct tree_context* tc = tree_get_context();
 
-    snprintf(dir+dirlen, MAX_PATH-dirlen, "/%s", subdir);
+    snprintf(
+        dir + dirlen, MAX_PATH - dirlen,
+        /* only add a trailing slash if we need one */
+        dirlen && dir[dirlen - 1] == '/' ? "%s" : "/%s",
+        subdir
+    );
     
     if (ft_load(tc, dir) < 0)
     {
