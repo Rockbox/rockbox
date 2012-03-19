@@ -188,9 +188,13 @@ each option pertains both to files and directories):
   \item [Set As Recording Directory.]
     Save recordings in the selected directory.
 }
-\item [Start File Browser Here.]
+\item [\label{ref:StartFileBrowserHere}Start File Browser Here.]
   This option allows users to set the currently selected directory as the default
   start directory for the file browser. This option is not available for files.
+  \note{If you have \setting{Auto-Change Directory} and
+  \setting{Constrain Auto-Change} enabled, the directories returned will
+  be constrained to the directory you have chosen here and those below it.
+  See \reference{ref:ConstrainAutoChange}}
 \item [Add to Shortcuts.]
   Adds a link to the selected item in the \fname{shortcuts.link} file.
   If the file does not already exist it will be created in the root directory.

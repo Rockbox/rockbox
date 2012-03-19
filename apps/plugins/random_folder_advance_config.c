@@ -65,8 +65,15 @@ static void traversedir(char* location, char* name)
     bool check = false;
     int i;
 
-    rb->snprintf(fullpath, sizeof(fullpath), "%s/%s", location, name);
-    dir = rb->opendir(fullpath);
+    /* behave differently if we're at root to avoid
+       duplication of the initial slash later on */
+    if (location[0] == '\0' && name[0] == '\0') {
+        rb->strcpy(fullpath, "");
+        dir = rb->opendir("/");
+    } else {
+        rb->snprintf(fullpath, sizeof(fullpath), "%s/%s", location, name);
+        dir = rb->opendir(fullpath);
+    }
     if (dir) {
         entry = rb->readdir(dir);
         while (entry) {

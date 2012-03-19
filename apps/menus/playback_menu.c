@@ -135,6 +135,8 @@ MENUITEM_SETTING(beep, &global_settings.beep ,NULL);
 MENUITEM_SETTING(spdif_enable, &global_settings.spdif_enable, NULL);
 #endif
 MENUITEM_SETTING(next_folder, &global_settings.next_folder, NULL);
+MENUITEM_SETTING(constrain_next_folder,
+                 &global_settings.constrain_next_folder, NULL);
 static int audioscrobbler_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
@@ -205,7 +207,7 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #ifdef HAVE_SPDIF_POWER
           &spdif_enable,
 #endif
-          &next_folder, &audioscrobbler, &cuesheet
+          &next_folder, &constrain_next_folder, &audioscrobbler, &cuesheet
 #ifdef HAVE_HEADPHONE_DETECTION
          ,&unplug_menu
 #endif

@@ -2644,8 +2644,17 @@ static void audio_on_skip(void)
     skip_pending = TRACK_SKIP_NONE;
 
     /* Update the playlist current track now */
-    while (playlist_next(playlist_delta) < 0)
+    int pl_retval;
+    while ((pl_retval = playlist_next(playlist_delta)) < 0)
     {
+        if (pl_retval < -1)
+        {
+            /* Some variety of fatal error while updating playlist */
+            filling = STATE_ENDED;
+            audio_stop_playback();
+            return;
+        }
+
         /* Manual skip out of range (because the playlist wasn't updated
            yet by us and so the check in audio_skip returned 'ok') - bring
            back into range */
