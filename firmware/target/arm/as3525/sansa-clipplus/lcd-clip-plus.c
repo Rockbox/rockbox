@@ -41,8 +41,10 @@ int lcd_hw_init(void)
     /* configure GPIO B3 (display type detect) as input */
     GPIOB_DIR &= ~(1<<3);
 
-    /* set GPIO A5 (display RESET# ?) */
+    /* reset display using GPIO A5 (display RESET#) */
     GPIOA_DIR |= (1<<5);
+    GPIOA_PIN(5) = 0;
+    udelay(1000);
     GPIOA_PIN(5) = (1<<5);
 
     /* detect display type on GPIO B3 */    
