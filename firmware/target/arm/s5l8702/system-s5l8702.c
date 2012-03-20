@@ -255,16 +255,52 @@ void set_cpu_frequency(long frequency)
     if (cpu_frequency == frequency)
         return;
 
-    //TODO: Need to understand this better
+    /*
+     * CPU scaling parameters:
+     * CPUFREQ_MAX:    CPU = 216MHz, AHB = 108MHz, Vcore = 1.200V
+     * CPUFREQ_NORMAL: CPU =  54MHz, AHB =  54MHz, Vcore = 1.050V
+     *
+     * CLKCON0 sets PLL2->FCLK divider (CPU clock)
+     * CLKCON1 sets FCLK->HCLK divider (AHB clock)
+     *
+     * HCLK is derived from FCLK, the system goes unstable if HCLK
+     * is out of the range 54-108 MHz, so two stages are required to
+     * switch FCLK (216 MHz <-> 54 MHz), adjusting HCLK in between
+     * to ensure system stability.
+     */
     if (frequency == CPUFREQ_MAX)
     {
+        /* Vcore = 1.200V */
+        pmu_write(0x1e, 0x17);
+
+        /* FCLK = PLL2 / 2  (FCLK = 108MHz, HCLK = 108MHz) */
+        CLKCON0 = 0x3011;
+        udelay(50);
+
+        /* HCLK = FCLK / 2  (HCLK = 54MHz) */
         CLKCON1 = 0x404101;
+        udelay(50);
+
+        /* FCLK = PLL2  (FCLK = 216MHz, HCLK = 108MHz) */
         CLKCON0 = 0x3000;
+        udelay(100);
     }
     else
     {
+        /* FCLK = PLL2 / 2  (FCLK = 108MHz, HCLK = 54MHz) */
         CLKCON0 = 0x3011;
+        udelay(50);
+
+        /* HCLK = FCLK  (HCLK = 108MHz) */
         CLKCON1 = 0x4001;
+        udelay(50);
+
+        /* FCLK = PLL2 / 4  (FCLK = 54MHz, HCLK = 54MHz) */
+        CLKCON0 = 0x3013;
+        udelay(100);
+
+        /* Vcore = 1.050V */
+        pmu_write(0x1e, 0x11);
     }
 
     cpu_frequency = frequency;

@@ -40,6 +40,9 @@ void power_off(void)
 void power_init(void)
 {
     idepowered = false;
+
+    /* DOWN1CTL: CPU DVM step time = 30us (default: no DVM) */
+    pmu_write(0x20, 2);
 }
 
 void ide_power_enable(bool on)
