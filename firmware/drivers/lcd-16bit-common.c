@@ -469,7 +469,6 @@ void lcd_fillrect(int x, int y, int width, int height)
     enum fill_opt fillopt = OPT_NONE;
     fb_data *dst, *dst_end;
     int len, step;
-    debugf("%s()\n", __func__);
 
     /******************** In viewport clipping **********************/
     /* nothing to draw? */
