@@ -58,6 +58,8 @@ bool dbg_hw_info(void)
         if(state == 0)
         {
             _DEBUG_PRINTF("CPU:");
+            _DEBUG_PRINTF("speed: %d MHz", ((CLKCON0 & 1) ?
+                                CPUFREQ_NORMAL : CPUFREQ_MAX) / 1000000);
             _DEBUG_PRINTF("current_tick: %d", (unsigned int)current_tick);
             line++;
 
