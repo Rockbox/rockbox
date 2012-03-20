@@ -362,7 +362,13 @@ static void s5l_clickwheel_init(void)
     WHEEL04 |= 1;
     PDAT10 &= ~2;
 #elif CONFIG_CPU==S5L8702
-    //TODO: enable and init clickwheel controller
+    PWRCON(1) &= ~(1 << 1); /* unmask wheel controller clock gate */
+    WHEELINT = 7;
+    WHEEL10 = 1;
+    WHEEL00 = 0x380000;
+    WHEEL08 = 0x20000;
+    WHEELTX = 0x8000023A;
+    WHEEL04 |= 1;
     GPIOCMD = 0xe040f;
 #endif
 }
@@ -434,7 +440,9 @@ int button_read_device(void)
             PWRCONEXT |= 1;
 #elif CONFIG_CPU==S5L8702
             GPIOCMD = 0xe040e;
-            //TODO: disable clickwheel controller
+            WHEEL00 = 0;
+            WHEEL10 = 0;
+            PWRCON(1) |= (1 << 1); /* mask wheel controller clock gate */
 #endif
         }
         else
