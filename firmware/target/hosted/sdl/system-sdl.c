@@ -133,6 +133,8 @@ static int sdl_event_thread(void * param)
     flags |= SDL_FULLSCREEN;
 #endif
 
+    SDL_WM_SetCaption(UI_TITLE, NULL);
+
     if ((gui_surface = SDL_SetVideoMode(width * display_zoom, height * display_zoom, depth, flags)) == NULL) {
         panicf("%s", SDL_GetError());
     }
@@ -148,8 +150,6 @@ static int sdl_event_thread(void * param)
     SDL_ShowCursor(SDL_ENABLE);
     SDL_SetCursor(hiddenCursor);
 #endif
-
-    SDL_WM_SetCaption(UI_TITLE, NULL);
 
     if (background && picture_surface != NULL)
         SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
