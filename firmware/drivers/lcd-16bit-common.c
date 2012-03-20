@@ -111,6 +111,90 @@ void lcd_update_viewport_rect(int x, int y, int width, int height)
     lcd_update_rect(current_vp->x + x, current_vp->y + y, width, height);
 }
 
+/* Clear the current viewport */
+void lcd_clear_viewport(void)
+{
+    fb_data *dst, *dst_end;
+    int x, y, width, height;
+    int len, step;
+
+    x = current_vp->x;
+    y = current_vp->y;
+    width = current_vp->width;
+    height = current_vp->height;
+
+#if defined(HAVE_VIEWPORT_CLIP)
+    /********************* Viewport on screen clipping ********************/
+    /* nothing to draw? */
+    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    /* clip image in viewport in screen */
+    if (x < 0)
+    {
+        width += x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+#endif
+
+    len  = STRIDE_MAIN(width, height);
+    step = STRIDE_MAIN(ROW_INC, COL_INC);
+
+    dst = FBADDR(x, y);
+    dst_end = FBADDR(x + width - 1 , y + height - 1);
+
+    if (current_vp->drawmode & DRMODE_INVERSEVID)
+    {
+        do
+        {
+            memset16(dst, current_vp->fg_pattern, len);
+            dst += step;
+        }
+        while (dst < dst_end);
+    }
+    else
+    {
+        if (!lcd_backdrop)
+        {
+            do
+            {
+                memset16(dst, current_vp->bg_pattern, len);
+                dst += step;
+            }
+            while (dst < dst_end);
+        }
+        else
+        {
+            do
+            {
+                memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
+                       len * sizeof(fb_data));
+                dst += step;
+            }
+            while (dst < dst_end);
+        }
+    }
+
+    if (current_vp == &default_vp)
+    {
+        lcd_scroll_info.lines = 0;
+    }
+    else
+    {
+        lcd_scroll_stop(current_vp);
+    }
+}
+
 /*** parameter handling ***/
 
 void lcd_set_drawmode(int mode)

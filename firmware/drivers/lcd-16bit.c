@@ -46,56 +46,6 @@
 
 /*** drawing functions ***/
 
-/* Clear the current viewport */
-void lcd_clear_viewport(void)
-{
-    fb_data *dst, *dst_end;
-
-    dst = FBADDR(current_vp->x, current_vp->y);
-    dst_end = dst + current_vp->height * LCD_WIDTH;
-
-    if (current_vp->drawmode & DRMODE_INVERSEVID)
-    {
-        do
-        {
-            memset16(dst, current_vp->fg_pattern, current_vp->width);
-            dst += LCD_WIDTH;
-        }
-        while (dst < dst_end);
-    }
-    else
-    {
-        if (!lcd_backdrop)
-        {
-            do
-            {
-                memset16(dst, current_vp->bg_pattern, current_vp->width);
-                dst += LCD_WIDTH;
-            }
-            while (dst < dst_end);
-        }
-        else
-        {
-            do
-            {
-                memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
-                       current_vp->width * sizeof(fb_data));
-                dst += LCD_WIDTH;
-            }
-            while (dst < dst_end);
-        }
-    }
-
-    if (current_vp == &default_vp)
-    {
-        lcd_scroll_info.lines = 0;
-    }
-    else
-    {
-        lcd_scroll_stop(current_vp);
-    }
-}
-
 /* Draw a horizontal line (optimised) */
 void lcd_hline(int x1, int x2, int y)
 {
