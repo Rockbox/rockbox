@@ -926,12 +926,8 @@ bool simplelist_show_list(struct simplelist_info *info)
 
     while(1)
     {
-        list_do_action(CONTEXT_LIST, info->timeout,
+        list_do_action(CONTEXT_LIST, skin_get_refresh_rate(CUSTOM_STATUSBAR),
                        &lists, &action, wrap);
-
-        /* We must yield in this case or no other thread can run */
-        if (info->timeout == TIMEOUT_NOBLOCK)
-            yield();
 
         if (info->action_callback)
         {
@@ -981,7 +977,6 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->selection_size = 1;
     info->hide_selection = false;
     info->scroll_all = false;
-    info->timeout = HZ/10;
     info->selection = 0;
     info->action_callback = NULL;
     info->title_icon = Icon_NOICON;

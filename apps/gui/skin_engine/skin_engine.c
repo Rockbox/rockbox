@@ -278,6 +278,24 @@ struct wps_state *skin_get_global_state(void)
     return &wps_state;
 }
 
+int skin_get_refresh_rate(enum skinnable_screens skin)
+{
+    int min = INT_MAX, j;
+
+    FOR_NB_SCREENS(i)
+    {
+        if (skins[skin][i].needs_full_update)
+            min = 0;
+        j = skin_get_gwps(skin, i)->data->update_ticks;
+        if (j < min)
+            min = j;
+    }
+    if (min == INT_MAX)
+        return TIMEOUT_BLOCK;
+
+    return min;
+}
+
 /* This is called to find out if we the screen needs a full update.
  * if true you MUST do a full update as the next call will return false */
 bool skin_do_full_update(enum skinnable_screens skin,

@@ -656,7 +656,8 @@ static int dirbrowse(void)
         keyclick_set_callback(gui_synclist_keyclick_callback, &tree_lists);
 #endif
         button = get_action(CONTEXT_TREE,
-                            list_do_action_timeout(&tree_lists, HZ/2));
+                            list_do_action_timeout(&tree_lists,
+                            skin_get_refresh_rate(CUSTOM_STATUSBAR)));
 #ifdef HAVE_LCD_BITMAP
         oldbutton = button;
 #endif

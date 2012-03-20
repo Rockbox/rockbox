@@ -82,6 +82,7 @@ int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout);
 void skin_load(enum skinnable_screens skin, enum screen_type screen,
                const char *buf, bool isfile);
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen);
+int skin_get_refresh_rate(enum skinnable_screens skin);
 struct wps_state *skin_get_global_state(void);
 void gui_sync_skin_init(void);
 

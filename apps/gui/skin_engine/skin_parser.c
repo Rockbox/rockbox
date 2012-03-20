@@ -855,6 +855,10 @@ static int parse_timeout_tag(struct skin_element *element,
     else
         val = get_param(element, 0)->data.number;
     token->value.i = val * TIMEOUT_UNIT;
+    if (token->type == SKIN_TOKEN_SUBLINE_TIMEOUT &&
+        token->value.i < wps_data->update_ticks)
+        wps_data->update_ticks = token->value.i;
+
     return 0;
 }
 
@@ -1074,6 +1078,9 @@ static int parse_progressbar_tag(struct skin_element* element,
     else if (token->type == SKIN_TOKEN_LIST_NEEDS_SCROLLBAR)
         token->type = SKIN_TOKEN_LIST_SCROLLBAR;
     pb->type = token->type;
+    /* Make sure we have smooth updates */
+    if (wps_data->update_ticks > HZ / 5)
+        wps_data->update_ticks = HZ / 5;
         
     return 0;
     
@@ -1604,6 +1611,7 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
 static void skin_data_reset(struct wps_data *wps_data)
 {
     skin_data_free_buflib_allocs(wps_data);
+    wps_data->update_ticks = 10 * HZ;
 #ifdef HAVE_LCD_BITMAP
     wps_data->images = INVALID_OFFSET;
 #endif
@@ -2174,6 +2182,8 @@ static int skin_element_callback(struct skin_element* element, void* data)
         {
             struct line_alternator *alternator = 
                 (struct line_alternator *)skin_buffer_alloc(sizeof(struct line_alternator));
+            if (wps_data->update_ticks > DEFAULT_SUBLINE_TIME_MULTIPLIER*TIMEOUT_UNIT)
+                wps_data->update_ticks = DEFAULT_SUBLINE_TIME_MULTIPLIER*TIMEOUT_UNIT;
             alternator->current_line = 0;
 #ifndef __PCTOOL__
             alternator->next_change_tick = current_tick;

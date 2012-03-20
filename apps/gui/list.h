@@ -232,7 +232,6 @@ struct simplelist_info {
     int selection_size; /* list selection size, usually 1 */
     bool hide_selection;
     bool scroll_all;
-    int  timeout;
     int  selection; /* the item to select when the list is first displayed */
                     /* when the list is exited, this will be set to the
                        index of the last item selected, or -1 if the list
@@ -279,7 +278,6 @@ void simplelist_addline(int line_number, const char *fmt, ...);
     info.get_name = NULL;
     info.get_voice = NULL;
     info.get_color = NULL;
-    info.timeout = HZ/10;
     info.selection = 0;
 */
 void simplelist_info_init(struct simplelist_info *info, char* title,

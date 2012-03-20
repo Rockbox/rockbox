@@ -775,7 +775,7 @@ long gui_wps_show(void)
             }
         }
         button = skin_wait_for_action(WPS, CONTEXT_WPS|ALLOW_SOFTLOCK, 
-                                      restore ? 1 : HZ/5);
+                                      restore ? 1 : skin_get_refresh_rate(WPS));
 
         /* Exit if audio has stopped playing. This happens e.g. at end of
            playlist or if using the sleep timer. */

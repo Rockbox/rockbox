@@ -327,6 +327,7 @@ struct skin_var_changer {
 struct wps_data
 {
     int buflib_handle;
+    int update_ticks;
 
     OFFSETTYPE(struct skin_element *) tree;
 #ifdef HAVE_LCD_BITMAP
