@@ -391,8 +391,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 #if CONFIG_CODEC == SWCODEC
         keyclick_set_callback(gui_synclist_keyclick_callback, &lists);
 #endif
-        action = get_action(CONTEXT_MAINMENU,
-                            list_do_action_timeout(&lists, HZ));
+        action = skin_wait_for_action(CUSTOM_STATUSBAR, CONTEXT_MAINMENU,
+                            list_do_action_timeout(&lists, TIMEOUT_BLOCK));
 
         /* query audio status to see if it changed */
         new_audio_status = audio_status();

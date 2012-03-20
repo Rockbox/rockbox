@@ -329,7 +329,6 @@ static bool dbg_cpuinfo(void)
     simplelist_info_init(&info, "CPU info:", 5 + cpu_count*(state_count+1), &state_count);
     info.get_name = get_cpuinfo;
     info.action_callback = cpuinfo_cb;
-    info.timeout = HZ;
     info.hide_selection = true;
     info.scroll_all = true;
     return simplelist_show_list(&info);
@@ -564,7 +563,6 @@ static bool dbg_buflib_allocs(void)
     simplelist_info_init(&info, "mem allocs", core_get_num_blocks(), NULL);
     info.get_name = bf_getname;
     info.action_callback = bf_action_cb;
-    info.timeout = TIMEOUT_BLOCK;
     return simplelist_show_list(&info);
 }
 
@@ -897,7 +895,6 @@ static bool tsc2100_debug(void)
     char title[32] = "tsc2100 registers - Page 0";
     struct simplelist_info info;
     simplelist_info_init(&info, title, 32, &page);
-    info.timeout = HZ/100;
     info.get_name = tsc2100_debug_getname;
     info.action_callback= tsc2100debug_action_callback;
     return simplelist_show_list(&info);
@@ -1672,11 +1669,7 @@ static bool dbg_tagcache_info(void)
     info.action_callback = database_callback;
     info.hide_selection = true;
     info.scroll_all = true;
-    
-    /* Don't do nonblock here, must give enough processing time
-       for tagcache thread. */
-    /* info.timeout = TIMEOUT_NOBLOCK; */
-    info.timeout = 1;
+
     tagcache_screensync_enable(true);
     return simplelist_show_list(&info);
 }
@@ -2095,7 +2088,6 @@ static bool dbg_isp1583(void)
     struct simplelist_info isp1583;
     isp1583.scroll_all = true;
     simplelist_info_init(&isp1583, "ISP1583", dbg_usb_num_items(), NULL);
-    isp1583.timeout = HZ/100; 
     isp1583.hide_selection = true;
     isp1583.get_name = dbg_usb_item;
     isp1583.action_callback = isp1583_action_callback;
@@ -2121,7 +2113,6 @@ static bool dbg_pic(void)
     struct simplelist_info pic;
     pic.scroll_all = true;
     simplelist_info_init(&pic, "PIC", pic_dbg_num_items(), NULL);
-    pic.timeout = HZ/100; 
     pic.hide_selection = true;
     pic.get_name = pic_dbg_item;
     pic.action_callback = pic_action_callback;

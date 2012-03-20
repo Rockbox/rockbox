@@ -655,8 +655,8 @@ static int dirbrowse(void)
 #if CONFIG_CODEC == SWCODEC
         keyclick_set_callback(gui_synclist_keyclick_callback, &tree_lists);
 #endif
-        button = get_action(CONTEXT_TREE,
-                            list_do_action_timeout(&tree_lists, HZ/2));
+        button = skin_wait_for_action(CUSTOM_STATUSBAR, CONTEXT_TREE,
+                            list_do_action_timeout(&tree_lists, TIMEOUT_BLOCK));
 #ifdef HAVE_LCD_BITMAP
         oldbutton = button;
 #endif

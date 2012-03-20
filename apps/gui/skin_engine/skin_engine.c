@@ -33,6 +33,9 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
+#ifdef HAVE_LCD_BITMAP
+#include "peakmeter.h"
+#endif
 #include "skin_engine.h"
 #include "skin_buffer.h"
 #include "statusbar-skinned.h"
@@ -293,4 +296,73 @@ void skin_request_full_update(enum skinnable_screens skin)
 {
     FOR_NB_SCREENS(i)
         skins[skin][i].needs_full_update = true;
+}
+
+
+/* do the button loop as often as required for the peak meters to update
+ * with a good refresh rate. 
+ */
+int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
+{
+    (void)skin; /* silence charcell warning */
+    int button = ACTION_NONE;
+    int min = INT_MAX, j;
+#ifdef HAVE_LCD_BITMAP
+    /* when the peak meter is enabled we want to have a
+        few extra updates to make it look smooth. On the
+        other hand we don't want to waste energy if it
+        isn't displayed */
+    bool pm=false;
+#endif
+    FOR_NB_SCREENS(i)
+    {
+#ifdef HAVE_LCD_BITMAP
+       if(skin_get_gwps(skin, i)->data->peak_meter_enabled)
+           pm = true;
+#endif
+        if (skins[skin][i].needs_full_update)
+            min = 0;
+        j = skin_get_gwps(skin, i)->data->update_ticks;
+        if (j < min)
+            min = j;
+    }
+#ifdef HAVE_LCD_BITMAP
+    if (pm && audio_status()) {
+        long next_refresh = current_tick;
+        long next_big_refresh = current_tick + timeout;
+        button = BUTTON_NONE;
+        while (TIME_BEFORE(current_tick, next_big_refresh)) {
+            button = get_action(context,TIMEOUT_NOBLOCK);
+            if (button != ACTION_NONE) {
+                break;
+            }
+            peak_meter_peek();
+            sleep(0);   /* Sleep until end of current tick. */
+
+            if (TIME_AFTER(current_tick, next_refresh)) {
+                FOR_NB_SCREENS(i)
+                {
+                    if(skin_get_gwps(skin, i)->data->peak_meter_enabled)
+                        skin_update(skin, i, SKIN_REFRESH_PEAK_METER);
+                    next_refresh += HZ / PEAK_METER_FPS;
+                }
+            }
+        }
+
+    }
+
+    /* The peak meter is disabled
+       -> no additional screen updates needed */
+    else
+#endif
+    {
+        if (min == INT_MAX)
+            min = TIMEOUT_BLOCK;
+        if (min != timeout && timeout == TIMEOUT_BLOCK)
+            timeout = min;
+        else
+            timeout = timeout < min ? timeout : min;
+        button = get_action(context, timeout);
+    }
+    return button;
 }
