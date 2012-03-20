@@ -462,6 +462,122 @@ void lcd_drawrect(int x, int y, int width, int height)
     lcd_hline(x, x2, y2);
 }
 
+/* Fill a rectangular area */
+void lcd_fillrect(int x, int y, int width, int height)
+{
+    unsigned bits = 0;
+    enum fill_opt fillopt = OPT_NONE;
+    fb_data *dst, *dst_end;
+    int len, step;
+    debugf("%s()\n", __func__);
+
+    /******************** In viewport clipping **********************/
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) ||
+        (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    if (x < 0)
+    {
+        width += x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        y = 0;
+    }
+    if (x + width > current_vp->width)
+        width = current_vp->width - x;
+    if (y + height > current_vp->height)
+        height = current_vp->height - y;
+
+    /* adjust for viewport */
+    x += current_vp->x;
+    y += current_vp->y;
+
+#if defined(HAVE_VIEWPORT_CLIP)
+    /********************* Viewport on screen clipping ********************/
+    /* nothing to draw? */
+    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    /* clip image in viewport in screen */
+    if (x < 0)
+    {
+        width += x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+#endif
+
+    /* drawmode and optimisation */
+    if (current_vp->drawmode & DRMODE_INVERSEVID)
+    {
+        if (current_vp->drawmode & DRMODE_BG)
+        {
+            if (!lcd_backdrop)
+            {
+                fillopt = OPT_SET;
+                bits = current_vp->bg_pattern;
+            }
+            else
+                fillopt = OPT_COPY;
+        }
+    }
+    else
+    {
+        if (current_vp->drawmode & DRMODE_FG)
+        {
+            fillopt = OPT_SET;
+            bits = current_vp->fg_pattern;
+        }
+    }
+    if (fillopt == OPT_NONE && current_vp->drawmode != DRMODE_COMPLEMENT)
+        return;
+
+    dst = FBADDR(x, y);
+    dst_end = FBADDR(x + width - 1, y + height - 1);
+
+    len  = STRIDE_MAIN(width, height);
+    step = STRIDE_MAIN(ROW_INC, COL_INC);
+
+    do
+    {
+        switch (fillopt)
+        {
+          case OPT_SET:
+            memset16(dst, bits, len);
+            break;
+
+          case OPT_COPY:
+            memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
+                   len * sizeof(fb_data));
+            break;
+
+          case OPT_NONE:  /* DRMODE_COMPLEMENT */
+          {
+            fb_data *start = dst;
+            fb_data *end = start + len;
+            do
+                *start = ~(*start);
+            while (++start < end);
+            break;
+          }
+        }
+        dst += step;
+    }
+    while (dst < dst_end);
+}
 
 /* About Rockbox' internal monochrome bitmap format:
  *
