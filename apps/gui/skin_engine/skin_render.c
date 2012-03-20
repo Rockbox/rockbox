@@ -29,6 +29,7 @@
 #include "config.h"
 #include "core_alloc.h"
 #include "kernel.h"
+#include "appevents.h"
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
 #endif
@@ -884,6 +885,13 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     display->set_framebuffer(NULL);
     skin_backdrop_show(data->backdrop_id);
 #endif
+
+    if (((refresh_mode&SKIN_REFRESH_ALL) == SKIN_REFRESH_ALL))
+    {
+        /* If this is the UI viewport then let the UI know
+         * to redraw itself */
+        send_event(GUI_EVENT_NEED_UI_UPDATE, NULL);
+    }
     /* Restore the default viewport */
     display->set_viewport(NULL);
     display->update();

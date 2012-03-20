@@ -596,6 +596,25 @@ bool gui_synclist_keyclick_callback(int action, void* data)
 }
 #endif
 
+/*
+ * Magic to make sure the list gets updated correctly if the skin does
+ * something naughty like a full screen update when we are in a button
+ * loop.
+ *
+ * The GUI_EVENT_NEED_UI_UPDATE event is registered for in list_do_action_timeout()
+ * and unregistered in gui_synclict_do_button(). This is done because
+ * if something is using the list UI they *must* be calling those
+ * two functions in the correct order or the list wont work.
+ */
+static struct gui_synclist *current_lists;
+static bool ui_update_event_registered = false;
+void _lists_uiviewport_update_callback(void *data)
+{
+    (void)data;
+    if (current_lists)
+        gui_synclist_draw(current_lists);
+}
+
 bool gui_synclist_do_button(struct gui_synclist * lists,
                             int *actionptr, enum list_wrap wrap)
 {
@@ -642,6 +661,9 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
         /* cancel kinetic if we got a normal button event */
         _gui_synclist_stop_kinetic_scrolling();
 #endif
+
+    /* Disable the skin redraw callback */
+    current_lists = NULL;
 
     switch (wrap)
     {
@@ -772,6 +794,14 @@ int list_do_action_timeout(struct gui_synclist *lists, int timeout)
 /* Returns the lowest of timeout or the delay until a postponed
    scheduled announcement is due (if any). */
 {
+    if (lists != current_lists)
+    {
+        if (!ui_update_event_registered)
+            ui_update_event_registered = 
+                    add_event(GUI_EVENT_NEED_UI_UPDATE, false,
+                            _lists_uiviewport_update_callback);
+        current_lists = lists;
+    }
     if(lists->scheduled_talk_tick)
     {
         long delay = lists->scheduled_talk_tick -current_tick +1;
