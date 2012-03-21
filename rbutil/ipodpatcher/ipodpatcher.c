@@ -1705,7 +1705,7 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
         case 0x100:
             ipod->modelstr="2nd Generation Nano";
             ipod->modelnum = 62;
-            ipod->modelname = "nn2x";
+            ipod->modelname = "nn2g";
             ipod->targetname = "ipodnano2g";
 #ifdef WITH_BOOTOBJS
             ipod->bootloader = ipodnano2g;
