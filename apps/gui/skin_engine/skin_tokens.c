@@ -913,6 +913,10 @@ const char *get_token_value(struct gui_wps *gwps,
             return truecount ? "true" : NULL;
         }
         break;
+        case SKIN_TOKEN_RANDOMVALUE:
+            if (intval)
+                *intval = rand() % limit;
+            return NULL;
         case SKIN_TOKEN_SUBSTRING:
         {
             struct substring *ss = SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);

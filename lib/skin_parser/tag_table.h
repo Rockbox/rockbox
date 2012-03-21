@@ -292,6 +292,7 @@ enum skin_token_type {
     SKIN_TOKEN_SUBSTRING,
 
     SKIN_TOKEN_DRAWRECTANGLE,
+    SKIN_TOKEN_RANDOMVALUE,
 };
 
 /*

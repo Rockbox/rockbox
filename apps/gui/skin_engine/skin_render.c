@@ -517,9 +517,13 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
             case CONDITIONAL:
                 conditional = SKINOFFSETTOPTR(skin_buffer, child->data);
                 last_value = conditional->last_value;
-                value = evaluate_conditional(info->gwps, info->offset, 
-                                             conditional, child->children_count);
-                conditional->last_value = value;
+                if (info->refresh_type & conditional->token->refresh_type) {
+                    value = evaluate_conditional(info->gwps, info->offset, 
+                                                 conditional, child->children_count);
+                    conditional->last_value = value;
+                } else {
+                    value = last_value;
+                }
                 if (child->children_count == 1)
                 {
                     /* special handling so 
