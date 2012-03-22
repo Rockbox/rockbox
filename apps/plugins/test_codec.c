@@ -764,12 +764,8 @@ static enum plugin_status test_track(const char* filename)
         /* show effective clockrate in MHz needed for realtime decoding */
         if (speed > 0)
         {
-            int freq = CPUFREQ_MAX;
-            
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            if(!boost)
-                freq = CPUFREQ_NORMAL;
-#endif
+            int freq;
+            freq = *rb->cpu_frequency;
             
             speed = freq / speed;
             rb->snprintf(str,sizeof(str),"%d.%02dMHz needed for realtime",
