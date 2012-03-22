@@ -116,13 +116,6 @@ public class RockboxService extends Service
 
         if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON))
         {
-            /* give it a bit of time so we can register button presses 
-             * sleeping longer doesn't work here, apparently Android 
-             * surpresses long sleeps during intent handling */
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) { }
-
             KeyEvent kev = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
             RockboxFramebuffer.buttonHandler(kev.getKeyCode(), 
                                 kev.getAction() == KeyEvent.ACTION_DOWN);
