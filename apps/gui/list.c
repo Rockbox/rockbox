@@ -954,6 +954,7 @@ bool simplelist_show_list(struct simplelist_info *info)
             break;
         }
         else if ((action == ACTION_REDRAW) ||
+                 (list_is_dirty(&lists)) ||
                  (old_line_count != simplelist_line_count))
         {
             if (info->get_name == NULL)
