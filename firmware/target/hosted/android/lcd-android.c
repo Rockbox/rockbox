@@ -36,6 +36,9 @@ static jmethodID java_lcd_update;
 static jmethodID java_lcd_update_rect;
 static jmethodID java_lcd_init;
 
+static jclass    AndroidRect_class;
+static jmethodID AndroidRect_constructor;
+
 static int dpi;
 static int scroll_threshold;
 static bool display_on;
@@ -43,7 +46,7 @@ static bool display_on;
 /* this might actually be called before lcd_init_device() or even main(), so
  * be sure to only access static storage initalized at library loading,
  * and not more */
-void connect_with_java(JNIEnv* env, jobject fb_instance)
+static void connect_with_java(JNIEnv* env, jobject fb_instance)
 {
     JNIEnv e = *env;
     static bool have_class;
@@ -53,11 +56,12 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
         jclass fb_class = e->GetObjectClass(env, fb_instance);
         /* cache update functions */
         java_lcd_update      = e->GetMethodID(env, fb_class,
-                                             "java_lcd_update",
-                                             "()V");
+                                             "update",
+                                             "(Ljava/nio/ByteBuffer;)V");
         java_lcd_update_rect = e->GetMethodID(env, fb_class,
-                                             "java_lcd_update_rect",
-                                             "(IIII)V");
+                                             "update",
+                                             "(Ljava/nio/ByteBuffer;"
+                                              "Landroid/graphics/Rect;)V");
         jmethodID get_dpi    = e->GetMethodID(env, fb_class,
                                              "getDpi", "()I");
         jmethodID thresh     = e->GetMethodID(env, fb_class,
@@ -67,19 +71,16 @@ void connect_with_java(JNIEnv* env, jobject fb_instance)
         scroll_threshold     = e->CallIntMethod(env, fb_instance, thresh);
 
         java_lcd_init        = e->GetMethodID(env, fb_class,
-                                             "java_lcd_init",
-                                             "(IILjava/nio/ByteBuffer;)V");
-
+                                             "initialize", "(II)V");
+        AndroidRect_class    = e->FindClass(env, "android/graphics/Rect");
+        AndroidRect_constructor = e->GetMethodID(env, AndroidRect_class,
+                                             "<init>", "(IIII)V");
         have_class           = true;
     }
 
-    /* Create native_buffer */
-    jobject buffer = (*env)->NewDirectByteBuffer(env, lcd_framebuffer,
-                                               (jlong) FRAMEBUFFER_SIZE);
-
     /* we need to setup parts for the java object every time */
     (*env)->CallVoidMethod(env, fb_instance, java_lcd_init,
-                          (jint)LCD_WIDTH, (jint)LCD_HEIGHT, buffer);
+                          (jint)LCD_WIDTH, (jint)LCD_HEIGHT);
 }
 
 /*
@@ -92,15 +93,32 @@ void lcd_init_device(void)
 void lcd_update(void)
 {
     if (display_on)
-        (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
-                                   java_lcd_update);
+    {
+        JNIEnv e = *env_ptr;
+        jobject buffer = e->NewDirectByteBuffer(env_ptr, lcd_framebuffer,
+                                               (jlong) FRAMEBUFFER_SIZE);
+
+        e->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
+                                   java_lcd_update, buffer);
+        e->DeleteLocalRef(env_ptr, buffer);
+    }
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
     if (display_on)
-        (*env_ptr)->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
-                                   java_lcd_update_rect, x, y, width, height);
+    {
+        JNIEnv e = *env_ptr;
+        jobject buffer = e->NewDirectByteBuffer(env_ptr, lcd_framebuffer,
+                                                   (jlong) FRAMEBUFFER_SIZE);
+        jobject rect = e->NewObject(env_ptr, AndroidRect_class, AndroidRect_constructor,
+                                        x, y, x + width, y + height);
+        e->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
+                                   java_lcd_update_rect, buffer, rect);
+
+        e->DeleteLocalRef(env_ptr, buffer);
+        e->DeleteLocalRef(env_ptr, rect);
+    }
 }
 
 /*

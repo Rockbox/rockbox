@@ -39,7 +39,6 @@ public class RockboxFramebuffer extends SurfaceView
 {
     private final DisplayMetrics metrics;
     private final ViewConfiguration view_config;
-    private ByteBuffer native_buf;
     private Bitmap btm;
 
     /* first stage init; needs to run from a thread that has a Looper 
@@ -47,7 +46,6 @@ public class RockboxFramebuffer extends SurfaceView
     public RockboxFramebuffer(Context c)
     {
         super(c);
-         
         metrics = c.getResources().getDisplayMetrics();
         view_config = ViewConfiguration.get(c);
         getHolder().addCallback(this);
@@ -61,18 +59,17 @@ public class RockboxFramebuffer extends SurfaceView
 
     /* second stage init; called from Rockbox with information about the 
      * display framebuffer */
-    private void java_lcd_init(int lcd_width, int lcd_height, ByteBuffer native_fb)
+    private void initialize(int lcd_width, int lcd_height)
     {
         btm = Bitmap.createBitmap(lcd_width, lcd_height, Bitmap.Config.RGB_565);
-        native_buf = native_fb;
         setEnabled(true);
     }
 
-    private void java_lcd_update()
+    private void update(ByteBuffer framebuffer)
     {
         SurfaceHolder holder = getHolder();                            
-        Canvas c = holder.lockCanvas(null);
-        btm.copyPixelsFromBuffer(native_buf);
+        Canvas c = holder.lockCanvas();
+        btm.copyPixelsFromBuffer(framebuffer);
         synchronized (holder)
         { /* draw */
             c.drawBitmap(btm, 0.0f, 0.0f, null);
@@ -80,14 +77,12 @@ public class RockboxFramebuffer extends SurfaceView
         holder.unlockCanvasAndPost(c);
     }
     
-    private void java_lcd_update_rect(int x, int y, int width, int height)
+    private void update(ByteBuffer framebuffer, Rect dirty)
     {
         SurfaceHolder holder = getHolder();         
-        Rect dirty = new Rect(x, y, x+width, y+height);
         Canvas c = holder.lockCanvas(dirty);
-        /* can't copy a partial buffer,
-         * but it doesn't make a noticeable difference anyway */
-        btm.copyPixelsFromBuffer(native_buf);
+        /* can't copy a partial buffer, but it doesn't make a noticeable difference anyway */
+        btm.copyPixelsFromBuffer(framebuffer);
         synchronized (holder)
         {   /* draw */
             c.drawBitmap(btm, dirty, dirty, null);   
