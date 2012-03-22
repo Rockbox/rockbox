@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAACH///4U\u003d",
+        "filename": "firmware/target/arm/ipod/button-clickwheel.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-03-22T10:58:49Z",
+      "side": 1,
+      "message": "This comment is unclear. Is it TODO still or the line below just do it?",
+      "revId": "35e61688a53e400caf99e5808b91fe50f38e42a2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///4Q\u003d",
+        "filename": "firmware/target/arm/ipod/button-clickwheel.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-03-22T10:58:49Z",
+      "side": 1,
+      "message": "The same question as in my first comment",
+      "revId": "35e61688a53e400caf99e5808b91fe50f38e42a2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
