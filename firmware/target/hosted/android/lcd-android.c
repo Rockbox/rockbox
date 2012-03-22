@@ -122,6 +122,9 @@ Java_org_rockbox_RockboxFramebuffer_surfaceCreated(JNIEnv *env, jobject this,
     connect_with_java(env, this);
     display_on = true;
 
+    /* need to wait for button_queue to be valid to post to */
+    wait_rockbox_ready();
+
     send_event(LCD_EVENT_ACTIVATION, NULL);
     /* Force an update, since the newly created surface is initially black
      * waiting for the next normal update results in a longish black screen */

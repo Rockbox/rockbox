@@ -37,4 +37,11 @@ extern JNIEnv* getJavaEnvironment(void);
 
 #endif /* __SYSTEM_TARGET_H__ */
 
+/* facility function to check/wait for rockbox being ready, to be used
+ * by java calls into native that depend on Rockbox structures such as
+ * initialized kernel. */
+bool is_rockbox_ready(void);
+void wait_rockbox_ready(void);
+void set_rockbox_ready(void);
+
 #define NEED_GENERIC_BYTESWAPS

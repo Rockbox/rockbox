@@ -21,11 +21,15 @@
 
 
 #include <jni.h>
+#include "system.h"
 #include "kernel.h"
 
 extern JNIEnv *env_ptr;
 extern jobject RockboxService_instance;
 
+/* telephony_init_device() is currently called in system_init(). Thus, there is
+ * a small chance of the callbacks (and queue_broadcast) being called before
+ * the kernel is initialized (this happens after system_init(). */
 
 void telephony_init_device(void)
 {
@@ -44,7 +48,8 @@ Java_org_rockbox_monitors_TelephonyMonitor_postCallIncoming(JNIEnv *env, jobject
 {
     (void)env;
     (void)this;
-    queue_broadcast(SYS_CALL_INCOMING, 0);
+    if (is_rockbox_ready())
+        queue_broadcast(SYS_CALL_INCOMING, 0);
 }
 
 JNIEXPORT void JNICALL
@@ -52,5 +57,6 @@ Java_org_rockbox_monitors_TelephonyMonitor_postCallHungUp(JNIEnv *env, jobject t
 {
     (void)env;
     (void)this;
-    queue_broadcast(SYS_CALL_HUNG_UP, 0);
+    if (is_rockbox_ready())
+        queue_broadcast(SYS_CALL_HUNG_UP, 0);
 }

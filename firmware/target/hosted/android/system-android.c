@@ -22,6 +22,7 @@
 
 #include <setjmp.h>
 #include <jni.h>
+#include <pthread.h>
 #include "config.h"
 #include "system.h"
 
@@ -94,4 +95,41 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
     }
     /* simply return here. this will allow the VM to clean up objects and do
      * garbage collection */
+}
+
+
+/* below is the facility for external (from other java threads) to safely call
+ * into our snative code. When extracting rockbox.zip the main function is
+ * called only after extraction. This delay can be accounted for by calling
+ * wait_rockbox_ready(). This does not return until the critical parts of Rockbox
+ * can be considered up and running. */
+static pthread_cond_t btn_cond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t btn_mtx = PTHREAD_MUTEX_INITIALIZER;
+static bool initialized;
+
+bool is_rockbox_ready(void)
+{
+    /* don't bother with mutexes for this */
+    return initialized;
+}
+
+void wait_rockbox_ready(void)
+{
+    pthread_mutex_lock(&btn_mtx);
+
+    if (!initialized)
+        pthread_cond_wait(&btn_cond, &btn_mtx);
+
+    pthread_mutex_unlock(&btn_mtx);
+}
+
+void set_rockbox_ready(void)
+{
+    pthread_mutex_lock(&btn_mtx);
+
+    initialized = true;
+    /* now ready. signal all waiters */
+    pthread_cond_broadcast(&btn_cond);
+
+    pthread_mutex_unlock(&btn_mtx);
 }

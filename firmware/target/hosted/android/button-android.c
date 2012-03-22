@@ -81,6 +81,8 @@ Java_org_rockbox_RockboxFramebuffer_buttonHandler(JNIEnv*env, jclass class,
             button = dpad_to_button((int)keycode);
         if (button)
         {
+            /* ensure button_queue can be safely posted to */
+            wait_rockbox_ready();
             reset_poweroff_timer();
             queue_post(&button_queue, button, 0);
             return true;
@@ -121,6 +123,10 @@ void button_init_device(void)
     e->NewObject(env_ptr, class,         
                         constructor,
                         RockboxService_instance);
+    /* when reaching this point, rockbox can be considered ready because the
+     * input system (button.c) is initialized. This implies the kernel and threading
+     * is up and running */
+    set_rockbox_ready();
 }
 
 int button_read_device(int *data)
