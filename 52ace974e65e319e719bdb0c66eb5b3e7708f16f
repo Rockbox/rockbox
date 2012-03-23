@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAACH///30\u003d",
+        "filename": "firmware/target/arm/s5l8702/kernel-s5l8702.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2012-03-23T01:01:43Z",
+      "side": 1,
+      "message": "This is needed because the actual tick clock (timer B) is derived from AHB clock, then when the bus frequency is decreased the tick is delayed. \n\nThis patch uses a fixed external clock, i suppose it is 12 MHz but not sure (i.e. it could be 24 MHz / 2), anyways the UNKNOWN bit is used by emCORE loader to configure the USEC_TIMER (timer E) so it is safe to use it. \n\nIn addition the new resulting frequency for timer B is more precise (10000 Hz vs 10015 Hz).",
+      "parentUuid": "AAAACH///4A\u003d",
+      "revId": "52ace974e65e319e719bdb0c66eb5b3e7708f16f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAACH///4I\u003d",
         "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "AAAACH///3w\u003d",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2012-03-23T01:01:43Z",
+      "side": 1,
+      "message": "Know that, the comment is not mine, let it there because some people uses /* */ style for final comments and // style for temporal comments (mainly TODOs or XXXs) that should be removed later, so i was thinking it is allowed to do that on rockbox code, no problem on changing the style.\n\nOr maybe its the time to remove the comment, but really i also need to understand this better :), CLKCON1 register is one of the most obscures for me, see my next comment.",
+      "parentUuid": "AAAACH///4I\u003d",
+      "revId": "52ace974e65e319e719bdb0c66eb5b3e7708f16f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAACH///4E\u003d",
         "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2012-03-22T11:11:27Z",
       "side": 1,
       "message": "Why do you change the same register two times? Is it really needed? What about delays? Changing dividers is usually atomic.",
+      "revId": "52ace974e65e319e719bdb0c66eb5b3e7708f16f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///3s\u003d",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2012-03-23T01:01:43Z",
+      "side": 1,
+      "message": "This needs some explanation, will try to do that, the best (and maybe the only) info about CLKCON registers is at freemyipod, i used it to write this patch.\n\nUsing CLKCON0 you can configure CPU clock (FCLK) by dividing PLL2 frequency (216MHz).\n\nCLKCON1 functionality is not clear for me, the only values that works for me are the ones already used on the actual code (not really used because HAVE_ADJUSTABLE_CPU_FREQ is disabled), i think they are dividing FCLK by 1 and 2 to obtain the AHB frequency, so bus frequency depends on CPU freq, if the CPU clock is changed then the bus frequency is also modified.\n\nI think initially CPU freq\u003d216 MHz and AHB divider\u003d2 (108MHz). Decreasing CPU clock to 108MHz results on 54MHz for AHB, this was widely tested and seems stable (cpu_freq-v1.patch). \n\nBut decreasing CPU clock to 54MHz will result on AHB frequency failing to 27MHz, this configuration produces corruption on DMA transfers. Setting the AHB divider to 1 while CPU freq is 216MHz is also unstable. \n\nModifying both parameters (CPU\u003d54MHz, AHB divider\u003d1) at the \u0027same\u0027 time produces DMA corruption, so we need various steps to achieve our goal, the delays are waiting for the system to consolidate an stable state before starting the next step. \n\nThis method (cpu_freq-v2.patch) has been tested for weeks by many head-fi.people and so far no issues are reported. It was also tested by myself using the graphic equalizer, the most aggressive CPU freq switcher ever seen :)",
+      "parentUuid": "AAAACH///4E\u003d",
       "revId": "52ace974e65e319e719bdb0c66eb5b3e7708f16f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
