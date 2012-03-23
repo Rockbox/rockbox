@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAACH///3o\u003d",
+        "filename": "firmware/target/arm/ipod/button-clickwheel.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2012-03-23T01:10:15Z",
+      "side": 1,
+      "message": "The TODO lines are still valid but i hope they will be removed soon by #195 (click wheel controller powersave).\n\nThe GPIOCMD commands are doing the same thing as the current implementation actually does, but in a more proper way IMHO, it drives GPIO E4 high and low when hold switch position is changed.\n\nWhat does this pin do?, don\u0027t know for sure (as usual) but i bet it is a kind of \u0027chip select\u0027 or reset for the \u0027firmware\u0027 inside the CY8C21x34 who is acting as the external wheel controller, ports E3 and E5 seems data lines connecting s5l8702 internal wheel controller and CY8C21x34.",
+      "parentUuid": "AAAACH///4U\u003d",
+      "revId": "35e61688a53e400caf99e5808b91fe50f38e42a2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAACH///4Q\u003d",
         "filename": "firmware/target/arm/ipod/button-clickwheel.c",
         "patchSetId": 1
