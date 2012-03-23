@@ -31,16 +31,26 @@ void button_init_device(void) {
 
 int button_read_device(void) {
     int adc_val = adc_read(ADC_BUTTONS);
-    if (adc_val < 30) {
-        return BUTTON_UP | (GPIO_PCDR & POWEROFF_BUTTON);
-    } else if (adc_val < 250) {
-        return BUTTON_RIGHT | (GPIO_PCDR & POWEROFF_BUTTON);
-    } else if (adc_val < 380) {
-        return BUTTON_LEFT | (GPIO_PCDR & POWEROFF_BUTTON);
-    } else if (adc_val < 450) {
-        return BUTTON_DOWN | (GPIO_PCDR & POWEROFF_BUTTON);
-    } else if (adc_val < 560) {
-        return BUTTON_PLAY | (GPIO_PCDR & POWEROFF_BUTTON);
+    int gpio_btn = GPIO_PCDR & BUTTON_POWER;
+
+    if (adc_val < 380) { /* 0 - 379 */
+        if (adc_val < 250) { /* 0 - 249 */
+            if (adc_val < 30) { /* 0 - 29 */
+                return BUTTON_UP | gpio_btn;
+            } else { /* 30 - 249 */
+                return BUTTON_RIGHT | gpio_btn;
+            }
+        } else { /* 250 - 379 */
+            return BUTTON_LEFT | gpio_btn;
+        }
+    } else { /* > 380 */
+        if (adc_val < 460) { /* 380 - 459 */
+            return BUTTON_DOWN | gpio_btn;
+        } else { /* > 460 */
+            if (adc_val < 560) {
+                return BUTTON_SELECT | gpio_btn;
+            }
+        }
     }
-    return (GPIO_PCDR & POWEROFF_BUTTON);
+    return gpio_btn;
 }
