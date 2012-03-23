@@ -104,6 +104,24 @@
       "revId": "52ace974e65e319e719bdb0c66eb5b3e7708f16f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///3c\u003d",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-03-23T08:43:18Z",
+      "side": 1,
+      "message": "Ok, fair answer. Anyway it would be best if you could put this in condensed form as an comment. This way your tests will be somehow documented.",
+      "parentUuid": "AAAACH///3s\u003d",
+      "revId": "52ace974e65e319e719bdb0c66eb5b3e7708f16f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
