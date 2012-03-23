@@ -855,7 +855,8 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
 
     /* TODO: Do it without stopping playback, if possible */
     long offset = audio_current_track()->offset;
-    bool playing = (audio_status() & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY;
+    /* resume if playing */
+    bool playing = (audio_status() == AUDIO_STATUS_PLAY);
     /* There's one problem with stoping and resuming: If it happens in a too
      * frequent fashion, the codecs lose the resume postion and playback
      * begins from the beginning.
