@@ -14,6 +14,7 @@ clock
 
 #if    (CONFIG_KEYPAD != ONDIO_PAD) /* not enough buttons */ \
     && (CONFIG_KEYPAD != SANSA_M200_PAD) /* not enough buttons */ \
+    && (CONFIG_KEYPAD != HM60X_PAD) /* not enough buttons */ \
     && (LCD_PIXELFORMAT != HORIZONTAL_PACKING) /* TODO */ \
     && (LCD_PIXELFORMAT != VERTICAL_INTERLEAVED) /* TODO */ \
     && (defined(HAVE_LCD_COLOR) || (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) || \

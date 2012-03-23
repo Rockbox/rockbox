@@ -497,6 +497,23 @@
 #define STAR_LEVEL_DOWN_NAME "Power"
 #define STAR_LEVEL_REPEAT_NAME "User"
 
+#elif (CONFIG_KEYPAD == HM60X_PAD)
+
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_SELECT
+#define STAR_LEVEL_UP       (BUTTON_POWER | BUTTON_UP)
+#define STAR_LEVEL_DOWN     (BUTTON_POWER | BUTTON_DOWN)
+#define STAR_LEVEL_REPEAT   (BUTTON_POWER | BUTTON_SELECT)
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME      "POWER"
+#define STAR_LEVEL_UP_NAME  "POWER + UP"
+#define STAR_LEVEL_DOWN_NAME "POWER + DOWN"
+#define STAR_LEVEL_REPEAT_NAME "POWER + SELECT"
+
 #else
 #error No keymap defined!
 #endif

@@ -484,6 +484,20 @@ enum {
 #define BJACK_RIGHT         BUTTON_RIGHT
 #define BJACK_LEFT          BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == HM60X_PAD
+#define BJACK_SELECT_NAME   "SELECT"
+#define BJACK_STAY_NAME     "UP+POWER"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "DOWN+POWER"
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_STAY          (BUTTON_UP|BUTTON_POWER)
+#define BJACK_DOUBLEDOWN    (BUTTON_DOWN|BUTTON_POWER)
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
+
 #else
 #error No keymap defined!
 #endif

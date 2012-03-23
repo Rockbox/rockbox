@@ -287,6 +287,15 @@
 #define AST_RIGHT       BUTTON_RIGHT
 #define AST_FIRE        BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == HM60X_PAD)
+#define AST_PAUSE       (BUTTON_SELECT|BUTTON_POWER)
+#define AST_QUIT        BUTTON_POWER
+#define AST_THRUST      BUTTON_UP
+#define AST_HYPERSPACE  BUTTON_DOWN
+#define AST_LEFT        BUTTON_LEFT
+#define AST_RIGHT       BUTTON_RIGHT
+#define AST_FIRE        BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif

@@ -240,6 +240,12 @@
 #define BATTERY_ON_TXT  "SELECT - start"
 #define BATTERY_OFF_TXT "POWER"
 
+#elif (CONFIG_KEYPAD == HM60X_PAD)
+#define BATTERY_ON BUTTON_SELECT
+#define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT  "SELECT - start"
+#define BATTERY_OFF_TXT "POWER"
+
 #else
 #error No keymap defined!
 #endif
