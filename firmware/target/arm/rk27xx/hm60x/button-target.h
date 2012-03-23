@@ -22,12 +22,13 @@
 #define _BUTTON_TARGET_H_
 
 #define BUTTON_UP          0x00000001
+#define BUTTON_POWER       0x00000002
 #define BUTTON_DOWN        0x00000004
 #define BUTTON_LEFT        0x00000008
 #define BUTTON_RIGHT       0x00000010
-#define BUTTON_PLAY        0x00000020
+#define BUTTON_SELECT      0x00000020
 
-#define POWEROFF_BUTTON 0x02
+#define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 30
 
 #endif /* _BUTTON_TARGET_H_ */
