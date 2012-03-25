@@ -178,16 +178,16 @@ public class RockboxService extends Service
                 /* use arbitrary file to determine whether extracting is needed */
                 File arbitraryFile = new File(rockboxCreditsPath, "credits.rock");
                 File rockboxInfoFile = new File(rockboxSdDirPath, "rockbox-info.txt");
-                boolean extractToSd = false;
-                if(rockboxInfoFile.exists()) {
-                    extractToSd = true;
-                    Logger.d("extracting resources to SD card");
-                }
-                else {
-                    Logger.d("extracting resources to internal memory");
-                }
                 if (!arbitraryFile.exists() || (libMisc.lastModified() > arbitraryFile.lastModified()))
                 {
+                    boolean extractToSd = false;
+                    if(rockboxInfoFile.exists()) {
+                        extractToSd = true;
+                        Logger.d("extracting resources to SD card");
+                    }
+                    else {
+                        Logger.d("extracting resources to internal memory");
+                    }
                     try
                     {
                         Bundle progressData = new Bundle();
