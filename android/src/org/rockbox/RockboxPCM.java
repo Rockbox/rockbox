@@ -69,7 +69,7 @@ public class RockboxPCM extends AudioTrack
         Arrays.fill(raw_data, (byte) 0);
 
         /* find cleaner way to get context? */
-        rbservice = RockboxService.get_instance();
+        rbservice = RockboxService.getInstance();
         audiomanager =
             (AudioManager) rbservice.getSystemService(Context.AUDIO_SERVICE);
         maxstreamvolume = audiomanager.getStreamMaxVolume(streamtype);
@@ -147,7 +147,7 @@ public class RockboxPCM extends AudioTrack
 
     private void play_pause(boolean pause) 
     {
-        RockboxService service = RockboxService.get_instance();
+        RockboxService service = RockboxService.getInstance();
         if (pause)
         {
             Intent widgetUpdate = new Intent("org.rockbox.UpdateState");
@@ -192,8 +192,8 @@ public class RockboxPCM extends AudioTrack
 
         Intent widgetUpdate = new Intent("org.rockbox.UpdateState");
         widgetUpdate.putExtra("state", "stop");
-        RockboxService.get_instance().sendBroadcast(widgetUpdate);
-        RockboxService.get_instance().stopForeground();
+        RockboxService.getInstance().sendBroadcast(widgetUpdate);
+        RockboxService.getInstance().stopForeground();
     }
     
     public int setStereoVolume(float leftVolume, float rightVolume)

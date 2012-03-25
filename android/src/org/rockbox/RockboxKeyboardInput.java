@@ -35,7 +35,7 @@ public class RockboxKeyboardInput
 {
     public void kbd_input(final String text, final String ok, final String cancel)
     {
-        final Activity c = RockboxService.get_instance().get_activity();
+        final Activity c = RockboxService.getInstance().getActivity();
 
         c.runOnUiThread(new Runnable() {
             public void run()
@@ -74,6 +74,6 @@ public class RockboxKeyboardInput
 
     public boolean is_usable()
     {
-        return RockboxService.get_instance().get_activity() != null;
+        return RockboxService.getInstance().getActivity() != null;
     }
 }

@@ -91,9 +91,9 @@ public class RockboxActivity extends Activity
 
     private void setServiceActivity(boolean set)
     {
-        RockboxService s = RockboxService.get_instance();
+        RockboxService s = RockboxService.getInstance();
         if (s != null)
-            s.set_activity(set ? this : null);
+            s.setActivity(set ? this : null);
     }
 
     public void onResume()

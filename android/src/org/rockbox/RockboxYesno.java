@@ -29,7 +29,7 @@ public class RockboxYesno
 {
     private void yesno_display(final String text, final String yes, final String no)
     {
-        final Activity c = RockboxService.get_instance().get_activity();
+        final Activity c = RockboxService.getInstance().getActivity();
 
         c.runOnUiThread(new Runnable() {
             public void run()
@@ -60,7 +60,7 @@ public class RockboxYesno
 
     private boolean is_usable()
     {
-        return RockboxService.get_instance().get_activity() != null;
+        return RockboxService.getInstance().getActivity() != null;
     }
     
     private native void put_result(boolean result);

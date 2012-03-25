@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.rockbox.Helper.Logger;
 import org.rockbox.Helper.MediaButtonReceiver;
 import org.rockbox.Helper.RunForegroundManager;
 import android.app.Activity;
@@ -38,7 +39,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.ResultReceiver;
-import android.util.Log;
 import android.view.KeyEvent;
 
 /* This class is used as the main glue between java and c.
@@ -47,19 +47,17 @@ import android.view.KeyEvent;
 
 public class RockboxService extends Service
 {
-    /* this Service is really a singleton class - well almost.
-     * To do it properly this line should be instance = new RockboxService()
-     * but apparently that doesnt work with the way android Services are created.
-     */
+    /* this Service is really a singleton class - well almost. */
     private static RockboxService instance = null;
 
-    /* locals needed for the c code and rockbox state */
+    /* locals needed for the c code and Rockbox state */
     private static volatile boolean rockbox_running;
-    private Activity current_activity = null;
-    private RunForegroundManager fg_runner;
+    private Activity mCurrentActivity = null;
+    private RunForegroundManager mFgRunner;
     private MediaButtonReceiver mMediaButtonReceiver;
-    private ResultReceiver resultReceiver;
+    private ResultReceiver mResultReceiver;
 
+    /* possible result values for intent handling */ 
     public static final int RESULT_INVOKING_MAIN = 0;
     public static final int RESULT_LIB_LOAD_PROGRESS = 1;
     public static final int RESULT_SERVICE_RUNNING = 3;
@@ -72,12 +70,12 @@ public class RockboxService extends Service
     {
         instance = this;
         mMediaButtonReceiver = new MediaButtonReceiver(this);
-        fg_runner = new RunForegroundManager(this);
+        mFgRunner = new RunForegroundManager(this);
     }
 
-    public static RockboxService get_instance()
+    public static RockboxService getInstance()
     {
-        /* don't call the construtor here, the instances are managed by
+        /* don't call the constructor here, the instances are managed by
          * android, so we can't just create a new one */
         return instance;
     }
@@ -86,33 +84,44 @@ public class RockboxService extends Service
     {
         return rockbox_running;
     }
-    public Activity get_activity()
+    public Activity getActivity()
     {
-        return current_activity;
-    }
-    public void set_activity(Activity a)
-    {
-        current_activity = a;
+        return mCurrentActivity;
     }
 
-    private void do_start(Intent intent)
+    public void setActivity(Activity a)
     {
-        LOG("Start RockboxService (Intent: " + intent.getAction() + ")");
+        mCurrentActivity = a;
+    }
+    
+    private void putResult(int resultCode)
+    {
+        putResult(resultCode, null);
+    }
+
+    private void putResult(int resultCode, Bundle resultData)
+    {
+        if (mResultReceiver != null)
+            mResultReceiver.send(resultCode, resultData);
+    }
+
+    private void doStart(Intent intent)
+    {
+        Logger.d("Start RockboxService (Intent: " + intent.getAction() + ")");
 
         if (intent.getAction().equals("org.rockbox.ResendTrackUpdateInfo"))
         {
             if (rockbox_running)
-                fg_runner.resendUpdateNotification();
+                mFgRunner.resendUpdateNotification();
             return;
         }
 
         if (intent.hasExtra("callback"))
-            resultReceiver = (ResultReceiver) intent.getParcelableExtra("callback");
+            mResultReceiver = (ResultReceiver) intent.getParcelableExtra("callback");
 
         if (!rockbox_running)
-            startservice();
-        if (resultReceiver != null)
-            resultReceiver.send(RESULT_LIB_LOADED, null);
+            startService();
+        putResult(RESULT_LIB_LOADED);
 
         if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON))
         {
@@ -123,24 +132,13 @@ public class RockboxService extends Service
 
         /* (Re-)attach the media button receiver, in case it has been lost */
         mMediaButtonReceiver.register();
-        if (resultReceiver != null)
-            resultReceiver.send(RESULT_SERVICE_RUNNING, null);
+        putResult(RESULT_SERVICE_RUNNING);
 
         rockbox_running = true;
     }
 
-    private void LOG(CharSequence text)
-    {
-        Log.d("Rockbox", (String) text);
-    }
-
-    private void LOG(CharSequence text, Throwable tr)
-    {
-        Log.d("Rockbox", (String) text, tr);
-    }
-
     public void onStart(Intent intent, int startId) {
-        do_start(intent);
+        doStart(intent);
     }
 
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -149,11 +147,11 @@ public class RockboxService extends Service
          * after getting killed for memory pressure earlier */
         if (intent == null)
             intent = new Intent("org.rockbox.ServiceRestarted");
-        do_start(intent);
+        doStart(intent);
         return START_STICKY;
     }
 
-    private void startservice()
+    private void startService()
     {
         final Object lock = new Object();
         Thread rb = new Thread(new Runnable()
@@ -164,9 +162,6 @@ public class RockboxService extends Service
                 String rockboxDirPath = "/data/data/org.rockbox/app_rockbox/rockbox";
                 String rockboxCreditsPath = "/data/data/org.rockbox/app_rockbox/rockbox/rocks/viewers";
                 String rockboxSdDirPath = "/sdcard/rockbox";
-                File rockboxDir = new File(rockboxDirPath);
-                File rockboxSdDir = new File(rockboxSdDirPath);
-                File rockboxCreditsDir = new File(rockboxCreditsPath);
 
                 /* load library before unzipping which may take a while */
                 synchronized (lock) {
@@ -186,10 +181,10 @@ public class RockboxService extends Service
                 boolean extractToSd = false;
                 if(rockboxInfoFile.exists()) {
                     extractToSd = true;
-                    LOG("extracting resources to SD card");
+                    Logger.d("extracting resources to SD card");
                 }
                 else {
-                    LOG("extracting resources to internal memory");
+                    Logger.d("extracting resources to internal memory");
                 }
                 if (!arbitraryFile.exists() || (libMisc.lastModified() > arbitraryFile.lastModified()))
                 {
@@ -240,20 +235,16 @@ public class RockboxService extends Service
                                is.close();
                            }
 
-                           if (resultReceiver != null) {
-                               progressData.putInt("value", progressData.getInt("value", 0) + 1);
-                               resultReceiver.send(RESULT_LIB_LOAD_PROGRESS, progressData);
-                           }
+                           progressData.putInt("value", progressData.getInt("value", 0) + 1);
+                           putResult(RESULT_LIB_LOAD_PROGRESS, progressData);
                         }
                         arbitraryFile.setLastModified(libMisc.lastModified());
                     } catch(Exception e) {
-                        LOG("Exception when unzipping", e);
+                        Logger.d("Exception when unzipping", e);
+                        Bundle bundle = new Bundle();
                         e.printStackTrace();
-                        if (resultReceiver != null) {
-                            Bundle bundle = new Bundle();
-                            bundle.putString("error", getString(R.string.error_extraction));
-                            resultReceiver.send(RESULT_ERROR_OCCURED, bundle);
-                        }
+                        bundle.putString("error", getString(R.string.error_extraction));
+                        putResult(RESULT_ERROR_OCCURED, bundle);
                     }
                 }
 
@@ -272,21 +263,19 @@ public class RockboxService extends Service
                         strm.write("lang: /.rockbox/langs/" + getString(R.string.rockbox_language_file) + "\n");
                         strm.close();
                     } catch(Exception e) {
-                        LOG("Exception when writing default config", e);
+                        Logger.d("Exception when writing default config", e);
                     }
                 }
 
                 /* Start native code */
-                if (resultReceiver != null)
-                    resultReceiver.send(RESULT_INVOKING_MAIN, null);
+                putResult(RESULT_INVOKING_MAIN);
 
                 main();
 
-                if (resultReceiver != null)
-                    resultReceiver.send(RESULT_ROCKBOX_EXIT, null);
+                putResult(RESULT_ROCKBOX_EXIT);
 
-                LOG("Stop service: main() returned");
-                stopSelf(); /* serivce is of no use anymore */
+                Logger.d("Stop service: main() returned");
+                stopSelf(); /* service is of no use anymore */
             }
         }, "Rockbox thread");
         rb.setDaemon(false);
@@ -311,18 +300,17 @@ public class RockboxService extends Service
     @Override
     public IBinder onBind(Intent intent)
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     void startForeground()
     {
-        fg_runner.startForeground();
+        mFgRunner.startForeground();
     }
 
     void stopForeground()
     {
-        fg_runner.stopForeground();
+        mFgRunner.stopForeground();
     }
 
     @Override
@@ -330,7 +318,7 @@ public class RockboxService extends Service
     {
         super.onDestroy();
         /* Don't unregister so we can receive them (and startup the service)
-         * after idle poweroff. Hopefully it's ok if mMediaButtonReceiver is
+         * after idle power-off. Hopefully it's OK if mMediaButtonReceiver is
          * garbage collected.
          *  mMediaButtonReceiver.unregister(); */
         mMediaButtonReceiver = null;
