@@ -37,6 +37,9 @@
 /rbutil/Makefile
 /rbutil/rbutil
 
+# /rbutil/ipodpatcher/
+/rbutil/ipodpatcher/ipodpatcher
+
 # /rbutil/chinachippatcher/
 /rbutil/chinachippatcher/chinachip
 
