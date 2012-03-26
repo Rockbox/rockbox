@@ -63,12 +63,14 @@ all: $(DEPFILE) build
 # dependencies and compile rules
 include $(TOOLSDIR)/tools.make
 
-ifeq (,$(findstring checkwps,$(APPSDIR)))
-  ifeq (,$(findstring database,$(APPSDIR)))
-    include $(FIRMDIR)/firmware.make
-    include $(ROOTDIR)/apps/bitmaps/bitmaps.make
-	ifeq (,$(findstring bootloader,$(APPSDIR)))
-      include $(ROOTDIR)/lib/skin_parser/skin_parser.make
+ifneq (,$(findstring checkwps,$(APP_TYPE)))
+  ifneq (,$(findstring database,$(APP_TYPE)))
+    ifneq (,$(findstring warble,$(APP_TYPE)))
+      include $(FIRMDIR)/firmware.make
+      include $(ROOTDIR)/apps/bitmaps/bitmaps.make
+	  ifeq (,$(findstring bootloader,$(APPSDIR)))
+        include $(ROOTDIR)/lib/skin_parser/skin_parser.make
+      endif
     endif
   endif
 endif
@@ -97,6 +99,8 @@ else ifneq (,$(findstring database,$(APP_TYPE)))
   include $(APPSDIR)/database.make
 else ifneq (,$(findstring warble,$(APP_TYPE)))
   include $(ROOTDIR)/lib/rbcodec/test/warble.make
+  include $(APPSDIR)/codecs/codecs.make
+  include $(ROOTDIR)/lib/rbcodec/rbcodec.make
 else
   include $(APPSDIR)/apps.make
   include $(ROOTDIR)/lib/rbcodec/rbcodec.make
