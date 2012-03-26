@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAACH///2k\u003d",
+        "filename": "wps/cabbiev2.96x96x16.wps",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-03-26T12:58:19Z",
+      "side": 1,
+      "message": "You really should use better labels than this. (I know this is mostly copy/paste)",
+      "revId": "a0f29a7325eacf53f487b2c488d02985aa6c6089",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///2w\u003d",
+        "filename": "wps/cabbiev2.96x96x16.wps",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-03-26T12:58:19Z",
+      "side": 1,
+      "message": "This could be done with a bar tag instead",
+      "revId": "a0f29a7325eacf53f487b2c488d02985aa6c6089",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///2s\u003d",
+        "filename": "wps/cabbiev2.96x96x16.wps",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-03-26T12:58:19Z",
+      "side": 1,
+      "message": "%xd(E, %mm, 1) (or if that doesnt work get rid of the 1 and add a blank subimage at the top of the strip)",
+      "revId": "a0f29a7325eacf53f487b2c488d02985aa6c6089",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAACH///2o\u003d",
+        "filename": "wps/cabbiev2.96x96x16.wps",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-03-26T12:58:19Z",
+      "side": 1,
+      "message": "%xd(F, %mp)",
+      "revId": "a0f29a7325eacf53f487b2c488d02985aa6c6089",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
