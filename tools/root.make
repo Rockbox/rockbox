@@ -63,9 +63,9 @@ all: $(DEPFILE) build
 # dependencies and compile rules
 include $(TOOLSDIR)/tools.make
 
-ifneq (,$(findstring checkwps,$(APP_TYPE)))
-  ifneq (,$(findstring database,$(APP_TYPE)))
-    ifneq (,$(findstring warble,$(APP_TYPE)))
+ifeq (,$(findstring checkwps,$(APP_TYPE)))
+  ifeq (,$(findstring database,$(APP_TYPE)))
+    ifeq (,$(findstring warble,$(APP_TYPE)))
       include $(FIRMDIR)/firmware.make
       include $(ROOTDIR)/apps/bitmaps/bitmaps.make
 	  ifeq (,$(findstring bootloader,$(APPSDIR)))
