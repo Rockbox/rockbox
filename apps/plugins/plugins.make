@@ -53,6 +53,8 @@ else
 PLUGINSUBDIRS := $(call preprocess, $(APPSDIR)/plugins/SUBDIRS)
 endif
 
+PLUGIN_LIBS := $(EXTRA_LIBS) $(TLSFLIB) $(PLUGINLIB) $(PLUGINBITMAPLIB)
+
 # include <dir>.make from each subdir (yay!)
 $(foreach dir,$(PLUGINSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
 
@@ -65,7 +67,7 @@ PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS)
 $(ROCKS1): $(BUILDDIR)/%.rock: $(BUILDDIR)/%.o
 
 # dependency for all plugins
-$(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(LIBARMSUPPORT) $(PLUGINLIB) $(PLUGINBITMAPLIB) $(PLUGIN_CRT0) $(LIBSETJMP)
+$(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGIN_LIBS) $(PLUGIN_CRT0)
 
 $(PLUGINLIB): $(PLUGINLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
@@ -85,7 +87,7 @@ $(BUILDDIR)/credits.raw credits.raw: $(DOCSDIR)/CREDITS
 	$(call PRINTS,Create credits.raw)perl $(APPSDIR)/plugins/credits.pl < $< > $(BUILDDIR)/$(@F)
 
 # special dependencies
-$(BUILDDIR)/apps/plugins/wav2wv.rock: $(BUILDDIR)/apps/codecs/libwavpack.a $(PLUGINLIB)
+$(BUILDDIR)/apps/plugins/wav2wv.rock: $(BUILDDIR)/apps/codecs/libwavpack.a $(PLUGIN_LIBS)
 
 # Do not use '-ffunction-sections' and '-fdata-sections' when compiling sdl-sim
 ifeq ($(findstring sdl-sim, $(APP_TYPE)), sdl-sim)
@@ -129,7 +131,7 @@ endif
 $(BUILDDIR)/apps/plugins/%.lua: $(ROOTDIR)/apps/plugins/%.lua
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $(BUILDDIR)/apps/plugins/
 
-$(BUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(OVERLAYREF_LDS) $(LIBARMSUPPORT) $(PLUGINLIB) $(PLUGINBITMAPLIB) $(LIBSETJMP) $(PLUGIN_CRT0)
+$(BUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(OVERLAYREF_LDS) $(PLUGIN_LIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o /dev/null \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \

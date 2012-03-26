@@ -20,7 +20,7 @@ OTHER_SRC += $(MIKMOD_SRC)
 
 MIKMODCFLAGS = $(PLUGINFLAGS) -I$(MIKMODSRCDIR) -O2
 
-$(MIKMODBUILDDIR)/mikmod.rock: $(MIKMOD_OBJ) $(CODECDIR)/libtlsf.a
+$(MIKMODBUILDDIR)/mikmod.rock: $(MIKMOD_OBJ)
 
 # new rule needed to use extra compile flags
 $(MIKMODBUILDDIR)/%.o: $(MIKMODSRCDIR)/%.c

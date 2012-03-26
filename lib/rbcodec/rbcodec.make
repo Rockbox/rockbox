@@ -5,15 +5,15 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 
-RBCODEC_LIB = $(RBCODEC_BLD)/librbcodec.a
-RBCODEC_SRC := $(call preprocess, $(RBCODEC_DIR)/SOURCES)
-RBCODEC_OBJ := $(call c2obj, $(RBCODEC_SRC))
-INCLUDES += -I$(RBCODEC_DIR) -I$(RBCODEC_DIR)/dsp -I$(RBCODEC_DIR)/metadata
-OTHER_SRC += $(RBCODEC_SRC)
+# RBCODEC_BLD is defined in the calling Makefile
+RBCODECLIB_DIR := $(ROOTDIR)/lib/rbcodec
+RBCODECLIB_SRC := $(call preprocess, $(RBCODECLIB_DIR)/SOURCES)
+RBCODECLIB_OBJ := $(call c2obj, $(RBCODECLIB_SRC))
+RBCODECLIB := $(BUILDDIR)/lib/librbcodec.a
 
-$(RBCODEC_BLD)/%.o: $(RBCODEC_DIR)/%.c
-	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $<)$(CC) $(CFLAGS) $(RBCODEC_CFLAGS) -c $< -o $@
+INCLUDES += -I$(RBCODECLIB_DIR) -I$(RBCODECLIB_DIR)/dsp -I$(RBCODECLIB_DIR)/metadata
+OTHER_SRC += $(RBCODECLIB_SRC)
+CORE_LIBS += $(RBCODECLIB)
 
-$(RBCODEC_LIB): $(RBCODEC_OBJ)
+$(RBCODECLIB): $(RBCODECLIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null

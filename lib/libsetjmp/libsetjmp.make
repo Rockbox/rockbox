@@ -6,16 +6,16 @@
 #                     \/            \/     \/    \/            \/
 #
 
-SETJMP_DIR = $(ROOTDIR)/lib/libsetjmp
-SETJMP_SRC = $(call preprocess, $(SETJMP_DIR)/SOURCES)
-SETJMP_OBJ := $(call c2obj, $(SETJMP_SRC))
+SETJMPLIB_DIR = $(ROOTDIR)/lib/libsetjmp
+SETJMPLIB_SRC = $(call preprocess, $(SETJMPLIB_DIR)/SOURCES)
+SETJMPLIB_OBJ := $(call c2obj, $(SETJMPLIB_SRC))
 
-OTHER_SRC += $(SETJMP_SRC)
+SETJMPLIB = $(BUILDDIR)/lib/libsetjmp.a
 
-LIBSETJMP = $(BUILDDIR)/lib/libsetjmp.a
+INCLUDES += -I$(SETJMPLIB_DIR)
+OTHER_SRC += $(SETJMPLIB_SRC)
+EXTRA_LIBS += $(SETJMPLIB)
 
-INCLUDES += -I$(SETJMP_DIR)
-
-$(LIBSETJMP): $(SETJMP_OBJ)
+$(SETJMPLIB): $(SETJMPLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null

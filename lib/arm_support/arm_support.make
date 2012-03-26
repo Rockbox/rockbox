@@ -6,14 +6,16 @@
 #                     \/            \/     \/    \/            \/
 #
 
-ARMSUPPORT_DIR = $(ROOTDIR)/lib/arm_support
-ARMSUPPORT_SRC = $(ARMSUPPORT_DIR)/support-arm.S
-ARMSUPPORT_OBJ := $(call c2obj, $(ARMSUPPORT_SRC))
+ARMSUPPORTLIB_DIR := $(ROOTDIR)/lib/arm_support
+ARMSUPPORTLIB_SRC := $(ARMSUPPORTLIB_DIR)/support-arm.S
+ARMSUPPORTLIB_OBJ := $(call c2obj, $(ARMSUPPORTLIB_SRC))
+ARMSUPPORTLIB := $(BUILDDIR)/lib/libarm_support.a
 
-OTHER_SRC += $(ARMSUPPORT_SRC)
+OTHER_SRC += $(ARMSUPPORTLIB_SRC)
+# both core and plugins link this
+CORE_LIBS += $(ARMSUPPORTLIB)
+PLUGIN_LIBS += $(ARMSUPPORTLIB)
 
-LIBARMSUPPORT := $(BUILDDIR)/lib/libarm_support.a
-
-$(LIBARMSUPPORT): $(ARMSUPPORT_OBJ)
+$(ARMSUPPORTLIB): $(ARMSUPPORTLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null

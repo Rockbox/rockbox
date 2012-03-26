@@ -47,7 +47,7 @@ else
 endif
 
 # rule to create reference map for image decoder
-$(IMGVBUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(IMGVSRCDIR)/imageviewer.h $(PLUGINLINK_LDS) $(LIBARMSUPPORT) $(PLUGINLIB) $(PLUGINBITMAPLIB)
+$(IMGVBUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(IMGVSRCDIR)/imageviewer.h $(PLUGINLINK_LDS) $(PLUGIN_LIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(IMGDECFLAGS) -o /dev/null \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \

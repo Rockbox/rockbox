@@ -5,16 +5,16 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 #
-SKINP_DIR = $(ROOTDIR)/lib/skin_parser
-SKINP_SRC = $(call preprocess, $(SKINP_DIR)/SOURCES)
-SKINP_OBJ := $(call c2obj, $(SKINP_SRC))
+SKINPARSLIB_DIR = $(ROOTDIR)/lib/skin_parser
+SKINPARSLIB_SRC = $(call preprocess, $(SKINPARSLIB_DIR)/SOURCES)
+SKINPARSLIB_OBJ := $(call c2obj, $(SKINPARSLIB_SRC))
 
-OTHER_SRC += $(SKINP_SRC)
+SKINPARSLIB = $(BUILDDIR)/lib/libskin_parser.a
 
-SKINLIB = $(BUILDDIR)/lib/libskin_parser.a
+INCLUDES += -I$(SKINPARSLIB_DIR)
+OTHER_SRC += $(SKINPARSLIB_SRC)
+CORE_LIBS += $(SKINPARSLIB)
 
-INCLUDES += -I$(SKINP_DIR)
-
-$(SKINLIB): $(SKINP_OBJ)
+$(SKINPARSLIB): $(SKINPARSLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null

@@ -6,16 +6,17 @@
 #                     \/            \/     \/    \/            \/
 #
 
-UNWARM_DIR = $(ROOTDIR)/lib/unwarminder
-UNWARM_SRC = $(call preprocess, $(UNWARM_DIR)/SOURCES)
-UNWARM_OBJ := $(call c2obj, $(UNWARM_SRC))
+UNWARMLIB_DIR = $(ROOTDIR)/lib/unwarminder
+UNWARMLIB_SRC = $(call preprocess, $(UNWARMLIB_DIR)/SOURCES)
+UNWARMLIB_OBJ := $(call c2obj, $(UNWARMLIB_SRC))
 
-OTHER_SRC += $(UNWARM_SRC)
+OTHER_SRC += $(UNWARMLIB_SRC)
 
-UNWARMINDER = $(BUILDDIR)/lib/libunwarminder.a
+UNWARMLIB = $(BUILDDIR)/lib/libunwarminder.a
+CORE_LIBS += $(UNWARMLIB)
 
-INCLUDES += -I$(UNWARM_DIR)
+INCLUDES += -I$(UNWARMLIB_DIR)
 
-$(UNWARMINDER): $(UNWARM_OBJ)
+$(UNWARMLIB): $(UNWARMLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null

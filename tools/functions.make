@@ -26,6 +26,8 @@ asmdefs2file = $(SILENT)$(CC) $(PPCFLAGS) $(3) -S -x c -o - -include config.h $(
 
 c2obj = $(addsuffix .o,$(basename $(subst $(ROOTDIR),$(BUILDDIR),$(1))))
 
+a2lnk = $(patsubst lib%.a,-l%,$(notdir $(1)))
+
 # calculate dependencies for a list of source files $(2) and output them to $(1)
 mkdepfile = $(SILENT)perl $(TOOLSDIR)/multigcc.pl $(CC) $(PPCFLAGS) $(OTHER_INC) -MG -MM -include config.h -- $(2) | \
 	sed -e "s: lang.h: lang/lang.h:" \
