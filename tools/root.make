@@ -66,8 +66,10 @@ include $(TOOLSDIR)/tools.make
 ifeq (,$(findstring checkwps,$(APPSDIR)))
   ifeq (,$(findstring database,$(APPSDIR)))
     include $(FIRMDIR)/firmware.make
-    include $(ROOTDIR)/lib/skin_parser/skin_parser.make
     include $(ROOTDIR)/apps/bitmaps/bitmaps.make
+	ifeq (,$(findstring bootloader,$(APPSDIR)))
+      include $(ROOTDIR)/lib/skin_parser/skin_parser.make
+    endif
   endif
 endif
 

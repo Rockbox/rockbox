@@ -18,20 +18,15 @@ CLEANOBJS += $(BUILDDIR)/bootloader.*
 
 .SECONDEXPANSION:
 
-ifeq (arm,$(ARCH))
-  UNWARMINDER_LINK := -lunwarminder -L$(BUILDDIR)/lib
-else
-  UNWARMINDER_LINK :=
-endif
-
 $(BOOTLINK): $(BOOTLDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
-$(BUILDDIR)/bootloader.elf: $$(OBJ) $$(FIRMLIB) $$(UNWARMINDER) $$(BOOTLINK)
+$(BUILDDIR)/bootloader.elf: $$(OBJ) $(FIRMLIB) $(CORE_LIBS) $$(BOOTLINK)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
-		$(FIRMLIB) $(UNWARMINDER_LINK) -lgcc -L$(BUILDDIR)/firmware \
-		-T$(BOOTLINK) $(GLOBAL_LDOPTS) \
+		-L$(BUILDDIR)/firmware -lfirmware \
+		-L$(BUILDDIR)/lib $(call a2lnk, $(CORE_LIBS)) \
+		-lgcc -T$(BOOTLINK) $(GLOBAL_LDOPTS) \
 		-Wl,--gc-sections -Wl,-Map,$(BUILDDIR)/bootloader.map
 
 $(BUILDDIR)/bootloader.bin : $(BUILDDIR)/bootloader.elf
