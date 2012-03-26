@@ -780,7 +780,7 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
         /* only update if the line needs to be, and there is something to write */
         if (refresh_type && needs_update)
         {
-            if (!info.force_redraw)
+            if (info.force_redraw)
                 display->scroll_stop_line(&skin_viewport->vp, info.line_number);
             write_line(display, align, info.line_number,
                     info.line_scrolls, info.text_style);
