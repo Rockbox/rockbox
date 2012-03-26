@@ -7,9 +7,12 @@
 # $Id$
 #
 
-FLAGS=-g -D__PCTOOL__ $(TARGET) -Wall
+GCCOPTS=-g -D__PCTOOL__ -DCHECKWPS $(TARGET)
 
-SRC= $(call preprocess, $(TOOLSDIR)/checkwps/SOURCES)
+CHECKWPS_SRC = $(call preprocess, $(TOOLSDIR)/checkwps/SOURCES)
+CHECKWPS_OBJ = $(call c2obj,$(CHECKWPS_SRC))
+
+OTHER_SRC += $(CHECKWPS_SRC)
 
 INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/apps/gui/skin_engine \
@@ -24,11 +27,11 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(APPSDIR) \
            -I$(BUILDDIR)
 
-# Makes mkdepfile happy
-GCCOPTS+=-D__PCTOOL__ -DCHECKWPS -g
+include $(ROOTDIR)/lib/skin_parser/skin_parser.make
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
-$(BUILDDIR)/$(BINARY): $$(OBJ) $$(SKINLIB)
+$(BUILDDIR)/$(BINARY): $$(CHECKWPS_OBJ) $(CORE_LIBS)
 	@echo LD $(BINARY)
-	$(SILENT)$(HOSTCC) $(INCLUDE) $(FLAGS) -L$(BUILDDIR)/lib -lskin_parser -o $@ $+
+	$(SILENT)$(HOSTCC) -o $@ $+ $(INCLUDE) $(GCCOPTS)  \
+	-L$(BUILDDIR)/lib $(call a2lnk,$(CORE_LIBS))
