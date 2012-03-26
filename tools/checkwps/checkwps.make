@@ -27,11 +27,9 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(APPSDIR) \
            -I$(BUILDDIR)
 
-include $(ROOTDIR)/lib/skin_parser/skin_parser.make
-
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
-$(BUILDDIR)/$(BINARY): $$(CHECKWPS_OBJ) $(CORE_LIBS)
+$(BUILDDIR)/$(BINARY): $$(CHECKWPS_OBJ) $$(CORE_LIBS)
 	@echo LD $(BINARY)
 	$(SILENT)$(HOSTCC) -o $@ $+ $(INCLUDE) $(GCCOPTS)  \
 	-L$(BUILDDIR)/lib $(call a2lnk,$(CORE_LIBS))
