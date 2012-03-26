@@ -19,12 +19,12 @@
 include(tests.pri)
 
 TEMPLATE = app
-TARGET = compareversion
+TARGET = test-compareversion
 INCLUDEPATH += . ../base
 
 # Input
 SOURCES += \
-    compareversion.cpp \
+    test-compareversion.cpp \
     ../base/rbsettings.cpp \
     ../base/rockboxinfo.cpp \
     ../base/systeminfo.cpp \

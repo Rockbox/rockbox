@@ -92,5 +92,5 @@ QTEST_MAIN(TestVersionCompare)
 
 // this include is needed because we don't use a separate header file for the
 // test class. It also needs to be at the end.
-#include "compareversion.moc"
+#include "test-compareversion.moc"
 
