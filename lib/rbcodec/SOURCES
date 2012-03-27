@@ -7,13 +7,13 @@ dsp/compressor.c
 dsp/dsp.c
 dsp/eq.c
 # if defined(CPU_COLDFIRE)
-dsp/dsp_cf.S
+// dsp/dsp_cf.S
 dsp/eq_cf.S
 # elif defined(CPU_ARM)
-dsp/dsp_arm.S
+// dsp/dsp_arm.S
 dsp/eq_arm.S
 #  if ARM_ARCH >= 6
-dsp/dsp_arm_v6.S
+// dsp/dsp_arm_v6.S
 #  endif
 # endif
 # ifdef HAVE_PITCHSCREEN
