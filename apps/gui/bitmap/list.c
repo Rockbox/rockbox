@@ -22,13 +22,13 @@
 /* This file contains the code to draw the list widget on BITMAP LCDs. */
 
 #include "config.h"
+#include "system.h"
 #include "lcd.h"
 #include "font.h"
 #include "button.h"
 #include "string.h"
 #include "settings.h"
 #include "kernel.h"
-#include "system.h"
 #include "file.h"
 
 #include "action.h"

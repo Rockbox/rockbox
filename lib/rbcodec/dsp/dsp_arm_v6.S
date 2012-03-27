@@ -20,19 +20,21 @@
  ****************************************************************************/
 
 /****************************************************************************
- *  void sample_output_mono(int count, struct dsp_data *data,
- *                          const int32_t *src[], int16_t *dst)
+ *  void sample_output_mono(struct sample_io_data *this,
+ *                          struct dsp_buffer *src,
+ *                          struct dsp_buffer *dst)
  */
-    .section .text, "ax", %progbits
-    .align  2
+    .section .text
     .global sample_output_mono
     .type   sample_output_mono, %function
 sample_output_mono:
-    @ input: r0 = count, r1 = data, r2 = src, r3 = dst
+    @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4, lr }            @
                                        @
-    ldr     r1, [r1]                   @ r1 = data->output_scale
-    ldr     r2, [r2]                   @ r2 = src[0]
+    ldr     r0, [r0]                   @ r0 = this->outcount
+    ldr     r3, [r2, #4]               @ r3 = dst->p16out
+    ldr     r2, [r1, #4]               @ r2 = src->p32[0]
+    ldrb    r1, [r1, #19]              @ r1 = src->format.output_scale
                                        @
     mov     r4, #1                     @ r4 = 1 << (scale - 1)
     mov     r4, r4, lsl r1             @
@@ -63,24 +65,26 @@ sample_output_mono:
     ssat    r12, #16, r12              @
     pkhbt   r12, r12, r12, asl #16     @
     str     r12, [r3]                  @ store So
-                                       @       
+                                       @
     ldmfd   sp!, { r4, pc }            @
     .size   sample_output_mono, .-sample_output_mono
 
 /****************************************************************************
- * void sample_output_stereo(int count, struct dsp_data *data,
- *                           const int32_t *src[], int16_t *dst)
+ * void sample_output_stereo(struct sample_io_data *this,
+ *                           struct dsp_buffer *src,
+ *                           struct dsp_buffer *dst)
  */
-    .section .text, "ax", %progbits
-    .align  2
+    .section .text
     .global sample_output_stereo
     .type   sample_output_stereo, %function
 sample_output_stereo:
-    @ input: r0 = count, r1 = data, r2 = src, r3 = dst
+    @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4-r7, lr }         @
                                        @
-    ldr     r1, [r1]                   @ r1 = data->output_scale    
-    ldmia   r2, { r2, r4 }             @ r2 = src[0], r4 = src[1]
+    ldr     r0, [r0]                   @ r0 = this->outcount
+    ldr     r3, [r2, #4]               @ r3 = dst->p16out
+    ldmib   r1, { r2, r4 }             @ r2 = src->p32[0], r4 = src->p32[1]
+    ldrb    r1, [r1, #19]              @ r1 = src->format.output_scale
                                        @
     mov     r5, #1                     @ r5 = 1 << (scale - 1)
     mov     r5, r5, lsl r1             @
@@ -95,7 +99,7 @@ sample_output_stereo:
     qadd    r7, r7, r5                 @ Li0+Ri0 to So0, Li1+Ri1 to So1
     qadd    r12, r12, r5               @
     qadd    r14, r14, r5               @
-    mov     r6, r6, asr r1             @ 
+    mov     r6, r6, asr r1             @
     mov     r7, r7, asr r1             @
     mov     r12, r12, asr r1           @
     mov     r14, r14, asr r1           @

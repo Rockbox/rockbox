@@ -36,6 +36,7 @@ struct audio_thread_data
     unsigned samplerate;    /* Current stream sample rate */
     int nchannels;          /* Number of audio channels */
     struct dsp_config *dsp; /* The DSP we're using */
+    struct dsp_buffer src;  /* Current audio data for DSP processing */
 };
 
 /* The audio thread is stolen from the core codec thread */
@@ -479,12 +480,13 @@ static void audio_thread(void)
     /* We need this here to init the EMAC for Coldfire targets */
     init_mad();
 
-    td.dsp = (struct dsp_config *)rb->dsp_configure(NULL, DSP_MYDSP,
-                                                    CODEC_IDX_AUDIO);
+    td.dsp = rb->dsp_get_config(CODEC_IDX_AUDIO);
 #ifdef HAVE_PITCHSCREEN
     rb->sound_set_pitch(PITCH_SPEED_100);
+    rb->dsp_set_timestretch(PITCH_SPEED_100);
 #endif
     rb->dsp_configure(td.dsp, DSP_RESET, 0);
+    rb->dsp_configure(td.dsp, DSP_FLUSH, 0);
     rb->dsp_configure(td.dsp, DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
 
     goto message_wait;
@@ -631,43 +633,53 @@ static void audio_thread(void)
                                 STEREO_MONO : STEREO_NONINTERLEAVED);
         }
 
+        td.src.remcount  = synth.pcm.length;
+        td.src.pin[0]    = synth.pcm.samples[0];
+        td.src.pin[1]    = synth.pcm.samples[1];
+        td.src.proc_mask = 0;
+
         td.state  = TSTATE_RENDER_WAIT;
 
         /* Add a frame of audio to the pcm buffer. Maximum is 1152 samples. */
     render_wait:
-        if (synth.pcm.length > 0)
+        rb->yield();
+
+        while (1)
         {
-            const char *src[2] =
-                { (char *)synth.pcm.samples[0], (char *)synth.pcm.samples[1] };
-            int out_count = (synth.pcm.length * CLOCK_RATE
-                                + (td.samplerate - 1)) / td.samplerate;
-            unsigned char *out_buf;
-            ssize_t size = out_count*4;
+            struct dsp_buffer dst;
+            dst.remcount = 0;
+            dst.bufcount = MAX(td.src.remcount, 1024);
+
+            ssize_t size = dst.bufcount * 2 * sizeof(int16_t);
 
             /* Wait for required amount of free buffer space */
-            while ((out_buf = pcm_output_get_buffer(&size)) == NULL)
+            while ((dst.p16out = pcm_output_get_buffer(&size)) == NULL)
             {
                 /* Wait one frame */
-                int timeout = out_count*HZ / td.samplerate;
+                int timeout = dst.bufcount*HZ / td.samplerate;
                 str_get_msg_w_tmo(&audio_str, &td.ev, MAX(timeout, 1));
                 if (td.ev.id != SYS_TIMEOUT)
                     goto message_process;
             }
 
-            out_count = rb->dsp_process(td.dsp, out_buf, src, synth.pcm.length);
+            dst.bufcount = size / (2 * sizeof (int16_t));
+            rb->dsp_process(td.dsp, &td.src, &dst);
 
-            if (out_count <= 0)
+            if (dst.remcount > 0)
+            {
+                /* Make this data available to DMA */
+                pcm_output_commit_data(dst.remcount * 2 * sizeof(int16_t),
+                                       audio_queue.curr->time);
+
+                /* As long as we're on this timestamp, the time is just
+                   incremented by the number of samples */
+                audio_queue.curr->time += dst.remcount;
+            }
+            else if (td.src.remcount <= 0)
+            {
                 break;
-
-            /* Make this data available to DMA */
-            pcm_output_commit_data(out_count*4, audio_queue.curr->time);
-
-            /* As long as we're on this timestamp, the time is just
-               incremented by the number of samples */
-            audio_queue.curr->time += out_count;
+            }
         }
-
-        rb->yield();
     } /* end decoding loop */
 }
 
