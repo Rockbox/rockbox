@@ -23,7 +23,7 @@
 #define PDBOX_H
 
 /* Use TLSF. */
-#include "codecs/lib/tlsf/src/tlsf.h"
+#include <tlsf.h>
 
 /* Pure Data */
 #include "PDa/src/m_pd.h"

@@ -23,7 +23,7 @@
 #include "libtremor/ivorbisfile.h"
 #include "libtremor/ogg.h"
 #ifdef SIMULATOR
-#include "lib/tlsf/src/tlsf.h"
+#include <tlsf.h>
 #endif
 
 CODEC_HEADER

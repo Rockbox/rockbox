@@ -70,6 +70,7 @@ ifeq (,$(findstring checkwps,$(APP_TYPE)))
       include $(ROOTDIR)/apps/bitmaps/bitmaps.make
 	  ifeq (,$(findstring bootloader,$(APPSDIR)))
         include $(ROOTDIR)/lib/skin_parser/skin_parser.make
+        include $(ROOTDIR)/lib/tlsf/libtlsf.make
       endif
     endif
   endif

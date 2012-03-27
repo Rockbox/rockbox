@@ -1,5 +1,5 @@
 #include "os_types.h"
-#include "../lib/tlsf/src/tlsf.h"
+#include <tlsf.h>
 
 #if defined(CPU_ARM) || defined(CPU_COLDFIRE) || defined(CPU_MIPS)
 #include <setjmp.h>

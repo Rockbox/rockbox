@@ -1,7 +1,7 @@
 #include <string.h>
 #include "plugin.h"
 #include "inttypes.h"
-#include "codecs/lib/tlsf/src/tlsf.h"
+#include <tlsf.h>
 
 #ifndef MIKMOD_SUPP_H
 #define MIKMOD_SUPP_H

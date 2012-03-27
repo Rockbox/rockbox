@@ -14,15 +14,12 @@ OTHER_SRC += $(CODECS_SRC)
 CODECS := $(CODECS_SRC:.c=.codec)
 CODECS := $(subst $(ROOTDIR),$(BUILDDIR),$(CODECS))
 
-# TLSF memory allocator library
-include $(APPSDIR)/codecs/lib/tlsf/libtlsf.make
-
 # the codec helper library
 include $(APPSDIR)/codecs/lib/libcodec.make
 OTHER_INC += -I$(APPSDIR)/codecs/lib
 
 # extra libraries
-CODEC_LIBS := $(EXTRA_LIBS) $(TLSFLIB) $(CODECLIB)
+CODEC_LIBS := $(EXTRA_LIBS) $(CODECLIB)
 
 # the codec libraries
 include $(APPSDIR)/codecs/demac/libdemac.make

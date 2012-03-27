@@ -53,7 +53,7 @@ else
 PLUGINSUBDIRS := $(call preprocess, $(APPSDIR)/plugins/SUBDIRS)
 endif
 
-PLUGIN_LIBS := $(EXTRA_LIBS) $(TLSFLIB) $(PLUGINLIB) $(PLUGINBITMAPLIB)
+PLUGIN_LIBS := $(EXTRA_LIBS) $(PLUGINLIB) $(PLUGINBITMAPLIB)
 
 # include <dir>.make from each subdir (yay!)
 $(foreach dir,$(PLUGINSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
