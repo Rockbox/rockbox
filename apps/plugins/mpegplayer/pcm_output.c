@@ -164,7 +164,7 @@ static void get_more(const void **start, size_t *size)
     clock_time += sizeof (silence) / 4;
     clock_tick += sizeof (silence) / 4;
 
-    *start = (unsigned char *)silence;
+    *start = silence;
     *size = sizeof (silence);
 
     if (sz < 0)
@@ -175,7 +175,7 @@ static void get_more(const void **start, size_t *size)
 
 /* Return a buffer pointer if at least size bytes are available and if so,
  * give the actual free space */
-unsigned char * pcm_output_get_buffer(ssize_t *size)
+void * pcm_output_get_buffer(ssize_t *size)
 {
     ssize_t sz = *size;
     ssize_t free = pcm_output_bytes_free() - PCM_HDR_SIZE;

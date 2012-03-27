@@ -29,16 +29,17 @@
 
 enum
 {
-    STEREO_INTERLEAVED = 0,
-    STEREO_NONINTERLEAVED,
-    STEREO_MONO,
-    STEREO_NUM_MODES,
+    CODEC_IDX_AUDIO = 0,
+    CODEC_IDX_VOICE,
+    DSP_COUNT,
 };
 
 enum
 {
-    CODEC_IDX_AUDIO = 0,
-    CODEC_IDX_VOICE,
+    STEREO_INTERLEAVED = 0,
+    STEREO_NONINTERLEAVED,
+    STEREO_MONO,
+    STEREO_NUM_MODES,
 };
 
 enum
@@ -50,13 +51,73 @@ enum
     DSP_SET_STEREO_MODE,
     DSP_RESET,
     DSP_FLUSH,
-    DSP_SET_TRACK_GAIN,
-    DSP_SET_ALBUM_GAIN,
-    DSP_SET_TRACK_PEAK,
-    DSP_SET_ALBUM_PEAK,
-    DSP_CROSSFEED
+    DSP_SET_REPLAY_GAIN,
+    DSP_CROSSFEED,
+    DSP_IS_BUSY,
 };
 
+/* Identifier for each effect in DSP chain */
+enum dsp_proc_masks
+{
+    DSP_PROC_GAIN          = 0x00000001,
+    DSP_PROC_TIMESTRETCH   = 0x00000002,
+    DSP_PROC_RESAMPLE      = 0x00000004,
+    DSP_PROC_CROSSFEED     = 0x00000008,
+    DSP_PROC_EQUALIZER     = 0x00000010,
+    DSP_PROC_TONE_CONTROLS = 0x00000020,
+    DSP_PROC_CHANNELS      = 0x00000040,
+    DSP_PROC_COMPRESSOR    = 0x00000080,
+    DSP_PROC_MASK_USE_INIT_CB = 0xffffffff,
+};
+
+/* Used by ASM routines - keep field order or else fix the functions */
+struct dsp_buffer
+{
+    int remcount;           /* 00h: Samples in buffer */
+    union
+    {
+        const void *pin[2]; /* 04h: Channel pointers (input) */
+        int32_t *p32[2];    /* 04h: Channel pointers (internal) */
+        int16_t *p16out;    /* 04h: DSP output buffer (output) */
+    };
+    union
+    {
+        uint32_t proc_mask; /* 0Ch: In-place effects already appled to buffer
+                                    in order to aboid double-processing. Set
+                                    to zero on new buffer before passing to
+                                    DSP. */
+        int bufcount;       /* 0Ch: Buffer length/dest buffer remaining
+                                    Basically, pay no attention unless it's
+                                    *your* new buffer and is used internally
+                                    or is specifically the final output
+                                    buffer. */
+    };
+};
+
+static inline void dsp_advance_buffer_input(struct dsp_buffer *buf,
+                                            int by_count,
+                                            size_t size_each)
+{
+    buf->remcount -= by_count;
+    buf->pin[0] += by_count * size_each;
+    buf->pin[1] += by_count * size_each;
+}
+
+static inline void dsp_advance_buffer_output(struct dsp_buffer *buf,
+                                             int by_count)
+{
+    buf->bufcount -= by_count;
+    buf->remcount += by_count;
+    buf->p16out += 2 * by_count; /* Interleaved stereo */
+}
+
+static inline void dsp_advance_buffer32(struct dsp_buffer *buf,
+                                        int by_count)
+{
+    buf->remcount -= by_count;
+    buf->p32[0] += by_count;
+    buf->p32[1] += by_count;
+}
 
 /****************************************************************************
  * NOTE: Any assembly routines that use these structures must be updated
@@ -88,19 +149,28 @@ struct dsp_data
     int output_scale;                   /* 00h */
     int num_channels;                   /* 04h */
     struct resample_data resample_data; /* 08h */
-    int32_t clip_min;                   /* 18h */
-    int32_t clip_max;                   /* 1ch */
-    int32_t gain;                       /* 20h - Note that this is in S8.23 format. */
-    int frac_bits;                      /* 24h */
-                                        /* 28h */
+    int32_t gain;                       /* 18h - Note that this is in S8.23 format. */
+    int frac_bits;                      /* 1ch */
+                                        /* 20h */
+};
+
+/* Structure used with DSP_SET_REPLAY_GAIN message */
+struct dsp_replay_gains
+{
+    long track_gain;
+    long album_gain;
+    long track_peak;
+    long album_peak;
 };
 
 struct dsp_config;
 
-int dsp_process(struct dsp_config *dsp, char *dest,
-                const char *src[], int count);
-int dsp_input_count(struct dsp_config *dsp, int count);
+#define CONFIG_FROM_DATA(x) \
+    TYPE_FROM_MEMBER(struct dsp_config, x, data)
+
 int dsp_output_count(struct dsp_config *dsp, int count);
+void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
+                 struct dsp_buffer *dst);
 intptr_t dsp_configure(struct dsp_config *dsp, int setting,
                        intptr_t value);
 int get_replaygain_mode(bool have_track_gain, bool have_album_gain);

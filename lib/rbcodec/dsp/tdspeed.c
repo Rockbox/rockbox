@@ -29,6 +29,7 @@
 #include "system.h"
 #include "tdspeed.h"
 #include "settings.h"
+#include "dsp-util.h"
 
 #define assert(cond)
 
@@ -36,47 +37,9 @@
 #define MAX_RATE 48000 /* double buffer for double rate */
 #define MINFREQ 100
 
-#define FIXED_BUFSIZE 3072 /* 48KHz factor 3.0 */
-
-static int32_t** dsp_src;
-static int handles[4];
-static int32_t *overlap_buffer[2] = { NULL, NULL };
-static int32_t *outbuf[2] = { NULL, NULL };
-
-static int move_callback(int handle, void* current, void* new)
-{
-    /* TODO */
-    (void)handle;
-    if (dsp_src)
-    {
-        int ch = (current == outbuf[0]) ? 0 : 1;
-        dsp_src[ch] = outbuf[ch] = new;
-    }
-    return BUFLIB_CB_OK;
-}
-
-static struct buflib_callbacks ops = {
-    .move_callback = move_callback,
-    .shrink_callback = NULL,
-};
-
-static int ovl_move_callback(int handle, void* current, void* new)
-{
-    /* TODO */
-    (void)handle;
-    if (dsp_src)
-    {
-        int ch = (current == overlap_buffer[0]) ? 0 : 1;
-        overlap_buffer[ch] = new;
-    }
-    return BUFLIB_CB_OK;
-}
-
-static struct buflib_callbacks ovl_ops = {
-    .move_callback = ovl_move_callback,
-    .shrink_callback = NULL,
-};
-
+#define MAX_INPUTCOUNT       512 /* Max input count so dst doesn't overflow */
+#define FIXED_BUFCOUNT      3072 /* 48KHz factor 3.0 */
+#define FIXED_OUTBUFCOUNT   4096
 
 static struct tdspeed_state_s
 {
@@ -91,59 +54,112 @@ static struct tdspeed_state_s
     int32_t *ovl_buff[2];   /* overlap buffer */
 } tdspeed_state;
 
+static int handles[4] = { 0, 0, 0, 0 };
+static int32_t *buffers[4] = { NULL, NULL, NULL, NULL };
+
+#define overlap_buffer  (&buffers[0])
+#define outbuf          (&buffers[2])
+#define out_size        FIXED_OUTBUFCOUNT
+
+/* Processed buffer passed out to later stages */
+static struct dsp_buffer dsp_outbuf;
+
+static int move_callback(int handle, void *current, void *new)
+{
+    struct dsp_config *dsp = (void *)dsp_configure(NULL, DSP_MYDSP,
+                                                   CODEC_IDX_AUDIO);
+
+    if (dsp_configure(dsp, DSP_IS_BUSY, 0))
+        return BUFLIB_CB_CANNOT_MOVE; /* DSP processing in progress */
+
+    for (unsigned int i = 0; i < ARRAYLEN(handles); i++)
+    {
+        if (handle != handles[i])
+            continue;
+
+        if (i >= 2)
+        {
+            /* Moving outbuf[0/1] pointer - dsp buffer needs adjusting */
+            /* Whether it's already initialized makes no difference */
+            ptrdiff_t amt = (int32_t *)new - buffers[i];
+
+            if (i == 2)
+            {
+                if (dsp_outbuf.p32[0] == dsp_outbuf.p32[1])
+                    dsp_outbuf.p32[1] += amt; /* mono mode */
+
+                dsp_outbuf.p32[0] += amt;
+            }
+            else
+            {
+                dsp_outbuf.p32[1] += amt;
+            }
+        }
+
+        buffers[i] = new;
+        break;
+    }
+
+    return BUFLIB_CB_OK;
+
+    (void)current;
+}
+
+static struct buflib_callbacks ops =
+{
+    .move_callback = move_callback,
+    .shrink_callback = NULL,
+};
+
 void tdspeed_init(void)
 {
-    if (!global_settings.timestretch_enabled)
-        return;
+    static const struct
+    {
+        const char *name;
+        size_t size;
+    } bufdefs[4] =
+    {
+        { "tdspeed ovl L", FIXED_BUFCOUNT * sizeof(int32_t) },
+        { "tdspeed ovl R", FIXED_BUFCOUNT * sizeof(int32_t) },
+        { "tdspeed out L", FIXED_OUTBUFCOUNT * sizeof(int32_t) },
+        { "tdspeed out R", FIXED_OUTBUFCOUNT * sizeof(int32_t) },
+    };
 
     /* Allocate buffers */
-    if (overlap_buffer[0] == NULL)
+    for (unsigned i = 0; i < ARRAYLEN(bufdefs); i++)
     {
-        handles[0] = core_alloc_ex("tdspeed ovl left", FIXED_BUFSIZE * sizeof(int32_t), &ovl_ops);
-        overlap_buffer[0] = core_get_data(handles[0]);
-    }
-    if (overlap_buffer[1] == NULL)
-    {
-        handles[1] = core_alloc_ex("tdspeed ovl right", FIXED_BUFSIZE * sizeof(int32_t), &ovl_ops);
-        overlap_buffer[1] = core_get_data(handles[1]);
-    }
-    if (outbuf[0] == NULL)
-    {
-        handles[2] = core_alloc_ex("tdspeed left", TDSPEED_OUTBUFSIZE * sizeof(int32_t), &ops);
-        outbuf[0] = core_get_data(handles[2]);
-    }
-    if (outbuf[1] == NULL)
-    {
-        handles[3] = core_alloc_ex("tdspeed right", TDSPEED_OUTBUFSIZE * sizeof(int32_t), &ops);
-        outbuf[1] = core_get_data(handles[3]);
+        if (buffers[i] == NULL)
+        {
+            handles[i] = core_alloc_ex(bufdefs[i].name, bufdefs[i].size, &ops);
+            buffers[i] = core_get_data(handles[i]);
+        }
     }
 }
 
 void tdspeed_finish(void)
 {
-    for(unsigned i = 0; i < ARRAYLEN(handles); i++)
+    for (unsigned i = 0; i < ARRAYLEN(handles); i++)
     {
         if (handles[i] > 0)
         {
             core_free(handles[i]);
             handles[i] = 0;
         }
+
+        buffers[i] = NULL;
     }
-    overlap_buffer[0] = overlap_buffer[1] = NULL;
-    outbuf[0]         = outbuf[1]         = NULL;
 }
 
 bool tdspeed_config(int samplerate, bool stereo, int32_t factor)
 {
     struct tdspeed_state_s *st = &tdspeed_state;
-    int src_frame_sz;
 
     /* Check buffers were allocated ok */
-    if (overlap_buffer[0] == NULL || overlap_buffer[1] == NULL)
-        return false;
-
-    if (outbuf[0] == NULL || outbuf[1] == NULL)
-        return false;
+    for (unsigned i = 0; i < ARRAYLEN(buffers); i++)
+    {
+        if (handles[i] <= 0 || buffers[i] == NULL)
+            return false;
+    }
 
     /* Check parameters */
     if (factor == PITCH_SPEED_100)
@@ -170,7 +186,7 @@ bool tdspeed_config(int samplerate, bool stereo, int32_t factor)
     st->src_step = st->dst_step * factor / PITCH_SPEED_100;
     st->shift_max = (st->dst_step > st->src_step) ? st->dst_step : st->src_step;
 
-    src_frame_sz = st->shift_max + st->dst_step;
+    int src_frame_sz = st->shift_max + st->dst_step;
 
     if (st->dst_step > st->src_step)
         src_frame_sz += st->dst_step - st->src_step;
@@ -181,8 +197,8 @@ bool tdspeed_config(int samplerate, bool stereo, int32_t factor)
     if (st->src_step > st->dst_step)
         st->ovl_space += 2*st->src_step - st->dst_step;
 
-    if (st->ovl_space > FIXED_BUFSIZE)
-        st->ovl_space = FIXED_BUFSIZE;
+    if (st->ovl_space > FIXED_BUFCOUNT)
+        st->ovl_space = FIXED_BUFCOUNT;
 
     st->ovl_size = 0;
     st->ovl_shift = 0;
@@ -194,11 +210,13 @@ bool tdspeed_config(int samplerate, bool stereo, int32_t factor)
     else
         st->ovl_buff[1] = st->ovl_buff[0];
 
+    dsp_outbuf.remcount = 0;
+
     return true;
 }
 
 static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
-                         int data_len, int last, int out_size)
+                         int data_len, int last, int *consumed)
 /* data_len in samples */
 {
     struct tdspeed_state_s *st = &tdspeed_state;
@@ -232,13 +250,15 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         if (copy > data_len)
             copy = data_len;
 
-        assert(st->ovl_size + copy <= FIXED_BUFSIZE);
+        assert(st->ovl_size + copy <= FIXED_BUFCOUNT);
         memcpy(st->ovl_buff[0] + st->ovl_size, buf_in[0],
                copy * sizeof(int32_t));
 
         if (stereo)
             memcpy(st->ovl_buff[1] + st->ovl_size, buf_in[1],
                    copy * sizeof(int32_t));
+
+        *consumed += copy;
 
         if (!last && have + copy < src_frame_sz)
         {
@@ -253,13 +273,14 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
 
         if (copy == data_len)
         {
-            assert(have + copy <= FIXED_BUFSIZE);
+            assert(have + copy <= FIXED_BUFCOUNT);
             return tdspeed_apply(buf_out, st->ovl_buff, have+copy, last,
-                               out_size);
+                                 consumed);
         }
 
-        assert(have + copy <= FIXED_BUFSIZE);
-        int i = tdspeed_apply(buf_out, st->ovl_buff, have+copy, -1, out_size);
+        assert(have + copy <= FIXED_BUFCOUNT);
+        int i = tdspeed_apply(buf_out, st->ovl_buff, have+copy, -1,
+                              consumed);
 
         dest[0] = buf_out[0] + i;
         dest[1] = buf_out[1] + i;
@@ -308,8 +329,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
 
             for (int j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
             {
-                int32_t diff = *curr - *prev;
-                delta += abs(diff);
+                delta += ad_s32(*curr, *prev);
 
                 if (delta >= min_delta)
                     goto skip;
@@ -322,8 +342,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
 
                 for (int j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
                 {
-                    int32_t diff = *curr - *prev;
-                    delta += abs(diff);
+                    delta += ad_s32(*curr, *prev);
 
                     if (delta >= min_delta)
                         goto skip;
@@ -401,6 +420,8 @@ skip:;
             memcpy(dest[1], buf_in[1] + prev_frame, i * sizeof(int32_t));
             dest[1] += i;
         }
+
+        *consumed += i;
     }
     else
     {
@@ -409,7 +430,7 @@ skip:;
         int i = (st->ovl_shift < 0) ? next_frame : prev_frame;
         st->ovl_size = data_len - i;
 
-        assert(st->ovl_size <= FIXED_BUFSIZE);
+        assert(st->ovl_size <= FIXED_BUFCOUNT);
         memcpy(st->ovl_buff[0], buf_in[0] + i, st->ovl_size * sizeof(int32_t));
 
         if (stereo)
@@ -419,32 +440,43 @@ skip:;
     return dest[0] - buf_out[0];
 }
 
-long tdspeed_est_output_size()
+int tdspeed_est_output_count(void)
 {
-    return TDSPEED_OUTBUFSIZE;
+    /* Return worst-case */
+    return FIXED_OUTBUFCOUNT;
 }
 
-long tdspeed_est_input_size(long size)
+void tdspeed_doit(struct dsp_data *data, struct dsp_buffer **buf_p)
 {
-    struct tdspeed_state_s *st = &tdspeed_state;
+    struct dsp_buffer *src = *buf_p;
+    struct dsp_buffer *dst = &dsp_outbuf;
 
-    size = (size - st->ovl_size) * st->src_step / st->dst_step;
+    *buf_p = dst; /* switch to our buffer */
 
-    if (size < 0)
-        size = 0;
+    int count = dst->remcount;
 
-    return size;
+    if (count > 0)
+        return; /* output remains from earlier call */
+
+    dst->p32[0] = outbuf[0];
+    dst->p32[1] = outbuf[data->num_channels - 1];
+
+    if (src->remcount <= 0)
+    {
+        dst->remcount = 0;
+        return; /* purged dsp_outbuf */
+    }
+
+    dst->bufcount = 0; /* use this to get consumed src */
+
+    count = tdspeed_apply(dst->p32, src->p32,
+                          MIN(src->remcount, MAX_INPUTCOUNT), 0,
+                          &dst->bufcount);
+
+    /* advance src by samples consumed */
+    if (dst->bufcount > 0)
+        dsp_advance_buffer32(src, dst->bufcount);
+
+    dst->remcount = count;
+    dst->proc_mask = 0;
 }
-
-int tdspeed_doit(int32_t *src[], int count)
-{
-    dsp_src = src;
-    count = tdspeed_apply( (int32_t *[2]) { outbuf[0], outbuf[1] },
-                           src, count, 0, TDSPEED_OUTBUFSIZE);
-
-    src[0] = outbuf[0];
-    src[1] = outbuf[1];
-
-    return count;
-}
-

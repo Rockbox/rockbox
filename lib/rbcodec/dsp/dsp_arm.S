@@ -21,7 +21,8 @@
  #include "config.h"
 
 /****************************************************************************
- *  void channels_process_sound_chan_mono(int count, int32_t *buf[])
+ *  void channels_process_sound_chan_mono(struct dsp_data *data,
+ *                                        struct dsp_buffer **buf_p)
  */
 
 #include "config.h"
@@ -31,10 +32,12 @@
     .global channels_process_sound_chan_mono
     .type   channels_process_sound_chan_mono, %function
 channels_process_sound_chan_mono:
-    @ input: r0 = count, r1 = buf
+    @ input: r0 = data, r1 = buf_p
+    ldr     r1, [r1]                   @ r1 = buf = *buf_p;
     stmfd   sp!, { r4, lr }            @
                                        @
-    ldmia   r1, { r1, r2 }             @ r1 = buf[0], r2 = buf[1]
+    ldmia   r1, { r0-r2 }              @ r0 = buf->remcount, r1 = buf->p32[0],
+                                       @ r2 = buf->p32[1]
     subs    r0, r0, #1                 @ odd: end at 0; even: end at -1
     beq     .mono_singlesample         @ Zero? Only one sample!
                                        @
@@ -65,25 +68,29 @@ channels_process_sound_chan_mono:
                 .-channels_process_sound_chan_mono
 
 /****************************************************************************
- * void channels_process_sound_chan_custom(int count, int32_t *buf[])
+ * void channels_process_sound_chan_custom(struct dsp_data *data,
+ *                                         struct dsp_buffer **buf_p)
  */
     .section .icode, "ax", %progbits
     .align  2
     .global channels_process_sound_chan_custom
     .type   channels_process_sound_chan_custom, %function
 channels_process_sound_chan_custom:
+    @ input: r0 = data, r1 = buf_p
+    ldr     r1, [r1]                   @ r1 = buf = *buf_p;
     stmfd   sp!, { r4-r10, lr }
-    
+
     ldr     r3, =dsp_sw_gain
     ldr     r4, =dsp_sw_cross
 
-    ldmia   r1, { r1, r2 }             @ r1 = buf[0], r2 = buf[1]
+    ldmia   r1, { r0-r2 }              @ r0 = buf->remcount, r1 = buf->p32[0],
+                                       @ r2 = buf->p32[1]
     ldr     r3, [r3]                   @ r3 = dsp_sw_gain
     ldr     r4, [r4]                   @ r4 = dsp_sw_cross
-    
+
     subs    r0, r0, #1
     beq     .custom_single_sample      @ Zero? Only one sample!
-    
+
 .custom_loop:
     ldmia   r1, { r5, r6 }             @ r5 = Li0, r6 = Li1
     ldmia   r2, { r7, r8 }             @ r7 = Ri0, r8 = Ri1
@@ -94,29 +101,29 @@ channels_process_sound_chan_custom:
     smull   r12, r14, r7, r3           @ Rc0 = Ri0*gain
     smlal   r9, r10, r7, r4            @ Lc0 += Ri0*cross
     smlal   r12, r14, r5, r4           @ Rc0 += Li0*cross
-    
+
     mov     r9, r9, lsr #31            @ Convert to s0.31
     mov     r12, r12, lsr #31
     orr     r5, r9, r10, asl #1
     orr     r7, r12, r14, asl #1
-    
+
     smull   r9, r10, r6, r3            @ Lc1 = Li1*gain
     smull   r12, r14, r8, r3           @ Rc1 = Ri1*gain
     smlal   r9, r10, r8, r4            @ Lc1 += Ri1*cross
     smlal   r12, r14, r6, r4           @ Rc1 += Li1*cross
-    
+
     mov     r9, r9, lsr #31            @ Convert to s0.31
     mov     r12, r12, lsr #31
     orr     r6, r9, r10, asl #1
     orr     r8, r12, r14, asl #1
-    
+
     stmia   r1!, { r5, r6 }            @ Store Lc0, Lc1
     stmia   r2!, { r7, r8 }            @ Store Rc0, Rc1
 
     bgt     .custom_loop
-    
+
     ldmpc   cond=lt, regs=r4-r10       @ < 0? even count
-    
+
 .custom_single_sample:
     ldr     r5, [r1]                   @ handle odd sample
     ldr     r7, [r2]
@@ -139,17 +146,20 @@ channels_process_sound_chan_custom:
                 .-channels_process_sound_chan_custom
 
 /****************************************************************************
- *  void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
+ *  void channels_process_sound_chan_karaoke(struct dsp_data *data,
+ *                                           struct dsp_buffer **buf_p)
  */
     .section .icode, "ax", %progbits
     .align  2
     .global channels_process_sound_chan_karaoke
     .type   channels_process_sound_chan_karaoke, %function
 channels_process_sound_chan_karaoke:
-    @ input: r0 = count, r1 = buf
+    @ input: r0 = data, r1 = buf_p
+    ldr     r1, [r1]                   @ r1 = buf = *buf_p;
     stmfd   sp!, { r4, lr }            @
                                        @
-    ldmia   r1, { r1, r2 }             @ r1 = buf[0], r2 = buf[1]
+    ldmia   r1, { r0-r2 }              @ r0 = buf->remcout, r1 = buf->p32[0],
+                                       @ r2 = buf->p32[1]
     subs    r0, r0, #1                 @ odd: end at 0; even: end at -1
     beq     .karaoke_singlesample      @ Zero? Only one sample!
                                        @
@@ -185,7 +195,7 @@ channels_process_sound_chan_karaoke:
 #if ARM_ARCH < 6
 /****************************************************************************
  *  void sample_output_mono(int count, struct dsp_data *data,
- *                          const int32_t *src[], int16_t *dst)
+ *                          int32_t const * const src[], int16_t *dst)
  */
     .section .icode, "ax", %progbits
     .align  2
@@ -218,16 +228,16 @@ sample_output_mono:
     mov     r12, r6, asr #15
     teq     r12, r12, asr #31
     eorne   r6, r14, r6, asr #31       @ Clip (-32768...+32767)
-    
+
     and     r5, r5, r14, lsr #16
     and     r6, r6, r14, lsr #16
     orr     r5, r5, r5, lsl #16        @ pack first 2 halfwords into 1 word
     orr     r6, r6, r6, lsl #16        @ pack last 2 halfwords into 1 word
     stmia   r3!, { r5, r6 }
-    
+
     subs    r0, r0, #2
-    bgt     .somloop     
-       
+    bgt     .somloop
+
     ldmpc   cond=lt, regs=r4-r6        @ even 'count'? return
 
 .som_singlesample:
@@ -244,10 +254,10 @@ sample_output_mono:
 
     ldmpc   regs=r4-r6
     .size   sample_output_mono, .-sample_output_mono
-    
+
 /****************************************************************************
  * void sample_output_stereo(int count, struct dsp_data *data,
- *                           const int32_t *src[], int16_t *dst)
+ *                           int32_t const * const src[], int16_t *dst)
  */
     .section .icode, "ax", %progbits
     .align  2
@@ -263,7 +273,7 @@ sample_output_stereo:
     mov     r4, #1
     mov     r4, r4, lsl r1             @ r4 = 1 << (scale-1)
     mov     r4, r4, lsr #1             @
-    
+
     mvn     r14, #0x8000               @ r14 = 0xffff7fff, needed for
                                        @ clipping and masking
     subs    r0, r0, #1                 @
@@ -283,7 +293,7 @@ sample_output_stereo:
     mov     r12, r7, asr #15
     teq     r12, r12, asr #31
     eorne   r7, r14, r7, asr #31       @ Clip (-32768...+32767)
-    
+
     add     r8, r8, r4                 @ r8 = (r8 + 1<<(scale-1)) >> scale
     mov     r8, r8, asr r1
     mov     r12, r8, asr #15
@@ -294,7 +304,7 @@ sample_output_stereo:
     mov     r12, r9, asr #15
     teq     r12, r12, asr #31
     eorne   r9, r14, r9, asr #31       @ Clip (-32768...+32767)
-    
+
     and     r6, r6, r14, lsr #16       @ pack first 2 halfwords into 1 word
     orr     r8, r6, r8, asl #16
     and     r7, r7, r14, lsr #16       @ pack last 2 halfwords into 1 word
@@ -307,7 +317,7 @@ sample_output_stereo:
 
     ldmpc   cond=lt, regs=r4-r9        @ even 'count'? return
 
-.sos_singlesample:    
+.sos_singlesample:
     ldr     r6, [r2]                   @ left odd sample
     ldr     r8, [r5]                   @ right odd sample
 
@@ -321,7 +331,7 @@ sample_output_stereo:
     mov     r12, r8, asr #15
     teq     r12, r12, asr #31
     eorne   r8, r14, r8, asr #31       @ Clip (-32768...+32767)
-    
+
     and     r6, r6, r14, lsr #16       @ pack 2 halfwords into 1 word
     orr     r8, r6, r8, asl #16
 
@@ -329,29 +339,32 @@ sample_output_stereo:
 
     ldmpc   regs=r4-r9
     .size   sample_output_stereo, .-sample_output_stereo
-#endif /* ARM_ARCH < 6 */    
+#endif /* ARM_ARCH < 6 */
 
 /****************************************************************************
- * void apply_crossfeed(int count, int32_t* src[])
+ * void apply_crossfeed(struct dsp_data *data,
+ *                      struct dsp_buffer **buf_p)
  */
     .section .text
-    .global apply_crossfeed 
+    .global apply_crossfeed
 apply_crossfeed:
+    @ input: r0 = data, r1 = buf_p
     @ unfortunately, we ended up in a bit of a register squeeze here, and need
     @ to keep the count on the stack :/
+    ldr     r1, [r1]                   @ r1 = buf = *buf_p;
     stmdb   sp!, { r4-r11, lr }        @ stack modified regs
-    ldmia   r1, { r2-r3 }              @ r2 = src[0], r3 = src[1]
-    
+    ldr     r12, [r1]                  @ r12 = buf->remcount
+    ldmib   r1, { r2-r3 }              @ r2 = buf->p32[0], r3 = buf->p32[1]
+
     ldr     r1, =crossfeed_data
     ldmia   r1!, { r4-r11 }            @ load direct gain and filter data
-    mov     r12, r0                    @ better to ldm delay + count later
     add     r0, r1, #13*4*2            @ calculate end of delay
     stmdb   sp!, { r0, r12 }           @ stack end of delay adr and count
     ldr     r0, [r1, #13*4*2]          @ fetch current delay line address
 
     /* Register usage in loop:
-     * r0 = &delay[index][0], r1 = accumulator high, r2 = src[0], r3 = src[1],
-     * r4 = direct gain, r5-r7 = b0, b1, a1 (filter coefs),
+     * r0 = &delay[index][0], r1 = accumulator high, r2 = buf->p32[0],
+     * r3 = buf->p32[1], r4 = direct gain, r5-r7 = b0, b1, a1 (filter coefs),
      * r8-r11 = filter history, r12 = temp, r14 = accumulator low
      */
 .cfloop:
@@ -361,7 +374,7 @@ apply_crossfeed:
     smlal   r14, r1, r5, r8            @ acc += b0*dr[n]
     mov     r9, r1, lsl #1             @ fix format for filter history
     ldr     r12, [r2]                  @ load left input
-    smlal   r14, r1, r4, r12           @ acc += gain*x_l[n] 
+    smlal   r14, r1, r4, r12           @ acc += gain*x_l[n]
     mov     r1, r1, lsl #1             @ fix format
     str     r1, [r2], #4               @ save result
 
@@ -380,11 +393,11 @@ apply_crossfeed:
 
     cmp     r0, r12                    @ need to wrap to start of delay?
     subeq   r0, r0, #13*4*2            @ wrap back delay line ptr to start
- 
+
     subs    r14, r14, #1               @ are we finished?
     strne   r14, [sp, #4]              @ nope, save count back to stack
     bne     .cfloop
-    
+
     @ save data back to struct
     ldr     r12, =crossfeed_data + 4*4
     stmia   r12, { r8-r11 }            @ save filter history
@@ -393,6 +406,7 @@ apply_crossfeed:
     ldmpc   regs=r4-r11
     .size   apply_crossfeed, .-apply_crossfeed
 
+#if 0
 /****************************************************************************
  * int dsp_downsample(int count, struct dsp_data *data,
  *                    in32_t *src[], int32_t *dst[])
@@ -412,7 +426,7 @@ dsp_downsample:
     ldr     r8, [r3, r5, lsl #2]    @ r8 = d = dst[ch - 1]
     add     r9, r4, #4              @ r9 = &last_sample[0]
     ldr     r10, [r9, r5, lsl #2]   @ r10 = last_sample[ch - 1]
-    sub     r11, r0, #1             
+    sub     r11, r0, #1
     ldr     r14, [r7, r11, lsl #2]  @ load last sample in s[] ...
     str     r14, [r9, r5, lsl #2]   @ and write as next frame's last_sample
     movs    r9, r1, lsr #16         @ r9 = pos = phase >> 16
@@ -451,16 +465,17 @@ dsp_downsample:
     .size   dsp_downsample, .-dsp_downsample
 
 /****************************************************************************
- * int dsp_upsample(int count, struct dsp_data *dsp,
- *                  in32_t *src[], int32_t *dst[])
+ * int dsp_upsample(struct dsp_data *data, struct dsp_buffer *src,
+ *                  struct dsp_buffer *dst)
  */
     .section    .text
     .global     dsp_upsample
 dsp_upsample:
+    @input: r0 = data, r1 = src, r2 = dst
     stmfd   sp!, { r4-r11, lr }     @ stack modified regs
-    ldmib   r1, { r5-r6 }           @ r5 = num_channels,r6 = resample_data.delta
+    ldmib   r0, { r5-r6 }           @ r5 = num_channels,r6 = resample_data.delta
     sub     r5, r5, #1              @ pre-decrement num_channels for use
-    add     r4, r1, #12             @ r4 = &resample_data.phase
+    add     r4, r0, #12             @ r4 = &resample_data.phase
     mov     r6, r6, lsl #16         @ we'll use carry to detect pos increments
     stmfd   sp!, { r0, r4 }         @ stack count and &resample_data.phase
 .uschannel_loop:
@@ -469,7 +484,7 @@ dsp_upsample:
     ldr     r8, [r3, r5, lsl #2]    @ r8 = d = dst[ch - 1]
     add     r9, r4, #4              @ r9 = &last_sample[0]
     mov     r1, r12, lsl #16        @ we'll use carry to detect pos increments
-    sub     r11, r0, #1             
+    sub     r11, r0, #1
     ldr     r14, [r7, r11, lsl #2]  @ load last sample in s[] ...
     ldr     r10, [r9, r5, lsl #2]   @ r10 = last_sample[ch - 1]
     str     r14, [r9, r5, lsl #2]   @ and write as next frame's last_sample
@@ -512,28 +527,32 @@ dsp_upsample:
     add     sp, sp, #8              @ adjust stack for temp variables
     ldmpc   regs=r4-r11             @ ... and we're out
     .size       dsp_upsample, .-dsp_upsample
+#endif
 
 /****************************************************************************
- *  void dsp_apply_gain(int count, struct dsp_data *data, int32_t *buf[])
+ *  void dsp_apply_gain(struct dsp_data *data,
+ *                      struct dsp_buffer **buf_p)
  */
     .section .icode, "ax", %progbits
     .align  2
     .global dsp_apply_gain
     .type   dsp_apply_gain, %function
 dsp_apply_gain:
-    @ input: r0 = count, r1 = data, r2 = buf[]
+    @ input: r0 = data, r1 = buf_p
+    ldr     r1, [r1]                @ r1 = buf = *buf_p;
     stmfd   sp!, { r4-r8, lr }
 
-    ldr     r3, [r1,  #4]           @ r3 = data->num_channels
-    ldr     r4, [r1, #32]           @ r5 = data->gain
+    ldr     r3, [r0, #0x04]         @ r3 = data->num_channels
+    ldr     r4, [r0, #0x18]         @ r5 = data->gain
+    ldr     r0, [r1], #4            @ r0 = buf->remcount
 
 .dag_outerloop:
-    ldr     r1, [r2], #4            @ r1 = buf[0] and increment index of buf[]
-    subs    r12, r0, #1             @ r12 = r0 = count - 1
+    ldr     r2, [r1], #4            @ r2 = buf->p32[ch] and inc index of p32
+    subs    r12, r0, #1             @ r12 = count - 1
     beq     .dag_singlesample       @ Zero? Only one sample!
 
 .dag_innerloop:
-    ldmia   r1, { r5, r6 }          @ load r5, r6 from r1
+    ldmia   r2, { r5, r6 }          @ load r5, r6 from r2 (*p32[ch])
     smull   r7, r8, r5, r4          @ r7 = FRACMUL_SHL(r5, r4, 8)
     smull   r14, r5, r6, r4         @ r14 = FRACMUL_SHL(r6, r4, 8)
     subs    r12, r12, #2
@@ -541,21 +560,21 @@ dsp_apply_gain:
     mov     r14, r14, lsr #23
     orr     r7, r7, r8, asl #9
     orr     r14, r14, r5, asl #9
-    stmia   r1!, { r7, r14 }        @ save r7, r14 to [r1] and increment r1
+    stmia   r2!, { r7, r14 }        @ save r7, r14 to *p32[ch] and increment
     bgt     .dag_innerloop          @ end of inner loop
 
     blt     .dag_evencount          @ < 0? even count
 
 .dag_singlesample:
-    ldr     r5, [r1]                @ handle odd sample
+    ldr     r5, [r2]                @ handle odd sample
     smull   r7, r8, r5, r4          @ r7 = FRACMUL_SHL(r5, r4, 8)
     mov     r7, r7, lsr #23
     orr     r7, r7, r8, asl #9
-    str     r7, [r1]
+    str     r7, [r2]
 
 .dag_evencount:
     subs    r3, r3, #1
     bgt     .dag_outerloop          @ end of outer loop
-               
+
     ldmpc   regs=r4-r8
     .size   dsp_apply_gain, .-dsp_apply_gain
