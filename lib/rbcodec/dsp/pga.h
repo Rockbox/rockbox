@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006-2007 Thom Johansen
+ * Copyright (C) 2012 Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,23 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _EQ_H
-#define _EQ_H
+#ifndef PGA_H
+#define PGA_H
 
-/* => support from 3 to 32 bands, inclusive
- * Menus and screens must be updated to support changing this from 5
- * without modifying other stuff (remove comment when this is no longer
- * true :-) */
-#define EQ_NUM_BANDS 5
+#define PGA_UNITY ((int32_t)0x01000000) /* s7.24 */
 
-struct eq_band_setting
+/* Various gains supported by pre-gain amp */
+enum pga_gain_ids
 {
-    int cutoff; /* Hz */
-    int q;
-    int gain;   /* +/- dB */
+    PGA_EQ_PRECUT = 0,
+    PGA_REPLAYGAIN,
+#ifdef HAVE_SW_VOLUME_CONTROL
+    PGA_VOLUME,
+#endif
+    PGA_NUM_GAINS,
 };
 
-/** DSP interface **/
-void dsp_set_eq_precut(int precut);
-void dsp_set_eq_coefs(int band, const struct eq_band_setting *setting);
-void dsp_eq_enable(bool enable);
+void pga_set_gain(enum pga_gain_ids id, int32_t value);
+void pga_enable_gain(enum pga_gain_ids id, bool enable);
 
-#endif /* _EQ_H */
+#endif /* PGA_H */

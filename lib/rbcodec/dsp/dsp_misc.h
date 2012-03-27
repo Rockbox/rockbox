@@ -7,7 +7,9 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006-2007 Thom Johansen
+ * Copyright (C) 2005 Miika Pekkarinen
+ * Copyright (C) 2005 Magnus Holmgren
+ * Copyright (C) 2007 Thom Johansen
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +20,31 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _EQ_H
-#define _EQ_H
+#ifndef DSP_MISC_H
+#define DSP_MISC_H
 
-/* => support from 3 to 32 bands, inclusive
- * Menus and screens must be updated to support changing this from 5
- * without modifying other stuff (remove comment when this is no longer
- * true :-) */
-#define EQ_NUM_BANDS 5
+/* Set the tri-pdf dithered output */
+void dsp_dither_enable(bool enable); /* in dsp_sample_output.c */
 
-struct eq_band_setting
+/* Structure used with REPLAYGAIN_SET_GAINS message */
+#define REPLAYGAIN_SET_GAINS (DSP_PROC_SETTING+DSP_PROC_MISC_HANDLER)
+struct dsp_replay_gains
 {
-    int cutoff; /* Hz */
-    int q;
-    int gain;   /* +/- dB */
+    long track_gain;
+    long album_gain;
+    long track_peak;
+    long album_peak;
 };
 
-/** DSP interface **/
-void dsp_set_eq_precut(int precut);
-void dsp_set_eq_coefs(int band, const struct eq_band_setting *setting);
-void dsp_eq_enable(bool enable);
+int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
+void dsp_set_replaygain(void);
 
-#endif /* _EQ_H */
+#ifdef HAVE_PITCHSCREEN
+void sound_set_pitch(int32_t ratio);
+int32_t sound_get_pitch(void);
+#endif /* HAVE_PITCHSCREEN */
+
+/* Callback for firmware layers to interface */
+int dsp_callback(int msg, intptr_t param);
+
+#endif /* DSP_MISC_H */

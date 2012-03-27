@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006-2007 Thom Johansen 
+ * Copyright (C) 2006-2007 Thom Johansen
+ * Copyright (C) 2012 Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,251 +19,156 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-#include <inttypes.h>
 #include "config.h"
+#include "system.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
-#include "eq.h"
+#include "dsp.h"
+#include "dsp_filter.h"
 #include "replaygain.h"
-
-/** 
- * Calculate first order shelving filter. Filter is not directly usable by the
- * eq_filter() function.
- * @param cutoff shelf midpoint frequency. See eq_pk_coefs for format.
- * @param A decibel value multiplied by ten, describing gain/attenuation of
- * shelf. Max value is 24 dB.
- * @param low true for low-shelf filter, false for high-shelf filter.
- * @param c pointer to coefficient storage. Coefficients are s4.27 format.
- */
-void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c)
-{
-    long sin, cos;
-    int32_t b0, b1, a0, a1; /* s3.28 */
-    const long g = get_replaygain_int(A*5) << 4; /* 10^(db/40), s3.28 */
-
-    sin = fp_sincos(cutoff/2, &cos);
-    if (low) {
-        const int32_t sin_div_g = fp_div(sin, g, 25);
-        const int32_t sin_g = FRACMUL(sin, g);
-        cos >>= 3;
-        b0 = sin_g + cos;             /* 0.25 .. 4.10 */
-        b1 = sin_g - cos;             /* -1 .. 3.98 */
-        a0 = sin_div_g + cos;         /* 0.25 .. 4.10 */
-        a1 = sin_div_g - cos;         /* -1 .. 3.98 */
-    } else {
-        const int32_t cos_div_g = fp_div(cos, g, 25);
-        const int32_t cos_g = FRACMUL(cos, g);
-        sin >>= 3;
-        b0 = sin + cos_g;             /* 0.25 .. 4.10 */
-        b1 = sin - cos_g;             /* -3.98 .. 1 */
-        a0 = sin + cos_div_g;         /* 0.25 .. 4.10 */
-        a1 = sin - cos_div_g;         /* -3.98 .. 1 */
-    }
-
-    const int32_t rcp_a0 = fp_div(1, a0, 57); /* 0.24 .. 3.98, s2.29 */
-    *c++ = FRACMUL_SHL(b0, rcp_a0, 1);       /* 0.063 .. 15.85 */
-    *c++ = FRACMUL_SHL(b1, rcp_a0, 1);       /* -15.85 .. 15.85 */
-    *c++ = -FRACMUL_SHL(a1, rcp_a0, 1);      /* -1 .. 1 */
-}
-
-#ifdef HAVE_SW_TONE_CONTROLS
-/** 
- * Calculate second order section filter consisting of one low-shelf and one
- * high-shelf section.
- * @param cutoff_low low-shelf midpoint frequency. See eq_pk_coefs for format.
- * @param cutoff_high high-shelf midpoint frequency.
- * @param A_low decibel value multiplied by ten, describing gain/attenuation of
- * low-shelf part. Max value is 24 dB.
- * @param A_high decibel value multiplied by ten, describing gain/attenuation of
- * high-shelf part. Max value is 24 dB.
- * @param A decibel value multiplied by ten, describing additional overall gain.
- * @param c pointer to coefficient storage. Coefficients are s4.27 format.
- */
-void filter_bishelf_coefs(unsigned long cutoff_low, unsigned long cutoff_high,
-                          long A_low, long A_high, long A, int32_t *c)
-{
-    const long g = get_replaygain_int(A*10) << 7; /* 10^(db/20), s0.31 */
-    int32_t c_ls[3], c_hs[3];
-
-    filter_shelf_coefs(cutoff_low, A_low, true, c_ls);
-    filter_shelf_coefs(cutoff_high, A_high, false, c_hs);
-    c_ls[0] = FRACMUL(g, c_ls[0]);
-    c_ls[1] = FRACMUL(g, c_ls[1]);
-
-    /* now we cascade the two first order filters to one second order filter
-     * which can be used by eq_filter(). these resulting coefficients have a
-     * really wide numerical range, so we use a fixed point format which will
-     * work for the selected cutoff frequencies (in dsp.c) only.
-     */
-    const int32_t b0 = c_ls[0], b1 = c_ls[1], b2 = c_hs[0], b3 = c_hs[1];
-    const int32_t a0 = c_ls[2], a1 = c_hs[2];
-    *c++ = FRACMUL_SHL(b0, b2, 4);
-    *c++ = FRACMUL_SHL(b0, b3, 4) + FRACMUL_SHL(b1, b2, 4);
-    *c++ = FRACMUL_SHL(b1, b3, 4);
-    *c++ = a0 + a1;
-    *c++ = -FRACMUL_SHL(a0, a1, 4);
-}
-#endif
-
-/* Coef calculation taken from Audio-EQ-Cookbook.txt by Robert Bristow-Johnson.
- * Slightly faster calculation can be done by deriving forms which use tan()
- * instead of cos() and sin(), but the latter are far easier to use when doing
- * fixed point math, and performance is not a big point in the calculation part.
- * All the 'a' filter coefficients are negated so we can use only additions
- * in the filtering equation.
- */
-
-/** 
- * Calculate second order section peaking filter coefficients.
- * @param cutoff a value from 0 to 0x80000000, where 0 represents 0 Hz and
- * 0x80000000 represents the Nyquist frequency (samplerate/2).
- * @param Q Q factor value multiplied by ten. Lower bound is artificially set
- * at 0.5.
- * @param db decibel value multiplied by ten, describing gain/attenuation at
- * peak freq. Max value is 24 dB.
- * @param c pointer to coefficient storage. Coefficients are s3.28 format.
- */
-void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
-{
-    long cs;
-    const long one = 1 << 28; /* s3.28 */
-    const long A = get_replaygain_int(db*5) << 5; /* 10^(db/40), s2.29 */
-    const long alpha = fp_sincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
-    int32_t a0, a1, a2; /* these are all s3.28 format */
-    int32_t b0, b1, b2;
-    const long alphadivA = fp_div(alpha, A, 27);
-    const long alphaA = FRACMUL(alpha, A);
-
-    /* possible numerical ranges are in comments by each coef */
-    b0 = one + alphaA;                /* [1 .. 5] */
-    b1 = a1 = -2*(cs >> 3);           /* [-2 .. 2] */
-    b2 = one - alphaA;                /* [-3 .. 1] */
-    a0 = one + alphadivA;             /* [1 .. 5] */
-    a2 = one - alphadivA;             /* [-3 .. 1] */
-
-    /* range of this is roughly [0.2 .. 1], but we'll never hit 1 completely */
-    const long rcp_a0 = fp_div(1, a0, 59); /* s0.31 */
-    *c++ = FRACMUL(b0, rcp_a0);         /* [0.25 .. 4] */
-    *c++ = FRACMUL(b1, rcp_a0);         /* [-2 .. 2] */
-    *c++ = FRACMUL(b2, rcp_a0);         /* [-2.4 .. 1] */
-    *c++ = FRACMUL(-a1, rcp_a0);        /* [-2 .. 2] */
-    *c++ = FRACMUL(-a2, rcp_a0);        /* [-0.6 .. 1] */
-}
+#include <string.h>
+#include "dsp_proc_entry.h"
 
 /**
- * Calculate coefficients for lowshelf filter. Parameters are as for
- * eq_pk_coefs, but the coefficient format is s5.26 fixed point.
- */
-void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
-{
-    long cs;
-    const long one = 1 << 25; /* s6.25 */
-    const long sqrtA = get_replaygain_int(db*5/2) << 2; /* 10^(db/80), s5.26 */
-    const long A = FRACMUL_SHL(sqrtA, sqrtA, 8); /* s2.29 */
-    const long alpha = fp_sincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
-    const long ap1 = (A >> 4) + one;
-    const long am1 = (A >> 4) - one;
-    const long ap1_cs = FRACMUL(ap1, cs);
-    const long am1_cs = FRACMUL(am1, cs);
-    const long twosqrtalpha = 2*FRACMUL(sqrtA, alpha);
-    int32_t a0, a1, a2; /* these are all s6.25 format */
-    int32_t b0, b1, b2;
-    
-    /* [0.1 .. 40] */
-    b0 = FRACMUL_SHL(A, ap1 - am1_cs + twosqrtalpha, 2);
-    /* [-16 .. 63.4] */
-    b1 = FRACMUL_SHL(A, am1 - ap1_cs, 3);
-    /* [0 .. 31.7] */
-    b2 = FRACMUL_SHL(A, ap1 - am1_cs - twosqrtalpha, 2);
-    /* [0.5 .. 10] */
-    a0 = ap1 + am1_cs + twosqrtalpha;
-    /* [-16 .. 4] */
-    a1 = -2*(am1 + ap1_cs);
-    /* [0 .. 8] */
-    a2 = ap1 + am1_cs - twosqrtalpha;
-
-    /* [0.1 .. 1.99] */
-    const long rcp_a0 = fp_div(1, a0, 55);    /* s1.30 */
-    *c++ = FRACMUL_SHL(b0, rcp_a0, 2);       /* [0.06 .. 15.9] */
-    *c++ = FRACMUL_SHL(b1, rcp_a0, 2);       /* [-2 .. 31.7] */
-    *c++ = FRACMUL_SHL(b2, rcp_a0, 2);       /* [0 .. 15.9] */
-    *c++ = FRACMUL_SHL(-a1, rcp_a0, 2);      /* [-2 .. 2] */
-    *c++ = FRACMUL_SHL(-a2, rcp_a0, 2);      /* [0 .. 1] */
-}
-
-/**
- * Calculate coefficients for highshelf filter. Parameters are as for
- * eq_pk_coefs, but the coefficient format is s5.26 fixed point.
- */
-void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
-{
-    long cs;
-    const long one = 1 << 25; /* s6.25 */
-    const long sqrtA = get_replaygain_int(db*5/2) << 2; /* 10^(db/80), s5.26 */
-    const long A = FRACMUL_SHL(sqrtA, sqrtA, 8); /* s2.29 */
-    const long alpha = fp_sincos(cutoff, &cs)/(2*Q)*10 >> 1; /* s1.30 */
-    const long ap1 = (A >> 4) + one;
-    const long am1 = (A >> 4) - one;
-    const long ap1_cs = FRACMUL(ap1, cs);
-    const long am1_cs = FRACMUL(am1, cs);
-    const long twosqrtalpha = 2*FRACMUL(sqrtA, alpha);
-    int32_t a0, a1, a2; /* these are all s6.25 format */
-    int32_t b0, b1, b2;
-
-    /* [0.1 .. 40] */
-    b0 = FRACMUL_SHL(A, ap1 + am1_cs + twosqrtalpha, 2);
-    /* [-63.5 .. 16] */
-    b1 = -FRACMUL_SHL(A, am1 + ap1_cs, 3);
-    /* [0 .. 32] */
-    b2 = FRACMUL_SHL(A, ap1 + am1_cs - twosqrtalpha, 2);
-    /* [0.5 .. 10] */
-    a0 = ap1 - am1_cs + twosqrtalpha;
-    /* [-4 .. 16] */
-    a1 = 2*(am1 - ap1_cs);
-    /* [0 .. 8] */
-    a2 = ap1 - am1_cs - twosqrtalpha;
-
-    /* [0.1 .. 1.99] */
-    const long rcp_a0 = fp_div(1, a0, 55);    /* s1.30 */
-    *c++ = FRACMUL_SHL(b0, rcp_a0, 2);       /* [0 .. 16] */
-    *c++ = FRACMUL_SHL(b1, rcp_a0, 2);       /* [-31.7 .. 2] */
-    *c++ = FRACMUL_SHL(b2, rcp_a0, 2);       /* [0 .. 16] */
-    *c++ = FRACMUL_SHL(-a1, rcp_a0, 2);      /* [-2 .. 2] */
-    *c++ = FRACMUL_SHL(-a2, rcp_a0, 2);      /* [0 .. 1] */
-}
-
-/* We realise the filters as a second order direct form 1 structure. Direct
- * form 1 was chosen because of better numerical properties for fixed point
- * implementations.
+ * Current setup is one lowshelf filters three peaking filters and one
+ *  highshelf filter. Varying the number of shelving filters make no sense,
+ *  but adding peaking filters is possible. Check EQ_NUM_BANDS to have
+ *  2 shelving filters and EQ_NUM_BANDS-2 peaking filters.
  */
 
-#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM))
-void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
-               unsigned channels, unsigned shift)
-{
-    unsigned c, i;
-    long long acc;
-
-    /* Direct form 1 filtering code.
-       y[n] = b0*x[i] + b1*x[i - 1] + b2*x[i - 2] + a1*y[i - 1] + a2*y[i - 2],
-       where y[] is output and x[] is input.
-     */
-
-    for (c = 0; c < channels; c++) {
-        for (i = 0; i < num; i++) {
-            acc  = (long long) x[c][i] * f->coefs[0];
-            acc += (long long) f->history[c][0] * f->coefs[1];
-            acc += (long long) f->history[c][1] * f->coefs[2];
-            acc += (long long) f->history[c][2] * f->coefs[3];
-            acc += (long long) f->history[c][3] * f->coefs[4];
-            f->history[c][1] = f->history[c][0];
-            f->history[c][0] = x[c][i];
-            f->history[c][3] = f->history[c][2];
-            x[c][i] = (acc << shift) >> 32;
-            f->history[c][2] = x[c][i];
-        }
-    }
-}
+#if EQ_NUM_BANDS < 3
+/* No good. Expect at least 1 peaking and low/high shelving filters */
+#error Band count must be greater than or equal to 3
 #endif
 
+static struct eq_state
+{
+    uint32_t enabled;                        /* Mask of enabled bands */
+    uint8_t bands[EQ_NUM_BANDS+1];           /* Indexes of enabled bands */
+    struct dsp_filter filters[EQ_NUM_BANDS]; /* Data for each filter */
+} eq_data IBSS_ATTR;
+
+/* Clear histories of all enabled bands */
+static void eq_flush(void)
+{
+    if (eq_data.enabled == 0)
+        return; /* Not initialized yet/no bands on */
+
+    for (uint8_t *b = eq_data.bands; *b < EQ_NUM_BANDS; b++)
+        filter_flush(&eq_data.filters[*b]);
+}
+
+/** DSP interface **/
+
+/* Set the precut gain value */
+void dsp_set_eq_precut(int precut)
+{
+    pga_set_gain(PGA_EQ_PRECUT, get_replaygain_int(precut * -10));
+}
+
+/* Update the filter configuration for the band */
+void dsp_set_eq_coefs(int band, const struct eq_band_setting *setting)
+{
+    static void (* const coef_gen[EQ_NUM_BANDS])(unsigned long cutoff,
+                                                 unsigned long Q, long db,
+                                                 struct dsp_filter *f) =
+    {
+        [0]                    = filter_ls_coefs,
+        [1 ... EQ_NUM_BANDS-2] = filter_pk_coefs, 
+        [EQ_NUM_BANDS-1]       = filter_hs_coefs,
+    };
+
+    if (band < 0 || band >= EQ_NUM_BANDS)
+        return;
+
+    /* NOTE: The coef functions assume the EMAC unit is in fractional mode,
+       which it should be, since we're executed from the main thread. */
+
+    uint32_t mask = eq_data.enabled;
+    struct dsp_filter *filter = &eq_data.filters[band];
+
+    /* Assume a band is disabled if the gain is zero */
+    mask &= ~BIT_N(band);
+
+    if (setting->gain != 0)
+    {
+        mask |= BIT_N(band);
+
+        /* Convert user settings to format required by coef generator
+           functions */
+        coef_gen[band](0xffffffff / NATIVE_FREQUENCY * setting->cutoff,
+                       setting->q ?: 1, setting->gain, filter);
+    }
+
+    if (mask == eq_data.enabled)
+        return; /* No change in band-enable state */
+
+    if (mask & BIT_N(band))
+        filter_flush(filter); /* Coming online */
+
+    eq_data.enabled = mask;
+
+    /* Only be active if there are bands to process - if EQ is off, then
+       this call has no effect */
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    dsp_proc_activate(dsp, DSP_PROC_EQUALIZER, mask != 0);
+  
+    /* Prepare list of enabled bands for efficient iteration */
+    for (band = 0; mask != 0; mask &= mask - 1, band++)
+        eq_data.bands[band] = (uint8_t)find_first_set_bit(mask);
+
+    eq_data.bands[band] = EQ_NUM_BANDS;
+}
+
+/* Enable or disable the equalizer */
+void dsp_eq_enable(bool enable)
+{
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    dsp_proc_enable(dsp, DSP_PROC_EQUALIZER, enable);
+
+    if (enable && eq_data.enabled != 0)
+        dsp_proc_activate(dsp, DSP_PROC_EQUALIZER, true);
+}
+
+/* Apply EQ filters to those bands that have got it switched on. */
+static void eq_process(struct dsp_proc_entry *this,
+                       struct dsp_buffer **buf_p)
+{
+    struct dsp_buffer *buf = *buf_p;
+    int count = buf->remcount;
+    unsigned int channels = buf->format.num_channels;
+
+    for (uint8_t *b = eq_data.bands; *b < EQ_NUM_BANDS; b++)
+        filter_process(&eq_data.filters[*b], buf->p32, count, channels);
+
+    (void)this;
+}
+
+/* DSP message hook */
+static intptr_t eq_configure(struct dsp_proc_entry *this,
+                             struct dsp_config *dsp,
+                             unsigned int setting,
+                             intptr_t value)
+{
+    switch (setting)
+    {
+    case DSP_PROC_INIT:
+        if (value != 0)
+            break;
+        this->process[0] = eq_process;
+    case DSP_PROC_CLOSE:
+        pga_enable_gain(PGA_EQ_PRECUT, setting == DSP_PROC_INIT);
+        break;
+        
+    case DSP_FLUSH:
+        eq_flush();
+        break;
+    }
+
+    return 1;
+    (void)dsp;
+}
+
+/* Database entry */
+DSP_PROC_DB_ENTRY(EQUALIZER,
+                  eq_configure);

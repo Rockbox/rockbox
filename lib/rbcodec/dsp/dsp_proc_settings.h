@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006-2007 Thom Johansen
+ * Copyright (C) 2012 Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,23 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _EQ_H
-#define _EQ_H
+#ifndef DSP_PROC_SETTINGS_H
+#define DSP_PROC_SETTINGS_H
 
-/* => support from 3 to 32 bands, inclusive
- * Menus and screens must be updated to support changing this from 5
- * without modifying other stuff (remove comment when this is no longer
- * true :-) */
-#define EQ_NUM_BANDS 5
+struct dsp_config;
 
-struct eq_band_setting
-{
-    int cutoff; /* Hz */
-    int q;
-    int gain;   /* +/- dB */
-};
+/* Collect all headers together */
+#include "channel_mode.h"
+#include "compressor.h"
+#include "crossfeed.h"
+#include "dsp_misc.h"
+#include "eq.h"
+#include "pga.h"
+#ifdef HAVE_PITCHSCREEN
+#include "tdspeed.h"
+#endif
+#ifdef HAVE_SW_TONE_CONTROLS
+#include "tone_controls.h"
+#endif
 
-/** DSP interface **/
-void dsp_set_eq_precut(int precut);
-void dsp_set_eq_coefs(int band, const struct eq_band_setting *setting);
-void dsp_eq_enable(bool enable);
-
-#endif /* _EQ_H */
+#endif /* DSP_PROC_SETTINGS_H */

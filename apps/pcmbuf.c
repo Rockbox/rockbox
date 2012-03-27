@@ -47,16 +47,23 @@
    smaller math - must be < 65536 bytes */
 #define PCMBUF_CHUNK_SIZE    8192u
 
-/* Massive size is a nasty temp fix */
-#define PCMBUF_GUARD_SIZE    (1024u*12*((NATIVE_FREQUENCY+7999)/8000))
+/* Small guard buf to give decent space near end */
+#define PCMBUF_GUARD_SIZE    (PCMBUF_CHUNK_SIZE / 8)
 
 /* Mnemonics for common data commit thresholds */
 #define COMMIT_CHUNKS        PCMBUF_CHUNK_SIZE
 #define COMMIT_ALL_DATA      1u
 
- /* Size of the crossfade buffer where codec data is written to be faded
-    on commit */
-#define CROSSFADE_BUFSIZE    8192u
+/* Size of the crossfade buffer where codec data is written to be faded
+   on commit */
+#define CROSSFADE_BUFSIZE    PCMBUF_CHUNK_SIZE
+
+/* Maximum contiguous space that PCM buffer will allow (to avoid excessive
+   draining between inserts and observe low-latency mode) */
+#define PCMBUF_MAX_BUFFER    (PCMBUF_CHUNK_SIZE * 4)
+
+/* Forced buffer insert constraint can thus be from 1KB to 32KB using 8KB
+   chunks */
 
 /* Return data level in 1/4-second increments */
 #define DATA_LEVEL(quarter_secs) (NATIVE_FREQUENCY * (quarter_secs))
@@ -383,7 +390,11 @@ void * pcmbuf_request_buffer(int *count)
     /* If crossfade has begun, put the new track samples in crossfade_buffer */
     if (crossfade_status != CROSSFADE_INACTIVE && size > CROSSFADE_BUFSIZE)
         size = CROSSFADE_BUFSIZE;
-#endif
+    else
+#endif /* HAVE_CROSSFADE */
+
+    if (size > PCMBUF_MAX_BUFFER)
+        size = PCMBUF_MAX_BUFFER; /* constrain */
 
     enum channel_status status = mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK);
     size_t remaining = pcmbuf_unplayed_bytes();
@@ -432,11 +443,22 @@ void * pcmbuf_request_buffer(int *count)
             pcmbuf_play_start();
     }
 
-    void *buf =
+    void *buf;
+
 #ifdef HAVE_CROSSFADE
-        crossfade_status != CROSSFADE_INACTIVE ? crossfade_buffer :
+    if (crossfade_status != CROSSFADE_INACTIVE)
+    {
+        buf = crossfade_buffer; /* always CROSSFADE_BUFSIZE */
+    }
+    else
 #endif
-        get_write_buffer(&size);
+    {
+        /* Give the maximum amount available if there's more */
+        if (size + PCMBUF_CHUNK_SIZE < freespace)
+            size = freespace - PCMBUF_CHUNK_SIZE;
+
+        buf = get_write_buffer(&size);
+    }
 
     *count = size / 4;
     return buf;
