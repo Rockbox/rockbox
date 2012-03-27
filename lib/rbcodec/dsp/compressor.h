@@ -18,12 +18,21 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #ifndef COMPRESSOR_H
 #define COMPRESSOR_H
 
-void compressor_process(int count, struct dsp_data *data, int32_t *buf[]);
-bool compressor_update(void);
-void compressor_reset(void);
+struct compressor_settings
+{
+    int threshold;
+    int makeup_gain;
+    int ratio;
+    int knee;
+    int release_time;
+};
+
+/** DSP interface **/
+void dsp_set_compressor(const struct compressor_settings *settings);
+
+extern const struct dsp_proc_db_entry compressor_proc_db_entry;
 
 #endif /* COMPRESSOR_H */

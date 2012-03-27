@@ -70,12 +70,11 @@ const char* eq_precut_format(char* buffer, size_t buffer_size, int value, const 
  */
 static void eq_apply(void)
 {
-    int i;
-    dsp_set_eq(global_settings.eq_enabled); 
+    dsp_eq_enable(global_settings.eq_enabled); 
     dsp_set_eq_precut(global_settings.eq_precut);    
     /* Update all bands */
-    for(i = 0; i < 5; i++) {
-        dsp_set_eq_coefs(i);
+    for(int i = 0; i < EQ_NUM_BANDS; i++) {
+        dsp_set_eq_coefs(i, &global_settings.eq_band_settings[i]);
     }
 }
 
@@ -578,7 +577,8 @@ bool eq_menu_graphical(void)
         
         /* Update the filter if the user changed something */
         if (has_changed) {
-            dsp_set_eq_coefs(current_band);
+            dsp_set_eq_coefs(current_band,
+                &global_settings.eq_band_settings[current_band]);
             has_changed = false;
         }
     }

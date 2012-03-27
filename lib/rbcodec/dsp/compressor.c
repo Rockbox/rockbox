@@ -19,15 +19,17 @@
  *
  ****************************************************************************/
 #include "config.h"
+#include "system.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
-#include "settings.h"
 #include "dsp.h"
-#include "compressor.h"
+#include <string.h>
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
 #include "logf.h"
+
+static struct compressor_settings curr_set; /* Cached settings */
 
 static int32_t comp_rel_slope IBSS_ATTR;   /* S7.24 format */
 static int32_t comp_makeup_gain IBSS_ATTR; /* S7.24 format */
@@ -38,60 +40,57 @@ static int32_t release_gain IBSS_ATTR;     /* S7.24 format */
 
 /** COMPRESSOR UPDATE
  *  Called via the menu system to configure the compressor process */
-bool compressor_update(void)
+bool compressor_update(const struct compressor_settings *settings)
 {
-    static int curr_set[5];
-    int new_set[5] = {
-        global_settings.compressor_threshold,
-        global_settings.compressor_makeup_gain,
-        global_settings.compressor_ratio,
-        global_settings.compressor_knee,
-        global_settings.compressor_release_time};
-    
     /* make menu values useful */
-    int  threshold  =  new_set[0];
-    bool auto_gain  = (new_set[1] == 1);
-    const int comp_ratios[] = {2, 4, 6, 10, 0};
-    int  ratio      =  comp_ratios[new_set[2]];
-    bool soft_knee  = (new_set[3] == 1);
-    int  release    =  new_set[4] * NATIVE_FREQUENCY / 1000;
+    int  threshold  = settings->threshold;
+    bool auto_gain  = (settings->makeup_gain == 1);
+    static const int comp_ratios[] = { 2, 4, 6, 10, 0 };
+    int  ratio      =  comp_ratios[settings->ratio];
+    bool soft_knee  = (settings->knee == 1);
+    int  release    =  settings->release_time * NATIVE_FREQUENCY / 1000;
 
     bool changed = false;
     bool active  = (threshold < 0);
 
-    for (int i = 0; i < 5; i++)
+    if (memcmp(settings, &curr_set, sizeof (curr_set)))
     {
-        if (curr_set[i] != new_set[i])
-        {
-            changed = true;
-            curr_set[i] = new_set[i];
+        /* Compressor settings have changed since last call */
+        changed = true;
             
 #if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
-            switch (i)
-            {
-            case 0:
-                logf("   Compressor Threshold: %d dB\tEnabled: %s",
-                    threshold, active ? "Yes" : "No");
-                break;
-            case 1:
-                logf("   Compressor Makeup Gain: %s",
-                    auto_gain ? "Auto" : "Off");
-                break;
-            case 2:
-                if (ratio)
-                    { logf("   Compressor Ratio: %d:1", ratio); }
-                else
-                    { logf("   Compressor Ratio: Limit"); }
-                break;
-            case 3:
-                logf("   Compressor Knee: %s", soft_knee?"Soft":"Hard");
-                break;
-            case 4:
-                logf("   Compressor Release: %d", release);
-                break;
-            }
-#endif
+        if (settings->threshold != curr_set.threshold)
+        {
+            logf("   Compressor Threshold: %d dB\tEnabled: %s",
+                 threshold, active ? "Yes" : "No");
         }
+
+        if (settings->makeup_gain != curr_set.makeup_gain)
+        {
+            logf("   Compressor Makeup Gain: %s",
+                 auto_gain ? "Auto" : "Off");
+        }
+
+        if (settings->ratio != cur_set.ratio)
+        {
+            if (ratio)
+                { logf("   Compressor Ratio: %d:1", ratio); }
+            else
+                { logf("   Compressor Ratio: Limit"); }
+        }
+
+        if (settings->knee != cur_set.knee)
+        {
+            logf("   Compressor Knee: %s", soft_knee?"Soft":"Hard");
+        }
+
+        if (settings->release_time != cur_set.release_time)
+        {
+            logf("   Compressor Release: %d", release);
+        }
+#endif
+
+        curr_set = *settings;
     }
 
     if (changed && active)
@@ -244,7 +243,7 @@ bool compressor_update(void)
         logf("Release slope:\t%.6f", (float)comp_rel_slope / UNITY);
         
         release_gain = UNITY;
-    }
+    } /* changed && active */
 
     return active;
 }
@@ -253,10 +252,10 @@ bool compressor_update(void)
  *  Returns the required gain factor in S7.24 format in order to compress the
  *  sample in accordance with the compression curve.  Always 1 or less.
  */
-static inline int32_t get_compression_gain(struct dsp_data *data,
+static inline int32_t get_compression_gain(struct sample_format *format,
                                            int32_t sample)
 {
-    const int frac_bits_offset = data->frac_bits - 15;
+    const int frac_bits_offset = format->frac_bits - 15;
     
     /* sample must be positive */
     if (sample < 0)
@@ -297,21 +296,23 @@ static inline int32_t get_compression_gain(struct dsp_data *data,
 /** COMPRESSOR PROCESS
  *  Changes the gain of the samples according to the compressor curve
  */
-void compressor_process(int count, struct dsp_data *data, int32_t *buf[])
+static void compressor_process(struct dsp_proc_entry *this,
+                               struct dsp_buffer **buf_p)
 {
-    const int num_chan = data->num_channels;
-    int32_t *in_buf[2] = {buf[0], buf[1]};
-    
+    struct dsp_buffer *buf = *buf_p;
+    int count = buf->remcount;
+    int32_t *in_buf[2] = { buf->p32[0], buf->p32[1] };
+    const int num_chan = buf->format.num_channels;
+
     while (count-- > 0)
     {
-        int ch;
         /* use lowest (most compressed) gain factor of the output buffer
            sample pair for both samples (mono is also handled correctly here)
          */
         int32_t sample_gain = UNITY;
-        for (ch = 0; ch < num_chan; ch++)
+        for (int ch = 0; ch < num_chan; ch++)
         {
-            int32_t this_gain = get_compression_gain(data, *in_buf[ch]);
+            int32_t this_gain = get_compression_gain(&buf->format, *in_buf[ch]);
             if (this_gain < sample_gain)
                 sample_gain = this_gain;
         }
@@ -347,7 +348,7 @@ void compressor_process(int count, struct dsp_data *data, int32_t *buf[])
            output buffer sample pair/mono sample */
         if (total_gain != UNITY)
         {
-            for (ch = 0; ch < num_chan; ch++)
+            for (int ch = 0; ch < num_chan; ch++)
             {
                 *in_buf[ch] = FRACMUL_SHL(total_gain, *in_buf[ch], 7);
             }
@@ -355,9 +356,48 @@ void compressor_process(int count, struct dsp_data *data, int32_t *buf[])
         in_buf[0]++;
         in_buf[1]++;
     }
+
+    (void)this;
 }
 
-void compressor_reset(void)
+/** COMPRESSOR CONFIGURE
+ *  DSP message hook
+ */
+static void compressor_configure(struct dsp_proc_entry *this,
+                                 struct dsp_config *dsp,
+                                 enum dsp_settings setting,
+                                 intptr_t value)
 {
-    release_gain = UNITY;
+    switch (setting)
+    {
+    case DSP_PROC_INIT:
+        if (value != 0)
+            break; /* Already enabled */
+        this->process[0] = compressor_process;
+    case DSP_RESET:
+    case DSP_FLUSH:
+        release_gain = UNITY;
+        break;
+
+    default:
+        break;
+    }
+
+    (void)dsp;
 }
+
+/** DSP interface **/
+void dsp_set_compressor(const struct compressor_settings *settings)
+{
+    /* enable/disable the compressor depending upon settings */
+    bool enable = compressor_update(settings);
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    dsp_proc_enable(dsp, DSP_PROC_COMPRESSOR, enable);
+    dsp_proc_activate(dsp, DSP_PROC_COMPRESSOR, true);
+}
+
+const struct dsp_proc_db_entry compressor_proc_db_entry =
+{
+    .id = DSP_PROC_COMPRESSOR,
+    .configure = compressor_configure
+};
