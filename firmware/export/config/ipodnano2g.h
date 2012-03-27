@@ -172,7 +172,7 @@
 /* I2C interface */
 #define CONFIG_I2C I2C_S5L8700
 
-#define HAVE_USB_CHARGING_ENABLE
+//#define HAVE_USB_CHARGING_ENABLE
 
 /* The size of the flash ROM */
 #define FLASH_SIZE 0x400000
@@ -228,7 +228,7 @@
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1260
 #define USB_NUM_ENDPOINTS 5
-#define USE_ROCKBOX_USB
+//#define USE_ROCKBOX_USB
 #define USB_DEVBSS_ATTR __attribute__((aligned(16)))
 
 /* Define this if you can switch on/off the accessory power supply */

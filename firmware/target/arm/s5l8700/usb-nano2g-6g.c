@@ -24,7 +24,7 @@
 #include "usb-s3c6400x.h"
 #include "cpu.h"
 
-#ifdef HAVE_USBSTACK
+#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
 #include "usb_core.h"
 #include "usb_drv.h"
 #include "power.h"
@@ -33,13 +33,6 @@ void usb_enable(bool on)
 {
     if (on) usb_core_init();
     else usb_core_exit();
-}
-
-int usb_detect(void)
-{
-    if (charger_inserted())
-        return USB_INSERTED;
-    return USB_EXTRACTED;
 }
 
 void usb_init_device(void)
@@ -65,11 +58,6 @@ void usb_enable(bool on)
     (void)on;
 }
 
-int usb_detect(void)
-{
-    return USB_EXTRACTED;
-}
-
 void usb_init_device(void)
 {
     DCTL = DCTL_pwronprgdone | DCTL_sftdiscon;
@@ -85,4 +73,13 @@ void usb_init_device(void)
     PWRCON(0) |= 0x4;
     PWRCON(1) |= 0x8;
 #endif
+}
 #endif
+
+int usb_detect(void)
+{
+    if (charger_inserted())
+        return USB_INSERTED;
+    return USB_EXTRACTED;
+}
+

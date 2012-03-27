@@ -208,7 +208,7 @@ static inline bool usb_configure_drivers(int for_state)
 #endif
         /* Check any drivers enabled at this point for exclusive storage
          * access requirements. */
-        exclusive_storage_access = usb_core_any_exclusive_storage();
+        exclusive_storage_access = true; //usb_core_any_exclusive_storage();
 
         if(exclusive_storage_access)
             return true;
