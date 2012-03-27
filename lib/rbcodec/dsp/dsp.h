@@ -29,16 +29,16 @@
 
 enum
 {
-    STEREO_INTERLEAVED = 0,
-    STEREO_NONINTERLEAVED,
-    STEREO_MONO,
-    STEREO_NUM_MODES,
+    CODEC_IDX_AUDIO = 0,
+    CODEC_IDX_VOICE,
 };
 
 enum
 {
-    CODEC_IDX_AUDIO = 0,
-    CODEC_IDX_VOICE,
+    STEREO_INTERLEAVED = 0,
+    STEREO_NONINTERLEAVED,
+    STEREO_MONO,
+    STEREO_NUM_MODES,
 };
 
 enum
@@ -50,13 +50,49 @@ enum
     DSP_SET_STEREO_MODE,
     DSP_RESET,
     DSP_FLUSH,
-    DSP_SET_TRACK_GAIN,
-    DSP_SET_ALBUM_GAIN,
-    DSP_SET_TRACK_PEAK,
-    DSP_SET_ALBUM_PEAK,
-    DSP_CROSSFEED
+    DSP_SET_REPLAY_GAIN,
+    DSP_CROSSFEED,
+    DSP_IS_BUSY,
 };
 
+/* Used by ASM routines - keep field order */
+struct dsp_buffer
+{
+    int bufcount;           /* 00h: Buffer length/dest buffer remaining */
+    int remcount;           /* 04h: Samples remaining in buffer (or written so far) */
+    union
+    {
+        const void *pin[2]; /* 08h: Channel pointers (input) */
+        int32_t *p32[2];    /* 08h: Channel pointers (internal) */
+        int16_t *p16out;    /* 08h: DSP output buffer (output) */
+    };
+    uintptr_t dsp_info;     /* 10h: For DSP use - set to 0 on first use */
+};
+
+static inline void dsp_advance_buffer_input(struct dsp_buffer *buf,
+                                            int by,
+                                            size_t size)
+{
+    buf->remcount -= by;
+    buf->pin[0] += by * size;
+    buf->pin[1] += by * size;
+}
+
+static inline void dsp_advance_buffer_output(struct dsp_buffer *buf,
+                                             int by)
+{
+    buf->bufcount -= by;
+    buf->remcount += by;
+    buf->p16out += 2*by;
+}
+
+static inline void dsp_advance_buffer32(struct dsp_buffer *buf,
+                                        int by)
+{
+    buf->remcount -= by;
+    buf->p32[0] += by;
+    buf->p32[1] += by;
+}
 
 /****************************************************************************
  * NOTE: Any assembly routines that use these structures must be updated
@@ -88,19 +124,25 @@ struct dsp_data
     int output_scale;                   /* 00h */
     int num_channels;                   /* 04h */
     struct resample_data resample_data; /* 08h */
-    int32_t clip_min;                   /* 18h */
-    int32_t clip_max;                   /* 1ch */
-    int32_t gain;                       /* 20h - Note that this is in S8.23 format. */
-    int frac_bits;                      /* 24h */
-                                        /* 28h */
+    int32_t gain;                       /* 18h - Note that this is in S8.23 format. */
+    int frac_bits;                      /* 1ch */
+                                        /* 20h */
+};
+
+/* Structure used with DSP_SET_REPLAY_GAIN message */
+struct dsp_replay_gains
+{
+    long track_gain;
+    long album_gain;
+    long track_peak;
+    long album_peak;
 };
 
 struct dsp_config;
 
-int dsp_process(struct dsp_config *dsp, char *dest,
-                const char *src[], int count);
-int dsp_input_count(struct dsp_config *dsp, int count);
 int dsp_output_count(struct dsp_config *dsp, int count);
+void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
+                 struct dsp_buffer *dst);
 intptr_t dsp_configure(struct dsp_config *dsp, int setting,
                        intptr_t value);
 int get_replaygain_mode(bool have_track_gain, bool have_album_gain);

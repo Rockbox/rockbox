@@ -39,6 +39,6 @@ void voice_thread_init(void) INIT_ATTR;
 void voice_thread_set_priority(int priority);
 #endif
 
-size_t voicebuf_init(unsigned char *bufend);
+size_t voicebuf_init(void *bufend);
 
 #endif /* VOICE_THREAD_H */

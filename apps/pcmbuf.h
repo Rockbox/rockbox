@@ -28,7 +28,7 @@ void *pcmbuf_request_buffer(int *count);
 void pcmbuf_write_complete(int count, unsigned long elapsed, off_t offset);
 
 /* Init */
-size_t pcmbuf_init(unsigned char *bufend);
+size_t pcmbuf_init(void *bufend);
 
 /* Playback */
 void pcmbuf_play_start(void);
