@@ -300,6 +300,12 @@ static inline uint32_t swaw32_hw(uint32_t value)
 #define BIT_N(n) (1U << (n))
 #endif
 
+#ifndef MASK_N
+/* Make a mask of n contiguous bits, shifted left by 'shift' */
+#define MASK_N(type, n, shift) \
+    ((type)((((type)1 << (n)) - (type)1) << (shift)))
+#endif
+
 /* Declare this as HIGHEST_IRQ_LEVEL if they don't differ */
 #ifndef DISABLE_INTERRUPTS
 #define DISABLE_INTERRUPTS  HIGHEST_IRQ_LEVEL
@@ -352,7 +358,7 @@ static inline uint32_t swaw32_hw(uint32_t value)
 
 /* Define MEM_ALIGN_ATTR which may be used to align e.g. buffers for faster
  * access. */
-#if   defined(CPU_ARM)
+#if defined(CPU_ARM)
     /* Use ARMs cache alignment. */
     #define MEM_ALIGN_ATTR CACHEALIGN_ATTR
     #define MEM_ALIGN_SIZE CACHEALIGN_SIZE
@@ -361,11 +367,15 @@ static inline uint32_t swaw32_hw(uint32_t value)
     #define MEM_ALIGN_ATTR __attribute__((aligned(16)))
     #define MEM_ALIGN_SIZE 16
 #else
-    /* Do nothing. */
-    #define MEM_ALIGN_ATTR
     /* Align pointer size */
+    #define MEM_ALIGN_ATTR __attribute__((aligned(sizeof(intptr_t))))
     #define MEM_ALIGN_SIZE sizeof(intptr_t)
 #endif
+
+#define MEM_ALIGN_UP(x) \
+    ((typeof (x))ALIGN_UP((uintptr_t)(x), MEM_ALIGN_SIZE))
+#define MEM_ALIGN_DOWN(x) \
+    ((typeof (x))ALIGN_DOWN((uintptr_t)(x), MEM_ALIGN_SIZE))
 
 #ifdef STORAGE_WANTS_ALIGN
     #define STORAGE_ALIGN_ATTR __attribute__((aligned(CACHEALIGN_SIZE)))

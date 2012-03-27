@@ -133,9 +133,8 @@ struct voice_thread_data
     SpeexBits bits;         /* Bit cursor */
     struct dsp_config *dsp; /* DSP used for voice output */
     struct voice_info vi;   /* Copy of clip data */
-    const char *src[2];     /* Current output buffer pointers */
     int lookahead;          /* Number of samples to drop at start of clip */
-    int count;              /* Count of samples remaining to send to PCM */
+    struct dsp_buffer src;  /* Speex output buffer/input to DSP */
 };
 
 /* Functions called in their repective state that return the next state to
@@ -264,9 +263,7 @@ void voice_wait(void)
  * setup the DSP parameters */
 static void voice_data_init(struct voice_thread_data *td)
 {
-    td->dsp = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
-                                                 CODEC_IDX_VOICE);
-
+    td->dsp = dsp_get_config(CODEC_IDX_VOICE);
     dsp_configure(td->dsp, DSP_RESET, 0);
     dsp_configure(td->dsp, DSP_SET_FREQUENCY, VOICE_SAMPLE_RATE);
     dsp_configure(td->dsp, DSP_SET_SAMPLE_DEPTH, VOICE_SAMPLE_DEPTH);
@@ -378,7 +375,8 @@ static enum voice_state voice_decode(struct voice_thread_data *td)
         else
         {
             /* If all clips are done and not playing, force pcm playback. */
-            voice_start_playback();
+            if (voice_unplayed_frames() > 0)
+                voice_start_playback();
             return VOICE_STATE_MESSAGE;
         }
     }
@@ -387,12 +385,14 @@ static enum voice_state voice_decode(struct voice_thread_data *td)
         yield();
 
         /* Output the decoded frame */
-        td->count = VOICE_FRAME_COUNT - td->lookahead;
-        td->src[0] = (const char *)&voice_output_buf[td->lookahead];
-        td->src[1] = NULL;
+        td->src.remcount  = VOICE_FRAME_COUNT - td->lookahead;
+        td->src.pin[0]    = &voice_output_buf[td->lookahead];
+        td->src.pin[1]    = NULL;
+        td->src.proc_mask = 0;
+
         td->lookahead -= MIN(VOICE_FRAME_COUNT, td->lookahead);
 
-        if (td->count > 0)
+        if (td->src.remcount > 0)
             return VOICE_STATE_BUFFER_INSERT;
     }
 
@@ -405,12 +405,21 @@ static enum voice_state voice_buffer_insert(struct voice_thread_data *td)
     if (!queue_empty(&voice_queue))
         return VOICE_STATE_MESSAGE;
 
-    char *dest = (char *)voice_buf_get();
+    struct dsp_buffer dst;
 
-    if (dest != NULL)
+    if ((dst.p16out = voice_buf_get()) != NULL)
     {
-        voice_buf_commit(dsp_process(td->dsp, dest, td->src, td->count));
-        return VOICE_STATE_DECODE;
+        dst.remcount = 0;
+        dst.bufcount = VOICE_PCM_FRAME_COUNT;
+
+        dsp_process(td->dsp, &td->src, &dst);
+
+        voice_buf_commit(dst.remcount);
+
+        /* Unless other effects are introduced to voice that have delays,
+           all output should have been purged to dst in one call */
+        return td->src.remcount > 0 ?
+            VOICE_STATE_BUFFER_INSERT : VOICE_STATE_DECODE;
     }
 
     sleep(0);

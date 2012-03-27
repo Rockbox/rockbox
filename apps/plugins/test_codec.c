@@ -164,6 +164,7 @@ static inline void int2le16(unsigned char* buf, int16_t x)
 
 static unsigned char *wavbuffer;
 static unsigned char *dspbuffer;
+static int dspbuffer_count;
 
 void init_wav(char* filename)
 {
@@ -215,34 +216,31 @@ static void* codec_get_buffer(size_t *size)
 
 static int process_dsp(const void *ch1, const void *ch2, int count)
 {
-    const char *src[2] = { ch1, ch2 };
-    int written_count = 0;
-    char *dest = dspbuffer;
-    
-    while (count > 0)
+    struct dsp_buffer src;
+    src.remcount = count;
+    src.pin[0] = ch1;
+    src.pin[1] = ch2;
+    src.proc_mask = 0;
+
+    struct dsp_buffer dst;
+    dst.remcount = 0;
+    dst.p16out = (int16_t *)dspbuffer;
+    dst.bufcount = dspbuffer_count;
+
+    while (1)
     {
-        int out_count = rb->dsp_output_count(ci.dsp, count);
+        int old_remcount = dst.remcount;
+        rb->dsp_process(ci.dsp, &src, &dst);
         
-        int inp_count = rb->dsp_input_count(ci.dsp, out_count);
-        
-        if (inp_count <= 0)
+        if (dst.bufcount <= 0 ||
+            (src.remcount <= 0 && dst.remcount <= old_remcount))
+        {
+            /* Dest is full or no input left and DSP purged */
             break;
-        
-        if (inp_count > count)
-            inp_count = count;
-        
-        out_count = rb->dsp_process(ci.dsp, dest, src, inp_count);
-        
-        if (out_count <= 0)
-            break;
-        
-        written_count += out_count;
-        dest += out_count * 4;
-        
-        count -= inp_count;
+        }
     }
     
-    return written_count;
+    return dst.remcount;
 }
 
 /* Null output */
@@ -502,7 +500,6 @@ static void configure(int setting, intptr_t value)
         rb->dsp_configure(ci.dsp, setting, value);
     switch(setting)
     {
-        case DSP_SWITCH_FREQUENCY:
         case DSP_SET_FREQUENCY:
             DEBUGF("samplerate=%d\n",(int)value);
             wavinfo.samplerate = use_dsp ? NATIVE_FREQUENCY : (int)value;
@@ -525,9 +522,7 @@ static void init_ci(void)
 {
     /* --- Our "fake" implementations of the codec API functions. --- */
 
-    ci.dsp = (struct dsp_config *)rb->dsp_configure(NULL, DSP_MYDSP,
-                                                    CODEC_IDX_AUDIO);
-
+    ci.dsp = rb->dsp_get_config(CODEC_IDX_AUDIO);
     ci.codec_get_buffer = codec_get_buffer;
 
     if (wavinfo.fd >= 0 || checksum) {
@@ -849,6 +844,8 @@ enum plugin_status plugin_start(const void* parameter)
 
     wavbuffer = rb->plugin_get_buffer(&buffer_size);
     dspbuffer = wavbuffer + buffer_size / 2;
+    dspbuffer_count = (buffer_size - (dspbuffer - wavbuffer)) /
+                        (2 * sizeof (int16_t));
 
     codec_mallocbuf = rb->plugin_get_audio_buffer(&audiosize);
     /* Align codec_mallocbuf to pointer size, tlsf wants that */

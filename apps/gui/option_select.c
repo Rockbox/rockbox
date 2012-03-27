@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include "string-extra.h"
 #include "config.h"
+#include "system.h"
 #include "option_select.h"
 #include "kernel.h"
 #include "lang.h"

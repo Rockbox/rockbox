@@ -1398,7 +1398,7 @@ const struct settings_list settings[] = {
 
     /* crossfeed */
     OFFON_SETTING(F_SOUNDSETTING, crossfeed, LANG_CROSSFEED, false,
-                  "crossfeed", dsp_set_crossfeed),
+                  "crossfeed", dsp_crossfeed_enable),
     INT_SETTING_NOWRAP(F_SOUNDSETTING, crossfeed_direct_gain,
                        LANG_CROSSFEED_DIRECT_GAIN, -15,
                        "crossfeed direct gain", UNIT_DB, -60, 0, 5,

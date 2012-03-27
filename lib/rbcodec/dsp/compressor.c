@@ -19,15 +19,17 @@
  *
  ****************************************************************************/
 #include "config.h"
+#include "system.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
-#include "settings.h"
 #include "dsp.h"
-#include "compressor.h"
+#include <string.h>
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
 #include "logf.h"
+
+#include "dsp_proc_entry.h"
 
 static struct compressor_settings curr_set; /* Cached settings */
 
@@ -251,10 +253,10 @@ bool compressor_update(const struct compressor_settings *settings)
  *  Returns the required gain factor in S7.24 format in order to compress the
  *  sample in accordance with the compression curve.  Always 1 or less.
  */
-static inline int32_t get_compression_gain(struct dsp_data *data,
+static inline int32_t get_compression_gain(struct sample_format *format,
                                            int32_t sample)
 {
-    const int frac_bits_offset = data->frac_bits - 15;
+    const int frac_bits_offset = format->frac_bits - 15;
     
     /* sample must be positive */
     if (sample < 0)
@@ -292,24 +294,40 @@ static inline int32_t get_compression_gain(struct dsp_data *data,
     return -1;
 }
 
+/** DSP interface **/
+
+/** SET COMPRESSOR
+ *  Enable or disable the compressor based upon the settings
+ */
+void dsp_set_compressor(const struct compressor_settings *settings)
+{
+    /* enable/disable the compressor depending upon settings */
+    bool enable = compressor_update(settings);
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    dsp_proc_enable(dsp, DSP_PROC_COMPRESSOR, enable);
+    dsp_proc_activate(dsp, DSP_PROC_COMPRESSOR, true);
+}
+
 /** COMPRESSOR PROCESS
  *  Changes the gain of the samples according to the compressor curve
  */
-void compressor_process(int count, struct dsp_data *data, int32_t *buf[])
+static void compressor_process(struct dsp_proc_entry *this,
+                               struct dsp_buffer **buf_p)
 {
-    const int num_chan = data->num_channels;
-    int32_t *in_buf[2] = {buf[0], buf[1]};
-    
+    struct dsp_buffer *buf = *buf_p;
+    int count = buf->remcount;
+    int32_t *in_buf[2] = { buf->p32[0], buf->p32[1] };
+    const int num_chan = buf->format.num_channels;
+
     while (count-- > 0)
     {
-        int ch;
         /* use lowest (most compressed) gain factor of the output buffer
            sample pair for both samples (mono is also handled correctly here)
          */
         int32_t sample_gain = UNITY;
-        for (ch = 0; ch < num_chan; ch++)
+        for (int ch = 0; ch < num_chan; ch++)
         {
-            int32_t this_gain = get_compression_gain(data, *in_buf[ch]);
+            int32_t this_gain = get_compression_gain(&buf->format, *in_buf[ch]);
             if (this_gain < sample_gain)
                 sample_gain = this_gain;
         }
@@ -345,7 +363,7 @@ void compressor_process(int count, struct dsp_data *data, int32_t *buf[])
            output buffer sample pair/mono sample */
         if (total_gain != UNITY)
         {
-            for (ch = 0; ch < num_chan; ch++)
+            for (int ch = 0; ch < num_chan; ch++)
             {
                 *in_buf[ch] = FRACMUL_SHL(total_gain, *in_buf[ch], 7);
             }
@@ -353,9 +371,33 @@ void compressor_process(int count, struct dsp_data *data, int32_t *buf[])
         in_buf[0]++;
         in_buf[1]++;
     }
+
+    (void)this;
 }
 
-void compressor_reset(void)
+/* DSP message hook */
+static intptr_t compressor_configure(struct dsp_proc_entry *this,
+                                     struct dsp_config *dsp,
+                                     unsigned int setting,
+                                     intptr_t value)
 {
-    release_gain = UNITY;
+    switch (setting)
+    {
+    case DSP_PROC_INIT:
+        if (value != 0)
+            break; /* Already enabled */
+        this->process[0] = compressor_process;
+    case DSP_RESET:
+    case DSP_FLUSH:
+        release_gain = UNITY;
+        break;
+    }
+
+    return 1;
+    (void)dsp;
 }
+
+/* Database entry */
+DSP_PROC_DB_ENTRY(
+    COMPRESSOR,
+    compressor_configure);

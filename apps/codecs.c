@@ -118,6 +118,7 @@ struct codec_api ci = {
 
     commit_dcache,
     commit_discard_dcache,
+    commit_discard_idcache,
 
     /* strings and memory */
     strcpy,
@@ -166,7 +167,6 @@ struct codec_api ci = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-    commit_discard_idcache,
 };
 
 void codec_get_full_path(char *path, const char *codec_root_fn)

@@ -213,49 +213,41 @@ void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
 static void codec_pcmbuf_insert_callback(
         const void *ch1, const void *ch2, int count)
 {
-    const char *src[2] = { ch1, ch2 };
+    struct dsp_buffer src;
 
-    while (count > 0)
+    src.remcount  = count;
+    src.pin[0]    = ch1;
+    src.pin[1]    = ch2;
+    src.proc_mask = 0;
+
+    while (1)
     {
-        int out_count = dsp_output_count(ci.dsp, count);
-        int inp_count;
-        char *dest;
+        struct dsp_buffer dst;
+        dst.remcount = 0;
+        dst.bufcount = MAX(src.remcount, 1024); /* Arbitrary min request */
 
-        while (1)
+        while ((dst.p16out = pcmbuf_request_buffer(&dst.bufcount)) == NULL)
         {
-            if ((dest = pcmbuf_request_buffer(&out_count)) != NULL)
-                break;
-
             cancel_cpu_boost();
 
-            /* It will be awhile before space is available but we want
+            /* It may be awhile before space is available but we want
                "instant" response to any message */
             queue_wait_w_tmo(&codec_queue, NULL, HZ/20);
 
             if (!queue_empty(&codec_queue) &&
                 codec_check_queue__have_msg() < 0)
+            {
+                dsp_configure(ci.dsp, DSP_FLUSH, 0); /* Discontinuity */
                 return;
+            }
         }
 
-        /* Get the real input_size for output_size bytes, guarding
-         * against resampling buffer overflows. */
-        inp_count = dsp_input_count(ci.dsp, out_count);
+        dsp_process(ci.dsp, &src, &dst);
 
-        if (inp_count <= 0)
-            return;
-
-        /* Input size has grown, no error, just don't write more than length */
-        if (inp_count > count)
-            inp_count = count;
-
-        out_count = dsp_process(ci.dsp, dest, src, inp_count);
-
-        if (out_count <= 0)
-            return;
-
-        pcmbuf_write_complete(out_count, ci.id3->elapsed, ci.id3->offset);
-
-        count -= inp_count;
+        if (dst.remcount > 0)
+            pcmbuf_write_complete(dst.remcount, ci.id3->elapsed, ci.id3->offset);
+        else if (src.remcount <= 0)
+            break; /* No input remains and DSP purged */
     }
 }
 
@@ -352,10 +344,7 @@ static void codec_seek_complete_callback(void)
 
 static void codec_configure_callback(int setting, intptr_t value)
 {
-    if (!dsp_configure(ci.dsp, setting, value))
-    {
-        logf("Illegal key: %d", setting);
-    }
+    dsp_configure(ci.dsp, setting, value);
 }
 
 static enum codec_command_action
@@ -611,8 +600,7 @@ static void NORETURN_ATTR codec_thread(void)
 void codec_thread_init(void)
 {
     /* Init API */
-    ci.dsp              = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
-                                                             CODEC_IDX_AUDIO);
+    ci.dsp              = dsp_get_config(CODEC_IDX_AUDIO);
     ci.codec_get_buffer = codec_get_buffer_callback;
     ci.pcmbuf_insert    = codec_pcmbuf_insert_callback;
     ci.set_elapsed      = audio_codec_update_elapsed;

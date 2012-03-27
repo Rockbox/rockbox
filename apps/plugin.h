@@ -153,12 +153,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 218
+#define PLUGIN_API_VERSION 219
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 218
+#define PLUGIN_MIN_API_VERSION 219
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -680,15 +680,17 @@ struct plugin_api {
     void (*audio_set_output_source)(int monitor);
     void (*audio_set_input_source)(int source, unsigned flags);
 #endif
-    void (*dsp_set_crossfeed)(bool enable);
-    void (*dsp_set_eq)(bool enable);
+    void (*dsp_crossfeed_enable)(bool enable);
+    void (*dsp_eq_enable)(bool enable);
     void (*dsp_dither_enable)(bool enable);
-    intptr_t (*dsp_configure)(struct dsp_config *dsp, int setting,
-                              intptr_t value);
-    int (*dsp_process)(struct dsp_config *dsp, char *dest,
-                       const char *src[], int count);
-    int (*dsp_input_count)(struct dsp_config *dsp, int count);
-    int (*dsp_output_count)(struct dsp_config *dsp, int count);
+#ifdef HAVE_PITCHSCREEN
+    void (*dsp_set_timestretch)(int32_t percent);
+#endif
+    intptr_t (*dsp_configure)(struct dsp_config *dsp,
+                              unsigned int setting, intptr_t value);
+    struct dsp_config * (*dsp_get_config)(enum dsp_ids id);
+    void (*dsp_process)(struct dsp_config *dsp, struct dsp_buffer *src,
+                        struct dsp_buffer *dst);
 
     enum channel_status (*mixer_channel_status)(enum pcm_mixer_channel channel);
     const void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel,

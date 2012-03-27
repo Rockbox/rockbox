@@ -3,21 +3,30 @@ metadata/id3tags.c
 metadata/mp3.c
 metadata/mp3data.c
 #if CONFIG_CODEC == SWCODEC
+dsp/channel_mode.c
 dsp/compressor.c
-dsp/dsp.c
+dsp/crossfeed.c
+dsp/dsp_core.c
+dsp/dsp_filter.c
+dsp/dsp_misc.c
+dsp/dsp_sample_input.c
+dsp/dsp_sample_output.c
 dsp/eq.c
+dsp/lin_resample.c
+dsp/pga.c
+# ifdef HAVE_PITCHSCREEN
+dsp/tdspeed.c
+# endif
+# ifdef HAVE_SW_TONE_CONTROLS
+dsp/tone_controls.c
+# endif
 # if defined(CPU_COLDFIRE)
 dsp/dsp_cf.S
-dsp/eq_cf.S
 # elif defined(CPU_ARM)
 dsp/dsp_arm.S
-dsp/eq_arm.S
 #  if ARM_ARCH >= 6
 dsp/dsp_arm_v6.S
 #  endif
-# endif
-# ifdef HAVE_PITCHSCREEN
-dsp/tdspeed.c
 # endif
 metadata/replaygain.c
 metadata/metadata_common.c
