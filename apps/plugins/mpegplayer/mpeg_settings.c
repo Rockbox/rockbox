@@ -457,13 +457,13 @@ static void sync_audio_setting(int setting, bool global)
         break;
 
     case MPEG_AUDIO_CROSSFEED:
-        rb->dsp_set_crossfeed((global || settings.crossfeed) ?
-                              rb->global_settings->crossfeed : false);
+        rb->dsp_crossfeed_enable((global || settings.crossfeed) ?
+                                 rb->global_settings->crossfeed : false);
         break;
 
     case MPEG_AUDIO_EQUALIZER:
-        rb->dsp_set_eq((global || settings.equalizer) ?
-                       rb->global_settings->eq_enabled : false);
+        rb->dsp_eq_enable((global || settings.equalizer) ?
+                          rb->global_settings->eq_enabled : false);
         break;
 
     case MPEG_AUDIO_DITHERING:

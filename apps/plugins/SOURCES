@@ -33,6 +33,7 @@ flipit.c
 shopper.c
 resistor.c
 
+test_codec.c
 
 #ifdef USB_ENABLE_HID
 remote_control.c

@@ -75,12 +75,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 44
+#define CODEC_API_VERSION 45
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 43
+#define CODEC_MIN_API_VERSION 45
 
 /* reasons for calling codec main entrypoint */
 enum codec_entry_call_reason {
@@ -171,6 +171,7 @@ struct codec_api {
 
     void (*commit_dcache)(void);
     void (*commit_discard_dcache)(void);
+    void (*commit_discard_idcache)(void);
 
     /* strings and memory */
     char* (*strcpy)(char *dst, const char *src);
@@ -223,7 +224,6 @@ struct codec_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    void (*commit_discard_idcache)(void);
 };
 
 /* codec header */
