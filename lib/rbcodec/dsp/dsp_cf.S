@@ -19,23 +19,26 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 
 /****************************************************************************
- * void dsp_apply_gain(int count, struct dsp_data *data, int32_t *buf[])
+ * void dsp_apply_gain(struct dsp_data *data,
+ *                     struct dsp_buffer **buf_p)
  */
     .section    .text
     .align      2
     .global     dsp_apply_gain
 dsp_apply_gain:
+    movem.l     4(%sp), %a0-%a1         | %a0 = data,
+                                        | %a1 = buf_p
+    move.l      (%a1), %a1              | %a1 = buf = *buf_p
     lea.l       -20(%sp), %sp           | save registers
     movem.l     %d2-%d4/%a2-%a3, (%sp)  |
-    movem.l     28(%sp), %a0-%a1        | %a0 = data,
-                                        | %a1 = buf
     move.l      4(%a0), %d1             | %d1 = data->num_channels
-    move.l      32(%a0), %a0            | %a0 = data->gain (in s8.23)
+    move.l      24(%a0), %a0            | %a0 = data->gain (in s8.23)
 10: | channel loop                      |
-    move.l      24(%sp), %d0            | %d0 = count
-    move.l      -4(%a1, %d1.l*4), %a2   | %a2 = s = buf[ch-1]
+    move.l      (%a1), %d0              | %d0 = buf->remcount
+    move.l      (%a1, %d1.l*4), %a2     | %a2 = s = buf->p32[ch-1]
     move.l      %a2, %a3                | %a3 = d = s
     move.l      (%a2)+, %d2             | %d2 = *s++,
     mac.l       %a0, %d2, (%a2)+, %d2, %acc0 | %acc0 = S(n)*gain, load S(n+1)
@@ -64,16 +67,19 @@ dsp_apply_gain:
     .size       dsp_apply_gain,.-dsp_apply_gain
 
 /****************************************************************************
- * void apply_crossfeed(int count, int32_t *buf[])
+ * void apply_crossfeed(struct dsp_data *data,
+ *                      struct dsp_buffer **buf_p)
  */
     .section    .text
     .align      2
-    .global     apply_crossfeed 
+    .global     apply_crossfeed
 apply_crossfeed:
     lea.l       -44(%sp), %sp           |
     movem.l     %d2-%d7/%a2-%a6, (%sp)  | save all regs
-    movem.l     48(%sp), %d7/%a4        | %d7 = count, %a4 = src
-    movem.l     (%a4), %a4-%a5          | %a4 = src[0], %a5 = src[1]
+    move.l      52(%sp), %a4            | %a4 = buf_p
+    move.l      (%a4), %a4              | %a4 = buf = *buf_p
+    movem.l     (%a4), %d7/%a4-%a5      | %d7 = buf->remcount, %a4 = buf->p32[0],
+                                        | %a5 = buf->p32[1]
     lea.l       crossfeed_data, %a1     | %a1 = &crossfeed_data
     move.l      (%a1)+, %d6             | %d6 = direct gain
     movem.l     12(%a1), %d0-%d3        | fetch filter history samples
@@ -109,7 +115,7 @@ apply_crossfeed:
     mac.l       %d6, %d5, %acc1         | %acc1 += gain*x_r[n]
     cmp.l       %a6, %a0                | wrap %a0 if passed end
     bhs.b       30f | wrap buffer       |
-    .word       0x51fb | tpf.l          | trap the buffer wrap
+    tpf.l                               | trap the buffer wrap
 30: | wrap buffer                       | ...fwd taken branches more costly
     lea.l       -104(%a0), %a0          | wrap it up
     subq.l      #1, %d7                 | --count > 0 ?
@@ -124,148 +130,147 @@ apply_crossfeed:
     movem.l     (%sp), %d2-%d7/%a2-%a6  | restore all regs
     lea.l       44(%sp), %sp            |
     rts                                 |
-    .size       apply_crossfeed,.-apply_crossfeed 
+    .size       apply_crossfeed,.-apply_crossfeed
 
 /****************************************************************************
- * int dsp_downsample(int count, struct dsp_data *data,
- *                    in32_t *src[], int32_t *dst[])
+ * int dsp_lin_resample(struct dsp_data *data, struct dsp_buffer *src,
+ *                      struct dsp_buffer *dst)
  */
     .section    .text
     .align      2
-    .global     dsp_downsample
-dsp_downsample:
-    lea.l       -40(%sp), %sp           | save non-clobberables
-    movem.l     %d2-%d7/%a2-%a5, (%sp)  |
-    movem.l     44(%sp), %d2/%a0-%a2    | %d2 = count
-                                        | %a0 = data
+    .global     dsp_lin_resample
+dsp_lin_resample:
+    lea.l       -44(%sp), %sp           | save non-volatiles
+    movem.l     %d2-%d7/%a2-%a6, (%sp)  |
+    movem.l     48(%sp), %a0-%a2        | %a0 = data
                                         | %a1 = src
                                         | %a2 = dst
-    movem.l     4(%a0), %d3-%d4         | %d3 = ch = data->num_channels
-                                        | %d4 = delta = data->resample_data.delta
+    move.l      4(%a0), %d1             | %d1 = ch = data->num_channels
     moveq.l     #16, %d7                | %d7 = shift
 10: | channel loop                      |
-    move.l      12(%a0), %d5            | %d5 = phase = data->resample_data.phase
-    move.l      -4(%a1, %d3.l*4), %a3   | %a3 = s = src[ch-1]
-    move.l      -4(%a2, %d3.l*4), %a4   | %a4 = d = dst[ch-1]
-    lea.l       12(%a0, %d3.l*4), %a5   | %a5 = &data->resample_data.ast_sample[ch-1]
-    move.l      (%a5), %d0              | %d0 = last = data->resample_data.last_sample[ch-1]
-    move.l      -4(%a3, %d2.l*4), (%a5) | data->resample_data.last_sample[ch-1] = s[count-1]
-    move.l      %d5, %d6                | %d6 = pos = phase >> 16
-    lsr.l       %d7, %d6                |
-    cmp.l       %d2, %d6                | past end of samples?
-    bge.b       40f | skip resample loop| yes? skip loop
-    tst.l       %d6                     | need last sample of prev. frame?
-    bne.b       20f | resample loop     | no? start main loop
-    move.l      (%a3, %d6.l*4), %d1     | %d1 = s[pos]
-    bra.b       30f | resample start last | start with last (last in %d0)
-20: | resample loop                     |
-    lea.l       -4(%a3, %d6.l*4), %a5   | load s[pos-1] and s[pos]
-    movem.l     (%a5), %d0-%d1          |
-30: | resample start last               |
-    sub.l       %d0, %d1                | %d1 = diff = s[pos] - s[pos-1]
-    move.l      %d0, %acc0              | %acc0 = previous sample
-    move.l      %d5, %d0                | frac = (phase << 16) >> 1
+    movem.l     8(%a0), %d2-%d3         | %d2 = delta = data->resample_data.delta,
+                                        | %d3 = phase = data->resample_data.phase
+    move.l      (%a1), %d4              | %d4 = srcrem = src->remcount
+    move.l      12(%a2), %d5            | %d5 = dstrem = dst->bufcount
+    move.l      %d3, %d0                | %d0 = pos
+    lsr.l       %d7, %d0                | ...
+    move.l      (%a1, %d1.l*4), %a3     | %a3 = s = src->p32[ch]
+    move.l      (%a2, %d1.l*4), %a4     | %a4 = d = dst->p32[ch]
+    cmp.l       %d4, %d0                | pos = MIN(pos, srcrem)
+    blt.b       11f                     |
+    move.l      %d4, %d0                | pos = srcrem
+    move.l      -4(%a3, %d0.l*4), %d6   | %d6 = last = s[pos - 1]
+    bra.w       40f | channel done      |
+11:                                     |
+    tst.l       %d0                     | pos > 0?
+    bgt.b       12f                     |
+    move.l      12(%a0, %d1.l*4), %d6   | %d6 = last = last_sample[ch]
+    tpf.l                               | trap next move.l
+12:                                     |
+    move.l      -4(%a3, %d0.l*4), %d6   | %d6 = last = s[pos - 1]
+    cmp.l       #0x10000, %d2           | delta >= 1.0?
+    bhs.w       30f | downsample        | yes? downsampling
+                                        |
+    /** Upsampling **/                  |
+    lea.l       (%a3, %d0.l*4), %a3     | %a3 = &s[pos]
+    sub.l       %d4, %d0                | %d0 = pos - srcrem = -dte
+    lsl.l       %d7, %d2                | move delta to bits 30..15
+    lsr.l       #1, %d2                 |
+    lsl.l       %d7, %d3                | move phase to bits 30..15
+    lsr.l       #1, %d3                 |
+    move.l      (%a3)+, %a5             | %a5 = s[pos]
+    move.l      %a5, %a6                | %a6 = diff = s[pos] - last
+    sub.l       %d6, %a6                |
+    bra.b       22f | usloop start      |
+20: | next sample loop                  |
+    move.l      (%a3)+, %a5             | %a5 = s[pos]
+    move.l      %a5, %a6                | %a6 = diff = s[pos] - last
+    sub.l       %d6, %a6                |
+21: | same sample loop                  |
+    subq.l      #1, %d5                 | dstrem <= 0?
+    ble.b       24f | dest full         | yes? stop
+    movclr.l    %acc0, %d7              | *d++ = %d7 = result
+    move.l      %d7, (%a4)+             |
+22: | usloop start                      |
+    move.l      %d6, %acc0              | %acc0 = last
+    mac.l       %d3, %a6, %acc0         | %acc0 += frac * diff
+    add.l       %d2, %d3                | phase += delta
+    bpl.b       21b | same sample loop  | load next values?
+    cmp.l       #1, %d5                 |
+    ble.b       23f | us complete       |
+    move.l      %a5, %d6                |
+    bclr.l      #31, %d3                | clear sign bit
+    addq.l      #1, %d0                 | dte > 0?
+    bmi.b       20b | next sample loop  | yes? continue resampling
+23: | us complete                       |
+    subq.l      #1, %d5                 |
+24: | dest full                         |
+    movclr.l    %acc0, %d7              | *d = %d7 = result
+    move.l      %d7, (%a4)              |
+    lsl.l       #1, %d3                 | frac -> phase
+    bcc.b       25f | no inc            |
+    move.l      %a5, %d6                |
+    addq.l      #1, %d0                 |
+25: | no inc                            |
+    add.l       %d4, %d0                | %d0 = -dte + srcrem = pos
+    or.l        %d0, %d3                | restore phase
+    swap        %d3                     |
+    moveq.l     #16, %d7                | %d7 = shift
+    bra.b       40f | channel done      |
+                                        |
+    /** Downsampling **/                |
+30: | downsample                        |
+    move.l      (%a3, %d0.l*4), %a5     | %a5 = s[pos]
+    bra.b       32f | dsloop start      |
+31: | dsloop                            |
+    lea.l       -4(%a3, %d0.l*4), %a5   | %d6 = s[pos - 1], %a5 = s[pos]
+    movem.l     (%a5), %d6/%a5          |
+32: | dsloop start                      |
+    move.l      %d6, %acc0              | %acc0 = last
+    sub.l       %d6, %a5                | %a5 = diff = s[pos] - s[pos - 1]
+    move.l      %d3, %d0                | frac = (phase << 16) >> 1
     lsl.l       %d7, %d0                |
     lsr.l       #1, %d0                 |
-    mac.l       %d0, %d1, %acc0         | %acc0 += frac * diff
-    add.l       %d4, %d5                | phase += delta
-    move.l      %d5, %d6                | pos = phase >> 16
-    lsr.l       %d7, %d6                |
-    movclr.l    %acc0, %d0              |
-    move.l      %d0, (%a4)+             | *d++ = %d0
-    cmp.l       %d2, %d6                | pos < count?
-    blt.b       20b | resample loop     | yes? continue resampling
-40: | skip resample loop                |
-    subq.l      #1, %d3                 | ch > 0?
-    bgt.b       10b | channel loop      | yes? process next channel
-    lsl.l       %d7, %d2                | wrap phase to start of next frame
-    sub.l       %d2, %d5                | data->resample_data.phase =
-    move.l      %d5, 12(%a0)            | ... phase - (count << 16)
-    move.l      %a4, %d0                | return d - d[0]
-    sub.l       (%a2), %d0              |
-    asr.l       #2, %d0                 | convert bytes->samples
-    movem.l     (%sp), %d2-%d7/%a2-%a5  | restore non-clobberables
-    lea.l       40(%sp), %sp            | cleanup stack
+    mac.l       %d0, %a5, %acc0         | %acc0 += frac * diff
+    add.l       %d2, %d3                | phase += delta
+    move.l      %d3, %d0                | pos = phase >> 16
+    lsr.l       %d7, %d0                |
+    movclr.l    %acc0, %a5              |
+    move.l      %a5, (%a4)+             | *d++ = %d0
+    subq.l      #1, %d5                 | dst full?
+    ble.b       33f | dst full          | yes? stop
+    cmp.l       %d4, %d0                | pos < srcrem?
+    blt.b       31b | dsloop            | yes? continue resampling
+    tpf.l                               | trap cmp.l and ble.b
+33: | dst full                          |
+    cmp.l       %d4, %d0                | pos = MIN(pos, srcrem)
+    ble.b       34f                     |
+    move.l      %d4, %d0                |
+34: |                                   |
+    move.l      -4(%a3, %d0.l*4), %d6   | %d6 = s[pos - 1]
+                                        |
+40: | channel done                      |
+    move.l      %d6, 12(%a0, %d1.l*4)   | last_sample[ch] = last
+    subq.l      #1, %d1                 | ch > 0?
+    bgt.w       10b | channel loop      | yes? process next channel
+                                        |
+    move.l      12(%a2), %d1            | %d1 = dst->bufcount
+    sub.l       %d5, %d1                | written = dst->bufcount - dstrem
+    move.l      %d1, (%a2)              | dst->remcount = written
+    move.l      %d0, %d1                | wrap phase to position in next frame
+    lsl.l       %d7, %d1                | resample_data.phase = phase - (pos << 16)
+    sub.l       %d1, %d3                | ...
+    move.l      %d3, 12(%a0)            | ...
+    movem.l     (%sp), %d2-%d7/%a2-%a6  | restore non-volatiles
+    lea.l       44(%sp), %sp            | cleanup stack
     rts                                 | buh-bye
-    .size       dsp_downsample,.-dsp_downsample
+
+    .size       dsp_lin_resample,.-dsp_lin_resample
+
 
 /****************************************************************************
- * int dsp_upsample(int count, struct dsp_data *dsp,
- *                  const int32_t *src[], int32_t *dst[])
- */
-    .section    .text
-    .align      2
-    .global     dsp_upsample
-dsp_upsample:
-    lea.l       -40(%sp), %sp           | save non-clobberables
-    movem.l     %d2-%d7/%a2-%a5, (%sp)  |
-    movem.l     44(%sp), %d2/%a0-%a2    | %d2 = count
-                                        | %a0 = data
-                                        | %a1 = src
-                                        | %a2 = dst
-    movem.l      4(%a0), %d3-%d4        | %d3 = ch = channels
-                                        | %d4 = delta = data->resample_data.delta
-    swap        %d4                     | swap delta to high word to use...
-                                        | ...carries to increment position
-10: | channel loop                      |
-    move.l      12(%a0), %d5            | %d5 = phase = data->resample_data.phase
-    move.l      -4(%a1, %d3.l*4), %a3   | %a3 = s = src[ch-1]
-    lea.l       12(%a0, %d3.l*4), %a4   | %a4 = &data->resample_data.last_sample[ch-1]
-    lea.l       -4(%a3, %d2.l*4), %a5   | %a5 = src_end = &src[count-1]
-    move.l      (%a4), %d0              | %d0 = last = data->resample_data.last_sample[ch-1]
-    move.l      (%a5), (%a4)            | data->resample_data.last_sample[ch-1] = s[count-1]
-    move.l      -4(%a2, %d3.l*4), %a4   | %a4 = d = dst[ch-1]
-    move.l      (%a3)+, %d1             | fetch first sample - might throw this...
-                                        | ...away later but we'll be preincremented
-    move.l      %d1, %d6                | save sample value
-    sub.l       %d0, %d1                | %d1 = diff = s[0] - last
-    swap        %d5                     | swap phase to high word to use
-                                        | carries to increment position
-    move.l      %d5, %d7                | %d7 = pos = phase >> 16
-    clr.w       %d5                     |
-    eor.l       %d5, %d7                | pos == 0?
-    beq.b       40f | loop start        | yes? start loop
-    cmp.l       %d2, %d7                | past end of samples?
-    bge.b       50f | skip resample loop| yes? go to next channel and collect info
-    lea.l       (%a3, %d7.l*4), %a3     | %a3 = s = &s[pos+1]
-    movem.l     -8(%a3), %d0-%d1        | %d0 = s[pos-1], %d1 = s[pos]
-    move.l      %d1, %d6                | save sample value
-    sub.l       %d0, %d1                | %d1 = diff = s[pos] - s[pos-1]
-    bra.b       40f | loop start        |
-20: | next sample loop                  |
-    move.l      %d6, %d0                | move previous sample to %d0
-    move.l      (%a3)+, %d1             | fetch next sample
-    move.l      %d1, %d6                | save sample value
-    sub.l       %d0, %d1                | %d1 = diff = s[pos] - s[pos-1]
-30: | same sample loop                  |
-    movclr.l    %acc0, %d7              | %d7 = result
-    move.l      %d7, (%a4)+             | *d++ = %d7
-40: | loop start                        |
-    lsr.l       #1, %d5                 | make phase into frac
-    move.l      %d0, %acc0              | %acc0 = s[pos-1]
-    mac.l       %d1, %d5, %acc0         | %acc0 = diff * frac
-    lsl.l       #1, %d5                 | restore frac to phase
-    add.l       %d4, %d5                | phase += delta
-    bcc.b       30b | same sample loop  | load next values?
-    cmp.l       %a5, %a3                | src <= src_end?
-    bls.b       20b | next sample loop  | yes? continue resampling
-    movclr.l    %acc0, %d7              | %d7 = result
-    move.l      %d7, (%a4)+             | *d++ = %d7
-50: | skip resample loop                |
-    subq.l      #1, %d3                 | ch > 0?
-    bgt.b       10b | channel loop      | yes? process next channel
-    swap        %d5                     | wrap phase to start of next frame
-    move.l      %d5, 12(%a0)            | ...and save in data->resample_data.phase
-    move.l      %a4, %d0                | return d - d[0]
-    sub.l       (%a2), %d0              |
-    movem.l     (%sp), %d2-%d7/%a2-%a5  | restore non-clobberables
-    asr.l       #2, %d0                 | convert bytes->samples
-    lea.l       40(%sp), %sp            | cleanup stack
-    rts                                 | buh-bye
-    .size       dsp_upsample,.-dsp_upsample
-
-/****************************************************************************
- * void channels_process_sound_chan_mono(int count, int32_t *buf[])
+ * void channels_process_sound_chan_mono(struct dsp_data *data,
+ *                                       struct dsp_buffer **buf_p)
  *
  * Mix left and right channels 50/50 into a center channel.
  */
@@ -273,10 +278,12 @@ dsp_upsample:
     .align      2
     .global     channels_process_sound_chan_mono
 channels_process_sound_chan_mono:
-    movem.l     4(%sp), %d0/%a0         | %d0 = count, %a0 = buf
+    move.l      8(%sp), %a0             | %a0 = buf_p
+    move.l      (%a0), %a0              | %a0 = buf = *buf_p
     lea.l       -20(%sp), %sp           | save registers
     movem.l     %d2-%d4/%a2-%a3, (%sp)  |
-    movem.l     (%a0), %a0-%a1          | get channel pointers
+    movem.l     (%a0), %d0/%a0-%a1      | %d0 = buf->remcount, %a0 = buf->p32[0],
+                                        | %a1 = buf->p32[1]
     move.l      %a0, %a2                | use separate dst pointers since read
     move.l      %a1, %a3                | pointers run one ahead of write
     move.l      #0x40000000, %d3        | %d3 = 0.5
@@ -305,7 +312,8 @@ channels_process_sound_chan_mono:
                 .-channels_process_sound_chan_mono
 
 /****************************************************************************
- * void channels_process_sound_chan_custom(int count, int32_t *buf[])
+ * void channels_process_sound_chan_custom(struct dsp_data *data,
+ *                                         struct dsp_buffer **buf_p)
  *
  * Apply stereo width (narrowing/expanding) effect.
  */
@@ -313,14 +321,16 @@ channels_process_sound_chan_mono:
     .align      2
     .global     channels_process_sound_chan_custom
 channels_process_sound_chan_custom:
-    movem.l     4(%sp), %d0/%a0         | %d0 = count, %a0 = buf
+    move.l      8(%sp), %a0             | %a0 = buf_p
+    move.l      (%a0), %a0              | %a0 = buf = *buf_p
     lea.l       -28(%sp), %sp           | save registers
     movem.l     %d2-%d6/%a2-%a3, (%sp)  |
-    movem.l     (%a0), %a0-%a1          | get channel pointers
+    movem.l     (%a0), %d0/%a0-%a1      | %d0 = buf->remcount, %a0 = buf->p32[0],
+                                        | %a1 = buf->p32[1]
+    lea.l       channels_mode_data, %a2 | %a2 = &dsp_channels_data
+    movem.l     (%a2), %d3-%d4          | %d3 = sw_gain, %d4 = sw_cross
     move.l      %a0, %a2                | use separate dst pointers since read
     move.l      %a1, %a3                | pointers run one ahead of write
-    move.l      dsp_sw_gain, %d3        | load straight (mid) gain
-    move.l      dsp_sw_cross, %d4       | load cross (side) gain
     move.l      (%a0)+, %d1             | prime the input registers
     move.l      (%a1)+, %d2             |
     mac.l       %d1, %d3             , %acc0 |  L = l*gain + r*cross
@@ -352,7 +362,8 @@ channels_process_sound_chan_custom:
                 .-channels_process_sound_chan_custom
 
 /****************************************************************************
- *  void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
+ *  void channels_process_sound_chan_karaoke(struct dsp_data *data,
+ *                                           struct dsp_buffer **buf_p)
  *
  *  Separate channels into side channels.
  */
@@ -360,10 +371,12 @@ channels_process_sound_chan_custom:
     .align      2
     .global     channels_process_sound_chan_karaoke
 channels_process_sound_chan_karaoke:
-    movem.l     4(%sp), %d0/%a0         | %d0 = count, %a0 = buf
+    move.l      8(%sp), %a0             | %a0 = buf_p
+    move.l      (%a0), %a0              | %a0 = buf = *buf_p
     lea.l       -20(%sp), %sp           | save registers
     movem.l     %d2-%d4/%a2-%a3, (%sp)  |
-    movem.l     (%a0), %a0-%a1          | get channel src pointers
+    movem.l     (%a0), %d0/%a0-%a1      | %d0 = buf->remcount, %a0 = buf->p32[0],
+                                        | %a1 = buf->p32[1]
     move.l      %a0, %a2                | use separate dst pointers since read
     move.l      %a1, %a3                | pointers run one ahead of write
     move.l      #0x40000000, %d3        | %d3 = 0.5
@@ -395,7 +408,7 @@ channels_process_sound_chan_karaoke:
 
 /****************************************************************************
  * void sample_output_stereo(int count, struct dsp_data *data,
- *                           const int32_t *src[], int16_t *dst)
+ *                           int32_t const * const src[], int16_t *dst)
  *
  * Framework based on the ubiquitous Rockbox line transfer logic for
  * Coldfire CPUs.
@@ -422,7 +435,7 @@ sample_output_stereo:
     movem.l     %d1-%d7/%a2-%a6, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     52(%sp), %a0-%a2/%a4      |
-    lea.l       (%a4, %a0.l*4), %a0       | %a0 = end address     
+    lea.l       (%a4, %a0.l*4), %a0       | %a0 = end address
     move.l      (%a1), %d1                | %a1 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
     neg.l       %d1                       |
@@ -448,7 +461,7 @@ sample_output_stereo:
     movclr.l    %acc0, %d1                | get possibly saturated results
     movclr.l    %acc1, %d2                |
     swap        %d2                       | move R to low word
-    move.w      %d2, %d1                  | interleave MS 16 bits of each 
+    move.w      %d2, %d1                  | interleave MS 16 bits of each
     move.l      %d1, (%a4)+               | ...and write both
     cmp.l       %a4, %d0                  |
     bhi.b       10b | long loop 0         |
@@ -517,7 +530,7 @@ sample_output_stereo:
 
 /****************************************************************************
  * void sample_output_mono(int count, struct dsp_data *data,
- *                         const int32_t *src[], int16_t *dst)
+ *                         int32_t const * const src[], int16_t *dst)
  *
  * Same treatment as sample_output_stereo but for one channel.
  */
@@ -530,7 +543,7 @@ sample_output_mono:
     movem.l     %d1-%d5/%a2-%a4, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     36(%sp), %a0-%a3          |
-    lea.l       (%a3, %a0.l*4), %a0       | %a0 = end address     
+    lea.l       (%a3, %a0.l*4), %a0       | %a0 = end address
     move.l      (%a1), %d1                | %d5 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
     neg.l       %d1                       |

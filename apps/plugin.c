@@ -568,9 +568,11 @@ static const struct plugin_api rockbox_api = {
     dsp_set_crossfeed,
     dsp_set_eq,
     dsp_dither_enable,
+#ifdef HAVE_PITCHSCREEN
+    dsp_set_timestretch,
+#endif
     dsp_configure,
     dsp_process,
-    dsp_input_count,
     dsp_output_count,
 
     mixer_channel_status,
@@ -584,7 +586,7 @@ static const struct plugin_api rockbox_api = {
 
     system_sound_play,
     keyclick_click,
-#endif
+#endif /* CONFIG_CODEC == SWCODEC */
     /* playback control */
     playlist_amount,
     playlist_resume,
