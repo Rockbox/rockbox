@@ -1830,6 +1830,8 @@ const struct settings_list settings[] = {
                   NULL, "qs bottom",
                   qs_load_from_cfg, qs_write_to_cfg,
                   qs_is_changed, qs_set_default),
+   OFFON_SETTING(0, shortcuts_replaces_qs, LANG_USE_SHORTCUTS_INSTEAD_OF_QS,
+                  false, "shortcuts instead of quickscreen", NULL),
 #endif
 #ifdef HAVE_SPEAKER
     OFFON_SETTING(0, speaker_enabled, LANG_ENABLE_SPEAKER, false, "speaker",

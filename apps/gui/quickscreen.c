@@ -391,6 +391,9 @@ bool quick_screen_quick(int button_enter)
     bool oldshuffle = global_settings.playlist_shuffle;
     int oldrepeat = global_settings.repeat_mode;
 
+    if (global_settings.shortcuts_replaces_qs)
+        return do_shortcut_menu(NULL);
+
     qs.items[QUICKSCREEN_TOP] =
             get_setting(global_settings.qs_items[QUICKSCREEN_TOP], NULL);
     qs.items[QUICKSCREEN_LEFT] =

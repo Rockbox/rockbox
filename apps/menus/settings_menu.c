@@ -297,6 +297,10 @@ MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness
 MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
 #endif
 
+#ifdef HAVE_QUICKSCREEN
+MENUITEM_SETTING(shortcuts_replaces_quickscreen, &global_settings.shortcuts_replaces_qs, NULL);
+#endif
+
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
           0, Icon_System_menu,
 #if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1)
@@ -306,6 +310,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &disk_menu,
 #endif
             &limits_menu,
+#ifdef HAVE_QUICKSCREEN
+            &shortcuts_replaces_quickscreen,
+#endif
 #ifdef HAVE_MORSE_INPUT
             &morse_input,
 #endif
