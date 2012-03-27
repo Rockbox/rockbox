@@ -32,6 +32,7 @@
 #include "button.h"
 #if CONFIG_CODEC == SWCODEC
 #include "audio.h"
+#include "dsp.h"
 #endif
 #include "rbpaths.h"
 
@@ -339,13 +340,7 @@ struct user_settings
     /* EQ */
     bool eq_enabled;            /* Enable equalizer */
     unsigned int eq_precut;     /* dB */
-
-    struct eq_band_setting
-    {
-        int cutoff;        /* Hz */
-        int q;
-        int gain;          /* +/- dB */
-    } eq_band_settings[5];
+    struct eq_band_setting eq_band_settings[EQ_NUM_BANDS]; /* for each band */
 
     /* Misc. swcodec */
     int  beep;              /* system beep volume when changing tracks etc. */
@@ -772,11 +767,7 @@ struct user_settings
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    int compressor_threshold;
-    int compressor_makeup_gain;
-    int compressor_ratio;
-    int compressor_knee;
-    int compressor_release_time;
+    struct compressor_settings compressor_settings;
 #endif
 
     int sleeptimer_duration; /* In minutes; 0=off */

@@ -384,6 +384,9 @@ static void init(void)
     viewportmanager_init();
 
     storage_init();
+#if CONFIG_CODEC == SWCODEC
+    dsp_init();
+#endif
     settings_reset();
     settings_load(SETTINGS_ALL);
     settings_apply(true);
@@ -631,6 +634,10 @@ static void init(void)
             system_reboot();
         }
     }
+
+#if CONFIG_CODEC == SWCODEC
+    dsp_init();
+#endif
 
 #if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H10_PAD)

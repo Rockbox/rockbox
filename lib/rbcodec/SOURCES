@@ -3,15 +3,21 @@ metadata/id3tags.c
 metadata/mp3.c
 metadata/mp3data.c
 #if CONFIG_CODEC == SWCODEC
+dsp/channel_mode.c
 dsp/compressor.c
+dsp/crossfeed.c
 dsp/dsp.c
+dsp/dsp_filter.c
 dsp/eq.c
+dsp/lin_resample.c
+dsp/pga.c
+#ifdef HAVE_SW_TONE_CONTROLS
+dsp/tone_controls.c
+#endif
 # if defined(CPU_COLDFIRE)
 dsp/dsp_cf.S
-dsp/eq_cf.S
 # elif defined(CPU_ARM)
 dsp/dsp_arm.S
-dsp/eq_arm.S
 #  if ARM_ARCH >= 6
 dsp/dsp_arm_v6.S
 #  endif
