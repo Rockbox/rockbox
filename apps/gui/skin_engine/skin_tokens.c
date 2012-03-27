@@ -927,7 +927,10 @@ const char *get_token_value(struct gui_wps *gwps,
                 if (utf8_len < ss->start)
                     return NULL;
 
-                start_byte = utf8seek(token_val, ss->start);
+                if (ss->start < 0)
+                    start_byte = utf8seek(token_val, ss->start + utf8_len);
+                else
+                    start_byte = utf8seek(token_val, ss->start);
 
                 if (ss->length < 0 || (ss->start + ss->length) > utf8_len)
                     end_byte = strlen(token_val);
