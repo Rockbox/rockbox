@@ -827,6 +827,9 @@ struct user_settings
     char start_directory[MAX_PATHNAME+1];
     /* Has the root been customized from the .cfg file? false = no, true = loaded from cfg */
     bool root_menu_customized;
+#ifdef HAVE_QUICKSCREEN
+    bool shortcuts_replaces_qs;
+#endif
 };
 
 /** global variables **/

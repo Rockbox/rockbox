@@ -13007,3 +13007,20 @@
     *: "Constrain Auto-Change"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </voice>
+</phrase>
