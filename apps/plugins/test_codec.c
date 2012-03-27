@@ -164,6 +164,7 @@ static inline void int2le16(unsigned char* buf, int16_t x)
 
 static unsigned char *wavbuffer;
 static unsigned char *dspbuffer;
+static int dspbuffer_count;
 
 void init_wav(char* filename)
 {
@@ -215,42 +216,31 @@ static void* codec_get_buffer(size_t *size)
 
 static int process_dsp(const void *ch1, const void *ch2, int count)
 {
-    const char *src[2] = { ch1, ch2 };
-    int written_count = 0;
-    char *dest = dspbuffer;
+    const void *src[2] = { ch1, ch2 };
+    int16_t (*dst)[2] = (int16_t (*)[2])dspbuffer;
+    int dst_total = 0;
+    int dspbuffer_rem = dspbuffer_count;
     
-    while (count > 0)
+    while (count > 0 && dspbuffer_rem > 0)
     {
-        int out_count = rb->dsp_output_count(ci.dsp, count);
+        int src_count = count;
+        int dst_count = dspbuffer_rem;
+        bool cont = rb->dsp_process(ci.dsp, dst[dst_total], &dst_count,
+                                    src, &src_count);
         
-        int inp_count = rb->dsp_input_count(ci.dsp, out_count);
-        
-        if (inp_count <= 0)
+        if (dst_count > 0)
+        {
+            dst_total += dst_count;
+            dspbuffer_rem -= dst_count;
+        }
+
+        if (!cont)
             break;
         
-        if (inp_count > count)
-            inp_count = count;
-        
-        out_count = rb->dsp_process(ci.dsp, dest, src, inp_count);
-        
-        if (out_count <= 0)
-            break;
-        
-        written_count += out_count;
-        dest += out_count * 4;
-        
-        count -= inp_count;
+        count -= src_count;
     }
     
-    return written_count;
-}
-
-static inline int32_t clip_sample(int32_t sample)
-{
-    if ((int16_t)sample != sample)
-        sample = 0x7fff ^ (sample >> 31);
-
-    return sample;
+    return dst_total;
 }
 
 /* Null output */
@@ -378,18 +368,18 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
             {
                 case STEREO_INTERLEAVED:
                     while (count--) {
-                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
-                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
                     }
                     break;
  
                 case STEREO_NONINTERLEAVED:
                     while (count--) {
-                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
-                        int2le16(p, clip_sample((*data2_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data2_32++ + dc_bias) >> scale));
                         p += 2;
                     }
 
@@ -397,7 +387,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
 
                 case STEREO_MONO:
                     while (count--) {
-                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
                     }
                     break;
@@ -856,6 +846,8 @@ enum plugin_status plugin_start(const void* parameter)
 
     wavbuffer = rb->plugin_get_buffer(&buffer_size);
     dspbuffer = wavbuffer + buffer_size / 2;
+    dspbuffer_count = (sbuffer_size - (dspbuffer - wavbuffer)) /
+                        (2 * sizeof (int16_t);
 
     codec_mallocbuf = rb->plugin_get_audio_buffer(&audiosize);
     /* Align codec_mallocbuf to pointer size, tlsf wants that */

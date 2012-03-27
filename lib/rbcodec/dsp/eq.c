@@ -238,20 +238,17 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
  */
 
 #if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM))
-void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
-               unsigned channels, unsigned shift)
+void eq_filter(int32_t *x[], struct eqfilter *f, int count, int channels)
 {
-    unsigned c, i;
-    long long acc;
-
     /* Direct form 1 filtering code.
        y[n] = b0*x[i] + b1*x[i - 1] + b2*x[i - 2] + a1*y[i - 1] + a2*y[i - 2],
        where y[] is output and x[] is input.
      */
+    unsigned shift = f->shift;
 
-    for (c = 0; c < channels; c++) {
-        for (i = 0; i < num; i++) {
-            acc  = (long long) x[c][i] * f->coefs[0];
+    for (int c = 0; c < channels; c++) {
+        for (int i = 0; i < count; i++) {
+            long long acc = (long long) x[c][i] * f->coefs[0];
             acc += (long long) f->history[c][0] * f->coefs[1];
             acc += (long long) f->history[c][1] * f->coefs[2];
             acc += (long long) f->history[c][2] * f->coefs[3];
@@ -265,4 +262,3 @@ void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
     }
 }
 #endif
-

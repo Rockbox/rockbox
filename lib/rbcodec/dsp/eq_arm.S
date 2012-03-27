@@ -27,8 +27,8 @@
 /* #define HIGH_PRECISION */
 
 /*
- * void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
- *                unsigned channels, unsigned shift)
+ * void eq_filter(int32_t *buf[], struct eqfilter *f, int count,
+ *                int channels)
  */
 #if CONFIG_CPU == PP5002
     .section    .icode,"ax",%progbits
@@ -37,9 +37,9 @@
 #endif
     .global eq_filter
 eq_filter:
-    ldr r12, [sp]             @ get shift parameter
-    stmdb sp!, { r0-r11, lr } @ save all params and clobbered regs 
+    stmdb sp!, { r0-r11, lr } @ save all params and clobbered regs
     ldmia r1!, { r4-r8 }      @ load coefs
+    ldr   r12, [r1, #(2*4)*4] @ get shift parameter
     mov r10, r1               @ loop prelude expects filter struct addr in r10
 
 .filterloop:

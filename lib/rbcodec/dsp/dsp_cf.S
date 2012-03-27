@@ -21,21 +21,23 @@
  ****************************************************************************/
 
 /****************************************************************************
- * void dsp_apply_gain(int count, struct dsp_data *data, int32_t *buf[])
+ * void dsp_apply_gain(struct dsp_data *data,
+ *                     struct dsp_buffer **buf_p)
  */
     .section    .text
     .align      2
     .global     dsp_apply_gain
 dsp_apply_gain:
+    movem.l     4(%sp), %a0-%a1         | %a0 = data,
+                                        | %a1 = buf_p
+    move.l      (%a1), %a1              | %a1 = buf = *buf_p
     lea.l       -20(%sp), %sp           | save registers
     movem.l     %d2-%d4/%a2-%a3, (%sp)  |
-    movem.l     28(%sp), %a0-%a1        | %a0 = data,
-                                        | %a1 = buf
-    move.l      4(%a0), %d1             | %d1 = data->num_channels
-    move.l      32(%a0), %a0            | %a0 = data->gain (in s8.23)
+    move.l      0x04(%a0), %d1          | %d1 = data->num_channels
+    move.l      0x18(%a0), %a0          | %a0 = data->gain (in s8.23)
 10: | channel loop                      |
-    move.l      24(%sp), %d0            | %d0 = count
-    move.l      -4(%a1, %d1.l*4), %a2   | %a2 = s = buf[ch-1]
+    move.l      4(%a1), %d0             | %d0 = buf->remcount
+    move.l      4(%a1, %d1.l*4), %a2    | %a2 = s = buf->p32[ch-1]
     move.l      %a2, %a3                | %a3 = d = s
     move.l      (%a2)+, %d2             | %d2 = *s++,
     mac.l       %a0, %d2, (%a2)+, %d2, %acc0 | %acc0 = S(n)*gain, load S(n+1)
@@ -64,16 +66,19 @@ dsp_apply_gain:
     .size       dsp_apply_gain,.-dsp_apply_gain
 
 /****************************************************************************
- * void apply_crossfeed(int count, int32_t *buf[])
+ * void apply_crossfeed(struct dsp_data *data,
+ *                      struct dsp_buffer **buf_p)
  */
     .section    .text
     .align      2
-    .global     apply_crossfeed 
+    .global     apply_crossfeed
 apply_crossfeed:
     lea.l       -44(%sp), %sp           |
     movem.l     %d2-%d7/%a2-%a6, (%sp)  | save all regs
-    movem.l     48(%sp), %d7/%a4        | %d7 = count, %a4 = src
-    movem.l     (%a4), %a4-%a5          | %a4 = src[0], %a5 = src[1]
+    move.l      52(%sp), %a4            | %a4 = buf_p
+    move.l      (%a4), %a4              | %a4 = buf = *buf_p
+    movem.l     4(%a4), %d7/%a4-%a5     | %d7 = buf->remcount, %a4 = buf->p32[0],
+                                        | %a5 = buf->p32[1]
     lea.l       crossfeed_data, %a1     | %a1 = &crossfeed_data
     move.l      (%a1)+, %d6             | %d6 = direct gain
     movem.l     12(%a1), %d0-%d3        | fetch filter history samples
@@ -124,8 +129,9 @@ apply_crossfeed:
     movem.l     (%sp), %d2-%d7/%a2-%a6  | restore all regs
     lea.l       44(%sp), %sp            |
     rts                                 |
-    .size       apply_crossfeed,.-apply_crossfeed 
+    .size       apply_crossfeed,.-apply_crossfeed
 
+#if 0
 /****************************************************************************
  * int dsp_downsample(int count, struct dsp_data *data,
  *                    in32_t *src[], int32_t *dst[])
@@ -263,9 +269,12 @@ dsp_upsample:
     lea.l       40(%sp), %sp            | cleanup stack
     rts                                 | buh-bye
     .size       dsp_upsample,.-dsp_upsample
+#endif
+
 
 /****************************************************************************
- * void channels_process_sound_chan_mono(int count, int32_t *buf[])
+ * void channels_process_sound_chan_mono(struct dsp_data *data,
+ *                                       struct dsp_buffer **buf_p)
  *
  * Mix left and right channels 50/50 into a center channel.
  */
@@ -273,10 +282,12 @@ dsp_upsample:
     .align      2
     .global     channels_process_sound_chan_mono
 channels_process_sound_chan_mono:
-    movem.l     4(%sp), %d0/%a0         | %d0 = count, %a0 = buf
+    move.l      8(%sp), %a0             | %a0 = buf_p
+    move.l      (%a0), %a0              | %a0 = buf = *buf_p
     lea.l       -20(%sp), %sp           | save registers
     movem.l     %d2-%d4/%a2-%a3, (%sp)  |
-    movem.l     (%a0), %a0-%a1          | get channel pointers
+    movem.l     4(%a0), %d0/%a0-%a1     | %d0 = buf->remcount, %a0 = buf->p32[0],
+                                        | %a1 = buf->p32[1]
     move.l      %a0, %a2                | use separate dst pointers since read
     move.l      %a1, %a3                | pointers run one ahead of write
     move.l      #0x40000000, %d3        | %d3 = 0.5
@@ -305,7 +316,8 @@ channels_process_sound_chan_mono:
                 .-channels_process_sound_chan_mono
 
 /****************************************************************************
- * void channels_process_sound_chan_custom(int count, int32_t *buf[])
+ * void channels_process_sound_chan_custom(struct dsp_data *data,
+ *                                         struct dsp_buffer **buf_p)
  *
  * Apply stereo width (narrowing/expanding) effect.
  */
@@ -313,10 +325,12 @@ channels_process_sound_chan_mono:
     .align      2
     .global     channels_process_sound_chan_custom
 channels_process_sound_chan_custom:
-    movem.l     4(%sp), %d0/%a0         | %d0 = count, %a0 = buf
+    move.l      8(%sp), %a0             | %a0 = buf_p
+    move.l      (%a0), %a0              | %a0 = buf = *buf_p
     lea.l       -28(%sp), %sp           | save registers
     movem.l     %d2-%d6/%a2-%a3, (%sp)  |
-    movem.l     (%a0), %a0-%a1          | get channel pointers
+    movem.l     4(%a0), %d0/%a0-%a1     | %d0 = buf->remcount, %a0 = buf->p32[0],
+                                        | %a1 = buf->p32[1]
     move.l      %a0, %a2                | use separate dst pointers since read
     move.l      %a1, %a3                | pointers run one ahead of write
     move.l      dsp_sw_gain, %d3        | load straight (mid) gain
@@ -352,7 +366,8 @@ channels_process_sound_chan_custom:
                 .-channels_process_sound_chan_custom
 
 /****************************************************************************
- *  void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
+ *  void channels_process_sound_chan_karaoke(struct dsp_data *data,
+ *                                           struct dsp_buffer **buf_p)
  *
  *  Separate channels into side channels.
  */
@@ -360,10 +375,12 @@ channels_process_sound_chan_custom:
     .align      2
     .global     channels_process_sound_chan_karaoke
 channels_process_sound_chan_karaoke:
-    movem.l     4(%sp), %d0/%a0         | %d0 = count, %a0 = buf
+    move.l      8(%sp), %a0             | %a0 = buf_p
+    move.l      (%a0), %a0              | %a0 = buf = *buf_p
     lea.l       -20(%sp), %sp           | save registers
     movem.l     %d2-%d4/%a2-%a3, (%sp)  |
-    movem.l     (%a0), %a0-%a1          | get channel src pointers
+    movem.l     4(%a0), %d0/%a0-%a1     | %d0 = buf->remcount, %a0 = buf->p32[0],
+                                        | %a1 = buf->p32[1]
     move.l      %a0, %a2                | use separate dst pointers since read
     move.l      %a1, %a3                | pointers run one ahead of write
     move.l      #0x40000000, %d3        | %d3 = 0.5
@@ -422,7 +439,7 @@ sample_output_stereo:
     movem.l     %d1-%d7/%a2-%a6, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     52(%sp), %a0-%a2/%a4      |
-    lea.l       (%a4, %a0.l*4), %a0       | %a0 = end address     
+    lea.l       (%a4, %a0.l*4), %a0       | %a0 = end address
     move.l      (%a1), %d1                | %a1 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
     neg.l       %d1                       |
@@ -448,7 +465,7 @@ sample_output_stereo:
     movclr.l    %acc0, %d1                | get possibly saturated results
     movclr.l    %acc1, %d2                |
     swap        %d2                       | move R to low word
-    move.w      %d2, %d1                  | interleave MS 16 bits of each 
+    move.w      %d2, %d1                  | interleave MS 16 bits of each
     move.l      %d1, (%a4)+               | ...and write both
     cmp.l       %a4, %d0                  |
     bhi.b       10b | long loop 0         |
@@ -530,7 +547,7 @@ sample_output_mono:
     movem.l     %d1-%d5/%a2-%a4, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     36(%sp), %a0-%a3          |
-    lea.l       (%a3, %a0.l*4), %a0       | %a0 = end address     
+    lea.l       (%a3, %a0.l*4), %a0       | %a0 = end address
     move.l      (%a1), %d1                | %d5 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
     neg.l       %d1                       |
