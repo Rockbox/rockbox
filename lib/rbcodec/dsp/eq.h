@@ -18,33 +18,27 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #ifndef _EQ_H
 #define _EQ_H
 
-#include <inttypes.h>
-#include <stdbool.h>
+/* => support from 2 to 32 bands, inclusive
+ * Menus and screens must be updated to support changing this from 5
+ * without modifying other stuff (remove comment when this is no longer
+ * true :-) */
+#define EQ_NUM_BANDS 5
 
-/* These depend on the fixed point formats used by the different filter types
-   and need to be changed when they change.
- */
-#define FILTER_BISHELF_SHIFT 5
-#define EQ_PEAK_SHIFT 4
-#define EQ_SHELF_SHIFT 6
-
-struct eqfilter {
-    int32_t coefs[5];        /* Order is b0, b1, b2, a1, a2 */
-    int32_t history[2][4];
+struct eq_band_setting
+{
+    int cutoff; /* Hz */
+    int q;
+    int gain;   /* +/- dB */
 };
 
-void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c);
-void filter_bishelf_coefs(unsigned long cutoff_low, unsigned long cutoff_high,
-                          long A_low, long A_high, long A, int32_t *c);
-void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
-void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
-void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
-void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
-               unsigned channels, unsigned shift);
+/** DSP interface **/
+void dsp_set_eq_precut(int precut);
+void dsp_set_eq_coefs(int band, const struct eq_band_setting *setting);
+void dsp_eq_enable(bool enable);
 
-#endif
+extern const struct dsp_proc_db_entry eq_proc_db_entry;
 
+#endif /* _EQ_H */

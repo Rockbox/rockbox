@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2011 by Michael Sevakis
+ * Copyright (C) 2005 Miika Pekkarinen
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,41 +18,22 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef DSP_HELPER_H
-#define DSP_HELPER_H
+#ifndef DSP_REPLAYGAIN_H
+#define DSP_REPLAYGAIN_H
 
-/** Clip sample to signed 16 bit range **/
-
-#ifdef CPU_ARM
-#if ARM_ARCH >= 6
-static FORCE_INLINE int32_t clip_sample_16(int32_t sample)
+/* Structure used with DSP_SET_REPLAY_GAIN message */
+struct dsp_replay_gains
 {
-    int32_t out;
-	asm ("ssat %0, #16, %1"
-        : "=r" (out) : "r"(sample));
-    return out;
-}
-#define CLIP_SAMPLE_16_DEFINED
-#endif /* ARM_ARCH */
-#endif /* CPU_ARM */
+    long track_gain;
+    long album_gain;
+    long track_peak;
+    long album_peak;
+};
 
-#ifndef CLIP_SAMPLE_16_DEFINED
-/* Generic implementation */
-static FORCE_INLINE int32_t clip_sample_16(int32_t sample)
-{
-    if ((int16_t)sample != sample)
-        sample = 0x7fff ^ (sample >> 31);
-    return sample;
-}
-#endif /* CLIP_SAMPLE_16_DEFINED */
+/** DSP Interface **/
+int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
+void dsp_set_replaygain(void);
 
-#undef CLIP_SAMPLE_16_DEFINED
+extern const struct dsp_proc_db_entry dsp_replaygain_proc_db_entry;
 
-/* Absolute difference of signed 32-bit numbers which must be dealt with
- * in the unsigned 32-bit range */
-static FORCE_INLINE uint32_t ad_s32(int32_t a, int32_t b)
-{
-    return (a >= b) ? (a - b) : (b - a);
-}
-
-#endif /* DSP_HELPER_H */
+#endif /* DSP_REPLAYGAIN_H */
