@@ -25,7 +25,7 @@
 
 #include "dsp.h"
 
-#define TDSPEED_OUTBUFSIZE 4096
+#define TDSPEED_OUTBUFCOUNT 4096
 
 /* some #define functions to get the pitch, stretch and speed values based on */
 /* two known values.  Remember that params are alphabetical.                  */
@@ -39,9 +39,8 @@
 void tdspeed_init(void);
 void tdspeed_finish(void);
 bool tdspeed_config(int samplerate, bool stereo, int32_t factor);
-long tdspeed_est_output_size(void);
-long tdspeed_est_input_size(long size);
-int tdspeed_doit(int32_t *src[], int count);
+int  tdspeed_est_output_count(void);
+void tdspeed_doit(struct dsp_data *data, struct dsp_buffer **buf);
 
 #define STRETCH_MAX (250L * PITCH_SPEED_PRECISION) /* 250% */
 #define STRETCH_MIN (35L  * PITCH_SPEED_PRECISION) /* 35%  */
