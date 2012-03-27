@@ -867,6 +867,17 @@ Lyre prototype 1 */
 .endm
 #endif
 
+#if defined(CPU_COLDFIRE) && defined(__ASSEMBLER__)
+/* Assembler doesn't support these as mnemonics but does tpf */
+.macro tpf.w
+.word 0x51fa
+.endm
+
+.macro tpf.l
+.word 0x51fb
+.endm
+#endif
+
 #ifndef CODEC_SIZE
 #define CODEC_SIZE 0
 #endif
