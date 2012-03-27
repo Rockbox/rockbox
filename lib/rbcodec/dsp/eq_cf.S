@@ -25,16 +25,16 @@
 /* #define HIGH_PRECISION */
 
 /*
- * void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
- *                unsigned channels, unsigned shift)
+ * void eq_filter(int32_t *buf[], struct eqfilter *f, int count,
+ *                int channels)
  */
     .text
     .global eq_filter
 eq_filter:
-    lea.l (-11*4, %sp), %sp 
+    lea.l (-11*4, %sp), %sp
     movem.l %d2-%d7/%a2-%a6, (%sp)    | save clobbered regs
     move.l (11*4+8, %sp), %a5         | fetch filter structure address
-    move.l (11*4+20, %sp), %d7        | load shift count
+    move.l ((5+2*4)*4, %a5), %d7      | load shift count
     subq.l #1, %d7                    | EMAC gives us one free shift
 #ifdef HIGH_PRECISION
     moveq.l #8, %d6
@@ -79,7 +79,7 @@ eq_filter:
     move.l %d2, (%a6)+                  | save result
     subq.l #1, %d5                      | are we done with this channel?
     jne .loop
-    
+
     movem.l %d0-%d3, (%a5)              | save history back to struct
     lea.l (4*4, %a5), %a5               | point to next channel's history
     subq.l #1, (11*4+16, %sp)           | have we processed both channels?

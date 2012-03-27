@@ -22,8 +22,10 @@
 #ifndef COMPRESSOR_H
 #define COMPRESSOR_H
 
-void compressor_process(int count, struct dsp_data *data, int32_t *buf[]);
-bool compressor_update(void);
+struct compressor_settings; /* defined apps/settings.h */
+
+void compressor_process(struct dsp_data *data, struct dsp_buffer **buf_p);
+bool compressor_update(const struct compressor_settings *settings);
 void compressor_reset(void);
 
 #endif /* COMPRESSOR_H */
