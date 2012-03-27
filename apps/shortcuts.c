@@ -418,6 +418,11 @@ int do_shortcut_menu(void *ignored)
     if (global_settings.talk_menu)
         list.get_talk = shortcut_menu_speak_item;
 
+    if (shortcut_count == 0)
+    {
+        splash(HZ, str(LANG_NO_FILES));
+        return GO_TO_PREVIOUS;
+    }
     push_current_activity(ACTIVITY_SHORTCUTSMENU);
 
     while (done == GO_TO_PREVIOUS)
