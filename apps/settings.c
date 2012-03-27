@@ -979,20 +979,17 @@ void settings_apply(bool read_disk)
     audio_set_crossfade(global_settings.crossfade);
 #endif
     dsp_set_replaygain();
-    dsp_set_crossfeed(global_settings.crossfeed);
+    dsp_crossfeed_enable(global_settings.crossfeed);
     dsp_set_crossfeed_direct_gain(global_settings.crossfeed_direct_gain);
     dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
                                    global_settings.crossfeed_hf_attenuation,
                                    global_settings.crossfeed_hf_cutoff);
 
     /* Configure software equalizer, hardware eq is handled in audio_init() */
-    dsp_set_eq(global_settings.eq_enabled);
+    dsp_eq_enable(global_settings.eq_enabled);
     dsp_set_eq_precut(global_settings.eq_precut);
-
-    for(int i = 0; i < 5; i++) {
-        dsp_set_eq_coefs(i, global_settings.eq_band_settings[i].cutoff,
-                         global_settings.eq_band_settings[i].q,
-                         global_settings.eq_band_settings[i].gain);
+    for(int i = 0; i < EQ_NUM_BANDS; i++) {
+        dsp_set_eq_coefs(i, &global_settings.eq_band_settings[i]);
     }
 
     dsp_dither_enable(global_settings.dithering_enabled);
