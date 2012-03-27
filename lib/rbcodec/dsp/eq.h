@@ -32,9 +32,11 @@
 #define EQ_PEAK_SHIFT 4
 #define EQ_SHELF_SHIFT 6
 
-struct eqfilter {
+struct eqfilter
+{
     int32_t coefs[5];        /* Order is b0, b1, b2, a1, a2 */
     int32_t history[2][4];
+    unsigned shift;
 };
 
 void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c);
@@ -43,8 +45,6 @@ void filter_bishelf_coefs(unsigned long cutoff_low, unsigned long cutoff_high,
 void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
 void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
 void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
-void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
-               unsigned channels, unsigned shift);
+void eq_filter(int32_t * const buf[], struct eqfilter *f, int count, int channels);
 
-#endif
-
+#endif /* _EQ_H */
