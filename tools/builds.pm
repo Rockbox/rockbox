@@ -223,7 +223,7 @@ $releasenotes="/wiki/ReleaseNotes310";
     },
     'sansac200v2' => {
         name => 'SanDisk Sansa c200 v2',
-        status => 2,
+        status => 3,
         icon => 'sansac200',
     },
     'sansaclip' => {
