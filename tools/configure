@@ -3673,7 +3673,7 @@ RANLIB=`findtool ${RANLIB} --lit`
 
 
 if [ -z "$arch" ]; then
-    cpp_defines=$(echo "" | $CPP -dD)
+    cpp_defines=$(echo "" | $CPP $GCCOPTS -dD)
     if [ -n "$(echo $cpp_defines | grep -w __sh__)" ]; then
         arch="sh"
     elif [ -n "$(echo $cpp_defines | grep -w __m68k__)" ]; then
