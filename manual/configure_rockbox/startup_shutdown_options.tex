@@ -43,14 +43,20 @@ are run at startup, or initiate a shutdown when conditions are met.
   The \setting{Sleep Timer} powers off your \dap{} after a given time, whether
   playing or not.
   \begin{description}
-    \item[Sleep Timer:]
-      Shown when the \setting{Sleep Timer} is inactive, it can be set from
-      \setting{Off} to 5 hours in 5 minute steps.
-      While the \setting{Sleep Timer} is reset on boot, the value selected is
-      retained and will be used as the default from then on.
-    \item[Cancel Sleep Timer (h:mm):]
-      Shown when the \setting{Sleep Timer} is active, this option disables the
-      current \setting{Sleep Timer}.
+    \item[Start Sleep Timer (\emph{duration}):]
+      Shown when the \setting{Sleep Timer} is inactive, this option will
+      initiate a \setting{Sleep Timer} with the duration shown in brackets.
+    \item[Cancel Sleep Timer (\emph{remaining}):]
+      Shown when the \setting{Sleep Timer} is active, this option will cancel
+      the current \setting{Sleep Timer}.\\
+      The time remaining before completion is shown in brackets.
+    \item[Default Sleep Timer Duration:]
+      The default number of minutes a new \setting{Sleep Timer} will run
+      for.\\
+      The values range from 5 minutes to 5 hours in 5 minute steps.\\
+      If a timer is currently active, the timer's duration will be set to the
+      newly entered value.\\
+      The value set is persistent, see \reference{ref:config_file_options}.
     \item[Start Sleep Timer On Boot:]
       If set, a \setting{Sleep Timer} will be initiated when the device
       starts.
