@@ -20,7 +20,7 @@ CODECLIBFLAGS = $(filter-out -O%,$(CODECFLAGS))
 
 ifeq ($(MEMORYSIZE),2)
     CODECLIBFLAGS += -Os
-else ifeq ($(CPU),coldfire)
+else ifeq ($(ARCH),arch_m68k)
     CODECLIBFLAGS += -O2
 else
     CODECLIBFLAGS += -O1

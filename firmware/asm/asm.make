@@ -10,8 +10,9 @@
 # Collect dummy C files in firmware/asm
 ASM_DUMMY_SRC := $(notdir $(call preprocess, $(FIRMDIR)/asm/SOURCES))
 
+ASM_ARCH := $(subst arch_,,$(ARCH)) # strip arch_ prefix from $(ARCH)
 # Get the corresponding real source files under firmware/asm/$ARCH (C or ASM)
-ASM_C_SRC := $(addprefix $(FIRMDIR)/asm/$(ARCH)/,$(ASM_DUMMY_SRC))
+ASM_C_SRC := $(addprefix $(FIRMDIR)/asm/$(ASM_ARCH)/,$(ASM_DUMMY_SRC))
 ASM_S_SRC := $(ASM_C_SRC:.c=.S)
 
 # ASM_SRC now contains only files that exist under $ARCH

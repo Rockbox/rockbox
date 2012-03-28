@@ -79,12 +79,12 @@ endif
 #included before codecs.make and plugins.make so they see them)
 ifndef APP_TYPE
   include $(ROOTDIR)/lib/libsetjmp/libsetjmp.make
-  ifeq (arm,$(ARCH))
+  ifeq (arch_arm,$(ARCH))
     include $(ROOTDIR)/lib/arm_support/arm_support.make
   endif
 endif
 
-ifeq (arm,$(ARCH))
+ifeq (arch_arm,$(ARCH))
     include $(ROOTDIR)/lib/unwarminder/unwarminder.make
 endif
 

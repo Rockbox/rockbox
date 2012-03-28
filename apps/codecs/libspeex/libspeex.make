@@ -23,7 +23,7 @@ VOICESPEEXFLAGS = $(filter-out -ffunction-sections, $(filter-out -DCODEC,$(_SPEE
 # libspeex is faster on ARM-targets with -O1 instead of -O2
 SPEEXFLAGS = $(filter-out -O%,$(_SPEEXFLAGS))
 
-ifeq ($(CPU),arm)
+ifeq ($(ARCH),arch_arm)
    SPEEXFLAGS += -O1
 else
    SPEEXFLAGS += -O2

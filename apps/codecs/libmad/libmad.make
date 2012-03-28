@@ -16,7 +16,7 @@ MADFLAGS = $(filter-out -O%,$(CODECFLAGS)) -I$(APPSDIR)/codecs/libmad
 MADFLAGS += -UDEBUG -DNDEBUG -DHAVE_LIMITS_H
 
 # libmad is faster on ARM-targets with -O1 than -O2
-ifeq ($(CPU),arm)
+ifeq ($(ARCH),arch_arm)
    MADFLAGS += -O1
 else
    MADFLAGS += -O2

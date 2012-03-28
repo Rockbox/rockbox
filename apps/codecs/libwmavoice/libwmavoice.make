@@ -19,7 +19,7 @@ $(WMAVOICELIB): $(WMAVOICELIB_OBJ)
 
 WMAVOICEFLAGS = -I$(APPSDIR)/codecs/libwmavoice $(filter-out -O%,$(CODECFLAGS))
 
-ifeq ($(CPU),coldfire)
+ifeq ($(ARCH),arch_m68k)
 	WMAVOICEFLAGS += -O2
 else
 	WMAVOICEFLAGS += -O1

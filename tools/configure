@@ -523,6 +523,8 @@ arm7ejscc () {
 }
 
 mipselcc () {
+ arch="mips"
+ arch_version=32 # FIXME: autodetect version (32 or 64)
  prefixtools mipsel-elf-
  # mips is predefined, but we want it for paths. use __mips instead
  GCCOPTS="$CCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -Umips"
@@ -3674,21 +3676,36 @@ if [ -z "$arch" ]; then
         arch="m68k"
     elif [ -n "$(echo $cpp_defines | grep -w __arm__)" ]; then
         arch="arm"
+        # cpp defines like "#define __ARM_ARCH_4TE__ 1" (where we want to extract the 4)
+        arch_version="$(echo $cpp_defines | sed s,\ ,\\n,g | grep __ARM_ARCH | sed -e 's,.*\([0-9]\).*,\1,')"
     elif [ -n "$(echo $cpp_defines | grep -w __mips__)" ]; then
-        arch="mips"
+        arch="mips" # FIXME: autodetect version (32 or 64)
     elif [ -n "$(echo $cpp_defines | grep -w _X86_)" ]; then
         arch="x86"
     elif [ -n "$(echo $cpp_defines | grep -w __x86_64__)" ]; then
         arch="amd64"
     else
-        arch="unknown"
+        arch="none"
         echo "Warning: Could not determine target arch"
     fi
-    if [ "$arch" != "unknown" ]; then
-        echo "Automatically selected arch: $arch"
+    if [ "$arch" != "none" ]; then        
+        if [ -n "$arch_version" ]; then
+            echo "Automatically selected arch: $arch (ver $arch_version)"
+        else
+            echo "Automatically selected arch: $arch"
+        fi
     fi;
 else
-    echo "Manually selected arch: $arch"
+    if [ -n "$arch_version" ]; then
+        echo "Manually selected arch: $arch (ver $arch_version)"
+    else
+        echo "Manually selected arch: $arch"
+    fi
+fi
+
+arch="arch_$arch"
+if [ -n "$arch_version" ]; then
+    Darch_version="#define ARCH_VERSION $arch_version"
 fi
 
 if test -n "$ccache"; then
@@ -3719,6 +3736,35 @@ cat > autoconf.h <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
 #define __BUILD_AUTOCONF_H
+
+/* lower case names match the what's exported in the Makefile
+ * upper case name looks nicer in the code */
+
+#define arch_none 0
+#define ARCH_NONE 0
+
+#define arch_sh 1
+#define ARCH_SH 1
+
+#define arch_m68k 2
+#define ARCH_M68K 2
+
+#define arch_arm 3
+#define ARCH_ARM 3
+
+#define arch_mips 4
+#define ARCH_MIPS 4
+
+#define arch_x86 5
+#define ARCH_X86 5
+
+#define arch_amd64 6
+#define ARCH_AMD64 6
+
+/* Define target machine architecture */
+#define ARCH ${arch}
+/* Optinally define architecture version */
+${Darch_version}
 
 /* Define endianess for the target or simulator platform */
 #define ${defendian} 1
@@ -3827,6 +3873,7 @@ export FLASHFILE=${flash}
 export TARGET_ID=${target_id}
 export TARGET=-D${target}
 export ARCH=${arch}
+export ARCH_VERSION=${arch_version}
 export CPU=${t_cpu}
 export MANUFACTURER=${t_manufacturer}
 export OBJDIR=${pwd}

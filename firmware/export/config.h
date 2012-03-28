@@ -526,12 +526,12 @@ Lyre prototype 1 */
 #ifndef __PCTOOL__
 
 /* define for all cpus from SH family */
-#if (CONFIG_CPU == SH7034)
+#if (ARCH == ARCH_SH) && (CONFIG_CPU == SH7034)
 #define CPU_SH
 #endif
 
 /* define for all cpus from coldfire family */
-#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
+#if (ARCH == ARCH_M68K) && ((CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250))
 #define CPU_COLDFIRE
 #endif
 
@@ -565,31 +565,13 @@ Lyre prototype 1 */
 #endif
 
 /* define for all cpus from ARM family */
-#if ((CONFIG_PLATFORM & PLATFORM_MAEMO5) && defined(MAEMO_ARM_BUILD)) \
-  || (CONFIG_PLATFORM & PLATFORM_PANDORA)
+#if ARCH == ARCH_ARM
 #define CPU_ARM
-#define ARM_ARCH 7 /* ARMv7 */
-
-#elif (CONFIG_CPU == IMX31L) || defined(SAMSUNG_YPR0) \
-  || ((CONFIG_PLATFORM & PLATFORM_MAEMO4) && defined(MAEMO_ARM_BUILD))
-#define CPU_ARM
-#define ARM_ARCH 6 /* ARMv6 */
-
-#elif defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320) \
-  || (CONFIG_CPU == AT91SAM9260) || (CONFIG_CPU == AS3525v2) \
-  || (CONFIG_CPU == S5L8702) || (CONFIG_CPU == IMX233) \
-  || (CONFIG_CPU == RK27XX) ||(CONFIG_PLATFORM & PLATFORM_ANDROID)
-#define CPU_ARM
-#define ARM_ARCH 5 /* ARMv5 */
-
-#elif defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-  || (CONFIG_CPU == DSC25) || defined(CPU_S5L870X) || (CONFIG_CPU == AS3525)
-#define CPU_ARM
-#define ARM_ARCH 4 /* ARMv4 */
+#define ARM_ARCH ARCH_VERSION /* ARMv{4,5,6,7} */
 #endif
 
-#if (CONFIG_CPU == JZ4732)
-#define CPU_MIPS 32
+#if ARCH == ARCH_MIPS
+#define CPU_MIPS ARCH_VERSION /* 32, 64 */
 #endif
 
 #endif /*__PCTOOL__*/

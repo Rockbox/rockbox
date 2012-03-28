@@ -88,7 +88,7 @@ $(WMAPROLIB) : CODECFLAGS += -O1
 $(WMAVOICELIB) : CODECFLAGS += -O1
 
 # fine-tuning of CODECFLAGS per cpu arch
-ifeq ($(ARCH),arm)
+ifeq ($(ARCH),arch_arm)
   # redo per arm generation
   $(ALACLIB) : CODECFLAGS += -O2
   $(AYLIB) : CODECFLAGS +=  -O1
@@ -100,7 +100,7 @@ ifeq ($(ARCH),arm)
   $(VGMLIB) : CODECFLAGS +=  -O1
   $(EMU2413LIB) : CODECFLAGS +=  -O3
   $(WAVPACKLIB) : CODECFLAGS += -O3
-else ifeq ($(ARCH),m68k)
+else ifeq ($(ARCH),arch_m68k)
   $(A52LIB) : CODECFLAGS += -O2
   $(ASFLIB) : CODECFLAGS += -O3
   $(ATRACLIB) : CODECFLAGS += -O2
