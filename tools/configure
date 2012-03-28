@@ -225,6 +225,10 @@ simcc () {
  prefixtools "$CROSS_COMPILE"
  ARG_ARM_THUMB=0 # can't use thumb in native builds
 
+ # unset arch if already set shcc() and friends
+ arch=
+ arch_version=
+
  app_type=$1
  winbuild=""
  GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
