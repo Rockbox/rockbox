@@ -259,10 +259,10 @@
   </source>
   <dest>
   *: "PLAY = Ano"
-    cowond2*: "MENU, or top-right = Ano"
+    cowond2*: "MENU, nebo vpravo nahoře = Ano"
     iriverh100,iriverh120,iriverh300: "NAVI = Ano"
     samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Ano"
-    mrobe500: "PLAY, POWER, or top-right = Ano"
+    mrobe500: "PLAY, POWER, nebo vpravo nahoře = Ano"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Ano"
   </dest>
@@ -1904,10 +1904,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Pokračovat další složkou"
+    *: "Pokračovat do další složky"
   </dest>
   <voice>
-    *: "Pokračovat další složkou"
+    *: "Pokračovat do další složky"
   </voice>
 </phrase>
 <phrase>
@@ -2243,14 +2243,14 @@
   <dest>
     *: "Vytvářím databázi... %d nalezeno (OFF pro návrat)"
     iriverh100,iriverh120,iriverh300: "Vytvářím databázi... %d nalezeno (STOP pro návrat)"
-    ipod*: "Vytvářím databázi... %d found (PREV pro návrat)"
+    ipod*: "Vytvářím databázi... %d nalezeno (PREV pro návrat)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Vytvářím databázi... %d nalezeno (LEFT pro návrat)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Vytvářím databázi... %d nalezeno (PREV pro návrat)"
     gogearsa9200: "Vytvářím databázi.. %d nalezeno (REW pro návrat)"
     archosplayer: "Vytvář. DB %d nalez."
   </dest>
   <voice>
-    *: "záznamů vytvořeno do databáze"
+    *: "Vytváření záznamů do databáze"
   </voice>
 </phrase>
 <phrase>
@@ -2909,7 +2909,7 @@
   </source>
   <dest>
     *: none
-    remote_ticking: "Zredukova tikání"
+    remote_ticking: "Zredukovat tikání"
   </dest>
   <voice>
     *: none
@@ -5700,8 +5700,8 @@
   </source>
   <dest>
     *: none
-    recording: "Mikrofón"
-    iriverh100,iriverh120,iriverh300: "Interní mikrofón"
+    recording: "Mikrofon"
+    iriverh100,iriverh120,iriverh300: "Interní mikrofon"
   </dest>
   <voice>
     *: none
@@ -6483,10 +6483,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Vkládat složky rekurzivně"
+    *: "Vkládat podsložky"
   </dest>
   <voice>
-    *: "Vkládat složky rekurzivně"
+    *: "Vkládat podsložky"
   </voice>
 </phrase>
 <phrase>
@@ -6497,10 +6497,10 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "Rekurzivně?"
+    *: "Vložit i podsložky?"
   </dest>
   <voice>
-    *: "Rekurzivně?"
+    *: "Vložit i podsložky?"
   </voice>
 </phrase>
 <phrase>
@@ -7650,7 +7650,7 @@
     *: "Přidat do zástupců"
   </dest>
   <voice>
-    *: "Přidat do zástupců"
+    *: "Přidat do zástupců, položka ale nebude ozvučená"
   </voice>
 </phrase>
 <phrase>
@@ -10161,7 +10161,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "nula nula"
+    rtc: "nula"
   </voice>
 </phrase>
 <phrase>
@@ -11359,11 +11359,11 @@
   </source>
   <dest>
     *: none
-    remote: "Dalkový stavový řádek"
+    remote: "Dálkový stavový řádek"
   </dest>
   <voice>
     *: none
-    remote: "Dalkový stavový řádek"
+    remote: "Dálkový stavový řádek"
   </voice>
 </phrase>
 <phrase>
@@ -12539,10 +12539,10 @@
     *: "Start File Browser Here"
   </source>
   <dest>
-    *: "Otevírat prohlížení souborů zde"
+    *: "Nastavit jako výchozí složku"
   </dest>
   <voice>
-    *: "Otevírat prohlížení souborů zde"
+    *: "Nastavit jako výchozí složku"
   </voice>
 </phrase>
 <phrase>
@@ -12553,10 +12553,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Nastavit prohlížení souborů na root"
+    *: "Výchozí složku nastavit na root"
   </dest>
   <voice>
-    *: "Nastavit prohlížení souborů na růt"
+    *: "Výchozí složku nastavit na růt"
   </voice>
 </phrase>
 <phrase>
@@ -12740,11 +12740,11 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "Skrýt interni disk přes USB"
+    multidrive_usb: "Skrýt interní pamět přes USB"
   </dest>
   <voice>
     *: none
-    multidrive_usb: "Skrýt interni disk přes ÚESBÉ"
+    multidrive_usb: "Skrýt interní pamět přes ÚESBÉ"
   </voice>
 </phrase>
 <phrase>
@@ -12779,20 +12779,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
-  desc: shown instead of sleep timer when it's running
-  user: core
-  <source>
-    *: "Cancel Sleep Timer"
-  </source>
-  <dest>
-    *: "Zrušit časovač vypnutí"
-  </dest>
-  <voice>
-    *: "Zrušit časovač vypnutí, zbývá"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SLEEP_TIMER_DURATION
   desc: default sleep timer duration in minutes (unused in UI)
   user: core
@@ -12821,34 +12807,31 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_GLYPHS
-  desc: in settings_menu
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
   user: core
   <source>
-    *: "Glyphs To Cache"
+    *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Vyrovnávací paměť pro glyphy"
+    *: "Zrušit časovač vypnutí"
   </dest>
   <voice>
-    *: "Vyrovnávací paměť pro glyphy"
+    *: "Zrušit časovač vypnutí, zbývá"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KEYCLICK_HARDWARE
-  desc: in keyclick settings menu
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
   user: core
   <source>
-    *: none
-    hardware_click: "Speaker Keyclick"
+    *: "Shortcuts"
   </source>
   <dest>
-    *: none
-    hardware_click: "Kliknutí přes reproduktor"
+    *: "Zástupci"
   </dest>
   <voice>
-    *: none
-    hardware_click: "Kliknutí přes reproduktor"
+    *: "Zástupci"
   </voice>
 </phrase>
 <phrase>
@@ -12869,17 +12852,34 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHORTCUTS
-  desc: Title in the shortcuts menu
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
   user: core
   <source>
-    *: "Shortcuts"
+    *: none
+    hardware_click: "Speaker Keyclick"
   </source>
   <dest>
-    *: "Zástupci"
+    *: none
+    hardware_click: "Kliknutí přes reproduktor"
   </dest>
   <voice>
-    *: "Zástupci"
+    *: none
+    hardware_click: "Kliknutí přes reproduktor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Vyrovnávací paměť pro glyphy"
+  </dest>
+  <voice>
+    *: "Vyrovnávací paměť pro glyphy"
   </voice>
 </phrase>
 <phrase>
@@ -12908,5 +12908,36 @@
   </dest>
   <voice>
     *: "Stisk klávesy restartuje časovač vypnutí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "Omezit pokračování do další složky"
+  </dest>
+  <voice>
+    *: "Omezit pokračování do další složky"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Použít menu Zástupci místo Rychlé nabídky"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Použít menu Zástupci místo Rychlé nabídky"
   </voice>
 </phrase>
