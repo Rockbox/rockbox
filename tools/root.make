@@ -100,6 +100,7 @@ else ifneq (,$(findstring database,$(APP_TYPE)))
   include $(APPSDIR)/database.make
 else ifneq (,$(findstring warble,$(APP_TYPE)))
   include $(ROOTDIR)/lib/rbcodec/test/warble.make
+  include $(ROOTDIR)/lib/tlsf/libtlsf.make
   include $(APPSDIR)/codecs/codecs.make
   include $(ROOTDIR)/lib/rbcodec/rbcodec.make
 else
