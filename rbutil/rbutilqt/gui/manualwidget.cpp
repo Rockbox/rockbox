@@ -59,8 +59,8 @@ QString ManualWidget::manualUrl(ManualFormat format)
             manualbasename += "/rockbox-build";
             break;
         case ManualZip:
-            manual.replace("%EXTENSION%", "-html.zip");
-            manualbasename += "/rockbox-build";
+            manual.replace("%EXTENSION%", "zip");
+            manualbasename += "-html";
             break;
         default:
             break;
