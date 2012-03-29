@@ -25,6 +25,8 @@
 #include <pthread.h>
 #include "config.h"
 #include "system.h"
+#include "power.h"
+#include "button.h"
 
 
 
@@ -40,8 +42,16 @@ uintptr_t *stackend;
 extern int main(void);
 extern void telephony_init_device(void);
 
-void system_exception_wait(void) { }
-void system_reboot(void) { }
+void system_exception_wait(void)
+{
+    intptr_t dummy = 0;
+    while(button_read_device(&dummy) != BUTTON_BACK);
+}
+
+void system_reboot(void)
+{
+    power_off();
+}
 
 /* this is used to return from the entry point of the native library. */
 static jmp_buf poweroff_buf;
