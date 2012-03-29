@@ -375,29 +375,13 @@ const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
     }
 }
 
-static void sleep_timer_set(int minutes)
-{
-    if (minutes)
-        global_settings.sleeptimer_duration = minutes;
-    set_sleep_timer(minutes * 60);
-}
-
-static int sleep_timer(void)
-{
-    int minutes = global_settings.sleeptimer_duration;
-    if (get_sleep_timer())
-        sleep_timer_set(0);
-    else
-        set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
-                &sleep_timer_set, 5, 0, 300, sleep_timer_formatter);
-    return 0;
-}
-
 static int seconds_to_min(int secs)
 {
     return (secs + 10) / 60;  /* round up for 50+ seconds */
 }
 
+/* A string representation of either whether a sleep timer will be started or
+   canceled, and how long it will be or how long is remaining in brackets */
 static char* sleep_timer_getname(int selected_item, void * data, char *buffer)
 {
     (void)selected_item;
@@ -405,16 +389,12 @@ static char* sleep_timer_getname(int selected_item, void * data, char *buffer)
     int sec = get_sleep_timer();
     char timer_buf[10];
     /* we have no sprintf, so MAX_PATH is a guess */
-    if (sec > 0)
-    {   /* show cancel and countdown if running */
-        snprintf(buffer, MAX_PATH, "%s (%s)",
-                 str(LANG_SLEEP_TIMER_CANCEL_CURRENT),
-                 sleep_timer_formatter(timer_buf, sizeof(timer_buf),
-                                       seconds_to_min(sec), NULL));
-    }
-    else
-        snprintf(buffer, MAX_PATH, "%s", str(LANG_SLEEP_TIMER));
-
+    snprintf(buffer, MAX_PATH, "%s (%s)",
+             str(sec ? LANG_SLEEP_TIMER_CANCEL_CURRENT
+                 : LANG_SLEEP_TIMER_START_CURRENT),
+             sleep_timer_formatter(timer_buf, sizeof(timer_buf),
+                sec ? seconds_to_min(sec)
+                    : global_settings.sleeptimer_duration, NULL));
     return buffer;
 }
 
@@ -423,27 +403,54 @@ static int sleep_timer_voice(int selected_item, void*data)
     (void)selected_item;
     (void)data;
     int seconds = get_sleep_timer();
-    if (seconds > 0)
-    {
-        long talk_ids[] = {
-            LANG_SLEEP_TIMER_CANCEL_CURRENT,
-            VOICE_PAUSE,
-            seconds_to_min(seconds) | UNIT_MIN << UNIT_SHIFT,
-            TALK_FINAL_ID
-        };
-        talk_idarray(talk_ids, true);
-    }
-    else
-        talk_id(LANG_SLEEP_TIMER, true);
+    long talk_ids[] = {
+        seconds ? LANG_SLEEP_TIMER_CANCEL_CURRENT
+            : LANG_SLEEP_TIMER_START_CURRENT,
+        VOICE_PAUSE,
+        (seconds ? seconds_to_min(seconds)
+            : global_settings.sleeptimer_duration) | UNIT_MIN << UNIT_SHIFT,
+        TALK_FINAL_ID
+    };
+    talk_idarray(talk_ids, true);
     return 0;
+}
+
+/* If a sleep timer is running, cancel it, otherwise start one */
+static int toggle_sleeptimer(void)
+{
+    set_sleep_timer(get_sleep_timer() ? 0
+                    : global_settings.sleeptimer_duration * 60);
+    return 0;
+}
+
+/* Handle restarting a current sleep timer to the newly set default
+   duration */
+static int sleeptimer_duration_cb(int action,
+    const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    static int initial_duration;
+    switch (action)
+    {
+        case ACTION_ENTER_MENUITEM:
+            initial_duration = global_settings.sleeptimer_duration;
+            break;
+        case ACTION_EXIT_MENUITEM:
+            if (initial_duration != global_settings.sleeptimer_duration
+                    && get_sleep_timer())
+                set_sleep_timer(global_settings.sleeptimer_duration * 60);
+    }
+    return action;
 }
 
 MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
-MENUITEM_FUNCTION_DYNTEXT(sleep_timer_call, 0, sleep_timer, NULL,
-                          sleep_timer_getname, sleep_timer_voice, NULL, NULL,
-                          Icon_Menu_setting);
-                          /* make it look like a setting to the user */
+MENUITEM_FUNCTION_DYNTEXT(sleeptimer_toggle, 0, toggle_sleeptimer, NULL,
+                          sleep_timer_getname, sleep_timer_voice, NULL,
+                          NULL, Icon_NOICON);
+MENUITEM_SETTING(sleeptimer_duration,
+                 &global_settings.sleeptimer_duration,
+                 sleeptimer_duration_cb);
 MENUITEM_SETTING(sleeptimer_on_startup,
                  &global_settings.sleeptimer_on_startup, NULL);
 MENUITEM_SETTING(keypress_restarts_sleeptimer,
@@ -453,7 +460,8 @@ MAKE_MENU(startup_shutdown_menu, ID2P(LANG_STARTUP_SHUTDOWN),
           0, Icon_System_menu,
             &start_screen,
             &poweroff,
-            &sleep_timer_call,
+            &sleeptimer_toggle,
+            &sleeptimer_duration,
             &sleeptimer_on_startup,
             &keypress_restarts_sleeptimer
          );
