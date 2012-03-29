@@ -82,6 +82,8 @@ void panicf( const char *fmt, ...)
     vsnprintf( panic_buf, sizeof(panic_buf), fmt, ap );
     va_end( ap );
 
+    lcd_set_viewport(NULL);
+
 #ifdef HAVE_LCD_CHARCELLS
     lcd_double_height(false);
     lcd_puts(0, 0, "*PANIC*");
@@ -98,7 +100,6 @@ void panicf( const char *fmt, ...)
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
-    lcd_set_viewport(NULL);
     lcd_puts(1, y++, (unsigned char *)"*PANIC*");
     {
         /* wrap panic line */
