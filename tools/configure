@@ -10,7 +10,9 @@
 # global CC options for all platforms
 CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -std=gnu99"
 
-# global LD options for all platforms
+# LD options for the core
+LDOPTS=""
+# LD options for the core + plugins
 GLOBAL_LDOPTS=""
 
 extradefines=""
@@ -235,7 +237,7 @@ simcc () {
 
  GCCOPTS="$GCCOPTS -fno-builtin -g"
  GCCOPTIMIZE=''
- LDOPTS='-lm' # button-sdl.c uses sqrt()
+ LDOPTS='$LDOPTS -lm' # button-sdl.c uses sqrt()
  sigaltstack=""
  fibers=""
  endian="" # endianess of the dap doesnt matter here
