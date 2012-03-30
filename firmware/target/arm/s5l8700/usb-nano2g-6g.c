@@ -85,4 +85,5 @@ void usb_init_device(void)
     PWRCON(0) |= 0x4;
     PWRCON(1) |= 0x8;
 #endif
+}
 #endif
