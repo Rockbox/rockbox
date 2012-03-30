@@ -237,7 +237,7 @@ simcc () {
 
  GCCOPTS="$GCCOPTS -fno-builtin -g"
  GCCOPTIMIZE=''
- LDOPTS='$LDOPTS -lm' # button-sdl.c uses sqrt()
+ LDOPTS="$LDOPTS -lm" # button-sdl.c uses sqrt()
  sigaltstack=""
  fibers=""
  endian="" # endianess of the dap doesnt matter here
@@ -3686,7 +3686,7 @@ if [ -z "$arch" ]; then
         arch_version="$(echo $cpp_defines | sed s,\ ,\\n,g | grep __ARM_ARCH | sed -e 's,.*\([0-9]\).*,\1,')"
     elif [ -n "$(echo $cpp_defines | grep -w __mips__)" ]; then
         arch="mips" # FIXME: autodetect version (32 or 64)
-    elif [ -n "$(echo $cpp_defines | grep -w _X86_)" ]; then
+    elif [ -n "$(echo $cpp_defines | grep -w __i386__)" ]; then
         arch="x86"
     elif [ -n "$(echo $cpp_defines | grep -w __x86_64__)" ]; then
         arch="amd64"
