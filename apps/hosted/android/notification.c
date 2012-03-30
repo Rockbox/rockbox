@@ -124,7 +124,7 @@ void notification_init(void)
 {
     JNIEnv e = *env_ptr;
     jfieldID nNM = e->GetFieldID(env_ptr, RockboxService_class,
-                    "fg_runner", "Lorg/rockbox/Helper/RunForegroundManager;");
+                    "mFgRunner", "Lorg/rockbox/Helper/RunForegroundManager;");
     NotificationManager_instance = e->GetObjectField(env_ptr,
                                                 RockboxService_instance, nNM);
     if (NotificationManager_instance == NULL)
