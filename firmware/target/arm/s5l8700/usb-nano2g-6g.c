@@ -24,7 +24,7 @@
 #include "usb-s3c6400x.h"
 #include "cpu.h"
 
-#ifdef HAVE_USBSTACK
+#if 0 //def HAVE_USBSTACK
 #include "usb_core.h"
 #include "usb_drv.h"
 #include "power.h"
