@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$version="3.11RC";
+$version="3.11";
 
 require "tools/builds.pm";
 
