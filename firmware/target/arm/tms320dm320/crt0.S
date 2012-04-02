@@ -292,51 +292,6 @@ _delay_cycles:
 .size       _delay_cycles, .-_delay_cycles
 
 /******************************************************************************
- *  Unused exception vectors.  These call the UIE function.                   *
- *  Arguements are:                                                           *
- *      r0: PC of exception                                                   *
- *      r1: Exception number.                                                 *
- *  Exception numbers are as defined:                                         *
- *      0: Undefined Instruction                                              *
- *      1: Prefetch Abort                                                     *
- *      2: Data Abort                                                         *
- *      3: DIV0                                                               *
- *      4: SWI                                                                *
- *  The exceptions return operations are documented in section A2.6 of the    *
- *  ARM Architecture Reference Manual.                                        *
- ******************************************************************************/
-
-/* A2.6.3: Undefined Instruction Exception - LR=PC of next instruction */
-_undefined_instruction:
-    sub    r0, lr, #4
-    mov    r1, #0
-    bl     UIE
-
-/* A2.6.4: Software Interrupt exception - These should not happen in Rockbox,
- * make it illegal
- */
-_software_interrupt:
-    sub    r0, lr, #4
-    mov    r1, #4
-    bl     UIE
-
-/* A2.6.5 Prefetch Abort - This is also the BKPT instruction since this is a
- * v5 target.  Pass it on to UIE since it is not currently used.
- */
-_prefetch_abort:
-    sub    r0, lr, #4
-    mov    r1, #1
-    bl     UIE
-
-/* A2.6.6 Data Abort - There was a memory abort, can return after fixing cause
- * with the LR address.
- */
-_data_abort:
-    sub    r0, lr, #8 
-    mov    r1, #2
-    bl     UIE
-
-/******************************************************************************
  * _dead_loop: Something really unexpected happened (like a reserved          *
  * exception).  Just hang.                                                    *
  ******************************************************************************/
