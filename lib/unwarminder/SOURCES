@@ -5,3 +5,4 @@ unwarm.c
 unwarminder.c
 unwarmmem.c
 unwarm_thumb.c
+safe_read.S
