@@ -36,7 +36,9 @@ TTSBase::TTSBase(QObject* parent): EncTtsSettingInterface(parent)
 // static functions
 void TTSBase::initTTSList()
 {
+#if !defined(Q_OS_WIN)
     ttsList["espeak"] = tr("Espeak TTS Engine");
+#endif
     ttsList["flite"] = tr("Flite TTS Engine");
     ttsList["swift"] = tr("Swift TTS Engine");
 #if defined(Q_OS_WIN)
