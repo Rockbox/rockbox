@@ -31,4 +31,5 @@ get_sp:
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     msr cpsr, r1         /* restore mode */
 #endif
+    bx  lr
 .size __get_sp, . - __get_sp
