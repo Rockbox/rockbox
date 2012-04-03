@@ -74,9 +74,9 @@ int BitswapAudio (unsigned char* pDest, unsigned char* pSrc, size_t len)
 
 int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
 {
-    
+
     int i,j;
-    
+
     /* two tables, one for normal strings, one for voice-only (>0x8000) */
     static char names[1000][80]; /* worst-case space */
     char name[80]; /* one string ID */
@@ -96,7 +96,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
     int target_id;
     int do_bitswap_audio = 0;
 
-    
+
     /* We bitswap the voice file only SH based archos players, target IDs
          equal to or lower than 8. See the target_id line for each target in
          configure */
@@ -129,7 +129,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
     {
         if (voiceonly[i] == 1)
             count_voiceonly++;
-        
+
         pos[i] = ftell(output);
         sprintf(mp3filename1, "%s%s.mp3", filedir, names[i]);
         sprintf(mp3filename2, "%s%s.wav.mp3", filedir, names[i]);
@@ -146,7 +146,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
                 continue;
             }
         }
-        printf("processing %s\n", mp3filename);
+        printf("processing %s", mp3filename);
 
         size[i] = fread(buffer, 1, sizeof(buffer), pMp3File);
         fclose(pMp3File);
@@ -154,7 +154,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
             BitswapAudio(buffer, buffer, size[i]);
         fwrite(buffer, 1, size[i], output);
 
-        printf("%d %s %d\n", i, names[i], size[i]); /* debug */
+        printf(": %d %s %d\n", i, names[i], size[i]); /* debug */
     } /*  for i */
 
 
