@@ -167,7 +167,11 @@ void screen_dump(void)
     if (fd < 0)
         return;
 
-    write(fd, bmpheader, sizeof(bmpheader));
+    if(write(fd, bmpheader, sizeof(bmpheader)) != sizeof(bmpheader))
+    {
+        close(fd);
+        return;
+    }
     SDL_LockSurface(lcd_surface);
 
     /* BMP image goes bottom up */
@@ -191,7 +195,11 @@ void screen_dump(void)
                 dst_mask = 0x80;
             }
         }
-        write(fd, line, sizeof(line));
+        if(write(fd, line, sizeof(line)) != sizeof(line))
+        {
+            close(fd);
+            return;
+        }
     }
     SDL_UnlockSurface(lcd_surface);
     close(fd);
