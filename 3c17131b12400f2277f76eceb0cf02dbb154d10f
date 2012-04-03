@@ -16,6 +16,24 @@
       "revId": "3c17131b12400f2277f76eceb0cf02dbb154d10f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH////Y\u003d",
+        "filename": "tools/configure",
+        "patchSetId": 1
+      },
+      "lineNbr": 3698,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2012-04-03T22:18:19Z",
+      "side": 1,
+      "message": "I didn\u0027t no make it configurable yet. I just split the big patch into several ones for now. Of course this will be selectable.",
+      "parentUuid": "AAAAKH////g\u003d",
+      "revId": "3c17131b12400f2277f76eceb0cf02dbb154d10f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
