@@ -3827,6 +3827,8 @@ if test -n "$t_cpu"; then
   elif [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted"
+    #disable _FORTIFY_SOURCE for simulator builds
+    GCCOPTS="$GCCOPTS -U_FORTIFY_SOURCE"
   fi
 
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
