@@ -40,11 +40,7 @@ $(IMGVBUILDDIR)/%.ovl: $(IMGDEC_OUTLDS)
 		$(filter-out $(PLUGIN_CRT0),$(filter %.o, $^)) \
 		$(filter %.a, $+) \
 		-lgcc $(IMGDEC_OVLFLAGS)
-ifdef APP_TYPE
-	$(SILENT)cp $(IMGVBUILDDIR)/$*.elf $@
-else
-	$(SILENT)$(OC) -O binary $(IMGVBUILDDIR)/$*.elf $@
-endif
+	$(SILENT)$(call objcopy,$(IMGVBUILDDIR)/$*.elf,$@)
 
 # rule to create reference map for image decoder
 $(IMGVBUILDDIR)/%.refmap: $(APPSDIR)/plugin.h $(IMGVSRCDIR)/imageviewer.h $(PLUGINLINK_LDS) $(PLUGIN_LIBS)

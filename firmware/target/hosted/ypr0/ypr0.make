@@ -21,4 +21,4 @@ $(BUILDDIR)/rockbox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS)
 		$(LDOPTS) $(GLOBAL_LDOPTS) -Wl,-Map,$(BUILDDIR)/rockbox.map
 
 $(BUILDDIR)/rockbox : $(BUILDDIR)/rockbox.elf
-	$(call PRINTS,OC $(@F))$(OC) -S -x $< $@
+	$(call PRINTS,OC $(@F))$(call objcopy,$^,$@)

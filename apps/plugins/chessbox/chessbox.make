@@ -44,7 +44,7 @@ $(CHESSBOX_OBJDIR)/chessbox.ovl: $(CHESSBOX_OBJ) $(CHESSBOX_OUTLDS)
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(CHESSBOX_OVLFLAGS)
-	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
+	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 
 # special pattern rule for compiling chessbox with extra flags
 $(CHESSBOX_OBJDIR)/%.o: $(CHESSBOX_SRCDIR)/%.c $(CHESSBOX_SRCDIR)/chessbox.make

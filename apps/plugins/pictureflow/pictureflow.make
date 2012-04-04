@@ -50,7 +50,7 @@ $(PICTUREFLOW_OBJDIR)/pictureflow.ovl: $(PICTUREFLOW_OBJ) $(PICTUREFLOW_OUTLDS)
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(PICTUREFLOW_OVLFLAGS)
-	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
+	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 
 # special pattern rule for compiling pictureflow with extra flags
 $(PICTUREFLOW_OBJDIR)/%.o: $(PICTUREFLOW_SRCDIR)/%.c $(PICTUREFLOW_SRCDIR)/pictureflow.make

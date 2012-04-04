@@ -202,10 +202,4 @@ $(CODECDIR)/%.codec: $(CODECDIR)/%.o
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(CODECLDFLAGS)
-ifndef APP_TYPE
-	$(SILENT)$(OC) -O binary $(CODECDIR)/$*.elf $@ # objcopy native
-else ifeq (,$(findstring sdl-sim,$(APP_TYPE)))
-	$(SILENT)$(OC) -S -x $(CODECDIR)/$*.elf $@	   # objcopy hosted
-else
-	$(SILENT)cp $(CODECDIR)/$*.elf $@			   # no objcopy, keep debug symbols
-endif
+	$(SILENT)$(call objcopy,$(CODECDIR)/$*.elf,$@)

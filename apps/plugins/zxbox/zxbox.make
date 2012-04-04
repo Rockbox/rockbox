@@ -45,7 +45,7 @@ $(ZXBOX_OBJDIR)/zxbox.ovl: $(ZXBOX_OBJ) $(ZXBOX_OUTLDS)
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(ZXBOX_LDFLAGS)
-	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
+	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 
 # special pattern rule for compiling zxbox with extra flags
 $(ZXBOX_OBJDIR)/%.o: $(ZXBOX_SRCDIR)/%.c $(ZXBOX_SRCDIR)/zxbox.make

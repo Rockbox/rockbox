@@ -56,4 +56,4 @@ $(LUA_BUILDDIR)/lua.ovl: $(LUA_OBJ) $(LUA_OUTLDS)
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(LUA_OVLFLAGS)
-	$(call PRINTS,LD $(@F))$(OC) -O binary $(basename $@).elf $@
+	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)

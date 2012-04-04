@@ -36,10 +36,6 @@ $(PDBOXBUILDDIR)/pdbox.rock:
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(PDBOXLDFLAGS)
-ifdef APP_TYPE
-	$(SILENT)cp $*.elf $@
-else
-	$(SILENT)$(OC) -O binary $*.elf $@
-endif
+	$(SILENT)$(call objcopy,$*.elf,$@)
 
 

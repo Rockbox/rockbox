@@ -220,10 +220,10 @@ $(BUILDDIR)/rombox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $$(LIN
 		-T$(LINKROM) -Wl,-Map,$(BUILDDIR)/rombox.map
 
 $(BUILDDIR)/rockbox.bin : $(BUILDDIR)/rockbox.elf
-	$(call PRINTS,OC $(@F))$(OC) $(if $(filter yes, $(USE_ELF)), -S -x, -O binary) $< $@
+	$(call PRINTS,OC $(@F))$(call objcopy,$<,$@)
 
 $(BUILDDIR)/rombox.bin : $(BUILDDIR)/rombox.elf
-	$(call PRINTS,OC $(@F))$(OC) -O binary $< $@
+	$(call PRINTS,OC $(@F))$(call objcopy,$<,$@)
 
 #
 # If there's a flashfile defined for this target (rockbox.ucl for Archos

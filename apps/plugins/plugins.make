@@ -120,13 +120,7 @@ $(BUILDDIR)/%.rock:
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(PLUGINLDFLAGS)
-ifndef APP_TYPE
-	$(SILENT)$(OC) -O binary $(BUILDDIR)/$*.elf $@ # objcopy native
-else ifeq (,$(findstring sdl-sim,$(APP_TYPE)))
-	$(SILENT)$(OC) -S -x $(BUILDDIR)/$*.elf $@	   # objcopy hosted
-else
-	$(SILENT)cp $(BUILDDIR)/$*.elf $@			   # no objcopy, keep debug symbols
-endif
+	$(SILENT)$(call objcopy,$(BUILDDIR)/$*.elf,$@)
 
 $(BUILDDIR)/apps/plugins/%.lua: $(ROOTDIR)/apps/plugins/%.lua
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $(BUILDDIR)/apps/plugins/
