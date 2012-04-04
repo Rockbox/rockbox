@@ -54,14 +54,15 @@ enum codec_status codec_run(void)
     int errcount = 0;
     intptr_t param;
 
-    /* Proper reset of the decoder context. */
-    memset(&wmadec, 0, sizeof(wmadec));
-
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
     resume_offset = ci->id3->offset;
 
 restart_track:
+
+    /* Proper reset of the decoder context. */
+    memset(&wmadec, 0, sizeof(wmadec));
+
     if (codec_init()) {
         LOGF("WMA: Error initialising codec\n");
         return CODEC_ERROR;
@@ -111,6 +112,15 @@ restart_track:
         /* Deal with any pending seek requests */
         if (action == CODEC_ACTION_SEEK_TIME) {
 
+            /*flush the wma decoder state*/
+            wmadec.last_superframe_len = 0;
+            wmadec.last_bitoffset = 0;
+
+            /*zero the frame out buffer so we don't overlap with a 
+                stale samples*/
+            memset((*(wmadec.frame_out)), 0,
+                sizeof(fixed32) * MAX_CHANNELS * BLOCK_MAX_SIZE * 2);
+
             if (param == 0) {
                 ci->set_elapsed(0);
                 ci->seek_complete();
@@ -124,10 +134,6 @@ restart_track:
                 break;
             }
             /*DEBUGF("Seek returned %d\n", (int)elapsedtime);*/
-
-            /*flush the wma decoder state*/
-            wmadec.last_superframe_len = 0;
-            wmadec.last_bitoffset = 0;
 
             ci->set_elapsed(elapsedtime);
             ci->seek_complete();
