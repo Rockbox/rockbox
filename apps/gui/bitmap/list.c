@@ -587,7 +587,7 @@ static int kinetic_callback(struct timeout *tmo)
             data->velocity = 0;
     }
 
-    queue_post(&button_queue, BUTTON_TOUCHSCREEN, 0);
+    queue_post(&button_queue, BUTTON_REDRAW, 0);
     /* stop if the velocity hit or crossed zero */
     if (!data->velocity)
     {

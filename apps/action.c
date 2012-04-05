@@ -233,6 +233,10 @@ static int get_action_worker(int context, int timeout,
      * multimedia button presses don't go through the action system */
     if (button == BUTTON_NONE || button & (SYS_EVENT|BUTTON_MULTIMEDIA))
         return button;
+    /* the special redraw button should result in a screen refresh */
+    if (button == BUTTON_REDRAW)
+        return ACTION_REDRAW;
+
     /* Don't send any buttons through untill we see the release event */
     if (wait_for_release)
     {

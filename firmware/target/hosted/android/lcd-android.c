@@ -146,7 +146,7 @@ Java_org_rockbox_RockboxFramebuffer_surfaceCreated(JNIEnv *env, jobject this,
     send_event(LCD_EVENT_ACTIVATION, NULL);
     /* Force an update, since the newly created surface is initially black
      * waiting for the next normal update results in a longish black screen */
-    queue_post(&button_queue, BUTTON_FORCE_REDRAW, 0);
+    queue_post(&button_queue, BUTTON_REDRAW, 0);
 }
 
 /*

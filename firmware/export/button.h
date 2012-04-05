@@ -81,13 +81,15 @@ void wheel_send_events(bool send);
 int button_apply_acceleration(const unsigned int data);
 #endif
 
-#define BUTTON_NONE        0x00000000
+#define BUTTON_NONE         0x00000000
 
 /* Button modifiers */
-#define BUTTON_REL         0x02000000
-#define BUTTON_REPEAT      0x04000000
-#define BUTTON_TOUCHSCREEN 0x08000000
-#define BUTTON_MULTIMEDIA  0x10000000
+#define BUTTON_REL          0x02000000
+#define BUTTON_REPEAT       0x04000000
+/* Special buttons */
+#define BUTTON_TOUCHSCREEN  0x08000000
+#define BUTTON_MULTIMEDIA   0x10000000
+#define BUTTON_REDRAW       0x20000000
 
 #define BUTTON_MULTIMEDIA_PLAYPAUSE (BUTTON_MULTIMEDIA|0x01)
 #define BUTTON_MULTIMEDIA_STOP      (BUTTON_MULTIMEDIA|0x02)
