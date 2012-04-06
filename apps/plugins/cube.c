@@ -349,6 +349,16 @@
 #define CUBE_PAUSE         BUTTON_SELECT
 #define CUBE_HIGHSPEED     (BUTTON_UP|BUTTON_POWER)
 
+#elif (CONFIG_KEYPAD == HM801_PAD)
+#define CUBE_QUIT          BUTTON_POWER
+#define CUBE_NEXT          BUTTON_RIGHT
+#define CUBE_PREV          BUTTON_LEFT
+#define CUBE_INC           BUTTON_UP
+#define CUBE_DEC           BUTTON_DOWN
+#define CUBE_MODE          BUTTON_PREV
+#define CUBE_PAUSE         BUTTON_SELECT
+#define CUBE_HIGHSPEED     BUTTON_NEXT
+
 #else
 #error No keymap defined!
 #endif

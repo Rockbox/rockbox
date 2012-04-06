@@ -1023,3 +1023,5 @@
 #define PFCNTRB_CTRL        (*(volatile unsigned long *)(ARM_CACHE_CTRL + 0x28))
 #define PFCNTRB             (*(volatile unsigned long *)(ARM_CACHE_CTRL + 0x2C))
 
+/* Timer frequency */
+#define TIMER_FREQ 50000000

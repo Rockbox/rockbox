@@ -275,6 +275,15 @@ GREY_INFO_STRUCT
 #   define FFT_WINDOW       (BUTTON_POWER|BUTTON_SELECT)
 #   define FFT_QUIT         BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == HM801_PAD)
+#   define FFT_PREV_GRAPH   BUTTON_LEFT
+#   define FFT_NEXT_GRAPH   BUTTON_RIGHT
+#   define FFT_AMP_SCALE    BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
+#   define FFT_ORIENTATION  BUTTON_SELECT
+#   define FFT_WINDOW       BUTTON_PLAY
+#   define FFT_QUIT         BUTTON_POWER
+
 #elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!
 #endif

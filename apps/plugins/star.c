@@ -514,6 +514,23 @@
 #define STAR_LEVEL_DOWN_NAME "POWER + DOWN"
 #define STAR_LEVEL_REPEAT_NAME "POWER + SELECT"
 
+#elif (CONFIG_KEYPAD == HM801_PAD)
+
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_SELECT
+#define STAR_LEVEL_UP       BUTTON_NEXT
+#define STAR_LEVEL_DOWN     BUTTON_PREV
+#define STAR_LEVEL_REPEAT   BUTTON_PLAY
+#define STAR_TOGGLE_CONTROL_NAME "SELECT"
+#define STAR_QUIT_NAME           "POWER"
+#define STAR_LEVEL_UP_NAME       "NEXT"
+#define STAR_LEVEL_DOWN_NAME     "PREV"
+#define STAR_LEVEL_REPEAT_NAME   "PLAY"
+
 #else
 #error No keymap defined!
 #endif

@@ -402,6 +402,18 @@
 #define FRACTAL_PRECISION_DEC   (BUTTON_POWER | BUTTON_DOWN)
 #define FRACTAL_RESET           (BUTTON_POWER | BUTTON_LEFT)
 
+#elif CONFIG_KEYPAD == HM801_PAD
+#define FRACTAL_QUIT            BUTTON_POWER
+#define FRACTAL_UP              BUTTON_UP
+#define FRACTAL_DOWN            BUTTON_DOWN
+#define FRACTAL_LEFT            BUTTON_LEFT
+#define FRACTAL_RIGHT           BUTTON_RIGHT
+#define FRACTAL_ZOOM_IN         BUTTON_SELECT
+#define FRACTAL_ZOOM_OUT        BUTTON_PLAY
+#define FRACTAL_PRECISION_INC   BUTTON_NEXT
+#define FRACTAL_PRECISION_DEC   BUTTON_PREV
+#define FRACTAL_RESET           (BUTTON_POWER | BUTTON_PLAY)
+
 #else
 #error No keymap defined!
 #endif

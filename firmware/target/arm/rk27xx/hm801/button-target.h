@@ -31,6 +31,12 @@
 #define BUTTON_PREV        0x00000080
 #define BUTTON_PLAY        0x00000100
 
+#define BUTTON_MAIN        (BUTTON_UP|BUTTON_POWER| \
+                            BUTTON_DOWN|BUTTON_LEFT| \
+                            BUTTON_RIGHT|BUTTON_SELECT| \
+                            BUTTON_NEXT|BUTTON_PREV| \
+                            BUTTON_PLAY)
+
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 30
 

@@ -403,6 +403,18 @@
 #define IMGVIEW_MENU        BUTTON_SELECT
 #define IMGVIEW_QUIT        BUTTON_POWER
 
+#elif CONFIG_KEYPAD == HM801_PAD
+#define IMGVIEW_ZOOM_IN     BUTTON_PLAY
+#define IMGVIEW_ZOOM_OUT    (BUTTON_POWER | BUTTON_PLAY)
+#define IMGVIEW_UP          BUTTON_UP
+#define IMGVIEW_DOWN        BUTTON_DOWN
+#define IMGVIEW_LEFT        BUTTON_LEFT
+#define IMGVIEW_RIGHT       BUTTON_RIGHT
+#define IMGVIEW_NEXT        BUTTON_NEXT
+#define IMGVIEW_PREVIOUS    BUTTON_PREV
+#define IMGVIEW_MENU        BUTTON_SELECT
+#define IMGVIEW_QUIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

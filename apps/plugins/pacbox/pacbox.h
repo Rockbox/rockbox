@@ -287,6 +287,17 @@
 #define PACMAN_COIN     (BUTTON_POWER | BUTTON_DOWN)
 #define PACMAN_MENU     BUTTON_POWER
 
+#elif CONFIG_KEYPAD == HM801_PAD
+
+#define PACMAN_UP       BUTTON_UP
+#define PACMAN_DOWN     BUTTON_DOWN
+#define PACMAN_LEFT     BUTTON_LEFT
+#define PACMAN_RIGHT    BUTTON_RIGHT
+#define PACMAN_1UP      BUTTON_SELECT
+#define PACMAN_2UP      BUTTON_PLAY
+#define PACMAN_COIN     BUTTON_PREV
+#define PACMAN_MENU     BUTTON_POWER
+
 #else
 
 #error Keymap not defined!

@@ -354,6 +354,18 @@ static void setoptions (void)
         options.SELECT = BUTTON_USER;
         options.MENU   = BUTTON_MENU;
 
+#elif CONFIG_KEYPAD == HM801_PAD
+        options.UP     = BUTTON_UP;
+        options.DOWN   = BUTTON_DOWN;
+        options.LEFT   = BUTTON_LEFT;
+        options.RIGHT  = BUTTON_RIGHT;
+
+        options.A      = BUTTON_PREV;
+        options.B      = BUTTON_NEXT;
+        options.START  = BUTTON_PLAY;
+        options.SELECT = BUTTON_SELECT;
+        options.MENU   = BUTTON_POWER;
+
 #else
 #error No Keymap Defined!
 #endif

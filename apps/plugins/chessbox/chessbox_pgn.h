@@ -443,6 +443,16 @@
 #define CB_LEVEL   (BUTTON_POWER | BUTTON_LEFT)
 #define CB_MENU    (BUTTON_POWER | BUTTON_RIGHT)
 
+#elif CONFIG_KEYPAD == HM801_PAD
+#define CB_SELECT  BUTTON_SELECT
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_LEFT
+#define CB_RIGHT   BUTTON_RIGHT
+#define CB_PLAY    BUTTON_PLAY
+#define CB_LEVEL   BUTTON_PREV
+#define CB_MENU    BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
