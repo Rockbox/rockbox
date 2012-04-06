@@ -25,8 +25,8 @@
 
 #define MAX_TABLE_SIZE     32768
 
-static const int mini_index[6] = {
-    0, 1, 3, 6, 7, 8
+static const int mini_index[7] = {
+    0, 1, 3, 6, 7, 8, 9
 };
 
 static unsigned short iso_table[MAX_TABLE_SIZE];
@@ -140,7 +140,7 @@ unsigned short iso_decode(unsigned char *latin1, int cp, int count)
                     ucs = iso8859_2_to_uni[*latin1++ - 0xA1];
             }
             break;
-        
+
         case 0x08: /* Central European (CP1250) */
             while (count--) {
                 /* first convert to unicode */
@@ -150,7 +150,17 @@ unsigned short iso_decode(unsigned char *latin1, int cp, int count)
                     ucs = cp1250_to_uni[*latin1++ - 0x80];
             }
             break;
-            
+
+        case 0x09: /* Western European (CP1252) */
+            while (count--) {
+                /* first convert to unicode */
+                if (*latin1 < 0x80 || *latin1 >= 0xa0)
+                    ucs = *latin1++;
+                else
+                    ucs = cp1252_to_uni[*latin1++ - 0x80];
+            }
+            break;
+
         default:
             break;
     }
@@ -209,7 +219,7 @@ int main(int argc, char **argv)
         of = fopen("isomini.cp", "wb");
         if (!of) return 1;
 
-        for (i=1; i<6; i++) {
+        for (i=1; i<7; i++) {
 
             for (j=0; j<128; j++) {
                 k = (unsigned char)j + 128;
@@ -223,7 +233,7 @@ int main(int argc, char **argv)
         of = fopen("iso.cp", "wb");
         if (!of) return 1;
 
-        for (i=1; i<9; i++) {
+        for (i=1; i<10; i++) {
 
             for (j=0; j<128; j++) {
                 k = (unsigned char)j + 128;
