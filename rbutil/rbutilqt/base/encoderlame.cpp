@@ -51,6 +51,9 @@ EncoderLame::EncoderLame(QObject *parent) : EncoderBase(parent)
     SYMBOLRESOLVE(lame_close, int (*)(lame_global_flags*));
 
     qDebug() << "[EncoderLame] libmp3lame loaded:" << lib->isLoaded();
+
+    m_encoderVolume = RbSettings::subValue("lame", RbSettings::EncoderVolume).toDouble();
+    m_encoderQuality = RbSettings::subValue("lame", RbSettings::EncoderQuality).toDouble();
     m_symbolsResolved = true;
 }
 
@@ -87,6 +90,10 @@ void EncoderLame::saveSettings()
                 getSetting(VOLUME)->current().toDouble());
         RbSettings::setSubValue("lame", RbSettings::EncoderQuality,
                 getSetting(QUALITY)->current().toDouble());
+        m_encoderVolume =
+            RbSettings::subValue("lame", RbSettings::EncoderVolume).toDouble();
+        m_encoderQuality =
+            RbSettings::subValue("lame", RbSettings::EncoderQuality).toDouble();
     }
 }
 
@@ -128,13 +135,11 @@ bool EncoderLame::encode(QString input,QString output)
     gfp = m_lame_init();
     m_lame_set_out_samplerate(gfp, 12000);      // resample to 12kHz
     // scale input volume
-    m_lame_set_scale(gfp,
-            RbSettings::subValue("lame", RbSettings::EncoderVolume).toDouble());
+    m_lame_set_scale(gfp, m_encoderVolume);
     m_lame_set_mode(gfp, MONO);                 // mono output mode
     m_lame_set_VBR(gfp, vbr_default);           // enable default VBR mode
     // VBR quality
-    m_lame_set_VBR_quality(gfp,
-            RbSettings::subValue("lame", RbSettings::EncoderQuality).toDouble());
+    m_lame_set_VBR_quality(gfp, m_encoderQuality);
     m_lame_set_VBR_max_bitrate_kbps(gfp, 64);   // maximum bitrate 64kbps
     m_lame_set_bWriteVbrTag(gfp, 0);            // disable LAME tag.
 

@@ -64,6 +64,8 @@ class EncoderLame : public EncoderBase
         int (*m_lame_close)(lame_global_flags*);
 
         bool m_symbolsResolved;
+        double m_encoderVolume;
+        double m_encoderQuality;
 };
 
 #endif
