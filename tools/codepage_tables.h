@@ -22,6 +22,7 @@
 extern const unsigned short iso8859_7_to_uni[];
 extern const unsigned short cp1250_to_uni[];
 extern const unsigned short cp1251_to_uni[];
+extern const unsigned short cp1252_to_uni[];
 extern const unsigned short cp1256_to_uni[];
 extern const unsigned short iso8859_2_to_uni[];
 extern const unsigned short cp932_table[];

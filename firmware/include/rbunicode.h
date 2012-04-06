@@ -45,6 +45,7 @@ enum codepages {
     ISO_8859_9,     /* Turkish */
     ISO_8859_2,     /* Latin Extended */
     WIN_1250,       /* Central European */
+    WIN_1252,       /* Western European */
     SJIS,           /* Japanese */
     GB_2312,        /* Simp. Chinese */
     KSX_1001,       /* Korean */
@@ -62,6 +63,7 @@ enum codepages {
     ISO_8859_9,     /* Turkish */
     ISO_8859_2,     /* Latin Extended */
     WIN_1250,       /* Central European */
+    WIN_1252,       /* Western European */
     UTF_8,          /* Unicode */
     NUM_CODEPAGES
 };
