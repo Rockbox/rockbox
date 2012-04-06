@@ -56,7 +56,7 @@ static const char * const filename[NUM_TABLES] =
 
 static const char cp_2_table[NUM_CODEPAGES] =
 {
-    0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 0
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 0
 };
 
 static const char * const name_codepages[NUM_CODEPAGES+1] =
@@ -70,6 +70,7 @@ static const char * const name_codepages[NUM_CODEPAGES+1] =
     "ISO-8859-9",
     "ISO-8859-2",
     "CP1250",
+    "CP1252",
     "SJIS",
     "GB-2312",
     "KSX-1001",
@@ -80,7 +81,7 @@ static const char * const name_codepages[NUM_CODEPAGES+1] =
 
 #else /* !HAVE_LCD_BITMAP, reduced support */
 
-#define MAX_CP_TABLE_SIZE  640
+#define MAX_CP_TABLE_SIZE  768
 #define NUM_TABLES           1
 
 static const char * const filename[NUM_TABLES] = {
@@ -89,7 +90,7 @@ static const char * const filename[NUM_TABLES] = {
 
 static const char cp_2_table[NUM_CODEPAGES] =
 {
-    0, 1, 1, 1, 1, 1, 0
+    0, 1, 1, 1, 1, 1, 1, 0
 };
 
 static const char * const name_codepages[NUM_CODEPAGES+1] =
@@ -100,6 +101,7 @@ static const char * const name_codepages[NUM_CODEPAGES+1] =
     "ISO-8859-9",
     "ISO-8859-2",
     "CP1250",
+    "CP1252",
     "UTF-8",
     "unknown"
 };
@@ -190,6 +192,7 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
             /* cp tells us which codepage to convert from */
             switch (cp) {
                 case ISO_8859_7:  /* Greek */
+                case WIN_1252:    /* Western European */
                 case WIN_1251:    /* Cyrillic */
                 case ISO_8859_9:  /* Turkish */
                 case ISO_8859_2:  /* Latin Extended */
