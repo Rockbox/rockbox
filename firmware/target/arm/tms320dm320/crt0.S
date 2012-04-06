@@ -42,14 +42,14 @@
 _vectors:
 
 #if defined(SHORT_VECTORS) /* Use relative branch vectors (64 MB limit) */
-   b        _start                  /* Reset Vector            */
-   b        _undefined_instruction  /* Undefined instruction   */
-   b        _software_interrupt     /* Software Vector         */
-   b        _prefetch_abort         /* Prefetch Abort          */
-   b        _data_abort             /* Data Abort              */
-   b        _dead_loop              /* Reserved/Unused         */
-   b        irq_handler             /* IRQ vector              */
-   b        fiq_handler             /* FIQ vector              */
+   b        _start                    /* Reset Vector            */
+   b        undef_instr_handler       /* Undefined instruction   */
+   b        software_int_handler      /* Software Vector         */
+   b        prefetch_abort_handler    /* Prefetch Abort          */
+   b        data_abort_handler        /* Data Abort              */
+   b        reserved_handler          /* Reserved/Unused         */
+   b        irq_handler               /* IRQ vector              */
+   b        fiq_handler               /* FIQ vector              */
 #else
 #if defined(LONG_VECTORS)
    /* Load the PC with the word values stored below */
@@ -64,11 +64,11 @@ _vectors:
    
    /* Addresses of the handlers */
    .word    _start
-   .word    _undefined_instruction
-   .word    _software_interrupt
-   .word    _prefetch_abort
-   .word    _data_abort
-   .word    _dead_loop
+   .word    undef_instr_handler
+   .word    software_int_handler
+   .word    prefetch_abort_handler
+   .word    data_abort_handler
+   .word    reserved_handler
    .word    irq_handler
    .word    fiq_handler
 #else
