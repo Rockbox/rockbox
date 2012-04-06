@@ -13038,3 +13038,17 @@
     *: "Start Sleep Timer"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "Western European (CP1252)"
+  </dest>
+  <voice>
+    *: "Western European"
+  </voice>
+</phrase>
