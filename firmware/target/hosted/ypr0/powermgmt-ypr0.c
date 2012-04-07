@@ -24,6 +24,7 @@
 #include "file.h"
 #include "adc.h"
 #include "sc900776.h"
+#include "radio-ypr0.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -37,7 +38,6 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
-/* FIXME: This is guessed. Make proper curve using battery_bench */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
     { 3450, 3502, 3550, 3587, 3623, 3669, 3742, 3836, 3926, 4026, 4200 }
@@ -45,7 +45,6 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
-/* FIXME: This is guessed. Make proper curve using battery_bench */
 const unsigned short const percent_to_volt_charge[11] =
 {
       3450, 3670, 3721, 3751, 3782, 3821, 3876, 3941, 4034, 4125, 4200
@@ -81,3 +80,29 @@ bool charging_state(void)
     /* dont indicate for > ~95% */
     return ret && (_battery_voltage() <= charged_thres);
 }
+
+#if CONFIG_TUNER
+static bool tuner_on = false;
+
+bool tuner_power(bool status)
+{
+    if (status != tuner_on)
+    {
+        tuner_on = status;
+        status = !status;
+        if (tuner_on) {
+            radiodev_open();
+        }
+        else {
+            radiodev_close();
+        }
+    }
+
+    return status;
+}
+
+bool tuner_powered(void)
+{
+    return tuner_on;
+}
+#endif /* #if CONFIG_TUNER */
