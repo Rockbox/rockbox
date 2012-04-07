@@ -212,7 +212,24 @@ static const struct button_mapping button_context_keyboard[]  = {
 }; /* button_context_keyboard */
 
 static const struct button_mapping button_context_radio[]  = {
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+    { ACTION_FM_MENU,            BUTTON_SELECT | BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_FM_PRESET,          BUTTON_MENU | BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_FM_STOP,            BUTTON_POWER | BUTTON_REL,     BUTTON_POWER },
+    { ACTION_FM_MODE,            BUTTON_MENU | BUTTON_REL,      BUTTON_MENU },
+    { ACTION_FM_EXIT,            BUTTON_BACK | BUTTON_REL,      BUTTON_BACK },
+    { ACTION_FM_PLAY,            BUTTON_SELECT | BUTTON_REL,    BUTTON_SELECT },
+    { ACTION_FM_NEXT_PRESET,     BUTTON_USER | BUTTON_RIGHT,    BUTTON_NONE },
+    { ACTION_FM_PREV_PRESET,     BUTTON_USER | BUTTON_LEFT,     BUTTON_NONE },
+    /* Volume */
+    { ACTION_SETTINGS_INC,       BUTTON_UP | BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_UP,                     BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_DOWN | BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_DOWN,                   BUTTON_NONE },
+    /* Tuning */
+    { ACTION_STD_PREV,           BUTTON_LEFT,                   BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,     BUTTON_LEFT | BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_RIGHT,                  BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,     BUTTON_RIGHT | BUTTON_REPEAT,  BUTTON_NONE },
 }; /* button_context_radio */
 
 const struct button_mapping* get_context_mapping(int context)

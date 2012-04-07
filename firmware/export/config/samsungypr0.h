@@ -75,7 +75,6 @@
 //#define HAVE_RTC_RAM
 
 /* define this if you have a real-time clock */
-//#define CONFIG_RTC APPLICATION
 #define CONFIG_RTC RTC_AS3514
 #define HAVE_RTC_ALARM
 
@@ -103,9 +102,17 @@
 
 #define HAVE_SW_TONE_CONTROLS
 
-/* TODO: Make use of the si4703 tuner hardware */
-/* #define CONFIG_TUNER SI4700 */
-/* #define HAVE_TUNER_PWR_CTRL*/
+#define CONFIG_TUNER SI4700
+#define HAVE_TUNER_PWR_CTRL
+
+/* TODO: next step: enable RDS
+#define HAVE_RDS_CAP
+#define RDS_ISR_PROCESSING
+*/
+
+/* Define this for FM radio input available */
+#define HAVE_FMRADIO_IN
+#define INPUT_SRC_CAPS SRC_CAP_FMRADIO
 
 /* We have a GPIO that detects it */
 #define HAVE_HEADPHONE_DETECTION

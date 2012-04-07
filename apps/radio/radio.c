@@ -127,6 +127,16 @@
 #define FM_MODE
 #define FM_STOP
 
+#elif (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
+#define FM_MENU
+#define FM_PRESET
+#define FM_STOP
+#define FM_MODE
+#define FM_EXIT
+#define FM_PLAY
+#define FM_PREV_PRESET
+#define FM_NEXT_PRESET
+
 #endif
 
 /* presets.c needs these so keep unstatic or redo the whole thing! */

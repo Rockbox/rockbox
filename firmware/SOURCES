@@ -92,6 +92,10 @@ target/hosted/ypr0/backlight-ypr0.c
 target/hosted/ypr0/ascodec-ypr0.c
 target/hosted/ypr0/powermgmt-ypr0.c
 target/hosted/ypr0/gpio_ypr0.c
+target/hosted/ypr0/audio-ypr0.c
+#if CONFIG_TUNER
+target/hosted/ypr0/radio-ypr0.c
+#endif
 #endif
 
 /* Maemo specific files */
@@ -309,7 +313,7 @@ drivers/rtc/rtc_imx233.c
 /* Tuner */
 #if CONFIG_TUNER
 tuner.c
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0))
 #if (CONFIG_TUNER & LV24020LP)
 drivers/tuner/lv24020lp.c
 #endif /* (CONFIG_TUNER & LV24020LP) */

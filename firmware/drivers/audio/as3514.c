@@ -156,8 +156,13 @@ void audiohw_preinit(void)
     as3514_write(AS3514_AUDIOSET3, AUDIOSET3_HPCM_on | AUDIOSET3_HP_LONGSTART);
 
     as3514_write(AS3543_DAC_IF, AS3543_DAC_INT_PLL);
+#ifdef SAMSUNG_YPR0
+    /* Select Line 1 for FM radio */
+    as3514_clear(AS3514_LINE_IN1_R, LINE_IN_R_LINE_SELECT);
+#else
     /* Select Line 2 for FM radio */
     as3514_set(AS3514_LINE_IN1_R, LINE_IN_R_LINE_SELECT);
+#endif
     /* Output SUM of microphone/line/DAC */
     as3514_write(AS3514_HPH_OUT_R, HPH_OUT_R_HEADPHONES | HPH_OUT_R_HP_OUT_SUM);
 
