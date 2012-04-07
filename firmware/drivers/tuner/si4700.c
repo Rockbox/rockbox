@@ -27,7 +27,12 @@
 #include "power.h"
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h"
+#ifdef SAMSUNG_YPR0
+#include "radio-ypr0.h" /* Contains low level buffer i2c read / write */
+#include "unistd.h" /* For usleep */
+#else
 #include "fmradio_i2c.h" /* physical interface driver */
+#endif
 #include "rds.h"
 
 #if defined(SANSA_CLIP) || defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2) \
@@ -322,7 +327,11 @@ static void si4700_sleep(int snooze)
         /* ENABLE high, DISABLE low */
         si4700_write_masked(POWERCFG, POWERCFG_ENABLE,
                             POWERCFG_DISABLE | POWERCFG_ENABLE);
+#ifdef SAMSUNG_YPR0
+        usleep(110000L);
+#else
         sleep(110 * HZ / 1000);
+#endif
 
         /* init register cache */
         si4700_read(16);
@@ -399,7 +408,11 @@ static void si4700_set_frequency(int freq)
     {
         /* tuning should be done within 60 ms according to the datasheet */
         si4700_write_reg(CHANNEL, CHANNEL_CHANw(chan) | CHANNEL_TUNE);
+#ifdef SAMSUNG_YPR0
+        usleep(60000L);
+#else
         sleep(HZ * 60 / 1000);
+#endif
 
         /* get tune result */
         readchan = si4700_read_reg(READCHAN) & READCHAN_READCHAN;
