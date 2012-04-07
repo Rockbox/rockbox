@@ -32,6 +32,9 @@
 
 #include "ascodec.h"
 #include "gpio_ypr0.h"
+#if CONFIG_TUNER
+#include "radio.h"
+#endif
 
 void power_off(void)
 {
@@ -55,6 +58,8 @@ void system_init(void)
     /* Here begins our platform specific initilization for various things */
     ascodec_init();
     gpio_init();
+    /* Uhm why is this NOT called in the main.c? */
+    radio_init();
 }
 
 

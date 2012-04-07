@@ -78,6 +78,11 @@
 #endif
 #include "power.h"
 
+#if defined(SAMSUNG_YPR0) && defined(CONFIG_TUNER)
+#include "tuner.h"
+#include "radio.h"
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 #include "scrollbar.h"
 #include "peakmeter.h"
