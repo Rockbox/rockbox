@@ -800,9 +800,10 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                 }
             }
             else if (action & BUTTON_REL)
-            {
                 scroll_mode = SCROLL_NONE;
-            }
+
+            if (scroll_mode == SCROLL_NONE)
+                last_y = 0;
             break;
         }
         case SCROLL_KINETIC:
