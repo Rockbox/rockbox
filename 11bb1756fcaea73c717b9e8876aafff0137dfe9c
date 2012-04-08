@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAKH///+c\u003d",
+        "filename": "apps/debug_menu.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-08T17:11:19Z",
+      "side": 1,
+      "message": "For what is this needed? No other changes in this file.",
+      "revId": "11bb1756fcaea73c717b9e8876aafff0137dfe9c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///+o\u003d",
+        "filename": "firmware/drivers/tuner/si4700.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-08T17:11:19Z",
+      "side": 1,
+      "message": "Why doesnt the ypr0 use \"fmradio_i2c.h\"?",
+      "revId": "11bb1756fcaea73c717b9e8876aafff0137dfe9c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///+k\u003d",
+        "filename": "firmware/drivers/tuner/si4700.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-08T17:11:19Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "11bb1756fcaea73c717b9e8876aafff0137dfe9c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///+Y\u003d",
+        "filename": "firmware/target/hosted/ypr0/powermgmt-ypr0.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-08T17:11:19Z",
+      "side": 1,
+      "message": "Not needed.",
+      "revId": "11bb1756fcaea73c717b9e8876aafff0137dfe9c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///+U\u003d",
+        "filename": "firmware/target/hosted/ypr0/radio-ypr0.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-08T17:11:19Z",
+      "side": 1,
+      "message": "Perhaps protect from opening twice? I dont trust rockbox core code enough :P",
+      "revId": "11bb1756fcaea73c717b9e8876aafff0137dfe9c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///+Q\u003d",
+        "filename": "firmware/target/hosted/ypr0/radio-ypr0.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-08T17:11:19Z",
+      "side": 1,
+      "message": "This is the same as memset() isn\u0027t it? Just call it in that case.",
+      "revId": "11bb1756fcaea73c717b9e8876aafff0137dfe9c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///+I\u003d",
+        "filename": "firmware/target/hosted/ypr0/si4709.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-08T17:11:19Z",
+      "side": 1,
+      "message": "Please add a license + header (it doesn\u0027t necessarily need to be the Rockbox header but would be nice :)).",
+      "revId": "11bb1756fcaea73c717b9e8876aafff0137dfe9c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///+M\u003d",
+        "filename": "firmware/target/hosted/ypr0/si4709.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-08T17:11:19Z",
+      "side": 1,
+      "message": "Fix indentation/tabs in this file please.",
+      "revId": "11bb1756fcaea73c717b9e8876aafff0137dfe9c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///+g\u003d",
+        "filename": "firmware/target/hosted/ypr0/system-ypr0.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-08T17:11:19Z",
+      "side": 1,
+      "message": "It is not called in main.c because the init() for HOSTED doesn\u0027t call it (only the NATIVE varianet does). this can be fixed separately so this change shouldn\u0027t be needed.",
+      "revId": "11bb1756fcaea73c717b9e8876aafff0137dfe9c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
