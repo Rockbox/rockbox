@@ -39,6 +39,26 @@ char str_duration[32];
 
 int num_properties;
 
+static const char* props_file[] =
+{
+    "[Path]",       str_dirname,
+    "[Filename]",   str_filename,
+    "[Size]",       str_size,
+    "[Date]",       str_date,
+    "[Time]",       str_time,
+    "[Artist]",     str_artist,
+    "[Title]",      str_title,
+    "[Album]",      str_album,
+    "[Duration]",   str_duration,
+};
+static const char* props_dir[] =
+{
+    "[Path]",       str_dirname,
+    "[Subdirs]",    str_dircount,
+    "[Files]",      str_filecount,
+    "[Size]",       str_size,
+};
+
 static const char human_size_prefix[4] = { '\0', 'K', 'M', 'G' };
 static unsigned human_size_log(unsigned long long size)
 {
@@ -73,17 +93,17 @@ static bool file_properties(char* selected_file)
             if(!rb->strcmp(entry->d_name, selected_file+dirlen))
             {
                 unsigned log;
-                rb->snprintf(str_dirname, sizeof str_dirname, "Path: %s", tstr);
-                rb->snprintf(str_filename, sizeof str_filename, "Name: %s",
+                rb->snprintf(str_dirname, sizeof str_dirname, "%s", tstr);
+                rb->snprintf(str_filename, sizeof str_filename, "%s",
                              selected_file+dirlen);
                 log = human_size_log((unsigned long)info.size);
-                rb->snprintf(str_size, sizeof str_size, "Size: %lu %cB",
+                rb->snprintf(str_size, sizeof str_size, "%lu %cB",
                              ((unsigned long)info.size) >> (log*10), human_size_prefix[log]);
-                rb->snprintf(str_date, sizeof str_date, "Date: %04d/%02d/%02d",
+                rb->snprintf(str_date, sizeof str_date, "%04d/%02d/%02d",
                     ((info.wrtdate >> 9 ) & 0x7F) + 1980, /* year    */
                     ((info.wrtdate >> 5 ) & 0x0F),        /* month   */
                     ((info.wrtdate      ) & 0x1F));       /* day     */
-                rb->snprintf(str_time, sizeof str_time, "Time: %02d:%02d",
+                rb->snprintf(str_time, sizeof str_time, "%02d:%02d",
                     ((info.wrttime >> 11) & 0x1F),        /* hour    */
                     ((info.wrttime >> 5 ) & 0x3F));       /* minutes */
 
@@ -99,23 +119,23 @@ static bool file_properties(char* selected_file)
                 {
                     long dur = id3.length / 1000;           /* seconds */
                     rb->snprintf(str_artist, sizeof str_artist,
-                                 "Artist: %s", id3.artist ? id3.artist : "");
+                                 "%s", id3.artist ? id3.artist : "");
                     rb->snprintf(str_title, sizeof str_title,
-                                 "Title: %s", id3.title ? id3.title : "");
+                                 "%s", id3.title ? id3.title : "");
                     rb->snprintf(str_album, sizeof str_album,
-                                 "Album: %s", id3.album ? id3.album : "");
+                                 "%s", id3.album ? id3.album : "");
                     num_properties += 3;
 
                     if (dur > 0)
                     {
                         if (dur < 3600)
                             rb->snprintf(str_duration, sizeof str_duration,
-                                         "Duration: %d:%02d", (int)(dur / 60),
+                                         "%d:%02d", (int)(dur / 60),
                                          (int)(dur % 60));
                         else
                             rb->snprintf(str_duration, sizeof str_duration,
-                                         "Duration: %d:%02d:%02d",
-                                         (int)(dur / 3600), 
+                                         "%d:%02d:%02d",
+                                         (int)(dur / 3600),
                                          (int)(dur % 3600 / 60),
                                          (int)(dur % 60));
                         num_properties++;
@@ -228,10 +248,10 @@ static bool dir_properties(char* selected_file)
 #endif
 
     rb->strlcpy(str_dirname, selected_file, MAX_PATH);
-    rb->snprintf(str_dircount, sizeof str_dircount, "Subdirs: %d", dps.dc);
-    rb->snprintf(str_filecount, sizeof str_filecount, "Files: %d", dps.fc);
+    rb->snprintf(str_dircount, sizeof str_dircount, "%d", dps.dc);
+    rb->snprintf(str_filecount, sizeof str_filecount, "%d", dps.fc);
     log = human_size_log(dps.bc);
-    rb->snprintf(str_size, sizeof str_size, "Size: %ld %cB",
+    rb->snprintf(str_size, sizeof str_size, "%ld %cB",
                  (long) (dps.bc >> (log*10)), human_size_prefix[log]);
     num_properties = 4;
     return true;
@@ -241,39 +261,27 @@ static const char * get_props(int selected_item, void* data,
                               char *buffer, size_t buffer_len)
 {
     (void)data;
-
-    switch(selected_item)
+    if(its_a_dir)
     {
-        case 0:
-            rb->strlcpy(buffer, str_dirname, buffer_len);
-            break;
-        case 1:
-            rb->strlcpy(buffer, its_a_dir ? str_dircount : str_filename,
-                        buffer_len);
-            break;
-        case 2:
-            rb->strlcpy(buffer, its_a_dir ? str_filecount : str_size, buffer_len);
-            break;
-        case 3:
-            rb->strlcpy(buffer, its_a_dir ? str_size : str_date, buffer_len);
-            break;
-        case 4:
-            rb->strlcpy(buffer, its_a_dir ? "" : str_time, buffer_len);
-            break;
-        case 5:
-            rb->strlcpy(buffer, its_a_dir ? "" : str_artist, buffer_len);
-            break;
-        case 6:
-            rb->strlcpy(buffer, its_a_dir ? "" : str_title, buffer_len);
-            break;
-        case 7:
-            rb->strlcpy(buffer, its_a_dir ? "" : str_album, buffer_len);
-            break;
-        case 8:
-            rb->strlcpy(buffer, its_a_dir ? "" : str_duration, buffer_len);
-            break;
-        default:
-            return "ERROR";
+        if(selected_item >= (int)(sizeof(props_dir) / sizeof(props_dir[0])))
+        {
+            rb->strlcpy(buffer, "ERROR", buffer_len);
+        }
+        else
+        {
+            rb->strlcpy(buffer, props_dir[selected_item], buffer_len);
+        }
+    }
+    else
+    {
+        if(selected_item >= (int)(sizeof(props_file) / sizeof(props_file[0])))
+        {
+            rb->strlcpy(buffer, "ERROR", buffer_len);
+        }
+        else
+        {
+            rb->strlcpy(buffer, props_file[selected_item], buffer_len);
+        }
     }
     return buffer;
 }
@@ -337,12 +345,12 @@ enum plugin_status plugin_start(const void* parameter)
         rb->viewportmanager_theme_enable(i, true, NULL);
 #endif
 
-    rb->gui_synclist_init(&properties_lists, &get_props, file, false, 1, NULL);
+    rb->gui_synclist_init(&properties_lists, &get_props, file, false, 2, NULL);
     rb->gui_synclist_set_title(&properties_lists, its_a_dir ?
                                                   "Directory properties" :
                                                   "File properties", NOICON);
     rb->gui_synclist_set_icon_callback(&properties_lists, NULL);
-    rb->gui_synclist_set_nb_items(&properties_lists, num_properties);
+    rb->gui_synclist_set_nb_items(&properties_lists, num_properties * 2);
     rb->gui_synclist_limit_scroll(&properties_lists, true);
     rb->gui_synclist_select_item(&properties_lists, 0);
     rb->gui_synclist_draw(&properties_lists);
