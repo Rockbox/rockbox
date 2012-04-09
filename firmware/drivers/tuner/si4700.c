@@ -447,9 +447,7 @@ int si4700_set(int setting, int value)
     switch(setting)
     {
         case RADIO_SLEEP:
-            if (value != 2)
-                si4700_sleep(value);
-            /* else actually it's 'pause' */
+            si4700_sleep(value);
             break;
 
         case RADIO_FREQUENCY:
