@@ -392,7 +392,6 @@ static void init(void)
 #ifdef HAVE_TAGCACHE
     init_tagcache();
 #endif
-    sleep(HZ/2);
     tree_mem_init();
     filetype_init();
     playlist_init();
