@@ -716,10 +716,6 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
     action = action_get_touchscreen_press(&x, &y);
     adj_y = y - parent->y;
 
-    /* selection needs to be corrected if items are only partially visible */
-    line = (adj_y - y_offset) / line_height;
-    if (list_display_title(list, screen))
-        line -= 1; /* adjust for the list title */
 
     /* some defaults before running the state machine */
     recurse = false;
@@ -729,8 +725,6 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
     {
         case SCROLL_NONE:
         {
-            list->selected_item = list_start_item+line;
-            gui_synclist_speak_item(list);
             if (!last_y)
             {   /* first run. register adj_y and re-run (will then take the else case) */
                 last_y = adj_y;
@@ -739,6 +733,16 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
             else
             {
                 int click_loc = get_click_location(list, x, y);
+                line = 0; /* silence gcc 'used uninitialized' warning */
+                if (click_loc & LIST)
+                {
+                    /* selection needs to be corrected if items are only partially visible */
+                    line = (adj_y - y_offset) / line_height;
+                    if (list_display_title(list, screen))
+                        line -= 1; /* adjust for the list title */
+                    list->selected_item = list_start_item+line;
+                    gui_synclist_speak_item(list);
+                }
                 if (action == BUTTON_TOUCHSCREEN)
                 {
                     /* if not scrolling, the user is trying to select */
@@ -748,7 +752,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                     else if (click_loc & SCROLLBAR)
                         scroll_mode = SCROLL_BAR;
 
-                    hide_selection = click_loc & SCROLLBAR;
+                    /* only show selection bar if clicking the list */
+                    hide_selection = click_loc & (SCROLLBAR|TITLE);
                 }
                 else if (action == BUTTON_REPEAT)
                 {
