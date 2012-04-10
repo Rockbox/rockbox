@@ -19,6 +19,7 @@
 #include <QtCore>
 #include "bootloaderinstallbase.h"
 #include "bootloaderinstallhex.h"
+#include "utils.h"
 
 #include "../../tools/iriver.h"
 #include "../../tools/mkboot.h"
@@ -209,9 +210,20 @@ void BootloaderInstallHex::installStage2(void)
         return;
     }
     // finally copy file to player
-    targethex.copy(m_blfile);
+    if(!Utils::resolvePathCase(m_blfile).isEmpty()) {
+        emit logItem(tr("A firmware file is already present on player"), LOGERROR);
+        emit done(true);
+        return;
+    }
+    if(targethex.copy(m_blfile)) {
+        emit logItem(tr("Success: modified firmware file created"), LOGINFO);
+    }
+    else {
+        emit logItem(tr("Copying modified firmware file failed"), LOGERROR);
+        emit done(true);
+        return;
+    }
 
-    emit logItem(tr("Success: modified firmware file created"), LOGINFO);
     logInstall(LogAdd);
     emit done(false);
 
