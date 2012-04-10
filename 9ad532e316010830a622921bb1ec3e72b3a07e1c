@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAKH///9s\u003d",
+        "filename": "apps/debug_menu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-10T09:47:35Z",
+      "side": 1,
+      "message": "This is still not needed, is it?",
+      "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///9o\u003d",
+        "filename": "apps/keymaps/keymap-ypr0.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-10T09:47:35Z",
+      "side": 1,
+      "message": "Remove these trailing spaces please.",
+      "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///9k\u003d",
+        "filename": "firmware/target/hosted/ypr0/radio-ypr0.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-10T09:47:35Z",
+      "side": 1,
+      "message": "I suggest to just remove the three lines.",
+      "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///9g\u003d",
+        "filename": "firmware/target/hosted/ypr0/system-ypr0.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-10T09:47:35Z",
+      "side": 1,
+      "message": "radio_init() is now called in main(). This is not needed anymore.",
+      "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///9c\u003d",
+        "filename": "firmware/target/hosted/ypr0/system-ypr0.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-04-10T09:47:35Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
