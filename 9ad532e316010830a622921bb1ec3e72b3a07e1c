@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAKH///9U\u003d",
+        "filename": "apps/debug_menu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2012-04-10T19:14:09Z",
+      "side": 1,
+      "message": "Need to check...but in general is needed, because of \"FM Radio\" debug screen.",
+      "parentUuid": "AAAAKH///9s\u003d",
+      "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAKH///9o\u003d",
         "filename": "apps/keymaps/keymap-ypr0.c",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2012-04-10T09:47:35Z",
       "side": 1,
       "message": "Remove these trailing spaces please.",
+      "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///9Q\u003d",
+        "filename": "apps/keymaps/keymap-ypr0.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2012-04-10T19:14:09Z",
+      "side": 1,
+      "message": "ok. Done.",
+      "parentUuid": "AAAAKH///9o\u003d",
       "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAAKH///9M\u003d",
+        "filename": "firmware/target/hosted/ypr0/radio-ypr0.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2012-04-10T19:14:09Z",
+      "side": 1,
+      "message": "Ops. Indeed, forgot about them :)",
+      "parentUuid": "AAAAKH///9k\u003d",
+      "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAKH///9g\u003d",
         "filename": "firmware/target/hosted/ypr0/system-ypr0.c",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2012-04-10T09:47:35Z",
       "side": 1,
       "message": "radio_init() is now called in main(). This is not needed anymore.",
+      "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///9I\u003d",
+        "filename": "firmware/target/hosted/ypr0/system-ypr0.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2012-04-10T19:14:09Z",
+      "side": 1,
+      "message": "it actually doesn\u0027t call it, I cannot understand why tough!",
+      "parentUuid": "AAAAKH///9g\u003d",
       "revId": "9ad532e316010830a622921bb1ec3e72b3a07e1c",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
