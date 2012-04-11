@@ -28,7 +28,7 @@ $(CPUFEAT_BUILD)/cpu-features.o: $(CPUFEAT)/cpu-features.c
 .PHONY: apk classes clean dex dirs libs jar
 
 # API version
-ANDROID_PLATFORM_VERSION=11
+ANDROID_PLATFORM_VERSION=15
 ANDROID_PLATFORM=$(ANDROID_SDK_PATH)/platforms/android-$(ANDROID_PLATFORM_VERSION)
 
 # android tools
