@@ -70,7 +70,7 @@ unsigned char rc_buf[5];
 /* ================================================== */
 static struct semaphore rc_thread_wakeup;
 static unsigned int remote_thread_id;
-static int remote_stack[256/sizeof(int)];
+static int remote_stack[512/sizeof(int)];
 static const char * const remote_thread_name = "remote";
 
 static bool remote_wait_ready(int ready_mask)
