@@ -1630,8 +1630,8 @@ static int update_short_entry( struct fat_file* file, long size, int attr )
     struct fat_file dir;
     int rc;
 
-    LDEBUGF("update_file_size(cluster:%lx entry:%d size:%ld)\n",
-            file->firstcluster, file->direntry, size);
+    LDEBUGF("update_file_size(cluster:%lx entry:%d size:%ld attr:%x)\n",
+            file->firstcluster, file->direntry, size, attr);
 
     /* create a temporary file handle for the dir holding this file */
     rc = fat_open(IF_MV2(file->volume,) file->dircluster, &dir, NULL);
@@ -2662,3 +2662,20 @@ bool fat_ismounted(int volume)
     return (volume<NUM_VOLUMES && fat_bpbs[volume].mounted);
 }
 #endif
+
+/* update fat attribute */
+int fat_attr(struct fat_file *file, long size, int attr)
+{
+#ifdef HAVE_MULTIVOLUME
+    struct bpb* fat_bpb = &fat_bpbs[file->volume];
+#endif
+    int rc = update_short_entry(file, size, attr);
+    if (rc < 0)
+        return rc * 10 - 1;
+
+    rc = flush_fat(IF_MV(fat_bpb));
+    if (rc < 0)
+        return rc * 10 - 2;
+
+    return 0;
+}

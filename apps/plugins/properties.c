@@ -23,6 +23,8 @@
 
 
 bool its_a_dir = false;
+int attr = 0;
+char str_attr[32];
 
 char str_filename[MAX_PATH];
 char str_dirname[MAX_PATH];
@@ -46,6 +48,7 @@ static const char* props_file[] =
     "[Size]",       str_size,
     "[Date]",       str_date,
     "[Time]",       str_time,
+    "[Attributes]", str_attr,
     "[Artist]",     str_artist,
     "[Title]",      str_title,
     "[Album]",      str_album,
@@ -57,6 +60,7 @@ static const char* props_dir[] =
     "[Subdirs]",    str_dircount,
     "[Files]",      str_filecount,
     "[Size]",       str_size,
+    "[Attributes]", str_attr,
 };
 
 static const char human_size_prefix[4] = { '\0', 'K', 'M', 'G' };
@@ -70,6 +74,12 @@ static unsigned human_size_log(unsigned long long size)
         size >>= 10; /* div by 1024 */
 
     return i;
+}
+
+static void set_str_attr(void)
+{
+    rb->snprintf(str_attr, sizeof str_attr, "[%c]Hidden [%c]Read-only",
+                 (attr&ATTR_HIDDEN)?'x':' ', (attr&ATTR_READ_ONLY)?'x':' ');
 }
 
 static bool file_properties(char* selected_file)
@@ -106,8 +116,10 @@ static bool file_properties(char* selected_file)
                 rb->snprintf(str_time, sizeof str_time, "%02d:%02d",
                     ((info.wrttime >> 11) & 0x1F),        /* hour    */
                     ((info.wrttime >> 5 ) & 0x3F));       /* minutes */
+                attr = info.attribute;
+                set_str_attr();
 
-                num_properties = 5;
+                num_properties = 6;
 
 #if (CONFIG_CODEC == SWCODEC)
                 int fd = rb->open(selected_file, O_RDONLY);
@@ -253,7 +265,8 @@ static bool dir_properties(char* selected_file)
     log = human_size_log(dps.bc);
     rb->snprintf(str_size, sizeof str_size, "%ld %cB",
                  (long) (dps.bc >> (log*10)), human_size_prefix[log]);
-    num_properties = 4;
+    set_str_attr();
+    num_properties = 5;
     return true;
 }
 
@@ -286,6 +299,80 @@ static const char * get_props(int selected_item, void* data,
     return buffer;
 }
 
+static int properties_menu_cb(int action, const struct menu_item_ex *this_item)
+{
+    int i = (intptr_t)this_item;
+    if ( (action == ACTION_REQUEST_MENUITEM) &&
+        ( ((i == 0) &&  (attr & ATTR_HIDDEN)) ||
+          ((i == 1) && !(attr & ATTR_HIDDEN)) ))
+        return ACTION_EXIT_MENUITEM;
+    return action;
+}
+
+MENUITEM_STRINGLIST(menu, "Properties Menu", properties_menu_cb,
+                    "Hide", "Unhide", "Quit");
+
+static int properties_menu(char *file)
+{
+    int selected = 0;
+    bool menu_quit = false;
+    DPS dps = {
+        .len = MAX_PATH,
+        .dc  = 0,
+        .fc  = 0,
+        .bc  = 0,
+    };
+    rb->strlcpy(dps.dirname, file, MAX_PATH);
+
+    while (!menu_quit)
+    {
+        int rc = 0;
+        switch (rb->do_menu(&menu, &selected, NULL, false))
+        {
+            case 0: /* hide */
+                rb->splash(0, "Hiding...");
+                if (its_a_dir) {
+                    rc = rb->file_hidedir(file, true);
+                    if (!rc) {
+                        attr |= ATTR_HIDDEN;
+                        set_str_attr();
+                    }
+                } else {
+                    rc = rb->file_hide(file, true);
+                    if (!rc)
+                        file_properties(file);
+                }
+                if (!rc)
+                    rb->reload_directory();
+                menu_quit = true;
+                break;
+            case 1: /* unhide */
+                rb->splash(0, "Unhiding...");
+                if (its_a_dir) {
+                    rc = rb->file_hidedir(file, false);
+                    if (!rc) {
+                        attr &= ~ATTR_HIDDEN;
+                        set_str_attr();
+                    }
+                } else {
+                    rc = rb->file_hide(file, false);
+                    if (!rc)
+                        file_properties(file);
+                }
+                if (!rc)
+                    rb->reload_directory();
+                menu_quit = true;
+                break;
+            case 2: /* quit */
+                menu_quit = true;
+                break;
+            case MENU_ATTACHED_USB:
+                return PLUGIN_USB_CONNECTED;
+        }
+    }
+    return PLUGIN_OK;
+}
+
 enum plugin_status plugin_start(const void* parameter)
 {
     struct gui_synclist properties_lists;
@@ -315,6 +402,7 @@ enum plugin_status plugin_start(const void* parameter)
             {
                 struct dirinfo info = rb->dir_get_info(dir, entry);
                 its_a_dir = info.attribute & ATTR_DIRECTORY ? true : false;
+                attr = info.attribute;
                 found = true;
                 break;
             }
@@ -365,6 +453,14 @@ enum plugin_status plugin_start(const void* parameter)
         {
             case ACTION_STD_CANCEL:
                 quit = true;
+                break;
+            case ACTION_STD_MENU:
+                if (properties_menu(file) == PLUGIN_USB_CONNECTED)
+                {
+                    quit = true;
+                    usb = true;
+                }
+                rb->gui_synclist_draw(&properties_lists);
                 break;
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
