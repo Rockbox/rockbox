@@ -30,6 +30,7 @@
 /* this has SEEK_SET et al */
 #include <stdio.h>
 #endif
+#include <stdbool.h>
 
 
 #undef MAX_PATH /* this avoids problems when building simulator */
@@ -99,6 +100,8 @@ extern int rename(const char* path, const char* newname);
 extern int ftruncate(int fd, off_t length);
 extern off_t filesize(int fd);
 extern int release_files(int volume);
+extern int file_hide(const char* name, bool hide);
+extern int file_hidedir(const char* name, bool hide);
 int fdprintf (int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 #endif /* !CODEC && !PLUGIN */
 #endif
