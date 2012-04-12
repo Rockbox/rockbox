@@ -159,7 +159,8 @@ def scrape_files(repo, treehash, filelist, dest=""):
     return dest
 
 
-def archive_files(repo, treehash, filelist, basename, tmpfolder=""):
+def archive_files(repo, treehash, filelist, basename, tmpfolder="",
+        archive="tbz"):
     '''Archive list of files into tarball.
     @param repo Path to repository root.
     @param treehash Hash identifying the tree.
@@ -169,15 +170,35 @@ def archive_files(repo, treehash, filelist, basename, tmpfolder=""):
                     basename inside of the archive as well (i.e. no tarbomb).
     @param tmpfolder Folder to put intermediate files in. If no folder is given
                      a temporary one will get used.
+    @param archive Type of archive to create. Supported values are "tbz" and
+                   "7z". The latter requires the 7z binary available in the
+                   system's path.
     @return Output filename.
     '''
-    print "Archiving files from repository"
 
-    workfolder = scrape_files(repo, treehash, filelist, tmpfolder)
-    outfile = basename + ".tar.bz2"
-    tf = tarfile.open(outfile, "w:bz2")
-    tf.add(workfolder, basename)
-    tf.close()
+    if tmpfolder == "":
+        temp_remove = True
+        tmpfolder = tempfile.mkdtemp()
+    else:
+        temp_remove = False
+    workfolder = scrape_files(repo, treehash, filelist,
+            os.path.join(tmpfolder, basename))
+    if basename is "":
+        return ""
+    print "Archiving files from repository"
+    if archive == "7z":
+        outfile = basename + ".7z"
+        output = subprocess.Popen(["7z", "a",
+            os.path.join(os.getcwd(), basename + ".7z"), basename],
+            cwd=tmpfolder, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output.communicate()
+    else:
+        outfile = basename + ".tar.bz2"
+        tf = tarfile.open(outfile, "w:bz2")
+        tf.add(workfolder, basename)
+        tf.close()
     if tmpfolder != workfolder:
         shutil.rmtree(workfolder)
+    if temp_remove:
+        shutil.rmtree(tmpfolder)
     return outfile
