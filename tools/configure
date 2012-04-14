@@ -128,13 +128,8 @@ app_set_lcd_size () {
 }
 
 findarmgcc() {
-  if [ "$ARG_ARM_EABI" != "0" ]; then
-    prefixtools arm-elf-eabi-
-    gccchoice="4.4.4"
-  else
-    prefixtools arm-elf-
-    gccchoice="4.0.3"
-  fi
+  prefixtools arm-elf-eabi-
+  gccchoice="4.4.4"
 }
 
 # scan the $PATH for the given command
@@ -444,9 +439,6 @@ coldfirecc () {
 arm7tdmicc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm7tdmi"
- if test "X$1" != "Xshort" -a "$ARG_ARM_EABI" = "0"; then
-   GCCOPTS="$GCCOPTS -mlong-calls"
- fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
@@ -454,9 +446,6 @@ arm7tdmicc () {
 arm9tdmicc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm9tdmi"
- if test "$modelname" != "gigabeatfx" -a "$t_manufacturer" != "as3525" -a "$ARG_ARM_EABI" = "0"; then
-  GCCOPTS="$GCCOPTS -mlong-calls"
- fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
@@ -464,9 +453,6 @@ arm9tdmicc () {
 arm940tbecc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mbig-endian -mcpu=arm940t"
- if test "$ARG_ARM_EABI" = "0"; then
-  GCCOPTS="$GCCOPTS -mlong-calls"
- fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
 }
@@ -474,9 +460,6 @@ arm940tbecc () {
 arm940tcc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm940t"
- if test "$ARG_ARM_EABI" = "0"; then
-  GCCOPTS="$GCCOPTS -mlong-calls"
- fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
@@ -484,9 +467,6 @@ arm940tcc () {
 arm946cc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm9e"
- if test "$ARG_ARM_EABI" = "0"; then
-  GCCOPTS="$GCCOPTS -mlong-calls"
- fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
@@ -494,9 +474,6 @@ arm946cc () {
 arm926ejscc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm926ej-s"
- if test "$t_manufacturer" != "as3525" -a "$ARG_ARM_EABI" = "0"; then
-  GCCOPTS="$GCCOPTS -mlong-calls"
- fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
@@ -504,9 +481,6 @@ arm926ejscc () {
 arm1136jfscc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm1136jf-s"
- if test "$modelname" != "gigabeats" -a "$ARG_ARM_EABI" = "0"; then
-  GCCOPTS="$GCCOPTS -mlong-calls"
- fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
@@ -514,9 +488,6 @@ arm1136jfscc () {
 arm1176jzscc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm1176jz-s"
- if test "$ARG_ARM_EABI" = "0"; then
-  GCCOPTS="$GCCOPTS -mlong-calls"
- fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
@@ -1154,9 +1125,6 @@ help() {
     --ccache          Enable ccache use (done by default these days)
     --no-ccache       Disable ccache use
 
-    --eabi            Make configure prefer toolchains that are able to compile
-                      for the new ARM standard abi EABI
-    --no-eabi         The opposite of --eabi (prefer old non-eabi toolchains)
     --thumb           Build with -mthumb (for ARM builds)
     --no-thumb        The opposite of --thumb (don't use thumb even for targets
                       where this is the default
@@ -1183,7 +1151,6 @@ ARG_TTS=
 ARG_TTSOPTS=
 ARG_TYPE=
 ARG_VOICE=
-ARG_ARM_EABI=
 ARG_ARM_THUMB=
 ARG_PREFIX="$PREFIX"
 ARG_THREAD_SUPPORT=
@@ -1203,8 +1170,6 @@ for arg in "$@"; do
 		--ttsopts=*)  ARG_TTSOPTS=`echo "$arg" | cut -d = -f 2`;;
 		--type=*)     ARG_TYPE=`echo "$arg" | cut -d = -f 2`;;
 		--voice=*)    ARG_VOICE=`echo "$arg" | cut -d = -f 2`;;
-		--eabi)       ARG_ARM_EABI=1;;
-		--no-eabi)    ARG_ARM_EABI=0;;
 		--thumb)      ARG_ARM_THUMB=1;;
 		--no-thumb)   ARG_ARM_THUMB=0;;
         --sdl-threads)ARG_THREAD_SUPPORT=1;;
