@@ -228,13 +228,13 @@ enum {
     RET_VAL_QUIT_ERR, /* quit or error */
 };
 
-void gen_interest(void);
-void init_resources(void);
-int select_square(void);
-void update_score(void);
-void gen_resources(void);
-void draw_cursor(void);
-void draw_board(void);
+static void gen_interest(void);
+static void init_resources(void);
+static int select_square(void);
+static void update_score(void);
+static void gen_resources(void);
+static void draw_cursor(void);
+static void draw_board(void);
 
 struct tile{
     signed int colour; /* -1 = Unset */
@@ -259,7 +259,7 @@ struct resources {
     int moves;
 };
 
-struct settings {
+static struct settings {
     int compstartfarms;
     int compstartinds;
     int humanstartfarms;
@@ -269,19 +269,19 @@ struct settings {
     int movesperturn;
 } superdom_settings;
 
-struct resources humanres;
-struct resources compres;
+static struct resources humanres;
+static struct resources compres;
 enum { GS_PROD, GS_MOVE, GS_WAR };
-int gamestate;
+static int gamestate;
 
-struct cursor{
+static struct cursor{
     int x;
     int y;
 } cursor;
 
-struct tile board[12][12];
+static struct tile board[12][12];
 
-void init_board(void) {
+static void init_board(void) {
     int i,j;
     rb->srand(*rb->current_tick);
     for(i=0;i<12;i++) {  /* Hopefully about 50% each colour */
@@ -426,7 +426,7 @@ void draw_board(void) {
     rb->lcd_update();
 }
 
-int calc_strength(int colour, int x, int y) {
+static int calc_strength(int colour, int x, int y) {
     int a, b, score=0;
     for (a = -1; a < 2; a++) {
         for (b = -1; b < 2; b++) {
@@ -526,7 +526,7 @@ void gen_resources(void) {
         compres.food += incfood;
 }
 
-void update_score(void) {
+static void update_score(void) {
     int strength;
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
@@ -539,7 +539,7 @@ void update_score(void) {
     rb->lcd_setfont(FONT_UI);
 }
 
-int settings_menu(void) {
+static int settings_menu(void) {
     int selection = 0;
 
     MENUITEM_STRINGLIST(menu, "Super Domination Settings", NULL,
@@ -614,7 +614,7 @@ static int superdom_help(void) {
     return RET_VAL_OK;
 }
 
-int start_menu(void) {
+static int start_menu(void) {
     int selection = 0;
 
     MENUITEM_STRINGLIST(menu, "Super Domination Menu", NULL,
@@ -646,7 +646,7 @@ int start_menu(void) {
     return RET_VAL_QUIT_ERR;
 }
 
-int save_game(void) {
+static int save_game(void) {
     int fd;
     char savepath[MAX_PATH];
 
@@ -697,7 +697,7 @@ int save_game(void) {
     return 0;
 }
 
-int ingame_menu(void) {
+static int ingame_menu(void) {
     MENUITEM_STRINGLIST(menu, "Super Domination Menu", NULL,
                     "Return to game", "Save Game",
                     "Playback Control", "Quit");
@@ -729,7 +729,7 @@ int ingame_menu(void) {
     return RET_VAL_OK;
 }
 
-int get_number(char* param, int* value, int max) {
+static int get_number(char* param, int* value, int max) {
     static const char *button_labels[4][3] = {
         { "1", "2", "3" },
         { "4", "5", "6" },
@@ -886,7 +886,7 @@ int get_number(char* param, int* value, int max) {
     return ret;
 }
 
-bool tile_has_item(int type, int x, int y) {
+static bool tile_has_item(int type, int x, int y) {
     switch(type) {
         case 0:
             return (board[x][y].men > 0);
@@ -910,7 +910,7 @@ bool tile_has_item(int type, int x, int y) {
     return false;
 }
 
-int buy_resources(int colour, int type, int x, int y, int nummen) {
+static int buy_resources(int colour, int type, int x, int y, int nummen) {
     const char *itemnames[][6] = {
         {
             "them",
@@ -1022,7 +1022,7 @@ int buy_resources(int colour, int type, int x, int y, int nummen) {
     return RET_VAL_OK;
 }
 
-int buy_resources_menu(void) {
+static int buy_resources_menu(void) {
     int selection = 0,nummen;
 
     MENUITEM_STRINGLIST(menu, "Buy Resources", NULL,
@@ -1064,7 +1064,7 @@ int buy_resources_menu(void) {
     return RET_VAL_OK;
 }
 
-int move_unit(int colour, int type, int fromx, int fromy,
+static int move_unit(int colour, int type, int fromx, int fromy,
                 int tox, int toy, int nummen) {
     const char *itemnames[][3] = {
         {
@@ -1152,7 +1152,7 @@ int move_unit(int colour, int type, int fromx, int fromy,
     return RET_VAL_OK;
 }
 
-int move_unit_menu(void) {
+static int move_unit_menu(void) {
     int selection = 0;
 
     MENUITEM_STRINGLIST(menu, "Move unit", NULL,
@@ -1176,7 +1176,7 @@ int move_unit_menu(void) {
     return RET_VAL_OK;
 }
 
-int launch_nuke(int colour, int nukex, int nukey, int targetx, int targety) {
+static int launch_nuke(int colour, int nukex, int nukey, int targetx, int targety) {
     bool human = (colour == COLOUR_LIGHT);
     int temp;
     struct resources *res;
@@ -1227,7 +1227,7 @@ int launch_nuke(int colour, int nukex, int nukey, int targetx, int targety) {
     return RET_VAL_OK;
 }
 
-int movement_menu(void) {
+static int movement_menu(void) {
     int selection = 0, temp;
 
     MENUITEM_STRINGLIST(menu, "Movement", NULL,
@@ -1328,7 +1328,7 @@ static const char* inventory_data(int selected_item, void * data,
     return buffer;
 }
 
-int show_inventory(void) {
+static int show_inventory(void) {
     struct simplelist_info info;
     rb->simplelist_info_init(&info, "Inventory", 9, NULL);
     info.hide_selection = true;
@@ -1340,7 +1340,7 @@ int show_inventory(void) {
     }
 }
 
-int production_menu(void) {
+static int production_menu(void) {
     int selection = 0, temp;
 
     MENUITEM_STRINGLIST(menu, "Production", NULL,
@@ -1401,7 +1401,7 @@ int production_menu(void) {
     return RET_VAL_OK;
 }
 
-void init_resources(void) {
+static void init_resources(void) {
     humanres.cash = superdom_settings.startcash;
     humanres.food = superdom_settings.startfood;
     humanres.tanks = 0;
@@ -1424,7 +1424,7 @@ void init_resources(void) {
     compres.moves = 0;
 }
 
-int select_square(void) {
+static int select_square(void) {
     int button = 0;
     draw_board();
     draw_cursor();
@@ -1527,7 +1527,7 @@ int select_square(void) {
     }
 }
 
-int killmen(int colour) {
+static int killmen(int colour) {
     bool human = (colour == COLOUR_LIGHT);
     int menkilled,i,j;
     int percent;
@@ -1557,7 +1557,7 @@ int killmen(int colour) {
 }
 
 /* return -1 if error, 1 if attack is succeeded, 0 otherwise */
-int attack_territory(int colour, int x, int y) {
+static int attack_territory(int colour, int x, int y) {
     bool human = (colour == COLOUR_LIGHT);
     int str_diff;
 
@@ -1613,7 +1613,7 @@ int attack_territory(int colour, int x, int y) {
     return 0;
 }
 
-int war_menu(void) {
+static int war_menu(void) {
     int selection = 0, temp;
 
     MENUITEM_STRINGLIST(menu, "War!", NULL,
@@ -1652,7 +1652,7 @@ struct threat {
     int str_diff;
 };
 
-bool place_adjacent(bool tank, int x, int y) {
+static bool place_adjacent(bool tank, int x, int y) {
     int type = (tank? 1: 2);
     if(!buy_resources(COLOUR_DARK, type, x, y, 0)) {
         return true;
@@ -1672,7 +1672,7 @@ bool place_adjacent(bool tank, int x, int y) {
     return false;
 }
 
-bool has_adjacent(int x, int y) {
+static bool has_adjacent(int x, int y) {
     if((board[x][y].colour == COLOUR_LIGHT) && 
        ((board[x-1][y].colour == COLOUR_DARK) ||
        (board[x+1][y].colour == COLOUR_DARK) ||
@@ -1683,7 +1683,7 @@ bool has_adjacent(int x, int y) {
         return 0;
 }
 
-void find_adjacent(int x, int y, int* adj_x, int* adj_y) {
+static void find_adjacent(int x, int y, int* adj_x, int* adj_y) {
     /* Finds adjacent squares, returning squares without tanks on them
      * in preference to those with them */
     if(board[x-1][y].colour == COLOUR_DARK) {
@@ -1708,7 +1708,7 @@ void find_adjacent(int x, int y, int* adj_x, int* adj_y) {
     }
 }
 
-void computer_allocate(void) {
+static void computer_allocate(void) {
     /* Firstly, decide whether to go offensive or defensive.
      * This is primarily decided by the human player posing a threat to either
      * the computer's farms or factories */
@@ -1864,7 +1864,7 @@ void computer_allocate(void) {
     compres.cash = 0;
 }
 
-int find_adj_target(int x, int y, struct cursor* adj) {
+static int find_adj_target(int x, int y, struct cursor* adj) {
     /* Find a square next to a computer's farm or factory owned by the player
      * that is vulnerable. Return 1 on success, 0 otherwise */
     if(board[x+1][y].colour == COLOUR_LIGHT && 
@@ -1894,7 +1894,7 @@ int find_adj_target(int x, int y, struct cursor* adj) {
     return 0;
 }
 
-void computer_war(void) {
+static void computer_war(void) {
     /* Work out where to attack - prioritise the defence of buildings */
     int i, j;
     bool found_target = true;
@@ -2007,7 +2007,7 @@ static int load_game(const char* file) {
     return 0;
 }
 
-void default_settings(void) {
+static void default_settings(void) {
     superdom_settings.compstartfarms = 1;
     superdom_settings.compstartinds = 1;
     superdom_settings.humanstartfarms = 2;
@@ -2017,7 +2017,7 @@ void default_settings(void) {
     superdom_settings.movesperturn = 2;
 }
 
-int average_strength(int colour) {
+static int average_strength(int colour) {
     /* This function calculates the average strength of the given player,
      * used to determine when the computer wins or loses. */
     int i,j;
