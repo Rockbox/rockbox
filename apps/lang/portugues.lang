@@ -12878,3 +12878,31 @@
     *: "Iniciar Temporizador no Arranque"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Arranque/Desligamento"
+  </dest>
+  <voice>
+    *: "Arranque/Desligamento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Reiniciar Temporizador ao Premir Teclas"
+  </dest>
+  <voice>
+    *: "Reiniciar Temporizador ao Premir Teclas"
+  </voice>
+</phrase>
