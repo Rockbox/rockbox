@@ -182,25 +182,11 @@ static struct skin_element* skin_parse_viewport(const char** document)
             }
             else if(*cursor == TAGSYM)
             {
-                /* A ';' directly after a '%' doesn't count */
-                cursor ++;
-
-                if(*cursor == '\0')
-                    break;
-
-                cursor++;
+                skip_tag(&cursor);
             }
             else if(*cursor == COMMENTSYM)
             {
                 skip_comment(&cursor);
-            }
-            else if(*cursor == ARGLISTOPENSYM)
-            {
-                skip_arglist(&cursor);
-            }
-            else if(*cursor == ENUMLISTOPENSYM)
-            {
-                skip_enumlist(&cursor);
             }
             else
             {
@@ -445,20 +431,9 @@ static struct skin_element* skin_parse_sublines_optional(const char** document,
         {
             skip_comment(&cursor);
         }
-        else if(*cursor == ENUMLISTOPENSYM)
-        {
-            skip_enumlist(&cursor);
-        }
-        else if(*cursor == ARGLISTOPENSYM)
-        {
-            skip_arglist(&cursor);
-        }
         else if(*cursor == TAGSYM)
         {
-            cursor++;
-            if(*cursor == '\0' || *cursor == '\n')
-                break;
-            cursor++;
+            skip_tag(&cursor);
         }
         else if(*cursor == MULTILINESYM)
         {
@@ -595,18 +570,11 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         /* Skipping over escaped characters */
         if(*cursor == TAGSYM)
         {
-            cursor++;
-            if(*cursor == '\0')
-                break;
-            cursor++;
+            skip_tag(&cursor);
         }
         else if(*cursor == COMMENTSYM)
         {
             skip_comment(&cursor);
-        }
-        else if(*cursor == ARGLISTOPENSYM)
-        {
-            skip_arglist(&cursor);
         }
         else if(*cursor == ARGLISTSEPARATESYM)
         {
@@ -974,18 +942,9 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
         {
             skip_comment(&cursor);
         }
-        else if(*cursor == ENUMLISTOPENSYM)
-        {
-            if (*cursor == '\n')
-                cursor++;
-            skip_enumlist(&cursor);
-        }
         else if(*cursor == TAGSYM)
         {
-            cursor++;
-            if(*cursor == '\0' || *cursor == '\n')
-                break;
-            cursor++;
+            skip_tag(&cursor);
         }
         else if(*cursor == ENUMLISTSEPARATESYM)
         {
@@ -1139,21 +1098,7 @@ static struct skin_element* skin_parse_code_as_arg(const char** document)
         }
         else if(*cursor == TAGSYM)
         {
-            /* A ';' directly after a '%' doesn't count */
-            cursor ++;
-
-            if(*cursor == '\0')
-                break;
-
-            cursor++;
-        }
-        else if(*cursor == ARGLISTOPENSYM)
-        {
-            skip_arglist(&cursor);
-        }
-        else if(*cursor == ENUMLISTOPENSYM)
-        {
-            skip_enumlist(&cursor);
+            skip_tag(&cursor);
         }
         else
         {
