@@ -27,11 +27,15 @@
 
 /* AMS Sansas start counting from Jan 1st 1970 instead of 1980 (not as3525v2) */
 #if (CONFIG_CPU==AS3525)
-#define SECS_ADJUST 0
+#define SECS_ADJUST 0           /* 1970-1-1 00:00:00 */
 #elif (CONFIG_CPU==AS3525v2)
-#define SECS_ADJUST ((2*365*24*3600) + 26*(24*3600) - 7*3600 - 25*60)
+#if defined(SANSA_CLIPZIP)
+#define SECS_ADJUST 0           /* 1970-1-1 00:00:00 */
 #else
-#define SECS_ADJUST 315532800   /* 1980/1/1 */
+#define SECS_ADJUST ((2*365*24*3600) + 26*(24*3600) - 7*3600 - 25*60)
+#endif
+#else
+#define SECS_ADJUST 315532800   /* 1980-1-1 00:00:00 */
 #endif
 
 #ifdef HAVE_RTC_ALARM /* as3543 */
