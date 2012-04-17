@@ -121,7 +121,6 @@ public class RockboxService extends Service
 
         if (!rockbox_running)
             startService();
-        putResult(RESULT_LIB_LOADED);
 
         if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON))
         {
@@ -163,12 +162,6 @@ public class RockboxService extends Service
                 String rockboxCreditsPath = "/data/data/org.rockbox/app_rockbox/rockbox/rocks/viewers";
                 String rockboxSdDirPath = "/sdcard/rockbox";
 
-                /* load library before unzipping which may take a while */
-                synchronized (lock) {
-                    System.loadLibrary("rockbox");
-                    lock.notify();
-                }
-
                 /* the following block unzips libmisc.so, which contains the files 
                  * we ship, such as themes. It's needed to put it into a .so file
                  * because there's no other way to ship files and have access
@@ -178,7 +171,21 @@ public class RockboxService extends Service
                 /* use arbitrary file to determine whether extracting is needed */
                 File arbitraryFile = new File(rockboxCreditsPath, "credits.rock");
                 File rockboxInfoFile = new File(rockboxSdDirPath, "rockbox-info.txt");
-                if (!arbitraryFile.exists() || (libMisc.lastModified() > arbitraryFile.lastModified()))
+                /* unzip newer or doesnt exist */
+                boolean doExtract = !arbitraryFile.exists()
+                        || (libMisc.lastModified() > arbitraryFile.lastModified());
+
+                /* load library before unzipping which may take a while
+                 * but at least tell if unzipping is going to be done before*/
+                synchronized (lock) {
+                    Bundle bdata = new Bundle();
+                    bdata.putBoolean("unzip", doExtract);
+                    System.loadLibrary("rockbox");
+                    putResult(RESULT_LIB_LOADED, bdata);
+                    lock.notify();
+                }
+
+                if (doExtract)
                 {
                     boolean extractToSd = false;
                     if(rockboxInfoFile.exists()) {
