@@ -13037,6 +13037,19 @@
   <voice>
     *: "Start Sleep Timer"
   </voice>
+<phrase>
+  id: LANG_RUN_SLEEP_TIMER
+  desc: whether to run sleep timer or not
+  user: core
+  <source>
+    *: "Run Sleep Timer"
+  </source>
+  <dest>
+    *: "Run Sleep Timer"
+  </dest>
+  <voice>
+    *: "Run Sleep Timer"
+  </voice>
 </phrase>
 <phrase>
   id: LANG_CODEPAGE_WESTERN_EUROPEAN
