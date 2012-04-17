@@ -13025,8 +13025,8 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SLEEP_TIMER_START_CURRENT
-  desc: shown when a sleep timer isn't running
+  id: LANG_START_SLEEP_TIMER
+  desc: whether to run sleep timer or not
   user: core
   <source>
     *: "Start Sleep Timer"
