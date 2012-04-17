@@ -26,6 +26,7 @@
 #include "debug.h"
 #include "adc.h"
 #include "string.h"
+//#include "stdio.h"
 #include "storage.h"
 #include "power.h"
 #include "audio.h"
@@ -66,8 +67,8 @@ static long sleeptimer_endtick;
 /* Whether an active sleep timer should be restarted when a key is pressed */
 static bool sleeptimer_key_restarts = false;
 /* The number of seconds the sleep timer was last set to */
-static unsigned int sleeptimer_duration = 0;
-
+static unsigned int sleeptimer_duration; // in seconds
+static bool sleeptimer;
 #if CONFIG_CHARGING
 /* State of the charger input as seen by the power thread */
 enum charger_input_state_type charger_input_state;
@@ -801,7 +802,7 @@ void set_poweroff_timeout(int timeout)
 void reset_poweroff_timer(void)
 {
     last_event_tick = current_tick;
-    if (sleeptimer_active && sleeptimer_key_restarts)
+    if (sleeptimer_active && sleeptimer_key_restarts && sleeptimer)
         set_sleep_timer(sleeptimer_duration);
 }
 
@@ -873,7 +874,8 @@ void set_sleep_timer(int seconds)
         sleeptimer_active  = false;
         sleeptimer_endtick = 0;
     }
-    sleeptimer_duration = seconds;
+    /* dont reset or set it to 0 on setup */
+    //sleeptimer_duration = seconds;
 }
 
 int get_sleep_timer(void)
@@ -884,10 +886,40 @@ int get_sleep_timer(void)
         return 0;
 }
 
+void set_sleeptimer(bool enable)
+{
+    sleeptimer = enable;
+}
+
 void set_keypress_restarts_sleep_timer(bool enable)
 {
     sleeptimer_key_restarts = enable;
 }
+
+void set_sleeptimer_duration (int minutes)
+{
+    //printf ("Setting Duration: %d\n", minutes);
+    sleeptimer_duration = minutes*60;
+}
+
+
+void sleep_timer_toggle(bool activate)
+{
+    sleeptimer = activate;
+    if (activate)
+    {
+        //printf ("activation: %d, sleeptime_duration: %d\n", activate, sleeptimer_duration);
+        if (sleeptimer_duration)
+            set_sleep_timer(sleeptimer_duration);
+    }
+    else 
+        {  
+            //set_keypress_restarts_sleep_timer(false); // for now let the keypressed option alone
+            //printf ("activation: %d, sleeptime_duration: %d\n", activate, sleeptimer_duration); 
+            set_sleep_timer(0);
+        }
+}
+
 
 #ifndef BOOTLOADER
 static void handle_sleep_timer(void)
