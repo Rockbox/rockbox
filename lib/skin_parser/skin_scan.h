@@ -29,7 +29,6 @@ extern "C"
 
 
 /* Scanning functions */
-void skip_tag(const char** document);
 void skip_comment(const char** document);
 void skip_arglist(const char** document);
 void skip_enumlist(const char** document);
