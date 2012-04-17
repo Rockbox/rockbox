@@ -1016,6 +1016,35 @@ static int STORAGE_INIT_ATTR ata_hard_reset(void)
     return ret;
 }
 
+// not putting this into STORAGE_INIT_ATTR, as ATA spec recommends to
+// re-read identify_info after soft reset. So we'll do that.
+static int identify(void)
+{
+    int i;
+
+    ATA_OUT8(ATA_SELECT, ata_device);
+
+    if(!wait_for_rdy()) {
+        DEBUGF("identify() - not RDY\n");
+        return -1;
+    }
+    ATA_OUT8(ATA_COMMAND, CMD_IDENTIFY);
+
+    if (!wait_for_start_of_transfer())
+    {
+        DEBUGF("identify() - CMD failed\n");
+        return -2;
+    }
+
+    for (i=0; i<SECTOR_SIZE/2; i++) {
+        /* the IDENTIFY words are already swapped, so we need to treat
+           this info differently that normal sector data */
+        identify_info[i] = ATA_SWAP_IDENTIFY(ATA_IN16(ATA_DATA));
+    }
+
+    return 0;
+}
+
 static int perform_soft_reset(void)
 {
 /* If this code is allowed to run on a Nano, the next reads from the flash will
@@ -1047,6 +1076,9 @@ static int perform_soft_reset(void)
 
     if (!ret)
         return -1;
+
+    if (identify())
+        return -5;
 
     if (set_features())
         return -2;
@@ -1090,6 +1122,9 @@ static int ata_power_on(void)
     if( ata_hard_reset() )
         return -1;
 
+    if (identify())
+        return -5;
+
     rc = set_features();
     if (rc)
         return rc * 10 - 2;
@@ -1122,33 +1157,6 @@ static int STORAGE_INIT_ATTR master_slave_detect(void)
         else
             return -1;
     }
-    return 0;
-}
-
-static int STORAGE_INIT_ATTR identify(void)
-{
-    int i;
-
-    ATA_OUT8(ATA_SELECT, ata_device);
-
-    if(!wait_for_rdy()) {
-        DEBUGF("identify() - not RDY\n");
-        return -1;
-    }
-    ATA_OUT8(ATA_COMMAND, CMD_IDENTIFY);
-
-    if (!wait_for_start_of_transfer())
-    {
-        DEBUGF("identify() - CMD failed\n");
-        return -2;
-    }
-
-    for (i=0; i<SECTOR_SIZE/2; i++) {
-        /* the IDENTIFY words are already swapped, so we need to treat
-           this info differently that normal sector data */
-        identify_info[i] = ATA_SWAP_IDENTIFY(ATA_IN16(ATA_DATA));
-    }
-
     return 0;
 }
 
