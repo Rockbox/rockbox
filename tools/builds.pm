@@ -65,6 +65,14 @@ $releasenotes="/wiki/ReleaseNotes3112";
         name => 'Philips GoGear SA9200',
         status => 2,
     },
+    'hifimanhm60x' => {
+        name => 'HiFiMAN HM-60x',
+        status => 2,
+    },
+    'hifimanhm801' => {
+        name => 'HiFiMAN HM-801',
+        status => 2,
+    },
     'iaudio7' => {
         name => 'iAudio 7',
         status => 1,
@@ -193,6 +201,10 @@ $releasenotes="/wiki/ReleaseNotes3112";
         name => 'Onda VX777',
         status => 1,
     },
+    'rk27generic' => {
+        name => 'Rockchip rk27xx',
+        status => 1,
+    }
     'samsungyh820' => {
         name => 'Samsung YH-820',
         status => 2,
