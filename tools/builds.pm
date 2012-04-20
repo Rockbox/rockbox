@@ -204,7 +204,7 @@ $releasenotes="/wiki/ReleaseNotes3112";
     'rk27generic' => {
         name => 'Rockchip rk27xx',
         status => 1,
-    }
+    },
     'samsungyh820' => {
         name => 'Samsung YH-820',
         status => 2,
