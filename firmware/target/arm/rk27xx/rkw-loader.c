@@ -41,7 +41,7 @@ static const char *err_str[] = {
 
 const char *rkw_strerror(int8_t errno)
 {
-    if (-errno >= sizeof(err_str)/sizeof(err_str[0]) || errno > 0)
+    if ((uint8_t)-errno >= sizeof(err_str)/sizeof(err_str[0]) || errno > 0)
         return "Unknown error";
 
     return err_str[-errno];

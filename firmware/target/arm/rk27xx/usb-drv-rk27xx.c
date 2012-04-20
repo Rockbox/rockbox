@@ -75,27 +75,27 @@ struct endpoint_t {
 };
 
 static struct endpoint_t ctrlep[2] = {
-    {USB_ENDPOINT_XFER_CONTROL, DIR_OUT, true, NULL, 0, 0, true},
-    {USB_ENDPOINT_XFER_CONTROL, DIR_IN, true, NULL, 0, 0, true}
+    {USB_ENDPOINT_XFER_CONTROL, DIR_OUT, true, NULL, 0, 0, true, {0, 0, 0}},
+    {USB_ENDPOINT_XFER_CONTROL, DIR_IN, true, NULL, 0, 0, true, {0, 0, 0}}
 };
 
 static struct endpoint_t endpoints[16] = {
-    {USB_ENDPOINT_XFER_CONTROL,    3, true,  NULL, 0, 0,  true},  /* stub   */
-    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false},  /* BOUT1  */
-    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false},  /* BIN2   */
-    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false},  /* IIN3   */
-    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false},  /* BOUT4  */
-    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false},  /* BIN5   */
-    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false},  /* IIN6   */
-    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false},  /* BOUT7  */
-    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false},  /* BIN8   */
-    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false},  /* IIN9   */
-    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false},  /* BOUT10 */
-    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false},  /* BIN11  */
-    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false},  /* IIN12  */
-    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false},  /* BOUT13 */
-    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false},  /* BIN14  */
-    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false},  /* IIN15  */
+    {USB_ENDPOINT_XFER_CONTROL,    3, true,  NULL, 0, 0,  true, {0, 0, 0}},  /* stub   */
+    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false, {0, 0, 0}},  /* BOUT1  */
+    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* BIN2   */
+    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* IIN3   */
+    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false, {0, 0, 0}},  /* BOUT4  */
+    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* BIN5   */
+    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* IIN6   */
+    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false, {0, 0, 0}},  /* BOUT7  */
+    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* BIN8   */
+    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* IIN9   */
+    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false, {0, 0, 0}},  /* BOUT10 */
+    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* BIN11  */
+    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* IIN12  */
+    {USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false, {0, 0, 0}},  /* BOUT13 */
+    {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* BIN14  */
+    {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* IIN15  */
 };
 
 static void setup_received(void)
@@ -431,6 +431,7 @@ void usb_drv_release_endpoint(int ep)
 {
     int ep_num = EP_NUM(ep);
     int ep_dir = EP_DIR(ep);
+    (void) ep_dir;
 
     logf("rel: ep%d %s", ep_num, XFER_DIR_STR(ep_dir));
     endpoints[ep_num].allocated = false;
