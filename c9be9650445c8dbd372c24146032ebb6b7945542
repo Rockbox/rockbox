@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAKH///60\u003d",
+        "filename": "firmware/target/hosted/ypr0/radio-ypr0.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000013
+      },
+      "writtenOn": "2012-04-20T17:54:22Z",
+      "side": 1,
+      "message": "Can\u0027t you just move radiodev_open and radiodev_close to powermgmt-ypr0.c?",
+      "revId": "c9be9650445c8dbd372c24146032ebb6b7945542",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///6w\u003d",
+        "filename": "firmware/target/hosted/ypr0/radio-ypr0.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000013
+      },
+      "writtenOn": "2012-04-20T17:54:22Z",
+      "side": 1,
+      "message": "What are si4709_write_reg and si4709_read_reg still used for?",
+      "revId": "c9be9650445c8dbd372c24146032ebb6b7945542",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///6s\u003d",
+        "filename": "firmware/target/hosted/ypr0/radio-ypr0.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000013
+      },
+      "writtenOn": "2012-04-20T17:54:22Z",
+      "side": 1,
+      "message": "I think this file can be left out:\n* radiodev_open/close can be moved to powermgmt-ypr0.c\n* si4709_read_reg/write_reg can be removed entirely",
+      "revId": "c9be9650445c8dbd372c24146032ebb6b7945542",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
