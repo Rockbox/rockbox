@@ -3061,7 +3061,7 @@ fi
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
     appextra="recorder:gui:radio"
-    plugins="yes"
+    plugins=""
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
