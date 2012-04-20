@@ -49,7 +49,6 @@
 
 #define RES_NO (-1)
 
-#define RK27XX_SD_DEBUG
 /* debug stuff */
 unsigned long sd_debug_time_rd = 0;
 unsigned long sd_debug_time_wr = 0;
