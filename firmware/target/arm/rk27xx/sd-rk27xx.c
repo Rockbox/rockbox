@@ -552,7 +552,7 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
             /* wait for transfer completion */
             semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
-#ifdef RK27XX_DEBUG
+#ifdef RK27XX_SD_DEBUG
             /* debug stuff */
             sd_debug_time_rd = 0xffffffff - TMR1CVR;
 #endif
