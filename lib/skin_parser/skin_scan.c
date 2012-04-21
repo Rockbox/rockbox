@@ -28,6 +28,7 @@
 #include "skin_debug.h"
 #include "symbols.h"
 #include "skin_parser.h"
+#include "tag_table.h"
 
 /* Scanning Functions */
 
@@ -40,6 +41,54 @@ void skip_comment(const char** document)
         (*document)++;
 }
 
+void skip_tag(const char** document)
+{
+    char tag_name[MAX_TAG_LENGTH];
+    int i;
+    bool qmark;
+    const struct tag_info *tag;
+    const char *cursor;
+
+    if(**document == TAGSYM)
+        (*document)++;
+    qmark = (**document == CONDITIONSYM);
+    if (qmark)
+        (*document)++;
+
+    if (!qmark && find_escape_character(**document))
+    {
+        (*document)++;
+    }
+    else
+    {
+        cursor = *document;
+
+        /* Checking the tag name */
+        for (i=0; cursor[i] && i<MAX_TAG_LENGTH; i++)
+            tag_name[i] = cursor[i];
+
+        /* First we check the two characters after the '%', then a single char */
+        tag = NULL;
+        i = MAX_TAG_LENGTH;
+        while (!tag && i > 1)
+        {
+            tag_name[i-1] = '\0';
+            tag = find_tag(tag_name);
+            i--;
+        }
+
+        if (tag)
+        {
+            *document += strlen(tag->name);
+        }
+    }
+    if (**document == ARGLISTOPENSYM)
+        skip_arglist(document);
+
+    if (**document == ENUMLISTOPENSYM)
+        skip_enumlist(document);
+}
+
 void skip_arglist(const char** document)
 {
     if(**document == ARGLISTOPENSYM)
@@ -47,16 +96,7 @@ void skip_arglist(const char** document)
     while(**document && **document != ARGLISTCLOSESYM)
     {
         if(**document == TAGSYM)
-        {
-            (*document)++;
-            if(**document == '\0')
-                break;
-            (*document)++;
-        }
-        else if(**document == ARGLISTOPENSYM)
-            skip_arglist(document);
-        else if(**document == ENUMLISTOPENSYM)
-            skip_enumlist(document);
+            skip_tag(document);
         else if(**document == COMMENTSYM)
             skip_comment(document);
         else
@@ -73,16 +113,7 @@ void skip_enumlist(const char** document)
     while(**document && **document != ENUMLISTCLOSESYM)
     {
         if(**document == TAGSYM)
-        {
-            (*document)++;
-            if(**document == '\0')
-                break;
-            (*document)++;
-        }
-        else if(**document == ARGLISTOPENSYM)
-            skip_arglist(document);
-        else if(**document == ENUMLISTOPENSYM)
-            skip_enumlist(document);
+            skip_tag(document);
         else if(**document == COMMENTSYM)
             skip_comment(document);
         else
