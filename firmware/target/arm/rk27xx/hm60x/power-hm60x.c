@@ -40,10 +40,18 @@ void power_init(void)
 
 unsigned int power_input_status(void)
 {
-    return (usb_detect() == USB_INSERTED) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
+    unsigned int status = POWER_INPUT_NONE;
+
+    if (!(GPIO_PADR & 0x80))
+        status |= POWER_INPUT_MAIN_CHARGER;
+
+    if (usb_detect() == USB_INSERTED)
+        status |= POWER_INPUT_USB_CHARGER;
+
+    return status;
 }
 
 bool charging_state(void)
 {
-   return true;
+    return (bool)(!(GPIO_PADR & 0x80));
 }
