@@ -80,6 +80,7 @@
 #include "notification.h"
 #endif
 #include "shortcuts.h"
+#include "filescanner.h"
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
@@ -162,6 +163,7 @@ int main(void)
     CHART(">init");
     init();
     CHART("<init");
+    filescanner_init();
     FOR_NB_SCREENS(i)
     {
         screens[i].clear_display();
