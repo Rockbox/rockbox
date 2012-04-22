@@ -49,15 +49,24 @@ struct filedesc {
     bool write;
     bool dirty;
     bool trunc;
+    bool modified;
 } CACHEALIGN_ATTR;
 
 static struct filedesc openfiles[MAX_OPEN_FILES] CACHEALIGN_ATTR;
+/* Store the filename for each opened file so we can send it in the
+ * "file modified" event.
+ */
+static char open_filenames[MAX_OPEN_FILES][MAX_PATH];
 
 static int flush_cache(int fd);
 
 int file_creat(const char *pathname)
 {
-    return open(pathname, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+    int fd = open(pathname, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+    if (fd >= 0)
+        send_event(FILE_EVENT_FILE_ADDED, pathname);
+
+    return fd;
 }
 
 static int open_internal(const char* pathname, int flags, bool use_cache)
@@ -130,6 +139,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
         file->attr = info->attribute;
         file->cacheoffset = -1;
         file->fileoffset = 0;
+        file->modified = false;
 
         return fd;
     }
@@ -215,6 +225,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
 
     file->cacheoffset = -1;
     file->fileoffset = 0;
+    file->modified = false;
 
     if (file->write && (flags & O_APPEND)) {
         rc = lseek(fd,0,SEEK_END);
@@ -233,7 +244,10 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
 int file_open(const char* pathname, int flags)
 {
     /* By default, use the dircache if available. */
-    return open_internal(pathname, flags, true);
+    int fd = open_internal(pathname, flags, true);
+    strlcpy(open_filenames[fd], pathname, MAX_PATH);
+
+    return fd;
 }
 
 int close(int fd)
@@ -261,6 +275,8 @@ int close(int fd)
 #endif
     }
 
+    if (file->modified)
+        send_event(FILE_EVENT_FILE_MODIFIED,  open_filenames[fd]);
     file->busy = false;
     return 0;
 }
@@ -320,6 +336,7 @@ int remove(const char* name)
     if ( fd < 0 )
         return fd * 10 - 1;
 
+    send_event(FILE_EVENT_FILE_REMOVED, name);
     file = &openfiles[fd];
 #ifdef HAVE_DIRCACHE
     dircache_remove(name);
@@ -705,6 +722,7 @@ ssize_t write(int fd, const void* buf, size_t count)
         errno = EACCES;
         return -1;
     }
+    openfiles[fd].modified = true;
     return readwrite(fd, (void *)buf, count, true);
 }
 
