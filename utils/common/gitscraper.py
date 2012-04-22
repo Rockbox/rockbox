@@ -41,22 +41,22 @@ def get_refs(repo):
     @param repo Path to repository root.
     @return Dict matching hashes to each ref.
     '''
-    print "Getting list of refs"
+    print("Getting list of refs")
     output = subprocess.Popen(["git", "show-ref"], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, cwd=repo)
     cmdout = output.communicate()
     refs = {}
 
     if len(cmdout[1]) > 0:
-        print "An error occured!\n"
-        print cmdout[1]
+        print("An error occured!\n")
+        print(cmdout[1])
         return refs
 
     for line in cmdout:
-        regex = re.findall(r'([a-f0-9]+)\s+(\S+)', line)
+        regex = re.findall(b'([a-f0-9]+)\s+(\S+)', line)
         for r in regex:
             # ref is the key, hash its value.
-            refs[r[1]] = r[0]
+            refs[r[1].decode()] = r[0].decode()
 
     return refs
 
@@ -75,24 +75,25 @@ def get_lstree(repo, start, filterlist=[]):
     objects = {}
 
     if len(cmdout[1]) > 0:
-        print "An error occured!\n"
-        print cmdout[1]
+        print("An error occured!\n")
+        print(cmdout[1])
         return objects
 
-    for line in cmdout[0].split('\n'):
-        regex = re.findall(r'([0-9]+)\s+([a-z]+)\s+([0-9a-f]+)\s+(\S+)', line)
+    for line in cmdout[0].decode().split('\n'):
+        regex = re.findall(b'([0-9]+)\s+([a-z]+)\s+([0-9a-f]+)\s+(\S+)',
+                line.encode())
         for rf in regex:
             # filter
             add = False
             for f in filterlist:
-                if rf[3].find(f) == 0:
+                if rf[3].decode().find(f) == 0:
                     add = True
 
             # If two files have the same content they have the same hash, so
             # the filename has to be used as key.
             if len(filterlist) == 0 or add == True:
                 if rf[3] in objects:
-                    print "FATAL: key already exists in dict!"
+                    print("FATAL: key already exists in dict!")
                     return {}
                 objects[rf[3]] = rf[2]
     return objects
@@ -110,14 +111,13 @@ def get_object(repo, blob, destfile):
     cmdout = output.communicate()
     # make sure output path exists
     if len(cmdout[1]) > 0:
-        print "An error occured!\n"
-        print cmdout[1]
+        print("An error occured!\n")
+        print(cmdout[1])
         return False
     if not os.path.exists(os.path.dirname(destfile)):
         os.makedirs(os.path.dirname(destfile))
     f = open(destfile, 'wb')
-    for line in cmdout[0]:
-        f.write(line)
+    f.write(cmdout[0])
     f.close()
     return True
 
@@ -132,8 +132,8 @@ def describe_treehash(repo, treehash):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
     cmdout = output.communicate()
     if len(cmdout[1]) > 0:
-        print "An error occured!\n"
-        print cmdout[1]
+        print("An error occured!\n")
+        print(cmdout[1])
         return ""
     return cmdout[0].rstrip()
 
@@ -148,13 +148,13 @@ def scrape_files(repo, treehash, filelist, dest=""):
                 created below dest as necessary.
     @return Destination path.
     '''
-    print "Scraping files from repository"
+    print("Scraping files from repository")
 
     if dest == "":
         dest = tempfile.mkdtemp()
     treeobjects = get_lstree(repo, treehash, filelist)
     for obj in treeobjects:
-        get_object(repo, treeobjects[obj], os.path.join(dest, obj))
+        get_object(repo, treeobjects[obj], os.path.join(dest.encode(), obj))
 
     return dest
 
@@ -185,7 +185,7 @@ def archive_files(repo, treehash, filelist, basename, tmpfolder="",
             os.path.join(tmpfolder, basename))
     if basename is "":
         return ""
-    print "Archiving files from repository"
+    print("Archiving files from repository")
     if archive == "7z":
         outfile = basename + ".7z"
         output = subprocess.Popen(["7z", "a",
