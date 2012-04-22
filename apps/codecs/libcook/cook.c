@@ -572,7 +572,7 @@ static void joint_decode(COOKContext *q, REAL_T* mlt_buffer1,
     int idx;
 
     memset(decouple_tab, 0, sizeof(decouple_tab));
-    memset(decode_buffer, 0, sizeof(decode_buffer));
+    memset(decode_buffer, 0, sizeof(q->decode_buffer_0));
 
     /* Make sure the buffers are zeroed out. */
     memset(mlt_buffer1,0, 1024*sizeof(REAL_T));
