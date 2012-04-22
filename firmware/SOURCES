@@ -6,6 +6,7 @@ events.c
 backlight.c
 buflib.c
 core_alloc.c
+filescanner.c
 general.c
 load_code.c
 powermgmt.c

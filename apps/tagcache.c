@@ -82,6 +82,7 @@
 #include "filefuncs.h"
 #include "structec.h"
 #include "debug.h"
+#include "filescanner.h"
 
 #ifndef __PCTOOL__
 #include "lang.h"
@@ -4363,6 +4364,71 @@ static int free_search_roots(struct search_roots_ll * start)
 #define free_search_roots(a) do {} while(0)
 #endif
 
+/* state files for the callbacks */
+static bool scanner_add_files;
+static bool file_scan_busy;
+static void filescanner_enter_directory_callback(void* data)
+{
+    struct file_scan_dir_data *dir_data = (struct file_scan_dir_data*)data;
+    int ignore, unignore;
+    /* check for a database.ignore and database.unignore */
+    check_ignore(dir_data->path, &ignore, &unignore);
+
+    printf("scanning dir %s\n", dir_data->path);
+    /* don't do anything if both ignore and unignore are there */
+    if (ignore != unignore)
+        scanner_add_files = unignore;
+
+    processed_dir_count++;
+    
+}
+static void filescanner_exit_directory_callback(void* data)
+{
+    printf("leaving dir %s\n", (char*)data);
+    scanner_add_files = true; // fixme
+}
+
+static void filescanner_file_callback(void* data)
+{
+    struct file_scan_file_data *info = (struct file_scan_file_data*)data;
+    if (!scanner_add_files)
+        return;
+
+    tc_stat.curentry = info->filename;
+    printf("scanning %s\n", info->filename);
+    /* Add a new entry to the temporary db file. */
+    add_tagcache(info->filename,
+            (info->info->wrtdate << 16) | info->info->wrttime
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+            , info->dir->internal_entry
+#endif
+            );
+    
+    tc_stat.curentry = NULL;
+}
+
+static void filescanner_finish_scan_callback(void* data)
+{
+    intptr_t killed = (intptr_t)data;
+    if (killed)
+    {
+        /* do something? */
+    }
+    remove_event(FILE_SCANNER_ENTER_DIRECTORY, filescanner_enter_directory_callback);
+    remove_event(FILE_SCANNER_EXIT_DIRECTORY, filescanner_exit_directory_callback);
+    remove_event(FILE_SCANNER_FILE, filescanner_file_callback);
+    file_scan_busy = false;
+}
+
+static void filescanner_start_scan_callback(void* data)
+{
+    scanner_add_files = true;
+    /* Only register the callbacks if we actually want to do a scan */
+    add_event(FILE_SCANNER_ENTER_DIRECTORY, false, filescanner_enter_directory_callback);
+    add_event(FILE_SCANNER_EXIT_DIRECTORY, false, filescanner_exit_directory_callback);
+    add_event(FILE_SCANNER_FILE, false, filescanner_file_callback);
+}
+    
 static bool check_dir(const char *dirname, int add_files)
 {
     DIR *dir;
@@ -4501,6 +4567,7 @@ void tagcache_build(const char *path)
     write(cachefd, &header, sizeof(struct tagcache_header));
 
     ret = true;
+#if 0
     roots_ll.path = path;
     roots_ll.next = NULL;
     struct search_roots_ll * this;
@@ -4512,7 +4579,15 @@ void tagcache_build(const char *path)
     }
     if (roots_ll.next)
         free_search_roots(roots_ll.next);
-
+#endif
+    file_scan_busy = true;
+    
+    add_event(FILE_SCANNER_START, false, filescanner_start_scan_callback);
+    add_event(FILE_SCANNER_FINISH, false, filescanner_finish_scan_callback);
+    filescanner_scan(1);
+    while (file_scan_busy)
+        yield();
+    printf("finished\n");
     /* Write the header. */
     header.magic = TAGCACHE_MAGIC;
     header.datasize = data_size;

@@ -80,6 +80,7 @@
 #include "notification.h"
 #endif
 #include "shortcuts.h"
+#include "filescanner.h"
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
 #include "iap.h"
@@ -144,6 +145,13 @@
 
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
+static void file_event_handler(void* data)
+{
+    char *filename = (char*)data;
+
+    printf("some action on %s\n", filename);
+}
+
 static void init(void);
 /* main(), and various functions called by main() and init() may be
  * be INIT_ATTR. These functions must not be called after the final call
@@ -162,6 +170,7 @@ int main(void)
     CHART(">init");
     init();
     CHART("<init");
+    filescanner_init();
     FOR_NB_SCREENS(i)
     {
         screens[i].clear_display();
