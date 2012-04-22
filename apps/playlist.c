@@ -104,6 +104,28 @@
 #include "rbunicode.h"
 #include "root_menu.h"
 #include "plugin.h" /* To borrow a temp buffer to rewrite a .m3u8 file */
+#include "events.h"
+
+/* Handle the File Deleted event.
+ * 
+ * Ideally this should only skip tracks if the file is not fully
+ * buffered, but this isnt trivial, so instead, always skip track
+ * if the currently playing track is deleted from disk.
+ */
+static bool file_event_registered = false;
+static void file_event_removed_callback(void* data)
+{
+    char *filename = (char*)data;
+    char buf[MAX_PATH];
+
+    if (!strcmp(filename, playlist_peek(0, buf, MAX_PATH)))
+    {
+        if (playlist_peek(1, buf, MAX_PATH) == NULL)
+            audio_stop();
+        else
+            audio_next();
+    }
+}   
 
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
@@ -2032,6 +2054,12 @@ void playlist_init(void)
                        IF_COP(, CPU));
     queue_init(&playlist_queue, true);
 #endif
+
+    if (!file_event_registered)
+    {
+        add_event(FILE_EVENT_FILE_DELETED, false, file_event_removed_callback);
+        file_event_registered = true;
+    }
 }
 
 /*

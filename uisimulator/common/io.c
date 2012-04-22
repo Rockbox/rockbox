@@ -59,8 +59,18 @@
 #include "ata.h" /* for IF_MV2 et al. */
 #include "rbpaths.h"
 #include "load_code.h"
+#include "events.h"
 
 /* keep this in sync with file.h! */
+/* Events for filesystem access, the data for each event is the filename. */
+enum {
+    /* File added. Called if successfully creat()'ed. */
+    FILE_EVENT_FILE_ADDED = (EVENT_CLASS_DISK | 32),
+    /* File modified. Called after file close()'ed. */
+    FILE_EVENT_FILE_MODIFIED,
+    /* File removed. Called before the file is removed. */
+    FILE_EVENT_FILE_DELETED
+};
 #undef MAX_PATH /* this avoids problems when building simulator */
 #define MAX_PATH 260
 #define MAX_OPEN_FILES 11
@@ -159,6 +169,14 @@ void dircache_rename(const char *oldname, const char *newname);
 extern const char *sim_root_dir;
 
 static int num_openfiles = 0;
+struct sim_fileinfo {
+    int fd;
+    bool modified;
+    struct sim_fileinfo *next;
+    char filename[MAX_PATH];
+};
+static struct sim_fileinfo open_files[MAX_OPEN_FILES];
+static bool open_files_initialised = false;
 
 /* from dir.h */
 struct dirinfo {
@@ -399,9 +417,15 @@ void sim_closedir(MYDIR *dir)
 int sim_open(const char *name, int o, ...)
 {
     int opts = rockbox2sim(o);
-    int ret;
+    int ret, i;
     if (num_openfiles >= MAX_OPEN_FILES)
         return -2;
+    if (!open_files_initialised)
+    {
+        for (i = 0; i < MAX_OPEN_FILES; i++)
+            open_files[i].fd = -1;
+        open_files_initialised = true;
+    }
 
     if (opts & O_CREAT)
     {
@@ -413,22 +437,49 @@ int sim_open(const char *name, int o, ...)
         if (ret >= 0 && (dircache_get_entry_id(name) < 0))
             dircache_add_file(name, 0);
 #endif
+        if (ret >= 0)
+            send_event(FILE_EVENT_FILE_ADDED, (void*)name);
         va_end(ap);
     }
     else
         ret = OPEN(get_sim_pathname(name), opts);
 
     if (ret >= 0)
+    {
+        for (i=0; i<MAX_OPEN_FILES; i++)
+        {
+            if (open_files[i].fd < 0)
+            {
+                open_files[i].fd = ret;
+                open_files[i].modified = false;
+                strlcpy(open_files[i].filename, name, MAX_PATH);
+                break;
+            }
+        }
         num_openfiles++;
+    }
     return ret;
 }
 
 int sim_close(int fd)
 {
-    int ret;
+    int ret, i;
     ret = CLOSE(fd);
     if (ret == 0)
+    {
+        for (i=0; i<MAX_OPEN_FILES; i++)
+        {
+            if (open_files[i].fd == fd)
+            {
+                open_files[i].fd = -1;
+                if (open_files[i].modified)
+                    send_event(FILE_EVENT_FILE_MODIFIED,
+                            (void*)open_files[i].filename);
+                break;
+            }
+        }
         num_openfiles--;
+    }
     return ret;
 }
 
@@ -495,6 +546,8 @@ int sim_remove(const char *name)
     if (ret >= 0)
         dircache_remove(name);
 #endif
+    if (ret >= 0)
+        send_event(FILE_EVENT_FILE_DELETED, (void*)name);
     return ret;
 }
 
