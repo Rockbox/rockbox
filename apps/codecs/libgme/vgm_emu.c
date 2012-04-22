@@ -194,7 +194,7 @@ static void get_vgm_length( struct header_t const* h, struct track_info_t* out )
 
 static blargg_err_t track_info( struct Vgm_Emu* this, struct track_info_t* out )
 {
-	memset(out, 0, sizeof out);
+	memset(out, 0, sizeof *out);
 	get_vgm_length( header( this ), out );
 	
 	int size;
