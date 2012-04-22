@@ -2032,6 +2032,7 @@ void playlist_init(void)
                        IF_COP(, CPU));
     queue_init(&playlist_queue, true);
 #endif
+
 }
 
 /*
