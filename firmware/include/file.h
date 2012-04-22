@@ -30,6 +30,17 @@
 /* this has SEEK_SET et al */
 #include <stdio.h>
 #endif
+#include "events.h"
+
+/* Events for filesystem access, the data for each event is the filename. */
+enum {
+    /* File added. Called if successfully creat()'ed. */
+    FILE_EVENT_FILE_ADDED = (EVENT_CLASS_DISK | 32),
+    /* File modified. Called after file close()'ed. */
+    FILE_EVENT_FILE_MODIFIED,
+    /* File removed. Called before the file is removed. */
+    FILE_EVENT_FILE_DELETED
+};
 
 
 #undef MAX_PATH /* this avoids problems when building simulator */

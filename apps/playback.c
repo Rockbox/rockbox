@@ -3820,6 +3820,37 @@ void audio_set_crossfade(int enable)
 
 
 /** -- Startup -- **/
+/* Handle the File Deleted event.
+ *
+ * If the deleteed track is partially buffered (it must be the last track
+ * in the track_list) then skip the track.
+ * It can also be the last track in the track_list if it is also
+ * the last track in the playlist in which case we need to know if it
+ * is fully buffered or not before deciding to end the playlist or
+ * let the track finish playing.
+ *
+ * Deleting a track which has already been buffered needs to be handled
+ * in some way (or does it?).
+ */
+static void file_event_removed_callback(void* data)
+{
+    char *filename = (char*)data;
+    struct track_info *track;
+    struct mp3entry *id3 = NULL;
+
+    if (!audio_status())
+        return;
+
+    track = track_list_last(0);
+    if (track && track->id3_hid >= 0)
+        id3 = bufgetid3(track->id3_hid);
+    if (id3 && !strcmp(id3->path, filename))
+    {
+        /* skip this track if it isnt fully buffered. */
+        if (buf_handle_remaining(track->audio_hid) > 0)
+            audio_next();
+    }
+}
 
 /* Initialize the audio system - called from init() in main.c */
 void audio_init(void)
@@ -3832,6 +3863,8 @@ void audio_init(void)
     }
 
     logf("audio: initializing");
+    add_event(FILE_EVENT_FILE_DELETED, false,
+            file_event_removed_callback);
 
     /* Initialize queues before giving control elsewhere in case it likes
        to send messages. Thread creation will be delayed however so nothing
