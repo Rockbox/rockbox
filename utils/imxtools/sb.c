@@ -110,7 +110,7 @@ static void compute_sb_offsets(struct sb_file_t *sb)
             else if(inst->inst == SB_INST_MODE)
             {
                 if(g_debug)
-                    printf("  MODE | mod=0x%08x", inst->addr);
+                    printf("  MODE | mod=0x%08x\n", inst->addr);
                 sb->image_size += sizeof(struct sb_instruction_mode_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_mode_t) / BLOCK_SIZE;
             }
