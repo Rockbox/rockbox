@@ -151,6 +151,9 @@ void Config::accept()
 
     RbSettings::setValue(RbSettings::Language, language);
 
+    // make sure mountpoint is read from dropdown box
+    updateMountpoint(ui.mountPoint->currentIndex());
+
     // mountpoint
     if(mountpoint.isEmpty()) {
         errormsg += "<li>" + tr("No mountpoint given") + "</li>";
