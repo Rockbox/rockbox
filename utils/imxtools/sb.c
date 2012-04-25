@@ -671,11 +671,12 @@ struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
     if(memcmp(sb_header->signature, "STMP", 4) != 0)
         fatal(SB_FORMAT_ERROR, "Bad signature\n");
     if(sb_header->image_size * BLOCK_SIZE > filesize)
-        fatal(SB_FORMAT_ERROR, "File too small");
+        fatal(SB_FORMAT_ERROR, "File too small (should be at least %d bytes)\n",
+            sb_header->image_size * BLOCK_SIZE);
     if(sb_header->header_size * BLOCK_SIZE != sizeof(struct sb_header_t))
-        fatal(SB_FORMAT_ERROR, "Bad header size");
+        fatal(SB_FORMAT_ERROR, "Bad header size\n");
     if(sb_header->sec_hdr_size * BLOCK_SIZE != sizeof(struct sb_section_header_t))
-        fatal(SB_FORMAT_ERROR, "Bad section header size");
+        fatal(SB_FORMAT_ERROR, "Bad section header size\n");
 
     if(filesize > sb_header->image_size * BLOCK_SIZE)
     {
