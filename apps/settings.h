@@ -772,11 +772,14 @@ struct user_settings
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    int compressor_threshold;
-    int compressor_makeup_gain;
-    int compressor_ratio;
-    int compressor_knee;
-    int compressor_release_time;
+    struct compressor_settings
+    {
+        int threshold;
+        int makeup_gain;
+        int ratio;
+        int knee;
+        int release_time;
+    } compressor_settings;
 #endif
 
     int sleeptimer_duration; /* In minutes; 0=off */

@@ -1565,9 +1565,9 @@ void dsp_set_replaygain(void)
 
 /** SET COMPRESSOR
  *  Called by the menu system to configure the compressor process */
-void dsp_set_compressor(void)
+void dsp_set_compressor(const struct compressor_settings *settings)
 {
     /* enable/disable the compressor */
-    AUDIO_DSP.compressor_process = compressor_update() ?
+    AUDIO_DSP.compressor_process = compressor_update(settings) ?
                                         compressor_process : NULL;
 }

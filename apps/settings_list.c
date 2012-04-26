@@ -436,7 +436,7 @@ static void crossfeed_cross_set(int val)
 static void compressor_set(int val)
 {
     (void)val;
-    dsp_set_compressor();
+    dsp_set_compressor(&global_settings.compressor_settings);
 }
 
 static const char* db_format(char* buffer, size_t buffer_size, int value,
@@ -1482,25 +1482,26 @@ const struct settings_list settings[] = {
 #endif
 
     /* compressor */
-    INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_threshold,
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_settings.threshold,
                        LANG_COMPRESSOR_THRESHOLD, 0,
                        "compressor threshold", UNIT_DB, 0, -24,
-                       -3, formatter_unit_0_is_off, getlang_unit_0_is_off, compressor_set),
-    CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_makeup_gain,
+                       -3, formatter_unit_0_is_off, getlang_unit_0_is_off,
+                       compressor_set),
+    CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_settings.makeup_gain,
                    LANG_COMPRESSOR_GAIN, 1, "compressor makeup gain",
                    "off,auto", compressor_set, 2,
                    ID2P(LANG_OFF), ID2P(LANG_AUTO)),
-    CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_ratio,
+    CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_settings.ratio,
                    LANG_COMPRESSOR_RATIO, 1, "compressor ratio",
                    "2:1,4:1,6:1,10:1,limit", compressor_set, 5,
                    ID2P(LANG_COMPRESSOR_RATIO_2), ID2P(LANG_COMPRESSOR_RATIO_4),
                    ID2P(LANG_COMPRESSOR_RATIO_6), ID2P(LANG_COMPRESSOR_RATIO_10),
                    ID2P(LANG_COMPRESSOR_RATIO_LIMIT)),
-    CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_knee,
+    CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_settings.knee,
                    LANG_COMPRESSOR_KNEE, 1, "compressor knee",
                    "hard knee,soft knee", compressor_set, 2,
                    ID2P(LANG_COMPRESSOR_HARD_KNEE), ID2P(LANG_COMPRESSOR_SOFT_KNEE)),
-    INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_release_time,
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_settings.release_time,
                        LANG_COMPRESSOR_RELEASE, 500,
                        "compressor release time", UNIT_MS, 100, 1000,
                        100, NULL, NULL, compressor_set),

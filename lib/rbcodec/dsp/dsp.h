@@ -120,6 +120,7 @@ int32_t sound_get_pitch(void);
 void dsp_set_timestretch(int32_t percent);
 int32_t dsp_get_timestretch(void);
 int dsp_callback(int msg, intptr_t param);
-void dsp_set_compressor(void);
+struct compressor_settings;
+void dsp_set_compressor(const struct compressor_settings *settings);
 
 #endif
