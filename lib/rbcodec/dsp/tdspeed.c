@@ -29,6 +29,7 @@
 #include "system.h"
 #include "tdspeed.h"
 #include "settings.h"
+#include "dsp-util.h"
 
 #define assert(cond)
 
@@ -308,8 +309,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
 
             for (int j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
             {
-                int32_t diff = *curr - *prev;
-                delta += abs(diff);
+                delta += ad_s32(*curr, *prev);
 
                 if (delta >= min_delta)
                     goto skip;
@@ -322,8 +322,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
 
                 for (int j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
                 {
-                    int32_t diff = *curr - *prev;
-                    delta += abs(diff);
+                    delta += ad_s32(*curr, *prev);
 
                     if (delta >= min_delta)
                         goto skip;

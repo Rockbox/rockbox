@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef DSP_HELPER_H
-#define DSP_HELPER_H
+#ifndef DSP_UTIL_H
+#define DSP_UTIL_H
 
 /** Clip sample to signed 16 bit range **/
 
@@ -48,4 +48,11 @@ static FORCE_INLINE int32_t clip_sample_16(int32_t sample)
 
 #undef CLIP_SAMPLE_16_DEFINED
 
-#endif /* DSP_HELPER_H */
+/* Absolute difference of signed 32-bit numbers which must be dealt with
+ * in the unsigned 32-bit range */
+static FORCE_INLINE uint32_t ad_s32(int32_t a, int32_t b)
+{
+    return (a >= b) ? (a - b) : (b - a);
+}
+
+#endif /* DSP_UTIL_H */
