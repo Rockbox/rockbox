@@ -143,6 +143,7 @@ void VoiceFileCreator::downloadDone(bool error)
         else if(line.contains("voice:"))  // voice found
         {
             voice = line.remove("voice:").remove('"').trimmed();
+            voice = voice.remove("<").remove(">");
             voicefound=true;
         }
 
