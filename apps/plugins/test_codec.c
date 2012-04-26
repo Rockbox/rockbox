@@ -245,14 +245,6 @@ static int process_dsp(const void *ch1, const void *ch2, int count)
     return written_count;
 }
 
-static inline int32_t clip_sample(int32_t sample)
-{
-    if ((int16_t)sample != sample)
-        sample = 0x7fff ^ (sample >> 31);
-
-    return sample;
-}
-
 /* Null output */
 static void pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
 {
@@ -304,40 +296,39 @@ static int fill_buffer(int new_offset){
 /* WAV output or calculate crc32 of output*/
 static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int count)
 {
-    const int16_t* data1_16;
-    const int16_t* data2_16;
-    const int32_t* data1_32;
-    const int32_t* data2_32;
-    unsigned char* p = wavbuffer;
-    const int scale = wavinfo.sampledepth - 15;
-    const int dc_bias = 1 << (scale - 1);
-    int channels = (wavinfo.stereomode == STEREO_MONO) ? 1 : 2;
-
     /* Prevent idle poweroff */
     rb->reset_poweroff_timer();
 
     if (use_dsp) {
         count = process_dsp(ch1, ch2, count);
         wavinfo.totalsamples += count;
-        if (channels == 1)
-        {
-            unsigned char *s = dspbuffer, *d = dspbuffer;
-            int c = count;
-            while (c-- > 0)
-            {
-                *d++ = *s++;
-                *d++ = *s++;
-                s++;
-                s++;
-            }
+
+#ifdef ROCKBOX_BIG_ENDIAN
+        unsigned char* p = dspbuffer;
+        int i;
+        for (i = 0; i < count; i++) {
+            int2le16(p,*(int16_t *)p);
+            p += 2;
+            int2le16(p,*(int16_t *)p);
+            p += 2;
         }
-        if (checksum)
-            crc32 = rb->crc_32(dspbuffer, count * 2 * channels, crc32);
-        else
-            rb->write(wavinfo.fd, dspbuffer, count * 2 * channels);
+#endif
+        if (checksum) {
+            crc32 = rb->crc_32(dspbuffer, count * 2 * sizeof (int16_t), crc32);
+        } else {
+            rb->write(wavinfo.fd, dspbuffer, count * 2 * sizeof (int16_t));
+        }
     }
     else
     { 
+        const int16_t* data1_16;
+        const int16_t* data2_16;
+        const int32_t* data1_32;
+        const int32_t* data2_32;
+        unsigned char* p = wavbuffer;
+        const int scale = wavinfo.sampledepth - 15;
+        const int dc_bias = 1 << (scale - 1);
+
         if (wavinfo.sampledepth <= 16) {
             data1_16 = ch1;
             data2_16 = ch2;
@@ -378,18 +369,18 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
             {
                 case STEREO_INTERLEAVED:
                     while (count--) {
-                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
-                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
                     }
                     break;
  
                 case STEREO_NONINTERLEAVED:
                     while (count--) {
-                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
-                        int2le16(p, clip_sample((*data2_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data2_32++ + dc_bias) >> scale));
                         p += 2;
                     }
 
@@ -397,7 +388,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
 
                 case STEREO_MONO:
                     while (count--) {
-                        int2le16(p, clip_sample((*data1_32++ + dc_bias) >> scale));
+                        int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
                     }
                     break;
@@ -514,17 +505,17 @@ static void configure(int setting, intptr_t value)
         case DSP_SWITCH_FREQUENCY:
         case DSP_SET_FREQUENCY:
             DEBUGF("samplerate=%d\n",(int)value);
-            wavinfo.samplerate = (int)value;
+            wavinfo.samplerate = use_dsp ? NATIVE_FREQUENCY : (int)value;
             break;
 
         case DSP_SET_SAMPLE_DEPTH:
             DEBUGF("sampledepth = %d\n",(int)value);
-            wavinfo.sampledepth=(int)value;
+            wavinfo.sampledepth = use_dsp ? 16 : (int)value;
             break;
 
         case DSP_SET_STEREO_MODE:
             DEBUGF("Stereo mode = %d\n",(int)value);
-            wavinfo.stereomode=(int)value;
+            wavinfo.stereomode = use_dsp ? STEREO_INTERLEAVED : (int)value;
             break;
     }
 
@@ -698,8 +689,10 @@ static enum plugin_status test_track(const char* filename)
     ci.id3 = &track.id3;
     ci.curpos = 0;
 
-    if (use_dsp)
+    if (use_dsp) {
         rb->dsp_configure(ci.dsp, DSP_RESET, 0);
+        rb->dsp_configure(ci.dsp, DSP_FLUSH, 0);
+    }
 
     if (checksum)
         crc32 = 0xffffffff;
