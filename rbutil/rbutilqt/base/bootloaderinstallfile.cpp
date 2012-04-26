@@ -80,11 +80,24 @@ void BootloaderInstallFile::installStage2(void)
 
     // place (new) bootloader
     m_tempfile.open();
-    qDebug() << "[BootloaderInstallFile] renaming" << m_tempfile.fileName() << "to" << fwfile;
+    qDebug() << "[BootloaderInstallFile] renaming" << m_tempfile.fileName()
+             << "to" << fwfile;
     m_tempfile.close();
-    m_tempfile.copy(fwfile);
 
-    emit logItem(tr("Bootloader successful installed"), LOGOK);
+    if(!Utils::resolvePathCase(fwfile).isEmpty()) {
+        emit logItem(tr("A firmware file is already present on player"), LOGERROR);
+        emit done(true);
+        return;
+    }
+    if(m_tempfile.copy(fwfile)) {
+        emit logItem(tr("Bootloader successful installed"), LOGOK);
+    }
+    else {
+        emit logItem(tr("Copying modified firmware file failed"), LOGERROR);
+        emit done(true);
+        return;
+    }
+
     logInstall(LogAdd);
 
     emit done(false);
