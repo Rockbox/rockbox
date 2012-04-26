@@ -182,7 +182,7 @@ static void voice_stop_playback(void)
 }
 
 /* Grab a free PCM frame */
-static uint16_t * voice_buf_get(void)
+static int16_t * voice_buf_get(void)
 {
     if (voice_unplayed_frames() >= VOICE_FRAMES)
     {
