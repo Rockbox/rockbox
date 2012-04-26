@@ -59,7 +59,7 @@
    latency */
 #define PRIORITY_VOICE (PRIORITY_PLAYBACK-4)
 
-#define VOICE_FRAME_SIZE    320 /* Samples / frame */
+#define VOICE_FRAME_COUNT   320 /* Samples / frame */
 #define VOICE_SAMPLE_RATE 16000 /* Sample rate in HZ */
 #define VOICE_SAMPLE_DEPTH   16 /* Sample depth in bits */
 
@@ -81,11 +81,11 @@ static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
 static int quiet_counter SHAREDDATA_ATTR = 0;
 
 /* Buffer for decoded samples */
-static spx_int16_t voice_output_buf[VOICE_FRAME_SIZE] CACHEALIGN_ATTR;
+static spx_int16_t voice_output_buf[VOICE_FRAME_COUNT] MEM_ALIGN_ATTR;
 
-#define VOICE_PCM_FRAME_COUNT   ((NATIVE_FREQUENCY*VOICE_FRAME_SIZE + \
+#define VOICE_PCM_FRAME_COUNT   ((NATIVE_FREQUENCY*VOICE_FRAME_COUNT + \
                                  VOICE_SAMPLE_RATE) / VOICE_SAMPLE_RATE)
-#define VOICE_PCM_FRAME_SIZE    (VOICE_PCM_FRAME_COUNT*4)
+#define VOICE_PCM_FRAME_SIZE    (VOICE_PCM_FRAME_COUNT*2*sizeof (int16_t))
 
 /* Default number of native-frequency PCM frames to queue - adjust as
    necessary per-target */
@@ -93,7 +93,7 @@ static spx_int16_t voice_output_buf[VOICE_FRAME_SIZE] CACHEALIGN_ATTR;
 
 /* Might have lookahead and be skipping samples, so size is needed */
 static size_t voicebuf_sizes[VOICE_FRAMES];
-static uint32_t (* voicebuf)[VOICE_PCM_FRAME_COUNT];
+static int16_t (* voicebuf)[2*VOICE_PCM_FRAME_COUNT];
 static unsigned int cur_buf_in, cur_buf_out;
 
 /* Voice processing states */
@@ -165,7 +165,8 @@ static void voice_pcm_callback(const void **start, size_t *size)
 /* Start playback of voice channel if not already playing */
 static void voice_start_playback(void)
 {
-    if (mixer_channel_status(PCM_MIXER_CHAN_VOICE) != CHANNEL_STOPPED)
+    if (mixer_channel_status(PCM_MIXER_CHAN_VOICE) != CHANNEL_STOPPED ||
+        voice_unplayed_frames() <= 0)
         return;
 
     unsigned int i = cur_buf_out % VOICE_FRAMES;
@@ -181,7 +182,7 @@ static void voice_stop_playback(void)
 }
 
 /* Grab a free PCM frame */
-static uint32_t * voice_buf_get(void)
+static uint16_t * voice_buf_get(void)
 {
     if (voice_unplayed_frames() >= VOICE_FRAMES)
     {
@@ -194,9 +195,13 @@ static uint32_t * voice_buf_get(void)
 }
 
 /* Commit a frame returned by voice_buf_get and set the actual size */
-static void voice_buf_commit(size_t size)
+static void voice_buf_commit(int count)
 {
-    voicebuf_sizes[cur_buf_in++ % VOICE_FRAMES] = size;
+    if (count > 0)
+    {
+        voicebuf_sizes[cur_buf_in++ % VOICE_FRAMES] =
+            count * 2 * sizeof (int16_t);
+    }
 }
 
 /* Stop any current clip and start playing a new one */
@@ -382,10 +387,10 @@ static enum voice_state voice_decode(struct voice_thread_data *td)
         yield();
 
         /* Output the decoded frame */
-        td->count = VOICE_FRAME_SIZE - td->lookahead;
+        td->count = VOICE_FRAME_COUNT - td->lookahead;
         td->src[0] = (const char *)&voice_output_buf[td->lookahead];
         td->src[1] = NULL;
-        td->lookahead -= MIN(VOICE_FRAME_SIZE, td->lookahead);
+        td->lookahead -= MIN(VOICE_FRAME_COUNT, td->lookahead);
 
         if (td->count > 0)
             return VOICE_STATE_BUFFER_INSERT;
@@ -404,8 +409,7 @@ static enum voice_state voice_buffer_insert(struct voice_thread_data *td)
 
     if (dest != NULL)
     {
-        voice_buf_commit(dsp_process(td->dsp, dest, td->src, td->count)
-                         * sizeof (int32_t));
+        voice_buf_commit(dsp_process(td->dsp, dest, td->src, td->count));
         return VOICE_STATE_DECODE;
     }
 
@@ -464,10 +468,10 @@ void voice_thread_set_priority(int priority)
 #endif
 
 /* Initialize voice PCM buffer and return size, allocated from the end */
-size_t voicebuf_init(unsigned char *bufend)
+size_t voicebuf_init(void *bufend)
 {
-    size_t size = VOICE_FRAMES * VOICE_PCM_FRAME_SIZE;
+    size_t size = VOICE_FRAMES * sizeof (voicebuf[0]);
     cur_buf_out = cur_buf_in = 0;
-    voicebuf = (uint32_t (*)[VOICE_PCM_FRAME_COUNT])(bufend - size);
+    voicebuf = bufend - size;
     return size;
 }
