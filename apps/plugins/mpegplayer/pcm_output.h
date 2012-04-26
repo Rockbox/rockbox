@@ -41,7 +41,7 @@ uint32_t pcm_output_get_ticks(uint32_t *start);
 void pcm_output_play_pause(bool play);
 void pcm_output_stop(void);
 void pcm_output_drain(void);
-unsigned char * pcm_output_get_buffer(ssize_t *size);
+void * pcm_output_get_buffer(ssize_t *size);
 bool pcm_output_commit_data(ssize_t size, uint32_t timestamp);
 bool pcm_output_empty(void);
 
