@@ -58,9 +58,22 @@ void BootloaderInstallMi4::installStage2(void)
 
     // place new bootloader
     m_tempfile.open();
-    qDebug() << "[BootloaderInstallMi4] renaming" << m_tempfile.fileName() << "to" << fwfile;
+    qDebug() << "[BootloaderInstallMi4] renaming" << m_tempfile.fileName()
+             << "to" << fwfile;
     m_tempfile.close();
-    m_tempfile.copy(fwfile);
+    if(!Utils::resolvePathCase(fwfile).isEmpty()) {
+        emit logItem(tr("A firmware file is already present on player"), LOGERROR);
+        emit done(true);
+        return;
+    }
+    if(m_tempfile.copy(fwfile)) {
+        emit logItem(tr("Bootloader successful installed"), LOGOK);
+    }
+    else {
+        emit logItem(tr("Copying modified firmware file failed"), LOGERROR);
+        emit done(true);
+        return;
+    }
 
     emit logItem(tr("Bootloader successful installed"), LOGOK);
     logInstall(LogAdd);
