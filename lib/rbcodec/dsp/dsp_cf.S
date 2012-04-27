@@ -68,7 +68,7 @@ dsp_apply_gain:
  */
     .section    .text
     .align      2
-    .global     apply_crossfeed 
+    .global     apply_crossfeed
 apply_crossfeed:
     lea.l       -44(%sp), %sp           |
     movem.l     %d2-%d7/%a2-%a6, (%sp)  | save all regs
@@ -124,7 +124,7 @@ apply_crossfeed:
     movem.l     (%sp), %d2-%d7/%a2-%a6  | restore all regs
     lea.l       44(%sp), %sp            |
     rts                                 |
-    .size       apply_crossfeed,.-apply_crossfeed 
+    .size       apply_crossfeed,.-apply_crossfeed
 
 /****************************************************************************
  * int dsp_downsample(int count, struct dsp_data *data,
@@ -422,7 +422,7 @@ sample_output_stereo:
     movem.l     %d1-%d7/%a2-%a6, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     52(%sp), %a0-%a2/%a4      |
-    lea.l       (%a4, %a0.l*4), %a0       | %a0 = end address     
+    lea.l       (%a4, %a0.l*4), %a0       | %a0 = end address
     move.l      (%a1), %d1                | %a1 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
     neg.l       %d1                       |
@@ -448,7 +448,7 @@ sample_output_stereo:
     movclr.l    %acc0, %d1                | get possibly saturated results
     movclr.l    %acc1, %d2                |
     swap        %d2                       | move R to low word
-    move.w      %d2, %d1                  | interleave MS 16 bits of each 
+    move.w      %d2, %d1                  | interleave MS 16 bits of each
     move.l      %d1, (%a4)+               | ...and write both
     cmp.l       %a4, %d0                  |
     bhi.b       10b | long loop 0         |
@@ -530,7 +530,7 @@ sample_output_mono:
     movem.l     %d1-%d5/%a2-%a4, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     36(%sp), %a0-%a3          |
-    lea.l       (%a3, %a0.l*4), %a0       | %a0 = end address     
+    lea.l       (%a3, %a0.l*4), %a0       | %a0 = end address
     move.l      (%a1), %d1                | %d5 = multiplier: (1 << (16 - scale))
     sub.l       #16, %d1                  |
     neg.l       %d1                       |

@@ -63,7 +63,7 @@ sample_output_mono:
     ssat    r12, #16, r12              @
     pkhbt   r12, r12, r12, asl #16     @
     str     r12, [r3]                  @ store So
-                                       @       
+                                       @
     ldmfd   sp!, { r4, pc }            @
     .size   sample_output_mono, .-sample_output_mono
 
@@ -79,7 +79,7 @@ sample_output_stereo:
     @ input: r0 = count, r1 = data, r2 = src, r3 = dst
     stmfd   sp!, { r4-r7, lr }         @
                                        @
-    ldr     r1, [r1]                   @ r1 = data->output_scale    
+    ldr     r1, [r1]                   @ r1 = data->output_scale
     ldmia   r2, { r2, r4 }             @ r2 = src[0], r4 = src[1]
                                        @
     mov     r5, #1                     @ r5 = 1 << (scale - 1)
@@ -95,7 +95,7 @@ sample_output_stereo:
     qadd    r7, r7, r5                 @ Li0+Ri0 to So0, Li1+Ri1 to So1
     qadd    r12, r12, r5               @
     qadd    r14, r14, r5               @
-    mov     r6, r6, asr r1             @ 
+    mov     r6, r6, asr r1             @
     mov     r7, r7, asr r1             @
     mov     r12, r12, asr r1           @
     mov     r14, r14, asr r1           @

@@ -73,17 +73,17 @@ channels_process_sound_chan_mono:
     .type   channels_process_sound_chan_custom, %function
 channels_process_sound_chan_custom:
     stmfd   sp!, { r4-r10, lr }
-    
+
     ldr     r3, =dsp_sw_gain
     ldr     r4, =dsp_sw_cross
 
     ldmia   r1, { r1, r2 }             @ r1 = buf[0], r2 = buf[1]
     ldr     r3, [r3]                   @ r3 = dsp_sw_gain
     ldr     r4, [r4]                   @ r4 = dsp_sw_cross
-    
+
     subs    r0, r0, #1
     beq     .custom_single_sample      @ Zero? Only one sample!
-    
+
 .custom_loop:
     ldmia   r1, { r5, r6 }             @ r5 = Li0, r6 = Li1
     ldmia   r2, { r7, r8 }             @ r7 = Ri0, r8 = Ri1
@@ -94,29 +94,29 @@ channels_process_sound_chan_custom:
     smull   r12, r14, r7, r3           @ Rc0 = Ri0*gain
     smlal   r9, r10, r7, r4            @ Lc0 += Ri0*cross
     smlal   r12, r14, r5, r4           @ Rc0 += Li0*cross
-    
+
     mov     r9, r9, lsr #31            @ Convert to s0.31
     mov     r12, r12, lsr #31
     orr     r5, r9, r10, asl #1
     orr     r7, r12, r14, asl #1
-    
+
     smull   r9, r10, r6, r3            @ Lc1 = Li1*gain
     smull   r12, r14, r8, r3           @ Rc1 = Ri1*gain
     smlal   r9, r10, r8, r4            @ Lc1 += Ri1*cross
     smlal   r12, r14, r6, r4           @ Rc1 += Li1*cross
-    
+
     mov     r9, r9, lsr #31            @ Convert to s0.31
     mov     r12, r12, lsr #31
     orr     r6, r9, r10, asl #1
     orr     r8, r12, r14, asl #1
-    
+
     stmia   r1!, { r5, r6 }            @ Store Lc0, Lc1
     stmia   r2!, { r7, r8 }            @ Store Rc0, Rc1
 
     bgt     .custom_loop
-    
+
     ldmpc   cond=lt, regs=r4-r10       @ < 0? even count
-    
+
 .custom_single_sample:
     ldr     r5, [r1]                   @ handle odd sample
     ldr     r7, [r2]
@@ -218,16 +218,16 @@ sample_output_mono:
     mov     r12, r6, asr #15
     teq     r12, r12, asr #31
     eorne   r6, r14, r6, asr #31       @ Clip (-32768...+32767)
-    
+
     and     r5, r5, r14, lsr #16
     and     r6, r6, r14, lsr #16
     orr     r5, r5, r5, lsl #16        @ pack first 2 halfwords into 1 word
     orr     r6, r6, r6, lsl #16        @ pack last 2 halfwords into 1 word
     stmia   r3!, { r5, r6 }
-    
+
     subs    r0, r0, #2
-    bgt     .somloop     
-       
+    bgt     .somloop
+
     ldmpc   cond=lt, regs=r4-r6        @ even 'count'? return
 
 .som_singlesample:
@@ -244,7 +244,7 @@ sample_output_mono:
 
     ldmpc   regs=r4-r6
     .size   sample_output_mono, .-sample_output_mono
-    
+
 /****************************************************************************
  * void sample_output_stereo(int count, struct dsp_data *data,
  *                           const int32_t *src[], int16_t *dst)
@@ -263,7 +263,7 @@ sample_output_stereo:
     mov     r4, #1
     mov     r4, r4, lsl r1             @ r4 = 1 << (scale-1)
     mov     r4, r4, lsr #1             @
-    
+
     mvn     r14, #0x8000               @ r14 = 0xffff7fff, needed for
                                        @ clipping and masking
     subs    r0, r0, #1                 @
@@ -283,7 +283,7 @@ sample_output_stereo:
     mov     r12, r7, asr #15
     teq     r12, r12, asr #31
     eorne   r7, r14, r7, asr #31       @ Clip (-32768...+32767)
-    
+
     add     r8, r8, r4                 @ r8 = (r8 + 1<<(scale-1)) >> scale
     mov     r8, r8, asr r1
     mov     r12, r8, asr #15
@@ -294,7 +294,7 @@ sample_output_stereo:
     mov     r12, r9, asr #15
     teq     r12, r12, asr #31
     eorne   r9, r14, r9, asr #31       @ Clip (-32768...+32767)
-    
+
     and     r6, r6, r14, lsr #16       @ pack first 2 halfwords into 1 word
     orr     r8, r6, r8, asl #16
     and     r7, r7, r14, lsr #16       @ pack last 2 halfwords into 1 word
@@ -307,7 +307,7 @@ sample_output_stereo:
 
     ldmpc   cond=lt, regs=r4-r9        @ even 'count'? return
 
-.sos_singlesample:    
+.sos_singlesample:
     ldr     r6, [r2]                   @ left odd sample
     ldr     r8, [r5]                   @ right odd sample
 
@@ -321,7 +321,7 @@ sample_output_stereo:
     mov     r12, r8, asr #15
     teq     r12, r12, asr #31
     eorne   r8, r14, r8, asr #31       @ Clip (-32768...+32767)
-    
+
     and     r6, r6, r14, lsr #16       @ pack 2 halfwords into 1 word
     orr     r8, r6, r8, asl #16
 
@@ -329,19 +329,19 @@ sample_output_stereo:
 
     ldmpc   regs=r4-r9
     .size   sample_output_stereo, .-sample_output_stereo
-#endif /* ARM_ARCH < 6 */    
+#endif /* ARM_ARCH < 6 */
 
 /****************************************************************************
  * void apply_crossfeed(int count, int32_t* src[])
  */
     .section .text
-    .global apply_crossfeed 
+    .global apply_crossfeed
 apply_crossfeed:
     @ unfortunately, we ended up in a bit of a register squeeze here, and need
     @ to keep the count on the stack :/
     stmdb   sp!, { r4-r11, lr }        @ stack modified regs
     ldmia   r1, { r2-r3 }              @ r2 = src[0], r3 = src[1]
-    
+
     ldr     r1, =crossfeed_data
     ldmia   r1!, { r4-r11 }            @ load direct gain and filter data
     mov     r12, r0                    @ better to ldm delay + count later
@@ -361,7 +361,7 @@ apply_crossfeed:
     smlal   r14, r1, r5, r8            @ acc += b0*dr[n]
     mov     r9, r1, lsl #1             @ fix format for filter history
     ldr     r12, [r2]                  @ load left input
-    smlal   r14, r1, r4, r12           @ acc += gain*x_l[n] 
+    smlal   r14, r1, r4, r12           @ acc += gain*x_l[n]
     mov     r1, r1, lsl #1             @ fix format
     str     r1, [r2], #4               @ save result
 
@@ -380,11 +380,11 @@ apply_crossfeed:
 
     cmp     r0, r12                    @ need to wrap to start of delay?
     subeq   r0, r0, #13*4*2            @ wrap back delay line ptr to start
- 
+
     subs    r14, r14, #1               @ are we finished?
     strne   r14, [sp, #4]              @ nope, save count back to stack
     bne     .cfloop
-    
+
     @ save data back to struct
     ldr     r12, =crossfeed_data + 4*4
     stmia   r12, { r8-r11 }            @ save filter history
@@ -412,7 +412,7 @@ dsp_downsample:
     ldr     r8, [r3, r5, lsl #2]    @ r8 = d = dst[ch - 1]
     add     r9, r4, #4              @ r9 = &last_sample[0]
     ldr     r10, [r9, r5, lsl #2]   @ r10 = last_sample[ch - 1]
-    sub     r11, r0, #1             
+    sub     r11, r0, #1
     ldr     r14, [r7, r11, lsl #2]  @ load last sample in s[] ...
     str     r14, [r9, r5, lsl #2]   @ and write as next frame's last_sample
     movs    r9, r1, lsr #16         @ r9 = pos = phase >> 16
@@ -469,7 +469,7 @@ dsp_upsample:
     ldr     r8, [r3, r5, lsl #2]    @ r8 = d = dst[ch - 1]
     add     r9, r4, #4              @ r9 = &last_sample[0]
     mov     r1, r12, lsl #16        @ we'll use carry to detect pos increments
-    sub     r11, r0, #1             
+    sub     r11, r0, #1
     ldr     r14, [r7, r11, lsl #2]  @ load last sample in s[] ...
     ldr     r10, [r9, r5, lsl #2]   @ r10 = last_sample[ch - 1]
     str     r14, [r9, r5, lsl #2]   @ and write as next frame's last_sample
@@ -556,6 +556,6 @@ dsp_apply_gain:
 .dag_evencount:
     subs    r3, r3, #1
     bgt     .dag_outerloop          @ end of outer loop
-               
+
     ldmpc   regs=r4-r8
     .size   dsp_apply_gain, .-dsp_apply_gain
