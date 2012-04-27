@@ -91,8 +91,8 @@ struct chunkdesc
 /* General PCM buffer data */
 #define INVALID_BUF_INDEX   ((size_t)0 - (size_t)1)
 
-static unsigned char *pcmbuf_buffer;
-static unsigned char *pcmbuf_guardbuf;
+static void *pcmbuf_buffer;
+static void *pcmbuf_guardbuf;
 static size_t pcmbuf_size;
 static struct chunkdesc *pcmbuf_descriptors;
 static unsigned int pcmbuf_desc_count;
@@ -126,7 +126,7 @@ static bool soft_mode = false;
 
 #ifdef HAVE_CROSSFADE
 /* Crossfade buffer */
-static unsigned char *crossfade_buffer;
+static void *crossfade_buffer;
 
 /* Crossfade related state */
 static int  crossfade_setting;
@@ -496,9 +496,9 @@ static void init_buffer_state(void)
 
 /* Initialize the PCM buffer. The structure looks like this:
  * ...[|FADEBUF]|---------PCMBUF---------|GUARDBUF|DESCS| */
-size_t pcmbuf_init(unsigned char *bufend)
+size_t pcmbuf_init(void *bufend)
 {
-    unsigned char *bufstart;
+    void *bufstart;
 
     /* Set up the buffers */
     pcmbuf_desc_count = get_next_required_pcmbuf_chunks();
@@ -844,7 +844,7 @@ static size_t crossfade_mix_fade(int factor, size_t size, void *buf,
         return size;
 
     const int16_t *input_buf = buf;
-    int16_t *output_buf = (int16_t *)index_buffer(index);
+    int16_t *output_buf = index_buffer(index);
 
     while (size)
     {
@@ -912,7 +912,7 @@ static size_t crossfade_mix_fade(int factor, size_t size, void *buf,
                 return size;
             }
 
-            output_buf = (int16_t *)index_buffer(index);
+            output_buf = index_buffer(index);
         }
     }
 
@@ -1042,7 +1042,7 @@ static void crossfade_start(void)
 /* Perform fade-in of new track */
 static void write_to_crossfade(size_t size, unsigned long elapsed, off_t offset)
 {
-    unsigned char *buf = crossfade_buffer;
+    void *buf = crossfade_buffer;
 
     if (crossfade_fade_in_rem)
     {
@@ -1072,7 +1072,7 @@ static void write_to_crossfade(size_t size, unsigned long elapsed, off_t offset)
 
         /* Fade remaining samples in place */
         int samples = fade_rem / 4;
-        int16_t *input_buf = (int16_t *)buf;
+        int16_t *input_buf = buf;
 
         while (samples--)
         {
@@ -1102,7 +1102,7 @@ static void write_to_crossfade(size_t size, unsigned long elapsed, off_t offset)
     while (size > 0)
     {
         size_t copy_n = size;
-        unsigned char *outbuf = get_write_buffer(&copy_n);
+        void *outbuf = get_write_buffer(&copy_n);
         memcpy(outbuf, buf, copy_n);
         commit_write_buffer(copy_n, elapsed, offset);
         buf += copy_n;
