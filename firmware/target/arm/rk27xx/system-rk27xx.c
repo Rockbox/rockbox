@@ -117,6 +117,7 @@ void fiq_dummy(void)
 
 void system_init(void)
 {
+#ifndef BOOTLOADER
     /* SDRAM tweaks */
     MCSDR_MODE = (2<<4)|3;         /* CAS=2, burst=8 */
     MCSDR_T_REF = (125*100) >> 3;  /* 125/8 = 15.625 autorefresh interval */
@@ -145,7 +146,7 @@ void system_init(void)
 
     /* turn off codec pll */
     SCU_PLLCON3 |= (1<<22);
-    return;
+#endif
 }
 
 /* not tested */
