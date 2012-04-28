@@ -359,8 +359,8 @@ unsigned char* load_of_file(
                     sizeof(tested_versions) - strlen(tested_versions) - 1);
             }
 
-        ERROR("[ERR]  Original firmware unknown, please try an other version." \
-              " Tested %sv%d versions are : %s\n",
+        ERROR("[ERR]  Original firmware unknown, please try another version."
+              " Tested %sv%d versions are: %s\n",
               ams_identity[model].model_name, ams_identity[model].hw_revision, tested_versions);
     }
 
