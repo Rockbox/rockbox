@@ -216,7 +216,6 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
     text += tr("<b>Description:</b> %1<hr/>").arg(codec->toUnicode(iniDetails
                     .value("about", tr("no description")).toByteArray()));
 
-    text.trimmed();
     text.replace("\n", "<br/>");
     ui.themeDescription->setHtml(text);
     iniDetails.endGroup();
