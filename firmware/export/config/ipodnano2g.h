@@ -227,7 +227,7 @@
 #define CONFIG_USBOTG USBOTG_S3C6400X
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1260
-#define USB_NUM_ENDPOINTS 5
+#define USB_NUM_ENDPOINTS 6
 #define USE_ROCKBOX_USB
 #define USB_DEVBSS_ATTR __attribute__((aligned(16)))
 

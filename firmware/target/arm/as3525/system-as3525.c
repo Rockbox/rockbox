@@ -57,7 +57,7 @@ void fiq_handler(void) __attribute__((interrupt ("FIQ")));
 default_interrupt(INT_WATCHDOG);
 default_interrupt(INT_TIMER1);
 default_interrupt(INT_TIMER2);
-default_interrupt(INT_USB);
+default_interrupt(INT_USB_FUNC);
 default_interrupt(INT_DMAC);
 default_interrupt(INT_NAND);
 default_interrupt(INT_IDE);
@@ -134,7 +134,7 @@ static const struct { int source; void (*isr) (void); } vec_int_srcs[] =
 #if (defined HAVE_MULTIDRIVE  && CONFIG_CPU == AS3525)
     { INT_SRC_MCI0, INT_MCI0 },
 #endif
-    { INT_SRC_USB, INT_USB, },
+    { INT_SRC_USB, INT_USB_FUNC, },
     { INT_SRC_TIMER1, INT_TIMER1 },
     { INT_SRC_TIMER2, INT_TIMER2 },
     { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
