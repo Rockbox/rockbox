@@ -123,6 +123,11 @@ clean:
 	rm -f $(OBJS) $(OUTPUT) $(TARGET_DIR)lib$(OUTPUT)*.a $(OUTPUT).dmg
 	rm -rf $(OUTPUT)-* i386 ppc $(OBJDIR)
 
+# extra tools
+BIN2C = $(TOP)/tools/bin2c
+$(BIN2C):
+	$(MAKE) -C $(TOP)/tools
+
 # OS X specifics
 $(OUTPUT).dmg: $(OUTPUT)
 	@echo DMG $@

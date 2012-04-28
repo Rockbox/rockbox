@@ -41,13 +41,11 @@ $(OBJDIR)main.o: $(BOOTSRC)
 $(OBJDIR)sansapatcher-rc.o: sansapatcher.rc sansapatcher.manifest
 	$(WINDRES) -i sansapatcher.rc -o sansapatcher-rc.o
 
-bootimg_c200.c: firmware.mi4 ../tools/bin2c
+bootimg_c200.c: firmware.mi4 $(BIN2C)
 	@echo BIN2C $<
-	$(SILENT)../tools/bin2c firmware.mi4 bootimg_c200
+	$(SILENT)$(BIN2C) $< $*
 
-bootimg_e200.c: PP5022.mi4 ../tools/bin2c
-	@echo BIN2C $<
-	$(SILENT)../tools/bin2c PP5022.mi4 bootimg_e200
+bootimg_e200.c: PP5022.mi4 $(BIN2C)
+	@echo BIN2C $< $*
+	$(SILENT)$(BIN2C) $< $*
 
-../tools/bin2c:
-	$(SILENT)make -C ../tools bin2c
