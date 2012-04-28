@@ -45,14 +45,11 @@ include ../libtools.make
 $(OBJDIR)ipodpatcher-rc.o: ipodpatcher.rc ipodpatcher.manifest
 	$(CROSS)$(WINDRES) -i ipodpatcher.rc -o ipodpatcher-rc.o
 
-ipod2c: ipod2c.c
-	$(NATIVECC) $(CFLAGS) -o ipod2c ipod2c.c
+%.c: bootloader-%.ipod $(BIN2C)
+	@echo BIN2C $<
+	$(SILENT)$(BIN2C) -i $< $*
 
-%.c: bootloader-%.ipod ipod2c
-	@echo IPOD2C $<
-	$(SILENT)./ipod2c $< $*
-
-%.c: bootloader-%.ipodx ipod2c
-	@echo IPOD2C $<
-	$(SILENT)./ipod2c $< $*
+%.c: bootloader-%.ipodx $(BIN2C)
+	@echo BIN2C $<
+	$(SILENT)$(BIN2C) -i $< $*
 
