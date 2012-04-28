@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2007 Dave Chapman
  *
@@ -39,6 +38,13 @@
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
+
+static void usage(void)
+{
+    fprintf(stderr, "bin2c [options] infile cfile\n");
+    fprintf(stderr, "       -i    ipod mode\n");
+}
+
 
 static off_t filesize(int fd)
 {
@@ -116,14 +122,25 @@ int main (int argc, char* argv[])
     unsigned char* buf;
     int len;
     int n;
+    int skip = 0;
+    int opts = 0;
 
-    if (argc != 3) {
-        fprintf(stderr,"Usage: bin2c file cname\n");
+
+    if(argc < 2) {
+        usage();
+        return 0;
+    }
+    if(strcmp(argv[1], "-i") == 0) {
+        skip = 8;
+        opts++;
+    }
+    if (argc < opts + 3) {
+        usage();
         return 0;
     }
 
-    infile=argv[1];
-    cname=argv[2];
+    infile=argv[opts + 1];
+    cname=argv[opts + 2];
 
     fd = open(infile,O_RDONLY|O_BINARY);
     if (fd < 0) {
@@ -131,7 +148,12 @@ int main (int argc, char* argv[])
         return 0;
     }
 
-    len = filesize(fd);
+    len = filesize(fd) - skip;
+    n = lseek(fd, skip, SEEK_SET);
+    if (n != skip) {
+        fprintf(stderr,"Seek failed\n");
+        return 0;
+    }
 
     buf = malloc(len);
     n = read(fd,buf,len);
