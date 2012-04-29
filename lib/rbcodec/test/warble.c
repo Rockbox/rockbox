@@ -75,6 +75,13 @@ void debugf(const char *fmt, ...)
     va_end(ap);
 }
 
+int find_first_set_bit(uint32_t value)
+{
+    if (value == 0)
+        return 32;
+    return __builtin_ctz(value);
+}
+
 /***************** INTERNAL *****************/
 
 static enum { MODE_PLAY, MODE_WRITE } mode;
@@ -391,17 +398,30 @@ static void ci_pcmbuf_insert(const void *ch1, const void *ch2, int count)
     num_output_samples += count;
 
     if (use_dsp) {
-        const char *src[2] = {ch1, ch2};
-        while (count > 0) {
-            int out_count = dsp_output_count(ci.dsp, count);
-            int in_count = MIN(dsp_input_count(ci.dsp, out_count), count);
+        struct dsp_buffer src;
+        src.remcount = count;
+        src.pin[0] = ch1;
+        src.pin[1] = ch2;
+        src.proc_mask = 0;
+        while (1) {
+            int out_count = MAX(count, 512);
             int16_t buf[2 * out_count];
-            out_count = dsp_process(ci.dsp, (char *)buf, src, in_count);
-            if (mode == MODE_WRITE)
-                write_pcm(buf, out_count);
-            else if (mode == MODE_PLAY)
-                playback_pcm(buf, out_count);
-            count -= in_count;
+            struct dsp_buffer dst;
+
+            dst.remcount = 0;
+            dst.p16out = buf;
+            dst.bufcount = out_count;
+
+            dsp_process(ci.dsp, &src, &dst);
+
+            if (dst.remcount > 0) {
+                if (mode == MODE_WRITE)
+                    write_pcm(buf, dst.remcount);
+                else if (mode == MODE_PLAY)
+                    playback_pcm(buf, dst.remcount);
+            } else if (src.remcount <= 0) {
+                break;
+            }
         }
     } else {
         /* Convert to 32-bit interleaved. */
@@ -601,8 +621,9 @@ static struct codec_api ci = {
     ci_semaphore_release,
 #endif
 
-    ci_cpucache_flush,
-    ci_cpucache_invalidate,
+    commit_dcache,
+    commit_discard_dcache,
+    commit_discard_idcache,
 
     /* strings and memory */
     strcpy,
@@ -685,7 +706,6 @@ static void decode_file(const char *input_fn)
     memset(&global_settings, 0, sizeof(global_settings));
     global_settings.timestretch_enabled = true;
     dsp_timestretch_enable(true);
-    tdspeed_init();
 
     /* Open file */
     if (!strcmp(input_fn, "-")) {
@@ -708,7 +728,7 @@ static void decode_file(const char *input_fn)
     ci.filesize = filesize(input_fd);
     ci.id3 = &id3;
     if (use_dsp) {
-        ci.dsp = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP, CODEC_IDX_AUDIO);
+        ci.dsp = dsp_get_config(CODEC_IDX_AUDIO);
         dsp_configure(ci.dsp, DSP_RESET, 0);
         dsp_dither_enable(false);
     }
