@@ -42,7 +42,8 @@
 #ifdef HAVE_RECORDING
 #include "pcm_record.h"
 #endif
-#include "dsp.h"
+#include "dsp_core.h"
+#include "dsp_misc.h"
 #include "dsp-util.h"
 #endif
 

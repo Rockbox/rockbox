@@ -21,7 +21,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
-#include "dsp.h"
+#include "dsp_core.h"
 #include "dsp_sample_io.h"
 
 #if 1

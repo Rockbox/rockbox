@@ -21,8 +21,6 @@
 #ifndef DSP_PROC_SETTINGS_H
 #define DSP_PROC_SETTINGS_H
 
-struct dsp_config;
-
 /* Collect all headers together */
 #include "channel_mode.h"
 #include "compressor.h"

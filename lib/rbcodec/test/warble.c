@@ -35,7 +35,7 @@
 #include "codecs.h"
 #include "core_alloc.h" /* core_allocator_init */
 #include "debug.h"
-#include "dsp.h"
+#include "dsp_core.h"
 #include "metadata.h"
 #include "settings.h"
 #include "sound.h"

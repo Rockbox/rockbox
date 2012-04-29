@@ -23,7 +23,7 @@
 #include "thread.h"
 #include "voice_thread.h"
 #include "talk.h"
-#include "dsp.h"
+#include "dsp_core.h"
 #include "audio.h"
 #include "playback.h"
 #include "pcmbuf.h"

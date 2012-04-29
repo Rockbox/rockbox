@@ -90,7 +90,8 @@ struct dsp_proc_db_entry;
 #include "dsp_proc_database.h"
 
 struct dsp_proc_entry;
-enum dsp_proc_ids;
+
+#include "dsp_core.h"
 
 /* DSP sample transform function prototype */
 typedef void (*dsp_proc_fn_type)(struct dsp_proc_entry *this,

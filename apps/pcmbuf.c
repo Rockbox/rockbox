@@ -40,7 +40,7 @@
 #include "settings.h"
 #include "audio.h"
 #include "voice_thread.h"
-#include "dsp.h"
+#include "dsp_core.h"
 
 /* This is the target fill size of chunks on the pcm buffer
    Can be any number of samples but power of two sizes make for faster and

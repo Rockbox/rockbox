@@ -38,7 +38,7 @@
 #include "talk.h"
 #include "misc.h"
 #include "sound.h"
-#include "dsp.h"
+#include "dsp_proc_settings.h"
 #include "tree.h"
 #include "screen_access.h"
 #include "keyboard.h"

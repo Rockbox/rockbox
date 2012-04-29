@@ -34,7 +34,6 @@
 #include "menu_common.h"
 #include "splash.h"
 #include "kernel.h"
-#include "dsp.h"
 
 /***********************************/
 /*    SOUND MENU                   */

@@ -19,17 +19,17 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "system.h"
+#include <stdbool.h>
+#include <sys/types.h>
 #include "fixedpoint.h"
 #include "fracmul.h"
-#include "dsp.h"
 #include <string.h>
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/
 #include "logf.h"
-
 #include "dsp_proc_entry.h"
+#include "compressor.h"
 
 static struct compressor_settings curr_set; /* Cached settings */
 
@@ -228,10 +228,10 @@ static bool compressor_update(const struct compressor_settings *settings)
     logf("\nGain factors:");
     for (int i = 1; i <= 65; i++)
     {
-        debugf("%02d: %.6f  ", i, (float)comp_curve[i] / UNITY);
-        if (i % 4 == 0) debugf("\n");
+        DEBUGF("%02d: %.6f  ", i, (float)comp_curve[i] / UNITY);
+        if (i % 4 == 0) DEBUGF("\n");
     }
-    debugf("\n");
+    DEBUGF("\n");
 #endif
 
     /* if using auto peak, then makeup gain is max offset -

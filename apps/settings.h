@@ -32,7 +32,7 @@
 #include "button.h"
 #if CONFIG_CODEC == SWCODEC
 #include "audio.h"
-#include "dsp.h"
+#include "dsp_proc_settings.h"
 #endif
 #include "rbpaths.h"
 

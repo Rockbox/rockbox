@@ -23,11 +23,13 @@
 #include "system.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
-#include "dsp.h"
 #include "dsp_filter.h"
+#include "dsp_proc_entry.h"
+#include "dsp_core.h"
+#include "eq.h"
+#include "pga.h"
 #include "replaygain.h"
 #include <string.h>
-#include "dsp_proc_entry.h"
 
 /**
  * Current setup is one lowshelf filters three peaking filters and one

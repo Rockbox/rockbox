@@ -21,12 +21,10 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
-#include "dsp.h"
 #include "fracmul.h"
 #include "fixedpoint.h"
-#include "dsp_sample_io.h"
-#include <string.h>
 #include "dsp_proc_entry.h"
+#include <string.h>
 
 /**
  * Linear interpolation resampling that introduces a one sample delay because

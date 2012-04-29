@@ -21,7 +21,7 @@
 #include "config.h"
 #include "system.h"
 #include "settings.h"
-#include "dsp.h"
+#include "dsp_core.h" /* for NATIVE_FREQUENCY */
 #include "pcm.h"
 #include "pcm_mixer.h"
 #include "misc.h"

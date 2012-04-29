@@ -23,7 +23,6 @@
 
 #include <string.h>
 #include "codecs.h"
-#include "dsp.h"
 #include "codeclib.h"
 #include "metadata.h"
 #include "dsp_proc_entry.h"

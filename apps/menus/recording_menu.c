@@ -53,7 +53,6 @@
 #include "splash.h"
 #if CONFIG_CODEC == SWCODEC
 #include "metadata.h"
-#include "dsp.h"
 #include "menus/eq_menu.h"
 #ifdef HAVE_RECORDING
 #include "enc_config.h"

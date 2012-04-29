@@ -21,11 +21,11 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
-#include "dsp.h"
 #include "dsp-util.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
 #include "dsp_proc_entry.h"
+#include "pga.h"
 
 /* Implemented here or in target assembly code */
 void pga_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p);

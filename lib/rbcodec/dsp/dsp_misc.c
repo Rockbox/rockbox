@@ -22,15 +22,14 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "system.h"
-#include "dsp.h"
-#include "dsp_sample_io.h"
-#include "replaygain.h"
 #include "sound.h"
 #include "settings.h"
 #include "fixedpoint.h"
-#include <string.h>
+#include "replaygain.h"
 #include "dsp_proc_entry.h"
+#include "dsp_sample_io.h"
+#include "dsp_misc.h"
+#include <string.h>
 
 /** Firmware callback interface **/
 

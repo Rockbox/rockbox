@@ -20,14 +20,15 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "system.h"
-#include "dsp.h"
-#include "dsp_filter.h"
+#include <stdbool.h>
+#include <sys/types.h>
 #include "fixedpoint.h"
 #include "fracmul.h"
 #include "replaygain.h"
-#include <string.h>
 #include "dsp_proc_entry.h"
+#include "dsp_filter.h"
+#include "crossfeed.h"
+#include <string.h>
 
 /* Implemented here or in target assembly code */
 void crossfeed_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p);

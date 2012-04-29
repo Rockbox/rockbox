@@ -80,7 +80,7 @@ struct user_settings global_settings;
 struct system_status global_status;
 
 #if CONFIG_CODEC == SWCODEC
-#include "dsp.h"
+#include "dsp_proc_settings.h"
 #include "playback.h"
 #ifdef HAVE_RECORDING
 #include "enc_config.h"

@@ -30,7 +30,6 @@
 #include "settings_list.h"
 #include "lang.h"
 #include "playlist.h"
-#include "dsp.h"
 #include "viewport.h"
 #include "audio.h"
 #include "quickscreen.h"

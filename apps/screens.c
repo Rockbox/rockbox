@@ -55,10 +55,6 @@
 #include "language.h"
 #include "replaygain.h"
 
-#if CONFIG_CODEC == SWCODEC
-#include "dsp.h"
-#endif
-
 #if defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
 #include "adc.h"
 #endif

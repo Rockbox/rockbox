@@ -28,7 +28,7 @@
 #include "pcmbuf.h"
 #include "playback.h"
 #include "buffering.h"
-#include "dsp.h"
+#include "dsp_core.h"
 #include "metadata.h"
 #include "settings.h"
 

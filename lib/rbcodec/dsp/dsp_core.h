@@ -23,9 +23,6 @@
 
 struct dsp_config;
 
-/* Include all this junk here for now */
-#include "dsp_proc_settings.h"
-
 enum dsp_ids
 {
     CODEC_IDX_AUDIO,

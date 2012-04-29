@@ -783,8 +783,6 @@ int sound_val2phys(int setting, int value)
 /* This function works by telling the decoder that we have another
    crystal frequency than we actually have. It will adjust its internal
    parameters and the result is that the audio is played at another pitch.
-
-   The pitch value precision is based on PITCH_SPEED_PRECISION (in dsp.h)
 */
 
 static int last_pitch = PITCH_SPEED_100;

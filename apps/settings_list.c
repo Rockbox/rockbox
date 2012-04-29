@@ -33,7 +33,6 @@
 #include "settings.h"
 #include "settings_list.h"
 #include "usb.h"
-#include "dsp.h"
 #include "audio.h"
 #include "power.h"
 #include "powermgmt.h"

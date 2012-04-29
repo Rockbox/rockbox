@@ -49,7 +49,6 @@
 /* Image stuff */
 #include "albumart.h"
 #endif
-#include "dsp.h"
 #include "playlist.h"
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"

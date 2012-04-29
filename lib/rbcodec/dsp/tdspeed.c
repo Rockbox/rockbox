@@ -24,11 +24,9 @@
 #include "system.h"
 #include "sound.h"
 #include "core_alloc.h"
-#include "system.h"
-#include "tdspeed.h"
-#include "settings.h"
 #include "dsp-util.h"
 #include "dsp_proc_entry.h"
+#include "tdspeed.h"
 
 #define assert(cond)
 

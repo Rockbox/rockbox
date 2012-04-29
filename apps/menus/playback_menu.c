@@ -31,7 +31,6 @@
 #include "sound_menu.h"
 #include "kernel.h"
 #include "playlist.h"
-#include "dsp.h"
 #include "scrobbler.h"
 #include "audio.h"
 #include "cuesheet.h"

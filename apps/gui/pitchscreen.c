@@ -26,7 +26,6 @@
 #include <stdlib.h> /* for abs() */
 #include "config.h"
 #include "action.h"
-#include "dsp.h"
 #include "sound.h"
 #include "pcmbuf.h"
 #include "lang.h"

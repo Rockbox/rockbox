@@ -42,7 +42,6 @@
 #include "plugin.h"
 #include "file.h"
 #include "filefuncs.h"
-#include "dsp.h"
 
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350

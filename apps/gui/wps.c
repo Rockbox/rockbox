@@ -61,7 +61,6 @@
 #include "viewport.h"
 #include "pcmbuf.h"
 #include "option_select.h"
-#include "dsp.h"
 #include "playlist_viewer.h"
 #include "wps.h"
 #include "statusbar-skinned.h"

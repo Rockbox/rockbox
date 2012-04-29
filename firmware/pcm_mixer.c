@@ -25,7 +25,7 @@
 #include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_mixer.h"
-#include "dsp.h"
+#include "dsp_core.h" /* For NATIVE_FREQUENCY */
 
 /* Channels use standard-style PCM callback interface but a latency of one
    frame by double-buffering is introduced in order to facilitate mixing and
