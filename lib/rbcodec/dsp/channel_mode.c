@@ -26,6 +26,7 @@
 #include "fracmul.h"
 #include "dsp_proc_entry.h"
 #include "channel_mode.h"
+#include <string.h>
 
 #if 0
 /* SOUND_CHAN_STEREO mode is a noop so has no function - just outline one for
