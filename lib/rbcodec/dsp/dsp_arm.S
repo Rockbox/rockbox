@@ -414,7 +414,7 @@ pga_process:
 #define HIGH_PRECISION 0
 
 #if CONFIG_CPU == PP5002
-    .section    .icode,"ax",%progbits
+    .section    .icode
 #else
     .text
 #endif
