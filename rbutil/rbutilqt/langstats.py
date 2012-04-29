@@ -5,7 +5,6 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$
 #
 # Copyright (c) 2010 Dominik Riebeling
 #
@@ -24,48 +23,44 @@ import subprocess
 import re
 import sys
 import string
-import pysvn
 import tempfile
 import os
 import shutil
 from datetime import date
 import time
 
+# extend search path for gitscraper
+sys.path.append(os.path.abspath(os.path.dirname(os.path.realpath(__file__))
+        + "/../../utils/common"))
+import gitscraper
+
 
 langs = {
-    'cs'        : 'Czech',
-    'de'        : 'German',
-    'fi'        : 'Finnish',
-    'fr'        : 'French',
-    'gr'        : 'Greek',
-    'he'        : 'Hebrew',
-    'it'        : 'Italian',
-    'ja'        : 'Japanese',
-    'nl'        : 'Dutch',
-    'pl'        : 'Polish',
-    'pt'        : 'Portuguese',
-    'pt_BR'     : 'Portuguese (Brasileiro)',
-    'ru'        : 'Russian',
-    'tr'        : 'Turkish',
-    'zh_CN'     : 'Chinese',
-    'zh_TW'     : 'Chinese (trad)'
+    'cs':       'Czech',
+    'de':       'German',
+    'fi':       'Finnish',
+    'fr':       'French',
+    'gr':       'Greek',
+    'he':       'Hebrew',
+    'it':       'Italian',
+    'ja':       'Japanese',
+    'nl':       'Dutch',
+    'pl':       'Polish',
+    'pt':       'Portuguese',
+    'pt_BR':    'Portuguese (Brasileiro)',
+    'ru':       'Russian',
+    'tr':       'Turkish',
+    'zh_CN':    'Chinese',
+    'zh_TW':    'Chinese (trad)'
 }
 
-# modules that are not part of python itself.
-try:
-    import pysvn
-except ImportError:
-    print "Fatal: This script requires the pysvn package to run."
-    print "       See http://pysvn.tigris.org/."
-    sys.exit(-5)
 
-
-svnserver = "svn://svn.rockbox.org/rockbox/trunk/"
-langbase  = "rbutil/rbutilqt/"
+langbase = "rbutil/rbutilqt/"
 # Paths and files to retrieve from svn.
 # This is a mixed list, holding both paths and filenames.
 # Get cpp sources as well for lupdate to work.
-svnpaths = [ langbase ]
+gitpaths = [langbase]
+
 
 def printhelp():
     print "Usage:", sys.argv[0], "[options]"
@@ -73,36 +68,6 @@ def printhelp():
     print "Options:"
     print "    --pretty: display pretty output instead of wiki-style"
     print "    --help: show this help"
-
-
-def gettrunkrev(svnsrv):
-    '''Get the revision of trunk for svnsrv'''
-    client = pysvn.Client()
-    entries = client.info2(svnsrv, recurse=False)
-    return entries[0][1].rev.number
-
-
-def getsources(svnsrv, filelist, dest):
-    '''Get the files listed in filelist from svnsrv and put it at dest.'''
-    client = pysvn.Client()
-    print "Checking out sources from %s, please wait." % svnsrv
-
-    for elem in filelist:
-        url = re.subn('/$', '', svnsrv + elem)[0]
-        destpath = re.subn('/$', '', dest + elem)[0]
-        # make sure the destination path does exist
-        d = os.path.dirname(destpath)
-        if not os.path.exists(d):
-            os.makedirs(d)
-        # get from svn
-        try:
-            client.export(url, destpath)
-        except:
-            print "SVN client error: %s" % sys.exc_value
-            print "URL: %s, destination: %s" % (url, destpath)
-            return -1
-    print "Checkout finished."
-    return 0
 
 
 def main():
@@ -116,17 +81,22 @@ def main():
     else:
         pretty = 0
 
-    # get svnpaths to temporary folder
+    # get gitpaths to temporary folder
     workfolder = tempfile.mkdtemp() + "/"
-    getsources(svnserver, svnpaths, workfolder)
+    repo = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    tree = gitscraper.get_refs(repo)['refs/remotes/origin/master']
+    filesprops = gitscraper.scrape_files(repo, tree, gitpaths, dest=workfolder,
+            timestamp_files=["rbutil/rbutilqt/lang"])
 
     projectfolder = workfolder + langbase
     # lupdate translations and drop all obsolete translations
-    subprocess.Popen(["lupdate-qt4", "-no-obsolete", "rbutilqt.pro"], \
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=projectfolder).communicate()
+    subprocess.Popen(["lupdate-qt4", "-no-obsolete", "rbutilqt.pro"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            cwd=projectfolder).communicate()
     # lrelease translations to get status
-    output = subprocess.Popen(["lrelease-qt4", "rbutilqt.pro"], stdout=subprocess.PIPE, \
-            stderr=subprocess.PIPE, cwd=projectfolder).communicate()
+    output = subprocess.Popen(["lrelease-qt4", "rbutilqt.pro"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            cwd=projectfolder).communicate()
     lines = re.split(r"\n", output[0])
 
     re_updating = re.compile(r"^Updating.*")
@@ -145,38 +115,33 @@ def main():
             titlemax = cur
 
     if pretty == 1:
-        delim = "+-" + titlemax * "-" \
-                + "-+-------+-----+-----+-----+-----+--------------------+-----------------+"
+        spaces = [7, 5, 5, 5, 5, 27, 17]
+        delim = "+--" + titlemax * "-"
+        for s in spaces:
+            delim += "+" + "-" * s
+        delim += "+"
         head = "| Language" + (titlemax - 8) * " " \
-                + " |  Code |Trans| Fin |Unfin| Untr|       Updated      |       Done      |"
+                + " |  Code |Trans| Fin |Unfin| Untr|           Updated         |       Done      |"
         print delim
-        print "|" + " " * (len(head) / 2 - 3) + str(gettrunkrev(svnserver)) \
-                + " " * (len(head) / 2 - 4) + "|"
+        print "|" + " " * ((len(head) / 2 - len(tree) / 2) - 1) + str(tree) \
+                + " " * ((len(head) / 2 - len(tree) / 2) - 1) + "|"
         print delim
         print head
         print delim
     else:
-        print "|  *Translation status as of revision " + str(gettrunkrev(svnserver)) + "*  ||||||||"
+        r = str(tree) + " (" + gitscraper.get_file_timestamp(repo, tree, ".") + ")"
+        print "|  *Translation status as of revision " + r + "*  ||||||||"
         print "| *Language* | *Language Code* | *Translations* | *Finished* | " \
         "*Unfinished* | *Untranslated* | *Updated* | *Done* |"
 
-    client = pysvn.Client()
     # scan output
     i = 0
-    tslateststamp = 0
-    tsoldeststamp = time.time()
     while i < len(lines):
         line = lines[i]
         if re_updating.search(line):
             lang = re_qmlang.findall(line)
-            tsfile = "lang/" + re_qmbase.findall(line)[0] + ".ts"
-            fileinfo = client.info2(svnserver + langbase + tsfile)[0][1]
-            tsrev = fileinfo.last_changed_rev.number
-            tsdate = date.fromtimestamp(fileinfo.last_changed_date).isoformat()
-            if fileinfo.last_changed_date > tslateststamp:
-                tslateststamp = fileinfo.last_changed_date
-            if fileinfo.last_changed_date < tsoldeststamp:
-                tsoldeststamp = fileinfo.last_changed_date
+            tsfile = "rbutil/rbutilqt/lang/" + re_qmbase.findall(line)[0] + ".ts"
+            tsdate = filesprops[1][tsfile]
 
             line = lines[i + 1]
             if re_generated.search(line):
@@ -191,7 +156,7 @@ def main():
                     ignored = string.atoi(re_ignout.findall(line)[0])
                 else:
                     ignored = 0
-            if langs.has_key(lang[0]):
+            if lang[0] in langs:
                 name = langs[lang[0]].strip()
             else:
                 name = '(unknown)'
@@ -205,11 +170,10 @@ def main():
                 fancylang = lang[0] + " " * (5 - len(lang[0]))
             else:
                 fancylang = lang[0]
-            tsversion = str(tsrev) + " (" + tsdate + ")"
-            status = [fancylang, translations, finished, unfinished, ignored, tsversion, percent, bar]
+            status = [fancylang, translations, finished, unfinished, ignored, tsdate, percent, bar]
             if pretty == 1:
                 thisname = name + (titlemax - len(name)) * " "
-                print "| " + thisname + " | %5s | %3s | %3s | %3s | %3s | %6s | %3i%% %s |" % tuple(status)
+                print "| " + thisname + " | %5s | %3s | %3s | %3s | %3s | %25s | %3i%% %s |" % tuple(status)
             else:
                 if percent > 90:
                     color = '%%GREEN%%'
@@ -226,11 +190,8 @@ def main():
     if pretty == 1:
         print delim
 
-    print "Last language updated on " + date.fromtimestamp(tslateststamp).isoformat()
-    print "Oldest language update was " + date.fromtimestamp(tsoldeststamp).isoformat()
     shutil.rmtree(workfolder)
 
 
 if __name__ == "__main__":
     main()
-
