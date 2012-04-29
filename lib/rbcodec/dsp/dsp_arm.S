@@ -24,7 +24,7 @@
  *  void channel_mode_proc_mono(struct dsp_proc_entry *this,
  *                              struct dsp_buffer **buf_p)
  */
-    .section .icode
+    .section .text
     .global channel_mode_proc_mono
     .type   channel_mode_proc_mono, %function
 channel_mode_proc_mono:
@@ -66,7 +66,7 @@ channel_mode_proc_mono:
  * void channel_mode_proc_custom(struct dsp_proc_entry *this,
  *                               struct dsp_buffer **buf_p)
  */
-    .section .icode
+    .section .text
     .global channel_mode_proc_custom
     .type   channel_mode_proc_custom, %function
 channel_mode_proc_custom:
@@ -141,7 +141,7 @@ channel_mode_proc_custom:
  *  void channel_mode_proc_karaoke(struct dsp_proc_entry *this,
  *                                 struct dsp_buffer **buf_p)
  */
-    .section .icode
+    .section .text
     .global channel_mode_proc_karaoke
     .type   channel_mode_proc_karaoke, %function
 channel_mode_proc_karaoke:
@@ -358,7 +358,7 @@ lin_resample_resample:
 /****************************************************************************
  *  void pga_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
  */
-    .section .icode
+    .section .text
     .global pga_process
     .type   pga_process, %function
 pga_process:
