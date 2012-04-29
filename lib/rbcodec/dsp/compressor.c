@@ -42,7 +42,7 @@ static int32_t release_gain IBSS_ATTR;     /* S7.24 format */
 
 /** COMPRESSOR UPDATE
  *  Called via the menu system to configure the compressor process */
-bool compressor_update(const struct compressor_settings *settings)
+static bool compressor_update(const struct compressor_settings *settings)
 {
     /* make settings values useful */
     int  threshold  = settings->threshold;
