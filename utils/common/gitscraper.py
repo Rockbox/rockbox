@@ -42,8 +42,8 @@ def get_refs(repo):
     @return Dict matching hashes to each ref.
     '''
     print("Getting list of refs")
-    output = subprocess.Popen(["git", "show-ref"], stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, cwd=repo)
+    output = subprocess.Popen(["git", "show-ref", "--abbrev"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
     cmdout = output.communicate()
     refs = {}
 
@@ -99,6 +99,21 @@ def get_lstree(repo, start, filterlist=[]):
     return objects
 
 
+def get_file_timestamp(repo, tree, filename):
+    '''Get timestamp for a file.
+    @param repo Path to repository root.
+    @param tree Hash of tree to use.
+    @param filename Filename in tree
+    @return Timestamp as string.
+    '''
+    output = subprocess.Popen(
+            ["git", "log", "--format=%ai", "-n", "1", tree, filename],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
+    cmdout = output.communicate()
+
+    return cmdout[0].decode().rstrip()
+
+
 def get_object(repo, blob, destfile):
     '''Get an identified object from the repository.
     @param repo Path to repository root.
@@ -138,7 +153,7 @@ def describe_treehash(repo, treehash):
     return cmdout[0].rstrip()
 
 
-def scrape_files(repo, treehash, filelist, dest=""):
+def scrape_files(repo, treehash, filelist, dest="", timestamp_files=[]):
     '''Scrape list of files from repository.
     @param repo Path to repository root.
     @param treehash Hash identifying the tree.
@@ -146,17 +161,23 @@ def scrape_files(repo, treehash, filelist, dest=""):
     @param dest Destination path for files. Files will get retrieved with full
                 path from the repository, and the folder structure will get
                 created below dest as necessary.
-    @return Destination path.
+    @param timestamp_files List of files to also get the last modified date.
+                           WARNING: this is SLOW!
+    @return Destination path, filename:timestamp dict.
     '''
     print("Scraping files from repository")
 
     if dest == "":
         dest = tempfile.mkdtemp()
     treeobjects = get_lstree(repo, treehash, filelist)
+    timestamps = {}
     for obj in treeobjects:
         get_object(repo, treeobjects[obj], os.path.join(dest.encode(), obj))
+        for f in timestamp_files:
+            if obj.find(f) == 0:
+                timestamps[obj] = get_file_timestamp(repo, treehash, obj)
 
-    return dest
+    return [dest, timestamps]
 
 
 def archive_files(repo, treehash, filelist, basename, tmpfolder="",
@@ -182,7 +203,7 @@ def archive_files(repo, treehash, filelist, basename, tmpfolder="",
     else:
         temp_remove = False
     workfolder = scrape_files(repo, treehash, filelist,
-            os.path.join(tmpfolder, basename))
+            os.path.join(tmpfolder, basename))[0]
     if basename is "":
         return ""
     print("Archiving files from repository")
@@ -192,11 +213,13 @@ def archive_files(repo, treehash, filelist, basename, tmpfolder="",
             os.path.join(os.getcwd(), basename + ".7z"), basename],
             cwd=tmpfolder, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output.communicate()
-    else:
+    elif archive == "tbz":
         outfile = basename + ".tar.bz2"
         tf = tarfile.open(outfile, "w:bz2")
         tf.add(workfolder, basename)
         tf.close()
+    else:
+        print("Files not archived")
     if tmpfolder != workfolder:
         shutil.rmtree(workfolder)
     if temp_remove:
