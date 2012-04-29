@@ -24,6 +24,7 @@ INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/apps/recorder \
            -I$(ROOTDIR)/apps/radio \
            -I$(ROOTDIR)/lib/rbcodec/metadata \
+           -I$(ROOTDIR)/lib/rbcodec/dsp \
            -I$(APPSDIR) \
            -I$(BUILDDIR)
 
