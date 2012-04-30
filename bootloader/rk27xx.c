@@ -18,6 +18,7 @@
 #include "file.h"
 #include "crc32-rkw.h"
 #include "rkw-loader.h"
+#include "version.h"
 
 /* beginning of DRAM */
 #define DRAM_ORIG 0x60000000
@@ -127,6 +128,7 @@ void main(void)
     else if (boot == of)
         snprintf(filename,sizeof(filename), BOOTDIR "/%s", "BASE.RKW");
 
+    printf("Bootloader version: %s", RBVERSION);
     printf("Loading: %s", filename);
 
     ret = load_rkw(loadbuffer, filename, LOAD_SIZE);
