@@ -716,7 +716,7 @@ static void usb_tick(void)
 }
 
 /* interrupt service routine */
-void INT_USB(void)
+void INT_USB_FUNC(void)
 {
     int ep = USB_DEV_EP_INTR & ~USB_DEV_EP_INTR_MASK;
     int intr = USB_DEV_INTR & ~USB_DEV_INTR_MASK;
