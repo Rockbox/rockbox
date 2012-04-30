@@ -953,6 +953,45 @@ void keyclick_click(bool rawbutton, int action)
 #endif
     }
 }
+
+/* Return the ReplayGain mode adjusted by other relevant settings */
+static int replaygain_setting_mode(int type)
+{
+    switch (type)
+    {
+    case REPLAYGAIN_SHUFFLE:
+        type = global_settings.playlist_shuffle ?
+            REPLAYGAIN_TRACK : REPLAYGAIN_ALBUM;
+    case REPLAYGAIN_ALBUM:
+    case REPLAYGAIN_TRACK:
+    case REPLAYGAIN_OFF:
+    default:
+        break;
+    }
+
+    return type;
+}
+
+/* Return the ReplayGain mode adjusted for display purposes */
+int id3_get_replaygain_mode(const struct mp3entry *id3)
+{
+    if (!id3)
+        return -1;
+
+    int type = global_settings.replaygain_settings.type;
+    type = replaygain_setting_mode(type);
+
+    return (type != REPLAYGAIN_TRACK && id3->album_gain != 0) ?
+        REPLAYGAIN_ALBUM : (id3->track_gain != 0 ? REPLAYGAIN_TRACK : -1);
+}
+
+/* Update DSP's replaygain from global settings */
+void replaygain_update(void)
+{
+    struct replaygain_settings settings = global_settings.replaygain_settings;
+    settings.type = replaygain_setting_mode(settings.type);
+    dsp_replaygain_set_settings(&settings);
+}
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #endif /* !defined(__PCTOOL__) */

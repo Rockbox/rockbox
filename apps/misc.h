@@ -149,6 +149,16 @@ typedef bool (*keyclick_callback)(int action, void* data);
 void keyclick_set_callback(keyclick_callback cb, void* data);
 /* Produce keyclick based upon button and global settings */
 void keyclick_click(bool rawbutton, int action);
+
+/* Return current ReplayGain mode a file should have (REPLAYGAIN_TRACK or
+ * REPLAYGAIN_ALBUM) if ReplayGain processing is enabled, or -1 if no
+ * information present.
+ */
+struct mp3entry;
+int id3_get_replaygain_mode(const struct mp3entry *id3);
+void replaygain_update(void);
+#else
+static inline void replaygain_update(void) {}
 #endif /* CONFIG_CODEC == SWCODEC */
 
 void push_current_activity(enum current_activity screen);

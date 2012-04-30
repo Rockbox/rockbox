@@ -978,7 +978,7 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_CROSSFADE
     audio_set_crossfade(global_settings.crossfade);
 #endif
-    dsp_set_replaygain();
+    replaygain_update();
     dsp_crossfeed_enable(global_settings.crossfeed);
     dsp_set_crossfeed_direct_gain(global_settings.crossfeed_direct_gain);
     dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
