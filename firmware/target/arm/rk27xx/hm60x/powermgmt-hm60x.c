@@ -53,7 +53,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
     /* TODO: simple copy of discharge curve */
-    { 3300, 3468, 3521, 3562, 3609, 3644, 3691, 3767, 3837, 3919, 4100 }
+    { 3300, 3468, 3521, 3562, 3609, 3644, 3691, 3767, 3837, 3919, 4100 };
 
 /* full-scale ADC readout (2^10) in millivolt */
 #define BATTERY_SCALE_FACTOR 6000
