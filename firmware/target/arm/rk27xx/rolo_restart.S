@@ -36,6 +36,11 @@ rolo_restart:
     ldrh    r5, [r4]
     strh    r5, [r4]
 
+    /* Ungate all clocks */
+    ldr     r4, =0x1801c018
+    eor     r5, r5
+    str     r5, [r4]
+
     adr     r4, restart_copy_start
     adr     r5, restart_copy_end
     ldr     r6, =0x18200000
