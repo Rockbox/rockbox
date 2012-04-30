@@ -26,6 +26,22 @@
 /* Set the tri-pdf dithered output */
 void dsp_dither_enable(bool enable); /* in dsp_sample_output.c */
 
+enum replaygain_types
+{
+    REPLAYGAIN_TRACK = 0,
+    REPLAYGAIN_ALBUM,
+    REPLAYGAIN_SHUFFLE,
+    REPLAYGAIN_OFF
+};
+
+struct replaygain_settings
+{
+    bool noclip; /* scale to prevent clips */
+    int type;    /* 0=track gain, 1=album gain, 2=track gain if
+                    shuffle is on, album gain otherwise, 4=off */
+    int preamp;  /* scale replaygained tracks by this */
+};
+
 /* Structure used with REPLAYGAIN_SET_GAINS message */
 #define REPLAYGAIN_SET_GAINS (DSP_PROC_SETTING+DSP_PROC_MISC_HANDLER)
 struct dsp_replay_gains
@@ -36,8 +52,8 @@ struct dsp_replay_gains
     long album_peak;
 };
 
-int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
-void dsp_set_replaygain(void);
+void dsp_replaygain_set_settings(const struct replaygain_settings *settings);
+void dsp_replaygain_set_gains(const struct dsp_replay_gains *gains);
 
 #ifdef HAVE_PITCHSCREEN
 void sound_set_pitch(int32_t ratio);

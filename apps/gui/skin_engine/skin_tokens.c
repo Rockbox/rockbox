@@ -1420,25 +1420,22 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_REPLAYGAIN:
         {
+            int globtype = global_settings.replaygain_settings.type;
             int val;
 
-            if (global_settings.replaygain_type == REPLAYGAIN_OFF)
+
+            if (globtype == REPLAYGAIN_OFF)
                 val = 1; /* off */
             else
             {
-                int type;
-                if (LIKELY(id3))
-                    type = get_replaygain_mode(id3->track_gain != 0,
-                                               id3->album_gain != 0);
-                else
-                    type = -1;
+                int type = id3_get_replaygain_mode(id3);
 
                 if (type < 0)
                     val = 6;    /* no tag */
                 else
                     val = type + 2;
 
-                if (global_settings.replaygain_type == REPLAYGAIN_SHUFFLE)
+                if (globtype == REPLAYGAIN_SHUFFLE)
                     val += 2;
             }
 

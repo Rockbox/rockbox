@@ -23,12 +23,16 @@
  ****************************************************************************/
 #include "config.h"
 #include "sound.h"
-#include "settings.h"
 #include "fixedpoint.h"
 #include "replaygain.h"
 #include "dsp_proc_entry.h"
 #include "dsp_sample_io.h"
 #include "dsp_misc.h"
+#include "pga.h"
+#include "channel_mode.h"
+#ifdef HAVE_SW_TONE_CONTROLS
+#include "tone_controls.h"
+#endif
 #include <string.h>
 
 /** Firmware callback interface **/
@@ -77,43 +81,37 @@ int dsp_callback(int msg, intptr_t param)
 }
 
 /** Replaygain settings **/
-static struct dsp_replay_gains current_rpgains;
+static struct replaygain_settings current_settings;
+static struct dsp_replay_gains current_gains;
 
-static void dsp_replaygain_update(const struct dsp_replay_gains *gains)
+static void dsp_replaygain_update(
+    const struct replaygain_settings *settings,
+    const struct dsp_replay_gains *gains)
 {
-    if (gains == NULL)
-    {
-        /* Use defaults */
-        memset(&current_rpgains, 0, sizeof (current_rpgains));
-        gains = &current_rpgains;
-    }
-    else
-    {
-        current_rpgains = *gains; /* Stash settings */
-    }
+    if (settings != &current_settings)
+        current_settings = *settings;   /* Stash settings */
+
+    if (gains != &current_gains)
+        current_gains = *gains;         /* Stash gains */
 
     int32_t gain = PGA_UNITY;
 
-    if (global_settings.replaygain_type != REPLAYGAIN_OFF ||
-        global_settings.replaygain_noclip)
+    if (settings->type != REPLAYGAIN_OFF || settings->noclip)
     {
-        bool track_mode =
-            get_replaygain_mode(gains->track_gain != 0,
-                                gains->album_gain != 0) == REPLAYGAIN_TRACK;
+        bool track_mode = settings->type == REPLAYGAIN_TRACK &&
+                          gains->track_gain != 0;
 
         int32_t peak = (track_mode || gains->album_peak == 0) ?
-            gains->track_peak : gains->album_peak;
+                            gains->track_peak : gains->album_peak;
 
-        if (global_settings.replaygain_type != REPLAYGAIN_OFF)
+        if (settings->type != REPLAYGAIN_OFF)
         {
             gain = (track_mode || gains->album_gain == 0) ?
                 gains->track_gain : gains->album_gain;
 
-            if (global_settings.replaygain_preamp)
+            if (settings->preamp != 0)
             {
-                int32_t preamp = get_replaygain_int(
-                    global_settings.replaygain_preamp * 10);
-
+                int32_t preamp = get_replaygain_int(settings->preamp * 10);
                 gain = fp_mul(gain, preamp, 24);
             }
         }
@@ -124,7 +122,7 @@ static void dsp_replaygain_update(const struct dsp_replay_gains *gains)
             gain = PGA_UNITY;
         }
 
-        if (global_settings.replaygain_noclip && peak != 0 &&
+        if (settings->noclip && peak != 0 &&
             fp_mul(gain, peak, 24) >= PGA_UNITY)
         {
             gain = fp_div(PGA_UNITY, peak, 24);
@@ -135,28 +133,21 @@ static void dsp_replaygain_update(const struct dsp_replay_gains *gains)
     pga_enable_gain(PGA_REPLAYGAIN, gain != PGA_UNITY);
 }
 
-int get_replaygain_mode(bool have_track_gain, bool have_album_gain)
+void dsp_replaygain_set_settings(const struct replaygain_settings *settings)
 {
-    bool track = false;
-
-    switch (global_settings.replaygain_type)
-    {
-    case REPLAYGAIN_TRACK:
-        track = true;
-        break;
-
-    case REPLAYGAIN_SHUFFLE:
-        track = global_settings.playlist_shuffle;
-        break;
-    }
-
-    return (!track && have_album_gain) ?
-        REPLAYGAIN_ALBUM : (have_track_gain ? REPLAYGAIN_TRACK : -1);
+    dsp_replaygain_update(settings, &current_gains);
 }
 
-void dsp_set_replaygain(void)
+void dsp_replaygain_set_gains(const struct dsp_replay_gains *gains)
 {
-    dsp_replaygain_update(&current_rpgains);
+    if (gains == NULL)
+    {
+        /* Set defaults */
+        gains = &current_gains;
+        memset((void *)gains, 0, sizeof (*gains));
+    }
+
+    dsp_replaygain_update(&current_settings, gains);
 }
 
 
@@ -217,7 +208,7 @@ static intptr_t misc_handler_configure(struct dsp_proc_entry *this,
 #endif
         value = (intptr_t)NULL; /* Default gains */
     case REPLAYGAIN_SET_GAINS:
-        dsp_replaygain_update((void *)value);
+        dsp_replaygain_set_gains((void *)value);
         break;
 
 #ifdef HAVE_PITCHSCREEN

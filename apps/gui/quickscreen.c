@@ -419,9 +419,7 @@ bool quick_screen_quick(int button_enter)
         if (oldshuffle != global_settings.playlist_shuffle
             && audio_status() & AUDIO_STATUS_PLAY)
         {
-#if CONFIG_CODEC == SWCODEC
-            dsp_set_replaygain();
-#endif
+            replaygain_update();
             if (global_settings.playlist_shuffle)
                 playlist_randomise(NULL, current_tick, true);
             else

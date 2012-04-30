@@ -117,9 +117,6 @@ enum { SORT_INTERPRET_AS_DIGIT, SORT_INTERPRET_AS_NUMBER };
 /* recursive dir insert options */
 enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
 
-/* replaygain types */
-enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE, REPLAYGAIN_OFF };
-
 /* show path types */
 enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
 
@@ -325,10 +322,7 @@ struct user_settings
 #endif
 
     /* Replaygain */
-    bool replaygain_noclip; /* scale to prevent clips */
-    int  replaygain_type;   /* 0=track gain, 1=album gain, 2=track gain if
-                               shuffle is on, album gain otherwise, 4=off */
-    int  replaygain_preamp; /* scale replaygained tracks by this */
+    struct replaygain_settings replaygain_settings;
 
     /* Crossfeed */
     bool crossfeed;                             /* enable crossfeed */
