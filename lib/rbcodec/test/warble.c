@@ -702,6 +702,9 @@ static void print_mp3entry(const struct mp3entry *id3, FILE *f)
 
 static void decode_file(const char *input_fn)
 {
+    /* Initialize DSP before any sort of interaction */
+    dsp_init();
+
     /* Set up global settings */
     memset(&global_settings, 0, sizeof(global_settings));
     global_settings.timestretch_enabled = true;
