@@ -24,37 +24,36 @@
 #include "adc-target.h"
 #include "powermgmt.h"
 
-/*  Battery voltage calculation and discharge/charge curves for the Meizu M3.
+/*  Battery voltage calculation and discharge/charge curves for the HiFiMAN HM-60x.
 
     Battery voltage is calculated under the assumption that the adc full-scale
     readout represents 3.00V and that the battery ADC channel is fed with
     exactly half of the battery voltage (through a resistive divider).
-    Discharge and charge curves have not been calibrated yet.
+    Charge curve have not been calibrated yet.
 */
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     /* TODO: this is just an initial guess */
-    3400
+    3350
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    /* TODO: this is just an initial guess */
     3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* TODO: simple uncalibrated curve, linear except for first 10% */
-    { 3300, 3600, 3665, 3730, 3795, 3860, 3925, 3990, 4055, 4120, 4185 }
+    /* Calibrated curve */
+    { 3300, 3468, 3521, 3562, 3609, 3644, 3691, 3767, 3837, 3919, 4100 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
-    /* TODO: simple uncalibrated curve, linear except for first 10% */
-    { 3300, 3600, 3665, 3730, 3795, 3860, 3925, 3990, 4055, 4120, 4185 };
+    /* TODO: simple copy of discharge curve */
+    { 3300, 3468, 3521, 3562, 3609, 3644, 3691, 3767, 3837, 3919, 4100 }
 
 /* full-scale ADC readout (2^10) in millivolt */
 #define BATTERY_SCALE_FACTOR 6000
