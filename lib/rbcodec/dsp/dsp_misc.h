@@ -53,7 +53,6 @@ struct dsp_replay_gains
 };
 
 void dsp_replaygain_set_settings(const struct replaygain_settings *settings);
-void dsp_replaygain_set_gains(const struct dsp_replay_gains *gains);
 
 #ifdef HAVE_PITCHSCREEN
 void sound_set_pitch(int32_t ratio);

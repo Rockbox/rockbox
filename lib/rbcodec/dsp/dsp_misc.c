@@ -138,12 +138,7 @@ static void dsp_replaygain_update(
     pga_enable_gain(PGA_REPLAYGAIN, gain != PGA_UNITY);
 }
 
-void dsp_replaygain_set_settings(const struct replaygain_settings *settings)
-{
-    dsp_replaygain_update(settings, &current_gains);
-}
-
-void dsp_replaygain_set_gains(const struct dsp_replay_gains *gains)
+static void dsp_replaygain_set_gains(const struct dsp_replay_gains *gains)
 {
     if (gains == NULL)
     {
@@ -153,6 +148,11 @@ void dsp_replaygain_set_gains(const struct dsp_replay_gains *gains)
     }
 
     dsp_replaygain_update(&current_settings, gains);
+}
+
+void dsp_replaygain_set_settings(const struct replaygain_settings *settings)
+{
+    dsp_replaygain_update(settings, &current_gains);
 }
 
 
