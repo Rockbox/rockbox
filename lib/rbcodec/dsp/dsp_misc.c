@@ -35,6 +35,11 @@
 #endif
 #include <string.h>
 
+#if defined(HAVE_SW_TONE_CONTROLS) && defined(HAVE_SW_VOLUME_CONTROL)
+/* Still need this for volume control */
+#include "settings.h"
+#endif
+
 /** Firmware callback interface **/
 
 /* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
