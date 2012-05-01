@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 Thom Johansen
+ * Copyright (C) 2010 Bertrik Sikken
  * Copyright (C) 2012 Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
@@ -31,7 +32,11 @@
 #include <string.h>
 
 /* Implemented here or in target assembly code */
-void crossfeed_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p);
+void crossfeed_process(struct dsp_proc_entry *this,
+                       struct dsp_buffer **buf_p);
+void crossfeed_meier_process(struct dsp_proc_entry *this,
+                             struct dsp_buffer **buf_p);
+
 
 /**
  * Applies crossfeed to the stereo signal.
@@ -46,20 +51,44 @@ static struct crossfeed_state
 {
     int32_t gain;           /* 00h: Direct path gain */
     int32_t coefs[3];       /* 04h: Coefficients for the shelving filter */
-    int32_t history[4];     /* 10h: Format is x[n - 1], y[n - 1] (L + R) */
-    int32_t delay[13*2];    /* 20h: Delay line buffer (L + R interleaved) */
+    union
+    {
+        struct              /* 10h: Data for meier crossfeed */
+        {
+            int32_t vcl;
+            int32_t vcr;
+            int32_t vdiff;
+            int32_t coef1;
+            int32_t coef2;
+        };
+        struct              /* 10h: Data for custom crossfeed */
+        {
+            int32_t history[4]; /* 10h: Format is x[n - 1], y[n - 1] (L + R) */
+            int32_t delay[13*2];/* 20h: Delay line buffer (L + R interleaved) */
+        };
+    };
     int32_t *index;         /* 88h: Current pointer into the delay line */
     struct dsp_config *dsp; /* 8ch: Current DSP */
                             /* 90h */
 } crossfeed_state IBSS_ATTR;
 
+static int crossfeed_type = CROSSFEED_TYPE_NONE;
+
 /* Discard the sample histories */
 static void crossfeed_flush(struct dsp_proc_entry *this)
 {
     struct crossfeed_state *state = (void *)this->data;
-    memset(state->history, 0, sizeof (state->history));
-    memset(state->delay, 0, sizeof (state->delay));
-    state->index = state->delay;
+
+    if (crossfeed_type == CROSSFEED_TYPE_CUSTOM)
+    {
+        memset(state->history, 0,
+            sizeof (state->history) + sizeof (state->delay));
+        state->index = state->delay;
+    }
+    else
+    {
+        state->vcl = state->vcr = state->vdiff = 0;
+    }
 }
 
 
@@ -74,30 +103,48 @@ static void crossfeed_process_new_format(struct dsp_proc_entry *this,
 
     DSP_PRINT_FORMAT(DSP_PROC_CROSSFEED, DSP_PROC_CROSSFEED, buf->format);
 
+    bool was_active = dsp_proc_active(state->dsp, DSP_PROC_CROSSFEED);
     bool active = buf->format.num_channels >= 2;
     dsp_proc_activate(state->dsp, DSP_PROC_CROSSFEED, active);
 
     if (!active)
     {
         /* Can't do this. Sleep until next change */
-        crossfeed_flush(this);
         DEBUGF("  DSP_PROC_CROSSFEED- deactivated\n");
         return;
     }
 
-    /* Switch to the real function and call it once */
-    this->process[0] = crossfeed_process;
+    dsp_proc_fn_type fn = crossfeed_process;
+
+    if (crossfeed_type != CROSSFEED_TYPE_CUSTOM)
+    {
+        /* 1 / (F.Rforward.C) */
+        state->coef1 = (0x7fffffff / NATIVE_FREQUENCY) * 2128;
+        /* 1 / (F.Rcross.C) */
+        state->coef2 = (0x7fffffff / NATIVE_FREQUENCY) * 1000;
+        fn = crossfeed_meier_process;
+    }
+
+    if (!was_active || this->process[0] != fn)
+    {
+        crossfeed_flush(this); /* Going online or actual type change */
+        this->process[0] = fn; /* Set real function */
+    }
+
+    /* Call it once */
     dsp_proc_call(this, buf_p, (unsigned)buf->format.changed - 1);
 }
 
-/* Enable or disable the crossfeed */
-void dsp_crossfeed_enable(bool enable)
+/* Set the type of crossfeed to use */
+void dsp_set_crossfeed_type(int type)
 {
-    if (enable != !crossfeed_state.dsp)
-        return;
+    if (type == crossfeed_type)
+        return; /* No change */
+
+    crossfeed_type = type;
 
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
-    dsp_proc_enable(dsp, DSP_PROC_CROSSFEED, enable);
+    dsp_proc_enable(dsp, DSP_PROC_CROSSFEED, type != CROSSFEED_TYPE_NONE);
 }
 
 /* Set the gain of the dry mix */
@@ -182,6 +229,50 @@ void crossfeed_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
 }
 #endif /* CPU */
 
+#if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
+/**
+ * Implementation of the "simple" passive crossfeed circuit by Jan Meier.
+ * See also: http://www.meier-audio.homepage.t-online.de/passivefilter.htm
+ */
+
+void crossfeed_meier_process(struct dsp_proc_entry *this,
+                             struct dsp_buffer **buf_p)
+{
+    struct dsp_buffer *buf = *buf_p;
+
+    /* Get filter state */
+    struct crossfeed_state *state = (struct crossfeed_state *)this->data;
+    int32_t vcl = state->vcl;
+    int32_t vcr = state->vcr;
+    int32_t vdiff = state->vdiff;
+    int32_t coef1 = state->coef1;
+    int32_t coef2 = state->coef2;
+
+    int count = buf->remcount;
+
+    for (int i = 0; i < count; i++)
+    {
+        /* Calculate new output */
+        int32_t lout = buf->p32[0][i] + vcl;
+        int32_t rout = buf->p32[1][i] + vcr;
+        buf->p32[0][i] = lout;
+        buf->p32[1][i] = rout;
+
+        /* Update filter state */
+        int32_t common = FRACMUL(vdiff, coef2);
+        vcl -= FRACMUL(vcl, coef1) + common;
+        vcr -= FRACMUL(vcr, coef1) - common;
+
+        vdiff = lout - rout;
+    }
+
+    /* Store filter state */
+    state->vcl = vcl;
+    state->vcr = vcr;
+    state->vdiff = vdiff;
+}
+#endif /* CPU */
+
 /* DSP message hook */
 static intptr_t crossfeed_configure(struct dsp_proc_entry *this,
                                     struct dsp_config *dsp,
@@ -191,11 +282,19 @@ static intptr_t crossfeed_configure(struct dsp_proc_entry *this,
     switch (setting)
     {
     case DSP_PROC_INIT:
-        this->data = (intptr_t)&crossfeed_state;
+        if (value == 0)
+        {
+            /* New object */
+            this->data = (intptr_t)&crossfeed_state;
+            this->process[1] = crossfeed_process_new_format;
+            ((struct crossfeed_state *)this->data)->dsp = dsp;
+        }
+
+        /* Force format change call each time */
         this->process[0] = crossfeed_process_new_format;
-        this->process[1] = crossfeed_process_new_format;
-        ((struct crossfeed_state *)this->data)->dsp = dsp;
         dsp_proc_activate(dsp, DSP_PROC_CROSSFEED, true);
+        break;
+
     case DSP_FLUSH:
         crossfeed_flush(this);
         break;
