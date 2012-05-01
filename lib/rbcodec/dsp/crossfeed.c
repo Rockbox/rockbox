@@ -31,7 +31,11 @@
 #include <string.h>
 
 /* Implemented here or in target assembly code */
-void crossfeed_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p);
+void crossfeed_process(struct dsp_proc_entry *this,
+                       struct dsp_buffer **buf_p);
+void crossfeed_meier_process(struct dsp_proc_entry *this,
+                             struct dsp_buffer **buf_p);
+
 
 /**
  * Applies crossfeed to the stereo signal.
@@ -52,6 +56,8 @@ static struct crossfeed_state
     struct dsp_config *dsp; /* 8ch: Current DSP */
                             /* 90h */
 } crossfeed_state IBSS_ATTR;
+
+static int crossfeed_type = CROSSFEED_TYPE_NONE;
 
 /* Discard the sample histories */
 static void crossfeed_flush(struct dsp_proc_entry *this)
@@ -86,18 +92,21 @@ static void crossfeed_process_new_format(struct dsp_proc_entry *this,
     }
 
     /* Switch to the real function and call it once */
-    this->process[0] = crossfeed_process;
+    this->process[0] = crossfeed_type != CROSSFEED_TYPE_CUSTOM ?
+                            crossfeed_meier_process : crossfeed_process;
     dsp_proc_call(this, buf_p, (unsigned)buf->format.changed - 1);
 }
 
-/* Enable or disable the crossfeed */
-void dsp_crossfeed_enable(bool enable)
+/* Set the type of crossfeed to use */
+void dsp_set_crossfeed_type(int type)
 {
-    if (enable != !crossfeed_state.dsp)
-        return;
+    if (type == crossfeed_type)
+        return; /* No change */
+
+    crossfeed_type = type;
 
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
-    dsp_proc_enable(dsp, DSP_PROC_CROSSFEED, enable);
+    dsp_proc_enable(dsp, DSP_PROC_CROSSFEED, type != CROSSFEED_TYPE_NONE);
 }
 
 /* Set the gain of the dry mix */
@@ -182,6 +191,50 @@ void crossfeed_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
 }
 #endif /* CPU */
 
+/**
+ * Implementation of the "simple" passive crossfeed circuit by Jan Meier.
+ * See also: http://www.meier-audio.homepage.t-online.de/passivefilter.htm
+ */
+void crossfeed_meier_process(struct dsp_proc_entry *this,
+                             struct dsp_buffer **buf_p)
+{
+    static const int32_t coef1 =
+        (0x7fffffff / NATIVE_FREQUENCY) * 2128; /* 1 / (F.Rforward.C) */
+    static const int32_t coef2 =
+        (0x7fffffff / NATIVE_FREQUENCY) * 1000; /* 1 / (F.Rcross.C) */
+
+    struct dsp_buffer *buf = *buf_p;
+
+    /* Get filter state */
+    int32_t *hist = ((struct crossfeed_state *)this->data)->history;
+    int32_t vcl = hist[0];
+    int32_t vcr = hist[1];
+    int32_t vdiff = hist[2];
+
+    int count = buf->remcount;
+
+    for (int i = 0; i < count; i++)
+    {
+        /* Calculate new output */
+        int32_t lout = buf->p32[0][i] + vcl;
+        int32_t rout = buf->p32[1][i] + vcr;
+        buf->p32[0][i] = lout;
+        buf->p32[1][i] = rout;
+
+        /* Update filter state */
+        int32_t common = FRACMUL(vdiff, coef2);
+        vcl -= (FRACMUL(vcl, coef1) + common);
+        vcr -= (FRACMUL(vcr, coef1) - common);
+
+        vdiff = lout - rout;
+    }
+
+    /* Store filter state */
+    hist[0] = vcl;
+    hist[1] = vcr;
+    hist[2] = vdiff;
+}
+
 /* DSP message hook */
 static intptr_t crossfeed_configure(struct dsp_proc_entry *this,
                                     struct dsp_config *dsp,
@@ -191,10 +244,16 @@ static intptr_t crossfeed_configure(struct dsp_proc_entry *this,
     switch (setting)
     {
     case DSP_PROC_INIT:
-        this->data = (intptr_t)&crossfeed_state;
+        if (value == 0)
+        {
+            /* New object */
+            this->data = (intptr_t)&crossfeed_state;
+            this->process[1] = crossfeed_process_new_format;
+            ((struct crossfeed_state *)this->data)->dsp = dsp;
+        }
+
+        /* Force format change call each time */
         this->process[0] = crossfeed_process_new_format;
-        this->process[1] = crossfeed_process_new_format;
-        ((struct crossfeed_state *)this->data)->dsp = dsp;
         dsp_proc_activate(dsp, DSP_PROC_CROSSFEED, true);
     case DSP_FLUSH:
         crossfeed_flush(this);
