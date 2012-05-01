@@ -495,7 +495,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
             s->noise_mult = 0x51f;
             /*unlikely, but we may have previoiusly used this table for LSP,
             so halve the values if needed*/
-            if(noisetable_exp[0] == 0x10) {
+            if(noisetable_exp[0] == 0x0a) {
                 for (i=0;i<NOISE_TAB_SIZE;++i)
                     noisetable_exp[i] >>= 1;  
             }
