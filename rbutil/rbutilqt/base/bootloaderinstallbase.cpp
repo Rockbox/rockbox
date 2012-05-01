@@ -20,16 +20,6 @@
 #include <QtCore>
 
 #include "bootloaderinstallbase.h"
-#include "bootloaderinstallmi4.h"
-#include "bootloaderinstallhex.h"
-#include "bootloaderinstallipod.h"
-#include "bootloaderinstallsansa.h"
-#include "bootloaderinstallfile.h"
-#include "bootloaderinstallchinachip.h"
-#include "bootloaderinstallams.h"
-#include "bootloaderinstalltcc.h"
-#include "bootloaderinstallmpio.h"
-#include "bootloaderinstallimx.h"
 #include "utils.h"
 #include "ziputil.h"
 
@@ -39,44 +29,6 @@
 #include <sys/mount.h>
 #endif
 
-
-BootloaderInstallBase* BootloaderInstallBase::createBootloaderInstaller(QObject* parent,QString type)
-{
-    if(type == "mi4") {
-        return new BootloaderInstallMi4(parent);
-    }
-    else if(type == "hex") {
-        return new BootloaderInstallHex(parent);
-    }
-    else if(type == "sansa") {
-        return new BootloaderInstallSansa(parent);
-    }
-    else if(type == "ipod") {
-        return new BootloaderInstallIpod(parent);
-    }
-    else if(type == "file") {
-        return new BootloaderInstallFile(parent);
-    }
-    else if(type == "chinachip") {
-        return new BootloaderInstallChinaChip(parent);
-    }
-    else if(type == "ams") {
-        return new BootloaderInstallAms(parent);
-    }
-    else if(type == "tcc") {
-        return new BootloaderInstallTcc(parent);
-    }
-    else if(type == "mpio") {
-        return new BootloaderInstallMpio(parent);
-    }
-    else if(type == "imx") {
-        return new BootloaderInstallImx(parent);
-    }
-    else {
-        return NULL;
-    }
-
-}
 
 BootloaderInstallBase::BootloaderType BootloaderInstallBase::installed(void)
 {
@@ -142,6 +94,7 @@ void BootloaderInstallBase::downloadBlFinish(bool error)
     emit downloadDone();
 }
 
+
 void BootloaderInstallBase::installBlfile(void)
 {
     qDebug() << "[BootloaderInstallBase] installBlFile(void)";
@@ -151,7 +104,6 @@ void BootloaderInstallBase::installBlfile(void)
 //! @brief backup OF file.
 //! @param to folder to write backup file to. Folder will get created.
 //! @return true on success, false on error.
-
 bool BootloaderInstallBase::backup(QString to)
 {
     qDebug() << "[BootloaderInstallBase] Backing up bootloader file";
@@ -195,67 +147,6 @@ int BootloaderInstallBase::logInstall(LogMode mode)
     emit logItem(tr("Installation log created"), LOGOK);
 
     return result;
-}
-
-
-//! @brief Return post install hints string.
-//! @param model model string
-//! @return hints.
-QString BootloaderInstallBase::postinstallHints(QString model)
-{
-    bool hint = false;
-    QString msg = tr("Bootloader installation is almost complete. "
-            "Installation <b>requires</b> you to perform the "
-            "following steps manually:");
-
-    msg += "<ol>";
-    if(model != "sansafuzeplus") {
-        msg += tr("<li>Safely remove your player.</li>");
-    }
-    if(model == "iriverh100" || model == "iriverh120" || model == "iriverh300" ||
-       model == "ondavx747") {
-        hint = true;
-        msg += tr("<li>Reboot your player into the original firmware.</li>"
-                "<li>Perform a firmware upgrade using the update functionality "
-                "of the original firmware. Please refer to your player's manual "
-                "on details.<br/><b>Important:</b> updating the firmware is a "
-                "critical process that must not be interrupted. <b>Make sure the "
-                "player is charged before starting the firmware update "
-                "process.</b></li>"
-                "<li>After the firmware has been updated reboot your player.</li>");
-    }
-    if(model == "sansafuzeplus") {
-        hint = true;
-        msg += tr("<li>Remove any previously inserted microSD card</li>");
-        msg += tr("<li>Disconnect your player. The player will reboot and "
-                "perform an update of the original firmware. "
-                "Please refer to your players manual on details.<br/>"
-                "<b>Important:</b> updating the firmware is a "
-                "critical process that must not be interrupted. <b>Make sure the "
-                "player is charged before disconnecting the player.</b></li>"
-                "<li>After the firmware has been updated reboot your player.</li>");
-    }
-    if(model == "iaudiox5" || model == "iaudiom5"
-            || model == "iaudiox5v" || model == "iaudiom3" || model == "mpioh200") {
-        hint = true;
-        msg += tr("<li>Turn the player off</li>"
-                "<li>Insert the charger</li>");
-    }
-    if(model == "gigabeatf") {
-        hint = true;
-        msg += tr("<li>Unplug USB and power adaptors</li>"
-                "<li>Hold <i>Power</i> to turn the player off</li>"
-                "<li>Toggle the battery switch on the player</li>"
-                "<li>Hold <i>Power</i> to boot into Rockbox</li>");
-    }
-    msg += "</ol>";
-    msg += tr("<p><b>Note:</b> You can safely install other parts first, but "
-            "the above steps are <b>required</b> to finish the installation!</p>");
-
-    if(hint)
-        return msg;
-    else
-        return QString("");
 }
 
 
@@ -320,6 +211,7 @@ void BootloaderInstallBase::setBlFile(QStringList sl)
     }
 }
 
+
 bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
 {
     bool found = false;
@@ -360,3 +252,4 @@ bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
     }
     return found;
 }
+

@@ -44,7 +44,7 @@
 #include "progressloggerinterface.h"
 
 #include "bootloaderinstallbase.h"
-#include "bootloaderinstallmpio.h"
+#include "bootloaderinstallhelper.h"
 
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
@@ -673,8 +673,9 @@ void RbUtilQt::installBootloader()
     m_error = false;
 
     // create installer
-    BootloaderInstallBase *bl = BootloaderInstallBase::createBootloaderInstaller(this,
-                                    SystemInfo::value(SystemInfo::CurBootloaderMethod).toString());
+    BootloaderInstallBase *bl =
+        BootloaderInstallHelper::createBootloaderInstaller(this,
+                SystemInfo::value(SystemInfo::CurBootloaderMethod).toString());
     if(bl == NULL) {
         logger->addItem(tr("No install method known."), LOGERROR);
         logger->setFinished();
@@ -806,7 +807,7 @@ void RbUtilQt::installBootloaderPost(bool error)
     if(m_auto)
         return;
 
-    QString msg = BootloaderInstallBase::postinstallHints(
+    QString msg = BootloaderInstallHelper::postinstallHints(
                     RbSettings::value(RbSettings::Platform).toString());
     if(!msg.isEmpty()) {
         QMessageBox::information(this, tr("Manual steps required"), msg);
@@ -1048,10 +1049,11 @@ void RbUtilQt::uninstallBootloader(void)
     QString platform = RbSettings::value(RbSettings::Platform).toString();
 
     // create installer
-    BootloaderInstallBase *bl = BootloaderInstallBase::createBootloaderInstaller(this,
-                                    SystemInfo::value(SystemInfo::CurBootloaderMethod).toString());
+    BootloaderInstallBase *bl
+        = BootloaderInstallHelper::createBootloaderInstaller(this,
+                SystemInfo::value(SystemInfo::CurBootloaderMethod).toString());
 
-    if(bl == NULL ) {
+    if(bl == NULL) {
         logger->addItem(tr("No uninstall method for this target known."), LOGERROR);
         logger->setFinished();
         return;
