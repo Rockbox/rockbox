@@ -13038,3 +13038,37 @@
     *: "Start Sleep Timer"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Meier"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Meier"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Meier"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Custom"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Custom"
+  </voice>
+</phrase>
