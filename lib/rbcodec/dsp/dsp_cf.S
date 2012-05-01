@@ -8,7 +8,8 @@
  * $Id$
  *
  * Copyright (C) 2006 Thom Johansen
- * Portions Copyright (C) 2007 Michael Sevakis
+ * Copyright (C) 2007, 2012 Michael Sevakis
+ * Copyright (C) 2010 Bertrik Sikken
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -132,6 +133,50 @@ crossfeed_process:
     lea.l       44(%sp), %sp            |
     rts                                 |
     .size       crossfeed_process,.-crossfeed_process
+
+/****************************************************************************
+ * void crossfeed_meier_process(struct dsp_proc_entry *this,
+ *                              struct dsp_buffer **buf_p)
+ */
+    .section .text
+    .global crossfeed_meier_process
+crossfeed_meier_process:
+    | input: 4(sp) = this, 8(sp) = buf_p
+    movem.l     4(%sp), %a0-%a1         | %a0 = this, %a1 = buf_p
+    lea.l       -24(%sp), %sp           | save non-volatiles
+    movem.l     %d2-%d6/%a2, (%sp)      | .
+    move.l      (%a0), %a0              | %a0 = &this->data = &crossfeed_state
+    move.l      (%a1), %a1              | %a1 = buf = *buf_p
+    movem.l     16(%a0), %d1-%d5        | %d1 = vcl, %d2 = vcr, %d3 = vdiff,
+                                        | %d4 = coef1, %d5 = coef2
+    movem.l     (%a1), %d0/%a1-%a2      | %d0 = count = buf->remcount
+                                        | %a1 = p32[0], %a2 = p32[1]
+    | Register usage in loop:
+    | %d0 = count, %d1 = vcl, %d2 = vcr, %d3 = vdiff/lout,
+    | %d4 = coef1, %d5 = coef2, %d6 = rout/scratch
+    | %a1 = p32[0], %a2 = p32[1]
+10: | loop
+    mac.l       %d5, %d3, %acc0         | %acc0 = common = coef2*vdiff
+    move.l      %acc0, %acc1            | copy common
+    mac.l       %d4, %d1, (%a1), %d3, %acc0 | %acc0 += coef1*vcl, %d3 = lout
+    msac.l      %d4, %d2, (%a2), %d6, %acc1 | %acc1 -= coef1*vcr, %d6 = rout
+    add.l       %d1, %d3                | lout += vcl
+    add.l       %d2, %d6                | rout += vcr
+    move.l      %d3, (%a1)+             | store left channel, pos inc
+    move.l      %d6, (%a2)+             | store right channel, pos inc
+    sub.l       %d6, %d3                | vdiff = lout - rout
+    movclr.l    %acc0, %d6              | %d4 = fetch res1 in s0.31
+    sub.l       %d6, %d1                | vcl -= res1
+    movclr.l    %acc1, %d6              | %d5 = fetch -res2 in s0.31
+    add.l       %d6, %d2                | vcr += -res2
+    subq.l      #1, %d0                 | count--
+    bgt         10b | loop              | more samples?
+                                        |
+    movem.l     %d1-%d3, 16(%a0)        | save vcl, vcr, vdiff
+    movem.l     (%sp), %d2-%d6/%a2      | restore non-volatiles
+    lea.l       24(%sp), %sp            | .
+    rts                                 |
+    .size   crossfeed_meier_process, .-crossfeed_meier_process
 
 /****************************************************************************
  * int lin_resample_resample(struct resample_data *data,
