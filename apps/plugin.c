@@ -565,7 +565,7 @@ static const struct plugin_api rockbox_api = {
     audio_set_output_source,
     audio_set_input_source,
 #endif
-    dsp_crossfeed_enable,
+    dsp_set_crossfeed_type ,
     dsp_eq_enable,
     dsp_dither_enable,
 #ifdef HAVE_PITCHCONTROL
