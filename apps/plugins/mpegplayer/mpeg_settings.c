@@ -457,8 +457,9 @@ static void sync_audio_setting(int setting, bool global)
         break;
 
     case MPEG_AUDIO_CROSSFEED:
-        rb->dsp_crossfeed_enable((global || settings.crossfeed) ?
-                                 rb->global_settings->crossfeed : false);
+        rb->dsp_set_crossfeed_type((global || settings.crossfeed) ?
+                                   rb->global_settings->crossfeed :
+                                   CROSSFEED_TYPE_NONE);
         break;
 
     case MPEG_AUDIO_EQUALIZER:

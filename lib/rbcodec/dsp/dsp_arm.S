@@ -8,6 +8,8 @@
  * $Id$
  *
  * Copyright (C) 2006-2007 Thom Johansen
+ * Copyright (C) 2010 Bertrik Sikken
+ * Copyright (C) 2012 Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -245,6 +247,48 @@ crossfeed_process:
     add     sp, sp, #8                 @ remove temp variables from stack
     ldmpc   regs=r4-r11
     .size   crossfeed_process, .-crossfeed_process
+
+/****************************************************************************
+ * void crossfeed_meier_process(struct dsp_proc_entry *this,
+ *                              struct dsp_buffer **buf_p)
+ */
+    .section .text
+    .global crossfeed_meier_process
+crossfeed_meier_process:
+    @ input: r0 = this, r1 = buf_p
+    ldr     r1, [r1]                   @ r1 = buf = *buf_p;
+    ldr     r0, [r0]                   @ r0 = this->data = &crossfeed_state
+    stmfd   sp!, { r4-r10, lr }        @ stack non-volatile context
+    ldmia   r1, { r1-r3 }              @ r1 = buf->remcout, r2=p32[0], r3=p32[1]
+    add     r0, r0, #16                @ r0 = &state->vcl
+    ldmia   r0, { r4-r8 }              @ r4 = vcl, r5 = vcr, r6 = vdiff
+                                       @ r7 = coef1, r8 = coef2
+.cfm_loop:
+    ldr     r12, [r2]                  @ r12 = lout
+    ldr     r14, [r3]                  @ r14 = rout
+    smull   r9, r10, r8, r6            @ r9, r10  = common = coef2*vdiff
+    add     r12, r12, r4               @ lout += vcl
+    add     r14, r14, r5               @ rout += vcr
+    sub     r6, r12, r14               @ r6 = vdiff = lout - rout
+    str     r12, [r2], #4              @ store left channel
+    str     r14, [r3], #4              @ store right channel
+    rsbs    r12, r9, #0                @ r12 = -common (lo)
+    rsc     r14, r10, #0               @ r14 = -common (hi)
+    smlal   r9, r10, r7, r4            @ r9, r10  = res1 = coef1*vcl + common
+    smlal   r12, r14, r7, r5           @ r12, r14 = res2 = coef1*vcr - common
+    subs    r1, r1, #1                 @ count--
+    mov     r9, r9, lsr #31            @ r9 = convert res1 to s0.31
+    orr     r9, r9, r10, asl #1        @ .
+    mov     r12, r12, lsr #31          @ r12 = convert res2 to s0.31
+    orr     r12, r12, r14, asl #1      @ .
+    sub     r4, r4, r9                 @ r4 = vcl -= res1
+    sub     r5, r5, r12                @ r5 = vcr -= res2
+    bgt     .cfm_loop                  @ more samples?
+
+    stmia   r0, { r4-r6 }              @ save vcl, vcr, vdiff
+    ldmpc   regs=r4-r10                @ restore non-volatile context, return
+    .size   crossfeed_meier_process, .-crossfeed_meier_process
+
 
 /****************************************************************************
  * int lin_resample_resample(struct resample_data *data,

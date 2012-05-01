@@ -13052,3 +13052,37 @@
     *: "Western European"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Simple (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Simple"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Custom"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Custom"
+  </voice>
+</phrase>

@@ -325,7 +325,7 @@ struct user_settings
     struct replaygain_settings replaygain_settings;
 
     /* Crossfeed */
-    bool crossfeed;                             /* enable crossfeed */
+    int crossfeed;                              /* crossfeed type */
     unsigned int crossfeed_direct_gain;         /* dB x 10 */
     unsigned int crossfeed_cross_gain;          /* dB x 10 */
     unsigned int crossfeed_hf_attenuation;      /* dB x 10 */

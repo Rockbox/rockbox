@@ -21,7 +21,14 @@
 #ifndef CROSSFEED_H
 #define CROSSFEED_H
 
-void dsp_crossfeed_enable(bool enable);
+enum crossfeed_type
+{
+    CROSSFEED_TYPE_NONE,
+    CROSSFEED_TYPE_MEIER,
+    CROSSFEED_TYPE_CUSTOM,
+};
+
+void dsp_set_crossfeed_type(int type);
 void dsp_set_crossfeed_direct_gain(int gain);
 void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff);
 
