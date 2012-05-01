@@ -1578,7 +1578,8 @@ const fixed64 lsp_pow_e_table[] ICONST_ATTR_WMA_XL_IRAM =
     0x0LL
 };
 
-/* table of exp noise values multiplied by 16 in order to reduce rounding error */
+/* table of exp noise values multiplied by 16 in order to reduce rounding error,
+ * note that that first value (0x5) is used as a magic number in the init code*/
 fixed32 noisetable_exp[] =
 {
     0x5, 0xfffffa2e, 0xc2c, 0xb47, 0xffffaebe, 0xfffffa63, 0xfffff7ff, 0x16bd,
