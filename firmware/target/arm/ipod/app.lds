@@ -117,7 +117,7 @@ SECTIONS
     {
         . = ALIGN(4);
         _initstart = .;
-        *(.init)
+        *(.init*)
         _initend = .;
     } AT> DRAM
 

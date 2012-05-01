@@ -528,7 +528,7 @@ bool dsp_is_busy(const struct dsp_config *dsp)
  * Must be done before changing settings for the first time. */
 void INIT_ATTR dsp_init(void)
 {
-    static const uint8_t slot_count[DSP_COUNT] /* INITDATA_ATTR */ =
+    static const uint8_t slot_count[DSP_COUNT] INITDATA_ATTR =
     {
         [CODEC_IDX_AUDIO] = DSP_NUM_PROC_STAGES,
         [CODEC_IDX_VOICE] = DSP_VOICE_NUM_PROC_STAGES
