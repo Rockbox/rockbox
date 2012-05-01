@@ -487,23 +487,33 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 
     s->reset_block_lengths = 1;
 
-    if (s->use_noise_coding)
+    if (s->use_noise_coding) /* init the noise generator */
     {
-        /* init the noise generator */
+        /* LSP values are simply 2x the EXP values */
         if (s->use_exp_vlc)
         {
             s->noise_mult = 0x51f;
+            /*unlikely, but we may have previoiusly used this table for LSP,
+            so halve the values if needed*/
+            if(noisetable_exp[0] == 0x10) {
+                for (i=0;i<NOISE_TAB_SIZE;++i)
+                    noisetable_exp[i] >>= 1;  
+            }
             s->noise_table = noisetable_exp;
         }
         else
         {
             s->noise_mult = 0xa3d;
-            /* LSP values are simply 2x the EXP values */
-            for (i=0;i<NOISE_TAB_SIZE;++i)
-                noisetable_exp[i] = noisetable_exp[i]<< 1;
+            /*check that we haven't already doubled this table*/
+            if(noisetable_exp[0] == 0x5) { 
+                for (i=0;i<NOISE_TAB_SIZE;++i)
+                    noisetable_exp[i] <<= 1;
+            }
             s->noise_table = noisetable_exp;
         }
 #if 0
+/*TODO:  Rockbox has a dither function.  Consider using it for noise coding*/
+
 /* We use a lookup table computered in advance, so no need to do this*/
         {
             unsigned int seed;
