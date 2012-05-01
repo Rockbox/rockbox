@@ -58,6 +58,7 @@ class SystemInfo : public QObject
             CurBootloaderMethod,
             CurBootloaderName,
             CurBootloaderFile,
+            CurBootloaderFilter,
             CurEncoder,
             CurBrand,
             CurName,

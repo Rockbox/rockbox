@@ -54,6 +54,7 @@ const static struct {
     { SystemInfo::CurBootloaderMethod,  ":platform:/bootloadermethod", "none" },
     { SystemInfo::CurBootloaderName,    ":platform:/bootloadername", "" },
     { SystemInfo::CurBootloaderFile,    ":platform:/bootloaderfile", "" },
+    { SystemInfo::CurBootloaderFilter,  ":platform:/bootloaderfilter", "" },
     { SystemInfo::CurEncoder,           ":platform:/encoder",   "" },
     { SystemInfo::CurBrand,             ":platform:/brand",     "" },
     { SystemInfo::CurName,              ":platform:/name",      "" },

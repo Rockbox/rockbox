@@ -760,8 +760,14 @@ void RbUtilQt::installBootloader()
         }
         // open dialog to browse to of file
         QString offile;
+        QString filter
+            = SystemInfo::value(SystemInfo::CurBootloaderFilter).toString();
+        if(!filter.isEmpty()) {
+            filter = tr("Bootloader files (%1)").arg(filter) + ";;";
+        }
+        filter += tr("All files (*)");
         offile = QFileDialog::getOpenFileName(this,
-                tr("Select firmware file"), QDir::homePath());
+                tr("Select firmware file"), QDir::homePath(), filter);
         if(!QFileInfo(offile).isReadable()) {
             logger->addItem(tr("Error opening firmware file"), LOGERROR);
             logger->setFinished();
