@@ -23,7 +23,10 @@
 
 #include "config.h"
 
+#ifndef MP3_PLAY_CALLBACK_DEFINED
+#define MP3_PLAY_CALLBACK_DEFINED
 typedef void (*mp3_play_callback_t)(const void **start, size_t *size);
+#endif
 
 void mp3_play_data(const void *start, size_t size,
                    mp3_play_callback_t get_more);
@@ -38,7 +41,5 @@ void voice_thread_init(void) INIT_ATTR;
 #ifdef HAVE_PRIORITY_SCHEDULING
 void voice_thread_set_priority(int priority);
 #endif
-
-size_t voicebuf_init(void *bufend);
 
 #endif /* VOICE_THREAD_H */

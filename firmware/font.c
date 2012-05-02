@@ -141,7 +141,7 @@ void font_lock(int font_id, bool lock)
         lock_font_handle(buflib_allocations[font_id], lock);
 }
 
-static struct buflib_callbacks buflibops = {buflibmove_callback, NULL };
+static struct buflib_callbacks buflibops = {buflibmove_callback, NULL, NULL };
 
 static inline struct font *pf_from_handle(int handle)
 {

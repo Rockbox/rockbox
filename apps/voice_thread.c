@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include <sys/types.h>
 #include "system.h"
+#include "core_alloc.h"
 #include "thread.h"
 #include "voice_thread.h"
 #include "talk.h"
@@ -30,6 +31,10 @@
 #include "pcm.h"
 #include "pcm_mixer.h"
 #include "codecs/libspeex/speex/speex.h"
+
+/* Default number of native-frequency PCM frames to queue - adjust as
+   necessary per-target */
+#define VOICE_FRAMES 4
 
 /* Define any of these as "1" and uncomment the LOGF_ENABLE line to log
    regular and/or timeout messages */
@@ -80,21 +85,9 @@ static struct event_queue voice_queue SHAREDBSS_ATTR;
 static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
 static int quiet_counter SHAREDDATA_ATTR = 0;
 
-/* Buffer for decoded samples */
-static spx_int16_t voice_output_buf[VOICE_FRAME_COUNT] MEM_ALIGN_ATTR;
-
 #define VOICE_PCM_FRAME_COUNT   ((NATIVE_FREQUENCY*VOICE_FRAME_COUNT + \
                                  VOICE_SAMPLE_RATE) / VOICE_SAMPLE_RATE)
 #define VOICE_PCM_FRAME_SIZE    (VOICE_PCM_FRAME_COUNT*2*sizeof (int16_t))
-
-/* Default number of native-frequency PCM frames to queue - adjust as
-   necessary per-target */
-#define VOICE_FRAMES            3
-
-/* Might have lookahead and be skipping samples, so size is needed */
-static size_t voicebuf_sizes[VOICE_FRAMES];
-static int16_t (* voicebuf)[2*VOICE_PCM_FRAME_COUNT];
-static unsigned int cur_buf_in, cur_buf_out;
 
 /* Voice processing states */
 enum voice_state
@@ -135,6 +128,7 @@ struct voice_thread_data
     struct voice_info vi;   /* Copy of clip data */
     int lookahead;          /* Number of samples to drop at start of clip */
     struct dsp_buffer src;  /* Speex output buffer/input to DSP */
+    struct dsp_buffer *dst; /* Pointer to DSP output buffer for PCM */
 };
 
 /* Functions called in their repective state that return the next state to
@@ -143,10 +137,62 @@ static enum voice_state voice_message(struct voice_thread_data *td);
 static enum voice_state voice_decode(struct voice_thread_data *td);
 static enum voice_state voice_buffer_insert(struct voice_thread_data *td);
 
+/* Might have lookahead and be skipping samples, so size is needed */
+static struct voice_buf
+{
+    /* Buffer for decoded samples */
+    spx_int16_t spx_outbuf[VOICE_FRAME_COUNT];
+    /* Queue frame indexes */
+    unsigned int frame_in, frame_out;
+    /* For PCM pointer adjustment */
+    struct voice_thread_data *td;
+    /* Buffers for mixing voice */
+    struct voice_pcm_frame
+    {
+        size_t size;
+        int16_t pcm[2*VOICE_PCM_FRAME_COUNT];
+    } frames[VOICE_FRAMES];
+} *voice_buf = NULL;
+
+static int voice_buf_hid = 0;
+
+static int move_callback(int handle, void *current, void *new)
+{
+    /* Have to adjust the pointers that point into things in voice_buf */
+    off_t diff = new - current;
+    struct voice_thread_data *td = voice_buf->td;
+    td->src.p32[0] = SKIPBYTES(td->src.p32[0], diff);
+    td->src.p32[1] = SKIPBYTES(td->src.p32[1], diff);
+    if (td->dst != NULL) /* Only when calling dsp_process */
+        td->dst->p16out = SKIPBYTES(td->dst->p16out, diff);
+    mixer_adjust_channel_address(PCM_MIXER_CHAN_VOICE, diff);
+    voice_buf = new;
+
+    return BUFLIB_CB_OK;
+    (void)handle;
+};
+
+static void sync_callback(int handle, bool sync_on)
+{
+    /* A move must not allow PCM to access the channel */
+    if (sync_on)
+        pcm_play_lock();
+    else
+        pcm_play_unlock();
+
+    (void)handle;
+}
+
+static struct buflib_callbacks ops =
+{
+    .move_callback = move_callback,
+    .sync_callback = sync_callback,
+};
+
 /* Number of frames in queue */
 static inline int voice_unplayed_frames(void)
 {
-    return cur_buf_in - cur_buf_out;
+    return voice_buf->frame_in - voice_buf->frame_out;
 }
 
 /* Mixer channel callback */
@@ -155,10 +201,11 @@ static void voice_pcm_callback(const void **start, size_t *size)
     if (voice_unplayed_frames() == 0)
         return; /* Done! */
 
-    unsigned int i = ++cur_buf_out % VOICE_FRAMES;
+    struct voice_pcm_frame *frame =
+        &voice_buf->frames[++voice_buf->frame_out % VOICE_FRAMES];
 
-    *start = voicebuf[i];
-    *size = voicebuf_sizes[i];
+    *start = frame->pcm;
+    *size = frame->size;
 }
 
 /* Start playback of voice channel if not already playing */
@@ -168,16 +215,18 @@ static void voice_start_playback(void)
         voice_unplayed_frames() <= 0)
         return;
 
-    unsigned int i = cur_buf_out % VOICE_FRAMES;
+    struct voice_pcm_frame *frame =
+        &voice_buf->frames[voice_buf->frame_out % VOICE_FRAMES];
+
     mixer_channel_play_data(PCM_MIXER_CHAN_VOICE, voice_pcm_callback,
-                            voicebuf[i], voicebuf_sizes[i]);
+                            frame->pcm, frame->size);
 }
 
 /* Stop the voice channel */
 static void voice_stop_playback(void)
 {
     mixer_channel_stop(PCM_MIXER_CHAN_VOICE);
-    cur_buf_in = cur_buf_out = 0;
+    voice_buf->frame_in = voice_buf->frame_out = 0;
 }
 
 /* Grab a free PCM frame */
@@ -190,7 +239,7 @@ static int16_t * voice_buf_get(void)
         return NULL;
     }
 
-    return voicebuf[cur_buf_in % VOICE_FRAMES];
+    return voice_buf->frames[voice_buf->frame_in % VOICE_FRAMES].pcm;
 }
 
 /* Commit a frame returned by voice_buf_get and set the actual size */
@@ -198,7 +247,7 @@ static void voice_buf_commit(int count)
 {
     if (count > 0)
     {
-        voicebuf_sizes[cur_buf_in++ % VOICE_FRAMES] =
+        voice_buf->frames[voice_buf->frame_in++ % VOICE_FRAMES].size =
             count * 2 * sizeof (int16_t);
     }
 }
@@ -207,7 +256,7 @@ static void voice_buf_commit(int count)
 void mp3_play_data(const void *start, size_t size,
                    mp3_play_callback_t get_more)
 {
-    if (get_more != NULL && start != NULL && size > 0)
+    if (voice_thread_id && start && size && get_more)
     {
         struct voice_info voice_clip =
         {
@@ -224,8 +273,11 @@ void mp3_play_data(const void *start, size_t size,
 /* Stop current voice clip from playing */
 void mp3_play_stop(void)
 {
-    LOGFQUEUE("mp3 >| voice Q_VOICE_STOP");
-    queue_send(&voice_queue, Q_VOICE_STOP, 0);
+    if (voice_thread_id != 0)
+    {
+        LOGFQUEUE("mp3 >| voice Q_VOICE_STOP");
+        queue_send(&voice_queue, Q_VOICE_STOP, 0);
+    }
 }
 
 void mp3_play_pause(bool play)
@@ -270,6 +322,9 @@ static void voice_data_init(struct voice_thread_data *td)
     dsp_configure(td->dsp, DSP_SET_STEREO_MODE, STEREO_MONO);
 
     mixer_channel_set_amplitude(PCM_MIXER_CHAN_VOICE, MIX_AMP_UNITY);
+
+    voice_buf->td = td;
+    td->dst = NULL;
 }
 
 /* Voice thread message processing */
@@ -299,9 +354,6 @@ static enum voice_state voice_message(struct voice_thread_data *td)
 
         /* Copy the clip info */
         td->vi = *(struct voice_info *)td->ev.data;
-
-        /* Be sure audio buffer is initialized */
-        audio_restore_playback(AUDIO_WANT_VOICE);
 
         /* We need nothing more from the sending thread - let it run */
         queue_reply(&voice_queue, 1);
@@ -356,7 +408,7 @@ static enum voice_state voice_decode(struct voice_thread_data *td)
         return VOICE_STATE_MESSAGE;
 
     /* Decode the data */
-    if (speex_decode_int(td->st, &td->bits, voice_output_buf) < 0)
+    if (speex_decode_int(td->st, &td->bits, voice_buf->spx_outbuf) < 0)
     {
         /* End of stream or error - get next clip */
         td->vi.size = 0;
@@ -386,7 +438,7 @@ static enum voice_state voice_decode(struct voice_thread_data *td)
 
         /* Output the decoded frame */
         td->src.remcount  = VOICE_FRAME_COUNT - td->lookahead;
-        td->src.pin[0]    = &voice_output_buf[td->lookahead];
+        td->src.pin[0]    = &voice_buf->spx_outbuf[td->lookahead];
         td->src.pin[1]    = NULL;
         td->src.proc_mask = 0;
 
@@ -412,7 +464,9 @@ static enum voice_state voice_buffer_insert(struct voice_thread_data *td)
         dst.remcount = 0;
         dst.bufcount = VOICE_PCM_FRAME_COUNT;
 
+        td->dst = &dst;
         dsp_process(td->dsp, &td->src, &dst);
+        td->dst = NULL;
 
         voice_buf_commit(dst.remcount);
 
@@ -451,9 +505,36 @@ static void NORETURN_ATTR voice_thread(void)
     }
 }
 
-/* Initialize all synchronization objects create the thread */
+/* Initialize buffers, all synchronization objects and create the thread */
 void voice_thread_init(void)
 {
+    if (voice_thread_id != 0)
+        return; /* Already did an init and succeeded at it */
+
+    if (!talk_voice_required())
+    {
+        logf("No voice required");
+        return;
+    }
+
+    voice_buf_hid = core_alloc_ex("voice buf", sizeof (*voice_buf), &ops);
+
+    if (voice_buf_hid <= 0)
+    {
+        logf("voice: core_alloc_ex failed");
+        return;
+    }
+
+    voice_buf = core_get_data(voice_buf_hid);
+
+    if (voice_buf == NULL)
+    {
+        logf("voice: core_get_data failed");
+        core_free(voice_buf_hid);
+        voice_buf_hid = 0;
+        return;
+    }
+
     logf("Starting voice thread");
     queue_init(&voice_queue, false);
 
@@ -469,18 +550,12 @@ void voice_thread_init(void)
 /* Set the voice thread priority */
 void voice_thread_set_priority(int priority)
 {
+    if (voice_thread_id == 0)
+        return;
+
     if (priority > PRIORITY_VOICE)
         priority = PRIORITY_VOICE;
 
     thread_set_priority(voice_thread_id, priority);
 }
 #endif
-
-/* Initialize voice PCM buffer and return size, allocated from the end */
-size_t voicebuf_init(void *bufend)
-{
-    size_t size = VOICE_FRAMES * sizeof (voicebuf[0]);
-    cur_buf_out = cur_buf_in = 0;
-    voicebuf = bufend - size;
-    return size;
-}

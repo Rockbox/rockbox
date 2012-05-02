@@ -406,6 +406,16 @@ void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
         *right = peaks->val[1];
 }
 
+/* Adjust channel pointer by a given offset to support movable buffers */
+void mixer_adjust_channel_address(enum pcm_mixer_channel channel,
+                                  off_t offset)
+{
+    pcm_play_lock();
+    /* Makes no difference if it's stopped */
+    channels[channel].start += offset;
+    pcm_play_unlock();
+}
+
 /* Stop ALL channels and PCM and reset state */
 void mixer_reset(void)
 {

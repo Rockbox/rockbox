@@ -175,7 +175,7 @@ static int buflib_move_callback(int handle, void* current, void* new)
     }
     return BUFLIB_CB_OK;
 }
-static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL};
+static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
 
 static void load_icons(const char* filename, enum Iconset iconset,
                         enum screen_type screen)

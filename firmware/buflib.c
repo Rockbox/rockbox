@@ -210,23 +210,27 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     /* disable IRQs to make accessing the buffer from interrupt context safe. */
     /* protect the move callback, as a cached global pointer might be updated
      * in it. and protect "tmp->alloc = new_start" for buflib_get_data() */
-    disable_irq();
     /* call the callback before moving */
-    if (ops)
+    if (ops && ops->sync_callback)
+        ops->sync_callback(handle, true);
+    else
+        disable_irq();
+
+    bool retval = false;
+    if (!ops || ops->move_callback(handle, tmp->alloc, new_start)
+                    != BUFLIB_CB_CANNOT_MOVE)
     {
-        if (ops->move_callback(handle, tmp->alloc, new_start)
-                == BUFLIB_CB_CANNOT_MOVE)
-        {
-            enable_irq();
-            return false;
-        }
+        tmp->alloc = new_start; /* update handle table */
+        memmove(new_block, block, block->val * sizeof(union buflib_data));
+        retval = true;
     }
 
-    tmp->alloc = new_start; /* update handle table */
-    memmove(new_block, block, block->val * sizeof(union buflib_data));
+    if (ops && ops->sync_callback)
+        ops->sync_callback(handle, false);
+    else
+        enable_irq();
 
-    enable_irq();
-    return true;
+    return retval;
 }
 
 /* Compact allocations and handle table, adjusting handle pointers as needed.

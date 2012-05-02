@@ -27,7 +27,10 @@
 #include <stdbool.h>
 
 /* callback fn */
+#ifndef MP3_PLAY_CALLBACK_DEFINED
+#define MP3_PLAY_CALLBACK_DEFINED
 typedef void (*mp3_play_callback_t)(const void **start, size_t* size);
+#endif
 
 /* functions formerly in mpeg.c */
 void mp3_init(int volume, int bass, int treble, int balance, int loudness,

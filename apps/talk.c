@@ -31,7 +31,11 @@
 #include "kernel.h"
 #include "settings.h"
 #include "settings_list.h"
+#if CONFIG_CODEC == SWCODEC
+#include "voice_thread.h"
+#else
 #include "mp3_playback.h"
+#endif
 #include "audio.h"
 #include "lang.h"
 #include "talk.h"
@@ -42,7 +46,6 @@
 #include "structec.h"
 #include "plugin.h" /* plugin_get_buffer() */
 #include "debug.h"
-
 
 /* Memory layout varies between targets because the
    Archos (MASCODEC) devices cannot mix voice and audio playback
@@ -589,7 +592,6 @@ static void queue_clip(unsigned char* buf, long size, bool enqueue)
     return;
 }
 
-
 static void alloc_thumbnail_buf(void)
 {
     /* use the audio buffer now, need to release before loading a voice */
@@ -614,8 +616,22 @@ static void reset_state(void)
 #endif
 
     p_silence = NULL; /* pause clip not accessible */
-    voicebuf = NULL;
+    voicebuf = NULL; /* voice buffer is gone */
 }
+
+#if CONFIG_CODEC == SWCODEC
+static bool restore_state(void)
+{
+    if (!voicebuf)
+    {
+        size_t size;
+        audio_restore_playback(AUDIO_WANT_VOICE);
+        voicebuf = audio_get_buffer(false, &size);
+    }
+
+    return !!voicebuf;
+}
+#endif /* CONFIG_CODEC == SWCODEC */
 
 
 /***************** Public implementation *****************/
@@ -655,7 +671,7 @@ void talk_init(void)
 
     voicefile_size = filesize(filehandle);
     
-    audio_get_buffer(false, NULL);  /* Must tell audio to reinitialize */
+    audio_get_buffer(false, NULL); /* Must tell audio to reinitialize */
     reset_state(); /* use this for most of our inits */
 
 #ifdef TALK_PARTIAL_LOAD
@@ -693,9 +709,14 @@ void talk_init(void)
         voicefile_size = 0;
     }
 
-    alloc_thumbnail_buf();
     close(filehandle); /* close again, this was just to detect presence */
     filehandle = -1;
+
+#if CONFIG_CODEC == SWCODEC
+    /* Safe to init voice playback engine now since we now know if talk is
+       required or not */
+    voice_thread_init();
+#endif
 }
 
 #if CONFIG_CODEC == SWCODEC
@@ -709,7 +730,7 @@ bool talk_voice_required(void)
 #endif
 
 /* return size of voice file */
-static int talk_get_buffer(void)
+static size_t talk_get_buffer_size(void)
 {
 #if CONFIG_CODEC == SWCODEC
     return voicefile_size + MAX_THUMBNAIL_BUFSIZE;
@@ -726,10 +747,11 @@ size_t talkbuf_init(char *bufstart)
 
     if (changed) /* must reload voice file */
         reset_state();
+
     if (bufstart)
         voicebuf = bufstart;
 
-    return talk_get_buffer();
+    return talk_get_buffer_size();
 }
 
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
@@ -748,29 +770,27 @@ void talk_buffer_steal(void)
     reset_state();
 }
 
-
 /* play a voice ID from voicefile */
 int talk_id(int32_t id, bool enqueue)
 {
     long clipsize;
-    int temp = talk_get_buffer();
     unsigned char* clipbuf;
     int32_t unit;
     int decimals;
 
     if (talk_temp_disable_count > 0)
         return -1;  /* talking has been disabled */
-#if CONFIG_CODEC != SWCODEC
+#if CONFIG_CODEC == SWCODEC
+    /* If talk buffer was stolen, it must be restored for voicefile's sake */
+    if (!restore_state())
+        return -1;  /* cannot get any space */
+#else
     if (audio_status()) /* busy, buffer in use */
         return -1;
 #endif
 
-    /* try to get audio buffer until talkbuf_init() is called */
-    if (!voicebuf)
-        voicebuf = audio_get_buffer(true, (size_t*)&temp);
-
-    if (p_voicefile == NULL && has_voicefile)
-        load_voicefile(false, voicebuf, MIN(talk_get_buffer(),temp)); /* reload needed */
+    if (p_voicefile == NULL && has_voicefile) /* reload needed? */
+        load_voicefile(false, voicebuf, talk_get_buffer_size());
 
     if (p_voicefile == NULL) /* still no voices? */
         return -1;
@@ -842,7 +862,11 @@ static int _talk_file(const char* filename,
 
     if (talk_temp_disable_count > 0)
         return -1;  /* talking has been disabled */
-#if CONFIG_CODEC != SWCODEC
+#if CONFIG_CODEC == SWCODEC
+    /* If talk buffer was stolen, it must be restored for thumbnail's sake */
+    if (!restore_state())
+        return -1;  /* cannot get any space */
+#else
     if (audio_status()) /* busy, buffer in use */
         return -1; 
 #endif

@@ -753,11 +753,12 @@ size_t audio_buffer_available(void)
 
 /* Set up the audio buffer for playback
  * filebuflen must be pre-initialized with the maximum size */
-static void audio_reset_buffer_noalloc(void* filebuf)
+static void audio_reset_buffer_noalloc(
+    void *filebuf, enum audio_buffer_state state)
 {
     /*
      * Layout audio buffer as follows:
-     * [[|TALK]|SCRATCH|BUFFERING|PCM|[VOICE|]]
+     * [[|TALK]|SCRATCH|BUFFERING|PCM]
      */
 
     /* see audio_get_recording_buffer if this is modified */
@@ -770,7 +771,8 @@ static void audio_reset_buffer_noalloc(void* filebuf)
     /* Initially set up file buffer as all space available */
     size_t allocsize;
 
-    /* Subtract whatever voice needs */
+    /* Subtract whatever voice needs (we're called when promoting
+                                      the state only) */
     allocsize = talkbuf_init(filebuf);
     allocsize = ALIGN_UP(allocsize, sizeof (intptr_t));
     if (allocsize > filebuflen)
@@ -779,41 +781,33 @@ static void audio_reset_buffer_noalloc(void* filebuf)
     filebuf += allocsize;
     filebuflen -= allocsize;
 
-    if (talk_voice_required())
+    if (state == AUDIOBUF_STATE_INITIALIZED)
     {
-        /* Need a space for voice PCM output */
-        allocsize = voicebuf_init(filebuf + filebuflen);
+        /* Subtract whatever the pcm buffer says it used plus the guard
+           buffer */
+        allocsize = pcmbuf_init(filebuf + filebuflen);
 
+        /* Make sure filebuflen is a pointer sized multiple after
+           adjustment */
         allocsize = ALIGN_UP(allocsize, sizeof (intptr_t));
         if (allocsize > filebuflen)
             goto bufpanic;
-
+    
         filebuflen -= allocsize;
+
+        /* Scratch memory */
+        allocsize = scratch_mem_size();
+        if (allocsize > filebuflen)
+            goto bufpanic;
+
+        scratch_mem_init(filebuf);
+        filebuf += allocsize;
+        filebuflen -= allocsize;
+
+        buffering_reset(filebuf, filebuflen);
     }
 
-    /* Subtract whatever the pcm buffer says it used plus the guard buffer */
-    allocsize = pcmbuf_init(filebuf + filebuflen);
-
-    /* Make sure filebuflen is a pointer sized multiple after adjustment */
-    allocsize = ALIGN_UP(allocsize, sizeof (intptr_t));
-    if (allocsize > filebuflen)
-        goto bufpanic;
-
-    filebuflen -= allocsize;
-
-    /* Scratch memory */
-    allocsize = scratch_mem_size();
-    if (allocsize > filebuflen)
-        goto bufpanic;
-
-    scratch_mem_init(filebuf);
-    filebuf += allocsize;
-    filebuflen -= allocsize;
-
-    buffering_reset(filebuf, filebuflen);
-
-    /* Clear any references to the file buffer */
-    buffer_state = AUDIOBUF_STATE_INITIALIZED;
+    buffer_state = state;
 
 #if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
     /* Make sure everything adds up - yes, some info is a bit redundant but
@@ -891,11 +885,12 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     {
         case BUFLIB_SHRINK_POS_BACK:
             core_shrink(handle, start, size);
-            audio_reset_buffer_noalloc(start);
+            audio_reset_buffer_noalloc(start, buffer_state);
             break;
         case BUFLIB_SHRINK_POS_FRONT:
             core_shrink(handle, start + wanted_size, size);
-            audio_reset_buffer_noalloc(start + wanted_size);
+            audio_reset_buffer_noalloc(start + wanted_size,
+                                       buffer_state);
             break;
     }
     if (playing || play_queued)
@@ -912,7 +907,7 @@ static struct buflib_callbacks ops = {
     .shrink_callback = shrink_callback,
 };
 
-static void audio_reset_buffer(void)
+static void audio_reset_buffer(enum audio_buffer_state state)
 {
     if (audiobuf_handle > 0)
     {
@@ -922,7 +917,7 @@ static void audio_reset_buffer(void)
     audiobuf_handle = core_alloc_maximum("audiobuf", &filebuflen, &ops);
     unsigned char *filebuf = core_get_data(audiobuf_handle);
 
-    audio_reset_buffer_noalloc(filebuf);
+    audio_reset_buffer_noalloc(filebuf, state);
 }
 
 /* Set the buffer margin to begin rebuffering when 'seconds' from empty */
@@ -2051,7 +2046,7 @@ static int audio_fill_file_buffer(void)
        file size shouldn't have changed so we can go straight from
        AUDIOBUF_STATE_VOICED_ONLY to AUDIOBUF_STATE_INITIALIZED */
     if (buffer_state != AUDIOBUF_STATE_INITIALIZED)
-        audio_reset_buffer();
+        audio_reset_buffer(AUDIOBUF_STATE_INITIALIZED);
 
     logf("Starting buffer fill");
 
@@ -3649,14 +3644,9 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
         logf("get buffer: audio");
         /* Safe to just return this if already AUDIOBUF_STATE_VOICED_ONLY or
            still AUDIOBUF_STATE_INITIALIZED */
-        /* Skip talk buffer and move pcm buffer to end to maximize available
-           contiguous memory - no audio running means voice will not need the
-           swap space */
-        size_t talkbuf_size;
-        buf += talkbuf_size = talkbuf_init(buf);
+        size_t talkbuf_size = talkbuf_init(buf);
+        buf += talkbuf_size; /* Skip talk buffer */
         filebuflen -= talkbuf_size;
-        filebuflen -= voicebuf_init(buf + filebuflen);
-
         buffer_state = AUDIOBUF_STATE_VOICED_ONLY;
     }
 
@@ -3673,19 +3663,18 @@ unsigned char * audio_get_recording_buffer(size_t *buffer_size)
 }
 #endif /* HAVE_RECORDING */
 
-/* Restore audio buffer to a particular state (one more valid than the current
-   state) */
+/* Restore audio buffer to a particular state (promoting status) */
 bool audio_restore_playback(int type)
 {
     switch (type)
     {
     case AUDIO_WANT_PLAYBACK:
         if (buffer_state != AUDIOBUF_STATE_INITIALIZED)
-            audio_reset_buffer();
+            audio_reset_buffer(AUDIOBUF_STATE_INITIALIZED);
         return true;
     case AUDIO_WANT_VOICE:
         if (buffer_state == AUDIOBUF_STATE_TRASHED)
-            audio_reset_buffer();
+            audio_reset_buffer(AUDIOBUF_STATE_VOICED_ONLY);
         return true;
     default:
         return false;
@@ -3910,24 +3899,18 @@ void audio_init(void)
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list,
                             audio_thread_id);
 
-#ifdef PLAYBACK_VOICE
-    voice_thread_init();
-#endif
-
-    /* audio_reset_buffer must know the size of voice buffer so init
-       talk first */
-    talk_init();
+    /* Initialize the track buffering system */
+    track_list_init();
+    buffering_init();
 
 #ifdef HAVE_CROSSFADE
     /* Set crossfade setting for next buffer init which should be about... */
     pcmbuf_request_crossfade_enable(global_settings.crossfade);
 #endif
 
-    /* Initialize the buffering system */
-    track_list_init();
-    buffering_init();
-    /* ...now! Set up the buffers */
-    audio_reset_buffer();
+    /* ...now...audio_reset_buffer must know the size of voicefile buffer so
+       init talk first which will init the buffers */
+    talk_init();
 
     /* Probably safe to say */
     audio_is_initialized = true;

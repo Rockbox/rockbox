@@ -103,6 +103,12 @@ struct buflib_callbacks {
      * at least shrinkable
      */
     int (*shrink_callback)(int handle, unsigned hints, void* start, size_t old_size);
+    /**
+     * This is called when special steps must be taken for synchronization
+     * both before the move_callback is called and after the data has been
+     * moved.
+     */
+    void (*sync_callback)(int handle, bool sync_on);
 };
 
 #define BUFLIB_SHRINK_POS_MASK ((1<<0|1<<1)<<30)

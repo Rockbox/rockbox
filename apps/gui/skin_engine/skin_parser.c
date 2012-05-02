@@ -1655,7 +1655,7 @@ static int buflib_move_callback(int handle, void* current, void* new)
         return BUFLIB_CB_CANNOT_MOVE;
     return BUFLIB_CB_OK;
 }
-static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL};
+static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
 static void lock_handle(int handle)
 {
     currently_loading_handle = handle;
