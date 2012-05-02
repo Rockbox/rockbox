@@ -581,14 +581,6 @@ static unsigned ci_sleep(unsigned ticks)
     return 0;
 }
 
-static void ci_cpucache_flush(void)
-{
-}
-
-static void ci_cpucache_invalidate(void)
-{
-}
-
 static struct codec_api ci = {
 
     0,                   /* filesize */
