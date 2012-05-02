@@ -113,7 +113,8 @@ buflib_init(struct buflib_context *ctx, void *buf, size_t size)
     ctx->alloc_end = bd_buf;
     ctx->compact = true;
 
-    BDEBUGF("buflib initialized with %d.%2d kiB", size / 1024, (size%1000)/10);
+    BDEBUGF("buflib initialized with %lu.%2lu kiB",
+            (unsigned long)size / 1024, ((unsigned long)size%1000)/10);
 }
 
 /* Allocate a new handle, returning 0 on failure */
@@ -203,7 +204,7 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
 
     int handle = ctx->handle_table - tmp;
     BDEBUGF("%s(): moving \"%s\"(id=%d) by %d(%d)\n", __func__, block[3].name,
-            handle, shift, shift*sizeof(union buflib_data));
+            handle, shift, shift*(int)sizeof(union buflib_data));
     new_block = block + shift;
     new_start = tmp->alloc + shift*sizeof(union buflib_data);
 
