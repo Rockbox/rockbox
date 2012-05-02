@@ -212,9 +212,13 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
      * in it. and protect "tmp->alloc = new_start" for buflib_get_data() */
     /* call the callback before moving */
     if (ops && ops->sync_callback)
+    {
         ops->sync_callback(handle, true);
+    }
     else
+    {
         disable_irq();
+    }
 
     bool retval = false;
     if (!ops || ops->move_callback(handle, tmp->alloc, new_start)
@@ -226,9 +230,13 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     }
 
     if (ops && ops->sync_callback)
+    {
         ops->sync_callback(handle, false);
+    }
     else
+    {
         enable_irq();
+    }
 
     return retval;
 }
