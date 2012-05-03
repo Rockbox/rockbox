@@ -45,11 +45,6 @@
 /***************** EXPORTED *****************/
 
 struct user_settings global_settings;
-volatile long current_tick = 0;
-
-void yield(void)
-{
-}
 
 int set_irq_level(int level)
 {
@@ -601,6 +596,10 @@ static void ci_logf(const char *fmt, ...)
 }
 #endif
 
+static void ci_yield(void)
+{
+}
+
 static void commit_dcache(void) {}
 static void commit_discard_dcache(void) {}
 static void commit_discard_idcache(void) {}
@@ -626,7 +625,7 @@ static struct codec_api ci = {
     ci_should_loop,
 
     ci_sleep,
-    yield,
+    ci_yield,
 
 #if NUM_CORES > 1
     ci_create_thread,
