@@ -102,9 +102,6 @@ unsigned long pcm_sampr SHAREDBSS_ATTR = HW_SAMPR_DEFAULT;
 /* samplerate frequency selection index */
 int pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
 
-/* peak data for the global peak values - i.e. what the final output is */
-static struct pcm_peaks global_peaks;
-
 /* Called internally by functions to reset the state */
 static void pcm_play_stopped(void)
 {
@@ -125,42 +122,38 @@ static void pcm_wait_for_init(void)
  *
  * Used for recording and playback.
  */
-static void pcm_peak_peeker(const int32_t *addr, int count, uint16_t peaks[2])
+static void pcm_peak_peeker(const int16_t *p, int count,
+                            struct pcm_peaks *peaks)
 {
-    int peak_l = 0, peak_r = 0;
-    const int32_t * const end = addr + count;
+    uint32_t peak_l = 0, peak_r = 0;
+    const int16_t *pend = p + 2 * count;
 
     do
     {
-        int32_t value = *addr;
-        int ch;
+        int32_t s;
 
-#ifdef ROCKBOX_BIG_ENDIAN
-        ch = value >> 16;
-#else
-        ch = (int16_t)value;
-#endif
-        if (ch < 0)
-            ch = -ch;
-        if (ch > peak_l)
-            peak_l = ch;
+        s = p[0];
 
-#ifdef ROCKBOX_BIG_ENDIAN
-        ch = (int16_t)value;
-#else
-        ch = value >> 16;
-#endif
-        if (ch < 0)
-            ch = -ch;
-        if (ch > peak_r)
-            peak_r = ch;
+        if (s < 0)
+            s = -s;
 
-        addr += 4;
+        if ((uint32_t)s > peak_l)
+            peak_l = s;
+
+        s = p[1];
+
+        if (s < 0)
+            s = -s;
+
+        if ((uint32_t)s > peak_r)
+            peak_r = s;
+
+        p += 4 * 2; /* Every 4th sample, interleaved */
     }
-    while (addr < end);
+    while (p < pend);
 
-    peaks[0] = peak_l;
-    peaks[1] = peak_r;
+    peaks->left = peak_l;
+    peaks->right = peak_r;
 }
 
 void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
@@ -177,7 +170,7 @@ void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
     else if (period > HZ/5)
         period = HZ/5;
 
-    peaks->period = (3*peaks->period + period) >> 2;
+    peaks->period = (3*peaks->period + period) / 4;
     peaks->tick = tick;
 
     if (active)
@@ -186,29 +179,32 @@ void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
         count = MIN(framecount, count);
 
         if (count > 0)
-            pcm_peak_peeker((int32_t *)addr, count, peaks->val);
+            pcm_peak_peeker(addr, count, peaks);
         /* else keep previous peak values */
     }
     else
     {
         /* peaks are zero */
-        peaks->val[0] = peaks->val[1] = 0;
+        peaks->left = peaks->right = 0;
     }
 }
 
 void pcm_calculate_peaks(int *left, int *right)
 {
+    /* peak data for the global peak values - i.e. what the final output is */
+    static struct pcm_peaks peaks;
+
     int count;
     const void *addr = pcm_play_dma_get_peak_buffer(&count);
 
-    pcm_do_peak_calculation(&global_peaks, pcm_playing && !pcm_paused,
+    pcm_do_peak_calculation(&peaks, pcm_playing && !pcm_paused,
                             addr, count);
 
     if (left)
-        *left = global_peaks.val[0];
+        *left = peaks.left;
 
     if (right)
-        *right = global_peaks.val[1];
+        *right = peaks.right;
 }
 
 const void* pcm_get_peak_buffer(int * count)
@@ -471,20 +467,20 @@ static void pcm_recording_stopped(void)
  */
 void pcm_calculate_rec_peaks(int *left, int *right)
 {
-    static uint16_t peaks[2];
+    static struct pcm_peaks peaks;
 
     if (pcm_recording)
     {
-        const void *peak_addr = pcm_rec_peak_addr;
-        const void *addr = pcm_rec_dma_get_peak_buffer();
+        const int16_t *peak_addr = pcm_rec_peak_addr;
+        const int16_t *addr = pcm_rec_dma_get_peak_buffer();
 
         if (addr != NULL)
         {
-            int count = (int)(((intptr_t)addr - (intptr_t)peak_addr) >> 2);
+            int count = (addr - peak_addr) / 2; /* Interleaved L+R */
 
             if (count > 0)
             {
-                pcm_peak_peeker((int32_t *)peak_addr, count, peaks);
+                pcm_peak_peeker(peak_addr, count, &peaks);
 
                 if (peak_addr == pcm_rec_peak_addr)
                     pcm_rec_peak_addr = addr;
@@ -494,15 +490,15 @@ void pcm_calculate_rec_peaks(int *left, int *right)
     }
     else
     {
-        peaks[0] = peaks[1] = 0;
+        peaks.left = peaks.right = 0;
     }
 
     if (left)
-        *left = peaks[0];
+        *left = peaks.left;
 
     if (right)
-        *right = peaks[1];
-} /* pcm_calculate_rec_peaks */
+        *right = peaks.right;
+}
 
 bool pcm_is_recording(void)
 {

@@ -21,7 +21,7 @@
 #ifndef PCM_PLAYBACK_H
 #define PCM_PLAYBACK_H
 
-#include <string.h> /* size_t */
+#include <sys/types.h> /* size_t, uint32_t */
 #include "config.h"
 
 enum pcm_dma_status
@@ -70,6 +70,16 @@ bool pcm_is_initialized(void);
 void pcm_play_data(pcm_play_callback_type get_more,
                    pcm_status_callback_type status_cb,
                    const void *start, size_t size);
+
+/* Kept internally for global PCM and used by mixer's verion of peak
+   calculation */
+struct pcm_peaks
+{
+    uint32_t left;  /* Left peak value */
+    uint32_t right; /* Right peak value */
+    long period;    /* For tracking calling period */
+    long tick;      /* Last tick called */
+};
 
 void pcm_calculate_peaks(int *left, int *right);
 const void* pcm_get_peak_buffer(int* count);

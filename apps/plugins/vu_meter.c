@@ -704,9 +704,11 @@ static void analog_meter(void) {
     int left_peak = rb->mas_codec_readreg(0xC);
     int right_peak = rb->mas_codec_readreg(0xD);
 #elif (CONFIG_CODEC == SWCODEC)
-    int left_peak, right_peak;
+    static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                      &left_peak, &right_peak);
+                                      &peaks);
+    #define left_peak peaks.left
+    #define right_peak peaks.right
 #endif
 
     if(vumeter_settings.analog_use_db_scale) {
@@ -762,8 +764,11 @@ static void digital_meter(void) {
     int left_peak = rb->mas_codec_readreg(0xC);
     int right_peak = rb->mas_codec_readreg(0xD);
 #elif (CONFIG_CODEC == SWCODEC)
-    int left_peak, right_peak;
-    rb->pcm_calculate_peaks(&left_peak, &right_peak);
+    static struct pcm_peaks peaks;
+    rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
+                                      &peaks);
+    #define left_peak peaks.left
+    #define right_peak peaks.right
 #endif
 
     if(vumeter_settings.digital_use_db_scale) {

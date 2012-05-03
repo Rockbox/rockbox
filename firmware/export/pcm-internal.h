@@ -29,13 +29,6 @@
     ({ (start) = (void *)(((uintptr_t)(start) + 3) & ~3); \
        (size) &= ~3; })
 
-struct pcm_peaks
-{
-    long period;
-    long tick;
-    uint16_t val[2];
-};
-
 void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
                              const void *addr, int count);
 

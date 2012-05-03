@@ -619,8 +619,13 @@ void peak_meter_peek(void)
    /* read current values */
 #if CONFIG_CODEC == SWCODEC
     if (pm_playback)
+    {
+        static struct pcm_peaks chan_peaks; /* *MUST* be static */
         mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                      &pm_cur_left, &pm_cur_right);
+                                      &chan_peaks);
+        pm_cur_left = chan_peaks.left;
+        pm_cur_right = chan_peaks.right;
+    }
 #ifdef HAVE_RECORDING
     else
         pcm_calculate_rec_peaks(&pm_cur_left, &pm_cur_right);

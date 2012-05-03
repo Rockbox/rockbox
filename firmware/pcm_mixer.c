@@ -60,9 +60,6 @@ static size_t next_size = 0;    /* Size of buffer to play next time */
 /* Descriptors for all available channels */
 static struct mixer_channel channels[PCM_MIXER_NUM_CHANNELS] IBSS_ATTR;
 
-/* History for channel peaks */
-static struct pcm_peaks channel_peaks[PCM_MIXER_NUM_CHANNELS];
-
 /* Packed pointer array of all playing (active) channels in "channels" array */
 static struct mixer_channel * active_channels[PCM_MIXER_NUM_CHANNELS+1] IBSS_ATTR;
 
@@ -389,21 +386,14 @@ const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count
 
 /* Calculate peak values for channel */
 void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
-                                   int *left, int *right)
+                                   struct pcm_peaks *peaks)
 {
-    struct mixer_channel *chan = &channels[channel];
-    struct pcm_peaks *peaks = &channel_peaks[channel];
     int count;
     const void *addr = mixer_channel_get_buffer(channel, &count);
 
-    pcm_do_peak_calculation(peaks, chan->status == CHANNEL_PLAYING,
+    pcm_do_peak_calculation(peaks,
+                            channels[channel].status == CHANNEL_PLAYING,
                             addr, count);
-
-    if (left)
-        *left = peaks->val[0];
-
-    if (right)
-        *right = peaks->val[1];
 }
 
 /* Adjust channel pointer by a given offset to support movable buffers */

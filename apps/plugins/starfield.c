@@ -228,9 +228,11 @@ static int plugin_main(void)
 
             /* Get the peaks. ( Borrowed from vu_meter ) */
 #if (CONFIG_CODEC == SWCODEC)
-            int left_peak, right_peak;
+            static struct pcm_peaks peaks;
             rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                              &left_peak, &right_peak);
+                                              &peaks);
+            #define left_peak peaks.left
+            #define right_peak peaks.right
 #else
             int left_peak = rb->mas_codec_readreg(0xC);
             int right_peak = rb->mas_codec_readreg(0xD);

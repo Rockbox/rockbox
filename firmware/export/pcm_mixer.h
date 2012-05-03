@@ -111,7 +111,7 @@ const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count
 
 /* Calculate peak values for channel */
 void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
-                                   int *left, int *right);
+                                   struct pcm_peaks *peaks);
 
 /* Adjust channel pointer by a given offset to support movable buffers */
 void mixer_adjust_channel_address(enum pcm_mixer_channel channel,
