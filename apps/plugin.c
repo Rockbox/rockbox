@@ -63,7 +63,7 @@
 #elif defined (APPLICATION)
 #define PREFIX(_x_) app_ ## _x_
 #else
-#define PREFIX
+#define PREFIX(_x_) _x_
 #endif
 
 #if defined (APPLICATION)
