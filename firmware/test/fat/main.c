@@ -9,6 +9,7 @@
 #include "dir.h"
 #include "file.h"
 #include "ata.h"
+#include "storage.h"
 
 void dbg_dump_sector(int sec);
 void dbg_dump_buffer(unsigned char *buf, int len, int offset);
@@ -432,7 +433,7 @@ void dbg_tail(char* name)
         if( rc > 0 )
         {
             buf[rc]=0;
-            printf("%d:\n%s\n", strlen(buf), buf);
+            printf("%d:\n%s\n", (int)strlen(buf), buf);
         }
         else if ( rc == 0 ) {
             DEBUGF("EOF\n");
@@ -463,7 +464,7 @@ int dbg_head(char* name)
     if( rc > 0 )
     {
         buf[rc]=0;
-        printf("%d:\n%s\n", strlen(buf), buf);
+        printf("%d:\n%s\n", (int)strlen(buf), buf);
     }
     else if ( rc == 0 ) {
         DEBUGF("EOF\n");
