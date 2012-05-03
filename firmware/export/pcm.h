@@ -21,7 +21,8 @@
 #ifndef PCM_PLAYBACK_H
 #define PCM_PLAYBACK_H
 
-#include <sys/types.h> /* size_t, uint32_t */
+#include <string.h> /* size_t */
+#include <inttypes.h> /* uint32_t */
 #include "config.h"
 
 enum pcm_dma_status
