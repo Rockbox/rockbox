@@ -21,6 +21,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
+#include "platform.h"
 #include "dsp_core.h"
 #include "dsp_sample_io.h"
 #include <sys/types.h>
@@ -52,9 +53,6 @@ struct dsp_config
                                       active/enabled stages */
 
     /** Misc. extra stuff **/
-#ifdef CPU_COLDFIRE
-    unsigned long old_macsr;       /* Old macsr value to restore */
-#endif
 #if 0 /* Not needed now but enable if something must know this */
     bool processing;               /* DSP is processing (to thwart inopportune
                                       buffer moves) */
@@ -350,31 +348,12 @@ bool dsp_proc_call(struct dsp_proc_entry *this, struct dsp_buffer **buf_p,
     return false;
 }
 
-static inline void dsp_process_start(struct dsp_config *dsp)
-{
-#if defined(CPU_COLDFIRE)
-    /* set emac unit for dsp processing, and save old macsr, we're running in
-       codec thread context at this point, so can't clobber it */
-    dsp->old_macsr = coldfire_get_macsr();
-    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
-#endif
-#if 0 /* Not needed now but enable if something must know this */
-    dsp->processing = true;
-#endif
-    (void)dsp;
-}
-
-static inline void dsp_process_end(struct dsp_config *dsp)
-{
-#if 0 /* Not needed now but enable if something must know this */
-    dsp->processing = false;
-#endif
-#if defined(CPU_COLDFIRE)
-    /* set old macsr again */
-    coldfire_set_macsr(dsp->old_macsr);
-#endif
-    (void)dsp;
-}
+#ifndef DSP_PROCESS_START
+/* These do nothing if not previously defined */
+#define DSP_PROCESS_START()
+#define DSP_PROCESS_LOOP()
+#define DSP_PROCESS_END()
+#endif /* !DSP_PROCESS_START */
 
 /**
  * dsp_process:
@@ -429,11 +408,10 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
         return;
     }
 
-    /* At least perform one yield before starting */
-    long last_yield = current_tick;
-    yield();
-
-    dsp_process_start(dsp);
+    DSP_PROCESS_START();
+#if 0 /* Not needed now but enable if something must know this */
+    dsp->processing = true;
+#endif
 
     /* Tag input with codec-specified sample format */
     src->format = dsp->io_data.format;
@@ -478,16 +456,14 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
         dsp_advance_buffer32(buf, outcount);
         dsp_advance_buffer_output(dst, outcount);
 
-        /* Yield at least once each tick */
-        long tick = current_tick;
-        if (TIME_AFTER(tick, last_yield))
-        {
-            last_yield = tick;
-            yield();
-        }
+        DSP_PROCESS_LOOP();
     } /* while */
 
-    dsp_process_end(dsp);
+#if 0 /* Not needed now but enable if something must know this */
+    dsp->process = false;
+#endif
+
+    DSP_PROCESS_END();
 }
 
 intptr_t dsp_configure(struct dsp_config *dsp, unsigned int setting,
