@@ -170,7 +170,7 @@ struct tea_key tea_keytable[] = {
   { "c200_106",          { 0xa913d139, 0xf842f398, 0x3e03f1a6, 0x060ee012 } },
   { "view",              { 0x70e19bda, 0x0c69ea7d, 0x2b8b1ad1, 0xe9767ced } },
   { "sa9200",            { 0x33ea0236, 0x9247bdc5, 0xdfaedf9f, 0xd67c9d30 } },
-  { "hdd1630",           { 0x04543ced, 0xcebfdbad, 0xf7477872, 0x0d12342e } },
+  { "hdd1630/hdd63x0",   { 0x04543ced, 0xcebfdbad, 0xf7477872, 0x0d12342e } },
   { "vibe500",           { 0xe3a66156, 0x77c6b67a, 0xe821dca5, 0xca8ca37c } },
 };
 
@@ -247,19 +247,19 @@ static int tea_find_key(struct mi4header_t *mi4header, int fd)
 {
     unsigned int i;
     int rc;
-    unsigned int j;
     uint32_t key[4];
+    uint32_t keyinc;
     unsigned char magic_enc[8];
     int key_found = -1;
     unsigned int magic_location = mi4header->length-4;
     int unaligned = 0;
-    
+
     if ( (magic_location % 8) != 0 )
     {
         unaligned = 1;
         magic_location -= 4;
     }
-    
+
     /* Load encrypted magic 0xaa55aa55 to check key */
     lseek(fd, MI4_HEADER_SIZE + magic_location, SEEK_SET);
     rc = read(fd, magic_enc, 8);
@@ -273,30 +273,23 @@ static int tea_find_key(struct mi4header_t *mi4header, int fd)
         key[1] = tea_keytable[i].key[1];
         key[2] = tea_keytable[i].key[2];
         key[3] = tea_keytable[i].key[3];
-        
+
         /* Now increment the key */
-        for(j=0; j<((magic_location-mi4header->plaintext)/8); j++){
-            key[0]++;
-            if (key[0]==0) {
-                key[1]++;
-                if (key[1]==0) {
-                    key[2]++;
-                    if (key[2]==0) {
-                        key[3]++;
-                    }
-                }
-            }
-        }
-        
+        keyinc = (magic_location-mi4header->plaintext)/8;
+        if ((key[0]+keyinc) < key[0]) key[1]++;
+        key[0] += keyinc;
+        if (key[1]==0) key[2]++;
+        if (key[2]==0) key[3]++;
+
         if (tea_test_key(magic_enc,key,unaligned))
         {
             key_found = i;
-            printf("%s...found", tea_keytable[i].name);
+             printf("%s...found", tea_keytable[i].name);
         } else {
            /* printf("%s...failed", tea_keytable[i].name); */
         }
     }
-    
+
     return key_found;
 }
 
