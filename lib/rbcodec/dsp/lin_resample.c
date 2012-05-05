@@ -40,6 +40,9 @@
 
 #define RESAMPLE_BUF_COUNT 192 /* Per channel, per DSP */
 
+/* CODEC_IDX_AUDIO = left and right, CODEC_IDX_VOICE = mono */
+static int32_t resample_out_bufs[3][RESAMPLE_BUF_COUNT] IBSS_ATTR;
+
 /* Data for each resampler on each DSP */
 static struct resample_data
 {
@@ -50,7 +53,7 @@ static struct resample_data
                              /* 14h */
     struct dsp_config *dsp;  /* The DSP for this resampler */
     struct dsp_buffer resample_buf; /* Buffer descriptor for resampled data */
-    int32_t resample_buf_arr[2][RESAMPLE_BUF_COUNT]; /* Actual output data */
+    int32_t *resample_buf_arr[2]; /* Actual output data pointers */
 } resample_data[DSP_COUNT] IBSS_ATTR;
 
 /* Actual worker function. Implemented here or in target assembly code. */
@@ -165,11 +168,9 @@ static void lin_resample_process(struct dsp_proc_entry *this,
     if (dst->remcount > 0)
         return; /* data still remains */
 
-    int channels = src->format.num_channels;
-
     dst->remcount = 0;
     dst->p32[0] = data->resample_buf_arr[0];
-    dst->p32[1] = data->resample_buf_arr[channels - 1];
+    dst->p32[1] = data->resample_buf_arr[1];
 
     if (src->remcount > 0)
     {
@@ -238,6 +239,36 @@ static void lin_resample_new_format(struct dsp_proc_entry *this,
     dsp_proc_call(this, buf_p, 0);
 }
 
+static void lin_resample_init(struct dsp_config *dsp,
+                              enum dsp_ids dsp_id)
+{
+    /* Always enable resampler so that format changes may be monitored and
+     * it self-activated when required */
+    dsp_proc_enable(dsp, DSP_PROC_RESAMPLE, true);
+
+    int32_t *lbuf, *rbuf;
+
+    switch (dsp_id)
+    {
+    case CODEC_IDX_AUDIO:
+        lbuf = resample_out_bufs[0];
+        rbuf = resample_out_bufs[1];
+        break;
+
+    case CODEC_IDX_VOICE:
+        lbuf = rbuf = resample_out_bufs[2]; /* Always mono */
+        break;
+
+    default:
+        /* huh? */
+        DEBUGF("DSP_PROC_RESAMPLE- unknown DSP %d\n", (int)dsp_id);
+        return;
+    }
+
+    resample_data[dsp_id].resample_buf_arr[0] = lbuf;
+    resample_data[dsp_id].resample_buf_arr[1] = rbuf;
+}
+
 /* DSP message hook */
 static intptr_t lin_resample_configure(struct dsp_proc_entry *this,
                                        struct dsp_config *dsp,
@@ -247,9 +278,7 @@ static intptr_t lin_resample_configure(struct dsp_proc_entry *this,
     switch (setting)
     {
     case DSP_INIT:
-        /* Always enable resampler so that format changes may be monitored and
-         * it self-activated when required */
-        dsp_proc_enable(dsp, DSP_PROC_RESAMPLE, true);
+        lin_resample_init(dsp, (enum dsp_ids)value);
         break;
 
     case DSP_FLUSH:

@@ -28,8 +28,6 @@
 #define WORD_FRACBITS   27
 #define NATIVE_DEPTH    16
 
-#define SAMPLE_BUF_COUNT 128 /* Per channel, per DSP */
-
 struct sample_io_data;
 
 /* DSP initial buffer input function call prototype */
@@ -50,7 +48,7 @@ struct sample_io_data
     int stereo_mode;  /* Codec-specified input format */
     sample_input_fn_type input_samples[2]; /* input functions */
     struct dsp_buffer sample_buf; /* Buffer descriptor for converted samples */
-    int32_t sample_buf_arr[2][SAMPLE_BUF_COUNT]; /* Internal format */
+    int32_t *sample_buf_arr[2];   /* Internal format buffer pointers */
     sample_output_fn_type output_samples[2]; /* Final output functions */
 };
 

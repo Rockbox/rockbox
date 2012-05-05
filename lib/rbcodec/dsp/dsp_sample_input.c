@@ -51,6 +51,10 @@
 extern void dsp_sample_output_init(struct sample_io_data *this);
 extern void dsp_sample_output_flush(struct sample_io_data *this);
 
+#define SAMPLE_BUF_COUNT 128 /* Per channel, per DSP */
+/* CODEC_IDX_AUDIO = left and right, CODEC_IDX_VOICE = mono */
+static int32_t sample_bufs[3][SAMPLE_BUF_COUNT] IBSS_ATTR;
+
 /* convert count 16-bit mono to 32-bit mono */
 static void sample_input_mono16(struct sample_io_data *this,
                                 struct dsp_buffer **buf_p)
@@ -269,8 +273,31 @@ static void dsp_sample_input_format_change(struct sample_io_data *this,
         format_change_ack(&src->format);
 }
 
-static void dsp_sample_input_init(struct sample_io_data *this)
+static void dsp_sample_input_init(struct sample_io_data *this,
+                                  enum dsp_ids dsp_id)
 {
+    int32_t *lbuf, *rbuf;
+
+    switch (dsp_id)
+    {
+    case CODEC_IDX_AUDIO:
+        lbuf = sample_bufs[0];
+        rbuf = sample_bufs[1];
+        break;
+
+    case CODEC_IDX_VOICE:
+        lbuf = rbuf = sample_bufs[2]; /* Always mono */
+        break;
+
+    default:
+        /* orly */
+        DEBUGF("DSP Input- unknown dsp %d\n", (int)dsp_id);
+        return;
+    }
+
+    this->sample_buf_arr[0] = lbuf;
+    this->sample_buf_arr[1] = rbuf;
+
     this->input_samples[0] = sample_input_ni_stereo32;
     this->input_samples[1] = dsp_sample_input_format_change;
 }
@@ -288,7 +315,7 @@ void dsp_sample_io_configure(struct sample_io_data *this,
     switch (setting)
     {
     case DSP_INIT:
-        dsp_sample_input_init(this);
+        dsp_sample_input_init(this, (enum dsp_ids)value);
         dsp_sample_output_init(this);
         break;
 
