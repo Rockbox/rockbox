@@ -20,15 +20,17 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "platform.h"
 #include "config.h"
-#include "system.h"
 #include "sound.h"
 #include "core_alloc.h"
 #include "dsp-util.h"
 #include "dsp_proc_entry.h"
 #include "tdspeed.h"
 
+#ifndef assert
 #define assert(cond)
+#endif
 
 #define TIMESTRETCH_SET_FACTOR (DSP_PROC_SETTING+DSP_PROC_TIMESTRETCH)
 
@@ -39,6 +41,7 @@
 #define MAX_INPUTCOUNT       512 /* Max input count so dst doesn't overflow */
 #define FIXED_BUFCOUNT      3072 /* 48KHz factor 3.0 */
 #define FIXED_OUTBUFCOUNT   4096
+#define NBUFFERS 4
 
 enum tdspeed_ops
 {
@@ -64,8 +67,13 @@ static struct tdspeed_state_s
     int32_t *ovl_buff[2];   /* overlap buffer (L+R) */
 } tdspeed_state;
 
-static int handles[4] = { 0, 0, 0, 0 };
-static int32_t *buffers[4] = { NULL, NULL, NULL, NULL };
+static int32_t *buffers[NBUFFERS] = { NULL, NULL, NULL, NULL };
+static const int buffer_sizes[NBUFFERS] = {
+    FIXED_BUFCOUNT * sizeof(int32_t),
+    FIXED_BUFCOUNT * sizeof(int32_t),
+    FIXED_OUTBUFCOUNT * sizeof(int32_t),
+    FIXED_OUTBUFCOUNT * sizeof(int32_t)
+};
 
 #define overlap_buffer  (&buffers[0])
 #define outbuf          (&buffers[2])
@@ -73,107 +81,6 @@ static int32_t *buffers[4] = { NULL, NULL, NULL, NULL };
 
 /* Processed buffer passed out to later stages */
 static struct dsp_buffer dsp_outbuf;
-
-static int move_callback(int handle, void *current, void *new)
-{
-#if 0
-    /* Should not currently need to block this since DSP loop completes an
-       iteration before yielding and begins again at its input buffer */
-    if (dsp_is_busy(tdspeed_state.dsp))
-        return BUFLIB_CB_CANNOT_MOVE; /* DSP processing in progress */
-#endif
-
-    ptrdiff_t shift = (int32_t *)new - (int32_t *)current;
-    int32_t **p32 = dsp_outbuf.p32;
-
-    for (unsigned int i = 0; i < ARRAYLEN(handles); i++)
-    {
-        if (handle != handles[i])
-            continue;
-
-        switch (i)
-        {
-        case 0: case 1:
-            /* moving overlap (input) buffers */
-            tdspeed_state.ovl_buff[i] = new;
-            break;
-
-        case 2:
-            /* moving outbuf left channel and dsp_outbuf.p32[0] */
-            if (p32[0] == p32[1])
-                p32[1] += shift; /* mono mode */
-
-            p32[0] += shift;
-            break;
-
-        case 3:
-            /* moving outbuf right channel and dsp_outbuf.p32[1] */
-            p32[1] += shift;
-            break;
-        }
-
-        buffers[i] = new;
-        break;
-    }
-
-    return BUFLIB_CB_OK;
-}
-
-static struct buflib_callbacks ops =
-{
-    .move_callback = move_callback,
-    .shrink_callback = NULL,
-};
-
-/* Allocate timestretch buffers */
-static bool tdspeed_alloc_buffers(void)
-{
-    static const struct
-    {
-        const char *name;
-        size_t size;
-    } bufdefs[4] =
-    {
-        { "tdspeed ovl L", FIXED_BUFCOUNT * sizeof(int32_t) },
-        { "tdspeed ovl R", FIXED_BUFCOUNT * sizeof(int32_t) },
-        { "tdspeed out L", FIXED_OUTBUFCOUNT * sizeof(int32_t) },
-        { "tdspeed out R", FIXED_OUTBUFCOUNT * sizeof(int32_t) },
-    };
-
-    for (unsigned int i = 0; i < ARRAYLEN(bufdefs); i++)
-    {
-        if (handles[i] <= 0)
-        {
-            handles[i] = core_alloc_ex(bufdefs[i].name, bufdefs[i].size, &ops);
-
-            if (handles[i] <= 0)
-                return false;
-        }
-
-        if (buffers[i] == NULL)
-        {
-            buffers[i] = core_get_data(handles[i]);
-
-            if (buffers[i] == NULL)
-                return false;
-        }
-    }
-
-    return true;
-}
-
-/* Free timestretch buffers */
-static void tdspeed_free_buffers(void)
-{
-    for (unsigned int i = 0; i < ARRAYLEN(handles); i++)
-    {
-        if (handles[i] > 0)
-            core_free(handles[i]);
-
-        handles[i] = 0;
-        buffers[i] = NULL;
-    }
-}
 
 /* Discard all data */
 static void tdspeed_flush(void)
@@ -650,7 +557,7 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
         break;
 
     case DSP_PROC_INIT:
-        if (!tdspeed_alloc_buffers())
+        if (!tdspeed_alloc_buffers(buffers, buffer_sizes, NBUFFERS))
             return -1; /* fail the init */
 
         st->this = this;
@@ -664,7 +571,7 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
         st->this = NULL;
         st->factor = PITCH_SPEED_100;
         dsp_outbuf.remcount = 0;
-        tdspeed_free_buffers();
+        tdspeed_free_buffers(buffers, NBUFFERS);
         break;
 
     case TIMESTRETCH_SET_FACTOR:
@@ -678,6 +585,35 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
 
     return 1;
     (void)value;
+}
+
+void tdspeed_move(int i, void* current, void* new)
+{
+    ptrdiff_t shift = (int32_t *)new - (int32_t *)current;
+    int32_t **p32 = dsp_outbuf.p32;
+
+    switch (i)
+    {
+    case 0: case 1:
+        /* moving overlap (input) buffers */
+        tdspeed_state.ovl_buff[i] = new;
+        break;
+
+    case 2:
+        /* moving outbuf left channel and dsp_outbuf.p32[0] */
+        if (p32[0] == p32[1])
+            p32[1] += shift; /* mono mode */
+
+        p32[0] += shift;
+        break;
+
+    case 3:
+        /* moving outbuf right channel and dsp_outbuf.p32[1] */
+        p32[1] += shift;
+        break;
+    }
+
+    buffers[i] = new;
 }
 
 /* Database entry */

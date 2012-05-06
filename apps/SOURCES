@@ -26,6 +26,7 @@ menus/audiohw_eq_menu.c
 menus/eq_menu.c
 buffering.c
 voice_thread.c
+rbcodec_helpers.c
 #else  /* !SWCODEC */
 mpeg.c
 #endif

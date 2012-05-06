@@ -1,6 +1,4 @@
 warble.c
-../../../firmware/buflib.c
-../../../firmware/core_alloc.c
 ../../../firmware/common/strlcpy.c
 ../../../firmware/common/unicode.c
 ../../../firmware/common/structec.c
