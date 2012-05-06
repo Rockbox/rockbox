@@ -49,8 +49,8 @@ static struct resample_data
     uint32_t delta;          /* 00h: Phase delta for each step */
     uint32_t phase;          /* 04h: Current phase [pos16|frac16] */
     int32_t  last_sample[2]; /* 08h: Last samples for interpolation (L+R) */
-    int32_t  frequency;      /* 10h: Virtual samplerate */
-                             /* 14h */
+                             /* 10h */
+    int32_t  frequency;      /* Virtual samplerate */
     struct dsp_config *dsp;  /* The DSP for this resampler */
     struct dsp_buffer resample_buf; /* Buffer descriptor for resampled data */
     int32_t *resample_buf_arr[2]; /* Actual output data pointers */
