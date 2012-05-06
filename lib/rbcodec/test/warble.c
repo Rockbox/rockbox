@@ -33,7 +33,6 @@
 #include <unistd.h>
 #include "buffering.h" /* TYPE_PACKET_AUDIO */
 #include "codecs.h"
-#include "core_alloc.h" /* core_allocator_init */
 #include "dsp_core.h"
 #include "metadata.h"
 #include "settings.h"
@@ -851,7 +850,6 @@ int main(int argc, char **argv)
         }
     }
 
-    core_allocator_init();
     if (argc == optind + 2) {
         write_init(argv[optind + 1]);
     } else if (argc == optind + 1) {

@@ -39,5 +39,6 @@ void dsp_timestretch_enable(bool enable);
 void dsp_set_timestretch(int32_t percent);
 int32_t dsp_get_timestretch(void);
 bool dsp_timestretch_available(void);
+void tdspeed_move(int i, void* current, void* new);
 
 #endif /* _TDSPEED_H */
