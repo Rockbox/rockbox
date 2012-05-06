@@ -34,11 +34,7 @@ void ata_device_init(void) STORAGE_INIT_ATTR;
  * an ATA to USB bridge chip can use it instead.*/
 void ata_enable(bool on);
 /* ATA hard reset: pulse the RESET pin */
-#ifdef HAVE_ATA_POWER_OFF
 void ata_reset(void);
-#else
-void ata_reset(void) STORAGE_INIT_ATTR;
-#endif
 
 /* Optional optimized target-specific PIO transfer */
 #ifdef ATA_OPTIMIZED_READING

@@ -58,6 +58,8 @@
 #define CMD_SLEEP                  0xE6
 #define CMD_SET_FEATURES           0xEF
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
+#define CMD_CHECK_POWER_MODE       0xE5
+#define CMD_IDLE_IMMEDIATE         0xE1
 #ifdef HAVE_ATA_DMA
 #define CMD_READ_DMA               0xC8
 #define CMD_READ_DMA_EXT           0x25
@@ -65,11 +67,16 @@
 #define CMD_WRITE_DMA_EXT          0x35
 #endif
 
+#define ATA_POWER_MODE_STANDBY     0x00
+#define ATA_POWER_MODE_IDLE        0x01
+#define ATA_POWER_MODE_ACTIVE      0x02
+
+
 /* Should all be < 0x100 (which are reserved for control messages) */
 #define Q_SLEEP    0
 #define Q_CLOSE    1
 
-#define READWRITE_TIMEOUT 5*HZ
+#define READWRITE_TIMEOUT 60*HZ
 
 #ifdef HAVE_ATA_POWER_OFF
 #define ATA_POWER_OFF_TIMEOUT 2*HZ
@@ -160,6 +167,15 @@ static bool ata_led_enabled = true;
 static bool ata_led_on = false;
 #endif
 static bool spinup = false;
+
+/* Why do we still keep this variable, despite functions like
+ * ata_get_power_mode()?
+ *
+ * ata_get_power_mode() should, in normal operation, not yield results different
+ * from what we expect with that state. Thus, this state is useful as a low-cost
+ * informational state for other libraries (as it's value is available via
+ * ata_disk_is_active()).
+ */
 static bool sleeping = true;
 #ifdef HAVE_ATA_POWER_OFF
 static bool poweroff = false;
@@ -203,6 +219,8 @@ static int ata_power_on(void);
 static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
 static int set_features(void);
+static int identify(void);
+static int freeze_lock(void);
 
 #ifndef ATA_TARGET_POLLING
 static ICODE_ATTR int wait_for_bsy(void)
@@ -338,6 +356,180 @@ static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
 }
 #endif /* !ATA_OPTIMIZED_WRITING */
 
+/**
+ * Power-cycle the IDE port and reinitialize the hard drive (includes calls to
+ * identify(), set_features() etc.). It assumes that you are currently holding
+ * the ata_mutex (otherwise chaos may ensue).
+ *
+ * Returns 0 upon success, a negative error code otherwise.
+ */
+static inline int ata_hard_reinit(void)
+{
+#ifdef HAVE_ATA_POWER_OFF
+    // have you tried turning it off and on again?
+    ide_power_enable(false);
+    sleep(HZ/4);
+    ide_power_enable(true);
+    sleep(HZ/4);
+#else
+    ata_reset();
+#endif
+    
+    ATA_OUT8(ATA_SELECT, ata_device);
+    
+    if (!wait_for_rdy()) {
+        return -1;
+    }
+
+    if (identify()) {
+        return -2;
+    }
+
+    if (set_features()) {
+        return -3;
+    }
+
+    if (set_multiple_mode(multisectors)) {
+        return -4;
+    }
+
+    if (freeze_lock()) {
+        return -5;
+    }
+    
+    return 0;
+}
+
+/**
+ * Figure out in which power state the drive currently is. This tries its best
+ * to get the drive to respond. If this does not work out, panicf() will be
+ * called.
+ *
+ * Returns one of:
+ *      ATA_POWER_MODE_STANDBY  -- drive is in ATA standby
+ *      ATA_POWER_MODE_IDLE     -- drive is idle
+ *      ATA_POWER_MODE_ACTIVE   -- drive is active
+ *  (see ATA specs for exact meaning)
+ *
+ * You may use ata_wake_device() to make sure the device is in a state in which
+ * you can safely issue commands. 
+ */
+static int ata_get_power_mode(void)
+{
+    bool did_hard_reset = false;
+    if ((ATA_IN8(ATA_SELECT) & 1) != ata_device) {
+        // select the device first
+        ATA_OUT8(ATA_SELECT, ata_device);
+        if (!wait_for_rdy()) {
+            DEBUGF("[ata/getpm] first select failed");
+            // okay, this should not be the case in correct operation.
+            // we try a hard reset here.
+            did_hard_reset = true;
+            int reinitResult = ata_hard_reinit();
+            if (reinitResult != 0) {
+                panicf("ata_get_power_mode -- drive not selectable; "
+                       "hard reinit failed: %d", reinitResult);
+            }
+        }
+    }
+
+    ATA_OUT8(ATA_COMMAND, CMD_CHECK_POWER_MODE);
+    if (!wait_for_rdy()) {
+        DEBUGF("[ata/getpm] timeout");
+        if (did_hard_reset) {
+            panicf("ata_get_power_mode -- drive not responding; "
+                   "did hard reset during select, so no point in "
+                   "retrying");
+            return -2;
+        } else {
+            int reinitResult = ata_hard_reinit();
+            if (reinitResult != 0) {
+                panicf("ata_get_power_mode -- drive not responding; "
+                       "hard reinit failed: %d", reinitResult);
+            }
+            ATA_OUT8(ATA_COMMAND, CMD_CHECK_POWER_MODE);
+            if (!wait_for_rdy()) {
+                panicf("ata_get_power_mode -- drive not responding after hard"
+                       "reinit");
+            }
+        }
+    }
+
+    unsigned char status = ATA_IN8(ATA_NSECTOR) & 0xff;
+    switch (status) {
+        case 0x00:
+            return ATA_POWER_MODE_STANDBY;
+        case 0x80:
+            return ATA_POWER_MODE_IDLE;
+        case 0xFF:
+            return ATA_POWER_MODE_ACTIVE;
+        default:
+            break;
+    }
+
+    // unknown power mode
+    panicf("ata_get_power_mode -- device in unknown power mode %d", status);
+    return -3;
+}
+
+/**
+ * Make sure the device is in a wake state (i.e. not in ATA STANDBY state). This
+ * calls ata_get_power_mode() for you. For now, this function will panicf() if
+ * an error condition occurs.
+ */
+static int ata_wake_device(void)
+{
+#ifdef HAVE_ATA_POWER_OFF
+    // we _have_ to check for poweroff even now with the more stateless setup
+    // as poweroff is a state on our side, not on the HDDs side.
+    if (poweroff) {
+        DEBUGF("[ata/wake] powered off");
+        int result = ata_power_on();
+        if (result)
+        {
+            panicf("ata_wake_device -- device wakeup using power on failed: "
+                   "%d", result);
+            return -1;
+        }
+        poweroff = false;
+        sleeping = false;
+    } else
+#endif
+    // We still use the sleeping global variable, see declaration for rationale
+    if (sleeping) {
+        DEBUGF("[ata/wake] sleeping");
+        int result = perform_soft_reset();
+        if (result) {
+            panicf("ata_wake_device -- device wakeup using soft reset failed: "
+                   "%d", result);
+            return -2;
+        }
+        sleeping = false;
+    }
+    
+    int power_mode = ata_get_power_mode();
+    if (power_mode < 0) {
+        // this indicates an error condition
+        return -3;
+    }
+    
+    if (power_mode == ATA_POWER_MODE_STANDBY) {
+        // wakeup the device into the IDLE state.
+        ATA_OUT8(ATA_SELECT, ata_device);
+        if (!wait_for_rdy()) {
+            panicf("ata_wake_device -- device not selectable");
+            return -4;
+        }
+        ATA_OUT8(ATA_COMMAND, CMD_IDLE_IMMEDIATE);
+        if (!wait_for_rdy()) {
+            panicf("ata_wake_device -- wakeup failed (no rdy)");
+            return -5;
+        }
+    }
+
+    return 0;
+}
+
 static int ata_transfer_sectors(unsigned long start,
                                 int incount,
                                 void* inbuf,
@@ -366,24 +558,9 @@ static int ata_transfer_sectors(unsigned long start,
 
     ata_led(true);
 
-    if ( sleeping ) {
-        sleeping = false; /* set this now since it'll be on */
-        spinup = true;
-#ifdef HAVE_ATA_POWER_OFF
-        if (poweroff) {
-            if (ata_power_on()) {
-                ret = -2;
-                goto error;
-            }
-        }
-        else
-#endif
-        {
-            if (perform_soft_reset()) {
-                ret = -2;
-                goto error;
-            }
-        }
+    if (ata_wake_device()) {
+        ret = -2;
+        goto error;
     }
 
     timeout = current_tick + READWRITE_TIMEOUT;
@@ -828,19 +1005,23 @@ static int ata_perform_sleep(void)
         return 0;
     }
 
-    ATA_OUT8(ATA_SELECT, ata_device);
-
-    if(!wait_for_rdy()) {
-        DEBUGF("ata_perform_sleep() - not RDY\n");
-        return -1;
+    int power_mode = ata_get_power_mode();
+    if (power_mode < 0) {
+        return -3;
     }
 
-    ATA_OUT8(ATA_COMMAND, CMD_SLEEP);
+    if (power_mode > ATA_POWER_MODE_STANDBY) {
+        ATA_OUT8(ATA_SELECT, ata_device);
+        if (!wait_for_rdy()) {
+            panicf("ata_perform_sleep() -- cannot select device");
+            return -1;
+        }
 
-    if (!wait_for_rdy())
-    {
-        DEBUGF("ata_perform_sleep() - CMD failed\n");
-        return -2;
+        ATA_OUT8(ATA_COMMAND, CMD_SLEEP);
+        if (!wait_for_rdy()) {
+            panicf("ata_perform_sleep() -- device not responding");
+            return -2;
+        }
     }
 
     sleeping = true;
@@ -908,6 +1089,7 @@ static void ata_thread(void)
                         {
                             call_storage_idle_notifys(true);
                         }
+                        DEBUGF("[ata/thread] perform sleep");
                         mutex_lock(&ata_mtx);
                         ata_perform_sleep();
 #ifdef HAVE_ATA_POWER_OFF
@@ -921,6 +1103,7 @@ static void ata_thread(void)
                 if ( !spinup && sleeping && !poweroff &&
                      TIME_AFTER( current_tick, last_sleep + ATA_POWER_OFF_TIMEOUT ))
                 {
+                    DEBUGF("[ata/thread] power off");
                     mutex_lock(&ata_mtx);
                     ide_power_enable(false);
                     poweroff = true;
@@ -939,23 +1122,7 @@ static void ata_thread(void)
                 /* There is no need to force ATA power on */
 #else
                 mutex_lock(&ata_mtx);
-                if (sleeping) {
-                    ata_led(true);
-                    sleeping = false; /* set this now since it'll be on */
-
-#ifdef HAVE_ATA_POWER_OFF
-                    if (poweroff) {
-                        ata_power_on();
-                        poweroff = false;
-                    }
-                    else
-#endif
-                    {
-                        perform_soft_reset();
-                    }
-
-                    ata_led(false);
-                }
+                ata_wake_device();
                 mutex_unlock(&ata_mtx);
 
                 /* Wait until the USB cable is extracted again */
@@ -992,11 +1159,7 @@ static void ata_thread(void)
 }
 
 /* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
-#ifdef HAVE_ATA_POWER_OFF
 static int ata_hard_reset(void)
-#else
-static int STORAGE_INIT_ATTR ata_hard_reset(void)
-#endif
 {
     int ret;
 
