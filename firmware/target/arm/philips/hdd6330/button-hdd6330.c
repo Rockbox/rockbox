@@ -82,7 +82,7 @@ void button_int(void)
     {
         int_btn |= BUTTON_TAP;
     }
-    else if ((data[0] == MEP_ABSOLUTE_HEADER))
+    else if (data[0] == MEP_ABSOLUTE_HEADER)
     {
         if (data[1] & MEP_FINGER)
         {

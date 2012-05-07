@@ -459,7 +459,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 selected = get_menu_selection(gui_synclist_get_sel_pos(&lists),menu);
                 temp = menu->submenus[selected];
                 type = (temp->flags&MENU_TYPE_MASK);
-                if ((type == MT_SETTING_W_TEXT || type == MT_SETTING))
+                if (type == MT_SETTING_W_TEXT || type == MT_SETTING)
                 {
 #ifdef HAVE_QUICKSCREEN
                     MENUITEM_STRINGLIST(quickscreen_able_option,

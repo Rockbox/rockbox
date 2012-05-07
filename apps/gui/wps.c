@@ -592,7 +592,7 @@ static void play_hop(int direction)
 #endif
         return;
     }
-    else if ((direction == -1 && elapsed < step))
+    else if (direction == -1 && elapsed < step)
     {
         elapsed = 0;
     }

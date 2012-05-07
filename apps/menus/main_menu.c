@@ -333,7 +333,7 @@ static int info_action_callback(int action, struct gui_synclist *lists)
 {
     if (action == ACTION_STD_CANCEL)
         return action;
-    else if ((action == ACTION_STD_OK)
+    else if (action == ACTION_STD_OK
 #ifdef HAVE_HOTSWAP
         || action == SYS_FS_CHANGED
 #endif

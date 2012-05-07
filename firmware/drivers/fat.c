@@ -1596,9 +1596,9 @@ static void randomize_dos_name(unsigned char *name)
     while(i++ < 8)
     {
         /* hunt for ~ and where to put it */
-        if((!tilde) && (*nameptr == '~'))
+        if(!tilde && *nameptr == '~')
             tilde = nameptr;
-        if((!lastpt) && ((*nameptr == ' ' || *nameptr == '~')))
+        if(!lastpt && (*nameptr == ' ' || *nameptr == '~'))
             lastpt = nameptr;
         nameptr++;
     }
