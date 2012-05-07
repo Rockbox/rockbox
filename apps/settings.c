@@ -977,6 +977,8 @@ void settings_apply(bool read_disk)
     CHART("<set_codepage");
 
 #if CONFIG_CODEC == SWCODEC
+    extern void resample_set_type(int type);
+    resample_set_type(global_settings.resampling_type);
 #ifdef HAVE_CROSSFADE
     audio_set_crossfade(global_settings.crossfade);
 #endif
