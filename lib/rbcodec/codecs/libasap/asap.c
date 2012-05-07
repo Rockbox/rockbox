@@ -1226,7 +1226,6 @@ PRIVATE FUNC(abool, parse_sap, (
         return FALSE;
     if (ast == NULL)
         return TRUE;
-    ZERO_ARRAY(ast _ memory);
     module_index = module_info _ header_len + 2;
     while (module_index + 5 <= module_len) {
         V(int, start_addr) = UWORD(module, module_index);
