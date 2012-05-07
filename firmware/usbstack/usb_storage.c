@@ -1228,17 +1228,13 @@ static void send_csw(int status)
 
 static void copy_padded(char *dest, char *src, int len)
 {
-   int i=0;
-   while(i<len && src[i]!=0)
-   {
-      dest[i]=src[i];
-      i++;
-   }
-   while(i<len)
-   {
-      dest[i]=' ';
-      i++;
-   }
+    for (int i = 0; i < len; i++) {
+        if (src[i] != 0) {
+            memset(&dest[i], ' ', len - i);
+            return;
+        }
+        dest[i] = src[i];
+    }
 }
 
 /* build SCSI INQUIRY */
