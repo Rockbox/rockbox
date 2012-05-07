@@ -88,14 +88,14 @@ void INT_GPIOA(void);
 default_interrupt(INT_GPIOB);
 default_interrupt(INT_GPIOC);
 
-static const char * const irqname[] =
+static const char const irqname[][9] =
 {
-    "INT_WATCHDOG", "INT_TIMER1", "INT_TIMER2", "INT_USB", "INT_DMAC", "INT_NAND",
-    "INT_IDE", "INT_MCI0", "INT_MCI1", "INT_AUDIO", "INT_SSP", "INT_I2C_MS",
-    "INT_I2C_AUDIO", "INT_I2SIN", "INT_I2SOUT", "INT_UART", "INT_GPIOD", "RESERVED1",
-    "INT_CGU", "INT_MEMORY_STICK", "INT_DBOP", "RESERVED2", "RESERVED3", "RESERVED4",
-    "RESERVED5", "RESERVED6", "RESERVED7", "RESERVED8", "RESERVED9", "INT_GPIOA",
-    "INT_GPIOB", "INT_GPIOC"
+    "WATCHDOG", "TIMER1", "TIMER2", "USB", "DMAC", "NAND",
+    "IDE", "MCI0", "MCI1", "AUDIO", "SSP", "I2C_MS",
+    "I2C_AUDIO", "I2SIN", "I2SOUT", "UART", "GPIOD", "RESERVD1",
+    "CGU", "MS", "DBOP", "RESERVD2", "RESERVD3", "RESERVD4",
+    "RESERVD5", "RESERVD6", "RESERVD7", "RESERVD8", "RESERVD9", "GPIOA",
+    "GPIOB", "GPIOC"
 };
 
 static void UIRQ(void)
