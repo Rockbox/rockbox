@@ -399,6 +399,217 @@ resample_linear:
     .size   resample_linear, .-resample_linear
 
 /****************************************************************************
+ * int resample_hermite(struct resample_data *data, struct dsp_buffer *src,
+ *                      struct dsp_buffer *dst)
+ */
+    .section    .text, "ax",%progbits
+    .global     resample_hermite
+resample_hermite:
+    @input: r0 = data, r1 = src, r2 = dst
+    stmfd   sp!, { r4-r11, lr }     @ stack modified regs
+    ldr     r9, [r1]                @ r9 = srcrem = src->remcount
+    ldrb    r10, [r1, #17]          @ r10 = ch = num_channels
+    add     r11, r0, #8             @ r11 = data->history
+    cmp     r9, #0x8000             @ srcrem = MIN(srcrem, 0x8000)
+    movgt   r9, #0x8000             @
+    stmfd   sp!, { r1-r2, r9-r11 }  @ stack src, dst, srcrem, ch, data->history
+
+.hrs_channel_loop:
+    ldmdb   r11, { r5, r14 }        @ r5 = data->delta, r14 = data->phase
+    ldr     r6, [r1, r10, lsl #2]   @ r6 = src->p32[ch]
+    ldr     r7, [r2, r10, lsl #2]   @ r7 = dst->p32[ch]
+    ldr     r8, [r2, #12]           @ r8 = dstrem = dst->bufcount
+    sub     r10, r10, #1            @ ch -= 1
+    str     r10, [sp, #12]          @ save ch
+
+    mov     r0, r14, lsr #16        @ r0 = pos = MIN(phase >> 16, srcrem)
+    cmp     r0, r9                  @
+    movgt   r0, r9                  @
+
+    add     r12, r6, r0, lsl #2     @ r12 = &s[pos]
+    cmp     r0, #3                  @ pos >= 3? history not needed
+    ldmgedb r12, { r1-r3 }          @ x3..x1 = s[pos-3]..s[pos-1]
+    bge     .hrs_loadhist_done      @
+    add     r10, r10, r10, asl #1   @ r11 = h = history[ch]
+    add     r11, r11, r10, asl #2   @
+    add     r10, r0, r0, lsl #1     @ branch pc + pos*12
+    add     pc, pc, r10, lsl #2     @
+    nop                             @
+    ldmia   r11, { r1-r3 }          @ x3..x1 = h[0]..h[2]
+    b       .hrs_loadhist_done      @
+    nop                             @
+    ldmib   r11, { r1-r2 }          @ x3..x2 = h[1]..h[2]
+    ldr     r3, [r12, #-4]          @ x1 = s[0]
+    b       .hrs_loadhist_done      @
+    ldr     r1, [r11, #8]           @ x3 = h[2]
+    ldmdb   r12, { r2-r3 }          @ x2..x1 = s[0]..s[1]
+.hrs_loadhist_done:
+
+    cmp      r0, r9                 @ pos past end? channel complete
+    bge     .hrs_channel_done       @
+
+    cmp     r5, #0x10000            @ delta >= 1.0?
+    bhs     .hrs_dsstart            @ yes? is downsampling
+
+    /** Upsampling **/
+    mov     r6, r12                 @ r6 = &s[pos]
+    mov     r14, r14, lsl #16       @ r14 = phase << 16
+    sub     r0, r9, r0              @ r0 = dte = srcrem - pos
+    mov     r5, r5, lsl #16         @ r5 = delta << 16
+
+    @ Register usage in loop:
+    @ r0 = dte
+    @ r1 = x3, r2 = x2, r3 = x1, r4 = x0
+    @ r5 = delta << 16, r6 = &s[pos], r7 = d, r8 = dstrem
+    @ r9 = scratch/acclo, r10 = scratch/acchi
+    @ r11 = c2, r12 = c3, (c1 calculated in loop)
+    @ r14 = phase,frac
+    @
+    @ Try to avoid overflow as much as possible and at the same time preserve
+    @ accuracy. Same formulas apply to downsampling but registers and
+    @ instruction order differ due to specific constraints.
+    @ c1 = -0.5*x3 + 0.5*x1
+    @    = 0.5*(x1 - x3)
+    @
+    @ v = x1 - x2, -v = x2 - x1
+    @ c2 = x3 - 2.5*x2 + 2*x1 - 0.5*x0
+    @    = x3 + 2*(x1 - x2) - 0.5*(x0 + x2)
+    @    = x3 + 2*v - 0.5*(x0 + x2)
+    @
+    @ c3 = -0.5*x3 + 1.5*x2 - 1.5*x1 + 0.5*x0
+    @    = 0.5*(x0 - x3 + (x2 - x1)) + (x2 - x1)
+    @    = 0.5*(x0 - x3 - v) - v
+.hrs_usloop_carry:
+    ldr     r4, [r6], #4            @ x0 = s[pos]
+    sub     r9, r3, r2              @ r9 = v, r11 = c2, r12 = c3
+    add     r11, r1, r9, asl #1     @
+    add     r10, r4, r2             @
+    sub     r12, r4, r1             @
+    sub     r12, r12, r9            @
+    sub     r11, r11, r10, asr #1   @
+    rsb     r12, r9, r12, asr #1    @
+.hrs_usloop_frac:
+    mov     r14, r14, lsr #16       @ r14 = phase -> frac
+    smull   r9, r10, r12, r14       @ acc = frac * c3 + c2
+    add     r9, r11, r9, lsr #16    @
+    add     r9, r9, r10, lsl #16    @
+    smull   r9, r10, r14, r9        @ acc = 2*(frac * acc) + (x1 - x3)
+    add     r9, r3, r9, lsr #15     @
+    add     r9, r9, r10, lsl #17    @
+    sub     r9, r9, r1              @
+    smull   r9, r10, r14, r9        @ acc = 0.5*(frac * acc) + x2
+    add     r9, r2, r9, lsr #17     @
+    add     r9, r9, r10, lsl #15    @
+    str     r9, [r7], #4            @ *d++ = acc
+    subs    r8, r8, #1              @ destination full?
+    bls     .hrs_usfull             @ yes? channel is done
+    adds    r14, r5, r14, lsl #16   @ frac += delta
+    bcc     .hrs_usloop_frac        @ if carry is set, pos is incremented
+    subs    r0, r0, #1              @ if dte > 0, do another sample
+    mov     r1, r2                  @ x3 = x2
+    mov     r2, r3                  @ x2 = x1
+    mov     r3, r4                  @ x1 = x0
+    bgt     .hrs_usloop_carry
+    b       .hrs_usdone
+
+.hrs_usfull:
+    adds    r14, r5, r14, lsl #16   @ do missed phase increment
+    bcc     .hrs_usdone             @
+    sub     r0, r0, #1              @ do missed dte decrement
+    mov     r1, r2                  @ do missed history update
+    mov     r2, r3                  @
+    mov     r3, r4                  @
+
+.hrs_usdone:
+    ldr     r9, [sp, #8]            @ r9 = srcrem
+    sub     r0, r9, r0              @ r0 = pos = srcrem - dte
+    orr     r14, r14, r0            @ reconstruct swapped phase
+    mov     r14, r14, ror #16       @ swap pos and frac for phase
+    b       .hrs_channel_done       @
+
+    /** Downsampling **/
+    @ Register usage in loop:
+    @ r0 = pos/frac
+    @ r1 = x3, r2 = x2, r3 = x1, r4 = x0
+    @ r5 = delta, r6 = s, r7 = d, r8 = dstrem
+    @ r9 = srcrem, r10 = scratch/acclo
+    @ r11 = scratch/c2, r12 = c3/acchi, (c1 calculated in loop)
+    @ r14 = phase
+.hrs_dsstart:
+    add     r11, r6, r0, lsl #2     @ r11 = &s[pos]
+.hrs_dsloop:
+    ldr     r4, [r11]               @ x0 = s[pos]
+    sub     r10, r3, r2             @ r10 = v, r11 = c2, r12 = c3
+    add     r12, r4, r2             @
+    add     r11, r1, r10, asl #1    @
+    sub     r11, r11, r12, asr #1   @
+    sub     r12, r4, r1             @
+    sub     r12, r12, r10           @
+    rsb     r12, r10, r12, asr #1   @
+
+    bic     r0, r14, r0, lsl #16    @ r0 = frac = phase & 0xffff
+    smull   r10, r12, r0, r12       @ acc = frac * c3 + c2
+    add     r10, r11, r10, lsr #16  @
+    add     r10, r10, r12, lsl #16  @
+    smull   r10, r12, r0, r10       @ acc = 2*(frac * acc) + (x1 - x3)
+    add     r10, r3, r10, lsr #15   @
+    add     r10, r10, r12, lsl #17  @
+    sub     r10, r10, r1            @
+    smull   r10, r12, r0, r10       @ acc = 0.5*(frac * acc) + x2
+    add     r10, r2, r10, lsr #17   @
+    add     r10, r10, r12, lsl #15  @
+    str     r10, [r7], #4           @ *d++ = acc
+
+    mov     r10, r14, lsr #16       @ r10 = prev pos
+    add     r14, r14, r5            @ phase += delta
+    mov     r0, r14, lsr #16        @ r0 = pos = phase >> 16
+    cmp     r0, r9                  @ r0 = pos = MIN(pos, srcrec)
+    movgt   r0, r9                  @
+
+    sub     r10, r0, r10            @ movement > 3, history not needed
+    cmp     r10, #3                 @
+    add     r11, r6, r0, lsl #2     @ r11 = &s[pos]
+    ldmgtdb r11, { r1-r3 }          @ x3..x1 = s[pos-3]..s[pos-1]
+    bgt     .hrs_dsshifthist_done   @
+    sub     r10, r10, #1            @ shift = 1, 2, 3, r4 = 0, 1, 2
+    add     pc, pc, r10, lsl #4     @ branch pc + shift*16
+    nop                             @
+    mov     r1, r2                  @ x3 = x2
+    mov     r2, r3                  @ x2 = x1
+    mov     r3, r4                  @ x1 = x0
+    b       .hrs_dsshifthist_done   @
+    mov     r1, r3                  @ x3 = x1
+    mov     r2, r4                  @ x2 = x0
+    ldr     r3, [r11, #-4]          @ x1 = s[pos-1]
+    b       .hrs_dsshifthist_done   @
+    mov     r1, r4                  @ x3 = x0
+    ldmdb   r11, { r2-r3 }          @ x2..x1 = s[pos-2]...s[pos-1]
+.hrs_dsshifthist_done:
+
+    subs    r8, r8, #1              @ destination full?
+    cmpgt   r9, r0                  @
+    bgt     .hrs_dsloop             @
+
+.hrs_channel_done:
+    ldr     r10, [sp, #12]          @ recover ch
+    ldr     r11, [sp, #16]          @ recover data->history
+    mov     r12, r10, asl #2        @ r12 = ch * 12
+    adds    r12, r12, r12, asl #1   @ also test ch > 0
+    add     r12, r11, r12           @ r12 = h = history[ch]
+    stmia   r12, { r1-r3 }          @ h[0..2] = x3..x1
+    ldmia   sp, { r1-r2 }           @ recover src, dst
+    bgt     .hrs_channel_loop       @
+
+    ldr     r1, [r2, #12]           @ r1 = dst->bufcount
+    sub     r14, r14, r0, lsl #16   @ r14 = phase - (pos << 16)
+    str     r14, [r11, #-4]         @ data->phase = r14
+    sub     r1, r1, r8              @ r1 = dst->bufcount - dstrem = dstcount
+    str     r1, [r2]                @ dst->remcount = dstcount
+    add     sp, sp, #20             @ adjust stack for temp variables
+    ldmpc   regs=r4-r11             @ ... and we're out
+    .size   resample_hermite, .-resample_hermite
+
+/****************************************************************************
  *  void pga_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
  */
     .section    .text, "ax",%progbits
