@@ -22,7 +22,6 @@
 #include "config.h"
 #include "system.h"
 #include "jz4740.h"
-#include "debug-target.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include "lcd.h"

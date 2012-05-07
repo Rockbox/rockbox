@@ -21,7 +21,6 @@
 
 /* Include Standard files */
 #include "at91sam9260.h"
-#include "debug-target.h"
 #include "config.h"
 
 /*-----------------------------------------------------------------------------

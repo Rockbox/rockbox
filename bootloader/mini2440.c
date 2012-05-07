@@ -42,7 +42,6 @@
 #include "sd.h"
 #include "backlight-target.h"
 #include "lcd-target.h"
-#include "debug-target.h"
 #include "dma-target.h"
 #include "uart-s3c2440.h"
 #include "led-mini2440.h"

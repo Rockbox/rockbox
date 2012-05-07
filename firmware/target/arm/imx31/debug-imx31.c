@@ -24,7 +24,6 @@
 #include "button.h"
 #include "lcd.h"
 #include "font.h"
-#include "debug-target.h"
 #include "mc13783.h"
 #include "adc.h"
 #include "ccm-imx31.h"

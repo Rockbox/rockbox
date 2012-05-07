@@ -28,7 +28,6 @@
 #include "button.h"
 #include "lcd.h"
 #include "font.h"
-#include "debug-target.h"
 #include "adc.h"
 
 bool dbg_ports(void)

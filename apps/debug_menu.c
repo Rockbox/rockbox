@@ -104,9 +104,6 @@
 #include "pcf50605.h"
 #endif
 #include "appevents.h"
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#include "debug-target.h"
-#endif
 
 #if defined(HAVE_AS3514) && defined(CONFIG_CHARGING)
 #include "ascodec.h"
@@ -1767,6 +1764,7 @@ static bool dbg_save_roms(void)
     return false;
 }
 #elif CONFIG_CPU == IMX31L
+bool __dbg_dvfs_dptc(void);
 static bool dbg_save_roms(void)
 {
     int fd = creat("/flash_rom_A0000000-A01FFFFF.bin", 0666);
