@@ -38,5 +38,5 @@ gcc = Popen(args + ['-mthumb'], stdout=PIPE, stderr=PIPE)
 if gcc.returncode != 0: # thumb failed, try outputting arm
     execv(args[0], args)
 
-stdout.write(out)
-stderr.write(err)
+stdout.write(out.decode("utf-8"))
+stderr.write(err.decode("utf-8"))
