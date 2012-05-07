@@ -278,7 +278,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
 
 static unsigned char response_data[256] USB_DEVBSS_ATTR;
 
-static short hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
+static const short hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
                         '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 #ifdef IPOD_ARCH
 static void set_serial_descriptor(void)
