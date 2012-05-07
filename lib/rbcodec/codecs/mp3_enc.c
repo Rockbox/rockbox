@@ -2082,6 +2082,34 @@ static bool init_mp3_encoder_engine(int sample_rate,
     return true;
 }
 
+static inline void to_mono(uint16_t **samp)
+{
+    int16_t l = **samp;
+    int16_t r = *(*samp+1);
+    int32_t m;
+
+    switch(cfg.rec_mono_mode)
+    {
+        case 1:
+            /* mono = L */
+            m  = l;
+            break;
+        case 2:
+            /* mono = R */
+            m  = r;
+            break;
+        case 0:
+        default:
+            /* mono = (L+R)/2 */
+            m  = l + r + err;
+            err = m & 1;
+            m >>= 1;
+            break;
+    }
+    *(*samp)++ = (uint16_t)m;
+    *(*samp)++ = (uint16_t)m;
+} /* to_mono */
+
 STATICIRAM void to_mono_mm(void) ICODE_ATTR;
 STATICIRAM void to_mono_mm(void)
 {
@@ -2090,34 +2118,6 @@ STATICIRAM void to_mono_mm(void)
      */
     uint16_t *samp = &mfbuf[2*512];
     uint16_t *samp_end = samp + 2*samp_per_frame;
-
-    inline void to_mono(uint16_t **samp)
-    {
-        int16_t l = **samp;
-        int16_t r = *(*samp+1);
-        int32_t m;
-
-        switch(cfg.rec_mono_mode)
-        {
-            case 1:
-                /* mono = L */
-                m  = l;
-                break;
-            case 2:
-                /* mono = R */
-                m  = r;
-                break;
-            case 0:
-            default:
-                /* mono = (L+R)/2 */
-                m  = l + r + err;
-                err = m & 1;
-                m >>= 1;
-                break;
-        }
-        *(*samp)++ = (uint16_t)m;
-        *(*samp)++ = (uint16_t)m;
-    } /* to_mono */
 
     do
     {
