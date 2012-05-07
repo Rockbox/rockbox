@@ -237,7 +237,6 @@ static void codec_pcmbuf_insert_callback(
             if (!queue_empty(&codec_queue) &&
                 codec_check_queue__have_msg() < 0)
             {
-                dsp_configure(ci.dsp, DSP_FLUSH, 0); /* Discontinuity */
                 return;
             }
         }
@@ -383,6 +382,7 @@ static enum codec_command_action
         case Q_CODEC_STOP:  /* Must only return 0 in main loop */
             LOGFQUEUE("codec < Q_CODEC_STOP");
             action = CODEC_ACTION_HALT;
+            dsp_configure(ci.dsp, DSP_FLUSH, 0); /* Discontinuity */
             break;
 
         default:            /* This is in error in this context. */
