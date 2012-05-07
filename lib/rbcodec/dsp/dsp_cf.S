@@ -179,14 +179,13 @@ crossfeed_meier_process:
     .size   crossfeed_meier_process, .-crossfeed_meier_process
 
 /****************************************************************************
- * int lin_resample_resample(struct resample_data *data,
- *                           struct dsp_buffer *src,
- *                           struct dsp_buffer *dst)
+ * int resample_linear(struct resample_data *data, struct dsp_buffer *src,
+ *                     struct dsp_buffer *dst)
  */
     .section    .text
     .align      2
-    .global     lin_resample_resample
-lin_resample_resample:
+    .global     resample_linear
+resample_linear:
     | input: 4(sp) = data, 8(sp) = src, 12(sp) = dst
     lea.l       -44(%sp), %sp           | save non-volatiles
     movem.l     %d2-%d7/%a2-%a6, (%sp)  |
@@ -317,7 +316,7 @@ lin_resample_resample:
     lea.l       44(%sp), %sp            | cleanup stack
     rts                                 | buh-bye
 
-    .size       lin_resample_resample, .-lin_resample_resample
+    .size       resample_linear, .-resample_linear
 
 
 /****************************************************************************

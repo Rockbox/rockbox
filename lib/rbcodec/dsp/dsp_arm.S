@@ -291,13 +291,12 @@ crossfeed_meier_process:
 
 
 /****************************************************************************
- * int lin_resample_resample(struct resample_data *data,
- *                           struct dsp_buffer *src,
- *                           struct dsp_buffer *dst)
+ * int resample_linear(struct resample_data *data, struct dsp_buffer *src,
+ *                     struct dsp_buffer *dst)
  */
     .section    .text, "ax",%progbits
-    .global     lin_resample_resample
-lin_resample_resample:
+    .global     resample_linear
+resample_linear:
     @input: r0 = data, r1 = src, r2 = dst
     stmfd   sp!, { r4-r11, lr }     @ stack modified regs
     ldr     r4, [r0]                @ r4 = data->delta
@@ -397,7 +396,7 @@ lin_resample_resample:
     str     r6, [r2]                @ dst->remcount = dstcount
     add     sp, sp, #8              @ adjust stack for temp variables
     ldmpc   regs=r4-r11             @ ... and we're out
-    .size   lin_resample_resample, .-lin_resample_resample
+    .size   resample_linear, .-resample_linear
 
 /****************************************************************************
  *  void pga_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
