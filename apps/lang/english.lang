@@ -13114,3 +13114,17 @@
     *: "Select directories to scan"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_RESAMPLING_TYPE
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Resampling type"
+  </source>
+  <dest>
+    *: "Resampling type"
+  </dest>
+  <voice>
+    *: "Resampling type"
+  </voice>
+</phrase>
