@@ -333,25 +333,15 @@ static enum {
 #if CONFIG_RTC
 static void yearday_to_daymonth(int yd, int y, int *d, int *m)
 {
-    static const char tnl[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-    static const char tl[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-    const char *t;
-    int i=0;
+    static char t[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-    if((y%4 == 0 && y%100 != 0) || y%400 == 0)
-    {
-        t=tl;
-    }
-    else
-    {
-        t=tnl;
-    }
+    bool leap = (y%4 == 0 && y%100 != 0) || y%400 == 0;
+    t[2] = leap ? 29 : 28;
 
-    while(i<12 && yd >= t[i])
-    {
-        yd-=t[i];
-        i++;
-    }
+    int i;
+    for (i = 0; i < 12 && yd >= t[i]; i++)
+        yd -= t[i];
+
     *d = yd+1;
     *m = i;
 }
@@ -757,8 +747,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
     struct storage_info info;
     unsigned int length = cbw->data_transfer_length;
-    unsigned int block_size = 0;
-    unsigned int block_count = 0;
+    unsigned int block_size, block_count;
     bool lun_present=true;
     unsigned char lun = cbw->lun;
     unsigned int block_size_mult = 1;
