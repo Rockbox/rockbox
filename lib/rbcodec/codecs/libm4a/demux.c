@@ -217,7 +217,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
 
         /* remaining is codec data */
 
-        if ((qtmovie->res->format==MAKEFOURCC('a','l','a','c'))) {
+        if (qtmovie->res->format==MAKEFOURCC('a','l','a','c')) {
           if (qtmovie->stream->ci->id3->codectype!=AFMT_MP4_ALAC) {
                return false;
           }
