@@ -526,15 +526,15 @@ static struct fps fps NOCACHEBSS_ATTR; /* Accessed on other processor */
 static void osd_show(unsigned show);
 
 #ifdef LCD_LANDSCAPE
-    #define _X (x + osd.x)
-    #define _Y (y + osd.y)
-    #define _W width
-    #define _H height
+    #define __X (x + osd.x)
+    #define __Y (y + osd.y)
+    #define __W width
+    #define __H height
 #else
-    #define _X (LCD_WIDTH - (y + osd.y) - height)
-    #define _Y (x + osd.x)
-    #define _W height
-    #define _H width
+    #define __X (LCD_WIDTH - (y + osd.y) - height)
+    #define __Y (x + osd.x)
+    #define __W height
+    #define __H width
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -560,17 +560,17 @@ static unsigned draw_blendcolor(unsigned c1, unsigned c2, unsigned char amount)
  * The origin is the upper-left corner of the OSD area */
 static void draw_update_rect(int x, int y, int width, int height)
 {
-    mylcd_update_rect(_X, _Y, _W, _H);
+    mylcd_update_rect(__X, __Y, __W, __H);
 }
 
 static void draw_clear_area(int x, int y, int width, int height)
 {
 #ifdef HAVE_LCD_COLOR
-    rb->screen_clear_area(rb->screens[SCREEN_MAIN], _X, _Y, _W, _H);
+    rb->screen_clear_area(rb->screens[SCREEN_MAIN], __X, __Y, __W, __H);
 #else
     int oldmode = grey_get_drawmode();
     grey_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
-    grey_fillrect(_X, _Y, _W, _H);
+    grey_fillrect(__X, __Y, __W, __H);
     grey_set_drawmode(oldmode);
 #endif
 }
@@ -582,7 +582,7 @@ static void draw_clear_area_rect(const struct vo_rect *rc)
 
 static void draw_fillrect(int x, int y, int width, int height)
 {
-    mylcd_fillrect(_X, _Y, _W, _H);
+    mylcd_fillrect(__X, __Y, __W, __H);
 }
 
 static void draw_hline(int x1, int x2, int y)
@@ -967,10 +967,10 @@ static void fps_update_post_frame_callback(void)
                 int height = cliprect.b - cliprect.t;
 
                 /* OSD coordinates -> framebuffer coordinates */
-                fps.pf_x = _X;
-                fps.pf_y = _Y;
-                fps.pf_width = _W;
-                fps.pf_height = _H;
+                fps.pf_x = __X;
+                fps.pf_y = __Y;
+                fps.pf_width = __W;
+                fps.pf_height = __H;
 
                 cb = fps_post_frame_callback;
             }

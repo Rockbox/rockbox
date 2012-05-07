@@ -287,12 +287,10 @@ static int do_item_menu(int cur_sel)
 }
 
 #ifdef HAVE_LCD_COLOR
-/* in misc.h but no need to polute the api */
-#define toupper(c) (((c >= 'a') && (c <= 'z'))?c+'A':c)
-#define isxdigit(c) ((c>='a' && c<= 'f') || (c>='A' && c<= 'F') \
-                    || (c>='0' && c<= '9'))
+
 #define hex2dec(c) (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' : \
                                                    (toupper(c)) - 'A' + 10)
+
 static int my_hex_to_rgb(const char* hex, int* color)
 {   int ok = 1;
     int i;
