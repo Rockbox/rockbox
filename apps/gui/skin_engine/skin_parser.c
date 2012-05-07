@@ -318,12 +318,10 @@ static int get_image_id(int c)
         return -1;
 }
 
-char *get_image_filename(const char *start, const char* bmpdir,
+void get_image_filename(const char *start, const char* bmpdir,
                                 char *buf, int buf_size)
 {
     snprintf(buf, buf_size, "%s/%s", bmpdir, start);
-
-    return buf;
 }
 
 static int parse_image_display(struct skin_element *element,
