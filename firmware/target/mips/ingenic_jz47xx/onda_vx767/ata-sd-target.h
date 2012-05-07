@@ -26,10 +26,6 @@
 #include "sdmmc.h"
 #include "jz4740.h"
 
-int _sd_read_sectors(unsigned long start, int count, void* buf);
-int _sd_write_sectors(unsigned long start, int count, const void* buf);
-int _sd_init(void);
-
 #define MMC_CD_PIN    (29 + 1 * 32)  /* Pin to check card insertion */
 //#define MMC_POWER_PIN (30 + 1 * 32)  /* Pin to enable/disable card power */
 //#define MMC_PW_PIN    (14 + 3 * 32)  /* Pin to check protect card */
