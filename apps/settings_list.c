@@ -660,8 +660,12 @@ static int32_t hotkey_getlang(int value, int unit)
     return get_hotkey_lang_id(value);
 }
 #endif /* HAVE_HOTKEY */
+extern void resample_set_type(int type);
 const struct settings_list settings[] = {
     /* sound settings */
+    CHOICE_SETTING(0, resampling_type,
+                   LANG_RESAMPLING_TYPE, 1, "resampling type",
+                   "linear,hermite", resample_set_type, 2, "Linear", "Hermite"),
     SOUND_SETTING(F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
     SOUND_SETTING(0, balance, LANG_BALANCE, "balance", SOUND_BALANCE),
 /* Tone controls */

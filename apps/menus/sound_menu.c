@@ -155,6 +155,11 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
     MENUITEM_SETTING(mdb_shape, &global_settings.mdb_shape, NULL);
 #endif
 
+#if CONFIG_CODEC == SWCODEC
+    MENUITEM_SETTING(resampling_type, &global_settings.resampling_type,
+                     lowlatency_callback);
+#endif
+
 #ifdef HAVE_SPEAKER
     MENUITEM_SETTING(speaker_enabled, &global_settings.speaker_enabled, NULL);
 #endif
@@ -196,6 +201,9 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #endif
 #ifdef HAVE_SPEAKER
          ,&speaker_enabled
+#endif
+#if CONFIG_CODEC == SWCODEC
+         ,&resampling_type
 #endif
          );
 
