@@ -179,145 +179,286 @@ crossfeed_meier_process:
     .size   crossfeed_meier_process, .-crossfeed_meier_process
 
 /****************************************************************************
- * int resample_linear(struct resample_data *data, struct dsp_buffer *src,
- *                     struct dsp_buffer *dst)
+ * int resample_hermite(struct resample_data *data, struct dsp_buffer *src,
+ *                      struct dsp_buffer *dst)
  */
     .section    .text
     .align      2
-    .global     resample_linear
-resample_linear:
+    .global     resample_hermite
+resample_hermite:
     | input: 4(sp) = data, 8(sp) = src, 12(sp) = dst
-    lea.l       -44(%sp), %sp           | save non-volatiles
-    movem.l     %d2-%d7/%a2-%a6, (%sp)  |
-    movem.l     48(%sp), %a0-%a2        | %a0 = data
+    lea.l       -52(%sp), %sp           | save non-volatiles, allocate temps
+    movem.l     %d2-%d7/%a2-%a6, 8(%sp) |
+    movem.l     56(%sp), %a0-%a2        | %a0 = data
                                         | %a1 = src
                                         | %a2 = dst
-    clr.l       %d1                     | %d1 = ch = src->format.num_channels
-    move.b      17(%a1), %d1            |
-    moveq.l     #16, %d7                | %d7 = shift
-.lrs_channel_loop:                      |
-    movem.l     (%a0), %d2-%d3          | %d2 = delta = data->delta,
-                                        | %d3 = phase = data->phase
-    move.l      (%a1), %d4              | %d4 = srcrem = src->remcount
-    move.l      12(%a2), %d5            | %d5 = dstrem = dst->bufcount
-    cmp.l       #0x8000, %d4            | %d4 = MIN(srcrem, 0x8000)
-    ble.b       10f                     |
-    move.l      #0x8000, %d4            |
-10:                                     |
-    move.l      (%a1, %d1.l*4), %a3     | %a3 = s = src->p32[ch]
-    move.l      (%a2, %d1.l*4), %a4     | %a4 = d = dst->p32[ch]
-    move.l      %d3, %d0                | %d0 = pos
-    lsr.l       %d7, %d0                | ...
-    beq.b       11f                     | pos == 0?
-    cmp.l       %d4, %d0                | pos = MIN(pos, srcrem)
-    blt.b       12f                     |
-    move.l      %d4, %d0                | pos = srcrem
-    move.l      -4(%a3, %d0.l*4), %d6   | %d6 = last = s[pos - 1]
-    bra.w       .lrs_channel_complete   | at limit; nothing to do but next
-11:                                     |
-    move.l      4(%a0, %d1.l*4), %d6    | %d6 = last = last_sample[ch]
-    tpf.l                               | trap next move.l (last = s[pos - 1])
-12:                                     |
-    move.l      -4(%a3, %d0.l*4), %d6   | %d6 = last = s[pos - 1]
-    cmp.l       #0x10000, %d2           | delta >= 1.0?
-    bhs.b       .lrs_downsample         | yes? downsampling
+    clr.l       %d5                     | %d5 = ch = src->format.num_channels
+    move.b      17(%a1), %d5            |
+    lea.l       8(%a0), %a5             | %a5 = h = history[ch]
+    moveq.l     #16, %d7                | %d7 = shift val
+.hrs_channel_loop:                      |
+    movem.l     %d5/%a5, (%sp)          | store ch, h
+    movem.l     (%a0), %d1-%d2          | %d1 = delta = data->delta,
+                                        | %d2 = phase = data->phase
+    move.l      (%a1), %d3              | %d3 = srcrem = src->remcount
+    move.l      12(%a2), %d4            | %d4 = dstrem = dst->bufcount
+
+    cmp.l       #0x8000, %d3            | %d4 = MIN(srcrem, 0x8000)
+    ble.b       1f                      |
+    move.l      #0x8000, %d3            |
+1:                                      |
+
+    move.l      (%a1, %d5.l*4), %a1     | %a1 = s = src->p32[ch]
+    move.l      (%a2, %d5.l*4), %a2     | %a2 = d = dst->p32[ch]
+
+    move.l      %d2, %d0                | %d0 = pos = phase >> 16
+    lsr.l       %d7, %d0                |
+
+    cmp.l       %d3, %d0                | pos = MIN(pos, srcrem)
+    ble.b       1f                      |
+    move.l      %d3, %d0                |
+1:
+
+    lea.l       (%a1, %d0.l*4), %a1     | %a1 = &s[pos]
+
+    cmp.l       #3, %d0                 |
+    bge.b       1f                      |
+    move.l      %d0, %a0                |
+    lea.l       (%a0, %a0.l*2), %a0     |
+    jmp         2(%pc, %a0.l*4)    | 4b |
+    | 0
+    movem.l     (%a5), %a3-%a5     | 4b | x3..x1 = h[0]..h[2]
+    bra.b       2f                 | 2b |
+    .dcb.w      3,0                | 6b | filler
+    | 1
+    movem.l     4(%a5), %a3-%a4    | 6b | x3..x2 = h[1]..h[2]
+    move.l      -4(%a1), %a5       | 4b | x1 = s[0]
+    bra.b       2f                 | 2b |
+    | 2
+    move.l      8(%a5), %a3        | 4b | x3 = h[2]
+    movem.l     -8(%a1), %a4-%a5   | 6b | x2..x1 = s[0]..s[1]
+    bra.b       2f                 | 2b |
+1:  | 3 +
+    movem.l     -12(%a1), %a3-%a5       | x3...x1 = s[pos-3]..s[pos-1]
+2:
+
+    cmp.l       %d3, %d0                | pos past end?
+    bge.w       .hrs_channel_done       |
+
+    cmp.l       #0x10000, %d1           | delta >= 1.0?
+    bhs.w       .hrs_dsstart            | yes? downsampling
                                         |
     /** Upsampling **/                  |
-    lea.l       (%a3, %d0.l*4), %a3     | %a3 = &s[pos]
-    sub.l       %d4, %d0                | %d0 = pos - srcrem = -dte
-    lsl.l       %d7, %d2                | move delta to bits 30..15
+    sub.l       %d3, %d0                | %d0 = pos - srcrem = -dte
+    lsl.l       %d7, %d1                | move delta to bits 30..15
+    lsr.l       #1, %d1                 |
+    lsl.l       %d7, %d2                | move phase to bits 30..15
     lsr.l       #1, %d2                 |
-    lsl.l       %d7, %d3                | move phase to bits 30..15
-    lsr.l       #1, %d3                 |
-    move.l      (%a3)+, %a5             | %a5 = s[pos]
-    move.l      %a5, %a6                | %a6 = diff = s[pos] - last
-    sub.l       %d6, %a6                |
-    bra.b       22f                     |
-    /* Funky loop structure is to avoid emac latency stalls */
-20:                                     |
-    move.l      (%a3)+, %a5             | %a5 = s[pos]
-    move.l      %a5, %a6                | %a6 = diff = s[pos] - last
-    sub.l       %d6, %a6                |
-21:                                     |
-    movclr.l    %acc0, %d7              | *d++ = %d7 = result
-    move.l      %d7, (%a4)+             |
-22:                                     |
-    move.l      %d6, %acc0              | %acc0 = last
-    mac.l       %d3, %a6, %acc0         | %acc0 += frac * diff
-    subq.l      #1, %d5                 | dstrem <= 0?
-    ble.b       23f                     | yes? stop
-    add.l       %d2, %d3                | phase += delta
-    bpl.b       21b                     | load next values?
-    move.l      %a5, %d6                |
-    bclr.l      #31, %d3                | clear sign bit
+    |
+    | Register usage in loop:
+    | r0 = dte, d1 = delta, d2 = phase, d3 = srcrem, d4 = dstrem
+    | d5 = scratch, d6 = c3, d7 = scratch
+    | a0 = c2, a1 = &s[pos], a2 = d,
+    | a3 = x3, a4 = x2, a5 = x1, a6 = x0
+    |
+    | Try to avoid overflow as much as possible and at the same time preserve
+    | accuracy. Same formulas apply to downsampling but registers and
+    | instruction order differ due to specific constraints.
+    | c1 = -0.5*x3 + 0.5*x1
+    |    = 0.5*(x1 - x3)                <--
+    |
+    | v = x1 - x2, -v = x2 - x1
+    | c2 = x3 - 2.5*x2 + 2*x1 - 0.5*x0
+    |    = x3 + 2*(x1 - x2) - 0.5*(x0 + x2)
+    |    = x3 + 2*v - 0.5*(x0 + x2)     <--
+    |
+    | c3 = -0.5*x3 + 1.5*x2 - 1.5*x1 + 0.5*x0
+    |    = 0.5*x0 - 0.5*x3 + 0.5*(x2 - x1) + (x2 - x1)
+    |    = 0.5*(x0 - x3 - v) - v        <--
+    |
+.hrs_usloop_carry:
+    move.l      (%a1)+, %a6             | %a6 = s[pos]
+
+    move.l      %a5, %d5                | v
+    sub.l       %a4, %d5                |
+
+    move.l      %a6, %d6                | c3
+    sub.l       %a3, %d6                |
+    sub.l       %d5, %d6                |
+    asr.l       #1, %d6                 |
+    sub.l       %d5, %d6                |
+
+    lea.l       (%a3, %d5.l*2), %a0     | c2
+    move.l      %a6, %d5                |
+    add.l       %a4, %d5                |
+    asr.l       #1, %d5                 |
+    sub.l       %d5, %a0                |
+
+.hrs_usloop_frac:
+    move.l      %a0, %acc0              | %acc0 = frac * c3 + c2
+    mac.l       %d2, %d6, %acc0         |
+
+    move.l      %a5, %d5                | c1
+    sub.l       %a3, %d5                |
+    asr.l       #1, %d5                 |
+
+    movclr.l    %acc0, %d7              | %acc1 = frac * acc + c1
+    move.l      %d5, %acc1              |
+    mac.l       %d2, %d7, %acc1         |
+
+    move.l      %a4, %acc0              | %acc0 = frac * acc + x2
+    movclr.l    %acc1, %d5              |
+    mac.l       %d2, %d5, %acc0         |
+
+    subq.l      #1, %d4                 | dstrem <= 0?
+    ble.b       .hrs_usfull             | yes? stop
+
+    movclr.l    %acc0, %d5              | *d++ = d5 = result
+    move.l      %d5, (%a2)+             |
+
+    add.l       %d1, %d2                | phase += delta
+    bpl.b       .hrs_usloop_frac        | load next values?
+
+    move.l      %a4, %a3                | x3 = x2
+    move.l      %a5, %a4                | x2 = x1
+    move.l      %a6, %a5                | x1 = x0
+
+    bclr.l      #31, %d2                | clear sign bit
     addq.l      #1, %d0                 | dte > 0?
-    bmi.b       20b                     | yes? continue resampling
-    tpf.w                               | trap next add.l (phase += delta)
-23:                                     |
-    add.l       %d2, %d3                | phase += delta
-    lsl.l       #1, %d3                 | frac -> phase
-    bcs.b       24f                     | was sign bit set?
-    tpf.l                               |
-24:                                     |
-    move.l      %a5, %d6                | yes? was going to move to new s[pos]
-    addq.l      #1, %d0                 |
-    movclr.l    %acc0, %d7              | *d = %d7 = result
-    move.l      %d7, (%a4)              |
-    add.l       %d4, %d0                | %d0 = -dte + srcrem = pos
-    or.l        %d0, %d3                | restore phase
-    swap.w      %d3                     |
-    moveq.l     #16, %d7                | %d7 = shift
-    bra.b       .lrs_channel_complete   |
-                                        |
-    /** Downsampling **/                |
-.lrs_downsample:                        |
-    move.l      (%a3, %d0.l*4), %a5     | %a5 = s[pos]
-    bra.b       31f                     |
-30:                                     |
-    lea.l       -4(%a3, %d0.l*4), %a5   | %d6 = s[pos - 1], %a5 = s[pos]
-    movem.l     (%a5), %d6/%a5          |
-31:                                     |
-    move.l      %d6, %acc0              | %acc0 = last
-    sub.l       %d6, %a5                | %a5 = diff = s[pos] - s[pos - 1]
-    move.l      %d3, %d0                | frac = (phase << 16) >> 1
-    lsl.l       %d7, %d0                |
-    lsr.l       #1, %d0                 |
-    mac.l       %d0, %a5, %acc0         | %acc0 += frac * diff
-    add.l       %d2, %d3                | phase += delta
-    move.l      %d3, %d0                | pos = phase >> 16
+    bmi.b       .hrs_usloop_carry       | yes? continue resampling
+    bra.b       .hrs_usdone
+
+.hrs_usfull:
+    movclr.l    %acc0, %d5              | *d++ = d5 = result
+    move.l      %d5, (%a2)              |
+
+    add.l       %d1, %d2                | do missed phase increment
+    bpl.b       .hrs_usdone             | was sign bit set?
+
+    move.l      %a4, %a3                | do missed history update
+    move.l      %a5, %a4                |
+    move.l      %a6, %a5                |
+
+    addq.l      #1, %d0                 | do missed dte decrement
+
+.hrs_usdone:
+    moveq.l     #16, %d7                | restore shift
+    lsl.l       #1, %d2                 | frac -> phase
+    add.l       %d3, %d0                | %d0 = -dte + srcrem = pos
+    or.l        %d0, %d2                | restore phase
+    swap.w      %d2                     |
+
+    bra.w       .hrs_channel_done       |
+
+    /** Downsampling **/
+    |
+    | Register usage in loop:
+    | r0 = pos, d1 = delta, d2 = phase, d3 = srcrem, d4 = dstrem
+    | d5 = scratch, d6 = scratch, d7 = 16 (shift value)
+    | a0 = scratch, a1 = &s[pos], a2 = d,
+    | a3 = x3, a4 = x2, a5 = x1, a6 = x0
+    |
+.hrs_dsloop:
+    movclr.l    %acc0, %d5              | *d++ = acc
+    move.l      %d5, (%a2)+             |
+
+    sub.l       %d0, %a0                | %a0 = -shift = last_pos - pos
+    move.l      %a0, %d5                |
+    asl.l       #2, %d5                 | -shift -> -bytes
+    sub.l       %d5, %a1                | %a1 = s = s - -bytes
+    cmp.l       #-4, %a0                | >= 4?
+    ble.b       1f                      |
+    add.l       %d5, %a0                | %a0 = 5 * -shift
+    jmp         40(%pc, %a0.l*2)  | 4b  |
+1:  | +4 +
+    movem.l     -12(%a1), %a3-%a5 | 6b  | x3..x0 = s[pos-3]..s[pos-1]
+    bra.b       1f                | 2b  |
+    | +3
+    move.l      %a6, %a3          | 2b  | x3 = x0
+    movem.l     -8(%a1), %a4-%a5  | 6b  | x2..x0 = s[pos-2]..s[pos-1]
+    bra.b       1f                | 2b  | 10
+    | +2
+    move.l      %a5, %a3          | 2b  | x3 = x1
+    move.l      %a6, %a4          | 2b  | x2 = x0
+    move.l      -4(%a1), %a5      | 4b  | x1 = s[pos-1]
+    bra.b       1f                | 2b  | 10
+    | +1
+    move.l      %a4, %a3          | 2b  | x3 = x2 | expected loop destination
+    move.l      %a5, %a4          | 2b  | x2 = x1
+    move.l      %a6, %a5          | 2b  | x1 = x0
+1:
+
+    subq.l      #1, %d4           | 2b  | dstrem <= 0?
+    ble.b       .hrs_channel_done | 2b  | yes? stop
+    cmp.l       %d3, %d0                |
+    bge.b       .hrs_channel_done       |
+
+.hrs_dsstart:
+    move.l      (%a1), %a6              | %a6 = s[pos]
+    move.l      %a5, %d5                | v
+    sub.l       %a4, %d5                |
+
+    move.l      %a6, %d6                | c3
+    sub.l       %a3, %d6                |
+    sub.l       %d5, %d6                |
+    asr.l       #1, %d6                 |
+    sub.l       %d5, %d6                |
+
+    lea.l       (%a3, %d5.l*2), %a0     | c2
+    move.l      %a6, %d5                |
+    add.l       %a4, %d5                |
+    asr.l       #1, %d5                 |
+    sub.l       %d5, %a0                |
+
+    move.l      %d2, %d5                | phase -> frac
+    lsl.l       %d7, %d5                |
+    lsr.l       #1, %d5                 |
+
+    move.l      %a0, %acc0              | %acc0 = frac * c3 + c2
+    mac.l       %d5, %d6, %acc0         |
+
+    move.l      %a5, %d6                | c1
+    sub.l       %a3, %d6                |
+    asr.l       #1, %d6                 |
+
+    movclr.l    %acc0, %a0              | %acc1 = frac * acc + c1
+    move.l      %d6, %acc1              |
+    mac.l       %d5, %a0, %acc1         |
+
+    move.l      %d0, %a0                | %a0 = last_pos
+    add.l       %d1, %d2                | phase += delta
+    move.l      %d2, %d0                | pos = phase >> 16
     lsr.l       %d7, %d0                |
-    movclr.l    %acc0, %a5              |
-    move.l      %a5, (%a4)+             | *d++ = %d0
-    subq.l      #1, %d5                 | dst full?
-    ble.b       32f                     | yes? stop
-    cmp.l       %d4, %d0                | pos < srcrem?
-    blt.b       30b                     | yes? continue resampling
-    tpf.l                               | trap cmp.l and ble.b
-32:                                     |
-    cmp.l       %d4, %d0                | pos = MIN(pos, srcrem)
-    ble.b       33f                     |
-    move.l      %d4, %d0                |
-33:                                     |
-    move.l      -4(%a3, %d0.l*4), %d6   | %d6 = s[pos - 1]
-                                        |
-.lrs_channel_complete:                  |
-    move.l      %d6, 4(%a0, %d1.l*4)    | last_sample[ch] = last
-    subq.l      #1, %d1                 | ch > 0?
-    bgt.w       .lrs_channel_loop       | yes? process next channel
-                                        |
+
+    movclr.l    %acc1, %d6              | %acc0 = frac * acc + x2
+    move.l      %a4, %acc0              |
+    mac.l       %d5, %d6, %acc0         |
+
+    cmp.l       %d3, %d0                | %d0 = MIN(pos, srcrem)
+    ble.w       .hrs_dsloop             |
+    move.l      %d3, %d0                |
+    bra.w       .hrs_dsloop             |
+
+.hrs_channel_done:                      |
+    movem.l     (%sp), %d5/%a0          | restore ch, h
+    movem.l     %a3-%a5, (%a0)          | h[0..2] = x3..x1
+    lea.l       12(%a0), %a5            | h++
+    movem.l     56(%sp), %a0-%a2        | load data, src, dst
+    subq.l      #1, %d5                 | ch > 0?
+    bgt.w       .hrs_channel_loop       | yes? process next channel
+
     move.l      12(%a2), %d1            | %d1 = dst->bufcount
-    sub.l       %d5, %d1                | written = dst->bufcount - dstrem
+    sub.l       %d4, %d1                | written = dst->bufcount - dstrem
     move.l      %d1, (%a2)              | dst->remcount = written
     move.l      %d0, %d1                | wrap phase to position in next frame
     lsl.l       %d7, %d1                | data->phase = phase - (pos << 16)
-    sub.l       %d1, %d3                | ...
-    move.l      %d3, 4(%a0)             | ...
-    movem.l     (%sp), %d2-%d7/%a2-%a6  | restore non-volatiles
-    lea.l       44(%sp), %sp            | cleanup stack
+    sub.l       %d1, %d2                |
+    move.l      %d2, 4(%a0)             |
+    movem.l     8(%sp), %d2-%d7/%a2-%a6 | restore non-volatiles
+    lea.l       52(%sp), %sp            | cleanup stack
     rts                                 | buh-bye
 
-    .size       resample_linear, .-resample_linear
-
+    .size       resample_hermite, .-resample_hermite
 
 /****************************************************************************
  * void channel_mode_proc_mono(struct dsp_proc_entry *this,
