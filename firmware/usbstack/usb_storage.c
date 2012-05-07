@@ -1218,7 +1218,7 @@ static void send_csw(int status)
 static void copy_padded(char *dest, char *src, int len)
 {
     for (int i = 0; i < len; i++) {
-        if (src[i] != 0) {
+        if (src[i] == '\0') {
             memset(&dest[i], ' ', len - i);
             return;
         }
