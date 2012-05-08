@@ -14,7 +14,7 @@ dsp/dsp_sample_output.c
 dsp/eq.c
 dsp/lin_resample.c
 dsp/pga.c
-# ifdef HAVE_PITCHSCREEN
+# ifdef HAVE_PITCHCONTROL
 dsp/tdspeed.c
 # endif
 # ifdef HAVE_SW_TONE_CONTROLS

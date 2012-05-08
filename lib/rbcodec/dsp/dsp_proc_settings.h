@@ -28,7 +28,7 @@
 #include "dsp_misc.h"
 #include "eq.h"
 #include "pga.h"
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
 #include "tdspeed.h"
 #endif
 #ifdef HAVE_SW_TONE_CONTROLS

@@ -481,7 +481,7 @@ static void audio_thread(void)
     init_mad();
 
     td.dsp = rb->dsp_get_config(CODEC_IDX_AUDIO);
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
     rb->sound_set_pitch(PITCH_SPEED_100);
     rb->dsp_set_timestretch(PITCH_SPEED_100);
 #endif

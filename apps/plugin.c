@@ -568,7 +568,7 @@ static const struct plugin_api rockbox_api = {
     dsp_crossfeed_enable,
     dsp_eq_enable,
     dsp_dither_enable,
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
     dsp_set_timestretch,
 #endif
     dsp_configure,
@@ -614,7 +614,7 @@ static const struct plugin_api rockbox_api = {
     mpeg_get_last_header,
 #endif
 #if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
-     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHSCREEN)
+     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
     sound_set_pitch,
 #endif
 

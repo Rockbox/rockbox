@@ -26,7 +26,7 @@
 #include "core_alloc.h"
 #include "tdspeed.h"
 
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
 static int handles[4] = { 0, 0, 0, 0 };
 
 static int move_callback(int handle, void *current, void *new)
@@ -100,5 +100,5 @@ void tdspeed_free_buffers(int32_t **buffers, int nbuf)
         buffers[i] = NULL;
     }
 }
-#endif /* HAVE_PITCHSCREEN */
+#endif /* HAVE_PITCHCONTROL */
 
