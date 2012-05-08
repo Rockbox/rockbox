@@ -685,7 +685,7 @@ struct plugin_api {
     void (*dsp_crossfeed_enable)(bool enable);
     void (*dsp_eq_enable)(bool enable);
     void (*dsp_dither_enable)(bool enable);
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
     void (*dsp_set_timestretch)(int32_t percent);
 #endif
     intptr_t (*dsp_configure)(struct dsp_config *dsp,
@@ -742,7 +742,7 @@ struct plugin_api {
     unsigned long (*mpeg_get_last_header)(void);
 #endif
 #if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
-     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHSCREEN)
+     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
     void (*sound_set_pitch)(int32_t pitch);
 #endif
 

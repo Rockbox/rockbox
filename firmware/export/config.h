@@ -1128,4 +1128,8 @@ Lyre prototype 1 */
 #define HAVE_PCM_FULL_DUPLEX
 #endif
 
+#if (CONFIG_CODEC == SWCODEC) || !defined(ARCHOS_PLAYER)
+#define HAVE_PITCHCONTROL
+#endif
+
 #endif /* __CONFIG_H__ */

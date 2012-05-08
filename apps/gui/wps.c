@@ -1011,7 +1011,7 @@ long gui_wps_show(void)
 #endif /* BUTTON_F3 */
 
                 /* pitch screen */
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
             case ACTION_WPS_PITCHSCREEN:
             {
                 gwps_leave_wps();
@@ -1020,7 +1020,7 @@ long gui_wps_show(void)
                 restore = true;
             }
             break;
-#endif /* HAVE_PITCHSCREEN */
+#endif /* HAVE_PITCHCONTROL */
 
 #ifdef AB_REPEAT_ENABLE
             /* reset A&B markers */

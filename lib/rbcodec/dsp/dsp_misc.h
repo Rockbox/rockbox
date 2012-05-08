@@ -54,10 +54,10 @@ struct dsp_replay_gains
 
 void dsp_replaygain_set_settings(const struct replaygain_settings *settings);
 
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
 void sound_set_pitch(int32_t ratio);
 int32_t sound_get_pitch(void);
-#endif /* HAVE_PITCHSCREEN */
+#endif /* HAVE_PITCHCONTROL */
 
 /* Callback for firmware layers to interface */
 int dsp_callback(int msg, intptr_t param);

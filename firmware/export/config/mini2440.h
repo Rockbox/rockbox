@@ -106,8 +106,7 @@
 #define HAVE_BMP_SCALING
 /* define this to enable JPEG decoding */
 #define HAVE_JPEG
-/* define this if you have access to the pitchscreen */
-#define HAVE_PITCHSCREEN
+
 #define HAVE_QUICKSCREEN
 
 /* define this if you have a real-time clock */
