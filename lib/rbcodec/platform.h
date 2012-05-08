@@ -101,11 +101,7 @@ size_t strlcpy(char *dst, const char *src, size_t siz);
 #ifndef MEM_ALIGN_ATTR
 # define MEM_ALIGN_ATTR
 #endif
-/*
-#ifndef STATICIRAM
-# define STATICIRAM
-#endif
-*/
+
 #ifndef CACHEALIGN_SIZE
 # define CACHEALIGN_SIZE 1
 #endif

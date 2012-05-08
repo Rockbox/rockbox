@@ -133,7 +133,7 @@ void ata_dma_set_mode(unsigned char mode) {
 /* This waits for an ATA interrupt using polling.
    In ATA_CONTROL, CONTROL_nIEN must be cleared.
  */
-STATICIRAM ICODE_ATTR int ata_wait_intrq(void)
+static ICODE_ATTR int ata_wait_intrq(void)
 {
     long timeout = current_tick + HZ*10;
     

@@ -182,9 +182,9 @@ static bool on_end_file(struct enc_file_event_data *data)
     return true;
 } /* on_end_file */
 
-STATICIRAM void enc_events_callback(enum enc_events event, void *data)
+static void enc_events_callback(enum enc_events event, void *data)
                                     ICODE_ATTR;
-STATICIRAM void enc_events_callback(enum enc_events event, void *data)
+static void enc_events_callback(enum enc_events event, void *data)
 {
     switch (event)
     {
@@ -252,8 +252,8 @@ static inline void sample_to_mono(uint32_t **src, uint32_t **dst)
     *(*dst)++ = htole32((lr2 << 16) | (uint16_t)lr1);
 } /* sample_to_mono */
 
-STATICIRAM void chunk_to_wav_format(uint32_t *src, uint32_t *dst) ICODE_ATTR;
-STATICIRAM void chunk_to_wav_format(uint32_t *src, uint32_t *dst)
+static void chunk_to_wav_format(uint32_t *src, uint32_t *dst) ICODE_ATTR;
+static void chunk_to_wav_format(uint32_t *src, uint32_t *dst)
 {
     if (num_channels == 1)
     {

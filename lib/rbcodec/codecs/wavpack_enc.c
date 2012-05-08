@@ -118,8 +118,8 @@ static inline void sample_to_int32_stereo(int32_t **src, int32_t **dst)
 #endif
 } /* sample_to_int32_stereo */
 
-STATICIRAM void chunk_to_int32(int32_t *src) ICODE_ATTR;
-STATICIRAM void chunk_to_int32(int32_t *src)
+static void chunk_to_int32(int32_t *src) ICODE_ATTR;
+static void chunk_to_int32(int32_t *src)
 {
     int32_t *src_end, *dst;
 #ifdef USE_IRAM
@@ -307,9 +307,9 @@ static bool on_end_file(struct enc_file_event_data *data)
     return true;
 } /* on_end_file */
 
-STATICIRAM void enc_events_callback(enum enc_events event, void *data)
+static void enc_events_callback(enum enc_events event, void *data)
                                     ICODE_ATTR;
-STATICIRAM void enc_events_callback(enum enc_events event, void *data)
+static void enc_events_callback(enum enc_events event, void *data)
 {
     switch (event)
     {
