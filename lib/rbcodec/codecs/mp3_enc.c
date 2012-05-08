@@ -2110,8 +2110,8 @@ static inline void to_mono(uint16_t **samp)
     *(*samp)++ = (uint16_t)m;
 } /* to_mono */
 
-STATICIRAM void to_mono_mm(void) ICODE_ATTR;
-STATICIRAM void to_mono_mm(void)
+static void to_mono_mm(void) ICODE_ATTR;
+static void to_mono_mm(void)
 {
     /* |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
      * |mmmmmmmmmmmmmmmm|mmmmmmmmmmmmmmmm|
@@ -2188,9 +2188,9 @@ static void set_scale_facs(int *mdct_freq)
   }
 }
 
-STATICIRAM void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
+static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
                              ICODE_ATTR;
-STATICIRAM void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
+static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
 {
    int      gr, gr_cnt;
    uint32_t max;

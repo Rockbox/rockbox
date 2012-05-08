@@ -205,7 +205,7 @@ static int set_multiple_mode(int sectors);
 static int set_features(void);
 
 #ifndef ATA_TARGET_POLLING
-STATICIRAM ICODE_ATTR int wait_for_bsy(void)
+static ICODE_ATTR int wait_for_bsy(void)
 {
     long timeout = current_tick + HZ*30;
     
@@ -220,7 +220,7 @@ STATICIRAM ICODE_ATTR int wait_for_bsy(void)
     return 0; /* timeout */
 }
 
-STATICIRAM ICODE_ATTR int wait_for_rdy(void)
+static ICODE_ATTR int wait_for_rdy(void)
 {
     long timeout;
 
@@ -244,7 +244,7 @@ STATICIRAM ICODE_ATTR int wait_for_rdy(void)
 #define wait_for_rdy    ata_wait_for_rdy
 #endif
 
-STATICIRAM ICODE_ATTR int wait_for_start_of_transfer(void)
+static ICODE_ATTR int wait_for_start_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
@@ -252,7 +252,7 @@ STATICIRAM ICODE_ATTR int wait_for_start_of_transfer(void)
     return (ATA_IN8(ATA_ALT_STATUS) & (STATUS_BSY|STATUS_DRQ)) == STATUS_DRQ;
 }
 
-STATICIRAM ICODE_ATTR int wait_for_end_of_transfer(void)
+static ICODE_ATTR int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
@@ -275,7 +275,7 @@ static void ata_led(bool on)
 #endif
 
 #ifndef ATA_OPTIMIZED_READING
-STATICIRAM ICODE_ATTR void copy_read_sectors(unsigned char* buf, int wordcount)
+static ICODE_ATTR void copy_read_sectors(unsigned char* buf, int wordcount)
 {
     unsigned short tmp = 0;
 
@@ -307,7 +307,7 @@ STATICIRAM ICODE_ATTR void copy_read_sectors(unsigned char* buf, int wordcount)
 #endif /* !ATA_OPTIMIZED_READING */
 
 #ifndef ATA_OPTIMIZED_WRITING
-STATICIRAM ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
+static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
                                               int wordcount)
 {
     if ( (unsigned long)buf & 1)

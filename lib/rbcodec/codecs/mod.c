@@ -292,7 +292,7 @@ static signed short s_sintable[0x40] IDATA_ATTR =
 
 const unsigned short mixingrate = 44100;
 
-STATICIRAM void mixer_playsample(int channel, int instrument) ICODE_ATTR;
+static void mixer_playsample(int channel, int instrument) ICODE_ATTR;
 void mixer_playsample(int channel, int instrument)
 {
     struct s_channel *p_channel = &mixer.channel[channel];
@@ -347,7 +347,7 @@ static inline void mixer_setamigaperiod(int channel, int amigaperiod)
 }
 
 /* Initialize the MOD Player with default values and precalc tables */
-STATICIRAM void initmodplayer(void) ICODE_ATTR;
+static void initmodplayer(void) ICODE_ATTR;
 void initmodplayer(void)
 {
     unsigned int c;
@@ -432,7 +432,7 @@ void initmodplayer(void)
 }
 
 /* Load the MOD File from memory */
-STATICIRAM bool loadmod(void *modfile) ICODE_ATTR;
+static bool loadmod(void *modfile) ICODE_ATTR;
 bool loadmod(void *modfile)
 {
     int i;
@@ -561,7 +561,7 @@ bool loadmod(void *modfile)
 }
 
 /* Apply vibrato to channel */
-STATICIRAM void vibrate(int channel) ICODE_ATTR;
+static void vibrate(int channel) ICODE_ATTR;
 void vibrate(int channel)
 {
     struct s_modchannel *p_modchannel = &modplayer.modchannel[channel];
@@ -579,7 +579,7 @@ void vibrate(int channel)
 
 /* Apply tremolo to channel
  * (same as vibrato, but only apply on volume instead of pitch) */
-STATICIRAM void tremolo(int channel) ICODE_ATTR;
+static void tremolo(int channel) ICODE_ATTR;
 void tremolo(int channel)
 {
     struct s_modchannel *p_modchannel = &modplayer.modchannel[channel];
@@ -598,7 +598,7 @@ void tremolo(int channel)
 }
 
 /* Apply Slide to Note effect to channel */
-STATICIRAM void slidetonote(int channel) ICODE_ATTR;
+static void slidetonote(int channel) ICODE_ATTR;
 void slidetonote(int channel)
 {
     struct s_modchannel *p_modchannel = &modplayer.modchannel[channel];
@@ -625,7 +625,7 @@ void slidetonote(int channel)
 
 /* Apply Slide to Note effect on channel,
  * but this time with glissando enabled */
-STATICIRAM void slidetonoteglissando(int channel) ICODE_ATTR;
+static void slidetonoteglissando(int channel) ICODE_ATTR;
 void slidetonoteglissando(int channel)
 {
     struct s_modchannel *p_modchannel = &modplayer.modchannel[channel];
@@ -650,7 +650,7 @@ void slidetonoteglissando(int channel)
 }
 
 /* Apply Volume Slide */
-STATICIRAM void volumeslide(int channel, int effectx, int effecty) ICODE_ATTR;
+static void volumeslide(int channel, int effectx, int effecty) ICODE_ATTR;
 void volumeslide(int channel, int effectx, int effecty)
 {
     struct s_modchannel *p_modchannel = &modplayer.modchannel[channel];
@@ -669,7 +669,7 @@ void volumeslide(int channel, int effectx, int effecty)
 }
 
 /* Play the current line (at tick 0) */
-STATICIRAM void playline(int pattern, int line) ICODE_ATTR;
+static void playline(int pattern, int line) ICODE_ATTR;
 void playline(int pattern, int line)
 {
     int c;
@@ -984,7 +984,7 @@ void playline(int pattern, int line)
 }
 
 /* Play the current effect of the note (ticks 1..speed) */
-STATICIRAM void playeffect(int currenttick) ICODE_ATTR;
+static void playeffect(int currenttick) ICODE_ATTR;
 void playeffect(int currenttick)
 {
     int c;
@@ -1155,7 +1155,7 @@ static inline int clip(int i)
     else return(i);
 }
 
-STATICIRAM void synthrender(int32_t *renderbuffer, int samplecount) ICODE_ATTR;
+static void synthrender(int32_t *renderbuffer, int samplecount) ICODE_ATTR;
 void synthrender(int32_t *renderbuffer, int samplecount)
 {
     /* 125bpm equals to 50Hz (= 0.02s)
