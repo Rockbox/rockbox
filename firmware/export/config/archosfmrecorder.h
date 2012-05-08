@@ -21,8 +21,7 @@
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
-/* define this if you have access to the pitchscreen */
-#define HAVE_PITCHSCREEN
+
 /* define this if you have the button bar */
 #define HAVE_BUTTONBAR
 

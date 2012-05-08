@@ -1118,4 +1118,9 @@ Lyre prototype 1 */
 #define HAVE_PCM_FULL_DUPLEX
 #endif
 
+#if (CONFIG_CODEC == SWCODEC) || (CONFIG_CODEC == MAS3587F) || \
+    (CONFIG_CODEC == MAS3539F)
+#define HAVE_PITCHCONTROL
+#endif
+
 #endif /* __CONFIG_H__ */

@@ -33,9 +33,6 @@
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
-/* define this if you have access to the pitchscreen */
-#define HAVE_PITCHSCREEN
-
 /* LCD dimensions */
 #define LCD_WIDTH  220
 #define LCD_HEIGHT 176

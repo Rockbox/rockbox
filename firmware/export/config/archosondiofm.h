@@ -46,9 +46,6 @@
 #define AB_REPEAT_ENABLE
 #define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 
-/* define this if you have access to the pitchscreen */
-#define HAVE_PITCHSCREEN
-
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 

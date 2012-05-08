@@ -158,7 +158,7 @@ void dsp_replaygain_set_settings(const struct replaygain_settings *settings)
 
 /** Pitch Settings **/
 
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
 static int32_t pitch_ratio = PITCH_SPEED_100;
 
 static void dsp_pitch_update(struct dsp_config *dsp)
@@ -183,7 +183,7 @@ void sound_set_pitch(int32_t percent)
     struct sample_io_data *data = (void *)dsp;
     dsp_configure(dsp, DSP_SWITCH_FREQUENCY, data->format.codec_frequency);
 }
-#endif /* HAVE_PITCHSCREEN */
+#endif /* HAVE_PITCHCONTROL */
 
 /* This is a null-processing stage that monitors as an enabled stage but never
  * becomes active in processing samples. It only hooks messages. */
@@ -208,7 +208,7 @@ static intptr_t misc_handler_configure(struct dsp_proc_entry *this,
         break;
 
     case DSP_RESET:
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
         dsp_pitch_update(dsp);
 #endif
         value = (intptr_t)NULL; /* Default gains */
@@ -216,7 +216,7 @@ static intptr_t misc_handler_configure(struct dsp_proc_entry *this,
         dsp_replaygain_set_gains((void *)value);
         break;
 
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
     case DSP_SET_FREQUENCY:
         dsp_pitch_update(dsp);
         break;

@@ -80,7 +80,7 @@ gui/bitmap/list-skinned.c
 gui/charcell/list.c
 #endif
 gui/option_select.c
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
 gui/pitchscreen.c
 #endif
 #ifdef HAVE_QUICKSCREEN

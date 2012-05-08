@@ -50,9 +50,6 @@
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
-/* define this if you have access to the pitchscreen */
-#define HAVE_PITCHSCREEN
-
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
 

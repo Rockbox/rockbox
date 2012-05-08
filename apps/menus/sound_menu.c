@@ -103,7 +103,7 @@ MENUITEM_SETTING(depth_3d, &global_settings.depth_3d, NULL);
               &crossfeed, &crossfeed_direct_gain, &crossfeed_cross_gain,
               &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
 
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
 static int timestretch_callback(int action,const struct menu_item_ex *this_item)
 {
     switch (action)
@@ -185,7 +185,7 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #endif
 #if CONFIG_CODEC == SWCODEC
           ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
           ,&timestretch_enabled
 #endif
           ,&compressor_menu

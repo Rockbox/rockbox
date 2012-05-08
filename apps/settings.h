@@ -341,7 +341,7 @@ struct user_settings
     int  keyclick;          /* keyclick volume */
     int  keyclick_repeats;  /* keyclick on repeats */
     bool dithering_enabled;
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
     bool timestretch_enabled;
 #endif
 #endif /* CONFIG_CODEC == SWCODEC */
@@ -733,7 +733,7 @@ struct user_settings
     struct touchscreen_parameter ts_calibration_data;
 #endif
 
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
     /* pitch screen settings */
     bool pitch_mode_semitone;
 #if CONFIG_CODEC == SWCODEC

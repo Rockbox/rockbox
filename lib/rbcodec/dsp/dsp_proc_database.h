@@ -37,7 +37,7 @@
 DSP_PROC_DB_START
     DSP_PROC_DB_ITEM(MISC_HANDLER)  /* misc stuff (null stage) */
     DSP_PROC_DB_ITEM(PGA)           /* pre-gain amp */
-#ifdef HAVE_PITCHSCREEN
+#ifdef HAVE_PITCHCONTROL
     DSP_PROC_DB_ITEM(TIMESTRETCH)   /* time-stretching */
 #endif
     DSP_PROC_DB_ITEM(RESAMPLE)      /* resampler providing NATIVE_FREQUENCY */
