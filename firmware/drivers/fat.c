@@ -131,9 +131,9 @@ static unsigned char FATLONG_NAME_SIZE[FATLONG_NAME_CHUNKS] = {10, 12, 4};
 #define FAT_LONGNAME_PAD_UCS 0xffff
 
 struct fsinfo {
-    unsigned long freecount; /* last known free cluster count */
-    unsigned long nextfree;  /* first cluster to start looking for free
-                               clusters, or 0xffffffff for no hint */
+    uint32_t freecount; /* last known free cluster count */
+    uint32_t nextfree;  /* first cluster to start looking for free
+                           clusters, or 0xffffffff for no hint */
 };
 /* fsinfo offsets */
 #define FSINFO_FREECOUNT 488
@@ -511,11 +511,11 @@ int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector)
         fat_recalc_free(IF_MV(volume));
     }
 
-    LDEBUGF("Freecount: %ld\n",fat_bpb->fsinfo.freecount);
-    LDEBUGF("Nextfree: 0x%lx\n",fat_bpb->fsinfo.nextfree);
-    LDEBUGF("Cluster count: 0x%lx\n",fat_bpb->dataclusters);
+    LDEBUGF("Freecount: %ld\n",(unsigned long)fat_bpb->fsinfo.freecount);
+    LDEBUGF("Nextfree: 0x%lx\n",(unsigned long)fat_bpb->fsinfo.nextfree);
+    LDEBUGF("Cluster count: 0x%lx\n",(unsigned long)fat_bpb->dataclusters);
     LDEBUGF("Sectors per cluster: %d\n",fat_bpb->bpb_secperclus);
-    LDEBUGF("FAT sectors: 0x%lx\n",fat_bpb->fatsize);
+    LDEBUGF("FAT sectors: 0x%lx\n",(unsigned long)fat_bpb->fatsize);
 
 #ifdef HAVE_MULTIVOLUME
     fat_bpb->mounted = true;
@@ -576,7 +576,7 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
     {
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
-            unsigned short* fat = cache_fat_sector(IF_MV2(fat_bpb,) i, false);
+            uint16_t* fat = cache_fat_sector(IF_MV2(fat_bpb,) i, false);
             for (j = 0; j < CLUSTERS_PER_FAT16_SECTOR; j++) {
                 unsigned int c = i * CLUSTERS_PER_FAT16_SECTOR + j;
                 if ( c > fat_bpb->dataclusters+1 ) /* nr 0 is unused */
@@ -595,7 +595,7 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
     {
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
-            unsigned long* fat = cache_fat_sector(IF_MV2(fat_bpb,) i, false);
+            uint32_t* fat = cache_fat_sector(IF_MV2(fat_bpb,) i, false);
             for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
                 unsigned long c = i * CLUSTERS_PER_FAT_SECTOR + j;
                 if ( c > fat_bpb->dataclusters+1 ) /* nr 0 is unused */
@@ -656,7 +656,7 @@ static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb))
         fat_bpb->bpb_secperclus)
     {
         DEBUGF( "bpb_is_sane() - Error: FSInfo.Freecount > disk size "
-                 "(0x%04lx)\n", fat_bpb->fsinfo.freecount);
+                 "(0x%04lx)\n", (unsigned long)fat_bpb->fsinfo.freecount);
         return -4;
     }
 
@@ -785,7 +785,7 @@ static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,)
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
             unsigned int nr = (i + sector) % fat_bpb->fatsize;
-            unsigned short* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr, false);
+            uint16_t* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr, false);
             if ( !fat )
                 break;
             for (j = 0; j < CLUSTERS_PER_FAT16_SECTOR; j++) {
@@ -813,7 +813,7 @@ static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,)
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
             unsigned long nr = (i + sector) % fat_bpb->fatsize;
-            unsigned long* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr, false);
+            uint32_t* fat = cache_fat_sector(IF_MV2(fat_bpb,) nr, false);
             if ( !fat )
                 break;
             for (j = 0; j < CLUSTERS_PER_FAT_SECTOR; j++) {
@@ -877,7 +877,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry,
         }
 
         LDEBUGF("update_fat_entry: %lu free clusters\n",
-                fat_bpb->fsinfo.freecount);
+                (unsigned long)fat_bpb->fsinfo.freecount);
 
         sec[offset] = htole16(val);
     }
@@ -886,7 +886,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry,
     {
         long sector = entry / CLUSTERS_PER_FAT_SECTOR;
         int offset = entry % CLUSTERS_PER_FAT_SECTOR;
-        unsigned long* sec;
+        uint32_t* sec;
 
         LDEBUGF("update_fat_entry(%lx,%lx)\n",entry,val);
 
@@ -914,7 +914,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry,
         }
 
         LDEBUGF("update_fat_entry: %ld free clusters\n",
-                fat_bpb->fsinfo.freecount);
+                (unsigned long)fat_bpb->fsinfo.freecount);
 
         /* don't change top 4 bits */
         sec[offset] &= htole32(0xf0000000);
@@ -950,7 +950,7 @@ static long read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry)
     {
         long sector = entry / CLUSTERS_PER_FAT_SECTOR;
         int offset = entry % CLUSTERS_PER_FAT_SECTOR;
-        unsigned long* sec;
+        uint32_t* sec;
 
         sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, false);
         if (!sec)
@@ -993,7 +993,7 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    unsigned long* intptr;
+    uint32_t* intptr;
     int rc;
 
 #ifdef HAVE_FAT16SUPPORT
@@ -1011,10 +1011,10 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
         DEBUGF( "update_fsinfo() - Couldn't read FSInfo (error code %d)", rc);
         return rc * 10 - 1;
     }
-    intptr = (long*)&(fsinfo[FSINFO_FREECOUNT]);
+    intptr = (uint32_t*)&(fsinfo[FSINFO_FREECOUNT]);
     *intptr = htole32(fat_bpb->fsinfo.freecount);
 
-    intptr = (long*)&(fsinfo[FSINFO_NEXTFREE]);
+    intptr = (uint32_t*)&(fsinfo[FSINFO_NEXTFREE]);
     *intptr = htole32(fat_bpb->fsinfo.nextfree);
 
     rc = storage_write_sectors(IF_MD2(fat_bpb->drive,)
@@ -1625,8 +1625,8 @@ static void randomize_dos_name(unsigned char *name)
 static int update_short_entry( struct fat_file* file, long size, int attr )
 {
     int sector = file->direntry / DIR_ENTRIES_PER_SECTOR;
-    unsigned long* sizeptr;
-    unsigned short* clusptr;
+    uint32_t* sizeptr;
+    uint16_t* clusptr;
     struct fat_file dir;
     int rc;
 
@@ -1660,28 +1660,28 @@ static int update_short_entry( struct fat_file* file, long size, int attr )
 
     entry[FATDIR_ATTR] = attr & 0xFF;
 
-    clusptr = (short*)(entry + FATDIR_FSTCLUSHI);
+    clusptr = (uint16_t*)(entry + FATDIR_FSTCLUSHI);
     *clusptr = htole16(file->firstcluster >> 16);
 
-    clusptr = (short*)(entry + FATDIR_FSTCLUSLO);
+    clusptr = (uint16_t*)(entry + FATDIR_FSTCLUSLO);
     *clusptr = htole16(file->firstcluster & 0xffff);
 
-    sizeptr = (long*)(entry + FATDIR_FILESIZE);
+    sizeptr = (uint32_t*)(entry + FATDIR_FILESIZE);
     *sizeptr = htole32(size);
 
     {
 #if CONFIG_RTC
-        unsigned short time = 0;
-        unsigned short date = 0;
+        uint16_t time = 0;
+        uint16_t date = 0;
 #else
         /* get old time to increment from */
-        unsigned short time = htole16(*(unsigned short*)(entry+FATDIR_WRTTIME));
-        unsigned short date = htole16(*(unsigned short*)(entry+FATDIR_WRTDATE));
+        uint16_t time = htole16(*(uint16_t*)(entry+FATDIR_WRTTIME));
+        uint16_t date = htole16(*(uint16_t*)(entry+FATDIR_WRTDATE));
 #endif
         fat_time(&date, &time, NULL);
-        *(unsigned short*)(entry + FATDIR_WRTTIME) = htole16(time);
-        *(unsigned short*)(entry + FATDIR_WRTDATE) = htole16(date);
-        *(unsigned short*)(entry + FATDIR_LSTACCDATE) = htole16(date);
+        *(uint16_t*)(entry + FATDIR_WRTTIME) = htole16(time);
+        *(uint16_t*)(entry + FATDIR_WRTDATE) = htole16(date);
+        *(uint16_t*)(entry + FATDIR_LSTACCDATE) = htole16(date);
     }
 
     rc = fat_seek( &dir, sector );
