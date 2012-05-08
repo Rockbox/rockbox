@@ -1034,6 +1034,8 @@ static int close_wrapper(int fd)
 
 static int creat_wrapper(const char *pathname, mode_t mode)
 {
+    (void)mode;
+
     int fd = PREFIX(creat)(pathname, mode);
 
     if(fd >= 0)
