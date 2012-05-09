@@ -55,27 +55,42 @@ extern void dsp_sample_output_flush(struct sample_io_data *this);
 /* CODEC_IDX_AUDIO = left and right, CODEC_IDX_VOICE = mono */
 static int32_t sample_bufs[3][SAMPLE_BUF_COUNT] IBSS_ATTR;
 
+/* inline helper to setup buffers when conversion is required */
+static FORCE_INLINE int sample_input_setup(struct sample_io_data *this,
+                                           struct dsp_buffer **buf_p,
+                                           int channels,
+                                           struct dsp_buffer **src,
+                                           struct dsp_buffer **dst)
+{
+    struct dsp_buffer *s = *buf_p;
+    struct dsp_buffer *d = *dst = &this->sample_buf;
+
+    *buf_p = d;
+
+    if (d->remcount > 0)
+        return 0; /* data still remains */
+
+    *src = s;
+
+    int count = MIN(s->remcount, SAMPLE_BUF_COUNT);
+
+    d->remcount  = count;
+    d->p32[0]    = this->sample_buf_arr[0];
+    d->p32[1]    = this->sample_buf_arr[channels - 1];
+    d->proc_mask = s->proc_mask;
+
+    return count;
+}
+
 /* convert count 16-bit mono to 32-bit mono */
 static void sample_input_mono16(struct sample_io_data *this,
                                 struct dsp_buffer **buf_p)
 {
-    struct dsp_buffer *src = *buf_p;
-    struct dsp_buffer *dst = &this->sample_buf;
-
-    *buf_p = dst;
-
-    if (dst->remcount > 0)
-        return; /* data still remains */
-
-    int count = MIN(src->remcount, SAMPLE_BUF_COUNT);
-
-    dst->remcount  = count;
-    dst->p32[0]    = this->sample_buf_arr[0];
-    dst->p32[1]    = this->sample_buf_arr[0];
-    dst->proc_mask = src->proc_mask;
+    struct dsp_buffer *src, *dst;
+    int count = sample_input_setup(this, buf_p, 1, &src, &dst);
 
     if (count <= 0)
-        return; /* purged sample_buf */
+        return;
 
     const int16_t *s = src->pin[0];
     int32_t *d = dst->p32[0];
@@ -94,23 +109,11 @@ static void sample_input_mono16(struct sample_io_data *this,
 static void sample_input_i_stereo16(struct sample_io_data *this,
                                     struct dsp_buffer **buf_p)
 {
-    struct dsp_buffer *src = *buf_p;
-    struct dsp_buffer *dst = &this->sample_buf;
-
-    *buf_p = dst;
-
-    if (dst->remcount > 0)
-        return; /* data still remains */
-
-    int count = MIN(src->remcount, SAMPLE_BUF_COUNT);
-
-    dst->remcount  = count;
-    dst->p32[0]    = this->sample_buf_arr[0];
-    dst->p32[1]    = this->sample_buf_arr[1];
-    dst->proc_mask = src->proc_mask;
+    struct dsp_buffer *src, *dst;
+    int count = sample_input_setup(this, buf_p, 2, &src, &dst);
 
     if (count <= 0)
-        return; /* purged sample_buf */
+        return;
 
     const int16_t *s = src->pin[0];
     int32_t *dl = dst->p32[0];
@@ -131,23 +134,11 @@ static void sample_input_i_stereo16(struct sample_io_data *this,
 static void sample_input_ni_stereo16(struct sample_io_data *this,
                                      struct dsp_buffer **buf_p)
 {
-    struct dsp_buffer *src = *buf_p;
-    struct dsp_buffer *dst = &this->sample_buf;
-
-    *buf_p = dst;
-
-    if (dst->remcount > 0)
-        return; /* data still remains */
-
-    int count = MIN(src->remcount, SAMPLE_BUF_COUNT);
-
-    dst->remcount  = count;
-    dst->p32[0]    = this->sample_buf_arr[0];
-    dst->p32[1]    = this->sample_buf_arr[1];
-    dst->proc_mask = src->proc_mask;
+    struct dsp_buffer *src, *dst;
+    int count = sample_input_setup(this, buf_p, 2, &src, &dst);
 
     if (count <= 0)
-        return; /* purged sample_buf */
+        return;
 
     const int16_t *sl = src->pin[0];
     const int16_t *sr = src->pin[1];
@@ -187,23 +178,11 @@ static void sample_input_mono32(struct sample_io_data *this,
 static void sample_input_i_stereo32(struct sample_io_data *this,
                                     struct dsp_buffer **buf_p)
 {
-    struct dsp_buffer *src = *buf_p;
-    struct dsp_buffer *dst = &this->sample_buf;
-
-    *buf_p = dst;
-
-    if (dst->remcount > 0)
-        return; /* data still remains */
-
-    int count = MIN(src->remcount, SAMPLE_BUF_COUNT);
-
-    dst->remcount  = count;
-    dst->p32[0]    = this->sample_buf_arr[0];
-    dst->p32[1]    = this->sample_buf_arr[1];
-    dst->proc_mask = src->proc_mask;
+    struct dsp_buffer *src, *dst;
+    int count = sample_input_setup(this, buf_p, 2, &src, &dst);
 
     if (count <= 0)
-        return; /* purged sample_buf */
+        return;
 
     const int32_t *s = src->pin[0];
     int32_t *dl = dst->p32[0];
