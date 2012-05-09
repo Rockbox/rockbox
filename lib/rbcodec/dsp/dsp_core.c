@@ -128,13 +128,15 @@ static void dsp_format_change_process(struct dsp_proc_entry *this,
 
     /* We don't keep back references to the DSP, so just search for it */
     struct dsp_config *dsp;
-    for (int i = 0; (dsp = dsp_get_config(i)); i++)
+    for (unsigned int i = 0; (dsp = dsp_get_config(i)); i++)
     {
-        struct dsp_proc_slot *slot = find_proc_slot(dsp, id);
-        /* Found one with the id, check if it's this one */
-        if (&slot->proc_entry == this && dsp_proc_active(dsp, id))
+        /* Found one with the id, check if it's this one
+           (NULL return doesn't matter) */
+        if (&find_proc_slot(dsp, id)->proc_entry == this)
         {
-            dsp_proc_call(this, buf_p, 0);
+            if (dsp_proc_active(dsp, id))
+                dsp_proc_call(this, buf_p, 0);
+
             break;
         }
     }
