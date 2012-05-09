@@ -114,6 +114,7 @@ void power_off(void)
     sleep(HZ / 2);
 #ifdef SANSA_FUZEPLUS
     /* This pin seems to be important to shutdown the hardware properly */
+    imx233_pinctrl_acquire_pin(0, 9, "power off");
     imx233_set_pin_function(0, 9, PINCTRL_FUNCTION_GPIO);
     imx233_enable_gpio_output(0, 9, true);
     imx233_set_gpio_output(0, 9, true);

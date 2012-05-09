@@ -399,13 +399,25 @@ bool dbg_hw_info_pinctrl(void)
 {
     lcd_setfont(FONT_SYSFIXED);
 
+#ifdef IMX233_PINCTRL_DEBUG
+    unsigned top_user = 0;
+#endif
     while(1)
     {
         int button = get_action(CONTEXT_STD, HZ / 10);
         switch(button)
         {
             case ACTION_STD_NEXT:
+#ifdef IMX233_PINCTRL_DEBUG
+                top_user++;
+                break;
+#endif
             case ACTION_STD_PREV:
+#ifdef IMX233_PINCTRL_DEBUG
+                if(top_user > 0)
+                    top_user--;
+                break;
+#endif
             case ACTION_STD_OK:
             case ACTION_STD_MENU:
                 lcd_setfont(FONT_UI);
@@ -418,6 +430,23 @@ bool dbg_hw_info_pinctrl(void)
         lcd_clear_display();
         for(int i = 0; i < 4; i++)
             lcd_putsf(0, i, "DIN%d = 0x%08x", i, imx233_get_gpio_input_mask(i, 0xffffffff));
+#ifdef IMX233_PINCTRL_DEBUG
+        unsigned cur_line = 6;
+        unsigned last_line = lcd_getheight() / font_get(lcd_getfont())->height;
+        unsigned cur_idx = 0;
+
+        for(int bank = 0; bank < 4; bank++)
+        for(int pin = 0; pin < 32; pin++)
+        {
+            const char *owner = imx233_pinctrl_get_pin_use(bank, pin);
+            if(owner == NULL)
+                continue;
+            if(cur_idx++ >= top_user && cur_line < last_line)
+                lcd_putsf(0, cur_line++, "B%dP%02d %s", bank, pin, owner);
+        }
+        if(cur_idx < top_user)
+            top_user = cur_idx - 1;
+#endif
         lcd_update();
         yield();
     }

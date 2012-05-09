@@ -64,6 +64,7 @@ void sd_power(bool on)
 {
     #ifdef SANSA_FUZEPLUS
     /* The Fuze+ uses pin B0P8 for whatever reason, power ? */
+    imx233_pinctrl_acquire_pin(0, 8, "sd power");
     imx233_set_pin_function(0, 8, PINCTRL_FUNCTION_GPIO);
     imx233_enable_gpio_output(0, 8, true);
     imx233_set_gpio_output(0, 8, !on);

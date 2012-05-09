@@ -41,6 +41,7 @@ void _backlight_set_brightness(int brightness)
 
 bool _backlight_init(void)
 {
+    imx233_pinctrl_acquire_pin(1, 28, "backlight");
     imx233_set_pin_function(1, 28, PINCTRL_FUNCTION_GPIO);
     imx233_set_pin_drive_strength(1, 28, PINCTRL_DRIVE_8mA);
     imx233_enable_gpio_output(1, 28, true);

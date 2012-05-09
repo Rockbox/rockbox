@@ -21,7 +21,46 @@
 #include "system.h"
 #include "system-target.h"
 #include "cpu.h"
+#include "string.h"
 #include "pinctrl-imx233.h"
+
+#ifdef IMX233_PINCTRL_DEBUG
+// 4 banks of 32 pins
+static const char *pin_use[4][32];
+
+void imx233_pinctrl_acquire_pin(unsigned bank, unsigned pin, const char *name)
+{
+    if(pin_use[bank][pin] != NULL && pin_use[bank][pin] != name)
+        panicf("acquire B%dP%02d for %s, was %s!", bank, pin, name, pin_use[bank][pin]);
+    pin_use[bank][pin] = name;
+}
+
+void imx233_pinctrl_acquire_pin_mask(unsigned bank, uint32_t mask, const char *name)
+{
+    for(unsigned pin = 0; pin < 32; pin++)
+        if(mask & (1 << pin))
+            imx233_pinctrl_acquire_pin(bank, pin, name);
+}
+
+void imx233_pinctrl_release_pin(unsigned bank, unsigned pin, const char *name)
+{
+    if(pin_use[bank][pin] != NULL && pin_use[bank][pin] != name)
+        panicf("release B%dP%02d for %s: was %s!", bank, pin, name, pin_use[bank][pin]);
+    pin_use[bank][pin] = NULL;
+}
+
+void imx233_pinctrl_release_pin_mask(unsigned bank, uint32_t mask, const char *name)
+{
+    for(unsigned pin = 0; pin < 32; pin++)
+        if(mask & (1 << pin))
+            imx233_pinctrl_release_pin(bank, pin, name);
+}
+
+const char *imx233_pinctrl_get_pin_use(unsigned bank, unsigned pin)
+{
+    return pin_use[bank][pin];
+}
+#endif
 
 static pin_irq_cb_t pin_cb[3][32]; /* 3 banks, 32 pins/bank */
 

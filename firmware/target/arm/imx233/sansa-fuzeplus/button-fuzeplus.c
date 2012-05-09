@@ -301,7 +301,8 @@ void button_init_device(void)
      * The B0P26 line seems to be related to the touchpad
      */
      
-    /* touchpad CE ? */
+    /* touchpad power */
+    imx233_pinctrl_acquire_pin(0, 26, "touchpad power");
     imx233_set_pin_function(0, 26, PINCTRL_FUNCTION_GPIO);
     imx233_enable_gpio_output(0, 26, false);
     imx233_set_pin_drive_strength(0, 26, PINCTRL_DRIVE_8mA);
@@ -324,10 +325,12 @@ void button_init_device(void)
     create_thread(rmi_thread, rmi_stack, sizeof(rmi_stack), 0,
             rmi_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
     /* enable interrupt */
+    imx233_pinctrl_acquire_pin(0, 27, "touchpad int");
     imx233_set_pin_function(0, 27, PINCTRL_FUNCTION_GPIO);
     imx233_enable_gpio_output(0, 27, false);
     imx233_setup_pin_irq(0, 27, true, true, false, &rmi_attn_cb);
     /* Volume down */
+    imx233_pinctrl_acquire_pin(1, 30, "volume down");
     imx233_set_pin_function(1, 30, PINCTRL_FUNCTION_GPIO);
     imx233_enable_gpio_output(1, 30, false);
 }
@@ -336,6 +339,10 @@ void button_init_device(void)
 
 void button_init_device(void)
 {
+    /* Volume down */
+    imx233_pinctrl_acquire_pin(1, 30, "volume down");
+    imx233_set_pin_function(1, 30, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(1, 30, false);
 }
 
 int touchpad_read_device(void)

@@ -63,6 +63,7 @@ int mmc_init(void)
     #ifdef SANSA_FUZEPLUS
     /** Sansa Fuze+ has an internal eMMC 8-bit wide flash, power gate is pin PWM3
      * and power up time is 20ms */
+    imx233_pinctrl_acquire_pin(1, 29, "emmc power");
     imx233_set_pin_function(1, 29, PINCTRL_FUNCTION_GPIO);
     imx233_enable_gpio_output(1, 29, true);
     imx233_set_gpio_output(1, 29, false);

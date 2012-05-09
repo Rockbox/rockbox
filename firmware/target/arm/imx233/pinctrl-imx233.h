@@ -23,7 +23,10 @@
 #ifndef __PINCTRL_IMX233_H__
 #define __PINCTRL_IMX233_H__
 
-#include "cpu.h"
+#include "config.h"
+
+// set to debug pinctrl use
+#define IMX233_PINCTRL_DEBUG
 
 #define HW_PINCTRL_BASE         0x80018000
 
@@ -50,6 +53,20 @@
 #define PINCTRL_DRIVE_8mA       1
 #define PINCTRL_DRIVE_12mA      2
 #define PINCTRL_DRIVE_16mA      3 /* not available on all pins */
+
+#ifdef IMX233_PINCTRL_DEBUG
+void imx233_pinctrl_acquire_pin(unsigned bank, unsigned pin, const char *name);
+void imx233_pinctrl_acquire_pin_mask(unsigned bank, uint32_t mask, const char *name);
+void imx233_pinctrl_release_pin(unsigned bank, unsigned pin, const char *name);
+void imx233_pinctrl_release_pin_mask(unsigned bank, uint32_t mask, const char *name);
+const char *imx233_pinctrl_get_pin_use(unsigned bank, unsigned pin);
+#else
+#define imx233_pinctrl_acquire_pin(...)
+#define imx233_pinctrl_acquire_pin_mask(...)
+#define imx233_pinctrl_release_pin(...)
+#define imx233_pinctrl_release_pin_mask(...)
+#define imx233_pinctrl_get_pin_use(...) NULL
+#endif
 
 typedef void (*pin_irq_cb_t)(int bank, int pin);
 

@@ -87,6 +87,8 @@ struct i2c_interface fmradio_i2c =
 
 void fmradio_i2c_init(void)
 {
+    imx233_pinctrl_acquire_pin(1, 24, "fmradio i2c");
+    imx233_pinctrl_acquire_pin(1, 22, "fmradio i2c");
     imx233_set_pin_function(1, 24, PINCTRL_FUNCTION_GPIO);
     imx233_set_pin_function(1, 22, PINCTRL_FUNCTION_GPIO);
     fmradio_i2c_bus = i2c_add_node(&fmradio_i2c);

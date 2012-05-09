@@ -150,12 +150,15 @@ void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     /* SSP_{CMD,SCK} */
     imx233_set_pin_drive_strength(2, 0, drive_strength);
     imx233_set_pin_drive_strength(2, 6, drive_strength);
+    imx233_pinctrl_acquire_pin(2, 0, "ssp1 cmd");
+    imx233_pinctrl_acquire_pin(2, 6, "ssp1 sck");
     imx233_set_pin_function(2, 0, PINCTRL_FUNCTION_MAIN);
     imx233_set_pin_function(2, 6, PINCTRL_FUNCTION_MAIN);
     imx233_enable_pin_pullup(2, 0, enable_pullups);
     /* SSP_DATA{0-3} */
     for(unsigned i = 0; i < MIN(bus_width, 4); i++)
     {
+        imx233_pinctrl_acquire_pin(2, 2 + i, "ssp1 data");
         imx233_set_pin_drive_strength(2, 2 + i, drive_strength);
         imx233_set_pin_function(2, 2 + i, PINCTRL_FUNCTION_MAIN);
         imx233_enable_pin_pullup(2, 2 + i, enable_pullups);
@@ -166,12 +169,14 @@ void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     {
         if(use_alt)
         {
+            imx233_pinctrl_acquire_pin(0, 22 + i, "ssp1 data");
             imx233_set_pin_drive_strength(0, 22 + i, drive_strength);
             imx233_set_pin_function(0, 22 + i, PINCTRL_FUNCTION_ALT2);
             imx233_enable_pin_pullup(0, 22 + i, enable_pullups);
         }
         else
         {
+            imx233_pinctrl_acquire_pin(0, 4 + i, "ssp1 data");
             imx233_set_pin_drive_strength(0, 4 + i, drive_strength);
             imx233_set_pin_function(0, 4 + i, PINCTRL_FUNCTION_ALT2);
             imx233_enable_pin_pullup(0, 4 + i, enable_pullups);
@@ -183,6 +188,8 @@ void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     unsigned drive_strength)
 {
     /* SSP_{CMD,SCK} */
+    imx233_pinctrl_acquire_pin(0, 20, "ssp2 cmd");
+    imx233_pinctrl_acquire_pin(0, 24, "ssp2 sck");
     imx233_set_pin_drive_strength(0, 20, drive_strength);
     imx233_set_pin_drive_strength(0, 24, drive_strength);
     imx233_set_pin_function(0, 20, PINCTRL_FUNCTION_ALT2);
@@ -191,13 +198,13 @@ void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     /* SSP_DATA{0-7}*/
     for(unsigned i = 0; i < bus_width; i++)
     {
+        imx233_pinctrl_acquire_pin(0, i, "ssp2 data");
         imx233_set_pin_drive_strength(0, i, drive_strength);
         imx233_set_pin_function(0, i, PINCTRL_FUNCTION_ALT2);
         imx233_enable_pin_pullup(0, i, enable_pullups);
+        imx233_enable_gpio_output(0, i, false);
+        imx233_set_gpio_output(0, i, false);
     }
-
-    imx233_enable_gpio_output_mask(0, 0x11000ff, false);
-    imx233_set_gpio_output_mask(0, 0x11000ff, false);
 }
 
 void imx233_ssp_set_mode(int ssp, unsigned mode)
@@ -348,6 +355,7 @@ void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn, boo
     ssp_detect_cb[ssp - 1] = fn;
     if(enable)
     {
+        imx233_pinctrl_acquire_pin(bank, pin, ssp == 1 ? "ssp1 detect" : "ssp2 detect");
         imx233_set_pin_function(bank, pin, PINCTRL_FUNCTION_GPIO);
         imx233_enable_gpio_output(bank, pin, false);
     }
