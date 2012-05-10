@@ -22,8 +22,13 @@
 #include <stdint.h>
 #include <string.h>
 #include <strlcpy.h>
+#include <kernel.h>
 #include "rds.h"
 #include "time.h"
+
+// timeout before segment obsolescence
+#define PS_SEGMENT_TIMEOUT  (HZ / 2)
+#define RT_SEGMENT_TIMEOUT  (10 * HZ)
 
 /* programme identification */
 static uint16_t pi_code;
@@ -31,11 +36,13 @@ static uint16_t pi_last;
 /* program service name */
 static char ps_data[9];
 static char ps_copy[9];
-static int ps_segment;
+static long ps_segment_timeout[4];
+static int ps_segment;// bitmap of received segments
 /* radio text */
 static char rt_data[65];
 static char rt_copy[65];
-static int rt_segment;
+static long rt_segment_timeout[16];
+static int rt_segment;// bitmap of received segments
 static int rt_abflag;
 /* date/time */
 static time_t ct_data;
@@ -95,22 +102,21 @@ static bool handle_group0(uint16_t data[4])
 {
     int segment, pos;
 
-    segment = data[1] & 3;
+    /* remove obsolete segments */
+    for(int i = 0; i < 4; i++)
+        if(TIME_AFTER(current_tick, ps_segment_timeout[i]))
+            ps_segment &= ~(1 << i);
 
-    /* reset parsing if not in expected order */
-    if (segment != ps_segment) {
-        ps_segment = 0;
-        if (segment != 0) {
-            return false;
-        }
-    }
+    segment = data[1] & 3;
 
     /* store data */
     pos = segment * 2;
     ps_data[pos++] = (data[3] >> 8) & 0xFF;
     ps_data[pos++] = (data[3] >> 0) & 0xFF;
-    if (++ps_segment == 4) {
-        ps_data[pos] = '\0';
+    ps_segment |= 1 << segment;
+    ps_segment_timeout[segment] = current_tick + PS_SEGMENT_TIMEOUT;
+    if (ps_segment == 0xf) {
+        ps_data[8] = '\0';
         if (strcmp(ps_copy, ps_data) != 0) {
             /* we got an updated message */
             strcpy(ps_copy, ps_data);
@@ -143,21 +149,25 @@ static bool handle_group2(uint16_t data[4])
 {
     int abflag, segment, version, pos;
     bool done;
+
+    /* remove obsolete segments */
+    for(int i = 0; i < 16; i++)
+        if(TIME_AFTER(current_tick, rt_segment_timeout[i]))
+            rt_segment &= ~(1 << i);
     
-    /* reset parsing if not in expected order */
+    /* reset parsing if the message type changed */
     abflag = (data[1] >> 4) & 1;
     segment = data[1] & 0xF;
-    if ((abflag != rt_abflag) || (segment != rt_segment)) {
+    if (abflag != rt_abflag) {
         rt_abflag = abflag;
         rt_segment = 0;
-        if (segment != 0) {
-            return false;
-        }
     }
+
+    rt_segment |= 1 << segment;
+    rt_segment_timeout[segment] = current_tick + RT_SEGMENT_TIMEOUT;
 
     /* store data */
     version = (data[1] >> 11) & 1;
-    done = false;
     if (version == 0) {
         pos = segment * 4;
         done = done || handle_rt(pos++, (data[2] >> 8) & 0xFF);
@@ -169,7 +179,10 @@ static bool handle_group2(uint16_t data[4])
         done = done || handle_rt(pos++, (data[3] >> 8) & 0xFF);
         done = done || handle_rt(pos++, (data[3] >> 0) & 0xFF);
     }
-    if ((++rt_segment == 16) || done) {
+    /* there are two cases for completion:
+     * - we got all 16 segments
+     * - we found a end of line AND we got all segments before it */
+    if (rt_segment == 0xffff || (done && rt_segment == (1 << segment) - 1)) {
         rt_data[pos] = '\0';
         if (strcmp(rt_copy, rt_data) != 0) {
             /* we got an updated message */
