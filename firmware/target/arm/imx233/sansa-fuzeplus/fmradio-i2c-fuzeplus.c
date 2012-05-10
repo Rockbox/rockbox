@@ -24,12 +24,15 @@
 #include "fmradio_i2c.h"
 #include "pinctrl-imx233.h"
 #include "generic_i2c.h"
+#include "rds.h"
+#include "si4700.h"
 
 /**
  * Sansa Fuze+ fmradio uses the following pins:
  * - B0P29 as CE apparently (active high)
  * - B1P24 as SDA
  * - B1P22 as SCL
+ * - B2P27 as STC/RDS
  */
 static int fmradio_i2c_bus = -1;
 
@@ -103,3 +106,60 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
     return i2c_read_data(fmradio_i2c_bus, address, -1, buf, count);
 }
+
+#ifdef HAVE_RDS_CAP
+/* Low-level RDS Support */
+static struct semaphore rds_sema;
+static uint32_t rds_stack[DEFAULT_STACK_SIZE / sizeof(uint32_t)];
+
+/* RDS GPIO interrupt handler */
+static void stc_rds_callback(int bank, int pin)
+{
+    (void) bank;
+    (void) pin;
+
+    semaphore_release(&rds_sema);
+}
+
+/* Captures RDS data and processes it */
+static void NORETURN_ATTR rds_thread(void)
+{
+    uint16_t rds_data[4];
+
+    while(true)
+    {
+        semaphore_wait(&rds_sema, TIMEOUT_BLOCK);
+        if(si4700_rds_read_raw(rds_data) && rds_process(rds_data))
+            si4700_rds_set_event();
+        /* renable callback */
+        imx233_setup_pin_irq(2, 27, true, true, false, &stc_rds_callback);
+    }
+}
+
+/* true after full radio power up, and false before powering down */
+void si4700_rds_powerup(bool on)
+{
+    if(on)
+    {
+        imx233_pinctrl_acquire_pin(2, 27, "tuner stc/rds");
+        imx233_set_pin_function(2, 27, PINCTRL_FUNCTION_GPIO);
+        imx233_enable_gpio_output(2, 27, false);
+        /* pin is set to 0 when an RDS packet has arrived */
+        imx233_setup_pin_irq(2, 27, true, true, false, &stc_rds_callback);
+    }
+    else
+    {
+        imx233_setup_pin_irq(2, 27, false, false, false, NULL);
+        imx233_pinctrl_release_pin(2, 27, "tuner stc/rds");
+    }
+}
+
+/* One-time RDS init at startup */
+void si4700_rds_init(void)
+{
+    semaphore_init(&rds_sema, 1, 0);
+    rds_init();
+    create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
+        IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
+}
+#endif /* HAVE_RDS_CAP */
