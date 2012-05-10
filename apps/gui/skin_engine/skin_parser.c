@@ -80,10 +80,6 @@
 #define WPS_ERROR_INVALID_PARAM         -1
 
 static char* skin_buffer = NULL;
-void skinparser_set_buffer(char* pointer)
-{
-    skin_buffer = pointer;
-}
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 static char *backdrop_filename;
