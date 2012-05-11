@@ -90,11 +90,12 @@ bool Utils::recursiveRmdir( const QString &dirName )
 //! @return returns exact casing of path, empty string if path not found.
 QString Utils::resolvePathCase(QString path)
 {
-    QStringList elems;
-    QString realpath;
-
-    elems = path.split("/", QString::SkipEmptyParts);
     int start;
+    QString realpath;
+    QStringList elems = path.split("/", QString::SkipEmptyParts);
+
+    if(path.isEmpty())
+        return QString();
 #if defined(Q_OS_WIN32)
     // on windows we must make sure to start with the first entry (i.e. the
     // drive letter) instead of a single / to make resolving work.
