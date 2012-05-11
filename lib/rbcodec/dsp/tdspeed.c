@@ -32,6 +32,8 @@
 #define assert(cond)
 #endif
 
+#define SOUNDTOUCH 1
+
 #define TIMESTRETCH_SET_FACTOR (DSP_PROC_SETTING+DSP_PROC_TIMESTRETCH)
 
 #define MIN_RATE 8000
@@ -39,8 +41,8 @@
 #define MINFREQ 100
 
 #define MAX_INPUTCOUNT       512 /* Max input count so dst doesn't overflow */
-#define FIXED_BUFCOUNT      3072 /* 48KHz factor 3.0 */
-#define FIXED_OUTBUFCOUNT   4096
+#define FIXED_BUFCOUNT      3072*16 /* 48KHz factor 3.0 */
+#define FIXED_OUTBUFCOUNT   4096*16
 #define NBUFFERS 4
 
 enum tdspeed_ops
@@ -53,17 +55,18 @@ enum tdspeed_ops
 static struct tdspeed_state_s
 {
     struct dsp_proc_entry *this; /* this stage */
-    int channels;           /* number of audio channels */
-    int32_t samplerate;     /* current samplerate of input data */
-    int32_t factor;         /* stretch factor (perdecimille) */
-    int32_t shift_max;      /* maximum displacement on a frame */
-    int32_t src_step;       /* source window pace */
-    int32_t dst_step;       /* destination window pace */
-    int32_t dst_order;      /* power of two for dst_step */
-    int32_t ovl_shift;      /* overlap buffer frame shift */
-    int32_t ovl_size;       /* overlap buffer used size */
-    int32_t *ovl_buff[2];   /* overlap buffer (L+R) */
-} tdspeed_state;
+    int channels;         /* number of audio channels */
+    int32_t samplerate;   /* current samplerate of input data */
+    int32_t factor;       /* stretch factor (perdecimille) */
+    int crossfade_order;  /* power of two for crossfade_size */
+    int shift_max;        /* maximum displacement on a frame */
+    int src_frame_sz;     /* required samples to process a frame */
+    int src_step;         /* source window pace */
+    int dst_step;         /* destination window pace */
+    int ovl_shift;        /* overlap buffer frame shift */
+    int ovl_size;         /* overlap buffer used size */
+    int32_t *ovl_buff[2]; /* overlap buffer (L+R) */
+} tdspeed_state IBSS_ATTR;
 
 static int32_t *buffers[NBUFFERS] = { NULL, NULL, NULL, NULL };
 
@@ -88,6 +91,7 @@ static inline int32_t blend_frame_samples(int32_t curr, int32_t prev,
                                           int i, int j, int order)
 {
     int32_t a0, a1;
+    order = 30 - order;
     asm (
         "mac.l     %2, %3, %%acc0 \n" /* acc = curr*(i<<(30-order)) >> 23 */
         "mac.l     %4, %5, %%acc0 \n" /* acc += prev*(j<<(30-order)) >> 23 */
@@ -101,7 +105,6 @@ static inline int32_t blend_frame_samples(int32_t curr, int32_t prev,
         : "=d"(a0), "=d"(a1)
         : "r"(curr), "r"(i << order),
           "r"(prev), "r"(j << order));
-
     return a0;
 }
 #else
@@ -144,25 +147,44 @@ static bool tdspeed_update(int32_t samplerate, int32_t factor)
     if (factor < STRETCH_MIN || factor > STRETCH_MAX)
         return false;
 
-    st->dst_step = samplerate / MINFREQ;
+#if SOUNDTOUCH  /* soundtouch params */
+    int crossfade_size = samplerate * 12 / 1000; /* 12ms  */
+
+    st->crossfade_order = 0;
+
+    while (crossfade_size >>= 1)
+        st->crossfade_order++;
+
+    crossfade_size = 1 << st->crossfade_order;
+
+    st->dst_step = samplerate * 78 / 1000; /* 78ms ~= 12.82 Hz */
+    st->src_step = st->dst_step * factor / PITCH_SPEED_100;
+
+    st->shift_max = samplerate * 28 / 1000; /* 28ms */
+#else /* !SOUNDTOUCH */
+    int crossfade_size = samplerate / MINFREQ;
 
     if (factor > PITCH_SPEED_100)
-        st->dst_step = st->dst_step * PITCH_SPEED_100 / factor;
+        crossfade_size = crossfade_size * PITCH_SPEED_100 / factor;
 
-    st->dst_order = 1;
+    st->crossfade_order = 1;
 
-    while (st->dst_step >>= 1)
-        st->dst_order++;
+    while (crossfade_size >>= 1)
+        st->crossfade_order++;
 
-    st->dst_step = (1 << st->dst_order);
-#ifdef CPU_COLDFIRE
-    /* blend_frame_samples works in s0.31 mode. Also must shift by
-       one less bit before mac in order not to overflow. */
-    st->dst_order = 30 - st->dst_order;
-#endif
+    crossfade_size = 1 << st->crossfade_order;
+
+    st->dst_step = crossfade_size;
     st->src_step = st->dst_step * factor / PITCH_SPEED_100;
+
     st->shift_max = (st->dst_step > st->src_step) ?
                         st->dst_step : st->src_step;
+#endif /* SOUNDTOUCH */
+
+    st->src_frame_sz = st->shift_max + st->dst_step;
+
+    if (2*crossfade_size > st->src_step + st->dst_step)
+        st->src_frame_sz += 2*crossfade_size - (st->src_step + st->dst_step);
 
     st->ovl_buff[0] = overlap_buffer[0];
     st->ovl_buff[1] = overlap_buffer[1]; /* ignored if mono */
@@ -175,10 +197,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
 /* data_len in samples */
 {
     struct tdspeed_state_s *const st = &tdspeed_state;
-    int32_t src_frame_sz = st->shift_max + st->dst_step;
-
-    if (st->dst_step > st->src_step)
-        src_frame_sz += st->dst_step - st->src_step;
+    int crossfade_size = 1 << st->crossfade_order;
 
     int32_t *dest[2];
     int32_t next_frame, prev_frame;
@@ -192,11 +211,20 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
             have -= st->ovl_shift;
 
         /* append just enough data to have all of the overlap buffer consumed */
-        int32_t steps = (have - 1) / st->src_step;
-        int32_t copy = steps * st->src_step + src_frame_sz - have;
+#if SOUNDTOUCH
+        int need = (have + st->src_step - 1) / st->src_step * st->src_step;
 
-        if (copy < src_frame_sz - st->dst_step)
+        if (st->src_step - crossfade_size > need - have)
+            need += st->src_step;  /* one more loop to move prev_frame out */
+
+        int copy = need - have + st->src_frame_sz - st->src_step;
+#else /* !SOUNDTOUCH */
+        int steps = (have - 1) / st->src_step;
+        int copy = steps * st->src_step + st->src_frame_sz - have;
+
+        if (copy < st->src_frame_sz - st->dst_step)
             copy += st->src_step;  /* one more step to allow for pregap data */
+#endif /* SOUNTOUCH */
 
         if (copy > data_len)
             copy = data_len;
@@ -212,7 +240,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         if (consumed)
             *consumed = copy;
 
-        if (op == TDSOP_PROCESS && have + copy < src_frame_sz)
+        if (op == TDSOP_PROCESS && have + copy < st->src_frame_sz)
         {
             /* still not enough to process at least one frame */
             st->ovl_size += copy;
@@ -238,7 +266,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         dest[1] = buf_out[1] + i;
 
         /* readjust pointers to account for data already consumed */
-        next_frame = copy - src_frame_sz + st->src_step;
+        next_frame = copy - st->src_frame_sz + st->src_step;
         prev_frame = next_frame - st->ovl_shift;
     }
     else
@@ -257,7 +285,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
     st->ovl_shift = 0;
 
     /* process all complete frames */
-    while (data_len - next_frame >= src_frame_sz)
+    while (data_len - next_frame >= st->src_frame_sz)
     {
         /* find frame overlap by autocorelation */
         int const INC1 = 8;
@@ -304,18 +332,34 @@ skip:;
             assert(prev_frame + st->dst_step <= data_len);
             assert(dest[ch] - buf_out[ch] + st->dst_step <= out_size);
 
-            for (int i = 0, j = st->dst_step; j; i++, j--)
+            for (int i = 0, j = crossfade_size; j; i++, j--)
             {
                 assert(d < buf_out[ch] + out_size);
                 *d++ = blend_frame_samples(*curr++, *prev++, i, j,
-                                           st->dst_order);
+                                           st->crossfade_order);
             }
+
+#if SOUNDTOUCH
+            /* copy any remaining frame that isn't part of the crossfade */
+            if (st->dst_step > crossfade_size)
+            {
+                int copy = st->dst_step - crossfade_size;
+                memcpy(d, curr, copy * sizeof(int32_t));
+                d += copy;
+            }
+#endif /* SOUNDTOUCH */
 
             dest[ch] = d;
         }
 
+#if SOUNDTOUCH
+        /* just add to shift the amount of extra copy (for frame increment) */
+        if (st->dst_step > crossfade_size)
+            shift += st->dst_step - crossfade_size;
+#endif
+
         /* adjust pointers for next frame */
-        prev_frame = next_frame + shift + st->dst_step;
+        prev_frame = next_frame + shift + crossfade_size;
         next_frame += st->src_step;
 
         /* here next_frame - prev_frame = src_step - dst_step - shift */
@@ -333,6 +377,8 @@ skip:;
         st->ovl_size = data_len - i;
         assert(st->ovl_size <= FIXED_BUFCOUNT);
 
+        /* NOTE: will data_len always be >= i here? If not, must limit!
+           Honestly, I see nothing to guarantee that -- jethead71 */
         for (int ch = 0; ch < st->channels; ch++)
         {
             memmove(st->ovl_buff[ch], buf_in[ch] + i,
@@ -341,7 +387,6 @@ skip:;
 
         if (consumed)
             *consumed = data_len;
-
         break;
         } /* TDSOP_PROCESS: */
 
