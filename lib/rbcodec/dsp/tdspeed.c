@@ -127,6 +127,10 @@ static bool tdspeed_update(int32_t samplerate, int32_t factor)
 {
     struct tdspeed_state_s *st = &tdspeed_state;
 
+    /* Save parameters we'll need later if format changes */
+    st->samplerate = samplerate;
+    st->factor     = factor;
+
     /* Check parameters */
     if (factor == PITCH_SPEED_100)
         return false;
@@ -136,10 +140,6 @@ static bool tdspeed_update(int32_t samplerate, int32_t factor)
 
     if (factor < STRETCH_MIN || factor > STRETCH_MAX)
         return false;
-
-    /* Save parameters we'll need later if format changes */
-    st->samplerate = samplerate;
-    st->factor     = factor;
 
     st->dst_step = samplerate / MINFREQ;
 
