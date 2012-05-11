@@ -54,7 +54,7 @@ static struct tdspeed_state_s
 {
     struct dsp_proc_entry *this; /* this stage */
     struct dsp_config *dsp; /* the DSP we use */
-    unsigned int channels;  /* flags parameter to use in call */
+    int channels;           /* number of audio channels */
     int32_t samplerate;     /* current samplerate of input data */
     int32_t factor;         /* stretch factor (perdecimille) */
     int32_t shift_max;      /* maximum displacement on a frame */
@@ -63,12 +63,13 @@ static struct tdspeed_state_s
     int32_t dst_order;      /* power of two for dst_step */
     int32_t ovl_shift;      /* overlap buffer frame shift */
     int32_t ovl_size;       /* overlap buffer used size */
-    int32_t ovl_space;      /* overlap buffer size */
     int32_t *ovl_buff[2];   /* overlap buffer (L+R) */
 } tdspeed_state;
 
 static int32_t *buffers[NBUFFERS] = { NULL, NULL, NULL, NULL };
-static const int buffer_sizes[NBUFFERS] = {
+
+static const int buffer_sizes[NBUFFERS] =
+{
     FIXED_BUFCOUNT * sizeof(int32_t),
     FIXED_BUFCOUNT * sizeof(int32_t),
     FIXED_OUTBUFCOUNT * sizeof(int32_t),
@@ -121,21 +122,8 @@ static bool tdspeed_update(int32_t samplerate, int32_t factor)
 
     st->dst_step = (1 << st->dst_order);
     st->src_step = st->dst_step * factor / PITCH_SPEED_100;
-    st->shift_max = (st->dst_step > st->src_step) ? st->dst_step : st->src_step;
-
-    int src_frame_sz = st->shift_max + st->dst_step;
-
-    if (st->dst_step > st->src_step)
-        src_frame_sz += st->dst_step - st->src_step;
-
-    st->ovl_space = ((src_frame_sz - 2) / st->src_step) * st->src_step
-                        + src_frame_sz;
-
-    if (st->src_step > st->dst_step)
-        st->ovl_space += 2*st->src_step - st->dst_step;
-
-    if (st->ovl_space > FIXED_BUFCOUNT)
-        st->ovl_space = FIXED_BUFCOUNT;
+    st->shift_max = (st->dst_step > st->src_step) ?
+                        st->dst_step : st->src_step;
 
     /* just discard remaining input data */
     st->ovl_size = 0;
@@ -151,28 +139,26 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
                          int data_len, enum tdspeed_ops op, int *consumed)
 /* data_len in samples */
 {
-    struct tdspeed_state_s *st = &tdspeed_state;
-    int32_t *dest[2];
-    int32_t next_frame, prev_frame, src_frame_sz;
-    bool stereo = st->channels > 1;
-
-    src_frame_sz = st->shift_max + st->dst_step;
+    struct tdspeed_state_s *const st = &tdspeed_state;
+    int32_t src_frame_sz = st->shift_max + st->dst_step;
 
     if (st->dst_step > st->src_step)
         src_frame_sz += st->dst_step - st->src_step;
 
+    int32_t *dest[2];
+    int32_t next_frame, prev_frame;
+
     /* deal with overlap data first, if any */
     if (st->ovl_size)
     {
-        int32_t have, copy, steps;
-        have = st->ovl_size;
+        int32_t have = st->ovl_size;
 
         if (st->ovl_shift > 0)
             have -= st->ovl_shift;
 
         /* append just enough data to have all of the overlap buffer consumed */
-        steps = (have - 1) / st->src_step;
-        copy = steps * st->src_step + src_frame_sz - have;
+        int32_t steps = (have - 1) / st->src_step;
+        int32_t copy = steps * st->src_step + src_frame_sz - have;
 
         if (copy < src_frame_sz - st->dst_step)
             copy += st->src_step;  /* one more step to allow for pregap data */
@@ -181,14 +167,15 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
             copy = data_len;
 
         assert(st->ovl_size + copy <= FIXED_BUFCOUNT);
-        memcpy(st->ovl_buff[0] + st->ovl_size, buf_in[0],
-               copy * sizeof(int32_t));
 
-        if (stereo)
-            memcpy(st->ovl_buff[1] + st->ovl_size, buf_in[1],
+        for (int ch = 0; ch < st->channels; ch++)
+        {
+            memcpy(st->ovl_buff[ch] + st->ovl_size, buf_in[ch],
                    copy * sizeof(int32_t));
+        }
 
-        *consumed += copy;
+        if (consumed)
+            *consumed = copy;
 
         if (op == TDSOP_PROCESS && have + copy < src_frame_sz)
         {
@@ -201,16 +188,16 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         have = st->ovl_size;
         st->ovl_size = 0;
 
+        assert(have + copy <= FIXED_BUFCOUNT);
+
         if (copy == data_len)
         {
-            assert(have + copy <= FIXED_BUFCOUNT);
-            return tdspeed_apply(buf_out, st->ovl_buff, have+copy, op,
-                                 consumed);
+            return tdspeed_apply(buf_out, st->ovl_buff, have + copy,
+                                 op, NULL);
         }
 
-        assert(have + copy <= FIXED_BUFCOUNT);
-        int i = tdspeed_apply(buf_out, st->ovl_buff, have+copy,
-                              TDSOP_LAST, consumed);
+        int i = tdspeed_apply(buf_out, st->ovl_buff, have + copy,
+                              TDSOP_LAST, NULL);
 
         dest[0] = buf_out[0] + i;
         dest[1] = buf_out[1] + i;
@@ -227,9 +214,9 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         next_frame = prev_frame = 0;
 
         if (st->ovl_shift > 0)
-            next_frame += st->ovl_shift;
+            next_frame = st->ovl_shift;
         else
-            prev_frame += -st->ovl_shift;
+            prev_frame = -st->ovl_shift;
     }
 
     st->ovl_shift = 0;
@@ -244,33 +231,20 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         int64_t min_delta = INT64_MAX;  /* most positive */
         int shift = 0;
 
-        /* Power of 2 of a 28bit number requires 56bits, can accumulate
-           256times in a 64bit variable. */
-        assert(st->dst_step / INC2 <= 256);
-        assert(next_frame + st->shift_max - 1 + st->dst_step - 1 < data_len);
-        assert(prev_frame + st->dst_step - 1 < data_len);
+        assert(next_frame + st->shift_max - 1 + st->dst_step <= data_len);
+        assert(prev_frame + st->dst_step <= data_len);
 
         for (int i = 0; i < st->shift_max; i += INC1)
         {
             int64_t delta = 0;
 
-            int32_t *curr = buf_in[0] + next_frame + i;
-            int32_t *prev = buf_in[0] + prev_frame;
-
-            for (int j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
+            for (int ch = 0; ch < st->channels; ch++)
             {
-                delta += ad_s32(*curr, *prev);
+                int32_t *curr = buf_in[ch] + next_frame + i;
+                int32_t *prev = buf_in[ch] + prev_frame;
 
-                if (delta >= min_delta)
-                    goto skip;
-            }
-
-            if (stereo)
-            {
-                curr = buf_in[1] + next_frame + i;
-                prev = buf_in[1] + prev_frame;
-
-                for (int j = 0; j < st->dst_step; j += INC2, curr += INC2, prev += INC2)
+                for (int j = 0; j < st->dst_step;
+                     j += INC2, curr += INC2, prev += INC2)
                 {
                     delta += ad_s32(*curr, *prev);
 
@@ -285,39 +259,25 @@ skip:;
         }
 
         /* overlap fading-out previous frame with fading-in current frame */
-        int32_t *curr = buf_in[0] + next_frame + shift;
-        int32_t *prev = buf_in[0] + prev_frame;
-
-        int32_t *d = dest[0];
-
-        assert(next_frame + shift + st->dst_step - 1 < data_len);
-        assert(prev_frame + st->dst_step - 1 < data_len);
-        assert(dest[0] - buf_out[0] + st->dst_step - 1 < out_size);
-
-        for (int i = 0, j = st->dst_step; j; i++, j--)
+        for (int ch = 0; ch < st->channels; ch++)
         {
-            *d++ = (*curr++ * (int64_t)i +
-                    *prev++ * (int64_t)j) >> st->dst_order;
-        }
+            int32_t *curr = buf_in[ch] + next_frame + shift;
+            int32_t *prev = buf_in[ch] + prev_frame;
+            int32_t *d = dest[ch];
 
-        dest[0] = d;
-
-        if (stereo)
-        {
-            curr = buf_in[1] + next_frame + shift;
-            prev = buf_in[1] + prev_frame;
-
-            d = dest[1];
+            assert(next_frame + shift + st->dst_step <= data_len);
+            assert(prev_frame + st->dst_step <= data_len);
+            assert(dest[ch] - buf_out[ch] + st->dst_step <= out_size);
 
             for (int i = 0, j = st->dst_step; j; i++, j--)
             {
-                assert(d < buf_out[1] + out_size);
+                assert(d < buf_out[ch] + out_size);
 
                 *d++ = (*curr++ * (int64_t)i +
                         *prev++ * (int64_t)j) >> st->dst_order;
             }
 
-            dest[1] = d;
+            dest[ch] = d;
         }
 
         /* adjust pointers for next frame */
@@ -326,46 +286,56 @@ skip:;
 
         /* here next_frame - prev_frame = src_step - dst_step - shift */
         assert(next_frame - prev_frame == st->src_step - st->dst_step - shift);
-    }
+    } /* while */
 
     /* now deal with remaining partial frames */
-    if (op == TDSOP_LAST)
+    switch (op)
     {
-        /* special overlap buffer processing: remember frame shift only */
-        st->ovl_shift = next_frame - prev_frame;
-    }
-    else if (op == TDSOP_PURGE)
-    {
-        /* last call: purge all remaining data to output buffer */
-        int i = data_len - prev_frame;
-
-        assert(dest[0] + i <= buf_out[0] + out_size);
-        memcpy(dest[0], buf_in[0] + prev_frame, i * sizeof(int32_t));
-
-        dest[0] += i;
-
-        if (stereo)
-        {
-            assert(dest[1] + i <= buf_out[1] + out_size);
-            memcpy(dest[1], buf_in[1] + prev_frame, i * sizeof(int32_t));
-            dest[1] += i;
-        }
-
-        *consumed += i;
-    }
-    else
+    case TDSOP_PROCESS:
     {
         /* preserve remaining data + needed overlap data for next call */
         st->ovl_shift = next_frame - prev_frame;
         int i = (st->ovl_shift < 0) ? next_frame : prev_frame;
         st->ovl_size = data_len - i;
-
         assert(st->ovl_size <= FIXED_BUFCOUNT);
-        memcpy(st->ovl_buff[0], buf_in[0] + i, st->ovl_size * sizeof(int32_t));
 
-        if (stereo)
-            memcpy(st->ovl_buff[1], buf_in[1] + i, st->ovl_size * sizeof(int32_t));
-    }
+        for (int ch = 0; ch < st->channels; ch++)
+        {
+            memcpy(st->ovl_buff[ch], buf_in[ch] + i,
+                   st->ovl_size * sizeof(int32_t));
+        }
+
+        if (consumed)
+            *consumed = data_len;
+
+        break;
+        } /* TDSOP_PROCESS: */
+
+    case TDSOP_LAST:
+    {
+        /* special overlap buffer processing: remember frame shift only */
+        st->ovl_shift = next_frame - prev_frame;
+        break;
+        } /* TDSOP_LAST: */
+
+    case TDSOP_PURGE:
+    {
+        /* last call: purge all remaining data to output buffer */
+        int i = data_len - prev_frame;
+
+        for (int ch = 0; ch < st->channels; ch++)
+        {
+            assert(dest[ch] + i <= buf_out[ch] + out_size);
+            memcpy(dest[ch], buf_in[ch] + prev_frame, i * sizeof(int32_t));
+            dest[ch] += i;
+        }
+
+        if (consumed)
+            *consumed += i;
+
+        break;
+        } /* TDSOP_PURGE: */
+    } /* switch */
 
     return dest[0] - buf_out[0];
 }
@@ -471,7 +441,7 @@ static void tdspeed_process_new_format(struct dsp_proc_entry *this,
     struct tdspeed_state_s *st = &tdspeed_state;
     struct dsp_config *dsp = st->dsp;
     struct sample_format *format = &src->format;
-    unsigned int channels = format->num_channels;
+    int channels = format->num_channels;
 
     if (format->codec_frequency != st->samplerate)
     {
