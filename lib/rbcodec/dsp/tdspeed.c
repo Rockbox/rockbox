@@ -83,6 +83,37 @@ static const int buffer_sizes[NBUFFERS] =
 /* Processed buffer passed out to later stages */
 static struct dsp_buffer dsp_outbuf;
 
+/* Blend overlapping frame samples according to position */
+#if defined(CPU_COLDFIRE)
+static inline int32_t blend_frame_samples(int32_t curr, int32_t prev,
+                                          int i, int j, int order)
+{
+    int32_t a0, a1;
+    asm (
+        "mac.l     %2, %3, %%acc0 \n" /* acc = curr*(i<<(30-order)) >> 23 */
+        "mac.l     %4, %5, %%acc0 \n" /* acc += prev*(j<<(30-order)) >> 23 */
+        "moveq.l   #1, %0         \n" /* Prepare mask */
+        "move.l    %%accext01, %1 \n" /* Get extension bits */
+        "lsr.l     #7, %1         \n" /* Get bit 7 of LSb extension ... */
+        "and.l     %0, %1         \n" /* ... into bit 0 */
+        "movclr.l  %%acc0, %0     \n" /* Get result >> 8 */
+        "asl.l     #1, %0         \n" /* Everything x2 */
+        "or.l      %1, %0         \n" /* Insert proper LSb from extension */
+        : "=d"(a0), "=d"(a1)
+        : "r"(curr), "r"(i << order),
+          "r"(prev), "r"(j << order));
+
+    return a0;
+}
+#else
+/* Generic */
+static inline int32_t blend_frame_samples(int32_t curr, int32_t prev,
+                                          int i, int j, int order)
+{
+    return (curr * (int64_t)i + prev * (int64_t)j) >> order;
+}
+#endif /* CPU_* */
+
 /* Discard all data */
 static void tdspeed_flush(void)
 {
@@ -121,6 +152,11 @@ static bool tdspeed_update(int32_t samplerate, int32_t factor)
         st->dst_order++;
 
     st->dst_step = (1 << st->dst_order);
+#ifdef CPU_COLDFIRE
+    /* blend_frame_samples works in s0.31 mode. Also must shift by
+       one less bit before mac in order not to overflow. */
+    st->dst_order = 30 - st->dst_order;
+#endif
     st->src_step = st->dst_step * factor / PITCH_SPEED_100;
     st->shift_max = (st->dst_step > st->src_step) ?
                         st->dst_step : st->src_step;
@@ -272,9 +308,8 @@ skip:;
             for (int i = 0, j = st->dst_step; j; i++, j--)
             {
                 assert(d < buf_out[ch] + out_size);
-
-                *d++ = (*curr++ * (int64_t)i +
-                        *prev++ * (int64_t)j) >> st->dst_order;
+                *d++ = blend_frame_samples(*curr++, *prev++, i, j,
+                                           st->dst_order);
             }
 
             dest[ch] = d;
