@@ -336,8 +336,8 @@ skip:;
 
         for (int ch = 0; ch < st->channels; ch++)
         {
-            memcpy(st->ovl_buff[ch], buf_in[ch] + i,
-                   st->ovl_size * sizeof(int32_t));
+            memmove(st->ovl_buff[ch], buf_in[ch] + i,
+                    st->ovl_size * sizeof(int32_t));
         }
 
         if (consumed)
