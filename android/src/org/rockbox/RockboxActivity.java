@@ -60,11 +60,14 @@ public class RockboxActivity extends Activity
             @Override
             protected void onReceiveResult(final int resultCode, final Bundle resultData)
             {
+                RockboxFramebuffer fb;
                 switch (resultCode) {
                     case RockboxService.RESULT_INVOKING_MAIN:
                         if (loadingdialog != null)
                             loadingdialog.dismiss();
-                        setContentView(new RockboxFramebuffer(RockboxActivity.this));
+                        fb = new RockboxFramebuffer(RockboxActivity.this);
+                        setContentView(fb);
+                        fb.requestFocus();
                         break;
                     case RockboxService.RESULT_LIB_LOAD_PROGRESS:
                         if (loadingdialog == null)
@@ -78,7 +81,11 @@ public class RockboxActivity extends Activity
                         break;
                     case RockboxService.RESULT_SERVICE_RUNNING:
                         if (!unzip) /* defer to RESULT_INVOKING_MAIN */
-                            setContentView(new RockboxFramebuffer(RockboxActivity.this));
+                        {
+                            fb = new RockboxFramebuffer(RockboxActivity.this);
+                            setContentView(fb);
+                            fb.requestFocus();
+                        }
                         setServiceActivity(true);
                         break;
                     case RockboxService.RESULT_ERROR_OCCURED:
