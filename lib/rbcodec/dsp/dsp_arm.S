@@ -24,7 +24,7 @@
  *  void channel_mode_proc_mono(struct dsp_proc_entry *this,
  *                              struct dsp_buffer **buf_p)
  */
-    .section .text
+    .section    .text, "ax",%progbits
     .global channel_mode_proc_mono
     .type   channel_mode_proc_mono, %function
 channel_mode_proc_mono:
@@ -66,7 +66,7 @@ channel_mode_proc_mono:
  * void channel_mode_proc_custom(struct dsp_proc_entry *this,
  *                               struct dsp_buffer **buf_p)
  */
-    .section .text
+    .section    .text, "ax",%progbits
     .global channel_mode_proc_custom
     .type   channel_mode_proc_custom, %function
 channel_mode_proc_custom:
@@ -141,7 +141,7 @@ channel_mode_proc_custom:
  *  void channel_mode_proc_karaoke(struct dsp_proc_entry *this,
  *                                 struct dsp_buffer **buf_p)
  */
-    .section .text
+    .section    .text, "ax",%progbits
     .global channel_mode_proc_karaoke
     .type   channel_mode_proc_karaoke, %function
 channel_mode_proc_karaoke:
@@ -186,7 +186,7 @@ channel_mode_proc_karaoke:
  * void crossfeed_process(struct dsp_proc_entry *this,
  *                        struct dsp_buffer **buf_p)
  */
-    .section .text
+    .section    .text, "ax",%progbits
     .global crossfeed_process
 crossfeed_process:
     @ input: r0 = this, r1 = buf_p
@@ -251,7 +251,7 @@ crossfeed_process:
  *                           struct dsp_buffer *src,
  *                           struct dsp_buffer *dst)
  */
-    .section    .text
+    .section    .text, "ax",%progbits
     .global     lin_resample_resample
 lin_resample_resample:
     @input: r0 = data, r1 = src, r2 = dst
@@ -358,7 +358,7 @@ lin_resample_resample:
 /****************************************************************************
  *  void pga_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
  */
-    .section .text
+    .section    .text, "ax",%progbits
     .global pga_process
     .type   pga_process, %function
 pga_process:
@@ -414,9 +414,9 @@ pga_process:
 #define HIGH_PRECISION 0
 
 #if CONFIG_CPU == PP5002
-    .section    .icode
+    .section    .icode,"ax",%progbits
 #else
-    .text
+    .section    .text, "ax",%progbits
 #endif
     .global filter_process
 filter_process:
@@ -476,7 +476,7 @@ filter_process:
  *                          struct dsp_buffer *src,
  *                          struct dsp_buffer *dst)
  */
-    .section .icode
+    .section    .icode,"ax",%progbits
     .global sample_output_mono
     .type   sample_output_mono, %function
 sample_output_mono:
@@ -540,7 +540,7 @@ sample_output_mono:
  *                          struct dsp_buffer *src,
  *                          struct dsp_buffer *dst)
  */
-    .section .icode
+    .section    .icode,"ax",%progbits
     .global sample_output_stereo
     .type   sample_output_stereo, %function
 sample_output_stereo:
