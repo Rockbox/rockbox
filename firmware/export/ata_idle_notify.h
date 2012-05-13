@@ -43,10 +43,10 @@ enum {
     DISK_EVENT_SPINUP = (EVENT_CLASS_DISK|1),
 };
 
-#define USING_STORAGE_CALLBACK  (CONFIG_PLATFORM & PLATFORM_NATIVE) \
-                            && ! ((CONFIG_STORAGE & STORAGE_NAND) \
-                               && (CONFIG_NAND == NAND_IFP7XX)) \
-                            && !defined(BOOTLOADER)
+#define USING_STORAGE_CALLBACK  ((CONFIG_STORAGE & STORAGE_NAND) \
+                                && (CONFIG_NAND == NAND_IFP7XX)) \
+                                && !defined(BOOTLOADER) || \
+                                (CONFIG_PLATFORM & PLATFORM_HOSTED)
 
 extern void register_storage_idle_func(void (*function)(void *data));
 #if USING_STORAGE_CALLBACK
