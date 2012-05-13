@@ -214,40 +214,41 @@ static void codec_pcmbuf_insert_callback(
         const void *ch1, const void *ch2, int count)
 {
     struct dsp_buffer src;
-
     src.remcount  = count;
     src.pin[0]    = ch1;
     src.pin[1]    = ch2;
     src.proc_mask = 0;
 
-    while (1)
+    while (LIKELY(queue_empty(&codec_queue)) ||
+           codec_check_queue__have_msg() >= 0)
     {
         struct dsp_buffer dst;
         dst.remcount = 0;
         dst.bufcount = MAX(src.remcount, 1024); /* Arbitrary min request */
 
-        while ((dst.p16out = pcmbuf_request_buffer(&dst.bufcount)) == NULL)
+        if ((dst.p16out = pcmbuf_request_buffer(&dst.bufcount)) == NULL)
         {
             cancel_cpu_boost();
 
             /* It may be awhile before space is available but we want
                "instant" response to any message */
             queue_wait_w_tmo(&codec_queue, NULL, HZ/20);
+        }
+        else
+        {
+            dsp_process(ci.dsp, &src, &dst);
 
-            if (!queue_empty(&codec_queue) &&
-                codec_check_queue__have_msg() < 0)
+            if (dst.remcount > 0)
             {
-                return;
+                pcmbuf_write_complete(dst.remcount, ci.id3->elapsed,
+                                      ci.id3->offset);
+            }
+            else if (src.remcount <= 0)
+            {
+                return; /* No input remains and DSP purged */
             }
         }
-
-        dsp_process(ci.dsp, &src, &dst);
-
-        if (dst.remcount > 0)
-            pcmbuf_write_complete(dst.remcount, ci.id3->elapsed, ci.id3->offset);
-        else if (src.remcount <= 0)
-            break; /* No input remains and DSP purged */
-    }
+    }    
 }
 
 /* helper function, not a callback */
@@ -360,9 +361,12 @@ static enum codec_command_action
     {
         enum codec_command_action action = CODEC_ACTION_NULL;
         struct queue_event ev;
-        queue_wait(&codec_queue, &ev);
 
-        switch (ev.id)
+        queue_peek(&codec_queue, &ev); /* Find out what it is */
+
+        long id = ev.id;
+
+        switch (id)
         {
         case Q_CODEC_RUN:   /* Already running */
             LOGFQUEUE("codec < Q_CODEC_RUN");
@@ -370,27 +374,30 @@ static enum codec_command_action
 
         case Q_CODEC_PAUSE: /* Stay here and wait */
             LOGFQUEUE("codec < Q_CODEC_PAUSE");
+            queue_wait(&codec_queue, &ev);  /* Remove message */
             codec_queue_ack(Q_CODEC_PAUSE);
+            queue_wait(&codec_queue, NULL); /* Wait for next (no remove) */
             continue;
 
         case Q_CODEC_SEEK:  /* Audio wants codec to seek */
             LOGFQUEUE("codec < Q_CODEC_SEEK %ld", ev.data);
             *param = ev.data;
             action = CODEC_ACTION_SEEK_TIME;
+            trigger_cpu_boost();
             break;
 
         case Q_CODEC_STOP:  /* Must only return 0 in main loop */
             LOGFQUEUE("codec < Q_CODEC_STOP");
-            action = CODEC_ACTION_HALT;
             dsp_configure(ci.dsp, DSP_FLUSH, 0); /* Discontinuity */
-            break;
+            return CODEC_ACTION_HALT; /* Leave in queue */
 
         default:            /* This is in error in this context. */
-            ev.id = Q_NULL;
             logf("codec bad req %ld (%s)", ev.id, __func__);
+            id = Q_NULL;
         }
 
-        codec_queue_ack(ev.id);
+        queue_wait(&codec_queue, &ev); /* Actually remove it */
+        codec_queue_ack(id);
         return action;
     }
 }
