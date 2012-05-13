@@ -740,6 +740,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                     line = (adj_y - y_offset) / line_height;
                     if (list_display_title(list, screen))
                         line -= 1; /* adjust for the list title */
+                    if (line >= list->nb_items)
+                        return ACTION_NONE;
                     list->selected_item = list_start_item+line;
                     gui_synclist_speak_item(list);
                 }
