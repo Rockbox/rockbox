@@ -45,6 +45,7 @@ struct mixer_channel
     pcm_play_callback_type get_more; /* Registered callback */
     enum channel_status status;      /* Playback status */
     uint32_t amplitude;              /* Amp. factor: 0x0000 = mute, 0x10000 = unity */
+    chan_buffer_hook_fn_type buffer_hook; /* Callback for new buffer */
 };
 
 /* Forget about boost here for the moment */
@@ -106,6 +107,12 @@ static void mixer_pcm_callback(const void **addr, size_t *size)
     *size = next_size;
 }
 
+static inline void chan_call_buffer_hook(struct mixer_channel *chan)
+{
+    if (UNLIKELY(chan->buffer_hook))
+        chan->buffer_hook(chan->start, chan->size);
+}
+
 /* Buffering callback - calls sub-callbacks and mixes the data for next
    buffer to be sent from mixer_pcm_callback() */
 static enum pcm_dma_status MIXER_CALLBACK_ICODE
@@ -149,6 +156,8 @@ fill_frame:
                 channel_stopped(chan);
                 continue;
             }
+
+            chan_call_buffer_hook(chan);
         }
 
         /* Channel will play for at least part of this frame */
@@ -298,6 +307,7 @@ void mixer_channel_play_data(enum pcm_mixer_channel channel,
         chan->get_more = get_more;
 
         mixer_activate_channel(chan);
+        chan_call_buffer_hook(chan);
         mixer_start_pcm();
     }
     else
@@ -403,6 +413,18 @@ void mixer_adjust_channel_address(enum pcm_mixer_channel channel,
     pcm_play_lock();
     /* Makes no difference if it's stopped */
     channels[channel].start += offset;
+    pcm_play_unlock();
+}
+
+/* Set a hook that is called upon getting a new source buffer for a channel
+   NOTE: Called for each buffer, not each mixer chunk */
+void mixer_channel_set_buffer_hook(enum pcm_mixer_channel channel,
+                                   chan_buffer_hook_fn_type fn)
+{
+    struct mixer_channel *chan = &channels[channel];
+
+    pcm_play_lock();
+    chan->buffer_hook = fn;
     pcm_play_unlock();
 }
 
