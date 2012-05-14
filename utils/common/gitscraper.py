@@ -19,7 +19,7 @@
 
 This module provides functions to get a subset of files from a git repository.
 The files to retrieve can be specified, and the git tree to work on can be
-specified. That was arbitrary trees can be retrieved (like a subset of files
+specified. That way arbitrary trees can be retrieved (like a subset of files
 for a given tag).
 
 Retrieved files can be packaged into a bzip2 compressed tarball or stored in a
