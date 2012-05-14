@@ -191,6 +191,7 @@ win32 {
     # support.
     DEFINES += __USE_MINGW_ANSI_STDIO=1
     DEFINES += _CRT_SECURE_NO_WARNINGS
+    DEFINES += UNICODE
     LIBS += -lsetupapi -lnetapi32
 }
 win32:static {
