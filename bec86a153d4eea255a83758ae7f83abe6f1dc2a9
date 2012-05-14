@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAKH///yg\u003d",
+        "filename": "rbutil/rbutilqt/base/rbsettings.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2012-05-14T07:46:41Z",
+      "side": 1,
+      "message": "Please use a consistent naming with the rest for the ini string: either lower_case_word or CamelCaseWord. I would also rename the enum value to RbSettings::ShowChangelog -- it\u0027s not a hint about a changelog and we don\u0027t \"boot\" an application :)",
+      "revId": "bec86a153d4eea255a83758ae7f83abe6f1dc2a9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///yY\u003d",
+        "filename": "rbutil/rbutilqt/changelog.ui",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2012-05-14T07:46:41Z",
+      "side": 1,
+      "message": "please use \"changelogfrm.ui\" as filename -- all forms (should) have the \"frm\" suffix to make them easier to recognize (it\u0027s debatable if this is a good thing, but for now I prefer consistency :)",
+      "revId": "bec86a153d4eea255a83758ae7f83abe6f1dc2a9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///yc\u003d",
+        "filename": "rbutil/rbutilqt/rbutilqt.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2012-05-14T07:46:41Z",
+      "side": 1,
+      "message": "Please don\u0027t use line splicing here -- line splicing is only necessary in macros, in normal code it is not necessary. You should also use tr() for the text to make it translatable. I.e.\n\nsetText(tr(\"This is a new installation \"\n    \"of Rockbox Utility\"));",
+      "revId": "bec86a153d4eea255a83758ae7f83abe6f1dc2a9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
