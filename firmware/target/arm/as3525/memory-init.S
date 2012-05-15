@@ -126,30 +126,44 @@ memory_init:
     mov     r1, #0                          @ virtual address
     mov     r2, #0x1000                     @ size (all memory)
     mov     r3, #CACHE_NONE
+    orr     r3, r3, #(1<<10)                @ AP = 01 = RW
     bl      map_section
 
     mov     r0, #0                          @ physical address
     ldr     r1, =IRAM_ORIG                  @ virtual address
     mov     r2, #1                          @ size : 1MB
     mov     r3, #CACHE_ALL
+    orr     r3, r3, #(1<<10)                @ AP = 01 = RW
     bl      map_section
 
     mov     r0, #0                          @ physical address
     ldr     r1, =UNCACHED_ADDR(IRAM_ORIG)   @ virtual address
     mov     r2, #1                          @ size : 1MB
     mov     r3, #CACHE_NONE
+    orr     r3, r3, #(1<<10)                @ AP = 01 = RW
     bl      map_section
 
     mov     r0, #0x30000000                 @ physical address
     mov     r1, #DRAM_ORIG                  @ virtual address
     mov     r2, #MEMORYSIZE                 @ size
     mov     r3, #CACHE_ALL
+    orr     r3, r3, #(1<<10)                @ AP = 01 = RW
+    bl      map_section
+
+    mov     r0, #0x30000000                 @ physical address
+    mov     r1, #DRAM_ORIG                  @ virtual address
+    add     r1, r1, #((MEMORYSIZE+1) * 0x100000)
+    mov     r2, #MEMORYSIZE                 @ size
+    mov     r3, #(1 << 3)           @ cacheable
+    add     r3, #(1 << 5)           @ domain 1 (Client)
+@    orr     r3, r3, #(1<<10)                @ AP = 01 = RW
     bl      map_section
 
     mov     r0, #0x30000000                 @ physical address
     mov     r1, #UNCACHED_ADDR(DRAM_ORIG)   @ virtual address
     mov     r2, #MEMORYSIZE                 @ size
     mov     r3, #CACHE_NONE
+    orr     r3, r3, #(1<<10)                @ AP = 01 = RW
     bl      map_section
 
     /* map 1st mbyte of RAM at 0x0 to have exception vectors available */
@@ -161,6 +175,7 @@ memory_init:
     mov     r1, #0                          @ virtual address
     mov     r2, #1                          @ size
     mov     r3, #CACHE_ALL
+    orr     r3, r3, #(1<<10)                @ AP = 01 = RW
     bl      map_section
 
     bl      enable_mmu

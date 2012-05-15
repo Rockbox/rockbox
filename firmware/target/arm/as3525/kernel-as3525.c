@@ -22,6 +22,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"
+#include "cpu.h"
 #include "timer.h"
 
 #if INCREASED_SCROLLWHEEL_POLLING
@@ -45,6 +46,15 @@ static inline void do_scrollwheel(void)
 #else
 static inline void do_scrollwheel(void)
 {
+    static int x = 0;
+    if (++x == 500) {
+        asm volatile(
+                "mvn     r1, #0                  @\n"
+                "bic     r1, r1, #(1 << 3)       @ D1 = Client (access are checked)\n"
+                "mcr     p15, 0, r1, c3, c0, 0   @ Set all domains to manager status\n"
+                : : : "r1");
+
+    }
     call_tick_tasks();      /* Run through the list of tick tasks */
 }
 #endif

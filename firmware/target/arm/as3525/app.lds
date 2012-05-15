@@ -26,6 +26,7 @@ STARTUP(target/arm/crt0.o)
 #define IRAMSIZE (0x20000)
 #endif
 
+#define DRAM_RO_OFFSET (DRAM_SIZE + 0x100000)
 
 /* Where the codec buffer ends, and the plugin buffer starts */
 #if CODEC_BUFFER_FILLS_IRAM
@@ -46,14 +47,15 @@ MEMORY
 SECTIONS
 {
     loadaddress = DRAM_ORIG;
+    . = DRAM_ORIG;
 
-    .vectors :
+    .vectors . + DRAM_RO_OFFSET:
     {
         _vectors_start = .;
         *(.init.text)
-    } > DRAM
+    } AT> DRAM
 
-    .text :
+    .text . :
     {
         _loadaddress = .;
         _textstart = .;
@@ -61,13 +63,15 @@ SECTIONS
         *(.glue_7)
         *(.glue_7t)
         . = ALIGN(0x4);
-    } > DRAM
+    } AT> DRAM
 
-    .rodata :
+    .rodata . :
     {
         *(.rodata*)
         . = ALIGN(0x4);
-    } > DRAM
+    } AT> DRAM
+
+    . = ALIGN(0x1000);
 
     .data :
     {

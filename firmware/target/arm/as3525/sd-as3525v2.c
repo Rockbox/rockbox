@@ -712,6 +712,8 @@ static void init_controller(void)
 
 int sd_init(void)
 {
+    //char *b = sd_thread_name;
+    //*b = 'l';
     int ret;
 
     bitset32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
