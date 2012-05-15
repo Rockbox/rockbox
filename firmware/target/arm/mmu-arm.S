@@ -93,6 +93,7 @@ ttb_init:
     ldr     r0, =TTB_BASE_ADDR      @
     mvn     r1, #0                  @
     mcr     p15, 0, r0, c2, c0, 0   @ Set the TTB base address
+    bic     r1, r1, #(1 << 3)       @ D1 = Client (access are checked)
     mcr     p15, 0, r1, c3, c0, 0   @ Set all domains to manager status
     bx      lr                      @
     .size   ttb_init, .-ttb_init
@@ -117,8 +118,9 @@ map_section:
     @  3,2: Cache flags (flags (r3))
     @  1:   Section signature
     orr     r0, r0, r3
-    orr     r0, r0, #0x410
-    orr     r0, r0, #0x2
+@    orr     r0, r0, #(1<<10) @ AP bit = 01 = RW
+    orr     r0, r0, #0x10 @ always 1
+    orr     r0, r0, #0x2  @ section sig
 
     @ unsigned int* ttbPtr = TTB_BASE + (va >> 20);
     @ sections are 1MB size
@@ -160,6 +162,7 @@ enable_mmu:
     orr     r0, r0, #1              @ enable mmu bit, i and dcache
     orr     r0, r0, #1<<2           @ enable dcache
     orr     r0, r0, #1<<12          @ enable icache
+    orr     r0, r0, #1<<9           @ ROM protection (read-only)
     mcr     p15, 0, r0, c1, c0, 0   @
     nop                             @
     nop                             @
