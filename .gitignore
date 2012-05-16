@@ -5,6 +5,8 @@
 *.elf
 *.exe
 *.so
+*.o
+*.a
 
 # android: java build system
 /android/bin
