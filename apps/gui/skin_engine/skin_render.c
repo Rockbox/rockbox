@@ -84,8 +84,6 @@ static void skin_render_playlistviewer(struct playlistviewer* viewer,
 #endif
 
 static char* skin_buffer;
-/* hack alert: fix skin_parser.c's skin_buffer pointer */
-void skinparser_set_buffer(char* pointer);
 
 static inline struct skin_element*
 get_child(OFFSETTYPE(struct skin_element**) children, int child)
@@ -720,7 +718,6 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
     struct align_pos * align = &info.align;
     bool needs_update;
     skin_buffer = get_skin_buffer(gwps->data);
-    skinparser_set_buffer(skin_buffer);
 #ifdef HAVE_LCD_BITMAP
     /* Set images to not to be displayed */
     struct skin_token_list *imglist = SKINOFFSETTOPTR(skin_buffer, gwps->data->images);
@@ -805,7 +802,6 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     
     int old_refresh_mode = refresh_mode;
     skin_buffer = get_skin_buffer(gwps->data);
-    skinparser_set_buffer(skin_buffer);
     
 #ifdef HAVE_LCD_CHARCELLS
     int i;
