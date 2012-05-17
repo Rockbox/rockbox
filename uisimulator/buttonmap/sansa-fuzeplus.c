@@ -78,15 +78,17 @@ int key_to_button(int keyboard_button)
 }
 
 struct button_map bm[] = {
-    { SDLK_KP8,          70, 265, 35, "Up" },
-    { SDLK_KP9,         141, 255, 31, "Play/Pause" },
-    { SDLK_LEFT,         69, 329, 31, "Left" },
-    { SDLK_SPACE,       141, 330, 20, "Select" },
-    { SDLK_RIGHT,       214, 331, 23, "Right" },
-    { SDLK_KP1,          69, 406, 30, "Bottom Left" },
-    { SDLK_KP3,         142, 406, 30, "Bottom Right" },
-    { SDLK_DOWN,        221, 384, 24, "Down" },
-    { SDLK_KP_MINUS,    270, 150, 25, "Volume -" },
-    { SDLK_KP_PLUS,     270, 180, 25, "Volume +" },
+    { SDLK_KP7,        69, 401, 39, "Back" },
+    { SDLK_KP8,       161, 404, 34, "Up" },
+    { SDLK_KP9,       258, 400, 43, "Play/Pause" },
+    { SDLK_KP4,        69, 477, 36, "Left" },
+    { SDLK_KP5,       161, 476, 31, "Select" },
+    { SDLK_KP6,       222, 474, 41, "Right" },
+    { SDLK_KP1,        82, 535, 34, "Bottom-Left" },
+    { SDLK_KP2,       162, 532, 33, "Down" },
+    { SDLK_KP3,       234, 535, 42, "Bottom-Right" },
+    { SDLK_KP_PLUS,     1, 128, 29, "Vol+" },
+    { SDLK_KP_MINUS,    5, 187, 30, "Vol-" },
+    { SDLK_HOME,      170,   6, 50, "Power" },
     { 0, 0, 0, 0, "None" }
 };
