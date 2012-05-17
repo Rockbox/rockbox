@@ -161,11 +161,18 @@ static int move_callback(int handle, void *current, void *new)
     /* Have to adjust the pointers that point into things in voice_buf */
     off_t diff = new - current;
     struct voice_thread_data *td = voice_buf->td;
-    td->src.p32[0] = SKIPBYTES(td->src.p32[0], diff);
-    td->src.p32[1] = SKIPBYTES(td->src.p32[1], diff);
-    if (td->dst != NULL) /* Only when calling dsp_process */
-        td->dst->p16out = SKIPBYTES(td->dst->p16out, diff);
-    mixer_adjust_channel_address(PCM_MIXER_CHAN_VOICE, diff);
+
+    if (td != NULL)
+    {
+        td->src.p32[0] = SKIPBYTES(td->src.p32[0], diff);
+        td->src.p32[1] = SKIPBYTES(td->src.p32[1], diff);
+
+        if (td->dst != NULL) /* Only when calling dsp_process */
+            td->dst->p16out = SKIPBYTES(td->dst->p16out, diff);
+
+        mixer_adjust_channel_address(PCM_MIXER_CHAN_VOICE, diff);
+    }
+
     voice_buf = new;
 
     return BUFLIB_CB_OK;
@@ -322,10 +329,7 @@ static void voice_data_init(struct voice_thread_data *td)
     dsp_configure(td->dsp, DSP_SET_STEREO_MODE, STEREO_MONO);
 
     mixer_channel_set_amplitude(PCM_MIXER_CHAN_VOICE, MIX_AMP_UNITY);
-
-    voice_buf->frame_in = voice_buf->frame_out = 0;
     voice_buf->td = td;
-    td->dst = NULL;
 }
 
 /* Voice thread message processing */
@@ -535,6 +539,8 @@ void voice_thread_init(void)
         voice_buf_hid = 0;
         return;
     }
+
+    memset(voice_buf, 0, sizeof (*voice_buf));
 
     logf("Starting voice thread");
     queue_init(&voice_queue, false);
