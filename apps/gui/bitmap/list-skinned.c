@@ -177,6 +177,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     struct gui_wps wps;
     if (!skinlist_is_configured(screen, list))
         return false;
+
     current_list = list;
     wps.display = display;
     wps.data = listcfg[screen]->data;
@@ -265,10 +266,6 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     display->set_viewport(parent);
     display->update_viewport();
     current_drawing_line = list->selected_item;
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    /* Abuse the callback to force the sbs to update */
-    send_event(LCD_EVENT_ACTIVATION, NULL);
-#endif
     return true;
 }
 
