@@ -506,6 +506,24 @@ const struct xchar_info xchar_info_newlcd[] = {
     { 0x0457, XF_CYR_yi,     1, 0x69 }, /* cyrillic yi */
     { 0x0458, 0, 0, 0x6a }, /* cyrillic je */
 
+    /* extra punctuation */
+    { 0x2013, 0, 0, 0x2d }, /* en dash */
+    { 0x2014, 0, 0, 0x2d }, /* em dash */
+
+    { 0x2018, 0, 0, 0x27 }, /* left single quotation mark */
+    { 0x2019, 0, 0, 0x27 }, /* right single quotation mark */
+    { 0x201a, 0, 0, 0x2c }, /* single low-9 quotation mark */
+    { 0x201b, 0, 0, 0x27 }, /* single high-reversed-9 quotation mark */
+    { 0x201c, 0, 0, 0x22 }, /* left double quotation mark */
+    { 0x201d, 0, 0, 0x22 }, /* right double quotation mark */
+    { 0x201e, 0, 0, 0x22 }, /* double low-9 quotation mark */
+    { 0x201f, 0, 0, 0x22 }, /* double high-reversed-9 quotation mark */
+
+    { 0x2022, 0, 0, 0xa5 }, /* bullet */
+
+    { 0x2039, 0, 0, 0x3c }, /* single left-pointing angle quotation mark */
+    { 0x203a, 0, 0, 0x3e }, /* single right-pointing angle quotation mark */
+
     /* Runtime-definable characters */
     { 0xe000, 0x8000, 15, 0x20 }, /* variable character 0 */
     { 0xe001, 0x8001, 15, 0x20 }, /* variable character 1 */
@@ -1013,6 +1031,24 @@ const struct xchar_info xchar_info_oldlcd[] = {
     { 0x0456, 0, 0, 0x6d }, /* cyrillic byeloruss-ukr. i */
     { 0x0457, 0, 0, 0xa3 }, /* cyrillic yi */
     { 0x0458, 0, 0, 0x6e }, /* cyrillic je */
+
+    /* extra punctuation */
+    { 0x2013, 0, 0, 0x31 }, /* en dash */
+    { 0x2014, 0, 0, 0x31 }, /* em dash */
+
+    { 0x2018, 0, 0, 0x2b }, /* left single quotation mark */
+    { 0x2019, 0, 0, 0x2b }, /* right single quotation mark */
+    { 0x201a, 0, 0, 0x30 }, /* single low-9 quotation mark */
+    { 0x201b, 0, 0, 0x2b }, /* single high-reversed-9 quotation mark */
+    { 0x201c, 0, 0, 0x26 }, /* left double quotation mark */
+    { 0x201d, 0, 0, 0x26 }, /* right double quotation mark */
+    { 0x201e, 0, 0, 0x26 }, /* double low-9 quotation mark */
+    { 0x201f, 0, 0, 0x26 }, /* double high-reversed-9 quotation mark */
+
+    { 0x2022, XF_MIDDLEDOT, 1, 0x32 }, /* bullet */
+
+    { 0x2039, 0, 0, 0x40 }, /* single left-pointing angle quotation mark */
+    { 0x203a, 0, 0, 0x42 }, /* single right-pointing angle quotation mark */
 
     /* Runtime-definable characters */
     { 0xe000, 0x8000, 15, 0x24 }, /* variable character 0 */
