@@ -34,7 +34,7 @@ if [ -z $GNU_MIRROR ] ; then
 fi
 
 # These are the tools this script requires and depends upon.
-reqtools="gcc bzip2 gzip make patch makeinfo automake libtool"
+reqtools="gcc bzip2 gzip make patch makeinfo automake libtool autoconf flex bison"
 
 ##############################################################################
 # Functions:
