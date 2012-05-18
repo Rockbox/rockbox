@@ -40,6 +40,10 @@ $(TOOLSDIR)/convttf: $(TOOLSDIR)/convttf.c
 	$(SILENT)$(HOSTCC) $(TOOLSFLAGS) -lm -O2 -Wall -g $+ -o $@ \
 		`freetype-config --libs` `freetype-config --cflags`
 
+$(TOOLSDIR)/player_unifont: $(TOOLSDIR)/player_unifont.c $(ROOTDIR)/firmware/drivers/lcd-charset-player.c
+	$(call PRINTS,CC $(@F))
+	$(SILENT)$(HOSTCC) $(TOOLSFLAGS) -DARCHOS_PLAYER -D__PCTOOL__ -I$(ROOTDIR)/firmware/export -I. $+ -o $@
+
 # implicit rule for simple tools
 $(TOOLSDIR)/%: $(TOOLSDIR)/%.c
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$@))

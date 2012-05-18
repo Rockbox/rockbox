@@ -23,6 +23,9 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mkboot $(TOOLSDIR)/iaudio_bl_flash.c \
 	$(TOOLSDIR)/iaudio_bl_flash.h
 
+ifeq ($(MODELNAME),archosplayer)
+  TOOLS += $(TOOLSDIR)/player_unifont
+endif
 
 ifeq (,$(PREFIX))
 ifdef APP_TYPE
