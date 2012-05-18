@@ -219,7 +219,7 @@ int main(int argc, char **argv)
         of = fopen("isomini.cp", "wb");
         if (!of) return 1;
 
-        for (i=1; i<6; i++) {
+        for (i=1; i<7; i++) {
 
             for (j=0; j<128; j++) {
                 k = (unsigned char)j + 128;
