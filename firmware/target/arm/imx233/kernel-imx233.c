@@ -23,6 +23,16 @@
 #include "clkctrl-imx233.h"
 #include "kernel-imx233.h"
 
+#ifdef SANSA_FUZEPLUS
+#define TICK_TIMER_NR   0
+#elif defined(CREATIVE_ZENXFI2)
+#define TICK_TIMER_NR   0
+#elif defined(CREATIVE_ZENXFI3)
+#define TICK_TIMER_NR   0
+#else
+#error Select tick timer !
+#endif
+
 static void tick_timer(void)
 {
     /* Run through the list of tick tasks */

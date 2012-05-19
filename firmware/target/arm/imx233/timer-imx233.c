@@ -22,6 +22,16 @@
 #include "timrot-imx233.h"
 #include "timer.h"
 
+#ifdef SANSA_FUZEPLUS
+#define USER_TIMER_NR   1
+#elif defined(CREATIVE_ZENXFI2)
+#define USER_TIMER_NR   1
+#elif defined(CREATIVE_ZENXFI3)
+#define USER_TIMER_NR   1
+#else
+#error Select user timer !
+#endif
+
 static long timer_cycles = 0;
 
 static void timer_fn(void)

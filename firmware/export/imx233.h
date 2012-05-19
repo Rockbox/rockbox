@@ -64,13 +64,6 @@
 /* Timer runs at APBX speed which is derived from ref_xtal@24MHz */
 #define TIMER_FREQ      24000000
 
-#ifdef SANSA_FUZEPLUS
-#define TICK_TIMER_NR   0
-#define USER_TIMER_NR   1
-#else
-#error Select timers !
-#endif
-
 /* USBOTG */
 #define USB_QHARRAY_ATTR    __attribute__((section(".qharray"),nocommon,aligned(2048)))
 #define USB_NUM_ENDPOINTS   5
@@ -84,6 +77,8 @@
 #define __REG_SET(reg)  (*((volatile uint32_t *)(&reg + 1)))
 #define __REG_CLR(reg)  (*((volatile uint32_t *)(&reg + 2)))
 #define __REG_TOG(reg)  (*((volatile uint32_t *)(&reg + 3)))
+#define __REG_SET_CLR(reg, set) \
+    (*((volatile uint32_t *)(&reg + (set ? 1 : 2))))
 
 #define __BLOCK_SFTRST  (1 << 31)
 #define __BLOCK_CLKGATE (1 << 30)
@@ -93,5 +88,6 @@
 #define __XTRACT(reg, field)    ((reg & reg##__##field##_BM) >> reg##__##field##_BP)
 #define __XTRACT_EX(val, field)    (((val) & field##_BM) >> field##_BP)
 #define __FIELD_SET(reg, field, val) reg = (reg & ~reg##__##field##_BM) | (val << reg##__##field##_BP)
+#define __FIELD_SET_CLR(reg, field, set) __REG_SET_CLR(reg, set) = reg##__##field
 
 #endif /* __IMX233_H__ */
