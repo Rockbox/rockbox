@@ -148,7 +148,7 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     if (!triggered)
     {
         triggered = true;
-        //backtrace(pc, __get_sp(), &line);
+        backtrace(pc, __get_sp(), &line);
     }
 
     lcd_update();
