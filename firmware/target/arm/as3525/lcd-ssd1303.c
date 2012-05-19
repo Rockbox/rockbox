@@ -288,15 +288,26 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     /* The Y coordinates have to work on even 8 pixel rows */
     if (x < 0)
-        height += x, x = 0;
+    {
+        width += x;
+        x = 0;
+    }
+
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x;
+
     if (width <= 0)
         return; /* nothing left to do, 0 is harmful to lcd_write_data() */
+
     if (y < 0)
-        height += y, y = 0;
+    {
+        height += y;
+        y = 0;
+    }
+
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
+
     if (height <= 0)
         return; /* nothing left to do */
 
