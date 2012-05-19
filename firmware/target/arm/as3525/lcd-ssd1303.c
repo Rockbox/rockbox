@@ -287,15 +287,21 @@ void lcd_update_rect(int x, int y, int width, int height)
         return;
 
     /* The Y coordinates have to work on even 8 pixel rows */
-    ymax = (y + height-1) >> 3;
-    y >>= 3;
-
-    if(x + width > LCD_WIDTH)
+    if (x < 0)
+        height += x, x = 0;
+    if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x;
     if (width <= 0)
         return; /* nothing left to do, 0 is harmful to lcd_write_data() */
-    if(ymax >= LCD_FBHEIGHT)
-        ymax = LCD_FBHEIGHT-1;
+    if (y < 0)
+        height += y, y = 0;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+    if (height <= 0)
+        return; /* nothing left to do */
+
+    ymax = (y + height-1) >> 3;
+    y >>= 3;
 
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)
