@@ -55,7 +55,8 @@ void INT_I2C_DMA(void)
 
 void imx233_i2c_init(void)
 {
-    imx233_reset_block(&HW_I2C_CTRL0);
+    //imx233_reset_block(&HW_I2C_CTRL0);
+    __REG_SET(HW_I2C_CTRL0) = __BLOCK_SFTRST;
     /* setup pins (must be done when shutdown) */
     imx233_pinctrl_acquire_pin(0, 30, "i2c");
     imx233_pinctrl_acquire_pin(0, 31, "i2c");
@@ -124,12 +125,12 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
     i2c_stage[i2c_nr_stages - 1].dma.cmd |= HW_APB_CHx_CMD__SEMAPHORE | HW_APB_CHx_CMD__IRQONCMPLT;
 
     __REG_CLR(HW_I2C_CTRL1) = HW_I2C_CTRL1__ALL_IRQ;
+    imx233_dma_reset_channel(APB_I2C);
     imx233_icoll_enable_interrupt(INT_SRC_I2C_DMA, true);
     imx233_dma_enable_channel_interrupt(APB_I2C, true);
-    imx233_dma_reset_channel(APB_I2C);
     imx233_dma_start_command(APB_I2C, &i2c_stage[0].dma);
 
-    enum imx233_i2c_error_t ret ;
+    enum imx233_i2c_error_t ret;
     if(semaphore_wait(&i2c_sema, timeout) == OBJ_WAIT_TIMEDOUT)
     {
         imx233_dma_reset_channel(APB_I2C);
