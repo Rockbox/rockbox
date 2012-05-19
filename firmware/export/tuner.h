@@ -139,6 +139,11 @@ extern int (*tuner_get)(int setting);
 #include "ipod_remote_tuner.h"
 #endif
 
+/* SigmaTel/Freescale STFM1000 */
+#if (CONFIG_TUNER & STFM1000)
+#include "stfm1000.h"
+#endif
+
 #if defined(SIMULATOR)
 #undef tuner_set
 int tuner_set(int setting, int value);

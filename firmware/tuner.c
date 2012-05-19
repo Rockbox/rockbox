@@ -94,6 +94,12 @@ void tuner_init(void)
                         rda5802_get,
                         rda5802_init())
     #endif
+    #if (CONFIG_TUNER & STFM1000)
+        TUNER_TYPE_CASE(STFM1000,
+                        stfm1000_set,
+                        stfm1000_get,
+                        stfm1000_init())
+    #endif
     }
 }
 #endif /* SIMULATOR */

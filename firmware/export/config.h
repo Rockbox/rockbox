@@ -42,6 +42,7 @@
 #define LV240000   0x20 /* Sanyo */
 #define IPOD_REMOTE_TUNER   0x40 /* Apple */
 #define RDA5802    0x80 /* RDA Microelectronics */
+#define STFM1000   0x100 /* Sigmatel */
 
 /* CONFIG_CODEC */
 #define MAS3587F 3587
@@ -294,6 +295,7 @@ Lyre prototype 1 */
 #define NAND_SAMSUNG 3
 #define NAND_CC      4 /* ChinaChip */
 #define NAND_RK27XX  5
+#define NAND_IMX233  6
 
 /* CONFIG_RTC */
 #define RTC_M41ST84W 1 /* Archos Recorder */
