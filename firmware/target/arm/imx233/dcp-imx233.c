@@ -116,7 +116,7 @@ static enum imx233_dcp_error_t imx233_dcp_job(int ch)
     /* if IRQs are not enabled, don't enable channel interrupt and do some polling */
     bool irq_enabled = irq_enabled();
     /* enable channel, clear interrupt, enable interrupt */
-    imx233_enable_interrupt(INT_SRC_DCP, true);
+    imx233_icoll_enable_interrupt(INT_SRC_DCP, true);
     if(irq_enabled)
         __REG_SET(HW_DCP_CTRL) = HW_DCP_CTRL__CHANNEL_INTERRUPT_ENABLE(ch);
     __REG_CLR(HW_DCP_STAT) = HW_DCP_STAT__IRQ(ch);

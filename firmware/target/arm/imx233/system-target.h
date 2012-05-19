@@ -25,6 +25,7 @@
 #include "mmu-arm.h"
 #include "panic.h"
 #include "clkctrl-imx233.h"
+#include "icoll-imx233.h"
 #include "clock-target.h" /* CPUFREQ_* are defined here */
 
 /* Digital control */
@@ -43,48 +44,6 @@
 
 #define HW_USBPHY_CTRL          (*(volatile uint32_t *)(HW_USBPHY_BASE + 0x30))
 
-/* Interrupt collector */
-#define HW_ICOLL_BASE           0x80000000
-
-#define HW_ICOLL_VECTOR         (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x0))
-
-#define HW_ICOLL_LEVELACK       (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x10))
-#define HW_ICOLL_LEVELACK__LEVEL0   0x1
-
-#define HW_ICOLL_CTRL           (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x20))
-#define HW_ICOLL_CTRL__IRQ_FINAL_ENABLE (1 << 16)
-#define HW_ICOLL_CTRL__ARM_RSE_MODE     (1 << 18)
-
-#define HW_ICOLL_VBASE          (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x40))
-#define HW_ICOLL_INTERRUPT(i)   (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x120 + (i) * 0x10))
-#define HW_ICOLL_INTERRUPT__PRIORITY_BM 0x3
-#define HW_ICOLL_INTERRUPT__ENABLE      0x4
-#define HW_ICOLL_INTERRUPT__SOFTIRQ     0x8
-#define HW_ICOLL_INTERRUPT__ENFIQ       0x10
-
-#define INT_SRC_SSP2_ERROR  2
-#define INT_SRC_VDD5V       3
-#define INT_SRC_DAC_DMA     5
-#define INT_SRC_DAC_ERROR   6
-#define INT_SRC_ADC_DMA     7
-#define INT_SRC_ADC_ERROR   8
-#define INT_SRC_USB_CTRL    11
-#define INT_SRC_SSP1_DMA    14
-#define INT_SRC_SSP1_ERROR  15
-#define INT_SRC_GPIO0       16
-#define INT_SRC_GPIO1       17
-#define INT_SRC_GPIO2       18
-#define INT_SRC_GPIO(i)     (INT_SRC_GPIO0 + (i))
-#define INT_SRC_SSP2_DMA    20
-#define INT_SRC_I2C_DMA     26
-#define INT_SRC_I2C_ERROR   27
-#define INT_SRC_TIMER(nr)   (28 + (nr))
-#define INT_SRC_LRADC_CHx(x)    (37 + (x))
-#define INT_SRC_LCDIF_DMA   45
-#define INT_SRC_LCDIF_ERROR 46
-#define INT_SRC_DCP         54
-#define INT_SRC_NR_SOURCES  66
-
 /**
  * Absolute maximum CPU speed: 454.74 MHz
  * Intermediate CPU speeds: 392.73 MHz, 360MHz, 261.82 MHz, 64 MHz
@@ -101,8 +60,6 @@
 #define CPUFREQ_MAX         IMX233_CPUFREQ_454_MHz
 #define CPUFREQ_SLEEP       IMX233_CPUFREQ_454_MHz
 
-void imx233_enable_interrupt(int src, bool enable);
-void imx233_softirq(int src, bool enable);
 void udelay(unsigned us);
 bool imx233_us_elapsed(uint32_t ref, unsigned us_delay);
 void imx233_reset_block(volatile uint32_t *block_reg);

@@ -124,7 +124,7 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
     i2c_stage[i2c_nr_stages - 1].dma.cmd |= HW_APB_CHx_CMD__SEMAPHORE | HW_APB_CHx_CMD__IRQONCMPLT;
 
     __REG_CLR(HW_I2C_CTRL1) = HW_I2C_CTRL1__ALL_IRQ;
-    imx233_enable_interrupt(INT_SRC_I2C_DMA, true);
+    imx233_icoll_enable_interrupt(INT_SRC_I2C_DMA, true);
     imx233_dma_enable_channel_interrupt(APB_I2C, true);
     imx233_dma_reset_channel(APB_I2C);
     imx233_dma_start_command(APB_I2C, &i2c_stage[0].dma);

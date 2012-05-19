@@ -111,6 +111,6 @@ void imx233_setup_pin_irq(int bank, int pin, bool enable_int,
             __REG_CLR(HW_PINCTRL_IRQPOL(bank)) = 1 << pin;
         __REG_SET(HW_PINCTRL_PIN2IRQ(bank)) = 1 << pin;
         __REG_SET(HW_PINCTRL_IRQEN(bank)) = 1 << pin;
-        imx233_enable_interrupt(INT_SRC_GPIO(bank), true);
+        imx233_icoll_enable_interrupt(INT_SRC_GPIO(bank), true);
     }
 }

@@ -58,13 +58,13 @@ void imx233_setup_timer(unsigned timer_nr, bool reload, unsigned count,
     if(fn != NULL)
     {
         /* enable interrupt */
-        imx233_enable_interrupt(INT_SRC_TIMER(timer_nr), true);
+        imx233_icoll_enable_interrupt(INT_SRC_TIMER(timer_nr), true);
         /* clear irq bit and enable */
         __REG_CLR(HW_TIMROT_TIMCTRL(timer_nr)) = HW_TIMROT_TIMCTRL__IRQ;
         __REG_SET(HW_TIMROT_TIMCTRL(timer_nr)) = HW_TIMROT_TIMCTRL__IRQ_EN;
     }
     else
-        imx233_enable_interrupt(INT_SRC_TIMER(timer_nr), false);
+        imx233_icoll_enable_interrupt(INT_SRC_TIMER(timer_nr), false);
     /* finally update */
     __REG_SET(HW_TIMROT_TIMCTRL(timer_nr)) = HW_TIMROT_TIMCTRL__UPDATE;
 

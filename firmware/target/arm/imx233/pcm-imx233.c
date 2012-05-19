@@ -103,8 +103,8 @@ void pcm_play_dma_init(void)
 void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();
-    imx233_enable_interrupt(INT_SRC_DAC_DMA, true);
-    imx233_enable_interrupt(INT_SRC_DAC_ERROR, true);
+    imx233_icoll_enable_interrupt(INT_SRC_DAC_DMA, true);
+    imx233_icoll_enable_interrupt(INT_SRC_DAC_ERROR, true);
     imx233_dma_enable_channel_interrupt(APB_AUDIO_DAC, true);
 }
 

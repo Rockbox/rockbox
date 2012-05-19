@@ -508,6 +508,7 @@ target/arm/imx233/sd-imx233.c
 target/arm/imx233/mmc-imx233.c
 target/arm/imx233/ssp-imx233.c
 target/arm/imx233/dma-imx233.c
+target/arm/imx233/icoll-imx233.c
 target/arm/imx233/pinctrl-imx233.c
 target/arm/imx233/power-imx233.c
 target/arm/imx233/powermgmt-imx233.c

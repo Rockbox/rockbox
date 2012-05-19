@@ -245,7 +245,7 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
 {
     mutex_lock(&ssp_mutex[ssp - 1]);
     /* Enable all interrupts */
-    imx233_enable_interrupt(INT_SRC_SSP_DMA(ssp), true);
+    imx233_icoll_enable_interrupt(INT_SRC_SSP_DMA(ssp), true);
     imx233_dma_enable_channel_interrupt(APB_SSP(ssp), true);
 
     unsigned xfer_size = block_count * (1 << ssp_log_block_size[ssp - 1]);

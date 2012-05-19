@@ -47,7 +47,7 @@ void usb_attach(void)
 
 void usb_drv_int_enable(bool enable)
 {
-    imx233_enable_interrupt(INT_SRC_USB_CTRL, enable);
+    imx233_icoll_enable_interrupt(INT_SRC_USB_CTRL, enable);
 }
 
 void INT_USB_CTRL(void)
