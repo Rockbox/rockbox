@@ -31,7 +31,7 @@
 #include "logf.h"
 
 #ifdef HAVE_LCD_ENABLE
-bool lcd_on; /* framebuffer-imx233.c */
+static bool lcd_on;
 #endif
 static unsigned lcd_yuv_options = 0;
 static int lcd_dcp_channel = -1;
