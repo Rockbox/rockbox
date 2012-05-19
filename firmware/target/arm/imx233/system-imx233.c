@@ -63,9 +63,16 @@ void system_exception_wait(void)
     _backlight_on();
     _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
     /* wait until button release (if a button is pressed) */
+#ifdef HAVE_BUTTON_DATA
+    int data;
+    while(button_read_device(&data));
+    /* then wait until next button press */
+    while(!button_read_device(&data));
+#else
     while(button_read_device());
     /* then wait until next button press */
     while(!button_read_device());
+#endif
 }
 
 int system_memory_guard(int newmode)
