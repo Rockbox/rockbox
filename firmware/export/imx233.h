@@ -86,6 +86,12 @@
 /* 32 bytes per cache line */
 #define CACHEALIGN_BITS     5
 
+#define ___ENSURE_ZERO(line, x) static uint8_t __ensure_zero_##line[-(x)] __attribute__((unused));
+#define __ENSURE_ZERO(x) ___ENSURE_ZERO(__LINE__, x)
+#define __ENSURE_MULTIPLE(x, y) __ENSURE_ZERO((x) % (y))
+#define __ENSURE_CACHELINE_MULTIPLE(x) __ENSURE_MULTIPLE(x, 1 << CACHEALIGN_BITS)
+#define __ENSURE_STRUCT_CACHE_FRIENDLY(name) __ENSURE_CACHELINE_MULTIPLE(sizeof(name))
+
 #define __XTRACT(reg, field)    ((reg & reg##__##field##_BM) >> reg##__##field##_BP)
 #define __XTRACT_EX(val, field)    (((val) & field##_BM) >> field##_BP)
 #define __FIELD_SET(reg, field, val) reg = (reg & ~reg##__##field##_BM) | (val << reg##__##field##_BP)

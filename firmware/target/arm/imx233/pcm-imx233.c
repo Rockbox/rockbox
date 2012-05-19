@@ -26,8 +26,17 @@
 #include "pcm-internal.h"
 #include "audioout-imx233.h"
 
+struct pcm_dma_command_t
+{
+    struct apb_dma_command_t dma;
+    /* padded to next multiple of cache line size (32 bytes) */
+    uint32_t pad[5];
+} __attribute__((packed)) CACHEALIGN_ATTR;
+
+__ENSURE_STRUCT_CACHE_FRIENDLY(struct pcm_dma_command_t)
+
 static int locked = 0;
-static struct apb_dma_command_t dac_dma;
+static struct pcm_dma_command_t dac_dma;
 static bool pcm_freezed = false;
 
 /**
@@ -37,14 +46,14 @@ static bool pcm_freezed = false;
 
 static void play(const void *addr, size_t size)
 {
-    dac_dma.next = NULL;
-    dac_dma.buffer = (void *)addr;
-    dac_dma.cmd = HW_APB_CHx_CMD__COMMAND__READ |
+    dac_dma.dma.next = NULL;
+    dac_dma.dma.buffer = (void *)addr;
+    dac_dma.dma.cmd = HW_APB_CHx_CMD__COMMAND__READ |
         HW_APB_CHx_CMD__IRQONCMPLT |
         HW_APB_CHx_CMD__SEMAPHORE |
         size << HW_APB_CHx_CMD__XFER_COUNT_BP;
     /* dma subsystem will make sure cached stuff is written to memory */
-    imx233_dma_start_command(APB_AUDIO_DAC, &dac_dma);
+    imx233_dma_start_command(APB_AUDIO_DAC, &dac_dma.dma);
 }
 
 void INT_DAC_DMA(void)

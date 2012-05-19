@@ -34,7 +34,11 @@ struct i2c_dma_command_t
     struct apb_dma_command_t dma;
     /* PIO words */
     uint32_t ctrl0;
-};
+    /* padded to next multiple of cache line size (32 bytes) */
+    uint32_t pad[4];
+} __attribute__((packed)) CACHEALIGN_ATTR;
+
+__ENSURE_STRUCT_CACHE_FRIENDLY(struct i2c_dma_command_t)
 
 #define I2C_NR_STAGES   4
 /* Current transfer */

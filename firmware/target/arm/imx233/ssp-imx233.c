@@ -43,7 +43,11 @@ struct ssp_dma_command_t
     uint32_t ctrl0;
     uint32_t cmd0;
     uint32_t cmd1;
-};
+    /* padded to next multiple of cache line size (32 bytes) */
+    uint32_t pad[2];
+} __attribute__((packed)) CACHEALIGN_ATTR;
+
+__ENSURE_STRUCT_CACHE_FRIENDLY(struct ssp_dma_command_t)
 
 static bool ssp_in_use[2];
 static int ssp_nr_in_use = 0;

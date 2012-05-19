@@ -118,6 +118,10 @@
  * COMMON *
  **********/
 
+/* DMA structures should be cache aligned and be padded so that their size
+ * is a multiple of a cache line size. Otherwise some nasty side effects
+ * could occur with adjacents data fields.
+ * The same apply to DMA buffers for the same reasons */
 struct apb_dma_command_t
 {
     struct apb_dma_command_t *next;
