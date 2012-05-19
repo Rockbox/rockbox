@@ -429,7 +429,13 @@ sub buildzip {
     if ($modelname =~ /samsungypr0/) {
         glob_copy("$ROOT/utils/ypr0tools/rockbox.sh", "$temp_dir/");
     }
-    
+    # add .nomedia on Android
+    # in the zip.
+    if ($modelname =~ /android/) {
+        open(NOMEDIA, ">$temp_dir/.nomedia")  || die "can't open .nomedia";
+        close(NOMEDIA);
+    }
+
     glob_mkdir("$temp_dir/langs");
     glob_mkdir("$temp_dir/rocks");
     glob_mkdir("$temp_dir/rocks/games");
