@@ -179,7 +179,7 @@ $releasenotes="/wiki/ReleaseNotes3112";
     },
     'mrobe100' => {
         name => 'Olympus M-Robe 100',
-        status => 3,
+        status => 2,
     },
     'mrobe500' => {
         name => 'Olympus M-Robe 500',
