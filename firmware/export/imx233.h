@@ -83,7 +83,8 @@
 #define __BLOCK_SFTRST  (1 << 31)
 #define __BLOCK_CLKGATE (1 << 30)
 
-#define CACHEALIGN_BITS     4
+/* 32 bytes per cache line */
+#define CACHEALIGN_BITS     5
 
 #define __XTRACT(reg, field)    ((reg & reg##__##field##_BM) >> reg##__##field##_BP)
 #define __XTRACT_EX(val, field)    (((val) & field##_BM) >> field##_BP)
