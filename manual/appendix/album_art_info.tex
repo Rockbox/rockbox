@@ -1,0 +1,51 @@
+\chapter{\label{ref:album_art}Album Art}
+Rockbox allows you to put the album art, or another image related to the music
+on your \dap{} to display it in the PictureFlow plugin\opt{albumart}{ or in the
+theme}. For this feature to work, there are a few requirements.
+
+\section{Limitations}
+
+\opt{albumart}{%
+   Rockbox supports embedded album art only for some specific formats, see
+  \reference{ref:featureset_for_generic_metadata_tags} for full details. It additionally
+  supports loading images located on the \disk{}. PictureFlow is currently unable to
+  use embedded album art.
+}%
+\nopt{albumart}{%
+   Rockbox currently only supports loading images located on the
+   \disk{} for use in PictureFlow.
+}%
+The image files must be in either BMP or JPEG format\opt{albumart}{, while embedded
+album art is currently limited to JPEG.  Embedded JPEG images must not be
+unsynchronized}. Rockbox does not support RLE-compressed BMP files, nor does it
+support progressive and multi-scan JPEG files.
+JPEG files must consist of a single scan with interleaved components, 
+as progessive and multi-scan images require much more memory to decode.
+
+\section{Where to put album art}
+
+The pictures can be named a number of different ways, and placed to a number of
+different locations. You can have pictures specific to the file or the album
+or use a generic picture. You can place the picture in the same directory
+as the file, in the parent directory or in a fixed directory named
+\fname{/.rockbox/albumart/}. The order Rockbox uses when looking for a picture
+is as follows (a list in braces means that those file extensions are tried in
+that order):
+
+\begin{enumerate}
+\item  embedded (JPEG images in ID3v2 or MP4 tags only)
+\item  \fname{./filename.\{jpeg,jpg,bmp\}}
+\item  \fname{./albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{./cover.\{jpeg,jpg,bmp\}}
+\item  \fname{./folder.jpg}
+\item  \fname{/.rockbox/albumart/albumartist-albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{../albumtitle.\{jpeg,jpg,bmp\}}
+\item  \fname{../cover.\{jpeg,jpg,bmp\}}
+\end{enumerate}
+
+The following characters will be replaced with an underscore (\_) when looking
+for albumtitle.bmp or albumartist-albumtitle.bmp: \textbackslash{} / : <
+> ? * |. Doublequotes will be replaced by single quotes.
+If no album artist is set, artist will be used instead. See \wikilink{AlbumArt}
+in the wiki for programs that will help you automate the process of putting
+album art on your \dap{}.
