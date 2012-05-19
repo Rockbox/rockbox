@@ -48,6 +48,46 @@ static struct
     { "ssp2", APB_SSP(2) },
 };
 
+static struct
+{
+    const char *name;
+    unsigned src;
+} dbg_irqs[] =
+{
+    { "ssp2_err", INT_SRC_SSP2_ERROR },
+    { "vdd5v", INT_SRC_VDD5V },
+    { "dac_dma", INT_SRC_DAC_DMA },
+    { "dac_err", INT_SRC_DAC_ERROR },
+    { "adc_dma", INT_SRC_ADC_DMA },
+    { "adc_err", INT_SRC_ADC_ERROR },
+    { "usbctrl", INT_SRC_USB_CTRL },
+    { "ssp1_dma", INT_SRC_SSP1_DMA },
+    { "ssp1_err", INT_SRC_SSP1_ERROR },
+    { "gpio0", INT_SRC_GPIO0 },
+    { "gpio1", INT_SRC_GPIO1 },
+    { "gpio2", INT_SRC_GPIO2 },
+    { "ssp2_dma", INT_SRC_SSP2_DMA },
+    { "i2c_dma", INT_SRC_I2C_DMA },
+    { "i2c_err", INT_SRC_I2C_ERROR },
+    { "timer0", INT_SRC_TIMER(0) },
+    { "timer1", INT_SRC_TIMER(1) },
+    { "timer2", INT_SRC_TIMER(2) },
+    { "timer3", INT_SRC_TIMER(3) },
+    { "touch_det", INT_SRC_TOUCH_DETECT },
+    { "lradc_ch0", INT_SRC_LRADC_CHx(0) },
+    { "lradc_ch1", INT_SRC_LRADC_CHx(1) },
+    { "lradc_ch2", INT_SRC_LRADC_CHx(2) },
+    { "lradc_ch3", INT_SRC_LRADC_CHx(3) },
+    { "lradc_ch4", INT_SRC_LRADC_CHx(4) },
+    { "lradc_ch5", INT_SRC_LRADC_CHx(5) },
+    { "lradc_ch6", INT_SRC_LRADC_CHx(6) },
+    { "lradc_ch7", INT_SRC_LRADC_CHx(7) },
+    { "lcdif_dma", INT_SRC_LCDIF_DMA },
+    { "lcdif_err", INT_SRC_LCDIF_ERROR },
+    { "rtc_1msec", INT_SRC_RTC_1MSEC },
+    { "dcp", INT_SRC_DCP },
+};
+
 bool dbg_hw_info_dma(void)
 {
     lcd_setfont(FONT_SYSFIXED);
@@ -395,6 +435,51 @@ bool dbg_hw_info_dcp(void)
     }
 }
 
+bool dbg_hw_info_icoll(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    int first_irq = 0;
+    int dbg_irqs_count = sizeof(dbg_irqs) / sizeof(dbg_irqs[0]);
+    int line_count = lcd_getheight() / font_get(lcd_getfont())->height;
+    
+    while(1)
+    {
+        int button = get_action(CONTEXT_STD, HZ / 10);
+        switch(button)
+        {
+            case ACTION_STD_NEXT:
+                first_irq++;
+                if(first_irq >= dbg_irqs_count)
+                    first_irq = dbg_irqs_count - 1;
+                break;
+            case ACTION_STD_PREV:
+                first_irq--;
+                if(first_irq < 0)
+                    first_irq = 0;
+                break;
+            case ACTION_STD_OK:
+            case ACTION_STD_MENU:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACTION_STD_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        for(int i = first_irq, j = 0; i < dbg_irqs_count && j < line_count; i++, j++)
+        {
+            struct imx233_icoll_irq_info_t info = imx233_icoll_get_irq_info(dbg_irqs[i].src);
+            lcd_putsf(0, j, "%s", dbg_irqs[i].name);
+            if(info.enabled)
+                lcd_putsf(10, j, "%d", info.freq);
+        }
+        lcd_update();
+        yield();
+    }
+}
+
 bool dbg_hw_info_pinctrl(void)
 {
     lcd_setfont(FONT_SYSFIXED);
@@ -456,7 +541,8 @@ bool dbg_hw_info(void)
 {
     return dbg_hw_info_clkctrl() && dbg_hw_info_dma() && dbg_hw_info_adc() &&
         dbg_hw_info_power() && dbg_hw_info_powermgmt() && dbg_hw_info_rtc() &&
-        dbg_hw_info_dcp() && dbg_hw_info_pinctrl() && dbg_hw_target_info();
+        dbg_hw_info_dcp() && dbg_hw_info_pinctrl() && dbg_hw_info_icoll() &&
+        dbg_hw_target_info();
 }
 
 bool dbg_ports(void)
