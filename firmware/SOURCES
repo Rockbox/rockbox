@@ -1132,6 +1132,7 @@ target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #endif /* CREATIVE_ZVx */
 
 #ifdef CREATIVE_ZENXFI2
+target/arm/imx233/creative-zenxfi2/fmradio-i2c-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/backlight-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/lcd-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/button-zenxfi2.c
