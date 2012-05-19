@@ -13,6 +13,7 @@
 # See apps/language.c (TODO: Use common include for both)
 # Cookie and binary version for the binary lang file
 my $LANGUAGE_COOKIE   = 0x1a;
+my $VOICE_COOKIE      = 0x9a;
 my $LANGUAGE_VERSION  = 0x06;
 my $LANGUAGE_FLAG_RTL = 0x01;
 
@@ -37,6 +38,10 @@ Usage: genlang [options] <langv2 file>
  -b=<outfile>
     Make the tool create a binary language (.lng) file named [outfile].
     The use of this option requires that you also use -e, -t and -i.
+
+ -c=<outfile>
+    Create binary voicestring file named [outfile]. Works like -b and can be
+    used the same time.
 
  -u
     Update language file. Given the translated file and the most recent english
@@ -89,18 +94,19 @@ my $prefix = $p;
 my $binary = $b;
 my $update = $u;
 my $sortfile = $s;
+my $binvoice = $c;
 
 my $english = $e;
 my $voiceout = $o;
 
-my $check = ($binary?1:0) + ($prefix?1:0) + ($update?1:0) + ($voiceout?1:0) + ($sortfile?1:0);
+my $check = ($binary?.5:0) + ($prefix?1:0) + ($update?1:0) + ($voiceout?1:0) + ($sortfile?1:0) + ($binvoice?.5:0);
 
 if($check > 1) {
-    print STDERR "Please use only one of -p, -u, -o, -b and -s\n";
+    print STDERR "Please use only one of -p, -u, -o, -b, -c and -s\n";
     exit;
 }
 if(!$check) {
-    print STDERR "Please use at least one of -p, -u, -o, -b and -s\n";
+    print STDERR "Please use at least one of -p, -u, -o, -c, -e and -s\n";
     exit;
 }
 
@@ -724,7 +730,7 @@ MOO
     close(HFILE_CORE);
     close(CFILE_CORE);
 } # end of the c/h file generation
-elsif($binary) {
+elsif($binary || $binvoice) {
     # Creation of a binary lang file was requested
 
     # We must first scan the english file to get the correct order of the id
@@ -732,10 +738,18 @@ elsif($binary) {
     # files. The english file is scanned before the translated file was
     # scanned.
 
-    open(OUTF, ">$binary") or die "Error: Can't create $binary";
-    binmode OUTF;
-    printf OUTF ("%c%c%c%c", $LANGUAGE_COOKIE, $LANGUAGE_VERSION, $target_id,
-      $langoptions); # magic lang file header
+    if($binary) {
+        open(OUTF, ">$binary") or die "Error: Can't create $binary";
+        binmode OUTF;
+        printf OUTF ("%c%c%c%c", $LANGUAGE_COOKIE, $LANGUAGE_VERSION, $target_id,
+            $langoptions); # magic lang file header
+    }
+    if($binvoice) {
+        open(OUTV, ">$binvoice") or die "Error: Can't create $binary";
+        binmode OUTV;
+        printf OUTV ("%c%c%c%c", $VOICE_COOKIE, $LANGUAGE_VERSION, $target_id,
+            $langoptions); # magic lang file header
+    }
 
     # output the number of strings for each user
     my $foffset = $HEADER_SIZE + $SUBHEADER_SIZE * keys(%users);
@@ -744,18 +758,28 @@ elsif($binary) {
         for $n (0 .. $idcount[$_]-1) {
             $size += length(trim($dest{$idnum[$_][$n]})) + 1;
         }
-        printf OUTF ("%c%c%c%c%c%c", ($idcount[$_] >> 8), ($idcount[$_] & 0xff),
-                     ($size >> 8), ($size & 0xff), ($foffset >> 8), ($foffset & 0xff));
+        if($binary) {
+            printf OUTF ("%c%c%c%c%c%c", ($idcount[$_] >> 8), ($idcount[$_] & 0xff),
+                ($size >> 8), ($size & 0xff), ($foffset >> 8), ($foffset & 0xff));
+        }
+        if($binvoice) {
+            printf OUTV ("%c%c%c%c%c%c", ($idcount[$_] >> 8), ($idcount[$_] & 0xff),
+                ($size >> 8), ($size & 0xff), ($foffset >> 8), ($foffset & 0xff));
+        }
         $foffset += $size;
     }
 
     for (keys %users) {
         # loop over the target phrases
-        for $n (0 .. $idcount[$_]-1) {
+        # This loops over the strings in the translated language file order
+        my @ids = ((0 .. ($idcount[$_]-1)));
+        push @ids, (0x8000 .. ($voiceid[$_]-1));
+        for $n (@ids) {
             my $name=$idnum[$_][$n]; # get the ID
             my $dest = $dest{$name}; # get the destination phrase
+            my $voice = $voice{$name}; # get the destination voice string
 
-            if($dest) {
+            if($dest && $n < 0x8000 && $binary) {
                 $dest =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
 
                 # Now, make sure we get the number from the english sort order:
@@ -763,7 +787,19 @@ elsif($binary) {
 
                 printf OUTF ("%c%c%s\x00", ($idnum>>8), ($idnum&0xff), $dest);
             }
+            if($voice && $binvoice) {
+                $voice =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
+                # Now, make sure we get the number from the english sort order:
+                $idnum = $idmap[$_]{$name};
+                printf OUTV ("%c%c%s\x00", ($idnum>>8), ($idnum&0xff), $voice);
+            }
         }
+    }
+    if($binary) {
+        close(OUTF);
+    }
+    if($binvoice) {
+        close(OUTV);
     }
 }
 elsif($voiceout) {
