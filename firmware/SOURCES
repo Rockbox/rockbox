@@ -332,6 +332,9 @@ drivers/tuner/ipod_remote_tuner.c
 #if (CONFIG_TUNER & RDA5802)
 drivers/tuner/rda5802.c
 #endif /* (CONFIG_TUNER & RDA5802) */
+#if (CONFIG_TUNER & STFM1000)
+drivers/tuner/stfm1000.c
+#endif /* (CONFIG_TUNER & STFM1000) */
 #if defined(HAVE_RDS_CAP)
 drivers/rds.c
 #endif /* HAVE_RDS_CAP */
@@ -504,8 +507,12 @@ target/arm/imx233/clkctrl-imx233.c
 target/arm/imx233/system-imx233.c
 target/arm/imx233/timrot-imx233.c
 target/arm/imx233/kernel-imx233.c
+# if (CONFIG_STORAGE & STORAGE_SD)
 target/arm/imx233/sd-imx233.c
+# endif
+# if (CONFIG_STORAGE & STORAGE_MMC)
 target/arm/imx233/mmc-imx233.c
+# endif
 target/arm/imx233/partitions-imx233.c
 target/arm/imx233/ssp-imx233.c
 target/arm/imx233/dma-imx233.c
@@ -1123,6 +1130,33 @@ target/arm/tms320dm320/creative-zvm/power-creativezvm.c
 target/arm/tms320dm320/creative-zvm/powermgmt-creativezvm.c
 target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #endif /* CREATIVE_ZVx */
+
+#ifdef CREATIVE_ZENXFI2
+target/arm/imx233/creative-zenxfi2/backlight-zenxfi2.c
+target/arm/imx233/creative-zenxfi2/lcd-zenxfi2.c
+target/arm/imx233/creative-zenxfi2/button-zenxfi2.c
+target/arm/imx233/creative-zenxfi2/debug-zenxfi2.c
+target/arm/imx233/creative-zenxfi2/power-zenxfi2.c
+target/arm/imx233/creative-zenxfi2/adc-zenxfi2.c
+target/arm/imx233/creative-zenxfi2/powermgmt-zenxfi2.c
+#ifndef BOOTLOADER
+target/arm/imx233/creative-zenxfi2/audio-zenxfi2.c
+#endif
+#endif
+
+#ifdef CREATIVE_ZENXFI3
+drivers/mpr121.c
+target/arm/imx233/creative-zenxfi3/backlight-zenxfi3.c
+target/arm/imx233/creative-zenxfi3/lcd-zenxfi3.c
+target/arm/imx233/creative-zenxfi3/button-zenxfi3.c
+target/arm/imx233/creative-zenxfi3/debug-zenxfi3.c
+target/arm/imx233/creative-zenxfi3/power-zenxfi3.c
+target/arm/imx233/creative-zenxfi3/adc-zenxfi3.c
+target/arm/imx233/creative-zenxfi3/powermgmt-zenxfi3.c
+#ifndef BOOTLOADER
+target/arm/imx233/creative-zenxfi3/audio-zenxfi3.c
+#endif
+#endif
 
 #ifdef SANSA_CONNECT
 drivers/lcd-memframe.c

@@ -62,6 +62,28 @@ struct sd_config_t sd_config[] =
         .power_pin = PIN(0, 8),
         .ssp = 1
     },
+#elif defined(CREATIVE_ZENXFI2)
+    /* The Zen X-Fi2 uses pin B1P29 for power*/
+    {
+        .name = "microSD",
+        .flags = POWER_PIN | REMOVABLE | DETECT_INVERTED,
+        .power_pin = PIN(1, 29),
+        .ssp = 1,
+    },
+#elif defined(CREATIVE_ZENXFI3)
+    {
+        .name = "internal/SD",
+        .flags = WINDOW,
+        .ssp = 2
+    },
+    /* The Zen X-Fi3 uses pin #B0P07 for power*/
+    {
+        .name = "microSD",
+        .flags = POWER_PIN | POWER_INVERTED | REMOVABLE | POWER_DELAY,
+        .power_pin = PIN(0, 7),
+        .power_delay = HZ / 10, /* extra delay, to ramp up voltage? */
+        .ssp = 1
+    },
 #else
 #error You need to write the sd config!
 #endif

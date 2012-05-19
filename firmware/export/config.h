@@ -145,6 +145,8 @@
 #define HM801_PAD          51
 #define SANSA_CONNECT_PAD  52
 #define SAMSUNG_YPR0_PAD   53
+#define CREATIVE_ZENXFI2_PAD 54
+#define CREATIVE_ZENXFI3_PAD 55
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -244,6 +246,8 @@
 #define LCD_CONNECT   45 /* as used by the Sandisk Sansa Connect */
 #define LCD_GIGABEATS 46
 #define LCD_YPR0      47
+#define LCD_CREATIVEZXFI2 48 /* as used by the Creative Zen X-Fi2 */
+#define LCD_CREATIVEZXFI3 49 /* as used by the Creative Zen X-Fi3 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -417,6 +421,10 @@ Lyre prototype 1 */
 #include "config/zenvisionm60gb.h"
 #elif defined(CREATIVE_ZV)
 #include "config/zenvision.h"
+#elif defined(CREATIVE_ZENXFI2)
+#include "config/creativezenxfi2.h"
+#elif defined(CREATIVE_ZENXFI3)
+#include "config/creativezenxfi3.h"
 #elif defined(PHILIPS_SA9200)
 #include "config/gogearsa9200.h"
 #elif defined(PHILIPS_HDD1630)

@@ -1271,27 +1271,28 @@ cat <<EOF
  90) Zen Vision:M 30GB    100) GoGear SA9200     54) Sansa c100
  91) Zen Vision:M 60GB    101) GoGear HDD1630/   55) Sansa Clip
  92) Zen Vision                HDD1830           56) Sansa e200v2
-                          102) GoGear HDD6330    57) Sansa m200v4
- ==Onda==                                        58) Sansa Fuze
- 120) VX747               ==Meizu==              59) Sansa c200v2
- 121) VX767               110) M6SL              60) Sansa Clipv2
- 122) VX747+              111) M6SP              61) Sansa View
- 123) VX777               112) M3                62) Sansa Clip+
-                                                 63) Sansa Fuze v2
- ==Samsung==              ==Tatung==             64) Sansa Fuze+
- 140) YH-820              150) Elio TPJ-1022     65) Sansa Clip Zip
- 141) YH-920                                     66) Sansa Connect
- 142) YH-925              ==Packard Bell==
- 143) YP-S3               160) Vibe 500          ==Logik==
-                                                 80) DAX 1GB MP3/DAB
- ==Application==          ==MPIO==
- 200) SDL                 170) HD200             ==Lyre project==
- 201) Android             171) HD300             130) Lyre proto 1
- 202) Nokia N8xx                                 131) Mini2440
- 203) Nokia N900          ==ROCKCHIP==           ==HiFiMAN==
- 204) Pandora             180) rk27xx generic    190) HM-60x
- 205) Samsung YP-R0                              191) HM-801
-
+ 93) Zen X-Fi2            102) GoGear HDD6330    57) Sansa m200v4
+ 94) Zen X-Fi3                                   58) Sansa Fuze
+                          ==Meizu==              59) Sansa c200v2
+ ==Onda==                 110) M6SL              60) Sansa Clipv2
+ 120) VX747               111) M6SP              61) Sansa View
+ 121) VX767               112) M3                62) Sansa Clip+
+ 122) VX747+                                     63) Sansa Fuze v2
+ 123) VX777               ==Tatung==             64) Sansa Fuze+
+                          150) Elio TPJ-1022     65) Sansa Clip Zip
+ ==Samsung==                                     66) Sansa Connect
+ 140) YH-820              ==Packard Bell==
+ 141) YH-920              160) Vibe 500          ==Logik==
+ 142) YH-925                                     80) DAX 1GB MP3/DAB
+ 143) YP-S3               ==MPIO==
+                          170) HD200             ==Lyre project==
+ ==Application==          171) HD300             130) Lyre proto 1
+ 200) SDL                                        131) Mini2440
+ 201) Android             ==ROCKCHIP==
+ 202) Nokia N8xx          180) rk27xx generic    ==HiFiMAN==
+ 203) Nokia N900                                 190) HM-60x
+ 204) Pandora                                    191) HM-801
+ 205) Samsung YP-R0
 EOF
 
   buildfor=`input`;
@@ -2197,6 +2198,46 @@ fi
     t_cpu="arm"
     t_manufacturer="tms320dm320"
     t_model="creative-zvm"
+    ;;
+
+   93|creativezenxfi2)
+    target_id=80
+    modelname="creativezenxfi2"
+    target="CREATIVE_ZENXFI2"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zxf2"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenxfi2.creative"
+    appextra="gui:recorder:radio"
+    plugins="yes"
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zenxfi2"
+    arm926ejscc
+    ;;
+
+   94|creativezenxfi3)
+    target_id=81
+    modelname="creativezenxfi3"
+    target="CREATIVE_ZENXFI3"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zxf3"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenxfi3.creative"
+    appextra="gui:recorder:radio"
+    plugins="no"
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zenxfi3"
+    arm926ejscc
     ;;
 
    50|sansae200)

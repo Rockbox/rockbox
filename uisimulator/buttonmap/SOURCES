@@ -67,6 +67,8 @@ mpio-hd200.c
 mpio-hd300.c
 #elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
 sansa-fuzeplus.c
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD
+creative-zenxfi3.c
 #elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
 sansa-connect.c
 #endif

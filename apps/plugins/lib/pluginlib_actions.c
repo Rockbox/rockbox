@@ -118,6 +118,7 @@ const struct button_mapping pla_main_ctx[] =
     || (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD) \
     || (CONFIG_KEYPAD == SANSA_CONNECT_PAD) \
     || (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD) \
+    || (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD) \
     || (CONFIG_KEYPAD == HM60X_PAD) \
     || (CONFIG_KEYPAD == HM801_PAD))
     { PLA_UP,               BUTTON_UP,                          BUTTON_NONE },
@@ -417,6 +418,12 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD)
+    {PLA_CANCEL,            BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_VOL_UP,                      BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_VOL_UP|BUTTON_REL,           BUTTON_VOL_UP},
+    {PLA_SELECT_REPEAT,     BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
 #else
 #   ifndef HAVE_TOUCHSCREEN
 #       error pluginlib_actions: No actions defined
