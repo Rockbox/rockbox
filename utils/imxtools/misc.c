@@ -39,7 +39,7 @@ void *memdup(const void *p, size_t len)
 
 void generate_random_data(void *buf, size_t sz)
 {
-    int i = 0;
+    size_t i = 0;
     unsigned char* p = (unsigned char*)buf;
     while(i++ < sz)
         *p++ = rand();

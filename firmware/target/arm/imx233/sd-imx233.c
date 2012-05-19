@@ -414,7 +414,6 @@ int sd_init(void)
 
 static int transfer_sectors(IF_MD2(int drive,) unsigned long start, int count, void *buf, bool read)
 {
-    IF_MD((void) drive);
     int ret = 0;
     uint32_t resp;
 
