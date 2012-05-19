@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2011 by amaury Pouly
+ * Copyright (C) 2011 by Amaury Pouly
  *
  * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
  * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
@@ -170,8 +170,15 @@ void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
 /* after callback is fired, imx233_ssp_sdmmc_setup_detect needs to be called
  * to enable detection again. If first_time is true, the callback will
  * be called if the sd card is inserted when the function is called, otherwise
- * it will be called on the next insertion change. */
-void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn, bool first_time);
+ * it will be called on the next insertion change.
+ * By default, sd_detect=1 means sd inserted; invert reverses this behaviour */
+void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn,
+    bool first_time, bool invert);
+/* needs prior setup with imx233_ssp_sdmmc_setup_detect */
+bool imx233_ssp_sdmmc_is_detect_inverted(int spp);
+/* raw value of the detect pin */
+bool imx233_ssp_sdmmc_detect_raw(int ssp);
+/* corrected value given the invert setting */
 bool imx233_ssp_sdmmc_detect(int ssp);
 /* SD/MMC requires that the card be provided the clock during an init sequence of
  * at least 1msec (or 74 clocks). Does NOT touch the clock so it has to be correct. */
