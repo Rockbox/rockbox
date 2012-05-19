@@ -32,7 +32,6 @@ const static struct {
 } ServerInfoList[] = {
     { ServerInfo::CurReleaseVersion,    ":platform:/releaseversion", "" },
     { ServerInfo::CurStatus,            ":platform:/status",         "Unknown" },
-    { ServerInfo::DailyRevision,        "dailyrev",                  "" },
     { ServerInfo::DailyDate,            "dailydate",                 "" },
     { ServerInfo::BleedingRevision,     "bleedingrev",               "" },
     { ServerInfo::BleedingDate,         "bleedingdate",              "" },
@@ -44,7 +43,6 @@ void ServerInfo::readBuildInfo(QString file)
 {
     QSettings info(file, QSettings::IniFormat);
     
-    setValue(ServerInfo::DailyRevision,info.value("dailies/rev"));
     QDate date = QDate::fromString(info.value("dailies/date").toString(), "yyyyMMdd");
     setValue(ServerInfo::DailyDate,date.toString(Qt::ISODate));
    

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0" >
  <class>InstallWindowFrm</class>
  <widget class="QDialog" name="InstallWindowFrm" >
@@ -16,7 +17,7 @@
    <string>Install Rockbox</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2" >
-   <item rowspan="9" row="0" column="0" >
+   <item row="0" column="0" rowspan="9" >
     <widget class="QLabel" name="label" >
      <property name="text" >
       <string/>
@@ -48,21 +49,14 @@
       <item>
        <widget class="QRadioButton" name="radioStable" >
         <property name="text" >
-         <string>Rockbox &amp;stable</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioArchived" >
-        <property name="text" >
-         <string>&amp;Archived Build</string>
+         <string>&amp;Stable release</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QRadioButton" name="radioCurrent" >
         <property name="text" >
-         <string>&amp;Current Build</string>
+         <string>&amp;Development build</string>
         </property>
        </widget>
       </item>
@@ -173,7 +167,7 @@
       <item row="1" column="2" >
        <widget class="QPushButton" name="changeBackup" >
         <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>

@@ -32,7 +32,6 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
 
     connect(ui.radioStable, SIGNAL(toggled(bool)), this, SLOT(setDetailsStable(bool)));
     connect(ui.radioCurrent, SIGNAL(toggled(bool)), this, SLOT(setDetailsCurrent(bool)));
-    connect(ui.radioArchived, SIGNAL(toggled(bool)), this, SLOT(setDetailsArchived(bool)));
     connect(ui.changeBackup, SIGNAL(pressed()), this, SLOT(changeBackupPath()));
     connect(ui.backup, SIGNAL(stateChanged(int)), this, SLOT(backupCheckboxChanged(int)));
 
@@ -56,10 +55,6 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
     backupCheckboxChanged(Qt::Unchecked);
 
 
-    if(ServerInfo::value(ServerInfo::DailyRevision).toString().isEmpty()) {
-        ui.radioArchived->setEnabled(false);
-        qDebug() << "[Install] no information about archived version available!";
-    }
     if(ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty()) {
         ui.radioStable->setEnabled(false);
     }
@@ -69,24 +64,16 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
     if(RbSettings::value(RbSettings::Build).toString() == "stable"
         && !ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
         ui.radioStable->setChecked(true);
-    else if(RbSettings::value(RbSettings::Build).toString() == "archived")
-        ui.radioArchived->setChecked(true);
     else if(RbSettings::value(RbSettings::Build).toString() == "current")
         ui.radioCurrent->setChecked(true);
     else if(!ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty()) {
         ui.radioStable->setChecked(true);
         ui.radioStable->setEnabled(true);
-        QFont font;
-        font.setBold(true);
-        ui.radioStable->setFont(font);
     }
     else {
         ui.radioCurrent->setChecked(true);
         ui.radioStable->setEnabled(false);
         ui.radioStable->setChecked(false);
-        QFont font;
-        font.setBold(true);
-        ui.radioCurrent->setFont(font);
     }
 
 }
@@ -146,12 +133,6 @@ void InstallWindow::accept()
         RbSettings::setValue(RbSettings::Build, "stable");
         myversion = ServerInfo::value(ServerInfo::CurReleaseVersion).toString();
     }
-    else if(ui.radioArchived->isChecked()) {
-        file = SystemInfo::value(SystemInfo::DailyUrl).toString();
-        RbSettings::setValue(RbSettings::Build, "archived");
-        myversion = "r" + ServerInfo::value(ServerInfo::DailyRevision).toString()
-            + "-" + ServerInfo::value(ServerInfo::DailyDate).toString();
-    }
     else if(ui.radioCurrent->isChecked()) {
         file = SystemInfo::value(SystemInfo::BleedingUrl).toString();
         RbSettings::setValue(RbSettings::Build, "current");
@@ -163,7 +144,6 @@ void InstallWindow::accept()
     }
     file.replace("%MODEL%", buildname);
     file.replace("%RELVERSION%", ServerInfo::value(ServerInfo::CurReleaseVersion).toString());
-    file.replace("%REVISION%", ServerInfo::value(ServerInfo::DailyRevision).toString());
     file.replace("%DATE%", ServerInfo::value(ServerInfo::DailyDate).toString());
 
     RbSettings::sync();
@@ -274,14 +254,10 @@ void InstallWindow::setDetailsCurrent(bool show)
 {
     if(show) {
         ui.labelDetails->setText(tr("This is the absolute up to the minute "
-                "Rockbox built. A current build will get updated every time "
-                "a change is made. Latest version is %1 (%2).")
+                "Rockbox built. The development version will get updated every time "
+                "a change is made. Latest development version is %1 (%2).")
                 .arg(ServerInfo::value(ServerInfo::BleedingRevision).toString(),
                     ServerInfo::value(ServerInfo::BleedingDate).toString()));
-        if(ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
-            ui.labelNote->setText(tr("<b>This is the recommended version.</b>"));
-        else
-            ui.labelNote->setText("");
     }
 }
 
@@ -294,24 +270,9 @@ void InstallWindow::setDetailsStable(bool show)
 
         if(!ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
             ui.labelNote->setText(tr("<b>Note:</b> "
-            "The lastest released version is %1. "
-            "<b>This is the recommended version.</b>")
+            "The lastest stable version is %1.")
                     .arg(ServerInfo::value(ServerInfo::CurReleaseVersion).toString()));
         else ui.labelNote->setText("");
-    }
-}
-
-
-void InstallWindow::setDetailsArchived(bool show)
-{
-    if(show) {
-        ui.labelDetails->setText(tr("These are automatically built each day "
-        "from the current development source code. This generally has more "
-        "features than the last stable release but may be much less stable. "
-        "Features may change regularly."));
-        ui.labelNote->setText(tr("<b>Note:</b> archived version is %1 (%2).")
-            .arg(ServerInfo::value(ServerInfo::DailyRevision).toString(),
-                ServerInfo::value(ServerInfo::DailyDate).toString()));
     }
 }
 

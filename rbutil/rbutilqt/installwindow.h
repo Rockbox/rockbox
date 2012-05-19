@@ -53,7 +53,6 @@ class InstallWindow : public QDialog
     private slots:
         void setDetailsCurrent(bool);
         void setDetailsStable(bool);
-        void setDetailsArchived(bool);
         void done(bool);
         void changeBackupPath(void);
         void backupCheckboxChanged(int state);
