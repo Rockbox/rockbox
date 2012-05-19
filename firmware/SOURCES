@@ -506,6 +506,7 @@ target/arm/imx233/timrot-imx233.c
 target/arm/imx233/kernel-imx233.c
 target/arm/imx233/sd-imx233.c
 target/arm/imx233/mmc-imx233.c
+target/arm/imx233/partitions-imx233.c
 target/arm/imx233/ssp-imx233.c
 target/arm/imx233/dma-imx233.c
 target/arm/imx233/icoll-imx233.c
