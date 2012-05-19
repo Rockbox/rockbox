@@ -160,7 +160,7 @@ void lcd_clear_viewport(void)
             memset16(dst, current_vp->fg_pattern, len);
             dst += step;
         }
-        while (dst < dst_end);
+        while (dst <= dst_end);
     }
     else
     {
@@ -171,7 +171,7 @@ void lcd_clear_viewport(void)
                 memset16(dst, current_vp->bg_pattern, len);
                 dst += step;
             }
-            while (dst < dst_end);
+            while (dst <= dst_end);
         }
         else
         {
@@ -181,7 +181,7 @@ void lcd_clear_viewport(void)
                        len * sizeof(fb_data));
                 dst += step;
             }
-            while (dst < dst_end);
+            while (dst <= dst_end);
         }
     }
 
@@ -575,7 +575,7 @@ void lcd_fillrect(int x, int y, int width, int height)
         }
         dst += step;
     }
-    while (dst < dst_end);
+    while (dst <= dst_end);
 }
 
 /* About Rockbox' internal monochrome bitmap format:
