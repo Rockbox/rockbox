@@ -110,7 +110,8 @@ void system_init(void)
     imx233_pwm_init();
     imx233_lradc_init();
     imx233_i2c_init();
-#if defined(SANSA_FUZEPLUS) && !defined(BOOTLOADER)
+#if !defined(BOOTLOADER) && \
+    (defined(SANSA_FUZEPLUS) || defined(CREATIVE_ZENXFI3))
     fmradio_i2c_init();
 #endif
 }

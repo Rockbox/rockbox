@@ -1867,6 +1867,15 @@ static int radio_callback(int btn, struct gui_synclist *lists)
         }
     }
 #endif /* RDA55802 */
+#if (CONFIG_TUNER & STFM1000)
+    IF_TUNER_TYPE(STFM1000)
+    {
+        struct stfm1000_dbg_info nfo;
+        stfm1000_dbg_info(&nfo);
+        simplelist_addline(SIMPLELIST_ADD_LINE, "STFM1000 regs:");
+        simplelist_addline(SIMPLELIST_ADD_LINE,"chipid: 0x%x", nfo.chipid);
+    }
+#endif /* STFM1000 */
 
 #ifdef HAVE_RDS_CAP
         simplelist_addline(SIMPLELIST_ADD_LINE, "PI:%04X PS:'%8s'",

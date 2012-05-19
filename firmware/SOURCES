@@ -1146,6 +1146,7 @@ target/arm/imx233/creative-zenxfi2/audio-zenxfi2.c
 
 #ifdef CREATIVE_ZENXFI3
 drivers/mpr121.c
+target/arm/imx233/creative-zenxfi3/fmradio-i2c-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/backlight-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/lcd-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/button-zenxfi3.c

@@ -5,12 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
  * $Id$
  *
- * Tuner header for the STFM1000
- *
- * Copyright (C) 2012 Amaury Pouly
+ * Copyright (C) 2012 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,27 +19,22 @@
  *
  ****************************************************************************/
 
-#ifndef __STFM1000__
-#define __STFM1000__
-#include <stdint.h>
+#include "config.h"
+#include "system.h"
+#include "fmradio_i2c.h"
+#include "pinctrl-imx233.h"
+#include "i2c.h"
 
-#define HAVE_RADIO_REGION
-#define HAVE_RADIO_RSSI
-
-struct stfm1000_dbg_info
+void fmradio_i2c_init(void)
 {
-    uint32_t chipid;
-};
+}
 
-bool stfm1000_detect(void);
-void stfm1000_init(void);
-int stfm1000_set(int setting, int value);
-int stfm1000_get(int setting);
-void stfm1000_dbg_info(struct stfm1000_dbg_info *nfo);
+int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
+{
+    return i2c_write(address, buf, count);
+}
 
-#ifndef CONFIG_TUNER_MULTI
-#define tuner_set stfm1000_set
-#define tuner_get stfm1000_get
-#endif
-
-#endif /* __STFM1000__ */
+int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
+{
+    return i2c_read(address, buf, count);
+}
