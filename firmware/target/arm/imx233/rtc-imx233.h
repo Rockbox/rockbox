@@ -101,6 +101,20 @@ static inline uint32_t imx233_rtc_read_persistent(int idx)
     return HW_RTC_PERSISTENTx(idx);
 }
 
+static inline void imx233_rtc_clear_msec_irq(void)
+{
+    __REG_CLR(HW_RTC_CTRL) = HW_RTC_CTRL__ONEMSEC_IRQ;
+}
+
+static inline void imx233_rtc_enable_msec_irq(bool enable)
+{
+    imx233_rtc_clear_msec_irq();
+    if(enable)
+        __REG_SET(HW_RTC_CTRL) = HW_RTC_CTRL__ONEMSEC_IRQ_EN;
+    else
+        __REG_CLR(HW_RTC_CTRL) = HW_RTC_CTRL__ONEMSEC_IRQ_EN;
+}
+
 void imx233_rtc_write_seconds(uint32_t seconds);
 void imx233_rtc_write_persistent(int idx, uint32_t val);
 
