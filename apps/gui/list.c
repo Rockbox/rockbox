@@ -608,7 +608,7 @@ bool gui_synclist_keyclick_callback(int action, void* data)
  */
 static struct gui_synclist *current_lists;
 static bool ui_update_event_registered = false;
-void _lists_uiviewport_update_callback(void *data)
+static void _lists_uiviewport_update_callback(void *data)
 {
     (void)data;
     if (current_lists)
