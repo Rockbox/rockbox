@@ -79,7 +79,7 @@ class SystemInfo : public QObject
         static QStringList platforms(enum PlatformType type = PlatformAll,
                                      QString variant="");
         //! returns a map of all languages
-        static QMap<QString, QString> languages(void);
+        static QMap<QString, QStringList> languages(void);
         //! returns a map of usb-ids and their targets
         static QMap<int, QString> usbIdMap(enum MapType);
         //! get a value from system settings
