@@ -666,10 +666,11 @@ struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t si
     #undef fatal
 }
 
-struct sb_file_t *sb_read_memory(void *buf, size_t filesize, bool raw_mode, void *u,
+struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, void *u,
     sb_color_printf cprintf, enum sb_error_t *err)
 {
     struct sb_file_t *sb_file = NULL;
+    uint8_t *buf = _buf;
     
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
     #define fatal(e, ...) \
