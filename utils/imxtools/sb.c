@@ -630,32 +630,55 @@ static uint32_t guess_alignment(uint32_t off)
 struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
     sb_color_printf cprintf, enum sb_error_t *err)
 {
-    uint8_t *buf = NULL;
+    return sb_read_file_ex(filename, 0, -1, raw_mode, u, cprintf, err);
+}
+
+struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t size, bool raw_mode, void *u,
+    sb_color_printf cprintf, enum sb_error_t *err)
+{
+    #define fatal(e, ...) \
+        do { if(err) *err = e; \
+            cprintf(u, true, GREY, __VA_ARGS__); \
+            free(buf); \
+            return NULL; } while(0)
+
+    FILE *f = fopen(filename, "rb");
+    void *buf = NULL;
+    if(f == NULL)
+        fatal(SB_OPEN_ERROR, "Cannot open file for reading\n");
+    fseek(f, 0, SEEK_END);
+    size_t read_size = ftell(f);
+    fseek(f, offset, SEEK_SET);
+    if(size != (size_t)-1)
+        read_size = size;
+    buf = xmalloc(read_size);
+    if(fread(buf, read_size, 1, f) != 1)
+    {
+        fclose(f);
+        fatal(SB_READ_ERROR, "Cannot read file\n");
+    }
+    fclose(f);
+
+    struct sb_file_t *ret = sb_read_memory(buf, read_size, raw_mode, u, cprintf, err);
+    free(buf);
+    return ret;
+
+    #undef fatal
+}
+
+struct sb_file_t *sb_read_memory(void *buf, size_t filesize, bool raw_mode, void *u,
+    sb_color_printf cprintf, enum sb_error_t *err)
+{
     struct sb_file_t *sb_file = NULL;
     
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
     #define fatal(e, ...) \
         do { if(err) *err = e; \
             cprintf(u, true, GREY, __VA_ARGS__); \
-            free(buf); \
             sb_free(sb_file); \
             return NULL; } while(0)
     #define print_hex(c, p, len, nl) \
         do { printf(c, ""); print_hex(p, len, nl); } while(0)
-
-    FILE *f = fopen(filename, "rb");
-    if(f == NULL)
-        fatal(SB_OPEN_ERROR, "Cannot open file for reading\n");
-    fseek(f, 0, SEEK_END);
-    long filesize = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    buf = xmalloc(filesize);
-    if(fread(buf, filesize, 1, f) != 1)
-    {
-        fclose(f);
-        fatal(SB_READ_ERROR, "Cannot read file\n");
-    }
-    fclose(f);
     
     struct sha_1_params_t sha_1_params;
     sb_file = xmalloc(sizeof(struct sb_file_t));
@@ -1048,7 +1071,6 @@ struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
         printf(RED, " Failed\n");
         fatal(SB_CHECKSUM_ERROR, "File SHA-1 error\n");
     }
-    free(buf);
     
     return sb_file;
     #undef printf

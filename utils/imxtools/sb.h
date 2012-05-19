@@ -228,6 +228,11 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename);
 typedef void (*sb_color_printf)(void *u, bool err, color_t c, const char *f, ...);
 struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
     sb_color_printf printf, enum sb_error_t *err);
+/* use size_t(-1) to use maximum size */
+struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t size, bool raw_mode, void *u,
+    sb_color_printf printf, enum sb_error_t *err);
+struct sb_file_t *sb_read_memory(void *buffer, size_t size, bool raw_mode, void *u,
+    sb_color_printf printf, enum sb_error_t *err);
 
 void sb_fill_section_name(char name[5], uint32_t identifier);
 void sb_dump(struct sb_file_t *file, void *u, sb_color_printf printf);
