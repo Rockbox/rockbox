@@ -40,7 +40,8 @@ enum imx_error_t
     IMX_BOOT_MISMATCH = -6,
     IMX_BOOT_CHECKSUM_ERROR = -7,
     IMX_DONT_KNOW_HOW_TO_PATCH = -8,
-    IMX_FIRST_SB_ERROR = -9,
+    IMX_VARIANT_MISMATCH = -9,
+    IMX_FIRST_SB_ERROR = -10,
 };
 
 enum imx_output_type_t
@@ -50,12 +51,38 @@ enum imx_output_type_t
     IMX_SINGLEBOOT = 2,
 };
 
+/* Supported models */
+enum imx_model_t
+{
+    MODEL_UNKNOWN = -1,
+    MODEL_FUZEPLUS = 0,
+    MODEL_ZENXFI2 = 1,
+    MODEL_ZENXFI3 = 2,
+    /* new models go here */
+
+    NUM_MODELS
+};
+
+/* Supported firmware variants */
+enum imx_firmware_variant_t
+{
+    VARIANT_DEFAULT = 0,
+    /* For the Creative ZEN X-Fi2 */
+    VARIANT_ZENXFI2_NAND,
+    VARIANT_ZENXFI2_SD,
+    VARIANT_ZENXFI2_RECOVERY,
+    /* Last */
+    VARIANT_COUNT
+};
+
 struct imx_option_t
 {
     bool debug;
     enum imx_output_type_t output;
+    enum imx_firmware_variant_t fw_variant;
 };
 
+void dump_imx_dev_info(const char *prefix);
 enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     const char *outfile, struct imx_option_t opt);
 

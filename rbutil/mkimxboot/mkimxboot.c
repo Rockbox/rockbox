@@ -26,20 +26,22 @@
 #include "dualboot.h"
 #include "md5.h"
 
-/* Supported models */
-enum imx_model_t
+struct imx_fw_variant_desc_t
 {
-    MODEL_UNKNOWN = -1,
-    MODEL_FUZEPLUS = 0,
-    /* new models go here */
-
-    NUM_MODELS
+    /* Offset within file */
+    size_t offset;
+    /* Total size of the firmware */
+    size_t size;
 };
 
 struct imx_md5sum_t
 {
-    int model;
+    /* Device model */
+    enum imx_model_t model;
+    /* md5sum of the file */
     char *md5sum;
+    /* Variant descriptions */
+    struct imx_fw_variant_desc_t fw_variants[VARIANT_COUNT];
 };
 
 struct imx_model_desc_t
@@ -66,9 +68,38 @@ struct imx_model_desc_t
     uint32_t bootloader_addr;
 };
 
+static const char *imx_fw_variant[] =
+{
+    [VARIANT_DEFAULT] = "default",
+    [VARIANT_ZENXFI2_RECOVERY] = "ZEN X-Fi2 Recovery",
+    [VARIANT_ZENXFI2_NAND] = "ZEN X-Fi2 NAND",
+    [VARIANT_ZENXFI2_SD] = "ZEN X-Fi2 eMMC/SD",
+};
+
 static const struct imx_md5sum_t imx_sums[] =
 {
-    { MODEL_FUZEPLUS, "c3e27620a877dc6b200b97dcb3e0ecc7" }, /* Version 2.38.6 */
+    {
+        /* Version 2.38.6 */
+        MODEL_FUZEPLUS, "c3e27620a877dc6b200b97dcb3e0ecc7",
+        { [VARIANT_DEFAULT] = { 0, 34652624 } }
+    },
+    {
+        /* Version 1.23.01e */
+        MODEL_ZENXFI2, "e37e2c24abdff8e624d0a29f79157850",
+    },
+    {
+        /* Version 1.23.01e */
+        MODEL_ZENXFI2, "2beff2168212d332f13cfc36ca46989d",
+        { [VARIANT_ZENXFI2_RECOVERY] = { 0x93010, 684192},
+          [VARIANT_ZENXFI2_NAND] = { 0x13a0b0, 42410704 },
+          [VARIANT_ZENXFI2_SD] = { 0x29ac380, 42304208 }
+        }
+    },
+    {
+        /* Version 1.00.22e */
+        MODEL_ZENXFI3, "658a24eeef5f7186ca731085d8822a87",
+        { [VARIANT_DEFAULT] = {0, 18110576} }
+    },
 };
 
 static struct crypto_key_t zero_key =
@@ -79,8 +110,12 @@ static struct crypto_key_t zero_key =
 
 static const struct imx_model_desc_t imx_models[] =
 {
-    [MODEL_FUZEPLUS]  = { "Fuze+",  dualboot_fuzeplus, sizeof(dualboot_fuzeplus), "fuz+", 72,
+    [MODEL_FUZEPLUS] = { "Fuze+",  dualboot_fuzeplus, sizeof(dualboot_fuzeplus), "fuz+", 72,
                           1, &zero_key, 0, 0x40000000 },
+    [MODEL_ZENXFI2] = {"Zen X-Fi2", dualboot_zenxfi2, sizeof(dualboot_zenxfi2), "zxf2", 82,
+                       1, &zero_key, 0, 0x40000000 },
+    [MODEL_ZENXFI3] = {"Zen X-Fi3", dualboot_zenxfi3, sizeof(dualboot_zenxfi3), "zxf3", 83,
+                       1, &zero_key, 0, 0x40000000 },
 };
 
 #define NR_IMX_SUMS     (sizeof(imx_sums) / sizeof(imx_sums[0]))
@@ -212,7 +247,8 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
     }
 }
 
-static enum imx_error_t patch_firmware(int model, enum imx_output_type_t type,
+static enum imx_error_t patch_firmware(enum imx_model_t model,
+    enum imx_firmware_variant_t variant, enum imx_output_type_t type,
     struct sb_file_t *sb_file, void *boot, size_t boot_sz)
 {
     switch(model)
@@ -221,6 +257,23 @@ static enum imx_error_t patch_firmware(int model, enum imx_output_type_t type,
             /* The Fuze+ uses the standard ____, host, play sections, patch after third
              * call in ____ section */
             return patch_std_zero_host_play(3, model, type, sb_file, boot, boot_sz);
+        case MODEL_ZENXFI3:
+            /* The ZEN X-Fi3 uses the standard ____, hSst, pSay sections, patch after third
+             * call in ____ section. Although sections names use the S variant, they are standard. */
+            return patch_std_zero_host_play(3, model, type, sb_file, boot, boot_sz);
+        case MODEL_ZENXFI2:
+            /* The ZEN X-Fi2 has two types of firmware: recovery and normal.
+             * Normal uses the standard ___, host, play sections and recovery only ____ */
+            switch(variant)
+            {
+                case VARIANT_ZENXFI2_RECOVERY:
+                case VARIANT_ZENXFI2_NAND:
+                case VARIANT_ZENXFI2_SD:
+                    return patch_std_zero_host_play(1, model, type, sb_file, boot, boot_sz);
+                default:
+                    return IMX_DONT_KNOW_HOW_TO_PATCH;
+            }
+            break;
         default:
             return IMX_DONT_KNOW_HOW_TO_PATCH;
     }
@@ -247,26 +300,38 @@ static uint32_t get_uint32be(unsigned char *p)
     return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
 }
 
+void dump_imx_dev_info(const char *prefix)
+{
+    printf("%smkimxboot models:\n", prefix);
+    for(int i = 0; i < NR_IMX_MODELS; i++)
+    {
+        printf("%s  %s: idx=%d rb_model=%s rb_num=%d\n", prefix,
+            imx_models[i].model_name, i, imx_models[i].rb_model_name,
+            imx_models[i].rb_model_num);
+    }
+    printf("%smkimxboot variants:\n", prefix);
+    for(int i = 0; i < VARIANT_COUNT; i++)
+    {
+        printf("%s  %d: %s\n", prefix, i, imx_fw_variant[i]);
+    }
+    printf("%smkimxboot mapping:\n", prefix);
+    for(int i = 0; i < NR_IMX_SUMS; i++)
+    {
+        printf("%s  md5sum=%s -> idx=%d\n", prefix, imx_sums[i].md5sum,
+            imx_sums[i].model);
+        for(int j = 0; j < VARIANT_COUNT; j++)
+            if(imx_sums[i].fw_variants[j].size)
+                printf("%s    variant=%d -> offset=%#x size=%#x\n", prefix,
+                    j, (unsigned)imx_sums[i].fw_variants[j].offset,
+                    (unsigned)imx_sums[i].fw_variants[j].size);
+    }
+}
+
 enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     const char *outfile, struct imx_option_t opt)
 {
     /* Dump tables */
-    do
-    {
-        printf("[INFO] mkimxboot models:\n");
-        for(int i = 0; i < NR_IMX_MODELS; i++)
-        {
-            printf("[INFO]   %s: idx=%d rb_model=%s rb_num=%d\n",
-                imx_models[i].model_name, i, imx_models[i].rb_model_name,
-                imx_models[i].rb_model_num);
-        }
-        printf("[INFO] mkimxboot mapping:\n");
-        for(int i = 0; i < NR_IMX_SUMS; i++)
-        {
-            printf("[INFO]   md5sum=%s -> idx=%d\n", imx_sums[i].md5sum,
-                imx_sums[i].model);
-        }
-    }while(0);
+    dump_imx_dev_info("[INFO] ");
     /* compute MD5 sum of the file */
     uint8_t file_md5sum[16];
     do
@@ -298,7 +363,8 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     printf("[INFO] MD5 sum of the file: ");
     print_hex(file_md5sum, 16, true);
     /* find model */
-    int model;
+    enum imx_model_t model;
+    int md5_idx;
     do
     {
         int i = 0;
@@ -327,6 +393,7 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
             return IMX_NO_MATCH;
         }
         model = imx_sums[i].model;
+        md5_idx = i;
     }while(0);
     printf("[INFO] File is for model %d (%s)\n", model, imx_models[model].model_name);
     /* load rockbox file */
@@ -385,11 +452,18 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     struct sb_file_t *sb_file;
     do
     {
+        if(imx_sums[md5_idx].fw_variants[opt.fw_variant].size == 0)
+        {
+            printf("[ERR] Input file does not contain variant '%s'\n", imx_fw_variant[opt.fw_variant]);
+            free(boot);
+            return IMX_VARIANT_MISMATCH;
+        }
         enum sb_error_t err;
         g_debug = opt.debug;
         clear_keys();
         add_keys(imx_models[model].keys, imx_models[model].nr_keys);
-        sb_file = sb_read_file(infile, false, NULL, &imx_printf, &err);
+        sb_file = sb_read_file_ex(infile, imx_sums[md5_idx].fw_variants[opt.fw_variant].offset,
+            imx_sums[md5_idx].fw_variants[opt.fw_variant].size, false, NULL, &imx_printf, &err);
         if(sb_file == NULL)
         {
             clear_keys();
@@ -398,7 +472,7 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
         }
     }while(0);
     /* produce file */
-    enum imx_error_t ret = patch_firmware(model, opt.output, sb_file, boot + 8, boot_size - 8);
+    enum imx_error_t ret = patch_firmware(model, opt.fw_variant, opt.output, sb_file, boot + 8, boot_size - 8);
     if(ret == IMX_SUCCESS)
         ret = sb_write_file(sb_file, outfile);
 

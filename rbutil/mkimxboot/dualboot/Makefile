@@ -4,8 +4,8 @@ CROSS_PREFIX=arm-elf-eabi
 # adding a new target.  mkimxboot.c also needs to be edited to refer to these
 # new images.
 
-BOOTOBJS = dualboot_fuzeplus.o
-BOOTBINS = dualboot_fuzeplus.arm-bin
+BOOTOBJS = dualboot_fuzeplus.o dualboot_zenxfi2.o dualboot_zenxfi3.o
+BOOTBINS = dualboot_fuzeplus.arm-bin dualboot_zenxfi2.arm-bin dualboot_zenxfi3.arm-bin
 
 all: ../dualboot.h ../dualboot.c
 
@@ -13,6 +13,12 @@ all: ../dualboot.h ../dualboot.c
 
 dualboot_fuzeplus.o: dualboot.S
 	$(CROSS_PREFIX)-$(CC) -mcpu=arm926ej-s -DSANSA_FUZEPLUS -c -o dualboot_fuzeplus.o dualboot.S
+
+dualboot_zenxfi2.o: dualboot.S
+	$(CROSS_PREFIX)-$(CC) -mcpu=arm926ej-s -DCREATIVE_ZENXFI2 -c -o dualboot_zenxfi2.o dualboot.S
+
+dualboot_zenxfi3.o: dualboot.S
+	$(CROSS_PREFIX)-$(CC) -mcpu=arm926ej-s -DCREATIVE_ZENXFI3 -c -o dualboot_zenxfi3.o dualboot.S
 
 # Rules for the ARM code embedded in mkamsboot - assemble, link, then extract
 # the binary code and finally convert to .h for building in mkamsboot

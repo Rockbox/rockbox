@@ -8,7 +8,7 @@
 # We use the SB code available in the Rockbox utils/sbtools directory
 IMXTOOLS_DIR=../../utils/imxtools/
 CFLAGS += -I$(IMXTOOLS_DIR) -Wall
-CFLAGS += -std=c99
+CFLAGS += -std=c99 -g
 
 OUTPUT = mkimxboot
 

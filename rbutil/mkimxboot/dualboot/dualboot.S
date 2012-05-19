@@ -65,6 +65,26 @@ power_down:
     ldr     r1, =0x3E770001 @ unlock key + power down
     str     r1, [r0]
     b       power_down
+#elif defined(CREATIVE_ZENXFI2)
+    /* If select key is hold, return so that the OF can boot */
+    ldr     r2, =0x80018600 @ HW_PINCTRL_DIN0
+    ldr     r2, [r2]
+    tst     r2, #0x4000 @ bit 14, active low
+    moveq   r0, #0 @ return 0, continue boot
+    bxeq    lr
+    str     r0, [r1]
+    mov     r0, #1
+    bx      lr
+#elif defined(CREATIVE_ZENXFI3)
+    /* If volume down key is hold, return so that the OF can boot */
+    ldr     r2, =0x80018620 @ HW_PINCTRL_DIN2
+    ldr     r2, [r2]
+    tst     r2, #0x80 @ bit 7, active low
+    moveq   r0, #0 @ return 0, continue boot
+    bxeq    lr
+    str     r0, [r1]
+    mov     r0, #1
+    bx      lr
 #else
 #error No target defined !
 #endif
