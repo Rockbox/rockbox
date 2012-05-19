@@ -515,6 +515,7 @@ target/arm/imx233/power-imx233.c
 target/arm/imx233/powermgmt-imx233.c
 target/arm/imx233/adc-imx233.c
 target/arm/imx233/lradc-imx233.c
+target/arm/imx233/pwm-imx233.c
 target/arm/imx233/rtc-imx233.c
 target/arm/imx233/dcp-imx233.c
 #ifndef BOOTLOADER

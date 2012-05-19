@@ -31,6 +31,7 @@
 #include "ssp-imx233.h"
 #include "i2c-imx233.h"
 #include "dcp-imx233.h"
+#include "pwm-imx233.h"
 #include "icoll-imx233.h"
 #include "lradc-imx233.h"
 #include "rtc-imx233.h"
@@ -99,6 +100,7 @@ void system_init(void)
     imx233_dma_init();
     imx233_ssp_init();
     imx233_dcp_init();
+    imx233_pwm_init();
     imx233_lradc_init();
     imx233_i2c_init();
 #if defined(SANSA_FUZEPLUS) && !defined(BOOTLOADER)
