@@ -47,7 +47,6 @@ SECTIONS
         *(.icode*)
         *(.irodata*)
         *(.idata*)
-        . = ALIGN(0x4);
         _iramend = .;
     } > IRAM AT> DRAM
 
@@ -63,7 +62,6 @@ SECTIONS
         _iedata = .;
         *(.qharray)
         *(.ibss*)
-        . = ALIGN(0x4);
         _iend = .;
     } > IRAM
 

@@ -55,7 +55,6 @@ SECTIONS
         *(.icode*)
         *(.irodata*)
         *(.idata*)
-        . = ALIGN(0x4);
         _iramend = .;
     } > IRAM AT> DRAM
 
@@ -66,16 +65,13 @@ SECTIONS
         _iedata = .;
         *(.qharray)
         *(.ibss*)
-        . = ALIGN(0x4);
         _iend = .;
     } > IRAM
 
     .init ENDAUDIOADDR :
     {
-        . = ALIGN(4);
         _initstart = .;
         *(.init*)
-        . = ALIGN(0x4);
         _initend = .;
     } AT> DRAM
 
@@ -119,7 +115,6 @@ SECTIONS
 
     .audiobuf (NOLOAD) :
     {
-        . = ALIGN(4);
         _audiobuffer = .;
         audiobuffer = .;
     } > DRAM
