@@ -430,7 +430,7 @@ static int transfer_sectors(IF_MD2(int drive,) unsigned long start, int count, v
 
     /* check window */
     start += sd_window_start[drive];
-    if((start + count) > sd_window_end[drive])
+    if((start + count) >= sd_window_end[drive])
     {
         ret = -201;
         goto Lend;
