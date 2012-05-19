@@ -32,6 +32,7 @@
 #include "i2c-imx233.h"
 #include "dcp-imx233.h"
 #include "lradc-imx233.h"
+#include "rtc-imx233.h"
 #include "lcd.h"
 #include "backlight-target.h"
 #include "button.h"
@@ -210,6 +211,7 @@ void system_init(void)
     /* enable final irq bit */
     __REG_SET(HW_ICOLL_CTRL) = HW_ICOLL_CTRL__IRQ_FINAL_ENABLE;
 
+    imx233_rtc_init();
     imx233_pinctrl_init();
     imx233_timrot_init();
     imx233_dma_init();

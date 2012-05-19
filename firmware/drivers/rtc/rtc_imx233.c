@@ -30,7 +30,7 @@
 
 void rtc_init(void)
 {
-    imx233_rtc_init();
+    /* rtc-imx233 is initialized by the system */
 }
 
 int rtc_read_datetime(struct tm *tm)
