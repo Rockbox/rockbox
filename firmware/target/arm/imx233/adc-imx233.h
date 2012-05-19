@@ -22,15 +22,17 @@
 #define _ADC_IMX233_H_
 
 #include "system.h"
+#include "adc.h"
+#include "adc-target.h"
+#include "powermgmt-target.h"
 #include "lradc-imx233.h"
-#include "adc-imx233.h"
 
 /* Virtual channels */
 #define IMX233_ADC_BATTERY      -1 /* Battery voltage (mV) */
 #define IMX233_ADC_DIE_TEMP     -2 /* Die temperature (°C) */
 #define IMX233_ADC_VDDIO        -3 /* VddIO voltage (mV) */
 #define IMX233_ADC_VDD5V        -4 /* Vdd5V voltage (mV) */
-#ifdef IMX233_ADC_BATT_TEMP_SENSOR
+#ifdef IMX233_BATT_TEMP_SENSOR
 #define IMX233_ADC_BATT_TEMP    -5 /* Battery temperature (°C) */
 #endif
 

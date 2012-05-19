@@ -19,10 +19,6 @@
  *
  ****************************************************************************/
 
-#include "config.h"
-#include "adc.h"
-#include "adc-target.h"
-#include "system.h"
 #include "adc-imx233.h"
 
 void adc_init(void)
@@ -73,11 +69,11 @@ static short adc_read_virtual(int c)
             imx233_lradc_release_channel(nmos_chan);
             return val;
         }
-#ifdef IMX233_ADC_BATT_TEMP_SENSOR
+#ifdef IMX233_BATT_TEMP_SENSOR
         case IMX233_ADC_BATT_TEMP:
         {
             int virt = imx233_lradc_acquire_channel(TIMEOUT_BLOCK);
-            int val = imx233_lradc_sense_ext_temperature(virt, IMX233_ADC_BATT_TEMP_SENSOR);
+            int val = imx233_lradc_sense_ext_temperature(virt, IMX233_BATT_TEMP_SENSOR);
             imx233_lradc_release_channel(virt);
             return val;
         }

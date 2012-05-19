@@ -30,6 +30,4 @@
 #define ADC_BATT_TEMP       4
 #define ADC_CH2             5
 
-#define IMX233_ADC_BATT_TEMP_SENSOR     0
-
 #endif
