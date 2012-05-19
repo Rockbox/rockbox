@@ -106,11 +106,11 @@ void imx233_ssp_start(int ssp)
         /** 2.3.1: the clk_ssp maximum frequency is 102.858 MHz */
         /* fracdiv = 18 => clk_io = pll = 480Mhz
          * intdiv = 5 => clk_ssp = 96Mhz */
-        imx233_set_fractional_divisor(CLK_IO, 18);
-        imx233_enable_clock(CLK_SSP, false);
-        imx233_set_clock_divisor(CLK_SSP, 5);
-        imx233_set_bypass_pll(CLK_SSP, false); /* use IO */
-        imx233_enable_clock(CLK_SSP, true);
+        imx233_clkctrl_set_fractional_divisor(CLK_IO, 18);
+        imx233_clkctrl_enable_clock(CLK_SSP, false);
+        imx233_clkctrl_set_clock_divisor(CLK_SSP, 5);
+        imx233_clkctrl_set_bypass_pll(CLK_SSP, false); /* use IO */
+        imx233_clkctrl_enable_clock(CLK_SSP, true);
     }
     ssp_nr_in_use++;
 }
@@ -128,8 +128,8 @@ void imx233_ssp_stop(int ssp)
     ssp_nr_in_use--;
     if(ssp_nr_in_use == 0)
     {
-        imx233_enable_clock(CLK_SSP, false);
-        imx233_set_fractional_divisor(CLK_IO, 0);
+        imx233_clkctrl_enable_clock(CLK_SSP, false);
+        imx233_clkctrl_set_fractional_divisor(CLK_IO, 0);
     }
 }
 

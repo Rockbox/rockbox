@@ -132,6 +132,7 @@ enum imx233_xtal_clk_t
     XTAL_FILT = 1 << 30,
     XTAL_DRI = 1 << 28,
     XTAL_TIMROT = 1 << 26,
+    XTAM_PWM =  1 << 29,
 };
 
 /* Auto-Slow monitoring */
@@ -158,28 +159,28 @@ enum imx233_as_div_t
 };
 
 /* can use a mask of clocks */
-void imx233_enable_xtal_clock(enum imx233_xtal_clk_t xtal_clk, bool enable);
-bool imx233_is_xtal_clock_enable(enum imx233_xtal_clk_t clk);
+void imx233_clkctrl_enable_xtal(enum imx233_xtal_clk_t xtal_clk, bool enable);
+void imx233_clkctrl_is_xtal_enabled(enum imx233_xtal_clk_t xtal_clk, bool enable);
 /* only use it for non-fractional clocks (ie not for IO) */
-void imx233_enable_clock(enum imx233_clock_t clk, bool enable);
-bool imx233_is_clock_enable(enum imx233_clock_t cl);
-void imx233_set_clock_divisor(enum imx233_clock_t clk, int div);
-int imx233_get_clock_divisor(enum imx233_clock_t clk);
+void imx233_clkctrl_enable_clock(enum imx233_clock_t clk, bool enable);
+bool imx233_clkctrl_is_clock_enabled(enum imx233_clock_t cl);
+void imx233_clkctrl_set_clock_divisor(enum imx233_clock_t clk, int div);
+int imx233_clkctrl_get_clock_divisor(enum imx233_clock_t clk);
 /* call with fracdiv=0 to disable it */
-void imx233_set_fractional_divisor(enum imx233_clock_t clk, int fracdiv);
+void imx233_clkctrl_set_fractional_divisor(enum imx233_clock_t clk, int fracdiv);
 /* 0 means fractional dividor disable */
-int imx233_get_fractional_divisor(enum imx233_clock_t clk);
-void imx233_set_bypass_pll(enum imx233_clock_t clk, bool bypass);
-bool imx233_get_bypass_pll(enum imx233_clock_t clk);
-void imx233_enable_usb_pll(bool enable);
-bool imx233_is_usb_pll_enable(void);
-unsigned imx233_get_clock_freq(enum imx233_clock_t clk);
+int imx233_clkctrl_get_fractional_divisor(enum imx233_clock_t clk);
+void imx233_clkctrl_set_bypass_pll(enum imx233_clock_t clk, bool bypass);
+bool imx233_clkctrl_get_bypass_pll(enum imx233_clock_t clk);
+void imx233_clkctrl_enable_usb_pll(bool enable);
+bool imx233_clkctrl_is_usb_pll_enabled(void);
+unsigned imx233_clkctrl_get_clock_freq(enum imx233_clock_t clk);
 
-void imx233_set_auto_slow_divisor(enum imx233_as_div_t div);
-enum imx233_as_div_t imx233_get_auto_slow_divisor(void);
-void imx233_enable_auto_slow(bool enable);
-bool imx233_is_auto_slow_enable(void);
-void imx233_enable_auto_slow_monitor(enum imx233_as_monitor_t monitor, bool enable);
-bool imx233_is_auto_slow_monitor_enable(enum imx233_as_monitor_t monitor);
+void imx233_clkctrl_set_auto_slow_divisor(enum imx233_as_div_t div);
+enum imx233_as_div_t imx233_clkctrl_get_auto_slow_divisor(void);
+void imx233_clkctrl_enable_auto_slow(bool enable);
+bool imx233_clkctrl_is_auto_slow_enabled(void);
+void imx233_clkctrl_enable_auto_slow_monitor(enum imx233_as_monitor_t monitor, bool enable);
+bool imx233_clkctrl_is_auto_slow_monitor_enabled(enum imx233_as_monitor_t monitor);
 
 #endif /* CLKCTRL_IMX233_H */

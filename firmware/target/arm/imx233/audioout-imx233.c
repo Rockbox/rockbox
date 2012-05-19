@@ -30,7 +30,7 @@ void imx233_audioout_preinit(void)
     /* Enable AUDIOOUT block */
     imx233_reset_block(&HW_AUDIOOUT_CTRL);
     /* Enable digital filter clock */
-    imx233_enable_xtal_clock(XTAL_FILT, true);
+    imx233_clkctrl_enable_xtal(XTAL_FILT, true);
     /* Enable DAC */
     __REG_CLR(HW_AUDIOOUT_ANACLKCTRL) = HW_AUDIOOUT_ANACLKCTRL__CLKGATE;
     /* Set capless mode */
@@ -76,7 +76,7 @@ void imx233_audioout_close(void)
     /* Gate off DAC */
     __REG_SET(HW_AUDIOOUT_ANACLKCTRL) = HW_AUDIOOUT_ANACLKCTRL__CLKGATE;
     /* Disable digital filter clock */
-    imx233_enable_xtal_clock(XTAL_FILT, false);
+    imx233_clkctrl_enable_xtal(XTAL_FILT, false);
     /* will also gate off the module */
     __REG_CLR(HW_AUDIOOUT_CTRL) = HW_AUDIOOUT_CTRL__RUN;
 }

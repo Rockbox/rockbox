@@ -69,7 +69,7 @@ void usb_enable(bool on)
 {
     if(on)
     {
-        imx233_enable_usb_pll(true);
+        imx233_clkctrl_enable_usb_pll(true);
         imx233_enable_usb_phy(true);
         imx233_enable_usb_controller(true);
         usb_core_init();
@@ -79,6 +79,6 @@ void usb_enable(bool on)
         usb_core_exit();
         imx233_enable_usb_controller(false);
         imx233_enable_usb_phy(false);
-        imx233_enable_usb_pll(false);
+        imx233_clkctrl_enable_usb_pll(false);
     }
 }
