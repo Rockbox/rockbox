@@ -56,7 +56,7 @@ enum plugin_status run_overlay(const void* parameter,
     audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
     if (!audiobuf)
     {
-        rb->splash(2*HZ, "Can't optain memory");
+        rb->splash(2*HZ, "Can't obtain memory");
         goto error;
     }
 
