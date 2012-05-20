@@ -192,6 +192,7 @@ typedef struct {
     int*     scale_factors;                           ///< pointer to the scale factor values used for decoding
     uint8_t  table_idx;                               ///< index in sf_offsets for the scale factor reference block
     int32_t* coeffs;                                  ///< pointer to the subframe decode buffer
+    uint16_t num_vec_coeffs;                          ///< number of vector coded coefficients
     int32_t* out;                                     ///< output buffer
 } WMAProChannelCtx;
 
@@ -260,6 +261,7 @@ typedef struct WMAProDecodeCtx {
     int8_t           channels_for_cur_subframe;     ///< number of channels that contain the subframe
     int8_t           channel_indexes_for_cur_subframe[WMAPRO_MAX_CHANNELS];
     int8_t           num_bands;                     ///< number of scale factor bands
+    int8_t           transmit_num_vec_coeffs;       ///< number of vector coded coefficients is part of the bitstream
     int16_t*         cur_sfb_offsets;               ///< sfb offsets for the current block
     uint8_t          table_idx;                     ///< index for the num_sfb, sfb_offsets, sf_offsets and subwoofer_cutoffs tables
     int8_t           esc_len;                       ///< length of escaped coefficients
@@ -845,7 +847,8 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
 
     /** decode vector coefficients (consumes up to 167 bits per iteration for
       4 vector coded large values) */
-    while (!rl_mode && cur_coeff + 3 < s->subframe_len) {
+        while ((s->transmit_num_vec_coeffs || !rl_mode) &&
+           (cur_coeff + 3 < ci->num_vec_coeffs)) {
         int32_t vals[4];
         int i;
         unsigned int idx;
@@ -902,7 +905,7 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
     }
 
     /** decode run level coded coefficients */
-    if (rl_mode) {
+    if (cur_coeff < s->subframe_len) {
         memset(&ci->coeffs[cur_coeff], 0,
                sizeof(*ci->coeffs) * (s->subframe_len - cur_coeff));
                       
@@ -1210,10 +1213,19 @@ static int decode_subframe(WMAProDecodeCtx *s)
     if (transmit_coeffs) {
         int step;
         int quant_step = 90 * s->bits_per_sample >> 4;
-        if ((get_bits1(&s->gb))) {
-            /** FIXME: might change run level mode decision */
-            DEBUGF("unsupported quant step coding\n");
-            return AVERROR_INVALIDDATA;
+
+        /** decode number of vector coded coefficients */
+        if ((s->transmit_num_vec_coeffs = get_bits1(&s->gb))) {
+            int num_bits = av_log2((s->subframe_len + 3)/4) + 1;
+            for (i = 0; i < s->channels_for_cur_subframe; i++) {
+                int c = s->channel_indexes_for_cur_subframe[i];
+                s->channel[c].num_vec_coeffs = get_bits(&s->gb, num_bits) << 2;
+            }
+        } else {
+            for (i = 0; i < s->channels_for_cur_subframe; i++) {
+                int c = s->channel_indexes_for_cur_subframe[i];
+                s->channel[c].num_vec_coeffs = s->subframe_len;
+            }
         }
         /** decode quantization step */
         step = get_sbits(&s->gb, 6);
