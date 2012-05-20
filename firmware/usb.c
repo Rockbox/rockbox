@@ -659,6 +659,11 @@ void usb_acknowledge(long id)
 
 void usb_init(void)
 {
+    /* Do required hardware inits first. For software USB the driver has
+     * to make sure this won't trigger a transfer completion before the
+     * queue and thread are created. */
+    usb_init_device();
+
 #ifdef USB_FULL_INIT
     usb_enable(false);
 
@@ -672,8 +677,6 @@ void usb_init(void)
     tick_add_task(usb_tick);
 #endif
 #endif /* USB_FULL_INIT */
-
-    usb_init_device();
 }
 
 void usb_wait_for_disconnect(struct event_queue *q)
