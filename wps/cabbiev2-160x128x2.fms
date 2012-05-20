@@ -1,0 +1,83 @@
+# Cabbie 2.0 style radio screen
+# (C) 2010, Marcin Bukat
+# based on Cabbie 2.0 WPS
+#
+# Disable Status Bar
+%wd
+#
+# Load Backdrop
+%X(fmsbackdrop-160x128x2.bmp)
+#
+# Preload Images
+%xl(lock,lock-160x128x2.bmp,0,0,2)
+%xl(battery,battery-160x128x2.bmp,0,0,10)
+%xl(volume,volume-160x128x2.bmp,0,0,10)
+#
+# Station Art/Info Viewport Conditional
+# Preset present conditional
+# RDS present conditional
+%?C<%Vd(art)>
+%?Ti<%?C<%Vd(art_preset)|%Vd(noart_preset)>>
+%?tx<%?Ti<%?C<%Vd(art_preset_rds)|%Vd(noart_preset_rds)>|%?C<%Vd(art_nopreset_rds)|%Vd(noart_nopreset_rds)>>|>
+#
+# Frequency Bar
+%V(1,86,158,8,-)
+%pb(0,0,158,8,pb-160x128x2.bmp)
+#
+# Hold
+%V(48,114,14,11,-)
+%xd(lock,%mh)
+#
+# Battery
+%V(66,115,17,10,-)
+%?bp<%?bc<%xd(battery,1)|%xd(battery,2)>|%xd(battery,%bl,2)>
+#
+# Volume
+%V(87,114,16,11,-)
+%xd(volume,%pv)
+#
+# Signal strength
+%V(110,114,48,10,-)
+%ar%tr dBuV
+# Below frequency bar Scan/Preset frequency MHz Force Mono/Mono/Stereo
+%V(1,96,158,10,1)
+%al%?tm<%Sx(Scan)|%Sx(Preset)> %ac%tf MHz %ar%?St(force fm mono)<%Sx(Force Mono)|%?ts<%Sx(Stereo)|%Sx(Mono)>>
+#
+# Station Art
+%ax%Vl(art,2,16,64,64,-)
+%Cl(0,0,64,64,c,c)
+%Cd
+#
+# Station Art
+# Preset present
+%ax%Vl(art_preset,70,17,-,16,-)
+%Vp(0,%s%ac%?Ti<Station: |>%?Tn<%Tn|%Tf>)
+%ax%Vl(art_preset,70,33,-,16,-)
+%Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%ax%Vl(art_preset_rds,70,56,-,32,-)
+%s%ty
+%s%tz
+#
+# Station Art
+# Preset absent
+%ax%Vl(art_nopreset_rds,70,37,-,32,-)
+%s%ty
+%s%tz
+#
+# No station art
+# Preset present
+%Vl(noart_preset,0,17,-,16,-)
+%Vp(0,%s%ac%?Ti<Station: |>%?Tn<%Tn|%Tf>)
+%Vl(noart_preset,0,33,-,16,-)
+%Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%Vl(noart_preset_rds,0,56,-,32,-)
+%s%ty
+%s%tz
+#
+# No station art
+# Preset absent
+%Vl(noart_nopreset_rds,0,37,-,32,-)
+%s%ty
+%s%tz
