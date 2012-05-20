@@ -53,6 +53,7 @@
 #include "pcm.h"
 #include "audiohw.h"
 #include "rtc.h"
+#include "time.h"
 
 #define LONG_DELAY  200000
 #define SHORT_DELAY  50000
@@ -105,12 +106,17 @@ void bl_debug_int(unsigned int input,unsigned int count)
     delay(SHORT_DELAY*6);
 }
 
+void post_mortem_stub(void)
+{
+}
+
 void main(void)
 {
     char mystring[64];
     int i;
     unsigned short data = 0;
     char write_data[2], read_data[16];
+    struct tm tm;
     
     //Set backlight pin to output and enable
     int oldval = PCON0;
@@ -180,10 +186,10 @@ void main(void)
 #endif
 
 #if 1   /* enable this to see info about the RTC */
-        rtc_read_datetime(read_data);
-        for (i = 0; i < 7; i++) {
-            snprintf(mystring + 2 * i, 64, "%02X", read_data[i]);
-        }
+        rtc_read_datetime(&tm);
+        snprintf(mystring, 64, "%04d-%02d-%02d %02d:%02d:%02d",
+            tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,
+            tm.tm_hour, tm.tm_min, tm.tm_sec);
         lcd_puts(0, 10, mystring);
 #endif 
 
@@ -199,11 +205,11 @@ void main(void)
 #endif
 
 #if 1   /* enable this to see info about IODMA channel 0 (PCM) */
-        snprintf(mystring, 64, "DMA: %08X %08X", DMACADDR0, DMACTCNT0);
+        snprintf(mystring, 64, "DMA: %08X %08X", (int)DMACADDR0, (int)DMACTCNT0);
         lcd_puts(0, 12, mystring);
 #endif        
 #if 1   /* enable this to see info about IIS */
-        snprintf(mystring, 64, "IIS: %08X", I2SSTATUS);
+        snprintf(mystring, 64, "IIS: %08X", (int)I2SSTATUS);
         lcd_puts(0, 13, mystring);
 #endif        
 
