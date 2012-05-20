@@ -33,7 +33,7 @@ objdir-check:
 manual-prep: objdir-check rockbox.tex $(OBJDIR)/CREDITS.tex $(OBJDIR)/version.tex $(OBJDIR)/$(MANFILE).tex
 	$(SILENT)mkdir -p $(OBJDIR)
 	$(SILENT)find * -type d \! -regex '.*\.svn.*' -exec mkdir -p $(OBJDIR)/{} \;
-	$(SILENT)find * -type f \! -regex '.*\.svn.*' -exec cp {} $(OBJDIR)/{} \;
+	$(SILENT)find -L * -type f \! -regex '.*\.svn.*' -exec cp {} $(OBJDIR)/{} \;
 	$(SILENT)mv $(OBJDIR)/Makefile.pdflatex $(OBJDIR)/Makefile
 
 $(OBJDIR)/$(MANFILE).tex:
