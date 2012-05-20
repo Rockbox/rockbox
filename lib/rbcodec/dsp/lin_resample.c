@@ -30,10 +30,8 @@
  * Linear interpolation resampling that introduces a one sample delay because
  * of our inability to look into the future at the end of a frame.
  */
- 
-#define HERMITE 1
 
-#if 1 /* Set to '1' to enable debug messages */
+#if 0 /* Set to '1' to enable debug messages */
 #include <debug.h>
 #else
 #undef DEBUGF
@@ -48,7 +46,7 @@ static int32_t resample_out_bufs[3][RESAMPLE_BUF_COUNT] IBSS_ATTR;
 /* Data for each resampler on each DSP */
 static struct resample_data
 {
-    uint32_t delta;          /* 00h: Phase delta for each step in s15.16*/
+    uint32_t delta;          /* 00h: Phase delta for each step */
     uint32_t phase;          /* 04h: Current phase [pos16|frac16] */
     int32_t  last_sample[2]; /* 08h: Last samples for interpolation (L+R) */
                              /* 10h */
@@ -56,18 +54,10 @@ static struct resample_data
     struct dsp_config *dsp;  /* The DSP for this resampler */
     struct dsp_buffer resample_buf; /* Buffer descriptor for resampled data */
     int32_t *resample_buf_arr[2]; /* Actual output data pointers */
-                                
-                                /*Hermite Resampler*/
-
-    int32_t  last_samples[6];
-    
 } resample_data[DSP_COUNT] IBSS_ATTR;
 
 /* Actual worker function. Implemented here or in target assembly code. */
 int lin_resample_resample(struct resample_data *data, struct dsp_buffer *src,
-                          struct dsp_buffer *dst);
-
-int hermite_resample_resample(struct resample_data *data, struct dsp_buffer *src,
                           struct dsp_buffer *dst);
 
 static void lin_resample_flush_data(struct resample_data *data)
@@ -104,101 +94,6 @@ static bool lin_resample_new_delta(struct resample_data *data,
     return true;
 }
 
-
-
-int hermite_resample_resample(struct resample_data *data, struct dsp_buffer *src,
-                          struct dsp_buffer *dst)
-{
-    int ch = src->format.num_channels - 1;
-    uint32_t count = MIN(src->remcount, 0x8000);
-    uint32_t delta = data->delta;
-    uint32_t phase, pos;
-    int32_t *d;
-    int x0, x1, x2, x3, frac, acc0;
-    //DEBUGF("hermite_resample_resample top\n");
-    /* restore state */
-
-    
-    //DEBUGF("count: %d delta: %d, phase: %d (%d)\n",count, delta,phase >> 16, phase);
-    do
-    {
-        const int32_t *s = src->p32[ch];
-
-        d = dst->p32[ch];
-        int32_t *dmax = d + dst->bufcount;
-
-        phase = data->phase;
-        pos = phase >> 16;
-        pos = MIN(pos, count);
-
-        int32_t last = pos > 0 ? s[pos - 1] : data->last_sample[ch];
-
-        if (pos < count)
-        {
-            while (1)
-            {
-
-                int i = pos;
-                if (i < 3) {
-                    x3 = (i < 3 ? data->last_samples[i+0] : s[i-3]) ;
-                    x2 = (i < 2 ? data->last_samples[i+1] : s[i-2]) ;
-                    x1 = (i < 1 ? data->last_samples[i+2] : s[i-1]) ;
-                } else {
-                    x3 = s[i-3] ;
-                    x2 = s[i-2] ;
-                    x1 = s[i-1] ;
-                }
-                x0 = s[i] ;
-                //frac = f >> 1;
-                frac=(0x0000FFFF&phase) << 15;
-                //DEBUGF("pos: %d phase: %d frac:  %d\n",pos, phase, frac);
-
-                /* 4-tap Hermite, using Farrow structure */
-                acc0 = (3 * (x2 - x1) + x0 - x3) >> 1;
-                acc0 = FRACMUL(acc0, frac);
-                acc0 += 2 * x1 + x3 - ((5 * x2 + x0) >> 1);
-                acc0 = FRACMUL(acc0, frac);
-                acc0 += (x1 - x3) >> 1;
-                acc0 = FRACMUL(acc0, frac);
-                acc0 += x2;
-
-
-                *d++ = acc0;
-
-                phase += delta;
-                pos = phase >> 16;
-
-                if (pos >= count || d >= dmax)
-                    break;
-    
-//                if (pos > 0){
-//                     /* save delay samples for next time (last_samples[0] = oldest, last_samples[2] = newest) */
-//                    data->last_samples[ch*3+0] = (pos < 3 ? data->last_samples[pos+0] : s[pos-3]);
-//                    data->last_samples[ch*3+1] = (pos < 2 ? data->last_samples[pos+1] : s[pos-2]);
-//                    data->last_samples[ch*3+2] = (pos < 1 ? data->last_samples[pos+2] : s[pos-1]); 
-//                }
-            }
-
-            //if (pos > 0)
-            //{
-                pos = MIN(pos, count);
-                data->last_samples[ch*3+0] = (pos < 3 ? data->last_samples[pos+0] : s[pos-3]);
-                data->last_samples[ch*3+1] = (pos < 2 ? data->last_samples[pos+1] : s[pos-2]);
-                data->last_samples[ch*3+2] = (pos < 1 ? data->last_samples[pos+2] : s[pos-1]); 
-            //}
-        }
-
-    }
-    while (--ch >= 0);
-
-
-    /* Wrap phase accumulator back to start of next frame. */
-    data->phase = phase - (pos << 16);
-    
-    dst->remcount = d - dst->p32[0];
-    return pos;
-}
-
 #if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
 /* Where the real work is done */
 int lin_resample_resample(struct resample_data *data, struct dsp_buffer *src,
@@ -209,7 +104,7 @@ int lin_resample_resample(struct resample_data *data, struct dsp_buffer *src,
     uint32_t delta = data->delta;
     uint32_t phase, pos;
     int32_t *d;
-    DEBUGF("count: %d delta: %d, phase: %d (%d)\n",count, delta,phase >> 16, phase);
+
     do
     {
         const int32_t *s = src->p32[ch];
@@ -227,7 +122,6 @@ int lin_resample_resample(struct resample_data *data, struct dsp_buffer *src,
         {
             while (1)
             {
-                DEBUGF("phase: %d frac:  %d\n", phase, (phase & 0xffff) << 15);
                 *d++ = last + FRACMUL((phase & 0xffff) << 15, s[pos] - last);
                 phase += delta;
                 pos = phase >> 16;
@@ -245,17 +139,16 @@ int lin_resample_resample(struct resample_data *data, struct dsp_buffer *src,
                 last = s[pos - 1];
             }
         }
-      
-        DEBUGF("pos: %d count: %d\n", pos, count);
+
         data->last_sample[ch] = last;
     }
     while (--ch >= 0);
 
     /* Wrap phase accumulator back to start of next frame. */
     data->phase = phase - (pos << 16);
-    
+
     dst->remcount = d - dst->p32[0];
-    DEBUGF("remcount: %d, pos %d\n", dst->remcount, pos);
+
     return pos;
 }
 #endif /* CPU */
@@ -283,12 +176,7 @@ static void lin_resample_process(struct dsp_proc_entry *this,
     {
         dst->bufcount = RESAMPLE_BUF_COUNT;
 
-        #if HERMITE
-        int consumed = hermite_resample_resample(data, src, dst);
-        #else 
         int consumed = lin_resample_resample(data, src, dst);
-        #endif
-        
 
         /* Advance src by consumed amount */
         if (consumed > 0)
@@ -323,13 +211,7 @@ static void lin_resample_new_format(struct dsp_proc_entry *this,
     if (src->format.frequency != frequency)
     {
         DEBUGF("  DSP_PROC_RESAMPLE- new delta\n");
-        DEBUGF("hermite_resample_new_delta in\n");
-        #if 0
-        active = hermite_resample_new_delta(data, src);
-        #else
         active = lin_resample_new_delta(data, src);
-        #endif
-        DEBUGF("hermite_resample_new_delta out\n");
         dsp_proc_activate(dsp, DSP_PROC_RESAMPLE, active);
     }
 
