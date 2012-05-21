@@ -478,7 +478,8 @@ static void tdspeed_process_new_format(struct dsp_proc_entry *this,
     struct sample_format *format = &src->format;
     int channels = format->num_channels;
 
-    if (format->codec_frequency != st->samplerate)
+    if (format->codec_frequency != st->samplerate ||
+        !dsp_proc_active(dsp, DSP_PROC_TIMESTRETCH))
     {
         /* relevent parameters are changing - all overlap will be discarded */
         st->channels = channels;
