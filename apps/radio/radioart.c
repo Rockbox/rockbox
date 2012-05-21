@@ -41,10 +41,9 @@ struct radioart {
     char name[MAX_FMPRESET_LEN+1];
 };
 
+static char* buf;
 static struct radioart radioart[MAX_RADIOART_IMAGES];
-#ifdef HAVE_RECORDING
-static bool allow_buffer_access = true; /* If we are recording dont touch the buffers! */
-#endif
+
 static int find_oldest_image(void)
 {
     int i;
@@ -101,12 +100,10 @@ int radio_get_art_hid(struct dim *requested_dim)
     int preset = radio_current_preset();
     int free_idx = -1;
     const char* preset_name;
-    if (radio_scan_mode() || preset < 0)
+
+    if (!buf || radio_scan_mode() || preset < 0)
         return -1;
-#ifdef HAVE_RECORDING
-    if (!allow_buffer_access)
-        return -1;
-#endif
+
     preset_name = radio_get_preset_name(preset);
     for (int i=0; i<MAX_RADIOART_IMAGES; i++)
     {
@@ -137,55 +134,38 @@ int radio_get_art_hid(struct dim *requested_dim)
         
     return -1;
 }
-static void playback_restarting_handler(void *data)
+
+static void buffer_reset_handler(void *data)
 {
-    (void)data;
-    int i;
-    for(i=0;i<MAX_RADIOART_IMAGES;i++)
+    buf = NULL;
+    for(int i=0;i<MAX_RADIOART_IMAGES;i++)
     {
         if (radioart[i].handle >= 0)
             bufclose(radioart[i].handle);
         radioart[i].handle = -1;
         radioart[i].name[0] = '\0';
     }
-}
-#ifdef HAVE_RECORDING
-static void recording_started_handler(void *data)
-{
+
     (void)data;
-    allow_buffer_access = false;
-    playback_restarting_handler(NULL);
 }
-static void recording_stopped_handler(void *data)
-{
-    (void)data;
-    allow_buffer_access = true;
-}
-#endif
 
 void radioart_init(bool entering_screen)
 {
-    int i;
     if (entering_screen)
     {
-        for(i=0;i<MAX_RADIOART_IMAGES;i++)
+        /* grab control over buffering */
+        size_t bufsize;
+        buf = audio_get_buffer(false, &bufsize);
+        buffering_reset(buf, bufsize);
+        /* one-shot */
+        add_event(BUFFER_EVENT_BUFFER_RESET, true, buffer_reset_handler);
+    }
+    else /* init at startup */
+    {
+        for(int i=0;i<MAX_RADIOART_IMAGES;i++)
         {
             radioart[i].handle = -1;
             radioart[i].name[0] = '\0';
         }
-        add_event(PLAYBACK_EVENT_START_PLAYBACK, true, playback_restarting_handler);
-
-        /* grab control over buffering */
-        char* buf;
-        size_t bufsize;
-        buf = audio_get_buffer(false, &bufsize);
-        buffering_reset(buf, bufsize);
-    }
-    else
-    {
-#if defined(HAVE_RECORDING)
-        add_event(RECORDING_EVENT_START, false, recording_started_handler);
-        add_event(RECORDING_EVENT_STOP, false, recording_stopped_handler);
-#endif
     }
 }

@@ -389,7 +389,7 @@ static bool rm_handle(const struct memory_handle *h)
    NULL if the handle wasn't found */
 static struct memory_handle *find_handle(int handle_id)
 {
-    if (handle_id < 0)
+    if (handle_id < 0 || !first_handle)
         return NULL;
 
     /* simple caching because most of the time the requested handle
@@ -1748,12 +1748,22 @@ bool buffering_reset(char *buf, size_t buflen)
        thus buf and buflen must be a aligned to an integer multiple of
        the storage alignment */
 
-    buflen -= GUARD_BUFSIZE;
+    if (buf) {
+        buflen -= MIN(buflen, GUARD_BUFSIZE);
+    
+        STORAGE_ALIGN_BUFFER(buf, buflen);
 
-    STORAGE_ALIGN_BUFFER(buf, buflen);
+        if (!buf || !buflen)
+            return false;
+    } else {
+        buflen = 0;
+    }
 
-    if (!buf || !buflen)
-        return false;
+    send_event(BUFFER_EVENT_BUFFER_RESET, NULL);
+
+    /* If handles weren't closed above, just do it */
+    while (num_handles != 0)
+        bufclose(first_handle->id);
 
     buffer = buf;
     buffer_len = buflen;

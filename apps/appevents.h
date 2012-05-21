@@ -54,6 +54,7 @@ enum {
     BUFFER_EVENT_CLOSED,
     BUFFER_EVENT_MOVED,
     BUFFER_EVENT_FINISHED,
+    BUFFER_EVENT_BUFFER_RESET
 };
 
 /** Generic GUI class events **/
