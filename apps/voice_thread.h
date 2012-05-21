@@ -37,7 +37,7 @@ bool mp3_is_playing(void);
 void voice_wait(void);
 void voice_stop(void);
 
-void voice_thread_init(void) INIT_ATTR;
+void voice_thread_init(void);
 #ifdef HAVE_PRIORITY_SCHEDULING
 void voice_thread_set_priority(int priority);
 #endif
