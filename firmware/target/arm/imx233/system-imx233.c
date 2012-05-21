@@ -100,6 +100,7 @@ void memory_init(void)
 
 void system_init(void)
 {
+    imx233_clkctrl_enable_clock(CLK_PLL, true);
     imx233_rtc_init();
     imx233_icoll_init();
     imx233_pinctrl_init();

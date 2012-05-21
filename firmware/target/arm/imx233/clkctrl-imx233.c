@@ -43,6 +43,17 @@ void imx233_clkctrl_enable_clock(enum imx233_clock_t clk, bool enable)
     {
         case CLK_PIX: REG = &HW_CLKCTRL_PIX; break;
         case CLK_SSP: REG = &HW_CLKCTRL_SSP; break;
+        case CLK_PLL:
+        {
+            if(enable)
+            {
+                __REG_SET(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__POWER;
+                while(!(HW_CLKCTRL_PLLCTRL1 & HW_CLKCTRL_PLLCTRL1__LOCK));
+            }
+            else
+                __REG_CLR(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__POWER;
+            return;
+        }
         default: return;
     }
 

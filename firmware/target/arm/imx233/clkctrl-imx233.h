@@ -34,6 +34,7 @@
 #define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BM     (3 << 20)
 
 #define HW_CLKCTRL_PLLCTRL1 (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x10))
+#define HW_CLKCTRL_PLLCTRL1__LOCK       (1 << 31)
 
 #define HW_CLKCTRL_CPU      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x20))
 #define HW_CLKCTRL_CPU__DIV_CPU_BP  0
@@ -121,7 +122,7 @@ enum imx233_clock_t
     CLK_IO, /* freq, frac */
     CLK_CPU, /* freq, div, frac, bypass */
     CLK_HBUS, /* freq, div, frac */
-    CLK_PLL, /* freq */
+    CLK_PLL, /* freq, enable */
     CLK_XTAL, /* freq */
     CLK_EMI, /* freq */
     CLK_XBUS, /* freq, div */
