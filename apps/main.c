@@ -88,6 +88,7 @@
 #if (CONFIG_CODEC == SWCODEC)
 #include "playback.h"
 #include "tdspeed.h"
+#include "voice_thread.h"
 #endif
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && !defined(SIMULATOR)
 #include "pcm_record.h"
@@ -421,9 +422,13 @@ static void init(void)
 
     audio_init();
 
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING)
+#if CONFIG_CODEC == SWCODEC
+    voice_thread_init();
+    talk_init();
+#ifdef HAVE_RECORDING
     pcm_rec_init();
 #endif
+#endif /* CONFIG_CODEC == SWCODEC */
 
     settings_apply_skins();
 }
@@ -722,9 +727,13 @@ static void init(void)
     audio_init();
     CHART("<audio_init");
 
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING)
+#if CONFIG_CODEC == SWCODEC
+    voice_thread_init();
+    talk_init();
+#ifdef HAVE_RECORDING
     pcm_rec_init();
 #endif
+#endif /* CONFIG_CODEC == SWCODEC */
 
     /* runtime database has to be initialized after audio_init() */
     cpu_boost(false);

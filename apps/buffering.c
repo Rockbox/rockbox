@@ -1759,11 +1759,14 @@ bool buffering_reset(char *buf, size_t buflen)
         buflen = 0;
     }
 
-    send_event(BUFFER_EVENT_BUFFER_RESET, NULL);
+    if (buffer) {
+        /* There is a current buffer */
+        send_event(BUFFER_EVENT_BUFFER_RESET, NULL);
 
-    /* If handles weren't closed above, just do it */
-    while (num_handles != 0)
-        bufclose(first_handle->id);
+        /* If handles weren't closed above, just do it */
+        while (num_handles != 0)
+            bufclose(first_handle->id);
+    }
 
     buffer = buf;
     buffer_len = buflen;
