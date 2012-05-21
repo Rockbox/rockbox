@@ -263,7 +263,7 @@ static void voice_buf_commit(int count)
 void mp3_play_data(const void *start, size_t size,
                    mp3_play_callback_t get_more)
 {
-    if (voice_thread_id && start && size && get_more)
+    if (start && size && get_more)
     {
         struct voice_info voice_clip =
         {
@@ -280,11 +280,8 @@ void mp3_play_data(const void *start, size_t size,
 /* Stop current voice clip from playing */
 void mp3_play_stop(void)
 {
-    if (voice_thread_id != 0)
-    {
-        LOGFQUEUE("mp3 >| voice Q_VOICE_STOP");
-        queue_send(&voice_queue, Q_VOICE_STOP, 0);
-    }
+    LOGFQUEUE("mp3 >| voice Q_VOICE_STOP");
+    queue_send(&voice_queue, Q_VOICE_STOP, 0);
 }
 
 void mp3_play_pause(bool play)
@@ -320,7 +317,7 @@ void voice_wait(void)
 
 /* Initialize voice thread data that must be valid upon starting and the
  * setup the DSP parameters */
-static void voice_data_init(struct voice_thread_data *td)
+static bool voice_data_init(struct voice_thread_data *td)
 {
     td->dsp = dsp_get_config(CODEC_IDX_VOICE);
     dsp_configure(td->dsp, DSP_RESET, 0);
@@ -329,7 +326,19 @@ static void voice_data_init(struct voice_thread_data *td)
     dsp_configure(td->dsp, DSP_SET_STEREO_MODE, STEREO_MONO);
 
     mixer_channel_set_amplitude(PCM_MIXER_CHAN_VOICE, MIX_AMP_UNITY);
+
+    voice_buf_hid = core_alloc_ex("voice buf", sizeof (*voice_buf), &ops);
+
+    if (voice_buf_hid <= 0)
+    {
+        logf("voice: core_alloc_ex failed");
+        return false;
+    }
+
+    voice_buf = core_get_data(voice_buf_hid);
+    memset(voice_buf, 0, sizeof (*voice_buf));
     voice_buf->td = td;
+    return true;
 }
 
 /* Voice thread message processing */
@@ -340,10 +349,17 @@ static enum voice_state voice_message(struct voice_thread_data *td)
     else
         queue_wait(&voice_queue, &td->ev);
 
+    if (!voice_buf && !voice_data_init(td))
+        return VOICE_STATE_MESSAGE;
+
     switch (td->ev.id)
     {
     case Q_VOICE_PLAY:
         LOGFQUEUE("voice < Q_VOICE_PLAY");
+
+        if (!voice_buf)
+            voice_data_init(td);
+
         if (quiet_counter == 0)
         {
             /* Boost CPU now */
@@ -491,8 +507,6 @@ static void NORETURN_ATTR voice_thread(void)
     struct voice_thread_data td;
     enum voice_state state = VOICE_STATE_MESSAGE;
 
-    voice_data_init(&td);
-
     while (1)
     {
         switch (state)
@@ -511,37 +525,8 @@ static void NORETURN_ATTR voice_thread(void)
 }
 
 /* Initialize buffers, all synchronization objects and create the thread */
-void voice_thread_init(void)
+void INIT_ATTR voice_thread_init(void)
 {
-    if (voice_thread_id != 0)
-        return; /* Already did an init and succeeded at it */
-
-    if (!talk_voice_required())
-    {
-        logf("No voice required");
-        return;
-    }
-
-    voice_buf_hid = core_alloc_ex("voice buf", sizeof (*voice_buf), &ops);
-
-    if (voice_buf_hid <= 0)
-    {
-        logf("voice: core_alloc_ex failed");
-        return;
-    }
-
-    voice_buf = core_get_data(voice_buf_hid);
-
-    if (voice_buf == NULL)
-    {
-        logf("voice: core_get_data failed");
-        core_free(voice_buf_hid);
-        voice_buf_hid = 0;
-        return;
-    }
-
-    memset(voice_buf, 0, sizeof (*voice_buf));
-
     logf("Starting voice thread");
     queue_init(&voice_queue, false);
 
@@ -557,9 +542,6 @@ void voice_thread_init(void)
 /* Set the voice thread priority */
 void voice_thread_set_priority(int priority)
 {
-    if (voice_thread_id == 0)
-        return;
-
     if (priority > PRIORITY_VOICE)
         priority = PRIORITY_VOICE;
 

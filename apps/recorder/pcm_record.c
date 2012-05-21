@@ -1170,7 +1170,7 @@ static void pcmrec_init(void)
     is_recording      = false;
     is_paused         = false;
 
-    buffer = audio_get_recording_buffer(&rec_buffer_size);
+    buffer = audio_get_buffer(true, &rec_buffer_size);
 
     /* Line align pcm_buffer 2^5=32 bytes */
     pcm_buffer = (unsigned char *)ALIGN_UP_P2((uintptr_t)buffer, 5);

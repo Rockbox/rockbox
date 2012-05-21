@@ -80,12 +80,6 @@ void audio_set_cuesheet(int enable);
 void audio_set_crossfade(int enable);
 #endif
 
-enum
-{
-    AUDIO_WANT_PLAYBACK = 0,
-    AUDIO_WANT_VOICE,
-};
-bool audio_restore_playback(int type); /* Restores the audio buffer to handle the requested playback */
 size_t audio_get_filebuflen(void);
 
 /* Automatic transition? Only valid to call during the track change events,
@@ -96,6 +90,18 @@ bool audio_automatic_skip(void);
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 #define AUDIO_HAVE_RECORDING
 #endif
+
+/** Possible arrangements of the main buffer **/
+enum audiobuf_state
+{
+    AUDIOBUF_TRASHED       = -2, /* mnemonic synonym for lowest */
+    AUDIOBUF_TAKE_ALL      = -2, /* demote to trashed */
+    AUDIOBUF_TAKE_PLAYBACK = -1, /* demote to voiced */
+    AUDIOBUF_VOICED        = 0,  /* promote to voice (if not at least) */
+    AUDIOBUF_PLAYBACK      = 1,  /* promote to playback (if not at least) */
+};
+
+void * audio_get_buffer_ex(enum audiobuf_state state, size_t *size);
 
 enum {
     Q_NULL = 0,                 /* reserved */

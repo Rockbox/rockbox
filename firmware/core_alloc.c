@@ -24,6 +24,17 @@ unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
 extern unsigned char *audiobufend;
 #endif
 
+static struct mutex core_mtx SHAREDBSS_ATTR;
+static void core_mutex_lock(void)
+{
+    mutex_lock(&core_mtx);
+}
+
+static void core_mutex_unlock(void)
+{
+    mutex_unlock(&core_mtx);
+}
+
 /* debug test alloc */
 static int test_alloc;
 void core_allocator_init(void)
@@ -37,6 +48,8 @@ void core_allocator_init(void)
         audiobufend -= (32<<20);
     }
 #endif
+
+    mutex_init(&core_mtx);
 
     buflib_init(&core_ctx, start, audiobufend - start);
 
@@ -54,31 +67,45 @@ bool core_test_free(void)
 
 int core_alloc(const char* name, size_t size)
 {
-    return buflib_alloc_ex(&core_ctx, size, name, NULL);
+    core_mutex_lock();
+    int handle = buflib_alloc_ex(&core_ctx, size, name, NULL);
+    core_mutex_unlock();
+    return handle;
 }
 
 int core_alloc_ex(const char* name, size_t size, struct buflib_callbacks *ops)
 {
-    return buflib_alloc_ex(&core_ctx, size, name, ops);
+    core_mutex_lock();
+    int handle = buflib_alloc_ex(&core_ctx, size, name, ops);
+    core_mutex_unlock();
+    return handle;
 }
 
 size_t core_available(void)
 {
-    return buflib_available(&core_ctx);
+    core_mutex_lock();
+    size_t size = buflib_available(&core_ctx);
+    core_mutex_unlock();
+    return size;
 }
 
 int core_free(int handle)
 {
+    /* Doesn't currently do callbacks; no lock */
     return buflib_free(&core_ctx, handle);
 }
 
 int core_alloc_maximum(const char* name, size_t *size, struct buflib_callbacks *ops)
 {
-    return buflib_alloc_maximum(&core_ctx, name, size, ops);
+    core_mutex_lock();
+    int handle = buflib_alloc_maximum(&core_ctx, name, size, ops);
+    core_mutex_unlock();
+    return handle;
 }
 
 bool core_shrink(int handle, void* new_start, size_t new_size)
 {
+    /* Doesn't currently do callbacks; no lock */
     return buflib_shrink(&core_ctx, handle, new_start, new_size);
 }
 

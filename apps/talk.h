@@ -76,12 +76,8 @@ extern const char* const dir_thumbnail_name; /* "_dirname.talk" */
 extern const char* const file_thumbnail_ext; /* ".talk" for file voicing */
 
 void talk_init(void);
-#if CONFIG_CODEC == SWCODEC
-bool talk_voice_required(void); /* returns true if voice codec required */
-#endif
-int talk_get_bufsize(void); /* get the loaded voice file size */
-size_t talkbuf_init(char* bufstart);
-void talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
+void talk_buffer_steal(void); /* claim the talk buffer e.g. for play/record */
+void talk_buffer_return(void); /* return the talk buffer to talk */
 bool is_voice_queued(void); /* Are there more voice clips to be spoken? */
 int talk_id(int32_t id, bool enqueue); /* play a voice ID from voicefont */
 /* play a thumbnail from file */
@@ -94,6 +90,8 @@ int talk_file_or_spell(const char *dirname, const char* filename,
 /* play dir's thumbnail or spell name */
 int talk_dir_or_spell(const char* filename,
                       const long *prefix_ids, bool enqueue);
+#else
+size_t talkbuf_init(char* bufstart);
 #endif
 int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
