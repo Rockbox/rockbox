@@ -69,6 +69,15 @@ void button_init_device(void)
     
     imx233_touchscreen_init();
     imx233_touchscreen_enable(true);
+
+    /* power button */
+    imx233_pinctrl_acquire_pin(0, 11, "power");
+    imx233_set_pin_function(0, 11, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(0, 11, false);
+    /* select button */
+    imx233_pinctrl_acquire_pin(0, 14, "select");
+    imx233_set_pin_function(0, 14, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(0, 14, false);
 }
 
 static int touch_to_pixels(int *val_x, int *val_y)
