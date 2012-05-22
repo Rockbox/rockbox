@@ -44,22 +44,21 @@ static void setup_parameters(void)
 
 static void setup_lcd_pins(bool use_lcdif)
 {
+    /* WARNING
+     * the B1P22 pins is used to gate the speaker! Do NOT drive
+     * them as lcd_dotclk and lcd_hsync or it will break audio */
     imx233_pinctrl_acquire_pin(1, 18, "lcd reset");
     imx233_pinctrl_acquire_pin(1, 19, "lcd rs");
     imx233_pinctrl_acquire_pin(1, 20, "lcd wr");
     imx233_pinctrl_acquire_pin(1, 21, "lcd cs");
-    imx233_pinctrl_acquire_pin(1, 22, "lcd dotclk");
     imx233_pinctrl_acquire_pin(1, 23, "lcd enable");
-    imx233_pinctrl_acquire_pin(1, 24, "lcd hsync");
     imx233_pinctrl_acquire_pin(1, 25, "lcd vsync");
     imx233_pinctrl_acquire_pin_mask(1, 0x3ffff, "lcd data");
     if(use_lcdif)
     {
         imx233_set_pin_function(1, 25, PINCTRL_FUNCTION_MAIN); /* lcd_vsync */
         imx233_set_pin_function(1, 21, PINCTRL_FUNCTION_MAIN); /* lcd_cs */
-        imx233_set_pin_function(1, 22, PINCTRL_FUNCTION_MAIN); /* lcd_dotclk */
-        imx233_set_pin_function(1, 23, PINCTRL_FUNCTION_MAIN); /* lcd_enable */
-        imx233_set_pin_function(1, 24, PINCTRL_FUNCTION_MAIN); /* lcd_hsync */
+        imx233_set_pin_function(1, 23, PINCTRL_FUNCTION_GPIO); /* lcd_enable */
         imx233_set_pin_function(1, 18, PINCTRL_FUNCTION_MAIN); /* lcd_reset */
         imx233_set_pin_function(1, 19, PINCTRL_FUNCTION_MAIN); /* lcd_rs */
         imx233_set_pin_function(1, 16, PINCTRL_FUNCTION_MAIN); /* lcd_d16 */
@@ -70,15 +69,13 @@ static void setup_lcd_pins(bool use_lcdif)
     else
     {
         __REG_SET(HW_PINCTRL_MUXSEL(2)) = 0xffffffff; /* lcd_d{0-15} */
-        imx233_enable_gpio_output_mask(1, 0x3ffffff, false); /* lcd_{d{0-17},reset,rs,wr,cs,dotclk,enable,hsync,vsync} */
+        imx233_enable_gpio_output_mask(1, 0x2bfffff, false); /* lcd_{d{0-17},reset,rs,wr,cs,enable,vsync} */
         imx233_set_pin_function(1, 16, PINCTRL_FUNCTION_GPIO); /* lcd_d16 */
         imx233_set_pin_function(1, 17, PINCTRL_FUNCTION_GPIO); /* lcd_d17 */
         imx233_set_pin_function(1, 19, PINCTRL_FUNCTION_GPIO); /* lcd_rs */
         imx233_set_pin_function(1, 20, PINCTRL_FUNCTION_GPIO); /* lcd_wr */
         imx233_set_pin_function(1, 21, PINCTRL_FUNCTION_GPIO); /* lcd_cs */
-        imx233_set_pin_function(1, 22, PINCTRL_FUNCTION_GPIO); /* lcd_dotclk */
         imx233_set_pin_function(1, 23, PINCTRL_FUNCTION_GPIO); /* lcd_enable */
-        imx233_set_pin_function(1, 24, PINCTRL_FUNCTION_GPIO); /* lcd_hsync */
         imx233_set_pin_function(1, 25, PINCTRL_FUNCTION_GPIO); /* lcd_vsync */
     }
 }
