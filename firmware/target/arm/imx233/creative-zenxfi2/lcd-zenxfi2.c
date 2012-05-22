@@ -44,6 +44,15 @@ static void setup_parameters(void)
 
 static void setup_lcd_pins(bool use_lcdif)
 {
+    imx233_pinctrl_acquire_pin(1, 18, "lcd reset");
+    imx233_pinctrl_acquire_pin(1, 19, "lcd rs");
+    imx233_pinctrl_acquire_pin(1, 20, "lcd wr");
+    imx233_pinctrl_acquire_pin(1, 21, "lcd cs");
+    imx233_pinctrl_acquire_pin(1, 22, "lcd dotclk");
+    imx233_pinctrl_acquire_pin(1, 23, "lcd enable");
+    imx233_pinctrl_acquire_pin(1, 24, "lcd hsync");
+    imx233_pinctrl_acquire_pin(1, 25, "lcd vsync");
+    imx233_pinctrl_acquire_pin_mask(1, 0x3ffff, "lcd data");
     if(use_lcdif)
     {
         imx233_set_pin_function(1, 25, PINCTRL_FUNCTION_MAIN); /* lcd_vsync */
