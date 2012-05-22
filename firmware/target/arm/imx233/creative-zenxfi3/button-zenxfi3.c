@@ -122,9 +122,22 @@ void button_init_device(void)
     create_thread(mpr121_thread, mpr121_stack, sizeof(mpr121_stack), 0,
         mpr121_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
     /* enable interrupt */
+    imx233_pinctrl_acquire_pin(0, 18, "mpr121 int");
     imx233_set_pin_function(0, 18, PINCTRL_FUNCTION_GPIO);
     imx233_enable_gpio_output(0, 18, false);
     imx233_setup_pin_irq(0, 18, true, true, false, &mpr121_irq_cb);
+    /* hold button */
+    imx233_pinctrl_acquire_pin(0, 4, "hold");
+    imx233_set_pin_function(0, 4, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(0, 4, false);
+    /* volume down button */
+    imx233_pinctrl_acquire_pin(0, 7, "volume down");
+    imx233_set_pin_function(0, 7, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(0, 7, false);
+    /* volume up button */
+    imx233_pinctrl_acquire_pin(0, 8, "volume up");
+    imx233_set_pin_function(0, 8, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(0, 8, false);
 }
 
 bool button_hold(void)
