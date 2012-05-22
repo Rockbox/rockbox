@@ -131,13 +131,13 @@ void button_init_device(void)
     imx233_set_pin_function(0, 4, PINCTRL_FUNCTION_GPIO);
     imx233_enable_gpio_output(0, 4, false);
     /* volume down button */
-    imx233_pinctrl_acquire_pin(0, 7, "volume down");
-    imx233_set_pin_function(0, 7, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(0, 7, false);
+    imx233_pinctrl_acquire_pin(2, 7, "volume down");
+    imx233_set_pin_function(2, 7, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(2, 7, false);
     /* volume up button */
-    imx233_pinctrl_acquire_pin(0, 8, "volume up");
-    imx233_set_pin_function(0, 8, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(0, 8, false);
+    imx233_pinctrl_acquire_pin(2, 8, "volume up");
+    imx233_set_pin_function(2, 8, PINCTRL_FUNCTION_GPIO);
+    imx233_enable_gpio_output(2, 8, false);
 }
 
 bool button_hold(void)
