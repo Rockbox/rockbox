@@ -49,6 +49,8 @@ void imx233_pwm_setup_channel(int channel, int period, int cdiv, int active,
     if(enable)
         imx233_pwm_enable_channel(channel, false);
     /* setup pin */
+    imx233_pinctrl_acquire_pin(IMX233_PWM_PIN_BANK(channel),
+        IMX233_PWM_PIN(channel), "pwm");
     imx233_set_pin_function(IMX233_PWM_PIN_BANK(channel), IMX233_PWM_PIN(channel),
         PINCTRL_FUNCTION_MAIN);
     imx233_set_pin_drive_strength(IMX233_PWM_PIN_BANK(channel), IMX233_PWM_PIN(channel),
