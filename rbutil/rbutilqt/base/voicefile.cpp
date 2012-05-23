@@ -57,15 +57,16 @@ bool VoiceFileCreator::createVoiceFile()
 
     QString target = info.target();
     QString features = info.features();
-    QString version = info.version();
     m_targetid = info.targetID().toInt();
-    m_versionstring = version.left(version.indexOf("-")).remove("r");
+    m_versionstring = info.version();
+    QString version = m_versionstring.left(m_versionstring.indexOf("-")).remove("r");
+    qDebug() << m_versionstring;
 
     //prepare download url
     QString genlang = SystemInfo::value(SystemInfo::GenlangUrl).toString();
     genlang.replace("%LANG%", m_lang);
     genlang.replace("%TARGET%", target);
-    genlang.replace("%REVISION%", m_versionstring);
+    genlang.replace("%REVISION%", version);
     genlang.replace("%FEATURES%", features);
     QUrl genlangUrl(genlang);
     qDebug() << "[VoiceFileCreator] downloading " << genlangUrl;
