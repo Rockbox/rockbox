@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAKH///v8\u003d",
+        "filename": "apps/lang/lang.make",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000014
+      },
+      "writtenOn": "2012-05-23T10:22:00Z",
+      "side": 1,
+      "message": "I don\u0027t like 3-char extensions. Please call it something descriptive instead.",
+      "revId": "c2f86130909b3b257986a348e5cfcf618c4500c3",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
