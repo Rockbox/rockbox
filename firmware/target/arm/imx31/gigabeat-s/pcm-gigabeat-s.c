@@ -428,13 +428,11 @@ void pcm_rec_dma_start(void *addr, size_t size)
     if (!sdma_channel_reset(DMA_REC_CH_NUM))
         return;
 
+    SSI_SRCR1 |= SSI_SRCR_RFEN0; /* Enable RX FIFO */
+
     /* Ensure clear FIFO */
     while (SSI_SFCSR1 & SSI_SFCSR_RFCNT0)
         SSI_SRX0_1;
-
-    dma_rec_data.state = 1; /* Check callback on unlock */
-
-    SSI_SRCR1 |= SSI_SRCR_RFEN0; /* Enable RX FIFO */
 
     /* Enable receive */
     SSI_SCR1 |= SSI_SCR_RE;
@@ -442,6 +440,8 @@ void pcm_rec_dma_start(void *addr, size_t size)
 
     /* Begin DMA transfer */
     rec_start_dma(addr, size);
+
+    dma_rec_data.state = 1; /* Check callback on unlock */
 }
 
 void pcm_rec_dma_close(void)
