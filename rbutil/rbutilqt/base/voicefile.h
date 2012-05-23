@@ -64,6 +64,7 @@ private:
     QString m_path;   //path where the wav and mp3 files are stored to
     int m_targetid;  //the target id
     QString m_lang;  // the language which will be spoken
+    QString m_versionstring; // version string to be used for logging
     int m_wavtrimThreshold;
 
     bool m_abort;

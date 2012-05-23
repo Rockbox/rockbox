@@ -59,13 +59,13 @@ bool VoiceFileCreator::createVoiceFile()
     QString features = info.features();
     QString version = info.version();
     m_targetid = info.targetID().toInt();
-    version = version.left(version.indexOf("-")).remove("r");
- 
+    m_versionstring = version.left(version.indexOf("-")).remove("r");
+
     //prepare download url
     QString genlang = SystemInfo::value(SystemInfo::GenlangUrl).toString();
     genlang.replace("%LANG%", m_lang);
     genlang.replace("%TARGET%", target);
-    genlang.replace("%REVISION%", version);
+    genlang.replace("%REVISION%", m_versionstring);
     genlang.replace("%FEATURES%", features);
     QUrl genlangUrl(genlang);
     qDebug() << "[VoiceFileCreator] downloading " << genlangUrl;
@@ -95,7 +95,8 @@ void VoiceFileCreator::downloadDone(bool error)
     // update progress bar
     emit logProgress(1,1);
     if(getter->httpResponse() != 200 && !getter->isCached()) {
-        emit logItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()),LOGERROR);
+        emit logItem(tr("Download error: received HTTP error %1.")
+                .arg(getter->httpResponse()),LOGERROR);
         emit done(true);
         return;
     }
@@ -233,15 +234,14 @@ void VoiceFileCreator::downloadDone(bool error)
 
     // Add Voice file to the install log
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
-    installlog.beginGroup("selfcreated Voice");
-    installlog.setValue("/.rockbox/langs/" + m_lang + ".voice",
-            QDate::currentDate().toString("yyyyMMdd"));
+    installlog.beginGroup(QString("Voice (self created, %1)").arg(m_lang));
+    installlog.setValue("/.rockbox/langs/" + m_lang + ".voice", m_versionstring);
     installlog.endGroup();
     installlog.sync();
 
     emit logProgress(1,1);
     emit logItem(tr("successfully created."),LOGOK);
-    
+
     emit done(false);
 }
 
