@@ -59,7 +59,7 @@ void ZipInstaller::installContinue()
         m_url = m_urllist.at(runner);
         m_logsection = m_loglist.at(runner);
         if(runner < m_verlist.size()) m_logver = m_verlist.at(runner);
-        else m_logver = "0";
+        else m_logver = "";
         installStart();
     }
     else {
@@ -175,6 +175,10 @@ void ZipInstaller::downloadDone(bool error)
 
         // add file to log
         zipContents.append(m_target);
+    }
+    if(m_logver.isEmpty()) {
+        // if no version info is set use the timestamp of the server file.
+        m_logver = getter->timestamp().toString(Qt::ISODate);
     }
 
     emit logItem(tr("Creating installation log"),LOGINFO);

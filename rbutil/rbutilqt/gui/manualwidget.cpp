@@ -127,7 +127,7 @@ void ManualWidget::downloadManual(void)
     }
     qDebug() << "[ManualWidget] Manual URL:" << manualurl;
 
-    installer->setLogVersion(ServerInfo::value(ServerInfo::DailyDate).toString());
+    installer->setLogVersion();
     installer->setUrl(manualurl);
     installer->setUnzip(false);
 

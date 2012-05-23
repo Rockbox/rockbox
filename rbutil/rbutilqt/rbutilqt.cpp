@@ -994,7 +994,7 @@ void RbUtilQt::installDoom()
 
     installer->setUrl(SystemInfo::value(SystemInfo::DoomUrl).toString());
     installer->setLogSection("Game Addons");
-    installer->setLogVersion(ServerInfo::value(ServerInfo::DailyDate).toString());
+    installer->setLogVersion();
     installer->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
