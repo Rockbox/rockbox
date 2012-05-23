@@ -60,7 +60,6 @@ bool VoiceFileCreator::createVoiceFile()
     m_targetid = info.targetID().toInt();
     m_versionstring = info.version();
     QString version = m_versionstring.left(m_versionstring.indexOf("-")).remove("r");
-    qDebug() << m_versionstring;
 
     //prepare download url
     QString genlang = SystemInfo::value(SystemInfo::GenlangUrl).toString();
