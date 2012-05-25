@@ -43,10 +43,10 @@ enum {
     DISK_EVENT_SPINUP = (EVENT_CLASS_DISK|1),
 };
 
-#define USING_STORAGE_CALLBACK  ((CONFIG_STORAGE & STORAGE_NAND) \
-                                && (CONFIG_NAND == NAND_IFP7XX)) \
-                                && !defined(BOOTLOADER) || \
-                                (CONFIG_PLATFORM & PLATFORM_HOSTED)
+/* Enable storage callbacks everywhere except for bootloaders. Both
+ * hosted and native targets need this.
+ */
+#define USING_STORAGE_CALLBACK  !defined(BOOTLOADER)
 
 extern void register_storage_idle_func(void (*function)(void *data));
 #if USING_STORAGE_CALLBACK
