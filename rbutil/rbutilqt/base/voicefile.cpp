@@ -73,7 +73,7 @@ bool VoiceFileCreator::createVoiceFile()
     //download the correct genlang output
     QTemporaryFile *downloadFile = new QTemporaryFile(this);
     downloadFile->open();
-    filename = downloadFile->fileName();
+    m_filename = downloadFile->fileName();
     downloadFile->close();
     // get the real file.
     getter = new HttpGet(this);
@@ -100,8 +100,8 @@ void VoiceFileCreator::downloadDone(bool error)
         emit done(true);
         return;
     }
-    
-    if(getter->isCached()) 
+
+    if(getter->isCached())
         emit logItem(tr("Cached file used."), LOGINFO);
     if(error)
     {
@@ -109,13 +109,18 @@ void VoiceFileCreator::downloadDone(bool error)
         emit done(true);
         return;
     }
-    else 
+    else
         emit logItem(tr("Download finished."),LOGINFO);
-    
-    QCoreApplication::processEvents();
 
+    QCoreApplication::processEvents();
+    create();
+}
+
+
+void VoiceFileCreator::create(void)
+{
     //open downloaded file
-    QFile genlang(filename);
+    QFile genlang(m_filename);
     if(!genlang.open(QIODevice::ReadOnly))
     {
         emit logItem(tr("failed to open downloaded file"),LOGERROR);
@@ -206,7 +211,7 @@ void VoiceFileCreator::downloadDone(bool error)
     
     //make voicefile
     emit logItem(tr("Creating voicefiles..."),LOGINFO);
-    FILE* ids2 = fopen(filename.toLocal8Bit(), "r");
+    FILE* ids2 = fopen(m_filename.toLocal8Bit(), "r");
     if (ids2 == NULL)
     {
         cleanup();

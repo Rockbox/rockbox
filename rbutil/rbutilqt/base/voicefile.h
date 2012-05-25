@@ -41,10 +41,10 @@ public:
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
     void setLang(QString name) { m_lang = name; }
     void setWavtrimThreshold(int th){m_wavtrimThreshold = th;}
-    
+
 public slots:
     void abort();
-    
+
 signals:
     void done(bool);
     void aborted();
@@ -56,10 +56,11 @@ private slots:
 
 private:
 
+    void create(void);
     void cleanup();
 
     HttpGet *getter;
-    QString filename;  //the temporary file
+    QString m_filename;  //the temporary file
     QString m_mountpoint;  //mountpoint of the device
     QString m_path;   //path where the wav and mp3 files are stored to
     int m_targetid;  //the target id
