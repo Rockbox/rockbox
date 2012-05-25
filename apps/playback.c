@@ -3624,8 +3624,7 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
     if (buffer_state == AUDIOBUF_STATE_INITIALIZED)
         buffering_reset(NULL, 0); /* mark buffer invalid */
 
-    if (talk_buf || buffer_state == AUDIOBUF_STATE_TRASHED
-           || !talk_voice_required())
+    if (talk_buf || !talk_voice_required())
     {
         logf("get buffer: talk, audio");
         /* Ok to use everything from audiobuf - voice is loaded,
