@@ -626,7 +626,7 @@ static bool restore_state(void)
     {
         size_t size;
         audio_restore_playback(AUDIO_WANT_VOICE);
-        voicebuf = audio_get_buffer(false, &size);
+        voicebuf = audio_get_buffer(true, &size);
     }
 
     return !!voicebuf;
