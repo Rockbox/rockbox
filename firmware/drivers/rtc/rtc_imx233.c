@@ -36,15 +36,15 @@ void rtc_init(void)
 int rtc_read_datetime(struct tm *tm)
 {
     uint32_t seconds = imx233_rtc_read_seconds();
-    #ifdef SANSA_FUZEPLUS
+#if defined(SANSA_FUZEPLUS) || defined(CREATIVE_ZENXFI3)
     /* The OF uses PERSISTENT2 register to keep the adjustment and only changes
      * SECONDS if necessary. */
     seconds += imx233_rtc_read_persistent(2);
-    #else
+#else
     /* The Freescale recommended way of keeping time is the number of seconds
      * since 00:00 1/1/1980 */
     seconds += YEAR1980;
-    #endif
+#endif
 
     gmtime_r(&seconds, tm);
 
@@ -57,18 +57,18 @@ int rtc_write_datetime(const struct tm *tm)
 
     seconds = mktime((struct tm *)tm);
 
-    #ifdef SANSA_FUZEPLUS
+#if defined(SANSA_FUZEPLUS) || defined(CREATIVE_ZENXFI3)
     /* The OF uses PERSISTENT2 register to keep the adjustment and only changes
      * SECONDS if necessary.
      * NOTE: the OF uses this mechanism to prevent roll back in time. Although
      *       Rockbox will handle a negative PERSISTENT2 value, the OF will detect
      *       it and won't return in time before SECONDS */
     imx233_rtc_write_persistent(2, seconds - imx233_rtc_read_seconds());
-    #else
+#else
     /* The Freescale recommended way of keeping time is the number of seconds
      * since 00:00 1/1/1980 */
     imx233_rtc_write_seconds(seconds - YEAR1980);
-    #endif
+#endif
 
     return 0;
 }
