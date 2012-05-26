@@ -20,24 +20,44 @@
  ****************************************************************************/
 
 #include <string.h> /* size_t */
+#include <dlfcn.h>
+#include "debug.h"
 #include "load_code.h"
 
-/* unix specific because WIN32 wants UCS instead of UTF-8, so filenames
- * need to be converted */
-
-/* plain wrappers , nothing to do */
 void *lc_open(const char *filename, unsigned char *buf, size_t buf_size)
 {
-    return _lc_open(filename, buf, buf_size);
+    (void)buf;
+    (void)buf_size;
+    void *handle = dlopen(filename, RTLD_NOW);
+    if (handle == NULL)
+    {
+        DEBUGF("failed to load %s\n", filename);
+        DEBUGF("lc_open(%s): %s\n", filename, dlerror());
+    }
+    return handle;
 }
 
 void *lc_get_header(void *handle)
 {
-    return _lc_get_header(handle);
+    char *ret = dlsym(handle, "__header");
+    if (ret == NULL)
+        ret = dlsym(handle, "___header");
+
+    return ret;
 }
 
 void lc_close(void *handle)
 {
-    _lc_close(handle);
+    dlclose(handle);
 }
 
+void *lc_open_from_mem(void *addr, size_t blob_size)
+{
+    (void)addr;
+    (void)blob_size;
+    /* we don't support loading code from memory on application builds,
+     * it doesn't make sense (since it means writing the blob to disk again and
+     * then falling back to load from disk) and requires the ability to write
+     * to an executable directory */
+    return NULL;
+}

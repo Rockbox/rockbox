@@ -7,7 +7,6 @@ backlight.c
 buflib.c
 core_alloc.c
 general.c
-load_code.c
 powermgmt.c
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 
@@ -32,6 +31,7 @@ logf.c
 #endif /* ROCKBOX_HAS_LOGF */
 kernel.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+load_code.c
 #ifdef RB_PROFILE
 profile.c
 #endif /* RB_PROFILE */

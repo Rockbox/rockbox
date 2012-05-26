@@ -584,27 +584,79 @@ int sim_fsync(int fd)
 
 #ifndef __PCTOOL__
 
+#include <SDL_loadso.h>
 void *lc_open(const char *filename, unsigned char *buf, size_t buf_size)
 {
-    const char *sim_path = get_sim_pathname(filename);
-    void *handle = _lc_open(UTF8_TO_OS(sim_path), buf, buf_size);
-
+    (void)buf;
+    (void)buf_size;
+    void *handle = SDL_LoadObject(get_sim_pathname(filename));
     if (handle == NULL)
     {
         DEBUGF("failed to load %s\n", filename);
-        DEBUGF("lc_open(%s): %s\n", filename, lc_last_error());
+        DEBUGF("lc_open(%s): %s\n", filename, SDL_GetError());
     }
     return handle;
 }
 
 void *lc_get_header(void *handle)
 {
-    return _lc_get_header(handle);
+    char *ret = SDL_LoadFunction(handle, "__header");
+    if (ret == NULL)
+        ret = SDL_LoadFunction(handle, "___header");
+
+    return ret;
 }
 
 void lc_close(void *handle)
 {
-    _lc_close(handle);
+    SDL_UnloadObject(handle);
+}
+
+void *lc_open_from_mem(void *addr, size_t blob_size)
+{
+#ifndef SIMULATOR
+    (void)addr;
+    (void)blob_size;
+    /* we don't support loading code from memory on application builds,
+     * it doesn't make sense (since it means writing the blob to disk again and
+     * then falling back to load from disk) and requires the ability to write
+     * to an executable directory */
+    return NULL;
+#else
+    /* support it in the sim for the sake of simulating */
+    int fd, i;
+    char temp_filename[MAX_PATH];
+
+    /* We have to create the dynamic link library file from ram so we
+       can simulate the codec loading. With voice and crossfade,
+       multiple codecs may be loaded at the same time, so we need
+       to find an unused filename */
+    for (i = 0; i < 10; i++)
+    {
+        snprintf(temp_filename, sizeof(temp_filename),
+                 ROCKBOX_DIR "/libtemp_binary_%d.dll", i);
+        fd = open(temp_filename, O_WRONLY|O_CREAT|O_TRUNC, 0700);
+        if (fd >= 0)
+            break;  /* Created a file ok */
+    }
+
+    if (fd < 0)
+    {
+        DEBUGF("open failed\n");
+        return NULL;
+    }
+
+    if (write(fd, addr, blob_size) < (ssize_t)blob_size)
+    {
+        DEBUGF("Write failed\n");
+        close(fd);
+        remove(temp_filename);
+        return NULL;
+    }
+
+    close(fd);
+    return lc_open(temp_filename, NULL, 0);
+#endif
 }
 
 #endif /* __PCTOOL__ */
