@@ -52,6 +52,7 @@ enum plugin_status run_overlay(const void* parameter,
     void *handle;
     struct plugin_header *p_hdr;
     struct lc_header     *hdr;
+    enum plugin_status retval = PLUGIN_ERROR;
 
     audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
     if (!audiobuf)
@@ -90,13 +91,11 @@ enum plugin_status run_overlay(const void* parameter,
         goto error_close;
     }
 
-    rb->lc_close(handle);
-
     *(p_hdr->api) = rb;
-    return p_hdr->entry_point(parameter);
-
+    retval = p_hdr->entry_point(parameter);
+    /* fall through */
 error_close:
     rb->lc_close(handle);
 error:
-    return PLUGIN_ERROR;
+    return retval;
 }
