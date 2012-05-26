@@ -2231,7 +2231,7 @@ fi
     output="rockbox.creative"
     bootoutput="bootloader-zenxfi3.creative"
     appextra="gui:recorder:radio"
-    plugins="no"
+    plugins=""
     swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
