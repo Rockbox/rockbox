@@ -214,6 +214,9 @@ static const char graphic_numeric[] = "graphic,numeric";
 #elif LCD_HEIGHT <= 80
   #define DEFAULT_FONT_HEIGHT 11
   #define DEFAULT_FONTNAME "11-Sazanami-Mincho"
+#elif (LCD_HEIGHT == 96) && (LCD_WIDTH == 96)   /* sandisk sansa clip zip */
+  #define DEFAULT_FONT_HEIGHT 8
+  #define DEFAULT_FONTNAME "08-Rockfont"
 #elif LCD_HEIGHT <= 220
   #define DEFAULT_FONT_HEIGHT 12
 #elif LCD_HEIGHT <= 320
@@ -250,9 +253,12 @@ static const char graphic_numeric[] = "graphic,numeric";
   #elif DEFAULT_FONT_HEIGHT >= 15
     #define DEFAULT_ICONSET "tango_icons.16x16"
     #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.16x16"
-  #else
+  #elif DEFAULT_FONT_HEIGHT >= 11
     #define DEFAULT_ICONSET "tango_icons.12x12"
     #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.12x12"
+  #elif DEFAULT_FONT_HEIGHT >= 7
+    #define DEFAULT_ICONSET "tango_icons.8x8"
+    #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.8x8"
   #endif
 #elif LCD_DEPTH > 1 /* greyscale */
   #define DEFAULT_ICONSET "tango_small_mono"
