@@ -77,7 +77,7 @@ static Boolean CliReport(void *data, Int32 address)
     unsigned *line = (unsigned *)data;
 
 
-    lcd_putsf(0, (*line)++, "    %c: 0x%08x",
+    lcd_putsf(0, (*line)++, "    %c: %08x",
               (address & 0x1) ? 'T' : 'A',
               address & (~0x1));
     lcd_update();
@@ -110,7 +110,7 @@ void backtrace(int pcAddr, int spAddr, unsigned *line)
 {
     UnwResult r;
 
-    lcd_putsf(0, (*line)++, "bt pc: 0x%08x, sp: 0x%08x", pcAddr, spAddr);
+    lcd_putsf(0, (*line)++, "bt pc: %08x, sp: %08x", pcAddr, spAddr);
     lcd_update();
 
     r = UnwindStart(pcAddr, spAddr, &cliCallbacks, (void *)line);
