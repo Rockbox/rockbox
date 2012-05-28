@@ -1,4 +1,3 @@
-#!/bin/sh
 ######################################################################
 #             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
@@ -43,6 +42,13 @@ echo "95" > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
 # bind these two to the root so that they're writable
 mount --bind /mnt/media0/.rockbox /.rockbox
 mount --bind /mnt/media0/Playlists /Playlists
+
+# replace Samsung's si470x.ko with our si4709.ko to support fm radio
+if [ -e /lib/modules/si4709.ko ]
+then
+  rmmod /lib/modules/si470x.ko
+  insmod /lib/modules/si4709.ko
+fi
 
 MAINFILE="/mnt/media0/.rockbox/rockbox"
 MAINFILE_ARGV=''

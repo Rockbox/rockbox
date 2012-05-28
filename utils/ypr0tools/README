@@ -10,3 +10,6 @@ After that, R0.ROM is patched and can load Rockbox.
 
 rockbox.sh is a script to put into rockbox.zip. It's a small loader script
 that sets stuff up.
+
+files/lib/modules/si4709.ko is a replacement kernel module for fm radio support,
+its source code is packaged in ./si4709.7z.
