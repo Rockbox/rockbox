@@ -41,15 +41,17 @@ sub doconfigure {
 	}
 	$command = "${srcdir}/configure --type=${type} --target=${target}";
 	%typenames = ("n" => "Normal", "s" => "Simulator", "b" => "Bootloader" );
-	print "Rockbox autoconf: \n\tTarget: $target \n\tType: $typenames{$type} \nCorrect? [Y/n] ";
-	chomp($response = <>);
-	if ($response eq "") {
-		$response = "y";
-	}
-	if ($response ne "y" && $response ne "Y") {
-		print "autoconf: Aborting\n";
-		exit(0);
-	}
+    unless (@ARGV[0] eq "-y") {
+        print "Rockbox autoconf: \n\tTarget: $target \n\tType: $typenames{$type} \nCorrect? [Y/n] ";
+        chomp($response = <>);
+        if ($response eq "") {
+            $response = "y";
+        }
+        if ($response ne "y" && $response ne "Y") {
+            print "autoconf: Aborting\n";
+            exit(0);
+        }
+    }
 	system($command);
 }
 
@@ -59,18 +61,22 @@ sub buildtype {
 		$build = "s";
 	} elsif ($text eq "boot") {
 		$build = "b";
-	} else {
+    } elsif ($text eq "build") {
 		$build = "n";
-	}
+	} else {
+        $build = "";
+    }
 	return $build;
 }
 
 if ($test =~ /(.*)-(.*)/)
 {
-	$target = $1;
-	$build = buildtype($2);
-	doconfigure($target, $build);
-} 
+    if (buildtype($2)) {
+        doconfigure($1, buildtype($2));
+    } elsif (buildtype($1)) {
+        doconfigure($2, buildtype($1));
+    }
+}
 elsif ($test =~ /(.*)/)
 {
 	$target = $1;
