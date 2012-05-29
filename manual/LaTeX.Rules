@@ -119,6 +119,14 @@ OTHER_FILES := $(DOCUMENT).blg $(DOCUMENT).log $(DOCUMENT).out
 INDEX_ARGS := -s mkidx.ist
 LATEXOPTS := -interaction=nonstopmode
 
+# program to pipe stdout through. Note: this needs to start with a pipe symbol
+# to not make the command fail if no filter is defined.
+ifndef V
+LATEXFILTER := | ./latexfilter.pl
+else
+LATEXFILTER := | ./latexfilter.pl -v
+endif
+
 # grab the contents of \bibliograph{} commands
 ifeq ($(BIB_FILES),)
 	BIB_FILES := $(shell for source in $(TEX_FILES) ; do sed -e '{' -e 'y/,/ /' -e 's?.*\\bibliography[{]\(.*\)[}].*?\1?' -e 't' -e 'd' -e '}' <$$source ; done)
@@ -222,7 +230,7 @@ define run-latex
 	makeobsolete() { touch -r $$(ls *.old | tail -n 1) $${1} ; true ; } ; \
 	nochange() { for file ; do [ ! -f $${1} ] || cmp $${1} $${1}.old >/dev/null || return ; done ; true ; } ; \
 	saveold $(MONITOR_FILES) ; \
-	if $(LATEX) $(LATEXOPTS) $* ; then \
+	if $(LATEX) $(LATEXOPTS) $* $(LATEXFILTER) ; then \
 	   if nochange $(MONITOR_FILES) ; then \
 	      echo "$(MAKE): LaTeX auxiliary files did not change (processing is complete)" ; \
 	      restoreold $(MONITOR_FILES) ; \
@@ -267,7 +275,7 @@ $(PDF_FILE) : %.pdf : $(TEX_FILES) $(MONITOR_FILES) $(GRAPHIC_FILES) $(XFIG_TEX)
 #
 
 %.aux %.idx : $(XFIG_TEX)
-	$(LATEX) $(LATEXOPTS) $*
+	$(LATEX) $(LATEXOPTS) $* $(LATEXFILTER)
 
 #
 # Distill xfig .fig files into .fig.tex and either .fig.pdf or .fig.ps
