@@ -283,7 +283,9 @@ static void init_tagcache(void)
 {
     bool clear = false;
 #if CONFIG_CODEC == SWCODEC
+#if 0 /* voice during database commit is disabled as a short-term workaround */
     long talked_tick = 0;
+#endif
 #endif
     tagcache_init();
     
@@ -294,6 +296,11 @@ static void init_tagcache(void)
         if (ret > 0)
         {
 #if CONFIG_CODEC == SWCODEC
+#if 0 /* voice during database commit is disabled as a short-term workaround */
+/* During commit, tagcache has claimed the entire buffer. Using voice to speak
+   commit progress will try to initialize the audio buffer, which will also try
+   to claim the entire buffer, leading to a panic.
+ */
             /* hwcodec can't use voice here, as the database commit
              * uses the audio buffer. */
             if(global_settings.talk_menu
@@ -306,6 +313,7 @@ static void init_tagcache(void)
                 talk_id(VOICE_OF, true);
                 talk_number(tagcache_get_max_commit_step(), true);
             }
+#endif /* 0 */
 #endif
 #ifdef HAVE_LCD_BITMAP
             if (lang_is_rtl())
