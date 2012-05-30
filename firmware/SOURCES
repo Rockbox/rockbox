@@ -488,7 +488,7 @@ target/arm/pnx0101/i2c-pnx0101.c
 #elif CONFIG_I2C == I2C_TCC780X || CONFIG_I2C == I2C_TCC77X 
 target/arm/i2c-telechips.c
 #elif CONFIG_I2C == I2C_S3C2440
-/* no i2c driver yet */
+target/arm/s3c2440/i2c-s3c2440.c
 #elif CONFIG_I2C == I2C_S5L8700
 target/arm/s5l8700/i2c-s5l8700.c
 #elif CONFIG_I2C == I2C_S5L8702
@@ -813,7 +813,6 @@ target/arm/s3c2440/kernel-s3c2440.c
 target/arm/s3c2440/system-s3c2440.c
 # ifndef BOOTLOADER
 target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
-target/arm/s3c2440/i2c-s3c2440.c
 # endif
 #endif /* CONFIG_CPU == S3C2440 */
 
