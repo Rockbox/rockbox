@@ -1946,6 +1946,10 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
         skin_vp->vp.height + skin_vp->vp.y > display->lcdheight)
         return CALLBACK_ERROR;
 
+    /* Fix x position for RTL languages */
+    if (follow_lang_direction && lang_is_rtl())
+        skin_vp->vp.x = display->lcdwidth - skin_vp->vp.x - skin_vp->vp.width;
+
     return CALLBACK_OK;
 }
 
