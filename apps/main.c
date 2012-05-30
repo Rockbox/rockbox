@@ -282,7 +282,7 @@ static void init_tagcache(void) INIT_ATTR;
 static void init_tagcache(void)
 {
     bool clear = false;
-#if CONFIG_CODEC == SWCODEC
+#if 0 /* CONFIG_CODEC == SWCODEC */
     long talked_tick = 0;
 #endif
     tagcache_init();
@@ -293,7 +293,7 @@ static void init_tagcache(void)
 
         if (ret > 0)
         {
-#if CONFIG_CODEC == SWCODEC
+#if 0 /* FIXME: Audio isn't even initialized yet! */ /* CONFIG_CODEC == SWCODEC */
             /* hwcodec can't use voice here, as the database commit
              * uses the audio buffer. */
             if(global_settings.talk_menu
