@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAKH///uI\u003d",
+        "filename": "apps/lang/english.lang",
+        "patchSetId": 1
+      },
+      "lineNbr": 13045,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-05-30T12:29:43Z",
+      "side": 1,
+      "message": "I think \"Start Sleep Timer\" is better than run",
+      "revId": "4b171e470e56b23d7bf524815dec5a93362a1bde",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///uc\u003d",
+        "filename": "apps/settings.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 785,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-05-30T12:29:43Z",
+      "side": 1,
+      "message": "you need to bump PLUGIN_API_VERSION and PLUGIN_MIN_API_VERSION with this change, or move this to the end of the struct",
+      "revId": "4b171e470e56b23d7bf524815dec5a93362a1bde",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///uY\u003d",
+        "filename": "firmware/powermgmt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-05-30T12:29:43Z",
+      "side": 1,
+      "message": "delete it completly",
+      "revId": "4b171e470e56b23d7bf524815dec5a93362a1bde",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///uU\u003d",
+        "filename": "firmware/powermgmt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 878,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-05-30T12:29:43Z",
+      "side": 1,
+      "message": "get rid of this",
+      "revId": "4b171e470e56b23d7bf524815dec5a93362a1bde",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///uQ\u003d",
+        "filename": "firmware/powermgmt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-05-30T12:29:43Z",
+      "side": 1,
+      "message": "get rid of this",
+      "revId": "4b171e470e56b23d7bf524815dec5a93362a1bde",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAKH///uM\u003d",
+        "filename": "firmware/powermgmt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 915,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-05-30T12:29:43Z",
+      "side": 1,
+      "message": "else { and remove the whitespace and commented lines",
+      "revId": "4b171e470e56b23d7bf524815dec5a93362a1bde",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
