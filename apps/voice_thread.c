@@ -143,7 +143,8 @@ static struct voice_buf
     /* Buffer for decoded samples */
     spx_int16_t spx_outbuf[VOICE_FRAME_COUNT];
     /* Queue frame indexes */
-    unsigned int frame_in, frame_out;
+    unsigned int volatile frame_in;
+    unsigned int volatile frame_out;
     /* For PCM pointer adjustment */
     struct voice_thread_data *td;
     /* Buffers for mixing voice */
@@ -197,7 +198,7 @@ static struct buflib_callbacks ops =
 };
 
 /* Number of frames in queue */
-static inline int voice_unplayed_frames(void)
+static unsigned int voice_unplayed_frames(void)
 {
     return voice_buf->frame_in - voice_buf->frame_out;
 }
@@ -205,11 +206,13 @@ static inline int voice_unplayed_frames(void)
 /* Mixer channel callback */
 static void voice_pcm_callback(const void **start, size_t *size)
 {
+    unsigned int frame_out = ++voice_buf->frame_out;
+
     if (voice_unplayed_frames() == 0)
         return; /* Done! */
 
     struct voice_pcm_frame *frame =
-        &voice_buf->frames[++voice_buf->frame_out % VOICE_FRAMES];
+        &voice_buf->frames[frame_out % VOICE_FRAMES];
 
     *start = frame->pcm;
     *size = frame->size;
@@ -219,7 +222,7 @@ static void voice_pcm_callback(const void **start, size_t *size)
 static void voice_start_playback(void)
 {
     if (mixer_channel_status(PCM_MIXER_CHAN_VOICE) != CHANNEL_STOPPED ||
-        voice_unplayed_frames() <= 0)
+        voice_unplayed_frames() == 0)
         return;
 
     struct voice_pcm_frame *frame =
@@ -254,8 +257,10 @@ static void voice_buf_commit(int count)
 {
     if (count > 0)
     {
-        voice_buf->frames[voice_buf->frame_in++ % VOICE_FRAMES].size =
+        unsigned int frame_in = voice_buf->frame_in;
+        voice_buf->frames[frame_in % VOICE_FRAMES].size =
             count * 2 * sizeof (int16_t);
+        voice_buf->frame_in = frame_in + 1;
     }
 }
 
