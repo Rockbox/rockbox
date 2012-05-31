@@ -127,7 +127,6 @@ data_abort_handler:
     cmp     r0, r1
     beq     1f
     @ otherwise just normally to UIE
-    mov     r0, r1
     mov     r1, #2
     b       UIE
 1:
