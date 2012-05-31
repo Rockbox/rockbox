@@ -53,7 +53,16 @@ sub dynamic_space
         $sel = <STDIN>;
     } while($sel <= 0 || $sel > $count - 1 || !($sel =~ /^[+-]?\d+$/));
 
-    my $file = sprintf("apps/%ss/%s", $space, @$space_array[$sel - 1]);
+    my $prefix;
+    if($space eq 'plugin')
+    {
+        $prefix = 'apps';
+    }
+    else
+    {
+        $prefix = 'lib/rbcodec';
+    }
+    my $file = sprintf("%s/%ss/%s", $prefix, $space, @$space_array[$sel - 1]);
     $ret{'library'} = sprintf("%s/%s", cwd(), $file);
     open FILE, "$objdump -t $file |" or die "Can't open pipe: $!";
     while(<FILE>)
