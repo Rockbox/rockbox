@@ -45,6 +45,7 @@
 #define CACHE_SIZE 4
 
 #elif CONFIG_CPU == IMX233
+#define HAVE_TEST_AND_CLEAN_CACHE
 #define USE_MMU
 #define CACHE_SIZE 16
 
