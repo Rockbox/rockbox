@@ -58,6 +58,10 @@
 #include "ata.h"
 #endif
 
+#if (CONFIG_CPU == IMX233)
+#include "ocotp-imx233.h"
+#endif
+
 #ifndef USB_MAX_CURRENT
 #define USB_MAX_CURRENT 500
 #endif
@@ -278,6 +282,16 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
 
 static unsigned char response_data[256] USB_DEVBSS_ATTR;
 
+/** NOTE Serial Number
+ * The serial number string is split into two parts:
+ * - the first character indicates the set of interfaces enabled
+ * - the other characters form a (hopefully) unique device-specific number
+ * The implementation of set_serial_descriptor should left the first character
+ * of usb_string_iSerial unused, ie never write to
+ * usb_string_iSerial.wString[0] but should take it into account when
+ * computing the length of the descriptor
+ */
+
 static const short hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
                         '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 #ifdef IPOD_ARCH
@@ -318,6 +332,19 @@ static void set_serial_descriptor(void)
         *p++ = hex[(serial[i] >> 0) & 0xF];
     }
     usb_string_iSerial.bLength = 36 + (2 * AS3514_UID_LEN);
+}
+#elif (CONFIG_CPU == IMX233)
+static void set_serial_descriptor(void)
+{
+    short* p = &usb_string_iSerial.wString[1];
+    for(int i = 0; i < IMX233_NUM_OCOTP_OPS; i++) {
+        uint32_t ops = imx233_ocotp_read(&HW_OCOTP_OPSx(i));
+        for(int j = 0; j < 8; j++) {
+            *p++ = hex[(ops >> 28) & 0xF];
+            ops <<= 4;
+        }
+    }
+    usb_string_iSerial.bLength = 2 + 2 * (1 + IMX233_NUM_OCOTP_OPS * 8);
 }
 #elif (CONFIG_STORAGE & STORAGE_ATA)
 /* If we don't know the device serial number, use the one
