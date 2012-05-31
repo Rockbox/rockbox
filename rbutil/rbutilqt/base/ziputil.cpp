@@ -100,6 +100,12 @@ bool ZipUtil::extractArchive(QString& dest, QString file)
         // if the entry is a path ignore it. Path existence is ensured separately.
         if(m_zip->getCurrentFileName().split("/").last() == "")
             continue;
+        // some tools set the MS-DOS file attributes. Check those for D flag,
+        // since in some cases a folder entry does not end with a /
+        QuaZipFileInfo fi;
+        currentFile->getFileInfo(&fi);
+        if(fi.externalAttr & 0x10) // FAT entry bit 4 indicating directory
+            continue;
 
         QString outfilename;
         if(!singleoutfile.isEmpty()
