@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <strlcpy.h>
+#include <system.h>
 #include <kernel.h>
 #include "rds.h"
 #include "time.h"
