@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "AAAAKH///t4\u003d",
+        "filename": "apps/settings.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 847,
+      "author": {
+        "id": 1000015
+      },
+      "writtenOn": "2012-05-31T08:05:36Z",
+      "side": 1,
+      "message": "please use /* */ style comments",
+      "revId": "4b171e470e56b23d7bf524815dec5a93362a1bde",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAAKH///uc\u003d",
         "filename": "apps/settings.h",
         "patchSetId": 1
