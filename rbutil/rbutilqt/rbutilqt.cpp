@@ -913,8 +913,12 @@ void RbUtilQt::installVoice()
     }
     if(relversion.isEmpty()) {
         // release is empty for non-release versions (i.e. daily / current)
-        voiceurl = SystemInfo::value(SystemInfo::DailyVoiceUrl).toString();
-        logversion = installInfo.revision();
+        QMessageBox::critical(this, tr("No voice available"),
+                tr("The installed version of Rockbox is a development version. "
+                    "Pre-built voices are only available for release versions "
+                    "of Rockbox. Please generate a voice yourself using the "
+                    "\"Create voice file\" functionality."));
+        return;
     }
     else {
         voiceurl = SystemInfo::value(SystemInfo::ReleaseVoiceUrl).toString();
@@ -925,11 +929,8 @@ void RbUtilQt::installVoice()
        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
         return;
 
-    QDate date = QDate::fromString(
-            ServerInfo::value(ServerInfo::DailyDate).toString(), Qt::ISODate);
     QString model = SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
     // replace placeholder in voice url
-    voiceurl.replace("%DATE%", date.toString("yyyyMMdd"));
     voiceurl.replace("%MODEL%", model);
     voiceurl.replace("%RELVERSION%", relversion);
 
