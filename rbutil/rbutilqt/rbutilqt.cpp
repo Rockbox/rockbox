@@ -860,7 +860,6 @@ void RbUtilQt::installFonts()
     if(relversion.isEmpty()) {
         // release is empty for non-release versions (i.e. daily / current)
         fontsurl = SystemInfo::value(SystemInfo::DailyFontUrl).toString();
-        logversion = installInfo.revision();
     }
     else {
         fontsurl = SystemInfo::value(SystemInfo::ReleaseFontUrl).toString();
