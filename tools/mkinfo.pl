@@ -28,6 +28,21 @@ sub cmd1line {
     return $out[0];
 }
 
+sub definescan {
+    my ($f, $d)=($_[0], $_[1]);
+    my $v;
+    open(M, "<$f");
+    while(<M>) {
+        if($_ =~ /\#define\s+$d\s+([^\s]+)\s?/) {
+            $v = $1;
+            last;
+        }
+    }
+    close(M);
+
+    return $v;
+}
+
 sub mapscan {
     my ($f)=@_;
     my $start, $end;
@@ -82,6 +97,7 @@ printf O ("Manufacturer: %s\n", $ENV{'MANUFACTURER'});
 printf O ("Version: %s", `$ENV{TOOLSDIR}/version.sh $ENV{ROOTDIR}`);
 printf O ("Binary: %s\n", $ENV{'BINARY'});
 printf O ("Binary size: %s\n", filesize($ENV{'BINARY'}));
+printf O ("Voice format: %s\n", definescan("$ENV{APPSDIR}/talk.h", "VOICE_VERSION"));
 
 if ($ENV{'APPSDIR'} =~ /\/apps$/) {
   printf O ("Actual size: %s\n", filesize("rockbox.bin"));
