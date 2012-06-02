@@ -912,8 +912,9 @@ void RbUtilQt::installVoice()
         return;
     }
     if(relversion.isEmpty()) {
-        // release is empty for non-release versions (i.e. daily / current)
-        QMessageBox::critical(this, tr("No voice available"),
+        // release is empty for development builds.
+        // No voice files are available for development builds.
+        QMessageBox::critical(this, tr("No voice file available"),
                 tr("The installed version of Rockbox is a development version. "
                     "Pre-built voices are only available for release versions "
                     "of Rockbox. Please generate a voice yourself using the "
