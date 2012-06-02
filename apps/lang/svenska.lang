@@ -12912,3 +12912,96 @@
     *: "Starta om insomningstajmer vid knapptryck"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "Begränsa automatiskt byte av kataloger"
+  </dest>
+  <voice>
+    *: "Begränsa automatiskt byte av kataloger"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Använd genvägar istället för snabbmeny"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Använd genvägar istället för snabbmeny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "Starta insomningstimer"
+  </dest>
+  <voice>
+    *: "Starta insomningstajmer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "Västeuropa (CP1252)"
+  </dest>
+  <voice>
+    *: "Västeuropa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Enkel (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Enkel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Anpassad"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Anpassad"
+  </voice>
+</phrase>
