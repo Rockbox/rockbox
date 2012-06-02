@@ -1770,6 +1770,18 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
             snprintf(dest, buf_length, "%s/%s", dir, src);
         }
     }
+#ifdef HAVE_MULTIVOLUME 
+
+    char vol_string[VOL_ENUM_POS + 8];
+    snprintf(vol_string, sizeof(vol_string), "/"VOL_NAMES, 1);
+
+    /*check if the playlist is on a external card, and correct path if needed */
+    if(strstr(dir, vol_string) && (strstr(dest, vol_string) == NULL)){
+        char temp[buf_length];
+        strlcpy(temp, dest, buf_length);
+        snprintf(dest, buf_length, "%s%s", vol_string, temp);
+    }
+#endif
 
     return 0;
 }
@@ -3451,7 +3463,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
 
     /* use current working directory as base for pathname */
     if (format_track_path(path, filename, sizeof(tmp_buf),
-                          strlen(filename)+1, getcwd(NULL, -1)) < 0)
+                          strlen(filename)+1, '/') < 0)
         return -1;
 
     /* can ignore volatile here, because core_get_data() is called later */
