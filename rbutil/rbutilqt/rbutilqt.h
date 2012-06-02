@@ -105,7 +105,6 @@ class RbUtilQt : public QMainWindow
         void createTalkFiles(void);
         void createVoiceFile(void);
         void downloadDone(bool);
-        void downloadBleedingDone(bool);
         void downloadInfo(void);
 
         void installVoice(void);

@@ -144,7 +144,6 @@ void InstallWindow::accept()
     }
     file.replace("%MODEL%", buildname);
     file.replace("%RELVERSION%", ServerInfo::value(ServerInfo::CurReleaseVersion).toString());
-    file.replace("%DATE%", ServerInfo::value(ServerInfo::DailyDate).toString());
 
     RbSettings::sync();
 

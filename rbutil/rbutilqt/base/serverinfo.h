@@ -27,25 +27,22 @@ class ServerInfo : public QObject
 {
     Q_OBJECT
     public:
-    
+
         //! All Server infos
         enum ServerInfos {
             CurReleaseVersion,
             CurStatus,
-            DailyDate,
             BleedingRevision,
             BleedingDate,
         };
-        
+
         //! read in buildinfo file
         static void readBuildInfo(QString file);
-        //! read in bleeding info file
-        static void readBleedingInfo(QString file);
         //! get a value from server info
         static QVariant value(enum ServerInfos setting);
         //! get a value from server info for a named platform.
         static QVariant platformValue(QString platform, enum ServerInfos setting);
-    
+
     private:
         //! set a server info value
         static void setValue(enum ServerInfos setting , QVariant value);

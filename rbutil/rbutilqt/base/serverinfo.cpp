@@ -32,20 +32,20 @@ const static struct {
 } ServerInfoList[] = {
     { ServerInfo::CurReleaseVersion,    ":platform:/releaseversion", "" },
     { ServerInfo::CurStatus,            ":platform:/status",         "Unknown" },
-    { ServerInfo::DailyDate,            "dailydate",                 "" },
     { ServerInfo::BleedingRevision,     "bleedingrev",               "" },
     { ServerInfo::BleedingDate,         "bleedingdate",              "" },
-};  
+};
 
 QMap<QString, QVariant> ServerInfo::serverInfos;
 
 void ServerInfo::readBuildInfo(QString file)
 {
     QSettings info(file, QSettings::IniFormat);
-    
-    QDate date = QDate::fromString(info.value("dailies/date").toString(), "yyyyMMdd");
-    setValue(ServerInfo::DailyDate,date.toString(Qt::ISODate));
-   
+
+    setValue(ServerInfo::BleedingRevision,info.value("bleeding/rev"));
+    QDateTime date = QDateTime::fromString(info.value("bleeding/timestamp").toString(), "yyyyMMddThhmmssZ");
+    setValue(ServerInfo::BleedingDate,date.toString(Qt::ISODate));
+
     info.beginGroup("release");
     QStringList keys = info.allKeys();
     info.endGroup();
@@ -87,19 +87,10 @@ void ServerInfo::readBuildInfo(QString file)
             setPlatformValue(variants.at(j), ServerInfo::CurStatus, status);
             setPlatformValue(variants.at(j), ServerInfo::CurReleaseVersion, release);
         }
-
     }
 }
 
-void ServerInfo::readBleedingInfo(QString file)
-{
-    QSettings info(file, QSettings::IniFormat);
-    
-    setValue(ServerInfo::BleedingRevision,info.value("bleeding/rev"));
-    QDateTime date = QDateTime::fromString(info.value("bleeding/timestamp").toString(), "yyyyMMddThhmmssZ");
-    setValue(ServerInfo::BleedingDate,date.toString(Qt::ISODate));
-}
-        
+
 QVariant ServerInfo::value(enum ServerInfos info)
 {
     // locate info item

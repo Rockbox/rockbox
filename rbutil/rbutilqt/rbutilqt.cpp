@@ -227,7 +227,7 @@ void RbUtilQt::downloadInfo()
     ui.statusbar->showMessage(tr("Downloading build information, please wait ..."));
     qDebug() << "[RbUtil] downloading build info";
     daily->setFile(&buildInfo);
-    daily->getFile(QUrl(SystemInfo::value(SystemInfo::ServerConfUrl).toString()));
+    daily->getFile(QUrl(SystemInfo::value(SystemInfo::BuildInfoUrl).toString()));
 }
 
 
@@ -249,42 +249,13 @@ void RbUtilQt::downloadDone(bool error)
     ServerInfo::readBuildInfo(buildInfo.fileName());
     buildInfo.close();
 
-    // start bleeding info download
-    bleeding = new HttpGet(this);
-    connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
-    connect(qApp, SIGNAL(lastWindowClosed()), bleeding, SLOT(abort()));
-    if(RbSettings::value(RbSettings::CacheOffline).toBool())
-        bleeding->setCache(true);
-    bleeding->setFile(&bleedingInfo);
-    bleeding->getFile(QUrl(SystemInfo::value(SystemInfo::BleedingInfo).toString()));
-    ui.statusbar->showMessage(tr("Downloading build information, please wait ..."));
+    ui.statusbar->showMessage(tr("Download build information finished."), 5000);
+    updateSettings();
+    m_gotInfo = true;
 
-}
+    //start check for updates
+    checkUpdate();
 
-
-void RbUtilQt::downloadBleedingDone(bool error)
-{
-    if(error) {
-        qDebug() << "[RbUtil] network error:" << bleeding->error();
-        ui.statusbar->showMessage(tr("Can't get version information!"));
-        QMessageBox::critical(this, tr("Network error"),
-                tr("Can't get version information.\n"
-                   "Network error: %1. Please check your network and proxy settings.")
-                    .arg(bleeding->errorString()));
-        return;
-    }
-    else {
-        bleedingInfo.open();
-        ServerInfo::readBleedingInfo(bleedingInfo.fileName());
-        bleedingInfo.close();
-
-        ui.statusbar->showMessage(tr("Download build information finished."), 5000);
-        updateSettings();
-        m_gotInfo = true;
-
-        //start check for updates
-        checkUpdate();
-    }
 }
 
 
