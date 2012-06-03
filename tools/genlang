@@ -807,7 +807,12 @@ elsif($voiceout) {
         my $o = $engl[$i];
 
         if(($o < 0) || !length($o)) {
-            print "#$i\nid: NOT_USED_$i\nvoice: \"\"\n";
+            if($i < 0x8000) {
+                print "#$i\nid: NOT_USED_$i\nvoice: \"\"\n";
+            }
+            else {
+                print "#$i\nid: VOICE_NOT_USED_$i\nvoice: \"\"\n";
+            }
             next;
         }
 
