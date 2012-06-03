@@ -88,14 +88,14 @@ static void matrix_init(void) {
     rb->srand(*rb->current_tick);
 
     /* Make the matrix */
-    for (i = 0; i <= ROWS; i++) {
-        for (j = 0; j <= COLS - 1; j++ ) {
+    for (i = 0; i < ROWS; i++) {
+        for (j = 0; j < COLS; j++) {
             matrix[i][j].val = -1;
             matrix[i][j].bold = 0;
         }
     }
 
-    for (j = 0; j <= COLS - 1; j++) {
+    for (j = 0; j < COLS; j++) {
         /* Set up spaces[] array of how many spaces to skip */
         spaces[j] = rb->rand() % ROWS + 1;
 
@@ -139,7 +139,7 @@ static void matrix_loop(void)
     if (count > 4)
         count = 1;
 
-    for (j = 0; j <= COLS - 1; j++) {
+    for (j = 0; j < COLS; j++) {
         if (count > updates[j]) {
             /* New style scrolling */
             if (matrix[0][j].val == -1 && matrix[1][j].val == 129
@@ -217,7 +217,7 @@ static void matrix_loop(void)
                 firstcoldone = 1;
                 i++;
             }
-            for (i = 1; i <= ROWS; i++) {
+            for (i = 1; i < ROWS; i++) {
                 if (matrix[i][j].val == 0 || matrix[i][j].bold == 2) {
                     if (matrix[i][j].val == 0)
                         matrix_blit_char(i - 1, j, 20);
