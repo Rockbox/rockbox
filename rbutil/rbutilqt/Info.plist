@@ -7,7 +7,7 @@
 	<key>CFBundleName</key>
 	<string>Rockbox Utility</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2.13 ($Rev$)</string>
+	<string>1.2.14 ($Rev$)</string>
 	<key>CFBundleIconFile</key>
 	<string>rbutilqt.icns</string>
 	<key>CFBundleIdentifier</key>

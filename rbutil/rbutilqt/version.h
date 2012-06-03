@@ -26,7 +26,7 @@
 // rebuilds because of issues like dependency problems or library updates).
 // Usually empty.
 #define BUILDID ""
-#define VERSION "1.2.13" BUILDID
+#define VERSION "1.2.14" BUILDID
 // PUREVERSION should identify the build uniquely. Use version string for now.
 #define PUREVERSION "$Rev$"
 
