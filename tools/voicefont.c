@@ -91,15 +91,13 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
     char mp3filename2[1024];
     char* mp3filename;
     FILE* pMp3File;
-    int target_id;
     int do_bitswap_audio = 0;
 
 
     /* We bitswap the voice file only SH based archos players, target IDs
-         equal to or lower than 8. See the target_id line for each target in
-         configure */
-    target_id = targetnum;
-    if (target_id <= 8)
+       equal to or lower than 8. See the "Target id:" line in rockbox-info.txt
+       or the target_id value in configure. */
+    if (targetnum <= 8)
         do_bitswap_audio = 1;
 
     memset(voiceonly, 0, sizeof(voiceonly));
@@ -112,10 +110,13 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
         fields = sscanf(line, " id: %s", name);
         if (fields == 1)
         {
-            count++; /* next entry started */
-            strcpy(names[count-1], name);
+            strcpy(names[count], name);
             if (strncmp("VOICE_", name, 6) == 0) /* voice-only id? */
-                voiceonly[count-1] = 1;
+            {
+                count_voiceonly++;
+                voiceonly[count] = 1;
+            }
+            count++; /* next entry started */
             continue;
         }
     }
@@ -125,9 +126,6 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
 
     for (i=0; i<count; i++)
     {
-        if (voiceonly[i] == 1)
-            count_voiceonly++;
-
         pos[i] = ftell(output);
         sprintf(mp3filename1, "%s%s.mp3", filedir, names[i]);
         sprintf(mp3filename2, "%s%s.wav.mp3", filedir, names[i]);
