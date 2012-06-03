@@ -67,6 +67,7 @@ private:
     QString m_lang;  // the language which will be spoken
     QString m_versionstring; // version string to be used for logging
     int m_wavtrimThreshold;
+    int m_voiceformat;
 
     bool m_abort;
     QList<TalkGenerator::TalkEntry> m_talkList;

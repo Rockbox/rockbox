@@ -59,6 +59,7 @@ bool VoiceFileCreator::createVoiceFile()
     QString features = info.features();
     m_targetid = info.targetID().toInt();
     m_versionstring = info.version();
+    m_voiceformat = info.voicefmt();
     QString version = m_versionstring.left(m_versionstring.indexOf("-")).remove("r");
 
     //prepare download url
@@ -231,7 +232,8 @@ void VoiceFileCreator::create(void)
         return;
     }
 
-    voicefont(ids2,m_targetid,m_path.toLocal8Bit().data(), output);
+    qDebug() << "[VoiceFile] Running voicefont, format" << m_voiceformat;
+    voicefont(ids2,m_targetid,m_path.toLocal8Bit().data(), output, m_voiceformat);
     // ids2 and output are closed by voicefont().
 
     //cleanup

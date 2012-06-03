@@ -70,7 +70,7 @@ int BitswapAudio (unsigned char* pDest, unsigned char* pSrc, size_t len)
     return 0;
 }
 
-int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
+int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsigned int version)
 {
 
     int i,j;
@@ -159,7 +159,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
     /* Create the file format: */
 
     /* 1st 32 bit value in the file is the version number    */
-    value = UINT_TO_BE(400); /* 4.00 */
+    value = UINT_TO_BE(version);
     fwrite(&value, sizeof(value), 1, output);
 
     /* 2nd 32 bit value in the file is the id number for the target
@@ -243,7 +243,7 @@ int main (int argc, char** argv)
         return -2;
     }
     
-    voicefont(ids, atoi(argv[2]),argv[3],output);
+    voicefont(ids, atoi(argv[2]),argv[3],output, 400);
     return 0;
 }
 #endif

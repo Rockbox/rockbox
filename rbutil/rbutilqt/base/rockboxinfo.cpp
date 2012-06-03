@@ -26,6 +26,7 @@ RockboxInfo::RockboxInfo(QString mountpoint, QString fname)
     qDebug() << "[RockboxInfo] Getting version info from rockbox-info.txt";
     QFile file(mountpoint + "/" + fname);
     m_success = false;
+    m_voicefmt = 400; // default value for compatibility
     if(!file.exists())
         return;
 
@@ -40,6 +41,7 @@ RockboxInfo::RockboxInfo(QString mountpoint, QString fname)
     QRegExp features("^Features:\\s+(\\S.*)");
     QRegExp targetid("^Target id:\\s+(\\S.*)");
     QRegExp memory("^Memory:\\s+(\\S.*)");
+    QRegExp voicefmt("^Voice format:\\s+(\\S.*)");
     while (!file.atEnd())
     {
         QString line = file.readLine().trimmed();
@@ -67,6 +69,9 @@ RockboxInfo::RockboxInfo(QString mountpoint, QString fname)
         }
         else if(memory.indexIn(line) >= 0) {
             m_ram = memory.cap(1).toInt();
+        }
+        else if(voicefmt.indexIn(line) >= 0) {
+            m_voicefmt = voicefmt.cap(1).toInt();
         }
     }
 

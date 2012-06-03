@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output);
+int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsigned int version);
 
 #ifdef __cplusplus
 }
