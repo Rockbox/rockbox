@@ -12257,15 +12257,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Realce 3D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Mejoras 3D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Realce 3 D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Mejoras 3D"
   </voice>
 </phrase>
 <phrase>
@@ -12777,7 +12777,7 @@
 </phrase>
 <phrase>
   id: LANG_SLEEP_TIMER_DURATION
-  desc: default sleep timer duration in minutes (unused in UI)
+  desc: default sleep timer duration in minutes
   user: core
   <source>
     *: "Default Sleep Timer Duration"
@@ -12815,5 +12815,188 @@
   </dest>
   <voice>
     *: "Iniciar temporizador de apagado al arrancar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Cache de glifos"
+  </dest>
+  <voice>
+    *: "Cache de glifos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Simple (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Simple (Meier)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "Comenzar temporizador de apagado"
+  </dest>
+  <voice>
+    *: "Comenzar temporizador de apagado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Sonido de teclado en altavoz"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Sonido de teclado en altavoz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Sonido de teclado en cascos"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Sonido de teclado en cascos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "Western European (CP1252)"
+  </dest>
+  <voice>
+    *: "Europa Oeste (CP1252)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Custom"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Personalizado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Shortcuts"
+  </dest>
+  <voice>
+    *: "Accesos directos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Encender/Apagar"
+  </dest>
+  <voice>
+    *: "Encender/Apagar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Reiniciar temporizador de apagado al tocar"
+  </dest>
+  <voice>
+    *: "Reiniciar temporizador de apagado al tocar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Usar accesos directos en lugar de Inicio Rápido"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Usar accesos directos en lugar de Inicio Rápido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "Actualizar restricciones"
+  </dest>
+  <voice>
+    *: "Actualizar restricciones"
   </voice>
 </phrase>
