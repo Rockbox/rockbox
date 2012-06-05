@@ -43,6 +43,8 @@
 #include "filefuncs.h"
 #include "load_code.h"
 
+#include "flat.h"
+
 #if CONFIG_CHARGING
 #include "power.h"
 #endif
@@ -793,10 +795,286 @@ static const struct plugin_api rockbox_api = {
        the API gets incompatible */
 };
 
+/* load plugin in bFLT format into memory and perform relocations
+ * return void * where it was loaded
+ * drop in replacement for lc_load()
+ */
+extern unsigned char plugin_start_addr[];
+
+static inline void endian_fix32(uint32_t * tofix, size_t count)
+{
+    /* bFLT is always big endian */
+    size_t i;
+    for (i=0; i<count; i++)
+        tofix[i] = betoh32(tofix[i]);
+}
+
+static int read_header(int fd, struct flat_hdr * header)
+{
+    lseek(fd, 0, SEEK_SET);
+    size_t bytes_read = read(fd, header, sizeof(struct flat_hdr));
+    endian_fix32(&header->rev, ( &header->build_date - &header->rev ) + 1);
+
+    if (bytes_read == sizeof(struct flat_hdr))
+    {
+        return 0;
+    }
+    else
+    {
+        DEBUGF("Error reading header");
+        return 1;
+    }
+}
+
+static int check_header(struct flat_hdr * header) {
+    if (memcmp(header->magic, "bFLT", 4) != 0)
+    {
+        DEBUGF("Magic number does not match");
+        return 1;
+    }
+
+    if (header->rev != FLAT_VERSION)
+    {
+        DEBUGF("Version number does not match");
+        return 2;
+    }
+
+    /* check for unsupported flags */
+    if (header->flags & (FLAT_FLAG_GZIP | FLAT_FLAG_GZDATA))
+    {
+        DEBUGF("Unsupported flags detected - GZip'd data is not supported");
+        return 3;
+    }
+
+    return 0;
+}
+
+/* TODO
+ * properly deal with PLUGIN_IRAMSIZE 0
+ */
+static int copy_segments(int fd, struct flat_hdr * header, void * dram, ssize_t dram_size, void * iram, ssize_t iram_size)
+{
+    /* each segment follows on one after the other */
+    /* [   .text   ][.icode]     [   .data   ]   [.idata][   .bss   ]        [.ibss]         */
+    /* ^entry       ^icode_start ^data_start ^data_end  ^.idata_end ^bss_end       ^ibss_end */
+
+    ssize_t text_size = header->icode_start - header->entry;
+    ssize_t icode_size = header->data_start - header->icode_start;
+    ssize_t data_size = header->data_end - header->data_start;
+    ssize_t idata_size = header->idata_end - header->data_end;
+    ssize_t bss_size = header->bss_end - header->idata_end;
+    ssize_t ibss_size = header->ibss_end - header->bss_end;
+
+    ssize_t dram_blob_size = text_size + data_size + bss_size;
+    ssize_t iram_blob_size = icode_size + idata_size + ibss_size;
+
+    if ((dram_blob_size > dram_size) || (iram_blob_size > iram_size))
+    {
+        DEBUGF("Not enough memory to run binary");
+        return 1;
+    }
+
+    /* skip bFLT header */
+    lseek(fd, header->entry, SEEK_SET);
+
+    /* now copy segments one by one */
+    if (read(fd, dram, text_size) != text_size)
+    {
+        DEBUGF("Error reading .text segment");
+        return 2;
+    }
+
+    if (read(fd, iram, icode_size) != icode_size)
+    {
+        DEBUGF("Error reading .icode segment");
+        return 3;
+    }
+
+    if (read(fd, dram+text_size, data_size) != data_size)
+    {
+        DEBUGF("Error reading .data segment");
+        return 4;
+    }
+
+    if (read(fd, iram+icode_size, idata_size) != idata_size)
+    {
+        DEBUGF("Error reading .idata segment");
+        return 5;
+    }
+
+    return 0;
+}
+
+static uint32_t calc_reloc(struct flat_hdr *header, uintptr_t dram_base, uintptr_t iram_base, uint32_t *fixme)
+{
+    uint32_t value;
+    size_t text_size = header->icode_start - header->entry;
+    size_t icode_size = header->data_start - header->icode_start;
+    size_t data_size = header->data_end - header->data_start;
+    size_t idata_size = header->idata_end - header->data_end;
+    size_t bss_size = header->bss_end - header->idata_end;
+
+    value = betoh32(*fixme);
+
+    if (value < text_size)
+        /* in .text */
+        return (value + dram_base);
+    else if (value < text_size + icode_size)
+        /* in .icode */
+        return (value + iram_base - text_size);
+    else if (value < text_size + icode_size + data_size)
+        /* in .data */
+        return (value + dram_base - icode_size);
+    else if (value < text_size + icode_size + data_size + idata_size)
+        /* in .idata */
+        return (value + iram_base - text_size - data_size);
+    else if (value < text_size + icode_size + data_size + idata_size + bss_size)
+        /* in .bss */
+        return (value + dram_base - icode_size - idata_size);
+    else
+        /* in .ibss */
+        return (value + iram_base - text_size - data_size - bss_size);
+}
+
+static int process_relocs(int fd, struct flat_hdr * header, void * dram_base, void * iram_base)
+{
+    uint32_t *fixme;
+    uint32_t reloc;
+    size_t i;
+
+    ssize_t text_size = header->icode_start - header->entry;
+    ssize_t icode_size = header->data_start - header->icode_start;
+    ssize_t data_size = header->data_end - header->data_start;
+
+    if (!header->reloc_count)
+    {
+        DEBUGF("No relocation needed");
+        return 0;
+    }
+
+    lseek(fd, header->reloc_start, SEEK_SET);
+
+    for (i=0; i<header->reloc_count; i++)
+    {
+        read(fd, &reloc, sizeof(reloc));
+        reloc = betoh32(reloc);
+
+        if (reloc < header->icode_start)
+        {
+            /* .text */
+            fixme = (uint32_t *)((uintptr_t)dram_base + reloc);
+        }
+        else if (reloc < header->data_start)
+        {
+            /* .icode */
+            fixme = (uint32_t *)((uintptr_t)iram_base + reloc - text_size);
+        }
+        else if (reloc < header->data_end)
+        {
+            /* .data */
+            fixme = (uint32_t *)((uintptr_t)dram_base + reloc - icode_size);
+        }
+        else
+        {
+            /* .idata */
+            fixme = (uint32_t *)((uintptr_t)iram_base + reloc - text_size - data_size);
+        }
+
+        *fixme = calc_reloc(header, (uintptr_t)dram_base, (uintptr_t)iram_base, fixme);
+
+    }
+
+    return 0;
+}
+
+static int process_got(struct flat_hdr * header, void * base) {
+    uint32_t *got = (uint32_t*)((uintptr_t)base + header->data_start - header->entry);
+
+    for (; *got != 0xffffffff; got++)
+        *got += (uintptr_t)base;
+
+    return 0;
+}
+
+
+static void * bflt_open(const char *filename, unsigned char *dram, size_t dram_size, unsigned char *iram, size_t iram_size)
+{
+    struct flat_hdr header;
+    int fd = open(filename, O_RDONLY);
+    
+    if (fd < 0)
+    {
+        DEBUGF("Could not open file");
+        goto error;
+    }
+
+#if NUM_CORES > 1
+    /* Make sure COP cache is flushed and invalidated before loading */
+    {
+        int my_core = switch_core(CURRENT_CORE ^ 1);
+        switch_core(my_core);
+    }
+#endif
+
+    if (read_header(fd, &header) != 0)
+    {
+        DEBUGF("Could not parse header");
+        goto error_fd;
+    }
+
+    if (check_header(&header) != 0)
+    {
+        DEBUGF("Bad header");
+        goto error_fd;
+    }
+
+    /* FIXIT */
+    if (copy_segments(fd, &header, dram, dram_size, iram, iram_size))
+    {
+        DEBUGF("Failed to copy segments");
+        goto error_fd;
+    }
+
+    if (process_relocs(fd, &header, dram, iram) != 0)
+    {
+        DEBUGF("Failed to relocate");
+        goto error_fd;
+    }
+
+    if (header.flags & FLAT_FLAG_GOTPIC)
+    {
+        if (process_got(&header, dram))
+        {
+            DEBUGF("Failed to process got");
+            goto error_fd;
+        }
+    }
+
+    size_t bss_offset = (header.icode_start - header.entry) + (header.data_end - header.data_start);
+    size_t bss_size = header.bss_end - header.idata_end;
+    size_t ibss_offset = (header.bss_end - (header.icode_start - header.data_start) - (header.idata_end - header.data_end));
+    size_t ibss_size = header.ibss_end - header.bss_end;
+    /* zero out memory for bss */
+    memset( (void *)((uintptr_t)dram + bss_offset), 0, bss_size );
+
+    memset( (void *)((uintptr_t)iram + ibss_offset), 0, ibss_size);
+
+    close(fd);
+    return dram;
+error_fd:
+    close(fd);
+error:
+    return NULL;        
+}
+
 int plugin_load(const char* plugin, const void* parameter)
 {
     struct plugin_header *p_hdr;
     struct lc_header     *hdr;
+
+    /* to get rid of dependency on plugin.lds */
+    size_t dram_size;
+    unsigned char *dram = plugin_get_buffer(&dram_size);
 
     if (current_plugin_handle && pfn_tsr_exit)
     {    /* if we have a resident old plugin and a callback */
@@ -812,7 +1090,7 @@ int plugin_load(const char* plugin, const void* parameter)
     splash(0, ID2P(LANG_WAIT));
     strcpy(current_plugin, plugin);
 
-    current_plugin_handle = lc_open(plugin, pluginbuf, PLUGIN_BUFFER_SIZE);
+    current_plugin_handle = bflt_open(plugin, dram, dram_size, (unsigned char *)PLUGIN_IRAMORIG, (size_t)PLUGIN_IRAMSIZE);
     if (current_plugin_handle == NULL) {
         splashf(HZ*2, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return -1;
@@ -826,10 +1104,10 @@ int plugin_load(const char* plugin, const void* parameter)
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
         || hdr->target_id != TARGET_ID
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-        || hdr->load_addr != pluginbuf
-        || hdr->end_addr > pluginbuf + PLUGIN_BUFFER_SIZE
-#endif
+//#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+//        || hdr->load_addr != pluginbuf
+//        || hdr->end_addr > pluginbuf + PLUGIN_BUFFER_SIZE
+//#endif
         )
     {
         lc_close(current_plugin_handle);
