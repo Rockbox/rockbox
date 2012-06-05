@@ -1092,6 +1092,8 @@ static void audio_playlist_track_finish(void)
     }
 }
 
+void pcm_set_id3(struct mp3entry *id3);
+
 /* Announce the beginning of the new track */
 static void audio_playlist_track_change(void)
 {
@@ -1103,6 +1105,9 @@ static void audio_playlist_track_change(void)
     position_key = pcmbuf_get_position_key();
 
     playlist_update_resume_info(id3);
+
+    /* TODO: clean up! Dirty hack! */
+    pcm_set_id3(id3);
 }
 
 /* Change the data for the next track and send the event */

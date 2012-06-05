@@ -40,11 +40,13 @@
 #include <gst/app/gstappsrc.h>
 #include <linux/types.h>
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
 /* Maemo5: N900 specific libplayback support */
 #include <libplayback/playback.h>
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-lowlevel.h>
 #include "maemo-thread.h"
+#endif
 
 #ifdef HAVE_RECORDING
 #include "audiohw.h"
@@ -65,8 +67,7 @@
 extern bool debug_audio;
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
 /* Declarations for libplayblack */
 pb_playback_t *playback = NULL;
 void playback_state_req_handler(pb_playback_t *pb,
@@ -79,16 +80,24 @@ void playback_state_req_callback(pb_playback_t *pb,
             pb_req_t *req,
             void *data);
 bool playback_granted = false;
+#endif
 
 /* Gstreamer related vars */
 GstCaps *gst_audio_caps = NULL;
 GstElement *gst_pipeline = NULL;
 GstElement *gst_appsrc = NULL;
 GstElement *gst_volume = NULL;
-GstElement *gst_pulsesink = NULL;
+GstElement *gst_sink = NULL;
+#if !(CONFIG_PLATFORM & PLATFORM_MAEMO5)
+GstElement *gst_mp3 = NULL;
+GstElement *gst_ti = NULL;
+#endif
+
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
 GstBus *gst_bus = NULL;
 static int bus_watch_id = 0;
 GMainLoop *pcm_loop = NULL;
+#endif
 
 static const void* pcm_data = NULL;
 static size_t pcm_data_size = 0;
@@ -131,13 +140,16 @@ void pcm_play_dma_start(const void *addr, size_t size)
     pcm_data = addr;
     pcm_data_size = size;
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
     if (playback_granted)
     {
+#endif
         /* Start playing now */
         if (!inside_feed_data)
             gst_element_set_state (GST_ELEMENT(gst_pipeline), GST_STATE_PLAYING);
         else
             DEBUGF("ERROR: dma_start called while inside feed_data\n");
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
     } else
     {
         /* N900: Request change to playing state */
@@ -146,6 +158,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
                                                 playback_state_req_callback,
                                                 NULL);
     }
+#endif
 }
 
 void pcm_play_dma_stop(void)
@@ -223,6 +236,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 }
 
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
 static gboolean
 gst_bus_message (GstBus * bus, GstMessage * message, void *unused)
 {
@@ -267,8 +281,9 @@ gst_bus_message (GstBus * bus, GstMessage * message, void *unused)
 
     return TRUE;
 }
+#endif
 
-void maemo_configure_appsrc(void)
+void configure_appsrc(void)
 {
     /* Block push-buffer until there is enough room */
     g_object_set (G_OBJECT(gst_appsrc), "block", TRUE, NULL);
@@ -289,6 +304,7 @@ void maemo_configure_appsrc(void)
     g_signal_connect (gst_appsrc, "need-data", G_CALLBACK (feed_data), NULL);
 }
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
 /* Init libplayback: Grant access rights to
    play audio while the phone is in silent mode */
 void maemo_init_libplayback(void)
@@ -367,13 +383,16 @@ void playback_state_req_callback(pb_playback_t *pb, enum pb_state_e granted_stat
 
     pb_playback_req_completed(pb, req);
 }
+#endif
 
 void pcm_play_dma_init(void)
 {
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
     maemo_init_libplayback();
 
     GMainContext *ctx = g_main_loop_get_context(maemo_main_loop);
     pcm_loop = g_main_loop_new (ctx, true);
+#endif
 
     gst_init (NULL, NULL);
 
@@ -381,18 +400,36 @@ void pcm_play_dma_init(void)
 
     gst_appsrc = gst_element_factory_make ("appsrc", NULL);
     gst_volume = gst_element_factory_make ("volume", NULL);
-    gst_pulsesink = gst_element_factory_make ("pulsesink", NULL);
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
+    gst_sink = gst_element_factory_make ("pulsesink", NULL);
+    /* Connect elements */
+    gst_bin_add_many (GST_BIN (gst_pipeline),
+                        gst_appsrc, gst_volume, gst_sink, NULL);
+    gst_element_link_many (gst_appsrc, gst_volume, gst_sink, NULL);
+#else
+    gst_mp3 = gst_element_factory_make ("lamemp3enc", NULL);
+    gst_ti = gst_element_factory_make ("taginject", NULL);
+    gst_sink = gst_element_factory_make ("shout2send", NULL);
+    g_object_set(G_OBJECT(gst_sink),
+            "ip","127.0.0.1",
+            "port", 8000,
+            "password", "hackme",
+            "mount", "rockbox.mp3",
+            NULL);
 
     /* Connect elements */
     gst_bin_add_many (GST_BIN (gst_pipeline),
-                        gst_appsrc, gst_volume, gst_pulsesink, NULL);
-    gst_element_link_many (gst_appsrc, gst_volume, gst_pulsesink, NULL);
+                        gst_appsrc, gst_volume, gst_mp3, gst_ti, gst_sink, NULL);
+    gst_element_link_many (gst_appsrc, gst_volume, gst_mp3, gst_ti, gst_sink, NULL);
+#endif
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
     /* Connect to gstreamer bus of the pipeline */
     gst_bus = gst_pipeline_get_bus (GST_PIPELINE (gst_pipeline));
     bus_watch_id = gst_bus_add_watch (gst_bus, (GstBusFunc) gst_bus_message, NULL);
+#endif
 
-    maemo_configure_appsrc();
+    configure_appsrc();
 }
 
 void pcm_shutdown_gstreamer(void)
@@ -404,19 +441,25 @@ void pcm_shutdown_gstreamer(void)
        so we wait up to ten seconds and just continue otherwise */
     gst_element_get_state (GST_ELEMENT(gst_pipeline), NULL, NULL, GST_SECOND * 10);
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
     g_source_remove (bus_watch_id);
     g_object_unref(gst_bus);
     gst_bus = NULL;
+#endif
 
     gst_object_unref (gst_pipeline);
     gst_pipeline = NULL;
 
     /* Shutdown libplayback and gstreamer */
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
     pb_playback_destroy (playback);
+#endif
     gst_deinit();
 
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
     g_main_loop_quit(pcm_loop);
     g_main_loop_unref (pcm_loop);
+#endif
 
     pthread_mutex_destroy(&audio_lock_mutex);
 }
@@ -424,6 +467,46 @@ void pcm_shutdown_gstreamer(void)
 void pcm_play_dma_postinit(void)
 {
 }
+
+#if !(CONFIG_PLATFORM & PLATFORM_MAEMO5)
+/* TODO: should listen to PLAYBACK_EVENT_TRACK_CHANGE instead, probably? */
+void pcm_set_id3(struct mp3entry *id3)
+{
+    char tagdata[1024];
+    tagdata[0]=0;
+    char tmpdata[1024];
+    if(id3->artist)
+    {
+        sprintf(tmpdata,"%s=\"%s\",",GST_TAG_ARTIST,id3->artist);
+        strcat(tagdata,tmpdata);
+    }
+    if(id3->title)
+    {
+        sprintf(tmpdata,"%s=\"%s\",",GST_TAG_TITLE,id3->title);
+        strcat(tagdata,tmpdata);
+    }
+    if(id3->composer)
+    {
+        sprintf(tmpdata,"%s=\"%s\",",GST_TAG_COMPOSER,id3->composer);
+        strcat(tagdata,tmpdata);
+    }
+    if(id3->album)
+    {
+        sprintf(tmpdata,"%s=\"%s\",",GST_TAG_ALBUM,id3->album);
+        strcat(tagdata,tmpdata);
+    }
+    if(strlen(tagdata)>0)
+    {
+        tagdata[strlen(tagdata)-1]=0;
+    }
+    if(gst_ti)
+    {
+        DEBUGF("Setting tags to %s\n",tagdata);
+        g_object_set(G_OBJECT(gst_ti), "tags",tagdata, NULL);
+    }
+}
+#endif
+
 
 void pcm_set_mixer_volume(int volume)
 {
@@ -481,5 +564,3 @@ unsigned long spdif_measure_frequency(void)
 #endif
 
 #endif /* HAVE_RECORDING */
-
-#endif /* CONFIG_CODEC == SWCODEC */

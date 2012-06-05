@@ -73,7 +73,7 @@
 
 /* Use SDL audio/pcm in a SDL app build */
 #define HAVE_SDL
-#define HAVE_SDL_AUDIO
+#define HAVE_GSTREAMER_AUDIO
 
 #define HAVE_SW_TONE_CONTROLS 
 
