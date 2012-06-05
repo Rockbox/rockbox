@@ -975,8 +975,8 @@ extern unsigned char plugin_start_addr[];
 extern unsigned char plugin_end_addr[];
 #define PLUGIN_HEADER \
         const struct plugin_api *rb DATA_ATTR; \
-        const struct plugin_header __header \
-        __attribute__ ((section (".header")))= { \
+        /*const*/ struct plugin_header __header \
+        __attribute__ ((section (".header"))) = { \
         { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
         plugin_start_addr, plugin_end_addr }, plugin__start, &rb };
 #else /* PLATFORM_HOSTED */

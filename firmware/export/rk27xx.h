@@ -1,3 +1,7 @@
+/* iram is to tiny to be usefull */
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+
 /* ARM part only for now */
 #define AHB_SRAM 0x00000000
 
