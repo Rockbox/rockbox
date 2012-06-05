@@ -65,6 +65,7 @@ enum plugin_status plugin__start(const void *param)
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 
+#if 0
 /* IRAM must be copied before clearing the BSS ! */
 #ifdef PLUGIN_USE_IRAM
     extern char iramcopy[], iramstart[], iramend[], iedata[], iend[];
@@ -85,13 +86,14 @@ enum plugin_status plugin__start(const void *param)
         asm volatile ("" ::: "memory");
     }
 #endif /* PLUGIN_USE_IRAM */
-
+#endif
     /* zero out the bss section */
-    rb->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
+//    rb->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
 
     /* Some parts of bss may be used via a no-cache alias (at least
      * portalplayer has this). If we don't clear the cache, those aliases
      * may read garbage */
+    rb->commit_discard_idcache();
     rb->commit_dcache();
 #endif
 
