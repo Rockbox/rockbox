@@ -25,4 +25,13 @@
    completely and redefine any minor differences */
 #include "pp5020.h"
 
+#undef PLUGIN_IRAMORIG
+#undef PLUGIN_IRAMSIZE
+
+/* 128KB of IRAM
+ * partialy taken by the core
+ */
+#define PLUGIN_IRAMORIG 0x4000c000
+#define PLUGIN_IRAMSIZE 0x14000
+
 #endif

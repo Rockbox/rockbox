@@ -23,6 +23,15 @@
 
 #include "mcf5249.h"
 
+#undef PLUGIN_IRAMORIG
+#undef PLUGIN_IRAMSIZE
+
+/* MCF5250 have 128KB of IRAM
+ * 0xc800 part is taken by the core
+ */
+#define PLUGIN_IRAMORIG 0x1000c800
+#define PLUGIN_IRAMSIZE 0x13800
+
 /* here we remove stuff, which is not included in mfc5250 */
 #undef DACR1
 #undef DMR1
