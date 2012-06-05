@@ -21,6 +21,10 @@
 #ifndef __IMX31L_H__
 #define __IMX31L_H__
 
+/* The bit of IRAM that is available is used in the core */
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+
 /* Most(if not all) of these defines are copied from Nand-Boot v4 provided w/ the Imx31 Linux Bsp*/
 
 #define REG8_PTR_T  volatile unsigned char *
