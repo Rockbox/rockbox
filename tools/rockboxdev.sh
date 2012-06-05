@@ -34,7 +34,7 @@ if [ -z $GNU_MIRROR ] ; then
 fi
 
 # These are the tools this script requires and depends upon.
-reqtools="gcc bzip2 gzip make patch makeinfo automake libtool autoconf flex bison"
+reqtools="git gcc bzip2 gzip make patch makeinfo automake libtool autoconf flex bison"
 
 ##############################################################################
 # Functions:
@@ -221,6 +221,42 @@ build() {
     echo "ROCKBOXDEV: $toolname/make install"
     $make install
 
+    # elf2flt needs intermediate files from binutils build
+    if [ "$toolname" = "binutils" ] ; then
+        echo "ROCKBOXDEV: downloading elf2flt"
+        if test -d "$dlwhere/elf2flt"; then
+            echo "already downloaded, skiping"
+        else
+            git clone --progress git://sources.blackfin.uclinux.org/git/users/vapier/elf2flt.git $dlwhere/elf2flt
+        fi
+        cp -r $dlwhere/elf2flt $builddir/build-elf2flt
+        cd $builddir/build-elf2flt
+        if test -f "$dlwhere/elf2flt_rb.diff"; then
+            echo "ROCKBOXDEV: patching elf2flt"
+            git apply $dlwhere/elf2flt_rb.diff
+        else
+            echo "ROCKBOXDEV: please manualy copy utils/bflt/elf2flt_rb.diff to $dlwhere/elf2flt_rb.diff"
+            echo "            delete intermediate $builddir" 
+            echo "            and re-run the script"
+            exit
+        fi
+        echo "ROCKBOXDEV: elf2flt/configure"
+        ./configure --with-libbfd=$builddir/build-$toolname/bfd/libbfd.a --with-libiberty=$builddir/build-$toolname/libiberty/libiberty.a --with-bfd-include-dir=$builddir/build-$toolname/bfd --with-binutils-include-dir=$builddir/$toolname-$version/include --target=$target --prefix=$prefix
+
+        echo "ROCKBOXDEV: elf2flt/make"
+        $make
+
+        echo "ROCKBOXDEV: elf2flt/make install"
+        $make install
+
+        echo "ROCKBOXDEV: rm -rf build-elf2flt"
+        cd ..
+        rm -rf $builddir/build-elf2flt
+
+        # go back to binutils build dir as this is what the rest of the script assumes
+        cd build-$toolname
+    fi
+
     echo "ROCKBOXDEV: rm -rf build-$toolname $toolname-$version"
     cd ..
     rm -rf build-$toolname $toolname-$version
@@ -291,16 +327,20 @@ build_ctng() {
     
 ##############################################################################
 # Code:
-
+force_exit=""
 # Verify required tools
 for t in $reqtools; do
     tool=`findtool $t`
     if test -z "$tool"; then
         echo "ROCKBOXDEV: \"$t\" is required for this script to work."
-        echo "ROCKBOXDEV: Please install \"$t\" and re-run the script."
-        exit
+        force_exit="1";
     fi
 done
+
+if test -n "$force_exit"; then
+    echo "ROCKBOXDEV: Please install required tools and re-run the script."
+    exit
+fi
 
 echo "Download directory : $dlwhere (set RBDEV_DOWNLOAD to change)"
 echo "Install prefix     : $prefix  (set RBDEV_PREFIX to change)"
