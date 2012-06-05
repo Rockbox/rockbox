@@ -1,0 +1,525 @@
+commit dde2b6c522f1e46243b1f51e8586914ef0347e15
+Author: Marcin Bukat <marcin.bukat@gmail.com>
+Date:   Tue Jun 26 16:37:53 2012 +0200
+
+    Rockbox changes to elf2flt utils
+    
+    1) small tweak to make it compile agains our binutils
+    2) add missing relocation types for ARM
+    3) extend format to support iram part
+
+diff --git a/cygwin-elf.h b/cygwin-elf.h
+index 2523c0e..8125bfc 100644
+--- a/cygwin-elf.h
++++ b/cygwin-elf.h
+@@ -1876,12 +1876,15 @@ typedef Elf32_Addr Elf32_Conflict;
+ #define R_ARM_GOTPC		25	/* 32 bit PC relative offset to GOT */
+ #define R_ARM_GOT32		26	/* 32 bit GOT entry */
+ #define R_ARM_PLT32		27	/* 32 bit PLT address */
++#define R_ARM_CALL		28
++#define R_ARM_JUMP24		29
+ #define R_ARM_ALU_PCREL_7_0	32
+ #define R_ARM_ALU_PCREL_15_8	33
+ #define R_ARM_ALU_PCREL_23_15	34
+ #define R_ARM_LDR_SBREL_11_0	35
+ #define R_ARM_ALU_SBREL_19_12	36
+ #define R_ARM_ALU_SBREL_27_20	37
++#define R_ARM_V4BX              40
+ #define R_ARM_GNU_VTENTRY	100
+ #define R_ARM_GNU_VTINHERIT	101
+ #define R_ARM_THM_PC11		102	/* thumb unconditional branch */
+diff --git a/elf2flt.c b/elf2flt.c
+index 2fea9b5..7aa4ad1 100644
+--- a/elf2flt.c
++++ b/elf2flt.c
+@@ -59,7 +59,8 @@ const char *elf2flt_progname;
+ #elif defined(TARGET_microblaze)
+ #include <elf/microblaze.h>	/* TARGET_* ELF support for the BFD library */
+ #else
+-#include <elf.h>      /* TARGET_* ELF support for the BFD library            */
++//#include <elf.h>      /* TARGET_* ELF support for the BFD library            */
++#include "cygwin-elf.h"
+ #endif
+ 
+ /* Always include Blackfin-specific defines in addition to common ELF stuff
+@@ -185,7 +186,7 @@ dump_symbols(asymbol **symbol_table, long number_of_symbols)
+   printf("SYMBOL TABLE:\n");
+   for (i=0; i<number_of_symbols; i++) {
+ 	printf("  NAME=%s  VALUE=0x%x\n", symbol_table[i]->name,
+-		symbol_table[i]->value);
++		(unsigned int)symbol_table[i]->value);
+   }
+   printf("\n");
+   return(0);
+@@ -368,7 +369,7 @@ dump_symbols(symbols, number_of_symbols);
+     got_size = ((unsigned char *)lp) - data;
+     if (verbose)
+ 	    printf("GOT table contains %d entries (%d bytes)\n",
+-			    got_size/sizeof(uint32_t), got_size);
++			    (int)(got_size/sizeof(uint32_t)), got_size);
+ #ifdef TARGET_m68k
+     if (got_size > GOT_LIMIT)
+ 	    fatal("GOT too large: %d bytes (limit = %d bytes)",
+@@ -380,7 +381,7 @@ dump_symbols(symbols, number_of_symbols);
+   	section_vma = bfd_section_vma(abs_bfd, a);
+ 
+ 	if (verbose)
+-		printf("SECTION: %s [0x%x]: flags=0x%x vma=0x%x\n", a->name, a,
++		printf("SECTION: %s: flags=0x%x vma=0x%x\n", a->name,
+ 			a->flags, section_vma);
+ 
+ //	if (bfd_is_abs_section(a))
+@@ -396,6 +397,7 @@ dump_symbols(symbols, number_of_symbols);
+ 	 *	Only relocate things in the data sections if we are PIC/GOT.
+ 	 *	otherwise do text as well
+ 	 */
++
+ 	if ((!pic_with_got || ALWAYS_RELOC_TEXT) && (a->flags & SEC_CODE))
+ 		sectionp = text + (a->vma - text_vma);
+ 	else if (a->flags & SEC_DATA)
+@@ -413,15 +415,15 @@ dump_symbols(symbols, number_of_symbols);
+ 	if (r == NULL)
+ 	  continue;
+ 	if (verbose)
+-	  printf(" RELOCS: %s [0x%x]: flags=0x%x vma=0x%x\n", r->name, r,
+-			r->flags, bfd_section_vma(abs_bfd, r));
++	  printf(" RELOCS: %s: flags=0x%x vma=0x%x\n", r->name,
++			r->flags, (unsigned int)bfd_section_vma(abs_bfd, r));
+   	if ((r->flags & SEC_RELOC) == 0)
+   	  continue;
+ 	relsize = bfd_get_reloc_upper_bound(rel_bfd, r);
+ 	if (relsize <= 0) {
+ 		if (verbose)
+ 			printf("%s(%d): no relocation entries section=0x%x\n",
+-				__FILE__, __LINE__, r->name);
++				__FILE__, __LINE__, (unsigned int)(uintptr_t)r->name);
+ 		continue;
+ 	}
+ 
+@@ -552,8 +554,9 @@ dump_symbols(symbols, number_of_symbols);
+ 				   still depend on the particular relocation
+ 				   though.  */
+ 				switch (q->howto->type) {
+-					int r2_type;
+ #ifdef TARGET_v850
++					int r2_type;
++
+ 				case R_V850_HI16_S:
+ 					/* We specially handle adjacent
+ 					   HI16_S/ZDA_15_16_OFFSET and
+@@ -645,6 +648,9 @@ dump_symbols(symbols, number_of_symbols);
+ 				case R_ARM_PLT32:
+ 				case R_ARM_GOTPC:
+ 				case R_ARM_GOT32:
++				case R_ARM_V4BX:
++				case R_ARM_CALL:
++				case R_ARM_JUMP24:
+ 					relocation_needed = 0;
+ 					break;
+ 				default:
+@@ -788,8 +794,8 @@ dump_symbols(symbols, number_of_symbols);
+ 							"%s vma=0x%x, value=0x%x, address=0x%x "
+ 							"sym_addr=0x%x rs=0x%x, opcode=0x%x\n",
+ 							"ABS32",
+-							sym_vma, (*(q->sym_ptr_ptr))->value,
+-							q->address, sym_addr,
++							sym_vma, (uint32_t)(*(q->sym_ptr_ptr))->value,
++							(uint32_t)q->address, sym_addr,
+ 							(*p)->howto->rightshift,
+ 							*(uint32_t *)r_mem);
+ 					sym_vma = bfd_section_vma(abs_bfd, sym_section);
+@@ -805,9 +811,9 @@ dump_symbols(symbols, number_of_symbols);
+ 							"%s vma=0x%x, value=0x%x, address=0x%x "
+ 							"sym_addr=0x%x rs=0x%x, opcode=0x%x\n",
+ 							"PLT32",
+-							sym_vma, (*(q->sym_ptr_ptr))->value,
+-							q->address, sym_addr,
+-							(*p)->howto->rightshift,
++							sym_vma, (uint32_t)(*(q->sym_ptr_ptr))->value,
++							(uint32_t)q->address, sym_addr,
++							(unsigned int)(*p)->howto->rightshift,
+ 							*(uint32_t *)r_mem);
+ 				case R_ARM_PC24:
+ 					sym_vma = 0;
+@@ -1352,8 +1358,8 @@ DIS29_RELOCATION:
+ 				}
+ 			}
+ 
+-			sprintf(&addstr[0], "+0x%x", sym_addr - (*(q->sym_ptr_ptr))->value -
+-					 bfd_section_vma(abs_bfd, sym_section));
++			sprintf(&addstr[0], "+0x%x", (uint32_t)(sym_addr - (*(q->sym_ptr_ptr))->value -
++					 bfd_section_vma(abs_bfd, sym_section)));
+ 
+ 
+ 			/*
+@@ -1498,9 +1504,9 @@ DIS29_RELOCATION:
+ 				printf("  RELOC[%d]: offset=0x%x symbol=%s%s "
+ 					"section=%s size=%d "
+ 					"fixup=0x%x (reloc=0x%x)\n", flat_reloc_count,
+-					q->address, sym_name, addstr,
++					(uint32_t)q->address, sym_name, addstr,
+ 					section_name, sym_reloc_size,
+-					sym_addr, section_vma + q->address);
++					sym_addr, (uint32_t)(section_vma + q->address));
+ 
+ 			/*
+ 			 *	Create relocation entry (PC relative doesn't need this).
+@@ -1515,7 +1521,7 @@ DIS29_RELOCATION:
+ 
+ 				if (verbose)
+ 					printf("reloc[%d] = 0x%x\n", flat_reloc_count,
+-							section_vma + q->address);
++							(uint32_t)(section_vma + q->address));
+ #else
+ 				switch ((*p)->howto->type) {
+ 				case R_E1_CONST31:
+@@ -1628,12 +1634,21 @@ int main(int argc, char *argv[])
+   uint32_t data_len = 0;
+   uint32_t bss_len = 0;
+   uint32_t text_len = 0;
++
++  uint32_t idata_len = 0;
++  uint32_t ibss_len = 0;
++  uint32_t icode_len = 0;
++
+   uint32_t reloc_len;
+ 
+   uint32_t data_vma = ~0;
+   uint32_t bss_vma = ~0;
+   uint32_t text_vma = ~0;
+ 
++  uint32_t idata_vma = ~0;
++  uint32_t ibss_vma = ~0;
++  uint32_t icode_vma = ~0;
++
+   uint32_t text_offs;
+ 
+   void *text;
+@@ -1747,22 +1762,51 @@ int main(int argc, char *argv[])
+ 
+   symbol_table = get_symbols(abs_bfd, &number_of_symbols);
+ 
+-  /* Group output sections into text, data, and bss, and calc their sizes.  */
++  /* Group output sections into .text, .icode .data, .idata, .bss, .ibss
++   * and calc their sizes
++   */
+   for (s = abs_bfd->sections; s != NULL; s = s->next) {
+     uint32_t *vma, *len;
+     bfd_size_type sec_size;
+     bfd_vma sec_vma;
+ 
+-    if (s->flags & SEC_CODE) {
+-      vma = &text_vma;
+-      len = &text_len;
+-    } else if (s->flags & SEC_DATA) {
+-      vma = &data_vma;
+-      len = &data_len;
+-    } else if (s->flags & SEC_ALLOC) {
+-      vma = &bss_vma;
+-      len = &bss_len;
+-    } else
++    if (verbose)
++      printf("elf2flt process section: %s\n", s->name);
++
++    /* we check for special named section first
++     * then we categorize sections by flags
++     */
++    if (strncmp(s->name, ".icode", 6) == 0)
++    {
++        vma = &icode_vma;
++        len = &icode_len;
++    }
++    else if (strncmp(s->name, ".idata", 6) == 0)
++    {
++        vma = &idata_vma;
++        len = &idata_len;
++    }
++    else if (strncmp(s->name, ".ibss", 5) == 0)
++    {
++        vma = &ibss_vma;
++        len = &ibss_len;
++    }
++    else if (s->flags & SEC_CODE)
++    {
++        vma = &text_vma;
++        len = &text_len;
++    }
++    else if (s->flags & SEC_DATA)
++    {
++        vma = &data_vma;
++        len = &data_len;
++    }
++    else if (s->flags & SEC_ALLOC)
++    {
++        vma = &bss_vma;
++        len = &bss_len;
++    }
++    else
+       continue;
+ 
+     sec_size = bfd_section_size(abs_bfd, s);
+@@ -1781,14 +1825,27 @@ int main(int argc, char *argv[])
+   if (text_len == 0)
+     fatal("%s: no .text section", abs_file);
+ 
+-  text = xmalloc(text_len);
++  /* .icode directly follows .text */
++  text = xmalloc(text_len + icode_len);
+ 
+   if (verbose)
++  {
+     printf("TEXT -> vma=0x%x len=0x%x\n", text_vma, text_len);
++    printf("icode -> vma=0x%x len=0x%x\n", icode_vma, icode_len);
++  }
+ 
+-  /* Read in all text sections.  */
++  /* Read in all code sections */
+   for (s = abs_bfd->sections; s != NULL; s = s->next)
+-    if (s->flags & SEC_CODE) 
++    if (strncmp(s->name, ".icode", 6) == 0)
++    {
++        if (!bfd_get_section_contents(abs_bfd, s,
++                                      text + text_len + (s->vma - icode_vma), 0,
++                                      bfd_section_size(abs_bfd, s)))
++        {
++          fatal("read error section %s", s->name);
++        }
++    }
++    else if (s->flags & SEC_CODE) 
+       if (!bfd_get_section_contents(abs_bfd, s,
+ 				   text + (s->vma - text_vma), 0,
+ 				   bfd_section_size(abs_bfd, s)))
+@@ -1798,25 +1855,40 @@ int main(int argc, char *argv[])
+ 
+   if (data_len == 0)
+     fatal("%s: no .data section", abs_file);
+-  data = xmalloc(data_len);
++
++  /* .idata directly follows .data */
++  data = xmalloc(data_len + idata_len);
+ 
+   if (verbose)
++  {
+     printf("DATA -> vma=0x%x len=0x%x\n", data_vma, data_len);
++    printf("idata -> vma=0x%x len=0x%x\n", idata_vma, idata_len);
++  }
+ 
+-  if ((text_vma + text_len) != data_vma) {
+-    if ((text_vma + text_len) > data_vma) {
+-      printf("ERROR: text=0x%x overlaps data=0x%x ?\n", text_len, data_vma);
++  if ((text_vma + text_len + icode_len) != data_vma) {
++    if ((text_vma + text_len + icode_len) > data_vma) {
++      printf("ERROR: text=0x%x overlaps data=0x%x ?\n", text_len + icode_len, data_vma);
+       exit(1);
+     }
+     if (verbose)
+       printf("WARNING: data=0x%x does not directly follow text=0x%x\n",
+-	  		data_vma, text_len);
+-    text_len = data_vma - text_vma;
++	  		data_vma, text_len + icode_len);
++    /* text_len = data_vma - text_vma; <- why to evaluate it once more??? */
+   }
+ 
+   /* Read in all data sections.  */
+   for (s = abs_bfd->sections; s != NULL; s = s->next)
+-    if (s->flags & SEC_DATA) 
++    if (strncmp(s->name, ".idata", 6) == 0)
++    {
++      if (!bfd_get_section_contents(abs_bfd, s,
++                                   data + data_len + (s->vma - idata_vma), 0,
++                                   bfd_section_size(abs_bfd, s)))
++      {
++        fatal("read error section %s", s->name);
++      }
++
++    }
++    else if (s->flags & SEC_DATA) 
+       if (!bfd_get_section_contents(abs_bfd, s,
+ 				   data + (s->vma - data_vma), 0,
+ 				   bfd_section_size(abs_bfd, s)))
+@@ -1825,29 +1897,29 @@ int main(int argc, char *argv[])
+       }
+ 
+   if (bss_vma == ~0)
+-    bss_vma = data_vma + data_len;
++    bss_vma = data_vma + data_len + idata_len;
+ 
+   /* Put common symbols in bss.  */
+   bss_len += add_com_to_bss(symbol_table, number_of_symbols, bss_len);
+ 
+   if (verbose)
+-    printf("BSS  -> vma=0x%x len=0x%x\n", bss_vma, bss_len);
++    printf("BSS  -> vma=0x%x len=0x%x\n", bss_vma, bss_len + ibss_len);
+ 
+-  if ((data_vma + data_len) != bss_vma) {
+-    if ((data_vma + data_len) > bss_vma) {
+-      printf("ERROR: text=0x%x + data=0x%x overlaps bss=0x%x ?\n", text_len,
+-	  		data_len, bss_vma);
++  if ((data_vma + data_len + idata_len) != bss_vma) {
++    if ((data_vma + data_len + idata_len) > bss_vma) {
++      printf("ERROR: text=0x%x + data=0x%x overlaps bss=0x%x ?\n", text_len + icode_len,
++	  		data_len + idata_len, bss_vma);
+       exit(1);
+     }
+     if (verbose)
+       printf("WARNING: bss=0x%x does not directly follow text=0x%x + data=0x%x(0x%x)\n",
+-      		bss_vma, text_len, data_len, text_len + data_len);
+-    data_len = bss_vma - data_vma;
++      		bss_vma, text_len + icode_len, data_len + idata_len, text_len + icode_len + data_len + idata_len);
++    /* data_len = bss_vma - data_vma; <- again why to evaluate it once more??? */
+   }
+ 
+   reloc = (uint32_t *)
+     output_relocs(abs_bfd, symbol_table, number_of_symbols, &reloc_len,
+-		  text, text_len, text_vma, data, data_len, data_vma, rel_bfd);
++		  text, text_len + icode_len, text_vma, data, data_len + idata_len, data_vma, rel_bfd);
+ 
+   if (reloc == NULL && verbose)
+     printf("No relocations in code!\n");
+@@ -1858,11 +1930,14 @@ int main(int argc, char *argv[])
+   memcpy(hdr.magic,"bFLT",4);
+   hdr.rev         = htonl(FLAT_VERSION);
+   hdr.entry       = htonl(sizeof(hdr) + bfd_get_start_address(abs_bfd));
+-  hdr.data_start  = htonl(sizeof(hdr) + text_offs + text_len);
+-  hdr.data_end    = htonl(sizeof(hdr) + text_offs + text_len +data_len);
+-  hdr.bss_end     = htonl(sizeof(hdr) + text_offs + text_len +data_len+bss_len);
++  hdr.icode_start = htonl(sizeof(hdr) + text_offs + text_len);
++  hdr.data_start  = htonl(sizeof(hdr) + text_offs + text_len + icode_len);
++  hdr.data_end    = htonl(sizeof(hdr) + text_offs + text_len + icode_len + data_len);
++  hdr.idata_end   = htonl(sizeof(hdr) + text_offs + text_len + icode_len + data_len + idata_len);
++  hdr.bss_end     = htonl(sizeof(hdr) + text_offs + text_len + icode_len + data_len + idata_len + bss_len);
++  hdr.ibss_end    = htonl(sizeof(hdr) + text_offs + text_len + icode_len + data_len + idata_len + bss_len + ibss_len);
+   hdr.stack_size  = htonl(stack); /* FIXME */
+-  hdr.reloc_start = htonl(sizeof(hdr) + text_offs + text_len +data_len);
++  hdr.reloc_start = htonl(sizeof(hdr) + text_offs + text_len + icode_len + data_len + idata_len);
+   hdr.reloc_count = htonl(reloc_len);
+   hdr.flags       = htonl(0
+ 	  | (load_to_ram || text_has_relocs ? FLAT_FLAG_RAM : 0)
+@@ -1873,6 +1948,18 @@ int main(int argc, char *argv[])
+   hdr.build_date = htonl((uint32_t)time(NULL));
+   memset(hdr.filler, 0x00, sizeof(hdr.filler));
+ 
++  if (verbose)
++  {
++    printf("output file: %s\n", ofile);
++    printf("text_len:    0x%08x (%d)\n", text_len, text_len);
++    printf("icode_len:   0x%08x (%d)\n", icode_len, icode_len);
++    printf("data_len:    0x%08x (%d)\n", data_len, data_len);
++    printf("idata_len:   0x%08x (%d)\n", idata_len, idata_len);
++    printf("bss_len:     0x%08x (%d)\n", bss_len, bss_len);
++    printf("ibss_len:    0x%08x (%d)\n", ibss_len, ibss_len);
++    printf("reloc count: 0x%08x (%d)\n", reloc_len, reloc_len);
++  }
++
+   for (i=0; i<reloc_len; i++) reloc[i] = htonl(reloc[i]);
+ 
+   if (verbose) {
+@@ -1892,7 +1979,9 @@ int main(int argc, char *argv[])
+   if ((fd = open (ofile, O_WRONLY|O_BINARY|O_CREAT|O_TRUNC, 0744)) < 0)
+     fatal_perror("Can't open output file %s", ofile);
+ 
+-  write(fd, &hdr, sizeof(hdr));
++  if (write(fd, &hdr, sizeof(hdr)) != sizeof(hdr))
++    fatal_perror("Error writing BFLT header\n");
++
+   close(fd);
+ 
+   if (fopen_stream_u(&gf, ofile, "a" BINARY_FILE_OPTS))
+@@ -1907,13 +1996,13 @@ int main(int argc, char *argv[])
+   write_zeroes(text_offs, &gf);
+ 
+   /* Write the text segment.  */
+-  fwrite_stream(text, text_len, 1, &gf);
++  fwrite_stream(text, text_len + icode_len, 1, &gf);
+ 
+   if (docompress == 2)
+     reopen_stream_compressed(&gf);
+ 
+   /* Write the data segment.  */
+-  fwrite_stream(data, data_len, 1, &gf);
++  fwrite_stream(data, data_len + idata_len, 1, &gf);
+ 
+   if (reloc)
+     fwrite_stream(reloc, reloc_len * 4, 1, &gf);
+diff --git a/flat.h b/flat.h
+index 2fef529..c0f0945 100644
+--- a/flat.h
++++ b/flat.h
+@@ -19,7 +19,7 @@
+ #endif
+ #include <stdint.h>
+ 
+-#define	FLAT_VERSION			0x00000004L
++#define	FLAT_VERSION			0x00000006L
+ 
+ #ifdef CONFIG_BINFMT_SHARED_FLAT
+ #define	MAX_SHARED_LIBS			(4)
+@@ -37,14 +37,18 @@ struct flat_hdr {
+     uint32_t rev;          /* version (as above) */
+     uint32_t entry;        /* Offset of first executable instruction
+                               with text segment from beginning of file */
++    uint32_t icode_start;  /* Offset of icode segment from beginning of
++                              file */
+     uint32_t data_start;   /* Offset of data segment from beginning of
+                               file */
+     uint32_t data_end;     /* Offset of end of data segment from beginning
+                               of file */
++    uint32_t idata_end;    /* Offset of end of idata segment from beginning
++                              of file */
+     uint32_t bss_end;      /* Offset of end of bss segment from beginning
+                               of file */
+-
+-    /* (It is assumed that data_end through bss_end forms the bss segment.) */
++    uint32_t ibss_end;     /* Offset of end of ibss segment from beginning
++                              of file */
+ 
+     uint32_t stack_size;   /* Size of stack, in bytes */
+     uint32_t reloc_start;  /* Offset of relocation records from beginning
+@@ -52,7 +56,7 @@ struct flat_hdr {
+     uint32_t reloc_count;  /* Number of relocation records */
+     uint32_t flags;       
+     uint32_t build_date;   /* When the program/library was built */
+-    uint32_t filler[5];    /* Reservered, set to zero */
++    uint32_t filler[2];    /* Reservered, set to zero */
+ };
+ 
+ #define FLAT_FLAG_RAM    0x0001 /* load program entirely into RAM */
+diff --git a/flthdr.c b/flthdr.c
+index dfc9107..52f7cef 100644
+--- a/flthdr.c
++++ b/flthdr.c
+@@ -116,9 +116,12 @@ process_file(char *ifile, char *ofile)
+ 		t = (time_t) htonl(old_hdr.build_date);
+ 		printf("    Build Date:   %s",      t?ctime(&t):"not specified\n");
+ 		printf("    Entry:        0x%x\n",  ntohl(old_hdr.entry));
++		printf("    Icode Start:  0x%x\n",  ntohl(old_hdr.icode_start));
+ 		printf("    Data Start:   0x%x\n",  ntohl(old_hdr.data_start));
+ 		printf("    Data End:     0x%x\n",  ntohl(old_hdr.data_end));
++		printf("    Idata End:    0x%x\n",  ntohl(old_hdr.idata_end));
+ 		printf("    BSS End:      0x%x\n",  ntohl(old_hdr.bss_end));
++		printf("    Ibss End:     0x%x\n",  ntohl(old_hdr.ibss_end));
+ 		printf("    Stack Size:   0x%x\n",  ntohl(old_hdr.stack_size));
+ 		reloc_start = ntohl(old_hdr.reloc_start);
+ 		printf("    Reloc Start:  0x%x\n",  reloc_start);
+diff --git a/ld-elf2flt.c b/ld-elf2flt.c
+index b8b02fd..045452b 100644
+--- a/ld-elf2flt.c
++++ b/ld-elf2flt.c
+@@ -24,7 +24,7 @@
+ #include <unistd.h>
+ #include <errno.h>
+ #include <libiberty.h>
+-#include <filenames.h>
++//#include <filenames.h>
+ 
+ #include "stubs.h"
+ const char *elf2flt_progname;
+@@ -280,7 +280,7 @@ static int do_final_link(void)
+ 							break;
+ 						if (streqn(ptr, "RELOC")) {
+ 							flag_move_data = 0;
+-							fprintf(stderr, "warning: .rodata section contains relocations");
++							fprintf(stderr, "warning: .rodata section contains relocations\n");
+ 							break;
+ 						} else
+ 							ptr++;

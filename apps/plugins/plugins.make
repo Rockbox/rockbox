@@ -41,8 +41,10 @@ PLUGINLIB_OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(PLUGINLIB_OBJ))
 ifndef APP_TYPE
 CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
 PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
+PLUGIN_BFLT_LDS := $(APPSDIR)/plugins/plugin_bflt.lds
 PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
 OVERLAYREF_LDS := $(BUILDDIR)/apps/plugins/overlay_ref.link
+PLUGINLINK_BFLT_LDS := $(BUILDDIR)/apps/plugins/plugin_bflt.link
 endif
 OTHER_SRC += $(ROOTDIR)/apps/plugins/plugin_crt0.c
 PLUGIN_CRT0 := $(BUILDDIR)/apps/plugins/plugin_crt0.o
@@ -67,7 +69,7 @@ PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS)
 $(ROCKS1): $(BUILDDIR)/%.rock: $(BUILDDIR)/%.o
 
 # dependency for all plugins
-$(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGIN_LIBS) $(PLUGIN_CRT0)
+$(ROCKS): $(APPSDIR)/plugin.h $(PLUGINLINK_LDS) $(PLUGINLINK_BFLT_LDS) $(PLUGIN_LIBS) $(PLUGIN_CRT0)
 
 $(PLUGINLIB): $(PLUGINLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
@@ -77,6 +79,11 @@ $(PLUGINLINK_LDS): $(PLUGIN_LDS) $(CONFIGFILE)
 	$(call PRINTS,PP $(@F))
 	$(shell mkdir -p $(dir $@))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
+
+$(PLUGINLINK_BFLT_LDS): $(PLUGIN_BFLT_LDS) $(CONFIGFILE)
+	$(call PRINTS,PP $(@F))
+	$(shell mkdir -p $(dir $@))
+	$(call preprocess2file,$<,$@)
 
 $(OVERLAYREF_LDS): $(PLUGIN_LDS)
 	$(call PRINTS,PP $(@F))
@@ -116,6 +123,10 @@ endif
 PLUGINLDFLAGS += $(GLOBAL_LDOPTS)
 
 $(BUILDDIR)/%.rock:
+	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.bflt \
+		$(filter %.o, $^) \
+		$(filter %.a, $+) \
+		-lgcc -T$(PLUGINLINK_BFLT_LDS) -Wl,-elf2flt
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
