@@ -30,7 +30,7 @@
 #include <inttypes.h>
 #include "time.h"
 
-#define VOICE_VERSION 400 /* 4.00 - if you change this, change it in voicefont too */
+#define VOICE_VERSION 500 /* if you change this, change it in voicefont too */
 
 enum {
     /* See array "unit_voiced" in talk.c function "talk_value" */

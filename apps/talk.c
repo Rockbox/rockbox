@@ -77,6 +77,9 @@ const char* const file_thumbnail_ext = ".talk";
 
 #define QUEUE_LEVEL ((queue_write - queue_read) & QUEUE_MASK)
 
+/* we use the MSB in the clip offset field to indicate if a clip has already
+ * been loaded. The offset value is a 32bit value, and if the clip is that large
+ * to cause problems with this use we cannot handle the clip anyway. */
 #define LOADED_MASK 0x80000000 /* MSB */
 
 /* swcodec: cap p_thumnail to MAX_THUMNAIL_BUFSIZE since audio keeps playing
@@ -92,7 +95,6 @@ const char* const file_thumbnail_ext = ".talk";
 struct clip_entry /* one entry of the index table */
 {
     int offset; /* offset from start of voicefile file */
-    int size; /* size of the clip */
 };
 
 struct voicefile /* file format of our voice file */
@@ -176,13 +178,13 @@ static int open_voicefile(void)
     char* p_lang = "english"; /* default */
 
     if ( global_settings.lang_file[0] &&
-         global_settings.lang_file[0] != 0xff ) 
+         global_settings.lang_file[0] != 0xff )
     {   /* try to open the voice file of the selected language */
         p_lang = (char *)global_settings.lang_file;
     }
 
     snprintf(buf, sizeof(buf), LANG_DIR "/%s.voice", p_lang);
-    
+
     return open(buf, O_RDONLY);
 }
 
@@ -207,17 +209,18 @@ static unsigned char* get_clip(long id, long* p_size)
         if (id >= p_voicefile->id1_max)
             return NULL; /* must be newer than we have */
     }
-    
-    clipsize = p_voicefile->index[id].size;
+
+    clipsize = (p_voicefile->index[id+1].offset & ~LOADED_MASK)
+        - (p_voicefile->index[id].offset & ~LOADED_MASK);
     if (clipsize == 0) /* clip not included in voicefile */
         return NULL;
 
 #ifndef TALK_PARTIAL_LOAD
-    clipbuf = (unsigned char *) p_voicefile + p_voicefile->index[id].offset;
+    clipbuf = (unsigned char *) p_voicefile + (p_voicefile->index[id].offset & ~LOADED_MASK);
 #endif
 
 #ifdef TALK_PARTIAL_LOAD
-    if (!(clipsize & LOADED_MASK))
+    if (!(p_voicefile->index[id].offset & LOADED_MASK))
     {   /* clip needs loading */
         int idx = 0;
         if (id == VOICE_PAUSE) {
@@ -249,12 +252,12 @@ static unsigned char* get_clip(long id, long* p_size)
         if (read(filehandle, clipbuf, clipsize) != clipsize)
             return NULL; /* read error */
 
-        p_voicefile->index[id].size |= LOADED_MASK; /* mark as loaded */
+        p_voicefile->index[id].offset |= LOADED_MASK; /* mark as loaded */
 
         if (id != VOICE_PAUSE) {
             if (buffered_id[idx] >= 0) {
                 /* mark previously loaded clip as unloaded */
-                p_voicefile->index[buffered_id[idx]].size &= ~LOADED_MASK;
+                p_voicefile->index[buffered_id[idx]].offset &= ~LOADED_MASK;
             }
             buffered_id[idx] = id;
         }
@@ -274,7 +277,6 @@ static unsigned char* get_clip(long id, long* p_size)
                     break;
                 }
         }
-        clipsize &= ~LOADED_MASK; /* without the extra bit gives true size */
     }
 #endif /* TALK_PARTIAL_LOAD */
 
@@ -363,7 +365,7 @@ static void load_voicefile(bool probe, char* buf, size_t bufsize)
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
     for (i = 0; i < p_voicefile->id1_max + p_voicefile->id2_max; i++)
-        structec_convert(&p_voicefile->index[i], "ll", 1, true);
+        structec_convert(&p_voicefile->index[i], "l", 1, true);
 #endif
 
 #ifdef TALK_PARTIAL_LOAD
@@ -673,7 +675,7 @@ void talk_init(void)
     }
 
     voicefile_size = filesize(filehandle);
-    
+
     audio_get_buffer(false, NULL); /* Must tell audio to reinitialize */
     reset_state(); /* use this for most of our inits */
 
@@ -690,7 +692,8 @@ void talk_init(void)
     int silence_size = 0;
 
     for(i=0; i<clips; i++) {
-        int size = p_voicefile->index[i].size;
+        int size = (p_voicefile->index[i+1].offset & ~LOADED_MASK)
+            - (p_voicefile->index[i].offset & ~LOADED_MASK);
         if (size > max_clipsize)
             max_clipsize = size;
         if (i == VOICE_PAUSE)

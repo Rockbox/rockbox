@@ -83,6 +83,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
     int voiceonly[1000]; /* flag if this is voice only */
     int count = 0;
     int count_voiceonly = 0;
+    int count_lang = 0;
     unsigned int value; /* value to be written to file */
     static unsigned char buffer[65535]; /* clip buffer, allow only 64K */
     int fields;
@@ -116,13 +117,21 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
                 count_voiceonly++;
                 voiceonly[count] = 1;
             }
+            /* count_voiceonly stops counting once the first VOICE string has
+             * been found. */
+            if(count_voiceonly == 0)
+                count_lang++;
             count++; /* next entry started */
             continue;
         }
     }
     fclose(voicefontids);
 
-    fseek(output, HEADER_SIZE + count*8, SEEK_SET); /* space for header */
+    /* space for header */
+    if(version <= 400)
+        fseek(output, HEADER_SIZE + count*8, SEEK_SET);
+    else
+        fseek(output, HEADER_SIZE + (1+count)*4, SEEK_SET);
 
     for (i=0; i<count; i++)
     {
@@ -172,7 +181,10 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
     fwrite(&value, sizeof(value), 1, output);
 
     /* 4th 32 bit value in the file is the number of clips in 1st table   */
-    value = UINT_TO_BE(count-count_voiceonly);
+    if (version > 400)
+        value = UINT_TO_BE(count_lang);
+    else
+        value = UINT_TO_BE(count-count_voiceonly);
     fwrite(&value, sizeof(value), 1, output);
 
     /* 5th bit value in the file is the number of clips in 2nd table */
@@ -180,27 +192,34 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
     fwrite(&value, sizeof(value), 1, output);
 
     /* then followed by offset/size pairs for each clip */
-    for (j=0; j<2; j++) /* now 2 tables */
-    {
+    if(version <= 400) {
+        /* voicefile version up to 400 uses re-sorting */
+        for (j=0; j<2; j++) /* now 2 tables */
+        {
+            for (i=0; i<count; i++)
+            {
+                /* skip voice only during first run, others during second run */
+                if (j != voiceonly[i])
+                    continue;
+
+                value = UINT_TO_BE(pos[i]); /* position */
+                fwrite(&value, sizeof(value), 1, output);
+                value = UINT_TO_BE(size[i]); /* size */
+                fwrite(&value, sizeof(value), 1, output);
+            } /* for i */
+        } /* for j */
+    }
+    else {
+        /* later versions assume voice-only strings to be correctly sorted at
+         * the end. */
         for (i=0; i<count; i++)
         {
-            if (j == 0) /* first run, skip the voice only ones */
-            {
-                if (voiceonly[i] == 1)
-                    continue;
-            }
-            else /* second run, skip the non voice only ones */
-            {
-                if (!voiceonly[i] == 1)
-                    continue;
-            }
-
             value = UINT_TO_BE(pos[i]); /* position */
-            fwrite(&value, sizeof(value), 1,output);
-            value = UINT_TO_BE(size[i]); /* size */
             fwrite(&value, sizeof(value), 1, output);
         } /* for i */
-    } /* for j */
+        /* repeat last entry as end marker */
+        fwrite(&value, sizeof(value), 1, output);
+    }
 
 
     /*
@@ -212,7 +231,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
 
     return 0;
 
-    
+
 }
 #ifndef RBUTIL
 int main (int argc, char** argv)
@@ -243,7 +262,7 @@ int main (int argc, char** argv)
         return -2;
     }
     
-    voicefont(ids, atoi(argv[2]),argv[3],output, 400);
+    voicefont(ids, atoi(argv[2]),argv[3],output, 500);
     return 0;
 }
 #endif
