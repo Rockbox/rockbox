@@ -13038,3 +13038,17 @@
     *: "Start Sleep Timer"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SLEEPTIMER_POWERDOWN_IN
+  desc: generic restart string
+  user: core
+  <source>
+    *: "Shutdown in"
+  </source>
+  <dest>
+    *: "Shutdown in"
+  </dest>
+  <voice>
+    *: "Shutdown in"
+  </voice>
+</phrase>

@@ -389,6 +389,37 @@ static int32_t getlang_unit_0_is_skip_track(int value, int unit)
 #else
 #define DEFAULT_BACKLIGHT_TIMEOUT 15
 #endif
+
+
+static const char* sleeptimer_formatter(char *buffer, size_t buffer_size,
+                                int val, const char *unit)
+{
+  switch (val) {
+  case SLEEPTIMER_STOP: {
+    if (get_sleep_timer()) {
+      snprintf(buffer, buffer_size, "%s\n", str(LANG_SLEEP_TIMER_CANCEL_CURRENT));
+    }
+    else {
+      snprintf(buffer, buffer_size, "%s\n", str(LANG_OFF));
+    }
+      break;
+  }
+  case SLEEPTIMER_START:
+    {
+      int timeleft = get_sleep_timer();
+      if (timeleft) {
+        snprintf(buffer, buffer_size, "%s %d %s\n", str(LANG_SLEEPTIMER_POWERDOWN_IN), seconds_to_min(timeleft), unit);
+        }
+      else {
+        snprintf(buffer, buffer_size, "%s\n", str(LANG_START_SLEEP_TIMER)); break;
+      }
+      break;
+    }
+  }
+  return buffer;
+}
+
+
 static const char* backlight_formatter(char *buffer, size_t buffer_size,
                                 int val, const char *unit)
 {
@@ -1800,16 +1831,16 @@ const struct settings_list settings[] = {
 #endif
 #endif /* CONFIG_CODEC == SWCODEC */
     TEXT_SETTING(0, playlist_catalog_dir, "playlist catalog directory",
-                     PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL),
+                 PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL),
     INT_SETTING(0, sleeptimer_duration, LANG_SLEEP_TIMER_DURATION, 30,
                 "sleeptimer duration",
-                UNIT_MIN, 5, 300, 5, NULL, NULL, set_sleeptimer_duration),
-    OFFON_SETTING(0, sleeptimer_on_startup, LANG_SLEEP_TIMER_ON_POWER_UP, false,
+                UNIT_MIN, 5, 300, 5, NULL, NULL, NULL),
+    OFFON_SETTING(0, sleeptimer_on_powerup, LANG_SLEEP_TIMER_ON_POWER_UP, false,
                   "sleeptimer on startup", NULL),
     OFFON_SETTING(0, keypress_restarts_sleeptimer, LANG_KEYPRESS_RESTARTS_SLEEP_TIMER, false,
-                  "keypress restarts sleeptimer", set_keypress_restarts_sleep_timer ),
-    OFFON_SETTING(0, sleeptimer, LANG_START_SLEEP_TIMER, false,
-                  "start sleeptimer", sleep_timer_toggle ),
+                  "keypress restarts sleeptimer", NULL ),
+    INT_SETTING_W_CFGVALS (F_TEMPVAR, sleeptimer, LANG_SLEEP_TIMER, SLEEPTIMER_STOP, "start sleeptimer", NULL,
+                           UNIT_MIN,  0, 1, 1, sleeptimer_formatter, NULL, NULL),
 
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     CHOICE_SETTING(0, touchpad_sensitivity, LANG_TOUCHPAD_SENSITIVITY, 0,
