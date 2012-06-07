@@ -893,15 +893,23 @@ void set_sleeptimer_duration (int minutes)
     sleeptimer_duration = minutes*60;
 }
 
-void sleep_timer_toggle(bool activate)
+int get_sleeptimer_duration (void)
 {
-  sleeptimer = activate;
-  if (activate) {
-    if (sleeptimer_duration)
-      set_sleep_timer(sleeptimer_duration);
-  }
-  else {
-    set_sleep_timer(0);
+  return sleeptimer_duration/60;
+}
+
+
+int seconds_to_min (int secs) 
+{
+  return (secs + 10) / 60;  /* round up for 50+ seconds */
+}
+
+void sleep_timer_start(int setting)
+{
+  switch (setting) {
+  case SLEEPTIMER_OFF:      set_sleep_timer(0); break;                    /* off */
+  case SLEEPTIMER_ON:       set_sleep_timer(sleeptimer_duration);break;   /* on */
+  case SLEEPTIMER_CONTINUE: set_sleep_timer(get_sleep_timer());break;     /* continue */
   }
 }
 

@@ -389,6 +389,20 @@ static int32_t getlang_unit_0_is_skip_track(int value, int unit)
 #else
 #define DEFAULT_BACKLIGHT_TIMEOUT 15
 #endif
+
+
+static const char* sleeptimer_formatter(char *buffer, size_t buffer_size,
+                                int val, const char *unit)
+{
+  switch (val) {
+  case SLEEPTIMER_OFF:      snprintf(buffer, buffer_size, "%s", str(LANG_OFF)); break;
+  case SLEEPTIMER_CONTINUE: snprintf(buffer, buffer_size, "%s %d %s", str(LANG_CONTINUE), seconds_to_min(get_sleep_timer()), unit); break;
+  case SLEEPTIMER_ON:       snprintf(buffer, buffer_size, "%s %d %s", str(LANG_ON), get_sleeptimer_duration(), unit); break;
+  default: snprintf(buffer, buffer_size, "Out of legal values: %d", val);
+  }
+  return buffer;
+}
+
 static const char* backlight_formatter(char *buffer, size_t buffer_size,
                                 int val, const char *unit)
 {
@@ -1808,8 +1822,10 @@ const struct settings_list settings[] = {
                   "sleeptimer on startup", NULL),
     OFFON_SETTING(0, keypress_restarts_sleeptimer, LANG_KEYPRESS_RESTARTS_SLEEP_TIMER, false,
                   "keypress restarts sleeptimer", set_keypress_restarts_sleep_timer ),
-    OFFON_SETTING(0, sleeptimer, LANG_START_SLEEP_TIMER, false,
-                  "start sleeptimer", sleep_timer_toggle ),
+    INT_SETTING_W_CFGVALS (F_TEMPVAR, sleeptimer, LANG_SLEEP_TIMER, 0, "start sleeptimer", NULL,
+                  UNIT_MIN, 0, 2, 1, sleeptimer_formatter, NULL, NULL),
+    //INT_SETTING (0, sleeptimer, LANG_SLEEP_TIMER, 0, "start sleeptimer", 
+    //              UNIT_MIN, 0, 2, 1, sleeptimer_formatter, NULL, NULL),
 
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     CHOICE_SETTING(0, touchpad_sensitivity, LANG_TOUCHPAD_SENSITIVITY, 0,

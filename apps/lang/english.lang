@@ -13038,3 +13038,17 @@
     *: "Start Sleep Timer"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CONTINUE
+  desc: continue string
+  user: core
+  <source>
+    *: "Continue"
+  </source>
+  <dest>
+    *: "Continue"
+  </dest>
+  <voice>
+    *: "Continue"
+  </voice>
+</phrase>
