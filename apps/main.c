@@ -386,7 +386,9 @@ static void init(void)
     storage_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
-    settings_apply(true);
+    //settings_apply(true);
+    settings_applied_on_startup();
+
     init_dircache(true);
     init_dircache(false);
 #ifdef HAVE_TAGCACHE

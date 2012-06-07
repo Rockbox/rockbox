@@ -776,6 +776,11 @@ void sound_settings_apply(void)
 #endif
 }
 
+void settings_applied_on_startup (void ) {
+  settings_apply(true);
+  if (global_settings.sleeptimer_on_startup) sleep_timer_start(SLEEPTIMER_ON);
+}
+
 void settings_apply(bool read_disk)
 {
 #ifdef HAVE_LCD_BITMAP
@@ -847,9 +852,7 @@ void settings_apply(bool read_disk)
     /* init sleeptimer_duration */
     set_sleeptimer_duration(global_settings.sleeptimer_duration);
     set_keypress_restarts_sleep_timer(global_settings.keypress_restarts_sleeptimer);
-    sleep_timer_toggle(global_settings.sleeptimer);
-
-
+    sleep_timer_start(global_settings.sleeptimer);
 #if defined(BATTERY_CAPACITY_INC) && BATTERY_CAPACITY_INC > 0
     /* only call if it's really exchangable */
     set_battery_capacity(global_settings.battery_capacity);
