@@ -359,6 +359,41 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 /*    STARTUP/SHUTDOWN MENU      */
 
 /* sleep timer option */
+static int sleeptimer_duration_cb(int action,const struct menu_item_ex *this_item)
+{
+  (void)this_item;
+  switch (action)
+    {
+    case ACTION_EXIT_MENUITEM:
+      set_sleeptimer_duration(global_settings.sleeptimer_duration);
+    }
+  return action;
+}
+
+static int keypress_restarts_sleeptimer_cb(int action,const struct menu_item_ex *this_item)
+{
+  (void)this_item;
+  switch (action)
+    {
+    case ACTION_EXIT_MENUITEM:
+      set_keypress_restarts_sleep_timer(global_settings.keypress_restarts_sleeptimer);
+    }
+  return action;
+}
+
+
+static int sleeptimer_cb(int action,const struct menu_item_ex *this_item)
+{
+  (void)this_item;
+  switch (action)
+    {
+    case ACTION_EXIT_MENUITEM:
+      sleep_timer_start(global_settings.sleeptimer);
+    }
+  return action;
+}
+
+
 const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
                                          int value, const char* unit)
 {
@@ -378,20 +413,20 @@ const char* sleep_timer_formatter(char* buffer, size_t buffer_size,
 
 MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
-MENUITEM_SETTING(sleeptimer_duration, 
-                 &global_settings.sleeptimer_duration, NULL);
-MENUITEM_SETTING(sleeptimer_on_startup,
-                 &global_settings.sleeptimer_on_startup, NULL);
+MENUITEM_SETTING(sleeptimer_duration,
+                 &global_settings.sleeptimer_duration, sleeptimer_duration_cb);
+MENUITEM_SETTING(sleeptimer_on_powerup,
+                 &global_settings.sleeptimer_on_powerup, NULL);
 MENUITEM_SETTING(keypress_restarts_sleeptimer,
-                 &global_settings.keypress_restarts_sleeptimer, NULL);
+                 &global_settings.keypress_restarts_sleeptimer, keypress_restarts_sleeptimer_cb);
 MENUITEM_SETTING(sleeptimer,
-                 &global_settings.sleeptimer, NULL);
+                 &global_settings.sleeptimer, sleeptimer_cb);
 MAKE_MENU(startup_shutdown_menu, ID2P(LANG_STARTUP_SHUTDOWN),
           0, Icon_System_menu,
           &start_screen,
           &poweroff,
           &sleeptimer_duration,
-          &sleeptimer_on_startup,
+          &sleeptimer_on_powerup,
           &keypress_restarts_sleeptimer,
           &sleeptimer
          );
