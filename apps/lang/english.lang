@@ -13038,3 +13038,59 @@
     *: "Start Sleep Timer"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CONTINUE
+  desc: continue string
+  user: core
+  <source>
+    *: "Continue"
+  </source>
+  <dest>
+    *: "Continue"
+  </dest>
+  <voice>
+    *: "Continue"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP
+  desc: generic stop string
+  user: core
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "Stop"
+  </dest>
+  <voice>
+    *: "Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START
+  desc: generic start string
+  user: core
+  <source>
+    *: "Start"
+  </source>
+  <dest>
+    *: "Start"
+  </dest>
+  <voice>
+    *: "Start"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART
+  desc: generic restart string
+  user: core
+  <source>
+    *: "Restart"
+  </source>
+  <dest>
+    *: "Restart"
+  </dest>
+  <voice>
+    *: "Restart"
+  </voice>
+</phrase>

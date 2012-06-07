@@ -67,7 +67,6 @@ static long sleeptimer_endtick;
 static bool sleeptimer_key_restarts = false;
 /* The number of seconds the sleep timer was last set to */
 static unsigned int sleeptimer_duration; // in seconds
-static bool sleeptimer;
 #if CONFIG_CHARGING
 /* State of the charger input as seen by the power thread */
 enum charger_input_state_type charger_input_state;
@@ -801,7 +800,7 @@ void set_poweroff_timeout(int timeout)
 void reset_poweroff_timer(void)
 {
     last_event_tick = current_tick;
-    if (sleeptimer_active && sleeptimer_key_restarts && sleeptimer)
+    if (sleeptimer_active && sleeptimer_key_restarts)
         set_sleep_timer(sleeptimer_duration);
 }
 
@@ -893,15 +892,23 @@ void set_sleeptimer_duration (int minutes)
     sleeptimer_duration = minutes*60;
 }
 
-void sleep_timer_toggle(bool activate)
+int get_sleeptimer_duration (void)
 {
-  sleeptimer = activate;
-  if (activate) {
-    if (sleeptimer_duration)
-      set_sleep_timer(sleeptimer_duration);
-  }
-  else {
-    set_sleep_timer(0);
+  return sleeptimer_duration/60;
+}
+
+
+int seconds_to_min (int secs) 
+{
+  return (secs + 10) / 60;  /* round up for 50+ seconds */
+}
+
+void sleep_timer_start(int setting)
+{
+  switch (setting) {
+  case SLEEPTIMER_STOP:     set_sleep_timer(0); break;
+  case SLEEPTIMER_START:    set_sleep_timer(sleeptimer_duration);break;
+  case SLEEPTIMER_CONTINUE: break;
   }
 }
 
