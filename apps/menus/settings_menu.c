@@ -380,8 +380,8 @@ MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
 MENUITEM_SETTING(sleeptimer_duration, 
                  &global_settings.sleeptimer_duration, NULL);
-MENUITEM_SETTING(sleeptimer_on_startup,
-                 &global_settings.sleeptimer_on_startup, NULL);
+MENUITEM_SETTING(sleeptimer_on_powerup,
+                 &global_settings.sleeptimer_on_powerup, NULL);
 MENUITEM_SETTING(keypress_restarts_sleeptimer,
                  &global_settings.keypress_restarts_sleeptimer, NULL);
 MENUITEM_SETTING(sleeptimer,
@@ -391,7 +391,7 @@ MAKE_MENU(startup_shutdown_menu, ID2P(LANG_STARTUP_SHUTDOWN),
           &start_screen,
           &poweroff,
           &sleeptimer_duration,
-          &sleeptimer_on_startup,
+          &sleeptimer_on_powerup,
           &keypress_restarts_sleeptimer,
           &sleeptimer
          );

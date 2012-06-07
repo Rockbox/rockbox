@@ -382,11 +382,11 @@ static void init(void)
     gui_sync_skin_init();
     sb_skin_init();
     viewportmanager_init();
-
     storage_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
-    settings_apply(true);
+    settings_applied_on_powerup();
+
     init_dircache(true);
     init_dircache(false);
 #ifdef HAVE_TAGCACHE
