@@ -223,6 +223,8 @@ void sound_settings_apply(void);
  */
 void settings_apply_skins(void);
 
+void settings_applied_on_powerup(void);
+
 void settings_apply(bool read_disk);
 void settings_apply_pm_range(void);
 void settings_display(void);
@@ -778,11 +780,10 @@ struct user_settings
     int compressor_knee;
     int compressor_release_time;
 #endif
-
-    int sleeptimer_duration; /* In minutes; 0=off */
-    bool sleeptimer_on_startup;
+    int sleeptimer_duration; /* in seconds; 0=off */
+    bool sleeptimer_on_powerup;
     bool keypress_restarts_sleeptimer;
-    bool sleeptimer;
+    int sleeptimer;
 
 #ifdef HAVE_MORSE_INPUT
     bool morse_input; /* text input method setting */

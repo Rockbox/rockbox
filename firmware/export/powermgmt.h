@@ -167,11 +167,20 @@ void set_battery_capacity(int capacity); /* set local battery capacity value */
 int  get_battery_capacity(void); /* get local battery capacity value */
 void set_battery_type(int type); /* set local battery type */
 
-void set_sleep_timer(int seconds);
+enum {
+  SLEEPTIMER_STOP = 0, /*0*/
+  SLEEPTIMER_START,    /*1*/
+  SLEEPTIMER_CONTINUE  /*2*/
+};
+
 int get_sleep_timer(void);
+int seconds_to_min (int secs);
+void set_sleep_timer(int seconds);
+
 void set_keypress_restarts_sleep_timer(bool enable);
 void set_sleeptimer_duration(int minutes);
-void sleep_timer_toggle(bool activate);
+int  get_sleeptimer_duration(void);
+void sleep_timer_start(int start);
 void init_sleeptimer_duration (int duration);
 void handle_auto_poweroff(void);
 void set_car_adapter_mode(bool setting);
