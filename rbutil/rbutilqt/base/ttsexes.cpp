@@ -24,7 +24,7 @@ TTSExes::TTSExes(QString name,QObject* parent) : TTSBase(parent)
 {
     m_name = name;
 
-    m_TemplateMap["espeak"] = "\"%exe\" %options -w \"%wavfile\" \"%text\"";
+    m_TemplateMap["espeak"] = "\"%exe\" %options -w \"%wavfile\" -- \"%text\"";
     m_TemplateMap["flite"] = "\"%exe\" %options -o \"%wavfile\" -t \"%text\"";
     m_TemplateMap["swift"] = "\"%exe\" %options -o \"%wavfile\" \"%text\"";
 
