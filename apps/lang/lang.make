@@ -26,7 +26,7 @@ CLEANOBJS += $(BUILDDIR)/lang/max_language_size.h $(BUILDDIR)/lang/lang*
 # in order to only calculate the maximum size based on the core strings.
 $(BUILDDIR)/lang/max_language_size.h: $(LANGOBJ) $(BUILDDIR)/apps/lang/voicestrings.zip
 	$(call PRINTS,GEN $(subst $(BUILDDIR)/,,$@))
-	$(SILENT)echo "#define MAX_LANGUAGE_SIZE `ls -ln $(BUILDDIR)/apps/lang/* | awk '{print $$5-10}' | sort -n | tail -1`" > $@
+	$(SILENT)echo "#define MAX_LANGUAGE_SIZE `ls -ln $(BUILDDIR)/apps/lang/*.lng | awk '{print $$5-10}' | sort -n | tail -1`" > $@
 
 $(BUILDDIR)/lang/lang_core.o: $(APPSDIR)/lang/$(LANGUAGE).lang $(BUILDDIR)/apps/features
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
