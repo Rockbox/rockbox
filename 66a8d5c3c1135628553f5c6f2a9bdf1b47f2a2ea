@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASH////U\u003d",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-06-09T10:48:31Z",
+      "side": 1,
+      "message": "bad whitespace",
+      "revId": "66a8d5c3c1135628553f5c6f2a9bdf1b47f2a2ea",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASH////c\u003d",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-06-09T10:48:31Z",
+      "side": 1,
+      "message": "needs a \\n",
+      "revId": "66a8d5c3c1135628553f5c6f2a9bdf1b47f2a2ea",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASH////Y\u003d",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-06-09T10:48:31Z",
+      "side": 1,
+      "message": "return \"\"; in the default case.",
+      "revId": "66a8d5c3c1135628553f5c6f2a9bdf1b47f2a2ea",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASH////Q\u003d",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1834,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-06-09T10:48:31Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "66a8d5c3c1135628553f5c6f2a9bdf1b47f2a2ea",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASH////g\u003d",
+        "filename": "firmware/export/powermgmt.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-06-09T10:48:31Z",
+      "side": 1,
+      "message": "get rid of the comments, redundant",
+      "revId": "66a8d5c3c1135628553f5c6f2a9bdf1b47f2a2ea",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
