@@ -331,6 +331,9 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     const char *outfile, struct imx_option_t opt)
 {
     /* Dump tables */
+    if(opt.fw_variant > VARIANT_COUNT) {
+        return IMX_ERROR;
+    }
     dump_imx_dev_info("[INFO] ");
     /* compute MD5 sum of the file */
     uint8_t file_md5sum[16];

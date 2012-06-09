@@ -49,6 +49,7 @@ void BootloaderThreadImx::run(void)
     struct imx_option_t opt;
     opt.debug = false;
     opt.output = IMX_DUALBOOT;
+    opt.fw_variant = VARIANT_DEFAULT;
 
     m_error = mkimxboot(m_inputfile.toLocal8Bit().constData(),
             m_bootfile.toLocal8Bit().constData(),
