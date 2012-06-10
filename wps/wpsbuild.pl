@@ -267,7 +267,6 @@ MOO
                      "rfms" => $rfms);
     for my $skin (keys %skinfiles) {
         my $val = $skinfiles{$skin};
-        print "$skin: $val\n";
         if (!defined($val)) {
             # dont put value if not defined (e.g. rwps when there's no remote)
             next;
