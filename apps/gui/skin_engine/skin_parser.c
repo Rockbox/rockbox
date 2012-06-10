@@ -1665,7 +1665,7 @@ static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char*
     size_t buf_size = read_bmp_fd(fd, bitmap, 0,
                                     format|FORMAT_RETURN_SIZE, NULL);
     handle = core_alloc_ex(bitmap->data, buf_size, &buflib_ops);
-    if (handle < 0)
+    if (handle <= 0)
     {
         DEBUGF("Not enough skin buffer: need %zd more.\n",
                 buf_size - skin_buffer_freespace());
@@ -2315,7 +2315,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
 #ifndef __PCTOOL__
     wps_data->buflib_handle = core_alloc(isfile ? buf : "failsafe skin",
                                             skin_buffer_usage());
-    if (wps_data->buflib_handle >= 0)
+    if (wps_data->buflib_handle > 0)
     {
         wps_data->wps_loaded = true;
         memcpy(core_get_data(wps_data->buflib_handle), skin_buffer,

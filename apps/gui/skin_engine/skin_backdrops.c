@@ -245,7 +245,7 @@ void skin_backdrop_load_setting(void)
                     backdrops[i].buflib_handle =
                             core_alloc_ex(global_settings.backdrop_file,
                                         LCD_BACKDROP_BYTES, &buflib_ops);
-                    if (backdrops[i].buflib_handle < 0)
+                    if (backdrops[i].buflib_handle <= 0)
                         return;
                 }
                 bool loaded;

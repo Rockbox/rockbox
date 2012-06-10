@@ -344,7 +344,7 @@ void  filetype_init(void)
 
     strdup_bufsize = filesize(fd);
     strdup_handle = core_alloc_ex("filetypes", strdup_bufsize, &ops);
-    if (strdup_handle < 0)
+    if (strdup_handle <= 0)
     {
         close(fd);
         return;

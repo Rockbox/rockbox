@@ -197,7 +197,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
         size_t buf_size = read_bmp_fd(fd, &ic->bmp, 0, 
                                         bmpformat|FORMAT_RETURN_SIZE, NULL);
         ic->handle = core_alloc_ex(filename, buf_size, &buflib_ops);
-        if (ic->handle < 0)
+        if (ic->handle <= 0)
         {
             close(fd);
             return;

@@ -255,7 +255,7 @@ int scrobbler_init(void)
         return -1;
 
     scrobbler_cache = core_alloc("scrobbler", SCROBBLER_MAX_CACHE*SCROBBLER_CACHE_LEN);
-    if (scrobbler_cache < 0)
+    if (scrobbler_cache <= 0)
     {
         logf("SCROOBLER: OOM");
         return -1;

@@ -514,7 +514,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     int handle = core_alloc_ex( path, 
                      bufsize + sizeof( struct buflib_alloc_data ), 
                      &buflibops );
-    if ( handle < 0 )
+    if ( handle <= 0 )
     {
         return -1;
     }
