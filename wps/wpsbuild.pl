@@ -12,6 +12,7 @@ use strict;
 use Getopt::Long qw(:config pass_through);	# pass_through so not confused by -DTYPE_STUFF
 
 my $ROOT="..";
+my $wpsdir;
 my $verbose;
 my $rbdir=".rockbox";
 my $tempdir=".rockbox";
@@ -31,21 +32,22 @@ GetOptions ( 'r|root=s'		=> \$ROOT,
 
 my $firmdir="$ROOT/firmware";
 my $cppdef = $target;
-my @depthlist = ( 16, 8, 4, 2, 1 );
 
 # These parameters are filled in as we parse wpslist
-my $req_size;
-my $req_g_wps;
 my $req_t;
-my $req_t_wps;
+my $theme;
+my $has_wps;
 my $wps;
-my $wps_prefix;
-my $sbs_prefix;
+my $has_rwps;
 my $rwps;
+my $has_sbs;
 my $sbs;
-my $sbs_w_size;
+my $has_rsbs;
 my $rsbs;
-my $rsbs_w_size;
+my $has_fms;
+my $fms;
+my $has_rfms;
+my $rfms;
 my $width;
 my $height;
 my $font;
@@ -53,13 +55,16 @@ my $remotefont;
 my $fgcolor;
 my $bgcolor;
 my $statusbar;
+my $remotestatusbar;
 my $author;
 my $backdrop;
 my $lineselectstart;
 my $lineselectend;
 my $selecttype;
 my $iconset;
+my $remoteiconset;
 my $viewericon;
+my $remoteviewericon;
 my $lineselecttextcolor;
 my $filetylecolor;
 my $listviewport;
@@ -135,28 +140,33 @@ STOP
 
 sub mkdirs
 {
-    my $wpsdir = $wps;
-    $wpsdir =~ s/\.(r|)wps//;
     mkdir "$tempdir/wps", 0777;
     mkdir "$tempdir/themes", 0777;
+    mkdir "$tempdir/icons", 0777;
 
-    if( -d "$tempdir/wps/$wpsdir") {
-        #print STDERR "wpsbuild warning: directory wps/$wpsdir already exists!\n";
+    if( -d "$tempdir/wps/$theme") {
+        #print STDERR "wpsbuild warning: directory wps/$theme already exists!\n";
     }
     else
     {
-       mkdir "$tempdir/wps/$wpsdir", 0777;
+       mkdir "$tempdir/wps/$theme", 0777;
     }
+}
+
+sub normalize
+{
+    my $in = $_[0];
+    # strip resolution
+    $in =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
+    return $in;
 }
 
 sub copybackdrop
 {
     #copy the backdrop file into the build dir
     if ($backdrop ne '') {
-        my $dst = $backdrop;
-        $dst =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
-        my $cmd = "cp $ROOT/$backdrop $tempdir/$dst";
-        `$cmd`;
+        my $dst = normalize($backdrop);
+        system("cp $ROOT/$backdrop $tempdir/$dst");
     }
 }
 
@@ -167,31 +177,30 @@ sub copythemefont
 
     $o =~ s/\.fnt/\.bdf/;
     mkdir "$tempdir/fonts";
-    my $cmd ="$ROOT/tools/convbdf -f -o \"$tempdir/fonts/$_[0]\" \"$ROOT/fonts/$o\" ";
-    `$cmd`;
+    system("$ROOT/tools/convbdf -f -o \"$tempdir/fonts/$_[0]\" \"$ROOT/fonts/$o\" ");
 }
 
 sub copythemeicon
 {
+    my $i = $_[0];
     #copy the icon specified by the theme
-    if ($iconset ne '') {
-        my $tempicon = $tempdir . "/" . $iconset;
-        $iconset = $rbdir . "/" . $iconset;
+    if ($i ne "-") {
+        my $tempicon = $tempdir . "/" . $i;
         $tempicon =~ /\/.*icons\/(.*)/i;
-        `cp $ROOT/icons/$1 $tempicon`;
+        system("cp $ROOT/icons/$1 $tempicon");
     }
 }
 
-sub copythemeviewericon
-{
-    #copy the viewer icon specified by the theme
-
-    if ($viewericon ne '') {
-        my $tempviewericon = $tempdir . "/" . $viewericon;
-        $viewericon = $rbdir . "/" . $viewericon;
-        $tempviewericon =~ /\/.*icons\/(.*)/i;
-        `cp $ROOT/icons/$1 $tempviewericon`;
+sub uniq {
+    my %seen = ();
+    my @r = ();
+    foreach my $a (@_) {
+        unless ($seen{$a}) {
+            push @r, $a;
+            $seen{$a} = 1;
+        }
     }
+    return @r;
 }
 
 sub copywps
@@ -199,181 +208,104 @@ sub copywps
     # we assume that we copy the WPS files from the same dir the WPSLIST
     # file is located in
     my $dir;
+    my %skinfiles = ("wps", $wps,
+                     "sbs", $sbs,
+                     "fms", $fms,
+                     "rwps", $rwps,
+                     "rsbs", $rsbs,
+                     "rfms", $rfms);
     my @filelist;
     my $file;
-    my $__sb;
 
-    if($wpslist =~ /(.*)WPSLIST/) {
+    if($wpslist =~ /(.*)\/WPSLIST/) {
         $dir = $1;
-        $__sb = $sbs_prefix . "." . $req_size . ".sbs";
-        #print "$req_t_wps $req_g_wps $sbs_prefix\n";
-        #print "$dir/$__sb\n";
 
-#        system("cp $dir/$wps .rockbox/wps/");
-        # check for <name>.WIDTHxHEIGHTxDEPTH.sbs
-        if (-e "$dir/$__sb") {
-            system("cp $dir/$__sb $tempdir/wps/$sbs");
+        # copy fully-fledged wps, sbs, etc. including graphics
+        foreach my $ext (keys %skinfiles) {
+            next unless ($skinfiles{$ext});
+            $file = $skinfiles{$ext};
+            system("cp $dir/$file $tempdir/wps/$theme.$ext");
+            open(SKIN, "$dir/$file");
+            while (<SKIN>) {
+                $filelist[$#filelist + 1] = $1 if (/[\(,]([^,]*?.bmp)[\),]/);
+            }
+            close(SKIN);
         }
-        # check for <name>.WIDTHxHEIGHTxDEPTH.<model>.sbs and overwrite the
-        # previous sb if needed
-        $__sb = $sbs_prefix . "." . $req_size . "." . $modelname . ".sbs";
-        if (-e "$dir/$__sb") {
-            system("cp $dir/$__sb $tempdir/wps/$sbs");
+
+        if ($#filelist >= 0) {
+            if (-e "$dir/$theme") {
+                foreach $file (uniq(@filelist)) {
+                    system("cp $dir/$theme/$file $tempdir/wps/$theme/");
+                }
+            }
+            else {
+                print STDERR "beep, no dir to copy WPS from!\n";
+            }
         }
-        
-        if (-e "$dir/$req_t_wps" ) {
-          system("cp $dir/$req_t_wps $tempdir/wps/$wps");
-
-        } elsif (-e "$dir/$req_g_wps") {
-           system("cp $dir/$req_g_wps $tempdir/wps/$wps");
-
-           open(WPSFILE, "$dir/$req_g_wps");
-           while (<WPSFILE>) {
-              $filelist[$#filelist + 1] = $1 if (/[\(,]([^,]*?.bmp)[\),]/);
-           }
-           close(WPSFILE);
-
-           if ($#filelist >= 0) {
-              if (-e "$dir/$wps_prefix/$req_size") {
-                 foreach $file (@filelist) {
-                     system("cp $dir/$wps_prefix/$req_size/$file $tempdir/wps/$wps_prefix/");
-                 }
-              }
-              elsif (-e "$dir/$wps_prefix") {
-                 foreach $file (@filelist) {
-                     system("cp $dir/$wps_prefix/$file $tempdir/wps/$wps_prefix/");
-                 }
-              }
-              else {
-                  print STDERR "beep, no dir to copy WPS from!\n";
-              }
-           }
-
-       } else {
-           print STDERR "Skipping $wps - no matching resolution.\n";
-       }
     } else {
         print STDERR "No source directory!\n";
     }
 }
 
 sub buildcfg {
-    my $cfg = $wps;
-    my @out;    
-
-    $cfg =~ s/\.(r|)wps/.cfg/;
+    my $cfg = $theme . ".cfg";
+    my @out;
 
     push @out, <<MOO
 \#
 \# $cfg generated by wpsbuild.pl
 \# $wps is made by $author
 \#
-wps: $rbdir/wps/$wps
 MOO
 ;
-    if(defined($sbs)) {
-        if ($sbs eq '') {
-            push @out, "sbs: -\n";
+
+    my %skinfiles = ("wps" => $wps,
+                     "sbs" => $sbs,
+                     "fms" => $fms,
+                     "rwps" => $rwps,
+                     "rsbs" => $rsbs,
+                     "rfms" => $rfms);
+    for my $skin (keys %skinfiles) {
+        my $val = $skinfiles{$skin};
+        print "$skin: $val\n";
+        if (!defined($val)) {
+            # dont put value if not defined (e.g. rwps when there's no remote)
+            next;
+        } elsif ($val eq '') {
+            # empty resets to built-in
+            push @out, "$skin: -\n";
         } else {
-            push @out, "sbs: $rbdir/wps/$sbs\n";
+            # file name is always <theme>.{wps,rwps,...} (see copywps())
+            push @out, "$skin: $rbdir/wps/$theme.$skin\n";
         }
     }
-    if(defined($rsbs)  && $has_remote) {
-        if ($rsbs eq '') {
-            push @out, "rsbs: -\n";
-        } else {
-            push @out, "rsbs: $rbdir/wps/$rsbs\n";
-        }
+
+    push @out, "selector type: $selecttype\n"   if (defined($selecttype));
+    push @out, "backdrop: $backdrop\n"          if (defined($backdrop));
+    push @out, "filetype colours: $filetylecolor\n" if (defined($filetylecolor));
+
+    if ($main_depth > 2) {
+        push @out, "foreground color: $fgcolor\n"                     if($fgcolor);
+        push @out, "background color: $bgcolor\n"                     if($bgcolor);
+        push @out, "line selector start color: $lineselectstart\n"    if($lineselectstart);
+        push @out, "line selector end color: $lineselectend\n"        if($lineselectend);;
+        push @out, "line selector text color: $lineselecttextcolor\n" if($lineselecttextcolor);
     }
-    if($font) {
-        if ($font eq '') {
-            push @out, "font: -\n";
-        } else {
-            push @out, "font: $rbdir/fonts/$font\n";
-        }
+
+    push @out, "font: $font\n"                  if (defined($font));
+    push @out, "statusbar: $statusbar\n"        if (defined($statusbar));
+    push @out, "iconset: $iconset\n"            if (defined($iconset));
+    push @out, "viewers iconset: $viewericon\n" if (defined($viewericon));
+    push @out, "ui viewport: $listviewport\n"   if (defined($listviewport));
+
+    if ($has_remote) {
+        push @out, "remote font: $remotefont\n"                  if (defined($remotefont));
+        push @out, "remote statusbar: $remotestatusbar\n"        if (defined($remotestatusbar));
+        push @out, "remote iconset: $remoteiconset\n"            if (defined($remoteiconset));
+        push @out, "remote viewers iconset: $remoteviewericon\n" if (defined($remoteviewericon));
+        push @out, "remote ui viewport: $remotelistviewport\n"   if (defined($remotelistviewport));
     }
-    if(defined($remotefont) && $has_remote) {
-        if ($remotefont eq '') {
-            push @out, "remote font: -\n";
-        } else {
-            push @out, "remote font: $rbdir/fonts/$remotefont\n";
-        }
-    }
-    if($fgcolor && $main_depth > 2) {
-        push @out, "foreground color: $fgcolor\n";
-    }
-    if($bgcolor && $main_depth > 2) {
-        push @out, "background color: $bgcolor\n";
-    }
-    if($statusbar) {
-        if($rwps && $has_remote ) {
-            push @out, "remote statusbar: $statusbar\n";
-        }
-        push @out, "statusbar: $statusbar\n";
-    }
-    if(defined($backdrop)) {
-        if ($backdrop eq '') {
-            push @out, "backdrop: -\n";
-        } else {
-            # clip resolution from filename
-            $backdrop =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
-            push @out, "backdrop: $rbdir/$backdrop\n";
-        }
-    }
-    if($lineselectstart && $main_depth > 2) {
-        push @out, "line selector start color: $lineselectstart\n";
-    }
-    if($lineselectend && $main_depth > 2) {
-        push @out, "line selector end color: $lineselectend\n";
-    }
-    if($selecttype) {
-        push @out, "selector type: $selecttype\n";
-    }
-    if(defined($iconset)) {
-        if ($iconset eq '') {
-            push @out, "iconset: -\n";
-        } else {
-            push @out, "iconset: $iconset\n";
-        }
-    }
-    if(defined($viewericon)) {
-        if ($viewericon eq '') {
-            push @out, "viewers iconset: -\n";
-        } else {
-            push @out, "viewers iconset: $viewericon\n";
-        }
-    }
-    if($lineselecttextcolor && $main_depth > 2 ) {
-        push @out, "line selector text color: $lineselecttextcolor\n";
-    }
-    if($filetylecolor && $main_depth > 2) {
-        if ($filetylecolor eq '') {
-            push @out, "filetype colours: -\n";
-        } else {
-            push @out, "filetype colours: $filetylecolor\n";
-        }
-    }
-    if($rwps && $has_remote ) {
-        if ($rwps eq '') {
-            push @out, "rwps: -\n";
-        } else {
-            push @out, "rwps: $rbdir/wps/$rwps\n";
-        }
-    }
-    if(defined($listviewport)) {
-        if ($listviewport eq '') {
-            push @out, "ui viewport: -\n";
-        } else {
-            push @out, "ui viewport: $listviewport\n";
-        }
-    }
-    if(defined($remotelistviewport) && $has_remote) {
-        if ($remotelistviewport eq '') {
-            push @out, "remote ui viewport: -\n";
-        } else {
-            push @out, "remote ui viewport: $listviewport\n";
-        }
-    }
+
     if(-f "$tempdir/wps/$cfg") {
         print STDERR "wpsbuild warning: wps/$cfg already exists!\n";
     }
@@ -391,8 +323,47 @@ MOO
 #print "LCD: ${main_width}x${main_height}x${main_depth}\n";
 $has_remote = 1 if ($remote_height && $remote_width && $remote_depth);
 
-my $isrwps;
-my $within;
+
+# check if line matches the setting string or if it contains a regex
+# that contains the targets resolution
+sub check_res {
+    my ($line, $string, $remote) = @_;
+    if ($line =~ /^${string}: *(.*)/i) {
+        return $1;
+    }
+    elsif($line =~ /^${string}.(.*): *(.*)/i) {
+        # $1 is a resolution regex, $2 the filename incl. resolution
+        my $fn = $2;
+        my $size_str = "${main_width}x${main_height}x${main_depth}";
+        if ($remote) {
+            $size_str = "${remote_width}x${remote_height}x${remote_depth}";
+        }
+        if ($size_str =~ /$1$/) {
+            return $fn;
+        }
+    }
+    return "";
+}
+
+# check if <theme>.<model>.<ext> exists. If not, check if <theme>.<ext> exists
+sub check_skinfile {
+    my $ext = $_[0];
+    my $req_skin = $theme . "." . $modelname . ".$ext";
+    if (-e "$wpsdir/$req_skin") {
+        return $req_skin;
+    } else {
+        $req_skin = $theme . ".$ext";
+        if (-e "$wpsdir/$req_skin") {
+            return $req_skin;
+        }
+    }
+    return '';
+}
+
+
+# Infer WPS (etc.) filename from the the if it wasnt given
+$wpslist =~ /(.*)WPSLIST/;
+$wpsdir = $1;
 
 open(WPS, "<$wpslist");
 while(<WPS>) {
@@ -410,15 +381,21 @@ while(<WPS>) {
         $rbdir = "/" . $rbdir;
     }
 
-    if($l =~ /^ *<(r|)wps>/i) {
-        $isrwps = $1;
-        $within = 1;
+    if($l =~ /^ *<theme>/i) {
         # undef is a unary operator (!)
+        undef $theme;
+        undef $has_wps;
+        undef $has_rwps;
+        undef $has_sbs;
+        undef $has_rsbs;
+        undef $has_fms;
+        undef $has_rfms;
         undef $wps;
-        undef $wps_prefix;
         undef $rwps;
         undef $sbs;
         undef $rsbs;
+        undef $fms;
+        undef $rfms;
         undef $width;
         undef $height;
         undef $font;
@@ -426,224 +403,213 @@ while(<WPS>) {
         undef $fgcolor;
         undef $bgcolor;
         undef $statusbar;
+        undef $remotestatusbar;
         undef $author;
-        undef $req_g_wps;
-        undef $req_t_wps;
         undef $backdrop;
         undef $lineselectstart;
         undef $lineselectend;
         undef $selecttype;
         undef $iconset;
+        undef $remoteiconset;
         undef $viewericon;
+        undef $remoteviewericon;
         undef $lineselecttextcolor;
         undef $filetylecolor;
         undef $listviewport;
         undef $remotelistviewport;
-
-        next;
     }
-    if($within) {
-        if($l =~ /^ *<\/${isrwps}wps>/i) {
-            # Get the required width and height
-            my ($rheight, $rwidth, $rdepth);
-            if($isrwps) {
-                ($rheight, $rwidth, $rdepth) =
-                         ($remote_height, $remote_width, $remote_depth);
+    elsif($l =~ /^Name: *(.*)/i) {
+        $theme = $1;
+    }
+    elsif($l =~ /^Authors: *(.*)/i) {
+        $author = $1;
+    }
+    elsif ($l =~ /^WPS: *(yes|no)/i) {
+        $has_wps = $1;
+    }
+    elsif ($l =~ /^RWPS: *(yes|no)/i) {
+        $has_rwps = $1;
+    }
+    elsif ($l =~ /^SBS: *(yes|no)/i) {
+        $has_sbs = $1;
+    }
+    elsif ($l =~ /^RSBS: *(yes|no)/i) {
+        $has_rsbs = $1;
+    }
+    elsif ($l =~ /^FMS: *(yes|no)/i) {
+        $has_fms = $1;
+    }
+    elsif ($l =~ /^RFMS: *(yes|no)/i) {
+        $has_rfms = $1;
+    }
+    elsif($l =~ /^ *<main>/i) {
+        # parse main unit settings
+        while(<WPS>) {
+            my $l = $_;
+            if ($l =~ /^ *<\/main>/i) {
+                last;
             }
-            else {
-                ($rheight, $rwidth, $rdepth) =
-                         ($main_height, $main_width, $main_depth);
+            elsif($_ = check_res($l, "wps")) {
+                $wps = $_;
+            }
+            elsif($_ = check_res($l, "sbs")) {
+                $sbs = $_;
+            }
+            elsif($_ = check_res($l, "fms")) {
+                $fms = $_;
+            }
+            elsif($_ = check_res($l, "Font")) {
+                $font = $_;
+            }
+            elsif($_ = check_res($l, "Statusbar")) {
+                $statusbar = $_;
+            }
+            elsif($_ = check_res($l, "Backdrop")) {
+                $backdrop = $_;
+            }
+            elsif($l =~ /^Foreground Color: *(.*)/i) {
+                $fgcolor = $1;
+            }
+            elsif($l =~ /^Background Color: *(.*)/i) {
+                $bgcolor = $1;
+            }
+            elsif($l =~ /^line selector start color: *(.*)/i) {
+                $lineselectstart = $1;
+            }
+            elsif($l =~ /^line selector end color: *(.*)/i) {
+                $lineselectend = $1;
+            }
+            elsif($_ = check_res($l, "selector type")) {
+                $selecttype = $_;
+            }
+            elsif($_ = check_res($l, "iconset")) {
+                $iconset = $_;
+            }
+            elsif($_ = check_res($l, "viewers iconset")) {
+                $viewericon = $_;
+            }
+            elsif($l =~ /^line selector text color: *(.*)/i) {
+                $lineselecttextcolor = $1;
+            }
+            elsif($l =~ /^filetype colours: *(.*)/i) {
+                $filetylecolor = $1;
+            }
+            elsif($_ = check_res($l, "ui viewport")) {
+                $listviewport = $_;
+            }
+        }
+    }
+    elsif($l =~ /^ *<remote>/i) {
+        while(<WPS>) {
+            # parse remote settings
+            my $l = $_;
+            if ($l =~ /^ *<\/remote>/i) {
+                last;
+            }
+            elsif(!$has_remote) {
+                next; # dont parse <remote> section
+            }
+            elsif($_ = check_res($l, "rwps", 1)) {
+                $rwps = $_;
+            }
+            elsif($_ = check_res($l, "rsbs", 1)) {
+                $rsbs = $_;
+            }
+            elsif($_ = check_res($l, "rfms", 1)) {
+                $rfms = $_;
+            }
+            elsif($_ = check_res($l, "Font", 1)) {
+                $remotefont = $_;
+            }
+            elsif($_ = check_res($l, "iconset", 1)) {
+                $remoteiconset = $_;
+            }
+            elsif($_ = check_res($l, "viewers iconset", 1)) {
+                $remoteviewericon = $_;
+            }
+            elsif($_ = check_res($l, "statusbar", 1)) {
+                $remotestatusbar = $_;
+            }
+            elsif($_ = check_res($l, "ui viewport", 1)) {
+                $remotelistviewport = $_;
+            }
+        }
+    }
+    elsif($l =~ /^ *<\/theme>/i) {
+        # for each wps,sbs,fms (+ remote variants) check if <theme>[.<model>].wps
+        # exists if no filename was specified in WPSLIST
+        my $req_skin;
+
+        if ($has_wps eq "yes" && !$wps) {
+            $wps = check_skinfile("wps");
+        } elsif ($has_wps eq "no") {
+            $wps = '';
+        }
+
+        if ($has_sbs eq "yes" && !$sbs) {
+            $sbs = check_skinfile("sbs");
+        } elsif ($has_sbs eq "no") {
+            $sbs = '';
+        }
+
+        if ($has_fms eq "yes" && !$fms) {
+            $fms = check_skinfile("fms");
+        } elsif ($has_fms eq "no") {
+            $fms = '';
+        }
+
+        # now check for remote skin files (use main screen's extension)
+        if ($has_remote) {
+            if ($has_rwps eq "yes" && !$rwps) {
+                $rwps = check_skinfile("wps");
+            } elsif ($has_rwps eq "no") {
+                $rwps = '';
             }
 
-            if(!$rheight || !$rwidth) {
-                #printf STDERR "wpsbuild notice: No %sLCD size, skipping $wps\n",
-                #$isrwps?"remote ":"";
-                $within = 0;
-                next;
+            if ($has_rsbs eq "yes" && !$rsbs) {
+                $rsbs = check_skinfile("sbs");
+            } elsif ($has_rsbs eq "no") {
+                $rsbs = '';
             }
-            $wpslist =~ /(.*)WPSLIST/;
-            my $wpsdir = $1;
-            # If this WPS installable on this platform, one of the following
-            # two files will be present
-            foreach my $d (@depthlist) {
-                next if ($d > $rdepth);
 
-                $req_size = $rwidth . "x" . $rheight . "x" . $d;
-
-                # check for model specific wps
-                $req_g_wps = $wps_prefix . "." . $req_size . "." . $modelname . ".wps";
-                last if (-e "$wpsdir/$req_g_wps");
-
-                # check for normal wps (with WIDTHxHEIGHTxDEPTH)
-                $req_g_wps = $wps_prefix . "." . $req_size . ".wps";
-                last if (-e "$wpsdir/$req_g_wps");
-
-                if ($isrwps) {
-                    $req_size = $req_size . "." . $main_width . "x" . $main_height . "x" . "$main_depth";
-
-                    $req_g_wps = $wps_prefix . "." . $req_size . ".wps";
-                    last if (-e "$wpsdir/$req_g_wps");
-                }
+            if ($has_rfms eq "yes" && !$rfms) {
+                $rfms = check_skinfile("fms");
+            } elsif ($has_rfms eq "no") {
+                $rfms = '';
             }
-            $req_t_wps = $wps_prefix . ".txt" . ".wps";
+        }
+        #print "LCD: $wps wants $width x $height\n";
 
-            #print "LCD: $wps wants $width x $height\n";
-            #print "LCD: is $rwidth x $rheight\n";
-
-            #print "gwps: $wpsdir/$req_g_wps" . "\n";
-            if (-e "$wpsdir/$req_g_wps" || -e "$wpsdir/$req_t_wps" ) {
-                #
-                # The target model has an LCD that is suitable for this
-                # WPS
-                #
-                #print "Size requirement is fine!\n";
-                mkdirs() if (-e "$wpsdir/$req_g_wps");
-                # Do the copying before building the .cfg - buildcfg()
-                # mangles some filenames
-                if ($backdrop) {
-                    copybackdrop();
-                }
-                if ($iconset) {
-                    copythemeicon();
-                }
-                if ($viewericon) {
-                    copythemeviewericon();
-                }
-                if ($font) {
-                    copythemefont($font);
-                }
-                if ($remotefont) {
-                    copythemefont($remotefont);
-                }
-                if(!$isrwps) {
-                    # We only make .cfg files for <wps> sections:
-                    buildcfg();
-                }
-                copywps();
+        #
+        # The target model has an LCD that is suitable for this
+        # WPS
+        #
+        #print "Size requirement is fine!\n";
+        mkdirs() if (-e "$wpsdir/$theme");
+        # Do the copying before building the .cfg - buildcfg()
+        # mangles some filenames
+        if (defined($backdrop) && $backdrop ne "-") {
+            copybackdrop();
+            $backdrop = normalize($backdrop);
+        }
+        foreach my $i ($iconset, $viewericon, $remoteiconset, $remoteviewericon) {
+            if (defined($i) && $i ne "-") {
+                copythemeicon($i);
             }
-            else {
-                #print "(${wps_prefix}-${rwidth}x${rheight}x$rdepth) ";
-                #print "Skip $wps due to size restraints\n";
-            }
-            $within = 0;
         }
-        elsif($l =~ /^Name: *(.*)/i) {
-            # Note that in the case this is within <rwps>, $wps will contain the
-            # name of the rwps. Use $isrwps to figure out what type it is.
-            $wps = $wps_prefix = $1;
-            $wps_prefix =~ s/\.(r|)wps//;
-            #print $wps_prefix . "\n";
+        if (defined($font) && $font ne "-") {
+            copythemefont($font);
+            $font = "$rbdir/fonts/$font";
         }
-        elsif($l =~ /^RWPS: *(.*)/i) {
-            $rwps = $1;
+        if (defined($remotefont) && $remotefont ne "-") {
+            copythemefont($remotefont);
+            $remotefont = "$rbdir/fonts/$remotefont";
         }
-        elsif($l =~ /^RWPS\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $rwps = $1;
-        }
-        elsif($l =~ /^SBS: *(.*)/i) {
-            $sbs = $sbs_prefix = $1;
-            $sbs_prefix =~ s/\.(r|)sbs//;
-        }
-        elsif($l =~ /^SBS\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $sbs = $sbs_prefix = $1;
-            $sbs_prefix =~ s/\.(r|)sbs//;
-        }
-        elsif($l =~ /^RSBS: *(.*)/i) {
-            $rsbs = $1;
-        }
-        elsif($l =~ /^RSBS\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $rsbs = $1;
-        }
-        elsif($l =~ /^Author: *(.*)/i) {
-            $author = $1;
-        }
-        elsif($l =~ /^Width: *(.*)/i) {
-            $width = $1;
-        }
-        elsif($l =~ /^Width\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $width = $1;
-        }
-        elsif($l =~ /^Height: *(.*)/i) {
-            $height = $1;
-        }
-        elsif($l =~ /^Height\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $height = $1;
-        }
-        elsif($l =~ /^Font: *(.*)/i) {
-            $font = $1;
-        }
-        elsif($l =~ /^Font\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $font = $1;
-        }
-        elsif($l =~ /^Remote Font\.${remote_width}x${remote_height}x$remote_depth: *(.*)/i) {
-            $remotefont = $1;
-        }
-        elsif($l =~ /^Remote Font: *(.*)/i) {
-            $remotefont = $1;
-        }
-        elsif($l =~ /^Foreground Color: *(.*)/i) {
-            $fgcolor = $1;
-        }
-        elsif($l =~ /^Background Color: *(.*)/i) {
-            $bgcolor = $1;
-        }
-        elsif($l =~ /^Statusbar: *(.*)/i) {
-            $statusbar = $1;
-        }
-        elsif($l =~ /^Statusbar\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $statusbar = $1;
-        }
-        elsif($l =~ /^Backdrop: *(.*)/i) {
-            $backdrop = $1;
-        }
-        elsif($l =~ /^Backdrop\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $backdrop = $1;
-        }
-        elsif($l =~ /^line selector start color: *(.*)/i) {
-            $lineselectstart = $1;
-        }
-        elsif($l =~ /^line selector end color: *(.*)/i) {
-            $lineselectend = $1;
-        }
-        elsif($l =~ /^selector type: *(.*)/i) {
-            $selecttype = $1;
-        }
-        elsif($l =~ /^selector type\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $selecttype = $1;
-        }
-        elsif($l =~ /^iconset: *(.*)/i) {
-            $iconset = $1;
-        }
-        elsif($l =~ /^iconset\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $iconset = $1;
-        }
-        elsif($l =~ /^viewers iconset: *(.*)/i) {
-            $viewericon = $1;
-        }
-        elsif($l =~ /^viewers iconset\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $viewericon = $1;
-        }
-        elsif($l =~ /^line selector text color: *(.*)/i) {
-            $lineselecttextcolor = $1;
-        }
-        elsif($l =~ /^filetype colours: *(.*)/i) {
-            $filetylecolor = $1;
-        }
-        elsif($l =~ /^ui viewport: *(.*)/i) {
-            $listviewport = $1;
-        }
-        elsif($l =~ /^ui viewport\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $listviewport = $1;
-        }
-        elsif($l =~ /^remote ui viewport: *(.*)/i) {
-            $remotelistviewport = $1;
-        }
-        elsif($l =~ /^remote ui viewport\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
-            $remotelistviewport = $1;
-        }
-        else{
-            #print "Unknown line:  $l!\n";
-        }
+        buildcfg();
+        copywps();
+    }
+    else{
+        #print "Unknown line:  $l!\n";
     }
 }
 

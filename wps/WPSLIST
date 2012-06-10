@@ -11,7 +11,7 @@
 # This should list all WPS and RWPS files we have and what their requirements
 # and preferences are.
 #
-# Each <wps> section will also cause a "theme" .cfg to be made, which the
+# Each <theme> section will also cause a "theme" .cfg to be made, which the
 # <rwps> sections will not cause.
 #
 # A <wps> section can thus mention a "preferred" rwps file to load when that
@@ -19,21 +19,80 @@
 #
 # All sections should list what font and status bar setting they "like".
 
-
-<rwps>
-Name: rockbox_default.rwps
+<theme>
+Name: rockbox_default_icons
 Author: Rockbox team
-Font: 08-Schumacher-Clean.fnt
-Statusbar: top
-</rwps>
 
-<wps>
-Name: cabbiev2.wps
-RWPS: cabbiev2.rwps
-SBS:
-RSBS:
+<main>
+iconset: -
+viewers iconset..+x16: icons/viewers.6x8x16.bmp
+viewers iconset..+x1:  icons/viewers.6x8x1.bmp
+viewers iconset..+x2:  icons/viewers.6x8x2.bmp
+</main>
+
+<remote>
+iconset: -
+viewers iconset..+x1: icons/viewers.6x8x1.bmp
+viewers iconset..+x2: icons/viewers.6x8x2.bmp
+</remote>
+
+</theme>
+
+<theme>
+Name: rockbox_failsafe
+Author: Rockbox team
+
+WPS: yes
+RWPS: yes
+SBS: yes
+RSBS: yes
+FMS: yes
+RFMS: yes
+
+<main>
+backdrop: -
+font: -
+statusbar: top
+foreground color: 000000
+background color: B6C6E5
+selector type: bar (inverse)
+ui viewport: -
+</main>
+
+<remote>
+font: -
+statusbar: top
+ui viewport: -
+</remote>
+</theme>
+
+<theme>
+Name: cabbiev2
 # Real name of the creator of the WPS
-Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
+Authors: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
+WPS: yes
+RWPS: yes
+SBS: no
+RSBS: no
+
+<main>
+
+# override implicit .wps filename
+wps.800x480x16:  cabbiev2.800x480x16.wps
+wps.480x800x16:  cabbiev2.480x800x16.wps
+wps.320x480x16:  cabbiev2.320x480x16.wps
+wps.320x240x16:  cabbiev2.320x240x16.wps
+wps.128x128x16:  cabbiev2.128x128x16.wps
+wps.128x160x16:  cabbiev2.128x160x16.wps
+wps.132x80x16:   cabbiev2.132x80x16.wps
+wps.138x110x2:   cabbiev2.138x110x2.wps
+wps.160x128x16:  cabbiev2.160x128x16.wps
+wps.160x128x2:   cabbiev2.160x128x2.wps
+wps.176x132x16:  cabbiev2.176x132x16.wps
+wps.176x220x16:  cabbiev2.176x220x16.wps
+wps.220x176x16:  cabbiev2.220x176x16.wps
+wps.240x320x16:  cabbiev2.240x320x16.wps
+wps.240x400x16:  cabbiev2.240x400x16.wps
 
 # Preferred font (including .fnt extension - leave blank for player):
 Font.800x480x16: 35-Adobe-Helvetica.fnt
@@ -46,19 +105,16 @@ Font.220x176x16: 12-Adobe-Helvetica.fnt
 Font.176x220x16: 12-Adobe-Helvetica.fnt
 Font.176x132x16: 12-Adobe-Helvetica.fnt
 Font.160x128x16: 12-Adobe-Helvetica.fnt
-Font.160x128x2: 12-Adobe-Helvetica.fnt
-Font.160x128x1: 12-Adobe-Helvetica.fnt
-Font.138x110x2: 12-Adobe-Helvetica.fnt
+Font.160x128x2:  12-Adobe-Helvetica.fnt
+Font.160x128x1:  12-Adobe-Helvetica.fnt
+Font.138x110x2:  12-Adobe-Helvetica.fnt
 Font.128x128x16: 12-Adobe-Helvetica.fnt
 Font.128x160x16: 12-Adobe-Helvetica.fnt
-Font.128x128x2: 12-Adobe-Helvetica.fnt
-Font.132x80x16: 11-Sazanami-Mincho.fnt
-Font.128x64x1: 08-Rockfont.fnt
-Font.112x64x1: 08-Rockfont.fnt
-Font.96x96x16: 08-Rockfont.fnt
-
-# Remote font for iriver
-Remote Font.128x64x1: 08-Rockfont.fnt
+Font.128x128x2:  12-Adobe-Helvetica.fnt
+Font.132x80x16:  11-Sazanami-Mincho.fnt
+Font.128x64x1:   08-Rockfont.fnt
+Font.112x64x1:   08-Rockfont.fnt
+Font.96x96x16:   08-Rockfont.fnt
 
 #misc settings that should be ignored on grayscale targets
 foreground color: CCCCCC
@@ -66,92 +122,73 @@ background color: 000000
 line selector start color: fde89e
 line selector end color: b58c00
 line selector text color: 000000
-filetype colours:
+filetype colours: -
 
 #backdrop - remember this is the source file name in your SVN folder, not dest name!
-backdrop.800x480x16: backdrops/cabbiev2.800x480x16.bmp
-backdrop.480x800x16: backdrops/cabbiev2.480x800x16.bmp
-backdrop.320x480x16: backdrops/cabbiev2.320x480x16.bmp
-backdrop.320x240x16: backdrops/cabbiev2.320x240x16.bmp
-backdrop.128x128x16: backdrops/cabbiev2.128x128x16.bmp
-backdrop.128x160x16: backdrops/cabbiev2.128x160x16.bmp
-backdrop.132x80x16: backdrops/cabbiev2.132x80x16.bmp 
-backdrop.138x110x2: backdrops/cabbiev2.138x110x2.bmp
-backdrop.160x128x16: backdrops/cabbiev2.160x128x16.bmp
-backdrop.160x128x2: backdrops/cabbiev2.160x128x2.bmp
-backdrop.176x132x16: backdrops/cabbiev2.176x132x16.bmp
-backdrop.176x220x16: backdrops/cabbiev2.176x220x16.bmp
-backdrop.220x176x16: backdrops/cabbiev2.220x176x16.bmp
-backdrop.240x320x16: backdrops/cabbiev2.240x320x16.bmp
-backdrop.240x400x16: backdrops/cabbiev2.240x400x16.bmp
-backdrop.96x96x16: backdrops/cabbiev2.96x96x16.bmp
+backdrop.800x480x16:  backdrops/cabbiev2.800x480x16.bmp
+backdrop.480x800x16:  backdrops/cabbiev2.480x800x16.bmp
+backdrop.320x480x16:  backdrops/cabbiev2.320x480x16.bmp
+backdrop.320x240x16:  backdrops/cabbiev2.320x240x16.bmp
+backdrop.128x128x16:  backdrops/cabbiev2.128x128x16.bmp
+backdrop.128x160x16:  backdrops/cabbiev2.128x160x16.bmp
+backdrop.132x80x16:   backdrops/cabbiev2.132x80x16.bmp
+backdrop.138x110x2:   backdrops/cabbiev2.138x110x2.bmp
+backdrop.160x128x16:  backdrops/cabbiev2.160x128x16.bmp
+backdrop.160x128x2:   backdrops/cabbiev2.160x128x2.bmp
+backdrop.176x132x16:  backdrops/cabbiev2.176x132x16.bmp
+backdrop.176x220x16:  backdrops/cabbiev2.176x220x16.bmp
+backdrop.220x176x16:  backdrops/cabbiev2.220x176x16.bmp
+backdrop.240x320x16:  backdrops/cabbiev2.240x320x16.bmp
+backdrop.240x400x16:  backdrops/cabbiev2.240x400x16.bmp
+backdrop.96x96x16:    backdrops/cabbiev2.96x96x16.bmp
 
 #selection bar settings for color targets
-selector type.800x480x16: bar (gradient)
-selector type.480x800x16: bar (gradient)
-selector type.320x480x16: bar (gradient)
-selector type.320x240x16: bar (gradient)
-selector type.128x128x16: bar (gradient)
-selector type.128x160x16: bar (gradient)
-selector type.132x80x16:  bar (gradient)
-selector type.220x176x16: bar (gradient)
-selector type.160x128x16: bar (gradient)
-selector type.240x400x16: bar (gradient)
-selector type.240x320x16: bar (gradient)
-selector type.176x132x16: bar (gradient)
-selector type.176x220x16: bar (gradient)
-selector type.160x128x2: bar (inverse)
-selector type.138x110x2: bar (inverse)
-selector type.96x96x16: bar (gradient)
+selector type..+x16: bar (gradient)
+selector type..+x2: bar (inverse)
 
 #icons
-iconset.800x480x16: icons/tango_icons.32x32.bmp
-iconset.480x800x16: icons/tango_icons.32x32.bmp
-iconset.320x480x16: icons/tango_icons.24x24.bmp
-iconset.320x240x16: icons/tango_icons.16x16.bmp
-iconset.128x128x16: icons/tango_icons.12x12.bmp
-iconset.128x160x16: icons/tango_icons.12x12.bmp
-iconset.132x80x16:  icons/tango_icons.12x12.bmp
-iconset.138x110x2:  icons/tango_small_mono.bmp
-iconset.160x128x16: icons/tango_icons.12x12.bmp
-iconset.160x128x2:  icons/tango_small_mono.bmp
-iconset.176x132x16: icons/tango_icons.12x12.bmp
-iconset.176x220x16: icons/tango_icons.12x12.bmp
-iconset.220x176x16: icons/tango_icons.12x12.bmp
-iconset.240x320x16: icons/tango_icons.16x16.bmp
-iconset.240x400x16: icons/tango_icons.16x16.bmp
-iconset.96x96x16:   icons/tango_icons.8x8.bmp
+iconset.800x480x16:  icons/tango_icons.32x32.bmp
+iconset.480x800x16:  icons/tango_icons.32x32.bmp
+iconset.320x480x16:  icons/tango_icons.24x24.bmp
+iconset.320x240x16:  icons/tango_icons.16x16.bmp
+iconset.128x128x16:  icons/tango_icons.12x12.bmp
+iconset.128x160x16:  icons/tango_icons.12x12.bmp
+iconset.132x80x16:   icons/tango_icons.12x12.bmp
+iconset.160x128x16:  icons/tango_icons.12x12.bmp
+iconset.176x132x16:  icons/tango_icons.12x12.bmp
+iconset.176x220x16:  icons/tango_icons.12x12.bmp
+iconset.220x176x16:  icons/tango_icons.12x12.bmp
+iconset.240x320x16:  icons/tango_icons.16x16.bmp
+iconset.240x400x16:  icons/tango_icons.16x16.bmp
+iconset.96x96x16:    icons/tango_icons.8x8.bmp
+iconset..+x2:        icons/tango_small_mono.bmp
 
 #viewer icons
-viewers iconset.800x480x16: icons/tango_icons_viewers.32x32.bmp
-viewers iconset.480x800x16: icons/tango_icons_viewers.32x32.bmp
-viewers iconset.320x480x16: icons/tango_icons_viewers.24x24.bmp
-viewers iconset.320x240x16: icons/tango_icons_viewers.16x16.bmp
-viewers iconset.128x128x16: icons/tango_icons_viewers.12x12.bmp
-viewers iconset.128x160x16: icons/tango_icons_viewers.12x12.bmp
-viewers iconset.132x80x16:  icons/tango_icons_viewers.12x12.bmp
-viewers iconset.138x110x2:  icons/tango_small_viewers_mono.bmp
-viewers iconset.160x128x16: icons/tango_icons_viewers.12x12.bmp
-viewers iconset.160x128x2:  icons/tango_small_viewers_mono.bmp
-viewers iconset.176x132x16: icons/tango_icons_viewers.12x12.bmp
-viewers iconset.176x220x16: icons/tango_icons_viewers.12x12.bmp
-viewers iconset.220x176x16: icons/tango_icons_viewers.12x12.bmp
-viewers iconset.240x320x16: icons/tango_icons_viewers.16x16.bmp
-viewers iconset.240x400x16: icons/tango_icons_viewers.16x16.bmp
-viewers iconset.96x96x16:   icons/tango_icons_viewers.8x8.bmp
+viewers iconset.800x480x16:  icons/tango_icons_viewers.32x32.bmp
+viewers iconset.480x800x16:  icons/tango_icons_viewers.32x32.bmp
+viewers iconset.320x480x16:  icons/tango_icons_viewers.24x24.bmp
+viewers iconset.320x240x16:  icons/tango_icons_viewers.16x16.bmp
+viewers iconset.128x128x16:  icons/tango_icons_viewers.12x12.bmp
+viewers iconset.128x160x16:  icons/tango_icons_viewers.12x12.bmp
+viewers iconset.132x80x16:   icons/tango_icons_viewers.12x12.bmp
+viewers iconset.160x128x16:  icons/tango_icons_viewers.12x12.bmp
+viewers iconset.176x132x16:  icons/tango_icons_viewers.12x12.bmp
+viewers iconset.176x220x16:  icons/tango_icons_viewers.12x12.bmp
+viewers iconset.220x176x16:  icons/tango_icons_viewers.12x12.bmp
+viewers iconset.240x320x16:  icons/tango_icons_viewers.16x16.bmp
+viewers iconset.240x400x16:  icons/tango_icons_viewers.16x16.bmp
+viewers iconset.96x96x16:    icons/tango_icons_viewers.8x8.bmp
+viewers iconset..+x2:        icons/tango_small_viewers_mono.bmp
 
-# Whether the WPS is designed to have the statusbar on or off
-Statusbar: top
-remote statusbar: top
+statusbar: top
+ui viewport: -
+</main>
 
-# list & remote ui viewports
-ui viewport:
-remote ui viewport:
-</wps>
+<remote>
+rwps.128x64x1: cabbiev2.128x64x1.wps
+Font.128x64x1: 08-Rockfont.fnt
+statusbar: top
+ui viewport: -
+</remote>
 
-<rwps>
-Name: cabbiev2.rwps
-Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
-Font: 12-Adobe-Helvetica.fnt
-Statusbar: top
-</rwps>
+</theme>
