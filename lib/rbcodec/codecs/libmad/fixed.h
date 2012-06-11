@@ -292,6 +292,15 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
 
 # elif defined(FPM_MIPS)
 
+#if GCCNUM >= 404
+typedef unsigned int u64_di_t __attribute__ ((mode (DI))); 
+# define MAD_F_MLX(hi, lo, x, y) \
+do { \
+   u64_di_t __ll = (u64_di_t) (x) * (y); \
+   hi = __ll >> 32; \
+   lo = __ll; \
+}while(0)
+#else
 /*
  * This MIPS version is fast and accurate; the disposition of the least
  * significant bit depends on OPT_ACCURACY via mad_f_scale64().
@@ -321,6 +330,8 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
          : "%r" ((x) >> 12), "r" ((y) >> 16))
 #  define MAD_F_MLZ(hi, lo)  ((mad_fixed_t) (lo))
 # endif
+
+#endif /* GCCNUM */ 
 
 # if defined(OPT_SPEED)
 #  define mad_f_scale64(hi, lo)  \

@@ -3840,6 +3840,9 @@ ${Darch_version}
 /* Define endianess for the target or simulator platform */
 #define ${defendian} 1
 
+/* Define the GCC version used for the build */
+#define GCCNUM ${GCCNUM}
+
 /* Define this if you build rockbox to support the logf logging and display */
 ${use_logf}
 
