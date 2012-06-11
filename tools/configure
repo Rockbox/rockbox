@@ -646,7 +646,6 @@ ypr0cc () {
  SHARED_LDFLAG="-shared"
  SHARED_CFLAGS=''
  endian="little"
- thread_support="HAVE_SIGALTSTACK_THREADS"
  app_type="ypr0"
 
  # Include path
