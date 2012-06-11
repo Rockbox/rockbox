@@ -3840,7 +3840,7 @@ ${Darch_version}
 #define ${defendian} 1
 
 /* Define the GCC version used for the build */
-#define GCCNUM ${GCCNUM}
+#define GCCNUM ${gccnum}
 
 /* Define this if you build rockbox to support the logf logging and display */
 ${use_logf}
