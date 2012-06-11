@@ -23,17 +23,9 @@
 #define __ASM_THREAD_H__
 #include "config.h"
 
-#if defined(CPU_ARM)
-  #include "arm/thread.h"
-#elif defined(CPU_COLDFIRE)
-  #include "m68k/thread.h"
-#elif CONFIG_CPU == SH7034
-  #include "sh/thread.h"
-#elif defined(CPU_MIPS)
-  #include "mips/thread.h"
-#else
-
 /* generic thread.h */
+
+#if defined(HAVE_WIN32_FIBER_THREADS) || defined(HAVE_SIGALTSTACK_THREADS)
 
 struct regs
 {
@@ -44,14 +36,21 @@ struct regs
     uintptr_t stack;     /* pointer to start of the stack buffer */
 };
 
-#ifdef HAVE_SIGALTSTACK_THREADS
-  #include <signal.h>
-  /* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
-  #define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x3000) /* Bytes */
-#elif defined(HAVE_WIN32_FIBER_THREADS)
-  #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
+  #ifdef HAVE_SIGALTSTACK_THREADS
+    #include <signal.h>
+    /* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
+    #define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x3000) /* Bytes */
+  #elif defined(HAVE_WIN32_FIBER_THREADS)
+    #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
+  #endif
+#elif defined(CPU_ARM)
+  #include "arm/thread.h"
+#elif defined(CPU_COLDFIRE)
+  #include "m68k/thread.h"
+#elif CONFIG_CPU == SH7034
+  #include "sh/thread.h"
+#elif defined(CPU_MIPS)
+  #include "mips/thread.h"
 #endif
-
-#endif /* __ASM_THREAD_H__ */
 
 #endif
