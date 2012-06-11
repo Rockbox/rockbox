@@ -9,7 +9,7 @@
 
 PACKAGE=org.rockbox
 PACKAGE_PATH=org/rockbox
-BINLIB_DIR=$(BUILDDIR)/libs/armeabi
+BINLIB_DIR=$(BUILDDIR)/libs/$(ANDROID_ARCH)
 ANDROID_DIR=$(ROOTDIR)/android
 
 # this is a glibc compatibility hack to provide a get_nprocs() replacement.
@@ -70,7 +70,7 @@ APK		:= $(BUILDDIR)/rockbox.apk
 _DIRS		:= $(BUILDDIR)/___/$(PACKAGE_PATH)
 DIRS		+= $(subst ___,gen,$(_DIRS))
 DIRS		+= $(subst ___,data,$(_DIRS))
-DIRS		+= $(BUILDDIR)/libs/armeabi
+DIRS		+= $(BUILDDIR)/libs/$(ANDROID_ARCH)
 DIRS		+= $(CPUFEAT_BUILD)
 DIRS		+= $(CLASSPATH)
 

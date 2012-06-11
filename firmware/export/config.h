@@ -1133,4 +1133,9 @@ Lyre prototype 1 */
 #define HAVE_PITCHCONTROL
 #endif
 
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(CPU_MIPS)
+/* We don't have our own MIPS hosted threading support yet */
+#define HAVE_SIGALTSTACK_THREADS
+#endif
+
 #endif /* __CONFIG_H__ */

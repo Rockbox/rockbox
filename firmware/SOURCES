@@ -634,7 +634,7 @@ target/arm/rk27xx/crt0.S
 target/arm/crt0.S
 #endif /* defined(CPU_*) */
 
-#elif defined(CPU_MIPS)
+#elif defined(CPU_MIPS) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 target/mips/mmu-mips.c
 #if CONFIG_CPU==JZ4732
 target/mips/ingenic_jz47xx/crt0.S
