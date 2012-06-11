@@ -700,6 +700,7 @@ androidmipscc () {
     gcctarget="mipsel-linux-android-"
     gccprefix=$ANDROID_NDK_PATH/toolchains/$gcctarget$gccchoice/prebuilt/$buildhost-x86
     arch_version=32 # FIXME: autodetect version (32 or 64)
+    thread_support="HAVE_SIGALTSTACK_THREADS"
     PATH=$PATH:$gccprefix/bin
     prefixtools $gcctarget
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
