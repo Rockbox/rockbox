@@ -16,6 +16,9 @@
 *
 ****************************************************************************/
 
+#include <QtCore>
+#include <QTcpSocket>
+
 #include "ttsfestival.h"
 #include "utils.h"
 #include "rbsettings.h"

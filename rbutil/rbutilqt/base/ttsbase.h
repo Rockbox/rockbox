@@ -23,10 +23,6 @@
 #define TTSBASE_H
 
 #include <QtCore>
-#include <QProcess>
-#include <QDateTime>
-#include <QRegExp>
-#include <QTcpSocket>
 
 #include "encttssettings.h"
 
@@ -45,23 +41,23 @@ class TTSBase : public EncTtsSettingInterface
         virtual bool start(QString *errStr) =0;
         //! child class should stop
         virtual bool stop() =0;
-        
+
         virtual QString voiceVendor(void) = 0;
         // configuration
         //! Child class should return true, when configuration is good
-        virtual bool configOk()=0;        
+        virtual bool configOk()=0;
          //! Child class should generate and insertSetting(..) its settings
         virtual void generateSettings() = 0;
         //! Chlid class should commit the Settings to permanent storage
         virtual void saveSettings() = 0;
-        
+
         virtual Capabilities capabilities() = 0;
 
         // static functions
         static TTSBase* getTTS(QObject* parent,QString ttsname);
         static QStringList getTTSList();
         static QString getTTSName(QString tts);
-                
+
     private:
         //inits the tts List
         static void initTTSList();
