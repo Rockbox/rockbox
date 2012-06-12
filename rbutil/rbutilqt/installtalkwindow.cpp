@@ -125,20 +125,6 @@ void InstallTalkWindow::updateSettings(void)
         ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
             .arg("Invalid TTS configuration!"));
 
-    QString encoder = SystemInfo::value(SystemInfo::CurEncoder).toString();
-    EncoderBase* enc = EncoderBase::getEncoder(this,encoder);
-    if(enc != NULL) {
-        if(enc->configOk())
-            ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
-                .arg(EncoderBase::getEncoderName(encoder)));
-        else
-            ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
-                .arg("Invalid encoder configuration!"));
-    }
-    else
-        ui.labelEncProfile->setText(tr("Selected encoder: <b>%1</b>")
-            .arg("Invalid encoder configuration!"));
-
     ui.lineTalkFolder->setText(
             RbSettings::value(RbSettings::LastTalkedFolder).toString());
     emit settingsUpdated();
