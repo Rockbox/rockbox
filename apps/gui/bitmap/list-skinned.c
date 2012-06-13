@@ -167,6 +167,24 @@ void skinlist_get_scrollbar(int* nb_item, int* first_shown, int* last_shown)
     }
 }
 
+bool skinlist_get_item(struct screen *display, struct gui_synclist *list, int x, int y, int *item)
+{
+    const int screen = display->screen_type;
+    if (!skinlist_is_configured(screen, list))
+        return false;
+
+    printf("Click on %d %d\n",x,y);
+    printf("Blocks are %d %d\n",listcfg[screen]->width,listcfg[screen]->height);
+    int row = y / listcfg[screen]->height;
+    int column = x / listcfg[screen]->width;
+    printf("Row %d %d\n",row,column);
+    struct viewport *parent = (list->parent[screen]);
+    int cols = (parent->width / listcfg[screen]->width);
+    *item = row * cols+ column;
+    printf("item %d (%d columns)\n",*item,cols);
+    return true;
+}
+
 bool skinlist_draw(struct screen *display, struct gui_synclist *list)
 {
     int cur_line, display_lines;
