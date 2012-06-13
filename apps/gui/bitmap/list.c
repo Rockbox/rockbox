@@ -704,7 +704,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
     enum screen_type screen;
     struct viewport *parent;
     short x, y;
-    int action, adj_y, line, line_height, list_start_item;
+    int action, adj_x, adj_y, line, line_height, list_start_item;
     bool recurse;
     static int last_y = -1;
     
@@ -714,6 +714,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
     list_start_item = list->start_item[screen];
     /* start with getting the action code and finding the click location */
     action = action_get_touchscreen_press(&x, &y);
+    adj_x = x - parent->x;
     adj_y = y - parent->y;
 
 
@@ -736,13 +737,17 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                 line = 0; /* silence gcc 'used uninitialized' warning */
                 if (click_loc & LIST)
                 {
-                    /* selection needs to be corrected if items are only partially visible */
-                    line = (adj_y - y_offset) / line_height;
-                    if (list_display_title(list, screen))
-                        line -= 1; /* adjust for the list title */
+                    if(!skinlist_get_item(&screens[screen], list, adj_x, adj_y, &line))
+                    {
+                        /* selection needs to be corrected if items are only partially visible */
+                        line = (adj_y - y_offset) / line_height;
+                        if (list_display_title(list, screen))
+                            line -= 1; /* adjust for the list title */
+                    }
                     if (line >= list->nb_items)
                         return ACTION_NONE;
                     list->selected_item = list_start_item+line;
+
                     gui_synclist_speak_item(list);
                 }
                 if (action == BUTTON_TOUCHSCREEN)
