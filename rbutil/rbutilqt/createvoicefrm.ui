@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0" >
  <class>CreateVoiceFrm</class>
  <widget class="QDialog" name="CreateVoiceFrm" >
@@ -8,15 +9,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>659</width>
-    <height>482</height>
+    <width>588</width>
+    <height>448</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Create Voice File</string>
   </property>
-  <layout class="QGridLayout" >
-   <item rowspan="5" row="0" column="0" >
+  <layout class="QGridLayout" name="gridLayout" >
+   <item row="0" column="0" rowspan="5" >
     <widget class="QLabel" name="label" >
      <property name="text" >
       <string/>
@@ -29,10 +30,10 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="2" >
+   <item row="0" column="1" colspan="3" >
     <widget class="QLabel" name="label_2" >
      <property name="sizePolicy" >
-      <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+      <sizepolicy hsizetype="Minimum" vsizetype="Minimum" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -42,14 +43,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="2" >
-    <widget class="QComboBox" name="comboLanguage" >
-     <property name="accessibleName" >
-      <string>Language</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" colspan="2" >
+   <item row="2" column="1" colspan="3" >
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="title" >
       <string>Generation settings</string>
@@ -58,14 +52,14 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="labelTtsProfile" >
         <property name="text" >
-         <string>TTS profile:</string>
+         <string>TTS:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
+      <item row="0" column="2" >
        <widget class="QPushButton" name="change" >
         <property name="sizePolicy" >
-         <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -75,12 +69,12 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <spacer>
+      <item row="0" column="1" >
+       <spacer name="horizontalSpacer" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -88,15 +82,35 @@
         </property>
        </spacer>
       </item>
+      <item row="1" column="2" >
+       <widget class="QSpinBox" name="wavtrimthreshold" >
+        <property name="accessibleName" >
+         <string>Wavtrim Threshold</string>
+        </property>
+        <property name="maximum" >
+         <number>5000</number>
+        </property>
+        <property name="value" >
+         <number>500</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Silence threshold</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="4" column="1" >
+   <item row="3" column="1" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>20</width>
        <height>201</height>
@@ -104,12 +118,12 @@
      </property>
     </spacer>
    </item>
-   <item row="5" column="1" >
+   <item row="4" column="2" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>40</width>
        <height>20</height>
@@ -117,7 +131,7 @@
      </property>
     </spacer>
    </item>
-   <item row="5" column="2" >
+   <item row="4" column="3" >
     <layout class="QHBoxLayout" >
      <item>
       <widget class="QPushButton" name="buttonOk" >
@@ -125,7 +139,8 @@
         <string>&amp;Install</string>
        </property>
        <property name="icon" >
-        <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
+        <iconset resource="rbutilqt.qrc" >
+         <normaloff>:/icons/go-next.png</normaloff>:/icons/go-next.png</iconset>
        </property>
       </widget>
      </item>
@@ -135,47 +150,31 @@
         <string>&amp;Cancel</string>
        </property>
        <property name="icon" >
-        <iconset resource="rbutilqt.qrc" >:/icons/process-stop.png</iconset>
+        <iconset resource="rbutilqt.qrc" >
+         <normaloff>:/icons/process-stop.png</normaloff>:/icons/process-stop.png</iconset>
        </property>
       </widget>
      </item>
     </layout>
    </item>
-   <item row="3" column="1" colspan="2" >
-    <layout class="QHBoxLayout" >
-     <item>
-      <widget class="QLabel" name="label_3" >
-       <property name="text" >
-        <string>Wavtrim Threshold</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="wavtrimthreshold" >
-       <property name="accessibleName" >
-        <string>Wavtrim Threshold</string>
-       </property>
-       <property name="maximum" >
-        <number>5000</number>
-       </property>
-       <property name="value" >
-        <number>500</number>
-       </property>
-      </widget>
-     </item>
-    </layout>
+   <item row="1" column="1" colspan="3" >
+    <widget class="QComboBox" name="comboLanguage" >
+     <property name="accessibleName" >
+      <string>Language</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>buttonOk</tabstop>
+  <tabstop>buttonCancel</tabstop>
   <tabstop>comboLanguage</tabstop>
   <tabstop>change</tabstop>
   <tabstop>wavtrimthreshold</tabstop>
-  <tabstop>buttonOk</tabstop>
-  <tabstop>buttonCancel</tabstop>
  </tabstops>
  <resources>
-  <include location="rbutilqt.qrc" />
+  <include location="rbutilqt.qrc"/>
  </resources>
  <connections>
   <connection>

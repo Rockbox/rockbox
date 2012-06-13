@@ -94,10 +94,10 @@ void CreateVoiceWindow::updateSettings(void)
     QString ttsName = RbSettings::value(RbSettings::Tts).toString();
     TTSBase* tts = TTSBase::getTTS(this,ttsName);
     if(tts->configOk())
-        ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
+        ui.labelTtsProfile->setText(tr("Engine: <b>%1</b>")
             .arg(TTSBase::getTTSName(ttsName)));
     else
-        ui.labelTtsProfile->setText(tr("Selected TTS engine: <b>%1</b>")
+        ui.labelTtsProfile->setText(tr("Engine: <b>%1</b>")
             .arg("Invalid TTS configuration!"));
 
     ui.wavtrimthreshold->setValue(RbSettings::value(RbSettings::WavtrimThreshold).toInt());
