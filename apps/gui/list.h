@@ -188,6 +188,8 @@ struct listitem_viewport_cfg {
     bool    tile;
     struct skin_viewport selected_item_vp;
 };
+
+bool skinlist_get_item(struct screen *display, struct gui_synclist *list, int x, int y, int *item);
 bool skinlist_draw(struct screen *display, struct gui_synclist *list);
 bool skinlist_is_selected_item(void);
 void skinlist_set_cfg(enum screen_type screen,
