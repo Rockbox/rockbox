@@ -9,15 +9,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>450</height>
+    <width>722</width>
+    <height>448</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Install Talk Files</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0" rowspan="6">
+   <item row="0" column="0" rowspan="4">
     <widget class="QLabel" name="label">
      <property name="text">
       <string/>
@@ -30,37 +30,48 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="3">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Select the Folder to generate Talkfiles for.</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="2">
-    <widget class="QLineEdit" name="lineTalkFolder">
-     <property name="accessibleName">
-      <string>Talkfile Folder</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QPushButton" name="buttonBrowse">
-     <property name="text">
-      <string>&amp;Browse</string>
-     </property>
-     <property name="icon">
-      <iconset resource="rbutilqt.qrc">
-       <normaloff>:/icons/system-search.png</normaloff>:/icons/system-search.png</iconset>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="1" colspan="3">
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Generation settings</string>
+      <string>Generation options</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="7" column="0">
+       <widget class="QCheckBox" name="StripExtensions">
+        <property name="text">
+         <string>Strip Extensions</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="talkFiles">
+        <property name="text">
+         <string>Generate for files</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="tristate">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="labelTtsProfile">
         <property name="text">
@@ -68,7 +79,27 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="1" column="1" colspan="2">
+       <widget class="QCheckBox" name="talkFolders">
+        <property name="text">
+         <string>Generate for folders</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="recursive">
+        <property name="text">
+         <string>Recurse into folders</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
        <widget class="QPushButton" name="change">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -81,49 +112,30 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="8" column="0">
+       <widget class="QCheckBox" name="checkBox">
+        <property name="text">
+         <string>Ignore files</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+       </widget>
+      </item>
+      <item row="8" column="1" colspan="2">
+       <widget class="QLineEdit" name="ignoreFiles"/>
+      </item>
+      <item row="4" column="1" colspan="2">
+       <widget class="QCheckBox" name="GenerateOnlyNew">
+        <property name="text">
+         <string>Skip existing</string>
         </property>
-       </spacer>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="4" column="2">
-    <spacer>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="5" column="1">
-    <spacer>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="5" column="2" colspan="2">
+   <item row="3" column="2" colspan="2">
     <layout class="QHBoxLayout">
      <item>
       <widget class="QPushButton" name="buttonOk">
@@ -149,86 +161,46 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="1" colspan="3">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Generation options</string>
+   <item row="1" column="1" colspan="3">
+    <widget class="QTreeView" name="treeView"/>
+   </item>
+   <item row="0" column="1" colspan="3">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Select folders for Talkfile generation (Ctrl for multiselect)</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="ignoreFiles"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Ignore files (comma seperated Wildcards):</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="talkFiles">
-        <property name="text">
-         <string>Generate .talk files for Files</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-        <property name="tristate">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QCheckBox" name="talkFolders">
-        <property name="text">
-         <string>Generate .talk files for Folders</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QCheckBox" name="recursive">
-        <property name="text">
-         <string>Run recursive</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QCheckBox" name="StripExtensions">
-        <property name="text">
-         <string>Strip Extensions</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QCheckBox" name="GenerateOnlyNew">
-        <property name="text">
-         <string>Create only new Talkfiles</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
+   </item>
+   <item row="3" column="1">
+    <spacer>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>lineTalkFolder</tabstop>
-  <tabstop>buttonBrowse</tabstop>
-  <tabstop>change</tabstop>
   <tabstop>buttonOk</tabstop>
   <tabstop>buttonCancel</tabstop>
+  <tabstop>treeView</tabstop>
+  <tabstop>change</tabstop>
+  <tabstop>talkFiles</tabstop>
+  <tabstop>talkFolders</tabstop>
+  <tabstop>recursive</tabstop>
+  <tabstop>GenerateOnlyNew</tabstop>
+  <tabstop>StripExtensions</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>ignoreFiles</tabstop>
  </tabstops>
  <resources>
   <include location="rbutilqt.qrc"/>
