@@ -78,7 +78,7 @@ RES		:= $(wildcard $(ANDROID_DIR)/res/*/*)
 
 CLEANOBJS += bin gen libs data
 
-JAVAC_OPTS += -implicit:none -classpath $(ANDROID_PLATFORM)/android.jar:$(CLASSPATH)
+JAVAC_OPTS += -source 1.6 -target 1.6 -implicit:none -classpath $(ANDROID_PLATFORM)/android.jar:$(CLASSPATH)
 
 .PHONY:
 $(MANIFEST): $(MANIFEST_SRC) $(DIRS)
@@ -148,7 +148,8 @@ endif
 	$(SILENT)rm -f $@
 	$(call PRINTS,SIGN $(subst $(BUILDDIR)/,,$@))jarsigner \
 		-keystore "$(KEYSTORE)" -storepass "android" -keypass "android" \
-		-signedjar $(TEMP_APK2) $(TEMP_APK) "androiddebugkey"
+		-signedjar $(TEMP_APK2) $(TEMP_APK) "androiddebugkey" \
+		-sigalg MD5withRSA -digestalg SHA1
 	$(SILENT)$(ZIPALIGN) -v 4 $(TEMP_APK2) $@ > /dev/null
 
 $(DIRS):
