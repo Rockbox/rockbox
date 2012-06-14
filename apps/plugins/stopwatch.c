@@ -539,9 +539,19 @@ enum plugin_status plugin_start(const void* parameter)
 
             /* Lap timer */
             case STOPWATCH_LAP_TIMER:
-                 lap_times[curr_lap%MAX_LAPS] = stopwatch;
-                 curr_lap++;
-                 update_lap = true;
+                 /*check if we're timing, and start if not*/
+                 if (counting)
+                 {
+                     lap_times[curr_lap%MAX_LAPS] = stopwatch;
+                     curr_lap++;
+                     update_lap = true;
+                 }
+                 else
+                 {
+                     counting = ! counting;
+                     start_at = *rb->current_tick;
+                     stopwatch = prev_total + *rb->current_tick - start_at;
+                 }
                  break;
 
             /* Scroll Lap timer up */
