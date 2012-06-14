@@ -24,7 +24,7 @@
 #include "sim-ui-defines.h"
 #include "system.h" /* for MIN() and MAX() */
 
-int display_zoom = 1;
+double display_zoom = 1;
 
 void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
                      int height, int max_x, int max_y,

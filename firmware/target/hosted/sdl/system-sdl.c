@@ -314,7 +314,7 @@ void sys_handle_argv(int argc, char *argv[])
             {
                 x++;
                 if(x < argc)
-                    display_zoom=atoi(argv[x]);
+                    display_zoom=atof(argv[x]);
                 else
                     display_zoom = 2;
                 printf("Window zoom is %d\n", display_zoom);
@@ -364,7 +364,7 @@ void sys_handle_argv(int argc, char *argv[])
             }
         }
     }
-    if (display_zoom > 1) {
+    if (display_zoom != 1) {
         background = false;
     }
 }
