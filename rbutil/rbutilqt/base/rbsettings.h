@@ -27,7 +27,7 @@ class RbSettings : public QObject
 {
     Q_OBJECT
     public:
-        
+
         //! All user settings
         enum UserSettings {
             RbutilVersion,
@@ -42,7 +42,14 @@ class RbSettings : public QObject
             Language,
             Tts,
             UseTtsCorrections,
-            LastTalkedFolder,
+            TalkFolders,
+            TalkProcessFiles,
+            TalkProcessFolders,
+            TalkRecursive,
+            TalkSkipExisting,
+            TalkStripExtensions,
+            TalkIgnoreFiles,
+            TalkIgnoreWildcards,
             VoiceLanguage,
             TtsLanguage,
             TtsOptions,
@@ -61,7 +68,7 @@ class RbSettings : public QObject
             EncoderQuality,
             EncoderVolume,
         };
- 
+
         //! call this to flush the user Settings
         static void sync();
         //! returns the filename of the usersettings file

@@ -39,6 +39,7 @@ class InstallTalkWindow : public QDialog
 
     private slots:
         void updateSettings(void);
+        void saveSettings(void);
 
     signals:
         void settingsUpdated(void);

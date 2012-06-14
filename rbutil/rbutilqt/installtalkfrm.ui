@@ -113,7 +113,7 @@
        </widget>
       </item>
       <item row="8" column="0">
-       <widget class="QCheckBox" name="checkBox">
+       <widget class="QCheckBox" name="ignoreEnabled">
         <property name="text">
          <string>Ignore files</string>
         </property>
@@ -199,7 +199,7 @@
   <tabstop>recursive</tabstop>
   <tabstop>GenerateOnlyNew</tabstop>
   <tabstop>StripExtensions</tabstop>
-  <tabstop>checkBox</tabstop>
+  <tabstop>ignoreEnabled</tabstop>
   <tabstop>ignoreFiles</tabstop>
  </tabstops>
  <resources>
@@ -213,8 +213,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>472</x>
-     <y>418</y>
+     <x>624</x>
+     <y>437</y>
     </hint>
     <hint type="destinationlabel">
      <x>382</x>
@@ -229,8 +229,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>561</x>
-     <y>428</y>
+     <x>711</x>
+     <y>437</y>
     </hint>
     <hint type="destinationlabel">
      <x>522</x>

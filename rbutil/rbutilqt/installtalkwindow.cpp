@@ -50,12 +50,8 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
 }
 
 
-void InstallTalkWindow::change()
+void InstallTalkWindow::saveSettings(void)
 {
-    Config *cw = new Config(this, 4);
-
-    // make sure the current selected folder doesn't get lost on settings
-    // changes.
     QModelIndexList si = ui.treeView->selectionModel()->selectedIndexes();
     QStringList foldersToTalk;
     for(int i = 0; i < si.size(); i++) {
@@ -63,7 +59,26 @@ void InstallTalkWindow::change()
             foldersToTalk.append(fsm->filePath(si.at(i)));
         }
     }
-    RbSettings::setValue(RbSettings::LastTalkedFolder, foldersToTalk);
+    RbSettings::setValue(RbSettings::TalkFolders, foldersToTalk);
+
+    RbSettings::setValue(RbSettings::TalkSkipExisting, ui.GenerateOnlyNew->isChecked());
+    RbSettings::setValue(RbSettings::TalkRecursive, ui.recursive->isChecked());
+    RbSettings::setValue(RbSettings::TalkStripExtensions, ui.StripExtensions->isChecked());
+    RbSettings::setValue(RbSettings::TalkProcessFolders, ui.talkFolders->isChecked());
+    RbSettings::setValue(RbSettings::TalkProcessFiles, ui.talkFiles->isChecked());
+    RbSettings::setValue(RbSettings::TalkIgnoreWildcards, ui.ignoreFiles->text());
+    RbSettings::setValue(RbSettings::TalkIgnoreFiles, ui.ignoreEnabled->isChecked());
+
+    RbSettings::sync();
+}
+
+
+void InstallTalkWindow::change()
+{
+    Config *cw = new Config(this, 4);
+
+    // make sure the current selected folder doesn't get lost on settings
+    // changes.
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
 
     cw->show();
@@ -73,19 +88,10 @@ void InstallTalkWindow::accept()
 {
     logger = new ProgressLoggerGui(this);
 
-    QModelIndexList si = ui.treeView->selectionModel()->selectedIndexes();
-    QStringList foldersToTalk;
-    for(int i = 0; i < si.size(); i++) {
-        if(si.at(i).column() == 0) {
-            foldersToTalk.append(fsm->filePath(si.at(i)));
-        }
-    }
+    saveSettings();
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
     logger->show();
-
-    RbSettings::setValue(RbSettings::LastTalkedFolder, foldersToTalk);
-
-    RbSettings::sync();
+    saveSettings();
 
     talkcreator->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
 
@@ -101,6 +107,8 @@ void InstallTalkWindow::accept()
     connect(talkcreator, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
     connect(logger,SIGNAL(aborted()),talkcreator,SLOT(abort()));
 
+    QStringList foldersToTalk
+        = RbSettings::value(RbSettings::TalkFolders).toStringList();
     for(int i = 0; i < foldersToTalk.size(); i++) {
         talkcreator->setDir(QDir(foldersToTalk.at(i)));
         talkcreator->createTalkFiles();
@@ -119,7 +127,7 @@ void InstallTalkWindow::updateSettings(void)
         ui.labelTtsProfile->setText(tr("<b>%1</b>")
             .arg("Invalid TTS configuration!"));
 
-    QStringList folders = RbSettings::value(RbSettings::LastTalkedFolder).toStringList();
+    QStringList folders = RbSettings::value(RbSettings::TalkFolders).toStringList();
     for(int i = 0; i < folders.size(); ++i) {
         QModelIndex mi = fsm->index(folders.at(i));
         ui.treeView->selectionModel()->select(mi, QItemSelectionModel::Select);
@@ -128,6 +136,20 @@ void InstallTalkWindow::updateSettings(void)
             ui.treeView->setExpanded(mi, true);
         }
     }
+    ui.GenerateOnlyNew->setChecked(
+            RbSettings::value(RbSettings::TalkSkipExisting).toBool());
+    ui.recursive->setChecked(
+            RbSettings::value(RbSettings::TalkRecursive).toBool());
+    ui.StripExtensions->setChecked(
+            RbSettings::value(RbSettings::TalkStripExtensions).toBool());
+    ui.talkFolders->setChecked(
+            RbSettings::value(RbSettings::TalkProcessFolders).toBool());
+    ui.talkFiles->setChecked(
+            RbSettings::value(RbSettings::TalkProcessFiles).toBool());
+    ui.ignoreFiles->setText(
+            RbSettings::value(RbSettings::TalkIgnoreWildcards).toString());
+    ui.ignoreEnabled->setChecked(
+            RbSettings::value(RbSettings::TalkIgnoreFiles).toBool());
 
     emit settingsUpdated();
 }
