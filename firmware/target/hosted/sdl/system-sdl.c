@@ -60,7 +60,6 @@ bool            lcd_display_redraw = true;  /* Used for player simulator */
 char            having_new_lcd = true;      /* Used for player simulator */
 bool            sim_alarm_wakeup = false;
 const char     *sim_root_dir = NULL;
-extern int      display_zoom;
 
 static SDL_Thread *evt_thread = NULL;
 

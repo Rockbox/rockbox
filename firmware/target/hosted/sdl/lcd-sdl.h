@@ -26,7 +26,6 @@
 #include "SDL.h"
 
 /* Default display zoom level */
-extern int display_zoom;
 extern SDL_Surface *gui_surface;
 
 void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
