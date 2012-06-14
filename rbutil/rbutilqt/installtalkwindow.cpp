@@ -52,11 +52,13 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
 
 void InstallTalkWindow::saveSettings(void)
 {
+    QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
     QModelIndexList si = ui.treeView->selectionModel()->selectedIndexes();
     QStringList foldersToTalk;
     for(int i = 0; i < si.size(); i++) {
         if(si.at(i).column() == 0) {
-            foldersToTalk.append(fsm->filePath(si.at(i)));
+            QString current = fsm->filePath(si.at(i));
+            foldersToTalk.append(current.remove(QRegExp("^" + mp)));
         }
     }
     RbSettings::setValue(RbSettings::TalkFolders, foldersToTalk);
@@ -118,6 +120,7 @@ void InstallTalkWindow::accept()
 
 void InstallTalkWindow::updateSettings(void)
 {
+    QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
     QString ttsName = RbSettings::value(RbSettings::Tts).toString();
     TTSBase* tts = TTSBase::getTTS(this,ttsName);
     if(tts->configOk())
@@ -129,7 +132,7 @@ void InstallTalkWindow::updateSettings(void)
 
     QStringList folders = RbSettings::value(RbSettings::TalkFolders).toStringList();
     for(int i = 0; i < folders.size(); ++i) {
-        QModelIndex mi = fsm->index(folders.at(i));
+        QModelIndex mi = fsm->index(mp + folders.at(i));
         ui.treeView->selectionModel()->select(mi, QItemSelectionModel::Select);
         // make sure all parent items are expanded.
         while((mi = mi.parent()) != QModelIndex()) {
