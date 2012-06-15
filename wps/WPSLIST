@@ -82,18 +82,23 @@ wps.800x480x16:  cabbiev2.800x480x16.wps
 wps.480x800x16:  cabbiev2.480x800x16.wps
 wps.320x480x16:  cabbiev2.320x480x16.wps
 wps.320x240x16:  cabbiev2.320x240x16.wps
-wps.128x128x16:  cabbiev2.128x128x16.wps
-wps.128x160x16:  cabbiev2.128x160x16.wps
-wps.132x80x16:   cabbiev2.132x80x16.wps
-wps.138x110x2:   cabbiev2.138x110x2.wps
+wps.240x400x16:  cabbiev2.240x400x16.wps
+wps.240x320x16:  cabbiev2.240x320x16.wps
+wps.220x176x16:  cabbiev2.220x176x16.wps
+wps.176x220x16:  cabbiev2.176x220x16.wps
+wps.176x132x16:  cabbiev2.176x132x16.wps
 wps.160x128x16:  cabbiev2.160x128x16.wps
 wps.160x128x2:   cabbiev2.160x128x2.wps
-wps.176x132x16:  cabbiev2.176x132x16.wps
-wps.176x220x16:  cabbiev2.176x220x16.wps
-wps.220x176x16:  cabbiev2.220x176x16.wps
-wps.240x320x16:  cabbiev2.240x320x16.wps
-wps.240x400x16:  cabbiev2.240x400x16.wps
+wps.160x128x1:   cabbiev2.160x128x1.wps
+wps.138x110x2:   cabbiev2.138x110x2.wps
+wps.128x128x16:  cabbiev2.128x128x16.wps
+wps.128x128x2:   cabbiev2.128x128x2.wps
+wps.128x160x16:  cabbiev2.128x160x16.wps
+wps.132x80x16:   cabbiev2.132x80x16.wps
 wps.128x96x2:    cabbiev2.128x96x2.wps
+wps.128x64x1:    cabbiev2.128x64x1.wps
+wps.112x64x1:    cabbiev2.112x64x1.wps
+wps.96x96x16:    cabbiev2.96x96x16.wps
 
 # Preferred font (including .fnt extension - leave blank for player):
 Font.800x480x16: 35-Adobe-Helvetica.fnt
@@ -110,13 +115,13 @@ Font.160x128x2:  12-Adobe-Helvetica.fnt
 Font.160x128x1:  12-Adobe-Helvetica.fnt
 Font.138x110x2:  12-Adobe-Helvetica.fnt
 Font.128x128x16: 12-Adobe-Helvetica.fnt
-Font.128x160x16: 12-Adobe-Helvetica.fnt
 Font.128x128x2:  12-Adobe-Helvetica.fnt
+Font.128x160x16: 12-Adobe-Helvetica.fnt
 Font.132x80x16:  11-Sazanami-Mincho.fnt
+Font.128x96x2:   12-Adobe-Helvetica.fnt
 Font.128x64x1:   08-Rockfont.fnt
 Font.112x64x1:   08-Rockfont.fnt
 Font.96x96x16:   08-Rockfont.fnt
-Font.128x96x2:   12-Adobe-Helvetica.fnt
 
 #misc settings that should be ignored on grayscale targets
 foreground color: CCCCCC
