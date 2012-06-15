@@ -49,7 +49,7 @@ static struct viewport list_text[NB_SCREENS], title_text[NB_SCREENS];
 
 #ifdef HAVE_TOUCHSCREEN
 static int y_offset;
-static bool hide_selection = true;
+static bool hide_selection;
 #endif
 
 int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
@@ -719,7 +719,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
 
     /* some defaults before running the state machine */
     recurse = false;
-    hide_selection = true;
+    hide_selection = false;
 
     switch (scroll_mode)
     {
@@ -753,9 +753,6 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                         scroll_mode = SCROLL_SWIPE;
                     else if (click_loc & SCROLLBAR)
                         scroll_mode = SCROLL_BAR;
-
-                    /* only show selection bar if clicking the list */
-                    hide_selection = click_loc & (SCROLLBAR|TITLE);
                 }
                 else if (action == BUTTON_REPEAT)
                 {
@@ -794,6 +791,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
             /* when swipe scrolling, we accept outside presses as well and
              * grab the entire screen (i.e. click_loc does not matter) */
             int diff = adj_y - last_y;
+            hide_selection = true;
             kinetic_stats_collect(diff);
             if (swipe_scroll(list, diff))
             {
@@ -801,7 +799,10 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                 if ((action & BUTTON_REL))
                 {
                     if (kinetic_setup_scroll(list))
+                    {
+                        hide_selection = true;
                         scroll_mode = SCROLL_KINETIC;
+                    }
                     else
                         scroll_mode = SCROLL_NONE;
                 }
@@ -837,6 +838,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
         }
         case SCROLL_BAR:
         {
+            hide_selection = true;
             /* similarly to swipe scroll, using the scrollbar grabs
              * focus so the click location is irrelevant */
             scrollbar_scroll(list, adj_y);
