@@ -151,7 +151,7 @@
         <item row="0" column="1">
          <widget class="QLabel" name="labelComplete">
           <property name="text">
-           <string>&lt;b&gt;Complete Installation&lt;/b&gt;&lt;br/&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Complete Installation&lt;/span&gt;&lt;br/&gt;This installs the bootloader, the most recent release and the extras package. This is the recommended method for new installations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -181,7 +181,7 @@
         <item row="1" column="1">
          <widget class="QLabel" name="labelSmall">
           <property name="text">
-           <string>&lt;b&gt;Minimal installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don't want the extras package, choose this option.</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Minimal installation&lt;/span&gt;&lt;br/&gt;This installs bootloader and the most recent release of Rockbox. If you don't want the extras package, choose this option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -370,7 +370,7 @@
         <item row="1" column="1">
          <widget class="QLabel" name="labelThemes">
           <property name="text">
-           <string>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos;s look can be customized by themes. You can choose and install several officially distributed themes.</string>
+           <string>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox's look can be customized by themes. You can choose and install several officially distributed themes.</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
