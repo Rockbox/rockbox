@@ -145,7 +145,6 @@ void usb_acknowledge(long id)
 
 void usb_wait_for_disconnect(struct event_queue *q)
 {
-#ifdef USB_FULL_INIT
     struct queue_event ev;
 
     /* Don't return until we get SYS_USB_DISCONNECTED */
@@ -155,6 +154,4 @@ void usb_wait_for_disconnect(struct event_queue *q)
         if(ev.id == SYS_USB_DISCONNECTED)
             return;
     }
-#endif /* USB_FULL_INIT */
-    (void)q;
 }
