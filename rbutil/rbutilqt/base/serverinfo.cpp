@@ -56,7 +56,10 @@ void ServerInfo::readBuildInfo(QString file)
     setValue(ServerInfo::BleedingDate, date.toString(Qt::ISODate));
 
     info.beginGroup("release");
-    QStringList keys = info.allKeys();
+    QStringList releasekeys = info.allKeys();
+    info.endGroup();
+    info.beginGroup("release-candidate");
+    QStringList rckeys = info.allKeys();
     info.endGroup();
 
     // get base platforms, handle variants with platforms in the loop
@@ -75,13 +78,13 @@ void ServerInfo::readBuildInfo(QString file)
         // - <target>=<version>. In this case the URL is constructed.
         // - <target>=<version>,<url>.
         info.beginGroup("release");
-        if(keys.contains(platforms.at(i))) {
+        if(releasekeys.contains(platforms.at(i))) {
             QStringList entry = info.value(platforms.at(i)).toStringList();
             releaseVersion = entry.at(0);
             if(entry.size() > 1) {
                 releaseUrl = entry.at(1);
             }
-            else {
+            else if(!releaseVersion.isEmpty()) {
                 // construct release download URL
                 releaseUrl = releaseBaseUrl;
                 releaseUrl.replace("%MODEL%", platforms.at(i));
@@ -91,10 +94,10 @@ void ServerInfo::readBuildInfo(QString file)
         info.endGroup();
         // "release-candidate" section currently only support the 2nd format.
         info.beginGroup("release-candidate");
-        if(keys.contains(platforms.at(i))) {
+        if(rckeys.contains(platforms.at(i))) {
             QStringList entry = info.value(platforms.at(i)).toStringList();
-            relCandidateVersion = entry.at(0);
             if(entry.size() > 1) {
+                relCandidateVersion = entry.at(0);
                 relCandidateUrl = entry.at(1);
             }
         }
@@ -183,7 +186,7 @@ QVariant ServerInfo::platformValue(QString platform, enum ServerInfos info)
     s.replace(":platform:", platform);
     QString d = ServerInfoList[i].def;
     d.replace(":platform:", platform);
-    qDebug() << "[ServerInfo] GET" << s << serverInfos.value(s, d).toString();
+    qDebug() << "[ServerInfo] GET:" << s << serverInfos.value(s, d).toString();
     return serverInfos.value(s, d);
 }
 
