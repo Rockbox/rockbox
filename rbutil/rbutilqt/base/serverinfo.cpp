@@ -71,13 +71,22 @@ void ServerInfo::readBuildInfo(QString file)
         QString releaseUrl;
         QString relCandidateVersion;
         QString relCandidateUrl;
+        // support two formats for "release" sections:
+        // - <target>=<version>. In this case the URL is constructed.
+        // - <target>=<version>,<url>.
         info.beginGroup("release");
         if(keys.contains(platforms.at(i))) {
-            releaseVersion = info.value(platforms.at(i)).toString();
-            // construct release download URL
-            releaseUrl = releaseBaseUrl;
-            releaseUrl.replace("%MODEL%", platforms.at(i));
-            releaseUrl.replace("%RELVERSION%", releaseVersion);
+            QStringList entry = info.value(platforms.at(i)).toStringList();
+            releaseVersion = entry.at(0);
+            if(entry.size() > 1) {
+                releaseUrl = entry.at(1);
+            }
+            else {
+                // construct release download URL
+                releaseUrl = releaseBaseUrl;
+                releaseUrl.replace("%MODEL%", platforms.at(i));
+                releaseUrl.replace("%RELVERSION%", releaseVersion);
+            }
         }
         info.endGroup();
         // "release-candidate" section currently only support the 2nd format.
@@ -91,6 +100,11 @@ void ServerInfo::readBuildInfo(QString file)
         }
         info.endGroup();
 
+        // "bleeding" section (development) does not provide individual
+        // information but only a global revision value.
+        QString develUrl = develBaseUrl;
+        develUrl.replace("%MODEL%", platforms.at(i));
+        develUrl.replace("%RELVERSION%", developmentRevision);
 
         info.beginGroup("status");
         QString status = tr("Unknown");
@@ -109,11 +123,6 @@ void ServerInfo::readBuildInfo(QString file)
                 break;
         }
         info.endGroup();
-        // release and development URLs are not provided by the server but
-        // constructed.
-        QString develUrl = develBaseUrl;
-        develUrl.replace("%MODEL%", platforms.at(i));
-        develUrl.replace("%RELVERSION%", developmentRevision);
         // set variants (if any)
         for(int j = 0; j < variants.size(); ++j) {
             setPlatformValue(variants.at(j), ServerInfo::CurStatus, status);
