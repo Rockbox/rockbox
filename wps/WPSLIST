@@ -193,6 +193,7 @@ ui viewport: -
 </main>
 
 <remote>
+rwps.128x96x2: cabbiev2.128x96x2.wps
 rwps.128x64x1: cabbiev2.128x64x1.wps
 Font.128x64x1: 08-Rockfont.fnt
 statusbar: top
