@@ -31,6 +31,7 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
     ui.setupUi(this);
 
     connect(ui.radioStable, SIGNAL(toggled(bool)), this, SLOT(setDetailsStable(bool)));
+    connect(ui.radioCandidate, SIGNAL(toggled(bool)), this, SLOT(setDetailsCandidate(bool)));
     connect(ui.radioCurrent, SIGNAL(toggled(bool)), this, SLOT(setDetailsCurrent(bool)));
     connect(ui.changeBackup, SIGNAL(pressed()), this, SLOT(changeBackupPath()));
     connect(ui.backup, SIGNAL(stateChanged(int)), this, SLOT(backupCheckboxChanged(int)));
@@ -39,8 +40,7 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
     RockboxInfo rbinfo(RbSettings::value(RbSettings::Mountpoint).toString());
     QString version = rbinfo.version();
 
-    if(version != "")
-    {
+    if(version != "") {
         ui.Backupgroup->show();
         m_backupName = RbSettings::value(RbSettings::Mountpoint).toString();
         if(!m_backupName.endsWith("/")) m_backupName += "/";
@@ -48,12 +48,10 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
         // for some reason the label doesn't return its final size yet.
         // Delay filling ui.backupLocation until the checkbox is changed.
     }
-    else
-    {
+    else {
         ui.Backupgroup->hide();
     }
     backupCheckboxChanged(Qt::Unchecked);
-
 
     if(ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty()) {
         ui.radioStable->setEnabled(false);
@@ -61,11 +59,18 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
 
     // try to use the old selection first. If no selection has been made
     // in the past, use a preselection based on released status.
-    if(RbSettings::value(RbSettings::Build).toString() == "stable"
-        && !ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
+    QString lastinstalled = RbSettings::value(RbSettings::Build).toString();
+    if(lastinstalled == "stable"
+        && !ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty()) {
         ui.radioStable->setChecked(true);
-    else if(RbSettings::value(RbSettings::Build).toString() == "current")
+    }
+    else if(lastinstalled == "rc"
+            && !ServerInfo::value(ServerInfo::RelCandidateVersion).toString().isEmpty()) {
+        ui.radioCandidate->setChecked(true);
+    }
+    else if(lastinstalled == "current") {
         ui.radioCurrent->setChecked(true);
+    }
     else if(!ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty()) {
         ui.radioStable->setChecked(true);
         ui.radioStable->setEnabled(true);
@@ -74,6 +79,9 @@ InstallWindow::InstallWindow(QWidget *parent) : QDialog(parent)
         ui.radioCurrent->setChecked(true);
         ui.radioStable->setEnabled(false);
         ui.radioStable->setChecked(false);
+    }
+    if(ServerInfo::value(ServerInfo::RelCandidateVersion).toString().isEmpty()) {
+        ui.radioCandidate->setEnabled(false);
     }
 
 }
@@ -115,6 +123,7 @@ void InstallWindow::backupCheckboxChanged(int state)
 
 void InstallWindow::accept()
 {
+    QString url;
     logger = new ProgressLoggerGui(this);
     logger->show();
     QString mountPoint = RbSettings::value(RbSettings::Mountpoint).toString();
@@ -128,14 +137,19 @@ void InstallWindow::accept()
 
     QString myversion;
     if(ui.radioStable->isChecked()) {
-        file = ServerInfo::value(ServerInfo::CurReleaseUrl).toString();
+        url = ServerInfo::value(ServerInfo::CurReleaseUrl).toString();
         RbSettings::setValue(RbSettings::Build, "stable");
         myversion = ServerInfo::value(ServerInfo::CurReleaseVersion).toString();
     }
     else if(ui.radioCurrent->isChecked()) {
-        file = ServerInfo::value(ServerInfo::CurDevelUrl).toString();
+        url = ServerInfo::value(ServerInfo::CurDevelUrl).toString();
         RbSettings::setValue(RbSettings::Build, "current");
         myversion = "r" + ServerInfo::value(ServerInfo::BleedingRevision).toString();
+    }
+    else if(ui.radioCandidate->isChecked()) {
+        url = ServerInfo::value(ServerInfo::RelCandidateUrl).toString();
+        RbSettings::setValue(RbSettings::Build, "rc");
+        myversion = ServerInfo::value(ServerInfo::RelCandidateVersion).toString();
     }
     else {
         qDebug() << "[Install] no build selected -- this shouldn't happen";
@@ -192,7 +206,7 @@ void InstallWindow::accept()
 
     //! install build
     installer = new ZipInstaller(this);
-    installer->setUrl(file);
+    installer->setUrl(url);
     installer->setLogSection("Rockbox (Base)");
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool()
         && !ui.checkBoxCache->isChecked())
@@ -267,6 +281,25 @@ void InstallWindow::setDetailsStable(bool show)
             ui.labelNote->setText(tr("<b>Note:</b> "
             "The lastest stable version is %1.")
                     .arg(ServerInfo::value(ServerInfo::CurReleaseVersion).toString()));
+        else ui.labelNote->setText("");
+    }
+}
+
+
+void InstallWindow::setDetailsCandidate(bool show)
+{
+    if(show) {
+        ui.labelDetails->setText(
+            tr("This is the release candidate for the next Rockbox version."
+                "<br/>A release candidate is intended for testing. It will "
+                "receive bugfixes and eventually become the next stable "
+                "release of Rockbox. If you want to help testing Rockbox and "
+                "improve the next release install the release candidate."));
+
+        if(!ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty())
+            ui.labelNote->setText(tr("<b>Note:</b> "
+            "The lastest release candidate is %1.")
+                    .arg(ServerInfo::value(ServerInfo::RelCandidateVersion).toString()));
         else ui.labelNote->setText("");
     }
 }

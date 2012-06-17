@@ -41,7 +41,6 @@ class InstallWindow : public QDialog
         ProgressLoggerGui* logger;
         QHttp *download;
         QFile *target;
-        QString file;
         ZipInstaller* installer;
         QString m_backupName;
         void resizeEvent(QResizeEvent*);
@@ -53,6 +52,7 @@ class InstallWindow : public QDialog
     private slots:
         void setDetailsCurrent(bool);
         void setDetailsStable(bool);
+        void setDetailsCandidate(bool);
         void done(bool);
         void changeBackupPath(void);
         void backupCheckboxChanged(int state);

@@ -54,6 +54,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QRadioButton" name="radioCandidate" >
+        <property name="text" >
+         <string>Release &amp;Candidate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QRadioButton" name="radioCurrent" >
         <property name="text" >
          <string>&amp;Development build</string>
