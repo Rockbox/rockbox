@@ -36,6 +36,8 @@ class ServerInfo : public QObject
             CurDevelUrl,
             BleedingRevision,
             BleedingDate,
+            RelCandidateVersion,
+            RelCandidateUrl,
         };
 
         //! read in buildinfo file

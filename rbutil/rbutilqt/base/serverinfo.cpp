@@ -32,6 +32,8 @@ const static struct {
 } ServerInfoList[] = {
     { ServerInfo::CurReleaseVersion,    ":platform:/releaseversion", "" },
     { ServerInfo::CurReleaseUrl,        ":platform:/releaseurl",     "" },
+    { ServerInfo::RelCandidateVersion,  ":platform:/rcversion",      "" },
+    { ServerInfo::RelCandidateUrl,      ":platform:/rcurl",          "" },
     { ServerInfo::CurStatus,            ":platform:/status",         "Unknown" },
     { ServerInfo::BleedingRevision,     "bleedingrev",               "" },
     { ServerInfo::BleedingDate,         "bleedingdate",              "" },
@@ -67,6 +69,8 @@ void ServerInfo::readBuildInfo(QString file)
         variants = SystemInfo::platforms(SystemInfo::PlatformVariantDisabled, platforms.at(i));
         QString releaseVersion;
         QString releaseUrl;
+        QString relCandidateVersion;
+        QString relCandidateUrl;
         info.beginGroup("release");
         if(keys.contains(platforms.at(i))) {
             releaseVersion = info.value(platforms.at(i)).toString();
@@ -76,6 +80,17 @@ void ServerInfo::readBuildInfo(QString file)
             releaseUrl.replace("%RELVERSION%", releaseVersion);
         }
         info.endGroup();
+        // "release-candidate" section currently only support the 2nd format.
+        info.beginGroup("release-candidate");
+        if(keys.contains(platforms.at(i))) {
+            QStringList entry = info.value(platforms.at(i)).toStringList();
+            relCandidateVersion = entry.at(0);
+            if(entry.size() > 1) {
+                relCandidateUrl = entry.at(1);
+            }
+        }
+        info.endGroup();
+
 
         info.beginGroup("status");
         QString status = tr("Unknown");
@@ -105,6 +120,10 @@ void ServerInfo::readBuildInfo(QString file)
             if(!releaseUrl.isEmpty()) {
                 setPlatformValue(variants.at(j), ServerInfo::CurReleaseVersion, releaseVersion);
                 setPlatformValue(variants.at(j), ServerInfo::CurReleaseUrl, releaseUrl);
+            }
+            if(!relCandidateUrl.isEmpty()) {
+                setPlatformValue(variants.at(j), ServerInfo::RelCandidateVersion, relCandidateVersion);
+                setPlatformValue(variants.at(j), ServerInfo::RelCandidateUrl, relCandidateUrl);
             }
             setPlatformValue(variants.at(j), ServerInfo::CurDevelUrl, develUrl);
         }
