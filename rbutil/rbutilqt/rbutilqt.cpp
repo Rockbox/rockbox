@@ -529,9 +529,7 @@ void RbUtilQt::installBtn()
 
 bool RbUtilQt::installAuto()
 {
-    QString file = SystemInfo::value(SystemInfo::ReleaseUrl).toString();
-    file.replace("%MODEL%", SystemInfo::value(SystemInfo::CurBuildserverModel).toString());
-    file.replace("%RELVERSION%", ServerInfo::value(ServerInfo::CurReleaseVersion).toString());
+    QString file = ServerInfo::value(ServerInfo::CurReleaseUrl).toString();
 
     // check installed Version and Target
     QString warning = Utils::checkEnvironment(false);

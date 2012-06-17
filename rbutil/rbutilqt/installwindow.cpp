@@ -118,7 +118,7 @@ void InstallWindow::accept()
     logger = new ProgressLoggerGui(this);
     logger->show();
     QString mountPoint = RbSettings::value(RbSettings::Mountpoint).toString();
-    qDebug() << "[Install] mountpoint:" << RbSettings::value(RbSettings::Mountpoint).toString();
+    qDebug() << "[Install] mountpoint:" << mountPoint;
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
@@ -127,14 +127,13 @@ void InstallWindow::accept()
     }
 
     QString myversion;
-    QString buildname = SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
     if(ui.radioStable->isChecked()) {
-        file = SystemInfo::value(SystemInfo::ReleaseUrl).toString();
+        file = ServerInfo::value(ServerInfo::CurReleaseUrl).toString();
         RbSettings::setValue(RbSettings::Build, "stable");
         myversion = ServerInfo::value(ServerInfo::CurReleaseVersion).toString();
     }
     else if(ui.radioCurrent->isChecked()) {
-        file = SystemInfo::value(SystemInfo::BleedingUrl).toString();
+        file = ServerInfo::value(ServerInfo::CurDevelUrl).toString();
         RbSettings::setValue(RbSettings::Build, "current");
         myversion = "r" + ServerInfo::value(ServerInfo::BleedingRevision).toString();
     }
@@ -142,9 +141,6 @@ void InstallWindow::accept()
         qDebug() << "[Install] no build selected -- this shouldn't happen";
         return;
     }
-    file.replace("%MODEL%", buildname);
-    file.replace("%RELVERSION%", ServerInfo::value(ServerInfo::CurReleaseVersion).toString());
-
     RbSettings::sync();
 
     QString warning = Utils::checkEnvironment(false);

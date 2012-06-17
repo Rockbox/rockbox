@@ -31,20 +31,27 @@ const static struct {
     const char* def;
 } ServerInfoList[] = {
     { ServerInfo::CurReleaseVersion,    ":platform:/releaseversion", "" },
+    { ServerInfo::CurReleaseUrl,        ":platform:/releaseurl",     "" },
     { ServerInfo::CurStatus,            ":platform:/status",         "Unknown" },
     { ServerInfo::BleedingRevision,     "bleedingrev",               "" },
     { ServerInfo::BleedingDate,         "bleedingdate",              "" },
+    { ServerInfo::CurDevelUrl,          ":platform:/develurl",       "" },
 };
 
 QMap<QString, QVariant> ServerInfo::serverInfos;
 
 void ServerInfo::readBuildInfo(QString file)
 {
+    QString releaseBaseUrl = SystemInfo::value(SystemInfo::ReleaseUrl).toString();
+    QString develBaseUrl = SystemInfo::value(SystemInfo::BleedingUrl).toString();
+    QString manualBaseUrl = SystemInfo::value(SystemInfo::ManualUrl).toString();
+
     QSettings info(file, QSettings::IniFormat);
 
-    setValue(ServerInfo::BleedingRevision,info.value("bleeding/rev"));
+    QString developmentRevision = info.value("bleeding/rev").toString();
+    setValue(ServerInfo::BleedingRevision, developmentRevision);
     QDateTime date = QDateTime::fromString(info.value("bleeding/timestamp").toString(), "yyyyMMddThhmmssZ");
-    setValue(ServerInfo::BleedingDate,date.toString(Qt::ISODate));
+    setValue(ServerInfo::BleedingDate, date.toString(Qt::ISODate));
 
     info.beginGroup("release");
     QStringList keys = info.allKeys();
@@ -58,13 +65,18 @@ void ServerInfo::readBuildInfo(QString file)
         // them the same time.
         QStringList variants;
         variants = SystemInfo::platforms(SystemInfo::PlatformVariantDisabled, platforms.at(i));
-        QVariant release;
+        QString releaseVersion;
+        QString releaseUrl;
         info.beginGroup("release");
         if(keys.contains(platforms.at(i))) {
-            release = info.value(platforms.at(i));
+            releaseVersion = info.value(platforms.at(i)).toString();
+            // construct release download URL
+            releaseUrl = releaseBaseUrl;
+            releaseUrl.replace("%MODEL%", platforms.at(i));
+            releaseUrl.replace("%RELVERSION%", releaseVersion);
         }
-
         info.endGroup();
+
         info.beginGroup("status");
         QString status = tr("Unknown");
         switch(info.value(platforms.at(i)).toInt())
@@ -82,10 +94,19 @@ void ServerInfo::readBuildInfo(QString file)
                 break;
         }
         info.endGroup();
+        // release and development URLs are not provided by the server but
+        // constructed.
+        QString develUrl = develBaseUrl;
+        develUrl.replace("%MODEL%", platforms.at(i));
+        develUrl.replace("%RELVERSION%", developmentRevision);
         // set variants (if any)
         for(int j = 0; j < variants.size(); ++j) {
             setPlatformValue(variants.at(j), ServerInfo::CurStatus, status);
-            setPlatformValue(variants.at(j), ServerInfo::CurReleaseVersion, release);
+            if(!releaseUrl.isEmpty()) {
+                setPlatformValue(variants.at(j), ServerInfo::CurReleaseVersion, releaseVersion);
+                setPlatformValue(variants.at(j), ServerInfo::CurReleaseUrl, releaseUrl);
+            }
+            setPlatformValue(variants.at(j), ServerInfo::CurDevelUrl, develUrl);
         }
     }
 }

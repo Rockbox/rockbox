@@ -32,6 +32,8 @@ class ServerInfo : public QObject
         enum ServerInfos {
             CurReleaseVersion,
             CurStatus,
+            CurReleaseUrl,
+            CurDevelUrl,
             BleedingRevision,
             BleedingDate,
         };
