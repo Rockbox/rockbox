@@ -50,12 +50,30 @@
 #include "playlist_menu.h"
 #include "yesno.h"
 
-/* Maximum number of tracks we can have loaded at one time */
-#define MAX_PLAYLIST_ENTRIES 200
+#define INITIAL_AVERAGE_PATH_LENGTH 50
+
+/* This is used by search_playlist(), and this many
+ * integers are allocated on the stack */
+#define MAX_STACK_PLAYLIST_ENTRIES 200
 
 /* The number of items between the selected one and the end/start of
  * the buffer under which the buffer must reload */
 #define MIN_BUFFER_MARGIN (screens[0].getnblines()+1)
+
+/* The percentage of entries in the forward direction. You probably
+ * want this to be > 50. Very high values could be noticeable when
+ * changing scrolling direction */
+#define FORWARD_PERCENTAGE 80
+
+/* LIMIT_MAXIMUM_PLAYLIST_ENTRIES:
+ * Uncomment this if you want to artificially limit the number
+ * of playlist entries. Best results are achieved if the playlist
+ * fits into memory, with this being undefined, or a high value.
+ * 
+ * For large playlists, that don't fit into memory, high values
+ * produce a more noticeable jerkyness, (longer waits). With small
+ * values scrolling is slightly smoother.
+//#define LIMIT_MAXIMUM_PLAYLIST_ENTRIES 200
 
 /* Information about a specific track */
 struct playlist_entry {
@@ -75,7 +93,10 @@ enum direction
 struct playlist_buffer
 {
     char *name_buffer;        /* Buffer used to store track names */
-    int buffer_size;          /* Size of name buffer */
+    int name_buffer_size;          /* Size of name buffer */
+    int just_struct_size;     /* Size of the struct, including tracks[] */
+    int full_struct_size;     /* Size of the struct, including tracks[], AND the name buffer
+                                 following it in memory */
 
     int first_index;          /* Real index of first track loaded inside
                                  the buffer */
@@ -85,8 +106,9 @@ struct playlist_buffer
                                  the buffer has a real index < to the
                                  real index of the the first track)*/
 
-    struct playlist_entry tracks[MAX_PLAYLIST_ENTRIES];
     int num_loaded;           /* Number of track entries loaded in buffer */
+    int num_allocated;        /* Number of track entries allocated in this struct */
+    struct playlist_entry tracks[];
 };
 
 /* Global playlist viewer settings */
@@ -99,7 +121,7 @@ struct playlist_viewer {
                                    or -1 if nothing is currently being moved */
     int moving_playlist_index;  /* Playlist-relative index (as opposed to 
                                    viewer-relative index) of moving track    */
-    struct playlist_buffer buffer;
+    struct playlist_buffer *buffer;
 };
 
 static struct playlist_viewer  viewer;
@@ -107,8 +129,6 @@ static struct playlist_viewer  viewer;
 /* Used when viewing playlists on disk */
 static struct playlist_info temp_playlist;
 
-static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
-                                 int names_buffer_size);
 static void playlist_buffer_load_entries(struct playlist_buffer * pb, int index,
                                          enum direction direction);
 static int playlist_entry_load(struct playlist_entry *entry, int index,
@@ -116,6 +136,8 @@ static int playlist_entry_load(struct playlist_entry *entry, int index,
 
 static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer *pb,
                                                          int index);
+
+static void recalculate_max_playlist_entries(struct playlist_buffer *pb, int average_path_length);
 
 static bool playlist_viewer_init(struct playlist_viewer * viewer,
                                  const char* filename, bool reload);
@@ -127,15 +149,6 @@ static void format_line(const struct playlist_entry* track, char* str,
 static bool update_playlist(bool force);
 static int  onplay_menu(int index);
 
-static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
-                                 int names_buffer_size)
-{
-    pb->name_buffer = names_buffer;
-    pb->buffer_size = names_buffer_size;
-    pb->first_index = 0;
-    pb->num_loaded = 0;
-}
-
 /*
  * Loads the entries following 'index' in the playlist buffer
  */
@@ -144,12 +157,12 @@ static void playlist_buffer_load_entries(struct playlist_buffer *pb, int index,
 {
     int num_entries = viewer.num_tracks;
     char* p = pb->name_buffer;
-    int remaining = pb->buffer_size;
+    int remaining = pb->name_buffer_size;
     int i;
 
     pb->first_index = index;
-    if (num_entries > MAX_PLAYLIST_ENTRIES)
-        num_entries = MAX_PLAYLIST_ENTRIES;
+    if (num_entries > pb->num_allocated)
+        num_entries = pb->num_allocated;
 
     for (i = 0; i < num_entries; i++)
     {
@@ -173,6 +186,7 @@ static void playlist_buffer_load_entries(struct playlist_buffer *pb, int index,
     }
     pb->direction = direction;
     pb->num_loaded = i;
+    recalculate_max_playlist_entries(pb, MAX(20,MIN(120,(pb->name_buffer_size - remaining) / pb->num_loaded)));
 }
 
 static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
@@ -181,7 +195,8 @@ static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
 {
     if (direction == FORWARD)
     {
-        int min_start = reference_track-2*screens[0].getnblines();
+        int min_start = reference_track -
+              (MIN(pb->num_allocated,viewer.num_tracks) * (100 - FORWARD_PERCENTAGE)) / 100;
         while (min_start < 0)
             min_start += viewer.num_tracks;
         min_start %= viewer.num_tracks;
@@ -189,7 +204,8 @@ static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
     }
     else
     {
-        int max_start = reference_track+2*screens[0].getnblines();
+        int max_start = reference_track +
+              (MIN(pb->num_allocated,viewer.num_tracks) * (100 - FORWARD_PERCENTAGE)) / 100;
         max_start %= viewer.num_tracks;
         playlist_buffer_load_entries(pb, max_start, BACKWARD);
     }
@@ -271,12 +287,12 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
     // In some cases, when scrolling really fast, it could happen that a reqested track
     // has not been pre-loaded
     if (buffer_index < 0) {
-        playlist_buffer_load_entries_screen(&viewer.buffer,
+        playlist_buffer_load_entries_screen(viewer.buffer,
                     pb->direction == FORWARD ? BACKWARD : FORWARD,
                     index);
 
     } else if (buffer_index >= pb->num_loaded) {
-        playlist_buffer_load_entries_screen(&viewer.buffer,
+        playlist_buffer_load_entries_screen(viewer.buffer,
                     pb->direction,
                     index);
     }
@@ -294,6 +310,21 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
     }
     return &(pb->tracks[buffer_index]);
 }
+
+static void recalculate_max_playlist_entries(struct playlist_buffer *pb, int average_path_length) {
+    int average_entry_length = average_path_length + sizeof(struct playlist_entry);
+    int max_playlist_entries = (pb->full_struct_size - sizeof(struct playlist_buffer))/ average_entry_length;
+#ifdef LIMIT_MAXIMUM_PLAYLIST_ENTRIES
+    max_playlist_entries = MIN(max_playlist_entries, LIMIT_MAXIMUM_PLAYLIST_ENTRIES);
+#endif
+    pb->num_allocated = max_playlist_entries;
+    pb->just_struct_size = sizeof(struct playlist_buffer) +
+        sizeof(struct playlist_entry) * max_playlist_entries;
+    
+    pb->name_buffer = ((char *)pb) + pb->just_struct_size;
+    pb->name_buffer_size = pb->full_struct_size - pb->just_struct_size;
+}
+
 
 /* Initialize the playlist viewer. */
 static bool playlist_viewer_init(struct playlist_viewer * viewer,
@@ -369,7 +400,13 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         buffer += index_buffer_size;
         buffer_size -= index_buffer_size;
     }
-    playlist_buffer_init(&viewer->buffer, buffer, buffer_size);
+
+    viewer->buffer = (struct playlist_buffer *) buffer;
+    viewer->buffer->full_struct_size = buffer_size;
+
+    recalculate_max_playlist_entries(viewer->buffer, INITIAL_AVERAGE_PATH_LENGTH);
+    viewer->buffer->first_index = 0;
+    viewer->buffer->num_loaded = 0;
 
     viewer->moving_track = -1;
     viewer->moving_playlist_index = -1;
@@ -451,9 +488,9 @@ static bool update_playlist(bool force)
             global_status.resume_offset = -1;
             return false;
         }
-        playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD,
+        playlist_buffer_load_entries_screen(viewer.buffer, FORWARD,
                           viewer.selected_track);
-        if (viewer.buffer.num_loaded <= 0)
+        if (viewer.buffer->num_loaded <= 0)
         {
             global_status.resume_index = -1;
             global_status.resume_offset = -1;
@@ -470,7 +507,7 @@ static int onplay_menu(int index)
 {
     int result, ret = 0;
     struct playlist_entry * current_track =
-        playlist_buffer_get_track(&viewer.buffer, index);
+        playlist_buffer_get_track(viewer.buffer, index);
     MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL, 
                         ID2P(LANG_CURRENT_PLAYLIST), ID2P(LANG_CATALOG),
                         ID2P(LANG_REMOVE), ID2P(LANG_MOVE), ID2P(LANG_SHUFFLE),
@@ -512,7 +549,7 @@ static int onplay_menu(int index)
                        /* Start playing new track except if it's the lasttrack
                           track in the playlist and repeat mode is disabled */
                         current_track =
-                            playlist_buffer_get_track(&viewer.buffer, index);
+                            playlist_buffer_get_track(viewer.buffer, index);
                         if (current_track->display_index!=viewer.num_tracks ||
                             global_settings.repeat_mode == REPEAT_ALL)
                         {
@@ -582,7 +619,7 @@ static const char* playlist_callback_name(int selected_item,
 
     int track_num = get_track_num(local_viewer, selected_item);
     struct playlist_entry *track =
-        playlist_buffer_get_track(&(local_viewer->buffer), track_num);
+        playlist_buffer_get_track(local_viewer->buffer, track_num);
 
     format_line(track, buffer, buffer_len);
 
@@ -597,7 +634,7 @@ static enum themable_icons playlist_callback_icons(int selected_item,
 
     int track_num = get_track_num(local_viewer, selected_item);
     struct playlist_entry *track =
-        playlist_buffer_get_track(&(local_viewer->buffer), track_num);
+        playlist_buffer_get_track(local_viewer->buffer, track_num);
 
     if (track->index == local_viewer->current_playing_track)
     {
@@ -624,7 +661,7 @@ static int playlist_callback_voice(int selected_item, void *data)
 
     int track_num = get_track_num(local_viewer, selected_item);
     struct playlist_entry *track =
-        playlist_buffer_get_track(&(local_viewer->buffer), track_num);
+        playlist_buffer_get_track(local_viewer->buffer, track_num);
 
     bool enqueue = false;
 
@@ -702,10 +739,10 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
         viewer.selected_track=gui_synclist_get_sel_pos(&playlist_lists);
         if (res)
         {
-            bool reload = playlist_buffer_needs_reload(&viewer.buffer,
+            bool reload = playlist_buffer_needs_reload(viewer.buffer,
                     viewer.selected_track);
             if (reload)
-                playlist_buffer_load_entries_screen(&viewer.buffer,
+                playlist_buffer_load_entries_screen(viewer.buffer,
                     button == ACTION_STD_NEXT ? FORWARD : BACKWARD,
                     viewer.selected_track);
             if (reload || viewer.moving_track >= 0)
@@ -734,7 +771,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
             case ACTION_STD_OK:
             {
                 struct playlist_entry * current_track =
-                            playlist_buffer_get_track(&viewer.buffer,
+                            playlist_buffer_get_track(viewer.buffer,
                                                       viewer.selected_track);
 
                 if (viewer.moving_track >= 0)
@@ -852,7 +889,7 @@ bool search_playlist(void)
     char search_str[32] = "";
     bool ret = false, exit = false;
     int i, playlist_count;
-    int found_indicies[MAX_PLAYLIST_ENTRIES];
+    int found_indicies[MAX_STACK_PLAYLIST_ENTRIES];
     int found_indicies_count = 0, last_found_count = -1;
     int button;
     struct gui_synclist playlist_lists;
@@ -868,7 +905,7 @@ bool search_playlist(void)
     cpu_boost(true);
 
     for (i = 0; i < playlist_count &&
-        found_indicies_count < MAX_PLAYLIST_ENTRIES; i++)
+        found_indicies_count < MAX_STACK_PLAYLIST_ENTRIES; i++)
     {
         if (found_indicies_count != last_found_count)
         {
