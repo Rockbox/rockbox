@@ -35,6 +35,9 @@ const static struct {
     { ServerInfo::RelCandidateVersion,  ":platform:/rcversion",      "" },
     { ServerInfo::RelCandidateUrl,      ":platform:/rcurl",          "" },
     { ServerInfo::CurStatus,            ":platform:/status",         "Unknown" },
+    { ServerInfo::ManualPdfUrl,         ":platform:/manual_pdf",     "" },
+    { ServerInfo::ManualHtmlUrl,        ":platform:/manual_html",    "" },
+    { ServerInfo::ManualZipUrl,         ":platform:/manual_zip",     "" },
     { ServerInfo::BleedingRevision,     "bleedingrev",               "" },
     { ServerInfo::BleedingDate,         "bleedingdate",              "" },
     { ServerInfo::CurDevelUrl,          ":platform:/develurl",       "" },
@@ -126,6 +129,28 @@ void ServerInfo::readBuildInfo(QString file)
                 break;
         }
         info.endGroup();
+
+        // manual URLs
+        QString manualPdfUrl = manualBaseUrl;
+        QString manualHtmlUrl = manualBaseUrl;
+        QString manualZipUrl = manualBaseUrl;
+
+        QString buildservermodel = SystemInfo::platformValue(platforms.at(i),
+                SystemInfo::CurBuildserverModel).toString();
+        QString modelman = SystemInfo::platformValue(platforms.at(i),
+                SystemInfo::CurManual).toString();
+        QString manualBaseName = "rockbox-";
+
+        if(modelman.isEmpty()) manualBaseName += buildservermodel;
+        else manualBaseName += modelman;
+
+        manualPdfUrl.replace("%EXTENSION%", "pdf");
+        manualPdfUrl.replace("%MANUALBASENAME%", manualBaseName);
+        manualHtmlUrl.replace("%EXTENSION%", "html");
+        manualHtmlUrl.replace("%MANUALBASENAME%", manualBaseName + "/rockbox-build");
+        manualZipUrl.replace("%EXTENSION%", "zip");
+        manualZipUrl.replace("%MANUALBASENAME%", manualBaseName + "-html");
+
         // set variants (if any)
         for(int j = 0; j < variants.size(); ++j) {
             setPlatformValue(variants.at(j), ServerInfo::CurStatus, status);
@@ -138,6 +163,10 @@ void ServerInfo::readBuildInfo(QString file)
                 setPlatformValue(variants.at(j), ServerInfo::RelCandidateUrl, relCandidateUrl);
             }
             setPlatformValue(variants.at(j), ServerInfo::CurDevelUrl, develUrl);
+
+            setPlatformValue(variants.at(j), ServerInfo::ManualPdfUrl, manualPdfUrl);
+            setPlatformValue(variants.at(j), ServerInfo::ManualHtmlUrl, manualHtmlUrl);
+            setPlatformValue(variants.at(j), ServerInfo::ManualZipUrl, manualZipUrl);
         }
     }
 }

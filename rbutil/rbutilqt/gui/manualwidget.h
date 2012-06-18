@@ -26,20 +26,15 @@ class ManualWidget : public QWidget
 {
     Q_OBJECT
     public:
-        enum ManualFormat {
-            ManualPdf,
-            ManualHtml,
-            ManualZip,
-        };
         ManualWidget(QWidget *parent = 0);
 
     public slots:
         void downloadManual(void);
         void updateManual();
-        QString manualUrl(ManualFormat format);
 
     private:
         Ui::ManualWidgetFrm ui;
+        QString platform;
 };
 
 #endif

@@ -28,46 +28,8 @@ ManualWidget::ManualWidget(QWidget *parent) : QWidget(parent)
 {
     ui.setupUi(this);
     ui.radioPdf->setChecked(true);
+    platform = RbSettings::value(RbSettings::Platform).toString();
     connect(ui.buttonDownloadManual, SIGNAL(clicked()), this, SLOT(downloadManual()));
-}
-
-
-QString ManualWidget::manualUrl(ManualFormat format)
-{
-    if(RbSettings::value(RbSettings::Platform).toString().isEmpty()) {
-        return QString();
-    }
-
-    QString buildservermodel = SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
-    QString modelman = SystemInfo::value(SystemInfo::CurManual).toString();
-    QString manualbasename;
-
-    if(modelman.isEmpty()) {
-        manualbasename = "rockbox-" + buildservermodel;
-    }
-    else {
-        manualbasename = "rockbox-" + modelman;
-    }
-
-    QString manual = SystemInfo::value(SystemInfo::ManualUrl).toString();
-    switch(format) {
-        case ManualPdf:
-            manual.replace("%EXTENSION%", "pdf");
-            break;
-        case ManualHtml:
-            manual.replace("%EXTENSION%", "html");
-            manualbasename += "/rockbox-build";
-            break;
-        case ManualZip:
-            manual.replace("%EXTENSION%", "zip");
-            manualbasename += "-html";
-            break;
-        default:
-            break;
-    };
-
-    manual.replace("%MANUALBASENAME%", manualbasename);
-    return manual;
 }
 
 
@@ -76,9 +38,9 @@ void ManualWidget::updateManual()
     if(!RbSettings::value(RbSettings::Platform).toString().isEmpty())
     {
         ui.labelPdfManual->setText(tr("<a href='%1'>PDF Manual</a>")
-            .arg(manualUrl(ManualPdf)));
+            .arg(ServerInfo::platformValue(platform, ServerInfo::ManualPdfUrl).toString()));
         ui.labelHtmlManual->setText(tr("<a href='%1'>HTML Manual (opens in browser)</a>")
-            .arg(manualUrl(ManualHtml)));
+            .arg(ServerInfo::platformValue(platform, ServerInfo::ManualHtmlUrl).toString()));
     }
     else {
         ui.labelPdfManual->setText(tr("Select a device for a link to the correct manual"));
@@ -114,12 +76,12 @@ void ManualWidget::downloadManual(void)
         installer->setCache(true);
 
     if(ui.radioPdf->isChecked()) {
-        manualurl = manualUrl(ManualPdf);
+        manualurl = ServerInfo::platformValue(platform, ServerInfo::ManualPdfUrl).toString();
         installer->setLogSection("Manual (PDF)");
         installer->setTarget("/" + manual + ".pdf");
     }
     else {
-        manualurl = manualUrl(ManualZip);
+        manualurl = ServerInfo::platformValue(platform, ServerInfo::ManualZipUrl).toString();
         installer->setLogSection("Manual (HTML)");
         installer->setTarget("/" + manual + "-" + "-html.zip");
     }
