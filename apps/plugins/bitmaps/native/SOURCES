@@ -2,7 +2,11 @@
 
 /* Brickmania */
 #ifdef HAVE_LCD_COLOR
+#if LCD_WIDTH >= 112
 brickmania_gameover.112x54x16.bmp
+#elif LCD_WIDTH >= 56
+brickmania_gameover.56x27x24.bmp
+#endif
 
 #if LCD_WIDTH >= 640 /* M:Robe 500 */
 brickmania_ball.15x15x16.bmp
@@ -76,7 +80,7 @@ brickmania_long_pads.132x80x16.bmp
 brickmania_powerups.132x80x16.bmp
 brickmania_break.132x80x16.bmp
 
-#elif LCD_WIDTH >= 96
+#elif LCD_WIDTH >= 128
 brickmania_ball.4x4x16.bmp
 brickmania_bricks.128x128x16.bmp
 brickmania_pads.132x80x16.bmp
@@ -84,6 +88,15 @@ brickmania_short_pads.132x80x16.bmp
 brickmania_long_pads.132x80x16.bmp
 brickmania_powerups.132x80x16.bmp
 brickmania_break.132x80x16.bmp
+
+#elif LCD_WIDTH >= 96
+brickmania_ball.4x4x16.bmp
+brickmania_bricks.96x96x16.bmp
+brickmania_pads.96x96x16.bmp
+brickmania_short_pads.96x96x16.bmp
+brickmania_long_pads.96x96x16.bmp
+brickmania_powerups.132x80x16.bmp
+brickmania_break.96x96x16.bmp
 
 #endif /* different colour displays */
 
