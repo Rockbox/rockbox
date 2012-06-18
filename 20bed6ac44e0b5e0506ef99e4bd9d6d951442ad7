@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASH///9o\u003d",
+        "filename": "apps/playlist_viewer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-06-18T11:24:47Z",
+      "side": 1,
+      "message": "Perhaps add a small comment what reference_track is? It\u0027s not entirely clear on the first sight.",
+      "revId": "20bed6ac44e0b5e0506ef99e4bd9d6d951442ad7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASH///9k\u003d",
+        "filename": "apps/playlist_viewer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-06-18T11:24:47Z",
+      "side": 1,
+      "message": "Please use /* */ style comments. // is not permitted.",
+      "revId": "20bed6ac44e0b5e0506ef99e4bd9d6d951442ad7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
