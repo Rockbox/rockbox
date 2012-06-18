@@ -66,8 +66,6 @@ void ManualWidget::downloadManual(void)
         manual = "rockbox-" + SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
     }
 
-    QString manualurl;
-
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
     logger->show();
     ZipInstaller *installer = new ZipInstaller(this);
@@ -76,19 +74,18 @@ void ManualWidget::downloadManual(void)
         installer->setCache(true);
 
     if(ui.radioPdf->isChecked()) {
-        manualurl = ServerInfo::platformValue(platform, ServerInfo::ManualPdfUrl).toString();
+        installer->setUrl(ServerInfo::platformValue(platform,
+                    ServerInfo::ManualPdfUrl).toString());
         installer->setLogSection("Manual (PDF)");
         installer->setTarget("/" + manual + ".pdf");
     }
     else {
-        manualurl = ServerInfo::platformValue(platform, ServerInfo::ManualZipUrl).toString();
+        installer->setUrl(ServerInfo::platformValue(platform,
+                    ServerInfo::ManualZipUrl).toString());
         installer->setLogSection("Manual (HTML)");
         installer->setTarget("/" + manual + "-" + "-html.zip");
     }
-    qDebug() << "[ManualWidget] Manual URL:" << manualurl;
-
     installer->setLogVersion();
-    installer->setUrl(manualurl);
     installer->setUnzip(false);
 
     connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
