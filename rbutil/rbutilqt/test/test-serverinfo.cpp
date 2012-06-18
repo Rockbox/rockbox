@@ -73,6 +73,9 @@ const struct testvector testdata[] =
     { "iaudiox5",         ServerInfo::RelCandidateUrl,     "http://download.rockbox.org/release-candidate/f9dce96/rockbox-iaudiox5.zip" },
     { "iaudiox5.v",       ServerInfo::RelCandidateVersion, "f9dce96" },
     { "iaudiox5.v",       ServerInfo::RelCandidateUrl,     "http://download.rockbox.org/release-candidate/f9dce96/rockbox-iaudiox5.zip" },
+    { "iaudiox5.v",       ServerInfo::ManualPdfUrl,        "http://download.rockbox.org/manual/rockbox-iaudiox5.pdf" },
+    { "iriverh100",       ServerInfo::ManualHtmlUrl,       "http://download.rockbox.org/manual/rockbox-iriverh100/rockbox-build.html" },
+    { "iriverh120",       ServerInfo::ManualZipUrl,        "http://download.rockbox.org/manual/rockbox-iriverh100-html.zip" },
 };
 
 
