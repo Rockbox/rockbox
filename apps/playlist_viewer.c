@@ -176,11 +176,12 @@ static void playlist_buffer_load_entries(struct playlist_buffer *pb, int index,
 }
 
 static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
-                                                enum direction direction)
+                                                enum direction direction,
+                                                int reference_track)
 {
     if (direction == FORWARD)
     {
-        int min_start = viewer.selected_track-2*screens[0].getnblines();
+        int min_start = reference_track-2*screens[0].getnblines();
         while (min_start < 0)
             min_start += viewer.num_tracks;
         min_start %= viewer.num_tracks;
@@ -188,7 +189,7 @@ static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
     }
     else
     {
-        int max_start = viewer.selected_track+2*screens[0].getnblines();
+        int max_start = reference_track+2*screens[0].getnblines();
         max_start %= viewer.num_tracks;
         playlist_buffer_load_entries(pb, max_start, BACKWARD);
     }
@@ -266,6 +267,31 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
                                                          int index)
 {
     int buffer_index = playlist_buffer_get_index(pb, index);
+    // Make sure that we are not returning an invalid pointer.
+    // In some cases, when scrolling really fast, it could happen that a reqested track
+    // has not been pre-loaded
+    if (buffer_index < 0) {
+        playlist_buffer_load_entries_screen(&viewer.buffer,
+                    pb->direction == FORWARD ? BACKWARD : FORWARD,
+                    index);
+
+    } else if (buffer_index >= pb->num_loaded) {
+        playlist_buffer_load_entries_screen(&viewer.buffer,
+                    pb->direction,
+                    index);
+    }
+    buffer_index = playlist_buffer_get_index(pb, index);
+    if (buffer_index < 0 || buffer_index >= pb->num_loaded) {
+        // This really shouldn't happen. If this happens, then
+        // the name_buffer is probably too small to store enough
+        // titles to fill the screen, and preload data in the short
+        // direction.
+        //
+        // If this happens then scrolling performance will probably
+        // be quite low, but it's better then having Data Abort errors
+        playlist_buffer_load_entries(pb, index, FORWARD);
+        buffer_index = playlist_buffer_get_index(pb, index);
+    }
     return &(pb->tracks[buffer_index]);
 }
 
@@ -425,7 +451,8 @@ static bool update_playlist(bool force)
             global_status.resume_offset = -1;
             return false;
         }
-        playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD);
+        playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD,
+                          viewer.selected_track);
         if (viewer.buffer.num_loaded <= 0)
         {
             global_status.resume_index = -1;
@@ -679,7 +706,8 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     viewer.selected_track);
             if (reload)
                 playlist_buffer_load_entries_screen(&viewer.buffer,
-                    button == ACTION_STD_NEXT ? FORWARD : BACKWARD);
+                    button == ACTION_STD_NEXT ? FORWARD : BACKWARD,
+                    viewer.selected_track);
             if (reload || viewer.moving_track >= 0)
                 gui_synclist_draw(&playlist_lists);
         }
