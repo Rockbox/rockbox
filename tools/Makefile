@@ -54,7 +54,7 @@ mkzenboot.o: mkzenboot.c
 	$(SILENT)$(CC) $(CFLAGS) -DSTANDALONE -c -o $@ $+
 
 mkzenboot: mkzenboot.o hmac-sha1.o
-	$(SILENT)$(CC) $(LDFLAGS) -lz $+ -o $@
+	$(SILENT)$(CC) $(LDFLAGS) $+ -lz -o $@
 
 mkzenboot.exe: mkzenboot.o hmac-sha1.o
 	$(SILENT)$(CC) $(LDFLAGS) -lz $+ C:\MingW\lib\libz.a -o $@
@@ -95,7 +95,7 @@ voicefont: voicefont.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
 
 usb_benchmark: usb_benchmark.c
-	$(SILENT)$(CC) $(CFLAGS) -lusb $+ -o $@
+	$(SILENT)$(CC) $(CFLAGS) $+ -lusb -o $@
 
 convttf: convttf.c
 	$(call PRINTS,CC $(@F))
