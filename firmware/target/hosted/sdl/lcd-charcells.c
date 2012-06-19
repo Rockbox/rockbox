@@ -178,7 +178,7 @@ void screen_dump(void)
     for (y = SIM_LCD_HEIGHT - 1; y >= 0; y--)
     {
         Uint8 *src = (Uint8 *)lcd_surface->pixels 
-                   + y * SIM_LCD_WIDTH * display_zoom * display_zoom;
+                   + y * SIM_LCD_WIDTH * (int)display_zoom * (int)display_zoom;
         unsigned char *dst = line;
         unsigned dst_mask = 0x80;
 
@@ -187,7 +187,7 @@ void screen_dump(void)
         {
             if (*src)
                 *dst |= dst_mask;
-            src += display_zoom;
+            src += (int)display_zoom;
             dst_mask >>= 1;
             if (dst_mask == 0)
             {
