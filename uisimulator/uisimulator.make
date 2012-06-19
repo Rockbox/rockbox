@@ -31,7 +31,7 @@ $(SIMLIB): $$(SIMOBJ) $(UIBMP)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $(SIMLIB)
-	$(call PRINTS,LD $(BINARY))$(CC) -o $@ $^ $(SIMLIB) $(LDOPTS) $(GLOBAL_LDOPTS) \
+	$(call PRINTS,LD $(BINARY))$(CC) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LDOPTS) $(GLOBAL_LDOPTS) \
 	-Wl,-Map,$(BUILDDIR)/rockbox.map
 	$(SILENT)$(call objcopy,$@,$@)
 
