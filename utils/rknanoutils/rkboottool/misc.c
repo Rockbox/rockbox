@@ -34,6 +34,13 @@ char BLUE[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 
 static bool g_color_enable = true;
 
+void *xmalloc(size_t s)
+{
+    void * r = malloc(s);
+    if(!r) bugp("malloc");
+    return r;
+}
+
 void enable_color(bool enable)
 {
     g_color_enable = enable;

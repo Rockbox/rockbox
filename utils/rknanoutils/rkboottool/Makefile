@@ -10,7 +10,7 @@ all: $(BINS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-rkboottool: rkboottool.o misc.o
+rkboottool: rkboottool.o misc.o elf.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 clean:

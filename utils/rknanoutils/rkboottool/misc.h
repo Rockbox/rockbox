@@ -34,6 +34,7 @@
 typedef char color_t[];
 
 extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
+void *xmalloc(size_t s);
 void color(color_t c);
 void enable_color(bool enable);
 

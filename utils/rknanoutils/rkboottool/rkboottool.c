@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
+#include <stdarg.h>
 #include "misc.h"
+#include "elf.h"
 
 #define cprintf(col, ...) do {color(col); printf(__VA_ARGS__); }while(0)
 
@@ -150,7 +152,10 @@ static void save_blob(const struct rknano_blob_t *b, void *buf, uint32_t size,
     if(g_out_prefix == NULL || b->size == 0 || b->offset + b->size > size)
         return;
     char *path = malloc(strlen(g_out_prefix) + strlen(name) + 32);
-    sprintf(path, "%s%s%d.bin", g_out_prefix, name, suffix);
+    if(suffix >= 0)
+        sprintf(path, "%s%s%d.bin", g_out_prefix, name, suffix);
+    else
+        sprintf(path, "%s%s.bin", g_out_prefix, name);
     FILE *f = fopen(path, "wb");
     uint8_t *ptr = buf + b->offset;
     if(enc_mode != NO_ENC)
@@ -274,19 +279,61 @@ static int do_nanofw_image(uint8_t *buf, unsigned long size)
 struct rknano_stage_header_t
 {
     uint32_t addr;
+    uint32_t count;
 } __attribute__((packed));
+
+/*
+ * The [code_pa,code_pa+code_sz[ and [data_pa,data_pa+data_sz[ ranges
+ * are consitent: they never overlap and have no gaps and fill the
+ * entire space. Furthermore they match the code sequences so it's
+ * reasonable to assume these fields are correct.
+ * The other fields are still quite unsure. */
 
 struct rknano_stage_section_t
 {
-    uint32_t a;
     uint32_t code_pa;
     uint32_t code_va;
     uint32_t code_sz;
     uint32_t data_pa;
     uint32_t data_va;
     uint32_t data_sz;
-    uint32_t bss_end_va;
+    uint32_t bss_va;
+    uint32_t bss_sz;
 } __attribute__((packed));
+
+static void elf_printf(void *user, bool error, const char *fmt, ...)
+{
+    if(!g_debug && !error)
+        return;
+    (void) user;
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+}
+
+static void elf_write(void *user, uint32_t addr, const void *buf, size_t count)
+{
+    FILE *f = user;
+    fseek(f, addr, SEEK_SET);
+    fwrite(buf, count, 1, f);
+}
+
+static void extract_elf_section(struct elf_params_t *elf, int count)
+{
+    char *filename = xmalloc(strlen(g_out_prefix) + 32);
+    sprintf(filename, "%s%d.elf", g_out_prefix, count);
+    if(g_debug)
+        printf("Write entry %d to %s\n", count, filename);
+
+    FILE *fd = fopen(filename, "wb");
+    free(filename);
+
+    if(fd == NULL)
+        return ;
+    elf_write_file(elf, elf_write, elf_printf, fd);
+    fclose(fd);
+}
 
 static int do_nanostage_image(uint8_t *buf, unsigned long size)
 {
@@ -294,37 +341,69 @@ static int do_nanostage_image(uint8_t *buf, unsigned long size)
         return 1;
     struct rknano_stage_header_t *hdr = (void *)buf;
 
+    uint32_t *buf32 = (void *)buf;
+    cprintf(BLUE, "Dump\n");
+    for(int j = 0; j < 2; j++)
+        cprintf(YELLOW, "%8x ", buf32[j]);
+    printf("\n");
+    for(unsigned i = 0; i < hdr->count; i++)
+    {
+        for(int j = 0; j < 8; j++)
+            cprintf(YELLOW, "%8x ", buf32[i * 8 + j + 2]);
+        printf("\n");
+    }
+    printf("\n");
+
     cprintf(BLUE, "Header\n");
     cprintf(GREEN, "  Base Address: ");
-    cprintf(YELLOW, "%#x\n", hdr->addr);
+    cprintf(YELLOW, "%#08x\n", hdr->addr);
+    cprintf(GREEN, "  Load count: ");
+    cprintf(YELLOW, "%d\n", hdr->count);
     
     struct rknano_stage_section_t *sec = (void *)(hdr + 1);
-    void *end = buf + size;
 
-    int i = 0;
-    while((void *)sec < end && (sec->code_sz || sec->bss_end_va))
+    for(unsigned i = 0; i < hdr->count; i++, sec++)
     {
         cprintf(BLUE, "Section %d\n", i);
-        cprintf(GREEN, "  Something: ");
-        cprintf(YELLOW, "%#x\n", sec->a);
         cprintf(GREEN, "  Code: ");
-        cprintf(YELLOW, "%#x", sec->code_pa);
+        cprintf(YELLOW, "0x%08x", sec->code_pa);
+        cprintf(RED, "-(txt)-");
+        cprintf(YELLOW, "0x%08x", sec->code_pa + sec->code_sz);
         cprintf(BLUE, " |--> ");
-        cprintf(YELLOW, "%#x", sec->code_va);
-        cprintf(RED, "-(code)-");
-        cprintf(YELLOW, "%#x\n", sec->code_va + sec->code_sz);
+        cprintf(YELLOW, "0x%08x", sec->code_va);
+        cprintf(RED, "-(txt)-");
+        cprintf(YELLOW, "0x%08x\n", sec->code_va + sec->code_sz);
 
         cprintf(GREEN, "  Data: ");
-        cprintf(YELLOW, "%#x", sec->data_pa);
+        cprintf(YELLOW, "0x%08x", sec->data_pa);
+        cprintf(RED, "-(dat)-");
+        cprintf(YELLOW, "0x%08x", sec->data_pa + sec->data_sz);
         cprintf(BLUE, " |--> ");
-        cprintf(YELLOW, "%#x", sec->data_va);
-        cprintf(RED, "-(data)-");
-        cprintf(YELLOW, "%#x", sec->data_va + sec->data_sz);
-        cprintf(RED, "-(bss)-");
-        cprintf(YELLOW, "%#x\n", sec->bss_end_va);
+        cprintf(YELLOW, "0x%08x", sec->data_va);
+        cprintf(RED, "-(dat)-");
+        cprintf(YELLOW, "0x%08x\n", sec->data_va + sec->data_sz);
 
-        sec++;
-        i++;
+        cprintf(GREEN, "  Data: ");
+        cprintf(RED, "                           ");
+        cprintf(BLUE, " |--> ");
+        cprintf(YELLOW, "0x%08x", sec->bss_va);
+        cprintf(RED, "-(bss)-");
+        cprintf(YELLOW, "0x%08x\n", sec->bss_va + sec->bss_sz);
+
+#if 0
+        struct rknano_blob_t blob;
+        blob.offset = sec->code_pa - hdr->addr;
+        blob.size = sec->code_sz;
+        save_blob(&blob, buf, size, "entry.", i, NO_ENC);
+#else
+        struct elf_params_t elf;
+        elf_init(&elf);
+        elf_add_load_section(&elf, sec->code_va, sec->code_sz, buf + sec->code_pa - hdr->addr);
+        elf_add_load_section(&elf, sec->data_va, sec->data_sz, buf + sec->data_pa - hdr->addr);
+        elf_add_fill_section(&elf, sec->bss_va, sec->bss_sz, 0);
+        extract_elf_section(&elf, i);
+        elf_release(&elf);
+#endif
     }
 
     return 0;
@@ -487,8 +566,8 @@ static int do_boot_desc(uint8_t *buf, unsigned long size,
         blob.offset = entry->offset;
         blob.size = entry->size;
         char name[128];
-        sprintf(name, "desc_%d_ent_%S_", desc_idx, from_uni16(entry->name));
-        save_blob(&blob, buf, size, name, i, PAGE_ENC);
+        sprintf(name, "%d.%S", desc_idx, from_uni16(entry->name));
+        save_blob(&blob, buf, size, name, -1, PAGE_ENC);
     }
 
     return 0;
