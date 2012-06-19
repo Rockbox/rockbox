@@ -321,6 +321,8 @@ static void elf_write(void *user, uint32_t addr, const void *buf, size_t count)
 
 static void extract_elf_section(struct elf_params_t *elf, int count)
 {
+    if(g_out_prefix == NULL)
+        return;
     char *filename = xmalloc(strlen(g_out_prefix) + 32);
     sprintf(filename, "%s%d.elf", g_out_prefix, count);
     if(g_debug)
@@ -340,19 +342,6 @@ static int do_nanostage_image(uint8_t *buf, unsigned long size)
     if(size < sizeof(struct rknano_stage_section_t))
         return 1;
     struct rknano_stage_header_t *hdr = (void *)buf;
-
-    uint32_t *buf32 = (void *)buf;
-    cprintf(BLUE, "Dump\n");
-    for(int j = 0; j < 2; j++)
-        cprintf(YELLOW, "%8x ", buf32[j]);
-    printf("\n");
-    for(unsigned i = 0; i < hdr->count; i++)
-    {
-        for(int j = 0; j < 8; j++)
-            cprintf(YELLOW, "%8x ", buf32[i * 8 + j + 2]);
-        printf("\n");
-    }
-    printf("\n");
 
     cprintf(BLUE, "Header\n");
     cprintf(GREEN, "  Base Address: ");
