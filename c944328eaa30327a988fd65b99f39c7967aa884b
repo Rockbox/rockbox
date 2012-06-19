@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASH///88\u003d",
+        "filename": "apps/playlist_viewer.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1000164
+      },
+      "writtenOn": "2012-06-19T01:07:47Z",
+      "side": 0,
+      "message": "Here, the index buffer gets allocated on the first half of the plugin buffer. The second half is also give to playlist_create_ex as a \"temp\" buffer, but i\u0027m not sure how much of it is actually used by playlist_create_ex.",
+      "revId": "c944328eaa30327a988fd65b99f39c7967aa884b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASH///84\u003d",
+        "filename": "apps/playlist_viewer.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1000164
+      },
+      "writtenOn": "2012-06-19T01:07:47Z",
+      "side": 0,
+      "message": "Here, the second half of the plugin buffer (or the full plugin buffer if the index buffer was not needed) is allocated to the name buffer.",
+      "revId": "c944328eaa30327a988fd65b99f39c7967aa884b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
