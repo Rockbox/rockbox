@@ -30,7 +30,9 @@
 #include "wps_internals.h" /* TODO: remove this line.. shoudlnt be needed */
 
 enum skinnable_screens {
+#ifdef HAVE_LCD_BITMAP
     CUSTOM_STATUSBAR,
+#endif
     WPS,
 #if CONFIG_TUNER
     FM_SCREEN,
