@@ -137,8 +137,15 @@ static uint16_t crc(uint8_t *buf, int size)
     return result;
 }
 
+/* scramble mode */
+enum {
+    NO_ENC,
+    CONTINOUS_ENC, /* scramble whole block at once */
+    PAGE_ENC       /* nand bootloader is scrambled in 0x200 chunks */
+};
+
 static void save_blob(const struct rknano_blob_t *b, void *buf, uint32_t size,
-    char *name, int suffix, bool descramble)
+    char *name, int suffix, int enc_mode)
 {
     if(g_out_prefix == NULL || b->size == 0 || b->offset + b->size > size)
         return;
@@ -146,10 +153,23 @@ static void save_blob(const struct rknano_blob_t *b, void *buf, uint32_t size,
     sprintf(path, "%s%s%d.bin", g_out_prefix, name, suffix);
     FILE *f = fopen(path, "wb");
     uint8_t *ptr = buf + b->offset;
-    if(descramble)
+    if(enc_mode != NO_ENC)
     {
         ptr = malloc(b->size);
-        encode_page(buf + b->offset, ptr, b->size);
+        int len = b->size;
+        uint8_t *buff_ptr = buf + b->offset;
+        uint8_t *out_ptr = ptr;
+        if(enc_mode == PAGE_ENC)
+        {
+            while(len >= 0x200)
+            {
+                encode_page(buff_ptr, out_ptr, 0x200);
+                buff_ptr += 0x200;
+                out_ptr += 0x200;
+                len -= 0x200;
+            }
+        }
+        encode_page(buff_ptr, out_ptr, len);
     }
     
     if(f)
@@ -158,7 +178,7 @@ static void save_blob(const struct rknano_blob_t *b, void *buf, uint32_t size,
         fclose(f);
     }
 
-    if(descramble)
+    if(enc_mode != NO_ENC)
         free(ptr);
 }
 
@@ -196,7 +216,7 @@ static int do_nanofw_image(uint8_t *buf, unsigned long size)
         cprintf(GREEN, "  %i: ", i);
         print_blob_interval(&hdr->stage[i]);
         cprintf(OFF, "\n");
-        save_blob(&hdr->stage[i], buf, size, "stage", i, false);
+        save_blob(&hdr->stage[i], buf, size, "stage", i, NO_ENC);
     }
     cprintf(BLUE, "Fonts\n");
     for(unsigned i = 0; i < hdr->nr_fonts; i++)
@@ -204,7 +224,7 @@ static int do_nanofw_image(uint8_t *buf, unsigned long size)
         cprintf(GREEN, "  %i: ", i);
         print_blob_interval(&hdr->font[i]);
         cprintf(OFF, "\n");
-        save_blob(&hdr->font[i], buf, size, "font", i, false);
+        save_blob(&hdr->font[i], buf, size, "font", i, NO_ENC);
     }
     cprintf(BLUE, "GBK\n");
     for(unsigned i = 0; i < hdr->nr_gbk; i++)
@@ -212,7 +232,7 @@ static int do_nanofw_image(uint8_t *buf, unsigned long size)
         cprintf(GREEN, "  %i: ", i);
         print_blob_interval(&hdr->gbk[i]);
         cprintf(OFF, "\n");
-        save_blob(&hdr->gbk[i], buf, size, "gbk", i, false);
+        save_blob(&hdr->gbk[i], buf, size, "gbk", i, NO_ENC);
     }
     cprintf(BLUE, "String Tables\n");
     for(unsigned i = 0; i < hdr->nr_strtbl; i++)
@@ -220,7 +240,7 @@ static int do_nanofw_image(uint8_t *buf, unsigned long size)
         cprintf(GREEN, "  %i: ", i);
         print_blob_interval(&hdr->strtbl[i]);
         cprintf(OFF, "\n");
-        save_blob(&hdr->strtbl[i], buf, size, "strtbl", i, false);
+        save_blob(&hdr->strtbl[i], buf, size, "strtbl", i, NO_ENC);
     }
     cprintf(BLUE, "Image Resources\n");
     for(unsigned i = 0; i < hdr->nr_imageres; i++)
@@ -228,7 +248,7 @@ static int do_nanofw_image(uint8_t *buf, unsigned long size)
         cprintf(GREEN, "  %i: ", i);
         print_blob_interval(&hdr->imageres[i]);
         cprintf(OFF, "\n");
-        save_blob(&hdr->imageres[i], buf, size, "imgres", i, false);
+        save_blob(&hdr->imageres[i], buf, size, "imgres", i, NO_ENC);
     }
     cprintf(BLUE, "Unknown\n");
     for(unsigned i = 0; i < hdr->nr_unk; i++)
@@ -236,7 +256,7 @@ static int do_nanofw_image(uint8_t *buf, unsigned long size)
         cprintf(GREEN, "  %i: ", i);
         print_blob_interval(&hdr->unk[i]);
         cprintf(OFF, "\n");
-        save_blob(&hdr->unk[i], buf, size, "unk", i, false);
+        save_blob(&hdr->unk[i], buf, size, "unk", i, NO_ENC);
     }
     cprintf(BLUE, "Other\n");
     cprintf(GREEN, "  Size: ");
@@ -313,6 +333,13 @@ static int do_nanostage_image(uint8_t *buf, unsigned long size)
 #define MAGIC_BOOT      "BOOT"
 #define MAGIC_BOOT_SIZE 4
 
+struct rknano_boot_desc_t
+{
+    uint8_t count;
+    uint32_t offset;
+    uint8_t stride;
+} __attribute__((packed));
+
 struct rknano_boot_header_t
 {
     char magic[MAGIC_BOOT_SIZE];
@@ -322,15 +349,150 @@ struct rknano_boot_header_t
     uint16_t field_E;
     uint8_t field_10[5];
     uint32_t field_15;
-    uint8_t field_19;
-    uint32_t field_1A;
-    uint8_t field_1E[2];
-    uint32_t field_20;
-    uint8_t field_24[2];
-    uint32_t field_26;
-    uint8_t field_2A[10];
+    struct rknano_boot_desc_t desc_1;
+    struct rknano_boot_desc_t desc_2;
+    struct rknano_boot_desc_t desc_4;
+    uint8_t field_2B[9];
     uint32_t field_34;
 } __attribute__((packed));
+
+struct rknano_boot_entry_t
+{
+    uint8_t entry_size; // unsure
+    uint32_t unk;
+    uint16_t name[20];
+    uint32_t offset;
+    uint32_t size;
+    uint32_t sthg2;
+} __attribute__((packed));
+
+uint32_t boot_crc_table[256] =
+{
+    0x00000000, 0x04C10DB7, 0x09821B6E, 0x0D4316D9,
+    0x130436DC, 0x17C53B6B, 0x1A862DB2, 0x1E472005,
+    0x26086DB8, 0x22C9600F, 0x2F8A76D6, 0x2B4B7B61,
+    0x350C5B64, 0x31CD56D3, 0x3C8E400A, 0x384F4DBD,
+    0x4C10DB70, 0x48D1D6C7, 0x4592C01E, 0x4153CDA9,
+    0x5F14EDAC, 0x5BD5E01B, 0x5696F6C2, 0x5257FB75,
+    0x6A18B6C8, 0x6ED9BB7F, 0x639AADA6, 0x675BA011,
+    0x791C8014, 0x7DDD8DA3, 0x709E9B7A, 0x745F96CD,
+    0x9821B6E0, 0x9CE0BB57, 0x91A3AD8E, 0x9562A039,
+    0x8B25803C, 0x8FE48D8B, 0x82A79B52, 0x866696E5,
+    0xBE29DB58, 0xBAE8D6EF, 0xB7ABC036, 0xB36ACD81,
+    0xAD2DED84, 0xA9ECE033, 0xA4AFF6EA, 0xA06EFB5D,
+    0xD4316D90, 0xD0F06027, 0xDDB376FE, 0xD9727B49,
+    0xC7355B4C, 0xC3F456FB, 0xCEB74022, 0xCA764D95,
+    0xF2390028, 0xF6F80D9F, 0xFBBB1B46, 0xFF7A16F1,
+    0xE13D36F4, 0xE5FC3B43, 0xE8BF2D9A, 0xEC7E202D,
+    0x34826077, 0x30436DC0, 0x3D007B19, 0x39C176AE,
+    0x278656AB, 0x23475B1C, 0x2E044DC5, 0x2AC54072,
+    0x128A0DCF, 0x164B0078, 0x1B0816A1, 0x1FC91B16,
+    0x018E3B13, 0x054F36A4, 0x080C207D, 0x0CCD2DCA,
+    0x7892BB07, 0x7C53B6B0, 0x7110A069, 0x75D1ADDE,
+    0x6B968DDB, 0x6F57806C, 0x621496B5, 0x66D59B02,
+    0x5E9AD6BF, 0x5A5BDB08, 0x5718CDD1, 0x53D9C066,
+    0x4D9EE063, 0x495FEDD4, 0x441CFB0D, 0x40DDF6BA,
+    0xACA3D697, 0xA862DB20, 0xA521CDF9, 0xA1E0C04E,
+    0xBFA7E04B, 0xBB66EDFC, 0xB625FB25, 0xB2E4F692,
+    0x8AABBB2F, 0x8E6AB698, 0x8329A041, 0x87E8ADF6,
+    0x99AF8DF3, 0x9D6E8044, 0x902D969D, 0x94EC9B2A,
+    0xE0B30DE7, 0xE4720050, 0xE9311689, 0xEDF01B3E,
+    0xF3B73B3B, 0xF776368C, 0xFA352055, 0xFEF42DE2,
+    0xC6BB605F, 0xC27A6DE8, 0xCF397B31, 0xCBF87686,
+    0xD5BF5683, 0xD17E5B34, 0xDC3D4DED, 0xD8FC405A,
+    0x6904C0EE, 0x6DC5CD59, 0x6086DB80, 0x6447D637,
+    0x7A00F632, 0x7EC1FB85, 0x7382ED5C, 0x7743E0EB,
+    0x4F0CAD56, 0x4BCDA0E1, 0x468EB638, 0x424FBB8F,
+    0x5C089B8A, 0x58C9963D, 0x558A80E4, 0x514B8D53,
+    0x25141B9E, 0x21D51629, 0x2C9600F0, 0x28570D47,
+    0x36102D42, 0x32D120F5, 0x3F92362C, 0x3B533B9B,
+    0x031C7626, 0x07DD7B91, 0x0A9E6D48, 0x0E5F60FF,
+    0x101840FA, 0x14D94D4D, 0x199A5B94, 0x1D5B5623,
+    0xF125760E, 0xF5E47BB9, 0xF8A76D60, 0xFC6660D7,
+    0xE22140D2, 0xE6E04D65, 0xEBA35BBC, 0xEF62560B,
+    0xD72D1BB6, 0xD3EC1601, 0xDEAF00D8, 0xDA6E0D6F,
+    0xC4292D6A, 0xC0E820DD, 0xCDAB3604, 0xC96A3BB3,
+    0xBD35AD7E, 0xB9F4A0C9, 0xB4B7B610, 0xB076BBA7,
+    0xAE319BA2, 0xAAF09615, 0xA7B380CC, 0xA3728D7B,
+    0x9B3DC0C6, 0x9FFCCD71, 0x92BFDBA8, 0x967ED61F,
+    0x8839F61A, 0x8CF8FBAD, 0x81BBED74, 0x857AE0C3,
+    0x5D86A099, 0x5947AD2E, 0x5404BBF7, 0x50C5B640,
+    0x4E829645, 0x4A439BF2, 0x47008D2B, 0x43C1809C,
+    0x7B8ECD21, 0x7F4FC096, 0x720CD64F, 0x76CDDBF8,
+    0x688AFBFD, 0x6C4BF64A, 0x6108E093, 0x65C9ED24,
+    0x11967BE9, 0x1557765E, 0x18146087, 0x1CD56D30,
+    0x02924D35, 0x06534082, 0x0B10565B, 0x0FD15BEC,
+    0x379E1651, 0x335F1BE6, 0x3E1C0D3F, 0x3ADD0088,
+    0x249A208D, 0x205B2D3A, 0x2D183BE3, 0x29D93654,
+    0xC5A71679, 0xC1661BCE, 0xCC250D17, 0xC8E400A0,
+    0xD6A320A5, 0xD2622D12, 0xDF213BCB, 0xDBE0367C,
+    0xE3AF7BC1, 0xE76E7676, 0xEA2D60AF, 0xEEEC6D18,
+    0xF0AB4D1D, 0xF46A40AA, 0xF9295673, 0xFDE85BC4,
+    0x89B7CD09, 0x8D76C0BE, 0x8035D667, 0x84F4DBD0,
+    0x9AB3FBD5, 0x9E72F662, 0x9331E0BB, 0x97F0ED0C,
+    0xAFBFA0B1, 0xAB7EAD06, 0xA63DBBDF, 0xA2FCB668,
+    0xBCBB966D, 0xB87A9BDA, 0xB5398D03, 0xB1F880B4,
+};
+
+static uint32_t boot_crc(uint8_t *buf, int size)
+{
+    uint32_t crc = 0;
+    for(int i = 0; i < size; i++)
+        crc = boot_crc_table[buf[i] ^ (crc >> 24)] ^ (crc << 8);
+    return crc;
+}
+
+wchar_t *from_uni16(uint16_t *str)
+{
+    static wchar_t buffer[64];
+    int i = 0;
+    while(str[i])
+    {
+        buffer[i] = str[i];
+        i++;
+    }
+    return buffer;
+}
+
+static int do_boot_desc(uint8_t *buf, unsigned long size,
+    struct rknano_boot_desc_t *desc, int desc_idx)
+{
+    (void) buf;
+    (void) size;
+    cprintf(BLUE, "Desc %d\n", desc_idx);
+    cprintf(GREEN, "  Count: "); cprintf(YELLOW, "%d\n", desc->count);
+    cprintf(GREEN, "  Offset: "); cprintf(YELLOW, "%#x\n", desc->offset);
+    cprintf(GREEN, "  Stride: "); cprintf(YELLOW, "%#x ", desc->stride);
+    if(desc->stride < sizeof(struct rknano_boot_entry_t))
+        cprintf(RED, "(too small <%#lx)\n", sizeof(struct rknano_boot_entry_t));
+    else
+        cprintf(RED, "(OK >=%#lx)\n", sizeof(struct rknano_boot_entry_t));
+
+    for(int i = 0; i < desc->count; i++)
+    {
+        struct rknano_boot_entry_t *entry = (void *)(buf + desc->offset + i * desc->stride);
+        cprintf(BLUE, "  Entry %d\n", i);
+        cprintf(GREEN, "    Entry size: "); cprintf(YELLOW, "%#x ", entry->entry_size);
+        if(desc->stride < sizeof(struct rknano_boot_entry_t))
+            cprintf(RED, "(too small <%#lx)\n", sizeof(struct rknano_boot_entry_t));
+        else
+            cprintf(RED, "(OK >=%#lx)\n", sizeof(struct rknano_boot_entry_t));
+        cprintf(GREEN, "    Unk: "); cprintf(YELLOW, "%#x\n", entry->unk);
+        cprintf(GREEN, "    Name: "); cprintf(YELLOW, "%S\n", from_uni16(entry->name));
+        cprintf(GREEN, "    Offset: "); cprintf(YELLOW, "%#x\n", entry->offset);
+        cprintf(GREEN, "    Size: "); cprintf(YELLOW, "%#x\n", entry->size);
+        cprintf(GREEN, "    Sthg 2: "); cprintf(YELLOW, "%#x\n", entry->sthg2);
+
+        struct rknano_blob_t blob;
+        blob.offset = entry->offset;
+        blob.size = entry->size;
+        char name[128];
+        sprintf(name, "desc_%d_ent_%S_", desc_idx, from_uni16(entry->name));
+        save_blob(&blob, buf, size, name, i, PAGE_ENC);
+    }
+
+    return 0;
+}
 
 static int do_boot_image(uint8_t *buf, unsigned long size)
 {
@@ -359,17 +521,28 @@ static int do_boot_image(uint8_t *buf, unsigned long size)
     print("field_E", field_E);
     print_arr("field_10", field_10, 5);
     print("field_15", field_15);
-    print("field_19", field_19);
-    print("field_1A", field_1A);
-    print_arr("field_1E", field_1E, 2);
-    print("field_20", field_20);
-    print_arr("field_24", field_24, 2);
-    print("field_26", field_26);
-    print_arr("field_2A", field_2A, 10);
+    print_arr("field_2A", field_2B, 9);
     print("field_34", field_34);
-    cprintf(GREEN, "Value: ");
-    cprintf(YELLOW, "%#x\n", *(unsigned long *)((uint8_t *)hdr + hdr->field_34 - 10));
 
+    do_boot_desc(buf, size, &hdr->desc_1, 1);
+    do_boot_desc(buf, size, &hdr->desc_2, 2);
+    do_boot_desc(buf, size, &hdr->desc_4, 4);
+
+    cprintf(BLUE, "Variable Header:\n");
+    cprintf(GREEN, "  Value: ");
+    cprintf(YELLOW, "%#lx\n", *(unsigned long *)((uint8_t *)hdr + hdr->field_34 - 10));
+
+    /* The last 4 bytes are a 32-bit CRC */
+    cprintf(BLUE, "Post Header:\n");
+    cprintf(GREEN, "  CRC: ");
+    uint32_t crc = *(uint32_t *)(buf + size - 4);
+    uint32_t ccrc = boot_crc(buf, size - 4);
+    cprintf(YELLOW, "%08x ", crc);
+    if(crc == ccrc)
+        cprintf(RED, "OK\n");
+    else
+        cprintf(RED, "Mismatch\n");
+    
     return 0;
 }
 
@@ -414,12 +587,12 @@ static int do_rkfw_image(uint8_t *buf, unsigned long size)
     cprintf(GREEN, "  Loader: ");
     print_blob_interval(&hdr->loader);
     cprintf(OFF, "\n");
-    save_blob(&hdr->loader, buf, size, "loader", 0, false);
+    save_blob(&hdr->loader, buf, size, "loader", 0, NO_ENC);
 
     cprintf(GREEN, "  Update: ");
     print_blob_interval(&hdr->update);
     cprintf(OFF, "\n");
-    save_blob(&hdr->update, buf, size, "update", 0, false);
+    save_blob(&hdr->update, buf, size, "update", 0, NO_ENC);
 
     print("hdr_size", hdr_size);
     print("field_6", field_6);
