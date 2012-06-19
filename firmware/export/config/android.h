@@ -45,7 +45,7 @@
 #endif
 
 #define LCD_DEPTH  16
-#define LCD_PIXELFORMAT 565
+#define LCD_PIXELFORMAT RGB565
 
 #define HAVE_LCD_ENABLE
 

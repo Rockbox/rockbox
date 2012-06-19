@@ -45,7 +45,7 @@
 #endif
 
 #define LCD_DEPTH  16
-#define LCD_PIXELFORMAT 565
+#define LCD_PIXELFORMAT RGB565
 
 /* define this to indicate your device's keypad */
 #define HAVE_TOUCHSCREEN

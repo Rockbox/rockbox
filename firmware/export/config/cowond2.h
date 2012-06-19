@@ -74,7 +74,7 @@
 #define LCD_HEIGHT 240
 #define LCD_DPI    160
 #define LCD_DEPTH  16
-#define LCD_PIXELFORMAT 565
+#define LCD_PIXELFORMAT RGB565
 
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE

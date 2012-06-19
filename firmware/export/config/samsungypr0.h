@@ -52,7 +52,7 @@
 
 #define LCD_DEPTH  16
 /* Check that but should not matter */
-#define LCD_PIXELFORMAT 565
+#define LCD_PIXELFORMAT RGB565
 
 /* YP-R0 has the backlight */
 #define HAVE_BACKLIGHT
