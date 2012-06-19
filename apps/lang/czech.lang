@@ -12382,15 +12382,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D vylepšení"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: ""
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "TŘIDÉ vylepšení"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: ""
   </voice>
 </phrase>
 <phrase>
@@ -12780,7 +12780,7 @@
 </phrase>
 <phrase>
   id: LANG_SLEEP_TIMER_DURATION
-  desc: default sleep timer duration in minutes (unused in UI)
+  desc: default sleep timer duration in minutes
   user: core
   <source>
     *: "Default Sleep Timer Duration"
@@ -12939,5 +12939,67 @@
   <voice>
     *: none
     quickscreen: "Použít menu Zástupci místo Rychlé nabídky"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Jednoduchý (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Jednoduchý"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "Zapnout časovač vypnutí"
+  </dest>
+  <voice>
+    *: "Zapnout časovač vypnutí"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "Západní Evropa (CP1252)"
+  </dest>
+  <voice>
+    *: "Západní Evropa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Vlastní"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Vlastní"
   </voice>
 </phrase>
