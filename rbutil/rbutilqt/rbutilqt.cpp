@@ -376,8 +376,8 @@ void RbUtilQt::updateDevice()
     if(name.isEmpty()) name = "&lt;none&gt;";
     if(mountpoint.isEmpty())
         mountpoint = "&lt;invalid&gt;";
-    ui.labelDevice->setText(tr("<b>%1 %2</b> at <b>%3</b>")
-            .arg(brand, name, mountdisplay));
+    ui.labelDevice->setText(tr("<b>%1 %2</b>").arg(brand, name));
+    ui.labelMountpoint->setText(tr("<b>%1</b>").arg(mountdisplay));
 
     // hide quickstart buttons if no release available        
     bool installable = !ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty();

@@ -20,58 +20,58 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout">
     <item row="0" column="0">
-     <layout class="QHBoxLayout">
-      <property name="spacing">
-       <number>6</number>
+     <widget class="QLabel" name="logoLabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="margin">
-       <number>0</number>
+      <property name="baseSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
       </property>
-      <item>
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="logoLabel">
-        <property name="text">
-         <string comment="Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox."/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="rbutilqt.qrc">:/icons/rblogo.png</pixmap>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
+      <property name="text">
+       <string comment="Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox."/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="rbutilqt.qrc">:/icons/rblogo.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+     </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QGroupBox" name="groupBox_3">
+    <item row="0" column="1">
+     <widget class="QGroupBox" name="groupBoxDevice">
       <property name="title">
        <string>Device</string>
       </property>
-      <layout class="QGridLayout">
-       <item row="0" column="0">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="1" column="2">
+        <widget class="QLabel" name="labelMountpoint">
+         <property name="text">
+          <string>mountpoint unknown or invalid</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="labelMountpointTitle">
+         <property name="text">
+          <string>Mountpoint:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="labelDevice">
+         <property name="text">
+          <string>device unknown or invalid</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
         <widget class="QLabel" name="labelDeviceTitle">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -80,19 +80,12 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Selected device:</string>
+          <string>Device:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="labelDevice">
-         <property name="text">
-          <string>device / mountpoint unknown or invalid</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <spacer>
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -118,10 +111,10 @@
       </layout>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="1" column="0" colspan="2">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="quickStart">
        <attribute name="title">
