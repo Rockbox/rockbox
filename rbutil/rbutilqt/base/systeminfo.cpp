@@ -59,6 +59,7 @@ const static struct {
     { SystemInfo::CurName,              ":platform:/name",      "" },
     { SystemInfo::CurBuildserverModel,  ":platform:/buildserver_modelname", "" },
     { SystemInfo::CurConfigureModel,    ":platform:/configure_modelname", "" },
+    { SystemInfo::CurPlayerPicture,     ":platform:/playerpic", "" },
 };
 
 //! pointer to setting object to NULL

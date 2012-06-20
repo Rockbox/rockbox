@@ -42,6 +42,56 @@
         <file>icons/wizard.jpg</file>
         <file alias="icons/rockbox-clef.svg">../../docs/logo/rockbox-clef.svg</file>
     </qresource>
+    <qresource>
+        <file>icons/players/archosfmrecorder-small.png</file>
+        <file>icons/players/archosondiofm-small.png</file>
+        <file>icons/players/archosondiosp-small.png</file>
+        <file>icons/players/archosplayer-small.png</file>
+        <file>icons/players/archosrecorder-small.png</file>
+        <file>icons/players/archosrecorderv2-small.png</file>
+        <file>icons/players/cowond2-small.png</file>
+        <file>icons/players/gigabeatfx-small.png</file>
+        <file>icons/players/gigabeats-small.png</file>
+        <file>icons/players/gogearhdd1630-small.png</file>
+        <file>icons/players/gogearhdd6330-small.png</file>
+        <file>icons/players/gogearsa9200-small.png</file>
+        <file>icons/players/hifimanhm60x-small.png</file>
+        <file>icons/players/hifimanhm801-small.png</file>
+        <file>icons/players/iaudiom3-small.png</file>
+        <file>icons/players/iaudiom5-small.png</file>
+        <file>icons/players/iaudiox5-small.png</file>
+        <file>icons/players/ipod1g2g-small.png</file>
+        <file>icons/players/ipod3g-small.png</file>
+        <file>icons/players/ipod4g-small.png</file>
+        <file>icons/players/ipodcolor-small.png</file>
+        <file>icons/players/ipodmini1g-small.png</file>
+        <file>icons/players/ipodnano1g-small.png</file>
+        <file>icons/players/ipodnano2g-small.png</file>
+        <file>icons/players/ipodvideo-small.png</file>
+        <file>icons/players/iriverh100-small.png</file>
+        <file>icons/players/iriverh10_5gb-small.png</file>
+        <file>icons/players/iriverh10-small.png</file>
+        <file>icons/players/iriverh300-small.png</file>
+        <file>icons/players/mpiohd200-small.png</file>
+        <file>icons/players/mpiohd300-small.png</file>
+        <file>icons/players/mrobe100-small.png</file>
+        <file>icons/players/mrobe500-small.png</file>
+        <file>icons/players/samsungyh820-small.png</file>
+        <file>icons/players/samsungyh920-small.png</file>
+        <file>icons/players/samsungyh925-small.png</file>
+        <file>icons/players/samsungypr0-small.png</file>
+        <file>icons/players/sansac200-small.png</file>
+        <file>icons/players/sansaclipplus-small.png</file>
+        <file>icons/players/sansaclip-small.png</file>
+        <file>icons/players/sansaclipzip-small.png</file>
+        <file>icons/players/sansaconnect-small.png</file>
+        <file>icons/players/sansae200-small.png</file>
+        <file>icons/players/sansafuzeplus-small.png</file>
+        <file>icons/players/sansafuze-small.png</file>
+        <file>icons/players/vibe500-small.png</file>
+        <file>icons/players/vx747-small.png</file>
+        <file>icons/players/vx777-small.png</file>
+    </qresource>
     <qresource prefix="/ini">
         <file>rbutil.ini</file>
     </qresource>

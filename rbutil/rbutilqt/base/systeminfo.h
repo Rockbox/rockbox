@@ -63,6 +63,7 @@ class SystemInfo : public QObject
             CurName,
             CurBuildserverModel,
             CurConfigureModel,
+            CurPlayerPicture,
         };
 
         enum PlatformType {

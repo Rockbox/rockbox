@@ -364,20 +364,28 @@ void RbUtilQt::updateDevice()
     ui.menuA_ctions->setEnabled(configurationValid);
 
     // displayed device info
-    QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
     QString brand = SystemInfo::value(SystemInfo::CurBrand).toString();
-    QString name = SystemInfo::value(SystemInfo::CurName).toString() +
-        " (" + ServerInfo::value(ServerInfo::CurStatus).toString() + ")";
-    QString mountdisplay = QDir::toNativeSeparators(mountpoint);
-    QString label = Utils::filesystemName(mountpoint);
-    if(!label.isEmpty())
-        mountdisplay += " (" + label + ")";
-
-    if(name.isEmpty()) name = "&lt;none&gt;";
-    if(mountpoint.isEmpty())
-        mountpoint = "&lt;invalid&gt;";
+    QString name
+        = QString("%1 (%2)").arg(SystemInfo::value(SystemInfo::CurName).toString(),
+            ServerInfo::value(ServerInfo::CurStatus).toString());
     ui.labelDevice->setText(tr("<b>%1 %2</b>").arg(brand, name));
-    ui.labelMountpoint->setText(tr("<b>%1</b>").arg(mountdisplay));
+
+    QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    QString mountdisplay = QDir::toNativeSeparators(mountpoint);
+    if(!mountdisplay.isEmpty()) {
+        QString label = Utils::filesystemName(mountpoint);
+        if(!label.isEmpty()) mountdisplay += QString(" (%1)").arg(label);
+        ui.labelMountpoint->setText(tr("<b>%1</b>").arg(mountdisplay));
+    }
+    else {
+        mountdisplay = "(unknown)";
+    }
+
+    QPixmap pm;
+    QString m = SystemInfo::value(SystemInfo::CurPlayerPicture).toString();
+    pm.load(":/icons/players/" + m + "-small.png");
+    pm = pm.scaledToHeight(QFontMetrics(QApplication::font()).height() * 3);
+    ui.labelPlayerPic->setPixmap(pm);
 
     // hide quickstart buttons if no release available        
     bool installable = !ServerInfo::value(ServerInfo::CurReleaseVersion).toString().isEmpty();
