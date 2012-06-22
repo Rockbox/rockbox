@@ -3463,7 +3463,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
 
     /* use current working directory as base for pathname */
     if (format_track_path(path, filename, sizeof(tmp_buf),
-                          strlen(filename)+1, '/') < 0)
+                          strlen(filename)+1, "/") < 0)
         return -1;
 
     /* can ignore volatile here, because core_get_data() is called later */
