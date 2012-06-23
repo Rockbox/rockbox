@@ -46,6 +46,8 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
             this, SLOT(updateDetails(QListWidgetItem*, QListWidgetItem*)));
     connect(ui.listThemes, SIGNAL(itemSelectionChanged()), this, SLOT(updateSize()));
     connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
+
+    logger = NULL;
 }
 
 ThemesInstallWindow::~ThemesInstallWindow()
@@ -285,6 +287,9 @@ void ThemesInstallWindow::resizeEvent(QResizeEvent* e)
 void ThemesInstallWindow::show()
 {
     QDialog::show();
+    if(windowSelectOnly)
+        ui.buttonOk->setText(tr("Select"));
+
     logger = new ProgressLoggerGui(this);
     logger->show();
     logger->addItem(tr("getting themes information ..."), LOGINFO);
@@ -304,7 +309,16 @@ void ThemesInstallWindow::abort()
 }
 
 
-void ThemesInstallWindow::accept()
+void ThemesInstallWindow::accept(void)
+{
+    if(!windowSelectOnly)
+        install();
+    else
+        close();
+}
+
+
+void ThemesInstallWindow::install()
 {
     if(ui.listThemes->selectedItems().size() == 0) {
         this->close();
@@ -329,7 +343,8 @@ void ThemesInstallWindow::accept()
     }
     qDebug() << "[Themes] installing:" << themes;
 
-    logger = new ProgressLoggerGui(this);
+    if(logger == NULL)
+        logger = new ProgressLoggerGui(this);
     logger->show();
     QString mountPoint = RbSettings::value(RbSettings::Mountpoint).toString();
     qDebug() << "[Themes] mountpoint:" << mountPoint;
@@ -348,13 +363,15 @@ void ThemesInstallWindow::accept()
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
 
-    connect(logger, SIGNAL(closed()), this, SLOT(close()));
+    if(!windowSelectOnly) {
+        connect(logger, SIGNAL(closed()), this, SLOT(close()));
+        connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    }
     connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
     connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
-    connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(installer, SIGNAL(done(bool)), this, SIGNAL(done(bool)));
     connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
     installer->install();
-
 }
 
 

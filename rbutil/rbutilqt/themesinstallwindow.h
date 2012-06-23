@@ -38,9 +38,15 @@ class ThemesInstallWindow : public QDialog
         ~ThemesInstallWindow();
         void downloadInfo(void);
         void show(void);
+        void setLogger(ProgressLoggerGui* l) { logger = l; }
+        void setSelectOnly(bool state) { windowSelectOnly = state; }
+        void install(void);
 
     public slots:
         void accept(void);
+
+    signals:
+        void done(bool);
 
     private:
         Ui::ThemeInstallFrm ui;
@@ -56,6 +62,7 @@ class ThemesInstallWindow : public QDialog
         QString fileName;
 
         QString infocachedir;
+        bool windowSelectOnly;
 
     private slots:
         void downloadDone(bool);
