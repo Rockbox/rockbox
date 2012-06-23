@@ -49,7 +49,7 @@ void lcd_print_icon(int x, int icon_line, bool enable, char **icon)
 
     for (; icon[row]; row++)
     {
-        for (; icon[row][col]; col++)
+        for (col = 0; icon[row][col]; col++)
         {
             switch (icon[row][col])
             {
