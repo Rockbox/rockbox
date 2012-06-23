@@ -6083,11 +6083,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigtype"
+    recording: "Typ wyzwalacza"
   </dest>
   <voice>
     *: none
-    recording: "Trigtype"
+    recording: "Typ wyzwalacza"
   </voice>
 </phrase>
 <phrase>
@@ -12075,15 +12075,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Efekt 3D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Efekt 3D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Efekt 3D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Efekt 3D"
   </voice>
 </phrase>
 <phrase>
@@ -12891,7 +12891,7 @@
 </phrase>
 <phrase>
   id: LANG_SLEEP_TIMER_DURATION
-  desc: default sleep timer duration in minutes (unused in UI)
+  desc: default sleep timer duration in minutes
   user: core
   <source>
     *: "Default Sleep Timer Duration"
@@ -12915,5 +12915,98 @@
   </dest>
   <voice>
     *: "Uruchom usypiacz przy włączeniu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Prosty (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Prosty Mejer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "Uruchom usypiacz"
+  </dest>
+  <voice>
+    *: "Uruchom usypiacz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "Europa Zachodnia (CP1252)"
+  </dest>
+  <voice>
+    *: "Europa Zachodnia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Własny"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Własny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Użyj Skrótów zamiast Szybkiego Dostępu"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Użyj Skrótów zamiast Szybkiego Dostępu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "Ogranicz przechodzenie między folderami"
+  </dest>
+  <voice>
+    *: "Ogranicz przechodzenie między folderami"
   </voice>
 </phrase>
