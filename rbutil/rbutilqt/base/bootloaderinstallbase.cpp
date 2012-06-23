@@ -225,18 +225,23 @@ bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
             // strip any path, we don't know the structure in the zip
             QString f = QFileInfo(blfile.at(i)).fileName();
             qDebug() << "[BootloaderInstallBase] searching archive for" << f;
-            int index = contents.indexOf(f); // FIXME: support files in folders
-            if(index >= 0) {
-                found = true;
-                emit logItem(tr("Extracting firmware %1 from archive")
-                             .arg(f), LOGINFO);
-                // store in class temporary file
-                m_tempof.open();
-                m_offile = m_tempof.fileName();
-                m_tempof.close();
-                if(!z.extractArchive(m_offile, contents.at(index))) {
-                    emit logItem(tr("Error extracting firmware from archive"), LOGERROR);
-                    found = false;
+            // contents.indexOf() works case sensitive. Since the filename
+            // casing is unknown (and might change) do this manually.
+            // FIXME: support files in folders
+            for(int j = 0; j < contents.size(); ++j) {
+                if(contents.at(j).compare(f, Qt::CaseInsensitive) == 0) {
+                    found = true;
+                    emit logItem(tr("Extracting firmware %1 from archive")
+                            .arg(f), LOGINFO);
+                    // store in class temporary file
+                    m_tempof.open();
+                    m_offile = m_tempof.fileName();
+                    m_tempof.close();
+                    if(!z.extractArchive(m_offile, contents.at(j))) {
+                        emit logItem(tr("Error extracting firmware from archive"), LOGERROR);
+                        found = false;
+                        break;
+                    }
                     break;
                 }
             }
