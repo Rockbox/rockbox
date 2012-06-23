@@ -29,7 +29,7 @@
 
 static bool display_on = false;
 
-static void lcd_display_init(void)
+static void lcd_v1_display_init(void)
 {
     unsigned int x, y;
 
@@ -108,13 +108,7 @@ static void lcd_display_init(void)
     display_on = true;
 }
 
-void lcd_init_device(void)
-{
-    lcdif_init(LCDIF_16BIT);
-    lcd_display_init();
-}
-
-void lcd_enable (bool on)
+static void lcd_v1_enable (bool on)
 {
     if (on)
     {
@@ -145,30 +139,183 @@ void lcd_enable (bool on)
         lcd_write_reg(0x21, 0x00);
     }
     display_on = on;
+}
+
+static void lcd_v1_update_rect(int x, int y, int width, int height)
+{
+     int px = x, py = y;
+     int pxmax = x + width, pymax = y + height;
+ 
+     lcd_write_reg(0x03, y);
+     lcd_write_reg(0x05, pymax-1);
+     lcd_write_reg(0x07, x);
+     lcd_write_reg(0x09, pxmax-1);
+     
+     lcd_cmd(0x22);
+     
+     for (px=x; px<pxmax; px++)
+         for (py=y; py<pymax; py++)
+             lcd_data(*FBADDR(px, py));
+}
+
+
+#ifdef HM60X
+
+enum lcd_type_t
+{
+    LCD_V1,
+    LCD_v2
+} lcd_type;
+
+static void identify_lcd(void)
+{
+    SCU_IOMUXB_CON &= ~(1<<2);
+    GPIO_PCCON |= (1<<4);
+    if (GPIO_PCDR & (1<<4))
+    {
+        lcd_type = LCD_V1;
+    }
+    else
+    {
+        lcd_type = LCD_v2;
+    }
+}
+
+static void lcd_v2_display_init(void)
+{
+    unsigned int x, y;
+
+    lcd_write_reg(0xD0, 0x0003);
+    lcd_write_reg(0xEB, 0x0B00);
+    lcd_write_reg(0xEC, 0x00CF);
+    lcd_write_reg(0xC7, 0x030F);
+
+    lcd_write_reg(0x01, 0x001C);
+    lcd_write_reg(0x02, 0x0100);
+    lcd_write_reg(0x03, 0x1038);
+    lcd_write_reg(0x07, 0x0000);
+    lcd_write_reg(0x08, 0x0808);
+    lcd_write_reg(0x0F, 0x0901);
+    lcd_write_reg(0x10, 0x0000);
+    lcd_write_reg(0x11, 0x1B41);
+    lcd_write_reg(0x12, 0x2010);
+    lcd_write_reg(0x13, 0x0009);
+    lcd_write_reg(0x14, 0x4C65);
+
+    lcd_write_reg(0x30, 0x0000);
+    lcd_write_reg(0x31, 0x00DB);
+    lcd_write_reg(0x32, 0x0000);
+    lcd_write_reg(0x33, 0x0000);
+    lcd_write_reg(0x34, 0x00DB);
+    lcd_write_reg(0x35, 0x0000);
+    lcd_write_reg(0x36, 0x00AF);
+    lcd_write_reg(0x37, 0x0000);
+    lcd_write_reg(0x38, 0x00DB);
+    lcd_write_reg(0x39, 0x0000);
+
+    lcd_write_reg(0x50, 0x0000);
+    lcd_write_reg(0x51, 0x0705);
+    lcd_write_reg(0x52, 0x0C0A);
+    lcd_write_reg(0x53, 0x0401);
+    lcd_write_reg(0x54, 0x040C);
+    lcd_write_reg(0x55, 0x0608);
+    lcd_write_reg(0x56, 0x0000);
+    lcd_write_reg(0x57, 0x0104);
+    lcd_write_reg(0x58, 0x0E06);
+    lcd_write_reg(0x59, 0x060E);
+
+    lcd_write_reg(0x20, 0x0000);
+    lcd_write_reg(0x21, 0x0000);
+
+    lcd_write_reg(0x07, 0x1017);
+
+    lcd_write_reg(0x20, 0x00AF);
+    lcd_write_reg(0x21, 0x0000);
+
+    lcd_cmd(0x22);
+
+    for (x=0; x<LCD_WIDTH; x++)
+        for(y=0; y<LCD_HEIGHT; y++)
+            lcd_data(0x00);
+
+    display_on = true;
+}
+
+static void lcd_v2_enable (bool on)
+{
+    display_on = on;
+}
+
+static void lcd_v2_update_rect(int x, int y, int width, int height)
+{
+    int px, py;
+    (void) x;
+    (void) y;
+    (void) width;
+    (void)height;
+
+    lcd_cmd(0x22);
+    
+    for (py=0; py<LCD_HEIGHT; py++)
+        for (px=0; px<LCD_WIDTH; px++)
+            lcd_data(*FBADDR(px, py));
+}
+
+void lcd_init_device(void)
+{
+    lcdif_init(LCDIF_16BIT);
+
+    identify_lcd();
+    if (lcd_type == LCD_V1)
+        lcd_v1_display_init();
+    else
+        lcd_v2_display_init();
 
 }
+
+void lcd_enable (bool on)
+{
+    if (lcd_type == LCD_V1)
+        lcd_v1_enable(on);
+    else
+        lcd_v2_enable(on);
+}
+
+void lcd_update_rect(int x, int y, int width, int height)
+{
+    if (lcd_type == LCD_V1)
+        lcd_v1_update_rect(x, y, width, height);
+    else
+        lcd_v2_update_rect(x, y, width, height);
+}
+
+
+
+#else /* HM801 */
+
+void lcd_init_device(void)
+{
+    lcdif_init(LCDIF_16BIT);
+    lcd_v1_display_init();
+}
+
+void lcd_enable (bool on)
+{
+    lcd_v1_enable(on);
+}
+
+void lcd_update_rect(int x, int y, int width, int height)
+{
+    lcd_v1_update_rect(x, y, width, height);
+}
+
+#endif
+
+
 
 bool lcd_active()
 {
     return display_on;
-}
-
-
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    int px = x, py = y;
-    int pxmax = x + width, pymax = y + height;
-
-    lcd_write_reg(0x03, y);
-    lcd_write_reg(0x05, pymax-1);
-    lcd_write_reg(0x07, x);
-    lcd_write_reg(0x09, pxmax-1);
-
-    lcd_cmd(0x22);
-
-    for (px=x; px<pxmax; px++)
-	for (py=y; py<pymax; py++)
-            lcd_data(*FBADDR(px, py));
 }
 
 /* Blit a YUV bitmap directly to the LCD */
