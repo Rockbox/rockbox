@@ -40,7 +40,6 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
     ui.treeView->setModel(fsm);
     ui.treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui.treeView->setRootIndex(fsm->index(mp));
-    qDebug() << fsm->columnCount();
     fsm->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
     for(int i = 1; i < fsm->columnCount(); i++)
         ui.treeView->setColumnHidden(i, true);

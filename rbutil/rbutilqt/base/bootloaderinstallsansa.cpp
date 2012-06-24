@@ -166,7 +166,7 @@ void BootloaderInstallSansa::installStage3(bool mounted)
         emit logItem(tr("Writing log aborted"), LOGERROR);
         emit done(true);
     }
-    qDebug() << "version installed:" << m_blversion.toString(Qt::ISODate);
+    qDebug() << "[BootloaderInstallSansa] version installed:" << m_blversion.toString(Qt::ISODate);
 }
 
 

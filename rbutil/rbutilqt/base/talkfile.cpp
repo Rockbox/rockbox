@@ -160,7 +160,7 @@ bool TalkFileCreator::createTalkList(QDir startDir)
                 entry.target = dir.path() + "/_dirname.talk";
                 entry.voiced = false;
                 entry.encoded = false;
-                qDebug() << "toSpeak:" << entry.toSpeak
+                qDebug() << "[TalkFileCreator] toSpeak:" << entry.toSpeak
                          << "target:" << entry.target
                          << "intermediates:" << entry.wavfilename << entry.talkfilename;
                 m_talkList.append(entry);
@@ -204,7 +204,7 @@ bool TalkFileCreator::createTalkList(QDir startDir)
                 entry.target =  fileInf.path() + "/" + fileInf.fileName() + ".talk";
                 entry.voiced = false;
                 entry.encoded = false;
-                qDebug() << "toSpeak:" << entry.toSpeak
+                qDebug() << "[TalkFileCreator] toSpeak:" << entry.toSpeak
                          << "target:" << entry.target
                          << "intermediates:" <<
                             entry.wavfilename << entry.talkfilename;
@@ -249,7 +249,8 @@ bool TalkFileCreator::copyTalkFiles(QString* errString)
             QFile::remove(m_talkList[i].target);
 
         // copying
-        qDebug() << "copying " << m_talkList[i].talkfilename << "to" << m_talkList[i].target;
+        qDebug() << "[TalkFileCreator] copying" << m_talkList[i].talkfilename
+                 << "to" << m_talkList[i].target;
         if(!QFile::copy(m_talkList[i].talkfilename,m_talkList[i].target))
         {
             *errString = tr("Copying of %1 to %2 failed").arg(m_talkList[i].talkfilename).arg(m_talkList[i].target);

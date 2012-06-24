@@ -207,7 +207,8 @@ TalkGenerator::Status TalkGenerator::encodeList(QList<TalkEntry>* list)
          //skip non-voiced entrys
         if(list->at(i).voiced == false)
         {
-            qDebug() << "non voiced entry" << list->at(i).toSpeak <<"detected";
+            qDebug() << "[TalkGenerator] non voiced entry detected:"
+                     << list->at(i).toSpeak;
             emit logProgress(++m_progress,progressMax);
             continue;
         }

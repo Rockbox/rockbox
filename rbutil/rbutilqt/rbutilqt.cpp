@@ -1117,11 +1117,13 @@ void RbUtilQt::installPortable(void)
 QUrl RbUtilQt::proxy()
 {
     QUrl proxy;
-    if(RbSettings::value(RbSettings::ProxyType) == "manual")
+    QString proxytype = RbSettings::value(RbSettings::ProxyType).toString();
+    if(proxytype == "manual")
         proxy.setEncodedUrl(RbSettings::value(RbSettings::Proxy).toByteArray());
-    else if(RbSettings::value(RbSettings::ProxyType) == "system")
+    else if(proxytype == "system")
         proxy = System::systemProxy();
-    qDebug() << proxy.userName() << proxy.password() << proxy.host() << proxy.port();
+
+    qDebug() << "[RbUtilQt] Proxy is" << proxy;
     return proxy;
 }
 

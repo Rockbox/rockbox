@@ -178,7 +178,7 @@ bool EncoderLame::encode(QString input,QString output)
             // input format used should be known. In case some TTS uses a
             // different wave encoding some time this needs to get adjusted.
             if(chunkdatalen < 16) {
-                qDebug() << "fmt chunk too small!";
+                qDebug() << "[EncoderLame] fmt chunk too small!";
             }
             else {
                 unsigned char *buf = new unsigned char[chunkdatalen];

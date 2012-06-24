@@ -84,7 +84,7 @@ void TTSSapi::saveSettings()
 
 void TTSSapi::updateVoiceList()
 {
-    qDebug() << "update voiceList";
+    qDebug() << "[TTSSapi] updating voicelist";
     QStringList voiceList = getVoiceList(getSetting(eLANGUAGE)->current().toString());
     getSetting(eVOICE)->setList(voiceList);
     if(voiceList.size() > 0) getSetting(eVOICE)->setCurrent(voiceList.at(0));

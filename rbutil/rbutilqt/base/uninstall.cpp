@@ -66,7 +66,7 @@ void Uninstaller::uninstall(void)
                 if(installlog.contains(toDeleteList.at(j)))
                 {
                     deleteFile = false;
-                    qDebug() << "file still in use:" << toDeleteList.at(j);
+                    qDebug() << "[Uninstaller] file still in use:" << toDeleteList.at(j);
                 }
                 installlog.endGroup();
             }
@@ -79,7 +79,7 @@ void Uninstaller::uninstall(void)
                     emit logItem(tr("Could not delete %1")
                           .arg(toDelete.filePath()), LOGWARNING);
                 installlog.remove(toDeleteList.at(j));
-                qDebug() << "deleted: " << toDelete.filePath() ;
+                qDebug() << "[Uninstaller] deleted:" << toDelete.filePath();
             }
             else  // if it is a dir, remember it for later deletion
             {
