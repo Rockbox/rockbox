@@ -1055,6 +1055,39 @@ static int parse_progressbar_tag(struct skin_element* element,
         token->type = SKIN_TOKEN_LIST_SCROLLBAR;
     pb->type = token->type;
 
+#ifdef HAVE_TOUCHSCREEN
+	if (token->type == SKIN_TOKEN_VOLUMEBAR ||
+		token->type == SKIN_TOKEN_PROGRESSBAR)
+	{
+		struct touchregion *region = skin_buffer_alloc(sizeof(*region));
+
+		if (!region)
+			return 0;
+
+		if (token->type == SKIN_TOKEN_VOLUMEBAR)
+			region->action = ACTION_TOUCH_VOLUME;
+		else
+			region->action = ACTION_TOUCH_SCROLLBAR;
+
+		region->x = pb->x;
+		region->y = pb->y;
+		region->width = pb->width;
+		region->height = pb->height;
+		region->wvp = PTRTOSKINOFFSET(skin_buffer, curr_vp);
+		region->reverse_bar = false;
+		region->allow_while_locked = false;
+		region->press_length = PRESS;
+		region->last_press = 0xffff;
+		region->armed = false;
+		region->bar = PTRTOSKINOFFSET(skin_buffer, pb);
+
+		struct skin_token_list *item = new_skin_token_list_item(NULL, region);
+		if (!item)
+			return WPS_ERROR_INVALID_PARAM;
+		add_to_ll_chain(&wps_data->touchregions, item);
+	}
+#endif
+
     return 0;
 
 #else
@@ -1429,6 +1462,7 @@ static int parse_touchregion(struct skin_element *element,
     region->last_press = 0xffff;
     region->press_length = PRESS;
     region->allow_while_locked = false;
+    region->bar = -1;
     action = get_param_text(element, p++);
 
     /* figure out the action */
