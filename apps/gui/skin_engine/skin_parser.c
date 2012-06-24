@@ -871,6 +871,9 @@ static int parse_progressbar_tag(struct skin_element* element,
     struct skin_tag_parameter *param = get_param(element, 0);
     int curr_param = 0;
     char *image_filename = NULL;
+#ifdef HAVE_TOUCHSCREEN
+    bool suppress_touchregion = false;
+#endif
 
     if (element->params_count == 0 &&
         element->tag->type != SKIN_TOKEN_PROGRESSBAR)
@@ -1008,6 +1011,10 @@ static int parse_progressbar_tag(struct skin_element* element,
         }
         else if (!strcmp(text, "horizontal"))
             pb->horizontal = true;
+#ifdef HAVE_TOUCHSCREEN
+        else if (!strcmp(text, "notouch"))
+            suppress_touchregion = true;
+#endif
         else if (curr_param == 4)
             image_filename = text;
 
@@ -1054,6 +1061,51 @@ static int parse_progressbar_tag(struct skin_element* element,
     else if (token->type == SKIN_TOKEN_LIST_NEEDS_SCROLLBAR)
         token->type = SKIN_TOKEN_LIST_SCROLLBAR;
     pb->type = token->type;
+
+#ifdef HAVE_TOUCHSCREEN
+    if (/*!suppress_touchregion &&*/
+        (token->type == SKIN_TOKEN_VOLUMEBAR || token->type == SKIN_TOKEN_PROGRESSBAR))
+    {
+        struct touchregion *region = skin_buffer_alloc(sizeof(*region));
+        struct skin_token_list *item;
+
+        if (!region)
+            return 0;
+
+        if (token->type == SKIN_TOKEN_VOLUMEBAR)
+            region->action = ACTION_TOUCH_VOLUME;
+        else
+            region->action = ACTION_TOUCH_SCROLLBAR;
+
+        /* try to add some extra space on either end to make pressing the
+         * full bar easier. ~5% on either side
+         */
+        region->x = pb->x - pb->width*5/100;
+        if (region->x < 0)
+            region->x = 0;
+        region->width = pb->width;
+        if (region->width + pb->width*5/100 < curr_vp->vp.x + curr_vp->vp.width)
+            region->width += pb->width*5/100;
+        region->y = pb->y - pb->height*5/100;
+        if (region->y < 0)
+            region->y = 0;
+        region->height = pb->height;
+        if (region->height + pb->height*5/100 < curr_vp->vp.y + curr_vp->vp.height)
+            region->height += pb->height*5/100;
+        region->wvp = PTRTOSKINOFFSET(skin_buffer, curr_vp);
+        region->reverse_bar = false;
+        region->allow_while_locked = false;
+        region->press_length = PRESS;
+        region->last_press = 0xffff;
+        region->armed = false;
+        region->bar = PTRTOSKINOFFSET(skin_buffer, pb);
+
+        item = new_skin_token_list_item(NULL, region);
+        if (!item)
+            return WPS_ERROR_INVALID_PARAM;
+        add_to_ll_chain(&wps_data->touchregions, item);
+    }
+#endif
 
     return 0;
 
@@ -1429,6 +1481,7 @@ static int parse_touchregion(struct skin_element *element,
     region->last_press = 0xffff;
     region->press_length = PRESS;
     region->allow_while_locked = false;
+    region->bar = -1;
     action = get_param_text(element, p++);
 
     /* figure out the action */

@@ -676,6 +676,12 @@ display cycling round the defined sublines. See
   Some tags can be used to display a bar which draws according to the value of
   the tag. To use these tags like a bar you need to use the following parameters
   (\%XX should be replaced with the actual tag).
+  
+\opt{touchscreen}{
+    Volume and progress bars automatically create touch regions the same size
+    as the bar (slightly larger actually). This can be disabled with the
+    \config{notouch} option.
+}
 
 \begin{tagmap}
   \config{\%XX(x, y, width, height, [options])}
@@ -706,6 +712,9 @@ display cycling round the defined sublines. See
      ``slider'' option).
   \item[nobar] -- don't draw the bar or its frame (for use with the
     ``slider'' option).
+    \opt{touchscreen}{
+        \item[notouch] -- don't create the touchregion for progress/volume bars.
+    }
 \end{description}
 
 Example: \config{\%pb(0,0,-,-,-,nofill, slider, slider\_image, invert)} -- draw
