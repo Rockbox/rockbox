@@ -63,7 +63,6 @@
 # progressbar and bottom icons
 %V(0,360,-,-,-)
 %pb(20,11,280,-,pb-320x480x16.bmp)
-%T(20,0,280,40,progressbar)
 
 #%?mh<%xd(Aa)|%xd(Ab)>
 #%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
