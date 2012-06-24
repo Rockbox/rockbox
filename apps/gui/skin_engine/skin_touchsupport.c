@@ -99,7 +99,6 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                 /* reposition the touch within the area */
                 vx -= r->x;
                 vy -= r->y;
-                
 
                 switch(r->action)
                 {
@@ -107,11 +106,13 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                     case ACTION_TOUCH_VOLUME:
                         if (edge_offset)
                         {
+                            struct progressbar *bar =
+                                    SKINOFFSETTOPTR(skin_buffer, r->bar);
                             if(r->width > r->height)
                                 *edge_offset = vx*100/r->width;
                             else
                                 *edge_offset = vy*100/r->height;
-                            if (r->reverse_bar)
+                            if (r->reverse_bar || (bar && bar->invert_fill_direction))
                                 *edge_offset = 100 - *edge_offset;
                         }
                         temp = r;

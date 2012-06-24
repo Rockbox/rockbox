@@ -49,7 +49,6 @@
 # progressbar and bottom icons
 %V(0,323,-,33,-)
 %pb(25,0,750,-,pb-800x480x16.bmp)
-%T(25,0,750,50,progressbar)
 
 # volume
 %V(344,400,108,60,-)

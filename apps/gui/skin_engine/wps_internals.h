@@ -215,6 +215,7 @@ struct touchregion {
         int   value;
     };
     long last_press;        /* last tick this was pressed */
+    OFFSETTYPE(struct progressbar*) bar;
 };
 
 
