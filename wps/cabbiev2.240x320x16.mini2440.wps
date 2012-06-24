@@ -8,7 +8,6 @@
 %T(46,292,84,24,menu)
 %T(139,292,24,24,shuffle)
 %T(182,292,24,24,repmode)
-%T(22,254,199,13,progressbar)
 %X(wpsbackdrop-240x320x16.bmp)
 %xl(A,lock-240x320x16.bmp,11,292,2)
 %xl(B,battery-240x320x16.bmp,46,292,10)
