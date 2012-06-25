@@ -65,7 +65,7 @@ void lcd_write_reg(unsigned int reg, unsigned int val)
     lcd_data(val);
 }
 
-static void lcdctrl_bypass(unsigned int on_off)
+void lcdctrl_bypass(unsigned int on_off)
 {
     while (!(LCDC_STA & LCDC_MCU_IDLE));
 
@@ -89,37 +89,21 @@ static void lcdctrl_init(void)
     LCDC_CTRL = ALPHA(7) | LCDC_STOP | LCDC_MCU | RGB24B;
     MCU_CTRL = ALPHA_BASE(0x3f) | MCU_CTRL_BYPASS;
 
-    HOR_ACT = LCD_WIDTH + 3;    /* define horizonatal active region */
-    VERT_ACT = LCD_HEIGHT;       /* define vertical active region */
-    VERT_PERIOD = 0xfff;  /* CSn/WEn/RDn signal timings */
+    HOR_BP = LCD_WIDTH + 3;    /* define horizonatal active region */
+    VERT_BP = LCD_HEIGHT;       /* define vertical active region */
+    VERT_PERIOD = (1<<7)|(1<<5)|1;//0xfff;  /* CSn/WEn/RDn signal timings */
 
-    LINE0_YADDR = LINE_ALPHA_EN | 0x7fe;
-    LINE1_YADDR = LINE_ALPHA_EN | ((1 * LCD_WIDTH) - 2);
-    LINE2_YADDR = LINE_ALPHA_EN | ((2 * LCD_WIDTH) - 2);
-    LINE3_YADDR = LINE_ALPHA_EN | ((3 * LCD_WIDTH) - 2);
-
-    LINE0_UVADDR = 0x7fe + 1;
-    LINE1_UVADDR = ((1 * LCD_WIDTH) - 2 + 1);
-    LINE2_UVADDR = ((2 * LCD_WIDTH) - 2 + 1);
-    LINE3_UVADDR = ((3 * LCD_WIDTH) - 2 + 1);
-
-#if 0
     LINE0_YADDR = 0;
-    LINE1_YADDR = (1 * LCD_WIDTH);
-    LINE2_YADDR = (2 * LCD_WIDTH);
-    LINE3_YADDR = (3 * LCD_WIDTH);
+    LINE1_YADDR = 1 * LCD_WIDTH/2;
+    LINE2_YADDR = 2 * LCD_WIDTH/2;
+    LINE3_YADDR = 3 * LCD_WIDTH/2;
 
     LINE0_UVADDR = 1;
-    LINE1_UVADDR = (1 * LCD_WIDTH) + 1;
-    LINE2_UVADDR = (2 * LCD_WIDTH) + 1;
-    LINE3_UVADDR = (3 * LCD_WIDTH) + 1;
+    LINE1_UVADDR = (1 * LCD_WIDTH/2) + 1;
+    LINE2_UVADDR = (2 * LCD_WIDTH/2) + 1;
+    LINE3_UVADDR = (3 * LCD_WIDTH/2) + 1;
 
-    START_X = 0;
-    START_Y = 0;
-    DELTA_X = 0x200; /* no scaling */
-    DELTA_Y = 0x200; /* no scaling */
-#endif
-    LCDC_INTR_MASK = INTR_MASK_LINE; /* INTR_MASK_EVENLINE; */
+    LCDC_INTR_MASK = 0; /*INTR_MASK_LINE;  INTR_MASK_EVENLINE; */
 }
 
 /* configure pins to drive lcd in 18bit mode (16bit mode for HiFiMAN's) */
@@ -138,26 +122,106 @@ static void iomux_lcd(enum lcdif_mode_t mode)
     SCU_IOMUXB_CON |= IOMUX_LCD_D815;
 }
 
+static void dwdma_init(void)
+{
+    DWDMA_DMA_CHEN = 0xf00;
+    DWDMA_CLEAR_BLOCK = 0x0f;
+    DWDMA_DMA_CFG = 1; /* global enable */
+}
+
+/* dwdma linked list struct */
+struct llp_t {
+    uint32_t sar;
+    uint32_t dar;
+    struct llp_t *llp;
+    uint32_t ctl_l;
+    uint32_t ctl_h;
+    uint32_t dstat;
+};
+
+
+/* structs which describe full screen update */
+static struct llp_t scr_llp[LCD_HEIGHT];
+
+
+static void llp_setup(void *src, void *dst, struct llp_t *llp, uint32_t size)
+{
+    llp->sar = (uint32_t)src;
+    llp->dar = (uint32_t)dst;
+    llp->llp = llp + 1;
+    llp->ctl_h = size;
+    llp->ctl_l = (1<<20) |
+                 (1<<23) |
+                 (1<<17) |
+                 (2<<1)  |
+                 (2<<4)  |
+                 (3<<11) |
+                 (3<<14) |
+                 (1<<27) |
+                 (1<<28);
+}
+
+static void llp_end(struct llp_t *llp)
+{
+    llp->ctl_l &= ~((1<<27)|(1<<28));
+}
+
+
+static void dwdma_start(uint8_t ch, struct llp_t *llp, uint8_t handshake)
+{
+    DWDMA_SAR(ch) = 0;
+    DWDMA_DAR(ch) = 0;
+    DWDMA_LLP(ch) = (uint32_t)llp;
+    DWDMA_CTL_L(ch) = (1<<20) |
+                      (1<<23) |
+                      (1<<17) |
+                      (2<<1)  |
+                      (2<<4)  |
+                      (3<<11) |
+                      (3<<14) |
+                      (1<<27) |
+                      (1<<28);
+
+   DWDMA_CTL_H(ch) = 1;
+   DWDMA_CFG_L(ch) = (7<<5);
+   DWDMA_CFG_H(ch) = (handshake<<11)|(1<<2);
+   DWDMA_SGR(ch) = (13<<20);
+   DWDMA_DMA_CHEN = (0x101<<ch);
+
+}
+
+
+void create_llp(void)
+{
+    int i = 0;
+
+    /* build LLPs */
+    for (i=0; i<LCD_HEIGHT; i++)
+        llp_setup((void *)FBADDR(0,i), (void*)(&LCD_BUFF+((i%4)*LCD_WIDTH/2)), &(scr_llp[i]), LCD_WIDTH/2);
+
+    /* this seems to work with 2,3 and 4 dunno why is this */
+    llp_end(&scr_llp[LCD_HEIGHT-4]);
+}
+
 void lcdif_init(enum lcdif_mode_t mode)
 {
     iomux_lcd(mode);   /* setup pins for lcd interface */
+    dwdma_init();
+    create_llp();
     lcdctrl_init();    /* basic lcdc module configuration */
-    lcdctrl_bypass(1); /* run in bypass mode - all writes goes directly to lcd controller */
 }
 
-/* This is ugly hack. We drive lcd in bypass mode
- * where all writes goes directly to lcd controller.
- * This is suboptimal at best. IF module povides
- * FIFO, internal sram buffer, hardware scaller,
- * DMA signals, hardware alpha blending and more.
- * BUT the fact is that I have no idea how to use
- * this modes. Datasheet floating around is very
- * unclean in this regard and OF uses ackward
- * lcd update routines which are hard to understand.
- * Moreover OF sets some bits in IF module registers
- * which are referred as reseved in datasheet.
- */
 void lcd_update()
 {
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcd_set_gram_area(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcdctrl_bypass(0);
+
+    commit_discard_dcache_range(FBADDR(0,0), 2*LCD_WIDTH*LCD_HEIGHT);
+
+    dwdma_start(0, scr_llp, 6);
+    udelay(10);
+
+    MCU_CTRL=(1<<1)|(1<<2)|(1<<5);
+
+    while (DWDMA_CTL_L(0) & (1<<27));
 }

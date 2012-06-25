@@ -179,25 +179,34 @@ void lcd_init_device(void)
     lcd_display_init();
 }
 
+void lcd_set_gram_area(int x, int y, int width, int height)
+{
+    lcdctrl_bypass(1);
+    LCDC_CTRL |= RGB24B;
+
+    /* addresses setup */
+    lcd_write_reg(WINDOW_H_START,  y);
+    lcd_write_reg(WINDOW_H_END,    height-1);
+    lcd_write_reg(WINDOW_V_START,  x);
+    lcd_write_reg(WINDOW_V_END,    width-1);
+    lcd_write_reg(GRAM_H_ADDR,     y);
+    lcd_write_reg(GRAM_V_ADDR,     x);
+
+    lcd_cmd(GRAM_WRITE);
+    LCDC_CTRL &= ~RGB24B;
+}
+
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int px = x, py = y;
     int pxmax = x + width, pymax = y + height;
 
-    /* addresses setup */
-    lcd_write_reg(WINDOW_H_START,  y);
-    lcd_write_reg(WINDOW_H_END,    pymax-1);
-    lcd_write_reg(WINDOW_V_START,  x);
-    lcd_write_reg(WINDOW_V_END,    pxmax-1);
-    lcd_write_reg(GRAM_H_ADDR,     y);
-    lcd_write_reg(GRAM_V_ADDR,     x);
-
-    lcd_cmd(GRAM_WRITE);
+    lcd_set_gram_area(x, y, pxmax, pymax);
 
     for (py=y; py<pymax; py++)
     {
         for (px=x; px<pxmax; px++)
-            LCD_DATA = lcd_pixel_transform(*FBADDR(px,py));
+            LCD_DATA = *FBADDR(px,py);
     }
 }
 
@@ -213,5 +222,4 @@ void lcd_blit_yuv(unsigned char * const src[3],
     (void)x;
     (void)y;
     (void)width;
-    (void)height;
 }
