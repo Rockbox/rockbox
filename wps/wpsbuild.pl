@@ -589,20 +589,19 @@ while(<WPS>) {
         # mangles some filenames
         if (defined($backdrop) && $backdrop ne "-") {
             copybackdrop();
-            $backdrop = normalize($backdrop);
+            $backdrop = "$rbdir/" . normalize($backdrop);
         }
         foreach my $i ($iconset, $viewericon, $remoteiconset, $remoteviewericon) {
             if (defined($i) && $i ne "-") {
                 copythemeicon($i);
+                $i = "$rbdir/$i";
             }
         }
-        if (defined($font) && $font ne "-") {
-            copythemefont($font);
-            $font = "$rbdir/fonts/$font";
-        }
-        if (defined($remotefont) && $remotefont ne "-") {
-            copythemefont($remotefont);
-            $remotefont = "$rbdir/fonts/$remotefont";
+        foreach my $i ($font, $remotefont) {
+            if (defined($i) && $i ne "-") {
+                copythemefont($font);
+                $i = "$rbdir/fonts/$font";
+            }
         }
         buildcfg();
         copywps();
