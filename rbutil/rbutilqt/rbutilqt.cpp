@@ -198,19 +198,14 @@ void RbUtilQt::trace(void)
 
 void RbUtilQt::sysinfo(void)
 {
-    Sysinfo info(this);
-    info.exec();
+    Sysinfo sysinfo(this);
+    sysinfo.exec();
 }
 
 void RbUtilQt::updateTabs(int count)
 {
-    switch(count) {
-        case 6:
-            info->updateInfo();
-            break;
-        default:
-            break;
-    }
+    if(count == ui.tabWidget->indexOf(info->parentWidget()))
+        info->updateInfo();
 }
 
 
