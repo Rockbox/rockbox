@@ -71,6 +71,7 @@ Name: cabbiev2
 # Real name of the creator of the WPS
 Authors: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
 WPS: yes
+FMS: yes
 RWPS: yes
 SBS: no
 RSBS: no
@@ -99,6 +100,9 @@ wps.128x96x2:    cabbiev2.128x96x2.wps
 wps.128x64x1:    cabbiev2.128x64x1.wps
 wps.112x64x1:    cabbiev2.112x64x1.wps
 wps.96x96x16:    cabbiev2.96x96x16.wps
+
+# override implicit .fms filename
+fms.160x128x2:   cabbiev2-160x128x2.fms
 
 # Preferred font (including .fnt extension - leave blank for player):
 Font.800x480x16: 35-Adobe-Helvetica.fnt
