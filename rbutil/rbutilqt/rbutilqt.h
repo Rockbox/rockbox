@@ -34,6 +34,7 @@
 #include "bootloaderinstallbase.h"
 #include "manualwidget.h"
 #include "infowidget.h"
+#include "backupdialog.h"
 
 class RbUtilQt : public QMainWindow
 {
@@ -47,6 +48,7 @@ class RbUtilQt : public QMainWindow
     private:
         ManualWidget *manual;
         InfoWidget *info;
+        BackupDialog *backupdialog;
         Ui::RbUtilQtFrm ui;
 
         void changeEvent(QEvent *e);
@@ -106,6 +108,7 @@ class RbUtilQt : public QMainWindow
         void createVoiceFile(void);
         void downloadDone(bool);
         void downloadInfo(void);
+        void backup(void);
 
         void installVoice(void);
         void installThemes(void);

@@ -78,6 +78,7 @@ SOURCES += \
  quazip/ioapi.c \
  base/ziputil.cpp \
  comboboxviewdelegate.cpp \
+ gui/backupdialog.cpp \
 
 
 HEADERS += \
@@ -149,6 +150,7 @@ HEADERS += \
  base/ziputil.h \
  lame/lame.h \
  comboboxviewdelegate.h \
+ gui/backupdialog.h \
 
 
 FORMS += \
@@ -165,7 +167,8 @@ FORMS += \
  previewfrm.ui \
  createvoicefrm.ui \
  sysinfofrm.ui \
- systracefrm.ui
+ systracefrm.ui \
+ gui/backupdialogfrm.ui \
 
 
 TRANSLATIONS += \

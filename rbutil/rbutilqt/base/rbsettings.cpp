@@ -40,6 +40,7 @@ const static struct {
     { RbSettings::OfPath,               "ofpath",               "" },
     { RbSettings::Platform,             "platform",             "" },
     { RbSettings::Language,             "lang",                 "" },
+    { RbSettings::BackupPath,           "backuppath",           "" },
 #if defined(Q_OS_WIN32)
     { RbSettings::Tts,                  "tts",                  "sapi" },
 #elif defined(Q_OS_MACX)

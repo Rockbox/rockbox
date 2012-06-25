@@ -40,6 +40,7 @@
 #include "ziputil.h"
 #include "manualwidget.h"
 #include "infowidget.h"
+#include "backupdialog.h"
 
 #include "progressloggerinterface.h"
 
@@ -152,6 +153,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonRemoveBootloader, SIGNAL(clicked()), this, SLOT(uninstallBootloader()));
     connect(ui.buttonSmall, SIGNAL(clicked()), this, SLOT(smallInstall()));
     connect(ui.buttonComplete, SIGNAL(clicked()), this, SLOT(completeInstall()));
+    connect(ui.buttonBackup, SIGNAL(clicked()), this, SLOT(backup()));
 
     // actions accessible from the menu
     connect(ui.actionComplete_Installation, SIGNAL(triggered()), this, SLOT(completeInstall()));
@@ -383,6 +385,13 @@ void RbUtilQt::updateDevice()
     ui.buttonComplete->setEnabled(installable);
     ui.actionSmall_Installation->setEnabled(installable);
     ui.actionComplete_Installation->setEnabled(installable);
+}
+
+
+void RbUtilQt::backup(void)
+{
+    backupdialog = new BackupDialog(this);
+    backupdialog->show();
 }
 
 

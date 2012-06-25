@@ -40,6 +40,7 @@ class RbSettings : public QObject
             OfPath,
             Platform,
             Language,
+            BackupPath,
             Tts,
             UseTtsCorrections,
             TalkFolders,
