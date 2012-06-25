@@ -84,7 +84,7 @@ static void lcd_v1_display_init(void)
     udelay(40);
 
     /* Memmory access setting */
-    lcd_write_reg(0x16, 0x48);
+    lcd_write_reg(0x16, 0x68);
     /* Setup 16bit mode */
     lcd_write_reg(0x17, 0x05);
 
@@ -92,11 +92,11 @@ static void lcd_v1_display_init(void)
     lcd_write_reg(0x02, 0x00);
     lcd_write_reg(0x03, 0x00);
     lcd_write_reg(0x04, 0x00);
-    lcd_write_reg(0x05, LCD_HEIGHT - 1);
+    lcd_write_reg(0x05, LCD_WIDTH - 1);
     lcd_write_reg(0x06, 0x00);
     lcd_write_reg(0x07, 0x00);
     lcd_write_reg(0x08, 0x00);
-    lcd_write_reg(0x09, LCD_WIDTH - 1);
+    lcd_write_reg(0x09, LCD_HEIGHT - 1);
 
     /* Start GRAM write */
     lcd_cmd(0x22);
@@ -110,6 +110,8 @@ static void lcd_v1_display_init(void)
 
 static void lcd_v1_enable (bool on)
 {
+    lcdctrl_bypass(1);
+    
     if (on)
     {
         lcd_write_reg(0x18, 0x44);

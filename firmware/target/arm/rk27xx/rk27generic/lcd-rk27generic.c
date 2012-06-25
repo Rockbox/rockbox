@@ -183,6 +183,8 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     int px = x, py = y;
     int pxmax = x + width, pymax = y + height;
+lcdctrl_bypass(1);
+LCDC_CTRL |= RGB24B;
 
     /* addresses setup */
     lcd_write_reg(WINDOW_H_START,  y);
@@ -193,12 +195,13 @@ void lcd_update_rect(int x, int y, int width, int height)
     lcd_write_reg(GRAM_V_ADDR,     x);
 
     lcd_cmd(GRAM_WRITE);
-
+LCDC_CTRL &= ~RGB24B;
     for (py=y; py<pymax; py++)
     {
         for (px=x; px<pxmax; px++)
-            LCD_DATA = lcd_pixel_transform(*FBADDR(px,py));
+            LCD_DATA = *FBADDR(px,py);
     }
+//lcd_update();
 }
 
 /* Blit a YUV bitmap directly to the LCD */
@@ -213,5 +216,4 @@ void lcd_blit_yuv(unsigned char * const src[3],
     (void)x;
     (void)y;
     (void)width;
-    (void)height;
 }
