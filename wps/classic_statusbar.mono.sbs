@@ -16,12 +16,12 @@
 %Vd(a)%Vd(e)
 
 # comment out the next line if you dont want battery number as text
-# %Vdb
+# %Vd(b)
 
 # comment out the next line if you dont want volume icons
 %Vd(c)
 # comment out the next line if you dont want volume number as text
-# %Vdd
+# %Vd(d)
  
 ################################################################
 
