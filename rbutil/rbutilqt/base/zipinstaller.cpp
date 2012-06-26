@@ -63,8 +63,7 @@ void ZipInstaller::installContinue()
         installStart();
     }
     else {
-        emit logItem(tr("Installation finished successfully."), LOGOK);
-
+        emit logItem(tr("Package installation finished successfully."), LOGOK);
         emit done(false);
         return;
     }
