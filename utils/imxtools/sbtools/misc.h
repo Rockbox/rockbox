@@ -33,6 +33,7 @@
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
 
 extern bool g_debug;
+extern bool g_force;
 
 typedef struct crypto_key_t *key_array_t;
 int g_nr_keys;

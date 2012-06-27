@@ -169,6 +169,7 @@ static void usage(void)
     printf("  -a/--add-key <key>\tAdd single key (hex or usbotp)\n");
     printf("  -n/--no-color\tDisable output colors\n");
     printf("  -l/--loopback <file>\tProduce sb file out of extracted description*\n");
+    printf("  -f/--force\tForce reading even without a key*\n");
     printf("Options marked with a * are for debug purpose only\n");
     exit(1);
 }
@@ -204,10 +205,11 @@ int main(int argc, char **argv)
             {"add-key", required_argument, 0, 'a'},
             {"no-color", no_argument, 0, 'n'},
             {"loopback", required_argument, 0, 'l'},
+            {"force", no_argument, 0, 'f' },
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?do:k:zra:nl:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?do:k:zra:nl:f", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -231,6 +233,9 @@ int main(int argc, char **argv)
             case 'o':
                 g_out_prefix = optarg;
                 break;
+            case 'f':
+                g_force = true;
+                break;
             case 'k':
             {
                 if(!add_keys_from_file(optarg))
@@ -250,9 +255,9 @@ int main(int argc, char **argv)
                 struct crypto_key_t key;
                 char *s = optarg;
                 if(!parse_key(&s, &key))
-                    bug("Invalid key specified as argument");
+                    bug("Invalid key specified as argument\n");
                 if(*s != 0)
-                    bug("Trailing characters after key specified as argument");
+                    bug("Trailing characters after key specified as argument\n");
                 add_keys(&key, 1);
                 break;
             }

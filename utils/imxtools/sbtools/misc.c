@@ -25,6 +25,7 @@
 #include "misc.h"
 
 bool g_debug = false;
+bool g_force = false;
 
 /**
  * Misc

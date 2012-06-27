@@ -503,7 +503,7 @@ static struct sb_section_t *read_section(bool data_sec, uint32_t id, byte *buf,
         printf(OFF, "%s", indent);
         uint8_t checksum = instruction_checksum(hdr);
         if(checksum != hdr->checksum)
-            fatal(SB_CHECKSUM_ERROR, "Bad instruction checksum");
+            fatal(SB_CHECKSUM_ERROR, "Bad instruction checksum\n");
         if(hdr->flags != 0)
         {
             printf(GREY, "[");
@@ -788,7 +788,8 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
         printf(BLUE, "Encryption keys\n");
         for(int i = 0; i < g_nr_keys; i++)
         {
-            printf(RED, "  Key %d: ", i);
+            printf(RED, "  Key %d\n", i),
+            printf(GREEN, "    Key: ");
             printf(YELLOW, "");
             print_key(&g_key_array[i], true);
             printf(GREEN, "    CBC-MAC: ");
@@ -859,7 +860,12 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
         free(cbcmacs);
 
         if(!valid_key)
-            fatal(SB_NO_VALID_KEY, "No valid key found\n");
+        {
+            if(g_force)
+                printf(GREY, "  No valid key found\n");
+            else
+                fatal(SB_NO_VALID_KEY, "No valid key found\n");
+        }
 
         if(getenv("SB_REAL_KEY") != 0)
         {
@@ -868,6 +874,12 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
             if(!parse_key(&env, &k) || *env)
                 fatal(SB_ERROR, "Invalid SB_REAL_KEY\n");
             memcpy(real_key, k.u.key, 16);
+            /* assume the key is valid */
+            if(valid_key)
+                printf(GREY, "  Overriding real key\n");
+            else
+                printf(GREY, "  Assuming real key is ok\n");
+            valid_key = true;
         }
 
         printf(RED, "  Summary:\n");
@@ -916,6 +928,13 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
             if(encrypted)
                 printf(RED, " (Encrypted)");
             printf(OFF, "\n");
+
+            /* skip it if we cannot decrypt it */
+            if(encrypted && !valid_key)
+            {
+                printf(GREY, "  Skipping section content (no valid key)\n");
+                continue;
+            }
             
             /* save it */
             byte *sec = xmalloc(size);
@@ -939,7 +958,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
             free(sec);
         }
     }
-    else
+    else if(valid_key)
     {
         /* advanced raw mode */
         printf(BLUE, "Commands\n");
@@ -1040,6 +1059,10 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
                 break;
             }
         }
+    }
+    else
+    {
+        printf(GREY, "Cannot read content in raw mode without a valid key\n");
     }
     
     /* final signature */
