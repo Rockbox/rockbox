@@ -23,6 +23,7 @@
 #include <file.h>
 #include <updater.h>
 #include <utils.h>
+#include <firmware.h>
 
 
 static const char VERSION[] = "0.1";
@@ -225,6 +226,38 @@ int process_arguments(int argc, char* argv[])
         return 10;
     }
 
+    if (verbose)
+        std::cout << "[*] Normalizing firmware archive..." << std::endl;
+
+    /* We only know the compressed size of the archive, not the uncompressed one.
+     * In some cases (like in some Zen X-Fi updater), the uncompressed archive
+     * has extraneous zero bytes at the end which will make the device reject
+     * the firmware. To normalize the archives, we simply read it and write it
+     * again, so that it will remove all useless extra bytes */
+    zen::firmware_archive archive(false);
+    std::ifstream ifs;
+    ifs.open(firmarename.c_str(), std::ios::binary);
+    if (!ifs)
+    {
+        std::cerr << "Failed to open the firmware archive." << std::endl;
+        return 11;
+    }
+
+    if (!archive.read(ifs))
+    {
+        std::cerr << "Failed to read the firmware archive." << std::endl;
+        return 12;
+    }
+    ifs.close();
+
+    std::ofstream ofs;
+    ofs.open(firmarename.c_str(), std::ios::binary);
+    if (!archive.write(ofs))
+    {
+        std::cerr << "Failed to write the firmware archive." << std::endl;
+        return 13;
+    }
+    ofs.close();
 
     //--------------------------------------------------------------------
     // Generate an options file for the extracted firmware archive.
@@ -237,7 +270,6 @@ int process_arguments(int argc, char* argv[])
         std::cout << "[*] Producing options file..." << std::endl;
 
     // Produce options file for the given input file.
-    std::ofstream ofs;
     ofs.open(optionsname.c_str(), std::ios::binary);
     if (!ofs)
     {
