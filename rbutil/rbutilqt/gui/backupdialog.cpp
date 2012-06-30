@@ -108,6 +108,13 @@ void BackupDialog::updateSizeInfo(void)
 
 void BackupDialog::backup(void)
 {
+    if(QFileInfo(m_backupName).isFile()) {
+        if(QMessageBox::warning(this, tr("File exists"),
+                tr("The selected backup file already exists. Overwrite?"),
+                QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
+            return;
+        }
+    }
     m_logger = new ProgressLoggerGui(this);
     connect(m_logger, SIGNAL(closed()), this, SLOT(close()));
     m_logger->show();
