@@ -33,6 +33,7 @@ class ManualWidget : public QWidget
         void updateManual();
 
     private:
+        void changeEvent(QEvent*);
         Ui::ManualWidgetFrm ui;
         QString platform;
 };

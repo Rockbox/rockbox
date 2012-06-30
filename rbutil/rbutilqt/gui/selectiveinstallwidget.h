@@ -51,6 +51,8 @@ class SelectiveInstallWidget : public QWidget
         void installSkipped(bool);
 
     private:
+        void changeEvent(QEvent *e);
+
         Ui::SelectiveInstallWidget ui;
         QString m_target;
         QString m_blmethod;

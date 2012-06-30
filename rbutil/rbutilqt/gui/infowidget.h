@@ -32,6 +32,8 @@ class InfoWidget : public QWidget
         void updateInfo(void);
 
     private:
+        void changeEvent(QEvent *e);
+
         Ui::InfoWidgetFrm ui;
 };
 

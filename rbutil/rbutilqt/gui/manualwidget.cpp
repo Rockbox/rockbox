@@ -95,3 +95,14 @@ void ManualWidget::downloadManual(void)
     installer->install();
 }
 
+
+void ManualWidget::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+        updateManual();
+    } else {
+        QWidget::changeEvent(e);
+    }
+}
+

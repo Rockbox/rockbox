@@ -550,3 +550,12 @@ void SelectiveInstallWidget::installGamefiles(void)
     }
 }
 
+void SelectiveInstallWidget::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+    } else {
+        QWidget::changeEvent(e);
+    }
+}
+

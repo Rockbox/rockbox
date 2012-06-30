@@ -98,3 +98,14 @@ void InfoWidget::updateInfo(void)
     ui.treeInfo->collapseAll();
 }
 
+
+void InfoWidget::changeEvent(QEvent *e)
+{
+    if(e->type() == QEvent::LanguageChange) {
+        ui.retranslateUi(this);
+        ui.treeInfo->setHeaderLabels(QStringList() << tr("File") << tr("Version"));
+    } else {
+        QWidget::changeEvent(e);
+    }
+}
+
