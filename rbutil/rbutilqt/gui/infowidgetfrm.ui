@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Info</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -31,7 +31,7 @@
     <widget class="QTreeWidget" name="treeInfo">
      <column>
       <property name="text">
-       <string>1</string>
+       <string>Package</string>
       </property>
      </column>
     </widget>

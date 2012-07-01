@@ -353,14 +353,14 @@ void RbUtilQt::updateDevice()
     QString name
         = QString("%1 (%2)").arg(SystemInfo::value(SystemInfo::CurName).toString(),
             ServerInfo::value(ServerInfo::CurStatus).toString());
-    ui.labelDevice->setText(tr("<b>%1 %2</b>").arg(brand, name));
+    ui.labelDevice->setText(QString("<b>%1 %2</b>").arg(brand, name));
 
     QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
     QString mountdisplay = QDir::toNativeSeparators(mountpoint);
     if(!mountdisplay.isEmpty()) {
         QString label = Utils::filesystemName(mountpoint);
         if(!label.isEmpty()) mountdisplay += QString(" (%1)").arg(label);
-        ui.labelMountpoint->setText(tr("<b>%1</b>").arg(mountdisplay));
+        ui.labelMountpoint->setText(QString("<b>%1</b>").arg(mountdisplay));
     }
     else {
         mountdisplay = "(unknown)";

@@ -63,7 +63,7 @@ void SelectiveInstallWidget::selectedVersionChanged(int index)
     if(current == "release")
         ui.selectedDescription->setText(tr("This is the latest stable "
                     "release available."));
-    if(current == "current")
+    if(current == "development")
         ui.selectedDescription->setText(tr("The development version is "
                     "updated on every code change. Last update was on %1").arg(
                         ServerInfo::value(ServerInfo::BleedingDate).toString()));
@@ -89,7 +89,7 @@ void SelectiveInstallWidget::updateVersion(void)
     // re-populate all version items
     m_versions.clear();
     m_versions.insert("release", ServerInfo::value(ServerInfo::CurReleaseVersion).toString());
-    m_versions.insert("current", ServerInfo::value(ServerInfo::BleedingRevision).toString());
+    m_versions.insert("development", ServerInfo::value(ServerInfo::BleedingRevision).toString());
     m_versions.insert("rc", ServerInfo::value(ServerInfo::RelCandidateVersion).toString());
 
     ui.selectedVersion->clear();
@@ -97,9 +97,9 @@ void SelectiveInstallWidget::updateVersion(void)
         ui.selectedVersion->addItem(tr("Stable Release (Version %1)").arg(
                     m_versions["release"]), "release");
     }
-    if(!m_versions["current"].isEmpty()) {
+    if(!m_versions["development"].isEmpty()) {
         ui.selectedVersion->addItem(tr("Development Version (Revison %1)").arg(
-                    m_versions["current"]), "current");
+                    m_versions["development"]), "development");
     }
     if(!m_versions["rc"].isEmpty()) {
         ui.selectedVersion->addItem(tr("Release Candidate (Revison %1)").arg(
@@ -116,7 +116,7 @@ void SelectiveInstallWidget::updateVersion(void)
         ui.selectedVersion->setCurrentIndex(index);
     }
     else {
-        index = ui.selectedVersion->findData("current");
+        index = ui.selectedVersion->findData("development");
         ui.selectedVersion->setCurrentIndex(index);
     }
     // check if Rockbox is installed. If it is untick the bootloader option, as
@@ -377,7 +377,7 @@ void SelectiveInstallWidget::installRockbox(void)
 
         if(selected == "release") url = ServerInfo::platformValue(m_target,
                 ServerInfo::CurReleaseUrl).toString();
-        else if(selected == "current") url = ServerInfo::platformValue(m_target,
+        else if(selected == "development") url = ServerInfo::platformValue(m_target,
                 ServerInfo::CurDevelUrl).toString();
         else if(selected == "rc") url = ServerInfo::platformValue(m_target,
                 ServerInfo::RelCandidateUrl).toString();

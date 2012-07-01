@@ -76,7 +76,7 @@ SOURCES += \
  quazip/zip.c \
  quazip/ioapi.c \
  base/ziputil.cpp \
- comboboxviewdelegate.cpp \
+ gui/comboboxviewdelegate.cpp \
  gui/selectiveinstallwidget.cpp \
  gui/backupdialog.cpp \
 
@@ -148,7 +148,7 @@ HEADERS += \
  quazip/zip.h \
  base/ziputil.h \
  lame/lame.h \
- comboboxviewdelegate.h \
+ gui/comboboxviewdelegate.h \
  gui/selectiveinstallwidget.h \
  gui/backupdialog.h \
 
