@@ -235,21 +235,12 @@ static void tea_decrypt_buf(unsigned char* src, unsigned char* dest, size_t n, u
     }
 }
 
-static inline bool tea_test_key(unsigned char magic_enc[8], uint32_t * key, int unaligned)
-{
-    unsigned char magic_dec[8];
-    tea_decrypt_buf(magic_enc, magic_dec, 8, key);
-
-    return (le2int(&magic_dec[4*unaligned]) == 0xaa55aa55);
-}
-
-static int tea_find_key(struct mi4header_t *mi4header, int fd)
+static int tea_find_key(struct mi4header_t *mi4header, unsigned char* buf)
 {
     unsigned int i;
-    int rc;
     uint32_t key[4];
     uint32_t keyinc;
-    unsigned char magic_enc[8];
+    unsigned char magic_dec[8];
     int key_found = -1;
     unsigned int magic_location = mi4header->length-4;
     int unaligned = 0;
@@ -259,12 +250,6 @@ static int tea_find_key(struct mi4header_t *mi4header, int fd)
         unaligned = 1;
         magic_location -= 4;
     }
-
-    /* Load encrypted magic 0xaa55aa55 to check key */
-    lseek(fd, MI4_HEADER_SIZE + magic_location, SEEK_SET);
-    rc = read(fd, magic_enc, 8);
-    if(rc < 8 )
-        return EREAD_IMAGE_FAILED;
 
     printf("Searching for key:");
 
@@ -281,10 +266,13 @@ static int tea_find_key(struct mi4header_t *mi4header, int fd)
         if (key[1]==0) key[2]++;
         if (key[2]==0) key[3]++;
 
-        if (tea_test_key(magic_enc,key,unaligned))
+        /* Decrypt putative magic */
+        tea_decrypt_buf(&buf[magic_location], magic_dec, 8, key);
+
+        if (le2int(&magic_dec[4*unaligned]) == 0xaa55aa55)
         {
             key_found = i;
-             printf("%s...found", tea_keytable[i].name);
+            printf("%s...found", tea_keytable[i].name);
         } else {
            /* printf("%s...failed", tea_keytable[i].name); */
         }
@@ -336,33 +324,25 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     /* Load firmware file */
     lseek(fd, MI4_HEADER_SIZE, SEEK_SET);
     rc = read(fd, buf, mi4header.mi4size-MI4_HEADER_SIZE);
+    close(fd);
     if(rc < (int)mi4header.mi4size-MI4_HEADER_SIZE)
-    {
-        close(fd);
         return EREAD_IMAGE_FAILED;
-    }
- 
+
     /* Check CRC32 to see if we have a valid file */
     sum = chksum_crc32 (buf, mi4header.mi4size - MI4_HEADER_SIZE);
 
     printf("Calculated CRC32: %x", sum);
 
     if(sum != mi4header.crc32)
-    {
-        close(fd);
         return EBAD_CHKSUM;
-    }
 
     if( (mi4header.plaintext + MI4_HEADER_SIZE) != mi4header.mi4size)
     {
         /* Load encrypted firmware */
-        int key_index = tea_find_key(&mi4header, fd);
+        int key_index = tea_find_key(&mi4header, buf);
         
         if (key_index < 0)
-        {
-            close(fd);
             return EINVALID_FORMAT;
-        }
         
         /* Plaintext part is already loaded */
         buf += mi4header.plaintext;
@@ -376,13 +356,9 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
         
         /* Check decryption was successfull */
         if(le2int(&buf[mi4header.length-mi4header.plaintext-4]) != 0xaa55aa55)
-        {
-            close(fd);
             return EREAD_IMAGE_FAILED;
-        }
     }
 
-    close(fd);
     return EOK;
 }
 
