@@ -111,8 +111,12 @@ void SelectiveInstallWidget::updateVersion(void)
     if(index != -1) {
         ui.selectedVersion->setCurrentIndex(index);
     }
-    else {
+    else if(!m_versions["release"].isEmpty()) {
         index = ui.selectedVersion->findData("release");
+        ui.selectedVersion->setCurrentIndex(index);
+    }
+    else {
+        index = ui.selectedVersion->findData("current");
         ui.selectedVersion->setCurrentIndex(index);
     }
     // check if Rockbox is installed. If it is untick the bootloader option, as
@@ -377,52 +381,6 @@ void SelectiveInstallWidget::installRockbox(void)
                 ServerInfo::CurDevelUrl).toString();
         else if(selected == "rc") url = ServerInfo::platformValue(m_target,
                 ServerInfo::RelCandidateUrl).toString();
-
-#if 0
-        RockboxInfo info(m_mountpoint);
-        if(info.success()) {
-            // existing installation found. Ask for backup.
-            QMessageBox::information(this, tr("Backup existing installation?"),
-                    tr("Existing installation detected. Create a backup before installing?"),
-                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-
-        }
-#endif
-#if 0
-        //! check if we should backup
-        if(ui.backup->isChecked())
-        {
-            m_logger->addItem(tr("Beginning Backup..."),LOGINFO);
-            QCoreApplication::processEvents();
-
-            //! create dir, if it doesnt exist
-            QFileInfo backupFile(m_backupName);
-            if(!QDir(backupFile.path()).exists())
-            {
-                QDir a;
-                a.mkpath(backupFile.path());
-            }
-
-            //! create backup
-            bool result = true;
-            ZipUtil zip(this);
-            connect(&zip, SIGNAL(logProgress(int, int)), m_logger, SLOT(setProgress(int, int)));
-            connect(&zip, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
-            zip.open(m_backupName, QuaZip::mdCreate);
-            QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
-            QString folder = mp + "/.rockbox";
-            result = zip.appendDirToArchive(folder, mp);
-            zip.close();
-            if(result) {
-                m_logger->addItem(tr("Backup finished."), LOGINFO);
-            }
-            else {
-                m_logger->addItem(tr("Backup failed!"), LOGERROR);
-                m_logger->setFinished();
-                return;
-            }
-        }
-#endif
 
         //! install build
         if(m_zipinstaller != NULL) delete m_zipinstaller;
