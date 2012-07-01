@@ -1,2 +1,34 @@
-1 24 MOVEABLE PURE "rbutilqt.manifest"
+#include <windows.h>
+#include "version.h"
+1 MANIFEST MOVEABLE PURE "rbutilqt.manifest"
 RBUTIL_ICON               ICON    DISCARDABLE     "icons/rockbox.ico"
+
+// Version Info
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO,VERSION_PATCH
+PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_MICRO,VERSION_PATCH
+FILEFLAGSMASK 0x17L
+FILEFLAGS 0x0L
+FILEOS 0x4L
+FILETYPE 0x0L
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "FileDescription", "Rockbox Utility"
+            VALUE "FileVersion", VERSIONSTRING(VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO)
+            VALUE "LegalCopyright", "Rockbox developers"
+            VALUE "ProductName", "Rockbox Utility"
+            VALUE "ProductVersion", VERSIONSTRING(VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO)
+            VALUE "OriginalFilename", "RockboxUtility.exe"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+

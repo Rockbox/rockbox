@@ -26,7 +26,15 @@
 // rebuilds because of issues like dependency problems or library updates).
 // Usually empty.
 #define BUILDID ""
-#define VERSION "1.2.14" BUILDID
+// Version string is constructed from parts, since the Windows rc file needs it
+// combined differently.
+#define VERSION_MAJOR 1
+#define VERSION_MINOR 2
+#define VERSION_MICRO 14
+#define VERSION_PATCH 0
+#define STR(x) #x
+#define VERSIONSTRING(a, b, c) STR(a) "." STR(b) "." STR(c)
+#define VERSION VERSIONSTRING(VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO) BUILDID
 // PUREVERSION should identify the build uniquely. Use version string for now.
 #define PUREVERSION "$Rev$"
 
