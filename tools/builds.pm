@@ -127,6 +127,10 @@ $releasenotes="/wiki/ReleaseNotes3112";
         name => 'iPod Video',
         status => 3,
     },
+    'ipod6g' => {
+        name => 'iPod 6th gen (Classic)',
+        status => 1,
+    },
     'iriverh10' => {
         name => 'iriver H10 20GB',
         status => 3,
