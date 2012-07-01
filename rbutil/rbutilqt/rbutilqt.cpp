@@ -521,12 +521,16 @@ void RbUtilQt::uninstallBootloader(void)
     bl->setBlFile(blfilepath);
 
     BootloaderInstallBase::BootloaderType currentbl = bl->installed();
-    if((bl->capabilities() & BootloaderInstallBase::Uninstall) == 0
-            || currentbl == BootloaderInstallBase::BootloaderUnknown
-            || currentbl == BootloaderInstallBase::BootloaderOther)
-    {
+    if((bl->capabilities() & BootloaderInstallBase::Uninstall) == 0) {
         logger->addItem(tr("Rockbox Utility can not uninstall the bootloader on this target. "
                             "Try a normal firmware update to remove the booloader."), LOGERROR);
+        logger->setFinished();
+        delete bl;
+        return;
+    }
+    if(currentbl == BootloaderInstallBase::BootloaderUnknown
+            || currentbl == BootloaderInstallBase::BootloaderOther) {
+        logger->addItem(tr("No Rockbox bootloader found."), LOGERROR);
         logger->setFinished();
         delete bl;
         return;
