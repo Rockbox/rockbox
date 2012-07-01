@@ -796,6 +796,26 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
 }
 
 
+int ipod_has_bootloader(struct ipod_t* ipod)
+{
+    /* The 2nd gen Nano is installed differently */
+    if (ipod->modelnum == 62) {
+        int i;
+        int has_osbk = 0;
+        /* Check if we have an OSBK image */
+        for (i = 0; i < ipod->nimages; i++) {
+            if (ipod->ipod_directory[i].ftype==FTYPE_OSBK) {
+                has_osbk = 1;
+            }
+        }
+        return has_osbk;
+    }
+    else {
+        return (ipod->ipod_directory[0].entryOffset != 0);
+    }
+}
+
+
 /*
     Bootloader installation on the Nano2G consists of renaming the
     OSOS image to OSBK and then writing the Rockbox bootloader as a
@@ -810,17 +830,8 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
 
 static int add_bootloader_nano2g(struct ipod_t* ipod, char* filename, int type)
 {
-    int i;
-    int has_osbk = 0;
-
     /* Check if we already have an OSBK image */
-    for (i = 0; i < ipod->nimages; i++) {
-        if (ipod->ipod_directory[i].ftype==FTYPE_OSBK) {
-            has_osbk = 1;
-        }
-    }
-
-    if (has_osbk == 0) {
+    if (ipod_has_bootloader(ipod) == 0) {
         /* First-time install - rename OSOS to OSBK and create new OSOS for bootloader */
         fprintf(stderr,"[INFO] Creating OSBK backup image of original firmware\n");
 
@@ -841,17 +852,8 @@ static int add_bootloader_nano2g(struct ipod_t* ipod, char* filename, int type)
 
 static int delete_bootloader_nano2g(struct ipod_t* ipod)
 {
-    int i;
-    int has_osbk = 0;
-
     /* Check if we have an OSBK image */
-    for (i = 0; i < ipod->nimages; i++) {
-        if (ipod->ipod_directory[i].ftype==FTYPE_OSBK) {
-            has_osbk = 1;
-        }
-    }
-
-    if (has_osbk == 0) {
+    if (ipod_has_bootloader(ipod) == 0) {
         fprintf(stderr,"[ERR]  No OSBK image found - nothing to uninstall\n");
         return -1;
     } else {
@@ -1118,7 +1120,7 @@ int delete_bootloader(struct ipod_t* ipod)
 
     /* Firstly check we have a bootloader... */
 
-    if (ipod->ipod_directory[0].entryOffset == 0) {
+    if (ipod_has_bootloader(ipod) == 0) {
         fprintf(stderr,"[ERR]  No bootloader found.\n");
         return -1;
     }

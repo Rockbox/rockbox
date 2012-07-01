@@ -69,6 +69,7 @@ void ipod_get_ramsize(struct ipod_t* ipod);
 int read_aupd(struct ipod_t* ipod, char* filename);
 int write_aupd(struct ipod_t* ipod, char* filename);
 off_t filesize(int fd);
+int ipod_has_bootloader(struct ipod_t* ipod);
 
 #ifdef __cplusplus
 }
