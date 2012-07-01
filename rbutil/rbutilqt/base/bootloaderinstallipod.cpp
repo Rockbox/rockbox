@@ -68,7 +68,7 @@ bool BootloaderInstallIpod::install(void)
     }
     if(getmodel(&ipod,(ipod.ipod_directory[ipod.ososimage].vers>>8)) < 0) {
         emit logItem(tr("Unknown version number in firmware (%1)").arg(
-                    ipod.ipod_directory[0].vers), LOGERROR);
+                    ipod.ipod_directory[ipod.ososimage].vers), LOGERROR);
         emit done(true);
         return false;
     }
@@ -153,9 +153,9 @@ bool BootloaderInstallIpod::uninstall(void)
         emit done(true);
         return false;
     }
-    if (getmodel(&ipod,(ipod.ipod_directory[0].vers>>8)) < 0) {
+    if (getmodel(&ipod,(ipod.ipod_directory[ipod.ososimage].vers>>8)) < 0) {
         emit logItem(tr("Unknown version number in firmware (%1)").arg(
-                    ipod.ipod_directory[0].vers), LOGERROR);
+                    ipod.ipod_directory[ipod.ososimage].vers), LOGERROR);
         emit done(true);
         return false;
     }
