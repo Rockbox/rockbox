@@ -321,7 +321,8 @@ void ThemesInstallWindow::accept(void)
 void ThemesInstallWindow::install()
 {
     if(ui.listThemes->selectedItems().size() == 0) {
-        this->close();
+        logger->addItem(tr("No themes selected, skipping"), LOGINFO);
+        emit done(false);
         return;
     }
     QStringList themes;

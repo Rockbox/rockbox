@@ -465,10 +465,10 @@ void SelectiveInstallWidget::installThemes(void)
         if(m_themesinstaller == NULL)
             m_themesinstaller = new ThemesInstallWindow(this);
 
+        connect(m_themesinstaller, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
         m_themesinstaller->setLogger(m_logger);
         m_themesinstaller->setModal(true);
         m_themesinstaller->install();
-        connect(m_themesinstaller, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
     }
     else {
         qDebug() << "[SelectiveInstallWidget] Themes install disabled.";
