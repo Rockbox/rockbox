@@ -8,8 +8,8 @@
  * floating point value is :
  *         quant = pow(10.0, exp/20)
  * 'exp' is an integer value which I have exmerimentally found to fall in the 
- * range (0,170). */
-const int32_t quant_tab[171] = {
+ * range (0,180). */
+const int32_t quant_tab[181] = {
     0x00000001, 0x00000001,
     0x00000001, 0x00000001, 0x00000002, 0x00000002,
     0x00000002, 0x00000002, 0x00000003, 0x00000003,
@@ -53,11 +53,13 @@ const int32_t quant_tab[171] = {
     0x04BC0C77, 0x054FF0E6, 0x05F5E100, 0x06B01075, 
     0x0780F7BD, 0x086B5C7A, 0x09725AE7, 0x0A997065, 
     0x0BE48757, 0x0D580472, 0x0EF8D5A3, 0x10CC82D5,
-    0x12D940B6
+    0x12D940B6, 0x152605CD, 0x17BAA222, 0x1A9FD9C8, 
+    0x1DDF82A1, 0x2184A5CD, 0x259BA520, 0x2A326538, 
+    0x2F587CAA, 0x351F68FA, 0x3B9ACA00,
 };
 
 #define EXP_MIN 0
-#define EXP_MAX 170
+#define EXP_MAX 180
 
 /* return the correct value of quant based on exp */
 #define QUANT(exp)    quant_tab[exp - EXP_MIN]
