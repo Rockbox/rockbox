@@ -2,6 +2,69 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pt_BR">
 <context>
+    <name>BackupDialog</name>
+    <message>
+        <source>Backup</source>
+        <translation type="unfinished">Cópia de Segurança</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This dialog will create a backup by archiving the contents of the Rockbox installation on the player into a zip file. This will include installed themes and settings stored below the .rockbox folder on the player.&lt;/p&gt;&lt;p&gt;The backup filename will be created based on the installed version. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size: unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup to: unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Change</source>
+        <translation type="unfinished">M&amp;odificar</translation>
+    </message>
+    <message>
+        <source>&amp;Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Cancelar</translation>
+    </message>
+    <message>
+        <source>Installation size: calculating ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Backup Filename</source>
+        <translation type="unfinished">Selecione Nome do Arquivo da Cópia de Segurança</translation>
+    </message>
+    <message>
+        <source>Installation size: %L1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starting backup ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup successful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup failed!</source>
+        <translation type="unfinished">Cópia de segurança falhou!</translation>
+    </message>
+    <message>
+        <source>File exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected backup file already exists. Overwrite?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BootloaderInstallAms</name>
     <message>
         <source>Downloading bootloader file</source>
@@ -83,26 +146,6 @@
         <translation>Registro de instalação criado</translation>
     </message>
     <message>
-        <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
-        <translation>A instalação do inicializador está quase completa. A instalação &lt;b&gt;requer&lt;/b&gt; que você execute os seguintes passos manualmente:</translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Remova seu reprodutor de forma segura.&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Desligue o reprodutor&lt;/li&gt;&lt;li&gt;Insira o carregador&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
-        <translation>&lt;li&gt;Desconecte os adaptadores USB e de alimentação&lt;/li&gt;&lt;li&gt;Pressione &lt;i&gt;Power&lt;/i&gt; para desligar o reprodutor&lt;/li&gt;&lt;li&gt;Alterne o interruptor da bateria no reprodutor&lt;/li&gt;&lt;li&gt;Pressione &lt;i&gt;Power&lt;/i&gt; para iniciar com o Rockbox&lt;/li&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Nota:&lt;/b&gt; Você pode, de forma segura, instalar outros componentes primeiro, porém, os passos acima são &lt;b&gt;necessários&lt;/b&gt; para se finalizar a instalação!&lt;/p&gt;</translation>
-    </message>
-    <message>
         <source>Waiting for system to remount player</source>
         <translation>Espere pelo sistema para remontar o reprodutor</translation>
     </message>
@@ -113,18 +156,6 @@
     <message>
         <source>Timeout on remount</source>
         <translation>Tempo de espera ao remontar</translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Remove any previously inserted microSD card&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;li&gt;Disconnect your player. The player will reboot and perform an update of the original firmware. Please refer to your players manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before disconnecting the player.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Zip file format detected</source>
@@ -243,6 +274,14 @@
     <message>
         <source>Original bootloader restored successfully.</source>
         <translation>Inicializador original restaurado com sucesso.</translation>
+    </message>
+    <message>
+        <source>A firmware file is already present on player</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying modified firmware file failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -374,6 +413,14 @@
     <message>
         <source>Uninstallation not possible, only installation info removed</source>
         <translation>A desistalação não é possível, apenas a remoção de informação de instalação</translation>
+    </message>
+    <message>
+        <source>A firmware file is already present on player</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying modified firmware file failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -537,6 +584,14 @@ Veja http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <source>Rockbox bootloader successful removed</source>
         <translation>Inicializador do Rockbox removido com sucesso</translation>
+    </message>
+    <message>
+        <source>A firmware file is already present on player</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying modified firmware file failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1117,14 +1172,6 @@ You need to change your player to MSC mode for installation. </source>
         <translation>Configurações para a geração</translation>
     </message>
     <message>
-        <source>Encoder profile:</source>
-        <translation>Perfil do codificador:</translation>
-    </message>
-    <message>
-        <source>TTS profile:</source>
-        <translation>Perfil TTS:</translation>
-    </message>
-    <message>
         <source>Change</source>
         <translation>Modificar</translation>
     </message>
@@ -1140,16 +1187,20 @@ You need to change your player to MSC mode for installation. </source>
         <source>Wavtrim Threshold</source>
         <translation>Limiar Wavtrim</translation>
     </message>
+    <message>
+        <source>TTS:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Silence threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CreateVoiceWindow</name>
     <message>
-        <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Selecionado motor TTS: &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Selecionado codificador: &lt;b&gt;%1&lt;/b&gt;</translation>
+        <source>Engine: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1246,16 +1297,16 @@ You need to change your player to MSC mode for installation. </source>
 <context>
     <name>InfoWidgetFrm</name>
     <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
         <translation type="unfinished">Pacotes instalados atualmente.&lt;br/&gt;&lt;b&gt;Nota:&lt;/b&gt; se você instalou pacotes manualmente, isto pode não estar correto!</translation>
     </message>
     <message>
-        <source>1</source>
-        <translation type="unfinished">1</translation>
+        <source>Info</source>
+        <translation type="unfinished">Informação</translation>
+    </message>
+    <message>
+        <source>Package</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1263,26 +1314,6 @@ You need to change your player to MSC mode for installation. </source>
     <message>
         <source>Install Talk Files</source>
         <translation>Instalar Arquivos Talk</translation>
-    </message>
-    <message>
-        <source>Select the Folder to generate Talkfiles for.</source>
-        <translation>Selecione a Pasta onde gerar os arquivos Talk.</translation>
-    </message>
-    <message>
-        <source>Talkfile Folder</source>
-        <translation>Pasta de Arquivo Talk</translation>
-    </message>
-    <message>
-        <source>&amp;Browse</source>
-        <translation>&amp;Navegar</translation>
-    </message>
-    <message>
-        <source>Generation settings</source>
-        <translation>Configurações para a geração</translation>
-    </message>
-    <message>
-        <source>Encoder profile:</source>
-        <translation>Perfil do codificador:</translation>
     </message>
     <message>
         <source>TTS profile:</source>
@@ -1297,20 +1328,8 @@ You need to change your player to MSC mode for installation. </source>
         <translation>Opções para a geração</translation>
     </message>
     <message>
-        <source>Run recursive</source>
-        <translation>Executar recursivamente</translation>
-    </message>
-    <message>
         <source>Strip Extensions</source>
         <translation>Retirar Extensões</translation>
-    </message>
-    <message>
-        <source>Generate .talk files for Folders</source>
-        <translation>Gerar arquivos .talk para Pastas</translation>
-    </message>
-    <message>
-        <source>Generate .talk files for Files</source>
-        <translation>Gerar arquivos .talk para Arquivos</translation>
     </message>
     <message>
         <source>&amp;Install</source>
@@ -1321,161 +1340,35 @@ You need to change your player to MSC mode for installation. </source>
         <translation>&amp;Cancelar</translation>
     </message>
     <message>
-        <source>Ignore files (comma seperated Wildcards):</source>
-        <translation>Ignorar arquivos (Coringas separados por vírgula):</translation>
+        <source>Generate for files</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Create only new Talkfiles</source>
-        <translation>Criar apenas arquivos Talk novos</translation>
+        <source>Generate for folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recurse into folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip existing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select folders for Talkfile generation (Ctrl for multiselect)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>InstallTalkWindow</name>
     <message>
-        <source>The Folder to Talk is wrong!</source>
-        <translation>A Pasta para o Talk está incorreta!</translation>
-    </message>
-    <message>
-        <source>Selected TTS engine: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Selecionado motor TTS: &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>Selected encoder: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Selecionado codificador: &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>Select folder to create talk files</source>
-        <translation>Selecionar pasta para criar arquivos talk</translation>
-    </message>
-</context>
-<context>
-    <name>InstallWindow</name>
-    <message>
-        <source>Backup to %1</source>
-        <translation>Cópia de segurança em %1</translation>
-    </message>
-    <message>
-        <source>Mount point is wrong!</source>
-        <translation>O ponto de montagem está incorreto!</translation>
-    </message>
-    <message>
-        <source>Really continue?</source>
-        <translation>Realmente continuar?</translation>
-    </message>
-    <message>
-        <source>Aborted!</source>
-        <translation>Abortado!</translation>
-    </message>
-    <message>
-        <source>Beginning Backup...</source>
-        <translation>Iniciando Cópia de Segurança...</translation>
-    </message>
-    <message>
-        <source>Backup failed!</source>
-        <translation>Cópia de segurança falhou!</translation>
-    </message>
-    <message>
-        <source>Select Backup Filename</source>
-        <translation>Selecione Nome do Arquivo da Cópia de Segurança</translation>
-    </message>
-    <message>
-        <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is %1 (%2).</source>
-        <translation>Esta é a compilação do Rockbox mais recente. Uma compilação atual será atualizada toda vez que um mudança é efetuada. A versão mais recente é %1 (%2).</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Esta é a versão recomendada.&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>This is the last released version of Rockbox.</source>
-        <translation>Está é a última versão lançada do Rockbox.</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Note:&lt;/b&gt; The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Nota:&lt;/b&gt; A última versão liberada é %1. &lt;b&gt;Está é a versão recomendada.&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
-        <translation>Estas são construidas automaticamente todos os dias a partir do código fonte de desenvolvimento atual. Esta, geralmente, tem mais funcionalidades do que a última versão estável mas pode ser bem menos estável. Funcionalidades podem mudar com frequência.</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Note:&lt;/b&gt; archived version is %1 (%2).</source>
-        <translation>&lt;b&gt;Nota:&lt;/b&gt; a versão arquivada é %1 (%2).</translation>
-    </message>
-    <message>
-        <source>Backup finished.</source>
+        <source>&lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>InstallWindowFrm</name>
-    <message>
-        <source>Install Rockbox</source>
-        <translation>Instalar Rockbox</translation>
-    </message>
-    <message>
-        <source>Please select the Rockbox version you want to install on your player:</source>
-        <translation>Por favor, selecione a versão do Rockbox que você deseja instalar em seu reprodutor:</translation>
-    </message>
-    <message>
-        <source>Version</source>
-        <translation>Versão</translation>
-    </message>
-    <message>
-        <source>Rockbox &amp;stable</source>
-        <translation>Rockbox E&amp;stável</translation>
-    </message>
-    <message>
-        <source>&amp;Archived Build</source>
-        <translation>Compilação &amp;Arquivada</translation>
-    </message>
-    <message>
-        <source>&amp;Current Build</source>
-        <translation>&amp;Compilação Atual</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation>Detalhes</translation>
-    </message>
-    <message>
-        <source>Details about the selected version</source>
-        <translation>Detalhes sobre a versão selecionada</translation>
-    </message>
-    <message>
-        <source>Note</source>
-        <translation>Nota</translation>
-    </message>
-    <message>
-        <source>&amp;Install</source>
-        <translation>&amp;Instalar</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;Cancelar</translation>
-    </message>
-    <message>
-        <source>Backup</source>
-        <translation>Cópia de Segurança</translation>
-    </message>
-    <message>
-        <source>Backup before installing</source>
-        <translation>Fazer cópia de segurança antes de instalar</translation>
-    </message>
-    <message>
-        <source>Backup location</source>
-        <translation>Localização da Cópia de Segurança</translation>
-    </message>
-    <message>
-        <source>Change</source>
-        <translation>Modificar</translation>
-    </message>
-    <message>
-        <source>Rockbox Utility stores copies of Rockbox it has downloaded on the local hard disk to save network traffic. If your local copy is no longer working, tick this box to download a fresh copy.</source>
-        <translation>O Utilitário Rockbox armazena cópias do Rockbox já transferidas no disco local para economizar tráfego de rede. Se sua cópia local não está mais funcionando, selecione está opção para transferir uma cópia recente.</translation>
-    </message>
-    <message>
-        <source>&amp;Don&apos;t use locally cached copy</source>
-        <translation>&amp;Não usar cópia cacheada localmente</translation>
     </message>
 </context>
 <context>
@@ -1508,10 +1401,6 @@ You need to change your player to MSC mode for installation. </source>
 <context>
     <name>ManualWidgetFrm</name>
     <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Read the manual</source>
         <translation type="unfinished">Ler o manual</translation>
     </message>
@@ -1538,6 +1427,10 @@ You need to change your player to MSC mode for installation. </source>
     <message>
         <source>Down&amp;load</source>
         <translation type="unfinished">Trans&amp;ferência</translation>
+    </message>
+    <message>
+        <source>Manual</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1598,6 +1491,38 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
         <source>(unknown product name)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
+        <translation type="unfinished">A instalação do inicializador está quase completa. A instalação &lt;b&gt;requer&lt;/b&gt; que você execute os seguintes passos manualmente:</translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;Remova seu reprodutor de forma segura.&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Remove any previously inserted microSD card&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Disconnect your player. The player will reboot and perform an update of the original firmware. Please refer to your players manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before disconnecting the player.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;Desligue o reprodutor&lt;/li&gt;&lt;li&gt;Insira o carregador&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
+        <translation type="unfinished">&lt;li&gt;Desconecte os adaptadores USB e de alimentação&lt;/li&gt;&lt;li&gt;Pressione &lt;i&gt;Power&lt;/i&gt; para desligar o reprodutor&lt;/li&gt;&lt;li&gt;Alterne o interruptor da bateria no reprodutor&lt;/li&gt;&lt;li&gt;Pressione &lt;i&gt;Power&lt;/i&gt; para iniciar com o Rockbox&lt;/li&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Nota:&lt;/b&gt; Você pode, de forma segura, instalar outros componentes primeiro, porém, os passos acima são &lt;b&gt;necessários&lt;/b&gt; para se finalizar a instalação!&lt;/p&gt;</translation>
+    </message>
 </context>
 <context>
     <name>QuaZipFile</name>
@@ -1629,126 +1554,12 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
         <translation>Sua configuração é inválida. Isto é geralmente causado por uma mudança no caminho do dispositivo. A janela de configuração abrirá agora para permitir que você corrija o problema.</translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
-        <translation>&lt;b&gt;%1 %2&lt;/b&gt; à&lt;b&gt;%3&lt;/b&gt;</translation>
-    </message>
-    <message>
         <source>Confirm Installation</source>
         <translation>Confirmar Instalação</translation>
     </message>
     <message>
-        <source>Do you really want to perform a complete installation?
-
-This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
-        <translation>Você realmente quer efetuar uma instalação completa?
-
-Isto irá instalar o Rockbox %1. Para instalar a compilação de desenvolvimento mais recente pressione &quot;Cancelar&quot; e use a aba &quot;Instalação&quot;.</translation>
-    </message>
-    <message>
-        <source>Do you really want to perform a minimal installation? A minimal installation will contain only the absolutely necessary parts to run Rockbox.
-
-This will install Rockbox %1. To install the most recent development build available press &quot;Cancel&quot; and use the &quot;Installation&quot; tab.</source>
-        <translation>Você realmente quer efetuar uma instalação mínima? Uma instalação mínima conterá apenas as partes absolutamente necessárias para executar o Rockbox.
-
-Isto irá instalar o Rockbox %1. Para instalar a compilação de desenvolvimento mais recente pressione &quot;Cancelar&quot; e use a aba &quot;Instalação&quot;.</translation>
-    </message>
-    <message>
         <source>Mount point is wrong!</source>
         <translation>O ponto de montagem está incorreto!</translation>
-    </message>
-    <message>
-        <source>Really continue?</source>
-        <translation>Realmente continuar?</translation>
-    </message>
-    <message>
-        <source>Aborted!</source>
-        <translation>Abortado!</translation>
-    </message>
-    <message>
-        <source>Installed Rockbox detected</source>
-        <translation>Detectado Rockbox instalado</translation>
-    </message>
-    <message>
-        <source>Rockbox installation detected. Do you want to backup first?</source>
-        <translation>Detectada instalação do Rockbox. Você quer criar uma cópia de segurança primeiro?</translation>
-    </message>
-    <message>
-        <source>Starting backup...</source>
-        <translation>Iniciando cópia de segurança...</translation>
-    </message>
-    <message>
-        <source>Backup successful</source>
-        <translation>Cópia de segurança efetuada com sucesso</translation>
-    </message>
-    <message>
-        <source>Backup failed!</source>
-        <translation>Cópia de segurança falhou!</translation>
-    </message>
-    <message>
-        <source>Do you really want to install the Bootloader?</source>
-        <translation>Você realmente quer instalar o Inicializador?</translation>
-    </message>
-    <message>
-        <source>No install method known.</source>
-        <translation>Nenhum método de instalação conhecido.</translation>
-    </message>
-    <message>
-        <source>Bootloader detected</source>
-        <translation>Detectado Inicializador</translation>
-    </message>
-    <message>
-        <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
-        <translation>Inicializador já instalado. Você quer reinstalar o inicializador?</translation>
-    </message>
-    <message>
-        <source>Bootloader installation skipped</source>
-        <translation>Instalação do Inicializador ignorada</translation>
-    </message>
-    <message>
-        <source>Create Bootloader backup</source>
-        <translation>Criar cópia de segurança do Inicializador</translation>
-    </message>
-    <message>
-        <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
-Press &quot;No&quot; to skip this step.</source>
-        <translation>Você pode criar uma cópia de segurança do arquivo original do inicializador. Pressione &quot;Sim&quot; para selecionar a pasta de saída no seu computador, onde salvar o arquivo. O arquivo será colocado em uma nova pasta &quot;%1&quot; criada dentro da pasta selecionada.
-Pressione &quot;Não&quot; para pular esse passo.</translation>
-    </message>
-    <message>
-        <source>Browse backup folder</source>
-        <translation>Navegar na pasta de cópia de segurança</translation>
-    </message>
-    <message>
-        <source>Prerequisites</source>
-        <translation>Pré-requisitos</translation>
-    </message>
-    <message>
-        <source>Bootloader installation aborted</source>
-        <translation>Instalação do Inicializador abortada</translation>
-    </message>
-    <message>
-        <source>Select firmware file</source>
-        <translation>Selecione o arquivo de firmware</translation>
-    </message>
-    <message>
-        <source>Error opening firmware file</source>
-        <translation>Erro abrindo arquivo de firmware</translation>
-    </message>
-    <message>
-        <source>Backup error</source>
-        <translation>Erro na cópia de segurança</translation>
-    </message>
-    <message>
-        <source>Could not create backup file. Continue?</source>
-        <translation>Não foi possível criar o arquivo de cópia de segurança. Continuar?</translation>
-    </message>
-    <message>
-        <source>Manual steps required</source>
-        <translation>Passo manual requerido</translation>
-    </message>
-    <message>
-        <source>Do you really want to install the fonts package?</source>
-        <translation>Você realmente quer instalar o pacote de fontes?</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -1761,18 +1572,6 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
     <message>
         <source>Do you really want to install the voice file?</source>
         <translation>Você realmente quer instalar o arquivo de voz?</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Erro</translation>
-    </message>
-    <message>
-        <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
-        <translation>Seu dispositivo não tem um plugin doom. Abortando.</translation>
-    </message>
-    <message>
-        <source>Do you really want to install the game addon files?</source>
-        <translation>Você realmente quer instalar os arquivos complementares de jogos?</translation>
     </message>
     <message>
         <source>Confirm Uninstallation</source>
@@ -1861,10 +1660,6 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
         <translation>Nenhuma instalação do Rockbox encontrada</translation>
     </message>
     <message>
-        <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing fonts.</source>
-        <translation>Não foi possível determinar a versão do Rockbox instalada. Por favor, instale uma compilação do Rockbox antes de instalar fontes.</translation>
-    </message>
-    <message>
         <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
         <translation>Não foi possível determinar a versão do Rockbox instalada. Por favor, instale uma compilação do Rockbox antes de instalar arquivos de voz.</translation>
     </message>
@@ -1881,11 +1676,15 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
         <translation>O Utilitário Rockbox está atualizado.</translation>
     </message>
     <message>
-        <source>Beginning Backup...</source>
-        <translation type="unfinished">Iniciando Cópia de Segurança...</translation>
+        <source>No voice file available</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error reading firmware file</source>
+        <source>The installed version of Rockbox is a development version. Pre-built voices are only available for release versions of Rockbox. Please generate a voice yourself using the &quot;Create voice file&quot; functionality.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Rockbox bootloader found.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1900,92 +1699,16 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
         <translation>Dispositivo</translation>
     </message>
     <message>
-        <source>Selected device:</source>
-        <translation>Dispositivo selecionado:</translation>
-    </message>
-    <message>
-        <source>device / mountpoint unknown or invalid</source>
-        <translation>dispositivo / ponto de montagem desconhecido ou inválido</translation>
-    </message>
-    <message>
         <source>&amp;Change</source>
         <translation>M&amp;odificar</translation>
-    </message>
-    <message>
-        <source>&amp;Quick Start</source>
-        <translation>I&amp;nício Rápido</translation>
     </message>
     <message>
         <source>Welcome</source>
         <translation>Bem-vindo</translation>
     </message>
     <message>
-        <source>Complete Installation</source>
-        <translation>Instalação Completa</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Complete Installation&lt;/b&gt;&lt;br/&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.</source>
-        <translation>&lt;b&gt;Instalação Completa&lt;/b&gt;&lt;br/&gt;Instala o inicializador, a compilação atual e pacotes extras. Este é o método recomendado para novas instalações.</translation>
-    </message>
-    <message>
-        <source>Minimal Installation</source>
-        <translation>Instalação Mínima</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Minimal installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
-        <translation>&lt;b&gt;Instalação Mínima&lt;/b&gt;&lt;br/&gt;Instala o inicializador e a compilação atual do Rockbox. Se você não quer os pacotes extras, escolha está opção.</translation>
-    </message>
-    <message>
         <source>&amp;Installation</source>
         <translation>Ins&amp;talação</translation>
-    </message>
-    <message>
-        <source>Basic Rockbox installation</source>
-        <translation>Instalação básica do Rockbox</translation>
-    </message>
-    <message>
-        <source>Install Bootloader</source>
-        <translation>Instalar Inicializador</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Install the bootloader&lt;/b&gt;&lt;br/&gt;Before Rockbox can be run on your audio player, you may have to install a bootloader. This is only necessary the first time Rockbox is installed.</source>
-        <translation>&lt;b&gt;Instalar o inicializador&lt;/b&gt;&lt;br/&gt;Antes que o Rockbox possa ser executado no seu reprodutor de audio, você deverá instalar um inicializador. Esta opção é necessária apenas na primeira vez que o Rockbox for instalado.</translation>
-    </message>
-    <message>
-        <source>Install Rockbox</source>
-        <translation>Instalar Rockbox</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Install Rockbox&lt;/b&gt; on your audio player</source>
-        <translation>&lt;b&gt;Instalar Rockbox&lt;/b&gt; no seu reprodutor de audio</translation>
-    </message>
-    <message>
-        <source>&amp;Extras</source>
-        <translation>&amp;Extras</translation>
-    </message>
-    <message>
-        <source>Install extras for Rockbox</source>
-        <translation>Instalar extras para o Rockbox</translation>
-    </message>
-    <message>
-        <source>Install Fonts package</source>
-        <translation>Instalar pacote de Fontes</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Fonts Package&lt;/b&gt;&lt;br/&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.</source>
-        <translation>&lt;b&gt;Pacote de Fontes&lt;/b&gt;&lt;br/&gt;O Pacote de Fontes contém fontes frequentementes usadas. A instalação é altamente recomendada.</translation>
-    </message>
-    <message>
-        <source>Install themes</source>
-        <translation>Instalar temas</translation>
-    </message>
-    <message>
-        <source>Install game files</source>
-        <translation>Instalar arquivos de jogos</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Install Game Files&lt;/b&gt;&lt;br/&gt;Doom needs a base wad file to run.</source>
-        <translation>&lt;b&gt;Instalar Arquivos de Jogos&lt;/b&gt;&lt;br/&gt;O Doom precisa de uma arquivo wad base para funcionar.</translation>
     </message>
     <message>
         <source>&amp;Accessibility</source>
@@ -2178,7 +1901,220 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <translation>&amp;Trace do Sistema</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos;s look can be customized by themes. You can choose and install several officially distributed themes.</source>
+        <source>mountpoint unknown or invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mountpoint:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>device unknown or invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup &amp;&amp; &amp;Uninstallation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation type="unfinished">Cópia de Segurança</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Backup current installation.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Create a backup by archiving the contents of the Rockbox installation folder.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SelectiveInstallWidget</name>
+    <message>
+        <source>Rockbox version to install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version information not available yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rockbox components to install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Bootloader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The main Rockbox firmware.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Rockbox</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some game plugins require additional files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional fonts for the User Interface.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The bootloader is required for starting Rockbox. Only necessary for first time install.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Themes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Themes allow adjusting the user interface of Rockbox. Use &quot;Customize&quot; to select themes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Install</source>
+        <translation type="unfinished">&amp;Instalar</translation>
+    </message>
+    <message>
+        <source>This is the latest stable release available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The development version is updated on every code change. Last update was on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will eventually become the next Rockbox version. Install it to help testing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stable Release (Version %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Development Version (Revison %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release Candidate (Revison %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected player doesn&apos;t need a bootloader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The bootloader is required for starting Rockbox. Installation of the bootloader is only necessary on first time installation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mountpoint is wrong</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No install method known.</source>
+        <translation type="unfinished">Nenhum método de instalação conhecido.</translation>
+    </message>
+    <message>
+        <source>Bootloader detected</source>
+        <translation type="unfinished">Detectado Inicializador</translation>
+    </message>
+    <message>
+        <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
+        <translation type="unfinished">Inicializador já instalado. Você quer reinstalar o inicializador?</translation>
+    </message>
+    <message>
+        <source>Bootloader installation skipped</source>
+        <translation type="unfinished">Instalação do Inicializador ignorada</translation>
+    </message>
+    <message>
+        <source>Create Bootloader backup</source>
+        <translation type="unfinished">Criar cópia de segurança do Inicializador</translation>
+    </message>
+    <message>
+        <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
+Press &quot;No&quot; to skip this step.</source>
+        <translation type="unfinished">Você pode criar uma cópia de segurança do arquivo original do inicializador. Pressione &quot;Sim&quot; para selecionar a pasta de saída no seu computador, onde salvar o arquivo. O arquivo será colocado em uma nova pasta &quot;%1&quot; criada dentro da pasta selecionada.
+Pressione &quot;Não&quot; para pular esse passo.</translation>
+    </message>
+    <message>
+        <source>Browse backup folder</source>
+        <translation type="unfinished">Navegar na pasta de cópia de segurança</translation>
+    </message>
+    <message>
+        <source>Prerequisites</source>
+        <translation type="unfinished">Pré-requisitos</translation>
+    </message>
+    <message>
+        <source>Bootloader installation aborted</source>
+        <translation type="unfinished">Instalação do Inicializador abortada</translation>
+    </message>
+    <message>
+        <source>Bootloader files (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select firmware file</source>
+        <translation type="unfinished">Selecione o arquivo de firmware</translation>
+    </message>
+    <message>
+        <source>Error opening firmware file</source>
+        <translation type="unfinished">Erro abrindo arquivo de firmware</translation>
+    </message>
+    <message>
+        <source>Error reading firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup error</source>
+        <translation type="unfinished">Erro na cópia de segurança</translation>
+    </message>
+    <message>
+        <source>Could not create backup file. Continue?</source>
+        <translation type="unfinished">Não foi possível criar o arquivo de cópia de segurança. Continuar?</translation>
+    </message>
+    <message>
+        <source>Manual steps required</source>
+        <translation type="unfinished">Passo manual requerido</translation>
+    </message>
+    <message>
+        <source>Continue with installation?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Really continue?</source>
+        <translation type="unfinished">Realmente continuar?</translation>
+    </message>
+    <message>
+        <source>Aborted!</source>
+        <translation type="unfinished">Abortado!</translation>
+    </message>
+    <message>
+        <source>Your installation doesn&apos;t require game files, skipping.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selective Installation</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2442,10 +2378,6 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
 <context>
     <name>TalkFileCreator</name>
     <message>
-        <source>Starting Talk file generation</source>
-        <translation>Iniciando geração de arquivo Talk</translation>
-    </message>
-    <message>
         <source>Reading Filelist...</source>
         <translation>Lendo Lista de Arquivos...</translation>
     </message>
@@ -2476,6 +2408,10 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
     <message>
         <source>Cleaning up...</source>
         <translation>Limpando...</translation>
+    </message>
+    <message>
+        <source>Starting Talk file generation for folder %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2635,6 +2571,14 @@ código de resposta HTTP: %1</translation>
             <numerusform>Tamanho %L1 kiB (%n itens)</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No themes selected, skipping</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UninstallFrm</name>
@@ -2781,16 +2725,24 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <source>Finished</source>
         <translation>Finalizado</translation>
     </message>
+    <message>
+        <source>Extracted voice strings from installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extracted voice strings incompatible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not retrieve strings from installation, downloading</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ZipInstaller</name>
     <message>
         <source>done.</source>
         <translation>feito.</translation>
-    </message>
-    <message>
-        <source>Installation finished successfully.</source>
-        <translation>Instalação finalizada com sucesso.</translation>
     </message>
     <message>
         <source>Downloading file %1.%2</source>
@@ -2834,6 +2786,10 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     </message>
     <message>
         <source>Extraction failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Package installation finished successfully.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
