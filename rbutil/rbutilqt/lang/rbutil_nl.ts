@@ -7,7 +7,7 @@
         <location filename="../gui/backupdialogfrm.ui" line="14"/>
         <location filename="../gui/backupdialogfrm.ui" line="40"/>
         <source>Backup</source>
-        <translation type="unfinished">Backup</translation>
+        <translation>Backup</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="30"/>
@@ -27,7 +27,7 @@
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="73"/>
         <source>&amp;Change</source>
-        <translation type="unfinished">&amp;Veranderen</translation>
+        <translation>&amp;Veranderen</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="113"/>
@@ -37,7 +37,7 @@
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="124"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Annuleren</translation>
+        <translation>&amp;Annuleren</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="66"/>
@@ -47,7 +47,7 @@
     <message>
         <location filename="../gui/backupdialog.cpp" line="85"/>
         <source>Select Backup Filename</source>
-        <translation type="unfinished">Selecteer backup bestandsnaam</translation>
+        <translation>Selecteer backup bestandsnaam</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="105"/>
@@ -77,7 +77,7 @@
     <message>
         <location filename="../gui/backupdialog.cpp" line="143"/>
         <source>Backup failed!</source>
-        <translation type="unfinished">Backup mislukt!</translation>
+        <translation>Backup mislukt!</translation>
     </message>
 </context>
 <context>
@@ -85,7 +85,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="32"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished">Voor installatie van de bootloader is het nodig dat u een kopie van de originele Sandisk firmware (bin bestand) aanlevert. Dit bestand zal aangepast en dan geïnstalleerd worden op uw speler, samen met de rockbox bootloader. U moet dit bestand zelf downloaden om juridische redenen. Kijk op &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; of op &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;handleiding&lt;/a&gt; en de &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wikipagina hoe u dit bestand kan verkrijgen.&lt;br/&gt;Druk Ok om door te gaan en om op uw computer te bladeren naar het firmware bestand.</translation>
+        <translation>Voor installatie van de bootloader is het nodig dat u een kopie van de originele Sandisk firmware (bin bestand) aanlevert. Dit bestand zal aangepast en dan geïnstalleerd worden op uw speler, samen met de rockbox bootloader. U moet dit bestand zelf downloaden om juridische redenen. Kijk op &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; of op &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;handleiding&lt;/a&gt; en de &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wikipagina hoe u dit bestand kan verkrijgen.&lt;br/&gt;Druk Ok om door te gaan en om op uw computer te bladeren naar het firmware bestand.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="55"/>
@@ -101,7 +101,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="124"/>
         <source>No room to insert bootloader, try another firmware version</source>
-        <translation type="unfinished">Geen ruimte om de bootloader in te voegen, probeer een andere firmwareversie.</translation>
+        <translation>Geen ruimte om de bootloader in te voegen, probeer een andere firmwareversie.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="134"/>
@@ -126,7 +126,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="182"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation type="unfinished">Voer een normale upgrade met een ongewijzigde originele firmware, om the deïnstalleren.</translation>
+        <translation>Voer een normale upgrade met een ongewijzigde originele firmware, om the deïnstalleren.</translation>
     </message>
 </context>
 <context>
@@ -199,17 +199,17 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="157"/>
         <source>Waiting for system to remount player</source>
-        <translation type="unfinished">Wachten op het systeem om de speler opnieuw te koppelen</translation>
+        <translation>Wachten op het systeem om de speler opnieuw te koppelen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="187"/>
         <source>Player remounted</source>
-        <translation type="unfinished">Speler opnieuw gekoppeld</translation>
+        <translation>Speler opnieuw gekoppeld</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="192"/>
         <source>Timeout on remount</source>
-        <translation type="unfinished">Time-out bij opnieuw koppelen</translation>
+        <translation>Time-out bij opnieuw koppelen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="147"/>
@@ -478,7 +478,7 @@
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="236"/>
         <source>Uninstallation not possible, only installation info removed</source>
-        <translation type="unfinished">Deïnstallatie niet mogelijk, alleen installatie info verwijderd</translation>
+        <translation>Deïnstallatie niet mogelijk, alleen installatie info verwijderd</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhex.cpp" line="257"/>
@@ -541,7 +541,7 @@
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="98"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished">Bezig met downloaden van Bootloader</translation>
+        <translation>Bezig met downloaden van Bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="108"/>
@@ -561,7 +561,7 @@
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="156"/>
         <source>Bootloader successful installed</source>
-        <translation type="unfinished">Bootloader succesvol geïnstalleerd</translation>
+        <translation>Bootloader succesvol geïnstalleerd</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="162"/>
@@ -602,7 +602,8 @@
         <location filename="../base/bootloaderinstallipod.cpp" line="76"/>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods. 
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
-        <translation type="unfinished">Dit is een MacPod, Rockbox draait alleen op WinPods.</translation>
+        <translation>Dit is een MacPod, Rockbox draait alleen op WinPods.
+Zie http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="95"/>
@@ -623,12 +624,12 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="128"/>
         <source>Bootloader Installation complete.</source>
-        <translation type="unfinished">Installatie van bootloader voltooid.</translation>
+        <translation>Installatie van bootloader voltooid.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="133"/>
         <source>Writing log aborted</source>
-        <translation type="unfinished">Schrijven log afgebroken</translation>
+        <translation>Schrijven log afgebroken</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="170"/>
@@ -648,17 +649,17 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="230"/>
         <source>Error: could not retrieve device name</source>
-        <translation type="unfinished">Fout: kon apparaatnaam niet ophalen</translation>
+        <translation>Fout: kon apparaatnaam niet ophalen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="246"/>
         <source>Error: no mountpoint specified!</source>
-        <translation type="unfinished">Fout: geen koppelpunt aangegeven!</translation>
+        <translation>Fout: geen koppelpunt aangegeven!</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="251"/>
         <source>Could not open Ipod: permission denied</source>
-        <translation type="unfinished">Kon Ipod niet openen: toestemming geweigerd</translation>
+        <translation>Kon Ipod niet openen: toestemming geweigerd</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="255"/>
@@ -750,72 +751,72 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="52"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished">Bezig met downloaden van Bootloader</translation>
+        <translation>Bezig met downloaden van Bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="79"/>
         <source>Could not open the original firmware.</source>
-        <translation type="unfinished">Kon originele firmware niet openen.</translation>
+        <translation>Kon originele firmware niet openen.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="82"/>
         <source>Could not read the original firmware.</source>
-        <translation type="unfinished">Kon originele firmware niet lezen.</translation>
+        <translation>Kon originele firmware niet lezen.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="85"/>
         <source>Loaded firmware file does not look like MPIO original firmware file.</source>
-        <translation type="unfinished">De geladen firmware lijkt niet op een MPIO origineel firmware-bestand.</translation>
+        <translation>De geladen firmware lijkt niet op een MPIO origineel firmware-bestand.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="100"/>
         <source>Could not open output file.</source>
-        <translation type="unfinished">Kon uitvoerbestand niet openen.</translation>
+        <translation>Kon uitvoerbestand niet openen.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="103"/>
         <source>Could not write output file.</source>
-        <translation type="unfinished">Kon niet schrijven naar uitvoerbestand.</translation>
+        <translation>Kon niet schrijven naar uitvoerbestand.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="106"/>
         <source>Unknown error number: %1</source>
-        <translation type="unfinished">Onbekende foutcode: %1</translation>
+        <translation>Onbekende foutcode: %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="88"/>
         <source>Could not open downloaded bootloader.</source>
-        <translation type="unfinished">Kon ge-downloade bootloader niet openen.</translation>
+        <translation>Kon ge-downloade bootloader niet openen.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="91"/>
         <source>Place for bootloader in OF file not empty.</source>
-        <translation type="unfinished">Plek voor bootloader in de OF is niet leeg.</translation>
+        <translation>Plek voor bootloader in de OF is niet leeg.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="94"/>
         <source>Could not read the downloaded bootloader.</source>
-        <translation type="unfinished">Kon ge-downloade bootloader niet lezen.</translation>
+        <translation>Kon ge-downloade bootloader niet lezen.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="97"/>
         <source>Bootloader checksum error.</source>
-        <translation type="unfinished">Controlesom van bootloader fout.</translation>
+        <translation>Controlesom van bootloader fout.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="111"/>
         <source>Patching original firmware failed: %1</source>
-        <translation type="unfinished">Aanpassen van originele firmware mislukt: %1</translation>
+        <translation>Aanpassen van originele firmware mislukt: %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="118"/>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished">Succes: gemodificeerde Firmware aangemaakt</translation>
+        <translation>Succes: gemodificeerde Firmware aangemaakt</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="126"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation type="unfinished">Voer een normale upgrade met een originele firmware uit, om te deinstalleren.</translation>
+        <translation>Voer een normale upgrade met een originele firmware uit, om te deinstalleren.</translation>
     </message>
 </context>
 <context>
@@ -879,17 +880,17 @@ Zie http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="161"/>
         <source>Bootloader Installation complete.</source>
-        <translation type="unfinished">Bootloader-installatie voltooid.</translation>
+        <translation>Bootloader-installatie voltooid.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="166"/>
         <source>Writing log aborted</source>
-        <translation type="unfinished">Schrijven naar logbestand afgebroken</translation>
+        <translation>Schrijven naar logbestand afgebroken</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="248"/>
         <source>Error: could not retrieve device name</source>
-        <translation type="unfinished">Fout: kon apparaatnaam niet ophalen</translation>
+        <translation>Fout: kon apparaatnaam niet ophalen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="264"/>
@@ -952,48 +953,48 @@ Zie http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="50"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished">Bezig met downloaden van Bootloader</translation>
+        <translation>Bezig met downloaden van Bootloader</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="82"/>
         <location filename="../base/bootloaderinstalltcc.cpp" line="99"/>
         <source>Could not load %1</source>
-        <translation type="unfinished">Kon %1 niet laden</translation>
+        <translation>Kon %1 niet laden</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="90"/>
         <source>Unknown OF file used: %1</source>
-        <translation type="unfinished">Onbekende OF gebruikt: %1</translation>
+        <translation>Onbekende OF gebruikt: %1</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="104"/>
         <source>Patching Firmware...</source>
-        <translation type="unfinished">Bezig met patchen van firmware...</translation>
+        <translation>Bezig met patchen van firmware...</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="111"/>
         <source>Could not patch firmware</source>
-        <translation type="unfinished">Kon firmware niet aanpassen</translation>
+        <translation>Kon firmware niet aanpassen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="117"/>
         <source>Could not open %1 for writing</source>
-        <translation type="unfinished">Kon %1 niet openen voor schrijven</translation>
+        <translation>Kon %1 niet openen voor schrijven</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="126"/>
         <source>Could not write firmware file</source>
-        <translation type="unfinished">Kon het firmware bestand niet beschrijven</translation>
+        <translation>Kon het firmware bestand niet beschrijven</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="131"/>
         <source>Success: modified firmware file created</source>
-        <translation type="unfinished">Succes: gemodificeerde Firmware aangemaakt</translation>
+        <translation>Succes: gemodificeerde Firmware aangemaakt</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="151"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation type="unfinished">Voer een normale upgrade met een ongewijzigde firmware uit, om te deinstalleren.</translation>
+        <translation>Voer een normale upgrade met een ongewijzigde firmware uit, om te deinstalleren.</translation>
     </message>
 </context>
 <context>
@@ -1001,48 +1002,48 @@ Zie http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <location filename="../configure.cpp" line="315"/>
         <source>Showing disabled targets</source>
-        <translation type="unfinished">Uitgeschakelde spelers tonen</translation>
+        <translation>Uitgeschakelde spelers tonen</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="316"/>
         <source>You just enabled showing targets that are marked disabled. Disabled targets are not recommended to end users. Please use this option only if you know what you are doing.</source>
-        <translation type="unfinished">U heeft zojuist gekozen om spelers te tonen die als uitgeschakeld zijn gemarkeerd. Deze spelers worden niet aanbevolen voor eindgebruikers. Gebruik deze optie alleen als u weet waar u mee bezig bent.</translation>
+        <translation>U heeft zojuist gekozen om spelers te tonen die als uitgeschakeld zijn gemarkeerd. Deze spelers worden niet aanbevolen voor eindgebruikers. Gebruik deze optie alleen als u weet waar u mee bezig bent.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="498"/>
         <source>Proxy Detection</source>
-        <translation type="unfinished">Proxy-detectie</translation>
+        <translation>Proxy-detectie</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="499"/>
         <source>The System Proxy settings are invalid!
 Rockbox Utility can&apos;t work with this proxy settings. Make sure the system proxy is set correctly. Note that &quot;proxy auto-config (PAC)&quot; scripts are not supported by Rockbox Utility. If your system uses this you need to use manual proxy settings.</source>
-        <translation type="unfinished">The systeemproxy-detectie instellingen zijn ongeldig!
+        <translation>The systeemproxy-detectie instellingen zijn ongeldig!
 Rockbox Utility kan niet werken met deze instellingen. Stel de systeemproxy-instellingen juist in. Let op: &quot;proxy auto-config (PAC)&quot; scripts worden niet ondersteund door Rockbox Utility. Wanneer uw systeem dit gebruikt, moet u handmatige proxy-instellingen gebruiken.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="612"/>
         <source>Set Cache Path</source>
-        <translation type="unfinished">Stel cache-locatie in</translation>
+        <translation>Stel cache-locatie in</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="741"/>
         <source>%1 &quot;MacPod&quot; found!
 Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
-        <translation type="unfinished">%1 &quot;MacPod&quot; gevonden!
+        <translation>%1 &quot;MacPod&quot; gevonden!
 Rockbox heeft een FAT-geformattered Ipod (een zogenaamde &quot;WinPod&quot;) nodig om te kunnen draaien.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="748"/>
         <source>%1 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
-        <translation type="unfinished">%1 in MTP modus gevonden!
+        <translation>%1 in MTP modus gevonden!
 U moet uw speler in MSC modus zetten voor installatie.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="753"/>
         <source>Until you change this installation will fail!</source>
-        <translation type="unfinished">Installatie zal mislukken totdat u dit aanpast!</translation>
+        <translation>Installatie zal mislukken totdat u dit aanpast!</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="760"/>
@@ -1113,12 +1114,12 @@ Gelieve de TTS engine te configureren.</translation>
     <message>
         <location filename="../configure.cpp" line="851"/>
         <source>Could not start TTS engine.</source>
-        <translation type="unfinished">Kon TTS niet starten.</translation>
+        <translation>Kon TTS niet starten.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="870"/>
         <source>Could not voice test string.</source>
-        <translation type="unfinished">Kon testzin niet uitspreken.</translation>
+        <translation>Kon testzin niet uitspreken.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="852"/>
@@ -1250,7 +1251,7 @@ Gelieve de TTS engine te configureren.</translation>
     <message>
         <location filename="../configurefrm.ui" line="58"/>
         <source>&amp;Refresh</source>
-        <translation type="unfinished">&amp;Vernieuwen</translation>
+        <translation>&amp;Vernieuwen</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="114"/>
@@ -1382,7 +1383,7 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../configurefrm.ui" line="455"/>
         <source>&amp;Use string corrections for TTS</source>
-        <translation type="unfinished">&amp;Gebruik correcties voor TTS</translation>
+        <translation>&amp;Gebruik correcties voor TTS</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="465"/>
@@ -1407,7 +1408,7 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../configurefrm.ui" line="95"/>
         <source>Show disabled targets</source>
-        <translation type="unfinished">Toon &apos;uitgeschakelde&apos; spelers</translation>
+        <translation>Toon &apos;uitgeschakelde&apos; spelers</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="420"/>
@@ -1532,7 +1533,7 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../encttscfggui.cpp" line="363"/>
         <source>Select executable</source>
-        <translation type="unfinished">Selecteer programma</translation>
+        <translation>Selecteer programma</translation>
     </message>
 </context>
 <context>
@@ -1540,12 +1541,12 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../base/encoderexe.cpp" line="40"/>
         <source>Path to Encoder:</source>
-        <translation type="unfinished">Pad naar encoder:</translation>
+        <translation>Pad naar encoder:</translation>
     </message>
     <message>
         <location filename="../base/encoderexe.cpp" line="42"/>
         <source>Encoder options:</source>
-        <translation type="unfinished">Encoder opties:</translation>
+        <translation>Encoder opties:</translation>
     </message>
 </context>
 <context>
@@ -1577,22 +1578,22 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../base/encoderrbspeex.cpp" line="33"/>
         <source>Volume:</source>
-        <translation type="unfinished">Volume:</translation>
+        <translation>Volume:</translation>
     </message>
     <message>
         <location filename="../base/encoderrbspeex.cpp" line="35"/>
         <source>Quality:</source>
-        <translation type="unfinished">Kwaliteit:</translation>
+        <translation>Kwaliteit:</translation>
     </message>
     <message>
         <location filename="../base/encoderrbspeex.cpp" line="37"/>
         <source>Complexity:</source>
-        <translation type="unfinished">Complexiteit:</translation>
+        <translation>Complexiteit:</translation>
     </message>
     <message>
         <location filename="../base/encoderrbspeex.cpp" line="39"/>
         <source>Use Narrowband:</source>
-        <translation type="unfinished">Gebruik smalband:</translation>
+        <translation>Gebruik smalband:</translation>
     </message>
 </context>
 <context>
@@ -1601,13 +1602,13 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
         <location filename="../gui/infowidget.cpp" line="29"/>
         <location filename="../gui/infowidget.cpp" line="106"/>
         <source>File</source>
-        <translation type="unfinished">Bestand</translation>
+        <translation>Bestand</translation>
     </message>
     <message>
         <location filename="../gui/infowidget.cpp" line="29"/>
         <location filename="../gui/infowidget.cpp" line="106"/>
         <source>Version</source>
-        <translation type="unfinished">Versie</translation>
+        <translation>Versie</translation>
     </message>
 </context>
 <context>
@@ -1615,12 +1616,12 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../gui/infowidgetfrm.ui" line="14"/>
         <source>Info</source>
-        <translation type="unfinished">Info</translation>
+        <translation>Info</translation>
     </message>
     <message>
         <location filename="../gui/infowidgetfrm.ui" line="20"/>
         <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
-        <translation type="unfinished">Huidige geïnstalleerde pakketten.&lt;br/&gt;&lt;b&gt;Pas op:&lt;/b&gt; als u manueel pakketten installeert kan dit niet correct zijn!</translation>
+        <translation type="unfinished">Huidige geïnstalleerde pakketten.&lt;br/&gt;&lt;b&gt;Pas op:&lt;/b&gt; als u manueel pakketten installeert kan dit incorrect zijn!</translation>
     </message>
     <message>
         <location filename="../gui/infowidgetfrm.ui" line="34"/>
@@ -1702,7 +1703,7 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
         <location filename="../installtalkwindow.cpp" line="126"/>
         <location filename="../installtalkwindow.cpp" line="129"/>
         <source>&lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -1710,32 +1711,32 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../gui/manualwidget.cpp" line="40"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
-        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;PDF Handboek&lt;/a&gt;</translation>
+        <translation>&lt;a href=&apos;%1&apos;&gt;PDF Handboek&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../gui/manualwidget.cpp" line="42"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
-        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;HTML Handboek (opent in een browser)&lt;/a&gt;</translation>
+        <translation>&lt;a href=&apos;%1&apos;&gt;HTML Handboek (opent in een browser)&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../gui/manualwidget.cpp" line="46"/>
         <source>Select a device for a link to the correct manual</source>
-        <translation type="unfinished">Selecteer een apparaat voor een link naar het correcte handboek</translation>
+        <translation>Selecteer een apparaat voor een link naar het correcte handboek</translation>
     </message>
     <message>
         <location filename="../gui/manualwidget.cpp" line="47"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
-        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Handboek overzicht&lt;/a&gt;</translation>
+        <translation>&lt;a href=&apos;%1&apos;&gt;Handboek overzicht&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../gui/manualwidget.cpp" line="58"/>
         <source>Confirm download</source>
-        <translation type="unfinished">Bevestig download</translation>
+        <translation>Bevestig download</translation>
     </message>
     <message>
         <location filename="../gui/manualwidget.cpp" line="59"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
-        <translation type="unfinished">Wilt u zeker het handboek downloaden? Dit handboek zal opgeslagen worden in de hoofdmap van uw speler.</translation>
+        <translation>Wilt u zeker het handboek downloaden? Dit handboek zal opgeslagen worden in de hoofdmap van uw speler.</translation>
     </message>
 </context>
 <context>
@@ -1748,37 +1749,37 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="20"/>
         <source>Read the manual</source>
-        <translation type="unfinished">Lees de handleiding</translation>
+        <translation>Lees de handleiding</translation>
     </message>
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="26"/>
         <source>PDF manual</source>
-        <translation type="unfinished">PDF handleiding</translation>
+        <translation>PDF handleiding</translation>
     </message>
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="39"/>
         <source>HTML manual</source>
-        <translation type="unfinished">HTML handleiding</translation>
+        <translation>HTML handleiding</translation>
     </message>
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="55"/>
         <source>Download the manual</source>
-        <translation type="unfinished">Download de handleiding</translation>
+        <translation>Download de handleiding</translation>
     </message>
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="63"/>
         <source>&amp;PDF version</source>
-        <translation type="unfinished">&amp;PDF versie</translation>
+        <translation>&amp;PDF versie</translation>
     </message>
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="70"/>
         <source>&amp;HTML version (zip file)</source>
-        <translation type="unfinished">&amp;HTML versie (zip bestand)</translation>
+        <translation>&amp;HTML versie (zip bestand)</translation>
     </message>
     <message>
         <location filename="../gui/manualwidgetfrm.ui" line="92"/>
         <source>Down&amp;load</source>
-        <translation type="unfinished">Down&amp;load</translation>
+        <translation>Down&amp;load</translation>
     </message>
 </context>
 <context>
@@ -1845,22 +1846,22 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../base/system.cpp" line="384"/>
         <source>(unknown vendor name) </source>
-        <translation type="unfinished">(onbekende fabrikantnaam)</translation>
+        <translation>(onbekende fabrikantnaam)</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="402"/>
         <source>(unknown product name)</source>
-        <translation type="unfinished">(onbekende productnaam)</translation>
+        <translation>(onbekende productnaam)</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="80"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
-        <translation type="unfinished">Bootloader installatie is bijna voltooid. De installatie &lt;b&gt;vereist&lt;/b&gt; dat u de volgende stappen handmatig uitvoert:</translation>
+        <translation>Bootloader installatie is bijna voltooid. De installatie &lt;b&gt;vereist&lt;/b&gt; dat u de volgende stappen handmatig uitvoert:</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="86"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;Verwijder veilig uw speler.&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;Verwijder veilig uw speler.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="91"/>
@@ -1880,17 +1881,17 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="114"/>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;Zet de speler uit&lt;/li&gt;&lt;li&gt;Steek de oplader erin&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;Zet de speler uit&lt;/li&gt;&lt;li&gt;Steek de oplader erin&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="119"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;Ontkoppel USB en stroomadapters&lt;/li&gt;&lt;li&gt;Hou &lt;i&gt;Power&lt;/i&gt; ingedrukt om de speler uit te schakelen&lt;/li&gt;&lt;li&gt;Zet de batterij schakelaar aan en uit op de speler&lt;/li&gt;&lt;li&gt;Hou &lt;i&gt;Power&lt;/i&gt; ingedrukt om in Rockbox op te starten&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;Ontkoppel USB en stroomadapters&lt;/li&gt;&lt;li&gt;Hou &lt;i&gt;Power&lt;/i&gt; ingedrukt om de speler uit te schakelen&lt;/li&gt;&lt;li&gt;Zet de batterij schakelaar uit en aan op de speler&lt;/li&gt;&lt;li&gt;Hou &lt;i&gt;Power&lt;/i&gt; ingedrukt om in Rockbox op te starten&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallhelper.cpp" line="125"/>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;&lt;b&gt;Noot:&lt;/b&gt; U kan veilig andere delen eerst installeren, maar de hierboven vermelde stappen zijn &lt;b&gt;verplicht&lt;/b&gt; om de installatie te voltooien!&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Noot:&lt;/b&gt; U kan veilig andere delen eerst installeren, maar de hierboven vermelde stappen zijn &lt;b&gt;vereist&lt;/b&gt; om de installatie te voltooien!&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -1898,7 +1899,7 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../quazip/quazipfile.cpp" line="141"/>
         <source>ZIP/UNZIP API error %1</source>
-        <translation type="unfinished">ZIP/UNZIP API-fout %1</translation>
+        <translation>ZIP/UNZIP API-fout %1</translation>
     </message>
 </context>
 <context>
@@ -1906,17 +1907,17 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="212"/>
         <source>Downloading build information, please wait ...</source>
-        <translation type="unfinished">Bezig met downloaden van bestand, wachten aub...</translation>
+        <translation>Bezig met downloaden van build informatie, wachten aub...</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="223"/>
         <source>Can&apos;t get version information!</source>
-        <translation type="unfinished">Kan versie-informatie niet verkrijgen!</translation>
+        <translation>Kan versie-informatie niet verkrijgen!</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="237"/>
         <source>Download build information finished.</source>
-        <translation type="unfinished">Downloaden van bestand voltooid.</translation>
+        <translation>Downloaden van build informatie voltooid.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="434"/>
@@ -1931,12 +1932,12 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="414"/>
         <source>No Rockbox installation found</source>
-        <translation type="unfinished">Geen rockbox installatie gevonden</translation>
+        <translation>Geen rockbox installatie gevonden</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="415"/>
         <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
-        <translation type="unfinished">Kon de versie van de Rockbox-installatie niet bepalen. Installeer eerst Rockbox voordat u Talk bestanden installeert.</translation>
+        <translation>Kon de versie van de Rockbox-installatie niet bepalen. Installeer eerst Rockbox voordat u Talk bestanden installeert.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="435"/>
@@ -1966,12 +1967,12 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="512"/>
         <source>No uninstall method for this target known.</source>
-        <translation type="unfinished">Geen deïnstallatiemethode voor de speler gevonden.</translation>
+        <translation>Geen deïnstallatiemethode voor de speler gevonden.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="526"/>
         <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
-        <translation type="unfinished">Rockbox Utility kon de bootloader van deze speler niet deïnstalleren. Probeer een normale firmware update om de bootloader te verwijderen.</translation>
+        <translation>Rockbox Utility kon de bootloader van deze speler niet deïnstalleren. Probeer een normale firmware update om de bootloader te verwijderen.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="534"/>
@@ -2016,27 +2017,27 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="646"/>
         <source>Checking for update ...</source>
-        <translation type="unfinished">Controleren op een update...</translation>
+        <translation>Controleren op een update...</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="711"/>
         <source>RockboxUtility Update available</source>
-        <translation type="unfinished">Rockbox Utility update gevonden</translation>
+        <translation>Rockbox Utility update gevonden</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="712"/>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished">&lt;b&gt;Nieuwe versie Rockbox Utility beschikbaar.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download het hier: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
+        <translation>&lt;b&gt;Nieuwe versie Rockbox Utility beschikbaar.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download het hier: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="715"/>
         <source>New version of Rockbox Utility available.</source>
-        <translation type="unfinished">Nieuwe versie van Rockbox Utility beschikbaar.</translation>
+        <translation>Nieuwe versie van Rockbox Utility beschikbaar.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="718"/>
         <source>Rockbox Utility is up to date.</source>
-        <translation type="unfinished">Rockbox Utility is de meest actuele versie.</translation>
+        <translation>Rockbox Utility is de meest actuele versie.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="321"/>
@@ -2057,18 +2058,18 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="104"/>
         <source>Wine detected!</source>
-        <translation type="unfinished">Wine gedetecteerd!</translation>
+        <translation>Wine gedetecteerd!</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="105"/>
         <source>It seems you are trying to run this program under Wine. Please don&apos;t do this, running under Wine will fail. Use the native Linux binary instead.</source>
-        <translation type="unfinished">Het lijkt erop dat u dit programma onder Winde draait. Doe dit alstublieft niet, draaien onder Wine zal mislukken. Gebruik in plaats daarvan de Linux applicatie.</translation>
+        <translation>Het lijkt erop dat u dit programma onder Wine draait. Doe dit alstublieft niet, draaien onder Wine zal mislukken. Gebruik in plaats daarvan de Linux applicatie.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="225"/>
         <source>Can&apos;t get version information.
 Network error: %1. Please check your network and proxy settings.</source>
-        <translation type="unfinished">Can versie-informatie niet ophalen.
+        <translation>Can versie-informatie niet ophalen.
 Netwerkfout: %1. Controleer uw netwerk- en proxy-instellingen.</translation>
     </message>
     <message>
@@ -2332,7 +2333,7 @@ Netwerkfout: %1. Controleer uw netwerk- en proxy-instellingen.</translation>
     <message>
         <location filename="../rbutilqtfrm.ui" line="326"/>
         <source>Backup</source>
-        <translation type="unfinished">Backup</translation>
+        <translation>Backup</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="343"/>
@@ -2530,49 +2531,49 @@ Netwerkfout: %1. Controleer uw netwerk- en proxy-instellingen.</translation>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="219"/>
         <source>No install method known.</source>
-        <translation type="unfinished">Geen installatie methode bekend.</translation>
+        <translation>Geen installatie methode bekend.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="246"/>
         <source>Bootloader detected</source>
-        <translation type="unfinished">Bootloader gevonden</translation>
+        <translation>Bootloader gevonden</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="247"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
-        <translation type="unfinished">Bootloader is al geïnstalleerd. Wilt u de Bootloader herinstalleren?</translation>
+        <translation>Bootloader is al geïnstalleerd. Wilt u de Bootloader herinstalleren?</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="251"/>
         <source>Bootloader installation skipped</source>
-        <translation type="unfinished">Bootloader installatie overgeslagen</translation>
+        <translation>Bootloader installatie overgeslagen</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="264"/>
         <source>Create Bootloader backup</source>
-        <translation type="unfinished">Maak Bootloader backup</translation>
+        <translation>Maak Bootloader backup</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="265"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
-        <translation type="unfinished">U kan een backup maken van de Originele Bootloader. Kies &quot;Ja&quot; om de output map op uw computer te selecteren waarin het bestand zal worden opgeslagen. Dit bestand zal geplaatst worden in een nieuwe map &quot;%1&quot; die zal worden aangemaakt onder de geselecteerde map.
+        <translation>U kan een backup maken van de Originele Bootloader. Kies &quot;Ja&quot; om de output map op uw computer te selecteren waarin het bestand zal worden opgeslagen. Dit bestand zal geplaatst worden in een nieuwe map &quot;%1&quot; die zal worden aangemaakt onder de geselecteerde map.
 Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="272"/>
         <source>Browse backup folder</source>
-        <translation type="unfinished">Blader naar backup map</translation>
+        <translation>Blader naar backup map</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="284"/>
         <source>Prerequisites</source>
-        <translation type="unfinished">Vereisten</translation>
+        <translation>Vereisten</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="289"/>
         <source>Bootloader installation aborted</source>
-        <translation type="unfinished">Bootloader installatie afgebroken</translation>
+        <translation>Bootloader installatie afgebroken</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="299"/>
@@ -2587,12 +2588,12 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="303"/>
         <source>Select firmware file</source>
-        <translation type="unfinished">Selecteer firmware bestand</translation>
+        <translation>Selecteer firmware bestand</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="305"/>
         <source>Error opening firmware file</source>
-        <translation type="unfinished">Fout bij openen van firmware bestand</translation>
+        <translation>Fout bij openen van firmware bestand</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="311"/>
@@ -2602,17 +2603,17 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="321"/>
         <source>Backup error</source>
-        <translation type="unfinished">Backup fout</translation>
+        <translation>Backup fout</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="322"/>
         <source>Could not create backup file. Continue?</source>
-        <translation type="unfinished">Kon geen backup maken. Verdergaan?</translation>
+        <translation>Kon geen backup maken. Verdergaan?</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="346"/>
         <source>Manual steps required</source>
-        <translation type="unfinished">Handmatige stappen zijn genoodzaakt</translation>
+        <translation>Handmatige stappen zijn genoodzaakt</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="366"/>
@@ -2622,12 +2623,12 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="367"/>
         <source>Really continue?</source>
-        <translation type="unfinished">Wilt u zeker verdergaan?</translation>
+        <translation>Wilt u zeker verdergaan?</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="371"/>
         <source>Aborted!</source>
-        <translation type="unfinished">Afgebroken!</translation>
+        <translation>Afgebroken!</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="485"/>
@@ -2640,22 +2641,22 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../base/serverinfo.cpp" line="116"/>
         <source>Unknown</source>
-        <translation type="unfinished">Onbekend</translation>
+        <translation>Onbekend</translation>
     </message>
     <message>
         <location filename="../base/serverinfo.cpp" line="120"/>
         <source>Unusable</source>
-        <translation type="unfinished">Onbruikbaar</translation>
+        <translation>Onbruikbaar</translation>
     </message>
     <message>
         <location filename="../base/serverinfo.cpp" line="123"/>
         <source>Unstable</source>
-        <translation type="unfinished">Onstabiel</translation>
+        <translation>Onstabiel</translation>
     </message>
     <message>
         <location filename="../base/serverinfo.cpp" line="126"/>
         <source>Stable</source>
-        <translation type="unfinished">Stabiel</translation>
+        <translation>Stabiel</translation>
     </message>
 </context>
 <context>
@@ -2697,7 +2698,7 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../systracefrm.ui" line="79"/>
         <source>Save &amp;previous</source>
-        <translation type="unfinished">Opslaan &amp;vorige</translation>
+        <translation>Opslaan &amp;vorige</translation>
     </message>
 </context>
 <context>
@@ -2735,32 +2736,32 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../sysinfo.cpp" line="65"/>
         <source>Mountpoint</source>
-        <translation type="unfinished">Koppelpunt</translation>
+        <translation>Koppelpunt</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="65"/>
         <source>Label</source>
-        <translation type="unfinished">Label</translation>
+        <translation>Label</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="66"/>
         <source>Free</source>
-        <translation type="unfinished">Beschikbaar</translation>
+        <translation>Beschikbaar</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="66"/>
         <source>Total</source>
-        <translation type="unfinished">Totaal</translation>
+        <translation>Totaal</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="67"/>
         <source>Cluster Size</source>
-        <translation type="unfinished">Clustergrootte</translation>
+        <translation>Clustergrootte</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="69"/>
         <source>&lt;tr&gt;&lt;td&gt;%1&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td&gt;%2 GiB&lt;/td&gt;&lt;td&gt;%3 GiB&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished">&lt;tr&gt;&lt;td&gt;%1&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td&gt;%2 GiB&lt;/td&gt;&lt;td&gt;%3 GiB&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;</translation>
+        <translation>&lt;tr&gt;&lt;td&gt;%1&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td&gt;%2 GiB&lt;/td&gt;&lt;td&gt;%3 GiB&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
 </context>
 <context>
@@ -2786,28 +2787,28 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../base/system.cpp" line="120"/>
         <source>Guest</source>
-        <translation type="unfinished">Gast</translation>
+        <translation>Gast</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="123"/>
         <source>Admin</source>
-        <translation type="unfinished">Hoofdgebruiker</translation>
+        <translation>Hoofdgebruiker</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="126"/>
         <source>User</source>
-        <translation type="unfinished">Gebruiker</translation>
+        <translation>Gebruiker</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="129"/>
         <source>Error</source>
-        <translation type="unfinished">Fout</translation>
+        <translation>Fout</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="277"/>
         <location filename="../base/system.cpp" line="322"/>
         <source>(no description available)</source>
-        <translation type="unfinished">(geen beschrijving beschikbaar)</translation>
+        <translation>(geen beschrijving beschikbaar)</translation>
     </message>
 </context>
 <context>
@@ -2815,32 +2816,32 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../base/ttsbase.cpp" line="40"/>
         <source>Espeak TTS Engine</source>
-        <translation type="unfinished">Espeak TTS</translation>
+        <translation>Espeak TTS</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="42"/>
         <source>Flite TTS Engine</source>
-        <translation type="unfinished">Flite TTS</translation>
+        <translation>Flite TTS</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="43"/>
         <source>Swift TTS Engine</source>
-        <translation type="unfinished">Swift TTS</translation>
+        <translation>Swift TTS</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="45"/>
         <source>SAPI TTS Engine</source>
-        <translation type="unfinished">SAPI TTS</translation>
+        <translation>SAPI TTS</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="48"/>
         <source>Festival TTS Engine</source>
-        <translation type="unfinished">Festival TTS</translation>
+        <translation>Festival TTS</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="51"/>
         <source>OS X System Engine</source>
-        <translation type="unfinished">OS X Systeem</translation>
+        <translation>OS X Systeem</translation>
     </message>
 </context>
 <context>
@@ -2848,27 +2849,27 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../base/ttscarbon.cpp" line="138"/>
         <source>Voice:</source>
-        <translation type="unfinished">Stem:</translation>
+        <translation>Stem:</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="144"/>
         <source>Speed (words/min):</source>
-        <translation type="unfinished">Snelheid (woorden/min):</translation>
+        <translation>Snelheid (woorden/min):</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="151"/>
         <source>Pitch (0 for default):</source>
-        <translation type="unfinished">Toonhoogte (0 voor standaard):</translation>
+        <translation>Toonhoogte (0 voor standaard):</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="221"/>
         <source>Could not voice string</source>
-        <translation type="unfinished">Kon zin niet uitspreken</translation>
+        <translation>Kon zin niet uitspreken</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="231"/>
         <source>Could not convert intermediate file</source>
-        <translation type="unfinished">Kon tussenbestand niet omzetten</translation>
+        <translation>Kon tussenbestand niet omzetten</translation>
     </message>
 </context>
 <context>
@@ -2990,7 +2991,7 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../base/talkfile.cpp" line="277"/>
         <source>Cleaning up...</source>
-        <translation type="unfinished">Opruimen...</translation>
+        <translation>Opruimen...</translation>
     </message>
     <message>
         <location filename="../base/talkfile.cpp" line="288"/>
@@ -3266,12 +3267,12 @@ HTTP response code: %1</source>
     <message>
         <location filename="../base/uninstall.cpp" line="48"/>
         <source>Uninstalling %1...</source>
-        <translation type="unfinished">%1 deïnstalleren...</translation>
+        <translation>%1 deïnstalleren...</translation>
     </message>
     <message>
         <location filename="../base/uninstall.cpp" line="79"/>
         <source>Could not delete %1</source>
-        <translation type="unfinished">Kon %1 niet wissen</translation>
+        <translation>Kon %1 niet wissen</translation>
     </message>
     <message>
         <location filename="../base/uninstall.cpp" line="108"/>
@@ -3285,18 +3286,18 @@ HTTP response code: %1</source>
         <location filename="../base/utils.cpp" line="310"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;Uw machtigingen zijn niet voldoende om de Bootloader te installeren.
+        <translation>&lt;li&gt;Uw machtigingen zijn niet voldoende om de Bootloader te installeren.
 Administrator privileges zijn nodig.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/utils.cpp" line="322"/>
         <source>&lt;li&gt;Target mismatch detected.&lt;br/&gt;Installed target: %1&lt;br/&gt;Selected target: %2.&lt;/li&gt;</source>
-        <translation type="unfinished">&lt;li&gt;Verkeerde combinatie gedetecteerd.&lt;br&gt;Geïnstalleerd: %1&lt;br/&gt;Gekozen: %2.&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;Verkeerde combinatie gedetecteerd.&lt;br&gt;Geïnstalleerd: %1&lt;br/&gt;Gekozen: %2.&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/utils.cpp" line="329"/>
         <source>Problem detected:</source>
-        <translation type="unfinished">Probleem gevonden:</translation>
+        <translation>Probleem gevonden:</translation>
     </message>
 </context>
 <context>
@@ -3324,7 +3325,7 @@ Administrator privileges zijn nodig.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/voicefile.cpp" line="170"/>
         <source>Downloading voice info...</source>
-        <translation type="unfinished">Downloaden van steminformatie...</translation>
+        <translation>Downloaden van steminformatie...</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="183"/>
@@ -3364,7 +3365,7 @@ Administrator privileges zijn nodig.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/voicefile.cpp" line="341"/>
         <source>Cleaning up...</source>
-        <translation type="unfinished">Opruimen...</translation>
+        <translation>Opruimen...</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="352"/>
@@ -3442,7 +3443,7 @@ Administrator privileges zijn nodig.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/zipinstaller.cpp" line="150"/>
         <source>Extraction failed!</source>
-        <translation type="unfinished">Uitpakken mislukt!</translation>
+        <translation>Uitpakken mislukt!</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="159"/>
@@ -3470,17 +3471,17 @@ Administrator privileges zijn nodig.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/ziputil.cpp" line="124"/>
         <source>Creating output path failed</source>
-        <translation type="unfinished">Aanmaken uitvoerlokatie mislukt</translation>
+        <translation>Aanmaken uitvoerlokatie mislukt</translation>
     </message>
     <message>
         <location filename="../base/ziputil.cpp" line="131"/>
         <source>Creating output file failed</source>
-        <translation type="unfinished">Aanmaken uitvoerbestand mislukt</translation>
+        <translation>Aanmaken uitvoerbestand mislukt</translation>
     </message>
     <message>
         <location filename="../base/ziputil.cpp" line="140"/>
         <source>Error during Zip operation</source>
-        <translation type="unfinished">Fout tijdens Zip-bewerking</translation>
+        <translation>Fout tijdens Zip-bewerking</translation>
     </message>
 </context>
 <context>
@@ -3513,7 +3514,7 @@ Administrator privileges zijn nodig.&lt;/li&gt;</translation>
     <message>
         <location filename="../aboutbox.ui" line="132"/>
         <source>&amp;Speex License</source>
-        <translation type="unfinished">&amp;Speex Licentie</translation>
+        <translation>&amp;Speex Licentie</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="158"/>
