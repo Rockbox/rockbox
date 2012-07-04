@@ -44,6 +44,16 @@
 #include "usbstack/usb_serial.h"
 #endif
 
+#ifdef ROCKBOX_HAS_LOGDISKF
+#include "logdiskf.h"
+#include "file.h"
+#include "rbpaths.h"
+#include "ata_idle_notify.h"
+
+unsigned char logdiskfbuffer[MAX_LOGDISKF_SIZE];
+int logdiskfindex;
+#endif
+
 /* Only provide all this if asked to */
 #ifdef ROCKBOX_HAS_LOGF
 
@@ -68,33 +78,33 @@ static void displayremote(void)
        I hope there is no font with height < 6 ! */
     const int NB_ENTRIES=LCD_REMOTE_HEIGHT / 6;
     int line_start_ptr[NB_ENTRIES];
-    
+
     fontnr = lcd_getfont();
     font = font_get(fontnr);
-    
+
     /* get the horizontal size of each line */
     font_getstringsize("A", NULL, &delta_y, fontnr);
-    
+
     /* font too small ? */
     if(delta_y < 6)
         return;
     /* nothing to print ? */
     if(logfindex == 0 && !logfwrap)
         return;
-    
+
     w = LCD_REMOTE_WIDTH;
     h = LCD_REMOTE_HEIGHT;
     nb_lines = 0;
-    
+
     if(logfwrap)
         i = logfindex;
     else
         i = 0;
-    
+
     cur_x = 0;
-    
+
     line_start_ptr[0] = i;
-    
+
     do
     {
         if(logfbuffer[i] == '\0')
@@ -106,7 +116,7 @@ static void displayremote(void)
         {
             /* does character fit on this line ? */
             delta_x = font_get_width(font, logfbuffer[i]);
-            
+
             if(cur_x + delta_x > w)
             {
                 cur_x = 0;
@@ -119,14 +129,14 @@ static void displayremote(void)
         if(i >= MAX_LOGF_SIZE)
             i = 0;
     } while(i != logfindex);
-    
+
     lcd_remote_clear_display();
-    
+
     i = line_start_ptr[ MAX(nb_lines - h / delta_y, 0) % NB_ENTRIES];
     cur_x = 0;
     cur_y = 0;
     buf[1] = '\0';
-    
+
     do {
         if(logfbuffer[i] == '\0')
         {
@@ -137,24 +147,24 @@ static void displayremote(void)
         {
             /* does character fit on this line ? */
             delta_x = font_get_width(font, logfbuffer[i]);
-            
+
             if(cur_x + delta_x > w)
             {
                 cur_y += delta_y;
                 cur_x = 0;
             }
-            
+
             buf[0] = logfbuffer[i];
             lcd_remote_putsxy(cur_x, cur_y, buf);
             cur_x += delta_x;
         }
-        
+
         i++;
         if(i >= MAX_LOGF_SIZE)
             i = 0;
     } while(i != logfindex);
-    
-    lcd_remote_update();   
+
+    lcd_remote_update();
 }
 #else
 #define displayremote()
@@ -166,14 +176,14 @@ void _logf(const char *format, ...)
     char buf[1024];
     va_list ap;
     va_start(ap, format);
-    
+
     vsnprintf(buf, sizeof buf, format, ap);
     printf("DEBUG: %s\n", buf);
 }
 #else
 static void check_logfindex(void)
 {
-    if(logfindex >= MAX_LOGF_SIZE) 
+    if(logfindex >= MAX_LOGF_SIZE)
     {
         /* wrap */
         logfwrap = true;
@@ -184,10 +194,10 @@ static void check_logfindex(void)
 static int logf_push(void *userp, unsigned char c)
 {
     (void)userp;
-    
+
     logfbuffer[logfindex++] = c;
     check_logfindex();
-    
+
 #if defined(HAVE_SERIAL) && !defined(SIMULATOR) && defined(LOGF_SERIAL)
     if(c != '\0')
     {
@@ -197,7 +207,7 @@ static int logf_push(void *userp, unsigned char c)
         serial_tx(buf);
     }
 #endif
-    
+
     return true;
 }
 
@@ -209,7 +219,7 @@ void _logf(const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    
+
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     char buf[1024];
     vsnprintf(buf, sizeof buf, fmt, ap);
@@ -221,10 +231,10 @@ void _logf(const char *fmt, ...)
 
     vuprintf(logf_push, NULL, fmt, ap);
     va_end(ap);
-    
+
     /* add trailing zero */
     logf_push(NULL, '\0');
-    
+
 #if defined(HAVE_SERIAL) && !defined(SIMULATOR) && defined(LOGF_SERIAL)
     serial_tx("\r\n");
 #endif
@@ -238,10 +248,77 @@ void _logf(const char *fmt, ...)
     else
         usb_serial_send(logfbuffer + old_logfindex, logfindex - old_logfindex - 1);
     usb_serial_send("\r\n", 2);
-#endif  
+#endif
 
     displayremote();
 }
 #endif
+
+#endif
+
+#ifdef ROCKBOX_HAS_LOGDISKF
+static int logdiskf_push(void *userp, unsigned char c)
+{
+    (void)userp;
+
+    /*just stop logging if out of space*/
+    if(logdiskfindex>=MAX_LOGDISKF_SIZE-1)
+    {
+        strcpy(&logdiskfbuffer[logdiskfindex-8], "LOGFULL");
+        logdiskfindex=MAX_LOGDISKF_SIZE;
+        return false;
+    }
+    logdiskfbuffer[logdiskfindex++] = c;
+
+    return true;
+}
+
+void _logdiskf(const char* file, const char level, const char *fmt, ...)
+{
+
+    va_list ap;
+
+    va_start(ap, fmt);
+    int len =strlen(file);
+    if(logdiskfindex +len + 4 > MAX_LOGDISKF_SIZE-1)
+    {
+        strcpy(&logdiskfbuffer[logdiskfindex-8], "LOGFULL");
+        logdiskfindex=MAX_LOGDISKF_SIZE;
+        return;
+    }
+
+    logdiskf_push(NULL, level);
+    logdiskf_push(NULL, ' ');
+    logdiskf_push(NULL, '[');
+    strcpy(&logdiskfbuffer[logdiskfindex], file);
+    logdiskfindex += len;
+    logdiskf_push(NULL, ']');
+
+    vuprintf(logdiskf_push, NULL, fmt, ap);
+    va_end(ap);
+
+
+}
+static void flush_buffer(void* data)
+{
+    (void)data;
+    int fd;
+    if(logdiskfindex < 1)
+        return;
+
+    fd = open(HOME_DIR"/rockbox_log.txt", O_RDWR | O_CREAT | O_APPEND, 0666);
+    if (fd < 0)
+        return;
+
+    write(fd, logdiskfbuffer, logdiskfindex);
+    close(fd);
+
+    logdiskfindex = 0;
+}
+
+void init_logdiskf()
+{
+    register_storage_idle_func(flush_buffer);
+}
 
 #endif

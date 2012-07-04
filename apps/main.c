@@ -76,6 +76,7 @@
 #include "skin_engine/skin_engine.h"
 #include "statusbar-skinned.h"
 #include "bootchart.h"
+#include "logdiskf.h"
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #include "notification.h"
 #endif
@@ -487,6 +488,10 @@ static void init(void)
 #ifdef HAVE_SERIAL
     serial_setup();
 #endif
+#endif
+
+#ifdef ROCKBOX_HAS_LOGDISKF
+    init_logdiskf();
 #endif
 
 #if CONFIG_RTC
