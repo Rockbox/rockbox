@@ -44,6 +44,16 @@
 #include "usbstack/usb_serial.h"
 #endif
 
+#ifdef ROCKBOX_HAS_LOGDISKF
+#include "logdiskf.h"
+#include "file.h"
+#include "rbpaths.h"
+#include "ata_idle_notify.h"
+
+unsigned char logdiskfbuffer[MAX_LOGDISKF_SIZE];
+int logdiskfindex;
+#endif
+
 /* Only provide all this if asked to */
 #ifdef ROCKBOX_HAS_LOGF
 
@@ -243,5 +253,56 @@ void _logf(const char *fmt, ...)
     displayremote();
 }
 #endif
+
+#endif
+
+#ifdef ROCKBOX_HAS_LOGDISKF
+static int logdiskf_push(void *userp, unsigned char c)
+{
+    (void)userp;
+    
+    logdiskfbuffer[logdiskfindex++] = c;
+    
+    /*just stop logging if out of space*/
+    if(logdiskfindex>=MAX_LOGDISKF_SIZE-2)
+        return false;
+        
+    return true;
+}
+
+void _logdiskf(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    
+    vuprintf(logdiskf_push, NULL, fmt, ap);
+    va_end(ap);
+    
+    /* add trailing zero */
+    //logdiskf_push(NULL, '\0');
+    
+}
+static void flush_buffer(void* data)
+{
+    (void)data;
+    int fd;
+    if(logdiskfindex < 1)
+        return;
+
+    fd = open(HOME_DIR"/rockbox_log.txt", O_RDWR | O_CREAT | O_APPEND, 0666);
+    if (fd < 0)
+        return;
+
+    write(fd, logdiskfbuffer, logdiskfindex);
+    close(fd);
+
+    logdiskfindex = 0;
+}
+
+void init_logdiskf()
+{
+    register_storage_idle_func(flush_buffer);
+}
 
 #endif
