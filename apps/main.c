@@ -76,6 +76,7 @@
 #include "skin_engine/skin_engine.h"
 #include "statusbar-skinned.h"
 #include "bootchart.h"
+#include "logdiskf.h"
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #include "notification.h"
 #endif
@@ -488,6 +489,8 @@ static void init(void)
     serial_setup();
 #endif
 #endif
+
+    init_logdiskf();
 
 #if CONFIG_RTC
     rtc_init();
