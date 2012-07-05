@@ -211,8 +211,9 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "IIiii", 0 },
     
     { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f", SKIN_REFRESH_STATIC|NOBREAK },
-    
-    { SKIN_TOKEN_SETTING,               "St" , "S", SKIN_REFRESH_DYNAMIC },
+    /* This uses the bar tag params also but the first item can be a string
+     * and we don't allow no params. */
+    { SKIN_TOKEN_SETTING,               "St" , "[Si]|iiis*", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_TRANSLATEDSTRING,      "Sx" , "S", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_LANG_IS_RTL,           "Sr" , "", SKIN_REFRESH_STATIC },
     

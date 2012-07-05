@@ -44,6 +44,7 @@
 #include "audio.h"
 #include "tagcache.h"
 #include "list.h"
+#include "option_select.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -144,6 +145,13 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         skinlist_get_scrollbar(&val, &min, &max);
         end = val - min;
         length = max - min;
+    }
+    else if (pb->type == SKIN_TOKEN_SETTINGBAR)
+    {
+        int val, count;
+        get_setting_info_for_bar(pb->setting_id, &count, &val);
+        length = count - 1;
+        end = val;
     }
 #if CONFIG_TUNER
     else if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))

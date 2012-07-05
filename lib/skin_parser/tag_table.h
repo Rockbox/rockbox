@@ -246,6 +246,7 @@ enum skin_token_type {
 
     /* Setting option */
     SKIN_TOKEN_SETTING,
+    SKIN_TOKEN_SETTINGBAR,
     SKIN_TOKEN_CURRENT_SCREEN,
     SKIN_TOKEN_LANG_IS_RTL,
     

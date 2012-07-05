@@ -736,6 +736,10 @@ static int parse_image_special(struct skin_element *element,
 
 #endif /* HAVE_LCD_BITMAP */
 
+static int parse_progressbar_tag(struct skin_element* element,
+                                 struct wps_token *token,
+                                 struct wps_data *wps_data);
+
 static int parse_setting_and_lang(struct skin_element *element,
                                   struct wps_token *token,
                                   struct wps_data *wps_data)
@@ -756,6 +760,13 @@ static int parse_setting_and_lang(struct skin_element *element,
         if (i < 0)
             return WPS_ERROR_INVALID_PARAM;
 #endif
+    }
+    else if (element->params_count > 1)
+    {
+        if (element->params_count > 4)
+            return parse_progressbar_tag(element, token, wps_data);
+        else
+            return WPS_ERROR_INVALID_PARAM;
     }
     else
     {
@@ -891,6 +902,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     pb->image = PTRTOSKINOFFSET(skin_buffer, NULL);
     pb->slider = PTRTOSKINOFFSET(skin_buffer, NULL);
     pb->backdrop = PTRTOSKINOFFSET(skin_buffer, NULL);
+    pb->setting_id = -1;
     pb->invert_fill_direction = false;
     pb->horizontal = true;
 
@@ -1015,6 +1027,19 @@ static int parse_progressbar_tag(struct skin_element* element,
         else if (!strcmp(text, "notouch"))
             suppress_touchregion = true;
 #endif
+		else if (token->type == SKIN_TOKEN_SETTING && !strcmp(text, "setting"))
+		{
+            if (curr_param+1 < element->params_count)
+            {
+                curr_param++;
+                param++;
+                text = SKINOFFSETTOPTR(skin_buffer, param->data.text);
+#ifndef __PCTOOL__
+				if (find_setting_by_cfgname(text, &pb->setting_id) == NULL)
+					return WPS_ERROR_INVALID_PARAM;
+#endif
+			}
+		}
         else if (curr_param == 4)
             image_filename = text;
 
@@ -1060,6 +1085,8 @@ static int parse_progressbar_tag(struct skin_element* element,
         token->type = SKIN_TOKEN_PEAKMETER_RIGHTBAR;
     else if (token->type == SKIN_TOKEN_LIST_NEEDS_SCROLLBAR)
         token->type = SKIN_TOKEN_LIST_SCROLLBAR;
+    else if (token->type == SKIN_TOKEN_SETTING)
+		token->type = SKIN_TOKEN_SETTINGBAR;
     pb->type = token->type;
 
 #ifdef HAVE_TOUCHSCREEN

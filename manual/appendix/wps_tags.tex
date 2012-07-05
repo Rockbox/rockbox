@@ -360,6 +360,8 @@ that, it will display the volume value.
     \config{\%St(<setting\tabnlindent{}name>)} & The value of the Rockbox
              setting with the specified name. See \reference{ref:config_file_options}
              for the list of the available settings.\\
+    \config{\%St(...)} & Draw a bar using from the setting.
+            See \reference{ref:bar_tags} for details.\\
   \end{tagmap}
 
 Examples:
@@ -715,6 +717,8 @@ display cycling round the defined sublines. See
     \opt{touchscreen}{
         \item[notouch] -- don't create the touchregion for progress/volume bars.
     }
+  \item[setting] -- Specify the setting name to draw the bar from (bar must be
+    \%St type), the next param is the settings config name.
 \end{description}
 
 Example: \config{\%pb(0,0,-,-,-,nofill, slider, slider\_image, invert)} -- draw
