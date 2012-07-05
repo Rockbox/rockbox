@@ -198,6 +198,13 @@ int fast_readline(int fd, char *buf, int buf_size, void *parameters,
             next = ++p;
         }
 
+        if ( (p = strchr(buf, '\r')) != NULL)
+        {
+            *p = '\0';
+            if (!next)
+                next = ++p;
+        }
+
         rc = callback(count, buf, parameters);
         if (rc < 0)
             return rc;
