@@ -617,7 +617,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         /* Checking for comments */
         if(*cursor == COMMENTSYM)
             skip_comment(&cursor);
-            
+
         if (*tag_args == '[')
         {
             /* we need to guess which type of param it is. 
@@ -782,7 +782,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         {
             if (i+1 == num_args)
                 tag_args += 2;
-            else if (open_square_bracket)
+            else if (open_square_bracket  && *tag_args == ']')
             {
                 tag_args = open_square_bracket;
                 open_square_bracket = NULL;
