@@ -1491,7 +1491,7 @@ static int parse_touchregion(struct skin_element *element,
     region->last_press = 0xffff;
     region->press_length = PRESS;
     region->allow_while_locked = false;
-    region->bar = -1;
+    region->bar = PTRTOSKINOFFSET(skin_buffer, NULL);
     action = get_param_text(element, p++);
 
     /* figure out the action */
@@ -2409,7 +2409,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     }
     regions = SKINOFFSETTOPTR(skin_buffer, wps_data->touchregions);
     if (regions && !user_touch_region_found)
-        wps_data->touchregions = -1;
+        wps_data->touchregions = PTRTOSKINOFFSET(skin_buffer, NULL);
 #endif
 
     skin_buffer = NULL;
