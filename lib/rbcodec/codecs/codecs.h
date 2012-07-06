@@ -64,6 +64,35 @@
 #define LOGF(...)
 #endif
 
+#ifdef ROCKBOX_HAS_LOGDISKF
+#define CODEC_LOGDISK_LEVEL 2  /*TODO:  find better place for this*/
+#if CODEC_LOGDISK_LEVEL > 0       /*serious errors or problems*/
+ #undef ERRORF
+ #define ERRORF(...) ci->logdiskf(__func__,'E', __VA_ARGS__)
+#else
+  #define ERRORF(...)
+#endif
+
+#if CODEC_LOGDISK_LEVEL > 1       /*matters of concern*/
+ #undef WARNF
+ #define WARNF(...) ci->logdiskf(__func__, 'W', __VA_ARGS__)
+#else
+ #define WARNF(...)
+#endif
+
+#if CODEC_LOGDISK_LEVEL > 2       /*useful for debug only*/
+ #undef NOTEF
+ #define NOTEF(...) ci->logdiskf(__func__, 'N', __VA_ARGS__)
+#else
+ #define NOTEF(...)
+#endif
+
+#else
+ #define ERRORF(...)
+ #define WARNF(...)
+ #define NOTEF(...)
+#endif /*ROCKBOX_HAS_LOGDISKF*/
+
 #endif
 
 /* magic for normal codecs */
@@ -72,12 +101,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 45
+#define CODEC_API_VERSION 46
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 45
+#define CODEC_MIN_API_VERSION 46
 
 /* reasons for calling codec main entrypoint */
 enum codec_entry_call_reason {
@@ -107,13 +136,13 @@ enum codec_command_action {
 struct codec_api {
     off_t  filesize;          /* Total file length */
     off_t  curpos;            /* Current buffer position */
-    
+
     struct mp3entry *id3;     /* TAG metadata pointer */
     int    audio_hid;         /* Current audio handle */
-    
+
     /* The dsp instance to be used for audio output */
     struct dsp_config *dsp;
-    
+
     /* Returns buffer to malloc array. Only codeclib should need this. */
     void* (*codec_get_buffer)(size_t *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
@@ -121,7 +150,7 @@ struct codec_api {
     void (*pcmbuf_insert)(const void *ch1, const void *ch2, int count);
     /* Set song position in WPS (value in ms). */
     void (*set_elapsed)(unsigned long value);
-    
+
     /* Read next <size> amount bytes from file buffer to <ptr>.
        Will return number of bytes read or 0 if end of file. */
     size_t (*read_filebuf)(void *ptr, size_t size);
@@ -187,6 +216,10 @@ struct codec_api {
 #ifdef ROCKBOX_HAS_LOGF
     void (*logf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
+#ifdef ROCKBOX_HAS_LOGDISKF
+    void (*logdiskf)(const char* function, const char level,
+                const char *format, ...) ATTRIBUTE_PRINTF(3, 4);
+#endif
 
     /* Tremor requires qsort */
     void (*qsort)(void *base, size_t nmemb, size_t size,
@@ -198,7 +231,7 @@ struct codec_api {
     void (*profile_func_enter)(void *this_fn, void *call_site);
     void (*profile_func_exit)(void *this_fn, void *call_site);
 #endif
- 
+
 #ifdef HAVE_RECORDING
     void            (*enc_get_inputs)(struct enc_inputs *inputs);
     void            (*enc_set_parameters)(struct enc_parameters *params);

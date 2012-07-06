@@ -151,7 +151,7 @@ enum codec_status codec_run(void)
 
     /* Open a non-seekable stream */
     error = ov_open_callbacks(ci, &vf, NULL, 0, callbacks);
-    
+
     /* If the non-seekable open was successful, we need to supply the missing
      * data to make it seekable.  This is a hack, but it's reasonable since we
      * don't want to run the whole file through the buffer before we start
@@ -186,7 +186,7 @@ enum codec_status codec_run(void)
          vf.ready_state = OPENED;
          vf.links = 1;
     } else {
-         DEBUGF("Vorbis: ov_open failed: %d\n", error);
+         ERRORF("Vorbis: ov_open failed: %d\n", error);
          goto done;
     }
 
@@ -232,7 +232,7 @@ enum codec_status codec_run(void)
         if (n == 0) {
             eof = 1;
         } else if (n < 0) {
-            DEBUGF("Vorbis: Error decoding frame\n");
+            ERRORF("Vorbis: Error decoding frame\n");
         } else {
             ci->pcmbuf_insert(pcm[0], pcm[1], n);
             ci->set_offset(ov_raw_tell(&vf));

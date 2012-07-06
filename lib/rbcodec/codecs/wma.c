@@ -64,7 +64,7 @@ restart_track:
     memset(&wmadec, 0, sizeof(wmadec));
 
     if (codec_init()) {
-        LOGF("WMA: Error initialising codec\n");
+        ERRORF("WMA: Error initialising codec\n");
         return CODEC_ERROR;
     }
 
@@ -74,7 +74,7 @@ restart_track:
 
     ci->seek_buffer(ci->id3->first_frame_offset);
     if (wma_decode_init(&wmadec,&wfx) < 0) {
-        LOGF("WMA: Unsupported or corrupt file\n");
+        ERRORF("WMA: Unsupported or corrupt file\n");
         return CODEC_ERROR;
     }
 
@@ -116,7 +116,7 @@ restart_track:
             wmadec.last_superframe_len = 0;
             wmadec.last_bitoffset = 0;
 
-            /*zero the frame out buffer so we don't overlap with a 
+            /*zero the frame out buffer so we don't overlap with a
                 stale samples*/
             memset((*(wmadec.frame_out)), 0,
                 sizeof(fixed32) * MAX_CHANNELS * BLOCK_MAX_SIZE * 2);
@@ -153,7 +153,7 @@ new_packet:
             }
 
             errcount++;
-            DEBUGF("read_packet error %d, errcount %d\n",wmares, errcount);
+            WARNF("read_packet error %d, errcount %d\n",wmares, errcount);
             if (errcount > 5) {
                 return CODEC_ERROR;
             } else {
@@ -173,7 +173,7 @@ new_packet:
                 if (wmares < 0) {
                     /* Do the above, but for errors in decode. */
                     errcount++;
-                    DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
+                    WARNF("WMA decode error %d, errcount %d\n",wmares, errcount);
                     if (errcount > 5) {
                         return CODEC_ERROR;
                     } else {
