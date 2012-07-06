@@ -254,6 +254,7 @@ enum {
     ACTION_TOUCH_SCROLLBAR,
     ACTION_TOUCH_VOLUME,
     ACTION_TOUCH_SOFTLOCK,
+    ACTION_TOUCH_SETTING,
 #endif    
 
     /* USB HID codes */

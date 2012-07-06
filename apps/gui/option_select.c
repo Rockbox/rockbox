@@ -600,3 +600,21 @@ int get_setting_info_for_bar(int setting_id, int *count, int *val)
     val_to_selection(setting, oldvalue, count, val, &function);
     return true;
 }
+
+#ifdef HAVE_TOUCHSCREEN
+void update_setting_value_from_touch(int setting_id, int selection)
+{
+    const struct settings_list *setting = &settings[setting_id];
+    int new_val = selection_to_val(setting, selection);
+    int var_type = setting->flags&F_T_MASK;
+
+    if (var_type == F_T_INT || var_type == F_T_UINT)
+    {
+        *(int*)setting->setting = new_val;
+    }
+    else if (var_type == F_T_BOOL)
+    {
+        *(bool*)setting->setting = new_val ? true : false;
+    }
+}
+#endif

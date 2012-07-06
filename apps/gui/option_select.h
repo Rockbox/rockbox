@@ -49,5 +49,8 @@ void option_talk_value(const struct settings_list *setting, int value, bool enqu
 int option_value_as_int(const struct settings_list *setting);
 
 int get_setting_info_for_bar(int setting_id, int *count, int *val);
+#ifdef HAVE_TOUCHSCREEN
+void update_setting_value_from_touch(int setting_id, int selection);
+#endif
 
 #endif /* _GUI_OPTION_SELECT_H_ */

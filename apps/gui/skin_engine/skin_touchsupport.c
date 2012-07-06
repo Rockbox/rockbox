@@ -104,6 +104,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                 {
                     case ACTION_TOUCH_SCROLLBAR:
                     case ACTION_TOUCH_VOLUME:
+                    case ACTION_TOUCH_SETTING:
                         if (edge_offset)
                         {
                             struct progressbar *bar =
@@ -282,6 +283,19 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                 option_select_next_val(rep_setting, false, true);
                 audio_flush_and_reload_tracks();
                 returncode = ACTION_REDRAW;
+            }
+            break;
+            case ACTION_TOUCH_SETTING:
+            {                
+                struct progressbar *bar =
+                        SKINOFFSETTOPTR(skin_buffer, temp->bar);
+                if (bar && edge_offset)
+                {                    
+                    int val, count;
+                    get_setting_info_for_bar(bar->setting_id, &count, &val);
+                    val = *edge_offset * count / 100;
+                    update_setting_value_from_touch(bar->setting_id, val);
+                }
             }
             break;
         }

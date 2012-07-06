@@ -1091,7 +1091,9 @@ static int parse_progressbar_tag(struct skin_element* element,
 
 #ifdef HAVE_TOUCHSCREEN
     if (!suppress_touchregion &&
-        (token->type == SKIN_TOKEN_VOLUMEBAR || token->type == SKIN_TOKEN_PROGRESSBAR))
+        (token->type == SKIN_TOKEN_VOLUMEBAR ||
+         token->type == SKIN_TOKEN_PROGRESSBAR ||
+         token->type == SKIN_TOKEN_SETTINGBAR))
     {
         struct touchregion *region = skin_buffer_alloc(sizeof(*region));
         struct skin_token_list *item;
@@ -1102,6 +1104,8 @@ static int parse_progressbar_tag(struct skin_element* element,
 
         if (token->type == SKIN_TOKEN_VOLUMEBAR)
             region->action = ACTION_TOUCH_VOLUME;
+        else if (token->type == SKIN_TOKEN_SETTINGBAR)
+            region->action = ACTION_TOUCH_SETTING;
         else
             region->action = ACTION_TOUCH_SCROLLBAR;
 
