@@ -25,7 +25,7 @@
 
 CODEC_HEADER
 
-/* The maximum buffer size handled. This amount of bytes is buffered for each 
+/* The maximum buffer size handled. This amount of bytes is buffered for each
  * frame. */
 #define ALAC_BYTE_BUFFER_SIZE 32768
 
@@ -60,7 +60,7 @@ enum codec_status codec_run(void)
     /* Clean and initialize decoder structures */
     memset(&demux_res , 0, sizeof(demux_res));
     if (codec_init()) {
-        LOGF("ALAC: Error initialising codec\n");
+        ERRORF("ALAC: Error initialising codec\n");
         return CODEC_ERROR;
     }
 
@@ -72,19 +72,19 @@ enum codec_status codec_run(void)
     stream_create(&input_stream,ci);
 
     /* Read from ci->id3->offset before calling qtmovie_read. */
-    samplesdone = (uint32_t)(((uint64_t)(ci->id3->offset) * ci->id3->frequency) /  
+    samplesdone = (uint32_t)(((uint64_t)(ci->id3->offset) * ci->id3->frequency) /
                   (ci->id3->bitrate*128));
-  
+
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
     if (!qtmovie_read(&input_stream, &demux_res)) {
-        LOGF("ALAC: Error initialising file\n");
+        ERRORF("ALAC: Error initialising file\n");
         return CODEC_ERROR;
     }
 
     /* initialise the sound converter */
     alac_set_info(&alac, demux_res.codecdata);
-  
+
     /* Set i for first frame, seek to desired sample position for resuming. */
     i=0;
     if (samplesdone > 0) {
@@ -141,6 +141,6 @@ enum codec_status codec_run(void)
         i++;
     }
 
-    LOGF("ALAC: Decoded %lu samples\n",(unsigned long)samplesdone);
+    NOTEF("ALAC: Decoded %lu samples\n",(unsigned long)samplesdone);
     return CODEC_OK;
 }

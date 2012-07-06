@@ -48,7 +48,7 @@ static unsigned short get_short_le(void* buf)
         (((bits) != 0x03) ? ((bits) != 0x02) ? ((bits) != 0x01) ? \
          0 : *(data) : get_short_le(data) : get_long_le(data))
 
-int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength, 
+int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
                     asf_waveformatex_t* wfx)
 {
     uint8_t tmp8, packet_flags, packet_property;
@@ -84,7 +84,7 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
 
     /* TODO: We need a better way to detect endofstream */
     if (tmp8 != 0x82) {
-    DEBUGF("Read failed:  packet did not sync\n");
+    NOTEF("Read failed:  packet did not sync\n");
     return -1;
     }
 
@@ -95,7 +95,7 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
        ec_length_type = (tmp8 >> 5) & 0x03;
 
        if (ec_length_type != 0x00 || opaque_data != 0 || ec_length != 0x02) {
-            DEBUGF("incorrect error correction flags\n");
+            ERRORF("incorrect error correction flags\n");
             return ASF_ERROR_INVALID_VALUE;
        }
 
@@ -157,7 +157,7 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
     }
 
     if (length > wfx->packet_size) {
-        DEBUGF("packet with too big length value\n");
+        ERRORF("packet with too big length value\n");
         return ASF_ERROR_INVALID_LENGTH;
     }
 
@@ -175,7 +175,7 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
     }
 
     if (length < bytesread) {
-        DEBUGF("header exceeded packet size, invalid file - length=%d, bytesread=%d\n",(int)length,(int)bytesread);
+        ERRORF("header exceeded packet size, invalid file - length=%d, bytesread=%d\n",(int)length,(int)bytesread);
         /* FIXME: should this be checked earlier? */
         return ASF_ERROR_INVALID_LENGTH;
     }
@@ -200,7 +200,7 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
            relatively small packets less than about 8KB), but I don't
            know what is expected.
         */
-        DEBUGF("Could not read packet (requested %d bytes, received %d), curpos=%d, aborting\n",
+        ERRORF("Could not read packet (requested %d bytes, received %d), curpos=%d, aborting\n",
                (int)length,(int)bufsize,(int)ci->curpos);
         return -1;
     }
@@ -222,7 +222,7 @@ int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
         }
 #endif
         if (payload_hdrlen > sizeof(data)) {
-            DEBUGF("Unexpectedly long datalen in data - %d\n",datalen);
+            ERRORF("Unexpectedly long datalen in data - %d\n",datalen);
             return ASF_ERROR_OUTOFMEM;
         }
 
@@ -413,7 +413,7 @@ int asf_seek(int ms, asf_waveformatex_t* wfx)
 
         if (time < 0) {
             /*unknown error, try to recover*/
-            DEBUGF("UKNOWN SEEK ERROR\n");
+            ERRORF("UKNOWN SEEK ERROR\n");
             ci->seek_buffer(ci->id3->first_frame_offset+initial_packet*wfx->packet_size);
             /*seek failed so return time stamp of the initial packet*/
             return asf_get_timestamp(&duration);

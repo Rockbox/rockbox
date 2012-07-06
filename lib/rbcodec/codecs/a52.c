@@ -89,16 +89,20 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
                 /* This is the configuration for the downmixing: */
                 flags = A52_STEREO | A52_ADJUST_LEVEL;
 
-                if (a52_frame(state, buf, &flags, &level, bias))
+                if (a52_frame(state, buf, &flags, &level, bias)){
+                    ERRORF("a52_frame error\n");
                     goto error;
+                }
                 a52_dynrng(state, NULL, NULL);
                 frequency = sample_rate;
 
                 /* An A52 frame consists of 6 blocks of 256 samples
                    So we decode and output them one block at a time */
                 for (i = 0; i < 6; i++) {
-                    if (a52_block(state))
+                if (a52_block(state)){
+                        ERRORF("a52_block error\n");
                         goto error;
+                }
                     output_audio(a52_samples(state));
                     samplesdone += 256;
                 }
@@ -107,7 +111,6 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
                 bufpos = buf + 7;
                 continue;
             error:
-                //logf("Error decoding A52 stream\n");
                 bufptr = buf;
                 bufpos = buf + 7;
             }
