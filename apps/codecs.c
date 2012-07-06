@@ -52,6 +52,10 @@
 #include "general.h"
 #include "rbpaths.h"
 
+#ifdef ROCKBOX_HAS_LOGDISKF
+//#include "logdiskf.h"
+#endif
+
 #define LOGF_ENABLE
 #include "logf.h"
 
@@ -99,7 +103,7 @@ struct codec_api ci = {
     NULL, /* configure */
     NULL, /* get_command */
     NULL, /* loop_track */
-    
+
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
     __div0,
@@ -135,6 +139,9 @@ struct codec_api ci = {
 #endif
 #ifdef ROCKBOX_HAS_LOGF
     logf,
+#endif
+#ifdef ROCKBOX_HAS_LOGDISKF
+    _logdiskf,
 #endif
 
     (qsort_func)qsort,

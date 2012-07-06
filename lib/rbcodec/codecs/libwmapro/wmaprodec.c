@@ -309,10 +309,10 @@ int decode_init(asf_waveformatex_t *wfx)
     int i;
     int log2_max_num_subframes;
     int num_possible_block_sizes;
-    
+
     /* Use globally defined array. Allows IRAM usage for models with large IRAM. */
     s->tmp = g_tmp;
-    
+
     /* Use globally defined arrays. Allows IRAM usage for up to 2 channels. */
     s->channel[0].out = g_out_ch0;
     s->channel[1].out = g_out_ch1;
@@ -476,12 +476,12 @@ int decode_init(asf_waveformatex_t *wfx)
                      / wfx->rate;
         s->subwoofer_cutoffs[i] = av_clip(cutoff, 4, block_size);
     }
-    
+
 #if 0
     /** calculate sine values for the decorrelation matrix */
     for (i = 0; i < 33; i++)
         sin64[i] = sin(i*M_PI / 64.0);
-#endif 
+#endif
 
 #ifdef WMAPRO_DUMP_CTX_EN
     dump_context(s);
@@ -593,7 +593,7 @@ static int decode_tilehdr(WMAProDecodeCtx *s)
             WMAProChannelCtx* chan = &s->channel[c];
 
             if (contains_subframe[c]) {
-                if (chan->num_subframes >= MAX_SUBFRAMES) { 
+                if (chan->num_subframes >= MAX_SUBFRAMES) {
                     DEBUGF("broken frame: num subframes > 31\n");
                     return AVERROR_INVALIDDATA;
                 }
@@ -651,7 +651,7 @@ static void decode_decorrelation_matrix(WMAProDecodeCtx *s,
     for (i = 0; i < chgroup->num_channels; i++) {
         chgroup->decorrelation_matrix[chgroup->num_channels * i + i] =
             get_bits1(&s->gb) ? 1.0 : -1.0;
-            
+
         if(chgroup->decorrelation_matrix[chgroup->num_channels * i + i] > 0)
             chgroup->fixdecorrelation_matrix[chgroup->num_channels * i + i] =  ONE_FRACT16;
         else
@@ -693,7 +693,7 @@ static void decode_decorrelation_matrix(WMAProDecodeCtx *s,
                                                fixmul31(f1, fixsinv) - fixmul31(f2, fixcosv);
                 chgroup->fixdecorrelation_matrix[y + i * chgroup->num_channels] =
                                                fixmul31(f1, fixcosv) + fixmul31(f2, fixsinv);
-                                               
+
             }
         }
         offset += i;
@@ -881,11 +881,11 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
             vals[3] = (symbol_to_vec4[idx]      ) & 0xF;
         }
 
-        /* Rockbox: To be able to use rockbox' optimized mdct we need to 
+        /* Rockbox: To be able to use rockbox' optimized mdct we need to
          * pre-shift the values by >>(nbits-3). */
         const int nbits = av_log2(s->subframe_len)+1;
         const int shift = WMAPRO_FRACT-(nbits-3);
-        
+
         /** decode sign */
         for (i = 0; i < 4; i++) {
             if (vals[i]) {
@@ -908,7 +908,7 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
     if (cur_coeff < s->subframe_len) {
         memset(&ci->coeffs[cur_coeff], 0,
                sizeof(*ci->coeffs) * (s->subframe_len - cur_coeff));
-                      
+
         if (ff_wma_run_level_decode(&s->gb, vlc,
                                     level, run, 1, ci->coeffs,
                                     cur_coeff, s->subframe_len,
@@ -995,7 +995,7 @@ static int decode_scale_factors(WMAProDecodeCtx* s)
                     s->channel[c].scale_factors[i] += (val ^ sign) - sign;
                 }
             }
-            
+
             /** swap buffers */
             s->channel[c].scale_factor_idx = !s->channel[c].scale_factor_idx;
             s->channel[c].table_idx = s->table_idx;
@@ -1041,14 +1041,14 @@ static void inverse_channel_transform(WMAProDecodeCtx *s)
                         const int32_t* data_end = data + num_channels;
                         int32_t* data_ptr = data;
                         int32_t** ch;
-                        
+
                         for (ch = ch_data; ch < ch_end; ch++)
                             *data_ptr++ = (*ch)[y];
 
                         for (ch = ch_data; ch < ch_end; ch++) {
                             int32_t sum = 0;
                             data_ptr = data;
-                                
+
                             while (data_ptr < data_end)
                                 sum += fixmul16(*mat++, *data_ptr++);
 
@@ -1090,16 +1090,16 @@ static void wmapro_window(WMAProDecodeCtx *s)
             xstart += (winlen - s->subframe_len) >> 1;
             winlen = s->subframe_len;
         }
-  
+
         window = sine_windows[av_log2(winlen) - BLOCK_MIN_BITS];
-            
+
         winlen >>= 1;
 
         vector_fixmul_window(xstart, xstart, xstart + winlen,
                                   window, winlen);
 
         s->channel[c].prev_block_len = s->subframe_len;
-        
+
     }
 }
 
@@ -1260,7 +1260,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
                 }
             }
         }
- 
+
         /** decode scale factors */
         if (decode_scale_factors(s) < 0)
             return AVERROR_INVALIDDATA;
@@ -1303,24 +1303,24 @@ static int decode_subframe(WMAProDecodeCtx *s)
                 const int exp = s->channel[c].quant_step -
                             (s->channel[c].max_scale_factor - *sf++) *
                             s->channel[c].scale_factor_step;
-                
+
                 if(exp < EXP_MIN || exp > EXP_MAX) {
-                    DEBUGF("in wmaprodec.c : unhandled value for exp (%d), please report sample.\n", exp);
+                    ERRORF("in wmaprodec.c : unhandled value for exp (%d), please report sample.\n", exp);
                     return -1;
                 }
                 const int32_t quant = QUANT(exp);
                 int start = s->cur_sfb_offsets[b];
-                   
-                vector_fixmul_scalar(s->tmp+start, 
+
+                vector_fixmul_scalar(s->tmp+start,
                                      s->channel[c].coeffs + start,
                                      quant, end-start);
 
-               
+
             }
 
             /** apply imdct (ff_imdct_half == DCTIV with reverse) */
             ff_imdct_half(nbits,s->channel[c].coeffs, s->tmp);
-                          
+
         }
     }
 
@@ -1364,7 +1364,7 @@ static int decode_frame(WMAProDecodeCtx *s)
         s->packet_loss = 1;
         return 0;
     }
-#endif 
+#endif
 
     /** get frame length */
     if (s->len_prefix)
@@ -1519,7 +1519,7 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
  *@param avpkt input packet
  *@return number of bytes that were read from the input buffer
  */
-int decode_packet(asf_waveformatex_t *wfx, int32_t *dec[2], int *data_size, 
+int decode_packet(asf_waveformatex_t *wfx, int32_t *dec[2], int *data_size,
                   void* pktdata, int size)
 {
     WMAProDecodeCtx *s = &globWMAProDecCtx;
@@ -1536,8 +1536,8 @@ int decode_packet(asf_waveformatex_t *wfx, int32_t *dec[2], int *data_size,
         memcpy(&s->channel[i].out[0],
                &s->channel[i].out[s->samples_per_frame],
                s->samples_per_frame * sizeof(*s->channel[i].out) >> 1);
-               
-               
+
+
     s->samples = 0;
     *data_size = 0;
 
@@ -1610,7 +1610,7 @@ int decode_packet(asf_waveformatex_t *wfx, int32_t *dec[2], int *data_size,
 
     dec[0] = s->channel[0].out;
     dec[1] = s->channel[1].out;
-    
+
     *data_size = s->samples;
     s->packet_offset = get_bits_count(gb) & 7;
 
