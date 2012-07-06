@@ -48,43 +48,44 @@ enum codec_status codec_run(void)
     int res;                    /* Return values from asf_read_packet() and decode_packet() */
     uint8_t* audiobuf;          /* Pointer to the payload of one wma pro packet */
     int audiobufsize;           /* Payload size */
-    int packetlength = 0;       /* Logical packet size (minus the header size) */          
+    int packetlength = 0;       /* Logical packet size (minus the header size) */
     int outlen = 0;             /* Number of bytes written to the output buffer */
     int pktcnt = 0;             /* Count of the packets played */
     uint8_t *data;              /* Pointer to decoder input buffer */
     int size;                   /* Size of the input frame to the decoder */
     intptr_t param;
 
+    ERRORF("(WMA PRO) testing error logging!\n");
 restart_track:
     if (codec_init()) {
-        LOGF("(WMA PRO) Error: Error initialising codec\n");
+        ERRORF("(WMA PRO) Error: Error initialising codec\n");
         return CODEC_ERROR;
     }
 
     /* Copy the format metadata we've stored in the id3 TOC field.  This
        saves us from parsing it again here. */
     memcpy(&wfx, ci->id3->toc, sizeof(wfx));
-    
+
     ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);
-    
+
     if (decode_init(&wfx) < 0) {
-        LOGF("(WMA PRO) Error: Unsupported or corrupt file\n");
+        ERRORF("(WMA PRO) Error: Unsupported or corrupt file\n");
         return CODEC_ERROR;
     }
 
     /* Now advance the file position to the first frame */
     ci->seek_buffer(ci->id3->first_frame_offset);
-    
+
     elapsedtime = 0;
     ci->set_elapsed(0);
-    
+
     /* The main decoding loop */
 
     while (pktcnt < wfx.numpackets)
-    { 
+    {
         enum codec_command_action action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
@@ -112,13 +113,13 @@ restart_track:
         res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
 
         if (res < 0) {
-            LOGF("(WMA PRO) Warning: asf_read_packet returned %d", res);
+            ERRORF("(WMA PRO) Warning: asf_read_packet returned %d", res);
             return CODEC_ERROR;
         } else {
             data = audiobuf;
             size = audiobufsize;
             pktcnt++;
-            
+
             /* We now loop on the packet, decoding and outputting the subframes
              * one-by-one. For more information about how wma pro structures its
              * audio frames, see libwmapro/wmaprodec.c */
@@ -126,7 +127,7 @@ restart_track:
             {
                 res = decode_packet(&wfx, dec, &outlen, data, size);
                 if(res < 0) {
-                    LOGF("(WMA PRO) Error: decode_packet returned %d", res);
+                    ERRORF("(WMA PRO) Error: decode_packet returned %d", res);
                     return CODEC_ERROR;
                 }
                 data += res;
