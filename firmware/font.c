@@ -621,6 +621,25 @@ void font_unload_all(void)
     }
 }
 
+static struct font* font_get_nofallback(int font)
+{
+    struct font* pf;
+    if (font == FONT_UI)
+        font = MAXFONTS-1;
+    if (font <= FONT_SYSFIXED)
+        return &sysfont;
+
+    if (buflib_allocations[font] > 0)
+    {
+        struct buflib_alloc_data *alloc = core_get_data(buflib_allocations[font]);
+        pf = &alloc->font;
+        if (pf && pf->height)
+            return pf;
+    }
+
+    return NULL;
+}
+
 /*
  * Return a pointer to an incore font structure.
  * If the requested font isn't loaded/compiled-in,
@@ -629,22 +648,9 @@ void font_unload_all(void)
 struct font* font_get(int font)
 {
     struct font* pf;
-    if (font == FONT_UI)
-        font = MAXFONTS-1;
-    if (font <= FONT_SYSFIXED)
-        return &sysfont;
+    while ((pf = font_get_nofallback(font)) == NULL);
 
-    while (1) {
-        if (buflib_allocations[font] > 0)
-        {
-            struct buflib_alloc_data *alloc = core_get_data(buflib_allocations[font]);
-            pf = &alloc->font;
-            if (pf && pf->height)
-                return pf;
-        }
-        if (--font < 0)
-            return &sysfont;
-    }
+    return pf;
 }
 
 /*
@@ -719,13 +725,18 @@ static void cache_create(struct font* pf)
     font_cache_create(&pf->cache, pf->buffer_start, pf->buffer_size, bitmap_size);
 }
 
+static int has_glyph(struct font* pf, unsigned short char_code)
+{
+    return !(char_code < pf->firstchar || char_code >= pf->firstchar+pf->size);
+}
+
 /*
  * Returns width of character
  */
 int font_get_width(struct font* pf, unsigned short char_code)
 {
     /* check input range*/
-    if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
+    if (!has_glyph(pf, char_code))
         char_code = pf->defaultchar;
     char_code -= pf->firstchar;
 
@@ -739,7 +750,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
     const unsigned char* bits;
 
     /* check input range*/
-    if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
+    if (!has_glyph(pf, char_code))
         char_code = pf->defaultchar;
     char_code -= pf->firstchar;
 
