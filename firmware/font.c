@@ -93,6 +93,13 @@ struct buflib_alloc_data {
 };
 static int buflib_allocations[MAXFONTS];
 
+#define MAX_FALLBACK_ENTRIES 4
+struct fallback_entry {
+    const char* family_name;
+    int font_id;
+};
+static struct fallback_entry fallback_entries[MAX_FALLBACK_ENTRIES];
+
 static int cache_fd;
 static struct font* cache_pf;
 
@@ -168,6 +175,12 @@ void font_init(void)
     cache_fd = -1;
     while (i<MAXFONTS)
         buflib_allocations[i++] = -1;
+
+    for (i = 0; i < MAX_FALLBACK_ENTRIES; ++i)
+        fallback_entries[i].font_id = -1;
+
+    fallback_entries[0].family_name = "Sazanami-Mincho";
+    fallback_entries[1].family_name = "GNU-Unifont";
 }
 
 /* Check if we have x bytes left in the file buffer */
@@ -621,6 +634,25 @@ void font_unload_all(void)
     }
 }
 
+static struct font* font_get_nofallback(int font)
+{
+    struct font* pf;
+    if (font == FONT_UI)
+        font = MAXFONTS-1;
+    if (font <= FONT_SYSFIXED)
+        return &sysfont;
+
+    if (buflib_allocations[font] > 0)
+    {
+        struct buflib_alloc_data *alloc = core_get_data(buflib_allocations[font]);
+        pf = &alloc->font;
+        if (pf && pf->height)
+            return pf;
+    }
+
+    return NULL;
+}
+
 /*
  * Return a pointer to an incore font structure.
  * If the requested font isn't loaded/compiled-in,
@@ -629,22 +661,9 @@ void font_unload_all(void)
 struct font* font_get(int font)
 {
     struct font* pf;
-    if (font == FONT_UI)
-        font = MAXFONTS-1;
-    if (font <= FONT_SYSFIXED)
-        return &sysfont;
+    while ((pf = font_get_nofallback(font)) == NULL);
 
-    while (1) {
-        if (buflib_allocations[font] > 0)
-        {
-            struct buflib_alloc_data *alloc = core_get_data(buflib_allocations[font]);
-            pf = &alloc->font;
-            if (pf && pf->height)
-                return pf;
-        }
-        if (--font < 0)
-            return &sysfont;
-    }
+    return pf;
 }
 
 /*
@@ -676,33 +695,36 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
         p->width = pf->maxwidth;
     }
 
-    int32_t bitmap_offset = 0;
+    /* If glyph is present */
+    if (p->width != 0xFF) {
+        int32_t bitmap_offset = 0;
 
-    if (pf->file_offset_offset)
-    {
-        int32_t offset = pf->file_offset_offset + char_code * (pf->long_offset ? sizeof(int32_t) : sizeof(int16_t));
-        /* load via different fd to get this file section cached */
-        if(pf->fd_offset >=0 )
-            fd = pf->fd_offset;
-        else
-            fd = pf->fd;
-        lseek(fd, offset, SEEK_SET);
-        read (fd, tmp, 2);
-        bitmap_offset = tmp[0] | (tmp[1] << 8);
-        if (pf->long_offset) {
+        if (pf->file_offset_offset)
+        {
+            int32_t offset = pf->file_offset_offset + char_code * (pf->long_offset ? sizeof(int32_t) : sizeof(int16_t));
+            /* load via different fd to get this file section cached */
+            if(pf->fd_offset >=0 )
+                fd = pf->fd_offset;
+            else
+                fd = pf->fd;
+            lseek(fd, offset, SEEK_SET);
             read (fd, tmp, 2);
-            bitmap_offset |= (tmp[0] << 16) | (tmp[1] << 24);
+            bitmap_offset = tmp[0] | (tmp[1] << 8);
+            if (pf->long_offset) {
+                read (fd, tmp, 2);
+                bitmap_offset |= (tmp[0] << 16) | (tmp[1] << 24);
+            }
         }
-    }
-    else
-    {
-        bitmap_offset = char_code * glyph_bytes(pf, p->width);
-    }
+        else
+        {
+            bitmap_offset = char_code * glyph_bytes(pf, p->width);
+        }
 
-    int32_t file_offset = FONT_HEADER_SIZE + bitmap_offset;
-    lseek(pf->fd, file_offset, SEEK_SET);
-    int src_bytes = glyph_bytes(pf, p->width);
-    read(pf->fd, p->bitmap, src_bytes);
+        int32_t file_offset = FONT_HEADER_SIZE + bitmap_offset;
+        lseek(pf->fd, file_offset, SEEK_SET);
+        int src_bytes = glyph_bytes(pf, p->width);
+        read(pf->fd, p->bitmap, src_bytes);
+    }
 
     lock_font_handle(pf->handle, false);
 }
@@ -719,14 +741,98 @@ static void cache_create(struct font* pf)
     font_cache_create(&pf->cache, pf->buffer_start, pf->buffer_size, bitmap_size);
 }
 
+static int has_glyph(struct font* pf, unsigned short char_code)
+{
+    if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
+        return false;
+
+    unsigned char w;
+
+    if (pf->fd >= 0 && pf != &sysfont) {
+        struct font_cache_entry* glyph = font_cache_get(&pf->cache, char_code, load_cache_entry, pf);
+        w = glyph->width;
+    } else {
+        w = pf->width ? pf->width[char_code] : pf->maxwidth;
+    }
+
+    return w != 0xFF;
+}
+
+static struct font*
+find_fallback_glyph(unsigned short char_code, unsigned int font_height)
+{
+    int i;
+
+    for (i = 0; i < MAXFONTS; ++i)
+    {
+        struct font* pf = font_get_nofallback(i);
+
+        if (pf != NULL && pf->height == font_height && has_glyph(pf, char_code))
+            return pf;
+    }
+
+    for (i = 0; i < MAX_FALLBACK_ENTRIES; ++i)
+    {
+        /* NULL family name means unused entry */
+        if (fallback_entries[i].family_name == NULL)
+            break;
+
+        /* Check if font needs to be loaded */
+        int needs_to_load = 0;
+
+        if (fallback_entries[i].font_id < 0) {
+            /* Font was never loaded. */
+            needs_to_load = 1;
+        }
+        else
+        {
+            struct font* pf = font_get_nofallback(fallback_entries[i].font_id);
+            if (pf->height != font_height)
+            {
+                /* Loaded font has incorrect height. */
+                font_unload(fallback_entries[i].font_id);
+                fallback_entries[i].font_id = -1;
+                needs_to_load = 1;
+            }
+        }
+
+        if (needs_to_load)
+        {
+            /* Try to load font */
+            char path[MAX_PATH];
+
+            snprintf(path, sizeof path, FONT_DIR "/%02d-%s.fnt",
+                    font_height, fallback_entries[i].family_name);
+            fallback_entries[i].font_id = font_load(path);
+        }
+
+        if (fallback_entries[i].font_id >= 0)
+        {
+            struct font* pf = font_get_nofallback(fallback_entries[i].font_id);
+            /* Found matching font. */
+            if (has_glyph(pf, char_code))
+                return pf;
+        }
+    }
+
+    /* Failed to find replacement font. */
+    return NULL;
+}
+
 /*
  * Returns width of character
  */
 int font_get_width(struct font* pf, unsigned short char_code)
 {
     /* check input range*/
-    if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
-        char_code = pf->defaultchar;
+    if (!has_glyph(pf, char_code))
+    {
+        struct font* new_pf = find_fallback_glyph(char_code, pf->height);
+        if (new_pf == NULL)
+            char_code = pf->defaultchar;
+        else
+            pf = new_pf;
+    }
     char_code -= pf->firstchar;
 
     return (pf->fd >= 0 && pf != &sysfont)?
@@ -734,13 +840,15 @@ int font_get_width(struct font* pf, unsigned short char_code)
         pf->width? pf->width[char_code]: pf->maxwidth;
 }
 
-const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
+const unsigned char* font_get_bits_nofallback(struct font* pf, unsigned short char_code)
 {
     const unsigned char* bits;
 
     /* check input range*/
-    if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
+    if (!has_glyph(pf, char_code))
+    {
         char_code = pf->defaultchar;
+    }
     char_code -= pf->firstchar;
 
     if (pf->fd >= 0 && pf != &sysfont)
@@ -763,6 +871,20 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
     }
 
     return bits;
+}
+
+const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
+{
+    /* check input range*/
+    if (!has_glyph(pf, char_code))
+    {
+        struct font* new_pf = find_fallback_glyph(char_code, pf->height);
+        if (new_pf == NULL)
+            char_code = pf->defaultchar;
+        else
+            pf = new_pf;
+    }
+    return font_get_bits_nofallback(pf, char_code);
 }
 
 static void font_path_to_glyph_path( const char *font_path, char *glyph_path)
@@ -887,11 +1009,11 @@ static void glyph_cache_load(const char *font_path, struct font *pf)
 
                 /* load font bitmaps */
                 for( i = 0; i < size ; i++ )
-                         font_get_bits(pf, glyphs[i]);
+                         font_get_bits_nofallback(pf, glyphs[i]);
                 
                 /* redo to fix lru order */
                 for ( i = 0; i < size ; i++)
-                    font_get_bits(pf, glyphs_lru_order[i]);
+                    font_get_bits_nofallback(pf, glyphs_lru_order[i]);
 
                 if ( size < sort_size )
                     break;
@@ -901,7 +1023,7 @@ static void glyph_cache_load(const char *font_path, struct font *pf)
         } else {
             /* load latin1 chars into cache */
             for ( ch = 32 ; ch < 256  && ch < pf->cache._capacity + 32; ch++ )
-                font_get_bits(pf, ch);
+                font_get_bits_nofallback(pf, ch);
         }
     }
     return;

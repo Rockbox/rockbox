@@ -722,9 +722,11 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
     /* reset file pointer */
     fseek(fp, 0L, SEEK_SET);
 
-    /* initially mark offsets as not used */
-    for (i=0; i<pf->size; ++i)
+    /* initially mark offsets and widths as not used */
+    for (i=0; i<pf->size; ++i) {
         pf->offset[i] = -1;
+        pf->width[i] = 0xFF;
+    }
 
     for (;;) {
         if (!bdf_getline(fp, buf, sizeof(buf))) {
@@ -878,14 +880,6 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
         }
         if (strequal(buf, "ENDFONT"))
             break;
-    }
-
-    /* change unused width values to default char values */
-    for (i=0; i<pf->size; ++i) {
-        int defchar = pf->defaultchar - pf->firstchar;
-
-        if (pf->offset[i] == -1)
-            pf->width[i] = pf->width[defchar];
     }
 
     /* determine whether font doesn't require encode table */
@@ -1352,8 +1346,7 @@ int gen_c_source(struct font* pf, char *path)
             int offset = pf->offset[i];
             int offrot = pf->offrot[i];
             if (offset == -1) {
-                offset = pf->offset[pf->defaultchar - pf->firstchar];
-                offrot = pf->offrot[pf->defaultchar - pf->firstchar];
+                offrot = -1;
             }
             fprintf(ofp, "  %d,\t/* (0x%02x) */\n", 
 #ifdef ROTATE
@@ -1612,7 +1605,7 @@ int gen_fnt_file(struct font* pf, char *path)
         {
             int offrot = pf->offrot[i];
             if (pf->offset[i] == -1) {
-                offrot = pf->offrot[pf->defaultchar - pf->firstchar];
+                offrot = -1;
             }
             if ( pf->bits_size < 0xFFDB )
                 writeshort(ofp, offrot);
@@ -1633,9 +1626,6 @@ int gen_fnt_file(struct font* pf, char *path)
     if (pf->offset)
         for (i=0; i<pf->size; ++i) {
             int offset = pf->offset[i];
-            if (offset == -1) {
-                offset = pf->offset[pf->defaultchar - pf->firstchar];
-            }
             writeint(ofp, offset);
         }
 
