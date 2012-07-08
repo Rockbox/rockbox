@@ -65,19 +65,26 @@
 #endif
 
 #ifdef ROCKBOX_HAS_LOGDISKF
-#if LOGDISK_LEVEL > 0       /*serious errors or problems*/
+#define CODEC_LOGDISK_LEVEL 2  /*TODO:  find better place for this*/
+#if CODEC_LOGDISK_LEVEL > 0       /*serious errors or problems*/
  #undef ERRORF
  #define ERRORF(...) ci->logdiskf(__func__,'E', __VA_ARGS__)
+#else
+  #define ERRORF(...)
 #endif
 
-#if LOGDISK_LEVEL > 1       /*matters of concern*/
+#if CODEC_LOGDISK_LEVEL > 1       /*matters of concern*/
  #undef WARNF
  #define WARNF(...) ci->logdiskf(__func__, 'W', __VA_ARGS__)
+#else
+ #define WARNF(...)
 #endif
 
-#if LOGDISK_LEVEL > 2       /*useful for debug only*/
+#if CODEC_LOGDISK_LEVEL > 2       /*useful for debug only*/
  #undef NOTEF
  #define NOTEF(...) ci->logdiskf(__func__, 'N', __VA_ARGS__)
+#else
+ #define NOTEF(...)
 #endif
 
 #else
@@ -210,7 +217,7 @@ struct codec_api {
     void (*logf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
 #ifdef ROCKBOX_HAS_LOGDISKF
-    void logdiskf(const char* file, const char level,
+    void (*logdiskf)(const char* function, const char level,
                 const char *format, ...) ATTRIBUTE_PRINTF(3, 4);
 #endif
 

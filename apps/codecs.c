@@ -53,7 +53,7 @@
 #include "rbpaths.h"
 
 #ifdef ROCKBOX_HAS_LOGDISKF
-//#include "logdiskf.h"
+#include "logdiskf.h"
 #endif
 
 #define LOGF_ENABLE

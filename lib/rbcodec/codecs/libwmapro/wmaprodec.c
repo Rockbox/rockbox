@@ -337,7 +337,7 @@ int decode_init(asf_waveformatex_t *wfx)
         DEBUGF("\n");
 
     } else {
-        DEBUGF("Unknown extradata size\n");
+        ERRORF("Unknown extradata size\n");
         return AVERROR_INVALIDDATA;
     }
 
@@ -350,7 +350,7 @@ int decode_init(asf_waveformatex_t *wfx)
     s->len_prefix  = (s->decode_flags & 0x40);
 
     if (!s->len_prefix) {
-        DEBUGF("no length prefix\n");
+        ERRORF("no length prefix\n");
         return AVERROR_INVALIDDATA;
     }
 
@@ -374,7 +374,7 @@ int decode_init(asf_waveformatex_t *wfx)
     s->dynamic_range_compression = (s->decode_flags & 0x80);
 
     if (s->max_num_subframes > MAX_SUBFRAMES) {
-        DEBUGF("invalid number of subframes %i\n",
+        ERRORF("invalid number of subframes %i\n",
                s->max_num_subframes);
         return AVERROR_INVALIDDATA;
     }
@@ -393,10 +393,10 @@ int decode_init(asf_waveformatex_t *wfx)
     }
 
     if (s->num_channels < 0) {
-        DEBUGF("invalid number of channels %d\n", s->num_channels);
+        WARNF("invalid number of channels %d\n", s->num_channels);
         return AVERROR_INVALIDDATA;
     } else if (s->num_channels > WMAPRO_MAX_CHANNELS) {
-        DEBUGF("unsupported number of channels\n");
+        WARNF("unsupported number of channels\n");
         return AVERROR_PATCHWELCOME;
     }
 
@@ -516,7 +516,7 @@ static int decode_subframe_length(WMAProDecodeCtx *s, int offset)
     /** sanity check the length */
     if (subframe_len < s->min_samples_per_subframe ||
         subframe_len > s->samples_per_frame) {
-        DEBUGF("broken frame: subframe_len %i\n",
+        WARNF("broken frame: subframe_len %i\n",
                subframe_len);
         return AVERROR_INVALIDDATA;
     }
@@ -1240,7 +1240,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
             quant_step += ((quant + step) ^ sign) - sign;
         }
         if (quant_step < 0) {
-            DEBUGF("negative quant step\n");
+            WARNF("negative quant step\n");
         }
 
         /** decode quantization step modifiers for every channel */
@@ -1380,7 +1380,7 @@ static int decode_frame(WMAProDecodeCtx *s)
 
     /** read postproc transform */
     if (s->num_channels > 1 && get_bits1(gb)) {
-        DEBUGF("Unsupported postproc transform found\n");
+        WARNF("Unsupported postproc transform found\n");
         s->packet_loss = 1;
         return 0;
     }
