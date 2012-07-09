@@ -117,6 +117,9 @@ void fiq_dummy(void)
 
 void system_init(void)
 {
+    /* disable WDT just in case nand loader activated it */
+    WDTCON &= ~(1<<3);
+
 #ifndef BOOTLOADER
     /* SDRAM tweaks */
     MCSDR_MODE = (2<<4)|3;         /* CAS=2, burst=8 */
