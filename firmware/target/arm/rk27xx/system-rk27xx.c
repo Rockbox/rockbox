@@ -22,6 +22,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
+#include "button.h"
 #include "system-target.h"
 
 #define default_interrupt(name) \
@@ -166,7 +167,10 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
-    while(1);
+    /* wait until button release (if a button is pressed) */
+    while(button_read_device());
+    /* then wait until next button press */
+    while(!button_read_device());
 }
 
 int system_memory_guard(int newmode)
