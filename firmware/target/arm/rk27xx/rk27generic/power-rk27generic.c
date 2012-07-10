@@ -45,5 +45,5 @@ unsigned int power_input_status(void)
 
 bool charging_state(void)
 {
-   return true;
+   return (usb_detect() == USB_INSERTED);
 }
