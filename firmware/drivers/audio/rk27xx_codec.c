@@ -99,21 +99,19 @@ void audiohw_preinit(void)
 
 void audiohw_postinit(void)
 {
+    /* power up DAC */
     codec_write(PMR1, SB_OUT|SB_MIX|SB_ADC|SB_IN1|SB_IN2|SB_MIC|SB_IND);
 
-    udelay(10000);
+    /* leave sleep mode */
+    codec_write(PMR2, GIM|SB_MC);
 
-    codec_write(PMR2, GIM | SB_MC);
+    /* 1ms delay */
+    udelay(1000);
 
-    udelay(10000);
-
-    codec_write(PMR1, SB_OUT|SB_ADC|SB_IN1|SB_IN2|SB_MIC|SB_IND);
-
-    udelay(10000);
-
+    /* power up output stage */
     codec_write(PMR1, SB_ADC|SB_IN1|SB_IN2|SB_MIC|SB_IND);
 
-    sleep(3*HZ);
+    sleep(HZ/10);
     GPIO_PDDR |= (1<<7); /* PD7 high */
     sleep(HZ/10);
 
