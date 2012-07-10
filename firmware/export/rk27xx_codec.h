@@ -24,8 +24,8 @@
 #ifndef _RK27XX_CODEC_H_
 #define _RK27XX_CODEC_H_
 
-#define VOLUME_MIN -335
-#define VOLUME_MAX   45
+#define VOLUME_MIN -330
+#define VOLUME_MAX   40
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
 
 extern int tenthdb2master(int db);

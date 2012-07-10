@@ -28,7 +28,7 @@
 #include "i2c-rk27xx.h"
 
 const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 1,  5,-335,  45,-255},
+    [SOUND_VOLUME]        = {"dB", 0,  1, -34,   4, -25},
     /* HAVE_SW_TONE_CONTROLS */
     [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
     [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
@@ -72,7 +72,7 @@ int tenthdb2master(int tdb)
      */
 
     if (tdb < VOLUME_MIN)
-        return 31;
+        return 32;
     else if (tdb < -115)
         return -(((tdb + 115)/20) - 20); /* 2.0 dB steps */
     else if (tdb < 5)
@@ -150,11 +150,16 @@ void audiohw_set_frequency(int fsel)
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
 {
-    uint8_t val;
 
-    val = (uint8_t)(vol_r & 0x1f);
-    codec_write(CGR9, val);
+    if (vol_l > 31 || vol_r > 31)
+    {
+        audiohw_mute(true);
+    }
+    else
+    {
+        audiohw_mute(false);
 
-    val = (uint8_t)(vol_l & 0x1f);
-    codec_write(CGR8, val);
+        codec_write(CGR9, vol_r);
+        codec_write(CGR8, vol_l);
+    }
 }
