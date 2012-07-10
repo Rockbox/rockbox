@@ -37,41 +37,68 @@ extern void show_logo( void );
 static void enter_rkusb(void)
 {
     asm volatile (
-        /* turn off cache */
+        /* Turn off cache */
         "ldr     r0, =0xefff0000 \n"
         "ldrh    r1, [r0] \n"
         "strh    r1, [r0] \n"
 
-        /* turn off interrupts */
+        /* Turn off interrupts */
         "mrs     r0, cpsr \n"
         "bic     r0, r0, #0x1f \n"
         "orr     r0, r0, #0xd3 \n"
         "msr     cpsr, r0 \n"
 
-        /* disable iram remap */
+        /* Disable iram remap */
         "mov     r0, #0x18000000 \n"
         "add     r0, r0, #0x1c000 \n"
         "mov     r1, #0 \n"
         "str     r1, [r0, #4] \n"
 
-        /* setup stacks in unmapped
-         * iram just as rom will do
+        /* Ungate all clocks */
+        "str     r1, [r0, #0x18] \n"
+
+        /* Read SCU_ID to determine
+         * which version of bootrom we have
+         * 2706A has ID 0xa1000604
+         * 2706B and 2705 have ID 0xa10002b7
          */
-        "msr     cpsr, #0xd2 \n"
+        "ldr     r1, [r0] \n"
+        "ldr     r2, =0xa1000604 \n"
+        "cmp     r1, r2 \n"
+        "bne     rk27xx_new \n"
+
+        /* Setup stacks in unmapped
+         * iram just as rom will do.
+         *
+         * We know about two versions
+         * of bootrom which are very similar
+         * but memory addresses are slightly
+         * different.
+         */
+        "rk27xx_old: \n"
+        "ldr     r1, =0x18200258 \n"
+        "ldr     r0, =0xaf0 \n"
+        "b       jump_to_rom \n"
+
+        "rk27xx_new: \n"
         "ldr     r1, =0x18200274 \n"
+        "ldr     r0, =0xec0 \n"
+
+        "jump_to_rom: \n"
+        "msr     cpsr, #0xd2 \n"
         "add     r1, r1, #0x200 \n"
         "mov     sp, r1 \n"
         "msr     cpsr, #0xd3 \n"
         "add     r1, r1, #0x400 \n"
         "mov     sp, r1 \n"
 
-        /* jump to main() in rom
-         * just before dfu handler
+        /* Finaly jump to rkusb handler
+         * in bootrom.
          */
-        "ldr     r0, =0xec0 \n"
         "bx      r0 \n"
     );
 }
+
 
 void main(void) NORETURN_ATTR;
 void main(void)
