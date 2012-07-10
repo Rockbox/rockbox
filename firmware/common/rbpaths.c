@@ -25,7 +25,7 @@
 #include <stdarg.h>
 #include "config.h"
 #include "rbpaths.h"
-#include "file.h" /* MAX_PATH */
+#include "file.h" /* MAX_PATH, FILE_ events */
 #include "logf.h"
 #include "gcc_extensions.h"
 #include "string-extra.h"
