@@ -109,7 +109,7 @@ fms.128x128x2:   cabbiev2-128x128x2.fms
 # Preferred font (including .fnt extension - leave blank for player):
 Font.800x480x16: 35-Adobe-Helvetica.fnt
 Font.480x800x16: 35-Adobe-Helvetica.fnt
-Font.400x240x16: 27-Adobe-Helvetica.fnt
+Font.400x240x16: 15-Adobe-Helvetica.fnt
 Font.320x480x16: 27-Adobe-Helvetica.fnt
 Font.320x240x16: 15-Adobe-Helvetica.fnt
 Font.240x400x16: 16-Adobe-Helvetica.fnt
