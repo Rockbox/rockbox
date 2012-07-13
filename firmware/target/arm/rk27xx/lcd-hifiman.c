@@ -170,7 +170,7 @@ enum lcd_type_t
 static void identify_lcd(void)
 {
     SCU_IOMUXB_CON &= ~(1<<2);
-    GPIO_PCCON |= (1<<4);
+
     if (GPIO_PCDR & (1<<4))
     {
         lcd_type = LCD_V1;
