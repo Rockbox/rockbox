@@ -39,6 +39,7 @@
 #include "appevents.h"
 #include "usb_screen.h"
 #include "skin_engine/skin_engine.h"
+#include "playlist.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bitmaps/usblogo.h"
@@ -330,6 +331,8 @@ void gui_usb_screen_run(bool early_usb)
         /* Not pretty, reload all settings so fonts are loaded again correctly */
         settings_apply(true);
         settings_apply_skins();
+        /* Reload playlist */
+        playlist_resume();
     }
 #endif
 
