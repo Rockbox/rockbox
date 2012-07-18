@@ -66,6 +66,21 @@ static void tagcache_update_with_splash(void)
     splash(HZ*2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
 }
 
+static int dirs_to_scan(void)
+{
+    if (folder_select(global_settings.tagcache_scan_paths,
+                          sizeof(global_settings.tagcache_scan_paths)))
+    {
+        static const char *lines[] = {ID2P(LANG_TAGCACHE_BUSY),
+                                      ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
+        static const struct text_message message = {lines, 2};
+
+        if (gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
+            tagcache_rebuild_with_splash();
+    }
+    return 0;
+}
+
 #ifdef HAVE_TC_RAMCACHE
 MENUITEM_SETTING(tagcache_ram, &global_settings.tagcache_ram, NULL);
 #endif
@@ -83,12 +98,16 @@ MENUITEM_FUNCTION(tc_export, 0, ID2P(LANG_TAGCACHE_EXPORT),
 MENUITEM_FUNCTION(tc_import, 0, ID2P(LANG_TAGCACHE_IMPORT),
                     (int(*)(void))tagtree_import, NULL,
                     NULL, Icon_NOICON);
+MENUITEM_FUNCTION(tc_paths, 0, ID2P(LANG_SELECT_DATABASE_DIRS),
+                    dirs_to_scan, NULL, NULL, Icon_NOICON);
+
 MAKE_MENU(tagcache_menu, ID2P(LANG_TAGCACHE), 0, Icon_NOICON,
 #ifdef HAVE_TC_RAMCACHE
                 &tagcache_ram,
 #endif
                 &tagcache_autoupdate, &tc_init, &tc_update, &runtimedb,
-                &tc_export, &tc_import);
+                &tc_export, &tc_import, &tc_paths
+                );
 #endif /* HAVE_TAGCACHE */
 /*    TAGCACHE MENU                */
 /***********************************/

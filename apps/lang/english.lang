@@ -13100,3 +13100,17 @@
     *: "Select one or more directories"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Select directories to scan"
+  </dest>
+  <voice>
+    *: "Select directories to scan"
+  </voice>
+</phrase>

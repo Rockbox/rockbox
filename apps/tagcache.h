@@ -201,8 +201,6 @@ struct tagcache_search {
     int32_t idx_id;      /* Entry number in the master index. */
 };
 
-void tagcache_build(const char *path);
-
 #ifdef __PCTOOL__
 void tagcache_reverse_scan(void);
 #endif
