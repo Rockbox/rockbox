@@ -232,7 +232,13 @@ static int get_action_worker(int context, int timeout,
     /* Data from sys events can be pulled with button_get_data
      * multimedia button presses don't go through the action system */
     if (button == BUTTON_NONE || button & (SYS_EVENT|BUTTON_MULTIMEDIA))
+    {
+        /* no button pressed so no point in waiting for release */
+        if (button == BUTTON_NONE)
+            wait_for_release = false;
         return button;
+    }
+
     /* the special redraw button should result in a screen refresh */
     if (button == BUTTON_REDRAW)
         return ACTION_REDRAW;
