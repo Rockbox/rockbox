@@ -27,6 +27,7 @@
 #include <time.h>
 #include <errno.h>
 #include "config.h"
+#include "ata_idle_notify.h"
 
 #define HAVE_STATVFS (!defined(WIN32))
 #define HAVE_LSTAT   (!defined(WIN32))
