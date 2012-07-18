@@ -73,6 +73,7 @@ extern int show_logo(void);
 #define BOM_UTF_16_BE "\xfe\xff"
 #define BOM_UTF_16_SIZE 2
 
+int split_string(char *str, const char needle, char *vector[], int vector_length);
 int open_utf8(const char* pathname, int flags);
 
 #ifdef BOOTFILE

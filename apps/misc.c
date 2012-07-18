@@ -1075,6 +1075,37 @@ void format_time(char* buf, int buf_size, long t)
     }
 }
 
+/**
+ * Splits str at each occurence of split_char and puts the substrings into vector,
+ * but at most vector_lenght items. Empty substrings are ignored.
+ *
+ * Modifies str by replacing each split_char following a substring with nul
+ *
+ * Returns the number of substrings found, i.e. the number of valid strings
+ * in vector
+ */
+int split_string(char *str, const char split_char, char *vector[], const int vector_length)
+{
+    int i;
+    char *p = str;
+
+    /* skip leading splitters */
+    while(*p == split_char) p++;
+
+    /* *p in the condition takes care of trailing splitters */
+    for(i = 0; p && *p && i < vector_length; i++)
+    {
+        vector[i] = p;
+        if ((p = strchr(p, split_char)))
+        {
+            *p++ = '\0';
+            while(*p == split_char) p++; /* skip successive splitters */
+        }
+    }
+
+    return i;
+}
+
 
 /** Open a UTF-8 file and set file descriptor to first byte after BOM.
  *  If no BOM is present this behaves like open().
