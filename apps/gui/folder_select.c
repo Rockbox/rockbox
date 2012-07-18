@@ -6,8 +6,8 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Copyright (C) 2011 Jonathan Gordon
- * Copyright (C) 2011 Thomas Martitz
+ * Copyright (C) 2012 Jonathan Gordon
+ * Copyright (C) 2012 Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,17 +34,19 @@
 
 /*
  * Order for changing child states:
- * 1) expand folder (skip to 2 if empty)
+ * 1) expand folder (skip to 3 if empty, skip to 4 if cannot be opened)
  * 2) collapse and select
- * 3) unselect
+ * 3) unselect (skip to 1)
+ * 4) do nothing
  */
 
 enum child_state {
     EXPANDED,
     SELECTED,
-    COLLAPSED
+    COLLAPSED,
+    EACCESS,
 };
-    
+
 struct child {
     char* name;
     struct folder *folder;
@@ -216,7 +218,7 @@ static int count_items(struct folder *start)
         count++;
     }
     return count;
-}    
+}
 
 static struct child* find_index(struct folder *start, int index, struct folder **parent)
 {
@@ -249,7 +251,6 @@ static struct child* find_index(struct folder *start, int index, struct folder *
 static const char * folder_get_name(int selected_item, void * data,
                                    char * buffer, size_t buffer_len)
 {
-    (void)buffer_len;
     struct folder *root = (struct folder*)data;
     struct folder *parent;
     struct child *this = find_index(root, selected_item , &parent);
@@ -260,7 +261,19 @@ static const char * folder_get_name(int selected_item, void * data,
         for(int i = 0; i <= parent->depth; i++)
             strcat(buffer, "\t");
 
-    strcat(buffer, this->name);
+    strlcat(buffer, this->name, buffer_len);
+
+    if (this->state == EACCESS)
+    {   /* append error message to the entry if unaccessible */
+        size_t len = strlcat(buffer, " (", buffer_len);
+        if (buffer_len > len)
+        {
+            snprintf(&buffer[len], buffer_len - len, str(LANG_READ_FAILED),
+                        this->name);
+            strlcat(buffer, ")", buffer_len);
+        }
+    }
+
     return buffer;
 }
 
@@ -278,6 +291,8 @@ static enum themable_icons folder_get_icon(int selected_item, void * data)
             return Icon_Folder;
         case EXPANDED:
             return Icon_Submenu;
+        case EACCESS:
+            return Icon_Questionmark;
     }
     return Icon_NOICON;
 }
@@ -301,8 +316,12 @@ static int folder_action_callback(int action, struct gui_synclist *list)
             case COLLAPSED:
                 if (this->folder == NULL)
                     this->folder = load_folder(parent, this->name);
-                this->state = this->folder->children_count == 0 ?
-                        SELECTED : EXPANDED;
+                this->state = this->folder ? (this->folder->children_count == 0 ?
+                        SELECTED : EXPANDED) : EACCESS;
+                break;
+            case EACCESS:
+                /* cannot open, do nothing */
+                break;
         }
         list->nb_items = count_items(root);
         return ACTION_REDRAW;
@@ -401,7 +420,7 @@ static void save_folders_r(struct folder *root, char* dst, size_t maxlen)
 
 static void save_folders(struct folder *root, char* dst, size_t maxlen)
 {
-    int len;    
+    int len;
     dst[0] = '\0';
     save_folders_r(root, dst, maxlen);
     len = strlen(dst);
