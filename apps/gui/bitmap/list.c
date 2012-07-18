@@ -154,6 +154,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     int icon_yoffset = 0; /* to center the icon */
     bool show_title;
     struct viewport *list_text_vp = &list_text[screen];
+    int indent = 0;
 
     line_height = parent->line_height;
     display->set_viewport(parent);
@@ -249,9 +250,28 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         unsigned char *entry_name;
         int text_pos = 0;
         int line = i - start;
+        indent = 0;
         s = list->callback_get_item_name(i, list->data, entry_buffer,
                                          sizeof(entry_buffer));
         entry_name = P2STR(s);
+
+        while (*entry_name == '\t')
+        {
+            indent++;
+            entry_name++;
+        }
+        if (indent)
+        {
+            if (icon_width)
+                indent *= icon_width;
+            else
+                indent *= display->getcharwidth();
+
+            list_icons.x += indent;
+            list_text_vp->x += indent;
+            list_text_vp->width -= indent;
+        }
+
         display->set_viewport(list_text_vp);
         style = STYLE_DEFAULT;
         /* position the string at the correct offset place */
@@ -352,6 +372,12 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             screen_put_iconxy(display, 0,
                             line*line_height + draw_offset + icon_yoffset,
                             Icon_Cursor);
+        }
+        if (indent)
+        {
+            list_icons.x -= indent;
+            list_text_vp->x -= indent;
+            list_text_vp->width += indent;
         }
     }
     display->set_viewport(parent);
