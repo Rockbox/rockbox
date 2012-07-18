@@ -26,7 +26,7 @@ endif
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
-$(SIMLIB): $$(SIMOBJ) $(UIBMP)
+$(SIMLIB): $$(SIMOBJ) $(UIBMP) rblogo.bmp
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
@@ -40,4 +40,7 @@ $(BUILDDIR)/uisimulator/%.o: $(ROOTDIR)/uisimulator/%.c
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(SIMFLAGS) -c $< -o $@
 
 $(UIBMP): $(ROOTDIR)/uisimulator/bitmaps/UI-$(MODELNAME).bmp
+	$(call PRINTS,CP $(@F))cp $< $@
+
+rblogo.bmp: $(ROOTDIR)/uisimulator/bitmaps/rblogo.bmp
 	$(call PRINTS,CP $(@F))cp $< $@

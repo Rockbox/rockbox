@@ -133,6 +133,7 @@ static int sdl_event_thread(void * param)
 #endif
 
     SDL_WM_SetCaption(UI_TITLE, NULL);
+    SDL_WM_SetIcon(SDL_LoadBMP("rblogo.bmp"), NULL);
 
     if ((gui_surface = SDL_SetVideoMode(width * display_zoom, height * display_zoom, depth, flags)) == NULL) {
         panicf("%s", SDL_GetError());
