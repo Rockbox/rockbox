@@ -86,6 +86,7 @@ gui/pitchscreen.c
 #ifdef HAVE_QUICKSCREEN
 gui/quickscreen.c
 #endif
+gui/folder_select.c
 
 gui/wps.c
 gui/scrollbar.c
