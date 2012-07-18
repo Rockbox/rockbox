@@ -316,6 +316,12 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 #endif /* HAVE_RECORDING */
 
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#define DEFAULT_TAGCACHE_SCAN_PATHS "/sdcard"
+#else
+#define DEFAULT_TAGCACHE_SCAN_PATHS "/"
+#endif
+
 #ifdef HAVE_TOUCHSCREEN
 
 static const char* list_pad_formatter(char *buffer, size_t buffer_size,
@@ -1355,6 +1361,8 @@ const struct settings_list settings[] = {
 
     OFFON_SETTING(0, runtimedb, LANG_RUNTIMEDB_ACTIVE, false,
                   "gather runtime data", NULL),
+    TEXT_SETTING(0, tagcache_scan_paths, "database scan paths",
+                 DEFAULT_TAGCACHE_SCAN_PATHS, NULL, NULL),
 #endif
 
 #if CONFIG_CODEC == SWCODEC
