@@ -232,10 +232,29 @@ static int get_action_worker(int context, int timeout,
     /* Data from sys events can be pulled with button_get_data
      * multimedia button presses don't go through the action system */
     if (button == BUTTON_NONE || button & (SYS_EVENT|BUTTON_MULTIMEDIA))
+    {
+        /* no button pressed so no point in waiting for release */
+        if (button == BUTTON_NONE)
+            wait_for_release = false;
         return button;
+    }
+
     /* the special redraw button should result in a screen refresh */
     if (button == BUTTON_REDRAW)
         return ACTION_REDRAW;
+
+    /* if action_wait_for_release() was called without a button being pressed
+     * then actually waiting for release would do the wrong thing, i.e.
+     * the next key press is entirely ignored. So, if here comes a normal
+     * button press (neither release nor repeat) the press is a fresh one and
+     * no point in waiting for release
+     *
+     * This logic doesn't work for touchscreen which can send normal
+     * button events repeatedly before the first repeat (as in BUTTON_REPEAT).
+     * These cannot be distinguished from the very first touch
+     * but there's nothing we can do about it here */
+    if ((button & (BUTTON_REPEAT|BUTTON_REL)) == 0)
+        wait_for_release = false;
 
     /* Don't send any buttons through untill we see the release event */
     if (wait_for_release)
@@ -487,6 +506,11 @@ int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp
 /* Don't let get_action*() return any ACTION_* values until the current buttons
  * have been released. SYS_* and BUTTON_NONE will go through.
  * Any actions relying on _RELEASE won't get seen.
+ *
+ * Note this doesn't currently work for touchscreen targets if called
+ * when the screen isn't currently touched, because they can send normal
+ * (non-BUTTON_REPEAT) events repeatedly, if the touch coordinates change.
+ * This cannot be distinguished from normal buttons events.
  */
 void action_wait_for_release(void)
 {
