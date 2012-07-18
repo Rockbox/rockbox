@@ -270,6 +270,8 @@ static ssize_t io_trigger_and_wait(enum io_dir cmd)
         result = -1;
     }
 
+    call_storage_idle_notifys(false);
+
     /* Regain our status as current */
     if (mythread != NULL)
     {
