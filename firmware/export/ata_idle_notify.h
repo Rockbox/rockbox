@@ -46,7 +46,7 @@ enum {
 /* Enable storage callbacks everywhere except for bootloaders. Both
  * hosted and native targets need this.
  */
-#define USING_STORAGE_CALLBACK  !defined(BOOTLOADER) && !defined(APPLICATION)
+#define USING_STORAGE_CALLBACK  !defined(BOOTLOADER) && !defined(APPLICATION) && !defined(__PCTOOL__)
 
 extern void register_storage_idle_func(void (*function)(void *data));
 #if USING_STORAGE_CALLBACK
