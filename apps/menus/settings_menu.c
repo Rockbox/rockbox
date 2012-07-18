@@ -48,6 +48,7 @@
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
 #endif
+#include "folder_select.h"
 
 /***********************************/
 /*    TAGCACHE MENU                */
@@ -534,8 +535,8 @@ static int autoresume_nexttrack_callback(int action,
             break;
         case ACTION_EXIT_MENUITEM:
             if (global_settings.autoresume_automatic == AUTORESUME_NEXTTRACK_CUSTOM
-                && kbd_input ((char*) &global_settings.autoresume_paths,
-                              MAX_PATHNAME+1) < 0)
+                && !folder_select(global_settings.autoresume_paths,
+                              MAX_PATHNAME+1))
             {
                 global_settings.autoresume_automatic = oldval;
             }
