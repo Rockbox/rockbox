@@ -4272,10 +4272,29 @@ static void __attribute__ ((noinline)) check_ignore(const char *dirname,
     *unignore = file_exists(newpath);
 }
 
+/* max roots on native. on application more can be added via malloc() */
+#define MAX_STATIC_ROOTS 12
+
 static struct search_roots_ll {
     const char *path;
     struct search_roots_ll * next;
-} roots_ll;
+} roots_ll[MAX_STATIC_ROOTS];
+
+/* check if the path is already included in the search roots, by the
+ * means that the path itself or one of its parents folders is in the list */
+static bool search_root_exists(const char *path)
+{
+    struct search_roots_ll *this;
+    for(this = &roots_ll[0]; this; this = this->next)
+    {
+        size_t root_len = strlen(this->path);
+        /* check if the link target is inside of an existing search root
+         * don't add if target is inside, we'll scan it later */
+        if (!strncmp(this->path, path, root_len))
+            return true;
+    }
+    return false;
+}
 
 #ifdef APPLICATION
 /*
@@ -4316,14 +4335,11 @@ static bool add_search_root(const char *name)
     if (realpath(target, abs_target) == NULL)
         return false;
 
-    for(this = &roots_ll; this; prev = this, this = this->next)
-    {
-        size_t root_len = strlen(this->path);
-        /* check if the link target is inside of an existing search root
-         * don't add if target is inside, we'll scan it later */
-        if (!strncmp(this->path, abs_target, root_len))
-            return false;
-    }
+    if (search_root_exists(abs_target))
+        return false;
+
+    /* get the end of the list */
+    for(this = &roots_ll[0]; this; prev = this, this = this->next);
 
     if (prev)
     {
@@ -4347,14 +4363,22 @@ static bool add_search_root(const char *name)
     return false;
 }
 
+static int free_search_root_single(struct search_roots_ll * start)
+{
+    if (start < &roots_ll[0] && start >= &roots_ll[MAX_STATIC_ROOTS])
+    {
+        free(start->next);
+        return sizeof(struct search_roots_ll);
+    }
+    return 0;
+}
+
 static int free_search_roots(struct search_roots_ll * start)
 {
     int ret = 0;
     if (start->next)
     {
-        ret += free_search_roots(start->next);
-        ret += sizeof(struct search_roots_ll);
-        free(start->next);
+        ret += free_search_root_single(start->next);
     }
     return ret;
 }
@@ -4459,7 +4483,8 @@ void tagcache_screensync_enable(bool state)
     tc_stat.syncscreen = state;
 }
 
-void tagcache_build(const char *path)
+
+static void do_tagcache_build(const char *path[])
 {
     struct tagcache_header header;
     bool ret;
@@ -4501,17 +4526,29 @@ void tagcache_build(const char *path)
     write(cachefd, &header, sizeof(struct tagcache_header));
 
     ret = true;
-    roots_ll.path = path;
-    roots_ll.next = NULL;
+
+    roots_ll[0].path = path[0];
+    roots_ll[0].next = NULL;
+    /* i is for the path vector, j for the roots_ll array
+     * path can be skipped , but root_ll entries can't */
+    for(int i = 1, j = 1; path[i] && j < MAX_STATIC_ROOTS; i++)
+    {
+        if (search_root_exists(path[i])) /* skip this path */
+            continue;
+
+        roots_ll[j].path = path[i];
+        roots_ll[j-1].next = &roots_ll[j];
+        j++;
+    }
+
     struct search_roots_ll * this;
     /* check_dir might add new roots */
-    for(this = &roots_ll; this; this = this->next)
+    for(this = &roots_ll[0]; this; this = this->next)
     {
         strcpy(curpath, this->path);
         ret = ret && check_dir(this->path, true);
     }
-    if (roots_ll.next)
-        free_search_roots(roots_ll.next);
+    free_search_roots(&roots_ll[0]);
 
     /* Write the header. */
     header.magic = TAGCACHE_MAGIC;
@@ -4556,6 +4593,18 @@ void tagcache_build(const char *path)
 #endif
     
     cpu_boost(false);
+}
+
+void tagcache_build(void)
+{
+    char *vect[MAX_STATIC_ROOTS + 1]; /* +1 to ensure NULL sentinel */
+    char str[sizeof(global_settings.tagcache_scan_paths)];
+    strlcpy(str, global_settings.tagcache_scan_paths, sizeof(str));
+
+    int res = split_string(str, ':', vect, MAX_STATIC_ROOTS);
+    vect[res] = NULL;
+
+    do_tagcache_build((const char**)vect);
 }
 
 #ifdef HAVE_TC_RAMCACHE
@@ -4643,11 +4692,11 @@ static void tagcache_thread(void)
             case Q_REBUILD:
                 remove_files();
                 remove(TAGCACHE_FILE_TEMP);
-                tagcache_build("/");
+                tagcache_build();
                 break;
             
             case Q_UPDATE:
-                tagcache_build("/");
+                tagcache_build();
 #ifdef HAVE_TC_RAMCACHE
                 load_ramcache();
 #endif
@@ -4665,13 +4714,13 @@ static void tagcache_thread(void)
                 {
                     load_ramcache();
                     if (tc_stat.ramcache && global_settings.tagcache_autoupdate)
-                        tagcache_build("/");
+                        tagcache_build();
                 }
                 else
 #endif
                 if (global_settings.tagcache_autoupdate)
                 {
-                    tagcache_build("/");
+                    tagcache_build();
                     
                     /* This will be very slow unless dircache is enabled
                        or target is flash based, but do it anyway for
