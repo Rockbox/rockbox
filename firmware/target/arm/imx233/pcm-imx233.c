@@ -61,7 +61,7 @@ void INT_DAC_DMA(void)
     const void *start;
     size_t size;
 
-    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
+    if(pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
     {
         play(start, size);
         pcm_play_dma_status_callback(PCM_DMAST_STARTED);
