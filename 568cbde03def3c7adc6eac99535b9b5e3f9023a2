@@ -16,6 +16,24 @@
       "revId": "568cbde03def3c7adc6eac99535b9b5e3f9023a2",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASH///3s\u003d",
+        "filename": "firmware/font.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 1000167
+      },
+      "writtenOn": "2012-07-19T13:11:01Z",
+      "side": 1,
+      "message": "Yup, looks like I forgot that...\n\nI\u0027ll fix this when I (eventually) redo this change along with my other one.",
+      "parentUuid": "AAAASH///34\u003d",
+      "revId": "568cbde03def3c7adc6eac99535b9b5e3f9023a2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
