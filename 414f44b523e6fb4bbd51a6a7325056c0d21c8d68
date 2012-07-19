@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASH///4A\u003d",
+        "filename": "uisimulator/common/io.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-07-19T08:21:08Z",
+      "side": 1,
+      "message": "http://stackoverflow.com/questions/1644416/how-to-read-vfat-attributes-of-files-in-linux-using-c\n\nBut it\u0027s probably better to not mess with it and keep what you have now.",
+      "revId": "414f44b523e6fb4bbd51a6a7325056c0d21c8d68",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
