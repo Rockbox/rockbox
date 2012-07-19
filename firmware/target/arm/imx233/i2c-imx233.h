@@ -134,4 +134,4 @@ enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, 
 /* end building a transfer and start the transfer */
 enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout);
 
-#endif // __DMA_IMX233_H__
+#endif // __I2C_IMX233_H__
