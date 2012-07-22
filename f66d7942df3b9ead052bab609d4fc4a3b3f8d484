@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASH///2k\u003d",
+        "filename": "apps/gui/folder_select.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-07-22T01:42:43Z",
+      "side": 1,
+      "message": "This code assumes english wording for \"foo (read error)\", either change the translated string to \"%s (Read Error)\" or drop it completly, the icon will be enough to show the folder isnt accessable.",
+      "revId": "f66d7942df3b9ead052bab609d4fc4a3b3f8d484",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
