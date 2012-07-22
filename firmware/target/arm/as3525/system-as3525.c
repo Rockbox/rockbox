@@ -272,7 +272,9 @@ void system_init(void)
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 #endif
 
-    CGU_PERI &= ~CGU_ROM_ENABLE;   /*disable built in boot rom clock*/
+    /*this saves a tiny bit of power but seems to leave the processor in
+      a bad state if it manages to reboot without the clock reenabled*/
+    /*CGU_PERI &= ~CGU_ROM_ENABLE;*/   /*disable built in boot rom clock*/
 
     /* bits 31:30 should be set to 0 in arm926-ejs */
     asm volatile(
@@ -320,7 +322,7 @@ void system_init(void)
     dma_init();
 
     ascodec_init();
-    
+
     /*  Initialize power management settings */
 #ifdef HAVE_AS3543
     /* PLL:       disable audio PLL, we use MCLK already */
@@ -364,8 +366,8 @@ void system_reboot(void)
 
     disable_irq();
 
-    /* re-enable internal ROM */
-    CGU_PERI |= CGU_ROM_ENABLE;
+    /* re-enable internal ROM so that we don't hard lock on power up*/
+    CGU_PERI |= CGU_ROM_ENABLE; /*should always be on, but to be safe...*/
 
     /* use watchdog to reset */
     CGU_PERI |= (CGU_WDOCNT_CLOCK_ENABLE | CGU_WDOIF_CLOCK_ENABLE);
