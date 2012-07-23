@@ -42,6 +42,7 @@ extern char *global_stack;
 /* Room for 120 ms of stereo audio at 48 kHz */
 #define MAX_FRAME_SIZE  (2*120*48)
 #define CHUNKSIZE       (16*1024)
+#define SEEK_CHUNKSIZE 7*CHUNKSIZE
 
 static int get_more_data(ogg_sync_state *oy)
 {
@@ -54,6 +55,246 @@ static int get_more_data(ogg_sync_state *oy)
 
     return bytes;
 }
+/* The read/seek functions track absolute position within the stream */
+static int64_t get_next_page(ogg_sync_state *oy, ogg_page *og,
+                                 int64_t boundary)
+{
+    int64_t localoffset = ci->curpos;
+    long more;
+    long ret;
+
+    if (boundary > 0)
+        boundary += ci->curpos;
+
+    while (1) {
+        more = ogg_sync_pageseek(oy,og);
+
+        if (more < 0) {
+            /* skipped n bytes */
+            localoffset-=more;
+        } else {
+            if (more == 0) {
+                /* send more data */
+                if(!boundary)return(-1);
+                {
+                    ret = get_more_data(oy);
+                    if (ret == 0)
+                        return(-2);
+
+                    if (ret < 0)
+                        return(-3);
+                }
+            } else {
+                /* got a page.  Return the offset at the page beginning,
+                   advance the internal offset past the page end */
+
+                int64_t ret=localoffset;
+
+                return(ret);
+            }
+        }
+    }
+}
+
+static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
+                                  int64_t wantedpos)
+{
+    int64_t crofs;
+    int64_t *curoffset=&crofs;
+    *curoffset=ci->curpos;
+    int64_t begin=*curoffset;
+    int64_t end=begin;
+    int64_t ret;
+    int64_t offset=-1;
+    int64_t avgpagelen=-1;
+    int64_t lastgranule=-1;
+
+    short time = -1;
+
+    while (offset == -1) {
+
+        begin -= SEEK_CHUNKSIZE;
+
+        if (begin < 0) {
+            if (time < 0) {
+                begin = 0;
+                time++;
+            } else {
+                LOGF("Can't seek that early:%lld\n",begin);
+                return -3;  /* too early */
+            }
+        }
+
+        *curoffset = begin;
+
+        ci->seek_buffer(*curoffset);
+
+        ogg_sync_reset(oy);
+
+        lastgranule = -1;
+
+        while (*curoffset < end) {
+            ret = get_next_page(oy,og,end-*curoffset);
+
+            if (ret > 0) {
+                if (lastgranule != -1) {
+                    if (avgpagelen < 0)
+                        avgpagelen = (ogg_page_granulepos(og)-lastgranule);
+                    else
+                       avgpagelen=((ogg_page_granulepos(og)-lastgranule)
+                                   + avgpagelen) / 2;
+                }
+
+                lastgranule=ogg_page_granulepos(og);
+
+                if ((lastgranule - (avgpagelen/4)) < wantedpos &&
+                    (lastgranule + avgpagelen + (avgpagelen/4)) > wantedpos) {
+
+                    /*wanted offset found Yeay!*/
+
+                    /*LOGF("GnPagefound:%d,%d,%d,%d\n",ret,
+                           lastgranule,wantedpos,avgpagelen);*/
+
+                    return ret;
+
+                } else if (lastgranule > wantedpos) {  /*too late, seek more*/
+                    if (offset != -1) {
+                        LOGF("Toolate, returnanyway:%lld,%lld,%lld,%lld\n",
+                             ret,lastgranule,wantedpos,avgpagelen);
+                        return ret;
+                    }
+                    break;
+                } else{ /*if (ogg_page_granulepos(&og)<wantedpos)*/
+                    /*too early*/
+                    offset = ret;
+                    continue;
+                }
+            } else if (ret == -3) 
+                return(-3);
+            else if (ret<=0)
+                break;
+            else if (*curoffset < end) {
+                /*this should not be possible*/
+
+                //LOGF("Seek:get_earlier_page:Offset:not_cached by granule:"\"%d,%d,%d,%d,%d\n",*curoffset,end,begin,wantedpos,curpos);
+
+                offset=ret;
+            }
+        }
+    }
+    return -1;
+}
+
+static int speex_seek_page_granule(int64_t pos, int64_t curpos,
+                                   ogg_sync_state *oy,
+                                   int64_t headerssize)
+{
+    /* TODO: Someone may want to try to implement seek to packet, 
+             instead of just to page (should be more accurate, not be any 
+             faster) */
+
+    int64_t crofs;
+    int64_t *curbyteoffset = &crofs;
+    *curbyteoffset = ci->curpos;
+    int64_t curoffset;
+    curoffset = *curbyteoffset;
+    int64_t offset = 0;
+    ogg_page og = {0,0,0,0};
+    int64_t avgpagelen = -1;
+    int64_t lastgranule = -1;
+
+    if(abs(pos-curpos)>10000 && headerssize>0 && curoffset-headerssize>10000) {
+        /* if seeking for more that 10sec,
+           headersize is known & more than 10kb is played,
+           try to guess a place to seek from the number of
+           bytes playe for this position, this works best when 
+           the bitrate is relativly constant.
+         */
+
+        curoffset = (((*curbyteoffset-headerssize) * pos)/curpos)*98/100;
+        if (curoffset < 0)
+            curoffset=0;
+
+        //int64_t toffset=curoffset;
+
+        ci->seek_buffer(curoffset);
+
+        ogg_sync_reset(oy);
+
+        offset = get_next_page(oy,&og,-1);
+
+        if (offset < 0) { /* could not find new page,use old offset */
+            LOGF("Seek/guess/fault:%lld->-<-%d,%lld:%lld,%d,%ld,%d\n",
+                 curpos,0,pos,offset,0,
+                 ci->curpos,/*stream_length*/0);
+
+            curoffset = *curbyteoffset;
+
+            ci->seek_buffer(curoffset);
+
+            ogg_sync_reset(oy);
+        } else {
+            if (ogg_page_granulepos(&og) == 0 && pos > 5000) {
+                LOGF("SEEK/guess/fault:%lld->-<-%lld,%lld:%lld,%d,%ld,%d\n",
+                     curpos,ogg_page_granulepos(&og),pos,
+                     offset,0,ci->curpos,/*stream_length*/0);
+
+                curoffset = *curbyteoffset;
+
+                ci->seek_buffer(curoffset);
+
+                ogg_sync_reset(oy);
+            } else {
+                curoffset = offset;
+                curpos = ogg_page_granulepos(&og);
+            }
+        }
+    }
+
+    /* which way do we want to seek? */
+
+    if (curpos > pos) {  /* backwards */
+        offset = seek_backwards(oy,&og,pos);
+
+        if (offset > 0) {
+            *curbyteoffset = curoffset;
+            return 1;
+        }
+    } else {  /* forwards */
+
+        while ( (offset = get_next_page(oy,&og,-1)) > 0) {
+            if (lastgranule != -1) {
+               if (avgpagelen < 0)
+                   avgpagelen = (ogg_page_granulepos(&og) - lastgranule);
+               else
+                   avgpagelen = ((ogg_page_granulepos(&og) - lastgranule)
+                                 + avgpagelen) / 2;
+            }
+
+            lastgranule = ogg_page_granulepos(&og);
+
+            if ( ((lastgranule - (avgpagelen/4)) < pos && ( lastgranule + 
+                  avgpagelen + (avgpagelen / 4)) > pos) ||
+                 lastgranule > pos) {
+
+                /*wanted offset found Yeay!*/
+
+                *curbyteoffset = offset;
+
+                return offset;
+            }
+        }
+    }
+
+    ci->seek_buffer(*curbyteoffset);
+
+    ogg_sync_reset(oy);
+
+    LOGF("Seek failed:%lld\n", offset);
+
+    return -1;
+}
+
 
 /* this is the codec entry point */
 enum codec_status codec_main(enum codec_entry_call_reason reason)
@@ -112,13 +353,23 @@ enum codec_status codec_run(void)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
-            LOGF("Opus seek not implemented yet");
+            if(st!=NULL){
+#define SAMPLERATE 48
+                LOGF("Opus seek page:%ld,%lld,%ld\n",
+		     (long)(param*48), page_granule, (long)param);
+
+                speex_seek_page_granule(((int64_t)param) * 48,
+                                        page_granule, &oy, 0);
+#undef SAMPLERATE
+            }
+
+            ci->set_elapsed(param);
+            ci->seek_complete();
 //            if (ov_time_seek(&vf, param)) {
                 //ci->logf("ov_time_seek failed");
 //            }
 
 //            ci->set_elapsed(ov_time_tell(&vf));
-            ci->seek_complete();
         }
 
         /*Get the ogg buffer for writing*/
