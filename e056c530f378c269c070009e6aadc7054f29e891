@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASH///2Q\u003d",
+        "filename": "apps/gui/skin_engine/skin_parser.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1999,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-07-24T06:55:02Z",
+      "side": 1,
+      "message": "can you make that 1000 a #define somewhere instead?",
+      "revId": "e056c530f378c269c070009e6aadc7054f29e891",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASH///2M\u003d",
+        "filename": "lib/skin_parser/tag_table.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-07-24T06:55:02Z",
+      "side": 1,
+      "message": "add a comment like the above line... i.e\nPercentages are stored as (whole*100?)+part",
+      "revId": "e056c530f378c269c070009e6aadc7054f29e891",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
