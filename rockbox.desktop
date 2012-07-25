@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Rockbox
+GenericName=Music Player
+X-GNOME-FullName=Rocbox Music Player
+Comment=The Rockbox Custom Jukebox Firmware on your Desktop
+Exec=rockbox
+Icon=rockbox
+Terminal=false
+Type=Application
+Categories=AudioVideo;
+StartupNotify=true
+X-Ubuntu-Gettext-Domain=rockbox
