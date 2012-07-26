@@ -90,8 +90,9 @@ void codec_free(void* ptr) {
 void* codec_realloc(void* ptr, size_t size)
 {
     void* x;
-    (void)ptr;
     x = codec_malloc(size);
+    memcpy(x, ptr, size);
+    codec_free(ptr);
     return(x);
 }
 
