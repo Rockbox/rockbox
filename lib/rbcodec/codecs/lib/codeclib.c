@@ -91,7 +91,7 @@ void* codec_realloc(void* ptr, size_t size)
 {
     void* x;
     x = codec_malloc(size);
-    memcpy(x, ptr, size);
+    ci->memcpy(x, ptr, size);
     codec_free(ptr);
     return(x);
 }
