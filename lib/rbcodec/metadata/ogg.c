@@ -62,6 +62,7 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
     int segments, header_size;
     int i;
     bool eof = false;
+    int temp;
 
     /* 92 bytes is enough for both Vorbis and Speex headers */
     if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, buf, 92) < 92))
@@ -99,6 +100,21 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
         /* Comments are in second Ogg page (byte 108 onwards for Speex) */
         if (lseek(fd, 28 + header_size, SEEK_SET) < 0)
         {
+            return false;
+        }
+    }
+    else if (memcmp(&buf[28], "OpusHead", 8) == 0)
+    {
+        id3->codectype = AFMT_OPUS;
+        temp = get_long_le(&buf[40]);
+        id3->frequency = (temp == 0) ? 48000 : temp;
+        id3->vbr = true;
+
+// FIXME handle an actual channel mapping table
+        /* Comments are in second Ogg page (byte 108 onwards for Speex) */
+        if (lseek(fd, 47, SEEK_SET) < 0)
+        {
+            DEBUGF("Couldnotseektoogg");
             return false;
         }
     }
