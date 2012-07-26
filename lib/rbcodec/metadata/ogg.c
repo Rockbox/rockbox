@@ -102,6 +102,20 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
             return false;
         }
     }
+    else if (memcmp(&buf[28], "OpusHead", 8) == 0)
+    {
+        id3->codectype = AFMT_OPUS;
+        id3->frequency = 48000;
+        id3->vbr = true;
+
+// FIXME handle an actual channel mapping table
+        /* Comments are in second Ogg page (byte 108 onwards for Speex) */
+        if (lseek(fd, 47, SEEK_SET) < 0)
+        {
+            DEBUGF("Couldnotseektoogg");
+            return false;
+        }
+    }
     else
     {
         /* Unsupported format, try to print the marker, catches Ogg/FLAC at least */

@@ -1,5 +1,6 @@
 /* decoders */
 
+opus.c
 vorbis.c
 mpa.c
 flac.c
