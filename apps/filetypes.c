@@ -80,6 +80,7 @@ static const struct filetype inbuilt_filetypes[] = {
     { "aif", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "aiff",FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "spx" ,FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "opus",FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "sid", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "adx", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "nsf", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
