@@ -1,0 +1,25 @@
+Libraries:  Opus (snapshot) / Opus-tools (snapshot) / libogg 1.3
+Imported:   July 26th, 2012
+
+Steps taken to adapt original opus/opus-tool/ogg source files to rockbox
+(useful when for example syncing a new snapshot)
+
+Opus:
+* copy files from opus/src/ and opus/include/ to lib/rbcodec/codecs/libopus
+* copy files from opus/celt to lib/rbcodec/codecs/libopus/celt
+* copy files from opus/celt/fixed to lib/rbcodec/codecs/libopus/celt/fixed
+* copy files from opus/silk to lib/rbcodec/codecs/libopus/silk
+* rename opus config.h file to opus_config.h and replace #include "config.h",
+  for example
+find . -name "*.h" -print | xargs sed -i 's/include "config.h"/include "opus_config.h"/g'
+find . -name "*.c" -print | xargs sed -i 's/include "config.h"/include "opus_config.h"/g'
+
+Opus-tools:
+* copy src/opus_header.h and src/opus_header.c to lib/rbcodec/codecs/libopus
+
+Ogg:
+* copy libogg/src/framing.c to lib/rbcodec/codecs/libopus/ogg
+* copy libogg/include/ogg.h to lib/rbcodec/codecs/libopus/ogg
+* changed #include "ogg/ogg.h" to #include "ogg.h" in framing.c
+* added os_config.h to lib/rbcodec/codecs/libopus/ogg
+
