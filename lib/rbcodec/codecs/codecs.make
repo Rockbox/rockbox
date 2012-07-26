@@ -51,6 +51,7 @@ include $(RBCODECLIB_DIR)/codecs/libgme/libsgc.make
 include $(RBCODECLIB_DIR)/codecs/libgme/libvgm.make
 include $(RBCODECLIB_DIR)/codecs/libgme/libkss.make
 include $(RBCODECLIB_DIR)/codecs/libgme/libemu2413.make
+include $(RBCODECLIB_DIR)/codecs/libopus/libopus.make
 
 # compile flags for codecs
 CODECFLAGS = $(CFLAGS) $(RBCODEC_CFLAGS) -fstrict-aliasing \
@@ -74,6 +75,7 @@ $(KSSLIB) : CODECFLAGS +=  -O2
 $(M4ALIB) : CODECFLAGS += -O3
 $(MUSEPACKLIB) : CODECFLAGS += -O1
 $(NSFLIB) : CODECFLAGS +=  -O2
+$(OPUSLIB) : CODECFLAGS +=  -O2
 $(PCMSLIB) : CODECFLAGS += -O1
 $(RMLIB) : CODECFLAGS += -O3
 $(SGCLIB) : CODECFLAGS +=  -O2
@@ -168,6 +170,7 @@ $(CODECDIR)/nsf.codec : $(CODECDIR)/libnsf.a $(CODECDIR)/libemu2413.a
 $(CODECDIR)/sgc.codec : $(CODECDIR)/libsgc.a $(CODECDIR)/libemu2413.a
 $(CODECDIR)/vgm.codec : $(CODECDIR)/libvgm.a $(CODECDIR)/libemu2413.a
 $(CODECDIR)/kss.codec : $(CODECDIR)/libkss.a $(CODECDIR)/libemu2413.a
+$(CODECDIR)/opus.codec : $(CODECDIR)/libopus.a
 
 $(CODECS): $(CODEC_LIBS) # this must be last in codec dependency list
 
