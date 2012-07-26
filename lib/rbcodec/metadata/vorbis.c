@@ -250,7 +250,7 @@ static bool file_init(struct file* file, int fd, int type, int remaining)
     memset(file, 0, sizeof(*file));
     file->fd = fd;
     
-    if (type == AFMT_OGG_VORBIS || type == AFMT_SPEEX)
+    if (type == AFMT_OGG_VORBIS || type == AFMT_SPEEX || type == AFMT_OPUS)
     {
         if (!file_read_page_header(file))
         {
@@ -272,6 +272,22 @@ static bool file_init(struct file* file, int fd, int type, int remaining)
          * are type 3.
          */
         if (buffer[0] != 3)
+        {
+            return false;
+        }
+    }
+    else if (type == AFMT_OPUS)
+    {
+        char buffer[8];
+
+        /* Read comment header */
+        if (file_read(file, buffer, sizeof(buffer)) < (ssize_t) sizeof(buffer))
+        {
+            return false;
+        }
+
+        /* Should be equal to "OpusTags" */
+        if (memcmp(buffer, "OpusTags", 8) != 0)
         {
             return false;
         }
