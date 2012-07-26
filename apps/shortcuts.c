@@ -6,7 +6,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2011 Jonathan Gordon
  *
@@ -44,6 +43,7 @@
 #include "onplay.h"
 #include "screens.h"
 #include "talk.h"
+#include "yesno.h"
 
 
 #define MAX_SHORTCUT_NAME 32
@@ -135,6 +135,21 @@ static struct shortcut* get_shortcut(int index)
     return &h->shortcuts[handle_index];
 }
 
+static void remove_shortcut(int index)
+{
+    int this = index, next = index + 1;
+    struct shortcut *prev = get_shortcut(this);
+
+    while (next <= shortcut_count)
+    {
+        struct shortcut *sc = get_shortcut(next);
+        memcpy(prev, sc, sizeof(struct shortcut));
+        next++;
+        prev = sc;
+    }
+    shortcut_count--;
+}
+
 static bool verify_shortcut(struct shortcut* sc)
 {
     switch (sc->type)
@@ -168,15 +183,18 @@ static void init_shortcut(struct shortcut* sc)
 }
 
 static int first_idx_to_writeback = -1;
+static bool overwrite_shortcuts = false;
 static void shortcuts_ata_idle_callback(void* data)
 {
     (void)data;
     int fd;
     char buf[MAX_PATH];
     int current_idx = first_idx_to_writeback;
+    int append = overwrite_shortcuts ? O_TRUNC : O_APPEND;
+    
     if (first_idx_to_writeback < 0)
         return;
-    fd = open(SHORTCUTS_FILENAME, O_APPEND|O_RDWR|O_CREAT, 0644);
+    fd = open(SHORTCUTS_FILENAME, append|O_RDWR|O_CREAT, 0644);
     if (fd < 0)
         return;
     while (current_idx < shortcut_count)
@@ -218,8 +236,10 @@ void shortcuts_add(enum shortcut_type type, const char* value)
         sc->u.setting = (void*)value;
     else
         strlcpy(sc->u.path, value, MAX_PATH);
+
     if (first_idx_to_writeback < 0)
         first_idx_to_writeback = shortcut_count - 1;
+    overwrite_shortcuts = false;
     register_storage_idle_func(shortcuts_ata_idle_callback);
 }
 
@@ -354,6 +374,24 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
     (void)lists;
     if (action == ACTION_STD_OK)
         return ACTION_STD_CANCEL;
+    else if (action == ACTION_STD_CONTEXT)
+    {
+        int selection = gui_synclist_get_sel_pos(lists);
+
+        if (!yesno_pop(ID2P(LANG_REALLY_DELETE)))
+            return ACTION_REDRAW;
+
+        remove_shortcut(selection);
+        gui_synclist_set_nb_items(lists, shortcut_count);
+        if (selection >= shortcut_count)
+            gui_synclist_select_item(lists, shortcut_count - 1);
+        first_idx_to_writeback = 0;
+        overwrite_shortcuts = true;
+        shortcuts_ata_idle_callback(NULL);
+        if (shortcut_count == 0)
+            return ACTION_STD_CANCEL;
+        return ACTION_REDRAW;
+    }
     return action;
 }
 
