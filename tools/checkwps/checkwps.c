@@ -294,9 +294,8 @@ int main(int argc, char **argv)
     while (argv[filearg]) {
         printf("Checking %s...\n", argv[filearg]);
 #ifdef HAVE_REMOTE_LCD
-        if((strcmp(&argv[filearg][strlen(argv[filearg])-4], "rwps") == 0) || 
-           (strcmp(&argv[filearg][strlen(argv[filearg])-4], "rsbs") == 0) ||
-           (strcmp(&argv[filearg][strlen(argv[filearg])-4], "rfms") == 0))
+        char *ext = strrchr(argv[filearg], '.');
+        if (strcmp(ext, "rwps") == 0 || strcmp(ext, "rsbs") == 0 || strcmp(ext, "rfms") == 0)
             screen = SCREEN_REMOTE;
         else
             screen = SCREEN_MAIN;
