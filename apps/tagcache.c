@@ -822,6 +822,8 @@ static long find_tag(int tag, int idx_id, const struct index_entry *idx)
             return result;
         }
     }
+#else
+    (void)idx_id;
 #endif
 
     return idx->tag_seek[tag];
@@ -3110,7 +3112,10 @@ static bool commit(void)
     return true;
 }
 
+#ifndef __PCTOOL__
 static int tempbuf_handle;
+#endif
+
 static void allocate_tempbuf(void)
 {
     /* Yeah, malloc would be really nice now :) */
@@ -4483,8 +4488,11 @@ void tagcache_screensync_enable(bool state)
     tc_stat.syncscreen = state;
 }
 
-
-static void do_tagcache_build(const char *path[])
+#ifndef __PCTOOL__
+/* this is called by the database tool to not pull in global_settings */
+static
+#endif
+void do_tagcache_build(const char *path[])
 {
     struct tagcache_header header;
     bool ret;
@@ -4595,6 +4603,7 @@ static void do_tagcache_build(const char *path[])
     cpu_boost(false);
 }
 
+#ifndef __PCTOOL__
 void tagcache_build(void)
 {
     char *vect[MAX_STATIC_ROOTS + 1]; /* +1 to ensure NULL sentinel */
@@ -4606,6 +4615,7 @@ void tagcache_build(void)
 
     do_tagcache_build((const char**)vect);
 }
+#endif
 
 #ifdef HAVE_TC_RAMCACHE
 static void load_ramcache(void)

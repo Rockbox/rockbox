@@ -3530,6 +3530,7 @@ fi
       toolset='';
       t_cpu='';
       GCCOPTS='';
+      rbdir='.'
       extradefines="$extradefines  -DDEBUG"
       appsdir='$(ROOTDIR)/tools/checkwps';
       output='checkwps.'${modelname};
@@ -3538,10 +3539,8 @@ fi
       ;;
     [Dd])
       uname=`uname`
-      simcc "database"
+      simcc "database-sdl"
       toolset='';
-      t_cpu='';
-      GCCOPTS='';
       appsdir='$(ROOTDIR)/tools/database';
       archosrom='';
 
@@ -3553,7 +3552,10 @@ fi
               output='database.'${modelname};
               ;;
       esac
-
+      # architecture, manufacturer and model for the target-tree build
+      t_cpu="hosted"
+      t_manufacturer="sdl"
+      t_model="database"
       echo "Database tool build selected"
       ;;
     [Ww])

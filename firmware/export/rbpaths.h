@@ -30,11 +30,7 @@
 /* name of directory where configuration, fonts and other data
  * files are stored */
 #ifdef __PCTOOL__
-#undef ROCKBOX_DIR
-#undef ROCKBOX_DIR_LEN
 #undef WPS_DIR
-#define ROCKBOX_DIR "."
-#define ROCKBOX_DIR_LEN 1
 #else
 
 /* ROCKBOX_DIR is now defined in autoconf.h for flexible build types */

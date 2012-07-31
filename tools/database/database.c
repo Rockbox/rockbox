@@ -2,26 +2,37 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <errno.h>
 #include <sys/stat.h>
+
+#include "config.h"
 #include "tagcache.h"
+#include "dir.h"
+
+/* This is meant to be run on the root of the dap. it'll put the db files into
+ * a .rockbox subdir */
 
 int main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
+    errno = 0;
+    if (mkdir(ROCKBOX_DIR) == -1 && errno != EEXIST)
+        return 1;
+
+    /* / is actually ., will get translated in io.c
+     * (with the help of sim_root_dir below */
+    const char *paths[] = { "/", NULL };
     tagcache_init();
-    tagcache_build(".");
+    do_tagcache_build(paths);
     tagcache_reverse_scan();
     
     return 0;
 }
 
-/* stub to avoid including all of apps/misc.c */
-bool file_exists(const char *file)
-{
-    struct stat s;
-    if (!stat(file, &s))
-        return true;
-    return false;
-}
+/* needed for io.c */
+const char *sim_root_dir = ".";
 
 /* stubs to avoid including thread-sdl.c */
 #include "kernel.h"

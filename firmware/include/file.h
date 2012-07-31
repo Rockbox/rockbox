@@ -54,7 +54,7 @@ extern int app_rename(const char* path, const char* newname);
 #   define write(x,y,z) sim_write(x,y,z)
 #   define close(x) sim_close(x)
 #   endif
-#elif defined(SIMULATOR)
+#elif defined(SIMULATOR) || defined(DBTOOL)
 #   define open(x, ...) sim_open(x, __VA_ARGS__)
 #   define creat(x,m) sim_creat(x,m)
 #   define remove(x) sim_remove(x)

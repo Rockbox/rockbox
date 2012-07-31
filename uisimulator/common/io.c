@@ -282,7 +282,7 @@ static ssize_t io_trigger_and_wait(enum io_dir cmd)
     return result;
 }
 
-#if !defined(__PCTOOL__) && !defined(APPLICATION)
+#if !defined(APPLICATION)
 static const char *get_sim_pathname(const char *name)
 {
     static char buffer[MAX_PATH]; /* sufficiently big */
