@@ -292,17 +292,30 @@ int main(int argc, char **argv)
     /* Go through every skin that was thrown at us, error out at the first
      * flawed wps */
     while (argv[filearg]) {
-        printf("Checking %s...\n", argv[filearg]);
+        const char* name = argv[filearg++];
+        char *ext = strrchr(name, '.');
+        printf("Checking %s...\n", name);
+        if (!ext)
+        {
+            printf("Invalid extension\n");
+            return 2;
+        }
+        ext++;
 #ifdef HAVE_REMOTE_LCD
-        char *ext = strrchr(argv[filearg], '.');
-        if (strcmp(ext, "rwps") == 0 || strcmp(ext, "rsbs") == 0 || strcmp(ext, "rfms") == 0)
+        if (!strcmp(ext, "rwps") || !strcmp(ext, "rsbs") || !strcmp(ext, "rfms"))
             screen = SCREEN_REMOTE;
         else
+#endif
+        if (!strcmp(ext, "wps")  || !strcmp(ext, "sbs")  || !strcmp(ext, "fms"))
             screen = SCREEN_MAIN;
-#endif    
+        else
+        {
+            printf("Invalid extension\n");
+            return 2;
+        }
         wps_screen = &screens[screen];
 
-        res = skin_data_load(screen, &wps, argv[filearg], true);
+        res = skin_data_load(screen, &wps, name, true);
 
         if (!res) {
             printf("WPS parsing failure\n");
@@ -313,7 +326,6 @@ int main(int argc, char **argv)
         printf("WPS parsed OK\n\n");
         if (wps_verbose_level>2)
             skin_debug_tree(SKINOFFSETTOPTR(skin_buffer, wps.tree));
-        filearg++;
     }
     return 0;
 }
