@@ -13,7 +13,6 @@ dsp/dsp_sample_input.c
 dsp/dsp_sample_output.c
 dsp/eq.c
 dsp/lin_resample.c
-dsp/hermite_resample.c
 dsp/pga.c
 # ifdef HAVE_PITCHCONTROL
 dsp/tdspeed.c

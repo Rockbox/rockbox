@@ -30,12 +30,14 @@
  * Linear interpolation resampling that introduces a one sample delay because
  * of our inability to look into the future at the end of a frame.
  */
+ 
+#define HERMITE 1
 
 #if 0 /* Set to '1' to enable debug messages */
 #include <debug.h>
 #else
-#undef DEBUGF
-#define DEBUGF(...)
+//#undef DEBUGF
+//#define DEBUGF(...)
 #endif
 
 #define RESAMPLE_BUF_COUNT 192 /* Per channel, per DSP */
@@ -46,12 +48,18 @@ static int32_t resample_out_bufs[3][RESAMPLE_BUF_COUNT] IBSS_ATTR;
 /* Data for each resampler on each DSP */
 static struct resample_data
 {
-    uint32_t delta;          /* 00h: Phase delta for each step */
-    uint32_t phase;          /* 04h: Current phase [pos16|frac16] */
-    int32_t  last_sample[2]; /* 08h: Last samples for interpolation (L+R) */
-                             /* 10h */
-    int32_t  frequency;      /* Virtual samplerate */
-    struct dsp_config *dsp;  /* The DSP for this resampler */
+    uint32_t delta;         /* 00h: Phase delta for each step in s15.16*/
+    uint32_t phase;         /* 04h: Current phase [pos16|frac16] */
+#if HERMITE
+    int32_t  history[2][3]; /* 08h: Last samples for interpolation (L+R) 
+                                    0 = oldest, 2 = newest */
+                            /* 20h */
+#else
+    int32_t  history[2][1]; /* 08h: Last samples for interpolation (L+R) */
+                            /* 10h */
+#endif
+    int32_t  frequency;          /* Virtual samplerate */
+    struct dsp_config *dsp;      /* The DSP for this resampler */
     struct dsp_buffer resample_buf; /* Buffer descriptor for resampled data */
     int32_t *resample_buf_arr[2]; /* Actual output data pointers */
 } resample_data[DSP_COUNT] IBSS_ATTR;
@@ -60,11 +68,13 @@ static struct resample_data
 int lin_resample_resample(struct resample_data *data, struct dsp_buffer *src,
                           struct dsp_buffer *dst);
 
+int hermite_resample_resample(struct resample_data *data, struct dsp_buffer *src,
+                          struct dsp_buffer *dst);
+
 static void lin_resample_flush_data(struct resample_data *data)
 {
     data->phase = 0;
-    data->last_sample[0] = 0;
-    data->last_sample[1] = 0;
+    memset(data->history, 0, sizeof (data->history));
 }
 
 static void lin_resample_flush(struct dsp_proc_entry *this)
@@ -85,13 +95,104 @@ static bool lin_resample_new_delta(struct resample_data *data,
     if (frequency == NATIVE_FREQUENCY)
     {
         /* NOTE: If fully glitch-free transistions from no resampling to
-           resampling are desired, last_sample history should be maintained
-           even when not resampling. */
+           resampling are desired, history should be maintained even when
+           not resampling. */
         lin_resample_flush_data(data);
         return false;
     }
 
     return true;
+}
+
+int hermite_resample_resample(struct resample_data *data, struct dsp_buffer *src,
+                          struct dsp_buffer *dst)
+{
+    int ch = src->format.num_channels - 1;
+    uint32_t count = MIN(src->remcount, 0x8000);
+    uint32_t delta = data->delta;
+    uint32_t phase, pos;
+    int32_t *d;
+    int x0, x1, x2, x3, frac, acc0;
+        
+    //DEBUGF("count: %d delta: %d, phase: %d (%d)\n",count, delta,phase >> 16, phase);
+    do
+    {
+        const int32_t *s = src->p32[ch];
+
+        d = dst->p32[ch];
+        int32_t *dmax = d + dst->bufcount;
+
+        /* Restore state */
+        phase = data->phase;
+        pos = phase >> 16;
+        pos = MIN(pos, count);
+
+        if (pos < count)
+        {
+            while (1)
+            {
+                if (pos < 3)
+                { 
+                    x3 = data->history[ch][pos+0];
+                    x2 = pos < 2 ? data->history[ch][pos+1] : s[pos-2];  
+                    x1 = pos < 1 ? data->history[ch][pos+2] : s[pos-1];
+                }
+                else
+                {
+                     x3 = s[pos-3];
+                     x2 = s[pos-2];  
+                     x1 = s[pos-1];  
+                }  
+
+                x0 = s[pos];
+
+                frac = (phase & 0xffff) << 15;
+                //DEBUGF("pos: %d phase: %d frac:  %d\n",pos, phase, frac);
+
+                /* 4-tap Hermite, using Farrow structure */
+                /*acc0 = (3 * (x2 - x1) + x0 - x3) >> 1;
+                acc0 = FRACMUL(acc0, frac);
+                acc0 += 2 * x1 + x3 - ((5 * x2 + x0) >> 1);
+                acc0 = FRACMUL(acc0, frac);
+                acc0 += (x1 - x3) >> 1;
+                acc0 = FRACMUL(acc0, frac);
+                acc0 += x2;*/
+				/*4-point, 3rd-order Hermite (x-form)*/	
+				/*polynomial coefficients*/
+				int32_t c1 = (x1-x3)>>1; 
+				int32_t c2 = x3 + x1<<1 - (x0+5*x2)>>1; 
+				int32_t c3 = ((x0-x3) + 3*(x2-x1))>>1; 
+				/*evaluate polynomial at time 'frac'*/
+				acc0 = FRACMUL(c3,frac)+c2;
+				acc0 = FRACMUL(acc0,frac)+c1;
+				acc0 = FRACMUL(acc0,frac)+x2;	
+
+                *d++ = acc0;
+
+                phase += delta;
+                pos = phase >> 16;
+
+                if (pos >= count || d >= dmax)
+                    break;
+            }
+
+            pos = MIN(pos, count);
+        }
+
+        /* Save delay samples for next time. Must do this even if pos was
+         * clamped before loop in order to keep record up to date. */
+        data->history[ch][0] = pos < 3 ? data->history[ch][pos+0] : s[pos-3];
+        data->history[ch][1] = pos < 2 ? data->history[ch][pos+1] : s[pos-2];
+        data->history[ch][2] = pos < 1 ? data->history[ch][pos+2] : s[pos-1]; 
+    }
+    while (--ch >= 0);
+
+    /* Wrap phase accumulator back to start of next frame. */
+    data->phase = phase - (pos << 16);
+    
+    dst->remcount = d - dst->p32[0];
+    DEBUGF("remcount: %d, pos %d\n", dst->remcount, pos);
+    return pos;
 }
 
 #if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
@@ -105,6 +206,8 @@ int lin_resample_resample(struct resample_data *data, struct dsp_buffer *src,
     uint32_t phase, pos;
     int32_t *d;
 
+    DEBUGF("count: %d delta: %d, phase: %d (%d)\n",count, delta.phase >> 16, phase);
+
     do
     {
         const int32_t *s = src->p32[ch];
@@ -116,12 +219,13 @@ int lin_resample_resample(struct resample_data *data, struct dsp_buffer *src,
         pos = phase >> 16;
         pos = MIN(pos, count);
 
-        int32_t last = pos > 0 ? s[pos - 1] : data->last_sample[ch];
+        int32_t last = pos > 0 ? s[pos - 1] : data->history[ch][0];
 
         if (pos < count)
         {
             while (1)
             {
+                DEBUGF("phase: %d frac:  %d\n", phase, (phase & 0xffff) << 15);
                 *d++ = last + FRACMUL((phase & 0xffff) << 15, s[pos] - last);
                 phase += delta;
                 pos = phase >> 16;
@@ -139,16 +243,17 @@ int lin_resample_resample(struct resample_data *data, struct dsp_buffer *src,
                 last = s[pos - 1];
             }
         }
-
-        data->last_sample[ch] = last;
+      
+        DEBUGF("pos: %d count: %d\n", pos, count);
+        data->history[ch][0] = last;
     }
     while (--ch >= 0);
 
     /* Wrap phase accumulator back to start of next frame. */
     data->phase = phase - (pos << 16);
-
+    
     dst->remcount = d - dst->p32[0];
-
+    DEBUGF("remcount: %d, pos %d\n", dst->remcount, pos);
     return pos;
 }
 #endif /* CPU */
@@ -176,7 +281,11 @@ static void lin_resample_process(struct dsp_proc_entry *this,
     {
         dst->bufcount = RESAMPLE_BUF_COUNT;
 
+#if HERMITE
+        int consumed = hermite_resample_resample(data, src, dst);
+#else 
         int consumed = lin_resample_resample(data, src, dst);
+#endif
 
         /* Advance src by consumed amount */
         if (consumed > 0)
@@ -211,7 +320,9 @@ static void lin_resample_new_format(struct dsp_proc_entry *this,
     if (src->format.frequency != frequency)
     {
         DEBUGF("  DSP_PROC_RESAMPLE- new delta\n");
+        DEBUGF("..._resample_new_delta in\n");
         active = lin_resample_new_delta(data, src);
+        DEBUGF("..._resample_new_delta out\n");
         dsp_proc_activate(dsp, DSP_PROC_RESAMPLE, active);
     }
 
