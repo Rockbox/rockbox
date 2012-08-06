@@ -63,6 +63,26 @@ static const unsigned short lin_brightness[] = {
 };
 #endif
 
+void set_pwm_frequency(int frequency)
+{
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    if (frequency == CPUFREQ_NORMAL)
+    {
+        PWMT0_LRC = lin_brightness[MAX_BRIGHTNESS_SETTING]>>1;
+        PWMT0_HRC = lin_brightness[brightness]>>1;
+    }
+    else
+#else
+    (void)frequency;
+#endif
+    {
+        PWMT0_LRC = lin_brightness[MAX_BRIGHTNESS_SETTING];
+        PWMT0_HRC = lin_brightness[brightness];
+    }
+
+    PWMT0_CNTR = 0x00;
+}
+
 bool _backlight_init(void)
 {
     /* configure PD4 as output */
@@ -78,13 +98,8 @@ bool _backlight_init(void)
     PWMT0_CTRL = (0<<9) | (1<<7);
 
     /* set pwm frequency */
-    /* (apb_freq/pwm_freq)/pwm_div = (50 000 000/pwm_freq)/2 */
-    PWMT0_LRC = lin_brightness[MAX_BRIGHTNESS_SETTING];
-    PWMT0_HRC = lin_brightness[brightness];
+    set_pwm_frequency(cpu_frequency);
 
-    /* reset counter */
-    PWMT0_CNTR = 0x00;
-    
     /* DIV/2, PWM output enable, PWM timer enable */
     PWMT0_CTRL = (0<<9) | (1<<3) | (1<<0);
 
@@ -124,5 +139,9 @@ void _backlight_off(void)
 void _backlight_set_brightness(int val)
 {
     brightness = val & 0x1f;
-    PWMT0_HRC = lin_brightness[brightness];
+
+    if (cpu_frequency == CPUFREQ_MAX)
+        PWMT0_HRC = lin_brightness[brightness];
+    else
+        PWMT0_HRC = lin_brightness[brightness]>>1;
 }

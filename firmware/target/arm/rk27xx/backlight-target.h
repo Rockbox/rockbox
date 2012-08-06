@@ -26,4 +26,5 @@ void _backlight_on(void);
 void _backlight_off(void);
 void _backlight_set_brightness(int brightness);
 
+void set_pwm_frequency(int frequency);
 #endif
