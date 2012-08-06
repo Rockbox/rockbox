@@ -1889,8 +1889,7 @@ static bool skin_load_fonts(struct wps_data *data)
 
         if (font->id < 0)
         {
-            DEBUGF("Unable to load font %d: '%s.fnt'\n",
-                    font_id, font->name);
+            DEBUGF("Unable to load font %d: '%s'\n", font_id, font->name);
             font->name = NULL; /* to stop trying to load it again if we fail */
             success = false;
             continue;
