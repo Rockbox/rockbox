@@ -174,7 +174,7 @@
 #define STORAGE_NEEDS_ALIGN
 
 /* Define this if you have adjustable CPU frequency */
-/* #define HAVE_ADJUSTABLE_CPU_FREQ */
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #define RKW_FORMAT
 #define BOOTFILE_EXT "rkw"

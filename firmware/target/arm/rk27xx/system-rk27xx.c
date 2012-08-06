@@ -231,3 +231,58 @@ void commit_discard_dcache_range (const void *base, unsigned int size)
         opcode += 32;
     }
 }
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+static inline void set_sdram_timing(int ahb_freq)
+{
+    MCSDR_T_REF = (125*ahb_freq/1000000) >> 3;
+    MCSDR_T_RFC = (64*ahb_freq/1000000)/1000;
+}
+
+void set_cpu_frequency(long frequency)
+{
+    if (cpu_frequency == frequency)
+        return;
+
+    set_sdram_timing(12000000);
+
+    if (frequency == CPUFREQ_MAX)
+    {
+        /* PLL set to 200 Mhz
+         * PLL:ARM = 1:1
+         * ARM:AHB = 2:1
+         * AHB:APB = 2:1
+         */
+        SCU_DIVCON1 = (SCU_DIVCON1 &~ 0x1f) | (1<<3)|1;
+        SCU_PLLCON1 = ((1<<24)|(1<<23)|(5<<16)|(49<<4)); /*((24/6)*50)/1*/
+
+        /* wait for PLL lock ~0.3 ms */
+        while (!(SCU_STATUS & 1));
+
+        /* leave SLOW mode */
+        SCU_DIVCON1 &= ~1;
+
+        set_sdram_timing(CPUFREQ_MAX/2);
+    }
+    else
+    {
+        /* PLL set to 100 MHz
+         * PLL:ARM = 2:1
+         * ARM:AHB = 1:1
+         * AHB:APB = 1:1
+         */
+        SCU_DIVCON1 = (SCU_DIVCON1 & ~0x1f) | (1<<2)|1;
+        SCU_PLLCON1 = ((1<<24)|(1<<23)|(5<<16)|(49<<4)|(1<<1)); /*((24/6)*50)/2*/
+
+        /* wait for PLL lock ~0.3 ms */
+        while (!(SCU_STATUS & 1));
+
+        /* leave SLOW mode */
+        SCU_DIVCON1 &= ~1;
+
+        set_sdram_timing(CPUFREQ_NORMAL);
+    }
+
+    cpu_frequency = frequency;
+}
+#endif
