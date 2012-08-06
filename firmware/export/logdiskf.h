@@ -29,8 +29,6 @@
 
 void init_logdiskf(void);
 
-#ifndef __PCTOOL__
-
 /*large memory devices spin up the disk much less often*/
 #if MEMORYSIZE > 32
  #define MAX_LOGDISKF_SIZE 8192
@@ -42,8 +40,6 @@ void init_logdiskf(void);
 
 extern unsigned char logdiskfbuffer[MAX_LOGDISKF_SIZE];
 extern int logfdiskindex;
-#endif /* __PCTOOL__ */
-
 
 #define LOGDISK_LEVEL 1
 
@@ -78,4 +74,12 @@ void _logdiskf(const char* file, const char level,
 
 #endif /* !ROCKBOX_HAS_LOGDISKF */
 
+#else
+
+#define ERRORF DEBUGF
+#define WARNF DEBUGF
+#define NOTEF DEBUGF
+
 #endif /* LOGDISKF_H */
+    
+    

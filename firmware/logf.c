@@ -320,5 +320,4 @@ void init_logdiskf()
 {
     register_storage_idle_func(flush_buffer);
 }
-
 #endif
