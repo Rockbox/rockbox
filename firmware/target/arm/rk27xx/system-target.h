@@ -48,7 +48,8 @@ static inline void commit_dcache(void) {}
 void commit_discard_dcache(void);
 void commit_discard_idcache(void);
 
-#define CPUFREQ_NORMAL 200000000
-#define CPUFREQ_MAX    200000000
+#define CPUFREQ_DEFAULT  50000000
+#define CPUFREQ_NORMAL   50000000
+#define CPUFREQ_MAX     200000000
 
 #endif /* SYSTEM_TARGET_H */
