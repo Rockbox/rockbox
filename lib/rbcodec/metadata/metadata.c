@@ -233,6 +233,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* KSS (MSX computer KSS Music File) */
     [AFMT_KSS] =
         AFMT_ENTRY("KSS", "kss", NULL, get_kss_metadata,   "kss\0"),
+    /* Opus */
+    [AFMT_OPUS] =
+        AFMT_ENTRY("Opus", "opus", NULL, get_ogg_metadata,   "opus\0"),
 #endif
 };
 
