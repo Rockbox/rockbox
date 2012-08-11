@@ -12999,3 +12999,31 @@
     *: "Constrain Auto-Change"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Select one or more directories"
+  </dest>
+  <voice>
+    *: "Select one or more directories"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Select directories to scan"
+  </dest>
+  <voice>
+    *: "Select directories to scan"
+  </voice>
+</phrase>
