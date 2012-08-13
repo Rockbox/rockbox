@@ -300,11 +300,12 @@ static enum themable_icons folder_get_icon(int selected_item, void * data)
 static int folder_action_callback(int action, struct gui_synclist *list)
 {
     struct folder *root = (struct folder*)list->data;
+    struct folder *parent;
+    struct child *this = find_index(root, list->selected_item, &parent), *child;
+    int i;
 
     if (action == ACTION_STD_OK)
     {
-        struct folder *parent;
-        struct child *this = find_index(root, list->selected_item, &parent);
         switch (this->state)
         {
             case EXPANDED:
@@ -321,11 +322,49 @@ static int folder_action_callback(int action, struct gui_synclist *list)
                 break;
             case EACCESS:
                 /* cannot open, do nothing */
-                break;
+                return action;
         }
         list->nb_items = count_items(root);
         return ACTION_REDRAW;
     }
+    else if (action == ACTION_STD_CONTEXT)
+    {
+        switch (this->state)
+        {
+            case EXPANDED:
+                for (i = 0; i < this->folder->children_count; i++)
+                {
+                    child = &this->folder->children[i];
+                    if (child->state == SELECTED ||
+                        child->state == EXPANDED)
+                        child->state = COLLAPSED;
+                    else if (child->state == COLLAPSED)
+                        child->state = SELECTED;
+                }
+                break;
+            case SELECTED:
+            case COLLAPSED:
+                if (this->folder == NULL)
+                    this->folder = load_folder(parent, this->name);
+                this->state = this->folder ? (this->folder->children_count == 0 ?
+                        SELECTED : EXPANDED) : EACCESS;
+                if (this->state == EACCESS)
+                    break;
+                for (i = 0; i < this->folder->children_count; i++)
+                {
+                    child = &this->folder->children[i];
+                    child->state = SELECTED;
+                }
+                break;
+            case EACCESS:
+                /* cannot open, do nothing */
+                return action;
+        }
+        list->nb_items = count_items(root);
+        return ACTION_REDRAW;
+    }
+            
+        
     return action;
 }
 
