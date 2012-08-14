@@ -103,9 +103,13 @@ static char* get_full_path(struct folder *start)
 {
     static char buffer[MAX_PATH];
 
-    buffer[0] = '\0';
-
-    get_full_path_r(start, buffer);
+    if (strcmp(start->name, "/"))
+    {
+        buffer[0] = 0;
+        get_full_path_r(start, buffer);
+    }
+    else /* get_full_path_r() does the wrong thing for / */
+        return "/";
 
     return buffer;
 }
@@ -447,8 +451,12 @@ static void save_folders_r(struct folder *root, char* dst, size_t maxlen)
                 snprintf(buffer_front, buffer_end - buffer_front,
                         "%s:", get_full_path(this->folder));
             else
+            {
+                char *p = get_full_path(root);
                 snprintf(buffer_front, buffer_end - buffer_front,
-                        "%s/%s:", get_full_path(root), this->name);
+                        "%s/%s:", strcmp(p, "/") ? p : "",
+                                  strcmp(this->name, "/") ? this->name : "");
+            }
             strlcat(dst, buffer_front, maxlen);
         }
         else if (this->state == EXPANDED)
