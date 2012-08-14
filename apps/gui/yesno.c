@@ -169,10 +169,9 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
         screens[i].stop_scroll();
         gui_yesno_draw(&(yn[i]));
     }
-
     /* make sure to eat any extranous keypresses */
-    action_wait_for_release();
-
+    while (get_action(CONTEXT_STD+99, TIMEOUT_NOBLOCK))
+        action_wait_for_release();
     while (result==-1)
     {
         /* Repeat the question every 5secs (more or less) */
@@ -206,7 +205,6 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                 result=YESNO_YES;
                 break;
             case ACTION_NONE:
-            case ACTION_UNKNOWN:
             case SYS_CHARGER_DISCONNECTED:
             case SYS_BATTERY_UPDATE:
                 /* ignore some SYS events that can happen */
@@ -235,7 +233,6 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
         screens[i].scroll_stop(yn[i].vp);
         viewportmanager_theme_undo(i, true);
     }
-
     return(result);
 }
 
