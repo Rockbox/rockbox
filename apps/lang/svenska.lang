@@ -263,7 +263,7 @@
     *: "SPELA = Ja"
     cowond2*: "MENY, eller överst-höger = Ja"
     iriverh100,iriverh120,iriverh300: "NAVI = Ja"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "VÄLJ = Ja"
+    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "VÄLJ = Ja"
     mrobe500: "SPELA, PÅ/AV, eller överst-höger = Ja"
     archosplayer: "SPELA/STOPP"
     vibe500: "OK = Ja"
@@ -3962,7 +3962,7 @@
     rtc: "PÅ = Ställ"
     mrobe500: "HJÄRTA = Ställ"
     iriverh100,iriverh120,iriverh300: "NAVI = Ställ"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "VÄLJ = Ställ"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "VÄLJ = Ställ"
     gogearsa9200: "SPELA = Ställ"
     vibe500: "OK = Ställ"
     mpiohd300: "ENTER = Ställ"
@@ -12384,15 +12384,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D-förbättring"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D-förbättring"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D-förbättring"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D-förbättring"
   </voice>
 </phrase>
 <phrase>
@@ -12782,7 +12782,7 @@
 </phrase>
 <phrase>
   id: LANG_SLEEP_TIMER_DURATION
-  desc: default sleep timer duration in minutes (unused in UI)
+  desc: default sleep timer duration in minutes
   user: core
   <source>
     *: "Default Sleep Timer Duration"
@@ -13003,5 +13003,33 @@
   <voice>
     *: none
     swcodec: "Anpassad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Välj en eller flera kataloger"
+  </dest>
+  <voice>
+    *: "Välj en eller flera kataloger"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Välj kataloger att söka igenom"
+  </dest>
+  <voice>
+    *: "Välj kataloger att söka igenom"
   </voice>
 </phrase>
