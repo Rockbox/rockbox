@@ -189,7 +189,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
             case ACTION_TOUCHSCREEN:
                 {
                     short int x, y;
-                    if (action_get_touchscreen_press_in_vp(&x, &y, yn[0].vp) == BUTTON_TOUCHSCREEN)
+                    if (action_get_touchscreen_press_in_vp(&x, &y, yn[0].vp) == BUTTON_REL)
                     {
                         if (y > yn[0].vp->height/2)
                         {
