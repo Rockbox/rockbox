@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASH///yk\u003d",
+        "filename": "firmware/target/arm/rk27xx/lcdif-rk27xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-08-17T07:39:21Z",
+      "side": 1,
+      "message": "This line alone gives ~2x speedup when changed on HEAD\nbuffered writes give another ~2x boost",
+      "revId": "d6864572d7c0e0cb0dd646ff2c14189264f03c7e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
