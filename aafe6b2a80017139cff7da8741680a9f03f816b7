@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASH///yU\u003d",
+        "filename": "firmware/target/arm/rk27xx/system-rk27xx.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2012-08-17T11:24:50Z",
+      "side": 1,
+      "message": "SCU_DIVCON1 \u003d (SCU_DIVCON1 \u0026 ~((0xff\u003c\u003c10)|(0x1f)) ) | (49\u003c\u003c10) | (1\u003c\u003c3)|1;\n\nThis should fix ADC frequency.",
+      "revId": "aafe6b2a80017139cff7da8741680a9f03f816b7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASH///yQ\u003d",
+        "filename": "firmware/target/arm/rk27xx/system-rk27xx.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2012-08-17T11:24:50Z",
+      "side": 1,
+      "message": "SCU_DIVCON1 \u003d (SCU_DIVCON1 \u0026 ~((0xff\u003c\u003c10)|(0x1f)) ) | (24\u003c\u003c10) | (1\u003c\u003c3) | (1\u003c\u003c2) | 1;\n\nThis should fix ADC frequency.",
+      "revId": "aafe6b2a80017139cff7da8741680a9f03f816b7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
