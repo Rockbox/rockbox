@@ -123,7 +123,8 @@ enum imx233_i2c_error_t
     I2C_TIMEOUT = -2,
     I2C_MASTER_LOSS = -3,
     I2C_NO_SLAVE_ACK = -4,
-    I2C_SLAVE_NAK = -5
+    I2C_SLAVE_NAK = -5,
+    I2C_BUFFER_FULL = -6,
 };
 
 void imx233_i2c_init(void);

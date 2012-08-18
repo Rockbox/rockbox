@@ -27,6 +27,26 @@
 #include "dma-imx233.h"
 #include "i2c-imx233.h"
 #include "pinctrl-imx233.h"
+#include "string.h"
+
+/**
+ * Driver Architecture:
+ * The driver has two interfaces: the good'n'old i2c_* api and a more
+ * advanced one specific to the imx233 dma architecture. The i2c_* api is
+ * implemented with the imx233_i2c_* one.
+ * Since each i2c transfer must be split into several dma transfers and we
+ * cannot do dynamic allocation, we allow for at most I2C_NR_STAGES stages.
+ * A typical read memory transfer will require 3 stages thus 4 is safe:
+ * - one with start, device address and memory address
+ * - one with repeated start and device address
+ * - one with data read and stop
+ * To make the interface easier to use and to handle the DMA/cache related
+ * issues, all the data transfers are done in a statically allocated buffer
+ * which is managed by the driver. The driver will ensure that all transfers
+ * are cache aligned and will copy back the data to user buffers at the end.
+ * The I2C_BUFFER_SIZE define controls the size of the buffer. All transfers
+ * should probably fit within 512 bytes.
+ */
 
 /* Used for DMA */
 struct i2c_dma_command_t
@@ -34,18 +54,24 @@ struct i2c_dma_command_t
     struct apb_dma_command_t dma;
     /* PIO words */
     uint32_t ctrl0;
+    /* copy buffer copy */
+    void *src;
+    void *dst;
     /* padded to next multiple of cache line size (32 bytes) */
-    uint32_t pad[4];
+    uint32_t pad[2];
 } __attribute__((packed)) CACHEALIGN_ATTR;
 
 __ENSURE_STRUCT_CACHE_FRIENDLY(struct i2c_dma_command_t)
 
 #define I2C_NR_STAGES   4
+#define I2C_BUFFER_SIZE 512
 /* Current transfer */
 static int i2c_nr_stages;
 static struct i2c_dma_command_t i2c_stage[I2C_NR_STAGES];
 static struct mutex i2c_mutex;
 static struct semaphore i2c_sema;
+static uint8_t i2c_buffer[I2C_BUFFER_SIZE] CACHEALIGN_ATTR;
+static uint32_t i2c_buffer_end; /* current end */
 
 void INT_I2C_DMA(void)
 {
@@ -92,12 +118,34 @@ void imx233_i2c_begin(void)
     /* wakeup */
     __REG_CLR(HW_I2C_CTRL0) = __BLOCK_CLKGATE;
     i2c_nr_stages = 0;
+    i2c_buffer_end = 0;
 }
 
 enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, unsigned size, bool stop)
 {
     if(i2c_nr_stages == I2C_NR_STAGES)
         return I2C_ERROR;
+    /* align buffer end on cache boundary */
+    uint32_t start_off = CACHEALIGN_UP(i2c_buffer_end);
+    uint32_t end_off = start_off + size;
+    if(end_off > I2C_BUFFER_SIZE)
+    {
+        panicf("die");
+        return I2C_BUFFER_FULL;
+    }
+    i2c_buffer_end = end_off;
+    if(transmit)
+    {
+        /* copy data to buffer */
+        memcpy(i2c_buffer + start_off, buffer, size);
+    }
+    else
+    {
+        /* record pointers for finalization */
+        i2c_stage[i2c_nr_stages].src = i2c_buffer + start_off;
+        i2c_stage[i2c_nr_stages].dst = buffer;
+    }
+    
     if(i2c_nr_stages > 0)
     {
         i2c_stage[i2c_nr_stages - 1].dma.next = &i2c_stage[i2c_nr_stages].dma;
@@ -105,7 +153,7 @@ enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, 
         if(!start)
             i2c_stage[i2c_nr_stages - 1].ctrl0 |= HW_I2C_CTRL0__RETAIN_CLOCK;
     }
-    i2c_stage[i2c_nr_stages].dma.buffer = buffer;
+    i2c_stage[i2c_nr_stages].dma.buffer = i2c_buffer + start_off;
     i2c_stage[i2c_nr_stages].dma.next = NULL;
     i2c_stage[i2c_nr_stages].dma.cmd =
         (transmit ? HW_APB_CHx_CMD__COMMAND__READ : HW_APB_CHx_CMD__COMMAND__WRITE) |
@@ -119,6 +167,18 @@ enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, 
         (stop ? HW_I2C_CTRL0__POST_SEND_STOP : 0) |
         HW_I2C_CTRL0__MASTER_MODE;
     i2c_nr_stages++;
+    return I2C_SUCCESS;
+}
+
+static enum imx233_i2c_error_t imx233_i2c_finalize(void)
+{
+    discard_dcache_range(i2c_buffer, I2C_BUFFER_SIZE);
+    for(int i = 0; i < i2c_nr_stages; i++)
+    {
+        struct i2c_dma_command_t *c = &i2c_stage[i];
+        if(__XTRACT_EX(c->dma.cmd, HW_APB_CHx_CMD__COMMAND) == HW_APB_CHx_CMD__COMMAND__WRITE)
+            memcpy(c->dst, c->src, __XTRACT_EX(c->dma.cmd, HW_APB_CHx_CMD__XFER_COUNT));
+    }
     return I2C_SUCCESS;
 }
 
@@ -147,7 +207,7 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
     else if(HW_I2C_CTRL1 & HW_I2C_CTRL1__EARLY_TERM_IRQ)
         ret = I2C_SLAVE_NAK;
     else
-        ret = I2C_SUCCESS;
+        ret = imx233_i2c_finalize();
     /* sleep */
     __REG_SET(HW_I2C_CTRL0) = __BLOCK_CLKGATE;
     mutex_unlock(&i2c_mutex);
@@ -162,7 +222,7 @@ int i2c_write(int device, const unsigned char* buf, int count)
 {
     uint8_t addr = device;
     imx233_i2c_begin();
-    imx233_i2c_add(true, true, &addr, 1, false); /* start + addr */
+    imx233_i2c_add(true, true, &addr, 1, false); /* start + dev addr */
     imx233_i2c_add(false, true, (void *)buf, count, true); /* data + stop */
     return imx233_i2c_end(TIMEOUT_BLOCK);
 }
@@ -171,7 +231,7 @@ int i2c_read(int device, unsigned char* buf, int count)
 {
     uint8_t addr = device | 1;
     imx233_i2c_begin();
-    imx233_i2c_add(true, true, &addr, 1, false); /* start + addr */
+    imx233_i2c_add(true, true, &addr, 1, false); /* start + dev addr */
     imx233_i2c_add(false, false, buf, count, true); /* data + stop */
     return imx233_i2c_end(TIMEOUT_BLOCK);
 }
@@ -181,8 +241,8 @@ int i2c_readmem(int device, int address, unsigned char* buf, int count)
     uint8_t start[2] = {device, address};
     uint8_t addr_rd = device | 1;
     imx233_i2c_begin();
-    imx233_i2c_add(true, true, start, 2, false); /* start + addr + addr */
-    imx233_i2c_add(true, true, &addr_rd, 1, false); /* start + addr */
+    imx233_i2c_add(true, true, start, 2, false); /* start + dev addr + addr */
+    imx233_i2c_add(true, true, &addr_rd, 1, false); /* start + dev addr */
     imx233_i2c_add(false, false, buf, count, true); /* data + stop */
     return imx233_i2c_end(TIMEOUT_BLOCK);
 }
@@ -191,7 +251,7 @@ int i2c_writemem(int device, int address, const unsigned char* buf, int count)
 {
     uint8_t start[2] = {device, address};
     imx233_i2c_begin();
-    imx233_i2c_add(true, true, start, 2, false); /* start + addr + addr */
+    imx233_i2c_add(true, true, start, 2, false); /* start + dev addr + addr */
     imx233_i2c_add(false, true, (void *)buf, count, true); /* data + stop */
     return imx233_i2c_end(TIMEOUT_BLOCK);
 }
