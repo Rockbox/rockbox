@@ -511,11 +511,8 @@ target/arm/imx233/clkctrl-imx233.c
 target/arm/imx233/system-imx233.c
 target/arm/imx233/timrot-imx233.c
 target/arm/imx233/kernel-imx233.c
-# if (CONFIG_STORAGE & STORAGE_SD)
-target/arm/imx233/sd-imx233.c
-# endif
-# if (CONFIG_STORAGE & STORAGE_MMC)
-target/arm/imx233/mmc-imx233.c
+# if (CONFIG_STORAGE & (STORAGE_SD | STORAGE_MMC))
+target/arm/imx233/sdmmc-imx233.c
 # endif
 target/arm/imx233/partitions-imx233.c
 target/arm/imx233/ssp-imx233.c

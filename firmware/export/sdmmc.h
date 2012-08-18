@@ -39,13 +39,13 @@ typedef struct
     unsigned int r2w_factor;
     unsigned long numblocks;        /* size in flash blocks */
     unsigned int blocksize;         /* block size in bytes */
+    unsigned long rca;              /* RCA register */
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
     unsigned char bitrate_register;
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_SD)
-    unsigned long rca;               /* RCA register */
     unsigned int current_bank;
 #endif
 } tCardInfo;
