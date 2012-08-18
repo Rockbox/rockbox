@@ -27,6 +27,9 @@
 #include "lcd.h"
 #include "string.h"
 
+// statistics about unaligned transfers
+static int apb_nr_unaligned[32];
+
 void imx233_dma_init(void)
 {
     /* Enable APHB and APBX */
@@ -142,7 +145,7 @@ bool imx233_dma_is_channel_error_irq(unsigned chan)
 /* Commit and/or discard all DMA descriptors and buffers pointed by them,
  * handle circular lists. At the same time, convert virtual pointers to
  * real ones */
-static void imx233_dma_commit_and_discard(struct apb_dma_command_t *cmd)
+static void imx233_dma_commit_and_discard(unsigned chan, struct apb_dma_command_t *cmd)
 {
     /* We handle circular descriptors by using unused bits:
      * bits 8-11 are not used by the hardware so we first go through the whole
@@ -162,6 +165,8 @@ static void imx233_dma_commit_and_discard(struct apb_dma_command_t *cmd)
         /* host > device: commit and discard */
         else if(op == HW_APB_CHx_CMD__COMMAND__READ)
             commit_discard_dcache_range(cur->buffer, sz);
+        if((uint32_t)cur->buffer % CACHEALIGN_SIZE)
+            apb_nr_unaligned[chan]++;
         /* Virtual to physical buffer pointer conversion */
         cur->buffer = PHYSICAL_ADDR(cur->buffer);
         /* chain ? */
@@ -195,7 +200,7 @@ static void imx233_dma_commit_and_discard(struct apb_dma_command_t *cmd)
 
 void imx233_dma_start_command(unsigned chan, struct apb_dma_command_t *cmd)
 {
-    imx233_dma_commit_and_discard(cmd);
+    imx233_dma_commit_and_discard(chan, cmd);
     if(APB_IS_APBX_CHANNEL(chan))
     {
         HW_APBX_CHx_NXTCMDAR(APB_GET_DMA_CHANNEL(chan)) = (uint32_t)PHYSICAL_ADDR(cmd);
@@ -208,16 +213,18 @@ void imx233_dma_start_command(unsigned chan, struct apb_dma_command_t *cmd)
     }
 }
 
-void imx233_dma_wait_completion(unsigned chan)
+int imx233_dma_wait_completion(unsigned chan, unsigned tmo)
 {
+    tmo += current_tick;
     volatile uint32_t *sema;
     if(APB_IS_APBX_CHANNEL(chan))
         sema = &HW_APBX_CHx_SEMA(APB_GET_DMA_CHANNEL(chan));
     else
         sema = &HW_APBH_CHx_SEMA(APB_GET_DMA_CHANNEL(chan));
 
-    while(*sema & HW_APB_CHx_SEMA__PHORE_BM)
+    while(*sema & HW_APB_CHx_SEMA__PHORE_BM && !TIME_AFTER(current_tick, tmo))
         yield();
+    return __XTRACT_EX(*sema, HW_APB_CHx_SEMA__PHORE);
 }
 
 struct imx233_dma_info_t imx233_dma_get_info(unsigned chan, unsigned flags)
@@ -254,6 +261,7 @@ struct imx233_dma_info_t imx233_dma_get_info(unsigned chan, unsigned flags)
         s.int_error = apbx ? HW_APBX_CTRL2 & HW_APBX_CTRL2__CHx_ERROR_IRQ(dmac) :
             HW_APBH_CTRL2 & HW_APBH_CTRL2__CHx_ERROR_IRQ(dmac);
     }
+    s.nr_unaligned = apb_nr_unaligned[chan];
     return s;
 }
 

@@ -154,6 +154,7 @@ struct imx233_dma_info_t
     bool int_enabled;
     bool int_cmdcomplt;
     bool int_error;
+    int nr_unaligned;
 };
 
 #define APBH_DMA_CHANNEL(i)     i
@@ -168,6 +169,7 @@ struct imx233_dma_info_t
 #define APB_NAND(dev)       APBH_DMA_CHANNEL(HW_APBH_NAND(dev))
 
 #define HW_APB_CHx_CMD__COMMAND_BM         0x3
+#define HW_APB_CHx_CMD__COMMAND_BP         0
 #define HW_APB_CHx_CMD__COMMAND__NO_XFER   0
 #define HW_APB_CHx_CMD__COMMAND__WRITE     1
 #define HW_APB_CHx_CMD__COMMAND__READ      2
@@ -180,7 +182,7 @@ struct imx233_dma_info_t
 #define HW_APB_CHx_CMD__SEMAPHORE          (1 << 6)
 #define HW_APB_CHx_CMD__WAIT4ENDCMD        (1 << 7)
 /* An errata advise not to use it */
-//#define HW_APB_CHx_CMD__HALTONTERMINATE    (1 << 8)
+#define HW_APB_CHx_CMD__HALTONTERMINATE    (1 << 8)
 #define HW_APB_CHx_CMD__CMDWORDS_BM         0xf000
 #define HW_APB_CHx_CMD__CMDWORDS_BP         12
 #define HW_APB_CHx_CMD__XFER_COUNT_BM       0xffff0000
@@ -193,8 +195,9 @@ struct imx233_dma_info_t
 #define HW_APB_CHx_SEMA__PHORE_BM           0xff0000
 #define HW_APB_CHx_SEMA__PHORE_BP           16
 
-/* A single descriptor cannot transfer more than 2^16 bytes */
-#define IMX233_MAX_SINGLE_DMA_XFER_SIZE     (1 << 16)
+/* A single descriptor cannot transfer more than 2^16 bytes but because of the
+ * weird 0=64KiB, it's safer to restrict to 2^15 */
+#define IMX233_MAX_SINGLE_DMA_XFER_SIZE     (1 << 15)
 
 void imx233_dma_init(void);
 void imx233_dma_reset_channel(unsigned chan);
@@ -208,7 +211,8 @@ void imx233_dma_clear_channel_interrupt(unsigned chan);
 bool imx233_dma_is_channel_error_irq(unsigned chan);
 /* assume no command is in progress */
 void imx233_dma_start_command(unsigned chan, struct apb_dma_command_t *cmd);
-void imx233_dma_wait_completion(unsigned chan);
+/* return value of the semaphore */
+int imx233_dma_wait_completion(unsigned chan, unsigned tmo);
 /* get some info
  * WARNING: if channel is not freezed, data might not be coherent ! */
 struct imx233_dma_info_t imx233_dma_get_info(unsigned chan, unsigned flags);

@@ -111,17 +111,15 @@ bool dbg_hw_info_dma(void)
         
         lcd_clear_display();
 
-        lcd_putsf(0, 0, "I G F C E name bar apb ahb");
+        lcd_putsf(0, 0, "S C name bar      apb ahb una");
         for(unsigned i = 0; i < ARRAYLEN(dbg_channels); i++)
         {
             struct imx233_dma_info_t info = imx233_dma_get_info(dbg_channels[i].chan, DMA_INFO_ALL);
-            lcd_putsf(0, i + 1, "%c %c %c %c %c %4s %x %x %x",
-                info.int_enabled ? 'i' : ' ',
-                info.gated ? 'g' : ' ',
-                info.freezed ? 'f' : ' ',
-                info.int_cmdcomplt ? 'c' : ' ',
-                info.int_error ? 'e' : ' ',
-                dbg_channels[i].name, info.bar, info.apb_bytes, info.ahb_bytes);
+            lcd_putsf(0, i + 1, "%c %c %4s %8x %3x %3x %3x",
+                info.gated ? 'g' : info.freezed ? 'f' : ' ',
+                !info.int_enabled ? '-' : info.int_error ? 'e' : info.int_cmdcomplt ? 'c' : ' ',
+                dbg_channels[i].name, info.bar, info.apb_bytes, info.ahb_bytes,
+                info.nr_unaligned);
         }
         
         lcd_update();
