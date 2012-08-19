@@ -157,9 +157,23 @@ void SelectiveInstallWidget::startInstall(void)
 {
     qDebug() << "[SelectiveInstallWidget] starting installation";
     saveSettings();
+
     m_installStage = 0;
     if(m_logger != NULL) delete m_logger;
     m_logger = new ProgressLoggerGui(this);
+    QString warning = Utils::checkEnvironment(false);
+    if(!warning.isEmpty())
+    {
+        warning += "<br/>" + tr("Continue with installation?");
+        if(QMessageBox::warning(this, tr("Really continue?"), warning,
+                    QMessageBox::Ok | QMessageBox::Abort, QMessageBox::Abort)
+                == QMessageBox::Abort)
+        {
+            emit installSkipped(true);
+            return;
+        }
+    }
+
     m_logger->show();
     if(!QFileInfo(m_mountpoint).isDir()) {
         m_logger->addItem(tr("Mountpoint is wrong"), LOGERROR);
@@ -359,21 +373,6 @@ void SelectiveInstallWidget::installRockbox(void)
         QString selected = ui.selectedVersion->itemData(ui.selectedVersion->currentIndex()).toString();
         RbSettings::setValue(RbSettings::Build, selected);
         RbSettings::sync();
-
-        QString warning = Utils::checkEnvironment(false);
-        if(!warning.isEmpty())
-        {
-            warning += "<br/>" + tr("Continue with installation?");
-            if(QMessageBox::warning(this, tr("Really continue?"), warning,
-                        QMessageBox::Ok | QMessageBox::Abort, QMessageBox::Abort)
-                    == QMessageBox::Abort)
-            {
-                m_logger->addItem(tr("Aborted!"),LOGERROR);
-                m_logger->setFinished();
-                emit installSkipped(true);
-                return;
-            }
-        }
 
         if(selected == "release") url = ServerInfo::platformValue(m_target,
                 ServerInfo::CurReleaseUrl).toString();

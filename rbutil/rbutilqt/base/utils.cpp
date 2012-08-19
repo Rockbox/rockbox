@@ -299,6 +299,7 @@ QString Utils::findExecutable(QString name)
  */
 QString Utils::checkEnvironment(bool permission)
 {
+    qDebug() << "[Utils] checking environment";
     QString text = "";
 
     // check permission
