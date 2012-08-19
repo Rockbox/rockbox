@@ -290,13 +290,17 @@ void ThemesInstallWindow::show()
     if(windowSelectOnly)
         ui.buttonOk->setText(tr("Select"));
 
-    logger = new ProgressLoggerGui(this);
-    logger->show();
-    logger->addItem(tr("getting themes information ..."), LOGINFO);
+    if(!logger)
+        logger = new ProgressLoggerGui(this);
 
-    connect(logger, SIGNAL(aborted()), this, SLOT(close()));
+    if(ui.listThemes->count() == 0) {
+        logger->show();
+        logger->addItem(tr("getting themes information ..."), LOGINFO);
 
-    downloadInfo();
+        connect(logger, SIGNAL(aborted()), this, SLOT(close()));
+
+        downloadInfo();
+    }
 
 }
 
