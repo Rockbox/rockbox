@@ -562,8 +562,6 @@ static int init_drive(int drive)
         default: ret = 0;
     }
     if(ret < 0)
-        panicf("die %d", ret);
-    if(ret < 0)
         return ret;
 
     /* compute window */
