@@ -21,6 +21,7 @@
 #include "config.h"
 #include "system.h"
 #include "sd.h"
+#include "mmc.h"
 #include "sdmmc.h"
 #include "ssp-imx233.h"
 #include "pinctrl-imx233.h"
@@ -31,6 +32,24 @@
 #include "usb.h"
 #include "debug.h"
 #include "string.h"
+
+/** NOTE For convenience, this drivers relies on the many similar commands
+ * between SD and MMC. The following assumptions are made:
+ * - SD_SEND_STATUS = MMC_SEND_STATUS
+ * - SD_SELECT_CARD = MMC_SELECT_CARD
+ * - SD_TRAN = MMC_TRAN
+ * - MMC_WRITE_MULTIPLE_BLOCK = SD_WRITE_MULTIPLE_BLOCK
+ * - MMC_READ_MULTIPLE_BLOCK = SD_READ_MULTIPLE_BLOCK
+ * - SD_STOP_TRANSMISSION = MMC_STOP_TRANSMISSION
+ * - SD_DESELECT_CARD = MMC_DESELECT_CARD
+ */
+#if SD_SEND_STATUS != MMC_SEND_STATUS || SD_SELECT_CARD != MMC_SELECT_CARD || \
+    SD_TRAN != MMC_TRAN || MMC_WRITE_MULTIPLE_BLOCK != SD_WRITE_MULTIPLE_BLOCK || \
+    MMC_READ_MULTIPLE_BLOCK != SD_READ_MULTIPLE_BLOCK || \
+    SD_STOP_TRANSMISSION != MMC_STOP_TRANSMISSION || \
+    SD_DESELECT_CARD != MMC_DESELECT_CARD
+#error SD/MMC mismatch
+#endif
 
 struct sdmmc_config_t
 {
@@ -115,11 +134,18 @@ struct sdmmc_config_t sdmmc_config[] =
 #define SDMMC_SSP(drive) SDMMC_CONF(drive).ssp
 #define SDMMC_MODE(drive) SDMMC_CONF(drive).mode
 
+/** WARNING
+ * to be consistent with all our SD drivers, the .rca field of sdmmc_card_info
+ * in reality holds (rca << 16) because all command arguments actually require
+ * the RCA is the 16-bit msb. Be careful that this is not the actuall RCA ! */
+
 /* common */
 static unsigned window_start[SDMMC_NUM_DRIVES];
 static unsigned window_end[SDMMC_NUM_DRIVES];
 static uint8_t aligned_buffer[SDMMC_NUM_DRIVES][512] CACHEALIGN_ATTR;
 static tCardInfo sdmmc_card_info[SDMMC_NUM_DRIVES];
+static struct mutex mutex[SDMMC_NUM_DRIVES];
+static int disk_last_activity[SDMMC_NUM_DRIVES];
 
 #define SDMMC_INFO(drive) sdmmc_card_info[drive]
 #define SDMMC_RCA(drive) SDMMC_INFO(drive).rca
@@ -127,19 +153,16 @@ static tCardInfo sdmmc_card_info[SDMMC_NUM_DRIVES];
 /* sd only */
 #if CONFIG_STORAGE & STORAGE_SD
 static long sd_stack[(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
-static struct mutex sd_mutex;
 static const char sd_thread_name[] = "sd";
 static struct event_queue sd_queue;
 static int sd_first_drive;
 static unsigned _sd_num_drives;
-static int _sd_last_disk_activity;
 static int sd_map[SDMMC_NUM_DRIVES]; /* sd->sdmmc map */
 #endif
 /* mmc only */
 #if CONFIG_STORAGE & STORAGE_MMC
 static int mmc_first_drive;
 static unsigned _mmc_num_drives;
-static int _mmc_last_disk_activity;
 static int mmc_map[SDMMC_NUM_DRIVES]; /* mmc->sdmmc map */
 #endif
 
@@ -193,13 +216,13 @@ static void sdmmc_power(int drive, bool on)
 #define MCI_NO_RESP     0
 #define MCI_RESP        (1<<0)
 #define MCI_LONG_RESP   (1<<1)
-#define MCI_ACMD        (1<<2)
+#define MCI_ACMD        (1<<2) /* sd only */
 #define MCI_NOCRC       (1<<3)
 #define MCI_BUSY        (1<<4)
 
-static bool send_sd_cmd(int drive, uint8_t cmd, uint32_t arg, uint32_t flags, uint32_t *resp)
+static bool send_cmd(int drive, uint8_t cmd, uint32_t arg, uint32_t flags, uint32_t *resp)
 {
-    if((flags & MCI_ACMD) && !send_sd_cmd(drive, SD_APP_CMD, SDMMC_RCA(drive), MCI_RESP, resp))
+    if((flags & MCI_ACMD) && !send_cmd(drive, SD_APP_CMD, SDMMC_RCA(drive), MCI_RESP, resp))
         return false;
 
     enum imx233_ssp_resp_t resp_type = (flags & MCI_LONG_RESP) ? SSP_LONG_RESP :
@@ -219,7 +242,7 @@ static bool send_sd_cmd(int drive, uint8_t cmd, uint32_t arg, uint32_t flags, ui
     return ret == SSP_SUCCESS;
 }
 
-static int wait_for_sd_tran_state(int drive)
+static int wait_for_state(int drive, unsigned state)
 {
     unsigned long response;
     unsigned int timeout = current_tick + 5*HZ;
@@ -227,26 +250,27 @@ static int wait_for_sd_tran_state(int drive)
     
     while (1)
     {
-        while(!send_sd_cmd(drive, SD_SEND_STATUS, SDMMC_RCA(drive), MCI_RESP, &response) && cmd_retry > 0)
+        /* NOTE: rely on SD_SEND_STATUS=MMC_SEND_STATUS */
+        while(!send_cmd(drive, SD_SEND_STATUS, SDMMC_RCA(drive), MCI_RESP, &response) && cmd_retry > 0)
             cmd_retry--;
 
         if(cmd_retry <= 0)
             return -1;
 
-        if(((response >> 9) & 0xf) == SD_TRAN)
+        if(((response >> 9) & 0xf) == state)
             return 0;
 
         if(TIME_AFTER(current_tick, timeout))
             return -10 * ((response >> 9) & 0xf);
 
-        _sd_last_disk_activity = current_tick;
+        disk_last_activity[drive] = current_tick;
     }
 
     return 0;
 }
 
 #if CONFIG_STORAGE & STORAGE_SD
-static int sdmmc_init_sd_card(int drive)
+static int init_sd_card(int drive)
 {
     int ssp = SDMMC_SSP(drive);
     sdmmc_power(drive, false);
@@ -267,11 +291,11 @@ static int sdmmc_init_sd_card(int drive)
     uint32_t resp;
     long init_timeout;
     /* go to idle state */
-    if(!send_sd_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_RESP, NULL))
+    if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_RESP, NULL))
         return -1;
     /* CMD8 Check for v2 sd card.  Must be sent before using ACMD41
        Non v2 cards will not respond to this command */
-    if(send_sd_cmd(drive, SD_SEND_IF_COND, 0x1AA, MCI_RESP, &resp))
+    if(send_cmd(drive, SD_SEND_IF_COND, 0x1AA, MCI_RESP, &resp))
         if((resp & 0xFFF) == 0x1AA)
             sd_v2 = true;
     /* timeout for initialization is 1sec, from SD Specification 2.00 */
@@ -283,42 +307,42 @@ static int sdmmc_init_sd_card(int drive)
             return -2;
 
         /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
-        if(!send_sd_cmd(drive, SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
+        if(!send_cmd(drive, SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
                 MCI_ACMD|MCI_NOCRC|MCI_RESP, &SDMMC_INFO(drive).ocr))
             return -100;
     } while(!(SDMMC_INFO(drive).ocr & (1<<31)));
 
     /* CMD2 send CID */
-    if(!send_sd_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, SDMMC_INFO(drive).cid))
+    if(!send_cmd(drive, SD_ALL_SEND_CID, 0, MCI_RESP|MCI_LONG_RESP, SDMMC_INFO(drive).cid))
         return -3;
 
     /* CMD3 send RCA */
-    if(!send_sd_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, &SDMMC_INFO(drive).rca))
+    if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, &SDMMC_INFO(drive).rca))
         return -4;
 
     /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
     if(sd_v2)
     {
         /*  CMD7 w/rca: Select card to put it in TRAN state */
-        if(!send_sd_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_RESP, NULL))
+        if(!send_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_RESP, NULL))
             return -5;
 
-        if(wait_for_sd_tran_state(drive))
+        if(wait_for_state(drive, SD_TRAN))
             return -6;
 
         /* CMD6 */
-        if(!send_sd_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
+        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
             return -7;
         sleep(HZ/10);
 
         /*  go back to STBY state so we can read csd */
         /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
-        if(!send_sd_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
+        if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
             return -8;
     }
 
     /* CMD9 send CSD */
-    if(!send_sd_cmd(drive, SD_SEND_CSD, SDMMC_RCA(drive), MCI_RESP|MCI_LONG_RESP,
+    if(!send_cmd(drive, SD_SEND_CSD, SDMMC_RCA(drive), MCI_RESP|MCI_LONG_RESP,
             SDMMC_INFO(drive).csd))
         return -9;
 
@@ -331,16 +355,16 @@ static int sdmmc_init_sd_card(int drive)
     imx233_ssp_set_timings(ssp, 4, 0, 0xffff);
 
     /* CMD7 w/rca: Select card to put it in TRAN state */
-    if(!send_sd_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_RESP, &resp))
+    if(!send_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_RESP, &resp))
         return -12;
-    if(wait_for_sd_tran_state(drive) < 0)
+    if(wait_for_state(drive, SD_TRAN))
         return -13;
 
     /* ACMD6: set bus width to 4-bit */
-    if(!send_sd_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_RESP|MCI_ACMD, &resp))
+    if(!send_cmd(drive, SD_SET_BUS_WIDTH, 2, MCI_RESP|MCI_ACMD, &resp))
         return -15;
     /* ACMD42: disconnect the pull-up resistor on CD/DAT3 */
-    if(!send_sd_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_RESP|MCI_ACMD, &resp))
+    if(!send_cmd(drive, SD_SET_CLR_CARD_DETECT, 0, MCI_RESP|MCI_ACMD, &resp))
         return -17;
 
     /* Switch to 4-bit */
@@ -350,115 +374,15 @@ static int sdmmc_init_sd_card(int drive)
 
     return 0;
 }
-
-static int transfer_sd_sectors(int drive, unsigned long start, int count, void *buf, bool read)
-{
-    int ret = 0;
-    uint32_t resp;
-
-    _sd_last_disk_activity = current_tick;
-
-    mutex_lock(&sd_mutex);
-
-    if(SDMMC_INFO(drive).initialized <= 0)
-    {
-        ret = sdmmc_init_sd_card(drive);
-        if(SDMMC_INFO(drive).initialized <= 0)
-            goto Lend;
-    }
-
-    /* check window */
-    start += window_start[drive];
-    if((start + count) > window_end[drive])
-    {
-        ret = -201;
-        goto Lend;
-    }
-
-    if(!send_sd_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_NO_RESP, NULL))
-    {
-        ret = -20;
-        goto Lend;
-    }
-    ret = wait_for_sd_tran_state(drive);
-    if(ret < 0)
-        goto Ldeselect;
-    while(count != 0)
-    {
-        /* FIXME implement this_count > 1 by using a sub-buffer of [sub] that is
-         * cache-aligned and then moving the data when possible. This way we could
-         * transfer much greater amount of data at once */
-        int this_count = 1;
-        /* Set bank_start to the correct unit (blocks or bytes) */
-        int bank_start = start;
-        if(!(SDMMC_INFO(drive).ocr & (1<<30)))   /* not SDHC */
-            bank_start *= SD_BLOCK_SIZE;
-        if(!read)
-            memcpy(aligned_buffer[drive], buf, 512);
-        ret = imx233_ssp_sd_mmc_transfer(SDMMC_SSP(drive),
-            read ? SD_READ_MULTIPLE_BLOCK : SD_WRITE_MULTIPLE_BLOCK,
-            bank_start, SSP_SHORT_RESP, aligned_buffer[drive], this_count, false, read, &resp);
-        if(ret != SSP_SUCCESS)
-            break;
-        if(!send_sd_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP|MCI_BUSY, &resp))
-        {
-            ret = -15;
-            break;
-        }
-        if(read)
-            memcpy(buf, aligned_buffer[drive], 512);
-        count -= this_count;
-        start += this_count;
-        buf += this_count * 512;
-    }
-
-    Ldeselect:
-    /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
-    if(!send_sd_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-        ret = -23;
-    Lend:
-    mutex_unlock(&sd_mutex);
-    return ret;
-}
 #endif
 
 #if CONFIG_STORAGE & STORAGE_MMC
-static int transfer_mmc_sectors(int drive, unsigned long start, int count, void *buf, bool read)
-{
-    /* check window */
-    start += window_start[drive];
-    if((start + count) > window_end[drive])
-        return -201;
-    int ret = 0;
-    uint32_t resp;
-
-    _mmc_last_disk_activity = current_tick;
-
-    do
-    {
-        /* FIXME implement this_count > 1 by using a sub-buffer of [sub] that is
-         * cache-aligned and then moving the data when possible. This way we could
-         * transfer much greater amount of data at once */
-        int this_count = 1;
-        if(!read)
-            memcpy(aligned_buffer[drive], buf, 512);
-        ret = imx233_ssp_sd_mmc_transfer(SDMMC_SSP(drive), read ? 17 : 24, start,
-                SSP_SHORT_RESP, aligned_buffer[drive], this_count, false, read, &resp);
-        if(read)
-            memcpy(buf, aligned_buffer[drive], 512);
-        count -= this_count;
-        start += this_count;
-        buf += this_count * 512;
-    }while(count != 0 && ret == SSP_SUCCESS);
-
-    return ret;
-}
-
-static int sdmmc_init_mmc_drive(int drive)
+static int init_mmc_drive(int drive)
 {
     int ssp = SDMMC_SSP(drive);
-    // we can choose the RCA of mmc cards: pick drive
-    SDMMC_RCA(drive) = drive;
+    /* we can choose the RCA of mmc cards: pick drive. Following our convention,
+     * .rca is actually RCA << 16 */
+    SDMMC_RCA(drive) = drive << 16;
 
     sdmmc_power(drive, false);
     sdmmc_power(drive, true);
@@ -472,52 +396,44 @@ static int sdmmc_init_mmc_drive(int drive)
     imx233_ssp_set_bus_width(ssp, 1);
     imx233_ssp_set_block_size(ssp, 9);
     /* go to idle state */
-    int ret = imx233_ssp_sd_mmc_transfer(ssp, 0, 0, SSP_NO_RESP, NULL, 0, false, false, NULL);
-    if(ret != 0)
+    if(!send_cmd(drive, MMC_GO_IDLE_STATE, 0, MCI_NO_RESP, NULL))
         return -1;
     /* send op cond until the card respond with busy bit set; it must complete within 1sec */
     unsigned timeout = current_tick + HZ;
+    bool ret = false;
     do
     {
         uint32_t ocr;
-        ret = imx233_ssp_sd_mmc_transfer(ssp, 1, 0x40ff8000, SSP_SHORT_RESP, NULL, 0, false, false, &ocr);
-        if(ret == 0 && ocr & (1 << 31))
+        ret = send_cmd(drive, MMC_SEND_OP_COND, 0x40ff8000, MCI_RESP, &ocr);
+        if(ret && ocr & (1 << 31))
             break;
     }while(!TIME_AFTER(current_tick, timeout));
 
-    if(ret != 0)
+    if(!ret)
         return -2;
     /* get CID */
     uint32_t cid[4];
-    ret = imx233_ssp_sd_mmc_transfer(ssp, 2, 0, SSP_LONG_RESP, NULL, 0, false, false, cid);
-    if(ret != 0)
+    if(!send_cmd(drive, MMC_ALL_SEND_CID, 0, MCI_LONG_RESP, cid))
         return -3;
     /* Set RCA */
     uint32_t status;
-    ret = imx233_ssp_sd_mmc_transfer(ssp, 3, SDMMC_RCA(drive) << 16, SSP_SHORT_RESP, NULL, 0, false, false, &status);
-    if(ret != 0)
+    if(!send_cmd(drive, MMC_SET_RELATIVE_ADDR, SDMMC_RCA(drive), MCI_RESP, &status))
         return -4;
     /* Select card */
-    ret = imx233_ssp_sd_mmc_transfer(ssp, 7, SDMMC_RCA(drive) << 16, SSP_SHORT_RESP, NULL, 0, false, false, &status);
-    if(ret != 0)
+    if(!send_cmd(drive, MMC_SELECT_CARD, SDMMC_RCA(drive), MCI_RESP, &status))
         return -5;
     /* Check TRAN state */
-    ret = imx233_ssp_sd_mmc_transfer(ssp, 13, SDMMC_RCA(drive) << 16, SSP_SHORT_RESP, NULL, 0, false, false, &status);
-    if(ret != 0)
+    if(wait_for_state(drive, MMC_TRAN))
         return -6;
-    if(((status >> 9) & 0xf) != 4)
-        return -7;
     /* Switch to 8-bit bus */
-    ret = imx233_ssp_sd_mmc_transfer(ssp, 6, 0x3b70200, SSP_SHORT_RESP, NULL, 0, true, false, &status);
-    if(ret != 0)
+    if(!send_cmd(drive, MMC_SWITCH, 0x3b70200, MCI_RESP|MCI_BUSY, &status))
         return -8;
     /* switch error ? */
     if(status & 0x80)
         return -9;
     imx233_ssp_set_bus_width(ssp, 8);
     /* Switch to high speed mode */
-    ret = imx233_ssp_sd_mmc_transfer(ssp, 6, 0x3b90100, SSP_SHORT_RESP, NULL, 0, true, false, &status);
-    if(ret != 0)
+    if(!send_cmd(drive, MMC_SWITCH, 0x3b90100,  MCI_RESP|MCI_BUSY, &status))
         return -10;
     /* switch error ?*/
     if(status & 0x80)
@@ -529,60 +445,124 @@ static int sdmmc_init_mmc_drive(int drive)
     /* read extended CSD */
     {
         uint8_t ext_csd[512];
-        ret = imx233_ssp_sd_mmc_transfer(ssp, 8, 0, SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, &status);
-        if(ret != 0)
+        if(imx233_ssp_sd_mmc_transfer(ssp, 8, 0, SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, &status))
             return -12;
         memcpy(ext_csd, aligned_buffer[drive], 512);
         uint32_t *sec_count = (void *)&ext_csd[212];
         window_start[drive] = 0;
         window_end[drive] = *sec_count;
     }
+    /* deselect card */
+    if(!send_cmd(drive, MMC_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
+        return -13;
 
     return 0;
 }
 #endif
 
-static int sdmmc_read_sectors(int drive, unsigned long start, int count, void* buf)
+static int transfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
 {
-    switch(SDMMC_MODE(drive))
-    {
+    int ret = 0;
+    uint32_t resp;
+
+    /* update disk activity */
+    disk_last_activity[drive] = current_tick;
+
+    /* lock per-drive mutex */
+    mutex_lock(&mutex[drive]);
+
+    /* for SD cards, init if necessary */
 #if CONFIG_STORAGE & STORAGE_SD
-        case SD_MODE: return transfer_sd_sectors(drive, start, count, buf, true);
-#endif
-#if CONFIG_STORAGE & STORAGE_MMC
-        case MMC_MODE: return transfer_mmc_sectors(drive, start, count, buf, true);
-#endif
-        default: return -1;
+    if(SDMMC_MODE(drive) == SD_MODE && SDMMC_INFO(drive).initialized <= 0)
+    {
+        ret = init_sd_card(drive);
+        if(SDMMC_INFO(drive).initialized <= 0)
+            goto Lend;
     }
+#endif
+
+    /* check window */
+    start += window_start[drive];
+    if((start + count) > window_end[drive])
+    {
+        ret = -201;
+        goto Lend;
+    }
+
+    /* select card.
+     * NOTE: rely on SD_SELECT_CARD=MMC_SELECT_CARD */
+    if(!send_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_NO_RESP, NULL))
+    {
+        ret = -20;
+        goto Lend;
+    }
+    /* wait for TRAN state */
+    /* NOTE: rely on SD_TRAN=MMC_TRAN */
+    ret = wait_for_state(drive, SD_TRAN);
+    if(ret < 0)
+        goto Ldeselect;
+    while(count != 0)
+    {
+        /* FIXME implement this_count > 1 by using a sub-buffer of [sub] that is
+         * cache-aligned and then moving the data when possible. This way we could
+         * transfer much greater amount of data at once */
+        int this_count = 1;
+        /* Set bank_start to the correct unit (blocks or bytes).
+         * MMC drives use block addressing, SD cards bytes or blocks */
+        int bank_start = start;
+        if(SDMMC_MODE(drive) == SD_MODE && !(SDMMC_INFO(drive).ocr & (1<<30)))   /* not SDHC */
+            bank_start *= SD_BLOCK_SIZE;
+        /* on write transfers, copy data to the aligned buffer */
+        if(!read)
+            memcpy(aligned_buffer[drive], buf, 512);
+        /* issue read/write
+         * NOTE: rely on SD_{READ,WRITE}_MULTIPLE_BLOCK=MMC_{READ,WRITE}_MULTIPLE_BLOCK */
+        ret = imx233_ssp_sd_mmc_transfer(SDMMC_SSP(drive),
+            read ? SD_READ_MULTIPLE_BLOCK : SD_WRITE_MULTIPLE_BLOCK,
+            bank_start, SSP_SHORT_RESP, aligned_buffer[drive], this_count, false, read, &resp);
+        if(ret != SSP_SUCCESS)
+            break;
+        /* stop transmission
+         * NOTE: rely on SD_STOP_TRANSMISSION=MMC_STOP_TRANSMISSION */
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP|MCI_BUSY, &resp))
+        {
+            ret = -15;
+            break;
+        }
+        /* on read transfers, copy the data back to the user buffer */
+        if(read)
+            memcpy(buf, aligned_buffer[drive], 512);
+        count -= this_count;
+        start += this_count;
+        buf += this_count * 512;
+    }
+    /* deselect card */
+    Ldeselect:
+    /*  CMD7 w/rca =0 : deselects card & puts it in STBY state
+     * NOTE: rely on SD_DESELECT_CARD=MMC_DESELECT_CARD */
+    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
+        ret = -23;
+    Lend:
+    /* release per-drive mutex */
+    mutex_unlock(&mutex[drive]);
+    return ret;
 }
 
-static int sdmmc_write_sectors(int drive, unsigned long start, int count, const void* buf)
-{
-    switch(SDMMC_MODE(drive))
-    {
-#if CONFIG_STORAGE & STORAGE_SD
-        case SD_MODE: return transfer_sd_sectors(drive, start, count, (void *)buf, false);
-#endif
-#if CONFIG_STORAGE & STORAGE_MMC
-        case MMC_MODE: return transfer_mmc_sectors(drive, start, count, (void *)buf, false);
-#endif
-        default: return -1;
-    }
-}
-
-static int sdmmc_init_drive(int drive)
+static int init_drive(int drive)
 {
     int ret;
     switch(SDMMC_MODE(drive))
     {
 #if CONFIG_STORAGE & STORAGE_SD
-        case SD_MODE: ret = sdmmc_init_sd_card(drive); break;
+        case SD_MODE: ret = init_sd_card(drive); break;
 #endif
 #if CONFIG_STORAGE & STORAGE_MMC
-        case MMC_MODE: ret = sdmmc_init_mmc_drive(drive); break;
+        case MMC_MODE: ret = init_mmc_drive(drive); break;
 #endif
         default: ret = 0;
     }
+    if(ret < 0)
+        panicf("die %d", ret);
     if(ret < 0)
         return ret;
 
@@ -590,15 +570,14 @@ static int sdmmc_init_drive(int drive)
     if((SDMMC_FLAGS(drive) & WINDOW) && imx233_partitions_is_window_enabled())
     {
         uint8_t mbr[512];
-        int ret = sdmmc_read_sectors(IF_MD2(drive,) 0, 1, mbr);
+        int ret = transfer_sectors(drive, 0, 1, mbr, true);
         if(ret)
             panicf("Cannot read MBR: %d", ret);
         ret = imx233_partitions_compute_window(mbr, &window_start[drive],
             &window_end[drive]);
         if(ret)
             panicf("cannot compute partitions window: %d", ret);
-        if(SDMMC_MODE(drive) == SD_MODE)
-            SDMMC_INFO(drive).numblocks = window_end[drive] - window_start[drive];
+        SDMMC_INFO(drive).numblocks = window_end[drive] - window_start[drive];
     }
 
     return 0;
@@ -624,9 +603,6 @@ static void sd_thread(void)
               * would cause a reverse-order attempt with
               * another thread */
             fat_lock();
-            /* lock-out card activity - direct calls
-             * into driver that bypass the fat cache */
-            mutex_lock(&sd_mutex);
 
             /* We now have exclusive control of fat cache and sd.
              * Release "by force", ensure file
@@ -634,9 +610,13 @@ static void sd_thread(void)
              * ones are invalid if mounting. */
             for(unsigned sd_drive = 0; sd_drive < _sd_num_drives; sd_drive++)
             {
+                int drive = sd_map[sd_drive];
                 /* Skip non-removable drivers */
                 if(!sd_removable(sd_drive))
                     continue;
+                /* lock-out card activity - direct calls
+                 * into driver that bypass the fat cache */
+                mutex_lock(&mutex[drive]);
                 disk_unmount(sd_first_drive + sd_drive);
                 /* Force card init for new card, re-init for re-inserted one or
                  * clear if the last attempt to init failed with an error. */
@@ -644,7 +624,7 @@ static void sd_thread(void)
 
                 if(ev.id == SYS_HOTSWAP_INSERTED)
                 {
-                    microsd_init = sdmmc_init_drive(sd_map[sd_drive]);
+                    microsd_init = init_drive(drive);
                     if(microsd_init < 0) /* initialisation failed */
                         panicf("%s init failed : %d", SDMMC_CONF(sd_map[sd_drive]).name, microsd_init);
 
@@ -656,14 +636,15 @@ static void sd_thread(void)
                 */
                 if(microsd_init)
                     queue_broadcast(SYS_FS_CHANGED, 0);
+                /* unlock card */
+                mutex_unlock(&mutex[drive]);
             }
             /* Access is now safe */
-            mutex_unlock(&sd_mutex);
             fat_unlock();
             break;
         }
         case SYS_TIMEOUT:
-            if(!TIME_BEFORE(current_tick, _sd_last_disk_activity + 3 * HZ))
+            if(!TIME_BEFORE(current_tick, sd_last_disk_activity() + 3 * HZ))
                 sd_enable(false);
             break;
         case SYS_USB_CONNECTED:
@@ -675,15 +656,16 @@ static void sd_thread(void)
     }
 }
 
-int sdmmc_init(void)
+static int sdmmc_init(void)
 {
     static int is_initialized = false;
     if(is_initialized)
         return 0;
     is_initialized = true;
+    for(unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
+        mutex_init(&mutex[drive]);
 
 #if CONFIG_STORAGE & STORAGE_SD
-    mutex_init(&sd_mutex);
     queue_init(&sd_queue, true);
     create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
             sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
@@ -748,7 +730,10 @@ bool sd_removable(IF_MV_NONVOID(int sd_drive))
 
 long sd_last_disk_activity(void)
 {
-    return _sd_last_disk_activity;
+    long last = 0;
+    for(unsigned i = 0; i < _sd_num_drives; i++)
+        last = MAX(last, disk_last_activity[sd_map[i]]);
+    return last;
 }
 
 void sd_enable(bool on)
@@ -758,12 +743,12 @@ void sd_enable(bool on)
 
 int sd_read_sectors(IF_MD2(int sd_drive,) unsigned long start, int count, void *buf)
 {
-    return sdmmc_read_sectors(sd_map[sd_drive], start, count, buf);
+    return transfer_sectors(sd_map[sd_drive], start, count, buf, true);
 }
 
 int sd_write_sectors(IF_MD2(int sd_drive,) unsigned long start, int count, const void* buf)
 {
-    return sdmmc_write_sectors(sd_map[sd_drive], start, count, buf);
+    return transfer_sectors(sd_map[sd_drive], start, count, (void *)buf, false);
 }
 #endif
 
@@ -778,7 +763,7 @@ int mmc_init(void)
         if(SDMMC_MODE(drive) == MMC_MODE)
         {
             mmc_map[_mmc_num_drives++] = drive;
-            sdmmc_init_drive(drive);
+            init_drive(drive);
         }
     return 0;
 }
@@ -811,7 +796,10 @@ bool mmc_removable(IF_MV_NONVOID(int mmc_drive))
 
 long mmc_last_disk_activity(void)
 {
-    return _mmc_last_disk_activity;
+    long last = 0;
+    for(unsigned i = 0; i < _mmc_num_drives; i++)
+        last = MAX(last, disk_last_activity[mmc_map[i]]);
+    return last;
 }
 
 void mmc_enable(bool on)
@@ -863,12 +851,12 @@ int mmc_spinup_time(void)
 
 int mmc_read_sectors(IF_MD2(int mmc_drive,) unsigned long start, int count, void *buf)
 {
-    return sdmmc_read_sectors(mmc_map[mmc_drive], start, count, buf);
+    return transfer_sectors(mmc_map[mmc_drive], start, count, buf, true);
 }
 
 int mmc_write_sectors(IF_MD2(int mmc_drive,) unsigned long start, int count, const void* buf)
 {
-    return sdmmc_write_sectors(mmc_map[mmc_drive], start, count, buf);
+    return transfer_sectors(mmc_map[mmc_drive], start, count, (void *)buf, false);
 }
 
 #endif
