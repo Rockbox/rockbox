@@ -460,10 +460,43 @@ static int init_mmc_drive(int drive)
 }
 #endif
 
+// low-level function, don't call directly!
+static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
+{
+    uint32_t resp;
+    int ret = 0;
+    while(count != 0)
+    {
+        int this_count = MIN(count, IMX233_MAX_SINGLE_DMA_XFER_SIZE / 512);
+        /* Set bank_start to the correct unit (blocks or bytes).
+         * MMC drives use block addressing, SD cards bytes or blocks */
+        int bank_start = start;
+        if(SDMMC_MODE(drive) == SD_MODE && !(SDMMC_INFO(drive).ocr & (1<<30)))   /* not SDHC */
+            bank_start *= SD_BLOCK_SIZE;
+        /* issue read/write
+         * NOTE: rely on SD_{READ,WRITE}_MULTIPLE_BLOCK=MMC_{READ,WRITE}_MULTIPLE_BLOCK */
+        ret = imx233_ssp_sd_mmc_transfer(SDMMC_SSP(drive),
+            read ? SD_READ_MULTIPLE_BLOCK : SD_WRITE_MULTIPLE_BLOCK,
+            bank_start, SSP_SHORT_RESP, buf, this_count, false, read, &resp);
+        if(ret != SSP_SUCCESS)
+            break;
+        /* stop transmission
+         * NOTE: rely on SD_STOP_TRANSMISSION=MMC_STOP_TRANSMISSION */
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP|MCI_BUSY, &resp))
+        {
+            ret = -15;
+            break;
+        }
+        count -= this_count;
+        start += this_count;
+        buf += this_count * 512;
+    }
+    return ret;
+}
+
 static int transfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
 {
     int ret = 0;
-    uint32_t resp;
 
     /* update disk activity */
     disk_last_activity[drive] = current_tick;
@@ -488,7 +521,6 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
         ret = -201;
         goto Lend;
     }
-
     /* select card.
      * NOTE: rely on SD_SELECT_CARD=MMC_SELECT_CARD */
     if(!send_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_NO_RESP, NULL))
@@ -501,41 +533,63 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
     ret = wait_for_state(drive, SD_TRAN);
     if(ret < 0)
         goto Ldeselect;
-    while(count != 0)
+
+    /**
+     * NOTE: we need to make sure dma transfers are aligned. This handled
+     * differently for read and write transfers. We do not repeat it each
+     * time but it should be noted that all transfers are limited by
+     * IMX233_MAX_SINGLE_DMA_XFER_SIZE and thus need to be split if needed.
+     *
+     * Read transfers:
+     *   If the buffer is already aligned, transfer everything at once.
+     *   Otherwise, transfer all sectors but one to the sub-buffer starting
+     *   on the next cache ligned and then move the data. Then transfer the
+     *   last sector to the aligned_buffer and then copy to the buffer.
+     *
+     * Write transfers:
+     *   If the buffer is already aligned, transfer everything at once.
+     *   Otherwise, copy the first sector to the aligned_buffer and transfer.
+     *   Then move all other sectors within the buffer to make it cache
+     *   aligned and transfer it.
+     */
+    if(read)
     {
-        /* FIXME implement this_count > 1 by using a sub-buffer of [sub] that is
-         * cache-aligned and then moving the data when possible. This way we could
-         * transfer much greater amount of data at once */
-        int this_count = 1;
-        /* Set bank_start to the correct unit (blocks or bytes).
-         * MMC drives use block addressing, SD cards bytes or blocks */
-        int bank_start = start;
-        if(SDMMC_MODE(drive) == SD_MODE && !(SDMMC_INFO(drive).ocr & (1<<30)))   /* not SDHC */
-            bank_start *= SD_BLOCK_SIZE;
-        /* on write transfers, copy data to the aligned buffer */
-        if(!read)
-            memcpy(aligned_buffer[drive], buf, 512);
-        /* issue read/write
-         * NOTE: rely on SD_{READ,WRITE}_MULTIPLE_BLOCK=MMC_{READ,WRITE}_MULTIPLE_BLOCK */
-        ret = imx233_ssp_sd_mmc_transfer(SDMMC_SSP(drive),
-            read ? SD_READ_MULTIPLE_BLOCK : SD_WRITE_MULTIPLE_BLOCK,
-            bank_start, SSP_SHORT_RESP, aligned_buffer[drive], this_count, false, read, &resp);
-        if(ret != SSP_SUCCESS)
-            break;
-        /* stop transmission
-         * NOTE: rely on SD_STOP_TRANSMISSION=MMC_STOP_TRANSMISSION */
-        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP|MCI_BUSY, &resp))
+        void *ptr = CACHEALIGN_UP(buf);
+        if(buf != ptr)
         {
-            ret = -15;
-            break;
+            // copy count-1 sector and then move within the buffer
+            ret = __xfer_sectors(drive, start, count - 1, ptr, read);
+            memmove(buf, ptr, 512 * (count - 1));
+            if(ret >= 0)
+            {
+                // transfer the last sector the aligned_buffer and copy
+                ret = __xfer_sectors(drive, start + count - 1, 1,
+                    aligned_buffer[drive], read);
+                memcpy(buf + 512 * (count - 1), aligned_buffer[drive], 512);
+            }
         }
-        /* on read transfers, copy the data back to the user buffer */
-        if(read)
-            memcpy(buf, aligned_buffer[drive], 512);
-        count -= this_count;
-        start += this_count;
-        buf += this_count * 512;
+        else
+            ret = __xfer_sectors(drive, start, count, buf, read);
     }
+    else
+    {
+        void *ptr = CACHEALIGN_UP(buf);
+        if(buf != ptr)
+        {
+            // transfer the first sector to aligned_buffer and copy
+            memcpy(aligned_buffer[drive], buf, 512);
+            ret = __xfer_sectors(drive, start, 1, aligned_buffer[drive], read);
+            if(ret >= 0)
+            {
+                // move within the buffer and transfer
+                memmove(ptr, buf + 512, 512 * (count - 1));
+                ret = __xfer_sectors(drive, start + 1, count - 1, ptr, read);
+            }
+        }
+        else
+            ret = __xfer_sectors(drive, start, count, buf, read);
+    }
+    
     /* deselect card */
     Ldeselect:
     /*  CMD7 w/rca =0 : deselects card & puts it in STBY state
