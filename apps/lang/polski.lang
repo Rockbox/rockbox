@@ -13010,3 +13010,31 @@
     *: "Ogranicz przechodzenie między folderami"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Wybierz jeden lub wiele katalogów"
+  </dest>
+  <voice>
+    *: "Wybierz jeden lub wiele katalogów"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Wybierz katalogi do przeskanowania"
+  </dest>
+  <voice>
+    *: "Wybierz katalogi do przeskanowania"
+  </voice>
+</phrase>
