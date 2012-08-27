@@ -28,6 +28,14 @@
 
 unsigned short adc_read(int channel)
 {
+    unsigned short result;
+
+    /* ungate lsadc clocks */
+    SCU_CLKCFG &= ~(3<<23);
+
+    /* wait a bit for clock to stabilize */
+    udelay(10);
+
     ADC_CTRL = (1<<4)|(1<<3) | (channel & (NUM_ADC_CHANNELS - 1));
 
     /* Wait for conversion ready.
@@ -38,16 +46,18 @@ unsigned short adc_read(int channel)
      * ~10us should be enough so we wait 20us to be on the safe side
      */
     udelay(20);
- 
+
     /* 10bits result */
-    return (ADC_DATA & 0x3ff);
+    result = (ADC_DATA & 0x3ff);
+
+    /* turn off lsadc clock when not in use */
+    SCU_CLKCFG |= (3<<23);
+
+    return result; 
 }
 
 void adc_init(void)
 {
     /* ADC clock divider to reach max 1MHz */
     SCU_DIVCON1 = (SCU_DIVCON1 & ~(0xff<<10)) | (49<<10);
-
-    /* enable clocks for ADC */
-    SCU_CLKCFG &= ~(3<<23);
 }
