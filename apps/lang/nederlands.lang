@@ -12972,3 +12972,65 @@
     *: "Beperk automatisch naar volgende map"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Kies een of meerdere mappen"
+  </dest>
+  <voice>
+    *: "Kies een of meerdere mappen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Eenvoudig (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Eenvoudig"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Kies mappen om te doorzoeken"
+  </dest>
+  <voice>
+    *: "Kies mappen om te doorzoeken"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Aangepast"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Aangepast"
+  </voice>
+</phrase>
