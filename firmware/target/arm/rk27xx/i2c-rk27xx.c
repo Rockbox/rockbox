@@ -40,7 +40,7 @@ static struct mutex i2c_mtx;
 
 static bool i2c_write_byte(uint8_t data, bool start)
 {
-    long timeout = current_tick + 50;
+    long timeout = current_tick + HZ/50;
 
     /* START */
     I2C_CONR |= (1<<3) | (1<<2); /* master port enable, transmit bit */
@@ -66,34 +66,34 @@ static bool i2c_write_byte(uint8_t data, bool start)
 
 static bool i2c_read_byte(unsigned char *data)
 {
-   long timeout = current_tick + HZ / 50;
+    long timeout = current_tick + HZ/50;
 
-   I2C_LCMR = (1<<2); /* resume op */
+    I2C_LCMR = (1<<2); /* resume op */
 
-   while (!(I2C_ISR & (1<<1)))
-       if (TIME_AFTER(current_tick, timeout))
-           return false;
+    while (!(I2C_ISR & (1<<1)))
+        if (TIME_AFTER(current_tick, timeout))
+            return false;
 
-   *data = I2C_MRXR;
+    *data = I2C_MRXR;
 
-   /* clear status bit */
-   I2C_ISR &= ~(1<<1);
+    /* clear status bit */
+    I2C_ISR &= ~(1<<1);
 
-  return true;
+    return true;
 }
 
 static bool i2c_stop(void)
 {
-   long timeout = current_tick + HZ / 50;
+    long timeout = current_tick + HZ/50;
 
-   I2C_CONR &= ~(1<<4);
-   I2C_LCMR |= (1<<2) | (1<<1); /* resume op, stop */
+    I2C_CONR &= ~(1<<4);
+    I2C_LCMR |= (1<<2) | (1<<1); /* resume op, stop */
 
-   while (I2C_LCMR & (1<<1))
-       if (TIME_AFTER(current_tick, timeout))
-           return false;
+    while (I2C_LCMR & (1<<1))
+        if (TIME_AFTER(current_tick, timeout))
+            return false;
 
-   return true;
+    return true;
 }
 
 /* route i2c bus to internal codec or external bus
@@ -103,154 +103,173 @@ static bool i2c_stop(void)
  */
 static void i2c_iomux(unsigned char slave)
 {
-   unsigned long muxa = SCU_IOMUXA_CON & ~(0x1f<<14);
+    unsigned long muxa = SCU_IOMUXA_CON & ~(0x1f<<14);
 
-   if ((slave & 0xfe) == (0x27<<1))
-   {
-       /* internal codec */
-       SCU_IOMUXA_CON = (muxa | (1<<16) | (1<<14));
-   }
-   else
-   {
-       /* external I2C bus */
-       SCU_IOMUXA_CON = (muxa | (1<<18));
-   }
+    if ((slave & 0xfe) == (0x27<<1))
+    {
+        /* internal codec */
+        SCU_IOMUXA_CON = (muxa | (1<<16) | (1<<14));
+    }
+    else
+    {
+        /* external I2C bus */
+        SCU_IOMUXA_CON = (muxa | (1<<18));
+    }
 }
 
 void i2c_init(void)
 {
-   mutex_init(&i2c_mtx);
+    mutex_init(&i2c_mtx);
 
-   SCU_CLKCFG &= ~(1<< 20);
 
-   I2C_OPR |= (1<<7); /* reset state machine */
-   sleep(HZ/100);
-   I2C_OPR &= ~((1<<7) | (1<<6)); /* clear ENABLE bit, deasert reset */
+    /* ungate i2c module clock */
+    SCU_CLKCFG &= ~(1<< 20);
 
-   /* set I2C divider to stay within allowed SCL freq limit
-    * APBfreq = 50Mhz
-    * SCLfreq = (APBfreq/5*(I2CCDVR[5:3] + 1) * 2^((I2CCDVR[2:0] + 1))
-    */
+    I2C_OPR |= (1<<7); /* reset state machine */
+    sleep(HZ/100);
+    I2C_OPR &= ~((1<<7) | (1<<6)); /* clear ENABLE bit, deasert reset */
 
-   /* we are driving this slightly above specs
-    * (6<<3) | (1<<0)    416kHz
-    * (7<<3) | (1<<0)    357kHz
-    * (6<<3) | (2<<0)    208kHz
-    */
-   I2C_OPR = (I2C_OPR & ~(0x3F)) | (6<<3) | (1<<0);
+    /* set I2C divider to stay within allowed SCL freq limit
+     * APBfreq = 50Mhz
+     * SCLfreq = (APBfreq/5*(I2CCDVR[5:3] + 1) * 2^((I2CCDVR[2:0] + 1))
+     */
 
-   I2C_IER = 0x00;
+    /* we are driving this slightly above specs
+     * (6<<3) | (1<<0)    416kHz
+     * (7<<3) | (1<<0)    357kHz
+     * (6<<3) | (2<<0)    208kHz
+     */
+    I2C_OPR = (I2C_OPR & ~(0x3F)) | (6<<3) | (1<<0);
 
-   I2C_OPR |= (1<<6); /* enable i2c core */
+    I2C_IER = 0x00;
+
+    I2C_OPR |= (1<<6); /* enable i2c core */
+
+    /* turn off i2c module clock until we need to comunicate */
+    SCU_CLKCFG |= (1<< 20);
 }
 
 int i2c_write(unsigned char slave, int address, int len,
               const unsigned char *data)
 {
-   mutex_lock(&i2c_mtx);
+    int ret = 0;
 
-   i2c_iomux(slave);
+    mutex_lock(&i2c_mtx);
 
-   /* clear all flags */
-   I2C_ISR = 0x00;
-   I2C_IER = 0x00;
+    i2c_iomux(slave);
 
-   /* START */
-   if (! i2c_write_byte(slave & ~1, true))
-   {
-       mutex_unlock(&i2c_mtx);
-       return 1;
-   }
+    /* ungate i2c clock */
+    SCU_CLKCFG &= ~(1<<20);
 
-   if (address >= 0)
-   {
-       if (! i2c_write_byte(address, false))
-       {
-           mutex_unlock(&i2c_mtx);
-           return 2;
-       }
-   }
+    /* clear all flags */
+    I2C_ISR = 0x00;
+    I2C_IER = 0x00;
 
-   /* write data */
-   while (len--)
-   {
-       if (! i2c_write_byte(*data++, false))
-       {
-           mutex_unlock(&i2c_mtx);
-           return 4;
-       }
-   }
+    /* START */
+    if (! i2c_write_byte(slave & ~1, true))
+    {
+        ret = 1;
+        goto end;
+    }
 
-   /* STOP */
-   if (! i2c_stop())
-   {
-       mutex_unlock(&i2c_mtx);
-       return 5;
-   }
+    if (address >= 0)
+    {
+        if (! i2c_write_byte(address, false))
+        {
+            ret = 2;
+            goto end;
+        }
+    }
 
-   mutex_unlock(&i2c_mtx);
-   return 0;
+    /* write data */
+    while (len--)
+    {
+        if (! i2c_write_byte(*data++, false))
+        {
+            ret = 4;
+            goto end;
+        }
+    }
+
+    /* STOP */
+    if (! i2c_stop())
+    {
+        ret = 5;
+        goto end;
+    }
+
+end:
+    mutex_unlock(&i2c_mtx);
+    SCU_CLKCFG |= (1<<20);
+    return ret;
 }
 
 int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
 {
-   mutex_lock(&i2c_mtx);
+    int ret = 0;
 
-   i2c_iomux(slave);
+    mutex_lock(&i2c_mtx);
 
-   /* clear all flags */
-   I2C_ISR = 0x00;
-   I2C_IER = 0x00;
+    i2c_iomux(slave);
 
-   if (address >= 0)
-   {
-       /* START */
-       if (! i2c_write_byte(slave & ~1, true))
-       {
-           mutex_unlock(&i2c_mtx);
-           return 1;
-       }
+    /* ungate i2c module clock */
+    SCU_CLKCFG &= ~(1<<20);
 
-       /* write address */
-       if (! i2c_write_byte(address, false))
-       {
-           mutex_unlock(&i2c_mtx);
-           return 2;
-       }
-   }
+    /* clear all flags */
+    I2C_ISR = 0x00;
+    I2C_IER = 0x00;
 
-   /* (repeated) START */
-   if (! i2c_write_byte(slave | 1, true))
-   {
-       mutex_unlock(&i2c_mtx);
-       return 3;
-   }
+    if (address >= 0)
+    {
+        /* START */
+        if (! i2c_write_byte(slave & ~1, true))
+        {
+            ret = 1;
+            goto end;
+        }
 
-   I2C_CONR &= ~(1<<3); /* clear transmit bit (switch to receive mode) */
+        /* write address */
+        if (! i2c_write_byte(address, false))
+        {
+            ret = 2;
+            goto end;
+        }
+    }
 
-   while (len)
-   {
-       if (! i2c_read_byte(data++))
-       {
-               mutex_unlock(&i2c_mtx);
-               return 4;
-       }
+    /* (repeated) START */
+    if (! i2c_write_byte(slave | 1, true))
+    {
+        ret = 3;
+        goto end;
+    }
 
-       if (len == 1)
-           I2C_CONR |= (1<<4); /* NACK */
-       else
-           I2C_CONR &= ~(1<<4); /* ACK */
+    I2C_CONR &= ~(1<<3); /* clear transmit bit (switch to receive mode) */
 
-       len--;
-   }
+    while (len)
+    {
+        if (! i2c_read_byte(data++))
+        {
+            ret = 4;
+            goto end;
+        }
+
+        if (len == 1)
+            I2C_CONR |= (1<<4); /* NACK */
+        else
+            I2C_CONR &= ~(1<<4); /* ACK */
+
+        len--;
+    }
 
    /* STOP */
-   if (! i2c_stop())
-   {
-       mutex_unlock(&i2c_mtx);
-       return 5;
-   }
+    if (! i2c_stop())
+    {
+        ret = 5;
+        goto end;
+    }
 
-   mutex_unlock(&i2c_mtx);
-   return 0;
+end:
+    mutex_unlock(&i2c_mtx);
+    SCU_CLKCFG |= (1<<20);
+    return ret;
 }
