@@ -1135,7 +1135,7 @@ Lyre prototype 1 */
 
 /* enable logging messages to disk*/
 #if CONFIG_PLATFORM == PLATFORM_NATIVE  && !defined(SIMULATOR) && !defined(BOOTLOADER) \
-    && !defined(__PCTOOL__)
+    && !defined(__PCTOOL__) && (CONFIG_CODEC == SWCODEC)
 #define ROCKBOX_HAS_LOGDISKF
 #endif
 
