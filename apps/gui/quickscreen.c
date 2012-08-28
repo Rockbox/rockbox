@@ -439,7 +439,11 @@ bool quick_screen_f3(int button_enter)
     qs.items[QUICKSCREEN_RIGHT] =
                     find_setting(&global_settings.statusbar, NULL);
     qs.items[QUICKSCREEN_BOTTOM] =
+#ifdef HAVE_LCD_FLIP
                     find_setting(&global_settings.flip_display, NULL);
+#else
+                    NULL;
+#endif
     qs.callback = NULL;
     if (gui_syncquickscreen_run(&qs, button_enter))
     {
