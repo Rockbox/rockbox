@@ -13000,3 +13000,31 @@
     *: "Actualizar restricciones"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Seleccione uno o más directorios"
+  </dest>
+  <voice>
+    *: "Seleccione uno o más directorios"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Seleccione los directorios que explorar"
+  </dest>
+  <voice>
+    *: "Seleccione los directorios que explorar"
+  </voice>
+</phrase>
