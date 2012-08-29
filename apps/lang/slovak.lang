@@ -12999,3 +12999,31 @@
     *: "Obmedziť Automatickú Zmenu"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Vyberte Jeden Alebo Viacero Priečinkov"
+  </dest>
+  <voice>
+    *: "Vyberte Jeden Alebo Viacero Priečinkov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Vyberte Priečinky Pre Prehľadávanie"
+  </dest>
+  <voice>
+    *: "Vyberte Priečinky Pre Prehľadávanie"
+  </voice>
+</phrase>
