@@ -716,8 +716,10 @@ static void sdmmc_thread(void)
                 next_yield = current_tick;
 
                 if(!idle_notified)
+                {
                     call_storage_idle_notifys(false);
-                idle_notified = true;
+                    idle_notified = true;
+                }
             }
             break;
             break;
