@@ -7,6 +7,14 @@
 *.so
 *.o
 *.a
+*.sh
+*.opensdf
+*.sln
+*.suo
+*.sdf
+*.vcxproj
+*.filters
+*.user
 
 # android: java build system
 /android/bin
