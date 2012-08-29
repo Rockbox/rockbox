@@ -150,7 +150,7 @@ void imx233_clkctrl_set_fractional_divisor(enum imx233_clock_t clk, int fracdiv)
     if(fracdiv != 0)
         *REG = fracdiv;
     else
-        *REG = HW_CLKCTRL_FRAC_XX__CLKGATEXX;;
+        *REG = HW_CLKCTRL_FRAC_XX__CLKGATEXX;
 }
 
 int imx233_clkctrl_get_fractional_divisor(enum imx233_clock_t clk)
@@ -258,6 +258,11 @@ void imx233_clkctrl_enable_auto_slow_monitor(enum imx233_as_monitor_t monitor, b
 bool imx233_clkctrl_is_auto_slow_monitor_enabled(enum imx233_as_monitor_t monitor)
 {
     return HW_CLKCTRL_HBUS & monitor;
+}
+
+bool imx233_clkctrl_is_emi_sync_enabled(void)
+{
+    return !!(HW_CLKCTRL_EMI & HW_CLKCTRL_EMI__SYNC_MODE_EN);
 }
 
 unsigned imx233_clkctrl_get_clock_freq(enum imx233_clock_t clk)

@@ -124,7 +124,7 @@ enum imx233_clock_t
     CLK_HBUS, /* freq, div, frac */
     CLK_PLL, /* freq, enable */
     CLK_XTAL, /* freq */
-    CLK_EMI, /* freq */
+    CLK_EMI, /* freq, div, frac, bypass (NOTE: don't modify directly EMI) */
     CLK_XBUS, /* freq, div */
 };
 
@@ -176,6 +176,8 @@ bool imx233_clkctrl_get_bypass_pll(enum imx233_clock_t clk);
 void imx233_clkctrl_enable_usb_pll(bool enable);
 bool imx233_clkctrl_is_usb_pll_enabled(void);
 unsigned imx233_clkctrl_get_clock_freq(enum imx233_clock_t clk);
+
+bool imx233_clkctrl_is_emi_sync_enabled(void);
 
 void imx233_clkctrl_set_auto_slow_divisor(enum imx233_as_div_t div);
 enum imx233_as_div_t imx233_clkctrl_get_auto_slow_divisor(void);
