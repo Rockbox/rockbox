@@ -103,7 +103,7 @@ static void usb_mode(int connect_timeout)
                 info.state == TRICKLE ? "trickle" :
                 info.state == TOPOFF ? "topoff" :
                 info.state == CHARGING ? "charging" : "<unknown>");
-            lcd_putsf(0, 8, "Battery: %d%%", battery_level());
+            lcd_putsf(0, 8, "Battery: %d%% (%d mV)", battery_level(), battery_voltage());
             lcd_putsf(0, 9, "Die temp: %d°C [%d, %d]",
                 adc_read(ADC_DIE_TEMP), IMX233_DIE_TEMP_HIGH,
                 IMX233_DIE_TEMP_LOW);
