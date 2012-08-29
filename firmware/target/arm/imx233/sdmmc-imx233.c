@@ -32,6 +32,7 @@
 #include "usb.h"
 #include "debug.h"
 #include "string.h"
+#include "ata_idle_notify.h"
 
 /** NOTE For convenience, this drivers relies on the many similar commands
  * between SD and MMC. The following assumptions are made:
@@ -146,15 +147,17 @@ static uint8_t aligned_buffer[SDMMC_NUM_DRIVES][512] CACHEALIGN_ATTR;
 static tCardInfo sdmmc_card_info[SDMMC_NUM_DRIVES];
 static struct mutex mutex[SDMMC_NUM_DRIVES];
 static int disk_last_activity[SDMMC_NUM_DRIVES];
+#define MIN_YIELD_PERIOD 5  /* ticks */
+static int next_yield = 0;
 
 #define SDMMC_INFO(drive) sdmmc_card_info[drive]
 #define SDMMC_RCA(drive) SDMMC_INFO(drive).rca
 
 /* sd only */
+static long sdmmc_stack[(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
+static const char sdmmc_thread_name[] = "sdmmc";
+static struct event_queue sdmmc_queue;
 #if CONFIG_STORAGE & STORAGE_SD
-static long sd_stack[(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
-static const char sd_thread_name[] = "sd";
-static struct event_queue sd_queue;
 static int sd_first_drive;
 static unsigned _sd_num_drives;
 static int sd_map[SDMMC_NUM_DRIVES]; /* sd->sdmmc map */
@@ -263,7 +266,11 @@ static int wait_for_state(int drive, unsigned state)
         if(TIME_AFTER(current_tick, timeout))
             return -10 * ((response >> 9) & 0xf);
 
-        disk_last_activity[drive] = current_tick;
+        if(TIME_AFTER(current_tick, next_yield))
+        {
+            yield();
+            next_yield = current_tick + MIN_YIELD_PERIOD;
+        }
     }
 
     return 0;
@@ -635,17 +642,19 @@ static int init_drive(int drive)
     return 0;
 }
 
-static void sd_thread(void) NORETURN_ATTR;
-static void sd_thread(void)
+static void sdmmc_thread(void) NORETURN_ATTR;
+static void sdmmc_thread(void)
 {
     struct queue_event ev;
+    bool idle_notified = false;
 
     while (1)
     {
-        queue_wait_w_tmo(&sd_queue, &ev, HZ);
+        queue_wait_w_tmo(&sdmmc_queue, &ev, HZ);
 
         switch(ev.id)
         {
+#if CONFIG_STORAGE & STORAGE_SD
         case SYS_HOTSWAP_INSERTED:
         case SYS_HOTSWAP_EXTRACTED:
         {
@@ -695,14 +704,27 @@ static void sd_thread(void)
             fat_unlock();
             break;
         }
+#endif
         case SYS_TIMEOUT:
-            if(!TIME_BEFORE(current_tick, sd_last_disk_activity() + 3 * HZ))
-                sd_enable(false);
+            if(TIME_BEFORE(current_tick, sd_last_disk_activity()+(3*HZ)) ||
+                    TIME_BEFORE(current_tick, mmc_last_disk_activity()+(3*HZ)))
+            {
+                idle_notified = false;
+            }
+            else
+            {
+                next_yield = current_tick;
+
+                if(!idle_notified)
+                    call_storage_idle_notifys(false);
+                idle_notified = true;
+            }
+            break;
             break;
         case SYS_USB_CONNECTED:
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             /* Wait until the USB cable is extracted again */
-            usb_wait_for_disconnect(&sd_queue);
+            usb_wait_for_disconnect(&sdmmc_queue);
             break;
         }
     }
@@ -717,11 +739,9 @@ static int sdmmc_init(void)
     for(unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
         mutex_init(&mutex[drive]);
 
-#if CONFIG_STORAGE & STORAGE_SD
-    queue_init(&sd_queue, true);
-    create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
-            sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
-#endif
+    queue_init(&sdmmc_queue, true);
+    create_thread(sdmmc_thread, sdmmc_stack, sizeof(sdmmc_stack), 0,
+            sdmmc_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
 
     for(unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
     {
