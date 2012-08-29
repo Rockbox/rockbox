@@ -165,6 +165,130 @@ void imx233_power_set_stop_current(unsigned current)
     }
 }
 
+/* regulator info */
+#define HAS_BO              (1 << 0)
+#define HAS_LINREG          (1 << 1)
+#define HAS_LINREG_OFFSET   (1 << 2)
+
+static struct
+{
+    unsigned min, step;
+    volatile uint32_t *reg;
+    uint32_t trg_bm, trg_bp; // bitmask and bitpos
+    unsigned flags;
+    uint32_t bo_bm, bo_bp; // bitmask and bitpos
+    uint32_t linreg_bm;
+    uint32_t linreg_offset_bm, linreg_offset_bp; // bitmask and bitpos
+} regulator_info[] =
+{
+#define ADD_REGULATOR(name, mask) \
+        .min = HW_POWER_##name##CTRL__TRG_MIN, \
+        .step = HW_POWER_##name##CTRL__TRG_STEP, \
+        .reg = &HW_POWER_##name##CTRL, \
+        .trg_bm = HW_POWER_##name##CTRL__TRG_BM, \
+        .trg_bp = HW_POWER_##name##CTRL__TRG_BP, \
+        .flags = mask
+#define ADD_REGULATOR_BO(name) \
+        .bo_bm = HW_POWER_##name##CTRL__BO_OFFSET_BM, \
+        .bo_bp = HW_POWER_##name##CTRL__BO_OFFSET_BP
+#define ADD_REGULATOR_LINREG(name) \
+        .linreg_bm = HW_POWER_##name##CTRL__ENABLE_LINREG
+#define ADD_REGULATOR_LINREG_OFFSET(name) \
+        .linreg_offset_bm = HW_POWER_##name##CTRL__LINREG_OFFSET_BM, \
+        .linreg_offset_bp = HW_POWER_##name##CTRL__LINREG_OFFSET_BP
+    [REGULATOR_VDDD] =
+    {
+        ADD_REGULATOR(VDDD, HAS_BO|HAS_LINREG|HAS_LINREG_OFFSET),
+        ADD_REGULATOR_BO(VDDD),
+        ADD_REGULATOR_LINREG(VDDD),
+        ADD_REGULATOR_LINREG_OFFSET(VDDD)
+    },
+    [REGULATOR_VDDA] =
+    {
+        ADD_REGULATOR(VDDA, HAS_BO|HAS_LINREG|HAS_LINREG_OFFSET),
+        ADD_REGULATOR_BO(VDDA),
+        ADD_REGULATOR_LINREG(VDDA),
+        ADD_REGULATOR_LINREG_OFFSET(VDDA)
+    },
+    [REGULATOR_VDDIO] =
+    {
+        ADD_REGULATOR(VDDIO, HAS_BO|HAS_LINREG_OFFSET),
+        ADD_REGULATOR_BO(VDDIO),
+        ADD_REGULATOR_LINREG_OFFSET(VDDIO)
+    },
+    [REGULATOR_VDDMEM] =
+    {
+        ADD_REGULATOR(VDDMEM, HAS_LINREG),
+        ADD_REGULATOR_LINREG(VDDMEM),
+    },
+};
+
+void imx233_power_get_regulator(enum imx233_regulator_t reg, unsigned *value_mv,
+    unsigned *brownout_mv)
+{
+    uint32_t reg_val = *regulator_info[reg].reg;
+    /* read target value */
+    unsigned raw_val = (reg_val & regulator_info[reg].trg_bm) >> regulator_info[reg].trg_bp;
+    /* convert it to mv */
+    if(value_mv)
+        *value_mv = regulator_info[reg].min + regulator_info[reg].step * raw_val;
+    if(regulator_info[reg].flags & HAS_BO)
+    {
+        /* read brownout offset */
+        unsigned raw_bo = (reg_val & regulator_info[reg].bo_bm) >> regulator_info[reg].bo_bp;
+        /* convert it to mv */
+        if(brownout_mv)
+            *brownout_mv = regulator_info[reg].min + regulator_info[reg].step * (raw_val - raw_bo);
+    }
+    else if(brownout_mv)
+        *brownout_mv = 0;
+}
+
+void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
+    unsigned brownout_mv)
+{
+    // compute raw values
+    unsigned raw_val = (value_mv - regulator_info[reg].min) / regulator_info[reg].step;
+    unsigned raw_bo_offset = (value_mv - brownout_mv) / regulator_info[reg].step;
+    // update
+    uint32_t reg_val = (*regulator_info[reg].reg) & ~regulator_info[reg].trg_bm;
+    reg_val |= raw_val << regulator_info[reg].trg_bp;
+    if(regulator_info[reg].flags & HAS_BO)
+    {
+        reg_val &= ~regulator_info[reg].bo_bm;
+        reg_val |= raw_bo_offset << regulator_info[reg].bo_bp;
+    }
+    *regulator_info[reg].reg = reg_val;
+}
+
+// offset is -1,0 or 1
+void imx233_power_get_regulator_linreg(enum imx233_regulator_t reg,
+    bool *enabled, int *linreg_offset)
+{
+    if(enabled && regulator_info[reg].flags & HAS_LINREG)
+        *enabled = !!(*regulator_info[reg].reg & regulator_info[reg].linreg_bm);
+    else if(enabled)
+        *enabled = true;
+    if(regulator_info[reg].flags & HAS_LINREG_OFFSET)
+    {
+        unsigned v = (*regulator_info[reg].reg & regulator_info[reg].linreg_offset_bm);
+        v >>= regulator_info[reg].linreg_offset_bp;
+        if(linreg_offset)
+            *linreg_offset = (v == 0) ? 0 : (v == 1) ? 1 : -1;
+    }
+    else if(linreg_offset)
+        *linreg_offset = 0;
+}
+
+// offset is -1,0 or 1
+/*
+void imx233_power_set_regulator_linreg(enum imx233_regulator_t reg,
+    bool enabled, int linreg_offset)
+{
+}
+*/
+
+
 struct imx233_power_info_t imx233_power_get_info(unsigned flags)
 {
     static int dcdc_freqsel[8] = {
@@ -180,31 +304,6 @@ struct imx233_power_info_t imx233_power_get_info(unsigned flags)
     
     struct imx233_power_info_t s;
     memset(&s, 0, sizeof(s));
-    if(flags & POWER_INFO_VDDD)
-    {
-        s.vddd = HW_POWER_VDDDCTRL__TRG_MIN + HW_POWER_VDDDCTRL__TRG_STEP * __XTRACT(HW_POWER_VDDDCTRL, TRG);
-        s.vddd_linreg = HW_POWER_VDDDCTRL & HW_POWER_VDDDCTRL__ENABLE_LINREG;
-        s.vddd_linreg_offset = __XTRACT(HW_POWER_VDDDCTRL, LINREG_OFFSET) == 0 ? 0 :
-            __XTRACT(HW_POWER_VDDDCTRL, LINREG_OFFSET) == 1 ? 25 : -25;
-    }
-    if(flags & POWER_INFO_VDDA)
-    {
-        s.vdda = HW_POWER_VDDACTRL__TRG_MIN + HW_POWER_VDDACTRL__TRG_STEP * __XTRACT(HW_POWER_VDDACTRL, TRG);
-        s.vdda_linreg = HW_POWER_VDDACTRL & HW_POWER_VDDACTRL__ENABLE_LINREG;
-        s.vdda_linreg_offset = __XTRACT(HW_POWER_VDDACTRL, LINREG_OFFSET) == 0 ? 0 :
-            __XTRACT(HW_POWER_VDDACTRL, LINREG_OFFSET) == 1 ? 25 : -25;
-    }
-    if(flags & POWER_INFO_VDDIO)
-    {
-        s.vddio = HW_POWER_VDDIOCTRL__TRG_MIN + HW_POWER_VDDIOCTRL__TRG_STEP * __XTRACT(HW_POWER_VDDIOCTRL, TRG);
-        s.vddio_linreg_offset = __XTRACT(HW_POWER_VDDIOCTRL, LINREG_OFFSET) == 0 ? 0 :
-            __XTRACT(HW_POWER_VDDIOCTRL, LINREG_OFFSET) == 1 ? 25 : -25;
-    }
-    if(flags & POWER_INFO_VDDMEM)
-    {
-        s.vddmem = HW_POWER_VDDMEMCTRL__TRG_MIN + HW_POWER_VDDMEMCTRL__TRG_STEP * __XTRACT(HW_POWER_VDDMEMCTRL, TRG);
-        s.vddmem_linreg = HW_POWER_VDDMEMCTRL & HW_POWER_VDDMEMCTRL__ENABLE_LINREG;
-    }
     if(flags & POWER_INFO_DCDC)
     {
         s.dcdc_sel_pllclk = HW_POWER_MISC & HW_POWER_MISC__SEL_PLLCLK;

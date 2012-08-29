@@ -34,6 +34,7 @@
 #include "pinctrl-imx233.h"
 #include "ocotp-imx233.h"
 #include "string.h"
+#include "stdio.h"
 
 #define DEBUG_CANCEL  BUTTON_BACK
 
@@ -150,21 +151,33 @@ bool dbg_hw_info_power(void)
         lcd_clear_display();
 
         struct imx233_power_info_t info = imx233_power_get_info(POWER_INFO_ALL);
-        lcd_putsf(0, 0, "VDDD: %d mV  linreg: %d  offset: %d", info.vddd, info.vddd_linreg,
-            info.vddd_linreg_offset);
-        lcd_putsf(0, 1, "VDDA: %d mV  linreg: %d  offset: %d", info.vdda, info.vdda_linreg,
-            info.vdda_linreg_offset);
-        lcd_putsf(0, 2, "VDDIO: %d mV offset: %d", info.vddio, info.vddio_linreg_offset);
-        lcd_putsf(0, 3, "VDDMEM: %d mV  linreg: %d", info.vddmem, info.vddmem_linreg);
-        lcd_putsf(0, 4, "DC-DC: pll: %d   freq: %d", info.dcdc_sel_pllclk, info.dcdc_freqsel);
-        lcd_putsf(0, 5, "charge: %d mA  stop: %d mA", info.charge_current, info.stop_current);
-        lcd_putsf(0, 6, "charging: %d  bat_adj: %d", info.charging, info.batt_adj);
-        lcd_putsf(0, 7, "4.2: en: %d  dcdc: %d", info._4p2_enable, info._4p2_dcdc);
-        lcd_putsf(0, 8, "4.2: cmptrip: %d dropout: %d", info._4p2_cmptrip, info._4p2_dropout);
-        lcd_putsf(0, 9, "5V: pwd_4.2_charge: %d", info._5v_pwd_charge_4p2);
-        lcd_putsf(0, 10, "5V: chargelim: %d mA", info._5v_charge_4p2_limit);
-        lcd_putsf(0, 11, "5V: dcdc: %d  xfer: %d", info._5v_enable_dcdc, info._5v_dcdc_xfer);
-        lcd_putsf(0, 12, "5V: thr: %d mV use: %d cmps: %d", info._5v_vbusvalid_thr,
+        int line = 0;
+        unsigned trg, bo;
+        bool en;
+        int linreg;
+        char buf[16];
+        
+        lcd_putsf(0, line++, "name  value bo linreg");
+#define DISP_REGULATOR(name) \
+        imx233_power_get_regulator(REGULATOR_##name, &trg, &bo); \
+        imx233_power_get_regulator_linreg(REGULATOR_##name, &en, &linreg); \
+        if(en) snprintf(buf, sizeof(buf), "%d", linreg); \
+        else snprintf(buf, sizeof(buf), " "); \
+        lcd_putsf(0, line++, "%6s %4d %4d %s", #name, trg, bo, buf); \
+
+        DISP_REGULATOR(VDDD);
+        DISP_REGULATOR(VDDA);
+        DISP_REGULATOR(VDDIO);
+        DISP_REGULATOR(VDDMEM);
+        lcd_putsf(0, line++, "DC-DC: pll: %d   freq: %d", info.dcdc_sel_pllclk, info.dcdc_freqsel);
+        lcd_putsf(0, line++, "charge: %d mA  stop: %d mA", info.charge_current, info.stop_current);
+        lcd_putsf(0, line++, "charging: %d  bat_adj: %d", info.charging, info.batt_adj);
+        lcd_putsf(0, line++, "4.2: en: %d  dcdc: %d", info._4p2_enable, info._4p2_dcdc);
+        lcd_putsf(0, line++, "4.2: cmptrip: %d dropout: %d", info._4p2_cmptrip, info._4p2_dropout);
+        lcd_putsf(0, line++, "5V: pwd_4.2_charge: %d", info._5v_pwd_charge_4p2);
+        lcd_putsf(0, line++, "5V: chargelim: %d mA", info._5v_charge_4p2_limit);
+        lcd_putsf(0, line++, "5V: dcdc: %d  xfer: %d", info._5v_enable_dcdc, info._5v_dcdc_xfer);
+        lcd_putsf(0, line++, "5V: thr: %d mV use: %d cmps: %d", info._5v_vbusvalid_thr,
             info._5v_vbusvalid_detect, info._5v_vbus_cmps);
         
         lcd_update();
@@ -286,7 +299,8 @@ bool dbg_hw_info_clkctrl(void)
             #undef c
         }
         int line = ARRAYLEN(dbg_clk) + 1;
-        lcd_putsf(0, line, "auto slow: %d", imx233_clkctrl_is_auto_slow_enabled());
+        lcd_putsf(0, line, "auto slow: %d  emi sync: %d", imx233_clkctrl_is_auto_slow_enabled(),
+            imx233_clkctrl_is_emi_sync_enabled());
         line++;
         lcd_putsf(0, line, "as monitor: ");
         int x_off = 12;

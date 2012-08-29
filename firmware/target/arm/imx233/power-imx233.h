@@ -77,6 +77,8 @@
 #define HW_POWER_VDDDCTRL       (*(volatile uint32_t *)(HW_POWER_BASE + 0x40))
 #define HW_POWER_VDDDCTRL__TRG_BP   0
 #define HW_POWER_VDDDCTRL__TRG_BM   0x1f
+#define HW_POWER_VDDDCTRL__BO_OFFSET_BP 8
+#define HW_POWER_VDDDCTRL__BO_OFFSET_BM (0x7 << 8)
 #define HW_POWER_VDDDCTRL__TRG_STEP 25 /* mV */
 #define HW_POWER_VDDDCTRL__TRG_MIN  800 /* mV */
 #define HW_POWER_VDDDCTRL__LINREG_OFFSET_BP 16
@@ -86,6 +88,8 @@
 #define HW_POWER_VDDACTRL       (*(volatile uint32_t *)(HW_POWER_BASE + 0x50))
 #define HW_POWER_VDDACTRL__TRG_BP   0
 #define HW_POWER_VDDACTRL__TRG_BM   0x1f
+#define HW_POWER_VDDACTRL__BO_OFFSET_BP 8
+#define HW_POWER_VDDACTRL__BO_OFFSET_BM (0x7 << 8)
 #define HW_POWER_VDDACTRL__TRG_STEP 25 /* mV */
 #define HW_POWER_VDDACTRL__TRG_MIN  1500 /* mV */
 #define HW_POWER_VDDACTRL__LINREG_OFFSET_BP 12
@@ -95,6 +99,8 @@
 #define HW_POWER_VDDIOCTRL      (*(volatile uint32_t *)(HW_POWER_BASE + 0x60))
 #define HW_POWER_VDDIOCTRL__TRG_BP  0
 #define HW_POWER_VDDIOCTRL__TRG_BM  0x1f
+#define HW_POWER_VDDIOCTRL__BO_OFFSET_BP 8
+#define HW_POWER_VDDIOCTRL__BO_OFFSET_BM (0x7 << 8)
 #define HW_POWER_VDDIOCTRL__TRG_STEP    25 /* mV */
 #define HW_POWER_VDDIOCTRL__TRG_MIN 2800 /* mV */
 #define HW_POWER_VDDIOCTRL__LINREG_OFFSET_BP    12
@@ -173,10 +179,33 @@ void imx233_power_set_charge_current(unsigned current); /* in mA */
 void imx233_power_set_stop_current(unsigned current); /* in mA */
 void imx233_power_enable_batadj(bool enable);
 
+enum imx233_regulator_t
+{
+    REGULATOR_VDDD, /* target, brownout, linreg, linreg offset */
+    REGULATOR_VDDA, /* target, brownout, linreg, linreg offset */
+    REGULATOR_VDDIO, /* target, brownout, linreg offset */
+    REGULATOR_VDDMEM, /* target, linreg */
+    REGULATOR_COUNT,
+};
+
+void imx233_power_get_regulator(enum imx233_regulator_t reg, unsigned *target_mv,
+    unsigned *brownout_mv);
+
+void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned target_mv,
+    unsigned brownout_mv);
+
+// offset is -1,0 or 1
+void imx233_power_get_regulator_linreg(enum imx233_regulator_t reg,
+    bool *enabled, int *linreg_offset);
+
+// offset is -1,0 or 1
+void imx233_power_set_regulator_linreg(enum imx233_regulator_t reg,
+    bool enabled, int linreg_offset);
+
 static inline void imx233_power_set_dcdc_freq(bool pll, unsigned freq)
 {
     HW_POWER_MISC &= ~(HW_POWER_MISC__SEL_PLLCLK | HW_POWER_MISC__FREQSEL_BM);
-    /* WARNING: HW_POWER_MISC does have a SET/CLR variant ! */
+    /* WARNING: HW_POWER_MISC does not have a SET/CLR variant ! */
     if(pll)
     {
         HW_POWER_MISC |= freq << HW_POWER_MISC__FREQSEL_BP;
@@ -186,16 +215,6 @@ static inline void imx233_power_set_dcdc_freq(bool pll, unsigned freq)
 
 struct imx233_power_info_t
 {
-    int vddd; /* in mV */
-    bool vddd_linreg; /* VDDD source: linreg from VDDA or DC-DC */
-    int vddd_linreg_offset;
-    int vdda; /* in mV */
-    bool vdda_linreg; /* VDDA source: linreg from VDDIO or DC-DC */
-    int vdda_linreg_offset;
-    int vddio; /* in mV */
-    int vddio_linreg_offset;
-    int vddmem; /* in mV */
-    bool vddmem_linreg; /* VDDMEM source: linreg from VDDIO or off */
     bool dcdc_sel_pllclk; /* clock source of DC-DC: pll or 24MHz xtal */
     int dcdc_freqsel;
     int charge_current;
@@ -215,10 +234,6 @@ struct imx233_power_info_t
     bool _5v_vbus_cmps;
 };
 
-#define POWER_INFO_VDDD     (1 << 0)
-#define POWER_INFO_VDDA     (1 << 1)
-#define POWER_INFO_VDDIO    (1 << 2)
-#define POWER_INFO_VDDMEM   (1 << 3)
 #define POWER_INFO_DCDC     (1 << 4)
 #define POWER_INFO_CHARGE   (1 << 5)
 #define POWER_INFO_4P2      (1 << 6)
