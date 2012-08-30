@@ -647,6 +647,7 @@ static void sdmmc_thread(void)
 {
     struct queue_event ev;
     bool idle_notified = false;
+    int timeout = 0;
 
     while (1)
     {
@@ -706,8 +707,13 @@ static void sdmmc_thread(void)
         }
 #endif
         case SYS_TIMEOUT:
-            if(TIME_BEFORE(current_tick, sd_last_disk_activity()+(3*HZ)) ||
-                    TIME_BEFORE(current_tick, mmc_last_disk_activity()+(3*HZ)))
+#if CONFIG_STORAGE & STORAGE_SD
+            timeout = MAX(timeout, sd_last_disk_activity()+(3*HZ));
+#endif
+#if CONFIG_STORAGE & STORAGE_MMC
+            timeout = MAX(timeout, mmc_last_disk_activity()+(3*HZ));
+#endif
+            if(TIME_BEFORE(current_tick, timeout))
             {
                 idle_notified = false;
             }
