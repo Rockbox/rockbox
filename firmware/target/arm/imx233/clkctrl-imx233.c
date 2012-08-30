@@ -225,8 +225,11 @@ bool imx233_clkctrl_is_usb_pll_enabled(void)
 
 void imx233_clkctrl_set_auto_slow_divisor(enum imx233_as_div_t div)
 {
-    __REG_CLR(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__SLOW_DIV_BM;
-    __REG_SET(HW_CLKCTRL_HBUS) = div;
+    /* the SLOW_DIV must only be set when auto-slow is disabled */
+    bool old_status = imx233_clkctrl_is_auto_slow_enabled();
+    imx233_clkctrl_enable_auto_slow(false);
+    __FIELD_SET(HW_CLKCTRL_HBUS, SLOW_DIV, div);
+    imx233_clkctrl_enable_auto_slow(old_status);
 }
 
 enum imx233_as_div_t imx233_clkctrl_get_auto_slow_divisor(void)
