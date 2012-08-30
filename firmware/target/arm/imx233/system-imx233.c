@@ -36,7 +36,6 @@
 #include "lradc-imx233.h"
 #include "rtc-imx233.h"
 #include "power-imx233.h"
-#include "emi-imx233.h"
 #include "lcd.h"
 #include "backlight-target.h"
 #include "button.h"
