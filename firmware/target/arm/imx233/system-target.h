@@ -55,10 +55,10 @@
 #define IMX233_CPUFREQ_64_MHz    64000000
 #define IMX233_CPUFREQ_24_MHz    24000000
 
-#define CPUFREQ_DEFAULT     IMX233_CPUFREQ_454_MHz
-#define CPUFREQ_NORMAL      IMX233_CPUFREQ_454_MHz
+#define CPUFREQ_DEFAULT     IMX233_CPUFREQ_261_MHz
+#define CPUFREQ_NORMAL      IMX233_CPUFREQ_261_MHz
 #define CPUFREQ_MAX         IMX233_CPUFREQ_454_MHz
-#define CPUFREQ_SLEEP       IMX233_CPUFREQ_454_MHz
+#define CPUFREQ_SLEEP       IMX233_CPUFREQ_261_MHz
 
 void udelay(unsigned us);
 bool imx233_us_elapsed(uint32_t ref, unsigned us_delay);

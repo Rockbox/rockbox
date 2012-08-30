@@ -35,6 +35,8 @@
 #include "icoll-imx233.h"
 #include "lradc-imx233.h"
 #include "rtc-imx233.h"
+#include "power-imx233.h"
+#include "emi-imx233.h"
 #include "lcd.h"
 #include "backlight-target.h"
 #include "button.h"
@@ -115,6 +117,14 @@ void system_init(void)
     defined(CREATIVE_ZENXFI3) || defined(CREATIVE_ZENXFI2))
     fmradio_i2c_init();
 #endif
+    imx233_clkctrl_enable_auto_slow_monitor(AS_CPU_INSTR, true);
+    imx233_clkctrl_enable_auto_slow_monitor(AS_CPU_DATA, true);
+    imx233_clkctrl_enable_auto_slow_monitor(AS_TRAFFIC, true);
+    imx233_clkctrl_enable_auto_slow_monitor(AS_TRAFFIC_JAM, true);
+    imx233_clkctrl_enable_auto_slow_monitor(AS_APBXDMA, true);
+    imx233_clkctrl_enable_auto_slow_monitor(AS_APBHDMA, true);
+    imx233_clkctrl_set_auto_slow_divisor(AS_DIV_8);
+    imx233_clkctrl_enable_auto_slow(true);
 }
 
 bool imx233_us_elapsed(uint32_t ref, unsigned us_delay)
@@ -151,18 +161,44 @@ void set_cpu_frequency(long frequency)
 {
     switch(frequency)
     {
-        #if 0
         case IMX233_CPUFREQ_454_MHz:
-            /* clk_h@clk_p/3 */
-            imx233_set_clock_divisor(CLK_AHB, 3);
-            /* clk_p@ref_cpu/1*18/19 */
-            imx233_set_fractional_divisor(CLK_CPU, 19);
-            imx233_set_clock_divisor(CLK_CPU, 1);
+            /* go back to a known state: everything at 24MHz ! */
+            imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
+            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 1);
+            _logf("set freq 454MHz");
+            /* set VDDD to 1.550 mV (brownout at 1.450 mV) */
+            imx233_power_set_regulator(REGULATOR_VDDD, 1550, 1450);
+            /* clk_h@clk_p/2 */
+            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 3);
+            /* clk_p@ref_cpu/1*18/33 */
+            imx233_clkctrl_set_fractional_divisor(CLK_CPU, 19);
+            imx233_clkctrl_set_clock_divisor(CLK_CPU, 1);
+            imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
             /* ref_cpu@480 MHz
-             * clk_p@454.74 MHz
-             * clk_h@151.58 MHz */
+             * ref_emi@480 MHz
+             * clk_emi@130.91 MHz
+             * clk_p@261.82 MHz
+             * clk_h@130.91 MHz */
             break;
-        #endif
+        case IMX233_CPUFREQ_261_MHz:
+            /* go back to a known state: everything at 24MHz ! */
+            imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
+            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 1);
+            _logf("set freq 261MHz");
+            /* set VDDD to 1.550 mV (brownout at 1.275 mV) */
+            imx233_power_set_regulator(REGULATOR_VDDD, 1275, 1175);
+            /* clk_h@clk_p/2 */
+            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 2);
+            /* clk_p@ref_cpu/1*18/33 */
+            imx233_clkctrl_set_fractional_divisor(CLK_CPU, 33);
+            imx233_clkctrl_set_clock_divisor(CLK_CPU, 1);
+            imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
+            /* ref_cpu@480 MHz
+             * ref_emi@480 MHz
+             * clk_emi@130.91 MHz
+             * clk_p@261.82 MHz
+             * clk_h@130.91 MHz */
+            break;
         default:
             break;
     }
