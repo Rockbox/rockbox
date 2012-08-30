@@ -168,14 +168,14 @@ void set_cpu_frequency(long frequency)
             imx233_power_set_regulator(REGULATOR_VDDD, 1550, 1450);
             /* clk_h@clk_p/2 */
             imx233_clkctrl_set_clock_divisor(CLK_HBUS, 3);
-            /* clk_p@ref_cpu/1*18/33 */
+            /* clk_p@ref_cpu/1*18/19 */
             imx233_clkctrl_set_fractional_divisor(CLK_CPU, 19);
             imx233_clkctrl_set_clock_divisor(CLK_CPU, 1);
             imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
             /* ref_cpu@480 MHz
              * ref_emi@480 MHz
              * clk_emi@130.91 MHz
-             * clk_p@261.82 MHz
+             * clk_p@454.74 MHz
              * clk_h@130.91 MHz */
             break;
         case IMX233_CPUFREQ_261_MHz:
