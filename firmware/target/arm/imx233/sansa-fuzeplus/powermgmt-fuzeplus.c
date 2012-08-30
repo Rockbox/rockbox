@@ -23,12 +23,12 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3300
+    3400
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3100
+    3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
