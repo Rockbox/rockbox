@@ -23,24 +23,24 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3659
+    3300
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3630
+    3100
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* Toshiba Gigabeat S Li Ion 700mAH figured from discharge curve */
-    { 3659, 3719, 3745, 3761, 3785, 3813, 3856, 3926, 3984, 4040, 4121 },
+    /* Sansa Fuze+ Li Ion 600mAH figured from discharge curve */
+    { 3100, 3650, 3720, 3750, 3780, 3820, 3880, 4000, 4040, 4125, 4230 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    /* Toshiba Gigabeat S Li Ion 700mAH figured from charge curve */
-    4028, 4063, 4087, 4111, 4135, 4156, 4173, 4185, 4194, 4202, 4208
+    /* Sansa Fuze+ Li Ion 600mAH figured from charge curve */
+    3480, 3790, 3845, 3880, 3900, 3935, 4005, 4070, 4150, 4250, 4335
 };
