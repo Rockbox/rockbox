@@ -164,7 +164,6 @@ void set_cpu_frequency(long frequency)
             /* go back to a known state: everything at 24MHz ! */
             imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
             imx233_clkctrl_set_clock_divisor(CLK_HBUS, 1);
-            _logf("set freq 454MHz");
             /* set VDDD to 1.550 mV (brownout at 1.450 mV) */
             imx233_power_set_regulator(REGULATOR_VDDD, 1550, 1450);
             /* clk_h@clk_p/2 */
@@ -183,7 +182,6 @@ void set_cpu_frequency(long frequency)
             /* go back to a known state: everything at 24MHz ! */
             imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
             imx233_clkctrl_set_clock_divisor(CLK_HBUS, 1);
-            _logf("set freq 261MHz");
             /* set VDDD to 1.550 mV (brownout at 1.275 mV) */
             imx233_power_set_regulator(REGULATOR_VDDD, 1275, 1175);
             /* clk_h@clk_p/2 */
