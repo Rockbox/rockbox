@@ -237,9 +237,9 @@ enum imx233_as_div_t imx233_clkctrl_get_auto_slow_divisor(void)
 void imx233_clkctrl_enable_auto_slow(bool enable)
 {
     if(enable)
-        __REG_CLR(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__AUTO_SLOW_MODE;
-    else
         __REG_SET(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__AUTO_SLOW_MODE;
+    else
+        __REG_CLR(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__AUTO_SLOW_MODE;
 }
 
 bool imx233_clkctrl_is_auto_slow_enabled(void)
