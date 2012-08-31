@@ -299,8 +299,8 @@ bool dbg_hw_info_clkctrl(void)
             #undef c
         }
         int line = ARRAYLEN(dbg_clk) + 1;
-        lcd_putsf(0, line, "auto slow: %d  emi sync: %d", imx233_clkctrl_is_auto_slow_enabled(),
-            imx233_clkctrl_is_emi_sync_enabled());
+        lcd_putsf(0, line, "as: %d/%d  emi sync: %d", imx233_clkctrl_is_auto_slow_enabled(),
+            1 << imx233_clkctrl_get_auto_slow_divisor(), imx233_clkctrl_is_emi_sync_enabled());
         line++;
         lcd_putsf(0, line, "as monitor: ");
         int x_off = 12;
