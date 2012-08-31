@@ -7,77 +7,77 @@
         <location filename="../gui/backupdialogfrm.ui" line="14"/>
         <location filename="../gui/backupdialogfrm.ui" line="40"/>
         <source>Backup</source>
-        <translation type="unfinished">Sauvegarde</translation>
+        <translation>Sauvegarde</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="30"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This dialog will create a backup by archiving the contents of the Rockbox installation on the player into a zip file. This will include installed themes and settings stored below the .rockbox folder on the player.&lt;/p&gt;&lt;p&gt;The backup filename will be created based on the installed version. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette fenêtre va créer une sauvegarde de votre installation de Rockbox en archivant le contenu du lecteur dans un fichier zip. Ceci inclut les thèmes installés ainsi que les fichiers de configuration stockés sous le répertoire .rocbox du lecteur.&lt;/p&gt;&lt;p&gt;Le nom du fichier de sauvegarde sera généré à partir de la version installée.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="46"/>
         <source>Size: unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille: inconnue</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="53"/>
         <source>Backup to: unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde sous: inconnu</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="73"/>
         <source>&amp;Change</source>
-        <translation type="unfinished">&amp;Modifier</translation>
+        <translation>&amp;Modifier</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="113"/>
         <source>&amp;Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sauvegarder</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="124"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Annuler</translation>
+        <translation>&amp;Annuler</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="66"/>
         <source>Installation size: calculating ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille de l&apos;installation: calcul en cours...</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="85"/>
         <source>Select Backup Filename</source>
-        <translation type="unfinished">Sélectionnez un fichier de sauvegarde</translation>
+        <translation>Sélectionnez un fichier de sauvegarde</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="105"/>
         <source>Installation size: %L1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille de l&apos;installation: %L1 %2</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="112"/>
         <source>File exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier existant</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="113"/>
         <source>The selected backup file already exists. Overwrite?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le fichier sélectionné existe déjà. Voulez-vous vraiment l&apos;écraser ?</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="121"/>
         <source>Starting backup ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrage de la sauvegarder...</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="140"/>
         <source>Backup successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde effectuée avec succès.</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="143"/>
         <source>Backup failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>La sauvegarde a échoué !</translation>
     </message>
 </context>
 <context>
@@ -85,7 +85,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="32"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&apos;&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;installation du bootloader nécessite que vous fournissiez une copie du firmware original (fichier bin). Ce firmware sera alors modifié et installé sur votre lecteur avec le bootloader de Rockbox. Vous devez télécharger ce fichier par vous-même pour des raisons légales. Veuillez vous référer au &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Forums de Sansa&lt;/a&gt; ou au &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manuel&lt;/a&gt; et à la page wiki &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; pour obtenir ce fichier.&lt;br/&gt;Appuyez sur Ok pour continuer et parcourir les fichiers sur votre ordinateur pour indiquer le fichier du firmware.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="55"/>
@@ -101,7 +101,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="124"/>
         <source>No room to insert bootloader, try another firmware version</source>
-        <translation type="unfinished">Il n&apos;y a pas assez d&apos;espace pour insérer le bootloader, veuillez essayer une autre version du firmware</translation>
+        <translation>Il n&apos;y a pas assez d&apos;espace pour insérer le bootloader, veuillez essayer une autre version du firmware</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="134"/>
@@ -179,27 +179,27 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="221"/>
         <source>Zip file format detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier au format zip détecté</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="234"/>
         <source>Extracting firmware %1 from archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Extraction du firmware %1 depuis l&apos;archive</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="241"/>
         <source>Error extracting firmware from archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de l&apos;extraction du firmware depuis l&apos;archive</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="250"/>
         <source>Could not find firmware in archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de trouver le firmware original dans l&apos;archive</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="157"/>
         <source>Waiting for system to remount player</source>
-        <translation type="unfinished">Attend que le système ait remonté le périphérique audio</translation>
+        <translation>Attend que le système ait remonté le lecteur</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="187"/>
