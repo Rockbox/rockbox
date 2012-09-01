@@ -571,7 +571,7 @@
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="173"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware.</source>
-        <translation>Pour le désinstaller, faites une mise à jour normale avec un firmware non modifié</translation>
+        <translation>Pour le désinstaller, faites une mise à jour normale avec un firmware non modifié.</translation>
     </message>
 </context>
 <context>
@@ -1951,12 +1951,12 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="423"/>
         <source>No voice file available</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun fichier de voix disponible</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="424"/>
         <source>The installed version of Rockbox is a development version. Pre-built voices are only available for release versions of Rockbox. Please generate a voice yourself using the &quot;Create voice file&quot; functionality.</source>
-        <translation type="unfinished"></translation>
+        <translation>La version de Rockbox installée est une version de dévelopement. Des fichiers de voix précalculés sont uniquement disponible pour les versions stables de Rockbox. Veuillez générer des fichiers de voix en utilisant la fonctionnalité &quot;Création de fichiers de voix&quot;.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="496"/>
@@ -1981,7 +1981,7 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="534"/>
         <source>No Rockbox bootloader found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader de Rockbox n&apos;a pas été trouvé.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="552"/>
@@ -2165,22 +2165,22 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
     <message>
         <location filename="../rbutilqtfrm.ui" line="37"/>
         <source>mountpoint unknown or invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>point de montage inconnu ou invalide</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="44"/>
         <source>Mountpoint:</source>
-        <translation type="unfinished"></translation>
+        <translation>Point de montage:</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="51"/>
         <source>device unknown or invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>périphérique inconnu ou invalide</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="64"/>
         <source>Device:</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique:</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="269"/>
@@ -2317,7 +2317,7 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
     <message>
         <location filename="../rbutilqtfrm.ui" line="260"/>
         <source>Backup &amp;&amp; &amp;Uninstallation</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde &amp;&amp; &amp;Désinstallation</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="286"/>
@@ -2332,12 +2332,12 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
     <message>
         <location filename="../rbutilqtfrm.ui" line="326"/>
         <source>Backup</source>
-        <translation type="unfinished">Sauvegarde</translation>
+        <translation>Sauvegarde</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="343"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Backup current installation.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Create a backup by archiving the contents of the Rockbox installation folder.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Sauvegarder l&apos;installation courante.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Créé une sauvegarde en archivant le contenu du dossier de Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="515"/>
@@ -2410,234 +2410,233 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="20"/>
         <source>Selective Installation</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation personnalisée</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="26"/>
         <source>Rockbox version to install</source>
-        <translation type="unfinished"></translation>
+        <translation>Version de Rockbox à installer</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="35"/>
         <source>Version information not available yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les informations de version ne sont pas encore disponibles.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="54"/>
         <source>Rockbox components to install</source>
-        <translation type="unfinished"></translation>
+        <translation>Composants de Rockbox à installer</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="60"/>
         <source>&amp;Bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Bootloader</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="80"/>
         <source>The main Rockbox firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le logiciel principal de Rockbox.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="90"/>
         <source>Fonts</source>
-        <translation type="unfinished"></translation>
+        <translation>Polices</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="104"/>
         <source>&amp;Rockbox</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Rockbox</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="124"/>
         <source>Some game plugins require additional files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Certains plugins de jeu nécessitent des fichiers additionnels.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="140"/>
         <source>Additional fonts for the User Interface.</source>
-        <translation type="unfinished"></translation>
+        <translation>Polices additionnelles pour l&apos;interface utilisateur.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="156"/>
         <source>The bootloader is required for starting Rockbox. Only necessary for first time install.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader est nécessaire pour démarrer Rockbox. Son installation n&apos;est nécessaire que lors de la première installation.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="166"/>
         <source>Game Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichiers de jeux</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="177"/>
         <source>Customize</source>
-        <translation type="unfinished"></translation>
+        <translation>Personnaliser</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="184"/>
         <source>Themes</source>
-        <translation type="unfinished"></translation>
+        <translation>Thèmes</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="201"/>
         <source>Themes allow adjusting the user interface of Rockbox. Use &quot;Customize&quot; to select themes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les thèmes permettent de modifier l&apos;interface utilisateur de Rockbox. Utilisez &quot;Personnaliser&quot; pour sélectionner les thèmes.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="246"/>
         <source>&amp;Install</source>
-        <translation type="unfinished">&amp;Installer</translation>
+        <translation>&amp;Installer</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="64"/>
         <source>This is the latest stable release available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceci est la dernière version stable de Rockbox disponible.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="67"/>
         <source>The development version is updated on every code change. Last update was on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>La version de dévelopment est mise à jour à chaque changement du code. La dernière mise à jour a eu lieu le %1</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="71"/>
         <source>This will eventually become the next Rockbox version. Install it to help testing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette version est vouée à devenir la prochaine version stable. Installez-là pour la tester.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="97"/>
         <source>Stable Release (Version %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Version stable (Version %1)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="101"/>
         <source>Development Version (Revison %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Version de dévelopement (Révision %1)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="105"/>
         <source>Release Candidate (Revison %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Version pré-stable (Révision %1)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="127"/>
         <source>The selected player doesn&apos;t need a bootloader.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le lecteur audio sélectionné ne nécessite pas l&apos;installation d&apos;un bootloader.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="132"/>
         <source>The bootloader is required for starting Rockbox. Installation of the bootloader is only necessary on first time installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader est nécessaire pour démarrer Rockbox. Son installation n&apos;est nécessaire que lors de la première installation.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="165"/>
         <source>Mountpoint is wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>Le point de montage est erroné</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="219"/>
         <source>No install method known.</source>
-        <translation type="unfinished">Aucune méthode d&apos;installation n&apos;est connue.</translation>
+        <translation>Aucune méthode d&apos;installation n&apos;est connue.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="246"/>
         <source>Bootloader detected</source>
-        <translation type="unfinished">Le bootloader a été détecté</translation>
+        <translation>Le bootloader a été détecté</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="247"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
-        <translation type="unfinished">Le bootloader est déjà installé. Voulez-vous le réinstaller ?</translation>
+        <translation>Le bootloader est déjà installé. Voulez-vous le réinstaller ?</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="251"/>
         <source>Bootloader installation skipped</source>
-        <translation type="unfinished">Installation du bootloader ignorée</translation>
+        <translation>Installation du bootloader ignorée</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="264"/>
         <source>Create Bootloader backup</source>
-        <translation type="unfinished">Sauvegarde du bootloader</translation>
+        <translation>Sauvegarde du bootloader</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="265"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
-        <translation type="unfinished">Vous pouvez créer une sauvegarde du bootloader original. Appuyez sur &quot;Oui&quot; pour sélectionner un dossier de sortie sur votre ordinateur où le fichier sera enregistré. Le fichier sera placé dans le sous-dossier &quot;%1&quot;.
-Appuyez sur &quot;Non&quot; pour ignorez cette étape.</translation>
+        <translation>Vous pouvez créer une sauvegarde du bootloader original. Appuyez sur &quot;Oui&quot; pour sélectionner un dossier de sortie sur votre ordinateur où le fichier sera enregistré. Le fichier sera placé dans un nouveau sous-dossier &quot;%1&quot; créé dans le dossier sélectionné. Appuyez sur &quot;Non&quot; pour ignorez cette étape.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="272"/>
         <source>Browse backup folder</source>
-        <translation type="unfinished">Parcourir le dossier de sauvegarde</translation>
+        <translation>Parcourir le dossier de sauvegarde</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="284"/>
         <source>Prerequisites</source>
-        <translation type="unfinished">Prérequis</translation>
+        <translation>Prérequis</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="289"/>
         <source>Bootloader installation aborted</source>
-        <translation type="unfinished">Installation du bootloader annulée</translation>
+        <translation>Installation du bootloader annulée</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="299"/>
         <source>Bootloader files (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichiers du bootloader (%1)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="301"/>
         <source>All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous les fichiers (*)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="303"/>
         <source>Select firmware file</source>
-        <translation type="unfinished">Sélectionnez le fichier firmware</translation>
+        <translation>Sélectionnez le fichier firmware</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="305"/>
         <source>Error opening firmware file</source>
-        <translation type="unfinished">Impossible d&apos;ouvrir le fichier firmware</translation>
+        <translation>Impossible d&apos;ouvrir le fichier firmware</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="311"/>
         <source>Error reading firmware file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de lire le fichier firmware</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="321"/>
         <source>Backup error</source>
-        <translation type="unfinished">Erreur de la sauvegarde</translation>
+        <translation>Erreur de la sauvegarde</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="322"/>
         <source>Could not create backup file. Continue?</source>
-        <translation type="unfinished">Impossible de créer une sauvegarde. Voulez-vous poursuivre ?</translation>
+        <translation>Impossible de créer une sauvegarde. Voulez-vous poursuivre ?</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="346"/>
         <source>Manual steps required</source>
-        <translation type="unfinished">Des étapes manuelles sont nécessaires</translation>
+        <translation>Des étapes manuelles sont nécessaires</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="366"/>
         <source>Continue with installation?</source>
-        <translation type="unfinished"></translation>
+        <translation>Continuer l&apos;installation ?</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="367"/>
         <source>Really continue?</source>
-        <translation type="unfinished">Êtes vous sûr de vouloir poursuivre ?</translation>
+        <translation>Êtes vous sûr de vouloir poursuivre ?</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="371"/>
         <source>Aborted!</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulé !</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="485"/>
         <source>Your installation doesn&apos;t require game files, skipping.</source>
-        <translation type="unfinished"></translation>
+        <translation>Votre installation ne nécessite pas de fichier de jeu, étape ignorée.</translation>
     </message>
 </context>
 <context>
@@ -2740,7 +2739,7 @@ Appuyez sur &quot;Non&quot; pour ignorez cette étape.</translation>
     <message>
         <location filename="../sysinfo.cpp" line="65"/>
         <source>Mountpoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Point de montage</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="65"/>
