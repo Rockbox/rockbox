@@ -2744,27 +2744,27 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../sysinfo.cpp" line="65"/>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Libellé</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="66"/>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Libre</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="66"/>
         <source>Total</source>
-        <translation type="unfinished"></translation>
+        <translation>Total</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="67"/>
         <source>Cluster Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille des clusters</translation>
     </message>
     <message>
         <location filename="../sysinfo.cpp" line="69"/>
         <source>&lt;tr&gt;&lt;td&gt;%1&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td&gt;%2 GiB&lt;/td&gt;&lt;td&gt;%3 GiB&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;tr&gt;&lt;td&gt;%1&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td&gt;%2 Gio&lt;/td&gt;&lt;td&gt;%3 Gio&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
 </context>
 <context>
@@ -2819,32 +2819,32 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../base/ttsbase.cpp" line="40"/>
         <source>Espeak TTS Engine</source>
-        <translation type="unfinished">Synthèse vocale basée sur Espeak</translation>
+        <translation>Synthèse vocale basée sur Espeak</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="42"/>
         <source>Flite TTS Engine</source>
-        <translation type="unfinished">Synthèse vocale basée sur Flite</translation>
+        <translation>Synthèse vocale basée sur Flite</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="43"/>
         <source>Swift TTS Engine</source>
-        <translation type="unfinished">Synthèse vocale basée sur Swift</translation>
+        <translation>Synthèse vocale basée sur Swift</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="45"/>
         <source>SAPI TTS Engine</source>
-        <translation type="unfinished">Synthèse vocale basée sur SAPI</translation>
+        <translation>Synthèse vocale basée sur SAPI</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="48"/>
         <source>Festival TTS Engine</source>
-        <translation type="unfinished">Synthèse vocale basée sur Festival</translation>
+        <translation>Synthèse vocale basée sur Festival</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="51"/>
         <source>OS X System Engine</source>
-        <translation type="unfinished">Synthèse vocale basée sur le système OS X</translation>
+        <translation>Synthèse vocale basée sur le système OS X</translation>
     </message>
 </context>
 <context>
@@ -2862,7 +2862,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../base/ttscarbon.cpp" line="151"/>
         <source>Pitch (0 for default):</source>
-        <translation type="unfinished">Hauteur de ton  (0 est la valeur par defaut) :</translation>
+        <translation>Hauteur de ton  (0 est la valeur par defaut) :</translation>
     </message>
     <message>
         <location filename="../base/ttscarbon.cpp" line="221"/>
@@ -2946,12 +2946,12 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../base/ttssapi.cpp" line="110"/>
         <source>Could not copy the SAPI script</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de copy the script SAPI</translation>
     </message>
     <message>
         <location filename="../base/ttssapi.cpp" line="131"/>
         <source>Could not start SAPI process</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible lancer le processus SAPI</translation>
     </message>
 </context>
 <context>
@@ -2984,7 +2984,7 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../base/talkfile.cpp" line="35"/>
         <source>Starting Talk file generation for folder %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Début de la génération des fichiers de voix pour le dossier %1</translation>
     </message>
     <message>
         <location filename="../base/talkfile.cpp" line="79"/>
@@ -3164,7 +3164,7 @@ Veuillez vérifier vos paramètres réseau et proxy.</translation>
     <message>
         <location filename="../themesinstallwindow.cpp" line="291"/>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner</translation>
     </message>
     <message>
         <location filename="../themesinstallwindow.cpp" line="295"/>
@@ -3174,7 +3174,7 @@ Veuillez vérifier vos paramètres réseau et proxy.</translation>
     <message>
         <location filename="../themesinstallwindow.cpp" line="324"/>
         <source>No themes selected, skipping</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun thème sélectionné, étape ignorée</translation>
     </message>
     <message>
         <location filename="../themesinstallwindow.cpp" line="354"/>
@@ -3296,7 +3296,7 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/utils.cpp" line="322"/>
         <source>&lt;li&gt;Target mismatch detected.&lt;br/&gt;Installed target: %1&lt;br/&gt;Selected target: %2.&lt;/li&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;li&gt;Incompatibilité de modèles détectée. &lt;br/&gt;Modèle installé: %1&lt;br/&gt;Modèle sélectionné: %2&lt;/li&gt;</translation>
     </message>
     <message>
         <location filename="../base/utils.cpp" line="329"/>
@@ -3314,17 +3314,17 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/voicefile.cpp" line="89"/>
         <source>Extracted voice strings from installation</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichiers de voix extrait depuis l&apos;installation</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="99"/>
         <source>Extracted voice strings incompatible</source>
-        <translation type="unfinished"></translation>
+        <translation>Les fichiers de voix extraits sont incompatibles</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="144"/>
         <source>Could not retrieve strings from installation, downloading</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;extraire les fichiers de voix depuis l&apos;installation, téléchargement</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="170"/>
@@ -3412,7 +3412,7 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/zipinstaller.cpp" line="66"/>
         <source>Package installation finished successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le paquet a été installé avec succès.</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="78"/>
@@ -3447,7 +3447,7 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/zipinstaller.cpp" line="150"/>
         <source>Extraction failed!</source>
-        <translation type="unfinished">L&apos;extraction a échoué !</translation>
+        <translation>L&apos;extraction a échoué !</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="159"/>
@@ -3475,17 +3475,17 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/ziputil.cpp" line="124"/>
         <source>Creating output path failed</source>
-        <translation type="unfinished">La création du chemin d&apos;installation a échoué</translation>
+        <translation>La création du chemin d&apos;installation a échoué</translation>
     </message>
     <message>
         <location filename="../base/ziputil.cpp" line="131"/>
         <source>Creating output file failed</source>
-        <translation type="unfinished">la création du fichier à installer a échoué</translation>
+        <translation>La création du fichier à installer a échoué</translation>
     </message>
     <message>
         <location filename="../base/ziputil.cpp" line="140"/>
         <source>Error during Zip operation</source>
-        <translation type="unfinished">Erreur lors de l&apos;utilisation de Zip</translation>
+        <translation>Erreur lors de l&apos;utilisation de Zip</translation>
     </message>
 </context>
 <context>
@@ -3518,7 +3518,7 @@ Les privilèges administrateur sont requis.&lt;/li&gt;</translation>
     <message>
         <location filename="../aboutbox.ui" line="132"/>
         <source>&amp;Speex License</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence de &amp;Speex</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="158"/>
