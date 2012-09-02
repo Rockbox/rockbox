@@ -123,10 +123,10 @@ void InstallTalkWindow::updateSettings(void)
     QString ttsName = RbSettings::value(RbSettings::Tts).toString();
     TTSBase* tts = TTSBase::getTTS(this,ttsName);
     if(tts->configOk())
-        ui.labelTtsProfile->setText(tr("<b>%1</b>")
+        ui.labelTtsProfile->setText(QString("<b>%1</b>")
             .arg(TTSBase::getTTSName(ttsName)));
     else
-        ui.labelTtsProfile->setText(tr("<b>%1</b>")
+        ui.labelTtsProfile->setText(QString("<b>%1</b>")
             .arg("Invalid TTS configuration!"));
 
     QStringList folders = RbSettings::value(RbSettings::TalkFolders).toStringList();
