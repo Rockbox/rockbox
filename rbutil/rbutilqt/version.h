@@ -22,6 +22,8 @@
 // contain a build timestamp because it needs to be the same in different
 // files
 // VERSION is the plain version number, used for http User-Agent string.
+// It is concatenated from separate digits to allow reusing for the Windows
+// resource information
 // BUILDID is an additional build string to handle package updates (i.e.
 // rebuilds because of issues like dependency problems or library updates).
 // Usually empty.
@@ -29,8 +31,8 @@
 // Version string is constructed from parts, since the Windows rc file needs it
 // combined differently.
 #define VERSION_MAJOR 1
-#define VERSION_MINOR 2
-#define VERSION_MICRO 14
+#define VERSION_MINOR 3
+#define VERSION_MICRO 0
 #define VERSION_PATCH 0
 #define STR(x) #x
 #define VERSIONSTRING(a, b, c) STR(a) "." STR(b) "." STR(c)
