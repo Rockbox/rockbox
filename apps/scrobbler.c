@@ -88,6 +88,8 @@ static void get_scrobbler_filename(char *path, size_t size)
     used = snprintf(path, size, "/home/user/MyDocs/%s", base_filename);
 #elif (CONFIG_PLATFORM & PLATFORM_ANDROID)
     used = snprintf(path, size, "/sdcard/%s", base_filename);
+#elif defined (SAMSUNG_YPR0)
+    used = snprintf(path, size, "%s/%s", HOME_DIR, base_filename);
 #else /* SDL/unknown RaaA build */
     used = snprintf(path, size, "%s/%s", ROCKBOX_DIR, base_filename);
 #endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
