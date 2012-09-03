@@ -158,6 +158,8 @@ void udelay(unsigned us)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
 {
+    (void) frequency;
+#if 0
     switch(frequency)
     {
         case IMX233_CPUFREQ_454_MHz:
@@ -199,6 +201,7 @@ void set_cpu_frequency(long frequency)
         default:
             break;
     }
+#endif
 }
 #endif
 
