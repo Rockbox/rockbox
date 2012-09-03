@@ -58,6 +58,7 @@ static int cache_pos;
 static struct mp3entry scrobbler_entry;
 static bool pending = false;
 static bool scrobbler_initialised = false;
+static bool scrobbler_started = false;
 #if CONFIG_RTC
 static time_t timestamp;
 #else
@@ -224,6 +225,10 @@ static void add_to_cache(unsigned long play_length)
 static void scrobbler_change_event(void *data)
 {
     struct mp3entry *id = (struct mp3entry*)data;
+
+    if (!scrobbler_started)
+      return;
+
     /* add entry using the previous scrobbler_entry and timestamp */
     if (pending)
         add_to_cache(audio_prev_elapsed());
@@ -246,6 +251,15 @@ static void scrobbler_change_event(void *data)
         timestamp = 0;
 #endif
         pending = true;
+    }
+}
+
+void scrobbler_start (void *data)
+{
+  if (!scrobbler_started)
+    {
+      scrobbler_started = true;
+      scrobbler_change_event (data);
     }
 }
 
@@ -295,6 +309,7 @@ void scrobbler_shutdown(void)
     {
         remove_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
         scrobbler_initialised = false;
+        scrobbler_started = false;
         /* get rid of the buffer */
         core_free(scrobbler_cache);
         scrobbler_cache = 0;

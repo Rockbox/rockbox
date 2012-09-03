@@ -41,6 +41,7 @@
 #include "playback.h"
 #include "misc.h"
 #include "settings.h"
+#include "scrobbler.h"
 
 #ifdef HAVE_TAGCACHE
 #include "tagcache.h"
@@ -3327,6 +3328,8 @@ void audio_pcmbuf_sync_position(void)
 {
     audio_pcmbuf_position_callback(ci.id3->elapsed, ci.id3->offset,
                                    pcmbuf_get_position_key());
+    /* Scrobbler can be started only when the elapsed time was synced */
+    scrobbler_start (id3_get(PLAYING_ID3));
 }
 
 /* Post message from pcmbuf that the end of the previous track has just
