@@ -26,5 +26,6 @@ int scrobbler_init(void);
 void scrobbler_shutdown(void);
 void scrobbler_poweroff(void);
 bool scrobbler_is_enabled(void);
+void scrobbler_start(void *data);
 
 #endif /* __SCROBBLER_H__ */
