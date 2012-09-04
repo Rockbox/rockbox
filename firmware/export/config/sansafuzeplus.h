@@ -190,7 +190,7 @@
 #define MAX_LOG_SECTOR_SIZE 2048
 
 /* Define this if you have adjustable CPU frequency */
-#define HAVE_ADJUSTABLE_CPU_FREQ
+//#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #define BOOTFILE_EXT    "sansa"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
