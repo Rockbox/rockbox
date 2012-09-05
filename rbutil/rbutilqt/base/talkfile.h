@@ -35,46 +35,46 @@ public:
     TalkFileCreator(QObject* parent);
 
     bool createTalkFiles();
-    
-    void setDir(QDir dir){m_dir = dir; }
-    void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
+
+    void setDir(QString dir) {m_dir = dir;}
+    void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
 
     void setGenerateOnlyNew(bool ov) {m_generateOnlyNew = ov;}
     void setRecursive(bool ov) {m_recursive = ov;}
     void setStripExtensions(bool ov) {m_stripExtensions = ov;}
-    void setTalkFolders(bool ov) {m_talkFolders = ov;} 
+    void setTalkFolders(bool ov) {m_talkFolders = ov;}
     void setTalkFiles(bool ov) {m_talkFiles = ov;}
-    void setIgnoreFiles(QStringList wildcards) {m_ignoreFiles=wildcards;}
+    void setIgnoreFiles(QStringList wildcards) {m_ignoreFiles = wildcards;}
 public slots:
     void abort();
-    
+
 signals:
     void done(bool);
     void aborted();
     void logItem(QString, int); //! set logger item
     void logProgress(int, int); //! set progress bar.
-    
+
 private:
     bool cleanup();
     QString stripExtension(QString filename);
     void doAbort();
     void resetProgress(int max);
     bool copyTalkFiles(QString* errString);
-    
+
     bool createTalkList(QDir startDir);
-   
-    QDir   m_dir;
+
+    QString m_dir;
     QString m_mountpoint;
- 
+
     bool m_generateOnlyNew;
     bool m_recursive;
     bool m_stripExtensions;
     bool m_talkFolders;
     bool m_talkFiles;
     QStringList m_ignoreFiles;
-    
+
     bool m_abort;
-    
+
     QList<TalkGenerator::TalkEntry> m_talkList;
 };
 

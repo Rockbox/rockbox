@@ -111,7 +111,9 @@ void InstallTalkWindow::accept()
     QStringList foldersToTalk
         = RbSettings::value(RbSettings::TalkFolders).toStringList();
     for(int i = 0; i < foldersToTalk.size(); i++) {
-        talkcreator->setDir(QDir(foldersToTalk.at(i)));
+        qDebug() << "[InstallTalkWindow] creating talk files for folder"
+                 << foldersToTalk.at(i);
+        talkcreator->setDir(foldersToTalk.at(i));
         talkcreator->createTalkFiles();
     }
 }

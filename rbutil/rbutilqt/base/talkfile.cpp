@@ -33,13 +33,13 @@ bool TalkFileCreator::createTalkFiles()
     QString errStr;
 
     emit logItem(tr("Starting Talk file generation for folder %1")
-            .arg(m_dir.dirName()), LOGINFO);
+            .arg(m_dir), LOGINFO);
     emit logProgress(0,0);
     QCoreApplication::processEvents();
 
     // read in Maps of paths - file/dirnames
     emit logItem(tr("Reading Filelist..."),LOGINFO);
-    if(createTalkList(m_dir) == false)
+    if(createTalkList(m_mountpoint + "/" + m_dir) == false)
     {
         emit logItem(tr("Talk file creation aborted"),LOGERROR);
         doAbort();
@@ -109,6 +109,7 @@ void TalkFileCreator::doAbort()
 //! \param startDir The directory from which to start scanning
 bool TalkFileCreator::createTalkList(QDir startDir)
 {
+    qDebug() << "[TalkGenerator] generating list of files" << startDir;
     m_talkList.clear();
 
      // create Iterator
@@ -213,6 +214,7 @@ bool TalkFileCreator::createTalkList(QDir startDir)
         }
         QCoreApplication::processEvents();
     }
+    qDebug() << "[TalkFileCreator] list created, entries:" << m_talkList.size();
     return true;
 }
 
