@@ -28,19 +28,21 @@ ManualWidget::ManualWidget(QWidget *parent) : QWidget(parent)
 {
     ui.setupUi(this);
     ui.radioPdf->setChecked(true);
-    platform = RbSettings::value(RbSettings::Platform).toString();
+    m_platform = RbSettings::value(RbSettings::Platform).toString();
     connect(ui.buttonDownloadManual, SIGNAL(clicked()), this, SLOT(downloadManual()));
 }
 
 
 void ManualWidget::updateManual()
 {
-    if(!RbSettings::value(RbSettings::Platform).toString().isEmpty())
+    qDebug() << "[ManualWidget] updating manual URLs";
+    m_platform = RbSettings::value(RbSettings::Platform).toString();
+    if(!m_platform.isEmpty())
     {
         ui.labelPdfManual->setText(tr("<a href='%1'>PDF Manual</a>")
-            .arg(ServerInfo::platformValue(platform, ServerInfo::ManualPdfUrl).toString()));
+            .arg(ServerInfo::platformValue(m_platform, ServerInfo::ManualPdfUrl).toString()));
         ui.labelHtmlManual->setText(tr("<a href='%1'>HTML Manual (opens in browser)</a>")
-            .arg(ServerInfo::platformValue(platform, ServerInfo::ManualHtmlUrl).toString()));
+            .arg(ServerInfo::platformValue(m_platform, ServerInfo::ManualHtmlUrl).toString()));
     }
     else {
         ui.labelPdfManual->setText(tr("Select a device for a link to the correct manual"));
@@ -74,13 +76,13 @@ void ManualWidget::downloadManual(void)
         installer->setCache(true);
 
     if(ui.radioPdf->isChecked()) {
-        installer->setUrl(ServerInfo::platformValue(platform,
+        installer->setUrl(ServerInfo::platformValue(m_platform,
                     ServerInfo::ManualPdfUrl).toString());
         installer->setLogSection("Manual (PDF)");
         installer->setTarget("/" + manual + ".pdf");
     }
     else {
-        installer->setUrl(ServerInfo::platformValue(platform,
+        installer->setUrl(ServerInfo::platformValue(m_platform,
                     ServerInfo::ManualZipUrl).toString());
         installer->setLogSection("Manual (HTML)");
         installer->setTarget("/" + manual + "-" + "-html.zip");

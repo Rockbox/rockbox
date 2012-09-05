@@ -35,7 +35,7 @@ class ManualWidget : public QWidget
     private:
         void changeEvent(QEvent*);
         Ui::ManualWidgetFrm ui;
-        QString platform;
+        QString m_platform;
 };
 
 #endif
