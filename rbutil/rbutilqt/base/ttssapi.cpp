@@ -198,7 +198,10 @@ QStringList TTSSapi::getVoiceList(QString language)
     voicescript->waitForReadyRead();
 
     QString dataRaw = voicescript->readAllStandardError().data();
-    result = dataRaw.split(",",QString::SkipEmptyParts);
+    if(dataRaw.startsWith("Error")) {
+        qDebug() << "[TTSSapi] Error:" << dataRaw;
+    }
+    result = dataRaw.split(";",QString::SkipEmptyParts);
     if(result.size() > 0)
     {
         result.sort();

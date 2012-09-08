@@ -139,7 +139,7 @@ Else ' SAPI5
         For Each nLangID in LangIDs(sLanguage)
             sSelectString = "Language=" & Hex(nLangID)
             For Each oVoice in oSpVoice.GetVoices(sSelectString)
-                WScript.StdErr.Write oVoice.GetAttribute("Name") & ","
+                WScript.StdErr.Write oVoice.GetAttribute("Name") & ";"
             Next
         Next
         WScript.StdErr.WriteLine
