@@ -176,6 +176,10 @@
         <property name="text">
          <string>Customize</string>
         </property>
+        <property name="icon">
+         <iconset resource="../rbutilqt.qrc">
+          <normaloff>:/icons/preferences-system.png</normaloff>:/icons/preferences-system.png</iconset>
+        </property>
        </widget>
       </item>
       <item row="3" column="0">
@@ -244,6 +248,10 @@
     <widget class="QPushButton" name="installButton">
      <property name="text">
       <string>&amp;Install</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../rbutilqt.qrc">
+       <normaloff>:/icons/package-x-generic.png</normaloff>:/icons/package-x-generic.png</iconset>
      </property>
     </widget>
    </item>
