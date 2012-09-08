@@ -110,6 +110,11 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
         RegCloseKey(hk);
     }
 #endif
+
+#if !defined(Q_OS_WIN32)
+    /* eject funtionality is only implemented on W32 right now. */
+    ui.buttonEject->setEnabled(false);
+#endif
     updateDevice();
     downloadInfo();
 
@@ -142,6 +147,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.action_Configure, SIGNAL(triggered()), this, SLOT(configDialog()));
     connect(ui.actionE_xit, SIGNAL(triggered()), this, SLOT(shutdown()));
     connect(ui.buttonChangeDevice, SIGNAL(clicked()), this, SLOT(configDialog()));
+    connect(ui.buttonEject, SIGNAL(clicked()), this, SLOT(eject()));
     connect(ui.buttonTalk, SIGNAL(clicked()), this, SLOT(createTalkFiles()));
     connect(ui.buttonCreateVoice, SIGNAL(clicked()), this, SLOT(createVoiceFile()));
     connect(ui.buttonVoice, SIGNAL(clicked()), this, SLOT(installVoice()));
@@ -730,6 +736,22 @@ void RbUtilQt::changeEvent(QEvent *e)
         updateDevice();
     } else {
         QMainWindow::changeEvent(e);
+    }
+}
+
+void RbUtilQt::eject(void)
+{
+    QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
+    if(Utils::ejectDevice(mountpoint)) {
+        QMessageBox::information(this, tr("Device ejected"),
+                tr("Device successfully ejected. "
+                   "You may now disconnect the player from the PC."));
+    }
+    else {
+        QMessageBox::critical(this, tr("Ejecting failed"),
+                tr("Ejecting the device failed. Please make sure no programs "
+                   "are accessing files on the device. If ejecting still "
+                   "fails please use your computers eject funtionality."));
     }
 }
 

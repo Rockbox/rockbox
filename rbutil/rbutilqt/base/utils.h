@@ -50,6 +50,7 @@ public:
     static QString resolveDevicename(QString path);
     static QString resolveMountPoint(QString device);
     static QStringList findRunningProcess(QStringList names);
+    static bool ejectDevice(QString device);
 };
 
 #endif

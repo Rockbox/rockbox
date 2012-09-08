@@ -692,3 +692,63 @@ QStringList Utils::findRunningProcess(QStringList names)
     qDebug() << "[Utils] Found listed processes running:" << found;
     return found;
 }
+
+
+/** Eject device from PC.
+ *  Request the OS to eject the player.
+ *  @param device mountpoint of the device
+ *  @return true on success, fals otherwise.
+ */
+bool Utils::ejectDevice(QString device)
+{
+#if defined(Q_OS_WIN32)
+    /* See http://support.microsoft.com/kb/165721 on the procedure to eject a
+     * device. */
+    bool success = false;
+    int i;
+    HANDLE hdl;
+    DWORD bytesReturned;
+    TCHAR volume[8];
+
+    /* CreateFile */
+    _stprintf(volume, _TEXT("\\\\.\\%c:"), device.toAscii().at(0));
+    hdl = CreateFile(volume, GENERIC_READ | GENERIC_WRITE,
+            FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+            OPEN_EXISTING, 0, NULL);
+    if(hdl == INVALID_HANDLE_VALUE)
+        return false;
+
+    /* lock volume to make sure no other application is accessing the volume.
+     * Try up to 10 times. */
+    for(i = 0; i < 10; i++) {
+        if(DeviceIoControl(hdl, FSCTL_LOCK_VOLUME,
+                    NULL, 0, NULL, 0, &bytesReturned, NULL))
+            break;
+        /* short break before retry */
+        Sleep(100);
+    }
+    if(i < 10) {
+        /* successfully locked, now dismount */
+        if(DeviceIoControl(hdl, FSCTL_DISMOUNT_VOLUME,
+                    NULL, 0, NULL, 0, &bytesReturned, NULL)) {
+            /* make sure media can be removed. */
+            PREVENT_MEDIA_REMOVAL pmr;
+            pmr.PreventMediaRemoval = false;
+            if(DeviceIoControl(hdl, IOCTL_STORAGE_MEDIA_REMOVAL,
+                        &pmr, sizeof(PREVENT_MEDIA_REMOVAL),
+                        NULL, 0, &bytesReturned, NULL)) {
+                /* eject the media */
+                if(DeviceIoControl(hdl, IOCTL_STORAGE_EJECT_MEDIA,
+                            NULL, 0, NULL, 0, &bytesReturned, NULL))
+                    success = true;
+            }
+        }
+    }
+    /* close handle */
+    CloseHandle(hdl);
+    return success;
+
+#endif
+    return false;
+}
+

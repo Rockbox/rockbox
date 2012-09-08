@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>550</height>
+    <height>399</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,24 +31,25 @@
        <string>Device</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="2">
-        <widget class="QLabel" name="labelMountpoint">
-         <property name="text">
-          <string>mountpoint unknown or invalid</string>
+       <item row="0" column="0" rowspan="3">
+        <widget class="QLabel" name="labelPlayerPic">
+         <property name="lineWidth">
+          <number>1</number>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="labelMountpointTitle">
          <property name="text">
-          <string>Mountpoint:</string>
+          <string/>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QLabel" name="labelDevice">
-         <property name="text">
-          <string>device unknown or invalid</string>
+         <property name="pixmap">
+          <pixmap resource="rbutilqt.qrc">:/icons/rockbox-32.png</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="margin">
+          <number>3</number>
          </property>
         </widget>
        </item>
@@ -65,6 +66,13 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="labelDevice">
+         <property name="text">
+          <string>device unknown or invalid</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="3">
         <spacer name="horizontalSpacer">
          <property name="orientation">
@@ -78,17 +86,7 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="0" rowspan="2">
-        <widget class="QLabel" name="labelPlayerPic">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4" rowspan="2">
+       <item row="0" column="4">
         <widget class="QPushButton" name="buttonChangeDevice">
          <property name="text">
           <string>&amp;Change</string>
@@ -96,6 +94,31 @@
          <property name="icon">
           <iconset resource="rbutilqt.qrc">
            <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="4" rowspan="2">
+        <widget class="QPushButton" name="buttonEject">
+         <property name="text">
+          <string>&amp;Eject</string>
+         </property>
+         <property name="icon">
+          <iconset resource="rbutilqt.qrc">
+           <normaloff>:/icons/media-eject.png</normaloff>:/icons/media-eject.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="labelMountpointTitle">
+         <property name="text">
+          <string>Mountpoint:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="labelMountpoint">
+         <property name="text">
+          <string>mountpoint unknown or invalid</string>
          </property>
         </widget>
        </item>
@@ -130,7 +153,7 @@
     <item row="1" column="0" colspan="2">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>7</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="selective">
        <attribute name="title">
@@ -388,7 +411,7 @@
      <x>0</x>
      <y>0</y>
      <width>650</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

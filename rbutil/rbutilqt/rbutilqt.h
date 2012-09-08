@@ -79,6 +79,7 @@ class RbUtilQt : public QMainWindow
         void help(void);
         void sysinfo(void);
         void trace(void);
+        void eject(void);
         void configDialog(void);
         void updateDevice(void);
         void updateSettings(void);
