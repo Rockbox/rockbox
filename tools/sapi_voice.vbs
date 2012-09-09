@@ -39,6 +39,7 @@ Const STDERR = 2
 Dim oShell, oArgs, oEnv
 Dim oFSO, oStdIn, oStdOut
 Dim bVerbose, bSAPI4, bList
+Dim bMSSP
 Dim sLanguage, sVoice, sSpeed, sName, sVendor
 
 Dim oSpVoice, oSpFS ' SAPI5 voice and filestream
@@ -60,6 +61,7 @@ bVerbose = (oEnv("V") <> "")
 
 Set oArgs = WScript.Arguments.Named
 bSAPI4 = oArgs.Exists("sapi4")
+bMSSP = oArgs.Exists("mssp")
 bList = oArgs.Exists("listvoices")
 sLanguage = oArgs.Item("language")
 sVoice = oArgs.Item("voice")
@@ -121,20 +123,25 @@ If bSAPI4 Then
 
     ' Speed selection
     If sSpeed <> "" Then oTTS.Speed = sSpeed
-    
+
     ' Get vendor information
     sVendor = oTTS.MfgName(nMode)
 
 Else ' SAPI5
     ' Create SAPI5 object
-    Set oSpVoice = CreateObject("SAPI.SpVoice")
+    If bMSSP Then
+            Set oSpVoice = CreateObject("speech.SpVoice")
+    Else
+            Set oSpVoice = CreateObject("SAPI.SpVoice")
+    End If
     If Err.Number <> 0 Then
-        WScript.StdErr.WriteLine "Error - could not get SpVoice object." _
+        WScript.StdErr.WriteLine "Error " & Err.Number _
+                                 & " - could not get SpVoice object." _
                                  & " SAPI 5 not installed?"
         WScript.Quit 1
     End If
-    
-    If bList Then 
+
+    If bList Then
         ' Just list available voices for the selected language
         For Each nLangID in LangIDs(sLanguage)
             sSelectString = "Language=" & Hex(nLangID)

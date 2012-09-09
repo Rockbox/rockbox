@@ -21,6 +21,7 @@
 #include "ttsfestival.h"
 #include "ttssapi.h"
 #include "ttssapi4.h"
+#include "ttsmssp.h"
 #include "ttsexes.h"
 #if defined(Q_OS_MACX)
 #include "ttscarbon.h"
@@ -47,6 +48,7 @@ void TTSBase::initTTSList()
     ttsList["sapi4"] = tr("SAPI4 TTS Engine");
 #endif
     ttsList["sapi"] = tr("SAPI5 TTS Engine");
+    ttsList["mssp"] = tr("MS Speech Platform");
 #endif
 #if defined(Q_OS_LINUX)
     ttsList["festival"] = tr("Festival TTS Engine");
@@ -66,6 +68,8 @@ TTSBase* TTSBase::getTTS(QObject* parent,QString ttsName)
         tts = new TTSSapi(parent);
     else if (ttsName == "sapi4")
         tts = new TTSSapi4(parent);
+    else if (ttsName == "mssp")
+        tts = new TTSMssp(parent);
     else
 #elif defined(Q_OS_LINUX)
     if (ttsName == "festival")
