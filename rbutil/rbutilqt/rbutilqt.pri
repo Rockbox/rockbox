@@ -113,6 +113,7 @@ HEADERS += \
  base/ttsexes.h \
  base/ttsfestival.h \
  base/ttssapi.h \
+ base/ttssapi4.h \
  ../../tools/wavtrim.h \
  ../../tools/voicefont.h \
  base/voicefile.h \

@@ -20,6 +20,7 @@
 
 #include "ttsfestival.h"
 #include "ttssapi.h"
+#include "ttssapi4.h"
 #include "ttsexes.h"
 #if defined(Q_OS_MACX)
 #include "ttscarbon.h"
@@ -42,7 +43,10 @@ void TTSBase::initTTSList()
     ttsList["flite"] = tr("Flite TTS Engine");
     ttsList["swift"] = tr("Swift TTS Engine");
 #if defined(Q_OS_WIN)
-    ttsList["sapi"] = tr("SAPI TTS Engine");
+#if 0 /* SAPI4 has been disabled since long. Keep support for now. */
+    ttsList["sapi4"] = tr("SAPI4 TTS Engine");
+#endif
+    ttsList["sapi"] = tr("SAPI5 TTS Engine");
 #endif
 #if defined(Q_OS_LINUX)
     ttsList["festival"] = tr("Festival TTS Engine");
@@ -56,36 +60,26 @@ void TTSBase::initTTSList()
 TTSBase* TTSBase::getTTS(QObject* parent,QString ttsName)
 {
 
-    TTSBase* tts;
+    TTSBase* tts = 0;
 #if defined(Q_OS_WIN)
     if(ttsName == "sapi")
-    {
         tts = new TTSSapi(parent);
-        return tts;
-    }
+    else if (ttsName == "sapi4")
+        tts = new TTSSapi4(parent);
     else
-#endif
-#if defined(Q_OS_LINUX)
+#elif defined(Q_OS_LINUX)
     if (ttsName == "festival")
-    {
         tts = new TTSFestival(parent);
-        return tts;
-    }
     else
-#endif
-#if defined(Q_OS_MACX)
+#elif defined(Q_OS_MACX)
     if(ttsName == "carbon")
-    {
         tts = new TTSCarbon(parent);
-        return tts;
-    }
     else
 #endif
-    if (true) // fix for OS other than WIN or LINUX
-    {
-        tts = new TTSExes(ttsName,parent);
-        return tts;
-    }
+    // fix for OS other than WIN or LINUX
+    if (true)
+        tts = new TTSExes(ttsName, parent);
+    return tts;
 }
 
 // get the list of encoders, nice names
