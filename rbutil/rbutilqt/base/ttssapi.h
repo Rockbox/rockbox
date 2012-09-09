@@ -61,12 +61,15 @@ class TTSSapi : public TTSBase
 
         QString m_TTSexec;
         QString m_TTSOpts;
-        QString m_TTSTemplate;
         QString m_TTSLanguage;
         QString m_TTSVoice;
         QString m_TTSSpeed;
-        bool m_sapi4;
         bool m_started;
+
+    protected:
+        QString m_TTSTemplate;
+        QString m_TTSVoiceTemplate;
+        QString m_TTSType;
 };
 
 

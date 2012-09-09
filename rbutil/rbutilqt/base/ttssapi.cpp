@@ -23,10 +23,11 @@
 
 TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
 {
-    m_TTSTemplate = "cscript //nologo \"%exe\" /language:%lang /voice:\"%voice\""
-        " /speed:%speed \"%options\"";
+    m_TTSTemplate = "cscript //nologo \"%exe\" /language:%lang "
+        "/voice:\"%voice\" /speed:%speed \"%options\"";
+    m_TTSVoiceTemplate = "cscript //nologo \"%exe\" /language:%lang /listvoices";
+    m_TTSType = "sapi";
     defaultLanguage = "english";
-    m_sapi4 = false;
     m_started = false;
 }
 
@@ -43,40 +44,44 @@ void TTSSapi::generateSettings()
     for(int i = 0; i < languages.values().size(); ++i) {
         langs.append(languages.values().at(i).at(0));
     }
-    EncTtsSetting* setting =new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,
-        tr("Language:"),RbSettings::subValue("sapi",RbSettings::TtsLanguage),
-        langs);
+    EncTtsSetting* setting = new EncTtsSetting(this,
+            EncTtsSetting::eSTRINGLIST, tr("Language:"),
+            RbSettings::subValue(m_TTSType, RbSettings::TtsLanguage),
+            langs);
     connect(setting,SIGNAL(dataChanged()),this,SLOT(updateVoiceList()));
     insertSetting(eLANGUAGE,setting);
     // voice
-    setting = new EncTtsSetting(this,EncTtsSetting::eSTRINGLIST,
-        tr("Voice:"),RbSettings::subValue("sapi",RbSettings::TtsVoice),
-        getVoiceList(RbSettings::subValue("sapi",RbSettings::TtsLanguage).toString()),
-        EncTtsSetting::eREFRESHBTN);
+    setting = new EncTtsSetting(this,
+            EncTtsSetting::eSTRINGLIST, tr("Voice:"),
+            RbSettings::subValue(m_TTSType, RbSettings::TtsVoice),
+            getVoiceList(RbSettings::subValue(m_TTSType,
+                    RbSettings::TtsLanguage).toString()),
+            EncTtsSetting::eREFRESHBTN);
     connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceList()));
     insertSetting(eVOICE,setting);
     //speed
-    int speed = RbSettings::subValue("sapi", RbSettings::TtsSpeed).toInt();
+    int speed = RbSettings::subValue(m_TTSType, RbSettings::TtsSpeed).toInt();
     if(speed > 10 || speed < -10)
         speed = 0;
-    insertSetting(eSPEED, new EncTtsSetting(this, EncTtsSetting::eINT,
-                tr("Speed:"), speed, -10, 10));
+    insertSetting(eSPEED, new EncTtsSetting(this,
+                EncTtsSetting::eINT, tr("Speed:"), speed, -10, 10));
     // options
-    insertSetting(eOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,
-        tr("Options:"),RbSettings::subValue("sapi",RbSettings::TtsOptions)));
+    insertSetting(eOPTIONS, new EncTtsSetting(this,
+                EncTtsSetting::eSTRING, tr("Options:"),
+                RbSettings::subValue(m_TTSType, RbSettings::TtsOptions)));
 
 }
 
 void TTSSapi::saveSettings()
 {
     //save settings in user config
-    RbSettings::setSubValue("sapi",RbSettings::TtsLanguage,
+    RbSettings::setSubValue(m_TTSType, RbSettings::TtsLanguage,
             getSetting(eLANGUAGE)->current().toString());
-    RbSettings::setSubValue("sapi",RbSettings::TtsVoice,
+    RbSettings::setSubValue(m_TTSType, RbSettings::TtsVoice,
             getSetting(eVOICE)->current().toString());
-    RbSettings::setSubValue("sapi",RbSettings::TtsSpeed,
+    RbSettings::setSubValue(m_TTSType, RbSettings::TtsSpeed,
             getSetting(eSPEED)->current().toInt());
-    RbSettings::setSubValue("sapi",RbSettings::TtsOptions,
+    RbSettings::setSubValue(m_TTSType, RbSettings::TtsOptions,
             getSetting(eOPTIONS)->current().toString());
 
     RbSettings::sync();
@@ -94,11 +99,10 @@ void TTSSapi::updateVoiceList()
 bool TTSSapi::start(QString *errStr)
 {
 
-    m_TTSOpts = RbSettings::subValue("sapi",RbSettings::TtsOptions).toString();
-    m_TTSLanguage =RbSettings::subValue("sapi",RbSettings::TtsLanguage).toString();
-    m_TTSVoice=RbSettings::subValue("sapi",RbSettings::TtsVoice).toString();
-    m_TTSSpeed=RbSettings::subValue("sapi",RbSettings::TtsSpeed).toString();
-    m_sapi4 = RbSettings::subValue("sapi",RbSettings::TtsUseSapi4).toBool();
+    m_TTSOpts = RbSettings::subValue(m_TTSType, RbSettings::TtsOptions).toString();
+    m_TTSLanguage =RbSettings::subValue(m_TTSType, RbSettings::TtsLanguage).toString();
+    m_TTSVoice=RbSettings::subValue(m_TTSType, RbSettings::TtsVoice).toString();
+    m_TTSSpeed=RbSettings::subValue(m_TTSType, RbSettings::TtsSpeed).toString();
 
     QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
     QFile::copy(":/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
@@ -117,9 +121,6 @@ bool TTSSapi::start(QString *errStr)
     execstring.replace("%lang",m_TTSLanguage);
     execstring.replace("%voice",m_TTSVoice);
     execstring.replace("%speed",m_TTSSpeed);
-
-    if(m_sapi4)
-        execstring.append(" /sapi4 ");
 
     qDebug() << "[TTSSapi] Start:" << execstring;
     voicescript = new QProcess(NULL);
@@ -179,12 +180,9 @@ QStringList TTSSapi::getVoiceList(QString language)
         return result;
 
     // create the voice process
-    QString execstring = "cscript //nologo \"%exe\" /language:%lang /listvoices";
+    QString execstring = m_TTSVoiceTemplate;
     execstring.replace("%exe",m_TTSexec);
     execstring.replace("%lang",language);
-
-    if(RbSettings::value(RbSettings::TtsUseSapi4).toBool())
-        execstring.append(" /sapi4 ");
 
     qDebug() << "[TTSSapi] Start:" << execstring;
     voicescript = new QProcess(NULL);
@@ -263,7 +261,7 @@ bool TTSSapi::stop()
 
 bool TTSSapi::configOk()
 {
-    if(RbSettings::subValue("sapi",RbSettings::TtsVoice).toString().isEmpty())
+    if(RbSettings::subValue(m_TTSType, RbSettings::TtsVoice).toString().isEmpty())
         return false;
     return true;
 }
