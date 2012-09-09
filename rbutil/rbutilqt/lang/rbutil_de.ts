@@ -1618,7 +1618,7 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../gui/infowidgetfrm.ui" line="20"/>
         <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
-        <translation>Aktuell installierte Pakete.&lt;br/&gt;&lt;b&gt;Hinweis:&lt;/b&gt; wenn Pakete manuell installiert wurden kann die Anzeige fehlerhaft sein! Anzeige nicht korrekt sein!</translation>
+        <translation>Aktuell installierte Pakete.&lt;br/&gt;&lt;b&gt;Hinweis:&lt;/b&gt; wenn Pakete manuell installiert wurden kann die Anzeige fehlerhaft sein!</translation>
     </message>
     <message>
         <location filename="../gui/infowidgetfrm.ui" line="34"/>
