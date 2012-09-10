@@ -122,6 +122,7 @@ $releasenotes="/wiki/ReleaseNotes3112";
     'ipodnano2g' => {
         name => 'iPod Nano 2nd gen',
         status => 2,
+        release => '3.10',
     },
     'ipodvideo' => {
         name => 'iPod Video',
@@ -354,7 +355,7 @@ sub stablebuilds {
     my @list;
 
     for my $b (sort byname keys %builds) {
-        push @list, $b if ($builds{$b}{status} >= 3);
+        push @list, $b if ($builds{$b}{status} >= 3) or $builds{$b}{release};
     }
 
     return @list;
