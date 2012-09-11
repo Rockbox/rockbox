@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///+8\u003d",
+        "filename": "apps/playlist_viewer.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-09-11T07:55:39Z",
+      "side": 1,
+      "message": "This change seems unrelated, isn\u0027t it?",
+      "revId": "b328f13082fddc58803f2e9efaa02737041b9089",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///+4\u003d",
+        "filename": "apps/playlist_viewer.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-09-11T07:55:39Z",
+      "side": 1,
+      "message": "Ditto",
+      "revId": "b328f13082fddc58803f2e9efaa02737041b9089",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///+0\u003d",
+        "filename": "apps/playlist_viewer.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2012-09-11T07:55:39Z",
+      "side": 1,
+      "message": "This function violates our coding standards (brace placement, line length, trailing spaces).",
+      "revId": "b328f13082fddc58803f2e9efaa02737041b9089",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
