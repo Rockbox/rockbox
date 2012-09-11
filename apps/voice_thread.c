@@ -335,6 +335,7 @@ static void voice_data_init(struct voice_thread_data *td)
 
     mixer_channel_set_amplitude(PCM_MIXER_CHAN_VOICE, MIX_AMP_UNITY);
     voice_buf->td = td;
+    td->dst = NULL;
 }
 
 /* Voice thread message processing */
