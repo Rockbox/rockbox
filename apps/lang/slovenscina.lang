@@ -1158,11 +1158,11 @@
     masd: none
   </source>
   <dest>
-    *: "Logaritmična (dB)"
+    *: "Logaritmično (dB)"
     masd: none
   </dest>
   <voice>
-    *: "Logaritmična (dB)"
+    *: "Logaritmično v decibelih"
     masd: none
   </voice>
 </phrase>
@@ -1175,11 +1175,11 @@
     masd: none
   </source>
   <dest>
-    *: "Linearna(%)"
+    *: "Linearno (%)"
     masd: none
   </dest>
   <voice>
-    *: "Linearna (%)"
+    *: "Linearno odstotki"
     masd: none
   </voice>
 </phrase>
@@ -3197,17 +3197,19 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
-    *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
-    gogearsa9200: "Building database... %d found (REW to return)"
+    *: "Ustvarjanje baze podatkov ... najdenih %d (OFF za nazaj)"
+    iriverh100,iriverh120,iriverh300: "Ustvarjanje baze podatkov ... najdenih %d (STOP za nazaj)"
+    ipod*: "Ustvarjanje baze podatkov ... najdenih %d (PREV za nazaj)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Ustvarjanje baze podatkov ... najdenih %d (LEVO za nazaj)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Ustvarjanje baze podatkov ... najdenih %d (PREV za nazaj)"
+    gogearsa9200: "Ustvarjanje baze podatkov ... najdenih %d (REW za nazaj)"
+    archosplayer: "Ustvarjanje baze podatkov ... najdenih %d"
   </dest>
   <voice>
-    *: "entries found for database"
+    *: "najdeni vnosi za bazo"
   </voice>
 </phrase>
 <phrase>
@@ -7435,7 +7437,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -7444,7 +7446,7 @@
     *: "Playlist Catalog"
   </dest>
   <voice>
-    *: "Playlist Catalog"
+    *: "Katalog seznamov predvajanja"
   </voice>
 </phrase>
 <phrase>
@@ -8272,15 +8274,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Izboljšava 3-D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Izboljšava 3-D"
   </voice>
 </phrase>
 <phrase>
@@ -8575,19 +8577,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11078,16 +11077,16 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
   </source>
   <dest>
-    *: "Playlists"
+    *: "Seznam predvajanja"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "Seznam predvajanja"
   </voice>
 </phrase>
 <phrase>
@@ -12149,5 +12148,782 @@
   <voice>
     *: none
     radio: "FM Radio Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOUDNESS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: none
+    masf: "Loudness"
+  </source>
+  <dest>
+    *: none
+    masf: "Glasnost"
+  </dest>
+  <voice>
+    *: none
+    masf: "Glasnost"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TIMESPLIT
+  desc: Record split menu
+  user: core
+  <source>
+    *: none
+    recording: "File Split Options"
+  </source>
+  <dest>
+    *: none
+    recording: "Nastavitev delitve datoteke"
+  </dest>
+  <voice>
+    *: none
+    recording: "Nastavitev delitve datoteke"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ALARM_MENU
+  desc: The name of the additional entry in the main menu for the RTC alarm mod.
+  user: core
+  <source>
+    *: none
+    alarm: "Wake-Up Alarm"
+  </source>
+  <dest>
+    *: none
+    alarm: "Budilka"
+  </dest>
+  <voice>
+    *: none
+    alarm: "Budilka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Line Selector Type"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Vrsta izbirnika vrstice"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Vrsta izbirnika vrstice"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Trenutni seznam predvajanja"
+  </dest>
+  <voice>
+    *: "Trenutni seznam predvajanja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Izberite eno ali več map"
+  </dest>
+  <voice>
+    *: "Izberite eno ali več map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Število pismenk v predpomnilniku"
+  </dest>
+  <voice>
+    *: "Število pismenk v predpomnilniku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_LCD_INVERSE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    lcd_invert,remote_lcd_invert: "Inverse"
+  </source>
+  <dest>
+    *: none
+    lcd_invert,remote_lcd_invert: "Obrnjeno"
+  </dest>
+  <voice>
+    *: none
+    lcd_invert,remote_lcd_invert: "Obrnjeno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Samodejno nadaljevanje"
+  </dest>
+  <voice>
+    *: "Samodejno nadaljevanje"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Enostavno (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Enostavno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Posodobi ob prekinitvi"
+  </dest>
+  <voice>
+    *: "Posodobi ob prekinitvi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Nadaljuj pri samodejno spremembi sledi"
+  </dest>
+  <voice>
+    *: "Nadaljuj pri samodejno spremembi sledi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Del"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Del"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILESIZE
+  desc: in record timesplit options and in track information viewer
+  user: core
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Velikost datoteke"
+  </dest>
+  <voice>
+    *: "Velikost datoteke"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "Zaženi časovnik stanja pripravljenost"
+  </dest>
+  <voice>
+    *: "Zaženi časovnik stanja pripravljenost"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "USB skrij notranji pogon"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "USB skrij notranji pogon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Zvok tipke preko zvočnika"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Zvok tipke preko zvočnika"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Zvok tipke v slušalkah"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Zvok tipke v slušalkah"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Nastavi kot mapo za katalog seznamov predvajanj"
+  </dest>
+  <voice>
+    *: "Nastavi kot mapo za katalog seznamov predvajanj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Izberite mape za preiskovanje"
+  </dest>
+  <voice>
+    *: "Izberite mape za preiskovanje"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "Western European (CP1252)"
+  </dest>
+  <voice>
+    *: "Western European"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_EDITABLE
+  desc: Editable recordings setting
+  user: core
+  <source>
+    *: none
+    recording_hwcodec: "Independent Frames"
+  </source>
+  <dest>
+    *: none
+    recording_hwcodec: "Samostojni okvir"
+  </dest>
+  <voice>
+    *: none
+    recording_hwcodec: "Samostojni okvir"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Zapolnjevanje vrstic v spisku"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Zapolnjevanje vrstic v spisku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Naj shranim spremembe?"
+  </dest>
+  <voice>
+    *: "Naj shranim spremembe?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Previjanje ob pavzi"
+  </dest>
+  <voice>
+    *: "Previjanje ob pavzi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Samodejno"
+  </dest>
+  <voice>
+    *: "Samodejno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_POINTER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Pointer"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Kazalec"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Kazalec"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Prekliči"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Prekliči"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Po meri"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Po meri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Sestavljalnik"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Bližnjice"
+  </dest>
+  <voice>
+    *: "Bližnjice"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Prekini časovnik stanja pripravljenost"
+  </dest>
+  <voice>
+    *: "Prekini časovnik stanja pripravljenost"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Zaženi brskalnik datotek na /"
+  </dest>
+  <voice>
+    *: "Zaženi brskalnik datotek na korenu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Moč signala:"
+  </dest>
+  <voice>
+    *: none
+    radio: "Moč signala:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Zagon/Izklop"
+  </dest>
+  <voice>
+    *: "Zagon/Izklop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Ponovno zaženi časovnik stanja pripravljenosti ob pritisku na tipko"
+  </dest>
+  <voice>
+    *: "Ponovno zaženi časovnik stanja pripravljenosti ob pritisku na tipko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Privzeti časovnik stanja pripravljenost"
+  </dest>
+  <voice>
+    *: "Privzeti časovnik stanja pripravljenost"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Uporabi bližnjice namesto hitrega zaslona"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Uporabi bližnjice namesto hitrega zaslona"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "TokSlik"
+  </dest>
+  <voice>
+    *: "odpri tok slik"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+  desc: in display_settings_menu, backlight timeout with charger connected
+  user: core
+  <source>
+    *: none
+    charging: "Backlight (While Plugged In)"
+  </source>
+  <dest>
+    *: none
+    charging: "Osvetlitev ozadja (med priklopom)"
+  </dest>
+  <voice>
+    *: none
+    charging: "Osvetlitev ozadja (med priklopom)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Vsili"
+  </dest>
+  <voice>
+    *: "Vsili"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Ponastavi mapo kataloga seznamov predvajanj"
+  </dest>
+  <voice>
+    *: "Ponastavi mapo kataloga seznamov predvajanj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "Omeji samodejno spremembo"
+  </dest>
+  <voice>
+    *: "Omeji samodejno spremembo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_BAR
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Bar (Inverse)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Stolpec (obrnjen)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Obrnjeni stolpec"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Zaženi časovnik stanja pripravljenost ob zagonu"
+  </dest>
+  <voice>
+    *: "Zaženi časovnik stanja pripravljenost ob zagonu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Samo v mapah po meri"
+  </dest>
+  <voice>
+    *: "Samo v mapah po meri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Zaženi brskalnik datotek tukaj"
+  </dest>
+  <voice>
+    *: "Zaženi brskalnik datotek tukaj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DECAY
+  desc: in sound_settings
+  user: core
+  <source>
+    *: none
+    masf: "AV Decay Time"
+  </source>
+  <dest>
+    *: none
+    masf: "čas upadanja AV"
+  </dest>
+  <voice>
+    *: none
+    masf: ""
   </voice>
 </phrase>
