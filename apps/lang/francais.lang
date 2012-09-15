@@ -12893,3 +12893,93 @@
     *: "Raccourcis"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Mise en cache des caractères"
+  </dest>
+  <voice>
+    *: "Mise en cache des caractères"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Clic de la touche haut-parleur"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Clic de la touche haut-parleur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Clic de la touche écouteur"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Clic de la touche écouteur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Raccourcis"
+  </dest>
+  <voice>
+    *: "Raccourcis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Démarrage/Arrêt"
+  </dest>
+  <voice>
+    *: "Démarrage/Arrêt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Redémarrer la mise en veille programmable sur pression d'une touche"
+  </dest>
+  <voice>
+    *: "Redémarrer la mise en veille programmable sur pression d'une touche"
+  </voice>
+</phrase>
