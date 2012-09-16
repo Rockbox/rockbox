@@ -111,7 +111,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     }
 #endif
 
-#if !defined(Q_OS_WIN32)
+#if !defined(Q_OS_WIN32) && !defined(Q_OS_MACX)
     /* eject funtionality is only implemented on W32 right now. */
     ui.buttonEject->setEnabled(false);
 #endif

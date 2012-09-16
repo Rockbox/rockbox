@@ -749,6 +749,45 @@ bool Utils::ejectDevice(QString device)
     return success;
 
 #endif
+#if defined(Q_OS_MACX)
+    // FIXME: FSUnmountVolumeSync is deprecated starting with 10.8.
+    // Use DADiskUnmount / DiskArbitration framework eventually.
+    // BSD label does not include folder.
+    QString bsd = Utils::resolveDevicename(device).remove("/dev/");
+    OSStatus result;
+    ItemCount index = 1;
+    bool found = false;
+
+    do {
+        FSVolumeRefNum volrefnum;
+
+        result = FSGetVolumeInfo(kFSInvalidVolumeRefNum, index, &volrefnum,
+                kFSVolInfoFSInfo, NULL, NULL, NULL);
+        if(result == noErr) {
+            GetVolParmsInfoBuffer volparms;
+            HParamBlockRec hpb;
+            hpb.ioParam.ioNamePtr = NULL;
+            hpb.ioParam.ioVRefNum = volrefnum;
+            hpb.ioParam.ioBuffer = (Ptr)&volparms;
+            hpb.ioParam.ioReqCount = sizeof(volparms);
+
+            if(PBHGetVolParmsSync(&hpb) == noErr) {
+                if(volparms.vMServerAdr == 0) {
+                    if(bsd == (char*)volparms.vMDeviceID) {
+                        pid_t dissenter;
+                        result = FSUnmountVolumeSync(volrefnum, 0, &dissenter);
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+        index++;
+    } while(result == noErr);
+    if(result == noErr && found)
+        return true;
+
+#endif
     return false;
 }
 
