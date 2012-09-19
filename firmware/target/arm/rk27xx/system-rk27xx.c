@@ -200,19 +200,29 @@ void udelay(unsigned usecs)
     );
 }
 
-void commit_discard_idcache(void)
+/* Invalidating both cache lines from single function
+ * gives sometimes strange data aborts.
+ * This version resembles how OF invalidates cache.
+ * noinline attribute is to guarantee that future
+ * gcc change will not decide to inline this call (although
+ * current arm-eabi version from our toolchain doesn't do that
+ */
+static void __attribute__((noinline)) cache_invalidate_way(int way)
 {
-    /* invalidate cache way 0 */
-    CACHEOP = 0x02;
+    /* Issue invalidata way command to the cache controler */
+    CACHEOP = ((way<<31)|0x2);
 
     /* wait for invalidate process to complete */
     while (CACHEOP & 0x03);
+}
+
+void commit_discard_idcache(void)
+{
+    /* invalidate cache way 0 */
+    cache_invalidate_way(0);
 
     /* invalidate cache way 1 */
-    CACHEOP = 0x80000002;
-
-    /* wait for invalidate process to complete */
-    while (CACHEOP & 0x03);   
+    cache_invalidate_way(1);
 }
 void commit_discard_dcache (void) __attribute__((alias("commit_discard_idcache")));
 
