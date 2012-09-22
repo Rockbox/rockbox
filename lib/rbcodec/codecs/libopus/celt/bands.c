@@ -73,6 +73,7 @@ static int bitexact_log2tan(int isin,int icos)
          -FRAC_MUL16(icos, FRAC_MUL16(icos, -2597) + 7932);
 }
 
+#if 0
 #ifdef FIXED_POINT
 /* Compute the amplitude (sqrt energy) in each of the bands */
 void compute_band_energies(const CELTMode *m, const celt_sig *X, celt_ener *bandE, int end, int C, int M)
@@ -170,6 +171,7 @@ void normalise_bands(const CELTMode *m, const celt_sig * OPUS_RESTRICT freq, cel
 }
 
 #endif /* FIXED_POINT */
+#endif
 
 /* De-normalise the energy to produce the synthesis from the unit-energy bands */
 void denormalise_bands(const CELTMode *m, const celt_norm * OPUS_RESTRICT X, celt_sig * OPUS_RESTRICT freq, const celt_ener *bandE, int end, int C, int M)
@@ -390,6 +392,7 @@ static void stereo_merge(celt_norm *X, celt_norm *Y, opus_val16 mid, int N)
    }
 }
 
+#if 0
 /* Decide whether we should spread the pulses in the current frame */
 int spreading_decision(const CELTMode *m, celt_norm *X, int *average,
       int last_decision, int *hf_average, int *tapset_decision, int update_hf,
@@ -482,6 +485,7 @@ int spreading_decision(const CELTMode *m, celt_norm *X, int *average,
 #endif
    return decision;
 }
+#endif
 
 #ifdef MEASURE_NORM_MSE
 

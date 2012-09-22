@@ -46,6 +46,7 @@
    complex numbers.  It also delares the kf_ internal functions.
 */
 
+#if 0
 static void kf_bfly2(
                      kiss_fft_cpx * Fout,
                      const size_t fstride,
@@ -78,6 +79,7 @@ static void kf_bfly2(
       }
    }
 }
+#endif
 
 static void ki_bfly2(
                      kiss_fft_cpx * Fout,
@@ -110,6 +112,7 @@ static void ki_bfly2(
    }
 }
 
+#if 0
 static void kf_bfly4(
                      kiss_fft_cpx * Fout,
                      const size_t fstride,
@@ -158,6 +161,7 @@ static void kf_bfly4(
       }
    }
 }
+#endif
 
 static void ki_bfly4(
                      kiss_fft_cpx * Fout,
@@ -206,6 +210,7 @@ static void ki_bfly4(
 
 #ifndef RADIX_TWO_ONLY
 
+#if 0
 static void kf_bfly3(
                      kiss_fft_cpx * Fout,
                      const size_t fstride,
@@ -257,6 +262,7 @@ static void kf_bfly3(
       } while(--k);
    }
 }
+#endif
 
 static void ki_bfly3(
                      kiss_fft_cpx * Fout,
@@ -308,6 +314,7 @@ static void ki_bfly3(
    }
 }
 
+#if 0
 static void kf_bfly5(
                      kiss_fft_cpx * Fout,
                      const size_t fstride,
@@ -376,6 +383,7 @@ static void kf_bfly5(
       }
    }
 }
+#endif
 
 static void ki_bfly5(
                      kiss_fft_cpx * Fout,
@@ -609,6 +617,7 @@ void opus_fft_free(const kiss_fft_state *cfg)
 
 #endif /* CUSTOM_MODES */
 
+#if 0
 void opus_fft(const kiss_fft_state *st,const kiss_fft_cpx *fin,kiss_fft_cpx *fout)
 {
     int m2, m;
@@ -667,6 +676,7 @@ void opus_fft(const kiss_fft_state *st,const kiss_fft_cpx *fin,kiss_fft_cpx *fou
        m = m2;
     }
 }
+#endif
 
 void opus_ifft(const kiss_fft_state *st,const kiss_fft_cpx *fin,kiss_fft_cpx *fout)
 {

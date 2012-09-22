@@ -132,10 +132,12 @@ OPUS_CUSTOM_EXPORT void opus_custom_mode_destroy(OpusCustomMode *mode);
   * @param [in] channels <tt>int</tt>: Number of channels
   * @returns size
   */
+# if 0
 OPUS_CUSTOM_EXPORT_STATIC OPUS_WARN_UNUSED_RESULT int opus_custom_encoder_get_size(
     const OpusCustomMode *mode,
     int channels
 ) OPUS_ARG_NONNULL(1);
+#endif
 
 /** Creates a new encoder state. Each stream needs its own encoder
   * state (can't be shared across simultaneous streams).
@@ -164,11 +166,13 @@ OPUS_CUSTOM_EXPORT OPUS_WARN_UNUSED_RESULT OpusCustomEncoder *opus_custom_encode
   * @param [in] channels <tt>int</tt>: Number of channels
   * @return OPUS_OK Success or @ref opus_errorcodes
   */
+#if 0
 OPUS_CUSTOM_EXPORT_STATIC int opus_custom_encoder_init(
     OpusCustomEncoder *st,
     const OpusCustomMode *mode,
     int channels
 ) OPUS_ARG_NONNULL(1) OPUS_ARG_NONNULL(2);
+#endif
 
 /** Destroys a an encoder state.
   * @param[in] st <tt>OpusCustomEncoder*</tt>: State to be freed.

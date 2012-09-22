@@ -198,6 +198,7 @@ struct OpusCustomEncoder {
    /* opus_val16 oldEBands[], Size = 2*channels*mode->nbEBands */
 };
 
+#if 0
 int celt_encoder_get_size(int channels)
 {
    CELTMode *mode = opus_custom_mode_create(48000, 960, NULL);
@@ -280,6 +281,7 @@ void opus_custom_encoder_destroy(CELTEncoder *st)
    opus_free(st);
 }
 #endif /* CUSTOM_MODES */
+#endif
 
 static inline opus_val16 SIG2WORD16(celt_sig x)
 {
@@ -293,6 +295,7 @@ static inline opus_val16 SIG2WORD16(celt_sig x)
 #endif
 }
 
+#if 0
 static int transient_analysis(const opus_val32 * OPUS_RESTRICT in, int len, int C,
                               int overlap)
 {
@@ -410,6 +413,7 @@ static void compute_mdcts(const CELTMode *mode, int shortBlocks, celt_sig * OPUS
       } while (++c<C);
    }
 }
+#endif
 
 /** Compute the IMDCT and apply window for all sub-frames and
     all channels in a frame */
@@ -536,6 +540,7 @@ static const signed char tf_select_table[4][8] = {
       {0, -2, 0, -3,    3, 0, 1,-1},
 };
 
+#if 0
 static opus_val32 l1_metric(const celt_norm *tmp, int N, int LM, int width)
 {
    int i, j;
@@ -737,6 +742,7 @@ static void tf_encode(int start, int end, int isTransient, int *tf_res, int LM, 
       tf_res[i] = tf_select_table[LM][4*isTransient+2*tf_select+tf_res[i]];
    /*printf("%d %d ", isTransient, tf_select); for(i=0;i<end;i++)printf("%d ", tf_res[i]);printf("\n");*/
 }
+#endif
 
 static void tf_decode(int start, int end, int isTransient, int *tf_res, int LM, ec_dec *dec)
 {
@@ -788,6 +794,7 @@ static void init_caps(const CELTMode *m,int *cap,int LM,int C)
    }
 }
 
+#if 0
 static int alloc_trim_analysis(const CELTMode *m, const celt_norm *X,
       const opus_val16 *bandLogE, int end, int LM, int C, int N0)
 {
@@ -1901,6 +1908,7 @@ bad_request:
    va_end(ap);
    return OPUS_UNIMPLEMENTED;
 }
+#endif
 
 /**********************************************************************/
 /*                                                                    */
