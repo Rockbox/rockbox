@@ -16,8 +16,7 @@ OPUSLIB_OBJ := $(call c2obj, $(OPUSLIB_SRC))
 $(OPUSLIB) : CODECFLAGS += -DHAVE_CONFIG_H \
    -I$(RBCODECLIB_DIR)/codecs/libopus \
    -I$(RBCODECLIB_DIR)/codecs/libopus/celt \
-   -I$(RBCODECLIB_DIR)/codecs/libopus/silk \
-   -I$(RBCODECLIB_DIR)/codecs/libopus/silk/fixed
+   -I$(RBCODECLIB_DIR)/codecs/libopus/silk
 
 $(OPUSLIB): $(OPUSLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
