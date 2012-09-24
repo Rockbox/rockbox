@@ -301,13 +301,19 @@ int main(int argc, char **argv)
             return 2;
         }
         ext++;
-#ifdef HAVE_REMOTE_LCD
         if (!strcmp(ext, "rwps") || !strcmp(ext, "rsbs") || !strcmp(ext, "rfms"))
+        {
+#ifdef HAVE_REMOTE_LCD
             screen = SCREEN_REMOTE;
-        else
+#else
+            /* skip rwps etc. if not supported on this target (not an error) */
+            continue;
 #endif
-        if (!strcmp(ext, "wps")  || !strcmp(ext, "sbs")  || !strcmp(ext, "fms"))
+        }
+        else if (!strcmp(ext, "wps")  || !strcmp(ext, "sbs")  || !strcmp(ext, "fms"))
+        {
             screen = SCREEN_MAIN;
+        }
         else
         {
             printf("Invalid extension\n");
