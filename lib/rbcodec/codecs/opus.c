@@ -332,6 +332,12 @@ enum codec_status codec_run(void)
     }
     global_stack = 0;
 
+#if defined(CPU_COLDFIRE)
+    /* EMAC rounding is disabled because of MULT16_32_Q15, which will be
+       inaccurate with rounding in its current incarnation */
+    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+#endif
+
     /* pre-init the ogg_sync_state buffer, so it won't need many reallocs */
     ogg_sync_init(&oy);
     oy.storage = 64*1024;
