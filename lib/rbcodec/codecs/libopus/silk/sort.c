@@ -37,6 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "SigProc_FIX.h"
 
+#if 0
 void silk_insertion_sort_increasing(
     opus_int32           *a,             /* I/O   Unsorted / Sorted vector               */
     opus_int             *idx,           /* O     Index vector for the sorted elements   */
@@ -130,6 +131,7 @@ void silk_insertion_sort_decreasing_int16(
         }
     }
 }
+#endif
 #endif
 
 void silk_insertion_sort_increasing_all_values_int16(

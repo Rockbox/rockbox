@@ -151,11 +151,13 @@ void silk_ana_filt_bank_1(
 /*                        SCALAR FUNCTIONS                          */
 /********************************************************************/
 
+#if 0
 /* Approximation of 128 * log2() (exact inverse of approx 2^() below) */
 /* Convert input to a log scale    */
 opus_int32 silk_lin2log(
     const opus_int32            inLin               /* I  input in linear scale                                         */
 );
+#endif
 
 /* Approximation of a sigmoid function */
 opus_int silk_sigm_Q15(

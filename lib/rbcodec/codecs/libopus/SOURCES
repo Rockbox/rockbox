@@ -31,7 +31,6 @@ silk/decode_pulses.c
 silk/decoder_set_fs.c
 silk/gain_quant.c
 silk/init_decoder.c
-silk/lin2log.c
 silk/log2lin.c
 silk/LPC_analysis_filter.c
 silk/LPC_inv_pred_gain.c
