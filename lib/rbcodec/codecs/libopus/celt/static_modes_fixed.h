@@ -6,7 +6,7 @@
 
 #ifndef DEF_WINDOW120
 #define DEF_WINDOW120
-static const opus_val16 window120[120] = {
+static const opus_val16 window120[120] ICONST_ATTR = {
 2, 20, 55, 108, 178,
 266, 372, 494, 635, 792,
 966, 1157, 1365, 1590, 1831,
@@ -96,7 +96,7 @@ static const unsigned char cache_caps50[168] = {
 
 #ifndef FFT_TWIDDLES48000_960
 #define FFT_TWIDDLES48000_960
-static const kiss_twiddle_cpx fft_twiddles48000_960[480] = {
+static const kiss_twiddle_cpx fft_twiddles48000_960[480] ICONST_ATTR = {
 {32767, 0}, {32766, -429},
 {32757, -858}, {32743, -1287},
 {32724, -1715}, {32698, -2143},
@@ -424,7 +424,7 @@ static const opus_int16 fft_bitrev60[60] = {
 
 #ifndef FFT_STATE48000_960_0
 #define FFT_STATE48000_960_0
-static const kiss_fft_state fft_state48000_960_0 = {
+static const kiss_fft_state fft_state48000_960_0 ICONST_ATTR = {
 480,    /* nfft */
 -1,     /* shift */
 {4, 120, 4, 30, 2, 15, 3, 5, 5, 1, 0, 0, 0, 0, 0, 0, }, /* factors */
@@ -435,7 +435,7 @@ fft_twiddles48000_960,  /* bitrev */
 
 #ifndef FFT_STATE48000_960_1
 #define FFT_STATE48000_960_1
-static const kiss_fft_state fft_state48000_960_1 = {
+static const kiss_fft_state fft_state48000_960_1 ICONST_ATTR = {
 240,    /* nfft */
 1,      /* shift */
 {4, 60, 4, 15, 3, 5, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, },   /* factors */
@@ -446,7 +446,7 @@ fft_twiddles48000_960,  /* bitrev */
 
 #ifndef FFT_STATE48000_960_2
 #define FFT_STATE48000_960_2
-static const kiss_fft_state fft_state48000_960_2 = {
+static const kiss_fft_state fft_state48000_960_2 ICONST_ATTR = {
 120,    /* nfft */
 2,      /* shift */
 {4, 30, 2, 15, 3, 5, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, },   /* factors */
@@ -457,7 +457,7 @@ fft_twiddles48000_960,  /* bitrev */
 
 #ifndef FFT_STATE48000_960_3
 #define FFT_STATE48000_960_3
-static const kiss_fft_state fft_state48000_960_3 = {
+static const kiss_fft_state fft_state48000_960_3 ICONST_ATTR = {
 60,     /* nfft */
 3,      /* shift */
 {4, 15, 3, 5, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },    /* factors */
@@ -470,7 +470,7 @@ fft_twiddles48000_960,  /* bitrev */
 
 #ifndef MDCT_TWIDDLES960
 #define MDCT_TWIDDLES960
-static const opus_val16 mdct_twiddles960[481] = {
+static const opus_val16 mdct_twiddles960[481] ICONST_ATTR = {
 32767, 32767, 32767, 32767, 32766,
 32763, 32762, 32759, 32757, 32753,
 32751, 32747, 32743, 32738, 32733,
@@ -570,7 +570,7 @@ static const opus_val16 mdct_twiddles960[481] = {
 0, };
 #endif
 
-static const CELTMode mode48000_960_120 = {
+static const CELTMode mode48000_960_120 ICONST_ATTR = {
 48000,  /* Fs */
 120,    /* overlap */
 21,     /* nbEBands */
