@@ -188,8 +188,7 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
 }
 
 static int speex_seek_page_granule(int64_t pos, int64_t curpos,
-                                   ogg_sync_state *oy,
-                                   int64_t headerssize)
+                                   ogg_sync_state *oy)
 {
     /* TODO: Someone may want to try to implement seek to packet, 
              instead of just to page (should be more accurate, not be any 
@@ -204,7 +203,7 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
     ogg_page og = {0,0,0,0};
     int64_t avgpagelen = -1;
     int64_t lastgranule = -1;
-
+#if 0
     if(abs(pos-curpos)>10000 && headerssize>0 && curoffset-headerssize>10000) {
         /* if seeking for more that 10sec,
            headersize is known & more than 10kb is played,
@@ -252,10 +251,14 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
             }
         }
     }
-
+#endif
     /* which way do we want to seek? */
-
-    if (curpos > pos) {  /* backwards */
+    if (pos == 0) {  /* start */
+        *curbyteoffset = 0;
+        ci->seek_buffer(*curbyteoffset);
+        ogg_sync_reset(oy);
+        return 0;
+    } else if (curpos > pos) {  /* backwards */
         offset = seek_backwards(oy,&og,pos);
 
         if (offset > 0) {
@@ -364,7 +367,7 @@ enum codec_status codec_run(void)
 
                 LOGF("Opus seek page:%lld,%lld,%ld\n",
 		            seek_target, page_granule, (long)param);
-                speex_seek_page_granule(seek_target, page_granule, &oy, 0);
+                speex_seek_page_granule(seek_target, page_granule, &oy);
             }
 
             ci->set_elapsed(param);
