@@ -20,6 +20,7 @@
  *
  ****************************************************************************/
 
+
 #include "config.h"
 #include "kernel.h"
 #include "lcd.h"
@@ -29,7 +30,7 @@
 
 static bool display_on = false;
 
-static void lcd_v1_display_init(void)
+void lcd_v1_display_init(void)
 {
     unsigned int x, y;
 
@@ -84,7 +85,7 @@ static void lcd_v1_display_init(void)
     udelay(40);
 
     /* Memmory access setting */
-    lcd_write_reg(0x16, 0x48);
+    lcd_write_reg(0x16, 0x68);
     /* Setup 16bit mode */
     lcd_write_reg(0x17, 0x05);
 
@@ -92,11 +93,11 @@ static void lcd_v1_display_init(void)
     lcd_write_reg(0x02, 0x00);
     lcd_write_reg(0x03, 0x00);
     lcd_write_reg(0x04, 0x00);
-    lcd_write_reg(0x05, LCD_HEIGHT - 1);
+    lcd_write_reg(0x05, LCD_WIDTH - 1);
     lcd_write_reg(0x06, 0x00);
     lcd_write_reg(0x07, 0x00);
     lcd_write_reg(0x08, 0x00);
-    lcd_write_reg(0x09, LCD_WIDTH - 1);
+    lcd_write_reg(0x09, LCD_HEIGHT - 1);
 
     /* Start GRAM write */
     lcd_cmd(0x22);
@@ -110,6 +111,9 @@ static void lcd_v1_display_init(void)
 
 static void lcd_v1_enable (bool on)
 {
+    lcdctrl_bypass(1);
+    LCDC_CTRL |= RGB24B;
+
     if (on)
     {
         lcd_write_reg(0x18, 0x44);
@@ -139,23 +143,33 @@ static void lcd_v1_enable (bool on)
         lcd_write_reg(0x21, 0x00);
     }
     display_on = on;
+
+    LCDC_CTRL &= ~RGB24B;
+}
+static void lcd_v1_set_gram_area(int x, int y, int width, int height)
+{
+    lcdctrl_bypass(1);
+    LCDC_CTRL |= RGB24B;
+    
+    lcd_write_reg(0x03, x);
+    lcd_write_reg(0x05, width-1);
+    lcd_write_reg(0x07, y);
+    lcd_write_reg(0x09, height-1);
+    
+    lcd_cmd(0x22);
+    LCDC_CTRL &= ~RGB24B;
 }
 
 static void lcd_v1_update_rect(int x, int y, int width, int height)
 {
-     int px = x, py = y;
-     int pxmax = x + width, pymax = y + height;
- 
-     lcd_write_reg(0x03, y);
-     lcd_write_reg(0x05, pymax-1);
-     lcd_write_reg(0x07, x);
-     lcd_write_reg(0x09, pxmax-1);
-     
-     lcd_cmd(0x22);
-     
-     for (px=x; px<pxmax; px++)
-         for (py=y; py<pymax; py++)
-             lcd_data(*FBADDR(px, py));
+    int px = x, py = y;
+    int pxmax = x + width, pymax = y + height;
+
+    lcd_v1_set_gram_area(x, y, pxmax, pymax);
+
+    for (py=y; py<pymax; py++)
+        for (px=x; px<pxmax; px++)     
+            LCD_DATA = (*FBADDR(px, py));
 }
 
 
@@ -246,31 +260,34 @@ static void lcd_v2_enable (bool on)
     display_on = on;
 }
 
-static void lcd_v2_update_rect(int x, int y, int width, int height)
+static void lcd_v2_set_gram_area(int x, int y, int width, int height)
 {
-    int px, py;
     (void) x;
     (void) y;
     (void) width;
-    (void)height;
-
+    (void) height;
+    lcdctrl_bypass(1);
+    LCDC_CTRL |= RGB24B;
     lcd_cmd(0x22);
-    
-    for (py=0; py<LCD_HEIGHT; py++)
-        for (px=0; px<LCD_WIDTH; px++)
-            lcd_data(*FBADDR(px, py));
+    LCDC_CTRL &= ~RGB24B;
 }
 
-void lcd_init_device(void)
+static void lcd_v2_update_rect(int x, int y, int width, int height)
 {
-    lcdif_init(LCDIF_16BIT);
+    (void) x;
+    (void) y;
+    (void) width;
+    (void) height;
+    lcd_update();
+}
 
+void lcd_display_init(void)
+{
     identify_lcd();
     if (lcd_type == LCD_V1)
         lcd_v1_display_init();
     else
         lcd_v2_display_init();
-
 }
 
 void lcd_enable (bool on)
@@ -279,6 +296,14 @@ void lcd_enable (bool on)
         lcd_v1_enable(on);
     else
         lcd_v2_enable(on);
+}
+
+void lcd_set_gram_area(int x, int y, int width, int height)
+{
+   if (lcd_type == LCD_V1)
+        lcd_v1_set_gram_area(x, y, width, height);
+    else
+        lcd_v2_set_gram_area(x, y, width, height);
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
@@ -293,15 +318,19 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 #else /* HM801 */
 
-void lcd_init_device(void)
+void lcd_display_init(void)
 {
-    lcdif_init(LCDIF_16BIT);
     lcd_v1_display_init();
 }
 
 void lcd_enable (bool on)
 {
     lcd_v1_enable(on);
+}
+
+void lcd_set_gram_area(int x, int y, int width, int height)
+{
+    lcd_v1_set_gram_area(x, y, width, height);
 }
 
 void lcd_update_rect(int x, int y, int width, int height)

@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2011 Marcin Bukat
  *
@@ -37,17 +36,6 @@ static inline void delay_nop(int cycles)
 }
 
 
-/* converts RGB565 pixel into internal lcd bus format */
-static unsigned int lcd_pixel_transform(unsigned short rgb565)
-{
-    unsigned int r, g, b;
-    b = rgb565 & 0x1f;
-    g = (rgb565 >> 5) & 0x3f;
-    r = (rgb565 >> 11) & 0x1f;
-
-    return r<<19 | g<<10 | b<<3;
-}
-
 /* not tested */
 static void lcd_sleep(bool sleep)
 {
@@ -71,7 +59,7 @@ static void lcd_sleep(bool sleep)
     lcd_cmd(GRAM_WRITE);
 }
 
-static void lcd_display_init(void)
+void lcd_display_init(void)
 {
     unsigned int x, y;
 
@@ -173,10 +161,21 @@ static void lcd_display_init(void)
     lcd_sleep(false);
 }
 
-void lcd_init_device(void)
+void lcd_set_gram_area(int x, int y, int width, int height)
 {
-    lcdif_init(LCDIF_18BIT);
-    lcd_display_init();
+    lcdctrl_bypass(1);
+    LCDC_CTRL |= RGB24B;
+
+    /* addresses setup */
+    lcd_write_reg(WINDOW_H_START,  y);
+    lcd_write_reg(WINDOW_H_END,    height-1);
+    lcd_write_reg(WINDOW_V_START,  x);
+    lcd_write_reg(WINDOW_V_END,    width-1);
+    lcd_write_reg(GRAM_H_ADDR,     y);
+    lcd_write_reg(GRAM_V_ADDR,     x);
+
+    lcd_cmd(GRAM_WRITE);
+    LCDC_CTRL &= ~RGB24B;
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
@@ -184,20 +183,12 @@ void lcd_update_rect(int x, int y, int width, int height)
     int px = x, py = y;
     int pxmax = x + width, pymax = y + height;
 
-    /* addresses setup */
-    lcd_write_reg(WINDOW_H_START,  y);
-    lcd_write_reg(WINDOW_H_END,    pymax-1);
-    lcd_write_reg(WINDOW_V_START,  x);
-    lcd_write_reg(WINDOW_V_END,    pxmax-1);
-    lcd_write_reg(GRAM_H_ADDR,     y);
-    lcd_write_reg(GRAM_V_ADDR,     x);
-
-    lcd_cmd(GRAM_WRITE);
+    lcd_set_gram_area(x, y, pxmax, pymax);
 
     for (py=y; py<pymax; py++)
     {
         for (px=x; px<pxmax; px++)
-            LCD_DATA = lcd_pixel_transform(*FBADDR(px,py));
+            LCD_DATA = *FBADDR(px,py);
     }
 }
 
