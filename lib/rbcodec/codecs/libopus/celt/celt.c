@@ -458,10 +458,10 @@ static void compute_inv_mdcts(const CELTMode *mode, int shortBlocks, celt_sig *X
    RESTORE_STACK;
 }
 
-static void deemphasis(celt_sig *in[], opus_val16 *pcm, int N, int C, int downsample, const opus_val16 *coef, celt_sig *mem)
+static void deemphasis(celt_sig *in[], opus_val16 *pcm, int N, int C, /* int downsample,*/ const opus_val16 *coef, celt_sig *mem)
 {
    int c;
-   int count=0;
+/*   int count=0;*/
    c=0; do {
       int j;
       celt_sig * OPUS_RESTRICT x;
@@ -472,18 +472,21 @@ static void deemphasis(celt_sig *in[], opus_val16 *pcm, int N, int C, int downsa
       for (j=0;j<N;j++)
       {
          celt_sig tmp = *x + m;
-         m = MULT16_32_Q15(coef[0], tmp)
-           - MULT16_32_Q15(coef[1], *x);
+         m = MULT16_32_Q15(coef[0], tmp);
+#ifdef CUSTOM_MODES
+         m -= MULT16_32_Q15(coef[1], *x);
          tmp = SHL32(MULT16_32_Q15(coef[3], tmp), 2);
+#endif
          x++;
          /* Technically the store could be moved outside of the if because
             the stores we don't want will just be overwritten */
-         if (count==0)
+         /* ROCKBOX: we don't downsample
+         if (count==0) */
             *y = SCALEOUT(SIG2WORD16(tmp));
-         if (++count==downsample)
+         /* if (++count==downsample) */
          {
             y+=C;
-            count=0;
+         /*   count=0; */
          }
       }
       mem[c] = m;
@@ -2286,7 +2289,7 @@ static void celt_decode_lost(CELTDecoder * OPUS_RESTRICT st, opus_val16 * OPUS_R
       } while (++c<C);
    }
 
-   deemphasis(out_syn, pcm, N, C, st->downsample, st->mode->preemph, st->preemph_memD);
+   deemphasis(out_syn, pcm, N, C, /*st->downsample,*/ st->mode->preemph, st->preemph_memD);
 
    st->loss_count++;
 
@@ -2661,7 +2664,7 @@ int celt_decode_with_ec(CELTDecoder * OPUS_RESTRICT st, const unsigned char *dat
    } while (++c<2);
    st->rng = dec->rng;
 
-   deemphasis(out_syn, pcm, N, CC, st->downsample, st->mode->preemph, st->preemph_memD);
+   deemphasis(out_syn, pcm, N, CC, /*st->downsample,*/ st->mode->preemph, st->preemph_memD);
    st->loss_count = 0;
    RESTORE_STACK;
    if (ec_tell(dec) > 8*len)
