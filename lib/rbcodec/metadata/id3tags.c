@@ -320,6 +320,13 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
             entry->albumart.type = AA_TYPE_JPG;
             tag += 5;
         }
+        else if (strcmp(tag, "jpg") == 0)
+        {
+            /* image/jpg is technically invalid, but it does occur in
+             * the wild */
+            entry->albumart.type = AA_TYPE_JPG;
+            tag += 4;
+        }
         else if (strcmp(tag, "png") == 0)
         {
             entry->albumart.type = AA_TYPE_PNG;

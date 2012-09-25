@@ -493,6 +493,10 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 lseek(fd, strlength-32, SEEK_CUR);
                                 if (!strcmp("image/jpeg", utf8buf)) {
                                     id3->albumart.type = AA_TYPE_JPG;
+                                } else if (!strcmp("image/jpg", utf8buf)) {
+                                    /* image/jpg is technically invalid,
+                                     * but it does occur in the wild */
+                                    id3->albumart.type = AA_TYPE_JPG;
                                 } else if (!strcmp("image/png", utf8buf)) {
                                     id3->albumart.type = AA_TYPE_PNG;
                                 } else {
