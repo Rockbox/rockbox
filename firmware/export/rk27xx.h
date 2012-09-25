@@ -877,13 +877,23 @@
 #define INTR_MASK_VERT       (1<<1)
 #define INTR_MASK_HOR        (1<<0)
 
+#define ALPHA_ALX            (*(volatile unsigned long *)(AHB1_LCDC + 0x5C))
+#define ALPHA_ATY            (*(volatile unsigned long *)(AHB1_LCDC + 0x60))
+#define ALPHA_ARX            (*(volatile unsigned long *)(AHB1_LCDC + 0x64))
+#define ALPHA_ABY            (*(volatile unsigned long *)(AHB1_LCDC + 0x68))
+
+#define ALPHA_BLX            (*(volatile unsigned long *)(AHB1_LCDC + 0x6C))
+#define ALPHA_BTY            (*(volatile unsigned long *)(AHB1_LCDC + 0x70))
+#define ALPHA_BRX            (*(volatile unsigned long *)(AHB1_LCDC + 0x74))
+#define ALPHA_BBY            (*(volatile unsigned long *)(AHB1_LCDC + 0x78))
+
 #define LCDC_STA             (*(volatile unsigned long *)(AHB1_LCDC + 0x7C))
 #define LCDC_MCU_IDLE        (1<<12)
 
 #define LCD_COMMAND          (*(volatile unsigned long *)(AHB1_LCDC + 0x1000))
 #define LCD_DATA             (*(volatile unsigned long *)(AHB1_LCDC + 0x1004))
 
-#define LCD_BUFF             (*(volatile unsigned long *)(AHB1_LCDC + 0x2000))
+#define LCD_BUFF             ((volatile void *)(AHB1_LCDC + 0x2000))
 /* High speed ADC interface */
 #define AHB1_HS_ADC            0x186EC000
 #define HSADC_DATA           (*(volatile unsigned long *)(AHB1_HS_ADC + 0x00))
