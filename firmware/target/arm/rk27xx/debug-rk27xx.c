@@ -65,6 +65,7 @@ bool dbg_hw_info(void)
         line++;
         _DEBUG_PRINTF("sd_debug_time_rd: %d", sd_debug_time_rd);
         _DEBUG_PRINTF("sd_debug_time_wr: %d", sd_debug_time_wr);
+
         lcd_update(); 
         switch(button_get_w_tmo(HZ/20))
         {
@@ -89,7 +90,7 @@ bool dbg_ports(void)
     {
         lcd_clear_display();
         line = 0;
-        
+
         _DEBUG_PRINTF("GPIO_PADR:  %02x",(unsigned char)GPIO_PADR);
         _DEBUG_PRINTF("GPIO_PACON: %02x",(unsigned char)GPIO_PACON);
         _DEBUG_PRINTF("GPIO_PBDR:  %02x",(unsigned char)GPIO_PBDR);
