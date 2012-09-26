@@ -45,14 +45,13 @@
 #if defined(CPU_COLDFIRE)
 static inline int32_t MULT16_32_Q15(int32_t a, int32_t b)
 {
-  asm volatile ("lsl.l #8, %[a];"
-                "lsl.l #8, %[a];"
-                "mac.l %[a], %[b], %%acc0;"
-                "movclr.l %%acc0, %[a];"
-                : [a] "+d" (a)
-                : [b] "d" (b)
+  int32_t r;
+  asm volatile ("mac.l %[a], %[b], %%acc0;"
+                "movclr.l %%acc0, %[r];"
+                : [r] "=r" (r)
+                : [a] "r" (a<<16), [b] "r" (b)
                 : "cc");
-  return a;
+  return r;
 }
 
 #elif defined(CPU_ARM)
