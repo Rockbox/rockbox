@@ -214,14 +214,15 @@ void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scala
    int i;
    int N, N2, N4;
    kiss_twiddle_scalar sine;
-   VARDECL(kiss_fft_scalar, f);
+/*   VARDECL(kiss_fft_scalar, f); */
    VARDECL(kiss_fft_scalar, f2);
    SAVE_STACK;
-   N = l->n;
+   N = l->n; /* static modes => N = 1920 */
    N >>= shift;
    N2 = N>>1;
    N4 = N>>2;
-   ALLOC(f, N2, kiss_fft_scalar);
+/*   ALLOC(f, N2, kiss_fft_scalar); */
+   kiss_fft_scalar f[N2]; /* worst case 3840b */
    ALLOC(f2, N2, kiss_fft_scalar);
    /* sin(x) ~= x here */
 #ifdef FIXED_POINT
