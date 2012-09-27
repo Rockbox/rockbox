@@ -33,6 +33,41 @@
       "revId": "6cda32bce8971008cbc1574fdf7206e86f167205",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///9A\u003d",
+        "filename": "firmware/target/arm/rk27xx/lcdif-rk27xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2012-09-27T07:31:32Z",
+      "side": 1,
+      "message": "I opt for renaming",
+      "parentUuid": "AAAASX///9M\u003d",
+      "revId": "6cda32bce8971008cbc1574fdf7206e86f167205",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///88\u003d",
+        "filename": "firmware/target/arm/rk27xx/lcdif-rk27xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2012-09-27T07:31:32Z",
+      "side": 1,
+      "message": "Probably nothing bad will happen when you cast away volatile, but it\u0027s not very good practice, as it\u0027s undefined behavior.\nMaybe it would be better to replace this with simple for loop.",
+      "revId": "6cda32bce8971008cbc1574fdf7206e86f167205",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
