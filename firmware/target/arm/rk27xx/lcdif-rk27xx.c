@@ -113,7 +113,7 @@ static void lcdctrl_init(void)
      * on second lcd_update call
      */
     for (i=0; i<2048; i++)
-        *((uint32_t *)LCD_BUFF + i) = 0;
+        *((volatile uint32_t *)LCD_BUFF + i) = 0;
 
     /* Setup buffered writes to lcd controler */
     MCU_CTRL = MCU_CTRL_RS_HIGH|MCU_CTRL_BUFF_WRITE|MCU_CTRL_BUFF_START;
