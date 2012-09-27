@@ -111,6 +111,9 @@ void lcd_v1_display_init(void)
 
 static void lcd_v1_enable (bool on)
 {
+    if (on == display_on)
+        return;
+
     lcdctrl_bypass(1);
     LCDC_CTRL |= RGB24B;
 
