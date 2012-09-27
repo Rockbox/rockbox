@@ -25,8 +25,12 @@
 #include <sys/ioctl.h>
 #include "stdint.h"
 #include "string.h"
+#include "kernel.h"
 
 #include "radio-ypr0.h"
+#include "rds.h"
+#include "si4700.h"
+#include "power.h"
 
 static int radio_dev = -1;
 
@@ -64,3 +68,50 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
     sSi4709_i2c_t r = { .size = count, .buf = buf };
     return ioctl(radio_dev, IOCTL_SI4709_I2C_READ, &r);
 }
+
+#ifdef HAVE_RDS_CAP
+
+/* Register we are going to poll */
+#define STATUSRSSI  0xA
+#define STATUSRSSI_RDSR     (0x1 << 15)
+
+/* Low-level RDS Support */
+static uint32_t rds_stack[DEFAULT_STACK_SIZE / sizeof(uint32_t)];
+static uint16_t rds_data[4];
+
+/* Captures RDS data and processes it */
+static inline void rds_polling(void)
+{
+    if (tuner_powered()) {
+        if ((si4709_read_reg(STATUSRSSI) & STATUSRSSI_RDSR) >> 8) {
+            if (si4700_rds_read_raw(rds_data) && rds_process(rds_data))
+                si4700_rds_set_event();
+        }
+        sleep(1);
+    }
+    else {
+        sleep(HZ*1);
+    }
+}
+
+static void NORETURN_ATTR rds_thread(void)
+{
+    while (true)
+        rds_polling();
+}
+
+/* true after full radio power up, and false before powering down */
+void si4700_rds_powerup(bool on)
+{
+    (void)on;
+}
+
+/* One-time RDS init at startup */
+void si4700_rds_init(void)
+{
+    rds_init();
+    create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
+        IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
+
+}
+#endif /* HAVE_RDS_CAP */

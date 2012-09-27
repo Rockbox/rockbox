@@ -37,17 +37,27 @@ void gpio_init(void)
 
 void gpio_close(void)
 {
-    if (r0_gpio_dev < 0)
+    if (r0_gpio_dev >= 0)
         close(r0_gpio_dev);
 }
 
 int gpio_control_struct(int request, R0GPIOInfo r)
 {
-    return ioctl(r0_gpio_dev, request, &r);
+    if (r0_gpio_dev < 0) {
+        return -1;
+    }
+    else {
+        return ioctl(r0_gpio_dev, request, &r);
+    }
 }
 
 int gpio_control(int request, int num, int mode, int val)
 {
-    R0GPIOInfo r = { .num = num, .mode = mode, .val = val, };
-    return ioctl(r0_gpio_dev, request, &r);
+    if (r0_gpio_dev < 0) {
+        return -1;
+    }
+    else {
+        R0GPIOInfo r = { .num = num, .mode = mode, .val = val, };
+        return ioctl(r0_gpio_dev, request, &r);
+    }
 }
