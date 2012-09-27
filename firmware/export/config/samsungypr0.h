@@ -18,9 +18,6 @@
 /*TODO: implement USB data transfer management -> see safe mode script and think a way to implemtent it in the code */
 #define USB_NONE
 
-/* There is only USB charging */
-//#define HAVE_USB_POWER
-
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
 
@@ -28,7 +25,6 @@
 #define HAVE_LCD_COLOR
 
 /* define this if the LCD needs to be shutdown */
-/* TODO: Our framebuffer must be closed... */
 #define HAVE_LCD_SHUTDOWN
 
 /* define this if you want album art for this target */
@@ -84,7 +80,6 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-/* We can do AB-repeat -> we use User key, our hotkey */
 #define AB_REPEAT_ENABLE
 #define ACTION_WPSAB_SINGLE ACTION_WPS_HOTKEY
 
@@ -93,10 +88,9 @@
 
 /* R0 KeyPad configuration for plugins */
 #define CONFIG_KEYPAD SAMSUNG_YPR0_PAD
-/* It's better to close /dev/r0Btn at shutdown */
 #define BUTTON_DRIVER_CLOSE
 
-/* The YPR0 has a as3534 codec and we use that to control the volume */
+/* The YPR0 has a as3534 codec */
 #define HAVE_AS3514
 #define HAVE_AS3543
 
@@ -105,10 +99,7 @@
 #define CONFIG_TUNER SI4700
 #define HAVE_TUNER_PWR_CTRL
 
-/* TODO: next step: enable RDS
 #define HAVE_RDS_CAP
-#define RDS_ISR_PROCESSING
-*/
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
@@ -154,5 +145,5 @@
 /* Max IMX37 Cpu Frequency */
 /* #define CPUFREQ_MAX         CPU_FREQ */
 
-/* TODO: my idea is to create a folder in the cramfs [/.rockbox], mounting it by the starter script as the current working directory, so no issues of any type keeping the rockbox folder as in all other players */
+/* This folder resides in the ReadOnly CRAMFS. It is binded to /mnt/media0/.rockbox */
 #define BOOTDIR "/.rockbox"
