@@ -111,6 +111,8 @@ else ifeq ($(ARCH),arch_m68k)
   $(SPCLIB) : CODECFLAGS +=  -O3
   $(WMAPROLIB) : CODECFLAGS += -O3
   $(WMAVOICELIB) : CODECFLAGS += -O2
+else ifeq ($(ARCH),arch_mips)
+  $(OPUSLIB) : CODECFLAGS += -fno-strict-aliasing
 endif
 
 ifeq ($(MEMORYSIZE),2)
