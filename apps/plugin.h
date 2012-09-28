@@ -59,6 +59,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "button.h"
 #include "action.h"
 #include "load_code.h"
+#include "elfload.h"
 #include "usb.h"
 #include "font.h"
 #include "lcd.h"
@@ -956,6 +957,8 @@ struct plugin_api {
     void (*semaphore_release)(struct semaphore *s);
 #endif
 
+    void* (*elf_open)(const char *filename, struct mem_info_t *m);
+
     const char *rbversion;
 
     /* new stuff at the end, sort into place next time
@@ -978,7 +981,7 @@ extern unsigned char plugin_end_addr[];
         const struct plugin_header __header \
         __attribute__ ((section (".header")))= { \
         { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, plugin__start, &rb };
+        NULL, NULL }, plugin__start, &rb };
 #else /* PLATFORM_HOSTED */
 #define PLUGIN_HEADER \
         const struct plugin_api *rb DATA_ATTR; \

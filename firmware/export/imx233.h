@@ -36,6 +36,11 @@
 
 #define IRAM_ORIG           0
 #define IRAM_SIZE           0x8000
+
+/* The IRAM is too small and already partly used by the core */
+#define PLUGIN_IRAMORIG     0
+#define PLUGIN_IRAMSIZE     0
+
 #define DRAM_ORIG           0x40000000
 #define DRAM_SIZE           (MEMORYSIZE * 0x100000)
 

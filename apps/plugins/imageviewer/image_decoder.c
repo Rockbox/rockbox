@@ -117,6 +117,7 @@ const struct image_decoder *load_decoder(struct loader_info *loader_info)
     char filename[MAX_PATH];
     struct imgdec_header *hdr;
     struct lc_header     *lc_hdr;
+    struct mem_info_t mem_info;
 
     if (loader_info->type < 0 || loader_info->type >= MAX_IMAGE_TYPES)
     {
@@ -130,7 +131,13 @@ const struct image_decoder *load_decoder(struct loader_info *loader_info)
     rb->snprintf(filename, MAX_PATH, VIEWERS_DIR "/%s.ovl", name);
 
     /* load decoder to the buffer. */
-    decoder_handle = rb->lc_open(filename, loader_info->buffer, loader_info->size);
+    /* decoder_handle = rb->lc_open(filename, loader_info->buffer, loader_info->size); */
+    mem_info.dram = loader_info->buffer;
+    mem_info.dram_size = loader_info->size;
+    mem_info.dram_runtime_use = mem_info.dram_load_use = 0;
+
+    decoder_handle = rb->elf_open(filename, &mem_info);
+
     if (!decoder_handle)
     {
         rb->splashf(2*HZ, "Can't open %s", filename);
@@ -165,6 +172,8 @@ const struct image_decoder *load_decoder(struct loader_info *loader_info)
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     loader_info->size = lc_hdr->load_addr - loader_info->buffer;
 #endif
+
+    rb->commit_discard_idcache();
 
     return hdr->decoder;
 
