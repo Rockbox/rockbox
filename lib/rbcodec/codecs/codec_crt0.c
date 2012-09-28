@@ -33,7 +33,7 @@ int _start(void) {return 0;}
 
 enum codec_status codec_start(enum codec_entry_call_reason reason)
 {
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(USE_ELFLOADER))
     if (reason == CODEC_LOAD)
     {
 #ifdef USE_IRAM

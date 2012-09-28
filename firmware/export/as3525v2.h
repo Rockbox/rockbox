@@ -34,6 +34,10 @@
 #undef IRAM_SIZE
 #define IRAM_SIZE 0x100000
 
+/* entirely in IRAM anyway */
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+
 #define CGU_SDSLOT         (*(volatile unsigned long *)(CGU_BASE + 0x3C))
 
 #undef USB_NUM_ENDPOINTS
