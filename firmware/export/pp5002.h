@@ -21,6 +21,14 @@
 #ifndef __PP5002_H__
 #define __PP5002_H__
 
+/* 96KB of IRAM
+ * half taken by the core
+ */
+#define PLUGIN_IRAMORIG 0x4000c000
+#define PLUGIN_IRAMSIZE 0x0c000
+
+#define NOCACHE_BASE    0x28000000
+#define CACHEALIGN_SIZE 16
 /* Much info gleaned and/or copied from the iPodLinux project. */
 
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
