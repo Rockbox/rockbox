@@ -788,6 +788,8 @@ static void cb_play_game(void) {
 
     /* init PGN history data structures */
     game = pgn_init_game();
+    if (game == NULL)
+        return;
     
     /* restore saved position, if saved */
     cb_restoreposition();
@@ -804,6 +806,9 @@ static void cb_play_game(void) {
             pgn_store_game(game);
             GNUChess_Initialize();
             game = pgn_init_game();
+            if (game == NULL)
+                return;
+
             cb_drawboard();
         }
         command = cb_getcommand ();
@@ -846,6 +851,9 @@ static void cb_play_game(void) {
             case COMMAND_RESTART:
                 GNUChess_Initialize();
                 game = pgn_init_game();
+                if (game == NULL)
+                    return;
+
                 cb_drawboard();
                 break;
 #endif
@@ -864,6 +872,8 @@ static void cb_play_game(void) {
 
                 /* init PGN history data structures */
                 game = pgn_init_game();
+                if (game == NULL)
+                    return;
 
                 /* restore saved position, if saved */
                 cb_restoreposition();

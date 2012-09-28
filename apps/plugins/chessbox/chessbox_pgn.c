@@ -733,6 +733,9 @@ struct pgn_game_node* pgn_init_game(void){
 
     /* create an "end of game" dummy ply and assign defaults */
     ply = (struct pgn_ply_node *)pl_malloc(sizeof ply_size);
+    if (ply == NULL)
+        return NULL;
+
     ply->player = neutral;
     ply->pgn_text[0] = '\0';
     ply->prev_node = NULL;
@@ -740,6 +743,9 @@ struct pgn_game_node* pgn_init_game(void){
 
     /* create the game and assign defaults */
     game = (struct pgn_game_node *)pl_malloc(sizeof game_size);
+    if (game == NULL)
+        return NULL;
+
     game->game_number = 0;
     rb->strcpy(game->white_player,"Player");
     rb->strcpy(game->black_player,"GnuChess");
