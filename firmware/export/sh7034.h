@@ -22,6 +22,9 @@
 #ifndef __SH7034_H__
 #define __SH7034_H__
 
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+
 #define GBR           0x00000000
 
 /* register address macros: */
