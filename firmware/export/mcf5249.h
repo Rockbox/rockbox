@@ -21,6 +21,12 @@
 #ifndef __MCF5249_H__
 #define __MCF5249_H__
 
+/* MCF5249 have 96KB of IRAM
+ * half of which is used by core
+ */
+#define PLUGIN_IRAMORIG 0x1000c000
+#define PLUGIN_IRAMSIZE 0xc000
+
 #define MBAR  0x40000000
 #define MBAR2 0x80000000
 
