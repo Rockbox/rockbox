@@ -131,10 +131,13 @@ int opus_decoder_init(OpusDecoder *st, opus_int32 Fs, int channels)
    return OPUS_OK;
 }
 
+#define STATIC_DECODER_SIZE 26532 /* 26486 for 32bit, 26532 for 64bit environment */
+static char s_dec[STATIC_DECODER_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
+
 OpusDecoder *opus_decoder_create(opus_int32 Fs, int channels, int *error)
 {
    int ret;
-   OpusDecoder *st;
+   OpusDecoder *st = NULL;
    if ((Fs!=48000&&Fs!=24000&&Fs!=16000&&Fs!=12000&&Fs!=8000)
     || (channels!=1&&channels!=2))
    {
@@ -142,7 +145,12 @@ OpusDecoder *opus_decoder_create(opus_int32 Fs, int channels, int *error)
          *error = OPUS_BAD_ARG;
       return NULL;
    }
-   st = (OpusDecoder *)opus_alloc(opus_decoder_get_size(channels));
+
+   if (STATIC_DECODER_SIZE >= opus_decoder_get_size(channels))
+      st = (OpusDecoder *)s_dec;
+   else
+      st = (OpusDecoder *)opus_alloc(opus_decoder_get_size(channels));
+
    if (st == NULL)
    {
       if (error)
