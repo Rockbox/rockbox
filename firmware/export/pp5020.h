@@ -21,6 +21,22 @@
 #ifndef __PP5020_H__
 #define __PP5020_H__
 
+#if (CONFIG_CPU == PP5020)
+/* 96KB of IRAM
+ * partialy taken by the core
+ */
+#define PLUGIN_IRAMORIG 0x4000c000
+#define PLUGIN_IRAMSIZE 0x0c000
+#elif (CONFIG_CPU == PP5022)
+/* 128KB of IRAM
+ * partialy taken by the core
+ */
+#define PLUGIN_IRAMORIG 0x4000c000
+#define PLUGIN_IRAMSIZE 0x14000
+#endif
+
+#define NOCACHE_BASE    0x10000000
+#define CACHEALIGN_SIZE 16
 /* All info gleaned and/or copied from the iPodLinux project. */
 
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */

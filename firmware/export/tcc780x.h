@@ -21,6 +21,14 @@
 #ifndef __TCC780X_H__
 #define __TCC780X_H__
 
+#if (CONFIG_CPU==TCC7801)
+#define PLUGIN_IRAMORIG 0x1000c000
+#define PLUGIN_IRAMSIZE 0xc000
+#else
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+#endif
+
 #define CACHEALIGN_BITS (5)
 
 #define TTB_SIZE      (0x4000)
