@@ -61,6 +61,7 @@ prefixtools () {
  AR=${prefix}ar
  AS=${prefix}as
  OC=${prefix}objcopy
+ STRIP=${prefix}strip
 }
 
 app_set_paths () {
@@ -3734,6 +3735,7 @@ LD=`findtool ${LD} --lit`
 AR=`findtool ${AR} --lit`
 AS=`findtool ${AS} --lit`
 OC=`findtool ${OC} --lit`
+STRIP=`findtool ${STRIP} --lit`
 WINDRES=`findtool ${WINDRES} --lit`
 DLLTOOL=`findtool ${DLLTOOL} --lit`
 DLLWRAP=`findtool ${DLLWRAP} --lit`
@@ -3976,6 +3978,7 @@ export LD=${LD}
 export AR=${AR}
 export AS=${AS}
 export OC=${OC}
+export STRIP=${STRIP}
 export WINDRES=${WINDRES}
 export DLLTOOL=${DLLTOOL}
 export DLLWRAP=${DLLWRAP}

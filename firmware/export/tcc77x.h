@@ -21,6 +21,9 @@
 #ifndef __TCC77X_H__
 #define __TCC77X_H__
 
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+
 #define CACHEALIGN_BITS (5)
 
 /* General-purpose IO */

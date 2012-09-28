@@ -21,6 +21,16 @@
 
 #include <inttypes.h>
 
+#if CONFIG_CPU==S5L8700
+/* S5L8700 have 256KB of IRAM */
+#define PLUGIN_IRAMORIG (0x00000000 + (48*1024))
+#define PLUGIN_IRAMSIZE (208*1024)
+#elif CONFIG_CPU==S5L8701
+/* S5L8701 have 176KB of IRAM */
+#define PLUGIN_IRAMORIG (0x00000000 + (48*1024))
+#define PLUGIN_IRAMSIZE (128*1024)
+#endif
+
 #define REG8_PTR_T  volatile uint8_t *
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
